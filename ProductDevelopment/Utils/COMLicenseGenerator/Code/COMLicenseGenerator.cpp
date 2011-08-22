@@ -312,6 +312,8 @@ BOOL CCOMLicenseGeneratorApp::InitInstance()
 	}
 #endif
 
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
 	// force loading of the COMLMCore.Dll right now so that a following call to
 	// GetModuleHandle() to determine the COMLMCore.DLL's location does not fail
 	HMODULE hCOMLMCore = LoadLibrary("COMLMCore.Dll");
@@ -347,6 +349,8 @@ BOOL CCOMLicenseGeneratorApp::InitInstance()
 	}
 
 	FreeLibrary(hCOMLMCore);
+
+	CoUninitialize();
 
 	// Since the dialog has been closed, return FALSE so that we exit the
 	//  application, rather than start the application's message pump.

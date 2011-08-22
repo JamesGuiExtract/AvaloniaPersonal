@@ -48,11 +48,15 @@ CUserLicenseApp theApp;
 
 BOOL CUserLicenseApp::InitInstance()
 {
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
 	try
 	{
 		// Set up the exception handling aspect.
 		static UCLIDExceptionDlg exceptionDlg;
 		UCLIDException::setExceptionHandler( &exceptionDlg );
+
+		bool bInit = false;
 
 		// If appropriate command line argument has been provided,
 		// initialize the Date-Time file and registry items and return
@@ -60,6 +64,8 @@ BOOL CUserLicenseApp::InitInstance()
 		{
 			if (_stricmp(__argv[1], "/init") == 0)
 			{
+				bInit = true;
+
 				// Get file creation time of UserLicense EXE
 				CFileFind	ffSource;
 				FILETIME	ftCreationTime;
@@ -105,16 +111,19 @@ BOOL CUserLicenseApp::InitInstance()
 					UCLIDException ue( "ELI07480", "Unable to initialize licensing scheme!" );
 					throw ue;
 				}
-
-				return FALSE;
 			}
 		}
 
-		// Run the user license wizard
-		CLicenseWizard wizard("User License");
-		wizard.DoModal();
+		if (!bInit)
+		{
+			// Run the user license wizard
+			CLicenseWizard wizard("User License");
+			wizard.DoModal();
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07450")
+
+	CoUninitialize();
 
 	// Since the dialog has been closed, return FALSE so that we exit the
 	//  application, rather than start the application's message pump.

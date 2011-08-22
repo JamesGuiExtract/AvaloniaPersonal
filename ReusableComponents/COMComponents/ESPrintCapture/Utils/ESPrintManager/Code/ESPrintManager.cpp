@@ -75,6 +75,8 @@ CESPrintManagerApp theApp;
 // CESPrintManagerApp initialization
 BOOL CESPrintManagerApp::InitInstance()
 {
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
 	try
 	{
 		CWinApp::InitInstance();
@@ -88,25 +90,28 @@ BOOL CESPrintManagerApp::InitInstance()
 		if (__argc != 2)
 		{
 			AfxMessageBox("Invalid command line\nUsage:\nESPrintManager <INIFileName>");
-			return FALSE;
 		}
+		else
+		{
+			// Get the INI file from the command line
+			m_strPrintedINIFile = buildAbsolutePath(__argv[1]);
 
-		// Get the INI file from the command line
-		m_strPrintedINIFile = buildAbsolutePath(__argv[1]);
+			// Ensure the file exists
+			validateFileOrFolderExistence(m_strPrintedINIFile);
 
-		// Ensure the file exists
-		validateFileOrFolderExistence(m_strPrintedINIFile);
+			// Read the registry settings
+			readSettingsFromRegistry();
 
-		// Read the registry settings
-		readSettingsFromRegistry();
+			// Process the INI file
+			PrintedImageResults results = processPrintedINIFile();
 
-		// Process the INI file
-		PrintedImageResults results = processPrintedINIFile();
-
-		// Launch the application
-		launchApplication(results);
+			// Launch the application
+			launchApplication(results);
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI22141");
+
+	CoUninitialize();
 
 	// Since the dialog has been closed, return FALSE so that we exit the
 	//  application, rather than start the application's message pump.

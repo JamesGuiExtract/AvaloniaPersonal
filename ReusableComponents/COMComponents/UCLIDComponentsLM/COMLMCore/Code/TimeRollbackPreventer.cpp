@@ -444,8 +444,8 @@ bool TimeRollbackPreventer::decryptDateTimeString(const string& strEncryptedDT,
 			// Decrypt the bytes
 			ByteStream bsEncrypted( strEncryptedDT );
 			ByteStream bsUnencrypted;
-			EncryptionEngine ee;
-			ee.decrypt( bsUnencrypted, bsEncrypted, bsPassword );
+			MapLabel encryptionEngine;
+			encryptionEngine.getMapLabel( bsUnencrypted, bsEncrypted, bsPassword );
 
 			// Extract CTime data from the bytes
 			ByteStreamManipulator bsm( ByteStreamManipulator::kRead, bsUnencrypted );
@@ -519,8 +519,8 @@ bool TimeRollbackPreventer::encryptDateTime(CTime tmTime, const ByteStream& bsPa
 
 			// Encrypt the byte stream
 			ByteStream encryptedByteStream;
-			EncryptionEngine ee;
-			ee.encrypt( encryptedByteStream, unencryptedByteStream, bsPassword );
+			MapLabel encryptionEngine;
+			encryptionEngine.setMapLabel( encryptedByteStream, unencryptedByteStream, bsPassword );
 
 			// Convert the encrypted stream of bytes to an upper-case string
 			strEncryptedDT = encryptedByteStream.asString();
@@ -566,8 +566,8 @@ bool TimeRollbackPreventer::evaluateUnlockCode(string strCode)
 			// Decrypt unlock code
 			//////////////////////
 			//LMData	Data;
-			EncryptionEngine ee;
-			ee.decrypt( decryptedBS, bytes, getUnlockPassword());
+			MapLabel encryptionEngine;
+			encryptionEngine.getMapLabel( decryptedBS, bytes, getUnlockPassword());
 
 			ByteStreamManipulator bsm( ByteStreamManipulator::kRead, decryptedBS );
 
@@ -1197,8 +1197,8 @@ string TimeRollbackPreventer::encryptUnlockStream(const ByteStream& bytes)
 	try
 	{
 		ByteStream			encryptedByteStream;
-		EncryptionEngine	ee;
-		ee.encrypt( encryptedByteStream, bytes, getUnlockPassword() );
+		MapLabel encryptionEngine;
+		encryptionEngine.setMapLabel( encryptedByteStream, bytes, getUnlockPassword() );
 
 		// Convert the encrypted stream of bytes to a string
 		string strResult = encryptedByteStream.asString();
@@ -1221,9 +1221,9 @@ bool TimeRollbackPreventer::getIdentityDataFromUnlockStream(string strCode,
 		swapUnlockCodeChars(strCode);
 		ByteStream bytes(strCode);
 
-		EncryptionEngine ee;
+		MapLabel encryptionEngine;
 		ByteStream decryptedBS;
-		ee.decrypt( decryptedBS, bytes, TimeRollbackPreventer::getUnlockPassword() );
+		encryptionEngine.getMapLabel( decryptedBS, bytes, TimeRollbackPreventer::getUnlockPassword() );
 
 		ByteStreamManipulator bsm( ByteStreamManipulator::kRead, decryptedBS );
 

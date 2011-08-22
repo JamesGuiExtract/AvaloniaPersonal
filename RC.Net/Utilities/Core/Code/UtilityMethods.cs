@@ -21,6 +21,21 @@ namespace Extract.Utilities
         /// Object name used for license validation calls.
         /// </summary>
         readonly static string _OBJECT_NAME = typeof(UtilityMethods).ToString();
+        
+        /// <summary>
+        /// The uppercase letters for use by GetRandomString.
+        /// </summary>
+        const string _UPPERCASE_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        /// <summary>
+        /// The lowercase letters for use by GetRandomString.
+        /// </summary>
+        const string _LOWERCASE_LETTERS = "abcdefghijklmnopqrstuvwxyz";
+
+        /// <summary>
+        /// The digits for use by GetRandomString
+        /// </summary>
+        const string _DIGITS = "0123456789";
 
         #endregion Constants
 
@@ -356,6 +371,41 @@ namespace Extract.Utilities
             {
                 throw ex.AsExtract("ELI31890");
             }
+        }
+
+        /// <summary>
+        /// Generates a random string.
+        /// </summary>
+        /// <param name="size">The size of the string to produce.</param>
+        /// <param name="uppercase"><see langword="true"/> to include uppercase letters.</param>
+        /// <param name="lowercase"><see langword="true"/> to include lowercase letters.</param>
+        /// <param name="digits"><see langword="true"/> to include digits.</param>
+        /// <returns>A random string.</returns>
+        public static string GetRandomString(int size, bool uppercase, bool lowercase, bool digits)
+        {
+            try 
+	        {	        
+                ExtractException.Assert("ELI33379", "GetRandomString: empty character domain.",
+                    uppercase || lowercase || digits);
+
+		        Random random = new Random();
+                string charDomain = (uppercase ? _UPPERCASE_LETTERS : "") +
+                                    (lowercase ? _LOWERCASE_LETTERS : "") +
+                                    (digits ? _DIGITS : "");
+                int domainSize = charDomain.Length;
+
+                StringBuilder sb = new StringBuilder(size);
+                for (int i = 0; i < size; i++)
+                {
+                    sb.Append(charDomain[random.Next(domainSize)]);
+                }
+
+                return sb.ToString();
+	        }
+	        catch (Exception ex)
+	        {
+		        throw ex.AsExtract("ELI33378");
+	        }
         }
     }
 }

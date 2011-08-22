@@ -1,4 +1,6 @@
+using Extract.Encryption;
 using Extract.Interfaces;
+using Extract.Licensing;
 using Microsoft.Win32;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -18,6 +20,19 @@ namespace Extract.Utilities
     /// </summary>
     public static class FileSystemMethods
     {
+        #region Constants
+
+        /// <summary>
+        /// The passwords used to authenticate the secure file deleter.
+        /// Use in order: 3, 0, 2, 1
+        /// </summary>
+        const uint _SECURE_AUTH_KEY_00 = 0x2109429A;
+        const uint _SECURE_AUTH_KEY_01 = 0xFF4ED600;
+        const uint _SECURE_AUTH_KEY_02 = 0x0584CC2A;
+        const uint _SECURE_AUTH_KEY_03 = 0x6F5519FE;
+
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
@@ -875,28 +890,7 @@ namespace Extract.Utilities
 	        {
                 if (secureDeleteFile)
                 {
-                    lock (_secureFileDeleterLock)
-                    {
-                        if (_secureFileDeleter == null)
-                        {
-                            // Instantiate the deleter
-                            Type deleterType =
-                                Type.GetTypeFromProgID(_registry.Settings.SecureDeleter);
-                            if (deleterType == null)
-                            {
-                                ExtractException ee = new ExtractException("ELI32875",
-                                    "Failed to find registered secure file deleter.");
-                                ee.AddDebugData("Deleter Type", _registry.Settings.SecureDeleter,
-                                    false);
-                                throw ee;
-                            }
-
-                            _secureFileDeleter =
-                                (ISecureFileDeleter)Activator.CreateInstance(deleterType);
-                        }
-                    }
-
-                    _secureFileDeleter.SecureDeleteFile(fileName, throwIfUnableToDeleteSecurely);
+                    GetSecureFileDeleter().SecureDeleteFile(fileName, throwIfUnableToDeleteSecurely);
                 }
                 else
                 {
@@ -909,6 +903,74 @@ namespace Extract.Utilities
 	        {
 		        throw ex.AsExtract("ELI32876");
 	        }
+        }
+
+        /// <summary>
+        /// Gets and authenticates the configured secure file deleter.
+        /// </summary>
+        /// <returns>The configured secure file deleter.</returns>
+        static ISecureFileDeleter GetSecureFileDeleter()
+        {
+            lock (_secureFileDeleterLock)
+            {
+                if (_secureFileDeleter == null)
+                {
+                    try
+                    {
+                        // Instantiate the deleter
+                        Type deleterType =
+                            Type.GetTypeFromProgID(_registry.Settings.SecureDeleter);
+                        if (deleterType == null)
+                        {
+                            ExtractException ee = new ExtractException("ELI32875",
+                                "Failed to find registered secure file deleter.");
+                            ee.AddDebugData("Deleter Type", _registry.Settings.SecureDeleter,
+                                false);
+                            throw ee;
+                        }
+
+                        _secureFileDeleter =
+                            (ISecureFileDeleter)Activator.CreateInstance(deleterType);
+
+                        // Generate a random key, use it to call authenticate, then test that the same
+                        // result (interpreted as a hex string) is achieved by encrypting the key with the
+                        // secure file deleter authenticaion password.
+                        string key = UtilityMethods.GetRandomString(32, true, true, true);
+                        string response = _secureFileDeleter.Authenticate(key);
+
+                        // Load the secure file deleter authenticaion password
+                        byte[] password = new byte[16];
+                        BitConverter.GetBytes(_SECURE_AUTH_KEY_03).CopyTo(password, 0);
+                        BitConverter.GetBytes(_SECURE_AUTH_KEY_00).CopyTo(password, 4);
+                        BitConverter.GetBytes(_SECURE_AUTH_KEY_02).CopyTo(password, 8);
+                        BitConverter.GetBytes(_SECURE_AUTH_KEY_01).CopyTo(password, 12);
+
+                        // Create streams for the key data and encrypted result.
+                        using (MemoryStream stream =
+                            new MemoryStream(Encoding.ASCII.GetBytes(key)))
+                        using (MemoryStream encryptedStream = new MemoryStream())
+                        {
+                            // Preform the encryption, then ensure the result matches the
+                            // authentication response.
+                            ExtractEncryption.SetMapLabel(stream, encryptedStream, password,
+                                new MapLabel());
+
+                            string encryptedString = encryptedStream.ToArray().ToHexString();
+                            ExtractException.Assert("ELI33380",
+                                "Secure file deletion authentication failed.",
+                                string.Compare(encryptedString, response,
+                                    StringComparison.OrdinalIgnoreCase) == 0);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _secureFileDeleter = null;
+                        throw ex.AsExtract("ELI33387");
+                    }
+                }
+            }
+
+            return _secureFileDeleter;
         }
 
         /// <overloads>Will attempt to delete a specified file and return whether the

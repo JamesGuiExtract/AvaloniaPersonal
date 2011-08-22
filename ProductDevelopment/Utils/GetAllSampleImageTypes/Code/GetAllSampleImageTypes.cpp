@@ -1432,6 +1432,8 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 {
 	int nRetCode = 0;
 
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
 	try
 	{
 		try
@@ -1552,6 +1554,8 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 		ue.display();
 		nRetCode = 1;
 	}
+
+	CoUninitialize();
 
 	return nRetCode;
 }

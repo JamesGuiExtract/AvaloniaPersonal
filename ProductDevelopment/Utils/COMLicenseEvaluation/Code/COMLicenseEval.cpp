@@ -154,6 +154,8 @@ CCOMLicenseEvalApp theApp;
 
 BOOL CCOMLicenseEvalApp::InitInstance()
 {
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
 	AfxEnableControlContainer();
 
 	try
@@ -201,6 +203,8 @@ BOOL CCOMLicenseEvalApp::InitInstance()
 		FreeLibrary(hCOMLMCore);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12142")
+
+	CoUninitialize();
 
 	// Since the dialog has been closed, return FALSE so that we exit the
 	//  application, rather than start the application's message pump.

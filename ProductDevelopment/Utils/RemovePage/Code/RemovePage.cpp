@@ -101,6 +101,8 @@ int main(int argc, char *argv[])
 			return EXIT_FAILURE;
 		}
 
+		CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
 		// get the root directory
 		string strRootDir = argv[1];
 		// make filename with a full path; if it doesn't have a path make it the current dir
@@ -110,6 +112,8 @@ int main(int argc, char *argv[])
 		return EXIT_SUCCESS;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08557")
+
+	CoUninitialize();
 
 		// if we reached here, it's because an exception was caught.
 	cout << endl;

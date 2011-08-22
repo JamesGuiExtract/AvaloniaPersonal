@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Extract.Encryption;
+using Extract.Licensing;
+using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace Extract.Utilities.SecureFileDeleters
 {
@@ -37,6 +40,15 @@ namespace Extract.Utilities.SecureFileDeleters
         /// date/time stamps may be set to.
         /// </summary>
         static readonly int _RANDOM_TIME_SPAN = _SECONDS_PER_YEAR * 3;
+
+        /// <summary>
+        /// The passwords used to authenticate the secure file deleter.
+        /// Use in order: 3, 0, 2, 1
+        /// </summary>
+        const uint _SECURE_AUTH_KEY_00 = 0x2109429A;
+        const uint _SECURE_AUTH_KEY_01 = 0xFF4ED600;
+        const uint _SECURE_AUTH_KEY_02 = 0x0584CC2A;
+        const uint _SECURE_AUTH_KEY_03 = 0x6F5519FE;
 
         #endregion Constants
 
@@ -144,6 +156,41 @@ namespace Extract.Utilities.SecureFileDeleters
         #endregion Properties
 
         #region Methods
+
+        /// <summary>
+        /// Authenticates this <see cref="SecureFileDeleterBase"/> instance.
+        /// </summary>
+        /// <param name="key">The authentication key.</param>
+        /// <returns>The authentication value.</returns>
+        public string Authenticate(string key)
+        {
+            try
+            {
+                // So that the caller can verify that this is an Extract Systems implementation,
+                // it will expect the result to be a hex string representing the key encrypted with
+                // Extract Systems legacy (ICE) encryption.
+                byte[] password = new byte[16];
+                BitConverter.GetBytes(_SECURE_AUTH_KEY_03).CopyTo(password, 0);
+                BitConverter.GetBytes(_SECURE_AUTH_KEY_00).CopyTo(password, 4);
+                BitConverter.GetBytes(_SECURE_AUTH_KEY_02).CopyTo(password, 8);
+                BitConverter.GetBytes(_SECURE_AUTH_KEY_01).CopyTo(password, 12);
+
+                using (MemoryStream stream =
+                    new MemoryStream(Encoding.ASCII.GetBytes(key)))
+                using (MemoryStream encryptedStream = new MemoryStream())
+                {
+                    ExtractEncryption.SetMapLabel(stream, encryptedStream, password,
+                        new MapLabel());
+
+                    string encryptedString = encryptedStream.ToArray().ToHexString();
+                    return encryptedString;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI33381", "Secure file deletion authentication failed.");
+            }
+        }
 
         /// <summary>
         /// Securely deletes the specified <see paramref="fileName"/>.
@@ -511,8 +558,10 @@ namespace Extract.Utilities.SecureFileDeleters
         {
             try
             {
-                var rng = new RNGCryptoServiceProvider();
-                rng.GetBytes(buffer);
+                using (var rng = new RNGCryptoServiceProvider())
+                {
+                    rng.GetBytes(buffer);
+                }
             }
             catch (Exception ex)
             {

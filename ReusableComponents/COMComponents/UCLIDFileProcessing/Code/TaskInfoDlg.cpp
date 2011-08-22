@@ -8,6 +8,7 @@
 #include <UCLIDException.h>
 #include <TemporaryResourceOverride.h>
 #include <cpputil.h>
+#include <DateUtil.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -75,8 +76,8 @@ void TaskInfoDlg::setTask(const FileProcessingRecord& task)
 	else
 	{
 		// TESTTHIS: was the code change here during the VS2005 port valid
-		tm _tm;
-		m_taskFileProcessing.m_stopWatch.getBeginTime().GetLocalTm(&_tm);
+		tm _tm  = systemTimeToTm(m_taskFileProcessing.m_stopWatch.getBeginTime());
+
 		// the display string
 		char pszTemp[256];
 		if (asctime_s(pszTemp, sizeof(pszTemp), &_tm) != 0)

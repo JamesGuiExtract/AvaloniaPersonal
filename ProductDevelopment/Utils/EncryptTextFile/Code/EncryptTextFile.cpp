@@ -78,6 +78,8 @@ int main(int argc, char* argv[])
 			return EXIT_FAILURE;
 		}
 
+		CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
 		// get the names of the input and output files
 		string strInputFile = argv[1];
 		
@@ -107,8 +109,8 @@ int main(int argc, char* argv[])
 
 		// compile the input file and save compiled results 
 		// as the specified output file
-		EncryptedFileManager efm;
-		efm.encrypt(strInputFile, strOutputFile);
+		MapLabelManager encryptedFileManager;
+		encryptedFileManager.setMapLabel(strInputFile, strOutputFile);
 
 		// display message indicating that encrypting is over
 		cout << "Encryption successfully completed." << endl;
@@ -163,6 +165,8 @@ int main(int argc, char* argv[])
 		return EXIT_SUCCESS;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06603")
+
+	CoUninitialize();
 
 	// if we reached here, it's because an exception was caught
 	return EXIT_FAILURE;

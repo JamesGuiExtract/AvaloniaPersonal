@@ -383,9 +383,9 @@ vector<string> PatternFileInterpreter::convertToLines(const string& strInput, bo
 		if (_strcmpi(getExtensionFromFullPath(strInput).c_str(), ".etf") == 0)
 		{
 			// Open an input file, which is encrypted
-			EncryptedFileManager efm;
+			MapLabelManager encryptedFileManager;
 			// decrypt the file
-			vecLines = efm.decryptTextFile(strInput);
+			vecLines = encryptedFileManager.getMapLabel(strInput);
 		}
 		else
 		{

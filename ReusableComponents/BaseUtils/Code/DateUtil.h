@@ -22,6 +22,9 @@
 
 using namespace std;
 
+// The number of SYSTEMTIME "ticks" in a second.
+#define ST_SECOND 10000000
+
 //-------------------------------------------------------------------------------------------------
 // PROMISE:	Returns Sunday, Monday, Tuesday, etc. for lNumber = 1, 2, 3, etc.  Returns empty string 
 //			if lNumber < 1 OR lNumber > 7.
@@ -90,4 +93,13 @@ EXPORT_BaseUtils bool isValidDate(string strDate, long *plMonth, long *plDay, lo
 //
 EXPORT_BaseUtils bool isValidTime(const string& strWord, long* lHour, long* lMinute, long* lSecond, 
 								  bool* bFoundAMPM, bool* bIsAM);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: Converts the provided SYSTEMTIME argument into a tm struct
+EXPORT_BaseUtils tm systemTimeToTm(const SYSTEMTIME &st);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: Converts the provided SYSTEMTIME argument into a ULONGLONG
+EXPORT_BaseUtils ULONGLONG asULongLong(const SYSTEMTIME &st);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: Formats that provided SYSTEMTIME using a strftime format specification
+EXPORT_BaseUtils string formatSystemTime(const SYSTEMTIME &st, const string& strFormat);
 //-------------------------------------------------------------------------------------------------

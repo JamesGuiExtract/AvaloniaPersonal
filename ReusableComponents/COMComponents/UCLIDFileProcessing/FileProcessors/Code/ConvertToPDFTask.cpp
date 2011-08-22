@@ -669,8 +669,8 @@ void CConvertToPDFTask::encryptString(string& rstrString)
 	bsmBytes.flushToByteStream(8);
 
 	ByteStream encrypted;
-	EncryptionEngine ee;
-	ee.encrypt(encrypted, bytes, bytesKey);
+	MapLabel encryptionEngine;
+	encryptionEngine.setMapLabel(encrypted, bytes, bytesKey);
 
 	rstrString = encrypted.asString();
 }

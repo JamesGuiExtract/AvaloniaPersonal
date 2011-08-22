@@ -183,8 +183,8 @@ string LMData::compressData(bool bAddDashes)
 
 	// Encrypt the byte stream
 	ByteStream			encryptedByteStream;
-	EncryptionEngine	ee;
-	ee.encrypt( encryptedByteStream, bytes, getUserLicensePassword() );
+	MapLabel encryptionEngine;
+	encryptionEngine.setMapLabel( encryptedByteStream, bytes, getUserLicensePassword() );
 
 	// Convert the encrypted stream of bytes to a string
 	strResult = encryptedByteStream.asString();
@@ -262,8 +262,8 @@ string LMData::compressDataToString(unsigned long ulKey1, unsigned long ulKey2,
 
 	// Encrypt the byte stream
 	ByteStream			encryptedByteStream;
-	EncryptionEngine	ee;
-	ee.encrypt( encryptedByteStream, bytesLicense, bytesKey );
+	MapLabel encryptionEngine;
+	encryptionEngine.setMapLabel( encryptedByteStream, bytesLicense, bytesKey );
 
 	// Convert the encrypted stream of bytes to a string
 	strOutput = encryptedByteStream.asString();
@@ -313,8 +313,8 @@ void LMData::extractData(string strLicenseKey)
 		ByteStream decryptedBS;
 
 		// Decrypt the string here
-		EncryptionEngine ee;
-		ee.decrypt( decryptedBS, bytes, getUserLicensePassword() );
+		MapLabel encryptionEngine;
+		encryptionEngine.getMapLabel( decryptedBS, bytes, getUserLicensePassword() );
 
 		ByteStreamManipulator bsm( ByteStreamManipulator::kRead, decryptedBS );
 
@@ -448,8 +448,8 @@ void LMData::extractDataFromString(const string& strLicenseString,
 	ByteStream decryptedBS;
 
 	// Decrypt and convert to string
-	EncryptionEngine ee;
-	ee.decrypt( decryptedBS, bytes, bytesKey );
+	MapLabel encryptionEngine;
+	encryptionEngine.getMapLabel( decryptedBS, bytes, bytesKey );
 
 	// Extract the original license string
 	ByteStreamManipulator bsm( ByteStreamManipulator::kRead, decryptedBS );
@@ -788,8 +788,8 @@ void LMData::setUserString(const string& strData)
 		ByteStream decryptedBS;
 
 		// Decrypt the string here
-		EncryptionEngine ee;
-		ee.decrypt( decryptedBS, bytes, getUserLicensePassword() );
+		MapLabel encryptionEngine;
+		encryptionEngine.getMapLabel( decryptedBS, bytes, getUserLicensePassword() );
 
 		ByteStreamManipulator bsm( ByteStreamManipulator::kRead, decryptedBS );
 
@@ -822,8 +822,8 @@ string LMData::getUserLicenseString()
 	bsm.flushToByteStream(8);
 
 	ByteStream encrypted;
-	EncryptionEngine ee;
-	ee.encrypt(encrypted, bytes, getUserLicensePassword());
+	MapLabel encryptionEngine;
+	encryptionEngine.setMapLabel(encrypted, bytes, getUserLicensePassword());
 
 	// Convert the encrypted stream of bytes to a string
 	string strResult = encrypted.asString();

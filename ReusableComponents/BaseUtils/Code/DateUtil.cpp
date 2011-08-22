@@ -724,3 +724,33 @@ bool isValidTime(const string& strWord, long* lHour, long* lMinute, long* lSecon
 	}
 }
 //-------------------------------------------------------------------------------------------------
+EXPORT_BaseUtils tm systemTimeToTm(const SYSTEMTIME &st)
+{
+	tm tm_time;
+	ZeroMemory(&tm_time, sizeof(tm_time));
+
+	tm_time.tm_year = st.wYear - 1900;
+	tm_time.tm_mon = st.wMonth - 1;
+	tm_time.tm_mday = st.wDay;
+	tm_time.tm_hour = st.wHour;
+	tm_time.tm_min = st.wMinute;
+	tm_time.tm_sec = st.wSecond;
+	
+	return tm_time;
+}
+//-------------------------------------------------------------------------------------------------
+EXPORT_BaseUtils ULONGLONG asULongLong(const SYSTEMTIME& st)
+{
+	FILETIME ft;
+	SystemTimeToFileTime(&st, &ft);
+
+	return (((ULONGLONG) ft.dwHighDateTime) << 32) + ft.dwLowDateTime;		
+}//-------------------------------------------------------------------------------------------------
+EXPORT_BaseUtils string formatSystemTime(const SYSTEMTIME &st, const string& strFormat)
+{
+	tm _tm = systemTimeToTm(st);
+	char szBuf[256] = {0};
+	strftime(szBuf, sizeof(szBuf), strFormat.c_str(), &_tm);
+    return string(szBuf);
+}
+//-------------------------------------------------------------------------------------------------

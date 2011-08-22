@@ -138,8 +138,8 @@ void decryptString(string& rstrEncryptedString)
 	// Decrypt the string
 	ByteStream bytes(rstrEncryptedString);
 	ByteStream decrypted;
-	EncryptionEngine ee;
-	ee.decrypt(decrypted, bytes, bytesKey);
+	MapLabel encryptionEngine;
+	encryptionEngine.getMapLabel(decrypted, bytes, bytesKey);
 
 	// Get the decrypted string
 	ByteStreamManipulator bsm (ByteStreamManipulator::kRead, decrypted);
@@ -690,6 +690,8 @@ BOOL CImageFormatConverterApp::InitInstance()
 						"Cannot apply passwords to non-PDF file type.");
 				}
 
+				CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
 				// Check if the passwords need to be decrypted
 				if (bEncryptedPasswords)
 				{
@@ -747,6 +749,8 @@ BOOL CImageFormatConverterApp::InitInstance()
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15899");
+
+	CoUninitialize();
 
 	// Since the dialog has been closed, return FALSE so that we exit the
 	//  application, rather than start the application's message pump.

@@ -351,8 +351,8 @@ void autoEncryptFile(const string& strFile, const string& strRegistryKey)
 				}
 
 				// Encrypt the base file to the temporary filename
-				static EncryptedFileManager efm;
-				efm.encrypt(strBaseFile, strTempEncryptionFile);
+				static MapLabelManager encryptedFileManager;
+				encryptedFileManager.setMapLabel(strBaseFile, strTempEncryptionFile);
 
 				// Once the encryption process is complete, copy it into the real destination.
 				copyFile(strTempEncryptionFile, strFile);

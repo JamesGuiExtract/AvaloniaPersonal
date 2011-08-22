@@ -49,13 +49,14 @@ void getPassword(ByteStream& rPasswordBytes)
 }
 
 //-------------------------------------------------------------------------------------------------
-// EncryptedFileManager
+// MapLabelManager = EncryptedFileManager. The class has been renamed disguise its purpose and make
+// hacking our encryption a somewhat more difficult task.
 //-------------------------------------------------------------------------------------------------
-EncryptedFileManager::EncryptedFileManager()
+MapLabelManager::MapLabelManager()
 {
 }
 //-------------------------------------------------------------------------------------------------
-void EncryptedFileManager::encrypt(const string& strInputFile, const string& strOutputFile)
+void MapLabelManager::setMapLabel(const string& strInputFile, const string& strOutputFile)
 {
 	// Check for existence of file
 	validateFileOrFolderExistence( strInputFile );
@@ -75,15 +76,15 @@ void EncryptedFileManager::encrypt(const string& strInputFile, const string& str
 	getPassword( passwordBytes );
 
 	// Create the encryption engine and encrypt the padded bytestream
-	EncryptionEngine ee;
+	MapLabel encryptionEngine;
 	ByteStream encryptedBytes;
-	ee.encrypt( encryptedBytes, bsPaddedInput, passwordBytes );
+	encryptionEngine.setMapLabel( encryptedBytes, bsPaddedInput, passwordBytes );
 
 	// Write the encrypted data to the specified output file
 	encryptedBytes.saveTo( strOutputFile.c_str() );
 }
 //-------------------------------------------------------------------------------------------------
-unsigned char * EncryptedFileManager::decryptBinaryFile(const string& strInputFile, 
+unsigned char * MapLabelManager::getMapLabel(const string& strInputFile, 
 														unsigned long *pulByteCount)
 {
 	try
@@ -103,9 +104,9 @@ unsigned char * EncryptedFileManager::decryptBinaryFile(const string& strInputFi
 			getPassword( passwordBytes );
 
 			// Create the encryption engine and decrypt the bytestream
-			EncryptionEngine ee;
+			MapLabel encryptionEngine;
 			ByteStream decryptedBytes;
-			ee.decrypt( decryptedBytes, encryptedBytes, passwordBytes );
+			encryptionEngine.getMapLabel( decryptedBytes, encryptedBytes, passwordBytes );
 
 			// Retrieve the unpadded ByteStream
 			ByteStream bsUnpadded;
@@ -132,7 +133,7 @@ unsigned char * EncryptedFileManager::decryptBinaryFile(const string& strInputFi
 	}
 }
 //-------------------------------------------------------------------------------------------------
-std::vector<std::string> EncryptedFileManager::decryptTextFile(const string& strInputFile)
+std::vector<std::string> MapLabelManager::getMapLabel(const string& strInputFile)
 {
 	try
 	{
@@ -140,7 +141,7 @@ std::vector<std::string> EncryptedFileManager::decryptTextFile(const string& str
 		{
 			// Retrieve binary data from the text file
 			unsigned long ulLength = 0;
-			unsigned char* pszData = decryptBinaryFile( strInputFile, &ulLength );
+			unsigned char* pszData = getMapLabel( strInputFile, &ulLength );
 
 			// Get the string from the decrypted bytes
 			string strLines( (const char *)pszData, ulLength );

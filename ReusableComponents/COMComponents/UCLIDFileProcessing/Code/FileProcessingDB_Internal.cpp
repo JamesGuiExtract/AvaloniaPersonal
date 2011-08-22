@@ -1876,8 +1876,8 @@ string CFileProcessingDB::getEncryptedString(const string strInput)
 
 	// Do the encryption
 	ByteStream encryptedBS;
-	EncryptionEngine ee;
-	ee.encrypt(encryptedBS, bytes, pwBS);
+	MapLabel encryptionEngine;
+	encryptionEngine.setMapLabel(encryptedBS, bytes, pwBS);
 
 	// Return the encrypted value
 	return encryptedBS.asString();
@@ -1977,8 +1977,8 @@ bool  CFileProcessingDB::isPasswordValid(const string& strPassword, bool bUseAdm
 	ByteStream decryptedPW;
 
 	// Decrypt the stored, encrypted PW
-	EncryptionEngine ee;
-	ee.decrypt(decryptedPW, strStoredEncryptedCombined, pwBS);
+	MapLabel encryptionEngine;
+	encryptionEngine.getMapLabel(decryptedPW, strStoredEncryptedCombined, pwBS);
 	ByteStreamManipulator bsm(ByteStreamManipulator::kRead, decryptedPW);
 
 	// Get the decrypted combined username and password from byte stream

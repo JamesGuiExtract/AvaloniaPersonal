@@ -26,6 +26,13 @@ namespace Extract.Interfaces
         }
 
         /// <summary>
+        /// Authenticates the <see cref="ISecureFileDeleter"/> instance.
+        /// </summary>
+        /// <param name="key">The authentication key.</param>
+        /// <returns>The authentication value.</returns>
+        string Authenticate(string key);
+
+        /// <summary>
         /// Securely deletes the specified <see paramref="fileName"/>.
         /// </summary>
         /// <param name="fileName">Name of the file to securely delete.</param>

@@ -1139,7 +1139,9 @@ void FileProcessingDlgStatusPage::updateStatisticsVariablesWithTaskInfo(long nFi
 	try
 	{
 		// Make an interval for this task's processing time
-		TimeInterval interval(task.getStartTime(), CTime::GetCurrentTime());
+		SYSTEMTIME stCurrentTime;
+		GetLocalTime(&stCurrentTime);
+		TimeInterval interval(task.getStartTime(), stCurrentTime);
 
 		// Add the processing time of this task to the total processing time
 		// The merge prevents overlaps from being counted twice.

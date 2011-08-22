@@ -1254,7 +1254,8 @@ namespace Extract.Redaction
         {
             ComAttribute timeInfo = _comAttribute.Create("_TimeInfo");
             ComAttribute date = _comAttribute.Create("_Date", time.Start.ToShortDateString());
-            ComAttribute timeStarted = _comAttribute.Create("_TimeStarted", time.Start.ToLongTimeString());
+            ComAttribute timeStarted = _comAttribute.Create("_TimeStarted",
+                time.Start.ToString("h:mm:ss.fff tt", CultureInfo.CurrentCulture));
             ComAttribute totalSeconds = _comAttribute.Create("_TotalSeconds", time.ElapsedSeconds);
             AttributeMethods.AppendChildren(timeInfo, date, timeStarted, totalSeconds);
 

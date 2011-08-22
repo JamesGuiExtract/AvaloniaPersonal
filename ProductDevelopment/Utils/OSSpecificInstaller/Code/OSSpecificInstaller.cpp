@@ -242,6 +242,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,
                      LPSTR     lpCmdLine,
                      int       nCmdShow)
 {
+	int nReturn = 0;
+
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
 	try
 	{
 		// Get the current directory
@@ -310,14 +314,13 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 				}
 
 				// Run the command
-				int nReturn = RunCommand(strCommand, strDescription);
+				nReturn = RunCommand(strCommand, strDescription);
 
 				// If OS is 64 bit revert file system redirection
 				if (bTurnOf64FSRedirection && fnWow64RevertWow64FsRedirection != NULL)
 				{
 					fnWow64RevertWow64FsRedirection(&pRedirection);
 				}
-				return nReturn;
 			}
 		}
 		else
@@ -329,17 +332,19 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 				MB_OK | MB_TOPMOST | MB_SYSTEMMODAL | MB_ICONEXCLAMATION);
 
 			// Return -1 since the the OS could not be determined.
-			return -1;
-		}		
+			nReturn = -1;
+		}
 	}
 	catch(...)
 	{
 		// Display message that there was an unspecified error.
 		MessageBox(NULL, "There was an unspecified error running the install.", "Install failed", 
 			MB_OK | MB_TOPMOST | MB_SYSTEMMODAL | MB_ICONEXCLAMATION);
-		return -1;
+		nReturn = -1;
 	};
 
-	return 0;
+	CoUninitialize();
+
+	return nReturn;
 }
 //-------------------------------------------------------------------------------------------------

@@ -8,9 +8,11 @@
 
 using namespace std;
 
-void EncryptionEngine::encrypt(ByteStream& cipherByteStream, 
-							   const ByteStream& plainByteStream, 
-							   const ByteStream& passwordByteStream)
+// MapLabel = EncrytionEngine. The class has been renamed disguise its purpose and make hacking our
+// encryption a somewhat more difficult task.
+void MapLabel::setMapLabel(ByteStream& cipherByteStream, 
+						   const ByteStream& plainByteStream, 
+						   const ByteStream& passwordByteStream)
 {
 	// make sure that the length of the password is divisible
 	// by 8, as this is a requirement of using the IceKey engine
@@ -44,9 +46,9 @@ void EncryptionEngine::encrypt(ByteStream& cipherByteStream,
 		ik.encrypt(pszPlainText+i*8, pszCipherText+i*8);
 }
 
-void EncryptionEngine::decrypt(ByteStream& plainByteStream, 
-							   const ByteStream& cipherByteStream, 
-							   const ByteStream& passwordByteStream)
+void MapLabel::getMapLabel(ByteStream& plainByteStream, 
+						   const ByteStream& cipherByteStream, 
+						   const ByteStream& passwordByteStream)
 {
 	// make sure that the length of the password is divisible
 	// by 8, as this is a requirement of using the IceKey engine

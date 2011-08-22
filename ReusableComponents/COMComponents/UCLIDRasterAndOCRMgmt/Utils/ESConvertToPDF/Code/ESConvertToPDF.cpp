@@ -92,6 +92,8 @@ CESConvertToPDFApp theApp;
 //-------------------------------------------------------------------------------------------------
 BOOL CESConvertToPDFApp::InitInstance()
 {
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
 	try
 	{
 		try
@@ -101,30 +103,28 @@ BOOL CESConvertToPDFApp::InitInstance()
 			UCLIDException::setExceptionHandler(&ue_dlg);
 
 			// get valid arguments
-			if( !getAndValidateArguments(__argc, __argv) )
+			if(getAndValidateArguments(__argc, __argv) )
 			{
-				return FALSE;
-			}
+				// validate licensing
+				validateLicense(); 
 
-			// validate licensing
-			validateLicense(); 
+				// do the work
+				convertToSearchablePDF();
 
-			// do the work
-			convertToSearchablePDF();
-
-			// remove the original file if that option was specified
-			if(m_bRemoveOriginal)
-			{
-				// Do not remove the original if the input and output files are the same
-				// [LRCAU #5595]
-				if (!stringCSIS::sEqual(getUNCPath(m_strInputFile), getUNCPath(m_strOutputFile)))
+				// remove the original file if that option was specified
+				if(m_bRemoveOriginal)
 				{
-					deleteFile(m_strInputFile);
+					// Do not remove the original if the input and output files are the same
+					// [LRCAU #5595]
+					if (!stringCSIS::sEqual(getUNCPath(m_strInputFile), getUNCPath(m_strOutputFile)))
+					{
+						deleteFile(m_strInputFile);
+					}
 				}
-			}
 
-			// completed successfully
-			m_bIsError = false;
+				// completed successfully
+				m_bIsError = false;
+			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18536");
 	}
@@ -142,6 +142,8 @@ BOOL CESConvertToPDFApp::InitInstance()
 			ue.log(m_strExceptionLogFile, true);
 		}
 	}
+
+	CoUninitialize();
 
 	return FALSE;
 }
@@ -682,8 +684,8 @@ void CESConvertToPDFApp::decryptString(string& rstrEncryptedString)
 	// Decrypt the string
 	ByteStream bytes(rstrEncryptedString);
 	ByteStream decrypted;
-	EncryptionEngine ee;
-	ee.decrypt(decrypted, bytes, bytesKey);
+	MapLabel encryptionEngine;
+	encryptionEngine.getMapLabel(decrypted, bytes, bytesKey);
 
 	// Get the decrypted string
 	ByteStreamManipulator bsm (ByteStreamManipulator::kRead, decrypted);

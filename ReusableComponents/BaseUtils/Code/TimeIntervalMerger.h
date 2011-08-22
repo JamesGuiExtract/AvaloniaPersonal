@@ -18,7 +18,7 @@ public:
 	// PURPOSE: Constructor
 	// REQUIRE: stopWatch.isRunning() == false
 	//			endTime >= startTime
-	TimeInterval(const CTime& startTime, const CTime& endTime);
+	TimeInterval(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime);
 	TimeInterval(const StopWatch& stopWatch);
 	//---------------------------------------------------------------------------------------------
 	// copy ctor, assignment operator, less than, and equal operator
@@ -34,11 +34,11 @@ public:
 	friend std::ostream& operator << (std::ostream& rStream, const TimeInterval& interval);
 	//---------------------------------------------------------------------------------------------
 	// read-only access to the member variables
-	inline const CTime& getStartTime() const
+	inline const SYSTEMTIME& getStartTime() const
 	{
 		return m_startTime;
 	}
-	inline const CTime& getEndTime() const
+	inline const SYSTEMTIME& getEndTime() const
 	{
 		return m_endTime;
 	}
@@ -46,8 +46,8 @@ public:
 
 private:
 	// member variables
-	CTime m_startTime;
-	CTime m_endTime;
+	SYSTEMTIME m_startTime;
+	SYSTEMTIME m_endTime;
 };
 
 //-------------------------------------------------------------------------------------------------

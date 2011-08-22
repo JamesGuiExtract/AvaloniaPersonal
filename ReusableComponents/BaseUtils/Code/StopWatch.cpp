@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "StopWatch.h"
 #include "UCLIDException.h"
+#include "DateUtil.h"
 
 // global / static member variables
 bool StopWatch::ms_bHighResSupported = false;
@@ -58,8 +59,8 @@ void StopWatch::reset()
 	//getCurrentTime(m_startTime, m_startCounter);
 	m_startCounter.QuadPart = 0;
 	m_endCounter.QuadPart = 0;
-	m_endTime = 0;
-	m_startTime = 0;
+	ZeroMemory(&m_endTime, sizeof(m_endTime));
+	ZeroMemory(&m_startTime, sizeof(m_endTime));
 	m_fElapsedTime = 0;
 	m_bIsReset = true;
 	m_bIsRunning = false;
@@ -86,7 +87,7 @@ double StopWatch::getElapsedTime() const
 {
 	if (m_bIsRunning && !m_bIsReset)
 	{
-		CTime endTime;
+		SYSTEMTIME endTime;
 		LARGE_INTEGER endCounter;
 		
 		getCurrentTime(endTime, endCounter);
@@ -143,7 +144,7 @@ bool StopWatch::isReset()
 	return m_bIsReset;
 }
 //-------------------------------------------------------------------------------------------------
-const CTime& StopWatch::getBeginTime() const
+const SYSTEMTIME& StopWatch::getBeginTime() const
 {
 	if(m_bIsReset)
 	{
@@ -156,7 +157,7 @@ const CTime& StopWatch::getBeginTime() const
 	}
 }
 //-------------------------------------------------------------------------------------------------
-const CTime& StopWatch::getEndTime() const
+const SYSTEMTIME& StopWatch::getEndTime() const
 {
 	// ensure that the stop watch is not running
 	if (m_bIsRunning)
@@ -173,10 +174,10 @@ const CTime& StopWatch::getEndTime() const
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------
-void StopWatch::getCurrentTime(CTime& rendTime, LARGE_INTEGER& rendCounter) const
+void StopWatch::getCurrentTime(SYSTEMTIME& rendTime, LARGE_INTEGER& rendCounter) const
 {
 	// get the end time
-	rendTime = CTime::GetCurrentTime();
+	GetLocalTime(&rendTime);
 
 	// get the end-counter
 	if (QueryPerformanceCounter(&rendCounter) == 0)
@@ -188,23 +189,22 @@ void StopWatch::getCurrentTime(CTime& rendTime, LARGE_INTEGER& rendCounter) cons
 	}
 }
 //-------------------------------------------------------------------------------------------------
-double StopWatch::getLowResElapsedTime(const CTime& endTime) const
+double StopWatch::getLowResElapsedTime(const SYSTEMTIME& endTime) const
 {
 	// if the end time is less than the start time log an exception
-	if (endTime < m_startTime)
+	if (asULongLong(endTime) < asULongLong(m_startTime))
 	{
 		UCLIDException ue("ELI20436", "End time is less than the start time!");
-		ue.addDebugInfo("Start time", asString(m_startTime.GetTime()));
-		ue.addDebugInfo("End time", asString(endTime.GetTime()));
 		
 		// Log the exception for debug purposes and return 0
 		ue.log();
 		return 0.0;
 	}
 
-	// return the elapsed time
-	CTimeSpan duration = endTime - m_startTime;
-	return (double) duration.GetTotalSeconds();
+	// return the elapsed time in seconds
+	ULONGLONG qwSpan = asULongLong(m_endTime) - asULongLong(m_startTime);
+
+	return (double) qwSpan / ST_SECOND;
 }
 //-------------------------------------------------------------------------------------------------
 double StopWatch::getHighResElapsedTime(const LARGE_INTEGER& endCounter) const

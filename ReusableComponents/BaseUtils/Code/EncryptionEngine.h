@@ -4,14 +4,18 @@
 
 class ByteStream;
 
-class EXPORT_BaseUtils EncryptionEngine
+// MapLabel = EncrytionEngine. The class has been renamed disguise its purpose and make hacking our
+// encryption a somewhat more difficult task.
+class EXPORT_BaseUtils MapLabel
 {
 public:
+	// encrypt
 	// require: plainByteStream.getLength() % 8 = 0;
-	void encrypt(ByteStream& cipherByteStream, const ByteStream& plainByteStream, 
+	void setMapLabel(ByteStream& cipherByteStream, const ByteStream& plainByteStream, 
 		const ByteStream& passwordByteStream);
 
+	// decrypt
 	// require: cipherByteStream.getLength() % 8 = 0;
-	void decrypt(ByteStream& plainByteStream, const ByteStream& cipherByteStream,
+	void getMapLabel(ByteStream& plainByteStream, const ByteStream& cipherByteStream,
 		const ByteStream& passwordByteStream);
 };

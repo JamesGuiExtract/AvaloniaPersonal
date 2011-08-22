@@ -707,7 +707,10 @@ bool FileProcessingDlgReportPage::setTimeRemainingRows()
 		}
 
 		// Find how many seconds have passed since the oldest snapshot
-		TimeInterval interval(rOldestSnapshotInVector.getTime(), currentTime);
+		SYSTEMTIME stOldest, stCurrent;
+		rOldestSnapshotInVector.getTime().GetAsSystemTime(stOldest);
+		currentTime.GetAsSystemTime(stCurrent);
+		TimeInterval interval(stOldest, stCurrent);
 		unsigned long nSeconds = interval.getTotalSeconds();
 		_lastCodePos = "70";
 		
@@ -869,7 +872,10 @@ bool FileProcessingDlgReportPage::setTimeRemainingRows()
 			if ( ipActionStatsRecent->NumBytesComplete == ipActionStatsNew->NumBytesComplete )
 			{
 				// Get the amount of time that has passed since reliable processing has taken place
-				TimeInterval interval(m_TimeOfLastProcess, currentTime);
+				SYSTEMTIME stTimeOfLastProcess, stCurrentTime;
+				m_TimeOfLastProcess.GetAsSystemTime(stTimeOfLastProcess);
+				currentTime.GetAsSystemTime(stCurrentTime);
+				TimeInterval interval(stTimeOfLastProcess, stCurrentTime);
 				_lastCodePos = "320";
 
 				// Split the time into a meaningful format

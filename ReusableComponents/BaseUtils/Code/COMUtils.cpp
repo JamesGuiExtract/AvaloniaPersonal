@@ -825,7 +825,7 @@ void readStorageFromEncryptedFile(IStorage** ppStorage, BSTR bstrFileName)
 	string strFileName = asString(bstrFileName);
 
 	// Create the EncryptedFileManager
-	EncryptedFileManager efm;
+	MapLabelManager encryptedFileManager;
 	unsigned long ulByteCount = 0;
 	unsigned long ulWritten = 0;
 	unsigned char* pucDecryptedBytes = NULL;
@@ -834,7 +834,7 @@ void readStorageFromEncryptedFile(IStorage** ppStorage, BSTR bstrFileName)
 	try
 	{
 		// Decrypt the encrypted file
-		pucDecryptedBytes = efm.decryptBinaryFile(strFileName, &ulByteCount);
+		pucDecryptedBytes = encryptedFileManager.getMapLabel(strFileName, &ulByteCount);
 
 		// Create the LockBytes object
 		ILockBytesPtr ipLockBytes;

@@ -258,6 +258,8 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 					return EXIT_FAILURE;
 				}
 
+				CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
 				// Get the file name from the command line
 				string strComponentIDFile(argv[1]);
 
@@ -356,6 +358,8 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 			cerr << "Exception: ,,,,,," << uex.asStringizedByteStream() << endl;
 		}
 	}
+
+	CoUninitialize();
 
 	return EXIT_SUCCESS;
 }

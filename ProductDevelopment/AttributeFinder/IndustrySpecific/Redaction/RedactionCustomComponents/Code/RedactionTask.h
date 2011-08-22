@@ -194,7 +194,7 @@ private:
 
 	// Adds a metadata attribute to the specified voa file using the specified information
 	void storeMetaData(const string& strVoaFile, IIUnknownVectorPtr ipAttributes, 
-		IIUnknownVectorPtr ipRedactedAttributes, CTime tStartTime, double dSeconds, 
+		IIUnknownVectorPtr ipRedactedAttributes, SYSTEMTIME tStartTime, double dSeconds, 
 		const string& strSourceDocument, const string& strRedactedImage, bool bOverwroteOutput);
 
 	// Gets next attribute id from the specified attributes
@@ -217,14 +217,14 @@ private:
 
 	// Creates a metadata attribute using the specified information
 	IAttributePtr createMetaDataAttribute(long lSession, const string& strVoaFile, 
-		IIUnknownVectorPtr ipRedactedAttributes, CTime tStartTime, double dElapsedSeconds, 
+		IIUnknownVectorPtr ipRedactedAttributes, SYSTEMTIME tStartTime, double dElapsedSeconds, 
 		const string& strSourceDocument, const string& strRedactedImage, bool bOverwroteOutput);
 
 	// Creates the user info attribute
 	IAttributePtr createUserInfoAttribute(const string& strSourceDocument);
 
 	// Creates the time info attribute
-	IAttributePtr createTimeInfoAttribute(const string& strSourceDocument, CTime tStartTime, 
+	IAttributePtr createTimeInfoAttribute(const string& strSourceDocument, SYSTEMTIME tStartTime, 
 		double dElapsedSeconds);
 
 	// Creates the redacted categories attribute

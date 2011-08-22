@@ -121,8 +121,8 @@ SafeNetPasswords::SafeNetPasswords()
 	
 	// Decrypt the safenet passwords
 	ByteStream decryptedPasswords;
-	EncryptionEngine ee;
-	ee.decrypt(decryptedPasswords, encryptedPasswords, passwordBytes );
+	MapLabel encryptionEngine;
+	encryptionEngine.getMapLabel(decryptedPasswords, encryptedPasswords, passwordBytes );
 
 	ByteStreamManipulator bsmDecrypted(ByteStreamManipulator::kRead, decryptedPasswords);
 	bsmDecrypted >> wDeveloperID;

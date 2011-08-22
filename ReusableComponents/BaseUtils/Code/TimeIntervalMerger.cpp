@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "TimeIntervalMerger.h"
 #include "UCLIDException.h"
+#include "DateUtil.h"
 
 #include <algorithm>
 
@@ -26,20 +27,20 @@ static const string& gstrTIME_DEBUG_INFO_FORMAT = "%#c";
 //-------------------------------------------------------------------------------------------------
 // TimeInterval class
 //-------------------------------------------------------------------------------------------------
-TimeInterval::TimeInterval(const CTime& startTime, const CTime& endTime)
+TimeInterval::TimeInterval(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
 :m_startTime(startTime), m_endTime(endTime)
 {
 	try
 	{
 		// ensure proper argument
-		ASSERT_ARGUMENT("ELI11117", m_endTime >= m_startTime);
-		ASSERT_ARGUMENT("ELI11128", m_endTime >= 0);
-		ASSERT_ARGUMENT("ELI11129", m_startTime >= 0);
+		ASSERT_ARGUMENT("ELI11117", asULongLong(m_endTime) >= asULongLong(m_startTime));
+		ASSERT_ARGUMENT("ELI11128", asULongLong(m_endTime) >= 0);
+		ASSERT_ARGUMENT("ELI11129", asULongLong(m_startTime) >= 0);
 	}
 	catch (UCLIDException& ue)
 	{
-		CString zStartTime = m_startTime.Format(gstrTIME_DEBUG_INFO_FORMAT.c_str());
-		CString zEndTime = m_endTime.Format(gstrTIME_DEBUG_INFO_FORMAT.c_str());
+		CString zStartTime = formatSystemTime(m_startTime, gstrTIME_DEBUG_INFO_FORMAT).c_str();
+		CString zEndTime = formatSystemTime(m_endTime, gstrTIME_DEBUG_INFO_FORMAT).c_str();
 		ue.addDebugInfo("startTime", (LPCTSTR) zStartTime);
 		ue.addDebugInfo("endTime", (LPCTSTR) zEndTime);
 		throw ue;
@@ -52,14 +53,14 @@ TimeInterval::TimeInterval(const StopWatch& stopWatch)
 	try
 	{
 		// ensure proper argument
-		ASSERT_ARGUMENT("ELI11124", m_endTime >= m_startTime);
-		ASSERT_ARGUMENT("ELI11130", m_endTime >= 0);
-		ASSERT_ARGUMENT("ELI11131", m_startTime >= 0);
+		ASSERT_ARGUMENT("ELI11124", asULongLong(m_endTime) >= asULongLong(m_startTime));
+		ASSERT_ARGUMENT("ELI11130", asULongLong(m_endTime) >= 0);
+		ASSERT_ARGUMENT("ELI11131", asULongLong(m_startTime) >= 0);
 	}
 	catch (UCLIDException& ue)
 	{
-		CString zStartTime = m_startTime.Format(gstrTIME_DEBUG_INFO_FORMAT.c_str());
-		CString zEndTime = m_endTime.Format(gstrTIME_DEBUG_INFO_FORMAT.c_str());
+		CString zStartTime = formatSystemTime(m_startTime, gstrTIME_DEBUG_INFO_FORMAT).c_str();
+		CString zEndTime = formatSystemTime(m_endTime, gstrTIME_DEBUG_INFO_FORMAT).c_str();
 		ue.addDebugInfo("startTime", (LPCTSTR) zStartTime);
 		ue.addDebugInfo("endTime", (LPCTSTR) zEndTime);
 		throw ue;
@@ -83,13 +84,13 @@ TimeInterval& TimeInterval::operator=(const TimeInterval& objToAssign)
 //-------------------------------------------------------------------------------------------------
 bool operator < (const TimeInterval& a, const TimeInterval& b)
 {
-	if (a.m_startTime < b.m_startTime)
+	if (asULongLong(a.m_startTime) < asULongLong(b.m_startTime))
 	{
 		return true;
 	}
-	else if (a.m_startTime == b.m_startTime)
+	else if (asULongLong(a.m_startTime) == asULongLong(b.m_startTime))
 	{
-		return (a.m_endTime < b.m_endTime) == TRUE;
+		return (asULongLong(a.m_endTime) < asULongLong(b.m_endTime)) == TRUE;
 	}
 	else
 	{
@@ -99,15 +100,15 @@ bool operator < (const TimeInterval& a, const TimeInterval& b)
 //-------------------------------------------------------------------------------------------------
 bool operator == (const TimeInterval& a, const TimeInterval& b)
 {
-	return (a.m_startTime == b.m_startTime) && 
-		   (a.m_endTime == b.m_endTime);
+	return asULongLong(a.m_startTime) == asULongLong(b.m_startTime) && 
+		   asULongLong(a.m_endTime) == asULongLong(b.m_endTime);
 }
 //-------------------------------------------------------------------------------------------------
 ostream& operator << (ostream& rStream, const TimeInterval& interval)
 {
 	// write the interval object's data members to the output stream
-	string strStartTime = (LPCTSTR) interval.m_startTime.Format("%H:%M:%S");
-	string strEndTime = (LPCTSTR) interval.m_endTime.Format("%H:%M:%S");
+	string strStartTime = formatSystemTime(interval.m_startTime, "%H:%M:%S");
+	string strEndTime = formatSystemTime(interval.m_endTime, "%H:%M:%S");
 	rStream << "Interval(" << strStartTime << ", " << strEndTime << ")";
 
 	return rStream;
@@ -115,8 +116,10 @@ ostream& operator << (ostream& rStream, const TimeInterval& interval)
 //-------------------------------------------------------------------------------------------------
 unsigned long TimeInterval::getTotalSeconds() const
 {
-	CTimeSpan timeSpan = m_endTime - m_startTime;
-	return (unsigned long) timeSpan.GetTotalSeconds();
+	// return the elapsed time in seconds
+	ULONGLONG qwSpan = asULongLong(m_endTime) - asULongLong(m_startTime);
+
+	return (unsigned long)(qwSpan / ST_SECOND);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -308,8 +311,8 @@ void TimeIntervalMerger::merge(const TimeInterval& interval)
 		while (ulLeftIndex > 0)
 		{
 			const TimeInterval& leftInterval = m_vecIntervals[ulLeftIndex - 1];
-			if (leftInterval.getEndTime() >= interval.getStartTime() ||
-				leftInterval.getStartTime() == interval.getStartTime())
+			if (asULongLong(leftInterval.getEndTime()) >= asULongLong(interval.getStartTime()) ||
+				asULongLong(leftInterval.getStartTime()) == asULongLong(interval.getStartTime()))
 			{
 				ulLeftIndex--;
 				continue;
@@ -325,8 +328,8 @@ void TimeIntervalMerger::merge(const TimeInterval& interval)
 		while (ulRightIndex < ulNumIntevals - 1)
 		{
 			const TimeInterval& rightInterval = m_vecIntervals[ulRightIndex + 1];
-			if (rightInterval.getStartTime() <= interval.getEndTime() ||
-				rightInterval.getEndTime() == interval.getEndTime())
+			if (asULongLong(rightInterval.getStartTime()) <= asULongLong(interval.getEndTime()) ||
+				asULongLong(rightInterval.getEndTime()) == asULongLong(interval.getEndTime()))
 			{
 				ulRightIndex++;
 				continue;
@@ -339,8 +342,8 @@ void TimeIntervalMerger::merge(const TimeInterval& interval)
 		if (ulLeftIndex != nInsertPos || ulRightIndex != nInsertPos)
 		{
 			// determine the start/end time of the new merged inteval
-			CTime startTime = m_vecIntervals[ulLeftIndex].getStartTime();
-			CTime endTime = m_vecIntervals[ulRightIndex].getEndTime();
+			SYSTEMTIME startTime = m_vecIntervals[ulLeftIndex].getStartTime();
+			SYSTEMTIME endTime = m_vecIntervals[ulRightIndex].getEndTime();
 
 			// erase the overlapping intervals
 			// get the iterStart iterator to the correct location

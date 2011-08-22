@@ -268,8 +268,8 @@ vector<string> DocTypeInterpreter::convertToLines(const string& strInputFileName
 	if (getExtensionFromFullPath(strInputFileName, true) == ".etf")
 	{
 		// Open an input file, which is encrypted
-		EncryptedFileManager efm;
-		vecLines = efm.decryptTextFile(strInputFileName);
+		MapLabelManager encryptedFileManager;
+		vecLines = encryptedFileManager.getMapLabel(strInputFileName);
 	}
 	else
 	{

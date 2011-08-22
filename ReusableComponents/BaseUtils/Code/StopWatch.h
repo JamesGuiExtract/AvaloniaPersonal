@@ -40,16 +40,16 @@ public:
 
 	// REQUIRE: isReset() == false
 	// PROMISE: To return the time at which the watch was started from a reset state
-	const CTime& getBeginTime() const;
+	const SYSTEMTIME& getBeginTime() const;
 
 	// REQUIRE: isRunning() == false
 	// PROMISE: To return the end time of this watch.
-	const CTime& getEndTime() const;
+	const SYSTEMTIME& getEndTime() const;
 
 private:
-	// keep track of start time in CTime (in case the hardware does not
+	// keep track of start time in SYSTEMTIME (in case the hardware does not
 	// support high resolution counters)
-	CTime m_startTime, m_endTime;
+	SYSTEMTIME m_startTime, m_endTime;
 
 	// if the hardware supports high resolution counters, then we keep
 	// track of the start counter here.
@@ -73,15 +73,15 @@ private:
 
 	// This is the time that the watch was started with the clock at 0
 	// i.e. the time of the first start after a reset
-	CTime m_beginTime;
+	SYSTEMTIME m_beginTime;
 
 	// PURPOSE: To get the current low-res and high-res time/counter
 	// values into the provided variables
-	void getCurrentTime(CTime& rendTime, LARGE_INTEGER& rendCounter) const;
+	void getCurrentTime(SYSTEMTIME& rendTime, LARGE_INTEGER& rendCounter) const;
 	
 	// get the low-resolution elapsed time.  Resolution of returned
 	// value is 1 second.
-	double getLowResElapsedTime(const CTime& endTime) const;
+	double getLowResElapsedTime(const SYSTEMTIME& endTime) const;
 
 	// get the high-resolution elapsed time
 	double getHighResElapsedTime(const LARGE_INTEGER& endCounter) const;

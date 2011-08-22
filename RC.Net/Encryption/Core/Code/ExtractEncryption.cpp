@@ -3,6 +3,9 @@
 #include "stdafx.h"
 #include "ExtractEncryption.h"
 
+#include <ByteStream.h>
+#include <EncryptionEngine.h>
+
 #include <string>
 
 using namespace Extract;
@@ -11,6 +14,7 @@ using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::IO;
 using namespace System::Reflection;
+using namespace System::Runtime::InteropServices;
 using namespace System::Security::Cryptography;
 using namespace System::Security::Permissions;
 using namespace System::Security::Policy;
@@ -60,7 +64,9 @@ const int _VERSION = 1;
 // Version 1 - Makes use of the version RSA key
 // Version 2 - Same algorithm but adds a checksum of the password hash into the stream
 //			   to better be able to check if the password provided is valid for the encrypted file
-const int _PASSWORD_ENCRYPT_VERSION = 2;
+// Version 3 - Switch MD5Cng hash algorithm to MD5 for ComputeCheckSum since MD5Cng is only
+//			   available on Vista and later OS's.
+const int _PASSWORD_ENCRYPT_VERSION = 3;
 
 //--------------------------------------------------------------------------------------------------
 // Local methods
@@ -194,7 +200,7 @@ size_t getDestinationLength() { return _LENGTH/2; }
 //--------------------------------------------------------------------------------------------------
 [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
 void ExtractEncryption::EncryptFile(String^ fileToEncrypt, String^ encryptedFileName,
-									bool overwrite, MapLabel^ mapLabel)
+									bool overwrite, Extract::Licensing::MapLabel^ mapLabel)
 {
 	try
 	{
@@ -229,7 +235,7 @@ void ExtractEncryption::EncryptFile(String^ fileToEncrypt, String^ encryptedFile
 }
 //--------------------------------------------------------------------------------------------------
 [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
-String^ ExtractEncryption::EncryptString(String^ data, MapLabel^ mapLabel)
+String^ ExtractEncryption::EncryptString(String^ data, Extract::Licensing::MapLabel^ mapLabel)
 {
 	try
 	{
@@ -305,7 +311,7 @@ void ExtractEncryption::EncryptStream(Stream^ plainData, Stream^ cipherData, Str
 //--------------------------------------------------------------------------------------------------
 [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
 void ExtractEncryption::EncryptStream(Stream^ plainData, Stream^ cipherData, array<Byte>^ password,
-	MapLabel^ mapLabel)
+	Extract::Licensing::MapLabel^ mapLabel)
 {
 	try
 	{
@@ -322,7 +328,8 @@ void ExtractEncryption::EncryptStream(Stream^ plainData, Stream^ cipherData, arr
 }
 //--------------------------------------------------------------------------------------------------
 [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
-array<Byte>^ ExtractEncryption::DecryptBinaryFile(String^ fileName, MapLabel^ mapLabel)
+array<Byte>^ ExtractEncryption::DecryptBinaryFile(String^ fileName, 
+	Extract::Licensing::MapLabel^ mapLabel)
 {
 	try
 	{
@@ -351,7 +358,8 @@ array<Byte>^ ExtractEncryption::DecryptBinaryFile(String^ fileName, MapLabel^ ma
 }
 //--------------------------------------------------------------------------------------------------
 [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
-String^ ExtractEncryption::DecryptTextFile(String^ fileName, Encoding^ encoding, MapLabel^ mapLabel)
+String^ ExtractEncryption::DecryptTextFile(String^ fileName, Encoding^ encoding,
+	Extract::Licensing::MapLabel^ mapLabel)
 {
 	try
 	{
@@ -380,7 +388,7 @@ String^ ExtractEncryption::DecryptTextFile(String^ fileName, Encoding^ encoding,
 }
 //--------------------------------------------------------------------------------------------------
 [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
-String^ ExtractEncryption::DecryptString(String^ data, MapLabel^ mapLabel) 
+String^ ExtractEncryption::DecryptString(String^ data, Extract::Licensing::MapLabel^ mapLabel) 
 {
 	try
 	{
@@ -424,7 +432,7 @@ void ExtractEncryption::DecryptStream(Stream^ cipherData, Stream^ plainData, Str
 //--------------------------------------------------------------------------------------------------
 [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
 void ExtractEncryption::DecryptStream(Stream^ cipherData, Stream^ plainData, array<Byte>^ password,
-	MapLabel^ mapLabel)
+	Extract::Licensing::MapLabel^ mapLabel)
 {
 	try
 	{
@@ -444,7 +452,8 @@ void ExtractEncryption::DecryptStream(Stream^ cipherData, Stream^ plainData, arr
 }
 //--------------------------------------------------------------------------------------------------
 [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
-array<Byte>^ ExtractEncryption::GetHashedBytes(String^ value, int version, MapLabel^ mapLabel)
+array<Byte>^ ExtractEncryption::GetHashedBytes(String^ value, int version,
+	Extract::Licensing::MapLabel^ mapLabel)
 {
 	try
 	{
@@ -457,6 +466,76 @@ array<Byte>^ ExtractEncryption::GetHashedBytes(String^ value, int version, MapLa
 	catch(Exception^ ex)
 	{
 		throw ExtractException::AsExtractException("ELI32370", ex);
+	}
+}
+[SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
+//--------------------------------------------------------------------------------------------------
+void ExtractEncryption::SetMapLabel(Stream^ plainData, Stream^ cipherData, array<Byte>^ password,
+	Extract::Licensing::MapLabel^ mapLabel)
+{
+	try
+	{
+		// Ensure calling assembly is signed by Extract
+		ExtractException::Assert("ELI33383", "Failed internal data check.",
+			CheckData(Assembly::GetCallingAssembly()));
+
+		int nDataLength = (int)plainData->Length;
+		array<Byte>^ plainBuffer = gcnew array<Byte>(nDataLength);
+		plainData->Read(plainBuffer, 0, nDataLength);
+
+		// Pin the buffer and password so we can pass it to the unmanaged code
+		pin_ptr<Byte> pinnedPlain = &plainBuffer[0];
+		pin_ptr<Byte> pinnedPassword = &password[0];
+
+		ByteStream bsPlainBytes(pinnedPlain, nDataLength);
+		ByteStream bsPassword(pinnedPassword, password->Length);
+		ByteStream bsCipherBytes;
+
+		::MapLabel encryptionEngine;
+		encryptionEngine.setMapLabel(bsCipherBytes, bsPlainBytes, bsPassword);
+
+		array<Byte>^ cipherBuffer = gcnew array<Byte>(nDataLength);
+		Marshal::Copy(IntPtr(bsCipherBytes.getData()), cipherBuffer, 0, nDataLength);
+		cipherData->Write(cipherBuffer, 0, nDataLength);
+	}
+	catch(Exception^ ex)
+	{
+		throw ExtractException::AsExtractException("ELI33384", ex);
+	}
+}
+//--------------------------------------------------------------------------------------------------
+[SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
+void ExtractEncryption::GetMapLabel(Stream^ cipherData, Stream^ plainData, array<Byte>^ password,
+	Extract::Licensing::MapLabel^ mapLabel)
+{
+	try
+	{
+		// Ensure calling assembly is signed by Extract
+		ExtractException::Assert("ELI33385", "Failed internal data check.",
+			CheckData(Assembly::GetCallingAssembly()));
+
+		int nDataLength = (int)cipherData->Length;
+		array<Byte>^ cipherBuffer = gcnew array<Byte>(nDataLength);
+		cipherData->Read(cipherBuffer, 0, nDataLength);
+
+		// Pin the buffer and password so we can pass it to the unmanaged code
+		pin_ptr<Byte> pinnedCipher = &cipherBuffer[0];
+		pin_ptr<Byte> pinnedPassword = &password[0];
+
+		ByteStream bsCipherBytes(pinnedCipher, nDataLength);
+		ByteStream bsPassword(pinnedPassword, password->Length);
+		ByteStream bsPlainBytes;
+
+		::MapLabel encryptionEngine;
+		encryptionEngine.getMapLabel(bsPlainBytes, bsCipherBytes, bsPassword);
+
+		array<Byte>^ plainBuffer = gcnew array<Byte>(nDataLength);
+		Marshal::Copy(IntPtr(bsPlainBytes.getData()), plainBuffer, 0, nDataLength);
+		plainData->Write(plainBuffer, 0, nDataLength);
+	}
+	catch(Exception^ ex)
+	{
+		throw ExtractException::AsExtractException("ELI33386", ex);
 	}
 }
 
@@ -543,6 +622,8 @@ void ExtractEncryption::Encrypt(Stream^ plain, Stream^ cipher, array<Byte>^ pass
 {
 	RijndaelManaged^ rjndl = nullptr;
 	CryptoStream^ cryptoStream = nullptr;
+	HashAlgorithm^ hashAlgorithm = nullptr;
+
 	try
 	{
 		// Write the tag and version number to the stream
@@ -554,7 +635,9 @@ void ExtractEncryption::Encrypt(Stream^ plain, Stream^ cipher, array<Byte>^ pass
 		cipher->Write(BitConverter::GetBytes(_PASSWORD_ENCRYPT_VERSION), 0, 4);
 
 		// Write the checksum for the password
-		cipher->Write(BitConverter::GetBytes(ComputeCheckSum(passwordHash)), 0, 4);
+		hashAlgorithm = MD5::Create();
+		cipher->Write(BitConverter::GetBytes(
+			ComputeCheckSum(passwordHash, hashAlgorithm)), 0, 4);
 
 		rjndl = GetRijndael(passwordHash, HashVersion);
 		cryptoStream = gcnew CryptoStream(cipher, rjndl->CreateEncryptor(),
@@ -582,6 +665,10 @@ void ExtractEncryption::Encrypt(Stream^ plain, Stream^ cipher, array<Byte>^ pass
 		if (rjndl != nullptr)
 		{
 			rjndl->Clear();
+		}
+		if (hashAlgorithm != nullptr)
+		{
+			hashAlgorithm->Clear();
 		}
 	}
 }
@@ -717,19 +804,24 @@ void ExtractEncryption::Decrypt(Stream^ cipher, Stream^ plain, int version,
 	{
 	case 1:
 	case 2:
+	case 3:
 		{
 			RijndaelManaged^ rjndl = nullptr;
 			CryptoStream^ cryptoStream = nullptr;
+			HashAlgorithm^ hashAlgorithm = nullptr;
+
 			try
 			{
 				// Compare password checksum value
-				if (version == 2)
+				if (version == 2 || version == 3)
 				{
-					// Read the password check sum and validate it
+					hashAlgorithm = (version == 2) ? gcnew MD5Cng() : MD5::Create();
+
+					// Read the password check sum and validate it with MD5Cng
 					auto data = gcnew array<Byte>(4);
 					cipher->Read(data, 0, 4);
 					auto checkSum = BitConverter::ToInt32(data, 0);
-					if (ComputeCheckSum(passwordHash) != checkSum)
+					if (ComputeCheckSum(passwordHash, hashAlgorithm) != checkSum)
 					{
 						throw gcnew ExtractException("ELI32466",
 							"The decryption password is not valid.");
@@ -762,6 +854,10 @@ void ExtractEncryption::Decrypt(Stream^ cipher, Stream^ plain, int version,
 				if (rjndl != nullptr)
 				{
 					rjndl->Clear();
+				}
+				if (hashAlgorithm != nullptr)
+				{
+					hashAlgorithm->Clear();
 				}
 			}
 		}
@@ -995,11 +1091,11 @@ array<Byte>^ ExtractEncryption::ComputeHash(array<Byte>^ value, int version)
 	}
 }
 //--------------------------------------------------------------------------------------------------
-int ExtractEncryption::ComputeCheckSum(array<Byte>^ hash)
+int ExtractEncryption::ComputeCheckSum(array<Byte>^ hash, HashAlgorithm^ algorithm)
 {
 	try
 	{
-		auto checkHash = (gcnew MD5Cng())->ComputeHash(hash);
+		auto checkHash = algorithm->ComputeHash(hash);
 		unsigned int checkSum = 0;
 		for(int i=0; i < checkHash->Length; i++)
 		{

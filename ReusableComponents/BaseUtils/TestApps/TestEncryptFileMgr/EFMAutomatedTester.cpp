@@ -67,7 +67,7 @@ STDMETHODIMP CEFMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 		m_ipResultLogger->StartTestCase( _bstr_t("Object Creation"), 
 			_bstr_t("Test EFM"), kAutomatedTestCase ); 
 
-		EncryptedFileManager efm;
+		MapLabelManager encryptedFileManager;
 
 		m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
 
@@ -111,10 +111,10 @@ STDMETHODIMP CEFMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 
 		// Encrypt the file
 		TemporaryFileName	tfnOutput(true);
-		efm.encrypt( tfnInput.getName().c_str(), tfnOutput.getName().c_str() );
+		encryptedFileManager.setMapLabel( tfnInput.getName().c_str(), tfnOutput.getName().c_str() );
 
 		// Decrypt the file
-		vector<string> vecResult = efm.decryptTextFile( tfnOutput.getName().c_str());
+		vector<string> vecResult = encryptedFileManager.getMapLabel( tfnOutput.getName().c_str());
 
 		// Compare vectors
 		if (vecData.size() != vecResult.size())
@@ -175,11 +175,11 @@ STDMETHODIMP CEFMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 
 		// Encrypt the file
 		TemporaryFileName	tfnEncryptBin(true);
-		efm.encrypt( tfnBinaryIn.getName().c_str(), tfnEncryptBin.getName().c_str() );
+		encryptedFileManager.setMapLabel( tfnBinaryIn.getName().c_str(), tfnEncryptBin.getName().c_str() );
 
 		// Decrypt the file
 		unsigned long ulSize = 0;
-		unsigned char *pOutData = efm.decryptBinaryFile( 
+		unsigned char *pOutData = encryptedFileManager.getMapLabel( 
 			tfnEncryptBin.getName().c_str(), &ulSize );
 
 		// Compare bytes
@@ -224,11 +224,11 @@ STDMETHODIMP CEFMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 
 		// Encrypt the file
 		TemporaryFileName	tfnEncryptBin2(true);
-		efm.encrypt( tfnBinaryIn2.getName().c_str(), tfnEncryptBin2.getName().c_str() );
+		encryptedFileManager.setMapLabel( tfnBinaryIn2.getName().c_str(), tfnEncryptBin2.getName().c_str() );
 
 		// Decrypt the file
 		ulSize = 0;
-		unsigned char *pOutData2 = efm.decryptBinaryFile( 
+		unsigned char *pOutData2 = encryptedFileManager.getMapLabel( 
 			tfnEncryptBin2.getName().c_str(), &ulSize );
 
 		// Compare bytes
@@ -263,11 +263,11 @@ STDMETHODIMP CEFMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 
 		// Encrypt the file
 		TemporaryFileName	tfnEncryptBin3(true);
-		efm.encrypt( tfnBinaryIn3.getName(), tfnEncryptBin3.getName().c_str() );
+		encryptedFileManager.setMapLabel( tfnBinaryIn3.getName(), tfnEncryptBin3.getName().c_str() );
 
 		// Decrypt the file
 		ulSize = 0;
-		unsigned char *pOutData3 = efm.decryptBinaryFile( 
+		unsigned char *pOutData3 = encryptedFileManager.getMapLabel( 
 			tfnEncryptBin3.getName().c_str(), &ulSize );
 		
 		// Compare size since the length should be zero

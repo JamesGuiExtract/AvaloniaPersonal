@@ -13,6 +13,7 @@
 #include <ComponentLicenseIDs.h>
 #include <StopWatch.h>
 #include <MiscLeadUtils.h>
+#include <DateUtil.h>
 
 #include <string>
 #include <set>
@@ -576,7 +577,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 
         // Stop the stop watch
         swProcessingTime.stop();
-        CTime tStartTime = swProcessingTime.getBeginTime();
+        SYSTEMTIME tStartTime = swProcessingTime.getBeginTime();
         double dElapsedSeconds = swProcessingTime.getElapsedTime();
 
         // Add a metadata attribute to the VOA file
@@ -1896,7 +1897,7 @@ string CRedactionTask::getExemptionCodes(IAttributePtr ipAttribute)
 }
 //-------------------------------------------------------------------------------------------------
 void CRedactionTask::storeMetaData(const string& strVoaFile, IIUnknownVectorPtr ipAttributes, 
-    IIUnknownVectorPtr ipRedactedAttributes, CTime tStartTime, double dSeconds, 
+    IIUnknownVectorPtr ipRedactedAttributes, SYSTEMTIME tStartTime, double dSeconds, 
     const string& strSourceDocument, const string& strRedactedImage, bool bOverwroteOutput)
 {
     try
@@ -2116,7 +2117,7 @@ long CRedactionTask::getNextSessionId(IIUnknownVectorPtr ipAttributes)
 }
 //-------------------------------------------------------------------------------------------------
 IAttributePtr CRedactionTask::createMetaDataAttribute(long lSession, const string& strVoaFile,
-    IIUnknownVectorPtr ipRedactedAttributes, CTime tStartTime, double dElapsedSeconds, 
+    IIUnknownVectorPtr ipRedactedAttributes, SYSTEMTIME tStartTime, double dElapsedSeconds, 
     const string& strSourceDocument, const string& strRedactedImage, bool bOverwroteOutput)
 {
     try
@@ -2213,17 +2214,18 @@ IAttributePtr CRedactionTask::createUserInfoAttribute(const string& strSourceDoc
 }
 //-------------------------------------------------------------------------------------------------
 IAttributePtr CRedactionTask::createTimeInfoAttribute(const string& strSourceDocument, 
-                                                      CTime tStartTime, double dElapsedSeconds)
+                                                      SYSTEMTIME tStartTime, double dElapsedSeconds)
 {
     try
     {
         // Start date
-        string strDate = tStartTime.Format("%#m/%#d/%Y");
+        string strDate = formatSystemTime(tStartTime, "%#m/%#d/%Y");
         IAttributePtr ipDate = createAttribute(strSourceDocument, "_Date", strDate);
         ASSERT_RESOURCE_ALLOCATION("ELI28390", ipDate != __nullptr);
 
         // Start time
-        string strTimeStarted = tStartTime.Format("%I:%M:%S %p");
+        string strTimeStarted = formatSystemTime(tStartTime, "%I:%M:%S.<ms> %p");
+		replaceVariable(strTimeStarted, "<ms>", asString(tStartTime.wMilliseconds));
         IAttributePtr ipTime = createAttribute(strSourceDocument, "_TimeStarted", strTimeStarted);
         ASSERT_RESOURCE_ALLOCATION("ELI28391", ipTime != __nullptr);
 

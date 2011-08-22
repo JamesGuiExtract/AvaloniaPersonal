@@ -151,9 +151,9 @@ unsigned char* externManipulator(const char* pszInput, unsigned long* pulLength)
 			_lastCodePos = "40";
 
 			// Create an encryption engine and use it to encrypt the input data
-			EncryptionEngine ee;
+			MapLabel encryptionEngine;
 			ByteStream bsEncryptedBytes;
-			ee.encrypt(bsEncryptedBytes, bsPaddedInput, bsPassword);
+			encryptionEngine.setMapLabel(bsEncryptedBytes, bsPaddedInput, bsPassword);
 			_lastCodePos = "50";
 
 			*pulLength = bsEncryptedBytes.getLength();
@@ -1251,10 +1251,10 @@ void UCLIDException::getEncryptedValueTypePair(ValueTypePair& vtpNew)
 
 		// Encrypt the ByteStream
 		ByteStream encryptedBytes;
-		EncryptionEngine ee;
+		MapLabel encryptionEngine;
 		ByteStream passwordBytes;
 		getUEPassword( passwordBytes );
-		ee.encrypt( encryptedBytes, bsInput, passwordBytes );
+		encryptionEngine.setMapLabel( encryptedBytes, bsInput, passwordBytes );
 
 		// Retrieve encrypted value as Hex string
 		string strEncryptedHex = encryptedBytes.asString();
@@ -1707,12 +1707,12 @@ string UCLIDException::sGetDataValue(const string& strEncryptedValue)
 
 					// Decrypt the ByteStream
 					ByteStream decryptedBytes;
-					EncryptionEngine ee;
+					MapLabel encryptionEngine;
 					ByteStream passwordBytes;
 
 					getUEPassword( passwordBytes );
 
-					ee.decrypt( decryptedBytes, bsInput, passwordBytes );
+					encryptionEngine.getMapLabel( decryptedBytes, bsInput, passwordBytes );
 
 					// Retrieve the final string
 					ByteStreamManipulator bsmFinal(ByteStreamManipulator::kRead, decryptedBytes);

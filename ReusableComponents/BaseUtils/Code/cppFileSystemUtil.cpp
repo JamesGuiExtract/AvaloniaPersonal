@@ -19,6 +19,10 @@
 #include "UCLIDException.h"
 #include "TemporaryFileName.h"
 #include "VectorOperations.h"
+#include "Random.h"
+#include "ByteStreamManipulator.h"
+#include "EncryptionEngine.h"
+#include "COMUtils.h"
 
 #include <Shlwapi.h>
 #include <io.h>
@@ -47,6 +51,12 @@ const string gstrDEFAULT_SECURE_DELETER = "Extract.Utilities.SecureFileDeleters.
 const string gstrSECURE_DELETE_ALL = "SecureDeleteAllSensitiveFiles";
 const string gstrSECURE_DELETER = "SecureDeleter";
 
+// Use in order: 3, 0, 2, 1
+const unsigned long	gulSecureAuthKey00 = 0x2109429A;
+const unsigned long	gulSecureAuthKey01 = 0xFF4ED600;
+const unsigned long	gulSecureAuthKey02 = 0x0584CC2A;
+const unsigned long	gulSecureAuthKey03 = 0x6F5519FE;
+
 //--------------------------------------------------------------------------------------------------
 // This helper method retrieves the configured ISecureFileDeleter if either bForceUseSecureDeleter is
 // true or the SecureDeleteAllSensitiveFiles registry value is true. The ISecureFileDeleter is
@@ -59,6 +69,7 @@ ISecureFileDeleterPtr getSecureFileDeleter(bool bForceUseSecureDeleter)
 	static bool sbAlwaysUseSecureDeleter = false;
 	static bool sbSecureDeleteAllSensitiveFiles = false;
 	static ISecureFileDeleterPtr sipSecureFileDeleter(__nullptr);
+	static string strSecureFileDeleterProgID;
 
 	// Lock mutex 
 	CSingleLock lg(&sMutex, TRUE);
@@ -82,7 +93,6 @@ ISecureFileDeleterPtr getSecureFileDeleter(bool bForceUseSecureDeleter)
 		sbAlwaysUseSecureDeleter = !strDeleteAll.empty() && asCppBool(strDeleteAll);
 
 		// Retrieve theSecureDeleter setting (if it exists).
-		string strSecureFileDeleterProgID;
 		if (machineCfgMgr.keyExists(sstrRegPath, gstrSECURE_DELETER))
 		{
 			strSecureFileDeleterProgID = machineCfgMgr.getKeyValue(sstrRegPath, gstrSECURE_DELETER,
@@ -93,19 +103,56 @@ ISecureFileDeleterPtr getSecureFileDeleter(bool bForceUseSecureDeleter)
 			strSecureFileDeleterProgID = gstrDEFAULT_SECURE_DELETER;
 		}
 
-		// Retrieve the SecureDeleter setting and create an instance of the class if a value has
-		// been specified.
-		if (!strSecureFileDeleterProgID.empty())
-		{
-			sipSecureFileDeleter.CreateInstance(strSecureFileDeleterProgID.c_str());
-			ASSERT_RESOURCE_ALLOCATION("ELI32863", sipSecureFileDeleter != __nullptr);
-		}
-
 		sbInitialized = true;
 	}
 
 	if (bForceUseSecureDeleter || sbAlwaysUseSecureDeleter)
 	{
+		// Retrieve the SecureDeleter setting and create an instance of the class if a value has
+		// been specified.
+		if (sipSecureFileDeleter == __nullptr && !strSecureFileDeleterProgID.empty())
+		{
+			try
+			{
+				sipSecureFileDeleter.CreateInstance(strSecureFileDeleterProgID.c_str());
+				ASSERT_RESOURCE_ALLOCATION("ELI32863", sipSecureFileDeleter != __nullptr);
+
+				// Generate a random key, use it to call authenticate, then test that the same
+				// result (interpreted as a hex string) is achieved by encrypting the key with the
+				// secure file deleter authenticaion password.
+				string strKey = Random().getRandomString(32, true, true, true);
+				string strResponse = asString(sipSecureFileDeleter->Authenticate(strKey.c_str()));
+			
+				// Load the byte stream from the input string
+				ByteStream bsKey((unsigned char*)strKey.c_str(), 32);
+
+				// Load the secure file deleter authenticaion password into a byte stream.
+				ByteStream bsPasswordBytes;
+				ByteStreamManipulator bsm(ByteStreamManipulator::kWrite, bsPasswordBytes);
+				bsm << gulSecureAuthKey03;
+				bsm << gulSecureAuthKey00;
+				bsm << gulSecureAuthKey02;
+				bsm << gulSecureAuthKey01;
+				bsm.flushToByteStream(8);
+
+				// Create an encryption engine and use it to encrypt the key.
+				ByteStream bsEncryptedBytes;
+				MapLabel().setMapLabel(bsEncryptedBytes, bsKey, bsPasswordBytes);
+
+				string strEncrypted = bsEncryptedBytes.asString();
+				if (_strcmpi(strResponse.c_str(), strEncrypted.c_str()) != 0)
+				{
+					UCLIDException ue("ELI33377", "Secure file deletion authentication failed.");
+					throw ue;
+				}
+			}
+			catch (...)
+			{
+				sipSecureFileDeleter = __nullptr;
+				throw;
+			}
+		}
+
 		// If secure deletion is to be used in this case, return sipSecureFileDeleter.
 		if (sipSecureFileDeleter == __nullptr)
 		{

@@ -18,24 +18,29 @@
 #include <string>
 #include <vector>
 
-class EXPORT_BaseUtils EncryptedFileManager
+// MapLabelManager = EncryptedFileManager. The class has been renamed disguise its purpose and make
+// hacking our encryption a somewhat more difficult task.
+class EXPORT_BaseUtils MapLabelManager
 {
 public:
-	EncryptedFileManager();
+	MapLabelManager();
 
 	//---------------------------------------------------------------------------------------------
-	// PROMISE: To convert a file into an encrypted file
-	void encrypt(const std::string& strInputFile, const std::string& strOutputFile);
+	// PROMISE:  setMapLabel = encrypt
+	//			 To convert a file into an encrypted file
+	void setMapLabel(const std::string& strInputFile, const std::string& strOutputFile);
 
 	//---------------------------------------------------------------------------------------------
-	// PROMISE: To convert an encrypted binary file into a collection of bytes
+	// PROMISE:  getMapLabel = decryptBinaryFile
+	//			 To convert an encrypted binary file into a collection of bytes
 	// REQUIRES: Calling method is responsible for deleting the returned bytes
-	unsigned char* decryptBinaryFile(const std::string& strInputFile, 
+	unsigned char* getMapLabel(const std::string& strInputFile, 
 		unsigned long *pulByteCount);
 
 	//---------------------------------------------------------------------------------------------
-	// PROMISE: To convert an encrypted text file into a vector of unencrypted strings
-	std::vector<std::string> decryptTextFile(const std::string& strInputFile);
+	// PROMISE: getMapLabel = decryptTextFile
+	//			To convert an encrypted text file into a vector of unencrypted strings
+	std::vector<std::string> getMapLabel(const std::string& strInputFile);
 
 	// static variables
 	// NOTE: This class does not check for licenses.  However, this ID is

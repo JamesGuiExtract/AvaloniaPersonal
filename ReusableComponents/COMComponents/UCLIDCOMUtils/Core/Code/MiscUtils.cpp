@@ -553,10 +553,10 @@ STDMETHODIMP CMiscUtils::GetStringOptionallyFromFile(BSTR bstrFileName, BSTR *pb
 		if ( strExt == ".etf" )
 		{
 			// Define a encrypted file manager object to read encrypted file
-			EncryptedFileManager efm;
+			MapLabelManager encryptedFileManager;
 
 			// Return the vector of unencrypted strings from the file
-			vector<string> vecStrFromFile = efm.decryptTextFile( strFileName );
+			vector<string> vecStrFromFile = encryptedFileManager.getMapLabel( strFileName );
 
 			// Create CommentedTextFileReader object to read the vector of string
 			CommentedTextFileReader fileReader(vecStrFromFile, "//", false);
@@ -634,10 +634,10 @@ STDMETHODIMP CMiscUtils::GetColumnStringsOptionallyFromFile(BSTR bstrFileName, I
 		if ( strExt == ".etf" )
 		{
 			// Define a encrypted file manager object to read encrypted file
-			EncryptedFileManager efm;
+			MapLabelManager encryptedFileManager;
 
 			// Return the vector of unencrypted strings from the file
-			vector<string> vecStrFromFile = efm.decryptTextFile( strFileName );
+			vector<string> vecStrFromFile = encryptedFileManager.getMapLabel( strFileName );
 
 			// Create CommentedTextFileReader object to read the vector of string
 			CommentedTextFileReader fileReader(vecStrFromFile, "//", false);

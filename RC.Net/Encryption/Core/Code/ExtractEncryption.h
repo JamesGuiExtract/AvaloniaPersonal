@@ -46,7 +46,7 @@ namespace Extract
 			//								then it must not exist
 			//			
 			static void EncryptFile(String^ fileToEncrypt, String^ encryptedFileName, bool overwrite,
-				MapLabel^ mapLabel);
+				Extract::Licensing::MapLabel^ mapLabel);
             //--------------------------------------------------------------------------------------
 			// PURPOSE:	To encrypt the specified string
 			//
@@ -56,7 +56,7 @@ namespace Extract
 			//					   check used to determine if the calling assembly was
 			//					   signed by Extract Systems
 			// RETURNS:	A string containing the encrypted data as a base64 encrypted string
-			static String^ EncryptString(String^ data, MapLabel^ mapLabel);
+			static String^ EncryptString(String^ data, Extract::Licensing::MapLabel^ mapLabel);
             //--------------------------------------------------------------------------------------
 			// PURPOSE:	To encrypt the specified string and store the encrypted data in a file
 			//
@@ -73,7 +73,7 @@ namespace Extract
 			//			encryptedFileName - Must not be null/empty and if overwrite is false
 			//								then it must not exist
 			static void EncryptTextFile(String^ data, String^ encryptedFileName, bool overwrite,
-				MapLabel^ mapLabel);
+				Extract::Licensing::MapLabel^ mapLabel);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To encrypt the bytes contained in the input stream and place them in
 			//			the cipher data stream. The encryption key will be generated from
@@ -96,7 +96,7 @@ namespace Extract
 			//					   check used to determine if the calling assembly was
 			//					   signed by Extract Systems
 			static void EncryptStream(Stream^ plainData, Stream^ cipherData, array<Byte>^ password,
-				MapLabel^ mapLabel);
+				Extract::Licensing::MapLabel^ mapLabel);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To decrypt the specified binary file
 			//
@@ -106,7 +106,8 @@ namespace Extract
 			//					   check used to determine if the calling assembly was
 			//					   signed by Extract Systems
 			// RETURNS:	An array of bytes containing the decrypted data
-			static array<Byte>^ DecryptBinaryFile(String^ fileName, MapLabel^ mapLabel);
+			static array<Byte>^ DecryptBinaryFile(String^ fileName,
+				Extract::Licensing::MapLabel^ mapLabel);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To decrypt the specified encrypted text file
 			//
@@ -118,7 +119,8 @@ namespace Extract
 			//					   check used to determine if the calling assembly was
 			//					   signed by Extract Systems
 			// RETURNS:	A string containing the decrypted data
-			static String^ DecryptTextFile(String^ fileName, Encoding^ encoding, MapLabel^ mapLabel);
+			static String^ DecryptTextFile(String^ fileName, Encoding^ encoding,
+				Extract::Licensing::MapLabel^ mapLabel);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To decrypt the specified string
 			//
@@ -151,7 +153,7 @@ namespace Extract
 			//					   check used to determine if the calling assembly was
 			//					   signed by Extract Systems
 			static void DecryptStream(Stream^ cipherData, Stream^ plainData, array<Byte>^ password,
-				MapLabel^ mapLabel);
+				Extract::Licensing::MapLabel^ mapLabel);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To convert the specified string to the specified hash version
 			// ARGS:	value - The string to compute the hash for.
@@ -160,7 +162,36 @@ namespace Extract
 			//					   event handler which could potentially circumvent the
 			//					   check used to determine if the calling assembly was
 			//					   signed by Extract Systems
-			static array<Byte>^ GetHashedBytes(String^ value, int version, MapLabel^ mapLabel);
+			static array<Byte>^ GetHashedBytes(String^ value, int version,
+				Extract::Licensing::MapLabel^ mapLabel);
+			//--------------------------------------------------------------------------------------
+			// PURPOSE: SetMapLabel = LegacyEncrypt.
+			//			To encrypt the bytes contained in the input stream and place them in
+			//			the cipher data stream using the legacy Extract Systems encryption algorithm.
+			//
+			// ARGS:	stream1 = plainData - The input stream to read the data from
+			//			stream2 = cipherData - The output stream to write the encrypted bytes to
+			//			data = password - The hash of the password used encrypt the data
+			//			mapLabel - Used to prevent calling this method as a delegate or
+			//					   event handler which could potentially circumvent the
+			//					   check used to determine if the calling assembly was
+			//					   signed by Extract Systems
+			static void SetMapLabel(Stream^ stream1, Stream^ stream2, array<Byte>^ data,
+				Extract::Licensing::MapLabel^ mapLabel);
+			//--------------------------------------------------------------------------------------
+			// PURPOSE: GetMapLabel = LegacyDecrypt
+			//			To decrypt the bytes contained in the input stream and place them in
+			//			the plain data stream using the legacy Extract Systems encryption algorithm.
+			//
+			// ARGS:	stream1 = cipherData - The input stream to read the encrypted bytes from
+			//			stream2 = plainData - The output stream to write the decrypted data to
+			//			data - The hash of the password used decrypt the data
+			//			mapLabel - Used to prevent calling this method as a delegate or
+			//					   event handler which could potentially circumvent the
+			//					   check used to determine if the calling assembly was
+			//					   signed by Extract Systems
+			static void GetMapLabel(Stream^ stream1, Stream^ stream2, array<Byte>^ data,
+				Extract::Licensing::MapLabel^ mapLabel);
 
 		private:
 
@@ -228,7 +259,7 @@ namespace Extract
 			static array<Byte>^ ComputeHash(array<Byte>^ value, int version);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To compute a checksum for the specified value
-			static int ComputeCheckSum(array<Byte>^ value);
+			static int ComputeCheckSum(array<Byte>^ value, HashAlgorithm^ algorithm);
             //--------------------------------------------------------------------------------------
 			// PURPOSE:	Added to remove FxCop error - http://msdn.microsoft.com/en-us/ms182169.aspx
 			//			Microsoft.Design::CA1053 - Static holder types should not have constructors
@@ -240,13 +271,13 @@ namespace Extract
 		{
 		public:
 			[System::Runtime::CompilerServices::Extension]
-			static String^ ExtractEncrypt(String^ value, MapLabel^ mapLabel)
+			static String^ ExtractEncrypt(String^ value, Extract::Licensing::MapLabel^ mapLabel)
 			{
 				return ExtractEncryption::EncryptString(value, mapLabel);
 			}
 
 			[System::Runtime::CompilerServices::Extension]
-			static String^ ExtractDecrypt(String^ value, MapLabel^ mapLabel)
+			static String^ ExtractDecrypt(String^ value, Extract::Licensing::MapLabel^ mapLabel)
 			{
 				return ExtractEncryption::DecryptString(value, mapLabel);
 			}
@@ -265,14 +296,14 @@ namespace Extract
 
 			[System::Runtime::CompilerServices::Extension]
 			static void ExtractEncrypt(Stream^ plainData, Stream^ cipherData, array<Byte>^ password,
-				MapLabel^ mapLabel)
+				Extract::Licensing::MapLabel^ mapLabel)
 			{
 				ExtractEncryption::EncryptStream(plainData, cipherData, password, mapLabel);
 			}
 
 			[System::Runtime::CompilerServices::Extension]
 			static void ExtractDecrypt(Stream^ cipherData, Stream^ plainData, array<Byte>^ password,
-				MapLabel^ mapLabel)
+				Extract::Licensing::MapLabel^ mapLabel)
 			{
 				ExtractEncryption::DecryptStream(cipherData, plainData, password, mapLabel);
 			}

@@ -32,9 +32,9 @@ void convertFileToLines(const string& strInput, bool bIsFilename, vector<string>
 		if (getExtensionFromFullPath(strInput, true) == ".etf")
 		{
 			// Open an input file, which is encrypted
-			EncryptedFileManager efm;
+			MapLabelManager encryptedFileManager;
 			// decrypt the file
-			rvecLines = efm.decryptTextFile(strInput);
+			rvecLines = encryptedFileManager.getMapLabel(strInput);
 		}
 		else
 		{

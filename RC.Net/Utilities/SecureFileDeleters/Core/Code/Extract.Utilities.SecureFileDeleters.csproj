@@ -74,6 +74,10 @@
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Encryption\Core\Code\Extract.Encryption.vcxproj">
+      <Project>{C79815C7-A80A-41AA-AB02-F6AC83EFA579}</Project>
+      <Name>Extract.Encryption</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
       <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
       <Name>Extract.Interfaces</Name>

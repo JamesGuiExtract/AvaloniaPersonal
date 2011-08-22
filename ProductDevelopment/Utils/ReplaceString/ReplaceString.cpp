@@ -250,10 +250,8 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if(g_bUseRegExp)
-	{
-		CoInitializeEx(NULL, COINIT_MULTITHREADED);
-	}
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
 	try
 	{
 		if( g_bUseRegExp )
@@ -316,9 +314,7 @@ int main(int argc, char *argv[])
 		cout <<"Unexpected Exception"<<endl;
 		return EXIT_FAILURE;
 	}
-	if(g_bUseRegExp)
-	{
-		CoUninitialize();
-	}	
+
+	CoUninitialize();
 
 }
