@@ -566,7 +566,7 @@ STDMETHODIMP CREPMFinder::raw_GetComponentDescription(BSTR * pstrComponentDescri
 	{
 		ASSERT_ARGUMENT("ELI33267", pstrComponentDescription != __nullptr)
 
-		*pstrComponentDescription = _bstr_t("Regular expression pattern matcher finder").Detach();
+		*pstrComponentDescription = _bstr_t("Regular expression pattern matcher").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33268")
 
@@ -841,7 +841,7 @@ IRegularExprParserPtr CREPMFinder::getRegExParser()
 
 	if (m_ipRegExpParser == __nullptr)
 	{
-		m_ipRegExpParser = m_ipMiscUtils->GetNewRegExpParserInstance("REPMFinder");
+		m_ipRegExpParser = m_ipMiscUtils->GetNewRegExpParserInstance("REPM");
 		ASSERT_RESOURCE_ALLOCATION("ELI33224", m_ipRegExpParser != __nullptr);
 	}
 
@@ -897,13 +897,13 @@ void CREPMFinder::validateLicense()
 {
 	static const unsigned long THIS_COMPONENT_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
 
-	VALIDATE_LICENSE(THIS_COMPONENT_ID, "ELI33291", "Regular Expression Pattern Matcher Finder");
+	VALIDATE_LICENSE(THIS_COMPONENT_ID, "ELI33291", "Regular Expression Pattern Matcher");
 }
 //-------------------------------------------------------------------------------------------------
 void CREPMFinder::validateRDTLicense()
 {
 	static const unsigned long COMP_RDT_ID = gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS;
 
-	VALIDATE_LICENSE(COMP_RDT_ID, "ELI33292", "REPMFinder - Pattern Reader");
+	VALIDATE_LICENSE(COMP_RDT_ID, "ELI33292", "REPM - Pattern Reader");
 }
 //-------------------------------------------------------------------------------------------------

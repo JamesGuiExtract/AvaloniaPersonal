@@ -141,8 +141,17 @@ bool RegExPatternFileInterpreter::foundPattern(IRegularExprParserPtr ipRegExpPar
 			long nThisDataScore = 0;
 			if (ipDataScorer != __nullptr)
 			{
+				// [FlexIDSCore:4801]
+				// Make a copy of the attributes before scoring so that any modifications the
+				// scorer makes do not end up as part of the result.
+				IIUnknownVectorPtr ipFoundAttributesCopy(CLSID_IUnknownVector);
+				ASSERT_RESOURCE_ALLOCATION("ELI33388", ipFoundAttributesCopy != __nullptr);
+				ICopyableObjectPtr ipCopyableObj = ipFoundAttributesCopy;
+				ASSERT_RESOURCE_ALLOCATION("ELI33389", ipCopyableObj != __nullptr);
+				ipCopyableObj->CopyFrom(ipFoundAttributes);
+
 				// get the score of the data
-				nThisDataScore = ipDataScorer->GetDataScore2(ipFoundAttributes);
+				nThisDataScore = ipDataScorer->GetDataScore2(ipFoundAttributesCopy);
 				
 				// if it does not meet the minimum standards, 
 				// ignore it
@@ -241,6 +250,7 @@ void RegExPatternFileInterpreter::readPatterns(const string& strInputFile, bool 
 
 	bool bPatternOpen = false;
 	IDToPattern pattern;
+	vector<string> vecCurrentPatternLines;
 	
 	// convert input into vector of uncommented lines that includes all imported files.
 	vector<string> vecLines = parseCommentsAndImports(strInputFile);
@@ -262,8 +272,10 @@ void RegExPatternFileInterpreter::readPatterns(const string& strInputFile, bool 
 			if (nPos != string::npos)
 			{
 				// If there is a pattern open, submit it before opening a new one.
-				if (bPatternOpen && !pattern.m_strPatternText.empty())
+				if (bPatternOpen && vecCurrentPatternLines.size() > 0)
 				{
+					// Build the regular expression string, removing any whitespace( \f\n\r\t\v)
+					pattern.m_strPatternText = asString(vecCurrentPatternLines, true);
 					m_vecPatterns.push_back(pattern);
 					m_setDefinedPatterns.insert(pattern.m_strPatternID);
 				}
@@ -271,6 +283,7 @@ void RegExPatternFileInterpreter::readPatterns(const string& strInputFile, bool 
 				// Create a new pattern and extract the pattern ID.
 				pattern = IDToPattern();
 				pattern.m_strPatternID = ::trim(strLine.substr(1, nPos - 1), " ", " ");
+				vecCurrentPatternLines.clear();
 				if (m_setDefinedPatterns.find(pattern.m_strPatternID) != m_setDefinedPatterns.end())
 				{
 					UCLIDException ue("ELI33369", "Duplicate regular expression pattern matcher pattern defined.");
@@ -293,13 +306,15 @@ void RegExPatternFileInterpreter::readPatterns(const string& strInputFile, bool 
 
 		if (bPatternOpen)
 		{
-			pattern.m_strPatternText += strLine;
+			vecCurrentPatternLines.push_back(strLine);
 		}
 	}
 
 	// If a pattern is open, add the current line to it.
-	if (bPatternOpen && !pattern.m_strPatternText.empty())
+	if (bPatternOpen && vecCurrentPatternLines.size() > 0)
 	{
+		// Build the regular expression string, removing any whitespace( \f\n\r\t\v)
+		pattern.m_strPatternText = asString(vecCurrentPatternLines, true);
 		m_vecPatterns.push_back(pattern);
 		m_setDefinedPatterns.insert(pattern.m_strPatternID);
 	}
