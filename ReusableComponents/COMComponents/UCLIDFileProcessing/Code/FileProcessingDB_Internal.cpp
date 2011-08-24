@@ -2024,18 +2024,10 @@ void CFileProcessingDB::initializeIfBlankDB()
 		ipTables->MoveNext();
 	}
 	
-	// If blank flag is set, prompt to clear (prepare) the database
+	// If blank flag is set clear the database
 	if (bBlank)
 	{
-		// Default to using the desktop as the parent for the messagebox below
-		HWND hParent = getAppMainWndHandle();
-
-		int iResult = ::MessageBox(hParent, "This database has not been initialized for use.\r\n\r\n"
-			"Do you wish to initialize it now?", "Initialize Database?", MB_YESNO);
-		if (iResult == IDYES)
-		{
-			clear();
-		}
+		clear();
 	}
 }
 //--------------------------------------------------------------------------------------------------
