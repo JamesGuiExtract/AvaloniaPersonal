@@ -262,6 +262,16 @@ STDMETHODIMP CAutomatedRuleSetTester::raw_RunAutomatedTests(IVariantVector* pPar
 		m_ipResultLogger->AddComponentTestException(get_bstr_t(ue.asStringizedByteStream()));
 	}
 
+	// Ensure all accumulated USB clicks are decremented.
+	try
+	{
+		IRuleSetPtr ipRuleSet(CLSID_RuleSet);
+		ASSERT_RESOURCE_ALLOCATION("ELI33410", ipRuleSet != __nullptr);
+
+		ipRuleSet->Cleanup();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33411");
+
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------

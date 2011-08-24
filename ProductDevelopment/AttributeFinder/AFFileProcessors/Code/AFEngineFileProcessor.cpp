@@ -300,7 +300,11 @@ STDMETHODIMP CAFEngineFileProcessor::raw_Close()
 	
 	try
 	{
-		// nothing to do
+		// Ensure all accumulated USB clicks are decremented.
+		UCLID_AFCORELib::IRuleSetPtr ipRuleSet(CLSID_RuleSet);
+		ASSERT_RESOURCE_ALLOCATION("ELI33403", ipRuleSet != __nullptr);
+
+		ipRuleSet->Cleanup();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17790");
 

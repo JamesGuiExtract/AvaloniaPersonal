@@ -54,6 +54,7 @@ public:
 // IRuleSet
 	STDMETHOD(ExecuteRulesOnText)(IAFDocument* pAFDoc, IVariantVector *pvecAttributeNames,
 		IProgressStatus *pProgressStatus, IIUnknownVector** pAttributes);
+	STDMETHOD(Cleanup)();	
 	STDMETHOD(SaveTo)(BSTR strFullFileName, VARIANT_BOOL bClearDirty);
 	STDMETHOD(LoadFrom)(BSTR strFullFileName, VARIANT_BOOL bSetDirtyFlagToTrue);
 	STDMETHOD(get_AttributeNameToInfoMap)(IStrToObjectMap * *pVal);
@@ -169,6 +170,23 @@ private:
 	bool m_bIgnorePreprocessorErrors;
 	bool m_bIgnoreOutputHandlerErrors;
 
+	// Used to track data for each counter in order to determine the number of counts that may be
+	// accumulated prior to deducting them from the USB key. [LegacyRCAndUtils:6170]
+	struct CounterData
+	{
+		int m_nCountsDecrementedInProcess;
+		int m_nLastCountValue;
+		int m_nCountDecrementAccumulation;
+	};
+
+	static CounterData ms_indexingCounterData;
+	static CounterData ms_paginationCounterData;
+	static CounterData ms_redactionCounterData;
+
+	// Keep track of the number of Rulesets in existence. Before the last closes, flush any
+	// accumulated USB counts.
+	static int ms_referenceCount;
+
 	/////////////////
 	// Helper functions
 	/////////////////
@@ -198,6 +216,14 @@ private:
 
 	// Method decrements counters if any are set 
 	void decrementCounters( ISpatialStringPtr ipText );
+
+	// Decrements the specified DataCell by the specified amount. This method includes code that
+	// can allow a small number of counts to accumulate before deducting them from the key to limit
+	// the extent to which a USB key can be a bottleneck.
+	void decrementCounter(DataCell cell, int nNumToDecrement, CounterData& counterData);
+
+	// Decrements from the USB key any accumulated counts right away.
+	void flushCounter(DataCell cell, CounterData& counterData);
 
 	// returns a reference of the member variable m_vecSerialNumbers
 	// this function separates the serial numbers in the string m_strKeySerialNumbers

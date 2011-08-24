@@ -827,7 +827,8 @@ SP_DWORD SafeNetLicenseMgr::decreaseCellValue( DataCell &rCell, SP_DWORD dwAmoun
 
 			// if lock is not obtained an exception will be thrown
 			CellLock clLock( *this, rCell );
-			dwCurrValue = getCellValue ( rCell );
+			DWORD dwOrigValue = getCellValue ( rCell );
+			dwCurrValue = dwOrigValue;
 
 			// Make sure amount decrementing is available
 			if ( (dwCurrValue < dwAmount)  )
@@ -885,7 +886,7 @@ SP_DWORD SafeNetLicenseMgr::decreaseCellValue( DataCell &rCell, SP_DWORD dwAmoun
 			}
 
 			// Check new counter value and possibly add item to exception log
-			if (dwCurrValue % gnLOG_FREQUENCY == 0)
+			if (((dwOrigValue - 1) / gnLOG_FREQUENCY) != ((dwCurrValue - 1)/ gnLOG_FREQUENCY))
 			{
 				UCLIDException ue("ELI15935", "Application trace: debug information");
 				ue.addDebugInfo( "Item 1", getKeySN(), true );

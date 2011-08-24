@@ -478,6 +478,16 @@ void RuleTesterDlg::OnButtonExecute()
 		// Update the button states (perform update outside of first try catch block
 		// so that buttons will be re-enabled even if an exception occurred)
 		updateButtonStates();
+
+		// Ensure all accumulated USB clicks are decremented.
+		try
+		{
+			UCLID_AFCORELib::IRuleSetPtr ipRuleSet(CLSID_RuleSet);
+			ASSERT_RESOURCE_ALLOCATION("ELI33415", ipRuleSet != __nullptr);
+
+			ipRuleSet->Cleanup();
+		}
+		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33416");
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI25562");
 }

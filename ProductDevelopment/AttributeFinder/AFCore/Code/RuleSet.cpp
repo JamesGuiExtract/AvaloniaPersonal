@@ -43,6 +43,15 @@ CMutex CRuleSet::ms_mutexLM;
 unique_ptr<SafeNetLicenseMgr> CRuleSet::m_apSafeNetMgr(__nullptr);
 int CRuleSet::m_iSNMRefCount = 0;
 
+// Max accumulation = 10 (use char index 4 followed by char index 2 as a long);
+#define _MAX_COUNTER_ACCUMULATION "D804155D-471C-4C81-A07D-9392AD45661C"
+
+CRuleSet::CounterData CRuleSet::ms_indexingCounterData = { 0 };
+CRuleSet::CounterData CRuleSet::ms_paginationCounterData = { 0 };
+CRuleSet::CounterData CRuleSet::ms_redactionCounterData = { 0 };
+
+int CRuleSet::ms_referenceCount = 0;
+
 //-------------------------------------------------------------------------------------------------
 // CRuleSet
 //-------------------------------------------------------------------------------------------------
@@ -67,6 +76,8 @@ m_nVersionNumber(gnCurrentVersion) // by default, all rulesets are the current v
 	{
 		// Lock the mutex for USB License manager
 		CSingleLock lg( &ms_mutexLM, TRUE );
+
+		ms_referenceCount++;
 
 		// if this is the first instance of RuleSet will need to allocate the pointer
 		if ( m_apSafeNetMgr.get() == __nullptr )
@@ -107,6 +118,21 @@ CRuleSet::~CRuleSet()
 	{
 		// Lock the mutex for USB License manager
 		CSingleLock lg( &ms_mutexLM, TRUE);
+
+		ms_referenceCount--;
+
+		// Before releasing the connection to m_apSafeNetMgr, flush any accumulated values that have
+		// not yet been decremented.
+		if (ms_referenceCount == 0)
+		{
+			try
+			{
+				flushCounter(gdcellFlexIndexingCounter, ms_indexingCounterData);
+				flushCounter(gdcellFlexPaginationCounter, ms_paginationCounterData);
+				flushCounter(gdcellIDShieldRedactionCounter, ms_redactionCounterData);
+			}
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33414")
+		}
 
 		// Decrement the reference Count
 		m_iSNMRefCount--;
@@ -502,6 +528,21 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04157");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::Cleanup()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		flushCounter(gdcellFlexIndexingCounter, ms_indexingCounterData);
+		flushCounter(gdcellFlexPaginationCounter, ms_paginationCounterData);
+		flushCounter(gdcellIDShieldRedactionCounter, ms_redactionCounterData);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33402");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::get_AttributeNameToInfoMap(IStrToObjectMap **pVal)
@@ -1679,12 +1720,12 @@ void CRuleSet::decrementCounters( ISpatialStringPtr ipText )
 		// Update counters as needed
 		if ( m_bUseIndexingCounter )
 		{
-			m_apSafeNetMgr->decreaseCellValue(gdcellFlexIndexingCounter, 1 );
+			decrementCounter(gdcellFlexIndexingCounter, 1, ms_indexingCounterData);
 		}
 
 		if ( m_bUsePaginationCounter )
 		{
-			m_apSafeNetMgr->decreaseCellValue(gdcellFlexPaginationCounter, 1 );
+			decrementCounter(gdcellFlexPaginationCounter, 1, ms_paginationCounterData);
 		}
 
 		if ( m_bUsePagesRedactionCounter )
@@ -1697,14 +1738,71 @@ void CRuleSet::decrementCounters( ISpatialStringPtr ipText )
 			{
 				nNumberOfPages = ipText->GetLastPageNumber() - ipText->GetFirstPageNumber() + 1;
 			}
-			m_apSafeNetMgr->decreaseCellValue(gdcellIDShieldRedactionCounter, nNumberOfPages );
+
+			decrementCounter(gdcellIDShieldRedactionCounter, nNumberOfPages, ms_redactionCounterData);
 		}
 
 		if( m_bUseDocsRedactionCounter )
 		{
 			// Decrement counter once for the document.
-			m_apSafeNetMgr->decreaseCellValue(gdcellIDShieldRedactionCounter, 1 );
+			decrementCounter(gdcellIDShieldRedactionCounter, 1, ms_redactionCounterData);
 		}
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleSet::decrementCounter(DataCell cell, int nNumToDecrement, CounterData& counterData)
+{
+	try
+	{
+		// The max allowed accumulation for the counter value before decrementing the key is
+		// defined as Min(A,B,C) where:
+		// A = 10 (_MAX_COUNTER_ACCUMULATION)
+		// B = D / 10
+		// C = E / 100
+		// D = number of counts successfully decremented off the USB key from in the current process
+		// E = number of counts on the USB key at the time of the last successful decrement of the
+		// USB key from the current process.
+
+		// Lock the mutex for USB License manager to ensure thread safety of counterData.
+		CSingleLock lg( &ms_mutexLM, TRUE);
+
+		string strMaxAccumulation(_MAX_COUNTER_ACCUMULATION);
+		int allowedAccumulation = asLong(strMaxAccumulation.substr(4, 1) + strMaxAccumulation[2]);
+		allowedAccumulation = min(allowedAccumulation, counterData.m_nCountsDecrementedInProcess / 10);
+		allowedAccumulation = min(allowedAccumulation, counterData.m_nLastCountValue / 100);
+
+		int nCurrentAccumulation = counterData.m_nCountDecrementAccumulation + nNumToDecrement;
+		if (nCurrentAccumulation < allowedAccumulation)
+		{
+			counterData.m_nCountDecrementAccumulation = nCurrentAccumulation;
+		}
+		else
+		{
+			counterData.m_nLastCountValue =
+				m_apSafeNetMgr->decreaseCellValue(cell, nCurrentAccumulation);
+			counterData.m_nCountsDecrementedInProcess += nCurrentAccumulation;
+			counterData.m_nCountDecrementAccumulation = 0;
+		}
+	}
+	catch (...)
+	{
+		// If there was an exception decrementing counts, ensure the next attempts to decrement
+		// aren't accumulated.
+		counterData.m_nCountsDecrementedInProcess = 0;
+
+		throw;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleSet::flushCounter(DataCell cell, CounterData& counterData)
+{
+	// Lock the mutex for USB License manager to ensure thread safety of counterData.
+	CSingleLock lg( &ms_mutexLM, TRUE);
+
+	if (counterData.m_nCountDecrementAccumulation > 0)
+	{
+		m_apSafeNetMgr->decreaseCellValue(cell, counterData.m_nCountDecrementAccumulation);
+		counterData.m_nCountDecrementAccumulation = 0;
 	}
 }
 //-------------------------------------------------------------------------------------------------

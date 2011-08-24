@@ -410,6 +410,10 @@ library UCLID_AFCORELib
 			IgnoreOutputHandlerErrors([out, retval] VARIANT_BOOL *pVal);
 		[propput, id(21), helpstring("property IgnoreOutputHandlerErrors")] HRESULT
 			IgnoreOutputHandlerErrors([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To give the ruleset a chance to perform any cleanup needed at the end of
+		// processing
+		[id(22), helpstring("method Cleanup")] HRESULT Cleanup();		
 	};
 
 	[

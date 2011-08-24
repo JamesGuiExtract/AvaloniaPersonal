@@ -433,6 +433,16 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 		m_ipResultLogger->AddComponentTestException(get_bstr_t(ue.asStringizedByteStream()));
 	}
 
+	// Ensure all accumulated USB clicks are decremented.
+	try
+	{
+		IRuleSetPtr ipRuleSet(CLSID_RuleSet);
+		ASSERT_RESOURCE_ALLOCATION("ELI33406", ipRuleSet != __nullptr);
+
+		ipRuleSet->Cleanup();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33407");
+
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------

@@ -261,6 +261,16 @@ BOOL CRunRulesApp::InitInstance()
 	// CoUninitialize removed to prevent unhandled exception on exit (P16 #2642)
 	//CoUninitialize();
 
+	// Ensure all accumulated USB clicks are decremented.
+	try
+	{
+		IRuleSetPtr ipRuleSet(CLSID_RuleSet);
+		ASSERT_RESOURCE_ALLOCATION("ELI33405", ipRuleSet != __nullptr);
+
+		ipRuleSet->Cleanup();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33404");
+
 	// Since the dialog has been closed, return FALSE so that we exit the
 	//  application, rather than start the application's message pump.
 	return TRUE;

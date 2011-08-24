@@ -132,6 +132,16 @@ STDMETHODIMP CAFEngineTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07187")
 
+	// Ensure all accumulated USB clicks are decremented.
+	try
+	{
+		UCLID_AFCORELib::IRuleSetPtr ipRuleSet(CLSID_RuleSet);
+		ASSERT_RESOURCE_ALLOCATION("ELI33412", ipRuleSet != __nullptr);
+
+		ipRuleSet->Cleanup();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33413");
+
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
