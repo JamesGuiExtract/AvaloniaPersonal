@@ -18,7 +18,8 @@
     #define EXTRACT_DIR "\\Extract Systems\\CommonComponents"
     #define REG_PATH_SQL_NATIVE_CLIENT "SOFTWARE\\Microsoft\\Microsoft SQL Native Client 10.0\\CurrentVersion"
     #define REG_PATH_SQL_COMPACT_EDITION "SOFTWARE\\Microsoft\\Microsoft SQL Server Compact Edition\\v3.5"
-    #define SQL_COMPACT_EDITION_GUID "{E59113EB-0285-4BFD-A37A-B79EAC6B8F4B}"
+    #define SQL_COMPACT_EDITION_GUID "{3A9FC03D-C685-4831-94CF-4EDFD3749497}"
+    #define SQL_COMPACT_EDITION_GUID_64 "{D4AD39AD-091E-4D33-BB2B-59F6FCB8ADC3}"
     #define REG_PATH_DOT_NET_VER_2_0 "\\SOFTWARE\\Microsoft\\.NETFramework\\policy\\v2.0"
     #define REG_PATH_UNINSTALL "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
     #define FLEX_INDEX_PRODUCT_CODE "{A7DFE34D-A07E-4D57-A624-B758E42A69D4}"
@@ -27,12 +28,11 @@
     #define IDSHIELDOFFICE_PRODUCT_CODE "{A8DDFDC1-069D-42DE-AF69-A78FC232A86A}"
     #define EXTRACT_LM_PRODUCT_CODE "{EB8DE231-8B66-4DE6-A56D-39452D8CF35F}"
     #define LABDE_PRODUCT_CODE "{0E412937-E4FA-4737-A321-00AED69497C7}"
-    #define LOG_FILE_PATH CommonAppDataFolder ^ "\\Extract Systems\\LogFiles\\Misc"
+    #define LOG_FILE_PATH CommonAppDataFolder ^ "\\Extract Systems\\LogFiles"
     #define CRYSTAL_REPORTS_GUID "{C484CC8D-03CF-4022-89C4-DB4F02E8A15B}"
     #define INLITE_INSTALLER_EXE "ClearImageEUK_5_7_3.exe"
     #define EXCEPTION_FILE_NAME "ExtractException.uex"
     #define UCLID_EXCEPTION_FILE_NAME "UCLIDException.uex"
-    #define SQL_CE_DATABASE_VIEWER_AND_EDITOR_CODE "{0EACBFA9-5D4F-4D7E-8FB2-5C9E66FB6632}"
     #define REG_PATH_DOT_NET_40_INSTALL "\\SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full"  
     #define INSTALL_UTIL_PATH "C:\\WINDOWS\\Microsoft.NET\\Framework\\v4.0.30319\\InstallUtil.exe"
     
@@ -566,9 +566,12 @@ begin
 
 		if (nResult = IDYES) then
 			SdShowMsg("Setup is Uninstalling SQL Compact Edition", TRUE);
-	    	UninstallApplication(REG_PATH_SQL_COMPACT_EDITION,"", LAAW_OPTION_WAIT  | LAAW_OPTION_SHOW_HOURGLASS);
-	    	UninstallApplication(SQL_CE_DATABASE_VIEWER_AND_EDITOR_CODE,"", LAAW_OPTION_WAIT  | LAAW_OPTION_SHOW_HOURGLASS);
-			SdShowMsg("Setup is Installing SQL Compact Edition ", FALSE);
+	    	UninstallApplication(SQL_COMPACT_EDITION_GUID,"", LAAW_OPTION_WAIT  | LAAW_OPTION_SHOW_HOURGLASS);
+	    	
+	    	// If 64 bit OS install 64 version of SSCE	
+			if ( SYSINFO.bIsWow64 ) then
+				UninstallApplication(SQL_COMPACT_EDITION_GUID_64,"", LAAW_OPTION_WAIT  | LAAW_OPTION_SHOW_HOURGLASS);			
+			endif;
 	  	endif;
 	endif;
 end;
@@ -708,3 +711,4 @@ begin
 
  	SdShowMsg("Setup is unregistering shell extension.", FALSE);
 end;
+

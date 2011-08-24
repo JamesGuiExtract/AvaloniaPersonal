@@ -334,7 +334,7 @@
 		<row><td>SpatialStringSearcherTest.dll</td><td>{3500F62F-152E-4651-8790-0BC0D880343D}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>SpatialStringSearcherTest.dl</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>SpotRecIRAutoTest.dll</td><td>{CCE85CA0-04FE-4FBF-AF95-B59F03809DCD}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>SpotRecIRAutoTest.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>StringPatternMatcherAutoTest.dll</td><td>{1E6802EF-175A-4CED-8005-F1EE56BC261E}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>StringPatternMatcherAutoTest</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>TestingFiles</td><td>{C97C3820-7F9D-4F29-82CA-75EB2D334DD2}</td><td>TESTINGFILES</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>TestingFiles</td><td>{C97C3820-7F9D-4F29-82CA-75EB2D334DD2}</td><td>TESTING_FILES</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UCLIDTestingComponentCore.dll</td><td>{F2E949E8-E546-4D51-8DBE-827330B11D71}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>VBScriptUtils.dll</td><td>{40C916DB-9296-4317-A747-9D7A0B03D5D7}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>vbscriptutils.dll</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
@@ -434,10 +434,7 @@
 		<col def="S255">ISDescription</col>
 		<col def="I4">ISAttributes</col>
 		<col def="S255">ISFolderName</col>
-		<row><td>AFCORE1</td><td>ATTRIBUTEFINDER1</td><td>AFCore</td><td/><td>0</td><td/></row>
-		<row><td>AFCORETEST1</td><td>AFCORE1</td><td>AFCORE~1|AFCoreTest</td><td/><td>0</td><td/></row>
 		<row><td>ALLUSERSPROFILE</td><td>TARGETDIR</td><td>.:ALLUSE~1|All Users</td><td/><td>0</td><td/></row>
-		<row><td>ATTRIBUTEFINDER1</td><td>PRODUCTDEVELOPMENT1</td><td>ATTRIB~1|AttributeFinder</td><td/><td>0</td><td/></row>
 		<row><td>AdminToolsFolder</td><td>TARGETDIR</td><td>.:Admint~1|AdminTools</td><td/><td>0</td><td/></row>
 		<row><td>AppDataFolder</td><td>TARGETDIR</td><td>.:APPLIC~1|Application Data</td><td/><td>0</td><td/></row>
 		<row><td>AutomatedTests</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING23##</td><td/><td>1</td><td/></row>
@@ -448,6 +445,7 @@
 		<row><td>CommonFilesFolder</td><td>TARGETDIR</td><td>.:Common</td><td/><td>0</td><td/></row>
 		<row><td>DesktopFolder</td><td>TARGETDIR</td><td>.:Desktop</td><td/><td>3</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS</td><td>ProgramFilesFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
+		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>CommonAppDataFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
 		<row><td>FLEX_HELP</td><td>FLEX_INDEX</td><td>Help</td><td/><td>0</td><td/></row>
 		<row><td>FLEX_INDEX</td><td>EXTRACT_SYSTEMS</td><td>FLEXIN~1|FlexIndex</td><td/><td>0</td><td/></row>
 		<row><td>FLEX_INDEX_COMPONENTS</td><td>EXTRACT_SYSTEMS</td><td>FLEXIN~1|FlexIndexComponents</td><td/><td>0</td><td/></row>
@@ -461,7 +459,6 @@
 		<row><td>INSTALLDIR</td><td>FLEX_INDEX</td><td>.</td><td/><td>0</td><td/></row>
 		<row><td>LocalAppDataFolder</td><td>TARGETDIR</td><td>.:LocalA~1|LocalAppData</td><td/><td>0</td><td/></row>
 		<row><td>MyPicturesFolder</td><td>TARGETDIR</td><td>.:MyPict~1|MyPictures</td><td/><td>0</td><td/></row>
-		<row><td>PRODUCTDEVELOPMENT1</td><td>TESTINGFILES</td><td>PRODUC~1|ProductDevelopment</td><td/><td>0</td><td/></row>
 		<row><td>PersonalFolder</td><td>TARGETDIR</td><td>.:Personal</td><td/><td>0</td><td/></row>
 		<row><td>PrimaryVolumePath</td><td>TARGETDIR</td><td>.:Primar~1|PrimaryVolumePath</td><td/><td>0</td><td/></row>
 		<row><td>ProgramFiles64Folder</td><td>TARGETDIR</td><td>.:Prog64~1|Program Files 64</td><td/><td>0</td><td/></row>
@@ -475,8 +472,7 @@
 		<row><td>System64Folder</td><td>TARGETDIR</td><td>.:System64</td><td/><td>0</td><td/></row>
 		<row><td>SystemFolder</td><td>TARGETDIR</td><td>.:System32</td><td/><td>0</td><td/></row>
 		<row><td>TARGETDIR</td><td/><td>SourceDir</td><td/><td>0</td><td/></row>
-		<row><td>TESTFILES2</td><td>AFCORETEST1</td><td>TESTFI~1|TestFiles</td><td/><td>0</td><td/></row>
-		<row><td>TESTINGFILES</td><td>EXTRACT_SYSTEMS</td><td>TESTIN~1|TestingFiles</td><td/><td>0</td><td/></row>
+		<row><td>TESTING_FILES</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>TESTIN~1|TestingFiles</td><td/><td>0</td><td/></row>
 		<row><td>TempFolder</td><td>TARGETDIR</td><td>.:Temp</td><td/><td>0</td><td/></row>
 		<row><td>TemplateFolder</td><td>TARGETDIR</td><td>.:ShellNew</td><td/><td>0</td><td/></row>
 		<row><td>UCLID_FLEXINDEX_SDK</td><td>ProgramMenuFolder</td><td>##ID_STRING7##</td><td/><td>1</td><td/></row>
@@ -3971,7 +3967,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut3</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING10##</td><td>Binaries</td><td>[COMMON_COMPONENTS]TestHarness.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut4</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING11##</td><td>Help</td><td>[HELP]FlexIndex.chm</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut5</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING21##</td><td>Help</td><td>[HELP]FlexIndexSDK.chm</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut6</td><td>AutomatedTests</td><td>##ID_STRING24##</td><td>TestingFiles</td><td>[COMMON_COMPONENTS]TestHarness</td><td>/f"[ProgramFilesFolder]Extract Systems\TestingFiles\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\All\AFCore.tcl"</td><td>##ID_STRING26##</td><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut6</td><td>AutomatedTests</td><td>##ID_STRING24##</td><td>TestingFiles</td><td>[COMMON_COMPONENTS]TestHarness</td><td>/f"[CommonAppDataFolder]Extract Systems\TestingFiles\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\All\AFCore.tcl"</td><td>##ID_STRING26##</td><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut7</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING16##</td><td>Binaries</td><td>[COMMON_COMPONENTS]IndexConverter.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut8</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING17##</td><td>Binaries</td><td>[COMMON_COMPONENTS]RDTConfig.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut9</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING18##</td><td>Binaries</td><td>[COMMON_COMPONENTS]RuleSetEditor.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>

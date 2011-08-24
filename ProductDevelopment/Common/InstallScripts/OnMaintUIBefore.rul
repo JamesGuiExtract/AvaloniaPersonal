@@ -69,6 +69,14 @@ Dlg_SdFeatureTree:
 			
 			// Check if other products are installed before uninstalling these items
 			if (AreOtherExtractProductsInstalled() == FALSE) then
+				// Stop the services first
+				ServiceStopService("Extract Systems Exception Service");
+				ServiceStopService("Extract Systems FDRS Service");
+				ServiceStopService("Extract Systems IPC Service");
+				
+				// Unregister the shell extension
+				UnregisterLoginNPShellExtension("Extract.Utilities.ShellExtensions.dll");
+
 				// Uninstall ESFAMService
 				UninstallDotNetService("\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFAMService.exe\"");
 				
@@ -81,12 +89,12 @@ Dlg_SdFeatureTree:
 				// UnInstall the ESIPCService
 				UninstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESIPCService.exe\"");      
 				
-				// Unregister the shell extension
-				UnregisterLoginNPShellExtension("Extract.Utilities.ShellExtensions.dll");
-
 				// Uninstall Crystal Reports
 				UninstallCrystalReports12();
 				UninstallInstallSQLCE ();
+				
+				// Register the shell extension
+				UnregisterLoginNPShellExtension("Extract.Utilities.ShellExtensions.dll");
 			endif;
   			FeatureRemoveAll();
 		case REPAIR:    

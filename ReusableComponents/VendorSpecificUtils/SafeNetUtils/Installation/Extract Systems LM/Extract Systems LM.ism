@@ -314,7 +314,7 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
-		<row><td>AllOtherFiles</td><td>{A68CD803-AB47-49CC-9488-BF68116E1BFE}</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ExtractCommonAppFolder</td><td>{F1E4A6BB-F90F-46C5-A49B-727F68211701}</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FieldActivation</td><td>{3198502E-576E-4944-83FB-5CEBA591DF96}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>fieldactutil.exe</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UUsafe32.dll</td><td>{BAA2F71D-781F-4961-98FB-1715CC627C78}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>uusafe32.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
@@ -370,7 +370,7 @@
 	<table name="CreateFolder">
 		<col key="yes" def="s72">Directory_</col>
 		<col key="yes" def="s72">Component_</col>
-		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>AllOtherFiles</td></row>
+		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>ExtractCommonAppFolder</td></row>
 	</table>
 
 	<table name="CustomAction">
@@ -430,7 +430,7 @@
 		<row><td>CommonFilesFolder</td><td>TARGETDIR</td><td>.:Common</td><td/><td>0</td><td/></row>
 		<row><td>DesktopFolder</td><td>TARGETDIR</td><td>.:Desktop</td><td/><td>3</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS</td><td>ProgramFilesFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
-		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>CommonFilesFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
+		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>CommonAppDataFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
 		<row><td>ExtractSystemsLM_Programs</td><td>ProgramMenuFolder</td><td>##ID_STRING5##</td><td/><td>1</td><td/></row>
 		<row><td>FavoritesFolder</td><td>TARGETDIR</td><td>.:FAVORI~1|Favorites</td><td/><td>0</td><td/></row>
 		<row><td>FontsFolder</td><td>TARGETDIR</td><td>.:Fonts</td><td/><td>0</td><td/></row>
@@ -1133,7 +1133,7 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
-		<row><td>DefaultFeature</td><td>AllOtherFiles</td></row>
+		<row><td>DefaultFeature</td><td>ExtractCommonAppFolder</td></row>
 		<row><td>DefaultFeature</td><td>FieldActivation</td></row>
 		<row><td>DefaultFeature</td><td>UUsafe32.dll</td></row>
 	</table>
@@ -1403,7 +1403,7 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
-		<row><td>AllOtherFiles</td><td/><td/><td>_0F9BC11F_11FA_464C_9308_795917BFE2A7_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ExtractCommonAppFolder</td><td/><td/><td>_37907DAE_2072_44EF_87EB_F7AD13511568_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FieldActivation</td><td/><td/><td>_94CB8EED_363C_42D4_BE99_3E7FA0968D70_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UUsafe32.dll</td><td/><td/><td>_56B51402_AD24_471E_BC88_0E3D875A2FB3_FILTER</td><td/><td/><td/><td/></row>
 	</table>
@@ -1597,7 +1597,8 @@
 		<col key="yes" def="s255">User</col>
 		<col def="I4">Permission</col>
 		<col def="I4">Attributes</col>
-		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Everyone</td><td>1880031743</td><td>0</td></row>
+		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Administrators</td><td>1880031743</td><td>0</td></row>
+		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Authenticated Users</td><td>1610809791</td><td>0</td></row>
 	</table>
 
 	<table name="ISLogicalDisk">
@@ -1733,6 +1734,7 @@
 		<row><td>PATH_TO_64BITINSTALLER_FILES</td><td>I:\Common\Engineering\ProductDevelopment\LicenseManager\Files\64bitInstaller</td><td/><td>2</td></row>
 		<row><td>PATH_TO_FIELDACTIVATION_FI</td><td>P:\LicenseManager\Files\FieldActivation</td><td/><td>2</td></row>
 		<row><td>PATH_TO_FIELDACTIVATION_FILES</td><td>I:\Common\Engineering\ProductDevelopment\LicenseManager\Files\FieldActivation</td><td/><td>2</td></row>
+		<row><td>PATH_TO_INSTALLSCRIPTS_FIL</td><td>D:\William\Engineering\ProductDevelopment\Common\InstallScripts</td><td/><td>2</td></row>
 		<row><td>PATH_TO_LEADTOOLSDLLS_FILES</td><td>I:\Common\Engineering\ProductDevelopment\InputFunnel\CoreInstallation\Files\LeadToolsDlls</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCC_FILES</td><td>I:\Common\Engineering\ProductDevelopment\LicenseManager\Files\NonSelfRegCC</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCOMMO_FILES1</td><td>I:\Common\Engineering\ProductDevelopment\InputFunnel\CoreInstallation\Files\NonSelfRegCommonComponents</td><td/><td>2</td></row>
@@ -1973,6 +1975,7 @@
 	<table name="ISScriptFile">
 		<col key="yes" def="s255">ISScriptFile</col>
 		<row><td>&lt;ISProjectDataFolder&gt;\script files\Setup.Rul</td></row>
+		<row><td>&lt;PATH_TO_INSTALLSCRIPTS_FIL&gt;\Common.rul</td></row>
 	</table>
 
 	<table name="ISSearchReplace">

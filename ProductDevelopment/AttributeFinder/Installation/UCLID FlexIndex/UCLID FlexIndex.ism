@@ -309,6 +309,7 @@
 		<col key="yes" def="s72">Directory_</col>
 		<col key="yes" def="s72">Component_</col>
 		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ExtractCommonAppFolder.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td></row>
+		<row><td>STANDARD_REPORTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td></row>
 	</table>
 
 	<table name="CustomAction">
@@ -904,6 +905,8 @@
 		<col def="I4">Attributes</col>
 		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Administrators</td><td>1880031743</td><td>0</td></row>
 		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Authenticated Users</td><td>1610809791</td><td>0</td></row>
+		<row><td>STANDARD_REPORTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Administrators</td><td>1880031743</td><td>0</td></row>
+		<row><td>STANDARD_REPORTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Authenticated Users</td><td>1610809791</td><td>0</td></row>
 	</table>
 
 	<table name="ISLogicalDisk">
