@@ -777,8 +777,15 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 		*pbLoginValid = VARIANT_FALSE;
 		*pbLoginCancelled = VARIANT_FALSE;
 
+		// [LegacyRCAndUtils:6168]
 		// Initialize the DB if it is blank
-		initializeIfBlankDB();
+		if (!initializeIfBlankDB())
+		{
+			// If the user chose not to initialize an empty database, treat as a cancelled login.
+			*pbLoginValid = VARIANT_FALSE;
+			*pbLoginCancelled = VARIANT_TRUE;
+			return S_OK;
+		}
 
 		// Get the stored password (if it exists)
 		string strStoredEncryptedCombined;
@@ -1049,6 +1056,15 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName)
 		{
 			UCLIDException ue("ELI18327", "Database name must not be empty!");
 			throw ue;
+		}
+
+		// [LegacyRCAndUtils:6168]
+		// Check for an existing, blank database.
+		if (isBlankDB())
+		{
+			// If this is a blank database, return without an exception; this will result in
+			// ShowLogin being called and, therefore, the prompt ot initialized the database.
+			return S_OK;
 		}
 		
 		// Create a connection object to the master db to create the database

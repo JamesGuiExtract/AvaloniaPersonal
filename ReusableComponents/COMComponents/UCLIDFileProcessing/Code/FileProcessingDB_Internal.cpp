@@ -1997,38 +1997,78 @@ bool  CFileProcessingDB::isPasswordValid(const string& strPassword, bool bUseAdm
 		strDecryptedCombined.substr(iUserNameSize) == strCombined.substr(iUserNameSize));
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::initializeIfBlankDB()
+bool CFileProcessingDB::isBlankDB()
 {
-	// Get the tables that exist in the database
-	_ConnectionPtr ipConnection =  getDBConnection();
-	_RecordsetPtr ipTables = ipConnection->OpenSchema(adSchemaTables);
-
-	// Set blank flag to true
-	bool bBlank = true;
-
-	// Go thru all of the tables
-	while (!asCppBool(ipTables->adoEOF))
+	try
 	{
-		// Get the Table Type
-		string strType = getStringField(ipTables->Fields, "TABLE_TYPE");
+		_ConnectionPtr ipConnection;
 
-		// Only need to look at the tables (no system tables or views)
-		if (strType == "TABLE")
+		try
 		{
-			// There is at least one non system table
-			bBlank = false;
-			break;
+			ipConnection = getDBConnection();
+		}
+		catch (...)
+		{
+			// If the database doesn't exist, its not blank.
+			return false;
 		}
 
-		// Get next table
-		ipTables->MoveNext();
+		// Get the tables that exist in the database
+		_RecordsetPtr ipTables = ipConnection->OpenSchema(adSchemaTables);
+
+		// Set blank flag to true
+		bool bBlank = true;
+
+		// Go thru all of the tables
+		while (!asCppBool(ipTables->adoEOF))
+		{
+			// Get the Table Type
+			string strType = getStringField(ipTables->Fields, "TABLE_TYPE");
+
+			// Only need to look at the tables (no system tables or views)
+			if (strType == "TABLE")
+			{
+				// There is at least one non system table
+				bBlank = false;
+				break;
+			}
+
+			// Get next table
+			ipTables->MoveNext();
+		}
+
+		return bBlank;
 	}
-	
-	// If blank flag is set clear the database
-	if (bBlank)
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33400");
+}
+//--------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::initializeIfBlankDB()
+{
+	try
 	{
-		clear();
+		bool bBlank = isBlankDB();
+	
+		// If blank flag is set clear the database
+		if (bBlank)
+		{
+			// Default to using the desktop as the parent for the messagebox below
+			HWND hParent = getAppMainWndHandle();
+
+			int iResult = ::MessageBox(hParent,
+				"This database exists but has not been initialized for use.\r\n\r\n"
+				"Do you wish to initialize it now?", "Initialize Database?", MB_YESNO);
+			if (iResult == IDYES)
+			{
+				clear();
+				return true;
+			}
+
+			return false;
+		}
+
+		return true;
 	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33401");
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)

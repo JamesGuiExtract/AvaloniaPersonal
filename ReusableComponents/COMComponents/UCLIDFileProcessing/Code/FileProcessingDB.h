@@ -588,8 +588,16 @@ private:
 	// Checks the strPassword value agains the password from the database
 	bool isPasswordValid(const string& strPassword, bool bUseAdmin);
 
-	// Checks for blank database and if it is blank will clear the database to set it up
-	void initializeIfBlankDB();
+	// Returns true if the configured database exists and is blank.
+	// Returns false if the configured database doesn't exist or is not blank.
+	// NOTE: This method will attempt a database connection, but eat any exception thrown attempting
+	// to do so and return false instead.
+	bool isBlankDB();
+
+	// Checks for blank database and if it is blank will clear the database to set it up.
+	// Returns true if the database is not blank or it was initialized.
+	// Returns false if the user was prompted to initialize the database, but declined.
+	bool initializeIfBlankDB();
 
 	// Fills the rvecTables vector with the Extract Tables
 	void getExpectedTables(vector<string>& rvecTables);
