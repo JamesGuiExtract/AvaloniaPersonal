@@ -667,6 +667,15 @@ library UCLID_AFUTILSLib
 		// If VARIANT_FALSE, the values in TypeMergePriority will be treated as literal values.
 		[propget, id(21), helpstring("property TreatTypeListAsRegex")] HRESULT TreatTypeListAsRegex([out, retval] VARIANT_BOOL *pVal);
 		[propput, id(21), helpstring("property TreatTypeListAsRegex")] HRESULT TreatTypeListAsRegex([in] VARIANT_BOOL newVal);
+
+		// When merging, if one attribute matches one of the MergeExclusionQueries queries and the other doesn't, they
+		// will be prevented from merging. In other words, in order to be merged, attributes must belong to the same
+		// list of sets defined here.
+		// As an example usage, the initial need for this field is to prevent Clues from merging with any attribute
+		// that is not a clue.
+		[propget, id(22), helpstring("property MergeExclusionQueries")] HRESULT MergeExclusionQueries([out, retval] IVariantVector **ppVal);
+		[propput, id(22), helpstring("property MergeExclusionQueries")] HRESULT MergeExclusionQueries([in] IVariantVector *pNewVal);
+		
     };
 
 	// Coclasses

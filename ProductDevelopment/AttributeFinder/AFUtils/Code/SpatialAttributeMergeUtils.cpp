@@ -35,10 +35,13 @@ CSpatialAttributeMergeUtils::CSpatialAttributeMergeUtils()
 , m_ipNameMergePriority(__nullptr)
 , m_ipValueMergePriority(__nullptr)
 , m_ipTypeMergePriority(__nullptr)
+, m_ipMergeExclusionQueries(__nullptr)
 , m_ipParser(__nullptr)
 {
 	try
 	{
+		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
+		ASSERT_RESOURCE_ALLOCATION("ELI33394", m_ipAFUtility != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31768");
 }
@@ -55,7 +58,9 @@ CSpatialAttributeMergeUtils::~CSpatialAttributeMergeUtils()
 		m_mapSpatialInfos.clear();
 		m_ipValueMergePriority = __nullptr;
 		m_ipTypeMergePriority = __nullptr;
+		m_ipMergeExclusionQueries = __nullptr;
 		m_ipParser = __nullptr;
+		m_ipAFUtility = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI31769");
 }
@@ -77,7 +82,9 @@ void CSpatialAttributeMergeUtils::FinalRelease()
 		m_mapSpatialInfos.clear();
 		m_ipValueMergePriority = __nullptr;
 		m_ipTypeMergePriority = __nullptr;
+		m_ipMergeExclusionQueries = __nullptr;
 		m_ipParser = __nullptr;
+		m_ipAFUtility = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI32133");
 }
@@ -681,6 +688,41 @@ STDMETHODIMP CSpatialAttributeMergeUtils::put_TreatTypeListAsRegex(VARIANT_BOOL 
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33102")
 }
 //--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::get_MergeExclusionQueries(IVariantVector **ppVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33390", ppVal != __nullptr);
+
+		validateLicense();
+		
+		IVariantVectorPtr ipShallowCopy = m_ipMergeExclusionQueries;
+		*ppVal = ipShallowCopy.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33391")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::put_MergeExclusionQueries(IVariantVector *pNewVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33392", pNewVal != __nullptr);
+
+		validateLicense();
+
+		m_ipMergeExclusionQueries = pNewVal;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33393")
+}
+//--------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialAttributeMergeUtils::FindQualifiedMerges(IIUnknownVector* pAttributes,
 	ISpatialString *pDocText)
 {
@@ -855,6 +897,10 @@ void CSpatialAttributeMergeUtils::findQualifiedMerges(IIUnknownVectorPtr ipAttri
 
 	ipTargetAttributes->Append(ipAttributeSet2);
 	
+	// Before iterating the attributes, compile sets of attributes that cannot be merged with
+	// attributes not in the set.
+	IIUnknownVectorPtr ipExclusiveSets = getExclusiveAttributeSets(ipAttributeSet1, ipAttributeSet2);
+
 	long nSet1Size = ipAttributeSet1->Size();
 	long nTargetSetSize = ipTargetAttributes->Size();
 
@@ -888,6 +934,12 @@ void CSpatialAttributeMergeUtils::findQualifiedMerges(IIUnknownVectorPtr ipAttri
 
 			// [FlexIDSCore:3328] Don't attempt to process non-spatial attributes 
 			if (m_mapAttributeInfo.find(ipAttribute2) == m_mapAttributeInfo.end())
+			{
+				continue;
+			}
+
+			// Prevent merging if excluded by MergeExclusionQueries.
+			if (isMergeExcludedByQuery(ipAttribute1, ipAttribute2, ipExclusiveSets))
 			{
 				continue;
 			}
@@ -939,6 +991,76 @@ void CSpatialAttributeMergeUtils::findQualifiedMerges(IIUnknownVectorPtr ipAttri
 			i = -1;
 		}
 	}
+}
+//-------------------------------------------------------------------------------------------------
+IIUnknownVectorPtr CSpatialAttributeMergeUtils::getExclusiveAttributeSets(
+	IIUnknownVectorPtr ipAttributeSet1, IIUnknownVectorPtr ipAttributeSet2)
+{
+	// Generate the result vector
+	IIUnknownVectorPtr ipExclusiveSets(CLSID_IUnknownVector);
+	ASSERT_RESOURCE_ALLOCATION("ELI33396", ipExclusiveSets != __nullptr);
+
+	// Combine the two attribute sets into one. It doesn't matter if the sets overalp, we are only
+	// going to check that one attribute is contained while another isn't. (It makes no difference
+	// whether one attribute is contained twice.
+	IIUnknownVectorPtr ipCombinedSets(CLSID_IUnknownVector);
+	ASSERT_RESOURCE_ALLOCATION("ELI33398", ipCombinedSets != __nullptr);
+
+	ipCombinedSets->Append(ipAttributeSet1);
+	ipCombinedSets->Append(ipAttributeSet2);
+
+	// Loop through each of the specified MergeExclusionQueries.
+	if (m_ipMergeExclusionQueries != __nullptr)
+	{
+		long nCount = m_ipMergeExclusionQueries->Size;
+		for (long i = 0; i < nCount; i++)
+		{
+			_bstr_t bstrQuery = m_ipMergeExclusionQueries->GetItem(i);
+			
+			// Query for all attributes matching the query.
+			IIUnknownVectorPtr ipSetMembers = m_ipAFUtility->QueryAttributes(ipCombinedSets, bstrQuery,
+				VARIANT_FALSE);
+			ASSERT_RESOURCE_ALLOCATION("ELI33397", ipSetMembers != __nullptr);
+
+			// If there are any, add a defined set of attributes which may be merged only with other
+			// members of the set.
+			if (ipSetMembers->Size() > 0)
+			{
+				ipExclusiveSets->PushBack(ipSetMembers);
+			}
+		}
+	}
+
+	return ipExclusiveSets;
+}
+//-------------------------------------------------------------------------------------------------
+bool CSpatialAttributeMergeUtils::isMergeExcludedByQuery(IAttributePtr ipAttribute1,
+	IAttributePtr ipAttribute2, IIUnknownVectorPtr ipExclusiveSets)
+{
+	// Loop through each set of attributes which may only be merged with other members of the set.
+	long nCount = ipExclusiveSets->Size();
+	for (long i = 0; i < nCount; i++)
+	{
+		IIUnknownVectorPtr ipSetMembers = ipExclusiveSets->At(i);
+
+		// Is ipAttribute1 in the set?
+		long nFoundIndex = -1;
+		ipSetMembers->FindByReference(ipAttribute1, 0, &nFoundIndex);
+		bool bAttribute1Included = (nFoundIndex != -1);
+
+		// Is ipAttribute2 in the set?
+		nFoundIndex = -1;
+		ipSetMembers->FindByReference(ipAttribute2, 0, &nFoundIndex);
+		bool bAttribute2Included = (nFoundIndex != -1);
+
+		// If one is in the set, but the other isn't, these attributes may not merge.
+		if (bAttribute1Included != bAttribute2Included)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 //-------------------------------------------------------------------------------------------------
 set<long> CSpatialAttributeMergeUtils::getPagesWithOverlap(IAttributePtr ipAttribute1, 

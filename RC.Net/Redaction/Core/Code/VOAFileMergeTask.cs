@@ -38,8 +38,9 @@ namespace Extract.Redaction
 
         /// <summary>
         /// Current task version.
+        /// Version 2: Added UseMutualOverlapPercent
         /// </summary>
-        internal const int _CURRENT_VERSION = 1;
+        internal const int _CURRENT_VERSION = 2;
 
         #endregion Constants
 
@@ -145,8 +146,8 @@ namespace Extract.Redaction
                 LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI32041",
                     _COMPONENT_DESCRIPTION);
 
-                _attributeMerger =
-                    InitializeAttributeMerger(_idShieldSettings, _settings.OverlapThreshold);
+                _attributeMerger = InitializeAttributeMerger(_idShieldSettings,
+                    _settings.UseMutualOverlap, _settings.OverlapThreshold);
             }
             catch (Exception ex)
             {
@@ -737,17 +738,22 @@ namespace Extract.Redaction
         /// Initializes the attribute merger.
         /// </summary>
         /// <param name="idShieldSettings">The ID shield ini settings to use.</param>
+        /// <param name="useMutualOverlap"><see langword="true"/> if
+        /// <see paramref="overlapThreshold"/> must be met when comparing redaction A to B as well
+        /// as B to A. <see langword="false"/> if <see paramref="overlapThreshold"/> needs to be met
+        /// in only one of the two comparisons (such as a small redaction contained in a larger one.
+        /// </param>
         /// <param name="overlapThreshold">The percentage of mutual overlap required to consider
         /// two redactions as equivalent.</param>
         internal static SpatialAttributeMergeUtils InitializeAttributeMerger(
-            InitializationSettings idShieldSettings, double overlapThreshold)
+            InitializationSettings idShieldSettings, bool useMutualOverlap, double overlapThreshold)
         {
             try
             {
                 SpatialAttributeMergeUtils attributeMerger = new SpatialAttributeMergeUtils();
 
                 attributeMerger.OverlapPercent = overlapThreshold;
-                attributeMerger.UseMutualOverlap = true;
+                attributeMerger.UseMutualOverlap = useMutualOverlap;
                 attributeMerger.NameMergeMode = EFieldMergeMode.kPreserveField;
                 attributeMerger.TypeMergeMode = EFieldMergeMode.kCombineField;
                 attributeMerger.PreserveAsSubAttributes = true;
@@ -770,6 +776,13 @@ namespace Extract.Redaction
                 }
 
                 attributeMerger.NameMergePriority = nameMergePriority;
+
+                // [FlexIDSCore:4626]
+                // Do not allow clues to merge with any attribute that is not also a clue.
+                VariantVector mergeExclusionQueries = new VariantVector();
+                mergeExclusionQueries.PushBack("Clues");
+
+                attributeMerger.MergeExclusionQueries = mergeExclusionQueries;
 
                 return attributeMerger;
             }

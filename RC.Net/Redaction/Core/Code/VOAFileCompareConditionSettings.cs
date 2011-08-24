@@ -83,6 +83,11 @@ namespace Extract.Redaction
         /// return <see langword="true"/> when they differ.</param>
         /// <param name="dataFile1">The first data file to compare.</param>
         /// <param name="dataFile2">The second data file to compare.</param>
+        /// <param name="useMutualOverlap"><see langword="true"/> if
+        /// <see paramref="overlapThreshold"/> must be met when comparing redaction A to B as well
+        /// as B to A. <see langword="false"/> if <see paramref="overlapThreshold"/> needs to be met
+        /// in only one of the two comparisons (such as a small redaction contained in a larger one.
+        /// </param>
         /// <param name="overlapThreshold">The percentage of mutual overlap required to consider two
         /// redactions as equivalent.</param>
         /// <param name="createOutput"><see langword="true"/> if a merged ID Shield data output file
@@ -92,9 +97,9 @@ namespace Extract.Redaction
         /// output only when the condition succeeds; <see langword="false"/> to always create the
         /// merged output.</param>
         public VOAFileCompareConditionSettings(bool conditionMetIfMatching, string dataFile1,
-            string dataFile2, int overlapThreshold, bool createOutput, string outputFile,
-            bool createOutputOnlyOnCondition)
-            : base(dataFile1, dataFile2, overlapThreshold, outputFile)
+            string dataFile2, bool useMutualOverlap, int overlapThreshold, bool createOutput,
+            string outputFile, bool createOutputOnlyOnCondition)
+            : base(dataFile1, dataFile2, useMutualOverlap, overlapThreshold, outputFile)
         {
             try 
 	        {	        

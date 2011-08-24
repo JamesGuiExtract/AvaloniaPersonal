@@ -23,6 +23,7 @@ namespace Extract.Redaction
             {
                 DataFile1 = "<SourceDocName>.session1.voa";
                 DataFile2 = "<SourceDocName>.session2.voa";
+                UseMutualOverlap = true;
                 OverlapThreshold = 75;
                 OutputFile = "<SourceDocName>.merged.voa";
             }
@@ -44,6 +45,7 @@ namespace Extract.Redaction
             {
                 DataFile1 = settings.DataFile1;
                 DataFile2 = settings.DataFile2;
+                UseMutualOverlap = settings.UseMutualOverlap;
                 OverlapThreshold = settings.OverlapThreshold;
                 OutputFile = settings.OutputFile;
             }
@@ -58,16 +60,22 @@ namespace Extract.Redaction
         /// </summary>
         /// <param name="dataFile1">The first data file to merge.</param>
         /// <param name="dataFile2">The second data file to merge.</param>
+        /// <param name="useMutualOverlap"><see langword="true"/> if
+        /// <see paramref="overlapThreshold"/> must be met when comparing redaction A to B as well
+        /// as B to A. <see langword="false"/> if <see paramref="overlapThreshold"/> needs to be met
+        /// in only one of the two comparisons (such as a small redaction contained in a larger one.
+        /// </param>
         /// <param name="overlapThreshold">The percentage of mutual overlap required to consider two
         /// redactions as equivalent.</param>
         /// <param name="outputFile">The filename where merged output should be written.</param>
-        public VOAFileMergeTaskSettings(string dataFile1, string dataFile2, int overlapThreshold,
-            string outputFile)
+        public VOAFileMergeTaskSettings(string dataFile1, string dataFile2, bool useMutualOverlap,
+            int overlapThreshold, string outputFile)
         {
             try 
 	        {	        
                 DataFile1 = dataFile1;
                 DataFile2 = dataFile2;
+                UseMutualOverlap = useMutualOverlap;
                 OverlapThreshold = overlapThreshold;
                 OutputFile = outputFile;
 	        }
@@ -103,6 +111,21 @@ namespace Extract.Redaction
         /// The percentage of mutual overlap required to consider two redactions as equivalent.
         /// </summary>
         public int OverlapThreshold
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
+        /// Gets or sets whether <see cref="OverlapThreshold"/> must be met when comparing 
+        /// redaction A to B as well as B to A. 
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if redactions must mutually overlap to be merged;
+        /// <see langword="false"/> if <see cref="OverlapThreshold"/> needs to be met in only one
+        /// of the two comparisons. (such as a small redaction contained in a larger one)
+        /// </value>
+        public bool UseMutualOverlap
         {
             get;
             protected set;
@@ -145,6 +168,11 @@ namespace Extract.Redaction
                 settings.OverlapThreshold = reader.ReadInt32();
                 settings.OutputFile = reader.ReadString();
 
+                if (reader.Version >= 2)
+                {
+                    settings.UseMutualOverlap = reader.ReadBoolean();
+                }
+
                 return settings;
             }
             catch (Exception ex)
@@ -168,6 +196,7 @@ namespace Extract.Redaction
                 writer.Write(DataFile2);
                 writer.Write(OverlapThreshold);
                 writer.Write(OutputFile);
+                writer.Write(UseMutualOverlap);
             }
             catch (Exception ex)
             {

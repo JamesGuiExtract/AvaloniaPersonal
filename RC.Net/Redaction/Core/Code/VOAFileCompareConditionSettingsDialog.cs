@@ -96,6 +96,7 @@ namespace Extract.Redaction
                     _settings.ConditionMetIfMatching ? "met" : "not met";
                 _dataFile1TextBox.Text = _settings.DataFile1;
                 _dataFile2TextBox.Text = _settings.DataFile2;
+                _useMutualOverlapComboBox.SelectedIndex = _settings.UseMutualOverlap ? 0 : 1;
                 _overlapThresholdUpDown.Value = _settings.OverlapThreshold;
                 _outputDataCheckBox.Checked = _settings.CreateOutput;
                 _outputFileTextBox.Text = _settings.OutputFile;
@@ -156,13 +157,15 @@ namespace Extract.Redaction
                     _conditionMetComboBox.Text.Equals("met", StringComparison.OrdinalIgnoreCase);
                 string dataFile1 = _dataFile1TextBox.Text;
                 string dataFile2 = _dataFile2TextBox.Text;
+                bool useMutualOverlap = (_useMutualOverlapComboBox.SelectedIndex == 0) ? true : false;
                 int overlapThreshold = (int)_overlapThresholdUpDown.Value;
                 bool createOutput = _outputDataCheckBox.Checked;
                 string outputFile = _outputFileTextBox.Text;
                 bool createOutputOnlyOnCondition = _outputConditionCheckBox.Checked;
 
                 return new VOAFileCompareConditionSettings(conditionMetIfMatching, dataFile1,
-                    dataFile2, overlapThreshold, createOutput, outputFile, createOutputOnlyOnCondition);
+                    dataFile2, useMutualOverlap, overlapThreshold, createOutput, outputFile,
+                    createOutputOnlyOnCondition);
             }
             catch (Exception ex)
             {

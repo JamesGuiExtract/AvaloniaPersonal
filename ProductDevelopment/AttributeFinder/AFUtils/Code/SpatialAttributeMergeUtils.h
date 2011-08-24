@@ -71,6 +71,8 @@ class ATL_NO_VTABLE CSpatialAttributeMergeUtils :
 	STDMETHOD(put_TypeMergePriority)(IVariantVector *pNewVal);
 	STDMETHOD(get_TreatTypeListAsRegex)(VARIANT_BOOL *pVal);
 	STDMETHOD(put_TreatTypeListAsRegex)(VARIANT_BOOL newVal);
+	STDMETHOD(get_MergeExclusionQueries)(IVariantVector **ppVal);
+	STDMETHOD(put_MergeExclusionQueries)(IVariantVector *pNewVal);
 	STDMETHOD(FindQualifiedMerges)(IIUnknownVector* pAttributes, ISpatialString *pDocText);
 	STDMETHOD(CompareAttributeSets)(IIUnknownVector* pvecAttributeSet1,
 		IIUnknownVector* pvecAttributeSet2, ISpatialString *pDocText,
@@ -145,6 +147,10 @@ private:
 	// If true, the values in m_ipTypeMergePriority will be treated as regular expressions.
 	bool m_bTreatTypeListAsRegex;
 
+	// The queries that define sets of attributes that cannot be merged with attributes not in the
+	// set.
+	IVariantVectorPtr m_ipMergeExclusionQueries;
+
 	// Define type to represent the portion of an attribute that is on a given page and 
 	typedef pair<IAttribute*, long> AttributePage;
 	// Define a map to Keep track of the merged attribute each AttributePage belongs to.
@@ -175,6 +181,9 @@ private:
 	// The parser to use to evaluate regex preservation lists.
 	IRegularExprParserPtr m_ipParser;
 
+	// An AFUtility instance to execute attribute queries.
+	UCLID_AFUTILSLib::IAFUtilityPtr m_ipAFUtility;
+
 	/////////////////
 	// Methods
 	/////////////////
@@ -188,6 +197,16 @@ private:
 	// NOTE: The input vectors will not be modified by this call. applyResults must be called to
 	// use the qualified merges that were found.
 	void findQualifiedMerges(IIUnknownVectorPtr ipAttributeSet1, IIUnknownVectorPtr ipAttributeSet2);
+
+	// Generates a vector of vectors where each vector is the member of a set defined by
+	// the MergeExclusionQueries.
+	IIUnknownVectorPtr getExclusiveAttributeSets(IIUnknownVectorPtr ipAttributeSet1,
+		IIUnknownVectorPtr ipAttributeSet2);
+
+	// Using the results of getExclusiveAttributeSets, determines whether the two attributes
+	// provided are excluded as possible merges by the MergeExclusionQueries.
+	bool isMergeExcludedByQuery(IAttributePtr ipAttribute1, IAttributePtr ipAttribute2,
+		IIUnknownVectorPtr ipExclusiveSets);
 
 	// Returns a set of pages representing all pages in which ipAttribute1 and ipAttribute2 overlap
 	// at least the amount specified by m_dOverlapPercent.

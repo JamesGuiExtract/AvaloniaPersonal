@@ -85,6 +85,7 @@ namespace Extract.Redaction
 
                 _dataFile1TextBox.Text = _settings.DataFile1;
                 _dataFile2TextBox.Text = _settings.DataFile2;
+                _useMutualOverlapComboBox.SelectedIndex = _settings.UseMutualOverlap ? 0 : 1;
                 _overlapThresholdUpDown.Value = _settings.OverlapThreshold;
                 _outputFileTextBox.Text = _settings.OutputFile;
             }
@@ -138,10 +139,12 @@ namespace Extract.Redaction
             {
                 string dataFile1 = _dataFile1TextBox.Text;
                 string dataFile2 = _dataFile2TextBox.Text;
+                bool useMutualOverlap = (_useMutualOverlapComboBox.SelectedIndex == 0) ? true : false;
                 int overlapThreshold = (int)_overlapThresholdUpDown.Value;
                 string outputFile = _outputFileTextBox.Text;
 
-                return new VOAFileMergeTaskSettings(dataFile1, dataFile2, overlapThreshold, outputFile);
+                return new VOAFileMergeTaskSettings(dataFile1, dataFile2, useMutualOverlap,
+                    overlapThreshold, outputFile);
             }
             catch (Exception ex)
             {

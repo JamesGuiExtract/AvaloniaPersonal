@@ -40,8 +40,9 @@ namespace Extract.Redaction
 
         /// <summary>
         /// Current task version.
+        /// Version 2: Added UseMutualOverlapPercent
         /// </summary>
-        internal const int _CURRENT_VERSION = 1;
+        internal const int _CURRENT_VERSION = 2;
 
         #endregion Constants
 
@@ -119,7 +120,7 @@ namespace Extract.Redaction
                     _COMPONENT_DESCRIPTION);
 
                 SpatialAttributeMergeUtils attributeMerger = VOAFileMergeTask.InitializeAttributeMerger(
-                    _idShieldSettings, _settings.OverlapThreshold);
+                    _idShieldSettings, _settings.UseMutualOverlap, _settings.OverlapThreshold);
 
                 bool conditionResult = VOAFileMergeTask.CompareMergeFiles(
                     _settings, _idShieldSettings, attributeMerger, pFileRecord.Name, pFAMTagManager);
