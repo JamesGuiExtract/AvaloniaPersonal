@@ -2262,6 +2262,9 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 
 							m_nAutoRevertTimeOutInMinutes =  asLong(getStringField(ipFields, "Value"));
 
+// [LegacyRCAndUtils:6172]
+// Don't enforce gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES in debug mode; having a low value is useful in development.
+#ifndef _DEBUG
 							// if less that a minimum value this should be reset to the minimum value
 							if (m_nAutoRevertTimeOutInMinutes < gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES)
 							{
@@ -2283,6 +2286,7 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 
 								m_nAutoRevertTimeOutInMinutes = gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES;
 							}
+#endif
 						}
 						else if (strValue == gstrAUTO_REVERT_NOTIFY_EMAIL_LIST)
 						{

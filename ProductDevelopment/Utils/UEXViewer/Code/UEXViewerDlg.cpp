@@ -66,12 +66,8 @@ const string PID_WIDTH			= "PidWidth";
 const string TIME_WIDTH			= "TimeWidth";
 const string ELI_WIDTH			= "ELICodeWidth";
 const string EXCEPTION_WIDTH	= "ExceptionWidth";
-const string SHOW_TRACES		= "ShowApplicationTraces";
-const string SHOW_DISPLAYED_EXCEPTIONS = "ShowDisplayedExceptions";
 
 const string DEFAULT_DIRECTORY = "C:\\";
-const string DEFAULT_SHOW_TRACES = "1";
-const string DEFAULT_SHOW_DISPLAYED_EXCEPTIONS = "1";
 
 // Window Size Bounds
 #define	MIN_WINDOW_X				731
@@ -1169,11 +1165,6 @@ void CUEXViewerDlg::OnClose()
 		strKey = (LPCTSTR) m_zDirectory;
 		m_pCfgMgr->setKeyValue( GENERAL, DIRECTORY, strKey, true );
 
-		m_pCfgMgr->setKeyValue(GENERAL, SHOW_TRACES, m_bShowTraces ? "1" : "0", true);
-		m_pCfgMgr->setKeyValue(GENERAL, SHOW_DISPLAYED_EXCEPTIONS,
-			m_bShowDisplayedExceptions ? "1" : "0", true);
-
-
 		// ELI Code column width
 		(m_listUEX.GetHeaderCtrl())->GetItemRect( TOP_ELI_COLUMN, &rect );
 		m_iELIColumnWidth = rect.Width();
@@ -1544,19 +1535,6 @@ void CUEXViewerDlg::initPersistent()
 	{
 		// Default to C drive
 		m_zDirectory = DEFAULT_DIRECTORY.c_str();
-	}
-
-	// Set the initial state of the "Show application traces" option.
-	if (m_pCfgMgr->keyExists(GENERAL, SHOW_TRACES))
-	{
-		m_bShowTraces = asCppBool(m_pCfgMgr->getKeyValue(GENERAL, SHOW_TRACES, DEFAULT_SHOW_TRACES));
-	}
-
-	// Set the initial state of the "Show displayed exceptions" option.
-	if (m_pCfgMgr->keyExists(GENERAL, SHOW_DISPLAYED_EXCEPTIONS))
-	{
-		m_bShowDisplayedExceptions = asCppBool(
-			m_pCfgMgr->getKeyValue(GENERAL, SHOW_DISPLAYED_EXCEPTIONS, DEFAULT_SHOW_DISPLAYED_EXCEPTIONS));
 	}
 
 	// Retrieve column widths

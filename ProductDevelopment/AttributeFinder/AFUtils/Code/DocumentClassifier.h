@@ -72,6 +72,8 @@ public:
 // IDocumentClassifier
 	STDMETHOD(get_IndustryCategoryName)(/*[out, retval]*/ BSTR *pVal);
 	STDMETHOD(put_IndustryCategoryName)(/*[in]*/ BSTR newVal);
+	STDMETHOD(get_ReRunClassifier)(/*[out, retval]*/ VARIANT_BOOL *pVal);
+	STDMETHOD(put_ReRunClassifier)(/*[in]*/ VARIANT_BOOL newVal);
 
 // IDocumentPreprocessor
 	STDMETHOD(raw_Process)(/*[in]*/ IAFDocument* pDocument,/*[in]*/ IProgressStatus *pProgressStatus);
@@ -119,6 +121,8 @@ private:
 
 	string m_strIndustryCategoryName;
 
+	bool m_bReRunClassifier;
+
 	UCLID_AFUTILSLib::IAFUtilityPtr m_ipAFUtility;
 
 	// Each industry name associated with a vector of DocTypeInterpreters
@@ -145,6 +149,11 @@ private:
 	// DocTypeInterpreter from m_vecDocTypeInterpreters.
 	// strSpecificIndustryName - ex, County Documents, etc.
 	void loadDocTypeFiles(const string& strSpecificIndustryName);
+
+	// Checks for existing classification results. If there are existing classification results,
+	// it will either return immediately and use the existing results or clear them and re-run
+	// classification.
+	bool useExistingResults(IAFDocumentPtr ipAFDoc);
 
 	void validateLicense();
 };

@@ -153,6 +153,13 @@ library UCLID_AFUTILSLib
 		// The industry specific categroy name, ex. County Document, Medical Document, etc
 		[propget, id(1), helpstring("property IndustryCategoryName")] HRESULT IndustryCategoryName([out, retval] BSTR *pVal);
 		[propput, id(1), helpstring("property IndustryCategoryName")] HRESULT IndustryCategoryName([in] BSTR newVal);
+
+		// If there are existing document classification results and ReRunClassifier is VARIANT_TRUE, the previous
+		// results will be cleared and the new classification (if any) will be added in its place.
+		// If there are existing document classification results and ReRunClassifier is VARIANT_FALSE, the results
+		// will be left alone and this instance will not be run.
+		[propget, id(2), helpstring("property ReRunClassifier")] HRESULT ReRunClassifier([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property ReRunClassifier")] HRESULT ReRunClassifier([in] VARIANT_BOOL newVal);
 	}
 	[
 		object,

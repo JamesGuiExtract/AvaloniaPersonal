@@ -17,7 +17,8 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 2: Added ReRunClassifier
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CDocumentClassifier
@@ -25,6 +26,7 @@ const unsigned long gnCurrentVersion = 1;
 CDocumentClassifier::CDocumentClassifier()
 : m_bDirty(false),
   m_strIndustryCategoryName(""),
+  m_bReRunClassifier(false),
   m_ipAFUtility(NULL)
 {
 }
@@ -101,6 +103,16 @@ STDMETHODIMP CDocumentClassifier::raw_Process(IAFDocument* pDocument, IProgressS
 			throw UCLIDException("ELI07124", "Please specify an Industry Category name before processing this document.");
 		}
 
+		IAFDocumentPtr ipDocument(pDocument);
+		ASSERT_RESOURCE_ALLOCATION("ELI29402", ipDocument != __nullptr);
+
+		// [FlexIDSCore:4753]
+		// If there are existing results and we are configured to use them, return right away.
+		if (useExistingResults(ipDocument))
+		{
+			return S_OK;
+		}
+
 		// use a smart pointer for the progress status object
 		IProgressStatusPtr ipProgressStatus = pProgressStatus;
 
@@ -119,7 +131,7 @@ STDMETHODIMP CDocumentClassifier::raw_Process(IAFDocument* pDocument, IProgressS
 			ipProgressStatus->StartNextItemGroup("Loading document type files",
 				lPROGRESS_ITEMS_PER_LOAD_FILES);
 		}
-
+		
 		// load the index file containing all document type 
 		// names for a given industry category name
 		try
@@ -146,9 +158,6 @@ STDMETHODIMP CDocumentClassifier::raw_Process(IAFDocument* pDocument, IProgressS
 		// create tags in the document
 		try
 		{
-			IAFDocumentPtr ipDocument(pDocument);
-			ASSERT_RESOURCE_ALLOCATION("ELI29402", ipDocument != __nullptr);
-
 			try
 			{
 				createDocTags(ipDocument, m_strIndustryCategoryName);
@@ -166,10 +175,10 @@ STDMETHODIMP CDocumentClassifier::raw_Process(IAFDocument* pDocument, IProgressS
 		{
 			ipProgressStatus->CompleteCurrentItemGroup();
 		}
+
+		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07110");
-	
-	return S_OK;
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07110");	
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -182,10 +191,10 @@ STDMETHODIMP CDocumentClassifier::get_IndustryCategoryName(BSTR *pVal)
 	try
 	{
 		*pVal = get_bstr_t(m_strIndustryCategoryName).Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07122")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CDocumentClassifier::put_IndustryCategoryName(BSTR newVal)
@@ -197,10 +206,38 @@ STDMETHODIMP CDocumentClassifier::put_IndustryCategoryName(BSTR newVal)
 		m_strIndustryCategoryName = asString(newVal);
 
 		m_bDirty = true;
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07123")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CDocumentClassifier::get_ReRunClassifier(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
-	return S_OK;
+	try
+	{
+		*pVal = asVariantBool(m_bReRunClassifier);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33417")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CDocumentClassifier::put_ReRunClassifier(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		m_bReRunClassifier = asCppBool(newVal);
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33418")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -216,10 +253,10 @@ STDMETHODIMP CDocumentClassifier::raw_GetComponentDescription(BSTR * pstrCompone
 
 		// Provide description
 		*pstrComponentDescription = bstr_t("Document classifier").Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07111")
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -238,12 +275,13 @@ STDMETHODIMP CDocumentClassifier::raw_CopyFrom(IUnknown *pObject)
 		UCLID_AFUTILSLib::IDocumentClassifierPtr ipSource(pObject);
 		ASSERT_RESOURCE_ALLOCATION("ELI08240", ipSource != __nullptr );
 
-		// Copy industry category name
+		// Copy settings.
 		m_strIndustryCategoryName = asString(ipSource->IndustryCategoryName);
+		m_bReRunClassifier = asCppBool(ipSource->ReRunClassifier);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08241");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CDocumentClassifier::raw_Clone(IUnknown* *pObject)
@@ -264,10 +302,10 @@ STDMETHODIMP CDocumentClassifier::raw_Clone(IUnknown* *pObject)
 	
 		// Return the new object to the caller
 		*pObject = ipObjCopy.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07114");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -299,6 +337,8 @@ STDMETHODIMP CDocumentClassifier::Load(IStream *pStream)
 		validateLicense();
 
 		m_strIndustryCategoryName = "";
+		// For an existing ruleset, m_bReRunClassifier should be true if it was saved as version 1.
+		m_bReRunClassifier = true;
 		
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -325,13 +365,17 @@ STDMETHODIMP CDocumentClassifier::Load(IStream *pStream)
 		{
 			dataReader >> m_strIndustryCategoryName;
 		}
+		if (nDataVersion >= 2)
+		{
+			dataReader >> m_bReRunClassifier;
+		}
 
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
+
+		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07115");
-	
-	return S_OK;
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07115");	
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CDocumentClassifier::Save(IStream *pStream, BOOL fClearDirty)
@@ -349,6 +393,7 @@ STDMETHODIMP CDocumentClassifier::Save(IStream *pStream, BOOL fClearDirty)
 
 		dataWriter << gnCurrentVersion;
 		dataWriter << m_strIndustryCategoryName;
+		dataWriter << m_bReRunClassifier;
 
 		dataWriter.flushToByteStream();
 
@@ -362,10 +407,10 @@ STDMETHODIMP CDocumentClassifier::Save(IStream *pStream, BOOL fClearDirty)
 		{
 			m_bDirty = false;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07116");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CDocumentClassifier::GetSizeMax(ULARGE_INTEGER *pcbSize)
@@ -385,10 +430,10 @@ STDMETHODIMP CDocumentClassifier::raw_IsConfigured(VARIANT_BOOL * pbValue)
 		validateLicense();
 
 		*pbValue = asVariantBool( !m_strIndustryCategoryName.empty() );
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07117");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -442,10 +487,10 @@ STDMETHODIMP CDocumentClassifier::GetDocumentIndustries(IVariantVector** ppIndus
 
 		// Provide vector to caller
 		*ppIndustries = ipVec.Detach();
+
+		return S_OK;
 	}	
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11916");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CDocumentClassifier::GetSpecialDocTypeTags(VARIANT_BOOL bAllowMultiplyClassified,
@@ -475,10 +520,10 @@ STDMETHODIMP CDocumentClassifier::GetSpecialDocTypeTags(VARIANT_BOOL bAllowMulti
 
 		// Provide vector to caller
 		*ppTags = ipVec.Detach();
+
+		return S_OK;
 	}	
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11919");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CDocumentClassifier::GetDocumentTypes(BSTR strIndustry, IVariantVector** ppTypes)
@@ -512,10 +557,10 @@ STDMETHODIMP CDocumentClassifier::GetDocumentTypes(BSTR strIndustry, IVariantVec
 
 		// Provide vector to caller
 		*ppTypes = ipVec.Detach();
+	
+		return S_OK;
 	}	
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11921");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry, 
@@ -578,10 +623,10 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 
 		// Provide vector to caller
 		*ppTypes = ipVec.Detach();
+
+		return S_OK;
 	}	
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11926");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -818,6 +863,35 @@ void CDocumentClassifier::loadDocTypeFiles(const string& strSpecificIndustryName
 
 	// add/update the DocTypeInterpreter entry
 	m_mapNameToVecInterpreters[strSpecificIndustryName] = vecDocTypeInterpreters;
+}
+//-------------------------------------------------------------------------------------------------
+bool CDocumentClassifier::useExistingResults(IAFDocumentPtr ipAFDoc)
+{
+	IStrToObjectMapPtr ipObjectTags(ipAFDoc->ObjectTags);
+	if (ipObjectTags != __nullptr)
+	{
+		if (asCppBool(ipObjectTags->Contains(get_bstr_t(DOC_TYPE))))
+		{
+			if (m_bReRunClassifier)
+			{
+				ipObjectTags->RemoveItem(get_bstr_t(DOC_TYPE));
+				ipObjectTags->RemoveItem(get_bstr_t(DCC_BLOCK_ID_TAG));
+				ipObjectTags->RemoveItem(get_bstr_t(DCC_RULE_ID_TAG));
+
+				IStrToStrMapPtr ipStringTags(ipAFDoc->StringTags);
+				if (ipStringTags != __nullptr)
+				{
+					ipStringTags->RemoveItem(get_bstr_t(DOC_PROBABILITY));
+				}
+			}
+			else
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 //-------------------------------------------------------------------------------------------------
 void CDocumentClassifier::validateLicense()

@@ -62,6 +62,9 @@ STDMETHODIMP CDocumentClassifierPP::Apply(void)
 			{
 				UCLID_AFUTILSLib::IDocumentClassifierPtr ipDocClassifier = m_ppUnk[i];
 				ipDocClassifier->IndustryCategoryName = _bstr_t(lpszText);
+
+				ipDocClassifier->ReRunClassifier =
+					asVariantBool(m_chkReRunClassifier.GetCheck() == BST_CHECKED);
 			}
 			m_bDirty = FALSE;
 		}
@@ -110,12 +113,15 @@ LRESULT CDocumentClassifierPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPa
 	try
 	{
 		m_cmbCategoryName = GetDlgItem(IDC_CMB_CATEGORY_NAME);
+		m_chkReRunClassifier = GetDlgItem(IDC_CHECK_RERUN_CLASSIFIER);
 
 		UCLID_AFUTILSLib::IDocumentClassifierPtr ipDocClassifier = m_ppUnk[0];
 		// if current category name is not empty
 		string strCurrentCategoryName = ipDocClassifier->IndustryCategoryName;
 		// populate combo box drop down list
 		populateComboBox(strCurrentCategoryName);
+
+		m_chkReRunClassifier.SetCheck(asBSTChecked(ipDocClassifier->ReRunClassifier));
 
 		SetDirty(FALSE);
 	}

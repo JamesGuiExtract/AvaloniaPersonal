@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by AFUtils.rc
 //
 #define IDS_PROJNAME                    100
@@ -15,10 +15,11 @@
 #define IDR_DOCUMENTCLASSIFIERPP        110
 #define IDD_DOCUMENTCLASSIFIERPP        111
 #define IDR_DOCUMENTCLASSIFICATIONUTILS 118
-#define IDR_SPATIALATTRIBUTEMERGEUTILS	119
+#define IDR_SPATIALATTRIBUTEMERGEUTILS  119
 #define IDC_CMB_CATEGORY_NAME           201
 #define IDC_RULES_FILENAME              202
 #define IDC_OUTPUT_FILENAME             203
+#define IDC_CHECK_RERUN_CLASSIFIER      204
 #define IDC_CHK_FROM_USS                298
 #define IDC_BTN_RULES_BROWSE_FILE       303
 #define IDC_BTN_OUTPUT_BROWSE_FILE      304
@@ -32,7 +33,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        201
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         204
+#define _APS_NEXT_CONTROL_VALUE         205
 #define _APS_NEXT_SYMED_VALUE           120
 #endif
 #endif

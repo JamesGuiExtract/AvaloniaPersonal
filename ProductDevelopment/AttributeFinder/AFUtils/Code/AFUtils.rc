@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -104,16 +102,18 @@ END
 // Dialog
 //
 
-IDD_DOCUMENTCLASSIFIERPP DIALOGEX 0, 0, 205, 41
+IDD_DOCUMENTCLASSIFIERPP DIALOGEX 0, 0, 209, 55
 STYLE DS_SETFONT | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     LTEXT           "Select Industry Specific Category name : ",IDC_STATIC,8,6,130,8
-    COMBOBOX        IDC_CMB_CATEGORY_NAME,8,20,189,49,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CMB_CATEGORY_NAME,8,20,193,49,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Clear existing classification and re-run document classifier.",IDC_CHECK_RERUN_CLASSIFIER,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,38,196,10
 END
 
-IDD_DLG_ADDDOCTYPES DIALOG  0, 0, 232, 174
+IDD_DLG_ADDDOCTYPES DIALOG 0, 0, 232, 174
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Select Document Types"
 FONT 8, "MS Sans Serif"
@@ -133,8 +133,14 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
+    IDD_DOCUMENTCLASSIFIERPP, DIALOG
+    BEGIN
+        RIGHTMARGIN, 205
+        BOTTOMMARGIN, 54
+    END
+
     IDD_DLG_ADDDOCTYPES, DIALOG
     BEGIN
         LEFTMARGIN, 5
@@ -151,7 +157,7 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_PROJNAME            "AFUtils"
     IDS_TITLEDocumentClassifierPP "DocumentClassifierPP"
@@ -159,7 +165,7 @@ BEGIN
     IDS_DOCSTRINGDocumentClassifierPP "DocumentClassifierPP"
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

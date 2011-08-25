@@ -52,6 +52,7 @@ private:
 	// Variables
 	/////////////
 	ATLControls::CComboBox m_cmbCategoryName;
+	ATLControls::CButton m_chkReRunClassifier;
 
 	UCLID_AFUTILSLib::IAFUtilityPtr m_ipAFUtility;
 
