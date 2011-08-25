@@ -94,7 +94,13 @@ Dlg_SdFeatureTree:
 				UninstallInstallSQLCE ();
 				
 				// Register the shell extension
-				UnregisterLoginNPShellExtension("Extract.Utilities.ShellExtensions.dll");
+				UnregisterLoginNPShellExtension("Extract.Utilities.ShellExtensions.dll");  
+				
+			    // Unregister Dlls
+				szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\UnegisterAll.bat\"";
+				szCmd = "cmd";
+				LaunchAppAndWait( szRegAllCmdLine, "/s", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+				
 			endif;
   			FeatureRemoveAll();
 		case REPAIR:    

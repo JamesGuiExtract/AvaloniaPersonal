@@ -498,7 +498,7 @@ int nResult, svServiceState;
 begin
 	// Change the root for the registry
 	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
-	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) < 0) then
+	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) = 0) then
 		SdShowMsg("Setup is Installing SQL Compact Edition", TRUE);
 
 		// Install SQL Compact Edition
@@ -566,12 +566,13 @@ begin
 
 		if (nResult = IDYES) then
 			SdShowMsg("Setup is Uninstalling SQL Compact Edition", TRUE);
-	    	UninstallApplication(SQL_COMPACT_EDITION_GUID,"", LAAW_OPTION_WAIT  | LAAW_OPTION_SHOW_HOURGLASS);
-	    	
 	    	// If 64 bit OS install 64 version of SSCE	
 			if ( SYSINFO.bIsWow64 ) then
 				UninstallApplication(SQL_COMPACT_EDITION_GUID_64,"", LAAW_OPTION_WAIT  | LAAW_OPTION_SHOW_HOURGLASS);			
 			endif;
+	
+	    	UninstallApplication(SQL_COMPACT_EDITION_GUID,"", LAAW_OPTION_WAIT  | LAAW_OPTION_SHOW_HOURGLASS);
+	    	SdShowMsg("Setup is Uninstalling SQL Compact Edition", FALSE);
 	  	endif;
 	endif;
 end;
