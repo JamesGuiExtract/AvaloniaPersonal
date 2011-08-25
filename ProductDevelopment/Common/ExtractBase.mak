@@ -43,6 +43,7 @@ CopyExtractBaseFiles : CleanupExtractBaseFiles
 	@COPY /v  "$(BinariesFolder)\COMLMCore.dll" "$(ExtractBaseInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\ExtractTRP2.exe" "$(ExtractBaseInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V "$(PDCommonDir)\RegisterAll.bat" "$(ExtractBaseInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V "$(PDCommonDir)\UnregisterAll.bat" "$(ExtractBaseInstallFilesRootDir)\NonSelfRegFiles"
 	
 	@DIR "$(ExtractBaseInstallFilesRootDir)\SelfRegFiles\*.*" /b >"$(ExtractBaseInstallFilesRootDir)\NonSelfRegFiles\ExtractBase.rl"
 	
