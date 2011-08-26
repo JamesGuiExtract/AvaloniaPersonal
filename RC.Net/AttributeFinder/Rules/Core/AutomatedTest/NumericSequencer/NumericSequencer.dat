@@ -1,0 +1,29 @@
+// Contract sequence, sort ascending, don't remove duplicates
+<TESTCASE>;ContractAscDuplicate.rsd;Source.txt;;ContractAscDuplicate.eav
+
+// Contract sequence, sort ascending, remove duplicates
+<TESTCASE>;ContractAscEliminate.rsd;Source.txt;;ContractAscEliminate.eav
+
+// Contract sequence, sort descending, don't remove duplicates
+<TESTCASE>;ContractDescDuplicate.rsd;Source.txt;;ContractDescDuplicate.eav
+
+// Contract sequence, sort descending, remove duplicates
+<TESTCASE>;ContractDescEliminate.rsd;Source.txt;;ContractDescEliminate.eav
+
+// Expand sequence, sort ascending, don't remove duplicates
+<TESTCASE>;ExpandAscDuplicate.rsd;Source.txt;;ExpandAscDuplicate.eav
+
+// Expand sequence, sort ascending, remove duplicates
+<TESTCASE>;ExpandAscEliminate.rsd;Source.txt;;ExpandAscEliminate.eav
+
+// Expand sequence, sort descending, don't remove duplicates
+<TESTCASE>;ExpandDescDuplicate.rsd;Source.txt;;ExpandDescDuplicate.eav
+
+// Expand sequence, sort descending, remove duplicates
+<TESTCASE>;ExpandDescEliminate.rsd;Source.txt;;ExpandDescEliminate.eav
+
+// Expand sequence, keep original ordering, don't remove duplicates
+<TESTCASE>;ExpandUnsortedDuplicate.rsd;Source.txt;;ExpandUnsortedDuplicate.eav
+
+// Expand sequence, keep original ordering, remove duplicates
+<TESTCASE>;ExpandUnsortedEliminate.rsd;Source.txt;;ExpandUnsortedEliminate.eav
