@@ -7,3 +7,4 @@
 <FILE>;..\..\..\AFSelectors\AutomatedTest\All\AFSelectors.dat
 <FILE>;..\..\..\AFSplitters\AutomatedTest\All\TestAFSplitters.dat
 <FILE>;..\..\..\InputValidators\AutomatedTest\All\InputValidators.dat
+<FILE>;..\..\..\..\..\RC.Net\AttributeFinder\Rules\Core\AutomatedTest\All\Extract.AttributeFinder.Rules.dat

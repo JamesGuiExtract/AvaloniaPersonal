@@ -157,9 +157,6 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                _watchingTask = new Task(() => WatchForFiles());
-                _queuingTask = new Task(() => QueueFiles());
-                _waitingForStopTask = new Task(() => WaitForSupplyingToStop());
             }
             catch (Exception ex)
             {
@@ -777,10 +774,11 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// 
+        /// Handles the case that the WCF connection faulted.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
         void WcfConnectionFaulted(object sender, EventArgs e)
         {
             try
@@ -854,7 +852,8 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// This thread watches the service-hosted file receiver files.
+        /// This thread watches the service-hosted file receiver for files and expands directories
+        /// into the files it contains.
         /// </summary>
         void WatchForFiles()
         {
@@ -940,8 +939,7 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// This thread collects the files from the file receiver, expands directories into the
-        /// files it contains, and queues them to the FAM DB.
+        /// This thread takes the files from the WatchForFiles thread and queues them to the FAM DB.
         /// </summary>
         void QueueFiles()
         {
