@@ -8,7 +8,7 @@
 //---------------------------------------------------------------------------
 function OnMaintUIBefore()
 	NUMBER nResult, nType;
-	STRING szTitle, szMsg, svDir, svResult, szCaption;
+	STRING szTitle, szMsg, svDir, svResult, szCaption,  szRegAllCmdLine, szCmd;
 begin
 	// TO DO: if you want to enable background, window title, and caption bar title   								
 	// SetTitle( @PRODUCT_NAME, 24, WHITE );					
