@@ -297,7 +297,7 @@
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Redaction: Compare ID Shield data files condition";
+            this.Text = "Redaction: Compare ID Shield data files condition settings";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._overlapThresholdUpDown)).EndInit();

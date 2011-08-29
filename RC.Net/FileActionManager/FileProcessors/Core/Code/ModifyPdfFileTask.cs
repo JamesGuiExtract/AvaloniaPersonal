@@ -31,7 +31,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The description of this task
         /// </summary>
-        const string _COMPONENT_DESCRIPTION = "Core: Modify pdf file";
+        const string _COMPONENT_DESCRIPTION = "Core: Modify PDF file";
 
         /// <summary>
         /// Current task version.

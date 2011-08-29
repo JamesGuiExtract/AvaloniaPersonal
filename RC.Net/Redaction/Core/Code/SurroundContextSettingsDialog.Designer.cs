@@ -217,7 +217,7 @@ namespace Extract.Redaction
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Redaction: Extend redactions to surround context";
+            this.Text = "Redaction: Extend redactions to surround context settings";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);

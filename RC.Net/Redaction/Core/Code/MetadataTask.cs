@@ -52,7 +52,7 @@ namespace Extract.Redaction
     {
         #region Constants
 
-        const string _COMPONENT_DESCRIPTION = "Redaction: Create metadata xml";
+        const string _COMPONENT_DESCRIPTION = "Redaction: Create metadata XML";
 
         const int _TASK_VERSION = 2;
 
@@ -906,8 +906,8 @@ namespace Extract.Redaction
             }
             catch (Exception ex)
             {
-                throw ExtractException.CreateComVisible("ELI28516", 
-                    "Unable to cancel 'Create metadata xml' task.", ex);
+                throw ExtractException.CreateComVisible("ELI28516",
+                    "Unable to cancel 'Create metadata XML' task.", ex);
             }
         }
 
@@ -925,7 +925,7 @@ namespace Extract.Redaction
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI28518",
-                    "Unable to close 'Create metadata xml' task.", ex);
+                    "Unable to close 'Create metadata XML' task.", ex);
             }
         }
 
@@ -958,7 +958,7 @@ namespace Extract.Redaction
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI28520",
-                    "Unable to initialize 'Create metadata xml' task.", ex);
+                    "Unable to initialize 'Create metadata XML' task.", ex);
             }
         }
 
@@ -1086,7 +1086,7 @@ namespace Extract.Redaction
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI28523",
-                    "Unable to load 'Create metadata xml' task.", ex);
+                    "Unable to load 'Create metadata XML' task.", ex);
             }
         }
 
@@ -1120,7 +1120,7 @@ namespace Extract.Redaction
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI28524",
-                    "Unable to save 'Create metadata xml' task.", ex);
+                    "Unable to save 'Create metadata XML' task.", ex);
             }
         }
 

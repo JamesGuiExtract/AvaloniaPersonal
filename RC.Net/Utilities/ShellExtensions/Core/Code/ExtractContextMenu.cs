@@ -3,18 +3,17 @@ using LogicNP.EZShellExtensions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.ServiceModel;
-using System.Windows.Forms;
 
 // Note:
-// This code is loaded into run within the process space of any process making use of Window's
-// shell. On 64bit OS's, this means this code needs to run as 64bit as well as 32bit. Therefore
-// this assembly is compiled as any CPU and cannot have any dependencies on 32bit Extract
-// assemblies.
+// This code is loaded into the process space of any process making use of Window's shell. On 64bit
+// OS's, this means this code needs to run as 64bit as well as 32bit. Therefore this assembly is
+// compiled as any CPU and cannot have any dependencies on 32bit Extract assemblies.
 namespace Extract.Utilities.ShellExtensions
 {
     /// <summary>
@@ -32,25 +31,9 @@ namespace Extract.Utilities.ShellExtensions
         #region Constants
 
         /// <summary>
-        /// If the context menu is being owner-drawn, the x offset the icon should be drawn at.
-        /// </summary>
-        const int _ICON_X_POS = 1;
-
-        /// <summary>
-        /// If the context menu is being owner-drawn, the x offset the text should be drawn at.
-        /// </summary>
-        const int _TEXT_X_POS = 17;
-
-        /// <summary>
         /// If the context menu is being owner-drawn, the size the icon should be.
         /// </summary>
         static readonly Size _ICON_SIZE = new Size(16, 16);
-
-        /// <summary>
-        /// If the context menu is being owner-drawn, the vertical padding that should exist above
-        /// and below the menu item icon text.
-        /// </summary>
-        const int _VERTICAL_PADDING = 2;
 
         #endregion Constants
 
@@ -70,12 +53,12 @@ namespace Extract.Utilities.ShellExtensions
         /// </summary>
         Dictionary<int, IEnumerable<string>> _qualifiedFiles =
             new Dictionary<int, IEnumerable<string>>();
-        
+
         /// <summary>
-        /// For each owner-drawn <see cref="ShellMenuItem"/>, the icon that should be drawn.
+        /// Caches menu item bitmaps so they don't need to be re-loaded from disk every time the
+        /// context menu is displayed.
         /// </summary>
-        Dictionary<ShellMenuItem, string> _iconFileNames =
-            new Dictionary<ShellMenuItem, string>();
+        static Dictionary<string, Bitmap> _bitmapCache = new Dictionary<string, Bitmap>();
 
         #endregion Fields
 
@@ -213,49 +196,6 @@ namespace Extract.Utilities.ShellExtensions
         }
 
         /// <summary>
-        /// Called when an owner drawn context menu item is to be drawn.
-        /// </summary>
-        /// <param name="e">The data for the method. The  MenuItem property specifies the menu item
-        /// which is to be drawn. The  Verb property identifies the menu item.</param>
-        protected override void OnDrawMenuItem(LogicNP.EZShellExtensions.EZSDrawItemEventArgs e)
-        {
-            e.DrawBackground();
-
-            // SNK Note: I'm skeptical of using hard-coded positions to draw the menu item
-            // components as it seems this will not be able to deal with different Window's themes.
-            // But the sample code uses hard-coded values as well-- I don't see any other option.
-
-            // Load the specified icon and draw it.
-            string iconFile = _iconFileNames[e.MenuItem];
-            using (FileStream stream = File.Open(iconFile, FileMode.Open))
-            using (Icon icon = new Icon(stream, _ICON_SIZE))
-            {
-                e.Graphics.DrawIcon(icon, _ICON_X_POS, 2);
-            }
-
-            // Draw the menu option text.
-            e.Graphics.DrawString(e.MenuItem.Caption, SystemInformation.MenuFont,
-                new SolidBrush(e.ForeColor), (float)_TEXT_X_POS, (float)e.Bounds.Top + _VERTICAL_PADDING);
-
-            e.DrawFocusRectangle();
-        }
-
-        /// <summary>
-        /// Called to retrieve the dimensions of owner drawn contex tmenu items.
-        /// </summary>
-        /// <param name="e">The data for the method. The  MenuItem property specifies the menu item
-        /// which is to be drawn. The Verb property identifies the menu item.</param>
-        protected override void OnMeasureMenuItem(LogicNP.EZShellExtensions.EZSMeasureItemEventArgs e)
-        {
-            // SNK Note: I'm skeptical of using hard-coded positions to draw the menu item
-            // components as it seems this will not be able to deal with different Window's themes.
-            // But the sample code uses hard-coded values as well-- I don't see any other option.
-
-            e.ItemHeight = SystemInformation.MenuHeight;
-            e.ItemWidth = _TEXT_X_POS + (int)(e.Graphics.MeasureString(e.MenuItem.Caption, SystemInformation.MenuFont)).Width;
-        }
-
-        /// <summary>
         /// Called when a contextmenu item is selected by the user.
         /// </summary>
         /// <param name="e">The data for the method. The  MenuItem property specifies the menu item
@@ -332,17 +272,64 @@ namespace Extract.Utilities.ShellExtensions
         /// <param name="iconFileName">The fileName of the icon to display.</param>
         /// <param name="menuItem">The <see cref="ShellMenuItem"/> for which the icon should be
         /// displayed.</param>
-        void ApplyIcon(string iconFileName, ShellMenuItem menuItem)
+        static void ApplyIcon(string iconFileName, ShellMenuItem menuItem)
         {
-            // If the specified icon file exists, use it.
-            if (File.Exists(iconFileName))
+            try
             {
-                _iconFileNames[menuItem] = iconFileName;
+                // If the specified icon file exists, use it.
+                if (File.Exists(iconFileName))
+                {
+                    Bitmap bitmap;
 
-                // There appears to be a bug with the owener-draw code for EZShellExtensions.
-                // For now, avoid drawing icons.
-                // menuItem.OwnerDraw = true;
+                    if (!_bitmapCache.TryGetValue(iconFileName, out bitmap))
+                    {
+                        // If an .ico file, load the file as an icon
+                        if (iconFileName.EndsWith(".ico", StringComparison.OrdinalIgnoreCase))
+                        {
+                            using (FileStream stream = File.Open(iconFileName, FileMode.Open))
+                            using (Icon icon = new Icon(stream, _ICON_SIZE))
+                            {
+                                bitmap = icon.ToBitmap();
+                                _bitmapCache[iconFileName] = bitmap;
+                            }
+                        }
+                        // If not an .ico file, load the icon associated with the file.
+                        else
+                        {
+                            using (Icon icon = Icon.ExtractAssociatedIcon(iconFileName))
+                            {
+                                if (icon.Size == _ICON_SIZE)
+                                {
+                                    bitmap = icon.ToBitmap();
+                                }
+                                else
+                                {
+                                    // ExtractAssociatedIcon can only retrieve 32x32 sized icons.
+                                    // Without using p/invoke for SHGetFileInfo, it appears the
+                                    // only way around this is to scale the image (the results may
+                                    // not be great.
+                                    using (Bitmap unsizedBitmap = icon.ToBitmap())
+                                    {
+                                        bitmap = new Bitmap(_ICON_SIZE.Width, _ICON_SIZE.Height);
+                                        using (Graphics g = Graphics.FromImage(bitmap))
+                                        {
+                                            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                                            g.SmoothingMode = SmoothingMode.HighQuality;
+                                            g.DrawImage(unsizedBitmap, 0, 0, _ICON_SIZE.Width, _ICON_SIZE.Height);
+                                        }
+                                    }
+                                }
+
+                                _bitmapCache[iconFileName] = bitmap;
+                            }
+                        }
+                    }
+
+                    menuItem.SetBitmap(bitmap);
+                }
             }
+            // If the icon can't be set, we can still display the menu item; Ignore any exceptions.
+            catch { }
         }
 
         #endregion Private Members

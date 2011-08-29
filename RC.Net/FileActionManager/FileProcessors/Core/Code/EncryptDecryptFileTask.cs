@@ -84,7 +84,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The description of this task
         /// </summary>
-        const string _COMPONENT_DESCRIPTION = "Core: Encrypt/Decrypt File";
+        const string _COMPONENT_DESCRIPTION = "Core: Encrypt/decrypt file";
 
         /// <summary>
         /// Current task version.
@@ -438,7 +438,7 @@ namespace Extract.FileActionManager.FileProcessors
                 var task = pObject as EncryptDecryptFileTask;
                 if (task == null)
                 {
-                    throw new InvalidCastException("Object is not an Encrypt/Decrypt file task.");
+                    throw new InvalidCastException("Object is not an Encrypt/decrypt file task.");
                 }
 
                 CopyFrom(task);

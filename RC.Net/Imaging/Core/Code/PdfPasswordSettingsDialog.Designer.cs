@@ -318,7 +318,7 @@ namespace Extract.Imaging
             this.MinimizeBox = false;
             this.Name = "PdfPasswordSettingsDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure PDF Security Settings";
+            this.Text = "PDF security settings";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);

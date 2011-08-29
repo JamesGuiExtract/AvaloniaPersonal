@@ -276,7 +276,7 @@
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Core: Transfer file via FTP/SFTP";
+            this.Text = "Core: Transfer file via FTP/SFTP settings";
             this._settingsTabControl.ResumeLayout(false);
             this._generalSettingsTabPage.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);

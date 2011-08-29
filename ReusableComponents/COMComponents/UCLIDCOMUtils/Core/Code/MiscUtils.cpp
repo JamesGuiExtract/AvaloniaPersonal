@@ -295,7 +295,7 @@ STDMETHODIMP CMiscUtils::AllowUserToConfigureObjectProperties(IObjectWithDescrip
 
 		// initialize title string
 		string strComponentDesc = ipCategorizedComponent->GetComponentDescription();
-		string strTitle = string("Configure ") + strComponentDesc;
+		string strTitle = strComponentDesc + " settings";
 
 		// create IObjectPropertiesUI object
 		UCLID_COMUTILSLib::IObjectPropertiesUIPtr ipPropertiesUI(CLSID_ObjectPropertiesUI);

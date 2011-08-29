@@ -13,9 +13,19 @@
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
+            if (disposing)
             {
-                components.Dispose();
+                if (components != null)
+                {
+                    components.Dispose();
+                    components = null;
+                }
+
+                if (_relativeTimeExampleTimer != null)
+                {
+                    _relativeTimeExampleTimer.Dispose();
+                    _relativeTimeExampleTimer = null;
+                }
             }
             base.Dispose(disposing);
         }
@@ -39,6 +49,7 @@
             System.Windows.Forms.Label label6;
             System.Windows.Forms.Label label7;
             this.panel1 = new System.Windows.Forms.Panel();
+            this._relativeTimeExampleLabel = new System.Windows.Forms.Label();
             this._timePeriodComboBox = new System.Windows.Forms.ComboBox();
             this._relativeTimePeriodCompareRadioButton = new System.Windows.Forms.RadioButton();
             this._fileCompareLabel1 = new System.Windows.Forms.Label();
@@ -111,6 +122,7 @@
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Controls.Add(this._relativeTimeExampleLabel);
             this.panel1.Controls.Add(label5);
             this.panel1.Controls.Add(this._timePeriodComboBox);
             this.panel1.Controls.Add(this._relativeTimePeriodCompareRadioButton);
@@ -132,6 +144,15 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(476, 148);
             this.panel1.TabIndex = 15;
+            // 
+            // _relativeTimeExampleLabel
+            // 
+            this._relativeTimeExampleLabel.AutoSize = true;
+            this._relativeTimeExampleLabel.Location = new System.Drawing.Point(221, 30);
+            this._relativeTimeExampleLabel.Name = "_relativeTimeExampleLabel";
+            this._relativeTimeExampleLabel.Size = new System.Drawing.Size(78, 13);
+            this._relativeTimeExampleLabel.TabIndex = 87;
+            this._relativeTimeExampleLabel.Text = "(Time example)";
             // 
             // label5
             // 
@@ -514,7 +535,7 @@
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Core: File Timestamp Condition";
+            this.Text = "Core: File timestamp condition";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             this.panel1.ResumeLayout(false);
@@ -553,5 +574,6 @@
         private System.Windows.Forms.Label _relativeCompareLabel2;
         private System.Windows.Forms.ComboBox _timePeriodComboBox;
         private System.Windows.Forms.RadioButton _relativeTimePeriodCompareRadioButton;
+        private System.Windows.Forms.Label _relativeTimeExampleLabel;
     }
 }

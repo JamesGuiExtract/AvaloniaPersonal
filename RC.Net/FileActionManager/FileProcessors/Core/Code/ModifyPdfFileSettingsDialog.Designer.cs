@@ -156,7 +156,7 @@ namespace Extract.FileActionManager.FileProcessors
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Core: Modify PDF file";
+            this.Text = "Core: Modify PDF file settings";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);

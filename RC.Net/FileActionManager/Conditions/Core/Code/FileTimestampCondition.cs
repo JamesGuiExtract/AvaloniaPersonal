@@ -2,6 +2,7 @@
 using Extract.Licensing;
 using Extract.Utilities;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -16,17 +17,15 @@ namespace Extract.FileActionManager.Conditions
     /// </summary>
     [ComVisible(true)]
     [Guid("FA88AF8A-2C67-4A87-AA63-803971B0BC52")]
+    // "1" is missing because Accessed was removed per RCDotNetAndUtils:700; these are not intended
+    // to be combinable flags.
+    [SuppressMessage("Microsoft.Design", "CA1027:MarkEnumsWithFlags")]
     public enum FileTimestampProperty
     {
         /// <summary>
         /// The date and time the file was created.
         /// </summary>
         Created = 0,
-
-        /// <summary>
-        /// The date and time the file was accessed.
-        /// </summary>
-        Accessed = 1,
 
         /// <summary>
         /// The date and time the file was modified.
@@ -774,7 +773,7 @@ namespace Extract.FileActionManager.Conditions
                 string file1Name = pFAMTagManager.ExpandTags(File1Name, pFileRecord.Name);
                 DateTime file1DateTime = GetFileDateTime(file1Name, File1Property);
 
-                if (ComparisonMethod == TimestampComparisonMethod.FileComparison)
+                if (ComparisonMethod == TimestampComparisonMethod.RangeComparison)
                 {
                     // Check to see if it is within the specified range (inclusive).
                     comparisonIsTrue =
@@ -798,7 +797,8 @@ namespace Extract.FileActionManager.Conditions
                             break;
 
                         case TimestampComparisonMethod.RelativeComparison:
-                            comparisonDateTime = GetRelativeDateTime();
+                            comparisonDateTime =
+                                GetRelativeDateTime(RelativeTimeSpanUnit, RelativeNumberAgo);
                             break;
 
                         case TimestampComparisonMethod.FileComparison:
@@ -1153,45 +1153,49 @@ namespace Extract.FileActionManager.Conditions
         /// <summary>
         /// Gets the <see cref="DateTime"/> to use for relative time comparisons.
         /// </summary>
-        /// <returns>The <see cref="DateTime"/> calculated relative to the current time.</returns>
-        DateTime GetRelativeDateTime()
+        /// <param name="unit">The <see cref="TimeSpanUnit"/> to use.</param>
+        /// <param name="numberAgo">The number of <see paramref="unit"/> to use.</param>
+        /// <returns>
+        /// The <see cref="DateTime"/> calculated relative to the current time.
+        /// </returns>
+        static internal DateTime GetRelativeDateTime(TimeSpanUnit unit, int numberAgo)
         {
             DateTime comparisonDateTime = DateTime.Now;
 
-            switch (RelativeTimeSpanUnit)
+            switch (unit)
             {
                 case TimeSpanUnit.Seconds:
-                    comparisonDateTime = comparisonDateTime.AddSeconds(-RelativeNumberAgo);
+                    comparisonDateTime = comparisonDateTime.AddSeconds(-numberAgo);
                     break;
 
                 case TimeSpanUnit.Minutes:
                     comparisonDateTime =
-                        comparisonDateTime.AddMinutes(-RelativeNumberAgo);
+                        comparisonDateTime.AddMinutes(-numberAgo);
                     break;
 
                 case TimeSpanUnit.Hours:
                     comparisonDateTime =
-                        comparisonDateTime.AddHours(-RelativeNumberAgo);
+                        comparisonDateTime.AddHours(-numberAgo);
                     break;
 
                 case TimeSpanUnit.Days:
                     comparisonDateTime =
-                        comparisonDateTime.AddDays(-RelativeNumberAgo);
+                        comparisonDateTime.AddDays(-numberAgo);
                     break;
 
                 case TimeSpanUnit.Weeks:
                     comparisonDateTime =
-                        comparisonDateTime.AddDays(-RelativeNumberAgo * 7);
+                        comparisonDateTime.AddDays(-numberAgo * 7);
                     break;
 
                 case TimeSpanUnit.Months:
                     comparisonDateTime =
-                        comparisonDateTime.AddMonths(-RelativeNumberAgo);
+                        comparisonDateTime.AddMonths(-numberAgo);
                     break;
 
                 case TimeSpanUnit.Years:
                     comparisonDateTime =
-                        comparisonDateTime.AddYears(-RelativeNumberAgo);
+                        comparisonDateTime.AddYears(-numberAgo);
                     break;
 
                 default:
@@ -1404,9 +1408,6 @@ namespace Extract.FileActionManager.Conditions
             {
                 case FileTimestampProperty.Created:
                     return File.GetCreationTime(fileName);
-
-                case FileTimestampProperty.Accessed:
-                    return File.GetLastAccessTime(fileName);
 
                 case FileTimestampProperty.Modified:
                     return File.GetLastWriteTime(fileName);

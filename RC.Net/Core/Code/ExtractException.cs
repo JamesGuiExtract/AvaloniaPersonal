@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -1498,6 +1499,29 @@ namespace Extract
                 // Throw the new exception
                 throw ee;
             }
+        }
+
+        /// <summary>
+        /// Throws a <see cref="Win32Exception"/> with the last error code wrapped in an
+        /// <see cref="ExtractException"/> built from the provided <see paramref="eliCode"/> if the
+        /// condition provided is false, otherwise does nothing.
+        /// </summary>
+        /// <param name="eliCode">A unique Extract Systems ELI Code</param>
+        /// <param name="message">The message to associate with this exception.</param>
+        /// <param name="condition">An expression that evaluates to a boolean.</param>
+        public static void Win32Assert(string eliCode, string message, bool condition)
+        {
+            try 
+	        {
+                if (!condition)
+                {
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                }
+	        }
+	        catch (Exception ex)
+	        {
+                throw new ExtractException(eliCode, message, ex);
+	        }
         }
 
         /// <summary>

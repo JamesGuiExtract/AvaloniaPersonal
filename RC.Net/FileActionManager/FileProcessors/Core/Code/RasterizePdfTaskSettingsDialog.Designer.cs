@@ -235,7 +235,7 @@
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Core: Rasterize PDF settings";
+            this.Text = "Core: Rasterize PDF settings";
             this._groupDeleteFailed.ResumeLayout(false);
             this._groupDeleteFailed.PerformLayout();
             this.ResumeLayout(false);

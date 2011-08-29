@@ -1,6 +1,7 @@
 ﻿using Extract.Licensing;
 using Extract.Utilities;
 using System;
+using System.IO;
 using System.Windows.Forms;
 
 namespace Extract.FileActionManager.FileSuppliers
@@ -147,7 +148,7 @@ namespace Extract.FileActionManager.FileSuppliers
         bool WarnIfInvalid()
         {
             ExtractException.Assert("ELI33161",
-                "Context menu file supplier settings have not been provided.", Settings != null);
+                "Files from context menu settings have not been provided.", Settings != null);
 
             if (string.IsNullOrWhiteSpace(_menuOptionNameTextBox.Text))
             {
@@ -166,11 +167,11 @@ namespace Extract.FileActionManager.FileSuppliers
                 return true;
             }
 
-            if (_limitRootCheckBox.Checked && string.IsNullOrWhiteSpace(_rootPathTextBox.Text))
+            if (_limitRootCheckBox.Checked && !Directory.Exists(_rootPathTextBox.Text))
             {
                 _rootPathTextBox.Focus();
                 UtilityMethods.ShowMessageBox(
-                    "Please specify root folder for which this context menu should be available.",
+                    "Please specify a valid root folder under which this context menu should be available.",
                     "Specify Path Root", false);
                 return true;
             }

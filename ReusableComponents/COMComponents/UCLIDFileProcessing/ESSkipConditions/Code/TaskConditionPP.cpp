@@ -152,7 +152,7 @@ LRESULT CTaskConditionPP::OnBnClickedBtnConfigure(WORD wNotifyCode, WORD wID, HW
 
 		// Create the title for the task configuration box
 		string strComponentDesc = asString(ipCopy->GetComponentDescription());
-		string strTitle = string( "Configure " ) + strComponentDesc;
+		string strTitle = strComponentDesc + " settings";
 
 		if(asCppBool(ipProperties->DisplayProperties1(ipCopy, strTitle.c_str())))
 		{

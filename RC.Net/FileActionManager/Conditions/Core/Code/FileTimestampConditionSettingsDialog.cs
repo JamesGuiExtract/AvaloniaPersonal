@@ -2,6 +2,7 @@
 using Extract.Utilities;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace Extract.FileActionManager.Conditions
@@ -22,6 +23,15 @@ namespace Extract.FileActionManager.Conditions
 
         #endregion Constants
 
+        #region Fields
+
+        /// <summary>
+        /// A timer used to update _relativeTimeExampleTextBox every second.
+        /// </summary>
+        Timer _relativeTimeExampleTimer = new Timer();
+
+        #endregion Fields
+
         #region Constructors
 
         /// <summary>
@@ -36,7 +46,6 @@ namespace Extract.FileActionManager.Conditions
             {
                 // Assign readable values for enums to be displayed in combo boxes.
                 FileTimestampProperty.Created.SetReadableValue("created");
-                FileTimestampProperty.Accessed.SetReadableValue("accessed");
                 FileTimestampProperty.Modified.SetReadableValue("modified");
 
                 TimeSpanUnit.Seconds.SetReadableValue("seconds");
@@ -47,8 +56,8 @@ namespace Extract.FileActionManager.Conditions
                 TimeSpanUnit.Months.SetReadableValue("months");
                 TimeSpanUnit.Years.SetReadableValue("years");
 
-                DateComparisonOperator.Equal.SetReadableValue("equal to");
-                DateComparisonOperator.NotEqual.SetReadableValue("not equal to");
+                DateComparisonOperator.Equal.SetReadableValue("exactly equal to");
+                DateComparisonOperator.NotEqual.SetReadableValue("not exactly equal to");
                 DateComparisonOperator.After.SetReadableValue("after");
                 DateComparisonOperator.OnOrAfter.SetReadableValue("equal to or after");
                 DateComparisonOperator.Before.SetReadableValue("before");
@@ -113,10 +122,12 @@ namespace Extract.FileActionManager.Conditions
 
                             _comparisonDateTimePicker.Enabled =
                                 enable && _staticTimeCompareRadioButton.Checked;
-                            _numberAgoUpDown.Enabled =
+                            bool relativeTimeEnabled =
                                 enable && _relativeTimeCompareRadioButton.Checked;
-                            _unitsAgoComboBox.Enabled =
-                                enable && _relativeTimeCompareRadioButton.Checked;
+                            _numberAgoUpDown.Enabled = relativeTimeEnabled;
+                            _unitsAgoComboBox.Enabled = relativeTimeEnabled;
+                            _relativeTimeExampleLabel.Enabled = relativeTimeEnabled;
+                            UpdateRelativeDateTimeExample();
                             _timePeriodComboBox.Enabled =
                                 enable && _relativeTimePeriodCompareRadioButton.Checked;
                             _file2PropertyComboBox.Enabled =
@@ -143,6 +154,19 @@ namespace Extract.FileActionManager.Conditions
                             _compareRadioButton.Checked && _relativeTimeCompareRadioButton.Checked;
                         _unitsAgoComboBox.Enabled =
                             _compareRadioButton.Checked && _relativeTimeCompareRadioButton.Checked;
+                        _relativeTimeExampleLabel.Enabled =
+                            _compareRadioButton.Checked && _relativeTimeCompareRadioButton.Checked;
+                        UpdateRelativeDateTimeExample();
+                    });
+
+                _numberAgoUpDown.ValueChanged  += ((sender, args) =>
+                    {
+                        UpdateRelativeDateTimeExample();
+                    });
+
+                _unitsAgoComboBox.SelectedIndexChanged += ((sender, args) =>
+                    {
+                        UpdateRelativeDateTimeExample();
                     });
 
                 _relativeTimePeriodCompareRadioButton.CheckedChanged += ((sender, args) =>
@@ -162,8 +186,8 @@ namespace Extract.FileActionManager.Conditions
                             else
                             {
                                 _timePeriodComboBox.Enabled = false;
-                                _comparisonComboBox.RenameEnumValue(DateComparisonOperator.Equal, "equal to");
-                                _comparisonComboBox.RenameEnumValue(DateComparisonOperator.NotEqual, "not equal to");
+                                _comparisonComboBox.RenameEnumValue(DateComparisonOperator.Equal, "exactly equal to");
+                                _comparisonComboBox.RenameEnumValue(DateComparisonOperator.NotEqual, "not exactly equal to");
                                 _comparisonComboBox.RenameEnumValue(DateComparisonOperator.OnOrAfter, "equal to or after");
                                 _comparisonComboBox.RenameEnumValue(DateComparisonOperator.OnOrBefore, "equal to or before");
                             }
@@ -202,6 +226,8 @@ namespace Extract.FileActionManager.Conditions
         public FileTimestampCondition Settings { get; set; }
 
         #endregion Properties
+
+        #region Overrides
 
         /// <summary>
         /// Raises the <see cref="E:System.Windows.Forms.Form.Load"/> event.
@@ -270,12 +296,41 @@ namespace Extract.FileActionManager.Conditions
                     _file2PropertyComboBox.SelectEnumValue(Settings.File2Property);
                     _file2TextBox.Text = Settings.File2Name;
                 }
+
+                _relativeTimeExampleTimer.Interval = 1000;
+                _relativeTimeExampleTimer.Tick += HandleRelativeTimeExampleTimerTick;
+                _relativeTimeExampleTimer.Start();
+
+                // Do the initial time example update right away.
+                UpdateRelativeDateTimeExample();
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI32805");
             }
         }
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Form.Closing"/> event.
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.ComponentModel.CancelEventArgs"/> that contains
+        /// the event data.</param>
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            try
+            {
+                base.OnClosing(e);
+
+                // Stop the relative time example updates when the form is closing.
+                _relativeTimeExampleTimer.Stop();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI33461");
+            }
+        }
+
+        #endregion Overrides
 
         #region Event Handlers
 
@@ -343,6 +398,24 @@ namespace Extract.FileActionManager.Conditions
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI32808");
+            }
+        }
+
+        /// <summary>
+        /// Handles the _relativeTimeExampleTimer Tick event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleRelativeTimeExampleTimerTick(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateRelativeDateTimeExample();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI33460");
             }
         }
 
@@ -431,6 +504,26 @@ namespace Extract.FileActionManager.Conditions
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Updates the relative date time example.
+        /// </summary>
+        void UpdateRelativeDateTimeExample()
+        {
+            if (_relativeTimeExampleTimer.Enabled && _relativeTimeExampleLabel.Enabled)
+            {
+                TimeSpanUnit unit = _unitsAgoComboBox.ToEnumValue<TimeSpanUnit>();
+                DateTime relativeDateTime = FileTimestampCondition.GetRelativeDateTime(
+                    unit, (int)_numberAgoUpDown.Value);
+                _relativeTimeExampleLabel.Text = "(" +
+                    relativeDateTime.ToString(_rangeStartDateTimePicker.CustomFormat.Trim(),
+                    CultureInfo.CurrentCulture) + ")";
+            }
+            else
+            {
+                _relativeTimeExampleLabel.Text = "";
+            }
         }
 
         #endregion Private Members

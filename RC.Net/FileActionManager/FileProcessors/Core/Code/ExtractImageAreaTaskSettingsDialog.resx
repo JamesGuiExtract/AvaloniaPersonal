@@ -167,6 +167,10 @@ Examples:
     <value>If multiple areas may be extracted, the &lt;AreaID&gt; tag must be used in the output file.
 &lt;AreaID&gt; will be replaced with a number that ensures uniqueness of the output file
 (not just for the current source document, but in general).
+
+Note that since the &lt;AreaID&gt; tag will ensure that the output file is unique, when used
+the option to append to an existing image will not be available (and will therefore be
+disabled.)
 </value>
   </data>
   <data name="_outputFilePathTagsButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">

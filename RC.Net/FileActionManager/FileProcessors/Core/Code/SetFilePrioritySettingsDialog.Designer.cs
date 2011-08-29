@@ -172,7 +172,7 @@
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Core: Set file priority";
+            this.Text = "Core: Set file priority settings";
             _fileNameGroupBox.ResumeLayout(false);
             _fileNameGroupBox.PerformLayout();
             _priorityGroupBox.ResumeLayout(false);

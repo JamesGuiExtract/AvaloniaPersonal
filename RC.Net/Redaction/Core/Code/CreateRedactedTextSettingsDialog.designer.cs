@@ -396,7 +396,7 @@
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Redaction: Create redacted text";
+            this.Text = "Redaction: Create redacted text settings";
             this._dataToRedactGroupBox.ResumeLayout(false);
             this._dataToRedactGroupBox.PerformLayout();
             this._redactionMethodGroupBox.ResumeLayout(false);

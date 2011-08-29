@@ -224,7 +224,7 @@
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Core: Document Type Condition";
+            this.Text = "Core: Document type condition settings";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             this.ResumeLayout(false);

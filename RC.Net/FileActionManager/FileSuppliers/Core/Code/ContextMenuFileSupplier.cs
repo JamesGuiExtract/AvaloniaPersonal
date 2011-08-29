@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.ServiceModel;
+using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -33,7 +34,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <summary>
         /// The description of this file supplier
         /// </summary>
-        const string _COMPONENT_DESCRIPTION = "Context menu file supplier";
+        const string _COMPONENT_DESCRIPTION = "Files from context menu";
 
         /// <summary>
         /// Current file supplier version.
@@ -52,6 +53,11 @@ namespace Extract.FileActionManager.FileSuppliers
         const int _POLLING_INTERVAL = 1000;
 
         /// <summary>
+        /// The time to wait in seconds for the ESIPC service to start.
+        /// </summary>
+        const int _SERVICE_TIMEOUT = 15;
+
+        /// <summary>
         /// The text of the sub menu that should be added to the context menu.
         /// </summary>
         const string _PARENT_MENU_NAME = "Send to FAM";
@@ -60,11 +66,17 @@ namespace Extract.FileActionManager.FileSuppliers
         /// The file containing the icon that should be used for the adde sub-menu.
         /// </summary>
         static readonly string _ICON_FILE =
-            Path.Combine(FileSystemMethods.CommonComponentsPath, "FAM.ico");
+            Path.Combine(FileSystemMethods.CommonComponentsPath, "ProcessFiles.ico");
 
         #endregion Constants
 
         #region Fields
+
+        /// <summary>
+        /// Prevents multiple file supplier instances in a process from attempting to start the
+        /// service at the same time.
+        /// </summary>
+        static object _serviceLock = new object();
 
         // Target for the files that are being supplier
         IFileSupplierTarget _fileTarget;
@@ -157,6 +169,7 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
+                FileFilter = "*.tif;*.tiff";
             }
             catch (Exception ex)
             {
@@ -272,6 +285,8 @@ namespace Extract.FileActionManager.FileSuppliers
                 _supplyingStopped.Reset();
                 _supplyingActivated.Set();
                 _filesAreAvailable.Reset();
+
+                StartESIPCService();
 
                 _watchingTask = new Task(() => WatchForFiles());
                 _watchingTask.Start();
@@ -693,7 +708,7 @@ namespace Extract.FileActionManager.FileSuppliers
                      OperationContext.Current.Channel.State != CommunicationState.Opened))
                 {
                     ExtractException ee = new ExtractException("ELI33123",
-                        "Context menu file supplier: lost connection to Extract IPC Service.");
+                        "Files from context menu: lost connection to Extract IPC Service.");
                     ee.AddDebugData("Name", MenuOptionName, false);
                     ee.Log();
 
@@ -735,7 +750,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 if (_loggedConnectionFailed)
                 {
                     ExtractException ee = new ExtractException("ELI33179",
-                        "Application trace: Context menu file supplier connection restored.");
+                        "Application trace: Files from context menu connection restored.");
                     ee.AddDebugData("Name", MenuOptionName, false);
                     ee.Log();
 
@@ -763,7 +778,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 {
                     _loggedConnectionFailed = true;
                     ExtractException ee = new ExtractException("ELI33122",
-                        "Context menu file supplier: failed to connect to Extract IPC Service.",
+                        "Files from context menu: failed to connect to Extract IPC Service.",
                         ex);
                     ee.AddDebugData("Name", MenuOptionName, false);
                     ee.Log();
@@ -788,7 +803,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 _loggedConnectionFailed = true;
 
                 ExtractException ee = new ExtractException("ELI33178",
-                            "Context menu file supplier: lost connection to Extract IPC Service.");
+                            "Files from context menu: lost connection to Extract IPC Service.");
                 ee.AddDebugData("Name", MenuOptionName, false);
                 ee.Log();
 
@@ -883,7 +898,7 @@ namespace Extract.FileActionManager.FileSuppliers
 
                             {
                                 ExtractException ee = new ExtractException("ELI33176",
-                                "Context menu file supplier: error communicating with Extract IPC Service.", ex);
+                                "Files from context menu: error communicating with Extract IPC Service.", ex);
                                 ee.AddDebugData("Name", MenuOptionName, false);
                                 throw ee;
                             }
@@ -999,6 +1014,15 @@ namespace Extract.FileActionManager.FileSuppliers
             }
             catch { }
 
+            // [DotNetRCAndUtils:711]
+            // Flush the queue whenever processing stops so remaining files don't unexpectedly
+            // start queuing if the FAM is restarted.
+            string temp;
+            while (!_filesToQueue.IsEmpty)
+            {
+                _filesToQueue.TryDequeue(out temp);
+            }
+
             _fileTarget.NotifyFileSupplyingDone(this);
             _supplyingStopped.Set();
 
@@ -1020,6 +1044,61 @@ namespace Extract.FileActionManager.FileSuppliers
                     MenuOptionName + " context menu supplier has failed.",
                     exceptions.AsAggregateException());
                 ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Attempts to start the IPC Service if it is not already running.
+        /// </summary>
+        static void StartESIPCService()
+        {
+            if (Monitor.TryEnter(_serviceLock, 0))
+            {
+                try
+                {
+                    using (ServiceController serviceController = new ServiceController("ESIPCService"))
+                    {
+                        try
+                        {
+                            if (serviceController.Status != ServiceControllerStatus.Running)
+                            {
+                                serviceController.Start();
+                                serviceController.WaitForStatus(ServiceControllerStatus.Running,
+                                    new TimeSpan(0, 0, _SERVICE_TIMEOUT));
+
+                                ExtractException.Assert("ELI33457",
+                                    "Extract Systems IPC Service did not start.",
+                                    serviceController.Status == ServiceControllerStatus.Running);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // Display any errors starting the service, but allow the file supplier
+                            // to continue running so that if the service is started at a later time,
+                            // the context menu will become available.
+                            ExtractException ee = new ExtractException("ELI33458",
+                                "Failed to start \"Extract Systems IPC Service\".\r\n" +
+                                "Extract Systems context menu option(s) will not be available " +
+                                "until the service is started.", ex);
+
+                            ee.Display();
+                        }
+                    }
+                }
+                finally
+                {
+                    Monitor.Exit(_serviceLock);
+                }
+            }
+            else
+            {
+                // If another instance is already starting the service, just wait for that attempt
+                // to finish. We should wait so that the _watchingTask doesn't unnecessarily log
+                // exceptions while the service is starting.
+                if (Monitor.TryEnter(_serviceLock, _SERVICE_TIMEOUT))
+                {
+                    Monitor.Exit(_serviceLock);
+                }
             }
         }
 

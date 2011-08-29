@@ -39,7 +39,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The description to be displayed in the categorized component selection list.
         /// </summary>
-        const string _COMPONENT_DESCRIPTION = "Core: Apply Bates number";
+        const string _COMPONENT_DESCRIPTION = "Core: Apply bates number";
 
         /// <summary>
         /// The total number of times the apply bates number task will retry applying the

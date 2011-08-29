@@ -123,4 +123,39 @@
   <metadata name="label2.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
+  <metadata name="infoTip2.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="infoTip2.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAACnSURBVDhPrVMBCsAgCOzpPa2X1WZmnmbRYIFgopenV0p62ut+tVnd9CTwyZU7xtkfD3YQSOR6
+        CnkrpQxwAMg5dyTsQAq1QMFs7KW8AmDb6lvQsAPPkQZqaVxTEDoRFZxwH6JSiKbMHdiXNc8BMHat1a0x
+        uh62wACSEHUA+7IUdqIxrGMdyBysHqbSTvLWj2D1wH+CYjuDP8QuAqDGl8RdAGlcF/2R+ABXWzYReseN
+        mQAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="infoTip2.TipText" xml:space="preserve">
+    <value>In addition to ensuring against unwanted files being queued, this setting can guard 
+against files being queued via a path not accessible from all machines.
+
+For example, one user may have network share "\\FileServer\\Images" mapped as "I:\\".
+If this user queues files while using the mapped drive "I:\\", other machines will fail to
+process the files unless they have mapped "I:\\" in the same way. This situation
+can be avoided by using this field to ensure the context menu is only available under
+a path accessible to all machines ("\\FileServer\\Images" in this example).</value>
+  </data>
+  <metadata name="infoTip1.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="infoTip1.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAACnSURBVDhPrVMBCsAgCOzpPa2X1WZmnmbRYIFgopenV0p62ut+tVnd9CTwyZU7xtkfD3YQSOR6
+        CnkrpQxwAMg5dyTsQAq1QMFs7KW8AmDb6lvQsAPPkQZqaVxTEDoRFZxwH6JSiKbMHdiXNc8BMHat1a0x
+        uh62wACSEHUA+7IUdqIxrGMdyBysHqbSTvLWj2D1wH+CYjuDP8QuAqDGl8RdAGlcF/2R+ABXWzYReseN
+        mQAAAABJRU5ErkJggg==
+</value>
+  </data>
 </root>

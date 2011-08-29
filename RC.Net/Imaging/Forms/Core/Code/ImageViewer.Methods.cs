@@ -2525,8 +2525,9 @@ namespace Extract.Imaging.Forms
                         }
                     }
 
-                    // Iterate through all selected layerObjects
-                    foreach (LayerObject layerObject in _layerObjects.Selection)
+                    // Iterate through all selected and moveable layerObjects
+                    foreach (LayerObject layerObject in _layerObjects.Selection
+                        .Where(layerObject => layerObject.Movable))
                     {
                         // Skip this layerObject if it is on a different page
                         if (layerObject.PageNumber != _pageNumber)
@@ -2560,8 +2561,11 @@ namespace Extract.Imaging.Forms
 
                             clickedObject.Selected = true;
 
-                            // Switch the cursor to the move cursor
-                            Cursor = Cursors.SizeAll;
+                            if (clickedObject.Movable)
+                            {
+                                // Switch the cursor to the move cursor
+                                Cursor = Cursors.SizeAll;
+                            }
                         }
                         else if (modifiers == Keys.Control)
                         {
@@ -2577,7 +2581,10 @@ namespace Extract.Imaging.Forms
 
                         // Check if any layer object was clicked [DotNetRCAndUtils #159]
                         // Start a tracking event for all selected layer objects on the active page
-                        foreach (LayerObject layerObject in _layerObjects.Selection)
+                        // [FlexIDSCore:4808]
+                        // Don't start a tracking operation for immovable layer objects.
+                        foreach (LayerObject layerObject in _layerObjects.Selection
+                            .Where(layerObject => layerObject.Movable))
                         {
                             if (layerObject.PageNumber == _pageNumber)
                             {
@@ -2586,9 +2593,9 @@ namespace Extract.Imaging.Forms
                         }
                     }
 
-                    // Only start a tracking event if a layer object was clicked or banded
+                    // Only start a tracking event if a movable layer object was clicked or banded
                     // selection is enabled.
-                    if (clickedObject != null || _allowBandedSelection)
+                    if ((clickedObject != null && clickedObject.Movable) || _allowBandedSelection)
                     {
                         // Start a click and drag event
                         _trackingData = new TrackingData(this, mouseX, mouseY,
@@ -3066,7 +3073,13 @@ namespace Extract.Imaging.Forms
                 // Deselect previous layerObject unless modifier key is pressed
                 if (ModifierKeys != Keys.Shift)
                 {
-                    _layerObjects.Selection.Clear();
+                    // Do not clear selection for any layer object that was under the staring point
+                    // of the tracking event; If a non-moveable layer object was clicked the cursor
+                    // will still be the default cursor (just as in banded selection). This ensures
+                    // the clicked item doesn't loose its selection on mouse up.
+                    _layerObjects.Selection.Remove(_layerObjects.Selection
+                        .Where(layerObject => !layerObject.HitTest(rectangle.Location)),
+                            true, true);
                 }
 
                 // Iterate through all the layerObjects

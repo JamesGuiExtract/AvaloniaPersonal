@@ -118,6 +118,34 @@ namespace Extract.FileActionManager.FileProcessors
         #region Event Handlers
 
         /// <summary>
+        /// Handles the case that the text of the output file text box has changed.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleOutputFileTextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // [FlexIDSCore:722]
+                // Make it clear this option is useless when the <AreaID> tag is being used.
+                if (_outputFileTextBox.Text.Contains(ExtractImageAreaTask._AREA_ID_TAG))
+                {
+                    _allowOutputAppendCheckBox.Checked = false;
+                    _allowOutputAppendCheckBox.Enabled = false;
+                }
+                else
+                {
+                    _allowOutputAppendCheckBox.Enabled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI33459");
+            }
+        }
+
+        /// <summary>
         /// In the case that the OK button is clicked, validates the settings, applies them, and
         /// closes.
         /// </summary>

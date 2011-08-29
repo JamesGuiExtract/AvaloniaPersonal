@@ -348,7 +348,7 @@
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Files from FTP site";
+            this.Text = "Files from FTP site settings";
             this._settingsTabControl.ResumeLayout(false);
             this._generalSettingsTabPage.ResumeLayout(false);
             this._generalSettingsTabPage.PerformLayout();

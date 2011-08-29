@@ -168,6 +168,12 @@ namespace Extract.FileActionManager.FileProcessors
         Dictionary<int, RasterImage> _rasterImagePages = new Dictionary<int, RasterImage>();
 
         /// <summary>
+        /// Indicates whether the output file has already been created by this task (and thus it is
+        /// always acceptable to overwrite the file when generating the final output).
+        /// </summary>
+        bool _outputFileCreated;
+
+        /// <summary>
         /// Indicates that settings have been changed, but not saved.
         /// </summary>
         bool _dirty;
@@ -237,11 +243,6 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     throw ex.AsExtract("ELI33210");
                 }
-            }
-
-            private set
-            {
-                _outputPathTags = value;
             }
         }
 
@@ -493,6 +494,8 @@ namespace Extract.FileActionManager.FileProcessors
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI33192", _COMPONENT_DESCRIPTION);
 
+                _outputFileCreated = false;
+
                 string sourceDocName = pFileRecord.Name;
 
                 // Initialize the path tag instances with sourceDocName.
@@ -741,7 +744,6 @@ namespace Extract.FileActionManager.FileProcessors
             UseOverallBounds = source.UseOverallBounds;
             OutputAllAreas = source.OutputAllAreas;
             OutputFileName = source.OutputFileName;
-            OutputPathTags = source.OutputPathTags;
             AllowOutputAppend = source.AllowOutputAppend;
 
             _dirty = true;
@@ -805,7 +807,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="path">The path that is being expanded. (all non-custom tags and path tag
         /// functions will already be expanded.)</param>
         /// <returns>The value to use for the AreaID path tag.</returns>
-        static string ExpandAreaIDTag(string path)
+        string ExpandAreaIDTag(string path)
         {
             string replacementValue;
 
@@ -842,6 +844,7 @@ namespace Extract.FileActionManager.FileProcessors
                     }
 
                     // If the file was able to be created, leave it there and return the file name.
+                    _outputFileCreated = true;
                     break;
                 }
                 catch (IOException ioException)
@@ -958,7 +961,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                 // If not allowing areas to be appended to an existing area, do not allow
                 // overwriting an existing file.
-                writer.Commit(AllowOutputAppend);
+                writer.Commit(AllowOutputAppend || _outputFileCreated);
             }
         }
 

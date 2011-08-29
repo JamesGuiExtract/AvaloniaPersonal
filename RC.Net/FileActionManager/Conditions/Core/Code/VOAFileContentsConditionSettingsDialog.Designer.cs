@@ -512,7 +512,7 @@
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Core: VOA File Contents Condition";
+            this.Text = "Core: VOA file contents condition";
             ((System.ComponentModel.ISupportInitialize)(this._attributeCountUpDown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

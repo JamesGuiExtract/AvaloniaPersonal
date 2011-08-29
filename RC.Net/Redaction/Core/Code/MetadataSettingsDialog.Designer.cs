@@ -152,7 +152,7 @@ namespace Extract.Redaction
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Redaction: Create metadata xml";
+            this.Text = "Redaction: Create metadata XML settings";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             this.ResumeLayout(false);

@@ -426,40 +426,33 @@ string RegExPatternFileInterpreter::getImportFileName(const string& strImportSta
 {
 	string strFileToImport("");
 
-	// find first quote sign
-	int nQuotePos = strImportStatement.find("\"");
-	if (nQuotePos == string::npos)
+	unsigned long ulStartImport = strImportStatement.find(IMPORT_TAG);
+	if (ulStartImport != string::npos)
 	{
-		UCLIDException ue("ELI33342", "Invalid <import> statement.");
-		ue.addDebugInfo("Text", strImportStatement);
-		throw ue;
-	}
-	// find next quote sign
-	int nUnquotePos = strImportStatement.find("\"", nQuotePos+1);
-	if (nUnquotePos == string::npos)
-	{
-		UCLIDException ue("ELI33343", "Invalid <import> statement.");
-		ue.addDebugInfo("Text", strImportStatement);
-		throw ue;
-	}
+		unsigned long ulStartFileName = strImportStatement.find_first_not_of(" \t", 
+			ulStartImport + IMPORT_TAG.size());
+		if (ulStartFileName == string::npos)
+		{
+			UCLIDException ue("ELI33448", "Invalid #import statememt.");
+			ue.addDebugInfo("string", strImportStatement);
+			throw ue;
+		}
 
-	// take the file name part out from the import statement
-	strFileToImport = strImportStatement.substr(nQuotePos+1, nUnquotePos-nQuotePos-1);
-	string strParentDirectory(strCurrentFileName);
+		// The import file's path is relative to this file's path so compute the full path
+		string strParentDirectory(strCurrentFileName);
+		strFileToImport = strImportStatement.substr(ulStartFileName);
+		strFileToImport = getAbsoluteFileName(strParentDirectory, strFileToImport);
 
-	// the import file's path is relative to this file's path
-	// so compute the full path
-	strFileToImport = ::getAbsoluteFileName(strParentDirectory, strFileToImport);
-
-	// if this doc type file has extension .etf, then convert the import
-	// file to have .etf extension
-	if (_strcmpi(::getExtensionFromFullPath(strCurrentFileName).c_str(), ".etf") == 0)
-	{
-		// if the extension of the import filename is not .etf, then
-		// get the equivalent import filename with the .etf extension
-		if (_strcmpi(::getExtensionFromFullPath(strFileToImport).c_str(), ".etf") != 0)
-		{	
-			strFileToImport += ".etf";
+		// if this doc type file has extension .etf, then convert the import
+		// file to have .etf extension
+		if (_strcmpi(::getExtensionFromFullPath(strCurrentFileName).c_str(), ".etf") == 0)
+		{
+			// if the extension of the import filename is not .etf, then
+			// get the equivalent import filename with the .etf extension
+			if (_strcmpi(::getExtensionFromFullPath(strFileToImport).c_str(), ".etf") != 0)
+			{	
+				strFileToImport += ".etf";
+			}
 		}
 	}
 

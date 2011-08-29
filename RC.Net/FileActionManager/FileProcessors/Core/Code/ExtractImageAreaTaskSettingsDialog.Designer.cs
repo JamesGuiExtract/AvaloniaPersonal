@@ -227,6 +227,7 @@
             this._outputFileTextBox.Name = "_outputFileTextBox";
             this._outputFileTextBox.Size = new System.Drawing.Size(391, 20);
             this._outputFileTextBox.TabIndex = 11;
+            this._outputFileTextBox.TextChanged += new System.EventHandler(this.HandleOutputFileTextChanged);
             // 
             // _outputFileBrowseButton
             // 
@@ -313,7 +314,7 @@
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Core: Extract image area";
+            this.Text = "Core: Extract image area settings";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);

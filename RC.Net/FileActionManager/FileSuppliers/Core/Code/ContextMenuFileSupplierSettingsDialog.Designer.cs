@@ -30,6 +30,9 @@
         {
             System.Windows.Forms.Label label1;
             System.Windows.Forms.Label label2;
+            Extract.Utilities.Forms.InfoTip infoTip2;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ContextMenuFileSupplierSettingsDialog));
+            Extract.Utilities.Forms.InfoTip infoTip1;
             this._menuOptionNameTextBox = new System.Windows.Forms.TextBox();
             this._fileFilterComboBox = new System.Windows.Forms.ComboBox();
             this._limitRootCheckBox = new System.Windows.Forms.CheckBox();
@@ -40,6 +43,8 @@
             this._pathBrowse = new Extract.Utilities.Forms.BrowseButton();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
+            infoTip2 = new Extract.Utilities.Forms.InfoTip();
+            infoTip1 = new Extract.Utilities.Forms.InfoTip();
             this.SuspendLayout();
             // 
             // label1
@@ -145,6 +150,27 @@
             this._btnOK.UseVisualStyleBackColor = true;
             this._btnOK.Click += new System.EventHandler(this.HandleOkButtonClick);
             // 
+            // infoTip2
+            // 
+            infoTip2.BackColor = System.Drawing.Color.Transparent;
+            infoTip2.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("infoTip2.BackgroundImage")));
+            infoTip2.Location = new System.Drawing.Point(290, 84);
+            infoTip2.Name = "infoTip2";
+            infoTip2.Size = new System.Drawing.Size(16, 16);
+            infoTip2.TabIndex = 11;
+            infoTip2.TipText = resources.GetString("infoTip2.TipText");
+            // 
+            // infoTip1
+            // 
+            infoTip1.BackColor = System.Drawing.Color.Transparent;
+            infoTip1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("infoTip1.BackgroundImage")));
+            infoTip1.Location = new System.Drawing.Point(149, 9);
+            infoTip1.Name = "infoTip1";
+            infoTip1.Size = new System.Drawing.Size(16, 16);
+            infoTip1.TabIndex = 10;
+            infoTip1.TipText = "When running, the name below will appear in a sub-menu under a\r\ncontext menu opti" +
+    "on named \"Send to FAM\".";
+            // 
             // _pathBrowse
             // 
             this._pathBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -162,6 +188,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(439, 198);
+            this.Controls.Add(infoTip2);
+            this.Controls.Add(infoTip1);
             this.Controls.Add(label2);
             this.Controls.Add(this._pathBrowse);
             this.Controls.Add(this._btnCancel);
@@ -180,7 +208,7 @@
             this.ShowIcon = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure: Context menu file supplier";
+            this.Text = "Files from context menu settings";
             this.ResumeLayout(false);
             this.PerformLayout();
 

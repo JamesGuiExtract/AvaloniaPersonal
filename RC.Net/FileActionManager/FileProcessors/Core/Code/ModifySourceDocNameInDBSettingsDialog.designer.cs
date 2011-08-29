@@ -125,7 +125,7 @@
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Core: Modify source document name in database";
+            this.Text = "Core: Modify source document name in database settings";
             this.ResumeLayout(false);
             this.PerformLayout();
 

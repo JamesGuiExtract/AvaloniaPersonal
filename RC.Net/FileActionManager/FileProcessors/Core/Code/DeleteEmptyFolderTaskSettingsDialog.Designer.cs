@@ -172,7 +172,7 @@
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Core: Delete empty folder";
+            this.Text = "Core: Delete empty folder settings";
             this.ResumeLayout(false);
             this.PerformLayout();
 

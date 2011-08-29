@@ -61,7 +61,12 @@ namespace Extract.Interfaces
         /// folders that are supplied; <see langword="false"/> to ignore supplied folders.</param>
         public FileFilter(string pathRoot, string filterPattern, bool allowFolders)
         {
-            _pathRoot = pathRoot;
+            // Ensure the _pathRoot doesn't include trailing slash or whitespace to simplify path
+            // checks.
+            if (pathRoot != null)
+            {
+                _pathRoot = pathRoot.TrimEnd('\\', '/', ' ', '\t');
+            }
             _allowFolders = allowFolders;
 
             // Convert filterPattern into a RegEx pattern that can be used to evaluate fileNames.
@@ -151,8 +156,12 @@ namespace Extract.Interfaces
         [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public bool FileMatchesFilter(string pathName)
         {
+            // [DotNetRCAndUtils:710]
+            // If specified, _pathRoot must exactly match or must match with a trailing backslash so
+            // as not to allow files from a folder that only starts with _rootPath.
             if (!string.IsNullOrWhiteSpace(_pathRoot) &&
-                !pathName.StartsWith(_pathRoot, StringComparison.OrdinalIgnoreCase))
+                !pathName.Equals(_pathRoot, StringComparison.OrdinalIgnoreCase) &&
+                !pathName.StartsWith(_pathRoot + "\\", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
