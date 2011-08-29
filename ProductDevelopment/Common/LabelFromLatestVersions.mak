@@ -14,6 +14,7 @@ LabelCommonDir:
 	$(Label) $$/Engineering/ReusableComponents "$(ReusableComponentsVersion)" 
 	$(Label) $$/Engineering/ProductDevelopment/Utils "$(PDUtilsVersion)"
 	$(Label) $$/Engineering/ProductDevelopment/PlatformSpecificUtils "$(PlatformSpecificUtilsVersion)"
+	$(Label) "$$/Engineering/Rules/ComponentData" "$(FKBVersion)"
 	$(Label) "$$/Engineering/RC.Net" "$(RCDotNetVersion)"
 	$(Label) "$$/Engineering/Rules" "$(RulesVersion)"
 	$(Label) "$$/Branches/InternalRules" "$(RulesVersion)"
@@ -23,4 +24,4 @@ LabelCommonDir:
 	$(Label) $$/Engineering/ProductDevelopment/Common "$(FlexIDSSPVersion)"
 	$(Label) $$/Engineering/ProductDevelopment/Common "$(IDShieldOfficeVersion)"
 	$(Label) $$/Engineering/ProductDevelopment/Common "$(LabDEVersion)"
-	
+	$(Label) $$/Engineering/ProductDevelopment/Common "$(FKBVersion)"
