@@ -10,4 +10,4 @@ IDShieldOfficeVersion=IDShield Office Ver. 1.0.7.70
 LabDEVersion=LabDE Ver. 2.0.0.70
 RulesVersion=Rules Ver. 3.0.0.70
 FlexIDSSPVersion=FlexIDS for SP Ver. 2.0.0.70
-FKBVersion=FKB Ver. 11.0.69
+FKBVersion=FKB Ver. 11.0.70
