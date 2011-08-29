@@ -108,11 +108,11 @@ GetLaserFicheFiles:
 	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(LaserficheVersion)"
 
 GetComponentDataFiles:
-	@ECHO Getting ComponentDataFiles $(RulesVersion)
+	@ECHO Getting ComponentDataFiles $(FKBVersion)
 	@IF NOT EXIST "$(RulesDir)\ComponentData" @MKDIR "$(RulesDir)\ComponentData"
 	$(BUILD_DRIVE) 
 	@CD "$(RulesDir)\ComponentData"
-	@$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\ComponentData" $$/Engineering/Rules/ComponentData "$(RulesVersion)"
+	@$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\ComponentData" $$/Engineering/Rules/ComponentData "$(FKBVersion)"
 	
 GetDemo_IDShieldRules:
 	@ECHO Getting Demo_IDShield Rules $(RulesVersion)

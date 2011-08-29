@@ -28,6 +28,9 @@ ExtractFlexCommonInstallDir=$(PDRootDir)\AttributeFinder\Installation\ExtractFle
 ExtractFlexCommonInstallFilesRootDir=P:\ExtractFlexCommon
 RequiredInstallsDir=P:\AttributeFinder\RequiredInstalls
 
+FKBUpdateReleaseDir=$(AFBleedingEdgeDir)\$(FKBVersion)
+FKBUpdateInstallRoot=$(PDRootDir)\AttributeFinder\Installation\FKBInstall
+FKBInstallMediaDir=$(FKBUpdateInstallRoot)\Media\CD-ROM\DiskImages\DISK1
 
 AFCoreInstallFilesRootDir=P:\AttributeFinder\CoreInstallation\Files
 LMInstallFilesRootDir=P:\LicenseManager\Files
@@ -331,7 +334,17 @@ MakeExtractFlexCommonMergeModule: MakeExtractCommonMergeModule
     @CD "$(AFRootDirectory)\Build
     @nmake /F ExtractFlexCommon.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" CreateExtractFlexCommonMergeModule
 	
-BuildAFCoreMergeModule: CreateVersionISImportFile CleanupPreviousBuildFolders MakeExtractFlexCommonMergeModule CopyFilesToInstallFolder EncryptAndCopyComponentDataFiles  
+BuildFKBUpdateIfRequired:
+	@IF NOT EXISTS("$(FKBUpdateReleaseDir)\$(FKBVersion)) (
+		@CD "$(AFRootDirectory)\Build
+		NMAKE /F FKBUpdate.mak BuildConfig="Release" ProductRootDirName=ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" CreateFKBIntall
+		@IF NOT EXISTS("$(FKBUpdateReleaseDir)\$(FKBVersion)" @MKDIR "$(FKBUpdateReleaseDir)\$(FKBVersion)"
+		@IF NOT EXISTS("$(AFCoreInstallFilesRootDir)\FKBInstall" @MKDIR "$(AFCoreInstallFilesRootDir)\FKBInstall"
+		@COPY "$(FKBInstallMediaDir)\*.*" "$(FKBUpdateReleaseDir)\$(FKBVersion)"
+		@COPY "$(FKBInstallMediaDir)\*.*" "$(AFCoreInstallFilesRootDir)\FKBInstall"
+	)
+	
+BuildAFCoreMergeModule: CreateVersionISImportFile CleanupPreviousBuildFolders MakeExtractFlexCommonMergeModule CopyFilesToInstallFolder  
     @ECHO Buliding the UCLIDFlexIndex Merge Module installation...
 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\bin;;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(AFCoreMergeModuleInstallRoot)\UCLID FlexIndex.ism" "$(FlexIndexVersion)"
@@ -343,9 +356,9 @@ BuildDataEntryMergeModule: CreateVersionISImportFile BuildAFCoreMergeModule
 	$(SetProductVerScript) "$(LabDEInstallRootDir)\DataEntry\DataEntry.ism" "$(LabDEVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(LabDEInstallRootDir)\DataEntry\DataEntry.ism"
 
-GetAllFiles: GetPDCommonFiles GetReusableComponentFiles GetRCdotNETFiles GetAttributeFinderFiles GetPDUtilsFiles GetComponentDataFiles GetDataEntryInstall
+GetAllFiles: GetPDCommonFiles GetReusableComponentFiles GetRCdotNETFiles GetAttributeFinderFiles GetPDUtilsFiles GetDataEntryInstall
 
-DoEverythingNoGet: SetupBuildEnv CleanUpMergeModulesFromPreviousBuilds BuildAFCoreMergeModule BuildDataEntryMergeModule CopyCommonFiles
+DoEverythingNoGet: SetupBuildEnv CleanUpMergeModulesFromPreviousBuilds BuildAFCoreMergeModule BuildDataEntryMergeModule CopyCommonFiles BuildFKBUpdateIfRequired
     @ECHO.
     @DATE /T
     @TIME /T
