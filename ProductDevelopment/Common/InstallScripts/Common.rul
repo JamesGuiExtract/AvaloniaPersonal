@@ -82,7 +82,9 @@
 	prototype BOOL AreOtherExtractProductsInstalled();
 	prototype InstallOfficeRedist();
 	prototype RegisterLoginNPShellExtension(STRING);
-	prototype UnregisterLoginNPShellExtension(STRING);
+	prototype UnregisterLoginNPShellExtension(STRING);   
+	prototype InstallFKB();
+	prototype UninstallFBK();
 
     // your global variables
     BOOL gbInstalled;
@@ -494,11 +496,19 @@ end;
 ///////////////////////////////////////////////////////////////////////////////
 function InstallSQLCE()
 STRING szProgram, szCmdLine, strUninstallKey;
-int nResult, svServiceState;
+int nResult, svServiceState;      
+STRING szSPLevel;     
+number nSize;  
+number nType;
 begin
 	// Change the root for the registry
 	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
-	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) = 0) then
+	nType = REGDB_NUMBER;
+	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) < 1 || 
+			((RegDBGetKeyValueEx(REG_PATH_SQL_COMPACT_EDITION, "ServicePackLevel", nType, 
+			szSPLevel, nSize) = 0 ) && 
+			szSPLevel != "2")) then
+			
 		SdShowMsg("Setup is Installing SQL Compact Edition", TRUE);
 
 		// Install SQL Compact Edition
@@ -558,7 +568,7 @@ function UninstallInstallSQLCE()
 STRING szProgram, szCmdLine;
 int nResult, svServiceState;
 begin  
-	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) = 0) then
+	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) = 1) then
 		// Ask user if they wish to unintall SQL Server CE
 		nResult = MessageBox("Do you wish to uninstall SQL Compact Edition?" + 
 			"\r\nOther installed applications may use this and uninstalling " + 
@@ -713,3 +723,32 @@ begin
  	SdShowMsg("Setup is unregistering shell extension.", FALSE);
 end;
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: InstallFKB
+//
+//  Purpose: This function installs the included FKB update
+///////////////////////////////////////////////////////////////////////////////
+function InstallFKB() 
+	string szProgram, szCmdLine;
+begin             
+	SdShowMsg("Setup is Installing Extract Systems FKB", TRUE);
+	
+	// Install FKB 
+	szProgram = "msiexec";
+	szCmdLine = " /qn /i " + SUPPORTDIR ^ "\\Extract Systems FKB.msi";
+	LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
+	
+	SdShowMsg("Setup is Installing Extract Systems FKB", FALSE);
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: UninstallFKB
+//
+//  Purpose: This function prompts to ask if you want to uninstall the FKB
+//			 
+///////////////////////////////////////////////////////////////////////////////
+function UninstallFKB()
+begin
+end;

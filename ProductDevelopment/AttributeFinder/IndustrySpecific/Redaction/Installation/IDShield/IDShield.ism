@@ -1786,6 +1786,7 @@
 		<row><td>PATH_TO_CORE_DOTNET</td><td>P:\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CRYSTAL_REPORTS12</td><td>P:\AttributeFinder\RequiredInstalls\CrystalReports12</td><td/><td>2</td></row>
 		<row><td>PATH_TO_EXEMPTIONCODES_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\ExemptionCodes</td><td/><td>2</td></row>
+		<row><td>PATH_TO_FKBINSTALL_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\FKBInstall</td><td/><td>2</td></row>
 		<row><td>PATH_TO_HELP_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\Help</td><td/><td>2</td></row>
 		<row><td>PATH_TO_INLITEKEYINSTAL_FILES</td><td>P:\AttributeFinder\RequiredInstalls\InliteKeyInstall</td><td/><td>2</td></row>
 		<row><td>PATH_TO_LOGICNP_FILES</td><td>P:\AttributeFinder\RequiredInstalls\LogicNP</td><td/><td>2</td></row>
@@ -2083,6 +2084,7 @@
 		<row><td>SetupFile13</td><td>SqlCeEditorSetup.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQL COMPACT EDI_FI&gt;\SqlCeEditorSetup.msi</td></row>
 		<row><td>SetupFile14</td><td>SSCERuntime_x86-ENU.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLCOMPACT EDIT_FI&gt;\SSCERuntime_x86-ENU.msi</td></row>
 		<row><td>SetupFile15</td><td>RegisterExtensionDotNet40_x64.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_LOGICNP_FILES&gt;\RegisterExtensionDotNet40_x64.exe</td></row>
+		<row><td>SetupFile16</td><td>Extract Systems FKB.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_FKBINSTALL_FILES&gt;\Extract Systems FKB.msi</td></row>
 		<row><td>SetupFile2</td><td>Setup.bmp</td><td/><td>0</td><td>1</td><td>&lt;ISProjectDataFolder&gt;\support files\Setup.bmp</td></row>
 		<row><td>SetupFile3</td><td>sqlncli.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLSERVEREXPRES_FILES&gt;\sqlncli.msi</td></row>
 		<row><td>SetupFile4</td><td>sqlncli_x64.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLSERVEREXPRES_FILES&gt;\sqlncli_x64.msi</td></row>

@@ -20,7 +20,10 @@ begin
 	szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\RegisterAll.bat\"";
 	szCmd = "cmd";
 	LaunchAppAndWait( szRegAllCmdLine, "/s", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
-	
+ 
+ 	// Install FKB 
+	InstallFKB();
+		
 	// Install the ESFAMService.exe 
 	InstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFAMService.exe\"");
 

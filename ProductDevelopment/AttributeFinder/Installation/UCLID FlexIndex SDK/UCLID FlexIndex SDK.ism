@@ -1754,6 +1754,7 @@
 		<row><td>PATH_TO_COMMON_INSTALL_SCRIPTS</td><td>&lt;ISProjectFolder&gt;..\..\..\Common\InstallScripts</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CRYSTAL_REPORTS12</td><td>P:\AttributeFinder\RequiredInstalls\CrystalReports12</td><td/><td>2</td></row>
 		<row><td>PATH_TO_DATABASEFILES_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\DatabaseFiles</td><td/><td>2</td></row>
+		<row><td>PATH_TO_FKBINSTALL_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\FKBInstall</td><td/><td>2</td></row>
 		<row><td>PATH_TO_HELP_FILES</td><td>P:\AttributeFinder\SDKInstallation\Files\Help</td><td/><td>2</td></row>
 		<row><td>PATH_TO_INLITEKEYINSTAL_FILES</td><td>P:\AttributeFinder\RequiredInstalls\InliteKeyInstall</td><td/><td>2</td></row>
 		<row><td>PATH_TO_LOGICNP_FILES</td><td>P:\AttributeFinder\RequiredInstalls\LogicNP</td><td/><td>2</td></row>
@@ -2059,6 +2060,7 @@
 		<row><td>SetupFile6</td><td>SSCERuntime_x64-ENU.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLCOMPACT EDIT_FI&gt;\SSCERuntime_x64-ENU.msi</td></row>
 		<row><td>SetupFile7</td><td>CBUSetup.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_INLITEKEYINSTAL_FILES&gt;\CBUSetup.exe</td></row>
 		<row><td>SetupFile8</td><td>CRRuntime_12_1_mlb.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_CRYSTAL_REPORTS12&gt;\CRRuntime_12_1_mlb.msi</td></row>
+		<row><td>SetupFile9</td><td>Extract Systems FKB.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_FKBINSTALL_FILES&gt;\Extract Systems FKB.msi</td></row>
 	</table>
 
 	<table name="ISSetupPrerequisites">

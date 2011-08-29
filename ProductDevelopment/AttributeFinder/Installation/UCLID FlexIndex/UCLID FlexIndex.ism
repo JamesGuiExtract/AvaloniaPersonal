@@ -190,7 +190,6 @@
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>ClearImage.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{360A61B5-15DC-4AED-AC50-94984A011457}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>_11111111.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ComponentData.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{D0CF33E9-D686-4F96-B168-555C8E384DC5}</td><td>COMPONENT_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td><td/><td>FKBVersion.txt.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>CountyCustomComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{7F3236DA-95FF-4D6C-86E0-0AB0FA283204}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>CountyCustomComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ESAFSelectors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{A82B6DBF-7E9C-4E66-B4FF-4BB1BFDBCCF2}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>ESAFSelectors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ESFAMConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{4536C0B2-E6CF-46C9-B974-2C86140A9DA1}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>esfamconditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -465,7 +464,6 @@
 		<row><td>CountyCustomComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>CountyCustomComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>COUNTY~1.DLL|CountyCustomComponents.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCORECOMP_FILES&gt;\CountyCustomComponents.dll</td><td>17</td><td/></row>
 		<row><td>ESAFSelectors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESAFSelectors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESAFSE~1.DLL|ESAFSelectors.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCORECOMP_FILES&gt;\ESAFSelectors.dll</td><td>17</td><td/></row>
 		<row><td>ESFileSuppliers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFileSuppliers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFILE~1.DLL|ESFileSuppliers.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\ESFileSuppliers.dll</td><td>17</td><td/></row>
-		<row><td>FKBVersion.txt.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ComponentData.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FKBVER~1.TXT|FKBVersion.txt</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_COMPONENTDATA_FILES&gt;\FKBVersion.txt</td><td>17</td><td/></row>
 		<row><td>FileProcessors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FileProcessors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FILEPR~1.DLL|FileProcessors.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\FileProcessors.dll</td><td>17</td><td/></row>
 		<row><td>UCLIDAFConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDAFConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDA~1.DLL|UCLIDAFConditions.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCORECOMP_FILES&gt;\UCLIDAFConditions.dll</td><td>17</td><td/></row>
 		<row><td>UCLIDAFCore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDAFCore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDA~1.DLL|UCLIDAFCore.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCORECOMP_FILES&gt;\UCLIDAFCore.dll</td><td>17</td><td/></row>
@@ -654,7 +652,6 @@
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
 		<row><td>ClearImage.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_7691BC11_C729_4DB9_B2E6_3956F2A7CD0A_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ComponentData.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_235D7774_6F14_4A35_BF03_0E4CE8C4AE81_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>CountyCustomComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_BF34E9F1_CCAB_4C3A_90F8_EB156B51E5EC_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ESAFSelectors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_85561DEF_6B21_40FD_9BB4_232D16E11237_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ESFAMConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_234A27B5_47C0_4725_B138_600D471D657F_FILTER</td><td/><td/><td/><td/></row>
@@ -811,7 +808,6 @@
 		<col def="S0">IncludeFiles</col>
 		<col def="S0">ExcludeFiles</col>
 		<col def="I4">ISAttributes</col>
-		<row><td>ComponentData.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_COMPONENTDATA_FILES&gt;</td><td>4</td><td/><td>FKBVersion.txt</td><td>2</td></row>
 		<row><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_NONSELFREGCOMMON_FILES&gt;</td><td>4</td><td/><td>AFCommon.rl, RWUtils.dll</td><td>2</td></row>
 		<row><td>ProgramDataFolder.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_PROGRAMDATAFILE_FI&gt;</td><td>4</td><td/><td/><td>10</td></row>
 		<row><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;SDK_REPORT_PATH&gt;</td><td>4</td><td/><td>Detailed report for specific document.rpt</td><td>2</td></row>
@@ -1337,7 +1333,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col key="yes" def="s72">ModuleID</col>
 		<col key="yes" def="i2">Language</col>
 		<row><td>ClearImage.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
-		<row><td>ComponentData.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>CountyCustomComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ESAFSelectors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ESFAMConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
