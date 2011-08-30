@@ -60,7 +60,7 @@ BuildFKBUpdate: EncryptAndCopyComponentDataFiles
 	CScript "(CommonDirectory)\SetupFKBInstallBuild.vbs" "$(FKBUpdateInstallRoot)\FKBInstall.ism" "$(FKBVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(FKBUpdateInstallRoot)\FKBInstall.ism" 
 
-CreateFKBIntall: BuildFKBUpdate
+CreateFKBInstall: BuildFKBUpdate
 	@ECHO Copying file to FKBUpdate directory...
 	@IF NOT EXIST "$(FKBUpdateReleaseDir)" @MKDIR "$(FKBUpdateReleaseDir)"
 	@XCOPY "$(FKBInstallMediaDir)\*.*" "$(FKBUpdateReleaseDir)" /v /s /e /y
