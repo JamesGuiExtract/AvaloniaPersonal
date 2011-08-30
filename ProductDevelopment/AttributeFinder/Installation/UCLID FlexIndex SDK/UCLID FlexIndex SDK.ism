@@ -315,6 +315,7 @@
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>Help</td><td>{A9BD080B-7CB4-4954-8BBF-32EA6DADF977}</td><td>TARGET_HELP</td><td>0</td><td/><td>flexindex.chm</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>NewComponent1</td><td>{9349657F-7A89-4E4A-8ED8-06A5CB62D4DE}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Redist</td><td>{EE4C3899-3218-4C52-A42A-33FD36B7160F}</td><td>TARGET_REDIST</td><td>0</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>SDKComponents</td><td>{520CC137-57D4-420C-AF6E-B3F95C8BD13B}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Tutorial</td><td>{7A726349-9FED-42A1-B39F-2F135E7C2958}</td><td>TARGET_TUTORIAL</td><td>0</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -378,6 +379,7 @@
 		<col key="yes" def="s72">Directory_</col>
 		<col key="yes" def="s72">Component_</col>
 		<row><td>COMMON_COMPONENTS</td><td>SDKComponents</td></row>
+		<row><td>INSTALLDIR</td><td>NewComponent1</td></row>
 	</table>
 
 	<table name="CustomAction">
@@ -1154,6 +1156,7 @@
 		<row><td>Documentation</td><td>Help</td></row>
 		<row><td>Documentation</td><td>Tutorial</td></row>
 		<row><td>Redist</td><td>Redist</td></row>
+		<row><td>SDKMain</td><td>NewComponent1</td></row>
 		<row><td>SDKMain</td><td>SDKComponents</td></row>
 	</table>
 
@@ -1420,6 +1423,7 @@
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
 		<row><td>Help</td><td/><td/><td>_4E568C81_CDF3_4602_9111_7E1D69E11C19_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>NewComponent1</td><td/><td/><td>_35EA845E_F070_4E8B_891C_BFBD3510A529_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Redist</td><td/><td/><td>_87C1C298_20D3_413C_9D4F_5496D89762B6_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>SDKComponents</td><td/><td/><td>_194782D1_93CC_4676_B268_CA86FF42B50D_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Tutorial</td><td/><td/><td>_AB9656E4_8192_4599_B254_24392C55241D_FILTER</td><td/><td/><td/><td/></row>
@@ -4387,6 +4391,8 @@
 		<row><td>ID_STRING4</td><td>1033</td><td>FEEDBA~1|FeedBack Manager</td><td>0</td><td/><td>1830330511</td></row>
 		<row><td>ID_STRING40</td><td>0</td><td>NEWSHO~1|NewShortcut16</td><td>0</td><td/><td>312434409</td></row>
 		<row><td>ID_STRING40</td><td>1033</td><td>FAMNET~1|FAM Network Manager</td><td>0</td><td/><td>312442601</td></row>
+		<row><td>ID_STRING41</td><td>0</td><td>NEWSHO~1|NewShortcut2</td><td>0</td><td/><td>-199266870</td></row>
+		<row><td>ID_STRING41</td><td>1033</td><td>TESTTE~1|Test Text Function Expander</td><td>0</td><td/><td>-199244342</td></row>
 		<row><td>ID_STRING5</td><td>0</td><td>FEEDBA~1|FeedBack Manager</td><td>0</td><td/><td>178112137</td></row>
 		<row><td>ID_STRING5</td><td>1033</td><td>FEEDBA~1|Feedback Manager</td><td>0</td><td/><td>2040452583</td></row>
 		<row><td>ID_STRING6</td><td>0</td><td>FILEPR~1|File Action Manager</td><td>0</td><td/><td>178112137</td></row>
@@ -5075,6 +5081,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut141</td><td>SDKComponents</td><td/><td>UCLID_FLEXINDEX_SDK</td><td>2</td></row>
 		<row><td>NewShortcut1411</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut16</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
+		<row><td>NewShortcut2</td><td>NewComponent1</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut3</td><td>SDKComponents</td><td/><td>UCLID_FLEXINDEX_SDK</td><td>2</td></row>
 		<row><td>NewShortcut4</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut5</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
@@ -5177,6 +5184,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut1411</td><td>newfolder1</td><td>##ID_STRING34##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ConvertFAMDB.exe</td><td>"[COMMON_COMPONENTS]ESFAMService.sdf"</td><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut15</td><td>newfolder1</td><td>##ID_STRING39##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]SQLCDBEditor</td><td>"[CommonAppDataFolder]Extract Systems\ESFAMService\ESFAMService.sdf"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut16</td><td>newfolder1</td><td>##ID_STRING40##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]FAMNetworkManager.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut2</td><td>newfolder1</td><td>##ID_STRING41##</td><td>NewComponent1</td><td>[COMMON_COMPONENTS]TestTextFunctionExpander.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut3</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING6##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ProcessFiles.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut4</td><td>newfolder1</td><td>##ID_STRING7##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]RuleTester.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut5</td><td>newfolder1</td><td>##ID_STRING8##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]USSFileViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
