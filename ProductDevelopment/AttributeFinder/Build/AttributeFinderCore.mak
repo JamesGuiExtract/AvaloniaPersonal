@@ -28,6 +28,7 @@ ExtractFlexCommonInstallDir=$(PDRootDir)\AttributeFinder\Installation\ExtractFle
 ExtractFlexCommonInstallFilesRootDir=P:\ExtractFlexCommon
 RequiredInstallsDir=P:\AttributeFinder\RequiredInstalls
 
+AFBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge
 FKBUpdateReleaseDir=$(AFBleedingEdgeDir)\$(FKBVersion)
 FKBUpdateInstallRoot=$(PDRootDir)\AttributeFinder\Installation\FKBInstall
 FKBInstallMediaDir=$(FKBUpdateInstallRoot)\Media\CD-ROM\DiskImages\DISK1
@@ -338,12 +339,12 @@ MakeExtractFlexCommonMergeModule: MakeExtractCommonMergeModule
     @nmake /F ExtractFlexCommon.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" CreateExtractFlexCommonMergeModule
 	
 BuildFKBUpdateIfRequired:
-	@IF NOT EXISTS "$(FKBUpdateReleaseDir)\$(FKBVersion)" (
+	@IF NOT EXISTS "$(FKBUpdateReleaseDir)" (
 		@CD "$(AFRootDirectory)\Build"
 		NMAKE /F FKBUpdate.mak BuildConfig="Release" ProductRootDirName=ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" CreateFKBIntall
-		@IF NOT EXISTS("$(FKBUpdateReleaseDir)\$(FKBVersion)" @MKDIR "$(FKBUpdateReleaseDir)\$(FKBVersion)"
+		@IF NOT EXISTS("$(FKBUpdateReleaseDir)" @MKDIR "$(FKBUpdateReleaseDir)"
 		@IF NOT EXISTS("$(AFCoreInstallFilesRootDir)\FKBInstall" @MKDIR "$(AFCoreInstallFilesRootDir)\FKBInstall"
-		@COPY "$(FKBInstallMediaDir)\*.*" "$(FKBUpdateReleaseDir)\$(FKBVersion)"
+		@COPY "$(FKBInstallMediaDir)\*.*" "$(FKBUpdateReleaseDir)"
 		@COPY "$(FKBInstallMediaDir)\*.*" "$(AFCoreInstallFilesRootDir)\FKBInstall"
 	)
 	
