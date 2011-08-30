@@ -338,7 +338,7 @@ MakeExtractFlexCommonMergeModule: MakeExtractCommonMergeModule
     @nmake /F ExtractFlexCommon.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" CreateExtractFlexCommonMergeModule
 	
 BuildFKBUpdateIfRequired:
-	@IF NOT EXISTS("$(FKBUpdateReleaseDir)\$(FKBVersion)") (
+	@IF NOT EXISTS "$(FKBUpdateReleaseDir)\$(FKBVersion)" (
 		@CD "$(AFRootDirectory)\Build"
 		NMAKE /F FKBUpdate.mak BuildConfig="Release" ProductRootDirName=ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" CreateFKBIntall
 		@IF NOT EXISTS("$(FKBUpdateReleaseDir)\$(FKBVersion)" @MKDIR "$(FKBUpdateReleaseDir)\$(FKBVersion)"
