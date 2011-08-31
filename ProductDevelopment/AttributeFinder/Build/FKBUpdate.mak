@@ -34,7 +34,7 @@ AFBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge
 FKBUpdateReleaseDir=$(AFBleedingEdgeDir)\$(FKBVersion)
 FKBInstallMediaDir=$(FKBUpdateInstallRoot)\Media\CD-ROM\DiskImages\DISK1
 	
-EncryptAndCopyComponentDataFiles: GetComponentDataFiles
+EncryptAndCopyComponentDataFiles: 
     @ECHO Copying the ComponentData subdirectories and files to installation directory...
     @rmdir "$(AFCoreInstallFilesRootDir)\ComponentData" /s /q
     @IF NOT EXIST "$(AFCoreInstallFilesRootDir)\ComponentData" @MKDIR "$(AFCoreInstallFilesRootDir)\ComponentData"
