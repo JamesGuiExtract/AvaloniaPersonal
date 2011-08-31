@@ -84,7 +84,7 @@
 	prototype RegisterLoginNPShellExtension(STRING);
 	prototype UnregisterLoginNPShellExtension(STRING);   
 	prototype InstallFKB();
-	prototype UninstallFBK();
+	prototype UninstallFKB();
 
     // your global variables
     BOOL gbInstalled;
