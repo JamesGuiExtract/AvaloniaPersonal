@@ -341,7 +341,7 @@ MakeExtractFlexCommonMergeModule: MakeExtractCommonMergeModule
 BuildFKBUpdateIfRequired:
 	@IF NOT EXIST "$(FKBUpdateReleaseDir)" (
 		@CD "$(AFRootDirectory)\Build"
-		NMAKE /F FKBUpdate.mak BuildConfig="Release" ProductRootDirName=ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" CreateFKBInstall
+		NMAKE /F FKBUpdate.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" CreateFKBInstall
 		@IF NOT EXISTS("$(FKBUpdateReleaseDir)" @MKDIR "$(FKBUpdateReleaseDir)"
 		@IF NOT EXISTS("$(AFCoreInstallFilesRootDir)\FKBInstall" @MKDIR "$(AFCoreInstallFilesRootDir)\FKBInstall"
 		@COPY "$(FKBInstallMediaDir)\*.*" "$(FKBUpdateReleaseDir)"
