@@ -1,0 +1,549 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0.0.77 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0.0.77 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+	        <li><b>[DotNetRC #610]</b> Test Text Function Expander
+        	<ul>
+	            	<li>Confirm that a shortcut to the utility is available for 
+			<b>FLEX Index</b>.
+	            	<li>Confirm that a shortcut to the utility is available for 
+			<b>ID Shield</b>.
+		</ul>
+<p>
+	        <li><b>[DotNetRC #681, #701]</b> File encryption on XP-32
+        	<ul>
+	            	<li>Confirm that the <b>Core: Encrypt/decrypt file</b> task works 
+			properly on <b>32-bit Windows XP</b>.
+	            	<li>Confirm that the <b>Core: Encrypt/decrypt file</b> task works 
+			properly on <b>64-bit 2003 Server R2</b>.
+		</ul>
+<p>
+	        <li><b>[DotNetRC #693]</b> FTP File Transfer Task
+        	<ul>
+	            	<li>Create an FPS file to use the <b>Core: Transfer file via FTP/SFTP</b> 
+			task.
+			<li>Configure the task to upload the file to 
+			<b>.\asdf\$FileOf(&lt;SourceDocName&gt;)</b>.
+			<li>Confirm that each file ends up in the expected <b>asdf</b> folder.
+		</ul>
+<p>
+	        <li><b>[DotNetRC #696, #699]</b> Secure delete exceptions
+        	<ul>
+	            	<li>Confirm that no <b>Failed to get the value of a registry key</b> 
+			exceptions are logged when installing <b>ID Shield</b>.
+	            	<li>Confirm that no <b>Unable to allocate necessary resources</b> 
+			exceptions are logged when installing <b>RDT</b>.
+			<li>Confirm that the <b>Core: Convert to searchable PDF</b> task works 
+			properly.
+			<li>Confirm that the <b>Core: Rasterize PDF</b> task works properly.
+		</ul>
+<p>
+	        <li><b>[DotNetRC #697, #700, #704, #705]</b> File timestamp condition
+        	<ul>
+	            	<li>Confirm that a file timestamp condition can be used to conditionally 
+			delete a file when the created date is within a specified range.
+			<li>Confirm that a file timestamp condition cannot be used based on 
+			an <b>accessed</b> timestamp.
+			<li>Exercise use of relative timestamps.
+			<ul>
+				<li>Confirm that <b>0 days ago</b> works as expected.
+				<li>Confirm that <b>1 day ago</b> works as expected.
+			</ul>
+			<li>Compare two files based on <b>modified</b> date.
+			<ul>
+				<li>Confirm that <b>before</b> works as expected.
+				<li>Confirm that <b>after</b> works as expected.
+				<li>Confirm that <b>equal to</b> works as expected.
+			</ul>
+			<li>Confirm that behavior of the condition object is consistent if 
+			one or the other file is missing.
+		</ul>
+<p>
+	        <li><b>[DotNetRC #707, #708, #709, #710, #724, #725, #726]</b> Context menu 
+		file supplier
+        	<ul>
+	            	<li>Confirm that the context menu file supplier is available after 
+			installation.
+			<li>Confirm that the context menu includes a <b>Process Files</b> 
+			icon for the <b>Send to FAM</b> option.
+			<li>Confirm that the file supplier description mimics other file 
+			suppliers as <b>Files from context menu</b>.
+			<li>Confirm that the caption for the configuration dialog mimics 
+			the captions for other file suppliers.
+			<li>Create a collection of folders ( IMages, Images2, Images3 ) to 
+			test this supplier.
+			<li>Confirm that supplying files from the Images folder does not 
+			include files from Images2 or Images3.
+			<li>Confirm that menu label characters are properly validated.
+			<li>Confirm that users without administrator privileges can use 
+			the file supplier even if the Extract Systems IPC service is not 
+			running after login.
+			<li>Confirm that services are stopped at uninstall and that everything 
+			uninstalls normally.
+		</ul>
+<p>
+	        <li><b>[DotNetRC #713, #715]</b> FTP file supplier
+        	<ul>
+	            	<li>Confirm that the configuration dialog can be closed via <b>Esc</b>.
+			<li>Configure the remote folder as <b>_Original_</b> with a <b>1</b> 
+			subfolder that contains a few images.
+			<li>Configure the file supplier to download the files to 
+			<b>C:\LocalFTPRoot</b>.
+			<li>Confirm that the files are downloaded to <b>C:\LocalFTPRoot\1</b>.
+		</ul>
+<p>
+	        <li><b>[DotNetRC #720, #722, #727]</b> Extract Image Area
+        	<ul>
+	            	<li>Configure the task to output images to 
+			<b>$InsertBeforeExt(<SourceDocName>,.extracted<AreaID>)</b>.
+			<li>Confirm that images can be extracted without appending to 
+			existing files.
+			<li>Confirm that pages cannot be appended to existing files if the 
+			<b>&lt;AreaID&gt;</b> tag is used.
+			<li>Exercise this task using VOA files created from the 
+			Demo_FLEXIndex images and rules.
+			<ul>
+				<li>Confirm that each image created appropriate output images.
+				<li>Confirm that each top-level attribute created an output 
+				image.
+				<li>Confirm that output images are created only for the 
+				appropriate input images.
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #2311]</b> FLEX Index SDK Help File
+        	<ul>
+            		<li>Confirm that the <b>Welcome</b> page includes a disclaimer about 
+			file contents being out-of-date.
+			<li>Confirm that the external link to the <b>Extract Systems</b> web 
+			site on the <b>Welcome</b> page opens in a separate browser window.
+			<li>Confirm that the external link to the <b>Extract Systems</b> web 
+			site on the <b>Technical Support</b> page opens in a separate browser 
+			window.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4547]</b> Verification handle leaks
+        	<ul>
+            		<li>Exercise verification in slideshow mode.
+			<li>Confirm that the handle count remains steady.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4622, #4626]</b> VOA compare / merge
+        	<ul>
+            		<li>Confirm that the <b>Redaction: Compare ID Shield data files</b> 
+			condition allows specification of equal redactions if 
+			<ul>
+				<li>one is overlapped by the other 
+				<li>they mutually overlap each other 
+			</ul>
+			<li>Confirm the same behavior for the <b>Redaction: Merge ID Shield 
+			data files</b> task.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4659]</b> FKB installer
+        	<ul>
+            		<li>Confirm that the ComponentData rules are installed to a named 
+			subfolder such as <b>Extract 
+			Systems\FlexIndexComponents\ComponentData\10.5</b>.
+			<li>Confirm that the FKB version and install directory includes 
+			a major version, minor version and build number.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4674]</b> ID Shield reports
+        	<ul>
+            		<li>Confirm that the ID Shield reports are installed to the 
+			<b>ProgramData\Extract Systems\Reports\Standard reports</b> folder.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4706]</b> Renaming old UEX files
+        	<ul>
+            		<li>Confirm that existing UEX files are renamed.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4753]</b> Document Classifier option
+        	<ul>
+            		<li>Confirm that the Document Classifier includes an option to use 
+			existing <b>lt;DocTypegt;</b> information.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4778]</b> Background OCR
+        	<ul>
+            		<li>Prepare some images for verification.
+			<li>Delete any existing USS files to make background OCR work.
+			<li>Start verifying documents and confirm that background OCR is 
+			taking place.
+			<li>Select the <b>Word redaction</b> tool.  Confirm that background 
+			OCR <b>does not</b> restart.
+			<li>Repeatedly click (without dragging the mouse) in the document 
+			with the <b>Word redaction</b> tool.  Confirm that background 
+			OCR <b>does not</b> restart.
+			<li>Exercise <b>ID Shield On Demand</b> the same way and confirm 
+			proper functionality of background OCR.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4782]</b> ID Shield installation
+        	<ul>
+            		<li>Confirm that <b>ID Shield</b> installs correctly.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4786, #4787]</b> Verification shortcuts
+        	<ul>
+            		<li>Prepare some images for verification.
+			<li>Start verifying documents and modify Verification options so that 
+			auto-zoom is turned <b>off</b>.
+            		<li>Confirm that the associated slider is enabled.
+			<li>Confirm that <b>F2</b> works as a shortcut to zoom in to the 
+			selected redaction.
+            		<li>Confirm that <b>Backspace</b> works as a shortcut for <b>Zoom 
+			previous</b>.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4788, #4807, #4808]</b> Clues not moveable 
+		or redactable
+        	<ul>
+            		<li>Prepare some images for verification.
+			<li>Start verifying documents.
+            		<li>Confirm that clues can still be selected.
+            		<li>Confirm that clues cannot be resized, rotated or moved.
+            		<li>Confirm that a move cursor is not presented when only a clue is 
+			selected.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4789]</b> Mouse cursor for auto-fit mode
+        	<ul>
+            		<li>Prepare some images for verification.
+			<li>Start verifying documents.
+            		<li>Confirm that the mouse cursor changes if <b>Shift</b> is 
+			pressed while drawing a redaction.
+            		<li>Confirm that the mouse cursor changes if <b>Ctrl+Shift</b> is 
+			pressed while drawing a redaction.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4790, #4799, #4800, #4801, #4802, #4823]</b> 
+		Regular Expression Pattern Matcher
+        	<ul>
+            		<li><u>User Interface</u>
+			<ul>
+				<li>Confirm that the property page caption is <b>Regular 
+				expression pattern matcher settings</b>.
+				<li>Confirm that the <b>Pattern file</b> group box contains 
+				an enabled edit box with an associated tag selector and 
+				browse button.
+				<li>Confirm that the tag selector list includes the following 
+				along with the usual <b>$</b> functions.
+				<ul>
+					<li>&lt;RSDFileDir&gt;
+					<li>&lt;DocType&gt;
+					<li>&lt;ComponentDataDir&gt;
+					<li>&lt;SourceDocName&gt;
+					<li>&lt;RuleExecutionID&gt;
+					<li>&lt;XMLOutputFile&gt;
+					<li>&lt;VOAOutputFile&gt;
+				</ul>
+				<li>Confirm that the browse button works correctly.
+				<li>Confirm that the associated document button opens the 
+				specified file using <b>Notepad</b>.
+				<li>Confirm that balloon help is provided to indicate file 
+				syntax and various limitations on behavior.
+				<li>Confirm that a checkbox is provided (checked by default) 
+				that allows return of no attributes and no error if the 
+				tag to be expanded does not exist.
+				<li>Confirm that the <b>Match Options</b> group box contains 
+				a <b>Case sensitive</b> checkbox.
+				<li>Confirm that another checkbox is provided to <b>Store rule 
+				ID(s) of successfully executed rule(s) as document tag named</b>.
+				<li>Confirm that an associated edit box is provided for the name 
+				of the document tag.
+				<li>Confirm that the edit box is enabled only when the checkbox 
+				is checked.
+				<li>Confirm that if no name is defined, a message is displayed 
+				about using the default value.
+				<li>Confirm that the default value is <b>RuleWorked</b>.
+				<li>Confirm that balloon help is provided.
+				<li>Confirm that a Data Scorer can be selected and configured.
+				<li>Confirm that <b>&lt;None&gt;</b> is available and clears a 
+				previous selection.
+				<li>Confirm that the associated read-only edit box displays 
+				the data scorer and its description.
+				<li>Confirm that the associated <b>Minimum match</b> edit box 
+				is enabled only when a data scorer is defined.
+				<li>Confirm that balloon help is provided.
+				<li>Confirm that the <b>Return Options</b> group box contains 
+				four radio buttons
+				<ul>
+					<li>Return first match only (the default)
+					<li>Return best match
+					<li>Return all matches
+					<li>Return first match &gt;= or best match
+				</ul>
+				<li>Confirm that the last radio button includes an edit box 
+				allowing for specification of a desired score.
+				<li>Confirm that the edit box is enabled only if the radio button 
+				is selected.
+				<li>Confirm that balloon help is provided.
+			</ul>
+<p>
+            		<li><u>Functionality</u>
+			<ul>
+				<li>Exercise basic functionality for the REPM.
+				<li>Confirm that an exception is thrown if the associated 
+				checkbox is unchecked and the tag does not exist.
+				<li>Confirm that the <b>Case sensitive</b> checkbox works 
+				properly.
+				<li>Confirm that rule IDs can be returned.
+				<li>Confirm that a data scorer works to validate matches.
+				<li>Confirm proper behavior for each <b>Return Option</b>.
+				<li>Confirm that import statements work properly with 
+				<b>#import path to file\filename.dat</b> syntax.
+			</ul>
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4793]</b> RDT automated tests under ProgramData
+        	<ul>
+            		<li>Confirm that the automated tests installed with the <b>RDT</b> 
+			are installed under <b>ProgramData</b>.
+			<li>Confirm that the <b>Output Handler</b> automated tests run 
+			successfully for a user that is not in the <b>Administrators</b> group.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4797]</b> Select page region
+        	<ul>
+            		<li>Exercise the RSD file and image 
+			at <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4797</b>.
+			<li>Confirm that no attribute is found.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4803]</b> Redaction metadata with millisecond resolution
+        	<ul>
+            		<li>Confirm that redaction metadata includes millisecond accuracy 
+			in <b>VOA</b> files.
+            		<li>Confirm that redaction metadata includes millisecond accuracy 
+			in <b>XML</b> files.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4810]</b> Uninstalling SQL CE
+        	<ul>
+            		<li>Confirm that uninstalling <b>FLEX Index</b> prompts for 
+			uninstallation of SQL CE.
+            		<li>Confirm that uninstalling <b>ID Shield</b> prompts for 
+			uninstallation of SQL CE.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4811]</b> FAM service and database
+        	<ul>
+            		<li>Confirm that <b>Configure FAM Service</b> works properly.
+			<li>Confirm that <b>Extract Systems FAM Service</b> is installed 
+			correctly.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4812, #4822]</b> Numeric sequence expander value modifier
+        	<ul>
+            		<li>Confirm proper behavior of the property page user interface.
+			<li>Confirm proper behavior <b>expanding</b> a sequence.
+			<li>Confirm proper behavior <b>contracting</b> a sequence.
+			<li>Confirm that the automated tests execute without error.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5847, #6058]</b> Installer and uninstaller
+        	<ul>
+			<li>Confirm that <b>ExtractDebugData.exe</b> is installed to the 
+			<b>CommonComponents</b> folder.
+            		<li>Confirm that uninstalling all Extract Systems software on or 
+			after build <b>9.0.0.68</b> unregisters all Extract Systems COM 
+			objects.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6102, #6103, #6104]</b> FTP file supplier
+        	<ul>
+            		<li>Confirm that a wait cursor is presented when testing the 
+			connection.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6156, #6158]</b> UEX Viewer
+        	<ul>
+            		<li>Open the UEX Viewer.
+			<li>Confirm that <b>View - Show application traces</b> is checked 
+			by default.
+			<li>Confirm that <b>View - Show displayed exceptions</b> is checked 
+			by default.
+			<li>Confirm that unchecking these items modifies the visible list.
+			<li>Confirm that changes in these settings are not persistent.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6164, #6170]</b> USB counter management and log 
+		file entries
+        	<ul>
+            		<li><u>Goals</u>
+			<ul>
+				<li>Ensure that <b>Application trace</b> items are logged 
+				for each transition across <b>1000</b> counts.
+				<li>Accumulate USB decrement requests to limit the number 
+				of counter requests and allow for more processors to 
+				successfully access a multi-user key.
+			</ul>
+<p>
+            		<li><u>Logged transitions</u>
+			<ul>
+				<li>Ensure that <b>Application trace</b> items are logged 
+				for each transition across <b>1000</b> counts. (Note: Only 
+				one trace message will be logged if a very large image is 
+				processed that might otherwise require multiple log 
+				entries.)
+				<ul>
+					<li>Test this with a local, single-user key.
+					<li>Test this with a remote, multiple-user key.
+				</ul>
+			</ul>
+<p>
+            		<li><u>Accumulate decrement requests</u>
+			<ul>
+				<li>Prepare a large number of single-page images to be 
+				processed with an <b>ID Shield</b> ruleset that requires a 
+				decrement-by-page USB key.
+				<li>Prepare an FPS file to process the files using only one 
+				or two threads in order to more carefully watch decrements 
+				of the USB counter.
+				<li>Use a local USB key to minimize delay in counter value 
+				refreshes.
+				<li>Process the files and refresh the <b>USB License Key 
+				Manager</b> frequently, noting the number of counts removed 
+				with each refresh.
+				<ul>
+					<li>Confirm that beginning processing still decrements 
+					the counter by single pages.
+					<li>Confirm that counter decrements increase up to a 
+					maximum of <b>10</b> pages at a time.
+				</ul>
+				<li>Confirm that killing a FAM instance provides a small 
+				number of free counts since the accumulated decrement is not 
+				applied to the key.
+				<li>Confirm that the usual retry code is still executed and 
+				works properly if the USB key is missing.
+				<li>Confirm that for a USB key with few remaining counts, the 
+				decrement is not greater than 1% of the remaining counts.
+				<li>Confirm that for a USB key with <b>less than 100</b> 
+				remaining counts, the decrement remains at <b>1</b>.
+				<li>Confirm that the counter value will not go negative.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6166, #6167]</b> Property pages and description strings
+        	<ul>
+            		<li>Exercise <b>Check for new components</b> to confirm that all 
+			task objects are available.
+			<li>Check the description string for each available task object.
+			<ul>
+				<li>Confirm that each description uses sentence case with 
+				a preceding <b>Core:</b>, <b>Data Entry:</b> or 
+				<b>Redaction:</b> label.
+				<li>Confirm that each acronym such as PDF or FTP is 
+				presented in upper-case.
+				<li>Confirm that proper names such as <b>Bates</b> are 
+				capitalized.
+			</ul>
+			<li>Check the property page caption for each available task object.
+			<ul>
+				<li>Confirm that each caption is built from the task 
+				description as <b>&lt;task description&gt; settings</b>.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6168]</b> DB Admin and empty databases
+        	<ul>
+			<li>Login to the test machine as a member of the local Administrators 
+			group.
+            		<li>Confirm that <b>DB Admin</b> can login to an otherwise empty 
+			database created by SQL Management Studio.
+			<li>Confirm that a confirmation dialog is presented.
+            		<li>Confirm that <b>DB Admin</b> can create a new database with the 
+			same name as an empty database created by SQL Management Studio.
+			<li>Confirm that a confirmation dialog is presented.
+<p>
+			<li>Create two more empty databases with <b>SQL Management Studio</b>.
+			<li>Create two SQL logins using <b>SQL Management Studio</b>.
+			<ul>
+				<li>User A - granted <b>db_owner</b> privileges to the new 
+				databases.
+				<li>User B - granted <b>db_datareader + db_datawriter</b> 
+				privileges to the new databases.
+				<li>Neither user should be a member of the <b>Administrators</b> 
+				group.
+			</ul>
+<p>
+			<li>Login to the test machine as <b>User B</b>.
+			<ul>
+				<li>Confirm that the user <b>cannot</b> create or login to 
+				either of the new databases.
+			</ul>
+			<li>Login to the test machine as <b>User A</b>.
+			<ul>
+				<li>Confirm that the user <b>can</b> create the first new 
+				database.
+				<li>Confirm that the user <b>can</b> login to the second new 
+				database.
+			</ul>
+			<li>Login to the test machine as <b>User B</b>.
+			<ul>
+				<li>Confirm that the user <b>can</b> add actions and counters 
+				to one of the new databases.
+				<li>Confirm that the user <b>cannot</b> clear the new database.
+			</ul>
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
