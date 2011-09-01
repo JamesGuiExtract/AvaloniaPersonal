@@ -1,11 +1,7 @@
-del *.test *.xml
-del \TestDriveOfTag.xml
-del "\Tst  Imag.tif.xml"
-del "\TestFile.tif.xml"
-del "\Test  Image.tif.xml"
-del "\FLEX Index test.xml"
-del "\\fnp2\internal\Common\Testing\Product Testing\TestTextFunctionExpander\Test  Image.tif.xml"
-del "\\fnp2\internal\Common\Testing\Product Testing\TestTextFunctionExpander\ABC\Test  Image.tif.xml"
+del *.xml
+del *_0?.test
+del H:\*.*
+
 rmdir /S h:
-rmdir /S Now
+rmdir /S 16_Now
 del testResults.txt
