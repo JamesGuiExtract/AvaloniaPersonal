@@ -1,0 +1,92 @@
+<HTML>
+
+<HEAD>
+<TITLE>ID Shield On Demand Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>ID Shield On Demand Testing Checklist<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+
+<!-- *********************************************** -->
+    
+    <li><h2><b>Licensing et cetera</b></h2>
+    <ul>
+        <li>Confirm that an ID Shield [TBD] license is needed to run this application.</li>
+        <li>Confirm that licensing is checked when the application opens.</li>
+    <p>
+        <li>Confirm that there is a Start menu shortcut for this application.</li>
+    </ul></li>
+<p>
+    <li><b>Basic functionality</b>
+    <ul>
+        <li>Confirm that the application can be opened from the command line.</li>
+        <li>Confirm that a usage message is presented if it is run with the <b>/?</b> flag.</li>
+        <li>Confirm that the application can be run with the <b>/ef</b> flag to specify where to
+        log exceptions.</li>
+        <li>Confirm that the application can be run with a single argument specifying a file to
+        open.</li>
+    <p>
+        <li>Confirm that the File menu contains an <b>Open</b> item.</li>
+        <li>Confirm the presence of an <b>Open</b> toolstrip button.</li>
+        <li>Confirm that the toolstrip button has an associated MRU list and that it works as
+        expected.</li>
+        <li>Confirm that the Save and Commit option is now just a <b>Save</b> option.</li>
+        <li>Confirm that document navigation options are not available.</li>
+        <li>Confirm that the <b>Skip</b> and <b>Tag</b> options are not available.</li>
+        <li>Confirm that the <b>Tab</b> key and the <b>Next item</b> command do <b>not</b> attempt
+        to save and move on when you reach the end of the document.</li>
+        <li>Confirm that when you save, you are prompted to save a redacted output file.</li>
+        <li>Confirm that the default output filename is the original filename with <b>.redacted</b>
+        inserted before the extension.</li>
+        <li>Confirm that you are not able to overwrite the original image.</li>
+    <p>
+        <li>Confirm that the verification and redaction behave like their default configurations
+        except:
+        <ul>
+            <li>VerifyAllPages is false</li>
+            <li>VerifyAllItems is false</li>
+            <li>Require types is false</li>
+            <li>Seamless mode is false</li>
+            <li>Slideshow is disabled</li>
+            <li>Redactions will be created for all items except clues</li>
+            <li>Redaction text will be &lt;ExemptionCodes&gt;</li>
+        </ul></lI>
+    <p>
+        <li>Confirm that there is an <b>ID Shield On Demand</b> tab in the verification 
+        options.</li>
+        <li>Confirm that it contains the following options that determine whether or not to create
+        a VOA file:
+        <ul>
+            <li>Do not create data file (default)</li>
+            <li>Prompt for whether to create data file</li>
+            <li>Create a data file</li>
+        </ul></li>
+        <li>Confirm that if there is a pre-existing VOA file, changes will be saved regardless of
+        which option is selected.</li>
+        <li>Confirm that metadata is saved under an <b>OnDemandSession</b> node in the VOA 
+        file.</li>
+    <p>    
+        <li>Confirm that <b>TIF</b> images can be verified and saved.</li>
+        <li>Confirm that <b>PDF</b> images can be verified and saved.</li>
+        <li>Confirm that <b>multipage</b> images can be verified and saved.</li>
+        <li>With each redaction tool, confirm that redactions can be drawn and rotated.</li>
+        <li>Confirm that <b>auto-OCR</b> works as expected.</li>
+        <li>Confirm that all the toolstrip buttons work as expected.</li>
+    </ul></li>
+<p>
+    <LI><b>Bug fixes</b>
+    <ul>
+        
+    </ul></li>
+
+<!-- *********************************************** -->    
+</OL>
+</BODY>
+</HTML>
