@@ -20,19 +20,6 @@ namespace Extract.Utilities
     /// </summary>
     public static class FileSystemMethods
     {
-        #region Constants
-
-        /// <summary>
-        /// The passwords used to authenticate the secure file deleter.
-        /// Use in order: 3, 0, 2, 1
-        /// </summary>
-        const uint _SECURE_AUTH_KEY_00 = 0x2109429A;
-        const uint _SECURE_AUTH_KEY_01 = 0xFF4ED600;
-        const uint _SECURE_AUTH_KEY_02 = 0x0584CC2A;
-        const uint _SECURE_AUTH_KEY_03 = 0x6F5519FE;
-
-        #endregion Constants
-
         #region Fields
 
         /// <summary>
@@ -108,6 +95,12 @@ namespace Extract.Utilities
         /// Mutex used to prevent multiple threads from trying instantiate _secureFileDeleter.
         /// </summary>
         static object _secureFileDeleterLock = new object();
+
+        /// <summary>
+        /// Keeps track of whether authentication of the secure file deleter has failed so that
+        /// repeated attempts to authenticate are not made.
+        /// </summary>
+        static bool _secureFileDeleterAuthenticationFailed;
 
         /// <summary>
         /// The registry settings from which the the secure file delete options are to be retrieved.
@@ -913,6 +906,11 @@ namespace Extract.Utilities
         {
             lock (_secureFileDeleterLock)
             {
+                // If we have already failed to authenticate, don't try again.
+                ExtractException.Assert("ELI33484",
+                    "Secure file deletion authentication failed.",
+                    !_secureFileDeleterAuthenticationFailed);
+
                 if (_secureFileDeleter == null)
                 {
                     try
@@ -932,35 +930,35 @@ namespace Extract.Utilities
                         _secureFileDeleter =
                             (ISecureFileDeleter)Activator.CreateInstance(deleterType);
 
-                        // Generate a random key, use it to call authenticate, then test that the same
-                        // result (interpreted as a hex string) is achieved by encrypting the key with the
-                        // secure file deleter authenticaion password.
+                        // Generate a random 32 char key, use it to call authenticate.
                         string key = UtilityMethods.GetRandomString(32, true, true, true);
                         string response = _secureFileDeleter.Authenticate(key);
 
-                        // Load the secure file deleter authenticaion password
-                        byte[] password = new byte[16];
-                        BitConverter.GetBytes(_SECURE_AUTH_KEY_03).CopyTo(password, 0);
-                        BitConverter.GetBytes(_SECURE_AUTH_KEY_00).CopyTo(password, 4);
-                        BitConverter.GetBytes(_SECURE_AUTH_KEY_02).CopyTo(password, 8);
-                        BitConverter.GetBytes(_SECURE_AUTH_KEY_01).CopyTo(password, 12);
+                        // Test that the same result is achieved by:
+                        // 1) Encrypting the key.
+                        // 2) Interpreting the result as 5 64 bit numbers.
+                        // 3) XOR'ing them where each is rotated left by its index (0-4)
+                        // 4) Converting this result to a 16 char hex string.
+                        // Do this quick and dirty checksum rather than direct encryption so one can't call
+                        // Authenticate repeatedly to crack our standard encryption scheme).
+                        string encryptedString = NativeMethods.EncryptString(key);
+                        byte[] encryptedBytes = StringMethods.ConvertHexStringToBytes(encryptedString);
 
-                        // Create streams for the key data and encrypted result.
-                        using (MemoryStream stream =
-                            new MemoryStream(Encoding.ASCII.GetBytes(key)))
-                        using (MemoryStream encryptedStream = new MemoryStream())
+                        ulong result = 0;
+                        for (int i = 0; i < 5; i++)
                         {
-                            // Preform the encryption, then ensure the result matches the
-                            // authentication response.
-                            ExtractEncryption.SetMapLabel(stream, encryptedStream, password,
-                                new MapLabel());
-
-                            string encryptedString = encryptedStream.ToArray().ToHexString();
-                            ExtractException.Assert("ELI33380",
-                                "Secure file deletion authentication failed.",
-                                string.Compare(encryptedString, response,
-                                    StringComparison.OrdinalIgnoreCase) == 0);
+                            ulong value = BitConverter.ToUInt64(encryptedBytes, i * sizeof(ulong));
+                            result ^= (value << i) | (value >> (64 - i));
                         }
+                        string resultString = result.ToString("X16", CultureInfo.InvariantCulture);
+
+                        // If authentication failed, don't attempt to authenticate again.
+                        _secureFileDeleterAuthenticationFailed =
+                            !response.Equals(resultString, StringComparison.OrdinalIgnoreCase);
+
+                        ExtractException.Assert("ELI33380",
+                            "Secure file deletion authentication failed.",
+                            !_secureFileDeleterAuthenticationFailed);
                     }
                     catch (Exception ex)
                     {

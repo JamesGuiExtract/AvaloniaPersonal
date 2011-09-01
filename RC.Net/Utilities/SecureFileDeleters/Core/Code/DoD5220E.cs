@@ -19,7 +19,7 @@ namespace Extract.Utilities.SecureFileDeleters
     [ComVisible(true)]
     [Guid("2AA3693B-8724-4275-B343-DCE7047B1E63")]
     [SuppressMessage("Microsoft.Interoperability", "CA1405:ComVisibleTypeBaseTypesShouldBeComVisible")]
-    public class DoD5220E : SecureFileDeleterBase, ISecureFileDeleter
+    public sealed class DoD5220E : SecureFileDeleterBase, ISecureFileDeleter
     {
         #region Constants
 

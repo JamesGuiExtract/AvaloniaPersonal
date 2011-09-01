@@ -1,8 +1,7 @@
-﻿using Extract.Encryption;
-using Extract.Licensing;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -41,15 +40,6 @@ namespace Extract.Utilities.SecureFileDeleters
         /// </summary>
         static readonly int _RANDOM_TIME_SPAN = _SECONDS_PER_YEAR * 3;
 
-        /// <summary>
-        /// The passwords used to authenticate the secure file deleter.
-        /// Use in order: 3, 0, 2, 1
-        /// </summary>
-        const uint _SECURE_AUTH_KEY_00 = 0x2109429A;
-        const uint _SECURE_AUTH_KEY_01 = 0xFF4ED600;
-        const uint _SECURE_AUTH_KEY_02 = 0x0584CC2A;
-        const uint _SECURE_AUTH_KEY_03 = 0x6F5519FE;
-
         #endregion Constants
 
         #region Delegates
@@ -60,7 +50,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="bytesToWrite">The number of bytes to fill the buffer with</param>
-        protected delegate void OverwritePass(Byte[] buffer, int bytesToWrite);
+        internal protected delegate void OverwritePass(Byte[] buffer, int bytesToWrite);
 
         #endregion Delegates
 
@@ -84,7 +74,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// <summary>
         /// Initializes a new instance of the <see cref="SecureFileDeleterBase"/> class.
         /// </summary>
-        protected SecureFileDeleterBase()
+        internal protected SecureFileDeleterBase()
         {
             try 
 	        {
@@ -110,7 +100,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// <value>
         /// The calls that are to provide data for overwriting the files' data.
         /// </value>
-        protected Collection<OverwritePass> OverwritePasses
+        internal protected Collection<OverwritePass> OverwritePasses
         {
             get;
             private set;
@@ -122,7 +112,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// </summary>
         /// <value><see langword="true"/> to verify the file was overwritten as intended; otherwise,
         /// <see langword="false"/>.</value>
-        protected bool Verify
+        internal protected bool Verify
         {
             get;
             set;
@@ -134,7 +124,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// </summary>
         /// <value><see langword="true"/> if the name and date/time stamps; otherwise,
         /// <see langword="false"/>.</value>
-        protected bool Obfuscate
+        internal protected bool Obfuscate
         {
             get;
             set;
@@ -147,7 +137,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// <value>
         /// The number of times to rename files before deletion
         /// </value>
-        protected int RenameRepetitions
+        internal protected int RenameRepetitions
         {
             get;
             set;
@@ -166,25 +156,7 @@ namespace Extract.Utilities.SecureFileDeleters
         {
             try
             {
-                // So that the caller can verify that this is an Extract Systems implementation,
-                // it will expect the result to be a hex string representing the key encrypted with
-                // Extract Systems legacy (ICE) encryption.
-                byte[] password = new byte[16];
-                BitConverter.GetBytes(_SECURE_AUTH_KEY_03).CopyTo(password, 0);
-                BitConverter.GetBytes(_SECURE_AUTH_KEY_00).CopyTo(password, 4);
-                BitConverter.GetBytes(_SECURE_AUTH_KEY_02).CopyTo(password, 8);
-                BitConverter.GetBytes(_SECURE_AUTH_KEY_01).CopyTo(password, 12);
-
-                using (MemoryStream stream =
-                    new MemoryStream(Encoding.ASCII.GetBytes(key)))
-                using (MemoryStream encryptedStream = new MemoryStream())
-                {
-                    ExtractEncryption.SetMapLabel(stream, encryptedStream, password,
-                        new MapLabel());
-
-                    string encryptedString = encryptedStream.ToArray().ToHexString();
-                    return encryptedString;
-                }
+                return ObfuscatedAuthenticate(key);
             }
             catch (Exception ex)
             {
@@ -284,7 +256,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// <param name="exceptions">If <see paramref="throwIfUnableToDeleteSecurely"/> is 
         /// <see langword="false"/>, any exceptions encountered should be added to this
         /// <see cref="Collection{T}"/>.</param>
-        protected virtual void OverwriteFile(string fileName, bool throwIfUnableToDeleteSecurely,
+        internal protected virtual void OverwriteFile(string fileName, bool throwIfUnableToDeleteSecurely,
             Collection<ExtractException> exceptions)
         {
             try
@@ -395,7 +367,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// <requires><see paramref="readBuffer"/> and <see paramref="readBuffer"/> must be at least
         /// as large as <see paramref="bytesToVerify"/>.</requires>
         /// <throws><see cref="ExtractException"/> if the verificaton fails.</throws>
-        protected static void VerifyData(Stream stream, byte[] writeBuffer, byte[] readBuffer,
+        internal protected static void VerifyData(Stream stream, byte[] writeBuffer, byte[] readBuffer,
             int bytesToVerify)
         {
             try
@@ -436,7 +408,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// <param name="exceptions">Any excpetions encountered will be added to this
         /// <see paramref="Collection{T}"/>.</param>
         /// <returns>The final name of the file after the renaming.</returns>
-        protected virtual string RenameFile(string fileName, int count,
+        internal protected virtual string RenameFile(string fileName, int count,
             Collection<ExtractException> exceptions)
         {
             string currentFileName = fileName;
@@ -480,7 +452,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         /// <param name="exceptions">The exceptions.</param>
-        protected static void ObfuscateFileAttributes(string fileName,
+        internal protected static void ObfuscateFileAttributes(string fileName,
             Collection<ExtractException> exceptions)
         {
             try
@@ -513,7 +485,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// </summary>
         /// <returns>The random <see cref="DateTime"/>.</returns>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        protected static DateTime GetRandomDateTime()
+        internal protected static DateTime GetRandomDateTime()
         {
             try
             {
@@ -533,7 +505,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// <param name="buffer">The buffer to fill.</param>
         /// <param name="bytesToWrite">The number of bytes to fill the buffer with</param>
         /// <param name="value">The <see langword="byte"/> that should fill the buffer.</param>
-        protected virtual void StaticOverwrite(Byte[] buffer, int bytesToWrite, byte value)
+        internal protected virtual void StaticOverwrite(Byte[] buffer, int bytesToWrite, byte value)
         {
             try
             {
@@ -554,7 +526,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// </summary>
         /// <param name="buffer">The buffer to fill.</param>
         /// <param name="bytesToWrite">The number of bytes to fill the buffer with</param>
-        protected virtual void RandomOverwrite(Byte[] buffer, int bytesToWrite)
+        internal protected virtual void RandomOverwrite(Byte[] buffer, int bytesToWrite)
         {
             try
             {
@@ -570,5 +542,41 @@ namespace Extract.Utilities.SecureFileDeleters
         }
 
         #endregion Protected Members
+
+        #region Private Member
+
+        /// <summary>
+        /// Authenticates this <see cref="SecureFileDeleterBase"/> instance. (Obfuscated since this
+        /// is private).
+        /// </summary>
+        /// <param name="key">The authentication key.</param>
+        /// <returns>The authentication value.</returns>
+        static string ObfuscatedAuthenticate(string key)
+        {
+            ExtractException.Assert("ELI33483", "Invalid authentication key", key.Length == 32);
+
+            // So that the caller can verify that this is an Extract Systems implementation, it will
+            // expect a result calculated by:
+            // 1) Encrypting the key.
+            // 2) Interpreting the result as 5 64 bit numbers.
+            // 3) XOR'ing them where each is rotated left by its index (0-4)
+            // 4) Converting this result to a 16 char hex string.
+            // Do this quick and dirty checksum rather than direct encryption so one can't call
+            // Authenticate repeatedly to crack our standard encryption scheme).
+            string encryptedString = NativeMethods.EncryptString(key);
+            byte[] encryptedBytes = StringMethods.ConvertHexStringToBytes(encryptedString);
+
+            ulong result = 0;
+            for (int i = 0; i < 5; i++)
+            {
+                ulong value = BitConverter.ToUInt64(encryptedBytes, i * sizeof(ulong));
+                result ^= (value << i) | (value >> (64 - i));
+            }
+            string resultString = result.ToString("X16", CultureInfo.InvariantCulture);
+
+            return resultString;
+        }
+
+        #endregion Private Member
     }
 }
