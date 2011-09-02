@@ -515,12 +515,12 @@ begin
 		// 32bit needs to be installed even on 64 bit
 		szProgram = "msiexec";
 		szCmdLine = " /i " + SUPPORTDIR ^ "\\SSCERuntime_x86-ENU.msi" + " /qb";
-		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT); 
+		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
 
 		// If 64 bit OS install 64 version of SSCE	
 		if ( SYSINFO.bIsWow64 ) then
 			szCmdLine = " /i " + SUPPORTDIR ^ "\\SSCERuntime_x64-ENU.msi" + " /qb";
-			LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT); 
+			LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
 		endif;
 		SdShowMsg("Setup is Installing SQL Compact Edition", FALSE);
 		//if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) < 0  ) then
@@ -578,10 +578,10 @@ begin
 			SdShowMsg("Setup is Uninstalling SQL Compact Edition", TRUE);
 	    	// If 64 bit OS install 64 version of SSCE	
 			if ( SYSINFO.bIsWow64 ) then
-				UninstallApplication(SQL_COMPACT_EDITION_GUID_64,"", LAAW_OPTION_WAIT  | LAAW_OPTION_SHOW_HOURGLASS);			
+				UninstallApplication(SQL_COMPACT_EDITION_GUID_64,"", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);			
 			endif;
 	
-	    	UninstallApplication(SQL_COMPACT_EDITION_GUID,"", LAAW_OPTION_WAIT  | LAAW_OPTION_SHOW_HOURGLASS);
+	    	UninstallApplication(SQL_COMPACT_EDITION_GUID,"", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);
 	    	SdShowMsg("Setup is Uninstalling SQL Compact Edition", FALSE);
 	  	endif;
 	endif;
@@ -687,12 +687,12 @@ begin
    
    	szProgram = SUPPORTDIR ^ "\\RegisterExtensionDotNet40_x86.exe";
    	szArguments = "-i "  + PROGRAMFILES ^ EXTRACT_DIR ^ strExtension;
-	LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT); 
+	LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
 
 	// Register for 64 bit also
 	if ( SYSINFO.bIsWow64 ) then
    		szProgram = SUPPORTDIR ^ "\\RegisterExtensionDotNet40_x64.exe";
-		LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT); 
+		LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
 	endif;
 	
   	SdShowMsg("Setup is registering shell extension.", FALSE);
@@ -712,12 +712,12 @@ begin
    
    	szProgram = SUPPORTDIR ^ "\\RegisterExtensionDotNet40_x86.exe";
    	szArguments = "-u "  + PROGRAMFILES ^ EXTRACT_DIR ^ strExtension;
-	LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT); 
+	LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
 
 	// Register for 64 bit also
 	if ( SYSINFO.bIsWow64 ) then
    		szProgram = SUPPORTDIR ^ "\\RegisterExtensionDotNet40_x64.exe";
-		LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT); 
+		LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
 	endif;
 
  	SdShowMsg("Setup is unregistering shell extension.", FALSE);
@@ -730,14 +730,17 @@ end;
 //  Purpose: This function installs the included FKB update
 ///////////////////////////////////////////////////////////////////////////////
 function InstallFKB() 
-	string szProgram, szCmdLine;
+	string szProgram, szCmdLine; 
+	string szInstallToRun;
 begin             
 	SdShowMsg("Setup is Installing Extract Systems FKB", TRUE);
 	
 	// Install FKB 
-	szProgram = "msiexec";
-	szCmdLine = " /qn /i " + SUPPORTDIR ^ "\\Extract Systems FKB.msi";
-	LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
+	szProgram = "msiexec"; 
+	szInstallToRun = SUPPORTDIR ^ "\\Extract Systems FKB.msi";
+	LongPathToQuote(szInstallToRun, TRUE);
+	szCmdLine = " /i " + szInstallToRun + " /qb";;
+	LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
 	
 	SdShowMsg("Setup is Installing Extract Systems FKB", FALSE);
 end;

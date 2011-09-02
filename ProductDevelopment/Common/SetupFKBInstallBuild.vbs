@@ -63,6 +63,9 @@ Sub Main
     'Need to change the product code
     pProject.ProductCode = pProject.GenerateGUID()
     
+    'Need to change the upgrade code so each install will be completely separate of other installs
+    pProject.UpgradeCode = pProject.GenerateGUID()
+    
     'Set the default install path
     pProject.INSTALLDIR = "[ProgramFilesFolder]Extract Systems\FlexIndexComponents\ComponentData\" + sVersionNumber
     
