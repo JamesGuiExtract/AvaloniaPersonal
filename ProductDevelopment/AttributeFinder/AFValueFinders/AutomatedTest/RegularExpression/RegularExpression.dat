@@ -121,3 +121,7 @@
 
 //test39 Fuzzy search; 1 method=better_fit 1 method=fast; input has repeating substrings, leading non-whitespace chars, 1 deletion
 <TESTCASE>;Fuzzy7.rsd;.\Fuzzy21.txt;;Test39.eav
+ 
+//test40 First match only set.
+//[FlexIDSCore:4072]
+<TESTCASE>;Test40.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test40.eav
