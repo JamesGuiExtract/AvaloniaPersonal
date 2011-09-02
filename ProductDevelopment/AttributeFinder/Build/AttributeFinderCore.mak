@@ -125,25 +125,6 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe  /in:"$(BinariesFolder)\ExtractDebugData.exe" /mapout:"$(BinariesFolder)\Map\mapExtractDebugData.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.AttributeFinder.Rules.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.AttributeFinder.Rules.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 		
-EncryptAndCopyComponentDataFiles: 
-    @ECHO Copying the ComponentData subdirectories and files to installation directory...
-    @rmdir "$(AFCoreInstallFilesRootDir)\ComponentData" /s /q
-    @IF NOT EXIST "$(AFCoreInstallFilesRootDir)\ComponentData" @MKDIR "$(AFCoreInstallFilesRootDir)\ComponentData"
-    @XCOPY "$(RulesDir)\ComponentData\*.*" "$(AFCoreInstallFilesRootDir)\ComponentData" /v /s /e /y
-    $(VerifyDir) "$(RulesDir)\ComponentData" "$(AFCoreInstallFilesRootDir)\ComponentData"
-    @ECHO Encrypting ComponentData pattern files...
-    @SendFilesAsArgumentToApplication "$(AFCoreInstallFilesRootDir)\ComponentData\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
-    @SendFilesAsArgumentToApplication "$(AFCoreInstallFilesRootDir)\ComponentData\*.dcc" 1 1 "$(BinariesFolder)\EncryptFile.exe"
-    @SendFilesAsArgumentToApplication "$(AFCoreInstallFilesRootDir)\ComponentData\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
-    @SendFilesAsArgumentToApplication "$(AFCoreInstallFilesRootDir)\ComponentData\*.spm" 1 1 "$(BinariesFolder)\EncryptFile.exe"
-    @DeleteFiles "$(AFCoreInstallFilesRootDir)\ComponentData\*.dcc"
-    @DeleteFiles "$(AFCoreInstallFilesRootDir)\ComponentData\*.dat"
-    @DeleteFiles "$(AFCoreInstallFilesRootDir)\ComponentData\*.rsd"
-    @DeleteFiles "$(AFCoreInstallFilesRootDir)\ComponentData\*.txt"
-	@DeleteFiles "$(AFCoreInstallFilesRootDir)\ComponentData\*.spm"
-    @DeleteFiles "$(AFCoreInstallFilesRootDir)\vssver.scc"
-    @ECHO $(FKBVersion) > "$(AFCoreInstallFilesRootDir)\ComponentData\FKBVersion.txt"
-
 CopyCommonFiles:
 	@ECHO Copying common .NET files to installation build folders...
 	@XCOPY "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles" "$(AFCoreInstallFilesRootDir)\DotNetGAC" /Y/E

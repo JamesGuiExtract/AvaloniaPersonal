@@ -18,6 +18,16 @@
 !ERROR Build variable 'BuildConfig' must be defined (e.g. "Release")
 !ENDIF
 
+# determine the name of the release output directory based upon the build
+# configuration that is being built
+!IF "$(BuildConfig)" == "Release"
+BuildOutputDir=Release
+!ELSEIF "$(BuildConfig)" == "Debug"
+BuildOutputDir=Debug
+!ELSE
+!ERROR Internal error - invalid value for BuildConfig variable!
+!ENDIF
+
 #############################################################################
 # M A K E F I L E   V A R I A B L E S
 #
@@ -33,6 +43,9 @@ AFInstallFilesRootDir=$(AFInstallPDRootDir)\SDKInstallation\Files
 AFBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge
 FKBUpdateReleaseDir=$(AFBleedingEdgeDir)\$(FKBVersion)
 FKBInstallMediaDir=$(FKBUpdateInstallRoot)\Media\CD-ROM\DiskImages\DISK1
+
+BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
+
 	
 EncryptAndCopyComponentDataFiles: 
     @ECHO Copying the ComponentData subdirectories and files to installation directory...
