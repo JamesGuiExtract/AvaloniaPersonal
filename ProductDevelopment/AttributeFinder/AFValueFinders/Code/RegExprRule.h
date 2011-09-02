@@ -75,6 +75,8 @@ public:
 	STDMETHOD(put_IsRegExpFromFile)(/*[in]*/ BOOL newVal);
 	STDMETHOD(get_CreateSubAttributesFromNamedMatches)(/*[out, retval]*/ VARIANT_BOOL *pVal);
 	STDMETHOD(put_CreateSubAttributesFromNamedMatches)(/*[in]*/ VARIANT_BOOL newVal);
+	STDMETHOD(get_FirstMatchOnly)(/*[out, retval]*/ VARIANT_BOOL *pVal);
+	STDMETHOD(put_FirstMatchOnly)(/*[in]*/ VARIANT_BOOL newVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -106,7 +108,7 @@ public:
 
 private:	
 	bool m_bCaseSensitive;
-
+	bool m_bFirstMatchOnly;
 	bool m_bAddCapturesAsSubAttributes;
 	
 	bool m_bIsRegExpFromFile;

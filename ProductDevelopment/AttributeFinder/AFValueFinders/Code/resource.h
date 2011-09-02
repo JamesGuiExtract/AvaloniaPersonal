@@ -372,6 +372,8 @@
 #define IDC_COMBO_EXPAND_UNITS_RIGHT    473
 #define IDC_BTN_BROWSE_REPM             474
 #define IDC_CHK_CASE_REPM               475
+#define IDC_CHK_FIRST_MATCH_ONLY        476
+#define IDC_FIRST_MATCH_ONLY_INFO       477
 
 // Next default values for new objects
 // 
@@ -379,7 +381,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        1002
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         476
+#define _APS_NEXT_CONTROL_VALUE         478
 #define _APS_NEXT_SYMED_VALUE           200
 #endif
 #endif

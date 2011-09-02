@@ -70,6 +70,10 @@ STDMETHODIMP CRegExprRulePP::Apply(void)
 			// Check if sub attribute check box is checked
 			nChecked = m_checkCreateSubAttributesFromMatches.GetCheck();
 			ipRegExprRule->CreateSubAttributesFromNamedMatches = asVariantBool(nChecked == BST_CHECKED);
+
+			// Check first match only setting.
+			nChecked = m_checkFirstMatchOnly.GetCheck();
+			ipRegExprRule->FirstMatchOnly = asVariantBool(nChecked == BST_CHECKED);
 		}
 		SetDirty(FALSE);
 	}
@@ -157,6 +161,10 @@ LRESULT CRegExprRulePP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 			bool bCapturesAsSubAttributes = asCppBool(ipRegExprRule->CreateSubAttributesFromNamedMatches);
 			m_checkCreateSubAttributesFromMatches.SetCheck(asBSTChecked( bCapturesAsSubAttributes ));
 			
+			// Setup first match only check box.
+			m_checkFirstMatchOnly = GetDlgItem(IDC_CHK_FIRST_MATCH_ONLY);
+			m_checkFirstMatchOnly.SetCheck(asBSTChecked(ipRegExprRule->FirstMatchOnly));
+
 			updateControls();
 		}
 		
@@ -285,6 +293,22 @@ LRESULT CRegExprRulePP::OnClickedRegExpFileInfo(WORD wNotifyCode, WORD wID, HWND
 		m_infoTip.Show(zText);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07536");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CRegExprRulePP::OnClickedFirstMatchOnlyInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// show tooltip info
+		CString zText("When used as an attriubte modifier, 'First match only' will\n"
+			"always be treated as checked regardless of how it's configured.");
+		m_infoTip.Show(zText);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI33505");
 
 	return 0;
 }

@@ -21,7 +21,9 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 4;
+// Version 4: Added m_bAddCapturesAsSubAttributes
+// Version 5: Added m_bFirstMatchOnly
+const unsigned long gnCurrentVersion = 5;
 
 //-------------------------------------------------------------------------------------------------
 // CRegExprRule
@@ -35,6 +37,7 @@ CRegExprRule::CRegExprRule()
 	m_ipAFUtility(NULL),
 	m_ipMiscUtils(NULL),
 	m_bAddCapturesAsSubAttributes(false),
+	m_bFirstMatchOnly(false),
 	m_cachedRegExLoader(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str())
 {
 	try
@@ -280,6 +283,36 @@ STDMETHODIMP CRegExprRule::put_CreateSubAttributesFromNamedMatches(VARIANT_BOOL 
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI23026");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRegExprRule::get_FirstMatchOnly(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33502", pVal != __nullptr);
+
+		*pVal = asVariantBool(m_bFirstMatchOnly);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33503");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRegExprRule::put_FirstMatchOnly(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_bFirstMatchOnly = asCppBool(newVal);
+		
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33504");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IPersistStream
@@ -297,7 +330,6 @@ STDMETHODIMP CRegExprRule::IsDirty(void)
 	return m_bDirty ? S_OK : S_FALSE;
 }
 //-------------------------------------------------------------------------------------------------
-// Version 4: Added m_bAddCapturesAsSubAttributes
 STDMETHODIMP CRegExprRule::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -313,6 +345,7 @@ STDMETHODIMP CRegExprRule::Load(IStream *pStream)
 		m_bIsRegExpFromFile = false;
 		m_strRegExpFileName = "";
 		m_bAddCapturesAsSubAttributes = false;
+		m_bFirstMatchOnly = false;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -328,14 +361,18 @@ STDMETHODIMP CRegExprRule::Load(IStream *pStream)
 		{
 			dataReader >> m_bCaseSensitive;
 			dataReader >> m_strPattern;
-			if ( nDataVersion >= 2)
+			if (nDataVersion >= 2)
 			{
 				dataReader >> m_bIsRegExpFromFile;
 				dataReader >> m_strRegExpFileName;
 			}
-			if ( nDataVersion >= 4)
+			if (nDataVersion >= 4)
 			{
 				dataReader >> m_bAddCapturesAsSubAttributes;
+			}
+			if (nDataVersion >= 5)
+			{
+				dataReader >> m_bFirstMatchOnly;
 			}
 		}
 		// in the newer version all whitespace is removed so
@@ -408,6 +445,7 @@ STDMETHODIMP CRegExprRule::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_bIsRegExpFromFile;
 		dataWriter << m_strRegExpFileName;
 		dataWriter << m_bAddCapturesAsSubAttributes;
+		dataWriter << m_bFirstMatchOnly;
 		dataWriter.flushToByteStream();
 
 		// Write the bytestream data into the IStream object
@@ -483,6 +521,11 @@ STDMETHODIMP CRegExprRule::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* 
 		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
 		ASSERT_RESOURCE_ALLOCATION("ELI06863", ipAFDoc != __nullptr);
 		ipAFDoc->Text = ipAttrValue;
+
+		// [FlexIDSCore:4744]
+		// It never makes sense for this rule, when used as a modifier, to return anything but the
+		// first match.
+		m_bFirstMatchOnly = true;
 
 		IIUnknownVectorPtr ipAttributes = parseText(ipAFDoc);
 		if (ipAttributes != __nullptr && ipAttributes->Size() > 0)
@@ -629,6 +672,7 @@ STDMETHODIMP CRegExprRule::raw_CopyFrom(IUnknown *pObject)
 		m_strRegExpFileName = ipSource->GetRegExpFileName();
 		m_strPattern = ipSource->GetPattern();
 		m_bAddCapturesAsSubAttributes = asCppBool(ipSource->CreateSubAttributesFromNamedMatches);
+		m_bFirstMatchOnly = asCppBool(ipSource->FirstMatchOnly);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08257");
 
@@ -806,7 +850,8 @@ IIUnknownVectorPtr CRegExprRule::parseText(IAFDocumentPtr ipAFDoc)
 
 		// Use the regular expression engine to parse the text and find attribute values
 		// matching the specified regular expression
-		IIUnknownVectorPtr ipMatches = ipParser->Find(ipInputText->String, VARIANT_FALSE, 
+		IIUnknownVectorPtr ipMatches = ipParser->Find(ipInputText->String,
+			asVariantBool(m_bFirstMatchOnly),
 			asVariantBool(m_bAddCapturesAsSubAttributes));
 		ASSERT_RESOURCE_ALLOCATION("ELI29404", ipMatches != __nullptr);
 

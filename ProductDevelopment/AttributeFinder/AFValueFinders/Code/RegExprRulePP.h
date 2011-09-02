@@ -40,6 +40,7 @@ BEGIN_MSG_MAP(CRegExprRulePP)
 	COMMAND_HANDLER(IDC_RADIO_TEXT, BN_CLICKED, OnClickedRadioText)
 	COMMAND_HANDLER(IDC_BTN_OPEN_NOTEPAD, BN_CLICKED, OnClickedBtnOpenNotepad)
 	COMMAND_HANDLER(IDC_REG_EXP_FILE_INFO, BN_CLICKED, OnClickedRegExpFileInfo)
+	COMMAND_HANDLER(IDC_FIRST_MATCH_ONLY_INFO, BN_CLICKED, OnClickedFirstMatchOnlyInfo)
 	COMMAND_HANDLER(IDC_BTN_SELECT_DOC_TAG, BN_CLICKED, OnClickedSelectDocTag)
 	COMMAND_HANDLER(IDC_CHK_NAMED_MATCHES_AS_SUBATTRIBUTES, BN_CLICKED, OnClickedNamedMatchesAsSubAttributes);
 
@@ -62,6 +63,7 @@ END_MSG_MAP()
 	LRESULT OnClickedRadioText(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedBtnOpenNotepad(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedRegExpFileInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedFirstMatchOnlyInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedSelectDocTag(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedNamedMatchesAsSubAttributes(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
@@ -73,6 +75,7 @@ private:
 	ATLControls::CButton m_btnOpenNotepad;
 	ATLControls::CButton m_btnSelectDocTag;
 	ATLControls::CButton m_checkCreateSubAttributesFromMatches;
+	ATLControls::CButton m_checkFirstMatchOnly;
 
 	CXInfoTip m_infoTip;
 
