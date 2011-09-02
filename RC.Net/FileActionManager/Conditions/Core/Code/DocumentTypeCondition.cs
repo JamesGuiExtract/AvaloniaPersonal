@@ -556,7 +556,7 @@ namespace Extract.FileActionManager.Conditions
         [ComVisible(false)]
         static void RegisterFunction(Type type)
         {
-            ComMethods.RegisterTypeInCategory(type, ExtractGuids.FileActionManagerConditions);
+            ComMethods.RegisterTypeInCategory(type, ExtractCategories.FileActionManagerConditionsGuid);
         }
 
         /// <summary>
@@ -568,7 +568,7 @@ namespace Extract.FileActionManager.Conditions
         [ComVisible(false)]
         static void UnregisterFunction(Type type)
         {
-            ComMethods.UnregisterTypeInCategory(type, ExtractGuids.FileActionManagerConditions);
+            ComMethods.UnregisterTypeInCategory(type, ExtractCategories.FileActionManagerConditionsGuid);
         }
 
         /// <summary>

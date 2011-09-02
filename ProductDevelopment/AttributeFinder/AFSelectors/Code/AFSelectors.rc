@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -111,7 +109,7 @@ STYLE DS_SETFONT | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    LTEXT           "Query the attributes to be removed:",IDC_STATIC,5,5,200,10
+    LTEXT           "Query the attributes to select:",IDC_STATIC,5,5,200,10
     EDITTEXT        IDC_EDIT_QUERY,5,17,215,55,ES_MULTILINE
 END
 
@@ -120,7 +118,7 @@ STYLE DS_SETFONT | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    LTEXT           "Select Attributes whose spatial zones",IDC_STATIC,7,8,119,9
+    LTEXT           "Select attributes whose spatial zones",IDC_STATIC,7,8,119,9
     COMBOBOX        IDC_COMBO_CONTAINS,127,7,63,33,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "the following",IDC_STATIC,195,8,45,8
     EDITTEXT        IDC_EDIT_PIXEL_ROWS,12,21,40,12,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
@@ -216,8 +214,12 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
+    IDD_QUERYBASEDASPP, DIALOG
+    BEGIN
+    END
+
     IDD_SPATIALCONTENTBASEDASPP, DIALOG
     BEGIN
         LEFTMARGIN, 7
@@ -264,19 +266,19 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_PROJNAME            "AFSelectors"
     IDS_TITLEQUERYBASEDASPP "Query Based AS Properties"
     IDS_TITLESPATIALCONTENTBASEDASPP "Spatial Content Based AS Properties"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TITLEDATASCORERBASEDASPP "Data Scorer Based AS Properties"
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

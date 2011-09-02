@@ -344,7 +344,7 @@ namespace Extract.Utilities
                     }
                 }
 
-                return identifiers.All(s => !_identifierValidator.IsMatch(s));
+                return identifiers.All(s => _identifierValidator.IsMatch(s));
             }
             catch (Exception ex)
             {

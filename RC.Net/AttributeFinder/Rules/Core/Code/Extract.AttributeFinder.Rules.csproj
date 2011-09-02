@@ -49,6 +49,10 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Extract.Utilities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
+    <Reference Include="Interop.UCLID_AFUTILSLib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -60,10 +64,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AttributeSelectorControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AttributeSelectorControl.Designer.cs">
+      <DependentUpon>AttributeSelectorControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DuplicateAndSeparateTrees.cs" />
+    <Compile Include="DuplicateAndSeparateTreesSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DuplicateAndSeparateTreesSettingsDialog.Designer.cs">
+      <DependentUpon>DuplicateAndSeparateTreesSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="NumericSequencer.cs" />
-	<Compile Include="NumericRange.cs">
-	  <DependentUpon>NumericSequencer.cs</DependentUpon>
-	</Compile>
+    <Compile Include="NumericRange.cs">
+      <DependentUpon>NumericSequencer.cs</DependentUpon>
+    </Compile>
     <Compile Include="NumericSequencerSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -143,6 +160,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="AttributeSelectorControl.resx">
+      <DependentUpon>AttributeSelectorControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DuplicateAndSeparateTreesSettingsDialog.resx">
+      <DependentUpon>DuplicateAndSeparateTreesSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="NumericSequencerSettingsDialog.resx">
       <DependentUpon>NumericSequencerSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>

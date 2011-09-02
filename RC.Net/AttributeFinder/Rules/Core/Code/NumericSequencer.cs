@@ -487,7 +487,7 @@ namespace Extract.AttributeFinder.Rules
         [ComVisible(false)]
         static void RegisterFunction(Type type)
         {
-            ComMethods.RegisterTypeInCategory(type, ExtractGuids.ValueModifiers);
+            ComMethods.RegisterTypeInCategory(type, ExtractCategories.ValueModifiersGuid);
         }
 
         /// <summary>
@@ -499,7 +499,7 @@ namespace Extract.AttributeFinder.Rules
         [ComVisible(false)]
         static void UnregisterFunction(Type type)
         {
-            ComMethods.UnregisterTypeInCategory(type, ExtractGuids.ValueModifiers);
+            ComMethods.UnregisterTypeInCategory(type, ExtractCategories.ValueModifiersGuid);
         }
 
         /// <summary>

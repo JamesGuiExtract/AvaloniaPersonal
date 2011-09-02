@@ -664,7 +664,7 @@ namespace Extract.FileActionManager.FileSuppliers
         [ComVisible(false)]
         static void RegisterFunction(Type type)
         {
-            ComMethods.RegisterTypeInCategory(type, ExtractGuids.FileSuppliers);
+            ComMethods.RegisterTypeInCategory(type, ExtractCategories.FileSuppliersGuid);
         }
 
         /// <summary>
@@ -676,7 +676,7 @@ namespace Extract.FileActionManager.FileSuppliers
         [ComVisible(false)]
         static void UnregisterFunction(Type type)
         {
-            ComMethods.UnregisterTypeInCategory(type, ExtractGuids.FileSuppliers);
+            ComMethods.UnregisterTypeInCategory(type, ExtractCategories.FileSuppliersGuid);
         }
 
         /// <summary>

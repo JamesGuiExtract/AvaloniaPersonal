@@ -113,7 +113,7 @@ namespace Extract.Redaction.Verification
         [ComVisible(false)]
         static void RegisterFunction(Type type)
         {
-            ComMethods.RegisterTypeInCategory(type, ExtractGuids.FileProcessors);
+            ComMethods.RegisterTypeInCategory(type, ExtractCategories.FileProcessorsGuid);
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace Extract.Redaction.Verification
         [ComVisible(false)]
         static void UnregisterFunction(Type type)
         {
-            ComMethods.UnregisterTypeInCategory(type, ExtractGuids.FileProcessors);
+            ComMethods.UnregisterTypeInCategory(type, ExtractCategories.FileProcessorsGuid);
         }
 
         /// <summary>

@@ -378,26 +378,26 @@ namespace Extract.Redaction
 
         /// <summary>
         /// Code to be executed upon registration in order to add this class to the
-        /// <see cref="ExtractGuids.FileActionManagerConditions"/> COM category.
+        /// <see cref="ExtractCategories.FileActionManagerConditionsGuid"/> COM category.
         /// </summary>
         /// <param name="type">The <paramref name="type"/> being registered.</param>
         [ComRegisterFunction]
         [ComVisible(false)]
         static void RegisterFunction(Type type)
         {
-            ComMethods.RegisterTypeInCategory(type, ExtractGuids.FileActionManagerConditions);
+            ComMethods.RegisterTypeInCategory(type, ExtractCategories.FileActionManagerConditionsGuid);
         }
 
         /// <summary>
         /// Code to be executed upon unregistration in order to remove this class from the
-        /// <see cref="ExtractGuids.FileActionManagerConditions"/> COM category.
+        /// <see cref="ExtractCategories.FileActionManagerConditionsGuid"/> COM category.
         /// </summary>
         /// <param name="type">The <paramref name="type"/> being unregistered.</param>
         [ComUnregisterFunction]
         [ComVisible(false)]
         static void UnregisterFunction(Type type)
         {
-            ComMethods.UnregisterTypeInCategory(type, ExtractGuids.FileActionManagerConditions);
+            ComMethods.UnregisterTypeInCategory(type, ExtractCategories.FileActionManagerConditionsGuid);
         }
 
         /// <summary>

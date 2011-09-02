@@ -72,9 +72,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComMethods.cs" />
-    <Compile Include="ExtractGuids.cs" />
+    <Compile Include="ComUtils.cs" />
+    <Compile Include="ExtractCategories.cs" />
     <Compile Include="HResult.cs" />
     <Compile Include="IPersistStream.cs" />
+    <Compile Include="ISpecifyPropertyPages.cs" />
     <Compile Include="IStreamReader.cs" />
     <Compile Include="IStreamWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -107,6 +109,26 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="UCLID_COMLMLib">
+      <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_COMUTILSLib">
+      <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -116,7 +138,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\RegAsm "$(TargetPath)" /tlb:"$(TargetDir)$(TargetName).tlb"
+    <PostBuildEvent>Call C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\RegAsm "$(TargetPath)" /tlb:"$(TargetDir)$(TargetName).tlb"
 Call CommonDebugPostBuild.bat "$(TargetPath)"
 </PostBuildEvent>
   </PropertyGroup>
