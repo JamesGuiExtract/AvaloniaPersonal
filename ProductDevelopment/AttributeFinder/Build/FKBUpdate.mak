@@ -49,8 +49,8 @@ BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
 	
 EncryptAndCopyComponentDataFiles: 
     @ECHO Copying the ComponentData subdirectories and files to installation directory...
-	@DeleteFiles "$(AFCoreInstallFilesRootDir)\ComponentData\*.*"
-    @rmdir "$(AFCoreInstallFilesRootDir)\ComponentData" /s /q
+	@IF EXIST "$(AFCoreInstallFilesRootDir)\ComponentData" @DeleteFiles "$(AFCoreInstallFilesRootDir)\ComponentData\*.*"
+    @IF EXIST "$(AFCoreInstallFilesRootDir)\ComponentData" @rmdir "$(AFCoreInstallFilesRootDir)\ComponentData" /s /q
     @IF NOT EXIST "$(AFCoreInstallFilesRootDir)\ComponentData" @MKDIR "$(AFCoreInstallFilesRootDir)\ComponentData"
     @XCOPY "$(RulesDir)\ComponentData\*.*" "$(AFCoreInstallFilesRootDir)\ComponentData" /v /s /e /y
     $(VerifyDir) "$(RulesDir)\ComponentData" "$(AFCoreInstallFilesRootDir)\ComponentData"
