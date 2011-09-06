@@ -108,9 +108,9 @@ Shield DemoShield application.</h2>
                 		<li>Convert FPS File</li>
                 		<li>Detect and Report Failure</li>
                 		<li>FAM Network Manager</li>
-                		<li>Feedback Manager</li>
                 		<li>Image Viewer</li>
                 		<li>Rule Tester</li>
+                		<li>Test Text Function Expander</li>
                 		<li>USS File Viewer</li>
                 		<li>View Exception Log</li>
                 		<li>VOA File Viewer</li>
@@ -126,9 +126,6 @@ Shield DemoShield application.</h2>
         	<li>Select Help &gt; About File Action Manager...</li>
         	<li>Confirm that no exception is seen.</li>
     	</ul></li>
-<p>
-	<li>Login as a user that is a member of the <b>Administrators</b> group.
-    	<li>Confirm that <b>RegisterAll.bat</b> can be run without error.</li>
 <p>
     	<LI><b>ID Shield Installation</b>
     	<ul>
@@ -187,6 +184,7 @@ Shield DemoShield application.</h2>
 				<li>ID Shield Statistics Reporter</li>
                 		<li>Image Viewer</li>
                 		<li>Rule Tester</li>
+                		<li>Test Text Function Expander</li>
                 		<li>USS File Viewer</li>
                 		<li>View Exception Log</li>
                 		<li>VOA File Viewer</li>
@@ -234,8 +232,10 @@ Shield DemoShield application.</h2>
 		<li>Login as a user that is a member of the <b>Administrators</b> group.
         	<li>Confirm that <b>RDT</b>, <b>FLEX Index</b>, <b>ID Shield</b> and <b>Extract Systems 
 		LM</b> are installed.</li>
+        	<li>Confirm that the appropriate <b>FKB</b> version is also installed.</li>
 		<li>Confirm that <b>FLEX Index</b> cannot be uninstalled.
 		<li>Confirm that <b>ID Shield</b> cannot be uninstalled.
+        	<li>Confirm that the <b>FKB update</b> uninstalls without error.</li>
         	<li>Confirm that <b>RDT</b> uninstalls without error.</li>
         	<li><b>[LegacyRC #3458]</b> Confirm that <b>Crystal Reports</b> is not uninstalled 
 		as part of the RDT uninstall.</li>
@@ -253,8 +253,14 @@ Shield DemoShield application.</h2>
         	<li>Confirm that <b>ExtractTRP2.exe</b> is running.</li>
 		<li>Close <b>DB Administration</b>.
         	<li>Uninstall <b>ID Shield</b>.</li>
-        	<li><b>[FlexIDSCore #3163]</b> Confirm that <b>ExtractTRP2.exe</b> is killed before the
-        	uninstall occurs.</li>
+		<ul>
+	        	<li><b>[FlexIDSCore #3163]</b> Confirm that <b>ExtractTRP2.exe</b> is killed 
+			before the uninstall occurs.</li>
+			<li>Confirm that a prompt is presented about uninstalling <b>Crystal Reports</b>.
+			<li>Confirm that a prompt is presented about uninstalling <b>SQL Compact 
+			Edition</b>.
+		</ul>
+<p>
         	<li><b>[LegacyRC #3616]</b> Confirm that <b>FLEX Index Help</b> is still available from the
         	Start menu.</li>
         	<li>Confirm that the Help file opens.</li>
