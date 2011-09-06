@@ -2058,8 +2058,6 @@
 		<row><td>SetupFile14</td><td>SSCERuntime_x86-ENU.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLCOMPACT EDIT_FI&gt;\SSCERuntime_x86-ENU.msi</td></row>
 		<row><td>SetupFile15</td><td>RegisterExtensionDotNet40_x64.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_LOGICNP_FILES&gt;\RegisterExtensionDotNet40_x64.exe</td></row>
 		<row><td>SetupFile2</td><td>license.txt</td><td/><td>0</td><td>0</td><td>&lt;ISProjectDataFolder&gt;\support files\license.txt</td></row>
-		<row><td>SetupFile3</td><td>sqlncli.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLSERVEREXPRES_FILES&gt;\sqlncli.msi</td></row>
-		<row><td>SetupFile4</td><td>sqlncli_x64.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLSERVEREXPRES_FILES&gt;\sqlncli_x64.msi</td></row>
 		<row><td>SetupFile5</td><td>o2007pia.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_OFFICEREDIST_FILES&gt;\o2007pia.msi</td></row>
 		<row><td>SetupFile6</td><td>SSCERuntime_x64-ENU.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLCOMPACT EDIT_FI&gt;\SSCERuntime_x64-ENU.msi</td></row>
 		<row><td>SetupFile7</td><td>CBUSetup.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_INLITEKEYINSTAL_FILES&gt;\CBUSetup.exe</td></row>
@@ -2073,6 +2071,8 @@
 		<col def="I2">Order</col>
 		<col def="I2">ISSetupLocation</col>
 		<col def="S255">ISReleaseFlags</col>
+		<row><td>_259E9842_C10C_4634_96D9_86A290818710_</td><td>&lt;ISProductFolder&gt;\SetupPrerequisites\SQLServer 2008 R2 Native Client(x64).prq</td><td/><td/><td/></row>
+		<row><td>_CFA5031D_483B_4576_8951_1FB056426DE4_</td><td>&lt;ISProductFolder&gt;\SetupPrerequisites\SQLServer 2008 R2 Native Client(x86).prq</td><td/><td/><td/></row>
 	</table>
 
 	<table name="ISSetupType">

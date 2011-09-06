@@ -107,9 +107,6 @@ Dlg_SdStartCopy:
    	// Install .NET if required
    	InstallDotNET();
    	
-   	// Install SQL Native Client if required
-   	InstallSQLNativeClient();
-
 	// Install Inlite Key drivers
    	InstallInliteKeyDrivers();
 

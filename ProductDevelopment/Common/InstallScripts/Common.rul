@@ -16,7 +16,6 @@
 ////////////////////// string defines ////////////////////////////
     #define UCLID_DIR "\\UCLID Software\\CommonComponents"
     #define EXTRACT_DIR "\\Extract Systems\\CommonComponents"
-    #define REG_PATH_SQL_NATIVE_CLIENT "SOFTWARE\\Microsoft\\Microsoft SQL Native Client 10.0\\CurrentVersion"
     #define REG_PATH_SQL_COMPACT_EDITION "SOFTWARE\\Microsoft\\Microsoft SQL Server Compact Edition\\v3.5"
     #define SQL_COMPACT_EDITION_GUID "{3A9FC03D-C685-4831-94CF-4EDFD3749497}"
     #define SQL_COMPACT_EDITION_GUID_64 "{D4AD39AD-091E-4D33-BB2B-59F6FCB8ADC3}"
@@ -63,7 +62,6 @@
     // your script function prototypes    
     prototype MoveRegKeys();
     prototype CopyLicFiles();
-	prototype InstallSQLNativeClient();     
 	prototype detectRDTInstall();
 	prototype InstallDotNET();
     prototype CheckOtherExtractProducts();
@@ -143,40 +141,6 @@ begin
 	endif;
 end;
 // --- include script file section ---
-
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// Function: InstallSQLNativeClient
-//
-//  Purpose: This function installs the SQL Native Client if it is not instaled
-//	Returns 0 if no errors
-///////////////////////////////////////////////////////////////////////////////
-function InstallSQLNativeClient()
-STRING szProgram, szCmdLine;
-int nResult, svServiceState;
-begin
-	// Change the root for the registry
-	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
-	//if ( RegDBKeyExist ( REG_PATH_SQL_NATIVE_CLIENT ) < 0) then
-		// Install SQL Native Client
-		szProgram = "msiexec";
-		SdShowMsg("Setup is Installing SQL Native Client", TRUE);
-		if ( SYSINFO.bIsWow64 ) then
-			szCmdLine = " /i " + SUPPORTDIR ^ "\\sqlncli_x64.msi /passive IACCEPTSQLNCLILICENSETERMS=YES";
-		else
-			szCmdLine = " /i " + SUPPORTDIR ^ "\\sqlncli.msi /passive IACCEPTSQLNCLILICENSETERMS=YES";
-		endif;
-		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT); 
-		SdShowMsg("Setup is Installing SQL Native Client", FALSE);
-		//if ( RegDBKeyExist ( REG_PATH_SQL_NATIVE_CLIENT ) < 0  ) then
-		//	MessageBox("SQL Native Client was not successfully Installed, installation will be aborted", SEVERE);
-		//	gbInstalled = FALSE;
-		//	abort;
-		//endif;
-	//endif;
-
-end;
 
 
 ///////////////////////////////////////////////////////////////////////////////
