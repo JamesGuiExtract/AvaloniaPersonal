@@ -53,6 +53,7 @@ class CRuleSetEditor : public CDialog
 // Construction
 public:
 	CRuleSetEditor(const string& strFileName = "", const string& strProductRootDir = "", CWnd* pParent = __nullptr);
+	~CRuleSetEditor();
 
 // Dialog Data
 	//{{AFX_DATA(CRuleSetEditor)
@@ -216,6 +217,10 @@ private:
 	// persistent manager
 	unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
 	unique_ptr<MRUList> ma_pMRUList;
+
+	// A rule execution session used to allow GetComponentData calls from within rule objects' UIs
+	// to take the configured FKB version into account.
+	UCLID_AFCORELib::IRuleExecutionSessionPtr m_ipRuleExecutionSession;
 
 	//////////
 	// Methods

@@ -1838,6 +1838,8 @@ void CRuleSetEditor::OnFileProperties()
 		
 		if (dialog.DoModal() == IDOK)
 		{
+			m_ipRuleExecutionSession->SetFKBVersion(m_ipRuleSet->FKBVersion);
+
 			// update the status bar as the user may have changed settings
 			setStatusBarText();
 		}

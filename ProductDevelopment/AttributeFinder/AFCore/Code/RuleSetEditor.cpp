@@ -104,6 +104,13 @@ CRuleSetEditor::CRuleSetEditor(const string& strFileName /*=""*/,
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
 		ASSERT_RESOURCE_ALLOCATION("ELI07842", m_ipMiscUtils != __nullptr);
 
+		// Initiate a rule execution session. This allows GetComponentData calls from within rule
+		// objects' UIs to take the configured FKB version into account.
+		m_ipRuleExecutionSession.CreateInstance(CLSID_RuleExecutionSession);
+		ASSERT_RESOURCE_ALLOCATION("ELI33511", m_ipRuleExecutionSession != __nullptr);
+		// The file name doesn't really matter here.
+		m_ipRuleExecutionSession->SetRSDFileName("RuleSetEditor");
+
 		ma_pUserCfgMgr.reset(new RegistryPersistenceMgr(HKEY_CURRENT_USER, gstrAF_AFCORE_KEY_PATH));
 		
 		ma_pMRUList.reset(new MRUList(ma_pUserCfgMgr.get(), "\\RuleSetEditor\\MRUList", "File_%d", 5));
@@ -155,8 +162,25 @@ CRuleSetEditor::CRuleSetEditor(const string& strFileName /*=""*/,
 
 		// trim off trailing slash
 		m_strBinFolder = ::trim(m_strBinFolder, "", "\\");
+
+		m_ipRuleExecutionSession->SetFKBVersion(m_ipRuleSet->FKBVersion);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI05074")
+}
+//-------------------------------------------------------------------------------------------------
+CRuleSetEditor::~CRuleSetEditor()
+{
+	try
+	{
+		m_ipAttributeNameToInfoMap = __nullptr;
+		m_ipClipboardMgr = __nullptr;
+		m_ipInfo = __nullptr;
+		m_ipMiscUtils = __nullptr;
+		m_ipRuleExecutionSession = __nullptr;
+		m_ipRuleSet = __nullptr;
+		m_ipRuleSetStream = __nullptr;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33510")
 }
 //-------------------------------------------------------------------------------------------------
 void CRuleSetEditor::DoDataExchange(CDataExchange* pDX)
@@ -323,6 +347,8 @@ void CRuleSetEditor::openFile(string strFileName)
 		// load the ruleset object from the specified file
 		_bstr_t bstrFileName = get_bstr_t(strFileName.c_str());
 		m_ipRuleSet->LoadFrom(bstrFileName, VARIANT_FALSE);
+
+		m_ipRuleExecutionSession->SetFKBVersion(m_ipRuleSet->FKBVersion);
 		
 		// add the file to MRU list
 		addFileToMRUList(strFileName);

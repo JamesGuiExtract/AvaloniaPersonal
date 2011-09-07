@@ -15,6 +15,8 @@
 #include <ComUtils.h>
 #include <Misc.h>
 #include <ComponentLicenseIDs.h>
+#include <FileIterator.h>
+#include <StringTokenizer.h>
 
 using namespace std;
 
@@ -25,6 +27,7 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 // Constants
 //-------------------------------------------------------------------------------------------------
 static const string COMPONENT_DATA_FOLDER_KEY = "ComponentDataFolder";
+static const char* LATEST_FKB_FLAG = "Latest";
 
 //-------------------------------------------------------------------------------------------------
 // Statics
@@ -410,7 +413,7 @@ string CAttributeFinderEngine::getLegacyFKBVersion()
 				// ensure that the version information is in the expected format
 				if (strVersionLine.find("FKB Ver.") == 0)
 				{
-					ms_strLegacyFKBVersion = strVersionLine.substr(9);
+					ms_strLegacyFKBVersion = trim(strVersionLine.substr(9), " \t", " \t");
 				}
 				else
 				{
@@ -510,6 +513,12 @@ void CAttributeFinderEngine::getRootComponentDataFolder(string& rstrFolder, bool
 	}
 	else
 	{
+		// For consistency, ensure the path returned does not end with a slash.
+		if (rstrFolder[rstrFolder.length() - 1] == '\\')
+		{
+			rstrFolder = rstrFolder.substr(0, rstrFolder.length() - 1);
+		}
+
 		rbOverridden = true;
 		return;
 	}
@@ -535,6 +544,31 @@ void CAttributeFinderEngine::getRootComponentDataFolder(string& rstrFolder, bool
 	}
 }
 //-------------------------------------------------------------------------------------------------
+// Converts a 4 part version string into a ULONGLONG. Helper function for getComponentDataFolder
+ULONGLONG getVersionAsULONGLONG(string strVersion)
+{
+	ULONGLONG nVersion = 0;
+
+	try
+	{
+		vector<string> vecVersionParts;
+		StringTokenizer	st('.');
+		st.parse(strVersion, vecVersionParts);
+		for (int i = 0; i < 4; i++)
+		{
+			ULONGLONG nVersionPart = asLong(vecVersionParts[i]);
+			nVersion  |= (nVersionPart << (48 - (i * 16)));
+		}
+	}
+	catch (...)
+	{
+		// Ignore any errors parsing the version numbers and return 0 to indicate it was not parsed.
+		return 0;
+	}
+
+	return nVersion;
+}
+//-------------------------------------------------------------------------------------------------
 void CAttributeFinderEngine::getComponentDataFolder(string& rstrFolder)
 {
 	bool bOverriden = false;
@@ -556,26 +590,59 @@ void CAttributeFinderEngine::getComponentDataFolder(string& rstrFolder)
 	string strFKBVersion = asString(m_ipRuleExecutionEnv->FKBVersion);
 	string strLegacyFKBVersion = getLegacyFKBVersion();
 
-	// If no FKB version has been assigned for this thread, but a legacy FKB version has been
-	// installed to the root of the component data folder, assume that FKB version is to be used for
-	// backward compatibility.
-	if (strFKBVersion.empty())
+	// If no FKB version has been assigned for this thread or the "Latest" keyword is specified,
+	// use highest installed version number.
+	if (strFKBVersion.empty() || _stricmp(strFKBVersion.c_str(), LATEST_FKB_FLAG) == 0)
 	{
-		if (!strLegacyFKBVersion.empty() && isValidFolder(rstrFolder))
+		ULONGLONG nHighestVersion = 0;
+
+		// Iterate through all component data sub-directories matching the version number pattern.
+		vector<string> vecDirectories;
+		string strRootFolder = rstrFolder + "\\";
+		FileIterator iter(strRootFolder + "*");
+		while (iter.moveNext())
 		{
-			m_ipRuleExecutionEnv->FKBVersion = strLegacyFKBVersion.c_str();
+			// Only look at directories matching the version string pattern.
+			if (!iter.isDirectory())
+			{
+				continue;
+			}
+
+			string strFolder = iter.getFileName();
+
+			if (count(strFolder.begin(), strFolder.end(), '.') == 3)
+			{
+				ULONGLONG dwVersion = getVersionAsULONGLONG(iter.getFileName());
+
+				if (dwVersion > nHighestVersion)
+				{
+					nHighestVersion = dwVersion;
+					rstrFolder = strRootFolder + strFolder;
+				}
+			}
+		}
+		
+		// If there were no FKB folders found, use the legacy version (if available).
+		if (nHighestVersion == 0 && !strLegacyFKBVersion.empty())
+		{
+			rstrFolder = strRootFolder + strLegacyFKBVersion;
 		}
 	}
-	// Otherwise, use the version number to build the version specific component data path (as long
-	// its not a legacy FKB version).
-	else if (strFKBVersion != getLegacyFKBVersion())
+	// If the assigned FKB version matches an installed legacy FKB version installed to the root of
+	// the component data folder, use the legacy FKB version for backward compatibility.
+	else if (strFKBVersion == strLegacyFKBVersion)
+	{
+		m_ipRuleExecutionEnv->FKBVersion = strLegacyFKBVersion.c_str();
+	}
+	// Otherwise, use the version number to find the version specific component data path
+	else
 	{
 		rstrFolder += "\\" + strFKBVersion;
 	}
 	
 	if (!isValidFolder(rstrFolder))
 	{
-		UCLIDException ue("ELI32475", "Version specific componentData folder doesn't exist.");
+		UCLIDException ue("ELI32475", "Version specific ComponentData folder doesn't exist.");
 		ue.addDebugInfo("ComponentData Folder", rstrFolder);
 		ue.addDebugInfo("FKB Version", strFKBVersion);
 		ue.addWin32ErrorInfo();

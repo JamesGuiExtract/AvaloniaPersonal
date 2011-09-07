@@ -272,6 +272,12 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 						"Rule execution is not allowed - make sure that a USB counter is selected.");
 				}
 
+				if (m_strFKBVersion.empty() && (isUsingCounter() || m_bSwipingRule))
+				{
+					throw UCLIDException("ELI33506", "An FKB version must be specified for a swiping rule or a "
+						"ruleset that decrements counters.");
+				}
+
 				// Wrap pvecAttributeNames in a smart pointer
 				IVariantVectorPtr ipvecAttributeNames = pvecAttributeNames;
 

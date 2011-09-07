@@ -7,6 +7,7 @@
 #include <IConfigurationSettingsPersistenceMgr.h>
 #include <memory>
 #include <string>
+#include <algorithm>
 
 using namespace std;
 

@@ -142,7 +142,7 @@ void CDocumentClassifierPP::populateComboBox(const string& strCurrentText)
 	}
 
 	// get \ComponentData\DocumentClassifiers folder
-	const static string strComponentDataFolder = m_ipAFUtility->GetComponentDataFolder();
+	string strComponentDataFolder = m_ipAFUtility->GetComponentDataFolder();
 	string strDocClassifiersFolder = strComponentDataFolder + "\\" + DOC_CLASSIFIERS_FOLDER;
 
 	// make sure the directory exists
