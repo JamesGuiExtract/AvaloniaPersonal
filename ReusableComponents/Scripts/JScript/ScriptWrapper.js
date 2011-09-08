@@ -8,6 +8,25 @@ var GBoolShowDebugInfo = false;
 // Create FileSystemObject
 var fso = new ActiveXObject("Scripting.FileSystemObject");
 
+//--------------------------------------------------------------------------------------------------
+// Add trim function to String
+//--------------------------------------------------------------------------------------------------
+if(typeof String.prototype.trim !== 'function') {
+  String.prototype.trim = function() {
+    return this.replace(/^\s+|\s+$/, '');
+  };
+}
+
+//--------------------------------------------------------------------------------------------------
+// Add map function to Array
+//--------------------------------------------------------------------------------------------------
+if(typeof Array.prototype.map !== 'function') {
+	Array.prototype.map = function(fn) {
+		for (var i=0, r=[], l = this.length; i < l; r.push(fn(this[i++])));
+			return r;
+	};
+}
+
 // Run the script
 main(parseCommandLineOptions());
 
@@ -122,7 +141,7 @@ function handleDebug() {
         pairs = arguments[0];
     }
     else {
-        for (i=0; i < arguments.length-1; i+=2) {
+        for (var i=0; i < arguments.length-1; i+=2) {
             pairs.push(arguments[i] + ": " + arguments[i+1]);
         }
     }
