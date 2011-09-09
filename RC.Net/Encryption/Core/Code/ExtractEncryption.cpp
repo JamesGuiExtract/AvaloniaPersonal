@@ -60,7 +60,9 @@ const int _VERSION = 1;
 // Version 1 - Makes use of the version RSA key
 // Version 2 - Same algorithm but adds a checksum of the password hash into the stream
 //			   to better be able to check if the password provided is valid for the encrypted file
-const int _PASSWORD_ENCRYPT_VERSION = 2;
+// Version 3 - Switch MD5Cng hash algorithm to MD5 for ComputeCheckSum since MD5Cng is only
+//			   available on Vista and later OS's.
+const int _PASSWORD_ENCRYPT_VERSION = 3;
 
 //--------------------------------------------------------------------------------------------------
 // Local methods
@@ -543,6 +545,8 @@ void ExtractEncryption::Encrypt(Stream^ plain, Stream^ cipher, array<Byte>^ pass
 {
 	RijndaelManaged^ rjndl = nullptr;
 	CryptoStream^ cryptoStream = nullptr;
+	HashAlgorithm^ hashAlgorithm = nullptr;
+
 	try
 	{
 		// Write the tag and version number to the stream
@@ -554,7 +558,9 @@ void ExtractEncryption::Encrypt(Stream^ plain, Stream^ cipher, array<Byte>^ pass
 		cipher->Write(BitConverter::GetBytes(_PASSWORD_ENCRYPT_VERSION), 0, 4);
 
 		// Write the checksum for the password
-		cipher->Write(BitConverter::GetBytes(ComputeCheckSum(passwordHash)), 0, 4);
+		hashAlgorithm = MD5::Create();
+		cipher->Write(BitConverter::GetBytes(
+			ComputeCheckSum(passwordHash, hashAlgorithm)), 0, 4);
 
 		rjndl = GetRijndael(passwordHash, HashVersion);
 		cryptoStream = gcnew CryptoStream(cipher, rjndl->CreateEncryptor(),
@@ -582,6 +588,10 @@ void ExtractEncryption::Encrypt(Stream^ plain, Stream^ cipher, array<Byte>^ pass
 		if (rjndl != nullptr)
 		{
 			rjndl->Clear();
+		}
+		if (hashAlgorithm != nullptr)
+		{
+			hashAlgorithm->Clear();
 		}
 	}
 }
@@ -717,19 +727,24 @@ void ExtractEncryption::Decrypt(Stream^ cipher, Stream^ plain, int version,
 	{
 	case 1:
 	case 2:
+	case 3:
 		{
 			RijndaelManaged^ rjndl = nullptr;
 			CryptoStream^ cryptoStream = nullptr;
+			HashAlgorithm^ hashAlgorithm = nullptr;
+
 			try
 			{
 				// Compare password checksum value
-				if (version == 2)
+				if (version == 2 || version == 3)
 				{
+					hashAlgorithm = (version == 2) ? gcnew MD5Cng() : MD5::Create();
+
 					// Read the password check sum and validate it
 					auto data = gcnew array<Byte>(4);
 					cipher->Read(data, 0, 4);
 					auto checkSum = BitConverter::ToInt32(data, 0);
-					if (ComputeCheckSum(passwordHash) != checkSum)
+					if (ComputeCheckSum(passwordHash, hashAlgorithm) != checkSum)
 					{
 						throw gcnew ExtractException("ELI32466",
 							"The decryption password is not valid.");
@@ -762,6 +777,10 @@ void ExtractEncryption::Decrypt(Stream^ cipher, Stream^ plain, int version,
 				if (rjndl != nullptr)
 				{
 					rjndl->Clear();
+				}
+				if (hashAlgorithm != nullptr)
+				{
+					hashAlgorithm->Clear();
 				}
 			}
 		}
@@ -995,11 +1014,11 @@ array<Byte>^ ExtractEncryption::ComputeHash(array<Byte>^ value, int version)
 	}
 }
 //--------------------------------------------------------------------------------------------------
-int ExtractEncryption::ComputeCheckSum(array<Byte>^ hash)
+int ExtractEncryption::ComputeCheckSum(array<Byte>^ hash, HashAlgorithm^ algorithm)
 {
 	try
 	{
-		auto checkHash = (gcnew MD5Cng())->ComputeHash(hash);
+		auto checkHash = algorithm->ComputeHash(hash);
 		unsigned int checkSum = 0;
 		for(int i=0; i < checkHash->Length; i++)
 		{
