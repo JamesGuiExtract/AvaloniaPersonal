@@ -754,7 +754,7 @@ namespace Extract.Imaging.Forms.Test
             OpenTestImage(imageViewer);
 
             // Rotate the image 90 degrees
-            imageViewer.Rotate(90);
+            imageViewer.Rotate(90, true, true);
 
             // Check that the orientation is 90 degrees
             Assert.That(imageViewer.Orientation == 90);
@@ -1003,7 +1003,7 @@ namespace Extract.Imaging.Forms.Test
 
             // Move to page 3 and rotate it 90 degrees
             imageViewer.PageNumber = 3;
-            imageViewer.Rotate(90);
+            imageViewer.Rotate(90, true, true);
 
             // Navigate to next page
             imageViewer.PageNumber = 4;

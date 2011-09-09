@@ -262,8 +262,7 @@ namespace Extract.Imaging.Forms
                         }
 
                         // Display the first page
-                        _pageNumber = 1;
-                        base.Image = GetPage(1);
+                        ShowPageImage(1);
 
                         // Store the image file name
                         _imageFile = fileName;
@@ -657,8 +656,7 @@ namespace Extract.Imaging.Forms
         {
             // Get the amount to translate the origin
             PointF offset = PointF.Empty;
-            int orientation = _imagePages[_pageNumber - 1].Orientation;
-            switch (orientation)
+            switch (Orientation)
             {
                 case 0:
                     break;
@@ -683,7 +681,7 @@ namespace Extract.Imaging.Forms
             // Rotate each annotation
             foreach (AnnObject annotation in _annotations.Objects)
             {
-                annotation.Rotate(orientation, AnnPoint.Empty);
+                annotation.Rotate(Orientation, AnnPoint.Empty);
                 annotation.Translate(offset.X, offset.Y);
             }
         }
@@ -1662,10 +1660,16 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="angle">The angle to rotate the image in degrees. Must be a multiple of 
         /// 90.</param>
+        /// <param name="updateZoomHistory"><see langword="true"/> if the zoom history should be
+        /// updated; <see langword="false"/> if it should not.</param>
+        /// <param name="raiseZoomChanged"><see langword="true"/> if the <see cref="ZoomChanged"/> 
+        /// event should be raised; <see langword="false"/> if it should not.</param>
+        /// <event cref="ZoomChanged"><paramref name="raiseZoomChanged"/> was 
+        /// <see langword="true"/>.</event>
         /// <exception cref="ExtractException">No image is open.</exception>
         /// <exception cref="ExtractException"><paramref name="angle"/> is not a multiple of 90.
         /// </exception>
-        public void Rotate(int angle)
+        public void Rotate(int angle, bool updateZoomHistory, bool raiseZoomChanged)
         {
             try
             {
@@ -1678,20 +1682,33 @@ namespace Extract.Imaging.Forms
 
                 // Calulate the new orientation
                 ImagePageData page = _imagePages[_pageNumber - 1];
-                page.RotateOrientation(angle);
+
+                int originalOrientation = _orientation;
 
                 // Get the center of the visible image in logical (image) coordinates
                 Point center = GetVisibleImageCenter();
 
                 try
                 {
+                    // GetRotatedMatrix (which is called upon rotation) depends upon _orientation.
+                    // Set it before calling RotateImageByDegrees
+                    _orientation += angle;
+                    _orientation %= 360;
+                    if (_orientation < 0)
+                    {
+                        _orientation += 360;
+                    }
+
+                    page.Orientation = _orientation;
+
                     // Check if the view perspectives are licensed (ID Annotation feature)
                     ImageMethods.RotateImageByDegrees(base.Image, angle);
                 }
                 catch
                 {
-                    // Reverse the orientation change
-                    page.RotateOrientation(-angle);
+                    // Restore the original orientation value.
+                    _orientation = originalOrientation;
+                    page.Orientation = originalOrientation;
 
                     throw;
                 }
@@ -1699,9 +1716,10 @@ namespace Extract.Imaging.Forms
                 // Center at the same point as prior to rotation
                 CenterAtPoint(center, false, false);
 
+                UpdateZoom(updateZoomHistory, raiseZoomChanged);
+
                 // Raise the OrientationChanged event
-                OnOrientationChanged(
-                    new OrientationChangedEventArgs(page.Orientation));
+                OnOrientationChanged(new OrientationChangedEventArgs(_orientation));
             }
             catch (Exception e)
             {
@@ -3818,15 +3836,12 @@ namespace Extract.Imaging.Forms
             // Calculate the reversal multiplier value
             int reverseValue = reverseRotation ? -1 : 1;
 
-            // Get the current orientation
-            int orientation = _imagePages[_pageNumber - 1].Orientation;
-
             // Rotate the matrix
             Matrix rotatedMatrix = matrix.Clone();
-            rotatedMatrix.Rotate(orientation * reverseValue);
+            rotatedMatrix.Rotate(Orientation * reverseValue);
 
             // Translate the origin
-            switch (orientation)
+            switch (Orientation)
             {
                 case 0:
                     break;
@@ -3865,7 +3880,7 @@ namespace Extract.Imaging.Forms
         ZoomInfo GetZoomInfo()
         {
             // Return the ZoomInfo
-            return new ZoomInfo(GetVisibleImageCenter(), ScaleFactor, _fitMode);
+            return new ZoomInfo(GetVisibleImageCenter(), ScaleFactor, Orientation, _fitMode);
         }
 
         /// <summary>
@@ -4081,6 +4096,17 @@ namespace Extract.Imaging.Forms
         void SetZoomInfo(ZoomInfo zoomInfo, bool updateZoomHistory, bool raiseZoomChanged,
             bool raiseFitModeChanged)
         {
+            // [FlexIDSCore:4850, 4861]
+            // If the current orientation differs from the orientation specified in zoomInfo,
+            // rotate the image accordingly.
+            // Use _orientation field here since the Orientation getter asserts that these
+            // orientation values are equal... but this is where we make them equal.
+            int orientationDelta = zoomInfo.Orientation - _orientation;
+            if (orientationDelta != 0)
+            {
+                Rotate(orientationDelta, false, false);
+            }
+
             // Check if the fit mode is specified
             if (zoomInfo.FitMode != FitMode.None)
             {
@@ -4796,7 +4822,7 @@ namespace Extract.Imaging.Forms
 
                     // Zoom in on this point.
                     ZoomInfo magnifiedZoom =
-                        new ZoomInfo(transformedPoints[0], scaleFactor, FitMode.None);
+                        new ZoomInfo(transformedPoints[0], scaleFactor, Orientation, FitMode.None);
                     SetZoomInfo(magnifiedZoom, false, false, false);
 
                     // Convert the center point back into client coordinates now that the image is
@@ -5320,7 +5346,7 @@ namespace Extract.Imaging.Forms
                 if (base.Image != null)
                 {
                     // Rotate 90 degrees
-                    Rotate(90);
+                    Rotate(90, true, true);
                 }
             }
             catch (Exception ex)
@@ -5339,7 +5365,7 @@ namespace Extract.Imaging.Forms
                 if (base.Image != null)
                 {
                     // Rotate 270 degrees
-                    Rotate(270);
+                    Rotate(270, true, true);
                 }
             }
             catch (Exception ex)

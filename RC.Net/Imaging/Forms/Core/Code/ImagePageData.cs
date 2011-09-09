@@ -74,15 +74,20 @@ namespace Extract.Imaging.Forms
         #region ImagePageData Properties
 
         /// <summary>
-        /// Gets the visible rotation in degrees from the original image of the current page.
+        /// Gets or sets the visible rotation in degrees from the original image of the current page.
         /// </summary>
-        /// <returns>The visible rotation in degrees from the original image of the current page.
-        /// </returns>
+        /// <value>The visible rotation in degrees from the original image of the current page.
+        /// </value>
         public int Orientation
         {
             get
             {
                 return _orientation;
+            }
+
+            set
+            {
+                _orientation = value;
             }
         }
 
@@ -166,22 +171,6 @@ namespace Extract.Imaging.Forms
         #endregion ImagePageData Properties
 
         #region ImagePageData Methods
-
-        /// <summary>
-        /// Rotates the page orientation clockwise by the specified number of degrees.
-        /// </summary>
-        /// <param name="angle">The number of degrees to rotate the page orientation clockwise.
-        /// </param>
-        internal void RotateOrientation(int angle)
-        {
-            _orientation += angle;
-            _orientation %= 360;
-
-            if (_orientation < 0)
-            {
-                _orientation += 360;
-            }
-        }
 
         /// <summary>
         /// Retreats to the previous entry in the zoom history.

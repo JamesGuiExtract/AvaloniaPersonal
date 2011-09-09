@@ -1955,7 +1955,7 @@ namespace Extract.Imaging.Forms.Test
             Assert.That(!previousTile.Enabled);
 
             // Rotate the image 90 degrees
-            imageViewer.Rotate(90);
+            imageViewer.Rotate(90, true, true);
 
             // The previous tile button should be enabled
             Assert.That(previousTile.Enabled);
@@ -2140,7 +2140,7 @@ namespace Extract.Imaging.Forms.Test
 
             // Rotate the image 90 degrees
             imageViewer.FitMode = FitMode.None;
-            imageViewer.Rotate(90);
+            imageViewer.Rotate(90, true, true);
 
             // The next tile button should be enabled
             Assert.That(nextTile.Enabled);

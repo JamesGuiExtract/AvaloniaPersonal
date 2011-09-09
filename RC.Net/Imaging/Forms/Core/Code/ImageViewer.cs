@@ -468,6 +468,11 @@ namespace Extract.Imaging.Forms
         /// </summary>
         ThreadSafeSpatialString _ocrData;
 
+        /// <summary>
+        /// The visible rotation in degrees from the original image of the current page.
+        /// </summary>
+        int _orientation;
+
         #endregion Fields
 
         #region Delegates
@@ -1442,8 +1447,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Go to the specified page
-                _pageNumber = pageNumber;
-                base.Image = GetPage(pageNumber);
+                ShowPageImage(pageNumber);
 
                 // Check whether the zoom setting should be updated, too.
                 if (updateZoom)
@@ -1575,6 +1579,7 @@ namespace Extract.Imaging.Forms
 
                     _pageNumber = 1;
                     _pageCount = 1;
+                    _orientation = 0;
                     _ocrData = null;
                     _imagePages = new List<ImagePageData>(1);
                     _imagePages.Add(new ImagePageData());
@@ -1599,7 +1604,7 @@ namespace Extract.Imaging.Forms
                     // If the orientation is not 0, rotate the image by the orientation
                     if (orientation != 0)
                     {
-                        Rotate(orientation);
+                        Rotate(orientation, false, false);
                     }
 
                     // Disable adding highlights
@@ -1625,31 +1630,31 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Gets an image for the specified page of the currently open image.
+        /// Displays the image for the specified page of the currently open image file.
         /// </summary>
         /// <param name="pageNumber">The 1-based page number to open.</param>
         /// <returns>The image with <paramref name="pageNumber"/> from the currently open image.
         /// </returns>
-        RasterImage GetPage(int pageNumber)
+        void ShowPageImage(int pageNumber)
         {
             RasterImage image = null;
             try
             {
                 image = _reader.ReadPage(pageNumber);
+                _orientation = _imagePages[pageNumber - 1].Orientation;
+                ImageMethods.RotateImageByDegrees(image, _orientation);
 
-                int rotation = _imagePages[pageNumber - 1].Orientation;
-                ImageMethods.RotateImageByDegrees(image, rotation);
+                base.Image = image;
+                _pageNumber = pageNumber;
             }
             catch (Exception)
             {
                 if (image != null)
                 {
                     image.Dispose();
-                }                
+                }
                 throw;
             }
-
-            return image;
         }
 
         /// <summary>
@@ -1915,7 +1920,10 @@ namespace Extract.Imaging.Forms
                 ExtractException.Assert("ELI21220", "Cannot get orientation. No image is open.",
                     base.Image != null);
 
-                return _imagePages[_pageNumber - 1].Orientation;
+                ExtractException.Assert("ELI33517", "Error determining image orientation.",
+                    _imagePages[_pageNumber - 1].Orientation == _orientation);
+
+                return _orientation;
             }
             set
             {
@@ -1929,7 +1937,7 @@ namespace Extract.Imaging.Forms
                         value % 90 == 0);
 
                     // Rotate the orientation
-                    Rotate(_imagePages[_pageNumber - 1].Orientation - value);
+                    Rotate(_orientation - value, false, false);
                 }
                 catch (Exception e)
                 {
@@ -1974,8 +1982,7 @@ namespace Extract.Imaging.Forms
                 // Ensure an image is open
                 ExtractException.Assert("ELI21503", "No image is open.", base.Image != null);
 
-                return _imagePages[_pageNumber - 1].Orientation % 180 == 0 ?
-                    base.Image.ImageHeight : base.Image.ImageWidth;
+                return Orientation % 180 == 0 ? base.Image.ImageHeight : base.Image.ImageWidth;
             }
         }
 
@@ -1992,8 +1999,7 @@ namespace Extract.Imaging.Forms
                 // Ensure an image is open
                 ExtractException.Assert("ELI21504", "No image is open.", base.Image != null);
 
-                return _imagePages[_pageNumber - 1].Orientation % 180 == 0 ?
-                    base.Image.ImageWidth : base.Image.ImageHeight;
+                return Orientation % 180 == 0 ? base.Image.ImageWidth : base.Image.ImageHeight;
             }
         }
 

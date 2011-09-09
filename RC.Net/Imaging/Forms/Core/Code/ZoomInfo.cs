@@ -23,6 +23,11 @@ namespace Extract.Imaging.Forms
         double _scaleFactor;
 
         /// <summary>
+        /// The image orientation in degrees.
+        /// </summary>
+        int _orientation;
+
+        /// <summary>
         /// The mode to scale the image within the visible area.
         /// </summary>
         FitMode _fitMode;
@@ -39,11 +44,13 @@ namespace Extract.Imaging.Forms
         /// coordinates.</param>
         /// <param name="scaleFactor">The ratio of physical (client) pixel size to logical (image) 
         /// pixel size.</param>
+        /// <param name="orientation">The image orientation in degrees.</param>
         /// <param name="fitMode">The mode to scale the image within the visible area.</param>
-        public ZoomInfo(Point center, double scaleFactor, FitMode fitMode)
+        public ZoomInfo(Point center, double scaleFactor, int orientation, FitMode fitMode)
         {
             _zoomCenter = center;
             _scaleFactor = scaleFactor;
+            _orientation = orientation;
             _fitMode = fitMode;
         }
 
@@ -90,6 +97,23 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Gets or sets the image orientation in degrees.
+        /// </summary>
+        /// <value>The image orientation in degrees.</value>
+        public int Orientation
+        {
+            get
+            {
+                return _orientation;
+            }
+
+            set
+            {
+                _orientation = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the mode to scale the image within the visible area.
         /// </summary>
         /// <value>The mode to scale the image within the visible area.</value>
@@ -129,7 +153,8 @@ namespace Extract.Imaging.Forms
         /// <returns>A hash value for this <see cref="ZoomInfo"/>.</returns>
         public override int GetHashCode()
         {
-            return (int)_fitMode ^ _scaleFactor.GetHashCode() ^ _zoomCenter.GetHashCode();
+            return (int)_fitMode ^ _scaleFactor.GetHashCode() ^ _zoomCenter.GetHashCode()
+                ^ _orientation.GetHashCode();
         }
 
         #endregion Methods
@@ -177,7 +202,8 @@ namespace Extract.Imaging.Forms
         /// setting as this <see cref="ZoomInfo"/>; <see langword="false"/> if they differ.</returns>
         public bool Equals(ZoomInfo other)
         {
-            if (_fitMode != other._fitMode || _scaleFactor != other._scaleFactor)
+            if (_fitMode != other._fitMode || _scaleFactor != other._scaleFactor ||
+                _orientation != other._orientation)
             {
                 return false;
             }
