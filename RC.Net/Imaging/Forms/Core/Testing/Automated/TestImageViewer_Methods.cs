@@ -741,7 +741,7 @@ namespace Extract.Imaging.Forms.Test
         #region Rotate
 
         /// <summary>
-        /// Tests that the <see cref="ImageViewer.Rotate(int)"/> sets the
+        /// Tests that the <see cref="ImageViewer.Rotate"/> sets the
         /// <see cref="ImageViewer.Orientation"/> property properly.
         /// </summary>
         [Test, Category("Automated")]
