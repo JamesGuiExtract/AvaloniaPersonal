@@ -38,6 +38,7 @@
 				to be supplied via listening.
 				<li><b>Images3</b> - for a Folder file supplier to use to supply images 
 				for <b>Execute rules</b> and later verification.
+                <li><b>TestImages</b> - contains subfolders of nonstandard images
 				<li><b>Rules</b> - copies of <b>Demo_IDShield</b> rules used for 
 				processing.
 			</ul>
@@ -187,6 +188,35 @@
 		<li>Exercise <b>decryption</b>.
 		<li>Confirm that the decrypted files are the same size as the original files.
 	</ul>
+<p />
+    <li><h2>Processing atypical images</h2>
+    <ul>
+        <li>For each sanity test, select 2 or 3 of the TestImages subfolders to be processed and
+        confirm correct behavior.</li>
+        <li><b>Annotated</b>
+        <ul>
+            <li>Confirm that annotations can either be retained or not.</li>
+        </ul></lI>
+        <li><b>Corrupt</b>
+        <ul>
+            <li>Confirm that files fail reasonably gracefully.</li>
+        </ul></lI>
+        <li><b>ImageTypes</b>
+        <ul>
+            <li>Confirm that reasonable things happen when you try to process these images; note
+            that some may not process successfully.</li>
+        </ul></lI>
+        <li><b>PDFVersions</b>
+        <ul>
+            <li>Confirm that all PDF versions can be processed successfully.</li>
+        </ul></lI>
+        <li><b>Rotated</b>
+        <ul>
+            <li>Confirm that you see reasonable behavior regardless of image orientation; note
+            that some documents are mirror images and that the rules will not be very successful
+            with those documents.</li>
+        </ul></lI>
+    </ul></li>
 <p />
 	<li><h2>FLEX Index - Demo</h2>
 	<ul>
