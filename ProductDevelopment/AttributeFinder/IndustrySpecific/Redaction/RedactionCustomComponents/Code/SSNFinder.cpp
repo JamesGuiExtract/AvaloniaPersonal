@@ -19,7 +19,12 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 2;
+// Version 1:
+//   no persistent options
+// Version 2:
+//   added subattribute name, spatial subattribute, and clear if none found options
+// Version 3: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 3;
 
 // minimum and maximum digits contained in the first, second, and third part of a found SSN
 const int giMIN_FIRST_DIGITS = 2;
@@ -451,10 +456,6 @@ STDMETHODIMP CSSNFinder::IsDirty(void)
 	return m_bDirty ? S_OK : S_FALSE;
 }
 //-------------------------------------------------------------------------------------------------
-// Version 1:
-//   no persistent options
-// Version 2:
-//   added subattribute name, spatial subattribute, and clear if none found options
 STDMETHODIMP CSSNFinder::Load(IStream* pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -500,6 +501,12 @@ STDMETHODIMP CSSNFinder::Load(IStream* pStream)
 			dataReader >> m_bSpatialSubattribute;
 			dataReader >> m_bClearIfNoneFound;
 		}
+
+		if (nDataVersion >= 3)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
 		
 		// clear the dirty flag since a new object was loaded
 		m_bDirty = false;
@@ -535,6 +542,9 @@ STDMETHODIMP CSSNFinder::Save(IStream* pStream, BOOL fClearDirty)
 		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
 		pStream->Write(data.getData(), nDataLength, NULL);
 
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
+
 		// Clear the flag as specified
 		if (fClearDirty)
 		{
@@ -549,6 +559,24 @@ STDMETHODIMP CSSNFinder::Save(IStream* pStream, BOOL fClearDirty)
 STDMETHODIMP CSSNFinder::GetSizeMax(ULARGE_INTEGER* pcbSize)
 {
 	return E_NOTIMPL;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSSNFinder::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33637")
 }
 
 //-------------------------------------------------------------------------------------------------
