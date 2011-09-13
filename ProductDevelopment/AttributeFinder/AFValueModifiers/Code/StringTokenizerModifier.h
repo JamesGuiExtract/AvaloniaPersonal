@@ -5,6 +5,8 @@
 
 #include "..\..\AFCore\Code\AFCategories.h"
 
+#include <IdentifiableRuleObject.h>
+
 #include <string>
 #include <vector>
 
@@ -23,7 +25,9 @@ class ATL_NO_VTABLE CStringTokenizerModifier :
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public IPersistStream,
-	public ISpecifyPropertyPagesImpl<CStringTokenizerModifier>
+	public ISpecifyPropertyPagesImpl<CStringTokenizerModifier>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CStringTokenizerModifier();
@@ -44,6 +48,7 @@ BEGIN_COM_MAP(CStringTokenizerModifier)
 	COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CStringTokenizerModifier)
@@ -93,6 +98,9 @@ public:
 	STDMETHOD(Load)(IStream *pStm);
 	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 	/////////////

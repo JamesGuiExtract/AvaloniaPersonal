@@ -11,7 +11,8 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 2: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 2;
 
 //--------------------------------------------------------------------------------------------------
 // CFindingRuleCondition
@@ -307,6 +308,12 @@ STDMETHODIMP CFindingRuleCondition::Load(IStream *pStream)
 		readObjectFromStream(ipRuleStream, pStream, "ELI18263");
 		m_ipAFRule = ipRuleStream;
 
+		if (nDataVersion >= 2)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -342,6 +349,9 @@ STDMETHODIMP CFindingRuleCondition::Save(IStream *pStream, BOOL fClearDirty)
 		IPersistStreamPtr ipRuleStream = m_ipAFRule;
 		ASSERT_RESOURCE_ALLOCATION("ELI18264", ipRuleStream != __nullptr);
 		writeObjectToStream(ipRuleStream, pStream, "ELI18265", fClearDirty);
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -419,6 +429,24 @@ STDMETHODIMP CFindingRuleCondition::InterfaceSupportsErrorInfo(REFIID riid)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18215")
 
 	return S_FALSE;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFindingRuleCondition::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33524")
 }
 
 //-------------------------------------------------------------------------------------------------

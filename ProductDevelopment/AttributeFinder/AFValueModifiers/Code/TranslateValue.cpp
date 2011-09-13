@@ -18,7 +18,8 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 2;
+// Version 3: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 3;
 
 //-------------------------------------------------------------------------------------------------
 // CTranslateValue
@@ -676,6 +677,12 @@ STDMETHODIMP CTranslateValue::Load(IStream *pStream)
 
 		m_ipTranslationStringPairs = ipObj;
 
+		if (nDataVersion >= 3)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -718,6 +725,9 @@ STDMETHODIMP CTranslateValue::Save(IStream *pStream, BOOL fClearDirty)
 			::writeObjectToStream(ipObj, pStream, "ELI09927", fClearDirty);
 		}
 
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
+
 		// Clear the flag as specified
 		if (fClearDirty)
 		{
@@ -732,6 +742,24 @@ STDMETHODIMP CTranslateValue::Save(IStream *pStream, BOOL fClearDirty)
 STDMETHODIMP CTranslateValue::GetSizeMax(ULARGE_INTEGER *pcbSize)
 {
 	return E_NOTIMPL;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CTranslateValue::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33593")
 }
 
 //-------------------------------------------------------------------------------------------------

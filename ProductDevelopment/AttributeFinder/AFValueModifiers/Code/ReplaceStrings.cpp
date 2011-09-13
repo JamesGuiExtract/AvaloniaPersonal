@@ -18,7 +18,18 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 2;
+// Version 1:
+//   * Saved: 
+//            data version,
+//            case-sensitivity flag,
+//            collection of replacement strings
+// Version 2:
+//   * Additionally saved:
+//            regular expression flag
+//   * NOTE:
+//            new flag located immediately after Case Sensitive flag
+// Version 3: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 3;
 
 //-------------------------------------------------------------------------------------------------
 // CReplaceStrings
@@ -535,17 +546,6 @@ STDMETHODIMP CReplaceStrings::IsDirty(void)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-// NOTES about versions:
-// Version 1:
-//   * Saved: 
-//            data version,
-//            case-sensitivity flag,
-//            collection of replacement strings
-// Version 2:
-//   * Additionally saved:
-//            regular expression flag
-//   * NOTE:
-//            new flag located immediately after Case Sensitive flag
 STDMETHODIMP CReplaceStrings::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -602,6 +602,12 @@ STDMETHODIMP CReplaceStrings::Load(IStream *pStream)
 
 		m_ipReplaceInfos = ipObj;
 
+		if (nDataVersion >= 3)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -646,6 +652,9 @@ STDMETHODIMP CReplaceStrings::Save(IStream *pStream, BOOL fClearDirty)
 			::writeObjectToStream(ipObj, pStream, "ELI09925", fClearDirty);
 		}
 
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
+
 		// Clear the flag as specified
 		if (fClearDirty)
 		{
@@ -682,6 +691,24 @@ STDMETHODIMP CReplaceStrings::raw_Process(IAFDocument* pDocument, IProgressStatu
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07436");
 	
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CReplaceStrings::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33589")
 }
 
 //-------------------------------------------------------------------------------------------------

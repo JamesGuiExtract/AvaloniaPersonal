@@ -12,7 +12,8 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 2: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 2;
 const int gnMIN_ZONE_HEIGHT = 20;
 const int gnMIN_ZONE_WIDTH = 20;
 
@@ -666,6 +667,12 @@ STDMETHODIMP CImageRegionWithLines::Load(IStream *pStream)
 		readObjectFromStream(ipLineUtil, pStream, "ELI18955");
 		m_ipImageLineUtility = ipLineUtil;
 
+		if (nDataVersion >= 2)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -711,6 +718,9 @@ STDMETHODIMP CImageRegionWithLines::Save(IStream *pStream, BOOL fClearDirty)
 		IPersistStreamPtr ipLineUtilStream(getImageLineUtility());
 		ASSERT_RESOURCE_ALLOCATION("ELI18953", ipLineUtilStream != __nullptr);
 		writeObjectToStream(ipLineUtilStream, pStream, "ELI18954", fClearDirty);
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -787,6 +797,24 @@ STDMETHODIMP CImageRegionWithLines::InterfaceSupportsErrorInfo(REFIID riid)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18415")
 
 	return S_FALSE;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CImageRegionWithLines::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33569")
 }
 
 //-------------------------------------------------------------------------------------------------

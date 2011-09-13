@@ -16,7 +16,27 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion				= 4;
+// Version 1:
+// m_strDefaultAttributeText
+// m_strAttributeName
+// m_dMinimumWidth
+// m_bExcludeByOCR
+// m_bExcludePoorOCRAreas
+// m_nOCRThreshold
+// m_bUseLines
+// m_bReOCRWithHandwriting
+// 
+// Version 2: 
+// Added m_dMinimumHeight, m_strGoodOCRType and m_strPoorOCRType.
+// m_bExcludeByOCR and m_bExcludePoorOCRAreas replaced by m_bIncludeGoodOCR and m_bIncludePoorOCR
+//
+// Version 3: 
+// Added m_bIncludeOCRAsTrueSpatialString
+//
+// Version 4:
+// Added m_nRequiredHorizontalSeparation;
+// Version 5: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion				= 5;
 const unsigned int gnDEFAULT_CHAR_WIDTH_PIXELS		= 25;
 const unsigned int gnDEFAULT_CHAR_HEIGHT_PIXELS		= 60;
 const double gnDEFAULT_CHAR_WIDTH_IN				= .08;
@@ -717,25 +737,6 @@ STDMETHODIMP CSplitRegionIntoContentAreas::IsDirty(void)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI22081");
 }
 //-------------------------------------------------------------------------------------------------
-// Version 1:
-// m_strDefaultAttributeText
-// m_strAttributeName
-// m_dMinimumWidth
-// m_bExcludeByOCR
-// m_bExcludePoorOCRAreas
-// m_nOCRThreshold
-// m_bUseLines
-// m_bReOCRWithHandwriting
-// 
-// Version 2: 
-// Added m_dMinimumHeight, m_strGoodOCRType and m_strPoorOCRType.
-// m_bExcludeByOCR and m_bExcludePoorOCRAreas replaced by m_bIncludeGoodOCR and m_bIncludePoorOCR
-//
-// Version 3: 
-// Added m_bIncludeOCRAsTrueSpatialString
-//
-// Version 4:
-// Added m_nRequiredHorizontalSeparation;
 STDMETHODIMP CSplitRegionIntoContentAreas::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -806,6 +807,12 @@ STDMETHODIMP CSplitRegionIntoContentAreas::Load(IStream *pStream)
 			dataReader >> m_nRequiredHorizontalSeparation;
 		}
 
+		if (nDataVersion >= 5)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 
@@ -853,6 +860,9 @@ STDMETHODIMP CSplitRegionIntoContentAreas::Save(IStream *pStream, BOOL fClearDir
 		long nDataLength = data.getLength();
 		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
 		pStream->Write(data.getData(), nDataLength, NULL);
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -1311,6 +1321,24 @@ bool operator < (const CRect& first, const CRect& second)
 	}	
 
 	return false;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSplitRegionIntoContentAreas::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33590")
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -4,6 +4,7 @@
 #include "resource.h"       // main symbols
 #include "..\\..\\AFCore\\Code\\AFCategories.h"
 #include "AFSelectors.h"
+#include <IdentifiableRuleObject.h>
 #include <string>
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
@@ -24,7 +25,9 @@ class ATL_NO_VTABLE CQueryBasedAS :
 	public IDispatchImpl<ICopyableObject, &__uuidof(ICopyableObject), &LIBID_UCLID_COMUTILSLib, /* wMajor = */ 1>,
 	public IDispatchImpl<ILicensedComponent, &__uuidof(ILicensedComponent), &LIBID_UCLID_COMLMLib, /* wMajor = */ 1>,
 	public ISpecifyPropertyPagesImpl<CQueryBasedAS>,
-	public IDispatchImpl<IMustBeConfiguredObject, &__uuidof(IMustBeConfiguredObject), &LIBID_UCLID_COMUTILSLib, /* wMajor = */ 1>
+	public IDispatchImpl<IMustBeConfiguredObject, &__uuidof(IMustBeConfiguredObject), &LIBID_UCLID_COMUTILSLib, /* wMajor = */ 1>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CQueryBasedAS();
@@ -42,6 +45,7 @@ public:
 		COM_INTERFACE_ENTRY(ILicensedComponent)
 		COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
 		COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
+		COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 	END_COM_MAP()
 
 	BEGIN_CATEGORY_MAP(CQueryBasedAS)
@@ -94,6 +98,9 @@ public:
 
 	// IMustBeConfiguredObject Methods
 	STDMETHOD(raw_IsConfigured)(VARIANT_BOOL * bConfigured);
+
+	// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 	//////////

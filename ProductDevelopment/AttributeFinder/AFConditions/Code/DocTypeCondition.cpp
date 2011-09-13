@@ -17,7 +17,8 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 3;
+// Version 4: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 4;
 
 //-------------------------------------------------------------------------------------------------
 // CDocTypeCondition
@@ -497,7 +498,7 @@ STDMETHODIMP CDocTypeCondition::Load(IStream *pStream)
 
 		dataReader >> m_bAllowTypes;
 
-		if (nDataVersion > 1)
+		if (nDataVersion >= 2)
 		{
 			long nTmp;
 			dataReader >> nTmp;
@@ -505,7 +506,7 @@ STDMETHODIMP CDocTypeCondition::Load(IStream *pStream)
 		}
 
 		// Load Category string
-		if (nDataVersion > 2)
+		if (nDataVersion >= 3)
 		{
 			dataReader >> m_strCategory;
 		}
@@ -514,6 +515,12 @@ STDMETHODIMP CDocTypeCondition::Load(IStream *pStream)
 		IPersistStreamPtr ipObj;
 		readObjectFromStream(ipObj, pStream, "ELI10823");
 		m_ipTypes = ipObj;
+
+		if (nDataVersion >= 4)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
 
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
@@ -552,6 +559,9 @@ STDMETHODIMP CDocTypeCondition::Save(IStream *pStream, BOOL fClearDirty)
 		ASSERT_RESOURCE_ALLOCATION("ELI10822", ipObj != __nullptr);
 		writeObjectToStream(ipObj, pStream, "ELI19123", fClearDirty);
 
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
+
 		// Clear the flag as specified
 		if (fClearDirty)
 		{
@@ -568,6 +578,24 @@ STDMETHODIMP CDocTypeCondition::GetSizeMax(ULARGE_INTEGER *pcbSize)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	
 	return E_NOTIMPL;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CDocTypeCondition::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33523")
 }
 
 //-------------------------------------------------------------------------------------------------

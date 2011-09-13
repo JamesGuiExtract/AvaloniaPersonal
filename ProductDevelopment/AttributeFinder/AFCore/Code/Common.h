@@ -29,3 +29,6 @@ const std::string gstrRSD_FILE_OPEN_FILTER =	"Ruleset definition files (*.rsd;*.
 
 const std::string gstrAF_REG_EAVGENERATOR_FOLDER_PATH = 
 	gstrAF_REG_UTILS_FOLDER_PATH + std::string("\\EAVGenerator");
+
+const std::string gstrAF_PROFILE_RULES_KEY = "ProfileRules";
+const std::string gstrAF_DEFAULT_PROFILE_RULES = "0";

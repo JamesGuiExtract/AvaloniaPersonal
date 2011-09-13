@@ -2,6 +2,7 @@
 #pragma once
 
 #include "resource.h"       // main symbols
+#include "IdentifiableRuleObject.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CAttributeFindInfo
@@ -12,7 +13,9 @@ class ATL_NO_VTABLE CAttributeFindInfo :
 	public IPersistStream,
 	public IDispatchImpl<IAttributeFindInfo, &IID_IAttributeFindInfo, &LIBID_UCLID_AFCORELib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
-	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>
+	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CAttributeFindInfo();
@@ -29,6 +32,7 @@ BEGIN_COM_MAP(CAttributeFindInfo)
 	COM_INTERFACE_ENTRY2(IDispatch, IAttributeFindInfo)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 public:
@@ -63,6 +67,9 @@ public:
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 	/////////////

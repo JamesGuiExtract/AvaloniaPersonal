@@ -108,6 +108,8 @@
       <ImportLibrary>.\..\Release/UCLIDAFOutputHandlers.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <RegisterOutput>true</RegisterOutput>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -153,7 +155,6 @@
     <Link>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\AFOutputHandlers.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\Debug/UCLIDAFOutputHandlers.pdb</ProgramDatabaseFile>
@@ -161,6 +162,9 @@
       <ImportLibrary>.\..\Debug/UCLIDAFOutputHandlers.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <RegisterOutput>true</RegisterOutput>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -448,6 +452,10 @@
     <ProjectReference Include="..\..\AFCore\Code\AFCore.vcxproj">
       <Project>{83c2c49f-e325-4abf-b4eb-8125ee2dd4fa}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <Private>true</Private>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
     <ProjectReference Include="..\..\AFCppUtils\Code\AFCppUtils.vcxproj">
       <Project>{1bdb2a4e-7678-42c1-9828-5ef4f522ab21}</Project>

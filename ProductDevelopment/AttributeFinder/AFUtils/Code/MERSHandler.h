@@ -6,6 +6,8 @@
 
 #include "..\..\AFCore\Code\AFCategories.h"
 
+#include <IdentifiableRuleObject.h>
+
 #include <string>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -19,7 +21,9 @@ class ATL_NO_VTABLE CMERSHandler :
 	public IDispatchImpl<IMERSHandler, &IID_IMERSHandler, &LIBID_UCLID_AFUTILSLib>,
 	public IDispatchImpl<ICategorizedComponent, &IID_ICategorizedComponent, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
-	public IPersistStream
+	public IPersistStream,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CMERSHandler();
@@ -38,6 +42,7 @@ BEGIN_COM_MAP(CMERSHandler)
 	COM_INTERFACE_ENTRY(ICategorizedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IPersistStream)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_CATEGORY_MAP(CEntityFinder)
@@ -70,6 +75,9 @@ public:
 	STDMETHOD(Load)(IStream *pStm);
 	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 	//////////

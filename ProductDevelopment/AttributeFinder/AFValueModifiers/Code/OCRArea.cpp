@@ -16,7 +16,11 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 1:
+//   filter options, custom filter characters, detect handwriting, return unrecognized characters,
+//   and clear if no text found
+// Version 2: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 2;
 
 // default filter for new OCRArea objects (all the filter options except kCustomFilter)
 const EFilterCharacters geDEFAULT_FILTER = EFilterCharacters(kAlphaFilter | kNumeralFilter | 
@@ -421,9 +425,6 @@ STDMETHODIMP COCRArea::IsDirty(void)
 	return m_bDirty ? S_OK : S_FALSE;
 }
 //-------------------------------------------------------------------------------------------------
-// Version 1:
-//   filter options, custom filter characters, detect handwriting, return unrecognized characters,
-//   and clear if no text found
 STDMETHODIMP COCRArea::Load(IStream* pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -475,6 +476,12 @@ STDMETHODIMP COCRArea::Load(IStream* pStream)
 		dataReader >> m_bDetectHandwriting;
 		dataReader >> m_bReturnUnrecognized;
 		dataReader >> m_bClearIfNoneFound;
+
+		if (nDataVersion >= 2)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
 		
 		// clear the dirty flag since a new object was loaded
 		m_bDirty = false;
@@ -515,6 +522,9 @@ STDMETHODIMP COCRArea::Save(IStream* pStream, BOOL fClearDirty)
 		HANDLE_HRESULT(ipStream->Write(data.getData(), nDataLength, NULL), "ELI18533", 
 			"Unable to write object to stream.", ipStream, __uuidof(IStream));
 
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
+
 		// Clear the flag as specified
 		if (fClearDirty)
 		{
@@ -531,6 +541,24 @@ STDMETHODIMP COCRArea::GetSizeMax(ULARGE_INTEGER* pcbSize)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	return E_NOTIMPL;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COCRArea::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33586")
 }
 
 //-------------------------------------------------------------------------------------------------

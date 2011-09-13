@@ -5,7 +5,7 @@
 #include "AFConditions.h"
 
 #include <AFCategories.h>
-
+#include <IdentifiableRuleObject.h>
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
@@ -24,7 +24,9 @@ class ATL_NO_VTABLE CCharacterConfidenceCondition :
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ICategorizedComponent, &IID_ICategorizedComponent, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
-	public ISpecifyPropertyPagesImpl<CCharacterConfidenceCondition>
+	public ISpecifyPropertyPagesImpl<CCharacterConfidenceCondition>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CCharacterConfidenceCondition();
@@ -42,6 +44,7 @@ public:
 		COM_INTERFACE_ENTRY(ICategorizedComponent)
 		COM_INTERFACE_ENTRY(ICopyableObject)
 		COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
+		COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 	END_COM_MAP()
 
 	BEGIN_PROP_MAP(CCharacterConfidenceCondition)
@@ -101,6 +104,10 @@ public:
 	STDMETHOD(put_AndSecondCondition)(VARIANT_BOOL newVal);
 	STDMETHOD(get_IsMet)(VARIANT_BOOL* pVal);
 	STDMETHOD(put_IsMet)(VARIANT_BOOL newVal);
+
+	// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
+
 public:
 	///////////////
 	// Variables

@@ -18,7 +18,8 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 2: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CRSDFileCondition
@@ -387,6 +388,12 @@ STDMETHODIMP CRSDFileCondition::Load(IStream *pStream)
 			throw ue;
 		}
 
+		if (nDataVersion >= 2)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -417,6 +424,9 @@ STDMETHODIMP CRSDFileCondition::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write( &nDataLength, sizeof(nDataLength), __nullptr );
 		pStream->Write( data.getData(), nDataLength, __nullptr );
 
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
+
 		// Clear the flag as specified
 		if (fClearDirty)
 		{
@@ -437,6 +447,24 @@ STDMETHODIMP CRSDFileCondition::GetSizeMax(ULARGE_INTEGER *pcbSize)
 		return E_NOTIMPL;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12861");
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRSDFileCondition::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33525")
 }
 
 //-------------------------------------------------------------------------------------------------

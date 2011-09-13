@@ -8,11 +8,13 @@
 #include <COMUtils.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
+#include <RuleSetProfiler.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 2: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CSpatialContentBasedAS
@@ -108,6 +110,12 @@ STDMETHODIMP CSpatialContentBasedAS::Load(IStream * pStream)
 		dataReader >> m_lMaxPercent;
 		dataReader >> m_bIncludeNonSpatial;
 
+		if (nDataVersion >= 2)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -139,6 +147,9 @@ STDMETHODIMP CSpatialContentBasedAS::Save(IStream * pStream, BOOL fClearDirty)
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
 
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
+
 		// Clear the flag as specified
 		if (fClearDirty)
 		{
@@ -168,6 +179,11 @@ STDMETHODIMP CSpatialContentBasedAS::raw_SelectAttributes(IIUnknownVector * pAtt
 	{
 		// validate license
 		validateLicense();
+
+		// Ordinarily, the parent object will make this call for the child to limit the number of
+		// places where this call is needed. Selectors and scorers, however, make this call on
+		// themselves.
+		PROFILE_RULE_OBJECT("", asString(GetComponentDescription()), this, 0)
 
 		IIUnknownVectorPtr ipIn( pAttrIn);
 		IIUnknownVectorPtr ipFound(CLSID_IUnknownVector);
@@ -470,6 +486,24 @@ STDMETHODIMP CSpatialContentBasedAS::put_IncludeNonSpatial(VARIANT_BOOL newVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13345");
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialContentBasedAS::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33553")
 }
 
 //-------------------------------------------------------------------------------------------------

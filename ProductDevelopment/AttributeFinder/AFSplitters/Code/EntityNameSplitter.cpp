@@ -14,7 +14,18 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 5;
+// Version 1:
+//   * Saved the version only.
+// Version 2:
+//   * Saves the VariantVector of CompanyClueType's
+// Version 3:
+//   * Saves the version only
+// Version 4:
+//   * Also saves the Alias choice
+// Version 5:
+//   * Also saves the Trust Name Exchange
+// Version 6: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 6;
 const string gstrAF_SPLITTERS_PATH = gstrAF_REG_ROOT_FOLDER_PATH + string("\\AFSplitters");
 
 //-------------------------------------------------------------------------------------------------
@@ -1145,17 +1156,6 @@ STDMETHODIMP CEntityNameSplitter::IsDirty(void)
 	return m_bDirty ? S_OK : S_FALSE;
 }
 //-------------------------------------------------------------------------------------------------
-// NOTES about versions:
-// Version 1:
-//   * Saved the version only.
-// Version 2:
-//   * Saves the VariantVector of CompanyClueType's
-// Version 3:
-//   * Saves the version only
-// Version 4:
-//   * Also saves the Alias choice
-// Version 5:
-//   * Also saves the Trust Name Exchange
 STDMETHODIMP CEntityNameSplitter::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -1217,6 +1217,12 @@ STDMETHODIMP CEntityNameSplitter::Load(IStream *pStream)
 			dataReader >> m_bMoveTrustName;
 		}
 
+		if (nDataVersion >= 6)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -1250,6 +1256,9 @@ STDMETHODIMP CEntityNameSplitter::Save(IStream *pStream, BOOL fClearDirty)
 		long nDataLength = data.getLength();
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -1296,4 +1305,21 @@ STDMETHODIMP CEntityNameSplitter::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	return S_OK;
 }
+
 //-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CEntityNameSplitter::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33557")
+}

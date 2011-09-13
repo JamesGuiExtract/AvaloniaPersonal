@@ -16,7 +16,8 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 2: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CRSDSplitter
@@ -371,6 +372,12 @@ STDMETHODIMP CRSDSplitter::Load(IStream *pStream)
 		{
 			dataReader >> m_strRSDFileName;
 		}
+
+		if (nDataVersion >= 2)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
 			
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
@@ -401,6 +408,9 @@ STDMETHODIMP CRSDSplitter::Save(IStream *pStream, BOOL fClearDirty)
 		long nDataLength = data.getLength();
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -447,6 +457,24 @@ STDMETHODIMP CRSDSplitter::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19117");
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRSDSplitter::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33560")
 }
 
 //-------------------------------------------------------------------------------------------------

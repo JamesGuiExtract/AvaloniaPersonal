@@ -7,6 +7,7 @@
 #include "..\..\AFCore\Code\StringLoader.h"
 
 #include <CachedListLoader.h>
+#include <IdentifiableRuleObject.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // CReplaceStrings
@@ -23,7 +24,9 @@ class ATL_NO_VTABLE CReplaceStrings :
 	public IDispatchImpl<IDocumentPreprocessor, &IID_IDocumentPreprocessor, &LIBID_UCLID_AFCORELib>,
 	public IPersistStream,
 	public ISpecifyPropertyPagesImpl<CReplaceStrings>,
-	public IDispatchImpl<IOutputHandler, &IID_IOutputHandler, &LIBID_UCLID_AFCORELib>
+	public IDispatchImpl<IOutputHandler, &IID_IOutputHandler, &LIBID_UCLID_AFCORELib>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CReplaceStrings();
@@ -46,6 +49,7 @@ BEGIN_COM_MAP(CReplaceStrings)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
 	COM_INTERFACE_ENTRY(IOutputHandler)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CReplaceStrings)
@@ -102,6 +106,9 @@ public:
 // IOutputHandler
 	STDMETHOD(raw_ProcessOutput)(IIUnknownVector *pAttributes, IAFDocument *pDoc, 
 		IProgressStatus *pProgressStatus);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 	////////////

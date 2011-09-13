@@ -5,6 +5,7 @@
 #include "EditorLicenseID.h"
 #include "Common.h"
 #include "AttributeFinderEngine.h"
+#include "RuleSetProfiler.h"
 
 #include <UCLIDException.h>
 #include <COMUtils.h>
@@ -18,7 +19,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 10;
+const unsigned long gnCurrentVersion = 11;
 // Version 3:
 //   Added Output Handler persistence
 // Version 7:
@@ -30,6 +31,7 @@ const unsigned long gnCurrentVersion = 10;
 //	 Added FKB version
 // Version 10:
 //	 Added Ignore preprocessor and output handler error options.
+// Version 11: Added CIdentifiableRuleObject
 
 const string gstrRULESET_FILE_SIGNATURE = "UCLID AttributeFinder RuleSet Definition (RSD) File";
 const string gstrRULESET_FILE_SIGNATURE_2 = "UCLID AttributeFinder RuleSet Definition (RSD) File 2";
@@ -259,6 +261,8 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 	{
 		validateLicense();
 
+		PROFILE_RULE_OBJECT(m_strFileName, "RuleSet", this, 0)
+
 		// Use double try...catch block so if any exceptions are thrown the Rule file name can
 		// be added to the exception. 
 		try
@@ -393,6 +397,9 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 							UCLID_AFCORELib::IDocumentPreprocessorPtr ipDocPreprocessor(m_ipDocPreprocessor->Object);
 							if (ipDocPreprocessor)
 							{
+								PROFILE_RULE_OBJECT(
+									asString(m_ipDocPreprocessor->Description), "", ipDocPreprocessor, 0)
+
 								ipDocPreprocessor->Process(ipAFDoc, ipSubProgressStatus);
 							}
 						}
@@ -455,6 +462,9 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 					IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
 						__nullptr : ipProgressStatus->SubProgressStatus;
 
+					PROFILE_RULE_OBJECT(asString(_bstrAttributeName), "Attribute finder block",
+						ipAttributeFindInfo, 0)
+
 					// find all attributes values for the current attribute
 					IIUnknownVectorPtr ipAttributes = 
 						ipAttributeFindInfo->ExecuteRulesOnText(ipAFDoc, ipSubProgressStatus);
@@ -496,6 +506,8 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 								// whether the caller requested progress information
 								IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
 									__nullptr : ipProgressStatus->SubProgressStatus;
+
+								PROFILE_RULE_OBJECT(asString(m_ipOutputHandler->Description), "", ipOH, 0)
 
 								ipOH->ProcessOutput( ipFoundAttributes, ipAFDoc, ipSubProgressStatus );
 							}
@@ -547,6 +559,9 @@ STDMETHODIMP CRuleSet::Cleanup()
 		flushCounter(gdcellFlexIndexingCounter, ms_indexingCounterData);
 		flushCounter(gdcellFlexPaginationCounter, ms_paginationCounterData);
 		flushCounter(gdcellIDShieldRedactionCounter, ms_redactionCounterData);
+
+		CRuleSetProfiler::GenerateOuput();
+		CRuleSetProfiler::Reset();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33402");
 }
@@ -1356,6 +1371,12 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 			m_ipOutputHandler = ipObj;
 		}
 
+		if (m_nVersionNumber >= 11)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// clear the dirty flag as we just loaded a fresh object
 		m_bDirty = false;
 
@@ -1458,6 +1479,9 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 				"Output Handler object does not support persistence." );
 		}
 		writeObjectToStream( ipObj, pStream, "ELI09912", fClearDirty );
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// clear the flag as specified
 		if (fClearDirty)
@@ -1624,6 +1648,24 @@ STDMETHODIMP CRuleSet::raw_Clone(IUnknown * * pObject)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05023");
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33528")
 }
 
 //-------------------------------------------------------------------------------------------------

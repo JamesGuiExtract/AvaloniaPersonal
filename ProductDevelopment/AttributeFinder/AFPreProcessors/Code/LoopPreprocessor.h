@@ -4,6 +4,7 @@
 #include "AFPreprocessors.h"
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
+#include <IdentifiableRuleObject.h>
 
 #include <comsvcs.h>
 
@@ -20,7 +21,9 @@ class ATL_NO_VTABLE CLoopPreprocessor :
 	public IDispatchImpl<ILicensedComponent, &__uuidof(ILicensedComponent), &LIBID_UCLID_COMLMLib, /* wMajor = */ 1>,
 	public IDispatchImpl<IMustBeConfiguredObject, &__uuidof(IMustBeConfiguredObject), &LIBID_UCLID_COMUTILSLib, /* wMajor = */ 1>,
 	public IPersistStream,
-	public ISpecifyPropertyPagesImpl<CLoopPreprocessor>
+	public ISpecifyPropertyPagesImpl<CLoopPreprocessor>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CLoopPreprocessor();
@@ -45,6 +48,7 @@ public:
 		COM_INTERFACE_ENTRY(IPersistStream)
 		COM_INTERFACE_ENTRY(ISupportErrorInfo)
 		COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
+		COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 	END_COM_MAP()
 
 	BEGIN_PROP_MAP(CLoopPreprocessor)
@@ -94,6 +98,9 @@ public:
 	STDMETHOD(put_Iterations)( long newVal);
 	STDMETHOD(get_LoopType)(ELoopType *pVal);
 	STDMETHOD(put_LoopType)(ELoopType newVal);
+
+	// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 	// Data Members

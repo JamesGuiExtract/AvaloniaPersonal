@@ -14,7 +14,12 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 3;
+// Version 2:
+//   * Added saving of m_bSplitDefaults
+// Version 3:
+//   * Added m_lMinTwoDigitYear and m_bTwoDigitYearBeforeCurrentYear
+// Version 4: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 4;
 
 const long glDEFAULT_TWO_DIGIT_YEAR = 1970;
 
@@ -684,11 +689,6 @@ STDMETHODIMP CDateTimeSplitter::IsDirty(void)
 	return m_bDirty ? S_OK : S_FALSE;
 }
 //-------------------------------------------------------------------------------------------------
-// NOTES about versions:
-// Version 2:
-//   * Added saving of m_bSplitDefaults
-// Version 3:
-//   * Added m_lMinTwoDigitYear and m_bTwoDigitYearBeforeCurrentYear
 STDMETHODIMP CDateTimeSplitter::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -755,6 +755,12 @@ STDMETHODIMP CDateTimeSplitter::Load(IStream *pStream)
 			dataReader >> m_bTwoDigitYearBeforeCurrentYear;
 		}
 
+		if (nDataVersion >= 4)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -799,6 +805,9 @@ STDMETHODIMP CDateTimeSplitter::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
 
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
+
 		// Clear the flag as specified
 		if (fClearDirty)
 		{
@@ -814,6 +823,24 @@ STDMETHODIMP CDateTimeSplitter::GetSizeMax(ULARGE_INTEGER *pcbSize)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	return E_NOTIMPL;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CDateTimeSplitter::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33556")
 }
 
 //-------------------------------------------------------------------------------------------------

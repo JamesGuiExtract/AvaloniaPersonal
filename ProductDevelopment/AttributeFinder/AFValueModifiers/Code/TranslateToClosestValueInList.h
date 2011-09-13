@@ -6,6 +6,7 @@
 #include "..\..\AFCore\Code\AFCategories.h"
 
 #include <CachedListLoader.h>
+#include <IdentifiableRuleObject.h>
 
 #include <string>
 using namespace std;
@@ -23,7 +24,9 @@ class ATL_NO_VTABLE CTranslateToClosestValueInList :
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public IPersistStream,
-	public ISpecifyPropertyPagesImpl<CTranslateToClosestValueInList>
+	public ISpecifyPropertyPagesImpl<CTranslateToClosestValueInList>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CTranslateToClosestValueInList();
@@ -44,6 +47,7 @@ BEGIN_COM_MAP(CTranslateToClosestValueInList)
 	COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CTranslateToClosestValueInList)
@@ -91,6 +95,9 @@ public:
 	STDMETHOD(Load)(IStream *pStm);
 	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 	///////////////

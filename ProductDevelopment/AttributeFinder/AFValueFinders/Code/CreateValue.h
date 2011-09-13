@@ -6,6 +6,8 @@
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
 
+#include <IdentifiableRuleObject.h>
+
 #include <string>
 #include <map>
 
@@ -22,7 +24,9 @@ class ATL_NO_VTABLE CCreateValue :
 	public IDispatchImpl<ICategorizedComponent, &IID_ICategorizedComponent, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
-	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>
+	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CCreateValue();
@@ -43,6 +47,7 @@ BEGIN_COM_MAP(CCreateValue)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CCreateValue)
@@ -86,6 +91,9 @@ END_CATEGORY_MAP()
 // ICopyableObject
 	STDMETHOD(raw_Clone)(/*[out, retval]*/ IUnknown* *pObject);
 	STDMETHOD(raw_CopyFrom)(/*[in]*/ IUnknown *pObject);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 public:
 	std::string m_strValue;

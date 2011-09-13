@@ -6,6 +6,7 @@
 #include "..\..\AFCore\Code\AFCategories.h"
 
 #include <CachedListLoader.h>
+#include <IdentifiableRuleObject.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // CRemoveEntriesFromList
@@ -20,7 +21,9 @@ class ATL_NO_VTABLE CRemoveEntriesFromList :
 	public IDispatchImpl<IOutputHandler, &IID_IOutputHandler, &LIBID_UCLID_AFCORELib>,
 	public IDispatchImpl<IRemoveEntriesFromList, &IID_IRemoveEntriesFromList, &LIBID_UCLID_AFOUTPUTHANDLERSLib>,
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
-	public ISpecifyPropertyPagesImpl<CRemoveEntriesFromList>
+	public ISpecifyPropertyPagesImpl<CRemoveEntriesFromList>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CRemoveEntriesFromList();
@@ -41,6 +44,7 @@ BEGIN_COM_MAP(CRemoveEntriesFromList)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CRemoveEntriesFromList)
@@ -86,6 +90,9 @@ public:
 	STDMETHOD(Load)(IStream *pStm);
 	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 	///////////////

@@ -13,7 +13,8 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 2;
+// Version 3: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 3;
 
 //-------------------------------------------------------------------------------------------------
 // CBlockFinder
@@ -412,6 +413,11 @@ STDMETHODIMP CBlockFinder::Load(IStream *pStream)
 		}
 		m_ipClues = ipObj;
 
+		if (nDataVersion >= 3)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
 
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
@@ -463,6 +469,8 @@ STDMETHODIMP CBlockFinder::Save(IStream *pStream, BOOL fClearDirty)
 		}
 		::writeObjectToStream(ipObj, pStream, "ELI09918", fClearDirty);
 		
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -960,6 +968,24 @@ STDMETHODIMP CBlockFinder::put_PairBeginAndEnd(VARIANT_BOOL newVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10067");
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CBlockFinder::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33562")
 }
 
 //-------------------------------------------------------------------------------------------------

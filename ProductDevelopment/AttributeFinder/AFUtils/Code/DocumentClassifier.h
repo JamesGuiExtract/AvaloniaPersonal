@@ -7,6 +7,9 @@
 #include "..\..\AFCore\Code\AFCategories.h"
 #include "DocTypeInterpreter.h"
 #include "DocPageCache.h"
+
+#include <IdentifiableRuleObject.h>
+
 #include <string>
 #include <vector>
 #include <map>
@@ -27,7 +30,9 @@ class ATL_NO_VTABLE CDocumentClassifier :
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IDocumentClassificationUtils, &IID_IDocumentClassificationUtils, &LIBID_UCLID_AFUTILSLib>,
 	public IPersistStream,
-	public ISpecifyPropertyPagesImpl<CDocumentClassifier>
+	public ISpecifyPropertyPagesImpl<CDocumentClassifier>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CDocumentClassifier();
@@ -52,6 +57,7 @@ BEGIN_COM_MAP(CDocumentClassifier)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY(IDocumentClassificationUtils)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CDocumentClassifier)
@@ -111,6 +117,9 @@ public:
 		/*[in]*/ VARIANT_BOOL bAllowSpecialTags,
 		/*[in]*/ VARIANT_BOOL bAllowMultiplyClassified,
 		/*[out, retval]*/ IVariantVector** ppTypes);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 

@@ -10,11 +10,22 @@
 #include <ComponentLicenseIDs.h>
 #include <cpputil.h>
 #include <VectorOperations.h>
+#include <RuleSetProfiler.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 4;
+// Version 1:
+//   * Saved: 
+//            Attribute Name
+//            Attribute Value
+// Version 2:
+//   * Additionally saved:
+//            Attribute Type
+//            Set Attribute Value
+//            Set Attribute Type
+// Version 5: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 5;
 
 //-------------------------------------------------------------------------------------------------
 // CRunObjectOnQuery
@@ -241,6 +252,8 @@ STDMETHODIMP CRunObjectOnQuery::raw_ProcessOutput(IIUnknownVector* pAttributes, 
 			ipProgressStatus->StartNextItemGroup("Running object", lPROGRESS_ITEMS_PER_OBJECT);
 		}
 
+		PROFILE_RULE_OBJECT("", "", m_ipObject, 0)
+
 		// Run the object in the appropriate way depending on what type of 
 		// object it is
 		if(m_objectIID == IID_IAttributeModifyingRule)
@@ -427,16 +440,6 @@ STDMETHODIMP CRunObjectOnQuery::IsDirty(void)
 	return m_bDirty ? S_OK : S_FALSE;
 }
 //-------------------------------------------------------------------------------------------------
-// NOTES about versions:
-// Version 1:
-//   * Saved: 
-//            Attribute Name
-//            Attribute Value
-// Version 2:
-//   * Additionally saved:
-//            Attribute Type
-//            Set Attribute Value
-//            Set Attribute Type
 STDMETHODIMP CRunObjectOnQuery::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -487,6 +490,12 @@ STDMETHODIMP CRunObjectOnQuery::Load(IStream *pStream)
 		::readObjectFromStream(ipObj, pStream, "ELI09983");
 		m_ipObject = ipObj;
 
+		if (nDataVersion >= 5)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -529,6 +538,9 @@ STDMETHODIMP CRunObjectOnQuery::Save(IStream *pStream, BOOL fClearDirty)
 		ASSERT_RESOURCE_ALLOCATION("ELI10417", ipObj != __nullptr);
 		writeObjectToStream(ipObj, pStream, "ELI10418", fClearDirty);
 
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
+
 		// Clear the flag as specified
 		if (fClearDirty)
 		{
@@ -545,6 +557,24 @@ STDMETHODIMP CRunObjectOnQuery::GetSizeMax(ULARGE_INTEGER *pcbSize)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	
 	return E_NOTIMPL;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRunObjectOnQuery::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33541")
 }
 
 //-------------------------------------------------------------------------------------------------

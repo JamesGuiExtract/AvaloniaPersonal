@@ -6,6 +6,7 @@
 #include "..\..\AFCore\Code\AFCategories.h"
 
 #include <CachedListLoader.h>
+#include <IdentifiableRuleObject.h>
 
 #include <string>
 #include <map>
@@ -24,7 +25,9 @@ class ATL_NO_VTABLE CTranslateValue :
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public IPersistStream,
 	public ISpecifyPropertyPagesImpl<CTranslateValue>,
-	public IDispatchImpl<IOutputHandler, &IID_IOutputHandler, &LIBID_UCLID_AFCORELib>
+	public IDispatchImpl<IOutputHandler, &IID_IOutputHandler, &LIBID_UCLID_AFCORELib>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CTranslateValue();
@@ -46,6 +49,7 @@ BEGIN_COM_MAP(CTranslateValue)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
 	COM_INTERFACE_ENTRY(IOutputHandler)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CTranslateValue)
@@ -98,6 +102,9 @@ public:
 // IOutputHandler
 	STDMETHOD(raw_ProcessOutput)(IIUnknownVector * pAttributes, IAFDocument * pDoc,
 		IProgressStatus *pProgressStatus);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 	//////////////

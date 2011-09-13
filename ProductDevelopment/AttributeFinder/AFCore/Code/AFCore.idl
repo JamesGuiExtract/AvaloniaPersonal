@@ -676,6 +676,22 @@ library UCLID_AFCORELib
 		[id(1), helpstring("method SelectAttributes")] HRESULT SelectAttributes( [in] IIUnknownVector *pAttrIn, [in] IAFDocument *pAFDoc, [out, retval] IIUnknownVector **pAttrOut);
 	};
 
+	[
+		object,
+		uuid(9B270563-F873-4F63-A460-2D701E73F4F7),
+		dual,
+		helpstring("IIdentifiableRuleObject Interface"),
+		pointer_default(unique)
+	]
+	interface IIdentifiableRuleObject : IDispatch
+	{
+		//---------------------------------------------------------------------------------------------
+		// PROMISE: Will return a GUID that uniquely identifies this instance. An instance is
+		// considered a unique persistence of a rule of which there may be multiple copies in
+		// memory if the ruleset has been loaded from different callers.
+		[propget, id(1), helpstring("property InstanceGUID")] HRESULT InstanceGUID([out, retval] GUID *pGUID);
+	};
+
 	//---------------------------------------------------------------------------------------------
 	/////////////////
 	// CoClasses

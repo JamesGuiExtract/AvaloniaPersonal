@@ -27,7 +27,10 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 1:
+//   * Saves the version only.
+// Version 2: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CLegalDescSplitter
@@ -87,9 +90,6 @@ STDMETHODIMP CLegalDescSplitter::IsDirty()
 	return m_bDirty ? S_OK : S_FALSE;
 }
 //-------------------------------------------------------------------------------------------------
-// NOTES about versions:
-// Version 1:
-//   * Saves the version only.
 STDMETHODIMP CLegalDescSplitter::Load(IStream * pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -122,6 +122,12 @@ STDMETHODIMP CLegalDescSplitter::Load(IStream * pStream)
 			throw ue;
 		}
 
+		if (nDataVersion >= 2)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -149,6 +155,9 @@ STDMETHODIMP CLegalDescSplitter::Save(IStream * pStream, BOOL fClearDirty)
 		long nDataLength = data.getLength();
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -320,6 +329,24 @@ STDMETHODIMP CLegalDescSplitter::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	}
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CLegalDescSplitter::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33558")
 }
 
 //-------------------------------------------------------------------------------------------------

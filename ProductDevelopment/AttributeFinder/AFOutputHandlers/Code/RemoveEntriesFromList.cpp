@@ -16,7 +16,8 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 2;
+// Version 3: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 3;
 
 //-------------------------------------------------------------------------------------------------
 // CRemoveEntriesFromList
@@ -361,7 +362,7 @@ STDMETHODIMP CRemoveEntriesFromList::Load(IStream *pStream)
 			throw ue;
 		}
 
-		if(nDataVersion > 1)
+		if(nDataVersion >= 2)
 		{
 			dataReader >> m_bCaseSensitive;
 		}
@@ -377,6 +378,12 @@ STDMETHODIMP CRemoveEntriesFromList::Load(IStream *pStream)
 		else
 		{
 			m_ipEntriesList = ipObj;
+		}
+
+		if (nDataVersion >= 3)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
 		}
 
 		// Clear the dirty flag as we've loaded a fresh object
@@ -419,6 +426,9 @@ STDMETHODIMP CRemoveEntriesFromList::Save(IStream *pStream, BOOL fClearDirty)
 		{
 			::writeObjectToStream( ipPersistentObj, pStream, "ELI09914", fClearDirty );
 		}
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -539,6 +549,24 @@ STDMETHODIMP CRemoveEntriesFromList::raw_IsConfigured(VARIANT_BOOL * bConfigured
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI06783");
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRemoveEntriesFromList::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33538")
 }
 
 //-------------------------------------------------------------------------------------------------

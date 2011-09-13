@@ -5,6 +5,7 @@
 #include "AFConditions.h"
 
 #include <AFCategories.h>
+#include <IdentifiableRuleObject.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // CFindingRuleCondition
@@ -20,7 +21,9 @@ class ATL_NO_VTABLE CFindingRuleCondition :
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ICategorizedComponent, &IID_ICategorizedComponent, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
-	public ISpecifyPropertyPagesImpl<CFindingRuleCondition>
+	public ISpecifyPropertyPagesImpl<CFindingRuleCondition>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CFindingRuleCondition();
@@ -44,6 +47,7 @@ BEGIN_COM_MAP(CFindingRuleCondition)
 	COM_INTERFACE_ENTRY(ICategorizedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CFindingRuleCondition)
@@ -83,6 +87,9 @@ END_CATEGORY_MAP()
 
 // ISupportsErrorInfo
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 	///////////////

@@ -20,7 +20,8 @@
 
 // current version
 // Version 6: Added units field to boundary info.
-const unsigned long gnCurrentVersion = 6;
+// Version 7: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 7;
 
 //-------------------------------------------------------------------------------------------------
 // CLocateImageRegion
@@ -664,6 +665,12 @@ STDMETHODIMP CLocateImageRegion::Load(IStream *pStream)
 			m_mapIndexToClueListInfo[eClueListIndex] = listInfo;
 		}
 
+		if (nDataVersion >= 7)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -763,6 +770,9 @@ STDMETHODIMP CLocateImageRegion::Save(IStream *pStream, BOOL fClearDirty)
 			}
 			::writeObjectToStream(ipPersistentObj, pStream, "ELI09919", fClearDirty);
 		}
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -1019,6 +1029,24 @@ STDMETHODIMP CLocateImageRegion::raw_Clone(IUnknown* *pObject)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07747");
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CLocateImageRegion::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33571")
 }
 
 //-------------------------------------------------------------------------------------------------

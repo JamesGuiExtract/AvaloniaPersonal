@@ -16,7 +16,8 @@
 // Version 3: Added TreatNameListAsRegex, m_eValueMergeMode, m_ipValueMergePriority,
 //			  m_bTreatValueListAsRegexTypeFromName, PreserveType, TypeMergePriority and
 //			  TreatTypeListAsRegex
-const unsigned long gnCurrentVersion			= 3;
+// Version 4: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion			= 4;
 const unsigned long gnDEFAULT_OVERLAP_PERCENT	= 75;
 
 //--------------------------------------------------------------------------------------------------
@@ -856,6 +857,12 @@ STDMETHODIMP CMergeAttributes::Load(IStream *pStream)
 			m_ipTypeMergePriority = ipTypeMergePriority;
 		}
 
+		if (nDataVersion >= 4)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Reset m_ipAttributeMerger to force it to be re-loaded next time the rule is run.
 		m_ipAttributeMerger = __nullptr;
 
@@ -926,6 +933,9 @@ STDMETHODIMP CMergeAttributes::Save(IStream *pStream, BOOL fClearDirty)
 		IPersistStreamPtr ipTypeMergePriority(m_ipTypeMergePriority);
 		ASSERT_RESOURCE_ALLOCATION("ELI33053", ipTypeMergePriority != __nullptr);
 		writeObjectToStream(ipTypeMergePriority, pStream, "ELI33054", fClearDirty);
+
+		// Save the GUID for the IIdentifiableRuleObject interface (version 4)
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -1169,6 +1179,24 @@ STDMETHODIMP CMergeAttributes::InterfaceSupportsErrorInfo(REFIID riid)
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI22753")
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33531")
 }
 
 //--------------------------------------------------------------------------------------------------

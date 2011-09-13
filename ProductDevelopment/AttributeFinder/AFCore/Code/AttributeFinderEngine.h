@@ -64,6 +64,9 @@ public:
 	// if the path has been overridden via registry key.
 	static void getRootComponentDataFolder(string& rstrFolder, bool& rbOverridden);
 
+	// Determines whether ruleset profiling is enabled.
+	static bool isProfilingEnabled();
+
 private:
 	//////////////
 	// Variables

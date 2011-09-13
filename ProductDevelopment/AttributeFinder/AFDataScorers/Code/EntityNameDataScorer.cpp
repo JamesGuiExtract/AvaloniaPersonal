@@ -16,6 +16,7 @@
 #include <cpputil.h>
 #include <misc.h>
 #include <ComponentLicenseIDs.h>
+#include <RuleSetProfiler.h>
 
 #include <algorithm>
 
@@ -29,7 +30,8 @@ const string gstrDEFAULT_DATA_SCORER_LOGGING_ENABLED = "0";
 const string gstrAF_DATA_SCORERS = "AFDataScorers";
 const string gstrAF_DATA_SCORERS_PATH = gstrAF_REG_ROOT_FOLDER_PATH + string("\\") + gstrAF_DATA_SCORERS;
 const string gstrENDS = "\\EntityNameDataScorer";
-const unsigned long gnCurrentVersion = 1;
+// Version 2: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CEntityNameDataScorer
@@ -102,6 +104,11 @@ STDMETHODIMP CEntityNameDataScorer::raw_GetDataScore1(IAttribute * pAttribute, L
 	{
 		// validate License
 		validateLicense();
+
+		// Ordinarily, the parent object will make this call for the child to limit the number of
+		// places where this call is needed. Selectors and scorers, however, make this call on
+		// themselves.
+		PROFILE_RULE_OBJECT("", asString(GetComponentDescription()), this, 0)
 		
 		ASSERT_ARGUMENT("ELI08597", pScore != __nullptr );
 
@@ -137,6 +144,11 @@ STDMETHODIMP CEntityNameDataScorer::raw_GetDataScore2(IIUnknownVector * pAttribu
 	{
 		// validate License
 		validateLicense();
+
+		// Ordinarily, the parent object will make this call for the child to limit the number of
+		// places where this call is needed. Selectors and scorers, however, make this call on
+		// themselves.
+		PROFILE_RULE_OBJECT("", asString(GetComponentDescription()), this, 0)
 
 		ASSERT_ARGUMENT("ELI08599", pScore != __nullptr );
 		IIUnknownVectorPtr ipAttributes(pAttributes);
@@ -241,6 +253,12 @@ STDMETHODIMP CEntityNameDataScorer::Load(IStream *pStream)
 		unsigned long nDataVersion = 0;
 		dataReader >> nDataVersion;
 
+		if (nDataVersion >= 2)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -268,6 +286,9 @@ STDMETHODIMP CEntityNameDataScorer::Save(IStream *pStream, BOOL fClearDirty)
 		long nDataLength = data.getLength();
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -356,6 +377,24 @@ STDMETHODIMP CEntityNameDataScorer::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	}
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CEntityNameDataScorer::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33545")
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -5,6 +5,8 @@
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
 
+#include <IdentifiableRuleObject.h>
+
 /////////////////////////////////////////////////////////////////////////////
 // CChangeCase
 class ATL_NO_VTABLE CChangeCase : 
@@ -18,7 +20,9 @@ class ATL_NO_VTABLE CChangeCase :
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IPersistStream,
 	public ISpecifyPropertyPagesImpl<CChangeCase>,
-	public IDispatchImpl<IOutputHandler, &IID_IOutputHandler, &LIBID_UCLID_AFCORELib>
+	public IDispatchImpl<IOutputHandler, &IID_IOutputHandler, &LIBID_UCLID_AFCORELib>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CChangeCase();
@@ -39,6 +43,7 @@ BEGIN_COM_MAP(CChangeCase)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
 	COM_INTERFACE_ENTRY(IOutputHandler)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CChangeCase)
@@ -82,6 +87,9 @@ public:
 // IOutputHandler
 	STDMETHOD(raw_ProcessOutput)(IIUnknownVector * pAttributes, IAFDocument * pDoc, 
 		IProgressStatus *pProgressStatus);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:	
 	////////////

@@ -5,6 +5,7 @@
 #include "Common.h"
 #include "AFInternalUtils.h"
 #include "AFAboutDlg.h"
+#include "RuleSetProfiler.h"
 
 #include <SpecialStringDefinitions.h>
 #include <UCLIDException.h>
@@ -250,6 +251,9 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 			}
 		}
 		_lastCodePos = "15";
+
+		// Check the profiling setting, and apply it to CRuleSetProfiler.
+		CRuleSetProfiler::ms_bEnabled = isProfilingEnabled();
 
 		// Create RuleSet object
 		UCLID_AFCORELib::IRuleSetPtr ipRuleSet;
@@ -648,6 +652,26 @@ void CAttributeFinderEngine::getComponentDataFolder(string& rstrFolder)
 		ue.addWin32ErrorInfo();
 		throw ue;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+bool CAttributeFinderEngine::isProfilingEnabled()
+{
+	if (!LicenseManagement::isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS))
+	{
+		return false;
+	}
+
+	if (!mu_spUserCfgMgr->keyExists(gstrAF_REG_SETTINGS_FOLDER, gstrAF_PROFILE_RULES_KEY))
+	{
+		mu_spUserCfgMgr->createKey(gstrAF_REG_SETTINGS_FOLDER, gstrAF_PROFILE_RULES_KEY,
+			gstrAF_DEFAULT_PROFILE_RULES);
+		return (gstrAF_DEFAULT_PROFILE_RULES == "1");
+	}
+
+	string strValue = mu_spUserCfgMgr->getKeyValue(gstrAF_REG_SETTINGS_FOLDER, gstrAF_PROFILE_RULES_KEY,
+		gstrAF_DEFAULT_PROFILE_RULES);
+
+	return (strValue == "1");
 }
 //-------------------------------------------------------------------------------------------------
 void CAttributeFinderEngine::validateLicense()

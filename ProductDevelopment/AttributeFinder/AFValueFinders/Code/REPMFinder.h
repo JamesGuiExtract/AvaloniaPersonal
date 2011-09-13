@@ -6,6 +6,7 @@
 #include "RegExPatternFileInterpreter.h"
 
 #include "..\..\AFCore\Code\AFCategories.h"
+#include <IdentifiableRuleObject.h>
 
 #include <string>
 #include <map>
@@ -23,7 +24,9 @@ class ATL_NO_VTABLE CREPMFinder :
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public IPersistStream,
-	public ISpecifyPropertyPagesImpl<CREPMFinder>
+	public ISpecifyPropertyPagesImpl<CREPMFinder>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CREPMFinder();
@@ -44,6 +47,7 @@ BEGIN_COM_MAP(CREPMFinder)
 	COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CREPMFinder)
@@ -101,6 +105,9 @@ public:
 	STDMETHOD(put_ReturnMatchType)(/*[in]*/ EPMReturnMatchType eNewVal);
 	STDMETHOD(get_IgnoreInvalidTags)(/*[out, retval]*/ VARIANT_BOOL *pVal);
 	STDMETHOD(put_IgnoreInvalidTags)(/*[in]*/ VARIANT_BOOL newVal);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:	
 	////////////

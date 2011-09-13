@@ -8,11 +8,14 @@
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
 #include <MiscLeadUtils.h>
+#include <RuleSetProfiler.h>
 
 //--------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion	= 2;
+// Version 2: Added m_bTargetsMustContainReferences
+// Version 3: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion	= 3;
 const CRect grectNULL					= CRect(0, 0, 0, 0);
 
 //--------------------------------------------------------------------------------------------------
@@ -326,6 +329,11 @@ STDMETHODIMP CSpatialProximityAS::raw_SelectAttributes(IIUnknownVector *pAttrIn,
 		// validate license
 		validateLicense();
 
+		// Ordinarily, the parent object will make this call for the child to limit the number of
+		// places where this call is needed. Selectors and scorers, however, make this call on
+		// themselves.
+		PROFILE_RULE_OBJECT("", asString(GetComponentDescription()), this, 0)
+
 		IIUnknownVectorPtr ipAttributes(pAttrIn);
 		ASSERT_ARGUMENT("ELI22562", ipAttributes != __nullptr);
 		IAFDocumentPtr ipAFDoc(pAFDoc);
@@ -421,7 +429,6 @@ STDMETHODIMP CSpatialProximityAS::IsDirty(void)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI22568");
 }
 //-------------------------------------------------------------------------------------------------
-// Version 2: Added m_bTargetsMustContainReferences
 STDMETHODIMP CSpatialProximityAS::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -485,6 +492,12 @@ STDMETHODIMP CSpatialProximityAS::Load(IStream *pStream)
 			m_mapBorderInfo[iter->first].m_eUnits = (EUnits) nTemp;
 		}
 
+		if (nDataVersion >= 3)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 
@@ -536,6 +549,9 @@ STDMETHODIMP CSpatialProximityAS::Save(IStream *pStream, BOOL fClearDirty)
 		long nDataLength = data.getLength();
 		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
 		pStream->Write(data.getData(), nDataLength, NULL);
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -717,6 +733,24 @@ STDMETHODIMP CSpatialProximityAS::InterfaceSupportsErrorInfo(REFIID riid)
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI22576")
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialProximityAS::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33554")
 }
 
 //--------------------------------------------------------------------------------------------------

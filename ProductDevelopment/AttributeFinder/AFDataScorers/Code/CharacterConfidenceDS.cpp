@@ -8,11 +8,13 @@
 #include <COMUtils.h>
 #include <cpputil.h>
 #include <ComponentLicenseIDs.h>
+#include <RuleSetProfiler.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 2: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CCharacterConfidenceDS
@@ -54,6 +56,11 @@ STDMETHODIMP CCharacterConfidenceDS::raw_GetDataScore1(IAttribute * pAttribute, 
 	{
 		// validate License
 		validateLicense();
+
+		// Ordinarily, the parent object will make this call for the child to limit the number of
+		// places where this call is needed. Selectors and scorers, however, make this call on
+		// themselves.
+		PROFILE_RULE_OBJECT("", asString(GetComponentDescription()), this, 0)
 		
 		// Make sure the arguments are valid
 		ASSERT_ARGUMENT("ELI29338", pScore != __nullptr );
@@ -77,6 +84,11 @@ STDMETHODIMP CCharacterConfidenceDS::raw_GetDataScore2(IIUnknownVector * pAttrib
 		// validate License
 		validateLicense();
 		
+		// Ordinarily, the parent object will make this call for the child to limit the number of
+		// places where this call is needed. Selectors and scorers, however, make this call on
+		// themselves.
+		PROFILE_RULE_OBJECT("", asString(GetComponentDescription()), this, 0)
+
 		// Make sure the arguments are valid
 		ASSERT_ARGUMENT("ELI29339", pScore != __nullptr );
 		IIUnknownVectorPtr ipAttributes(pAttributes);
@@ -193,6 +205,12 @@ STDMETHODIMP CCharacterConfidenceDS::Load(IStream *pStream)
 		dataReader >> nTmp;
 		m_eAggregateFunction = (EAggregateFunctions)nTmp;
 
+		if (nDataVersion >= 2)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 
@@ -225,6 +243,9 @@ STDMETHODIMP CCharacterConfidenceDS::Save(IStream *pStream, BOOL fClearDirty)
 		long nDataLength = data.getLength();
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -384,6 +405,25 @@ STDMETHODIMP CCharacterConfidenceDS::raw_IsConfigured(VARIANT_BOOL * pbConfigure
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29327");
 }
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CCharacterConfidenceDS::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33544")
+}
+
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------

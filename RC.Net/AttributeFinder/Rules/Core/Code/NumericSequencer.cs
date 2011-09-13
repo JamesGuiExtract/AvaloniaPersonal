@@ -19,7 +19,7 @@ namespace Extract.AttributeFinder.Rules
     [Guid("5643B027-B38A-4CC0-954E-EDA53FC34857")]
     [CLSCompliant(false)]
     public interface INumericSequencer : IAttributeModifyingRule, ICategorizedComponent, IConfigurableObject,
-        ICopyableObject, ILicensedComponent, IPersistStream
+        ICopyableObject, ILicensedComponent, IPersistStream, IIdentifiableRuleObject
     {
         /// <summary>
         /// Gets or sets a value indicating whether to expand hyphenated ranges, or contract
@@ -82,7 +82,7 @@ namespace Extract.AttributeFinder.Rules
     [ComVisible(true)]
     [Guid("361CE46B-0B83-4C8A-A955-6005BACE9F0F")]
     [CLSCompliant(false)]
-    public partial class NumericSequencer : INumericSequencer
+    public partial class NumericSequencer : IdentifiableRuleObject, INumericSequencer
     {
         #region Constants
 
@@ -93,8 +93,10 @@ namespace Extract.AttributeFinder.Rules
 
         /// <summary>
         /// Current version.
+        /// <para><b>Version 2</b></para>
+        /// Added IdentifiableRuleObject inheritance
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -414,6 +416,12 @@ namespace Extract.AttributeFinder.Rules
                     Sort = reader.ReadBoolean();
                     AscendingSortOrder = reader.ReadBoolean();
                     EliminateDuplicates = reader.ReadBoolean();
+
+                    if (reader.Version >= 2)
+                    {
+                        // Load the GUID for the IIdentifiableRuleObject interface.
+                        LoadGuid(stream);
+                    }
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -451,6 +459,9 @@ namespace Extract.AttributeFinder.Rules
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
                 }
+
+                // Save the GUID for the IIdentifiableRuleObject interface.
+                SaveGuid(stream);
 
                 if (clearDirty)
                 {

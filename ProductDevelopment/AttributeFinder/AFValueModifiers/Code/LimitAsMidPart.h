@@ -5,6 +5,8 @@
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
 
+#include <IdentifiableRuleObject.h>
+
 /////////////////////////////////////////////////////////////////////////////
 // CLimitAsMidPart
 class ATL_NO_VTABLE CLimitAsMidPart : 
@@ -18,7 +20,9 @@ class ATL_NO_VTABLE CLimitAsMidPart :
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public IPersistStream,
-	public ISpecifyPropertyPagesImpl<CLimitAsMidPart>
+	public ISpecifyPropertyPagesImpl<CLimitAsMidPart>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CLimitAsMidPart();
@@ -39,6 +43,7 @@ BEGIN_COM_MAP(CLimitAsMidPart)
 	COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CLimitAsMidPart)
@@ -86,6 +91,9 @@ public:
 	STDMETHOD(Load)(IStream *pStm);
 	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 	/////////////

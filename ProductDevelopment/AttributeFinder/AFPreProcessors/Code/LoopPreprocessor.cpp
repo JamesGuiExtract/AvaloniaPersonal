@@ -8,11 +8,13 @@
 #include <cpputil.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
+#include <RuleSetProfiler.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const long gnCurrentVersion = 1;
+// Version 2: Added CIdentifiableRuleObject
+const long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CLoopPreprocessor
@@ -121,6 +123,8 @@ STDMETHODIMP CLoopPreprocessor::raw_Process(IAFDocument * pDocument, IProgressSt
 				// if the loop is a while loop the condition needs to be tested
 				if (m_eLoopType == kWhileLoop)
 				{
+					PROFILE_RULE_OBJECT(asString(m_ipCondition->GetDescription()), "", ipCondition, 0);
+
 					bConditionMet = asCppBool(ipCondition->ProcessCondition(ipAFDoc)) == m_bConditionValue;
 				}
 
@@ -128,8 +132,12 @@ STDMETHODIMP CLoopPreprocessor::raw_Process(IAFDocument * pDocument, IProgressSt
 				// and the number of iterations has not been reached
 				while ((bConditionMet || m_eLoopType == kForLoop) && nIterations < m_nIterations)
 				{
-					// Run the PreProcessor after running the rule
-					ipPreProcessor->Process(ipAFDoc, pProgressStatus);
+					{
+						PROFILE_RULE_OBJECT(asString(m_ipPreprocessor->GetDescription()), "", ipPreProcessor, 0);
+
+						// Run the PreProcessor after running the rule
+						ipPreProcessor->Process(ipAFDoc, pProgressStatus);
+					}
 
 					// Increment the number of iterations
 					nIterations++;
@@ -137,6 +145,8 @@ STDMETHODIMP CLoopPreprocessor::raw_Process(IAFDocument * pDocument, IProgressSt
 					// Check if conditions are met
 					if (m_eLoopType != kForLoop)
 					{
+						PROFILE_RULE_OBJECT(asString(m_ipCondition->GetDescription()), "", ipCondition, 0);
+
 						bConditionMet = asCppBool(ipCondition->ProcessCondition(ipAFDoc)) == m_bConditionValue;
 					}
 				}
@@ -447,6 +457,12 @@ STDMETHODIMP CLoopPreprocessor::Load(IStream *pStream)
 			ASSERT_RESOURCE_ALLOCATION("ELI24138", m_ipCondition != __nullptr);
 		}
 
+		if (nDataVersion >= 2)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 		return S_OK;
@@ -497,6 +513,9 @@ STDMETHODIMP CLoopPreprocessor::Save(IStream *pStream, BOOL fClearDirty)
 			ASSERT_RESOURCE_ALLOCATION("ELI24143", ipObj != __nullptr);
 			writeObjectToStream(ipObj, pStream, "ELI24144", fClearDirty);
 		}
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -775,6 +794,24 @@ STDMETHODIMP CLoopPreprocessor::put_LoopType( ELoopType newVal)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI24163");
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CLoopPreprocessor::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33548")
 }
 
 //-------------------------------------------------------------------------------------------------

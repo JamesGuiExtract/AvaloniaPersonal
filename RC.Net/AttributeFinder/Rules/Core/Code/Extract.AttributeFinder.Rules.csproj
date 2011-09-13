@@ -76,6 +76,7 @@
     <Compile Include="DuplicateAndSeparateTreesSettingsDialog.Designer.cs">
       <DependentUpon>DuplicateAndSeparateTreesSettingsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="IdentifiableRuleObject.cs" />
     <Compile Include="NumericSequencer.cs" />
     <Compile Include="NumericRange.cs">
       <DependentUpon>NumericSequencer.cs</DependentUpon>

@@ -8,11 +8,13 @@
 #include <COMUtils.h>
 #include <ComponentLicenseIDs.h>
 #include <cpputil.h>
+#include <RuleSetProfiler.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 2;
+// Version 3: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 3;
 
 //-------------------------------------------------------------------------------------------------
 // COutputHandlerSequence
@@ -107,7 +109,7 @@ STDMETHODIMP COutputHandlerSequence::raw_ProcessOutput(IIUnknownVector* pAttribu
 		{
 			// get the outputhandler object-with-description 
 			// at the current position
-			IObjectWithDescriptionPtr ipObj = m_ipOutputHandlers->At(i);;
+			IObjectWithDescriptionPtr ipObj = m_ipOutputHandlers->At(i);
 			ASSERT_RESOURCE_ALLOCATION("ELI08447", ipObj != __nullptr);
 
 			// Check state and use this Output Handler only if Enabled
@@ -124,6 +126,8 @@ STDMETHODIMP COutputHandlerSequence::raw_ProcessOutput(IIUnknownVector* pAttribu
 				// get the output handler inside the object-with-description
 				IOutputHandlerPtr ipOutputHandler = ipObj->Object;
 				ASSERT_RESOURCE_ALLOCATION("ELI08101", ipOutputHandler != __nullptr);
+
+				PROFILE_RULE_OBJECT(asString(ipObj->Description), "", ipOutputHandler, 0)
 
 				// process this output handler, passing in the 
 				// subprogress object if it is available
@@ -318,6 +322,12 @@ STDMETHODIMP COutputHandlerSequence::Load(IStream *pStream)
 			ASSERT_RESOURCE_ALLOCATION("ELI08128", m_ipOutputHandlers != __nullptr);
 		}
 
+		if (nDataVersion >= 3)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -353,6 +363,9 @@ STDMETHODIMP COutputHandlerSequence::Save(IStream *pStream, BOOL fClearDirty)
 			throw UCLIDException("ELI08127", "IIUnknownVector component does not support persistence!");
 		}
 		writeObjectToStream(ipObj, pStream, "ELI09913", fClearDirty);
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -495,6 +508,24 @@ STDMETHODIMP COutputHandlerSequence::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	}
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COutputHandlerSequence::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33527")
 }
 
 //-------------------------------------------------------------------------------------------------

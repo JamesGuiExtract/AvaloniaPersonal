@@ -5,7 +5,7 @@
 #include "AFSelectors.h"
 
 #include <AFCategories.h>
-
+#include <IdentifiableRuleObject.h>
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
@@ -24,7 +24,9 @@ class ATL_NO_VTABLE CDataScorerBasedAS :
 	public IDispatchImpl<ICopyableObject, &__uuidof(ICopyableObject), &LIBID_UCLID_COMUTILSLib, /* wMajor = */ 1>,
 	public IDispatchImpl<ILicensedComponent, &__uuidof(ILicensedComponent), &LIBID_UCLID_COMLMLib, /* wMajor = */ 1>,
 	public ISpecifyPropertyPagesImpl<CDataScorerBasedAS>,
-	public IDispatchImpl<IMustBeConfiguredObject, &__uuidof(IMustBeConfiguredObject), &LIBID_UCLID_COMUTILSLib, /* wMajor = */ 1>
+	public IDispatchImpl<IMustBeConfiguredObject, &__uuidof(IMustBeConfiguredObject), &LIBID_UCLID_COMUTILSLib, /* wMajor = */ 1>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CDataScorerBasedAS();
@@ -43,6 +45,7 @@ public:
 		COM_INTERFACE_ENTRY(ILicensedComponent)
 		COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
 		COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
+		COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 	END_COM_MAP()
 
 	BEGIN_CATEGORY_MAP(CDataScorerBasedAS)
@@ -107,6 +110,9 @@ public:
 	STDMETHOD(put_SecondScoreToCompare)(long newVal);
 	STDMETHOD(get_AndSecondCondition)(VARIANT_BOOL* pVal);
 	STDMETHOD(put_AndSecondCondition)(VARIANT_BOOL newVal);
+
+	// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 	//////////

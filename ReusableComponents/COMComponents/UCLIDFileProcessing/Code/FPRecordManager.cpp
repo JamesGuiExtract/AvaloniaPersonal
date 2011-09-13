@@ -885,7 +885,7 @@ void FPRecordManager::computeSleepIntervals()
 			nMaxSleepTime = nClosest;
 		}
 
-		if (nMinSleepTime > nMaxSleepTime || nMaxSleepTime - nMinSleepTime < 100)
+		if (nMinSleepTime > nMaxSleepTime || nMinSleepTime < 100)
 		{
 			UCLIDException ue("ELI32570",
 				"Invalid min and max sleep times specified in database. Using default values.");

@@ -79,7 +79,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\APIs\SafeNetUltraPro\Inc;..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code;..\..\AFUtils\Code;..\..\..\..\ReusableComponents\VendorSpecificUtils\UltimateGrid\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_LINK_TO_UG_IN_EXTDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_LINK_TO_UG_IN_EXTDLL;EXPORT_AFCORE_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -132,7 +132,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\APIs\SafeNetUltraPro\Inc;..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code;..\..\AFUtils\Code;..\..\..\..\ReusableComponents\VendorSpecificUtils\UltimateGrid\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_LINK_TO_UG_IN_EXTDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_LINK_TO_UG_IN_EXTDLL;EXPORT_AFCORE_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -278,6 +278,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="RuleSetProfiler.cpp" />
     <ClCompile Include="RulesetPropertiesDlg.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -340,6 +341,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="IdentifiableRuleObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AFCore.def" />
@@ -399,6 +401,7 @@
     <ClInclude Include="AttributeRule.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="ConditionalRulePP.h" />
+    <ClInclude Include="Export.h" />
     <ClInclude Include="msword9.h" />
     <ClInclude Include="RequiredInterfaces.h" />
     <ClInclude Include="Resource.h" />
@@ -407,6 +410,7 @@
     <ClInclude Include="RuleGrid.h" />
     <ClInclude Include="RuleSet.h" />
     <ClInclude Include="RuleSetEditor.h" />
+    <ClInclude Include="RuleSetProfiler.h" />
     <ClInclude Include="RulesetPropertiesDlg.h" />
     <ClInclude Include="RuleTesterDlg.h" />
     <ClInclude Include="RuleTesterUI.h" />
@@ -417,6 +421,7 @@
     <ClInclude Include="TesterDlgInputPage.h" />
     <ClInclude Include="TesterDlgRulesetPage.h" />
     <ClInclude Include="TesterDlgSettingsPage.h" />
+    <ClInclude Include="IdentifiableRuleObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.csproj">

@@ -10,6 +10,7 @@
 #include <common.h>
 #include <CachedObjectFromFile.h>
 #include <RegExLoader.h>
+#include <IdentifiableRuleObject.h>
 
 #include <string>
 
@@ -31,7 +32,9 @@ class ATL_NO_VTABLE CEntityFinder :
 	public IDispatchImpl<IEntityFinder, &IID_IEntityFinder, &LIBID_UCLID_AFUTILSLib>,
 	public IDispatchImpl<ICategorizedComponent, &IID_ICategorizedComponent, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
-	public IPersistStream
+	public IPersistStream,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CEntityFinder();
@@ -50,6 +53,7 @@ BEGIN_COM_MAP(CEntityFinder)
 	COM_INTERFACE_ENTRY(ICategorizedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IPersistStream)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_CATEGORY_MAP(CEntityFinder)
@@ -84,6 +88,9 @@ public:
 	STDMETHOD(Load)(IStream *pStm);
 	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 

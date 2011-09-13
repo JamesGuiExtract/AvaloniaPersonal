@@ -6,6 +6,7 @@
 #include "..\..\AFCore\Code\AFCategories.h"
 
 #include <MiscLeadUtils.h>
+#include <IdentifiableRuleObject.h>
 
 #include <string>
 #include <vector>
@@ -26,7 +27,9 @@ class ATL_NO_VTABLE CSelectPageRegion :
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IPersistStream,
-	public ISpecifyPropertyPagesImpl<CSelectPageRegion>
+	public ISpecifyPropertyPagesImpl<CSelectPageRegion>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CSelectPageRegion();
@@ -48,6 +51,7 @@ BEGIN_COM_MAP(CSelectPageRegion)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CSelectPageRegion)
@@ -127,6 +131,9 @@ public:
 // ICopyableObject
 	STDMETHOD(raw_Clone)(/*[out, retval]*/ IUnknown* *pObject);
 	STDMETHOD(raw_CopyFrom)(/*[in]*/ IUnknown *pObject);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 

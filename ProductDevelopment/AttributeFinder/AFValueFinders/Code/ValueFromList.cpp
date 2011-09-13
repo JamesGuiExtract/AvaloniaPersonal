@@ -16,7 +16,8 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 2: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CValueFromList
@@ -567,6 +568,12 @@ STDMETHODIMP CValueFromList::Load(IStream *pStream)
 			m_ipValueList = ipObj;
 		}
 
+		if (nDataVersion >= 2)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -608,6 +615,9 @@ STDMETHODIMP CValueFromList::Save(IStream *pStream, BOOL fClearDirty)
 			::writeObjectToStream( ipPersistentObj, pStream, "ELI09924", fClearDirty );
 		}
 
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
+
 		// Clear the flag as specified
 		if (fClearDirty)
 		{
@@ -622,6 +632,24 @@ STDMETHODIMP CValueFromList::Save(IStream *pStream, BOOL fClearDirty)
 STDMETHODIMP CValueFromList::GetSizeMax(ULARGE_INTEGER *pcbSize)
 {
 	return E_NOTIMPL;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CValueFromList::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33578")
 }
 
 //-------------------------------------------------------------------------------------------------

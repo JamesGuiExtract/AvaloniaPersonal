@@ -5,6 +5,7 @@
 
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
+#include <IdentifiableRuleObject.h>
 
 #include <string>
 #include <vector>
@@ -22,7 +23,9 @@ class ATL_NO_VTABLE CRemoveSpatialInfo :
 	public IDispatchImpl<IOutputHandler, &IID_IOutputHandler, &LIBID_UCLID_AFCORELib>,
 	public IDispatchImpl<ICategorizedComponent, &IID_ICategorizedComponent, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
-	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>
+	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CRemoveSpatialInfo();
@@ -43,6 +46,7 @@ BEGIN_COM_MAP(CRemoveSpatialInfo)
 	COM_INTERFACE_ENTRY(ICategorizedComponent)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_CATEGORY_MAP(CRemoveSpatialInfo)
@@ -83,6 +87,10 @@ END_CATEGORY_MAP()
 // ICopyableObject
 	STDMETHOD(raw_Clone)(/*[out, retval]*/ IUnknown* *pObject);
 	STDMETHOD(raw_CopyFrom)(/*[in]*/ IUnknown *pObject);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
+
 private:
 
 	bool m_bDirty;

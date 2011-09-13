@@ -8,11 +8,13 @@
 #include <COMUtils.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
+#include <RuleSetProfiler.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 2: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CQueryBasedAS
@@ -104,6 +106,12 @@ STDMETHODIMP CQueryBasedAS::Load(IStream * pStream)
 		// load data here
 		dataReader >> m_strQueryText;
 
+		if (nDataVersion >= 2)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 
@@ -133,6 +141,9 @@ STDMETHODIMP CQueryBasedAS::Save(IStream * pStream, BOOL fClearDirty)
 		long nDataLength = data.getLength();
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -164,6 +175,11 @@ STDMETHODIMP CQueryBasedAS::raw_SelectAttributes(IIUnknownVector * pAttrIn, IAFD
 	{
 		// validate license
 		validateLicense();
+
+		// Ordinarily, the parent object will make this call for the child to limit the number of
+		// places where this call is needed. Selectors and scorers, however, make this call on
+		// themselves.
+		PROFILE_RULE_OBJECT("", asString(GetComponentDescription()), this, 0)
 
 		IIUnknownVectorPtr ipAttributes(pAttrIn);
 		ASSERT_RESOURCE_ALLOCATION("ELI13318", ipAttributes != __nullptr);
@@ -314,6 +330,24 @@ STDMETHODIMP CQueryBasedAS::raw_IsConfigured(VARIANT_BOOL * bConfigured)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13346");
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CQueryBasedAS::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33552")
 }
 
 //-------------------------------------------------------------------------------------------------

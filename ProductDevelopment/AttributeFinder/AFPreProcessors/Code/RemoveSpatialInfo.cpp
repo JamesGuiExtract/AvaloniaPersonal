@@ -13,7 +13,8 @@
 #include <ComponentLicenseIDs.h>
 
 // current version
-const unsigned long gnCurrentVersion = 1;
+// Version 2: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CRemoveSpatialInfo
@@ -183,6 +184,12 @@ STDMETHODIMP CRemoveSpatialInfo::Load(IStream *pStream)
 			ue.addDebugInfo("Version to Load", nDataVersion);
 			throw ue;
 		}
+
+		if (nDataVersion >= 2)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
 		
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
@@ -213,6 +220,9 @@ STDMETHODIMP CRemoveSpatialInfo::Save(IStream *pStream, BOOL fClearDirty)
 		long nDataLength = data.getLength();
 		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
 		pStream->Write(data.getData(), nDataLength, NULL);
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -313,6 +323,24 @@ STDMETHODIMP CRemoveSpatialInfo::raw_Clone(IUnknown* *pObject)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10050");
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRemoveSpatialInfo::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33549")
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -8,11 +8,13 @@
 #include <COMUtils.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
+#include <RuleSetProfiler.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 2: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CDataScorerBasedAS
@@ -135,6 +137,12 @@ STDMETHODIMP CDataScorerBasedAS::Load(IStream * pStream)
 		ASSERT_RESOURCE_ALLOCATION("ELI29280", ipObj != __nullptr);
 		m_ipDataScorer = ipObj;
 
+		if (nDataVersion >= 2)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 
@@ -189,6 +197,9 @@ STDMETHODIMP CDataScorerBasedAS::Save(IStream * pStream, BOOL fClearDirty)
 			throw UCLIDException("ELI29282", "Data Scorer object does not support persistence.");
 		}
 		writeObjectToStream(ipObj, pStream, "ELI29283", fClearDirty);
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 		
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -219,6 +230,11 @@ STDMETHODIMP CDataScorerBasedAS::raw_SelectAttributes(IIUnknownVector * pAttrIn,
 	{
 		// validate license
 		validateLicense();
+
+		// Ordinarily, the parent object will make this call for the child to limit the number of
+		// places where this call is needed. Selectors and scorers, however, make this call on
+		// themselves.
+		PROFILE_RULE_OBJECT("", asString(GetComponentDescription()), this, 0)
 
 		// Put input vector into smart pointer and validate the arguments that are used.
 		IIUnknownVectorPtr ipIn( pAttrIn);
@@ -704,6 +720,24 @@ STDMETHODIMP CDataScorerBasedAS::put_AndSecondCondition(VARIANT_BOOL newVal)
 		return S_OK;
 	}			
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29278");
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CDataScorerBasedAS::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33551")
 }
 
 //-------------------------------------------------------------------------------------------------

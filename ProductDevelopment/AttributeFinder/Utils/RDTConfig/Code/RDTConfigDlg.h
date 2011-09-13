@@ -35,6 +35,7 @@ public:
 	BOOL	m_bDisplaySRWPercent;
 	BOOL	m_bAutoOpenImage;
 	BOOL	m_bAutoExpandAttribute;
+	BOOL	m_bEnableProfiling;
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
@@ -148,6 +149,10 @@ private:
 	// Gets and sets the auto expand attribute feature of the rule tester
 	bool	getAutoExpandAttributes();
 	void	setAutoExpandAttributes(bool bNewSetting);
+
+	// Gets and sets whether ruleset profiling is enabled.
+	bool	getEnableProfiling();
+	void	setEnableProfiling(bool bNewSetting);
 
 	// Return the string for the command line to use to diff the files. The user can specify
 	// any program they want to use, replacing the file names with the placeholders %1 and %2. 

@@ -18,7 +18,18 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 2;
+// Version 1:
+//   * Saved: 
+//            data version,
+//            case-sensitivity flag,
+//            collection of Closest Value strings
+// Version 2:
+//   * Additionally saved:
+//            forced match flag
+//   * NOTE:
+//            new flag located immediately after Case Sensitive flag
+// Version 3: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 3;
 
 // Minimum match score to allow automatic replacement
 const double gMATCH_THRESHOLD = 70;
@@ -470,17 +481,6 @@ STDMETHODIMP CTranslateToClosestValueInList::IsDirty(void)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-// NOTES about versions:
-// Version 1:
-//   * Saved: 
-//            data version,
-//            case-sensitivity flag,
-//            collection of Closest Value strings
-// Version 2:
-//   * Additionally saved:
-//            forced match flag
-//   * NOTE:
-//            new flag located immediately after Case Sensitive flag
 STDMETHODIMP CTranslateToClosestValueInList::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -537,6 +537,12 @@ STDMETHODIMP CTranslateToClosestValueInList::Load(IStream *pStream)
 
 		m_ipClosestValuesList = ipObj;
 
+		if (nDataVersion >= 3)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -545,8 +551,6 @@ STDMETHODIMP CTranslateToClosestValueInList::Load(IStream *pStream)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-// Version 2:
-//    Added m_bForceMatch
 STDMETHODIMP CTranslateToClosestValueInList::Save(IStream *pStream, BOOL fClearDirty)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -581,6 +585,9 @@ STDMETHODIMP CTranslateToClosestValueInList::Save(IStream *pStream, BOOL fClearD
 			::writeObjectToStream(ipObj, pStream, "ELI09926", fClearDirty);
 		}
 
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
+
 		// Clear the flag as specified
 		if (fClearDirty)
 		{
@@ -595,6 +602,24 @@ STDMETHODIMP CTranslateToClosestValueInList::Save(IStream *pStream, BOOL fClearD
 STDMETHODIMP CTranslateToClosestValueInList::GetSizeMax(ULARGE_INTEGER *pcbSize)
 {
 	return E_NOTIMPL;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CTranslateToClosestValueInList::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33592")
 }
 
 //-------------------------------------------------------------------------------------------------

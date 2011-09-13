@@ -12,13 +12,15 @@
 #include <ByteStreamManipulator.h>
 #include <Misc.h>
 #include <ComponentLicenseIDs.h>
+#include <RuleSetProfiler.h>
 
 #include <io.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 2: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CConditionalPreprocessor
@@ -226,7 +228,12 @@ STDMETHODIMP CConditionalPreprocessor::raw_Process(IAFDocument* pAFDoc, IProgres
 				lPROGRESS_ITEMS_PER_PREPROCESSOR_CONDITION); 
 		}
 
-		bool bCondition = asCppBool( m_ipCondition->ProcessCondition(ipAFDoc) );
+		bool bCondition;
+		{
+			PROFILE_RULE_OBJECT("", "", m_ipCondition, 0)
+
+			bCondition = asCppBool( m_ipCondition->ProcessCondition(ipAFDoc) );
+		}
 
 		if(m_bInvertCondition)
 		{
@@ -245,6 +252,8 @@ STDMETHODIMP CConditionalPreprocessor::raw_Process(IAFDocument* pAFDoc, IProgres
 
 		if(bCondition)
 		{
+			PROFILE_RULE_OBJECT("", "", m_ipRule, 0)
+
 			// run this preprocessor and pass in the sub progress object 
 			// if the caller requested progress status updates
 			m_ipRule->Process(ipAFDoc, 
@@ -309,6 +318,12 @@ STDMETHODIMP CConditionalPreprocessor::Load(IStream *pStream)
 		readObjectFromStream(ipObj2, pStream, "ELI10841");
 		m_ipRule = ipObj2;
 
+		if (nDataVersion >= 2)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -347,6 +362,9 @@ STDMETHODIMP CConditionalPreprocessor::Save(IStream *pStream, BOOL fClearDirty)
 		ipObj = m_ipRule;
 		ASSERT_RESOURCE_ALLOCATION("ELI10844", ipObj != __nullptr);
 		writeObjectToStream(ipObj, pStream, "ELI10857", fClearDirty);
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -491,6 +509,24 @@ STDMETHODIMP CConditionalPreprocessor::raw_Clone(IUnknown* *pObject)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10850");
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CConditionalPreprocessor::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33546")
 }
 
 //-------------------------------------------------------------------------------------------------

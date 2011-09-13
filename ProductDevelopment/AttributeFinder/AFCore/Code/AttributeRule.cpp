@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "AFCore.h"
 #include "AttributeRule.h"
+#include "RuleSetProfiler.h"
 
 #include <UCLIDException.h>
 #include <COMUtils.h>
@@ -18,7 +19,8 @@ using namespace std;
 // History : m_bApplyModifyingRules is added in version 2
 //         : m_ipDocPreprocessor is added in version 3
 //		   : m_bIgnoreErrors, m_bIgnorePreprocessorErrors, m_bIgnoreModifierErrors: version 4
-const unsigned long gnCurrentVersion = 4;
+//		   : CIdentifiableRuleObject: version 5
+const unsigned long gnCurrentVersion = 5;
 const long nNUM_PROGRESS_ITEMS_PER_VALUE_MODIFYING_RULE = 1;
 
 //-------------------------------------------------------------------------------------------------
@@ -480,6 +482,9 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 								IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
 									__nullptr : ipProgressStatus->SubProgressStatus;
 
+								PROFILE_RULE_OBJECT(asString(m_ipDocPreprocessor->GetDescription()), "",
+									ipDocPreprocessor, 0)
+
 								// Execute the local attribute-level pre-processor rule
 								ipDocPreprocessor->Process(ipAFDocCopy, ipSubProgressStatus);
 							}
@@ -506,11 +511,16 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 						nNUM_PROGRESS_ITEMS_VALUE_FINDING_RULE);
 				}
 
-				// Find all possible values through current attribute finding rule,
-				// if the progress status is non-NULL pass in its sub progress object
-				IIUnknownVectorPtr ipOriginAttributes = m_ipAttributeFindingRule->ParseText(
-					ipAFDocCopy, (ipProgressStatus ? ipProgressStatus->SubProgressStatus : __nullptr) );
-				ASSERT_RESOURCE_ALLOCATION("ELI06034", ipOriginAttributes != __nullptr);
+				IIUnknownVectorPtr ipOriginAttributes;
+				{
+					PROFILE_RULE_OBJECT("", "", m_ipAttributeFindingRule, 0)
+
+					// Find all possible values through current attribute finding rule,
+					// if the progress status is non-NULL pass in its sub progress object
+					ipOriginAttributes = m_ipAttributeFindingRule->ParseText(
+						ipAFDocCopy, (ipProgressStatus ? ipProgressStatus->SubProgressStatus : __nullptr) );
+					ASSERT_RESOURCE_ALLOCATION("ELI06034", ipOriginAttributes != __nullptr);
+				}
 
 				// Start next item group if progress status was requested
 				if (ipProgressStatus)
@@ -532,6 +542,11 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 					ipSubProgressStatus->InitProgressStatus("Initializing value modifier rules",
 						0, nSize, VARIANT_FALSE);
 				}
+
+				// Do not add the "Attribute Modifiers" profiling object if there are no modifiers
+				// or there are no attributes.
+				PROFILE_RULE_OBJECT("Attribute Modifiers", "",
+					(m_bApplyModifyingRules  && nSize > 0) ? this : __nullptr, 1)
 
 				try
 				{
@@ -827,6 +842,12 @@ STDMETHODIMP CAttributeRule::Load(IStream *pStream)
 			m_ipDocPreprocessor = ipObj;
 		}
 
+		if (nDataVersion >= 5)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -893,6 +914,9 @@ STDMETHODIMP CAttributeRule::Save(IStream *pStream, BOOL fClearDirty)
 		}
 		writeObjectToStream( ipPersistentObj, pStream, "ELI09909", fClearDirty );
 
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
+
 		// Clear the flag as specified
 		if (fClearDirty)
 		{
@@ -937,6 +961,24 @@ STDMETHODIMP CAttributeRule::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	}
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttributeRule::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33607")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1070,6 +1112,8 @@ void CAttributeRule::executeModifyingRulesOnAttribute(UCLID_AFCORELib::IAttribut
 				}
 
 				UCLID_AFCORELib::IAFDocumentPtr ipOriginInput(pOriginInput);
+
+				PROFILE_RULE_OBJECT(asString(ipMRInfo->GetDescription()), "", ipModifyingRule, 0)
 
 				// modify the value, passing the sub-sub progress status if SubProgressStatus exists
 				ipModifyingRule->ModifyValue(ripAttribute, ipOriginInput, 

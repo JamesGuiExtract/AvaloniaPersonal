@@ -6,6 +6,8 @@
 #include "..\..\AFCore\Code\AFCategories.h"
 #include "ENSConfigMgr.h"
 
+#include <IdentifiableRuleObject.h>
+
 #include <string>
 #include <vector>
 using namespace std;
@@ -24,7 +26,9 @@ class ATL_NO_VTABLE CEntityNameSplitter :
 	public IDispatchImpl<ICategorizedComponent, &IID_ICategorizedComponent, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
-	public IDispatchImpl<IAttributeSplitter, &IID_IAttributeSplitter, &LIBID_UCLID_AFSPLITTERSLib>
+	public IDispatchImpl<IAttributeSplitter, &IID_IAttributeSplitter, &LIBID_UCLID_AFSPLITTERSLib>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CEntityNameSplitter();
@@ -44,6 +48,7 @@ BEGIN_COM_MAP(CEntityNameSplitter)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(ICategorizedComponent)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 //BEGIN_PROP_MAP(CEntityNameSplitter)
@@ -82,6 +87,9 @@ public:
 // IEntityNameSplitter
 	STDMETHOD(get_EntityAliasChoice)(/*[out, retval]*/ EEntityAliasChoice *pChoice);
 	STDMETHOD(put_EntityAliasChoice)(/*[in]*/ EEntityAliasChoice newChoice);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 	///////

@@ -5,6 +5,8 @@
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
 
+#include <IdentifiableRuleObject.h>
+
 /////////////////////////////////////////////////////////////////////////////
 // CPersonNameSplitter
 // Splits a human name into Title, First, Middle, Last, and Suffix
@@ -17,7 +19,9 @@ class ATL_NO_VTABLE CPersonNameSplitter :
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<IAttributeSplitter, &IID_IAttributeSplitter, &LIBID_UCLID_AFSPLITTERSLib>,
-	public IDispatchImpl<IPersonNameSplitter, &IID_IPersonNameSplitter, &LIBID_UCLID_AFSPLITTERSLib>
+	public IDispatchImpl<IPersonNameSplitter, &IID_IPersonNameSplitter, &LIBID_UCLID_AFSPLITTERSLib>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CPersonNameSplitter();
@@ -36,6 +40,7 @@ BEGIN_COM_MAP(CPersonNameSplitter)
 	COM_INTERFACE_ENTRY(ICategorizedComponent)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(IPersonNameSplitter)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_CATEGORY_MAP(CPersonNameSplitter)
@@ -70,6 +75,9 @@ public:
 // IPersonNameSplitter
 	STDMETHOD(BuildAttribute)(BSTR strParentName, BSTR strTitle, BSTR strFirst, BSTR strMiddle, 
 		BSTR strLast, BSTR strSuffix, VARIANT_BOOL bAutoBuildParent, IAttribute* *pVal);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 	// flag to keep track of whether object is dirty

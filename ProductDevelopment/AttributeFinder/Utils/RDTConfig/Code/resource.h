@@ -19,8 +19,10 @@
 #define IDC_CHECK_ENDSLOG               1008
 #define IDC_EDIT_DIFF_COMMAND_LINE      1009
 #define IDC_CHECK_SRW_PERCENT           1010
-#define IDC_CHECK_AUTOOPENIMAGE			1011
-#define IDC_CHECK_AUTOEXPAND			1012
+#define IDC_CHECK_AUTOOPENIMAGE         1011
+#define IDC_CHECK_AUTOEXPAND            1012
+#define IDC_CHECK_AUTOEXPAND2           1013
+#define IDC_CHECK_ENABLE_PROFILING      1013
 
 // Next default values for new objects
 // 

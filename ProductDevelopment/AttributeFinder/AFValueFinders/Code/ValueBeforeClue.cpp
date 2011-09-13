@@ -12,7 +12,14 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 3;
+// Version == 2
+//   Added m_bStopForOther
+//   Added m_strStops
+// Version == 3
+//   Added m_bClueToStringAsRegExpr
+//   Removed m_strLimitingRegExpr
+// Version 4: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 4;
 
 //-------------------------------------------------------------------------------------------------
 // CValueBeforeClue
@@ -894,33 +901,6 @@ STDMETHODIMP CValueBeforeClue::IsDirty(void)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-// NOTES about versions:
-// Version 1:
-//   * Saved: 
-//            data version,
-//            case-sensitivity flag,
-//            clue is regular expression flag,
-//            refining type enumeration,
-//            number of words,
-//            string of punctuation characters
-//            stop at new line flag,
-//            number of lines,
-//            include clue line flag,
-//            limiting string,
-//            limiting regular expression
-// Version 2:
-//   * Additionally saved:
-//            stop for other characters flag
-//            string of other stop characters
-//   * NOTE:
-//            two new items located immediately after Stop At New Line flag
-// Version 3:
-//   * Additionally saved:
-//            clue to string is regular expression flag,
-//   * Removed:
-//            limiting regular expression
-//   * NOTE:
-//            new item located immediately after limiting string
 STDMETHODIMP CValueBeforeClue::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -1022,6 +1002,12 @@ STDMETHODIMP CValueBeforeClue::Load(IStream *pStream)
 			m_ipClues = ipObj;
 		}
 
+		if (nDataVersion >= 4)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -1030,12 +1016,6 @@ STDMETHODIMP CValueBeforeClue::Load(IStream *pStream)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-// Version == 2
-//   Added m_bStopForOther
-//   Added m_strStops
-// Version == 3
-//   Added m_bClueToStringAsRegExpr
-//   Removed m_strLimitingRegExpr
 STDMETHODIMP CValueBeforeClue::Save(IStream *pStream, BOOL fClearDirty)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -1085,6 +1065,9 @@ STDMETHODIMP CValueBeforeClue::Save(IStream *pStream, BOOL fClearDirty)
 			::writeObjectToStream( ipObj, pStream, "ELI09923", fClearDirty );
 		}
 
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
+
 		// Clear the flag as specified
 		if (fClearDirty)
 		{
@@ -1099,6 +1082,24 @@ STDMETHODIMP CValueBeforeClue::Save(IStream *pStream, BOOL fClearDirty)
 STDMETHODIMP CValueBeforeClue::GetSizeMax(ULARGE_INTEGER *pcbSize)
 {
 	return E_NOTIMPL;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CValueBeforeClue::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33577")
 }
 
 //-------------------------------------------------------------------------------------------------

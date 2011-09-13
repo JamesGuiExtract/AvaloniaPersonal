@@ -10,7 +10,19 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 2;
+// Version 1:
+//   * Saved: 
+//            data version,
+//            start position of extraction,
+//            end position of extraction,
+//            whether or not to accept a smaller length
+// Version 2:
+//   * Additionally saved:
+//            whether or not characters are being extracted or removed
+//   * NOTE:
+//            Position information used in Version 1 for extraction is now also used for removal
+// Version 3: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 3;
 
 //-------------------------------------------------------------------------------------------------
 // CLimitAsMidPart
@@ -443,18 +455,6 @@ STDMETHODIMP CLimitAsMidPart::IsDirty(void)
 	return m_bDirty ? S_OK : S_FALSE;
 }
 //-------------------------------------------------------------------------------------------------
-// NOTES about versions:
-// Version 1:
-//   * Saved: 
-//            data version,
-//            start position of extraction,
-//            end position of extraction,
-//            whether or not to accept a smaller length
-// Version 2:
-//   * Additionally saved:
-//            whether or not characters are being extracted or removed
-//   * NOTE:
-//            Position information used in Version 1 for extraction is now also used for removal
 STDMETHODIMP CLimitAsMidPart::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -504,6 +504,12 @@ STDMETHODIMP CLimitAsMidPart::Load(IStream *pStream)
 			dataReader >> m_bExtract;
 		}
 
+		if (nDataVersion >= 3)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -512,8 +518,6 @@ STDMETHODIMP CLimitAsMidPart::Load(IStream *pStream)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-// Version == 2
-//   Added m_bExtract
 STDMETHODIMP CLimitAsMidPart::Save(IStream *pStream, BOOL fClearDirty)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -538,6 +542,9 @@ STDMETHODIMP CLimitAsMidPart::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
 
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
+
 		// Clear the flag as specified
 		if (fClearDirty)
 		{
@@ -552,6 +559,24 @@ STDMETHODIMP CLimitAsMidPart::Save(IStream *pStream, BOOL fClearDirty)
 STDMETHODIMP CLimitAsMidPart::GetSizeMax(ULARGE_INTEGER *pcbSize)
 {
 	return E_NOTIMPL;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CLimitAsMidPart::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33584")
 }
 
 //-------------------------------------------------------------------------------------------------

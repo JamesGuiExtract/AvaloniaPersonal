@@ -6,6 +6,7 @@
 
 #include <CachedObjectFromFile.h>
 #include <RegExLoader.h>
+#include <IdentifiableRuleObject.h>
 
 #include <string>
 #include <vector>
@@ -89,7 +90,9 @@ class ATL_NO_VTABLE CMicrFinder :
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib, 1>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib, 1>,
 	public IPersistStream,
-	public ISpecifyPropertyPagesImpl<CMicrFinder>
+	public ISpecifyPropertyPagesImpl<CMicrFinder>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CMicrFinder();
@@ -109,6 +112,7 @@ BEGIN_COM_MAP(CMicrFinder)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 	BEGIN_PROP_MAP(CMicrFinder)
@@ -161,6 +165,9 @@ public:
 	STDMETHOD(put_Rotate180)(VARIANT_BOOL newVal);
 	STDMETHOD(get_Rotate270)(VARIANT_BOOL *pVal);
 	STDMETHOD(put_Rotate270)(VARIANT_BOOL newVal);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 	bool m_bDirty;

@@ -116,6 +116,7 @@ void CRDTConfigDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_AUTOOPENIMAGE, m_bAutoOpenImage);
 	DDX_Text(pDX, IDC_EDIT_DIFF_COMMAND_LINE, m_zDiffCommandLine);
 	DDX_Check(pDX, IDC_CHECK_AUTOEXPAND, m_bAutoExpandAttribute);
+	DDX_Check(pDX, IDC_CHECK_ENABLE_PROFILING, m_bEnableProfiling);
 	//}}AFX_DATA_MAP
 }
 //-------------------------------------------------------------------------------------------------
@@ -259,6 +260,8 @@ void CRDTConfigDlg::OnDefaults()
 
 	// Auto expand attributes is FALSE
 	m_bAutoExpandAttribute = FALSE;
+
+	m_bEnableProfiling = FALSE;
 
 	// Set default for prefix
 	int iIndex = m_comboPrefix.FindString( -1, gstrEMPTY_DEFAULT.c_str() );
@@ -491,6 +494,8 @@ void CRDTConfigDlg::getRegistrySettings()
 
 	m_bAutoExpandAttribute = asMFCBool(getAutoExpandAttributes());
 
+	m_bEnableProfiling = asMFCBool(getEnableProfiling());
+
 	// Load MRU list items
 	loadMRUListItems();
 
@@ -642,6 +647,21 @@ bool CRDTConfigDlg::getAutoExpandAttributes()
 		DEFAULT_AUTOEXPANDATTRIBUTES));
 }
 //-------------------------------------------------------------------------------------------------
+bool CRDTConfigDlg::getEnableProfiling()
+{
+	if (!ma_pSettingsCfgMgr->keyExists(SETTINGS_SECTION, gstrAF_PROFILE_RULES_KEY))
+	{
+		ma_pSettingsCfgMgr->createKey(SETTINGS_SECTION, gstrAF_PROFILE_RULES_KEY,
+			gstrAF_DEFAULT_PROFILE_RULES);
+		return asCppBool(gstrAF_DEFAULT_PROFILE_RULES);
+	}
+
+	string strValue = ma_pSettingsCfgMgr->getKeyValue(SETTINGS_SECTION, gstrAF_PROFILE_RULES_KEY,
+		gstrAF_DEFAULT_PROFILE_RULES);
+
+	return asCppBool(strValue);
+}
+//-------------------------------------------------------------------------------------------------
 void CRDTConfigDlg::loadMRUListItems()
 {
 	////////////////////
@@ -734,6 +754,8 @@ void CRDTConfigDlg::saveRegistrySettings()
 	setAutoOpenImage(asCppBool(m_bAutoOpenImage));
 
 	setAutoExpandAttributes(asCppBool(m_bAutoExpandAttribute));
+
+	setEnableProfiling(asCppBool(m_bEnableProfiling));
 
 	////////////////////////////////////////////
 	// Write selected combobox items to registry
@@ -875,3 +897,10 @@ void CRDTConfigDlg::setAutoExpandAttributes(bool bNewSetting)
 		bNewSetting ? "1" : "0");
 }
 //-------------------------------------------------------------------------------------------------
+void CRDTConfigDlg::setEnableProfiling(bool bNewSetting)
+{
+	ma_pSettingsCfgMgr->setKeyValue(SETTINGS_SECTION, gstrAF_PROFILE_RULES_KEY,
+		bNewSetting ? "1" : "0");
+}
+//-------------------------------------------------------------------------------------------------
+

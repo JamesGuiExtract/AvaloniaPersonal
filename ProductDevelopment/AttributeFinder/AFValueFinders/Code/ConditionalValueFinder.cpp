@@ -12,13 +12,15 @@
 #include <ByteStreamManipulator.h>
 #include <Misc.h>
 #include <ComponentLicenseIDs.h>
+#include <RuleSetProfiler.h>
 
 #include <io.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 2: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CConditionalValueFinder
@@ -227,8 +229,13 @@ STDMETHODIMP CConditionalValueFinder::raw_ParseText(IAFDocument* pAFDoc, IProgre
 			ipProgressStatus->StartNextItemGroup("Processing value finder condition",
 				lPROGRESS_ITEMS_PER_CONDITION); 
 		}
-		
-		bool bCondition = asCppBool( m_ipCondition->ProcessCondition(ipAFDoc) );
+
+		bool bCondition;
+		{
+			PROFILE_RULE_OBJECT("", "", m_ipCondition, 0)
+
+			bCondition = asCppBool( m_ipCondition->ProcessCondition(ipAFDoc) );
+		}
 
 		if(m_bInvertCondition)
 		{
@@ -246,6 +253,8 @@ STDMETHODIMP CConditionalValueFinder::raw_ParseText(IAFDocument* pAFDoc, IProgre
 		
 		if(bCondition)
 		{
+			PROFILE_RULE_OBJECT("", "", m_ipRule, 0)
+
 			// parse the text passing in the sub progress object if it exists
 			ipAttributes = m_ipRule->ParseText(ipAFDoc, 
 				(ipProgressStatus ? ipProgressStatus->SubProgressStatus : NULL) );
@@ -316,6 +325,12 @@ STDMETHODIMP CConditionalValueFinder::Load(IStream *pStream)
 		readObjectFromStream(ipObj2, pStream, "ELI10744");
 		m_ipRule = ipObj2;
 
+		if (nDataVersion >= 2)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -354,6 +369,9 @@ STDMETHODIMP CConditionalValueFinder::Save(IStream *pStream, BOOL fClearDirty)
 		ipObj = m_ipRule;
 		ASSERT_RESOURCE_ALLOCATION("ELI10741", ipObj != __nullptr);
 		writeObjectToStream(ipObj, pStream, "ELI10742", fClearDirty);
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -498,6 +516,24 @@ STDMETHODIMP CConditionalValueFinder::raw_Clone(IUnknown* *pObject)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10737");
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CConditionalValueFinder::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33565")
 }
 
 //-------------------------------------------------------------------------------------------------

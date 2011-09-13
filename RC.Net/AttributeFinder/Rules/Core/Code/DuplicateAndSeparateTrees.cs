@@ -21,8 +21,9 @@ namespace Extract.AttributeFinder.Rules
     [ComVisible(true)]
     [Guid("C2241B09-F2CA-4DEA-B12B-91620343BB5E")]
     [CLSCompliant(false)]
-    public interface IDuplicateAndSeparateTrees : IOutputHandler, ICategorizedComponent, IConfigurableObject,
-        ICopyableObject, ILicensedComponent, IPersistStream, IMustBeConfiguredObject
+    public interface IDuplicateAndSeparateTrees : IOutputHandler, ICategorizedComponent,
+        IConfigurableObject, ICopyableObject, ILicensedComponent, IPersistStream,
+        IMustBeConfiguredObject, IIdentifiableRuleObject
     {
 
         /// <summary>
@@ -62,7 +63,7 @@ namespace Extract.AttributeFinder.Rules
     [ComVisible(true)]
     [Guid("DC265266-BFDE-4D45-AF91-CFEA253040E2")]
     [CLSCompliant(false)]
-    public class DuplicateAndSeparateTrees : IDuplicateAndSeparateTrees
+    public class DuplicateAndSeparateTrees : IdentifiableRuleObject, IDuplicateAndSeparateTrees
     {
         #region Constants
 
@@ -73,8 +74,10 @@ namespace Extract.AttributeFinder.Rules
 
         /// <summary>
         /// Current version.
+        /// <para><b>Version 2</b></para>
+        /// Added IdentifiableRuleObject inheritance
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -430,6 +433,12 @@ namespace Extract.AttributeFinder.Rules
                 {
                     AttributeSelector = reader.ReadIPersistStream() as IAttributeSelector;
                     DividingAttributeName = reader.ReadString();
+
+                    if (reader.Version >= 2)
+                    {
+                        // Load the GUID for the IIdentifiableRuleObject interface.
+                        LoadGuid(stream);
+                    }
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -462,6 +471,9 @@ namespace Extract.AttributeFinder.Rules
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
                 }
+
+                // Save the GUID for the IIdentifiableRuleObject interface.
+                SaveGuid(stream);
 
                 if (clearDirty)
                 {

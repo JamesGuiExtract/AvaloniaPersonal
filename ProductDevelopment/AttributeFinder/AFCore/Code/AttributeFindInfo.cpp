@@ -3,6 +3,7 @@
 #include "AFCore.h"
 #include "AFInternalUtils.h"
 #include "AttributeFindInfo.h"
+#include "RuleSetProfiler.h"
 
 #include <UCLIDException.h>
 #include <COMUtils.h>
@@ -13,8 +14,25 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
+// Version 1:
+//   * Saved: 
+//            data version,
+//            whether or not to stop searching when a value was found
+//            collection of Attribute Rules
+//            collection of Ignore list strings
+//            Input Validator object with description
+// Version 2:
+//   * Additionally saved:
+//            Attribute Splitter object with description
+// Version 3:
+//   * Additionally saved:
+//            Document Preprocessor object with description
+// Version 4:
+//   * Removed from save:
+//            collection of Ignore list strings
 // Version 6: Added IgnoreAttributeSplitterErrors
-const unsigned long gnCurrentVersion = 6;
+// Version 7: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 7;
 
 //-------------------------------------------------------------------------------------------------
 // CAttributeFindInfo
@@ -255,6 +273,9 @@ STDMETHODIMP CAttributeFindInfo::ExecuteRulesOnText(IAFDocument* pAFDoc,
 					IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
 						__nullptr : ipProgressStatus->SubProgressStatus;
 
+					PROFILE_RULE_OBJECT(asString(ipAttributeRule->GetDescription()), "Finding rule",
+						ipAttributeRule, 0)
+
 					// Execute the attribute rule
 					ipAttributes = ipAttributeRule->ExecuteRuleOnText(ipAFDoc, ipSubProgressStatus);
 					ASSERT_RESOURCE_ALLOCATION("ELI04399", ipAttributes != __nullptr);
@@ -350,6 +371,8 @@ STDMETHODIMP CAttributeFindInfo::ExecuteRulesOnText(IAFDocument* pAFDoc,
 							// Get the splitter object
 							UCLID_AFCORELib::IAttributeSplitterPtr ipSplitter =
 								m_ipAttributeSplitter->Object;
+
+							PROFILE_RULE_OBJECT(asString(m_ipAttributeSplitter->GetDescription()), "", ipSplitter, 0)
 							
 							// Execute the split operation
 							ipSplitter->SplitAttribute(ipAttribute, ipAFDoc, __nullptr/*ipSubProgressStatus*/);
@@ -536,23 +559,6 @@ STDMETHODIMP CAttributeFindInfo::IsDirty(void)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-// NOTES about versions:
-// Version 1:
-//   * Saved: 
-//            data version,
-//            whether or not to stop searching when a value was found
-//            collection of Attribute Rules
-//            collection of Ignore list strings
-//            Input Validator object with description
-// Version 2:
-//   * Additionally saved:
-//            Attribute Splitter object with description
-// Version 3:
-//   * Additionally saved:
-//            Document Preprocessor object with description
-// Version 4:
-//   * Removed from save:
-//            collection of Ignore list strings
 STDMETHODIMP CAttributeFindInfo::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -680,6 +686,12 @@ STDMETHODIMP CAttributeFindInfo::Load(IStream *pStream)
 			readObjectFromStream(ipObj, pStream, "ELI09951");
 		}
 
+		if (nDataVersion >= 7)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we just loaded a fresh object
 		m_bDirty = false;
 	}
@@ -734,6 +746,9 @@ STDMETHODIMP CAttributeFindInfo::Save(IStream *pStream, BOOL fClearDirty)
 			throw UCLIDException("ELI05286", "AttributeSplitter object does not support persistence!");
 		}
 		writeObjectToStream(ipPersistentObj, pStream, "ELI09906", fClearDirty);
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// clear the flag as specified
 		if (fClearDirty)
@@ -854,6 +869,24 @@ STDMETHODIMP CAttributeFindInfo::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	}
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttributeFindInfo::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33529")
 }
 
 //-------------------------------------------------------------------------------------------------

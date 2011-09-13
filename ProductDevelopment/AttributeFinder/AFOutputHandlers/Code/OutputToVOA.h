@@ -4,6 +4,7 @@
 
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
+#include <IdentifiableRuleObject.h>
 #include <string>
 
 using namespace std;
@@ -21,7 +22,9 @@ class ATL_NO_VTABLE COutputToVOA :
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ICategorizedComponent, &IID_ICategorizedComponent, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
-	public ISpecifyPropertyPagesImpl<COutputToVOA>
+	public ISpecifyPropertyPagesImpl<COutputToVOA>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	COutputToVOA();
@@ -42,6 +45,7 @@ BEGIN_COM_MAP(COutputToVOA)
 	COM_INTERFACE_ENTRY(ICategorizedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(COutputToVOA)
@@ -82,6 +86,9 @@ END_CATEGORY_MAP()
 	STDMETHOD(Load)(IStream *pStm);
 	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 	// flag to keep track of whether object is dirty

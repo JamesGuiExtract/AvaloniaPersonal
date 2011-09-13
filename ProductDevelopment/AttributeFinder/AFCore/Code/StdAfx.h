@@ -39,15 +39,14 @@ using namespace UCLID_COMUTILSLib;
 	rename("LoadImage", "LoadRasterImage")
 using namespace UCLID_RASTERANDOCRMGMTLib;
 
+#import "..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb" named_guids
+using namespace UCLID_INPUTFUNNELLib;
+
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.tlb" named_guids
 using namespace UCLID_SSOCRLib;
 
 #import "..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.tlb" named_guids
 using namespace Extract_Utilities_Email;
-
-
-#import "..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb" named_guids
-using namespace UCLID_INPUTFUNNELLib;
 
 #import "..\..\..\..\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Code\Core\SpotRecognitionIR.tlb" named_guids
 using namespace UCLID_SPOTRECOGNITIONIRLib;

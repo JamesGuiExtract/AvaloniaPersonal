@@ -8,11 +8,13 @@
 #include <COMUtils.h>
 #include <ComponentLicenseIDs.h>
 #include <cpputil.h>
+#include <RuleSetProfiler.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 2: Added CIdentifiableRuleObject
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CDocPreprocessorSequence
@@ -119,6 +121,8 @@ STDMETHODIMP CDocPreprocessorSequence::raw_Process(IAFDocument* pDocument, IProg
 				// get the DocPreprocessor at the current position
 				IDocumentPreprocessorPtr ipDP = ipObj->Object;
 				ASSERT_RESOURCE_ALLOCATION("ELI08449", ipDP != __nullptr);
+
+				PROFILE_RULE_OBJECT(asString(ipObj->GetDescription()), "", ipDP, 0)
 
 				// execute the document preprocessor & pass in the 
 				// sub progress object if progress status updates were requested
@@ -311,6 +315,12 @@ STDMETHODIMP CDocPreprocessorSequence::Load(IStream *pStream)
 			ASSERT_RESOURCE_ALLOCATION("ELI08159", m_ipDocPreprocessors != __nullptr);
 		}
 
+		if (nDataVersion >= 2)
+		{
+			// Load the GUID for the IIdentifiableRuleObject interface.
+			loadGUID(pStream);
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -346,6 +356,9 @@ STDMETHODIMP CDocPreprocessorSequence::Save(IStream *pStream, BOOL fClearDirty)
 			throw UCLIDException("ELI08161", "IIUnknownVector component does not support persistence!");
 		}
 		writeObjectToStream(ipObj, pStream, "ELI09916", fClearDirty);
+
+		// Save the GUID for the IIdentifiableRuleObject interface.
+		saveGUID(pStream);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -489,6 +502,24 @@ STDMETHODIMP CDocPreprocessorSequence::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	}
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IIdentifiableRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CDocPreprocessorSequence::get_InstanceGUID(GUID *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = getGUID();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33547")
 }
 
 //-------------------------------------------------------------------------------------------------

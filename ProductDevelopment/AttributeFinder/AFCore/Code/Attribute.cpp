@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "AFCore.h"
 #include "Attribute.h"
+#include "RuleSetProfiler.h"
 
 #include <UCLIDException.h>
 #include <COMUtils.h>
@@ -17,6 +18,8 @@ using namespace std;
 // Constants
 //-------------------------------------------------------------------------------------------------
 const unsigned long gnCurrentVersion = 2;
+static const GUID gProfilingGUID = { 0x3f9058ec, 0x77e3, 0x43a5, 
+			{ 0x95, 0x35, 0x22, 0x97, 0x88, 0x67, 0x1d, 0x6a } };
 
 //-------------------------------------------------------------------------------------------------
 // CAttribute
@@ -31,6 +34,11 @@ CAttribute::CAttribute()
   m_ipDataObject(__nullptr),
   m_bDirty(false)
 {
+	try
+	{
+		PROFILE_SPECIAL_OBJECT_IF_ACTIVE("[Attribute Created]", "", gProfilingGUID, 0)
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33635");
 }
 //-------------------------------------------------------------------------------------------------
 CAttribute::~CAttribute()
@@ -50,6 +58,8 @@ void CAttribute::FinalRelease()
 {
 	try
 	{
+		PROFILE_SPECIAL_OBJECT_IF_ACTIVE("[Attribute Deleted]", "", gProfilingGUID, 1)
+
 		// Release COM objects before the object is destructed
 		m_ipSubAttributes = __nullptr;
 		m_ipAttributeValue = __nullptr;

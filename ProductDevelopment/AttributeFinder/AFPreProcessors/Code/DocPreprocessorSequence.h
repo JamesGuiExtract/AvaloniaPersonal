@@ -4,6 +4,7 @@
 
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
+#include <IdentifiableRuleObject.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // CDocPreprocessorSequence
@@ -18,7 +19,9 @@ class ATL_NO_VTABLE CDocPreprocessorSequence :
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IMultipleObjectHolder, &IID_IMultipleObjectHolder, &LIBID_UCLID_COMUTILSLib>,
-	public ISpecifyPropertyPagesImpl<CDocPreprocessorSequence>
+	public ISpecifyPropertyPagesImpl<CDocPreprocessorSequence>,
+	public IDispatchImpl<IIdentifiableRuleObject, &IID_IIdentifiableRuleObject, &LIBID_UCLID_AFCORELib>,
+	private CIdentifiableRuleObject
 {
 public:
 	CDocPreprocessorSequence();
@@ -39,6 +42,7 @@ BEGIN_COM_MAP(CDocPreprocessorSequence)
 	COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 	COM_INTERFACE_ENTRY(IMultipleObjectHolder)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
+	COM_INTERFACE_ENTRY(IIdentifiableRuleObject)
 END_COM_MAP()
 
 BEGIN_PROP_MAP(CDocPreprocessorSequence)
@@ -82,6 +86,9 @@ public:
 	STDMETHOD(put_ObjectsVector)(/*[in]*/IIUnknownVector *newVal);
 	STDMETHOD(raw_GetObjectType)(/*[out, retval]*/BSTR *pstrObjectType);
 	STDMETHOD(raw_GetRequiredIID)(/*[out, retval]*/ IID *riid);
+
+// IIdentifiableRuleObject
+	STDMETHOD(get_InstanceGUID)(GUID *pVal);
 
 private:
 	////////////
