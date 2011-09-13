@@ -599,7 +599,7 @@ namespace Extract.AttributeFinder.Rules
                                 i, rangeList.Count - i, mergedRange, mergedRange);
                             // If an equivalent is not found, the index will be the bitwise
                             // complement of the index where mergedRange should be inserted. 
-                            insertionIndex = (insertionIndex > 0) ? insertionIndex : ~insertionIndex;
+                            insertionIndex = (insertionIndex >= 0) ? insertionIndex : ~insertionIndex;
                             rangeList.Insert(insertionIndex, mergedRange);
                         }
 
