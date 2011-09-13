@@ -27,3 +27,6 @@
 
 // Expand sequence, keep original ordering, remove duplicates
 <TESTCASE>;ExpandUnsortedEliminate.rsd;Source.txt;;ExpandUnsortedEliminate.eav
+
+// FlexIDSCore:4844
+<TESTCASE>;contractthree.rsd;contractthree.txt;;contractthree.eav
