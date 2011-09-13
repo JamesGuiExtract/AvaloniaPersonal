@@ -20,7 +20,7 @@
         	<ul>
             		<li>.\50_Database\ID_Shield50.bak</li>
             		<li>.\60_Database\Demo_IDShield60.bak</li>
-            		<li>.\60_Large_Database\nysos_esprocess6.bak</li>
+            		<li>.\60_Large_Database\Large_DB.bak</li>
             		<li>.\70_Database\Test70.bak</li>
         	</ul>
         	<li>Restore the databases using <b>SQL Server Management Studio</b> from the 
@@ -29,7 +29,7 @@
         	<li>Confirm that <b>DB Admin</b> opens each database but displays a <b>Database 
         	found, but schema version is not compatible with this application!</b> error 
         	message in the <b>Connection Status</b> edit box.  The password is <b>a</b> for 
-        	each database except for <b>ID_Shield50.bak</b>.</li>
+        	each database.</li>
       	</ul></li>
 <p>
       	<li><h2>User Interface</h2>
@@ -105,13 +105,9 @@
 <p>
     	<li><h2>Test of Large Database</h2>
     	<ul>
-        	<li>Exercise the <b>6.0 Large Database</b>
+        	<li>Exercise the <b>Large DB</b>
         	<ul>
             		<li>Confirm that the status bar is updated during database conversion.</li>
-            		<li>Confirm that cancelling the conversion displays a confirmation 
-            		dialog.</li>
-            		<li>Confirm that cancelling the conversion deletes the output 
-            		database.</li>
             		<li><b>Overnight or Weekend Test</b>: 
             		<ul>
                 		<li>Confirm that the conversion finishes successfully.</li>
