@@ -102,7 +102,7 @@ void ThreadSafeLogFile::init()
 
 		// Make sure that directory of log file exists
 		string strDirectory = getDirectoryFromFullPath( m_strLogFileName );
-		createDirectory( strDirectory, true );
+		createDirectory( strDirectory );
 
 		static unsigned long ls_ulLastUsedID = 0;
 		

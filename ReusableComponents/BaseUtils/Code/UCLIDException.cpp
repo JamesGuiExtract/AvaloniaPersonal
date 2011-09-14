@@ -962,7 +962,7 @@ void UCLIDException::log(const string& strFile, bool bNotifyExceptionEvent, bool
 			string strFolder = getDirectoryFromFullPath( strOutputLogFile );
 
 			// Make sure that the directory exists
-			createDirectory(strFolder, true);
+			createDirectory(strFolder);
 			
 			pEx->saveTo(strOutputLogFile, true, pszMachineName, pszUserName, nDateTime,
 				nPid, pszProductVersion);

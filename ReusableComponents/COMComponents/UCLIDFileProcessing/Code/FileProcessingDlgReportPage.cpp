@@ -1309,7 +1309,7 @@ const string& FileProcessingDlgReportPage::getLogFileFullPath()
 		// Check if the folder exists and create if necessary [LRCAU #5111]
 		if (!isValidFolder(strDir1))
 		{
-			createDirectory(strDir1, true);
+			createDirectory(strDir1);
 		}
 
 		ls_strLogFileName = strDir1 + "\\Statistics.csv";	

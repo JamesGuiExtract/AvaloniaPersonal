@@ -257,64 +257,132 @@ unsigned long getDiskSerialNumber()
 //--------------------------------------------------------------------------------------------------
 void writeToFile(const string& strData, const string& strOutputFileName)
 {
-	// create the output file stream
-	// [FlexIDSCore:3797] Open as binary to prevent each "\n" char from being converted to "\r\n"
-	ofstream ofs(strOutputFileName.c_str(), ofstream::binary);
-	
-	// make sure the output file stream could be created ok
-	if (!ofs)
+	int iRetryCount(0), iRetryTimeout(0);
+	getFileAccessRetryCountAndTimeout(iRetryCount, iRetryTimeout);
+	bool bOpened = false;
+	ULONGLONG ullFileLength = 0;
+	int iRetries = 0;
+	do
 	{
-		string strMsg = "Unable to open file \"";
-		strMsg += strOutputFileName;
-		strMsg += "\" for writing.";
-		throw UCLIDException("ELI00247", strMsg);
+		// create the output file stream
+		// [FlexIDSCore:3797] Open as binary to prevent each "\n" char from being converted to "\r\n"
+		ofstream ofs(strOutputFileName.c_str(), ofstream::binary);
+
+		if (bOpened)
+		{
+			// write the data to the output file stream
+			ofs << strData << "\r\n";
+			ofs.close();
+
+			// make sure that there were no errors in closing the output file stream
+			if (!ofs)
+			{
+				UCLIDException uex("ELI00255", "Unexpected error occurred while writing to the file.");
+				uex.addDebugInfo("Output File Name", strOutputFileName);
+				throw uex;
+			}
+
+			// Wait until the file is readable
+			waitForFileToBeReadable(strOutputFileName);
+		}
+		else
+		{
+			DWORD errorCode = GetLastError();
+
+			if (errorCode != ERROR_SHARING_VIOLATION)
+			{
+				// Not a sharing violation, build a UCLIDException and throw it
+				string strMsg = "Unable to open file \"";
+				strMsg += strOutputFileName;
+				strMsg += "\" for writing.";
+				UCLIDException ue("ELI00247", strMsg);
+				ue.addDebugInfo("OS Error Code", errorCode);
+				throw ue;
+			}
+			// Sharing violation, check retry count
+			else if (iRetries > iRetryCount)
+			{
+				string strMsg = "Unable to open file \"";
+				strMsg += strOutputFileName;
+				strMsg += "\" for writing.";
+				UCLIDException ue("ELI33643", strMsg);
+				ue.addDebugInfo("Number of retries", iRetries);
+				ue.addDebugInfo("Max number of retries", iRetryCount);
+				throw ue;
+			}
+
+			// increment the number of retires and wait for the timeout period
+			iRetries++;
+			Sleep(iRetryTimeout);
+		}
 	}
-
-	// write the data to the output file stream
-	ofs << strData << "\r\n";
-	ofs.close();
-
-	// make sure that there were no errors in closing the output file stream
-	if (!ofs)
-	{
-		UCLIDException uex("ELI00255", "Unexpected error occurred while writing to the file.");
-		uex.addDebugInfo("Output File Name", strOutputFileName);
-		throw uex;
-	}
-
-	// Wait until the file is readable
-	waitForFileToBeReadable(strOutputFileName);
+	while (!bOpened);
 }
 //--------------------------------------------------------------------------------------------------
 void appendToFile(const string& strData, const string& strOutputFileName)
 {
-	// create the output file stream
-	// [FlexIDSCore:3797] Open as binary to prevent each "\n" char from being converted to "\r\n"
-	ofstream ofs(strOutputFileName.c_str(), ofstream::out | ofstream::app | ofstream::binary);
+	int iRetryCount(0), iRetryTimeout(0);
+	getFileAccessRetryCountAndTimeout(iRetryCount, iRetryTimeout);
+	bool bOpened = false;
+	ULONGLONG ullFileLength = 0;
+	int iRetries = 0;
+	do
+	{
+		// create the output file stream
+		// [FlexIDSCore:3797] Open as binary to prevent each "\n" char from being converted to "\r\n"
+		ofstream ofs(strOutputFileName.c_str(), ofstream::out | ofstream::app | ofstream::binary);
+		bOpened = ofs.is_open();
 	 
-	// make sure the output file stream could be created ok
-	if (!ofs)
-	{
-		string strMsg = "Unable to open file \"";
-		strMsg += strOutputFileName;
-		strMsg += "\" for appending.";
-		throw UCLIDException("ELI12466", strMsg);
+		// make sure the output file stream could be created ok
+		if (bOpened)
+		{
+			// write the data to the output file stream
+			ofs << strData << "\r\n";
+			ofs.close();
+
+			// make sure that there were no errors in closing the output file stream
+			if (!ofs)
+			{
+				UCLIDException uex("ELI12467", "Unexpected error occurred while writing to file.");
+				uex.addDebugInfo("Output File Name", strOutputFileName);
+				throw uex;
+			}
+
+			// Wait until the file is readable
+			waitForFileToBeReadable(strOutputFileName);
+		}
+		else
+		{
+			DWORD errorCode = GetLastError();
+
+			if (errorCode != ERROR_SHARING_VIOLATION)
+			{
+				// Not a sharing violation, build a UCLIDException and throw it
+				string strMsg = "Unable to open file \"";
+				strMsg += strOutputFileName;
+				strMsg += "\" for appending.";
+				UCLIDException ue("ELI12466", strMsg);
+				ue.addDebugInfo("OS Error Code", errorCode);
+				throw ue;
+			}
+			// Sharing violation, check retry count
+			else if (iRetries > iRetryCount)
+			{
+				string strMsg = "Unable to open file \"";
+				strMsg += strOutputFileName;
+				strMsg += "\" for appending.";
+				UCLIDException ue("ELI33644", strMsg);
+				ue.addDebugInfo("Number of retries", iRetries);
+				ue.addDebugInfo("Max number of retries", iRetryCount);
+				throw ue;
+			}
+
+			// increment the number of retires and wait for the timeout period
+			iRetries++;
+			Sleep(iRetryTimeout);
+		}
 	}
-
-	// write the data to the output file stream
-	ofs << strData << "\r\n";
-	ofs.close();
-
-	// make sure that there were no errors in closing the output file stream
-	if (!ofs)
-	{
-		UCLIDException uex("ELI12467", "Unexpected error occurred while writing to file.");
-		uex.addDebugInfo("Output File Name", strOutputFileName);
-		throw uex;
-	}
-
-	// Wait until the file is readable
-	waitForFileToBeReadable(strOutputFileName);
+	while (!bOpened);
 }
 //--------------------------------------------------------------------------------------------------
 string removeLastSlashFromPath(string strInput)

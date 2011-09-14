@@ -372,10 +372,7 @@ private:
 	void updateRedactionAttributeTester();
 
 	// PROMISE: Sets m_strOutputFileDirectory based on the provided rootDirectory and current time.
-	// If bAutoSelectDirectory is true and the rootDirectory is underneath the
-	// "Extract Systems\TestingFiles" Program Files directory, a parallel directory will be
-	// automatically selected under application data instead.
-	void getOutputDirectory(string rootDirectory, bool bAutoSelectDirectory);
+	void getOutputDirectory(string rootDirectory);
 
 	// PROMISE: To convert a set of strings into a comma delimited list.
 	string getSetAsDelimitedList(const set<string>& setValues);

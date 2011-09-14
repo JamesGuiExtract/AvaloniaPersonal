@@ -33,8 +33,8 @@ CTestHarness::CTestHarness()
 
 		m_ipInteractiveTestExecuter->SetResultLogger(m_ipTestResultLogger);
 
-		// set the default results output folder to the application data folder + "\TesterResults\"
-		m_strDefaultOutputFolder = getExtractApplicationDataPath() + "\\TesterResults\\";
+		// set the default results output folder to the application data folder + "\TestResults\"
+		m_strDefaultOutputFolder = getExtractApplicationDataPath() + "\\TestResults\\";
 
 		m_Variables.addVariable("$(DateTimeStamp)", getTimeStamp());
 		m_Variables.addVariable("$(ProgID)", "");
