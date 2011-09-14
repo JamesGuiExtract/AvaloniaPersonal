@@ -1,0 +1,197 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0.0.90 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0.0.90 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DotNet #731]</b> Authentication Code for Secure File Deletion
+        	<ul>
+            		<li>Use <b>Reflector</b> to examine the parameter passed in to the 
+			<b>Authenticate()</b> method.
+			<li>Confirm that the password is encrypted.
+			<li>Confirm that the encryption methods are well obfuscated.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4072, #4774]</b> Regular Expression Rule
+        	<ul>
+            		<li>Confirm that the property page includes a <b>First match only</b> 
+			checkbox.
+			<li>Create and test a rule that finds multiple matches.
+			<li>Confirm that the checkbox works properly when <b>checked</b>.
+			<li>Confirm that the checkbox works properly when <b>unchecked</b>.
+			<li>Exercise the RSD files from 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4774</b> against the 
+			associated <b>input.txt</b>.
+			<ul>
+				<li>Confirm that each RSD file completes in a reasonable 
+				amount of time.
+			</ul>
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4681]</b> Verification of Rotated Images in History
+        	<ul>
+            		<li>Verify some documents
+			<li>Draw a redaction on the last page of a document, rotate the page, 
+			and save the changes
+			<li>Navigate back to the previous document.
+			<li>Confirm that the page rotation is displayed properly.
+			<li>Confirm that the redaction is displayed properly.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4717]</b> Entity Finder Reg Ex
+        	<ul>
+            		<li>Exercise the <b>Indexing</b> NRS.
+			<li>Confirm that the <b>Entity Finder</b> test cases execute without 
+			failure.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4775, #4828, #4830, #4831, #4832, #4836, #4837]</b> FKB Updates
+        	<ul>
+            		<li>Install a legacy FKB update to the root of the <b>ComponentData</b> 
+			folder.
+			<li>Create a rule set that specifies use of this FKB update.
+			<li>Confirm that the rule set executes properly via <b>Rule Tester</b>.
+			<li>Confirm that an older FKB update can be installed after a newer 
+			version has been installed.
+			<li>Confirm that the <b>Document Classifier</b> works by exercising 
+			the <b>Demo_IDShield</b> rules.
+			<li>Exercise the automated tests without a legacy FKB update and 
+			confirm that the following tests pass
+			<ul>
+				<li>Entity Name Data Scorer
+				<li>Entity Name Splitter
+				<li>MERS Modifier
+				<li>Entity Finder
+			</ul>
+			<li>Confirm that <b>.etf</b> files are included in the FKB update.
+			<li>Confirm that specifying the <b>Full path to component data</b> via 
+			<b>RDT Config</b> overrides the setting in an RSD file.
+			<li>Confirm that FKB update version numbers are in the form 
+			<b>MM.mm.0.###</b>.
+			<ul>
+				<li><b>MM</b> = Major version or last two digits of year
+				<li><b>mm</b> = Minor version or numbered update for the year
+				<li><b>###</b> = Build number
+			</ul>
+			<li>Confirm that the FKB update build number deployed with a build, 
+			especially a released build, matches the software build number.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4817]</b> Duplicate and separate attribute trees output handler
+        	<ul>
+            		<li><u>UI</u>
+			<ul>
+				<li>Confirm that a combo box is provided allowing selection of an 
+				<b>attribute selector</b>.
+				<li>Confirm that the following attribute selectors are available 
+				and can be configured.
+				<ul>
+					<li>Data scorer based attribute selector
+					<li>Query attribute selector
+					<li>Spatial content attribute selector
+					<li>Spatial proximity attribute selector
+				</ul>
+				<li>Confirm that an edit box is provided allowing specification of a 
+				dividing attribute.
+				<li>Confirm that a valid attribute name must be provided.
+			</ul>
+<p>
+            		<li><u>Functionality</u>
+			<ul>
+				<li>TBD
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4827]</b> Msiexec Help file
+        	<ul>
+            		<li>Confirm that the <b>Msiexec</b> help file is <b>not</b> displayed 
+			near the end of the <b>FLEX Index</b> install.
+            		<li>Confirm that the <b>Msiexec</b> help file is <b>not</b> displayed 
+			near the end of the <b>ID Shield</b> install.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4844]</b> Numeric Sequence Expander
+        	<ul>
+            		<li>Create an RSD file that uses the <b>Numeric Sequence Expander</b> 
+			value modifier.
+            		<li>Confirm that the following text strings process without error
+			<ul>
+				<li>7,7,7
+				<li>11,220,11,11,75
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4850]</b> Verification and Zoom History
+        	<ul>
+            		<li>Verify a document.
+			<li>Change zoom and position on a page several times and rotate the 
+			document 90 degrees during the sequence of changes.
+			<li>Use the <b>Zoom Previous</b> command several times until it is 
+			disabled.
+			<li>Confirm that the image returns to its original orientation.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6095]</b> SQL Server Installation
+        	<ul>
+            		<li>Start with a clean test machine and a 64-bit operating system.
+			<li>Install <b>.NET</b>.
+			<li>Install <b>ID Shield</b>.
+			<li>Install <b>SQL Server 2008 R2</b>.
+			<li>Confirm that the installation succeeds without error.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
