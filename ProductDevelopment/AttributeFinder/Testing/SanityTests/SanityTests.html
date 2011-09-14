@@ -21,10 +21,12 @@
 			<li>Copy images to the test machine.
 			<ul>
 				<li>Create destination folder for Sanity Test images on the test machine.
-				<li>Open command window on test machine and navigate to the <b>IDShield_Sanity</b> 
-				folder provided above.
-				<li>Exercise <b>\\fnp2\Internal\Common\Testing\Product Testing\IDShield_Sanity\Copy_SanityTest_Files.bat</b> using the fully-qualified path to the 
-				destination folder as the single argument.
+				<li>Open command window on test machine and navigate to the 
+				<b>IDShield_Sanity</b> folder provided above.
+				<li>Exercise <b>\\fnp2\Internal\Common\Testing\Product 
+				Testing\IDShield_Sanity\Copy_SanityTest_Files.bat</b> 
+				using the fully-qualified path to the destination folder 
+				as the single argument.
 			</ul>
 			<li>Confirm presence of the following non-empty child folders.
 			<ul>
@@ -38,9 +40,10 @@
 				to be supplied via listening.
 				<li><b>Images3</b> - for a Folder file supplier to use to supply images 
 				for <b>Execute rules</b> and later verification.
-                <li><b>TestImages</b> - contains subfolders of nonstandard images
 				<li><b>Rules</b> - copies of <b>Demo_IDShield</b> rules used for 
 				processing.
+				<li><b>TestImages</b> - subfolders containing different types of images 
+				for testing.
 			</ul>
 			<li>Verify the <b>USB License Key Manager</b> is pointed to a USB key with redaction 
 			counts available (usually LISA).
@@ -161,6 +164,26 @@
 			<li>Modify the FPS file to process the skipped files.
 			<li>Finish verifying the sensitive documents and confirm that the verification UI 
 			automatically closes.
+		</ul>
+<p />
+		<li><b>Test4 - Special images</b>
+		<ul>
+			<li>Open <b>TestImages1.fps</b> and start processing.
+			<ul>
+				<li>Confirm that multiple file suppliers are defined.
+				<li>Confirm that <b>most</b> files are successfully queued.  Some 
+				files will fail queuing for acceptable reasons.
+				<li>Confirm that <b>most</b> files process successfully.
+			</ul>
+			<li>Open <b>TestImages2.fps</b> and start processing.
+			<ul>
+				<li>Exercise basic features of verification.
+				<li>Create and adjust some manual redactions.
+				<li>Rotate some images and add additional manual redactions.
+				<li>Confirm that reviewing document history shows found and 
+				added redactions each in their appropriate places.
+				<li>Confirm that <b>all</b> files process successfully.
+			</ul>
 		</ul>
 <p />
 		<li><b>Analysis of ID Shield test results</b>
@@ -299,7 +322,8 @@
 			<li>Confirm that connecting to a USB key on the <b>local</b> machine 
 			populates the appropriate fields.
 			<li>Confirm that clicking the <b>Server Status</b> button displays a browser 
-			window with details about the local key.
+			window with details about the local key.  Note that <b>Java</b> may need to 
+			be installed before the details are displayed.
 		</ul>
 		<p />
 		<li><b>User License</b>
@@ -414,6 +438,13 @@
 			<li>Confirm that <b>Rule Tester</b> displays an exception when trying to exercise a 
 			different <b>rsd.etf</b> file from the Redaction Demo.
 			<br>Note: For the exception to be thrown, the RDT cannot be licensed.
+		</ul>
+<p />
+		<li><b>Test Text Function Expander</b>
+		<ul>
+			<li>Confirm that the <b>Test Text Function Expander</b> utility provides a list 
+			of functions to be tested.
+			<li>Confirm that several different functions expand correctly.
 		</ul>
 <p />
 		<li><b>USS Viewer</b>
