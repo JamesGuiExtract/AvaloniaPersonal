@@ -11,36 +11,36 @@ static const string gstrUSER_ID_VAR = "<UserID>";
 static const string gstrMACHINE_ID_VAR = "<MachineID>";
 
 // Create Table SQL statements
-static const string gstrCREATE_ACTION_TABLE = "CREATE TABLE [Action] ([ID] [int] IDENTITY(1,1) NOT NULL "
+static const string gstrCREATE_ACTION_TABLE = "CREATE TABLE [dbo].[Action] ([ID] [int] IDENTITY(1,1) NOT NULL "
 	"CONSTRAINT [PK_Action] PRIMARY KEY CLUSTERED, " 
 	"[ASCName] [nvarchar](50) NOT NULL,	[Description] [nvarchar](255) NULL)";
 
 static const string gstrCREATE_LOCK_TABLE = 
-	"CREATE TABLE [LockTable]([LockName] [nvarchar](50) NOT NULL CONSTRAINT [PK_LockTable] PRIMARY KEY CLUSTERED,"
+	"CREATE TABLE [dbo].[LockTable]([LockName] [nvarchar](50) NOT NULL CONSTRAINT [PK_LockTable] PRIMARY KEY CLUSTERED,"
 	"[UPI] [nvarchar](512), "
 	"[LockTime] datetime NOT NULL CONSTRAINT [DF_LockTable_LockTime]  DEFAULT (GETDATE()))";
 
 static const string gstrCREATE_DB_INFO_TABLE = 
-	"CREATE TABLE [DBInfo]([ID] int IDENTITY(1,1) NOT NULL, "
+	"CREATE TABLE [dbo].[DBInfo]([ID] int IDENTITY(1,1) NOT NULL, "
 	"[Name] [nvarchar](50) NOT NULL PRIMARY KEY CLUSTERED, "
 	"[Value] [nvarchar](max))";
 
-static const string gstrCREATE_ACTION_STATE_TABLE = "CREATE TABLE [ActionState]([Code] [nvarchar](1) NOT NULL "
+static const string gstrCREATE_ACTION_STATE_TABLE = "CREATE TABLE [dbo].[ActionState]([Code] [nvarchar](1) NOT NULL "
 	"CONSTRAINT [PK_ActionState] PRIMARY KEY CLUSTERED,"
 	"[Meaning] [nvarchar](255) NULL)";
 
-static const string gstrCREATE_FAM_FILE_TABLE = "CREATE TABLE [FAMFile]("
+static const string gstrCREATE_FAM_FILE_TABLE = "CREATE TABLE [dbo].[FAMFile]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_File] PRIMARY KEY CLUSTERED,"
 	"[FileName] [nvarchar](255) NULL,"
 	"[FileSize] [bigint] NOT NULL CONSTRAINT [DF_FAMFile_FileSize]  DEFAULT ((0)),"
 	"[Pages] [int] NOT NULL CONSTRAINT [DF_FAMFile_Pages]  DEFAULT ((0)),"
 	"[Priority] [int] NOT NULL CONSTRAINT [DF_FAMFile_Priority] DEFAULT((3)))";
 
-static const string gstrCREATE_QUEUE_EVENT_CODE_TABLE = "CREATE TABLE [QueueEventCode]("
+static const string gstrCREATE_QUEUE_EVENT_CODE_TABLE = "CREATE TABLE [dbo].[QueueEventCode]("
 	"[Code] [nvarchar](1) NOT NULL CONSTRAINT [PK_QueueEventCode] PRIMARY KEY CLUSTERED ,"
 	"[Description] [nvarchar](255) NULL)";
 
-static const string gstrCREATE_ACTION_STATISTICS_TABLE = "CREATE TABLE [ActionStatistics]("
+static const string gstrCREATE_ACTION_STATISTICS_TABLE = "CREATE TABLE [dbo].[ActionStatistics]("
 	"[ActionID] [int] NOT NULL CONSTRAINT [PK_Statistics] PRIMARY KEY CLUSTERED,"
 	"[LastUpdateTimeStamp] [datetime] NULL,"
 	"[NumDocuments] [int] NOT NULL CONSTRAINT [DF_ActionStatistics_TotalDocuments]  DEFAULT ((0)),"
@@ -59,7 +59,7 @@ static const string gstrCREATE_ACTION_STATISTICS_TABLE = "CREATE TABLE [ActionSt
 	"[NumBytesFailed] [bigint] NOT NULL CONSTRAINT [DF_ActionStatistics_NumBytesFailed]  DEFAULT ((0)),"
 	"[NumBytesSkipped] [bigint] NOT NULL CONSTRAINT [DF_ActionStatistics_NumBytesSkipped]  DEFAULT ((0)))";
 
-static const string gstrCREATE_ACTION_STATISTICS_DELTA_TABLE = "CREATE TABLE [ActionStatisticsDelta]("
+static const string gstrCREATE_ACTION_STATISTICS_DELTA_TABLE = "CREATE TABLE [dbo].[ActionStatisticsDelta]("
 	"[ID] [bigint] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_ActionStatisticsDelta] PRIMARY KEY CLUSTERED,"
 	"[ActionID] [int] NOT NULL,"
 	"[NumDocuments] [int] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_TotalDocuments]  DEFAULT ((0)),"
@@ -78,7 +78,7 @@ static const string gstrCREATE_ACTION_STATISTICS_DELTA_TABLE = "CREATE TABLE [Ac
 	"[NumBytesFailed] [bigint] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_NumBytesFailed]  DEFAULT ((0)),"
 	"[NumBytesSkipped] [bigint] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_NumBytesSkipped]  DEFAULT ((0)))";
 
-static const string gstrCREATE_FILE_ACTION_STATE_TRANSITION_TABLE  ="CREATE TABLE [FileActionStateTransition]("
+static const string gstrCREATE_FILE_ACTION_STATE_TRANSITION_TABLE  ="CREATE TABLE [dbo].[FileActionStateTransition]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FileActionStateTransition] PRIMARY KEY CLUSTERED,"
 	"[FileID] [int] NULL,"
 	"[ActionID] [int] NULL,"
@@ -90,7 +90,7 @@ static const string gstrCREATE_FILE_ACTION_STATE_TRANSITION_TABLE  ="CREATE TABL
 	"[Exception] [ntext] NULL,"
 	"[Comment] [nvarchar](50) NULL)";
 
-static const string gstrCREATE_QUEUE_EVENT_TABLE = "CREATE TABLE [QueueEvent]("
+static const string gstrCREATE_QUEUE_EVENT_TABLE = "CREATE TABLE [dbo].[QueueEvent]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_QueueEvent] PRIMARY KEY CLUSTERED,"
 	"[FileID] [int] NULL,"
 	"[ActionID] [int] NULL,"
@@ -101,25 +101,25 @@ static const string gstrCREATE_QUEUE_EVENT_TABLE = "CREATE TABLE [QueueEvent]("
 	"[MachineID] [int] NULL, "
 	"[FAMUserID] [int] NULL)";
 
-static const string gstrCREATE_LOGIN_TABLE = "CREATE TABLE [Login]("
+static const string gstrCREATE_LOGIN_TABLE = "CREATE TABLE [dbo].[Login]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL, "
 	"[UserName] [nvarchar](50) NOT NULL, "
 	"[Password] [nvarchar](128) NOT NULL DEFAULT(''), "
 	"CONSTRAINT [PK_LoginID] PRIMARY KEY CLUSTERED ( [ID] ASC ))";
 
-static const string gstrCREATE_MACHINE_TABLE = "CREATE TABLE [Machine]("
+static const string gstrCREATE_MACHINE_TABLE = "CREATE TABLE [dbo].[Machine]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL, "
 	"[MachineName] [nvarchar](50) NULL, "
 	"CONSTRAINT [PK_Machine] PRIMARY KEY CLUSTERED ([ID] ASC), "
 	"CONSTRAINT [IX_MachineName] UNIQUE NONCLUSTERED ([MachineName]))";
 
-static const string gstrCREATE_FAM_USER_TABLE = "CREATE TABLE [FAMUser]("
+static const string gstrCREATE_FAM_USER_TABLE = "CREATE TABLE [dbo].[FAMUser]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL, "
 	"[UserName] [nvarchar](50) NULL, "
 	"CONSTRAINT [PK_FAMUser] PRIMARY KEY CLUSTERED ([ID] ASC), "
 	"CONSTRAINT [IX_UserName] UNIQUE NONCLUSTERED ([UserName] ASC))";
 
-static const string gstrCREATE_FAM_FILE_ACTION_COMMENT_TABLE = "CREATE TABLE [FileActionComment] ("
+static const string gstrCREATE_FAM_FILE_ACTION_COMMENT_TABLE = "CREATE TABLE [dbo].[FileActionComment] ("
 	"[ID] [int] IDENTITY(1,1) NOT NULL, "
 	"[UserName] [nvarchar](50) NULL, "
 	"[FileID] [int] NULL, "
@@ -128,7 +128,7 @@ static const string gstrCREATE_FAM_FILE_ACTION_COMMENT_TABLE = "CREATE TABLE [Fi
 	"[DateTimeStamp] [datetime] NOT NULL CONSTRAINT [DF_FileActionComment_DateTimeStamp] DEFAULT((GETDATE())), "
 	"CONSTRAINT [PK_FAMFileActionComment] PRIMARY KEY CLUSTERED ([ID] ASC))";
 
-static const string gstrCREATE_FAM_SKIPPED_FILE_TABLE = "CREATE TABLE [SkippedFile] ("
+static const string gstrCREATE_FAM_SKIPPED_FILE_TABLE = "CREATE TABLE [dbo].[SkippedFile] ("
 	"[ID] [int] IDENTITY(1,1) NOT NULL, "
 	"[UserName] [nvarchar](50) NULL, "
 	"[FileID] [int] NULL, "
@@ -138,27 +138,27 @@ static const string gstrCREATE_FAM_SKIPPED_FILE_TABLE = "CREATE TABLE [SkippedFi
 	"[UPIID] [int] NOT NULL DEFAULT(0), "
 	"CONSTRAINT [PK_FAMSkippedFile] PRIMARY KEY CLUSTERED ([ID] ASC))";
 
-static const string gstrCREATE_FAM_TAG_TABLE = "CREATE TABLE [Tag] ("
+static const string gstrCREATE_FAM_TAG_TABLE = "CREATE TABLE [dbo].[Tag] ("
 	"[ID] [int] IDENTITY(1,1) NOT NULL, "
 	"[TagName] [nvarchar](100) NOT NULL, "
 	"[TagDescription] [nvarchar](255) NULL, "
 	"CONSTRAINT [PK_FAMTag] PRIMARY KEY CLUSTERED ([ID] ASC), "
 	"CONSTRAINT [IX_TagName] UNIQUE NONCLUSTERED ([TagName] ASC))";
 
-static const string gstrCREATE_FAM_FILE_TAG_TABLE = "CREATE TABLE [FileTag] ("
+static const string gstrCREATE_FAM_FILE_TAG_TABLE = "CREATE TABLE [dbo].[FileTag] ("
 	"[FileID] [int] NOT NULL, "
 	"[TagID] [int] NOT NULL)";
 
 // The ProcessingFAM table is now the ActiveFAM table, but this definition needs to remain for the
 // schema update process.
 static const string gstrCREATE_PROCESSING_FAM_TABLE = 
-	"CREATE TABLE [ProcessingFAM]([ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_ProcessingFAM] PRIMARY KEY CLUSTERED, "
+	"CREATE TABLE [dbo].[ProcessingFAM]([ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_ProcessingFAM] PRIMARY KEY CLUSTERED, "
 	"[ActionID] [int] NOT NULL, "
 	"[UPI] [nvarchar](450), "
 	"[LastPingTime] datetime NOT NULL CONSTRAINT [DF_ProcessingFAM_LastPingTime]  DEFAULT (GETDATE()))";
 
 static const string gstrCREATE_ACTIVE_FAM_TABLE = 
-	"CREATE TABLE [ActiveFAM]([ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_ActiveFAM] PRIMARY KEY CLUSTERED, "
+	"CREATE TABLE [dbo].[ActiveFAM]([ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_ActiveFAM] PRIMARY KEY CLUSTERED, "
 	"[ActionID] [int] NOT NULL, "
 	"[UPI] [nvarchar](450), "
 	"[LastPingTime] datetime NOT NULL CONSTRAINT [DF_ActiveFAM_LastPingTime]  DEFAULT (GETDATE()),"
@@ -166,24 +166,24 @@ static const string gstrCREATE_ACTIVE_FAM_TABLE =
 	"[Processing] [bit] NOT NULL)";
 
 static const string gstrCREATE_LOCKED_FILE_TABLE = 
-	"CREATE TABLE [LockedFile]([FileID] [int] NOT NULL,"
+	"CREATE TABLE [dbo].[LockedFile]([FileID] [int] NOT NULL,"
 	"[ActionID] [int] NOT NULL, "
 	"[UPIID] [int] , "
 	"[StatusBeforeLock] [nvarchar](1) NOT NULL, "
 	"CONSTRAINT [PK_LockedFile] PRIMARY KEY CLUSTERED ([FileID], [ActionID], [UPIID]))";
 
 static const string gstrCREATE_USER_CREATED_COUNTER_TABLE =
-	"CREATE TABLE [UserCreatedCounter] ("
+	"CREATE TABLE [dbo].[UserCreatedCounter] ("
 	"[CounterName] [nvarchar](50) NOT NULL CONSTRAINT [PK_UserCreatedCounter] PRIMARY KEY CLUSTERED,"
 	"[Value] [bigint] NOT NULL CONSTRAINT [DF_UserCreatedCounter_Value] DEFAULT((0)))";
 
 static const string gstrCREATE_FPS_FILE_TABLE =
-	"CREATE TABLE [FPSFile] ("
+	"CREATE TABLE [dbo].[FPSFile] ("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FPSFile] PRIMARY KEY CLUSTERED, "
 	"[FPSFileName] [nvarchar](512) NOT NULL)";
 
 static const string gstrCREATE_FAM_SESSION =
-	"CREATE TABLE [FAMSession] ("
+	"CREATE TABLE [dbo].[FAMSession] ("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FAMSession] PRIMARY KEY CLUSTERED, "
 	"[MachineID] int NOT NULL, "
 	"[FAMUserID] int NOT NULL, "
@@ -193,7 +193,7 @@ static const string gstrCREATE_FAM_SESSION =
 	"[FPSFileID] int NOT NULL)";
 
 static const string gstrCREATE_INPUT_EVENT =
-	"CREATE TABLE [InputEvent] ("
+	"CREATE TABLE [dbo].[InputEvent] ("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_InputEvent] PRIMARY KEY CLUSTERED, "
 	"[TimeStamp] [DateTime] NOT NULL, "
 	"[ActionID] int NOT NULL, "
@@ -203,7 +203,7 @@ static const string gstrCREATE_INPUT_EVENT =
 	"[SecondsWithInputEvents] int NOT NULL)";
 
 static const string gstrCREATE_FILE_ACTION_STATUS = 
-	"CREATE TABLE [FileActionStatus]( "
+	"CREATE TABLE [dbo].[FileActionStatus]( "
 	"[ActionID] [int] NOT NULL, "
 	"[FileID] [int] NOT NULL, "
 	"[ActionStatus] [nvarchar](1) NOT NULL, "
@@ -214,7 +214,7 @@ static const string gstrCREATE_FILE_ACTION_STATUS =
 	")) ";
 
 static const string gstrCREATE_SOURCE_DOC_CHANGE_HISTORY =
-	"CREATE TABLE [SourceDocChangeHistory]( "
+	"CREATE TABLE [dbo].[SourceDocChangeHistory]( "
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_SourceDocChangeHistory] PRIMARY KEY CLUSTERED, "
 	"[FileID] [int] NOT NULL, "
 	"[FromFileName]  [nvarchar](255) NULL,"
@@ -224,7 +224,7 @@ static const string gstrCREATE_SOURCE_DOC_CHANGE_HISTORY =
 	"[MachineID] int NOT NULL) ";
 
 static const string gstrCREATE_DOC_TAG_HISTORY_TABLE =
-	"CREATE TABLE [DocTagHistory]( "
+	"CREATE TABLE [dbo].[DocTagHistory]( "
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_DocTagHistory] PRIMARY KEY CLUSTERED, "
 	"[FileID] [int] NOT NULL, "
 	"[TagID] [int] NOT NULL, "
@@ -234,7 +234,7 @@ static const string gstrCREATE_DOC_TAG_HISTORY_TABLE =
 	"[MachineID] int NOT NULL) ";
 
 static const string gstrCREATE_DB_INFO_CHANGE_HISTORY_TABLE =
-	"CREATE TABLE [DBInfoChangeHistory]( "
+	"CREATE TABLE [dbo].[DBInfoChangeHistory]( "
 	"[ID] INT IDENTITY(1,1) NOT NULL CONSTRAINT [PK_DBInfoHistory] PRIMARY KEY CLUSTERED, "
 	"[FAMUserID] INT NOT NULL, "
 	"[MachineID] INT NOT NULL, "
