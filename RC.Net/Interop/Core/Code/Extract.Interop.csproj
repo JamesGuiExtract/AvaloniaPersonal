@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComMethods.cs" />
+    <Compile Include="ComObjectReleaser.cs" />
     <Compile Include="ComUtils.cs" />
     <Compile Include="ExtractCategories.cs" />
     <Compile Include="HResult.cs" />

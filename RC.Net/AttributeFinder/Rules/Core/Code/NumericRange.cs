@@ -25,6 +25,12 @@ namespace Extract.AttributeFinder.Rules
             static Regex _suffixedNumberRegex = new Regex(@"[\d]+(?=[\w]+)");
 
             /// <summary>
+            /// Indicates whether the range should be considered in ascending or descending order
+            /// when comparing ranges or outputing via <see cref="ToString"/>.
+            /// </summary>
+            bool _ascendingOrder;
+
+            /// <summary>
             /// A value used to determine this instances position in a sorted list of
             /// <see cref="NumericRange"/>s.
             /// </summary>
@@ -39,11 +45,16 @@ namespace Extract.AttributeFinder.Rules
             /// <summary>Initializes a new instance of the <see cref="NumericRange"/> class.
             /// </summary>
             /// <param name="text">The text value that represents the range.</param>
-            public NumericRange(string text)
+            /// <param name="ascendingOrder"><see langword="true"/> if the range should be
+            /// considered in ascending when comparing ranges or outputing via
+            /// <see cref="ToString"/>; <see langword="false"/> if it should be considered in
+            /// descending order.</param>
+            public NumericRange(string text, bool ascendingOrder)
             {
                 try
                 {
                     Text = text.Trim();
+                    _ascendingOrder = ascendingOrder;
 
                     string[] values = Text.Split('-');
                     ExtractException.Assert("ELI33434", "Too many hypens", values.Length <= 2);
@@ -88,10 +99,15 @@ namespace Extract.AttributeFinder.Rules
             /// Initializes a new instance of the <see cref="NumericRange"/> class.
             /// </summary>
             /// <param name="number">The one and only number to be in this instance.</param>
-            public NumericRange(uint number)
+            /// <param name="ascendingOrder"><see langword="true"/> if the range should be
+            /// considered in ascending when comparing ranges or outputing via
+            /// <see cref="ToString"/>; <see langword="false"/> if it should be considered in
+            /// descending order.</param>
+            public NumericRange(uint number, bool ascendingOrder)
             {
                 try
                 {
+                    _ascendingOrder = ascendingOrder;
                     Numeric = true;
                     StartNumber = number;
                     EndNumber = number;
@@ -107,10 +123,15 @@ namespace Extract.AttributeFinder.Rules
             /// </summary>
             /// <param name="number1">The first number in the new range.</param>
             /// <param name="number2">The last number in the new range.</param>
-            public NumericRange(uint number1, uint number2)
+            /// <param name="ascendingOrder"><see langword="true"/> if the range should be
+            /// considered in ascending when comparing ranges or outputing via
+            /// <see cref="ToString"/>; <see langword="false"/> if it should be considered in
+            /// descending order.</param>
+            public NumericRange(uint number1, uint number2, bool ascendingOrder)
             {
                 try
                 {
+                    _ascendingOrder = ascendingOrder;
                     Numeric = true;
                     StartNumber = Math.Min(number1, number2);
                     EndNumber = Math.Max(number1, number2);
@@ -223,6 +244,10 @@ namespace Extract.AttributeFinder.Rules
                     ExtractException.Assert("ELI33438", "Cannot merge unsorted numeric ranges",
                         range1.CompareTo(range2) <= 0);
 
+                    ExtractException.Assert("ELI33666",
+                        "Cannot merge numeric ranges with opposite ordering.",
+                        range1._ascendingOrder == range2._ascendingOrder);
+
                     // If the ranges don't intersect, they can't be merged.
                     if (range1.EndNumber < range2.StartNumber - 1 ||
                         range1.StartNumber > range2.EndNumber + 1)
@@ -236,7 +261,8 @@ namespace Extract.AttributeFinder.Rules
                         return new NumericRange[]
                         {
                             new NumericRange(Math.Min(range1.StartNumber, range2.StartNumber),
-                                             Math.Max(range1.EndNumber, range2.EndNumber))
+                                             Math.Max(range1.EndNumber, range2.EndNumber),
+                                             range1._ascendingOrder)
                         };
                     }
                     // If range1 starts before range2, but does not extend past the end of range2,
@@ -248,8 +274,10 @@ namespace Extract.AttributeFinder.Rules
                         return new NumericRange[]
                         {
                             new NumericRange(Math.Min(range1.StartNumber, range2.StartNumber),
-                                             Math.Max(range1.EndNumber, range2.EndNumber)),
-                            new NumericRange(range2.StartNumber, range1.EndNumber)
+                                             Math.Max(range1.EndNumber, range2.EndNumber),
+                                             range1._ascendingOrder),
+                            new NumericRange(range2.StartNumber, range1.EndNumber,
+                                             range1._ascendingOrder)
                         };
                     }
                     else
@@ -283,7 +311,7 @@ namespace Extract.AttributeFinder.Rules
                     {
                         // If there are more than one numbers in this range, expand them.
                         return Enumerable.Range((int)StartNumber, (int)EndNumber - (int)StartNumber + 1)
-                            .Select(number => new NumericRange(Convert.ToUInt32(number)));
+                            .Select(number => new NumericRange(Convert.ToUInt32(number), _ascendingOrder));
                     }
                     else
                     {
@@ -321,8 +349,16 @@ namespace Extract.AttributeFinder.Rules
                     }
                     else
                     {
-                        return StartNumber.ToString(CultureInfo.InvariantCulture) + "-" +
-                            EndNumber.ToString(CultureInfo.InvariantCulture);
+                        if (_ascendingOrder)
+                        {
+                            return StartNumber.ToString(CultureInfo.InvariantCulture) + "-" +
+                                EndNumber.ToString(CultureInfo.InvariantCulture);
+                        }
+                        else
+                        {
+                            return EndNumber.ToString(CultureInfo.InvariantCulture) + "-" +
+                                StartNumber.ToString(CultureInfo.InvariantCulture);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -356,8 +392,16 @@ namespace Extract.AttributeFinder.Rules
                     {
                         if (Numeric && other.Numeric)
                         {
-                            // For numeric tiebreaker, use the end number
-                            return EndNumber.CompareTo(other.EndNumber);
+                            // For numeric tiebreaker, use other number than was used for the
+                            // NumericSortValue.
+                            if (_ascendingOrder)
+                            {
+                                return EndNumber.CompareTo(other.EndNumber);
+                            }
+                            else
+                            {
+                                return StartNumber.CompareTo(other.StartNumber);
+                            }
                         }
                         else
                         {
@@ -496,7 +540,9 @@ namespace Extract.AttributeFinder.Rules
                     {
                         if (Numeric)
                         {
-                            _numericSortValue = checked((int)StartNumber);
+                            _numericSortValue = checked((int)(_ascendingOrder
+                                ? StartNumber
+                                : EndNumber));
                         }
                         else
                         {
