@@ -7,6 +7,7 @@
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
+#include <AFTagManager.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -59,10 +60,12 @@ STDMETHODIMP CTranslateToClosestValueInListPP::Apply(void)
 			}
 		}
 		m_bDirty = FALSE;
+
+		return S_OK;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04337");
 
-	return S_OK;
+	return S_FALSE;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -520,6 +523,8 @@ bool CTranslateToClosestValueInListPP::saveListValues()
 			lst.GetItemText(n, 0, pszValue, NUM_OF_CHARS);
 			ipValueList->PushBack(_bstr_t(pszValue));
 		}
+
+		AFTagManager::validateDynamicFilePath("ELI33660", ipValueList);
 
 		m_ipInternalValueList->ClosestValueList = ipValueList;
 

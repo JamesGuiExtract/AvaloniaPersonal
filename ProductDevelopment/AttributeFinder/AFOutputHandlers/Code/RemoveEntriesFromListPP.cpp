@@ -8,6 +8,7 @@
 #include <LicenseMgmt.h>
 #include <EditorLicenseID.h>
 #include <ComponentLicenseIDs.h>
+#include <AFTagManager.h>
 
 using namespace std;
 
@@ -77,10 +78,12 @@ STDMETHODIMP CRemoveEntriesFromListPP::Apply(void)
 		}
 
 		m_bDirty = FALSE;
+
+		return S_OK;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06758");
 	
-	return S_OK;
+	return S_FALSE;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -500,6 +503,8 @@ bool CRemoveEntriesFromListPP::saveListValues()
 			m_listEntries.GetItemText(n, 0, pszValue, NUM_OF_CHARS);
 			ipEntryList->PushBack(_bstr_t(pszValue));
 		}
+
+		AFTagManager::validateDynamicFilePath("ELI33653", ipEntryList);
 		
 		m_ipInternalObject->EntryList = ipEntryList;
 		

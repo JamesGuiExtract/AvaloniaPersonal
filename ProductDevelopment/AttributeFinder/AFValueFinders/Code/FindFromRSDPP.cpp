@@ -48,6 +48,9 @@ STDMETHODIMP CFindFromRSDPP::Apply(void)
 			
 			CComBSTR bstrRSDFileName;
 			GetDlgItemText(IDC_EDIT_RSD_FILE, bstrRSDFileName.m_str);
+
+			AFTagManager::validateAsExplicitPath("ELI33648", asString(bstrRSDFileName));
+
 			ipFinder->RSDFileName = _bstr_t(bstrRSDFileName);
 		}
 			

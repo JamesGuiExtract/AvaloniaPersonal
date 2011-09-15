@@ -9,6 +9,7 @@
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
 #include <Misc.h>
+#include <AFTagManager.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -746,6 +747,8 @@ IVariantVectorPtr CBoxFinderPP::retrieveAndValidateClues()
 		m_listClues.GetItemText(n, 0, pszValue, MAX_CLUE_CHARS); 
 		ipClues->PushBack(pszValue);
 	}
+
+	AFTagManager::validateDynamicFilePath("ELI33655", ipClues);
 	
 	return ipClues;
 }

@@ -371,12 +371,10 @@ bool CRegExprRulePP::storePatternFile(UCLID_AFVALUEFINDERSLib::IRegExprRulePtr i
 		// if the edit box has text
 		GetDlgItemText(IDC_EDIT_REG_EXP_FILE, bstrRegExpFile.m_str);
 		_bstr_t _bstrFileName(bstrRegExpFile);
-		if (_bstrFileName.length() == 0)
-		{
-			throw UCLIDException("ELI07523", "File name shall not be empty.");
-		}
 
-		ipRegExprRule->RegExpFileName = _bstr_t(bstrRegExpFile);
+		AFTagManager::validateAsExplicitPath("ELI33650", asString(_bstrFileName));
+
+		ipRegExprRule->RegExpFileName = _bstrFileName;
 		
 		return true;
 	}

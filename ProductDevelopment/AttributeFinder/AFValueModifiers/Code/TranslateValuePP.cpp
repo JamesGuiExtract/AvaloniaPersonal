@@ -10,6 +10,7 @@
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
 #include <comutils.h>
+#include <AFTagManager.h>
 
 #include <map>
 
@@ -105,10 +106,12 @@ STDMETHODIMP CTranslateValuePP::Apply(void)
 			}
 		}
 		m_bDirty = FALSE;
+
+		return S_OK;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04243");
 
-	return S_OK;
+	return S_FALSE;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -584,9 +587,14 @@ bool CTranslateValuePP::saveAllTranslationPairsFromList()
 		{
 			string strEnt1 = getItemText(n, giTRANS_FROM_COLUMN);
 			string strEnt2 = getItemText(n, giTRANS_TO_COLUMN);
+
+			AFTagManager::validateDynamicFilePath("ELI33661", strEnt1);
+			AFTagManager::validateDynamicFilePath("ELI33664", strEnt2);
+
 			IStringPairPtr ipStringPair(CLSID_StringPair);
 			ipStringPair->StringKey = _bstr_t(strEnt1.c_str());
 			ipStringPair->StringValue = _bstr_t(strEnt2.c_str());
+
 			ipTranslationPairs->PushBack(ipStringPair);
 		}
 

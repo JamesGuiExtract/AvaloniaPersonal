@@ -9,6 +9,7 @@
 #include <comutils.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
+#include <AFTagManager.h>
 
 const int NUM_OF_CHARS = 4096;
 
@@ -102,6 +103,9 @@ STDMETHODIMP CBlockFinderPP::Apply(void)
 					m_listClues.GetItemText(n, 0, pszValue, NUM_OF_CHARS);
 					ipClues->PushBack(_bstr_t(pszValue));
 				}
+
+				AFTagManager::validateDynamicFilePath("ELI33654", ipClues);
+
 				ipBlockFinder->Clues = ipClues;
 				
 				bool bChecked = IsDlgButtonChecked(IDC_CHK_AS_REG_EXP)==BST_CHECKED;
@@ -113,10 +117,12 @@ STDMETHODIMP CBlockFinderPP::Apply(void)
 			}
 		}
 		SetDirty(FALSE);
+
+		return S_OK;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI05702")
 
-	return S_OK;
+	return S_FALSE;
 }
 
 //-------------------------------------------------------------------------------------------------

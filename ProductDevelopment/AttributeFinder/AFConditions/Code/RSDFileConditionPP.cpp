@@ -54,17 +54,8 @@ STDMETHODIMP CRSDFileConditionPP::Apply(void)
 			m_editRSDFileName.GetWindowText(bstrName.m_str);
 			_bstr_t _bstrName(bstrName);
 
-			if(m_ipAFUtility->StringContainsTags(_bstrName) == VARIANT_FALSE)
-			{
-				// ensure that the file exists
-				if (!isValidFile(asString(_bstrName)))
-				{
-					UCLIDException ue("ELI10910", "Specified .rsd file does not exist!");
-					ue.addDebugInfo("RSD File", asString(_bstrName));
-					ue.addWin32ErrorInfo();
-					throw ue;
-				}
-			}
+			AFTagManager::validateAsExplicitPath("ELI33663", asString(bstrName));
+
 			ipCondition->RSDFileName = _bstrName;
 		}
 

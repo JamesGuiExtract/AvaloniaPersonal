@@ -12,6 +12,20 @@ public:
 	~AFTagManager();
 
 	const std::string expandTagsAndFunctions(const std::string& strText, IAFDocumentPtr ipAFDoc);
+	
+	// Validates that the filename is either an absolute path for a file that exists or is a path
+	// based on a tag (and not a relative path for which the base directory may not be clear).
+	static void validateAsExplicitPath(const std::string& eliCode, const std::string& strFilename);
+
+	// Validates that if the value is a dynamic file specification that it is either an absolute
+	// path for a file that exists or is a path based on a tag (and not a relative path for which
+	// the base directory may not be clear).
+	static void validateDynamicFilePath(const std::string& eliCode, std::string strValue);
+
+	// For each item in the list, validates that if the value is a dynamic file specification that
+	// it is either an absolute path for a file that exists or is a path based on a tag (and not a
+	// relative path for which the base directory may not be clear).
+	static void validateDynamicFilePath(const std::string& eliCode, IVariantVectorPtr ipList);
 
 private:
 	IAFUtilityPtr getAFUtility();

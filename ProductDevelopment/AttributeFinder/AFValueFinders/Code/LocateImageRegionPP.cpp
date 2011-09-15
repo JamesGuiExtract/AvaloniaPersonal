@@ -10,6 +10,7 @@
 #include <cpputil.h>
 #include <CommentedTextFileReader.h>
 #include <ComponentLicenseIDs.h>
+#include <AFTagManager.h>
 
 const int NUM_OF_CHARS = 4096;
 
@@ -1329,6 +1330,8 @@ bool CLocateImageRegionPP::storeClueLists(UCLID_AFVALUEFINDERSLib::ILocateImageR
 			{
 				ipClues->PushBack(_bstr_t(listInfo.m_vecClues[ui].c_str()));
 			}
+
+			AFTagManager::validateDynamicFilePath("ELI33656", ipClues);
 			
 			ipLocateRegion->SetClueList(
 				(UCLID_AFVALUEFINDERSLib::EClueListIndex)eClueListIndex,

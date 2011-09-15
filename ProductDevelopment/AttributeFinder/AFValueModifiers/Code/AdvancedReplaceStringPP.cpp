@@ -64,6 +64,9 @@ STDMETHODIMP CAdvancedReplaceStringPP::Apply(void)
 			// get replacement
 			CComBSTR bstrReplacement;
 			GetDlgItemText(IDC_EDIT_REPLACEMENT, bstrReplacement.m_str);
+
+			AFTagManager::validateDynamicFilePath("ELI33658", asString(bstrReplacement));
+
 			ipAdvancedRS->Replacement = bstrReplacement.Detach();
 			
 			// occurrence type
@@ -100,10 +103,12 @@ STDMETHODIMP CAdvancedReplaceStringPP::Apply(void)
 		}
 
 		m_bDirty = FALSE;
+
+		return S_OK;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI05004");
 
-	return S_OK;
+	return S_FALSE;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -414,6 +419,9 @@ bool CAdvancedReplaceStringPP::storeToBeReplaced(
 	{
 		CComBSTR bstrToBeReplaced;
 		m_editFindString.GetWindowText(bstrToBeReplaced.m_str);
+
+		AFTagManager::validateDynamicFilePath("ELI33658", asString(bstrToBeReplaced));
+
 		ipARS->StrToBeReplaced = _bstr_t(bstrToBeReplaced);
 
 		return true;

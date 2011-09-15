@@ -542,10 +542,8 @@ bool CREPMFinderPP::storeRulesFile(UCLID_AFVALUEFINDERSLib::IREPMFinderPtr ipREP
 		// if the edit box has text
 		GetDlgItemText(IDC_EDIT_RULE_FILE, bstrRulesFile.m_str);
 		_bstr_t _bstrFileName(bstrRulesFile);
-		if (_bstrFileName.length() == 0)
-		{
-			throw UCLIDException("ELI33321", "File name shall not be empty.");
-		}
+		
+		AFTagManager::validateAsExplicitPath("ELI33649", asString(bstrRulesFile));
 
 		ipREPMFinder->RulesFileName = _bstr_t(bstrRulesFile);
 		

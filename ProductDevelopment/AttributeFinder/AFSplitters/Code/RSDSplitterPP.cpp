@@ -89,6 +89,8 @@ STDMETHODIMP CRSDSplitterPP::Apply(void)
 					{
 						CComBSTR bstrFileName;
 						GetDlgItemText(IDC_EDIT_RSD_FILE, bstrFileName.m_str);
+
+						AFTagManager::validateAsExplicitPath("ELI33647", asString(bstrFileName));
 						
 						ipRSDSplitter->RSDFileName = _bstr_t(bstrFileName);
 					}
@@ -104,10 +106,12 @@ STDMETHODIMP CRSDSplitterPP::Apply(void)
 			}
 		}
 		m_bDirty = FALSE;
+
+		return S_OK;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI05770");
 
-	return S_OK;
+	return S_FALSE;
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -10,6 +10,8 @@
 #include <Prompt2Dlg.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
+#include <AFTagManager.h>
+#include <COMUtils.h>
 
 #include <map>
 
@@ -84,10 +86,12 @@ STDMETHODIMP CReplaceStringsPP::Apply(void)
 		}
 
 		m_bDirty = FALSE;
+
+		return S_OK;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04316");
 
-	return S_OK;
+	return S_FALSE;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -774,10 +778,15 @@ bool CReplaceStringsPP::saveReplacements()
 			// get item texts from list
 			string strEnt1 = getItemText(n, TO_BE_REPLACED_COLUMN);
 			string strEnt2 = getItemText(n, REPLACEMENT_COLUMN);
+
+			AFTagManager::validateDynamicFilePath("ELI33659", strEnt1);
+			AFTagManager::validateDynamicFilePath("ELI33665", strEnt2);
+
 			// store them in the map
 			IStringPairPtr ipStringPair(CLSID_StringPair);
 			ipStringPair->StringKey = _bstr_t(strEnt1.c_str());
 			ipStringPair->StringValue = _bstr_t(strEnt2.c_str());
+
 			ipStrPairs->PushBack(ipStringPair);
 		}
 
