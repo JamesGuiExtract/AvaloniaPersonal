@@ -199,6 +199,12 @@ namespace Extract.Redaction.Verification
         DataGridViewCellStyle _visitedReadOnlyPageCellStyle;
 
         /// <summary>
+        /// Indicates whether an auto-zoom operation is in progress so that the grid can keep track
+        /// of whether the image viewer is currently zoomed to the selection.
+        /// </summary>
+        bool _performingAutoZoom;
+
+        /// <summary>
         /// Indicates whether the grid is actively tracking data.
         /// </summary>
         bool _active;
@@ -1017,27 +1023,6 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Handles UI command to bring the selected item into view.
-        /// </summary>
-        /// <param name="forceAutoZoom"><see langword="true"/> to perform auto-zoom even if
-        /// <see cref="_autoZoom"/> is <see langword="false"/>.</param>
-        /// <param name="alwaysShiftZoom"><see langword="true"/> if the zoom should be adjusted
-        /// regardless of whether redactions are already in view; <see langword="false"/> if the
-        /// zoom should only be adjusted if in auto-zoom mode is on or if at least one redaction
-        /// on the page is not fully visible.</param>
-        public void BringSelectionIntoViewSelected(bool forceAutoZoom, bool alwaysShiftZoom)
-        {
-            try
-            {
-                BringSelectionIntoView(forceAutoZoom, alwaysShiftZoom);
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI33221");
-            }
-        }
-
-        /// <summary>
         /// Centers the view on redactions selected on the current page; if there are no
         /// redactions selected on the current page, uses the first page with a selected redaction.
         /// </summary>
@@ -1183,16 +1168,27 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void PerformAutoZoom(IEnumerable<LayerObject> layerObjects)
         {
-            // Get combined area of all the selected layer objects on the current page
-            Rectangle area = LayerObject.GetCombinedBounds(layerObjects);
+            try
+            {
+                _performingAutoZoom = true;
 
-            // Adjust the area by the auto zoom scale
-            int padding = (_autoZoomScale - 1) * _PADDING_MULTIPLIER + _MIN_PADDING;
-            area = _imageViewer.PadViewingRectangle(area, padding, padding, false);
-            area = _imageViewer.GetTransformedRectangle(area, false);
+                // Get combined area of all the selected layer objects on the current page
+                Rectangle area = LayerObject.GetCombinedBounds(layerObjects);
 
-            // Zoom to appropriate area
-            _imageViewer.ZoomToRectangle(area);
+                // Adjust the area by the auto zoom scale
+                int padding = (_autoZoomScale - 1) * _PADDING_MULTIPLIER + _MIN_PADDING;
+                area = _imageViewer.PadViewingRectangle(area, padding, padding, false);
+                area = _imageViewer.GetTransformedRectangle(area, false);
+
+                // Zoom to appropriate area
+                _imageViewer.ZoomToRectangle(area);
+
+                ZoomedToSelection = true;
+            }
+            finally
+            {
+                _performingAutoZoom = false;
+            }
         }
 
         /// <summary>
@@ -2392,6 +2388,50 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="ImageViewer"/> ZoomChanged event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.ZoomChangedEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleZoomChanged(object sender, ZoomChangedEventArgs e)
+        {
+            try
+            {
+                // If not in an auto-zoom operation, set the new zoom level as the last
+                // non-selection zoom.
+                if (!_performingAutoZoom && _imageViewer.ZoomHistoryCount > 0)
+                {
+                    ZoomedToSelection = false;
+                    LastNonSelectionZoomInfo = _imageViewer.ZoomInfo;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI33671");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ImageViewer"/> PageChanged event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.PageChangedEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandlePageChanged(object sender, PageChangedEventArgs e)
+        {
+            try
+            {
+                // Upon loading a new page, there is no LastNonSelectionZoomInfo for the current
+                // page.
+                LastNonSelectionZoomInfo = null;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI33680");
+            }
+        }
+
         #endregion Event Handlers
 
         #region IImageViewerControl Members
@@ -2421,6 +2461,8 @@ namespace Extract.Redaction.Verification
                         Active = false;
                         _imageViewer.ImageFileChanged -= HandleImageFileChanged;
                         _imageViewer.ImageFileClosing -= HandleImageFileClosing;
+                        _imageViewer.PageChanged -= HandlePageChanged;
+                        _imageViewer.ZoomChanged -= HandleZoomChanged;
                         _imageViewer.Shortcuts[Keys.T] = null;
                     }
 
@@ -2432,6 +2474,8 @@ namespace Extract.Redaction.Verification
                     {
                         _imageViewer.ImageFileChanged += HandleImageFileChanged;
                         _imageViewer.ImageFileClosing += HandleImageFileClosing;
+                        _imageViewer.PageChanged += HandlePageChanged;
+                        _imageViewer.ZoomChanged += HandleZoomChanged;
                         _imageViewer.Shortcuts[Keys.T] = SelectDropDownTypeList;
                     }
                 }
@@ -2444,6 +2488,30 @@ namespace Extract.Redaction.Verification
         }
 
         #endregion IImageViewerControl Members
+
+        #region Internal Members
+
+        /// <summary>
+        /// Gets whether the <see cref="ImageViewer"/> is zoomed to the current selection in
+        /// grid.
+        /// </summary>
+        internal bool ZoomedToSelection
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the last zoom info for the current page that is not a zoom to an item that had been
+        /// selected in the grid.
+        /// </summary>
+        internal ZoomInfo? LastNonSelectionZoomInfo
+        {
+            get;
+            private set;
+        }
+
+        #endregion Internal Members
 
         #region Private Members
 

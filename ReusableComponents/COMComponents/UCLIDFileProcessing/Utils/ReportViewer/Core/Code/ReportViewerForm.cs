@@ -373,7 +373,7 @@ namespace Extract.ReportViewer
                     }
 
                     // Build the file name from the response
-                    baseSavedName = ExtractReport.SavedReportFolder + response;
+                    baseSavedName = Path.Combine(ExtractReport.SavedReportFolder, response);
                     
                     // Check if there is a standard report with the same name
                     if (IsSameNameAsStandardReport(response))

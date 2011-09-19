@@ -2374,16 +2374,23 @@ namespace Extract.Imaging.Forms
                 return;
             }
 
-            // Add the entry to the zoom history for the current page if necessary
-            if (updateZoomHistory)
-            {
-                _imagePages[_pageNumber - 1].ZoomInfo = zoomInfo;
-            }
+            // Check to see that the zoom actually changed.
+            bool zoomChanged = _imagePages[_pageNumber - 1].ZoomHistoryCount == 0 ||
+                               _imagePages[_pageNumber - 1].ZoomInfo != zoomInfo;
 
-            // Raise the ZoomChanged event
-            if (raiseZoomChanged)
+            if (zoomChanged)
             {
-                OnZoomChanged(new ZoomChangedEventArgs(zoomInfo));
+                // Add the entry to the zoom history for the current page if necessary
+                if (updateZoomHistory)
+                {
+                    _imagePages[_pageNumber - 1].ZoomInfo = zoomInfo;
+                }
+
+                // Raise the ZoomChanged event
+                if (raiseZoomChanged)
+                {
+                    OnZoomChanged(new ZoomChangedEventArgs(zoomInfo));
+                }
             }
         }
 

@@ -2377,8 +2377,7 @@ namespace Extract.Redaction.Verification
 
                 // Center on selected layer objects. Use forceAutoZoom parameter so that it works
                 // even if auto-zoom is disabled.
-                _imageViewer.Shortcuts[Keys.F2] = (() =>
-                    _redactionGridView.BringSelectionIntoViewSelected(true, false));
+                _imageViewer.Shortcuts[Keys.F2] = HandleToggleZoomToSelection;
 
                 // Disable the close image
                 _imageViewer.Shortcuts[Keys.F4 | Keys.Control] = null;
@@ -3555,6 +3554,34 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI32630");
+            }
+        }
+
+        /// <summary>
+        /// Handles the toggle zoom to selection UI command.
+        /// </summary>
+        void HandleToggleZoomToSelection()
+        {
+            try
+            {
+                // If not currently zoomed to the current selection and there has been a ZoomInfo
+                // for the current page that is not a zoom to selection, return to that ZoomInfo.
+                if (_redactionGridView.ZoomedToSelection)
+                {
+                    if (_redactionGridView.LastNonSelectionZoomInfo != null)
+                    {
+                        _imageViewer.ZoomInfo = _redactionGridView.LastNonSelectionZoomInfo.Value;
+                    }
+                }
+                // Otherwise, zoom to the current selection.
+                else
+                {
+                    _redactionGridView.BringSelectionIntoView(true, false);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI33221");
             }
         }
 
