@@ -18,3 +18,6 @@
 
 // Run an output handler on a parent attribute
 <TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
+
+// The same as Test2, but with the query in an attribute selector instead.
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
