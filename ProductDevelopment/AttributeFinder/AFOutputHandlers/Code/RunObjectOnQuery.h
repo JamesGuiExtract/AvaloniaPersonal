@@ -60,27 +60,14 @@ END_CATEGORY_MAP()
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
 // IRunObjectOnQuery
-	// REQUIRE: nothing
-	// PROMISE: to return the query being used by this object
 	STDMETHOD(get_AttributeQuery)(/*[out, retval]*/ BSTR *pVal);
-	// REQUIRE: newVal has a length > 0.  Should require that newVal is a valid
-	//			query string but currently does not
-	// PROMISE: From the time this method is called on newVal will be used to query attributes
 	STDMETHOD(put_AttributeQuery)(/*[in]*/ BSTR newVal);
-
-	// REQUIRE: nothing
-	// PROMISE: This mehtod will return the object and the interface that will be run on the 
-	//			queried attributes, The Object may be NULL, but if it is not it will implement the returned
-	//			IID.
 	STDMETHOD(GetObjectAndIID)(/*[in, out]*/ IID *pIID, /*[out, retval]*/ ICategorizedComponent **pObject);
-	// REQUIRE: newIID must be one of the following:
-	//			IID_IAttributeModifyingRule
-	//			IID_IAttributeSplitter
-	//			IID_IOutputHandler
-	//			newObject must implement the interface represented by newIID
-	// PROMISE: Specify the object and the interface that will be run on the queried attributes
-	//			from this method call on.
 	STDMETHOD(SetObjectAndIID)(/*[in]*/ IID newIID, /*[in]*/ ICategorizedComponent *newObject);
+	STDMETHOD(get_UseAttributeSelector)(/*[out, retval]*/ VARIANT_BOOL* pVal);
+	STDMETHOD(put_UseAttributeSelector)(/*[in]*/ VARIANT_BOOL newVal);
+	STDMETHOD(get_AttributeSelector)(IAttributeSelector ** pVal);
+	STDMETHOD(put_AttributeSelector)(IAttributeSelector * newVal);
 
 
 // IOutputHandler
@@ -121,6 +108,10 @@ private:
 	// Name of Attribute(s) to be affected
 	// May also be a query to find the affected Attribute(s)
 	std::string	m_strAttributeQuery;
+
+	// The attribute selector (and whether to use it).
+	bool m_bUseSelector;
+	IAttributeSelectorPtr m_ipSelector;
 
 	// This is the component that will be run on the queried attributes
 	ICategorizedComponentPtr m_ipObject;

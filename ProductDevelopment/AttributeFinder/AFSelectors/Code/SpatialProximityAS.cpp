@@ -700,7 +700,14 @@ STDMETHODIMP CSpatialProximityAS::raw_IsConfigured(VARIANT_BOOL *pbValue)
 		// Check parameter
 		ASSERT_ARGUMENT("ELI22584", pbValue != __nullptr);
 
-		*pbValue = VARIANT_TRUE;
+		if (m_strTargetQuery.empty() || m_strReferenceQuery.empty())
+		{
+			*pbValue = VARIANT_FALSE;
+		}
+		else
+		{
+			*pbValue = VARIANT_TRUE;
+		}
 
 		return S_OK;
 	}

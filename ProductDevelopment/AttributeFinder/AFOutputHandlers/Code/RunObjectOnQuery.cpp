@@ -25,14 +25,18 @@
 //            Set Attribute Value
 //            Set Attribute Type
 // Version 5: Added CIdentifiableRuleObject
-const unsigned long gnCurrentVersion = 5;
+// Version 6: Rule is now named "Run object on attributes"
+//			  Added UseAttributeSelector and AttributeSelector
+const unsigned long gnCurrentVersion = 6;
 
 //-------------------------------------------------------------------------------------------------
 // CRunObjectOnQuery
 //-------------------------------------------------------------------------------------------------
 CRunObjectOnQuery::CRunObjectOnQuery()
 : m_bDirty(false),
-  m_ipObject(NULL),
+  m_bUseSelector(false),
+  m_ipSelector(__nullptr),
+  m_ipObject(__nullptr),
   m_objectIID(IID_IAttributeModifyingRule)
 {
 	try
@@ -47,6 +51,8 @@ CRunObjectOnQuery::~CRunObjectOnQuery()
 {
 	try
 	{
+		m_ipSelector = __nullptr;
+		m_ipObject = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16318");
 }
@@ -202,6 +208,74 @@ STDMETHODIMP CRunObjectOnQuery::SetObjectAndIID(IID newIID, ICategorizedComponen
 
 	return S_OK;
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CRunObjectOnQuery::get_UseAttributeSelector(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33695", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = asVariantBool(m_bUseSelector);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33696")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CRunObjectOnQuery::put_UseAttributeSelector(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bUseSelector = asCppBool(newVal);
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33697")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRunObjectOnQuery::get_AttributeSelector(IAttributeSelector **pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		IAttributeSelectorPtr ipShallowCopy(m_ipSelector);
+		*pVal = ipShallowCopy.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33692")
+
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRunObjectOnQuery::put_AttributeSelector(IAttributeSelector *newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		ASSERT_ARGUMENT("ELI33693", newVal != __nullptr);
+
+		m_ipSelector = newVal;
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33694")
+}
 
 //-------------------------------------------------------------------------------------------------
 // IOutputHandler
@@ -245,6 +319,12 @@ STDMETHODIMP CRunObjectOnQuery::raw_ProcessOutput(IIUnknownVector* pAttributes, 
 		// query the vector for desired attributes
 		IIUnknownVectorPtr ipQueriedAttributes = m_ipAFUtility->QueryAttributes(
 				ipOrigAttributes, get_bstr_t(m_strAttributeQuery), VARIANT_FALSE);
+
+		// Further narrow ipQueriedAttributes using the selector (if one is specified).
+		if (m_bUseSelector)
+		{
+			ipQueriedAttributes = m_ipSelector->SelectAttributes(ipQueriedAttributes, ipAFDoc);
+		}
 
 		// update the progress status if it exists
 		if (ipProgressStatus)
@@ -359,7 +439,7 @@ STDMETHODIMP CRunObjectOnQuery::raw_GetComponentDescription(BSTR * pstrComponent
 	{
 		ASSERT_ARGUMENT("ELI19554", pstrComponentDescription != __nullptr)
 
-		*pstrComponentDescription = _bstr_t("Run object on query").Detach();
+		*pstrComponentDescription = _bstr_t("Run object on attributes").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10387")
 
@@ -380,6 +460,19 @@ STDMETHODIMP CRunObjectOnQuery::raw_CopyFrom(IUnknown *pObject)
 		
 		// Copy Attribute query
 		m_strAttributeQuery = asString( ipSource->AttributeQuery );
+
+		// Copy the attribute selector and whether to use it.
+		m_bUseSelector = asCppBool(ipSource->UseAttributeSelector);
+		
+		ICopyableObjectPtr ipCopySelector(ipSource->AttributeSelector);
+		if (ipCopySelector != __nullptr)
+		{
+			m_ipSelector = ipCopySelector->Clone();
+		}
+		else
+		{
+			m_ipSelector = __nullptr;
+		}
 		
 		// Copy the IID and the Object
 		ICopyableObjectPtr ipCopyObj(ipSource->GetObjectAndIID(&m_objectIID));
@@ -468,7 +561,7 @@ STDMETHODIMP CRunObjectOnQuery::Load(IStream *pStream)
 		{
 			// Throw exception
 			UCLIDException ue( "ELI10391", 
-				"Unable to load newer Run Object On Query Output Handler!" );
+				"Unable to load newer 'Run object on attributes' output handler!" );
 			ue.addDebugInfo( "Current Version", gnCurrentVersion );
 			ue.addDebugInfo( "Version to Load", nDataVersion );
 			throw ue;
@@ -484,11 +577,23 @@ STDMETHODIMP CRunObjectOnQuery::Load(IStream *pStream)
 			dataReader >> m_objectIID.Data4[i];
 		}
 
+		if (nDataVersion >= 6)
+		{
+			dataReader >> m_bUseSelector;
+		}
 
 		// read the object
 		IPersistStreamPtr ipObj;
 		::readObjectFromStream(ipObj, pStream, "ELI09983");
 		m_ipObject = ipObj;
+
+		// Read the selector only if it is being used.
+		if (nDataVersion >= 6 && m_bUseSelector)
+		{
+			IPersistStreamPtr ipSelector;
+			::readObjectFromStream(ipSelector, pStream, "ELI33700");
+			m_ipSelector = ipSelector;
+		}
 
 		if (nDataVersion >= 5)
 		{
@@ -526,6 +631,7 @@ STDMETHODIMP CRunObjectOnQuery::Save(IStream *pStream, BOOL fClearDirty)
 		{
 			dataWriter << m_objectIID.Data4[i];
 		}
+		dataWriter << m_bUseSelector;
 		dataWriter.flushToByteStream();
 
 		// Write the bytestream data into the IStream object
@@ -537,6 +643,14 @@ STDMETHODIMP CRunObjectOnQuery::Save(IStream *pStream, BOOL fClearDirty)
 		IPersistStreamPtr ipObj = m_ipObject;
 		ASSERT_RESOURCE_ALLOCATION("ELI10417", ipObj != __nullptr);
 		writeObjectToStream(ipObj, pStream, "ELI10418", fClearDirty);
+
+		// write the selector out if one is being used.
+		if (m_bUseSelector)
+		{
+			IPersistStreamPtr ipSelector = m_ipSelector;
+			ASSERT_RESOURCE_ALLOCATION("ELI33698", ipSelector != __nullptr);
+			writeObjectToStream(ipSelector, pStream, "ELI33699", fClearDirty);
+		}
 
 		// Save the GUID for the IIdentifiableRuleObject interface.
 		saveGUID(pStream);
@@ -583,7 +697,7 @@ STDMETHODIMP CRunObjectOnQuery::get_InstanceGUID(GUID *pVal)
 void CRunObjectOnQuery::validateLicense()
 {
 	VALIDATE_LICENSE( gnRULE_WRITING_CORE_OBJECTS, "ELI10394", 
-		"Run Object On Query Output Handler" );
+		"Run object on attributes output handler" );
 }
 //-------------------------------------------------------------------------------------------------
 void CRunObjectOnQuery::runAttributeModifier(IIUnknownVectorPtr ipAttributes, IAFDocumentPtr ipAFDoc)

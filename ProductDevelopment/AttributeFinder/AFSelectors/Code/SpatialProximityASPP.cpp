@@ -174,10 +174,20 @@ STDMETHODIMP CSpatialProximityASPP::Apply(void)
 			// Apply settings to rule
 			CComBSTR bstrTargetQuery;
 			m_editTargetQuery.GetWindowText(&bstrTargetQuery);
+			if (bstrTargetQuery.Length() == 0)
+			{
+				UCLIDException ue("ELI33689", "Target attribute query text must not be empty.");
+				throw ue;
+			}
 			ipRule->TargetQuery = bstrTargetQuery.m_str;
 
 			CComBSTR bstrReferenceQuery;
 			m_editReferenceQuery.GetWindowText(&bstrReferenceQuery);
+			if (bstrReferenceQuery.Length() == 0)
+			{
+				UCLIDException ue("ELI33690", "Reference attribute query text must not be empty.");
+				throw ue;
+			}
 			ipRule->ReferenceQuery = bstrReferenceQuery.m_str;
 			
 			CComBSTR bstrInclusionMethod;

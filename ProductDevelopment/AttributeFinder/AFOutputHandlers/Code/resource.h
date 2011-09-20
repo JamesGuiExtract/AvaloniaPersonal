@@ -177,14 +177,16 @@
 #define IDC_EDIT_VALUE_LIST             349
 #define IDC_BUTTON_EDIT_VALUE_LIST      350
 #define IDC_RADIO_PRESERVE_VALUE        351
+#define IDC_CHK_USE_SELECTOR            352
+#define IDC_TXT_MUST_CONFIGURE_SELECTOR 353
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        352
+#define _APS_NEXT_RESOURCE_VALUE        354
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         352
+#define _APS_NEXT_CONTROL_VALUE         354
 #define _APS_NEXT_SYMED_VALUE           164
 #endif
 #endif

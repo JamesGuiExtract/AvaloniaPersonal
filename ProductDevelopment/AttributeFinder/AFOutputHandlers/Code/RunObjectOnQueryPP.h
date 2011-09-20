@@ -38,6 +38,9 @@ BEGIN_MSG_MAP(CRunObjectOnQueryPP)
 	COMMAND_HANDLER(IDC_BTN_CONFIGURE, BN_CLICKED, OnClickedBtnConfigure)
 	COMMAND_HANDLER(IDC_CMB_OBJECT_TYPE, CBN_SELCHANGE, OnSelChangeCmbObjectType)
 	COMMAND_HANDLER(IDC_CMB_OBJECT, CBN_SELCHANGE, OnSelChangeCmbObject)
+	COMMAND_HANDLER(IDC_CHK_USE_SELECTOR, BN_CLICKED, OnBnClickedCheckUseSelector)
+	COMMAND_HANDLER(IDC_BUTTON_CONFIGURE_SELECTOR, BN_CLICKED, OnBnClickedButtonConfigureSelector)
+	COMMAND_HANDLER(IDC_COMBO_ATTRIBUTE_SELECTOR, CBN_SELCHANGE, OnCbnSelchangeComboAttributeSelector)
 END_MSG_MAP()
 // Handler prototypes:
 //  LRESULT MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -55,6 +58,9 @@ END_MSG_MAP()
 	LRESULT OnClickedBtnConfigure(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnSelChangeCmbObjectType(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnSelChangeCmbObject(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnBnClickedCheckUseSelector(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnBnClickedButtonConfigureSelector(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnCbnSelchangeComboAttributeSelector(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 private:
 
@@ -73,6 +79,9 @@ private:
 	// Variables
 	//////////////
 	ATLControls::CEdit m_editAttributeQuery;
+	ATLControls::CButton m_btnUseAttributeSelector;
+	ATLControls::CComboBox m_cmbAttributeSelectors;
+	ATLControls::CButton m_btnConfigureSelector;
 	ATLControls::CComboBox m_cmbObjectType;
 	ATLControls::CComboBox m_cmbObject;
 	ATLControls::CButton m_btnConfigure;
@@ -83,8 +92,14 @@ private:
 	// Stores association between registered Object names and ProgIDs
 	UCLID_COMUTILSLib::IStrToStrMapPtr	m_ipObjectMap;
 
-	// This is the currently selected componenet
+	// This is the currently selected component
 	ICategorizedComponentPtr m_ipObject;
+
+	// Maps attribute selector names to ProgIDs
+	UCLID_COMUTILSLib::IStrToStrMapPtr m_ipSelectorMap;
+
+	// This is the currently selected selector
+	ICategorizedComponentPtr m_ipSelector;
 
 	///////////
 	// Methods
@@ -97,8 +112,14 @@ private:
 	// Fills the object combo box with objects based on the currently selected object type
 	void populateObjectCombo();
 
-	// sets m_ipObject to a new instance of whatever type of object is selected in the object combo
+	// Fills the selector combo box with the available attribute selectors
+	void populateSelectorCombo();
+
+	// Sets m_ipObject to a new instance of whatever type of object is selected in the object combo
 	void createSelectedObject();
+
+	// Sets m_ipSelector to a new instance of the selector type in the selector combo
+	void createSelectedSelector();
 
 	std::string getCategoryName(IID& riid);
 
@@ -106,12 +127,19 @@ private:
 	// str name
 	ICategorizedComponentPtr createObjectFromName(std::string strName);
 
-	// This will show or hide the "Object Must be configured" message based on
-	// the current object
-	void showReminder();
+	// This will create a categorized component for the selector type indicated by strName
+	ICategorizedComponentPtr createSelectorFromName(std::string strName);
 
-	// Shows/Hides the configure button
-	void updateConfigureButton();
+	// This will show or hide the "Object Must be configured" message indicated by nLabelID based
+	// on the specified ipObject.
+	void showReminder(ICategorizedComponentPtr ipObject, int nLabelID);
+
+	// Shows/Hides the configure button indicated by nButtonID bast on the configuration state of
+	// ipObject
+	void updateConfigureButton(ICategorizedComponentPtr ipObject, int nButtonID);
+	
+	// Enables/disables and hides/shows attribute selector controls based on the current settings.
+	void updateSelectorControls();
 
 	void selectType(IID& riid);
 

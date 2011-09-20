@@ -19,9 +19,11 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 // CRunObjectOnQueryPP
 //-------------------------------------------------------------------------------------------------
 CRunObjectOnQueryPP::CRunObjectOnQueryPP()
-: m_ipCategoryMgr(NULL),
-  m_ipObjectMap(NULL),
-  m_ipObject(NULL)
+: m_ipCategoryMgr(__nullptr),
+  m_ipObjectMap(__nullptr),
+  m_ipObject(__nullptr),
+  m_ipSelectorMap(__nullptr),
+  m_ipSelector(__nullptr)
 {
 	try
 	{
@@ -60,6 +62,28 @@ STDMETHODIMP CRunObjectOnQueryPP::Apply(void)
 				throw UCLIDException( "ELI10395", "Please specify an Attribute Query!" );
 			}
 
+			// Apply the attribute selector (and whether to use it).
+			bool bUseSelector = m_btnUseAttributeSelector.GetCheck() == BST_CHECKED;
+			if (bUseSelector)
+			{
+				UCLID_COMUTILSLib::IMustBeConfiguredObjectPtr ipConfiguredSelector(m_ipSelector);
+				if (ipConfiguredSelector != __nullptr &&
+					!asCppBool(ipConfiguredSelector->IsConfigured()))
+				{
+					// The selector hasn't been configured yet, show the configuration dialog to the user
+					MessageBox("The selector has not been configured completely. "
+						"Please specify all required properties.", "Configuration");
+					
+					BOOL bTmp;
+					OnBnClickedButtonConfigureSelector(0, 0, 0, bTmp);
+		
+					// do not close the dialog
+					return S_FALSE;
+				}
+			}
+
+			ipObject->UseAttributeSelector = asVariantBool(bUseSelector);
+			ipObject->AttributeSelector = IAttributeSelectorPtr(m_ipSelector);
 
 			// ensure the object is configured
 			UCLID_COMUTILSLib::IMustBeConfiguredObjectPtr ipConfiguredObj(m_ipObject);
@@ -152,6 +176,31 @@ LRESULT CRunObjectOnQueryPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 			m_editAttributeQuery.SetSel( 0, -1 );
 			m_editAttributeQuery.SetFocus();
 
+			// Initialize the UI to the state of the current attribute selector
+			m_btnUseAttributeSelector = GetDlgItem(IDC_CHK_USE_SELECTOR);
+			m_cmbAttributeSelectors = GetDlgItem(IDC_COMBO_ATTRIBUTE_SELECTOR);
+			m_btnConfigureSelector = GetDlgItem(IDC_BUTTON_CONFIGURE_SELECTOR);
+
+			m_btnUseAttributeSelector.SetCheck(asBSTChecked(ipObject->UseAttributeSelector));
+			m_ipSelector = ipObject->AttributeSelector;
+
+			populateSelectorCombo();
+
+			if(m_ipSelector != __nullptr)
+			{
+				string strSelectorName = asString(m_ipSelector->GetComponentDescription());
+
+				// Set the combo box selection
+				m_cmbAttributeSelectors.SelectString(-1, strSelectorName.c_str());	
+			}
+			else
+			{
+				m_cmbAttributeSelectors.SetCurSel(0);
+				createSelectedSelector();
+			}
+
+			updateSelectorControls();
+
 			// set up the configure button
 			m_btnConfigure = GetDlgItem( IDC_BTN_CONFIGURE );
 
@@ -190,10 +239,10 @@ LRESULT CRunObjectOnQueryPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 				// does the object need to be configured
 				// this should only happen when an object requires additional
 				// configuration in a later version
-				showReminder();
+				showReminder(m_ipObject, IDC_TXT_MUST_CONFIGURE);
 
 				// show or hide the configure button
-				updateConfigureButton();
+				updateConfigureButton(m_ipObject, IDC_BTN_CONFIGURE);
 			}
 			else
 			{
@@ -237,7 +286,7 @@ LRESULT CRunObjectOnQueryPP::OnClickedBtnConfigure(WORD wNotifyCode, WORD wID,
 			}
 
 			// Check configured state of Component
-			showReminder();
+			showReminder(m_ipObject, IDC_TXT_MUST_CONFIGURE);
 		}
 
 		// Set dirty flag
@@ -282,6 +331,77 @@ LRESULT CRunObjectOnQueryPP::OnSelChangeCmbObject(WORD wNotifyCode, WORD wID, HW
 		SetDirty( TRUE );
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19191");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CRunObjectOnQueryPP::OnBnClickedCheckUseSelector(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		updateSelectorControls();
+
+		// Set dirty flag
+		SetDirty( TRUE );
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI33691");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CRunObjectOnQueryPP::OnBnClickedButtonConfigureSelector(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Must have a combo box selection
+		if (m_ipSelector != __nullptr)
+		{
+			// Create the ObjectPropertiesUI object
+			IObjectPropertiesUIPtr	ipProperties( CLSID_ObjectPropertiesUI );
+			ASSERT_RESOURCE_ALLOCATION("ELI33683", ipProperties != __nullptr);
+
+			UCLID_COMUTILSLib::ICopyableObjectPtr ipCopyObj = m_ipSelector;
+			ASSERT_RESOURCE_ALLOCATION("ELI33684", ipCopyObj != __nullptr);
+			UCLID_COMUTILSLib::ICategorizedComponentPtr ipCopy = ipCopyObj->Clone();
+
+			string strComponentDesc = ipCopy->GetComponentDescription();
+			string strTitle = string( "Configure " ) + strComponentDesc;
+			_bstr_t	bstrTitle( strTitle.c_str() );
+
+			if(asCppBool(ipProperties->DisplayProperties1(ipCopy, bstrTitle)))
+			{
+				m_ipSelector = ipCopy;
+			}
+
+			// Check configured state of Component
+			showReminder(m_ipSelector, IDC_TXT_MUST_CONFIGURE_SELECTOR);
+		}
+
+		// Set dirty flag
+		SetDirty( TRUE );
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI33685");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CRunObjectOnQueryPP::OnCbnSelchangeComboAttributeSelector(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Create a new object
+		createSelectedSelector();
+
+		// Set dirty flag
+		SetDirty( TRUE );
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI33688");
 
 	return 0;
 }
@@ -339,6 +459,29 @@ void CRunObjectOnQueryPP::populateObjectCombo()
 	}
 }
 //-------------------------------------------------------------------------------------------------
+void CRunObjectOnQueryPP::populateSelectorCombo()
+{
+	// clear the list
+	m_cmbAttributeSelectors.ResetContent();
+
+	m_ipSelectorMap = m_ipCategoryMgr->GetDescriptionToProgIDMap1(
+		AFAPI_ATTRIBUTE_SELECTORS_CATEGORYNAME.c_str());
+
+	// Fill the object combo with the object names
+	// Get names from map
+	CString	zName;
+	long nNumEntries = m_ipSelectorMap->GetSize();
+	UCLID_COMUTILSLib::IVariantVectorPtr ipKeys = m_ipSelectorMap->GetKeys();
+	ASSERT_RESOURCE_ALLOCATION("ELI33687", ipKeys != __nullptr);
+	int i;
+	for (i = 0; i < nNumEntries; i++)
+	{
+		// Add name to combo box
+		zName = (char *)_bstr_t(ipKeys->GetItem( i ));
+		m_cmbAttributeSelectors.AddString(zName);
+	}
+}
+//-------------------------------------------------------------------------------------------------
 std::string CRunObjectOnQueryPP::getCategoryName(IID& riid)
 {
 	if (riid == IID_IAttributeModifyingRule)
@@ -375,9 +518,29 @@ void CRunObjectOnQueryPP::createSelectedObject()
 	m_ipObject = createObjectFromName(strName);
 
 	// display the must configure message if appropriate
-	showReminder();
+	showReminder(m_ipObject, IDC_TXT_MUST_CONFIGURE);
 	// show or hide the configure button
-	updateConfigureButton();
+	updateConfigureButton(m_ipObject, IDC_BTN_CONFIGURE);
+}
+//-------------------------------------------------------------------------------------------------
+void CRunObjectOnQueryPP::createSelectedSelector()
+{
+	// get the objects description
+	long nIndex = m_cmbAttributeSelectors.GetCurSel();
+	long nLen = m_cmbAttributeSelectors.GetLBTextLen(nIndex);
+	char* buf = new char[nLen+1];
+	m_cmbAttributeSelectors.GetLBText(nIndex, buf);
+	string strName = buf;
+	delete buf;
+
+	// create and object with the appropriate progid
+	m_ipSelector = createSelectorFromName(strName);
+
+	// display the must configure message if appropriate
+	showReminder(m_ipSelector, IDC_TXT_MUST_CONFIGURE_SELECTOR);
+
+	// show or hide the configure button
+	updateConfigureButton(m_ipSelector, IDC_BUTTON_CONFIGURE_SELECTOR);
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_COMUTILSLib::ICategorizedComponentPtr CRunObjectOnQueryPP::createObjectFromName(std::string strName)
@@ -406,14 +569,43 @@ UCLID_COMUTILSLib::ICategorizedComponentPtr CRunObjectOnQueryPP::createObjectFro
 	}
 	
 	// Not found in map, just return NULL
-	return NULL;
+	return __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
-void CRunObjectOnQueryPP::showReminder() 
+UCLID_COMUTILSLib::ICategorizedComponentPtr CRunObjectOnQueryPP::createSelectorFromName(std::string strName)
 {
-	ATLControls::CStatic txtConfigure = GetDlgItem( IDC_TXT_MUST_CONFIGURE );
+	// Check for the Prog ID in the map
+	_bstr_t	bstrName( strName.c_str() );
+	if (m_ipSelectorMap->Contains( bstrName ) == VARIANT_TRUE)
+	{
+		// Retrieve the Prog ID string
+		_bstr_t	bstrProgID = m_ipSelectorMap->GetValue( bstrName );
+		
+		// Create the object
+		UCLID_COMUTILSLib::ICategorizedComponentPtr ipComponent( 
+			bstrProgID.operator const char *() );
+
+		// if the object is privately licensed, then initialize
+		// the private license
+		IPrivateLicensedComponentPtr ipPLComponent = ipComponent;
+		if (ipPLComponent)
+		{
+			_bstr_t _bstrKey = LICENSE_MGMT_PASSWORD.c_str();
+			ipPLComponent->InitPrivateLicense(_bstrKey);
+		}
+
+		return ipComponent;
+	}
+	
+	// Not found in map, just return NULL
+	return __nullptr;
+}
+//-------------------------------------------------------------------------------------------------
+void CRunObjectOnQueryPP::showReminder(ICategorizedComponentPtr ipObject, int nLabelID) 
+{
+	ATLControls::CStatic txtConfigure = GetDlgItem(nLabelID);
 	// Check configured state of object
-	UCLID_COMUTILSLib::IMustBeConfiguredObjectPtr ipConfiguredObj(m_ipObject);
+	UCLID_COMUTILSLib::IMustBeConfiguredObjectPtr ipConfiguredObj(ipObject);
 	if (ipConfiguredObj)
 	{
 		// Has object been configured yet?
@@ -421,7 +613,7 @@ void CRunObjectOnQueryPP::showReminder()
 		{
 			// Else Component IS NOT configured and
 			// label should be shown
-			txtConfigure.ShowWindow( SW_SHOW );
+			txtConfigure.ShowWindow(SW_SHOW);
 			return;
 		}
 	}
@@ -444,14 +636,39 @@ void CRunObjectOnQueryPP::selectType(IID& riid)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CRunObjectOnQueryPP::updateConfigureButton()
+void CRunObjectOnQueryPP::updateConfigureButton(ICategorizedComponentPtr ipObject, int nButtonID)
 {
-	ISpecifyPropertyPagesPtr ipPP( m_ipObject );
+	ISpecifyPropertyPagesPtr ipPP(ipObject);
 	BOOL bEnable = FALSE;
 	if (ipPP) 
 	{
 		bEnable = TRUE;
 	}
-	m_btnConfigure.EnableWindow(bEnable);
+	
+	CWindow wndButton = GetDlgItem(nButtonID);
+	wndButton.EnableWindow(bEnable);
+}
+//-------------------------------------------------------------------------------------------------
+void CRunObjectOnQueryPP::updateSelectorControls()
+{
+	bool bUseSelector = (m_btnUseAttributeSelector.GetCheck() == BST_CHECKED);
+
+	if (bUseSelector)
+	{
+		m_cmbAttributeSelectors.EnableWindow(TRUE);
+
+		// Indicate whether the selector needs configuration.
+		showReminder(m_ipSelector, IDC_TXT_MUST_CONFIGURE_SELECTOR);
+
+		// Show or hide the configure button depending on whether the select is configurable
+		updateConfigureButton(m_ipSelector, IDC_BUTTON_CONFIGURE_SELECTOR);
+	}
+	else
+	{
+		// Disable the selector combo and configure button and hide the configuration reminder text.
+		m_cmbAttributeSelectors.EnableWindow(FALSE);
+		m_btnConfigureSelector.EnableWindow(FALSE);
+		GetDlgItem(IDC_TXT_MUST_CONFIGURE_SELECTOR).ShowWindow(SW_HIDE);
+	}
 }
 //-------------------------------------------------------------------------------------------------
