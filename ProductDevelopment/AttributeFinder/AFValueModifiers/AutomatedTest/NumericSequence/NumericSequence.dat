@@ -1,0 +1,29 @@
+//*********************************************************************************
+// NumericSequence.dat
+// This file contains testcases for testing the 
+// Numeric Sequence Expander/Contractor Value Modifier
+//*********************************************************************************
+
+// Test case for Expand + Sort Ascending + Eliminate Duplicates
+<TESTCASE>;NumericSequence01.rsd;NumericSequenceTests.txt;;NumericSequence01.eav
+
+// Test case for Expand + Sort Descending + Eliminate Duplicates
+<TESTCASE>;NumericSequence02.rsd;NumericSequenceTests.txt;;NumericSequence02.eav
+
+// Test case for Expand + NO SORT + Eliminate Duplicates
+<TESTCASE>;NumericSequence03.rsd;NumericSequenceTests.txt;;NumericSequence03.eav
+
+// Test case for Expand + NO SORT + NO Eliminate Duplicates
+<TESTCASE>;NumericSequence04.rsd;NumericSequenceTests.txt;;NumericSequence04.eav
+
+// Test case for Contract + Sort Ascending + Eliminate Duplicates
+<TESTCASE>;NumericSequence05.rsd;NumericSequenceTests.txt;;NumericSequence05.eav
+
+// Test case for Contract + Sort Descending + Eliminate Duplicates
+<TESTCASE>;NumericSequence06.rsd;NumericSequenceTests.txt;;NumericSequence06.eav
+
+// Test case for Contract + Sort Ascending + NO Eliminate Duplicates
+<TESTCASE>;NumericSequence07.rsd;NumericSequenceTests.txt;;NumericSequence07.eav
+
+// Test case for Contract + Sort Descending + NO Eliminate Duplicates
+<TESTCASE>;NumericSequence08.rsd;NumericSequenceTests.txt;;NumericSequence08.eav

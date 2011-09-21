@@ -1,0 +1,25 @@
+// Test cases for Numeric Sequence Expander/Contractor
+
+// basic test for expansion
+1,3-6,8,11
+
+// expansion test with duplicates
+3,6-8,9,3,6
+
+// [FlexIDSCore #4844] test with triples
+7,7,7
+11,220,11,11,75
+
+// [FlexIDSCore #4844] other test with triples
+1,7,7,7
+7,7,7,1
+11,220,22,4,11,75
+
+// basic test for contraction
+2,3,4,5,6,9
+
+// contraction test with duplicates
+4,5,6,6,7,10,4
+
+// [FlexIDSCore #4848] Ascending and descending sequence test eliminating duplicates
+11,222,3232,223,224,222,31,221,222
