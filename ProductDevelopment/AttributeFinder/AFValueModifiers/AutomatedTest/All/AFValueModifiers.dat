@@ -8,6 +8,7 @@
 <FILE>;..\FindCompanyOrPerson\FindCompanyOrPerson.dat
 <FILE>;..\InsertChars\InsertCharsTest.dat
 <FILE>;..\MERSModifier\Mers.dat
+<FILE>;..\NumericSequence\NumericSequence.dat
 <FILE>;..\LocateImageRegion\LocateImageRegion.dat
 <FILE>;..\OCRImageArea\OCRArea.dat
 <FILE>;..\PadValue\PadValueTest.dat
