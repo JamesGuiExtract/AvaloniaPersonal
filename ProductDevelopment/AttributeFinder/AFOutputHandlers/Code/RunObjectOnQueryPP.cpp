@@ -640,9 +640,17 @@ void CRunObjectOnQueryPP::updateConfigureButton(ICategorizedComponentPtr ipObjec
 {
 	ISpecifyPropertyPagesPtr ipPP(ipObject);
 	BOOL bEnable = FALSE;
-	if (ipPP) 
+	if (ipPP != __nullptr) 
 	{
 		bEnable = TRUE;
+	}
+	else
+	{
+		IConfigurableObjectPtr ipConfigurableObject(ipObject);
+		if (ipConfigurableObject != __nullptr)
+		{
+			bEnable = TRUE;
+		}
 	}
 	
 	CWindow wndButton = GetDlgItem(nButtonID);

@@ -76,6 +76,13 @@
     <Compile Include="DuplicateAndSeparateTreesSettingsDialog.Designer.cs">
       <DependentUpon>DuplicateAndSeparateTreesSettingsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="ExtractOcrTextInImageArea.cs" />
+    <Compile Include="ExtractOcrTextInImageAreaSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExtractOcrTextInImageAreaSettingsDialog.Designer.cs">
+      <DependentUpon>ExtractOcrTextInImageAreaSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="IdentifiableRuleObject.cs" />
     <Compile Include="NumericSequencer.cs" />
     <Compile Include="NumericRange.cs">
@@ -162,6 +169,10 @@
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
+      <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
+      <Name>Extract.Utilities.Forms</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="AttributeSelectorControl.resx">
@@ -169,6 +180,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DuplicateAndSeparateTreesSettingsDialog.resx">
       <DependentUpon>DuplicateAndSeparateTreesSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExtractOcrTextInImageAreaSettingsDialog.resx">
+      <DependentUpon>ExtractOcrTextInImageAreaSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="NumericSequencerSettingsDialog.resx">
       <DependentUpon>NumericSequencerSettingsDialog.cs</DependentUpon>
