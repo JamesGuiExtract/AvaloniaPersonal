@@ -1,0 +1,26 @@
+// Original image, overall bounds, include chars. (Includes pre-processor to replace all chars)
+<TESTCASE>;Test1.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif;;Test1.eav
+
+// Document context, overall bounds, include chars. (Includes pre-processor to replace all chars)
+<TESTCASE>;Test2.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif;;Test2.eav
+
+// Original image, overall bounds, include words.
+<TESTCASE>;Test3.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif;;Test3.eav
+
+// Original image, overall bounds, include lines.
+<TESTCASE>;Test4.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif;;Test4.eav
+
+// Original image, overall bounds, exclude chars.
+<TESTCASE>;Test5.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif;;Test5.eav
+
+// Original image, overall bounds, exclude words.
+<TESTCASE>;Test6.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif;;Test6.eav
+
+// Original image, overall bounds, include words, 2 lines of text
+<TESTCASE>;Test7.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif;;Test7.eav
+
+// Original image, separate zones, include words, 2 lines of text
+<TESTCASE>;Test8.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif;;Test8.eav
+
+// Original image, separate zones, exclude lines, 2 lines of text
+<TESTCASE>;Test9.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif;;Test9.eav
