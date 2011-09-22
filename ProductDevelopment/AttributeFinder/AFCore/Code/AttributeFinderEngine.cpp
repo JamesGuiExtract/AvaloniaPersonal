@@ -73,6 +73,9 @@ CAttributeFinderEngine::CAttributeFinderEngine()
 		mu_pUserCfgMgr.reset(new RegistryPersistenceMgr(HKEY_CURRENT_USER,
 			gstrAF_REG_ROOT_FOLDER_PATH ));
 		ASSERT_RESOURCE_ALLOCATION("ELI07337", mu_pUserCfgMgr.get()!= __nullptr);
+
+		// Check the profiling setting, and apply it to CRuleSetProfiler.
+		CRuleSetProfiler::ms_bEnabled = isProfilingEnabled();
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI13441")
 }
@@ -251,9 +254,6 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 			}
 		}
 		_lastCodePos = "15";
-
-		// Check the profiling setting, and apply it to CRuleSetProfiler.
-		CRuleSetProfiler::ms_bEnabled = isProfilingEnabled();
 
 		// Create RuleSet object
 		UCLID_AFCORELib::IRuleSetPtr ipRuleSet;

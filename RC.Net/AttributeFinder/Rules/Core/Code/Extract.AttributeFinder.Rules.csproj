@@ -49,9 +49,6 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Interop.UCLID_AFUTILSLib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -63,11 +60,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AttributeSelectorControl.cs">
+    <Compile Include="ConfigurableObjectControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="AttributeSelectorControl.Designer.cs">
-      <DependentUpon>AttributeSelectorControl.cs</DependentUpon>
+    <Compile Include="ConfigurableObjectControl.Designer.cs">
+      <DependentUpon>ConfigurableObjectControl.cs</DependentUpon>
     </Compile>
     <Compile Include="DuplicateAndSeparateTrees.cs" />
     <Compile Include="DuplicateAndSeparateTreesSettingsDialog.cs">
@@ -95,10 +92,27 @@
       <DependentUpon>NumericSequencerSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RuleObjectProfiler.cs" />
+    <Compile Include="ValueConditionSelector.cs" />
+    <Compile Include="ValueConditionSelectorSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ValueConditionSelectorSettingsDialog.Designer.cs">
+      <DependentUpon>ValueConditionSelectorSettingsDialog.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="UCLID_AFCORELib">
       <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFUTILSLib">
+      <Guid>{AC966E48-1A26-40C7-B61E-AC4C09C9D565}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
@@ -175,8 +189,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="AttributeSelectorControl.resx">
-      <DependentUpon>AttributeSelectorControl.cs</DependentUpon>
+    <EmbeddedResource Include="ConfigurableObjectControl.resx">
+      <DependentUpon>ConfigurableObjectControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DuplicateAndSeparateTreesSettingsDialog.resx">
       <DependentUpon>DuplicateAndSeparateTreesSettingsDialog.cs</DependentUpon>
@@ -186,6 +200,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="NumericSequencerSettingsDialog.resx">
       <DependentUpon>NumericSequencerSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ValueConditionSelectorSettingsDialog.resx">
+      <DependentUpon>ValueConditionSelectorSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

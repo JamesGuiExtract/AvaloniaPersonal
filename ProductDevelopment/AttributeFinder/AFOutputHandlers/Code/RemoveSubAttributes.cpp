@@ -13,6 +13,7 @@
 #include <StringTokenizer.h>
 #include <Misc.h>
 #include <ComponentLicenseIDs.h>
+#include <RuleSetProfiler.h>
 
 using namespace std;
 //-------------------------------------------------------------------------------------------------
@@ -260,8 +261,12 @@ STDMETHODIMP CRemoveSubAttributes::raw_ProcessOutput(IIUnknownVector* pAttribute
 
 		if(m_bConditionalRemove)
 		{
-			// Select the attributes
-			ipFoundAttributes = m_ipAS->SelectAttributes( ipAttributes, pAFDoc );
+			{
+				PROFILE_RULE_OBJECT("", "", m_ipAS, 0);
+
+				// Select the attributes
+				ipFoundAttributes = m_ipAS->SelectAttributes( ipAttributes, pAFDoc );
+			}
 
 			// Get the Data scorer object
 			IDataScorerPtr ipDataScorer = m_ipDataScorer->GetObject();
@@ -273,7 +278,13 @@ STDMETHODIMP CRemoveSubAttributes::raw_ProcessOutput(IIUnknownVector* pAttribute
 				IAttributePtr ipAttr = ipFoundAttributes->At(i);
 				ASSERT_RESOURCE_ALLOCATION("ELI09566", ipAttr != __nullptr);
 
-				long nScore = ipDataScorer->GetDataScore1(ipAttr);
+				long nScore;
+				{
+					PROFILE_RULE_OBJECT(asString(m_ipDataScorer->Description), "", ipDataScorer, 0);
+					
+					nScore = ipDataScorer->GetDataScore1(ipAttr);
+				}
+
 				bool bRemove = false;
 			
 				switch(m_eCondition)
@@ -310,6 +321,8 @@ STDMETHODIMP CRemoveSubAttributes::raw_ProcessOutput(IIUnknownVector* pAttribute
 		}
 		else
 		{
+			PROFILE_RULE_OBJECT("", "", m_ipAS, 0);
+
 			// Select the attributes
 			ipFoundAttributes = m_ipAS->SelectAttributes( ipAttributes, pAFDoc );
 		}

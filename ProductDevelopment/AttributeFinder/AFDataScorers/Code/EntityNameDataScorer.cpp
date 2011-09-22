@@ -16,7 +16,6 @@
 #include <cpputil.h>
 #include <misc.h>
 #include <ComponentLicenseIDs.h>
-#include <RuleSetProfiler.h>
 
 #include <algorithm>
 
@@ -105,11 +104,6 @@ STDMETHODIMP CEntityNameDataScorer::raw_GetDataScore1(IAttribute * pAttribute, L
 		// validate License
 		validateLicense();
 
-		// Ordinarily, the parent object will make this call for the child to limit the number of
-		// places where this call is needed. Selectors and scorers, however, make this call on
-		// themselves.
-		PROFILE_RULE_OBJECT("", asString(GetComponentDescription()), this, 0)
-		
 		ASSERT_ARGUMENT("ELI08597", pScore != __nullptr );
 
 		ICopyableObjectPtr ipFrom ( pAttribute );
@@ -144,11 +138,6 @@ STDMETHODIMP CEntityNameDataScorer::raw_GetDataScore2(IIUnknownVector * pAttribu
 	{
 		// validate License
 		validateLicense();
-
-		// Ordinarily, the parent object will make this call for the child to limit the number of
-		// places where this call is needed. Selectors and scorers, however, make this call on
-		// themselves.
-		PROFILE_RULE_OBJECT("", asString(GetComponentDescription()), this, 0)
 
 		ASSERT_ARGUMENT("ELI08599", pScore != __nullptr );
 		IIUnknownVectorPtr ipAttributes(pAttributes);

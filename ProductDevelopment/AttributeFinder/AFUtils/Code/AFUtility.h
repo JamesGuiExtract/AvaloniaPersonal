@@ -5,6 +5,7 @@
 #include "resource.h"       // main symbols
 
 #include <IConfigurationSettingsPersistenceMgr.h>
+#include <RuleSetProfiler.h>
 
 #include <afxmt.h>
 #include <string>
@@ -130,6 +131,9 @@ public:
 		/*[out, retval]*/ VARIANT_BOOL *pvbCacheRSD);
 	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, IAFDocument *pDoc, BSTR *pbstrOutput);
 	STDMETHOD(RemoveMetadataAttributes)(IIUnknownVector* pvecAttributes);
+	STDMETHOD(StartProfilingRule)(BSTR bstrName, BSTR bstrType,
+		IIdentifiableRuleObject *pRuleObject, long nSubID, long* pnHandle);
+	STDMETHOD(StopProfilingRule)(long nHandle);
 
 private:
 	//////////////////
@@ -276,6 +280,12 @@ private:
 	static map<string, string> ms_mapINIFileTagNameToValue;
 
 	static CMutex ms_Mutex;
+
+	// A map of handles to all active profiling calls started by StartProfilingRule.
+	static map<long, CRuleSetProfiler> ms_mapProfilers;
+
+	// The handle to assign to the next profiling call.
+	volatile static long ms_nNextProfilerHandle;
 
 	// Handles registry settings
 	unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;

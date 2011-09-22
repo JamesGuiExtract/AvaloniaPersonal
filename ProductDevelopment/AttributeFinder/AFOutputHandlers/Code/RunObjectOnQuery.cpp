@@ -323,6 +323,8 @@ STDMETHODIMP CRunObjectOnQuery::raw_ProcessOutput(IIUnknownVector* pAttributes, 
 		// Further narrow ipQueriedAttributes using the selector (if one is specified).
 		if (m_bUseSelector)
 		{
+			PROFILE_RULE_OBJECT("", "", m_ipSelector, 0);
+
 			ipQueriedAttributes = m_ipSelector->SelectAttributes(ipQueriedAttributes, ipAFDoc);
 		}
 

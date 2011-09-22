@@ -517,6 +517,15 @@ library UCLID_AFUTILSLib
 		[id(30), helpstring("method RemoveMetadataAttributes")] HRESULT RemoveMetadataAttributes(
 			[in] IIUnknownVector* pvecAttributes);
 		//-----------------------------------------------------------------------------------------
+		// Starts a profiling timer on a call to a rule object.
+		// StopProfilingRule should be called with the returned handle to stop the timer.
+		[id(31), helpstring("method StartProfilingRule")] HRESULT StartProfilingRule(
+			[in] BSTR bstrName, [in] BSTR bstrType,	[in] IIdentifiableRuleObject *pRuleObject,
+			[in] long nSubID, [out, retval] long* pnHandle);
+		//-----------------------------------------------------------------------------------------
+		// Stops a profiling timer on the object call identified by the handle.
+		[id(32), helpstring("method StopProfilingRule")] HRESULT StopProfilingRule([in] long nHandle);
+		//-----------------------------------------------------------------------------------------
 	};
 	[
 		object,

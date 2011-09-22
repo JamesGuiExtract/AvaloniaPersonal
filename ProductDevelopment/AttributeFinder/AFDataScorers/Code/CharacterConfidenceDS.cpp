@@ -8,7 +8,6 @@
 #include <COMUtils.h>
 #include <cpputil.h>
 #include <ComponentLicenseIDs.h>
-#include <RuleSetProfiler.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -57,11 +56,6 @@ STDMETHODIMP CCharacterConfidenceDS::raw_GetDataScore1(IAttribute * pAttribute, 
 		// validate License
 		validateLicense();
 
-		// Ordinarily, the parent object will make this call for the child to limit the number of
-		// places where this call is needed. Selectors and scorers, however, make this call on
-		// themselves.
-		PROFILE_RULE_OBJECT("", asString(GetComponentDescription()), this, 0)
-		
 		// Make sure the arguments are valid
 		ASSERT_ARGUMENT("ELI29338", pScore != __nullptr );
 		IAttributePtr ipAttribute(pAttribute);
@@ -83,11 +77,6 @@ STDMETHODIMP CCharacterConfidenceDS::raw_GetDataScore2(IIUnknownVector * pAttrib
 	{
 		// validate License
 		validateLicense();
-		
-		// Ordinarily, the parent object will make this call for the child to limit the number of
-		// places where this call is needed. Selectors and scorers, however, make this call on
-		// themselves.
-		PROFILE_RULE_OBJECT("", asString(GetComponentDescription()), this, 0)
 
 		// Make sure the arguments are valid
 		ASSERT_ARGUMENT("ELI29339", pScore != __nullptr );

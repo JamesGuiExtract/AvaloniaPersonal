@@ -9,6 +9,7 @@
 #include <cpputil.h>
 #include <comutils.h>
 #include <StringTokenizer.h>
+#include <RuleSetProfiler.h>
 
 #include <fstream>
 #include <io.h>
@@ -170,6 +171,8 @@ bool PatternFileInterpreter::foundPattern(IStringPatternMatcherPtr ipSPM,
 			long nThisDataScore = 0;
 			if (ipDataScorer != __nullptr)
 			{
+				PROFILE_RULE_OBJECT(asString(ipDataScorerObjWithDesc->Description), "", ipDataScorer, 0);
+
 				// get the score of the data
 				nThisDataScore = ipDataScorer->GetDataScore2(ipFoundAttributes);
 				

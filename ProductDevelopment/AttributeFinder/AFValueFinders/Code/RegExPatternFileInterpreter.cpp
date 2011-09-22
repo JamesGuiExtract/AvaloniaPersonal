@@ -9,6 +9,7 @@
 #include <cpputil.h>
 #include <comutils.h>
 #include <StringTokenizer.h>
+#include <RuleSetProfiler.h>
 
 #include <fstream>
 #include <io.h>
@@ -149,6 +150,8 @@ bool RegExPatternFileInterpreter::foundPattern(IRegularExprParserPtr ipRegExpPar
 				ICopyableObjectPtr ipCopyableObj = ipFoundAttributesCopy;
 				ASSERT_RESOURCE_ALLOCATION("ELI33389", ipCopyableObj != __nullptr);
 				ipCopyableObj->CopyFrom(ipFoundAttributes);
+
+				PROFILE_RULE_OBJECT(asString(ipDataScorerObjWithDesc->Description), "", ipDataScorer, 0);
 
 				// get the score of the data
 				nThisDataScore = ipDataScorer->GetDataScore2(ipFoundAttributesCopy);

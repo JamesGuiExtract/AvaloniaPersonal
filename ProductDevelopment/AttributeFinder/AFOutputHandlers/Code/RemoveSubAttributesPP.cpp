@@ -372,11 +372,19 @@ void CRemoveSubAttributesPP::updateComboSelection()
 //-------------------------------------------------------------------------------------------------
 void CRemoveSubAttributesPP::updateConfigureButton()
 {
-	ISpecifyPropertyPagesPtr ipPP( m_ipObject );
-	BOOL bEnable = FALSE;
-	if (ipPP) 
+	BOOL bEnable = FALSE;	
+	ISpecifyPropertyPagesPtr ipPP(m_ipObject);
+	if (ipPP != __nullptr) 
 	{
 		bEnable = TRUE;
+	}
+	else
+	{
+		IConfigurableObjectPtr ipConfigurableObject(m_ipObject);
+		if (ipConfigurableObject != __nullptr)
+		{
+			bEnable = TRUE;
+		}
 	}
 	m_btnConfigure.EnableWindow(bEnable);
 }

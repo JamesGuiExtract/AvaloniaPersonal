@@ -329,8 +329,21 @@ bool CFindingRuleConditionPP::updateRequiresConfig(IAttributeFindingRulePtr ipRu
 	ASSERT_ARGUMENT("ELI18315", ipRule != __nullptr);
 
 	// Enable/Disable the configure button as necessary
+	BOOL bEnable = FALSE;	
 	ISpecifyPropertyPagesPtr ipPP(ipRule);
-	m_btnConfig.EnableWindow(ipPP ? TRUE : FALSE);
+	if (ipPP != __nullptr) 
+	{
+		bEnable = TRUE;
+	}
+	else
+	{
+		IConfigurableObjectPtr ipConfigurableObject(ipRule);
+		if (ipConfigurableObject != __nullptr)
+		{
+			bEnable = TRUE;
+		}
+	}
+	m_btnConfig.EnableWindow(bEnable);
 
 	// Check configuration status
 	IMustBeConfiguredObjectPtr ipRuleConfig(ipRule);

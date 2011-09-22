@@ -229,49 +229,38 @@ namespace Extract.AttributeFinder.Rules
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI33420", _COMPONENT_DESCRIPTION);
 
-                // Use ComObjectReleaser to ensure that all COM objects accessed are released right
-                // away when going out of scope. This prevents both the appearance of memory leaks
-                // and allows the "[AttributeDelete]" tag to work correctly when profiling rulesets.
-                using (ComObjectReleaser comObjectReleaser = new ComObjectReleaser())
+                SpatialString attributeValue = pAttributeToBeModified.Value;
+
+                // Convert the attribute value into an enumeration of NumericRanges where commas
+                // delimit the ranges.
+                IEnumerable<NumericRange> ranges = attributeValue.String.Split(',')
+                    .Where(text => !string.IsNullOrWhiteSpace(text))
+                    .Select(text => new NumericRange(text, !Sort || AscendingSortOrder));
+
+                // Expand or contract the ranges (taking the EliminateDuplicates setting into
+                // account).
+                ranges = ExpandSequence
+                    ? Expand(ranges)
+                    : Contract(ranges);
+
+                // Sort the resulting ranges (if so configured).
+                if (Sort)
                 {
-                    comObjectReleaser.ManageObjects(pAttributeToBeModified);
-                    comObjectReleaser.ManageObjects(pOriginInput);
-                    comObjectReleaser.ManageObjects(pProgressStatus);
+                    ranges = AscendingSortOrder
+                        ? ranges.OrderBy(range => range)
+                        : ranges.OrderByDescending(range => range);
+                }
 
-                    SpatialString attributeValue = pAttributeToBeModified.Value;
-                    comObjectReleaser.ManageObjects(attributeValue);
+                // Convert the result into a comma delimited string and apply it to the attribute.
+                string outputValue = string.Join(",", ranges.Select(range => range.ToString()));
 
-                    // Convert the attribute value into an enumeration of NumericRanges where commas
-                    // delimit the ranges.
-                    IEnumerable<NumericRange> ranges = attributeValue.String.Split(',')
-                        .Where(text => !string.IsNullOrWhiteSpace(text))
-                        .Select(text => new NumericRange(text, !Sort || AscendingSortOrder));
-
-                    // Expand or contract the ranges (taking the EliminateDuplicates setting into
-                    // account).
-                    ranges = ExpandSequence
-                        ? Expand(ranges)
-                        : Contract(ranges);
-
-                    // Sort the resulting ranges (if so configured).
-                    if (Sort)
-                    {
-                        ranges = AscendingSortOrder
-                            ? ranges.OrderBy(range => range)
-                            : ranges.OrderByDescending(range => range);
-                    }
-
-                    // Convert the result into a comma delimited string and apply it to the attribute.
-                    string outputValue = string.Join(",", ranges.Select(range => range.ToString()));
-
-                    if (attributeValue.HasSpatialInfo())
-                    {
-                        attributeValue.ReplaceAndDowngradeToHybrid(outputValue);
-                    }
-                    else
-                    {
-                        attributeValue.ReplaceAndDowngradeToNonSpatial(outputValue);
-                    }
+                if (attributeValue.HasSpatialInfo())
+                {
+                    attributeValue.ReplaceAndDowngradeToHybrid(outputValue);
+                }
+                else
+                {
+                    attributeValue.ReplaceAndDowngradeToNonSpatial(outputValue);
                 }
             }
             catch (Exception ex)

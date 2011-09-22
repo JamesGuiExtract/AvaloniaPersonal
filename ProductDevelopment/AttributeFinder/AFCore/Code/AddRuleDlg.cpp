@@ -1440,19 +1440,21 @@ void CAddRuleDlg::setButtonStates()
 
 	// if current selected valud finding rule is a configurable object
 	// enable the Configure button
-	ISpecifyPropertyPagesPtr ipConfiguredObj(m_ipAFRule);
-
-	// Check for selected Value Finding Rule
-	if (m_comboRule.GetCurSel() == -1 || ipConfiguredObj == __nullptr)
+	BOOL bEnable = FALSE;	
+	ISpecifyPropertyPagesPtr ipPP(m_ipAFRule);
+	if (ipPP != __nullptr) 
 	{
-		// Disable this Configure button
-		m_btnConRule2.EnableWindow(FALSE);
+		bEnable = TRUE;
 	}
 	else
 	{
-		// Enable this Configure button
-		m_btnConRule2.EnableWindow(TRUE);
+		IConfigurableObjectPtr ipConfigurableObject(m_ipAFRule);
+		if (ipConfigurableObject != __nullptr)
+		{
+			bEnable = TRUE;
+		}
 	}
+	m_btnConRule2.EnableWindow(bEnable);
 
 	// Always enable the Select Document Preprocessor button
 	m_btnSelectPreprocessor.EnableWindow( TRUE );

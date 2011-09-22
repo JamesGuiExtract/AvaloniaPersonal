@@ -8,10 +8,10 @@ using UCLID_COMUTILSLib;
 namespace Extract.AttributeFinder.Rules
 {
     /// <summary>
-    /// Allows configuration of a <see cref="DuplicateAndSeparateTrees"/> instance.
+    /// Allows configuration of a <see cref="ValueConditionSelector"/> instance.
     /// </summary>
     [CLSCompliant(false)]
-    public partial class DuplicateAndSeparateTreesSettingsDialog : Form
+    public partial class ValueConditionSelectorSettingsDialog : Form
     {
         #region Constants
 
@@ -19,22 +19,23 @@ namespace Extract.AttributeFinder.Rules
         /// The object name.
         /// </summary>
         static readonly string _OBJECT_NAME =
-            typeof(NumericSequencerSettingsDialog).ToString();
+            typeof(ValueConditionSelectorSettingsDialog).ToString();
 
         #endregion Constants
 
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DuplicateAndSeparateTreesSettingsDialog"/> class.
+        /// Initializes a new instance of the <see cref="ValueConditionSelectorSettingsDialog"/>
+        /// class.
         /// </summary>
-        /// <param name="settings">The settings.</param>
-        public DuplicateAndSeparateTreesSettingsDialog(DuplicateAndSeparateTrees settings)
+        /// <param name="settings">The <see cref="ValueConditionSelector"/> instance to configure.</param>
+        public ValueConditionSelectorSettingsDialog(ValueConditionSelector settings)
         {
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.RuleWritingCoreObjects, "ELI33472",
+                LicenseUtilities.ValidateLicense(LicenseIdName.RuleWritingCoreObjects, "ELI33753",
                     _OBJECT_NAME);
 
                 Settings = settings;
@@ -43,7 +44,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI33473");
+                throw ex.AsExtract("ELI33754");
             }
         }
 
@@ -52,10 +53,10 @@ namespace Extract.AttributeFinder.Rules
         #region Properties
 
         /// <summary>
-        /// Gets or sets the <see cref="DuplicateAndSeparateTrees"/> to configure.
+        /// Gets or sets the <see cref="ValueConditionSelector"/> to configure.
         /// </summary>
-        /// <value>The <see cref="DuplicateAndSeparateTrees"/> to configure.</value>
-        public DuplicateAndSeparateTrees Settings
+        /// <value>The <see cref="ValueConditionSelector"/> to configure.</value>
+        public ValueConditionSelector Settings
         {
             get;
             set;
@@ -79,14 +80,13 @@ namespace Extract.AttributeFinder.Rules
                 // Apply Settings values to the UI.
                 if (Settings != null)
                 {
-                    _attributeSelectorControl.ConfigurableObject =
-                        (ICategorizedComponent)Settings.AttributeSelector;
-                    _dividingAttributeTextBox.Text = Settings.DividingAttributeName;
+                    _configureConditionControl.ConfigurableObject =
+                        (ICategorizedComponent)Settings.Condition;
                 }
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI33474");
+                throw ex.AsExtract("ELI33755");
             }
         }
 
@@ -111,15 +111,13 @@ namespace Extract.AttributeFinder.Rules
                     return;
                 }
 
-                Settings.AttributeSelector =
-                    (IAttributeSelector)_attributeSelectorControl.ConfigurableObject;
-                Settings.DividingAttributeName = _dividingAttributeTextBox.Text;
+                Settings.Condition = (IAFCondition)_configureConditionControl.ConfigurableObject;
 
                 DialogResult = DialogResult.OK;
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI33475");
+                ex.ExtractDisplay("ELI33756");
             }
         }
 
@@ -134,32 +132,21 @@ namespace Extract.AttributeFinder.Rules
         /// the settings are valid.</returns>
         bool WarnIfInvalid()
         {
-            if (_attributeSelectorControl.ConfigurableObject == null)
+            if (_configureConditionControl.ConfigurableObject == null)
             {
-                _attributeSelectorControl.Focus();
-                UtilityMethods.ShowMessageBox("Please specify an attribute selector to use.",
-                    "Specify attribute selector", false);
+                _configureConditionControl.Focus();
+                UtilityMethods.ShowMessageBox("Please specify a condition to use.",
+                    "Specify condition", false);
                 return true;
             }
 
             IMustBeConfiguredObject configurable =
-                _attributeSelectorControl.ConfigurableObject as IMustBeConfiguredObject;
+                _configureConditionControl.ConfigurableObject as IMustBeConfiguredObject;
             if (configurable != null && !configurable.IsConfigured())
             {
-                _attributeSelectorControl.Focus();
-                UtilityMethods.ShowMessageBox("The selected attribute selector has not been " +
-                    "properly configured.",
-                    "Attribute selector not configured", false);
-                return true;
-            }
-
-            _dividingAttributeTextBox.Text = _dividingAttributeTextBox.Text.Trim();
-            if (!UtilityMethods.IsValidIdentifier(_dividingAttributeTextBox.Text))
-            {
-                _dividingAttributeTextBox.Focus();
-                UtilityMethods.ShowMessageBox("Please specify a valid attribute name to be used " +
-                    "to divide the attribute tree.",
-                    "Specify dividing attribute", false);
+                _configureConditionControl.Focus();
+                UtilityMethods.ShowMessageBox("The selected condition has not been properly configured.",
+                    "Condition not configured", false);
                 return true;
             }
 

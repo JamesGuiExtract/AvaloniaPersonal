@@ -231,11 +231,6 @@ STDMETHODIMP CDataScorerBasedAS::raw_SelectAttributes(IIUnknownVector * pAttrIn,
 		// validate license
 		validateLicense();
 
-		// Ordinarily, the parent object will make this call for the child to limit the number of
-		// places where this call is needed. Selectors and scorers, however, make this call on
-		// themselves.
-		PROFILE_RULE_OBJECT("", asString(GetComponentDescription()), this, 0)
-
 		// Put input vector into smart pointer and validate the arguments that are used.
 		IIUnknownVectorPtr ipIn( pAttrIn);
 		ASSERT_ARGUMENT("ELI29308", ipIn != __nullptr);
@@ -264,7 +259,12 @@ STDMETHODIMP CDataScorerBasedAS::raw_SelectAttributes(IIUnknownVector * pAttrIn,
 			ASSERT_RESOURCE_ALLOCATION("ELI29306", ipAttributeToScore != __nullptr);
 
 			// Get the score for the attribute
-			long nScore = ipDataScorer->GetDataScore1(ipAttributeToScore);
+			long nScore;
+			{
+				PROFILE_RULE_OBJECT(asString(m_ipDataScorer->Description), "", ipDataScorer, 0);
+
+				nScore = ipDataScorer->GetDataScore1(ipAttributeToScore);
+			}
 
 			// Evaluate score for first condition
 			bool bSelect = evaluateCondition(m_eFirstScoreCondition, nScore, m_lFirstScoreToCompare);

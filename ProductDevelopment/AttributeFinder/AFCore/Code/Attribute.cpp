@@ -58,8 +58,6 @@ void CAttribute::FinalRelease()
 {
 	try
 	{
-		PROFILE_SPECIAL_OBJECT_IF_ACTIVE("[Attribute Deleted]", "", gProfilingGUID, 1)
-
 		// Release COM objects before the object is destructed
 		m_ipSubAttributes = __nullptr;
 		m_ipAttributeValue = __nullptr;

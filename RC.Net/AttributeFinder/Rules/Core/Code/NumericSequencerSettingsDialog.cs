@@ -39,7 +39,7 @@ namespace Extract.AttributeFinder.Rules
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects, "ELI33429",
+                LicenseUtilities.ValidateLicense(LicenseIdName.RuleWritingCoreObjects, "ELI33429",
                     _OBJECT_NAME);
 
                 Settings = settings;

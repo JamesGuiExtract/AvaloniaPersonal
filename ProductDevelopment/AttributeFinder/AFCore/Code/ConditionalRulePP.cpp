@@ -330,11 +330,19 @@ void CConditionalRulePP::showReminder()
 //-------------------------------------------------------------------------------------------------
 void CConditionalRulePP::toggleConfigButtons()
 {
-	ISpecifyPropertyPagesPtr ipPP( m_ipCondition );
-	BOOL bEnable = FALSE;
+	BOOL bEnable = FALSE;	
+	ISpecifyPropertyPagesPtr ipPP(m_ipCondition);
 	if (ipPP != __nullptr) 
 	{
 		bEnable = TRUE;
+	}
+	else
+	{
+		IConfigurableObjectPtr ipConfigurableObject(m_ipCondition);
+		if (ipConfigurableObject != __nullptr)
+		{
+			bEnable = TRUE;
+		}
 	}
 	m_btnConfigCondition.EnableWindow(bEnable);
 

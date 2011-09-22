@@ -41,6 +41,8 @@ const string strSOURCE_DOC_PATH_TAG = "<SourceDocName.Path>";
 // globals and statics
 map<string, string> CAFUtility::ms_mapINIFileTagNameToValue;
 CMutex CAFUtility::ms_Mutex;
+map<long, CRuleSetProfiler> CAFUtility::ms_mapProfilers;
+volatile long CAFUtility::ms_nNextProfilerHandle = 0;
 
 //-------------------------------------------------------------------------------------------------
 // CAFUtility
@@ -731,6 +733,51 @@ STDMETHODIMP CAFUtility::ExpandTagsAndFunctions(BSTR bstrInput, IAFDocument *pDo
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26166");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFUtility::StartProfilingRule(BSTR bstrName, BSTR bstrType,
+	IIdentifiableRuleObject *pRuleObject, long nSubID, long* pnHandle)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI33749", pRuleObject != __nullptr);
+		ASSERT_ARGUMENT("ELI33750", pnHandle != __nullptr);
+
+		*pnHandle = ::InterlockedIncrement(&ms_nNextProfilerHandle);
+		string strName = asString(bstrName);
+		string strType = asString(bstrType);
+
+		// Mutex while accessing static collection
+		CSingleLock lg(&ms_Mutex, TRUE);
+
+		ms_mapProfilers.insert(pair<long, CRuleSetProfiler>(
+			*pnHandle, CRuleSetProfiler(strName, strType, pRuleObject, nSubID)));
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33748");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFUtility::StopProfilingRule(long nHandle)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// Mutex while accessing static collection
+		CSingleLock lg(&ms_Mutex, TRUE);
+
+		ms_mapProfilers.erase(nHandle);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33751");
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -157,7 +157,7 @@ namespace Extract.AttributeFinder.Rules
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExtractOcrTextInImageArea"/> class as a
-        /// copy of the specified <see paramref="task"/>.
+        /// copy of the specified <see paramref="extractOcrTextInImageArea"/>.
         /// </summary>
         /// <param name="extractOcrTextInImageArea">The <see cref="ExtractOcrTextInImageArea"/>
         /// from which settings should be copied.</param>
@@ -279,64 +279,49 @@ namespace Extract.AttributeFinder.Rules
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI33710", _COMPONENT_DESCRIPTION);
 
-                // Use ComObjectReleaser to ensure that all COM objects accessed are released right
-                // away when going out of scope. This prevents the appearance of memory leaks.
-                using (ComObjectReleaser comObjectReleaser = new ComObjectReleaser())
+                // Initialize sourceString either from the uss file or from pOriginInput.
+                SpatialString sourceString;
+                if (UseOriginalDocumentOcr)
                 {
-                    comObjectReleaser.ManageObjects(pAttributeToBeModified);
-                    comObjectReleaser.ManageObjects(pOriginInput);
-                    comObjectReleaser.ManageObjects(pProgressStatus);
+                    string ussFileName = pOriginInput.Text.SourceDocName + ".uss";
+                    ExtractException.Assert("ELI33721",
+                        "Cannot find original OCR for document \"" +
+                        pOriginInput.Text.SourceDocName + "\"", File.Exists(ussFileName));
 
-                    // Initialize sourceString either from the uss file or from pOriginInput.
-                    SpatialString sourceString;
-                    if (UseOriginalDocumentOcr)
+                    sourceString = new SpatialString();
+                    sourceString.LoadFrom(ussFileName, false);
+                }
+                else
+                {
+                    sourceString = pOriginInput.Text;
+                }
+
+                // If there is no image area associated with this attribute, the resulting value
+                // will be null.
+                SpatialString extractedText = null;
+
+                // Loop through every raster zone to be extracted for this attribute.
+                foreach (RasterZone rasterZone in GetZonesToExtract(pAttributeToBeModified.Value))
+                {
+                    int page = rasterZone.PageNumber;
+                    LongRectangle bounds = rasterZone.GetRectangularBounds(
+                        sourceString.GetOCRImagePageBounds(page));
+
+                    SpatialStringSearcher searcher = GetSearcherForPage(page, sourceString);
+
+                    // If this is the first zone, initialize extractedText with the result.
+                    if (extractedText == null)
                     {
-                        string ussFileName = pOriginInput.Text.SourceDocName + ".uss";
-                        ExtractException.Assert("ELI33721",
-                            "Cannot find original OCR for document \"" +
-                            pOriginInput.Text.SourceDocName + "\"", File.Exists(ussFileName));
-
-                        sourceString = new SpatialString();
-                        sourceString.LoadFrom(ussFileName, false);
+                        extractedText = searcher.GetDataInRegion(bounds, true);
                     }
+                    // Otherwise, append this result to the existing value.
                     else
                     {
-                        sourceString = pOriginInput.Text;
+                        extractedText.Append(searcher.GetDataInRegion(bounds, true));
                     }
-                    comObjectReleaser.ManageObjects(sourceString);
-
-                    // If there is no image area associated with this attribute, the resulting value
-                    // will be null.
-                    SpatialString extractedText = null;
-
-                    // Loop through every raster zone to be extracted for this attribute.
-                    foreach (RasterZone rasterZone in GetZonesToExtract(pAttributeToBeModified.Value))
-                    {
-                        comObjectReleaser.ManageObjects(rasterZone);
-
-                        int page = rasterZone.PageNumber;
-                        LongRectangle bounds = rasterZone.GetRectangularBounds(
-                            sourceString.GetOCRImagePageBounds(page));
-                        comObjectReleaser.ManageObjects(bounds);
-
-                        SpatialStringSearcher searcher = GetSearcherForPage(page, sourceString);
-                        comObjectReleaser.ManageObjects(searcher);
-
-                        // If this is the first zone, initialize extractedText with the result.
-                        if (extractedText == null)
-                        {
-                            extractedText = searcher.GetDataInRegion(bounds, true);
-                            comObjectReleaser.ManageObjects(extractedText);
-                        }
-                        // Otherwise, append this result to the existing value.
-                        else
-                        {
-                            extractedText.Append(searcher.GetDataInRegion(bounds, true));
-                        }
-                    }
-
-                    pAttributeToBeModified.Value = extractedText;
                 }
+
+                pAttributeToBeModified.Value = extractedText;
             }
             catch (Exception ex)
             {
@@ -608,37 +593,28 @@ namespace Extract.AttributeFinder.Rules
         /// </returns>
         IEnumerable<RasterZone> GetZonesToExtract(SpatialString spatialString)
         {
-            // Use ComObjectReleaser to ensure that all COM objects accessed are released right
-            // away when going out of scope. This prevents the appearance of memory leaks.
-            using (ComObjectReleaser comObjectReleaser = new ComObjectReleaser())
+            if (spatialString.HasSpatialInfo())
             {
-                comObjectReleaser.ManageObjects(spatialString);
-
-                if (spatialString.HasSpatialInfo())
+                // Loop through each page of the attribute.
+                foreach (SpatialString pageText in
+                    spatialString.GetPages().ToIEnumerable<SpatialString>())
                 {
-                    // Loop through each page of the attribute.
-                    foreach (SpatialString pageText in
-                        spatialString.GetPages().ToIEnumerable<SpatialString>())
+                    // If using the overall bounds, there will be only one result for each page:
+                    // the overall attribute bounds.
+                    if (UseOverallBounds)
                     {
-                        comObjectReleaser.ManageObjects(pageText);
+                        RasterZone rasterZone = new RasterZone();
+                        rasterZone.CreateFromLongRectangle(pageText.GetOCRImageBounds(),
+                            pageText.GetFirstPageNumber());
 
-                        // If using the overall bounds, there will be only one result for each page:
-                        // the overall attribute bounds.
-                        if (UseOverallBounds)
+                        yield return rasterZone;
+                    }
+                    else
+                    {
+                        foreach (RasterZone rasterZone in
+                            pageText.GetOCRImageRasterZones().ToIEnumerable<RasterZone>())
                         {
-                            RasterZone rasterZone = new RasterZone();
-                            rasterZone.CreateFromLongRectangle(pageText.GetOCRImageBounds(),
-                                pageText.GetFirstPageNumber());
-
                             yield return rasterZone;
-                        }
-                        else
-                        {
-                            foreach (RasterZone rasterZone in
-                                pageText.GetOCRImageRasterZones().ToIEnumerable<RasterZone>())
-                            {
-                                yield return rasterZone;
-                            }
                         }
                     }
                 }

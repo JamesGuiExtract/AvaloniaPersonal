@@ -8,7 +8,6 @@
 #include <COMUtils.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
-#include <RuleSetProfiler.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -179,11 +178,6 @@ STDMETHODIMP CSpatialContentBasedAS::raw_SelectAttributes(IIUnknownVector * pAtt
 	{
 		// validate license
 		validateLicense();
-
-		// Ordinarily, the parent object will make this call for the child to limit the number of
-		// places where this call is needed. Selectors and scorers, however, make this call on
-		// themselves.
-		PROFILE_RULE_OBJECT("", asString(GetComponentDescription()), this, 0)
 
 		IIUnknownVectorPtr ipIn( pAttrIn);
 		IIUnknownVectorPtr ipFound(CLSID_IUnknownVector);

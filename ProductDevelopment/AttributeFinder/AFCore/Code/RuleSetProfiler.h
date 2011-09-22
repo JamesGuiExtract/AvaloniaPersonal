@@ -20,6 +20,7 @@
 
 #include "Export.h"
 
+#include <afxmt.h>
 #import <msxml.tlb> named_guids
 
 #include <string>

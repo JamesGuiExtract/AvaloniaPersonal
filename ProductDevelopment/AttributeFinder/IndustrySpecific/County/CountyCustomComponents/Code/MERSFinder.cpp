@@ -8,6 +8,7 @@
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <ComUtils.h>
+#include <RuleSetProfiler.h>
 
 #include <ctype.h>
 
@@ -187,7 +188,14 @@ void MERSFinder::findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc,
 		{
 			strValueFound = asString(ipFoundValue->String);
 		}
-		long nDataScore = m_ipDataScorer->GetDataScore1( ipTempAttr );
+		
+		long nDataScore;
+		{
+			PROFILE_RULE_OBJECT("", "", m_ipDataScorer, 0);
+
+			nDataScore = m_ipDataScorer->GetDataScore1( ipTempAttr );
+		}
+
 		if (ipFoundValue == __nullptr || findMERSKeyword ( strValueFound, nStartPos, nEndPos, ipParser ) 
 				|| nDataScore < MINSCORE )
 		{
@@ -198,7 +206,13 @@ void MERSFinder::findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc,
 			{
 				strValueFound = ipFoundValue->String;
 			}
-			nDataScore = m_ipDataScorer->GetDataScore1( ipTempAttr );
+
+			{
+				PROFILE_RULE_OBJECT("", "", m_ipDataScorer, 0);
+
+				nDataScore = m_ipDataScorer->GetDataScore1( ipTempAttr );
+			}
+
 			if (ipFoundValue == __nullptr || findMERSKeyword ( strValueFound, nStartPos, nEndPos, ipParser )
 				|| nDataScore < MINSCORE)
 			{
@@ -206,7 +220,13 @@ void MERSFinder::findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc,
 				// then search pattern 2
 				ipFoundValue = patternSearch2(ipOriginalText);
 				ipTempAttr->Value = ipFoundValue;
-				nDataScore = m_ipDataScorer->GetDataScore1( ipTempAttr );
+				
+				{
+					PROFILE_RULE_OBJECT("", "", m_ipDataScorer, 0);
+
+					nDataScore = m_ipDataScorer->GetDataScore1( ipTempAttr );
+				}
+
 				if ( nDataScore < MINSCORE )
 				{
 					ipFoundValue = __nullptr;
