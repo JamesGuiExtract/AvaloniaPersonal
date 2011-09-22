@@ -34,7 +34,29 @@
 			<li>Confirm that settings are persistent.
         	</ul></li>
 <p>
-		<li><b>Functionality</b> - Exercise the following scenarios
+		<li><b>Functionality</b>
+		<ul>
+			<li>Prepare a <b>Data Entry: Verify extracted data</b> task configured to 
+			use <b>DemoFlexIndex.config</b>.
+			<li>Confirm that the familiar demo window is presented for verification.
+			<li>Confirm that the <b>LocalDataSource</b> setting in the <b>.config</b> 
+			file is used for validation by modifying the 
+			<b>DatabaseFiles\DemoFlexIndex.sdf</b> database.
+			<ul>
+				<li>Modify the <b>63179</b> entry in the <b>ZipCode</b> to be 
+				<b>St. Louis</b>.
+				<li>Reprocess and re-verify <b>Example01.tif</b>.
+				<li>Confirm that the found <b>ReturnAddress - City</b> attribute 
+				is displayed as valid.
+				<li>Modify the <b>55117</b> entry in the <b>ZipCode</b> to be 
+				<b>St. Paul</b>.
+				<li>Reprocess and re-verify <b>Example04.tif</b>.
+				<li>Confirm that the found <b>ReturnAddress - City</b> attribute 
+				is displayed as valid.
+			</ul>
+        	</ul></li>
+<p>
+		<li><b>Specified DEPs</b>
 		<ul>
 			<li>TBD
 		</ul></li>
