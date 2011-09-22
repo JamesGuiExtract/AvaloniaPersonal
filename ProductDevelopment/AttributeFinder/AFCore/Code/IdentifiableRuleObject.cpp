@@ -34,14 +34,14 @@ CIdentifiableRuleObject::~CIdentifiableRuleObject()
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33625");
 }
 //--------------------------------------------------------------------------------------------------
-GUID CIdentifiableRuleObject::getGUID()
+GUID CIdentifiableRuleObject::getGUID(bool bRegenerate/* = false*/)
 {
 	try
 	{
 		validateLicense();
 
-		// Create the GUID if it has not yet been created.
-		if (m_upGUID.get() == __nullptr)
+		// Create the GUID if bRegenerate is set or it has not yet been created.
+		if (bRegenerate || m_upGUID.get() == __nullptr)
 		{
 			m_upGUID.reset(new GUID());
 			CoCreateGuid(m_upGUID.get());

@@ -33,7 +33,7 @@ public:
 
 protected:
 
-	GUID getGUID();
+	GUID getGUID(bool bRegenerate = false);
 	void loadGUID(IStream *pStream);
 	void saveGUID(IStream *pStream);
 

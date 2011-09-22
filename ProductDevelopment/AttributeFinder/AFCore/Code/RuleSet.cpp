@@ -19,7 +19,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 11;
+const unsigned long gnCurrentVersion = 12;
 // Version 3:
 //   Added Output Handler persistence
 // Version 7:
@@ -32,6 +32,7 @@ const unsigned long gnCurrentVersion = 11;
 // Version 10:
 //	 Added Ignore preprocessor and output handler error options.
 // Version 11: Added CIdentifiableRuleObject
+// Version 12: Added m_strPreviousFileName
 
 const string gstrRULESET_FILE_SIGNATURE = "UCLID AttributeFinder RuleSet Definition (RSD) File";
 const string gstrRULESET_FILE_SIGNATURE_2 = "UCLID AttributeFinder RuleSet Definition (RSD) File 2";
@@ -226,6 +227,23 @@ STDMETHODIMP CRuleSet::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDirty)
 	try
 	{
 		validateLicense();
+
+		// [FlexIDSCore:4865]
+		// If the filename has changed, in order to prevent the IdentifiableRuleObject GUIDs in a
+		// copied ruleset from conflicting with the GUIDs in the original ruleset, regenerate the
+		// GUIDs for all rule objects in this ruleset.
+		if (bClearDirty == VARIANT_TRUE &&
+			_strcmpi(m_strPreviousFileName.c_str(), asString(strFullFileName).c_str()) != 0)
+		{
+			// Regenerate the GUID for the ruleset itself.
+			getGUID(true);
+
+			// Create a clone off this ruleset, then copy the date from that clone. This causes all
+			// contained rule objects to be re-created which, in turn, creates new GUIDs for them.
+			ICopyableObjectPtr ipCopyThis = getThisAsCOMPtr();
+			ICopyableObjectPtr ipCopy = ipCopyThis->Clone();
+			ipCopyThis->CopyFrom(ipCopy);
+		}
 
 		writeObjectToFile(this, strFullFileName, m_bstrStreamName, asCppBool(bClearDirty));
 
@@ -1335,6 +1353,11 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 				dataReader >> m_bIgnorePreprocessorErrors;
 				dataReader >> m_bIgnoreOutputHandlerErrors;
 			}
+
+			if (m_nVersionNumber >= 12)
+			{
+				dataReader >> m_strPreviousFileName;
+			}
 		}
 
 		// load the string-to-object map (attribute name to attribute find info map)
@@ -1445,6 +1468,8 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 
 		dataWriter << m_bIgnorePreprocessorErrors;
 		dataWriter << m_bIgnoreOutputHandlerErrors;
+
+		dataWriter << m_strFileName;
 
 		// flush bytes
 		dataWriter.flushToByteStream();

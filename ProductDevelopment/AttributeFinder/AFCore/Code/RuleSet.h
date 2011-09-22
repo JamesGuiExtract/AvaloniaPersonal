@@ -136,6 +136,10 @@ private:
 
 	// the filename associated with this ruleset
 	string m_strFileName;
+	
+	// The filename this ruleset was last saved as. Used to determine if the IdentifiableRuleGUIDs
+	// need to be updated when saving.
+	string m_strPreviousFileName;
 
 	// this mutex is used in the constructor and destructor to protect the m_apSafeNetMgr member
 	static CMutex ms_mutexLM;
