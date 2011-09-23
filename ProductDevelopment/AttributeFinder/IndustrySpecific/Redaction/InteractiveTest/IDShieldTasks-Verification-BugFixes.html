@@ -144,76 +144,120 @@
                 processing multi-threaded.</li>
             </ul></li>
         </ul></li>
-    <p>
-        <li><b>Current (9.0-release-cycle) bugs</b>
+<p>
+   	<li><b>Current (9.0-release-cycle) bugs</b>
         <ul>
-            <LI><b>[FlexIDSCore #3621]</b> Duplicate exemption codes
-            <!-- fixed v 8.1.0.2 -->
-            <ul>
-                <li>Verify a document.</li>
-                <li>Create a redaction.</li>
-                <li>Apply the <b>(b)(1)</b> exemption code from FOIA to the 
-                redaction and press <b>OK</b>.</li>
-                <li>Open the exemption code dialog again.</li>
-                <li>Confirm that only one copy of the exemption code is present.</li>
-            </ul></li>
-        <p>
-            <LI><b>[FlexIDSCore #3857, #3863]</b> Commit conditions for skipped documents
-            <!-- fixed v 7.1.1.87, 8.0.0.2 -->
-            <ol>
-                <li>Configure an FPS file to require the user to view all pages or specify 
-                types for all redactions.</li>
-                <li>Open a document.</li>
-                <li>Make a change but make sure that the conditions in <b>step 1</b> are not
-                met.</li>
-                <li>Skip the document.</li>
-                <li>When prompted, choose <b>Save changes</b>.</li>
-                <li>Confirm that the document is skipped and no other prompts are presented.</li>
-            <p>
-                <li>Open another document.</li>
-                <li>Make a change and make sure that the conditions in <b>step 1</b> are met.</li>
-                <li>Save the changes without commit.</li>
-                <li>Skip the document.</li>
-                <li>Confirm that the document is skipped and no prompts are presented.</li>
-            </ol></li>
-        <p>
-            <li><b>[FlexIDSCore #4205]</b> Selected redaction should scroll into view
-            <!-- fixed v 8.1.0.6 -->
-            <ul>
-                <li>Create enough manual redactions that they are not all simultaneously
-                visible in the data grid.</li>
-                <li>In the image viewer, select one of the redactions that is not currently 
-                visible in the data grid.</li>
-                <li>Confirm that the data grid item scrolls into view.</li>
-                <li>Select multiple redactions with the Select redactions tool.</li>
-                <li>Confirm that the <b>first</b> selected redaction scrolls into view only if
-                necessary.</li>
-            </ul></li>
-        <p>
-            <li><b>[FlexIDSCore #4248]</b> PDF display
-            <!-- fixed v 8.1.0.6 -->
-            <ul>
-                <li>Confirm that all pages of the images in I:\Common\Testing\PVCS_Testing\Flex
-                IDSCore\4248 are visible in verification.</li>
-            </ul></li>
-        <p>
-            <li><b>[FlexIDSCore #4261]</b> Verification with multiple remote users
-            <!-- fixed v 8.1.0.5 -->
-            <ul>
-                <li>Enable terminal services (Note: a server OS is required for this test).</li>
-                <li>Create an .fps file to run as a service executing rules and setting files to
-                pending for a verification action.</li>
-                <li>Create an .fps file to verify images.</li>
-                <li>Confirm that multiple users can log on remotely and verify at the same time.</li>
-                <li>Confirm that multiple users can log on remotely and open the following 
-                utilities:
-                <ul>
-                    <li>DB Admin</li>
-                    <li>UEX Viewer</li>
-                    <li>USS Viewer</li>
-                    <li>VOA Viewer</li>
-                </ul></li>
-            </ul></li>
+            	<LI><b>[FlexIDSCore #3621]</b> Duplicate exemption codes
+            	<!-- fixed v 8.1.0.2 -->
+            	<ul>
+                	<li>Verify a document.</li>
+                	<li>Create a redaction.</li>
+                	<li>Apply the <b>(b)(1)</b> exemption code from FOIA to the 
+                	redaction and press <b>OK</b>.</li>
+                	<li>Open the exemption code dialog again.</li>
+                	<li>Confirm that only one copy of the exemption code is present.</li>
+            	</ul></li>
+<p>
+            	<LI><b>[FlexIDSCore #3857, #3863]</b> Commit conditions for skipped documents
+            	<!-- fixed v 7.1.1.87, 8.0.0.2 -->
+            	<ol>
+                	<li>Configure an FPS file to require the user to view all pages or specify 
+                	types for all redactions.</li>
+                	<li>Open a document.</li>
+                	<li>Make a change but make sure that the conditions in <b>step 1</b> are 
+			not met.</li>
+                	<li>Skip the document.</li>
+                	<li>When prompted, choose <b>Save changes</b>.</li>
+                	<li>Confirm that the document is skipped and no other prompts are presented.</li>
+<p>
+                	<li>Open another document.</li>
+                	<li>Make a change and make sure that the conditions in <b>step 1</b> are met.</li>
+                	<li>Save the changes without commit.</li>
+                	<li>Skip the document.</li>
+                	<li>Confirm that the document is skipped and no prompts are presented.</li>
+            	</ol></li>
+<p>
+		<LI><b>[FlexIDSCore #4105, #4166, #4541, #4562, #4565, #4725]</b> 
+		Redaction resizing
+        	<ul>
+            		<li>Verify some documents that include both <b>angular</b> and 
+			<b>rectangular</b> redactions.
+			<li>Click the grip handle of a redaction
+			<ul>
+            			<li>Confirm that slightly moving the mouse cursor <b>does 
+				not</b> cause the handle's side of the redaction to jump 
+				to the mouse cursor.
+			</ul>
+			<li>Click the grip handle of a very small <b>(1x1)</b> redaction
+			<ul>
+            			<li>Confirm that the redaction <b>does not</b> change size.
+            			<li>Confirm that the redaction <b>does not</b> move.
+			</ul>
+			<li>Create a redaction at a significant angle
+			<li>Use the shrink selection context menu option (possibly several 
+			times) to shrink all sides of the redaction
+			<ul>
+            			<li>Confirm that the redaction <b>continues</b> to shrink.
+			</ul>
+			<li>Create a long redaction at a slight angle
+			<li>Use the <b>+</b> shortcut several times to expand the redaction
+			<ul>
+            			<li>Confirm that the angle of the redaction remains 
+				unchanged.
+			</ul>
+			<li>Experiment with shrinking and enlarging angled redactions
+			<ul>
+            			<li>Confirm that the angle of the redaction remains 
+				unchanged.
+			</ul>
+			<li>Select a highlight
+			<ul>
+				<li>Press and hold the <b>+</b> and <b>-</b> shortcuts to 
+				repeatedly grow and shrink the highlights by large amounts.
+            			<li>Confirm that highlight does not move its center position.
+            			<li>Confirm that when returned to its original size, the 
+				aspect ratio is unchanged.
+			</ul>
+        	</ul>
+<p>
+            	<li><b>[FlexIDSCore #4205]</b> Selected redaction should scroll into view
+            	<!-- fixed v 8.1.0.6 -->
+            	<ul>
+                	<li>Create enough manual redactions that they are not all simultaneously
+                	visible in the data grid.</li>
+                	<li>In the image viewer, select one of the redactions that is not 
+			currently visible in the data grid.</li>
+                	<li>Confirm that the data grid item scrolls into view.</li>
+                	<li>Select multiple redactions with the Select redactions tool.</li>
+                	<li>Confirm that the <b>first</b> selected redaction scrolls into view 
+			only if necessary.</li>
+            	</ul></li>
+<p>
+            	<li><b>[FlexIDSCore #4248]</b> PDF display
+            	<!-- fixed v 8.1.0.6 -->
+            	<ul>
+                	<li>Confirm that all pages of the images in I:\Common\Testing\PVCS_Testing\
+			FlexIDSCore\4248 are visible in verification.</li>
+            	</ul></li>
+<p>
+            	<li><b>[FlexIDSCore #4261]</b> Verification with multiple remote users
+            	<!-- fixed v 8.1.0.5 -->
+            	<ul>
+                	<li>Enable terminal services (Note: a server OS is required for this test).</li>
+                	<li>Create an .fps file to run as a service executing rules and setting files 
+			to pending for a verification action.</li>
+                	<li>Create an .fps file to verify images.</li>
+                	<li>Confirm that multiple users can log on remotely and verify at the same 
+			time.</li>
+                	<li>Confirm that multiple users can log on remotely and open the following 
+                	utilities:
+                	<ul>
+                    		<li>DB Admin</li>
+                    		<li>UEX Viewer</li>
+                    		<li>USS Viewer</li>
+                    		<li>VOA Viewer</li>
+                	</ul></li>
+            	</ul></li>
         <p>
             <LI><b>[FlexIDSCore #4267]</b> Toggling
             <!-- fixed v 8.1.0.12 -->
