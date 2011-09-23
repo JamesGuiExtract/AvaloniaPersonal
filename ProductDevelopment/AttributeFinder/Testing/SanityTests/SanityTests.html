@@ -195,7 +195,7 @@
 <p />
 	<li><h2>PDF/A conversion and PDF security</h2>
 	<ul>
-		<li>Exercise <b>Core: Convert to searchble PDF</b> and enable PDF/A conversion.
+		<li>Exercise <b>Core: Convert to searchable PDF</b> and enable PDF/A conversion.
 		<li>Confirm that PDF/A-compliant files are created.
 		<li>Exercise <b>PDF security</b> from <b>Redaction: Create redacted image</b>.
 		<li>Confirm that <b>User</b> and <b>Owner</b> passwords can be applied.
@@ -277,6 +277,9 @@
 			<p />
 			<li>Confirm that an action can be <b>added</b> to the database.
 			<li>Confirm that an action can be <b>removed</b> from the database.
+			<ul>
+				<li>Confirm that removing an action requires double confirmation.
+			</ul>
 			<li>Confirm that an action can be <b>renamed</b> in the database.
 			<p />
 			<li>Confirm that a tag can be <b>added</b> to the database.
@@ -306,7 +309,7 @@
 			<li>Confirm that each available <b>Report</b> can be generated.
             		<li>Confirm that DBInfo settings can be <b>modified</b>.</li>
 		</ul>
-		<p />
+<p />
 		<li><b>Help File</b>
 		<ul>
 			<li>Confirm that the <b>ID Shield</b> help file opens without error.
@@ -314,7 +317,16 @@
 			<li>Confirm that the <b>FLEX Index</b> help file opens without error.
 			<li>Confirm that the <b>FLEX Index</b> help file contains the expected contents.
 		</ul>
-		<p />
+<p>
+		<li><b>ID Shield On Demand</b>
+		<ul>
+            		<li>Open an image that does not have an associated USS file and confirm that 
+			the image viewer status bar indicates progress as it is auto-OCRed.</li>
+            		<li>Draw some manual redactions and add some exemption codes.</li>
+            		<li>Save a redacted image. Open it in the image viewer and confirm that 
+			redactions are drawn appropriately with exemption codes as redaction text.</li>
+        	</uL></lI>
+<p />
 		<li><b>USB License Key Manager</b>
 		<ul>
 			<li>Confirm that connecting to a USB key on a remote machine (i.e. <b>LISA</b>) 
@@ -351,21 +363,13 @@
 			<li>Confirm that the three buttons copy the appropriate information onto 
 			the clipboard.
 		</ul>
-    <p>
-        <li><b>ID Shield On Demand</b>
-	<ul>
-            	<li>Open an image that does not have an associated USS file and confirm that the image
-            	viewer status bar indicates progress as it is auto-OCRed.</li>
-            	<li>Draw some manual redactions and add some exemption codes.</li>
-            	<li>Save a redacted image. Open it in the image viewer and confirm that redactions are drawn
-            	appropriately with exemption codes as redaction text.</li>
-        </uL></lI>
 	</ul>
 <p />
 	<li><h2>Utility Applications</h2>
 	<ul>
 		<li><b>Miscellaneous Utilities</b>
 		<ul>
+			<li>Configure Email Settings - opens without error.
 			<li>Configure FAM Service - successfully edits <b>ESFAMService.sdf</b>.
 			<li>Convert FAM Database - opens without error.
 			<li>Convert FPS File - opens without error.
@@ -379,6 +383,25 @@
 			with application settings.
 			<li>Confirm that <b>Exit</b> closes the application and removes the icon from the 
 			system tray.
+		</ul>
+<p />
+		<li><b>FAM Network Manager</b>
+		<ul>
+			<li>Add the current test machine and confirm that <b>FAM Status</b> and 
+			<b>FDRS Status</b> are both correct.
+			<li>Add a non-existent machine and confirm that status values are <b>Not 
+			Available</b>.
+			<li>Start the FAM Service on the test machine and confirm that FAM Status 
+			changes to <b>StartPending</b>.
+			<li>Confirm that the <b>Refresh status</b> toolbar button updates status 
+			for all defined machines.
+			<li>Click the <b>Auto refresh status</b> toolbar button
+			<ul>
+				<li>Confirm that <b>CPU</b> status changes at a regular frequency.
+				<li>Confirm that the <b>Refresh status</b> toolbar button is disabled.
+			</ul>
+			<li>Stop the FAM Service on the test machine and confirm that FAM Status 
+			changes to <b>Stopped</b>.
 		</ul>
 <p />
 		<li><b>ID Shield Statistics Reporter</b>
