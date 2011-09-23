@@ -28,10 +28,9 @@
 	<ul>
 		<li>The .\Common Files\Safenet Sentinel\ folder can be found under <b>C:\Program 
 		Files</b> or <b>C:\Program Files (x86)</b>.
-		<li>The EXE can be found under <b>.\Sentinel Protection Server\WinNT</b>.
-		<li>Confirm that the version number is as expected.  
-		<li><b>[LegacyRC #5517]</b> For the 8.0 release, the version should be 
-		<b>7.6.1</b>.
+		<li>The EXE can be found under <b>.\Common Files\SafeNet Sentinel\Sentinel 
+		Protection Server\WinNT</b>.
+		<li>For the 9.0 release, confirm that the version is <b>7.5.0.5</b>.
 	</ul>
 </UL>
 </LI>
@@ -39,19 +38,7 @@
 <!-- *********************************************** -->
 <LI><h2>USB License Key Manager</h2>
 <UL>
-	<LI><b>[LegacyRC #4699]</b> From a fresh install on a ghosted machine, confirm that 
-	the application does <b>not</b> require two minutes to come up.
 	<LI>Confirm that the default License Server is <b>Local Machine</b>.
-	<LI><b>[LegacyRC #5207]</b> Errors logged at startup
-	<ul>
-      		<li>Open the <b>USB Key License Manager</b> utility.
-      		<li>Adjust settings so that the utility will look for a local USB key.
-      		<li>Close the utility and remove any local key.
-      		<li>Open the <b>USB Key License Manager</b> utility again.
-      		<li>Confirm that after a short delay, zeros are displayed for counts.
-      		<li>Review the exception log and confirm that multiple retry error messages 
-		have not been logged.
-	</ul>
 	<LI>Confirm that the <b>Counter Value For Counter Serial #</b> edit box is populated.
 	<LI>Confirm that counter values are listed.
 	<LI>Select <b>Remote Machine</b>, set the edit box to the name of the current machine, 
@@ -60,37 +47,33 @@
 	<LI>Select a different Remote Machine with a key attached and Extract Systems LM or SDK 
 	installed. Click Apply and confirm that <b>Refresh</b> shows a new counter serial # and 
 	values for the counter on the selected machine.
-	<LI><b>[LegacyRC #4348]</b> Confirm that <b> Refresh</b> shows the hard limit
-      (Max #) and the soft limit (#) in 
-	separate read-only edit boxes.
 	<LI>Confirm that the <b>Alert Level</b> cells are editable.
 	<LI>Confirm that <b>Alert Multiple</b> cells are editable.
-	<LI>Select the <b>Server Status</b> button.
+	<LI>Select the <b>Server Status</b> button.  This requires that the <b>Java runtime</b> be 
+	installed.
 	<UL>
-		<LI>Confirm that the first time should prompt for installation of the Java runtime.
-		<LI>After Java installation has completed, confirm that a Web page is displayed 
-		with <b>Sentinel License Manager</b> showing information about the key installed 
-		on the selected machine.
+		<LI>Confirm that a Web page is displayed with <b>Sentinel License Manager</b> 
+		showing information about the key installed on the selected machine.
+        	<li><b>[LegacyRC #5517]</b> Confirm that the Sentinel Protection Server Version 
+		is <b>7.6.3</b>.
 	</UL>
 	<LI>Confirm that the <b>Send Alert to support@extractsystems.com</b> checkbox is selectable.
 	<UL>
 		<LI>Confirm that with no email Settings set and only this item checked 
 		clicking <b> Apply</b> displays an <b>SMTP Server not set in email settings</b> error.
-		<LI>Confirm that with no email Settings set and only this item checked clicking
-          <b> OK</b> 
-		displays an <b>SMTP Server not set in email settings</b> error.
+		<LI>Confirm that with no email Settings set and only this item checked clicking 
+		<b> OK</b> displays an <b>SMTP Server not set in email settings</b> error.
 	</UL>
 	<LI>Confirm that the <b>If Counter Value ... following addresses:</b> checkbox is selectable.
 	<UL>
 		<LI>Confirm that with no email Settings set and only this item checked 
 		clicking <b> Apply</b> displays an <b>SMTP Server not set in email settings</b> error.
-		<LI>Confirm that with no email Settings set and only this item checked clicking
-          <b> 
-		OK</b> displays an <b>SMTP Server not set in email settings</b> error.
+		<LI>Confirm that with no email Settings set and only this item checked clicking 
+		<b>OK</b> displays an <b>SMTP Server not set in email settings</b> error.
 	</UL>
 	<LI>Confirm that clicking the <b>Email Settings</b> button displays the <b>Email Settings 
 	Dialog</b>.
-	<h2>Email Settings Dialog</h2>
+	<h3>Email Settings Dialog</h3>
 	<UL>
 		<LI>Confirm that the <b>Outgoing mail (SMTP):</b> edit box is editable.
 		<LI>Confirm that when blank, clicking OK displays an <b>SMTP Sever name must not 
@@ -114,15 +97,6 @@
 	value...</b> checkbox is checked.
 	<LI>Confirm that when the edit box is empty and the <b>If Counter value...</b> checkbox is 
 	checked then clicking Ok displays a <b>No Address list set</b> error.
-<p>
-	<li><b>[LegacyRC #5163]</b> USB License Key Manager crash
-	<ul>
-		<li>Configure and run an FPS file.
-		<li>Use Task Manager to end the <b>ProcessFiles.exe</b> process.
-		<li>While the database is still locked, open the <b>USB License Key Manager</b>.
-		<li>Confirm that it opens without error.
-		<li>Hit the <b>Refresh</b> button and confirm that there is still no error.
-	</ul>
 </UL>
 <br>
 <LI><h2>Disable USB Key Via License File</h2>
@@ -136,22 +110,22 @@
 	is thrown.</LI>
   	<LI>Create an additional license file that includes only <b>Disable USB Key Serial 
 	Numbers</b>. Modify the RSD file properties to remove the internal-use flag.
-      Confirm that the rules execute with a USB key that has a different SN than the rules.</LI>
-  	<LI>Modify the RSD file properties to require an 
-	<b>Indexing</b> counter.  Do NOT use a USB Key.  Confirm that the rules do not execute 
-	and that an informative exception is thrown.</LI>
+	<LI>Confirm that the rules execute with a USB key that has a different SN than 
+	the rules.</LI>
+  	<LI>Modify the RSD file properties to require an <b>Indexing</b> counter.  Do NOT 
+	use a USB Key.  Confirm that the rules do not execute and that an informative exception 
+	is thrown.</LI>
   	<LI>Use the same modified RSD file, insert any USB key, and configure the USB License 
 	Key Manager to use the local USB key.  Confirm that the rules execute.</LI>
   	<LI>Modify the RSD file to include a specified USB key serial number different than 
 	the serial number of the attached key.  Confirm that the rules execute.</LI>
-  	<LI>Use the same modified RSD file and delete the <b>Disable USB Key Serial
-      Numbers</b> license.  Confirm that the rules do not execute and that an informative 
-	exception is thrown.</LI>
+  	<LI>Use the same modified RSD file and delete the <b>Disable USB Key Serial Numbers</b> 
+	license.  Confirm that the rules do not execute and that an informative exception 
+	is thrown.</LI>
   	<LI>Create an additional license file that includes only <b>Disable USB Counters 
 	(locked to PC)</b>.  Confirm that the rules execute without a USB key.</LI>
-</UL>
-<br>
-</LI>
+</UL></LI>
+<p>
 <LI><h2>Test Alert message levels</h2>
 	The following test require the email settings to be configured to a valid SMTP server
 	(i.e. mail.extractsystems.com) with sender display name and address with an email 
@@ -165,7 +139,6 @@
 	counts.  The email should end with the text specified in the email signature in the 
 	<b>Email Settings</b> dialog.
 <p>
-
 	<h2>Indexing Counter</h2>
 	<UL>
 		<LI>Set the <b>Alert Level</b> to value 1 less than the counter value. Run rules to 
@@ -389,7 +362,6 @@
 	</li>
 </UL>
 <p>
-
 <LI><h2>Support for AnywhereUSB Device</h2>
 <UL>
 	<li><b>Setup</b>
@@ -451,21 +423,5 @@
 	</ul>
 </UL>
 </LI>
-<p>
-
-<LI><h2>Miscellaneous</h2>
-<ul>
-	<li><b>[LegacyRC #5098, #5109]</b> Deadlock on USB key
-	<ul>
-		<li>Prepare an FPS file to execute rules on a test machine.
-		<li>Configure the test machine to use a remote machine to host the USB key.
-		<li>Confirm that processing is successful on the test machine.
-		<li>Reboot the remote machine that is hosting the USB key.
-		<li>Confirm that the processing machine handles the reboot gracefully and 
-		reconnects to the USB host.
-		<li>Confirm that an exception is logged when the test machine reconnects to 
-		the USB host.
-	</ul>
-</ul>
 </body>
 </HTML>
