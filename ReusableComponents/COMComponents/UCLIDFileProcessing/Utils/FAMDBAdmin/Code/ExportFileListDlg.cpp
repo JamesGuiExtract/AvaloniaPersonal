@@ -21,6 +21,7 @@ static char THIS_FILE[] = __FILE__;
 //-------------------------------------------------------------------------------------------------
 // Constant
 const string gstrSQL_SELECT_VALUES = "FAMFile.FileName, FAMFile.ID";
+const string gstrSQL_DISPLAY_SELECT_VALUES = "FAMFile.FileName";
 
 //-------------------------------------------------------------------------------------------------
 // CExportFileListDlg dialog
@@ -142,7 +143,7 @@ void CExportFileListDlg::OnClickedSelectFiles()
 	try
 	{
 		CSelectFilesDlg dlg(m_ipFAMDB, "Select filenames to export", 
-			"SELECT " + gstrSQL_SELECT_VALUES + " FROM ", m_settings);
+			"SELECT " + gstrSQL_DISPLAY_SELECT_VALUES + " FROM FAMFile", m_settings);
 
 		// Display the dialog and save changes if user clicked OK
 		if (dlg.DoModal() == IDOK)

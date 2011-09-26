@@ -199,7 +199,7 @@ void CSetActionStatusDlg::OnClickedSelectFiles()
 	{
 		// Create the file select dialog
 		CSelectFilesDlg dlg(m_ipFAMDB, "Select files to change action status for",
-			"SELECT FAMFile.ID FROM", m_settings);
+			"SELECT FAMFile.ID FROM FAMFile", m_settings);
 
 		// Display the dialog and save changes if user clicked OK
 		if (dlg.DoModal() == IDOK)
@@ -296,44 +296,12 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 			uex.addDebugInfo("Copy From Action", lFromActionID); 
 		}
 
-		// Check the scope for logging application trace
-		switch(m_settings.getScope())
-		{
-		case eAllFilesForWhich:
-		// If choose to change the status for the files according another action's status 
-		{
-			// Get the From action ID
-			long lWhereActionID = m_settings.getActionID();
-
-			// Get the status ID for the action from which we will copy the status to the selected action
-			int iWhereStatusID = m_settings.getStatus();
-			UCLID_FILEPROCESSINGLib::EActionStatus eWhereStatus = 
-				(UCLID_FILEPROCESSINGLib::EActionStatus)(iWhereStatusID);
-			uex.addDebugInfo("Action Where", lWhereActionID);
-			uex.addDebugInfo("Action Where Status", asString(m_ipFAMDB->AsStatusString(eWhereStatus)));
-
-			// If going from the skipped status check user name list
-			string strUser = "";
-			if (eWhereStatus == kActionSkipped)
-			{
-				// Get the user name from the settings
-				strUser = m_settings.getUser();
-				uex.addDebugInfo("Skipped By User", strUser);
-			}
-		}
-		break;
-
-		case eAllFilesPriority:
-			{
-				uex.addDebugInfo("Priority String", m_settings.getPriorityString());
-			}
-			break;
-		}
+		uex.addDebugInfo("Files Selected", m_settings.getSummaryString());
 
 		// If not processing all files or limiting the scope by a random subset
 		// then the operation must be performed a file at a time, otherwise
 		// just set the status for all files
-		if (m_settings.getScope() != eAllFiles || m_settings.getLimitByRandomCondition())
+		if (!m_settings.selectingAllFiles())
 		{
 			// Get the query for updating files
 			string strSelect = "FAMFile.ID";
@@ -355,7 +323,6 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 				m_ipFAMDB->CopyActionStatusFromAction(lFromActionID, lToActionID);
 			}
 		}
-
 
 		// Log application trace [LRCAU #5052 - JDS - 12/18/2008]
 		uex.log();

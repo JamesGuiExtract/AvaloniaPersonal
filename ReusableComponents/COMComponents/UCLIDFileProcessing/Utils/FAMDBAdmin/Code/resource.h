@@ -27,6 +27,7 @@
 #define IDR_MANAGE_ACTIONS_ACCELERATORS 141
 #define IDR_MANAGE_LOGIN_USERS_ACCELERATORS 142
 #define IDR_MENU_SUMMARY_CONTEXT        143
+#define IDD_DLG_ACTION_STATUS_CONDITION 144
 
 // Database Page ID's
 // These ID's need to be the same in every .h project that uses the Database Page object
@@ -142,6 +143,16 @@
 #define IDC_BTN_REFRESH_ACTIONS         2095
 #define IDC_BTN_ACTION_CLOSE            2096
 #define IDC_BTN_CLEAR_USER_PASSWORD     2097
+#define IDC_LIST_CONDITIONS             2098
+#define IDC_CMB_CONDITION_TYPE          2099
+#define IDC_RADIO_AND                   2100
+#define IDC_RADIO_OR                    2101
+#define IDC_BTN_ADD_CONDITION           2102
+#define IDC_BTN_MODIFY_CONDITION        2103
+#define IDC_BTN_DELETE_CONDITION        2104
+#define IDD_DLG_TAG_CONDITION           2105
+#define IDD_DLG_QUERY_CONDITION         2106
+#define IDD_DLG_PRIORITY_CONDITION      2107
 #define ID_DATABASE_SELECT              32772
 #define ID_DATABASE_CLEAR               32773
 #define ID_DATABASE_RESETLOCK           32774
@@ -164,17 +175,17 @@
 #define ID_SUMMARY_MENU_CANCEL          32795
 #define ID_SUMMARY_MENU_EXPORT_LIST     32796
 #define ID_SUMMARY_MENU_SET_ACTION_STATUS 32797
-#define ID_DATABASE_UPDATE_SCHEMA		32798
-#define ID_DATABASE_SET_OPTIONS			32799
-#define ID_SUMMARY_MENU_VIEW_FAILED		32800
+#define ID_DATABASE_UPDATE_SCHEMA       32798
+#define ID_DATABASE_SET_OPTIONS         32799
+#define ID_SUMMARY_MENU_VIEW_FAILED     32800
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        144
+#define _APS_NEXT_RESOURCE_VALUE        146
 #define _APS_NEXT_COMMAND_VALUE         32801
-#define _APS_NEXT_CONTROL_VALUE         2098
+#define _APS_NEXT_CONTROL_VALUE         2108
 #define _APS_NEXT_SYMED_VALUE           2000
 #endif
 #endif

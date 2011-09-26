@@ -4,6 +4,8 @@
 // 
 // Contains the definition of the SelectFileSettings class
 //-------------------------------------------------------------------------------------------------
+#include "SelectFileCondition.h"
+
 #include <COMUtils.h>
 #include <UCLIDException.h>
 
@@ -12,35 +14,15 @@
 
 using namespace std;
 
-const string gstrANY_USER = "<any user>";
-
-enum FileSelectScope { eAllFiles, eAllFilesForWhich, eAllFilesTag,
-						eAllFilesQuery, eAllFilesPriority };
-enum TagMatchType { eAnyTag = 0, eAllTag = 1, eNoneTag = 2 };
-
 class SelectFileSettings
 {
 private:
-	// The scope for the file selection (all, all for which, all files with tag(s), query)
-	FileSelectScope m_scope;
 
-	// Values for the eAllFilesForWhich scope
-	string m_strAction; // The action name
-	long m_nActionID; // The action ID
-	long m_nStatus; // The status for the specified action
-	string m_strStatus; // The status as a string
-	string m_strUser; // The user (specified if choosing skipped files)
+	// The set of conditions to be applied when selecting files.
+	vector<SelectFileCondition*> m_vecConditions;
 
-	// Values for the eAllFilesTag scope
-	TagMatchType m_eTagType; // Whether the user choose any tags or all tags
-	vector<string> m_vecTags; // The list of tags selected
-
-	// Value for the eAllFilesQuery scope
-	string m_strSQL; // The query statement to complete the line SELECT FAMFile.ID FROM
-
-	// Values for the eAllFilesPriority scope
-	EFilePriority m_ePriority; // The priority to select
-	string m_strPriority;
+	// Whether multiple conditions should be and'd or or'd together.
+	bool m_bAnd;
 
 	// Values for the random subset selection restriction
 	bool m_bLimitByRandomCondition; // Whether to narrow the selection to a random subset
@@ -52,43 +34,18 @@ public:
 	SelectFileSettings();
 	SelectFileSettings(const SelectFileSettings& settings);
 
-	~SelectFileSettings() {};
+	~SelectFileSettings();
 
-	void setScope(FileSelectScope scope) { m_scope = scope; }
-	FileSelectScope getScope() { return m_scope; }
+	SelectFileSettings & operator = (const SelectFileSettings &source);
 
-	void setAction(const string& strAction) { m_strAction = strAction; }
-	string getAction() { return m_strAction; }
+	void addCondition(SelectFileCondition* pCondition)
+		{ m_vecConditions.push_back(pCondition); }
+	const vector<SelectFileCondition*>& getConditions() { return m_vecConditions; }
+	void deleteCondition(int nIndex);
+	void clearConditions();
 
-	void setActionID(long nActionID) { m_nActionID = nActionID; }
-	long getActionID() { return m_nActionID; }
-
-	void setStatus(long nStatus) { m_nStatus = nStatus; }
-	long getStatus() { return m_nStatus; }
-
-	void setStatusString(const string& strStatus) { m_strStatus = strStatus; }
-	string getStatusString() { return m_strStatus; }
-
-	void setUser(const string& strUser) { m_strUser = strUser; }
-	string getUser() { return m_strUser; }
-
-	void setTagType(TagMatchType eTagType) { m_eTagType = eTagType; }
-	TagMatchType getTagType() { return m_eTagType; }
-
-	void setTags(const vector<string>& vecTags) { m_vecTags = vecTags; }
-	vector<string> getTags() { return m_vecTags; }
-
-	void setSQLString(const string& strSQL) { m_strSQL = strSQL; }
-	string getSQLString() { return m_strSQL; }
-
-	void setPriority(EFilePriority ePriority) {
-		m_ePriority = ePriority;
-		IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI27675", ipDB != __nullptr);
-		m_strPriority = asString(ipDB->AsPriorityString(ePriority));
-	}
-	EFilePriority getPriority() { return m_ePriority; }
-	string getPriorityString() { return m_strPriority; }
+	void setConjunction(bool bAnd) { m_bAnd = bAnd; }
+	bool getConjunction() { return m_bAnd; }
 
 	void setLimitByRandomCondition(bool bLimitByRandomCondition) { m_bLimitByRandomCondition = bLimitByRandomCondition; }
 	bool getLimitByRandomCondition() { return m_bLimitByRandomCondition; }
@@ -101,6 +58,8 @@ public:
 		m_nRandomAmount = nRandomAmount;
 	}
 	int getRandomAmount() { return m_nRandomAmount; }
+
+	bool selectingAllFiles() { return m_vecConditions.empty() && !m_bRandomSubsetUsePercentage; }
 
 	// Builds the summary string
 	string getSummaryString();

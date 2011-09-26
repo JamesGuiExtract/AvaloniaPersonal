@@ -2,14 +2,13 @@
 #include "SelectFileSettings.h"
 
 #include <cppUtil.h>
-#include <FAMUtilsConstants.h>
 #include <UCLIDException.h>
 
 //--------------------------------------------------------------------------------------------------
 // Constructors
 //--------------------------------------------------------------------------------------------------
 SelectFileSettings::SelectFileSettings() :
-m_scope(eAllFiles),
+m_bAnd(true),
 m_bLimitByRandomCondition(false),
 m_bRandomSubsetUsePercentage(true),
 m_nRandomAmount(0)
@@ -20,71 +19,74 @@ SelectFileSettings::SelectFileSettings(const SelectFileSettings &settings)
 {
 	*this = settings;
 }
+//--------------------------------------------------------------------------------------------------
+SelectFileSettings::~SelectFileSettings()
+{
+	try
+	{
+		clearConditions();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33788");
+}
 
 //--------------------------------------------------------------------------------------------------
 // Public methods
 //--------------------------------------------------------------------------------------------------
+SelectFileSettings& SelectFileSettings::operator =(const SelectFileSettings &source)
+{
+	m_bAnd = source.m_bAnd;
+	m_bLimitByRandomCondition = source.m_bLimitByRandomCondition;
+	m_bRandomSubsetUsePercentage = source.m_bRandomSubsetUsePercentage;
+	m_nRandomAmount = source.m_nRandomAmount;
+
+	// Delete any existing conditions.
+	clearConditions();
+
+	// Populate m_vecConditions with a clone of the conditions in source.
+	for each (SelectFileCondition* pCondition in source.m_vecConditions)
+	{
+		addCondition(pCondition->clone());
+	}
+
+	return *this;
+}
+//--------------------------------------------------------------------------------------------------
+void SelectFileSettings::deleteCondition(int nIndex)
+{
+	delete m_vecConditions[nIndex];
+	m_vecConditions.erase(m_vecConditions.begin() + nIndex);
+}
+//--------------------------------------------------------------------------------------------------
+void SelectFileSettings::clearConditions()
+{
+	for each (SelectFileCondition* pCondition in m_vecConditions)
+	{
+		delete pCondition;
+	}
+
+	m_vecConditions.clear();
+}
+//--------------------------------------------------------------------------------------------------
 string SelectFileSettings::getSummaryString()
 {
 	string strSummary = "All files ";
-	switch (m_scope)
+
+	if (m_vecConditions.empty())
 	{
-	case eAllFiles:
 		strSummary += "in the database";
-		break;
-
-	case eAllFilesForWhich:
+	}
+	else
+	{
+		for (size_t i = 0; i < m_vecConditions.size(); i++)
 		{
-			strSummary += "for which the \"" + m_strAction + "\" action's status is \""
-				+ m_strStatus + "\"";
-			if (m_nStatus == kActionSkipped)
+			bool bFirst = (i == 0);
+			if (!bFirst)
 			{
-				strSummary += " by " + m_strUser;
+				strSummary += m_bAnd ? " and " : " or ";
 			}
+
+			strSummary += m_vecConditions[i]->getSummaryString(bFirst);
 		}
-		break;
-
-	case eAllFilesTag:
-		{
-			strSummary += "associated with ";
-			switch(m_eTagType)
-			{
-			case eAnyTag:
-				strSummary += "any";
-				break;
-			case eAllTag:
-				strSummary += "all";
-				break;
-			case eNoneTag:
-				strSummary += "none";
-				break;
-			default:
-				THROW_LOGIC_ERROR_EXCEPTION("ELI29964");
-			}
-			strSummary += " of the following tags: ";
-			string strTagString = "";
-			for (vector<string>::iterator it = m_vecTags.begin(); it != m_vecTags.end(); it++)
-			{
-				if (!strTagString.empty())
-				{
-					strTagString += ", ";
-				}
-				strTagString += (*it);
-			}
-			strSummary += strTagString;
-		}
-		break;
-
-	case eAllFilesQuery:
-		strSummary += "selected by this custom query: SELECT FAMFile.ID FROM " + m_strSQL;
-		break;
-
-	case eAllFilesPriority:
-		strSummary += "with a file processing priority of " + m_strPriority;
-		break;
-
-	default:
-		THROW_LOGIC_ERROR_EXCEPTION("ELI26906");
 	}
 
 	if (m_bLimitByRandomCondition)
@@ -110,142 +112,23 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 	ASSERT_ARGUMENT("ELI27722", ipFAMDB != __nullptr);
 	
 	string strQueryPart1 = "SELECT " + strSelect + " FROM ";
-	string strQueryPart2;
+	string strQuery;
 
-	switch(m_scope)
+	if (m_vecConditions.empty())
 	{
-		// Query based on the action status
-	case eAllFilesForWhich:
+		strQuery = strQueryPart1 + "FAMFile";
+	}
+	else
+	{
+		for (size_t i = 0; i < m_vecConditions.size(); i++)
 		{
-			strQueryPart2 += "FAMFile ";
-
-			// Check if comparing skipped status
-			if (m_nStatus == kActionSkipped)
+			if (i > 0)
 			{
-				strQueryPart2 += "INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID WHERE "
-					"(SkippedFile.ActionID = " + asString(m_nActionID);
-				string strUser = m_strUser;
-				if (strUser != gstrANY_USER)
-				{
-					strQueryPart2 += " AND SkippedFile.UserName = '" + strUser + "'";
-				}
-				strQueryPart2 += ")";
+				strQuery += m_bAnd ? "\r\nINTERSECT\r\n" : "\r\nUNION\r\n";
 			}
-			else
-			{
-				// Get the status as a string
-				string strStatus = ipFAMDB->AsStatusString((EActionStatus)m_nStatus);
 
-				// if the schema is 100 or higher the database is using the FileActionStatus table
-				// instead of columns in the FAMFile table.
-				// TODO: Remove if statement when it is no longer required to support columns in FAMFile table
-                if (ipFAMDB->DBSchemaVersion >= 100 )
-                {
-                    strQueryPart2 += " LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID "
-                        " AND FileActionStatus.ActionID = " + asString(m_nActionID);
-                    strQueryPart2 += " WHERE (";
-
-                    // [LRCAU #5942] - Files are no longer marked as unattempted due to the
-                    // database normalization changes. A file is unattempted for a particular
-                    // action if it does not contain an entry in the FileActionStatus table.
-                    if (m_nStatus == kActionUnattempted)
-                    {
-                        strQueryPart2 += "FileActionStatus.FileID IS NULL)";
-                    }
-                    else
-                    {
-                        strQueryPart2 += "FileActionStatus.ActionStatus = '"
-                            + strStatus + "')";
-                    }
-                }
-				else
-				{
-					strQueryPart2 += "WHERE (ASC_" + m_strAction + " = '"
-						+ strStatus + "')";
-				}
-			}
+			strQuery += m_vecConditions[i]->buildQuery(ipFAMDB, strSelect);
 		}
-		break;
-
-		// Query to export all the files
-	case eAllFiles:
-		{
-			strQueryPart2 += "FAMFile";
-		}
-		break;
-
-		// Export based on customer query
-	case eAllFilesQuery:
-		{
-			// Get the query input by the user
-			strQueryPart2 += m_strSQL;
-		}
-		break;
-
-	case eAllFilesTag:
-		{
-			// Get the size and ensure there is at least 1 tag
-			size_t nSize = m_vecTags.size();
-			if (nSize == 0)
-			{
-				UCLIDException uex("ELI27724", "No tags specified.");
-				throw uex;
-			}
-
-			string strMainQueryTemp = gstrQUERY_FILES_WITH_TAGS;
-
-			// Get the conjunction for the where clause (want the "any" behavior for
-			// both the "any" and "none" case - to achieve none just negate the any)
-			string strConjunction =
-				m_eTagType == eAnyTag || m_eTagType == eNoneTag ? "\nUNION\n" : "\nINTERSECT\n";
-
-			// For the "none" case select all files NOT in the "any" list
-			if (m_eTagType == eNoneTag)
-			{
-				strQueryPart2 =
-					"(SELECT " + strSelect + " FROM [FAMFile] WHERE [FAMFile].[ID] NOT IN ";
-
-				// The strMainQueryTemp will be used to select the file ids so it needs to 
-				// just return File ID's
-				replaceVariable(strMainQueryTemp, gstrTAG_QUERY_SELECT,
-					"FAMFile.[ID]");
-			}
-			else
-			{
-				// The strMainQueryTemp is the section so it needs to return FileName's
-				replaceVariable(strMainQueryTemp, gstrTAG_QUERY_SELECT,
-					strSelect);
-			}
-
-			strQueryPart2 += "(" + strMainQueryTemp;
-			replaceVariable(strQueryPart2, gstrTAG_NAME_VALUE, m_vecTags[0]);
-
-			// Build the rest of the query
-			for (size_t i=1; i < nSize; i++)
-			{
-				string strTemp = strMainQueryTemp;
-				replaceVariable(strTemp, gstrTAG_NAME_VALUE, m_vecTags[i]);
-				strQueryPart2 += strConjunction + strTemp;
-			}
-
-			// Need to add an extra paren in the "none" case
-			if (m_eTagType == eNoneTag)
-			{
-				strQueryPart2 += ")";
-			}
-			strQueryPart2 += ") AS FAMFile";
-		}
-		break;
-
-	case eAllFilesPriority:
-		{
-			strQueryPart2 += "FAMFile WHERE FAMFile.Priority = "
-				+ asString((long)m_ePriority);
-		}
-		break;
-
-	default:
-		THROW_LOGIC_ERROR_EXCEPTION("ELI27723");
 	}
 
 	if (m_bLimitByRandomCondition)
@@ -276,7 +159,8 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 			"	DROP TABLE #OriginalResults;\r\n"
 			"\r\n"
 			// This query creates table #OriginalResults with the same columns as the original query.
-			"SELECT TOP 0 " + strSelect + " INTO #OriginalResults FROM " + strQueryPart2 + "\r\n"
+			"SELECT TOP 0 " + strSelect + " INTO #OriginalResults FROM\r\n"
+			"(\r\n" + strQuery + "\r\n) AS FAMFile"
 			"\r\n"
 			// Determine if #OriginalResults contains an identity column. Add a RowNumber identity
 			// if an identity column doesn't already exist.
@@ -291,8 +175,9 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 			"DECLARE @rowsToReturn INT\r\n"
 			// Populate the table via INSERT INTO to avoid issues with ORDER BY + SELECT INTO +
 			// IDENTITY (http://support.microsoft.com/kb/273586)
-			"INSERT INTO #OriginalResults (" + strSelect + ") " + strQueryPart1 +
-				strQueryPart2 + "\r\n"
+			"INSERT INTO #OriginalResults (" + strSelect + ") " + strQueryPart1 + "\r\n"
+			"(\r\n" + strQuery + "\r\n) AS FAMFile"
+			"\r\n"
 			// Calculate the number to return (using SQL's PERCENT seems to be returning unexpected
 			// results: 50% of 28 = 15)
 			"SET @rowsToReturn = " + (m_bRandomSubsetUsePercentage ? 
@@ -360,7 +245,7 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 	{
 		// We don't need to return a sized randomized subset-- simply combine the query parts and
 		// return;
-		return strQueryPart1 + strQueryPart2 + strOrderByClause;
+		return strQuery + strOrderByClause;
 	}
 }
 //--------------------------------------------------------------------------------------------------

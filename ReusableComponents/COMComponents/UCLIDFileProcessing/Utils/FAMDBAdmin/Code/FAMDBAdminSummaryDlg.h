@@ -64,6 +64,9 @@ private:
 	// use by the "Set file action status" and "Export file list" context menu options.
 	SelectFileSettings m_contextMenuFileSelection;
 
+	// The action ID associated with the context menu click location.
+	long m_nContextMenuActionID;
+
 	//---------------------------------------------------------------------------------------------
 	// Helper methods
 	//---------------------------------------------------------------------------------------------

@@ -31,22 +31,15 @@ public:
 // Dialog Data
 	enum { IDD = IDD_DLG_SELECT_FILES };
 	CStatic m_grpSelectFor;
-	CStatic m_lblQuery;
-	CButton m_radioAllFiles;
-	CButton m_radioFilesForWhich;
-	CButton m_radioFilesWithTags;
-	CButton m_radioFilesFromQuery;
-	CButton m_radioFilesWithPriority;
-	CComboBox m_comboFilesUnderAction;
-	CComboBox m_comboFilesUnderStatus;
-	CComboBox m_comboSkippedUser;
-	CComboBox m_comboTagsAnyAll;
-	CComboBox m_comboPriority;
-	CEdit m_editSelectQuery;
-	CListCtrl m_listTags;
+	CComboBox m_cmbConditionType;
+	CListCtrl m_listConditions;
+	CButton m_btnModifyCondition;
+	CButton m_btnDeleteCondition;
 	CButton m_checkRandomSubset;
 	CEdit m_editRandomAmount;
 	CComboBox m_comboRandomSubsetUnits;
+	CButton m_cmbAnd;
+	CButton m_cmbOr;
 
 // Implementation
 protected:
@@ -54,14 +47,13 @@ protected:
 
 	// Message map functions
 	virtual BOOL OnInitDialog();
-	afx_msg void OnClickedRadioAllFiles();
-	afx_msg void OnClickedRadioFilesStatus();
-	afx_msg void OnClickedRadioFilesFromQuery();
-	afx_msg void OnClickedRadioFilesWithTags();
-	afx_msg void OnClickedRadioFilesWithPriority();
 	afx_msg void OnClickedCheckRandomSubset();
-	afx_msg void OnFilesUnderActionChange();
-	afx_msg void OnFilesUnderStatusChange();
+	afx_msg void OnBnClickedBtnAddCondition();
+	afx_msg void OnBnClickedBtnModifyCondition();
+	afx_msg void OnBnClickedBtnDeleteCondition();
+	afx_msg void OnNMDblclkListConditions(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLvnItemChangedListConditions(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedConjunction();
 	afx_msg void OnClose();
 	afx_msg void OnOK();
 	afx_msg void OnClickedOK();
@@ -89,20 +81,16 @@ private:
 	// Methods
 	///////////
 	//---------------------------------------------------------------------------------------------
-	// PURPOSE: To fill in the by user combo box for selecting files skipped by a particular user
-	void fillSkippedUsers();
+	// PURPOSE: Displays configuration for a new condition of type T on the set of files to be
+	// selected.
+	template <class T>
+	void addCondition(T* pCondition);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To update the controls based on the settings object
 	void setControlsFromSettings();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To update controls
 	void updateControls();
-	//---------------------------------------------------------------------------------------------
-	// PURPOSE: To configure the tag list and fill it with the current tags from the database
-	void configureAndPopulateTagList();
-	//---------------------------------------------------------------------------------------------
-	// PURPOSE: To fill the priority combo box
-	void fillPriorities();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To save the selected dialog settings to the settings object
 	bool saveSettings();

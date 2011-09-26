@@ -22,6 +22,7 @@ static char THIS_FILE[] = __FILE__;
 // Constants
 //-------------------------------------------------------------------------------------------------
 const string gstrSQL_SELECT_VALUE = "FAMFile.ID, FAMFile.Priority";
+const string gstrSQL_DISPLAY_SELECT_VALUES = "FAMFile.ID";
 
 //-------------------------------------------------------------------------------------------------
 // CSetFilePriorityDlg dialog
@@ -98,7 +99,7 @@ void CSetFilePriorityDlg::OnClickedSelectFiles()
 	try
 	{
 		CSelectFilesDlg dlg(m_ipFAMDB, "Select files to modify priority", 
-			"SELECT " + gstrSQL_SELECT_VALUE + " FROM ", m_settings);
+			"SELECT " + gstrSQL_DISPLAY_SELECT_VALUES + " FROM FAMFile", m_settings);
 
 		// Display the dialog and save changes if user clicked OK
 		if (dlg.DoModal() == IDOK)

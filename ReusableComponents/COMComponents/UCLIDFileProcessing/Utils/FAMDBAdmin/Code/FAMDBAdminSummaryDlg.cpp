@@ -3,6 +3,7 @@
 #include "FAMDBAdminSummaryDlg.h"
 #include "ExportFileListDlg.h"
 #include "SetActionStatusDlg.h"
+#include "ActionStatusCondition.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -280,12 +281,16 @@ void CFAMDBAdminSummaryDlg::OnNMRClickListActions(NMHDR *pNMHDR, LRESULT *pResul
 				string strFailedFileCount =
 					(LPCTSTR)m_listActions.GetItemText(pNMItemActivate->iItem, giFAILED_COLUMN);
 
-				m_contextMenuFileSelection.setScope(eAllFilesForWhich);
-				m_contextMenuFileSelection.setStatus(m_ipFAMDB->AsEActionStatus(strActionStatus.c_str()));
-				m_contextMenuFileSelection.setStatusString(strContextActionStatusName);		
-				m_contextMenuFileSelection.setActionID(m_ipFAMDB->GetActionID(strContextActionName.c_str()));		
-				m_contextMenuFileSelection.setAction(strContextActionName);
-				m_contextMenuFileSelection.setUser(gstrANY_USER);
+				ActionStatusCondition* pCondition = new ActionStatusCondition();
+				pCondition->setStatus(m_ipFAMDB->AsEActionStatus(strActionStatus.c_str()));
+				pCondition->setStatusString(strContextActionStatusName);		
+				m_nContextMenuActionID = m_ipFAMDB->GetActionID(strContextActionName.c_str()); 
+				pCondition->setActionID(m_nContextMenuActionID);		
+				pCondition->setAction(strContextActionName);
+				pCondition->setUser(gstrANY_USER);
+				
+				m_contextMenuFileSelection.clearConditions();
+				m_contextMenuFileSelection.addCondition(pCondition);
 
 				CMenu menu;
 				menu.LoadMenu(IDR_MENU_SUMMARY_CONTEXT);
@@ -344,7 +349,7 @@ void CFAMDBAdminSummaryDlg::OnContextViewFailed()
 		// recent failures will be displayed, and also to warn the user if there are too many
 		// exceptions to display them all.
 		IActionStatisticsPtr ipActionStats = m_ipFAMDB->GetStats(
-			m_contextMenuFileSelection.getActionID(), VARIANT_TRUE);
+			m_nContextMenuActionID, VARIANT_TRUE);
 
 		long nFailedCount = ipActionStats->GetNumDocumentsFailed();
 		if (nFailedCount > 1000)
@@ -360,7 +365,7 @@ void CFAMDBAdminSummaryDlg::OnContextViewFailed()
 
 		// Build and execute the query to retrieve the exceptions
 		string strQuery = gstrFAILED_FILES_EXCEPTIONS_QUERY;
-		replaceVariable(strQuery, "<ActionID>", asString(m_contextMenuFileSelection.getActionID()));
+		replaceVariable(strQuery, "<ActionID>", asString(m_nContextMenuActionID));
 
 		_RecordsetPtr ipRecordSet = m_ipFAMDB->GetResultsForQuery(strQuery.c_str());
 		ASSERT_RESOURCE_ALLOCATION("ELI32291", ipRecordSet != __nullptr);
