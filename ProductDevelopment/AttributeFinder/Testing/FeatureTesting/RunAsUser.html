@@ -49,6 +49,36 @@
 			<li>Confirm that the same image can be opened and OCR'd in 
 			<b>ExtractImageViewer.exe</b>.
         	</ul>
+<p>
+		<li><b>[LegacyRC #6043]</b> FDRS
+		<ul>
+                    	<li>Run FDRS as an unprivileged user.</li>
+                    	<li>Confirm that settings are read from and written to an INI file in the
+                    	common application data folder.</li>
+                    	<li>Confirm that settings can be modified via the <b>Configure &gt; Automatic
+                    	notifications...</b> context menu option.</li>
+		</ul></li>
+<p>
+		<li><b>[LegacyRC #6046]</b> Test Harness
+		<ul>
+                    	<li>As an unprivileged user, run all the automated tests and confirm that 
+			they work as expected.</li>
+		</ul></li>
+       	</ul>
+<p>
+	<LI><h2>Miscellaneous</h2>
+       	<ul>
+		<li><b>[LegacyRC 5890]</b> UEX log permissions
+		<ul>
+                    	<li>Log in as local admin to a machine with UAC enabled; remove any existing
+                    	UEX logs.</li>
+                    	<li>Do something that will cause ExtractException.uex to be created.</li>
+                    	<li>Log off and log back in as an unprivileged user.</li>
+                    	<li>Confirm that you have access to the UEX log and exceptions are logged
+                    	correctly.</lI>
+                    	<li>Repeat the test in the other direction (i.e., confirm that local admin has
+                    	access to a log created by another account).</li>
+    		</uL></li>
        	</ul>
 </OL>
 </BODY>
