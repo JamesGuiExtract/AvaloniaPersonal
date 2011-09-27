@@ -1,0 +1,55 @@
+<HTML>
+
+<HEAD>
+<TITLE>Run As User Feature Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield Feature Testing<br>Run As User<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h2>Goals and Setup</h2>
+       	<ul>
+		<li>Install ID Shield as <b>local admin</b>.
+		<li>Create a user account that does not have administrator privileges.
+       		<li>TBD
+       	</ul>
+<p>
+	<LI><h2>SQL Server</h2>
+       	<ul>
+       		<li>TBD
+       	</ul>
+<p>
+	<LI><h2>UAC and FAM Utilities</h2>
+       	<ul>
+  	   	<LI><b>[LegacyRC #5902, #6037, #6038, #6039, #6040, #6041]</b> 
+        	<ul>
+			<li>Confirm that the logged-in user does nto have <b>administrator</b> 
+			privileges.
+			<li>Open the UEX Viewer.
+			<li>Confirm that the error log opens without error.
+			<li>Confirm that the <b>Automatically close window</b> 
+			checkbox acts and persists as expected.
+			<li>Confirm that <b>USB License Key Manager</b> allows the 
+			non-privileged user to set and persist the License Server.
+			<li>Confirm that <b>Configure Email Settings</b> can be 
+			exercised without error.
+			<li>Exercise <b>Compute.fps</b> from the ID Shield demo.
+			<li>Confirm that files process without error.
+			<li>Confirm that processing (while listening) can be 
+			stopped without error.
+			<li>Confirm that a <b>TIF</b> image can be double-clicked 
+			to open it in the legacy Image Viewer.
+			<li>Confirm that the image can be OCR'd.
+			<li>Confirm that the same image can be opened and OCR'd in 
+			<b>ExtractImageViewer.exe</b>.
+        	</ul>
+       	</ul>
+</OL>
+</BODY>
+</HTML>
