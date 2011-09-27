@@ -770,6 +770,14 @@
                     <LI>Confirm that the image cannot be converted to a PDF/A-compliant image.
                     <li>Confirm that a meaningful error message is logged.
                 </ul>
+<p> 
+            	<li><b>[LegacyRC #5893]</b> Property page
+            	<ul>
+                	<li>Open the Core: Convert to searchable PDF config dialog. Note that the 
+			<b>Settings</b> button is initially disabled.</li>
+                	<li>Check the checkbox for PDF/A conversion, then uncheck it.</li>
+                	<li>Confirm that the <b>Settings</b> button remains disabled.</li>
+            	</ul></li>
             </ul>
         </ul> 
 <p>
@@ -1158,6 +1166,26 @@
             saved OCR results when processing images with numeric extensions regardless of 
             extension length.</li>
         </ul> 
+<p>
+     	<li><b>Core: Extract image area task</b>
+    	<ul>		
+		<li>Confirm that the task is installed and available.</li>
+		<li>Confirm that the property page contains:
+		<ul>
+                    	<li>an edit box for VOA file</li>
+                    	<li>an edit box for attribute query to select attribute(s) whose spatial 
+			area is to be extracted.</li>
+                    	<li>A choice between using the overall bounds of an attribute or using each
+                    	raster zone individually.</li>
+                    	<li>A choice between outputting only the first qualifying image area or
+                    	outputting them all.</li>
+                    	<li>An output filename expression editbox with a corresponding tag selector
+                    	which includes an &lt;AreaID&gt; so that unique filenames can be specified for
+                    	each qualifying area.</li>
+		</ul></li>
+		<li>Confirm that the task can be used to extract portions of an image and save them
+		to disk.</li>
+	</ul></li>
 <p>
         <li><b>Core: Launch application</b>
         <ul> 
