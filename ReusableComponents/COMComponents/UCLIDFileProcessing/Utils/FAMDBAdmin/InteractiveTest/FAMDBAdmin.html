@@ -220,6 +220,16 @@
             		<li>Confirm that counters, tags and users have been removed from the database.</li>
             		<li>Confirm that the original login password is still effective.</li>
         	</ul></li>
+        <p>
+            	<li><b>[LegacyRC #6163]</b> Confirm that the DB Admin does <b>not</b> allow you to clear 
+		the database in the following situations:
+                <ul>
+                    	<li>FAM is processing documents</lI>
+                    	<li>FAM is queueing documents</li>
+                    	<li>FAM is running displaying statistics</li>
+                    	<li>FAM is listening for documents or waiting for documents to be added to the
+                    	queue.</li>
+            	</ul></li>
     	</ul></li>
 <p>
     	<li><b>Reset Lock</b>
