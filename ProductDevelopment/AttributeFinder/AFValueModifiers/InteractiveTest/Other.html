@@ -180,43 +180,63 @@
         <li><b>Configure</b> button is inactive.
     </ul>
 <p>
-    <li><h2>OCR image area</h2>
-    <ul>
-        <li>Confirm that <b>Configure</b> button displays <b>Configure OCR image area</b> dialog.
+    	<li><h2>OCR image area</h2>
+    	<ul>
+        	<li>Confirm that <b>Configure</b> button displays <b>Configure OCR image area</b> dialog.
 <p>
-        <li>Confirm that the <b>Filter options</b> group box includes selectable checkboxes for
-        <b>Alphabetic characters</b>,  <b>Digits</b>, <b>Period</b>, <b>Hyphen</b>, 
-        <b>Underscore</b>, <b>Comma</b>, <b>Forward slash</b>, <b>Unrecognized characters</b>, and
-        <b>Other characters</b>.
-        <li>Confirm that the first seven checkboxes described above are selected by default in the
-        <b>Filter options</b> group box. 
-        <li>Confirm that the edit box associated with the <b>Other characters</b> checkbox is 
-        enabled only when the checkbox is checked. 
+        	<li>Confirm that the <b>Filter options</b> group box includes selectable checkboxes for
+        	<b>Alphabetic characters</b>,  <b>Digits</b>, <b>Period</b>, <b>Hyphen</b>, 
+        	<b>Underscore</b>, <b>Comma</b>, <b>Forward slash</b>, <b>Unrecognized characters</b>, and
+        	<b>Other characters</b>.
+        	<li>Confirm that the first seven checkboxes described above are selected by default in the
+        	<b>Filter options</b> group box. 
+        	<li>Confirm that the edit box associated with the <b>Other characters</b> checkbox is 
+        	enabled only when the checkbox is checked. 
 <p>
-        <li>Confirm that the <b>Text type</b> group box includes selectable radio buttons for
-        <b>Machine printed</b> and <b>Handwriting</b>.
-        <li>Confirm that the <b>Machine printed</b> radio button is selected by default. 
+        	<li>Confirm that the <b>Text type</b> group box includes selectable radio buttons for
+        	<b>Machine printed</b> and <b>Handwriting</b>.
+        	<li>Confirm that the <b>Machine printed</b> radio button is selected by default. 
 <p>
-        <li>Confirm that the <b>If no text is found</b> group box includes selectable radio buttons 
-        for <b>Discard attribute</b> and <b>Retain original attribute</b>.
-        <li>Confirm that the <b>Discard attribute</b> radio button is selected by default. 
+        	<li>Confirm that the <b>If no text is found</b> group box includes selectable radio buttons 
+        	for <b>Discard attribute</b> and <b>Retain original attribute</b>.
+        	<li>Confirm that the <b>Discard attribute</b> radio button is selected by default. 
 <p>
-        <li>Confirm that <b>OK</b> button saves changes and exits the dialog.
-        <li>Confirm that <b>Cancel</b> button ignores changes and exits the dialog.
-        <li>Confirm that <b>X</b> button ignores changes and exits the dialog.
-        <li>Confirm that settings are persistent.
+        	<li>Confirm that <b>OK</b> button saves changes and exits the dialog.
+        	<li>Confirm that <b>Cancel</b> button ignores changes and exits the dialog.
+        	<li>Confirm that <b>X</b> button ignores changes and exits the dialog.
+        	<li>Confirm that settings are persistent.
 <p>
-        <li><b>[FlexIDSCore #3021]</b> OCR Image Area throws an exception when OCRing white space
-        <ul>
-            <li>Open a RuleSet Editor window and configure a locate image region rule to find the
-            image region within 1.5 lines above	and 17 characters in either direction of a regular
-            expression clue [S5]{2}N
-            <li>Add an OCR Image Region value modifier. Configure it to filter digits, hyphen, and
-            underscore, look for machine-printed text, and discard attributes if no text is found.
-            <li>Run the rule on this image: 
+        	<li><b>[FlexIDSCore #3021]</b> OCR Image Area throws an exception when OCRing white space
+        	<ul>
+            		<li>Open a RuleSet Editor window and configure a locate image region rule to find 
+			the image region within 1.5 lines above	and 17 characters in either direction of 
+			a regular expression clue [S5]{2}N
+            		<li>Add an OCR Image Region value modifier. Configure it to filter digits, hyphen, 
+			and underscore, look for machine-printed text, and discard attributes if no text 
+			is found.
+            		<li>Run the rule on this image: 
 			K:\Common\Engineering\Sample Files\LoganSystems\VA - Judgments\Set001\Images\02340241.tif
-            <li>Confirm that no exceptions were logged.
-        </ul>
+            		<li>Confirm that no exceptions were logged.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4406]</b> OCR Image Area With ICR Option
+        	<ul>
+            		<li>Exercise the RSD file and image found at 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4406</b>.
+			<li>Confirm that one attribute is found, containing most 
+			of the entire image text.
+			<li>Confirm that no exceptions were logged about 
+			<b>Failure to OCR image</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4590]</b> Unknown Characters From OCR Image Area
+        	<ul>
+            		<li>Exercise the RSD file and image found at 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4590</b>.
+			<li>Confirm that unrecognized characters are found.
+			<li>Confirm that the character confidence of the unrecognized 
+			characters is <b>1</b>.
+        	</ul>
     </ul>
 <p>
     <li><h2>Pad value</h2>
