@@ -351,6 +351,19 @@
   	   	<LI><b>[FlexIDSCore #4095]</b> Confirm that the <b>Regular expression rule</b> value 
 		finder does not add subattributes for named capture groups that begin with an 
 		underscore character.
+<p>
+            	<li><b>[FlexIDSCore #4759]</b> "Ignore errors" option
+            	<ul>
+                	<li>Configure a regular expression rule with a malformed regex (e.g., 
+                	"[\s\S]**").</li>
+                	<li>Run the rule on some text and confirm that an error is displayed.</lI>
+                	<li>Check the IE box and confirm that the error is ignored.</li>
+                	<li>Add a value modifier that will cause an exception (e.g., an advanced 
+			replace string set to replace a malformed regex) and confirm that the 
+			<b>Ignore any modifying rule errors</b> works as expected.</li>
+                	<li>Confirm that the "ignore errors" options also work for preprocessors, 
+                	splitters, and output handlers.</li>
+            	</ul></li>
     	</ul>
   	</li>
 <p>
