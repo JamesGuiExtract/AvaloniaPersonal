@@ -106,29 +106,39 @@
         <li>Confirm that group box settings are persistent.
     </ul>
 <p>
-    <li><b>Expected size of box</b> group box
-    <ul>
-        <li>Confirm that an edit box exists for minimum page width.
-        <li>Confirm that an edit box exists for maximum page width.
-        <li>Confirm that an edit box exists for minimum page height.
-        <li>Confirm that an edit box exists for maximum page height.
+    	<li><b>Expected size of box</b> group box
+    	<ul>
+        	<li>Confirm that an edit box exists for minimum page width.
+        	<li>Confirm that an edit box exists for maximum page width.
+        	<li>Confirm that an edit box exists for minimum page height.
+        	<li>Confirm that an edit box exists for maximum page height.
 <p>
-        <li>Confirm that each edit box accepts only numeric characters for input.
-        <li>Confirm that the limits for each edit box are <b>0</b> and <b>100</b>.
-        <li>Confirm that an error message is displayed if the minimum width is greater than the
-        maximum width.
-        <li>Confirm that an error message is displayed if the minimum height is greater than the
-        maximum height.
-        <li>Confirm that group box settings are persistent.
+        	<li>Confirm that each edit box accepts only numeric characters for input.
+        	<li>Confirm that the limits for each edit box are <b>0</b> and <b>100</b>.
+        	<li>Confirm that an error message is displayed if the minimum width is greater than the
+        	maximum width.
+        	<li>Confirm that an error message is displayed if the minimum height is greater than the
+        	maximum height.
+        	<li>Confirm that group box settings are persistent.
 <p>
-        <li><b>[FlexIDSCore #2874]</b> Maximum page width.
-        <ul>
-            <li>Exercise the <b>RSD</b> file and the image associated with the SCR.
-            <li>Confirm that no box is found.
-            <li>Modify the maximum width to <b>12</b> percent and confirm that one box <b>is</b> 
-            found.
-        </ul>
-    </ul>
+        	<li><b>[FlexIDSCore #2874]</b> Maximum page width.
+        	<ul>
+            		<li>Exercise the <b>RSD</b> file and the image associated with the SCR.
+            		<li>Confirm that no box is found.
+            		<li>Modify the maximum width to <b>12</b> percent and confirm that one box 
+			<b>is</b> found.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4589]</b> More Precise Box Finder Box Sizes
+        	<ul>
+            		<li>Confirm that decimal percentages are supported in 
+			<b>Box Finder</b> configuration.
+            		<li>Exercise the image found at 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4589</b>.
+			<li>Confirm that the <b>date of birth</b> box can be isolated 
+			without including boxes that are significantly smaller.
+        	</ul>
+    	</ul>
 <p>
     <li><b>Return Value</b> group box
     <ul>
