@@ -162,8 +162,14 @@ void CRuleSetEditor::OnFileSave()
 			}
 			else
 			{
-				m_ipRuleSet->SaveTo(get_bstr_t(m_strCurrentFileName.c_str()), 
-					VARIANT_TRUE);
+				if (asCppBool(m_ipRuleSet->SaveTo(get_bstr_t(m_strCurrentFileName.c_str()), 
+						VARIANT_TRUE)))
+				{
+					// [FlexIDSCore:4872]
+					// If the ruleset re-generated IdentifiableRuleObject GUIDs, the references
+					// to the rule object interface pointers need to be updated.
+					refreshUIFromRuleSet();
+				}
 			}
 		}
 	}
@@ -195,7 +201,13 @@ void CRuleSetEditor::OnFileSaveas()
 
 		// Save the ruleset object to the specified file
 		_bstr_t bstrFileName = get_bstr_t(fileDlg.GetPathName());
-		m_ipRuleSet->SaveTo(bstrFileName, VARIANT_TRUE);
+		if (asCppBool(m_ipRuleSet->SaveTo(bstrFileName, VARIANT_TRUE)))
+		{
+			// [FlexIDSCore:4872]
+			// If the ruleset re-generated IdentifiableRuleObject GUIDs, the references
+			// to the rule object interface pointers need to be updated.
+			refreshUIFromRuleSet();
+		}
 
 		// update the caption of the window to contain the filename
 		m_strLastFileOpened = bstrFileName;
@@ -1743,7 +1755,7 @@ void CRuleSetEditor::OnTimer(UINT nIDEvent)
 		// as long as the currently loaded ruleset is not encrypted and is licensed to save
 		if (nIDEvent == giAUTO_SAVE_TIMERID && m_ipRuleSet->CanSave == VARIANT_TRUE)
 		{
-			// NOTE: we are passing VARIANT_TRUE as the second argument
+			// NOTE: we are passing VARIANT_FALSE as the second argument
 			// here because we don't want the internal dirty flag to be
 			// effected by this SaveTo() call.
 			m_ipRuleSet->SaveTo(get_bstr_t(m_FRM.getRecoveryFileName().c_str()),

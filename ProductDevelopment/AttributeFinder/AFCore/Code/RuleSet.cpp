@@ -220,29 +220,45 @@ STDMETHODIMP CRuleSet::LoadFrom(BSTR strFullFileName, VARIANT_BOOL bSetDirtyFlag
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04155");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRuleSet::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDirty)
+STDMETHODIMP CRuleSet::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDirty,
+	VARIANT_BOOL* pbGUIDsRegenerated)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI33826", pbGUIDsRegenerated != __nullptr);
+		*pbGUIDsRegenerated = VARIANT_FALSE;
+
 		validateLicense();
 
-		// [FlexIDSCore:4865]
-		// If the filename has changed, in order to prevent the IdentifiableRuleObject GUIDs in a
-		// copied ruleset from conflicting with the GUIDs in the original ruleset, regenerate the
-		// GUIDs for all rule objects in this ruleset.
-		if (bClearDirty == VARIANT_TRUE &&
-			_strcmpi(m_strPreviousFileName.c_str(), asString(strFullFileName).c_str()) != 0)
+		if (bClearDirty == VARIANT_TRUE)
 		{
-			// Regenerate the GUID for the ruleset itself.
-			getGUID(true);
+			// [FlexIDSCore:4865]
+			// If the filename has changed, in order to prevent the IdentifiableRuleObject GUIDs in a
+			// copied ruleset from conflicting with the GUIDs in the original ruleset, regenerate the
+			// GUIDs for all rule objects in this ruleset.
+			if (_strcmpi(m_strPreviousFileName.c_str(), asString(strFullFileName).c_str()) != 0)
+			{
+				// Regenerate the GUID for the ruleset itself.
+				getGUID(true);
 
-			// Create a clone off this ruleset, then copy the date from that clone. This causes all
-			// contained rule objects to be re-created which, in turn, creates new GUIDs for them.
-			ICopyableObjectPtr ipCopyThis = getThisAsCOMPtr();
-			ICopyableObjectPtr ipCopy = ipCopyThis->Clone();
-			ipCopyThis->CopyFrom(ipCopy);
+				// Create a clone off this ruleset, then copy the date from that clone. This causes all
+				// contained rule objects to be re-created which, in turn, creates new GUIDs for them.
+				ICopyableObjectPtr ipCopyThis = getThisAsCOMPtr();
+				ICopyableObjectPtr ipCopy = ipCopyThis->Clone();
+				CopyFrom(ipCopy);
+
+				*pbGUIDsRegenerated = VARIANT_TRUE;
+			}
+
+			// update the filename associated with this ruleset
+			// NOTE: we only want to update the filename when bClearDirty is
+			// true because this method gets called for "temporary saving" 
+			// with the auto-save-on-timer feature.  The auto-save method
+			// calls to this method will have bClearDirty set to false.
+			m_strFileName = asString(strFullFileName);
+			m_strPreviousFileName = m_strFileName;
 		}
 
 		writeObjectToFile(this, strFullFileName, m_bstrStreamName, asCppBool(bClearDirty));
@@ -251,13 +267,6 @@ STDMETHODIMP CRuleSet::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDirty)
 		if (bClearDirty == VARIANT_TRUE)
 		{
 			m_bDirty = false;
-
-			// update the filename associated with this ruleset
-			// NOTE: we only want to update the filename when bClearDirty is
-			// true because this method gets called for "temporary saving" 
-			// with the auto-save-on-timer feature.  The auto-save method
-			// calls to this method will have bClearDirty set to false.
-			m_strFileName = asString(strFullFileName);
 		}
 
 		// Wait until the file is readable

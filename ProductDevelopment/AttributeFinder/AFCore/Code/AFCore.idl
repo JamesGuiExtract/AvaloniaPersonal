@@ -305,8 +305,11 @@ library UCLID_AFCORELib
 		// PROMISE: If bClearDirty  == VARIANT_TRUE, the internal dirty flag's
 		//			value is set to false.  If bClearDirty == VARIANT_FALSE
 		//			then the internal dirty flag's value is unchanged.
+		// RETURNS: VARIANT_TRUE if the IdentifiableRuleObject GUIDs were regenerated which causes
+		//			the member interface pointers to be regenerated. In the case that the caller
+		//			has stored these pointers, they should be refreshed.
 		[id(2), helpstring("method SaveTo")] HRESULT SaveTo([in] BSTR strFullFileName, 
-			[in] VARIANT_BOOL bClearDirty);
+			[in] VARIANT_BOOL bClearDirty, [out, retval] VARIANT_BOOL* pbGUIDsRegenerated);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE:	Execute the rules for one or more attributes in this RuleSet on the 
 		//			specified AFDocument.

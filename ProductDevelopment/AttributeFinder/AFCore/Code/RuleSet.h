@@ -59,7 +59,7 @@ public:
 	STDMETHOD(ExecuteRulesOnText)(IAFDocument* pAFDoc, IVariantVector *pvecAttributeNames,
 		IProgressStatus *pProgressStatus, IIUnknownVector** pAttributes);
 	STDMETHOD(Cleanup)();	
-	STDMETHOD(SaveTo)(BSTR strFullFileName, VARIANT_BOOL bClearDirty);
+	STDMETHOD(SaveTo)(BSTR strFullFileName, VARIANT_BOOL bClearDirty, VARIANT_BOOL* pbGUIDsRegenerated);
 	STDMETHOD(LoadFrom)(BSTR strFullFileName, VARIANT_BOOL bSetDirtyFlagToTrue);
 	STDMETHOD(get_AttributeNameToInfoMap)(IStrToObjectMap * *pVal);
 	STDMETHOD(put_AttributeNameToInfoMap)(IStrToObjectMap * newVal);
