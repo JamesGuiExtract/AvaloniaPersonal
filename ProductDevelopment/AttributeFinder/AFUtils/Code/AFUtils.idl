@@ -526,6 +526,10 @@ library UCLID_AFUTILSLib
 		// Stops a profiling timer on the object call identified by the handle.
 		[id(32), helpstring("method StopProfilingRule")] HRESULT StopProfilingRule([in] long nHandle);
 		//-----------------------------------------------------------------------------------------
+		// Validates that the filename is either an absolute path for a file that exists or is a path
+		// based on a tag (and not a relative path for which the base directory may not be clear).
+		[id(33), helpstring("method ValidateAsExplicitPath")] HRESULT ValidateAsExplicitPath(
+			[in] BSTR bstrEliCode, [in] BSTR bstrFilename);
 	};
 	[
 		object,

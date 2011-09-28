@@ -134,6 +134,7 @@ public:
 	STDMETHOD(StartProfilingRule)(BSTR bstrName, BSTR bstrType,
 		IIdentifiableRuleObject *pRuleObject, long nSubID, long* pnHandle);
 	STDMETHOD(StopProfilingRule)(long nHandle);
+	STDMETHOD(ValidateAsExplicitPath)(BSTR bstrEliCode, BSTR bstrFilename);
 
 private:
 	//////////////////
@@ -233,7 +234,7 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: To return all tag names in strInput.
 	//			The returned strings will include the < and > chars
-	void getTagNames(const string& strInput, vector<string>& rvecTagNames) const;
+	vector<string> getTagNames(const string& strInput) const;
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE:	To expand the tags in the specified string (note rstrInput will be modified)
 	void expandTags(string& rstrInput, IAFDocumentPtr ipDoc);

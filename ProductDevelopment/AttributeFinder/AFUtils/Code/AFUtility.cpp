@@ -415,8 +415,7 @@ STDMETHODIMP CAFUtility::StringContainsTags(BSTR strInput, VARIANT_BOOL *pbValue
 		// it's OK for that to reach the outer scope.
 
 		// get the tags in the string
-		vector<string> vecTagNames;
-		getTagNames(stdstrInput, vecTagNames);
+		vector<string> vecTagNames = getTagNames(stdstrInput);
 
 		// return true as long as there's at least one tag
 		*pbValue = vecTagNames.empty() ? VARIANT_FALSE : VARIANT_TRUE;
@@ -438,8 +437,7 @@ STDMETHODIMP CAFUtility::StringContainsInvalidTags(BSTR strInput, VARIANT_BOOL *
 		string stdstrInput = asString(strInput);
 		
 		// get the tags in the string
-		vector<string> vecTagNames;
-		getTagNames(stdstrInput, vecTagNames);
+		vector<string> vecTagNames = getTagNames(stdstrInput);
 
 		// if we reached here, that means that all tags defined were valid.
 		// so return true.
@@ -778,6 +776,56 @@ STDMETHODIMP CAFUtility::StopProfilingRule(long nHandle)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33751");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFUtility::ValidateAsExplicitPath(BSTR bstrEliCode, BSTR bstrFilename)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		string strEliCode = asString(bstrEliCode);
+		string strFilename = asString(bstrFilename);
+
+		// If the filename contains tags, consider it valid.
+		vector<string> vecTagNames = getTagNames(strFilename);
+		if (vecTagNames.empty())
+		{
+			// If it doesn't contain tags, confirm this is a valid absolute path.
+			// If the name isn't at least 2 characters, it can't be a valid absolute path.
+			if (strFilename.length() <= 2)
+			{
+				UCLIDException ue(strEliCode, "Please specify a valid file name!");
+				ue.addDebugInfo("File", strFilename);
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
+
+			string strRoot = strFilename.substr(0, 2);
+
+			// An absolute path must begin with either a drive letter or double-backslash.
+			if (strRoot != "\\\\" && (!isalpha(strRoot[0]) || strRoot[1] != ':'))
+			{
+				UCLIDException ue(strEliCode, "Explicit path required. Use a path tag or absolute path.");
+				ue.addDebugInfo("File", strFilename);
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
+			// Ensure that the file exists
+			else if (!isValidFile(strFilename))
+			{
+				UCLIDException ue(strEliCode, "Specified file does not exist!");
+				ue.addDebugInfo("File", strFilename);
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33845");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1182,11 +1230,10 @@ void CAFUtility::expandINIFileTags(string& rstrInput,
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CAFUtility::getTagNames(const string& strInput, 
-							 vector<string>& rvecTagNames) const
+vector<string> CAFUtility::getTagNames(const string& strInput) const
 {
-	// clear the result vector
-	rvecTagNames.clear();
+	// Create the result vector
+	vector<string> vecTagNames;
 	
 	// get the tag names
 	long nSearchStartPos = 0;
@@ -1222,9 +1269,11 @@ void CAFUtility::getTagNames(const string& strInput,
 		}
 
 		// continue searching at the next position
-		rvecTagNames.push_back(strTagName);
+		vecTagNames.push_back(strTagName);
 		nSearchStartPos = nTagEndPos + 1;
 	}
+
+	return vecTagNames;
 }
 //-------------------------------------------------------------------------------------------------
 string CAFUtility::getRulesFilePrefix()
@@ -1569,8 +1618,7 @@ void CAFUtility::expandTags(string& rstrInput, IAFDocumentPtr ipDoc)
 		expandAFDocTags(rstrInput, ipDoc);
 
 		// at this time, ensure that there are no more tags left
-		vector<string> vecTagNames;
-		getTagNames(rstrInput, vecTagNames);
+		vector<string> vecTagNames = getTagNames(rstrInput);
 		if (!vecTagNames.empty())
 		{
 			UCLIDException ue("ELI09818", "One or more tag names could not be expanded.");

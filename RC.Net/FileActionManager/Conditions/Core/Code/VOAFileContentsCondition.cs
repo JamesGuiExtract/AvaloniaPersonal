@@ -1035,7 +1035,7 @@ namespace Extract.FileActionManager.Conditions
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI32685",
+                throw ex.CreateComVisible("ELI33853",
                     "Failed to check '" + _COMPONENT_DESCRIPTION + "' configuration.");
             }
         }

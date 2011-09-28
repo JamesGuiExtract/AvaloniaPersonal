@@ -274,6 +274,33 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Converts <see paramref="variantVector"/> into an <see cref="IEnumerable"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of object in the vector.</typeparam>
+        /// <param name="variantVector">The <see cref="IVariantVector"/> to convert.</param>
+        /// <returns>An <see cref="IEnumerable"/> of type <see paramref="T"/>.</returns>
+        [CLSCompliant(false)]
+        public static IEnumerable<T> ToIEnumerable<T>(this IVariantVector variantVector)
+        {
+            try
+            {
+                int size = variantVector.Size;
+                List<T> list = new List<T>(size);
+
+                for (int i = 0; i < size; i++)
+                {
+                    list.Add((T)variantVector[i]);
+                }
+
+                return list;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI33854", ex);
+            }
+        }
+
+        /// <summary>
         /// Tries to add the key value pair to the <see cref="Dictionary{K,V}"/> if the key is
         /// not already present in the dictionary.
         /// </summary>

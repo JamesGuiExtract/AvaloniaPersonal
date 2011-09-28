@@ -372,7 +372,10 @@ bool CRegExprRulePP::storePatternFile(UCLID_AFVALUEFINDERSLib::IRegExprRulePtr i
 		GetDlgItemText(IDC_EDIT_REG_EXP_FILE, bstrRegExpFile.m_str);
 		_bstr_t _bstrFileName(bstrRegExpFile);
 
-		AFTagManager::validateAsExplicitPath("ELI33650", asString(_bstrFileName));
+		IAFUtilityPtr ipAFUtility(CLSID_AFUtility);
+		ASSERT_RESOURCE_ALLOCATION("ELI33849", ipAFUtility != __nullptr);
+
+		ipAFUtility->ValidateAsExplicitPath("ELI33650", _bstrFileName);
 
 		ipRegExprRule->RegExpFileName = _bstrFileName;
 		

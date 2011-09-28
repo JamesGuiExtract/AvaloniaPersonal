@@ -90,7 +90,10 @@ STDMETHODIMP CRSDSplitterPP::Apply(void)
 						CComBSTR bstrFileName;
 						GetDlgItemText(IDC_EDIT_RSD_FILE, bstrFileName.m_str);
 
-						AFTagManager::validateAsExplicitPath("ELI33647", asString(bstrFileName));
+						IAFUtilityPtr ipAFUtility(CLSID_AFUtility);
+						ASSERT_RESOURCE_ALLOCATION("ELI33847", ipAFUtility != __nullptr);
+
+						ipAFUtility->ValidateAsExplicitPath("ELI33647", bstrFileName.m_str);
 						
 						ipRSDSplitter->RSDFileName = _bstr_t(bstrFileName);
 					}

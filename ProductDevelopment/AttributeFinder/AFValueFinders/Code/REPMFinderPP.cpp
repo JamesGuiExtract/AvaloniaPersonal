@@ -543,7 +543,10 @@ bool CREPMFinderPP::storeRulesFile(UCLID_AFVALUEFINDERSLib::IREPMFinderPtr ipREP
 		GetDlgItemText(IDC_EDIT_RULE_FILE, bstrRulesFile.m_str);
 		_bstr_t _bstrFileName(bstrRulesFile);
 		
-		AFTagManager::validateAsExplicitPath("ELI33649", asString(bstrRulesFile));
+		IAFUtilityPtr ipAFUtility(CLSID_AFUtility);
+		ASSERT_RESOURCE_ALLOCATION("ELI33850", ipAFUtility != __nullptr);
+
+		ipAFUtility->ValidateAsExplicitPath("ELI33649", bstrRulesFile.m_str);
 
 		ipREPMFinder->RulesFileName = _bstr_t(bstrRulesFile);
 		

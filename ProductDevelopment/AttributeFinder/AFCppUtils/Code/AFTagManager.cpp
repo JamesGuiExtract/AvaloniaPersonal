@@ -33,45 +33,6 @@ const std::string AFTagManager::expandTagsAndFunctions(const std::string& strTex
 	return strOut;
 }
 //-------------------------------------------------------------------------------------------------
-void AFTagManager::validateAsExplicitPath(const std::string& eliCode, const std::string& strFilename)
-{
-	IAFUtilityPtr ipAFUtility(CLSID_AFUtility);
-	ASSERT_RESOURCE_ALLOCATION("ELI33646", ipAFUtility != __nullptr);
-
-	// If the filename contains tags, consider it valid.
-	if(ipAFUtility->StringContainsTags(strFilename.c_str()) == VARIANT_FALSE)
-	{
-		// If it doesn't contain tags, confirm this is a valid absolute path.
-		// If the name isn't at least 2 characters, it can't be a valid absolute path.
-		if (strFilename.length() <= 2)
-		{
-			UCLIDException ue(eliCode, "Please specify a valid file name!");
-			ue.addDebugInfo("File", strFilename);
-			ue.addWin32ErrorInfo();
-			throw ue;
-		}
-
-		string strRoot = strFilename.substr(0, 2);
-
-		// An absolute path must begin with either a drive letter or double-backslash.
-		if (strRoot != "\\\\" && (!isalpha(strRoot[0]) || strRoot[1] != ':'))
-		{
-			UCLIDException ue(eliCode, "Explicit path required. Use a path tag or absolute path.");
-			ue.addDebugInfo("File", strFilename);
-			ue.addWin32ErrorInfo();
-			throw ue;
-		}
-		// Ensure that the file exists
-		else if (!isValidFile(strFilename))
-		{
-			UCLIDException ue(eliCode, "Specified file does not exist!");
-			ue.addDebugInfo("File", strFilename);
-			ue.addWin32ErrorInfo();
-			throw ue;
-		}
-	}
-}
-//-------------------------------------------------------------------------------------------------
 void AFTagManager::validateDynamicFilePath(const std::string& eliCode, std::string strValue)
 {
 	IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
@@ -86,7 +47,10 @@ void AFTagManager::validateDynamicFilePath(const std::string& eliCode, std::stri
 		string strFileWithoutHeader =
 			asString(ipMiscUtils->GetFileNameWithoutHeader(_bstr_t(strValue.c_str())));
 
-		AFTagManager::validateAsExplicitPath(eliCode, strFileWithoutHeader);
+		IAFUtilityPtr ipAFUtility(CLSID_AFUtility);
+		ASSERT_RESOURCE_ALLOCATION("ELI33846", ipAFUtility != __nullptr);
+
+		ipAFUtility->ValidateAsExplicitPath(eliCode.c_str(), strFileWithoutHeader.c_str());
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -112,7 +76,10 @@ void AFTagManager::validateDynamicFilePath(const std::string& eliCode, IVariantV
 			string strFileWithoutHeader =
 				asString(ipMiscUtils->GetFileNameWithoutHeader(_bstr_t(strValue.c_str())));
 
-			AFTagManager::validateAsExplicitPath(eliCode, strFileWithoutHeader);
+			IAFUtilityPtr ipAFUtility(CLSID_AFUtility);
+			ASSERT_RESOURCE_ALLOCATION("ELI33852", ipAFUtility != __nullptr);
+
+			ipAFUtility->ValidateAsExplicitPath(eliCode.c_str(), strFileWithoutHeader.c_str());
 		}
 	}
 }

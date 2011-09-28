@@ -54,7 +54,7 @@ STDMETHODIMP CRSDFileConditionPP::Apply(void)
 			m_editRSDFileName.GetWindowText(bstrName.m_str);
 			_bstr_t _bstrName(bstrName);
 
-			AFTagManager::validateAsExplicitPath("ELI33663", asString(bstrName));
+			m_ipAFUtility->ValidateAsExplicitPath("ELI33663", bstrName.m_str);
 
 			ipCondition->RSDFileName = _bstrName;
 		}
