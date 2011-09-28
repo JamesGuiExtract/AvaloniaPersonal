@@ -1,0 +1,206 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0.0.99 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0.0.99 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+    <li><h3>Recently fixed SCRs</h3>
+    <ul>
+        <li><b>[FlexIDSCore #4872]</b>
+        <ul>
+            <li>Open a new instance of the ruleset editor and set up a rule
+            that will find something. Save the file.</li>
+            <li>Open the rule tester and confirm that the rule works.</li>
+            <li>Uncheck the box for the rule and run again. Confirm that the
+            rule doesn't run and no data are found.</li>
+            <li>Save again and reopen the RSD file. Confirm that the rule is
+            still unchecked.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4865]</b>
+        <ul>
+            <li>Create an RSD file Test.rsd that will find some data.</li>
+            <li>Create a Master.rsd file that calls Test.rsd.</li>
+            <li>Copy and paste Test.rsd and edit Master.rsd to also call the
+            copy.</li>
+            <li>Run Master.rsd while profiling and confirm that the profiler is
+            unable to distinguish the rules in the original and the copy.</li>
+            <li>Open the copy in the ruleset editor and save without making
+            any changes.</li>
+            <li>Run Master.rsd again while profiling and confirm that the
+            profiler <b>is</b> able to distinguish between them.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4864]</b> >Confirm that the .NET rules objects
+        can all be configured.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4863]</b> Confirm that the RDT install includes
+        the automated tests for "Extract OCR text in image area".</li>
+    <p>
+        <li><b>[FlexIDSCore #4862]</b> Extract OCR text in image area
+        <ul>
+            <li>Confirm that <b>Extract OCR text in image area</b> is available
+            in the list of attribute modifiers.</li>
+        <p>
+            <li>Select the attribute modifier and open the property page.</li>
+            <li>Confirm that the title bar includes appropriate text.</li>
+            <li>Confirm that there is an <b>OCR source</b> group box containing
+            radio buttons for <b>Original image</b> and <b>Document context
+            passed to this rule object</b>.</li>
+            <li>Confirm that there is an <b>Area of extraction</b> group box
+            containing radio buttons for <b>Use the overall bounds of the
+            attribute</b> and <b>Use each raster zone separately</b>.</li>
+            <li>Confirm that there is a <b>Text to extract</b> group box with
+            two combo boxes.
+            <ul>
+                <li>One has the options <b>include</b> and <b>exclude</b></li>
+                <li>One has the options <b>characters</b>, <b>words</b>, and
+                <b>lines</b></li>
+            </uL></lI>
+        <p>
+            <li>Confirm that each of the options works correctly.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4858]</b>
+        <ul>
+            <li>Verify a document with a redaction.</li>
+            <li>Select the redaction.</li>
+            <li>Click F2 to zoom to the redaction.</li>
+            <li>Adjust the size/position of the redaction.</li>
+            <li>Confirm that clicking F2 again zooms previous.</li>
+        <p>
+            <li>Confirm that you get reasonable behavior pressing F2 
+            repeatedly.</lI>
+            <li>Confirm that you get reasonable behavior pressing F2 after
+            manually zooming in on a redaction.</li>
+        </uL></li>
+    <p>
+        <li><b>[FlexIDSCore #4848]</b>
+        <ul>
+            <li>Contract the following sequence in descending order while
+            eliminating duplicates: 11,222,3232,223,224,222,31,221,222</li>
+            <li>Confirm that the result is: 3232,224-221,31,11</li>
+        </ul></li>
+    <p> 
+        <li><b>[FlexIDSCore #4847]</b>
+        <ul>
+            <li>Create a local copy of the PVCS_Testing folder for this 
+            SCR.</li>
+            <li>Open the FPS file and modify it to supply the two files in the
+            folder.</lI>
+            <li>Run the FPS file. Use Ctrl+Tab and Ctrl+Shift+Tab to navigate
+            forward to the second document (TestImage001.tif), then back to
+            the first.</li>
+            <li>Stop the FAM.</li>
+            <li>Restart the FAM.</li>
+            <li>Use Ctrl+Tab and Ctrl+Shift+Tab to navigate back and forth
+            repeatedly.</li>
+            <li>Confirm that no errors or crashes are seen.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4820]</b> Value condition selector
+        <ul>
+            <li>Confirm that the <b>Value condition selector</b> is available
+            as an attribute selector.</li>
+            <li>Confirm that it allows you to select attributes based on their
+            values.</li>
+            <li>Confirm that each of the available conditions works as 
+            expected.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4814, #4815]</b> Run object on attributes
+        <ul>
+            <li>Confirm that Run object on query has been renamed to <b>Run
+            object on attributes</b>.</li>
+            <li>Confirm that there is now a checkbox after the query box to
+            <b>further narrow the attributes</b>.</li>
+            <li>Confirm that the checkbox enables a dropdown to choose an
+            attribute selector.</li>
+            <li>Confirm that an object can be run on a subattribute.</li>
+            <li>Confirm that each of the selectors works as expected.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4645]</b> Confirm that the <B>Find from RSD</b>
+        value finder requires that the full path of the called RSD file be
+        specified, either explicitly or using path tags.</li>
+    <p>
+        <li><b>[LegacyRC #6195]</b> Confirm that the DB Admin Select Files
+        dialog includes an appropriate label for the SQL query option.</li>
+    <P>
+        <li><b>[LegacyRC #6192]</b> Combining conditions for DB Admin Select
+        Files dialog
+        <ul>
+            <li>Confirm that multiple conditions in the Select files dialog can
+            be combined either inclusively or exclusively.</li>
+            <li>Confirm that files can be selected based on their status in two
+            different actions.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #6180]</b> dbo schema issues
+        <ul>
+            <li>As local admin, create an empty database in the Management
+            Studio.</li>
+            <li>Grant db_owner permissions for the database to the FAM Admins 
+            group.</li>
+            <li>Log in as a member of that group and try to log in to the
+            database using the DB Admin.</li>
+            <li>Confirm that DB Admin is able to create all the appropriate
+            tables.</li>
+        </uL></lI>
+    <p>
+        <li><b>[LegacyRC #6139]</b> Confirm that files associated with saved
+        reports are saved in the appropriate location.</li>
+    </ul></li>
+<p>
+    <LI><h3>Automated Testing</h3>
+        <ul>
+            <LI>Automated Tests
+            <ul>
+                <li>Date, Test Machine, Number of Failures
+                <li>Notes
+            </ul>
+            <LI>National Ruleset : Document Classification
+            <ul>
+                <li>Date, Test Machine, Number of Failures
+                <li>Notes
+            </ul>
+            <LI>National Ruleset : Redaction
+            <ul>
+                <li>Date, Test Machine, Number of Failures
+                <li>Notes
+            </ul>
+            <LI>National Ruleset : Indexing
+            <ul>
+                <li>Date, Test Machine, Number of Failures
+                <li>Notes
+            </ul>
+        </ul></LI>
+<p>
+    <LI><h3>Sanity Testing</h3>
+    <ul>
+        <li>32-bit Operating System</li>
+        <ul>
+            <li>Date, Tester, Test Machine
+            <li>Notes
+        </ul>						 
+<p>
+        <li>64-bit Operating System</li>
+        <ul>
+            <li>Date, Tester, Test Machine
+            <li>Notes
+        </ul>						 
+    </ul>						 
+    </LI>
+</OL>
+</BODY>
+</HTML>
