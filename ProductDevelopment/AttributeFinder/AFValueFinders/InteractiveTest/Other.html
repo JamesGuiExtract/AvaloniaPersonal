@@ -281,6 +281,85 @@
     	</ul>
   	</li>
 <p>
+	<li><h2><b>Regular Expression Pattern Matcher</b></h2>
+    	<ul>
+       		<li><u>User Interface</u>
+		<ul>
+			<li>Confirm that the property page caption is <b>Regular 
+			expression pattern matcher settings</b>.
+			<li>Confirm that the <b>Pattern file</b> group box contains 
+			an enabled edit box with an associated tag selector and 
+			browse button.
+			<li>Confirm that the tag selector list includes the following 
+			along with the usual <b>$</b> functions.
+			<ul>
+				<li>&lt;RSDFileDir&gt;
+				<li>&lt;DocType&gt;
+				<li>&lt;ComponentDataDir&gt;
+				<li>&lt;SourceDocName&gt;
+				<li>&lt;RuleExecutionID&gt;
+				<li>&lt;XMLOutputFile&gt;
+				<li>&lt;VOAOutputFile&gt;
+			</ul>
+			<li>Confirm that the browse button works correctly.
+			<li>Confirm that the associated document button opens the 
+			specified file using <b>Notepad</b>.
+			<li>Confirm that balloon help is provided to indicate file 
+			syntax and various limitations on behavior.
+			<li>Confirm that a checkbox is provided (checked by default) 
+			that allows return of no attributes and no error if the 
+			tag to be expanded does not exist.
+			<li>Confirm that the <b>Match Options</b> group box contains 
+			a <b>Case sensitive</b> checkbox.
+			<li>Confirm that another checkbox is provided to <b>Store rule 
+			ID(s) of successfully executed rule(s) as document tag named</b>.
+			<li>Confirm that an associated edit box is provided for the name 
+			of the document tag.
+			<li>Confirm that the edit box is enabled only when the checkbox 
+			is checked.
+			<li>Confirm that if no name is defined, a message is displayed 
+			about using the default value.
+			<li>Confirm that the default value is <b>RuleWorked</b>.
+			<li>Confirm that balloon help is provided.
+			<li>Confirm that a Data Scorer can be selected and configured.
+			<li>Confirm that <b>&lt;None&gt;</b> is available and clears a 
+			previous selection.
+			<li>Confirm that the associated read-only edit box displays 
+			the data scorer and its description.
+			<li>Confirm that the associated <b>Minimum match</b> edit box 
+			is enabled only when a data scorer is defined.
+			<li>Confirm that balloon help is provided.
+			<li>Confirm that the <b>Return Options</b> group box contains 
+			four radio buttons
+			<ul>
+				<li>Return first match only (the default)
+				<li>Return best match
+				<li>Return all matches
+				<li>Return first match &gt;= or best match
+			</ul>
+			<li>Confirm that the last radio button includes an edit box 
+			allowing for specification of a desired score.
+			<li>Confirm that the edit box is enabled only if the radio button 
+			is selected.
+			<li>Confirm that balloon help is provided.
+		</ul>
+<p>
+       		<li><u>Functionality</u>
+		<ul>
+			<li>Exercise basic functionality for the REPM.
+			<li>Confirm that an exception is thrown if the associated 
+			checkbox is unchecked and the tag does not exist.
+			<li>Confirm that the <b>Case sensitive</b> checkbox works 
+			properly.
+			<li>Confirm that rule IDs can be returned.
+			<li>Confirm that a data scorer works to validate matches.
+			<li>Confirm proper behavior for each <b>Return Option</b>.
+			<li>Confirm that import statements work properly with 
+			<b>#import path to file\filename.dat</b> syntax.
+		</ul>
+    	</ul>
+  	</li>
+<p>
   	<li><h2><b>Regular Expression Rule</b></h2>
     	<ul>
       		<li><b>Configure</b> button displays <b>Configure Regular Expression Rule</b> dialog.</li>
@@ -376,26 +455,29 @@
 <p>
   	<li><h2><b>Select Page Region</b></h2>
     	<ul>
-      		<li><b>[FlexIDSCore #4013]</b> Broken donut redaction
+      		<li><b>[FlexIDSCore #4013]</b> Exercise the RSD file and image from 
+		<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4013</b>.
 		<ul>
-			<li>Exercise the RSD file and image from 
-			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4013</b>.
 			<li>Confirm that the finding rules work properly.
 		</ul>
 <p>
-  	   	<LI><b>[FlexIDSCore #4014]</b> Exclude Pages In Select Page Region
+  	   	<LI><b>[FlexIDSCore #4014]</b> Exercise the RSD file and image found at 
+		<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4014</b>.
         	<ul>
-            		<li>Exercise the RSD file and image found at 
-			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4014</b>.
 			<li>Confirm that three attributes are found, one each for 
 			pages 6, 7 and 8.
         	</ul>
 <p>
-  	   	<LI><b>[FlexIDSCore #4719]</b> Select Page Region Selects Region Too Small
+  	   	<LI><b>[FlexIDSCore #4719]</b> Exercise the RSD file and image found at 
+		<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4719</b>.
         	<ul>
-            		<li>Exercise the RSD file and image found at 
-			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4719</b>.
 			<li>Confirm that each rule finds the whole page of the image.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4797]</b> Exercise the RSD file and image 
+		at <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4797</b>.
+        	<ul>
+			<li>Confirm that no attribute is found.
         	</ul>
     	</ul>
   	</li>
