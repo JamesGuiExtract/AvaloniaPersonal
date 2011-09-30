@@ -283,6 +283,62 @@
 		</UL>
 	</UL>
 <p>
+<LI><h2>Counter Management</h2>
+<ul>
+	<li><u>Goals</u>
+	<ul>
+		<li>Ensure that <b>Application trace</b> items are logged 
+		for each transition across <b>1000</b> counts.
+		<li>Accumulate USB decrement requests to limit the number 
+		of counter requests and allow for more processors to 
+		successfully access a multi-user key.
+	</ul>
+<p>
+	<li><u>Logged transitions</u>
+	<ul>
+		<li>Ensure that <b>Application trace</b> items are logged 
+		for each transition across <b>1000</b> counts. (Note: Only 
+		one trace message will be logged if a very large image is 
+		processed that might otherwise require multiple log 
+		entries.)
+		<ul>
+			<li>Test this with a local, single-user key.
+			<li>Test this with a remote, multiple-user key.
+		</ul>
+	</ul>
+<p>
+	<li><u>Accumulate decrement requests</u>
+	<ul>
+		<li>Prepare a large number of single-page images to be 
+		processed with an <b>ID Shield</b> ruleset that requires a 
+		decrement-by-page USB key.
+		<li>Prepare an FPS file to process the files using only one 
+		or two threads in order to more carefully watch decrements 
+		of the USB counter.
+		<li>Use a local USB key to minimize delay in counter value 
+		refreshes.
+		<li>Process the files and refresh the <b>USB License Key 
+		Manager</b> frequently, noting the number of counts removed 
+		with each refresh.
+		<ul>
+			<li>Confirm that beginning processing still decrements 
+			the counter by single pages.
+			<li>Confirm that counter decrements increase up to a 
+			maximum of <b>10</b> pages at a time.
+		</ul>
+		<li>Confirm that killing a FAM instance provides a small 
+		number of free counts since the accumulated decrement is not 
+		applied to the key.
+		<li>Confirm that the usual retry code is still executed and 
+		works properly if the USB key is missing.
+		<li>Confirm that for a USB key with few remaining counts, the 
+		decrement is not greater than 1% of the remaining counts.
+		<li>Confirm that for a USB key with <b>less than 100</b> 
+		remaining counts, the decrement remains at <b>1</b>.
+		<li>Confirm that the counter value will not go negative.
+	</ul>
+</ul>
+<p>
 <LI><h2>Error Handling</h2>
 <ul>
 	<li>Test Setup for next numbered items
