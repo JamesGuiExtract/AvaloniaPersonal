@@ -178,6 +178,17 @@
                 created.</li>
             </ul></li>
         </ul></li>
+<p>
+        <li><b>Miscellaneous</b>
+        <ul>
+        	<li><b>[FlexIDSCore #4803]</b> Redaction metadata with millisecond resolution
+        	<ul>
+            		<li>Confirm that redaction metadata includes millisecond accuracy 
+			in <b>VOA</b> files.
+            		<li>Confirm that redaction metadata includes millisecond accuracy 
+			in <b>XML</b> files.
+        	</ul>
+        </ul></li>
     </UL></li>
 <p>
     <LI><h2>Redaction: Create redacted image</h2>
@@ -984,6 +995,17 @@
                 get reasonable results regarding clues.</li>
             </ul></li>
         </ul></li>
+<p>
+        <li><b>[FlexIDSCore #4622, #4626]</b> VOA compare / merge
+        <ul>
+        	<li>Confirm that the <b>Redaction: Merge ID Shield data files</b> task allows 
+		specification of equal redactions if 
+		<ul>
+			<li>one is overlapped by the other 
+			<li>they mutually overlap each other 
+		</ul>
+		<li>Confirm that <b>Clues</b> can only be merged with <b>Clues</b>.
+        </ul>
     </ul></li>
 </UL></li>
 <p>
@@ -1063,18 +1085,29 @@
                 <li>Otherwise, each source attribute should show up separately in the 
                 results.</li>
             </ul></li>
-        <p>
-            <li><b>[FlexIDSCore #4604]</b> 
-            <ul>
-                <li>Run the ID Shield demo rules on the demo images.</li>
-                <li>With feedback collection turned on, verify the images. Make no changes before
-                saving.</li>
-                <li>Use the compare condition to compare the .found and .expected VOAs. Confirm
-                that you get reasonable results regarding clues.</li>
-            </ul></li>
+<p>
+            	<li><b>[FlexIDSCore #4604]</b> 
+            	<ul>
+                	<li>Run the ID Shield demo rules on the demo images.</li>
+                	<li>With feedback collection turned on, verify the images. Make no changes 
+			before saving.</li>
+                	<li>Use the compare condition to compare the .found and .expected VOAs. 
+			Confirm that you get reasonable results regarding clues.</li>
+            	</ul></li>
+<p>
+        	<li><b>[FlexIDSCore #4622, #4626]</b> VOA compare / merge
+        	<ul>
+            		<li>Confirm that the <b>Redaction: Compare ID Shield data files</b> 
+			condition allows specification of equal redactions if 
+			<ul>
+				<li>one is overlapped by the other 
+				<li>they mutually overlap each other 
+			</ul>
+			<li>Confirm that <b>Clues</b> can only be merged with <b>Clues</b>.
+        	</ul>
         </ul></li>
     </ul></li>
-
+<p>
     <LI><h2>ID Shield Data File Contents Condition</h2>
     <UL>
         <li>Begin configuring a <b>Conditional Task</b> object, selecting the <b>ID Shield data 
