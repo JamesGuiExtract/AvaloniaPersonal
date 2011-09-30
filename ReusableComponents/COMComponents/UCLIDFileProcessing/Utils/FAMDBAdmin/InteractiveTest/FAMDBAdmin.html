@@ -114,6 +114,48 @@
             		<li>Help &gt; About this application</li>
         	</ul></li>
     	</ul></li>
+<p>
+   	<LI><b>[LegacyRC #6168]</b> DB Admin and empty databases
+       	<ul>
+		<li>Login to the test machine as a member of the local Administrators 
+		group.
+       		<li>Confirm that <b>DB Admin</b> can login to an otherwise empty 
+		database created by SQL Management Studio.
+		<li>Confirm that a confirmation dialog is presented.
+       		<li>Confirm that <b>DB Admin</b> can create a new database with the 
+		same name as an empty database created by SQL Management Studio.
+		<li>Confirm that a confirmation dialog is presented.
+<p>
+		<li>Create two more empty databases with <b>SQL Management Studio</b>.
+		<li>Create two SQL logins using <b>SQL Management Studio</b>.
+		<ul>
+			<li>User A - granted <b>db_owner</b> privileges to the new 
+			databases.
+			<li>User B - granted <b>db_datareader + db_datawriter</b> 
+			privileges to the new databases.
+			<li>Neither user should be a member of the <b>Administrators</b> 
+			group.
+		</ul>
+<p>
+		<li>Login to the test machine as <b>User B</b>.
+		<ul>
+			<li>Confirm that the user <b>cannot</b> create or login to 
+			either of the new databases.
+		</ul>
+		<li>Login to the test machine as <b>User A</b>.
+		<ul>
+			<li>Confirm that the user <b>can</b> create the first new 
+			database.
+			<li>Confirm that the user <b>can</b> login to the second new 
+			database.
+		</ul>
+		<li>Login to the test machine as <b>User B</b>.
+		<ul>
+			<li>Confirm that the user <b>can</b> add actions and counters 
+			to one of the new databases.
+			<li>Confirm that the user <b>cannot</b> clear the new database.
+		</ul>
+       	</ul>
 </ul>
 
 <h2>Database Selection - Part 2</h2>
