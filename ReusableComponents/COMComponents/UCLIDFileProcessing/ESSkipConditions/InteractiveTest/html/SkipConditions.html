@@ -407,6 +407,27 @@
        				<li>Confirm that a file selected in the <b>Open</b> dialog replaces 
 				the text in the edit box.</li>
 			</ul>
+<p>
+		        <li><b>[DotNetRC #697, #700, #704, #705]</b>
+        		<ul>
+	            		<li>Confirm that a file timestamp condition can be used to conditionally 
+				delete a file when the created date is within a specified range.
+				<li>Confirm that a file timestamp condition cannot be used based on 
+				an <b>accessed</b> timestamp.
+				<li>Exercise use of relative timestamps.
+				<ul>
+					<li>Confirm that <b>0 days ago</b> works as expected.
+					<li>Confirm that <b>1 day ago</b> works as expected.
+				</ul>
+				<li>Compare two files based on <b>modified</b> date.
+				<ul>
+					<li>Confirm that <b>before</b> works as expected.
+					<li>Confirm that <b>after</b> works as expected.
+					<li>Confirm that <b>equal to</b> works as expected.
+				</ul>
+				<li>Confirm that behavior of the condition object is consistent if 
+				one or the other file is missing.
+			</ul>
       		</ul>
 <p>
       		<li>Confirm the droplist for the Select Condition dialog includes: 
