@@ -1185,6 +1185,25 @@
 		</ul></li>
 		<li>Confirm that the task can be used to extract portions of an image and save them
 		to disk.</li>
+<p>
+	        <li><b>[DotNetRC #720, #722, #727]</b>
+        	<ul>
+	            	<li>Configure the task to output images to 
+			<b>$InsertBeforeExt(<SourceDocName>,.extracted<AreaID>)</b>.
+			<li>Confirm that images can be extracted without appending to 
+			existing files.
+			<li>Confirm that pages cannot be appended to existing files if the 
+			<b>&lt;AreaID&gt;</b> tag is used.
+			<li>Exercise this task using VOA files created from the 
+			Demo_FLEXIndex images and rules.
+			<ul>
+				<li>Confirm that each image created appropriate output images.
+				<li>Confirm that each top-level attribute created an output 
+				image.
+				<li>Confirm that output images are created only for the 
+				appropriate input images.
+			</ul>
+		</ul>
 	</ul></li>
 <p>
         <li><b>Core: Launch application</b>
@@ -1780,6 +1799,18 @@
             whose value is obtained from an associated <b>.info</b> file.</li>
             <li>Confirm that if the tag is used and the .info file does not exist, an exception is
             thrown.</li>
+<p>
+		<li><b>Miscellaneous</b>
+		<ul>
+	        	<li><b>[DotNetRC #693]</b>
+        		<ul>
+	            		<li>Create an FPS file to use the <b>Core: Transfer file via 
+				FTP/SFTP</b> task.
+				<li>Configure the task to upload the file to 
+				<b>.\asdf\$FileOf(&lt;SourceDocName&gt;)</b>.
+				<li>Confirm that each file ends up in the expected <b>asdf</b> folder.
+			</ul>
+		</ul></li>
         </ul></li>
 </ul>
 </ol>
