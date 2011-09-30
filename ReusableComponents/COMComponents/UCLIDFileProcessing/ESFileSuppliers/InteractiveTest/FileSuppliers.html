@@ -276,6 +276,28 @@
 			<li>Confirm that the remaining files from the previous queuing session 
 			<b>are not</b> queued.
 		</ul>
+<p>
+	        <li><b>[DotNetRC #707, #708, #709, #710, #724, #725, #726]</b>
+        	<ul>
+	            	<li>Confirm that the context menu file supplier is available after 
+			installation.
+			<li>Confirm that the context menu includes a <b>Process Files</b> 
+			icon for the <b>Send to FAM</b> option.
+			<li>Confirm that the file supplier description mimics other file 
+			suppliers as <b>Files from context menu</b>.
+			<li>Confirm that the caption for the configuration dialog mimics 
+			the captions for other file suppliers.
+			<li>Create a collection of folders ( IMages, Images2, Images3 ) to 
+			test this supplier.
+			<li>Confirm that supplying files from the Images folder does not 
+			include files from Images2 or Images3.
+			<li>Confirm that menu label characters are properly validated.
+			<li>Confirm that users without administrator privileges can use 
+			the file supplier even if the Extract Systems IPC service is not 
+			running after login.
+			<li>Confirm that services are stopped at uninstall and that everything 
+			uninstalls normally.
+		</ul>
     	</ul> 
 <p>
     	<li>Select <b>Files from dynamic list</b> as the file supplier in Select File Supplier dialog, 
@@ -483,6 +505,16 @@
             		</ul></li>
             	</ul></li>
 <p>
+	        <li><b>[DotNetRC #713, #715]</b>
+        	<ul>
+	            	<li>Confirm that the configuration dialog can be closed via <b>Esc</b>.
+			<li>Configure the remote folder as <b>_Original_</b> with a <b>1</b> 
+			subfolder that contains a few images.
+			<li>Configure the file supplier to download the files to 
+			<b>C:\LocalFTPRoot</b>.
+			<li>Confirm that the files are downloaded to <b>C:\LocalFTPRoot\1</b>.
+		</ul>
+<p>
             	<li><b>[LegacyRC #6071]</b> Polling frequency
             	<ul>
                 	<li>Set up an FTP file supplier to supply TIF images, append TIF to remote 
@@ -491,6 +523,27 @@
                 	<li>Confirm that 2 minutes later, the renamed files (*.tif.tif) are 
                 	downloaded.</li>
                 	<li>Confirm that in another 2 minutes, the *.tif.tif.tif files are downloaded.</li>
+            	</ul></li>
+<p>
+  	   	<LI><b>[LegacyRC #6102]</b> Confirm that a wait cursor is presented when testing the 
+		connection.
+<p>
+  	   	<LI><b>[LegacyRC #6103, #6104]</b> Folder inconsistency
+            	<ul>
+                	<li>Set up an FTP file supplier to connect using the <b>ExtractTest</b> 
+			account.</li>
+                	<li>Add some images to the <b>\\FTPServer\Data\FTP\ExtractTest\Data</b> 
+			folder.</li>
+                	<li>Prepare the file supplier to supply recursively from 
+			<b>&quot;.&quot;</b> and use <b>D:\tmp</b> as the local working folder.</li>
+			<li>Exercise the FPS file and confirm that files are saved locally to 
+			<b>D:\tmp</b>.
+			<li>Modify the FPS file to supply from <b>Data</b>.
+			<li>Exercise the FPS file and confirm that files are saved locally to 
+			<b>D:\tmp</b>.
+			<li>Modify the FPS file to supply from <b>.\Data</b>.
+			<li>Exercise the FPS file and confirm that files are saved locally to 
+			<b>D:\tmp</b>.
             	</ul></li>
 	</ul></li>
 <p>
