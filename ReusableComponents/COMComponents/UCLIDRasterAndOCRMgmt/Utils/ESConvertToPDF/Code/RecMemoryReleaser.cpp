@@ -19,7 +19,7 @@ RecMemoryReleaser<MemoryType>::RecMemoryReleaser(MemoryType* pMemoryType)
 }
 //-------------------------------------------------------------------------------------------------
 template<>
-RecMemoryReleaser<tagRECDOCSTRUCT>::~RecMemoryReleaser()
+RecMemoryReleaser<RECDOCSTRUCT>::~RecMemoryReleaser()
 {
 	try
 	{
@@ -58,7 +58,7 @@ RecMemoryReleaser<tagIMGFILEHANDLE>::~RecMemoryReleaser()
 }
 //-------------------------------------------------------------------------------------------------
 template<>
-RecMemoryReleaser<tagRECPAGESTRUCT>::~RecMemoryReleaser()
+RecMemoryReleaser<RECPAGESTRUCT>::~RecMemoryReleaser()
 {
 	try
 	{

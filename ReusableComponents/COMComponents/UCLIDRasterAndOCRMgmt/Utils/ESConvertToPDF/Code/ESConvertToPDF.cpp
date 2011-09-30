@@ -251,7 +251,7 @@ void CESConvertToPDFApp::convertToSearchablePDF()
 	}
 
 	// ensure the output document is closed when the memory releaser object goes out of scope
-	RecMemoryReleaser<tagRECDOCSTRUCT> outputDocumentMemoryReleaser(hDoc);
+	RecMemoryReleaser<RECDOCSTRUCT> outputDocumentMemoryReleaser(hDoc);
 
 	// Get the retry count and timeout
 	int iRetryCount(-1), iRetryTimeout(-1);
@@ -694,14 +694,8 @@ void CESConvertToPDFApp::decryptString(string& rstrEncryptedString)
 //-------------------------------------------------------------------------------------------------
 void CESConvertToPDFApp::licenseOCREngine()
 {
-	// the license file is expected in the same directory as this exe.
-	// get the location of this exe.
-	string strLicFile( getCurrentProcessEXEDirectory() );
-	strLicFile += "\\";
-	strLicFile += gpszLICENSE_FILE_NAME;
-
 	// set the RecAPI engine license
-	RECERR rc = kRecSetLicense(strLicFile.c_str(), gpszOEM_KEY);
+	RECERR rc = kRecSetLicense(__nullptr, gpszOEM_KEY);
 	if(rc != REC_OK && rc != API_INIT_WARN)
 	{
 		UCLIDException ue("ELI18566", "Unable to load OCR engine license file.");

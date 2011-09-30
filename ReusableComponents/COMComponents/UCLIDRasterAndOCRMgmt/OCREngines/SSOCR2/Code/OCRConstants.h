@@ -16,6 +16,5 @@ WCHAR gwcUNRECOGNIZED = L'^';
 char gcUNRECOGNIZED = '^';
 //-------------------------------------------------------------------------------------------------
 // ScanSoft licensing
-const char *gpszLICENSE_FILE_NAME = "Nuance.ocl";
-const char *gpszOEM_KEY = "WtBwpqSozBX1iKzTvdGWy6u28tnlnf4cnnjBo0Irib0YJjPZXr1Ol6Ue6VDKmFjsKb+tqTaVNMoeet3haSELkJKRI8G2YZBqycZ/bd9m5CSztNUN4feWOoLtn3IR11Ck1IUFJEkuiliGePCnMqaFcsKMFA7Igtzf8WcXBETBOqd06Sgm8P4FRMGoeTl7Fe85";
+const char *gpszOEM_KEY = "9d478fe171d5";
 //-------------------------------------------------------------------------------------------------

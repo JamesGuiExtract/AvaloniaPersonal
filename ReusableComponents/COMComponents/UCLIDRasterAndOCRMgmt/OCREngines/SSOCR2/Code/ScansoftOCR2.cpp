@@ -1040,15 +1040,9 @@ void CScansoftOCR2::initEngineAndLicense()
 {
 	try
 	{
-		// the license file is expected in the same directory as this DLL
-		// get the location of this dll
-		string strLicFile("");
-		strLicFile = getThisDLLFolder() + "\\";
-
 		// initialize the OEM license using the license file that is expected to exist
 		// in the same directory as this DLL 
-		strLicFile += gpszLICENSE_FILE_NAME;
-		RECERR rc = kRecSetLicense(strLicFile.c_str(), gpszOEM_KEY);
+		RECERR rc = kRecSetLicense(__nullptr, gpszOEM_KEY);
 		if (rc != REC_OK && rc != API_INIT_WARN)
 		{
 			// create the exception object to throw to outer scope
@@ -1058,7 +1052,7 @@ void CScansoftOCR2::initEngineAndLicense()
 			}
 			catch (UCLIDException& ue)
 			{
-				ue.addDebugInfo("File", strLicFile);
+				loadScansoftRecErrInfo(ue, rc);
 				throw ue;
 			}
 		}
@@ -1571,7 +1565,7 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 	loadPageFromImageHandle(strImageFileName, m_hImageFile, nPageNum-1, &m_hPage);
 
 	// Ensure that the page image and recognition data are released
-	RecMemoryReleaser<tagRECPAGESTRUCT> PageMemoryReleaser(m_hPage);
+	RecMemoryReleaser<RECPAGESTRUCT> PageMemoryReleaser(m_hPage);
 
 	// Delete all zones
 	THROW_UE_ON_ERROR("ELI12720", "Unable to delete zones!", 
@@ -2479,7 +2473,7 @@ CScansoftOCR2::RecMemoryReleaser<tagIMGFILEHANDLE>::~RecMemoryReleaser()
 }
 //-------------------------------------------------------------------------------------------------
 template<>
-CScansoftOCR2::RecMemoryReleaser<tagRECPAGESTRUCT>::~RecMemoryReleaser()
+CScansoftOCR2::RecMemoryReleaser<RECPAGESTRUCT>::~RecMemoryReleaser()
 {
 	try
 	{
