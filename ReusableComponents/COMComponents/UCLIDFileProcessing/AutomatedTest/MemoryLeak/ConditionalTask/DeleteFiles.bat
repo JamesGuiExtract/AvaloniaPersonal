@@ -1,1 +1,1 @@
-del TestArea\%1.*
+del Source\%1.*
