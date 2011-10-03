@@ -1,0 +1,7 @@
+			Date	>95	>=95	<2000	2000+
+Date	08/26/1997	X			X
+Date	09/11/1997	X	X	X	X
+Date	03/17/2004	X				X
+Date	12/19/2006	X		X		X
+DocNumber 6560				X	
+Grantee	Name			X	X

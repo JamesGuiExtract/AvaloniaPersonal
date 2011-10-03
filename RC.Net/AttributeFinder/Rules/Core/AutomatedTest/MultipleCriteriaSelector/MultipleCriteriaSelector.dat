@@ -1,0 +1,29 @@
+// Date
+<TESTCASE>;Test1.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+// !Date
+<TESTCASE>;Test2.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+// >=95 Confidence AND Year <2000
+<TESTCASE>;Test3.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+// >=95 Confidence AND Year !<2000
+<TESTCASE>;Test4.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav
+
+// >=95 Confidence OR Year <2000
+<TESTCASE>;Test5.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+// !>=95 Confidence OR Year <2000 
+<TESTCASE>;Test6.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
+
+// >95% Confidence AND Date AND Year <2000 
+<TESTCASE>;Test7.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
+
+// >95% Confidence OR Date OR Year <2000 
+<TESTCASE>;Test8.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test8.eav
+
+// !(>95%) Confidence AND Date AND !(Year <2000)
+<TESTCASE>;Test9.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test9.eav
+
+// !(>95%) Confidence AND Date AND OFF(!(Year <2000))
+<TESTCASE>;Test10.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test10.eav
