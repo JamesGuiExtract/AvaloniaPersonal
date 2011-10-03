@@ -102,7 +102,7 @@ namespace Extract.FileActionManager.Conditions
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI32752");
+                ex.ExtractDisplay("ELI32752");
             }
         }
 

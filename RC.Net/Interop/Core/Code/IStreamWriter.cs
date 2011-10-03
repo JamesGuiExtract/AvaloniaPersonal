@@ -166,6 +166,36 @@ namespace Extract.Interop
         }
 
         /// <summary>
+        /// Writes an array of boolean to the <see cref="IStream"/> object.
+        /// </summary>
+        /// <param name="value">The array of booleans to write.</param>
+        public void Write(bool[] value)
+        {
+            try
+            {
+                // First stream whether the value is null
+                bool hasValue = value != null;
+                _formatter.Serialize(_stream, hasValue);
+                if (hasValue)
+                {
+                    // Stream the number of booleans in the array
+                    _formatter.Serialize(_stream, value.Length);
+
+                    // Stream each boolean
+                    for (int i = 0; i < value.Length; i++)
+                    {
+                        Write(value[i]);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI33874",
+                    "Unable to write boolean array.", ex);
+            }
+        }
+
+        /// <summary>
         /// Writes a <see cref="Boolean"/> to the <see cref="IStream"/> object.
         /// </summary>
         /// <param name="value">The <see cref="Boolean"/> to write.</param>

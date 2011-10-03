@@ -109,7 +109,7 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI33201");
+                ex.ExtractDisplay("ELI33201");
             }
         }
 

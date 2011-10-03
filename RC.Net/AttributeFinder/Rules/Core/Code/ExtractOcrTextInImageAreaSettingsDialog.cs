@@ -129,7 +129,7 @@ namespace Extract.AttributeFinder.Rules
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI33702");
+                ex.ExtractDisplay("ELI33702");
             }
         }
 

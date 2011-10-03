@@ -84,6 +84,13 @@
       <DependentUpon>ExtractOcrTextInImageAreaSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="IdentifiableRuleObject.cs" />
+    <Compile Include="MultipleCriteriaSelector.cs" />
+    <Compile Include="MultipleCriteriaSelectorSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MultipleCriteriaSelectorSettingsDialog.Designer.cs">
+      <DependentUpon>MultipleCriteriaSelectorSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="NumericSequencer.cs" />
     <Compile Include="NumericRange.cs">
       <DependentUpon>NumericSequencer.cs</DependentUpon>
@@ -211,6 +218,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ExtractOcrTextInImageAreaSettingsDialog.resx">
       <DependentUpon>ExtractOcrTextInImageAreaSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MultipleCriteriaSelectorSettingsDialog.resx">
+      <DependentUpon>MultipleCriteriaSelectorSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="NumericSequencerSettingsDialog.resx">
       <DependentUpon>NumericSequencerSettingsDialog.cs</DependentUpon>

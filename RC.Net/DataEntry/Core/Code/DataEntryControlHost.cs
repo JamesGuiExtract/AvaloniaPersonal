@@ -2069,9 +2069,7 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI23679", ex);
-                ee.AddDebugData("Event Arguments", e, false);
-                throw ee;
+                ex.ExtractDisplay("ELI23679");
             }
         }
 

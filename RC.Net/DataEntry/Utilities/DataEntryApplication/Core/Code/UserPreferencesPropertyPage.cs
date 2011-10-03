@@ -191,7 +191,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI27028", ex);
+                ex.ExtractDisplay("ELI27028");
             }
         }
 

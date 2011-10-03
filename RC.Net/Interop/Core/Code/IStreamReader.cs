@@ -213,6 +213,40 @@ namespace Extract.Interop
         }
 
         /// <summary>
+        /// Reads an array of booleans from the <see cref="IStream"/> object.
+        /// </summary>
+        /// <returns>An array of booleans.</returns>
+        public bool[] ReadBooleanArray()
+        {
+            try
+            {
+                // Check if the value is null
+                bool hasValue = (bool)_formatter.Deserialize(_stream);
+                if (!hasValue)
+                {
+                    return null;
+                }
+
+                // Get the number of items in the array
+                int count = (int)_formatter.Deserialize(_stream);
+
+                // Read each boolean
+                bool[] result = new bool[count];
+                for (int i = 0; i < count; i++)
+                {
+                    result[i] = ReadBoolean();
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI33875",
+                    "Unable to read boolean array.", ex);
+            }
+        }
+
+        /// <summary>
         /// Reads a <see cref="Boolean"/> from the <see cref="IStream"/> object.
         /// </summary>
         /// <returns>A <see cref="Boolean"/>.</returns>

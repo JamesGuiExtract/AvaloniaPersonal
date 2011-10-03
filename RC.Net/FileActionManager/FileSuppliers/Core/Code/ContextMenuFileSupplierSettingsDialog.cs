@@ -97,7 +97,7 @@ namespace Extract.FileActionManager.FileSuppliers
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI33159");
+                ex.ExtractDisplay("ELI33159");
             }
         }
 
