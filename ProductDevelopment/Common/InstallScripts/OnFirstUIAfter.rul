@@ -37,7 +37,10 @@ begin
 	InstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESIPCService.exe\"");   
 	
 	// Register the shell extension
-	RegisterLoginNPShellExtension("Extract.Utilities.ShellExtensions.dll");
+	RegisterLoginNPShellExtension("Extract.Utilities.ShellExtensions.dll");      
+	
+	// Install the Nuance licenses
+	InstallNuanceLicense();
 	
     Disable(STATUSEX);
 
