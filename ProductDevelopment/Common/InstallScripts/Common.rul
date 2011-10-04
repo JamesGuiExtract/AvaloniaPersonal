@@ -733,15 +733,10 @@ function InstallNuanceLicense()
 	string szPathToInstaller;
 begin      
 	SdShowMsg("Setup is Installing Nuance Licenses", TRUE);               
+	
 	szPathToInstaller = PROGRAMFILES ^ "\\Common Files\\Nuance\\Licensing\\NuanceLT";
-	LaunchAppAndWait(szPathToInstaller, "Load " + PROGRAMFILES ^ EXTRACT_DIR ^ " Nuance1.lcx",
+	LaunchAppAndWait(szPathToInstaller, "Load " + PROGRAMFILES ^ EXTRACT_DIR ^ "Nuance.lcxz",
 		LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);           
-	
-	LaunchAppAndWait(szPathToInstaller, "Load " + PROGRAMFILES ^ EXTRACT_DIR ^ " Nuance2.lcx",
-		LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);           
-	
-	LaunchAppAndWait(szPathToInstaller, "Load " + PROGRAMFILES ^ EXTRACT_DIR ^ " Nuance3.lcx",
-		LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);
-	
+		
 	SdShowMsg("Setup is Installing Nuance Licenses", FALSE);                          
 end;
