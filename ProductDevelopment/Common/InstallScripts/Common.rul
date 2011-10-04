@@ -542,11 +542,11 @@ begin
 		if (nResult = IDYES) then
 			SdShowMsg("Setup is Uninstalling SQL Compact Edition", TRUE);
 	    	// If 64 bit OS install 64 version of SSCE	
-			if ( SYSINFO.bIsWow64 ) then
-				UninstallApplication(SQL_COMPACT_EDITION_GUID_64,"", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);			
+			if ( SYSINFO.bIsWow64 ) then    
+				LaunchAppAndWait("msiexec", "/x" + SQL_COMPACT_EDITION_GUID_64 + " /qb",LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);			 
 			endif;
 	
-	    	UninstallApplication(SQL_COMPACT_EDITION_GUID,"", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);
+	    	LaunchAppAndWait("msiexec", "/x" + SQL_COMPACT_EDITION_GUID + " /qb", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);
 	    	SdShowMsg("Setup is Uninstalling SQL Compact Edition", FALSE);
 	  	endif;
 	endif;
