@@ -584,7 +584,27 @@
                 <li>Skip the last document in the queue.</li>
                 <li>Confirm that no exceptions are shown.</li>
             </ul></li>
-        <p>
+<p>
+        	<li><b>[FlexIDSCore #4681]</b> Verification of Rotated Images in History
+        	<ul>
+            		<li>Verify some documents
+			<li>Draw a redaction on the last page of a document, rotate the page, 
+			and save the changes
+			<li>Navigate back to the previous document.
+			<li>Confirm that the page rotation is displayed properly.
+			<li>Confirm that the redaction is displayed properly.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4850]</b> Verification and Zoom History
+        	<ul>
+            		<li>Verify a document.
+			<li>Change zoom and position on a page several times and rotate the 
+			document 90 degrees during the sequence of changes.
+			<li>Use the <b>Zoom Previous</b> command several times until it is 
+			disabled.
+			<li>Confirm that the image returns to its original orientation.
+        	</ul>
+<p>
             <li>[DotNet #673]</b> FormStateManager
             <ul>
                 <li>Run ID Shield verification via the FAM</li>
