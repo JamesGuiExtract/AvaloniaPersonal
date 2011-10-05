@@ -161,6 +161,38 @@
            		<li><b>OK</b> - Save changes and exits dialog.</li>
            		<li><b>Cancel</b> - Cancels changes and exits</li>
             		<li><b>X</b> button ignores changes and exits dialog.</li>
+<p>
+  	   		<LI><b>[FlexIDSCore #4775, #4828, #4830, #4831, #4832, #4836, #4837]</b> FKB Updates
+        		<ul>
+            			<li>Install a legacy FKB update to the root of the <b>ComponentData</b> 
+				folder.
+				<li>Create a rule set that specifies use of this FKB update.
+				<li>Confirm that the rule set executes properly via <b>Rule Tester</b>.
+				<li>Confirm that an older FKB update can be installed after a newer 
+				version has been installed.
+				<li>Confirm that the <b>Document Classifier</b> works by exercising 
+				the <b>Demo_IDShield</b> rules.
+				<li>Exercise the automated tests without a legacy FKB update and 
+				confirm that the following tests pass
+				<ul>
+					<li>Entity Name Data Scorer
+					<li>Entity Name Splitter
+					<li>MERS Modifier
+					<li>Entity Finder
+				</ul>
+				<li>Confirm that <b>.etf</b> files are included in the FKB update.
+				<li>Confirm that specifying the <b>Full path to component data</b> via 
+				<b>RDT Config</b> overrides the setting in an RSD file.
+				<li>Confirm that FKB update version numbers are in the form 
+				<b>MM.mm.0.###</b>.
+				<ul>
+					<li><b>MM</b> = Major version or last two digits of year
+					<li><b>mm</b> = Minor version or numbered update for the year
+					<li><b>###</b> = Build number
+				</ul>
+				<li>Confirm that the FKB update build number deployed with a build, 
+				especially a released build, matches the software build number.
+        		</ul>
         	</ul></li>
     	</ul>
 <p>
