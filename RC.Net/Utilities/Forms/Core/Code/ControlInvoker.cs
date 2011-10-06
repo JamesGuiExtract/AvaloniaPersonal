@@ -68,9 +68,9 @@ namespace Extract.Utilities.Forms
         /// window handle, with the specified list of arguments.
         /// </summary>
         /// <param name="method">A delegate to a method that takes no parameters.</param>
-        public void Invoke(Delegate method)
+        public object Invoke(Delegate method)
         {
-            Invoke(method, null);
+            return Invoke(method, null);
         }
 
         /// <summary>
@@ -81,15 +81,18 @@ namespace Extract.Utilities.Forms
         /// and type that are contained in the <paramref name="args"/> parameter.</param>
         /// <param name="args">An array of objects to pass as arguments to the specified method. 
         /// This parameter can be <see langword="null"/> if the method takes no arguments.</param>
-        public void Invoke(Delegate method, params object[] args)
+        /// <returns>The return value of the <see paramref="method"/>.</returns>
+        public object Invoke(Delegate method, params object[] args)
         {
+            object returnValue;
+
             // Invoke the method, storing exceptions internal to the method
             try
             {
                 _storeException = true;
 
                 // Invoke the method
-                _control.Invoke(method, args);
+                returnValue = _control.Invoke(method, args);
             }
             catch (Exception ex)
             {
@@ -113,6 +116,8 @@ namespace Extract.Utilities.Forms
                 _exception = null;
                 throw;
             }
+
+            return returnValue;
         }
 
         /// <summary>

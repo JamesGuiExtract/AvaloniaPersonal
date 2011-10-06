@@ -348,6 +348,21 @@ STDMETHODIMP CConvertToPDFTask::raw_Close()
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18757");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CConvertToPDFTask::raw_Standby(VARIANT_BOOL* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{		
+		ASSERT_ARGUMENT("ELI33902", pVal != __nullptr);
+
+		*pVal = VARIANT_TRUE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33903");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IAccessRequired interface implementation

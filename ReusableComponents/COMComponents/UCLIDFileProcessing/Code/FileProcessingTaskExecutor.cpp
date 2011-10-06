@@ -9,6 +9,63 @@
 #include <ComponentLicenseIDs.h>
 #include <ValueRestorer.h>
 
+//-------------------------------------------------------------------------------------------------
+// StandbyThread
+//-------------------------------------------------------------------------------------------------
+CFileProcessingTaskExecutor::StandbyThread::StandbyThread(Win32Event& eventCancelProcessing,
+	ProcessingTask *pProcessingTask)
+: m_eventCancelProcessing(eventCancelProcessing)
+, m_pProcessingTask(pProcessingTask)
+{
+	try
+	{
+		ASSERT_RESOURCE_ALLOCATION("ELI33938", m_pProcessingTask != __nullptr);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33939");
+}
+//-------------------------------------------------------------------------------------------------
+CFileProcessingTaskExecutor::StandbyThread::~StandbyThread()
+{
+	try
+	{
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33942")
+}
+//-------------------------------------------------------------------------------------------------
+BOOL CFileProcessingTaskExecutor::StandbyThread::InitInstance()
+{
+	// Return TRUE so Run is called.
+	return TRUE;
+}
+//-------------------------------------------------------------------------------------------------
+int CFileProcessingTaskExecutor::StandbyThread::Run()
+{
+	try
+	{
+		// The Standby call may block if this is a cancellable task.
+		if (!asCppBool(m_pProcessingTask->Task->Standby()) && !m_eventStandbyEnded.isSignaled())
+		{
+			m_eventCancelProcessing.signal();
+		}
+
+		// This thread needs to remain alive until Standby has ended so that endStandby may be
+		// called.
+		m_eventStandbyEnded.wait();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33943")
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingTaskExecutor::StandbyThread::endStandby()
+{
+	try
+	{
+		m_eventStandbyEnded.signal();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33944")
+}
+
 //--------------------------------------------------------------------------------------------------
 // CFileProcessingTaskExecutor
 //--------------------------------------------------------------------------------------------------
@@ -239,6 +296,93 @@ STDMETHODIMP CFileProcessingTaskExecutor::get_IsInitialized(VARIANT_BOOL *pVal)
 		*pVal = asVariantBool(m_bInitialized);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17899");
+
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingTaskExecutor::Standby(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+		
+		ASSERT_ARGUMENT("ELI33920", pVal != __nullptr);
+
+		m_eventEndStandby.reset();
+		vector< StandbyThread* > vecStandbyThreads;
+		Win32Event eventCancelProcessing;
+		DWORD dwWaitResult;
+
+		try
+		{
+			// For each task, spawn a thread to call Standby.
+			for (vector<ProcessingTask>::iterator iterTask = m_vecProcessingTasks.begin();
+				 iterTask != m_vecProcessingTasks.end();
+				 iterTask++)
+			{
+				if (iterTask->Enabled)
+				{
+					StandbyThread *pStandbyThread = new StandbyThread(eventCancelProcessing, &*iterTask);
+					vecStandbyThreads.push_back(pStandbyThread);
+
+					pStandbyThread->CreateThread();
+				}
+			}
+
+			HANDLE pEventHandles[] = { eventCancelProcessing.getHandle(), m_eventEndStandby.getHandle() };
+		
+			// Wait for either processing to be cancelled or standby mode to end.
+			dwWaitResult = WaitForMultipleObjects(2, pEventHandles, FALSE, INFINITE);
+		}
+		catch (...)
+		{
+			// The standby threads will live forever if endStandby is not called.
+			for (vector<StandbyThread*>::iterator iterThread = vecStandbyThreads.begin();
+				 iterThread != vecStandbyThreads.end();
+				 iterThread++)
+			{
+				(*iterThread)->endStandby();
+			}
+
+			throw;
+		}
+
+		// The standby threads will live forever if endStandby is not called.
+		for (vector<StandbyThread*>::iterator iterThread = vecStandbyThreads.begin();
+				iterThread != vecStandbyThreads.end();
+				iterThread++)
+		{
+			(*iterThread)->endStandby();
+		}
+		
+		if (dwWaitResult - WAIT_OBJECT_0 == 0)
+		{
+			// Processing has been canceled.
+			*pVal = VARIANT_FALSE;
+		}
+		else
+		{
+			// Standby mode has ended.
+			*pVal = VARIANT_TRUE;
+		}
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33921");
+
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingTaskExecutor::EndStandby()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_eventEndStandby.signal();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33928");
 
 	return S_OK;
 }

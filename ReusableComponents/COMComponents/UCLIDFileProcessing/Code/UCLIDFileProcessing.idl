@@ -292,6 +292,20 @@ library UCLID_FILEPROCESSINGLib
 		//				not per file
 		[id(14), helpstring("method Close")] HRESULT Close();
 		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To notify a file processor that the pending document queue is empty, but
+		//				the processing tasks have been configured to remain running until the next
+		//				document has been supplied. If the processor will standby until the next
+		//				file is supplied it should return VARIANT_TRUE. If the processor wants to
+		//				cancel processing, it should return VARIANT_FALSE. If the processor does not
+		//				immediately know whether processing should be cancelled right away, it may
+		//				block until it does know, and return at that time.
+		// NOTE:		This call will be made on a different thread than the other calls, so the
+		//				Standby call must be thread-safe.This allows the file processor to block on
+		//				the Standby call, but it also means that call to ProcessFile or Close may
+		//				come while the Standby call is still ocurring. If this happens, the return
+		//				value of Standby will be ignored; however, Standby should promptly return
+		//				in this case to avoid needlessly keeping a thread alive.
+		[id(15), helpstring("method Standby")] HRESULT Standby([out, retval] VARIANT_BOOL* pVal);
 	};
 
 	[
@@ -1548,6 +1562,26 @@ library UCLID_FILEPROCESSINGLib
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To indicate whether the task executor is currently initialized
 		[propget, id(8), helpstring("property IsInitialized")] HRESULT IsInitialized([out, retval] VARIANT_BOOL* pVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE:	To notify a the TaskExecutor that the pending document queue is empty, but
+		//			the processing tasks have been configured to remain running until the next
+		//			document has been supplied. If the processor will standby until the next
+		//			file is supplied it should return VARIANT_TRUE. If the processor wants to
+		//			cancel processing, it should return VARIANT_FALSE. If the processor does not
+		//			immediately know whether processing should be cancelled right away, it may
+		//			block until it does know, and return at that time.
+		// NOTE:	This call will be made on a different thread than the other calls, so the
+		//			Standby call must be thread-safe.This allows the file processor to block on
+		//			the Standby call, but it also means that call to ProcessFile or Close may
+		//			come while the Standby call is still ocurring. If this happens, the return
+		//			value of Standby will be ignored; however, Standby should promptly return
+		//			in this case to avoid needlessly keeping a thread alive.
+		[id(9), helpstring("method Standby")] HRESULT Standby([out, retval] VARIANT_BOOL* pVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To notify the TaskExecutor that following a previous Standby call either
+		//			another file has been supplied or processing has been stopped and, therefore,
+		//			it can ignore any still blocking Standby calls.
+		[id(10), helpstring("method EndStandby")] HRESULT EndStandby();
 	};
 
 	[

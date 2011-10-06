@@ -25,13 +25,44 @@ using namespace std;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-static const long glDATAENTRY_DB_SCHEMA_VERSION = 2;
+static const long glDATAENTRY_DB_SCHEMA_VERSION = 3;
 static const string gstrDATA_ENTRY_SCHEMA_VERSION_NAME = "DataEntrySchemaVersion";
 static const string gstrSTORE_DATAENTRY_PROCESSING_HISTORY = "StoreDataEntryProcessingHistory";
 static const string gstrSTORE_HISTORY_DEFAULT_SETTING = "1"; // TRUE
 static const string gstrENABLE_DATA_ENTRY_COUNTERS = "EnableDataEntryCounters";
 static const string gstrENABLE_DATA_ENTRY_COUNTERS_DEFAULT_SETTING = "0"; // FALSE
 static const string gstrDESCRIPTION = "DataEntry database manager";
+
+//-------------------------------------------------------------------------------------------------
+// Schema update functions
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion3(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 3;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("EXEC sp_rename 'dbo.DataEntryData.TotalDuration', 'OverheadTime', 'COLUMN'");
+		vecQueries.push_back("UPDATE [dbo].[DataEntryData] SET [OverheadTime] = 0");
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '3' WHERE [Name] = '" + 
+			gstrDATA_ENTRY_SCHEMA_VERSION_NAME + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33952");
+}
 
 //-------------------------------------------------------------------------------------------------
 // CDataEntryProductDBMgr
@@ -342,7 +373,12 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProces
 
 		switch (*pnProdSchemaVersion)
 		{
-			case 2: break;
+			case 2:	// The schema update from 2 to 3 needs to take place against FAM DB schema version 110
+					if (nFAMDBSchemaVersion == 110)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion3(ipConnection, pnNumSteps, NULL);
+					}
+			case 3: break;
 
 			default:
 				{
@@ -363,19 +399,21 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProces
 // IDataEntryProductDBMgr Methods
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CDataEntryProductDBMgr::AddDataEntryData(long lFileID, long nActionID,
-													  double lDuration, long* plInstanceID)
+										double dDuration, double dOverheadTime, long* plInstanceID)
 {
 	try
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		if (!AddDataEntryData_Internal(false, lFileID, nActionID, lDuration, plInstanceID))
+		if (!AddDataEntryData_Internal(false, lFileID, nActionID, dDuration, dOverheadTime,
+				plInstanceID))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
 				gstrMAIN_DB_LOCK);
 
-			AddDataEntryData_Internal(true, lFileID, nActionID, lDuration, plInstanceID);
+			AddDataEntryData_Internal(true, lFileID, nActionID, dDuration, dOverheadTime,
+				plInstanceID);
 		}
 	
 		return S_OK;
@@ -548,7 +586,7 @@ UCLID_DATAENTRYCUSTOMCOMPONENTSLib::IDataEntryProductDBMgrPtr CDataEntryProductD
 // Internal versions of Interface methods
 //-------------------------------------------------------------------------------------------------
 bool CDataEntryProductDBMgr::AddDataEntryData_Internal(bool bDBLocked, long lFileID, long nActionID,
-													  double lDuration, long* plInstanceID)
+										double dDuration, double dOverheadTime, long* plInstanceID)
 {
 	try
 	{
@@ -573,33 +611,11 @@ bool CDataEntryProductDBMgr::AddDataEntryData_Internal(bool bDBLocked, long lFil
 			long nUserID = getKeyID(ipConnection, "FAMUser", "UserName", getCurrentUserName());
 			long nMachineID = getKeyID(ipConnection, "Machine", "MachineName", getComputerName());
 
-			// -------------------------------------------
-			// Need to get the current TotalDuration value
-			// -------------------------------------------
-			double dTotalDuration = lDuration;
-			string strSql = "SELECT TOP 1 [TotalDuration] FROM [DataEntryData] WHERE [FileID] = "
-				+ strFileId + " ORDER BY [ID] DESC";
-
-			// Create a pointer to a recordset
-			_RecordsetPtr ipSet( __uuidof( Recordset ));
-			ASSERT_RESOURCE_ALLOCATION("ELI29009", ipSet != __nullptr );
-
-			// Open the recordset
-			ipSet->Open( strSql.c_str(), _variant_t((IDispatch *)ipConnection, true),
-				adOpenStatic, adLockReadOnly, adCmdText );
-
-			// If there is an entry, then get the total duration from it
-			if (ipSet->adoEOF == VARIANT_FALSE)
-			{
-				// Get the total duration from the datbase
-				dTotalDuration += getDoubleField(ipSet->Fields, "TotalDuration");
-			}
-
 			// Build insert SQL query 
 			string strInsertSQL = gstrINSERT_DATAENTRY_DATA_RCD + "(" + strFileId
 				+ ", " + asString(nUserID) + ", " + asString(nActionID) + ", "
-				+ asString(nMachineID) + ", GETDATE(), " + asString(lDuration) + ", "
-				+ asString(dTotalDuration) + ")";
+				+ asString(nMachineID) + ", GETDATE(), " + asString(dDuration) + ", "
+				+ asString(dOverheadTime) + ")";
 
 			// Create a transaction guard
 			TransactionGuard tg(ipConnection);

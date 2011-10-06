@@ -168,8 +168,14 @@ void FPRecordManager::remove(const std::string& strFileName)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-bool FPRecordManager::pop(FileProcessingRecord& task)
+bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
+						  bool* pbProcessingActive/*= __nullptr*/)
 {
+	if (pbProcessingActive != __nullptr)
+	{
+		*pbProcessingActive = false;
+	}
+
 	unsigned long nSleepTime = 0;
 	do
 	{
@@ -222,6 +228,11 @@ bool FPRecordManager::pop(FileProcessingRecord& task)
 			return false;
 		}
 
+		if (pbProcessingActive != __nullptr)
+		{
+			*pbProcessingActive = true;
+		}
+
 		if (m_queTaskIds.size() <= 0 && !processingQueueIsDiscarded())
 		{
 			// load from Database;
@@ -249,6 +260,13 @@ bool FPRecordManager::pop(FileProcessingRecord& task)
 				// all threads will exit even if more files get supplied.
 				// FlexIDSCore #3717
 				discardProcessingQueue();
+				return false;
+			}
+
+			// No files are immediately available. If the caller does not want to wait for the next
+			// file to be queued, return now.
+			if (!bWait)
+			{
 				return false;
 			}
 		}

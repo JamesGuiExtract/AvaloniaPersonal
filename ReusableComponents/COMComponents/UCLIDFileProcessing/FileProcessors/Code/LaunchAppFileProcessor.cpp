@@ -206,6 +206,21 @@ STDMETHODIMP CLaunchAppFileProcessor::raw_Close()
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CLaunchAppFileProcessor::raw_Standby(VARIANT_BOOL* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{		
+		ASSERT_ARGUMENT("ELI33906", pVal != __nullptr);
+
+		*pVal = VARIANT_TRUE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33907");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IAccessRequired interface implementation

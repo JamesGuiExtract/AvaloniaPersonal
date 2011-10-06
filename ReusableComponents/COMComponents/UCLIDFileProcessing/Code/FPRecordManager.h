@@ -77,13 +77,12 @@ public:
 	//			task method parameter is untouched.
 	//			If processingQueueIsDiscarded() == false and the queue contains no files to be
 	//			processed, and the processing queue is open and the database returns no records to
-	//			process, then this method will wait until 
-	//			the processing queue is closed and no files are returned from the database
-	//			(in which case false is returned and the task 
-	//			method parameter is untouched) or a file is added to the queue for processing
-	//			(in which case that file is assigned to task and true is 
-	//			returned) - whichever happens first.
-	bool pop(FileProcessingRecord& task);
+	//			process, then this method will wait until the processing queue is closed or
+	//			a file is added to the queue for processing if bWait is true. Otherwise, false is
+	//			returned and the task method parameter is untouched.
+	//			In all cases, if pbProcessingActive is not null, when returned the value will
+	//			indicate whether the processing queue is still active.
+	bool pop(FileProcessingRecord& task, bool bWait, bool* pbProcessingActive = __nullptr);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Will return FileProcessingRecord Associated with nTaskId
 	const FileProcessingRecord& getTask(long nTaskID);

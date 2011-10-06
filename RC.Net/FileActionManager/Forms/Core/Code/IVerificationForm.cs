@@ -44,7 +44,7 @@ namespace Extract.FileActionManager.Forms
     }
 
     /// <summary>
-    /// Delegate for a function that takes a single <see langword="string"/> as a parameter.
+    /// Delegate for the <see cref="IVerificationForm.Open"/> method.
     /// </summary>
     /// <param name="fileName">Specifies the filename of the document image to open.</param>
     /// <param name="fileID">The ID of the file being processed.</param>
@@ -54,6 +54,11 @@ namespace Extract.FileActionManager.Forms
     [CLSCompliant(false)]
     public delegate void VerificationFormOpen(string fileName, int fileID, int actionID,
         FAMTagManager tagManager, FileProcessingDB fileProcessingDB);
+
+    /// <summary>
+    /// Delegate for the <see cref="IVerificationForm.Standby"/> method.
+    /// </summary>
+    public delegate bool VerificationFormStandby();
 
     /// <summary>
     /// Represents a <see cref="Form"/> that verifies files in a multi-threaded environment.
@@ -108,5 +113,24 @@ namespace Extract.FileActionManager.Forms
         /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use.</param>
         void Prefetch(string fileName, int fileID, int actionID, FAMTagManager tagManager,
             FileProcessingDB fileProcessingDB);
+
+        /// <summary>
+        /// Called to notify the file processor that the pending document queue is empty, but
+        ///	the processing tasks have been configured to remain running until the next document
+        ///	has been supplied. If the processor will standby until the next file is supplied it
+        ///	should return <see langword="true"/>. If the processor wants to cancel processing,
+        ///	it should return <see langword="false"/>. If the processor does not immediately know
+        ///	whether processing should be cancelled right away, it may block until it does know,
+        ///	and return at that time.
+        /// <para><b>Note</b></para>
+        /// This call will be made on a different thread than the other calls, so the Standby call
+        /// must be thread-safe. This allows the file processor to block on the Standby call, but
+        /// it also means the form may be opened or closed while the Standby call is still ocurring.
+        /// If this happens, the return value of Standby will be ignored; however, Standby should
+        /// promptly return in this case to avoid needlessly keeping a thread alive.
+        /// </summary>
+        /// <returns><see langword="true"/> to standby until the next file is supplied;
+        /// <see langword="false"/> to cancel processing.</returns>
+        bool Standby();
     }
 }

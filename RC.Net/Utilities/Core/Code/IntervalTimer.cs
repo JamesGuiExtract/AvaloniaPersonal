@@ -38,6 +38,17 @@ namespace Extract.Utilities
             private set;
         }
 
+        /// <summary>
+        /// Gets the elapsed seconds since the timer was started.
+        /// </summary>
+        public double ElapsedSeconds
+        {
+            get
+            {
+                return _stopWatch.ElapsedMilliseconds / 1000.0;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -98,6 +109,30 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI29906", ex);
+            }
+        }
+
+
+        /// <summary>
+        /// Restarts the timer.
+        /// </summary>
+        /// <returns>The <see cref="TimeInterval"/> that elapsed since the last time 
+        /// <see cref="Start"/> was called.</returns>
+        public TimeInterval Restart()
+        {
+            try
+            {
+                double elapsedSeconds = _stopWatch.ElapsedMilliseconds / 1000.0;
+                TimeInterval result = new TimeInterval(_startTime, elapsedSeconds);
+
+                _startTime = DateTime.Now;
+                _stopWatch.Restart();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI33948", ex);
             }
         }
 

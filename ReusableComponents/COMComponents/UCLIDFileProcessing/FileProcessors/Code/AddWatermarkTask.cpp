@@ -407,6 +407,21 @@ STDMETHODIMP CAddWatermarkTask::raw_Close()
 	
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::raw_Standby(VARIANT_BOOL* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{		
+		ASSERT_ARGUMENT("ELI33894", pVal != __nullptr);
+
+		*pVal = VARIANT_TRUE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33895");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IAccessRequired interface implementation

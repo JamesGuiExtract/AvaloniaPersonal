@@ -558,16 +558,6 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
     interface IIDShieldProductDBMgr : IDispatch
     {
         //-----------------------------------------------------------------------------------------
-        // PROMISE: To add a record in the IDShieldData table in the database for the file with the
-        //          given values.
-        // NOTE:	Any existing records in the table that have IsMostRecentUpdate set to 1 will 
-        //          have it reset to 0 and the new record will have IsMostRecentUpdate set to 1.
-        [id(1), helpstring("method AddIDShieldData")] HRESULT AddIDShieldData([in] long lFileID, 
-            [in] VARIANT_BOOL vbVerified, [in] double lDuration, [in] long lNumHCDataFound, 
-            [in] long lNumMCDataFound, [in] long lNumLCDataFound, [in] long lNumCluesDataFound, 
-            [in] long lTotalRedactions, [in] long lTotalManualRedactions,
-            [in] long lNumPagesAutoAdvanced);
-        //-----------------------------------------------------------------------------------------
         // PROMISE: To set the FAMDB
         [propput, id(2), helpstring("property FAMDB")] HRESULT FAMDB([in] IFileProcessingDB* newVal);
         //-----------------------------------------------------------------------------------------
@@ -578,6 +568,14 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
         // PROMISE: Returns the FAM file ID for the specified file, otherwise throws exception.
         [id(4), helpstring("method GetFileID")] HRESULT GetFileID([in] BSTR bstrFileName, 
             [out, retval] long* plFileID);
+		//-----------------------------------------------------------------------------------------
+        // PROMISE: To add a record in the IDShieldData table in the database for the file with the
+        //          given values.
+        [id(5), helpstring("method AddIDShieldData")] HRESULT AddIDShieldData([in] long lFileID, 
+            [in] VARIANT_BOOL vbVerified, [in] double dDuration, [in] double dOverheadTime,
+			[in] long lNumHCDataFound, [in] long lNumMCDataFound, [in] long lNumLCDataFound,
+			[in] long lNumCluesDataFound, [in] long lTotalRedactions,
+			[in] long lTotalManualRedactions, [in] long lNumPagesAutoAdvanced);
     };
 
     [

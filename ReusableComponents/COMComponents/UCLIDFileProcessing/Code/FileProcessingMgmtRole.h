@@ -16,6 +16,42 @@ using namespace std;
 class CFileProcessingMgmtRole;
 
 //-------------------------------------------------------------------------------------------------
+// StandbyThread class
+//
+// In the event that the pending queue is emptied but processing is configured to continue until
+// the next document is queued, this class manages separate threads used to notify the processing
+// threads to standby.
+//-------------------------------------------------------------------------------------------------
+class StandbyThread : public CWinThread
+{
+public:
+	StandbyThread(Win32Event& eventCancelProcessing,
+		const UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr& ipTaskExecutor);
+	~StandbyThread();
+
+	// Initialized the instance
+	BOOL InitInstance();
+
+	// The main code for the standby thread.
+	int Run();
+
+	// This should be called to end standby if another file is supplied or if processing is stopped.
+	// After this call, the thread will no longer be able to signal for processing to stop.
+	// The thread will be guaranteed to remain alive until endStandby is called, but may end and
+	// self-delete at any time following this call.
+	void endStandby();
+
+	// The event that should be fired if one of the processing tasks requests for processing to stop.
+	Win32Event& m_eventCancelProcessing;
+
+	// m_eventStandbyEnded is signaled once the endStandby call is complete.
+	Win32Event m_eventStandbyEnded;
+
+	// The IFileProcessingTaskExecutor managing the processing tasks.
+	UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr m_ipTaskExecutor;
+};
+
+//-------------------------------------------------------------------------------------------------
 // ProcessingThreadData class
 //-------------------------------------------------------------------------------------------------
 class ProcessingThreadData

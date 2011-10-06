@@ -90,6 +90,7 @@ END_CATEGORY_MAP()
 		VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult);
 	STDMETHOD(raw_Cancel)();
 	STDMETHOD(raw_Close)();
+	STDMETHOD(raw_Standby)(VARIANT_BOOL* pVal);
 
 // IAccessRequired
 	STDMETHOD(raw_RequiresAdminAccess)(VARIANT_BOOL* pbResult);

@@ -24,7 +24,7 @@ static const string gstrCREATE_DATAENTRY_DATA =
 	" [MachineID] [int] NULL, "
 	" [DateTimeStamp] [datetime] NULL, "
 	" [Duration] [float] NULL, "
-	" [TotalDuration] [float] NULL)";
+	" [OverheadTime] [float] NULL)";
 
 // Query to add DataEntryData - FAMFile foreign key
 static const string gstrADD_FK_DATAENTRY_FAMFILE =
@@ -69,7 +69,7 @@ static const string gstrINSERT_DATAENTRY_DATA_RCD =
     "  ,[MachineID]"
     "  ,[DateTimeStamp]"
     "  ,[Duration]"
-	"  ,[TotalDuration]) "
+	"  ,[OverheadTime]) "
 	"  VALUES ";
 
 // Deletes all records in the DataEntryData table that 

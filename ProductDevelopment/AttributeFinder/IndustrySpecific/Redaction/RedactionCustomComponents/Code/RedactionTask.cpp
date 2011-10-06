@@ -593,7 +593,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
             ipIDSDB->FAMDB = ipFAMDB;
 
             // Add the IDShieldData record to the database
-            ipIDSDB->AddIDShieldData(nFileID, VARIANT_FALSE, swProcessingTime.getElapsedTime(), 
+            ipIDSDB->AddIDShieldData(nFileID, VARIANT_FALSE, swProcessingTime.getElapsedTime(), 0, 
                 idsData.m_lNumHCDataFound, idsData.m_lNumMCDataFound, idsData.m_lNumLCDataFound, 
                 idsData.m_lNumCluesFound, idsData.m_lTotalRedactions, idsData.m_lTotalManualRedactions,
                 idsData.m_lNumPagesAutoAdvanced);
@@ -624,6 +624,21 @@ STDMETHODIMP CRedactionTask::raw_Close()
         return S_OK;
     }
     CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17788");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRedactionTask::raw_Standby(VARIANT_BOOL* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{		
+		ASSERT_ARGUMENT("ELI33918", pVal != __nullptr);
+
+		*pVal = VARIANT_TRUE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33919");
 }
 
 //-------------------------------------------------------------------------------------------------

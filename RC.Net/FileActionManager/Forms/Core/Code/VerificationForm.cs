@@ -1,7 +1,5 @@
 using Extract.Licensing;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
@@ -78,6 +76,11 @@ namespace Extract.FileActionManager.Forms
         EventWaitHandle _closedEvent = new ManualResetEvent(false);
 
         /// <summary>
+        /// An event indicating when at least one file has been queued for processing.
+        /// </summary>
+        EventWaitHandle _fileProcessingEvent = new ManualResetEvent(false);
+
+        /// <summary>
         /// An event indicating when a file has finished loading.
         /// </summary>
         EventWaitHandle _fileLoadedEvent = new ManualResetEvent(false);
@@ -90,14 +93,31 @@ namespace Extract.FileActionManager.Forms
         volatile bool _closing;
 
         /// <summary>
+        /// If <see langword="true"/>, the FormClosing event has been received.
+        /// <see cref="ShowDocument"/> should not be called when in this state and any call to 
+        /// <see cref="ShowForm"/> needs to wait for the previous form to finish closing.
+        /// </summary>
+        volatile bool _formIsClosing;
+
+        /// <summary>
         /// The processing result of the file being shown.
         /// </summary>
         EFileProcessingResult _fileProcessingResult;
 
         /// <summary>
+        /// A reference count of the number of files currently in <see cref="ShowDocument"/>.
+        /// </summary>
+        long _processingFileCount;
+
+        /// <summary>
         /// Used to protect access to <see cref="VerificationForm{TForm}"/>.
         /// </summary>
         static object _lock = new object();
+
+        /// <summary>
+        /// Used to protect access to assignment and disposal of <see cref="MainForm"/>.
+        /// </summary>
+        static object _lockFormChange = new object();
 		
 	    #endregion VerificationForm Fields
 
@@ -146,6 +166,37 @@ namespace Extract.FileActionManager.Forms
             get
             {
                 return _canceledEvent.WaitOne(0, false);
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether there are any files currently being processed in
+        /// <see cref="ShowDocument"/>.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if any files currently being processed; otherwise,
+        /// <see langword="false"/>.</value>
+        public bool IsFileProcessing
+        {
+            get
+            {
+                return _fileProcessingEvent.WaitOne(0, false);
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is UI ready and available to display a
+        /// document.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if this instance is UI ready; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool IsUIReady
+        {
+            get
+            {
+                return (!_closing && !_formIsClosing && !Canceled &&
+                        _uiThread != null &&_uiThread.IsAlive && MainForm != null);
             }
         }
 
@@ -205,7 +256,7 @@ namespace Extract.FileActionManager.Forms
             {
                 try
                 {
-                    if (_closing)
+                    if (_closing || _formIsClosing)
                     {
                         ExtractException.Assert("ELI24002",
                             "Unable to access existing verification form.",
@@ -216,6 +267,7 @@ namespace Extract.FileActionManager.Forms
                     {
                         // Create and start the verification form thread if it doesn't already exist.
                         _closing = false;
+                        _formIsClosing = false;
                         _fileCompletedEvent.Reset();
                         _canceledEvent.Reset();
                         _exceptionThrownEvent.Reset();
@@ -264,8 +316,9 @@ namespace Extract.FileActionManager.Forms
         public EFileProcessingResult ShowDocument(string fileName, int fileID, int actionID,
             FAMTagManager tagManager, FileProcessingDB fileProcessingDB)
         {
-            if (this.Canceled)
+            if (!IsUIReady)
             {
+                // Either a Cancel request was received or the user closed the verification form.
                 return EFileProcessingResult.kProcessingCancelled;
             }
 
@@ -274,6 +327,11 @@ namespace Extract.FileActionManager.Forms
 
             try
             {
+                if (Interlocked.Increment(ref _processingFileCount) == 1)
+                {
+                    _fileProcessingEvent.Set();
+                }
+
                 // Attempt to get the lock for the verification UI thread, but don't block at this
                 // point if its not available.
                 haveLock = Monitor.TryEnter(_lock);
@@ -296,16 +354,22 @@ namespace Extract.FileActionManager.Forms
 
                 _fileLoadedEvent.Reset();
 
-                if (this.Canceled)
+                // Protect against the form being closed or disposed of until the document has been
+                // loaded.
+                lock (_lockFormChange)
                 {
-                    return EFileProcessingResult.kProcessingCancelled;
+                    if (!IsUIReady)
+                    {
+                        // Either a Cancel request was received or the user closed the verification form.
+                        return EFileProcessingResult.kProcessingCancelled;
+                    }
+
+                    // Ensure the verification form has been properly initialized.
+                    EnsureInitialization();
+
+                    // Open the file
+                    MainForm.Open(fileName, fileID, actionID, tagManager, fileProcessingDB);
                 }
-
-                // Ensure the verification form has been properly initialized.
-                EnsureInitialization();
-
-                // Open the file
-                MainForm.Open(fileName, fileID, actionID, tagManager, fileProcessingDB);
 
                 _fileLoadedEvent.Set();
 
@@ -336,6 +400,11 @@ namespace Extract.FileActionManager.Forms
                 if (haveLock)
                 {
                     Monitor.Exit(_lock);
+                }
+
+                if (Interlocked.Decrement(ref _processingFileCount) == 0)
+                {
+                    _fileProcessingEvent.Reset();
                 }
             }
 
@@ -404,6 +473,151 @@ namespace Extract.FileActionManager.Forms
             }
         }
 
+        /// <summary>
+        /// Called to notify the file processor that the pending document queue is empty, but
+        ///	the processing tasks have been configured to remain running until the next document
+        ///	has been supplied. If the processor will standby until the next file is supplied it
+        ///	should return <see langword="true"/>. If the processor wants to cancel processing,
+        ///	it should return <see langword="false"/>. If the processor does not immediately know
+        ///	whether processing should be cancelled right away, it may block until it does know,
+        ///	and return at that time.
+        /// <para><b>Note</b></para>
+        /// This call will be made on a different thread than the other calls, so the Standby call
+        /// must be thread-safe. This allows the file processor to block on the Standby call, but
+        /// it also means that call to <see cref="ShowDocument"/> or <see cref="CloseForm"/> may
+        /// come while the Standby call is still ocurring. If this happens, the return value of
+        /// Standby will be ignored; however, Standby should promptly return in this case to avoid
+        /// needlessly keeping a thread alive.
+        /// </summary>
+        /// <returns><see langword="true"/> to standby until the next file is supplied;
+        /// <see langword="false"/> to cancel processing.</returns>
+        public bool Standby()
+        {
+            try
+            {
+                if (!IsUIReady)
+                {
+                    // If the UI is gone or closing, cancel processing.
+                    Cancel();
+                    return false;
+                }
+                else if (IsFileProcessing)
+                {
+                    // If a new file has been supplied on a different thread, standby for one on
+                    // this thread.
+                    return true;
+                }
+
+                using (ManualResetEvent formClosedEvent = new ManualResetEvent(false))
+                {
+                    // Allows the formClosedDelegate to know if the call to standby ended before it
+                    // was called.
+                    bool standybyEnded = false;
+
+                    // Create a delegate which will signal formClosedEvent when the verification
+                    // form is closed.
+                    FormClosedEventHandler formClosedDelegate = (sender, eventArgs) =>
+                    {
+                        try
+                        {
+                            if (!standybyEnded)
+                            {
+                                // Lock to ensure standybyEnded doesn't get set and formClosedEvent
+                                // disposed after the initial check of standybyEnded, but before
+                                // signaling the event.
+                                lock (_lockFormChange)
+                                {
+                                    if (!standybyEnded)
+                                    {
+                                        formClosedEvent.Set();
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractDisplay("ELI33929");
+                        }
+                    };
+
+                    bool registeredForFormClosing = false;
+                    bool standby;
+
+                    try
+                    {
+                        // Lock to prevent a race condition in Standby whereby the form could close
+                        // after checking that the UI thread and form are still there but before
+                        // accessing the form.
+                        lock (_lock)
+                        lock (_lockFormChange)
+                        {
+                            // Once in the lock, double-check that the UI is still there and not
+                            // processing before subscribing to FormClosed.
+                            if (!IsUIReady)
+                            {
+                                // If the UI is gone or closing, cancel processing.
+                                Cancel();
+                                return false;
+                            }
+                            else if (IsFileProcessing)
+                            {
+                                // If a new file has been supplied on a different thread, standby
+                                // for one on this thread.
+                                return true;
+                            }
+
+                            // Subscribe to FormClosed so that false can be returned from Standby
+                            // to cancel processing if the verification form is closed.
+                            MainForm.FormClosed += formClosedDelegate;
+
+                            registeredForFormClosing = true;
+
+                            // Allow the form itself to have the first crack at handling standby.
+                            standby = MainForm.Standby();
+                        }
+
+                        // If the form approves of standing by, block until either another file is
+                        // supplied, or the form is closed.
+                        if (standby)
+                        {
+                            WaitHandle[] waitHandles =
+                                new WaitHandle[] { formClosedEvent, _fileProcessingEvent };
+
+                            standby = (WaitHandle.WaitAny(waitHandles) == 1);
+                        }
+                    }
+                    finally
+                    {
+                        lock (_lockFormChange)
+                        {
+                            // Though we unsubscribe to the FormClosed event before exiting, the
+                            // FormClosed event may have already fired. Set standybyEnded to notify the
+                            // handler that it should not attempt to call Set on the disposed waitHandle.
+                            standybyEnded = true;
+
+                            if (registeredForFormClosing && MainForm != null)
+                            {
+                                MainForm.FormClosed -= formClosedDelegate;
+                            }
+                        }
+                    }
+
+                    // If this task will not standby, cancel the verification form.
+                    if (!standby)
+                    {
+                        Cancel();
+                    }
+
+                    return standby;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI33924");
+                return true;
+            }
+        }
+
         #endregion VerificationForm Methods
 
         #region IDisposable Members
@@ -466,6 +680,11 @@ namespace Extract.FileActionManager.Forms
                     _fileLoadedEvent.Dispose();
                     _fileLoadedEvent = null;
                 }
+                if (_fileProcessingEvent != null)
+                {
+                    _fileProcessingEvent.Dispose();
+                    _fileProcessingEvent = null;
+                }
             }
 
             // Dispose of unmanaged resources
@@ -497,12 +716,10 @@ namespace Extract.FileActionManager.Forms
         }
 
         /// <summary>
-        /// Handles the <see cref="Form.Shown"/> event.
+        /// Handles the Form.Shown event.
         /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="Form.Shown"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="Form.Shown"/> event.</param>
+        /// <param name="sender">The object that sent the Form.Shown event.</param>
+        /// <param name="e">The event data associated with the Form.Shown event.</param>
         void HandleVerificationFormShown(object sender, EventArgs e)
         {
             // Notify any waiting threads that the verification form been initialized.
@@ -510,12 +727,75 @@ namespace Extract.FileActionManager.Forms
         }
 
         /// <summary>
-        /// Handles the <see cref="Form.Closed"/> event.
+        /// Handles the form closing.
         /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="Form.Closed"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="Form.Closed"/> event.</param>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.FormClosingEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleFormClosing(object sender, FormClosingEventArgs e)
+        {
+            bool gotLock = false;
+
+            try
+            {
+                _formIsClosing = true;
+
+                // If _closing is not set, the user has closed the form as opposed to it being
+                // programmatically closed. Processing should be cancelled.
+                if (!_closing)
+                {
+                    Cancel();
+                }
+
+                // Note the time to ensure processing doesn't hang here for an unreasonable amount
+                // of time.
+                DateTime closingTime = DateTime.Now;
+
+                // It is possible the form may be closing but there is still a thread in Prefetch.
+                // Spin the message loop here until all files have exited processing (in case
+                // Prefetch or Standby may need to use the message loop for processing).
+                while (IsFileProcessing)
+                {
+                    Thread.Sleep(50);
+                    Application.DoEvents();
+                    ExtractException.Assert("ELI33950",
+                        "Timeout waiting for the verification window to close.",
+                        (DateTime.Now - closingTime).TotalMilliseconds < _THREAD_TIMEOUT);
+                }
+
+                // Lock to prevent a race condition in Standby whereby the form could be disposed
+                // after checking that the UI thread and form are still there but before it accesses
+                // the form. Spin the message loop heres to prevent a deadlock since the UI may need
+                // to execute code to exit from an existing _lockFormChange lock.
+                gotLock = Monitor.TryEnter(_lockFormChange);
+                while (!gotLock)
+                {
+                    Thread.Sleep(50);
+                    Application.DoEvents();
+                    ExtractException.Assert("ELI33951",
+                        "Timeout waiting for the verification window to close.",
+                        (DateTime.Now - closingTime).TotalMilliseconds < _THREAD_TIMEOUT);
+                    gotLock = Monitor.TryEnter(_lockFormChange);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI33946");
+            }
+            finally
+            {
+                if (gotLock)
+                {
+                    Monitor.Exit(_lockFormChange);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the Form.Shown event.
+        /// </summary>
+        /// <param name="sender">The object that sent the  Form.Shown event.</param>
+        /// <param name="e">The event data associated with the  Form.Shown event.</param>
         void HandleFormClosed(object sender, FormClosedEventArgs e)
         {
             // Reset _initializedEvent to indicate the form is no longer initialized
@@ -565,12 +845,18 @@ namespace Extract.FileActionManager.Forms
             }
             set
             {
-                if (_form != null)
+                // Lock to prevent a race condition in Standby whereby the form could be disposed
+                // after checking that the UI thread and form are still there but before it accesses
+                // the form.
+                lock (_lockFormChange)
                 {
-                    _form.Dispose();
-                }
+                    if (_form != null)
+                    {
+                        _form.Dispose();
+                    }
 
-                _form = value;
+                    _form = value;
+                }
             }
         }
         
@@ -638,6 +924,7 @@ namespace Extract.FileActionManager.Forms
                 // Register events
                 MainForm.Shown += HandleVerificationFormShown;
                 MainForm.FileComplete += HandleFileComplete;
+                MainForm.FormClosing += HandleFormClosing;
                 MainForm.FormClosed += HandleFormClosed;
 
                 Application.Run(MainForm);
@@ -726,7 +1013,7 @@ namespace Extract.FileActionManager.Forms
                 _closing = true;
 
                 // Check if the UI thread needs to be taken down.
-                while (_uiThread != null && _uiThread.IsAlive)
+                while (!_formIsClosing && _uiThread != null && _uiThread.IsAlive)
                 {
                     // Attempt to end the thread cleanly by closing the form if it still exists.
                     // [DataEntry:308, 254]
@@ -770,10 +1057,8 @@ namespace Extract.FileActionManager.Forms
             }
             finally
             {
-                // Ensure the form and thread are set to null so that they will be re-initialized
-                // on the next call to Init.
+                // Ensure the thread is set to null so that it will be re-initialized on the next call to Init.
                 _uiThread = null;
-                MainForm = null;
                 _closedEvent.Set();
             }
         }

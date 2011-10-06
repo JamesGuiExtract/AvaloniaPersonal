@@ -199,10 +199,21 @@ namespace Extract.Redaction.Verification
         FileStream _processingStream;
 
         /// <summary>
-        /// Measures the duration of time that has passed since the current document was first 
-        /// viewed.
+        /// Measures the duration of time that a document has been verified.
         /// </summary>
-        IntervalTimer _screenTime = new IntervalTimer();
+        IntervalTimer _processingTimer = new IntervalTimer();
+
+        /// <summary>
+        /// The time the document has been displayed.
+        /// </summary>
+        TimeInterval _screenTimeInterval;
+
+        /// <summary>
+        /// The time between the previous document being saved/closed and the current document being
+        /// displayed. If this is the first document displayed (or the first since the last call to
+        /// <see cref="Standby"/>, this time will be 0.
+        /// </summary>
+        TimeInterval _overheadTimeInterval;
 
         /// <summary>
         /// <see langword="true"/> if the comment text box has been modified;
@@ -252,12 +263,6 @@ namespace Extract.Redaction.Verification
         /// Expands file action manager path tags.
         /// </summary>
         FAMTagManager _tagManager;
-
-        /// <summary>
-        /// <see langword="true"/> if the user chose to close the application through the x button, 
-        /// ALT+F4, or through stop processing; <see langword="false"/> otherwise.
-        /// </summary>
-        bool _userClosing;
 
         /// <summary>
         /// Used to invoke methods on this control.
@@ -340,7 +345,7 @@ namespace Extract.Redaction.Verification
         /// Keeps track of the total number of pages for all documents committed this session and
         /// the total screen time for all documents displayed this session that are not currently
         /// in the history queue. Item1 is the total number of pages, and Item2 is the total
-        /// verification time.
+        /// verification time (includes both screen time and overhead time).
         /// </summary>
         Tuple<int, double> _preHistoricPageVerificationTime = new Tuple<int, double>(0, 0);
 
@@ -855,7 +860,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Saves the ID Shield redaction counts to the ID Shield database.
         /// </summary>
-        void SaveRedactionCounts(TimeInterval screenTime)
+        void SaveRedactionCounts()
         {
             // Check for null database manager (only add counts to database if it is not null)
             // [FlexIDSCore #3627]
@@ -866,7 +871,8 @@ namespace Extract.Redaction.Verification
                 RedactionCounts counts = _redactionGridView.GetRedactionCounts();
 
                 // Add the data to the database
-                AddDatabaseData(memento.FileId, counts, screenTime);
+                AddDatabaseData(memento.FileId, counts, _screenTimeInterval.ElapsedSeconds,
+                    _overheadTimeInterval.ElapsedSeconds);
             }
         }
 
@@ -875,10 +881,15 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <param name="fileId">The unique file ID for the data being added.</param>
         /// <param name="counts">The counts of redaction categories.</param>
-        /// <param name="screenTime">The time the user spent verifying the redactions.</param>
-        void AddDatabaseData(int fileId, RedactionCounts counts, TimeInterval screenTime)
+        /// <param name="screenTime">The number of seconds the document has been displayed.</param>
+        /// <param name="overheadTime">The number of seconds between the previous document being
+        /// saved/closed and the current document being displayed. If this is the first document
+        /// displayed (or the first since the last call to <see cref="Standby"/>, this time will be 0.
+        /// </param>
+        void AddDatabaseData(int fileId, RedactionCounts counts, double screenTime,
+            double overheadTime)
         {
-            _idShieldDatabase.AddIDShieldData(fileId, true, screenTime.ElapsedSeconds, 
+            _idShieldDatabase.AddIDShieldData(fileId, true, screenTime, overheadTime,
                 counts.HighConfidence, counts.MediumConfidence, counts.LowConfidence,
                 counts.Clues, counts.Total, counts.Manual, _setSlideshowAdvancedPages.Count);
         }
@@ -1112,8 +1123,8 @@ namespace Extract.Redaction.Verification
                 return;
             }
 
-            TimeInterval screenTime = StopScreenTimeTimer();
-            SaveRedactionCounts(screenTime);
+            StopScreenTimeTimer();
+            SaveRedactionCounts();
 
             // Ensure slideshow timer is not running until the next document is completely loaded.
             if (_slideshowTimer.Enabled)
@@ -1141,7 +1152,8 @@ namespace Extract.Redaction.Verification
                     VerificationMemento memento = _history[0];
                     _preHistoricPageVerificationTime = new Tuple<int, double>(
                         _preHistoricPageVerificationTime.Item1 + memento.PageCount,
-                        _preHistoricPageVerificationTime.Item2 + memento.ScreenTimeThisSession);
+                        _preHistoricPageVerificationTime.Item2
+                            + memento.ScreenTimeThisSession + memento.OverheadTimeThisSession);
 
                     _imageViewer.UnloadImage(_history[0].DisplayImage);
 
@@ -1170,10 +1182,33 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void StartScreenTimeTimer()
         {
+            // Clear the screen time of the last document.
+            _screenTimeInterval = null;
+
+            VerificationMemento thisMemento = GetCurrentDocument();
+
+            // If the timer is currently running, its current time will be the overhead time (time
+            // since the previous document was saved. Restart the timer to track the screen time of
+            // this document.
+            if (_processingTimer.Running)
+            {
+                _overheadTimeInterval = _processingTimer.Restart();
+                if (thisMemento != null)
+                {
+                    double overheadTime = _processingTimer.Restart().ElapsedSeconds;
+                    thisMemento.OverheadTimeThisSession += overheadTime;
+                }
+            }
+            // The timer will need to be started for the first document. 
+            else
+            {
+                _overheadTimeInterval = new TimeInterval(DateTime.Now, 0);
+                _processingTimer.Start();
+            }
+
             // If _verificationRateStatusLabel exists, update it.
             if (_verificationRateStatusLabel != null)
             {
-                VerificationMemento thisMemento = GetCurrentDocument();
                 _verificationRateStatusLabel.Start((thisMemento == null)
                     ? 0 : thisMemento.ScreenTimeThisSession);
             }
@@ -1189,7 +1224,7 @@ namespace Extract.Redaction.Verification
                 foreach (var memento in _history)
                 {
                     totalPageCount += memento.PageCount;
-                    totalTime += memento.ScreenTimeThisSession;
+                    totalTime += memento.ScreenTimeThisSession + memento.OverheadTimeThisSession;
                 }
 
                 // Calculate the average number of pages verified per hour.
@@ -1200,8 +1235,6 @@ namespace Extract.Redaction.Verification
                 _pagesPerHourStatusLabel.Text = string.Format(
                     CultureInfo.CurrentCulture, "Average pages/hour: {0:#}", averagePagesPerHour);
             }
-
-            _screenTime.Start();
         }
 
         /// <summary>
@@ -1211,18 +1244,18 @@ namespace Extract.Redaction.Verification
         /// and now.</returns>
         TimeInterval StopScreenTimeTimer()
         {
-            bool running = _screenTime.Running;
-
-            TimeInterval screenTime = _screenTime.Stop();
-
-            // Only update memento.ScreenTimeThisSession and stop _verificationRateStatusLabel if
-            // the timer was running before this call.
-            if (running)
+            // Get _screenTimeInterval and update the memento and label if the screen time has not
+            // yet been retrieved for this document.
+            if (_screenTimeInterval == null)
             {
+                ExtractException.Assert("ELI33932", "Internal logic error.", _processingTimer.Running);
+
+                _screenTimeInterval = _processingTimer.Restart();
+
                 VerificationMemento memento = GetCurrentDocument();
                 if (memento != null)
                 {
-                    memento.ScreenTimeThisSession += screenTime.ElapsedSeconds;
+                    memento.ScreenTimeThisSession += _screenTimeInterval.ElapsedSeconds;
                 }
 
                 if (_verificationRateStatusLabel != null)
@@ -1231,7 +1264,7 @@ namespace Extract.Redaction.Verification
                 }
             }
 
-            return screenTime;
+            return _screenTimeInterval;
         }
         
         /// <summary>
@@ -1550,27 +1583,6 @@ namespace Extract.Redaction.Verification
             {
                 return false;
             }
-        }
-
-        /// <summary>
-        /// Displays a warning message if the user is trying to stop when no document is currently 
-        /// processing.
-        /// </summary>
-        /// <returns><see langword="true"/> if a warning was displayed; <see langword="false"/> if 
-        /// no warning was displayed.</returns>
-        bool WarnIfStopping()
-        {
-            bool warn = !_standAloneMode && _userClosing && !_imageViewer.IsImageAvailable;
-            if (warn)
-            {
-                _userClosing = false;
-                const string message = "If you are intending to stop processing, "
-                                       + "press the stop button in the File Action Manager.";
-                MessageBox.Show(this, message, "Stop processing", MessageBoxButtons.OK, 
-                    MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
-            }
-
-            return warn;
         }
 
         /// <summary>
@@ -1979,8 +1991,8 @@ namespace Extract.Redaction.Verification
                 // Check if changes have been made before moving away from a history document
                 if (!WarnIfDirty())
                 {
-                    TimeInterval screenTime = StopScreenTimeTimer();
-                    SaveRedactionCounts(screenTime);
+                    StopScreenTimeTimer();
+                    SaveRedactionCounts();
 
                     CommitComment();
 
@@ -2330,20 +2342,6 @@ namespace Extract.Redaction.Verification
         #region Overrides
 
         /// <summary>
-        /// Processes Windows messages.
-        /// </summary>
-        /// <param name="m">The Windows <see cref="Message"/> to process.</param>
-        protected override void WndProc(ref Message m)
-        {
-            if (m.Msg == WindowsMessage.SystemCommand && m.WParam == new IntPtr(SystemCommand.Close))
-            {
-                _userClosing = true;
-            }
-
-            base.WndProc(ref m);
-        }
-
-        /// <summary>
         /// Raises the <see cref="Form.Load"/> event.
         /// </summary>
         /// <param name="e">The event data associated with the <see cref="Form.Load"/> 
@@ -2470,35 +2468,28 @@ namespace Extract.Redaction.Verification
         /// event.</param>
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            base.OnFormClosing(e);
-
             try
             {
                 _redactionGridView.CommitChanges();
-
-                // Warn if stopping with no document processing [FIDSC #3885, #3995]
-                if (WarnIfStopping())
-                {
-                    e.Cancel = true;
-                    return; 
-                }
 
                 // Warn if the currently processing document is dirty
                 if (WarnIfDirty())
                 {
                     e.Cancel = true;
-                    return;
+                }
+                else
+                {
+                    CommitComment();
                 }
 
-                CommitComment();
+                // Don't call base.OnFormClosing until we know know if the close is being canceled
+                // (if VerificationForm receives a FormClosing event, it expects that the form will
+                // indeed close).
+                base.OnFormClosing(e);
             }
             catch (Exception ex)
             {
                 ExtractException.Display("ELI27116", ex);
-            }
-            finally
-            {
-                _userClosing = false;
             }
         }
 
@@ -2631,7 +2622,7 @@ namespace Extract.Redaction.Verification
                     TimeInterval screenTime = StopScreenTimeTimer();
                     Save(screenTime);
 
-                    SaveRedactionCounts(screenTime);
+                    SaveRedactionCounts();
                 }
             }
             catch (Exception ex)
@@ -2659,13 +2650,14 @@ namespace Extract.Redaction.Verification
 
                     if (!WarnIfDirty())
                     {
-                        TimeInterval screenTime = StopScreenTimeTimer();
-                        SaveRedactionCounts(screenTime);
+                        StopScreenTimeTimer();
+                        SaveRedactionCounts();
 
                         VerificationMemento memento = GetCurrentDocument();
                         _preHistoricPageVerificationTime = new Tuple<int, double>(
                             _preHistoricPageVerificationTime.Item1,
-                            _preHistoricPageVerificationTime.Item2 + memento.ScreenTimeThisSession);
+                            _preHistoricPageVerificationTime.Item2
+                                + memento.ScreenTimeThisSession + memento.OverheadTimeThisSession);
 
                         CommitComment();
 
@@ -2697,7 +2689,6 @@ namespace Extract.Redaction.Verification
                 // in the image viewer (i.e. Drawing a redaction)
                 if (!_imageViewer.IsTracking)
                 {
-                    _userClosing = true;
                     Close();
                 }
             }
@@ -3674,6 +3665,53 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Called to notify the file processor that the pending document queue is empty, but
+        ///	the processing tasks have been configured to remain running until the next document
+        ///	has been supplied. If the processor will standby until the next file is supplied it
+        ///	should return <see langword="true"/>. If the processor wants to cancel processing,
+        ///	it should return <see langword="false"/>. If the processor does not immediately know
+        ///	whether processing should be cancelled right away, it may block until it does know,
+        ///	and return at that time.
+        /// <para><b>Note</b></para>
+        /// This call will be made on a different thread than the other calls, so the Standby call
+        /// must be thread-safe. This allows the file processor to block on the Standby call, but
+        /// it also means the form may be opened or closed while the Standby call is still ocurring.
+        /// If this happens, the return value of Standby will be ignored; however, Standby should
+        /// promptly return in this case to avoid needlessly keeping a thread alive.
+        /// </summary>
+        /// <returns><see langword="true"/> to standby until the next file is supplied;
+        /// <see langword="false"/> to cancel processing.</returns>
+        public bool Standby()
+        {
+            try
+            {
+                if (InvokeRequired)
+                {
+                    return (bool)_invoker.Invoke(new VerificationFormStandby(Standby));
+                }
+
+                // [FlexIDSCore:4596]
+                // Stop the slideshow if we get to the end of the queue.
+                if (_slideshowRunning)
+                {
+                    StopSlideshow(true);
+                }
+
+                // Do not count time in standby toward overhead time.
+                if (_processingTimer.Running)
+                {
+                    _processingTimer.Stop();
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI33933");
+            }
+        }
+
         #endregion IVerificationForm Members
 
         #region IMessageFilter Members
@@ -3912,16 +3950,6 @@ namespace Extract.Redaction.Verification
             _slideShowTimerBarControl.Visible = true;
             _slideShowTimerBarControl.StartTimer(_slideshowTimer.Interval);
             _slideshowTimer.Start();
-
-            if (_slideshowTimerLastStopTime.HasValue && 
-                DateTime.Now.AddSeconds(-10) > _slideshowTimerLastStopTime)
-            {
-                // [FlexIDSCore:4596]
-                // If there is more than a 10 second gap between the last image getting closed and
-                // the new one being opened, assume the last file was the last in the queue at the
-                // time and stop the slideshow.
-                StopSlideshow(true);
-            }
         }
 
         /// <summary>

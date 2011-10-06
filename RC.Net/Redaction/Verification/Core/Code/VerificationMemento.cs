@@ -84,6 +84,12 @@ namespace Extract.Redaction.Verification
         double _screenTimeThisSession;
 
         /// <summary>
+        /// The cumulative number of seconds elapsed between the time the previous document was
+        /// saved and this document was fully loaded.
+        /// </summary>
+        double _overheadTimeThisSession;
+
+        /// <summary>
         /// The selected redaction grid rows for the document.
         /// </summary>
         HashSet<int> _selection = new HashSet<int>();
@@ -329,6 +335,25 @@ namespace Extract.Redaction.Verification
             set
             {
                 _screenTimeThisSession = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the cumulative number of seconds elapsed between the time the previous
+        /// document was saved and this document was fully loaded.
+        /// </summary>
+        /// <value>The cumulative number of seconds elapsed between the time the previous document
+        /// was saved and this document was fully loaded.</value>
+        public double OverheadTimeThisSession
+        {
+            get
+            {
+                return _overheadTimeThisSession;
+            }
+
+            set
+            {
+                _overheadTimeThisSession = value;
             }
         }
 

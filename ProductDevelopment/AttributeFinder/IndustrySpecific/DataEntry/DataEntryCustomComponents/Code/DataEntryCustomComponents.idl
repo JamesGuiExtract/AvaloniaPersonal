@@ -34,13 +34,6 @@ library UCLID_DATAENTRYCUSTOMCOMPONENTSLib
 	interface IDataEntryProductDBMgr : IDispatch
 	{
 		//-----------------------------------------------------------------------------------------
-		// PROMISE: To add a record in the DataEntryData table in the database for the file with the
-		//          given values.
-		// NOTE:	Any existing records in the table that have IsMostRecentUpdate set to 1 will 
-		//          have it reset to 0 and the new record will have IsMostRecentUpdate set to 1.
-		[id(1), helpstring("method AddDataEntryData")] HRESULT AddDataEntryData([in] long lFileID, 
-			long nActionID, [in] double lDuration, [out, retval] long* plInstanceID);
-		//-----------------------------------------------------------------------------------------
 		// PROMISE: To set the FAMDB
 		[propput, id(2), helpstring("property FAMDB")] HRESULT FAMDB([in] IFileProcessingDB* newVal);
 		//-----------------------------------------------------------------------------------------
@@ -57,6 +50,12 @@ library UCLID_DATAENTRYCUSTOMCOMPONENTSLib
 		[id(3), helpstring("method RecordCounterValues")] HRESULT RecordCounterValues(
 			[in, out] long* plInstanceToken, [in] long lDataEntryDataInstanceID,
 			[in] IIUnknownVector* pAttributes);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To add a record in the DataEntryData table in the database for the file with the
+		//          given values.
+		[id(4), helpstring("method AddDataEntryData")] HRESULT AddDataEntryData([in] long lFileID, 
+			[in] long nActionID, [in] double dDuration, [in] double dOverheadTime,
+			[out, retval] long* plInstanceID);
 	};
 
 	[

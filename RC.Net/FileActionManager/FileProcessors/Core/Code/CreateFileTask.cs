@@ -372,6 +372,29 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
+        /// Called to notify the file processor that the pending document queue is empty, but
+        ///	the processing tasks have been configured to remain running until the next document
+        ///	has been supplied. If the processor will standby until the next file is supplied it
+        ///	should return <see langword="true"/>. If the processor wants to cancel processing,
+        ///	it should return <see langword="false"/>. If the processor does not immediately know
+        ///	whether processing should be cancelled right away, it may block until it does know,
+        ///	and return at that time.
+        /// <para><b>Note</b></para>
+        /// This call will be made on a different thread than the other calls, so the Standby call
+        /// must be thread-safe. This allows the file processor to block on the Standby call, but
+        /// it also means that call to <see cref="ProcessFile"/> or <see cref="Close"/> may come
+        /// while the Standby call is still ocurring. If this happens, the return value of Standby
+        /// will be ignored; however, Standby should promptly return in this case to avoid
+        /// needlessly keeping a thread alive.
+        /// </summary>
+        /// <returns><see langword="true"/> to standby until the next file is supplied;
+        /// <see langword="false"/> to cancel processing.</returns>
+        public bool Standby()
+        {
+            return true;
+        }
+
+        /// <summary>
         /// Called before any file processing starts.
         /// </summary>  
         /// <param name="nActionID">The ID of the action being processed.</param>

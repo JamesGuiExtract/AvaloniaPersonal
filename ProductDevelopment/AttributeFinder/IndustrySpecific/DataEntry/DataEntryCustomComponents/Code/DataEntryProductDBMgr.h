@@ -68,7 +68,8 @@ public:
 		IProgressStatus* pProgressStatus);
 
 // IDataEntryProductDBMgr Methods
-	STDMETHOD(AddDataEntryData)(long lFileID, long nActionID, double lDuration, long* plInstanceID);
+	STDMETHOD(AddDataEntryData)(long lFileID, long nActionID, double dDuration,
+		double dOverheadTime, long* plInstanceID);
 	STDMETHOD(put_FAMDB)(IFileProcessingDB* newVal);
 	STDMETHOD(RecordCounterValues)(long* plInstanceToken, long lDataEntryDataInstanceID,
 		IIUnknownVector* pAttributes);
@@ -133,7 +134,7 @@ private:
 
 	// Internal versions of external methods that may require database locking
 	bool AddDataEntryData_Internal(bool bDBLocked, long lFileID, long nActionID,
-		double lDuration, long* plInstanceID);
+		double dDuration, double dOverheadTime, long* plInstanceID);
 	bool RecordCounterValues_Internal(bool bDBLocked, long* plInstanceToken,
 		long lDataEntryDataInstanceID, IIUnknownVector* pAttributes);
 

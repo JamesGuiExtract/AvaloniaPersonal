@@ -286,6 +286,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         Stopwatch _fileProcessingStopwatch;
 
         /// <summary>
+        /// The time in seconds between the previous document being saved/closed and the current
+        /// document being displayed. If this is the first document displayed (or the first since
+        /// the last call to<see cref="Standby"/>, this time will be 0.
+        /// </summary>
+        double? _overheadElapsedTime;
+
+        /// <summary>
+        /// Indicates whether an entry has been added to the DataEntryData table for the current
+        /// document.
+        /// </summary>
+        bool _recordedDatabaseData;
+
+        /// <summary>
         /// The close file command
         /// </summary>
         ApplicationCommand _closeFileCommand;
@@ -825,6 +838,46 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // TODO: Add prefetching code to improve load performance.
         }
 
+        /// <summary>
+        /// Called to notify the file processor that the pending document queue is empty, but
+        ///	the processing tasks have been configured to remain running until the next document
+        ///	has been supplied. If the processor will standby until the next file is supplied it
+        ///	should return <see langword="true"/>. If the processor wants to cancel processing,
+        ///	it should return <see langword="false"/>. If the processor does not immediately know
+        ///	whether processing should be cancelled right away, it may block until it does know,
+        ///	and return at that time.
+        /// <para><b>Note</b></para>
+        /// This call will be made on a different thread than the other calls, so the Standby call
+        /// must be thread-safe. This allows the file processor to block on the Standby call, but
+        /// it also means the form may be opened or closed while the Standby call is still ocurring.
+        /// If this happens, the return value of Standby will be ignored; however, Standby should
+        /// promptly return in this case to avoid needlessly keeping a thread alive.
+        /// </summary>
+        /// <returns><see langword="true"/> to standby until the next file is supplied;
+        /// <see langword="false"/> to cancel processing.</returns>
+        public bool Standby()
+        {
+            try
+            {
+                if (InvokeRequired)
+                {
+                    return (bool)_invoker.Invoke(new VerificationFormStandby(Standby));
+                }
+
+                // Do not count time in standby toward overhead time.
+                if (_fileProcessingStopwatch != null && _fileProcessingStopwatch.IsRunning)
+                {
+                    _fileProcessingStopwatch.Stop();
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI33953");
+            }
+        }
+
         #endregion Methods
 
         #region Overrides
@@ -1075,13 +1128,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     OpenSeparateImageWindow();
                 }
 
-                if (!_standAloneMode && _fileProcessingDb != null)
-                {
-                    // If running in FAM mode with a _fileProcessingDb, when a document is not
-                    // loaded, indicate that the UI is waiting for the next document.
-                    _exitToolStripMenuItem.Enabled = false;
-                }
-
                 // Adjust UI elements to reflect the current configuration.
                 SetUIConfiguration(_activeDataEntryConfig);
 
@@ -1214,41 +1260,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Processes windows messages.
-        /// </summary>
-        /// <param name="m">The Windows <see cref="Message"/> to process.</param>
-        protected override void WndProc(ref Message m)
-        {
-            try
-            {
-                // If a document is not loaded, the DataEntryApplicationForm has no way of informing
-                // the FAM of a cancel. Therefore, don't allow the form to be closed in FAM mode
-                // when a document is not loaded.
-                if (!_standAloneMode && _fileProcessingDb != null && !_imageViewer.IsImageAvailable &&
-                    m.Msg == WindowsMessage.SystemCommand && m.WParam == new IntPtr(SystemCommand.Close))
-                {
-                    MessageBox.Show(this, "If you are intending to stop processing, " +
-                        "press the stop button in the File Action Manager.",
-                        _brandingResources.ApplicationTitle, MessageBoxButtons.OK,
-                        MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
-
-                    return;
-                }
-
-                base.WndProc(ref m);
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI26764", ex);
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="Form.Closing"/> event in order to give the user an opportunity to save
+        /// Raises the <see cref="Form.FormClosing"/> event in order to give the user an opportunity to save
         /// data prior to closing the application.
         /// </summary>
         /// <param name="e">The event data associated with the event.</param>
-        protected override void OnClosing(CancelEventArgs e)
+        protected override void OnFormClosing(FormClosingEventArgs e)
         {
             try
             {
@@ -1277,7 +1293,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
                 }
 
-                base.OnClosing(e);
+                // Don't call base.OnFormClosing until we know know if the close is being canceled
+                // (if VerificationForm receives a FormClosing event, it expects that the form will
+                // indeed close).
+                base.OnFormClosing(e);
             }
             catch (Exception ex)
             {
@@ -1663,12 +1682,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 // [DataEntry:414]
                 // A document should only be allowed to be closed in FAM mode
-                _closeFileCommand.Enabled = (_standAloneMode && _imageViewer.IsImageAvailable);
-
-                // If a document is not loaded, the DataEntryApplicationForm has no way of informing
-                // the FAM of a cancel. Therefore, don't allow the form to be closed in FAM mode
-                // when a document is not loaded.
-                _exitToolStripMenuItem.Enabled = (_standAloneMode || _imageViewer.IsImageAvailable);
+                _closeFileCommand.Enabled = (_standAloneMode && _imageViewer.IsImageAvailable);;
 
                 _documentTypeComboBox.Enabled = _imageViewer.IsImageAvailable;
 
@@ -3618,8 +3632,23 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (onLoad)
                 {
-                    _fileProcessingStopwatch = new Stopwatch();
-                    _fileProcessingStopwatch.Start();
+                    _recordedDatabaseData = false;
+
+                    // If the timer is currently running, its current time will be the overhead time (time
+                    // since the previous document was saved. Restart the timer to track the screen time of
+                    // this document.
+                    if (_fileProcessingStopwatch != null && _fileProcessingStopwatch.IsRunning)
+                    {
+                        _overheadElapsedTime = _fileProcessingStopwatch.ElapsedMilliseconds / 1000.0;
+                        _fileProcessingStopwatch.Restart();
+                    }
+                    // The timer will need to be started for the first document. 
+                    else
+                    {
+                        _overheadElapsedTime = 0;
+                        _fileProcessingStopwatch = new Stopwatch();
+                        _fileProcessingStopwatch.Start();
+                    }
 
                     // Enable input event tracking.
                     if (_inputEventTracker != null)
@@ -3637,7 +3666,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             ref _counterStatisticsToken, 0, attributes);
                     }
                 }
-                else if (_fileProcessingStopwatch != null)
+                else if (!_recordedDatabaseData)
                 {
                     // Don't count input when a document is not open.
                     if (_inputEventTracker != null)
@@ -3646,8 +3675,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
 
                     double elapsedSeconds = _fileProcessingStopwatch.ElapsedMilliseconds / 1000.0;
+                    _fileProcessingStopwatch.Restart();
+
                     int instanceId = _dataEntryDatabaseManager.AddDataEntryData(
-                        _fileId, _actionId, elapsedSeconds);
+                        _fileId, _actionId, elapsedSeconds, _overheadElapsedTime.Value);
 
                     if (_countersEnabled)
                     {
@@ -3655,9 +3686,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             ref _counterStatisticsToken, instanceId, attributes);
                     }
 
-                    // Set to null after recording to ensure we never inappropriately record an entry
-                    // for a file.
-                    _fileProcessingStopwatch = null;
+                    // Ensure we never inappropriately record an entry for a file.
+                    _recordedDatabaseData = true;
                 }
             }
             catch (Exception ex)

@@ -38,10 +38,74 @@ const string gstrTASK_INFORMATION_DESCRIPTION = "Current task description: ";
 const string gstrEXCEPTION_DETAILS_HEADER = "****Exception Details****";
 
 //-------------------------------------------------------------------------------------------------
+// StandbyThread
+//-------------------------------------------------------------------------------------------------
+StandbyThread::StandbyThread(Win32Event& eventCancelProcessing,
+	const UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr& ipTaskExecutor)
+: m_eventCancelProcessing(eventCancelProcessing)
+, m_ipTaskExecutor(ipTaskExecutor)
+{
+	try
+	{
+		ASSERT_RESOURCE_ALLOCATION("ELI33940", m_ipTaskExecutor != __nullptr);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33941");
+}
+//-------------------------------------------------------------------------------------------------
+StandbyThread::~StandbyThread()
+{
+	try
+	{
+		m_ipTaskExecutor = __nullptr;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33934")
+}
+//-------------------------------------------------------------------------------------------------
+BOOL StandbyThread::InitInstance()
+{
+	// Return TRUE so Run is called.
+	return TRUE;
+}
+//-------------------------------------------------------------------------------------------------
+int StandbyThread::Run()
+{
+	try
+	{
+		// The Standby call may block if there is a cancellable task configured.
+		if (!asCppBool(m_ipTaskExecutor->Standby()) && !m_eventStandbyEnded.isSignaled())
+		{
+			// If the return value of Standby is false, and the Standby state has not yet ended,
+			// cancel processing.
+			m_eventCancelProcessing.signal();
+		}
+
+		// This thread needs to remain alive until Standby has ended so that endStandby may be
+		// called.
+		m_eventStandbyEnded.wait();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33935")
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+void StandbyThread::endStandby()
+{
+	try
+	{
+		// Notify the task executor that standby has ended so that it will stop waiting on replies
+		// from any Standby calls that are blocking.
+		m_ipTaskExecutor->EndStandby();
+
+		m_eventStandbyEnded.signal();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33936")
+}
+
+//-------------------------------------------------------------------------------------------------
 // ProcessingThreadData
 //-------------------------------------------------------------------------------------------------
 ProcessingThreadData::ProcessingThreadData()
-:	m_pThread(NULL), m_pFPMgmtRole(NULL)
+:	m_pThread(__nullptr), m_pFPMgmtRole(__nullptr)
 {
 	try
 	{
@@ -1279,7 +1343,7 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 		// because of the close way it is tied to processing, exceptions will be raised if the file
 		// does not follow the same code-path through push and pop prior to processing.
 		m_pRecordMgr->push(task);
-		m_pRecordMgr->pop(task);
+		m_pRecordMgr->pop(task, false);
 
 		// Process the file
 		processTask(task, &threadData);
@@ -1486,9 +1550,49 @@ void CFileProcessingMgmtRole::processFiles2(ProcessingThreadData *pThreadData)
 
 		try
 		{
-			if (!m_pRecordMgr->pop(task))
+			// Check if there are any files available right now.
+			bool bProcessingActive;
+			if (!m_pRecordMgr->pop(task, false, &bProcessingActive))
 			{
-				return;
+				// If not, and processing is no longer active, end the processing loop.
+				if (!bProcessingActive)
+				{
+					return;
+				}
+
+				UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipExecutor =
+					pThreadData->m_ipTaskExecutor;
+				ASSERT_RESOURCE_ALLOCATION("ELI33925", ipExecutor != __nullptr);
+
+				StandbyThread *pStandbyThread =
+					new StandbyThread(m_eventManualStopProcessing, ipExecutor);
+
+				// If waiting for the next file to be queued, initialize a standby thread to notify
+				// the file processing tasks to standby.
+				bool bGotFile = false;
+
+				try
+				{
+					pStandbyThread->CreateThread();
+
+					bGotFile = m_pRecordMgr->pop(task, true);
+
+					// Call endStandby so that the standby the thread will exit when all tasks have
+					// responded to the standby call.
+					pStandbyThread->endStandby();
+				}
+				catch (...)
+				{
+					// Ensure endStandby is called even in the case of an exception.
+					pStandbyThread->endStandby();
+					throw;
+				}
+
+				// If we didn't get any files after waiting, processing has ended.
+				if (!bGotFile)
+				{
+					return;
+				}
 			}
 
 			// we now have a valid task that we need to process

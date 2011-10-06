@@ -69,9 +69,10 @@ public:
 		long* pnNumSteps, IProgressStatus* pProgressStatus);
 
 // IIDShieldProductDBMgr Methods
-	STDMETHOD(AddIDShieldData)(long lFileID, VARIANT_BOOL vbVerified, double lDuration, 
-		long lNumHCDataFound, long lNumMCDataFound,	long lNumLCDataFound, long lNumCluesDataFound, 
-		long lTotalRedactions, long lTotalManualRedactions, long lNumPagesAutoAdvanced);
+	STDMETHOD(AddIDShieldData)(long lFileID, VARIANT_BOOL vbVerified, double dDuration,
+		double dOverheadTime, long lNumHCDataFound, long lNumMCDataFound, long lNumLCDataFound,
+		long lNumCluesDataFound, long lTotalRedactions, long lTotalManualRedactions,
+		long lNumPagesAutoAdvanced);
 	STDMETHOD(put_FAMDB)(IFileProcessingDB* newVal);
 	STDMETHOD(GetResultsForQuery)(BSTR bstrQuery, _Recordset** ppVal);
 	STDMETHOD(GetFileID)(BSTR bstrFileName, long* plFileID);
@@ -112,9 +113,10 @@ private:
 	void validateLicense();
 
 	// Internal versions of external methods that may require database locking
-	bool AddIDShieldData_Internal(bool bDBLocked, long lFileID, VARIANT_BOOL vbVerified, double lDuration, 
-		long lNumHCDataFound, long lNumMCDataFound,	long lNumLCDataFound, long lNumCluesDataFound, 
-		long lTotalRedactions, long lTotalManualRedactions, long lNumPagesAutoAdvanced);
+	bool AddIDShieldData_Internal(bool bDBLocked, long lFileID, VARIANT_BOOL vbVerified,
+		double dDuration, double dOverheadTime, long lNumHCDataFound, long lNumMCDataFound,
+		long lNumLCDataFound, long lNumCluesDataFound, long lTotalRedactions,
+		long lTotalManualRedactions, long lNumPagesAutoAdvanced);
 
 	// Retrieves the set of SQL queries used to create the IDShield specific database tables.
 	const vector<string> getTableCreationQueries();

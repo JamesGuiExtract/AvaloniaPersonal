@@ -345,6 +345,21 @@ STDMETHODIMP CSleepTask::raw_Close()
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29590");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSleepTask::raw_Standby(VARIANT_BOOL* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{		
+		ASSERT_ARGUMENT("ELI33914", pVal != __nullptr);
+
+		*pVal = VARIANT_TRUE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33915");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IAccessRequired interface implementation

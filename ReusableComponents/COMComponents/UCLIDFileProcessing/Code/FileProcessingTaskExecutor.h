@@ -53,6 +53,8 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 	STDMETHOD(Close)();
 	STDMETHOD(GetCurrentTask)(IFileProcessingTask ** ppCurrentTask);
 	STDMETHOD(get_IsInitialized)(VARIANT_BOOL *pVal);
+	STDMETHOD(Standby)(VARIANT_BOOL *pVal);
+	STDMETHOD(EndStandby)();
 	
 // ISupportsErrorInfo
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
@@ -61,9 +63,10 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 
 private:
-	///////////
-	// Helper class
-	///////////
+	//////////////////
+	// Helper classes
+	//////////////////
+
 	// Represents a File processing task (decomposed from IObjectWithDescription)
 	class ProcessingTask
 	{
@@ -94,6 +97,38 @@ private:
 		}
 	};
 
+	// In the event that the pending queue is emptied but processing is configured to continue until
+	// the next document is queued, this class manages separate threads used to notify the processing
+	// threads to standby.
+	class StandbyThread : public CWinThread
+	{
+	public:
+		StandbyThread(Win32Event& eventCancelProcessing, ProcessingTask *pProcessingTask);
+		~StandbyThread();
+
+		// Initialized the instance
+		BOOL InitInstance();
+
+		// The main code for the standby thread.
+		int Run();
+
+		// This should be called to end standby if another file is supplied or if processing is
+		// stopped. After this call, the thread will no longer be able to signal for processing to
+		// stop.
+		// The thread will be guaranteed to remain alive until endStandby is called, but may end and
+		// self-delete at any time following this call.
+		void endStandby();
+
+		// The event that should be fired if one of the processing tasks requests for processing to
+		// stop.
+		Win32Event& m_eventCancelProcessing;
+
+		// m_eventStandbyEnded is signaled once the endStandby call is complete.
+		Win32Event m_eventStandbyEnded;
+
+		ProcessingTask *m_pProcessingTask;
+	};
+
 	///////////
 	//Variables
 	//////////
@@ -101,6 +136,10 @@ private:
 	Win32Event m_eventCancelRequested;
 	CMutex m_mutex;
 	CMutex m_mutexCurrentTask;
+
+	// Signaled if standby mode has ended and the executor should not longer wait on any standby
+	// calls that are blocking.
+	Win32Event m_eventEndStandby;
 
 	// List of tasks that will be used to process a file
 	vector<ProcessingTask> m_vecProcessingTasks;

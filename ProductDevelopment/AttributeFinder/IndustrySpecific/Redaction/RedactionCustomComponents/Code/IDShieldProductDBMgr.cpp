@@ -24,7 +24,7 @@ using namespace std;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long glIDShieldDBSchemaVersion = 3;
+const long glIDShieldDBSchemaVersion = 4;
 const string gstrID_SHIELD_SCHEMA_VERSION_NAME = "IDShieldSchemaVersion";
 static const string gstrSTORE_IDSHIELD_PROCESSING_HISTORY = "StoreIDShieldProcessingHistory";
 static const string gstrSTORE_HISTORY_DEFAULT_SETTING = "1"; // TRUE
@@ -56,6 +56,34 @@ int UpdateToSchemaVersion3(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31415");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion4(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 4;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("EXEC sp_rename 'dbo.IDShieldData.TotalDuration', 'OverheadTime', 'COLUMN'");
+		vecQueries.push_back("UPDATE [dbo].[IDShieldData] SET [OverheadTime] = 0");
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '4' WHERE [Name] = '" + 
+			gstrID_SHIELD_SCHEMA_VERSION_NAME + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33949");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -359,7 +387,12 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcess
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion3(ipConnection, pnNumSteps, NULL);
 					}
-			case 3: break;
+			case 3:	// The schema update from 3 to 4 needs to take place against FAM DB schema version 110
+					if (nFAMDBSchemaVersion == 110)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion4(ipConnection, pnNumSteps, NULL);
+					}
+			case 4: break;
 
 			default:
 				{
@@ -377,16 +410,16 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcess
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long lFileID, VARIANT_BOOL vbVerified, 
-		double lDuration, long lNumHCDataFound, long lNumMCDataFound, long lNumLCDataFound, 
-		long lNumCluesDataFound, long lTotalRedactions, long lTotalManualRedactions,
-		long lNumPagesAutoAdvanced)
+		double dDuration, double dOverheadTime, long lNumHCDataFound, long lNumMCDataFound,
+		long lNumLCDataFound, long lNumCluesDataFound, long lTotalRedactions,
+		long lTotalManualRedactions, long lNumPagesAutoAdvanced)
 {
 	try
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		if (!AddIDShieldData_Internal(false, lFileID, vbVerified, lDuration, lNumHCDataFound, 
-			lNumMCDataFound,	lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, 
+		if (!AddIDShieldData_Internal(false, lFileID, vbVerified, dDuration, dOverheadTime,
+			lNumHCDataFound, lNumMCDataFound, lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, 
 			lTotalManualRedactions, lNumPagesAutoAdvanced))
 		{
 			UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr ipThis;
@@ -396,9 +429,9 @@ STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long lFileID, VARIANT_BOOL v
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(ipThis, gstrMAIN_DB_LOCK);
 			
-			AddIDShieldData_Internal(true, lFileID, vbVerified, lDuration, lNumHCDataFound, 
-				lNumMCDataFound, lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, 
-				lTotalManualRedactions, lNumPagesAutoAdvanced);
+			AddIDShieldData_Internal(true, lFileID, vbVerified, dDuration, dOverheadTime,
+				lNumHCDataFound, lNumMCDataFound, lNumLCDataFound, lNumCluesDataFound,
+				lTotalRedactions, lTotalManualRedactions, lNumPagesAutoAdvanced);
 		}
 		return S_OK;
 	}
@@ -588,10 +621,10 @@ void CIDShieldProductDBMgr::validateIDShieldSchemaVersion(bool bThrowIfMissing)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-bool CIDShieldProductDBMgr::AddIDShieldData_Internal(bool bDBLocked, long lFileID, VARIANT_BOOL vbVerified, 
-		double lDuration, long lNumHCDataFound, long lNumMCDataFound, long lNumLCDataFound, 
-		long lNumCluesDataFound, long lTotalRedactions, long lTotalManualRedactions,
-		long lNumPagesAutoAdvanced)
+bool CIDShieldProductDBMgr::AddIDShieldData_Internal(bool bDBLocked, long lFileID,
+		VARIANT_BOOL vbVerified, double dDuration, double dOverheadTime, long lNumHCDataFound,
+		long lNumMCDataFound, long lNumLCDataFound, long lNumCluesDataFound, long lTotalRedactions,
+		long lTotalManualRedactions, long lNumPagesAutoAdvanced)
 {
 	try
 	{
@@ -617,33 +650,15 @@ bool CIDShieldProductDBMgr::AddIDShieldData_Internal(bool bDBLocked, long lFileI
 			string strFileId = asString(lFileID);
 			string strVerified = vbVerified == VARIANT_TRUE ? "1" : "0";
 
-			// -------------------------------------------
-			// Need to get the current TotalDuration value
-			// -------------------------------------------
-			double dTotalDuration = lDuration;
-			string strSql = "SELECT TOP 1 [TotalDuration] FROM IDShieldData WHERE [FileID] = "
-				+ strFileId + " AND [Verified] = " + strVerified + " ORDER BY [ID] DESC";
-
 			// Create a pointer to a recordset
 			_RecordsetPtr ipSet( __uuidof( Recordset ));
 			ASSERT_RESOURCE_ALLOCATION("ELI28069", ipSet != __nullptr );
 
-			// Open the recordset
-			ipSet->Open( strSql.c_str(), _variant_t((IDispatch *)ipConnection, true),
-				adOpenStatic, adLockReadOnly, adCmdText );
-
-			// If there is an entry, then get the total duration from it
-			if (ipSet->adoEOF == VARIANT_FALSE)
-			{
-				// Get the total duration from the datbase
-				dTotalDuration += getDoubleField(ipSet->Fields, "TotalDuration");
-			}
-
 			// Build insert SQL query 
 			string strInsertSQL = gstrINSERT_IDSHIELD_DATA_RCD + "(" + strFileId
 				+ ", " + strVerified + ", " + asString(nUserID) + ", "
-				+ asString(nMachineID) + ", GETDATE(), " + asString(lDuration)
-				+ ", " + asString(dTotalDuration) + ", " + asString(lNumHCDataFound) + ", "
+				+ asString(nMachineID) + ", GETDATE(), " + asString(dDuration)
+				+ ", " + asString(dOverheadTime) + ", " + asString(lNumHCDataFound) + ", "
 				+ asString(lNumMCDataFound) + ", " + asString(lNumLCDataFound) + ", "
 				+ asString(lNumCluesDataFound) + ", " + asString(lTotalRedactions) + ", "
 				+ asString(lTotalManualRedactions) + ", "
