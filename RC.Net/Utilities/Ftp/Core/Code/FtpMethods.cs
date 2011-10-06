@@ -114,26 +114,8 @@ namespace Extract.Utilities.Ftp
         {
             try
             {
-                // The FTP path should have / instead of \ so need to convert all / to \
-                remoteWorkingFolderBase = remoteWorkingFolderBase.Replace('\\', '/');
-                
-                // Defaulte the remote working folder to / if empty
-                if (string.IsNullOrEmpty(remoteWorkingFolderBase))
-                {
-                    remoteWorkingFolderBase = "/";
-                }
-
-                // add / to the end of remoteWorkingFolderBase if needed
-                if (remoteWorkingFolderBase.LastIndexOf('/') != remoteWorkingFolderBase.Length - 1)
-                {
-                    remoteWorkingFolderBase += "/";
-                }
-
-                // Need to fix up the remoteWorkingFolderBase - it may need to have a / added to the front
-                if (remoteWorkingFolderBase.Length > 0 && remoteWorkingFolderBase[0] != '/' )
-                {
-                    remoteWorkingFolderBase = "/" + remoteWorkingFolderBase;
-                }
+                remoteWorkingFolderBase = NormalizeRemotePath(remoteWorkingFolderBase);
+                currentRemoteWorkingFolder = NormalizeRemotePath(currentRemoteWorkingFolder);
 
                 // Generate the path so that the directory structure rooted to 
                 // the base local working folder will be the same as the 
@@ -167,6 +149,36 @@ namespace Extract.Utilities.Ftp
                 ee.AddDebugData("remoteWorkingFolderBase", remoteWorkingFolderBase, false);
                 throw ee;
             }
+        }
+
+        /// <summary>
+        /// Normalizes a remote path by ensuring it begins and ends with '/'
+        /// </summary>
+        /// <param name="remotePath">The remote path to normalize</param>
+        /// <returns>The normalized path.</returns>
+        static string NormalizeRemotePath(string remotePath)
+        {
+            // The FTP path should have / instead of \ so need to convert all / to \
+            remotePath = remotePath.Replace('\\', '/');
+
+            // Defaulte the remote working folder to / if empty
+            if (string.IsNullOrEmpty(remotePath))
+            {
+                remotePath = "/";
+            }
+
+            // add / to the end of remoteWorkingFolderBase if needed
+            if (remotePath.LastIndexOf('/') != remotePath.Length - 1)
+            {
+                remotePath += "/";
+            }
+
+            // Need to fix up the remoteWorkingFolderBase - it may need to have a / added to the front
+            if (remotePath.Length > 0 && remotePath[0] != '/')
+            {
+                remotePath = "/" + remotePath;
+            }
+            return remotePath;
         }
         
         #endregion
