@@ -845,58 +845,89 @@
         	<li>Tools - Manually set file processing priority</li>
         	<li>Tools - Export file list</li>
     	</ul></li>
-    	<li>Confirm that a radio button exists for <b>All files referenced in the database</b>.</li>
-    	<li>Confirm that this is the default selection.</li>
+    	<li>Confirm that a <b>Limit the selected files using:</b> combo box exists.</li>
+	<ul>
+    		<li>Action status condition.</li>
+    		<li>Priority condition.</li>
+    		<li>Query condition.</li>
+    		<li>Tag condition.</li>
+	</ul>
+	<li>Confirm that a list box exists that will display the defined conditions.
+	<li>Confirm that <b>And</b> and <b>Or</b> radio buttons are defined to specify 
+	the logical operator between conditions.
+	<li>Confirm that an <b>Add...</b> button exists and is always enabled.
+	<li>Confirm that a <b>Modify...</b> button exists and is only enabled when a single 
+	condition is selected.
+	<li>Confirm that a <b>Delete</b> button exists and is only enabled when one or more 
+	conditions are selected.
 <p>
-    	<li>Confirm that a radio button exists for <b>All files for which</b>.</li>
-    	<li>Confirm that an associated combo box exists for selection of an <b>Action</b>.</li>
-    	<li>Confirm that an associated combo box exists for selection of a <b>Status</b>.</li>
-    	<li>Confirm that an associated combo box exists for selection of a <b>user</b>.</li>
-    	<li>Confirm that the first two combo boxes are always enabled when the radio button is 
-    	selected.</li>
-    	<li>Confirm that the third combo box is only enabled when the radio button is selected and 
-	when <b>Status = Skipped</b>.</li>
-    	<li>Confirm that the <b>Action</b> combo box contains one entry for each defined action.</li>
-    	<li>Confirm that the <b>Status</b> combo box contains the following entries:
-    	<ul>
-        	<li>Unattempted</li>
-        	<li>Pending</li>
-        	<li>Processing</li>
-        	<li>Completed</li>
-        	<li>Failed</li>
-        	<li>Skipped</li>
-    	</ul></li>
+    	<li><u>Add... button</u>
+	<ul>
+    		<li>Confirm that for <b>Action status condition</b>, an <b>Action status 
+		condition</b> dialog is displayed.</li>
+		<li>Confirm that an <b>Action</b> combo box is defined.
+		<li>Confirm that the combo box is populated with each action defined in the 
+		database.
+	    	<li>Confirm that a combo box exists for selection of a <b>Status</b>.</li>
+	    	<ul>
+        		<li>Unattempted</li>
+        		<li>Pending</li>
+	        	<li>Processing</li>
+        		<li>Completed</li>
+        		<li>Failed</li>
+	        	<li>Skipped</li>
+    		</ul></li>
+	    	<li>Confirm that the first two combo boxes are always enabled.</li>
+	    	<li>Confirm that a third <b>By</b> combo box is only enabled when 
+		<b>Status = Skipped</b>.</li>
+		<li>Confirm that the result is displayed in the list box with appropriate 
+		text inserted around the action and the status.
 <p>
-    	<li>Confirm that a radio button exists for <b>All files associated with</b>.</li>
-    	<li>Confirm that an associated combo box exists for selection of one of the following:
-    	<ul>
-        	<li>Any</li>
-        	<li>All</li>
-        	<li>None</li>
-    	</ul></li>
-    	<li>Confirm that an associated list box exists for selection of one or more <b>Tag 
-    	names</b>.</li>
-    	<li>Confirm that the combo box and list box are each only enabled when the radio button is 
-    	selected.</li>
+    		<li>Confirm that for <b>Priority condition</b>, a <b>Priority 
+		condition</b> dialog is displayed.</li>
+		<li>Confirm that a <b>Select all the files that have the file processing 
+		priority of</b> combo box is defined.
+	    	<ul>
+        		<li>Low</li>
+        		<li>Below Normal</li>
+	        	<li>Normal</li>
+        		<li>Above Normal</li>
+        		<li>High</li>
+    		</ul></li>
+		<li>Confirm that the result is displayed in the list box with appropriate 
+		text inserted before the priority.
 <p>
-    	<li>Confirm that a radio button exists for <b>All files that result from this SQL 
-    	query</b>.</li>
-    	<li>Confirm that an associated multi-line edit box exists for definition of the query.</li>
-    	<li>Confirm that a <b>SELECT FAMFile.ID FROM</b> label exists above the edit box.</li>
-    	<li>Confirm that the edit box is only enabled when the radio button is selected.</li>
+    		<li>Confirm that for <b>Query condition</b>, a <b>Query 
+		condition</b> dialog is displayed.</li>
+		<li>Confirm that a <b>SELECT FAMFile.FileName FROM FAMFile</b> multi-line edit 
+		box is defined.  Note that if the <b>Select Files</b> dialog is created via 
+		<b>Tools - Manually set action status</b>, the label above the edit box is 
+		<b>SELECT FAMFile.ID FROM FAMFile</b>. 
+		<li>Confirm that the result is displayed in the list box with appropriate 
+		text inserted before the query.
 <p>
-    	<li>Confirm that a radio button exists for <b>All files that have the file processing priority
-    	of</b>.</li>
-    	<li>Confirm that an associated combo box exists for selection of one of the following:
-    	<ul>
-        	<li>Low</li>
-        	<li>Below Normal</li>
-        	<li>Normal</li>
-        	<li>Above Normal</li>
-        	<li>High</li>
-    	</ul></li>
-    	<li>Confirm that the default combo box selection is <b>Low</b>.</li>
-    	<li>Confirm that the combo box is only enabled when the radio button is selected.</li>
+    		<li>Confirm that for <b>Tag condition</b>, a <b>Tag condition</b> dialog 
+		is displayed.</li>
+		<li>Confirm that a combo box is defined for <b>Any</b>, <b>All</b>, or 
+		<b>None</b> of the following tags.
+		<li>Confirm that <b>Any</b> is the default.
+		<li>Confirm that a list box is provided containing a checkable collection 
+		of tags defined in the database.
+		<li>Confirm that the result is displayed in the list box with appropriate 
+		text inserted before the selected tag or tags.
+	</ul>
+<p>
+    	<li><u>Modify button</u>
+	<ul>
+		<li>Confirm that an appropriate property page is displayed to modify the 
+		selected condition.
+		<li>Confirm that the modified condition is displayed in the list box.
+	</ul>
+<p>
+    	<li><u>Delete button</u>
+	<ul>
+		<li>Confirm that one or more selected conditions are deleted from the list.
+	</ul>
 <p>
     	<li>Confirm that a group box exists for <b>Random subset selection</b>.</li>
     	<li>Confirm that the group box contains a check box for <b>Further narrow the above selected
