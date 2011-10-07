@@ -37,10 +37,34 @@
         <li><b>X</b> button ignores changes and exits the dialog.
     </ul>
 <p>
-    <li><h2>Conditionally modify attribute</h2>
-    <ul>
-        <li>See <b>Ruleset Editor - Document Preprocessor - Other</b> checklist.
-    </ul>
+    	<li><h2>Conditionally modify attribute</h2>
+    	<ul>
+        	<li>See <b>Ruleset Editor - Document Preprocessor - Other</b> checklist.
+    	</ul>
+<p>
+	<li><h2>Extract OCR text in image area</h2>
+	<ul>
+            	<li>Confirm that <b>Extract OCR text in image area</b> is available
+            	in the list of attribute modifiers.</li>
+<p>
+            	<li>Select the attribute modifier and open the property page.</li>
+            	<li>Confirm that the title bar includes appropriate text.</li>
+            	<li>Confirm that there is an <b>OCR source</b> group box containing
+            	radio buttons for <b>Original image</b> and <b>Document context
+            	passed to this rule object</b>.</li>
+            	<li>Confirm that there is an <b>Area of extraction</b> group box
+            	containing radio buttons for <b>Use the overall bounds of the
+            	attribute</b> and <b>Use each raster zone separately</b>.</li>
+            	<li>Confirm that there is a <b>Text to extract</b> group box with
+            	two combo boxes.
+            	<ul>
+                	<li>One has the options <b>include</b> and <b>exclude</b></li>
+                	<li>One has the options <b>characters</b>, <b>words</b>, and
+                	<b>lines</b></li>
+            	</ul></li>
+<p>
+            	<li>Confirm that each of the options works correctly.</li>
+	</ul></li>
 <p>
     <li><h2>Extract or remove leftmost characters</h2>
     <ul>
@@ -186,7 +210,7 @@
 		<li>Confirm proper behavior <b>expanding</b> a sequence.
 		<li>Confirm proper behavior <b>contracting</b> a sequence.
 <p>
-  	   	<LI><b>[FlexIDSCore #4844]</b> Errors
+  	   	<LI><b>[FlexIDSCore #4844, #4848]</b> Errors
         	<ul>
             		<li>Create an RSD file that uses the <b>Numeric Sequence Expander</b> 
 			value modifier.
@@ -195,7 +219,11 @@
 				<li>7,7,7
 				<li>11,220,11,11,75
 			</ul>
-        	</ul>
+<p>
+            		<li>Contract the following sequence in descending order while
+            		eliminating duplicates: <b>11,222,3232,223,224,222,31,221,222</b></li>
+            		<li>Confirm that the result is: <b>3232,224-221,31,11</b></li>
+        	</ul></li>
     	</ul>
 <p>
     	<li><h2>OCR image area</h2>
