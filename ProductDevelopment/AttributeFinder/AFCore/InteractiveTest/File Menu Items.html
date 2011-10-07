@@ -75,6 +75,31 @@
         	been saved.</li>
         	<li><b>CTRL+S</b> saves changes to the file.</li>
         	<li><b>CTRL+S</b> opens <b>Save As</b> dialog if file has never been saved.</li>
+    <p>
+		<li><b>[FlexIDSCore #4865]</b> Rule Set Profiling
+        	<ul>
+            		<li>Create an RSD file Test.rsd that will find some data.</li>
+            		<li>Create a Master.rsd file that calls Test.rsd.</li>
+            		<li>Copy and paste Test.rsd and edit Master.rsd to also call the
+            		copy.</li>
+            		<li>Run Master.rsd while profiling and confirm that the profiler is
+            		unable to distinguish the rules in the original and the copy.</li>
+            		<li>Open the copy in the ruleset editor and save without making
+            		any changes.</li>
+            		<li>Run Master.rsd again while profiling and confirm that the
+            		profiler <b>is</b> able to distinguish between them.</li>
+        	</ul></li>
+<p>
+		<li><b>[FlexIDSCore #4872]</b>
+        	<ul>
+            		<li>Open a new instance of the ruleset editor and set up a rule
+            		that will find something. Save the file.</li>
+            		<li>Open the rule tester and confirm that the rule works.</li>
+            		<li>Uncheck the box for the rule and run again. Confirm that the
+            		rule doesn't run and no data are found.</li>
+            		<li>Save again and reopen the RSD file. Confirm that the rule is
+            		still unchecked.</li>
+        	</ul></li>
     	</ul>
     	<h2>Save As</h2>
     	<ul>
