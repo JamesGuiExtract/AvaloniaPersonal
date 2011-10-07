@@ -1,0 +1,173 @@
+<html>
+<HEAD>
+<TITLE>Attribute Selectors Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+ 
+<body>
+<h1>Ruleset Editor - Attribute Selectors<br>
+    <IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<ol>
+	<li><h2>Data scorer based attribute selector</h2>
+	<ul>
+		<li>Confirm that the <b>Configure</b> button is active.</li>
+		<li>Confirm that the property page caption is correct.</li>
+		<li>Confirm that a combo box is provided allowing specification of 
+		attributes whose data score is</li>
+		<ul>
+			<li><b>=</b>
+			<li><b>!=</b>
+			<li><b>&lt;</b>
+			<li><b>&gt;</b>
+			<li><b>&lt;=</b>
+			<li><b>&gt;=</b>
+		</ul>
+		<li>Confirm that an edit box is provided allowing specification of a 
+		data score.
+		<li>Confirm that the default score is <b>0</b>.
+		<li>Confirm that a check box is provided allowing specification of an 
+		additional data score.
+		<li>Confirm that two combo boxes and an edit box are associated with the 
+		check box.
+		<li>Confirm that the associated controls are enabled only when the check 
+		box is checked.
+		<li>Confirm that the first combo box provides the choice of <b>and</b> 
+		or <b>or</b> as a logical operator.
+		<liConfirm that the second combo box provides the same <b>&lt;</b>, 
+		<b>&gt;</b>, <b>=</b>, etc as the above combo box.
+		<li>Confirm that the default data score for the second score definition is 
+		<b>0</b>.
+		<li>Confirm that a read-only edit box and an associated <b>Commands &gt;</b> 
+		button are provided allowing specification of a data scorer.
+		<li>Confirm that the following data scorers are available.
+		<ul>
+			<li><b>&lt;None&gt;</b>
+			<li>Character confidence data scorer
+			<li>Entity name data scorer
+			<li>RSD data scorer
+		</ul>
+		<li>Confirm that the description and name of the selected data scorer is 
+		displayed in the read-only edit box.
+	</ul>
+	</li>
+<p>
+	<li><h2>Multiple criteria attribute selector</h2>
+	<ul>
+		<li>Confirm that the <b>Configure</b> button is active.</li>
+		<li>Confirm that the property page caption is correct.</li>
+		<li>Confirm that a <b>Select attributes using the following selectors</b> 
+		group box is defined.
+		<li>Confirm that a list box is defined with the following columns
+		<ul>
+			<li>On
+			<li>Not
+			<li>Selector
+		</ul>
+		<li>Confirm that an <b>Insert</b> button is defined.
+		<li>Confirm that an <b>Delete</b> button is defined.
+		<li>Confirm that an <b>Commands &gt;</b> button is defined.
+		<li>Confirm that only the <b>Insert</b> button is enabled by default.
+		<li>Confirm that <b>And</b> and <b>Or</b> radio buttons are defined.
+		<li>Confirm that the <b>And</b> radio button is selected by default.
+		<li>Confirm that clicking the <b>Insert</b> button displays a 
+		<b>Select Attribute selector</b> dialog.
+		<li>Confirm that the selected object is added to the list box.
+		<li>Confirm that added selectors are <b>On</b> by default.
+		<li>Confirm that the <b>Delete</b> and <b>Commands &gt;</b> buttons are 
+		only enabled when the list is not empty and an item is selected.
+		<li>Confirm that the <b>On</b> and <b>Not</b> settings are persistent.
+<p>
+		<li>Test one or more complex attribute selection definitions and confirm 
+		that each works as expected.
+	</ul>
+	</li>
+<p>
+	<li><h2>Query attribute selector</h2>
+	<ul>
+		<li>Confirm that the <b>Configure</b> button is active.</li>
+		<li>Confirm that the property page caption is correct.</li>
+		<li>Confirm that a <b>Query the attributes to select:</b> edit box is 
+		provided.
+		<li>Confirm that settings are persistent.
+	</ul>
+	</li>
+<p>
+	<li><h2>Spatial content attribute selector</h2>
+	<ul>
+		<li>Confirm that the <b>Configure</b> button is active.</li>
+		<li>Confirm that the property page caption is correct.</li>
+		<li>Confirm that a combo box is defined for spatial zones that 
+		<b>contain</b> or <b>do not contain</b> the following.
+		<li>Confirm that an edit box is provided to specify the 
+		<b>Consecutive rows of pixels with a minimum of</b>.
+		<li>Confirm that an edit box is provided to specify the 
+		<b>Percent black pixels and a maximum of</b>
+		<li>Confirm that an edit box is provided to specify the 
+		<b>Percent black pixels</b>
+		<li>Confirm that the minimum setting cannot be greater than the 
+		maximum setting.
+		<li>Confirm that a check box is provided for <b>Attributes without 
+		spatial information should be included in selection</b>.
+	</ul>
+	</li>
+<p>
+	<li><h2>Spatial proximity attribute selector</h2>
+	<ul>
+		<li>Confirm that the <b>Configure</b> button is active.</li>
+		<li>Confirm that the property page caption is correct.</li>
+		<li>Confirm that a <b>Select attributes matching this query</b> edit 
+		box is provided.
+		<li>Confirm that a combo box is provided allowing attributes to 
+		<b>overlap with</b> or <b>are completely contained in</b> or 
+		<b>completely contain</b> a region based on a reference attribute.
+		<li>Confirm that another edit box is provided allowing specification 
+		of the reference attribute.
+		<li>Confirm that group boxes are defined to define edges of the region
+		<ul>
+			<li>TOP
+			<li>LEFT
+			<li>RIGHT
+			<li>BOTTOM
+		</ul>
+		<li>Confirm that each group box contains the following controls
+		<ul>
+			<li>a combo box with <b>top</b> and <b>bottom</b> or <b>left</b> 
+			and <b>right</b>.
+			<li>a combo box with <b>reference attribute</b> or <b>page</b>.
+			<li>a combo box with <b>up</b> and <b>down</b> or <b>left</b> 
+			and <b>right</b>.
+			<li>an edit box with a default of <b>0.0</b>.
+			<li>a combo box with <b>inches</b> or <b>lines</b>.
+		</ul>
+		<li>Confirm that attributes can be selected using one of two radio buttons
+		<ul>
+			<li>each line of the attributes separately
+			<li>the overall bounds of each attribute
+		</ul>
+		<li>Confirm that an <b>Add defined regions as sub-attributes, but do not select 
+		any attributes the regions contain. (debug)</b> check box is defined.
+	</ul>
+	</li>
+<p>
+	<li><h2>Value condition selector</h2>
+	<ul>
+		<li>Confirm that the <b>Configure</b> button is active.</li>
+		<li>Confirm that the property page caption is correct.</li>
+            	<li>Confirm that it allows you to select attributes based on their
+            	values.</li>
+            	<li>Confirm that each of the available conditions works as 
+            	expected.</li>
+		<ul>
+			<li>Character confidence condition
+			<li>Document type condition
+			<li>Finding rule condition
+			<li>RSD file condition
+		</ul>
+	</ul>
+	</li>
+</ol>
+</body>
+</html>
