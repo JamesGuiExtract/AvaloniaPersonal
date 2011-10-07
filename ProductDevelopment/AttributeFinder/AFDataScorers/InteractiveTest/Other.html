@@ -1,0 +1,60 @@
+<html>
+<HEAD>
+<TITLE>Data Scorers Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+ 
+<body>
+<h1>Ruleset Editor - Data Scorers<br>
+    <IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<ol>
+	<li><h2>&lt;None&gt;</h2>
+	<ul>
+		<li>Confirm that the <b>Configure</b> button is inactive.</li>
+		<li>Confirm that the <b>Data Scorer description</b> edit box is inactive.</li>
+		<li>Confirm that selecting this data scorer clears any previously defined 
+		data scorer.
+	</ul>
+	</li>
+<p>
+	<li><h2>Character confidence data scorer</h2>
+	<ul>
+		<li>Confirm that the <b>Configure</b> button is active.</li>
+		<li>Confirm that the property page caption is correct.</li>
+		<li>Confirm that a combo box is provided allowing specification of confidence 
+		as the data score
+		<ul>
+			<li>average (default)
+			<li>minimum
+			<li>maximum
+		</ul>
+	</ul>
+	</li>
+<p>
+	<li><h2>Entity name data scorer</h2>
+	<ul>
+		<li>Confirm that the <b>Configure</b> button is inactive.</li>
+	</ul>
+	</li>
+<p>
+	<li><h2>RSD data scorer</h2>
+	<ul>
+		<li>Confirm that the <b>Configure</b> button is active.</li>
+		<li>Confirm that the property page caption is correct.</li>
+		<li>Confirm that the <b>RSD file name</b> group box includes an edit 
+		box, a tag selector button, and a browse button allowing specification 
+		of an RSD file to be used as a data scorer.
+		<li>Confirm that the <b>Score generation expression</b> group box includes 
+		a multi-line edit box allowing specification of an expression.
+		<li>Confirm that the default expression is <b>#ScorePart.sum()</b>.
+		<li>Confirm that a balloon help icon is provided.
+		<li>Confirm that the balloon help provides meaningful information and 
+		examples about expression evaluation.
+	</ul>
+	</li>
+</ol>
+</body>
+</html>
