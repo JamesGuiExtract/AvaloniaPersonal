@@ -623,39 +623,46 @@
         <li>See <b>Value Modifiers - Replace Strings</b>
     </ul>
 <p>
-    <li><h2>Run Object On Query</h2>
-    <ul>
-        <li><b>Select Attributes</b> edit box is editable.</li>
-        <li><b>Select a type of object</b> combo box is selectable.
-        <ul>
-            <li><b>Output Handlers</b> is listed.</li>
-            <li><b>Attribute Modifier</b> is listed.</li>
-            <li><b>Attribute Splitter</b> is listed.</li>
-        </ul>
-        <li><b>Select an object to run on the selected attributes</b> combo box is selectable.
-        <ul>
-            <li>Output Handlers, Attribute Modifiers, and Attribute Splitters are listed depending
-            on above combo box.</li>
-        </ul>
-        <li><b>Configure</b> button displays corresponding dialog.
-    <p>
-        <LI><b>[FlexIDSCore #3658]</b>
-        <!-- fixed v 8.1.0.7 -->
-	    <ul>
-            <li>Confirm that the following output handlers work properly when run only on
-            certain attributes specified via a Run object on query output handler.
-            <ul>
-                <li>Move and modify attributes
-                <li>Merge attributes
-                <li>Remove attributes
-                <li>Eliminate duplicates
-                <li>Remove entries from list
-                <li>Remove invalid entries
-            </ul>
-            <li>Ensure that the above output handlers are testing using all possible attribute
-            selectors.
-	    </ul>
-    </ul>
+    	<li><h2>Run Object On Attributes</h2>
+    	<ul>
+        	<li><b>Select Attributes</b> edit box is editable.</li>
+        	<li><b>Select a type of object</b> combo box is selectable.
+        	<ul>
+            		<li><b>Output Handlers</b> is listed.</li>
+            		<li><b>Attribute Modifier</b> is listed.</li>
+            		<li><b>Attribute Splitter</b> is listed.</li>
+        	</ul>
+            	<li>Confirm that there is now a checkbox after the query box to
+            	<b>further narrow the attributes</b>.</li>
+            	<li>Confirm that the checkbox enables a dropdown to choose an
+            	attribute selector.</li>
+            	<li>Confirm that an object can be run on a subattribute.</li>
+            	<li>Confirm that each of the selectors works as expected.</li>
+        	<li><b>Select an object to run on the selected attributes</b> combo box is selectable.
+        	<ul>
+            		<li>Output Handlers, Attribute Modifiers, and Attribute Splitters are 
+			listed depending on above combo box.</li>
+        	</ul>
+        	<li><b>Configure</b> button displays corresponding dialog.
+<p>
+        	<LI><b>[FlexIDSCore #3658]</b>
+        	<!-- fixed v 8.1.0.7 -->
+	    	<ul>
+            		<li>Confirm that the following output handlers work properly when run 
+			only on certain attributes specified via a Run object on attributes output 
+			handler.
+            		<ul>
+                		<li>Move and modify attributes
+                		<li>Merge attributes
+                		<li>Remove attributes
+                		<li>Eliminate duplicates
+                		<li>Remove entries from list
+                		<li>Remove invalid entries
+            		</ul>
+            		<li>Ensure that the above output handlers are testing using all possible 
+			attribute selectors.
+	    	</ul>
+    	</ul>
 <p>
     <li><h2>Select Multiple Output Handlers</h2>
     <ul>
