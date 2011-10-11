@@ -82,7 +82,8 @@ public:
 	STDMETHOD(raw_CopyFrom)(IUnknown * pObject);
 
 	// IFileSupplier Methods
-	STDMETHOD(raw_Start)(IFileSupplierTarget * pTarget, IFAMTagManager *pFAMTM);
+	STDMETHOD(raw_Start)(IFileSupplierTarget * pTarget, IFAMTagManager *pFAMTM,
+		IFileProcessingDB* pDB, long nActionID);
 	STDMETHOD(raw_Stop)();
 	STDMETHOD(raw_Pause)();
 	STDMETHOD(raw_Resume)();

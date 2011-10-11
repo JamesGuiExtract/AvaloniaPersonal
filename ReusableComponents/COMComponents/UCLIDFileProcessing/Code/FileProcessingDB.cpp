@@ -2437,6 +2437,30 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSettings(IStrToStrMap* pSettings, long*
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31912");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::RecordFTPEvent(long nFileId, long nActionID,
+	VARIANT_BOOL vbQueueing, EFTPAction eFTPAction, BSTR bstrServerAddress,
+	BSTR bstrUserName, BSTR bstrArg1, BSTR bstrArg2, long nRetries, BSTR bstrException)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!RecordFTPEvent_Internal(false, nFileId, nActionID, vbQueueing, eFTPAction,
+				bstrServerAddress, bstrUserName, bstrArg1, bstrArg2, nRetries, bstrException))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+			RecordFTPEvent_Internal(true, nFileId, nActionID, vbQueueing, eFTPAction, bstrServerAddress,
+				bstrUserName, bstrArg1, bstrArg2, nRetries, bstrException);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33988");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

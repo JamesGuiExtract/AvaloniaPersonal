@@ -795,9 +795,6 @@ void CUEXViewerDlg::OnEditPaste()
 				iPos = strText.find_first_of( "\r\n" );
 			}
 
-			// Prepend commas to text to represent a line of text from a UEX file
-			strText = string( ",,,,,," ) + strText;
-
 			// Parse the text and add record to list
 			parseLine( strText );
 
@@ -1792,8 +1789,16 @@ bool CUEXViewerDlg::parseLine(const string& strText)
 
 		// Step through tokens and add item to list
 		unsigned long ulCount = vecTokens.size();
-		string	strToken;
 
+		// If there are no commas in the supplied line, prepend commas to text to represent a line
+		// of text from a UEX file
+		if (ulCount == 1)
+		{
+			s.parse(string( ",,,,,," ) + strText, vecTokens);
+			ulCount = vecTokens.size();
+		}
+
+		string	strToken;
 		long lTime = 0;
 
 		// Only parse lines with expected number of tokens

@@ -1013,6 +1013,11 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_DB_INFO_HISTORY_FAMUSER_FK);
 		vecQueries.push_back(gstrADD_DB_INFO_HISTORY_MACHINE_FK);
 		vecQueries.push_back(gstrADD_DB_INFO_HISTORY_DB_INFO_FK);
+		vecQueries.push_back(gstrADD_FTP_EVENT_HISTORY_FTP_ACCOUNT_FK);
+		vecQueries.push_back(gstrADD_FTP_EVENT_HISTORY_FAM_FILE_FK);
+		vecQueries.push_back(gstrADD_FTP_EVENT_HISTORY_ACTION_FK);
+		vecQueries.push_back(gstrADD_FTP_EVENT_HISTORY_MACHINE_FK);
+		vecQueries.push_back(gstrADD_FTP_EVENT_HISTORY_FAM_USER_FK);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -1061,6 +1066,8 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_SOURCE_DOC_CHANGE_HISTORY);
 	vecQueries.push_back(gstrCREATE_DOC_TAG_HISTORY_TABLE);
 	vecQueries.push_back(gstrCREATE_DB_INFO_CHANGE_HISTORY_TABLE);
+	vecQueries.push_back(gstrCREATE_FTP_ACCOUNT);
+	vecQueries.push_back(gstrCREATE_FTP_EVENT_HISTORY_TABLE);
 
 	return vecQueries;
 }
@@ -1162,6 +1169,7 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrSTORE_DB_INFO_HISTORY] = "1";
 	mapDefaultValues[gstrMIN_SLEEP_BETWEEN_DB_CHECKS] = asString(gnDEFAULT_MIN_SLEEP_TIME_BETWEEN_DB_CHECK);
 	mapDefaultValues[gstrMAX_SLEEP_BETWEEN_DB_CHECKS] = asString(gnDEFAULT_MAX_SLEEP_TIME_BETWEEN_DB_CHECK);
+	mapDefaultValues[gstrSTORE_FTP_EVENT_HISTORY] = "1";
 	try
 	{
 		mapDefaultValues[gstrLAST_DB_INFO_CHANGE] = getSQLServerDateTime(getDBConnection());
@@ -2101,6 +2109,8 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrSOURCE_DOC_CHANGE_HISTORY);
 	vecTables.push_back(gstrDOC_TAG_HISTORY);
 	vecTables.push_back(gstrDB_INFO_HISTORY);
+	vecTables.push_back(gstrDB_FTP_ACCOUNT);
+	vecTables.push_back(gstrDB_FTP_EVENT_HISTORY);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)
@@ -2352,6 +2362,12 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 							_lastCodePos = "280";
 
 							m_bStoreDocTagHistory = getStringField(ipFields, "Value") == "1";
+						}
+						else if (strValue == gstrSTORE_FTP_EVENT_HISTORY)
+						{
+							_lastCodePos = "290";
+
+							m_bStoreFTPEventHistory = getStringField(ipFields, "Value") == "1";
 						}
 					}
 					else if (ipField->Name == _bstr_t("FAMDBSchemaVersion"))
@@ -3700,6 +3716,47 @@ void CFileProcessingDB::assertProcessingNotActiveForAnyAction(bool bDBLocked)
 			ue.addDebugInfo("First UPI", strUPI.c_str());
 		}
 		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::assertNotActiveBeforeSchemaUpdate()
+{
+	_ConnectionPtr ipConnection = getDBConnection();
+	
+	// In schema versions < 110, the ProcessingFAM table will contain the processing FAMs
+	if (doesTableExist(ipConnection, gstrPROCESSING_FAM))
+	{
+		_RecordsetPtr ipProcessingFAMCount(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI33958", ipProcessingFAMCount != __nullptr);
+
+		ipProcessingFAMCount->Open("SELECT COUNT(*) AS FAMCOUNT FROM [ProcessingFAM]",
+			_variant_t((IDispatch *)ipConnection, true), adOpenDynamic, adLockOptimistic, adCmdText);
+
+		ipProcessingFAMCount->MoveFirst();
+		long nRowCount = getLongField(ipProcessingFAMCount->Fields, "FAMCOUNT");
+		if (nRowCount > 0)
+		{
+			throw UCLIDException("ELI33959", "Unable to update database since at least one instance "
+				"of File Action Manager is currently processing files in the database");
+		}
+	}
+	// In schema versions >= 110, the ActiveFAM table will contain any active FAMs (processing,
+	// queuing, or just displaying stats)
+	else if (doesTableExist(ipConnection, gstrACTIVE_FAM))
+	{
+		_RecordsetPtr ipProcessingFAMCount(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI33960", ipProcessingFAMCount != __nullptr);
+
+		ipProcessingFAMCount->Open("SELECT COUNT(*) AS FAMCOUNT FROM [dbo].[ActiveFAM]",
+			_variant_t((IDispatch *)ipConnection, true), adOpenDynamic, adLockOptimistic, adCmdText);
+
+		ipProcessingFAMCount->MoveFirst();
+		long nRowCount = getLongField(ipProcessingFAMCount->Fields, "FAMCOUNT");
+		if (nRowCount > 0)
+		{
+			throw UCLIDException("ELI33961", "Unable to update database since at least one instance "
+				"of File Action Manager is active in the database");
+		}
 	}
 }
 //-------------------------------------------------------------------------------------------------

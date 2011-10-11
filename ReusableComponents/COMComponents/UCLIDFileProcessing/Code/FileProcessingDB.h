@@ -60,6 +60,8 @@ static const string gstrFILE_ACTION_STATUS = "FileActionStatus";
 static const string gstrSOURCE_DOC_CHANGE_HISTORY = "SourceDocChangeHistory";
 static const string gstrDOC_TAG_HISTORY = "DocTagHistory";
 static const string gstrDB_INFO_HISTORY = "DBInfoChangeHistory";
+static const string gstrDB_FTP_ACCOUNT = "FTPAccount";
+static const string gstrDB_FTP_EVENT_HISTORY = "FTPEventHistory";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
@@ -213,6 +215,9 @@ public:
 	STDMETHOD(RenameFile)(IFileRecord* pFileRecord, BSTR bstrNewName);
 	STDMETHOD(get_DBInfoSettings)(IStrToStrMap** ppSettings);
 	STDMETHOD(SetDBInfoSettings)(IStrToStrMap* pSettings, long* plNumUpdatedRows);
+	STDMETHOD(RecordFTPEvent)(long nFileId, long nActionID, VARIANT_BOOL vbQueueing,
+		EFTPAction eFTPAction, BSTR bstrServerAddress, BSTR bstrUserName, BSTR bstrArg1,
+		BSTR bstrArg2, long nRetries, BSTR bstrException);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -362,6 +367,9 @@ private:
 	// Flag indicating whether to store doc tag history
 	bool m_bStoreDocTagHistory;
 
+	// Flag indicating whether to store FTP event history
+	bool m_bStoreFTPEventHistory;
+
 	IMiscUtilsPtr m_ipMiscUtils;
 
 	// Events used for the LastPingThread
@@ -398,6 +406,10 @@ private:
 	//		bDBLocked - indicates if the database is locked, this is needed because the auto revert
 	//		requires the database to be locked.
 	void assertProcessingNotActiveForAnyAction(bool bDBLocked);
+
+	// Ensures that there are no entries in the ProcessingFAM (for schema versions < 110) or the
+	// ActiveFAM table (for schema versions >= 110) before allowing a schema update.
+	void assertNotActiveBeforeSchemaUpdate();
 
 	// PROMISE: returns a pointer to a new FileRecord object filled from ipFields
 	UCLID_FILEPROCESSINGLib::IFileRecordPtr getFileRecordFromFields(const FieldsPtr& ipFields,
@@ -884,6 +896,9 @@ private:
 	bool get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap** ppSettings);
 	bool SetDBInfoSettings_Internal(bool bDBLocked, bool bUpdateHistory,
 		vector<string> vecQueries, long& nNumRowsUpdated);
+	bool RecordFTPEvent_Internal(bool bDBLocked, long nFileId, long nActionID,
+		VARIANT_BOOL vbQueueing, EFTPAction eFTPAction, BSTR bstrServerAddress,
+		BSTR bstrUserName, BSTR bstrArg1, BSTR bstrArg2, long nRetries, BSTR bstrException);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

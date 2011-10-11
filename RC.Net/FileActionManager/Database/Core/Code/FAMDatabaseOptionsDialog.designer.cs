@@ -74,6 +74,7 @@
             this._buttonCancel = new System.Windows.Forms.Button();
             this._buttonOK = new System.Windows.Forms.Button();
             this._buttonRefresh = new System.Windows.Forms.Button();
+            this._checkStoreFTPEventHistory = new System.Windows.Forms.CheckBox();
             label2 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -324,6 +325,7 @@
             // 
             // _tabHistory
             // 
+            this._tabHistory.Controls.Add(this._checkStoreFTPEventHistory);
             this._tabHistory.Controls.Add(this._checkStoreDBSettingsChangeHistory);
             this._tabHistory.Controls.Add(this._checkStoreDocTagHistory);
             this._tabHistory.Controls.Add(this._upDownInputEventHistory);
@@ -625,6 +627,16 @@
             this._buttonRefresh.UseVisualStyleBackColor = true;
             this._buttonRefresh.Click += new System.EventHandler(this.HandleRefreshDialog);
             // 
+            // _checkStoreFTPEventHistory
+            // 
+            this._checkStoreFTPEventHistory.AutoSize = true;
+            this._checkStoreFTPEventHistory.Location = new System.Drawing.Point(6, 167);
+            this._checkStoreFTPEventHistory.Name = "_checkStoreFTPEventHistory";
+            this._checkStoreFTPEventHistory.Size = new System.Drawing.Size(137, 17);
+            this._checkStoreFTPEventHistory.TabIndex = 21;
+            this._checkStoreFTPEventHistory.Text = "Store FTP event history";
+            this._checkStoreFTPEventHistory.UseVisualStyleBackColor = true;
+            // 
             // FAMDatabaseOptionsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -702,6 +714,7 @@
         private System.Windows.Forms.CheckBox _checkStoreDBSettingsChangeHistory;
         private Utilities.Forms.NumericEntryTextBox _numberMaxTimeBetweenChecks;
         private Utilities.Forms.NumericEntryTextBox _numberMinTimeBetweenChecks;
+        private System.Windows.Forms.CheckBox _checkStoreFTPEventHistory;
     }
 }
 

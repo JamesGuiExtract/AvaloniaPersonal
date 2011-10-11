@@ -96,7 +96,8 @@ public:
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
 
 	// IFileSupplier
-	STDMETHOD(raw_Start)( IFileSupplierTarget *pTarget, IFAMTagManager *pFAMTM );
+	STDMETHOD(raw_Start)(IFileSupplierTarget *pTarget, IFAMTagManager *pFAMTM,
+		IFileProcessingDB* pDB, long nActionID);
 	STDMETHOD(raw_Stop)();
 	STDMETHOD(raw_Pause)();
 	STDMETHOD(raw_Resume)();

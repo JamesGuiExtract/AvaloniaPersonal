@@ -401,6 +401,20 @@ STDMETHODIMP CCOMUCLIDException::LogLocal()
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32598");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CCOMUCLIDException::CreateLogString(BSTR* pbstrLogString)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33975", pbstrLogString != __nullptr);
+		*pbstrLogString = _bstr_t(m_upException->createLogString().c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33974");
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private Methods

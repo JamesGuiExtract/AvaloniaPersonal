@@ -507,6 +507,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Email", "..\..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.csproj", "{1B3DED27-DBF9-478A-9E31-FFA479621F5C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Ftp", "..\..\..\..\..\RC.Net\Utilities\Ftp\Core\Code\Extract.Utilities.Ftp.csproj", "{D2DD8D8F-E632-429E-8646-B9489D21295F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExtractTRP2", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\ExtractTRP2\Code\ExtractTRP2.vcxproj", "{14D4D963-B656-4B04-ADD7-8F98FC4F664D}"
 EndProject

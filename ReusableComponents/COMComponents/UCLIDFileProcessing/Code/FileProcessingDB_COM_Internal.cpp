@@ -82,7 +82,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 110;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 111;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -117,20 +117,6 @@ int UpdateToSchemaVersion101(_ConnectionPtr ipConnection, long* pnNumSteps,
 		}
 
 		vector<string> vecQueries;
-
-		_RecordsetPtr ipProcessingFAMCount(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI31446", ipProcessingFAMCount != __nullptr);
-
-		ipProcessingFAMCount->Open("SELECT COUNT(*) AS FAMCOUNT FROM [ProcessingFAM]",
-			_variant_t((IDispatch *)ipConnection, true), adOpenDynamic, adLockOptimistic, adCmdText);
-
-		ipProcessingFAMCount->MoveFirst();
-		long nRowCount = getLongField(ipProcessingFAMCount->Fields, "FAMCOUNT");
-		if (nRowCount > 0)
-		{
-			throw UCLIDException("ELI31445", "Unable to update database since at least one instance "
-				"of File Action Manager is currently processing files in the database");
-		}
 
 		// Drop ProcessingFAM so it can be re-created with the proper columns.
 		// No need to transfer data. It will be assumed that all entries are crashed/hung instances.
@@ -388,9 +374,7 @@ int UpdateToSchemaVersion106(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("DROP TABLE [LockTable]");
 		vecQueries.push_back(gstrCREATE_LOCK_TABLE);
 
-		// Update schema version and dbinfo update time
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
-		vecQueries.push_back(gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
 
 		// Execute the queries
 		executeVectorOfSQL(ipConnection, vecQueries);
@@ -419,9 +403,7 @@ int UpdateToSchemaVersion107(_ConnectionPtr ipConnection, long* pnNumSteps,
 			+ gstrSKIP_AUTHENTICATION_ON_MACHINES
 			+ "' WHERE [Name] = 'SkipAuthenticationOnMachines'");
 
-		// Update schema version and dbinfo update time
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
-		vecQueries.push_back(gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
 
 		// Execute the queries
 		executeVectorOfSQL(ipConnection, vecQueries);
@@ -450,9 +432,7 @@ int UpdateToSchemaVersion108(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("EXEC sp_rename 'dbo.UserCreatedCounter.PK_UserCreatedConter', "
 			"'PK_UserCreatedCounter', 'INDEX'");
 
-		// Update schema version and dbinfo update time
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
-		vecQueries.push_back(gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
 
 		// Execute the queries
 		executeVectorOfSQL(ipConnection, vecQueries);
@@ -493,9 +473,7 @@ int UpdateToSchemaVersion109(_ConnectionPtr ipConnection, long* pnNumSteps,
 				+ gstrMAX_SLEEP_BETWEEN_DB_CHECKS + "', '"
 				+ asString(gnDEFAULT_MAX_SLEEP_TIME_BETWEEN_DB_CHECK) + "')");
 
-		// Update schema version and dbinfo update time
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
-		vecQueries.push_back(gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
 
 		// Execute the queries
 		executeVectorOfSQL(ipConnection, vecQueries);
@@ -521,20 +499,6 @@ int UpdateToSchemaVersion110(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		vector<string> vecQueries;
 
-		_RecordsetPtr ipProcessingFAMCount(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI33182", ipProcessingFAMCount != __nullptr);
-
-		ipProcessingFAMCount->Open("SELECT COUNT(*) AS FAMCOUNT FROM [ProcessingFAM]",
-			_variant_t((IDispatch *)ipConnection, true), adOpenDynamic, adLockOptimistic, adCmdText);
-
-		ipProcessingFAMCount->MoveFirst();
-		long nRowCount = getLongField(ipProcessingFAMCount->Fields, "FAMCOUNT");
-		if (nRowCount > 0)
-		{
-			throw UCLIDException("ELI33183", "Unable to update database since at least one instance "
-				"of File Action Manager is currently processing files in the database");
-		}
-
 		// Drop ProcessingFAM so it can be re-created with the proper columns.
 		// No need to transfer data. It will be assumed that all entries are crashed/hung instances.
 		vecQueries.push_back("ALTER TABLE [LockedFile] DROP CONSTRAINT [FK_LockedFile_ProcessingFAM]");
@@ -552,6 +516,46 @@ int UpdateToSchemaVersion110(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33184");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion111(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 111;
+
+		if (pnNumSteps != __nullptr)
+		{
+			// This update does not require transferring any data.
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// Add FTPAccount table
+		vecQueries.push_back(gstrCREATE_FTP_ACCOUNT);
+
+		// Add FTPEventHistory table
+		vecQueries.push_back(gstrCREATE_FTP_EVENT_HISTORY_TABLE);
+		vecQueries.push_back(gstrADD_FTP_EVENT_HISTORY_FTP_ACCOUNT_FK);
+		vecQueries.push_back(gstrADD_FTP_EVENT_HISTORY_FAM_FILE_FK);
+		vecQueries.push_back(gstrADD_FTP_EVENT_HISTORY_ACTION_FK);
+		vecQueries.push_back(gstrADD_FTP_EVENT_HISTORY_MACHINE_FK);
+		vecQueries.push_back(gstrADD_FTP_EVENT_HISTORY_FAM_USER_FK);
+
+		// Add default value for StoreFTPEventHistory.
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrSTORE_FTP_EVENT_HISTORY + "', '1')");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33957");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -5320,6 +5324,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 
 			ipConnection = getDBConnection();
 
+			assertNotActiveBeforeSchemaUpdate();
+
 			// If there are any unrecognized schema elements in the database, disallow a schema
 			// update.
 			vector<string> vecUnrecognizedSchemaElements =
@@ -5362,7 +5368,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 107:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion108);
 				case 108:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion109);
 				case 109:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion110);
-				case 110:	break;
+				case 110:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion111);
+				case 111:	break;
 
 				default:
 					{
@@ -5453,6 +5460,10 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 
 				ipProgressStatus->CompleteCurrentItemGroup();
 			}
+
+			// Update last DB info change time since any schema update will have needed to update
+			// the schema version
+			executeCmdQuery(ipConnection, gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
 
 			tg.CommitTrans();
 
@@ -5689,3 +5700,78 @@ bool CFileProcessingDB::SetDBInfoSettings_Internal(bool bDBLocked, bool bUpdateH
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::RecordFTPEvent_Internal(bool bDBLocked, long nFileId, long nActionID,
+	VARIANT_BOOL vbQueueing, EFTPAction eFTPAction, BSTR bstrServerAddress, BSTR bstrUserName,
+	BSTR bstrArg1, BSTR bstrArg2, long nRetries, BSTR bstrException)
+{
+	try
+	{
+		try
+		{
+			if (!m_bStoreFTPEventHistory)
+			{
+				return S_OK;
+			}
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			// Make sure the DB Schema is the expected version
+			validateDBSchemaVersion();
+
+			// Set the transaction guard
+			TransactionGuard tg(ipConnection);
+
+			string strMachineId = asString(getMachineID(ipConnection));
+			string strUserId = asString(getFAMUserID(ipConnection));
+			string strQueueOrProcess = asCppBool(vbQueueing) ? "Q" : "P";
+			string strFTPAction;
+			switch (eFTPAction)
+			{
+				case kDownloadFileFromFtpServer:	strFTPAction = "D"; break;
+				case kUploadFileToFtpServer:		strFTPAction = "U"; break;
+				case kDeleteFileFromFtpServer:		strFTPAction = "X"; break;
+				case kRenameFileOnFtpServer:		strFTPAction = "R"; break;
+			}
+
+			string strQuery = gstrRECORD_FTP_EVENT_QUERY;
+			replaceVariable(strQuery, gstrTAG_FTP_SERVERADDRESS_VAR, asString(bstrServerAddress));
+			replaceVariable(strQuery, gstrTAG_FTP_USERNAME_VAR, asString(bstrUserName));
+			replaceVariable(strQuery, gstrTAG_FTP_FILEID_VAR, (nFileId == -1) ? "NULL" : asString(nFileId));
+			replaceVariable(strQuery, gstrTAG_FTP_ACTIONID_VAR, (nActionID == -1) ? "NULL" : asString(nActionID));
+			replaceVariable(strQuery, gstrTAG_FTP_FTPACTION_VAR, strFTPAction);
+			replaceVariable(strQuery, gstrTAG_FTP_QUEUE_OR_PROCESS_VAR, strQueueOrProcess);
+			replaceVariable(strQuery, gstrTAG_FTP_ARG1_VAR, asString(bstrArg1));
+			replaceVariable(strQuery, gstrTAG_FTP_ARG2_VAR, (bstrArg2 == __nullptr)
+				? "NULL"
+				: "'" + asString(bstrArg2) + "'");
+			replaceVariable(strQuery, gstrTAG_FTP_MACHINEID_VAR, strMachineId);
+			replaceVariable(strQuery, gstrTAG_FTP_USERID_VAR, strUserId);
+			replaceVariable(strQuery, gstrTAG_FTP_RETRIES_VAR, (nRetries == -1) ? "NULL" : asString(nRetries));
+			replaceVariable(strQuery, gstrTAG_FTP_EXCEPTION_VAR, (bstrException == __nullptr)
+				? "NULL"
+				: "'" + asString(bstrException) + "'");
+
+			executeCmdQuery(ipConnection, strQuery);
+
+			tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI33962");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33963");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}

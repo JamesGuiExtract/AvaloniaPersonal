@@ -2,6 +2,7 @@
 using Extract.Utilities;
 using System;
 using System.Windows.Forms;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.FileProcessors
 {
@@ -78,13 +79,13 @@ namespace Extract.FileActionManager.FileProcessors
                 // Set the AfterDownloadAction radio buttons
                 switch (_settings.ActionToPerform)
                 {
-                    case TransferActionToPerform.DeleteFileFromFtpServer:
+                    case EFTPAction.kDeleteFileFromFtpServer:
                         _deleteFileRadioButton.Checked = true;
                         break;
-                    case TransferActionToPerform.DownloadFileFromFtpServer:
+                    case EFTPAction.kDownloadFileFromFtpServer:
                         _downloadFileRadioButton.Checked = true;
                         break;
-                    case TransferActionToPerform.UploadFileToFtpServer:
+                    case EFTPAction.kUploadFileToFtpServer:
                         _uploadFileRadioButton.Checked = true;
                         break;
                     default:
@@ -132,15 +133,15 @@ namespace Extract.FileActionManager.FileProcessors
                 }
                 if (_uploadFileRadioButton.Checked)
                 {
-                    _settings.ActionToPerform = TransferActionToPerform.UploadFileToFtpServer;
+                    _settings.ActionToPerform = EFTPAction.kUploadFileToFtpServer;
                 }
                 else if (_downloadFileRadioButton.Checked)
                 {
-                    _settings.ActionToPerform = TransferActionToPerform.DownloadFileFromFtpServer;
+                    _settings.ActionToPerform = EFTPAction.kDownloadFileFromFtpServer;
                 }
                 else if (_deleteFileRadioButton.Checked)
                 {
-                    _settings.ActionToPerform = TransferActionToPerform.DeleteFileFromFtpServer;
+                    _settings.ActionToPerform = EFTPAction.kDeleteFileFromFtpServer;
                 }
 
                 _settings.ConfiguredFtpConnection = _ftpConnectionSettingsControl.FtpConnection;

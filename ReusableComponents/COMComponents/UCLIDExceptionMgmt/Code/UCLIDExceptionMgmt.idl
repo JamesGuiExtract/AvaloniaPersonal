@@ -125,6 +125,11 @@ library UCLID_EXCEPTIONMGMTLib
 		// PURPOSE: To enforce the logging of the exception to the local exception log
 		[id(19), helpstring("method LogLocal")]HRESULT LogLocal();
 		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Formats the exception as an ouput string that contains metadata fields for the
+        // exception as well as the stringized exception itself. (This is the format used by Log or
+		// SaveTo).
+		[id(20), helpstring("method CreateLogString")]HRESULT CreateLogString(
+			[out, retval] BSTR* pbstrLogString);
 	};
 	[
 		uuid(FC391C54-6F67-436E-B7C5-DA799737752E),

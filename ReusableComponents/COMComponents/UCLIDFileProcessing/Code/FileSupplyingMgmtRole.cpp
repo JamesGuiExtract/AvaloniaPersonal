@@ -172,13 +172,16 @@ const unsigned long gnCurrentVersion = 1;
 //-------------------------------------------------------------------------------------------------
 SupplierThreadData::SupplierThreadData(UCLID_FILEPROCESSINGLib::IFileSupplier *pFS,
 	UCLID_FILEPROCESSINGLib::IFileSupplierTarget *pFST,
-	UCLID_FILEPROCESSINGLib::IFAMTagManager *pFAMTM)
-	:m_ipFileSupplier(pFS), m_ipFileSupplierTarget(pFST),  m_ipFAMTagManager(pFAMTM)
+	UCLID_FILEPROCESSINGLib::IFAMTagManager *pFAMTM,
+	IFileProcessingDB *pDB, long nActionID)
+	: m_ipFileSupplier(pFS), m_ipFileSupplierTarget(pFST), m_ipFAMTagManager(pFAMTM), m_ipDB(pDB),
+		m_nActionID(nActionID)
 {
 	// verify non-NULL arguments
-	ASSERT_ARGUMENT("ELI13761", pFS != __nullptr);
-	ASSERT_ARGUMENT("ELI13762", pFST != __nullptr);
-	ASSERT_ARGUMENT("ELI14436", pFAMTM != __nullptr);
+	ASSERT_ARGUMENT("ELI13761", m_ipFileSupplier != __nullptr);
+	ASSERT_ARGUMENT("ELI13762", m_ipFileSupplierTarget != __nullptr);
+	ASSERT_ARGUMENT("ELI14436", m_ipFAMTagManager != __nullptr);
+	ASSERT_ARGUMENT("ELI33970", m_ipDB != __nullptr);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -204,7 +207,8 @@ UINT CFileSupplyingMgmtRole::fileSupplyingThreadProc(void *pData)
 			UCLID_FILEPROCESSINGLib::IFileSupplierPtr ipFS = pSupplierThreadData->m_ipFileSupplier;
 			ASSERT_RESOURCE_ALLOCATION("ELI15640", ipFS != __nullptr );
 			ipFS->Start(pSupplierThreadData->m_ipFileSupplierTarget, 
-				pSupplierThreadData->m_ipFAMTagManager);
+				pSupplierThreadData->m_ipFAMTagManager, pSupplierThreadData->m_ipDB,
+				pSupplierThreadData->m_nActionID);
 		}
 		CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14242")
 
@@ -370,7 +374,8 @@ STDMETHODIMP CFileSupplyingMgmtRole::Start(IFileProcessingDB* pDB, long lActionI
 					ASSERT_RESOURCE_ALLOCATION("ELI13775", ipTarget);
 
 					// create the thread data structure
-					unique_ptr<SupplierThreadData> apThreadData(new SupplierThreadData(ipFileSupplier, ipTarget, getFAMTagManager()));
+					unique_ptr<SupplierThreadData> apThreadData(new SupplierThreadData(
+						ipFileSupplier, ipTarget, getFAMTagManager(), pDB, lActionId));
 
 					// start the file supplier thread
 					AfxBeginThread(fileSupplyingThreadProc, apThreadData.get());
@@ -784,12 +789,15 @@ STDMETHODIMP CFileSupplyingMgmtRole::GetSupplyingCounts(long *plNumSupplied, lon
 //-------------------------------------------------------------------------------------------------
 // IFileSupplierTarget
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplier *pSupplier)
+STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplier *pSupplier,
+	IFileRecord** ppFileRecord)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
+		ASSERT_RESOURCE_ALLOCATION("ELI33968", ppFileRecord != __nullptr);
+
 		validateLicense();
 
 		// Protect access to this method
@@ -873,6 +881,8 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplie
 				// Post the message which will be handled by the FPDlg's OnQueueEvent method
 				::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
 			}
+
+			*ppFileRecord = (IFileRecord*)ipFileRecord.Detach();
 		}
 		FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS("ELI13792", kFileAdded)
 	}

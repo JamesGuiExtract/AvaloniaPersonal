@@ -20,7 +20,8 @@ public:
 	// ctor
 	SupplierThreadData(UCLID_FILEPROCESSINGLib::IFileSupplier* pFS,
 		UCLID_FILEPROCESSINGLib::IFileSupplierTarget* pFST,
-		UCLID_FILEPROCESSINGLib::IFAMTagManager* pFAMTM);
+		UCLID_FILEPROCESSINGLib::IFAMTagManager* pFAMTM,
+		IFileProcessingDB* pDB, long nActionID);
 
 	Win32Event m_threadStartedEvent;
 	Win32Event m_threadEndedEvent;
@@ -33,6 +34,8 @@ private:
 	UCLID_FILEPROCESSINGLib::IFileSupplierPtr m_ipFileSupplier;
 	UCLID_FILEPROCESSINGLib::IFileSupplierTargetPtr m_ipFileSupplierTarget;
 	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr m_ipFAMTagManager;
+	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr m_ipDB;
+	long m_nActionID;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -97,7 +100,8 @@ public:
 	STDMETHOD(GetSupplyingCounts)(long* plNumSupplied, long* plNumSupplyingErrors);
 
 // IFileSupplierTarget Methods
-	STDMETHOD(NotifyFileAdded)(BSTR bstrFile,  IFileSupplier* pSupplier);
+	STDMETHOD(NotifyFileAdded)(BSTR bstrFile,  IFileSupplier* pSupplier,
+		IFileRecord** ppFileRecord);
 	STDMETHOD(NotifyFileRemoved)(BSTR bstrFile,  IFileSupplier* pSupplier);
 	STDMETHOD(NotifyFileRenamed)(BSTR bstrOldFile,  BSTR bstrNewFile,  IFileSupplier* pSupplier);
 	STDMETHOD(NotifyFolderDeleted)(BSTR bstrFolder,  IFileSupplier* pSupplier);

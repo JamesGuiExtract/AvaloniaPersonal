@@ -422,6 +422,25 @@ namespace Extract
         }
 
         /// <summary>
+        /// Formats the exception as an ouput string that contains metadata fields for the exception
+        /// as well as the stringized exception itself. (This is the format used by Log or SaveTo).
+        /// </summary>
+        /// <returns>The exception formated as an output string.</returns>
+        public string CreateLogString()
+        {
+            try
+            {
+                UCLID_EXCEPTIONMGMTLib.COMUCLIDException uex = AsCppException();
+
+                return uex.CreateLogString();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI33976");
+            }
+        }
+
+        /// <summary>
         /// Display this exception using the standard exception viewer window used by all
         /// of Extract Systems' products.
         /// </summary>

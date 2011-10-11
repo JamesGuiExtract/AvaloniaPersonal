@@ -318,7 +318,8 @@ STDMETHODIMP CDynamicFileListFS::GetSizeMax(ULARGE_INTEGER *pcbSize)
 //-------------------------------------------------------------------------------------------------
 // IFileSupplier
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CDynamicFileListFS::raw_Start( IFileSupplierTarget *pTarget, IFAMTagManager *pFAMTM)
+STDMETHODIMP CDynamicFileListFS::raw_Start( IFileSupplierTarget *pTarget, IFAMTagManager *pFAMTM,
+	IFileProcessingDB* pDB, long nActionID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 

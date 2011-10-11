@@ -20,14 +20,86 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.FileActionManager.FileSuppliers
 {
     /// <summary>
+    /// Interface for the <see cref="ContextMenuFileSupplier"/> class.
+    /// </summary>
+    [ComVisible(true)]
+    [Guid("015C9357-B409-4585-AC2C-E1C7E09467BD")]
+    [CLSCompliant(false)]
+    public interface IContextMenuFileSupplier : IFileSupplier, ICategorizedComponent,
+        IConfigurableObject, IMustBeConfiguredObject, ICopyableObject, ILicensedComponent,
+        IPersistStream, IDisposable
+    {
+        /// <summary>
+        /// Gets or sets the name of the menu option.
+        /// </summary>
+        /// <value>
+        /// The name of the menu option.
+        /// </value>
+        string MenuOptionName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the Window's filter string that describes which files the menu should be
+        /// available for (multiple filters can be delimited with a semi-colon).
+        /// </summary>
+        /// <value>
+        /// The file filter.
+        /// </value>
+        string FileFilter
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets whether the menu option should be availab only beneath
+        /// <see cref="PathRoot"/>.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if limiting to <see cref="PathRoot"/>, otherwise
+        /// <see langword="false"/>.
+        /// </value>
+        bool LimitPathRoot
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the path a file must be under in order for the context menu to display.
+        /// </summary>
+        /// <value>
+        /// The path a file must be under in order for the context menu to display.
+        /// </value>
+        string PathRoot
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether files from selected folders will be included.
+        /// </summary>
+        /// <value><see langword="true"/> if files from selected folders are to be included;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        bool IncludeFolders
+        {
+            get;
+            set;
+        }
+    }
+
+    /// <summary>
     /// An <see cref="IFileSupplier"/> implementation that adds a context menu into the Window's
     /// shell which will supply selected files if used.
     /// </summary>
     [ComVisible(true)]
     [Guid("AC260C30-E2F5-4EA3-A120-193FF8D94B05")]
-    public class ContextMenuFileSupplier : IFileSupplier, ICategorizedComponent, 
-        IConfigurableObject, IMustBeConfiguredObject, ICopyableObject, ILicensedComponent,
-        IPersistStream, IDisposable
+    public class ContextMenuFileSupplier : IContextMenuFileSupplier
     {
         #region Constants
 
@@ -271,8 +343,11 @@ namespace Extract.FileActionManager.FileSuppliers
         /// </summary>
         /// <param name="pTarget">The IFileSupplerTarget that receives the files</param>
         /// <param name="pFAMTM">The <see cref="FAMTagManager"/> to use if needed.</param>
+        /// <param name="pDB">The <see cref="FileProcessingDB"/> in use.</param>
+        /// <param name="nActionID">The ID of the action for which files are being queued.</param>
         [CLSCompliant(false)]
-        public void Start(IFileSupplierTarget pTarget, FAMTagManager pFAMTM)
+        public void Start(IFileSupplierTarget pTarget, FAMTagManager pFAMTM, FileProcessingDB pDB,
+            int nActionID)
         {
             try
             {

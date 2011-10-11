@@ -131,6 +131,19 @@ library UCLID_FILEPROCESSINGLib
 		kPriorityHigh = 5
 	}EFilePriority;
 
+	typedef
+		[
+			uuid(A1838015-95E3-4E83-8325-69A3F26B25E1), 
+			helpstring("Extract FTPAction")
+		]
+	enum EFTPAction
+	{
+		kUploadFileToFtpServer = 0,
+		kDownloadFileFromFtpServer = 1,
+		kDeleteFileFromFtpServer = 2,
+		kRenameFileOnFtpServer = 3
+	}EFTPAction;
+
 	//----------------------------------------------------------------------------------------------
 	//-I N T E R F A C E S -------------------------------------------------------------------------
 	//----------------------------------------------------------------------------------------------
@@ -458,7 +471,8 @@ library UCLID_FILEPROCESSINGLib
 	]
 	interface IFileSupplier : IDispatch
 	{
-		[id(1), helpstring("method Start")] HRESULT Start([in] IFileSupplierTarget* pTarget, [in] IFAMTagManager* pFAMTM);
+		[id(1), helpstring("method Start")] HRESULT Start([in] IFileSupplierTarget* pTarget, [in] IFAMTagManager* pFAMTM,
+			[in] IFileProcessingDB* pDB, [in] long nActionID);
 		[id(2), helpstring("method Stop")] HRESULT Stop();
 		[id(3), helpstring("method Pause")] HRESULT Pause();
 		[id(4), helpstring("method Resume")] HRESULT Resume();
@@ -473,7 +487,8 @@ library UCLID_FILEPROCESSINGLib
 	]
 	interface IFileSupplierTarget : IDispatch
 	{
-		[id(1), helpstring("method NotifyFileAdded")] HRESULT NotifyFileAdded([in] BSTR bstrFile, [in] IFileSupplier* pSupplier);
+		[id(1), helpstring("method NotifyFileAdded")] HRESULT NotifyFileAdded([in] BSTR bstrFile, [in] IFileSupplier* pSupplier,
+			[out, retval] IFileRecord** ppFileRecord);
 		[id(2), helpstring("method NotifyFileRemoved")] HRESULT NotifyFileRemoved([in] BSTR bstrFile, [in] IFileSupplier* pSupplier);
 		[id(3), helpstring("method NotifyFileRenamed")] HRESULT NotifyFileRenamed([in] BSTR bstrOldFile, [in] BSTR bstrNewFile, 
 			[in] IFileSupplier* pSupplier);
@@ -1137,6 +1152,12 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: To remove the record for in the ActiveFAM table and stop the thread updating
 		//			the LastPingTime
 		[id(101), helpstring("method UnregisterActiveFAM")] HRESULT UnregisterActiveFAM();
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: Records information regarding an attempted FTP event to the FTPEventHistory table.
+		[id(102), helpstring("method RecordFTPEvent")] HRESULT RecordFTPEvent([in] long nFileId,
+			[in] long lActionID, [in] VARIANT_BOOL vbQueueing, [in] EFTPAction eFTPAction,
+			[in] BSTR bstrServerAddress, [in] BSTR bstrUserName, [in] BSTR bstrArg1,
+			[in] BSTR bstrArg2, [in] long nRetries, [in] BSTR bstrException);
 	};
 
 	[

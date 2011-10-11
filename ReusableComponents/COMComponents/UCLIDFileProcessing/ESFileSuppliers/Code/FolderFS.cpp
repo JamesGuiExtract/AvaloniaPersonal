@@ -145,7 +145,8 @@ STDMETHODIMP CFolderFS::raw_CopyFrom(IUnknown * pObject)
 //-------------------------------------------------------------------------------------------------
 // IFileSupplier Methods
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFolderFS::raw_Start(IFileSupplierTarget * pTarget, IFAMTagManager *pFAMTM)
+STDMETHODIMP CFolderFS::raw_Start(IFileSupplierTarget * pTarget, IFAMTagManager *pFAMTM,
+	IFileProcessingDB* pDB, long nActionID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 

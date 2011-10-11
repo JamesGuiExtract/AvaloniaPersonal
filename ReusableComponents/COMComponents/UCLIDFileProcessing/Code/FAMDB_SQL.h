@@ -243,6 +243,27 @@ static const string gstrCREATE_DB_INFO_CHANGE_HISTORY_TABLE =
 	"[NewValue] NVARCHAR(MAX), "
 	"[TimeStamp] DATETIME NOT NULL DEFAULT(GETDATE()))";
 
+static const string gstrCREATE_FTP_ACCOUNT  ="CREATE TABLE [dbo].[FTPAccount]("
+	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FTPAccount] PRIMARY KEY CLUSTERED, "
+	"[ServerAddress] [nvarchar](128) NULL, "
+	"[UserName] [nvarchar](50) NOT NULL, "
+	"CONSTRAINT [IX_FTP_ACCOUNT] UNIQUE NONCLUSTERED ([ServerAddress], [UserName]))";
+
+static const string gstrCREATE_FTP_EVENT_HISTORY_TABLE  ="CREATE TABLE [dbo].[FTPEventHistory]("
+	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FTPEventHistory] PRIMARY KEY CLUSTERED,"
+	"[FileID] [int] NULL,"
+	"[ActionID] [int] NULL,"
+	"[DateTimeStamp] [datetime] NOT NULL CONSTRAINT [DF_FTPEventHistory_DateTimeStamp] DEFAULT((GETDATE())), "
+	"[QueueOrProcess] [nvarchar](1) NULL,"
+	"[FTPAction] [nvarchar](1) NOT NULL,"
+	"[FTPAccountID] [int] NOT NULL,"
+	"[Arg1] [nvarchar](255) NOT NULL,"
+	"[Arg2] [nvarchar](255) NULL,"
+	"[MachineID] [int] NULL, "
+	"[FAMUserID] [int] NULL, "
+	"[Retries] [int] NULL, "
+	"[Exception] [ntext] NULL)";
+
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
 	"ON [DBInfo]([ID])";
@@ -597,6 +618,41 @@ static const string gstrADD_DB_INFO_HISTORY_DB_INFO_FK =
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
+static const string gstrADD_FTP_EVENT_HISTORY_FTP_ACCOUNT_FK = 
+	"ALTER TABLE [dbo].[FTPEventHistory] "
+	"WITH CHECK ADD CONSTRAINT [FK_FTPEventHistory_FTPAccount] FOREIGN KEY([FTPAccountID]) "
+	"REFERENCES [dbo].[FTPAccount] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_FTP_EVENT_HISTORY_FAM_FILE_FK = 
+	"ALTER TABLE [dbo].[FTPEventHistory] "
+	"WITH CHECK ADD CONSTRAINT [FK_FTPEventHistory_FAMFile] FOREIGN KEY([FileID]) "
+	"REFERENCES [dbo].[FAMFile] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_FTP_EVENT_HISTORY_ACTION_FK = 
+	"ALTER TABLE [dbo].[FTPEventHistory] "
+	"WITH CHECK ADD CONSTRAINT [FK_FTPEventHistory_Action] FOREIGN KEY([ActionID]) "
+	"REFERENCES [dbo].[Action] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_FTP_EVENT_HISTORY_MACHINE_FK = 
+	"ALTER TABLE [dbo].[FTPEventHistory] "
+	"WITH CHECK ADD CONSTRAINT [FK_FTPEventHistory_Machine] FOREIGN KEY([MachineID]) "
+	"REFERENCES [dbo].[Machine] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_FTP_EVENT_HISTORY_FAM_USER_FK = 
+	"ALTER TABLE [dbo].[FTPEventHistory] "
+	"WITH CHECK ADD CONSTRAINT [FK_FTPEventHistory_FAMUser] FOREIGN KEY([FAMUserID]) "
+	"REFERENCES [dbo].[FAMUser] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
 // Query for obtaining the current db lock record with the time it has been locked
 static const string gstrDB_LOCK_NAME_VAL = "<LockName>";
 static const string gstrDB_LOCK_QUERY = 
@@ -863,3 +919,42 @@ static const string gstrUNTAG_FILE_QUERY =
 // removes the tag.
 static const string gstrTOGGLE_TAG_FOR_FILE_QUERY =
 	gstrTAG_FILE_QUERY + " ELSE " + gstrUNTAG_FILE_QUERY;
+
+// Variables for gstrRECORD_FTP_EVENT_QUERY
+static const string gstrTAG_FTP_SERVERADDRESS_VAR = "<ServerAddress>";
+static const string gstrTAG_FTP_USERNAME_VAR = "<UserName>";
+static const string gstrTAG_FTP_FILEID_VAR = "<FileID>";
+static const string gstrTAG_FTP_ACTIONID_VAR = "<ActionID>";
+static const string gstrTAG_FTP_QUEUE_OR_PROCESS_VAR = "<QueueOrProcess>";
+static const string gstrTAG_FTP_FTPACTION_VAR = "<FTPAction>";
+static const string gstrTAG_FTP_ARG1_VAR = "<Arg1>";
+static const string gstrTAG_FTP_ARG2_VAR = "<Arg2>";
+static const string gstrTAG_FTP_MACHINEID_VAR = "<MachineID>";
+static const string gstrTAG_FTP_USERID_VAR = "<UserID>";
+static const string gstrTAG_FTP_RETRIES_VAR = "<Retries>";
+static const string gstrTAG_FTP_EXCEPTION_VAR = "<Exception>";
+
+// Logs an FTP event to the FTPEventHistory table.
+static const string gstrRECORD_FTP_EVENT_QUERY =
+	string("DECLARE @FTPAccountIDTable TABLE(ID INT) \r\n")
+	+ "INSERT INTO @FTPAccountIDTable \r\n"
+	+ "		SELECT [ID] FROM [dbo].[FTPAccount] \r\n"
+	+ "			WHERE [ServerAddress] = '" + gstrTAG_FTP_SERVERADDRESS_VAR + "' \r\n"
+	+ "			AND [UserName] = '" + gstrTAG_FTP_USERNAME_VAR + "' \r\n"
+	+ "\r\n"
+	+ "IF (SELECT COUNT(*) FROM @FTPAccountIDTable) = 0 \r\n"
+	+ "		INSERT INTO [dbo].[FTPAccount] ([ServerAddress], [UserName]) \r\n"
+	+ "		OUTPUT INSERTED.ID INTO @FTPAccountIDTable \r\n"
+	+ "		VALUES ('" + gstrTAG_FTP_SERVERADDRESS_VAR + "', '" + gstrTAG_FTP_USERNAME_VAR + "') \r\n"
+	+ "\r\n"
+	+ "DECLARE @FTPAccountID INT \r\n"
+	+ "SELECT @FTPAccountID = ID FROM @FTPAccountIDTable \r\n"
+	+ "\r\n"
+	+ "INSERT INTO [dbo].[FTPEventHistory] \r\n"
+	+ "		([FileID], [ActionID], [QueueOrProcess], [FTPAction], [FTPAccountID], \r\n"
+	+ "		 [Arg1], [Arg2], [MachineID], [FAMUserID], [Retries], [Exception]) \r\n"
+	+ "VALUES (" + gstrTAG_FTP_FILEID_VAR + ", " + gstrTAG_FTP_ACTIONID_VAR + ", '"
+	+		gstrTAG_FTP_QUEUE_OR_PROCESS_VAR + "', '" + gstrTAG_FTP_FTPACTION_VAR + "', "
+	+		"@FTPAccountID, '" + gstrTAG_FTP_ARG1_VAR + "', " + gstrTAG_FTP_ARG2_VAR + ", "
+	+		gstrTAG_FTP_MACHINEID_VAR + ", " + gstrTAG_FTP_USERID_VAR + ", "
+	+		gstrTAG_FTP_RETRIES_VAR + ", " + gstrTAG_FTP_EXCEPTION_VAR + ")";

@@ -40,7 +40,133 @@ namespace Extract.FileActionManager.FileSuppliers
         /// Do nothing to the remote file on the server
         /// </summary>
         DoNothingToRemoteFile = 2
-   }
+    }
+
+    /// <summary>
+    /// Interface for the <see cref="FtpFileSupplier"/> class.
+    /// </summary>
+    [ComVisible(true)]
+    [Guid("98BD0513-3C87-43FD-BF53-D123FAD283E2")]
+    [CLSCompliant(false)]
+    public interface IFtpFileSupplier : ICategorizedComponent, IConfigurableObject,
+        IMustBeConfiguredObject, ICopyableObject, IFileSupplier, ILicensedComponent,
+        IPersistStream, IFtpEventErrorSource, IDisposable
+    {
+        /// <summary>
+        /// Folder on FTP site to download file from
+        /// </summary>
+        string RemoteDownloadFolder
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Extensions of files to download
+        /// </summary>
+        string FileExtensionsToDownload
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Flag indicating that all subfolders of the download folder should be searched
+        /// for files to download
+        /// </summary>
+        bool RecursivelyDownload
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Flag indicating that the remote location should be polled for files
+        /// every <see cref="PollingIntervalInMinutes"/>
+        /// </summary>
+        bool PollRemoteLocation
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The interval in minutes between checks of the remote location for
+        /// files only used if <see cref="PollRemoteLocation"/> is <see langword="true"/>
+        /// </summary>
+        Int32 PollingIntervalInMinutes
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Action to be taken after the file has been downloaded from the server
+        /// </summary>
+        AfterDownloadRemoteFileActon AfterDownloadAction
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The extension to change the remote file's extension to on the remote
+        /// server.  Only used if <see cref="AfterDownloadAction"/> is set to 
+        /// ChangeRemoteFileExtension
+        /// </summary>
+        string NewExtensionForRemoteFile
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Local folder that files are copied to when they are downloaded from
+        /// the remote server
+        /// </summary>
+        string LocalWorkingFolder
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The object that contains all of the settings relevant to make a connection to 
+        /// an ftp site
+        /// </summary>
+        SecureFTPConnection ConfiguredFtpConnection
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Number of connections used to download files
+        /// </summary>
+        int NumberOfConnections
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Number of times to retry calls to the ftp server
+        /// </summary>
+        int NumberOfTimesToRetry
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Time to wait between retries for calls to Ftp server
+        /// </summary>
+        int TimeToWaitBetweenRetries
+        {
+            get;
+            set;
+        }
+    }
 
     /// <summary>
     /// A File supplier that will get files from a SFTP/FTP site
@@ -48,11 +174,8 @@ namespace Extract.FileActionManager.FileSuppliers
     [ComVisible(true)]
     [Guid("2D201AC7-8EE8-47D0-96B3-708F4E34435C")]
     [ProgId("Extract.FileActionManager.FileSuppliers.FTPFileSupplier")]
-    public class FtpFileSupplier : ICategorizedComponent, IConfigurableObject,
-        IMustBeConfiguredObject, ICopyableObject, IFileSupplier, ILicensedComponent,
-        IPersistStream, IDisposable
+    public class FtpFileSupplier : IFtpFileSupplier
     {
-
         #region Constants
 
         /// <summary>
@@ -86,7 +209,12 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <summary>
         /// Default number of retries before failure
         /// </summary>
-        const int _DEFAULT_NUMBER_OF_RETRIES_BEFORE_FAILURE = 1000;
+        const int _DEFAULT_NUMBER_OF_RETRIES_BEFORE_FAILURE = 10;
+
+        /// <summary>
+        /// Default number of retries before failure
+        /// </summary>
+        const int _CONSECUTIVE_FAILURES_BEFORE_RE_POLLING = 10;
 
         #endregion
 
@@ -145,7 +273,7 @@ namespace Extract.FileActionManager.FileSuppliers
         ManualResetEvent _stopSupplying = new ManualResetEvent(false);
 
         // Event to indicate the FTP Server should be checked for more files
-        AutoResetEvent _pollFtpServerForFiles = new AutoResetEvent(false);
+        ManualResetEvent _pollFtpServerForFiles = new ManualResetEvent(false);
        
         // Event to indicate that all files have been added to the queue for the current
         // poll of the ftp server.
@@ -169,8 +297,33 @@ namespace Extract.FileActionManager.FileSuppliers
 
         // Time to wait between retries
         int _timeToWaitBetweenRetries = _DEFAULT_WAIT_TIME_IN_MILLISECONDS_BETWEEN_RETRIES;
+
+        /// <summary>
+        /// The <see cref="FileProcessingDB"/> in use.
+        /// </summary>
+        IFileProcessingDB _fileProcessingDB;
+
+        /// <summary>
+        /// The ID of the action for which files are being queued.
+        /// </summary>
+        int _actionID = -1;
+
+        /// <summary>
+        /// Keeps track of how many consecutive files fail to download; DownloadFiles will be
+        /// aborted if this number becomes > <see cref="NumberOfTimesToRetry"/>
+        /// </summary>
+        int _consecutiveDownloadFailures = 0;
+
+        #endregion Fields
+
+        #region Events
         
-        #endregion
+        /// <summary>
+        /// Raised when an error occurs during an FTP operation.
+        /// </summary>
+        public event EventHandler<ExtractExceptionEventArgs> FtpError;
+
+        #endregion Events
 
         #region Properties
 
@@ -426,7 +579,7 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
         
-        #endregion
+        #endregion Properties
           
         #region Constructors
 
@@ -625,14 +778,23 @@ namespace Extract.FileActionManager.FileSuppliers
         /// </summary>
         /// <param name="pTarget">The IFileSupplerTarget that receives the files</param>
         /// <param name="pFAMTM">The <see cref="FAMTagManager"/> to use if needed.</param>
+        /// <param name="pDB">The <see cref="FileProcessingDB"/> in use.</param>
+        /// <param name="nActionID">The ID of the action for which files are being queued.</param>
         [CLSCompliant(false)]
-        public void Start(IFileSupplierTarget pTarget, FAMTagManager pFAMTM)
+        public void Start(IFileSupplierTarget pTarget, FAMTagManager pFAMTM, FileProcessingDB pDB,
+            int nActionID)
         {
             try
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_licenseId,
                    "ELI32216", _COMPONENT_DESCRIPTION);
+
+                _fileProcessingDB = pDB;
+                _actionID = nActionID;
+
+                // Notify the FtpEventRecorder to recheck the DBInfo setting for whether to log FTP events
+                FtpEventRecorder.RecheckFtpLoggingStatus();
 
                 InitializeEventsForStart();
 
@@ -665,6 +827,9 @@ namespace Extract.FileActionManager.FileSuppliers
                 // Wait for the DownloadManagerThread to stop
                 _ftpDownloadManagerThread.Join();
                 _ftpDownloadManagerThread = null;
+
+                _fileProcessingDB = null;
+                _actionID = -1;
 
                 // Clear out any remaining files in the files to download queue
                 _filesToDownload = new ConcurrentQueue<FTPFile>();
@@ -913,63 +1078,6 @@ namespace Extract.FileActionManager.FileSuppliers
         #region EventHandlers
 
         /// <summary>
-        /// Handles the FileDownloaded event when downloading files from the ftpserver
-        /// If the file was successfully downloaded this will perform the 
-        /// after download action othewise it will delete any file in the local folder 
-        /// since this file may be corrupt.
-        /// </summary>
-        /// <param name="sender">The SecureFTPConnection that is downloading files</param>
-        /// <param name="e">The FTPFileTransferEventArgs object that contains
-        /// information about the file downloaded</param>
-        void HandleFileDownloaded(object sender, FTPFileTransferEventArgs e)
-        {
-            try
-            {
-                SecureFTPConnection runningConnection = (SecureFTPConnection)sender;
-                if (e.Succeeded)
-                {
-                    // Verify that the files is exists localy
-                    if (File.Exists(e.LocalPath) && e.LocalFileSize == e.RemoteFileSize)
-                    {
-                        // Add the local file that was just downloaded to the database
-                        _fileTarget.NotifyFileAdded(e.LocalPath, this);
-                        PerformAfterDownloadAction(e.RemoteFile, runningConnection);
-                    }
-                    else
-                    {
-                        ExtractException ee = new ExtractException("ELI32311", "File was not downloaded.");
-                        ee.AddDebugData("LocalFile", e.LocalPath, false);
-                        ee.AddDebugData("RemoteFile", e.RemoteFile, false);
-                        ee.AddDebugData("LocalFileSize", e.LocalFileSize, false);
-                        ee.AddDebugData("RemoteFileSize", e.RemoteFileSize, false);
-                        throw ee;
-                    }
-                }
-                else
-                {
-                    // If the file was partially downloaded should log and exception
-                    // The download may have failed due to the file existing in the local folder
-                    // and so the file may not have been changed.  Don't want to delete it 
-                    // since that could delete a file that existed before the download attempt
-                    if (File.Exists(e.LocalPath))
-                    {
-                        ExtractException ee = new ExtractException("ELI32323",
-                            "File may have been partially downloaded");
-                        ee.AddDebugData("Local File", e.LocalPath, false);
-                        ee.AddDebugData("Remote File", e.RemoteFile, false);
-                        ee.Log();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ex.AsExtract("ELI32142");
-                ee.AddDebugData("Remote File", e.RemoteFile, false);
-                ee.Log();
-            }
-        }
-                
-        /// <summary>
         /// Handles the PollingTimer timeout event, it will cause the ManageFileDownload thread
         /// to connect to the ftp server and get a listing of files to download.  If the 
         /// ManageFileDownload thread is already connected to the ftp server this will cause it
@@ -996,6 +1104,7 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 do
                 {
+                    _pollFtpServerForFiles.Reset();
                     _doneAddingFilesToQueue.Reset();
                     
                     // Start the file download threads
@@ -1024,6 +1133,9 @@ namespace Extract.FileActionManager.FileSuppliers
         /// downloading files</returns>
         List<Task> StartFileDownloadThreads()
         {
+            // Reset _consecutiveDownloadFailures before launching new DownloadFiles threads.
+            _consecutiveDownloadFailures = 0;
+
             // Set up the download connections
             List<Task> downloadThreads =
                 new List<Task>(NumberOfConnections);
@@ -1079,24 +1191,90 @@ namespace Extract.FileActionManager.FileSuppliers
                 {
                     FtpMethods.InitializeFtpApiLicense(runningConnection);
 
-                    // Add event handler for when files are down downloading.
-                    runningConnection.Downloaded += new FTPFileTransferEventHandler(HandleFileDownloaded);
-
                     FTPFile currentFtpFile;
 
                     // There are retry settings for the file supplier that will allow quicker exiting if
                     // the stop button is pressed on the FAM so change the connection to not retry.
                     runningConnection.RetryCount = 0;
 
-                    // Create retry object
-                    Retry<Exception> _retry = 
+                    // Create retry objects
+                    Retry<Exception> downloadRetry = 
+                        new Retry<Exception>(NumberOfTimesToRetry, TimeToWaitBetweenRetries, _stopSupplying);
+
+                    Retry<Exception> afterDownloadRetry =
                         new Retry<Exception>(NumberOfTimesToRetry, TimeToWaitBetweenRetries, _stopSupplying);
 
                     // Download the files
                     while (GetNextFileToDownload(out currentFtpFile))
                     {
-                        _retry.DoRetryNoReturnValue(DownloadFileFromFtpServer, 
-                            runningConnection, currentFtpFile);
+                        try
+                        {
+                            // The FileRecord will be provided by DownloadFileFromFtpServer.
+                            IFileRecord fileRecord;
+
+                            // Call the DownloadFileFromFtpServer retry within a FtpEventRecorder
+                            // block so that an FTP event history row will be added upon success or
+                            // after all retries have been exhausted.
+                            using (FtpEventRecorder recorder = new FtpEventRecorder(this,
+                                runningConnection, _fileProcessingDB, _actionID, true,
+                                EFTPAction.kDownloadFileFromFtpServer))
+                            {
+                                fileRecord = downloadRetry.DoRetry(
+                                    DownloadFileFromFtpServer, runningConnection, currentFtpFile);
+
+                                // Assign the FileRecord for the recorder so that it knows which
+                                // file the FTP event relates to.
+                                recorder.FileRecord = fileRecord;
+
+                                Interlocked.Exchange(ref _consecutiveDownloadFailures, 0);
+                            }
+
+                            // File record may be null if a skip condition excludes the file.
+                            if (fileRecord != null &&
+                                AfterDownloadAction != AfterDownloadRemoteFileActon.DoNothingToRemoteFile)
+                            {
+                                EFTPAction afterDownloadFtpAction = EFTPAction.kDeleteFileFromFtpServer;
+                                if (AfterDownloadAction == AfterDownloadRemoteFileActon.ChangeRemoteFileExtension)
+                                {
+                                    afterDownloadFtpAction = EFTPAction.kRenameFileOnFtpServer;
+                                }
+
+                                // Call the PerformAfterDownloadAction retry within a FtpEventRecorder
+                                // block so that an FTP event history row will be added upon success or
+                                // after all retries have been exhausted.
+                                using (FtpEventRecorder recorder = new FtpEventRecorder(this,
+                                    runningConnection, _fileProcessingDB, _actionID, true,
+                                    afterDownloadFtpAction))
+                                {
+                                    // Assign the FileRecord for the recorder so that it knows which
+                                    // file the FTP event relates to.
+                                    recorder.FileRecord = fileRecord;
+
+                                    afterDownloadRetry.DoRetryNoReturnValue(
+                                        PerformAfterDownloadAction, currentFtpFile.Path, runningConnection);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractLog("ELI33977");
+
+                            // If at least _CONSECUTIVE_FAILURES_BEFORE_RE_POLLING files have failed
+                            // since the last one was succesfully downloaded and the polling timer 
+                            // has fired since the last poll, re-poll before trying anymore downloads
+                            // in case the files in our list are no longer available on the server.
+                            if (Interlocked.Increment(ref _consecutiveDownloadFailures)
+                                    > _CONSECUTIVE_FAILURES_BEFORE_RE_POLLING &&
+                                _pollingTimer != null && _pollFtpServerForFiles.WaitOne(0))
+                            {
+                                // Clear out the existing queue so that a new list is generated from
+                                // scratch on the next poll.
+                                FTPFile temp;
+                                while (_filesToDownload.TryDequeue(out temp));
+
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -1183,7 +1361,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 {
                     _filesToDownload.Enqueue(file);
                 }
-                else if (RecursivelyDownload && file.Dir  )
+                else if (RecursivelyDownload && file.Dir)
                 {
                     DetermineFilesToDownload(file.Children);
                 }
@@ -1240,10 +1418,10 @@ namespace Extract.FileActionManager.FileSuppliers
                     runningConnection.RetryCount = 0;
 
                     // Create retry object
-                    Retry<Exception> _retry = 
+                    Retry<Exception> retry = 
                         new Retry<Exception>(NumberOfTimesToRetry, TimeToWaitBetweenRetries, _stopSupplying);
                     
-                    FTPFile[] directoryContents = _retry.DoRetry(GetFileListFromFtpServer, runningConnection);
+                    FTPFile[] directoryContents = retry.DoRetry(GetFileListFromFtpServer, runningConnection);
 
                     // Fill the filesToDownload list
                     DetermineFilesToDownload(directoryContents);
@@ -1420,7 +1598,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// </summary>
         /// <param name="remoteFile">Name of file to delete from the ftp sever</param>
         /// <param name="runningConnection">Connection to the ftp server</param>
-        private bool DeleteFileFromFtpServer(string remoteFile, SecureFTPConnection runningConnection)
+        static bool DeleteFileFromFtpServer(string remoteFile, SecureFTPConnection runningConnection)
         {
             try
             {
@@ -1444,7 +1622,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <param name="fromFileName">Name of file being renamed on ftp server</param>
         /// <param name="toFileName">New name for file on ftp server</param>
         /// <param name="runningConnection">Connection to the ftp server</param>
-        private bool RenameFileOnFtpServer(string fromFileName, string toFileName, SecureFTPConnection runningConnection)
+        static bool RenameFileOnFtpServer(string fromFileName, string toFileName, SecureFTPConnection runningConnection)
         {
             try
             {
@@ -1468,12 +1646,19 @@ namespace Extract.FileActionManager.FileSuppliers
         /// </summary>
         /// <param name="runningConnection">Connection to the ftp server</param>
         /// <param name="currentFtpFile">FTPFile object that has info for downloading the file</param>
-        private void DownloadFileFromFtpServer(SecureFTPConnection runningConnection, FTPFile currentFtpFile)
+        /// <returns>The <see cref="IFileRecord"/> associated with the dowloaded file if the
+        /// download and supplying succeeded; otherwise <see langword="null"/>.</returns>
+        private IFileRecord DownloadFileFromFtpServer(SecureFTPConnection runningConnection,
+            FTPFile currentFtpFile)
         {
             string localFile = "";
 
             try
             {
+                // The FileRecord will be set inside of the runningConnection.Downloaded delegate
+                // if the download and supplying succeeds.
+                IFileRecord fileRecord = null;
+
                 // If not already connected connect to the FTP Server
                 if (!runningConnection.IsConnected)
                 {
@@ -1501,16 +1686,87 @@ namespace Extract.FileActionManager.FileSuppliers
                     {
                         // The file does not need to be downloaded but it should be added to the
                         // database again if required
-                        _fileTarget.NotifyFileAdded(localFile, this);
+                        fileRecord = _fileTarget.NotifyFileAdded(localFile, this);
 
-                        // The after download action still needs to be done
-                        PerformAfterDownloadAction(currentFtpFile.Path, runningConnection);
-
-                        return;
+                        return fileRecord;
                     }
                 }
 
-                runningConnection.DownloadFile(localFile, currentFtpFile.Name);
+                // Define the runningConnection.Downloaded delegate in this scope so that it can set
+                // the fileRecord variable.
+                FTPFileTransferEventHandler handleDownloaded = ((sender, e) =>
+                {
+                    try
+                    {
+                        if (e.Succeeded)
+                        {
+                            // Verify that the files is exists localy
+                            if (File.Exists(e.LocalPath) && e.LocalFileSize == e.RemoteFileSize)
+                            {
+                                // Add the local file that was just downloaded to the database
+                                fileRecord = _fileTarget.NotifyFileAdded(e.LocalPath, this);
+                            }
+                            else
+                            {
+                                ExtractException ee = new ExtractException("ELI32311", "File was not downloaded.");
+                                ee.AddDebugData("LocalFile", e.LocalPath, false);
+                                ee.AddDebugData("RemoteFile", e.RemoteFile, false);
+                                ee.AddDebugData("LocalFileSize", e.LocalFileSize, false);
+                                ee.AddDebugData("RemoteFileSize", e.RemoteFileSize, false);
+                                throw ee;
+                            }
+                        }
+                        else
+                        {
+                            ExtractException ee;
+
+                            // The download may have failed due to the file existing in the local folder
+                            // and so the file may not have been changed. Don't want to delete it 
+                            // since that could delete a file that existed before the download attempt.
+                            if (File.Exists(e.LocalPath))
+                            {
+                                ee = new ExtractException("ELI32323",
+                                    "File may have been partially downloaded", e.Exception);
+                            }
+                            else
+                            {
+                                ee = new ExtractException("ELI33989", "Download failed", e.Exception);
+                            }
+
+                            ee.AddDebugData("Local File", e.LocalPath, false);
+                            ee.AddDebugData("Remote File", e.RemoteFile, false);
+                            throw ee;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ExtractException ee = ex.AsExtract("ELI32142");
+                        ee.AddDebugData("Remote File", e.RemoteFile, false);
+
+                        // In most cases we don't want throw from an event handler, but in this case
+                        // we know this event is part of the runningConnection.DownloadFile() call.
+                        // We want that call to throw this exception if the download did not
+                        // properly complete.
+                        throw ee;
+                    }
+                });
+
+                try
+                {
+                    runningConnection.Downloaded += handleDownloaded;
+
+                    runningConnection.DownloadFile(localFile, currentFtpFile.Name);
+                }
+                catch (Exception ex)
+                {
+                    // Raise an FTP error (as part of the IFtpEventExceptionSource implementation)
+                    OnFtpError(ex.AsExtract("ELI33978"));
+                    throw;
+                }
+                finally
+                {
+                    runningConnection.Downloaded -= handleDownloaded;
+                }
 
                 // Make sure the local file exists ( the dowload may have failed. in some way)
                 if (File.Exists(localFile))
@@ -1519,6 +1775,8 @@ namespace Extract.FileActionManager.FileSuppliers
                         currentFtpFile);
                     ftpInfoFile.Save();
                 }
+
+                return fileRecord;
             }
             catch (Exception ex)
             {
@@ -1545,27 +1803,45 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <param name="runningConnection">FTP connection used to preform the action</param>
         private void PerformAfterDownloadAction(string remoteFileName, SecureFTPConnection runningConnection)
         {
-            // There are retry settings for the file supplier that will allow quicker exiting if
-            // the stop button is pressed on the FAM so change the connection to not retry.
-            runningConnection.RetryCount = 0;
-
-            // Create retry object
-            Retry<Exception> _retry =
-                new Retry<Exception>(NumberOfTimesToRetry, TimeToWaitBetweenRetries, _stopSupplying);
-
-            // Perform the after download action
-            switch (AfterDownloadAction)
+            try
             {
-                case AfterDownloadRemoteFileActon.ChangeRemoteFileExtension:
-                    _retry.DoRetry(RenameFileOnFtpServer, remoteFileName,
-                        remoteFileName + NewExtensionForRemoteFile, runningConnection);
-                    break;
-                case AfterDownloadRemoteFileActon.DeleteRemoteFile:
-                    _retry.DoRetry(DeleteFileFromFtpServer, remoteFileName, runningConnection);
-                    break;
+                // There are retry settings for the file supplier that will allow quicker exiting if
+                // the stop button is pressed on the FAM so change the connection to not retry.
+                runningConnection.RetryCount = 0;
+
+                // Perform the after download action
+                switch (AfterDownloadAction)
+                {
+                    case AfterDownloadRemoteFileActon.ChangeRemoteFileExtension:
+                        RenameFileOnFtpServer(remoteFileName, remoteFileName + NewExtensionForRemoteFile,
+                            runningConnection);
+                        break;
+                    case AfterDownloadRemoteFileActon.DeleteRemoteFile:
+                        DeleteFileFromFtpServer(remoteFileName, runningConnection);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Raise an FTP error (as part of the IFtpEventExceptionSource implementation)
+                OnFtpError(ex.AsExtract("ELI33984"));
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="FtpError"/> event.
+        /// </summary>
+        /// <param name="ftpException">An <see cref="ExtractException"/> containing information
+        /// about the error.</param>
+        void OnFtpError(ExtractException ftpException)
+        {
+            if (FtpError != null)
+            {
+                FtpError(this, new ExtractExceptionEventArgs(ftpException));
             }
         }
         
-        #endregion
+        #endregion Methods
     }
 }

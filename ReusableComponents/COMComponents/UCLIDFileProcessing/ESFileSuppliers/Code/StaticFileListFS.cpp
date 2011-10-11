@@ -351,7 +351,8 @@ STDMETHODIMP CStaticFileListFS::GetSizeMax(ULARGE_INTEGER *pcbSize)
 //-------------------------------------------------------------------------------------------------
 // IFileSupplier
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CStaticFileListFS::raw_Start( IFileSupplierTarget *pTarget, IFAMTagManager *pFAMTM )
+STDMETHODIMP CStaticFileListFS::raw_Start(IFileSupplierTarget *pTarget, IFAMTagManager *pFAMTM,
+	IFileProcessingDB* pDB, long nActionID)
 {
 	try
 	{

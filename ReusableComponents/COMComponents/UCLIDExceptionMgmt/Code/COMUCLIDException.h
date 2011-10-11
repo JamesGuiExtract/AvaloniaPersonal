@@ -58,6 +58,7 @@ public:
 	STDMETHOD(LogWithSpecifiedInfo)(BSTR bstrMachineName, BSTR bstrUserName, long nDateTimeUtc,
 		long nPid, BSTR bstrAppName, VARIANT_BOOL vbForceLogLocal);
 	STDMETHOD(LogLocal)();
+	STDMETHOD(CreateLogString)(BSTR* pbstrLogString);
 
 private:
 	// Method creates exception with the data from the COMUCLIDException object passed

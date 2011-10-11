@@ -16,28 +16,71 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.FileActionManager.FileProcessors
 {
     /// <summary>
-    /// Enum for specifing the action to be taken on the remote server
+    /// Interface for the <see cref="FtpFileTransferTask"/>.
     /// </summary>
     [ComVisible(true)]
-    [Guid("BA66282F-6304-4A8C-A792-E2CA7A52DD9A")]
-    public enum TransferActionToPerform
+    [Guid("58E04DBF-7087-4EBD-BC14-6499700C7CF9")]
+    [CLSCompliant(false)]
+    public interface IFtpFileTransferTask : ICategorizedComponent, IConfigurableObject,
+        IMustBeConfiguredObject, ICopyableObject, IFileProcessingTask,
+        ILicensedComponent, IPersistStream, IFtpEventErrorSource, IDisposable
     {
         /// <summary>
-        /// Indicates file should be uploaded to FTP Server
+        /// Specifies the action to perform with the file
         /// </summary>
-        UploadFileToFtpServer = 0,
+        EFTPAction ActionToPerform
+        {
+            get;
+            set;
+        }
 
         /// <summary>
-        /// Indicates file should be downloaded from FTP Server
+        /// Specifies the name of the remote file using tags.
         /// </summary>
-        DownloadFileFromFtpServer = 1,
+        string RemoteFileName
+        {
+            get;
+            set;
+        }
 
         /// <summary>
-        /// Indicates file should be deleted from FTP Server
+        /// Specifies the name of the local file using tags.
         /// </summary>
-        DeleteFileFromFtpServer = 2
+        string LocalFileName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The object that contains all of the settings relevant to make a connection to 
+        /// an ftp site
+        /// </summary>
+        [CLSCompliant(false)]
+        SecureFTPConnection ConfiguredFtpConnection
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Number of times to retry calls to the ftp server
+        /// </summary>
+        int NumberOfTimesToRetry
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Time to wait between retries for calls to Ftp server
+        /// </summary>
+        int TimeToWaitBetweenRetries
+        {
+            get;
+            set;
+        }
     }
-
 
     /// <summary>
     /// Represents a file processing task that will upload, download or delete files from ftp server
@@ -45,9 +88,7 @@ namespace Extract.FileActionManager.FileProcessors
     [ComVisible(true)]
     [Guid("A4D719DE-EAD2-47AA-991D-9E60FE0D8D9F")]
     [ProgId("Extract.FileActionManager.FileProcessors.FtpFileTransferTask")]
-    public class FtpFileTransferTask : ICategorizedComponent, IConfigurableObject,
-        IMustBeConfiguredObject, ICopyableObject, IFileProcessingTask, 
-        ILicensedComponent, IPersistStream, IDisposable
+    public class FtpFileTransferTask : IFtpFileTransferTask
     {
         #region Constants
 
@@ -69,14 +110,14 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Default number of retries before failure
         /// </summary>
-        const int _DEFAULT_NUMBER_OF_RETRIES_BEFORE_FAILURE = 1000;
+        const int _DEFAULT_NUMBER_OF_RETRIES_BEFORE_FAILURE = 10;
 
         #endregion Constants
 
         #region Fields
         
         // Action the task is to perform on a file
-        TransferActionToPerform _actionToPerform;
+        EFTPAction _actionToPerform;
 
         // Contains the string including tags that specifies the remote file name
         string _remoteFileName = "";
@@ -123,12 +164,22 @@ namespace Extract.FileActionManager.FileProcessors
 
         #endregion Constructor
 
+        #region Events
+
+        /// <summary>
+        /// Raised when an error occurs during an FTP operation.
+        /// </summary>
+        public event EventHandler<ExtractExceptionEventArgs> FtpError;
+
+        #endregion Events
+
         #region Properties
 
         /// <summary>
         /// Specifies the action to perform with the file
         /// </summary>
-        public TransferActionToPerform ActionToPerform
+        [CLSCompliant(false)]
+        public EFTPAction ActionToPerform
         {
             get
             {
@@ -323,7 +374,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                return (ActionToPerform == TransferActionToPerform.DeleteFileFromFtpServer ||
+                return (ActionToPerform == EFTPAction.kDeleteFileFromFtpServer ||
                     !string.IsNullOrWhiteSpace(_localFileName)) &&
                     !string.IsNullOrWhiteSpace(_remoteFileName) &&
                     _remoteFileName[0] != '.' &&
@@ -461,6 +512,9 @@ namespace Extract.FileActionManager.FileProcessors
                 // Check if the RemoteSourceDocName tag is used in the input or output file name
                 _loadDownloadInfoFile = _localFileName.Contains(FileActionManagerPathTags.RemoteSourceDocumentTag) ||
                     _remoteFileName.Contains(FileActionManagerPathTags.RemoteSourceDocumentTag);
+
+                // Notify the FtpEventRecorder to recheck the DBInfo setting for whether to log FTP events
+                FtpEventRecorder.RecheckFtpLoggingStatus();
             }
             catch (Exception ex)
             {
@@ -513,7 +567,7 @@ namespace Extract.FileActionManager.FileProcessors
                        Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir);
                 }
 
-                if (ActionToPerform != TransferActionToPerform.DeleteFileFromFtpServer)
+                if (ActionToPerform != EFTPAction.kDeleteFileFromFtpServer)
                 {
                     localFile = tags.Expand(_localFileName);
                 }
@@ -528,7 +582,18 @@ namespace Extract.FileActionManager.FileProcessors
                 // Create retry object
                 Retry<Exception> retry = 
                     new Retry<Exception>(NumberOfTimesToRetry, TimeToWaitBetweenRetries, _cancelTask);
-                retry.DoRetryNoReturnValue(PerformAction, localFile, remoteFile);
+
+                // Call the PerformAction retry within a FtpEventRecorder block so that an FTP event
+                // history row will be added upon success or after all retries have been exhausted.
+                using (FtpEventRecorder recorder = new FtpEventRecorder(this,
+                    _runningConnection, pDB, nActionID, false, ActionToPerform))
+                {
+                    // Assign the FileRecord for the recorder so that it knows which file the FTP
+                    // event relates to.
+                    recorder.FileRecord = pFileRecord;
+
+                    retry.DoRetryNoReturnValue(PerformAction, localFile, remoteFile);
+                }
 
                 // If we reached this point then processing was successful
                 return EFileProcessingResult.kProcessingSuccessful;
@@ -632,7 +697,7 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     InitializeDefaults();
 
-                    _actionToPerform = (TransferActionToPerform)reader.ReadInt32();
+                    _actionToPerform = (EFTPAction)reader.ReadInt32();
                     _remoteFileName = reader.ReadString();
                     _localFileName = reader.ReadString();
 
@@ -827,36 +892,40 @@ namespace Extract.FileActionManager.FileProcessors
 
                 FtpMethods.SetCurrentFtpWorkingFolder(_runningConnection, remoteFile);
                 remoteFile = PathUtil.GetFileName(remoteFile);
+
                 switch (ActionToPerform)
                 {
-                    case TransferActionToPerform.UploadFileToFtpServer:
+                    case EFTPAction.kUploadFileToFtpServer:
                         _runningConnection.UploadFile(localFile, remoteFile);
                         break;
-                    case TransferActionToPerform.DownloadFileFromFtpServer:
+                    case EFTPAction.kDownloadFileFromFtpServer:
                         FtpMethods.GenerateLocalPathCreateIfNotExists(
                             _runningConnection.ServerDirectory, Path.GetDirectoryName(localFile),
                             _runningConnection.ServerDirectory);
                         _runningConnection.DownloadFile(localFile, remoteFile);
                         break;
-                    case TransferActionToPerform.DeleteFileFromFtpServer:
+                    case EFTPAction.kDeleteFileFromFtpServer:
                         _runningConnection.DeleteFile(remoteFile);
                         break;
                 }
             }
             catch (Exception ex)
             {
+                // Raise an FTP error (as part of the IFtpEventExceptionSource implementation)
+                OnFtpError(ex.AsExtract("ELI33979"));
+
                 ExtractException ee = ex.AsExtract("ELI32648");
                 switch (ActionToPerform)
                 {
-                    case TransferActionToPerform.UploadFileToFtpServer:
+                    case EFTPAction.kUploadFileToFtpServer:
                         ee.AddDebugData("TransferAction", "UploadFielToFtpServer", false);
                         ee.AddDebugData("LocalFile", localFile, false);
                         break;
-                    case TransferActionToPerform.DownloadFileFromFtpServer:
+                    case EFTPAction.kDownloadFileFromFtpServer:
                         ee.AddDebugData("TransferAction", "DownloadFileFromFtpServer", false);
                         ee.AddDebugData("LocalFile", localFile, false);
                         break;
-                    case TransferActionToPerform.DeleteFileFromFtpServer:
+                    case EFTPAction.kDeleteFileFromFtpServer:
                         ee.AddDebugData("TransferAction", "DeleteFileFromFtpServer", false);
                         break;
                 }
@@ -869,6 +938,19 @@ namespace Extract.FileActionManager.FileProcessors
         {
             _numberOfTimesToRetry = _DEFAULT_NUMBER_OF_RETRIES_BEFORE_FAILURE;
             _timeToWaitBetweenRetries = _DEFAULT_WAIT_TIME_IN_MILLISECONDS_BETWEEN_RETRIES;
+        }
+
+        /// <summary>
+        /// Raises the <see cref="FtpError"/> event.
+        /// </summary>
+        /// <param name="ftpException">An <see cref="ExtractException"/> containing information
+        /// about the error.</param>
+        void OnFtpError(ExtractException ftpException)
+        {
+            if (FtpError != null)
+            {
+                FtpError(this, new ExtractExceptionEventArgs(ftpException));
+            }
         }
 
         #endregion Methods
