@@ -226,16 +226,18 @@ namespace Extract.Utilities.Ftp
                     new ExtractException("ELI33982", "Unexpected FTP event.").Log();
                     UnregisterEvents();
                 }
-
-                // If this event has previously ended, this is a retry.
-                if (_eventEnded)
+                else
                 {
-                    _retryCount++;
-                }
+                    // If this event has previously ended, this is a retry.
+                    if (_eventEnded)
+                    {
+                        _retryCount++;
+                    }
 
-                _eventException = null;
-                _eventEnded = false;
-                _ftpEvent = e;
+                    _eventException = null;
+                    _eventEnded = false;
+                    _ftpEvent = e;
+                }
             }
             catch (Exception ex)
             {
@@ -327,13 +329,13 @@ namespace Extract.Utilities.Ftp
             {
                 try
                 {
-                    // Stop watch for FTP events (will have registered if _ftpConnection was set).
+                    // Stop watching for FTP events (will have registered if _ftpConnection was set).
                     if (_ftpConnection != null)
                     {
                         UnregisterEvents();
                     }
 
-                    // If these objects were set, and FTP event was tracked.
+                    // If these objects were set, an FTP event was tracked.
                     if (_ftpConnection != null && _fileProcessingDB != null && _ftpEvent != null)
                     {
                         // Assign argument1 and argument2 using _ftpEvent and the _ftpAction.

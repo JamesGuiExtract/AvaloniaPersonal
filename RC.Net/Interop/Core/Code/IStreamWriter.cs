@@ -196,6 +196,36 @@ namespace Extract.Interop
         }
 
         /// <summary>
+        /// Writes an array of <typeparamref name="T"/> to the <see cref="IStream"/> object.
+        /// </summary>
+        /// <param name="value">The array of <typeparamref name="T"/> to write.</param>
+        public void Write<T>(T[] value) where T : struct, ISerializable
+        {
+            try
+            {
+                // First stream whether the value is null
+                bool hasValue = value != null;
+                _formatter.Serialize(_stream, hasValue);
+                if (hasValue)
+                {
+                    // Stream the number of structs in the array
+                    _formatter.Serialize(_stream, value.Length);
+
+                    // Stream each struct
+                    for (int i = 0; i < value.Length; i++)
+                    {
+                        WriteStruct(value[i]);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI33991",
+                    "Unable to write struct array.", ex);
+            }
+        }
+
+        /// <summary>
         /// Writes a <see cref="Boolean"/> to the <see cref="IStream"/> object.
         /// </summary>
         /// <param name="value">The <see cref="Boolean"/> to write.</param>

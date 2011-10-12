@@ -6,7 +6,10 @@ using Extract.Utilities.Ftp;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -40,6 +43,31 @@ namespace Extract.FileActionManager.FileSuppliers
         /// Do nothing to the remote file on the server
         /// </summary>
         DoNothingToRemoteFile = 2
+    }
+
+    /// <summary>
+    /// Enum for whether the remote location should be polled for files and, if so, whether it
+    /// should be polled continuously or at set times.
+    /// </summary>
+    [ComVisible(true)]
+    [Guid("68EF6C79-CE78-44A6-A40A-86BA307F93BA")]
+    public enum PollingMethod
+    {
+        /// <summary>
+        /// Don't poll the server. Whatever files are available for download when the FAM is started
+        /// are the only ones that will be downloaded.
+        /// </summary>
+        NoPolling = 0,
+
+        /// <summary>
+        /// Poll the server a regular intervals indefinitely.
+        /// </summary>
+        Continuously = 1,
+
+        /// <summary>
+        /// Poll the server at specific times of the day.
+        /// </summary>
+        SetTimes = 2,
     }
 
     /// <summary>
@@ -81,20 +109,33 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// Flag indicating that the remote location should be polled for files
-        /// every <see cref="PollingIntervalInMinutes"/>
+        /// Indicates whether the remote location should be polled for files and, if so, whether it
+        /// should be polled continuously or at set times.
         /// </summary>
-        bool PollRemoteLocation
+        PollingMethod PollingMethod
         {
             get;
             set;
         }
 
         /// <summary>
-        /// The interval in minutes between checks of the remote location for
-        /// files only used if <see cref="PollRemoteLocation"/> is <see langword="true"/>
+        /// The interval in minutes between checks of the remote location for files. Only used if
+        /// <see cref="PollingMethod"/> is PollingMethod.Continuously.
         /// </summary>
         Int32 PollingIntervalInMinutes
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DateTime"/> values indicating the times of day that the
+        /// server should be polled. Only used if <see cref="PollingMethod"/> is
+        /// PollingMethod.SetTimes.
+        /// </summary>
+        // In order to export to COM, this cannot be a generic collection, such as IEnumerable.
+        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
+        DateTime[] PollingTimes
         {
             get;
             set;
@@ -185,8 +226,10 @@ namespace Extract.FileActionManager.FileSuppliers
 
         /// <summary>
         /// Current file supplier version.
+        /// <para>Version 4</para>
+        /// Boolean for whether to poll became PollingMethod; also added PollingTimes
         /// </summary>
-        const int _CURRENT_VERSION = 3;
+        const int _CURRENT_VERSION = 4;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -240,11 +283,15 @@ namespace Extract.FileActionManager.FileSuppliers
         // Field for the RecursivelyDowload property
         bool _recursivelyDownload;
 
-        // Field for PollRemoteLocation property
-        bool _pollRemoteLocation;
+        // Indicates whether the remote location should be polled for files and, if so, whether it
+        // should be polled continuously or at set times.
+        PollingMethod _pollingMethod;
 
         // Field for PollingIntervalInMinutes property
         Int32 _pollingIntervalInMinutes;
+        
+        // Field for PollingTimes property
+        DateTime[] _pollingTimes = new DateTime[0];
 
         // Field for AfterDownloadAction property
         AfterDownloadRemoteFileActon _afterDownloadAction;
@@ -313,6 +360,11 @@ namespace Extract.FileActionManager.FileSuppliers
         /// aborted if this number becomes > <see cref="NumberOfTimesToRetry"/>
         /// </summary>
         int _consecutiveDownloadFailures = 0;
+
+        /// <summary>
+        /// Protects access to creating/disposal of the _pollingTimer.
+        /// </summary>
+        object _lock = new object();
 
         #endregion Fields
 
@@ -402,28 +454,28 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// Flag indicating that the remote location should be polled for files
-        /// every <see cref="PollingIntervalInMinutes"/>
+        /// Indicates whether the remote location should be polled for files and, if so, whether it
+        /// should be polled continuously or at set times.
         /// </summary>
-        public bool PollRemoteLocation 
+        public PollingMethod PollingMethod
         { 
             get
             {
-                return _pollRemoteLocation;
+                return _pollingMethod;
             }
             set
             {
-                if (_pollRemoteLocation != value)
+                if (_pollingMethod != value)
                 {
-                    _pollRemoteLocation = value;
+                    _pollingMethod = value;
                     _dirty = true;
                 }
             }
         }
 
         /// <summary>
-        /// The interval in minutes between checks of the remote location for
-        /// files only used if <see cref="PollRemoteLocation"/> is <see langword="true"/>
+        /// The interval in minutes between checks of the remote location for files. Only used if
+        /// <see cref="PollingMethod"/> is PollingMethod.Continuously.
         /// </summary>
         public Int32 PollingIntervalInMinutes 
         { 
@@ -437,6 +489,42 @@ namespace Extract.FileActionManager.FileSuppliers
                 {
                     _pollingIntervalInMinutes = value;
                     _dirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DateTime"/> values indicating the times of day that the
+        /// server should be polled. Only used if <see cref="PollingMethod"/> is
+        /// PollingMethod.SetTimes.
+        /// </summary>
+        public DateTime[] PollingTimes
+        {
+            get
+            {
+                return _pollingTimes;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _pollingTimes)
+                    {
+                        // To make the displayed list of times as readable as possible, sort the times,
+                        // remove duplicates, and make sure they all fall on Jan 1, 0001.
+                        _pollingTimes = value
+                            .Select(time => new DateTime(1, 1, 1, time.Hour, time.Minute, time.Second))
+                            .Distinct()
+                            .OrderBy(time => time)
+                            .ToArray();
+
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI33996");
                 }
             }
         }
@@ -608,7 +696,66 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
-        #endregion
+        #endregion Constructors
+        
+        #region Methods
+
+        /// <summary>
+        /// Converts the specified text into an array of <see cref="DateTime"/> values. Used for
+        /// settings the <see cref="PollingTimes"/> property.
+        /// </summary>
+        /// <param name="text">The text to be parsed into <see cref="DateTime"/> values.</param>
+        /// <returns>The array of <see cref="DateTime"/> values.</returns>
+        internal static DateTime[] ConvertTextToTimes(string text)
+        {
+            try
+            {
+                string[] entries = text.Split(new char[] { ';', ',' },
+                    StringSplitOptions.RemoveEmptyEntries);
+
+                DateTime[] times = new DateTime[entries.Length];
+
+                for (int i = 0; i < entries.Length; i++)
+                {
+                    DateTime time;
+                    if (!DateTime.TryParse(entries[i], CultureInfo.CurrentCulture,
+                        DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.NoCurrentDateDefault, out time))
+                    {
+                        throw new ExtractException("ELI33992",
+                            "Failed to parse time value: \"" + entries[i] + "\"");
+                    }
+
+                    times[i] = time;
+                }
+
+                return times;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI33993");
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="PollingTimes"/> property as a string list.
+        /// </summary>
+        /// <returns></returns>
+        internal string GetPollingTimesAsText()
+        {
+            try 
+	        {	        
+		        string text = String.Join(", ", PollingTimes
+                    .Select(time => time.ToString("t", CultureInfo.CurrentCulture)));
+
+                return text;
+	        }
+	        catch (Exception ex)
+	        {
+		        throw ex.AsExtract("ELI33994");
+	        }
+        }
+
+        #endregion Methods
 
         #region ICategorizedComponent Members
 
@@ -621,7 +768,7 @@ namespace Extract.FileActionManager.FileSuppliers
             return _COMPONENT_DESCRIPTION;
         }
 
-        #endregion
+        #endregion ICategorizedComponent Members
 
         #region IConfigurableObject Members
 
@@ -658,7 +805,7 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
-        #endregion
+        #endregion IConfigurableObject Members
 
         #region IMustBeConfiguredObject Members
 
@@ -678,9 +825,10 @@ namespace Extract.FileActionManager.FileSuppliers
                     !string.IsNullOrWhiteSpace(RemoteDownloadFolder) &&
                     RemoteDownloadFolder[0] != '.' &&
                     !string.IsNullOrWhiteSpace(LocalWorkingFolder) && 
-                    !string.IsNullOrWhiteSpace(FileExtensionsToDownload) && 
-                    (!PollRemoteLocation || PollingIntervalInMinutes > 0) &&
-                    (AfterDownloadAction != AfterDownloadRemoteFileActon.ChangeRemoteFileExtension || 
+                    !string.IsNullOrWhiteSpace(FileExtensionsToDownload) &&
+                    (PollingMethod != PollingMethod.Continuously || PollingIntervalInMinutes > 0) &&
+                    (PollingMethod != PollingMethod.SetTimes || PollingTimes.Length > 0) &&
+                    (AfterDownloadAction != AfterDownloadRemoteFileActon.ChangeRemoteFileExtension ||
                         !string.IsNullOrWhiteSpace(NewExtensionForRemoteFile)) &&
                     !string.IsNullOrWhiteSpace(ConfiguredFtpConnection.ServerAddress) && 
                     !string.IsNullOrWhiteSpace(ConfiguredFtpConnection.UserName) &&
@@ -694,7 +842,7 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
-        #endregion
+        #endregion IMustBeConfigured Members
 
         #region ICopyableObject Members
 
@@ -732,7 +880,7 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
-        #endregion
+        #endregion ICopyableObject Members
 
         #region IFileSupplier Members
 
@@ -840,7 +988,7 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
-        #endregion
+        #endregion IFileSupplier Members
 
         #region IAccessRequired Members
 
@@ -876,7 +1024,7 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
-        #endregion
+        #endregion ILicensedComponent Members
 
         #region IPersistStream Members
 
@@ -916,7 +1064,16 @@ namespace Extract.FileActionManager.FileSuppliers
                     RemoteDownloadFolder = reader.ReadString();
                     FileExtensionsToDownload = reader.ReadString();
                     RecursivelyDownload = reader.ReadBoolean();
-                    PollRemoteLocation = reader.ReadBoolean();
+                    if (reader.Version < 4)
+                    {
+                        PollingMethod = reader.ReadBoolean()
+                            ? PollingMethod.Continuously
+                            : PollingMethod.NoPolling;
+                    }
+                    else
+                    {
+                        PollingMethod = (PollingMethod)reader.ReadInt32();
+                    }
                     PollingIntervalInMinutes = reader.ReadInt32();
                     AfterDownloadAction = (AfterDownloadRemoteFileActon)reader.ReadInt32();
                     NewExtensionForRemoteFile = reader.ReadString();
@@ -931,6 +1088,11 @@ namespace Extract.FileActionManager.FileSuppliers
                     {
                         NumberOfTimesToRetry = reader.ReadInt32();
                         TimeToWaitBetweenRetries = reader.ReadInt32();
+                    }
+
+                    if (reader.Version >= 4)
+                    {
+                        PollingTimes = reader.ReadStructArray<DateTime>();
                     }
 
                     string hexString = reader.ReadString();
@@ -970,7 +1132,7 @@ namespace Extract.FileActionManager.FileSuppliers
                     writer.Write(RemoteDownloadFolder);
                     writer.Write(FileExtensionsToDownload);
                     writer.Write(RecursivelyDownload);
-                    writer.Write(PollRemoteLocation);
+                    writer.Write((int)PollingMethod);
                     writer.Write(PollingIntervalInMinutes);
                     writer.Write((int)AfterDownloadAction);
                     writer.Write(NewExtensionForRemoteFile);
@@ -978,6 +1140,7 @@ namespace Extract.FileActionManager.FileSuppliers
                     writer.Write(NumberOfConnections);
                     writer.Write(NumberOfTimesToRetry);
                     writer.Write(TimeToWaitBetweenRetries);
+                    writer.Write(PollingTimes);
 
                     // Write the Ftp connection settings to the steam
                     using (MemoryStream ftpDataStream = new MemoryStream())
@@ -1010,7 +1173,7 @@ namespace Extract.FileActionManager.FileSuppliers
             size = HResult.NotImplemented;
         }
 
-        #endregion
+        #endregion IPersistStream Members
 
         #region IDisposable Members
 
@@ -1075,7 +1238,7 @@ namespace Extract.FileActionManager.FileSuppliers
 
         #endregion IDisposable
 
-        #region EventHandlers
+        #region Event Handlers
 
         /// <summary>
         /// Handles the PollingTimer timeout event, it will cause the ManageFileDownload thread
@@ -1086,10 +1249,35 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <param name="o">Object the triggered the event</param>
         void HandlePollingTimerTimeout(object o)
         {
-            _pollFtpServerForFiles.Set();
+            try
+            {
+                _pollFtpServerForFiles.Set();
+
+                // If using set times, rather than use the same interval, every time the timer fires we
+                // need to re-calculate the time interval until the next set time, and reset
+                // _pollingTimer accordingly.
+                if (PollingMethod == FileSuppliers.PollingMethod.SetTimes)
+                {
+                    lock (_lock)
+                    {
+                        System.Threading.Timer oldPollingTimer = _pollingTimer;
+
+                        long timeoutValue = GetMillisecondsUntilNextSetTime();
+
+                        _pollingTimer = new System.Threading.Timer(HandlePollingTimerTimeout, null,
+                            timeoutValue, timeoutValue);
+
+                        oldPollingTimer.Dispose();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI33997");
+            }
         }
 
-        #endregion
+        #endregion Event Handlers
 
         #region Thread Functions
         
@@ -1102,6 +1290,12 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
+                // If polling at set times, don't poll right away; wait until the next set time.
+                if (PollingMethod == FileSuppliers.PollingMethod.SetTimes && ExitManageFileDownload())
+                {
+                    return;
+                }
+
                 do
                 {
                     _pollFtpServerForFiles.Reset();
@@ -1158,7 +1352,7 @@ namespace Extract.FileActionManager.FileSuppliers
             try
             {
                 // If not polling, should exit if done adding files
-                if (!PollRemoteLocation)
+                if (PollingMethod == PollingMethod.NoPolling)
                 {
                     return true;
                 }
@@ -1284,9 +1478,9 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
-        #endregion
+        #endregion Thread Functions
 
-        #region Methods
+        #region Private Members
 
         /// <summary>
         /// Code to be executed upon registration in order to add this class to the
@@ -1316,15 +1510,16 @@ namespace Extract.FileActionManager.FileSuppliers
         /// Copies settings from the given file suppler
         /// </summary>
         /// <param name="fileSupplier">The FtpFileSupplier to copy setttings from </param>
-        public void CopyFrom(FtpFileSupplier fileSupplier)
+        void CopyFrom(FtpFileSupplier fileSupplier)
         {
             try
             {
                 RemoteDownloadFolder = fileSupplier.RemoteDownloadFolder;
                 FileExtensionsToDownload = fileSupplier.FileExtensionsToDownload;
                 RecursivelyDownload = fileSupplier.RecursivelyDownload;
-                PollRemoteLocation = fileSupplier.PollRemoteLocation;
+                PollingMethod = fileSupplier.PollingMethod;
                 PollingIntervalInMinutes = fileSupplier.PollingIntervalInMinutes;
+                PollingTimes = fileSupplier.PollingTimes;
                 AfterDownloadAction = fileSupplier.AfterDownloadAction;
                 NewExtensionForRemoteFile = fileSupplier.NewExtensionForRemoteFile;
                 LocalWorkingFolder = fileSupplier.LocalWorkingFolder;
@@ -1513,6 +1708,7 @@ namespace Extract.FileActionManager.FileSuppliers
 
             // Set Polling IntervalInMinutes to the default
             PollingIntervalInMinutes = 1;
+            PollingTimes = new DateTime[0];
             NumberOfConnections = 1;
             NumberOfTimesToRetry = _DEFAULT_NUMBER_OF_RETRIES_BEFORE_FAILURE;
             TimeToWaitBetweenRetries = _DEFAULT_WAIT_TIME_IN_MILLISECONDS_BETWEEN_RETRIES;
@@ -1523,10 +1719,13 @@ namespace Extract.FileActionManager.FileSuppliers
         /// </summary>
         void StopPolling()
         {
-            if (PollRemoteLocation)
+            lock (_lock)
             {
-                _pollingTimer.Dispose();
-                _pollingTimer = null;
+                if (_pollingTimer != null)
+                {
+                    _pollingTimer.Dispose();
+                    _pollingTimer = null;
+                }
             }
         }
 
@@ -1535,9 +1734,19 @@ namespace Extract.FileActionManager.FileSuppliers
         /// </summary>
         void StartPolling()
         {
-            if (PollRemoteLocation)
+            if (PollingMethod != FileSuppliers.PollingMethod.NoPolling)
             {
-                Int64 timeoutValue = (Int64)PollingIntervalInMinutes * 60 * 1000;
+                Int64 timeoutValue;
+
+                if (PollingMethod == PollingMethod.Continuously)
+                {
+                    timeoutValue = (Int64)PollingIntervalInMinutes * 60 * 1000;
+                }
+                else // (PollingMethod == PollingMethod.SetTimes)
+                {
+                    timeoutValue = GetMillisecondsUntilNextSetTime();
+                }
+
                 _pollingTimer = new System.Threading.Timer(HandlePollingTimerTimeout, null,
                     timeoutValue, timeoutValue);
             }
@@ -1841,7 +2050,25 @@ namespace Extract.FileActionManager.FileSuppliers
                 FtpError(this, new ExtractExceptionEventArgs(ftpException));
             }
         }
-        
-        #endregion Methods
+
+        /// <summary>
+        /// Gets the number of milliseconds
+        /// </summary>
+        /// <returns></returns>
+        long GetMillisecondsUntilNextSetTime()
+        {
+            long timeoutValue = (long)PollingTimes
+                .Select(time => time.TimeOfDay - DateTime.Now.TimeOfDay)
+                .Select(timeSpan => (timeSpan.Ticks < 0)
+                    ? timeSpan + new TimeSpan(1, 0, 0, 0)
+                    : timeSpan)
+                .OrderBy(timeSpan => timeSpan)
+                .First()
+                .TotalMilliseconds;
+
+            return timeoutValue;
+        }
+
+        #endregion Private Members
     }
 }

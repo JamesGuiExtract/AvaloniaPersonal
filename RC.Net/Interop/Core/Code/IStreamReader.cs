@@ -247,6 +247,40 @@ namespace Extract.Interop
         }
 
         /// <summary>
+        /// Reads an array of <typeparamref name="T"/> from the <see cref="IStream"/> object.
+        /// </summary>
+        /// <returns>An array of <typeparamref name="T"/></returns>
+        public T[] ReadStructArray<T>() where T : struct, ISerializable
+        {
+            try
+            {
+                // Check if the value is null
+                bool hasValue = (bool)_formatter.Deserialize(_stream);
+                if (!hasValue)
+                {
+                    return null;
+                }
+
+                // Get the number of items in the array
+                int count = (int)_formatter.Deserialize(_stream);
+
+                // Read each struct
+                T[] result = new T[count];
+                for (int i = 0; i < count; i++)
+                {
+                    result[i] = ReadStruct<T>();
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI33990",
+                    "Unable to read struct array.", ex);
+            }
+        }
+
+        /// <summary>
         /// Reads a <see cref="Boolean"/> from the <see cref="IStream"/> object.
         /// </summary>
         /// <returns>A <see cref="Boolean"/>.</returns>

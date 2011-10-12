@@ -70,8 +70,11 @@ namespace Extract.FileActionManager.FileSuppliers
                     "/" : _settings.RemoteDownloadFolder;
                 _fileExtensionSpecificationTextBox.Text = _settings.FileExtensionsToDownload;
                 _recursiveDownloadCheckBox.Checked = _settings.RecursivelyDownload;
-                _pollRemoteCheckBox.Checked = _settings.PollRemoteLocation;
+                _downloadOnceRadioButton.Checked = _settings.PollingMethod == PollingMethod.NoPolling;
+                _pollContinuouslyRadioButton.Checked = _settings.PollingMethod == PollingMethod.Continuously;
+                _pollAtSetTimesRadioButton.Checked = _settings.PollingMethod == PollingMethod.SetTimes;
                 _pollingIntervalNumericUpDown.Value = _settings.PollingIntervalInMinutes;
+                _pollingTimesTextBox.Text = _settings.GetPollingTimesAsText();
                 _ftpConnectionSettingsControl.NumberOfConnections = _settings.NumberOfConnections;
                 _ftpConnectionSettingsControl.TimeBetweenRetries = _settings.TimeToWaitBetweenRetries;
                 _ftpConnectionSettingsControl.NumberOfRetriesBeforeFailure = _settings.NumberOfTimesToRetry;
@@ -131,8 +134,34 @@ namespace Extract.FileActionManager.FileSuppliers
                 _settings.RemoteDownloadFolder = _remoteDownloadFolderTextBox.Text;
                 _settings.FileExtensionsToDownload = _fileExtensionSpecificationTextBox.Text;
                 _settings.RecursivelyDownload = _recursiveDownloadCheckBox.Checked;
-                _settings.PollRemoteLocation = _pollRemoteCheckBox.Checked;
+                if (_downloadOnceRadioButton.Checked)
+                {
+                    _settings.PollingMethod = PollingMethod.NoPolling;
+                }
+                else if (_pollContinuouslyRadioButton.Checked)
+                {
+                    _settings.PollingMethod = PollingMethod.Continuously;
+                }
+                else
+                {
+                    _settings.PollingMethod = PollingMethod.SetTimes;
+                }
+
                 _settings.PollingIntervalInMinutes = (int)_pollingIntervalNumericUpDown.Value;
+
+                try
+                {
+                    _settings.PollingTimes = FtpFileSupplier.ConvertTextToTimes(_pollingTimesTextBox.Text);
+                }
+                catch
+                {
+                    // Eat any exceptions parsing the set times unless PollingMethod.SetTimes is selected.
+                    if (_settings.PollingMethod == PollingMethod.SetTimes)
+                    {
+                        throw;
+                    }
+                }
+
                 _settings.NumberOfConnections = _ftpConnectionSettingsControl.NumberOfConnections;
                 _settings.NumberOfTimesToRetry = _ftpConnectionSettingsControl.NumberOfRetriesBeforeFailure;
                 _settings.TimeToWaitBetweenRetries = _ftpConnectionSettingsControl.TimeBetweenRetries;
@@ -217,7 +246,25 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
-       #endregion
+        /// <summary>
+        /// Handles the polling method checked changed.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandlePollingMethodCheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateControlState();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI33995");
+            }
+        }
+
+        #endregion
 
         #region Helper functions
         
@@ -226,10 +273,11 @@ namespace Extract.FileActionManager.FileSuppliers
         /// </summary>
         void UpdateControlState()
         {
-            _pollingIntervalNumericUpDown.Enabled = _pollRemoteCheckBox.Checked;
-            _doNothingRadioButton.Enabled = !_pollRemoteCheckBox.Checked;
+            _pollingIntervalNumericUpDown.Enabled = _pollContinuouslyRadioButton.Checked;
+            _pollingTimesTextBox.Enabled = _pollAtSetTimesRadioButton.Checked;
+            _doNothingRadioButton.Enabled = _downloadOnceRadioButton.Checked;
             _newExtensionTextBox.Enabled = _changeRemoteExtensionRadioButton.Checked;
-            if (_doNothingRadioButton.Checked && _pollRemoteCheckBox.Checked)
+            if (_doNothingRadioButton.Checked && !_downloadOnceRadioButton.Checked)
             {
                 _deleteRemoteFileRadioButton.Checked = true;
             }
@@ -266,13 +314,23 @@ namespace Extract.FileActionManager.FileSuppliers
                 _settingsTabControl.SelectTab(_generalSettingsTabPage);
                 _fileExtensionSpecificationTextBox.Focus();
             }
-            else if (_pollRemoteCheckBox.Checked &&
+            else if (_pollContinuouslyRadioButton.Checked &&
                 _pollingIntervalNumericUpDown.Value < 1)
             {
                 UtilityMethods.ShowMessageBox("Polling interval must be greater than 0.", 
                     "Configuration error", true);
                 _settingsTabControl.SelectTab(_generalSettingsTabPage);
                 _pollingIntervalNumericUpDown.Focus();
+            }
+            else if (_pollAtSetTimesRadioButton.Checked &&
+                string.IsNullOrWhiteSpace(_pollingTimesTextBox.Text))
+            {
+                UtilityMethods.ShowMessageBox(
+                    "Specify times to poll the server in a comma separated list",
+                    "Configuration error", true);
+
+                _settingsTabControl.SelectTab(_generalSettingsTabPage);
+                _pollingTimesTextBox.Focus();
             }
             else if (_changeRemoteExtensionRadioButton.Checked && string.IsNullOrWhiteSpace(_newExtensionTextBox.Text))
             {
@@ -295,7 +353,22 @@ namespace Extract.FileActionManager.FileSuppliers
             }
             else
             {
-                returnValue = true;
+                try
+                {
+                    if (_pollAtSetTimesRadioButton.Checked)
+                    {
+                        FtpFileSupplier.ConvertTextToTimes(_pollingTimesTextBox.Text);
+                    }
+
+                    // If ConvertTextToTimes did not throw an exception, its value is valid.
+                    returnValue = true;
+                }
+                catch (Exception ex)
+                {
+                    UtilityMethods.ShowMessageBox(ex.Message, "Configuration error", true);
+                    _settingsTabControl.SelectTab(_generalSettingsTabPage);
+                    _pollingTimesTextBox.Focus();
+                }
             }
             return returnValue;
         }
