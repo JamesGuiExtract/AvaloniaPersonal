@@ -13,13 +13,13 @@
 // StandbyThread
 //-------------------------------------------------------------------------------------------------
 CFileProcessingTaskExecutor::StandbyThread::StandbyThread(Win32Event& eventCancelProcessing,
-	ProcessingTask *pProcessingTask)
+	unique_ptr<ProcessingTask>& upProcessingTask)
 : m_eventCancelProcessing(eventCancelProcessing)
-, m_pProcessingTask(pProcessingTask)
+, m_upProcessingTask(upProcessingTask)
 {
 	try
 	{
-		ASSERT_RESOURCE_ALLOCATION("ELI33938", m_pProcessingTask != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI33938", upProcessingTask.get() != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33939");
 }
@@ -43,7 +43,7 @@ int CFileProcessingTaskExecutor::StandbyThread::Run()
 	try
 	{
 		// The Standby call may block if this is a cancellable task.
-		if (!asCppBool(m_pProcessingTask->Task->Standby()) && !m_eventStandbyEnded.isSignaled())
+		if (!asCppBool(m_upProcessingTask->Task->Standby()) && !m_eventStandbyEnded.isSignaled())
 		{
 			m_eventCancelProcessing.signal();
 		}
@@ -319,13 +319,13 @@ STDMETHODIMP CFileProcessingTaskExecutor::Standby(VARIANT_BOOL *pVal)
 		try
 		{
 			// For each task, spawn a thread to call Standby.
-			for (vector<ProcessingTask>::iterator iterTask = m_vecProcessingTasks.begin();
+			for (vector< unique_ptr<ProcessingTask> >::iterator iterTask = m_vecProcessingTasks.begin();
 				 iterTask != m_vecProcessingTasks.end();
 				 iterTask++)
 			{
-				if (iterTask->Enabled)
+				if (iterTask->get()->Enabled)
 				{
-					StandbyThread *pStandbyThread = new StandbyThread(eventCancelProcessing, &*iterTask);
+					StandbyThread *pStandbyThread = new StandbyThread(eventCancelProcessing, *iterTask);
 					vecStandbyThreads.push_back(pStandbyThread);
 
 					pStandbyThread->CreateThread();
@@ -482,16 +482,16 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 		// Exercise each File processor
 		for (long nCurrentTask = 0; nCurrentTask < nTaskCount; nCurrentTask++)
 		{
-			ProcessingTask& task = m_vecProcessingTasks[nCurrentTask];
+			unique_ptr<ProcessingTask>& upTask = m_vecProcessingTasks[nCurrentTask];
 
 			// Only process the file if the task is enabled
-			if (task.Enabled)
+			if (upTask->Enabled)
 			{
 				// Get the task number and task description
 				string strCurrentTaskName = "task #";
 				strCurrentTaskName += asString(nCurrentTask + 1);
 				strCurrentTaskName += " (";
-				strCurrentTaskName += task.Description;
+				strCurrentTaskName += upTask->Description;
 				strCurrentTaskName += ")";
 
 				try
@@ -518,7 +518,7 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 						{
 							// Lock access to m_ipCurrentTask to ensure it can't be read/written at the same time
 							CSingleLock lock(&m_mutexCurrentTask, TRUE);
-							m_ipCurrentTask = task.Task;
+							m_ipCurrentTask = upTask->Task;
 							ASSERT_RESOURCE_ALLOCATION("ELI17692", m_ipCurrentTask != __nullptr);
 						}
 
@@ -649,17 +649,15 @@ void CFileProcessingTaskExecutor::init(const IIUnknownVectorPtr& ipFileProcessin
 			UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipFileProc(ipObject->Object);
 			ASSERT_RESOURCE_ALLOCATION("ELI17849", ipFileProc != __nullptr);
 
-			ProcessingTask task(ipFileProc, asString(ipObject->Description),
-				asCppBool(ipObject->Enabled));
+			m_vecProcessingTasks.push_back(unique_ptr<ProcessingTask>(
+				new ProcessingTask(ipFileProc, asString(ipObject->Description),
+					asCppBool(ipObject->Enabled))));
 
 			// Only initialize the processing task if it is enabled
-			if (task.Enabled)
+			if (m_vecProcessingTasks[i]->Enabled)
 			{
 				ipFileProc->Init(actionID, ipFAMTagManager, ipDB);
 			}
-
-			// Add the task to the vector
-			m_vecProcessingTasks.push_back(task);
 		}
 
 		m_bInitialized = true;
@@ -675,13 +673,13 @@ void CFileProcessingTaskExecutor::close()
 		m_bInitialized = false;
 
 		// Close each FileProcessingTask
-		for (vector<ProcessingTask>::iterator it = m_vecProcessingTasks.begin();
+		for (vector< unique_ptr<ProcessingTask> >::iterator it = m_vecProcessingTasks.begin();
 			it != m_vecProcessingTasks.end(); it++)
 		{
 			// Only close the processing task if it is enabled
-			if (it->Enabled)
+			if (it->get()->Enabled)
 			{
-				it->Task->Close();
+				it->get()->Task->Close();
 			}
 		}
 		
@@ -706,10 +704,10 @@ UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr CFileProcessingTaskExecutor::get
 long CFileProcessingTaskExecutor::countEnabledTasks()
 {
 	long nCount = 0;
-	for(vector<ProcessingTask>::iterator it = m_vecProcessingTasks.begin();
+	for(vector< unique_ptr<ProcessingTask> >::iterator it = m_vecProcessingTasks.begin();
 		it != m_vecProcessingTasks.end(); it++)
 	{
-		if (it->Enabled)
+		if (it->get()->Enabled)
 		{
 			nCount++;
 		}

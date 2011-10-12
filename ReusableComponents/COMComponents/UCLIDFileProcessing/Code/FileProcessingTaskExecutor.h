@@ -103,7 +103,7 @@ private:
 	class StandbyThread : public CWinThread
 	{
 	public:
-		StandbyThread(Win32Event& eventCancelProcessing, ProcessingTask *pProcessingTask);
+		StandbyThread(Win32Event& eventCancelProcessing, unique_ptr<ProcessingTask>& upProcessingTask);
 		~StandbyThread();
 
 		// Initialized the instance
@@ -126,7 +126,7 @@ private:
 		// m_eventStandbyEnded is signaled once the endStandby call is complete.
 		Win32Event m_eventStandbyEnded;
 
-		ProcessingTask *m_pProcessingTask;
+		unique_ptr<ProcessingTask>& m_upProcessingTask;
 	};
 
 	///////////
@@ -142,7 +142,7 @@ private:
 	Win32Event m_eventEndStandby;
 
 	// List of tasks that will be used to process a file
-	vector<ProcessingTask> m_vecProcessingTasks;
+	vector< unique_ptr<ProcessingTask> > m_vecProcessingTasks;
 
 	// The task that is currently executing.  NULL if no task is executing.  NULL does not nessasarily mean all tasks
 	// are done processing, it just means that ProcessFile is not currently executing on any of the tasks
