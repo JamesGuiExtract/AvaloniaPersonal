@@ -1,0 +1,371 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE Abbreviated Sanity Test Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> Standard LabDE<br>Abbreviated Sanity Test Checklist<br>
+<IMG src="../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<UL>
+	<LI><h3>Installation and Licensing</h3>
+	<ul>
+		<LI>Confirm that <b>LabDE</b> installs successfully on this operating system.
+		<LI>Create individual license files for <b>FLEX Index Server 9.0</b>, <b>LabDE 
+		2.0 Server</b> and <b>LabDE 2.0 Client</b>.  Include support for <b>PDF</b> images.
+		<ul>
+			<LI>Confirm that LabDE <b>does not</b> run in stand-alone mode with only 
+			the <b>FLEX Index Server</b> license.
+			<LI>Confirm that LabDE <b>does</b> run in stand-alone mode with only 
+			the <b>LabDE Client</b> license.
+			<LI>Confirm that LabDE <b>does not</b> run in FAM mode with only 
+			the <b>FLEX Index Server</b> license.
+			<LI>Confirm that LabDE <b>does</b> run in FAM mode with only 
+			the <b>LabDE Server</b> license.
+			<LI><b>[DataEntry #694]</b> Confirm that the FAM <b>does</b> run with only 
+			a <b>LabDE Client</b> license.
+		</ul>
+		<LI>Confirm that <b>Extract Systems LabDE</b> is a supported 
+		software product in the <b>User License</b> utility.
+		<LI>Confirm that the proper version number is displayed 
+		in the <b>User License</b> utility.
+	</ul>
+<p>
+	<LI><h3>Demo_LabDE</h3>
+	<ul>
+		<LI><b>Test Setup for first-stage verification</b>
+		<ul>
+			<LI>Confirm that the <b>Demo_LabDE</b> folder has been copied to the test machine.
+			<LI>Install the <b>LongDemo</b> images by executing 
+			<b>Demo_LabDE/DemoFiles/Installs/LongDemo/Install.bat</b>.
+			<LI>Reset the demo by executing <b>Demo_LabDE/Clean.bat</b>.
+			<LI>Confirm that no unexpected errors are noted.
+<p>
+			<LI>Queue and process the images using <b>Demo_LabDE/FPS/ExtractData.fps</b>.
+			<LI>Confirm that the FPS file <b>is</b> listening for more documents.
+			<LI>Confirm that no exceptions are logged.
+			<LI>Verify the images using <b>Demo_LabDE/FPS/Verify.fps</b>.
+			<ul>
+				<li>Review the <b>Specific Features</b> section down below.
+				<li>Exercise those test cases are desired while stepping through 
+				the demo.
+				<LI>Skip one or more documents.
+				<LI>Confirm that the <b>FAM status bar</b> is updated properly.
+				<LI>Confirm that the <b>DB Admin Summary tab</b> is updated properly.
+				<LI>Modify the FPS file to process the skipped documents.
+				<LI>Confirm that the skipped documents are presented for verification.
+				<LI>Confirm that the <b>FAM status bar</b> is updated properly.
+				<LI>Confirm that the <b>DB Admin Summary tab</b> is updated properly.
+			</ul>
+			<li>Mark the <b>Demo_LabDE Check Table</b> while you verify the documents.
+			<LI>Confirm that the document <b>does</b> close and that the <b>FAM</b> 
+			<b>does not</b> stop processing when the last document is processed.
+		</ul>
+<p>
+		<LI><b>Second-stage verification</b>
+		<ul>
+			<LI>Verify the images using <b>Demo_LabDE/FPS/MatchToPatientAndOrders.fps</b>.
+			<LI>Confirm that <b>Patient Information - From EpicCare</b>, <b>Medical 
+			Record #</b> and <b>Order Number</b> fields are enabled and required for each file.
+			<LI>Fill in these fields and save results for each file.
+			<LI>Confirm that no exceptions are noted.
+		</ul>
+<p>
+		<LI><b>Send To EMR</b>
+		<ul>
+			<LI>Process the images using <b>Demo_LabDE/FPS/SendToEMR.fps</b>.
+			<LI>Confirm that no exceptions are noted.
+			<LI>Confirm that output files are created in the 
+			<b>.\Demo_LabDE\Outbound XML Messages</b> folder.
+			<LI>Ask Steve to confirm that appropriate XML files have been created.
+<p>
+			<LI><b>MessageSequenceNumber.txt</b>
+		       	<ul>
+  	   			<LI>Confirm that the <b>MessageSequenceNumber.txt</b> file is 
+				located in the Solution folder.
+				<li>Process a Demo_LabDE sample image for <b>SendToEMR</b>.
+		  	   	<LI>Confirm that the <b>MessageSequenceNumber.txt</b> file 
+				is updated.
+		       	</ul>
+		</ul>
+	</ul>
+<p>
+	<LI><h3>LabDE - Start Menu</h3>
+	<ul>
+		<li>Confirm that the following entries appear in the <b>Extract Systems LabDE</b> 
+		Start menu.  Each link should work although the applications do not need to be tested 
+		at this time.
+		<ul>
+			<li>DB Administration
+			<li>File Action Manager
+			<li>LabDE Help
+			<li>User License
+			<li>USB License Key Manager
+		</ul>
+	</ul>
+<p>
+	<li><h3>LabDE - Start Menu - Utilities</h3>
+	<ul>
+		<li>Confirm that the following entries appear in the <b>Extract Systems LabDE - 
+		Utilities</b> Start menu.  Each link should work although the applications do not need 
+		to be tested at this time.
+		<ul>
+			<li>Image Viewer
+			<li>Rule Tester
+			<li>USS Viewer
+			<li>View Exception Log
+			<li>VOA Viewer
+		</ul>
+	</ul>
+<p>
+	<LI><h3>File Action Manager</h3>
+	<ul>
+		<li>Exercise <b>Tools - Check for new components</b>.
+		<LI>Confirm that <b>DataEntry: Verify extracted data</b> is available as a file 
+		processing task.
+<p>
+		<LI><b>Server-side processing</b>
+		<ul>
+			<LI>Make a local copy of the TIF images from Advance Health Set002 and/or Set003.
+			<LI>Process the images using the rules installed with <b>Demo_LabDE</b>.
+			<LI>Confirm that USS and VOA files are created.
+			<LI>Confirm that no unexpected behavior is seen.
+		</ul>
+<p>
+		<LI><b>LabDE Help and About Box</b>
+		<ul>
+			<LI>Confirm that <b>Help - LabDE Help</b> displays the LabDE help file.
+			<LI>Confirm that <b>Help - About LabDE</b> displays the LabDE About box.
+			<LI>Confirm that the LabDE About box displays a framework version and an 
+			application version.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>DB Administration Reports</h3>
+	<ul>
+		<LI>Confirm that the <b>LabDE data entry rates by user</b> report exists and 
+		displays appropriate information.
+		<LI>Confirm that the <b>LabDE high effort files by user</b> report exists and 
+		displays appropriate information.
+	</ul>
+<p>
+	<LI><h3>Specific Features</h3>
+	<ul>
+		<LI>Reset and re-verify the <b>Demo_LabDE</b> images.  Exercise specific features 
+		as noted for each individual image in order.
+		<LI><b>A003.tif</b>
+		<ul>
+			<LI><b>Copy and Paste from tables</b>
+			<ul>
+				<li>Click in the <b>Test Name</b> field in the starred row.
+				<li>Paste plain text from the Clipboard into the cell and press <b>Enter</b>.
+  	   			<LI>Repeat several times.
+		  	   	<LI>Confirm that no error is seen.
+<p>
+				<LI><b>[DataEntry #746]</b> Multi-cell support for copy and paste
+       				<ul>
+	  		   		<LI>Confirm that the collection date and time values can be copied 
+					from one order and pasted into another order.
+					<li>Confirm that the units value for a single test can be pasted 
+					into multiple tests.
+       				</ul>
+			</ul>
+		</ul>
+<p>
+		<LI><b>B221.tif - Z1270.tif</b>
+		<ul>
+			<li>N/A
+		</ul>
+<p>
+		<LI><b>Z151.tif</b>
+		<ul>
+			<LI><b>OCR confidence</b>
+			<ul>
+				<LI>Select the <b>BASIC METABOLIC PANEL</b> row in the <b>Orders</b> table.
+				<LI>Confirm that the <b>Chloride</b> Test name text has a red background 
+				indicating lower OCR confidence.
+				<LI>Select the Test Name field and swipe <b>Chloride</b> to replace the 
+				Test Name.
+				<LI>Confirm that the text OCRs correctly.
+				<LI>Manually edit the <b>Test Name</b> cell such that <b>Chloride</b> 
+				becomes <b>Chlorine</b>.
+				<ul>
+					<LI>Confirm that the tooltip changes to <b>Chlorine</b>.
+					<LI>Confirm that the highlight is now completely <b>green</b>.
+				</ul>
+				<LI>Re-swipe <b>Chloride</b> to replace the Test Name.
+				<LI>Confirm that the text OCRs correctly.
+			</ul>
+<p>
+			<LI><b>Highlights and hints on tables</b>
+			<ul>
+				<LI>Select the <b>Test</b> table.
+				<LI>Confirm that selecting each individual row of the test table 
+				provides the appropriate highlights and tooltips.
+				<LI>Confirm that selecting multiple rows of the orders table in various 
+				combinations provides the appropriate highlights but without any tooltips.
+<p>
+				<LI>Select one of the <b>Test Name</b> cells in the 
+				<b>Selected Order Details</b> table.
+				<LI>Confirm that the <b>Test Name</b> text is highlighted 
+				and that a tooltip is also displayed.
+				<LI>Select one of the empty <b>Flag</b> cells in the <b>Selected Test 
+				Details</b> table.
+				<LI>Confirm that a <b>direct</b> hint is provided under the 
+				<b>OUT OF RANGE</b> column.
+				<LI>Select one of the empty <b>Comment</b> cells in the <b>Selected Order 
+				Details</b> table.
+				<LI>Confirm that an <b>indirect</b> hint is provided with dotted line boxes 
+				around the <b>TEST NAME</b>, <b>IN RANGE</b> or <b>OUT OF RANGE</b>, 
+				<b>UNITS</b> and <b>REFERENCE RANGE</b> columns.
+			</ul>
+<p>
+			<LI><b>Tooltips and swipes</b>
+			<ul>
+				<LI>Open image <b>Z151.tif</b> from Demo_LabDE.  Note that highlights 
+				are available for the selected fields.
+				<LI>Select the row in the <b>Patient Information - From Lab Result</b> table.
+				<LI>Swipe different text and confirm that the new text is entered 
+				in the fields.
+				<LI>Confirm that the tooltip moves to directly above the swiped text 
+				and now reflects the OCR result from the swipe.
+				<LI>Swipe the original text.
+				<LI>Confirm that the recognized text is entered in the field.
+				<LI>Confirm that the tooltip is displayed above the swipe.
+			</ul>
+<p>
+			<LI><b>Tooltips and manual updates</b>
+			<ul>
+				<LI>Open image <b>Z151.tif</b> from Demo_LabDE.  Note that highlights 
+				are available.
+				<LI>Select the row in the <b>Patient Information - From Lab Result</b> 
+				table.
+				<LI>Manually edit the text in the fields.
+				<LI>Confirm that the tooltips change properly with each character change.
+				<LI>Confirm that whitespace is trimmed from each end of the tooltip as 
+				the text is updated.
+<p>
+				<LI>Click the <b>Highlight all data in image</b> button.
+				<LI>Use <b>Tab</b> to navigate through some of the data fields.
+				<LI>Confirm that tooltips <b>are</b> visible for found data.
+				<LI>Confirm that tooltips <b>are not</b> visible for data that was not found.
+			</ul>
+<p>
+			<LI><b>Swiping from tables</b>
+			<ul>
+				<LI>Select <b>BASIC METABOLIC PANEL</b>.
+				<LI>Confirm that the order is incomplete, missing results for one or more 
+				of <b>BUN</b>, <b>CREAT</b>, <b>K</b> or <b>NA</b>.
+				<LI>Select the empty row at the bottom of the <b>Selected Order Details</b>.
+				<LI>Use the angular highlight tool to swipe the <b>Sodium</b> test data.
+				<ul>
+					<LI>Confirm that a <b>Sodium</b> Order appears.
+					<LI>Confirm that the test data is presented correctly. 
+				</ul>
+				<li>Swipe the <b>Potassium</b> test information if missing.
+				<li>Confirm that a new Order is presented.
+				<li>Swipe the <b>Blood Urea Nitrogen</b> test information if missing.
+				<li>Confirm that a new Order is presented.
+				<li>Swipe the <b>Creatinine</b> test information if missing.
+				<li>Confirm that a new Order is presented.
+				<LI>Error correction
+				<ul>
+					<LI>Select a cell with missing or incorrect text.
+					<LI>Zoom in close to the text and swipe it carefully. 
+					<LI>Confirm that the newly recognized text appears in the cell. 
+				</ul>
+				<li>Confirm that each of the <b>Tests</b> from the newly added Orders 
+				can be copied and pasted into the <b>BASIC METABOLIC PANEL</b> Order.
+				<li>Confirm that the <b>BASIC METABOLIC PANEL</b> Order validation 
+				warning is gone.
+				<li>Confirm that the new Orders can be deleted.
+			</ul>
+		</ul>
+<p>
+		<LI><b>Z191.tif</b>
+		<ul>
+			<LI><b>Swiping from tables</b>
+			<ul>
+				<LI>Select the empty row at the bottom of the <b>Orders</b> table.
+		                <LI>Use the rectangular highlight tool to swipe the entire 
+				<b>TOTAL/FREE PSA PANEL</b> order (from the date above <b>TUMOR 
+				MARKER STUDIES</b> to the indented line that starts with <b>% FREE PSA</b>).
+				<ul>
+					<LI>Confirm that a new <b>TOTAL/FREE PSA PANEL</b> order appears 
+					in the <b>Orders</b> table.
+					<LI>Confirm that test information is provided for <b>PSA, TOTAL</b>, 
+					<b>FREE PSA</b>, and <b>% FREE PSA</b>.
+					<LI>Confirm that highlights and hints are provided.
+					<LI>Note whether or not the <b>PSA, TOTAL</b> data was found correctly. 
+					<LI>Note whether or not the <b>FREE PSA</b> data was found correctly. 
+					<LI>Note whether or not the <b>% FREE PSA</b> data was found correctly. 
+					<LI>Select a cell with missing or incorrect text.
+					<LI>Zoom in close to the text and swipe it carefully. 
+					<LI>Confirm that the newly recognized text appears in the cell. 
+				</ul>
+		</ul>
+<p>
+		<LI><b>Z352.tif - Z403.tif</b>
+		<ul>
+			<li>N/A
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Auto-complete</h3>
+	<ul>
+		<LI>Confirm that an auto-complete list appears after starting to type 
+		in an empty cell for each of the following fields.  The auto-complete 
+		list should be restricted to the entries that match the typed text.
+		<ul>
+			<LI>Ordering Physician - First Name (NOTE: this is dependent on the 
+			presence of a valid Last Name)
+			<LI>Ordering Physician - Last Name
+			<LI>Ordering Physician - Code (NOTE: this is dependent on the values 
+			of the Name fields)
+			<LI>CopyTo Physician - First Name (NOTE: this is dependent on the 
+			presence of a valid Last Name)
+			<LI>CopyTo Physician - Last Name
+			<LI>CopyTo Physician - Code (NOTE: this is dependent on the values 
+			of the Name fields)
+			<LI>Orders - Order Name
+			<LI>Orders - Epic Code
+			<LI>Selected Order Details - Lab Name
+			<LI>Selected Order Details - Lab Code
+			<LI>Selected Order Details - Test Name
+			<LI>Selected Order Details - Code
+		</ul>
+<p>
+		<LI><b>[DataEntry #443]</b> Confirm that the entire auto-complete list 
+		can be dropped down from an empty cell by pressing the <b>space</b> bar.
+		<ul>
+			<LI>Ordering Physician - First Name
+			<LI>Ordering Physician - Last Name (NOTE: this is dependent on the 
+			presence of a valid First Name)
+			<LI>Ordering Physician - Code (NOTE: this is dependent on the values of 
+			the Name fields)
+			<LI>CopyTo Physician - First Name
+			<LI>CopyTo Physician - Last Name (NOTE: this is dependent on the 
+			presence of a valid First Name)
+			<LI>CopyTo Physician - Code (NOTE: this is dependent on the values 
+			of the Name fields)
+			<LI>Orders - Order Name
+			<LI>Orders - Epic Code
+			<LI>Selected Order Details - Lab Name
+			<LI>Selected Order Details - Lab Code
+			<LI>Selected Order Details - Test Name
+			<LI>Selected Order Details - Code
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Uninstall</h3>
+	<ul>
+		<LI>Confirm that <b>Extract Systems LabDE</b> is completely removed from the 
+		Start menu.
+	</ul>
+</UL>
+</BODY>
+</HTML>
