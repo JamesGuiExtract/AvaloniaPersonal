@@ -19,7 +19,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 12;
+const unsigned long gnCurrentVersion = 13;
 // Version 3:
 //   Added Output Handler persistence
 // Version 7:
@@ -33,6 +33,7 @@ const unsigned long gnCurrentVersion = 12;
 //	 Added Ignore preprocessor and output handler error options.
 // Version 11: Added CIdentifiableRuleObject
 // Version 12: Added m_strPreviousFileName
+// Version 13: Added Comments
 
 const string gstrRULESET_FILE_SIGNATURE = "UCLID AttributeFinder RuleSet Definition (RSD) File";
 const string gstrRULESET_FILE_SIGNATURE_2 = "UCLID AttributeFinder RuleSet Definition (RSD) File 2";
@@ -1166,7 +1167,38 @@ STDMETHODIMP CRuleSet::put_IgnoreOutputHandlerErrors(VARIANT_BOOL newVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32957")
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_Comments(BSTR *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
+	try
+	{
+		validateLicense();
+
+		*pVal = _bstr_t(m_strComments.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34019")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::put_Comments(BSTR newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// NOTE: Unlike other methods/properties, calling this method requries
+		// RuleSet Editor license.
+		void validateUILicense();
+
+		m_strComments = asString(newVal);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34020")
+}
 
 //-------------------------------------------------------------------------------------------------
 // IPersistStream
@@ -1367,6 +1399,11 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 			{
 				dataReader >> m_strPreviousFileName;
 			}
+
+			if (m_nVersionNumber >= 13)
+			{
+				dataReader >> m_strComments;
+			}
 		}
 
 		// load the string-to-object map (attribute name to attribute find info map)
@@ -1479,6 +1516,8 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_bIgnoreOutputHandlerErrors;
 
 		dataWriter << m_strFileName;
+
+		dataWriter << m_strComments;
 
 		// flush bytes
 		dataWriter.flushToByteStream();
@@ -1653,6 +1692,8 @@ STDMETHODIMP CRuleSet::raw_CopyFrom(IUnknown * pObject)
 
 		m_bIgnorePreprocessorErrors = asCppBool(ipSource->IgnorePreprocessorErrors);
 		m_bIgnoreOutputHandlerErrors = asCppBool(ipSource->IgnoreOutputHandlerErrors);
+
+		m_strComments = asString(ipSource->Comments);
 
 		return S_OK;
 	}

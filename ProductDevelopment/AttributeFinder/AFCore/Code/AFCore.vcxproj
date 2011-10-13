@@ -265,6 +265,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="RuleSetCommentsPage.cpp" />
     <ClCompile Include="RuleSetEditor.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -279,7 +280,8 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="RuleSetProfiler.cpp" />
-    <ClCompile Include="RulesetPropertiesDlg.cpp">
+    <ClCompile Include="RuleSetPropertiesDlg.cpp" />
+    <ClCompile Include="RuleSetPropertiesPage.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -409,9 +411,11 @@
     <ClInclude Include="RuleExecutionSession.h" />
     <ClInclude Include="RuleGrid.h" />
     <ClInclude Include="RuleSet.h" />
+    <ClInclude Include="RuleSetCommentsPage.h" />
     <ClInclude Include="RuleSetEditor.h" />
     <ClInclude Include="RuleSetProfiler.h" />
-    <ClInclude Include="RulesetPropertiesDlg.h" />
+    <ClInclude Include="RuleSetPropertiesDlg.h" />
+    <ClInclude Include="RuleSetPropertiesPage.h" />
     <ClInclude Include="RuleTesterDlg.h" />
     <ClInclude Include="RuleTesterUI.h" />
     <ClInclude Include="SpatiallyCompareAttributes.h" />

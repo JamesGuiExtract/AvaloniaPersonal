@@ -416,7 +416,11 @@ library UCLID_AFCORELib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE:	To give the ruleset a chance to perform any cleanup needed at the end of
 		// processing
-		[id(22), helpstring("method Cleanup")] HRESULT Cleanup();		
+		[id(22), helpstring("method Cleanup")] HRESULT Cleanup();
+		//-----------------------------------------------------------------------------------------
+		// Ruleset comments visible to customer (to be used in lieu of readme).
+		[propget, id(23), helpstring("property Comments")] HRESULT Comments([out, retval] BSTR *pVal);
+		[propput, id(23), helpstring("property Comments")] HRESULT Comments([in] BSTR newVal);
 	};
 
 	[

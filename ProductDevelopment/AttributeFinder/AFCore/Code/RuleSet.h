@@ -92,6 +92,8 @@ public:
 	STDMETHOD(put_IgnorePreprocessorErrors)(VARIANT_BOOL newVal);
 	STDMETHOD(get_IgnoreOutputHandlerErrors)(VARIANT_BOOL *pVal);
 	STDMETHOD(put_IgnoreOutputHandlerErrors)(VARIANT_BOOL newVal);
+	STDMETHOD(get_Comments)(BSTR *pVal);
+	STDMETHOD(put_Comments)(BSTR newVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -180,6 +182,9 @@ private:
 
 	bool m_bIgnorePreprocessorErrors;
 	bool m_bIgnoreOutputHandlerErrors;
+
+	// Comments for the ruleset.
+	string m_strComments;
 
 	// Used to track data for each counter in order to determine the number of counts that may be
 	// accumulated prior to deducting them from the USB key. [LegacyRCAndUtils:6170]
