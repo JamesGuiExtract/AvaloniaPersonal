@@ -7,14 +7,38 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.FileActionManager.FileProcessors
 {
     /// <summary>
-    /// Configuration Dialog for <see cref="FtpFileTransferTask"/>
+    /// Configuration Dialog for <see cref="FtpTask"/>
     /// </summary>
-    public partial class FtpFileTransferSettingsDialog : Form
+    public partial class FtpTaskSettingsDialog : Form
     {
+        #region Constants
+
+        /// <summary>
+        /// The label to use for the _remoteOrOldFileNameTextBox when renaming.
+        /// </summary>
+        const string _RENAME_OLD_FILE_LABEL = "Existing remote filename";
+        
+        /// <summary>
+        /// The label to use for the _localOrNewFileNameTextBox when renaming.
+        /// </summary>
+        const string _RENAME_NEW_FILE_LABEL = "New remote filename";
+
+        /// <summary>
+        /// The label to use for the _remoteOrOldFileNameTextBox when not renaming.
+        /// </summary>
+        const string _REMOTE_FILE_LABEL = "Remote filename";
+        
+        /// <summary>
+        /// The label to use for the _localOrNewFileNameTextBox when not renaming.
+        /// </summary>
+        const string _LOCAL_FILE_LABEL = "Local filename";
+
+        #endregion Constants
+
         #region Fields
         
         // FtpFileTransferTask that contains the configured settings
-        FtpFileTransferTask _settings;
+        FtpTask _settings;
         
         #endregion
         
@@ -23,7 +47,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Property to return the configured settings
         /// </summary>
-        public FtpFileTransferTask Settings 
+        public FtpTask Settings 
         { 
             get
             {
@@ -36,18 +60,18 @@ namespace Extract.FileActionManager.FileProcessors
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FtpFileTransferSettingsDialog"/> class
+        /// Initializes a new instance of the <see cref="FtpTaskSettingsDialog"/> class
         /// </summary>
-        public FtpFileTransferSettingsDialog():this(null)
+        public FtpTaskSettingsDialog():this(null)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FtpFileTransferSettingsDialog"/> class
+        /// Initializes a new instance of the <see cref="FtpTaskSettingsDialog"/> class
         /// with settings
         /// </summary>
-        /// <param name="settings"><see cref="FtpFileTransferTask"/> that has the intial settings.</param>
-        public FtpFileTransferSettingsDialog(FtpFileTransferTask settings)
+        /// <param name="settings"><see cref="FtpTask"/> that has the intial settings.</param>
+        public FtpTaskSettingsDialog(FtpTask settings)
         {
             InitializeComponent();
 
@@ -55,7 +79,7 @@ namespace Extract.FileActionManager.FileProcessors
             _localFileNamePathTagsButton.PathTags = new FileActionManagerPathTags("", "", "");
             _remoteFileNamePathTagsButton.PathTags = new FileActionManagerPathTags("", "", "");
 
-            _settings = settings ?? new FtpFileTransferTask();
+            _settings = settings ?? new FtpTask();
         }
 
         #endregion
@@ -73,14 +97,17 @@ namespace Extract.FileActionManager.FileProcessors
                 base.OnLoad(e);
 
                 // Set the initial values for the controls
-                _remoteFileNameTextBox.Text = _settings.RemoteFileName;
-                _localFileNameTextBox.Text = _settings.LocalFileName;
+                _remoteOrOldFileNameTextBox.Text = _settings.RemoteOrOldFileName;
+                _localOrNewFileNameTextBox.Text = _settings.LocalOrNewFileName;
 
                 // Set the AfterDownloadAction radio buttons
                 switch (_settings.ActionToPerform)
                 {
                     case EFTPAction.kDeleteFileFromFtpServer:
                         _deleteFileRadioButton.Checked = true;
+                        break;
+                    case EFTPAction.kRenameFileOnFtpServer:
+                        _renameFileRadioButton.Checked = true;
                         break;
                     case EFTPAction.kDownloadFileFromFtpServer:
                         _downloadFileRadioButton.Checked = true;
@@ -91,6 +118,8 @@ namespace Extract.FileActionManager.FileProcessors
                     default:
                         break;
                 }
+
+                _deleteEmptyFolderCheckBox.Checked = _settings.DeleteEmptyFolder;
 
                 _ftpConnectionSettingsControl.FtpConnection = 
                     _settings.ConfiguredFtpConnection ?? new SecureFTPConnection();
@@ -126,10 +155,10 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 // Transfer the settings from the controls to the _settings field
-                _settings.RemoteFileName = _remoteFileNameTextBox.Text;
+                _settings.RemoteOrOldFileName = _remoteOrOldFileNameTextBox.Text;
                 if (!_deleteFileRadioButton.Checked)
                 {
-                    _settings.LocalFileName = _localFileNameTextBox.Text;
+                    _settings.LocalOrNewFileName = _localOrNewFileNameTextBox.Text;
                 }
                 if (_uploadFileRadioButton.Checked)
                 {
@@ -139,10 +168,16 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     _settings.ActionToPerform = EFTPAction.kDownloadFileFromFtpServer;
                 }
+                else if (_renameFileRadioButton.Checked)
+                {
+                    _settings.ActionToPerform = EFTPAction.kRenameFileOnFtpServer;
+                }
                 else if (_deleteFileRadioButton.Checked)
                 {
                     _settings.ActionToPerform = EFTPAction.kDeleteFileFromFtpServer;
                 }
+
+                _settings.DeleteEmptyFolder = _deleteEmptyFolderCheckBox.Checked;
 
                 _settings.ConfiguredFtpConnection = _ftpConnectionSettingsControl.FtpConnection;
 
@@ -187,9 +222,28 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         void UpdateControlState()
         {
-            _localFileNameTextBox.Enabled = !_deleteFileRadioButton.Checked;
+            _localOrNewFileNameTextBox.Enabled = !_deleteFileRadioButton.Checked;
             _localFileNamePathTagsButton.Enabled = !_deleteFileRadioButton.Checked;
             _localFileNameBrowseButton.Enabled = !_deleteFileRadioButton.Checked;
+            _deleteEmptyFolderCheckBox.Enabled = _deleteFileRadioButton.Checked;
+            if (_renameFileRadioButton.Checked)
+            {
+                _remoteOrOldFileNameLabel.Text = _RENAME_OLD_FILE_LABEL;
+                _localOrNewFileNameLabel.Text = _RENAME_NEW_FILE_LABEL;
+
+                // If the _localOrNewFileNameTextBox equals <SourceDocName>, that is most likely
+                // just because it is the default value. <SourceDocName> on its own doesn't make
+                // sense as a new remote file name, so clear this value.
+                if (_localOrNewFileNameTextBox.Text == SourceDocumentPathTags.SourceDocumentTag)
+                {
+                    _localOrNewFileNameTextBox.Text = "";
+                }
+            }
+            else
+            {
+                _remoteOrOldFileNameLabel.Text = _REMOTE_FILE_LABEL;
+                _localOrNewFileNameLabel.Text = _LOCAL_FILE_LABEL;
+            }
         }
 
         /// <summary>
@@ -202,23 +256,37 @@ namespace Extract.FileActionManager.FileProcessors
         {
             bool returnValue = false;
 
-            if (string.IsNullOrWhiteSpace(_remoteFileNameTextBox.Text))
+            string remoteOrOldLabel = _renameFileRadioButton.Checked
+                ? _RENAME_OLD_FILE_LABEL
+                : _REMOTE_FILE_LABEL;
+
+            string localOrNewLabel = _renameFileRadioButton.Checked
+                ? _RENAME_NEW_FILE_LABEL
+                : _LOCAL_FILE_LABEL;
+
+            if (string.IsNullOrWhiteSpace(_remoteOrOldFileNameTextBox.Text))
             {
-                UtilityMethods.ShowMessageBox("Remote filename must be specified.", "Configuration error", true);
+                UtilityMethods.ShowMessageBox(remoteOrOldLabel + " must be specified.", "Configuration error", true);
                 _settingsTabControl.SelectTab(_generalSettingsTabPage);
-                _remoteFileNameTextBox.Focus();
+                _remoteOrOldFileNameTextBox.Focus();
             }
-            else if (_remoteFileNameTextBox.Text.Trim()[0] == '.')
+            else if (_remoteOrOldFileNameTextBox.Text.Trim()[0] == '.')
             {
-                UtilityMethods.ShowMessageBox("Remote filename cannot begin with '.'.", "Configuration error", true);
+                UtilityMethods.ShowMessageBox(remoteOrOldLabel + " cannot begin with '.'.", "Configuration error", true);
                 _settingsTabControl.SelectTab(_generalSettingsTabPage);
-                _remoteFileNameTextBox.Focus();
+                _remoteOrOldFileNameTextBox.Focus();
             }
-            else if (!_deleteFileRadioButton.Checked && string.IsNullOrWhiteSpace(_localFileNameTextBox.Text))
+            else if (!_deleteFileRadioButton.Checked && string.IsNullOrWhiteSpace(_localOrNewFileNameTextBox.Text))
             {
-                UtilityMethods.ShowMessageBox("Local filename must be specified.", "Configuration error", true);
+                UtilityMethods.ShowMessageBox(localOrNewLabel + " must be specified.", "Configuration error", true);
                 _settingsTabControl.SelectTab(_generalSettingsTabPage);
-                _localFileNameTextBox.Focus();
+                _localOrNewFileNameTextBox.Focus();
+            }
+            else if (_renameFileRadioButton.Checked && _localOrNewFileNameTextBox.Text.Trim()[0] == '.')
+            {
+                UtilityMethods.ShowMessageBox(localOrNewLabel + " cannot begin with '.'.", "Configuration error", true);
+                _settingsTabControl.SelectTab(_generalSettingsTabPage);
+                _localOrNewFileNameTextBox.Focus();
             }
             else if (!_ftpConnectionSettingsControl.IsConfigurationValid())
             {

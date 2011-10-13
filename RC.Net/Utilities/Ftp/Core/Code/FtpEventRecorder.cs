@@ -71,6 +71,11 @@ namespace Extract.Utilities.Ftp
         IFileRecord _fileRecord;
         
         /// <summary>
+        /// Indicates whether the FTP event has begun.
+        /// </summary>
+        bool _eventBegan;
+
+        /// <summary>
         /// Indicates whether the FTP event has ended.
         /// </summary>
         bool _eventEnded;
@@ -82,9 +87,9 @@ namespace Extract.Utilities.Ftp
         Exception _eventException;
 
         /// <summary>
-        /// The number of times the FTP operation was retried (whether or not it eventually succeeded).
+        /// The number of times the FTP operation was attempted (whether or not it eventually succeeded).
         /// </summary>
-        int _retryCount = 0;
+        int _attemptCount = 0;
 
         /// <summary>
         /// Indicates whether FTP history logging is enabled via the database DBInfo table.
@@ -221,23 +226,7 @@ namespace Extract.Utilities.Ftp
         {
             try
             {
-                if (_eventEnded && _eventException == null)
-                {
-                    new ExtractException("ELI33982", "Unexpected FTP event.").Log();
-                    UnregisterEvents();
-                }
-                else
-                {
-                    // If this event has previously ended, this is a retry.
-                    if (_eventEnded)
-                    {
-                        _retryCount++;
-                    }
-
-                    _eventException = null;
-                    _eventEnded = false;
-                    _ftpEvent = e;
-                }
+                StartTrackingEvent(e);
             }
             catch (Exception ex)
             {
@@ -255,8 +244,24 @@ namespace Extract.Utilities.Ftp
         {
             try
             {
-                _ftpEvent = e;
+                // EventBegin does not get called in some cases (such as when the local file could
+                // not be found). Require only that either EventBegin or EventEnd be called for each
+                // event.
+                if (!_eventBegan)
+                {
+                    StartTrackingEvent(e);
+                }
+                else
+                {
+                    // Update _ftpEvent in case e now has additional data.
+                    _ftpEvent = e;
+                }
+
                 _eventEnded = true;
+
+                // In case EventBegin is not called, ensure StartTrackingEvent will get called the
+                // next time HandleEventEnd is.
+                _eventBegan = false;
             }
             catch (Exception ex)
             {
@@ -288,7 +293,7 @@ namespace Extract.Utilities.Ftp
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="Extract.ExtractExceptionEventArgs"/> instance containing
         /// the event data.</param>
-        void HandleFtpExceptionSourceError(object sender, ExtractExceptionEventArgs e)
+        void HandleFtpErrorSourceError(object sender, ExtractExceptionEventArgs e)
         {
             try
             {
@@ -297,6 +302,28 @@ namespace Extract.Utilities.Ftp
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI33983");
+            }
+        }
+
+        /// <summary>
+        /// Starts tracking an FTP event.
+        /// </summary>
+        /// <param name="e">The <see cref="EnterpriseDT.Net.Ftp.FTPEventArgs"/> instance
+        /// containing data for the event.</param>
+        void StartTrackingEvent(FTPEventArgs e)
+        {
+            if (_eventEnded && _eventException == null)
+            {
+                new ExtractException("ELI33982", "Unexpected FTP event.").Log();
+                UnregisterEvents();
+            }
+            else
+            {
+                _eventBegan = true;
+                _eventEnded = false;
+                _attemptCount++;
+                _eventException = null;
+                _ftpEvent = e;
             }
         }
 
@@ -335,43 +362,22 @@ namespace Extract.Utilities.Ftp
                         UnregisterEvents();
                     }
 
-                    // If these objects were set, an FTP event was tracked.
-                    if (_ftpConnection != null && _fileProcessingDB != null && _ftpEvent != null)
+                    // If an FTP event was tracked, log it to the FTPEventHistory table.
+                    if (_ftpEvent != null)
                     {
-                        // Assign argument1 and argument2 using _ftpEvent and the _ftpAction.
+                        // Get argument1 and argument2 from _ftpEvent
                         string argument1 = null;
                         string argument2 = null;
 
-                        var fileTransferEvent = _ftpEvent as FTPFileTransferEventArgs;
-                        if (fileTransferEvent != null)
-                        {
-                            if (_ftpAction == EFTPAction.kDownloadFileFromFtpServer)
-                            {
-                                argument1 = fileTransferEvent.RemotePath;
-                                argument2 = fileTransferEvent.LocalPath;
-                            }
-                            else if ((_ftpAction == EFTPAction.kUploadFileToFtpServer))
-                            {
-                                argument1 = fileTransferEvent.LocalPath;
-                                argument2 = fileTransferEvent.RemotePath;
-                            }
-                            else
-                            {
-                                argument1 = fileTransferEvent.RemotePath;
-                            }
-                        }
+                        if (GetFTPFileTransferEventArgs(ref argument1, ref argument2))
+                        { }
+                        else if (GetFTPFileRenameEventArgs(ref argument1, ref argument2))
+                        { }
+                        else if (GetFTPDirectoryEventArgs(ref argument1))
+                        { }
                         else
                         {
-                            var fileRenameEvent = _ftpEvent as FTPFileRenameEventArgs;
-                            if (fileRenameEvent != null)
-                            {
-                                argument1 = fileRenameEvent.OldFilePath;
-                                argument2 = fileRenameEvent.NewFilePath;
-                            }
-                            else
-                            {
-                                ExtractException.ThrowLogicException("ELI33987");
-                            }
+                            ExtractException.ThrowLogicException("ELI33987");
                         }
 
                         // If the event never ended, this is an error (even if _eventException was
@@ -386,12 +392,13 @@ namespace Extract.Utilities.Ftp
                         int actionId = _actionID;
                         string userName = _ftpConnection.UserName;
                         string serverAddress = _ftpConnection.ServerAddress;
+                        int retryCount = _attemptCount - 1;
                         string exception = (_eventException == null)
                             ? null
                             : _eventException.AsExtract("ELI33980").CreateLogString();
 
                         _fileProcessingDB.RecordFTPEvent(fileId, actionId, _queuing, _ftpAction,
-                            serverAddress, userName, argument1, argument2, _retryCount, exception);
+                            serverAddress, userName, argument1, argument2, retryCount, exception);
                     }
                 }
                 catch (Exception ex)
@@ -408,6 +415,94 @@ namespace Extract.Utilities.Ftp
             }
         }
 
+        /// <summary>
+        /// Attempt to derive the appropriate FTPEventTable arguments from <see cref="_ftpEvent"/>
+        /// as a <see cref="FTPFileTransferEventArgs"/>
+        /// </summary>
+        /// <param name="argument1">The first argument in the FTPEventTable log entry.</param>
+        /// <param name="argument2">The second argument in the FTPEventTable log entry.</param>
+        /// <returns><see langword="true"/> if the arguments were able to be extracted from
+        /// <see cref="_ftpEvent"/> as a <see cref="FTPFileTransferEventArgs"/>;
+        /// <see langword="false"/> otherwise.</returns>
+        bool GetFTPFileTransferEventArgs(ref string argument1, ref string argument2)
+        {
+            var fileTransferEvent = _ftpEvent as FTPFileTransferEventArgs;
+            if (fileTransferEvent != null)
+            {
+                if (_ftpAction == EFTPAction.kDownloadFileFromFtpServer)
+                {
+                    argument1 = fileTransferEvent.RemotePath;
+                    argument2 = fileTransferEvent.LocalPath;
+                }
+                else if ((_ftpAction == EFTPAction.kUploadFileToFtpServer))
+                {
+                    argument1 = fileTransferEvent.LocalPath;
+                    argument2 = fileTransferEvent.RemotePath;
+                }
+                else
+                {
+                    ExtractException.Assert("ELI34004", "Unsupported FTP logging operation",
+                        _ftpAction == EFTPAction.kDeleteFileFromFtpServer);
+
+                    argument1 = fileTransferEvent.RemotePath;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Attempt to derive the appropriate FTPEventTable arguments from <see cref="_ftpEvent"/>
+        /// as a <see cref="FTPFileRenameEventArgs"/>
+        /// </summary>
+        /// <param name="argument1">The first argument in the FTPEventTable log entry.</param>
+        /// <param name="argument2">The second argument in the FTPEventTable log entry.</param>
+        /// <returns><see langword="true"/> if the arguments were able to be extracted from
+        /// <see cref="_ftpEvent"/> as a <see cref="FTPFileRenameEventArgs"/>;
+        /// <see langword="false"/> otherwise.</returns>
+        bool GetFTPFileRenameEventArgs(ref string argument1, ref string argument2)
+        {
+            var fileRenameEvent = _ftpEvent as FTPFileRenameEventArgs;
+            if (fileRenameEvent != null)
+            {
+                ExtractException.Assert("ELI34002", "Unsupported FTP logging operation",
+                    _ftpAction == EFTPAction.kRenameFileOnFtpServer);
+
+                argument1 = fileRenameEvent.OldFilePath;
+                argument2 = fileRenameEvent.NewFilePath;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Attempt to derive the appropriate FTPEventTable arguments from <see cref="_ftpEvent"/>
+        /// as a <see cref="FTPDirectoryEventArgs"/>
+        /// </summary>
+        /// <param name="argument1">The first argument in the FTPEventTable log entry.</param>
+        /// <returns><see langword="true"/> if the arguments were able to be extracted from
+        /// <see cref="_ftpEvent"/> as a <see cref="FTPDirectoryEventArgs"/>;
+        /// <see langword="false"/> otherwise.</returns>
+        bool GetFTPDirectoryEventArgs(ref string argument1)
+        {
+            var directoryEvent = _ftpEvent as FTPDirectoryEventArgs;
+            if (directoryEvent != null)
+            {
+                ExtractException.Assert("ELI34003", "Unsupported FTP logging operation",
+                    _ftpAction == EFTPAction.kDeleteFileFromFtpServer);
+
+                argument1 = directoryEvent.OldDirectoryPath;
+
+                return true;
+            }
+
+            return false;
+        }
+
         #endregion IDisposable Members
 
         #region Private Members
@@ -421,12 +516,14 @@ namespace Extract.Utilities.Ftp
             _ftpConnection.Uploading += HandleEventBegin;
             _ftpConnection.RenamingFile += HandleEventBegin;
             _ftpConnection.Deleting += HandleEventBegin;
+            _ftpConnection.DeletingDirectory += HandleEventBegin;
             _ftpConnection.Downloaded += HandleEventEnd;
             _ftpConnection.Uploaded += HandleEventEnd;
             _ftpConnection.RenamedFile += HandleEventEnd;
             _ftpConnection.Deleted += HandleEventEnd;
+            _ftpConnection.DeletedDirectory += HandleEventEnd;
             _ftpConnection.Error += HandleError;
-            _ftpExceptionSource.FtpError += HandleFtpExceptionSourceError;
+            _ftpExceptionSource.FtpError += HandleFtpErrorSourceError;
         }
 
         /// <summary>
@@ -438,12 +535,14 @@ namespace Extract.Utilities.Ftp
             _ftpConnection.Uploading -= HandleEventBegin;
             _ftpConnection.RenamingFile -= HandleEventBegin;
             _ftpConnection.Deleting -= HandleEventBegin;
+            _ftpConnection.DeletingDirectory -= HandleEventBegin;
             _ftpConnection.Downloaded -= HandleEventEnd;
             _ftpConnection.Uploaded -= HandleEventEnd;
             _ftpConnection.RenamedFile -= HandleEventEnd;
             _ftpConnection.Deleted -= HandleEventEnd;
+            _ftpConnection.DeletedDirectory -= HandleEventEnd;
             _ftpConnection.Error -= HandleError;
-            _ftpExceptionSource.FtpError -= HandleFtpExceptionSourceError;
+            _ftpExceptionSource.FtpError -= HandleFtpErrorSourceError;
         }
 
         #endregion Private Members

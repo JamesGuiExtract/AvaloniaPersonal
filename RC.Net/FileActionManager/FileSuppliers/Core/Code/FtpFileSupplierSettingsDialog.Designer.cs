@@ -42,11 +42,6 @@
             this._browseButton = new Extract.Utilities.Forms.BrowseButton();
             this._localWorkingFolderTextBox = new System.Windows.Forms.TextBox();
             this._pathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._afterDownloadGroupBox = new System.Windows.Forms.GroupBox();
-            this._newExtensionTextBox = new System.Windows.Forms.TextBox();
-            this._changeRemoteExtensionRadioButton = new System.Windows.Forms.RadioButton();
-            this._doNothingRadioButton = new System.Windows.Forms.RadioButton();
-            this._deleteRemoteFileRadioButton = new System.Windows.Forms.RadioButton();
             this._recursiveDownloadCheckBox = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -63,7 +58,6 @@
             ((System.ComponentModel.ISupportInitialize)(this._pollingIntervalNumericUpDown)).BeginInit();
             this._settingsTabControl.SuspendLayout();
             this._generalSettingsTabPage.SuspendLayout();
-            this._afterDownloadGroupBox.SuspendLayout();
             this._connectionSettingsTabPage.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -85,7 +79,7 @@
             // _pollingIntervalNumericUpDown
             // 
             this._pollingIntervalNumericUpDown.IntegersOnly = true;
-            this._pollingIntervalNumericUpDown.Location = new System.Drawing.Point(286, 44);
+            this._pollingIntervalNumericUpDown.Location = new System.Drawing.Point(291, 44);
             this._pollingIntervalNumericUpDown.Maximum = new decimal(new int[] {
             1440,
             0,
@@ -152,7 +146,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(337, 46);
+            this.label3.Location = new System.Drawing.Point(342, 46);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(49, 13);
             this.label3.TabIndex = 3;
@@ -166,7 +160,7 @@
             this._settingsTabControl.Location = new System.Drawing.Point(0, 0);
             this._settingsTabControl.Name = "_settingsTabControl";
             this._settingsTabControl.SelectedIndex = 0;
-            this._settingsTabControl.Size = new System.Drawing.Size(483, 483);
+            this._settingsTabControl.Size = new System.Drawing.Size(483, 382);
             this._settingsTabControl.TabIndex = 0;
             // 
             // _generalSettingsTabPage
@@ -174,7 +168,6 @@
             this._generalSettingsTabPage.Controls.Add(groupBox1);
             this._generalSettingsTabPage.Controls.Add(this._browseButton);
             this._generalSettingsTabPage.Controls.Add(this._pathTagsButton);
-            this._generalSettingsTabPage.Controls.Add(this._afterDownloadGroupBox);
             this._generalSettingsTabPage.Controls.Add(this._recursiveDownloadCheckBox);
             this._generalSettingsTabPage.Controls.Add(this.label4);
             this._generalSettingsTabPage.Controls.Add(this.label2);
@@ -185,7 +178,7 @@
             this._generalSettingsTabPage.Location = new System.Drawing.Point(4, 22);
             this._generalSettingsTabPage.Name = "_generalSettingsTabPage";
             this._generalSettingsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._generalSettingsTabPage.Size = new System.Drawing.Size(475, 457);
+            this._generalSettingsTabPage.Size = new System.Drawing.Size(475, 356);
             this._generalSettingsTabPage.TabIndex = 0;
             this._generalSettingsTabPage.Text = "General Settings";
             this._generalSettingsTabPage.UseVisualStyleBackColor = true;
@@ -193,7 +186,7 @@
             // _browseButton
             // 
             this._browseButton.FolderBrowser = true;
-            this._browseButton.Location = new System.Drawing.Point(440, 429);
+            this._browseButton.Location = new System.Drawing.Point(440, 288);
             this._browseButton.Name = "_browseButton";
             this._browseButton.Size = new System.Drawing.Size(27, 20);
             this._browseButton.TabIndex = 10;
@@ -203,7 +196,7 @@
             // 
             // _localWorkingFolderTextBox
             // 
-            this._localWorkingFolderTextBox.Location = new System.Drawing.Point(8, 429);
+            this._localWorkingFolderTextBox.Location = new System.Drawing.Point(8, 288);
             this._localWorkingFolderTextBox.Name = "_localWorkingFolderTextBox";
             this._localWorkingFolderTextBox.Size = new System.Drawing.Size(402, 20);
             this._localWorkingFolderTextBox.TabIndex = 8;
@@ -211,69 +204,13 @@
             // _pathTagsButton
             // 
             this._pathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_pathTagsButton.Image")));
-            this._pathTagsButton.Location = new System.Drawing.Point(416, 429);
+            this._pathTagsButton.Location = new System.Drawing.Point(416, 288);
             this._pathTagsButton.Name = "_pathTagsButton";
             this._pathTagsButton.PathTags = new Extract.Utilities.FileActionManagerSupplierPathTags();
             this._pathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._pathTagsButton.TabIndex = 9;
             this._pathTagsButton.TextControl = this._localWorkingFolderTextBox;
             this._pathTagsButton.UseVisualStyleBackColor = true;
-            // 
-            // _afterDownloadGroupBox
-            // 
-            this._afterDownloadGroupBox.Controls.Add(this._newExtensionTextBox);
-            this._afterDownloadGroupBox.Controls.Add(this._changeRemoteExtensionRadioButton);
-            this._afterDownloadGroupBox.Controls.Add(this._doNothingRadioButton);
-            this._afterDownloadGroupBox.Controls.Add(this._deleteRemoteFileRadioButton);
-            this._afterDownloadGroupBox.Location = new System.Drawing.Point(11, 273);
-            this._afterDownloadGroupBox.Name = "_afterDownloadGroupBox";
-            this._afterDownloadGroupBox.Size = new System.Drawing.Size(456, 135);
-            this._afterDownloadGroupBox.TabIndex = 6;
-            this._afterDownloadGroupBox.TabStop = false;
-            this._afterDownloadGroupBox.Text = "After downloading the remote file";
-            // 
-            // _newExtensionTextBox
-            // 
-            this._newExtensionTextBox.Location = new System.Drawing.Point(36, 42);
-            this._newExtensionTextBox.Name = "_newExtensionTextBox";
-            this._newExtensionTextBox.Size = new System.Drawing.Size(335, 20);
-            this._newExtensionTextBox.TabIndex = 1;
-            // 
-            // _changeRemoteExtensionRadioButton
-            // 
-            this._changeRemoteExtensionRadioButton.AutoSize = true;
-            this._changeRemoteExtensionRadioButton.Location = new System.Drawing.Point(16, 19);
-            this._changeRemoteExtensionRadioButton.Name = "_changeRemoteExtensionRadioButton";
-            this._changeRemoteExtensionRadioButton.Size = new System.Drawing.Size(286, 17);
-            this._changeRemoteExtensionRadioButton.TabIndex = 0;
-            this._changeRemoteExtensionRadioButton.TabStop = true;
-            this._changeRemoteExtensionRadioButton.Text = "Append the following to the remote filename\'s extension";
-            this._changeRemoteExtensionRadioButton.UseVisualStyleBackColor = true;
-            this._changeRemoteExtensionRadioButton.Click += new System.EventHandler(this.HandleCheckBoxOrRadioClick);
-            // 
-            // _doNothingRadioButton
-            // 
-            this._doNothingRadioButton.AutoSize = true;
-            this._doNothingRadioButton.Location = new System.Drawing.Point(16, 94);
-            this._doNothingRadioButton.Name = "_doNothingRadioButton";
-            this._doNothingRadioButton.Size = new System.Drawing.Size(187, 17);
-            this._doNothingRadioButton.TabIndex = 3;
-            this._doNothingRadioButton.TabStop = true;
-            this._doNothingRadioButton.Text = "Do nothing (leave remote file as is)";
-            this._doNothingRadioButton.UseVisualStyleBackColor = true;
-            this._doNothingRadioButton.Click += new System.EventHandler(this.HandleCheckBoxOrRadioClick);
-            // 
-            // _deleteRemoteFileRadioButton
-            // 
-            this._deleteRemoteFileRadioButton.AutoSize = true;
-            this._deleteRemoteFileRadioButton.Location = new System.Drawing.Point(16, 71);
-            this._deleteRemoteFileRadioButton.Name = "_deleteRemoteFileRadioButton";
-            this._deleteRemoteFileRadioButton.Size = new System.Drawing.Size(125, 17);
-            this._deleteRemoteFileRadioButton.TabIndex = 2;
-            this._deleteRemoteFileRadioButton.TabStop = true;
-            this._deleteRemoteFileRadioButton.Text = "Delete the remote file";
-            this._deleteRemoteFileRadioButton.UseVisualStyleBackColor = true;
-            this._deleteRemoteFileRadioButton.Click += new System.EventHandler(this.HandleCheckBoxOrRadioClick);
             // 
             // _recursiveDownloadCheckBox
             // 
@@ -289,7 +226,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(8, 411);
+            this.label4.Location = new System.Drawing.Point(8, 270);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(102, 13);
             this.label4.TabIndex = 7;
@@ -333,7 +270,7 @@
             this._connectionSettingsTabPage.Location = new System.Drawing.Point(4, 22);
             this._connectionSettingsTabPage.Name = "_connectionSettingsTabPage";
             this._connectionSettingsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._connectionSettingsTabPage.Size = new System.Drawing.Size(475, 457);
+            this._connectionSettingsTabPage.Size = new System.Drawing.Size(475, 356);
             this._connectionSettingsTabPage.TabIndex = 1;
             this._connectionSettingsTabPage.Text = "Connection Settings";
             this._connectionSettingsTabPage.UseVisualStyleBackColor = true;
@@ -348,7 +285,7 @@
             this._ftpConnectionSettingsControl.NumberOfRetriesBeforeFailure = 0;
             this._ftpConnectionSettingsControl.Padding = new System.Windows.Forms.Padding(3);
             this._ftpConnectionSettingsControl.ShowConnectionsControl = false;
-            this._ftpConnectionSettingsControl.Size = new System.Drawing.Size(469, 442);
+            this._ftpConnectionSettingsControl.Size = new System.Drawing.Size(469, 370);
             this._ftpConnectionSettingsControl.TabIndex = 3;
             this._ftpConnectionSettingsControl.TimeBetweenRetries = 0;
             // 
@@ -363,7 +300,7 @@
             // _btnOK
             // 
             this._btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._btnOK.Location = new System.Drawing.Point(315, 492);
+            this._btnOK.Location = new System.Drawing.Point(315, 388);
             this._btnOK.Name = "_btnOK";
             this._btnOK.Size = new System.Drawing.Size(75, 23);
             this._btnOK.TabIndex = 1;
@@ -375,7 +312,7 @@
             // 
             this._btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._btnCancel.Location = new System.Drawing.Point(396, 492);
+            this._btnCancel.Location = new System.Drawing.Point(396, 388);
             this._btnCancel.MinimumSize = new System.Drawing.Size(75, 23);
             this._btnCancel.Name = "_btnCancel";
             this._btnCancel.Size = new System.Drawing.Size(75, 23);
@@ -388,7 +325,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._btnCancel;
-            this.ClientSize = new System.Drawing.Size(483, 526);
+            this.ClientSize = new System.Drawing.Size(483, 423);
             this.Controls.Add(this._btnCancel);
             this.Controls.Add(this._btnOK);
             this.Controls.Add(this._settingsTabControl);
@@ -406,8 +343,6 @@
             this._settingsTabControl.ResumeLayout(false);
             this._generalSettingsTabPage.ResumeLayout(false);
             this._generalSettingsTabPage.PerformLayout();
-            this._afterDownloadGroupBox.ResumeLayout(false);
-            this._afterDownloadGroupBox.PerformLayout();
             this._connectionSettingsTabPage.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -421,11 +356,6 @@
         private System.Windows.Forms.Button _btnOK;
         private System.Windows.Forms.Button _btnCancel;
         private EnterpriseDT.Net.Ftp.SecureFTPConnection _secureFTPConnection;
-        private System.Windows.Forms.GroupBox _afterDownloadGroupBox;
-        private System.Windows.Forms.TextBox _newExtensionTextBox;
-        private System.Windows.Forms.RadioButton _changeRemoteExtensionRadioButton;
-        private System.Windows.Forms.RadioButton _doNothingRadioButton;
-        private System.Windows.Forms.RadioButton _deleteRemoteFileRadioButton;
         private System.Windows.Forms.Label label3;
         private Utilities.Forms.BetterNumericUpDown _pollingIntervalNumericUpDown;
         private System.Windows.Forms.CheckBox _recursiveDownloadCheckBox;

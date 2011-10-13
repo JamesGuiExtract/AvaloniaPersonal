@@ -22,30 +22,6 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.FileActionManager.FileSuppliers
 {
     /// <summary>
-    /// Enum for specifing the action to be taken on the remote
-    /// server after the file has been downloaded
-    /// </summary>
-    [ComVisible(true)]
-    [Guid("4A889E08-F8C0-4319-BEF9-3FA1DD10E71E")]
-    public enum AfterDownloadRemoteFileActon
-    {
-         /// <summary>
-        /// Change the file extension of the file on the server
-        /// </summary>
-        ChangeRemoteFileExtension = 0,
-
-       /// <summary>
-        /// Delete the remote file from the server
-        /// </summary>
-        DeleteRemoteFile = 1,
-
-         /// <summary>
-        /// Do nothing to the remote file on the server
-        /// </summary>
-        DoNothingToRemoteFile = 2
-    }
-
-    /// <summary>
     /// Enum for whether the remote location should be polled for files and, if so, whether it
     /// should be polled continuously or at set times.
     /// </summary>
@@ -142,26 +118,6 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// Action to be taken after the file has been downloaded from the server
-        /// </summary>
-        AfterDownloadRemoteFileActon AfterDownloadAction
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// The extension to change the remote file's extension to on the remote
-        /// server.  Only used if <see cref="AfterDownloadAction"/> is set to 
-        /// ChangeRemoteFileExtension
-        /// </summary>
-        string NewExtensionForRemoteFile
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Local folder that files are copied to when they are downloaded from
         /// the remote server
         /// </summary>
@@ -228,8 +184,10 @@ namespace Extract.FileActionManager.FileSuppliers
         /// Current file supplier version.
         /// <para>Version 4</para>
         /// Boolean for whether to poll became PollingMethod; also added PollingTimes
+        /// <para>Version 5</para>
+        /// Removed the after-download actions per [DotNetRCAndUtils:739]
         /// </summary>
-        const int _CURRENT_VERSION = 4;
+        const int _CURRENT_VERSION = 5;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -293,12 +251,6 @@ namespace Extract.FileActionManager.FileSuppliers
         // Field for PollingTimes property
         DateTime[] _pollingTimes = new DateTime[0];
 
-        // Field for AfterDownloadAction property
-        AfterDownloadRemoteFileActon _afterDownloadAction;
-
-        // Field for NewExtensionForRemoteFile property
-        string _newExtensionForRemoteFile;
-
         // Field for LocalWorkingFolder property
         string _localWorkingfolder;
 
@@ -360,6 +312,11 @@ namespace Extract.FileActionManager.FileSuppliers
         /// aborted if this number becomes > <see cref="NumberOfTimesToRetry"/>
         /// </summary>
         int _consecutiveDownloadFailures = 0;
+
+        /// <summary>
+        /// Allows for FTP operations to be automatically retried as configured.
+        /// </summary>
+        Retry<Exception> _retry;
 
         /// <summary>
         /// Protects access to creating/disposal of the _pollingTimer.
@@ -525,53 +482,6 @@ namespace Extract.FileActionManager.FileSuppliers
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI33996");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Action to be taken after the file has been downloaded from the server
-        /// </summary>
-        public AfterDownloadRemoteFileActon AfterDownloadAction 
-        { 
-            get
-            {
-                return _afterDownloadAction;
-            }
-            set
-            {
-                if (_afterDownloadAction != value)
-                {
-                    _afterDownloadAction = value;
-                    _dirty = true;
-                }
-            }
-        }
-
-        /// <summary>
-        /// The extension to change the remote file's extension to on the remote
-        /// server.  Only used if <see cref="AfterDownloadAction"/> is set to 
-        /// ChangeRemoteFileExtension
-        /// </summary>
-        public string NewExtensionForRemoteFile 
-        { 
-            get
-            {
-                return _newExtensionForRemoteFile;
-            }
-            set
-            {
-                try
-                {
-                    if (_newExtensionForRemoteFile != value)
-                    {
-                        _newExtensionForRemoteFile = value;
-                        _dirty = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI33074");
                 }
             }
         }
@@ -828,8 +738,6 @@ namespace Extract.FileActionManager.FileSuppliers
                     !string.IsNullOrWhiteSpace(FileExtensionsToDownload) &&
                     (PollingMethod != PollingMethod.Continuously || PollingIntervalInMinutes > 0) &&
                     (PollingMethod != PollingMethod.SetTimes || PollingTimes.Length > 0) &&
-                    (AfterDownloadAction != AfterDownloadRemoteFileActon.ChangeRemoteFileExtension ||
-                        !string.IsNullOrWhiteSpace(NewExtensionForRemoteFile)) &&
                     !string.IsNullOrWhiteSpace(ConfiguredFtpConnection.ServerAddress) && 
                     !string.IsNullOrWhiteSpace(ConfiguredFtpConnection.UserName) &&
                     !string.IsNullOrWhiteSpace(ConfiguredFtpConnection.Password);
@@ -940,6 +848,9 @@ namespace Extract.FileActionManager.FileSuppliers
 
                 _fileProcessingDB = pDB;
                 _actionID = nActionID;
+
+                // Create retry object
+                _retry = new Retry<Exception>(NumberOfTimesToRetry, TimeToWaitBetweenRetries, _stopSupplying);
 
                 // Notify the FtpEventRecorder to recheck the DBInfo setting for whether to log FTP events
                 FtpEventRecorder.RecheckFtpLoggingStatus();
@@ -1075,8 +986,12 @@ namespace Extract.FileActionManager.FileSuppliers
                         PollingMethod = (PollingMethod)reader.ReadInt32();
                     }
                     PollingIntervalInMinutes = reader.ReadInt32();
-                    AfterDownloadAction = (AfterDownloadRemoteFileActon)reader.ReadInt32();
-                    NewExtensionForRemoteFile = reader.ReadString();
+                    if (reader.Version < 5)
+                    {
+                        // Ignore removed after-download action settings.
+                        reader.ReadInt32();
+                        reader.ReadString();
+                    }
                     LocalWorkingFolder = reader.ReadString();
 
                     if (reader.Version >= 2)
@@ -1134,8 +1049,6 @@ namespace Extract.FileActionManager.FileSuppliers
                     writer.Write(RecursivelyDownload);
                     writer.Write((int)PollingMethod);
                     writer.Write(PollingIntervalInMinutes);
-                    writer.Write((int)AfterDownloadAction);
-                    writer.Write(NewExtensionForRemoteFile);
                     writer.Write(LocalWorkingFolder);
                     writer.Write(NumberOfConnections);
                     writer.Write(NumberOfTimesToRetry);
@@ -1391,21 +1304,11 @@ namespace Extract.FileActionManager.FileSuppliers
                     // the stop button is pressed on the FAM so change the connection to not retry.
                     runningConnection.RetryCount = 0;
 
-                    // Create retry objects
-                    Retry<Exception> downloadRetry = 
-                        new Retry<Exception>(NumberOfTimesToRetry, TimeToWaitBetweenRetries, _stopSupplying);
-
-                    Retry<Exception> afterDownloadRetry =
-                        new Retry<Exception>(NumberOfTimesToRetry, TimeToWaitBetweenRetries, _stopSupplying);
-
                     // Download the files
                     while (GetNextFileToDownload(out currentFtpFile))
                     {
                         try
                         {
-                            // The FileRecord will be provided by DownloadFileFromFtpServer.
-                            IFileRecord fileRecord;
-
                             // Call the DownloadFileFromFtpServer retry within a FtpEventRecorder
                             // block so that an FTP event history row will be added upon success or
                             // after all retries have been exhausted.
@@ -1413,40 +1316,14 @@ namespace Extract.FileActionManager.FileSuppliers
                                 runningConnection, _fileProcessingDB, _actionID, true,
                                 EFTPAction.kDownloadFileFromFtpServer))
                             {
-                                fileRecord = downloadRetry.DoRetry(
-                                    DownloadFileFromFtpServer, runningConnection, currentFtpFile);
-
                                 // Assign the FileRecord for the recorder so that it knows which
                                 // file the FTP event relates to.
-                                recorder.FileRecord = fileRecord;
+                                recorder.FileRecord = _retry.DoRetry(() =>
+                                    DownloadFileFromFtpServer(runningConnection, currentFtpFile));
 
+                                // If we got here, the file successfullly download; reset
+                                // _consecutiveDownloadFailures.
                                 Interlocked.Exchange(ref _consecutiveDownloadFailures, 0);
-                            }
-
-                            // File record may be null if a skip condition excludes the file.
-                            if (fileRecord != null &&
-                                AfterDownloadAction != AfterDownloadRemoteFileActon.DoNothingToRemoteFile)
-                            {
-                                EFTPAction afterDownloadFtpAction = EFTPAction.kDeleteFileFromFtpServer;
-                                if (AfterDownloadAction == AfterDownloadRemoteFileActon.ChangeRemoteFileExtension)
-                                {
-                                    afterDownloadFtpAction = EFTPAction.kRenameFileOnFtpServer;
-                                }
-
-                                // Call the PerformAfterDownloadAction retry within a FtpEventRecorder
-                                // block so that an FTP event history row will be added upon success or
-                                // after all retries have been exhausted.
-                                using (FtpEventRecorder recorder = new FtpEventRecorder(this,
-                                    runningConnection, _fileProcessingDB, _actionID, true,
-                                    afterDownloadFtpAction))
-                                {
-                                    // Assign the FileRecord for the recorder so that it knows which
-                                    // file the FTP event relates to.
-                                    recorder.FileRecord = fileRecord;
-
-                                    afterDownloadRetry.DoRetryNoReturnValue(
-                                        PerformAfterDownloadAction, currentFtpFile.Path, runningConnection);
-                                }
                             }
                         }
                         catch (Exception ex)
@@ -1520,8 +1397,6 @@ namespace Extract.FileActionManager.FileSuppliers
                 PollingMethod = fileSupplier.PollingMethod;
                 PollingIntervalInMinutes = fileSupplier.PollingIntervalInMinutes;
                 PollingTimes = fileSupplier.PollingTimes;
-                AfterDownloadAction = fileSupplier.AfterDownloadAction;
-                NewExtensionForRemoteFile = fileSupplier.NewExtensionForRemoteFile;
                 LocalWorkingFolder = fileSupplier.LocalWorkingFolder;
                 ConfiguredFtpConnection = (SecureFTPConnection)fileSupplier.ConfiguredFtpConnection.Clone();
                 NumberOfConnections = fileSupplier.NumberOfConnections;
@@ -1610,13 +1485,9 @@ namespace Extract.FileActionManager.FileSuppliers
 
                     // There are retry settings for the file supplier that will allow quicker exiting if
                     // the stop button is pressed on the FAM so change the connection to not retry.
-                    runningConnection.RetryCount = 0;
 
-                    // Create retry object
-                    Retry<Exception> retry = 
-                        new Retry<Exception>(NumberOfTimesToRetry, TimeToWaitBetweenRetries, _stopSupplying);
-                    
-                    FTPFile[] directoryContents = retry.DoRetry(GetFileListFromFtpServer, runningConnection);
+                    FTPFile[] directoryContents = _retry.DoRetry(() =>
+                        GetFileListFromFtpServer(runningConnection));
 
                     // Fill the filesToDownload list
                     DetermineFilesToDownload(directoryContents);
@@ -1704,8 +1575,6 @@ namespace Extract.FileActionManager.FileSuppliers
         /// </summary>
         void InitializeDefaults()
         {
-            AfterDownloadAction = AfterDownloadRemoteFileActon.DeleteRemoteFile;
-
             // Set Polling IntervalInMinutes to the default
             PollingIntervalInMinutes = 1;
             PollingTimes = new DateTime[0];
@@ -1799,54 +1668,6 @@ namespace Extract.FileActionManager.FileSuppliers
                     runningConnection.Close();
                 }
                 _pauseEvent.WaitOne();
-            }
-        }
-
-        /// <summary>
-        /// Deletes the file from the ftp server using runningConnection
-        /// </summary>
-        /// <param name="remoteFile">Name of file to delete from the ftp sever</param>
-        /// <param name="runningConnection">Connection to the ftp server</param>
-        static bool DeleteFileFromFtpServer(string remoteFile, SecureFTPConnection runningConnection)
-        {
-            try
-            {
-                if (!runningConnection.IsConnected)
-                {
-                    runningConnection.Connect();
-                }
-                return runningConnection.DeleteFile(remoteFile);
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = new ExtractException("ELI32554", "Delete file from FTP server failed.", ex);
-                ee.AddDebugData("RemoteFile", remoteFile, false);
-                throw ee;
-            }
-        }
-
-        /// <summary>
-        /// Renames a file on the ftp server 
-        /// </summary>
-        /// <param name="fromFileName">Name of file being renamed on ftp server</param>
-        /// <param name="toFileName">New name for file on ftp server</param>
-        /// <param name="runningConnection">Connection to the ftp server</param>
-        static bool RenameFileOnFtpServer(string fromFileName, string toFileName, SecureFTPConnection runningConnection)
-        {
-            try
-            {
-                if (!runningConnection.IsConnected)
-                {
-                    runningConnection.Connect();
-                }
-                return runningConnection.RenameFile(fromFileName, toFileName);
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = new ExtractException("ELI32555", "File rename on FTP server failed.", ex);
-                ee.AddDebugData("FromFile", fromFileName, false);
-                ee.AddDebugData("ToFile", toFileName, false);
-                throw ee;
             }
         }
 
@@ -2006,39 +1827,6 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// Performs the after download action for a downloaded file
-        /// </summary>
-        /// <param name="remoteFileName">The full remote file name with path on the server</param>
-        /// <param name="runningConnection">FTP connection used to preform the action</param>
-        private void PerformAfterDownloadAction(string remoteFileName, SecureFTPConnection runningConnection)
-        {
-            try
-            {
-                // There are retry settings for the file supplier that will allow quicker exiting if
-                // the stop button is pressed on the FAM so change the connection to not retry.
-                runningConnection.RetryCount = 0;
-
-                // Perform the after download action
-                switch (AfterDownloadAction)
-                {
-                    case AfterDownloadRemoteFileActon.ChangeRemoteFileExtension:
-                        RenameFileOnFtpServer(remoteFileName, remoteFileName + NewExtensionForRemoteFile,
-                            runningConnection);
-                        break;
-                    case AfterDownloadRemoteFileActon.DeleteRemoteFile:
-                        DeleteFileFromFtpServer(remoteFileName, runningConnection);
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                // Raise an FTP error (as part of the IFtpEventExceptionSource implementation)
-                OnFtpError(ex.AsExtract("ELI33984"));
-                throw;
-            }
-        }
-
-        /// <summary>
         /// Raises the <see cref="FtpError"/> event.
         /// </summary>
         /// <param name="ftpException">An <see cref="ExtractException"/> containing information
@@ -2052,15 +1840,15 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// Gets the number of milliseconds
+        /// Gets the number of milliseconds until the next time in PollingTimes.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The number of milliseconds until the next time in PollingTimes</returns>
         long GetMillisecondsUntilNextSetTime()
         {
             long timeoutValue = (long)PollingTimes
                 .Select(time => time.TimeOfDay - DateTime.Now.TimeOfDay)
                 .Select(timeSpan => (timeSpan.Ticks < 0)
-                    ? timeSpan + new TimeSpan(1, 0, 0, 0)
+                    ? timeSpan + new TimeSpan(1, 0, 0, 0) // If we have passed the time; use tomorrow.
                     : timeSpan)
                 .OrderBy(timeSpan => timeSpan)
                 .First()

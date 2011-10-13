@@ -16,12 +16,12 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.FileActionManager.FileProcessors
 {
     /// <summary>
-    /// Interface for the <see cref="FtpFileTransferTask"/>.
+    /// Interface for the <see cref="FtpTask"/>.
     /// </summary>
     [ComVisible(true)]
     [Guid("58E04DBF-7087-4EBD-BC14-6499700C7CF9")]
     [CLSCompliant(false)]
-    public interface IFtpFileTransferTask : ICategorizedComponent, IConfigurableObject,
+    public interface IFtpTask : ICategorizedComponent, IConfigurableObject,
         IMustBeConfiguredObject, ICopyableObject, IFileProcessingTask,
         ILicensedComponent, IPersistStream, IFtpEventErrorSource, IDisposable
     {
@@ -37,7 +37,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Specifies the name of the remote file using tags.
         /// </summary>
-        string RemoteFileName
+        string RemoteOrOldFileName
         {
             get;
             set;
@@ -46,7 +46,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Specifies the name of the local file using tags.
         /// </summary>
-        string LocalFileName
+        string LocalOrNewFileName
         {
             get;
             set;
@@ -80,6 +80,16 @@ namespace Extract.FileActionManager.FileProcessors
             get;
             set;
         }
+
+        /// <summary>
+        /// If a file delete is being performed, indicates whether the folder it was deleted from
+        /// should be deleted if it is now empty.
+        /// </summary>
+        bool DeleteEmptyFolder
+        {
+            get;
+            set;
+        }
     }
 
     /// <summary>
@@ -87,20 +97,22 @@ namespace Extract.FileActionManager.FileProcessors
     /// </summary>
     [ComVisible(true)]
     [Guid("A4D719DE-EAD2-47AA-991D-9E60FE0D8D9F")]
-    [ProgId("Extract.FileActionManager.FileProcessors.FtpFileTransferTask")]
-    public class FtpFileTransferTask : IFtpFileTransferTask
+    [ProgId("Extract.FileActionManager.FileProcessors.FtpTask")]
+    public class FtpTask : IFtpTask
     {
         #region Constants
 
         /// <summary>
         /// The description of this task
         /// </summary>
-        const string _COMPONENT_DESCRIPTION = "Core: Transfer file via FTP/SFTP";
+        const string _COMPONENT_DESCRIPTION = "Core: Transfer, rename or delete via FTP/SFTP";
 
         /// <summary>
         /// Current task version.
+        /// <para><b>Version 3</b></para>
+        /// Added <see cref="DeleteEmptyFolder"/>.
         /// </summary>
-        const int _CURRENT_VERSION = 2;
+        const int _CURRENT_VERSION = 3;
 
         /// <summary>
         /// Default wait time between retries
@@ -120,10 +132,11 @@ namespace Extract.FileActionManager.FileProcessors
         EFTPAction _actionToPerform;
 
         // Contains the string including tags that specifies the remote file name
-        string _remoteFileName = "";
+        string _remoteOrOldFileName = "";
 
-        // Contains the string including tags that specifies the local file name
-        string _localFileName = SourceDocumentPathTags.SourceDocumentTag;
+        // Contains the string including tags that specifies the local file name or the new name
+        // to assign to a remote file that is being renamed.
+        string _localOrNewFileName = SourceDocumentPathTags.SourceDocumentTag;
 
         // Connection that is used for the settings for the ftp server
         SecureFTPConnection _configuredFtpConnection = new SecureFTPConnection();
@@ -133,6 +146,10 @@ namespace Extract.FileActionManager.FileProcessors
 
         // Time to wait between retries
         int _timeToWaitBetweenRetries = _DEFAULT_WAIT_TIME_IN_MILLISECONDS_BETWEEN_RETRIES;
+
+        // If a file delete is being performed, indicates whether the folder it was deleted from
+        // should be deleted if it is now empty.
+        bool _deleteEmptyFolder;
 
         // Indicates that settings have been changed, but not saved.
         bool _dirty;
@@ -150,14 +167,19 @@ namespace Extract.FileActionManager.FileProcessors
         // Flag set when task is initialized to indicate if loading the download info file is required
         bool _loadDownloadInfoFile;
 
+        /// <summary>
+        /// Allows for FTP operations to be automatically retried as configured.
+        /// </summary>
+        Retry<Exception> _retry;
+
         #endregion Fields
 
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FtpFileTransferTask"/> class.
+        /// Initializes a new instance of the <see cref="FtpTask"/> class.
         /// </summary>
-        public FtpFileTransferTask()
+        public FtpTask()
         {
             FtpMethods.InitializeFtpApiLicense(_configuredFtpConnection);
         }
@@ -198,19 +220,19 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Specifies the name of the remote file using tags.
         /// </summary>
-        public string RemoteFileName
+        public string RemoteOrOldFileName
         {
             get
             {
-                return _remoteFileName;
+                return _remoteOrOldFileName;
             }
             set
             {
                 try
                 {
-                    if (!_remoteFileName.Equals(value ?? "", StringComparison.Ordinal))
+                    if (!_remoteOrOldFileName.Equals(value ?? "", StringComparison.Ordinal))
                     {
-                        _remoteFileName = value ?? "";
+                        _remoteOrOldFileName = value ?? "";
                         _dirty = true;
                     }
                 }
@@ -222,21 +244,22 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
-        /// Specifies the name of the local file using tags.
+        /// Specifies the name of the local file or the new name to assign to a remote file that is
+        /// being renamed using tags.
         /// </summary>
-        public string LocalFileName
+        public string LocalOrNewFileName
         {
             get
             {
-                return _localFileName;
+                return _localOrNewFileName;
             }
             set
             {
                 try
                 {
-                    if (!_localFileName.Equals(value ?? "", StringComparison.Ordinal))
+                    if (!_localOrNewFileName.Equals(value ?? "", StringComparison.Ordinal))
                     {
-                        _localFileName = value;
+                        _localOrNewFileName = value;
                         _dirty = true;
                     }
                 }
@@ -312,6 +335,27 @@ namespace Extract.FileActionManager.FileProcessors
                 }
             }
         }
+
+        /// <summary>
+        /// If a file delete is being performed, indicates whether the folder it was deleted from
+        /// should be deleted if it is now empty.
+        /// </summary>
+        public bool DeleteEmptyFolder
+        {
+            get
+            {
+                return _deleteEmptyFolder;
+            }
+
+            set
+            {
+                if (_deleteEmptyFolder != value)
+                {
+                    _deleteEmptyFolder = value;
+                    _dirty = true;
+                }
+            }
+        }
         
         #endregion Properties
          
@@ -331,7 +375,7 @@ namespace Extract.FileActionManager.FileProcessors
         #region IConfigurableObject Members
 
         /// <summary>
-        /// Performs configuration needed to create a valid <see cref="FtpFileTransferTask"/>.
+        /// Performs configuration needed to create a valid <see cref="FtpTask"/>.
         /// </summary>
         /// <returns><see langword="true"/> if the configuration was successfully updated or
         /// <see langword="false"/> if configuration was unsuccessful.</returns>
@@ -339,8 +383,8 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                using (FtpFileTransferTask cloneOfThis = (FtpFileTransferTask)Clone())
-                using (var dialog = new FtpFileTransferSettingsDialog(cloneOfThis))
+                using (FtpTask cloneOfThis = (FtpTask)Clone())
+                using (var dialog = new FtpTaskSettingsDialog(cloneOfThis))
                 {
                     if (dialog.ShowDialog() == DialogResult.OK)
                     {
@@ -375,9 +419,9 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 return (ActionToPerform == EFTPAction.kDeleteFileFromFtpServer ||
-                    !string.IsNullOrWhiteSpace(_localFileName)) &&
-                    !string.IsNullOrWhiteSpace(_remoteFileName) &&
-                    _remoteFileName[0] != '.' &&
+                    !string.IsNullOrWhiteSpace(_localOrNewFileName)) &&
+                    !string.IsNullOrWhiteSpace(_remoteOrOldFileName) &&
+                    _remoteOrOldFileName[0] != '.' &&
                     !string.IsNullOrWhiteSpace(ConfiguredFtpConnection.ServerAddress) &&
                     !string.IsNullOrWhiteSpace(ConfiguredFtpConnection.UserName) &&
                     !string.IsNullOrWhiteSpace(ConfiguredFtpConnection.Password);
@@ -393,14 +437,14 @@ namespace Extract.FileActionManager.FileProcessors
         #region ICopyableObject Members
 
         /// <summary>
-        /// Creates a copy of the <see cref="FtpFileTransferTask"/> instance.
+        /// Creates a copy of the <see cref="FtpTask"/> instance.
         /// </summary>
-        /// <returns>A copy of the <see cref="FtpFileTransferTask"/> instance.</returns>
+        /// <returns>A copy of the <see cref="FtpTask"/> instance.</returns>
         public object Clone()
         {
             try
             {
-                var task = new FtpFileTransferTask();
+                var task = new FtpTask();
 
                 task.CopyFrom(this);
 
@@ -413,14 +457,14 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
-        /// Copies the specified <see cref="FtpFileTransferTask"/> instance into this one.
+        /// Copies the specified <see cref="FtpTask"/> instance into this one.
         /// </summary>
         /// <param name="pObject">The object from which to copy.</param>
         public void CopyFrom(object pObject)
         {
             try
             {
-                var task = pObject as FtpFileTransferTask;
+                var task = pObject as FtpTask;
                 if (task == null)
                 {
                     throw new InvalidCastException("Object is not a Transfer file via FTP/SFTP task.");
@@ -510,8 +554,11 @@ namespace Extract.FileActionManager.FileProcessors
                 FtpMethods.InitializeFtpApiLicense(_runningConnection);
 
                 // Check if the RemoteSourceDocName tag is used in the input or output file name
-                _loadDownloadInfoFile = _localFileName.Contains(FileActionManagerPathTags.RemoteSourceDocumentTag) ||
-                    _remoteFileName.Contains(FileActionManagerPathTags.RemoteSourceDocumentTag);
+                _loadDownloadInfoFile = _localOrNewFileName.Contains(FileActionManagerPathTags.RemoteSourceDocumentTag) ||
+                    _remoteOrOldFileName.Contains(FileActionManagerPathTags.RemoteSourceDocumentTag);
+
+                // Create retry object
+                _retry = new Retry<Exception>(NumberOfTimesToRetry, TimeToWaitBetweenRetries, _cancelTask);
 
                 // Notify the FtpEventRecorder to recheck the DBInfo setting for whether to log FTP events
                 FtpEventRecorder.RecheckFtpLoggingStatus();
@@ -541,8 +588,8 @@ namespace Extract.FileActionManager.FileProcessors
             int nActionID, FAMTagManager pFAMTM, FileProcessingDB pDB,
             ProgressStatus pProgressStatus, bool bCancelRequested)
         {
-            string localFile = null;
-            string remoteFile = null;
+            string localOrNewFile = null;
+            string remoteOrOldFile = null;
             try
             {
                 // Validate the license
@@ -569,19 +616,15 @@ namespace Extract.FileActionManager.FileProcessors
 
                 if (ActionToPerform != EFTPAction.kDeleteFileFromFtpServer)
                 {
-                    localFile = tags.Expand(_localFileName);
+                    localOrNewFile = tags.Expand(_localOrNewFileName);
                 }
 
-                remoteFile = tags.Expand(_remoteFileName);
-                remoteFile = remoteFile.Replace('\\', '/');
+                remoteOrOldFile = tags.Expand(_remoteOrOldFileName);
+                remoteOrOldFile = remoteOrOldFile.Replace('\\', '/');
 
                 // There are retry settings for the file supplier that will allow quicker exiting if
                 // the stop button is pressed on the FAM so change the connection to not retry.
                 _runningConnection.RetryCount = 0;
-
-                // Create retry object
-                Retry<Exception> retry = 
-                    new Retry<Exception>(NumberOfTimesToRetry, TimeToWaitBetweenRetries, _cancelTask);
 
                 // Call the PerformAction retry within a FtpEventRecorder block so that an FTP event
                 // history row will be added upon success or after all retries have been exhausted.
@@ -592,7 +635,39 @@ namespace Extract.FileActionManager.FileProcessors
                     // event relates to.
                     recorder.FileRecord = pFileRecord;
 
-                    retry.DoRetryNoReturnValue(PerformAction, localFile, remoteFile);
+                    _retry.DoRetry(() => PerformAction(localOrNewFile, remoteOrOldFile));
+                }
+
+                if (DeleteEmptyFolder && ActionToPerform == EFTPAction.kDeleteFileFromFtpServer)
+                {
+                    string remoteFolder =
+                        remoteOrOldFile.Substring(0, remoteOrOldFile.LastIndexOf('/') + 1);
+
+                    try
+                    {
+                        bool isFolderEmpty = _retry.DoRetry(() => IsFolderEmpty(remoteFolder));
+
+                        if (isFolderEmpty)
+                        {
+                            using (FtpEventRecorder recorder = new FtpEventRecorder(this,
+                                _runningConnection, pDB, nActionID, false, EFTPAction.kDeleteFileFromFtpServer))
+                            {
+                                recorder.FileRecord = pFileRecord;
+
+                                _retry.DoRetry(() => DeleteRemoteFolder(remoteFolder));
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ExtractException ee = new ExtractException("ELI34010",
+                            "Failed to delete empty remote directory", ex);
+                        ee.AddDebugData("Remote directory", remoteFolder, false);
+                        
+                        // The deletion of a directory when empty is not a critical task and may
+                        // fail because there are directory contents we can't see. Just log.
+                        ee.Log();
+                    }
                 }
 
                 // If we reached this point then processing was successful
@@ -602,13 +677,13 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 // Wrap the exception as an extract exception and add debug data
                 var ee = ex.CreateComVisible("ELI32425", "Unable to process the file.");
-                if (string.IsNullOrWhiteSpace(localFile))
+                if (string.IsNullOrWhiteSpace(localOrNewFile))
                 {
-                    ee.AddDebugData("Local File ", localFile, false);
+                    ee.AddDebugData("Local File ", localOrNewFile, false);
                 }
-                if (string.IsNullOrWhiteSpace(remoteFile))
+                if (string.IsNullOrWhiteSpace(remoteOrOldFile))
                 {
-                    ee.AddDebugData("Remote file", remoteFile, false);
+                    ee.AddDebugData("Remote file", remoteOrOldFile, false);
                 }
                 ee.AddDebugData("File ID", pFileRecord.FileID, false);
                 ee.AddDebugData("Action ID", nActionID, false);
@@ -698,13 +773,18 @@ namespace Extract.FileActionManager.FileProcessors
                     InitializeDefaults();
 
                     _actionToPerform = (EFTPAction)reader.ReadInt32();
-                    _remoteFileName = reader.ReadString();
-                    _localFileName = reader.ReadString();
+                    _remoteOrOldFileName = reader.ReadString();
+                    _localOrNewFileName = reader.ReadString();
 
                     if (reader.Version >= 2)
                     {
                         _numberOfTimesToRetry = reader.ReadInt32();
                         _timeToWaitBetweenRetries = reader.ReadInt32();
+                    }
+
+                    if (reader.Version >= 3)
+                    {
+                        _deleteEmptyFolder = reader.ReadBoolean();
                     }
 
                     string hexString = reader.ReadString();
@@ -743,10 +823,11 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     // Serialize the settings
                     writer.Write((int)_actionToPerform);
-                    writer.Write(_remoteFileName);
-                    writer.Write(_localFileName);
+                    writer.Write(_remoteOrOldFileName);
+                    writer.Write(_localOrNewFileName);
                     writer.Write(_numberOfTimesToRetry);
                     writer.Write(_timeToWaitBetweenRetries);
+                    writer.Write(_deleteEmptyFolder);
 
                     // Write the Ftp connection settings to the steam
                     using (MemoryStream ftpDataStream = new MemoryStream())
@@ -786,7 +867,7 @@ namespace Extract.FileActionManager.FileProcessors
         #region IDisposable Members
 
         /// <summary>
-        /// Releases all resources used by the <see cref="FtpFileTransferTask"/>.
+        /// Releases all resources used by the <see cref="FtpTask"/>.
         /// </summary>
         public void Dispose()
         {
@@ -794,9 +875,9 @@ namespace Extract.FileActionManager.FileProcessors
             GC.SuppressFinalize(this);
         }
 
-        /// <overloads>Releases resources used by the <see cref="FtpFileTransferTask"/>.</overloads>
+        /// <overloads>Releases resources used by the <see cref="FtpTask"/>.</overloads>
         /// <summary>
-        /// Releases all unmanaged resources used by the <see cref="FtpFileTransferTask"/>.
+        /// Releases all unmanaged resources used by the <see cref="FtpTask"/>.
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>		
@@ -853,18 +934,19 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
-        /// Copies the specified <see cref="FtpFileTransferTask"/> instance into this one.
+        /// Copies the specified <see cref="FtpTask"/> instance into this one.
         /// </summary>
-        /// <param name="task">The <see cref="FtpFileTransferTask"/> from which to copy.</param>
-        public void CopyFrom(FtpFileTransferTask task)
+        /// <param name="task">The <see cref="FtpTask"/> from which to copy.</param>
+        public void CopyFrom(FtpTask task)
         {
             try
             {
                 _actionToPerform = task.ActionToPerform;
-                _localFileName = task.LocalFileName;
-                _remoteFileName = task._remoteFileName;
+                _localOrNewFileName = task.LocalOrNewFileName;
+                _remoteOrOldFileName = task._remoteOrOldFileName;
                 _timeToWaitBetweenRetries = task._timeToWaitBetweenRetries;
                 _numberOfTimesToRetry = task._numberOfTimesToRetry;
+                _deleteEmptyFolder = task._deleteEmptyFolder;
 
                 ConfiguredFtpConnection = (SecureFTPConnection)task.ConfiguredFtpConnection.Clone();
 
@@ -879,9 +961,10 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Performs the configured action on the files
         /// </summary>
-        /// <param name="localFile">File name with path of the local file if used</param>
-        /// <param name="remoteFile">File name with path of the remote file</param>
-        private void PerformAction(string localFile, string remoteFile)
+        /// <param name="localOrNewFile">File name with path of the local file if used or or the new
+        /// name to assign to a remote file that is being renamed.</param>
+        /// <param name="remoteOrOldFile">The remote or old file.</param>
+        private void PerformAction(string localOrNewFile, string remoteOrOldFile)
         {
             try
             {
@@ -889,23 +972,30 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     _runningConnection.Connect();
                 }
-
-                FtpMethods.SetCurrentFtpWorkingFolder(_runningConnection, remoteFile);
-                remoteFile = PathUtil.GetFileName(remoteFile);
+                
+                FtpMethods.SetCurrentFtpWorkingFolder(_runningConnection, remoteOrOldFile);
+                remoteOrOldFile = PathUtil.GetFileName(remoteOrOldFile);
+                if (ActionToPerform == EFTPAction.kRenameFileOnFtpServer)
+                {
+                    localOrNewFile = PathUtil.GetFileName(localOrNewFile);
+                }
 
                 switch (ActionToPerform)
                 {
                     case EFTPAction.kUploadFileToFtpServer:
-                        _runningConnection.UploadFile(localFile, remoteFile);
+                        _runningConnection.UploadFile(localOrNewFile, remoteOrOldFile);
                         break;
                     case EFTPAction.kDownloadFileFromFtpServer:
                         FtpMethods.GenerateLocalPathCreateIfNotExists(
-                            _runningConnection.ServerDirectory, Path.GetDirectoryName(localFile),
+                            _runningConnection.ServerDirectory, Path.GetDirectoryName(localOrNewFile),
                             _runningConnection.ServerDirectory);
-                        _runningConnection.DownloadFile(localFile, remoteFile);
+                        _runningConnection.DownloadFile(localOrNewFile, remoteOrOldFile);
+                        break;
+                    case EFTPAction.kRenameFileOnFtpServer:
+                        _runningConnection.RenameFile(remoteOrOldFile, localOrNewFile);
                         break;
                     case EFTPAction.kDeleteFileFromFtpServer:
-                        _runningConnection.DeleteFile(remoteFile);
+                        _runningConnection.DeleteFile(remoteOrOldFile);
                         break;
                 }
             }
@@ -918,18 +1008,84 @@ namespace Extract.FileActionManager.FileProcessors
                 switch (ActionToPerform)
                 {
                     case EFTPAction.kUploadFileToFtpServer:
-                        ee.AddDebugData("TransferAction", "UploadFielToFtpServer", false);
-                        ee.AddDebugData("LocalFile", localFile, false);
+                        ee.AddDebugData("Action", "UploadFielToFtpServer", false);
+                        ee.AddDebugData("Local file", localOrNewFile, false);
                         break;
                     case EFTPAction.kDownloadFileFromFtpServer:
-                        ee.AddDebugData("TransferAction", "DownloadFileFromFtpServer", false);
-                        ee.AddDebugData("LocalFile", localFile, false);
+                        ee.AddDebugData("Action", "DownloadFileFromFtpServer", false);
+                        ee.AddDebugData("Local file", localOrNewFile, false);
+                        break;
+                    case EFTPAction.kRenameFileOnFtpServer:
+                        ee.AddDebugData("Action", "RenameFileOnFtpServer", false);
+                        ee.AddDebugData("New filename", localOrNewFile, false);
                         break;
                     case EFTPAction.kDeleteFileFromFtpServer:
-                        ee.AddDebugData("TransferAction", "DeleteFileFromFtpServer", false);
+                        ee.AddDebugData("Action", "DeleteFileFromFtpServer", false);
                         break;
                 }
-                ee.AddDebugData("RemoteFile", remoteFile, false);
+                ee.AddDebugData("RemoteFile", remoteOrOldFile, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether <see paramref="remoteFolder"/> is empty.
+        /// </summary>
+        /// <param name="remoteFolder">The remote folder to check.</param>
+        /// <returns><see langword="true"/> if <see paramref="remoteFolder"/> is empty; otherwise,
+        /// <see langword="false"/>.</returns>
+        bool IsFolderEmpty(string remoteFolder)
+        {
+            bool showHiddenFilesValue = false;
+
+            try
+            {
+                showHiddenFilesValue = _runningConnection.ShowHiddenFiles;
+                _runningConnection.ShowHiddenFiles = true;
+
+                // Get all the files and directories in the working folder
+                FTPFile[] directoryContents = _retry.DoRetry(() =>
+                    _runningConnection.GetFileInfos(remoteFolder, false));
+
+                return (directoryContents.Length == 0);
+            }
+            catch (Exception ex)
+            {
+                // Raise an FTP error (as part of the IFtpEventExceptionSource implementation)
+                OnFtpError(ex.AsExtract("ELI34005"));
+
+                ExtractException ee = new ExtractException("ELI34000",
+                    "Failed to get directory listing on remote server", ex);
+                ee.AddDebugData("Remote directory", remoteFolder, false);
+                throw ee;
+            }
+            finally
+            {
+                if (!showHiddenFilesValue && _runningConnection.IsConnected)
+                {
+                    _runningConnection.ShowHiddenFiles = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Deletes the <see paramref="remoteFolder"/>.
+        /// </summary>
+        /// <param name="remoteFolder">The folder to delete.</param>
+        void DeleteRemoteFolder(string remoteFolder)
+        {
+            try
+            {
+                _runningConnection.DeleteDirectory(remoteFolder);
+            }
+            catch (Exception ex)
+            {
+                // Raise an FTP error (as part of the IFtpEventExceptionSource implementation)
+                OnFtpError(ex.AsExtract("ELI34006"));
+
+                ExtractException ee = new ExtractException("ELI34007",
+                    "Failed to delete directory on remote server", ex);
+                ee.AddDebugData("Remote directory", remoteFolder, false);
                 throw ee;
             }
         }

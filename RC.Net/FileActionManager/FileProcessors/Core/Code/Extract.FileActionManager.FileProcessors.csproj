@@ -127,13 +127,13 @@
     <Compile Include="ExtractImageAreaTaskSettingsDialog.Designer.cs">
       <DependentUpon>ExtractImageAreaTaskSettingsDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="FtpFileTransferSettingsDialog.cs">
+    <Compile Include="FtpTaskSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FtpFileTransferSettingsDialog.Designer.cs">
-      <DependentUpon>FtpFileTransferSettingsDialog.cs</DependentUpon>
+    <Compile Include="FtpTaskSettingsDialog.Designer.cs">
+      <DependentUpon>FtpTaskSettingsDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="FtpFileTransferTask.cs" />
+    <Compile Include="FtpTask.cs" />
     <Compile Include="ModifyPdfFileSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -307,8 +307,8 @@
     <EmbeddedResource Include="ExtractImageAreaTaskSettingsDialog.resx">
       <DependentUpon>ExtractImageAreaTaskSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FtpFileTransferSettingsDialog.resx">
-      <DependentUpon>FtpFileTransferSettingsDialog.cs</DependentUpon>
+    <EmbeddedResource Include="FtpTaskSettingsDialog.resx">
+      <DependentUpon>FtpTaskSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ModifyPdfFileSettingsDialog.resx">
       <SubType>Designer</SubType>

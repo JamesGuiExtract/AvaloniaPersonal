@@ -79,23 +79,6 @@ namespace Extract.FileActionManager.FileSuppliers
                 _ftpConnectionSettingsControl.TimeBetweenRetries = _settings.TimeToWaitBetweenRetries;
                 _ftpConnectionSettingsControl.NumberOfRetriesBeforeFailure = _settings.NumberOfTimesToRetry;
 
-                // Set the AfterDownloadAction radio buttons
-                switch (_settings.AfterDownloadAction)
-                {
-                    case AfterDownloadRemoteFileActon.DeleteRemoteFile:
-                        _deleteRemoteFileRadioButton.Checked = true;
-                        break;
-                    case AfterDownloadRemoteFileActon.ChangeRemoteFileExtension:
-                        _changeRemoteExtensionRadioButton.Checked = true;
-                        break;
-                    case AfterDownloadRemoteFileActon.DoNothingToRemoteFile:
-                        _doNothingRadioButton.Checked = true;
-                        break;
-                    default:
-                       break;
-                }
-
-                _newExtensionTextBox.Text = _settings.NewExtensionForRemoteFile;
                 _localWorkingFolderTextBox.Text = _settings.LocalWorkingFolder;
 
                 _secureFTPConnection = _settings.ConfiguredFtpConnection ?? new SecureFTPConnection();
@@ -166,20 +149,6 @@ namespace Extract.FileActionManager.FileSuppliers
                 _settings.NumberOfTimesToRetry = _ftpConnectionSettingsControl.NumberOfRetriesBeforeFailure;
                 _settings.TimeToWaitBetweenRetries = _ftpConnectionSettingsControl.TimeBetweenRetries;
 
-                if (_doNothingRadioButton.Checked)
-                {
-                    _settings.AfterDownloadAction = AfterDownloadRemoteFileActon.DoNothingToRemoteFile;
-                }
-                else if (_deleteRemoteFileRadioButton.Checked)
-                {
-                    _settings.AfterDownloadAction = AfterDownloadRemoteFileActon.DeleteRemoteFile;
-                }
-                else if (_changeRemoteExtensionRadioButton.Checked)
-                {
-                    _settings.AfterDownloadAction = AfterDownloadRemoteFileActon.ChangeRemoteFileExtension;
-                }
-
-                _settings.NewExtensionForRemoteFile = _newExtensionTextBox.Text;
                 _settings.LocalWorkingFolder = _localWorkingFolderTextBox.Text;
 
                 _settings.ConfiguredFtpConnection = _ftpConnectionSettingsControl.FtpConnection;
@@ -275,12 +244,6 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             _pollingIntervalNumericUpDown.Enabled = _pollContinuouslyRadioButton.Checked;
             _pollingTimesTextBox.Enabled = _pollAtSetTimesRadioButton.Checked;
-            _doNothingRadioButton.Enabled = _downloadOnceRadioButton.Checked;
-            _newExtensionTextBox.Enabled = _changeRemoteExtensionRadioButton.Checked;
-            if (_doNothingRadioButton.Checked && !_downloadOnceRadioButton.Checked)
-            {
-                _deleteRemoteFileRadioButton.Checked = true;
-            }
         }
 
         /// <summary>
@@ -331,13 +294,6 @@ namespace Extract.FileActionManager.FileSuppliers
 
                 _settingsTabControl.SelectTab(_generalSettingsTabPage);
                 _pollingTimesTextBox.Focus();
-            }
-            else if (_changeRemoteExtensionRadioButton.Checked && string.IsNullOrWhiteSpace(_newExtensionTextBox.Text))
-            {
-                UtilityMethods.ShowMessageBox("New extension for remote file must be specified.", 
-                    "Configuration error", true);
-                _settingsTabControl.SelectTab(_generalSettingsTabPage);
-                _newExtensionTextBox.Focus();
             }
             else if (string.IsNullOrWhiteSpace(_localWorkingFolderTextBox.Text))
             {
