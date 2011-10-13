@@ -41,9 +41,10 @@ protected:
 	//{{AFX_MSG(TesterDlgRulesetPage)
 	afx_msg void OnBtnBrowseRsd();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnBtnRulesetProperties();
+	afx_msg void OnChangeRuleset();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
-
 };
 
 //{{AFX_INSERT_LOCATION}}

@@ -1,9 +1,9 @@
-// RuleSetPropertiesDlg.cpp : implementation file
+// RuleSetPropertiesPage.cpp : implementation file
 //
 
 #include "stdafx.h"
 #include "afcore.h"
-#include "RuleSetPropertiesDlg.h"
+#include "RuleSetPropertiesPage.h"
 
 #include <LicenseMgmt.h>
 #include <StringTokenizer.h>
@@ -31,39 +31,47 @@ const int giREDACTION_DOCS_ITEM = 3;
 const int giTARGET_STATE_UNCHECKED = 2;
 
 //-------------------------------------------------------------------------------------------------
-// CRuleSetPropertiesDlg dialog
+// CRuleSetPropertiesPage dialog
 //-------------------------------------------------------------------------------------------------
-CRuleSetPropertiesDlg::CRuleSetPropertiesDlg(UCLID_AFCORELib::IRuleSetPtr ipRuleSet,
-											 CWnd* pParent /*=NULL*/)
-	: CDialog(CRuleSetPropertiesDlg::IDD, pParent), m_ipRuleSet(ipRuleSet)
+CRuleSetPropertiesPage::CRuleSetPropertiesPage(UCLID_AFCORELib::IRuleSetPtr ipRuleSet,
+	bool bReadOnly)
+: CPropertyPage(CRuleSetPropertiesPage::IDD)
+, m_ipRuleSet(ipRuleSet)
+, m_bReadOnly(bReadOnly)
 {
 }
-//-------------------------------------------------------------------------------------------------
-void CRuleSetPropertiesDlg::DoDataExchange(CDataExchange* pDX)
+//--------------------------------------------------------------------------------------------------
+CRuleSetPropertiesPage::~CRuleSetPropertiesPage()
 {
-	CDialog::DoDataExchange(pDX);
+	try
+	{
+		m_ipRuleSet = __nullptr;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI34021");
+}//-------------------------------------------------------------------------------------------------
+void CRuleSetPropertiesPage::DoDataExchange(CDataExchange* pDX)
+{
+	CPropertyPage::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_COUNTER_LIST, m_CounterList);
 	DDX_Control(pDX, IDC_CHECK_INTERNAL_USE_ONLY, m_checkboxForInternalUseOnly);
 	DDX_Control(pDX, IDC_SERIAL_NUMBERS, m_editKeySerialNumbers);
 	DDX_Control(pDX, IDC_CHECK_SWIPING_RULE, m_checkSwipingRule);
 	DDX_Control(pDX, IDC_FKB_VERSION, m_editFKBVersion);
-	DDX_Control(pDX, IDOK, m_buttonOk);
-	DDX_Control(pDX, IDCANCEL, m_buttonCancel);
 }
 //-------------------------------------------------------------------------------------------------
 
-BEGIN_MESSAGE_MAP(CRuleSetPropertiesDlg, CDialog)
-	ON_NOTIFY(LVN_ITEMCHANGED, IDC_COUNTER_LIST, &CRuleSetPropertiesDlg::OnCounterListItemChanged)
+BEGIN_MESSAGE_MAP(CRuleSetPropertiesPage, CPropertyPage)
+	ON_NOTIFY(LVN_ITEMCHANGED, IDC_COUNTER_LIST, &CRuleSetPropertiesPage::OnCounterListItemChanged)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
-// CRuleSetPropertiesDlg message handlers
+// CRuleSetPropertiesPage message handlers
 //-------------------------------------------------------------------------------------------------
-BOOL CRuleSetPropertiesDlg::OnInitDialog() 
+BOOL CRuleSetPropertiesPage::OnInitDialog() 
 {
 	try
 	{
-		CDialog::OnInitDialog();
+		CPropertyPage::OnInitDialog();
 		
 		// setup UI controls
 		setupCounterList();
@@ -186,7 +194,7 @@ BOOL CRuleSetPropertiesDlg::OnInitDialog()
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }
 //-------------------------------------------------------------------------------------------------
-void CRuleSetPropertiesDlg::OnOK() 
+void CRuleSetPropertiesPage::Apply()
 {
 	try
 	{
@@ -259,13 +267,11 @@ void CRuleSetPropertiesDlg::OnOK()
 		// Store whether this is a swiping rule
 		bChecked = m_checkSwipingRule.GetCheck() == BST_CHECKED;
 		m_ipRuleSet->IsSwipingRule = asVariantBool(bChecked);
-
-		CDialog::OnOK();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI11553")
 }
 //-------------------------------------------------------------------------------------------------
-void CRuleSetPropertiesDlg::OnCounterListItemChanged(NMHDR* pNMHDR, LRESULT* pResult)
+void CRuleSetPropertiesPage::OnCounterListItemChanged(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	try
 	{
@@ -308,7 +314,7 @@ void CRuleSetPropertiesDlg::OnCounterListItemChanged(NMHDR* pNMHDR, LRESULT* pRe
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------
-void CRuleSetPropertiesDlg::hideCheckboxes()
+void CRuleSetPropertiesPage::hideCheckboxes()
 {
 	// Hide the check boxes
 	m_checkboxForInternalUseOnly.ShowWindow(FALSE);
@@ -328,22 +334,6 @@ void CRuleSetPropertiesDlg::hideCheckboxes()
 	// Calculate the distance of empty space that should be removed
 	long lDelta = checkRect.bottom - editRect.bottom;
 
-	// Move the OK button up to fill the empty space
-	RECT okRect = {0};
-	m_buttonOk.GetWindowRect(&okRect);
-	ScreenToClient(&okRect);
-	okRect.top -= lDelta;
-	okRect.bottom -= lDelta;
-	m_buttonOk.MoveWindow(&okRect);
-
-	// Move the cancel button up to fill the empty space
-	RECT cancelRect = {0};
-	m_buttonCancel.GetWindowRect(&cancelRect);
-	ScreenToClient(&cancelRect);
-	cancelRect.top -= lDelta;
-	cancelRect.bottom -= lDelta;
-	m_buttonCancel.MoveWindow(&cancelRect);
-
 	// Shrink the dialog by the amount of empty space
 	RECT mainRect = {0};
 	GetWindowRect(&mainRect);
@@ -351,7 +341,7 @@ void CRuleSetPropertiesDlg::hideCheckboxes()
 	MoveWindow(&mainRect);
 }
 //-------------------------------------------------------------------------------------------------
-void CRuleSetPropertiesDlg::setupCounterList()
+void CRuleSetPropertiesPage::setupCounterList()
 {
 	m_CounterList.SetExtendedStyle( 
 		LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT | LVS_EX_CHECKBOXES );
@@ -378,9 +368,10 @@ void CRuleSetPropertiesDlg::setupCounterList()
 	m_iRedactDocsCounterItem = -1;
 
 	// Determine if FLEX Index rules are licensed - requires FLEX Index Rule Writing license
+	// (But if in read-only mode, always show)
 	// [FlexIDSCore #3059]
 	int nCounterItemPosition = giINDEXING_ITEM;
-	if (LicenseManagement::isLicensed( gnFLEXINDEX_RULE_WRITING_OBJECTS ))
+	if (m_bReadOnly || LicenseManagement::isLicensed( gnFLEXINDEX_RULE_WRITING_OBJECTS ))
 	{
 		// Add this item at the top of the list
 		nCounterItemPosition = m_CounterList.InsertItem( giINDEXING_ITEM, "" );
@@ -393,7 +384,8 @@ void CRuleSetPropertiesDlg::setupCounterList()
 	}
 
 	// Determine if Pagination rules are licensed - requires full RDT license
-	if (isRdtLicensed())
+	// (But if in read-only mode, always show)
+	if (m_bReadOnly || isRdtLicensed())
 	{
 		// Add this item next
 		nCounterItemPosition = m_CounterList.InsertItem( nCounterItemPosition + 1, "" );
@@ -406,7 +398,8 @@ void CRuleSetPropertiesDlg::setupCounterList()
 	}
 
 	// Determine if Redaction By Pages rules are licensed - requires ID Shield Rule Writing license
-	if (LicenseManagement::isLicensed( gnIDSHIELD_RULE_WRITING_OBJECTS ))
+	// (But if in read-only mode, always show)
+	if (m_bReadOnly || LicenseManagement::isLicensed( gnIDSHIELD_RULE_WRITING_OBJECTS ))
 	{
 		// Add this item next
 		nCounterItemPosition = m_CounterList.InsertItem( nCounterItemPosition + 1, "" );
@@ -419,7 +412,8 @@ void CRuleSetPropertiesDlg::setupCounterList()
 	}
 
 	// Determine if Redaction By Documents rules are licensed - requires full RDT license
-	if (isRdtLicensed())
+	// (But if in read-only mode, always show)
+	if (m_bReadOnly || isRdtLicensed())
 	{
 		// Add this item next
 		nCounterItemPosition = m_CounterList.InsertItem( nCounterItemPosition + 1, "" );
@@ -432,7 +426,7 @@ void CRuleSetPropertiesDlg::setupCounterList()
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CRuleSetPropertiesDlg::validateSerialList( const string &strSerialList )
+void CRuleSetPropertiesPage::validateSerialList( const string &strSerialList )
 {
 	try	
 	{
@@ -450,7 +444,7 @@ void CRuleSetPropertiesDlg::validateSerialList( const string &strSerialList )
 	// no exceptions means serial numbers are valid
 }
 //-------------------------------------------------------------------------------------------------
-bool CRuleSetPropertiesDlg::isCounterAvailable(int nCounterItem, bool &rbIsCounterChecked)
+bool CRuleSetPropertiesPage::isCounterAvailable(int nCounterItem, bool &rbIsCounterChecked)
 {
 	if (nCounterItem != -1)
 	{
@@ -461,7 +455,7 @@ bool CRuleSetPropertiesDlg::isCounterAvailable(int nCounterItem, bool &rbIsCount
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
-bool CRuleSetPropertiesDlg::isRdtLicensed()
+bool CRuleSetPropertiesPage::isRdtLicensed()
 {
 	return LicenseManagement::isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS);
 }

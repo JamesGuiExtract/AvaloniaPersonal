@@ -1,34 +1,37 @@
 #pragma once
 
-// SelectCountersDlg.h : header file
+// RuleSetPropertiesPage.h : header file
 //
 #include "resource.h"
-#include "afxwin.h"
 
 #include <string>
 
 using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
-// CRuleSetPropertiesDlg dialog
-
-class CRuleSetPropertiesDlg : public CDialog
+// CRuleSetPropertiesPage dialog
+/////////////////////////////////////////////////////////////////////////////
+class CRuleSetPropertiesPage : public CPropertyPage
 {
 // Construction
 public:
 	// PROMISE: The properties of ipRuleSet will be modified as specified by the
 	//			user ONLY if the user clicks the OK button to dismiss the dialog.
-	CRuleSetPropertiesDlg(UCLID_AFCORELib::IRuleSetPtr ipRuleSet, CWnd* pParent = __nullptr);   // standard constructor
+	CRuleSetPropertiesPage(UCLID_AFCORELib::IRuleSetPtr ipRuleSet,
+		bool bReadOnly);
+	~CRuleSetPropertiesPage();
+
+	// Applies the properties in the property page to the ruleset.
+	void Apply();
 
 // Dialog Data
-	enum { IDD = IDD_RULESET_PROPERTIES_DLG };
+	enum { IDD = IDD_RULESET_PROPERTIES_PAGE };
 
 // Overrides
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	virtual BOOL OnInitDialog();
-	virtual void OnOK();
 
 	afx_msg void OnCounterListItemChanged(NMHDR* pNMHDR, LRESULT* pResult);
 
@@ -63,9 +66,9 @@ private:
 	CListCtrl	m_CounterList;
 	CButton	m_checkboxForInternalUseOnly;
 	CEdit m_editKeySerialNumbers;
-	CButton m_buttonOk;
-	CButton m_buttonCancel;
 	CEdit m_editFKBVersion;
+
+	bool m_bReadOnly;
 };
 
 //{{AFX_INSERT_LOCATION}}
