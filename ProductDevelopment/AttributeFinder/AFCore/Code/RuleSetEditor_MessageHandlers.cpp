@@ -1846,7 +1846,7 @@ void CRuleSetEditor::OnFileProperties()
 
 	try
 	{	
-		CRuleSetPropertiesDlg dialog(m_ipRuleSet);
+		CRuleSetPropertiesDlg dialog(m_ipRuleSet, false);
 		
 		if (dialog.DoModal() == IDOK)
 		{
