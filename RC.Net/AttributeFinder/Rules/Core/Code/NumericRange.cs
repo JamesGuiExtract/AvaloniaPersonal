@@ -51,11 +51,21 @@ namespace Extract.AttributeFinder.Rules
             /// descending order.</param>
             public NumericRange(string text, bool ascendingOrder)
             {
+                try 
+	            {	        
+		            Text = text.Trim();
+                    _ascendingOrder = ascendingOrder;
+	            }
+	            catch (Exception ex)
+	            {
+		            throw ex.AsExtract("ELI34023");
+	            }
+                
+                // [FlexIDSCore:4877]
+                // Attempt to parse into a numeric range in a separate try block; if parsing fails,
+                // rather than throw an exception, just treat it as text.
                 try
                 {
-                    Text = text.Trim();
-                    _ascendingOrder = ascendingOrder;
-
                     string[] values = Text.Split('-');
                     ExtractException.Assert("ELI33434", "Too many hypens", values.Length <= 2);
 
@@ -86,12 +96,11 @@ namespace Extract.AttributeFinder.Rules
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    ExtractException ee =
-                        new ExtractException("ELI33435", "Failed to parse numeric range.", ex);
-                    ee.AddDebugData("Text", text, true);
-                    throw ee;
+                    Numeric = false;
+                    StartNumber = 0;
+                    EndNumber = 0;
                 }
             }
 
