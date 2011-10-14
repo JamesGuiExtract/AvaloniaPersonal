@@ -1788,6 +1788,15 @@ STDMETHODIMP CFileProcessingDB::RegisterActiveFAM(long lActionID, VARIANT_BOOL v
 	{
 		validateLicense();
 
+		// [LegacyRCAndUtils:6175]
+		// If ActiveFAM table is not being managed by autoRevertLockedFiles, ensure dead ActiveFAM
+		// instances are cleared out after 1 day.
+		if (!m_bAutoRevertLockedFiles)
+		{
+			executeCmdQuery(getDBConnection(),
+				"DELETE FROM ActiveFAM WHERE DATEDIFF(minute, [LastPingTime], GetDate()) > 1440");
+		}
+
 		// This creates a record in the ActiveFAM table and the LastPingTime
 		// is set to the current time by default.
 		executeCmdQuery(getDBConnection(), 
