@@ -704,7 +704,7 @@ namespace Extract.LabResultsCustomComponents
         [ComVisible(false)]
         static void RegisterFunction(Type type)
         {
-            ComMethods.RegisterTypeInCategory(type, ExtractGuids.OutputHandlers);
+            ComMethods.RegisterTypeInCategory(type, ExtractCategories.OutputHandlersGuid);
         }
 
         /// <summary>
@@ -716,7 +716,7 @@ namespace Extract.LabResultsCustomComponents
         [ComVisible(false)]
         static void UnregisterFunction(Type type)
         {
-            ComMethods.UnregisterTypeInCategory(type, ExtractGuids.OutputHandlers);
+            ComMethods.UnregisterTypeInCategory(type, ExtractCategories.OutputHandlersGuid);
         }
 
         /// <summary>
@@ -1415,7 +1415,7 @@ namespace Extract.LabResultsCustomComponents
                 // temp copy of the reference database file. Though multiple connections are allowed
                 // to a local file, the connections cannot see each other's changes.
                 string connectionString = "Data Source='" + 
-                    _localDatabaseCopyManager.GetCurrentTemporaryFileName(databaseFile, this) + "';";
+                    _localDatabaseCopyManager.GetCurrentTemporaryFileName(databaseFile, this, true) + "';";
 
                 // Try to open the database connection, if there is a sqlce exception,
                 // just increment retry count, sleep, and try again

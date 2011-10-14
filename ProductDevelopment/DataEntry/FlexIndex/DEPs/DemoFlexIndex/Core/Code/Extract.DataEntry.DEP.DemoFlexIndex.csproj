@@ -74,23 +74,23 @@
   </Target>
   -->
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\..\..\RC.Net\Core\Code\Extract.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\..\..\..\RC.Net\DataEntry\Core\Code\Extract.DataEntry.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\DataEntry\Core\Code\Extract.DataEntry.csproj">
       <Project>{55C4FA3A-26C9-4CC0-9F11-A7E607E6ACD2}</Project>
       <Name>Extract.DataEntry</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\..\..\..\RC.Net\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
       <Project>{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}</Project>
       <Name>Extract.Imaging.Forms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
       <Name>Extract.Interop</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj">
+    <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
       <Name>Extract.Licensing</Name>
     </ProjectReference>

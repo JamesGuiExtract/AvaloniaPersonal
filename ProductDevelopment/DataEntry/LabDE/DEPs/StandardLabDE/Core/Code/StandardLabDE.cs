@@ -26,6 +26,9 @@ namespace Extract.DataEntry.DEP.StandardLabDE
 
         #region Constructors
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StandardLabDEPanel"/> class.
+        /// </summary>
         public StandardLabDEPanel() 
             : base()
         {
