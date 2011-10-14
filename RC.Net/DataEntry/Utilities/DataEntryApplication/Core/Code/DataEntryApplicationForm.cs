@@ -620,6 +620,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
             catch (Exception ex)
             {
+                // [LegacyRCAndUtils:6190]
+                // If an exception is thrown from the constructor and, as a result, the form is
+                // not disposed of, this seems to lead to a crash when the application is closed.
+                Dispose();
+
                 throw ExtractException.AsExtractException("ELI23669", ex);
             }
         }
