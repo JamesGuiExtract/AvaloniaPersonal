@@ -59,7 +59,7 @@ public:
 	}
 	int getRandomAmount() { return m_nRandomAmount; }
 
-	bool selectingAllFiles() { return m_vecConditions.empty() && !m_bRandomSubsetUsePercentage; }
+	bool selectingAllFiles() { return m_vecConditions.empty() && !m_bLimitByRandomCondition; }
 
 	// Builds the summary string
 	string getSummaryString();
