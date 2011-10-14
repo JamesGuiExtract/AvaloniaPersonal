@@ -3043,10 +3043,13 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 	try
 	{
 		// Setup Setting Query
-		string strSQL = "SELECT FileID, Action.ID as ActionID, UPI, StatusBeforeLock, ASCName " 
+		string strSQL = "SELECT LockedFile.FileID, Action.ID as ActionID, UPI, StatusBeforeLock, ASCName "
 			" FROM LockedFile INNER JOIN ActiveFAM ON LockedFile.UPIID = ActiveFAM.ID"
 			" INNER JOIN Action ON LockedFile.ActionID = Action.ID"
-			" WHERE LockedFile.UPIID = " + asString(nUPIID);
+			" INNER JOIN FileActionStatus ON LockedFile.ActionID = FileActionStatus.ActionID"
+			"	AND LockedFile.FileID = FileActionStatus.FileID"
+			" WHERE LockedFile.UPIID = " + asString(nUPIID) +
+			"	AND FileActionStatus.ActionStatus = 'R'";
 
 		// Open a recordset that has the action names that need to have files reset
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
