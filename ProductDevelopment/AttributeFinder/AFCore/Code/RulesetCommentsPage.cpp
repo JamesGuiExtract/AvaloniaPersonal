@@ -54,9 +54,15 @@ void CRuleSetCommentsPage::Apply()
 {
 	try
 	{
-		CString zComments;
-		m_editRulesetComments.GetWindowText(zComments);
-		m_ipRuleSet->Comments = (LPCTSTR)zComments;
+		// [FlexIDSCore:4898]
+		// If the comments tab was not clicked on, the edit control will not yet have been created.
+		// Don't update the comments in this case.
+		if (m_editRulesetComments.m_hWnd != NULL)
+		{
+			CString zComments;
+			m_editRulesetComments.GetWindowText(zComments);
+			m_ipRuleSet->Comments = (LPCTSTR)zComments;
+		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34018")
 }
