@@ -17,7 +17,8 @@ AFRootDirectory=$(PDRootDir)\AttributeFinder
 RCDotNETDir=$(EngineeringRootDirectory)\RC.Net
 PDUtilsRootDir=$(EngineeringRootDirectory)\ProductDevelopment\Utils
 IDShieldOfficeDir=$(PDRootDir)\IDShieldOffice
-LabDEDir=$(PDRootDir)\LabDE
+DataEntryDir=$(PDRootDir)\DataEntry
+LabDEDir=$(DataEntryDir)\LabDE
 LaserFicheDir=$(PDRootDir)\AFIntegrations\Laserfiche
 RulesDir=$(EngineeringRootDirectory)\Rules
 Branch=
@@ -85,15 +86,24 @@ GetDataEntryInstall:
 	@IF NOT EXIST "$(LabDEDir)\Installation\DataEntry" @MKDIR "$(LabDEDir)\Installation\DataEntry"
 	$(BUILD_DRIVE) 
 	@CD "$(LabDEDir)\Installation\DataEntry"
-	$(Get) $(GetOptions) -nonworkingfolder "$(LabDEDir)\Installation\DataEntry" "$$$(Branch)/Engineering/ProductDevelopment/LabDE/Installation/DataEntry" "$(LabDEVersion)"
- 	
+	$(Get) $(GetOptions) -nonworkingfolder "$(LabDEDir)\Installation\DataEntry" "$$$(Branch)/Engineering/ProductDevelopment/DataEntry/LabDE/Installation/DataEntry" "$(LabDEVersion)"
+
+GetDataEntryFiles:
+	@ECHO Getting $(DataEntryDir) ...
+	@ECHO Please wait...
+	@IF NOT EXIST "$(DataEntryDir)" @MKDIR "$(DataEntryDir)"
+	$(BUILD_DRIVE) 
+	@CD "$(DataEntryDir)"
+	$(Get) $(GetOptions) -nonworkingfolder "$(DataEntryDir)" "$$$(Branch)/Engineering/ProductDevelopment/DataEntry" "$(DataEntryVersion)"
+    @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(DataEntryVersion)"
+	
 GetLabDEFiles:
 	@ECHO Getting $(LabDEDir) ...
 	@ECHO Please wait...
 	@IF NOT EXIST "$(LabDEDir)" @MKDIR "$(LabDEDir)"
 	$(BUILD_DRIVE) 
 	@CD "$(LabDEDir)"
-	$(Get) $(GetOptions) -nonworkingfolder "$(LabDEDir)" "$$$(Branch)/Engineering/ProductDevelopment/LabDE" "$(LabDEVersion)"
+	$(Get) $(GetOptions) -nonworkingfolder "$(LabDEDir)" "$$$(Branch)/Engineering/ProductDevelopment/DataEntry/LabDE" "$(LabDEVersion)"
     @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(LabDEVersion)"
 	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(LabDEVersion)"
 
