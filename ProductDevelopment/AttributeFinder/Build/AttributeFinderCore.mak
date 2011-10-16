@@ -41,7 +41,8 @@ PDCommonDir=$(PDRootDir)\Common
 
 IDShieldInstallFilesRootDir=P:\AttributeFinder\IDShieldInstallation\Files
 
-LabDEDir=$(PDRootDir)\LabDE
+DataEntryDir=$(PDRootDir)\DataEntry
+LabDEDir=$(DataEntryDir)\LabDE
 LabDEInstallRootDir=$(LabDEDir)\Installation
 DataEntryInstallFiles=P:\DataEntry
 DataEntryCoreInstallFilesDir=$(DataEntryInstallFiles)\CoreInstallation\Files
