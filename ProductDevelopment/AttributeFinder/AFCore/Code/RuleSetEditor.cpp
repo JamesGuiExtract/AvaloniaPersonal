@@ -734,6 +734,11 @@ void CRuleSetEditor::refreshUIFromAttribute()
 
 	// Update button states
 	setButtonStates();
+
+	// After making the change to remove the WS_CLIPCHILDREN and WS_CLIPSIBLINGS styles in
+	// UltimateGrid it is now necessary to invalidate the grid here to ensure it is refreshed
+	// correctly.
+	m_listRules.Invalidate();
 }
 //-------------------------------------------------------------------------------------------------
 void CRuleSetEditor::refreshUIFromRuleSet()
