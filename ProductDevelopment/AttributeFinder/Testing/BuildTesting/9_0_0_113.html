@@ -1,0 +1,270 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0.0.113 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0.0.113 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DotNet #737, #738, #739]</b> FTP File Supplier
+        	<ul>
+			<li>Select and configure a <b>Files from FTP site</b> file 
+			supplier.
+			<li>Confirm that the <b>General Settings</b> tab does not 
+			contain an <b>After downloading the remote file</b> group box.
+			<li>Confirm that the <b>General Settings</b> tab does 
+			contain a <b>Frequency of downloads</b> group box.
+			<ul>
+				<li>Confirm that the groupbox  contains a <b>Download 
+				files just once</b> radio button.
+				<li>Confirm that the groupbox  contains a <b>Keep polling 
+				the remote location for new files every minute(s)</b> 
+				radio button.
+				<li>Confirm that the associated spin control is enabled only 
+				when the radio button is selected.
+				<li>Confirm that the groupbox  contains a <b>Poll the 
+				remote location for new files at these times of the day</b> 
+				radio button.
+				<li>Confirm that the associated edit box is enabled only 
+				when the radio button is selected.
+<p>
+				<li>Confirm that the polling frequency is used properly. 
+				<li>Confirm that polling at specific times works properly
+				<ul>
+					<li>for times such as <b>9:00 AM</b>
+					<li>for times such as <b>2PM</b>
+					<li>for times such as <b>1500</b>
+					<li>for times such as <b>9:22 AM</b>
+					<li>for times such as <b>9:47:33 AM</b>
+				</ul>
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #736]</b> FTP Event History Table
+        	<ul>
+			<li>Confirm that <b>File - Database options</b> from DB Admin 
+			provides a <b>Store FTP event history</b> checkbox on the 
+			<b>History</b> tab.
+			<li>Confirm that the checkbox is checked by default.
+			<li>Select and configure a <b>Files from FTP site</b> file 
+			supplier.
+			<li>Supply some files and confirm that the <b>FTPEventHistory</b> 
+			table has suitable entries.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #740]</b> Rename Option For FTP Transfer Task
+        	<ul>
+			<li>Select and configure the <b>Core: Transfer, rename or delete 
+			via FTP/SFTP</b> task.
+			<li>Confirm that the <b>Select file operation</b> group box 
+			contains a <b>Rename file on remote server</b> radio button.
+			<li>Select the radio button.
+			<ul>
+				<li>Confirm that the labels for the <b>File paths</b> group 
+				box change to: <b>Existing remote filename</b> and <b>New 
+				remote filename</b>.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3002, #4816]</b> RSD-based Data Scorer
+        	<ul>
+			<li>Exercise the <b>RSD data scorer</b> section 
+			of the <b>Data Scorers</b> testing checklist.
+			<li>Confirm proper scoring behavior with RSD files containing 
+			one or more <b>ScorePart</b> attributes.
+			<li>Confirm proper scoring behavior with RSD files containing 
+			one or more other attributes.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #3974]</b> Uninstall SQL Compact Edition
+        	<ul>
+			<li>Confirm that during uninstall of either <b>FLEX Index</b> 
+			or <b>ID Shield</b>, a prompt is displayed asking the user if 
+			they would like to uninstall <b>SQL Compact Edition</b>.
+			<li>Confirm that the proper action is taken depending on user 
+			choice.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4821]</b> Multiple Criteria Attribute Selector
+        	<ul>
+			<li>Exercise the <b>Multiple ctriteria attribute selector</b> section 
+			of the <b>Attribute Selectors</b> testing checklist.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4838]</b> Rule Set Properties Dialog In Rule Tester
+        	<ul>
+			<li>Confirm that a <b>Ruleset Properties...</b> is provided on the 
+			<b>Ruleset</b> tab in the Rule Tester.
+			<li>Confirm that the button is enabled if and only if a rule set has been 
+			specified.
+			<li>Confirm that the dialog includes a <b>Properties</b> tab.
+			<li>Confirm that the tab includes the <b>Counters</b> list box, the 
+			<b>Key Serial #'s</b> edit box, and the <b>FKB Version</b> edit box.
+			<li>Confirm that the internal use only check box is only present if the 
+			user has an RDT license.
+			<li>Confirm that the swiping rule check box is only present if the 
+			user has an RDT license.
+			<li>Confirm that the dialog includes a <b>Comments</b> tab.
+			<li>Confirm that the tab includes a multi-line read-only edit box.
+<p>
+			<li>Confirm that the <b>Rule Set Editor</b> can modify the <b>Comments</b> 
+			edit box.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4877]</b> Numeric Sequence Output Handler
+        	<ul>
+			<li>Exercise the <b>Numeric sequence</b> output handler.
+			<li>Confirm that input text with too many hyphens such as 
+			<b>1-2-3</b> is returned unchanged and without exception.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4895]</b> Verification Can Stop Processing When Queue Is Empty
+        	<ul>
+			<li>Configure a verification FPS file to <b>Keep processing files as 
+			they are added to the queue</b>.
+			<li>Exercise verification.
+			<li>Confirm that the user can stop processing by closing the verification 
+			window when the queue is empty and no document is open.
+			<li>Confirm that the user can stop processing via <b>File - Stop 
+			processing</b> when the queue is empty and no document is open.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4896]</b> Total Duration versus Overhead Time in DB
+        	<ul>
+			<li>Exercise <b>Verify.fps</b> from the ID Shield Sanity Test.  Note 
+			the long delay between finishing verification of one document and display 
+			of the next document.
+			<li>After verification is complete, exercise the <b>ID Shield verification 
+			times and rates (by user)</b> report.
+			<li>Confirm that a significant portion of the overall verification time 
+			is accounted for in the <b>Overhead Time</b> column.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4898]</b> Rule Set Properties
+        	<ul>
+			<li>Open a rule set in <b>Rule Set Editor</b>.
+			<li>Select <b>File - Properties</b>.
+			<li>Click <b>OK</b> without clicking ont he <b>Comments</b> tab.
+			<li>Confirm that no errors are seen.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6175]</b> Clearing ActiveFAM Without Auto-Revert
+        	<ul>
+			<li>Configure a special database to turn off auto-reversion of locked files.
+			<li>Start processing against the database and kill the FAM using 
+			<b>Task Manager</b>.
+			<li>Confirm that one or more files is stuck in <b>Processing</b> 
+			status.
+			<li>Restart processing in less than 24 hours.  Confirm that the stuck files 
+			remain stuck in <b>Processing</b> status.
+			<li>Restart processing after more than 24 hours.  Confirm that the stuck 
+			files have reverted to <b>Pending</b> status.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6190]</b> FAM Crash On Close
+        	<ul>
+			<li>Open a FAM instance and connect to a database.
+			<li>Select an action and check the <b>Process files in the queue</b> 
+			checkbox.
+			<li>Select but do not configure a <b>Data Entry: Verify extracted data</b> 
+			task.
+			<li>Close the <b>Select Task</b> dialog and close the FAM without saving 
+			changes.
+			<li>Confirm that the FAM closes without error.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6199]</b> FTP File Supplier Exception
+        	<ul>
+			<li>Configure an FTP file supplier to supply files from a remote folder 
+			that contains files.
+			<li>Confirm that files are successfully downloaded to a specified folder.
+			<li>Confirm that no <b>ELI32453: Unable to generate local path</b> 
+			internal exceptions are logged.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6201]</b> FAM Crash with FTP File Supplier
+        	<ul>
+			<li>Confirm that the auto-revert timeout is a manageable value such 
+			as 5 minutes.
+			<li>Kill a FAM instance that is actively processing a file.
+			<li>Use <b>DB Admin</b> to set the file action status of the processing 
+			files to any <u>other</u> status than <b>Pending</b>.
+			<li>Wait until the auto-revert time period has passed.
+			<li>Open the FAM and start processing again.
+			<li>Confirm that the previously <b>stuck</b> files are NOT reverted 
+			to <b>Pending</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6204]</b> Select File Dialog
+        	<ul>
+			<li>Supply some files to a database
+			<li>Choose <b>Tools - Manually set action status</b> and click the 
+			<b>Select Files</b> button.
+			<li>Click the random selection checkbox and specify a number of 
+			<b>files</b>.
+			<li>Click <b>OK</b>.
+			<li>Confirm that the expected number of files had a change in status.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6205]</b> FAM Crash
+        	<ul>
+			<li>Create an FPS file that supplies and processes files.
+			<li>Configure the FPS file to stop processing once the queue is empty.
+			<li>Exercise the FPS file.
+			<li>Confirm that the FAM stops processing in a graceful manner once the 
+			queue is empty.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
