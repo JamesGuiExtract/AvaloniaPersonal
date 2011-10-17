@@ -157,8 +157,7 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				"AND ActionID = " + strActionID + " WHERE ActionID IS NULL AND FAMFile.ID IN (";
 		}
 		string strDeleteLockedFile = "DELETE FROM LockedFile WHERE ActionID = "
-			+ strActionID + " AND UPIID = " + asString(m_nUPIID)
-			+ " AND FileID IN (";
+			+ strActionID + " AND FileID IN (";
 		string strRemoveSkippedFile = "DELETE FROM SkippedFile WHERE ActionID = "
 			+ strActionID + " AND FileID IN (";
 		string strFastQuery = "INSERT INTO " + gstrFILE_ACTION_STATE_TRANSITION
