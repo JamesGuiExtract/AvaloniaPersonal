@@ -1788,6 +1788,11 @@ STDMETHODIMP CFileProcessingDB::RegisterActiveFAM(long lActionID, VARIANT_BOOL v
 	{
 		validateLicense();
 
+		// Always lock the database for this call.
+		// Not having a lock here may have had to do with some of the errors reported in
+		// [LegacyRCAndUtils:6154]
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
 		// [LegacyRCAndUtils:6175]
 		// If ActiveFAM table is not being managed by autoRevertLockedFiles, ensure dead ActiveFAM
 		// instances are cleared out after 1 day.
@@ -2051,12 +2056,12 @@ STDMETHODIMP CFileProcessingDB::RecordFAMSessionStart(BSTR bstrFPSFileName)
 
 	try
 	{
-		if (!RecordFAMSessionStart_Internal(false, bstrFPSFileName))
-		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
-			RecordFAMSessionStart_Internal(true, bstrFPSFileName);
-		}
+		// Always lock the database for this call.
+		// Not having a lock here may have had to do with some of the errors reported in
+		// [LegacyRCAndUtils:6154]
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+		RecordFAMSessionStart_Internal(true, bstrFPSFileName);
 
 		return S_OK;
 	}
