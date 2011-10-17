@@ -34,7 +34,7 @@ namespace Extract.BaseUtils.Testing
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI28795", ex);
+                ex.ExtractDisplay("ELI28795");
             }
         }
     }

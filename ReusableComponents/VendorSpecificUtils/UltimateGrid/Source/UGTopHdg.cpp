@@ -779,7 +779,8 @@ Returns:
 *************************************************/
 BOOL CUGTopHdg::PreCreateWindow(CREATESTRUCT& cs) 
 {
-	cs.style = cs.style | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+	// 10/17/2011 Hoping removing WS_CLIPCHILDREN fixes LegacyRCAndUtils:6145
+	//cs.style = cs.style | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
 
 	return CWnd::PreCreateWindow(cs);
 }
