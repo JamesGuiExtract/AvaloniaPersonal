@@ -55,7 +55,7 @@ namespace Extract.FileActionManager.Utilities
 
                 // Load and validate the license
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new Extract.Licensing.MapLabel());
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI30982",
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldServerCore, "ELI30982",
                     "FAM Network Manager Application");
 
                 var form = new FAMNetworkDashboardForm(fileName, resetForm);
