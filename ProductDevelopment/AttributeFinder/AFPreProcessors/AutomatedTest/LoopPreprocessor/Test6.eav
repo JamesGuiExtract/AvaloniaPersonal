@@ -4,18 +4,15 @@ Test|Mortgage Assignment    35.00
 Test|Total Recording:    35.00 
 .Key|Total Recording:
 .Value|35.00 
-Test|Book, Volume or Liber No. )70 7 b    , page(s) 
-.Key|Book, Volume or Liber No. )70 7 b
+Test|Book, Volume or Liber No. /7 0 7b    , page(s) 
+.Key|Book, Volume or Liber No. /7 0 7b
 .Value|, page(s) 
 Test|No.    ),    County Records, State of 
 .Key|No.    ),
 .Value|County Records, State of 
-Test|Date.cl:    May,4, 2004
+Test|Date.cl:    Map 20
 .Key|Date.cl:
-.Value|May,4, 2004
-Test|BY _Ltkf    &\": AL LU
-.Key|BY _Ltkf
-.Value|&\": AL LU
+.Value|Map 20
 Test|WITNESS    Sharon O'Dell, A/C Sales Support Mgr.
 .Key|WITNESS
 .Value|Sharon O'Dell, A/C Sales Support Mgr.
@@ -25,3 +22,6 @@ Test|STATE OF    Indiana
 Test|COUNTY OF Lake    ) SS: 
 .Key|COUNTY OF Lake
 .Value|) SS: 
+Test|L,(iktA Li    A tinnelf
+.Key|L,(iktA Li
+.Value|A tinnelf
