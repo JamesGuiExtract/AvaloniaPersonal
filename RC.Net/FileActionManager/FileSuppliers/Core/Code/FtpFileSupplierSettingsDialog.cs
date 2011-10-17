@@ -68,7 +68,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 // Set the initial values for the controls
                 _remoteDownloadFolderTextBox.Text = string.IsNullOrWhiteSpace(_settings.RemoteDownloadFolder) ?
                     "/" : _settings.RemoteDownloadFolder;
-                _fileExtensionSpecificationTextBox.Text = _settings.FileExtensionsToDownload;
+                _fileFilterComboBox.Text = _settings.FileExtensionsToDownload;
                 _recursiveDownloadCheckBox.Checked = _settings.RecursivelyDownload;
                 _downloadOnceRadioButton.Checked = _settings.PollingMethod == PollingMethod.NoPolling;
                 _pollContinuouslyRadioButton.Checked = _settings.PollingMethod == PollingMethod.Continuously;
@@ -115,7 +115,7 @@ namespace Extract.FileActionManager.FileSuppliers
 
                 // Transfer the settings from the controls to the _settings field
                 _settings.RemoteDownloadFolder = _remoteDownloadFolderTextBox.Text;
-                _settings.FileExtensionsToDownload = _fileExtensionSpecificationTextBox.Text;
+                _settings.FileExtensionsToDownload = _fileFilterComboBox.Text;
                 _settings.RecursivelyDownload = _recursiveDownloadCheckBox.Checked;
                 if (_downloadOnceRadioButton.Checked)
                 {
@@ -270,12 +270,12 @@ namespace Extract.FileActionManager.FileSuppliers
                 _settingsTabControl.SelectTab(_generalSettingsTabPage);
                 _remoteDownloadFolderTextBox.Focus();
             }
-            else if (string.IsNullOrWhiteSpace(_fileExtensionSpecificationTextBox.Text))
+            else if (string.IsNullOrWhiteSpace(_fileFilterComboBox.Text))
             {
                 UtilityMethods.ShowMessageBox("Extensions to download must be specified", 
                     "Configuration error", true);
                 _settingsTabControl.SelectTab(_generalSettingsTabPage);
-                _fileExtensionSpecificationTextBox.Focus();
+                _fileFilterComboBox.Focus();
             }
             else if (_pollContinuouslyRadioButton.Checked &&
                 _pollingIntervalNumericUpDown.Value < 1)

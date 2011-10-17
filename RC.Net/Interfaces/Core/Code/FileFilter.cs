@@ -137,6 +137,14 @@ namespace Extract.Interfaces
         [OnDeserializedAttribute]
         void InitRegex(StreamingContext context)
         {
+            InitRegex();
+        }
+
+        /// <summary>
+        /// Creates the <see cref="_filterRegex"/> instance using <see cref="_filterRegex"/>.
+        /// </summary>
+        void InitRegex()
+        {
             _filterRegex = new Regex(_filterPattern, RegexOptions.IgnoreCase);
         }
 
@@ -156,6 +164,11 @@ namespace Extract.Interfaces
         [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public bool FileMatchesFilter(string pathName)
         {
+            if (_filterRegex == null)
+            {
+                InitRegex();
+            }
+
             // [DotNetRCAndUtils:710]
             // If specified, _pathRoot must exactly match or must match with a trailing backslash so
             // as not to allow files from a folder that only starts with _rootPath.

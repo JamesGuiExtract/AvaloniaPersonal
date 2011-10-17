@@ -194,7 +194,7 @@ namespace Extract.FileActionManager.FileProcessors
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Core: Apply bates number settings";
+            this.Text = "Core: Apply Bates number settings";
             this._appearanceGroupBox.ResumeLayout(false);
             this._appearanceGroupBox.PerformLayout();
             this._fileNameGroupBox.ResumeLayout(false);

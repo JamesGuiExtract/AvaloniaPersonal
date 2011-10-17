@@ -424,7 +424,7 @@ namespace Extract.Redaction.Verification
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Redaction: Verify redactions settings";
+            this.Text = "Redaction: Verify sensitive data settings";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);

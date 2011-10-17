@@ -226,7 +226,7 @@ namespace Extract.FileActionManager.FileProcessors
                     UtilityMethods.ShowMessageBox(
                         "If more than one area may be extracted per image and image areas may not " +
                         "be appended to an existing output file, the <AreaID> tag must be used " +
-                        "to guarantee an unique output file name.",
+                        "to guarantee a unique output file name.",
                         "Output file must use <AreaID>", false);
                     return true;
                 }

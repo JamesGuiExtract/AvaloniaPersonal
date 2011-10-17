@@ -233,10 +233,8 @@ namespace Extract.FileActionManager.FileSuppliers
         // Field for the FileExtensionsToDownload property
         string _fileExtensionsToDownload;
 
-        // This is a regular expression that is set by the 
-        // FileExtensionsToDownload set operator and used to find the
-        // the files to download
-        string _fileExtensionsToDownloadRegEx;
+        // Used to test whether filenames match the _fileExtensionsToDownload filter.
+        Extract.Interfaces.FileFilter _fileFilter;
 
         // Field for the RecursivelyDowload property
         bool _recursivelyDownload;
@@ -375,13 +373,12 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 try
                 {
-                    _fileExtensionsToDownload = value;
-                    _fileExtensionsToDownloadRegEx = "^(" + FileExtensionsToDownload + ")$";
-                    _fileExtensionsToDownloadRegEx = _fileExtensionsToDownloadRegEx
-                        .Replace(".", "\\.")
-                        .Replace(';', '|')
-                        .Replace("*", ".*")
-                        .Replace("?", ".");
+                    if (value != _fileExtensionsToDownload)
+                    {
+                        _fileExtensionsToDownload = value;
+                        _fileFilter = null;
+                        _dirty = true;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -1452,8 +1449,13 @@ namespace Extract.FileActionManager.FileSuppliers
                 return false;
             }
 
-            return Regex.IsMatch(file.Name, _fileExtensionsToDownloadRegEx,
-                RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+            if (_fileFilter == null)
+            {
+                _fileFilter = new Interfaces.FileFilter("", _fileExtensionsToDownload, false);
+            }
+
+            // Test whether the filename matches the specified filter.
+            return _fileFilter.FileMatchesFilter(file.Name);
         }
 
         /// <summary>

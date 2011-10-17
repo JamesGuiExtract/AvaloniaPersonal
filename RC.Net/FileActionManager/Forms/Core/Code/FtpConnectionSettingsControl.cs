@@ -1,5 +1,6 @@
 ﻿using EnterpriseDT.Net.Ftp;
 using EnterpriseDT.Net.Ftp.Forms;
+using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
@@ -13,6 +14,15 @@ namespace Extract.FileActionManager.Forms
     /// </summary>
     public partial class FtpConnectionSettingsControl : UserControl
     {
+        #region Constants
+
+        /// <summary>
+        /// The object name used in licensing calls.
+        /// </summary>
+        static readonly string _OBJECT_NAME = typeof(FtpConnectionSettingsControl).ToString();
+
+        #endregion Constants
+
         #region Properties
 
         /// <summary>
@@ -116,7 +126,18 @@ namespace Extract.FileActionManager.Forms
         /// </summary>
         public FtpConnectionSettingsControl()
         {
-            InitializeComponent();
+            try
+            {
+                // Validate licensing
+                LicenseUtilities.ValidateLicense(LicenseIdName.FtpSftpFileTransfer,
+                    "ELI34026", _OBJECT_NAME);
+
+                InitializeComponent();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34027");
+            }
         }
         
         /// <summary>

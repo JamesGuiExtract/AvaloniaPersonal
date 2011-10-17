@@ -256,7 +256,7 @@ namespace Extract.Utilities.Email
                 // Ensure there is a username and password
                 if (string.IsNullOrWhiteSpace(_textUserName.Text))
                 {
-                    UtilityMethods.ShowMessageBox("Use name must be specified.",
+                    UtilityMethods.ShowMessageBox("User name must be specified.",
                         "No User Name", true);
                     _textUserName.Focus();
                     return null;

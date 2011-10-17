@@ -2132,6 +2132,23 @@ void FileProcessingDlg::updateUI()
 	m_statusBar.SetText(zSkipped, gnSKIPPED_COUNTS_STATUS_PANE_ID, 0);
 	m_statusBar.SetText(zFailed, gnFAILED_COUNTS_STATUS_PANE_ID, 0);
 	m_statusBar.SetText(zTotal, gnTOTAL_COUNTS_STATUS_PANE_ID, 0);
+
+	// Set the title bar text
+	CString szTitle = "File Action Manager";
+	if (m_strCurrFPSFilename != "")
+	{
+		string strFile = getFileNameFromFullPath(m_strCurrFPSFilename);
+		szTitle.Format("%s - %s on %s - File Action Manager", strFile.c_str(),
+			asString(getFPM()->DatabaseName).c_str(), asString(getFPM()->DatabaseServer).c_str());
+	}
+
+	// Add the Processing state string if 
+	if (!m_strProcessingStateString.empty())
+	{
+		string strTitle = szTitle;
+		szTitle.Format("%s (%s)", strTitle.c_str(), m_strProcessingStateString.c_str());
+	}
+	SetWindowText(szTitle);
 }
 //-------------------------------------------------------------------------------------------------
 bool FileProcessingDlg::isFAMReady()
@@ -2338,21 +2355,8 @@ UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr FileProcessingDlg::getFPM()
 void FileProcessingDlg::setCurrFPSFile(const string& strFileName)
 {
 	m_strCurrFPSFilename = strFileName;
-	CString szTitle = "File Action Manager";
-	if (m_strCurrFPSFilename != "")
-	{
-		string strFile = getFileNameFromFullPath(strFileName);
-		szTitle.Format("%s - %s on %s - File Action Manager", strFile.c_str(),
-			asString(getFPM()->DatabaseName).c_str(), asString(getFPM()->DatabaseServer).c_str());
-	}
 
-	// Add the Processing state string if 
-	if (!m_strProcessingStateString.empty())
-	{
-		string strTitle = szTitle;
-		szTitle.Format("%s (%s)", strTitle.c_str(), m_strProcessingStateString.c_str());
-	}
-	SetWindowText(szTitle);
+	updateUI();
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::loadSettingsFromManager()

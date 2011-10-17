@@ -39,6 +39,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this._settingsTabControl = new System.Windows.Forms.TabControl();
             this._generalSettingsTabPage = new System.Windows.Forms.TabPage();
+            this._fileFilterComboBox = new System.Windows.Forms.ComboBox();
             this._browseButton = new Extract.Utilities.Forms.BrowseButton();
             this._localWorkingFolderTextBox = new System.Windows.Forms.TextBox();
             this._pathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
@@ -46,7 +47,6 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this._fileExtensionSpecificationTextBox = new System.Windows.Forms.TextBox();
             this._remoteDownloadFolderTextBox = new System.Windows.Forms.TextBox();
             this._connectionSettingsTabPage = new System.Windows.Forms.TabPage();
             this._ftpConnectionSettingsControl = new Extract.FileActionManager.Forms.FtpConnectionSettingsControl(this.components);
@@ -91,7 +91,7 @@
             0,
             0});
             this._pollingIntervalNumericUpDown.Name = "_pollingIntervalNumericUpDown";
-            this._pollingIntervalNumericUpDown.Size = new System.Drawing.Size(45, 20);
+            this._pollingIntervalNumericUpDown.Size = new System.Drawing.Size(49, 20);
             this._pollingIntervalNumericUpDown.TabIndex = 2;
             this._pollingIntervalNumericUpDown.Value = new decimal(new int[] {
             1,
@@ -146,7 +146,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(342, 46);
+            this.label3.Location = new System.Drawing.Point(346, 46);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(49, 13);
             this.label3.TabIndex = 3;
@@ -165,6 +165,7 @@
             // 
             // _generalSettingsTabPage
             // 
+            this._generalSettingsTabPage.Controls.Add(this._fileFilterComboBox);
             this._generalSettingsTabPage.Controls.Add(groupBox1);
             this._generalSettingsTabPage.Controls.Add(this._browseButton);
             this._generalSettingsTabPage.Controls.Add(this._pathTagsButton);
@@ -173,7 +174,6 @@
             this._generalSettingsTabPage.Controls.Add(this.label2);
             this._generalSettingsTabPage.Controls.Add(this.label1);
             this._generalSettingsTabPage.Controls.Add(this._localWorkingFolderTextBox);
-            this._generalSettingsTabPage.Controls.Add(this._fileExtensionSpecificationTextBox);
             this._generalSettingsTabPage.Controls.Add(this._remoteDownloadFolderTextBox);
             this._generalSettingsTabPage.Location = new System.Drawing.Point(4, 22);
             this._generalSettingsTabPage.Name = "_generalSettingsTabPage";
@@ -183,13 +183,37 @@
             this._generalSettingsTabPage.Text = "General Settings";
             this._generalSettingsTabPage.UseVisualStyleBackColor = true;
             // 
+            // _fileFilterComboBox
+            // 
+            this._fileFilterComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._fileFilterComboBox.FormattingEnabled = true;
+            this._fileFilterComboBox.Items.AddRange(new object[] {
+            "*.bmp;*.rle;*.dib;*.rst;*.gp4;*.mil;*.cal;*.cg4;*.flc;*.fli;*.gif;*.jpg;*.jpeg;*." +
+                "pcx;*.pct;*.png;*.tga;*.tif;*.tiff;*.pdf",
+            "*.bmp;*.rle;*.dib",
+            "*.gif",
+            "*.jpg;*.jpeg",
+            "*.pcx",
+            "*.pct",
+            "*.pdf",
+            "*.png",
+            "*.tif;*.tiff",
+            "*.txt",
+            "*.xml",
+            "*.*"});
+            this._fileFilterComboBox.Location = new System.Drawing.Point(8, 85);
+            this._fileFilterComboBox.Name = "_fileFilterComboBox";
+            this._fileFilterComboBox.Size = new System.Drawing.Size(374, 21);
+            this._fileFilterComboBox.TabIndex = 3;
+            // 
             // _browseButton
             // 
             this._browseButton.FolderBrowser = true;
             this._browseButton.Location = new System.Drawing.Point(440, 288);
             this._browseButton.Name = "_browseButton";
             this._browseButton.Size = new System.Drawing.Size(27, 20);
-            this._browseButton.TabIndex = 10;
+            this._browseButton.TabIndex = 9;
             this._browseButton.Text = "...";
             this._browseButton.TextControl = this._localWorkingFolderTextBox;
             this._browseButton.UseVisualStyleBackColor = true;
@@ -199,7 +223,7 @@
             this._localWorkingFolderTextBox.Location = new System.Drawing.Point(8, 288);
             this._localWorkingFolderTextBox.Name = "_localWorkingFolderTextBox";
             this._localWorkingFolderTextBox.Size = new System.Drawing.Size(402, 20);
-            this._localWorkingFolderTextBox.TabIndex = 8;
+            this._localWorkingFolderTextBox.TabIndex = 7;
             // 
             // _pathTagsButton
             // 
@@ -208,7 +232,7 @@
             this._pathTagsButton.Name = "_pathTagsButton";
             this._pathTagsButton.PathTags = new Extract.Utilities.FileActionManagerSupplierPathTags();
             this._pathTagsButton.Size = new System.Drawing.Size(18, 20);
-            this._pathTagsButton.TabIndex = 9;
+            this._pathTagsButton.TabIndex = 8;
             this._pathTagsButton.TextControl = this._localWorkingFolderTextBox;
             this._pathTagsButton.UseVisualStyleBackColor = true;
             // 
@@ -229,7 +253,7 @@
             this.label4.Location = new System.Drawing.Point(8, 270);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(102, 13);
-            this.label4.TabIndex = 7;
+            this.label4.TabIndex = 6;
             this.label4.Text = "Local working folder";
             // 
             // label2
@@ -249,13 +273,6 @@
             this.label1.Size = new System.Drawing.Size(178, 13);
             this.label1.TabIndex = 0;
             this.label1.Text = "Remote folder to download files from";
-            // 
-            // _fileExtensionSpecificationTextBox
-            // 
-            this._fileExtensionSpecificationTextBox.Location = new System.Drawing.Point(8, 85);
-            this._fileExtensionSpecificationTextBox.Name = "_fileExtensionSpecificationTextBox";
-            this._fileExtensionSpecificationTextBox.Size = new System.Drawing.Size(374, 20);
-            this._fileExtensionSpecificationTextBox.TabIndex = 3;
             // 
             // _remoteDownloadFolderTextBox
             // 
@@ -363,7 +380,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox _localWorkingFolderTextBox;
-        private System.Windows.Forms.TextBox _fileExtensionSpecificationTextBox;
         private System.Windows.Forms.TextBox _remoteDownloadFolderTextBox;
         private Utilities.Forms.BrowseButton _browseButton;
         private Utilities.Forms.PathTagsButton _pathTagsButton;
@@ -372,5 +388,6 @@
         private System.Windows.Forms.RadioButton _pollAtSetTimesRadioButton;
         private System.Windows.Forms.RadioButton _pollContinuouslyRadioButton;
         private System.Windows.Forms.RadioButton _downloadOnceRadioButton;
+        private System.Windows.Forms.ComboBox _fileFilterComboBox;
     }
 }

@@ -591,7 +591,7 @@ void CAttributeFinderEngine::getComponentDataFolder(string& rstrFolder)
 		ASSERT_RESOURCE_ALLOCATION("ELI32474", m_ipRuleExecutionEnv != __nullptr);
 	}
 
-	string strFKBVersion = asString(m_ipRuleExecutionEnv->FKBVersion);
+	string strFKBVersion = trim(asString(m_ipRuleExecutionEnv->FKBVersion), " \t", " \t");
 	string strLegacyFKBVersion = getLegacyFKBVersion();
 
 	// If no FKB version has been assigned for this thread or the "Latest" keyword is specified,

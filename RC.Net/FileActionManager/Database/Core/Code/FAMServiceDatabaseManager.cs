@@ -69,7 +69,7 @@ namespace Extract.FileActionManager.Database
         /// A value of 0 indicates that the process should keep processing until it is
         /// stopped and will not be respawned. Negative values are not allowed.
         /// </summary>
-        public static readonly int DefaultNumberOfFilesToProcess = 0;
+        public static readonly int DefaultNumberOfFilesToProcess = 1000;
 
         /// <summary>
         /// The settings key for the dependent services list.

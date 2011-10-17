@@ -1322,21 +1322,46 @@ void addShellOpenDocumentErrorInfo(UCLIDException& rue, int nResult)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void shellOpenDocument(const string& strFilename)
+// Helper thread function for shellOpenDocument (below)
+UINT shellOpenDocumentThread(LPVOID pParam)
 {
-	string strFolder = isValidFolder(strFilename) ? strFilename : getDirectoryFromFullPath(strFilename);
-
-	// Request windows shell to open the specified document
-	int nRes = (int)ShellExecute(NULL, "open", strFilename.c_str(), NULL, 
-		strFolder.c_str(), SW_SHOWNORMAL);
-
-	// Per MDSN for ShellExecute: 0-32 represent error values
-	if (nRes >= 0 && nRes <= 32)
+	try
 	{
-		UCLIDException ue("ELI18144", "Failed to open document!");
-		ue.addDebugInfo("Filename", strFilename);
-		addShellOpenDocumentErrorInfo(ue, nRes);
-		throw ue;
+		char *pszFilename = (char *)pParam;
+
+		string strFolder = isValidFolder(pszFilename)
+			? pszFilename
+			: getDirectoryFromFullPath(pszFilename);
+
+		// Request windows shell to open the specified document
+		int nRes = (int)ShellExecute(NULL, "open", pszFilename, NULL, strFolder.c_str(),
+			SW_SHOWNORMAL);
+
+		// Per MDSN for ShellExecute: 0-32 represent error values
+		if (nRes >= 0 && nRes <= 32)
+		{
+			UCLIDException ue("ELI18144", "Failed to open document!");
+			ue.addDebugInfo("Filename", pszFilename);
+			addShellOpenDocumentErrorInfo(ue, nRes);
+			throw ue;
+		}
 	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI34024");
+
+	return 0;
 }
 //-------------------------------------------------------------------------------------------------
+void shellOpenDocument(const string& strFilename)
+{
+	// [LegacyRCAndUtils:6113]
+	// ShellExecute may fail when run in a thread with COM initialized as multi-threaded:
+	// http://support.microsoft.com/default.aspx?scid=287087
+	// Rather than require any calling threads to be initialized as such, create a separate thread
+	// and make the call from there.
+	CWinThread *pThread = AfxBeginThread(shellOpenDocumentThread, (LPVOID)strFilename.c_str());
+	ASSERT_RESOURCE_ALLOCATION("ELI34025", pThread != __nullptr);
+
+	WaitForSingleObject(pThread->m_hThread, INFINITE);
+}
+//-------------------------------------------------------------------------------------------------
+

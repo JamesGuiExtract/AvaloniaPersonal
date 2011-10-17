@@ -231,7 +231,7 @@ STDMETHODIMP CCleanupImageFileProcessor::raw_GetComponentDescription(BSTR * pstr
 	{
 		ASSERT_ARGUMENT("ELI19610", pstrComponentDescription != __nullptr);
 
-		*pstrComponentDescription = _bstr_t("Core: Cleanup image").Detach();
+		*pstrComponentDescription = _bstr_t("Core: Clean up image").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17296")
 

@@ -399,7 +399,7 @@
             "greater than or equal to"});
             this._comparisonComboBox.Location = new System.Drawing.Point(29, 120);
             this._comparisonComboBox.Name = "_comparisonComboBox";
-            this._comparisonComboBox.Size = new System.Drawing.Size(109, 21);
+            this._comparisonComboBox.Size = new System.Drawing.Size(142, 21);
             this._comparisonComboBox.TabIndex = 14;
             // 
             // label2

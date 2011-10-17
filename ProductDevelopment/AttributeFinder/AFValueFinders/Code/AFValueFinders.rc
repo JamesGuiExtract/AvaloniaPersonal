@@ -658,8 +658,8 @@ BEGIN
     PUSHBUTTON      "...",IDC_BTN_BROWSE_REPM,305,13,15,14
     PUSHBUTTON      "",IDC_BTN_OPEN_NOTEPAD,325,13,16,14,BS_ICON
     ICON            IDI_ICON_INFO,IDC_PATTERN_FILE_INFO,345,13,20,20,SS_NOTIFY
-    GROUPBOX        "Pattern file",IDC_STATIC,5,2,355,51
-    CONTROL         "Case Sensitive",IDC_CHK_CASE_REPM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,71,63,10
+    GROUPBOX        "Pattern File",IDC_STATIC,5,2,355,51
+    CONTROL         "Case sensitive",IDC_CHK_CASE_REPM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,71,61,10
     CONTROL         "Store rule ID(s) of successfully executed rule(s) as document tag named",IDC_CHK_STORE_RULE_WORKED,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,86,241,10
     EDITTEXT        IDC_EDIT_RULE_WORKED_NAME,259,86,80,12,ES_AUTOHSCROLL
@@ -679,7 +679,7 @@ BEGIN
     CONTROL         "Return all matches",IDC_RADIO_RETURN_ALL_MATCHES,"Button",BS_AUTORADIOBUTTON,47,166,78,10
     CONTROL         "Return first match  >=",IDC_RADIO_RETURN_FIRST_OR_BEST,
                     "Button",BS_AUTORADIOBUTTON,177,166,78,10
-    LTEXT           "Use following DataScorer object to determine validity of match",IDC_STATIC,15,102,225,10
+    LTEXT           "Use the following Data Scorer to determine validity of match ",IDC_STATIC,15,102,225,10
     GROUPBOX        "Match Options",IDC_STATIC,5,56,355,79
     CONTROL         "If, when expanding any tag in the above filename, the tag does not exist, return no attributes and do not throw an exception",IDC_CHK_IGNORE_NO_TAGS,
                     "Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,12,31,344,20

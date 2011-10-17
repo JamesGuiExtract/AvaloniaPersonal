@@ -150,9 +150,10 @@ namespace IDShieldOnDemand
             try 
 	        {
                 // Invoke the file open so that it doesn't occur as part of the Form.Load event
-                // handler.
-                FormsMethods.ExecuteInUIThread(_verifyForm,
-                    () =>_verifyForm.Open(_fileToOpen, 0, 0, null, null));
+                // handler. (Otherwise the _verifyForm will not yet be registered for the events it
+                // needs to be registered for).
+                _verifyForm.BeginInvoke((MethodInvoker)(() => 
+                    _verifyForm.Open(_fileToOpen, 0, 0, null, null)));
 	        }
 	        catch (Exception ex)
 	        {
