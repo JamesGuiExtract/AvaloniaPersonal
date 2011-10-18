@@ -258,9 +258,6 @@ private:
 
 	// Mutex is locked only inside of the get connection method
 	CMutex m_mutex;
-	
-	// Mutex for accessing/updating counter values from the database
-	CMutex m_counterMutex;
 
 	// handle to window that should receive the database status notifications
 	HWND m_hUIWindow;
@@ -282,12 +279,13 @@ private:
 	// If 0 there is not a registered UPI
 	int m_nUPIID;
 
-	// Flags indicating that this instance has the specified lock on the DB
-	// NOTE: If other locks are added, be sure to add the map entry in the
-	// constructor for the new lock.
-	bool m_bMainLock;
-	bool m_bUserCounterLock;
-	map<string, bool*> m_mapDbLocks;
+	// Mutexes indicating that this instance has the specified lock on the DB. The mutexes prevent
+	// multiple threads from each instance from sharing the lock.
+	// NOTE: If other locks are added, be sure to add the map entry in the constructor for the new
+	// lock.
+	static CMutex ms_mutexMainLock;
+	static CMutex ms_mutexUserCounterLock;
+	map<string, CMutex*> m_mapDbLocks;
 
 	// Machine username
 	string m_strFAMUserName;
@@ -565,9 +563,11 @@ private:
 	int getDBSchemaVersion();
 
 	// Locks the db for use using the connection provided.
+	// The caller must unlock the database on the same thread on which LockDB was called.
 	void lockDB(_ConnectionPtr ipConnection, const string& strLockName);
 	
-	// unlocks db using the connection provided.
+	// Unlocks db using the connection provided.
+	// The caller must unlock the database on the same thread on which LockDB was called.
 	void unlockDB(_ConnectionPtr ipConnection, const string& strLockName);
 
 	// Looks up the current username in the Login table if bUseAdmin is false
