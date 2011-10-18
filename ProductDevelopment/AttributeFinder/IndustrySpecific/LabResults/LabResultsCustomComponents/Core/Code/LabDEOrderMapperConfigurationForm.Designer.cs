@@ -66,7 +66,6 @@ namespace Extract.LabResultsCustomComponents
             // 
             // _buttonBrowse
             // 
-            this._buttonBrowse.DefaultFilterIndex = -1;
             this._buttonBrowse.FileFilter = "SQL Compact Database File (*.sdf)|*.sdf||";
             this._buttonBrowse.FileOrFolderPath = null;
             this._buttonBrowse.FolderBrowser = false;

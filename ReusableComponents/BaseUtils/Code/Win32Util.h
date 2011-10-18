@@ -112,7 +112,7 @@ EXPORT_BaseUtils void flashWindow(HWND hWnd, bool bSetFocus);
 typedef enum
 {
 	UNKNOWN, WIN9X, WINNT, WIN2KSERVER, WINXP, WIN2003SERVER, 
-	WINVISTA, WIN2008SERVER
+	WINVISTA, WIN2008SERVER, WIN7, WIN2008SERVERR2
 } PLATFORM;
 //-----------------------------------------------------------------------------------------
 // PURPOSE:	To return a string corresponding to the provided PLATFORM enum
@@ -122,7 +122,10 @@ EXPORT_BaseUtils std::string getPlatformAsString(PLATFORM platform);
 EXPORT_BaseUtils PLATFORM GetPlatform();
 //-----------------------------------------------------------------------------------------
 // PURPOSE: To return true if the current OS platform is Windows 2000 or greater
-EXPORT_BaseUtils bool isPlatformWin2KOrGreater(PLATFORM platform);
+EXPORT_BaseUtils bool isPlatformWin2KOrGreater();
+//-----------------------------------------------------------------------------------------
+// PURPOSE: To return true if the current OS platform is Windows Vista or greater
+EXPORT_BaseUtils bool isPlatformWinVistaOrGreater();
 
 //-----------------------------------------------------------------------------------------
 class EXPORT_BaseUtils HandleCloser

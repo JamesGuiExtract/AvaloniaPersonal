@@ -46,9 +46,10 @@ vector<string> FileSupplierConfigMgr::getFileExtensionList()
 	vector<string> vecExtList;
 	// default set of images support by our current SSOCR
 	string strList = "*.tif"
+					 "|*.pdf"
 					 "|*.bmp"
 					 "|*.bmp*;*.rle*;*.dib*;*.rst*;*.gp4*;*.mil*;*.cal*;*.cg4*;"
-					 "*.flc*;*.fli*;*.gif*;*.jpg*;*.pcx*;*.pct*;*.png*;*.tga*;*.tif*"
+					 "*.flc*;*.fli*;*.gif*;*.jpg*;*.pcx*;*.pct*;*.png*;*.tga*;*.tif*;*.pdf*"
 					 "|*.*";
 
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, gstrFILE_EXTENSION_LIST))

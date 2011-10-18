@@ -20,8 +20,13 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <string>
+using namespace std;
+
 // if you don't want to use MFC, comment out the following line:
 #include "stdafx.h"
+#include "Win32Util.h"
+#include "UCLIDException.h"
 
 #ifndef __AFX_H__
 #include "windows.h"
@@ -32,6 +37,9 @@
 #include "Shlobj.h"
 #include "io.h"
 #include "XBrowseForFolder.h"
+
+// ProgID of COM class to use to browse for folders (if available).
+#define _DOT_NET_FILE_BROWSER_PROGID "Extract.Utilities.Forms.FileBrowser"
 
 #ifndef __AFX_H__
 
@@ -57,7 +65,6 @@ public:
 	operator LPRECT() { return this; }
 };
 #endif
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // ScreenToClientX - helper function in case non-MFC
@@ -230,6 +237,23 @@ BOOL XBrowseForFolder(HWND hWnd,
 
 	if (lpszBuf == NULL || dwBufSize < MAX_PATH)
 		return FALSE;
+
+	// [LegacyRCAndUtils:4599]
+	// Use .Net folder browser exposed via COM (if available).
+	IFileBrowserPtr ipFileBrowser;
+	ipFileBrowser.CreateInstance(_DOT_NET_FILE_BROWSER_PROGID);
+	if (ipFileBrowser != __nullptr)
+	{
+		_bstr_t bstrFolder = ipFileBrowser->BrowseForFolder("", lpszInitialFolder);
+		if (bstrFolder.length() > 0)
+		{
+			strcpy_s(lpszBuf, dwBufSize, (LPCSTR)bstrFolder);
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
 
 	lpszBuf[0] = _T('\0');
 

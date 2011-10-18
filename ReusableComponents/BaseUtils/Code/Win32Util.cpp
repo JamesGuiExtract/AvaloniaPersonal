@@ -758,6 +758,14 @@ string getPlatformAsString(PLATFORM platform)
 		strReturnString = "Windows 2008 Server";
 		break;
 
+	case WIN7:
+		strReturnString = "Windows 7";
+		break;
+		
+	case WIN2008SERVERR2:
+		strReturnString = "Windows 2008 Server R2";
+		break;
+
 	default:
 		strReturnString = "Unknown";
 		break;
@@ -824,16 +832,34 @@ PLATFORM GetPlatform()
 
 			case 6:
 				{
-					// Version 6 - WinVista and Win2008
-					// Check product type to distinguish
-					if (osvi.wProductType == VER_NT_SERVER)
+					// Version 6 - WinVista, Win2008, Win7, Win2008R2
+					// Check minor version to distinguish
+					switch(osvi.dwMinorVersion)
 					{
-						platReturnVal = WIN2008SERVER;
+					case 0:
+						if (osvi.wProductType == VER_NT_SERVER)
+						{
+							platReturnVal = WIN2008SERVER;
+						}
+						else
+						{
+							platReturnVal = WINVISTA;
+						}
+						break;
+
+					case 1:
+						if (osvi.wProductType == VER_NT_SERVER)
+						{
+							platReturnVal = WIN2008SERVERR2;
+						}
+						else
+						{
+							platReturnVal = WIN7;
+						}
+						break;
 					}
-					else
-					{
-						platReturnVal = WINVISTA;
-					}
+					break;
+					
 				}
 				break;
 			}
@@ -844,22 +870,42 @@ PLATFORM GetPlatform()
 	return platReturnVal;
 }
 //--------------------------------------------------------------------------------------------------
-bool isPlatformWin2KOrGreater(PLATFORM platform)
+bool isPlatformWin2KOrGreater()
 {
-	switch(platform)
-	{
-	case WIN2KSERVER:
-	case WINXP:
-	case WIN2003SERVER:
-	case WINVISTA:
-	case WIN2008SERVER:
-		return true;
-		break;
+	// Create an OSVERSIONINFOEX struct and zero it out
+	OSVERSIONINFOEX osvi;
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
 
-	default:
+	// Set the sizeof flag
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+
+	// Attempt to get the version info
+	if (!GetVersionEx((OSVERSIONINFO*) &osvi))
+	{
+		// If failed to get the version info, return false
 		return false;
-		break;
 	}
+
+	return (osvi.dwMajorVersion >= 5);
+}
+//--------------------------------------------------------------------------------------------------
+bool isPlatformWinVistaOrGreater()
+{
+	// Create an OSVERSIONINFOEX struct and zero it out
+	OSVERSIONINFOEX osvi;
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+
+	// Set the sizeof flag
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+
+	// Attempt to get the version info
+	if (!GetVersionEx((OSVERSIONINFO*) &osvi))
+	{
+		// If failed to get the version info, return false
+		return false;
+	}
+
+	return (osvi.dwMajorVersion >= 6);
 }
 
 //--------------------------------------------------------------------------------------------------

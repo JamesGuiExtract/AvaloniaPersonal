@@ -91,13 +91,6 @@ namespace Extract.Utilities.Forms
         string _fileFilter;
 
         /// <summary>
-        /// The default filter that will be displayed in the <see cref="OpenFileDialog"/>. (Only
-        /// applies if <see cref="FolderBrowser"/> is <see langword="false"/> and
-        /// <see cref="FileFilter"/> is not <see langword="null"/> or empty string.
-        /// </summary>
-        int _defaultFilterIndex;
-
-        /// <summary>
         /// The <see cref="TextBox"/> that will be updated by the dialog result if the user
         /// selected OK.
         /// </summary>
@@ -126,7 +119,7 @@ namespace Extract.Utilities.Forms
         /// Defaults to a <see cref="FolderBrowserDialog"/>.
         /// </summary>
         public BrowseButton()
-            : this(false, null, null, -1)
+            : this(false, null, null)
         {
         }
 
@@ -142,11 +135,7 @@ namespace Extract.Utilities.Forms
         /// the dialog display when <see cref="DialogResult"/> is OK.</param>
         /// <param name="fileFilter">A file filter string for use in the
         /// <see cref="OpenFileDialog"/>. May be <see langword="null"/>.</param>
-        /// <param name="defaultFilterIndex">The default filter to display in the
-        /// <see cref="OpenFileDialog"/>. Only applies if <paramref name="fileFilter"/>
-        /// is specified.</param>
-        public BrowseButton(bool folderBrowser, TextBox textControl,
-            string fileFilter, int defaultFilterIndex)
+        public BrowseButton(bool folderBrowser, TextBox textControl, string fileFilter)
         {
             InitializeComponent();
 
@@ -155,8 +144,6 @@ namespace Extract.Utilities.Forms
             _textControl = textControl;
 
             _fileFilter = fileFilter;
-
-            _defaultFilterIndex = defaultFilterIndex;
         }
 
         #endregion Constructors
@@ -261,43 +248,6 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
-        /// Gets/sets the default filter index for the <see cref="OpenFileDialog"/>.
-        /// </summary>
-        /// <returns>The default file filter index for the <see cref="OpenFileDialog"/>.</returns>
-        /// <value>The default file filter index for the <see cref="OpenFileDialog"/>.</value>
-        [Category("Behavior")]
-        [Description("The default filter index. Only used if FolderBrowser is false.")]
-        public int DefaultFilterIndex
-        {
-            get
-            {
-                return _defaultFilterIndex;
-            }
-            set
-            {
-                _defaultFilterIndex = value;
-            }
-        }
-
-        /// <summary>
-        /// Determines whether the <see cref="DefaultFilterIndex"/> property should be serialized.
-        /// </summary>
-        /// <returns><see langword="true"/> if the property should be serialized; 
-        /// <see langword="false"/> if the property should not be serialized.</returns>
-        bool ShouldSerializeDefaultFilterIndex()
-        {
-            return !_folderBrowser && _defaultFilterIndex != -1;
-        }
-
-        /// <summary>
-        /// Resets the <see cref="DefaultFilterIndex"/> property to its default value.
-        /// </summary>
-        void ResetDefaultFilterIndex()
-        {
-            _defaultFilterIndex = -1;
-        }
-
-        /// <summary>
         /// Gets/sets the file or folder path that was returned from the dialog (also used
         /// to determine the initial folder displayed in the dialog).
         /// </summary>
@@ -363,12 +313,15 @@ namespace Extract.Utilities.Forms
                     null : Path.GetFullPath(_fileOrFolderPath);
 
                 // Build and display the desired dialog
-                DialogResult result = _folderBrowser ? 
-                    ShowFolderBrowser(initialFolder) : ShowFileDialog(initialFolder);
+                string fileOrFolderPath = _folderBrowser
+                    ? FormsMethods.BrowseForFolder(_folderDescription, initialFolder)
+                    : FormsMethods.BrowseForFile(_fileFilter, initialFolder);
 
-                // Check the dialog result
-                if (result == DialogResult.OK)
+                // If the return value from the dialog is null, the user canceled.
+                if (fileOrFolderPath != null)
                 {
+                    _fileOrFolderPath = fileOrFolderPath;
+
                     // If the result was OK and there is an associated text control, set its value
                     if (_textControl != null)
                     {
@@ -383,83 +336,6 @@ namespace Extract.Utilities.Forms
             catch (Exception ex)
             {
                 ExtractException.Display("ELI26228", ex);
-            }
-        }
-
-        /// <summary>
-        /// Allows the user to select a folder using the folder browser.
-        /// </summary>
-        /// <param name="initialFolder">The initial folder for the folder browser.</param>
-        /// <returns>The result of the user's selection.</returns>
-        DialogResult ShowFolderBrowser(string initialFolder)
-        {
-            using (FolderBrowserDialog folderBrowser = new FolderBrowserDialog())
-            {
-                // Set the initial folder if necessary
-                if (!string.IsNullOrEmpty(initialFolder))
-                {
-                    folderBrowser.SelectedPath = initialFolder;
-                }
-
-                // Set the folder browser description
-                folderBrowser.Description = _folderDescription;
-
-                // Show the dialog
-                DialogResult result = folderBrowser.ShowDialog();
-                if (result == DialogResult.OK)
-                {
-                    // Store the value returned on OK
-                    _fileOrFolderPath = folderBrowser.SelectedPath;
-                }
-
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// Allows the user to select a file using the file dialog.
-        /// </summary>
-        /// <param name="initialFolder">The initial folder for the file browser.</param>
-        /// <returns>The result of the user's selection.</returns>
-        DialogResult ShowFileDialog(string initialFolder)
-        {
-            using (OpenFileDialog openFile = new OpenFileDialog())
-            {
-                // Set the initial folder if necessary
-                if (!string.IsNullOrEmpty(initialFolder))
-                {
-                    openFile.InitialDirectory = initialFolder;
-                }
-
-                // Set the filter text and the initial filter
-                if (!string.IsNullOrEmpty(_fileFilter))
-                {
-                    openFile.Filter = _fileFilter;
-                    openFile.FilterIndex =
-                        _defaultFilterIndex >= 0 ? _defaultFilterIndex : 0;
-                    openFile.AddExtension = true;
-                }
-                else
-                {
-                    openFile.AddExtension = false;
-                }
-
-                // Set multi-select to false
-                openFile.Multiselect = false;
-
-                // Require that both the path and file exist
-                openFile.CheckFileExists = true;
-                openFile.CheckPathExists = true;
-
-                // Show the dialog
-                DialogResult result = openFile.ShowDialog();
-                if (result == DialogResult.OK)
-                {
-                    // Store the value returned on OK
-                    _fileOrFolderPath = openFile.FileName;
-                }
-
-                return result;
             }
         }
 

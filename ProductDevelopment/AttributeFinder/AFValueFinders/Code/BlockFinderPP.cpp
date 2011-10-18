@@ -174,6 +174,9 @@ LRESULT CBlockFinderPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 
 			// init controls
 			m_editMinNumOfClues = GetDlgItem(IDC_EDIT_MIN_NUMBER);
+			// [FlexIDSCore:3727] Limit number of digits allowed to 8.
+			m_editMinNumOfClues.SetLimitText(8);
+
 			m_btnAdd = GetDlgItem(IDC_BTN_ADD_BF);
 			m_btnRemove = GetDlgItem(IDC_BTN_REMOVE_BF);
 			m_btnModify = GetDlgItem(IDC_BTN_MODIFY_BF);

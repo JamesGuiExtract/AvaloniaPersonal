@@ -143,6 +143,7 @@
     <Compile Include="BrowseButton.Designer.cs">
       <DependentUpon>BrowseButton.cs</DependentUpon>
     </Compile>
+    <Compile Include="FileBrowser.cs" />
     <Compile Include="InfoTip.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -260,6 +261,10 @@
     <ProjectReference Include="..\..\..\..\Drawing\Core\Code\Extract.Drawing.csproj">
       <Project>{865B9A25-1D27-4445-9CC7-7BF88D736BA8}</Project>
       <Name>Extract.Drawing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
+      <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
+      <Name>Extract.Interfaces</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>

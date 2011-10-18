@@ -46,14 +46,11 @@ CCpuUsage::CCpuUsage()
 {
 	try
 	{
-		// Check the current platform
-		PLATFORM platform = GetPlatform();
-
-		// If it is not Win2K or greater then throw an exception
-		if (!isPlatformWin2KOrGreater(platform))
+		// If the current platform is not Win2K or greater then throw an exception
+		if (!isPlatformWin2KOrGreater())
 		{
 			UCLIDException uex("ELI21589", "Unsupported operating system for CpuUsage!");
-			uex.addDebugInfo("Platform", getPlatformAsString(platform));
+			uex.addDebugInfo("Platform", getPlatformAsString(GetPlatform()));
 			throw uex;
 		}
 

@@ -486,6 +486,103 @@ namespace Extract.Utilities.Forms
             }
         }
 
+        /// <summary>
+        /// Allows the user to select a folder using the folder browser.
+        /// </summary>
+        /// <param name="description">The text to display over the folder selection contro.</param>
+        /// <param name="initialFolder">The initial folder for the folder browser.</param>
+        /// <returns>The result of the user's selection or <see langword="null"/> if the user
+        /// canceled the dialog.</returns>
+        public static string BrowseForFolder(string description, string initialFolder)
+        {
+            try
+            {
+                using (FolderBrowserDialog folderBrowser = new FolderBrowserDialog())
+                {
+                    // Set the initial folder if necessary
+                    if (!string.IsNullOrEmpty(initialFolder))
+                    {
+                        folderBrowser.SelectedPath = initialFolder;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(description))
+                    {
+                        // Set the folder browser description
+                        folderBrowser.Description = description;
+                    }
+
+                    // Show the dialog
+                    DialogResult result = folderBrowser.ShowDialog();
+                    if (result == DialogResult.OK)
+                    {
+                        // Return the selected folder path.
+                        return folderBrowser.SelectedPath;
+                    }
+
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34029");
+            }
+        }
+
+        /// <summary>
+        /// Allows the user to select a single, exsiting file using the file dialog.
+        /// </summary>
+        /// <param name="fileFilter">The text to display over the file selection control.</param>
+        /// <param name="initialFolder">The initial folder for the file browser.</param>
+        /// <returns>The result of the user's selection or <see langword="null"/> if the user
+        /// canceled the dialog.</returns>
+        public static string BrowseForFile(string fileFilter, string initialFolder)
+        {
+            try
+            {
+                using (OpenFileDialog openFile = new OpenFileDialog())
+                {
+                    // Set the initial folder if necessary
+                    if (!string.IsNullOrEmpty(initialFolder))
+                    {
+                        openFile.InitialDirectory = initialFolder;
+                    }
+
+                    // Set the filter text and the initial filter
+                    if (!string.IsNullOrEmpty(fileFilter))
+                    {
+                        openFile.Filter = fileFilter;
+                        openFile.FilterIndex = 0;
+                        openFile.AddExtension = true;
+                    }
+                    else
+                    {
+                        openFile.AddExtension = false;
+                    }
+
+                    // Set multi-select to false
+                    openFile.Multiselect = false;
+
+                    // Require that both the path and file exist
+                    openFile.CheckFileExists = true;
+                    openFile.CheckPathExists = true;
+
+                    // Show the dialog
+                    DialogResult result = openFile.ShowDialog();
+                    if (result == DialogResult.OK)
+                    {
+                        // Return the selected file path.
+                        return openFile.FileName;
+                    }
+
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34028");
+            }
+        }
+
         #endregion Methods
     }
 
