@@ -608,26 +608,6 @@ namespace Extract.AttributeFinder.Rules
             RuleSet ruleSet = new RuleSet();
             ruleSet.LoadFrom(rsdFileName, false);
 
-            IEnumerable<string> ruleSetAttributes = ruleSet.AttributeNameToInfoMap.GetKeys()
-                .ToIEnumerable<string>();
-
-            // Check to ensure that the expression references the same set of attributes defined in
-            // the ruleset (helps prevent typos from causing un-noticed bugs).
-            int matchingAttributeCount = _variableNames
-                .Intersect(ruleSetAttributes, StringComparer.Ordinal)
-                .Count();
-
-            if (matchingAttributeCount != _variableNames.Count() ||
-                matchingAttributeCount != ruleSetAttributes.Count())
-            {
-                ExtractException ee = new ExtractException("ELI33856",
-                    "Score expression references a different set of attributes than are defined in " +
-                    "the ruleset.");
-                ee.AddDebugData("Expression attributes", string.Join(", ", _variableNames), true);
-                ee.AddDebugData("RuleSet attributes", string.Join(", ", ruleSetAttributes), true);
-                throw ee;
-            }
-
             return ruleSet;
         }
 

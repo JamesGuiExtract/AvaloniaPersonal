@@ -29,20 +29,96 @@
         private void InitializeComponent()
         {
             System.Windows.Forms.GroupBox groupBox3;
-            System.Windows.Forms.GroupBox groupBox1;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RSDDataScorerSettingsDialog));
+            System.Windows.Forms.GroupBox groupBox1;
+            this._rsdFileNamePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._rsdFileNameTextBox = new System.Windows.Forms.TextBox();
+            this._rsdFileNameBrowseButton = new Extract.Utilities.Forms.BrowseButton();
+            this._scoreExpressionInfoTip = new Extract.Utilities.Forms.InfoTip();
+            this._scoreExpressionTextBox = new System.Windows.Forms.TextBox();
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
-            this._rsdFileNameTextBox = new System.Windows.Forms.TextBox();
-            this._scoreExpressionTextBox = new System.Windows.Forms.TextBox();
-            this._scoreExpressionInfoTip = new Extract.Utilities.Forms.InfoTip();
-            this._rsdFileNamePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._rsdFileNameBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             groupBox3 = new System.Windows.Forms.GroupBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox3.SuspendLayout();
             groupBox1.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // groupBox3
+            // 
+            groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            groupBox3.Controls.Add(this._rsdFileNamePathTagsButton);
+            groupBox3.Controls.Add(this._rsdFileNameBrowseButton);
+            groupBox3.Controls.Add(this._rsdFileNameTextBox);
+            groupBox3.Location = new System.Drawing.Point(12, 12);
+            groupBox3.Name = "groupBox3";
+            groupBox3.Size = new System.Drawing.Size(431, 52);
+            groupBox3.TabIndex = 5;
+            groupBox3.TabStop = false;
+            groupBox3.Text = "RSD file name";
+            // 
+            // _rsdFileNamePathTagsButton
+            // 
+            this._rsdFileNamePathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._rsdFileNamePathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_rsdFileNamePathTagsButton.Image")));
+            this._rsdFileNamePathTagsButton.Location = new System.Drawing.Point(374, 20);
+            this._rsdFileNamePathTagsButton.Name = "_rsdFileNamePathTagsButton";
+            this._rsdFileNamePathTagsButton.Size = new System.Drawing.Size(18, 20);
+            this._rsdFileNamePathTagsButton.TabIndex = 2;
+            this._rsdFileNamePathTagsButton.TextControl = this._rsdFileNameTextBox;
+            this._rsdFileNamePathTagsButton.UseVisualStyleBackColor = true;
+            // 
+            // _rsdFileNameTextBox
+            // 
+            this._rsdFileNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._rsdFileNameTextBox.HideSelection = false;
+            this._rsdFileNameTextBox.Location = new System.Drawing.Point(6, 20);
+            this._rsdFileNameTextBox.Name = "_rsdFileNameTextBox";
+            this._rsdFileNameTextBox.Size = new System.Drawing.Size(362, 20);
+            this._rsdFileNameTextBox.TabIndex = 1;
+            // 
+            // _rsdFileNameBrowseButton
+            // 
+            this._rsdFileNameBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._rsdFileNameBrowseButton.Location = new System.Drawing.Point(398, 20);
+            this._rsdFileNameBrowseButton.Name = "_rsdFileNameBrowseButton";
+            this._rsdFileNameBrowseButton.Size = new System.Drawing.Size(27, 20);
+            this._rsdFileNameBrowseButton.TabIndex = 3;
+            this._rsdFileNameBrowseButton.Text = "...";
+            this._rsdFileNameBrowseButton.TextControl = this._rsdFileNameTextBox;
+            this._rsdFileNameBrowseButton.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(this._scoreExpressionInfoTip);
+            groupBox1.Controls.Add(this._scoreExpressionTextBox);
+            groupBox1.Location = new System.Drawing.Point(12, 71);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new System.Drawing.Size(431, 74);
+            groupBox1.TabIndex = 6;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Score generation expression";
+            // 
+            // _scoreExpressionInfoTip
+            // 
+            this._scoreExpressionInfoTip.BackColor = System.Drawing.Color.Transparent;
+            this._scoreExpressionInfoTip.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("_scoreExpressionInfoTip.BackgroundImage")));
+            this._scoreExpressionInfoTip.Location = new System.Drawing.Point(409, 19);
+            this._scoreExpressionInfoTip.Name = "_scoreExpressionInfoTip";
+            this._scoreExpressionInfoTip.Size = new System.Drawing.Size(16, 16);
+            this._scoreExpressionInfoTip.TabIndex = 1;
+            this._scoreExpressionInfoTip.TipText = resources.GetString("_scoreExpressionInfoTip.TipText");
+            // 
+            // _scoreExpressionTextBox
+            // 
+            this._scoreExpressionTextBox.Location = new System.Drawing.Point(6, 19);
+            this._scoreExpressionTextBox.Multiline = true;
+            this._scoreExpressionTextBox.Name = "_scoreExpressionTextBox";
+            this._scoreExpressionTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._scoreExpressionTextBox.Size = new System.Drawing.Size(397, 49);
+            this._scoreExpressionTextBox.TabIndex = 0;
             // 
             // _okButton
             // 
@@ -65,82 +141,6 @@
             this._cancelButton.TabIndex = 4;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
-            // 
-            // _rsdFileNameTextBox
-            // 
-            this._rsdFileNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._rsdFileNameTextBox.HideSelection = false;
-            this._rsdFileNameTextBox.Location = new System.Drawing.Point(6, 20);
-            this._rsdFileNameTextBox.Name = "_rsdFileNameTextBox";
-            this._rsdFileNameTextBox.Size = new System.Drawing.Size(362, 20);
-            this._rsdFileNameTextBox.TabIndex = 1;
-            // 
-            // groupBox3
-            // 
-            groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            groupBox3.Controls.Add(this._rsdFileNamePathTagsButton);
-            groupBox3.Controls.Add(this._rsdFileNameBrowseButton);
-            groupBox3.Controls.Add(this._rsdFileNameTextBox);
-            groupBox3.Location = new System.Drawing.Point(12, 12);
-            groupBox3.Name = "groupBox3";
-            groupBox3.Size = new System.Drawing.Size(431, 52);
-            groupBox3.TabIndex = 5;
-            groupBox3.TabStop = false;
-            groupBox3.Text = "RSD file name";
-            // 
-            // groupBox1
-            // 
-            groupBox1.Controls.Add(this._scoreExpressionInfoTip);
-            groupBox1.Controls.Add(this._scoreExpressionTextBox);
-            groupBox1.Location = new System.Drawing.Point(12, 71);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(431, 74);
-            groupBox1.TabIndex = 6;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "Score generation expression";
-            // 
-            // _scoreExpressionTextBox
-            // 
-            this._scoreExpressionTextBox.Location = new System.Drawing.Point(6, 19);
-            this._scoreExpressionTextBox.Multiline = true;
-            this._scoreExpressionTextBox.Name = "_scoreExpressionTextBox";
-            this._scoreExpressionTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._scoreExpressionTextBox.Size = new System.Drawing.Size(397, 49);
-            this._scoreExpressionTextBox.TabIndex = 0;
-            // 
-            // _scoreExpressionInfoTip
-            // 
-            this._scoreExpressionInfoTip.BackColor = System.Drawing.Color.Transparent;
-            this._scoreExpressionInfoTip.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("_scoreExpressionInfoTip.BackgroundImage")));
-            this._scoreExpressionInfoTip.Location = new System.Drawing.Point(409, 19);
-            this._scoreExpressionInfoTip.Name = "_scoreExpressionInfoTip";
-            this._scoreExpressionInfoTip.Size = new System.Drawing.Size(16, 16);
-            this._scoreExpressionInfoTip.TabIndex = 1;
-            this._scoreExpressionInfoTip.TipText = resources.GetString("_scoreExpressionInfoTip.TipText");
-            // 
-            // _rsdFileNamePathTagsButton
-            // 
-            this._rsdFileNamePathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._rsdFileNamePathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_rsdFileNamePathTagsButton.Image")));
-            this._rsdFileNamePathTagsButton.Location = new System.Drawing.Point(374, 20);
-            this._rsdFileNamePathTagsButton.Name = "_rsdFileNamePathTagsButton";
-            this._rsdFileNamePathTagsButton.Size = new System.Drawing.Size(18, 20);
-            this._rsdFileNamePathTagsButton.TabIndex = 2;
-            this._rsdFileNamePathTagsButton.TextControl = this._rsdFileNameTextBox;
-            this._rsdFileNamePathTagsButton.UseVisualStyleBackColor = true;
-            // 
-            // _rsdFileNameBrowseButton
-            // 
-            this._rsdFileNameBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._rsdFileNameBrowseButton.Location = new System.Drawing.Point(398, 20);
-            this._rsdFileNameBrowseButton.Name = "_rsdFileNameBrowseButton";
-            this._rsdFileNameBrowseButton.Size = new System.Drawing.Size(27, 20);
-            this._rsdFileNameBrowseButton.TabIndex = 3;
-            this._rsdFileNameBrowseButton.Text = "...";
-            this._rsdFileNameBrowseButton.TextControl = this._rsdFileNameTextBox;
-            this._rsdFileNameBrowseButton.UseVisualStyleBackColor = true;
             // 
             // RSDDataScorerSettingsDialog
             // 

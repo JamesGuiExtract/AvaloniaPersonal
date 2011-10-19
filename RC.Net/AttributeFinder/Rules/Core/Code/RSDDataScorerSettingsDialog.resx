@@ -120,10 +120,18 @@
   <metadata name="groupBox3.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="_rsdFileNamePathTagsButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABKSURBVFhH7dIxCgAgDARB//9pxUKwsgiBsxj7C8vgGB4B
+        AgQIEKgLzPq0Z7kDohEnIBZxB0QivhHo+VGFKxH2QqcJAQIECBB4CyyqxA/xREJjJwAAAABJRU5ErkJg
+        gg==
+</value>
+  </data>
   <metadata name="groupBox1.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="_scoreExpressionInfoTip.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
@@ -138,14 +146,16 @@
 Framework expression engine to generate the score. The expression can use standard
 mathematical operators as well many .Net methods (any that are available in mscorlib). 
 
-The expression must reference the same set of attributes defined in the rule set; if either
-the expression or the rule set contains an attribute not in the other, an exception will be
-thrown at runtime. The result of the expression must be an integer.
+The result of the expression must be an integer.
 
 An array of attribute values interpreted as integers (or zero for any that cannot be
 interpreted as an integer) can be included by using the attribute name prefixed with '#'.
 There will be as many items in the array as there are attributes by the specified name.
 Likewise, to use an array interpreted as strings, use the attribute name prefixed with '$'.
+
+If there are no attributes found of the specified name, the array will still exist, it will just
+be empty. For example, it is valid to use #ScorePart.sum() even if there are no ScorePart
+attributes found-- the result will be zero.
 
 The expression engine includes a number of methods for operating on arrays: count, sum,
 average, min, max, distinct, sort, among others. Alternatively, a specific instance in the
@@ -179,13 +189,5 @@ When reading this documentation, note the expression entered is passed with a nu
 and with variables that have been populated from the attribute values. Also note that the
 $[name] syntax to reference the string value is not supported by the Spring.Net framework
 itself, but is instead converted by this rule to a "#" prefixed variable.</value>
-  </data>
-  <data name="_rsdFileNamePathTagsButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABKSURBVFhH7dIxCgAgDARB//9pxUKwsgiBsxj7C8vgGB4B
-        AgQIEKgLzPq0Z7kDohEnIBZxB0QivhHo+VGFKxH2QqcJAQIECBB4CyyqxA/xREJjJwAAAABJRU5ErkJg
-        gg==
-</value>
   </data>
 </root>
