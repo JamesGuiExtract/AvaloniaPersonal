@@ -8,7 +8,7 @@
 // globals
 const unsigned long gulFOLDER_LISTENER_BUF_SIZE	 = 65536;
 const string gstrTIME_BETWEEN_LISTENING_RESTARTS_KEY = "FEL_TimeBetweenListeningRestarts";
-const unsigned long gulDEFAULT_TIME_BETWEEN_RESTARTS = 60000; // 60 seconds
+const unsigned long gulDEFAULT_TIME_BETWEEN_RESTARTS = 5000; // 5 seconds
 const unsigned long gulTIME_TO_WAIT_FOR_THREAD_EXIT = 10000; // 10 seconds
 
 //-------------------------------------------------------------------------------------------------
@@ -137,12 +137,15 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 		// let the the creating thread know it is ok to continue
 		fl->m_eventListeningStarted.signal();
 		
-		unsigned long ulTimeBetweenRestarts = gulDEFAULT_TIME_BETWEEN_RESTARTS;
+		unsigned long ulTimeBetweenRestarts = fl->getTimeBetweenListeningRestarts();
 		_lastCodePos = "30";
 
 		// Variable to track the number of times listening is started
 		// This will be used to track the number of calls to getListeningHandle
 		int nListeningStartCount = 0;
+
+		// Tracks the number of consecutive times we attempt to start listening.
+		int nListeningStartAttemptCount = 0;
 		
 		// Allocate buffers for the change operations
 		lpFileBuffer = new BYTE[gulFOLDER_LISTENER_BUF_SIZE];
@@ -176,100 +179,135 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 			// Listening handle for changes in the files
 			HANDLE hFile = NULL;
 
+			// Indicates whether listenting started correctly this iteration.
+			bool bListeningStarted = false;
+			nListeningStartAttemptCount++;
+
 			try
 			{
-				// Handle for file changes
-				hFile = fl->getListeningHandle(fl->m_strFolderToListenTo);
-				_lastCodePos = "90";
-
-				nListeningStartCount++;
-
-				// Log an exception each time listening starts 
-				UCLIDException ueStart("ELI29123", "Application trace: Listening started.");
-				ueStart.addDebugInfo("Number times started", nListeningStartCount);
-				ueStart.addDebugInfo("Folder",  fl->m_strFolderToListenTo);
-				ueStart.log();
-
-				bool bDone = false;
-				do
-				// There are many flags that can be specified other than FILE_NOTIFY_CHANGE_FILE_NAME
+				try
 				{
-					// Start listening for file changes
-					fl->beginChangeListen(hFile, 
-						FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_SIZE,
-						lpFileBuffer, oFileChanges,  bRecursive);
-					_lastCodePos = "100";
+					// Handle for file changes
+					hFile = fl->getListeningHandle(fl->m_strFolderToListenTo);
+					_lastCodePos = "90";
 
-					// Wait for changes or a kill signal
-					DWORD dwWaitResult = WaitForMultipleObjects( 2, (HANDLE *)&handles, FALSE, INFINITE );
-					_lastCodePos = "110";
+					bListeningStarted = true;
+					nListeningStartCount++;
 
-					if ( dwWaitResult == WAIT_OBJECT_0 )
+					// Log an exception each time listening starts 
+					UCLIDException ueStart("ELI29123", "Application trace: Listening started.");
+					ueStart.addDebugInfo("Number times started", nListeningStartCount);
+					ueStart.addDebugInfo("Folder",  fl->m_strFolderToListenTo);
+					if (nListeningStartAttemptCount > 1)
 					{
-						// File changes were detected
-						_lastCodePos = "120";
+						ueStart.addDebugInfo("Attempts required",  nListeningStartAttemptCount);
+					}
+					ueStart.log();
 
-						DWORD dwBytesTransfered;
+					nListeningStartAttemptCount = 0;
 
-						// This call will wait for the event in the oChanges to be signalled so don't 
-						// reset it until after this call
-						int iResult = GetOverlappedResult( hFile, &oFileChanges, &dwBytesTransfered, TRUE );
-						_lastCodePos = "130";
-						if ( iResult == FALSE )
+					bool bDone = false;
+					do
+					// There are many flags that can be specified other than FILE_NOTIFY_CHANGE_FILE_NAME
+					{
+						// Start listening for file changes
+						fl->beginChangeListen(hFile, 
+							FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_SIZE,
+							lpFileBuffer, oFileChanges,  bRecursive);
+						_lastCodePos = "100";
+
+						// Wait for changes or a kill signal
+						DWORD dwWaitResult = WaitForMultipleObjects( 2, (HANDLE *)&handles, FALSE, INFINITE );
+						_lastCodePos = "110";
+
+						if ( dwWaitResult == WAIT_OBJECT_0 )
 						{
-							// Error geting the results
-							UCLIDException ue ("ELI13017", "Error getting file changes.");
-							ue.addWin32ErrorInfo();
-							ue.addDebugInfo("Folder", fl->m_strFolderToListenTo);
-							throw ue;
+							// File changes were detected
+							_lastCodePos = "120";
+
+							DWORD dwBytesTransfered;
+
+							// This call will wait for the event in the oChanges to be signalled so don't 
+							// reset it until after this call
+							int iResult = GetOverlappedResult( hFile, &oFileChanges, &dwBytesTransfered, TRUE );
+							_lastCodePos = "130";
+							if ( iResult == FALSE )
+							{
+								// Error geting the results
+								UCLIDException ue ("ELI13017", "Error getting file changes.");
+								ue.addWin32ErrorInfo();
+								ue.addDebugInfo("Folder", fl->m_strFolderToListenTo);
+								throw ue;
+							}
+
+							// reset the event
+							eventFileChangesReady.reset();
+							_lastCodePos = "140";
+
+							_lastCodePos = "150";
+
+							// Process the changes
+							fl->processChanges(fl->m_strFolderToListenTo, fl->m_eventKillThreads, lpFileBuffer, fl->m_queEvents, true );
+							_lastCodePos = "160";
+
+							// Check to see if Kill thread event was signaled
+							bDone = fl->m_eventKillThreads.isSignaled();
+							_lastCodePos = "170";
 						}
-
-						// reset the event
-						eventFileChangesReady.reset();
-						_lastCodePos = "140";
-
-						_lastCodePos = "150";
-
-						// Process the changes
-						fl->processChanges(fl->m_strFolderToListenTo, fl->m_eventKillThreads, lpFileBuffer, fl->m_queEvents, true );
-						_lastCodePos = "160";
-
-						// Check to see if Kill thread event was signaled
-						bDone = fl->m_eventKillThreads.isSignaled();
-						_lastCodePos = "170";
+						else
+						{
+							// The kill event was signaled
+							bDone = true;
+							_lastCodePos = "180";
+						}
 					}
-					else
-					{
-						// The kill event was signaled
-						bDone = true;
-						_lastCodePos = "180";
-					}
+					while (!bDone);
 				}
-				while (!bDone);
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI13161");
 			}
-			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI13161");
+			catch (UCLIDException &ue)
+			{
+				// Only log exceptions when the first attempt to connect fails, or we had previously
+				// been connected. Don't continue to log exceptions with each repeated failed
+				// connection.
+				if (nListeningStartAttemptCount <= 1)
+				{
+					if (!bListeningStarted)
+					{
+						ue = UCLIDException("ELI34047",
+							"Failed to access folder, starting retry attempts...", ue);
+					}
+
+					ue.log();
+				}
+			}
 
 			_lastCodePos = "190";
 
-			// Clean up
-			//Check to make sure the hFile was opened before trying to close it
-			// Cancel any pending overlapped operations
-			if (hFile != __nullptr)
+			try
 			{
-				CancelIo( hFile );
-				_lastCodePos = "200";
-				CloseHandle( hFile );
-				_lastCodePos = "210";
+				// Clean up
+				// Check to make sure the hFile was opened before trying to close it
+				// Cancel any pending overlapped operations
+				if (hFile != __nullptr)
+				{
+					CancelIo( hFile );
+					_lastCodePos = "200";
+					CloseHandle( hFile );
+					_lastCodePos = "210";
+				}
 			}
-			
-			_lastCodePos = "230";
-			ulTimeBetweenRestarts = fl->getTimeBetweenListeningRestarts();
-			_lastCodePos = "240";
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI34040");
 
-			// Log Application trace exception so there is an indication when listening has stopped
-			UCLIDException ueStop("ELI30303", "Application trace: Listening stopped.");
-			ueStop.addDebugInfo("Folder",  fl->m_strFolderToListenTo);
-			ueStop.log();
+			if (bListeningStarted)
+			{
+				_lastCodePos = "240";
+
+				// Log Application trace exception so there is an indication when listening has stopped
+				UCLIDException ueStop("ELI30303", "Application trace: Listening stopped.");
+				ueStop.addDebugInfo("Folder",  fl->m_strFolderToListenTo);
+				ueStop.log();
+			}
 		}
 		while (fl->m_eventKillThreads.wait( ulTimeBetweenRestarts ) == WAIT_TIMEOUT );
 	}
