@@ -782,8 +782,7 @@ Returns:
 *****************************************************/
 BOOL CUGTab::PreCreateWindow( CREATESTRUCT& cs ) 
 {
-	// 10/17/2011 Hoping removing WS_CLIPCHILDREN fixes LegacyRCAndUtils:6145
-	//cs.style |= WS_CLIPCHILDREN;	
+	cs.style |= WS_CLIPCHILDREN;	
 	return CWnd::PreCreateWindow( cs );
 }
 

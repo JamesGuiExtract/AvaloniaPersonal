@@ -1417,8 +1417,7 @@ Returns:
 *****************************************************/
 BOOL CUGGrid::PreCreateWindow(CREATESTRUCT& cs)
 {
-	// 10/17/2011 Hoping removing WS_CLIPCHILDREN fixes LegacyRCAndUtils:6145
-	//cs.style = cs.style | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+	cs.style = cs.style | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
 	return CWnd::PreCreateWindow(cs);
 }
 

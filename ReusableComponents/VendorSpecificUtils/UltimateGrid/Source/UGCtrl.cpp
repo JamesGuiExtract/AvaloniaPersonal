@@ -828,8 +828,7 @@ PreCreateWindow
 ****************************************************/
 BOOL CUGCtrl::PreCreateWindow(CREATESTRUCT& cs) 
 {
-	// 10/17/2011 Hoping removing WS_CLIPCHILDREN fixes LegacyRCAndUtils:6145
-	//cs.style |= WS_CLIPCHILDREN;
+	cs.style |= WS_CLIPCHILDREN;
 	return CWnd::PreCreateWindow(cs);
 }
 /************************************************
@@ -888,8 +887,7 @@ BOOL CUGCtrl::AttachGrid(CWnd * wnd,UINT ID){
 	if( SubclassDlgItem(ID,wnd))
 	{
 		long style = GetWindowLong(m_hWnd,GWL_STYLE);
-		// 10/17/2011 Hoping removing WS_CLIPCHILDREN fixes LegacyRCAndUtils:6145
-		style = style/*|WS_CLIPCHILDREN*/|WS_TABSTOP;
+		style = style|WS_CLIPCHILDREN|WS_TABSTOP;
 		SetWindowLong(m_hWnd,GWL_STYLE,style);
 
 		// if the parent window is specified
