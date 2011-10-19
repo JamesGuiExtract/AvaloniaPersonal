@@ -315,36 +315,36 @@ STDMETHODIMP CFileProcessingTaskExecutor::Standby(VARIANT_BOOL *pVal)
 		Win32Event eventCancelProcessing;
 		DWORD dwWaitResult;
 
-		// Since Standby occurs on a different thread than Init & Close, we need to be sure that the
-		// initialization state remains constant until we are done accessing m_vecProcessingTasks.
-		{
-			CSingleLock lg(&m_mutex, TRUE);
-
-			// If we are no longer initialized, no need to initialize standby.
-			if (!m_bInitialized)
-			{
-				return S_OK;
-			}
-
-			m_eventEndStandby.reset();
-
-			// For each task, spawn a thread to call Standby.
-			for (vector< unique_ptr<ProcessingTask> >::iterator iterTask = m_vecProcessingTasks.begin();
-				 iterTask != m_vecProcessingTasks.end();
-				 iterTask++)
-			{
-				if (iterTask->get()->Enabled)
-				{
-					StandbyThread *pStandbyThread = new StandbyThread(eventCancelProcessing, *iterTask);
-					vecStandbyThreads.push_back(pStandbyThread);
-
-					pStandbyThread->CreateThread();
-				}
-			}
-		}
-
 		try
 		{
+			// Since Standby occurs on a different thread than Init & Close, we need to be sure that the
+			// initialization state remains constant until we are done accessing m_vecProcessingTasks.
+			{
+				CSingleLock lg(&m_mutex, TRUE);
+
+				// If we are no longer initialized, no need to initialize standby.
+				if (!m_bInitialized)
+				{
+					return S_OK;
+				}
+
+				m_eventEndStandby.reset();
+
+				// For each task, spawn a thread to call Standby.
+				for (vector< unique_ptr<ProcessingTask> >::iterator iterTask = m_vecProcessingTasks.begin();
+					 iterTask != m_vecProcessingTasks.end();
+					 iterTask++)
+				{
+					if (iterTask->get()->Enabled)
+					{
+						StandbyThread *pStandbyThread = new StandbyThread(eventCancelProcessing, *iterTask);
+						vecStandbyThreads.push_back(pStandbyThread);
+
+						pStandbyThread->CreateThread();
+					}
+				}
+			}
+		
 			HANDLE pEventHandles[] = { eventCancelProcessing.getHandle(), m_eventEndStandby.getHandle() };
 		
 			// Wait for either processing to be cancelled or standby mode to end.
