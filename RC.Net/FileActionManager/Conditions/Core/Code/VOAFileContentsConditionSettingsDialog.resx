@@ -185,8 +185,8 @@ Examples:
   </data>
   <data name="_comparisonInfoTip.TipText" xml:space="preserve">
     <value>If a comparison involving greater than or less than is specified and the value to compare against
-is a number, the specified attribute field value must be number to qualify for meeting
-the comparison.
+is numeric, the specified attribute field value must be numeric to qualify for meeting the
+comparison.
 
 If an equals or not equals comparison is specified or the value to compare against is not
 a number, the values will be compared lexicographically (alphabetically).</value>
@@ -201,7 +201,7 @@ a number, the values will be compared lexicographically (alphabetically).</value
 </value>
   </data>
   <data name="_rangeInfoTip.TipText" xml:space="preserve">
-    <value>If both the range start and end values are numbers, the specified attribute field value must be number to qualify to be in the range.
+    <value>If both the range start and end values are numeric, the specified attribute field value must be numeric to qualify to be in the range.
 Otherwise, the values will be compared lexicographically (alphabetically).</value>
   </data>
 </root>

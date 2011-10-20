@@ -189,7 +189,7 @@ STDMETHODIMP CMathematicalCondition::raw_GetComponentDescription(BSTR * pstrComp
 	{
 		ASSERT_ARGUMENT("ELI27148", pstrComponentDescription != __nullptr)
 
-		*pstrComponentDescription = _bstr_t("Match based upon mathematical condition").Detach();
+		*pstrComponentDescription = _bstr_t("Mathematical condition").Detach();
 
 		return S_OK;
 	}

@@ -374,7 +374,7 @@ STDMETHODIMP CFileNamePattern::raw_GetComponentDescription(BSTR * pstrComponentD
 	{
 		ASSERT_ARGUMENT("ELI19637", pstrComponentDescription != __nullptr)
 
-		*pstrComponentDescription = _bstr_t("Match based upon file name pattern").Detach();
+		*pstrComponentDescription = _bstr_t("File name pattern condition").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13635")
 

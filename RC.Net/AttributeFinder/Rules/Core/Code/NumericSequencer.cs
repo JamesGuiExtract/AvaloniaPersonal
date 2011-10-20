@@ -108,6 +108,27 @@ namespace Extract.AttributeFinder.Rules
         #region Fields
 
         /// <summary>
+        /// Indicatees whether to expand hyphenated ranges, or contract individual numbers into
+        /// hypenated ranges.
+        /// </summary>
+        bool _expandSequence;
+
+        /// <summary>
+        /// Indicates whether to sort the output
+        /// </summary>
+        bool _sort;
+
+        /// <summary>
+        /// Indicates whether to sort in ascending or descending order if sorting.
+        /// </summary>
+        bool _ascendingSortOrder;
+
+        /// <summary>
+        /// Indicates whether to eliminate duplicates in the output.
+        /// </summary>
+        bool _eliminateDuplicates;
+
+        /// <summary>
         /// <see langword="true"/> if changes have been made to <see cref="NumericSequencer"/>
         /// since it was created; <see langword="false"/> if no changes have been made since it was
         /// created.
@@ -168,8 +189,19 @@ namespace Extract.AttributeFinder.Rules
         /// </value>
         public bool ExpandSequence
         {
-            get;
-            set;
+            get
+            {
+                return _expandSequence;
+            }
+
+            set
+            {
+                if (value != _expandSequence)
+                {
+                    _expandSequence = value;
+                    _dirty = true;
+                }
+            }
         }
 
         /// <summary>
@@ -182,8 +214,19 @@ namespace Extract.AttributeFinder.Rules
         /// </value>
         public bool Sort
         {
-            get;
-            set;
+            get
+            {
+                return _sort;
+            }
+
+            set
+            {
+                if (value != _sort)
+                {
+                    _sort = value;
+                    _dirty = true;
+                }
+            }
         }
 
         /// <summary>
@@ -195,8 +238,19 @@ namespace Extract.AttributeFinder.Rules
         /// </value>
         public bool AscendingSortOrder
         {
-            get;
-            set;
+            get
+            {
+                return _ascendingSortOrder;
+            }
+
+            set
+            {
+                if (value != _ascendingSortOrder)
+                {
+                    _ascendingSortOrder = value;
+                    _dirty = true;
+                }
+            }
         }
 
         /// <summary>
@@ -207,8 +261,19 @@ namespace Extract.AttributeFinder.Rules
         /// </value>
         public bool EliminateDuplicates
         {
-            get;
-            set;
+            get
+            {
+                return _eliminateDuplicates;
+            }
+
+            set
+            {
+                if (value != _eliminateDuplicates)
+                {
+                    _eliminateDuplicates = value;
+                    _dirty = true;
+                }
+            }
         }
         
         #endregion Properties

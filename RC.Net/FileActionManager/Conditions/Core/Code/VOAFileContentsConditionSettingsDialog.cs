@@ -121,11 +121,19 @@ namespace Extract.FileActionManager.Conditions
 
                 _inListRadioButton.CheckedChanged += ((sender, args) =>
                     {
+                        bool itemSelected = _matchListBox.SelectedItems.Count > 0;
                         _matchListBox.Enabled = _inListRadioButton.Checked;
                         _addButton.Enabled = _inListRadioButton.Checked;
-                        _removeButton.Enabled = _inListRadioButton.Checked;
-                        _modifyButton.Enabled = _inListRadioButton.Checked;
+                        _removeButton.Enabled = _inListRadioButton.Checked && itemSelected;
+                        _modifyButton.Enabled = _inListRadioButton.Checked && itemSelected;
                         _regexCheckBox.Enabled = true;
+                    });
+
+                _matchListBox.SelectedIndexChanged += ((sender, args) =>
+                    {
+                        bool itemSelected = _matchListBox.SelectedItems.Count > 0;
+                        _modifyButton.Enabled = itemSelected;
+                        _removeButton.Enabled = itemSelected;
                     });
             }
             catch (Exception ex)

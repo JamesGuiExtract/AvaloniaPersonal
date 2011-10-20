@@ -291,7 +291,7 @@
             this._addButton.Name = "_addButton";
             this._addButton.Size = new System.Drawing.Size(75, 23);
             this._addButton.TabIndex = 28;
-            this._addButton.Text = "Add";
+            this._addButton.Text = "Add...";
             this._addButton.UseVisualStyleBackColor = true;
             this._addButton.Click += new System.EventHandler(this.HandleListAddButtonClick);
             // 
@@ -303,7 +303,7 @@
             this._modifyButton.Name = "_modifyButton";
             this._modifyButton.Size = new System.Drawing.Size(75, 23);
             this._modifyButton.TabIndex = 30;
-            this._modifyButton.Text = "Modify";
+            this._modifyButton.Text = "Modify...";
             this._modifyButton.UseVisualStyleBackColor = true;
             this._modifyButton.Click += new System.EventHandler(this.HandleListModifyButtonClick);
             // 
@@ -381,7 +381,7 @@
             this._regexInfoTip.Size = new System.Drawing.Size(16, 16);
             this._regexInfoTip.TabIndex = 33;
             this._regexInfoTip.TabStop = false;
-            this._regexInfoTip.TipText = "When not performing greater than or less that comparisons, any specified values w" +
+            this._regexInfoTip.TipText = "When not performing greater than or less than comparisons, any specified values w" +
     "ill be treated\r\nas reqular expressions that, unless otherwise specified, fully m" +
     "atch the specified attribute field.";
             // 

@@ -1337,6 +1337,15 @@ UINT shellOpenDocumentThread(LPVOID pParam)
 		int nRes = (int)ShellExecute(NULL, "open", pszFilename, NULL, strFolder.c_str(),
 			SW_SHOWNORMAL);
 
+		// Per a comment here:
+		// http://msdn.microsoft.com/en-us/library/windows/desktop/bb762153(v=vs.85).aspx
+		// used "runas" to prompt for elevated permissions if necessary.
+		if (nRes == SE_ERR_ACCESSDENIED)
+		{
+			nRes = (int)ShellExecute(NULL, "runas", pszFilename, NULL, strFolder.c_str(),
+				SW_SHOWNORMAL);
+		}
+
 		// Per MDSN for ShellExecute: 0-32 represent error values
 		if (nRes >= 0 && nRes <= 32)
 		{
@@ -1353,7 +1362,6 @@ UINT shellOpenDocumentThread(LPVOID pParam)
 //-------------------------------------------------------------------------------------------------
 void shellOpenDocument(const string& strFilename)
 {
-	// [LegacyRCAndUtils:6113]
 	// ShellExecute may fail when run in a thread with COM initialized as multi-threaded:
 	// http://support.microsoft.com/default.aspx?scid=287087
 	// Rather than require any calling threads to be initialized as such, create a separate thread

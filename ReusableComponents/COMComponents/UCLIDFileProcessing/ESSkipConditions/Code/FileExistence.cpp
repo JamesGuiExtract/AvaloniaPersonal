@@ -173,7 +173,7 @@ STDMETHODIMP CFileExistence::raw_GetComponentDescription(BSTR * pstrComponentDes
 	{
 		ASSERT_ARGUMENT("ELI19636", pstrComponentDescription != __nullptr)
 
-		*pstrComponentDescription = _bstr_t("Match based upon file existence").Detach();
+		*pstrComponentDescription = _bstr_t("File existence condition").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13518")
 

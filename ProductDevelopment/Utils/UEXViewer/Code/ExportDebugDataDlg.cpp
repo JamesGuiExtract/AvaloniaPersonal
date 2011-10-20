@@ -237,7 +237,7 @@ void CExportDebugDataDlg::getDebugDataFromException(vector<string> &rvecDebugPar
 	for (int i = 0; i < nSize; i++)
 	{
 		// Compare the name to the name that is being exported
-		if (vecDebug[i].GetName().c_str() == m_zDebugParamToExport)
+		if (_stricmp(vecDebug[i].GetName().c_str(), m_zDebugParamToExport) == 0)
 		{
 			// Get the Pair
 			ValueTypePair &pair = vecDebug[i].GetPair();
