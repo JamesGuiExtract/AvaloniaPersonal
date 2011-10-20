@@ -231,7 +231,7 @@ void CLicenseWizard::OnOpenLicenseFolder()
 
 	try
 	{
-		shellOpenDocument(getExtractLicenseFilesPath());
+		runEXE("explorer", getExtractLicenseFilesPath());
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32572");
 }
