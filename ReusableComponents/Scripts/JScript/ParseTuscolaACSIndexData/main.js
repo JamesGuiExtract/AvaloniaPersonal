@@ -17,6 +17,7 @@ function main(args) {
     var inputFile = fso.getAbsolutePathName(args[0]);
     var outputDir = fso.getAbsolutePathName(args[1]);
     var imageFiles = fso.GetFolder(fso.BuildPath(fso.getParentFolderName(outputDir), "Images")).Files;
+    var files = new Enumerator(imageFiles);
     var imageMap = {};
     for (; !files.atEnd(); files.moveNext()) {
         var f = files.item();
