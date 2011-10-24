@@ -1462,6 +1462,14 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 		}
 		else
 		{
+			// [FlexIDSCore:4907]
+			// If the return type is text, we can just short circuit since there is no spatial text
+			// on the page.
+			if (m_eReturnType == kReturnText)
+			{
+				return __nullptr;
+			}
+
 			// If spatial info is not available for this page, retrieve the height and width from
 			// the image itself.
 			getImagePixelHeightAndWidth(strSourceDoc, (int &)nHeight, (int &)nWidth, nPageNum);
