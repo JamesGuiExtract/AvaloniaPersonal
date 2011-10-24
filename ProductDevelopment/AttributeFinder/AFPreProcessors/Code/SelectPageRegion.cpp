@@ -663,9 +663,6 @@ STDMETHODIMP CSelectPageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressStat
 		
 		for (long i = 1; i <= nLastPageNumber; i++)
 		{
-			int nHeight(-1), nWidth(-1);
-			getImagePixelHeightAndWidth(strSourceDoc, nHeight, nWidth, i);
-
 			// Check the page specification
 			bool bPageSpecified = find(vecPageNumbers.begin(), vecPageNumbers.end(), 
 				i) != vecPageNumbers.end();
@@ -675,8 +672,8 @@ STDMETHODIMP CSelectPageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressStat
 				: ipInputText->GetSpecifiedPages(i, i);
 
 			// Get the appropriate content for this page
-			ISpatialStringPtr ipContentFromThisPage = getRegionContent(ipPageText, 
-				bPageSpecified, bRestrictionDefined, i, nWidth, nHeight);
+			ISpatialStringPtr ipContentFromThisPage = getRegionContent(ipPageText, strSourceDoc,
+				bPageSpecified, bRestrictionDefined, i);
 
 			// Provide non-NULL content to an Attribute to be included in the collection
 			if (ipContentFromThisPage != __nullptr)
@@ -754,9 +751,6 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 		// Step through each page of the document
 		for (long i=1; i <= nLastPageNumber; i++)
 		{
-			int nWidth(-1), nHeight(-1);
-			getImagePixelHeightAndWidth(strSourceDoc, nHeight, nWidth, i);
-
 			// If the page is specifed
 			bool bPageSpecified = find(vecActualPageNumbers.begin(), vecActualPageNumbers.end(), 
 				i) != vecActualPageNumbers.end();
@@ -766,7 +760,7 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 				: ipInputText->GetSpecifiedPages(i, i);
 
 			ISpatialStringPtr ipContentFromThisPage = getRegionContent(ipPageText,
-				bPageSpecified, bRestrictionDefined, i, nWidth, nHeight);
+				strSourceDoc, bPageSpecified, bRestrictionDefined, i);
 
 			// Append non-NULL content to the result string
 			if (ipContentFromThisPage != __nullptr)
@@ -1433,8 +1427,7 @@ bool CSelectPageRegion::isStringFoundOnPage(string strPageText)
 }
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStringPtr& ipOriginPage,
-															  long nPageNum, long nWidth,
-															  long nHeight, bool bPageSpecified)
+									const string& strSourceDoc, long nPageNum, bool bPageSpecified)
 {
 	try
 	{
@@ -1447,6 +1440,32 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 		m_ipSpatialStringSearcher->InitSpatialStringSearcher(ipOriginPage);
 
 		ISpatialStringPtr ipResult(NULL);
+
+		long nWidth;
+		long nHeight;
+
+		if (asCppBool(ipOriginPage->HasSpatialInfo()))
+		{
+			// Get the width and height of the page using the page info
+			// this will give us the real page boundaries as they relate to letter positions
+			nPageNum = ipOriginPage->GetFirstPageNumber();
+			ISpatialPageInfoPtr ipPageInfo = ipOriginPage->GetPageInfo(nPageNum);
+			if(ipPageInfo == __nullptr)
+			{
+				UCLIDException ue("ELI10502", "Unable to obtain spatial page info.");
+				ue.addDebugInfo("Page Number", nPageNum);
+				throw ue;
+			}
+
+			// Get the width and height of the page
+			ipPageInfo->GetWidthAndHeight(&nWidth, &nHeight);
+		}
+		else
+		{
+			// If spatial info is not available for this page, retrieve the height and width from
+			// the image itself.
+			getImagePixelHeightAndWidth(strSourceDoc, (int &)nHeight, (int &)nWidth, nPageNum);
+		}
 
 		// Compute current page's boundary
 		long nLeft(0), nTop(0), nRight(nWidth), nBottom(nHeight);
@@ -1472,8 +1491,7 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 		ipRect->SetBounds(nLeft, nTop, nRight, nBottom);
 
 		// Get extension of source file
-		string strPath = asString( ipOriginPage->SourceDocName );
-		string strExt = getExtensionFromFullPath( strPath );
+		string strExt = getExtensionFromFullPath(strSourceDoc);
 
 		// calculate the region
 		switch(m_eReturnType)
@@ -1525,7 +1543,7 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 					// Whiten the specified zone on this page - to a temporary file
 					TemporaryFileName tmpFile2( true, NULL, strExt.c_str(), true );
 					string strTempFileName2 = tmpFile2.getName();
-					excludeImageZone(strPath, strTempFileName2, nPageNum, nLeft, nTop, nRight, nBottom);
+					excludeImageZone(strSourceDoc, strTempFileName2, nPageNum, nLeft, nTop, nRight, nBottom);
 
 					// Get the text from entire remaining area on the page
 					ipResult = getOCREngine()->RecognizeTextInImageZone(strTempFileName2.c_str(), 1, 1, 
@@ -1534,7 +1552,7 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 					ASSERT_RESOURCE_ALLOCATION( "ELI28127", ipResult != __nullptr );
 
 					// Assign original filename to Spatial String
-					ipResult->SourceDocName = strPath.c_str();
+					ipResult->SourceDocName = strSourceDoc.c_str();
 
 					// Update the page number to the appropriate page
 					ipResult->UpdatePageNumber(nPageNum);
@@ -1551,7 +1569,7 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 					}
 
 					// Get the text from specified area after rotation
-					ipResult = getOCREngine()->RecognizeTextInImageZone(strPath.c_str(), 
+					ipResult = getOCREngine()->RecognizeTextInImageZone(strSourceDoc.c_str(), 
 						nPageNum, nPageNum, ipRect, nActualRotation, kNoFilter, "", VARIANT_FALSE, 
 						VARIANT_FALSE, VARIANT_TRUE, NULL );
 					ASSERT_RESOURCE_ALLOCATION( "ELI12698", ipResult != __nullptr );
@@ -1595,7 +1613,7 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 					ASSERT_RESOURCE_ALLOCATION("ELI28136", ipZone != __nullptr);
 					ipZone->CreateFromLongRectangle(ipRect, nPageNum);
 					ipResult->CreatePseudoSpatialString(ipZone, m_strTextToAssign.c_str(),
-						strPath.c_str(), ipPageInfos);
+						strSourceDoc.c_str(), ipPageInfos);
 				}
 				// Exclude for the specified page, build the appropriate
 				// set of raster zones
@@ -1612,14 +1630,14 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 						IRasterZonePtr ipZone = ipZones->At(0);
 						ASSERT_RESOURCE_ALLOCATION("ELI28162", ipZone != __nullptr);
 						ipResult->CreatePseudoSpatialString(ipZone,
-							m_strTextToAssign.c_str(), strPath.c_str(), ipPageInfos);
+							m_strTextToAssign.c_str(), strSourceDoc.c_str(), ipPageInfos);
 					}
 					// Create a hybrid string if there is more than 1 zone
 					else if (lSize > 1)
 					{
 						// Create a new hybrid string
 						ipResult->CreateHybridString(ipZones, m_strTextToAssign.c_str(),
-							strPath.c_str(), ipPageInfos);
+							strSourceDoc.c_str(), ipPageInfos);
 					}
 					// Leave the string empty if there are no zones
 				}
@@ -1657,8 +1675,7 @@ IOCREnginePtr CSelectPageRegion::getOCREngine()
 }
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CSelectPageRegion::getRegionContent(const ISpatialStringPtr& ipPageText, 
-													  bool bPageSpecified, bool bRestrictionDefined,
-													  long nPageNum, long nWidth, long nHeight)
+	const string& strSourceDoc, bool bPageSpecified, bool bRestrictionDefined, long nPageNum)
 {
 	// Get the desired Spatial String portion for this page depending on:
 	//	bRestrictionDefined - whether or not a subregion has been defined
@@ -1675,7 +1692,7 @@ ISpatialStringPtr CSelectPageRegion::getRegionContent(const ISpatialStringPtr& i
 	{
 		// If including and the page is specified OR excluding and the page is not
 		// specified, then return the contents of the page based on the current settings
-		ipSS = getIndividualPageContent( ipPageText, nPageNum, nWidth, nHeight, bPageSpecified );
+		ipSS = getIndividualPageContent( ipPageText, strSourceDoc, nPageNum, bPageSpecified);
 	}
 
 	// Return the appropriate Spatial String

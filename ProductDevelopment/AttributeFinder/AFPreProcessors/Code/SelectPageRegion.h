@@ -218,13 +218,13 @@ private:
 
 	// return actual page content based on the restriction defined
 	ISpatialStringPtr getIndividualPageContent(const ISpatialStringPtr& ipOriginPage,
-		long nPageNum, long nWidth, long nHeight, bool bPageSpecified);
+		const string& strSourceDoc, long nPageNum, bool bPageSpecified);
 
 	IOCREnginePtr getOCREngine();
 
 	// based on the specific page and selection, get the actual string out
-	ISpatialStringPtr getRegionContent(const ISpatialStringPtr& ipPageText, bool bPageSpecified,
-		bool bRestrictionDefined, long nPageNum=0, long nWidth=-1, long nHeight=-1);
+	ISpatialStringPtr getRegionContent(const ISpatialStringPtr& ipPageText, const string& strSourceDoc,
+		bool bPageSpecified, bool bRestrictionDefined, long nPageNum=0);
 
 	// check the horizontal and vertical restrictions to see if at least one
 	// of them is defined.

@@ -654,7 +654,7 @@ namespace Extract.AttributeFinder.Rules
         /// <param name="attribute">The <see cref="ComAttribute"/> whose value should be processed.
         /// </param>
         /// <returns>The <see cref="ComAttribute"/>s found by the <see paramref="ruleSet"/>.</returns>
-        IEnumerable<ComAttribute> GetFoundAttributes(RuleSet ruleSet, ComAttribute attribute)
+        static IEnumerable<ComAttribute> GetFoundAttributes(RuleSet ruleSet, ComAttribute attribute)
         {
             // Use ComObjectReleaser on the RuleExecutionSession so that the current RSD file name is
             // handled correctly.
@@ -664,19 +664,11 @@ namespace Extract.AttributeFinder.Rules
                 ComObjectReleaser.ManageObjects(session);
                 session.SetRSDFileName(ruleSet.FileName);
 
-                // Convert _variableNames into a VariantVector. 
-                VariantVector variableNamesVector = new VariantVector();
-                foreach (string variableName in _variableNames)
-                {
-                    variableNamesVector.PushBack(variableName);
-                }
-
                 // Turn the supplied attribute into an AFDocument to run the rules against.
                 AFDocument afDoc = new AFDocument();
                 afDoc.Text = attribute.Value;
 
-                IUnknownVector foundAttributes =
-                    ruleSet.ExecuteRulesOnText(afDoc, variableNamesVector, null);
+                IUnknownVector foundAttributes = ruleSet.ExecuteRulesOnText(afDoc, null, null);
 
                 return foundAttributes.ToIEnumerable<ComAttribute>();
             }
