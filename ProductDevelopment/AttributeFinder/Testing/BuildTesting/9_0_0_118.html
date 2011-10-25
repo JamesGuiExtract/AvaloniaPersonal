@@ -1,0 +1,278 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0.0.118 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0.0.118 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DotNet #648]</b> FTP Licensing
+        	<ul>
+			<li>Confirm that the <b>Files from FTP site</b> file supplier requires 
+			an <b>FTP/SFTP file transfer</b> license.
+			<li>Confirm that the <b>Core: Transer file via FTP/SFTP</b> task requires 
+			an <b>FTP/SFTP file transfer</b> license.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #691, #692]</b> VOA File Contents Condition
+        	<ul>
+			<li>Confirm that the property page buttons are <b>Add...</b> 
+			and <b>Modify...</b>
+			<li>Confirm that the <b>Remove</b> and <b>Modify...</b> buttons 
+			are only enabled if something is selected in the list box.
+			<li>Confirm that the text in the balloon help is spelled 
+			correctly and uses proper grammar.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #723]</b> Confirm that <b>FAM Network Manager</b> requires 
+		a <b>Server</b> license.
+<p>
+  	   	<LI><b>[DotNet #730]</b> Confirm that the default value for <b>Number 
+		of files to process per FAM instance</b> in the <b>Settings</b> table is 
+		<b>1000</b>.
+<p>
+  	   	<LI><b>[FlexIDSCore #3727]</b> Confirm that the minimum number of clues 
+		required to find a block using the <b>Block Finder</b> is capped at a 
+		reasonable number.
+<p>
+  	   	<LI><b>[FlexIDSCore #4794, #4907]</b> Spatial String Page Dimensions
+        	<ul>
+			<li>Exercise <b>Select Page Region</b> rules.
+			<li>Confirm that processing speed is acceptable.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4795]</b> Grammar Correction
+        	<ul>
+			<li>Configure a <b>Core: Extract image area</b> task incorrectly so that 
+			the output filename contains an <b>&lt;AreaID&gt;</b> tag.
+			<li>Confirm that the error message is grammatically correct.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4824]</b> REPM Property Page
+        	<ul>
+			<li>Select and configure a <b>Regular expression pattern matcher</b> 
+			object.
+			<li>Confirm that the <b>Pattern File</b> group box label is in title 
+			case.
+			<li>Confirm that the <b>Case sensitive</b> match option is in 
+			sentence case.
+			<li> Confirm <b>Use the following Data Scorer object to determine 
+			validity of match</b> as a label.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4826]</b> ID Shield On Demand
+        	<ul>
+			<li>Select an image with an associated VOA file.
+			<li>Open the image in <b>IDSOD</b> via command line or 
+			<b>Open with...</b> from an Explorer Window context menu.
+			<li>Confirm that the VOA file data are displayed when the image opens.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4829]</b> Property page captions
+        	<ul>
+			<li>Confirm <b>Redaction: Verify sensitive data settings</b>.
+			<li>Confirm <b>Core: Apply Bates number settings</b>.
+			<li>Confirm <b>Core: Clean up image settings</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4851]</b> Latest FKB Version
+        	<ul>
+			<li>Create an RSD file that uses a counter.
+			<li>Provide <b>&quot;latest&quot;</b> as the FKB version.
+			<li>Confirm proper operation of the rules.
+			<li>Modify the FKB Version to <b>&quot; latest &quot;</b>.
+			<li>Confirm proper operation of the rules.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4878]</b> Assignment of Rents REPM Rules
+        	<ul>
+			<li>Exercise the rules and image available at 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4878</b>.
+			<li>Confirm that the rules execute without a lengthy delay.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4879, #4880, #4881, #4883, #4884, #4885, #4886, 
+		#4887]</b> Automated Test and NRS Failures
+        	<ul>
+			<li>Exercise the installed automated tests and NRS tests.
+			<li>Confirm that the <b>Finding Rule Condition</b> tests 
+			all pass.
+			<li>Confirm that the <b>Loop Preprocessor</b> tests all pass.
+			<li>Confirm that the <b>Replace Strings Preprocessor</b> tests 
+			all pass.
+			<li>Confirm that the <b>Loop Finder</b> tests all pass.
+			<li>Confirm that the <b>OCR Image Area Value Modifier</b> 
+			tests all pass.
+			<li>Confirm that the <b>Pad Value Value Modifier</b> tests 
+			all pass.
+			<li>Confirm that the <b>Data Scorer Attribute Selector</b> 
+			tests all pass.
+			<li>Confirm that the <b>Indexing - Party Finder</b> tests 
+			all pass.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4902]</b> Confirm that <b>FindFromRSD</b> rules 
+		can be configured and exercised.
+<p>
+  	   	<LI><b>[FlexIDSCore #4905]</b> Confirm that validation of attributes names 
+		is no longer performed for the <b>RSD Data Scorer</b>.
+<p>
+  	   	<LI><b>[FlexIDSCore #4908]</b> Confirm that the <b>RSD Data Scorer</b> 
+		executes all attribute rules in the target ruleset.
+<p>
+  	   	<LI><b>[LegacyRC #5499]</b> Folder Browser Dialogs on Vista
+        	<ul>
+			<li>Confirm that browsing for a folder using the <b>Files from 
+			folder</b> file supplier does not take an unusually long time.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5623]</b> Folder File Supplier
+        	<ul>
+			<li>Confirm that the file supplier retries lost connections 
+			every 5 seconds via <b>HKLM\Software\Extract 
+			Systems\ReusableComponents\BaseUtils\FEL_TimeBetweenListeningRestarts</b>.
+			<li>Confirm that errors are only logged on initial connection attempts 
+			and on initial failure.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5713]</b> Confirm that the <b>Files from folder</b> 
+		file supplier includes <b>*.pdf</b> as an available file extension.
+<p>
+  	   	<LI><b>[LegacyRC #6062]</b> FTP File Supplier
+        	<ul>
+			<li>Confirm that the <b>Remote folder</b> definition is a combo box 
+			that saves recent entries.
+			<li>Confirm that the <b>File extension</b> definition is a combo box 
+			that saves recent entries.  The combo box should also be pre-populated 
+			with the usual file extensions.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6113]</b> Open License Folder
+        	<ul>
+			<li>Test this fix on <b>32-bit Vista</b> or <b>32-bit 2008 Server</b>.
+			<li>Confirm the the <b>Open license folder</b> button in the <b>User 
+			License</b> utility works properly.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6120]</b> Database Concurrency
+        	<ul>
+			<li>Exercise the FAM with repeated starting and stopping of processing.
+			<li>Exercise starting and stopping of verification, especially with 
+			an empty queue.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6128]</b> Captions for Legacy Condition Objects
+        	<ul>
+			<li>Confirm that the description text for all condition objects 
+			is written in the same style.
+			<ul>
+				<li>File existence condition
+				<li>File name pattern condition
+				<li>Mathematical condition
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6131]</b> Confirm that the name of the debug parameter 
+		to export from <b>UEXViewer.exe</b> is no longer case sensitive.  One 
+		example is <b>file</b> versus <b>File</b>.
+<p>
+  	   	<LI><b>[LegacyRC #6145]</b> FAM Window Refresh Issues
+        	<ul>
+			<li>Create and exercise an FPS file.
+			<li>Activate other applications and move the FAM window around the 
+			screen.
+			<li>Confirm that the FAM always redraws the window properly.
+			<li>Confirm that the rule list grid header is still visible in the 
+			<b>Rule Set Editor</b> after selecting File - New.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6174]</b> FAM Title Bar
+        	<ul>
+			<li>Open an FPS file and connect to a database.
+			<li>Confirm that the title bar indicates the server and database name.
+			<li>Create a different database with the same action names.
+			<li>Using the <b>Browse</b> button on the FAM Database tab, select 
+			and connect to the new database.
+			<li>Confirm that the title bar is updated to reflect the change.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6181]</b> Confirm that <b>TestTextFunctionExpander.exe</b> 
+		provides a meaningful error message and does not crash when run without a 
+		valid license.
+<p>
+  	   	<LI><b>[LegacyRC #6182]</b> Confirm that <b>not exactly equal to</b> fits 
+		properly in the combo box on the <b>File timestamp condition</b> property 
+		page.
+<p>
+  	   	<LI><b>[LegacyRC #6186]</b> Email File Error
+        	<ul>
+			<li>Bring up the Email File configuration dialog via <b>emailfile /c</b>.
+			<li>Provide an SMTP server and require authentication.
+			<li>Specify a password but no user name.
+			<li>Click the <b>Send test email</b> button.
+			<li>Confirm that the error text is correct.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6189]</b> UEX Viewer Shortcuts
+        	<ul>
+			<li>Open an exception log and select an exception.
+			<li>Press <b>Alt+V</b> to activate the <b>View</b> menu.
+			<li>Confirm that <b>A</b> is a shortcut for <b>Show application 
+			traces</b>.
+			<li>Confirm that <b>D</b> is a shortcut for <b>Show displayed 
+			exceptions</b>.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
