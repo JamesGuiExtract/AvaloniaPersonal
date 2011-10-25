@@ -541,14 +541,21 @@ namespace Extract.Redaction
                     .Select(item => item.Attribute.ComAttribute)
                     .Union(voaLoader.InsensitiveAttributes
                         .Where(attribute => attribute.Value.HasSpatialInfo()));
-                IUnknownVector attributeVector1 = set1OriginalAttributes.ToIUnknownVector();
 
                 // Find attributes from dataFile1 that have been turned off and archived under the
                 // revisions attribute.
-                HashSet<ComAttribute> turnedOffAttributes = new HashSet<ComAttribute>(
+                HashSet<ComAttribute> turnedOffAttributes1 = new HashSet<ComAttribute>(
                     voaLoader.Items
                         .Where(item => !item.Attribute.Redacted)
                         .Select(item => item.Attribute.ComAttribute));
+                IUnknownVector turnedOffAttributeVector1 = turnedOffAttributes1.ToIUnknownVector();
+
+                // [FlexIDSCore:4900]
+                // Turned-off attributes will be merged seperately so that turned off attributes
+                // don't get merged with turned-on attributes.
+                IUnknownVector attributeVector1 = set1OriginalAttributes
+                    .Except(turnedOffAttributes1)
+                    .ToIUnknownVector<ComAttribute>();
 
                 IEnumerable<ComAttribute> set1NonSpatial = voaLoader.InsensitiveAttributes
                     .Where(attribute => !attribute.Value.HasSpatialInfo());
@@ -561,16 +568,21 @@ namespace Extract.Redaction
                     .Select(item => item.Attribute.ComAttribute)
                     .Union(voaLoader.InsensitiveAttributes
                         .Where(attribute => attribute.Value.HasSpatialInfo()));
-                IUnknownVector attributeVector2 = set2OriginalAttributes.ToIUnknownVector();
 
                 // Find attributes from dataFile2 that have been turned off and archived under the
                 // revisions attribute.
-                foreach (ComAttribute turnedOffAttribute in voaLoader.Items
-                    .Where(item => !item.Attribute.Redacted)
-                    .Select(item => item.Attribute.ComAttribute))
-                {
-                    turnedOffAttributes.Add(turnedOffAttribute);
-                }
+                HashSet<ComAttribute> turnedOffAttributes2 = new HashSet<ComAttribute>(
+                    voaLoader.Items
+                        .Where(item => !item.Attribute.Redacted)
+                        .Select(item => item.Attribute.ComAttribute));
+                IUnknownVector turnedOffAttributeVector2 = turnedOffAttributes2.ToIUnknownVector();
+
+                // [FlexIDSCore:4900]
+                // Turned-off attributes will be merged seperately so that turned off attributes
+                // don't get merged with turned-on attributes.
+                IUnknownVector attributeVector2 = set2OriginalAttributes
+                    .Except(turnedOffAttributes2)
+                    .ToIUnknownVector<ComAttribute>();
 
                 IEnumerable<ComAttribute> set2NonSpatial = voaLoader.InsensitiveAttributes
                     .Where(attribute => !attribute.Value.HasSpatialInfo());
@@ -618,11 +630,25 @@ namespace Extract.Redaction
                     attributeMerger.ApplyMerges(attributeVector1);
                     attributeMerger.ApplyMerges(attributeVector2);
 
+                    // Merge the turned-off attributes separately. (differences in turned off
+                    // attributes should not affect whether the 2 VOA files are to be considered
+                    // different)
+                    attributeMerger.CompareAttributeSets(turnedOffAttributeVector1,
+                        turnedOffAttributeVector2, docText);
+
+                    attributeMerger.ApplyMerges(turnedOffAttributeVector1);
+                    attributeMerger.ApplyMerges(turnedOffAttributeVector2);
+
+                    HashSet<ComAttribute> allTurnedOffAttributes = new HashSet<ComAttribute>(
+                        turnedOffAttributes1.Union(turnedOffAttributes2));
+
                     // Convert the resulting vectors to IEnumerables for more efficient iteration.
                     IEnumerable<ComAttribute> set1Attributes =
-                        attributeVector1.ToIEnumerable<ComAttribute>();
+                        attributeVector1.ToIEnumerable<ComAttribute>()
+                        .Union(turnedOffAttributeVector1.ToIEnumerable<ComAttribute>());
                     IEnumerable<ComAttribute> set2Attributes =
-                        attributeVector2.ToIEnumerable<ComAttribute>();
+                        attributeVector2.ToIEnumerable<ComAttribute>()
+                        .Union(turnedOffAttributeVector2.ToIEnumerable<ComAttribute>());
 
                     // Create collections to store the final output as well as attributes to map each
                     // source attribute to an attribute in the output (merged or not).
@@ -639,18 +665,18 @@ namespace Extract.Redaction
                     // to the output attributes while adding a mapping entry that ties the item from the
                     // original file to the corresponding item in the output file.
                     AddUnmergedAttributes(attributeCreator, set1Attributes, mergedValue, set1Mappings,
-                        turnedOffAttributes, turnedOffIDs, outputAttributes, ref nextId);
+                        allTurnedOffAttributes, turnedOffIDs, outputAttributes, ref nextId);
                     AddUnmergedAttributes(attributeCreator, set2Attributes, mergedValue, set2Mappings,
-                        turnedOffAttributes, turnedOffIDs, outputAttributes, ref nextId);
+                        allTurnedOffAttributes, turnedOffIDs, outputAttributes, ref nextId);
 
                     // Find all sensitive items have been merged and add them to the output attributes
                     // while adding a mapping entries that tie original items to the merged item.
                     AddMergedAttributes(attributeCreator, set1Attributes, set1OriginalAttributes,
-                        mergedValue, set1Mappings, set2Mappings, turnedOffAttributes, turnedOffIDs,
+                        mergedValue, set1Mappings, set2Mappings, allTurnedOffAttributes, turnedOffIDs,
                         outputAttributes, ref nextId);
 
                     // Replace all attributes with the unique value with "Merged" in the final output.
-                    foreach (ComAttribute mergedAttribute in attributeVector1
+                    foreach (ComAttribute mergedAttribute in outputAttributes
                         .ToIEnumerable<ComAttribute>()
                         .Where(attribute => attribute.Value.String == mergedValue))
                     {

@@ -939,7 +939,8 @@ void CSpatialAttributeMergeUtils::findQualifiedMerges(IIUnknownVectorPtr ipAttri
 			}
 
 			// Prevent merging if excluded by MergeExclusionQueries.
-			if (isMergeExcludedByQuery(ipAttribute1, ipAttribute2, ipExclusiveSets))
+			set<IIUnknownVectorPtr> setExclusiveSets;
+			if (isMergeExcludedByQuery(ipAttribute1, ipAttribute2, ipExclusiveSets, setExclusiveSets))
 			{
 				continue;
 			}
@@ -965,6 +966,13 @@ void CSpatialAttributeMergeUtils::findQualifiedMerges(IIUnknownVectorPtr ipAttri
 					m_ipQualifiedMerges->PushBackIfNotContained(ipMergedAttribute);
 					ipTargetAttributes->PushBackIfNotContained(ipMergedAttribute);
 					nTargetSetSize = ipTargetAttributes->Size();
+
+					// If these attributes we part of one or more exclusive sets, the merged result
+					// should be part of those sets as well.
+					for each (IIUnknownVectorPtr ipExclusiveSet in setExclusiveSets)
+					{
+						ipExclusiveSet->PushBack(ipMergedAttribute);
+					}
 
 					// It is possible both these attributes were already merged in which case
 					// one of them will have been removed from the lists. 
@@ -1035,7 +1043,8 @@ IIUnknownVectorPtr CSpatialAttributeMergeUtils::getExclusiveAttributeSets(
 }
 //-------------------------------------------------------------------------------------------------
 bool CSpatialAttributeMergeUtils::isMergeExcludedByQuery(IAttributePtr ipAttribute1,
-	IAttributePtr ipAttribute2, IIUnknownVectorPtr ipExclusiveSets)
+	IAttributePtr ipAttribute2, IIUnknownVectorPtr ipExclusiveSets,
+	set<IIUnknownVectorPtr>& rsetExclusiveSets)
 {
 	// Loop through each set of attributes which may only be merged with other members of the set.
 	long nCount = ipExclusiveSets->Size();
@@ -1057,6 +1066,12 @@ bool CSpatialAttributeMergeUtils::isMergeExcludedByQuery(IAttributePtr ipAttribu
 		if (bAttribute1Included != bAttribute2Included)
 		{
 			return true;
+		}
+
+		// If both attributes are part of the exclusive set, add the set to rsetExclusiveSets.
+		if (bAttribute1Included)
+		{
+			rsetExclusiveSets.insert(ipSetMembers);
 		}
 	}
 

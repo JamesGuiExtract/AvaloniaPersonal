@@ -205,8 +205,10 @@ private:
 
 	// Using the results of getExclusiveAttributeSets, determines whether the two attributes
 	// provided are excluded as possible merges by the MergeExclusionQueries.
+	// If the merge is not excluded, rsetExclusiveSets will contain that exclusive sets for which
+	// both attributes are a member.
 	bool isMergeExcludedByQuery(IAttributePtr ipAttribute1, IAttributePtr ipAttribute2,
-		IIUnknownVectorPtr ipExclusiveSets);
+		IIUnknownVectorPtr ipExclusiveSets, set<IIUnknownVectorPtr>& rsetExclusiveSets);
 
 	// Returns a set of pages representing all pages in which ipAttribute1 and ipAttribute2 overlap
 	// at least the amount specified by m_dOverlapPercent.
