@@ -70,7 +70,7 @@ BEGIN
             VALUE "FileDescription", "AFValueFinders Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "AFValueFinders"
-            VALUE "LegalCopyright", "Copyright 2010"
+            VALUE "LegalCopyright", "Copyright 2012"
             VALUE "OriginalFilename", "AFValueFinders.DLL"
             VALUE "ProductName", "AFValueFinders Module"
             VALUE "ProductVersion", "1, 0, 0, 1"
@@ -552,6 +552,9 @@ IDD_BOXFINDERPP DIALOGEX 0, 0, 430, 282
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
+    GROUPBOX        "Clues to find box",IDC_STATIC,6,3,416,120
+    LTEXT           "Clues to find box:",IDC_STATIC,12,15,55,8
+    ICON            IDI_ICON_DYNAMIC_LIST,IDC_CLUE_DYNAMIC_LIST_HELP,71,15,20,20,SS_NOTIFY
     CONTROL         "",IDC_LIST_CLUES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,12,25,216,52
     PUSHBUTTON      "Add...",IDC_BTN_ADD_CLUE,235,25,42,13
     PUSHBUTTON      "Remove",IDC_BTN_REMOVE_CLUE,235,43,42,13
@@ -589,9 +592,6 @@ BEGIN
     GROUPBOX        "Search Scope",IDC_STATIC,6,128,168,83,BS_LEFT
     LTEXT           "pages",IDC_STATIC,84,158,54,8
     LTEXT           "pages",IDC_STATIC,84,175,54,8
-    LTEXT           "Clues to find box:",IDC_STATIC,12,15,55,8
-    ICON            IDI_ICON_DYNAMIC_LIST,IDC_CLUE_DYNAMIC_LIST_HELP,71,15,20,20,SS_NOTIFY
-    GROUPBOX        "Clues to find box",IDC_STATIC,6,3,416,120
     LTEXT           "Select location of clue relative to box:",IDC_STATIC,286,14,129,8
     GROUPBOX        "Return value",IDC_STATIC,182,128,240,147,BS_LEFT
     LTEXT           "the spatial area with the following text:",IDC_STATIC,198,152,120,8

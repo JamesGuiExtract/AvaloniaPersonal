@@ -70,7 +70,7 @@ BEGIN
             VALUE "FileDescription", "FileProcessors Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "FileProcessors"
-            VALUE "LegalCopyright", "Copyright 2010"
+            VALUE "LegalCopyright", "Copyright 2012"
             VALUE "OriginalFilename", "FileProcessors.DLL"
             VALUE "ProductName", "FileProcessors Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

@@ -1,6 +1,7 @@
 ﻿using EnterpriseDT.Net.Ftp;
 using Extract.Licensing;
 using System;
+using System.Globalization;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.Utilities.Ftp
@@ -375,6 +376,8 @@ namespace Extract.Utilities.Ftp
                         { }
                         else if (GetFTPDirectoryEventArgs(ref argument1))
                         { }
+                        else if (GetFTPDirectoryListingEventArgs(ref argument1, ref argument2))
+                        { }
                         else
                         {
                             ExtractException.ThrowLogicException("ELI33987");
@@ -417,7 +420,7 @@ namespace Extract.Utilities.Ftp
 
         /// <summary>
         /// Attempt to derive the appropriate FTPEventTable arguments from <see cref="_ftpEvent"/>
-        /// as a <see cref="FTPFileTransferEventArgs"/>
+        /// as a <see cref="FTPFileTransferEventArgs"/>.
         /// </summary>
         /// <param name="argument1">The first argument in the FTPEventTable log entry.</param>
         /// <param name="argument2">The second argument in the FTPEventTable log entry.</param>
@@ -455,7 +458,7 @@ namespace Extract.Utilities.Ftp
 
         /// <summary>
         /// Attempt to derive the appropriate FTPEventTable arguments from <see cref="_ftpEvent"/>
-        /// as a <see cref="FTPFileRenameEventArgs"/>
+        /// as a <see cref="FTPFileRenameEventArgs"/>.
         /// </summary>
         /// <param name="argument1">The first argument in the FTPEventTable log entry.</param>
         /// <param name="argument2">The second argument in the FTPEventTable log entry.</param>
@@ -481,7 +484,7 @@ namespace Extract.Utilities.Ftp
 
         /// <summary>
         /// Attempt to derive the appropriate FTPEventTable arguments from <see cref="_ftpEvent"/>
-        /// as a <see cref="FTPDirectoryEventArgs"/>
+        /// as a <see cref="FTPDirectoryEventArgs"/>.
         /// </summary>
         /// <param name="argument1">The first argument in the FTPEventTable log entry.</param>
         /// <returns><see langword="true"/> if the arguments were able to be extracted from
@@ -503,6 +506,33 @@ namespace Extract.Utilities.Ftp
             return false;
         }
 
+        /// <summary>
+        /// Attempt to derive the appropriate FTPEventTable arguments from <see cref="_ftpEvent"/>
+        /// as a <see cref="FTPDirectoryListEventArgs"/>.
+        /// </summary>
+        /// <param name="argument1">The first argument in the FTPEventTable log entry.</param>
+        /// <param name="argument2">The second argument in the FTPEventTable log entry.</param>
+        /// <returns><see langword="true"/> if the arguments were able to be extracted from
+        /// <see cref="_ftpEvent"/> as a <see cref="FTPDirectoryListEventArgs"/>;
+        /// <see langword="false"/> otherwise.</returns>
+        bool GetFTPDirectoryListingEventArgs(ref string argument1, ref string argument2)
+        {
+            var listingEvent = _ftpEvent as FTPDirectoryListEventArgs;
+
+            if (listingEvent != null)
+            {
+                ExtractException.Assert("ELI34053", "Unsupported FTP logging operation",
+                    _ftpAction == EFTPAction.kGetDirectoryListing);
+
+                argument1 = listingEvent.DirectoryPath;
+                argument2 = listingEvent.FileInfos.Length.ToString(CultureInfo.InvariantCulture);
+
+                return true;
+            }
+
+            return false;
+        }
+
         #endregion IDisposable Members
 
         #region Private Members
@@ -512,11 +542,13 @@ namespace Extract.Utilities.Ftp
         /// </summary>
         void RegisterEvents()
         {
+            _ftpConnection.DirectoryListing += HandleEventBegin;
             _ftpConnection.Downloading += HandleEventBegin;
             _ftpConnection.Uploading += HandleEventBegin;
             _ftpConnection.RenamingFile += HandleEventBegin;
             _ftpConnection.Deleting += HandleEventBegin;
             _ftpConnection.DeletingDirectory += HandleEventBegin;
+            _ftpConnection.DirectoryListed += HandleEventEnd;
             _ftpConnection.Downloaded += HandleEventEnd;
             _ftpConnection.Uploaded += HandleEventEnd;
             _ftpConnection.RenamedFile += HandleEventEnd;
@@ -531,11 +563,13 @@ namespace Extract.Utilities.Ftp
         /// </summary>
         void UnregisterEvents()
         {
+            _ftpConnection.DirectoryListing -= HandleEventBegin;
             _ftpConnection.Downloading -= HandleEventBegin;
             _ftpConnection.Uploading -= HandleEventBegin;
             _ftpConnection.RenamingFile -= HandleEventBegin;
             _ftpConnection.Deleting -= HandleEventBegin;
             _ftpConnection.DeletingDirectory -= HandleEventBegin;
+            _ftpConnection.DirectoryListed -= HandleEventEnd;
             _ftpConnection.Downloaded -= HandleEventEnd;
             _ftpConnection.Uploaded -= HandleEventEnd;
             _ftpConnection.RenamedFile -= HandleEventEnd;

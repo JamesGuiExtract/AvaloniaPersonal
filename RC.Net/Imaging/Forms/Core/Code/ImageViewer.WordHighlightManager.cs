@@ -532,6 +532,9 @@ namespace Extract.Imaging.Forms
                     else
                     {
                         Deactivate(true);
+
+                        // Ensure the background progress status is cleared.
+                        OnBackgroundProcessStatusUpdate("", 0);
                     }
                 }
                 catch (Exception ex)

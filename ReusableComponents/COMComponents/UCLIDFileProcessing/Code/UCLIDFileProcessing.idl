@@ -141,7 +141,8 @@ library UCLID_FILEPROCESSINGLib
 		kUploadFileToFtpServer = 0,
 		kDownloadFileFromFtpServer = 1,
 		kDeleteFileFromFtpServer = 2,
-		kRenameFileOnFtpServer = 3
+		kRenameFileOnFtpServer = 3,
+		kGetDirectoryListing = 4
 	}EFTPAction;
 
 	//----------------------------------------------------------------------------------------------

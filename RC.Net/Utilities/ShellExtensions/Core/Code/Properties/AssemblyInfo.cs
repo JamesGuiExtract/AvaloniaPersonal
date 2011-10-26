@@ -12,7 +12,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.Utilities.ShellExtensions")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems 2011")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems 2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

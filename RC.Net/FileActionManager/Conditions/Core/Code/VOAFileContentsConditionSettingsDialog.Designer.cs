@@ -381,9 +381,9 @@
             this._regexInfoTip.Size = new System.Drawing.Size(16, 16);
             this._regexInfoTip.TabIndex = 33;
             this._regexInfoTip.TabStop = false;
-            this._regexInfoTip.TipText = "When not performing greater than or less than comparisons, any specified values w" +
-    "ill be treated\r\nas reqular expressions that, unless otherwise specified, fully m" +
-    "atch the specified attribute field.";
+            this._regexInfoTip.TipText = "Search terms will be treated as regular expressions for \'match\' or \'equals\' tests" +
+    ".\r\n\'Equals\' means that the expression fully matches the specified attribute fiel" +
+    "d.";
             // 
             // _attributeQueryInfoTip
             // 

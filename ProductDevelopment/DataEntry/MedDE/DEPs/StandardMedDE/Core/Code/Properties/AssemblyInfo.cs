@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract System, LLC")]
 [assembly: AssemblyProduct("Extract.DataEntry.DEP.StandardMedDE")]
-[assembly: AssemblyCopyright("Copyright © Extract System, LLC 2010")]
+[assembly: AssemblyCopyright("Copyright © Extract System, LLC 2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

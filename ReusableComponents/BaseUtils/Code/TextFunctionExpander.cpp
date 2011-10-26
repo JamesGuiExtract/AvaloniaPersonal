@@ -62,7 +62,7 @@ const string gstrFUNC_OFFSET = "Offset";
 const string gstrFUNC_OFFSET_PARAMS = "number, offset";
 
 const string gstrFUNC_PAD_VALUE = "PadValue";
-const string gstrFUNC_PAD_VALUE_PARAMS = "source,character,length";
+const string gstrFUNC_PAD_VALUE_PARAMS = "source, character, length";
 
 const string gstrFUNC_RANDOM_ALPHA_NUMERIC = "RandomAlphaNumeric";
 const string gstrFUNC_RANDOM_ALPHA_NUMERIC_PARAMS = "num digits";

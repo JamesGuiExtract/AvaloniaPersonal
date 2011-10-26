@@ -70,7 +70,7 @@ BEGIN
             VALUE "FileDescription", "AFOutputHandlers Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "AFOutputHandlers"
-            VALUE "LegalCopyright", "Copyright 2010"
+            VALUE "LegalCopyright", "Copyright 2012"
             VALUE "OriginalFilename", "AFOutputHandlers.DLL"
             VALUE "ProductName", "AFOutputHandlers Module"
             VALUE "ProductVersion", "1, 0, 0, 1"
@@ -164,11 +164,11 @@ BEGIN
     PUSHBUTTON      "...",IDC_BTN_BROWSE_FILE,190,15,15,14
     GROUPBOX        "XML Format",IDC_STATIC,5,36,199,100
     CONTROL         "Version 1 format with <SubAttributes>",IDC_RADIO_ORIGINAL,
-                    "Button",BS_AUTORADIOBUTTON,15,49,128,11
+                    "Button",BS_AUTORADIOBUTTON,15,49,140,11
     CONTROL         "Version 2 format with <SpatialLine>",IDC_RADIO_SCHEMA,
                     "Button",BS_AUTORADIOBUTTON,15,66,124,11
     CONTROL         "Formatted with attribute names",IDC_CHECK_NAMES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,28,82,111,11
-    CONTROL         "Include schema name in output",IDC_CHECK_SCHEMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,28,98,111,11
+    CONTROL         "Include schema name in output",IDC_CHECK_SCHEMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,28,98,116,11
     EDITTEXT        IDC_EDIT_SCHEMANAME,40,114,102,14,ES_AUTOHSCROLL
     CONTROL         "Remove spatial information in output",IDC_CHK_XML_OUT_REMOVE_SPATIAL,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,141,150,11

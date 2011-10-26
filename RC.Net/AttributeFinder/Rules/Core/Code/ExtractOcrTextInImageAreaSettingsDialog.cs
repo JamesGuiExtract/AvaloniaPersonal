@@ -35,7 +35,7 @@ namespace Extract.AttributeFinder.Rules
             try
             {
                 // Create readable values for the ESpatialEntity enum.
-                ESpatialEntity.kCharacter.SetReadableValue("chars");
+                ESpatialEntity.kCharacter.SetReadableValue("characters");
                 ESpatialEntity.kWord.SetReadableValue("words");
                 ESpatialEntity.kLine.SetReadableValue("lines");
             }

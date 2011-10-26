@@ -176,6 +176,10 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     _settings.ActionToPerform = EFTPAction.kDeleteFileFromFtpServer;
                 }
+                else
+                {
+                    throw new ExtractException("ELI34056", "FTP operation not specified.");
+                }
 
                 _settings.DeleteEmptyFolder = _deleteEmptyFolderCheckBox.Checked;
 

@@ -124,8 +124,8 @@
             this._includeExcludeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._includeExcludeComboBox.FormattingEnabled = true;
             this._includeExcludeComboBox.Items.AddRange(new object[] {
-            "include",
-            "exclude"});
+            "Include",
+            "Exclude"});
             this._includeExcludeComboBox.Location = new System.Drawing.Point(9, 19);
             this._includeExcludeComboBox.Name = "_includeExcludeComboBox";
             this._includeExcludeComboBox.Size = new System.Drawing.Size(89, 21);

@@ -13,7 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems, LLC")]
 [assembly: AssemblyProduct("DataEntryApplication")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2010")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: Extract.AssemblyCompanyUrl("www.extractsystems.com")]

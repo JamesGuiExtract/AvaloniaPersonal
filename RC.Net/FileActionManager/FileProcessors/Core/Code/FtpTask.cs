@@ -645,7 +645,8 @@ namespace Extract.FileActionManager.FileProcessors
 
                     try
                     {
-                        bool isFolderEmpty = _retry.DoRetry(() => IsFolderEmpty(remoteFolder));
+                        bool isFolderEmpty = _retry.DoRetry(() =>
+                            IsFolderEmpty(remoteFolder, pDB, nActionID, pFileRecord));
 
                         if (isFolderEmpty)
                         {
@@ -997,6 +998,9 @@ namespace Extract.FileActionManager.FileProcessors
                     case EFTPAction.kDeleteFileFromFtpServer:
                         _runningConnection.DeleteFile(remoteOrOldFile);
                         break;
+                    
+                    default:
+                        throw new ExtractException("ELI34054", "Unexpected FTP operation.");
                 }
             }
             catch (Exception ex)
@@ -1032,9 +1036,14 @@ namespace Extract.FileActionManager.FileProcessors
         /// Determines whether <see paramref="remoteFolder"/> is empty.
         /// </summary>
         /// <param name="remoteFolder">The remote folder to check.</param>
+        /// <param name="fileProcessingDb">The <see cref="FileProcessingDB"/> in use.</param>
+        /// <param name="actionID">The ID of the action being processed.</param>
+        /// <param name="fileRecord">The file record that contains the info of the file being 
+        /// processed.</param>
         /// <returns><see langword="true"/> if <see paramref="remoteFolder"/> is empty; otherwise,
         /// <see langword="false"/>.</returns>
-        bool IsFolderEmpty(string remoteFolder)
+        bool IsFolderEmpty(string remoteFolder, FileProcessingDB fileProcessingDb, int actionID,
+            FileRecord fileRecord)
         {
             bool showHiddenFilesValue = false;
 
@@ -1043,9 +1052,17 @@ namespace Extract.FileActionManager.FileProcessors
                 showHiddenFilesValue = _runningConnection.ShowHiddenFiles;
                 _runningConnection.ShowHiddenFiles = true;
 
-                // Get all the files and directories in the working folder
-                FTPFile[] directoryContents = _retry.DoRetry(() =>
-                    _runningConnection.GetFileInfos(remoteFolder, false));
+                FTPFile[] directoryContents;
+
+                using (FtpEventRecorder recorder = new FtpEventRecorder(this, _runningConnection,
+                        fileProcessingDb, actionID, false, EFTPAction.kGetDirectoryListing))
+                {
+                    recorder.FileRecord = fileRecord;
+
+                    // Get all the files and directories in the working folder
+                    directoryContents = _retry.DoRetry(() =>
+                        _runningConnection.GetFileInfos(remoteFolder, false));
+                }
 
                 return (directoryContents.Length == 0);
             }

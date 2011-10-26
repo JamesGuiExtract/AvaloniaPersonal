@@ -1,6 +1,6 @@
 //==================================================================================================
 //
-// COPYRIGHT (c) 2011 UCLID SOFTWARE, LLC., IN PUBLISHED AND UNPUBLISHED WORKS
+// COPYRIGHT (c) 2012 Extract Systems, LLC., IN PUBLISHED AND UNPUBLISHED WORKS
 // ALL RIGHTS RESERVED.
 //
 // FILE:	WindowPersistenceMgr.h

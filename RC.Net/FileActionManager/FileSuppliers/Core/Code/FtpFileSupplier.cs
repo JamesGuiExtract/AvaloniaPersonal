@@ -3,6 +3,7 @@ using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Ftp;
+using Microsoft.Win32;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,7 +12,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -583,11 +583,21 @@ namespace Extract.FileActionManager.FileSuppliers
         /// </summary>
         public FtpFileSupplier()
         {
-            ConfiguredFtpConnection = new SecureFTPConnection();
+            try
+            {
+                ConfiguredFtpConnection = new SecureFTPConnection();
 
-            FtpMethods.InitializeFtpApiLicense(ConfiguredFtpConnection);
+                FtpMethods.InitializeFtpApiLicense(ConfiguredFtpConnection);
 
-            InitializeDefaults();
+                InitializeDefaults();
+
+                // Handle changes in the system time in case polling at set times is being used.
+                SystemEvents.TimeChanged += HandleTimeChanged;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34057");
+            }
         }
 
         /// <summary>
@@ -1168,22 +1178,42 @@ namespace Extract.FileActionManager.FileSuppliers
                 // _pollingTimer accordingly.
                 if (PollingMethod == FileSuppliers.PollingMethod.SetTimes)
                 {
-                    lock (_lock)
-                    {
-                        System.Threading.Timer oldPollingTimer = _pollingTimer;
+                    ExtractException ee = new ExtractException("ELI34052",
+                        "Application trace: Checking for files via FTP at specified time.");
 
-                        long timeoutValue = GetMillisecondsUntilNextSetTime();
+                    // Add a buffer of 30 seconds to protect against the chance of the timer firing
+                    // again immediately.
+                    long milliscondsToNextTime = SetTimerForNextSetTime(30000);
 
-                        _pollingTimer = new System.Threading.Timer(HandlePollingTimerTimeout, null,
-                            timeoutValue, timeoutValue);
-
-                        oldPollingTimer.Dispose();
-                    }
+                    // Next check in mins (rounded to nearest minute)
+                    ee.AddDebugData("Next check (mins)", (milliscondsToNextTime + 30000) / 60000, false);
+                    ee.Log();
                 }
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI33997");
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that the system time is changed.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleTimeChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // If checking at set times, reset the _polling timer based on the new system time.
+                if (_pollingTimer != null && PollingMethod == FileSuppliers.PollingMethod.SetTimes)
+                {
+                    SetTimerForNextSetTime(0);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34058");
             }
         }
 
@@ -1318,7 +1348,7 @@ namespace Extract.FileActionManager.FileSuppliers
                                 recorder.FileRecord = _retry.DoRetry(() =>
                                     DownloadFileFromFtpServer(runningConnection, currentFtpFile));
 
-                                // If we got here, the file successfullly download; reset
+                                // If we got here, the file successfully download; reset
                                 // _consecutiveDownloadFailures.
                                 Interlocked.Exchange(ref _consecutiveDownloadFailures, 0);
                             }
@@ -1488,8 +1518,14 @@ namespace Extract.FileActionManager.FileSuppliers
                     // There are retry settings for the file supplier that will allow quicker exiting if
                     // the stop button is pressed on the FAM so change the connection to not retry.
 
-                    FTPFile[] directoryContents = _retry.DoRetry(() =>
-                        GetFileListFromFtpServer(runningConnection));
+                    FTPFile[] directoryContents;
+
+                    using (FtpEventRecorder recorder = new FtpEventRecorder(this, runningConnection,
+                        _fileProcessingDB, _actionID, true, EFTPAction.kGetDirectoryListing))
+                    {
+                        directoryContents = _retry.DoRetry(() =>
+                            GetFileListFromFtpServer(runningConnection));
+                    }
 
                     // Fill the filesToDownload list
                     DetermineFilesToDownload(directoryContents);
@@ -1615,7 +1651,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 }
                 else // (PollingMethod == PollingMethod.SetTimes)
                 {
-                    timeoutValue = GetMillisecondsUntilNextSetTime();
+                    timeoutValue = GetMillisecondsUntilNextSetTime(0);
                 }
 
                 _pollingTimer = new System.Threading.Timer(HandlePollingTimerTimeout, null,
@@ -1842,14 +1878,39 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
+        /// Sets the timer for next set time.
+        /// </summary>
+        /// <param name="bufferMilliseconds">If within this number of milliseconds of the next time,
+        /// that check will be skipped.</param>
+        /// <returns>The number of milliseconds until the next set time.</returns>
+        long SetTimerForNextSetTime(int bufferMilliseconds)
+        {
+            lock (_lock)
+            {
+                System.Threading.Timer oldPollingTimer = _pollingTimer;
+
+                long timeoutValue = GetMillisecondsUntilNextSetTime(bufferMilliseconds);
+
+                _pollingTimer = new System.Threading.Timer(HandlePollingTimerTimeout, null,
+                    timeoutValue, timeoutValue);
+
+                oldPollingTimer.Dispose();
+
+                return timeoutValue;
+            }
+        }
+
+        /// <summary>
         /// Gets the number of milliseconds until the next time in PollingTimes.
         /// </summary>
+        /// <param name="bufferMilliseconds">If within this number of milliseconds of the next time,
+        /// that check will be skipped.</param>
         /// <returns>The number of milliseconds until the next time in PollingTimes</returns>
-        long GetMillisecondsUntilNextSetTime()
+        long GetMillisecondsUntilNextSetTime(int bufferMilliseconds)
         {
             long timeoutValue = (long)PollingTimes
                 .Select(time => time.TimeOfDay - DateTime.Now.TimeOfDay)
-                .Select(timeSpan => (timeSpan.Ticks < 0)
+                .Select(timeSpan => (timeSpan.Ticks < (bufferMilliseconds / 10000))
                     ? timeSpan + new TimeSpan(1, 0, 0, 0) // If we have passed the time; use tomorrow.
                     : timeSpan)
                 .OrderBy(timeSpan => timeSpan)

@@ -5737,6 +5737,7 @@ bool CFileProcessingDB::RecordFTPEvent_Internal(bool bDBLocked, long nFileId, lo
 				case kUploadFileToFtpServer:		strFTPAction = "U"; break;
 				case kDeleteFileFromFtpServer:		strFTPAction = "X"; break;
 				case kRenameFileOnFtpServer:		strFTPAction = "R"; break;
+				case kGetDirectoryListing:			strFTPAction = "Q"; break;
 			}
 
 			string strQuery = gstrRECORD_FTP_EVENT_QUERY;

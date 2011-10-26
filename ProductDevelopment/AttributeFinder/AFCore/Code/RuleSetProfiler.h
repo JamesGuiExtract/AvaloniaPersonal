@@ -1,6 +1,6 @@
 //=================================================================================================
 //
-// COPYRIGHT (c) 2011 EXTRACT SYSTEMS, LLC., IN PUBLISHED AND UNPUBLISHED WORKS
+// COPYRIGHT (c) 2012 EXTRACT SYSTEMS, LLC., IN PUBLISHED AND UNPUBLISHED WORKS
 // ALL RIGHTS RESERVED.
 //
 // FILE:	RuleSetProfiler.h
