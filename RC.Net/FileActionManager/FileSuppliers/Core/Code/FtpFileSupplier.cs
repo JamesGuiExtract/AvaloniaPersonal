@@ -1548,15 +1548,23 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <returns>Array of FTPFile objects representing the files and directories on the ftp server</returns>
         private FTPFile[] GetFileListFromFtpServer(SecureFTPConnection runningConnection)
         {
-            if (!runningConnection.IsConnected)
+            try
             {
-                // Connect to the ftp server
-                runningConnection.Connect();
-            }
+                if (!runningConnection.IsConnected)
+                {
+                    // Connect to the ftp server
+                    runningConnection.Connect();
+                }
 
-            // Get all the files and directories in the working folder and subfolders if required
-            FTPFile[] directoryContents = runningConnection.GetFileInfos(RemoteDownloadFolder, RecursivelyDownload);
-            return directoryContents;
+                // Get all the files and directories in the working folder and subfolders if required
+                FTPFile[] directoryContents = runningConnection.GetFileInfos(RemoteDownloadFolder, RecursivelyDownload);
+                return directoryContents;
+            }
+            catch (Exception ex)
+            {
+                OnFtpError(ex.AsExtract("ELI34060"));
+                throw;
+            }
         }
 
         /// <summary>

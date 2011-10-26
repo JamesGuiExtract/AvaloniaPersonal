@@ -525,7 +525,9 @@ namespace Extract.Utilities.Ftp
                     _ftpAction == EFTPAction.kGetDirectoryListing);
 
                 argument1 = listingEvent.DirectoryPath;
-                argument2 = listingEvent.FileInfos.Length.ToString(CultureInfo.InvariantCulture);
+                argument2 = (listingEvent.FileInfos == null)
+                    ? ""
+                    : listingEvent.FileInfos.Length.ToString(CultureInfo.InvariantCulture);
 
                 return true;
             }
