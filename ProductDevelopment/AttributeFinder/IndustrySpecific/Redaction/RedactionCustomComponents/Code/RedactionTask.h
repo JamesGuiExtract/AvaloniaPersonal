@@ -174,6 +174,9 @@ private:
 	// The password settings used when the output format is PDF
 	IPdfPasswordSettingsPtr m_ipPdfSettings;
 
+	// Has PDF support been initialized for this thread?
+	bool m_bPDFSupportInitialized;
+
 	//////////////
 	// Methods
 	//////////////

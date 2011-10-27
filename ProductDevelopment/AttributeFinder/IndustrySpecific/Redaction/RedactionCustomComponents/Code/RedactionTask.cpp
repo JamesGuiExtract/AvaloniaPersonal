@@ -45,7 +45,8 @@ CRedactionTask::CRedactionTask()
     m_bApplyRedactionsAsAnnotations(false),
     m_ipIDShieldDB(NULL),
     m_ipPdfSettings(NULL),
-    m_bUseRedactedImage(false)
+    m_bUseRedactedImage(false),
+	m_bPDFSupportInitialized(false)
 {
     ASSERT_RESOURCE_ALLOCATION("ELI19993", m_ipAttributeNames != __nullptr);
 
@@ -142,6 +143,17 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         // Check license
         validateLicense();
         _lastCodePos = "10";
+
+		// If PDF support is licensed initialize support
+		// NOTE: no exception is thrown or logged if PDF support is not licensed.
+		// NOTE2: Since the PDF settings are per-thread and the Init call occurs on a different
+		// thread than this one, initPDFSupport needs to be called here.
+		if (!m_bPDFSupportInitialized)
+		{
+			m_bPDFSupportInitialized = true;
+
+			initPDFSupport();
+		}
 
 		// Set of type names that have been seen already (used to track first instance
 		// of a type when using prefix and suffix text
