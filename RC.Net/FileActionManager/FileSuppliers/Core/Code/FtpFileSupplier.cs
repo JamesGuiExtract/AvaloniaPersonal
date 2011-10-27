@@ -1734,6 +1734,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 // The FileRecord will be set inside of the runningConnection.Downloaded delegate
                 // if the download and supplying succeeds.
                 IFileRecord fileRecord = null;
+                string downloadedFileName = null;
 
                 // If not already connected connect to the FTP Server
                 if (!runningConnection.IsConnected)
@@ -1780,7 +1781,7 @@ namespace Extract.FileActionManager.FileSuppliers
                             if (File.Exists(e.LocalPath) && e.LocalFileSize == e.RemoteFileSize)
                             {
                                 // Add the local file that was just downloaded to the database
-                                fileRecord = _fileTarget.NotifyFileAdded(e.LocalPath, this);
+                                downloadedFileName = e.LocalPath;
                             }
                             else
                             {
@@ -1844,13 +1845,23 @@ namespace Extract.FileActionManager.FileSuppliers
                     runningConnection.Downloaded -= handleDownloaded;
                 }
 
-                // Make sure the local file exists ( the dowload may have failed. in some way)
-                if (File.Exists(localFile))
-                {
-                    FtpDownloadedFileInfo ftpInfoFile = new FtpDownloadedFileInfo(infoFileName,
-                        currentFtpFile);
-                    ftpInfoFile.Save();
-                }
+                ExtractException.Assert("ELI34061", "Download failed.",
+                    File.Exists(downloadedFileName));
+
+                FtpDownloadedFileInfo ftpInfoFile = new FtpDownloadedFileInfo(infoFileName,
+                    currentFtpFile);
+
+                ftpInfoFile.Save();
+
+                // [DotNetRCAndUtils:745]
+                // Ensure the .info file is readable before calling NotifyFileAdded. Otherwise a
+                // processing task needing to access the .info file may fail.
+                FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() => 
+                { 
+                    using (new FileStream(infoFileName, FileMode.Open)) { };
+                });
+               
+                fileRecord = _fileTarget.NotifyFileAdded(downloadedFileName, this);
 
                 return fileRecord;
             }
