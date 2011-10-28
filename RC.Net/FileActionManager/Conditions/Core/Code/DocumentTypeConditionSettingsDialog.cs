@@ -49,7 +49,7 @@ namespace Extract.FileActionManager.Conditions
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI32750",
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI32750",
                     _OBJECT_NAME);
 
                 Settings = settings;

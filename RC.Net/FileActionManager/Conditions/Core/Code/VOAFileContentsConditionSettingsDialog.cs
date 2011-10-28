@@ -82,7 +82,7 @@ namespace Extract.FileActionManager.Conditions
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI32715",
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI32715",
                     _OBJECT_NAME);
 
                 InitializeComponent();

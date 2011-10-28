@@ -252,7 +252,7 @@ namespace Extract.FileActionManager.Conditions
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI32735",
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI32735",
                     _COMPONENT_DESCRIPTION);
 
                 string voaFileName = pFAMTagManager.ExpandTags(VOAFileName, pFileRecord.Name);
@@ -326,7 +326,7 @@ namespace Extract.FileActionManager.Conditions
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI32739",
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI32739",
                     _COMPONENT_DESCRIPTION);
 
                 // Make a clone to update settings and only copy if ok
@@ -443,7 +443,7 @@ namespace Extract.FileActionManager.Conditions
         /// if the component is not licensed.</returns>
         public bool IsLicensed()
         {
-            return LicenseUtilities.IsLicensed(LicenseIdName.FlexIndexCoreObjects);
+            return LicenseUtilities.IsLicensed(LicenseIdName.FlexIndexIDShieldCoreObjects);
         }
 
         #endregion ILicensedComponent Members

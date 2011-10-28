@@ -888,7 +888,7 @@ namespace Extract.FileActionManager.Conditions
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI32679",
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI32679",
                     _COMPONENT_DESCRIPTION);
 
                 // Validating the settings also initializes objects used by the condition.
@@ -981,7 +981,7 @@ namespace Extract.FileActionManager.Conditions
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI32683",
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI32683",
                     _COMPONENT_DESCRIPTION);
 
                 // Make a clone to update settings and only copy if ok
@@ -1109,7 +1109,7 @@ namespace Extract.FileActionManager.Conditions
         /// if the component is not licensed.</returns>
         public bool IsLicensed()
         {
-            return LicenseUtilities.IsLicensed(LicenseIdName.FlexIndexCoreObjects);
+            return LicenseUtilities.IsLicensed(LicenseIdName.FlexIndexIDShieldCoreObjects);
         }
 
         #endregion ILicensedComponent Members
