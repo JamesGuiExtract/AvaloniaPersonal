@@ -750,27 +750,32 @@ void CRuleSetEditor::OnBtnAddRule()
 		{
 			// Retrieve the rule description
 			CString	zDescription = dlg.m_zDescription;
-			int nCurrentSelectedIndex = -1;
+			int nIndex = -1;
 
 			// Add the description to the list
 			if (!zDescription.IsEmpty())
 			{
 				// Get index of first selection
-				nCurrentSelectedIndex = m_listRules.GetFirstSelectedRow();
+				nIndex = m_listRules.GetFirstSelectedRow();
 
 				// Check for item count if no selection
-				if (nCurrentSelectedIndex == -1)
+				int nRowCount = m_listRules.GetNumberRows();
+				if (nIndex == -1)
 				{
-					nCurrentSelectedIndex = m_listRules.GetNumberRows();
+					nIndex = m_listRules.GetNumberRows();
+				}
+				else
+				{
+					nIndex++;
 				}
 
 				//////////////////
-				// Insert new item before selection or at end of list
+				// Insert new item after selection or at end of list
 				//////////////////
 				// Add the item without text in Enabled column
-				m_listRules.InsertRow(nCurrentSelectedIndex);
+				m_listRules.InsertRow(nIndex);
 				// Default to enabled but not to ignore errors.
-				m_listRules.SetRowInfo(nCurrentSelectedIndex, true, false, zDescription);
+				m_listRules.SetRowInfo(nIndex, true, false, zDescription);
 
 				///////////////////////////////
 				// Insert this Rule into vector
@@ -785,7 +790,7 @@ void CRuleSetEditor::OnBtnAddRule()
 				}
 
 				// Insert the new Rule
-				ipRules->Insert( nCurrentSelectedIndex, ipRule );
+				ipRules->Insert( nIndex, ipRule );
 
 				// Store the updated vector
 				m_ipInfo->PutAttributeRules( ipRules );
@@ -798,7 +803,7 @@ void CRuleSetEditor::OnBtnAddRule()
 			clearListSelection();
 			
 			// Select the newly added rule or retain current selection
-			m_listRules.SelectRow(nCurrentSelectedIndex);
+			m_listRules.SelectRow(nIndex);
 			m_listRules.SetFocus();
 		}
 

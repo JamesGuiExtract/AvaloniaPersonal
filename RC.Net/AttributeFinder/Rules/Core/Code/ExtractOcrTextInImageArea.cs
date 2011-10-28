@@ -144,7 +144,7 @@ namespace Extract.AttributeFinder.Rules
         {
             try
             {
-                UseOriginalDocumentOcr = true;
+                UseOriginalDocumentOcr = false;
                 UseOverallBounds = true;
                 IncludeTextOnBoundary = true;
                 SpatialEntityType = ESpatialEntity.kCharacter;

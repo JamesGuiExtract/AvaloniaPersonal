@@ -154,7 +154,7 @@ BEGIN
     CTEXT           "The Rule Set is encrypted and cannot be viewed or modified.\r\n\r\nTesting is available from the Tools menu.",IDC_STATIC_PROMPT,35,78,204,27
     GROUPBOX        "Attribute Rules",IDC_STATIC_RULES,14,103,307,104
     LTEXT           "List2",IDC_LIST_RULES,22,113,225,74,SS_SUNKEN
-    PUSHBUTTON      "Insert...",IDC_BTN_ADDRULE,254,113,60,13
+    PUSHBUTTON      "Add...",IDC_BTN_ADDRULE,254,113,60,13
     PUSHBUTTON      "Delete",IDC_BTN_DELRULE,254,130,60,13
     PUSHBUTTON      "Modify...",IDC_BTN_CONRULE,254,147,60,13
     PUSHBUTTON      "",IDC_BTN_RULEUP,254,166,21,21,BS_ICON
@@ -201,7 +201,7 @@ BEGIN
     CONTROL         "Apply the following modifying rules",IDC_CHECK_MODIFY,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,107,135,9
     CONTROL         "List1",IDC_LIST_RULES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,118,262,173
-    PUSHBUTTON      "Add",IDC_BTN_ADDRULE,280,118,60,13
+    PUSHBUTTON      "Add...",IDC_BTN_ADDRULE,280,118,60,13
     PUSHBUTTON      "Remove",IDC_BTN_DELRULE,280,135,60,13
     PUSHBUTTON      "Commands >",IDC_BTN_CONRULE,280,153,60,13
     PUSHBUTTON      "",IDC_BTN_RULEUP,279,170,21,21,BS_ICON

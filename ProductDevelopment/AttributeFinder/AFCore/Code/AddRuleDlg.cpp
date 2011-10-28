@@ -276,6 +276,10 @@ void CAddRuleDlg::OnBtnAddRule()
 
 			if (iIndex > -1)
 			{
+				// [FlexIDSCore:4918]
+				// Add new rule after existing rule rather than before it.
+				iIndex++;
+
 				// Add a blank object to the list with no text.
 				iNewIndex = m_listRules.InsertItem( iIndex, "" );
 			}
@@ -287,7 +291,6 @@ void CAddRuleDlg::OnBtnAddRule()
 			// Put the text into the box.
 			m_listRules.SetItemText( iNewIndex, giDESC_LIST_COLUMN, 
 					LPCTSTR(zText) );
-
 
 			// Set the checkbox based on the object's Enabled state.
 			VARIANT_BOOL vbEnabled = ipObject->Enabled;

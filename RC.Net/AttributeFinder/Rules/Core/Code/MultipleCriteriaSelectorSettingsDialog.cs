@@ -196,21 +196,21 @@ namespace Extract.AttributeFinder.Rules
         }
 
         /// <summary>
-        /// Handles the insert button click.
+        /// Handles the add button click.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        void HandleInsertButtonClick(object sender, EventArgs e)
+        void HandleAddButtonClick(object sender, EventArgs e)
         {
             try
             {
                 Point menuLocationPoint = PointToScreen(ClientRectangle.Location);
-                menuLocationPoint.Offset(_insertButton.Right, _insertButton.Top);
+                menuLocationPoint.Offset(_addButton.Right, _addButton.Top);
 
                 int index = (SelectedRowIndex == -1)
                     ? _selectorDataGridView.Rows.Count
-                    : SelectedRowIndex;
+                    : SelectedRowIndex + 1;
 
                 ObjectWithDescription owd = new ObjectWithDescription();
                 Guid guid = new Guid();
@@ -223,6 +223,7 @@ namespace Extract.AttributeFinder.Rules
                     row.Cells[0].Value = owd.Enabled;
                     row.Cells[1].Value = false;
                     row.Cells[2].Value = owd.Description;
+                    row.Selected = true;
                 }
             }
             catch (Exception ex)
@@ -393,7 +394,7 @@ namespace Extract.AttributeFinder.Rules
         {
             if (_selectorDataGridView.Rows.Count == 0)
             {
-                _insertButton.Focus();
+                _addButton.Focus();
                 UtilityMethods.ShowMessageBox("At least one selector must be specified.",
                     "Add a selector", false);
                 return true;

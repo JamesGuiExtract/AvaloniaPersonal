@@ -33,10 +33,12 @@
             System.Windows.Forms.GroupBox groupBox1;
             System.Windows.Forms.GroupBox groupBox2;
             System.Windows.Forms.GroupBox groupBox3;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExtractOcrTextInImageAreaSettingsDialog));
             this._separateZonesRadioButton = new System.Windows.Forms.RadioButton();
             this._overallBoundsRadioButton = new System.Windows.Forms.RadioButton();
             this._includeExcludeComboBox = new System.Windows.Forms.ComboBox();
             this._spatialEntityComboBox = new Extract.Utilities.Forms.BetterComboBox();
+            this._originalImageInfoTip = new Extract.Utilities.Forms.InfoTip();
             this._originalDocumentOcrRadioButton = new System.Windows.Forms.RadioButton();
             this._documentContextRadioButton = new System.Windows.Forms.RadioButton();
             this._okButton = new System.Windows.Forms.Button();
@@ -144,6 +146,7 @@
             // 
             // groupBox3
             // 
+            groupBox3.Controls.Add(this._originalImageInfoTip);
             groupBox3.Controls.Add(this._originalDocumentOcrRadioButton);
             groupBox3.Controls.Add(this._documentContextRadioButton);
             groupBox3.Location = new System.Drawing.Point(16, 13);
@@ -153,10 +156,21 @@
             groupBox3.TabStop = false;
             groupBox3.Text = "OCR source";
             // 
+            // _originalImageInfoTip
+            // 
+            this._originalImageInfoTip.BackColor = System.Drawing.Color.Transparent;
+            this._originalImageInfoTip.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("_originalImageInfoTip.BackgroundImage")));
+            this._originalImageInfoTip.Location = new System.Drawing.Point(104, 43);
+            this._originalImageInfoTip.Name = "_originalImageInfoTip";
+            this._originalImageInfoTip.Size = new System.Drawing.Size(16, 16);
+            this._originalImageInfoTip.TabIndex = 2;
+            this._originalImageInfoTip.TipText = "This option will retrieve text from the uss file.\r\nIf the uss file does not exist" +
+    ", an exception will be thrown.";
+            // 
             // _originalDocumentOcrRadioButton
             // 
             this._originalDocumentOcrRadioButton.AutoSize = true;
-            this._originalDocumentOcrRadioButton.Location = new System.Drawing.Point(7, 18);
+            this._originalDocumentOcrRadioButton.Location = new System.Drawing.Point(7, 42);
             this._originalDocumentOcrRadioButton.Name = "_originalDocumentOcrRadioButton";
             this._originalDocumentOcrRadioButton.Size = new System.Drawing.Size(91, 17);
             this._originalDocumentOcrRadioButton.TabIndex = 0;
@@ -167,7 +181,7 @@
             // _documentContextRadioButton
             // 
             this._documentContextRadioButton.AutoSize = true;
-            this._documentContextRadioButton.Location = new System.Drawing.Point(7, 41);
+            this._documentContextRadioButton.Location = new System.Drawing.Point(7, 19);
             this._documentContextRadioButton.Name = "_documentContextRadioButton";
             this._documentContextRadioButton.Size = new System.Drawing.Size(232, 17);
             this._documentContextRadioButton.TabIndex = 1;
@@ -236,5 +250,6 @@
         private System.Windows.Forms.RadioButton _overallBoundsRadioButton;
         private System.Windows.Forms.RadioButton _originalDocumentOcrRadioButton;
         private System.Windows.Forms.RadioButton _documentContextRadioButton;
+        private Utilities.Forms.InfoTip _originalImageInfoTip;
     }
 }

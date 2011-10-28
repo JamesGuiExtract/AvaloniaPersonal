@@ -273,16 +273,22 @@ LRESULT CMultipleObjSelectorPP::OnClickedButtonInsert(WORD wNotifyCode, WORD wID
 
 			// get the index of the first selected item (if there's an item selected)
 			long nNumItems = m_listObjects.GetItemCount();
-			int nSelectedItemIndex = m_listObjects.GetNextItem(-1, LVNI_ALL | LVNI_SELECTED);
-			if (nSelectedItemIndex == -1)
+			int nItemIndex = m_listObjects.GetNextItem(-1, LVNI_ALL | LVNI_SELECTED);
+			if (nItemIndex == -1)
 			{
-				nSelectedItemIndex = nNumItems;
+				nItemIndex = nNumItems;
+			}
+			else
+			{
+				// [FlexIDSCore:4918]
+				// Add new object after existing object rather than before it.
+				nItemIndex++;
 			}
 
-			// Insert new item before selection or at end of list
-			int nIndex = m_listObjects.InsertItem(nSelectedItemIndex, "");
-			m_listObjects.SetItemText( nSelectedItemIndex, 1, zText.operator LPCTSTR() );
-			m_ipObjects->Insert(nSelectedItemIndex, ipNewObj);
+			// Insert new item after selection or at end of list
+			int nIndex = m_listObjects.InsertItem(nItemIndex, "");
+			m_listObjects.SetItemText( nIndex, 1, zText.operator LPCTSTR() );
+			m_ipObjects->Insert(nIndex, ipNewObj);
 
 			// Set check
 			bool bEnabled = asCppBool(ipNewObj->Enabled);

@@ -29,14 +29,14 @@
         private void InitializeComponent()
         {
             System.Windows.Forms.GroupBox groupBox1;
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this._orRadioButton = new System.Windows.Forms.RadioButton();
             this._andRadioButton = new System.Windows.Forms.RadioButton();
             this._deleteButton = new System.Windows.Forms.Button();
             this._commandButton = new System.Windows.Forms.Button();
-            this._insertButton = new System.Windows.Forms.Button();
+            this._addButton = new System.Windows.Forms.Button();
             this._selectorDataGridView = new System.Windows.Forms.DataGridView();
             this._enabledColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this._negatedColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
@@ -56,7 +56,7 @@
             groupBox1.Controls.Add(this._andRadioButton);
             groupBox1.Controls.Add(this._deleteButton);
             groupBox1.Controls.Add(this._commandButton);
-            groupBox1.Controls.Add(this._insertButton);
+            groupBox1.Controls.Add(this._addButton);
             groupBox1.Controls.Add(this._selectorDataGridView);
             groupBox1.Location = new System.Drawing.Point(12, 12);
             groupBox1.Name = "groupBox1";
@@ -111,16 +111,16 @@
             this._commandButton.UseVisualStyleBackColor = true;
             this._commandButton.Click += new System.EventHandler(this.HandleCommandsButtonClick);
             // 
-            // _insertButton
+            // _addButton
             // 
-            this._insertButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._insertButton.Location = new System.Drawing.Point(375, 18);
-            this._insertButton.Name = "_insertButton";
-            this._insertButton.Size = new System.Drawing.Size(89, 23);
-            this._insertButton.TabIndex = 1;
-            this._insertButton.Text = "Insert";
-            this._insertButton.UseVisualStyleBackColor = true;
-            this._insertButton.Click += new System.EventHandler(this.HandleInsertButtonClick);
+            this._addButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._addButton.Location = new System.Drawing.Point(375, 18);
+            this._addButton.Name = "_addButton";
+            this._addButton.Size = new System.Drawing.Size(89, 23);
+            this._addButton.TabIndex = 1;
+            this._addButton.Text = "Add...";
+            this._addButton.UseVisualStyleBackColor = true;
+            this._addButton.Click += new System.EventHandler(this.HandleAddButtonClick);
             // 
             // _selectorDataGridView
             // 
@@ -129,39 +129,39 @@
             this._selectorDataGridView.AllowUserToResizeRows = false;
             this._selectorDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._selectorDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._selectorDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this._selectorDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._selectorDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this._enabledColumn,
             this._negatedColumn,
             this._selectorColumn});
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this._selectorDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._selectorDataGridView.DefaultCellStyle = dataGridViewCellStyle5;
             this._selectorDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this._selectorDataGridView.Location = new System.Drawing.Point(6, 19);
             this._selectorDataGridView.MultiSelect = false;
             this._selectorDataGridView.Name = "_selectorDataGridView";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._selectorDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._selectorDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this._selectorDataGridView.RowHeadersVisible = false;
             this._selectorDataGridView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._selectorDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
@@ -251,7 +251,7 @@
         private System.Windows.Forms.RadioButton _andRadioButton;
         private System.Windows.Forms.Button _deleteButton;
         private System.Windows.Forms.Button _commandButton;
-        private System.Windows.Forms.Button _insertButton;
+        private System.Windows.Forms.Button _addButton;
         private System.Windows.Forms.DataGridViewCheckBoxColumn _enabledColumn;
         private System.Windows.Forms.DataGridViewCheckBoxColumn _negatedColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _selectorColumn;
