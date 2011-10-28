@@ -172,9 +172,7 @@ namespace Extract.Redaction.Verification
             this._rectangularRedactionToolStripMenuItem = new Extract.Imaging.Forms.RectangularRedactionToolStripMenuItem();
             this._wordRedactionToolStripMenuItem = new Extract.Imaging.Forms.WordRedactionToolStripMenuItem();
             this._slideshowToolStripMenuItemSeparator = new System.Windows.Forms.ToolStripSeparator();
-            this._slideshowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._slideshowPlayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._slideshowStopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this._optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -822,7 +820,7 @@ namespace Extract.Redaction.Verification
             this._rectangularRedactionToolStripMenuItem,
             this._wordRedactionToolStripMenuItem,
             this._slideshowToolStripMenuItemSeparator,
-            this._slideshowToolStripMenuItem,
+            this._slideshowPlayToolStripMenuItem,
             this._toolStripSeparator8,
             this._optionsToolStripMenuItem});
             this._toolsToolStripMenuItem.Name = "_toolsToolStripMenuItem";
@@ -894,28 +892,12 @@ namespace Extract.Redaction.Verification
             this._slideshowToolStripMenuItemSeparator.Name = "_slideshowToolStripMenuItemSeparator";
             this._slideshowToolStripMenuItemSeparator.Size = new System.Drawing.Size(255, 6);
             // 
-            // _slideshowToolStripMenuItem
-            // 
-            this._slideshowToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._slideshowPlayToolStripMenuItem,
-            this._slideshowStopToolStripMenuItem});
-            this._slideshowToolStripMenuItem.Name = "_slideshowToolStripMenuItem";
-            this._slideshowToolStripMenuItem.Size = new System.Drawing.Size(258, 22);
-            this._slideshowToolStripMenuItem.Text = "&Slideshow";
-            // 
             // _slideshowPlayToolStripMenuItem
             // 
-            this._slideshowPlayToolStripMenuItem.Name = "_slideshowPlayToolStripMenuItem";
-            this._slideshowPlayToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
-            this._slideshowPlayToolStripMenuItem.Text = "&Play";
+            this._slideshowPlayToolStripMenuItem.Name = "_slideshowToolStripMenuItem";
+            this._slideshowPlayToolStripMenuItem.Size = new System.Drawing.Size(258, 22);
+            this._slideshowPlayToolStripMenuItem.Text = "&Slideshow play";
             this._slideshowPlayToolStripMenuItem.Click += new System.EventHandler(this.HandleSlideshowPlayUIClick);
-            // 
-            // _slideshowStopToolStripMenuItem
-            // 
-            this._slideshowStopToolStripMenuItem.Name = "_slideshowStopToolStripMenuItem";
-            this._slideshowStopToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
-            this._slideshowStopToolStripMenuItem.Text = "&Stop";
-            this._slideshowStopToolStripMenuItem.Click += new System.EventHandler(this.HandleSlideshowStopUIClick);
             // 
             // _toolStripSeparator8
             // 
@@ -1938,9 +1920,7 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.ToolStripButton _slideshowStopToolStripButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator12;
         private System.Windows.Forms.ToolStripSeparator _slideshowToolStripMenuItemSeparator;
-        private System.Windows.Forms.ToolStripMenuItem _slideshowToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _slideshowPlayToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem _slideshowStopToolStripMenuItem;
         private DockableWindow _magnifierDockableWindow;
         private Imaging.Forms.MagnifierControl _magnifierControl;
         private Imaging.Forms.MagnifierWindowToolStripButton _magnifierToolStripButton;

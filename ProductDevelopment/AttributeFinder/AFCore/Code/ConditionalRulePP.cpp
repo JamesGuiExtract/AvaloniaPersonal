@@ -370,7 +370,7 @@ void CConditionalRulePP::configureComponent(ICategorizedComponentPtr& ipObject)
 		ASSERT_RESOURCE_ALLOCATION("ELI10766", ipCopy != __nullptr);
 
 		string strComponentDesc = ipCopy->GetComponentDescription();
-		string strTitle = string( "Configure " ) + strComponentDesc;
+		string strTitle = strComponentDesc  + " settings";
 		_bstr_t	bstrTitle( strTitle.c_str() );
 
 		if(asCppBool(ipProperties->DisplayProperties1(ipCopy, bstrTitle)))

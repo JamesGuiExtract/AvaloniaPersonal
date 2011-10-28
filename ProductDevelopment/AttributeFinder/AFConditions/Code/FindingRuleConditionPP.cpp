@@ -150,7 +150,7 @@ LRESULT CFindingRuleConditionPP::OnConfigure(WORD wNotifyCode, WORD wID, HWND hW
 		ASSERT_RESOURCE_ALLOCATION("ELI18314", ipCopy);
 
 		string strComponentDesc = asString(ipCopy->GetComponentDescription());
-		string strTitle = string( "Configure " ) + strComponentDesc;
+		string strTitle = strComponentDesc + " settings";
 
 		if(asCppBool(ipProperties->DisplayProperties1(ipCopy, strTitle.c_str())))
 		{

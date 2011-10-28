@@ -1131,7 +1131,7 @@ bool CIDShieldTester::updateStatisticsAndDetermineTestCaseResult(IIUnknownVector
 		appendToFile(strSourceDoc,
 			m_strOutputFileDirectory + gstrFILES_WITH_OVERLAPPING_EXPECTED_REDACTIONS);
 
-		string strNumOverLappingExpected = "Number of overlapping sensitive data items: " +
+		string strNumOverLappingExpected = "\tOverlapping sensitive data items: " +
 			asString(ulNumOverlappingExpected);
 		m_ipResultLogger->AddTestCaseNote(strNumOverLappingExpected.c_str());
 	}
@@ -1700,33 +1700,33 @@ void CIDShieldTester::displaySummaryStatistics()
 	string strStatisticSummary = "Image analysis:\r\n";
 
 	CString zTemp;
-	zTemp.Format("Number of files tested: %d", m_ulTotalFilesProcessed);
+	zTemp.Format("\tFiles tested: %d", m_ulTotalFilesProcessed);
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticSummary += zTemp + "\r\n";
 
-	zTemp.Format("Number of pages tested: %d", m_ulTotalPages);
+	zTemp.Format("\tPages tested: %d", m_ulTotalPages);
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticSummary += zTemp + "\r\n";
 
 	// Calculate the number of files with expected redactions
-	zTemp.Format("Number of files containing sensitive data items: %d (%0.1f%%)",	
+	zTemp.Format("\tFiles containing sensitive data items: %d (%0.1f%%)",	
 					m_ulNumFilesWithExpectedRedactions, 
 					getRatioAsPercentOfTwoLongs(m_ulNumFilesWithExpectedRedactions, m_ulTotalFilesProcessed));	
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticSummary += zTemp + "\r\n";
 
 	// Calculate the number of pages with expected redactions
-	zTemp.Format("Number of pages containing sensitive data items: %d (%0.1f%%)",	
+	zTemp.Format("\tPages containing sensitive data items: %d (%0.1f%%)",	
 					m_ulNumPagesWithExpectedRedactions, 
 					getRatioAsPercentOfTwoLongs(m_ulNumPagesWithExpectedRedactions, m_ulTotalPages));	
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticSummary += zTemp + "\r\n";
 
-	zTemp.Format("Number of sensitive data items: %d", m_ulTotalExpectedRedactions);
+	zTemp.Format("\tSensitive data items: %d", m_ulTotalExpectedRedactions);
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticSummary += zTemp + "\r\n";
 
-	zTemp.Format("Number of documents with overlapping sensitive data items: %d ", 
+	zTemp.Format("\tDocuments with overlapping sensitive data items: %d ", 
 		m_ulNumFilesWithOverlappingExpectedRedactions);
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticSummary += zTemp + "\r\n";
@@ -1735,15 +1735,15 @@ void CIDShieldTester::displaySummaryStatistics()
 
 	if (m_bOutputAutomatedStatsOnly)
 	{
-		strStatisticSummary += "Analysis type: Automated redaction\r\n";
+		strStatisticSummary += "\tAnalysis type: Automated redaction\r\n";
 	}
 	else if (m_bOutputHybridStats)
 	{
-		strStatisticSummary += "Analysis type: Hybrid\r\n";
+		strStatisticSummary += "\tAnalysis type: Hybrid\r\n";
 	}
 	else
 	{
-		strStatisticSummary += "Analysis type: Standard verification\r\n";
+		strStatisticSummary += "\tAnalysis type: Standard verification\r\n";
 	}
 
 	// If only automated stats were computed, there are no verification stats to report.
@@ -1752,7 +1752,7 @@ void CIDShieldTester::displaySummaryStatistics()
 		string strDataTypes = m_strVerificationCondition;
 		replaceVariable(strDataTypes, "|", ", ");
 
-		strStatisticSummary += "Manually review: Files that contain "
+		strStatisticSummary += "\tManually review: Files that contain "
 			+ m_strVerificationQuantifier + " " + strDataTypes + "\r\n";
 	}
 
@@ -1761,33 +1761,33 @@ void CIDShieldTester::displaySummaryStatistics()
 		string strDataTypes = m_strRedactionCondition;
 		replaceVariable(strDataTypes, "|", ", ");
 
-		strStatisticSummary += "Automatically redact: Files that contain " +
+		strStatisticSummary += "\tAutomatically redact: Files that contain " +
 			m_strRedactionQuantifier + " " + strDataTypes + "\r\n";
 	}
 
 	string strDataTypes = m_strRedactionQuery;
 	replaceVariable(strDataTypes, "|", ", ");
 
-	strStatisticSummary += "Default to redacting the following: " + strDataTypes + "\r\n";
+	strStatisticSummary += "\tDefault to redacting the following: " + strDataTypes + "\r\n";
 
 	// [FlexIDSCore: 3798]
 	// If limiting testing to specified doc types, indicates the doc types being tested.
 	if (!m_bOutputAutomatedStatsOnly && !m_setDocTypesToBeVerified.empty())
 	{
-		strStatisticSummary += "Document types to be verified: " +
+		strStatisticSummary += "\tDocument types to be verified: " +
 			getSetAsDelimitedList(m_setDocTypesToBeVerified) + "\r\n";
 	}
 	if ((m_bOutputAutomatedStatsOnly || m_bOutputHybridStats) &&
 		!m_setDocTypesToBeAutomaticallyRedacted.empty())
 	{
-		strStatisticSummary += "Document types to be automatically redacted: " +
+		strStatisticSummary += "\tDocument types to be automatically redacted: " +
 			getSetAsDelimitedList(m_setDocTypesToBeAutomaticallyRedacted) + "\r\n";
 	}
 
 	// If limiting testing to specified doc type, indicates the doc type being tested.
 	if (!m_setTypesToBeTested.empty())
 	{
-		strStatisticSummary += "Limit data types to be tested to: " + 
+		strStatisticSummary += "\tLimit data types to be tested to: " + 
 			getSetAsDelimitedList(m_setTypesToBeTested) + "\r\n";
 	}
 
@@ -1799,7 +1799,7 @@ void CIDShieldTester::displaySummaryStatistics()
 
 	// Note for number of redactions found
 	zTemp.Format(
-		"Number of sensitive data items redacted after processing: %d (%0.1f%%)",
+		"\tSensitive data items redacted after processing: %d (%0.1f%%)",
 			ulTotalNumberOfCorrectRedactions, getRatioAsPercentOfTwoLongs(
 				ulTotalNumberOfCorrectRedactions, m_ulTotalExpectedRedactions));
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
@@ -1808,7 +1808,7 @@ void CIDShieldTester::displaySummaryStatistics()
 	if (m_bOutputAutomatedStatsOnly || m_bOutputHybridStats)
 	{
 		// Note for the number of false positives found
-		zTemp.Format("Number of false positives in redacted images: %d ",
+		zTemp.Format("\tFalse positives in redacted images: %d ",
 			automatedStatistics.m_ulNumFalsePositives);
 		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 		strStatisticSummary += zTemp + "\r\n";
@@ -1816,13 +1816,13 @@ void CIDShieldTester::displaySummaryStatistics()
 		// if m_ulNumFalsePositives == 0, append "(ROCE = n/a)"
 		if(automatedStatistics.m_ulNumFalsePositives <= 0)
 		{
-			zTemp = "Ratio of correctly redacted items to false positives: n/a";
+			zTemp = "\tRatio of correctly redacted items to false positives: n/a";
 		}
 		// else ROCE > 0, append "(ROCE = N)"
 		else
 		{
 			// Use integer division to get a whole number ratio as a result
-			zTemp.Format("Ratio of correctly redacted items to false positives: %0.1f",
+			zTemp.Format("\tRatio of correctly redacted items to false positives: %0.1f",
 				((double)ulTotalNumberOfCorrectRedactions /
 				 (double)automatedStatistics.m_ulNumFalsePositives));
 		}
@@ -1835,7 +1835,7 @@ void CIDShieldTester::displaySummaryStatistics()
 		strStatisticSummary += "\r\nVerification efficiency:\r\n";
 
 		// Label for Number of files selected for review
-		zTemp.Format("Number of files selected for review: %d (%0.1f%%)",
+		zTemp.Format("\tFiles selected for review: %d (%0.1f%%)",
 			m_ulNumFilesSelectedForReview, getRatioAsPercentOfTwoLongs(
 				m_ulNumFilesSelectedForReview, m_ulTotalFilesProcessed));
 		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
@@ -1845,7 +1845,7 @@ void CIDShieldTester::displaySummaryStatistics()
 		{
 			// Make a note for the number of expected redactions in the reviewed files
 			// (This number would be a duplicate statistic in a standard workflow).
-			zTemp.Format("Number of sensitive data items in files presented for review: %d (%0.1f%%)",
+			zTemp.Format("\tSensitive data items in files presented for review: %d (%0.1f%%)",
 				verificationStatistics.m_ulExpectedRedactionsInSelectedFiles,
 				getRatioAsPercentOfTwoLongs(
 					verificationStatistics.m_ulExpectedRedactionsInSelectedFiles,
@@ -1862,14 +1862,14 @@ void CIDShieldTester::displaySummaryStatistics()
 		strStatisticSummary += "\r\nAutomated redaction efficiency:\r\n";
 		
 		// Label for Number of files selected for review
-		zTemp.Format("Number of automatically redacted files: %d (%0.1f%%)",
+		zTemp.Format("\tAutomatically redacted files: %d (%0.1f%%)",
 			m_ulNumFilesAutomaticallyRedacted, getRatioAsPercentOfTwoLongs(
 				m_ulNumFilesAutomaticallyRedacted, m_ulTotalFilesProcessed));
 		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 		strStatisticSummary += zTemp + "\r\n";
 
 		// Make a note for the number of expected redactions in the automatically redacted files
-		zTemp.Format("Number of sensitive data items in automatically redacted files: %d (%0.1f%%)",
+		zTemp.Format("\tSensitive data items in automatically redacted files: %d (%0.1f%%)",
 			automatedStatistics.m_ulExpectedRedactionsInSelectedFiles, 
 			getRatioAsPercentOfTwoLongs(automatedStatistics.m_ulExpectedRedactionsInSelectedFiles,
 				m_ulTotalExpectedRedactions));
@@ -1903,26 +1903,26 @@ string CIDShieldTester::displayStatisticsSection(
 	string strStatisticsSection = "";
 	CString zTemp;
 
-	zTemp = CString("Number of correct redactions") +
+	zTemp = CString("\tCorrect redactions") +
 		(bVerificationStatistics ? " presented to reviewers" : "");
 	zTemp.Format(zTemp + ": %d", statistics.m_ulNumCorrectRedactions);
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticsSection += zTemp + "\r\n";
 
-	zTemp = CString("Number of over-redactions") +
+	zTemp = CString("\tOver-redactions") +
 		(bVerificationStatistics ? " presented to reviewers" : "");
 	zTemp.Format(zTemp + ": %d", statistics.m_ulNumOverRedactions);
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticsSection += zTemp + "\r\n";
 
-	zTemp = CString("Number of under-redactions") +
+	zTemp = CString("\tUnder-redactions") +
 		(bVerificationStatistics ? " presented to reviewers" : "");
 	zTemp.Format(zTemp + ": %d", statistics.m_ulNumUnderRedactions);
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticsSection += zTemp + "\r\n";
 
 	// Note for the number of false positives found
-	zTemp = CString("Number of false positives") +
+	zTemp = CString("\tFalse positives") +
 		(bVerificationStatistics ? " presented to reviewers" : "");
 	zTemp.Format(zTemp + ": %d ", statistics.m_ulNumFalsePositives);
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
@@ -1930,11 +1930,11 @@ string CIDShieldTester::displayStatisticsSection(
 
 	if(statistics.m_ulNumFalsePositives <= 0)
 	{
-		zTemp = CString("Ratio of correctly redacted items to false positives: n/a");
+		zTemp = CString("\tRatio of correctly redacted items to false positives: n/a");
 	}
 	else
 	{
-		zTemp.Format("Ratio of correctly redacted items to false positives: %0.1f",
+		zTemp.Format("\tRatio of correctly redacted items to false positives: %0.1f",
 			((double)statistics.m_ulNumCorrectRedactions /
 				(double)statistics.m_ulNumFalsePositives));
 	}
@@ -1974,7 +1974,7 @@ void CIDShieldTester::displayDocumentTypeStats()
 	for( iter = m_mapDocTypeCount.begin(); iter != m_mapDocTypeCount.end(); ++iter )
 	{
 		// Get the doc type and the number of them found from the map
-		string strType = iter->first;
+		string strType = "\t" + iter->first;
 		int iNumber = iter->second;
 
 		// Create the string to display

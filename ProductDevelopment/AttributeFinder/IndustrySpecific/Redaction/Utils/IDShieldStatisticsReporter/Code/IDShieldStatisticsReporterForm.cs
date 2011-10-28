@@ -887,7 +887,7 @@ namespace Extract.IDShieldStatisticsReporter
                         // Build process information structure to launch the UEX application
                         ProcessStartInfo processInfo = new ProcessStartInfo();
                         processInfo.FileName = Path.Combine(commonComponentsDir, "UEXViewer.exe");
-                        processInfo.Arguments = failedTestCaseLog;
+                        processInfo.Arguments = "\"" + failedTestCaseLog + "\"";
 
                         Process.Start(processInfo);                     
                     }

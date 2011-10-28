@@ -277,7 +277,7 @@ LRESULT CRunObjectOnQueryPP::OnClickedBtnConfigure(WORD wNotifyCode, WORD wID,
 			UCLID_COMUTILSLib::ICategorizedComponentPtr ipCopy = ipCopyObj->Clone();
 
 			string strComponentDesc = ipCopy->GetComponentDescription();
-			string strTitle = string( "Configure " ) + strComponentDesc;
+			string strTitle = strComponentDesc + " settings";
 			_bstr_t	bstrTitle( strTitle.c_str() );
 
 			if(asCppBool(ipProperties->DisplayProperties1(ipCopy, bstrTitle)))
@@ -369,7 +369,7 @@ LRESULT CRunObjectOnQueryPP::OnBnClickedButtonConfigureSelector(WORD /*wNotifyCo
 			UCLID_COMUTILSLib::ICategorizedComponentPtr ipCopy = ipCopyObj->Clone();
 
 			string strComponentDesc = ipCopy->GetComponentDescription();
-			string strTitle = string( "Configure " ) + strComponentDesc;
+			string strTitle = strComponentDesc + " settings";
 			_bstr_t	bstrTitle( strTitle.c_str() );
 
 			if(asCppBool(ipProperties->DisplayProperties1(ipCopy, bstrTitle)))

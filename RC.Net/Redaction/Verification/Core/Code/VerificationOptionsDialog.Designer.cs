@@ -40,7 +40,7 @@ namespace Extract.Redaction.Verification
         {
             System.Windows.Forms.Label label3;
             System.Windows.Forms.GroupBox groupBox2;
-            System.Windows.Forms.TextBox textBox1;
+            System.Windows.Forms.Label label7;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VerificationOptionsDialog));
             System.Windows.Forms.GroupBox groupBox1;
             System.Windows.Forms.Label label2;
@@ -73,7 +73,7 @@ namespace Extract.Redaction.Verification
             this._createVOAFileRadioButton = new System.Windows.Forms.RadioButton();
             label3 = new System.Windows.Forms.Label();
             groupBox2 = new System.Windows.Forms.GroupBox();
-            textBox1 = new System.Windows.Forms.TextBox();
+            label7 = new System.Windows.Forms.Label();
             groupBox1 = new System.Windows.Forms.GroupBox();
             label2 = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
@@ -104,7 +104,7 @@ namespace Extract.Redaction.Verification
             | System.Windows.Forms.AnchorStyles.Right)));
             groupBox2.Controls.Add(this._slideshowRunKeyComboBox);
             groupBox2.Controls.Add(this.label6);
-            groupBox2.Controls.Add(textBox1);
+            groupBox2.Controls.Add(label7);
             groupBox2.Location = new System.Drawing.Point(6, 60);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new System.Drawing.Size(376, 102);
@@ -130,18 +130,16 @@ namespace Extract.Redaction.Verification
             this.label6.TabIndex = 1;
             this.label6.Text = "Slideshow run key:";
             // 
-            // textBox1
+            // label7
             // 
-            textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            label7.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            textBox1.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            textBox1.Location = new System.Drawing.Point(6, 19);
-            textBox1.Multiline = true;
-            textBox1.Name = "textBox1";
-            textBox1.Size = new System.Drawing.Size(357, 45);
-            textBox1.TabIndex = 0;
-            textBox1.Text = resources.GetString("textBox1.Text");
+            label7.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            label7.Location = new System.Drawing.Point(8, 19);
+            label7.Name = "label7";
+            label7.Size = new System.Drawing.Size(359, 45);
+            label7.TabIndex = 0;
+            label7.Text = resources.GetString("label7.Text");
             // 
             // groupBox1
             // 

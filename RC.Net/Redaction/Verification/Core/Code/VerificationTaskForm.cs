@@ -2435,12 +2435,12 @@ namespace Extract.Redaction.Verification
                     slideshowEnabled, true, slideshowEnabled);
 
                 _stopSlideshowCommand = new ApplicationCommand(null, null, null,
-                    new ToolStripItem[] { _slideshowStopToolStripButton, _slideshowStopToolStripMenuItem },
+                    new ToolStripItem[] { _slideshowStopToolStripButton },
                     false, true, false);
 
                 _slideShowToolStrip.Visible = slideshowEnabled;
                 _slideshowToolStripMenuItemSeparator.Visible = slideshowEnabled;
-                _slideshowToolStripMenuItem.Visible = slideshowEnabled;
+                _slideshowPlayToolStripMenuItem.Visible = slideshowEnabled;
 
                 if (slideshowEnabled && _config.Settings.AutoStartSlideshow)
                 {

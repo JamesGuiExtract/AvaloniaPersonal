@@ -203,8 +203,7 @@ void CAddRuleDlg::OnBtnConfigureRule2()
 				m_comboRule.GetLBText( iIndex, zText );
 
 				// Create prompt string
-				string strTitle = string( "Configure " ) + 
-					string( LPCTSTR(zText) );
+				string strTitle = string(LPCTSTR(zText))  + " settings";
 				_bstr_t	bstrTitle( strTitle.c_str() );
 
 				// Display the Property Page and check if the settings were applied

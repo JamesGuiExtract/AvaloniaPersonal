@@ -684,10 +684,10 @@ namespace Extract.FileActionManager.Database
                 _numberMaxTimeBetweenChecks.Focus();
                 return false;
             }
-            if ((max - min) < 100)
+            if ((max - min) < 0)
             {
                 UtilityMethods.ShowMessageBox(
-                    "The maximum time between checking for files to process must be at least 100ms greater than the minimum time.",
+                    "The maximum time between checking for files must be greater than the minimum time.",
                     "Invalid Max And Min", true);
                 _numberMaxTimeBetweenChecks.Focus();
                 return false;
