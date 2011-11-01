@@ -154,6 +154,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         ConfigSettings<Settings> _applicationConfig;
 
         /// <summary>
+        /// The user settings to be persisted to the registry for this application.
+        /// </summary>
+        RegistrySettings<Settings> _registry;
+
+        /// <summary>
         /// Provides the resources used to brand the DataEntryApplication as a specific product.
         /// </summary>
         BrandingResourceManager _brandingResources;
@@ -524,6 +529,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Initialize the application settings.
                 _applicationConfig = new ConfigSettings<Settings>(configFileName, false, false);
 
+                // Initialize the user registry settings.
+                _registry = new RegistrySettings<Settings>(@"Software\Extract Systems\DataEntry");
+
                 _brandingResources = new BrandingResourceManager(
                     DataEntryMethods.ResolvePath(_applicationConfig.Settings.ApplicationResourceFile));
 
@@ -615,6 +623,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _exitToolStripMenuItem.Text = "Stop processing";
                     _imageViewer.DefaultStatusMessage = "Waiting for next document...";
                 }
+
+                // Apply the peristed auto-OCR settings.
+                _imageViewer.AutoOcr = _registry.Settings.AutoOcr;
+                _imageViewer.OcrTradeoff = _registry.Settings.OcrTradeoff;
 
                 _invoker = new ControlInvoker(this);
             }
@@ -1020,7 +1032,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Toggle showing image viewer in a separate window.
                 _imageViewer.Shortcuts[Keys.F11] = ToggleSeparateImageWindow;
                 _separateImageWindowToolStripMenuItem.CheckState =
-                    RegistryManager.DefaultShowSeparateImageWindow
+                    _registry.Settings.ShowSeparateImageWindow
                         ? CheckState.Checked
                         : CheckState.Unchecked;
 
@@ -1099,17 +1111,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // settings. Do this regardless of whether the window will be maximized so that it
                 // will restore to the size used the last time the window was in the "normal" state.
                 Rectangle defaultBounds = new Rectangle(
-                    new Point(RegistryManager.DefaultWindowPositionX,
-                              RegistryManager.DefaultWindowPositionY),
-                    new Size(RegistryManager.DefaultWindowWidth,
-                             RegistryManager.DefaultWindowHeight));
+                    new Point(_registry.Settings.WindowPositionX,
+                              _registry.Settings.WindowPositionY),
+                    new Size(_registry.Settings.WindowWidth,
+                             _registry.Settings.WindowHeight));
 
                 Rectangle workingArea = Screen.GetWorkingArea(defaultBounds);
                 if (workingArea.IntersectsWith(defaultBounds))
                 {
                     DesktopBounds = defaultBounds;
 
-                    if (RegistryManager.DefaultWindowMaximized)
+                    if (_registry.Settings.WindowMaximized)
                     {
                         // Maximize the window if the registry setting indicates the application should
                         // launch maximized.
@@ -1128,7 +1140,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Establish connections between the image viewer and all image viewer controls.
                 _imageViewer.EstablishConnections(this);
 
-                if (RegistryManager.DefaultShowSeparateImageWindow)
+                if (_registry.Settings.ShowSeparateImageWindow)
                 {
                     OpenSeparateImageWindow();
                 }
@@ -1177,15 +1189,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     {
                         // If the user maximized the form, set the form to default to maximized,
                         // but don't adjust the default form size to use in normal mode.
-                        RegistryManager.DefaultWindowMaximized = true;
+                        _registry.Settings.WindowMaximized = true;
                     }
                     else if (WindowState == FormWindowState.Normal)
                     {
                         // If the user restored or moved the form in normal mode, store
                         // the new size as the default size.
-                        RegistryManager.DefaultWindowMaximized = false;
-                        RegistryManager.DefaultWindowWidth = Size.Width;
-                        RegistryManager.DefaultWindowHeight = Size.Height;
+                        _registry.Settings.WindowMaximized = false;
+                        _registry.Settings.WindowWidth = Size.Width;
+                        _registry.Settings.WindowHeight = Size.Height;
                     }
 
                     // If there is an image open in the image viewer then restore the previous
@@ -1217,8 +1229,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (_isLoaded && WindowState == FormWindowState.Normal)
                 {
                     // If the user moved the form, store the new position.
-                    RegistryManager.DefaultWindowPositionX = DesktopLocation.X;
-                    RegistryManager.DefaultWindowPositionY = DesktopLocation.Y;
+                    _registry.Settings.WindowPositionX = DesktopLocation.X;
+                    _registry.Settings.WindowPositionY = DesktopLocation.Y;
                 }
             }
             catch (Exception ex)
@@ -2056,7 +2068,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                RegistryManager.DefaultSplitterPosition = _splitContainer.SplitterDistance;
+                _registry.Settings.SplitterPosition = _splitContainer.SplitterDistance;
             }
             catch (Exception ex)
             {
@@ -2134,6 +2146,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 DialogResult result = _userPreferencesDialog.ShowDialog();
                 if (result == DialogResult.OK)
                 {
+                    // Apply the new auto-OCR settings to the image viewer.
+                    _imageViewer.AutoOcr = _userPreferences.AutoOcr;
+                    _imageViewer.OcrTradeoff = _userPreferences.OcrTradeoff;
+
                     // If the user applied settings, store them to the registry and update the
                     // dataEntryControlHost's settings.
                     _userPreferences.WriteToRegistry();
@@ -2201,15 +2217,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     // If the user maximized the form, set the form to default to maximized,
                     // but don't adjust the default form size to use in normal mode.
-                    RegistryManager.DefaultImageWindowMaximized = true;
+                    _registry.Settings.ImageWindowMaximized = true;
                 }
                 else if (_imageViewerForm.WindowState == FormWindowState.Normal)
                 {
                     // If the user restored or moved the form in normal mode, store
                     // the new size as the default size.
-                    RegistryManager.DefaultImageWindowMaximized = false;
-                    RegistryManager.DefaultImageWindowWidth = _imageViewerForm.Size.Width;
-                    RegistryManager.DefaultImageWindowHeight = _imageViewerForm.Size.Height;
+                    _registry.Settings.ImageWindowMaximized = false;
+                    _registry.Settings.ImageWindowWidth = _imageViewerForm.Size.Width;
+                    _registry.Settings.ImageWindowHeight = _imageViewerForm.Size.Height;
                 }
             }
             catch (Exception ex)
@@ -2233,8 +2249,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (_imageViewerForm.WindowState == FormWindowState.Normal)
                 {
                     // If the user moved the form, store the new position.
-                    RegistryManager.DefaultImageWindowPositionX = _imageViewerForm.DesktopLocation.X;
-                    RegistryManager.DefaultImageWindowPositionY = _imageViewerForm.DesktopLocation.Y;
+                    _registry.Settings.ImageWindowPositionX = _imageViewerForm.DesktopLocation.X;
+                    _registry.Settings.ImageWindowPositionY = _imageViewerForm.DesktopLocation.Y;
                 }
             }
             catch (Exception ex)
@@ -2275,7 +2291,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // If the user is closes the image viewer form, go back to single-window mode.
-                RegistryManager.DefaultShowSeparateImageWindow = false;
+                _registry.Settings.ShowSeparateImageWindow = false;
                 _separateImageWindowToolStripMenuItem.CheckState = CheckState.Unchecked;
                 CloseSeparateImageWindow();
             }
@@ -2990,6 +3006,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     if (_dataEntryControlHost != null)
                     {
+                        // Set Active = false for the old DEP so that it no longer tracks image
+                        // viewer events.
+                        _dataEntryControlHost.Active = false;
+
                         // Unregister for events and disengage shortcut handlers for the previous DEP
                         _dataEntryControlHost.SwipingStateChanged -= HandleSwipingStateChanged;
                         _dataEntryControlHost.InvalidItemsFound -= HandleInvalidItemsFound;
@@ -3040,6 +3060,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             _dataEntryControlHost.RemoveSpatialInfo;
                         _undoCommand.ShortcutHandler =
                             _dataEntryControlHost.Undo;
+
+                        // Set Active = true for the new DEP so that it tracks image viewer events.
+                        _dataEntryControlHost.Active = true;
                     }
 
                     // Load the panel into the _scrollPane
@@ -3321,7 +3344,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         void OpenSeparateImageWindow()
         {
             // Store mode in registry so the next time it will re-open in the same state.
-            RegistryManager.DefaultShowSeparateImageWindow = true;
+            _registry.Settings.ShowSeparateImageWindow = true;
             _separateImageWindowToolStripMenuItem.CheckState = CheckState.Checked;
 
             if (_imageViewerForm == null)
@@ -3372,8 +3395,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 // Initialize the position using previously stored registry settings or
                 // the previous desktop location of the image viewer.
-                Point location = new Point(RegistryManager.DefaultImageWindowPositionX,
-                    RegistryManager.DefaultImageWindowPositionY);
+                Point location = new Point(_registry.Settings.ImageWindowPositionX,
+                    _registry.Settings.ImageWindowPositionY);
                 Rectangle workingArea = Screen.GetWorkingArea(location);
                 if (location.X != -1 && location.Y != -1 && workingArea.Contains(location))
                 {
@@ -3388,8 +3411,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 // Initialize the size using previously stored registry settings or
                 // the previous size of the image viewer.
-                Size size = new Size(RegistryManager.DefaultImageWindowWidth,
-                    RegistryManager.DefaultImageWindowHeight);
+                Size size = new Size(_registry.Settings.ImageWindowWidth,
+                    _registry.Settings.ImageWindowHeight);
                 if (size.Width > 0 && size.Height > 0 && workingArea.Contains(location))
                 {
                     _imageViewerForm.Size = size;
@@ -3404,7 +3427,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Collapse the pane the image viewer was removed from.
                 _splitContainer.Panel2Collapsed = true;
 
-                if (RegistryManager.DefaultImageWindowMaximized)
+                if (_registry.Settings.ImageWindowMaximized)
                 {
                     _imageViewerForm.WindowState = FormWindowState.Maximized;
                 }
@@ -3426,7 +3449,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         void CloseSeparateImageWindow()
         {
             // Store mode in registry so the next time it will re-open in the same state.
-            RegistryManager.DefaultShowSeparateImageWindow = false;
+            _registry.Settings.ShowSeparateImageWindow = false;
             _separateImageWindowToolStripMenuItem.CheckState = CheckState.Unchecked;
 
             if (_imageViewerForm != null)
@@ -3723,9 +3746,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _dataEntryControlHost.Location
                     = new Point(_DATA_ENTRY_PANEL_PADDING, _DATA_ENTRY_PANEL_PADDING);
                 _splitContainer.SplitterWidth = _DATA_ENTRY_PANEL_PADDING;
-                if (RegistryManager.DefaultSplitterPosition > 0)
+                if (_registry.Settings.SplitterPosition > 0)
                 {
-                    _splitContainer.SplitterDistance = RegistryManager.DefaultSplitterPosition;
+                    _splitContainer.SplitterDistance = _registry.Settings.SplitterPosition;
                 }
                 else
                 {

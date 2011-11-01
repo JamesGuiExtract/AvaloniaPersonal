@@ -614,25 +614,25 @@ namespace Extract.Imaging.Forms
     }
 
     /// <summary>
-    /// Provides data for the <see cref="ImageViewer.OcrLoaded"/> event.
+    /// Provides data for events relating to OCR text.
     /// </summary>
-    public class OcrLoadedEventArgs : EventArgs
+    public class OcrTextEventArgs : EventArgs
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BackgroundProcessStatusUpdateEventArgs"/>
+        /// Initializes a new instance of the <see cref="OcrTextEventArgs"/>
         /// class.
         /// </summary>
-        /// <param name="ocrData">A <see cref="ThreadSafeSpatialString"/> instance representing the data
-        /// from the completed OCR operation.</param>
-        public OcrLoadedEventArgs(ThreadSafeSpatialString ocrData)
+        /// <param name="ocrData">A <see cref="ThreadSafeSpatialString"/> instance representing the
+        /// data for the event.</param>
+        public OcrTextEventArgs(ThreadSafeSpatialString ocrData)
             : base()
         {
             OcrData = ocrData;
         }
 
         /// <summary>
-        /// Gets a <see cref="ThreadSafeSpatialString"/> instance representing the data from the
-        /// completed OCR operation.
+        /// Gets a <see cref="ThreadSafeSpatialString"/> instance representing the data for the
+        /// event.
         /// </summary>
         public ThreadSafeSpatialString OcrData
         {

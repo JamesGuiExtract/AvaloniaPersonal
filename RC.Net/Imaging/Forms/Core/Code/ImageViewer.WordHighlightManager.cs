@@ -168,6 +168,22 @@ namespace Extract.Imaging.Forms
             HashSet<LayerObject> _activeWordHighlights = new HashSet<LayerObject>();
 
             /// <summary>
+            /// The OCR content associated with each word highlight. This is only populated when
+            /// <see cref="InRedactionMode"/> is <see langword="false"/>.
+            /// </summary>
+            ConcurrentDictionary<LayerObject, ThreadSafeSpatialString> _highlightOcr =
+                new ConcurrentDictionary<LayerObject, ThreadSafeSpatialString>();
+
+            /// <summary>
+            /// The OCR content of the word highlights loaded for the current document. This
+            /// dictionary is used to sort the results of and word highlight operation since the
+            /// words in this lists are in the same order as the OCR on the page. This is only
+            /// populated when <see cref="InRedactionMode"/> is <see langword="false"/>.
+            /// </summary>
+            ConcurrentDictionary<int, List<ThreadSafeSpatialString>> _loadedOcrWords =
+                new ConcurrentDictionary<int, List<ThreadSafeSpatialString>>();
+
+            /// <summary>
             /// Indicates for which image page OCR or word highlights are currently being loaded.
             /// -1 indicates no background loading is currently occurring.
             /// </summary>
@@ -274,7 +290,7 @@ namespace Extract.Imaging.Forms
             /// Raised when the automatic OCR processing has successfully completed on the currently
             /// loaded document.
             /// </summary>
-            public event EventHandler<OcrLoadedEventArgs> OcrLoaded;
+            public event EventHandler<OcrTextEventArgs> OcrLoaded;
 
             #endregion Events
 
@@ -469,13 +485,13 @@ namespace Extract.Imaging.Forms
 
                     if (!cancel)
                     {
-                        if (_imageViewer._cursorTool == CursorTool.WordHighlight)
+                        if (InRedactionMode)
                         {
-                            CreateOutputHighlight<CompositeHighlightLayerObject>();
+                            CreateOutput<Redaction>();
                         }
                         else
                         {
-                            CreateOutputHighlight<Redaction>();
+                            CreateOutput<CompositeHighlightLayerObject>();
                         }
                     }
 
@@ -622,7 +638,8 @@ namespace Extract.Imaging.Forms
                 try
                 {
                     // Auto-fit mode is allowed to change in the middle of a tracking operation.
-                    InAutoFitMode = (_imageViewer.Cursor == ExtractCursors.ShiftWordRedaction);
+                    InAutoFitMode = (_imageViewer.Cursor == ExtractCursors.ShiftWordRedaction ||
+                                     _imageViewer.Cursor == ExtractCursors.ShiftWordHighlight);
                 }
                 catch (Exception ex)
                 {
@@ -773,6 +790,21 @@ namespace Extract.Imaging.Forms
                             foreach (Highlight highlight in pageHighlights)
                             {
                                 _wordLineMapping.Remove(highlight);
+
+                                if (!InRedactionMode)
+                                {
+                                    // _highlightOcr will only be populated when not InRedactionMode.
+                                    ThreadSafeSpatialString temp;
+                                    _highlightOcr.TryRemove(highlight, out temp);
+                                }
+                            }
+
+                            if (!InRedactionMode)
+                            {
+                                // _loadedOcrWords will only be populated when not InRedactionMode.
+                                List<ThreadSafeSpatialString> ocrWords;
+                                ExtractException.Assert("ELI34064", "Internal error.",
+                                    _loadedOcrWords.TryRemove(page, out ocrWords));
                             }
                         }
 
@@ -1035,7 +1067,8 @@ namespace Extract.Imaging.Forms
                 {
                     _highlightsEnabled = true;
 
-                    InAutoFitMode = (_imageViewer.Cursor == ExtractCursors.ShiftWordRedaction);
+                    InAutoFitMode = (_imageViewer.Cursor == ExtractCursors.ShiftWordRedaction ||
+                                     _imageViewer.Cursor == ExtractCursors.ShiftWordHighlight);
 
                     // If word highlights are active, watch for when the cursor
                     // enters/leaves word highlights.
@@ -1230,7 +1263,7 @@ namespace Extract.Imaging.Forms
                             // occured after cancelation (for example, accessing the current page number
                             if (!_cancelToken.IsCancellationRequested)
                             {
-                                string message = (_imageViewer.CursorTool == CursorTool.WordHighlight)
+                                string message = InRedactionMode
                                     ? "Error loading data for word highlight tool."
                                     : "Error loading data for word redaction tool.";
 
@@ -1299,6 +1332,21 @@ namespace Extract.Imaging.Forms
             }
 
             /// <summary>
+            /// Gets a value indicating whether word highlights are being used to created redactions
+            /// versus highlights.
+            /// </summary>
+            /// <value><see langword="true"/> if word highlights are being used to created redactions;
+            /// <see langword="false"/> if word highlights are being used to created highlights.
+            /// </value>
+            bool InRedactionMode
+            {
+                get
+                {
+                    return (_imageViewer._cursorTool == CursorTool.WordRedaction);
+                }
+            }
+
+            /// <summary>
             /// Clear and disposes of all loaded data.
             /// <para><b>Note</b></para>
             /// This method must be called from within a lock.
@@ -1321,6 +1369,8 @@ namespace Extract.Imaging.Forms
 
                 _pagesOfAddedWordHighlights.Clear();
                 _wordHighlights.Clear();
+                _loadedOcrWords.Clear();
+                _highlightOcr.Clear();
                 _pageStatusMessages.Clear();
                 _wordLineMapping.Clear();
                 _averageLineHeight.Clear();
@@ -1888,6 +1938,18 @@ namespace Extract.Imaging.Forms
                     _wordHighlights[page] = wordHighlights;
                 }
 
+                // If not InRedactionMode, create or retrieve an existing list to hold the OCR for
+                // words on the current page.
+                List<ThreadSafeSpatialString> loadedOcrWords = null;
+                if (!InRedactionMode)
+                {
+                    if (!_loadedOcrWords.TryGetValue(page, out loadedOcrWords))
+                    {
+                        loadedOcrWords = new List<ThreadSafeSpatialString>();
+                        _loadedOcrWords[page] = loadedOcrWords;
+                    }
+                }
+
                 // Keeps track of the starting point of each line in terms of the number of words
                 // on the page before it.
                 int lineStartIndex = 0;
@@ -1940,14 +2002,25 @@ namespace Extract.Imaging.Forms
                         highlight.CanRender = false;
                         highlight.Visible = false;
 
-                        // [FlexIDSCore:4601]
-                        // Until pixels are scanned to refine the borders of OCR coordinates when
-                        // adding a redaction, the OCR coordinates may be a pixel too small in some
-                        // cases. Therefore, pad the preview highlights by AutoFitZonePadding in
-                        // each direction to give the user confidence that when the redaction is
-                        // added it will properly cover the entire word.
-                        highlight.Inflate((float)_registry.Settings.AutoFitZonePadding + 1,
-                            RoundingMode.Safe, false);
+                        if (InRedactionMode)
+                        {
+                            // [FlexIDSCore:4601]
+                            // Until pixels are scanned to refine the borders of OCR coordinates when
+                            // adding a redaction, the OCR coordinates may be a pixel too small in some
+                            // cases. Therefore, pad the preview highlights by AutoFitZonePadding in
+                            // each direction to give the user confidence that when the redaction is
+                            // added it will properly cover the entire word.
+                            highlight.Inflate((float)_registry.Settings.AutoFitZonePadding + 1,
+                                RoundingMode.Safe, false);
+                        }
+                        else
+                        {
+                            // In highlighting mode, collect the OCR text associated with the
+                            // highlight.
+                            var threadSafeWord = new ThreadSafeSpatialString(_imageViewer, word);
+                            loadedOcrWords.Add(threadSafeWord);
+                            _highlightOcr[highlight] = threadSafeWord;
+                        }
 
                         _wordLineMapping[highlight] = lineIdentifier;
                         wordHighlights.Add(highlight);
@@ -2149,10 +2222,10 @@ namespace Extract.Imaging.Forms
             }
 
             /// <summary>
-            /// Adds a <see cref="Highlight"/> or <see cref="Redaction"/> to the image viewer based
-            /// on the current tracking data.
+            /// Adds a <see cref="Highlight"/>, <see cref="Redaction"/> or highlights OCR text in
+            /// the image viewer based on the current tracking data.
             /// </summary>
-            void CreateOutputHighlight<T>() where T : CompositeHighlightLayerObject
+            void CreateOutput<T>() where T : CompositeHighlightLayerObject
             {
                 // Collect all raster zones from the active highlights.
                 List<RasterZone> rasterZones = new List<RasterZone>();
@@ -2190,7 +2263,17 @@ namespace Extract.Imaging.Forms
                 }
                 else
                 {
-                    zonesToHighlight.AddRange(GetWordOutputZones());
+                    if (InRedactionMode)
+                    {
+                        zonesToHighlight.AddRange(GetWordOutputZones());
+                    }
+                    else
+                    {
+                        // Rather than create spatial zones, report the OCR content itelf to be
+                        // highlighted via the OcrTextHighlighted event.
+                        HighlightActiveOCRText();
+                        return;
+                    }
                 }
 
                 foreach (RasterZone zone in zonesToHighlight)
@@ -2239,7 +2322,7 @@ namespace Extract.Imaging.Forms
 
                     try
                     {
-                        if (typeof(T) == typeof(Redaction))
+                        if (InRedactionMode)
                         {
                             outputLayerObject = new Redaction(_imageViewer,
                                 _imageViewer.PageNumber, LayerObject.ManualComment, rasterZones,
@@ -2283,6 +2366,66 @@ namespace Extract.Imaging.Forms
                         }
                     }
                 }
+            }
+
+            /// <summary>
+            /// Reports the OCR text associated with the active highlight(s) to be highlighted via
+            /// the <see cref="OcrTextHighlighted"/> event.
+            /// </summary>
+            void HighlightActiveOCRText()
+            {
+                if (_activeWordHighlights.Count == 0)
+                {
+                    // If there are no active word highlights, there is nothing to do.
+                    return;
+                }
+
+                // Populate pageOcrWords with the OCR content on the page in order to sort the OCR
+                // content of the active highlights correctly in the output.
+                int pageNumber = _activeWordHighlights.First().PageNumber;
+                List<ThreadSafeSpatialString> pageOcrWords;
+                ExtractException.Assert("ELI34065", "Internal error.",
+                    _loadedOcrWords.TryGetValue(pageNumber, out pageOcrWords));
+                int? lastWordLineNumber = null;
+
+                // Generate a SpatialString by merging the OCR content of all active word highlights.
+                SpatialString outputSpatialString = _activeWordHighlights
+                    .Select(highlight => new Tuple<int, ThreadSafeSpatialString>(
+                        _wordLineMapping[highlight], _highlightOcr[highlight]))
+                    .OrderBy(tuple => pageOcrWords.IndexOf(tuple.Item2))
+                    .Aggregate(new SpatialString(), (spatialString, next) =>
+                    {
+                        // For each active word, we have the line number of the word and a
+                        // SpatialString representing its OCR content.
+                        int nextLineNumber = next.Item1;
+                        SpatialString nextSpatialString = next.Item2.SpatialString;
+
+                        // If this is not the first word in the output, separate it from the
+                        // previous word using either a space or a carriage return depending on
+                        // whether it is on the same line as the previous word.
+                        if (lastWordLineNumber.HasValue)
+                        {
+                            if (lastWordLineNumber.Value == nextLineNumber)
+                            {
+                                spatialString.AppendString(" ");
+                            }
+                            else
+                            {
+                                spatialString.AppendString("\r\n");
+                            }
+                        }
+
+                        lastWordLineNumber = nextLineNumber;
+                        spatialString.Append(nextSpatialString);
+
+                        return spatialString;
+                    });
+
+                // Raise OcrTextHighlighted with the resulting SpatialString.
+                var eventArgs = new OcrTextEventArgs(
+                    new ThreadSafeSpatialString(_imageViewer, outputSpatialString));
+
+                _imageViewer.OnOcrTextHighlighted(eventArgs);
             }
 
             /// <summary>
@@ -2539,7 +2682,7 @@ namespace Extract.Imaging.Forms
             {
                 if (OcrLoaded != null)
                 {
-                    OcrLoaded(this, new OcrLoadedEventArgs(ocrData));
+                    OcrLoaded(this, new OcrTextEventArgs(ocrData));
                 }
             }
 

@@ -3528,9 +3528,9 @@ namespace Extract.Redaction.Verification
         /// Handles the case that a background OCR operation has completed.
         /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="Extract.Imaging.Forms.OcrLoadedEventArgs"/> instance
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.OcrTextEventArgs"/> instance
         /// containing the event data.</param>
-        void HandleOcrLoaded(object sender, OcrLoadedEventArgs e)
+        void HandleOcrLoaded(object sender, OcrTextEventArgs e)
         {
             try
             {

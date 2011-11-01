@@ -607,7 +607,12 @@ namespace Extract.Imaging.Forms
         /// Raised when the automatic OCR processing has successfully completed on the currently
         /// loaded document.
         /// </summary>
-        public event EventHandler<OcrLoadedEventArgs> OcrLoaded;
+        public event EventHandler<OcrTextEventArgs> OcrLoaded;
+
+        /// <summary>
+        /// Raised when OCR text is highlighted in the image viewer.
+        /// </summary>
+        public event EventHandler<OcrTextEventArgs> OcrTextHighlighted;
 
         #endregion
 
@@ -1919,9 +1924,6 @@ namespace Extract.Imaging.Forms
                 // Ensure the image is not null
                 ExtractException.Assert("ELI21220", "Cannot get orientation. No image is open.",
                     base.Image != null);
-
-                ExtractException.Assert("ELI33517", "Error determining image orientation.",
-                    _imagePages[_pageNumber - 1].Orientation == _orientation);
 
                 return _orientation;
             }
@@ -3390,13 +3392,26 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Raises the <see cref="OcrLoaded"/> event.
         /// </summary>
-        /// <param name="eventArgs">The <see cref="Extract.Imaging.Forms.OcrLoadedEventArgs"/>
+        /// <param name="eventArgs">The <see cref="Extract.Imaging.Forms.OcrTextEventArgs"/>
         /// instance containing the event data.</param>
-        void OnOcrLoaded(OcrLoadedEventArgs eventArgs)
+        void OnOcrLoaded(OcrTextEventArgs eventArgs)
         {
             if (OcrLoaded != null)
             {
                 OcrLoaded(this, eventArgs);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="OcrTextHighlighted"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The <see cref="Extract.Imaging.Forms.OcrTextEventArgs"/>
+        /// instance containing the event data.</param>
+        void OnOcrTextHighlighted(OcrTextEventArgs eventArgs)
+        {
+            if (OcrTextHighlighted != null)
+            {
+                OcrTextHighlighted(this, eventArgs);
             }
         }
 
@@ -3841,9 +3856,9 @@ namespace Extract.Imaging.Forms
         /// Handles the case that a background OCR operation has completed.
         /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="Extract.Imaging.Forms.OcrLoadedEventArgs"/> instance
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.OcrTextEventArgs"/> instance
         /// containing the event data.</param>
-        void HandleOcrLoaded(object sender, OcrLoadedEventArgs e)
+        void HandleOcrLoaded(object sender, OcrTextEventArgs e)
         {
             try
             {

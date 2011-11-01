@@ -23,6 +23,7 @@ using UCLID_COMUTILSLib;
 using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 using ESpatialStringMode = UCLID_RASTERANDOCRMGMTLib.ESpatialStringMode;
 using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
+using SpatialPageInfo = UCLID_RASTERANDOCRMGMTLib.SpatialPageInfo;
 
 namespace Extract.DataEntry
 {
@@ -226,6 +227,12 @@ namespace Extract.DataEntry
         /// The image viewer with which to display documents.
         /// </summary>
         ImageViewer _imageViewer;
+
+        /// <summary>
+        /// Indicates whether this DEP should be monitoring events from the
+        /// <see cref="_imageViewer"/>.
+        /// </summary>
+        bool _active;
 
         /// <summary>
         /// The vector of attributes associated with any currently open document.
@@ -1088,6 +1095,48 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this DEP should be monitoring events from the
+        /// <see cref="_imageViewer"/>.
+        /// </summary>
+        /// <value><see langword="true"/> if this DEP should be monitoring events from the
+        /// <see cref="_imageViewer"/>; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool Active
+        {
+            get
+            {
+                return _active;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _active)
+                    {
+                        _active = value;
+
+                        if (_imageViewer != null)
+                        {
+                            if (value)
+                            {
+                                RegisterForEvents();
+                            }
+                            else
+                            {
+                                UnregisterForEvents();
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI34068");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -1125,23 +1174,9 @@ namespace Extract.DataEntry
                 try
                 {
                     // Unregister from previously subscribed-to events
-                    if (_imageViewer != null)
+                    if (_imageViewer != null && _active)
                     {
-                        _imageViewer.CursorToolChanged -= HandleCursorToolChanged;
-                        _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
-                        _imageViewer.PreviewKeyDown -= HandleImageViewerPreviewKeyDown;
-                        _imageViewer.CursorEnteredLayerObject -= HandleCursorEnteredLayerObject;
-                        _imageViewer.CursorLeftLayerObject -= HandleCursorLeftLayerObject;
-                        _imageViewer.MouseDown -= HandleImageViewerMouseDown;
-                        _imageViewer.ZoomChanged -= HandleImageViewerZoomChanged;
-                        _imageViewer.ScrollPositionChanged -= HandleImageViewerScrollPositionsChanged;
-                        _imageViewer.PageChanged -= HandleImageViewerPageChanged;
-                        _imageViewer.FitModeChanged -= HandleImageViewerFitModeChanged;
-                        if (_imageViewer.CursorTool == CursorTool.SelectLayerObject)
-                        {
-                            _imageViewer.CursorEnteredLayerObject -= HandleCursorEnteredLayerObject;
-                            _imageViewer.CursorLeftLayerObject -= HandleCursorLeftLayerObject;
-                        }
+                        UnregisterForEvents();
                     }
 
                     // Store the new image viewer internally
@@ -1150,18 +1185,9 @@ namespace Extract.DataEntry
                     // Check if an image viewer was specified
                     if (_imageViewer != null)
                     {
-                        _imageViewer.CursorToolChanged += HandleCursorToolChanged;
-                        _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
-                        _imageViewer.PreviewKeyDown += HandleImageViewerPreviewKeyDown;
-                        _imageViewer.MouseDown += HandleImageViewerMouseDown;
-                        _imageViewer.ZoomChanged += HandleImageViewerZoomChanged;
-                        _imageViewer.ScrollPositionChanged += HandleImageViewerScrollPositionsChanged;
-                        _imageViewer.PageChanged += HandleImageViewerPageChanged;
-                        _imageViewer.FitModeChanged += HandleImageViewerFitModeChanged;
-                        if (_imageViewer.CursorTool == CursorTool.SelectLayerObject)
+                        if (_active)
                         {
-                            _imageViewer.CursorEnteredLayerObject += HandleCursorEnteredLayerObject;
-                            _imageViewer.CursorLeftLayerObject += HandleCursorLeftLayerObject;
+                            RegisterForEvents();
                         }
 
                         _imageViewer.DefaultHighlightColor = _defaultHighlightColor;
@@ -2753,68 +2779,41 @@ namespace Extract.DataEntry
                                 return;
                             }
 
-                            // If no OCR results were produced, notifiy the user.
-                            if (ocrText == null || string.IsNullOrEmpty(ocrText.String))
+                            // If a highlight was created using the auto-fit mode of the word
+                            // highlight tool, create a hybrid string whose spatial area is the full
+                            // area of the "swipe" rather than just what OCR'd. (allows an easy way
+                            // to add spatial info for a field.)
+                            if (_imageViewer.CursorTool == CursorTool.WordHighlight)
                             {
-                                ShowUserNotificationTooltip("No text was recognized.");
-                                return;
+                                // Create unrotated/skewed spatial page info for the resulting
+                                // hybrid string.
+                                var spatialPageInfos = new LongToObjectMap();
+                                var spatialPageInfo = new SpatialPageInfo();
+                                spatialPageInfo.SetPageInfo(_imageViewer.ImageWidth, _imageViewer.ImageHeight, 0, 0);
+                                spatialPageInfos.Set(_imageViewer.PageNumber, spatialPageInfo);
+
+                                // Create the hyrid result using the spatial data from the swipe
+                                // with the text from the OCR attempt.
+                                var hybridOcrText = new SpatialString();
+                                hybridOcrText.CreateHybridString(
+                                    highlightedZones
+                                        .Select(rasterZone => rasterZone.ToComRasterZone())
+                                        .ToIUnknownVector(),
+                                    (ocrText == null) ? "" : ocrText.String,
+                                    _imageViewer.ImageFile, spatialPageInfos);
+                                ocrText = hybridOcrText;
                             }
-
-                            // [DataEntry:269] Swipes should trigger document to be marked as dirty.
-                            OnDataChanged();
-
-                            try
+                            else
                             {
-                                // Delay calls to DrawHighlights until processing of the swipe is
-                                // complete.
-                                ControlUpdateReferenceCount++;
-
-                                // If a swipe did not produce any results usable by the control,
-                                // notify the user.
-                                if (!_activeDataControl.ProcessSwipedText(ocrText))
+                                // If no OCR results were produced, notifiy the user.
+                                if (ocrText == null || string.IsNullOrEmpty(ocrText.String))
                                 {
-                                    ShowUserNotificationTooltip("Unable to format swiped text " +
-                                        "into the current selection.");
+                                    ShowUserNotificationTooltip("No text was recognized.");
                                     return;
                                 }
                             }
-                            catch (Exception ex)
-                            {
-                                ExtractException.Log("ELI27090", ex);
 
-                                // Notify the user of errors the control encountered processing the 
-                                // swiped text.
-                                ShowUserNotificationTooltip("An error was encountered while " +
-                                    "formatting the swiped text into the current selection.");
-                                return;
-                            }
-                            finally
-                            {
-                                ControlUpdateReferenceCount--;
-                            }
-
-                            try
-                            {
-                                // Notify AttributeStatusInfo that the current edit is over so that
-                                // a non-incremental value modified event can be raised.
-                                AttributeStatusInfo.EndEdit();
-                            }
-                            catch (Exception ex)
-                            {
-                                ExtractException.Log("ELI27091", ex);
-
-                                // Notify the user of errors encountered while applying the change
-                                // (likely involves auto-update queries).
-                                ShowUserNotificationTooltip("An error was encountered while " +
-                                    "applying the swiped text to the current selection.");
-                            }
-
-                            // It is likely that the spatial information of the selected attributes
-                            // changed as a result of the swipe; update the active attribute(s)'
-                            // associated highlights.
-                            _refreshActiveControlHighlights = true;
-
-                            DrawHighlights(true);
+                            SendSpatialStringToActiveControl(ocrText);
                         }
                     }
                 }
@@ -2849,6 +2848,31 @@ namespace Extract.DataEntry
                     // in progress.
                     _processingSwipe = false;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that OCR text is highlighted in the image viewer. (i.e., "swiped" with
+        /// the word highlight tool.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.OcrTextEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleOcrTextHighlighted(object sender, OcrTextEventArgs e)
+        {
+            try
+            {
+                _processingSwipe = true;
+
+                SendSpatialStringToActiveControl(e.OcrData.SpatialString);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34069");
+            }
+            finally
+            {
+                _processingSwipe = false;
             }
         }
 
@@ -3970,6 +3994,75 @@ namespace Extract.DataEntry
 
                 PropagateAttributes(nextTabStopGenealogy, true, selectGroup);
             }
+        }
+
+        /// <summary>
+        /// Sends <see paramref="ocrText"/> to active control.
+        /// </summary>
+        /// <param name="ocrText">The ocr text to send to the active control.</param>
+        void SendSpatialStringToActiveControl(SpatialString ocrText)
+        {
+            if (_activeDataControl == null)
+            {
+                // If there is no active control, there is nothing to do.
+                return;
+            }
+
+            // [DataEntry:269] Swipes should trigger document to be marked as dirty.
+            OnDataChanged();
+
+            try
+            {
+                // Delay calls to DrawHighlights until processing of the swipe is
+                // complete.
+                ControlUpdateReferenceCount++;
+
+                // If a swipe did not produce any results usable by the control,
+                // notify the user.
+                if (!_activeDataControl.ProcessSwipedText(ocrText))
+                {
+                    ShowUserNotificationTooltip("Unable to format swiped text " +
+                        "into the current selection.");
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Log("ELI27090", ex);
+
+                // Notify the user of errors the control encountered processing the 
+                // swiped text.
+                ShowUserNotificationTooltip("An error was encountered while " +
+                    "formatting the swiped text into the current selection.");
+                return;
+            }
+            finally
+            {
+                ControlUpdateReferenceCount--;
+            }
+
+            try
+            {
+                // Notify AttributeStatusInfo that the current edit is over so that
+                // a non-incremental value modified event can be raised.
+                AttributeStatusInfo.EndEdit();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Log("ELI27091", ex);
+
+                // Notify the user of errors encountered while applying the change
+                // (likely involves auto-update queries).
+                ShowUserNotificationTooltip("An error was encountered while " +
+                    "applying the swiped text to the current selection.");
+            }
+
+            // It is likely that the spatial information of the selected attributes
+            // changed as a result of the swipe; update the active attribute(s)'
+            // associated highlights.
+            _refreshActiveControlHighlights = true;
+
+            DrawHighlights(true);
         }
 
         /// <summary>
@@ -6477,6 +6570,48 @@ namespace Extract.DataEntry
             finally
             {
                 _performingProgrammaticZoom = false;
+            }
+        }
+
+        /// <summary>
+        /// Registers for events.
+        /// </summary>
+        void RegisterForEvents()
+        {
+            _imageViewer.CursorToolChanged += HandleCursorToolChanged;
+            _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
+            _imageViewer.OcrTextHighlighted += HandleOcrTextHighlighted;
+            _imageViewer.PreviewKeyDown += HandleImageViewerPreviewKeyDown;
+            _imageViewer.MouseDown += HandleImageViewerMouseDown;
+            _imageViewer.ZoomChanged += HandleImageViewerZoomChanged;
+            _imageViewer.ScrollPositionChanged += HandleImageViewerScrollPositionsChanged;
+            _imageViewer.PageChanged += HandleImageViewerPageChanged;
+            _imageViewer.FitModeChanged += HandleImageViewerFitModeChanged;
+            if (_imageViewer.CursorTool == CursorTool.SelectLayerObject)
+            {
+                _imageViewer.CursorEnteredLayerObject += HandleCursorEnteredLayerObject;
+                _imageViewer.CursorLeftLayerObject += HandleCursorLeftLayerObject;
+            }
+        }
+
+        /// <summary>
+        /// Unregisters for events.
+        /// </summary>
+        void UnregisterForEvents()
+        {
+            _imageViewer.CursorToolChanged -= HandleCursorToolChanged;
+            _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
+            _imageViewer.OcrTextHighlighted -= HandleOcrTextHighlighted;
+            _imageViewer.PreviewKeyDown -= HandleImageViewerPreviewKeyDown;
+            _imageViewer.MouseDown -= HandleImageViewerMouseDown;
+            _imageViewer.ZoomChanged -= HandleImageViewerZoomChanged;
+            _imageViewer.ScrollPositionChanged -= HandleImageViewerScrollPositionsChanged;
+            _imageViewer.PageChanged -= HandleImageViewerPageChanged;
+            _imageViewer.FitModeChanged -= HandleImageViewerFitModeChanged;
+            if (_imageViewer.CursorTool == CursorTool.SelectLayerObject)
+            {
+                _imageViewer.CursorEnteredLayerObject -= HandleCursorEnteredLayerObject;
+                _imageViewer.CursorLeftLayerObject -= HandleCursorLeftLayerObject;
             }
         }
 

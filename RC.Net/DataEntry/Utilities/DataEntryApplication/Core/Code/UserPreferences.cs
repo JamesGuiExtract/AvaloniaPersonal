@@ -1,10 +1,9 @@
-using Extract.DataEntry;
+using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Licensing;
+using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Extract.DataEntry.Utilities.DataEntryApplication
@@ -26,21 +25,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #region Fields
 
         /// <summary>
-        /// Specifies how the image viewer zoom/view is adjusted when new fields are selected.
-        /// </summary>
-        AutoZoomMode _autoZoomMode;
-
-        /// <summary>
-        /// The page space (context) that should be shown around an object selected when AutoZoom
-        /// mode is active. 0 indicates no context space should be shown around the current
-        /// selection where 1 indicates the maximum context space should be shown.
-        /// </summary>
-        double _autoZoomContext;
-
-        /// <summary>
         /// The property page associated with the <see cref="UserPreferences"/>.
         /// </summary>
         UserPreferencesPropertyPage _propertyPage;
+
+        /// <summary>
+        /// Provides persistence of user DataEntry settings to the registry.
+        /// </summary>
+        static RegistrySettings<Properties.Settings> _registry =
+            new RegistrySettings<Properties.Settings>(@"Software\Extract Systems\DataEntry");
 
         #endregion Fields
 
@@ -68,6 +61,31 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #region Properties
 
         /// <summary>
+        /// Gets or sets a value indicating whether a document should automatically be OCR'd when
+        /// displayed for verification if it does not have an associated uss file.
+        /// </summary>
+        /// <value><see langword="true"/> to OCR a document when displayed for verification if it
+        /// does not have an associated uss file; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool AutoOcr
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="OcrTradeoff"/> to use when automatically OCR'ing document
+        /// text.
+        /// </summary>
+        /// <value>The <see cref="OcrTradeoff"/> to use when automatically OCR'ing document text.
+        /// </value>
+        public OcrTradeoff OcrTradeoff
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Specifies how the <see cref="ImageViewer"/> zoom/view is adjusted when new fields are
         /// selected.
         /// </summary>
@@ -77,15 +95,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// zoom/view is adjusted when new fields are selected.</returns>
         public AutoZoomMode AutoZoomMode
         {
-            get
-            {
-                return _autoZoomMode;
-            }
-
-            set
-            {
-                _autoZoomMode = value;
-            }
+            get;
+            set;
         }
 
         /// <summary>
@@ -97,15 +108,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <returns>The page space (context) that will be shown around an object.</returns>
         public double AutoZoomContext
         {
-            get
-            {
-                return _autoZoomContext;
-            }
-
-            set
-            {
-                _autoZoomContext = value;
-            }
+            get;
+            set;
         }
 
         #endregion Properties
@@ -120,8 +124,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Read the settings from the registry
-                _autoZoomMode = RegistryManager.AutoZoomMode;
-                _autoZoomContext = RegistryManager.AutoZoomContext;
+                AutoOcr = _registry.Settings.AutoOcr;
+                OcrTradeoff = _registry.Settings.OcrTradeoff;
+                AutoZoomMode = _registry.Settings.AutoZoomMode;
+                AutoZoomContext = _registry.Settings.AutoZoomContext;
             }
             catch (Exception ex)
             {
@@ -137,8 +143,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Write the settings to the registry
-                RegistryManager.AutoZoomMode = _autoZoomMode;
-                RegistryManager.AutoZoomContext = _autoZoomContext;
+                _registry.Settings.AutoOcr = AutoOcr;
+                _registry.Settings.OcrTradeoff = OcrTradeoff;
+                _registry.Settings.AutoZoomMode = AutoZoomMode;
+                _registry.Settings.AutoZoomContext = AutoZoomContext;
             }
             catch (Exception ex)
             {

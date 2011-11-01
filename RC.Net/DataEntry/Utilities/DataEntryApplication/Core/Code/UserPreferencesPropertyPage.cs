@@ -1,11 +1,10 @@
+using Extract.Imaging;
 using Extract.Licensing;
+using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
 
 namespace Extract.DataEntry.Utilities.DataEntryApplication
@@ -39,6 +38,25 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #endregion Fields
 
         #region Constructors
+
+        /// <summary>
+        /// Provides static initializatoin for the <see cref="UserPreferencesPropertyPage"/> class.
+        /// </summary>
+        // FXCop believes static members are being initialized here.
+        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
+        static UserPreferencesPropertyPage()
+        {
+            try
+            {
+                OcrTradeoff.Accurate.SetReadableValue("Accurate");
+                OcrTradeoff.Balanced.SetReadableValue("Balanced");
+                OcrTradeoff.Fast.SetReadableValue("Fast");
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34062");
+            }
+        }
 
         /// <summary>
         /// Initializes a new <see cref="UserPreferencesPropertyPage"/> class.
@@ -112,6 +130,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
+                // Store the auto-ocr settings.
+                _userPreferences.AutoOcr = _autoOcrCheckBox.Checked;
+                _userPreferences.OcrTradeoff = _ocrTradeOffComboBox.ToEnumValue<OcrTradeoff>();
+
                 // Store the specified zoom mode.
                 if (_noZoomRadioButton.Checked)
                 {
@@ -187,6 +209,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 base.OnLoad(e);
 
+                // Add the available OcrTradeoff options to the _ocrTradeOffComboBox.
+                _ocrTradeOffComboBox.InitializeWithReadableEnum<OcrTradeoff>(false);
+
                 RefreshSettings();
             }
             catch (Exception ex)
@@ -205,6 +230,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         void RefreshSettings()
         {
+            // Display the stored auto-OCR settings.
+            _autoOcrCheckBox.Checked = _userPreferences.AutoOcr;
+            _ocrTradeOffComboBox.SelectEnumValue(_userPreferences.OcrTradeoff);
+            _ocrTradeOffComboBox.Enabled = _autoOcrCheckBox.Checked;
+
             // Display the stored AutoZoomMode setting
             switch (_userPreferences.AutoZoomMode)
             {
@@ -238,6 +268,26 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             _mostContextLabel.Enabled = enableContextControl;
 
             _dirty = false;
+        }
+
+        /// <summary>
+        /// Handles the case that the state of the <see cref="_autoOcrCheckBox"/> changed.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleAutoOcrCheckChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _ocrTradeOffComboBox.Enabled = _autoOcrCheckBox.Checked;
+
+                OnPropertyPageModified();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34063");
+            }
         }
 
         /// <summary>

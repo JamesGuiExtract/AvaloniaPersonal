@@ -97,6 +97,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._viewCommandsImageViewerToolStrip = new Extract.Imaging.Forms.ViewCommandsImageViewerToolStrip();
             this._statusStrip = new System.Windows.Forms.StatusStrip();
             this._userActionToolStripStatusLabel = new Extract.Imaging.Forms.UserActionToolStripStatusLabel();
+            this._backgroundProgressStatusLabel = new Imaging.Forms.BackgroundProcessStatusLabel();
             this._resolutionToolStripStatusLabel = new Extract.Imaging.Forms.ResolutionToolStripStatusLabel();
             this._mousePositionToolStripStatusLabel = new Extract.Imaging.Forms.MousePositionToolStripStatusLabel();
             this._undoToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -911,6 +912,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this._statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._userActionToolStripStatusLabel,
+            this._backgroundProgressStatusLabel,
             this._resolutionToolStripStatusLabel,
             this._mousePositionToolStripStatusLabel});
             this._statusStrip.Location = new System.Drawing.Point(0, 569);
@@ -928,6 +930,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._userActionToolStripStatusLabel.Size = new System.Drawing.Size(716, 17);
             this._userActionToolStripStatusLabel.Spring = true;
             this._userActionToolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // _backgroundProgressStatusLabel
+            //
+            this._backgroundProgressStatusLabel.AutoSize = true;
+            this._backgroundProgressStatusLabel.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right;
+            this._backgroundProgressStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this._backgroundProgressStatusLabel.ImageViewer = null;
+            this._backgroundProgressStatusLabel.Name = "_backgroundProgressStatusLabel";
+            this._backgroundProgressStatusLabel.Size = new System.Drawing.Size(5, 17);
+            this._backgroundProgressStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // _resolutionToolStripStatusLabel
             // 
@@ -1021,6 +1033,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private Extract.Imaging.Forms.WordHighlightToolStripButton _wordHighlightToolStripButton;
         private System.Windows.Forms.StatusStrip _statusStrip;
         private Extract.Imaging.Forms.UserActionToolStripStatusLabel _userActionToolStripStatusLabel;
+        private Extract.Imaging.Forms.BackgroundProcessStatusLabel _backgroundProgressStatusLabel;
         private Extract.Imaging.Forms.ResolutionToolStripStatusLabel _resolutionToolStripStatusLabel;
         private Extract.Imaging.Forms.MousePositionToolStripStatusLabel _mousePositionToolStripStatusLabel;
         private System.Windows.Forms.MenuStrip _menuStrip;
