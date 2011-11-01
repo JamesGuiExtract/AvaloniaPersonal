@@ -50,7 +50,8 @@
 	license.</li>
 	<li>A corrupted license can be created by starting a licensed application, 
 	letting it run for a short time, and modifying system time to be a day or two 
-	earlier than actual calendar time.</li>
+	earlier than actual calendar time.  A random timer of <b>between 30 and 300 seconds</b> 
+	is built in to the software to check for such a change in system time.</li>
 	<li>Use the Control Panel to modify the <b>Windows Time</b> service.  Set the 
 	startup type to be <b>Manual</b> and <b>Stop</b> the service.  Without these changes, 
 	rebooting the PC resets the system time from the domain server and makes testing 
@@ -167,13 +168,19 @@
 		does not run.</li>
 	</ul>
 <p>
-   	<li>An <b>Unlock</b> file can have leading and trailing whitespace.</li>
+   	<li><b>[LegacyRC #4390]</b> An <b>Unlock</b> file can have leading and trailing whitespace.</li>
 	<ul>
    		<li>Establish a corrupted license.</li>
 		<li>Reboot the system.</li>
 		<li>Create and deploy an <b>Unlock</b> file.</li>
 		<li>Copy the <b>Unlock</b> file for use in the next test.</li>
 		<li>Manually edit the Unlock file to add leading and trailing whitespace.</li>
+		<ul>
+			<li>This is <b>fixed</b> for adding a carriage return after the 
+			Unlock string.
+			<li>This is <b>not fixed</b> for adding whitespace around the Unlock 
+			string.
+		</ul>
 		<li>Confirm that license corruption is gone and the software runs.</li>
 	</ul>
 <p>
@@ -187,7 +194,8 @@
 		does not run.</li>
 	</ul>
 <p>
-   	<li>An <b>Unlock</b> file can be used without a system reboot.</li>
+   	<li><b>[LegacyRC #4934] NOT FIXED!</b> An <b>Unlock</b> file can be used without a 
+	system reboot.</li>
 	<ul>
    		<li>Establish a corrupted license.</li>
 		<li><b>Do not</b> reboot the system.</li>
@@ -204,18 +212,15 @@
 		<li>Delete the following items.</li>
 		<ul>
 			<li>HKCU\Identities\{7FEF3749-A8CC-4CD0-9CEB-E6D267FA524E}\LTUSWU</li>
+			<li>HKCU\Identities\{526988F0-27BE-4451-B741-D8614827B838}\LTUSWU</li>
+			<li>HKCU\Software\Classes\Code (another item may be present in the 
+			wow6432 node if installed on a 64-bit operating system)
+			<li>HKCU\Software\Classes\State (if present)
+			<li>HKCU\Software\Windows\Count</li>
+<p>
 			<li><b>Note that this file is hidden!</b>  C:\Documents and 
 			Settings\<b>CURRENT_USER</b>\Application 
 			Data\Windows\{EFF9AEFC-3046-48BC-84D1-E9862F9D1E22}\estrpmfc.dll</li>
-<p>
-			<li>The following items were used for 8.0 and <b>may</b> not be 
-			correct for 9.0 and beyond.
-			<ul>
-				<li>HKCU\Software\Classes\Code (another item may be present in the 
-				wow6432 node if installed on a 64-bit operating system)
-				<li>HKCU\Software\Classes\State (if present)
-				<li>HKCU\Software\Windows\Count</li>
-			</ul>
 		</ul>
 		<li>Reboot the system.</li>
 		<li>Restore the system time.</li>
@@ -289,6 +294,7 @@
 <!-- *********************************************** -->
 <li><h3>Ruleset Properties</h3>
 <ul>
+	<li>Install and license the <b>RDT</b>.
 	<LI>Rulesets with Internal-use only flag
 	<ul>
 		<li>Using an RDT license, create and test an encrypted RSD file that has the 
@@ -313,15 +319,12 @@
 <p>
    	<LI>Swiping Rules
        	<ul>
-      		<li>Install and the <b>RDT</b>.
       		<li>Create separate license files for the <b>RDT</b> and for <b>ID 
 		Shield Rule Writing</b>.
       		<li>Create, save and exercise a <b>Simple Rules</b> rule set.
-      		<li>Confirm presence of a <b>This is a swiping rule</b> checkbox. 
-      		<li>Confirm that a <b>Swiping</b> rule can be saved without an 
-		RDT license <b>only if</b> a counter is selected.
-      		<li>Confirm that a <b>Swiping</b> rule can be saved without a 
-		counter <b>only</b> with an RDT license.
+      		<li>Confirm absence of a <b>This is a swiping rule</b> checkbox. 
+      		<li>Confirm that a <b>Swiping</b> rule can be saved <b>only</b> with an 
+		RDT license.
       		<li>Confirm that rule execution is allowed without a counter if 
 		the RSD file is a swiping rule. 
        	</ul>
@@ -332,10 +335,12 @@
 	<li><h3>Simple Rule Writing</h3>
 	<ul>
 		<li>Create an <b>ID Shield Rule Writing (Simple Rules passwords!)</b> license file.
-		<li>Confirm that the following rule objects are available
+		<li><b>[FlexIDSCore #4924]</b> Confirm that <b>only</b> the following rule objects 
+		are available.
 		<ul>
 			<li>Advanced replace string
 			<li>Change case
+			<li>Create value
 			<li>Extract lines
 			<li>Modify attributes
 			<li>Move and modify attributes
@@ -404,7 +409,7 @@
 	</ul>
 	</li>
 <p>
-   	<LI>Creation of license files using either JAKE or FNP2
+   	<LI><b>[LegacyRC #5020]</b> Creation of license files using either JAKE or FNP2
        	<ul>
 		<li>Log in to a test machine that is connected to the <b>extract.local</b> domain.
 		<li>Copy the I:\Common\Engineering\Tools\SecureClients\COMLicense_InternalTesting\Current 
