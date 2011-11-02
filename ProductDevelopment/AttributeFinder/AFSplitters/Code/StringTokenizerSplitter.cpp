@@ -802,7 +802,7 @@ STDMETHODIMP CStringTokenizerSplitter::get_InstanceGUID(GUID *pVal)
 //-------------------------------------------------------------------------------------------------
 void CStringTokenizerSplitter::validateLicense()
 {
-	VALIDATE_LICENSE( gnRULE_WRITING_CORE_OBJECTS, "ELI05276", "String Tokenizer Splitter");
+	VALIDATE_LICENSE( gnFLEXINDEX_IDSHIELD_CORE_OBJECTS, "ELI05276", "String Tokenizer Splitter");
 }
 //-------------------------------------------------------------------------------------------------
 void CStringTokenizerSplitter::validateSubAttributeName(const string& strName)

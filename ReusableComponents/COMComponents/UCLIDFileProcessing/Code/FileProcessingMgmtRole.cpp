@@ -97,6 +97,13 @@ void StandbyThread::endStandby()
 		m_ipTaskExecutor->EndStandby();
 
 		m_eventStandbyEnded.signal();
+
+		// Do not attempt the same code here that was added to
+		// CFileProcessingTaskExecutor::StandbyThread::endStandby() to address LegacyRCAndUtils:6211.
+		// The race condition is much less likely to occur in this class (the mgmt role would need
+		// to be destoryed in the time before m_eventCancelProcessing.signal is called) and doing
+		// so here would cause a deadlock. In the extremely unlikely case that the race condition
+		// occurs here, the only negative side-effect is that an exception will be logged (ELI33935).
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33936")
 }

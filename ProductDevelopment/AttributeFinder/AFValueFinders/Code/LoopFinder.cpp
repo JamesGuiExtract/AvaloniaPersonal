@@ -921,7 +921,7 @@ STDMETHODIMP CLoopFinder::get_InstanceGUID(GUID *pVal)
 //-------------------------------------------------------------------------------------------------
 void CLoopFinder::validateLicense()
 {
-	VALIDATE_LICENSE( gnRULE_WRITING_CORE_OBJECTS, "ELI23906", "Loop Finder Rule" );
+	VALIDATE_LICENSE( gnFLEXINDEX_IDSHIELD_CORE_OBJECTS, "ELI23906", "Loop Finder Rule" );
 }
 //-------------------------------------------------------------------------------------------------
 

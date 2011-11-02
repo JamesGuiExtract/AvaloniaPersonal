@@ -648,7 +648,21 @@ namespace Extract.Redaction.Verification
                 return _visitedReadOnlyPageCellStyle;
             }
         }
-        
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the next KeyUp event should be suppressed.
+        /// </summary>
+        /// <value><see langword="true"/> to suppress the next next key up event; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        internal bool SuppressNextKeyUp
+        {
+            get;
+            set;
+        }
+
         #endregion Properties
 
         #region Methods
@@ -1625,6 +1639,11 @@ namespace Extract.Redaction.Verification
                     bool keyProcessed = _imageViewer.Shortcuts.ProcessKey(keyData);
                     if (keyProcessed)
                     {
+                        // [FlexIDSCore:4917]
+                        // They key up event will be fired in the grid event if this key is deemed
+                        // processed. Suppress the next key up event in the grid.
+                        SuppressNextKeyUp = true;
+
                         return true;
                     }
                 }
@@ -2429,6 +2448,29 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI33680");
+            }
+        }
+
+        /// <summary>
+        /// Handles the KeyUp event from the _dataGridView in order to allow it to be suppressed.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.KeyEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleGridKeyUp(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                if (SuppressNextKeyUp)
+                {
+                    e.SuppressKeyPress = true;
+                }
+
+                SuppressNextKeyUp = false;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34073");
             }
         }
 

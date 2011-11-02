@@ -2507,6 +2507,11 @@ namespace Extract.Redaction.Verification
                 // Allow the image viewer to handle keyboard input for shortcuts.
                 if (ShortcutsEnabled() && _imageViewer.Shortcuts.ProcessKey(keyData))
                 {
+                    // [FlexIDSCore:4917]
+                    // They key up event will be fired in the grid event if this key is deemed
+                    // processed. Suppress the next key up event in the grid.
+                    _redactionGridView.SuppressNextKeyUp = true;
+
                     return true;
                 }
 

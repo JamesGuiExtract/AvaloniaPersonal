@@ -35,8 +35,8 @@ namespace Extract.AttributeFinder.Rules
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.RuleWritingCoreObjects, "ELI33753",
-                    _OBJECT_NAME);
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects,
+                    "ELI33753", _OBJECT_NAME);
 
                 Settings = settings;
 

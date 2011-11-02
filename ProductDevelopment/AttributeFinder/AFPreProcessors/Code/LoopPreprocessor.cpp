@@ -819,7 +819,7 @@ STDMETHODIMP CLoopPreprocessor::get_InstanceGUID(GUID *pVal)
 //-------------------------------------------------------------------------------------------------
 void CLoopPreprocessor::validateLicense()
 {
-	VALIDATE_LICENSE( gnRULE_WRITING_CORE_OBJECTS, "ELI24164", "Loop Preprocessor" );
+	VALIDATE_LICENSE( gnFLEXINDEX_IDSHIELD_CORE_OBJECTS, "ELI24164", "Loop Preprocessor" );
 }
 //-------------------------------------------------------------------------------------------------
 

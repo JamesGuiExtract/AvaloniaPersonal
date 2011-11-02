@@ -43,14 +43,17 @@ int CFileProcessingTaskExecutor::StandbyThread::Run()
 	try
 	{
 		// The Standby call may block if this is a cancellable task.
-		if (!asCppBool(m_upProcessingTask->Task->Standby()) && !m_eventStandbyEnded.isSignaled())
+		if (!asCppBool(m_upProcessingTask->Task->Standby()) && !m_eventStandbyEnding.isSignaled())
 		{
 			m_eventCancelProcessing.signal();
 		}
 
 		// This thread needs to remain alive until Standby has ended so that endStandby may be
 		// called.
-		m_eventStandbyEnded.wait();
+		m_eventStandbyEnding.wait();
+
+		// Notify endStandby that the thread is done.
+		m_eventStandbyEnded.signal();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33943")
 
@@ -61,7 +64,14 @@ void CFileProcessingTaskExecutor::StandbyThread::endStandby()
 {
 	try
 	{
-		m_eventStandbyEnded.signal();
+		m_eventStandbyEnding.signal();
+
+		// [LegacyRCAndUtils:6211]
+		// The existence of m_eventCancelProcessing cannot be guaranteed after returning from here.
+		// To prevent a race condition in which m_eventCancelProcessing goes out of scope in the
+		// calling function before m_eventCancelProcessing.signal() is called, ensure the standby
+		// thread is done processing before returning from this call.
+		m_eventStandbyEnded.wait();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33944")
 }

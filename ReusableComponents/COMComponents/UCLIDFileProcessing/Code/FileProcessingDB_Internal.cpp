@@ -1709,6 +1709,14 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 						ue.addDebugInfo ("Actual Lock Time", asString(nSecondsLocked));
 						ue.log();
 
+						// [FlexIDSCore:4911]
+						// Unlock the mutex since don't yet have the DB lock and are about to
+						// restart this loop.
+						// NOTE: Not sure if the loop does need to be restarted anymore, but since
+						// I don't know the reason it was coded this way, I don't want to change it.
+						bGotMutexLock = false;
+						pmutexLock->Unlock();
+
 						// Restart the loop since we don't want to assume this instance will 
 						// get the lock
 						continue;

@@ -123,7 +123,11 @@ private:
 		// stop.
 		Win32Event& m_eventCancelProcessing;
 
-		// m_eventStandbyEnded is signaled once the endStandby call is complete.
+		// m_eventStandbyEnding is signaled when endStandby is called.
+		Win32Event m_eventStandbyEnding;
+
+		// m_eventStandbyEnded is signaled once the thread has ended and endStandby call is
+		// complete.
 		Win32Event m_eventStandbyEnded;
 
 		unique_ptr<ProcessingTask>& m_upProcessingTask;

@@ -94,6 +94,7 @@ namespace Extract.Redaction.Verification
             this._dataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDataGridViewCellDoubleClick);
             this._dataGridView.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDataGridViewCellContentClick);
             this._dataGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDataGridViewCellContentClick);
+            this._dataGridView.KeyUp +=new System.Windows.Forms.KeyEventHandler(this.HandleGridKeyUp);
             // 
             // _redactedColumn
             // 

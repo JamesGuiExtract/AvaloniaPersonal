@@ -89,7 +89,7 @@ namespace Extract.AttributeFinder.Rules
         /// <summary>
         /// The license id to validate in licensing calls
         /// </summary>
-        const LicenseIdName _LICENSE_ID = LicenseIdName.RuleWritingCoreObjects;
+        const LicenseIdName _LICENSE_ID = LicenseIdName.FlexIndexIDShieldCoreObjects;
 
         #endregion Constants
 
