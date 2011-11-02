@@ -24,14 +24,14 @@
 PDRootDir=$(EngineeringRootDirectory)\ProductDevelopment
 AFRootDirectory=$(PDRootDir)\AttributeFinder
 RCNETDir=$(EngineeringRootDirectory)\RC.Net
-LabDEBleedingEdgeDir=R:\LabDE\Internal\BleedingEdge\$(LabDEVersion)
+LabDEBleedingEdgeDir=R:\LabDE\Internal\BleedingEdge\$(FlexIndexVersion)
 RulesDir=$(EngineeringRootDirectory)\Rules
 
 AFInstallRootDir=P:\AttributeFinder
 AFCoreInstallFilesRootDir=$(AFInstallRootDir)\CoreInstallation\Files
 DemoShieldRunFilesDir=$(AFInstallRootDir)\DemoShieldFiles
 
-LabDEDir=$(PDRootDir)\LabDE
+LabDEDir=$(PDRootDir)\DataEntry\LabDE
 LabDEInstallRootDir=$(LabDEDir)\Installation
 DataEntryInstallFiles=P:\DataEntry
 DataEntryCoreInstallFilesDir=$(DataEntryInstallFiles)\CoreInstallation\Files
@@ -42,7 +42,6 @@ LabDEInstallDir=$(LabDEBleedingEdgeDir)\LabDEInstall
 
 RDTInstallProjectRootDir=$(EngineeringRootDirectory)\ProductDevelopment\AttributeFinder\Installation\RuleDevelopmentKit
 RDTInstallMediaDir=$(RDTInstallProjectRootDir)\Media\CD-ROM\DiskImages\Disk1
-RDTReleaseBleedingEdgeDir=S:\LabDE\Internal\BleedingEdge\$(LabDEVersion)\RDT
 
 LabResultsDir=$(AFRootDirectory)\IndustrySpecific\LabResults
 LabDERulesDir=$(RulesDir)\LabDE\Demo_LabDE\Rules
@@ -64,42 +63,7 @@ BuildOutputDir=Debug
 #############################################################################
 # B U I L D    T A R G E T S
 #
-BuildAFCore: 
-	@ECHO Building AttributeFinderCore...
-	@CD "$(AFRootDirectory)\Build"
-    @nmake /F AttributeFinderCore.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" DoEverythingNoGet
-
-BuildRDT: BuildAFCore
-	@ECHO Building AttributeFinderCore...
-	@CD "$(AFRootDirectory)\Build"
-    @nmake /F RuleDevelopmentKit.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" BuildRDTInstall
-
-CopyRDTToInstallFolder: BuildRDT
-    @IF NOT EXIST "$(RDTReleaseBleedingEdgeDir)" MKDIR "$(RDTReleaseBleedingEdgeDir)"
-    @XCOPY "$(RDTInstallMediaDir)\*.*" "$(RDTReleaseBleedingEdgeDir)" /v /s /e /y
-    $(VerifyDir) "$(RDTInstallMediaDir)" "$(RDTReleaseBleedingEdgeDir)"
-    @DeleteFiles "$(RDTReleaseBleedingEdgeDir)\vssver.scc"
-
-BuildLabDEApplication: BuildRDT
-	@ECHO Building LabDE...
-	@CD "$(LabDEDir)\Core\Code"
-    @devenv LabDE.sln /BUILD $(BuildConfig) /USEENV
-
-ObfuscateFiles: BuildLabDEApplication
-#	Copy the strong naming key to location dotfuscator xml file expects
-	@IF NOT EXIST "$(AFCoreInstallFilesRootDir)\StrongNameKey" @MKDIR "$(AFCoreInstallFilesRootDir)\StrongNameKey"
-	@DeleteFiles "$(AFCoreInstallFilesRootDir)\StrongNameKey\*.*"
-	@COPY /V "$(RCNETDir)\Core\Code\ExtractInternalKey.snk" "$(AFCoreInstallFilesRootDir)\StrongNameKey"
-	@IF NOT EXIST "$(BinariesFolder)\Obfuscated" @MKDIR "$(BinariesFolder)\Obfuscated"
-	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_18\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\bin;;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages;C:\Program Files\PreEmptive Solutions\Dotfuscator Professional Edition 4.9;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Dotnet
-	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.DataEntry.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.DataEntry.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
-	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Imaging.Forms.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Imaging.Forms.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
-	dotfuscator.exe  /in:"$(BinariesFolder)\DataEntryApplication.exe" /mapout:"$(BinariesFolder)\Map\mapDataEntryApplication.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
-	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.LabResultsCustomComponents.dll" /mapout:"$(BinariesFolder)\Map\mapEExtract.LabResultsCustomComponents.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
-	dotfuscator.exe  /in:"$(BinariesFolder)\SqlCompactImporter.exe" /mapout:"$(BinariesFolder)\Map\mapSqlCompactImporter.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
-	dotfuscator.exe  /in:"$(BinariesFolder)\SqlCompactExporter.exe" /mapout:"$(BinariesFolder)\Map\SqlCompactExporter.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
-	
-CopyFilesToInstallFolder: ObfuscateFiles
+CopyFilesToInstallFolder:
 	@ECHO Moving files to LabDE Installation
 	@IF NOT EXIST "$(DataEntryCoreInstallFilesDir)\DotNet" @MKDIR "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@IF NOT EXIST "$(DataEntryCoreInstallFilesDir)\Misc" @MKDIR "$(DataEntryCoreInstallFilesDir)\DotNet\Misc" 
@@ -109,7 +73,7 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	
 	@DeleteFiles  "$(DataEntryCoreInstallFilesDir)\DotNet\*.*" /S
 	@DeleteFiles "$(LabDEInstallFiles)\Reports\*.*" /S
-	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Dotnet\leadtools*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet"
+	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Dotnet\leadtools*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet"
 	@COPY /v "$(BinariesFolder)\Obfuscated\*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(BinariesFolder)\Extract.DataEntry.DEP.StandardLabDE.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(BinariesFolder)\DataEntryCC.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
@@ -119,15 +83,8 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	@COPY /v "$(BinariesFolder)\Obfuscated\SqlCompactExporter.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(LabDEDir)\Misc\DisabledThemes.sdb" "$(DataEntryCoreInstallFilesDir)\Misc" 
 	@COPY /v "$(LabDEDir)\Reports\*.*" "$(LabDEInstallFiles)\Reports"
-# Copy pdb and map files to archive
-	@COPY  "$(BinariesFolder)\*.pdb" "$(InternalUseBuildFilesArchive)" 
-	@COPY  "$(BinariesFolder)\Obfuscated\*.pdb" "$(InternalUseBuildFilesArchive)" 
-	@COPY  "$(BinariesFolder)\Map\*.xml" "$(InternalUseBuildFilesArchive)" 
 # Make .nl files to register the COM .NET files
-	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.LabResultsCustomComponents.dll" /b >"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\DataEntry.nl"
-	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.DataEntry.dll" /b >>"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\DataEntry.nl"
-	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\DataEntryApplication.exe" /b >>"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\DataEntry.nl"
-	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\DataEntryCC.dll" /b >"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\DataEntry.rl"
+	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.LabResultsCustomComponents.dll" /b >"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\LabDE.nl"
 
 CopyFilesForLabDEInstall: CopyFilesToInstallFolder 
 	@ECHO Copying files for the LabDE Install
@@ -137,7 +94,7 @@ CopyFilesForLabDEInstall: CopyFilesToInstallFolder
 
 BuildLabDEInstall: CopyFilesForLabDEInstall
     @ECHO Building Extract Systems LabDE Install...
-	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_18\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Bin;;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Dotnet
+	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_18\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Bin;;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Dotnet
 	$(SetProductVerScript) "$(LabDEInstallRootDir)\LabDE\LabDE.ism" "$(LabDEVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(LabDEInstallRootDir)\LabDE\LabDE.ism"
 
@@ -149,18 +106,9 @@ CreateLabDEInstallCD: BuildLabDEInstall
 	@COPY / v "$(LabDEInstallFiles)\InstallHelp\*.*" "$(LabDEBleedingEdgeDir)\LabDE"
     @DeleteFiles "$(LabDEBleedingEdgeDir)\LabDE\vssver.scc"
 
-CopyLMFolderToInstall:
-	@ECHO Creating License Manager Install...
-	@CD "$(ReusableComponentsRootDirectory)\VendorSpecificUtils\SafeNetUtils\Build"
-    @nmake /F LicenseManager.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" ProductInstallFolder="$(LabDEBleedingEdgeDir)\Extract Systems LM"  CopyLMInstallToProductInstallFolder
-	
-CreateDemoShieldInstall: CopyLMFolderToInstall CreateLabDEInstallCD 
+CreateDemoShieldInstall: CreateLabDEInstallCD 
 	@ECHO Copying Required installs
-	@IF NOT EXIST "$(LabDEBleedingEdgeDir)\DotNet 3.5 Framework" MKDIR "$(LabDEBleedingEdgeDir)\DotNet 3.5 Framework"
-	@IF NOT EXIST "$(LabDEBleedingEdgeDir)\SQLServerExpress2005" MKDIR "$(LabDEBleedingEdgeDir)\SQLServerExpress2005"
 	@IF NOT EXIST "$(LabDEBleedingEdgeDir)\Corepoint Integration Engine" MKDIR "$(LabDEBleedingEdgeDir)\Corepoint Integration Engine"
-	@XCOPY "$(AFInstallRootDir)\RequiredInstalls\DotNet 3.5 Framework\*.*" "$(LabDEBleedingEdgeDir)\DotNet 3.5 Framework" /v /s /e /y
-	@XCOPY "$(AFInstallRootDir)\RequiredInstalls\SQLServerExpress2005\*.*" "$(LabDEBleedingEdgeDir)\SQLServerExpress2005" /v /s /e /y
 	@XCOPY "$(DataEntryInstallFiles)\RequiredInstalls\Corepoint Integration Engine\*.*" "$(LabDEBleedingEdgeDir)\Corepoint Integration Engine" /v /s /e /y
 	@ECHO Copying DemoShield Files
 	@IF NOT EXIST "$(LabDEInstallDir)" MKDIR "$(LabDEInstallDir)"
@@ -189,9 +137,7 @@ CreateDemo_LabDE:
 	@DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\*.spm"
     @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\vssver.scc"
 
-GetAllFiles: GetPDCommonFiles GetAttributeFinderFiles GetRCdotNETFiles GetReusableComponentFiles GetPDUtilsFiles GetComponentDataFiles GetLabDEFiles GetDemo_LabDERules
-
-DoEverythingNoGet: DisplayTimeStamp SetupBuildEnv BuildLabDEApplication CreateDemoShieldInstall CopyRDTToInstallFolder CreateDemo_LabDE
+DoEverything: DisplayTimeStamp SetupBuildEnv GetDemo_LabDERules CreateDemoShieldInstall CreateDemo_LabDE
     @ECHO.
     @DATE /T
     @TIME /T
@@ -199,11 +145,3 @@ DoEverythingNoGet: DisplayTimeStamp SetupBuildEnv BuildLabDEApplication CreateDe
     @ECHO LabDE Build process completed.
     @ECHO.
 
-DoEverything: DisplayTimeStamp SetupBuildEnv GetAllFiles DoEverythingNoGet
-    @ECHO.
-    @DATE /T
-    @TIME /T
-    @ECHO.
-    @ECHO LabDE Build process completed.
-    @ECHO.
-	

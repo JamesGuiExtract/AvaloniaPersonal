@@ -127,7 +127,6 @@
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
 		<row><td>ISLockPermissions.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\i386\ISLockPermissions.dll</td></row>
-		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\isregsvr.dll</td></row>
 	</table>
 
 	<table name="BindImage">
@@ -218,6 +217,7 @@
 		<row><td>FAMNetworkManager.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{3C99AD7E-842C-43AF-B97C-A7EAC3B0C9C7}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>famnetworkmanager.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FAMProcess.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{B7CFD920-3115-4699-A207-F964CAAE2B21}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>famprocess.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FileProcessors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{F7E49F0B-9652-49CF-996C-B4F1A871F4BB}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>FileProcessors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>FlexIndexHelp.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{5AA6248F-B775-4B60-B58E-124BC166A6E2}</td><td>TARGET_HELP.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>flexindexsdk.chm.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows Help file and Help contents.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>GeneralIV.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{B0101A67-962F-4AEA-88A5-377B4F7D29E1}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>generaliv.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IFCore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{1E5E5239-02B6-4E2C-B851-20765ECFFDBC}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>ifcore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ImageEdit.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{0B73E0FB-D84C-41CA-8A48-E17AE8F6CF0E}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>imageedit.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>20</td><td>This component consists of a custom control.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -321,10 +321,6 @@
 		<col def="S255">ISComments</col>
 		<row><td>ISLockPermissionsCost</td><td>1</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsCostAction</td><td/><td/></row>
 		<row><td>ISLockPermissionsInstall</td><td>3073</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsInstallAction</td><td/><td/></row>
-		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISUnSelfRegisterFiles</td><td/><td/></row>
 		<row><td>SetAllUsersProfileNT</td><td>51</td><td>ALLUSERSPROFILE</td><td>[%SystemRoot]\Profiles\All Users</td><td/><td/></row>
 		<row><td>setAllUsersProfile2K</td><td>51</td><td>ALLUSERSPROFILE</td><td>[%ALLUSERSPROFILE]</td><td/><td/></row>
 		<row><td>setUserProfileNT</td><td>51</td><td>USERPROFILE</td><td>[%USERPROFILE]</td><td/><td/></row>
@@ -399,6 +395,7 @@
 		<row><td>System64Folder</td><td>TARGETDIR</td><td>.:System64</td><td/><td>0</td><td/></row>
 		<row><td>SystemFolder</td><td>TARGETDIR</td><td>.:System32</td><td/><td>0</td><td/></row>
 		<row><td>TARGETDIR</td><td/><td>SourceDir</td><td/><td>0</td><td/></row>
+		<row><td>TARGET_HELP.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FLEXINDEX.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Help</td><td/><td>0</td><td/></row>
 		<row><td>TempFolder</td><td>TARGETDIR</td><td>.:Temp</td><td/><td>0</td><td/></row>
 		<row><td>TemplateFolder</td><td>TARGETDIR</td><td>.:ShellNew</td><td/><td>0</td><td/></row>
 		<row><td>USERPROFILE</td><td>TARGETDIR</td><td>.:USERPR~1|UserProfile</td><td/><td>0</td><td/></row>
@@ -504,6 +501,7 @@
 		<row><td>famdblockchecker.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FAMDBLockChecker.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FAMDBL~1.EXE|FAMDBLockChecker.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\FAMDBLockChecker.exe</td><td>1</td><td/></row>
 		<row><td>famnetworkmanager.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FAMNetworkManager.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FAMNET~1.EXE|FAMNetworkManager.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\FAMNetworkManager.exe</td><td>1</td><td/></row>
 		<row><td>famprocess.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FAMProcess.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FAMPRO~1.EXE|FAMProcess.exe</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_NONSELFREGCOMMON_FILES&gt;\FAMProcess.exe</td><td>17</td><td/></row>
+		<row><td>flexindexsdk.chm.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FlexIndexHelp.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FLEXIN~1.CHM|FlexIndexSDK.chm</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_HELP_FILES&gt;\FlexIndexSDK.chm</td><td>1</td><td/></row>
 		<row><td>generaliv.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>GeneralIV.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>GENERA~1.DLL|GeneralIV.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\GeneralIV.dll</td><td>1</td><td/></row>
 		<row><td>ifcore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>IFCore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>IFCore.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\IFCore.dll</td><td>1</td><td/></row>
 		<row><td>imageedit.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ImageEdit.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>IMAGEE~1.OCX|ImageEdit.ocx</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\ImageEdit.ocx</td><td>1</td><td/></row>
@@ -682,6 +680,7 @@
 		<row><td>FAMNetworkManager.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_7C90C8C5_1760_4E2B_AFBC_1E92CAB2FDF2_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FAMProcess.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_B82668FF_C673_4B69_943F_8BF62A426576_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FileProcessors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_C2020A5B_78B6_47A8_9E7E_5C96E484549A_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>FlexIndexHelp.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_3E020E20_EE84_4C23_84AA_4FD4AF34739E_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>GeneralIV.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_1803CD3C_C23B_4DB1_A8CB_ACFFCB5C1ED5_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>IFCore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_7035D66A_B4E9_4F9A_9A2B_D6A8AE68A29C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ImageEdit.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_65EDB86F_F3B8_4165_9FD3_C32B2C762F19_FILTER</td><td/><td/><td/><td/></row>
@@ -981,6 +980,7 @@
 		<row><td>PATH_TO_CLEARIMAGEFILES_FILES1</td><td>P:\AttributeFinder\ClearImageFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_COMPONENTDATA_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\ComponentData</td><td/><td>2</td></row>
 		<row><td>PATH_TO_DOTNETGAC_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
+		<row><td>PATH_TO_HELP_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\Help</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCOMMON_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\NonSelfRegFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCOREC_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\NonSelfRegFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGSDKCO_FILES</td><td>P:\AttributeFinder\SDKInstallation\Files\NonSelfRegSDKComponents</td><td/><td>2</td></row>
@@ -1364,6 +1364,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>FAMNetworkManager.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>FAMProcess.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>FileProcessors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
+		<row><td>FlexIndexHelp.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>GeneralIV.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>IFCore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ImageEdit.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
@@ -1456,14 +1457,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S255">Condition</col>
 		<row><td>ISLockPermissionsCost</td><td/><td>InstallValidate</td><td>1</td><td/></row>
 		<row><td>ISLockPermissionsInstall</td><td/><td>StartServices</td><td>1</td><td/></row>
-		<row><td>ISSelfRegisterCosting</td><td/><td>SelfUnregModules</td><td>1</td><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td/><td>SelfRegModules</td><td>1</td><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td/><td>InstallFinalize</td><td>1</td><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td/><td>ISSelfRegisterCosting</td><td>1</td><td/></row>
-		<row><td>InstallFinalize</td><td>3150</td><td/><td/><td/></row>
 		<row><td>InstallValidate</td><td>1400</td><td/><td/><td/></row>
-		<row><td>SelfRegModules</td><td>2850</td><td/><td/><td/></row>
-		<row><td>SelfUnregModules</td><td>1100</td><td/><td/><td/></row>
 		<row><td>StartServices</td><td>5900</td><td/><td/><td/></row>
 	</table>
 

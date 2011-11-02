@@ -57,6 +57,8 @@ IDShieldInstallMediaDir=$(IDShieldInstallRootDir)\Media\CD-ROM\DiskImages\DISK1
 
 RedactionDemoBuildDir=$(AFRootDirectory)\Utils\RedactionDemo\Build
 
+LabDEBuildDir=$(PDRootDir)\DataEntry\LabDE\Build
+
 # determine the name of the release output directory based upon the build
 # configuration that is being built
 !IF "$(BuildConfig)" == "Release"
@@ -188,7 +190,12 @@ CreateRedactionDemoInstall:
 	@CD "$(RedactionDemoBuildDir)"
 	@nmake /F $(RedactionDemoBuildDir)\RedactionDemo.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" DoEverything
 
-CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateDemoShieldInstall
+CreateLabDEInstall:
+	@Echo Building LabDE...
+	@CD "$(LabDEBuildDir)"
+    @nmake /F LabDE.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(LabDEVersion)" DoEverything
+	
+CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateDemoShieldInstall CreateLabDEInstall
 
 DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall
 

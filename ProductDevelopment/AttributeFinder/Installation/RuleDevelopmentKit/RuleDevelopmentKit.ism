@@ -322,7 +322,6 @@
 		<row><td>BaseUtilsTest.dll</td><td>{799292BB-B8F5-4CD1-BDF4-F31D5E485CC4}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>baseutilstest.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Binaries</td><td>{8F19E4E8-C671-43BF-A610-541055BFC7C6}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>CountyTester.dll</td><td>{788C1618-1F79-4F4F-81C9-EBD98A8155CD}</td><td>COMMON_COMPONENTS</td><td>0</td><td/><td>CountyTester.dll</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Help</td><td>{80F8B8EA-4FC3-4BEB-A725-3420A9439B18}</td><td>HELP</td><td>8</td><td/><td/><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISRegistryComponent</td><td>{775BB93C-F45F-4CDA-B0EF-7634480DA491}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>NonSelfRegCommon</td><td>{4CEEF54D-9017-40FC-BB20-28BA50FC1090}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RasterZoneTester.dll</td><td>{55E680F8-657F-46BD-831C-35ABA107CEBA}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>rasterzonetester.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -1156,7 +1155,6 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
-		<row><td>Documentation</td><td>Help</td></row>
 		<row><td>RDTComponents</td><td>AFCoreTest.dll</td></row>
 		<row><td>RDTComponents</td><td>AFDataScorersTest.dll</td></row>
 		<row><td>RDTComponents</td><td>AFSplittersTest.dll</td></row>
@@ -1205,7 +1203,6 @@
 		<row><td>SpotRecIRAutoTest.dll</td><td>SpotRecIRAutoTest.dll</td><td>SPOTRE~1.DLL|SpotRecIRAutoTest.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\SpotRecIRAutoTest.dll</td><td>17</td><td/></row>
 		<row><td>StringPatternMatcherAutoTest</td><td>StringPatternMatcherAutoTest.dll</td><td>STRING~1.DLL|StringPatternMatcherAutoTest.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\StringPatternMatcherAutoTest.dll</td><td>17</td><td/></row>
 		<row><td>baseutilstest.dll</td><td>BaseUtilsTest.dll</td><td>BASEUT~1.DLL|BaseUtilsTest.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\BaseUtilsTest.dll</td><td>17</td><td/></row>
-		<row><td>flexindex.chm</td><td>Help</td><td>FLEXIN~1.CHM|FLEXIndex.chm</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_HELP_FILES&gt;\FLEXIndex.chm</td><td>1</td><td/></row>
 		<row><td>idshield.ini</td><td>RedactionFiles</td><td>IDShield.ini</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_NONSELFREGCOMPO_FILES&gt;\IDShield.ini</td><td>17</td><td/></row>
 		<row><td>rasterzonetester.dll</td><td>RasterZoneTester.dll</td><td>RASTER~1.DLL|RasterZoneTester.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\RasterZoneTester.dll</td><td>17</td><td/></row>
 		<row><td>redactioncc.dll</td><td>RedactionCC.dll</td><td>REDACT~1.DLL|RedactionCC.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\RedactionCC.dll</td><td>17</td><td/></row>
@@ -1470,7 +1467,6 @@
 		<row><td>BaseUtilsTest.dll</td><td/><td/><td>_EE97A743_8196_49BB_9D70_6C6DDD553E10_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Binaries</td><td/><td/><td>_4DA596EB_D030_476D_9DFB_B301700AE020_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>CountyTester.dll</td><td/><td/><td>_838DAD13_280B_4007_8722_79D0195C1866_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Help</td><td/><td/><td>_12B08BDC_03DC_4E89_BC73_8FCD4BE2BB79_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISRegistryComponent</td><td/><td/><td>_8F9E7157_C911_4639_A6E5_B5069B7CBB1D_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>NonSelfRegCommon</td><td/><td/><td>_D6198984_8972_4217_BDA2_B23267AA1193_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>RasterZoneTester.dll</td><td/><td/><td>_0CDFC925_E00D_4C43_872C_928F405F92CC_FILTER</td><td/><td/><td/><td/></row>
@@ -1543,7 +1539,6 @@
 		<col def="S0">ExcludeFiles</col>
 		<col def="I4">ISAttributes</col>
 		<row><td>Binaries</td><td>&lt;PATH_TO_NONSELFREGRDTCO_FILES&gt;</td><td>4</td><td/><td/><td>2</td></row>
-		<row><td>Help</td><td>&lt;PATH_TO_HELP_FILES&gt;</td><td>4</td><td/><td>FLEXIndex.chm</td><td>0</td></row>
 		<row><td>NonSelfRegCommon</td><td>&lt;PATH_TO_NONSELFREGCOMMO_FILES&gt;</td><td>4</td><td/><td/><td>2</td></row>
 		<row><td>TestingFiles</td><td>&lt;TESTING_FILES_FOLDER&gt;</td><td>4</td><td>*.*</td><td>*.scc</td><td>2</td></row>
 		<row><td>UCLIDTestingComponentCore.dll</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;</td><td>4</td><td/><td/><td>1</td></row>
@@ -3875,7 +3870,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="s72">DirProperty</col>
 		<col def="i2">InstallMode</col>
 		<row><td>NewShortcut2</td><td>Binaries</td><td/><td>UCLID_FLEXINDEX_SDK</td><td>2</td></row>
-		<row><td>NewShortcut5</td><td>Help</td><td/><td>UCLID_FLEXINDEX_SDK</td><td>2</td></row>
 		<row><td>NewShortcut6</td><td>TestingFiles</td><td/><td>AutomatedTests</td><td>2</td></row>
 	</table>
 
@@ -3965,8 +3959,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut1</td><td>SendToFolder</td><td>##ID_STRING4##</td><td>Binaries</td><td>[COMMON_COMPONENTS]EncryptFile.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut2</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING28##</td><td>Binaries</td><td>[COMMON_COMPONENTS]ImageCleanupSettingsEditor.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut3</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING10##</td><td>Binaries</td><td>[COMMON_COMPONENTS]TestHarness.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut4</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING11##</td><td>Help</td><td>[HELP]FlexIndex.chm</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut5</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING21##</td><td>Help</td><td>[HELP]FlexIndexSDK.chm</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut6</td><td>AutomatedTests</td><td>##ID_STRING24##</td><td>TestingFiles</td><td>[COMMON_COMPONENTS]TestHarness</td><td>/f"[CommonAppDataFolder]Extract Systems\TestingFiles\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\All\AFCore.tcl"</td><td>##ID_STRING26##</td><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut7</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING16##</td><td>Binaries</td><td>[COMMON_COMPONENTS]IndexConverter.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut8</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING17##</td><td>Binaries</td><td>[COMMON_COMPONENTS]RDTConfig.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>

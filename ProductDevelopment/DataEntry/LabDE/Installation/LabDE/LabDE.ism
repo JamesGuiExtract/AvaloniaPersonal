@@ -1148,6 +1148,7 @@
 		<row><td>extract.dataentry.dep.standa</td><td>Extract.DataEntry.DEP.StandardLabDE.dll</td><td>EXTRAC~1.DLL|Extract.DataEntry.DEP.StandardLabDE.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.DataEntry.DEP.StandardLabDE.dll</td><td>1</td><td/></row>
 		<row><td>extract.labresultscu</td><td>Extract.LabResultsCustomComponents</td><td>EXTRAC~1.DLL|Extract.LabResultsCustomComponents.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.LabResultsCustomComponents.dll</td><td>1</td><td/></row>
 		<row><td>labde.chm</td><td>Help</td><td>LabDE.chm</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LABDE_HELP_FILES&gt;\LabDE.chm</td><td>1</td><td/></row>
+		<row><td>labde.nl</td><td>AllOtherFiles</td><td>LabDE.nl</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_NONREGFILES_FILES&gt;\LabDE.nl</td><td>1</td><td/></row>
 		<row><td>labde_data_entry_rates_by_us</td><td>Reports</td><td>LABDED~1.JPG|LabDE data entry rates by user.jpg</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_REPORTS_FILES&gt;\LabDE data entry rates by user.jpg</td><td>1</td><td/></row>
 		<row><td>labde_data_entry_rates_by_us1</td><td>Reports</td><td>LABDED~1.RPT|LabDE data entry rates by user.rpt</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_REPORTS_FILES&gt;\LabDE data entry rates by user.rpt</td><td>1</td><td/></row>
 		<row><td>labde_data_entry_rates_by_us2</td><td>Reports</td><td>LABDED~1.XML|LabDE data entry rates by user.xml</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_REPORTS_FILES&gt;\LabDE data entry rates by user.xml</td><td>1</td><td/></row>
@@ -1720,6 +1721,7 @@
 		<row><td>PATH_TO_INLITE_INSTALL</td><td>P:\AttributeFinder\InliteInstall</td><td/><td>2</td></row>
 		<row><td>PATH_TO_INLITE_KEY_INSTALL</td><td>P:\AttributeFinder\RequiredInstalls\InliteKeyInstall</td><td/><td>2</td></row>
 		<row><td>PATH_TO_LABDE_HELP_FILES</td><td>P:\DataEntry\LabDE\Files\Help</td><td/><td>2</td></row>
+		<row><td>PATH_TO_NONREGFILES_FILES</td><td>P:\DataEntry\LabDE\Files\NonRegFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_REPORTS_FILES</td><td>P:\DataEntry\LabDE\Files\Reports</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SQL_CE_EDITOR_INSTALL</td><td>P:\DataEntry\RequiredInstalls\SQL Compact Edition Editor</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SQL_COMPACT_EDITION</td><td>P:\DataEntry\RequiredInstalls\SQLCompact Edition</td><td/><td>2</td></row>

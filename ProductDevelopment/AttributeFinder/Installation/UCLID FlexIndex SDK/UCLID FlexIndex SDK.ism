@@ -245,7 +245,6 @@
 		<col key="yes" def="s72">Name</col>
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
-		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\isregsvr.dll</td></row>
 		<row><td>ISSetup.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\ISSetup.dll</td></row>
 		<row><td>ISSetupFilesHelper</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\SFHelper.dll</td></row>
 	</table>
@@ -389,12 +388,8 @@
 		<col def="S0">Target</col>
 		<col def="I4">ExtendedType</col>
 		<col def="S255">ISComments</col>
-		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
 		<row><td>ISSetupFilesCleanup</td><td>257</td><td>ISSetupFilesHelper</td><td>SFCleanupEx</td><td/><td/></row>
 		<row><td>ISSetupFilesExtract</td><td>257</td><td>ISSetupFilesHelper</td><td>SFStartupEx</td><td/><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISUnSelfRegisterFiles</td><td/><td/></row>
 		<row><td>ISVerifyScriptingRuntime</td><td>19</td><td/><td>[STANDARD_USE_SETUPEXE]</td><td/><td>Required for installations using InstallScript.</td></row>
 		<row><td>SetARPINSTALLLOCATION</td><td>51</td><td>ARPINSTALLLOCATION</td><td>[INSTALLDIR]</td><td/><td/></row>
 		<row><td>SetAllUsersProfileNT</td><td>51</td><td>ALLUSERSPROFILE</td><td>[%SystemRoot]\Profiles\All Users</td><td/><td/></row>
@@ -1484,7 +1479,7 @@
 		<col def="S0">IncludeFiles</col>
 		<col def="S0">ExcludeFiles</col>
 		<col def="I4">ISAttributes</col>
-		<row><td>Help</td><td>&lt;PATH_TO_HELP_FILES&gt;</td><td>4</td><td/><td>FLEXIndex.chm</td><td>2</td></row>
+		<row><td>Help</td><td>&lt;PATH_TO_HELP_FILES1&gt;</td><td>4</td><td/><td>FLEXIndex.chm</td><td>10</td></row>
 		<row><td>Redist</td><td>&lt;PATH_TO_REDIST_FILES&gt;</td><td>4</td><td/><td/><td>2</td></row>
 		<row><td>Tutorial</td><td>&lt;PATH_TO_TUTORIAL_FILES&gt;</td><td>4</td><td/><td/><td>2</td></row>
 	</table>
@@ -1760,6 +1755,7 @@
 		<row><td>PATH_TO_DATABASEFILES_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\DatabaseFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_FKBINSTALL_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\FKBInstall</td><td/><td>2</td></row>
 		<row><td>PATH_TO_HELP_FILES</td><td>P:\AttributeFinder\SDKInstallation\Files\Help</td><td/><td>2</td></row>
+		<row><td>PATH_TO_HELP_FILES1</td><td>P:\AttributeFinder\CoreInstallation\Files\Help</td><td/><td>2</td></row>
 		<row><td>PATH_TO_INLITEKEYINSTAL_FILES</td><td>P:\AttributeFinder\RequiredInstalls\InliteKeyInstall</td><td/><td>2</td></row>
 		<row><td>PATH_TO_LOGICNP_FILES</td><td>P:\AttributeFinder\RequiredInstalls\LogicNP</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGSDKCO_FILES</td><td>P:\AttributeFinder\SDKInstallation\Files\NonSelfRegSDKComponents</td><td/><td>2</td></row>
@@ -4565,12 +4561,8 @@
 		<row><td>FileCost</td><td/><td>900</td><td>FileCost</td><td/></row>
 		<row><td>FileManager.F12958CC_F693_4837_866A_16AE49AE39E2</td><td>Not Installed</td><td>5</td><td/><td>4</td></row>
 		<row><td>FindRelatedProducts</td><td>NOT ISSETUPDRIVEN</td><td>420</td><td>FindRelatedProducts</td><td/></row>
-		<row><td>ISSelfRegisterCosting</td><td/><td>2151</td><td/><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td/><td>5601</td><td/><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td/><td>6601</td><td/><td/></row>
 		<row><td>ISSetupFilesCleanup</td><td/><td>6606</td><td/><td/></row>
 		<row><td>ISSetupFilesExtract</td><td/><td>3</td><td/><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td/><td>2152</td><td/><td/></row>
 		<row><td>InstallFiles</td><td/><td>4000</td><td>InstallFiles</td><td/></row>
 		<row><td>InstallFinalize</td><td/><td>6600</td><td>InstallFinalize</td><td/></row>
 		<row><td>InstallInitialize</td><td/><td>1501</td><td>InstallInitialize</td><td/></row>
@@ -5073,7 +5065,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="i2">InstallMode</col>
 		<row><td>ConfigureEmailSettingsShortcut</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut1</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
-		<row><td>NewShortcut10</td><td>Help</td><td/><td>UCLID_FLEXINDEX_SDK</td><td>2</td></row>
 		<row><td>NewShortcut11</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut12</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut13</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
@@ -5176,7 +5167,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="I4">ISAttributes</col>
 		<row><td>ConfigureEmailSettingsShortcut</td><td>newfolder1</td><td>##ID_STRING35##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]EmailFile</td><td>/c</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut1</td><td>newfolder1</td><td>##ID_STRING17##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]VOAFileViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut10</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING23##</td><td>Help</td><td>[TARGET_HELP]FlexIndexSDK.chm</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut11</td><td>newfolder1</td><td>##ID_STRING26##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]UEXViewer.exe</td><td>"[CommonAppDataFolder]Extract Systems\LogFiles\ExtractException.UEX"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut12</td><td>newfolder1</td><td>##ID_STRING27##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ConvertFPSFile.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut13</td><td>newfolder1</td><td>##ID_STRING29##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ImageViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
