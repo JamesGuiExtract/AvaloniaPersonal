@@ -33,10 +33,17 @@ const int giCOUNTER_VALUE = 1;
 const int giALERT_LEVEL = 2;
 const int giALERT_MULTIPLE = 3;
 
-const WORD gwINDEXING_COUNTER = 0;
-const WORD gwPAGINATION_COUNTER = 1;
-const WORD gwREDACTION_COUNTER = 2;
+// LegacyRCAndUtils #6215
+// DO NOT CHANGE THESE VALUES - These values are the ones that are used to represent which counter
+// gets incremented when doing a remote update of the key (Field Activation Utility, Key Manager)
+const WORD gwINDEXING_COUNTER = 1;
+const WORD gwPAGINATION_COUNTER = 2;
+const WORD gwREDACTION_COUNTER = 3;
 
+// Constants for the grid row
+const WORD gwINDEXING_COUNTER_GRID_ROW = 0;
+const WORD gwPAGINATION_COUNTER_GRID_ROW = 1;
+const WORD gwREDACTION_COUNTER_GRID_ROW = 2;
 const double gdWAIT_SECONDS_RESET = 30;
 
 //--------------------------------------------------------------------------------------------------
@@ -426,9 +433,9 @@ void CUSBLicenseKeyManagerDlg::loadCounterValuesList(SafeNetLicenseMgr &snLM)
 	// Add the key soft limit
 	m_editSoftLimit.SetWindowText(asString(snLM.getCellValue(gdcellFlexIndexUserLimit)).c_str());
 
-	setGridCounterValues( snLM, gwINDEXING_COUNTER, gdcellFlexIndexingCounter );
-	setGridCounterValues( snLM, gwPAGINATION_COUNTER, gdcellFlexPaginationCounter );
-	setGridCounterValues( snLM, gwREDACTION_COUNTER, gdcellIDShieldRedactionCounter );
+	setGridCounterValues( snLM, gwINDEXING_COUNTER_GRID_ROW, gdcellFlexIndexingCounter );
+	setGridCounterValues( snLM, gwPAGINATION_COUNTER_GRID_ROW, gdcellFlexPaginationCounter );
+	setGridCounterValues( snLM, gwREDACTION_COUNTER_GRID_ROW, gdcellIDShieldRedactionCounter );
 }
 //--------------------------------------------------------------------------------------------------
 void CUSBLicenseKeyManagerDlg::prepareCounterList()
@@ -454,13 +461,13 @@ void CUSBLicenseKeyManagerDlg::prepareCounterList()
 	m_listCounterValues.InsertColumn(giALERT_LEVEL, "Alert Level", LVCFMT_CENTER, lValueWidth);
 	m_listCounterValues.InsertColumn(giALERT_MULTIPLE, "Alert Multiple", LVCFMT_CENTER, lRemainingWidth);
 
-	m_listCounterValues.InsertItem(gwINDEXING_COUNTER, "FLEX Index - Indexing");
-	m_listCounterValues.InsertItem(gwPAGINATION_COUNTER, "FLEX Index - Pagination");
-	m_listCounterValues.InsertItem(gwREDACTION_COUNTER, "ID Shield - Redaction");
+	m_listCounterValues.InsertItem(gwINDEXING_COUNTER_GRID_ROW, "FLEX Index - Indexing");
+	m_listCounterValues.InsertItem(gwPAGINATION_COUNTER_GRID_ROW, "FLEX Index - Pagination");
+	m_listCounterValues.InsertItem(gwREDACTION_COUNTER_GRID_ROW, "ID Shield - Redaction");
 
-	loadAlertValues(gwINDEXING_COUNTER, gdcellFlexIndexingCounter);
-	loadAlertValues(gwPAGINATION_COUNTER, gdcellFlexPaginationCounter);
-	loadAlertValues(gwREDACTION_COUNTER, gdcellIDShieldRedactionCounter);
+	loadAlertValues(gwINDEXING_COUNTER_GRID_ROW, gdcellFlexIndexingCounter);
+	loadAlertValues(gwPAGINATION_COUNTER_GRID_ROW, gdcellFlexPaginationCounter);
+	loadAlertValues(gwREDACTION_COUNTER_GRID_ROW, gdcellIDShieldRedactionCounter);
 
 	clearCounterValuesList();
 }
@@ -513,9 +520,9 @@ void CUSBLicenseKeyManagerDlg::applyNewValues()
 		m_snlcSafeNetCfg.setSendToExtract(false);
 	}
 	
-	applyAlertValues( gwINDEXING_COUNTER, gdcellFlexIndexingCounter );
-	applyAlertValues( gwPAGINATION_COUNTER, gdcellFlexPaginationCounter );
-	applyAlertValues( gwREDACTION_COUNTER, gdcellIDShieldRedactionCounter );
+	applyAlertValues( gwINDEXING_COUNTER_GRID_ROW, gdcellFlexIndexingCounter );
+	applyAlertValues( gwPAGINATION_COUNTER_GRID_ROW, gdcellFlexPaginationCounter );
+	applyAlertValues( gwREDACTION_COUNTER_GRID_ROW, gdcellIDShieldRedactionCounter );
 }
 //--------------------------------------------------------------------------------------------------
 void CUSBLicenseKeyManagerDlg::clearCounterValuesList()
