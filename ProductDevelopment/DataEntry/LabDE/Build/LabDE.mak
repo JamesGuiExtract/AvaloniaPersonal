@@ -6,7 +6,7 @@
 #
 
 !include ComponentVersions.mak
-!include ..\..\Common\Common.mak
+!include ..\..\..\Common\Common.mak
 
 #############################################################################
 # E N S U R E   P R E - C O N D I T I O N S   A R E   M E T
