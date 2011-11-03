@@ -146,6 +146,7 @@ CopyTestFiles:
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\RasterZoneTester\TestFiles\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\RasterZoneTester\TestFiles\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDCOMUtils\Core\Test\StringPatternMatcherAutoTest\TestFiles\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Test\StringPatternMatcherAutoTest\TestFiles\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\BaseUtils\AutomatedTest\TestFiles\*.*" "$(TestingFilesDirectory)\ReusableComponents\BaseUtils\AutomatedTest\TestFiles\" /s /e /y /I
+	@XCOPY "$(ReusableComponentsRootDirectory)\BaseUtils\InteractiveTest\*.*" "$(TestingFilesDirectory)\ReusableComponents\BaseUtils\InteractiveTest\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\AutomatedTest\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDFileProcessing\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\VendorSpecificUtils\SafeNetUtils\AutomatedTest\TestFiles\*.*" "$(TestingFilesDirectory)\ReusableComponents\VendorSpecificUtils\SafeNetUtils\AutomatedTest\TestFiles\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\ESFileSuppliers\AutomatedTest\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDFileProcessing\ESFileSuppliers\AutomatedTest\" /s /e /y /I
