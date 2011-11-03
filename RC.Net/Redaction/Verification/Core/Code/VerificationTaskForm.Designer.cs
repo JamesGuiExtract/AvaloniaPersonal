@@ -100,7 +100,6 @@ namespace Extract.Redaction.Verification
         {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ToolStripContainer dataGridToolStripContainer;
-            System.Windows.Forms.Label label3;
             System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label1;
             System.Windows.Forms.Label label4;
@@ -243,7 +242,7 @@ namespace Extract.Redaction.Verification
             this._thumbnailDockableWindow = new TD.SandDock.DockableWindow();
             this._thumbnailViewer = new Extract.Imaging.Forms.ThumbnailViewer();
             dataGridToolStripContainer = new System.Windows.Forms.ToolStripContainer();
-            label3 = new System.Windows.Forms.Label();
+            _commentsLabel = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
@@ -321,7 +320,7 @@ namespace Extract.Redaction.Verification
             // _dataWindowSplitContainer.Panel1
             // 
             this._dataWindowSplitContainer.Panel1.Controls.Add(this._commentsTextBox);
-            this._dataWindowSplitContainer.Panel1.Controls.Add(label3);
+            this._dataWindowSplitContainer.Panel1.Controls.Add(_commentsLabel);
             this._dataWindowSplitContainer.Panel1.Controls.Add(this._currentDocumentTextBox);
             this._dataWindowSplitContainer.Panel1.Controls.Add(label2);
             this._dataWindowSplitContainer.Panel1.Controls.Add(this._documentTypeTextBox);
@@ -351,14 +350,14 @@ namespace Extract.Redaction.Verification
             this._commentsTextBox.TabIndex = 6;
             this._commentsTextBox.TextChanged += new System.EventHandler(this.HandleCommentsTextBoxTextChanged);
             // 
-            // label3
+            // _commentsLabel
             // 
-            label3.AutoSize = true;
-            label3.Location = new System.Drawing.Point(4, 89);
-            label3.Name = "label3";
-            label3.Size = new System.Drawing.Size(56, 13);
-            label3.TabIndex = 5;
-            label3.Text = "Comments";
+            _commentsLabel.AutoSize = true;
+            _commentsLabel.Location = new System.Drawing.Point(4, 89);
+            _commentsLabel.Name = "_commentsLabel";
+            _commentsLabel.Size = new System.Drawing.Size(56, 13);
+            _commentsLabel.TabIndex = 5;
+            _commentsLabel.Text = "Comments";
             // 
             // _currentDocumentTextBox
             // 
@@ -1933,5 +1932,6 @@ namespace Extract.Redaction.Verification
         private Utilities.Forms.TimerBarControl _slideShowTimerBarControl;
         private Imaging.Forms.OpenImageToolStripSplitButton _openImageToolStripSplitButton;
         private Imaging.Forms.OpenImageToolStripMenuItem _openImageToolStripMenuItem;
+        private System.Windows.Forms.Label _commentsLabel;
     }
 }

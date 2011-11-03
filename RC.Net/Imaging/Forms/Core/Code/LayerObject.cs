@@ -51,8 +51,9 @@ namespace Extract.Imaging.Forms
 
         /// <summary>
         /// The minimum height and width of a layer object in logical (image) pixels.
+        /// This corresponds to the minimum height of a C++ RasterZone.
         /// </summary>
-        static readonly Size _MIN_SIZE = new Size(1, 1);
+        static readonly Size _MIN_SIZE = new Size(5, 5);
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.

@@ -306,12 +306,12 @@ namespace Extract.Imaging.Forms
                 // TODO: actually perform OCR
                 _text = (text == null && imageViewer.RecognizeHighlightText ? "OCR text" : text);
 
-                // [DataEntry:3860]
+                // [FlexIDSCore:3860]
                 // Ensure the newly created highlight is of minimum size.
                 Rectangle bounds = GetBounds();
                 if (bounds.Width < MinSize.Width)
                 {
-                    _endPoint.X += 1;
+                    _endPoint.X += MinSize.Width - bounds.Width;
                 }
                 if (bounds.Height < MinSize.Height)
                 {

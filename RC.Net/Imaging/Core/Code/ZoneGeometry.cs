@@ -532,11 +532,11 @@ namespace Extract.Imaging
 
                     if (roundingMode == RoundingMode.Simple)
                     {
-                        // Ensure height is even. If the height is odd, the top and bottom of the
-                        // zone will be a .5 value. When such a zone is displayed, those values will
-                        // be rounded off, potentially exposing pixel content. Expand the zone by a
-                        // pixel to prevent this.
-                        height = (int)Math.Round(_height / 2) * 2;
+                        // Ensure height is even by rounding to the nearest even number. If the
+                        // height is odd, the top and bottom of the zone will be a .5 value. When
+                        // such a zone is displayed, those values will be rounded off, potentially
+                        // exposing pixel content. 
+                        height = (int)Math.Round(_height / 2, MidpointRounding.AwayFromZero) * 2;
                     }
                     else
                     {

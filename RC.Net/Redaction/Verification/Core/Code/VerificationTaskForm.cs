@@ -386,6 +386,12 @@ namespace Extract.Redaction.Verification
         /// </summary>
         RedactionTaskClass _redactedOutputTask;
 
+        /// <summary>
+        /// The Y coordinate of the top of the _redactionGridView control prior to the comment box
+        /// being hidden.
+        /// </summary>
+        readonly int _originalDataGridTop;
+
         #endregion Fields
 
         #region Events
@@ -445,6 +451,8 @@ namespace Extract.Redaction.Verification
                 _actionStatusTask = GetActionStatusTask(_settings.ActionStatusSettings);
 
                 InitializeComponent();
+
+                _originalDataGridTop = _redactionGridView.Top;
 
                 _standAloneMode = standAloneMode;
                 
@@ -781,8 +789,12 @@ namespace Extract.Redaction.Verification
                 using (SaveFileDialog saveFileDialog = new SaveFileDialog())
                 {
                     saveFileDialog.InitialDirectory = Path.GetDirectoryName(memento.SourceDocument);
+                    saveFileDialog.DefaultExt = Path.GetExtension(memento.SourceDocument);
                     saveFileDialog.FileName =
-                        Path.GetFileNameWithoutExtension(memento.SourceDocument) + ".redacted";
+                        Path.GetFileNameWithoutExtension(memento.SourceDocument) + ".redacted" +
+                        (string.IsNullOrWhiteSpace(saveFileDialog.DefaultExt)
+                            ? ""
+                            : "." + saveFileDialog.DefaultExt);
                     saveFileDialog.Filter = "TIFF files (*.tif;*.tiff)|*.tif;*.tiff";
                     saveFileDialog.FilterIndex = 1;
                     saveFileDialog.AddExtension = true;
@@ -2135,6 +2147,10 @@ namespace Extract.Redaction.Verification
         {
             if (_imageViewer.IsImageAvailable)
             {
+                // [FlexIDSCore:4711]
+                // Hide comments field when the file processing database is not available.
+                CommentsBoxVisible = (_fileDatabase != null);
+
                 VerificationMemento memento = GetCurrentDocument();
 
                 if (memento == null)
@@ -2377,11 +2393,12 @@ namespace Extract.Redaction.Verification
                 // even if auto-zoom is disabled.
                 _imageViewer.Shortcuts[Keys.F2] = HandleToggleZoomToSelection;
 
-                // Disable the close image
-                _imageViewer.Shortcuts[Keys.F4 | Keys.Control] = null;
-
-                // Disable open image [FlexIDSCore #4262]
-                _imageViewer.Shortcuts[Keys.O | Keys.Control] = null;
+                if (!_standAloneMode)
+                {
+                    // Disable open/close image when not in stand-alone mode [FlexIDSCore #4262, 4709].
+                    _imageViewer.Shortcuts[Keys.O | Keys.Control] = null;
+                    _imageViewer.Shortcuts[Keys.F4 | Keys.Control] = null;
+                }
 
                 // Next/previous redaction
                 _imageViewer.Shortcuts[Keys.Tab] = SelectNextItemOrPage;
@@ -4051,6 +4068,42 @@ namespace Extract.Redaction.Verification
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the comments box should be visible.
+        /// </summary>
+        /// <value><see langword="true"/> if the comments box should be visible; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        bool CommentsBoxVisible
+        {
+            get
+            {
+                return _commentsTextBox.Visible;
+            }
+
+            set
+            {
+                if (value != _commentsTextBox.Visible)
+                {
+                    _commentsLabel.Visible = value;
+                    _commentsTextBox.Visible = value;
+
+                    int resizeAmount = _originalDataGridTop - _commentsLabel.Top;
+                    if (value)
+                    {
+                        resizeAmount = -resizeAmount;
+                        _redactionGridView.Top = _originalDataGridTop;
+                    }
+                    else
+                    {
+                        _redactionGridView.Top = _commentsLabel.Top;
+                    }
+
+                    _redactionGridView.Height += resizeAmount;
+                }
+            }
         }
 
         #endregion Private Members
