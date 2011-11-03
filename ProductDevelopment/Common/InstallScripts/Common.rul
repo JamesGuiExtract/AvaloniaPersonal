@@ -596,20 +596,20 @@ begin
 	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
  	
     // Check each of the expected version against any installed versions
-    if ((PRODUCT_GUID!= IDSHIELD_PRODUCT_CODE) && 
-    		CheckProductKeyInstalled(@FlexIndexVersion, IDSHIELD_PRODUCT_CODE, strVersion, FALSE)) then
+    if ((PRODUCT_GUID!= IDSHIELD_PRODUCT_CODE) &&                                              	
+    		CheckProductKeyInstalled(@FlexIndexVersion, IDSHIELD_PRODUCT_CODE, strVersion, TRUE)) then
     	bReturnValue = TRUE;
 	elseif ((PRODUCT_GUID != FLEX_INDEX_PRODUCT_CODE) && 
-    		CheckProductKeyInstalled(@FlexIndexVersion, FLEX_INDEX_PRODUCT_CODE, strVersion, FALSE)) then
+    		CheckProductKeyInstalled(@FlexIndexVersion, FLEX_INDEX_PRODUCT_CODE, strVersion, TRUE)) then
     	bReturnValue = TRUE;
 	elseif ((PRODUCT_GUID != LASERFICHE_PRODUCT_CODE) && 
-    		CheckProductKeyInstalled(@LaserficheVersion, LASERFICHE_PRODUCT_CODE, strVersion, FALSE)) then 
+    		CheckProductKeyInstalled(@LaserficheVersion, LASERFICHE_PRODUCT_CODE, strVersion, TRUE)) then 
     	bReturnValue = TRUE;
 	elseif ((PRODUCT_GUID != IDSHIELDOFFICE_PRODUCT_CODE) && 
-    		CheckProductKeyInstalled(@IDShieldOfficeVersion, IDSHIELDOFFICE_PRODUCT_CODE, strVersion, FALSE)) then 
+    		CheckProductKeyInstalled(@IDShieldOfficeVersion, IDSHIELDOFFICE_PRODUCT_CODE, strVersion, TRUE)) then 
     	bReturnValue = TRUE;
    	elseif ((PRODUCT_GUID != LABDE_PRODUCT_CODE) && 
-    		CheckProductKeyInstalled(@LabDEVersion, LABDE_PRODUCT_CODE, strVersion, FALSE)) then 
+    		CheckProductKeyInstalled(@LabDEVersion, LABDE_PRODUCT_CODE, strVersion, TRUE)) then 
     	bReturnValue = TRUE;
 	endif;
 	
