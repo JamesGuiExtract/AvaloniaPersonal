@@ -1421,7 +1421,7 @@ namespace Extract.Imaging.Forms
                     int averageLineHeight = 0;
                     if (!_averageLineHeight.TryGetValue(page, out averageLineHeight))
                     {
-                        if (_ocrData != null)
+                        if (_ocrData != null && _ocrData.SpatialString.HasSpatialInfo())
                         {
                             // Retrieve an IUnknownVector of SpatialStrings representing the words on the page.
                             SpatialString pageData =
@@ -1666,7 +1666,7 @@ namespace Extract.Imaging.Forms
                 {   
                     // If OCR data is available for the document as a whole, simply grab the page
                     // needed.
-                    if (_ocrData != null)
+                    if (_ocrData != null && _ocrData.SpatialString.HasSpatialInfo())
                     {
                         pageOcr = _ocrData.SpatialString.GetSpecifiedPages(page, page);
 
@@ -1677,7 +1677,7 @@ namespace Extract.Imaging.Forms
                         }
                     }
                     // Otherwise attempt to OCR data if _imageViewer.AutoOcr is on.
-                    else
+                    else if (_ocrData == null)
                     {
                         bool autoOcr = false;
                         OcrTradeoff ocrTradeoff = OcrTradeoff.Balanced;

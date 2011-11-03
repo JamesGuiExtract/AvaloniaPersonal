@@ -676,12 +676,13 @@ namespace Extract.Redaction.Verification
         /// <param name="type">The type associated with the <paramref name="layerObject"/>.</param>
         /// <param name="confidenceLevel">The confidence level associated with the 
         /// <paramref name="layerObject"/>.</param>
-        public void Add(LayerObject layerObject, string text, string category, string type, 
+        /// <returns>The index of the row that was added.</returns>
+        public int Add(LayerObject layerObject, string text, string category, string type, 
             ConfidenceLevel confidenceLevel)
         {
             try
             {
-                Add( new RedactionGridViewRow(layerObject, text, category, type, confidenceLevel) );
+                return Add( new RedactionGridViewRow(layerObject, text, category, type, confidenceLevel) );
             }
             catch (Exception ex)
             {
@@ -694,7 +695,8 @@ namespace Extract.Redaction.Verification
         /// Adds the specified row to the <see cref="RedactionGridView"/>.
         /// </summary>
         /// <param name="row">The row to add.</param>
-        void Add(RedactionGridViewRow row)
+        /// <returns>The index of the row that was added.</returns>
+        int Add(RedactionGridViewRow row)
         {
             string type = row.RedactionType;
             if (!string.IsNullOrEmpty(type) && !_typeColumn.Items.Contains(type))
@@ -707,14 +709,17 @@ namespace Extract.Redaction.Verification
             int index = GetLastSelectedRowIndex();
             if (index == -1)
             {
+                index = _redactions.Count;
                 _redactions.Add(row);
             }
             else
             {
-                _redactions.Insert(index + 1, row);
+                index++;
+                _redactions.Insert(index, row);
             }
 
             _dirty = true;
+            return index;
         }
 
         /// <summary>
@@ -2169,7 +2174,8 @@ namespace Extract.Redaction.Verification
                         strText = "[No text]";
                     }
 
-                    Add(e.LayerObject, strText, "Manual", _lastType, _confidenceLevels.Manual);
+                    int addedRowIndex =
+                        Add(e.LayerObject, strText, "Manual", _lastType, _confidenceLevels.Manual);
 
                     redaction.BorderColor = _confidenceLevels.Manual.Color;
                     redaction.Color = ToggledRedactionColor;
@@ -2180,8 +2186,7 @@ namespace Extract.Redaction.Verification
                     }
 
                     // Auto select the new layer object [FlexIDSCore #4206]
-                    _imageViewer.LayerObjects.Selection.Clear();
-                    _imageViewer.LayerObjects.Selection.Add(redaction);
+                    SelectOnly(addedRowIndex);
                 }
             }
             catch (Exception ex)
