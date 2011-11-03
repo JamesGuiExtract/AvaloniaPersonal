@@ -2470,6 +2470,12 @@ namespace Extract.Redaction.Verification
                     }
                 }
 
+                // If in stand-alone mode, we know we are not going to need the comments box.
+                if (_standAloneMode)
+                {
+                    CommentsBoxVisible = false;
+                }
+
                 UpdateControls();
             }
             catch (Exception ex)
