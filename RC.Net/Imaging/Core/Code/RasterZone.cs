@@ -149,8 +149,13 @@ namespace Extract.Imaging
                 _start.Y = comRasterZone.StartY;
                 _end.X = comRasterZone.EndX;
                 _end.Y = comRasterZone.EndY;
-                _height = comRasterZone.Height;
                 _pageNumber = comRasterZone.PageNumber;
+
+                // [LegacyRCAndUtils:6216, 6217]
+                // For the time being, to address the issue where RasterZones gain extra padding 
+                // every time they are opened and edited in the .Net image viewer convert the height
+                // to the .Net side by subtracting 1.
+                _height = comRasterZone.Height - 1;
             }
             catch (Exception ex)
             {
@@ -396,7 +401,11 @@ namespace Extract.Imaging
                 GetRoundedCoordinates(RoundingMode.Safe, out start, out end, out height);
 
                 // Copy the .Net RasterZone data to the COM RasterZone
-                comRasterZone.CreateFromData(start.X, start.Y, end.X, end.Y, height, _pageNumber);
+                // [LegacyRCAndUtils:6216, 6217]
+                // For the time being, to address the issue where RasterZones gain extra padding 
+                // every time they are opened and edited in the .Net image viewer convert the height
+                // to the .c++ side by adding 1.
+                comRasterZone.CreateFromData(start.X, start.Y, end.X, end.Y, height + 1, _pageNumber);
 
                 return comRasterZone;
             }

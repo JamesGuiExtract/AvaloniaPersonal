@@ -484,18 +484,21 @@ STDMETHODIMP CRasterZone::GetRectangularBounds(ILongRectangle *pPageBounds,
 		// calculate the angle of the line dy/dx
 		double dAngle = atan2((double) (m_nEndY - m_nStartY), (double) (m_nEndX  - m_nStartX));
 		
+		double dDeltaX = ((m_nHeight) / 2.0) * sin(dAngle);
+		double dDeltaY = ((m_nHeight) / 2.0) * cos(dAngle);
+		
 		// calculate the 4 points
-		p1.x = (long) (m_nStartX - (((m_nHeight)/2) * sin (dAngle)));
-		p1.y = (long) (m_nStartY + (((m_nHeight)/2) * cos (dAngle)));
+		p1.x = (long) (m_nStartX - dDeltaX);
+		p1.y = (long) (m_nStartY + dDeltaY);
 
-		p2.x = (long) (m_nEndX - (((m_nHeight)/2) * sin (dAngle)));
-		p2.y = (long) (m_nEndY + (((m_nHeight)/2) * cos (dAngle)));
+		p2.x = (long) (m_nEndX - dDeltaX);
+		p2.y = (long) (m_nEndY + dDeltaY);
 
-		p3.x = (long) (m_nEndX + (((m_nHeight)/2) * sin (dAngle)));
-		p3.y = (long) (m_nEndY - (((m_nHeight)/2) * cos (dAngle)));
+		p3.x = (long) (m_nEndX + dDeltaX);
+		p3.y = (long) (m_nEndY - dDeltaY);
 
-		p4.x = (long) (m_nStartX + (((m_nHeight)/2) * sin (dAngle)));
-		p4.y = (long) (m_nStartY - (((m_nHeight)/2) * cos (dAngle)));
+		p4.x = (long) (m_nStartX + dDeltaX);
+		p4.y = (long) (m_nStartY - dDeltaY);
 
 		// calculate the rectangular bounds
 		RECT rect;
