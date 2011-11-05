@@ -55,7 +55,7 @@ IF "%BUILD_FROM_SVN%"=="YES" (
 	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\..\..\Common" "$/Engineering/ProductDevelopment/Common" %1
 	CD ..\DataEntry\LabDE\Build
 	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\" "$/Engineering/ProductDevelopment/DataEntry/LabDE/Build" %1
-	CD ..\AttributeFinder\Build
+	CD ..\..\..\AttributeFinder\Build
 	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\" "$/Engineering/ProductDevelopment/AttributeFinder/Build" %1
 )
 
