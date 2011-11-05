@@ -4,7 +4,7 @@
 # the LatestComponentVersions.mak file being included here counts on $(ProductRootDirName)
 # ProductRootDirName defined as a non-null string
 #
-!include ..\..\Common\LatestComponentVersions.mak
+!include ..\..\..\Common\LatestComponentVersions.mak
 
 #############################################################################
 # O V E R R I D A B L E S
