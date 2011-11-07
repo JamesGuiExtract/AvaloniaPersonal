@@ -23,7 +23,7 @@ LaserFicheDir=$(PDRootDir)\AFIntegrations\Laserfiche
 RulesDir=$(EngineeringRootDirectory)\Rules
 Branch=
 
-Get=$(VAULT_DIR)\vault GETLABEL 
+Get="$(VAULT_DIR)\vault" GETLABEL 
 GetOptions=-server $(VAULT_SERVER) -repository $(VAULT_REPOSITORY) -makewritable 
 
 GetPDCommonFiles:
