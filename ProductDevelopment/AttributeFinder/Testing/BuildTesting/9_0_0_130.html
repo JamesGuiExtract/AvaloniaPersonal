@@ -1,0 +1,324 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0.0.130 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0.0.130 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    <ul>
+        <li><b>[LegacyRC #3616]</b> Confirm that uninstalling the RDT with the SDK 
+        installed does <b>not</b> remove the SDK help file.</li>
+        <li><b>[FIDSC #2206]</b> Confirm that it also did not remove the FlexIndex UI
+        help file.</lI>
+    <p>
+        <li><b>[LegacyRC #6138]</b> Confirm that Windows Installer, PowerShell, SQL, and
+        the Management Studio can all be installed from our installer on 64-bit XP.</li>
+    <p>
+        <li><b>[LegacyRC #6211]</b> During testing, especially after processing stops,
+        keep an eye out for ELI33943 "Unexpected exception caught!".</li>
+    <p>
+        <li><b>[LegacyRC #6215]</b> Install the LM and confirm that you can use the Field
+        Activation Utility and Sentinal Key Manager to increment each of the three kinds
+        of counters.</li>
+    <p>
+        <li><b>[FIDSC #3468]</b> Confirm that SQL Management Studio can be installed 
+        without first installing SQL.</li>
+    <p>
+        <li><b>[FIDSC #3694]</b> Confirm that all parts of all labels for the <b>Output
+        data to XML file</b> output handler and its related dialogs are visible.</li>
+    <p>
+        <li><b>[FIDSC #4177]</b> Run the ID Shield Statistics Reporter and confirm that
+        the data labels in the statistics tab are not prefixed with the text "Number 
+        of".</li>
+        <li><b>[FIDSC #4178]</b> Run the ID Shield Tester and confirm that the labels for
+        the output stats are not prefixed with the text "Number of".</li>
+    <p>
+        <li><b>[FIDSC #4221, #4924]</b> Confirm that none of the following is licensed
+        with a Simple Rulewriting license.
+        <ul>
+            <li>Duplicate and separate attribute trees</li>
+            <li>Extract OCR text in image area</li>
+            <li>Loop finder</li>
+            <li>Loop preprocessor</li>
+            <li>Numeric sequence expander</li>
+            <li>Run object on attributes</li>
+            <li>Split attributes using tokens</li>
+        </ul></li>
+    <p>
+        <li><b>[FIDSC #4404]</b> With a clean install, confirm that FPS, USS, and VOA
+        files are all correctly associated with appropriate icons and Extract 
+        programs.</li>
+    <p>
+        <li><b>[FIDSC #4638, 4736]</b> Confirm that the isntall splash screens for Flex 
+        Index, ID Shield, LabDE, and the RDT have 2012 copywrite dates.</li>
+    <p>
+        <li><b>[FIDSC #4731]</b> Confirm that the Demo Shield text for .NET is 
+        grammatically correct.</li>
+    <p>
+        <li><b>[FIDSC #4683]</b> On Vista, run verification and confirm that the area
+        around the run key text on the Slideshow tab of the Verification Options dialog
+        is the same color as the rest of the window.</li>
+    <p>
+        <li><b>[FIDSC #4686]</b> On 32-bit Vista, install our software in this order:
+        <ul>
+            <li>.NET</li>
+            <li>SQL Server</li>
+            <li>SQL Server Management Studio</li>
+            <li>ID Shield</li>
+        </ul> and confirm that the FAM service is installed correctly.</lI>
+    <P>
+        <li><b>[FIDSC #4709, 4710, 4711, 4712, 4714]</b> ID Shield on Demand
+        <ul>
+            <li>Confirm that <b>Ctrl+F3</b> and <b>Ctrl+O</b> are available as keyboard
+            shortcuts to close/open documents.</li>
+            <li>Confirm that when you save a TIF with the default save settings, the
+            output file is saved with the .tif extension.</li>
+            <li>Confirm that the Comment field is unavailable when a document is verified
+            in ID Shield on Demand.</li>
+            <li>Confirm that a PDF can be verified and saved.</li>
+        <p>
+            <li>Open a document that has no associated VOA file; note that the 
+            next/previous item toolstrip buttons are both disabled.</li>
+            <li>Draw a single manual redaction; confirm that they remain disabled.</lI>
+            <li>Switch to the selection tool and deselect the redaction (if 
+            selected).</li>
+            <li>Open another document that contains no redactions; confirm that the 
+            buttons are still disabled.</li>
+            <li>Draw two redactions.</li>
+            <li>Select the second redaction; confirm that only the <b>Previous item</b>
+            button is enabled.</li>
+            <li>Confirm that the buttons are enabled appropriately whether one, none, or
+            both of the items are selected.</lI>
+        </ul></lI>
+    <p>
+        <li><b>[FIDSC #4729]</b>
+        <ul>
+            <li>In verification, create a new redaction.</li>
+            <li>Resize it to be as narrow as possible. Confirm that you can still select
+            the redaction in the image viewer.</li>
+            <li>Save the document and navigate back. Confirm that the redaction size has
+            not changed.</li>
+        </ul></li>
+    <p>
+        <li><b>[FIDSC #4732]</b> Confirm that the tag selector dropdown text for 
+        <b>$PadValue()</b> contains whitespace as appropriate.</li>
+    <p>
+        <li><b>[FIDSC #4737, 4738]</b> 
+        <ul>
+            <li>Install .NET and SQL as local admin.</li>
+            <li>Install FLEX Index as a non-admin user.</lI>
+            <li>INstall ID Shield, LM, and the RDT as admin.</li>
+            <li>Uninstall RDT, LM, and ID Shield as admin.</li>
+            <li>Confirm that the Extract services and the FLEX help files have not been
+            uninstalled.</li>
+        </uL></li>
+    <p>
+        <li><b>[FIDSC #4740]</b>
+        <ul>
+            <li>Queue a single document for verification; configure the FPS file to
+            process continuously.</li>
+            <li>Verify the document; before saving it, confirm that the status bar 
+            indicates that OCR data are available.</li>
+            <li>Save the document. While the UI is waiting for the next document, confirm
+            that the status bar does not indicate that OCR data are available.</li>
+        </uL></li>
+    <p>
+        <li><b>[FIDSC #4755]</b> In verification, confirm that the <b>Tools &gt; Slideshow
+        &gt; Stop</b> menu item no longer exists.</li>
+    <p>
+        <li><b>[FIDSC #4757]</b> Confirm that the regex help message in the FAM VOA file
+        contents condition is readable and typo-free.</li>
+    <p>
+        <li><b>[FIDSC #4798]</b> Exercise verification and confirm that you don't see
+        jumping clues or redactions.</li>
+    <p>
+        <li><b>[FIDSC #4809]</b> Confirm that background OCR in the Data Entry and ID 
+        Shield verification interfaces and the Extract Image Viewer does <b>not</b>
+        require a server license.</li>
+    <p>
+        <li><b>[FIDSC #4834]</b>
+        <ul>
+            <li>Run the compute FPS file from the ID Shield demo.</li>
+            <li>Open TestImage004.tif for verification; there should be three redactions
+            over SSNs.</lI>
+            <li>Zoom in on the redactions. With the selection tool, grab the left grip 
+            handle of the second redaction and resize it to cover only the last four 
+            digits. Confirm that no sides of the redaction are resized inward.</li>
+        </ul></li>
+    <p>
+        <li><b>[FIDSC #4839]</b> Confirm that the RDT installs the InteractiveTest folder
+        under BaseUtils (which contains files for testing the Text Function 
+        Expander).</lI>
+    <p>
+        <li><b>[FIDSC #4861]</b> Install multiple FKB versions and confirm that the 
+        version numbers are separated by a comma and a space in about boxes.</lI>
+    <p>
+        <li><b>[FIDSC #4866]</b> Exercise the verification portion of a sanity test and
+        confirm that no errors related to loading data for the word redaction tool are
+        seen.</li>
+    <p>
+        <li><b>[FIDSC #4870]</b> Property page for Extract OCR text in image area
+        <ul>
+            <li>Confirm that <b>Include/Exclude</b> are capitalized in the first combo
+            box in the Text to extract group box.</li>
+            <li>Confirm that <b>characters</b> hasn't been abbreviated in the second
+            combo box.</li>
+        </uL></lI>
+    <p>
+        <li><b>[FIDSC #4897]</b> Confirm that the captions for attribute selector
+        property pages are correct.</li>
+    <p>
+        <li><b>[FIDSC #4900]</b> 
+        <ul>
+            <li>Run the compute FPS file from the ID Shield demo. Save a separate copy
+            of the output VOA files.</li>
+            <li>Verify a document. Disable an attribute that was found by the rules; make
+            no other changes.</li>
+            <li>Use the merge task to merge the rules output VOA with the verification
+            output VOA. Confirm that the enabled and disabled attributes are <b>not</b>
+            merged.</li>
+        </Ul></lI>
+    <p>
+        <li><b>[FIDSC #4910]</b>
+        <ul>    
+            <li>Create a VOA file where there is a clue contained within a redaction item
+            (this happens with TestImage005.tif from the redaction demo).</li>
+            <li>In verification, turn off the redaction and save.</li>
+            <li>Make a copy of the VOA file.</li>
+            <li>Use the merge task to merge the two VOAs.</lI>
+            <li>Confirm that both the clue and the containing attribute are present in
+            the output.</li>
+        </ul></li>
+    <p>
+        <li><b>[FIDSC #4911]</b>
+        <ul>
+            <li>I think you'll understand better than I how to test this; you're looking
+            for a deadlock attempting to start the FAM with a database that has an
+            expired lock.</lI>
+        </ul></li>
+    <p>
+        <li><b>[FIDSC #4913]</b> Confirm that the default setting for Extract OCR text in
+        image area is <b>document context</b> and not <b>original document</b>.</li>
+    <p>
+        <li><b>[FIDSC #4916]</b> Confirm processing the PDFs attached to the SCR with a
+        create redacted image task does not result in missing redactions or noticably
+        lower image quality in the output.</li>
+    <p>
+        <li><b>[FIDSC #4917]</b>
+        <ul>
+            <li>Create several redactions.</li>
+            <li>Disable some (not all) of them.</li>
+            <li>Press Ctrl+A to select all attributes and hit the space bar.</li>
+            <li>Confirm that everything is enabled and that no inappropriate prompts were
+            displayed.</li>
+        </ul></li>
+    <p>
+        <li><b>[FIDSC #4918]</b> In the following places, confirm that the buttons for
+        adding rule objects to sequences are uniformly labeled as <b>Add</b> buttons and
+        that they insert new objects <b>after</b> the currently-selected object in the
+        list:
+        <ul>
+            <li>Attribute rules list</li>
+            <li>Modifying rules list</li>
+            <li>Select multiple document preprocessors</li>
+            <li>Select multiple output handlers</li>
+            <li>Multiple criteria attribute selector</li>
+        </ul></li>
+    <p>
+        <li><b>[FIDSC #4919]</b> Confirm that the Add button for the multiple conditions
+        FAM condition inserts new objects <b>after</b> the currently selected item in the
+        list.</li>
+    <p>
+        <li><b>[FIDSC #4921]</b>
+        <ul>
+            <li>Run the IDSSR in such a way that some test cases fail.</li>
+            <Li>Double-click in the <b>FailedTestCases.txt</b> file list and confirm that
+            <b>FailedTestCases.uex</b> is opened.</li>
+        </ul></li>
+    <p>
+        <li><b>[FIDSC #4922]</b> Confirm that an ID Shield server license is sufficient
+        to use the FAM's VOA file contents condition and the Doc type condition.</li>
+    <p>
+        <li><b>[FIDSC #4923]</b>
+        <ul>
+            <li>Open a verification session and navigate to a multi-page document.</li>
+            <li>Rotate the first page 90 degrees to the right.</li>
+            <li>Navigate to page 2.</li>
+            <li>Confirm that no exception is seen.</li>
+            <li>Confirm appropriate behavior in data entry as well.</li>
+        </ul></li>
+    <p>
+        <li><b>[DNRCAU #743]</b> 
+        <ul>
+            <li>When the FTP file supplier is configured to check for files at specified
+            times, confirm that an application trace is logged indicating that the check
+            is occurring.</li>
+            <li>Confirm that directory listings from the FTP file supplier and task are
+            logged to the <b>FTPEventHistory</b> table.
+            <ul>
+                <li>Event code should be Q.</li>
+                <li>Arg1 should be the directory</li>
+                <li>Arg2 should be the number of files found.</lI>
+            </uL></li>
+        </uL></li>
+    <p>
+        <li><b>[DNRCAU #745]</b>
+        <ul>
+            <li>Set up an FPS file to simultaneously supply files via FTP and to do some
+            processing task that will try to access the .info file.</li>
+            <li>Run it for a while and confirm that no access violations are seen.</li>
+        </ul></li>
+    </ul></li>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
