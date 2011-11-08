@@ -13,11 +13,11 @@
 // Include header files /////////////////////////////////////////////////////
 #include "ifx.h"
 
-#include "..\..\..\..\Common\InstallScripts\Common.rul"
+#include "..\..\..\..\..\Common\InstallScripts\Common.rul"
 
-#include "..\..\..\..\Common\InstallScripts\OnMaintUIBefore.rul"
+#include "..\..\..\..\..\Common\InstallScripts\OnMaintUIBefore.rul"
 
-#include "..\..\..\..\Common\InstallScripts\OnMaintUIAfter.rul"
+#include "..\..\..\..\..\Common\InstallScripts\OnMaintUIAfter.rul"
                                  
                                  
 #define PATH_TO_REGASM WINDIR ^ "Microsoft.NET\\Framework\\v2.0.50727\\RegAsm.exe"
@@ -64,8 +64,8 @@ begin
 		abort;
 	endif;
 	
-	// Check for .NET 3.5
-	DetectDotNET_35();
+	// Check for .NET 4.0
+	DetectDotNET_40();
 	    
 	CheckOtherExtractProducts();
 	
@@ -102,7 +102,7 @@ Dlg_SdStartCopy:
    	//InstallDotNET();
    	                                
 	// Install SQL Native Client if not installed
-   	InstallSQLNativeClient();
+   	//InstallSQLNativeClient();
    	                          
 	// Install Inlite Key drivers
    	InstallInliteKeyDrivers();
