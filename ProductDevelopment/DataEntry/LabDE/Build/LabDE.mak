@@ -24,7 +24,7 @@
 PDRootDir=$(EngineeringRootDirectory)\ProductDevelopment
 AFRootDirectory=$(PDRootDir)\AttributeFinder
 RCNETDir=$(EngineeringRootDirectory)\RC.Net
-LabDEBleedingEdgeDir=R:\LabDE\Internal\BleedingEdge\$(FlexIndexVersion)
+LabDEBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)
 RulesDir=$(EngineeringRootDirectory)\Rules
 
 AFInstallRootDir=P:\AttributeFinder
