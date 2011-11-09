@@ -27,6 +27,20 @@ if(typeof Array.prototype.map !== 'function') {
 	};
 }
 
+//--------------------------------------------------------------------------------------------------
+// Add has function to Array
+//--------------------------------------------------------------------------------------------------
+if(typeof Array.prototype.has !== 'function') {
+	Array.prototype.has = function(value) {
+    for (var i=0, l = this.length; i < l; i++) {
+      if (this[i] == value) {
+        return true;
+      }
+    }
+    return false;
+  };
+}
+
 // Run the script
 main(parseCommandLineOptions());
 
