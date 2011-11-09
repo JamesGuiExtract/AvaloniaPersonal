@@ -8,6 +8,9 @@
 // Create EAVs out of the mostly CSV index data in the file named by the first argument and outputs
 // the results to files below the directory named by the second argument.
 //
+// Also copies the images to subfolders by document type (assumes images are in Images dir parallel
+// to output dir)
+//
 // Usage:   ParseTuscolaACSIndexData inputFile outputDir
 //              inputFile - The path to the index data file
 //              outputDir - The path to the EAV output dir
@@ -112,7 +115,7 @@ function main(args) {
         if (iname == undefined) {
             return;
         }
-        var newdir = fso.BuildPath(fso.GetParentFolderName(iname), doctype.replace(/[^\w\s]/, "_"));
+        var newdir = fso.BuildPath(fso.GetParentFolderName(iname), doctype.replace(/[^\w\s]/g, "_").replace(/_+$/,""));
 
         if (fso.FileExists(fso.BuildPath(newdir, fso.GetFileName(iname)))) {
             return;
