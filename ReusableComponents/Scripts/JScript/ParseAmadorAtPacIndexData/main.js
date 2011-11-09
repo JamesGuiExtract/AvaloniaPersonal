@@ -27,47 +27,67 @@ function main(args) {
         imageMap[f.Name.slice(0,4)+f.Name.slice(5,12)] = f;
     }
 
-    
     if (!fso.folderExists(outputDir)) {
         fso.createFolder(outputDir);
     }
 
+    // Create a map of images to destinations
+    // This is to deal with images that have multiple records and multiple doc-types
+    var imagesToCopy = {};
+    
     var csvlines = readAllText(inputFile).split(/\n/).map(function(s){return s.trim()});
     for (var i=0; i < csvlines.length; i++) {
         handleDebug("CSVLine", i);
         var fields = csvlines[i].split(/\s*(?:-\d{2})?\|\s*/);
 
-        // Copy the image to a subfolder
-        copyImage(fields);
+        // Update map of images to copy
+        setCopyImage(fields);
 
         makeEAVS_PARTIES(fields);
     }
+    
+    copyImages(imagesToCopy);
 
-    function copyImage(fields) {
-        var doctype = fields[3];
+    // Update map of images to destinations based on doc-type(s)
+    function setCopyImage(fields) {
+        var doctype = fields[3].replace(/[^\w\s]/g, "_").replace(/_+$/,"");
         var iname = getImageName(fields[0]+fields[1]);
         if (iname == undefined) {
             return;
         }
-        var newdir = fso.BuildPath(fso.GetParentFolderName(iname), doctype.replace(/[^\w\s]/g, "_").replace(/_+$/,""));
-
-        if (fso.FileExists(fso.BuildPath(newdir, fso.GetFileName(iname)))) {
-            return;
-        }
-        try {
-            if (!fso.folderExists(newdir)) {
-                fso.createFolder(newdir);
+        var existRecord = imagesToCopy[iname];
+        if (existRecord) {
+            if (existRecord.has(doctype)) {
+                return;
+            } else {
+                existRecord.push(doctype);
             }
+        } else {
+            imagesToCopy[iname] = [doctype];
         }
-        catch(err) {
-            handleScriptError("ParseAmadorAtPacIndexData_1", "Unable to create folder!", err, "FolderName", newdir);
-        }
+    }
 
-        try {
-            fso.CopyFile(iname, newdir+"\\");
-        }
-        catch(err) {
-            handleScriptError("ParseAmadorAtPacIndexData_2", "Unable to copy file!", err, "FileName", iname, "Destination", newdir);
+    function copyImages(imagesToDocTypes) {
+        for (iname in imagesToDocTypes) {
+            var doctypes = imagesToDocTypes[iname];
+            var doctype = doctypes.join(" and ");
+            var newdir = fso.BuildPath(fso.GetParentFolderName(iname), doctype);
+
+            try {
+                if (!fso.folderExists(newdir)) {
+                    fso.createFolder(newdir);
+                }
+            }
+            catch(err) {
+                handleScriptError("ParseAmadorAtPacIndexData_1", "Unable to create folder!", err, "FolderName", newdir);
+            }
+
+            try {
+                fso.CopyFile(iname, newdir+"\\");
+            }
+            catch(err) {
+                handleScriptError("ParseAmadorAtPacIndexData_2", "Unable to copy file!", err, "FileName", iname, "Destination", newdir);
+            }
         }
     }
 
