@@ -13,7 +13,7 @@ var fso = new ActiveXObject("Scripting.FileSystemObject");
 //--------------------------------------------------------------------------------------------------
 if(typeof String.prototype.trim !== 'function') {
   String.prototype.trim = function() {
-    return this.replace(/^\s+|\s+$/, '');
+    return this.replace(/^\s+|\s+$/g, '');
   };
 }
 
