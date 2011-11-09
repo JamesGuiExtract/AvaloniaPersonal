@@ -71,6 +71,25 @@ namespace Extract.FileActionManager.Forms
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether to reestablish a new connection before each
+        /// retry attempt.
+        /// </summary>
+        /// <value><see langword="true"/> to reestablish a new connection before each retry attempt;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        public bool ReestablishConnectionBeforeRetry
+        {
+            get
+            {
+                return _reestablishConnectionBeforeRetryCheckBox.Checked;
+            }
+            set
+            {
+                _reestablishConnectionBeforeRetryCheckBox.Checked = value;
+            }
+        }
+
+        /// <summary>
         /// Connection object used to get the settings for connecting to the FTP Server
         /// </summary>
         [CLSCompliant(false)]

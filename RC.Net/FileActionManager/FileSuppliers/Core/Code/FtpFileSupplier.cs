@@ -186,8 +186,10 @@ namespace Extract.FileActionManager.FileSuppliers
         /// Boolean for whether to poll became PollingMethod; also added PollingTimes
         /// <para>Version 5</para>
         /// Removed the after-download actions per [DotNetRCAndUtils:739]
+        /// <para><b>Version 6</b></para>
+        /// Added <see cref="ReestablishConnectionBeforeRetry"/>
         /// </summary>
-        const int _CURRENT_VERSION = 5;
+        const int _CURRENT_VERSION = 6;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -295,6 +297,9 @@ namespace Extract.FileActionManager.FileSuppliers
         // Time to wait between retries
         int _timeToWaitBetweenRetries = _DEFAULT_WAIT_TIME_IN_MILLISECONDS_BETWEEN_RETRIES;
 
+        // Indicates whether to reestablish a new connection before each retry attempt.
+        bool _reestablishConnectionBeforeRetry = true;
+
         /// <summary>
         /// The <see cref="FileProcessingDB"/> in use.
         /// </summary>
@@ -310,11 +315,6 @@ namespace Extract.FileActionManager.FileSuppliers
         /// aborted if this number becomes > <see cref="NumberOfTimesToRetry"/>
         /// </summary>
         int _consecutiveDownloadFailures = 0;
-
-        /// <summary>
-        /// Allows for FTP operations to be automatically retried as configured.
-        /// </summary>
-        Retry<Exception> _retry;
 
         /// <summary>
         /// Protects access to creating/disposal of the _pollingTimer.
@@ -569,6 +569,30 @@ namespace Extract.FileActionManager.FileSuppliers
                 if (_timeToWaitBetweenRetries != value)
                 {
                     _timeToWaitBetweenRetries = value;
+                    _dirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to reestablish a new connection before each
+        /// retry attempt.
+        /// </summary>
+        /// <value><see langword="true"/> to reestablish a new connection before each retry attempt;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        public bool ReestablishConnectionBeforeRetry
+        {
+            get
+            {
+                return _reestablishConnectionBeforeRetry;
+            }
+
+            set
+            {
+                if (_reestablishConnectionBeforeRetry != value)
+                {
+                    _reestablishConnectionBeforeRetry = value;
                     _dirty = true;
                 }
             }
@@ -856,9 +880,6 @@ namespace Extract.FileActionManager.FileSuppliers
                 _fileProcessingDB = pDB;
                 _actionID = nActionID;
 
-                // Create retry object
-                _retry = new Retry<Exception>(NumberOfTimesToRetry, TimeToWaitBetweenRetries, _stopSupplying);
-
                 // Notify the FtpEventRecorder to recheck the DBInfo setting for whether to log FTP events
                 FtpEventRecorder.RecheckFtpLoggingStatus();
 
@@ -1017,6 +1038,11 @@ namespace Extract.FileActionManager.FileSuppliers
                         PollingTimes = reader.ReadStructArray<DateTime>();
                     }
 
+                    if (reader.Version >= 6)
+                    {
+                        ReestablishConnectionBeforeRetry = reader.ReadBoolean();
+                    }
+
                     string hexString = reader.ReadString();
                     using (MemoryStream ftpDataStream = new MemoryStream(hexString.ToByteArray()))
                     {
@@ -1061,6 +1087,7 @@ namespace Extract.FileActionManager.FileSuppliers
                     writer.Write(NumberOfTimesToRetry);
                     writer.Write(TimeToWaitBetweenRetries);
                     writer.Write(PollingTimes);
+                    writer.Write(ReestablishConnectionBeforeRetry);
 
                     // Write the Ftp connection settings to the steam
                     using (MemoryStream ftpDataStream = new MemoryStream())
@@ -1336,21 +1363,51 @@ namespace Extract.FileActionManager.FileSuppliers
                     {
                         try
                         {
-                            // Call the DownloadFileFromFtpServer retry within a FtpEventRecorder
+                            string remoteFileName =
+                                FtpMethods.NormalizeRemotePath(RemoteDownloadFolder) + currentFtpFile.Name;
+
+                            // Call the DownloadFileFromFtpServer retry within a FtpEventRecorder//
                             // block so that an FTP event history row will be added upon success or
                             // after all retries have been exhausted.
-                            using (FtpEventRecorder recorder = new FtpEventRecorder(this,
-                                runningConnection, _fileProcessingDB, _actionID, true,
-                                EFTPAction.kDownloadFileFromFtpServer))
+                            using (var recorder = new FtpEventRecorder(this, runningConnection,
+                                _fileProcessingDB, _actionID, true,
+                                EFTPAction.kDownloadFileFromFtpServer, null, remoteFileName))
                             {
-                                // Assign the FileRecord for the recorder so that it knows which
-                                // file the FTP event relates to.
-                                recorder.FileRecord = _retry.DoRetry(() =>
-                                    DownloadFileFromFtpServer(runningConnection, currentFtpFile));
+                                string downloadedFileName = null;
 
-                                // If we got here, the file successfully download; reset
-                                // _consecutiveDownloadFailures.
-                                Interlocked.Exchange(ref _consecutiveDownloadFailures, 0);
+                                Retry<Exception> retry = GetRetry(runningConnection, recorder,
+                                    currentFtpFile.Name, true);
+
+                                downloadedFileName = retry.DoRetry(() =>
+                                    DownloadFileFromFtpServer(runningConnection, currentFtpFile, recorder));
+
+                                // Save the info file outside of the retry block as a failure here
+                                // shouldn't trigger the operation to be repeated.
+                                if (downloadedFileName != null)
+                                {
+                                    string ftpInfoFileName = downloadedFileName + ".info";
+
+                                    var ftpInfoFile =
+                                            new FtpDownloadedFileInfo(ftpInfoFileName, currentFtpFile);
+
+                                    ftpInfoFile.Save();
+
+                                    // [DotNetRCAndUtils:745]
+                                    // Ensure the .info file is readable before calling NotifyFileAdded. Otherwise a
+                                    // processing task needing to access the .info file may fail.
+                                    FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
+                                    {
+                                        using (new FileStream(ftpInfoFileName, FileMode.Open)) { };
+                                    });
+
+                                    // Assign the FileRecord for the recorder so that it knows which
+                                    // file the FTP event relates to.
+                                    recorder.FileRecord = _fileTarget.NotifyFileAdded(downloadedFileName, this);
+
+                                    // If we got here, the file successfully download; reset
+                                    // _consecutiveDownloadFailures.
+                                    Interlocked.Exchange(ref _consecutiveDownloadFailures, 0);
+                                }
                             }
                         }
                         catch (Exception ex)
@@ -1429,6 +1486,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 NumberOfConnections = fileSupplier.NumberOfConnections;
                 NumberOfTimesToRetry = fileSupplier.NumberOfTimesToRetry;
                 TimeToWaitBetweenRetries = fileSupplier.TimeToWaitBetweenRetries;
+                ReestablishConnectionBeforeRetry = fileSupplier.ReestablishConnectionBeforeRetry;
 
                 FtpMethods.InitializeFtpApiLicense(ConfiguredFtpConnection);
                 _dirty = true;
@@ -1436,6 +1494,117 @@ namespace Extract.FileActionManager.FileSuppliers
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI32021");
+            }
+        }
+
+        /// <summary>
+        /// Creates a <see cref="Retry{Exception}"/> instance per the supplier's configuration and
+        /// with the appropriately handler for any failures in the retry code.
+        /// </summary>
+        /// <param name="runningConnection">The <see cref="SecureFTPConnection"/> in use.</param>
+        /// <param name="recorder">The <see cref="FtpEventRecorder"/> recording the current FTP
+        /// operation.</param>
+        /// <param name="remotePathToValidate">If a check for this file/folder indicates it does not
+        /// exist, no further retry attempts will occur.
+        /// <param name="validateAsFile"><see langword="true"/> if
+        /// <see paramref="remotePathToValidate"/> should be checked for existence as a file,
+        /// <see langword="false"/> if it should be checked as a folder.</param>
+        /// <returns>The <see cref="Retry{Exception}"/> instance.</returns>
+        Retry<Exception> GetRetry(SecureFTPConnection runningConnection, FtpEventRecorder recorder,
+            string remotePathToValidate, bool validateAsFile)
+        {
+            var retry = new Retry<Exception>(
+                NumberOfTimesToRetry, TimeToWaitBetweenRetries, _stopSupplying);
+
+            Action<Exception> errorAction = (ex) =>
+            {
+                HandleRetryError(runningConnection, recorder, remotePathToValidate, validateAsFile, ex);
+            };
+
+            retry.AttemptFailed += ((sender, args) => errorAction(args.Exception));
+
+            return retry;
+        }
+
+        /// <summary>
+        /// Peforms tasks that should occur after a failure in a retry block before the next retry
+        /// is attempted.
+        /// </summary>
+        /// <param name="runningConnection">The <see cref="SecureFTPConnection"/> in use.</param>
+        /// <param name="recorder">The <see cref="FtpEventRecorder"/> that is recording the current
+        /// operation.</param>
+        /// <param name="remotePathToValidate">If a check for this file/folder indicates it does not
+        /// exist, no further retry attempts will occur.
+        /// <param name="validateAsFile"><see langword="true"/> if
+        /// <see paramref="remotePathToValidate"/> should be checked for existence as a file,
+        /// <see langword="false"/> if it should be checked as a folder.</param>
+        /// <param name="ex">The <see cref="Exception"/> that triggered the failure.</param>
+        void HandleRetryError(SecureFTPConnection runningConnection, FtpEventRecorder recorder,
+            string remotePathToValidate, bool validateAsFile, Exception ex)
+        {
+            // We will abort retries if we can successfully validate that remotePathToValidate does
+            // not exist on the server.
+            bool abortRetries = false;
+
+            try
+            {
+                // Do not let the recorder track the retry error code so any error here don't cover
+                // up the original FTP error and so that if this code runs successfully that the
+                // recorder doesn't interpret it that a retry was successful.
+                recorder.Active = false;
+
+                try
+                {
+                    // If ReestablishConnectionBeforeRetry is set, re-open the connection before
+                    // checking for files existence.
+                    if (ReestablishConnectionBeforeRetry && runningConnection.IsConnected)
+                    {
+                        runningConnection.Close();
+                        runningConnection.Connect();
+                    }
+
+                    // Check if the file/folder is still there.
+                    if (validateAsFile &&
+                        !runningConnection.Exists(remotePathToValidate))
+                    {
+                        abortRetries = true;
+                    }
+                    else if (!validateAsFile &&
+                        !runningConnection.DirectoryExists(remotePathToValidate))
+                    {
+                        abortRetries = true;
+                    }
+                }
+                // If unable to validate that the target file/folder still exists, just eat any
+                // exceptions from the check and continue with the next attempt.
+                catch { }
+
+                // Regardless of whether the check for file/folder existence succeeded, close the
+                // connection before the next attempt if ReestablishConnectionBeforeRetry is set.
+                if (ReestablishConnectionBeforeRetry && runningConnection.IsConnected)
+                {
+                    runningConnection.Close();
+                }
+            }
+            // Do not let any exceptions here interfere with the next retry attempt.
+            catch
+            { }
+            finally
+            {
+                // Re-activate the recorder for the next attempt.
+                recorder.Active = true;
+            }
+
+            if (abortRetries)
+            {
+                ExtractException ee = new ExtractException("ELI34101",
+                    "Aborting FTP retry attempts because target does not exist.",
+                    ex);
+                OnFtpError(ee);
+
+                // Raising an exception from within the AttemptFailed handler prevents additional
+                // retries from occuring.
+                throw ee;
             }
         }
 
@@ -1520,10 +1689,14 @@ namespace Extract.FileActionManager.FileSuppliers
 
                     FTPFile[] directoryContents;
 
-                    using (FtpEventRecorder recorder = new FtpEventRecorder(this, runningConnection,
-                        _fileProcessingDB, _actionID, true, EFTPAction.kGetDirectoryListing))
+                    using (var recorder = new FtpEventRecorder(this, runningConnection,
+                        _fileProcessingDB, _actionID, true, EFTPAction.kGetDirectoryListing,
+                        null, RemoteDownloadFolder))
                     {
-                        directoryContents = _retry.DoRetry(() =>
+                        Retry<Exception> retry = GetRetry(runningConnection, recorder,
+                            RemoteDownloadFolder, false);
+
+                        directoryContents = retry.DoRetry(() =>
                             GetFileListFromFtpServer(runningConnection));
                     }
 
@@ -1722,18 +1895,17 @@ namespace Extract.FileActionManager.FileSuppliers
         /// </summary>
         /// <param name="runningConnection">Connection to the ftp server</param>
         /// <param name="currentFtpFile">FTPFile object that has info for downloading the file</param>
+        /// <param name="recorder">The <see cref="FtpEventRecorder"/> recording the current FTP
+        /// operation.</param>
         /// <returns>The <see cref="IFileRecord"/> associated with the dowloaded file if the
         /// download and supplying succeeded; otherwise <see langword="null"/>.</returns>
-        private IFileRecord DownloadFileFromFtpServer(SecureFTPConnection runningConnection,
-            FTPFile currentFtpFile)
+        string DownloadFileFromFtpServer(SecureFTPConnection runningConnection,
+            FTPFile currentFtpFile, FtpEventRecorder recorder)
         {
             string localFile = "";
 
             try
             {
-                // The FileRecord will be set inside of the runningConnection.Downloaded delegate
-                // if the download and supplying succeeds.
-                IFileRecord fileRecord = null;
                 string downloadedFileName = null;
 
                 // If not already connected connect to the FTP Server
@@ -1742,7 +1914,8 @@ namespace Extract.FileActionManager.FileSuppliers
                     runningConnection.Connect();
                 }
 
-                FtpMethods.SetCurrentFtpWorkingFolder(runningConnection, currentFtpFile.Path);
+                FtpMethods.SetCurrentFtpWorkingFolder(runningConnection, currentFtpFile.Path, false);
+
                 string localFilePath = FtpMethods.GenerateLocalPathCreateIfNotExists(
                     runningConnection.ServerDirectory,
                     _expandedLocalWorkingFolder,
@@ -1750,6 +1923,9 @@ namespace Extract.FileActionManager.FileSuppliers
 
                 // Determine the full name of the local file
                 localFile = Path.Combine(localFilePath, currentFtpFile.Name);
+
+                // Once the local file path is known, provide it to the recorder.
+                recorder.LocalOrNewArgument = localFile;
 
                 string infoFileName = localFile + ".info";
 
@@ -1763,9 +1939,8 @@ namespace Extract.FileActionManager.FileSuppliers
                     {
                         // The file does not need to be downloaded but it should be added to the
                         // database again if required
-                        fileRecord = _fileTarget.NotifyFileAdded(localFile, this);
-
-                        return fileRecord;
+                        recorder.IgnoreEvent = true;
+                        return null;
                     }
                 }
 
@@ -1833,6 +2008,9 @@ namespace Extract.FileActionManager.FileSuppliers
                     runningConnection.Downloaded += handleDownloaded;
 
                     runningConnection.DownloadFile(localFile, currentFtpFile.Name);
+
+                    ExtractException.Assert("ELI34061", "Download failed.",
+                        File.Exists(downloadedFileName));
                 }
                 catch (Exception ex)
                 {
@@ -1845,25 +2023,7 @@ namespace Extract.FileActionManager.FileSuppliers
                     runningConnection.Downloaded -= handleDownloaded;
                 }
 
-                ExtractException.Assert("ELI34061", "Download failed.",
-                    File.Exists(downloadedFileName));
-
-                FtpDownloadedFileInfo ftpInfoFile = new FtpDownloadedFileInfo(infoFileName,
-                    currentFtpFile);
-
-                ftpInfoFile.Save();
-
-                // [DotNetRCAndUtils:745]
-                // Ensure the .info file is readable before calling NotifyFileAdded. Otherwise a
-                // processing task needing to access the .info file may fail.
-                FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() => 
-                { 
-                    using (new FileStream(infoFileName, FileMode.Open)) { };
-                });
-               
-                fileRecord = _fileTarget.NotifyFileAdded(downloadedFileName, this);
-
-                return fileRecord;
+                return downloadedFileName;
             }
             catch (Exception ex)
             {

@@ -40,6 +40,7 @@
             this._numberRetriesControl = new Extract.Utilities.Forms.BetterNumericUpDown();
             this._timeBetweenRetriesControl = new Extract.Utilities.Forms.NumericEntryTextBox();
             this._showAdvancedSettingsCheckBox = new System.Windows.Forms.CheckBox();
+            this._reestablishConnectionBeforeRetryCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this._numberConnections)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._numberRetriesControl)).BeginInit();
             this.SuspendLayout();
@@ -70,7 +71,7 @@
             // _connectionsLabel
             // 
             this._connectionsLabel.AutoSize = true;
-            this._connectionsLabel.Location = new System.Drawing.Point(6, 246);
+            this._connectionsLabel.Location = new System.Drawing.Point(3, 244);
             this._connectionsLabel.Name = "_connectionsLabel";
             this._connectionsLabel.Size = new System.Drawing.Size(288, 13);
             this._connectionsLabel.TabIndex = 3;
@@ -108,7 +109,7 @@
             // 
             // _testConnectionButton
             // 
-            this._testConnectionButton.Location = new System.Drawing.Point(6, 322);
+            this._testConnectionButton.Location = new System.Drawing.Point(4, 343);
             this._testConnectionButton.Name = "_testConnectionButton";
             this._testConnectionButton.Size = new System.Drawing.Size(116, 23);
             this._testConnectionButton.TabIndex = 2;
@@ -119,7 +120,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 271);
+            this.label1.Location = new System.Drawing.Point(3, 269);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(186, 13);
             this.label1.TabIndex = 5;
@@ -128,7 +129,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 294);
+            this.label2.Location = new System.Drawing.Point(3, 295);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(175, 13);
             this.label2.TabIndex = 6;
@@ -137,7 +138,7 @@
             // _numberRetriesControl
             // 
             this._numberRetriesControl.IntegersOnly = true;
-            this._numberRetriesControl.Location = new System.Drawing.Point(275, 269);
+            this._numberRetriesControl.Location = new System.Drawing.Point(275, 267);
             this._numberRetriesControl.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -149,7 +150,7 @@
             // 
             // _timeBetweenRetriesControl
             // 
-            this._timeBetweenRetriesControl.Location = new System.Drawing.Point(275, 296);
+            this._timeBetweenRetriesControl.Location = new System.Drawing.Point(275, 292);
             this._timeBetweenRetriesControl.MaximumValue = 1.7976931348623157E+308D;
             this._timeBetweenRetriesControl.MinimumValue = -1.7976931348623157E+308D;
             this._timeBetweenRetriesControl.Name = "_timeBetweenRetriesControl";
@@ -167,8 +168,21 @@
             this._showAdvancedSettingsCheckBox.UseVisualStyleBackColor = true;
             this._showAdvancedSettingsCheckBox.Click += new System.EventHandler(this.HandleAdvanced);
             // 
+            // _reestablishConnectionBeforeRetryCheckBox
+            // 
+            this._reestablishConnectionBeforeRetryCheckBox.AutoSize = true;
+            this._reestablishConnectionBeforeRetryCheckBox.Checked = true;
+            this._reestablishConnectionBeforeRetryCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this._reestablishConnectionBeforeRetryCheckBox.Location = new System.Drawing.Point(6, 318);
+            this._reestablishConnectionBeforeRetryCheckBox.Name = "_reestablishConnectionBeforeRetryCheckBox";
+            this._reestablishConnectionBeforeRetryCheckBox.Size = new System.Drawing.Size(237, 17);
+            this._reestablishConnectionBeforeRetryCheckBox.TabIndex = 10;
+            this._reestablishConnectionBeforeRetryCheckBox.Text = "Re-establish a new connection for each retry";
+            this._reestablishConnectionBeforeRetryCheckBox.UseVisualStyleBackColor = true;
+            // 
             // FtpConnectionSettingsControl
             // 
+            this.Controls.Add(this._reestablishConnectionBeforeRetryCheckBox);
             this.Controls.Add(this._showAdvancedSettingsCheckBox);
             this.Controls.Add(this._timeBetweenRetriesControl);
             this.Controls.Add(this._numberRetriesControl);
@@ -182,7 +196,7 @@
             this.MinimumSize = new System.Drawing.Size(360, 300);
             this.Name = "FtpConnectionSettingsControl";
             this.Padding = new System.Windows.Forms.Padding(3);
-            this.Size = new System.Drawing.Size(360, 363);
+            this.Size = new System.Drawing.Size(360, 371);
             ((System.ComponentModel.ISupportInitialize)(this._numberConnections)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._numberRetriesControl)).EndInit();
             this.ResumeLayout(false);
@@ -202,5 +216,6 @@
         private Utilities.Forms.BetterNumericUpDown _numberRetriesControl;
         private Utilities.Forms.NumericEntryTextBox _timeBetweenRetriesControl;
         private System.Windows.Forms.CheckBox _showAdvancedSettingsCheckBox;
+        private System.Windows.Forms.CheckBox _reestablishConnectionBeforeRetryCheckBox;
     }
 }

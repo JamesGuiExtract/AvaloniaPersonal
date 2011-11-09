@@ -126,6 +126,8 @@ namespace Extract.FileActionManager.FileProcessors
 
                 _ftpConnectionSettingsControl.TimeBetweenRetries = Settings.TimeToWaitBetweenRetries;
                 _ftpConnectionSettingsControl.NumberOfRetriesBeforeFailure = Settings.NumberOfTimesToRetry;
+                _ftpConnectionSettingsControl.ReestablishConnectionBeforeRetry =
+                    Settings.ReestablishConnectionBeforeRetry;
 
                 UpdateControlState();
             }
@@ -188,6 +190,9 @@ namespace Extract.FileActionManager.FileProcessors
                 _settings.TimeToWaitBetweenRetries = _ftpConnectionSettingsControl.TimeBetweenRetries;
 
                 _settings.NumberOfTimesToRetry = _ftpConnectionSettingsControl.NumberOfRetriesBeforeFailure;
+
+                _settings.ReestablishConnectionBeforeRetry =
+                    _ftpConnectionSettingsControl.ReestablishConnectionBeforeRetry;
 
                 // Still need to verify settings
                 DialogResult = DialogResult.OK;

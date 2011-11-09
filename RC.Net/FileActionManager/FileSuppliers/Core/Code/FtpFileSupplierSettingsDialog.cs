@@ -78,6 +78,8 @@ namespace Extract.FileActionManager.FileSuppliers
                 _ftpConnectionSettingsControl.NumberOfConnections = _settings.NumberOfConnections;
                 _ftpConnectionSettingsControl.TimeBetweenRetries = _settings.TimeToWaitBetweenRetries;
                 _ftpConnectionSettingsControl.NumberOfRetriesBeforeFailure = _settings.NumberOfTimesToRetry;
+                _ftpConnectionSettingsControl.ReestablishConnectionBeforeRetry =
+                    _settings.ReestablishConnectionBeforeRetry;
 
                 _localWorkingFolderTextBox.Text = _settings.LocalWorkingFolder;
 
@@ -148,6 +150,8 @@ namespace Extract.FileActionManager.FileSuppliers
                 _settings.NumberOfConnections = _ftpConnectionSettingsControl.NumberOfConnections;
                 _settings.NumberOfTimesToRetry = _ftpConnectionSettingsControl.NumberOfRetriesBeforeFailure;
                 _settings.TimeToWaitBetweenRetries = _ftpConnectionSettingsControl.TimeBetweenRetries;
+                _settings.ReestablishConnectionBeforeRetry =
+                    _ftpConnectionSettingsControl.ReestablishConnectionBeforeRetry;
 
                 _settings.LocalWorkingFolder = _localWorkingFolderTextBox.Text;
 

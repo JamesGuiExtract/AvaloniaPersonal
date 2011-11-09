@@ -111,8 +111,10 @@ namespace Extract.FileActionManager.FileProcessors
         /// Current task version.
         /// <para><b>Version 3</b></para>
         /// Added <see cref="DeleteEmptyFolder"/>.
+        /// <para><b>Version 4</b></para>
+        /// Added <see cref="ReestablishConnectionBeforeRetry"/>
         /// </summary>
-        const int _CURRENT_VERSION = 3;
+        const int _CURRENT_VERSION = 4;
 
         /// <summary>
         /// Default wait time between retries
@@ -147,6 +149,9 @@ namespace Extract.FileActionManager.FileProcessors
         // Time to wait between retries
         int _timeToWaitBetweenRetries = _DEFAULT_WAIT_TIME_IN_MILLISECONDS_BETWEEN_RETRIES;
 
+        // Indicates whether to reestablish a new connection before each retry attempt.
+        bool _reestablishConnectionBeforeRetry = true;
+
         // If a file delete is being performed, indicates whether the folder it was deleted from
         // should be deleted if it is now empty.
         bool _deleteEmptyFolder;
@@ -166,11 +171,6 @@ namespace Extract.FileActionManager.FileProcessors
 
         // Flag set when task is initialized to indicate if loading the download info file is required
         bool _loadDownloadInfoFile;
-
-        /// <summary>
-        /// Allows for FTP operations to be automatically retried as configured.
-        /// </summary>
-        Retry<Exception> _retry;
 
         #endregion Fields
 
@@ -331,6 +331,30 @@ namespace Extract.FileActionManager.FileProcessors
                 if (_timeToWaitBetweenRetries != value)
                 {
                     _timeToWaitBetweenRetries = value;
+                    _dirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to reestablish a new connection after each
+        /// failure.
+        /// </summary>
+        /// <value><see langword="true"/> to reestablish a new connection after each failure];
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        public bool ReestablishConnectionBeforeRetry
+        {
+            get
+            {
+                return _reestablishConnectionBeforeRetry;
+            }
+
+            set
+            {
+                if (_reestablishConnectionBeforeRetry != value)
+                {
+                    _reestablishConnectionBeforeRetry = value;
                     _dirty = true;
                 }
             }
@@ -557,9 +581,6 @@ namespace Extract.FileActionManager.FileProcessors
                 _loadDownloadInfoFile = _localOrNewFileName.Contains(FileActionManagerPathTags.RemoteSourceDocumentTag) ||
                     _remoteOrOldFileName.Contains(FileActionManagerPathTags.RemoteSourceDocumentTag);
 
-                // Create retry object
-                _retry = new Retry<Exception>(NumberOfTimesToRetry, TimeToWaitBetweenRetries, _cancelTask);
-
                 // Notify the FtpEventRecorder to recheck the DBInfo setting for whether to log FTP events
                 FtpEventRecorder.RecheckFtpLoggingStatus();
             }
@@ -628,14 +649,16 @@ namespace Extract.FileActionManager.FileProcessors
 
                 // Call the PerformAction retry within a FtpEventRecorder block so that an FTP event
                 // history row will be added upon success or after all retries have been exhausted.
-                using (FtpEventRecorder recorder = new FtpEventRecorder(this,
-                    _runningConnection, pDB, nActionID, false, ActionToPerform))
+                using (var recorder = new FtpEventRecorder(this, _runningConnection, pDB, nActionID,
+                    false, ActionToPerform, localOrNewFile, remoteOrOldFile, pFileRecord))
                 {
-                    // Assign the FileRecord for the recorder so that it knows which file the FTP
-                    // event relates to.
-                    recorder.FileRecord = pFileRecord;
+                    Retry<Exception> retry =
+                        GetRetry(recorder, (ActionToPerform == EFTPAction.kUploadFileToFtpServer)
+                            ? null
+                            : remoteOrOldFile
+                        , true);
 
-                    _retry.DoRetry(() => PerformAction(localOrNewFile, remoteOrOldFile));
+                    retry.DoRetry(() => PerformAction(localOrNewFile, remoteOrOldFile));
                 }
 
                 if (DeleteEmptyFolder && ActionToPerform == EFTPAction.kDeleteFileFromFtpServer)
@@ -647,22 +670,24 @@ namespace Extract.FileActionManager.FileProcessors
                     {
                         bool isFolderEmpty;
                         
-                        using (FtpEventRecorder recorder = new FtpEventRecorder(this, _runningConnection,
-                            pDB, nActionID, false, EFTPAction.kGetDirectoryListing))
+                        using (var recorder = new FtpEventRecorder(this, _runningConnection, pDB,
+                            nActionID, false, EFTPAction.kGetDirectoryListing, null, remoteFolder,
+                            pFileRecord))
                         {
-                            recorder.FileRecord = pFileRecord;
+                            Retry<Exception> retry = GetRetry(recorder, remoteFolder, false);
 
-                            isFolderEmpty = _retry.DoRetry(() => IsFolderEmpty(remoteFolder));
+                            isFolderEmpty = retry.DoRetry(() => IsFolderEmpty(remoteFolder));
                         }
 
                         if (isFolderEmpty)
                         {
-                            using (FtpEventRecorder recorder = new FtpEventRecorder(this,
-                                _runningConnection, pDB, nActionID, false, EFTPAction.kDeleteFileFromFtpServer))
+                            using (var recorder = new FtpEventRecorder(this, _runningConnection,
+                                pDB, nActionID, false, EFTPAction.kDeleteFileFromFtpServer, null,
+                                remoteFolder, pFileRecord))
                             {
-                                recorder.FileRecord = pFileRecord;
+                                Retry<Exception> retry = GetRetry(recorder, remoteFolder, false);
 
-                                _retry.DoRetry(() => DeleteRemoteFolder(remoteFolder));
+                                retry.DoRetry(() => DeleteRemoteFolder(remoteFolder));
                             }
                         }
                     }
@@ -795,6 +820,11 @@ namespace Extract.FileActionManager.FileProcessors
                         _deleteEmptyFolder = reader.ReadBoolean();
                     }
 
+                    if (reader.Version >= 4)
+                    {
+                        _reestablishConnectionBeforeRetry = reader.ReadBoolean();
+                    }
+
                     string hexString = reader.ReadString();
                     using (MemoryStream ftpDataStream = new MemoryStream(hexString.ToByteArray()))
                     {
@@ -836,6 +866,7 @@ namespace Extract.FileActionManager.FileProcessors
                     writer.Write(_numberOfTimesToRetry);
                     writer.Write(_timeToWaitBetweenRetries);
                     writer.Write(_deleteEmptyFolder);
+                    writer.Write(_reestablishConnectionBeforeRetry);
 
                     // Write the Ftp connection settings to the steam
                     using (MemoryStream ftpDataStream = new MemoryStream())
@@ -955,6 +986,7 @@ namespace Extract.FileActionManager.FileProcessors
                 _timeToWaitBetweenRetries = task._timeToWaitBetweenRetries;
                 _numberOfTimesToRetry = task._numberOfTimesToRetry;
                 _deleteEmptyFolder = task._deleteEmptyFolder;
+                _reestablishConnectionBeforeRetry = task._reestablishConnectionBeforeRetry;
 
                 ConfiguredFtpConnection = (SecureFTPConnection)task.ConfiguredFtpConnection.Clone();
 
@@ -976,12 +1008,9 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                if (!_runningConnection.IsConnected)
-                {
-                    _runningConnection.Connect();
-                }
-                
-                FtpMethods.SetCurrentFtpWorkingFolder(_runningConnection, remoteOrOldFile);
+                ConnectAndInitialize(remoteOrOldFile,
+                    ActionToPerform == EFTPAction.kUploadFileToFtpServer);
+
                 remoteOrOldFile = PathUtil.GetFileName(remoteOrOldFile);
                 if (ActionToPerform == EFTPAction.kRenameFileOnFtpServer)
                 {
@@ -1015,7 +1044,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // Raise an FTP error (as part of the IFtpEventExceptionSource implementation)
                 OnFtpError(ex.AsExtract("ELI33979"));
 
-                ExtractException ee = ex.AsExtract("ELI32648");
+                ExtractException ee = new ExtractException("ELI32648", "FTP action failed.", ex);
                 switch (ActionToPerform)
                 {
                     case EFTPAction.kUploadFileToFtpServer:
@@ -1051,11 +1080,12 @@ namespace Extract.FileActionManager.FileProcessors
 
             try
             {
+                ConnectAndInitialize(remoteFolder, false);
+
                 showHiddenFilesValue = _runningConnection.ShowHiddenFiles;
                 _runningConnection.ShowHiddenFiles = true;
 
-                FTPFile[] directoryContents = _retry.DoRetry(() =>
-                    _runningConnection.GetFileInfos(remoteFolder, false));
+                FTPFile[] directoryContents = _runningConnection.GetFileInfos(remoteFolder, false);
 
                 return (directoryContents.Length == 0);
             }
@@ -1086,6 +1116,8 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
+                ConnectAndInitialize(remoteFolder, false);
+
                 _runningConnection.DeleteDirectory(remoteFolder);
             }
             catch (Exception ex)
@@ -1096,6 +1128,143 @@ namespace Extract.FileActionManager.FileProcessors
                 ExtractException ee = new ExtractException("ELI34007",
                     "Failed to delete directory on remote server", ex);
                 ee.AddDebugData("Remote directory", remoteFolder, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Connects to the FTP server the and sets the working folder.
+        /// </summary>
+        /// <param name="remotePath">The working folder to set.</param>
+        /// <param name="autoCreateRemoteDirectory"><see langword="true"/> to create
+        /// <see paramref="remotePath"/> if it doesn't currently exist, <see langword="false"/>
+        /// to throw an exception.</param>
+        void ConnectAndInitialize(string remotePath, bool autoCreateRemoteDirectory)
+        {
+            if (!_runningConnection.IsConnected)
+            {
+                _runningConnection.Connect();
+            }
+
+            FtpMethods.SetCurrentFtpWorkingFolder(_runningConnection, remotePath,
+                autoCreateRemoteDirectory);
+        }
+
+        /// <summary>
+        /// Creates a <see cref="Retry{Exception}"/> instance per the supplier's configuration and
+        /// with the appropriately handler for any failures in the retry code.
+        /// </summary>
+        /// <param name="recorder">The <see cref="FtpEventRecorder"/> recording the current FTP
+        /// operation.</param>
+        /// <param name="remotePathToValidate">If a check for this file/folder indicates it does not
+        /// exist, no further retry attempts will occur.</param>
+        /// <param name="validateAsFile"><see langword="true"/> if
+        /// <see paramref="remotePathToValidate"/> should be checked for existence as a file,
+        /// <see langword="false"/> if it should be checked as a folder.</param>
+        /// <returns>The <see cref="Retry{Exception}"/> instance.</returns>
+        Retry<Exception> GetRetry(FtpEventRecorder recorder, string remotePathToValidate,
+            bool validateAsFile)
+        {
+            var retry = new Retry<Exception>(
+                NumberOfTimesToRetry, TimeToWaitBetweenRetries, _cancelTask);
+
+            bool validateRemotePath = !string.IsNullOrWhiteSpace(remotePathToValidate);
+
+            if (ReestablishConnectionBeforeRetry || validateRemotePath)
+            {
+                Action<Exception> errorAction = (ex) =>
+                {
+                    HandleRetryError(recorder, validateRemotePath, remotePathToValidate,
+                        validateAsFile, ex);
+                };
+
+                retry.AttemptFailed += ((sender, args) => errorAction(args.Exception));
+            }
+
+            return retry;
+        }
+
+        /// <summary>
+        /// Peforms tasks that should occur after a failure in a retry block before the next retry
+        /// is attempted.
+        /// </summary>
+        /// <param name="recorder">The <see cref="FtpEventRecorder"/> that is recording the current
+        /// operation.</param>
+        /// <param name="validateRemotePath"><see langword="true"/> if retry attempts should be
+        /// aborted if <see paramref="remotePathToValidate"/> does not exist on the server.</param>
+        /// <param name="remotePathToValidate">If <see paramref="validateRemotePath"/> is
+        /// <see langword="true"/> and a check for this file/folder indicates it does not exist,
+        /// no further retry attempts will occur.</param>
+        /// <param name="validateAsFile"><see langword="true"/> if
+        /// <see paramref="remotePathToValidate"/> should be checked for existence as a file,
+        /// <see langword="false"/> if it should be checked as a folder.</param>
+        /// <param name="ex">The <see cref="Exception"/> that triggered the failure.</param>
+        void HandleRetryError(FtpEventRecorder recorder, bool validateRemotePath,
+            string remotePathToValidate, bool validateAsFile, Exception ex)
+        {
+            // We will abort retries if validateRemotePath is true and we can successfully validate
+            // that remotePathToValidate does not exist on the server.
+            bool abortRetries = false;
+
+            try
+            {
+                // Do not let the recorder track the retry error code so any error here don't cover
+                // up the original FTP error and so that if this code runs successfully that the
+                // recorder doesn't interpret it that a retry was successful.
+                recorder.Active = false;
+
+                if (validateRemotePath)
+                {
+                    try
+                    {
+                        // If ReestablishConnectionBeforeRetry is set, re-open the connection before
+                        // checking for files existence.
+                        if (ReestablishConnectionBeforeRetry && _runningConnection.IsConnected)
+                        {
+                            _runningConnection.Close();
+                            _runningConnection.Connect();
+                        }
+
+                        // Check if the file/folder is still there.
+                        if (validateAsFile &&
+                            !_runningConnection.Exists(remotePathToValidate))
+                        {
+                            abortRetries = true;
+                        }
+                        else if (!validateAsFile &&
+                            !_runningConnection.DirectoryExists(remotePathToValidate))
+                        {
+                            abortRetries = true;
+                        }
+                    }
+                    // If unable to validate that the target file/folder still exists, just eat any
+                    // exceptions from the check and continue with the next attempt.
+                    catch { }
+                }
+
+                // Regardless of whether the check for file/folder existence succeeded, close the
+                // connection before the next attempt if ReestablishConnectionBeforeRetry is set.
+                if (ReestablishConnectionBeforeRetry && _runningConnection.IsConnected)
+                {
+                    _runningConnection.Close();
+                }
+            }
+            catch
+            { }
+            finally
+            {
+                recorder.Active = true;
+            }
+
+            if (abortRetries)
+            {
+                ExtractException ee = new ExtractException("ELI34094",
+                    "Aborting FTP retry attempts because target does not exist.",
+                    ex);
+                OnFtpError(ee);
+
+                // Raising an exception from within the AttemptFailed handler prevents additional
+                // retries from occuring.
                 throw ee;
             }
         }

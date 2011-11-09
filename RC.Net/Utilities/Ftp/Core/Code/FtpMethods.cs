@@ -63,13 +63,18 @@ namespace Extract.Utilities.Ftp
         }
 
         /// <summary>
-        /// Sets the current working folder on the FTP server if it is not the same as the 
+        /// Sets the current working folder on the FTP server if it is not the same as the
         /// directory of currentFile
         /// </summary>
         /// <param name="runningConnection">Connection to the FTP server</param>
-        /// <param name="currentFile">Current file used to determine new working folder on FTP server</param>
+        /// <param name="currentFile">Current file used to determine new working folder on FTP
+        /// server.</param>
+        /// <param name="createIfNotExists"><see langword="true"/> to create the directory if it
+        /// doesn't not exist; <see langword="false"/> to throw an exception if the
+        /// <see paramref="currentFile"/> doesn't exist.</param>
         [CLSCompliant(false)]
-        public static void SetCurrentFtpWorkingFolder(FTPConnection runningConnection, string currentFile)
+        public static void SetCurrentFtpWorkingFolder(FTPConnection runningConnection,
+            string currentFile, bool createIfNotExists)
         {
             try
             {
@@ -88,7 +93,14 @@ namespace Extract.Utilities.Ftp
                     // Directory must exist before changing
                     if (!runningConnection.DirectoryExists(currentFileDir))
                     {
-                        runningConnection.CreateDirectory(currentFileDir);
+                        if (createIfNotExists)
+                        {
+                            runningConnection.CreateDirectory(currentFileDir);
+                        }
+                        else
+                        {
+                            throw new ExtractException("ELI34091", "Folder does not exist.");
+                        }
                     }
 
                     runningConnection.ChangeWorkingDirectory(currentFileDir);
@@ -156,29 +168,37 @@ namespace Extract.Utilities.Ftp
         /// </summary>
         /// <param name="remotePath">The remote path to normalize</param>
         /// <returns>The normalized path.</returns>
-        static string NormalizeRemotePath(string remotePath)
+        public static string NormalizeRemotePath(string remotePath)
         {
-            // The FTP path should have / instead of \ so need to convert all / to \
-            remotePath = remotePath.Replace('\\', '/');
-
-            // Defaulte the remote working folder to / if empty
-            if (string.IsNullOrEmpty(remotePath))
+            try
             {
-                remotePath = "/";
-            }
+                // The FTP path should have / instead of \ so need to convert all / to \
+                remotePath = remotePath.Replace('\\', '/');
 
-            // add / to the end of remoteWorkingFolderBase if needed
-            if (remotePath.LastIndexOf('/') != remotePath.Length - 1)
-            {
-                remotePath += "/";
-            }
+                // Defaulte the remote working folder to / if empty
+                if (string.IsNullOrEmpty(remotePath))
+                {
+                    remotePath = "/";
+                }
 
-            // Need to fix up the remoteWorkingFolderBase - it may need to have a / added to the front
-            if (remotePath.Length > 0 && remotePath[0] != '/')
-            {
-                remotePath = "/" + remotePath;
+                // add / to the end of remoteWorkingFolderBase if needed
+                if (remotePath.LastIndexOf('/') != remotePath.Length - 1)
+                {
+                    remotePath += "/";
+                }
+
+                // Need to fix up the remoteWorkingFolderBase - it may need to have a / added to the front
+                if (remotePath.Length > 0 && remotePath[0] != '/')
+                {
+                    remotePath = "/" + remotePath;
+                }
+
+                return remotePath;
             }
-            return remotePath;
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34100");
+            }
         }
         
         #endregion

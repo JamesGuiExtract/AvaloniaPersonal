@@ -5,6 +5,48 @@ using System.Threading;
 namespace Extract.Utilities
 {
     /// <summary>
+    /// An <see cref="EventArgs"/> override that provides information for a 
+    /// <see cref="Retry{TExceptionType}.AttemptFailed"/> event.
+    /// </summary>
+    public class AttemptFailedEventArgs<TExceptionType> : EventArgs where TExceptionType : Exception
+    {
+        /// <summary>
+        /// The <see typeparam="TExceptionType"/> from the failure.
+        /// </summary>
+        TExceptionType _exception;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AttemptFailedEventArgs{TExceptionType}"/>
+        /// class.
+        /// </summary>
+        /// <param name="exception">The <see typeparam="TExceptionType"/> from the failure.</param>
+        public AttemptFailedEventArgs(TExceptionType exception)
+        {
+            try
+            {
+                _exception = exception;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI34092",
+                    "Failed to initialize AttemptFailedEventArgs!", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see typeparam="TExceptionType"/> that occurred.
+        /// </summary>
+        /// <returns>The <see typeparam="TExceptionType"/> that occurred.</returns>
+        public TExceptionType Exception
+        {
+            get
+            {
+                return _exception;
+            }
+        }
+    }
+
+    /// <summary>
     /// Class to be used to retry method calls.  When the method that is being retried throws an
     /// exception of the type TException the method will be retried until it no longer throws
     /// a TException or the numbe of retries specified in the constructor have been exceeded.
@@ -29,7 +71,19 @@ namespace Extract.Utilities
         /// </summary>
         EventWaitHandle _eventToWaitFor;
 
-        #endregion
+        #endregion Fields
+
+        #region Events
+
+        /// <summary>
+        /// Raised when an attempt fails.
+        /// <para><b>Note</b></para>
+        /// Any exceptions thrown from this handler will be thrown immediatly from
+        /// <see cref="DoRetry"/> thereby preventing additional retry attempts.
+        /// </summary>
+        public event EventHandler<AttemptFailedEventArgs<TExceptionType>> AttemptFailed;
+
+        #endregion Events
 
         #region Constructors
 
@@ -116,6 +170,10 @@ namespace Extract.Utilities
                 }
                 catch (TExceptionType ex)
                 {
+                    // This is intentionally not wrapped in a try/catch block. Any exceptions in the
+                    // handler should abort addtional retry attempts.
+                    OnAttemptFailed(ex);
+
                     // If the _retryCount is 0 there is nothing else to do so rethrow the exception.
                     if (_retryCount == 0)
                     {
@@ -152,7 +210,19 @@ namespace Extract.Utilities
             }
             while (true);
         }
+
+        /// <summary>
+        /// Raises the <see cref="AttemptFailed"/> event.
+        /// </summary>
+        /// <param name="ex">The <see typeparam="TExceptionType"/> from the failure.</param>
+        void OnAttemptFailed(TExceptionType ex)
+        {
+            if (AttemptFailed != null)
+            {
+                AttemptFailed(this, new AttemptFailedEventArgs<TExceptionType>(ex));
+            }
+        }
         
-        #endregion
+        #endregion Private Methods
     }
 }

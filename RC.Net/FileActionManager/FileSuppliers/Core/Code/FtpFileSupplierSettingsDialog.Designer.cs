@@ -160,7 +160,7 @@
             this._settingsTabControl.Location = new System.Drawing.Point(0, 0);
             this._settingsTabControl.Name = "_settingsTabControl";
             this._settingsTabControl.SelectedIndex = 0;
-            this._settingsTabControl.Size = new System.Drawing.Size(483, 382);
+            this._settingsTabControl.Size = new System.Drawing.Size(483, 402);
             this._settingsTabControl.TabIndex = 0;
             // 
             // _generalSettingsTabPage
@@ -287,7 +287,7 @@
             this._connectionSettingsTabPage.Location = new System.Drawing.Point(4, 22);
             this._connectionSettingsTabPage.Name = "_connectionSettingsTabPage";
             this._connectionSettingsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._connectionSettingsTabPage.Size = new System.Drawing.Size(475, 356);
+            this._connectionSettingsTabPage.Size = new System.Drawing.Size(475, 376);
             this._connectionSettingsTabPage.TabIndex = 1;
             this._connectionSettingsTabPage.Text = "Connection Settings";
             this._connectionSettingsTabPage.UseVisualStyleBackColor = true;
@@ -301,6 +301,7 @@
             this._ftpConnectionSettingsControl.NumberOfConnections = 1;
             this._ftpConnectionSettingsControl.NumberOfRetriesBeforeFailure = 0;
             this._ftpConnectionSettingsControl.Padding = new System.Windows.Forms.Padding(3);
+            this._ftpConnectionSettingsControl.ReestablishConnectionBeforeRetry = true;
             this._ftpConnectionSettingsControl.ShowConnectionsControl = false;
             this._ftpConnectionSettingsControl.Size = new System.Drawing.Size(469, 370);
             this._ftpConnectionSettingsControl.TabIndex = 3;
@@ -317,7 +318,7 @@
             // _btnOK
             // 
             this._btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._btnOK.Location = new System.Drawing.Point(315, 388);
+            this._btnOK.Location = new System.Drawing.Point(315, 408);
             this._btnOK.Name = "_btnOK";
             this._btnOK.Size = new System.Drawing.Size(75, 23);
             this._btnOK.TabIndex = 1;
@@ -329,7 +330,7 @@
             // 
             this._btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._btnCancel.Location = new System.Drawing.Point(396, 388);
+            this._btnCancel.Location = new System.Drawing.Point(396, 408);
             this._btnCancel.MinimumSize = new System.Drawing.Size(75, 23);
             this._btnCancel.Name = "_btnCancel";
             this._btnCancel.Size = new System.Drawing.Size(75, 23);
@@ -342,7 +343,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._btnCancel;
-            this.ClientSize = new System.Drawing.Size(483, 423);
+            this.ClientSize = new System.Drawing.Size(483, 443);
             this.Controls.Add(this._btnCancel);
             this.Controls.Add(this._btnOK);
             this.Controls.Add(this._settingsTabControl);
