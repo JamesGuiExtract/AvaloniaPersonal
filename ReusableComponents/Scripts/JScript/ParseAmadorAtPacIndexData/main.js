@@ -14,6 +14,8 @@
 // Usage:   ParseAmadorAtPacIndexData inputFile outputDir
 //              inputFile - The path to the index data file
 //              outputDir - The path to the EAV output dir
+//
+// Example inputFile: K:\Common\Engineering\Sample Files\AtPac\CA - Amador\Set005\Index_Data\extract2.txt
 //--------------------------------------------------------------------------------------------------
 
 function main(args) {

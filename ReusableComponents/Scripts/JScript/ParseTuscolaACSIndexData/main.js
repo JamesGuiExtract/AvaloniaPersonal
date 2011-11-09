@@ -14,6 +14,8 @@
 // Usage:   ParseTuscolaACSIndexData inputFile outputDir
 //              inputFile - The path to the index data file
 //              outputDir - The path to the EAV output dir
+// 
+// Example input file: K:\Common\Engineering\Sample Files\ACS\MI - Tuscola\Set004\IndexData\TUSCOLA_MI_INDEX.TXT
 //--------------------------------------------------------------------------------------------------
 
 function main(args) {
