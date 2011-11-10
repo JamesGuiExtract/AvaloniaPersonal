@@ -656,7 +656,7 @@ namespace Extract.FileActionManager.FileProcessors
                         GetRetry(recorder, (ActionToPerform == EFTPAction.kUploadFileToFtpServer)
                             ? null
                             : remoteOrOldFile
-                        , true);
+                        , true, false);
 
                     retry.DoRetry(() => PerformAction(localOrNewFile, remoteOrOldFile));
                 }
@@ -666,6 +666,11 @@ namespace Extract.FileActionManager.FileProcessors
                     string remoteFolder =
                         remoteOrOldFile.Substring(0, remoteOrOldFile.LastIndexOf('/') + 1);
 
+                    // If the folder we are trying to delete is already gone, the event will be
+                    // ignored (left out of) the FTPEventHistory table. Keep track of this situation
+                    // so that the logged exception can be made an application trace.
+                    bool eventIgnored = false;
+
                     try
                     {
                         bool isFolderEmpty;
@@ -674,9 +679,17 @@ namespace Extract.FileActionManager.FileProcessors
                             nActionID, false, EFTPAction.kGetDirectoryListing, null, remoteFolder,
                             pFileRecord))
                         {
-                            Retry<Exception> retry = GetRetry(recorder, remoteFolder, false);
+                            Retry<Exception> retry = GetRetry(recorder, remoteFolder, false, true);
 
-                            isFolderEmpty = retry.DoRetry(() => IsFolderEmpty(remoteFolder));
+                            try
+                            {
+                                isFolderEmpty = retry.DoRetry(() => IsFolderEmpty(remoteFolder));
+                            }
+                            catch
+                            {
+                                eventIgnored |= recorder.IgnoreEvent;
+                                throw;
+                            }
                         }
 
                         if (isFolderEmpty)
@@ -685,16 +698,29 @@ namespace Extract.FileActionManager.FileProcessors
                                 pDB, nActionID, false, EFTPAction.kDeleteFileFromFtpServer, null,
                                 remoteFolder, pFileRecord))
                             {
-                                Retry<Exception> retry = GetRetry(recorder, remoteFolder, false);
+                                Retry<Exception> retry = GetRetry(recorder, remoteFolder, false, true);
 
-                                retry.DoRetry(() => DeleteRemoteFolder(remoteFolder));
+                                try
+                                {
+                                    retry.DoRetry(() => DeleteRemoteFolder(remoteFolder));
+                                }
+                                catch
+                                {
+                                    eventIgnored |= recorder.IgnoreEvent;
+                                    throw;
+                                }
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        ExtractException ee = new ExtractException("ELI34010",
-                            "Failed to delete empty remote directory", ex);
+                        string message = "Failed to delete empty remote directory.";
+                        if (eventIgnored)
+                        {
+                            message = "Application trace: " + message; 
+                        }
+
+                        ExtractException ee = new ExtractException("ELI34010", message, ex);
                         ee.AddDebugData("Remote directory", remoteFolder, false);
                         
                         // The deletion of a directory when empty is not a critical task and may
@@ -1157,13 +1183,16 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="recorder">The <see cref="FtpEventRecorder"/> recording the current FTP
         /// operation.</param>
         /// <param name="remotePathToValidate">If a check for this file/folder indicates it does not
-        /// exist, no further retry attempts will occur.</param>
+        /// exist, no further retry attempts will occur or <see langword="null"/> if such a check
+        /// is not necessary.</param>
         /// <param name="validateAsFile"><see langword="true"/> if
         /// <see paramref="remotePathToValidate"/> should be checked for existence as a file,
         /// <see langword="false"/> if it should be checked as a folder.</param>
+        /// <param name="ignoreEventIfPathMissing"><see langword="true"/> if the event should be
+        /// ignored by the recorder if <see paramref="remotePathToValidate"/> does not exist.</param>
         /// <returns>The <see cref="Retry{Exception}"/> instance.</returns>
         Retry<Exception> GetRetry(FtpEventRecorder recorder, string remotePathToValidate,
-            bool validateAsFile)
+            bool validateAsFile, bool ignoreEventIfPathMissing)
         {
             var retry = new Retry<Exception>(
                 NumberOfTimesToRetry, TimeToWaitBetweenRetries, _cancelTask);
@@ -1175,7 +1204,7 @@ namespace Extract.FileActionManager.FileProcessors
                 Action<Exception> errorAction = (ex) =>
                 {
                     HandleRetryError(recorder, validateRemotePath, remotePathToValidate,
-                        validateAsFile, ex);
+                        validateAsFile, ignoreEventIfPathMissing, ex);
                 };
 
                 retry.AttemptFailed += ((sender, args) => errorAction(args.Exception));
@@ -1198,9 +1227,12 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="validateAsFile"><see langword="true"/> if
         /// <see paramref="remotePathToValidate"/> should be checked for existence as a file,
         /// <see langword="false"/> if it should be checked as a folder.</param>
+        /// <param name="ignoreEventIfPathMissing"><see langword="true"/> if the event should be
+        /// ignored by the recorder if <see paramref="remotePathToValidate"/> does not exist.</param>
         /// <param name="ex">The <see cref="Exception"/> that triggered the failure.</param>
         void HandleRetryError(FtpEventRecorder recorder, bool validateRemotePath,
-            string remotePathToValidate, bool validateAsFile, Exception ex)
+            string remotePathToValidate, bool validateAsFile, bool ignoreEventIfPathMissing,
+            Exception ex)
         {
             // We will abort retries if validateRemotePath is true and we can successfully validate
             // that remotePathToValidate does not exist on the server.
@@ -1258,6 +1290,11 @@ namespace Extract.FileActionManager.FileProcessors
 
             if (abortRetries)
             {
+                if (ignoreEventIfPathMissing)
+                {
+                    recorder.IgnoreEvent = true;
+                }
+
                 ExtractException ee = new ExtractException("ELI34094",
                     "Aborting FTP retry attempts because target does not exist.",
                     ex);
