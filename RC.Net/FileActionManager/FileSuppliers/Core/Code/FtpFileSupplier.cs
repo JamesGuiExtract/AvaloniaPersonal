@@ -1505,7 +1505,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <param name="recorder">The <see cref="FtpEventRecorder"/> recording the current FTP
         /// operation.</param>
         /// <param name="remotePathToValidate">If a check for this file/folder indicates it does not
-        /// exist, no further retry attempts will occur.
+        /// exist, no further retry attempts will occur.</param>
         /// <param name="validateAsFile"><see langword="true"/> if
         /// <see paramref="remotePathToValidate"/> should be checked for existence as a file,
         /// <see langword="false"/> if it should be checked as a folder.</param>
@@ -1534,7 +1534,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <param name="recorder">The <see cref="FtpEventRecorder"/> that is recording the current
         /// operation.</param>
         /// <param name="remotePathToValidate">If a check for this file/folder indicates it does not
-        /// exist, no further retry attempts will occur.
+        /// exist, no further retry attempts will occur.</param>
         /// <param name="validateAsFile"><see langword="true"/> if
         /// <see paramref="remotePathToValidate"/> should be checked for existence as a file,
         /// <see langword="false"/> if it should be checked as a folder.</param>
