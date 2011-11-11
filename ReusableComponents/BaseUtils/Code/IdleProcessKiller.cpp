@@ -9,6 +9,7 @@ IdleProcessKiller::IdleProcessKiller(unsigned long ulProcessId, int iTimeOut, in
 	: m_ulProcessId(ulProcessId),
 	  m_iInterval(iInterval),
 	  m_iZeroCpuCount(0),
+	  m_iLowCpuCount(0),
 	  m_iMaxZeroCpuCount(0),
 	  m_bKilledProcess(false)
 {
@@ -72,6 +73,9 @@ UINT IdleProcessKiller::monitorProcessLoop(void* pData)
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI25212");
 
+	// Temporary code to investigate LegacyRCAndUtils:5945
+	UCLIDException("ELI34104", "Idle process killer monitoring thread exited.").log();
+
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------
@@ -80,9 +84,35 @@ void IdleProcessKiller::monitorProcess()
 	INIT_EXCEPTION_AND_TRACING("MLI03274");
 	try
 	{
-		// Check if there is zero cpu usage
-		if (m_cpuUsage.GetCpuUsage(m_ulProcessId) > 0)
+		int nCpuUsage = m_cpuUsage.GetCpuUsage(m_ulProcessId);
+
+		// Temporary code to investigate LegacyRCAndUtils:5945
+		if (nCpuUsage > 2)
 		{
+			m_iLowCpuCount = 0;
+		}
+		else
+		{
+			m_iLowCpuCount++;
+
+			if (m_iLowCpuCount == m_iMaxZeroCpuCount)
+			{
+				UCLIDException("ELI34102", "Low (but not zero CPU usage) for an extended period.").log();
+			}
+		}
+
+		// Check if there is zero cpu usage
+		if (nCpuUsage > 0)
+		{
+			// Temporary code to investigate LegacyRCAndUtils:5945
+			if (m_iZeroCpuCount > 3) 
+			{
+				UCLIDException ue("ELI34103", "CPU usage had been (but is no longer) zero");
+				ue.addDebugInfo("Time at zero", m_iZeroCpuCount);
+				ue.addDebugInfo("Current usage", nCpuUsage);
+				ue.log();
+			}
+
 			// Process isn't idle. Reset the zero cpu count.
 			m_iZeroCpuCount = 0;
 
@@ -120,6 +150,11 @@ void IdleProcessKiller::monitorProcess()
 				ue.addDebugInfo("Process ID", m_ulProcessId);
 				ue.log();
 				_lastCodePos = "60";
+			}
+			else
+			{
+				// Temporary code to investigate LegacyRCAndUtils:5945
+				UCLIDException("ELI34103", "Application trace: Could not get handle to close process.").log();
 			}
 
 			// Stop monitoring the process

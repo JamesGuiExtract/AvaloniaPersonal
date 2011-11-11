@@ -77,7 +77,7 @@ namespace Extract.Redaction.Verification
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
             dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black;
             dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
@@ -90,11 +90,11 @@ namespace Extract.Redaction.Verification
             this._dataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this._dataGridView.Size = new System.Drawing.Size(575, 300);
             this._dataGridView.TabIndex = 0;
-            this._dataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDataGridViewCellValueChanged);
-            this._dataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDataGridViewCellDoubleClick);
-            this._dataGridView.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDataGridViewCellContentClick);
             this._dataGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDataGridViewCellContentClick);
-            this._dataGridView.KeyUp +=new System.Windows.Forms.KeyEventHandler(this.HandleGridKeyUp);
+            this._dataGridView.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDataGridViewCellContentClick);
+            this._dataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDataGridViewCellDoubleClick);
+            this._dataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDataGridViewCellValueChanged);
+            this._dataGridView.KeyUp += new System.Windows.Forms.KeyEventHandler(this.HandleGridKeyUp);
             // 
             // _redactedColumn
             // 

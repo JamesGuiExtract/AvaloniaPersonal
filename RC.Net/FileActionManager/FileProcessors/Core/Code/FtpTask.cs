@@ -1049,10 +1049,7 @@ namespace Extract.FileActionManager.FileProcessors
                         _runningConnection.UploadFile(localOrNewFile, remoteOrOldFile);
                         break;
                     case EFTPAction.kDownloadFileFromFtpServer:
-                        FtpMethods.GenerateLocalPathCreateIfNotExists(
-                            _runningConnection.ServerDirectory, Path.GetDirectoryName(localOrNewFile),
-                            _runningConnection.ServerDirectory);
-                        _runningConnection.DownloadFile(localOrNewFile, remoteOrOldFile);
+                        DownloadFile(localOrNewFile, remoteOrOldFile);
                         break;
                     case EFTPAction.kRenameFileOnFtpServer:
                         _runningConnection.RenameFile(remoteOrOldFile, localOrNewFile);
@@ -1091,6 +1088,56 @@ namespace Extract.FileActionManager.FileProcessors
                 }
                 ee.AddDebugData("RemoteFile", remoteOrOldFile, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Downloads the <see paramref="remoteOrOldFile"/> to <see paramref="localOrNewFile"/> with
+        /// protection so that if the download fails, the target file is not overwritten.
+        /// </summary>
+        /// <param name="localOrNewFile">The local or new file.</param>
+        /// <param name="remoteOrOldFile">The remote or old file.</param>
+        void DownloadFile(string localOrNewFile, string remoteOrOldFile)
+        {
+            TemporaryFile temporaryFile = null;
+
+            try
+            {
+                string downloadLocation = localOrNewFile;
+
+                // [DotNetRCAndUtils:750]
+                // If the local file already exists, download to a temporary location and overwrite
+                // localOrNewFile only if successful to avoid deleting the existing file when it
+                // doesn't need to be.
+                if (File.Exists(localOrNewFile))
+                {
+                    temporaryFile = new TemporaryFile(true);
+                    downloadLocation = temporaryFile.FileName;
+                }
+
+                FtpMethods.GenerateLocalPathCreateIfNotExists(
+                    _runningConnection.ServerDirectory, Path.GetDirectoryName(downloadLocation),
+                    _runningConnection.ServerDirectory);
+
+                _runningConnection.DownloadFile(downloadLocation, remoteOrOldFile);
+
+                // If the download was successful and we download to a temporary location,
+                // copy the file over to its final location now.
+                if (temporaryFile != null)
+                {
+                    FileSystemMethods.MoveFile(temporaryFile.FileName, localOrNewFile, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34107");
+            }
+            finally
+            {
+                if (temporaryFile != null)
+                {
+                    temporaryFile.Dispose();
+                }
             }
         }
 

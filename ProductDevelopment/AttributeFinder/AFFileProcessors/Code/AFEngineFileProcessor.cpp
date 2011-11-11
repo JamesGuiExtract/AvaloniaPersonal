@@ -97,26 +97,41 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
+	// Added MLI to help investigate FlexIDSCore:4869
+	INIT_EXCEPTION_AND_TRACING("MLI03284");
+
 	try
 	{
+		_lastCodePos = "10";
+
 		// Check license
 		validateLicense();
+
+		_lastCodePos = "20";
 
 		IFAMTagManagerPtr ipTagManager(pTagManager);
 		ASSERT_ARGUMENT("ELI26658", ipTagManager != __nullptr);
 		ASSERT_ARGUMENT("ELI17935", pResult != __nullptr);
+
+		_lastCodePos = "21";
 		
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI31334", ipFileRecord != __nullptr);
+
+		_lastCodePos = "22";
 
 		// Input file for processing
 		string strInputFile = asString(ipFileRecord->Name);
 		ASSERT_ARGUMENT("ELI17936", strInputFile.empty() == false);
 
+		_lastCodePos = "30";
+
 		// Expand the tags for the rules file
 		string strRulesFile = asString(
 			ipTagManager->ExpandTags(m_strRuleFileNameForFileProcessing.c_str(),
 			strInputFile.c_str()));
+
+		_lastCodePos = "40";
 
 		// Default to successful completion
 		*pResult = kProcessingSuccessful;
@@ -125,21 +140,31 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 		validateFileOrFolderExistence(strInputFile, "ELI26659");
 		validateFileOrFolderExistence(strRulesFile, "ELI26660");
 
+		_lastCodePos = "50";
+
 		// Create a new AFDoc pointer
 		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
 		ASSERT_RESOURCE_ALLOCATION("ELI19455", ipAFDoc != __nullptr);
+
+		_lastCodePos = "60";
 
 		// If reading the USS file from disk, check for USS file
 		// default the need to OCR to true
 		bool bNeedToRunOCR = true;
 		if (m_bReadUSSFileIfExist)
 		{
+			_lastCodePos = "60";
+
 			EFileType eFileType = getFileType(strInputFile);
 			string strSpatialStringFile = (eFileType == kUSSFile)
 				? strInputFile : strInputFile + ".uss";
 
+			_lastCodePos = "61";
+
 			if (!strSpatialStringFile.empty() && isValidFile(strSpatialStringFile))
 			{
+				_lastCodePos = "62";
+
 				ISpatialStringPtr ipText = ipAFDoc->Text;
 				ASSERT_RESOURCE_ALLOCATION("ELI28088", ipText != __nullptr);
 
@@ -151,6 +176,8 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 			}
 		}
 
+		_lastCodePos = "70";
+
 		// Based upon whether OCR will need to be run, determine the total number
 		// of items to use for progress status updates
 		const long nNUM_PROGRESS_ITEMS_OCR = 1;
@@ -161,11 +188,15 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 		// Wrap the progress status object in a smart pointer
 		IProgressStatusPtr ipProgressStatus(pProgressStatus);
 
+		_lastCodePos = "80";
+
 		// Since this object at runtime may only execute one sub task or more than one
 		// sub task, determine which progress status object should be passed to the sub tasks
 		IProgressStatusPtr ipProgressStatusToUseForSubTasks = __nullptr;
 		if (ipProgressStatus)
 		{
+			_lastCodePos = "90";
+
 			if (nTOTAL_PROGRESS_ITEMS > 1)
 			{
 				// There are multiple progress items associated with this task.  Pass
@@ -189,9 +220,13 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 			}
 		}
 
+		_lastCodePos = "100";
+
 		// Perform OCR on the document if necessary
 		if (bNeedToRunOCR)
 		{
+			_lastCodePos = "110";
+
 			// Update the progress status
 			if (ipProgressStatus && nTOTAL_PROGRESS_ITEMS > 1)
 			{
@@ -201,6 +236,8 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 			EFileType eFileType = getFileType(strInputFile);
 			if (eFileType == kImageFile)
 			{
+				_lastCodePos = "120";
+
 				// Get the name of the file to OCR
 				string strFileToOCR =
 					m_bUseCleanedImage ? getCleanImageNameIfExists(strInputFile) : strInputFile;
@@ -210,6 +247,8 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 				{
 				case kOCRAllPages:
 					{
+						_lastCodePos = "121";
+
 						// Recognize the image file and put the spatial string in ipAFDoc
 						ipAFDoc->Text = getOCRUtils()->RecognizeTextInImageFile( strFileToOCR.c_str(), 
 							-1, getOCREngine(), ipProgressStatusToUseForSubTasks);
@@ -217,6 +256,8 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 					break;
 				case kOCRCertainPages:
 					{
+						_lastCodePos = "122";
+
 						ipAFDoc->Text = getOCREngine()->RecognizeTextInImage2( strFileToOCR.c_str(), 
 							m_strSpecificPages.c_str(), VARIANT_TRUE, ipProgressStatusToUseForSubTasks);
 					}
@@ -226,6 +267,8 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 			// Text file
 			else
 			{
+				_lastCodePos = "130";
+
 				ISpatialStringPtr ipText = ipAFDoc->Text;
 				ASSERT_RESOURCE_ALLOCATION("ELI31688", ipText != __nullptr);
 
@@ -233,23 +276,33 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 				ipText->LoadFrom(strInputFile.c_str(), VARIANT_FALSE);
 			}
 
+			_lastCodePos = "140";
+
 			// Ensure the appropriate source doc name is in the spatial string
 			if (m_bUseCleanedImage || m_eOCRPagesType == kNoOCR)
 			{
+				_lastCodePos = "150";
+
 				ISpatialStringPtr ipText = ipAFDoc->Text;
 				ASSERT_RESOURCE_ALLOCATION("ELI28151", ipText != __nullptr);
 
 				ipText->SourceDocName = strInputFile.c_str();
 			}
 
+			_lastCodePos = "160";
+
 			if (m_bCreateUssFileIfNonExist && m_eOCRPagesType != kNoOCR)
 			{
+				_lastCodePos = "170";
+
 				// Output the spatial string to a USS file
 				ISpatialStringPtr ipText = ipAFDoc->Text;
 				ASSERT_RESOURCE_ALLOCATION("ELI15524", ipText != __nullptr);
 				ipText->SaveTo(get_bstr_t(strInputFile + ".uss"), VARIANT_TRUE, VARIANT_TRUE);
 			}
 		}
+
+		_lastCodePos = "180";
 
 		// Update the progress status to indicate that the next item group
 		// (associated with executing rules) is about to start.
@@ -263,18 +316,26 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 		// and so that it need not be loaded each time this method is called.
 		IRuleSetPtr ipRules = getRuleSet(strRulesFile);
 
+		_lastCodePos = "190";
+
 		IUnknownPtr ipUnknown = ipRules;
 		_variant_t _varRuleSet = (IUnknown *) ipUnknown;
+
+		_lastCodePos = "200";
 
 		// Execute the rule set
 		getAFEngine()->FindAttributes(ipAFDoc, strInputFile.c_str(), 0, 
 			_varRuleSet, NULL, VARIANT_TRUE, ipProgressStatusToUseForSubTasks);
+
+		_lastCodePos = "210";
 
 		// Update the progress status to indicate that rule running is complete.
 		if (ipProgressStatus && nTOTAL_PROGRESS_ITEMS > 1)
 		{
 			ipProgressStatus->CompleteCurrentItemGroup();
 		}
+
+		_lastCodePos = "220";
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08998")
 

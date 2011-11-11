@@ -74,6 +74,11 @@ namespace Extract.Redaction.Verification
         bool _visited;
 
         /// <summary>
+        /// Indicates whether the row has been added since the last save.
+        /// </summary>
+        bool _isNew = true;
+
+        /// <summary>
         /// <see langword="true"/> if <see cref="_layerObjects"/> has been modified; 
         /// <see langword="false"/> if it has not been modified.
         /// </summary>
@@ -362,7 +367,7 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Gets whether the row has been added since the last save.
+        /// Gets or sets whether the row has been added since the last save.
         /// </summary>
         /// <value><see langword="true"/> if the row has been added since the last save;
         /// <see langword="false"/> if the row existed prior to the last save.</value>
@@ -370,7 +375,12 @@ namespace Extract.Redaction.Verification
         {
             get
             {
-                return _attribute == null;
+                return _isNew;
+            }
+
+            set
+            {
+                _isNew = value;
             }
         }
 

@@ -42,7 +42,7 @@
             this._fileFilterComboBox = new System.Windows.Forms.ComboBox();
             this._browseButton = new Extract.Utilities.Forms.BrowseButton();
             this._localWorkingFolderTextBox = new System.Windows.Forms.TextBox();
-            this._pathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._localPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
             this._recursiveDownloadCheckBox = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -53,6 +53,7 @@
             this._secureFTPConnection = new EnterpriseDT.Net.Ftp.SecureFTPConnection(this.components);
             this._btnOK = new System.Windows.Forms.Button();
             this._btnCancel = new System.Windows.Forms.Button();
+            this._remotePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._pollingIntervalNumericUpDown)).BeginInit();
@@ -165,10 +166,11 @@
             // 
             // _generalSettingsTabPage
             // 
+            this._generalSettingsTabPage.Controls.Add(this._remotePathTagsButton);
             this._generalSettingsTabPage.Controls.Add(this._fileFilterComboBox);
             this._generalSettingsTabPage.Controls.Add(groupBox1);
             this._generalSettingsTabPage.Controls.Add(this._browseButton);
-            this._generalSettingsTabPage.Controls.Add(this._pathTagsButton);
+            this._generalSettingsTabPage.Controls.Add(this._localPathTagsButton);
             this._generalSettingsTabPage.Controls.Add(this._recursiveDownloadCheckBox);
             this._generalSettingsTabPage.Controls.Add(this.label4);
             this._generalSettingsTabPage.Controls.Add(this.label2);
@@ -178,7 +180,7 @@
             this._generalSettingsTabPage.Location = new System.Drawing.Point(4, 22);
             this._generalSettingsTabPage.Name = "_generalSettingsTabPage";
             this._generalSettingsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._generalSettingsTabPage.Size = new System.Drawing.Size(475, 356);
+            this._generalSettingsTabPage.Size = new System.Drawing.Size(475, 376);
             this._generalSettingsTabPage.TabIndex = 0;
             this._generalSettingsTabPage.Text = "General Settings";
             this._generalSettingsTabPage.UseVisualStyleBackColor = true;
@@ -225,16 +227,16 @@
             this._localWorkingFolderTextBox.Size = new System.Drawing.Size(402, 20);
             this._localWorkingFolderTextBox.TabIndex = 7;
             // 
-            // _pathTagsButton
+            // _localPathTagsButton
             // 
-            this._pathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_pathTagsButton.Image")));
-            this._pathTagsButton.Location = new System.Drawing.Point(416, 288);
-            this._pathTagsButton.Name = "_pathTagsButton";
-            this._pathTagsButton.PathTags = new Extract.Utilities.FileActionManagerSupplierPathTags();
-            this._pathTagsButton.Size = new System.Drawing.Size(18, 20);
-            this._pathTagsButton.TabIndex = 8;
-            this._pathTagsButton.TextControl = this._localWorkingFolderTextBox;
-            this._pathTagsButton.UseVisualStyleBackColor = true;
+            this._localPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_localPathTagsButton.Image")));
+            this._localPathTagsButton.Location = new System.Drawing.Point(416, 288);
+            this._localPathTagsButton.Name = "_localPathTagsButton";
+            this._localPathTagsButton.PathTags = new Extract.Utilities.FileActionManagerSupplierPathTags();
+            this._localPathTagsButton.Size = new System.Drawing.Size(18, 20);
+            this._localPathTagsButton.TabIndex = 8;
+            this._localPathTagsButton.TextControl = this._localWorkingFolderTextBox;
+            this._localPathTagsButton.UseVisualStyleBackColor = true;
             // 
             // _recursiveDownloadCheckBox
             // 
@@ -338,6 +340,17 @@
             this._btnCancel.Text = "Cancel";
             this._btnCancel.UseVisualStyleBackColor = true;
             // 
+            // _remotePathTagsButton
+            // 
+            this._remotePathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_remotePathTagsButton.Image")));
+            this._remotePathTagsButton.Location = new System.Drawing.Point(388, 27);
+            this._remotePathTagsButton.Name = "_remotePathTagsButton";
+            this._remotePathTagsButton.PathTags = new Extract.Utilities.FileActionManagerSupplierPathTags();
+            this._remotePathTagsButton.Size = new System.Drawing.Size(18, 20);
+            this._remotePathTagsButton.TabIndex = 2;
+            this._remotePathTagsButton.TextControl = this._remoteDownloadFolderTextBox;
+            this._remotePathTagsButton.UseVisualStyleBackColor = true;
+            // 
             // FtpFileSupplierSettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -383,12 +396,13 @@
         private System.Windows.Forms.TextBox _localWorkingFolderTextBox;
         private System.Windows.Forms.TextBox _remoteDownloadFolderTextBox;
         private Utilities.Forms.BrowseButton _browseButton;
-        private Utilities.Forms.PathTagsButton _pathTagsButton;
+        private Utilities.Forms.PathTagsButton _localPathTagsButton;
         private Forms.FtpConnectionSettingsControl _ftpConnectionSettingsControl;
         private System.Windows.Forms.TextBox _pollingTimesTextBox;
         private System.Windows.Forms.RadioButton _pollAtSetTimesRadioButton;
         private System.Windows.Forms.RadioButton _pollContinuouslyRadioButton;
         private System.Windows.Forms.RadioButton _downloadOnceRadioButton;
         private System.Windows.Forms.ComboBox _fileFilterComboBox;
+        private Utilities.Forms.PathTagsButton _remotePathTagsButton;
     }
 }

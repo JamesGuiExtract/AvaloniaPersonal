@@ -533,8 +533,8 @@ namespace Extract.Redaction.Verification
                 {
                     // Use InactiveCaptionText color for this row.
                     DataGridViewCellStyle style = _dataGridView.DefaultCellStyle.Clone();
-                    style.ForeColor = SystemColors.InactiveCaptionText;
-                    style.SelectionForeColor = SystemColors.InactiveCaptionText;
+                    style.SelectionForeColor = Color.LightGray;
+                    style.BackColor = Color.LightGray;
                     _readOnlyCellStyle = style;
                 }
 
@@ -704,19 +704,28 @@ namespace Extract.Redaction.Verification
                 _typeColumn.Items.Add(type);
             }
 
-            // Get the index of the last selected row and insert
-            // the item below that (if there is no selection, insert at the bottom)
-            int index = GetLastSelectedRowIndex();
-            if (index == -1)
+            if (row.RedactionItem == null)
             {
-                index = _redactions.Count;
-                _redactions.Add(row);
+                // [FlexIDSCore:4933]
+                // Save a temporary RedactionItem for the row right away so that it can be sorted
+                // into the correct position amongst any other existing redactions in the grid.
+                LongToObjectMap pageInfoMap = GetPageInfoMap();
+                row.SaveRedactionItem("", pageInfoMap);
             }
-            else
-            {
-                index++;
-                _redactions.Insert(index, row);
-            }
+
+            // Find the index at which to add the new item to the grid based on its spatial location
+            // in the document relative to the existing items.
+            int index = Array.BinarySearch(_redactions.ToArray(), row,
+                new RedactionGridViewRowComparer());
+
+            // The new row should not already be there.
+            ExtractException.Assert("ELI34105", "Internal logic error.", index < 0);
+
+            // The index where the new row should be added should be the bitwise complement of
+            // the BinarySearch result.
+            index = ~index;
+
+            _redactions.Insert(index, row);
 
             _dirty = true;
             return index;
@@ -1420,6 +1429,7 @@ namespace Extract.Redaction.Verification
                 // Add each attribute
                 RedactionGridViewRow row = 
                     RedactionGridViewRow.FromSensitiveItem(item, _imageViewer, MasterCodes);
+                row.IsNew = false;
 
                 Add(row);
 

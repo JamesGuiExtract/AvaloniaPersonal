@@ -282,8 +282,11 @@ namespace Extract.FileActionManager.FileSuppliers
         // from the ftp server
         Thread _ftpDownloadManagerThread;
 
-        // LocalWorkingFolder with tags expanded
-        string _expandedLocalWorkingFolder;
+        // RemoteDownloadFolder with tags expanded
+        string _expandedRemoteDownloadFolder;
+
+        // Used to expand folder paths
+        FileActionManagerSupplierPathTags _pathTags;
 
         // Queue of files to be downloaded.
         ConcurrentQueue<FTPFile> _filesToDownload = new ConcurrentQueue<FTPFile>();
@@ -885,7 +888,11 @@ namespace Extract.FileActionManager.FileSuppliers
 
                 InitializeEventsForStart();
 
-                ExpandLocalWorkingFolder(pFAMTM.FPSFileDir);
+                _pathTags = new FileActionManagerSupplierPathTags(pFAMTM.FPSFileDir);
+                
+                // Per discussion with Arvind, remote download folder should be expanded only once
+                // per session.
+                _expandedRemoteDownloadFolder = _pathTags.Expand(RemoteDownloadFolder);
 
                 // Set the file target
                 _fileTarget = pTarget;
@@ -1258,7 +1265,7 @@ namespace Extract.FileActionManager.FileSuppliers
             try
             {
                 // If polling at set times, don't poll right away; wait until the next set time.
-                if (PollingMethod == FileSuppliers.PollingMethod.SetTimes && ExitManageFileDownload())
+                if (PollingMethod == FileSuppliers.PollingMethod.SetTimes && !WaitForNextPollingTime())
                 {
                     return;
                 }
@@ -1275,7 +1282,7 @@ namespace Extract.FileActionManager.FileSuppliers
 
                     WaitForDownloadThreadsToFinish(downloadThreads);
                 }
-                while (!ExitManageFileDownload());
+                while (WaitForNextPollingTime());
             }
             catch (Exception ex)
             {
@@ -1310,18 +1317,18 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// Determines if the ftp server should be checked again for files
+        /// Waits for the next polling time. Determines if the ftp server should be checked again for files
         /// </summary>
-        /// <returns><see lang="true"/> if Polling is enabled and it is time to check for files
-        /// <see lang="false"/> if polling is not enabled or supplying should stop</returns>
-        bool ExitManageFileDownload()
+        /// <returns><see lang="true"/> if the wait is over and the FTP site should be polled;
+        /// <see lang="false"/> if polling is not enabled or supplying should stop.</returns>
+        bool WaitForNextPollingTime()
         {
             try
             {
                 // If not polling, should exit if done adding files
                 if (PollingMethod == PollingMethod.NoPolling)
                 {
-                    return true;
+                    return false;
                 }
 
                 // Wait for either stop suppling event or for a poll FTP server event
@@ -1332,7 +1339,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 };
                 
                 // Return false if result is index of pollFtpServerForFiles
-                return WaitHandle.WaitAny(handlesToWaitFor) != 1;
+                return WaitHandle.WaitAny(handlesToWaitFor) == 1;
             }
             catch (Exception ex)
             {
@@ -1364,7 +1371,8 @@ namespace Extract.FileActionManager.FileSuppliers
                         try
                         {
                             string remoteFileName =
-                                FtpMethods.NormalizeRemotePath(RemoteDownloadFolder) + currentFtpFile.Name;
+                                FtpMethods.NormalizeRemotePath(_expandedRemoteDownloadFolder)
+                                    + currentFtpFile.Name;
 
                             // Call the DownloadFileFromFtpServer retry within a FtpEventRecorder//
                             // block so that an FTP event history row will be added upon success or
@@ -1691,10 +1699,10 @@ namespace Extract.FileActionManager.FileSuppliers
 
                     using (var recorder = new FtpEventRecorder(this, runningConnection,
                         _fileProcessingDB, _actionID, true, EFTPAction.kGetDirectoryListing,
-                        null, RemoteDownloadFolder))
+                        null, _expandedRemoteDownloadFolder))
                     {
                         Retry<Exception> retry = GetRetry(runningConnection, recorder,
-                            RemoteDownloadFolder, false);
+                            _expandedRemoteDownloadFolder, false);
 
                         directoryContents = retry.DoRetry(() =>
                             GetFileListFromFtpServer(runningConnection));
@@ -1730,7 +1738,8 @@ namespace Extract.FileActionManager.FileSuppliers
                 }
 
                 // Get all the files and directories in the working folder and subfolders if required
-                FTPFile[] directoryContents = runningConnection.GetFileInfos(RemoteDownloadFolder, RecursivelyDownload);
+                FTPFile[] directoryContents = runningConnection.GetFileInfos(
+                    _expandedRemoteDownloadFolder, RecursivelyDownload);
                 return directoryContents;
             }
             catch (Exception ex)
@@ -1841,18 +1850,6 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// Sets _expandedLocalWorkingFolder by expanding the tags in LocalWorking folder
-        /// </summary>
-        /// <param name="FPSFileDir">The FPS file directory needed to expand the LocalWorking Folder</param>
-        void ExpandLocalWorkingFolder(string FPSFileDir)
-        {
-            FileActionManagerSupplierPathTags pathTags =
-                new FileActionManagerSupplierPathTags(FPSFileDir);
-
-            _expandedLocalWorkingFolder = pathTags.Expand(LocalWorkingFolder);
-        }
-
-        /// <summary>
         /// Resets or Sets events and flags to the starting state
         /// </summary>
         void InitializeEventsForStart()
@@ -1916,10 +1913,13 @@ namespace Extract.FileActionManager.FileSuppliers
 
                 FtpMethods.SetCurrentFtpWorkingFolder(runningConnection, currentFtpFile.Path, false);
 
+                // [DotNetRCAndUtils:751]
+                // Expand LocalWorkingFolder for each file separately.
+                string expandedLocalWorkingFolder = _pathTags.Expand(LocalWorkingFolder);
+
                 string localFilePath = FtpMethods.GenerateLocalPathCreateIfNotExists(
-                    runningConnection.ServerDirectory,
-                    _expandedLocalWorkingFolder,
-                    RemoteDownloadFolder);
+                    runningConnection.ServerDirectory, expandedLocalWorkingFolder,
+                    _expandedRemoteDownloadFolder);
 
                 // Determine the full name of the local file
                 localFile = Path.Combine(localFilePath, currentFtpFile.Name);
@@ -2007,10 +2007,45 @@ namespace Extract.FileActionManager.FileSuppliers
                 {
                     runningConnection.Downloaded += handleDownloaded;
 
-                    runningConnection.DownloadFile(localFile, currentFtpFile.Name);
+                    TemporaryFile temporaryFile = null;
+                    try
+                    {
+                        string downloadLocation = localFile;
 
-                    ExtractException.Assert("ELI34061", "Download failed.",
-                        File.Exists(downloadedFileName));
+                        // [DotNetRCAndUtils:750]
+                        // If the local file already exists, download to a temporary location and
+                        // overwrite localFile only if successful to avoid deleting the existing
+                        // file when it doesn't need to be.
+                        if (File.Exists(localFile))
+                        {
+                            temporaryFile = new TemporaryFile(true);
+                            downloadLocation = temporaryFile.FileName;
+                        }
+
+                        runningConnection.DownloadFile(downloadLocation, currentFtpFile.Name);
+
+                        // If the download was successful and we download to a temporary location,
+                        // copy the file over to its final location now.
+                        if (temporaryFile != null)
+                        {
+                            FileSystemMethods.MoveFile(temporaryFile.FileName, localFile, true);
+                        }
+
+                        downloadedFileName = localFile;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex.AsExtract("ELI34108");
+                    }
+                    finally
+                    {
+                        if (temporaryFile != null)
+                        {
+                            temporaryFile.Dispose();
+                        }
+                    }
+
+                    ExtractException.Assert("ELI34061", "Download failed.", File.Exists(localFile));
                 }
                 catch (Exception ex)
                 {
