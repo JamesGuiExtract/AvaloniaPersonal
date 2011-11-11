@@ -66,15 +66,11 @@ UINT IdleProcessKiller::monitorProcessLoop(void* pData)
 			}
 		}
 		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI25210");
-
 	
 		// Signal that this thread has stopped
 		pIdleProcessKiller->m_eventStopped.signal();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI25212");
-
-	// Temporary code to investigate LegacyRCAndUtils:5945
-	UCLIDException("ELI34104", "Idle process killer monitoring thread exited.").log();
 
 	return 0;
 }
