@@ -1215,9 +1215,7 @@ namespace Extract.FileActionManager.FileSuppliers
                     ExtractException ee = new ExtractException("ELI34052",
                         "Application trace: Checking for files via FTP at specified time.");
 
-                    // Add a buffer of 30 seconds to protect against the chance of the timer firing
-                    // again immediately.
-                    long milliscondsToNextTime = SetTimerForNextSetTime(30000);
+                    long milliscondsToNextTime = SetTimerForNextSetTime();
 
                     // Next check in mins (rounded to nearest minute)
                     ee.AddDebugData("Next check (mins)", (milliscondsToNextTime + 30000) / 60000, false);
@@ -1242,7 +1240,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 // If checking at set times, reset the _polling timer based on the new system time.
                 if (_pollingTimer != null && PollingMethod == FileSuppliers.PollingMethod.SetTimes)
                 {
-                    SetTimerForNextSetTime(0);
+                    SetTimerForNextSetTime();
                 }
             }
             catch (Exception ex)
@@ -1841,7 +1839,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 }
                 else // (PollingMethod == PollingMethod.SetTimes)
                 {
-                    timeoutValue = GetMillisecondsUntilNextSetTime(0);
+                    timeoutValue = GetMillisecondsUntilNextSetTime();
                 }
 
                 _pollingTimer = new System.Threading.Timer(HandlePollingTimerTimeout, null,
@@ -2094,16 +2092,26 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <summary>
         /// Sets the timer for next set time.
         /// </summary>
-        /// <param name="bufferMilliseconds">If within this number of milliseconds of the next time,
-        /// that check will be skipped.</param>
-        /// <returns>The number of milliseconds until the next set time.</returns>
-        long SetTimerForNextSetTime(int bufferMilliseconds)
+        long SetTimerForNextSetTime()
         {
             lock (_lock)
             {
                 System.Threading.Timer oldPollingTimer = _pollingTimer;
 
-                long timeoutValue = GetMillisecondsUntilNextSetTime(bufferMilliseconds);
+                long timeoutValue = GetMillisecondsUntilNextSetTime();
+
+                // The timer isn't super accurate so it may be off by a few seconds over a day's
+                // time. In the case that the time is early, in order to
+                // A) Prevent the polling from happening now and again within a few seconds and
+                // B) Prevent the possible confusion of the polling happening before the set time
+                // If the next scheduled time is within 30 seconds, assume this event has fired
+                // a bit early. Wait for the timeout value to elapse (add 1 second to ensure that
+                // the time has definitely passed) then re-calculate GetMillisecondsUntilNextSetTime.
+                if (timeoutValue < 30000)
+                {
+                    Thread.Sleep((int)timeoutValue + 1000);
+                    timeoutValue = GetMillisecondsUntilNextSetTime();
+                }
 
                 _pollingTimer = new System.Threading.Timer(HandlePollingTimerTimeout, null,
                     timeoutValue, timeoutValue);
@@ -2117,14 +2125,12 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <summary>
         /// Gets the number of milliseconds until the next time in PollingTimes.
         /// </summary>
-        /// <param name="bufferMilliseconds">If within this number of milliseconds of the next time,
-        /// that check will be skipped.</param>
         /// <returns>The number of milliseconds until the next time in PollingTimes</returns>
-        long GetMillisecondsUntilNextSetTime(int bufferMilliseconds)
+        long GetMillisecondsUntilNextSetTime()
         {
             long timeoutValue = (long)PollingTimes
                 .Select(time => time.TimeOfDay - DateTime.Now.TimeOfDay)
-                .Select(timeSpan => (timeSpan.Ticks < (bufferMilliseconds / 10000))
+                .Select(timeSpan => (timeSpan.Ticks < 0)
                     ? timeSpan + new TimeSpan(1, 0, 0, 0) // If we have passed the time; use tomorrow.
                     : timeSpan)
                 .OrderBy(timeSpan => timeSpan)
