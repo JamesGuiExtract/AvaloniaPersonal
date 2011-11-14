@@ -409,7 +409,7 @@ STDMETHODIMP CDataEntryProductDBMgr::AddDataEntryData(long lFileID, long nAction
 				plInstanceID))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(m_ipFAMDB,
 				gstrMAIN_DB_LOCK);
 
 			AddDataEntryData_Internal(true, lFileID, nActionID, dDuration, dOverheadTime,

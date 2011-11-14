@@ -422,12 +422,8 @@ STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long lFileID, VARIANT_BOOL v
 			lNumHCDataFound, lNumMCDataFound, lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, 
 			lTotalManualRedactions, lNumPagesAutoAdvanced))
 		{
-			UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr ipThis;
-			ipThis = this;
-			ASSERT_RESOURCE_ALLOCATION("ELI30712", ipThis != __nullptr);
-			
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(ipThis, gstrMAIN_DB_LOCK);
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(m_ipFAMDB, gstrMAIN_DB_LOCK);
 			
 			AddIDShieldData_Internal(true, lFileID, vbVerified, dDuration, dOverheadTime,
 				lNumHCDataFound, lNumMCDataFound, lNumLCDataFound, lNumCluesDataFound,
