@@ -197,7 +197,7 @@ STDMETHODIMP CFileProcessingDB::DefineNewAction(BSTR strAction, long* pnID)
 		// Check License
 		validateLicense();
 
-//		if (!DefineNewAction_Internal(false, strAction, pnID))
+		if (!DefineNewAction_Internal(false, strAction, pnID))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -218,7 +218,7 @@ STDMETHODIMP CFileProcessingDB::DeleteAction(BSTR strAction)
 		// Check License
 		validateLicense();
 
-//		if (!DeleteAction_Internal(false, strAction))
+		if (!DeleteAction_Internal(false, strAction))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -239,7 +239,7 @@ STDMETHODIMP CFileProcessingDB::GetActions(IStrToStrMap * * pmapActionNameToID)
 		// Check License
 		validateLicense();
 
-//		if (!GetActions_Internal(false, pmapActionNameToID))
+		if (!GetActions_Internal(false, pmapActionNameToID))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -263,8 +263,8 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 		// Check License
 		validateLicense();
 
-//		if (!AddFile_Internal(false, strFile, strAction, ePriority, bForceStatusChange, bFileModified,
-//			eNewStatus, pbAlreadyExists, pPrevStatus, ppFileRecord))
+		if (!AddFile_Internal(false, strFile, strAction, ePriority, bForceStatusChange, bFileModified,
+			eNewStatus, pbAlreadyExists, pPrevStatus, ppFileRecord))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -286,7 +286,7 @@ STDMETHODIMP CFileProcessingDB::RemoveFile(BSTR strFile, BSTR strAction)
 		// Check License
 		validateLicense();
 
-//		if (!RemoveFile_Internal(false, strFile, strAction))
+		if (!RemoveFile_Internal(false, strFile, strAction))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -307,7 +307,7 @@ STDMETHODIMP CFileProcessingDB::NotifyFileProcessed(long nFileID,  BSTR strActio
 		// Check License
 		validateLicense();
 
-//		if (!NotifyFileProcessed_Internal(false, nFileID, strAction))
+		if (!NotifyFileProcessed_Internal(false, nFileID, strAction))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -328,7 +328,7 @@ STDMETHODIMP CFileProcessingDB::NotifyFileFailed(long nFileID,  BSTR strAction, 
 		// Check License
 		validateLicense();
 
-//		if (!NotifyFileFailed_Internal(false, nFileID, strAction, strException))
+		if (!NotifyFileFailed_Internal(false, nFileID, strAction, strException))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -348,7 +348,7 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToPending(long nFileID,  BSTR strAc
 	{
 		// Check License
 		validateLicense();
-//		if (!SetFileStatusToPending_Internal(false, nFileID,  strAction))
+		if (!SetFileStatusToPending_Internal(false, nFileID,  strAction))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -370,7 +370,7 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToUnattempted(long nFileID,  BSTR s
 		// Check License
 		validateLicense();
 
-//		if (!SetFileStatusToUnattempted_Internal(false, nFileID, strAction))
+		if (!SetFileStatusToUnattempted_Internal(false, nFileID, strAction))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -392,7 +392,7 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToSkipped(long nFileID, BSTR strAct
 		// Check License
 		validateLicense();
 
-//		if (!SetFileStatusToSkipped_Internal(false, nFileID, strAction, bRemovePreviousSkipped))
+		if (!SetFileStatusToSkipped_Internal(false, nFileID, strAction, bRemovePreviousSkipped))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -415,7 +415,7 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus(long nFileID,  BSTR strAction,
 		// Check License
 		validateLicense();
 
-//		if (!GetFileStatus_Internal(false, nFileID,  strAction, vbAttemptRevertIfLocked, pStatus))
+		if (!GetFileStatus_Internal(false, nFileID,  strAction, vbAttemptRevertIfLocked, pStatus))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -439,8 +439,8 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus(long nWhereActionID,  
 		// Check License
 		validateLicense();
 
-//		if (!SearchAndModifyFileStatus_Internal(false, nWhereActionID, eWhereStatus, nToActionID, eToStatus,
-//			bstrSkippedFromUserName, nFromActionID, pnNumRecordsModified))
+		if (!SearchAndModifyFileStatus_Internal(false, nWhereActionID, eWhereStatus, nToActionID, eToStatus,
+			bstrSkippedFromUserName, nFromActionID, pnNumRecordsModified))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -462,7 +462,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionSta
 		// Check License
 		validateLicense();
 
-//		if (!SetStatusForAllFiles_Internal(false, strAction,  eStatus))
+		if (!SetStatusForAllFiles_Internal(false, strAction,  eStatus))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -484,7 +484,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFile(long nID,  BSTR strAction,  EAc
 		// Check License
 		validateLicense();
 
-//		if (!SetStatusForFile_Internal(false, nID, strAction, eStatus, poldStatus))
+		if (!SetStatusForFile_Internal(false, nID, strAction, eStatus, poldStatus))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -508,8 +508,8 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction,  long nMaxFile
 		// Check License
 		validateLicense();
 
-//		if (!GetFilesToProcess_Internal(false, strAction, nMaxFiles, bGetSkippedFiles, 
-//				bstrSkippedForUserName, pvecFileRecords))
+		if (!GetFilesToProcess_Internal(false, strAction, nMaxFiles, bGetSkippedFiles, 
+				bstrSkippedForUserName, pvecFileRecords))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -530,7 +530,7 @@ STDMETHODIMP CFileProcessingDB::RemoveFolder(BSTR strFolder, BSTR strAction)
 		// Check License
 		validateLicense();
 
-//		if (!RemoveFolder_Internal(false, strFolder, strAction))
+		if (!RemoveFolder_Internal(false, strFolder, strAction))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -551,7 +551,7 @@ STDMETHODIMP CFileProcessingDB::GetStats(long nActionID, VARIANT_BOOL vbForceUpd
 	{
 		validateLicense();
 
-//		if (!GetStats_Internal(false, nActionID, vbForceUpdate, pStats))
+		if (!GetStats_Internal(false, nActionID, vbForceUpdate, pStats))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -571,7 +571,7 @@ STDMETHODIMP CFileProcessingDB::CopyActionStatusFromAction(long  nFromAction, lo
 	{
 		validateLicense();
 
-//		if (!CopyActionStatusFromAction_Internal(false, nFromAction, nToAction))
+		if (!CopyActionStatusFromAction_Internal(false, nFromAction, nToAction))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -591,7 +591,7 @@ STDMETHODIMP CFileProcessingDB::RenameAction(long nActionID, BSTR strNewActionNa
 	{
 		validateLicense();
 
-//		if (!RenameAction_Internal(false, nActionID, strNewActionName))
+		if (!RenameAction_Internal(false, nActionID, strNewActionName))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -613,7 +613,7 @@ STDMETHODIMP CFileProcessingDB::Clear(VARIANT_BOOL vbRetainUserValues)
 		// Validate the license
 		validateLicense();
 	
-//		if (!Clear_Internal(false, vbRetainUserValues))
+		if (!Clear_Internal(false, vbRetainUserValues))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -635,8 +635,8 @@ STDMETHODIMP CFileProcessingDB::ExportFileList(BSTR strQuery, BSTR strOutputFile
 		// Validate the license
 		validateLicense();
 
-//		if (!ExportFileList_Internal(false, strQuery, strOutputFileName, pRandomCondition, 
-//			pnNumRecordsOutput))
+		if (!ExportFileList_Internal(false, strQuery, strOutputFileName, pRandomCondition, 
+			pnNumRecordsOutput))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -696,7 +696,7 @@ STDMETHODIMP CFileProcessingDB::GetActionID(BSTR bstrActionName, long* pnActionI
 
 	try
 	{
-//		if (!GetActionID_Internal(false, bstrActionName, pnActionID))
+		if (!GetActionID_Internal(false, bstrActionName, pnActionID))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1118,7 +1118,7 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSetting(BSTR bstrSettingName, BSTR bstr
 
 		validateLicense();
 
-//		if (!SetDBInfoSetting_Internal(false, bstrSettingName, bstrSettingValue, vbSetIfExists))
+		if (!SetDBInfoSetting_Internal(false, bstrSettingName, bstrSettingValue, vbSetIfExists))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1145,7 +1145,7 @@ STDMETHODIMP CFileProcessingDB::GetDBInfoSetting(BSTR bstrSettingName, VARIANT_B
 		bool bThrowIfMissing = asCppBool(vbThrowIfMissing);
 		string strSettingName = asString(bstrSettingName);
 		string strVal;
-//		if (!GetDBInfoSetting_Internal(false, strSettingName, bThrowIfMissing, strVal))
+		if (!GetDBInfoSetting_Internal(false, strSettingName, bThrowIfMissing, strVal))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1221,7 +1221,7 @@ STDMETHODIMP CFileProcessingDB::GetResultsForQuery(BSTR bstrQuery, _Recordset** 
 		validateLicense();
 
 
-//		if (!GetResultsForQuery_Internal(false, bstrQuery, ppVal))
+		if (!GetResultsForQuery_Internal(false, bstrQuery, ppVal))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1274,7 +1274,7 @@ STDMETHODIMP CFileProcessingDB::GetFileID(BSTR bstrFileName, long *pnFileID)
 
 		validateLicense();
 
-//		if (!GetFileID_Internal(false, bstrFileName, pnFileID))
+		if (!GetFileID_Internal(false, bstrFileName, pnFileID))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1294,7 +1294,7 @@ STDMETHODIMP CFileProcessingDB::GetActionName(long nActionID, BSTR *pbstrActionN
 
 		validateLicense();
 
-//		if (!GetActionName_Internal(false, nActionID, pbstrActionName))
+		if (!GetActionName_Internal(false, nActionID, pbstrActionName))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1315,7 +1315,7 @@ STDMETHODIMP CFileProcessingDB::NotifyFileSkipped(long nFileID, long nActionID)
 
 		validateLicense();
 
-//		if (!NotifyFileSkipped_Internal(false, nFileID, nActionID))
+		if (!NotifyFileSkipped_Internal(false, nFileID, nActionID))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1335,7 +1335,7 @@ STDMETHODIMP CFileProcessingDB::SetFileActionComment(long nFileID, long nActionI
 
 		validateLicense();
 
-//		if (!SetFileActionComment_Internal(false, nFileID, nActionID, bstrComment))
+		if (!SetFileActionComment_Internal(false, nFileID, nActionID, bstrComment))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1357,7 +1357,7 @@ STDMETHODIMP CFileProcessingDB::GetFileActionComment(long nFileID, long nActionI
 
 		validateLicense();
 
-//		if (!GetFileActionComment_Internal(false, nFileID, nActionID, pbstrComment))
+		if (!GetFileActionComment_Internal(false, nFileID, nActionID, pbstrComment))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1377,7 +1377,7 @@ STDMETHODIMP CFileProcessingDB::ClearFileActionComment(long nFileID, long nActio
 
 		validateLicense();
 
-//		if (!ClearFileActionComment_Internal(false, nFileID, nActionID))
+		if (!ClearFileActionComment_Internal(false, nFileID, nActionID))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1400,8 +1400,8 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 	{
 		validateLicense();
 
-//		if (!ModifyActionStatusForQuery_Internal(false, bstrQueryFrom, bstrToAction, eaStatus, 
-//			bstrFromAction, pRandomCondition, pnNumRecordsModified))
+		if (!ModifyActionStatusForQuery_Internal(false, bstrQueryFrom, bstrToAction, eaStatus, 
+			bstrFromAction, pRandomCondition, pnNumRecordsModified))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1421,7 +1421,7 @@ STDMETHODIMP CFileProcessingDB::GetTags(IStrToStrMap **ppTags)
 	{
 		validateLicense();
 
-//		if (!GetTags_Internal(false, ppTags))
+		if (!GetTags_Internal(false, ppTags))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1441,7 +1441,7 @@ STDMETHODIMP CFileProcessingDB::GetTagNames(IVariantVector **ppTagNames)
 	{
 		validateLicense();
 
-//		if (!GetTagNames_Internal(false, ppTagNames))
+		if (!GetTagNames_Internal(false, ppTagNames))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1462,7 +1462,7 @@ STDMETHODIMP CFileProcessingDB::HasTags(VARIANT_BOOL* pvbVal)
 	{
 		validateLicense();
 
-//		if (!HasTags_Internal(false, pvbVal))
+		if (!HasTags_Internal(false, pvbVal))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1482,7 +1482,7 @@ STDMETHODIMP CFileProcessingDB::TagFile(long nFileID, BSTR bstrTagName)
 	{
 		validateLicense();
 
-//		if (!TagFile_Internal(false, nFileID, bstrTagName))
+		if (!TagFile_Internal(false, nFileID, bstrTagName))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1502,7 +1502,7 @@ STDMETHODIMP CFileProcessingDB::UntagFile(long nFileID, BSTR bstrTagName)
 	{
 		validateLicense();
 
-//		if (!UntagFile_Internal(false, nFileID, bstrTagName))
+		if (!UntagFile_Internal(false, nFileID, bstrTagName))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1522,7 +1522,7 @@ STDMETHODIMP CFileProcessingDB::ToggleTagOnFile(long nFileID, BSTR bstrTagName)
 	{
 		validateLicense();
 
-//		if (!ToggleTagOnFile_Internal(false, nFileID, bstrTagName))
+		if (!ToggleTagOnFile_Internal(false, nFileID, bstrTagName))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1559,7 +1559,7 @@ STDMETHODIMP CFileProcessingDB::AddTag(BSTR bstrTagName, BSTR bstrTagDescription
 		}
 
 		bool bFailIfExists = asCppBool(vbFailIfExists);
-//		if (!AddTag_Internal(false, strTagName, strDescription, bFailIfExists))
+		if (!AddTag_Internal(false, strTagName, strDescription, bFailIfExists))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1579,7 +1579,7 @@ STDMETHODIMP CFileProcessingDB::DeleteTag(BSTR bstrTagName)
 	{
 		validateLicense();
 
-//		if (!DeleteTag_Internal(false, bstrTagName))
+		if (!DeleteTag_Internal(false, bstrTagName))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1601,7 +1601,7 @@ STDMETHODIMP CFileProcessingDB::ModifyTag(BSTR bstrOldTagName, BSTR bstrNewTagNa
 	{
 		validateLicense();
 
-//		if (!ModifyTag_Internal(false, bstrOldTagName, bstrNewTagName,bstrNewTagDescription))
+		if (!ModifyTag_Internal(false, bstrOldTagName, bstrNewTagName,bstrNewTagDescription))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1622,7 +1622,7 @@ STDMETHODIMP CFileProcessingDB::GetFilesWithTags(IVariantVector* pvecTagNames,
 	{
 		validateLicense();
 
-//		if (!GetFilesWithTags_Internal(false, pvecTagNames, vbAndOperation, ppvecFileIDs))
+		if (!GetFilesWithTags_Internal(false, pvecTagNames, vbAndOperation, ppvecFileIDs))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1641,7 +1641,7 @@ STDMETHODIMP CFileProcessingDB::GetTagsOnFile(long nFileID, IVariantVector** ppv
 	{
 		validateLicense();
 
-//		if (!GetTagsOnFile_Internal(false, nFileID, ppvecTagNames))
+		if (!GetTagsOnFile_Internal(false, nFileID, ppvecTagNames))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1682,8 +1682,8 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFilesWithTags(IVariantVector *pvecTa
 	{
 		validateLicense();
 
-//		if (!SetStatusForFilesWithTags_Internal(false, pvecTagNames, vbAndOperation, 
-//			nToActionID, eaNewStatus, nFromActionID))
+		if (!SetStatusForFilesWithTags_Internal(false, pvecTagNames, vbAndOperation, 
+			nToActionID, eaNewStatus, nFromActionID))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1768,7 +1768,7 @@ STDMETHODIMP CFileProcessingDB::ExecuteCommandQuery(BSTR bstrQuery, long* pnReco
 		validateLicense();
 
 
-//		if (!ExecuteCommandQuery_Internal(false, bstrQuery, pnRecordsAffected))
+		if (!ExecuteCommandQuery_Internal(false, bstrQuery, pnRecordsAffected))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1833,7 +1833,7 @@ STDMETHODIMP CFileProcessingDB::UnregisterActiveFAM()
 	{
 		validateLicense();
 
-//		if (!UnregisterActiveFAM_Internal(false))
+		if (!UnregisterActiveFAM_Internal(false))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -1854,8 +1854,8 @@ STDMETHODIMP CFileProcessingDB::SetPriorityForFiles(BSTR bstrSelectQuery, EFileP
 		validateLicense();
 
 
-//		if (!SetPriorityForFiles_Internal(false, bstrSelectQuery, eNewPriority, pRandomCondition, 
-//			pnNumRecordsModified))
+		if (!SetPriorityForFiles_Internal(false, bstrSelectQuery, eNewPriority, pRandomCondition, 
+			pnNumRecordsModified))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -2056,7 +2056,7 @@ STDMETHODIMP CFileProcessingDB::RecordFAMSessionStop()
 
 	try
 	{
-//		if (!RecordFAMSessionStop_Internal(false))
+		if (!RecordFAMSessionStop_Internal(false))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -2076,7 +2076,7 @@ STDMETHODIMP CFileProcessingDB::RecordInputEvent(BSTR bstrTimeStamp, long nActio
 	try
 	{
 
-//		if (!RecordInputEvent_Internal(false, bstrTimeStamp, nActionID, nEventCount, nProcessID))
+		if (!RecordInputEvent_Internal(false, bstrTimeStamp, nActionID, nEventCount, nProcessID))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -2094,7 +2094,7 @@ STDMETHODIMP CFileProcessingDB::GetLoginUsers(IStrToStrMap**  ppUsers)
 	try
 	{
 
-//		if (!GetLoginUsers_Internal(false, ppUsers))
+		if (!GetLoginUsers_Internal(false, ppUsers))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -2113,7 +2113,7 @@ STDMETHODIMP CFileProcessingDB::AddLoginUser(BSTR bstrUserName)
 		// Check License
 		validateLicense();
 
-//		if (!AddLoginUser_Internal(false, bstrUserName))
+		if (!AddLoginUser_Internal(false, bstrUserName))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -2132,7 +2132,7 @@ STDMETHODIMP CFileProcessingDB::RemoveLoginUser(BSTR bstrUserName)
 		// Check License
 		validateLicense();
 
-//		if (!RemoveLoginUser_Internal(false, bstrUserName))
+		if (!RemoveLoginUser_Internal(false, bstrUserName))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -2152,7 +2152,7 @@ STDMETHODIMP CFileProcessingDB::RenameLoginUser(BSTR bstrUserNameToRename, BSTR 
 		// Check License
 		validateLicense();
 
-//		if (!RenameLoginUser_Internal(false, bstrUserNameToRename, bstrNewUserName))
+		if (!RenameLoginUser_Internal(false, bstrUserNameToRename, bstrNewUserName))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -2172,7 +2172,7 @@ STDMETHODIMP CFileProcessingDB::ClearLoginUserPassword(BSTR bstrUserName)
 		// Check License
 		validateLicense();
 
-//		if (!ClearLoginUserPassword_Internal(false, bstrUserName))
+		if (!ClearLoginUserPassword_Internal(false, bstrUserName))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -2191,7 +2191,7 @@ STDMETHODIMP CFileProcessingDB::GetAutoCreateActions(VARIANT_BOOL* pvbValue)
 	{
 		validateLicense();
 
-//		if (!GetAutoCreateActions_Internal(false, pvbValue))
+		if (!GetAutoCreateActions_Internal(false, pvbValue))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -2210,7 +2210,7 @@ STDMETHODIMP CFileProcessingDB::AutoCreateAction(BSTR bstrActionName, long* plId
 	{
 		validateLicense();
 
-//		if (!AutoCreateAction_Internal(false, bstrActionName, plId))
+		if (!AutoCreateAction_Internal(false, bstrActionName, plId))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -2263,7 +2263,7 @@ STDMETHODIMP CFileProcessingDB::GetFileRecord(BSTR bstrFile, BSTR bstrActionName
 	{
 		validateLicense();
 		
-//		if (!GetFileRecord_Internal(false, bstrFile, bstrActionName, ppFileRecord))
+		if (!GetFileRecord_Internal(false, bstrFile, bstrActionName, ppFileRecord))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -2283,7 +2283,7 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToProcessing(long nFileId, long nAc
 	{
 		validateLicense();
 
-//		if (!SetFileStatusToProcessing_Internal(false, nFileId, nActionID))
+		if (!SetFileStatusToProcessing_Internal(false, nFileId, nActionID))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -2340,7 +2340,7 @@ STDMETHODIMP CFileProcessingDB::RenameFile(IFileRecord* pFileRecord, BSTR bstrNe
 		validateLicense();
 
 
-//		if (!RenameFile_Internal(false, pFileRecord, bstrNewName))
+		if (!RenameFile_Internal(false, pFileRecord, bstrNewName))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -2360,7 +2360,7 @@ STDMETHODIMP CFileProcessingDB::get_DBInfoSettings(IStrToStrMap** ppSettings)
 		validateLicense();
 		ASSERT_ARGUMENT("ELI31907", ppSettings != __nullptr);
 
-//		if (!get_DBInfoSettings_Internal(false, ppSettings))
+		if (!get_DBInfoSettings_Internal(false, ppSettings))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -2385,7 +2385,7 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSettings(IStrToStrMap* pSettings, long*
 		ASSERT_ARGUMENT("ELI32173", pnNumRowsUpdated != __nullptr);
 
 		string strSettingVal;
-//		if (!GetDBInfoSetting_Internal(false, gstrSTORE_DB_INFO_HISTORY, true, strSettingVal))
+		if (!GetDBInfoSetting_Internal(false, gstrSTORE_DB_INFO_HISTORY, true, strSettingVal))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -2420,7 +2420,7 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSettings(IStrToStrMap* pSettings, long*
 		}
 
 		long nNumRowsUpdated = 0;
-//		if (!SetDBInfoSettings_Internal(false, bUpdateHistory, vecQueries, nNumRowsUpdated))
+		if (!SetDBInfoSettings_Internal(false, bUpdateHistory, vecQueries, nNumRowsUpdated))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
@@ -2444,8 +2444,8 @@ STDMETHODIMP CFileProcessingDB::RecordFTPEvent(long nFileId, long nActionID,
 	{
 		validateLicense();
 
-//		if (!RecordFTPEvent_Internal(false, nFileId, nActionID, vbQueueing, eFTPAction,
-//				bstrServerAddress, bstrUserName, bstrArg1, bstrArg2, nRetries, bstrException))
+		if (!RecordFTPEvent_Internal(false, nFileId, nActionID, vbQueueing, eFTPAction,
+				bstrServerAddress, bstrUserName, bstrArg1, bstrArg2, nRetries, bstrException))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);

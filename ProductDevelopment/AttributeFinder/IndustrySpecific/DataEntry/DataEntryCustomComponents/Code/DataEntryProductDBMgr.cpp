@@ -405,8 +405,8 @@ STDMETHODIMP CDataEntryProductDBMgr::AddDataEntryData(long lFileID, long nAction
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-//		if (!AddDataEntryData_Internal(false, lFileID, nActionID, dDuration, dOverheadTime,
-//				plInstanceID))
+		if (!AddDataEntryData_Internal(false, lFileID, nActionID, dDuration, dOverheadTime,
+				plInstanceID))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(m_ipFAMDB,
