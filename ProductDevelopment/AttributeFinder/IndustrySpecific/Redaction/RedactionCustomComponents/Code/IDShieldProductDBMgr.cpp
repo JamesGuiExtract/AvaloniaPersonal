@@ -418,9 +418,9 @@ STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long lFileID, VARIANT_BOOL v
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		if (!AddIDShieldData_Internal(false, lFileID, vbVerified, dDuration, dOverheadTime,
-			lNumHCDataFound, lNumMCDataFound, lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, 
-			lTotalManualRedactions, lNumPagesAutoAdvanced))
+//		if (!AddIDShieldData_Internal(false, lFileID, vbVerified, dDuration, dOverheadTime,
+//			lNumHCDataFound, lNumMCDataFound, lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, 
+//			lTotalManualRedactions, lNumPagesAutoAdvanced))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(m_ipFAMDB, gstrMAIN_DB_LOCK);
