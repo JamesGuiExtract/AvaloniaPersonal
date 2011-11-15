@@ -70,6 +70,7 @@ static const string gstrINSERT_DATAENTRY_DATA_RCD =
     "  ,[DateTimeStamp]"
     "  ,[Duration]"
 	"  ,[OverheadTime]) "
+	"  OUTPUT INSERTED.ID"
 	"  VALUES ";
 
 // Deletes all records in the DataEntryData table that 

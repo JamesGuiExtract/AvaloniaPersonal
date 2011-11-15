@@ -401,23 +401,6 @@ double getDoubleField( const FieldsPtr& ipFields, const string& strFieldName )
 	}
 }
 //-------------------------------------------------------------------------------------------------
-long getLastTableID( const _ConnectionPtr& ipDBConnection, string strTableName )
-{
-	ASSERT_ARGUMENT("ELI18816", ipDBConnection != __nullptr);
-
-	_RecordsetPtr ipRSet;
-	// Build SQL string to get the last ID for the given table
-	string strGetIDSQL = "SELECT IDENT_CURRENT ('" + strTableName + "') AS CurrentID";
-
-	// Execute the command 
-	ipRSet = ipDBConnection->Execute( strGetIDSQL.c_str(), NULL, adCmdUnknown );
-	ASSERT_RESOURCE_ALLOCATION("ELI13525", ipRSet != __nullptr );
-
-	// The ID field in all of the tables is a 32 bit int so
-	// the value returned by this function can be changed to type long
-	return (long) getLongLongField( ipRSet->Fields, "CurrentID" );
-}
-//-------------------------------------------------------------------------------------------------
 string getSQLServerDateTime( const _ConnectionPtr& ipDBConnection )
 {
 	ASSERT_ARGUMENT("ELI18817", ipDBConnection != __nullptr);
@@ -487,7 +470,8 @@ string createConnectionString(const string& strServer, const string& strDatabase
 	return strConnectionString;
 }
 //-------------------------------------------------------------------------------------------------
-long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQuery, bool bDisplayExceptions)
+long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQuery,
+	bool bDisplayExceptions, long *pnOutputID)
 {
 	ASSERT_ARGUMENT("ELI18818", ipDBConnection != __nullptr);
 
@@ -496,8 +480,22 @@ long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQ
 	{
 		try
 		{
-			// Execute the SQL drop script
-			ipDBConnection->Execute(strSQLQuery.c_str(), &vtRecordsAffected, adCmdText | adExecuteNoRecords );
+			if (pnOutputID == __nullptr)
+			{
+				ipDBConnection->Execute(strSQLQuery.c_str(),
+					&vtRecordsAffected, adCmdText | adExecuteNoRecords);
+			}
+			else
+			{
+				_RecordsetPtr ipResult = 
+					ipDBConnection->Execute(strSQLQuery.c_str(), __nullptr, adCmdUnknown);
+				ASSERT_RESOURCE_ALLOCATION("ELI34111", ipResult != __nullptr);
+
+				// If pnOutputID is provided, it is assumed the query will return a single record
+				// with a field name of "ID".
+				ipResult->MoveFirst();
+				*pnOutputID = getLongField(ipResult->Fields, "ID");
+			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI14382");
 	}
@@ -550,7 +548,12 @@ long getKeyID(const _ConnectionPtr& ipDBConnection, const string& strTable, cons
 			ipKeySet->AddNew();
 			setStringField(ipKeySet->Fields, strKeyCol, rstrKey, true);
 			ipKeySet->Update();
-			lID = getLastTableID(ipDBConnection, strTable);
+
+			// [LegacyRCAndUtils:6154]
+			// Since IDENT_CURRENT can return the wrong ID when multiple processes are updating the
+			// same table and there is a known bug with SCOPE_IDENTITY() and @@IDENTITY, re-query to
+			// get the ID of the newly added row.
+			return getKeyID(ipDBConnection,strTable, strKeyCol, rstrKey, bAddKey);
 		}
 		else
 		{

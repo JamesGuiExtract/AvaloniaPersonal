@@ -118,6 +118,10 @@ private:
 		long lNumLCDataFound, long lNumCluesDataFound, long lTotalRedactions,
 		long lTotalManualRedactions, long lNumPagesAutoAdvanced);
 
+	bool GetResultsForQuery_Internal(bool bDBLocked, BSTR bstrQuery, _Recordset** ppVal);
+
+	bool GetFileID_Internal(bool bDBLocked, BSTR bstrFileName, long* plFileID);
+
 	// Retrieves the set of SQL queries used to create the IDShield specific database tables.
 	const vector<string> getTableCreationQueries();
 

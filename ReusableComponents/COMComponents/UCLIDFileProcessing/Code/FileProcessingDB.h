@@ -463,7 +463,7 @@ private:
 
 	// PROMISE:	To return the ID from the Action table from the given Action Name and modify strActionName to match
 	//			the action name stored in the database using the connection object provided.
-	long getActionID(_ConnectionPtr ipConnection, string& rstrActionName);
+	long getActionID(_ConnectionPtr ipConnection, const string& rstrActionName);
 
 	// PROMISE: To return the Action name for the given ID using the connection object provided;
 	string getActionName(_ConnectionPtr ipConnection, long nActionID);

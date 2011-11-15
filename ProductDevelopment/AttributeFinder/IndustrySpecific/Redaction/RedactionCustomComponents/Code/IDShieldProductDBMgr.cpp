@@ -467,33 +467,17 @@ STDMETHODIMP CIDShieldProductDBMgr::GetResultsForQuery(BSTR bstrQuery, _Recordse
 
 		validateLicense();
 
-		// validate IDShield schema
-		validateIDShieldSchemaVersion(true);
+		if (!GetResultsForQuery_Internal(false, bstrQuery, ppVal))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(m_ipFAMDB, gstrMAIN_DB_LOCK);
 
-		// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
-		_ConnectionPtr ipConnection = __nullptr;
+			GetResultsForQuery_Internal(true, bstrQuery, ppVal);
+		}
 
-		BEGIN_ADO_CONNECTION_RETRY();
-
-		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
-
-		// Create a pointer to a recordset
-		_RecordsetPtr ipResultSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI19531", ipResultSet != __nullptr );
-
-		// Open the Action table
-		ipResultSet->Open( bstrQuery, _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-			adLockReadOnly, adCmdText );
-
-		*ppVal = ipResultSet.Detach();
-
-		END_ADO_CONNECTION_RETRY(
-			ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29859");
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19530");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CIDShieldProductDBMgr::GetFileID(BSTR bstrFileName, long* plFileID)
@@ -508,28 +492,17 @@ STDMETHODIMP CIDShieldProductDBMgr::GetFileID(BSTR bstrFileName, long* plFileID)
 		// validate the license
 		validateLicense();
 
-		// validate IDShield schema
-		validateIDShieldSchemaVersion(true);
+		if (!GetFileID_Internal(false, bstrFileName, plFileID))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(m_ipFAMDB, gstrMAIN_DB_LOCK);
 
-		// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
-		_ConnectionPtr ipConnection = __nullptr;
-
-		BEGIN_ADO_CONNECTION_RETRY();
-
-		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
-
-		// query the database for the file ID
-		*plFileID = getKeyID(ipConnection, "FAMFile", "FileName", asString(bstrFileName), 
-			false);
-
-		END_ADO_CONNECTION_RETRY(
-			ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29860");
+			GetFileID_Internal(true, bstrFileName, plFileID);
+		}
+		
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI20179");
-
-	return S_OK;
-
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -684,6 +657,87 @@ bool CIDShieldProductDBMgr::AddIDShieldData_Internal(bool bDBLocked, long lFileI
 				ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29858");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30710");
+	}
+	catch(UCLIDException ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CIDShieldProductDBMgr::GetResultsForQuery_Internal(bool bDBLocked, BSTR bstrQuery,
+	_Recordset** ppVal)
+{
+	try
+	{
+		try
+		{
+			// validate IDShield schema
+			validateIDShieldSchemaVersion(true);
+
+			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
+			_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_ADO_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			// Create a pointer to a recordset
+			_RecordsetPtr ipResultSet( __uuidof( Recordset ));
+			ASSERT_RESOURCE_ALLOCATION("ELI19531", ipResultSet != __nullptr );
+
+			// Open the Action table
+			ipResultSet->Open( bstrQuery, _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
+				adLockReadOnly, adCmdText );
+
+			*ppVal = ipResultSet.Detach();
+
+			END_ADO_CONNECTION_RETRY(
+				ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29859");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34112");
+	}
+	catch(UCLIDException ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CIDShieldProductDBMgr::GetFileID_Internal(bool bDBLocked, BSTR bstrFileName, long* plFileID)
+{
+	try
+	{
+		try
+		{
+			// validate IDShield schema
+			validateIDShieldSchemaVersion(true);
+
+			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
+			_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_ADO_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			// query the database for the file ID
+			*plFileID = getKeyID(ipConnection, "FAMFile", "FileName", asString(bstrFileName), 
+				false);
+
+			END_ADO_CONNECTION_RETRY(
+				ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29860");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34113");
 	}
 	catch(UCLIDException ue)
 	{

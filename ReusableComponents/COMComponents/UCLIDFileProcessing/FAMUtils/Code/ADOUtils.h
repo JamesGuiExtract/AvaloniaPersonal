@@ -181,9 +181,6 @@ FAMUTILS_API void setTimeDateField( const FieldsPtr& ipFields, const string& str
 //			if the field is of the wrong type an exception will be thrown
 FAMUTILS_API void setDoubleField( const FieldsPtr& ipFields, const string& strFieldName, const double& dValue );
 
-// PROMISE:	To return the last Identity value for the last record added to the given table using the given connection
-FAMUTILS_API long getLastTableID ( const _ConnectionPtr& ipDBConnection, string strTableName );
-
 // PROMISE:	To return datetime as string from the SQL server using the GETDATE() SQL function 
 FAMUTILS_API string getSQLServerDateTime( const _ConnectionPtr& ipDBConnection );
 
@@ -197,7 +194,14 @@ FAMUTILS_API string createConnectionString(const string& strServer, const string
 // NOTES:	strSQLQuery must be a query that returns no records
 //			if bDisplayExceptions == false any exceptions will be thrown to caller
 //			if bDisplayExceptions == true any exceptions will be displayed and 0 will be returned
-FAMUTILS_API long executeCmdQuery( const _ConnectionPtr& ipDBConnection, const string& strSQLQuery, bool bDisplayExceptions = false );
+//			If pnOutputID is not NULL, it is assumed that the query will return a single long value
+//			with a field name of "ID". (presumably the ID of the record added/affected) Typically
+//			this ID will be generated using the "Output" SQL clause.
+// REQUIRED: This call must be made from code that has either explicitly locked the database or is
+//			testing for the case that optimistic locking failed. Outside of the FileProcessingDB
+//			class FileProcessingDB::ExecuteCommandQuery should be used instead.
+FAMUTILS_API long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQuery,
+	bool bDisplayExceptions = false, long *pnOutputID = __nullptr);
 
 // Returns ID from the given table by looking up the strKey in the key column and if
 // the key is not found it is added to the table if bAddKey is true and the new ID is returned

@@ -631,9 +631,7 @@ bool CDataEntryProductDBMgr::AddDataEntryData_Internal(bool bDBLocked, long lFil
 			}
 
 			// Insert the record
-			executeCmdQuery(ipConnection, strInsertSQL);
-
-			*plInstanceID = getLastTableID(ipConnection, "DataEntryData");
+			executeCmdQuery(ipConnection, strInsertSQL, false, plInstanceID);
 
 			// Commit the transactions
 			tg.CommitTrans();

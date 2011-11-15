@@ -613,13 +613,11 @@ STDMETHODIMP CFileProcessingDB::Clear(VARIANT_BOOL vbRetainUserValues)
 		// Validate the license
 		validateLicense();
 	
-		if (!Clear_Internal(false, vbRetainUserValues))
-		{
-			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+		// Always lock the database for Clear()
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			
-			Clear_Internal(true, vbRetainUserValues);
-		}
+		Clear_Internal(true, vbRetainUserValues);
+
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14088");
@@ -1805,13 +1803,12 @@ STDMETHODIMP CFileProcessingDB::RegisterActiveFAM(long lActionID, VARIANT_BOOL v
 		// This creates a record in the ActiveFAM table and the LastPingTime
 		// is set to the current time by default.
 		executeCmdQuery(getDBConnection(), 
-			"INSERT INTO ActiveFAM (UPI, ActionID, Queuing, Processing) "
-			"VALUES ('" + m_strUPI + "', '" + asString(lActionID) + "', '" 
-			+ (asCppBool(vbQueuing) ? "1" : "0") + "', '"
-			+ (asCppBool(vbProcessing) ? "1" : "0") + "')");
-
-		// get the new records ID to return
-		m_nUPIID = getLastTableID(getDBConnection(), "ActiveFAM");
+			string("INSERT INTO ActiveFAM (UPI, ActionID, Queuing, Processing) ")
+				+ "OUTPUT INSERTED.ID "
+				+ "VALUES ('" + m_strUPI + "', '" + asString(lActionID) + "', '" 
+				+ (asCppBool(vbQueuing) ? "1" : "0") + "', '"
+				+ (asCppBool(vbProcessing) ? "1" : "0") + "') ",
+			false, (long*)&m_nUPIID);
 
 		m_eventStopPingThread.reset();
 		m_eventPingThreadExited.reset();

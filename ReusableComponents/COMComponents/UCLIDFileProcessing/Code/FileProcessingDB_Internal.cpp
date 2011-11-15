@@ -601,7 +601,7 @@ void CFileProcessingDB::addQueueEventRecord(_ConnectionPtr ipConnection, long nF
 	}
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::addFileActionStateTransition (_ConnectionPtr ipConnection,
+void CFileProcessingDB::addFileActionStateTransition(_ConnectionPtr ipConnection,
 													  long nFileID, long nActionID, 
 													  const string &strFromState, 
 													  const string &strToState, 
@@ -650,11 +650,11 @@ long CFileProcessingDB::getFileID(_ConnectionPtr ipConnection, string& rstrFileN
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26720");
 }
 //--------------------------------------------------------------------------------------------------
-long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, string& rstrActionName)
+long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, const string& rstrActionName)
 {
 	try
 	{
-		return getKeyID(ipConnection, gstrACTION, "ASCName", rstrActionName, false);
+		return getKeyID(ipConnection, gstrACTION, "ASCName", string(rstrActionName), false);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26721");
 }
@@ -720,7 +720,11 @@ long CFileProcessingDB::addActionToRecordset(_ConnectionPtr ipConnection,
 		ipRecordset->Update();
 
 		// Get the ID of the new Action
-		long lActionId = getLastTableID(ipConnection, "Action");
+		// [LegacyRCAndUtils:6154]
+		// Since IDENT_CURRENT can return the wrong ID when multiple processes are updating the
+		// same table and there is a known bug with SCOPE_IDENTITY() and @@IDENTITY, re-query to
+		// get the ID of the newly added action.
+		long lActionId = getActionID(ipConnection, strAction);
 
 		return lActionId;
 	}
@@ -1726,6 +1730,12 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 				// Add the lock
 				executeCmdQuery(ipConnection, strAddLockSQL);
 
+				// [LegacyRCAndUtils:6154]
+				// If this thread has the lock, but collides with another thread which is not locked
+				// over a database resource, the thread that is locked should win the deadlock
+				// (cause the unlocked thread to be chosen as the deadlock victim).
+				executeCmdQuery(ipConnection, "SET DEADLOCK_PRIORITY HIGH");
+
 				// Commit the changes
 				// If a DB lock is in the table for another process this will throw an exception
 				tg.CommitTrans();
@@ -1781,6 +1791,9 @@ void CFileProcessingDB::unlockDB(_ConnectionPtr ipConnection, const string& strL
 	{
 		try
 		{
+			// Restore normal deadlock priority.
+			executeCmdQuery(ipConnection, "SET DEADLOCK_PRIORITY NORMAL");
+
 			// Delete the Lock record
 			string strDeleteSQL = gstrDELETE_DB_LOCK + " AND UPI = '" + m_strUPI + "'";
 			replaceVariable(strDeleteSQL, gstrDB_LOCK_NAME_VAL, strLockName);
@@ -3169,8 +3182,9 @@ void CFileProcessingDB::pingDB()
 		return;
 	}
 
-	// Lock mutex so that a call from the connection retry functionality will not collide
-	CSingleLock lock(&m_mutex, TRUE);
+	// Lock main static mutex so that we can ensure no other thread from this process is also
+	// trying to access the same entry in ActiveFAM (that would be using the same UPIID)
+	CSingleLock lock(&ms_mutexMainLock, TRUE);
 
 	// Always call the getKeyID so that if the record was removed by another
 	// instance because this instance lost the DB for a while
