@@ -5669,7 +5669,7 @@ bool CFileProcessingDB::SetDBInfoSettings_Internal(bool bDBLocked, bool bUpdateH
 						it != vecQueries.end(); it++)
 					{
 						replaceVariable(*it, gstrUSER_ID_VAR, strUserId, kReplaceAll);
-						replaceVariable(*it, gstrMACHINE_ID_VAR, strUserId, kReplaceAll);
+						replaceVariable(*it, gstrMACHINE_ID_VAR, strMachineId, kReplaceAll);
 					}
 				}
 
