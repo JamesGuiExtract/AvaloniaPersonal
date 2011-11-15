@@ -3542,6 +3542,10 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 				{
 					try
 					{
+						// Maintains a list of files getting set to processing until the transaction
+						// has completed successfully.
+						vector<UCLID_FILEPROCESSINGLib::IFileRecordPtr> tempFileVector;
+
 						// Action Column to change
 						string strActionName = getActionName(ipConnection, nActionID);
 
@@ -3576,8 +3580,13 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 								getFileRecordFromFields(ipFields);
 							ASSERT_RESOURCE_ALLOCATION("ELI30404", ipFileRecord != __nullptr);
 
-							// Put record in list of records to return
-							ipFiles->PushBack(ipFileRecord);
+							// [LegacyRCAndUtils:6225]
+							// Do not add the record to ipFiles until after we have successfully
+							// committed the transaction. If another thread/process has tried to
+							// grab the same file, an "Invalid File State Transition" exception
+							// will be thrown and, therefore, this thread/process should not process
+							// the file.
+							tempFileVector.push_back(ipFileRecord);
 
 							string strFileID = asString(ipFileRecord->FileID);
 
@@ -3605,6 +3614,14 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 
 						// Commit the changes to the database
 						tg.CommitTrans();
+
+						// Now that the transaction has processed correctly, copy the file records
+						// that have been set to processing over to ipFiles.
+						for each (UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord in tempFileVector)
+						{
+							ipFiles->PushBack(ipFileRecord);
+						}
+
 						bTransactionSuccessful = true;
 					}
 					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31138");
