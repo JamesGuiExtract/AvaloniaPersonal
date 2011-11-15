@@ -3182,9 +3182,15 @@ void CFileProcessingDB::pingDB()
 		return;
 	}
 
-	// Lock main static mutex so that we can ensure no other thread from this process is also
-	// trying to access the same entry in ActiveFAM (that would be using the same UPIID)
-	CSingleLock lock(&ms_mutexMainLock, TRUE);
+	// Use ms_mutexPingDBLock to ensure no other thread from this process is also trying to add or
+	// update the same entry in ActiveFAM (any thread from this process would be using the same
+	// UPIID). If another thread has the lock, there is no need to block; we can assume the other
+	// thread will update the ActiveFAM table appropriately.
+	CSingleLock lock(&ms_mutexPingDBLock);
+	if (!asCppBool(lock.Lock(0)))
+	{
+		return;
+	}
 
 	// Always call the getKeyID so that if the record was removed by another
 	// instance because this instance lost the DB for a while

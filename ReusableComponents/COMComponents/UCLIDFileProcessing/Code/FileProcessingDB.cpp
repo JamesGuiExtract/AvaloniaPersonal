@@ -88,6 +88,7 @@ std::string CFileProcessingDB::ms_strCurrServerName = "";
 std::string CFileProcessingDB::ms_strCurrDBName = "";
 CMutex CFileProcessingDB::ms_mutexMainLock;
 CMutex CFileProcessingDB::ms_mutexUserCounterLock;
+CMutex CFileProcessingDB::ms_mutexPingDBLock;
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB

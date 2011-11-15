@@ -259,6 +259,11 @@ private:
 	// Mutex is locked only inside of the get connection method
 	CMutex m_mutex;
 
+	// Ensure only one thread per process is trying to ping the database at once to avoid the chance
+	// of pingDB failing because multiple threads in the same process are trying to add or update
+	// the same an ActiveFAM entry.
+	static CMutex ms_mutexPingDBLock;
+
 	// handle to window that should receive the database status notifications
 	HWND m_hUIWindow;
 
