@@ -1227,6 +1227,28 @@
             		<li>Confirm that you get reasonable behavior pressing <b>F2</b> after
             		manually zooming in on a redaction.</li>
         	</uL></li>
+<p>
+  	   	<LI><b>[FlexIDSCore #4895]</b> Verification Can Stop Processing When Queue Is Empty
+        	<ul>
+			<li>Configure a verification FPS file to <b>Keep processing files as 
+			they are added to the queue</b>.
+			<li>Exercise verification.
+			<li>Confirm that the user can stop processing by closing the verification 
+			window when the queue is empty and no document is open.
+			<li>Confirm that the user can stop processing via <b>File - Stop 
+			processing</b> when the queue is empty and no document is open.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4896]</b> Total Duration versus Overhead Time in DB
+        	<ul>
+			<li>Exercise <b>Verify.fps</b> from the ID Shield Sanity Test.  Note 
+			the long delay between finishing verification of one document and display 
+			of the next document.
+			<li>After verification is complete, exercise the <b>ID Shield verification 
+			times and rates (by user)</b> report.
+			<li>Confirm that a significant portion of the overall verification time 
+			is accounted for in the <b>Overhead Time</b> column.
+        	</ul>
     	</ul></li>
     </ul></li>
 </ul>
