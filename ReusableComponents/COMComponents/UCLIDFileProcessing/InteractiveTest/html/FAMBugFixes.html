@@ -260,6 +260,31 @@
         <li>Confirm that no unusual errors are seen processing with multiple FAM instances on
         separate test machines pointing at the same database.</li>
     </ul></li>
+<p>
+   	<LI><b>[LegacyRC #6175]</b> Clearing ActiveFAM Without Auto-Revert
+       	<ul>
+		<li>Configure a special database to turn off auto-reversion of locked files.
+		<li>Start processing against the database and kill the FAM using 
+		<b>Task Manager</b>.
+		<li>Confirm that one or more files is stuck in <b>Processing</b> 
+		status.
+		<li>Restart processing in less than 24 hours.  Confirm that the stuck files 
+		remain stuck in <b>Processing</b> status.
+		<li>Restart processing after more than 24 hours.  Confirm that the stuck 
+		files have reverted to <b>Pending</b> status.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #6190]</b> FAM Crash On Close
+       	<ul>
+		<li>Open a FAM instance and connect to a database.
+		<li>Select an action and check the <b>Process files in the queue</b> 
+		checkbox.
+		<li>Select but do not configure a <b>Data Entry: Verify extracted data</b> 
+		task.
+		<li>Close the <b>Select Task</b> dialog and close the FAM without saving 
+		changes.
+		<li>Confirm that the FAM closes without error.
+       	</ul>
 </ul>
 </body> 
 </html>
