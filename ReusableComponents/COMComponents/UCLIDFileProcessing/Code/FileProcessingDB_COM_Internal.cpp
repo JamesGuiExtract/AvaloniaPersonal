@@ -1737,6 +1737,12 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 	{
 		try
 		{
+			// Get the connection for the thread and save it locally.
+			if (!m_bFAMRegistered)
+			{
+				throw UCLIDException("ELI34117", "FAM instance is not registered.");
+			}
+
 			static const string strActionIDPlaceHolder = "<ActionIDPlaceHolder>";
 
 			// Set the action name from the parameter

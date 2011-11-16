@@ -3192,29 +3192,33 @@ void CFileProcessingDB::pingDB()
 		return;
 	}
 
-	// Always call the getKeyID so that if the record was removed by another
-	// instance because this instance lost the DB for a while
-	long nUPIID = getKeyID(getDBConnection(), "ActiveFAM", "UPI", m_strUPI);
-	if (nUPIID != m_nUPIID)
+	// Always call the getKeyID to make sure the record wasn't removed by another instance because
+	// this instance lost the DB for a while.
+	try
 	{
-		// The only time m_nUPIID is 0 is when there was no previous instance 
-		if (m_nUPIID > 0 )
+		try
 		{
-			UCLIDException ue("ELI27785", "Application Trace: UPIID has changed.");
-			ue.addDebugInfo("Expected", m_nUPIID);
-			ue.addDebugInfo("New UPIID", nUPIID);
-			ue.log();
+			long nUPIID = getKeyID(getDBConnection(), "ActiveFAM", "UPI", m_strUPI, false);
+			if (nUPIID != m_nUPIID)
+			{
+				UCLIDException ue("ELI34118", "Unexpected UPIID.");
+				ue.addDebugInfo("Expected", m_nUPIID);
+				ue.addDebugInfo("New UPIID", nUPIID);
+				throw ue;
+			}
 		}
-
-		// Update the UPIID
-		m_nUPIID = nUPIID;
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34114");
 	}
-	else
+	catch (UCLIDException &ue)
 	{
-		// Update the ping record. 
-		executeCmdQuery(getDBConnection(), 
-			"UPDATE ActiveFAM SET LastPingTime=GETDATE() WHERE ID = " + asString(nUPIID));
+		UCLIDException ueOuter("ELI34115", "ActiveFAM registration has been lost.", ue);
+		ueOuter.addDebugInfo("UPIID", m_nUPIID);
+		throw ueOuter;
 	}
+
+	// Update the ping record. 
+	executeCmdQuery(getDBConnection(), 
+		"UPDATE ActiveFAM SET LastPingTime=GETDATE() WHERE ID = " + asString(m_nUPIID));
 }
 //--------------------------------------------------------------------------------------------------
 UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
@@ -3229,13 +3233,87 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 		// Enclose so that the exited event can always be signaled if it can be.
 		try
 		{
-			while (pDB->m_eventStopPingThread.wait(gnPING_TIMEOUT) == WAIT_TIMEOUT)
+			try
 			{
-				try
+				while (pDB->m_eventStopPingThread.wait(gnPING_TIMEOUT) == WAIT_TIMEOUT)
 				{
-					pDB->pingDB();
+					// Surround call to PingDB with code from the BEGIN_CONNECTION_RETRY macro to
+					// ensure the ping thread has an opportunity to reconnect just as the processing
+					// does. Unlike BEGIN_CONNECTION_RETRY, it will continue to try to re-establish
+					// connection indefinitely. But if the PingDB call fails on a good connection
+					// even after taking out a lock on the database, the active FAM's registration
+					// will be invalidated preventing further processing.
+					ADODB::_ConnectionPtr ipConnection = __nullptr;
+					bool bRetryExceptionLogged = false;
+					bool bRetrySuccess = false;
+					bool bLock = false;
+					do
+					{
+						CSingleLock retryLock(&(pDB->m_mutex), TRUE);
+						try
+						{
+							try
+							{
+								if (bLock)
+								{
+									// Lock the database if the last attempt with a valid connection
+									// failed.
+									LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(
+										pDB, gstrMAIN_DB_LOCK);
+
+									ipConnection = pDB->getDBConnection();
+
+									pDB->pingDB();
+								}
+								else
+								{
+									ipConnection = pDB->getDBConnection();
+
+									pDB->pingDB();
+								}
+
+								bRetrySuccess = true;
+							}
+							CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34116")
+						}
+						catch (UCLIDException &ue)
+						{
+							if (pDB->isConnectionAlive(ipConnection))
+							{ 
+								// If the update failed without a lock, try again with a lock.
+								if (!bLock)
+								{
+									bLock = true;
+									continue;
+								}
+
+								throw ue;
+							}
+
+							// If the connection is not valid, the next attempt with a valid
+							// connection should be without a lock.
+							bLock = false;
+
+							try
+							{
+								// Unlike with END_CONNECTION_RETRY, failed reconnections here
+								// shouldn't be fatal. Just keep trying until processing is
+								// stopped or we finally get a connection.
+								pDB->reConnectDatabase();
+							}
+							catch (...) {}
+						}
+					}
+					while (!bRetrySuccess);
 				}
-				CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27747");
+			}
+			catch (...)
+			{
+				// If we cannot succeed in pinging the database, consider this instance to be
+				// unregistered which will prevent any further processing.
+				pDB->m_bFAMRegistered = false;
+
+				throw;
 			}
 		}
 		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27858");
