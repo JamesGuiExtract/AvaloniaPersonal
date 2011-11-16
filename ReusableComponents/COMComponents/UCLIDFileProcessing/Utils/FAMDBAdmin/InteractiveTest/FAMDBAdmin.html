@@ -349,6 +349,7 @@
 					much history to store.</li>
                 		</ul></li>
                 		<li>Store database settings change history</li>
+                		<li>Store FTP event history</li>
             		</ul></li>
             		<li>Confirm that all settings are correctly propagated back to the <b>DBInfo</b>
             		table.</li>
@@ -710,6 +711,17 @@
 			not take an inordinately long time, even when the list of files to change is the 
 			result of a selection requiring a SQL query.</li>
         	</ul></li>
+<p>
+  	   	<LI><b>[LegacyRC #6204]</b> Select File Dialog
+        	<ul>
+			<li>Supply some files to a database
+			<li>Choose <b>Tools - Manually set action status</b> and click the 
+			<b>Select Files</b> button.
+			<li>Click the random selection checkbox and specify a number of 
+			<b>files</b>.
+			<li>Click <b>OK</b>.
+			<li>Confirm that the expected number of files had a change in status.
+        	</ul>
     	</ul></li>
 <p>
     	<li><b>Manually set file processing priority...</b>
