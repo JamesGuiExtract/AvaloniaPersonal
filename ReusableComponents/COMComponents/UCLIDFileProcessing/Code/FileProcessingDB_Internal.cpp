@@ -3278,6 +3278,11 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 						}
 						catch (UCLIDException &ue)
 						{
+							if (pDB->m_eventStopPingThread.wait(0) != WAIT_TIMEOUT)
+							{
+								break;
+							}
+
 							if (pDB->isConnectionAlive(ipConnection))
 							{ 
 								// If the update failed without a lock, try again with a lock.

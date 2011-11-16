@@ -1737,16 +1737,34 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 	{
 		try
 		{
-			// Get the connection for the thread and save it locally.
+			// Set the action name from the parameter
+			string strActionName = asString(strAction);
+
+			// If the FAM has lost its registration, re-register before continuing with processing.
 			if (!m_bFAMRegistered)
 			{
-				throw UCLIDException("ELI34117", "FAM instance is not registered.");
+				// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+				ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+				BEGIN_CONNECTION_RETRY();
+
+				ipConnection = getDBConnection();
+
+				// Re-add a new "Processing" ActiveFAM table entry. (The circumstances where this
+				// code will be used are rare, and not worth finding a way to pass on whether
+				// queuing is active).
+				UnregisterActiveFAM();
+				RegisterActiveFAM(getActionID(ipConnection, strActionName), VARIANT_FALSE, VARIANT_TRUE);
+
+				END_CONNECTION_RETRY(ipConnection, "ELI30377");
+
+				UCLIDException ue("ELI34130",
+					"Application trace: ActiveFAM registration has been restored.");
+				ue.addDebugInfo("UPIID", m_nUPIID);
+				ue.log();
 			}
 
 			static const string strActionIDPlaceHolder = "<ActionIDPlaceHolder>";
-
-			// Set the action name from the parameter
-			string strActionName = asString(strAction);
 
 			string strUPIID = asString(m_nUPIID);
 
