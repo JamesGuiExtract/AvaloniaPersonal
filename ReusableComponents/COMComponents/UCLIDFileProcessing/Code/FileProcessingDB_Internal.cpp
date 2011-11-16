@@ -3249,7 +3249,6 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 					bool bLock = false;
 					do
 					{
-						CSingleLock retryLock(&(pDB->m_mutex), TRUE);
 						try
 						{
 							try
