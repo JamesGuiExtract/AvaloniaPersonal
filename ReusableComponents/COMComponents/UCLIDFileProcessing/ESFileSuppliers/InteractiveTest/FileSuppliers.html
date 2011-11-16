@@ -424,19 +424,28 @@
                 	box, blank by default.</li>
                 	<li>Confirm the presence of a <b>Recursively download files from any 
                 	subfolders</b> checkbox, unchecked by default.</li>
-                	<li>Confirm the presence of a <b>Keep polling the remote location for new 
-			files</b> checkbox, unchecked by default.</li>
-                	<li>Confirm the presence of a related <b>minute(s)</b> spin control set 
-			to <b>1</b> by default and enabled only when the checkbox is checked.</li>
-                	<li>Confirm the presence of an <b>After downloading the remote file</b> 
-			group box containing the following controls:
-                	<ul>
-                    		<li>an <b>Append the following</b> radio button with an associated 
-				edit box</li>
-                    		<li>a <b>Delete the remote file</b> radio button selected by 
-				default</li>
-                    		<li>a <b>Do nothing</b> radio button</li>
-                	</ul></li>
+			<li>Confirm that the groupbox  contains a <b>Download 
+			files just once</b> radio button.
+			<li>Confirm that the groupbox  contains a <b>Keep polling 
+			the remote location for new files every minute(s)</b> 
+			radio button.
+			<li>Confirm that the associated spin control is enabled only 
+			when the radio button is selected.
+			<li>Confirm that the groupbox  contains a <b>Poll the 
+			remote location for new files at these times of the day</b> 
+			radio button.
+			<li>Confirm that the associated edit box is enabled only 
+			when the radio button is selected.
+<p>
+			<li>Confirm that the polling frequency is used properly. 
+			<li>Confirm that polling at specific times works properly
+			<ul>
+				<li>for times such as <b>9:00 AM</b>
+				<li>for times such as <b>2PM</b>
+				<li>for times such as <b>1500</b>
+				<li>for times such as <b>9:22 AM</b>
+				<li>for times such as <b>9:47:33 AM</b>
+			</ul>
                 	<li>Confirm the presence of a <b>Local working folder</b> edit box with 
 			associated tag selector and browse button.</li>
             	</ul></li>
@@ -545,6 +554,28 @@
 			<li>Exercise the FPS file and confirm that files are saved locally to 
 			<b>D:\tmp</b>.
             	</ul></li>
+<p>
+  	   	<LI><b>[LegacyRC #6199]</b> FTP File Supplier Exception
+        	<ul>
+			<li>Configure an FTP file supplier to supply files from a remote folder 
+			that contains files.
+			<li>Confirm that files are successfully downloaded to a specified folder.
+			<li>Confirm that no <b>ELI32453: Unable to generate local path</b> 
+			internal exceptions are logged.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6201]</b> FAM Crash with FTP File Supplier
+        	<ul>
+			<li>Confirm that the auto-revert timeout is a manageable value such 
+			as 5 minutes.
+			<li>Kill a FAM instance that is actively processing a file.
+			<li>Use <b>DB Admin</b> to set the file action status of the processing 
+			files to any <u>other</u> status than <b>Pending</b>.
+			<li>Wait until the auto-revert time period has passed.
+			<li>Open the FAM and start processing again.
+			<li>Confirm that the previously <b>stuck</b> files are NOT reverted 
+			to <b>Pending</b>.
+        	</ul>
 	</ul></li>
 <p>
     	<li>Select <b>Files from static list</b> as the file supplier in Select File Supplier dialog, 
