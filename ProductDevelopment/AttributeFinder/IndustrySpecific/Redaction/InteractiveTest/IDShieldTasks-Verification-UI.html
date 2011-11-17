@@ -127,7 +127,6 @@
                 appropriate tooltip text.
                 <ul>
                     <li>Slideshow play (F5)</li>
-                    <li>Slideshow stop</li>
                 </ul></li>
             </ul></li>
         <p>
@@ -254,7 +253,7 @@
                         of the pinned/unpinned state of the data window, and regardless of which
                         ID Shield window (e.g., image viewer or data window) has focus.</li>
                     </ul></li>
-                    <li>Confirm that the <b>Slideshow play/stop</b> items work as expected.
+                    <li>Confirm that the <b>Slideshow play</b> item works as expected.
                     <ul>
                         <li>If the verification task is set up to <b>require</b> the run key, you
                         should not be able to start the slideshow with the menu item.</li>
@@ -1156,6 +1155,25 @@
 <p> 
     	<li><b>Miscellaneous</b>
     	<ul>
+        	<li><b>[FIDSC #4729]</b>
+        	<ul>
+            		<li>In verification, create a new redaction.</li>
+            		<li>Resize it to be as narrow as possible. Confirm that you can still select
+            		the redaction in the image viewer.</li>
+            		<li>Save the document and navigate back. Confirm that the redaction size has
+            		not changed.</li>
+        	</ul></li>
+<p>
+        	<li><b>[FIDSC #4740]</b>
+        	<ul>
+            		<li>Queue a single document for verification; configure the FPS file to
+            		process continuously.</li>
+            		<li>Verify the document; before saving it, confirm that the status bar 
+            		indicates that OCR data are available.</li>
+            		<li>Save the document. While the UI is waiting for the next document, 
+			confirm that the status bar does not indicate that OCR data are available.</li>
+        	</uL></li>
+<p>
             	<li><b>[FlexIDSCore #4785]</b> Flash the verification title bar
             	<ul>
                 	<li>Set up an FPS file with a file supplier listening to a folder and a 
@@ -1198,7 +1216,24 @@
             		<li>Confirm that the mouse cursor changes if <b>Ctrl+Shift</b> is 
 			pressed while drawing a redaction.
         	</ul>
-<p> 
+<p>
+        	<li><b>[FIDSC #4798]</b> Exercise verification and confirm that you don't see
+        	jumping clues or redactions.</li>
+<p>
+        	<li><b>[FIDSC #4809]</b> Confirm that background OCR in the ID Shield 
+		verification interface and the Extract Image Viewer does <b>not</b> require a 
+		server license.</li>
+<p>
+        	<li><b>[FIDSC #4834]</b> Redaction Resizing
+        	<ul>
+            		<li>Run the compute FPS file from the ID Shield demo.</li>
+            		<li>Open TestImage004.tif for verification; there should be three redactions
+            		over SSNs.</lI>
+            		<li>Zoom in on the redactions. With the selection tool, grab the left grip 
+            		handle of the second redaction and resize it to cover only the last four 
+            		digits. Confirm that no sides of the redaction are resized inward.</li>
+        	</ul></li>
+<p>
         	<li><b>[FlexIDSCore #4847]</b> Document Navigation
         	<ul>
             		<li>Create a local copy of the PVCS_Testing folder for this SCR.</li>
@@ -1249,6 +1284,43 @@
 			<li>Confirm that a significant portion of the overall verification time 
 			is accounted for in the <b>Overhead Time</b> column.
         	</ul>
+<p>
+        	<li><b>[FIDSC #4900, #4910]</b> Merged VOA Files
+        	<ul>
+            		<li>Run the compute FPS file from the ID Shield demo. Save a separate copy
+            		of the output VOA files.</li>
+            		<li>Verify a document. Disable an attribute that was found by the rules; make
+            		no other changes.</li>
+            		<li>Use the merge task to merge the rules output VOA with the verification
+            		output VOA. Confirm that the enabled and disabled attributes are <b>not</b>
+            		merged.</li>
+<p>
+            		<li>Create a VOA file where there is a clue contained within a redaction item
+            		(this happens with TestImage005.tif from the redaction demo).</li>
+            		<li>In verification, turn off the redaction and save.</li>
+            		<li>Make a copy of the VOA file.</li>
+            		<li>Use the merge task to merge the two VOAs.</lI>
+            		<li>Confirm that both the clue and the containing attribute are present in
+            		the output.</li>
+        	</Ul></lI>
+<p>
+        	<li><b>[FIDSC #4917]</b>
+        	<ul>
+            		<li>Create several redactions.</li>
+            		<li>Disable some (not all) of them.</li>
+            		<li>Press Ctrl+A to select all attributes and hit the space bar.</li>
+            		<li>Confirm that everything is enabled and that no inappropriate prompts were
+            		displayed.</li>
+        	</ul></li>
+<p>
+        	<li><b>[FIDSC #4923]</b>
+        	<ul>
+            		<li>Open a verification session and navigate to a multi-page document.</li>
+            		<li>Rotate the first page 90 degrees to the right.</li>
+            		<li>Navigate to page 2.</li>
+            		<li>Confirm that no exception is seen.</li>
+            		<li>Confirm appropriate behavior in data entry as well.</li>
+        	</ul></li>
     	</ul></li>
     </ul></li>
 </ul>
