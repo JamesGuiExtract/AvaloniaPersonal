@@ -529,6 +529,27 @@
 			<li>Confirm that the files are downloaded to <b>C:\LocalFTPRoot\1</b>.
 		</ul>
 <p>
+        	<li><b>[DNRCAU #743]</b> 
+        	<ul>
+            		<li>When the FTP file supplier is configured to check for files at specified
+            		times, confirm that an application trace is logged indicating that the check
+            		is occurring.</li>
+            		<li>Confirm that directory listings from the FTP file supplier and task are
+            		logged to the <b>FTPEventHistory</b> table.
+            		<ul>
+                		<li>Event code should be Q.</li>
+                		<li>Arg1 should be the directory</li>
+                		<li>Arg2 should be the number of files found.</lI>
+            		</uL></li>
+        	</uL></li>
+<p>
+        	<li><b>[DNRCAU #745]</b>
+        	<ul>
+            		<li>Set up an FPS file to simultaneously supply files via FTP and to do some
+            		processing task that will try to access the .info file.</li>
+            		<li>Run it for a while and confirm that no access violations are seen.</li>
+        	</ul></li>
+<p>
             	<li><b>[LegacyRC #6071]</b> Polling frequency
             	<ul>
                 	<li>Set up an FTP file supplier to supply TIF images, append TIF to remote 
