@@ -2482,7 +2482,7 @@ string CRedactionTask::getColorAsString(COLORREF crColor)
 //-------------------------------------------------------------------------------------------------
 void CRedactionTask::validateLicense()
 {
-    VALIDATE_LICENSE(gnIDSHIELD_AUTOREDACTION_OBJECT, "ELI09999", "Redaction File Processor");
+    VALIDATE_LICENSE(gnIDSHIELD_CORE_OBJECTS, "ELI09999", "Redaction File Processor");
 }
 //-------------------------------------------------------------------------------------------------
 void CRedactionTask::fillAttributeSet(IVariantVectorPtr ipAttributeNames, set<string>& rsetAttributeNames)
