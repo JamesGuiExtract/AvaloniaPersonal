@@ -55,10 +55,10 @@
         	  	<b>AND multiple conditions</b>.
       			<ul> 
          			<li>Confirm when <b>AND multiple conditions</b> is selected, and the 
-				Configure button is pressed, it brings up the <b>Configure AND multiple 
-				conditions</b> dialog.
+				Configure button is pressed, it brings up the <b>AND multiple 
+				conditions settings</b> dialog.
          			<ul> 
-            				<li>Confirm that the <b>Configure AND multiple conditions</b> 
+            				<li>Confirm that the <b>AND multiple conditions settings</b> 
 					dialog has <b>Add...</b>, <b>Delete</b>, <b>Command &gt;</b> 
 					buttons, an <b>Up</b> arrow, a <b>Down</b> arrow, an <b>OK</b> 
 					button and a <b>Cancel</b> button. 
@@ -77,8 +77,6 @@
 					arrow and <b>Down</b> arrow are all disabled.
 	            			<li>Confirm that highlighting a FAM condition activates the 
 					<b>Delete</b> and <b>Command &gt;</b> buttons.
-	        	    		<li>Confirm that <b>CTRL+Left Click</b> allows for multiple selection 
-					of list box items.
             				<li>Confirm that <b>SHIFT+Left Click</b> allows for multiple 
 					selections of list box items.
             				<li><b>[LegacyRC #4911]</b> Confirm that <b>Ctrl+DoubleClick</b> 
@@ -92,7 +90,7 @@
 					list box items. 
             				<li>Confirm that the <b>Command &gt;</b> button displays a popup menu 
 					with <b>Select Condition...</b>, <b>Configure FAM Condition...</b>,  
-					<b>Configure description...</b> and <b>Cancel</b>items. 
+					<b>Configure description...</b> and <b>Cancel</b> items. 
 	        	    		<li>Confirm that the <b>Up</b> arrow button moves the selected item up 
 					in the list box.
 	            			<li>Confirm that the <b>Down</b> arrow button moves the selected item 
@@ -153,8 +151,8 @@
 			<b>Exactly ONE in multiple conditions</b>.</li> 
       			<ul>
          			<li>Confirm when the Configure button in Select Condition 
-	             		is pressed, it brings up the <b>Configure Exactly one in multiple 
-        	     		conditions</b> dialog.</li> 
+	             		is pressed, it brings up the <b>Exactly one in multiple conditions 
+				settings</b> dialog.</li> 
          			<li>Clear the database, then double click on <b>Skip_ExactlyOne.fps</b> 
              			in the FPS folder.</li> 
 	         		<li>Add action <b>skip_basedonexactlyone</b> to the database. 
@@ -174,8 +172,8 @@
         	  	<b>NONE in multiple conditions</b>.</li> 
       			<ul>
          			<li>Confirm that when the Configure button in Select Condition 
-	             		is pressed, it brings up the <b>Configure NONE in multiple 
-				conditions</b> dialog.</li> 
+	             		is pressed, it brings up the <b>NONE in multiple 
+				conditions settings</b> dialog.</li> 
          			<li>Clear the database, then double click on <b>Skip_NoneInMultiple.fps</b> 
              			in the FPS folder.</li> 
 	         		<li>Add action <b>skip_basedonnoneinmultiple</b> to the database.</li> 
@@ -195,7 +193,7 @@
         	  	<b>OR multiple conditions</b>.</li>
       			<ul> 
          			<li>Confirm when the Configure button in Select Condition 
-	             		is pressed, it brings up <b>Configure OR multiple conditions</b> 
+	             		is pressed, it brings up <b>OR multiple conditions settings</b> 
 				dialog.</li> 
          			<li>Clear the database, then double click on <b>Skip_OR.fps</b> in 
 				the FPS folder. 
@@ -223,8 +221,8 @@
       		<li>Confirm the droplist for the Select Condition dialog includes: 
        	  	<b>Document type condition</b>.</li>
 		<ul> 
-       			<li>Confirm clicking on the Configure button brings up the <b>Configure  
-			Document type condition</b> dialog.
+       			<li>Confirm clicking on the Configure button brings up the <b>Document type 
+			condition settings</b> dialog.
        	    		<li>Confirm that the dialog has a droplist with entries of <b>met</b> 
 			and <b>not met</b> as the fill-in text for <b>Consider condition as  
 			met|not met if the following VOA file:</b>. 
@@ -276,161 +274,6 @@
 			<li>Confirm that the <b>Clear</b> button is only enabled when the list box is 
 			not empty.
 			<li>Confirm that the <b>Clear</b> button removes all entries from the list box.
-      		</ul>
-<p>
-      		<li>Confirm the droplist for the Select Condition dialog includes: 
-       	  	<b>File timestamp condition</b>.</li>
-		<ul> 
-       			<li>Confirm clicking on the Configure button brings up the <b>Configure  
-			File timestamp condition</b> dialog.
-       	    		<li>Confirm that the dialog has a droplist with entries of <b>met</b> 
-			and <b>not met</b> as the fill-in text for <b>Consider condition as  
-			met|not met if the following file:</b>. 
-            		<li>Confirm that the dialog has an edit box with an associated 
-			<b>Tag Selector</b> button and <b>Browse</b> button.
-            		<li>Confirm that the default text in the edit box is 
-			<b>&ltSourceDocName&gt</b>.
-       			<li>Confirm that the <b>Tag Selector</b> button displays a context 
-               		menu to the immediate right of the button.
-            		<li>Confirm that the items in the context menu include <b>&ltSourceDocName&gt</b>,
-       	        	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.
-       			<li>Confirm that when an item is chosen it either inserts text at 
-			the cursor position or replaces the highlighted text in the edit box. 
-            		<li>Confirm that the <b>...</b> ( Browse ) button brings up 
-       	        	an <b>Open</b> dialog. 
-       			<li>Confirm that a file selected in the <b>Open</b> dialog replaces 
-			the text in the edit box.</li>
-			<li>Confirm that the dialog includes a <b>has a timestamp</b> combo box.
-			<ul>
-				<li>created
-				<li>accessed
-				<li>modified
-			</ul>
-			<li>Confirm that the default combo box selection is <b>modified</b>.
-			<li>Confirm that the dialog includes an <b>in the range</b> radio button.
-			<ul>
-				<li>Confirm that the two associated combo boxes are enabled only 
-				when the radio button is selected.
-				<li>Confirm that each combo box defaults to a date and time of 
-				the current day at midnight in a <b>MM/DD/YYYY HH:MM:SS</b> format.
-				<li>Confirm that the combo box also includes <b>AM</b> or 
-				<b>PM</b> at the end of the date and time.
-				<li>Confirm that clicking either combo box causes a calendar 
-				control to drop down allowing the user to select a date.
-				<li>Confirm that selecting a date in the calendar control modifies 
-				the <b>MM/DD/YYYY</b> text but does not modify the time text.
-				<li>Confirm that the edit control portion of each combo box 
-				allows modification of the time text.
-				<li>Confirm that a meaningful error message is presented if the 
-				range start time is after the range stop time.
-			</ul>
-			<li>Confirm that the dialog includes an <b>equal to</b> radio button.
-			<ul>
-				<li>Confirm that the combo box choices are as follows:
-				<ul>
-					<li>equal to
-					<li>not equal to
-					<li>before
-					<li>equal to or before
-					<li>after
-					<li>equal to or after
-				</ul>
-				<li>Confirm that a collection of radio buttons is indented from 
-				the top-level radio buttons.
-				<ul>
-					<li>a <b>MM/DD/YYYY HH:MM:SS AM/PM</b> timestamp
-					<li>a <b>0 days</b> ago
-					<li>a <b>today</b> combo box
-					<li>the <b>modified</b> timestamp of this file: combo box
-				</ul>
-				<li>Confirm that none of the radio buttons are selected by default.
-<p>
-				<li>Confirm that selecting the timestamp radio button enables the 
-				associated combo box.
-				<li>Confirm that each combo box defaults to a date and time of 
-				the current day at midnight in a <b>MM/DD/YYYY HH:MM:SS</b> format.
-				<li>Confirm that clicking the combo box causes a calendar 
-				control to drop down allowing the user to select a date.
-				<li>Confirm that selecting a date in the calendar control modifies 
-				the <b>MM/DD/YYYY</b> text but does not modify the time text.
-				<li>Confirm that the edit control portion of each combo box 
-				allows modification of the time text.
-<p>
-				<li>Confirm that the <b>ago</b> radio button includes an associated 
-				spinner control and combo box.
-				<li>Confirm that the associated controls are only enabled when the 
-				radio button is selected.
-				<li>Confirm that the minimum value allowed by the spinner is <b>0</b>.
-				<li>Confirm that the maximum value allowed by the spinner is 
-				<b>2147483647</b>.
-				<li>Confirm that the following options are available in the combo box.
-				<ul>
-					<li>seconds
-					<li>minutes
-					<li>hours
-					<li>days
-					<li>weeks
-					<li>months
-					<li>years
-				</ul>
-<p>
-				<li>Confirm that the <b>today</b> combo box is only enabled when the 
-				associated radio button is selected.
-				<li>Confirm that the following options are available in the combo box.
-				<ul>
-					<li>today
-					<li>yesterday
-					<li>this week
-					<li>last week
-					<li>this month
-					<li>last month
-					<li>this year
-					<li>last year
-				</ul>
-<p>
-				<li>Confirm that the <b>modified</b> combo box is only enabled when the 
-				associated radio button is selected.
-				<li>Confirm that the following options are available in the combo box.
-				<ul>
-					<li>created
-					<li>accessed
-					<li>modified
-				</ul>
-				<li>Confirm that an edit box along with a tag selector and browse button 
-				are also enabled when the radio button is selected.
-	       			<li>Confirm that the <b>Tag Selector</b> button displays a context 
-        	       		menu to the immediate right of the button.
-            			<li>Confirm that the items in the context menu include 
-				<b>&ltSourceDocName&gt</b>, <b>&ltFPSFileDir&gt</b>, and a set of 
-				functions that start with $.
-       				<li>Confirm that when an item is chosen it either inserts text at 
-				the cursor position or replaces the highlighted text in the edit box. 
-            			<li>Confirm that the <b>...</b> ( Browse ) button brings up 
-       	        		an <b>Open</b> dialog. 
-       				<li>Confirm that a file selected in the <b>Open</b> dialog replaces 
-				the text in the edit box.</li>
-			</ul>
-<p>
-		        <li><b>[DotNetRC #697, #700, #704, #705]</b>
-        		<ul>
-	            		<li>Confirm that a file timestamp condition can be used to conditionally 
-				delete a file when the created date is within a specified range.
-				<li>Confirm that a file timestamp condition cannot be used based on 
-				an <b>accessed</b> timestamp.
-				<li>Exercise use of relative timestamps.
-				<ul>
-					<li>Confirm that <b>0 days ago</b> works as expected.
-					<li>Confirm that <b>1 day ago</b> works as expected.
-				</ul>
-				<li>Compare two files based on <b>modified</b> date.
-				<ul>
-					<li>Confirm that <b>before</b> works as expected.
-					<li>Confirm that <b>after</b> works as expected.
-					<li>Confirm that <b>equal to</b> works as expected.
-				</ul>
-				<li>Confirm that behavior of the condition object is consistent if 
-				one or the other file is missing.
-			</ul>
       		</ul>
 <p>
       		<li>Confirm the droplist for the Select Condition dialog includes: 
@@ -534,6 +377,161 @@
 		</ul> 
 <p>
       		<li>Confirm the droplist for the Select Condition dialog includes: 
+       	  	<b>File timestamp condition</b>.</li>
+		<ul> 
+       			<li>Confirm clicking on the Configure button brings up the <b>File timestamp 
+			condition settings</b> dialog.
+       	    		<li>Confirm that the dialog has a droplist with entries of <b>met</b> 
+			and <b>not met</b> as the fill-in text for <b>Consider condition as  
+			met|not met if the following file:</b>. 
+            		<li>Confirm that the dialog has an edit box with an associated 
+			<b>Tag Selector</b> button and <b>Browse</b> button.
+            		<li>Confirm that the default text in the edit box is 
+			<b>&ltSourceDocName&gt</b>.
+       			<li>Confirm that the <b>Tag Selector</b> button displays a context 
+               		menu to the immediate right of the button.
+            		<li>Confirm that the items in the context menu include <b>&ltSourceDocName&gt</b>,
+       	        	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.
+       			<li>Confirm that when an item is chosen it either inserts text at 
+			the cursor position or replaces the highlighted text in the edit box. 
+            		<li>Confirm that the <b>...</b> ( Browse ) button brings up 
+       	        	an <b>Open</b> dialog. 
+       			<li>Confirm that a file selected in the <b>Open</b> dialog replaces 
+			the text in the edit box.</li>
+			<li>Confirm that the dialog includes a <b>has a timestamp</b> combo box.
+			<ul>
+				<li>created
+				<li>modified
+			</ul>
+			<li>Confirm that the default combo box selection is <b>modified</b>.
+			<li>Confirm that the dialog includes an <b>in the range</b> radio button.
+			<ul>
+				<li>Confirm that the two associated combo boxes are enabled only 
+				when the radio button is selected.
+				<li>Confirm that each combo box defaults to a date and time of 
+				the current day at midnight in a <b>MM/DD/YYYY HH:MM:SS</b> format.
+				<li>Confirm that the combo box also includes <b>AM</b> or 
+				<b>PM</b> at the end of the date and time.
+				<li>Confirm that clicking either combo box causes a calendar 
+				control to drop down allowing the user to select a date.
+				<li>Confirm that selecting a date in the calendar control modifies 
+				the <b>MM/DD/YYYY</b> text but does not modify the time text.
+				<li>Confirm that the edit control portion of each combo box 
+				allows modification of the time text.
+				<li>Confirm that a meaningful error message is presented if the 
+				range start time is after the range stop time.
+			</ul>
+			<li>Confirm that the dialog includes an <b>equal to</b> radio button.
+			<ul>
+				<li>Confirm that the combo box choices are as follows:
+				<ul>
+					<li>exactly equal to
+					<li>not exactly equal to
+					<li>before
+					<li>equal to or before
+					<li>after
+					<li>equal to or after
+				</ul>
+				<li>Confirm that a collection of radio buttons is indented from 
+				the top-level radio buttons.
+				<ul>
+					<li>a <b>MM/DD/YYYY HH:MM:SS AM/PM</b> timestamp
+					<li>a <b>0 days</b> ago
+					<li>a <b>today</b> combo box
+					<li>the <b>modified</b> timestamp of this file: combo box
+				</ul>
+				<li>Confirm that the date and time radio button is selected by default.
+<p>
+				<li>Confirm that selecting the timestamp radio button enables the 
+				associated combo box.
+				<li>Confirm that the combo box defaults to a date and time of 
+				the current day at midnight in a <b>MM/DD/YYYY HH:MM:SS</b> format.
+				<li>Confirm that clicking the combo box causes a calendar 
+				control to drop down allowing the user to select a date.
+				<li>Confirm that selecting a date in the calendar control modifies 
+				the <b>MM/DD/YYYY</b> text but does not modify the time text.
+				<li>Confirm that the edit control portion of each combo box 
+				allows modification of the time text.
+<p>
+				<li>Confirm that the <b>ago</b> radio button includes an associated 
+				spinner control and combo box.
+				<li>Confirm that the associated controls are only enabled when the 
+				radio button is selected.
+				<li>Confirm that the computed date and time are added after <b>ago</b> 
+				after the radio button is selected.
+				<li>Confirm that the minimum value allowed by the spinner is <b>0</b>.
+				<li>Confirm that a meaningful error message is presented if a large number 
+				of days is selected.
+				<li>Confirm that the following options are available in the combo box.
+				<ul>
+					<li>seconds
+					<li>minutes
+					<li>hours
+					<li>days
+					<li>weeks
+					<li>months
+					<li>years
+				</ul>
+<p>
+				<li>Confirm that the <b>today</b> combo box is only enabled when the 
+				associated radio button is selected.
+				<li>Confirm that the following options are available in the combo box.
+				<ul>
+					<li>today
+					<li>yesterday
+					<li>this week
+					<li>last week
+					<li>this month
+					<li>last month
+					<li>this year
+					<li>last year
+				</ul>
+<p>
+				<li>Confirm that the <b>modified</b> combo box is only enabled when the 
+				associated radio button is selected.
+				<li>Confirm that the following options are available in the combo box.
+				<ul>
+					<li>created
+					<li>modified
+				</ul>
+				<li>Confirm that an edit box along with a tag selector and browse button 
+				are also enabled when the radio button is selected.
+	       			<li>Confirm that the <b>Tag Selector</b> button displays a context 
+        	       		menu to the immediate right of the button.
+            			<li>Confirm that the items in the context menu include 
+				<b>&ltSourceDocName&gt</b>, <b>&ltFPSFileDir&gt</b>, and a set of 
+				functions that start with $.
+       				<li>Confirm that when an item is chosen it either inserts text at 
+				the cursor position or replaces the highlighted text in the edit box. 
+            			<li>Confirm that the <b>...</b> ( Browse ) button brings up 
+       	        		an <b>Open</b> dialog. 
+       				<li>Confirm that a file selected in the <b>Open</b> dialog replaces 
+				the text in the edit box.</li>
+			</ul>
+<p>
+		        <li><b>[DotNetRC #697, #700, #704, #705]</b>
+        		<ul>
+	            		<li>Confirm that a file timestamp condition can be used to conditionally 
+				delete a file when the created date is within a specified range.
+				<li>Confirm that a file timestamp condition cannot be used based on 
+				an <b>accessed</b> timestamp.
+				<li>Exercise use of relative timestamps.
+				<ul>
+					<li>Confirm that <b>0 days ago</b> works as expected.
+					<li>Confirm that <b>1 day ago</b> works as expected.
+				</ul>
+				<li>Compare two files based on <b>modified</b> date.
+				<ul>
+					<li>Confirm that <b>before</b> works as expected.
+					<li>Confirm that <b>after</b> works as expected.
+					<li>Confirm that <b>exactly equal to</b> works as expected.
+				</ul>
+				<li>Confirm that behavior of the condition object is consistent if 
+				one or the other file is missing.
+			</ul>
+      		</ul>
+<p>
+      		<li>Confirm the droplist for the Select Condition dialog includes: 
        	  	<b>Mathematical condition</b>.</li>
 		<ul> 
        			<li>Confirm clicking on the Configure button brings up the <b>Mathematical 
@@ -556,8 +554,20 @@
 			<b>1</b>.
 	      		<li>Confirm that the edit box is enabled only when the radio button 
 			is selected.
-      			<li>Confirm proper behavior for this condition being <b>met</b>.
-      			<li>Confirm proper behavior for this condition being <b>not met</b>.
+<p>
+         		<li>Clear the database, then double click on <b>Skip_Math.fps</b> 
+			in the FPS folder. Confirm that an <b>Action not Found</b> error 
+			message is displayed.</li> 
+       			<li>Add action <b>skip_basedonmath</b> to the database.</li> 
+         		<li>Select action <b>skip_basedonmath</b> in the Action tab of 
+			the File Action Manager for Skip_Math.fps.</li> 
+       			<li>Press the Start button. 
+       			<li>Confirm that the Name column of the <b>Files added or updated in 
+			the queue recently</b> display area of Queue Log shows only 
+			TestImage009.tif and TestImage020.tif, each in a separate row. 
+       			<li>Confirm that TestImage005.tif, TestImage015.tif, and TestImageB.tif 
+			do not show up in the Name column of the <b>Files added or updated in 
+			the queue recently</b> display area.
 <p>
 	      		<li>Confirm presence of a radio button for <b>File ID</b>.
 	      		<li>Confirm presence of an associated edit box for a modulus.
@@ -568,9 +578,6 @@
 			between <b>0</b> and <b>one less than the modulus</b>.
       			<li>Confirm that the edit boxes are enabled only when the radio button 
 			is selected.
-	      		<li>Confirm proper behavior for this condition being <b>met</b>.
-      			<li>Confirm proper behavior for this condition being <b>not met</b>.
-       	    		<li>Confirm that settings are persistent.</li> 
 <p>
 	  	   	<LI><b>[LegacyRC #5434]</b> Mathematical condition object
        			<ul>
@@ -612,11 +619,11 @@
 			behavior of the following settings.
 			<ul>
 				<li>Condition <b>met</b> with <b>all</b> of the following tags.
-				<li>Condition <b>unmet</b> with <b>all</b> of the following tags.
+				<li>Condition <b>not met</b> with <b>all</b> of the following tags.
 				<li>Condition <b>met</b> with <b>any</b> of the following tags.
-				<li>Condition <b>unmet</b> with <b>any</b> of the following tags.
+				<li>Condition <b>not met</b> with <b>any</b> of the following tags.
 				<li>Condition <b>met</b> with <b>none</b> of the following tags.
-				<li>Condition <b>unmet</b> with <b>none</b> of the following tags.
+				<li>Condition <b>not met</b> with <b>none</b> of the following tags.
 			</ul>
 <p>
 	  	   	<LI><b>[LegacyRC #5497]</b> Any tag condition is always true
@@ -637,7 +644,7 @@
        	  	<b>Task condition</b>.</li>
 		<ul> 
        			<li>Confirm that pressing the Configure button in the Select 
-			Condition dialog brings up the <b>Configure Task condition</b> 
+			Condition dialog brings up the <b>Task condition settings</b> 
 			dialog.</li>
        	    		<li>Confirm that there is a label about the condition being 
 			considered met.</li> 
@@ -651,7 +658,7 @@
        	    		<li>Confirm that settings are persistent.</li> 
 <p>
 			<li>Confirm that the <b>Task condition</b> can be both met and 
-			not met for each task object.
+			not met for many of the following task objects.
 			<ul>
 				<li>Core: Add watermark
 				<li>Core: Apply Bates number
@@ -689,8 +696,8 @@
       		<li>Confirm the droplist for the Select Condition dialog includes: 
        	  	<b>VOA file contents condition</b>.</li>
 		<ul> 
-       			<li>Confirm clicking on the Configure button brings up the <b>Configure  
-			VOA file contents condition</b> dialog.
+       			<li>Confirm clicking on the Configure button brings up the <b>VOA file 
+			contents condition settings</b> dialog.
        	    		<li>Confirm that the dialog has a droplist with entries of <b>met</b> 
 			and <b>not met</b> as the fill-in text for <b>Consider condition as  
 			met|not met if the following VOA file:</b>. 
@@ -771,6 +778,7 @@
 <p>
 			<li>Confirm that selecting the appropriate radio button enables the 
 			<b>contains a match for</b> combo box.
+			<li>Confirm that <b>fully matches</b> is also available in the combo box.
 			<li>Confirm that an associated multi-line edit box is also enabled.
 <p>
 			<li>Confirm that selecting the <b>matches one of the entries in the following 
