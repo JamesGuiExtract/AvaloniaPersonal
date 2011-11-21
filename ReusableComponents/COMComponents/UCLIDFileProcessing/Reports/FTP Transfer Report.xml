@@ -1,0 +1,6 @@
+<ExtractReportParameterData Version="2">
+	<ReportParameters>
+		<DateRangeParameter Name="ReportingPeriod" Default="" />
+		<ValueListParameter Name="DownloadOrUpload" Editable="false" Values="Download,Upload" Default="Download" />
+	</ReportParameters>
+</ExtractReportParameterData>
