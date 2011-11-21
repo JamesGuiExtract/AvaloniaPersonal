@@ -21,6 +21,8 @@ m_strFileNameOld(strFileNameOld)
 }
 //-------------------------------------------------------------------------------------------------
 FolderEventsListener::FolderEventsListener() 
+: m_strLastAddedFilename("")
+, m_dwAddFileTickTime(0)
 {
 	ma_pCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 		new RegistryPersistenceMgr(HKEY_LOCAL_MACHINE, gstrBASEUTILS_REG_PATH ));
@@ -484,13 +486,7 @@ void FolderEventsListener::processChanges(string strBaseDir, Win32Event &eventKi
 		// names
 		string strOldFilename = "";
 
-		// Add file events will be immediately followed by a modify event for the same file. Keep track
-		// of add file events so that if both events are being monitored, the modify event is considered
-		// part of the add event rather than a stand-alone modify event.
-		static string strLastAddedFilename = "";
-		static DWORD dwAddFileTickTime = 0;
-
-		// ierate through the buffer extracting the information that we need
+		// iterate through the buffer extracting the information that we need
 		do
 		{
 			// has this thread been instructed to terminate ?? 
@@ -557,19 +553,19 @@ void FolderEventsListener::processChanges(string strBaseDir, Win32Event &eventKi
 			// Any modify/add events that immediately follow an add event on the same file
 			// (and occurs within a second of the original add event) should be ignored.
 			if ((eFilteredEventType == kFileModified  || eFilteredEventType == kFileAdded) &&
-				strLastAddedFilename == strFilename && (GetTickCount() - dwAddFileTickTime) < 1000)
+				m_strLastAddedFilename == strFilename && (GetTickCount() - m_dwAddFileTickTime) < 1000)
 			{
 				eFilteredEventType = (EFileEventType)0;
 			}
 			else if (eFilteredEventType == kFileAdded)
 			{
 				// If this is a new add event, keep track of the filename
-				strLastAddedFilename = strFilename;
-				dwAddFileTickTime = GetTickCount();
+				m_strLastAddedFilename = strFilename;
+				m_dwAddFileTickTime = GetTickCount();
 			}
 			else
 			{
-				strLastAddedFilename = "";
+				m_strLastAddedFilename = "";
 			}
 
 			if (eFilteredEventType != 0)

@@ -97,6 +97,12 @@ private:
 	// Event used to signal that both listening and dispatch threads should stop.
 	Win32Event m_eventKillThreads;
 
+	// Add file events will be immediately followed by a modify event for the same file. Keep track
+	// of add file events so that if both events are being monitored, the modify event is considered
+	// part of the add event rather than a stand-alone modify event.
+	string m_strLastAddedFilename;
+	DWORD m_dwAddFileTickTime;
+
 	///////////////////////
 	// the listen thread
 	///////////////////////
