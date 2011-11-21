@@ -169,7 +169,7 @@ namespace Extract.Imaging.Forms
 
             /// <summary>
             /// The OCR content associated with each word highlight. This is only populated when
-            /// <see cref="InRedactionMode"/> is <see langword="false"/>.
+            /// <see cref="ImageViewer.RedactionMode"/> is <see langword="false"/>.
             /// </summary>
             ConcurrentDictionary<LayerObject, ThreadSafeSpatialString> _highlightOcr =
                 new ConcurrentDictionary<LayerObject, ThreadSafeSpatialString>();
@@ -178,7 +178,7 @@ namespace Extract.Imaging.Forms
             /// The OCR content of the word highlights loaded for the current document. This
             /// dictionary is used to sort the results of and word highlight operation since the
             /// words in this lists are in the same order as the OCR on the page. This is only
-            /// populated when <see cref="InRedactionMode"/> is <see langword="false"/>.
+            /// populated when <see cref="ImageViewer.RedactionMode"/> is <see langword="false"/>.
             /// </summary>
             ConcurrentDictionary<int, List<ThreadSafeSpatialString>> _loadedOcrWords =
                 new ConcurrentDictionary<int, List<ThreadSafeSpatialString>>();
@@ -485,7 +485,7 @@ namespace Extract.Imaging.Forms
 
                     if (!cancel)
                     {
-                        if (InRedactionMode)
+                        if (_imageViewer.RedactionMode)
                         {
                             CreateOutput<Redaction>();
                         }
@@ -791,17 +791,17 @@ namespace Extract.Imaging.Forms
                             {
                                 _wordLineMapping.Remove(highlight);
 
-                                if (!InRedactionMode)
+                                if (!_imageViewer.RedactionMode)
                                 {
-                                    // _highlightOcr will only be populated when not InRedactionMode.
+                                    // _highlightOcr will only be populated when not in RedactionMode.
                                     ThreadSafeSpatialString temp;
                                     _highlightOcr.TryRemove(highlight, out temp);
                                 }
                             }
 
-                            if (!InRedactionMode)
+                            if (!_imageViewer.RedactionMode)
                             {
-                                // _loadedOcrWords will only be populated when not InRedactionMode.
+                                // _loadedOcrWords will only be populated when not in RedactionMode.
                                 List<ThreadSafeSpatialString> ocrWords;
                                 ExtractException.Assert("ELI34064", "Internal error.",
                                     _loadedOcrWords.TryRemove(page, out ocrWords));
@@ -1263,7 +1263,7 @@ namespace Extract.Imaging.Forms
                             // occured after cancelation (for example, accessing the current page number
                             if (!_cancelToken.IsCancellationRequested)
                             {
-                                string message = InRedactionMode
+                                string message = _imageViewer.RedactionMode
                                     ? "Error loading data for word highlight tool."
                                     : "Error loading data for word redaction tool.";
 
@@ -1328,21 +1328,6 @@ namespace Extract.Imaging.Forms
                     {
                         return 0;
                     }
-                }
-            }
-
-            /// <summary>
-            /// Gets a value indicating whether word highlights are being used to created redactions
-            /// versus highlights.
-            /// </summary>
-            /// <value><see langword="true"/> if word highlights are being used to created redactions;
-            /// <see langword="false"/> if word highlights are being used to created highlights.
-            /// </value>
-            bool InRedactionMode
-            {
-                get
-                {
-                    return (_imageViewer._cursorTool == CursorTool.WordRedaction);
                 }
             }
 
@@ -1938,10 +1923,10 @@ namespace Extract.Imaging.Forms
                     _wordHighlights[page] = wordHighlights;
                 }
 
-                // If not InRedactionMode, create or retrieve an existing list to hold the OCR for
+                // If not in RedactionMode, create or retrieve an existing list to hold the OCR for
                 // words on the current page.
                 List<ThreadSafeSpatialString> loadedOcrWords = null;
-                if (!InRedactionMode)
+                if (!_imageViewer.RedactionMode)
                 {
                     if (!_loadedOcrWords.TryGetValue(page, out loadedOcrWords))
                     {
@@ -2002,7 +1987,7 @@ namespace Extract.Imaging.Forms
                         highlight.CanRender = false;
                         highlight.Visible = false;
 
-                        if (InRedactionMode)
+                        if (_imageViewer.RedactionMode)
                         {
                             // [FlexIDSCore:4601]
                             // Until pixels are scanned to refine the borders of OCR coordinates when
@@ -2263,7 +2248,7 @@ namespace Extract.Imaging.Forms
                 }
                 else
                 {
-                    if (InRedactionMode)
+                    if (_imageViewer.RedactionMode)
                     {
                         zonesToHighlight.AddRange(GetWordOutputZones());
                     }
@@ -2322,7 +2307,7 @@ namespace Extract.Imaging.Forms
 
                     try
                     {
-                        if (InRedactionMode)
+                        if (_imageViewer.RedactionMode)
                         {
                             outputLayerObject = new Redaction(_imageViewer,
                                 _imageViewer.PageNumber, LayerObject.ManualComment, rasterZones,

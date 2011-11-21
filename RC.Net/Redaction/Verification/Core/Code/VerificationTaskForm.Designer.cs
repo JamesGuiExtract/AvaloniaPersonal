@@ -1216,6 +1216,7 @@ namespace Extract.Redaction.Verification
             this._imageViewer.Location = new System.Drawing.Point(0, 0);
             this._imageViewer.MinimumAngularHighlightHeight = 1;
             this._imageViewer.Name = "_imageViewer";
+            this._imageViewer.RedactionMode = true;
             this._imageViewer.Size = new System.Drawing.Size(857, 822);
             this._imageViewer.TabIndex = 0;
             this._imageViewer.TabStop = false;

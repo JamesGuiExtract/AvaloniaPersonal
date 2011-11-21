@@ -245,6 +245,7 @@ namespace Extract.Imaging.Forms.Test
             rasterMagnifyGlass3.Size = new System.Drawing.Size(150, 150);
             this._imageViewer.MagnifyGlass = rasterMagnifyGlass3;
             this._imageViewer.Name = "_imageViewer";
+            this._imageViewer.RedactionMode = false;
             this._imageViewer.ScaleFactor = 1;
             this._imageViewer.ScrollPosition = new System.Drawing.Point(0, 0);
             this._imageViewer.Size = new System.Drawing.Size(742, 295);

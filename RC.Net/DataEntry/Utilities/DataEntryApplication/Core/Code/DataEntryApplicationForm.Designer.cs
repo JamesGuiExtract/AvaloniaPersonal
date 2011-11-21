@@ -192,6 +192,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._imageViewer.Location = new System.Drawing.Point(0, 0);
             this._imageViewer.MinimumAngularHighlightHeight = 1;
             this._imageViewer.Name = "_imageViewer";
+            this._imageViewer.RedactionMode = false;
             this._imageViewer.Size = new System.Drawing.Size(802, 506);
             this._imageViewer.TabIndex = 0;
             this._imageViewer.TabStop = false;

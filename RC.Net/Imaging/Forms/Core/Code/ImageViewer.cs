@@ -700,6 +700,18 @@ namespace Extract.Imaging.Forms
         #region Properties
 
         /// <summary>
+        /// Gets or sets a value indicating whether highlight tools for the image viewer are to
+        /// create redactions or to extract text.
+        /// </summary>
+        /// <value><see langword="true"/> if the highlight tools are being used to created
+        /// redactions;<see langword="false"/> if they are being used to extract text.</value>
+        public bool RedactionMode
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets the name of the currently open image file.
         /// </summary>
         /// <returns>The name of the currently open image file. If no image is open, returns the 

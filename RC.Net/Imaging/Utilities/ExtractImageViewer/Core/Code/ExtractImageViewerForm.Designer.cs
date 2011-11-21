@@ -286,6 +286,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._imageViewer.MinimumAngularHighlightHeight = 16;
             this._imageViewer.MinimumSize = new System.Drawing.Size(5, 5);
             this._imageViewer.Name = "_imageViewer";
+            this._imageViewer.RedactionMode = false;
             this._imageViewer.Size = new System.Drawing.Size(566, 440);
             this._imageViewer.TabIndex = 0;
             this._imageViewer.Text = "imageViewer1";
