@@ -520,6 +520,8 @@ namespace Extract.Redaction.Verification
                     }
                 }
 
+                _historyIndex = _history.Capacity > 0 ? 0 : -1;
+
                 // [FlexIDSCore:4442]
                 // For prefetching purposes, allow the ImageViewer will cache images.
                 _imageViewer.CacheImages = true;
@@ -593,7 +595,7 @@ namespace Extract.Redaction.Verification
         {
             get
             {
-                return _historyIndex < _history.Count;
+                return (_history.Capacity > 0) && (_historyIndex < _history.Count);
             }
         }
 
@@ -1155,27 +1157,30 @@ namespace Extract.Redaction.Verification
             }
             else
             {
-                // If the max document history was reached, drop the first item
-                if (_history.Count == _history.Capacity)
+                if (_history.Capacity > 0)
                 {
-                    // If the document being removed from the history queue has been commited, apply
-                    // the number of pages in the document and time displayed to
-                    // _preHistoricPageVerificationTime.
-                    VerificationMemento memento = _history[0];
-                    _preHistoricPageVerificationTime = new Tuple<int, double>(
-                        _preHistoricPageVerificationTime.Item1 + memento.PageCount,
-                        _preHistoricPageVerificationTime.Item2
-                            + memento.ScreenTimeThisSession + memento.OverheadTimeThisSession);
+                    // If the max document history was reached, drop the first item
+                    if (_history.Count == _history.Capacity)
+                    {
+                        // If the document being removed from the history queue has been commited, apply
+                        // the number of pages in the document and time displayed to
+                        // _preHistoricPageVerificationTime.
+                        VerificationMemento memento = _history[0];
+                        _preHistoricPageVerificationTime = new Tuple<int, double>(
+                            _preHistoricPageVerificationTime.Item1 + memento.PageCount,
+                            _preHistoricPageVerificationTime.Item2
+                                + memento.ScreenTimeThisSession + memento.OverheadTimeThisSession);
 
-                    _imageViewer.UnloadImage(_history[0].DisplayImage);
+                        _imageViewer.UnloadImage(_history[0].DisplayImage);
 
-                    _history.RemoveAt(0);
-                    _historyIndex--;
+                        _history.RemoveAt(0);
+                        _historyIndex--;
+                    }
+
+                    // Store the current document in the history
+                    _history.Add(_savedMemento);
+                    _historyIndex++;
                 }
-
-                // Store the current document in the history
-                _history.Add(_savedMemento);
-                _historyIndex++;
 
                 // Close current image before opening a new one. [FIDSC #3824]
                 _imageViewer.CloseImage();
