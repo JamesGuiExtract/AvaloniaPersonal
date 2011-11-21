@@ -154,6 +154,20 @@ namespace Extract.Imaging.Forms
                     int cursorTop = (ClientRectangle.Height / 2) - _imageViewer.Cursor.HotSpot.Y;
                     Rectangle cursorRect = new Rectangle(new Point(cursorLeft, cursorTop), Cursor.Size);
                     _imageViewer.Cursor.Draw(e.Graphics, cursorRect);
+
+                    // [FlexIDSCore:4677]
+                    // _imageViewer.PaintToGraphics locks updates while in progress to prevent
+                    // distracting scroll bar changes when the view perspective is modified for the
+                    // magnifier wingow. This ordinarily doesn't interfere with the main image viewer
+                    // being updated (because it has already been updated by this point. But when
+                    // the magnifier is undocked, for reasons I don't fully understand,
+                    // LockControlUpdate is preventing the main image viewer from updating.
+                    // There may be a more correct fix for this issue, but the simplist fix for now
+                    // seems to be to force an image viewer refresh here if undocked.
+                    if (this.TopLevelControl != _imageViewer.TopLevelControl)
+                    {
+                        _imageViewer.Refresh();
+                    }
                 }
             }
             catch (Exception ex)
