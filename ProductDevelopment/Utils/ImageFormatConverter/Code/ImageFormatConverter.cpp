@@ -189,7 +189,8 @@ bool expandImageWhenConvertingPdf()
 // if the output format is a pdf then the redaction annotations will be burned into the image.
 void convertImage(const string strInputFileName, const string strOutputFileName, 
 				  EConverterFileType eOutputType, bool bRetainAnnotations, HINSTANCE hInst,
-				  const string& strUserPassword, const string& strOwnerPassword, long nPermissions)
+				  const string& strUserPassword, const string& strOwnerPassword, long nPermissions,
+				  long nViewPerspective)
 {
 	HANNOBJECT hFileContainer = NULL;
 	ANNENUMCALLBACK pfnCallBack = NULL;
@@ -276,9 +277,11 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 			}
 
 			// Get initialized LOADFILEOPTION struct. 
-			// IgnoreViewPerspective to avoid a black region at the bottom of the image
-			LOADFILEOPTION lfo =
-				GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
+			// IgnoreViewPerspective to avoid a black region at the bottom of the image except if
+			// the user wants to manually specify the view perspective in which case we should load
+			// with the original perspective, then convert to the desired perspective.
+			LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(
+				(nViewPerspective > 0) ? 0 : ELO_IGNOREVIEWPERSPECTIVE);
 
 			// Get the input file name as a char*
 			char* pszInputFile = (char*) strInputFileName.c_str();
@@ -301,6 +304,14 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 				BITMAPHANDLE hBitmap = {0};
 				LeadToolsBitmapFreeer freer(hBitmap);
 				loadImagePage(strInputFileName, hBitmap, fileInfo, lfo, false);
+
+				// Convert view perspective is specified.
+				if (nViewPerspective > 0)
+				{
+					nRet = L_ChangeBitmapViewPerspective(&hBitmap, &hBitmap, sizeof(BITMAPHANDLE), nViewPerspective);
+					throwExceptionIfNotSuccess(nRet, "ELI34136", 
+						"ChangeBitmapViewPerspective operation failed.", strInputFileName); 
+				}
 
 				// Load the existing annotations if bRetainAnnotations and they exist.
 				if(bRetainAnnotations && hasAnnotations(strInputFileName, lfo, iFormat))
@@ -502,12 +513,16 @@ void usage()
 					" \t\tAllow filling in form fields = 64.\n"
 					" \t\tAllow document assembly = 128.\n"
 					" \t\tAllow all options = 255.\n"
+					"The optional argument /vp [perspective_id] will set the view perspective of "
+					"the output to the specified value (1-8) or to 1 (top-left) if the "
+					"perspective_id is not specified.\n"
 					"The optional argument (/ef <filename>) fully specifies the location \n"
 					"of an exception log that will store any thrown exception.  Without \n"
 					"an exception log, any thrown exception will be displayed.\n\n";
 		strUsage += "Usage:\n";
 		strUsage += "ImageFormatConverter.exe <strInput> <strOutput> <out_type> [/retain] "
-					"[/user \"<Password>\"] [/owner \"<Password>\" <Permissions>] [/ef <filename>]\n"
+					"[/user \"<Password>\"] [/owner \"<Password>\" <Permissions>] [/vp [perspective_id]] "
+					"[/ef <filename>]\n"
 					"where:\n"
 					"out_type is /pdf, /tif or /jpg,\n"
 					"<Password> is the password to apply (user and/or owner) to the PDF (requires out_type = /pdf).\n"
@@ -554,7 +569,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 
 				// Make sure the number of parameters is 3 or 12
 				size_t uiParamCount = vecParams.size();
-				if ((uiParamCount < 3) || (uiParamCount > 12))
+				if ((uiParamCount < 3) || (uiParamCount > 14))
 				{
 					usage();
 					return FALSE;
@@ -606,6 +621,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 				string strOwnerPassword = "";
 				long nOwnerPermissions = 0;
 				bool bEncryptedPasswords = false;
+				long nViewPerspective = 0;
 				for (size_t i=3; i < uiParamCount; i++)
 				{
 					string strTemp = vecParams[i];
@@ -656,6 +672,29 @@ BOOL CImageFormatConverterApp::InitInstance()
 						{
 							usage();
 							return FALSE;
+						}
+					}
+					else if (strTemp == "/vp")
+					{
+						// Use a view perspective of 1 (top-left) unless the user has specified the
+						// perspective to use with the following parameter.
+						nViewPerspective = 1;
+						
+						// Check for a parameter that specifies which view perspective to use.
+						if (i < uiParamCount - 1)
+						{
+							string strNextParam = vecParams[i + 1];
+							if (strNextParam.length() == 1 && isDigitChar(strNextParam[0]))
+							{
+								nViewPerspective = asLong(strNextParam);
+								if (nViewPerspective < 1 || nViewPerspective > 8)
+								{
+									usage();
+									return FALSE;
+								}
+
+								i++;
+							}
 						}
 					}
 					else if (strTemp == "/ef")
@@ -724,7 +763,8 @@ BOOL CImageFormatConverterApp::InitInstance()
 
 				// Convert the file
 				convertImage(strInputName, strOutputName, eOutputType, bRetainAnnotations,
-					this->m_hInstance, strUserPassword, strOwnerPassword, nOwnerPermissions);
+					this->m_hInstance, strUserPassword, strOwnerPassword, nOwnerPermissions,
+					nViewPerspective);
 
 				// No UI needed, just return
 			}

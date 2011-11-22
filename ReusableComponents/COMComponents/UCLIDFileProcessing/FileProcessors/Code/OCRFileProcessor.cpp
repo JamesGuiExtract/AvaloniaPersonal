@@ -209,6 +209,13 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 			}
 		}
 
+		if (ipSS->Size == 0)
+		{
+			UCLIDException ue("ELI34137", "Application trace: OCR output is blank");
+			ue.addDebugInfo("File", strInputFileName);
+			ue.log();
+		}
+
 		// OutputFileName = InputFileName.uss even if cleaned image was used
 		ipSS->SaveTo(strOutputFileName.c_str(), VARIANT_TRUE, VARIANT_TRUE);
 	}

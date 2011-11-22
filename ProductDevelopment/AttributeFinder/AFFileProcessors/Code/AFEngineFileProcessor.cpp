@@ -300,6 +300,13 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 				ASSERT_RESOURCE_ALLOCATION("ELI15524", ipText != __nullptr);
 				ipText->SaveTo(get_bstr_t(strInputFile + ".uss"), VARIANT_TRUE, VARIANT_TRUE);
 			}
+
+			if (m_eOCRPagesType != kNoOCR && (ipAFDoc->Text == __nullptr || ipAFDoc->Text->Size == 0))
+			{
+				UCLIDException ue("ELI34138", "Application trace: OCR output is blank");
+				ue.addDebugInfo("File", strInputFile);
+				ue.log();
+			}
 		}
 
 		_lastCodePos = "180";
