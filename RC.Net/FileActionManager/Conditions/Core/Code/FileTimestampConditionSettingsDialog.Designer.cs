@@ -535,7 +535,7 @@
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Core: File timestamp condition";
+            this.Text = "File timestamp condition settings";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             this.panel1.ResumeLayout(false);
