@@ -163,8 +163,8 @@ namespace Extract.BaseUtils.Testing
             this.pathTagsButton1.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this.pathTagsButton1.Size = new System.Drawing.Size(18, 20);
             this.pathTagsButton1.TabIndex = 16;
+            this.pathTagsButton1.TextControl = this._textValue;
             this.pathTagsButton1.UseVisualStyleBackColor = true;
-            this.pathTagsButton1.TagSelected += new System.EventHandler<Extract.Utilities.Forms.TagSelectedEventArgs>(this.HandlePathTagSelected);
             // 
             // TestForm
             // 

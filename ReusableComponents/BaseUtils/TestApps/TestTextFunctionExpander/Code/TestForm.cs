@@ -110,25 +110,5 @@ namespace Extract.BaseUtils.Testing
                 ee.Display();
             }
         }
-
-        /// <summary>
-        /// Handles the <see cref="PathTagsButton.TagSelected"/> event.
-        /// </summary>
-        /// <param name="sender">The object which sent the event.</param>
-        /// <param name="e">The data associated with the event.</param>
-        private void HandlePathTagSelected(object sender, TagSelectedEventArgs e)
-        {
-            try
-            {
-                // Replace the selected text with the selected tag
-                _textValue.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI28794", ex);
-                ee.AddDebugData("Tag Selected", e.Tag, false);
-                ee.Display();
-            }
-        }
     }
 }
