@@ -286,8 +286,8 @@ vector<string> FileProcessingConfigMgr::getFileExtensionList()
 	// default set of images support by our current SSOCR
 	string strList =  "*.tif"
 					  "|*.bmp"
-					  "|*.bmp*;*.rle*;*.dib*;*.rst*;*.gp4*;*.mil*;*.cal*;*.cg4*;"
-					  "*.flc*;*.fli*;*.gif*;*.jpg*;*.pcx*;*.pct*;*.png*;*.tga*;*.tif*"
+					  "|*.bmp;*.rle;*.dib;*.rst;*.gp4;*.mil;*.cal;*.cg4;"
+					  "*.flc;*.fli;*.gif;*.jpg;*.pcx;*.pct;*.png;*.tga;*.tif;*.tiff;*.pdf"
 					  "|*.*";
 	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_FILE_EXTENSION_LIST))
 	{

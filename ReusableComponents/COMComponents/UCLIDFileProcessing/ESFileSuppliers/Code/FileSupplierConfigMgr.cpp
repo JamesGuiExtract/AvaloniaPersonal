@@ -48,8 +48,8 @@ vector<string> FileSupplierConfigMgr::getFileExtensionList()
 	string strList = "*.tif"
 					 "|*.pdf"
 					 "|*.bmp"
-					 "|*.bmp*;*.rle*;*.dib*;*.rst*;*.gp4*;*.mil*;*.cal*;*.cg4*;"
-					 "*.flc*;*.fli*;*.gif*;*.jpg*;*.pcx*;*.pct*;*.png*;*.tga*;*.tif*;*.pdf*"
+					 "|*.bmp;*.rle;*.dib;*.rst;*.gp4;*.mil;*.cal;*.cg4;"
+					 "*.flc;*.fli;*.gif;*.jpg;*.pcx;*.pct;*.png;*.tga;*.tif;*.tiff;*.pdf"
 					 "|*.*";
 
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, gstrFILE_EXTENSION_LIST))

@@ -53,19 +53,19 @@ const std::string gstrICS_FILE_SAVE_FILTER =
 	"Image Cleanup Settings files (*.ics)|*.ics|All Files (*.*)|*.*||";
 
 const std::string gstrICS_FILE_TEST_FILTER =
-	"All image files|*.bmp*;*.rle*;*.dib*;*.rst*;*.gp4*;*.mil*;*.cal*;*.cg4*;*.flc*;*.fli*;*.gif*;*.jpg*;*.pcx*;*.pct*;*.png*;*.tga*;*.tif*;*.pdf*|"
+	"All image files|*.bmp;*.rle;*.dib;*.rst;*.gp4;*.mil;*.cal;*.cg4;*.flc;*.fli;*.gif;*.jpg;*.pcx;*.pct;*.png;*.tga;*.tif;*.tiff;*.pdf|"
 	"GDD files|*.gdd|"
-	"BMP files (*.bmp;*.rle;*.dib)|*.bmp*;*.rle*;*.dib*|"
-	"CALS1 files (*.rst;*.gp4;*.mil;*.cal;*.cg4)|*.rst*;*.gp4*;*.mil*;*.cal*;*.cg4*|"
-	"FLIC files (*.flc;*.fli)|*.flc*;*.fli*|"
-	"GIF files (*.gif)|*.gif*|"
-	"JFIF files (*.jpg)|*.jpg*|"
-	"PCX files (*.pcx)|*.pcx*|"
-	"PICT files (*.pct)|*.pct*|"
-	"PNG files (*.png)|*.png*|"
-	"TGA files (*.tga)|*.tga*|"
-	"TIFF files (*.tif)|*.tif*|"
-	"PDF files (*.pdf)|*.pdf*|"
+	"BMP files (*.bmp;*.rle;*.dib)|*.bmp;*.rle;*.dib|"
+	"CALS1 files (*.rst;*.gp4;*.mil;*.cal;*.cg4)|*.rst;*.gp4;*.mil;*.cal;*.cg4|"
+	"FLIC files (*.flc;*.fli)|*.flc;*.fli|"
+	"GIF files (*.gif)|*.gif|"
+	"JFIF files (*.jpg)|*.jpg|"
+	"PCX files (*.pcx)|*.pcx|"
+	"PICT files (*.pct)|*.pct|"
+	"PNG files (*.png)|*.png|"
+	"TGA files (*.tga)|*.tga|"
+	"TIFF files (*.tif)|*.tif|"
+	"PDF files (*.pdf)|*.pdf|"
 	"All files (*.*)|*.*||";
 
 const std::string gstrIC_REG_ROOT_FOLDER_PATH = gstrREG_ROOT_KEY + std::string("\\ImageCleanup");

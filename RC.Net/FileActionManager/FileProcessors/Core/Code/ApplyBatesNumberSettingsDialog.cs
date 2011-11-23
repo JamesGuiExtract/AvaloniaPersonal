@@ -31,12 +31,12 @@ namespace Extract.FileActionManager.FileProcessors
         /// The file filter string for the file browse button.
         /// </summary>
         private static readonly string _FILE_FILTERS =
-            "BMP files (*.bmp;*.rle;*.dib)|*.bmp*;*.rle*;*.dib*|"
-            + "GIF files (*.gif)|*.gif*|JFIF files (*.jpg)|*.jpg*|PCX files (*.pcx)|*.pcx*|"
-            + "PICT files (*.pct)|*.pct*|PNG files (*.png)|*.png*|TIFF files (*.tif)|*.tif*|"
-            + "PDF files (*.pdf)|*.pdf*|All image files|*.bmp*;*.rle*;*.dib*;*.rst*;*.gp4*;"
-            + "*.mil*;*.cal*;*.cg4*;*.flc*;*.fli*;*.gif*;*.jpg*;*.pcx*;*.pct*;*.png*;*.tga*;"
-            + "*.tif*;*.pdf*|All files (*.*)|*.*||";
+            "BMP files (*.bmp;*.rle;*.dib)|*.bmp;*.rle;*.dib|"
+            + "GIF files (*.gif)|*.gif|JFIF files (*.jpg)|*.jpg|PCX files (*.pcx)|*.pcx|"
+            + "PICT files (*.pct)|*.pct|PNG files (*.png)|*.png|TIFF files (*.tif)|*.tif;*.tiff|"
+            + "PDF files (*.pdf)|*.pdf|All image files|*.bmp;*.rle;*.dib;*.rst;*.gp4*;"
+            + "*.mil;*.cal;*.cg4;*.flc;*.fli;*.gif;*.jpg;*.pcx;*.pct;*.png;*.tga*;"
+            + "*.tif;*.tiff;*.pdf|All files (*.*)|*.*||";
 
         #endregion Constants
 
