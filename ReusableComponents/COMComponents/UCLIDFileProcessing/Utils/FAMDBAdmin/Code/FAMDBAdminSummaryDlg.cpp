@@ -583,6 +583,17 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 			long lProcessing = lTotal - (lPending + lCompleted + lSkipped + lFailed);
 			long lUnattempted = (long) llFileCount - lTotal;
 
+			// [LegacyRCAndUtils:6106]
+			// Since the file count is obtained in a separate call that the rest of the statistics,
+			// the FileTotal may include files queued since the time when the rest of the stats
+			// were accurate. This can cause a negative number in the unattempted column when
+			// queuing. Per discussion with Arvind, to avoid a more complex change late in the
+			// release cycle, for now simply change any negative unattempted number to zero
+			if (lUnattempted < 0)
+			{
+				lUnattempted = 0;
+			}
+
 			// fill in the grid row
 			m_listActions.SetItemText(nItem, giUNATTEMPTED_COLUMN, 
 				commaFormatNumber((long long) lUnattempted).c_str());
