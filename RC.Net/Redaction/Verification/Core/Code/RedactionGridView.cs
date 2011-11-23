@@ -718,12 +718,12 @@ namespace Extract.Redaction.Verification
             int index = Array.BinarySearch(_redactions.ToArray(), row,
                 new RedactionGridViewRowComparer());
 
-            // The new row should not already be there.
-            ExtractException.Assert("ELI34105", "Internal logic error.", index < 0);
-
-            // The index where the new row should be added should be the bitwise complement of
-            // the BinarySearch result.
-            index = ~index;
+            if (index < 0)
+            {
+                // The index where the new row should be added should be the bitwise complement of
+                // a negative BinarySearch result.
+                index = ~index;
+            }
 
             _redactions.Insert(index, row);
 
