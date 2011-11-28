@@ -1329,25 +1329,7 @@ namespace Extract.FileActionManager.Conditions
                             break;
 
                         case AttributeComparisonMethod.List:
-                            {
-                                // The pattern should be all the values of the list or'd together.
-                                StringBuilder pattern = new StringBuilder("(");
-                                bool firstValue = true;
-                                foreach (string value in ListValues)
-                                {
-                                    if (firstValue)
-                                    {
-                                        firstValue = false;
-                                    }
-                                    else
-                                    {
-                                        pattern.Append(")|(");
-                                    }
-                                    pattern.Append(value);
-                                }
-                                pattern.Append(")");
-                                _regexParser.Pattern = pattern.ToString();
-                            }
+                            // The pattern will need to be specified before each item in the list.
                             break;
 
                         default:
@@ -1496,7 +1478,11 @@ namespace Extract.FileActionManager.Conditions
 
                 if (UseRegex)
                 {
-                    RegexParser.ValidatePattern();
+                    foreach (string pattern in ListValues)
+                    {
+                        RegexParser.Pattern = pattern;
+                        RegexParser.ValidatePattern();
+                    }
                 }
             }
         }
@@ -1691,13 +1677,17 @@ namespace Extract.FileActionManager.Conditions
         /// <see langword="false"/> otherwise.</returns>
         bool IsValueInList(string comparisonValue)
         {
-            if (UseRegex)
+            foreach (string listValue in ListValues)
             {
-                return RegexParser.StringMatchesPattern(comparisonValue);
-            }
-            else
-            {
-                foreach (string listValue in ListValues)
+                if (UseRegex)
+                {
+                    RegexParser.Pattern = listValue;
+                    if (RegexParser.StringMatchesPattern(comparisonValue))
+                    {
+                        return true;
+                    }
+                }
+                else
                 {
                     if (string.Compare(comparisonValue, listValue, StringComparisonMode) == 0)
                     {
