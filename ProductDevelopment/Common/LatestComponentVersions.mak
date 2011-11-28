@@ -1,4 +1,4 @@
-IcoMapESRIVersion=IcoMapESRI Ver. 4.2.9.144 
+IcoMapESRIVersion=IcoMapESRI Ver. 4.2.9.144
 IcoMapCoreVersion=IcoMapCore Ver. 4.2.1.144
 ReusableComponentsVersion=RC Ver. 9.0.0.144
 PDUtilsVersion=PDUtils Ver. 3.7.0.144
