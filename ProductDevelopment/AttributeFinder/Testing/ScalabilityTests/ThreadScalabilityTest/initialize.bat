@@ -10,6 +10,15 @@ set cd=%~dp0
 set cd=%cd:~0,-1%
 set initdir=%cd%\initialfiles
 
+:: find log file and service database directory
+if defined ProgramData (
+set logdir=%ProgramData%\Extract Systems\LogFiles
+set dbdir=%ProgramData%\Extract Systems\ESFAMService
+) else (
+set logdir=C:\Documents and Settings\All Users\Application Data\Extract Systems\LogFiles
+set dbdir=C:\Documents and Settings\All Users\Application Data\Extract Systems\ESFAMService
+)
+
 :: -----------------------------------------------------------------------------
 :: Reset test
 :: -----------------------------------------------------------------------------
@@ -20,7 +29,7 @@ copy "%initdir%\ESFAMService.sdf" "%ccdir%"
 
 :: add queuing file to service db
 echo.Adding Queuing FAM to Service DB...
-"%ccdir%\sqlcompactexporter" "%ccdir%\ESFAMService.sdf" "insert into FPSFile (AutoStart, FileName) values ('true', '%cd%\q.fps')" "" > nul
+"%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "insert into FPSFile (NumberOfInstances, FileName, NumberOfFilesToProcess) values (1, '%cd%\q.fps', -1)" "" > nul
 
 echo.Done.
 "%ccdir%\sleep" 1s
