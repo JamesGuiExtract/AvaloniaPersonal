@@ -736,7 +736,13 @@ begin
 	
 	szPathToInstaller = PROGRAMFILES ^ "\\Common Files\\Nuance\\Licensing\\NuanceLT";
 	LaunchAppAndWait(szPathToInstaller, "Load \"" + PROGRAMFILES ^ EXTRACT_DIR ^ "Nuance.lcxz\"",
-		LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);           
+		LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS);
+                
+	ALLUSERS = 1;
+	
+	// Remove the Nuance Start Menu item  
+	DeleteDir( StartMenuFolder ^ "Programs\\Nuance", ALLCONTENTS); 
+	DeleteDir( StartMenuFolder ^ "Programs\\Nuance", ALLCONTENTS);
 		
 	SdShowMsg("Setup is Installing Nuance Licenses", FALSE);                          
 end;
