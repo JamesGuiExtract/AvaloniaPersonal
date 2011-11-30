@@ -12,43 +12,223 @@ Final SCRs </h1>
 <hr>
 
 <OL>
-	<LI><h3>Descriptions of DataEntry Changes</h3>
-       	<ul>
-  	   	<LI><b>[DataEntry #xxxx]</b> TBD
-		<ul>
-			<li>TBD
-		</ul>
-       	</ul>
-<p>
 	<LI><h3>Descriptions of DotNet Changes</h3>
        	<ul>
-  	   	<LI><b>[DotNet #xxxx]</b> TBD
+  	   	<LI><b>[DotNet #735]</b> Confirm that running the <b>FAM Network Manager</b> as 
+		a non-administrator user requests elevated privileges at launch.
+<p>
+  	   	<LI><b>[DotNet #744]</b> FTP Transfer Report
 		<ul>
-			<li>TBD
+			<li>Exercise the report against a database where no FTP transactions 
+			have occurred.  Confirm proper report behavior and appearance.
+			<li>Exercise the report against a database where FTP transactions 
+			have occurred.  Confirm proper report behavior and appearance.
+		</ul>
+<p>
+  	   	<LI><b>[DotNet #750, #751, #752, #753]</b> FTP File Supplier
+		<ul>
+			<li>Confirm that if a download operation fails, an already existing 
+			destination file is not overwritten or deleted.
+			<li>Confirm that path tags for <b>Local Working Folder</b> are evaluated 
+			for each file at download time.
+			<li>Confirm that a <b>path tags</b> button is available for the remote 
+			folder field.
+			<li>Confirm that an FTP file supplier configured to poll at set times 
+			logs only one polling event for each time.
+		</ul>
+<p>
+  	   	<LI><b>[DotNet #754]</b> Proper caption for property pages
+		<ul>
+			<li>Document type condition
+			<li>File time stamp condition
+			<li>VOA file contents condition
 		</ul>
        	</ul>
 <p>
 	<LI><h3>Descriptions of FlexIDSCore Changes</h3>
        	<ul>
-  	   	<LI><b>[FlexIDSCore #xxxx]</b> TBD
+  	   	<LI><b>[FlexIDSCore #4677]</b> Image Viewer Refresh
+		<ul>
+			<li>Verify some images
+			<li>Undock the <b>Magnifier Window</b>.
+			<li>Select the <b>Zoom</b> tool.
+			<li>Select a region in the image to zoom in on.
+			<li>Confirm that the image viewer refreshes to show the new zoom level.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4742]</b> Confirm that the <b>Redaction: Create redacted 
+		image</b> task requires only an <b>ID Shield Client</b> license.
+<p>
+  	   	<LI><b>[FlexIDSCore #4764]</b> VOA File Contents Condition
+		<ul>
+			<li>Prepare a condition to evaluate 
+			<b>\Engineering\ReusableComponents\COMComponents\UCLIDFileProcessing 
+			\ESSkipConditions\InteractiveTest\Images\TestImage009.tif.voa</b>.
+			<ul>
+				<li>Condition will be met if at least one attribute matches 
+				<b>*</b>.
+				<li>Attribute's value matches one of the entries in the list.
+				<li>Treat search terms as regular expressions.
+			</ul>
+			<li>Confirm that <b>[\S\s]*LAST</b> as the sole list entry succeeds.
+			<li>Add <b>Social Security</b> at the top of the list.
+			<li>Confirm that the condition still succeeds.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4861]</b> Confirm that multiple FKB versions are separated 
+		with a comma and space in About boxes.
+<p>
+  	   	<LI><b>[FlexIDSCore #4906]</b> View Perspective
+		<ul>
+			<li>Exercise OCR on the <b>TestImages\Rotated</b> subfolder from the ID 
+			Shield Sanity test.
+			<li>Confirm that the images with non-standard view perspective fail OCR 
+			with a meaningful exception.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4926]</b> Confirm that the appropriate FKB update is 
+		installed with LabDE.
+<p>
+  	   	<LI><b>[FlexIDSCore #4931, #4933]</b> Tab Order During Verification
+		<ul>
+			<li>Confirm that new redactions are added to the data grid in the order 
+			in which they appear in the document.
+			<li>Verify the image located at 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4931</b>.
+			<ul>
+				<li>Tab to page 5 of the image.
+				<li>Redact the Old Republic title number at the top.
+				<li>Continue tabbing.
+				<li>Confirm that tab navigation is not caught in an infinite 
+				loop.
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4932]</b> Confirm that read-only items in the Data Grid have 
+		a gray background when unselected and a gray text color when selected.
+<p>
+  	   	<LI><b>[FlexIDSCore #4935]</b> TBD
 		<ul>
 			<li>TBD
 		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4937]</b> Word Redaction Tool
+		<ul>
+			<li>Exercise <b>Compute.fps</b> from <b>Demo_IDShield</b>.
+			<li>Verify documents with the <b>Zoom</b> tool selected.
+			<li>Tab through documents until <b>TestImage010.tif</b>.
+			<li>Navigate back to <b>TestImage009.tif</b>, switch to the 
+			<b>Word</b> redaction tool and mouse over some text.
+			<li>Confirm proper behavior.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4939]</b> Disable Backwards Navigation
+		<ul>
+			<li>Modify the <b>HKCU\Software\Extract 
+			Systems\AttributeFinder\IndustrySpecific\Redaction
+			\RedactionCustomComponents\IDShield\NumPreviousDocsToQueue</b> 
+			registry key to <b>0</b>.
+			<li>Exercise verification and confirm that backwards navigation 
+			is disabled.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4941]</b> SRICA Out Of Memory Error
+		<ul>
+			<li>Exercise an Endurance test and check the exception log for any 
+			<b>ELI26617: Out of memory</b> errors.
+			<li>Confirm that useful debug information is provided.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4942]</b> Unable To Load VOA File
+		<ul>
+			<li>Exercise verification with the image and VOA file from 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4942</b>.
+			<li>Confirm that the VOA file can be loaded and changes 
+			can be saved as appropriate.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4943]</b> Confirm that the Nuance, Licensing and 
+		<b>Nuance Licensing Tool</b> items are not included in the Start menu.
     	</ul>
 <p>
 	<LI><h3>Descriptions of LegacyRCAndUtils Changes</h3>
        	<ul>
-  	   	<LI><b>[LegacyRC #xxxx]</b> TBD
+  	   	<LI><b>[LegacyRC #5104]</b> Confirm that the FAM About box no longer displays 
+		any information about the FKB version.
+<p>
+  	   	<LI><b>[LegacyRC #5314]</b> Exercise OCR or rule execution against some blank 
+		pages and confirm that an <b>Application Trace</b> exception is logged for each 
+		example.
+<p>
+  	   	<LI><b>[LegacyRC #5945]</b> Idle Process Killer
 		<ul>
 			<li>TBD
 		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6049]</b> Email Client
+		<ul>
+			<li>Confirm that <b>EmailFile.exe</b> can be used with the <b>\client</b> 
+			switch to send an email.
+			<li>Confirm that <b>UserLicense.exe</b> can send a license request email 
+			in this manner.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6106]</b> Confirm that the <b>Unattempted</b> column on the 
+		DB Admin Summary tab will no longer display negative numbers while queuing.
+<p>
+  	   	<LI><b>[LegacyRC #6149]</b> Confirm that the <b>TestTextFunctionExpander</b> 
+		utility no longer inserts parameter names when a tag is selected.
+<p>
+  	   	<LI><b>[LegacyRC #6193]</b> Database Options
+		<ul>
+			<li>Log in to a FAM database several different times, each as a 
+			different user.
+			<li>Confirm that each user can successfully modify database settings.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6196]</b> Confirm that the Nuance portion of the install has 
+		been cut down.  Also confirm that performance is not degraded.
+<p>
+  	   	<LI><b>[LegacyRC #6225, #6226]</b> Deadlock When Stopping FAM Service
+		<ul>
+			<li>Exercise a <b>Thread Scalability</b> test with many FAMs and two 
+			threads each.  Confirm that the <b>FAM service</b> can be stopped.
+			<li>Confirm during and after processing that the number of 
+			<b>Processing</b> files is never negative.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6230]</b> Multiple Folder Suppliers
+		<ul>
+			<li>Prepare a queuing FPS file with two <b>Files from folder</b> suppliers.
+			<li>Configure one to listen for <b>TIF</b> images in a folder.
+			<li>Configure one to listen for <b>PDF</b> images in a folder.
+			<li>Confirm that adding a mixture of file types to the folder still 
+			queues each added file.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6231]</b> File Filters
+		<ul>
+			<li>Confirm that the all image types file filters no longer include 
+			<b>*.ext.*</b> where image.tif.uss would be included as an image.
+			<ul>
+				<li><b>Files from folder</b> file supplier
+				<li><b>Core: Apply Bates number</b> task
+				<li><b>Image Cleanup Settings Editor</b> utility
+			</ul>
+			<li>Confirm that the file filters include <b>*.tiff</b> as part of the 
+			TIF selection.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6232]</b> Confirm that <b>Nuance.lcxz</b> is included in the 
+		<b>CommonComponents</b> folder.
        	</ul>
 <p>
 	<LI><h3>Descriptions of Miscellaneous Changes</h3>
        	<ul>
-  	   	<LI><b>TBD</b>
+  	   	<LI><b>LabDE Installation</b>
 		<ul>
-			<li>TBD
+			<li>Confirm that LabDE and its components can be installed via 
+			Demo Shield.
 		</ul>
        	</ul>
    	</LI>
