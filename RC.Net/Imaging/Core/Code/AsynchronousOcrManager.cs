@@ -156,17 +156,22 @@ namespace Extract.Imaging
         /// Holds a stringized byte stream representation of the SpatialString returned
         /// from the most recently completed OCR process.
         /// </summary>
-        string _ocrTextStream;
+        volatile string _ocrTextStream;
 
         /// <summary>
         /// The name of the file for the OCR thread to perform text recognition on.
         /// </summary>
-        string _fileToOcr;
+        volatile string _fileToOcr;
 
         /// <summary>
         /// Mutex object
         /// </summary>
         object _lock = new object();
+
+        /// <summary>
+        /// Mutex to ensure only on OCR operation is started or canceled at the same time.
+        /// </summary>
+        object _operationInitLock = new object();
 
         /// <summary>
         /// Handle to the thread that is performing the OCR process.
@@ -176,12 +181,12 @@ namespace Extract.Imaging
         /// <summary>
         /// The first page to OCR.
         /// </summary>
-        int _startPage;
+        volatile int _startPage;
 
         /// <summary>
         /// The last page to OCR.
         /// </summary>
-        int _endPage;
+        volatile int _endPage;
 
         /// <summary>
         /// The logical area of an image page that should be OCR'd
@@ -603,79 +608,97 @@ namespace Extract.Imaging
                     !string.IsNullOrEmpty(fileName));
                 ExtractException.Assert("ELI22033", "File is not valid!",
                     File.Exists(fileName), "Ocr File Name", fileName);
-
-                // Check if OCR is currently complete
-                if (!_ocrDocumentCompleteEvent.WaitOne(0, false))
+                
+                // [FlexIDSCore:4944]
+                // Lock _operationInitLock immediately to prevent another OCR event from being
+                // started or cancelled until this one has been started.
+                lock (_operationInitLock)
                 {
-                    // Signal OCR canceled
-                    _ocrCanceledEvent.Set();
-
-                    // If currently performing an OCR task then kill the OCR engine
-                    if (_currentlyInOcr)
+                    // Check if OCR is currently complete
+                    if (!_ocrDocumentCompleteEvent.WaitOne(0, false))
                     {
-                        // Kill the ocr engine and wait
-                        _ssocr.WhackOCREngine();
+                        // Signal OCR canceled
+                        _ocrCanceledEvent.Set();
+
+                        // If currently performing an OCR task then kill the OCR engine
+                        if (_currentlyInOcr)
+                        {
+                            // Kill the ocr engine and wait
+                            _ssocr.WhackOCREngine();
+                        }
+
+                        // Wait for the current ocr to complete (if it times out there was a
+                        // problem, throw an exception)
+                        if (!_ocrDocumentCompleteEvent.WaitOne(_OCR_THREAD_COMPLETION_TIMEOUT,
+                            false))
+                        {
+                            throw new ExtractException("ELI22151",
+                                "Error: Timeout occurred while waiting for current OCR process to end!");
+                        }
                     }
 
-                    // Wait for the current ocr to complete (if it times out there was a
-                    // problem, throw an exception)
-                    if (!_ocrDocumentCompleteEvent.WaitOne(_OCR_THREAD_COMPLETION_TIMEOUT,
-                        false))
+                    // Reset progress status
+                    OnOcrProgressUpdate(new OcrProgressUpdateEventArgs(0.0));
+
+                    // Mutex around member variable changes
+                    lock (_lock)
                     {
-                        throw new ExtractException("ELI22151",
-                            "Error: Timeout occurred while waiting for current OCR process to end!");
+                        // Reset any old Ocr text
+                        _ocrTextStream = "";
+
+                        // Set the file to OCR
+                        _fileToOcr = fileName;
+
+                        // Set the start and end page
+                        _startPage = startPage;
+                        _endPage = endPage;
+
+                        // Set the image area to OCR
+                        _zonalOcrArea = imageArea;
                     }
-                }
 
-                // Reset progress status
-                OnOcrProgressUpdate(new OcrProgressUpdateEventArgs(0.0));
-
-                // Mutex around member variable changes
-                lock (_lock)
-                {
-                    // Reset any old Ocr text
-                    _ocrTextStream = "";
-
-                    // Set the file to OCR
-                    _fileToOcr = fileName;
-
-                    // Set the start and end page
-                    _startPage = startPage;
-                    _endPage = endPage;
-
-                    // Set the image area to OCR
-                    _zonalOcrArea = imageArea;
-                }
-
-                // [DotNetRCAndUtils:302] Set the OCR complete event to unsignaled
-                // This needs to be reset here and not within OcrFileThread in order to
-                // prevent a race condition.
-                _ocrDocumentCompleteEvent.Reset();
-
-                // Set the OCR canceled event to unsignaled
-                _ocrCanceledEvent.Reset();
-
-                if (cancelToken != null)
-                {
                     // Before launching the OCR process, ensure the operaion has not already been
-                    // canceled.
-                    if (cancelToken.Value.IsCancellationRequested)
+                    // cancelled.
+                    if (cancelToken != null && cancelToken.Value.IsCancellationRequested)
                     {
                         return;
                     }
-                    else
-                    {
-                        // If a cancel token has been provided, spawn a thread to watch for
-                        // cancelation.
-                        _cancelToken = cancelToken;
-                        Thread cancelTokenWatchThread =
-                            new Thread(new ThreadStart(CancelTokenWatchThread));
-                        cancelTokenWatchThread.Start();
-                    }
-                }
 
-                // Signal the New OCR event
-                _newOcrEvent.Set();
+                    // [DotNetRCAndUtils:302] Set the OCR complete event to unsignaled
+                    // This needs to be reset here and not within OcrFileThread in order to
+                    // prevent a race condition.
+                    _ocrDocumentCompleteEvent.Reset();
+
+                    // Set the OCR canceled event to unsignaled
+                    _ocrCanceledEvent.Reset();
+
+                    try
+                    {
+                        if (cancelToken != null)
+                        {
+                            // If a cancel token has been provided, spawn a thread to watch for
+                            // cancelation.
+                            _cancelToken = cancelToken;
+                            Thread cancelTokenWatchThread =
+                                new Thread(new ThreadStart(CancelTokenWatchThread));
+                            cancelTokenWatchThread.Start();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // [FlexIDSCore:4944]
+                        // Ensure we don't reset _ocrDocumentCompleteEvent without _newOcrEvent ever
+                        // getting set. That will result in an instance that is "stuck" and not able
+                        // to OCR anymore since all new events will be waiting on
+                        // _ocrDocumentCompleteEvent.
+                        _ocrDocumentCompleteEvent.Set();
+
+                        throw ex.AsExtract("ELI34141");
+                    }
+
+                    // Signal the New OCR event
+                    _newOcrEvent.Set();
+                }
             }
             catch (Exception ex)
             {
@@ -690,33 +713,39 @@ namespace Extract.Imaging
         {
             try
             {
-                // If OCR is not complete, then cancel the OCR process
-                if (!_ocrDocumentCompleteEvent.WaitOne(0, false))
+                // [FlexIDSCore:4944]
+                // Lock _operationInitLock immediately to prevent another OCR event from being
+                // started until this one has been cancelled.
+                lock (_operationInitLock)
                 {
-                    // Signal OCR canceled
-                    _ocrCanceledEvent.Set();
-
-                    // If currently performing an OCR task then kill the OCR engine
-                    if (_currentlyInOcr)
+                    // If OCR is not complete, then cancel the OCR process
+                    if (!_ocrDocumentCompleteEvent.WaitOne(0, false))
                     {
-                        // Kill the ocr engine and wait
-                        _ssocr.WhackOCREngine();
-                    }
+                        // Signal OCR canceled
+                        _ocrCanceledEvent.Set();
 
-                    // Wait for the current ocr to complete
-                    _ocrDocumentCompleteEvent.WaitOne();
+                        // If currently performing an OCR task then kill the OCR engine
+                        if (_currentlyInOcr)
+                        {
+                            // Kill the ocr engine and wait
+                            _ssocr.WhackOCREngine();
+                        }
 
-                    // Reset progress status
-                    OnOcrProgressUpdate(new OcrProgressUpdateEventArgs(0.0));
+                        // Wait for the current ocr to complete
+                        _ocrDocumentCompleteEvent.WaitOne();
 
-                    // Mutex around member variable changes
-                    lock (_lock)
-                    {
-                        // Reset any old Ocr text
-                        _ocrTextStream = "";
+                        // Reset progress status
+                        OnOcrProgressUpdate(new OcrProgressUpdateEventArgs(0.0));
 
-                        // Set the file to OCR to empty string
-                        _fileToOcr = "";
+                        // Mutex around member variable changes
+                        lock (_lock)
+                        {
+                            // Reset any old Ocr text
+                            _ocrTextStream = "";
+
+                            // Set the file to OCR to empty string
+                            _fileToOcr = "";
+                        }
                     }
                 }
             }

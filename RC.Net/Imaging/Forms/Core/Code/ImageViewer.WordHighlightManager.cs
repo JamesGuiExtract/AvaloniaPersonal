@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
@@ -14,7 +15,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
-
 using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 
 namespace Extract.Imaging.Forms
@@ -1744,6 +1744,10 @@ namespace Extract.Imaging.Forms
             /// A <see cref="SpatialString"/> instance representing the OCR data for
             /// the specified <see paramref="imageFile"/> and <see paramref="pageNumber"/>.
             /// </returns>
+            // Throwing an OperationCanceledException with an explicit but unreferenced argument.
+            // If throw is used with no exception, it is not thrown out as an
+            // OperationCanceledException and catch statements intended to catch it won't work.
+            [SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails")]
             SpatialString OCRPage(string imageFile, int pageNumber, OcrTradeoff ocrTradeoff)
             {
                 // NOTE:
@@ -1823,6 +1827,12 @@ namespace Extract.Imaging.Forms
                         }
                         else
                         {
+                            // [FlexIDSCore:4944]
+                            // If the page wasn't correctly OCR'd, the initial processing was likely
+                            // cancelled which would have set _ocrPageComplete. Before retrying,
+                            // ensure _ocrPageComplete is reset.
+                            _ocrPageComplete.Reset();
+
                             // The risk of infinite resursion is small, and in the end would be
                             // stopped by a document change that would trip _ocrCanceler.
                             return OCRPage(imageFile, pageNumber, ocrTradeoff);
@@ -1854,13 +1864,44 @@ namespace Extract.Imaging.Forms
                         return _ocrPageData[pageNumber].SpatialString;
                     }
                 }
+                catch (OperationCanceledException ex)
+                {
+                    lock (_ocrLock)
+                    {
+                        try
+                        {
+                            // Ensure the flag that indicates OCR was being loaded for this page is
+                            // cleared.
+                            ThreadSafeSpatialString ocrData;
+                            _ocrPageData.TryRemove(pageNumber, out ocrData);
+                        }
+                        catch (Exception ex2)
+                        {
+                            ex2.ExtractLog("ELI34140");
+                        }
+                    }
+
+                    // [FlexIDSCore:4944]
+                    // The outer scope is expecting that any OperationCanceledException be passed
+                    // through as a OperationCanceledException, otherwise LoaderOperation will error
+                    // out.
+                    throw ex;
+                }
                 catch (Exception ex)
                 {
                     lock (_ocrLock)
                     {
-                        // Ensure the flag that indicates OCR was being loaded for this page is cleared.
-                        ThreadSafeSpatialString ocrData;
-                        _ocrPageData.TryRemove(pageNumber, out ocrData);
+                        try
+                        {
+                            // Ensure the flag that indicates OCR was being loaded for this page is
+                            // cleared.
+                            ThreadSafeSpatialString ocrData;
+                            _ocrPageData.TryRemove(pageNumber, out ocrData);
+                        }
+                        catch (Exception ex2)
+                        {
+                            ex2.ExtractLog("ELI34139");
+                        }
                     }
 
                     throw ex.AsExtract("ELI32614");
