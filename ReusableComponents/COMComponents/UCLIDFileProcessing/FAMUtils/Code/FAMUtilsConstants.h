@@ -45,7 +45,7 @@ static const long gnPING_TIMEOUT = 60000; // 60 seconds
 static const long gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES = 5; // 5 minutes
 static const double gdMINIMUM_TRANSACTION_TIMEOUT = 300.0; // 5 minutes
 static const long gnDEFAULT_MIN_SLEEP_TIME_BETWEEN_DB_CHECK = 2000; // 2 seconds
-static const long gnDEFAULT_MAX_SLEEP_TIME_BETWEEN_DB_CHECK = 60000; // 1 minute
+static const long gnDEFAULT_MAX_SLEEP_TIME_BETWEEN_DB_CHECK = 2000; // 2 seconds
 
 // Min and max allowed settings for sleep time between db check
 static const long gnMIN_ALLOWED_SLEEP_TIME_BETWEEN_DB_CHECK = 500;

@@ -1772,8 +1772,8 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 			string strTop = "TOP (" + asString(nMaxFiles) + ") ";
 			if (bGetSkippedFiles == VARIANT_TRUE)
 			{
-				strWhere = " INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID AND  "
-					"SkippedFile.ActionID = <ActionIDPlaceHolder> WHERE (ActionStatus = 'S'";
+				strWhere = "INNER JOIN SkippedFile ON FileActionStatus.FileID = SkippedFile.FileID "
+					"AND SkippedFile.ActionID = <ActionIDPlaceHolder> WHERE ActionStatus = 'S'";
 
 				string strUserName = asString(bstrSkippedForUserName);
 				if(!strUserName.empty())
@@ -1785,12 +1785,58 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 
 				// Only get files that have not been skipped by the current process
 				strWhere += " AND SkippedFile.UPIID <> " + strUPIID;
-
-				strWhere += ")";
 			}
 			else
 			{
 				strWhere = "WHERE (ActionStatus = 'P')";
+			}
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			long nActionID;
+
+			{
+				BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Get the action ID 
+				nActionID = getActionID(ipConnection, strActionName);
+
+				// [LegacyRCAndUtils:6233]
+				// Since the query run by setFilesToProcessing is expensive (even when there are no
+				// pending records available), before calling setFilesToProcessing do a quick and
+				// simple check to see if there are any files available.
+				string strGateKeeperQuery =
+					"SELECT TOP 1 [FileActionStatus].[FileID] FROM [FileActionStatus] " + strWhere +
+					" AND [FileActionStatus].[ActionID] = <ActionIDPlaceHolder>";
+
+				// Update the select statement with the action ID
+				replaceVariable(strGateKeeperQuery, strActionIDPlaceHolder, asString(nActionID));
+
+				_RecordsetPtr ipResultSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI34144", ipResultSet != __nullptr);
+
+				ipResultSet->Open(strGateKeeperQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+					adOpenStatic, adLockReadOnly, adCmdText);
+
+				// If there are no files available, don't bother calling setFilesToProcessing.
+				if (ipResultSet->RecordCount == 0)
+				{
+					IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
+					ASSERT_RESOURCE_ALLOCATION("ELI34145", ipFiles != __nullptr);
+
+					*pvecFileRecords = ipFiles.Detach();
+					
+					return true;
+				}
+
+				END_CONNECTION_RETRY(ipConnection, "ELI34143");
 			}
 
 			// Order by priority [LRCAU #5438]
@@ -1805,9 +1851,6 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 			string strSelectSQL = "SELECT " + strTop
 				+ " FAMFile.ID, FileName, Pages, FileSize, Priority, ActionStatus " + strFrom;
 
-			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = __nullptr;
-
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
@@ -1815,9 +1858,6 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
-
-				// Get the action ID 
-				long nActionID = getActionID(ipConnection, strActionName);
 
 				// Update the select statement with the action ID
 				replaceVariable(strSelectSQL, strActionIDPlaceHolder, asString(nActionID));
