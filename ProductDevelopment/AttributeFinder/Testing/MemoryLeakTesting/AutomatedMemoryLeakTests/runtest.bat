@@ -12,10 +12,10 @@ set dbname=MEMORY_LEAK
 
 :: find log file and service database directory
 if defined ProgramData (
-set logdir=%ProgramData%\Extract Systems\LogFiles\Misc
+set logdir=%ProgramData%\Extract Systems\LogFiles\
 set dbdir=%ProgramData%\Extract Systems\ESFAMService
 ) else (
-set logdir=C:\Documents and Settings\All Users\Application Data\Extract Systems\LogFiles\Misc
+set logdir=C:\Documents and Settings\All Users\Application Data\Extract Systems\LogFiles\
 set dbdir=C:\Documents and Settings\All Users\Application Data\Extract Systems\ESFAMService
 )
 
@@ -50,7 +50,7 @@ if exist "%testdir%\DatabaseFiles\*.*" del /q "%testdir%\DatabaseFiles\*.*"
 if exist "%testdir%\UEX_Logs\*.*" del /q "%testdir%\UEX_Logs\*.*"
 
 call "%testpath%\%testname%.bat"
-start "LogProcessStats" "%ccdir%\LogProcessStats.exe" esfamservice.exe,famprocess.exe,ssocr2.exe,imageformatconverter.exe 10s "%testdir%\Stats"
+start "LogProcessStats" "%ccdir%\LogProcessStats.exe" esfamservice.exe,famprocess.exe,fampro~1.exe,ssocr2.exe,imageformatconverter.exe 10s "%testdir%\Stats"
 
 :: -----------------------------------------------------------------------------
 :: Process for specified time

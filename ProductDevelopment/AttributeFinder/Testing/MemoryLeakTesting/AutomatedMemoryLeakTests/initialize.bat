@@ -14,10 +14,10 @@ set dbname=Memory_Leak
 
 :: find log file and service database directory
 if defined ProgramData (
-set logdir=%ProgramData%\Extract Systems\LogFiles\Misc
+set logdir=%ProgramData%\Extract Systems\LogFiles\
 set dbdir=%ProgramData%\Extract Systems\ESFAMService
 ) else (
-set logdir=C:\Documents and Settings\All Users\Application Data\Extract Systems\LogFiles\Misc
+set logdir=C:\Documents and Settings\All Users\Application Data\Extract Systems\LogFiles\
 set dbdir=C:\Documents and Settings\All Users\Application Data\Extract Systems\ESFAMService
 )
 
