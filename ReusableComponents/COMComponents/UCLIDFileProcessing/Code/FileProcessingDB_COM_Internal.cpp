@@ -82,7 +82,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 111;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 112;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -126,7 +126,7 @@ int UpdateToSchemaVersion101(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back(gstrADD_LOCKED_FILE_PROCESSINGFAM_FK);
 
 		// Create the FileActionStatus table and associated indexes/constraints.
-		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS);
+		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_LEGACY);
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_ACTION_ACTIONSTATUS_INDEX);
 		vecQueries.push_back(gstrADD_ACTION_PROCESSINGFAM_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_FK);
@@ -557,6 +557,48 @@ int UpdateToSchemaVersion111(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33957");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion112(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 112;
+
+		if (pnNumSteps != __nullptr)
+		{
+			// This update requires potentialy creating a new row in the FileActionStatus table for
+			// every row in the FAMFile table and is therefore O(n) relative to the number of files
+			// in the DB.
+			*pnNumSteps += 10;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("EXEC sp_rename 'dbo.FileActionStatus', 'FileActionStatus_Old'");
+		vecQueries.push_back("ALTER TABLE [FileActionStatus_Old] DROP CONSTRAINT [PK_FileActionStatus]");
+		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS);
+		vecQueries.push_back("INSERT INTO [FileActionStatus] "
+			"([ActionID], [FileID], [ActionStatus], [Priority]) "
+			"	SELECT [ActionID], [FileID], [ActionStatus], [FAMFile].[Priority] "
+			"		FROM [FileActionStatus_Old] "
+			"		INNER JOIN [FAMFile] ON [FileActionStatus_Old].[FileID] = [FAMFile].[ID]");
+		vecQueries.push_back("DROP TABLE [FileActionStatus_Old]");
+		vecQueries.push_back("DROP INDEX [IX_Files_PriorityID] ON [FAMFile]");
+		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_ALL_INDEX);
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_FK);
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_STATUS_FK);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34146");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -826,6 +868,8 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					// Set the fields from the new file record
 					setFieldsFromFileRecord(ipFields, ipNewFileRecord);
 
+					string strPriority = asString(getLongField(ipFields, "Priority"));
+
 					_lastCodePos = "60";
 
 					// Add the record
@@ -866,8 +910,10 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					_lastCodePos = "80";
 
 					// Create a record in the FileActionStatus table for the status of the new record
-					string strStatusSQL = "INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus)  VALUES( " + 
-						asString(nID) + ", " + asString(nActionID) + ", '" + strNewStatus + "')";
+					string strStatusSQL = "INSERT INTO FileActionStatus "
+						"(FileID, ActionID, ActionStatus, Priority) "
+						"VALUES( " + asString(nID) + ", " + asString(nActionID) + ", '" + strNewStatus +
+						"', " + strPriority + ")";
 
 					_lastCodePos = "85";
 
@@ -934,6 +980,8 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 						// (only update the priority if force processing)
 						setFieldsFromFileRecord(ipFields, ipNewFileRecord, asCppBool(bForceStatusChange));
 
+						string strPriority = asString(getLongField(ipFields, "Priority"));
+
 						_lastCodePos = "110";
 
 						// Update the record
@@ -945,18 +993,27 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 						string strStatusSQL;
 						if ( *pPrevStatus == kActionUnattempted)
 						{
-							strStatusSQL = "INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus)  VALUES( " + 
-								asString(nID) + ", " + asString(nActionID) + ", '" + strNewStatus + "')";
+							strStatusSQL = "INSERT INTO FileActionStatus "
+								"(FileID, ActionID, ActionStatus, Priority) "
+								"VALUES( " + asString(nID) + ", " + asString(nActionID) + ", '" + strNewStatus +
+								"', " + strPriority + ")";
 						}
 						else
 						{
 							strStatusSQL = "UPDATE FileActionStatus SET ActionStatus = '" + strNewStatus +
-								"' WHERE FileID = " + asString(nID) + " AND ActionID = " + asString(nActionID) +
-								" AND ActionStatus != '" + strNewStatus + "'";
+								"', Priority = " + strPriority + " WHERE FileID = " + asString(nID) +
+								" AND ActionID = " + asString(nActionID) + " AND ActionStatus != '" +
+								strNewStatus + "'";
 						}
 
 						// Update or insert the status 
-						long nRecordsAffected = executeCmdQuery(ipConnection, strStatusSQL);	
+						long nRecordsAffected = executeCmdQuery(ipConnection, strStatusSQL);
+
+						string strUpdatePrioritySQL = "UPDATE FileActionStatus SET Priority = " +
+							strPriority + " WHERE FileID = " + asString(nID) +
+							" AND Priority <> " + strPriority;
+
+						executeCmdQuery(ipConnection, strUpdatePrioritySQL);
 
 						// if no records were affected the previous status should be changed to the
 						// new status, since if no records were affected it was changed by another 
@@ -1652,11 +1709,14 @@ bool CFileProcessingDB::SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAc
 					executeCmdQuery(ipConnection, strUpdateStatus);
 
 					// Insert new records where previous status was 'U'
-					string strInsertStatus = "INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus)"
+					string strInsertStatus = "INSERT INTO FileActionStatus "
+						"(FileID, ActionID, ActionStatus, Priority) "
 						" SELECT FAMFile.ID, " + strActionID + " as ActionID, '" +
-						strActionStatus + "' as ActionStatus FROM FAMFile "
-						" LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID AND "
-						" FileActionStatus.ActionID = " + strActionID +
+						strActionStatus + "' AS ActionStatus, "
+						"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority "
+						"FROM FAMFile LEFT JOIN FileActionStatus ON "
+						"FAMFile.ID = FileActionStatus.FileID AND "
+						"FileActionStatus.ActionID = " + strActionID +
 						" WHERE FileActionStatus.ActionID IS NULL ";
 					executeCmdQuery(ipConnection, strInsertStatus);
 				}
@@ -1772,8 +1832,8 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 			string strTop = "TOP (" + asString(nMaxFiles) + ") ";
 			if (bGetSkippedFiles == VARIANT_TRUE)
 			{
-				strWhere = "INNER JOIN SkippedFile ON FileActionStatus.FileID = SkippedFile.FileID "
-					"AND SkippedFile.ActionID = <ActionIDPlaceHolder> WHERE ActionStatus = 'S'";
+				strWhere = " INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID AND  "
+					"SkippedFile.ActionID = <ActionIDPlaceHolder> WHERE (ActionStatus = 'S'";
 
 				string strUserName = asString(bstrSkippedForUserName);
 				if(!strUserName.empty())
@@ -1785,62 +1845,16 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 
 				// Only get files that have not been skipped by the current process
 				strWhere += " AND SkippedFile.UPIID <> " + strUPIID;
+
+				strWhere += ")";
 			}
 			else
 			{
 				strWhere = "WHERE (ActionStatus = 'P')";
 			}
 
-			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = __nullptr;
-
-			long nActionID;
-
-			{
-				BEGIN_CONNECTION_RETRY();
-
-				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
-
-				// Make sure the DB Schema is the expected version
-				validateDBSchemaVersion();
-
-				// Get the action ID 
-				nActionID = getActionID(ipConnection, strActionName);
-
-				// [LegacyRCAndUtils:6233]
-				// Since the query run by setFilesToProcessing is expensive (even when there are no
-				// pending records available), before calling setFilesToProcessing do a quick and
-				// simple check to see if there are any files available.
-				string strGateKeeperQuery =
-					"SELECT TOP 1 [FileActionStatus].[FileID] FROM [FileActionStatus] " + strWhere +
-					" AND [FileActionStatus].[ActionID] = <ActionIDPlaceHolder>";
-
-				// Update the select statement with the action ID
-				replaceVariable(strGateKeeperQuery, strActionIDPlaceHolder, asString(nActionID));
-
-				_RecordsetPtr ipResultSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI34144", ipResultSet != __nullptr);
-
-				ipResultSet->Open(strGateKeeperQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-					adOpenStatic, adLockReadOnly, adCmdText);
-
-				// If there are no files available, don't bother calling setFilesToProcessing.
-				if (ipResultSet->RecordCount == 0)
-				{
-					IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
-					ASSERT_RESOURCE_ALLOCATION("ELI34145", ipFiles != __nullptr);
-
-					*pvecFileRecords = ipFiles.Detach();
-					
-					return true;
-				}
-
-				END_CONNECTION_RETRY(ipConnection, "ELI34143");
-			}
-
 			// Order by priority [LRCAU #5438]
-			strWhere += " ORDER BY [FAMFile].[Priority] DESC, [FAMFile].[ID] ASC ";
+			strWhere += " ORDER BY [FileActionStatus].[Priority] DESC, [FileActionStatus].[FileID] ASC ";
 
 			// Build the from clause
 			string strFrom = "FROM FAMFile INNER JOIN FileActionStatus "
@@ -1849,7 +1863,10 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 
 			// create query to select top records;
 			string strSelectSQL = "SELECT " + strTop
-				+ " FAMFile.ID, FileName, Pages, FileSize, Priority, ActionStatus " + strFrom;
+				+ " FAMFile.ID, FileName, Pages, FileSize, FileActionStatus.Priority, ActionStatus " + strFrom;
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -1858,6 +1875,9 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
+
+				// Get the action ID 
+				long nActionID = getActionID(ipConnection, strActionName);
 
 				// Update the select statement with the action ID
 				replaceVariable(strSelectSQL, strActionIDPlaceHolder, asString(nActionID));
@@ -2808,14 +2828,16 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 				string strSelectQuery;
 				if (!bFromSpecified)
 				{
-					strSelectQuery = "SELECT FAMFile.ID, FileName, FileSize, Pages, Priority, "
-						"COALESCE(ToFAS.ActionStatus, 'U') AS ToActionStatus "
+					strSelectQuery = "SELECT FAMFile.ID, FileName, FileSize, Pages, "
+						"COALESCE (FileActionStatus.Priority, FAMFile.Priority) AS Priority, "
+						"COALESCE (ToFAS.ActionStatus, 'U') AS ToActionStatus "
 						"FROM FAMFile LEFT JOIN FileActionStatus as ToFAS "
 						"ON FAMFile.ID = ToFAS.FileID AND ToFAS.ActionID = " + strToActionID;
 				}
 				else
 				{
-					strSelectQuery = "SELECT FAMFile.ID, FileName, FileSize, Pages, Priority, "
+					strSelectQuery = "SELECT FAMFile.ID, FileName, FileSize, Pages, "
+						"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority, "
 						"COALESCE(ToFAS.ActionStatus, 'U') AS ToActionStatus, "
 						"COALESCE(FromFAS.ActionStatus, 'U') AS FromActionStatus "
 						"FROM FAMFile LEFT JOIN FileActionStatus as ToFAS "
@@ -4004,19 +4026,25 @@ bool CFileProcessingDB::SetPriorityForFiles_Internal(bool bDBLocked, BSTR bstrSe
 					glDEFAULT_FILE_PRIORITY : (long)eNewPriority);
 				while(!stackIDs.empty())
 				{
-					// Build the update query
-					string strUpdateQuery = "UPDATE FAMFile SET Priority = " + strPriority
-						+ " WHERE [FAMFile].[ID] IN (" + stackIDs.top();
+					vector<string> vecQueries;
+					
+					string strIDList("(" + stackIDs.top());
 					stackIDs.pop();
-					for (int i=0; !stackIDs.empty() && i < 150; i++)
+					for (int i = 0; !stackIDs.empty() && i < 150; i++)
 					{
-						strUpdateQuery += ", " + stackIDs.top();
+						strIDList += ", " + stackIDs.top();
 						stackIDs.pop();
 					}
-					strUpdateQuery += ")";
+					strIDList += ")";
 
-					// Execute the update query
-					executeCmdQuery(ipConnection, strUpdateQuery);
+					// Build the queries to update both FAMFile and FileActionStatus
+					vecQueries.push_back("UPDATE [FAMFile] SET [Priority] = " + strPriority
+						+ " WHERE [ID] IN " + strIDList);
+					vecQueries.push_back("UPDATE [FileActionStatus] SET [Priority] = " + strPriority
+						+ " WHERE [FileID] IN " + strIDList);
+					
+					// Execute the queries
+					executeVectorOfSQL(ipConnection, vecQueries);
 				}
 
 
@@ -5343,9 +5371,10 @@ bool CFileProcessingDB::SetFileStatusToProcessing_Internal(bool bDBLocked, long 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
-
-				string strSelectSQL = "SELECT FAMFile.ID, FileName, Pages, FileSize, Priority, "
-					"COALESCE(ActionStatus, 'U') AS ActionStatus FROM FAMFile LEFT JOIN FileActionStatus ON "
+				string strSelectSQL = "SELECT FAMFile.ID, FileName, Pages, FileSize, "
+					"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority, "
+					"COALESCE(ActionStatus, 'U') AS ActionStatus "
+					"FROM FAMFile LEFT JOIN FileActionStatus ON "
 					"FAMFile.ID = FileID AND ActionID = " + asString(nActionID) +
 					" WHERE FAMFile.ID = " + asString(nFileId);
 
@@ -5433,7 +5462,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 108:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion109);
 				case 109:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion110);
 				case 110:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion111);
-				case 111:	break;
+				case 111:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion112);
+				case 112:   break;
 
 				default:
 					{

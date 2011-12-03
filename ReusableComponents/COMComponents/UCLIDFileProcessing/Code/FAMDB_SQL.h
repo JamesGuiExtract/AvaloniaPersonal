@@ -202,7 +202,8 @@ static const string gstrCREATE_INPUT_EVENT =
 	"[PID] int NOT NULL, "
 	"[SecondsWithInputEvents] int NOT NULL)";
 
-static const string gstrCREATE_FILE_ACTION_STATUS = 
+// This is an old version of the FileActionStatus table that is used only for schema updates.
+static const string gstrCREATE_FILE_ACTION_STATUS_LEGACY = 
 	"CREATE TABLE [dbo].[FileActionStatus]( "
 	"[ActionID] [int] NOT NULL, "
 	"[FileID] [int] NOT NULL, "
@@ -211,6 +212,18 @@ static const string gstrCREATE_FILE_ACTION_STATUS =
 	"( "
 	"	[ActionID] ASC, "
 	"	[FileID] ASC "
+	")) ";
+
+static const string gstrCREATE_FILE_ACTION_STATUS = 
+	"CREATE TABLE [dbo].[FileActionStatus]( "
+	"[ActionID] [int] NOT NULL, "
+	"[FileID] [int] NOT NULL, "
+	"[ActionStatus] [nvarchar](1) NOT NULL, "
+	"[Priority] [int] NOT NULL, \r\n"
+	"CONSTRAINT [PK_FileActionStatus] PRIMARY KEY CLUSTERED "
+	"( "
+	"	[FileID] ASC, "
+	"	[ActionID] ASC "
 	")) ";
 
 static const string gstrCREATE_SOURCE_DOC_CHANGE_HISTORY =
@@ -268,9 +281,6 @@ static const string gstrCREATE_FTP_EVENT_HISTORY_TABLE  ="CREATE TABLE [dbo].[FT
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
 	"ON [DBInfo]([ID])";
 
-static const string gstrCREATE_FAM_FILE_ID_PRIORITY_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_Files_PriorityID] "
-	"ON [FAMFile]([Priority] DESC, [ID] ASC)";
-
 static const string gstrCREATE_FAM_FILE_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_Files_FileName] "
 	"ON [FAMFile]([FileName] ASC)";
 
@@ -301,10 +311,16 @@ static const string gstrCREATE_FPS_FILE_NAME_INDEX = "CREATE NONCLUSTERED INDEX 
 static const string gstrCREATE_INPUT_EVENT_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
 	"[IX_Input_Event] ON [InputEvent]([TimeStamp], [ActionID], [MachineID], [FAMUserID], [PID])";
 
+// No longer part of the database; definition for schema update use only.
 static const string gstrCREATE_FILE_ACTION_STATUS_ACTION_ACTIONSTATUS_INDEX = 
 	"CREATE NONCLUSTERED INDEX "
 	"[IX_FileActionStatus_ActionID_ActionStatus] ON [dbo].[FileActionStatus] "
 	"([ActionID] ASC, [ActionStatus] ASC)";
+
+static const string gstrCREATE_FILE_ACTION_STATUS_ALL_INDEX = 
+	"CREATE UNIQUE NONCLUSTERED INDEX "
+	"[IX_FileActionStatus_All] ON [dbo].[FileActionStatus] "
+	"([ActionID] ASC, [ActionStatus] ASC, [Priority] DESC, [FileID] ASC)";
 
 static const string gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX =
 	"CREATE UNIQUE NONCLUSTERED INDEX "

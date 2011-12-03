@@ -151,9 +151,10 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		{
 			strUpdateFAS = "UPDATE FileActionStatus SET ActionStatus = '" + strState
 				+ "' WHERE ActionID = " + strActionID + " AND FileID IN (";
-			strInsertIntoFAS = "INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus) "
-				"SELECT FAMFile.ID, " + strActionID + " AS ActionID, '" + strState + "' AS ActionStatus " +
-				"FROM FAMFile LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID "
+			strInsertIntoFAS = "INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus, Priority) "
+				"SELECT FAMFile.ID, " + strActionID + " AS ActionID, '" + strState + "' AS ActionStatus, " +
+				"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority FROM FAMFile " +
+				"LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID "
 				"AND ActionID = " + strActionID + " WHERE ActionID IS NULL AND FAMFile.ID IN (";
 		}
 		string strDeleteLockedFile = "DELETE FROM LockedFile WHERE ActionID = "
@@ -262,7 +263,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 
 		// Set up the select query to select the file to change and include and skipped file data
 		// If there is no skipped file record the SkippedActionID will be -1
-		string strFileSQL = "SELECT FAMFile.ID as ID, FileName, FileSize, Pages, Priority, " 
+		string strFileSQL = "SELECT FAMFile.ID as ID, FileName, FileSize, Pages, [FAMFile].Priority, " 
 			"COALESCE(ActionStatus, 'U') AS ActionStatus, COALESCE(SkippedFile.ActionID, -1) AS SkippedActionID "
 			"FROM FAMFile LEFT OUTER JOIN SkippedFile ON SkippedFile.FileID = FAMFile.ID AND " 
 			"SkippedFile.ActionID = " + asString(nActionID) + 
@@ -332,8 +333,10 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			if (easRtn == kActionUnattempted && strState != "U")
 			{
 				// add new record to the FileActionStatus table
-				executeCmdQuery(ipConnection, "INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus) "
-					" VALUES (" + asString(nFileID) + ", " + asString(nActionID) + ", '" + strState + "')");
+				executeCmdQuery(ipConnection, "INSERT INTO FileActionStatus "
+					"(FileID, ActionID, ActionStatus, Priority) "
+					" VALUES (" + asString(nFileID) + ", " + asString(nActionID) + ", '" + strState + "', " +
+					asString(ipCurrRecord->Priority) + ")");
 			}
 
 			_lastCodePos = "180";
@@ -952,7 +955,6 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		}
 
 		// Add indexes
-		vecQueries.push_back(gstrCREATE_FAM_FILE_ID_PRIORITY_INDEX);
 		vecQueries.push_back(gstrCREATE_FAM_FILE_INDEX);
 		vecQueries.push_back(gstrCREATE_QUEUE_EVENT_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_COMMENT_INDEX);
@@ -962,7 +964,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_UPI_INDEX);
 		vecQueries.push_back(gstrCREATE_FPS_FILE_NAME_INDEX);
 		vecQueries.push_back(gstrCREATE_INPUT_EVENT_INDEX);
-		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_ACTION_ACTIONSTATUS_INDEX);
+		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_ALL_INDEX);
 		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX);
 		
 		// Add user-table specific indices if necessary.
@@ -1242,9 +1244,9 @@ void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, con
 		executeCmdQuery(ipConnection, strDeleteTo);
 
 		// Create new FileActionStatus records based on the value of the from action ID
-		string strCopy = "INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus) "
-			"SELECT FileID, " + strToActionID + " as ActionID, ActionStatus FROM FileActionStatus "
-			"WHERE ActionID = " + strFromActionID;
+		string strCopy = "INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus, Priority) "
+			"SELECT FileID, " + strToActionID + " as ActionID, ActionStatus, Priority "
+			"FROM FileActionStatus WHERE ActionID = " + strFromActionID;
 		executeCmdQuery(ipConnection, strCopy);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27054");
