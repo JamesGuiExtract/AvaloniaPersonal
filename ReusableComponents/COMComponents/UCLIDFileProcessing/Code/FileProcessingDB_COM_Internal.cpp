@@ -231,7 +231,7 @@ int UpdateToSchemaVersion102(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		// Add default value for ActionStatisticsUpdateFreqInSeconds.
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
-				+ gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS + "', '5')");
+				+ gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS + "', '300')");
 
 		// Regenerate the action statistics for all actions (empty "where" clause)
 		string strCreateActionStatsSQL = gstrRECREATE_ACTION_STATISTICS_FOR_ACTION;

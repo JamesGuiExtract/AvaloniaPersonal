@@ -1166,7 +1166,7 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrREQUIRE_AUTHENTICATION_BEFORE_RUN] = "0";
 	mapDefaultValues[gstrAUTO_CREATE_ACTIONS] = "0";
 	mapDefaultValues[gstrSKIP_AUTHENTICATION_ON_MACHINES] = "";
-	mapDefaultValues[gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS] = "5";
+	mapDefaultValues[gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS] = "300";
 	mapDefaultValues[gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT] =
 		asString(gdMINIMUM_TRANSACTION_TIMEOUT, 0);
 	mapDefaultValues[gstrSTORE_SOURCE_DOC_NAME_CHANGE_HISTORY] = "1";
@@ -1459,7 +1459,7 @@ UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_Conn
 
 	// Open the recordset for the statisics with the record for ActionID if it exists
 	ipActionStatSet->Open(strSelectStat.c_str(), 
-		_variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+		_variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 		adLockOptimistic, adCmdText);
 
 	bool bRecalculated = false;
@@ -1511,6 +1511,26 @@ UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_Conn
 			ue.addDebugInfo("ActionID", nActionID);
 			throw ue;
 		}
+	}
+	else
+	{
+		// [LegacyRCAndUtils:6233]
+		// If m_nActionStatisticsUpdateFreqInSeconds has not expired since the last update,
+		// calculate stats using a query that aggregates all the values in the ActionStatisicsDelta
+		// table ActionStatistics so that m_nActionStatisticsUpdateFreqInSeconds can be a large
+		// value. On a stressed DB, this has very minimal cost compared to performing the locking
+		// that is necessary for updateActionStatisticsFromDelta, even when the delta table has
+		// tens of thousands of records.
+		ipActionStatSet->Close();
+
+		string strCalcStat = gstrCALCULATE_ACTION_STATISTICS_FOR_ACTION;
+		replaceVariable(strCalcStat, "<ActionIDWhereClause>", asString(nActionID));
+
+		ipActionStatSet->Open(strCalcStat.c_str(), 
+			_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockOptimistic, adCmdText);
+
+		ipFields = ipActionStatSet->Fields;
+		ASSERT_RESOURCE_ALLOCATION("ELI34152", ipFields != __nullptr);
 	}
 
 	// Get all the data from the recordset
@@ -1753,6 +1773,22 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 			{
 				// If we timed out getting the mutex lock, throw the time out exception.
 				throw;
+			}
+
+			// [LegacyRCAndUtils:5934]
+			// To avoid an error that can be displayed if the FAM is stopped while attempting to
+			// lock the DB, check if m_mapThreadIDtoDBConnections is empty which indicates
+			// closeAllDBConnections has been called since this method was first called. If that is
+			// the case, return without error.
+			{
+				CSingleLock lock(&m_mutex, TRUE);
+				if (m_mapThreadIDtoDBConnections.size() == 0)
+				{
+					// Ensure the mutex lock is released if we had it.
+					pmutexLock->Unlock();
+
+					return;
+				}
 			}
 
 			// Ensure the mutex lock is released if we had it.

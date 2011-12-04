@@ -788,6 +788,30 @@ static const string gstrRECREATE_ACTION_STATISTICS_FOR_ACTION =
 	"GROUP BY ActionID) as NewStats "
 	"<ActionIDWhereClause> ";
 
+// Query to obtain statistics by aggregating all of the data in ActionStatistics and
+// ActionStatisticsDelta.
+//		<ActionIDToUpdate> Should be replaced with the ActionID for which stats are needed.
+static const string gstrCALCULATE_ACTION_STATISTICS_FOR_ACTION =
+	"SELECT MAX([ActionStatistics].[NumDocuments]) + COALESCE(SUM([ActionStatisticsDelta].[NumDocuments]), 0) AS [NumDocuments],"
+	"      MAX([ActionStatistics].[NumDocumentsPending]) + COALESCE(SUM([ActionStatisticsDelta].[NumDocumentsPending]), 0) AS [NumDocumentsPending],"
+	"      MAX([ActionStatistics].[NumDocumentsComplete]) + COALESCE(SUM([ActionStatisticsDelta].[NumDocumentsComplete]), 0) AS [NumDocumentsComplete],"
+	"      MAX([ActionStatistics].[NumDocumentsFailed]) + COALESCE(SUM([ActionStatisticsDelta].[NumDocumentsFailed]), 0) AS [NumDocumentsFailed],"
+	"      MAX([ActionStatistics].[NumDocumentsSkipped]) + COALESCE(SUM([ActionStatisticsDelta].[NumDocumentsSkipped]), 0) AS [NumDocumentsSkipped],"
+	"      MAX([ActionStatistics].[NumPages]) + COALESCE(SUM([ActionStatisticsDelta].[NumPages]), 0) AS [NumPages],"
+	"      MAX([ActionStatistics].[NumPagesPending]) + COALESCE(SUM([ActionStatisticsDelta].[NumPagesPending]), 0) AS [NumPagesPending],"
+	"      MAX([ActionStatistics].[NumPagesComplete]) + COALESCE(SUM([ActionStatisticsDelta].[NumPagesComplete]), 0) AS [NumPagesComplete],"
+	"      MAX([ActionStatistics].[NumPagesFailed]) + COALESCE(SUM([ActionStatisticsDelta].[NumPagesFailed]), 0) AS [NumPagesFailed],"
+	"      MAX([ActionStatistics].[NumPagesSkipped]) + COALESCE(SUM([ActionStatisticsDelta].[NumPagesSkipped]), 0) AS [NumPagesSkipped],"
+	"      MAX([ActionStatistics].[NumBytes]) + COALESCE(SUM([ActionStatisticsDelta].[NumBytes]), 0) AS [NumBytes],"
+	"      MAX([ActionStatistics].[NumBytesPending]) + COALESCE(SUM([ActionStatisticsDelta].[NumBytesPending]), 0) AS [NumBytesPending],"
+	"      MAX([ActionStatistics].[NumBytesComplete]) + COALESCE(SUM([ActionStatisticsDelta].[NumBytesComplete]), 0) AS [NumBytesComplete],"
+	"      MAX([ActionStatistics].[NumBytesFailed]) + COALESCE(SUM([ActionStatisticsDelta].[NumBytesFailed]), 0) AS [NumBytesFailed],"
+	"      MAX([ActionStatistics].[NumBytesSkipped]) + COALESCE(SUM([ActionStatisticsDelta].[NumBytesSkipped]), 0) AS [NumBytesSkipped]"
+	"  FROM [ActionStatistics]"
+	"  LEFT JOIN [ActionStatisticsDelta] ON [ActionStatistics].[ActionID] = [ActionStatisticsDelta].[ActionID]"
+	"  WHERE [ActionStatistics].[ActionID] = <ActionIDWhereClause> "
+	"  GROUP BY [ActionStatistics].[ActionID]";
+
 // Query to use to update the ActionStatistics table from the ActionStatisticsDelta table
 // There are to variables that need to be replaced:
 //		<LastDeltaID>	Should be replaced with the last record in the ActionStatisticsDelta table 
