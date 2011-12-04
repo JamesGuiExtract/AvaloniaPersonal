@@ -1646,6 +1646,8 @@ void CFileProcessingDB::validateDBSchemaVersion()
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLockName)
 {
+	int nMaxWaitTime = -1;
+
 	// Get the lock variable for the specified lock name
 	CMutex* pmutexLock = m_mapDbLocks[strLockName];
 
@@ -1747,6 +1749,8 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 						// get the lock
 						continue;
 					}
+
+					throw UCLIDException("ELI34153", "Another process has the lock.");
 				}
 
 				// Add the lock
@@ -1778,21 +1782,22 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 			// [LegacyRCAndUtils:5934]
 			// To avoid an error that can be displayed if the FAM is stopped while attempting to
 			// lock the DB, check if m_mapThreadIDtoDBConnections is empty which indicates
-			// closeAllDBConnections has been called since this method was first called. If that is
-			// the case, return without error.
+			// closeAllDBConnections has been called since this method was first called.
+			bool bAllConnectionsClosed = false;
+			if (!bConnectionGood)
 			{
 				CSingleLock lock(&m_mutex, TRUE);
-				if (m_mapThreadIDtoDBConnections.size() == 0)
-				{
-					// Ensure the mutex lock is released if we had it.
-					pmutexLock->Unlock();
-
-					return;
-				}
+				bAllConnectionsClosed = (m_mapThreadIDtoDBConnections.size() == 0);
 			}
 
 			// Ensure the mutex lock is released if we had it.
 			pmutexLock->Unlock();
+
+			// If all connections have been intentionally closed, return without error.
+			if (bAllConnectionsClosed)
+			{
+				return;
+			}
 
 			// if the bConnectionGood flag is false the exception should be thrown
 			if (!bConnectionGood) 
@@ -1802,11 +1807,38 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 				throw uexOuter;
 			}
 		};
+
+		// Determine the range of possible wait times for each attempt at getting the lock based
+		// upon how many active FAMs there are. The more active FAMs, the greater the likelyhood
+		// that multiple processes are hitting the DB in this loop.
+		if (nMaxWaitTime < 0)
+		{
+			try
+			{
+				_RecordsetPtr ipActiveFAMs(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI34154", ipActiveFAMs != __nullptr);
+
+				// Retrieve the count of active FAMs
+				ipActiveFAMs->Open("SELECT COUNT(*) AS [FAMCount] FROM [ActiveFAM]", 
+					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+					adLockReadOnly, adCmdText);
+
+				ipActiveFAMs->MoveFirst();
+
+				nMaxWaitTime = 50 + (10 * getLongField(ipActiveFAMs->Fields, "FAMCount"));
+			}
+			catch (...)
+			{
+				// If the check for the number of processing FAMs fails for any reason, just
+				// use 50 ms as the max.
+				nMaxWaitTime = 50;
+			}
+		}
 		
-		// wait a random time from 0 to 50 ms
+		// Wait a random time from 0 to nMaxWaitTime
 		unsigned int iRandom;
 		rand_s(&iRandom);
-		Sleep(iRandom % 50);
+		Sleep(iRandom % nMaxWaitTime);
 	}
 }
 //--------------------------------------------------------------------------------------------------
