@@ -33,7 +33,10 @@
     #define EXCEPTION_FILE_NAME "ExtractException.uex"
     #define UCLID_EXCEPTION_FILE_NAME "UCLIDException.uex"
     #define REG_PATH_DOT_NET_40_INSTALL "\\SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full"  
-    #define INSTALL_UTIL_PATH "C:\\WINDOWS\\Microsoft.NET\\Framework\\v4.0.30319\\InstallUtil.exe"
+    #define INSTALL_UTIL_PATH "C:\\WINDOWS\\Microsoft.NET\\Framework\\v4.0.30319\\InstallUtil.exe" 
+    #define CLASS_INSTALLER_REG_PATH "Software\\Classes\\Installer\\Products"
+    #define SQL_COMPACT_35_SP2_32_INSTALLER_KEY CLASS_INSTALLER_REG_PATH ^ "D30CF9A3586C138449FCE4FD3D474979"  
+    #define SQL_COMPACT_35_SP2_64_INSTALLER_KEY CLASS_INSTALLER_REG_PATH ^ "DA93DA4DE19033D4BBB2956FCF8BDA3C"
     
 //////////////////// installation declarations ///////////////////
 
@@ -467,12 +470,17 @@ number nSize;
 number nType;
 begin
 	// Change the root for the registry
-	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);     
+	MessageBox( SQL_COMPACT_35_SP2_32_INSTALLER_KEY, MB_OK);
+	MessageBox( SQL_COMPACT_35_SP2_64_INSTALLER_KEY, MB_OK);
+
 	nType = REGDB_NUMBER;
 	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) < 1 || 
 			((RegDBGetKeyValueEx(REG_PATH_SQL_COMPACT_EDITION, "ServicePackLevel", nType, 
 			szSPLevel, nSize) = 0 ) && 
-			szSPLevel != "2")) then
+			szSPLevel != "2") ||
+			RegDBKeyExist(SQL_COMPACT_35_SP2_32_INSTALLER_KEY) < 1 ||
+			RegDBKeyExist(SQL_COMPACT_35_SP2_64_INSTALLER_KEY) < 1 ) then
 			
 		SdShowMsg("Setup is Installing SQL Compact Edition", TRUE);
 

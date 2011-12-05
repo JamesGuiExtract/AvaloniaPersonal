@@ -173,7 +173,49 @@ begin
 		SdFinish(szTitle, szMsg1, "Click Finish to exit.", "", "", bOpt1, bOpt2);
 	endif;
 end; 
+   
 
+//---------------------------------------------------------------------------
+// OnMaintUIAfter
+//
+// The OnMaintUIAfter event called by the framework after the file transfer
+// of the setup when the setup is running in maintenance mode. By default
+// this event displays UI that informs the end user that the maintenance setup
+// has been completed successfully.
+//---------------------------------------------------------------------------
+function OnMaintUIAfter()
+	STRING szTitle, szMsg1, szMsg2, szOption1, szOption2;
+	NUMBER bOpt1, bOpt2;
+begin
+    if ( REMOVEALLMODE) then
+		ALLUSERS = 1;
+		
+		// Remove the Extract Systems LM menu folder
+		DeleteDir( StartMenuFolder ^ "Programs\\Extract Systems LM", ALLCONTENTS); 
+		DeleteDir( StartMenuFolder ^ "Programs\\Extract Systems LM", ALLCONTENTS);
+    	
+    	// Delete all lst files
+    	DeleteFile(PROGRAMFILES + EXTRACT_DIR + "\\*.LST");
+    endif;
+    
+	Disable(STATUSEX);
+
+	bOpt1   = FALSE;
+	bOpt2   = FALSE;
+    
+	// Added - Version 9.5 - Use appropriate strings for complete
+    // uninstall.
+    if( REMOVEALLMODE ) then
+        szTitle = SdLoadString(IFX_SDFINISH_REMOVE_TITLE);
+        szMsg1 = SdLoadString(IFX_SDFINISH_REMOVE_MSG1);
+    else
+        szTitle = SdLoadString(IFX_SDFINISH_MAINT_TITLE);    
+        szMsg1  = SdLoadString(IFX_SDFINISH_MAINT_MSG1);
+    endif;
+
+	SdFinishEx(szTitle, szMsg1, szMsg2, szOption1, szOption2, bOpt1, bOpt2);
+end;
+  
 //////////////////////////////////////////////////////////////////////////////
 //
 //  FUNCTION:   OnBegin
@@ -246,6 +288,7 @@ begin
 	ReleaseDialog("ConfirmDriverUpdate");
 
 end;
+
 
 //////////////////////////////////////////////////////////////////////////////
 //
