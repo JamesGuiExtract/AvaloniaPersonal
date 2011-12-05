@@ -471,8 +471,6 @@ number nType;
 begin
 	// Change the root for the registry
 	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);     
-	MessageBox( SQL_COMPACT_35_SP2_32_INSTALLER_KEY, MB_OK);
-	MessageBox( SQL_COMPACT_35_SP2_64_INSTALLER_KEY, MB_OK);
 
 	nType = REGDB_NUMBER;
 	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) < 1 || 
