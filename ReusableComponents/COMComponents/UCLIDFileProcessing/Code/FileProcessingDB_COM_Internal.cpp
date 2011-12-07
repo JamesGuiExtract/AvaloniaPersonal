@@ -2869,7 +2869,7 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 				if (!bFromSpecified)
 				{
 					strSelectQuery = "SELECT FAMFile.ID, FileName, FileSize, Pages, "
-						"COALESCE (FileActionStatus.Priority, FAMFile.Priority) AS Priority, "
+						"COALESCE (ToFAS.Priority, FAMFile.Priority) AS Priority, "
 						"COALESCE (ToFAS.ActionStatus, 'U') AS ToActionStatus "
 						"FROM FAMFile LEFT JOIN FileActionStatus as ToFAS "
 						"ON FAMFile.ID = ToFAS.FileID AND ToFAS.ActionID = " + strToActionID;
@@ -2877,7 +2877,7 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 				else
 				{
 					strSelectQuery = "SELECT FAMFile.ID, FileName, FileSize, Pages, "
-						"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority, "
+						"COALESCE(ToFAS.Priority, FAMFile.Priority) AS Priority, "
 						"COALESCE(ToFAS.ActionStatus, 'U') AS ToActionStatus, "
 						"COALESCE(FromFAS.ActionStatus, 'U') AS FromActionStatus "
 						"FROM FAMFile LEFT JOIN FileActionStatus as ToFAS "
