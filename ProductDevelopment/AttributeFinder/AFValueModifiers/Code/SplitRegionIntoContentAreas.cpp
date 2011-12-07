@@ -2512,31 +2512,10 @@ CSplitRegionIntoContentAreas::ContentAreaInfo CSplitRegionIntoContentAreas::make
 	{
 		try
 		{
-			// Cycle through each horizontal line looking for a line that defines the edge of this area
+			// Cycle through each horizontal line looking for a line that dissects this area.
 			for each (LineRect line in m_vecHorizontalLines)
 			{
-				if (area.bottom + 1 == line.top || area.top - 1 == line.bottom)
-				{
-					// We found a line that matches the top or bottom edge.  Make sure the line runs at
-					// least 50% of the width of the area.
-					int nOverlap = min(area.right, line.right) - max(area.left, line.left);
-					double dOverlapPercent = (double)nOverlap / area.Width();
-
-					if (dOverlapPercent > gdREQUIRED_LINE_OVERLAP)
-					{
-						// This line appears to define the edge of this area.  Align the area's edge with
-						// the center of the line.
-						if (area.bottom + 1 == line.top)
-						{
-							area.bottom = line.CenterPoint().y;
-						}
-						else
-						{
-							area.top = line.CenterPoint().y;
-						}
-					}
-				}
-				else if (line.LinePosition() >= area.top + m_sizeAvgChar.cy &&
+				if (line.LinePosition() >= area.top + m_sizeAvgChar.cy &&
 					line.LinePosition() <= area.bottom - m_sizeAvgChar.cy)
 				{
 					// This line appears to split the current area with a sufficient amount of leftover on
@@ -2557,12 +2536,86 @@ CSplitRegionIntoContentAreas::ContentAreaInfo CSplitRegionIntoContentAreas::make
 				}
 			}
 
-			// Cycle through each vertical line looking for a line that defines the edge of this area
+			// Cycle through each horizontal line looking for a line that defines the top edge of
+			// this area
+			for each (LineRect line in m_vecHorizontalLines)
+			{
+				if (area.top - 1 == line.bottom)
+				{
+					// We found a line that matches the top edge.  Make sure the line runs at
+					// least 50% of the width of the area.
+					int nOverlap = min(area.right, line.right) - max(area.left, line.left);
+					double dOverlapPercent = (double)nOverlap / area.Width();
+
+					if (dOverlapPercent > gdREQUIRED_LINE_OVERLAP)
+					{
+						// This line appears to define the edge of this area.  Align the area's edge
+						// with the center of the line.
+						area.top = line.CenterPoint().y;
+
+						// [FlexIDSCore:4941]
+						// Once this area has been aligned with one line, don't allow it to be
+						// aligned with any others. Really this situation shouldn't happen anyway,
+						// but in one case where it did, it helped lead to infinite recursion.
+						break;
+					}
+				}
+			}
+
+			// Cycle through each horizontal line looking for a line that defines the bottom edge of this area
+			for each (LineRect line in m_vecHorizontalLines)
+			{
+				if (area.bottom + 1 == line.top)
+				{
+					// We found a line that matches bottom edge.  Make sure the line runs at
+					// least 50% of the width of the area.
+					int nOverlap = min(area.right, line.right) - max(area.left, line.left);
+					double dOverlapPercent = (double)nOverlap / area.Width();
+
+					if (dOverlapPercent > gdREQUIRED_LINE_OVERLAP)
+					{
+						// This line appears to define the edge of this area.  Align the area's edge with
+						// the center of the line.
+						area.bottom = line.CenterPoint().y;
+
+						// [FlexIDSCore:4941]
+						// Once this area has been aligned with one line, don't allow it to be
+						// aligned with any others. Really this situation shouldn't happen anyway,
+						// but in one case where it did, it helped lead to infinite recursion.
+						break;
+					}
+				}
+			}
+
+			// Cycle through each vertical line looking for a line that defines the left edge of
+			// this area.
 			for each (LineRect line in m_vecVerticalLines)
 			{
-				if (area.right + 1 == line.left || area.left - 1 == line.right)
+				if (area.left - 1 == line.right)
 				{
-					// We found a line that matches the left or right edge.  Make sure the line runs at
+					// We found a line that matches the left edge.  Make sure the line runs at
+					// least 50% of the height of the area.
+					int nOverlap = min(area.bottom, line.bottom) - max(area.top, line.top);
+					double dOverlapPercent = (double)nOverlap / area.Height();
+
+					if (dOverlapPercent > gdREQUIRED_LINE_OVERLAP)
+					{
+						// This line appears to define the edge of this area.  Align the area's
+						// edge with the center of the line.
+						area.left = line.CenterPoint().x;
+
+						break;
+					}
+				}
+			}
+
+			// Cycle through each vertical line looking for a line that defines the right edge of
+			// this area.
+			for each (LineRect line in m_vecVerticalLines)
+			{
+				if (area.right + 1 == line.left)
+				{
+					// We found a line that matches the right edge.  Make sure the line runs at
 					// least 50% of the height of the area.
 					int nOverlap = min(area.bottom, line.bottom) - max(area.top, line.top);
 					double dOverlapPercent = (double)nOverlap / area.Height();
@@ -2571,39 +2624,38 @@ CSplitRegionIntoContentAreas::ContentAreaInfo CSplitRegionIntoContentAreas::make
 					{
 						// This line appears to define the edge of this area.  Align the area's edge with
 						// the center of the line.
-						if (area.right + 1 == line.left)
-						{
-							area.right = line.CenterPoint().x;
-						}
-						else
-						{
-							area.left = line.CenterPoint().x;
-						}
+						area.right = line.CenterPoint().x;
+
+						break;
 					}
 				}
-				// The following code to allow an area to be divided by a vertical line seems to expose a bug in 
-				// the spatial string searcher on one of the documents (9519303_001.TIF). Commenting out for the
-				// time being.
-				//		else if (line.LinePosition() >= area.left + (m_sizeAvgChar.cx * m_nRequiredHorizontalSeparation) &&
-				//				 line.LinePosition() <= area.right - (m_sizeAvgChar.cx * m_nRequiredHorizontalSeparation))
-				//		{
-				//			// This line appears to split the current area with a sufficient amount of leftover on
-				//			// either side.  If the vertical overlap is sufficient, allow this area to be be
-				//			// divded in two along this line.
-				//			int nOverlap = min(area.bottom, line.bottom) - max(area.top, line.top);
-				//			double dOverlapPercent = (double)nOverlap / area.Height();
-				//
-				//			if (dOverlapPercent > gdREQUIRED_LINE_OVERLAP)
-				//			{
-				//				CRect newArea(area.left, area.top, line.LinePosition(), area.bottom);
-				//				shrinkToFit(newArea);
-				//				m_vecContentAreas.push_back(newArea);
-				//
-				//				area.left = line.LinePosition();
-				//				shrinkToFit(area);
-				//			}
-				//		}
 			}
+
+			// The following code to allow an area to be divided by a vertical line seems to expose a bug in 
+			// the spatial string searcher on one of the documents (9519303_001.TIF). Commenting out for the
+			// time being.
+			// for each (LineRect line in m_vecVerticalLines)
+			// {
+			//		if (line.LinePosition() >= area.left + (m_sizeAvgChar.cx * m_nRequiredHorizontalSeparation) &&
+			//				 line.LinePosition() <= area.right - (m_sizeAvgChar.cx * m_nRequiredHorizontalSeparation))
+			//		{
+			//			// This line appears to split the current area with a sufficient amount of leftover on
+			//			// either side.  If the vertical overlap is sufficient, allow this area to be be
+			//			// divded in two along this line.
+			//			int nOverlap = min(area.bottom, line.bottom) - max(area.top, line.top);
+			//			double dOverlapPercent = (double)nOverlap / area.Height();
+			//
+			//			if (dOverlapPercent > gdREQUIRED_LINE_OVERLAP)
+			//			{
+			//				CRect newArea(area.left, area.top, line.LinePosition(), area.bottom);
+			//				shrinkToFit(newArea);
+			//				m_vecContentAreas.push_back(newArea);
+			//
+			//				area.left = line.LinePosition();
+			//				shrinkToFit(area);
+			//			}
+			//		}
+			// }
 
 			return area;
 		}
