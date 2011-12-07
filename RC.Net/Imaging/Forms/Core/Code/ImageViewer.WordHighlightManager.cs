@@ -1747,7 +1747,6 @@ namespace Extract.Imaging.Forms
             // Throwing an OperationCanceledException with an explicit but unreferenced argument.
             // If throw is used with no exception, it is not thrown out as an
             // OperationCanceledException and catch statements intended to catch it won't work.
-            [SuppressMessage("Microsoft.Usage", "CA2200:RethrowToPreserveStackDetails")]
             SpatialString OCRPage(string imageFile, int pageNumber, OcrTradeoff ocrTradeoff)
             {
                 // NOTE:
@@ -1864,7 +1863,7 @@ namespace Extract.Imaging.Forms
                         return _ocrPageData[pageNumber].SpatialString;
                     }
                 }
-                catch (OperationCanceledException ex)
+                catch (OperationCanceledException)
                 {
                     lock (_ocrLock)
                     {
@@ -1882,10 +1881,12 @@ namespace Extract.Imaging.Forms
                     }
 
                     // [FlexIDSCore:4944]
-                    // The outer scope is expecting that any OperationCanceledException be passed
-                    // through as a OperationCanceledException, otherwise LoaderOperation will error
-                    // out.
-                    throw ex;
+                    // I am getting weird results when attempting throw either the caught exception
+                    // or a new OperationCanceledException from here. At times, the outer scope was
+                    // catching it as a base Exception instead and in other cases it never seemed
+                    // to be caught at all. Simply returning null should produce the same effect as
+                    // throwing an OperationCanceledException from here.
+                    return null;
                 }
                 catch (Exception ex)
                 {
