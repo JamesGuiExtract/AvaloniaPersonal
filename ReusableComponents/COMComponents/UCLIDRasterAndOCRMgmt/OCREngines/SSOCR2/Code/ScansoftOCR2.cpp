@@ -1269,8 +1269,17 @@ void CScansoftOCR2::addRecognizedLettersToVector(vector<CPPLetter>* pvecLetters,
 	const LETTER* pLastLetter;
 	pLastLetter = &pScansoftLetters[lNumLetters-1];
 	
-	for (pCurLetter = pScansoftLetters; pCurLetter != pLastLetter; pCurLetter++)
+	for (pCurLetter = pScansoftLetters; pCurLetter <= pLastLetter; pCurLetter++)
 	{
+		// [LegacyRCAndUtils:6246]
+		// To provide results consistent with the code prior to fixing the problem where we ignored
+		// the last character, if the last character is whitespace (seems to be the case in most
+		// situations), disregard it.
+		if (pCurLetter == pLastLetter && isWhitespaceChar(pCurLetter->code))
+		{
+			break;
+		}
+
 		bool bIsRecognized = isBasicLatinCharacter(pCurLetter->code);
 
 		// add this character to the vector if it is a positive-width, recognized character
@@ -1377,7 +1386,10 @@ void CScansoftOCR2::addRecognizedLettersToVector(vector<CPPLetter>* pvecLetters,
 		}
 
 		// ensure that the vector of letters is not empty
-		if( !pvecLetters->empty() )
+		// [LegacyRCAndUtils:6246]
+		// To provide results consistent with the code prior to fixing the problem where we
+		// ignored the last character, if this is the last character, do not add any newlines.
+		if(!pvecLetters->empty() && pCurLetter != pLastLetter)
 		{
 			// if this is the end of a paragraph, line, or zone,
 			// add that information to the last recognized page letter
@@ -1975,8 +1987,17 @@ void CScansoftOCR2::prepareHandwritingZones(const RECT* pArea, const IMG_INFO& i
 
 		// iterate through each letter
 		const LETTER* pLastLetter = &pLetters[lNumLetters-1];
-		for(LETTER* pCurLetter = (LETTER*) pLetters; pCurLetter != pLastLetter; pCurLetter++)
+		for(LETTER* pCurLetter = (LETTER*) pLetters; pCurLetter <= pLastLetter; pCurLetter++)
 		{
+			// [LegacyRCAndUtils:6246]
+			// To provide results consistent with the code prior to fixing the problem where we
+			// ignored the last character, if the last character is whitespace (seems to be the
+			// case in most situations), disregard it.
+			if (pCurLetter == pLastLetter && isWhitespaceChar(pCurLetter->code))
+			{
+				break;
+			}
+
 			// check if this letter is a space
 			if(pCurLetter->code != L' ')
 			{

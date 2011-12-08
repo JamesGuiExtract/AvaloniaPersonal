@@ -822,6 +822,24 @@ ISpatialStringPtr CScansoftOCR::recognizePrintedTextInImageZone(BSTR strImageFil
 	EFilterCharacters eFilter, BSTR bstrCustomFilterCharacters, VARIANT_BOOL bReturnUnrecognized, 
 	VARIANT_BOOL bReturnSpatialInfo, IProgressStatus* pProgressStatus)
 {
+	// [FlexIDSCore:4906]
+	// Since we did not get a fix from Nuance to address the issue that arose in v18 of their engine
+	// regarding view perspective, we are temporarily handling this situation by failing OCR on
+	// pages with non-standar view perspectives.
+	for (int nPage = lStartPage; nPage <= lEndPage; nPage++)
+	{
+		if (getImageViewPerspective(asString(strImageFileName), nPage) != TOP_LEFT)
+		{
+			UCLIDException ue("ELI34156",
+				"Cannot OCR document pages with non-standard view perspective; "
+				"use ImageFormatConverter <strInput> <strOutput> <out_type> /vp to set the view "
+				"perspective to the standard setting.");
+			ue.addDebugInfo("Filename", asString(strImageFileName));
+			ue.addDebugInfo("Page", asString(nPage));
+			throw ue;
+		}
+	}
+
 	// increment # of images processed
 	InterlockedIncrement(&m_ulNumImagesProcessed);
 
