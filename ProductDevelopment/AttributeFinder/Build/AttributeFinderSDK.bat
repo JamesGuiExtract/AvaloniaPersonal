@@ -5,6 +5,7 @@ IF "%~2"=="" GOTO normal_build
 IF "%~2"=="/patch" GOTO patch_build
 IF "%~2"=="/PATCH" GOTO patch_build
 IF "%~2"=="/Patch" GOTO patch_build
+IF "%~2"=="/noget" GOTO no_get_build
 GOTO invalid_second_argument_error
 
 :missing_version_number_error
@@ -31,16 +32,14 @@ ECHO Initiating a normal (non-patch) build....
 SET BuildScriptTarget=DoEverything
 GOTO init_build
 
+:no_get_build
+ECHO Initiating a build without get
+SET BuildScriptTarget=DoEverythingNoGet
+GOTO no_get
+
 :init_build
 CALL InitUserEnv.Bat
 CALL InitBuildEnv.Bat
-
-REM Get the build version number from the argument string
-set VERSION_NUMBER=%1
-:: Strip the quotes
-set VERSION_NUMBER=%VERSION_NUMBER:~1,-1%
-:: Remove the FlexIndex Ver. string
-set VERSION_NUMBER=%VERSION_NUMBER:FlexIndex Ver. =%
 
 REM Get specified version of files from Common dir as well as AttributeFinder\build dir
 IF NOT EXIST ..\..\Common mkdir ..\..\Common
@@ -56,6 +55,15 @@ IF "%BUILD_FROM_SVN%"=="YES" (
 	CD ..\AttributeFinder\Build
 	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\" "$/Engineering/ProductDevelopment/AttributeFinder/Build" %1
 )
+
+:no_get
+
+REM Get the build version number from the argument string
+set VERSION_NUMBER=%1
+:: Strip the quotes
+set VERSION_NUMBER=%VERSION_NUMBER:~1,-1%
+:: Remove the FlexIndex Ver. string
+set VERSION_NUMBER=%VERSION_NUMBER:FlexIndex Ver. =%
 
 Rem Remove previous build directory if it exists
 IF EXIST %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT% RMDIR /S /Q %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%
