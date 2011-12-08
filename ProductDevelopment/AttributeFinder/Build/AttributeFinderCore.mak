@@ -87,12 +87,12 @@ BuildAttributeFinderCore:
 UnregisterClearImage5_7:
 	@ECHO Unregistering ClearImage 5_7...
 	@CD "$(ClearImage_5_7_BinDir)"
-	@IF EXIST "$(ClearImage_5_7_BinDir)" @FOR /R %%i IN (*.dll) do @regsvr32 "%%~nxi" /u /s
+	@IF EXIST "$(ClearImage_5_7_BinDir)" @FOR /R %%i IN (ClearMicr.dll CiCxImage.dll ClearImage.dll ClearCheckIQA.dll) do @regsvr32 "%%~nxi" /u /s
 		
 RegisterClearImage_7_0: UnregisterClearImage5_7
 	@Echo Registering ClearImage 7_0...
 	@CD "$(ClearImage_5_7_BinDir)"
-	@IF EXIST "$(ClearImage_5_7_BinDir)" @FOR /R %%i IN (*.dll) do @regsvr32 "%%~nxi" /s
+	@IF EXIST "$(ClearImage_5_7_BinDir)" @FOR /R %%i IN (ClearMicr.dll CiCxImage.dll ClearImage.dll ClearCheckIQA.dll) do @regsvr32 "%%~nxi" /s
 	
 ObfuscateFiles: BuildAttributeFinderCore
 	@ECHO Obfuscating for FlexIndex...
