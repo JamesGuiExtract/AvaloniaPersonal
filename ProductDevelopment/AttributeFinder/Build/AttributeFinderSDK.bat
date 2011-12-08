@@ -35,6 +35,8 @@ GOTO init_build
 :no_get_build
 ECHO Initiating a build without get
 SET BuildScriptTarget=DoEverythingNoGet
+CALL InitUserEnv.Bat
+CALL InitBuildEnv.Bat
 GOTO no_get
 
 :init_build
