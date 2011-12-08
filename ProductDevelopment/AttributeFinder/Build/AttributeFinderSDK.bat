@@ -58,6 +58,9 @@ IF "%BUILD_FROM_SVN%"=="YES" (
 	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\" "$/Engineering/ProductDevelopment/AttributeFinder/Build" %1
 )
 
+Rem Remove previous build directory if it exists
+IF EXIST %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT% RMDIR /S /Q %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%
+
 :no_get
 
 REM Get the build version number from the argument string
@@ -66,9 +69,6 @@ set VERSION_NUMBER=%1
 set VERSION_NUMBER=%VERSION_NUMBER:~1,-1%
 :: Remove the FlexIndex Ver. string
 set VERSION_NUMBER=%VERSION_NUMBER:FlexIndex Ver. =%
-
-Rem Remove previous build directory if it exists
-IF EXIST %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT% RMDIR /S /Q %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%
 
 IF NOT EXIST %BUILD_DRIVE%%BUILD_DIRECTORY% MKDIR %BUILD_DRIVE%%BUILD_DIRECTORY%
 SET LOGFILE=%BUILD_DRIVE%%BUILD_DIRECTORY%\%VERSION_NUMBER% AttributeFinderSDK.log
