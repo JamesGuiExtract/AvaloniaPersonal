@@ -127,6 +127,7 @@
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
 		<row><td>ISLockPermissions.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\i386\ISLockPermissions.dll</td></row>
+		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\isregsvr.dll</td></row>
 	</table>
 
 	<table name="BindImage">
@@ -188,7 +189,6 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
-		<row><td>ClearImage.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{360A61B5-15DC-4AED-AC50-94984A011457}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>_11111111.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>CountyCustomComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{7F3236DA-95FF-4D6C-86E0-0AB0FA283204}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>CountyCustomComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ESAFSelectors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{A82B6DBF-7E9C-4E66-B4FF-4BB1BFDBCCF2}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>ESAFSelectors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ESFAMConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{4536C0B2-E6CF-46C9-B974-2C86140A9DA1}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>esfamconditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -321,6 +321,10 @@
 		<col def="S255">ISComments</col>
 		<row><td>ISLockPermissionsCost</td><td>1</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsCostAction</td><td/><td/></row>
 		<row><td>ISLockPermissionsInstall</td><td>3073</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsInstallAction</td><td/><td/></row>
+		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
+		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
+		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
+		<row><td>ISUnSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISUnSelfRegisterFiles</td><td/><td/></row>
 		<row><td>SetAllUsersProfileNT</td><td>51</td><td>ALLUSERSPROFILE</td><td>[%SystemRoot]\Profiles\All Users</td><td/><td/></row>
 		<row><td>setAllUsersProfile2K</td><td>51</td><td>ALLUSERSPROFILE</td><td>[%ALLUSERSPROFILE]</td><td/><td/></row>
 		<row><td>setUserProfileNT</td><td>51</td><td>USERPROFILE</td><td>[%USERPROFILE]</td><td/><td/></row>
@@ -474,7 +478,6 @@
 		<row><td>UCLIDAFValueFinders.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDAFValueFinders.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDA~1.DLL|UCLIDAFValueFinders.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCORECOMP_FILES&gt;\UCLIDAFValueFinders.dll</td><td>17</td><td/></row>
 		<row><td>UCLIDAFValueModifiers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDAFValueModifiers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDA~1.DLL|UCLIDAFValueModifiers.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCORECOMP_FILES&gt;\UCLIDAFValueModifiers.dll</td><td>17</td><td/></row>
 		<row><td>UCLIDFileProcessing.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFileProcessing.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDF~1.DLL|UCLIDFileProcessing.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\UCLIDFileProcessing.dll</td><td>17</td><td/></row>
-		<row><td>_11111111.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ClearImage.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>_11111~1.DLL|_11111111.Dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;CLEAR_IMAGE_PATH&gt;\_11111111.Dll</td><td>17</td><td/></row>
 		<row><td>adodb.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>adodb.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>adodb.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\microsoft.net\primary interop assemblies\adodb.dll</td><td>1</td><td/></row>
 		<row><td>detailed_report_for_.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>DETAIL~1.RPT|Detailed report for specific document.rpt</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;SDK_REPORT_PATH&gt;\Detailed report for specific document.rpt</td><td>17</td><td/></row>
 		<row><td>detectandreportfailure.ini.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ProgramDataFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>DETECT~1.INI|DetectAndReportFailure.ini</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_PROGRAMDATAFILE_FI&gt;\DetectAndReportFailure.ini</td><td>1</td><td/></row>
@@ -651,7 +654,6 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
-		<row><td>ClearImage.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_7691BC11_C729_4DB9_B2E6_3956F2A7CD0A_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>CountyCustomComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_BF34E9F1_CCAB_4C3A_90F8_EB156B51E5EC_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ESAFSelectors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_85561DEF_6B21_40FD_9BB4_232D16E11237_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ESFAMConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_234A27B5_47C0_4725_B138_600D471D657F_FILTER</td><td/><td/><td/><td/></row>
@@ -1335,7 +1337,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col key="yes" def="s72">Component</col>
 		<col key="yes" def="s72">ModuleID</col>
 		<col key="yes" def="i2">Language</col>
-		<row><td>ClearImage.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>CountyCustomComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ESAFSelectors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ESFAMConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
@@ -1457,7 +1458,14 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S255">Condition</col>
 		<row><td>ISLockPermissionsCost</td><td/><td>InstallValidate</td><td>1</td><td/></row>
 		<row><td>ISLockPermissionsInstall</td><td/><td>StartServices</td><td>1</td><td/></row>
+		<row><td>ISSelfRegisterCosting</td><td/><td>SelfUnregModules</td><td>1</td><td/></row>
+		<row><td>ISSelfRegisterFiles</td><td/><td>SelfRegModules</td><td>1</td><td/></row>
+		<row><td>ISSelfRegisterFinalize</td><td/><td>InstallFinalize</td><td>1</td><td/></row>
+		<row><td>ISUnSelfRegisterFiles</td><td/><td>ISSelfRegisterCosting</td><td>1</td><td/></row>
+		<row><td>InstallFinalize</td><td>3150</td><td/><td/><td/></row>
 		<row><td>InstallValidate</td><td>1400</td><td/><td/><td/></row>
+		<row><td>SelfRegModules</td><td>2850</td><td/><td/><td/></row>
+		<row><td>SelfUnregModules</td><td>1100</td><td/><td/><td/></row>
 		<row><td>StartServices</td><td>5900</td><td/><td/><td/></row>
 	</table>
 

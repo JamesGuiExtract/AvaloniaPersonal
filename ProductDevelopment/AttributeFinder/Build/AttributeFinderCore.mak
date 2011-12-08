@@ -49,9 +49,12 @@ DataEntryCoreInstallFilesDir=$(DataEntryInstallFiles)\CoreInstallation\Files
 
 ExtractCommonInstallFilesRootDir=P:\ExtractCommon
 
-ClearImageInstallFilesDir=P:\AttributeFinder\ClearImageFiles
+ClearImageInstallFilesDir=P:\AttributeFinder\InliteInstall
 
 InternalUseBuildFilesArchive=P:\AttributeFinder\Archive\InternalUseBuildFiles\InternalBuilds\$(FlexIndexVersion)
+
+ClearImage_5_7_BinDir=$(ReusableComponentsRootDirectory)\APIs\Inlite_5_7\bin
+ClearImage_7_0_BinDir=$(ReusableComponentsRootDirectory)\APIs\ClearImage_7_0\bin
 
 # determine the name of the release output directory based upon the build
 # configuration that is being built
@@ -80,6 +83,14 @@ BuildAttributeFinderCore:
 	@ECHO Building AFCore...
     @CD "$(AFRootDirectory)\AFCore\AFCoreTest\Code"
     @devenv AFCoreTest.sln /BUILD $(BuildConfig) /USEENV
+	
+UnregisterClearImage5_7:
+	@ECHO Unregistering ClearImage 5_7...
+	@IF EXIST "$(ClearImage_5_7_BinDir)" @FOR /R "$(ClearImage_5_7_Bin)" %%I IN (*.dll) do @regsvr32 %%i /u /s
+		
+RegisterClearImage_7_0: UnregisterClearImage5_7
+	@Echo Registering ClearImage 7_0...
+	@IF EXIST "$(ClearImage_5_7_BinDir)" @FOR /R "$(ClearImage_7_0_BinDir)" %%I IN (*.dll) do @regsvr32 %%i /s
 	
 ObfuscateFiles: BuildAttributeFinderCore
 	@ECHO Obfuscating for FlexIndex...
@@ -203,7 +214,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /v "$(BinariesFolder)\FAMProcess.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v "$(BinariesFolder)\Obfuscated\ReportViewer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v "$(ReusableComponentsRootDirectory)\Scripts\BatchFiles\KillAllOCRInstances.bat" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\Inlite_5_7\bin\*.*" "$(ClearImageInstallFilesDir)\" /v /s /e /y
+	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\ClearImage_7_0\Installer\*.*" "$(ClearImageInstallFilesDir)\" /v /s /e /y
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\Reports\*.*" "$(AFCoreInstallFilesRootDir)\Reports" /Y/E
 	@COPY "$(RCNETDir)\APIs\MSOffice\Office2007\installer\o2007pia.msi" "$(AFCoreInstallFilesRootDir)\OfficeRedist"
 	@COPY /v "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\Utils\ProcessFiles\Code\res\ProcessFiles.ico" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
@@ -344,7 +355,7 @@ BuildDataEntryMergeModule: CreateVersionISImportFile BuildAFCoreMergeModule
 
 GetAllFiles: GetPDCommonFiles GetReusableComponentFiles GetRCdotNETFiles GetAttributeFinderFiles GetPDUtilsFiles GetDataEntryFiles GetDataEntryInstall
 
-DoEverythingNoGet: SetupBuildEnv CleanUpMergeModulesFromPreviousBuilds BuildAFCoreMergeModule BuildDataEntryMergeModule CopyCommonFiles BuildFKBUpdateIfRequired
+DoEverythingNoGet: SetupBuildEnv CleanUpMergeModulesFromPreviousBuilds RegisterClearImage_7_0 BuildAFCoreMergeModule BuildDataEntryMergeModule CopyCommonFiles BuildFKBUpdateIfRequired
     @ECHO.
     @DATE /T
     @TIME /T

@@ -1209,7 +1209,7 @@ void CMicrFinder::findMICRZones(ISpatialStringPtr ipSpatialString, const vector<
 				ASSERT_RESOURCE_ALLOCATION("ELI24416", ipReader != __nullptr);
 
 				// Get the finding flags value from the registry [FlexIDSCore #3490]
-				ipReader->Flags = getMicrReaderFlags();
+				ipReader->flags = getMicrReaderFlags();
 				_lastCodePos = "110_E_" + strCount;
 
 				// Now loop through the each version of the image and attempt to find the MICR

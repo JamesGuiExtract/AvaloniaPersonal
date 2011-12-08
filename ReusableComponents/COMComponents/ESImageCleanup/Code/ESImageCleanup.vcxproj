@@ -76,7 +76,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\APIs\Inlite_5_7\include;..\..\..\APIs\LeadTools_17\Include;..\..\UCLIDCOMUtils\Core\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\BaseUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\APIs\ClearImage_7_0\include;..\..\..\APIs\LeadTools_17\Include;..\..\UCLIDCOMUtils\Core\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\BaseUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>

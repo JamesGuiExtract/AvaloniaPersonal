@@ -34,6 +34,6 @@ using namespace UCLID_COMLMLib;
 #import "..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
 using namespace UCLID_COMUTILSLib;
 
-#import "..\..\..\APIs\Inlite_5_7\bin\ClearImage.dll" no_namespace named_guids
+#import "..\..\..\APIs\ClearImage_7_0\bin\ClearImage.dll" no_namespace named_guids
 
 #import "ESImageCleanup.tlb"

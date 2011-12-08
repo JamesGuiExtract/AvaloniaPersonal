@@ -45,10 +45,10 @@ using namespace UCLID_AFCORELib;
 using namespace UCLID_AFUTILSLib;
 
 // Import the Inlite COM objects
-#import "..\..\..\..\ReusableComponents\APIs\Inlite_5_7\bin\ClearImage.dll" no_namespace named_guids
+#import "..\..\..\..\ReusableComponents\APIs\ClearImage_7_0\bin\ClearImage.dll" no_namespace named_guids
 #import "msvbvm60.dll" rename("RGB", "VBRGB") rename("EOF", "VBEOF") rename("GetObject", "VBGetObject")
 using namespace VBA;
-#import "..\..\..\..\ReusableComponents\APIs\Inlite_5_7\bin\ClearMicr.dll" no_namespace named_guids \
+#import "..\..\..\..\ReusableComponents\APIs\ClearImage_7_0\bin\ClearMicr.dll" no_namespace named_guids \
 	rename("GetObject", "MICRGetObject")
 
 #import "AFValueFinders.tlb"

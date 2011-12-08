@@ -29,7 +29,7 @@
     #define LABDE_PRODUCT_CODE "{0E412937-E4FA-4737-A321-00AED69497C7}"
     #define LOG_FILE_PATH CommonAppDataFolder ^ "\\Extract Systems\\LogFiles"
     #define CRYSTAL_REPORTS_GUID "{C484CC8D-03CF-4022-89C4-DB4F02E8A15B}"
-    #define INLITE_INSTALLER_EXE "ClearImageEUK_5_7_3.exe"
+    #define INLITE_INSTALLER_EXE "ClearImagePDK.7_0_3253.exe"
     #define EXCEPTION_FILE_NAME "ExtractException.uex"
     #define UCLID_EXCEPTION_FILE_NAME "UCLIDException.uex"
     #define REG_PATH_DOT_NET_40_INSTALL "\\SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full"  
@@ -370,11 +370,11 @@ end;
 function InstallInliteKeyDrivers()
 	string szProgram;
 begin  
-	szProgram = SUPPORTDIR ^ "\\CBUSetup.exe";
+	szProgram = SUPPORTDIR ^ "\\CbSetup.exe";
 	LaunchAppAndWait(szProgram, "/Q /CRYPTOKEN", LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);
 	
 	szProgram = SUPPORTDIR ^ INLITE_INSTALLER_EXE;
-	LaunchAppAndWait(szProgram, "/s ", LAAW_OPTION_WAIT);
+	LaunchAppAndWait(szProgram, "/S ", LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);
 end;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -388,13 +388,14 @@ function UninstallInliteKeyDrivers()
 begin       
   	SdShowMsg("Setup is Uninstalling Inlite drivers.", TRUE);
    
-   	szProgram = SUPPORTDIR ^ "\\CBUSetup.exe";
-	LaunchAppAndWait(szProgram, "/Q /U /CRYPTOKEN", LAAW_OPTION_WAIT); 
+   	szProgram = SUPPORTDIR ^ "\\CBSetup.exe";
+	LaunchAppAndWait(szProgram, "/Q /U /CRYPTOKEN", LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
+	                                                           
+	// Call the unwise.exe in the program folder for Inlite
+	szProgram = "\"" + PROGRAMFILES ^ "\\Inlite\\ClearImage 7 PDK\\UNWISE\"";
+	LaunchAppAndWait(szProgram, "/Q /A /Z INSTALL.LOG", LAAW_OPTION_WAIT 
+		| LAAW_OPTION_SHOW_HOURGLASS | LAAW_OPTION_CHANGEDIRECTORY);
 	
-	szProgram = SUPPORTDIR ^ "\\UninstallInlite.bat";
-	LaunchAppAndWait("cmd", "/c "+ szProgram,
-		LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
-
  	SdShowMsg("Setup is Uninstalling Inlite drivers.", FALSE);
 end;
 
