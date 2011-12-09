@@ -58,6 +58,10 @@
 // Tests that multi-line attributes are selected if each line is contained in a different reference region.
 <TESTFOLDER>;.\Test18.rsd;.\Images\199701424647_page_0001;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test18.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test18.voa
 
+// [FlexIDSCore:4615]
+// Test that attributes get selected properly on documents with rotated text.
+<TESTFOLDER>;.\Test19.rsd;.\Images\001-2004-00057950-004;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test19.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test19.voa
+
 // Run Test 17 manually whenever a new test is added and ensure there are no exceptions thrown.
 // NOTE: Test 17 doesn't produce any spatial data and fails as part of the redaction tester. In other words, even
 // when the rule runs properly, it would cause the automated test to fail.
