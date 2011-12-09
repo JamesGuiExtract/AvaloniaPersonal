@@ -652,7 +652,7 @@ STDMETHODIMP CSelectPageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressStat
 		ASSERT_RESOURCE_ALLOCATION("ELI18451", ipAttributes != __nullptr);
 
 		// Get the last page number
-		long nLastPageNumber = eMode == kNonSpatialMode ?
+		long nLastPageNumber = (m_eReturnType != kReturnText || eMode == kNonSpatialMode) ?
 			getNumberOfPagesInImage(strSourceDoc) : ipInputText->GetLastPageNumber();
 
 		// Get specific pages within which to Select Regions
@@ -736,7 +736,7 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 		}
 
 		// Get the last page number
-		long nLastPageNumber = eMode == kNonSpatialMode ?
+		long nLastPageNumber = (m_eReturnType != kReturnText || eMode == kNonSpatialMode) ?
 			getNumberOfPagesInImage(strSourceDoc) : ipInputText->GetLastPageNumber();
 
 		// Get specific pages within which to Select Regions

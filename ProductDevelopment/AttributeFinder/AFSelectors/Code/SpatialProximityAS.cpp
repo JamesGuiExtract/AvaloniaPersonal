@@ -758,7 +758,7 @@ STDMETHODIMP CSpatialProximityAS::get_InstanceGUID(GUID *pVal)
 // Private Methods
 //--------------------------------------------------------------------------------------------------
 vector< pair<CRect, long> > CSpatialProximityAS::getAttributeRects(IAttributePtr ipAttribute,
-																   bool bSeparateLines)
+												bool bSeparateLines, bool bConvertToTargetRegion)
 {
 	ASSERT_ARGUMENT("ELI22668", ipAttribute != __nullptr);
 
@@ -800,19 +800,25 @@ vector< pair<CRect, long> > CSpatialProximityAS::getAttributeRects(IAttributePtr
 
 		if (bSeparateLines)
 		{
-			// If using lines separately, simply add each line's rect separately
-			vecAttributeRects.push_back(pair<CRect, long>(rectBounds, nPage));
+			// If using lines separately, simply add each line's rect separately.
+			// Convert to target region if specified.
+			if (!bConvertToTargetRegion || convertToTargetRegion(rectBounds, nPage))
+			{
+				vecAttributeRects.push_back(pair<CRect, long>(rectBounds, nPage));
+			}
 		}
 		else if (nPage != nLastPage)
 		{
 			// If using the total attribute bounds, start a new result only
 			// if starting a new page.
-			
 			if (rectCompleteBounds != grectNULL)
 			{
 				// If we already were compiling a result for a previous page, add it to the results.
-				vecAttributeRects.push_back(
-					pair<CRect, long>(rectCompleteBounds, nLastPage));
+				// Convert to target region if specified.
+				if (!bConvertToTargetRegion || convertToTargetRegion(rectCompleteBounds, nLastPage))
+				{
+					vecAttributeRects.push_back(pair<CRect, long>(rectCompleteBounds, nLastPage));
+				}
 				rectCompleteBounds = grectNULL;
 			}
 			
@@ -832,8 +838,11 @@ vector< pair<CRect, long> > CSpatialProximityAS::getAttributeRects(IAttributePtr
 	{
 		// If using the total attribute bounds, be sure to return any result that has not yet
 		// been added to vecAttributeRects.
-		vecAttributeRects.push_back(
-			pair<CRect, long>(rectCompleteBounds, nLastPage));
+		// Convert to target region if specified.
+		if (!bConvertToTargetRegion || convertToTargetRegion(rectCompleteBounds, nLastPage))
+		{
+			vecAttributeRects.push_back(pair<CRect, long>(rectCompleteBounds, nLastPage));
+		}
 	}
 
 	return vecAttributeRects;
@@ -969,44 +978,25 @@ vector< pair<IAttributePtr, IAttributePtr> > CSpatialProximityAS::findContainmen
 	{
 		IAttributePtr ipContainerAttribute = ipContainerAttributes->At(i);
 		ASSERT_RESOURCE_ALLOCATION("ELI22675", ipContainerAttribute != __nullptr);
-		
-		// Get a rect and pagenum for each area needed to describe the container attribute's
-		// location.
-		vector< pair<CRect, long> > vecContainerRects =
-			getAttributeRects(ipContainerAttribute, m_bCompareLinesSeparately);
 
-		// Convert each of these locations to the locations to search.
-		for each (pair<CRect, long> containerRect in vecContainerRects)
+		long nAttributeCount = ipContainedAttributes->Size();
+		for (int j = 0; j < nAttributeCount; j++)
 		{
-			// If m_bTargetsMustContainReferences is false, the container rect is
-			// a reference rect and so it must be converted so that it reflects
-			// the specified bounds which are not necessarily the bounds of the 
-			// attribute itself.
-			if (m_bTargetsMustContainReferences ||
-				convertToTargetRegion(containerRect.first, containerRect.second))
-			{
-				// A valid area to search was found.
-				long nAttributeCount = ipContainedAttributes->Size();
-				for (int i = 0; i < nAttributeCount; i++)
-				{
-					IAttributePtr ipContainedAttribute = ipContainedAttributes->At(i);
-					ASSERT_RESOURCE_ALLOCATION("ELI22704", ipContainedAttribute != __nullptr);
+			IAttributePtr ipContainedAttribute = ipContainedAttributes->At(j);
+			ASSERT_RESOURCE_ALLOCATION("ELI22704", ipContainedAttribute != __nullptr);
 
-					// Don't allow an attribute to be selected based on itself.
-					if (ipContainedAttribute == ipContainerAttribute)
-					{
-						continue;
-					}
+			// Don't allow an attribute to be selected based on itself.
+			if (ipContainedAttribute == ipContainerAttribute)
+			{
+				continue;
+			}
 					
-					if (isAttributeContainedIn(ipContainedAttribute, 
-											   containerRect.first, containerRect.second))
-					{
-						// If ipContainedAttribute is indeed contained with containerRect,
-						// add that attribute pair to the return result.
-						vecContainmentPairs.push_back(pair<IAttributePtr, IAttributePtr>(
-							ipContainerAttribute, ipContainedAttribute));
-					}
-				}
+			if (isAttributeContainedIn(ipContainedAttribute, ipContainerAttribute))
+			{
+				// If ipContainedAttribute is indeed contained with containerRect,
+				// add that attribute pair to the return result.
+				vecContainmentPairs.push_back(pair<IAttributePtr, IAttributePtr>(
+					ipContainerAttribute, ipContainedAttribute));
 			}
 		}
 	}
@@ -1015,75 +1005,83 @@ vector< pair<IAttributePtr, IAttributePtr> > CSpatialProximityAS::findContainmen
 }
 //--------------------------------------------------------------------------------------------------
 bool CSpatialProximityAS::isAttributeContainedIn(IAttributePtr ipContainedAttribute,
-												 const CRect &rectContainerArea, long nPage)
+												 IAttributePtr ipContainerAttribute)
 {
 	ASSERT_ARGUMENT("ELI22702", ipContainedAttribute != __nullptr);
+	ASSERT_ARGUMENT("ELI34157", ipContainerAttribute != __nullptr);
 
-	// Obtain a rect describing the area of each of the attribute's lines.
+	// Obtain a rect describing the area of each container attribute's lines.
+	// If m_bTargetsMustContainReferences is false, ipContainerAttribute is
+	// a reference rect and so it must be converted so that it reflects
+	// the specified bounds which are not necessarily the bounds of the 
+	// attribute itself.
+	vector< pair<CRect, long> > vecContainerRectsAttributeRects =
+		getAttributeRects(ipContainerAttribute, m_bCompareLinesSeparately,
+		!m_bTargetsMustContainReferences);
+
+	// Obtain a rect describing the area of each contained candidate's lines.
+	// If m_bTargetsMustContainReferences is true, ipContainedAttribute is
+	// a reference rect and so it must be converted so that it reflects
+	// the specified bounds which are not necessarily the bounds of the 
+	// attribute itself.
 	vector< pair<CRect, long> > vecContainedAttributeRects = 
-		getAttributeRects(ipContainedAttribute, m_bCompareLinesSeparately);
+		getAttributeRects(ipContainedAttribute, m_bCompareLinesSeparately,
+		m_bTargetsMustContainReferences);
 
-	// Check each line for inclusion.
-	int nLineInclusionCount = 0;
-	for each (pair<CRect, long> rect in vecContainedAttributeRects)
+	// Loop through each candidate attribute to see if it is contained in one of the container
+	// attributes.
+	for each (pair<CRect, long> rectContained in vecContainedAttributeRects)
 	{
-		// If m_bTargetsMustContainReferences is true, ipContainedAttribute is
-		// a reference rect and so it must be converted so that it reflects
-		// the specified bounds which are not necessarily the bounds of the 
-		// attribute itself.
-		if (!m_bTargetsMustContainReferences || convertToTargetRegion(rect.first, rect.second))
-		{
-			if (nPage != rect.second)
-			{
-				// This line is not on the same page as the specified page.
+		// Indicates whether this particular rectContained instance is completely contained in one
+		// of the vecContainerRectsAttributeRects.
+		bool bLineIncluded = false;
 
-				if (m_bRequireCompleteInclusion)
-				{
-					// If complete inclusion is required, this attribute does not qualify. Move on
-					// to the next.
-					break;
-				}
-				else
-				{
-					// If only partial inclusion is required, move on to the next line.
-					continue;
-				}
+		// Loop through each vecContainerRectsAttributeRects to see if any contain rectContained.
+		for each (pair<CRect, long> rectContainer in vecContainerRectsAttributeRects)
+		{
+			// The rects are not on the same page; rectContainer cannot contain rectContained.
+			if (rectContainer.second != rectContained.second)
+			{
+				continue;
 			}
 
+			// Test for intersection.
 			CRect rectIntersection;
-			if (rectIntersection.IntersectRect(rect.first, rectContainerArea) == TRUE)
+			if (rectIntersection.IntersectRect(rectContainer.first, rectContained.first) == TRUE)
 			{
-				// There is overlap between this line of the target attribute and the 
-				// selection area.
-
+				// If complete inclusion is required, this rectContained instance qualifies; move on
+				// to the next
 				if (m_bRequireCompleteInclusion)
 				{
-					if (rectIntersection == rect.first)
+					if (rectIntersection == rectContained.first)
 					{
-						// This line is completely included in the container area. Keep count of all
-						// the lines that qualify.
-						nLineInclusionCount ++;
-					}
-					else
-					{
-						// This line is not completely included, this attribute does not qualify. 
-						// Move on to the next attribute.
+						// This line is completely included in the container area; mark it as
+						// qualified.
+						bLineIncluded = true;
 						break;
 					}
 				}
-
-				// If only partial inclusion is required or all the lines of the attribute are 
-				// completely included, add the attribute to the ipSelectedAttributes collection.
-				if (!m_bRequireCompleteInclusion || 
-					nLineInclusionCount == vecContainedAttributeRects.size())
+				// If complete inclusion is not required, there is overlap on at least one of
+				// vecContainerRectsAttributeRects, so we can now return true.
+				else
 				{
 					return true;
 				}
 			}
 		}
+
+		// If complete inclusion is required, but rectContained was not included in any of
+		// vecContainerRectsAttributeRects, ipContainedAttribute is not completely contained and we
+		// can now return false.
+		if (m_bRequireCompleteInclusion && !bLineIncluded)
+		{
+			return false;
+		}
 	}
 
-	return false;
+	// If we got to this point with m_bRequireCompleteInclusion true, all lines have qualified.
+	// If we got here with m_bRequireCompleteInclusion false, no lines have qualified.
+	return m_bRequireCompleteInclusion;
 }
 //--------------------------------------------------------------------------------------------------
 void CSpatialProximityAS::createDebugAttributes(IIUnknownVectorPtr ipReferenceAttributes)
@@ -1098,17 +1096,14 @@ void CSpatialProximityAS::createDebugAttributes(IIUnknownVectorPtr ipReferenceAt
 		
 		// Get a rect and pagenum for each area needed to describe the reference attribute's
 		// location.
-		vector< pair<CRect, long> > vecReferenceRects =
-			getAttributeRects(ipReferenceAttribute, m_bCompareLinesSeparately);
-
 		// Convert each of these locations to the locations to search.
+		vector< pair<CRect, long> > vecReferenceRects =
+			getAttributeRects(ipReferenceAttribute, m_bCompareLinesSeparately, true);
+
 		for each (pair<CRect, long> referenceRect in vecReferenceRects)
 		{
-			if (convertToTargetRegion(referenceRect.first, referenceRect.second))
-			{
-				// A valid reference area was found
-				createDebugAttributes(ipReferenceAttribute, referenceRect.first, referenceRect.second);
-			}
+			// A valid reference area was found
+			createDebugAttributes(ipReferenceAttribute, referenceRect.first, referenceRect.second);
 		}
 	}
 }

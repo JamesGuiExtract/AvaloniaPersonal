@@ -207,7 +207,10 @@ private:
 	// the rect belongs to. If bSeparateLines == true, a separate CRect pagenum pair will be
 	// returned for each line of the attribute,  If bSeparateLines == false, multiple pairs
 	// will be returned only if the attribute spans pages.
-	vector< pair<CRect, long> > getAttributeRects(IAttributePtr ipAttribute, bool bSeparateLines);
+	// If bConvertToTargetRegion is true, the resulting rects will have been converted to a
+	// target region with convertToTargetRegion.
+	vector< pair<CRect, long> > getAttributeRects(IAttributePtr ipAttribute,
+		bool bSeparateLines, bool bConvertToTargetRegion);
 
 	// The given rectangle representing a reference attribute is converted to the region to
 	// search for target attributes using the rules border settings.  Returns true if successful,
@@ -228,11 +231,9 @@ private:
 	vector< pair<IAttributePtr, IAttributePtr> > findContainmentPairs(
 		IIUnknownVectorPtr ipContainerAttributes, IIUnknownVectorPtr ipContainedAttributes);
 
-	// Returns true if ipContainedAttribute is contained in the area described by 
-	// rectContainerArea and nPage. The result is dependent upon the m_bCompareLinesSeparately
-	// setting.
-	bool isAttributeContainedIn(IAttributePtr ipContainedAttribute,
-							    const CRect &rectContainerArea, long nPage);
+	// Returns true if ipContainedAttribute is contained in ipContainerAttribute. The result is
+	// dependent upon the m_bCompareLinesSeparately and m_bTargetsMustContainReferences settings.
+	bool isAttributeContainedIn(IAttributePtr ipContainedAttribute, IAttributePtr ipContainerAttribute);
 
 	// Adds the rule's defined reference spatial regions to be tested as subattributes to the
 	// attributes used to describe the regions.
