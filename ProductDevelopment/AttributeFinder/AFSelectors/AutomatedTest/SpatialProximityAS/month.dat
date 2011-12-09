@@ -1,0 +1,25 @@
+(
+    (
+        jan | jan((?'-allow_newline')-\r\n)?u((?'-allow_newline')-\r\n)?ar((?'-allow_newline')-\r\n)?y
+      | feb | feb((?'-allow_newline')-\r\n)?ru((?'-allow_newline')-\r\n)?ar((?'-allow_newline')-\r\n)?y
+      | mar | march
+      | apr | a((?'-allow_newline')-\r\n)?pril
+      | may
+      | jun | june
+      | jul | ju((?'-allow_newline')-\r\n)?ly
+      | aug | au((?'-allow_newline')-\r\n)?gust
+      | sep | sep((?'-allow_newline')-\r\n)?tem((?'-allow_newline')-\r\n)?ber
+      | oct | oc((?'-allow_newline')-\r\n)?to((?'-allow_newline')-\r\n)?ber
+      | nov | no((?'-allow_newline')-\r\n)?vem((?'-allow_newline')-\r\n)?ber
+      | dec | de((?'-allow_newline')-\r\n)?cem((?'-allow_newline')-\r\n)?ber
+    )
+    (?'verbose_month')
+
+  | (?'-allow_newline')
+    (   
+        1 (\x20|-(?'-allow_extra_dash'))?
+        [0-2]
+      | ( 0 (\x20|-(?'-allow_extra_dash'))? )?
+        [1-9]
+    )
+)

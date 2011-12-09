@@ -1,0 +1,10 @@
+(
+    1 (\x20|-(?'-allow_extra_dash'))?
+    9 (\x20|-(?'-allow_extra_dash'))?
+  | 2 (\x20|-(?'-allow_extra_dash'))?
+    0 (\x20|-(?'-allow_extra_dash'))?
+)?
+[0-9B] (\x20|-(?'-allow_extra_dash'))?
+[0-9B]
+// allow misOCR at end
+\d? // K:\Common\Engineering\Sample Files\ACS\OR - Marion\Set002\Images\199501215596.tif

@@ -1,0 +1,12 @@
+(
+    [12] (\x20|-(?'-allow_extra_dash'))?
+    [0-9B]
+  | 3 (\x20|-(?'-allow_extra_dash'))?
+    [01]
+  | (0 (\x20|-(?'-allow_extra_dash'))?)?
+    [1-9B]
+) 
+(?(verbose_month)\d)? // K:\Common\Engineering\Sample Files\ACS\OR - Marion\Set002\Images\200117470260.tif
+( (\x20|-(?'-allow_extra_dash'))?
+  (st|rd|nd|th)
+)?

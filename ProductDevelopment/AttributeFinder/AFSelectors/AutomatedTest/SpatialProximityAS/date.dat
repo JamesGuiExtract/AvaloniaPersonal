@@ -1,0 +1,24 @@
+(?inxs)
+(?'allow_newline')
+(?'allow_extra_dash')
+(?<![\w-[_]])
+(
+    // | month d, [yy]yy 
+    // | m/d/[yy]yy
+    // | m-d-[yy]yy
+    #import month.dat
+    #import separator.dat
+    #import day.dat
+    #import separator.dat
+    #import year.dat
+
+  | // | d month [yy]yy
+    // | d-month-[yy]yy
+    #import day.dat
+    #import separator.dat
+    #import month.dat
+    #import separator.dat
+    #import year.dat
+
+)
+(?![\w-[_]])

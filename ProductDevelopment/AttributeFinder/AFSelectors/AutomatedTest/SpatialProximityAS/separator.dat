@@ -1,0 +1,12 @@
+(
+    / (?'allow_one')
+  | 1 (?'-allow_one') (?=\d{2}\D) // K:\Common\Engineering\Sample Files\ACS\OR - Marion\Set002\Images\199801495011.tif
+  | 1 (?=\d{2}/)
+  | 1 (?=\d/\d{2}\b)(?<=\d{2}1) // K:\Common\Engineering\Sample Files\ACS\OR - Marion\Set002\Images\200218940095.tif
+  | (?>
+        ( (?'-allow_newline')
+          [\r\n]{1,2}
+        )
+      | [\W_-[\r\n]]
+    ){1,3}
+)

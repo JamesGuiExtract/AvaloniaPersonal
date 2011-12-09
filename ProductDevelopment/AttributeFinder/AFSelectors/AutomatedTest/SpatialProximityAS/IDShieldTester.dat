@@ -1,7 +1,7 @@
-<SETTING>;VerificationCondition=Clues|HCData|SpansPages|Debug
+<SETTING>;VerificationCondition=Clues|HCData|SpansPages|Debug|a|b
 <SETTING>;VerificationConditionQuantifier=any
-<SETTING>;QueryForAutomatedRedaction=Clues|HCData|SpansPages|Debug
-<SETTING>;AutomatedCondition=Clues|HCData|SpansPages|Debug
+<SETTING>;QueryForAutomatedRedaction=Clues|HCData|SpansPages|Debug|a|b
+<SETTING>;AutomatedCondition=Clues|HCData|SpansPages|Debug|a|b
 <SETTING>;AutomatedConditionQuantifier=any
 <SETTING>;CreateTestOutputVOAFiles=0
 
@@ -53,3 +53,12 @@
 
 // Test removing attributes that completely contain another's unified area.
 <TESTFOLDER>;.\Test16.rsd;.\Images\;$DirOf(<SourceDocName>)\..\ActualVOA\Test16.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test16.voa
+
+// [FlexIDSCore:4382]
+// Tests that multi-line attributes are selected if each line is contained in a different reference region.
+<TESTFOLDER>;.\Test18.rsd;.\Images\199701424647_page_0001;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test18.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test18.voa
+
+// Run Test 17 manually whenever a new test is added and ensure there are no exceptions thrown.
+// NOTE: Test 17 doesn't produce any spatial data and fails as part of the redaction tester. In other words, even
+// when the rule runs properly, it would cause the automated test to fail.
+// If you are more abitious, create a new AutomatedRuleSetTester dat file.
