@@ -862,7 +862,19 @@ bool CSpatialProximityAS::convertToTargetRegion(CRect &rrect, long nPage)
 	ASSERT_RESOURCE_ALLOCATION("ELI22684", ipPageInfo != __nullptr);
 
 	// Create a rect to repersent the coordinates of the page as a whole
-	CRect rectPage(0, 0, ipPageInfo->Width, ipPageInfo->Height);
+	CRect rectPage;
+	EOrientation eOrientation = ipPageInfo->Orientation;
+	if (eOrientation == kRotNone ||
+		eOrientation == kRotDown ||
+		eOrientation == kRotFlipped ||
+		eOrientation == kRotFlippedDown)
+	{
+		rectPage = CRect(0, 0, ipPageInfo->Width, ipPageInfo->Height);
+	}
+	else
+	{
+		rectPage = CRect(0, 0, ipPageInfo->Height, ipPageInfo->Width);
+	}
 
 	// Create a copy of the rect to modify so that as the borders are altered, we still know the
 	// coordinates of the original.
