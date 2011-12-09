@@ -70,7 +70,8 @@ BOOL CFPAboutDlg::OnInitDialog(void)
 		// Set the Version string
 		SetDlgItemText( IDC_EDIT_VERSION, getFileProcessingManagerVersion().c_str() );
 
-		SetDlgItemText( IDC_EDIT_FKB_VERSION, getFKBUpdateVersion().c_str() );
+		// FKB version no longer shown... at least until the versioning system is reworked.
+		//SetDlgItemText( IDC_EDIT_FKB_VERSION, getFKBUpdateVersion().c_str() );
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19397")
 
