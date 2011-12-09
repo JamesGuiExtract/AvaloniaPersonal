@@ -1818,8 +1818,22 @@ IAttributePtr CBoxFinder::createTextResult(IAFDocumentPtr ipAFDoc, ILongRectangl
 	ASSERT_ARGUMENT("ELI20226", ipBox != __nullptr);
 	ASSERT_ARGUMENT("ELI20227", ipClue != __nullptr);
 
+	// [FlexIDSCore:4716]
+	// The box finder is not including text that intersects the box boundary in order to prevent
+	// grabbing text near the border of bordering boxes. However, if the box coordinates are far
+	// enough off, this can prevent text that is in the box from being selected. Therefore, pad
+	// the search box a bit when searching for text.
+	ICopyableObjectPtr ipCopyThis(ipBox);
+	ASSERT_RESOURCE_ALLOCATION("ELI34166", ipCopyThis != __nullptr);
+	
+	ILongRectanglePtr ipPaddedBox = ipCopyThis->Clone();
+	ASSERT_RESOURCE_ALLOCATION("ELI34167", ipPaddedBox != __nullptr);
+	
+	ipPaddedBox->Offset(-4, -4);
+	ipPaddedBox->Expand(8, 8);
+
 	// Return the spatial string text found within the box
-	ISpatialStringPtr ipText =  getSpatialStringSearcher()->GetDataInRegion(ipBox, VARIANT_FALSE);
+	ISpatialStringPtr ipText =  getSpatialStringSearcher()->GetDataInRegion(ipPaddedBox, VARIANT_FALSE);
 	ASSERT_RESOURCE_ALLOCATION("ELI19785", ipText != __nullptr);
 
 	// Expand clue list to replace any file names with the clues from the specified file
