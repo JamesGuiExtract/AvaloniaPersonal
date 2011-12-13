@@ -62,6 +62,7 @@ static const string gstrDOC_TAG_HISTORY = "DocTagHistory";
 static const string gstrDB_INFO_HISTORY = "DBInfoChangeHistory";
 static const string gstrDB_FTP_ACCOUNT = "FTPAccount";
 static const string gstrDB_FTP_EVENT_HISTORY = "FTPEventHistory";
+static const string gstrDB_QUEUED_ACTION_STATUS_CHANGE = "QueuedActionStatusChange";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
@@ -110,10 +111,12 @@ public:
 	STDMETHOD(RemoveFolder)(BSTR strFolder, BSTR strAction);
 	STDMETHOD(NotifyFileProcessed)(long nFileID, BSTR strAction);
 	STDMETHOD(NotifyFileFailed)(long nFileID, BSTR strAction, BSTR strException);
-	STDMETHOD(SetFileStatusToPending)(long nFileID, BSTR strAction);
-	STDMETHOD(SetFileStatusToUnattempted)(long nFileID, BSTR strAction);
+	STDMETHOD(SetFileStatusToPending)(long nFileID, BSTR strAction,
+		VARIANT_BOOL vbAllowQueuedStatusOverride);
+	STDMETHOD(SetFileStatusToUnattempted)(long nFileID, BSTR strAction,
+		VARIANT_BOOL vbAllowQueuedStatusOverride);
 	STDMETHOD(SetFileStatusToSkipped)(long nFileID, BSTR strAction, 
-		VARIANT_BOOL bRemovePreviousSkipped);
+		VARIANT_BOOL bRemovePreviousSkipped, VARIANT_BOOL vbAllowQueuedStatusOverride);
 	STDMETHOD(GetFileStatus)(long nFileID, BSTR strAction, VARIANT_BOOL vbAttemptRevertIfLocked,
 		EActionStatus* pStatus);
 	STDMETHOD(SearchAndModifyFileStatus)(long nWhereActionID, EActionStatus eWhereStatus, 
@@ -121,7 +124,7 @@ public:
 		long* pnNumRecordsModified);
 	STDMETHOD(SetStatusForAllFiles)(BSTR strAction, EActionStatus eStatus);
 	STDMETHOD(SetStatusForFile)(long nID, BSTR strAction, EActionStatus eStatus, 
-		EActionStatus* poldStatus);
+		VARIANT_BOOL vbQueueChangeIfProcessing, EActionStatus* poldStatus);
 	STDMETHOD(GetFilesToProcess)(BSTR strAction, long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
 		BSTR bstrSkippedForUserName, IIUnknownVector** pvecFileRecords);
 	STDMETHOD(GetStats)(long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
@@ -447,9 +450,11 @@ private:
 	//			strToState		- The new state for the action
 	//			strException	- Contains the exception string if this transitioning to a failed state
 	//			strComment		- Comment for the added records
+	//			nQueuedActionStatusChangeID - The QueuedActionStatusChange record to link the added
+	//							  FAST table record to (-1 to not link).
 	void addFileActionStateTransition (_ConnectionPtr ipConnection, long nFileID, 
 		long nActionID, const string &strFromState, const string &strToState, 
-		const string &strException, const string &strComment);
+		const string &strException, const string &strComment, long nQueuedActionStatusChangeID = -1);
 
 	// PROMISE:	To add multiple ActionStateTransition table records that are represented be the given data.
 	// ARGS:	ipConnection	- Connection object to use to update the tables
@@ -499,9 +504,13 @@ private:
 	//			will be updated for the file with the information for the current user and process.
 	//			If bRemovePreviousSkipped is false and strState == "S" the UPIID will be updated,
 	//			but all other skipped file fields will be unmodified.
+	//			If bAllowQueuedStatusOverride is true and the QueuedActionStatusChange table has a
+	//			pending change for the file, that change will be applied. If
+	//			bAllowQueuedStatusOverride is false, the QueuedActionStatusChange will be ignored
+	//			and the status will be set to strState.
 	EActionStatus setFileActionState(_ConnectionPtr ipConnection, long nFileID,
 		string strAction, const string& strState, const string& strException,
-		long nActionID = -1, bool bRemovePreviousSkipped = false, 
+		bool bAllowQueuedStatusOverride, long nActionID = -1, bool bRemovePreviousSkipped = false, 
 		const string& strFASTComment = "");
 
 	// PROMISE: To set the specified group of files' action state for the specified action.
@@ -814,10 +823,12 @@ private:
 	bool RemoveFile_Internal(bool bDBLocked, BSTR strFile, BSTR strAction);
 	bool NotifyFileProcessed_Internal(bool bDBLocked, long nFileID,  BSTR strAction);
 	bool NotifyFileFailed_Internal(bool bDBLocked, long nFileID,  BSTR strAction,  BSTR strException);
-	bool SetFileStatusToPending_Internal(bool bDBLocked, long nFileID,  BSTR strAction);
-	bool SetFileStatusToUnattempted_Internal(bool bDBLocked, long nFileID,  BSTR strAction);
+	bool SetFileStatusToPending_Internal(bool bDBLocked, long nFileID,  BSTR strAction,
+		VARIANT_BOOL vbAllowQueuedStatusOverride);
+	bool SetFileStatusToUnattempted_Internal(bool bDBLocked, long nFileID,  BSTR strAction,
+		VARIANT_BOOL vbAllowQueuedStatusOverride);
 	bool SetFileStatusToSkipped_Internal(bool bDBLocked, long nFileID, BSTR strAction,
-		VARIANT_BOOL bRemovePreviousSkipped);
+		VARIANT_BOOL bRemovePreviousSkipped, VARIANT_BOOL vbAllowQueuedStatusOverride);
 	bool GetFileStatus_Internal(bool bDBLocked, long nFileID,  BSTR strAction,
 		VARIANT_BOOL vbAttemptRevertIfLocked, EActionStatus * pStatus);
 	bool SearchAndModifyFileStatus_Internal(bool bDBLocked,  
@@ -825,7 +836,7 @@ private:
 		BSTR bstrSkippedFromUserName, long nFromActionID, long * pnNumRecordsModified);
 	bool SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAction,  EActionStatus eStatus);
 	bool SetStatusForFile_Internal(bool bDBLocked, long nID,  BSTR strAction,  EActionStatus eStatus,  
-		EActionStatus * poldStatus);
+		VARIANT_BOOL vbQueueChangeIfProcessing, EActionStatus * poldStatus);
 	bool GetFilesToProcess_Internal(bool bDBLocked, BSTR strAction,  long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
 		BSTR bstrSkippedForUserName, IIUnknownVector * * pvecFileRecords);
 	bool RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BSTR strAction);

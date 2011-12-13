@@ -693,10 +693,13 @@ library UCLID_FILEPROCESSINGLib
 			[in] BSTR strAction);
 		[id(7), helpstring("method NotifyFileFailed")] HRESULT NotifyFileFailed([in] long nFileID, 
 			[in] BSTR strAction, [in] BSTR strException);
+		// For the SetFileStatusTo methods, if vbAllowQueuedStatusOverride is VARIANT_TRUE and the
+		// QueuedActionStatusChange table has a pending change for the file, that change will be applied.
+		// If vbAllowQueuedStatusOverride is VARIANT_FALSE, the QueuedActionStatusChange will be ignored.
 		[id(8), helpstring("method SetFileStatusToPending")] HRESULT SetFileStatusToPending([in] long nFileID, 
-			[in] BSTR strAction);
+			[in] BSTR strAction, [in] VARIANT_BOOL vbAllowQueuedStatusOverride);
 		[id(9), helpstring("method SetFileStatusToUnattempted")] HRESULT SetFileStatusToUnattempted([in] long nFileID, 
-			[in] BSTR strAction);
+			[in] BSTR strAction, [in] VARIANT_BOOL vbAllowQueuedStatusOverride);
 		[id(10), helpstring("method GetFileStatus")] HRESULT GetFileStatus([in] long nFileID, [in] BSTR strAction,
 			[in] VARIANT_BOOL vbAttemptRevertIfLocked, [out, retval] EActionStatus* pStatus);
 
@@ -716,8 +719,13 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: If pOldStatus != __nullptr, then the old status associated with the file will be returned.
 		// NOTE:	If pOldStatus != __nullptr, then two database operations will need to performed (as opposed to
 		//			just one) in order to return the previous status
+		//			If vbQueueChangeIfProcessing is VARIANT_TRUE and the file is currently processing, a
+		//			change to eStatus will be queued in the QueuedActionStatusChange table. If
+		//			VARIANT_FALSE the file action status will be overwritten regardless of its current
+		//			processing state.
 		[id(13), helpstring("method SetStatusForFile")] HRESULT SetStatusForFile([in] long nID, [in] BSTR strAction, 
-			[in] EActionStatus eStatus, [out] EActionStatus* poldStatus);
+			[in] EActionStatus eStatus, [in] VARIANT_BOOL vbQueueChangeIfProcessing,
+			[out] EActionStatus* poldStatus);
 
 
 		// -----------------------------------------------------------------------------------------------
@@ -878,8 +886,13 @@ library UCLID_FILEPROCESSINGLib
 		//			If bRemovePreviousSkipped is VARIANT_FALSE the SkippedFileTable will only
 		//			update the UPIID in an existing record, if VARIANT_TRUE then any record in the
 		//			skipped table will be replaced with a new record.
+		//			If vbAllowQueuedStatusOverride is VARIANT_TRUE and the QueuedActionStatusChange table
+		//			has a pending change for the file, that change will be applied. If
+		//			vbAllowQueuedStatusOverride is VARIANT_FALSE, the QueuedActionStatusChange will be
+		//			ignored and the status will be set to skipped.
 		[id(50), helpstring("method SetFileStatusToSkipped")] HRESULT SetFileStatusToSkipped(
-			[in] long nFileID, [in] BSTR bstrAction, VARIANT_BOOL bRemovePreviousSkipped);
+			[in] long nFileID, [in] BSTR bstrAction, [in] VARIANT_BOOL bRemovePreviousSkipped,
+			[in] VARIANT_BOOL vbAllowQueuedStatusOverride);
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To set all files which match the specified query to the specified status
 		//			for the specified action.

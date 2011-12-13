@@ -341,7 +341,8 @@ STDMETHODIMP CFileProcessingDB::NotifyFileFailed(long nFileID,  BSTR strAction, 
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13544");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::SetFileStatusToPending(long nFileID,  BSTR strAction)
+STDMETHODIMP CFileProcessingDB::SetFileStatusToPending(long nFileID,  BSTR strAction,
+													   VARIANT_BOOL vbAllowQueuedStatusOverride)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -349,12 +350,12 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToPending(long nFileID,  BSTR strAc
 	{
 		// Check License
 		validateLicense();
-		if (!SetFileStatusToPending_Internal(false, nFileID,  strAction))
+		if (!SetFileStatusToPending_Internal(false, nFileID,  strAction, vbAllowQueuedStatusOverride))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-			SetFileStatusToPending_Internal(true, nFileID,  strAction);
+			SetFileStatusToPending_Internal(true, nFileID,  strAction, vbAllowQueuedStatusOverride);
 		}
 
 		return S_OK;
@@ -362,7 +363,8 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToPending(long nFileID,  BSTR strAc
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13546");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::SetFileStatusToUnattempted(long nFileID,  BSTR strAction)
+STDMETHODIMP CFileProcessingDB::SetFileStatusToUnattempted(long nFileID,  BSTR strAction,
+														   VARIANT_BOOL vbAllowQueuedStatusOverride)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -371,12 +373,12 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToUnattempted(long nFileID,  BSTR s
 		// Check License
 		validateLicense();
 
-		if (!SetFileStatusToUnattempted_Internal(false, nFileID, strAction))
+		if (!SetFileStatusToUnattempted_Internal(false, nFileID, strAction, vbAllowQueuedStatusOverride))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-			SetFileStatusToUnattempted_Internal(true, nFileID, strAction);
+			SetFileStatusToUnattempted_Internal(true, nFileID, strAction, vbAllowQueuedStatusOverride);
 		}
 		return S_OK;
 	}
@@ -384,7 +386,8 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToUnattempted(long nFileID,  BSTR s
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::SetFileStatusToSkipped(long nFileID, BSTR strAction,
-													   VARIANT_BOOL bRemovePreviousSkipped)
+													   VARIANT_BOOL bRemovePreviousSkipped,
+													   VARIANT_BOOL vbAllowQueuedStatusOverride)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -393,12 +396,14 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToSkipped(long nFileID, BSTR strAct
 		// Check License
 		validateLicense();
 
-		if (!SetFileStatusToSkipped_Internal(false, nFileID, strAction, bRemovePreviousSkipped))
+		if (!SetFileStatusToSkipped_Internal(false, nFileID, strAction, bRemovePreviousSkipped,
+				vbAllowQueuedStatusOverride))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-			SetFileStatusToSkipped_Internal(true, nFileID, strAction, bRemovePreviousSkipped);
+			SetFileStatusToSkipped_Internal(true, nFileID, strAction, bRemovePreviousSkipped,
+				vbAllowQueuedStatusOverride);
 		}
 
 		return S_OK;
@@ -476,7 +481,8 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionSta
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::SetStatusForFile(long nID,  BSTR strAction,  EActionStatus eStatus,  
-												 EActionStatus * poldStatus)
+												 VARIANT_BOOL vbOverrideProcessing,
+												 EActionStatus *poldStatus)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -485,12 +491,12 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFile(long nID,  BSTR strAction,  EAc
 		// Check License
 		validateLicense();
 
-		if (!SetStatusForFile_Internal(false, nID, strAction, eStatus, poldStatus))
+		if (!SetStatusForFile_Internal(false, nID, strAction, eStatus, vbOverrideProcessing, poldStatus))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-			SetStatusForFile_Internal(true, nID, strAction, eStatus, poldStatus);
+			SetStatusForFile_Internal(true, nID, strAction, eStatus, vbOverrideProcessing, poldStatus);
 		}
 		return S_OK;
 	}

@@ -82,7 +82,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 112;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 113;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -598,6 +598,40 @@ int UpdateToSchemaVersion112(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34146");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion113(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 113;
+
+		if (pnNumSteps != __nullptr)
+		{
+			// This update does not require transferring any data.
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_TABLE);
+		vecQueries.push_back(gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_INDEX);
+		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_ACTION_FK);
+		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_MACHINE_FK);
+		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_USER_FK);
+		vecQueries.push_back("ALTER TABLE [FileActionStateTransition] ADD [QueueID] INT NULL");
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATE_TRANSITION_QUEUE_FK);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34169");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1224,8 +1258,9 @@ bool CFileProcessingDB::NotifyFileProcessed_Internal(bool bDBLocked, long nFileI
 				// Begin a transaction
 				TransactionGuard tg(ipConnection);
 
-				// change the given files state to completed
-				setFileActionState(ipConnection, nFileID, asString(strAction), "C", "", -1);
+				// change the given files state to completed unless there is a pending state in the
+				// QueuedActionStatusChange table.
+				setFileActionState(ipConnection, nFileID, asString(strAction), "C", "", true, -1);
 
 				tg.CommitTrans();
 
@@ -1273,8 +1308,9 @@ bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked,long nFileID,  
 				ue.createFromString("ELI32298", asString(strException));
 				string strLogString = ue.createLogString();
 
-				// change the given files state to Failed
-				setFileActionState(ipConnection, nFileID, asString(strAction), "F", strLogString);
+				// change the given files state to Failed unless there is a pending state in the
+				// QueuedActionStatusChange table.
+				setFileActionState(ipConnection, nFileID, asString(strAction), "F", strLogString, true);
 
 				tg.CommitTrans();
 
@@ -1294,7 +1330,8 @@ bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked,long nFileID,  
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::SetFileStatusToPending_Internal(bool bDBLocked, long nFileID,  BSTR strAction)
+bool CFileProcessingDB::SetFileStatusToPending_Internal(bool bDBLocked, long nFileID, BSTR strAction,
+														VARIANT_BOOL vbAllowQueuedStatusOverride)
 {
 	try
 	{
@@ -1312,7 +1349,8 @@ bool CFileProcessingDB::SetFileStatusToPending_Internal(bool bDBLocked, long nFi
 				TransactionGuard tg(ipConnection);
 				
 				// change the given files state to Pending
-				setFileActionState(ipConnection, nFileID, asString(strAction), "P", "");
+				setFileActionState(ipConnection, nFileID, asString(strAction), "P", "", 
+					asCppBool(vbAllowQueuedStatusOverride));
 
 				tg.CommitTrans();
 
@@ -1332,7 +1370,8 @@ bool CFileProcessingDB::SetFileStatusToPending_Internal(bool bDBLocked, long nFi
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::SetFileStatusToUnattempted_Internal(bool bDBLocked, long nFileID,  BSTR strAction)
+bool CFileProcessingDB::SetFileStatusToUnattempted_Internal(bool bDBLocked, long nFileID, BSTR strAction,
+															VARIANT_BOOL vbAllowQueuedStatusOverride)
 {
 	try
 	{
@@ -1352,7 +1391,8 @@ bool CFileProcessingDB::SetFileStatusToUnattempted_Internal(bool bDBLocked, long
 				TransactionGuard tg(ipConnection);
 
 				// change the given files state to unattempted
-				setFileActionState(ipConnection, nFileID, asString(strAction), "U", "");
+				setFileActionState(ipConnection, nFileID, asString(strAction), "U", "",
+					asCppBool(vbAllowQueuedStatusOverride));
 
 				tg.CommitTrans();
 
@@ -1372,7 +1412,8 @@ bool CFileProcessingDB::SetFileStatusToUnattempted_Internal(bool bDBLocked, long
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::SetFileStatusToSkipped_Internal(bool bDBLocked, long nFileID, BSTR strAction,
-													   VARIANT_BOOL bRemovePreviousSkipped)
+													   VARIANT_BOOL bRemovePreviousSkipped,
+													   VARIANT_BOOL vbAllowQueuedStatusOverride)
 {
 	try
 	{
@@ -1390,8 +1431,8 @@ bool CFileProcessingDB::SetFileStatusToSkipped_Internal(bool bDBLocked, long nFi
 		TransactionGuard tg(ipConnection);
 
 		// Change the given files state to Skipped
-		setFileActionState(ipConnection, nFileID, asString(strAction), "S", "", -1,
-			asCppBool(bRemovePreviousSkipped));
+		setFileActionState(ipConnection, nFileID, asString(strAction), "S", "",
+			asCppBool(vbAllowQueuedStatusOverride), -1, asCppBool(bRemovePreviousSkipped));
 
 		tg.CommitTrans();
 
@@ -1591,7 +1632,7 @@ bool CFileProcessingDB::SearchAndModifyFileStatus_Internal(bool bDBLocked,
 						strToStatus = getStringField(ipFields, "WhereActionStatus");
 					}
 
-					setFileActionState(ipConnection, nFileID, strToAction, strToStatus, "",
+					setFileActionState(ipConnection, nFileID, strToAction, strToStatus, "", false,
 						nToActionID, true);
 
 					// Update modified records count
@@ -1674,6 +1715,13 @@ bool CFileProcessingDB::SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAc
 				string strDeleteLockedFiles = "DELETE FROM [LockedFile] WHERE ActionID = " + strActionID;
 				executeCmdQuery(ipConnection, strDeleteLockedFiles);
 
+				// There are no cases where this method should not just ignore all pending entries in
+				// [QueuedActionStatusChange] for the selected files.
+				string strUpdateQueuedActionStatusChange =
+					"UPDATE [QueuedActionStatusChange] SET [Status] = 'I'"
+					"WHERE [Status] = 'P' AND [ActionID] = " + strActionID;
+				executeCmdQuery(ipConnection, strUpdateQueuedActionStatusChange);
+
 				// If setting files to skipped, need to add skipped record for each file
 				if (eStatus == kActionSkipped)
 				{
@@ -1690,7 +1738,6 @@ bool CFileProcessingDB::SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAc
 				// Add the transition records
 				addASTransFromSelect(ipConnection, strActionName, nActionID, strActionStatus,
 					"", "", strWhere, "");
-
 
 				// if the new status is Unattempted
 				if (eStatus == kActionUnattempted)
@@ -1750,8 +1797,10 @@ bool CFileProcessingDB::SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAc
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BSTR strAction,  EActionStatus eStatus,  
-												 EActionStatus * poldStatus)
+bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BSTR strAction,
+												  EActionStatus eStatus,  
+												  VARIANT_BOOL vbQueueChangeIfProcessing,
+												  EActionStatus * poldStatus)
 {
 	try
 	{
@@ -1759,6 +1808,8 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			*poldStatus = kActionUnattempted;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -1768,8 +1819,58 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 				// Begin a transaction
 				TransactionGuard tg(ipConnection);
 
-				// change the status for the given file and return the previous state
-				*poldStatus = setFileActionState(ipConnection, nID, asString(strAction), asStatusString(eStatus), "");
+				// If vbQueueChangeIfProcessing, check to see if the file is currently processing.
+				if (asCppBool(vbQueueChangeIfProcessing))
+				{
+					string strActionID = asString(getActionID(ipConnection, asString(strAction)));
+
+					string strFileSQL = "SELECT FAMFile.ID, COALESCE(ActionStatus, 'U') AS ActionStatus "
+					"FROM FAMFile LEFT JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID "
+					" AND FileActionStatus.ActionID = " + strActionID + " WHERE FAMFile.ID = " 
+					+ asString(nID);
+
+					_RecordsetPtr ipFileSet(__uuidof(Recordset));
+					ASSERT_RESOURCE_ALLOCATION("ELI34168", ipFileSet != __nullptr);
+					ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+						adLockOptimistic, adCmdText);
+
+					// If the file was found in the DB
+					if (ipFileSet->adoEOF == VARIANT_FALSE)
+					{
+						// Check to see if its current status is processing.
+						string strStatus = getStringField(ipFileSet->Fields, "ActionStatus");
+						if (strStatus == "R")
+						{
+							string strActionStatus = asStatusString(eStatus);
+							string strFileID = asString(nID);
+
+							// Any previous pending entry in the QueuedActionStatusChange table for
+							// this file and status should be set to "O" to indicate the previously
+							// queued change has been overridden by this one.
+							executeCmdQuery(ipConnection,
+								"UPDATE [QueuedActionStatusChange] SET [Status] = 'O'"
+								"WHERE [Status] = 'P' AND [ActionID] = " + strActionID +
+								" AND [FileID] = " + asString(nID));
+
+							// Add a new QueuedActionStatusChange entry to queue this change.
+							executeCmdQuery(ipConnection, "INSERT INTO [QueuedActionStatusChange] "
+								"(FileID, ActionID, ASC_To, DateTimeStamp, MachineID, FAMUserID, UPI, Status) "
+								"VALUES(" + asString(nID) + ", " + strActionID + ", '" +
+								asStatusString(eStatus) + "', GETDATE(), " +
+								asString(getMachineID(ipConnection)) + ", " +
+								asString(getFAMUserID(ipConnection)) + ", '" + m_strUPI + "', 'P')");
+
+							*poldStatus = kActionProcessing;
+						}
+					}
+				}
+
+				if (*poldStatus == kActionUnattempted)
+				{
+					// change the status for the given file and return the previous state
+					*poldStatus =setFileActionState(ipConnection, nID, asString(strAction),
+						asStatusString(eStatus), "", false);
+				}
 
 				tg.CommitTrans();
 
@@ -1873,8 +1974,15 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 				// pending records available), before calling setFilesToProcessing do a quick and
 				// simple check to see if there are any files available.
 				string strGateKeeperQuery =
-					"SELECT TOP 1 [FileActionStatus].[FileID] FROM [FileActionStatus] " + strWhere +
-					" AND [FileActionStatus].[ActionID] = <ActionIDPlaceHolder>";
+					"SELECT TOP 1 [FileActionStatus].[FileID] AS ID FROM [FileActionStatus] " + strWhere +
+					"	AND [FileActionStatus].[ActionID] = <ActionIDPlaceHolder>";
+				if (m_bAutoRevertLockedFiles)
+				{
+					strGateKeeperQuery +=
+						"UNION SELECT TOP 1 [ID] AS ID FROM [ActiveFAM] "
+						"WHERE DATEDIFF(minute, [LastPingTime], GetDate()) > " + 
+							asString(m_nAutoRevertTimeOutInMinutes);
+				}
 
 				// Update the select statement with the action ID
 				replaceVariable(strGateKeeperQuery, strActionIDPlaceHolder, asString(nActionID));
@@ -1976,7 +2084,18 @@ bool CFileProcessingDB::RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BS
 					" WHERE ActionID = " + asString(nActionID) + " AND FileID IN ("
 					" SELECT FAMFile.ID FROM FileActionStatus RIGHT JOIN FAMFile "
 					" ON FileActionStatus.FileID = FAMFile.ID " + 
-					strWhere;
+					strWhere + ")";
+
+				// This method does not ever seem to get called, but in case it does, it seems reasonable
+				// to ignore and pending changes for files in the folder.
+				string strUpdateQueuedActionStatusChange =
+					"UPDATE [QueuedActionStatusChange] SET Status = 'I'"
+					"WHERE [Status] = 'P' AND [ActionID] = " + asString(nActionID) +
+					" AND [FileID] IN"
+					"("
+					"	SELECT FAMFile.ID FROM FileActionStatus RIGHT JOIN FAMFile "
+					"	ON FileActionStatus.FileID = FAMFile.ID " + strWhere +
+					")";
 
 				// Begin a transaction
 				TransactionGuard tg(ipConnection);
@@ -1997,6 +2116,9 @@ bool CFileProcessingDB::RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BS
 					// Add the QueueEvent records to the database
 					executeCmdQuery(ipConnection, strInsertQueueRecords);
 				}
+
+				// This needs to be called before strDeleteSQL.
+				executeCmdQuery(ipConnection, strUpdateQueuedActionStatusChange);
 
 				// Remove the FileActionStatus records for the deleted folder
 				executeCmdQuery(ipConnection, strDeleteSQL);
@@ -2567,8 +2689,9 @@ bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID,
 				// Begin a transaction
 				TransactionGuard tg(ipConnection);
 
-				// Set the file state to skipped
-				setFileActionState(ipConnection, nFileID, strActionName, "S", "", nActionID);
+				// Set the file state to skipped unless there is a pending state in the
+				// QueuedActionStatusChange table.
+				setFileActionState(ipConnection, nFileID, strActionName, "S", "", true, nActionID);
 
 				tg.CommitTrans();
 
@@ -3880,8 +4003,10 @@ bool CFileProcessingDB::SetStatusForFilesWithTags_Internal(bool bDBLocked, IVari
 					}
 
 					// Set the file action state
-					setFileActionState(ipConnection, nFileID, strToAction, strStatus, "", nToActionID, 
-						true);
+					// This call should not be made from file processing and the new state should
+					// overrule any pending state for the file in the QueuedActionStatusChange table.
+					setFileActionState(ipConnection, nFileID, strToAction, strStatus, "", false,
+						nToActionID);
 
 					// Move to next record
 					ipFileSet->MoveNext();
@@ -5503,7 +5628,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 109:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion110);
 				case 110:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion111);
 				case 111:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion112);
-				case 112:   break;
+				case 112:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion113);
+				case 113:   break;
 
 				default:
 					{

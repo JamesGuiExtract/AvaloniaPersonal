@@ -129,12 +129,14 @@ void FPRecordManager::discardProcessingQueue()
 		if (m_bProcessSkippedFiles)
 		{
 			// Return the state of the file to skipped in the database
-			m_ipFPMDB->SetFileStatusToSkipped( l, bstrAction, VARIANT_FALSE);
+			// Set vbAllowQueuedStatusOverride to true.
+			m_ipFPMDB->SetFileStatusToSkipped( l, bstrAction, VARIANT_FALSE, VARIANT_TRUE);
 		}
 		else
 		{
 			// Return the state of the file to pending in the database
-			m_ipFPMDB->SetFileStatusToPending( l, bstrAction);
+			// Set vbAllowQueuedStatusOverride to true.
+			m_ipFPMDB->SetFileStatusToPending( l, bstrAction, VARIANT_TRUE);
 		}
 	}
 
@@ -601,12 +603,15 @@ void FPRecordManager::changeState(FileProcessingRecord& task, CSingleLock& rLock
 				if (m_bProcessSkippedFiles)
 				{
 					// Set the file back to skipped (do not update the skipped table)
-					m_ipFPMDB->SetFileStatusToSkipped(nTaskID, m_strAction.c_str(), VARIANT_FALSE);
+					// Set vbAllowQueuedStatusOverride to true.
+					m_ipFPMDB->SetFileStatusToSkipped(nTaskID, m_strAction.c_str(), VARIANT_FALSE,
+						VARIANT_TRUE);
 					_lastCodePos = "290_A";
 				}
 				else
 				{
-					m_ipFPMDB->SetFileStatusToPending(nTaskID, m_strAction.c_str());
+					// Set vbAllowQueuedStatusOverride to true.
+					m_ipFPMDB->SetFileStatusToPending(nTaskID, m_strAction.c_str(), VARIANT_TRUE);
 					_lastCodePos = "290_B";
 				}
 			}
@@ -745,7 +750,10 @@ long FPRecordManager::loadTasksFromDB(long nNumToLoad)
 		// status reset in the database
 		if (push(fpTask) == false)
 		{
-			m_ipFPMDB->SetFileStatusToPending(fpTask.getFileID(), m_strAction.c_str());
+			// There should not be any pending records in QueuedActionStatusChange for this file
+			// at this point but in case there are, use vbAllowQueuedStatusOverride as VARIANT_FALSE
+			// to ignore them.
+			m_ipFPMDB->SetFileStatusToPending(fpTask.getFileID(), m_strAction.c_str(), VARIANT_FALSE);
 		}
 		else
 		{

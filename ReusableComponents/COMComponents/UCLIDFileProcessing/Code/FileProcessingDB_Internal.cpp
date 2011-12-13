@@ -161,6 +161,11 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			+ strActionID + " AND FileID IN (";
 		string strRemoveSkippedFile = "DELETE FROM SkippedFile WHERE ActionID = "
 			+ strActionID + " AND FileID IN (";
+		// There are no cases where this method should not just ignore all pending entries in
+		// [QueuedActionStatusChange] for the selected files.
+		string strUpdateQueuedActionStatusChange =
+			"UPDATE [QueuedActionStatusChange] SET [Status] = 'I'"
+			"WHERE [Status] = 'P' AND [ActionID] = " + strActionID + " AND FileID IN (";
 		string strFastQuery = "INSERT INTO " + gstrFILE_ACTION_STATE_TRANSITION
 			+ " (FileID, ActionID, ASC_From, ASC_To, DateTimeStamp, FAMUserID, MachineID"
 			+ ") SELECT FAMFile.ID, " + strActionID + " AS ActionID, "
@@ -210,6 +215,8 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			executeCmdQuery(ipConnection, strFastQuery + strFileIdList);
 			executeCmdQuery(ipConnection, strDeleteLockedFile + strFileIdList);
 			executeCmdQuery(ipConnection, strRemoveSkippedFile + strFileIdList);
+			executeCmdQuery(ipConnection, strUpdateQueuedActionStatusChange + strFileIdList);
+
 			if (!strClearComments.empty())
 			{
 				executeCmdQuery(ipConnection, strClearComments + strFileIdList);
@@ -235,6 +242,7 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection, long nFileID, 
 													string strAction, const string& strState,
 													const string& strException,
+													bool bAllowQueuedStatusOverride,
 													long nActionID, bool bRemovePreviousSkipped,
 													const string& strFASTComment)
 {
@@ -261,15 +269,24 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		}
 		_lastCodePos = "50";
 
+		string strFileId = asString(nFileID);
+		string strActionId = asString(nActionID);
+
 		// Set up the select query to select the file to change and include and skipped file data
 		// If there is no skipped file record the SkippedActionID will be -1
 		string strFileSQL = "SELECT FAMFile.ID as ID, FileName, FileSize, Pages, [FAMFile].Priority, " 
-			"COALESCE(ActionStatus, 'U') AS ActionStatus, COALESCE(SkippedFile.ActionID, -1) AS SkippedActionID "
-			"FROM FAMFile LEFT OUTER JOIN SkippedFile ON SkippedFile.FileID = FAMFile.ID AND " 
-			"SkippedFile.ActionID = " + asString(nActionID) + 
-			" LEFT OUTER JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID AND " + 
-			"FileActionStatus.ActionID = " + asString(nActionID) + 
-			" WHERE FAMFile.ID = " + asString (nFileID);
+			"COALESCE(ActionStatus, 'U') AS ActionStatus, "
+			"COALESCE(SkippedFile.ActionID, -1) AS SkippedActionID, "
+			"COALESCE(QueuedActionStatusChange.ID, -1) AS QueuedStatusChangeID "
+			"FROM FAMFile "
+			"LEFT OUTER JOIN SkippedFile ON SkippedFile.FileID = FAMFile.ID " 
+			"	AND SkippedFile.ActionID = " + strActionId + 
+			" LEFT OUTER JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID " + 
+			"	AND FileActionStatus.ActionID = " + strActionId + 
+			" LEFT OUTER JOIN QueuedActionStatusChange ON QueuedActionStatusChange.Status = 'P' "
+			"	AND QueuedActionStatusChange.FileID = FAMFile.ID "
+			"	AND QueuedActionStatusChange.ActionID = " + strActionId +
+			" WHERE FAMFile.ID = " + strFileId;
 		
 		_lastCodePos = "60";
 
@@ -304,6 +321,61 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			easRtn = asEActionStatus (strPrevStatus);
 			_lastCodePos = "150";
 
+			// Account for any entries in QueuedActionStatusChange for this file (whether that means
+			// applying the queued change or ignoring it).
+			string strNewState = strState;
+			string strNewFASTComment = strFASTComment;
+			long nQueuedStatusChangeID = getLongField(ipFileSetFields, "QueuedStatusChangeID");
+
+			_lastCodePos = "151";
+
+			if (nQueuedStatusChangeID >= 0)
+			{
+				// Open the relevant record in QueuedActionStatusChange.
+				_lastCodePos = "152";
+				_RecordsetPtr ipQueuedChangeSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI34184", ipQueuedChangeSet != __nullptr);
+
+				string strQueuedActionStatusSQL =
+					"SELECT [ASC_To], [Status] FROM [QueuedActionStatusChange] WHERE [ID] = " +
+					asString(nQueuedStatusChangeID);
+
+				ipQueuedChangeSet->Open(strQueuedActionStatusSQL.c_str(),
+					_variant_t((IDispatch *)ipConnection,true),
+					adOpenDynamic, adLockOptimistic, adCmdText);
+
+				_lastCodePos = "153";
+
+				if (bAllowQueuedStatusOverride)
+				{
+					_lastCodePos = "154";
+					string strOverrideState = getStringField(ipQueuedChangeSet->Fields, "ASC_To");
+
+					// If overrides from the QueuedChange table are allowed, update the target state
+					// and apply a comment that notes the override.
+					if (strOverrideState != strState)
+					{
+						strNewState = strOverrideState;
+						strNewFASTComment = "Transition to " + strState + " overridden";
+					}
+
+					_lastCodePos = "155";
+					setStringField(ipQueuedChangeSet->Fields, "Status", "C");
+				}
+				else
+				{
+					// If overrides from the QueuedChange table are not allowed, mark the
+					// QueuedChange record as ignored.
+					nQueuedStatusChangeID = -1;
+					
+					_lastCodePos = "156";
+					setStringField(ipQueuedChangeSet->Fields, "Status", "I");
+				}
+
+				_lastCodePos = "157";
+				ipQueuedChangeSet->Update();
+			}
+
 			// Get the current record
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipCurrRecord;
 			ipCurrRecord = getFileRecordFromFields(ipFileSetFields);
@@ -314,28 +386,28 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			_lastCodePos = "170";
 
 			// Update the FileActionStatus table appropriately
-			if (easRtn != kActionUnattempted && strState != "U")
+			if (easRtn != kActionUnattempted && strNewState != "U")
 			{
 				// update an existing record
 				executeCmdQuery(ipConnection, "UPDATE FileActionStatus SET ActionStatus = '" +
-					strState + "'" + strFileActionStatusFromClause);
+					strNewState + "'" + strFileActionStatusFromClause);
 			}
 
 			// if the new state is unattempted there should be no record in the FileActionStatus table
 			// for the file id and action id
-			if (strState == "U")
+			if (strNewState == "U")
 			{
 				// delete any record for file id and action id in the FileActionStatus table
 				executeCmdQuery(ipConnection, "DELETE FROM FileActionStatus " + strFileActionStatusFromClause);
 			}
 			
 			// if the old state is unattempted and the new state is not need to add record to FileActionStatus table
-			if (easRtn == kActionUnattempted && strState != "U")
+			if (easRtn == kActionUnattempted && strNewState != "U")
 			{
 				// add new record to the FileActionStatus table
 				executeCmdQuery(ipConnection, "INSERT INTO FileActionStatus "
 					"(FileID, ActionID, ActionStatus, Priority) "
-					" VALUES (" + asString(nFileID) + ", " + asString(nActionID) + ", '" + strState + "', " +
+					" VALUES (" + asString(nFileID) + ", " + asString(nActionID) + ", '" + strNewState + "', " +
 					asString(ipCurrRecord->Priority) + ")");
 			}
 
@@ -343,7 +415,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 
 			// If transition to complete and AutoDeleteFileActionComment == true
 			// then clear the file action comment for this file
-			if (strState == "C" && m_bAutoDeleteFileActionComment)
+			if (strNewState == "C" && m_bAutoDeleteFileActionComment)
 			{
 				_lastCodePos = "190";
 				clearFileActionComment(ipConnection, nFileID, nActionID);
@@ -351,7 +423,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			_lastCodePos = "200";
 
 			// if the old status does not equal the new status add transition records
-			if (strPrevStatus != strState || bRemovePreviousSkipped)
+			if (strPrevStatus != strNewState || bRemovePreviousSkipped)
 			{
 				_lastCodePos = "210";
 				// update the statistics
@@ -366,7 +438,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 						" AND UPIID = " + asString(m_nUPIID));
 				}
 				_lastCodePos = "250";
-				updateStats(ipConnection, nActionID, easStatsFrom, asEActionStatus(strState),
+				updateStats(ipConnection, nActionID, easStatsFrom, asEActionStatus(strNewState),
 					ipCurrRecord, ipCurrRecord);
 
 				_lastCodePos = "260";
@@ -375,12 +447,12 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				{
 					_lastCodePos = "270";
 					addFileActionStateTransition(ipConnection, nFileID, nActionID, strPrevStatus, 
-						strState, strException, strFASTComment);
+						strNewState, strException, strNewFASTComment, nQueuedStatusChangeID);
 				}
 				_lastCodePos = "280";
 
 				// Determine if existing skipped record should be removed
-				bool bSkippedRemoved = nSkippedActionID != -1 && (bRemovePreviousSkipped || strState != "S");
+				bool bSkippedRemoved = nSkippedActionID != -1 && (bRemovePreviousSkipped || strNewState != "S");
 
 				// These calls are order dependent.
 				// Remove the skipped record (if any) and add a new
@@ -392,7 +464,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				}
 				_lastCodePos = "300";
 
-				if (strState == "S")
+				if (strNewState == "S")
 				{
 					if (nSkippedActionID == -1 || bSkippedRemoved)
 					{
@@ -609,7 +681,8 @@ void CFileProcessingDB::addFileActionStateTransition(_ConnectionPtr ipConnection
 													  const string &strFromState, 
 													  const string &strToState, 
 													  const string &strException, 
-													  const string &strComment)
+													  const string &strComment,
+													  long nQueuedActionStatusChangeID/* = -1*/)
 {
 	string strInsertQuery = "";
 	try
@@ -626,11 +699,12 @@ void CFileProcessingDB::addFileActionStateTransition(_ConnectionPtr ipConnection
 			// Build the insert query for adding the new row
 			strInsertQuery = "INSERT INTO " + gstrFILE_ACTION_STATE_TRANSITION
 				+ " (FileID, ActionID, ASC_From, ASC_To, DateTimeStamp, FAMUserID, MachineID, "
-				"Exception, Comment) VALUES (" + asString(nFileID) + ", " + asString(nActionID)
+				"Exception, Comment, QueueID) VALUES (" + asString(nFileID) + ", " + asString(nActionID)
 				+ ", '" + strFromState + "', '" + strToState + "', GETDATE(), "
 				+ asString(getFAMUserID(ipConnection)) + ", " + asString(getMachineID(ipConnection)) + ", "
 				+ (strException.empty() ? "NULL" : ("'" + strException + "'")) + ", "
-				+ (strComment.empty() ? "NULL" : ("'" + strComment + "'")) + ")";
+				+ (strComment.empty() ? "NULL" : ("'" + strComment + "'")) + ", " +
+				((nQueuedActionStatusChangeID >= 0) ? asString(nQueuedActionStatusChangeID) : "NULL") + ")";
 
 			// Run the query
 			executeCmdQuery(ipConnection, strInsertQuery);
@@ -966,6 +1040,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_INPUT_EVENT_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_ALL_INDEX);
 		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX);
+		vecQueries.push_back(gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_INDEX);
 		
 		// Add user-table specific indices if necessary.
 		if (bAddUserTables)
@@ -984,6 +1059,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATE_TRANSITION_FAM_USER_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATE_TRANSITION_ACTION_STATE_TO_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATE_TRANSITION_ACTION_STATE_FROM_FK);
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATE_TRANSITION_QUEUE_FK);
 		vecQueries.push_back(gstrADD_QUEUE_EVENT_MACHINE_FK);
 		vecQueries.push_back(gstrADD_QUEUE_EVENT_FAM_USER_FK);
 		vecQueries.push_back(gstrADD_QUEUE_EVENT_ACTION_FK);
@@ -1023,6 +1099,10 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_FTP_EVENT_HISTORY_ACTION_FK);
 		vecQueries.push_back(gstrADD_FTP_EVENT_HISTORY_MACHINE_FK);
 		vecQueries.push_back(gstrADD_FTP_EVENT_HISTORY_FAM_USER_FK);
+		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_ACTION_FK);
+		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_MACHINE_FK);
+		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_USER_FK);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -1073,6 +1153,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_DB_INFO_CHANGE_HISTORY_TABLE);
 	vecQueries.push_back(gstrCREATE_FTP_ACCOUNT);
 	vecQueries.push_back(gstrCREATE_FTP_EVENT_HISTORY_TABLE);
+	vecQueries.push_back(gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_TABLE);
 
 	return vecQueries;
 }
@@ -1242,6 +1323,13 @@ void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, con
 		// Delete all of the previous status for the to action
 		string strDeleteTo = "DELETE FROM FileActionStatus WHERE ActionID = " + strToActionID;
 		executeCmdQuery(ipConnection, strDeleteTo);
+
+		// There are no cases where this method should not just ignore all pending entries in
+		// [QueuedActionStatusChange] for the selected files.
+		string strUpdateQueuedActionStatusChange =
+			"UPDATE [QueuedActionStatusChange] SET Status = 'I'"
+			"WHERE [Status] = 'P' AND [ActionID] = " + strToActionID;
+		executeCmdQuery(ipConnection, strUpdateQueuedActionStatusChange);
 
 		// Create new FileActionStatus records based on the value of the from action ID
 		string strCopy = "INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus, Priority) "
@@ -2228,6 +2316,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrDB_INFO_HISTORY);
 	vecTables.push_back(gstrDB_FTP_ACCOUNT);
 	vecTables.push_back(gstrDB_FTP_EVENT_HISTORY);
+	vecTables.push_back(gstrDB_QUEUED_ACTION_STATUS_CHANGE);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)
@@ -3192,9 +3281,11 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 			map_StatusCounts[strActionName][strRevertToStatus] = 
 				map_StatusCounts[strActionName][strRevertToStatus] + 1;
 
+			// Pass bAllowQueuedStatusOverride so that any queued changes for files that were
+			// processing when the FAM crashed are applied now.
 			setFileActionState(ipConnection, getLongField(ipFields, "FileID"), 
 				strActionName, strRevertToStatus, 
-				"", getLongField(ipFields, "ActionID"), false, strFASTComment);
+				"", true, getLongField(ipFields, "ActionID"), false, strFASTComment);
 
 			ipFileSet->MoveNext();
 		}
@@ -3755,6 +3846,13 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 								ue.addDebugInfo("File ID", strFileID);
 								throw ue;
 							}
+
+							// There are no cases where this method should not just ignore all
+							// pending entries in [QueuedActionStatusChange] for the selected files.
+							executeCmdQuery(ipConnection,
+								"UPDATE [QueuedActionStatusChange] SET Status = 'I'"
+								"WHERE [Status] = 'P' AND [ActionID] = " + asString(nActionID) +
+								" AND [FileID] = " + strFileID);
 
 							// Update the Statistics
 							updateStats(ipConnection, nActionID, asEActionStatus(strFileFromState), 

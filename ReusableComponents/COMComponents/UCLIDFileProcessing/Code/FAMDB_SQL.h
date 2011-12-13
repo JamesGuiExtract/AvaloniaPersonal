@@ -87,8 +87,9 @@ static const string gstrCREATE_FILE_ACTION_STATE_TRANSITION_TABLE  ="CREATE TABL
 	"[DateTimeStamp] [datetime] NULL,"
 	"[MachineID] [int] NULL, "
 	"[FAMUserID] [int] NULL, "
-	"[Exception] [ntext] NULL,"
-	"[Comment] [nvarchar](50) NULL)";
+	"[Exception] [ntext] NULL, "
+	"[Comment] [nvarchar](50) NULL, "
+	"[QueueID] [int] NULL)";
 
 static const string gstrCREATE_QUEUE_EVENT_TABLE = "CREATE TABLE [dbo].[QueueEvent]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_QueueEvent] PRIMARY KEY CLUSTERED,"
@@ -277,6 +278,18 @@ static const string gstrCREATE_FTP_EVENT_HISTORY_TABLE  ="CREATE TABLE [dbo].[FT
 	"[Retries] [int] NULL, "
 	"[Exception] [ntext] NULL)";
 
+static const string gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_TABLE =
+	"CREATE TABLE [dbo].[QueuedActionStatusChange]("
+	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_QueuedActionStatusChange] PRIMARY KEY CLUSTERED, "
+	"[FileID] [int] NULL, "
+	"[ActionID] [int] NULL, "
+	"[ASC_To] [nvarchar](1) NOT NULL, "
+	"[DateTimeStamp] [datetime] NULL,"
+	"[MachineID] int NOT NULL, "
+	"[FAMUserID] int NOT NULL, "
+	"[UPI] [nvarchar](450), "
+	"[Status][nvarchar](1))";
+
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
 	"ON [DBInfo]([ID])";
@@ -327,6 +340,10 @@ static const string gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX =
 	"[IX_ActionStatisticsDeltaActionID_ID] ON [dbo].[ActionStatisticsDelta] "
 	"([ActionID] ASC, [ID] ASC)";
 
+static const string gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_INDEX =
+	"CREATE NONCLUSTERED INDEX "
+	"[IX_QueuedActionStatusChange] ON [QueuedActionStatusChange]([Status], [ActionID], [FileID])";
+
 	// Add foreign keys SQL
 static const string gstrADD_STATISTICS_ACTION_FK = 
 	"ALTER TABLE [ActionStatistics]  "
@@ -372,6 +389,11 @@ static const string gstrADD_FILE_ACTION_STATE_TRANSITION_ACTION_STATE_FROM_FK =
 	"ALTER TABLE [dbo].[FileActionStateTransition] "
 	"WITH CHECK ADD CONSTRAINT [FK_FileActionStateTransition_ActionState_From] FOREIGN KEY([ASC_From])"
 	"REFERENCES [ActionState] ([Code])";
+
+static const string gstrADD_FILE_ACTION_STATE_TRANSITION_QUEUE_FK = 
+	"ALTER TABLE [dbo].[FileActionStateTransition] "
+	"WITH CHECK ADD CONSTRAINT [FK_FileActionStateTransition_Queue] FOREIGN KEY([QueueID])"
+	"REFERENCES [QueuedActionStatusChange] ([ID])";
 
 static const string gstrADD_QUEUE_EVENT_FAM_FILE_FK = 
 	"ALTER TABLE [QueueEvent]  "
@@ -665,6 +687,34 @@ static const string gstrADD_FTP_EVENT_HISTORY_MACHINE_FK =
 static const string gstrADD_FTP_EVENT_HISTORY_FAM_USER_FK = 
 	"ALTER TABLE [dbo].[FTPEventHistory] "
 	"WITH CHECK ADD CONSTRAINT [FK_FTPEventHistory_FAMUser] FOREIGN KEY([FAMUserID]) "
+	"REFERENCES [dbo].[FAMUser] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_QUEUED_ACTION_STATUS_CHANGE_FAMFILE_FK =
+	"ALTER TABLE [dbo].[QueuedActionStatusChange] "
+	"WITH CHECK ADD CONSTRAINT [FK_QueuedActionStatusChange_FAMFile] FOREIGN KEY([FileID]) "
+	"REFERENCES [dbo].[FAMFile] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_QUEUED_ACTION_STATUS_CHANGE_ACTION_FK =
+	"ALTER TABLE [dbo].[QueuedActionStatusChange] "
+	"WITH CHECK ADD CONSTRAINT [FK_QueuedActionStatusChange_Action] FOREIGN KEY([ActionID]) "
+	"REFERENCES [dbo].[Action] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_QUEUED_ACTION_STATUS_CHANGE_MACHINE_FK =
+	"ALTER TABLE [dbo].[QueuedActionStatusChange] "
+	"WITH CHECK ADD CONSTRAINT [FK_QueuedActionStatusChange_Machine] FOREIGN KEY([MachineID]) "
+	"REFERENCES [dbo].[Machine] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_QUEUED_ACTION_STATUS_CHANGE_USER_FK =
+	"ALTER TABLE [dbo].[QueuedActionStatusChange] "
+	"WITH CHECK ADD CONSTRAINT [FK_QueuedActionStatusChange_FAMUser] FOREIGN KEY([FAMUserID]) "
 	"REFERENCES [dbo].[FAMUser] ([ID]) "
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";

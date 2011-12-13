@@ -227,31 +227,11 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
 		}
 		else
 		{
-			// Ensure the file is not in processing
-			if (ipDB->GetFileStatus(nFileID, strActionName.c_str(), VARIANT_FALSE)
-				!= kActionProcessing)
-			{
-				ipDB->SetStatusForFile(nFileID, strActionName.c_str(), m_eActionStatus,
-					&ePrevStatus);
-			}
-			else
-			{
-				UCLIDException uex("ELI24025", "Cannot change status from Processing");
-				uex.addDebugInfo("Action Name", m_strActionName);
-				uex.addDebugInfo("Expanded Action Name", strActionName);
-				uex.addDebugInfo("Status Value", m_eActionStatus);
-
-				// Try to add the status as a string
-				try
-				{
-					uex.addDebugInfo("Status Requested",
-						asString(ipDB->AsStatusString(m_eActionStatus)));
-				}
-				CATCH_AND_LOG_ALL_EXCEPTIONS("ELI24026");
-
-				// Throw the exception
-				throw uex;
-			}
+			// Pass VARIANT_TRUE for vbQueueChangeIfProcessing so that if the file is currently
+			// processing, an action status change is queued up so that once processing is
+			// finished, m_eActionStatus will be applied at that time. 
+			ipDB->SetStatusForFile(nFileID, strActionName.c_str(), m_eActionStatus, VARIANT_TRUE,
+				&ePrevStatus);
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI15116")
