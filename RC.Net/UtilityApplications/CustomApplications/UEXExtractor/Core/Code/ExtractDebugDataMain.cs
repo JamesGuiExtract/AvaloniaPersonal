@@ -303,7 +303,7 @@ namespace Extract.ExtractDebugData
                     int resultCount = 0;
                     int lineNumber = 0;
                     string[] exceptionFileLines = null;
-                    if (settings.OutputUnreferencedExceptions)
+                    if (settings.OutputSelectedExceptions || settings.OutputUnreferencedExceptions)
                     {
                         // For efficiency, if we are going to be writing exceptions out to file,
                         // rather than use the "Log" function on the exception COM object, just
