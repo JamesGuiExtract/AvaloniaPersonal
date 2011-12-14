@@ -732,7 +732,7 @@ private:
 	static UINT maintainLastPingTimeForRevert(void* pData);
 
 	// Method updates the ActiveFAM LastPingTime for the currently registered FAM
-	void pingDB();
+	void pingDB(bool bDBLocked);
 
 	// Method that creates a thread to send the mail message
 	void emailMessage(const string& strMessage);

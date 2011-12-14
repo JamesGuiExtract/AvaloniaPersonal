@@ -287,8 +287,8 @@ static const string gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_TABLE =
 	"[DateTimeStamp] [datetime] NULL,"
 	"[MachineID] int NOT NULL, "
 	"[FAMUserID] int NOT NULL, "
-	"[UPI] [nvarchar](450), "
-	"[Status][nvarchar](1))";
+	"[UPI] [nvarchar](450) NULL, "
+	"[ChangeStatus][nvarchar](1) NOT NULL)";
 
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
@@ -342,7 +342,7 @@ static const string gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX =
 
 static const string gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_INDEX =
 	"CREATE NONCLUSTERED INDEX "
-	"[IX_QueuedActionStatusChange] ON [QueuedActionStatusChange]([Status], [ActionID], [FileID])";
+	"[IX_QueuedActionStatusChange] ON [QueuedActionStatusChange]([ChangeStatus], [ActionID], [FileID])";
 
 	// Add foreign keys SQL
 static const string gstrADD_STATISTICS_ACTION_FK = 

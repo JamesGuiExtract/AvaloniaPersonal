@@ -164,8 +164,8 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		// There are no cases where this method should not just ignore all pending entries in
 		// [QueuedActionStatusChange] for the selected files.
 		string strUpdateQueuedActionStatusChange =
-			"UPDATE [QueuedActionStatusChange] SET [Status] = 'I'"
-			"WHERE [Status] = 'P' AND [ActionID] = " + strActionID + " AND FileID IN (";
+			"UPDATE [QueuedActionStatusChange] SET [ChangeStatus] = 'I'"
+			"WHERE [ChangeStatus] = 'P' AND [ActionID] = " + strActionID + " AND FileID IN (";
 		string strFastQuery = "INSERT INTO " + gstrFILE_ACTION_STATE_TRANSITION
 			+ " (FileID, ActionID, ASC_From, ASC_To, DateTimeStamp, FAMUserID, MachineID"
 			+ ") SELECT FAMFile.ID, " + strActionID + " AS ActionID, "
@@ -283,7 +283,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			"	AND SkippedFile.ActionID = " + strActionId + 
 			" LEFT OUTER JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID " + 
 			"	AND FileActionStatus.ActionID = " + strActionId + 
-			" LEFT OUTER JOIN QueuedActionStatusChange ON QueuedActionStatusChange.Status = 'P' "
+			" LEFT OUTER JOIN QueuedActionStatusChange ON QueuedActionStatusChange.ChangeStatus = 'P' "
 			"	AND QueuedActionStatusChange.FileID = FAMFile.ID "
 			"	AND QueuedActionStatusChange.ActionID = " + strActionId +
 			" WHERE FAMFile.ID = " + strFileId;
@@ -337,7 +337,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				ASSERT_RESOURCE_ALLOCATION("ELI34184", ipQueuedChangeSet != __nullptr);
 
 				string strQueuedActionStatusSQL =
-					"SELECT [ASC_To], [Status] FROM [QueuedActionStatusChange] WHERE [ID] = " +
+					"SELECT [ASC_To], [ChangeStatus] FROM [QueuedActionStatusChange] WHERE [ID] = " +
 					asString(nQueuedStatusChangeID);
 
 				ipQueuedChangeSet->Open(strQueuedActionStatusSQL.c_str(),
@@ -360,7 +360,8 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 					}
 
 					_lastCodePos = "155";
-					setStringField(ipQueuedChangeSet->Fields, "Status", "C");
+					setStringField(ipQueuedChangeSet->Fields, "ChangeStatus", "C");
+					ipQueuedChangeSet->Update();
 				}
 				else
 				{
@@ -369,11 +370,17 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 					nQueuedStatusChangeID = -1;
 					
 					_lastCodePos = "156";
-					setStringField(ipQueuedChangeSet->Fields, "Status", "I");
 				}
 
+				// While there should only ever be on pending row in QueuedActionStatusChange for
+				// each FileID/ActionID pair, this call ensures sure that all pending changes for
+				// this file are reset here (whether or not the change was applied.
+				executeCmdQuery(ipConnection,
+					"UPDATE [QueuedActionStatusChange] SET [ChangeStatus] = 'I'"
+					"WHERE [ChangeStatus] = 'P' AND [ActionID] = " + asString(nActionID) +
+					" AND [FileID] = " + asString(nFileID));
+
 				_lastCodePos = "157";
-				ipQueuedChangeSet->Update();
 			}
 
 			// Get the current record
@@ -1327,8 +1334,8 @@ void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, con
 		// There are no cases where this method should not just ignore all pending entries in
 		// [QueuedActionStatusChange] for the selected files.
 		string strUpdateQueuedActionStatusChange =
-			"UPDATE [QueuedActionStatusChange] SET Status = 'I'"
-			"WHERE [Status] = 'P' AND [ActionID] = " + strToActionID;
+			"UPDATE [QueuedActionStatusChange] SET [ChangeStatus] = 'I'"
+			"WHERE [ChangeStatus] = 'P' AND [ActionID] = " + strToActionID;
 		executeCmdQuery(ipConnection, strUpdateQueuedActionStatusChange);
 
 		// Create new FileActionStatus records based on the value of the from action ID
@@ -3335,7 +3342,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27738");
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::pingDB()
+void CFileProcessingDB::pingDB(bool bDBLocked)
 {
 	// if m_bFAMRegistered is false there is nothing to do
 	if ( !m_bFAMRegistered )
@@ -3377,9 +3384,24 @@ void CFileProcessingDB::pingDB()
 		throw ueOuter;
 	}
 
+	_ConnectionPtr ipConnection = getDBConnection();
+
 	// Update the ping record. 
-	executeCmdQuery(getDBConnection(), 
+	executeCmdQuery(ipConnection, 
 		"UPDATE ActiveFAM SET LastPingTime=GETDATE() WHERE ID = " + asString(m_nUPIID));
+
+	// Revert files that got stuck in processing.
+	if (m_bAutoRevertLockedFiles && !m_bRevertInProgress)
+	{
+		// Begin a transaction
+		TransactionGuard tgRevert(ipConnection);
+
+		// Revert files
+		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
+
+		// Commit the reverted files
+		tgRevert.CommitTrans();
+	}
 }
 //--------------------------------------------------------------------------------------------------
 UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
@@ -3423,13 +3445,13 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 
 									ipConnection = pDB->getDBConnection();
 
-									pDB->pingDB();
+									pDB->pingDB(true);
 								}
 								else
 								{
 									ipConnection = pDB->getDBConnection();
 
-									pDB->pingDB();
+									pDB->pingDB(false);
 								}
 
 								bRetrySuccess = true;
@@ -3495,10 +3517,6 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _ConnectionPtr& ipConnection)
 {
-	// Make sure the LastPingTime is up to date to keep before reverting so that the
-	// current session doesn't get auto reverted
-	pingDB();
-
 	// check to see if this already running in this process
 	if (m_bRevertInProgress)
 	{
@@ -3756,19 +3774,6 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
 			ASSERT_RESOURCE_ALLOCATION("ELI30401", ipFiles != __nullptr);
 
-			// Revert files before attempting to get the files to process
-			if (m_bAutoRevertLockedFiles && !m_bRevertInProgress)
-			{
-				// Begin a transaction
-				TransactionGuard tgRevert(ipConnection);
-
-				// Revert files
-				revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-
-				// Commit the reverted files
-				tgRevert.CommitTrans();
-			}
-
 			bool bTransactionSuccessful = false;
 
 			// Start the stopwatch to use to check for transaction timeout
@@ -3850,8 +3855,8 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 							// There are no cases where this method should not just ignore all
 							// pending entries in [QueuedActionStatusChange] for the selected files.
 							executeCmdQuery(ipConnection,
-								"UPDATE [QueuedActionStatusChange] SET Status = 'I'"
-								"WHERE [Status] = 'P' AND [ActionID] = " + asString(nActionID) +
+								"UPDATE [QueuedActionStatusChange] SET [ChangeStatus] = 'I'"
+								"WHERE [ChangeStatus] = 'P' AND [ActionID] = " + asString(nActionID) +
 								" AND [FileID] = " + strFileID);
 
 							// Update the Statistics
