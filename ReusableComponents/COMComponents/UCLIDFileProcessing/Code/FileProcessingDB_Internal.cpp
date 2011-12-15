@@ -3342,7 +3342,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27738");
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::pingDB(bool bDBLocked)
+void CFileProcessingDB::pingDB()
 {
 	// if m_bFAMRegistered is false there is nothing to do
 	if ( !m_bFAMRegistered )
@@ -3384,24 +3384,11 @@ void CFileProcessingDB::pingDB(bool bDBLocked)
 		throw ueOuter;
 	}
 
-	_ConnectionPtr ipConnection = getDBConnection();
-
 	// Update the ping record. 
-	executeCmdQuery(ipConnection, 
+	executeCmdQuery(getDBConnection(), 
 		"UPDATE ActiveFAM SET LastPingTime=GETDATE() WHERE ID = " + asString(m_nUPIID));
 
-	// Revert files that got stuck in processing.
-	if (m_bAutoRevertLockedFiles && !m_bRevertInProgress)
-	{
-		// Begin a transaction
-		TransactionGuard tgRevert(ipConnection);
-
-		// Revert files
-		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-
-		// Commit the reverted files
-		tgRevert.CommitTrans();
-	}
+	m_dwLastPingTime = GetTickCount();
 }
 //--------------------------------------------------------------------------------------------------
 UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
@@ -3445,13 +3432,13 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 
 									ipConnection = pDB->getDBConnection();
 
-									pDB->pingDB(true);
+									pDB->pingDB();
 								}
 								else
 								{
 									ipConnection = pDB->getDBConnection();
 
-									pDB->pingDB(false);
+									pDB->pingDB();
 								}
 
 								bRetrySuccess = true;
@@ -3527,6 +3514,17 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 	{
 		// Set the revert in progress flag so only one thread executes this per process
 		m_bRevertInProgress = true;
+
+		// Make sure the LastPingTime is up to date to keep before reverting so that the
+		// current session doesn't get auto reverted
+		// pingDB can be expensive under heavy workloads as it is called by every get files to process
+		// call and can cause SQL locks to build up on the ActiveFAM table. Call only the first time or
+		// if the pingDB has not been called in longer than gnPING_TIMEOUT.
+		if (m_dwLastPingTime == 0 ||
+			(GetTickCount() - m_dwLastPingTime) > gnPING_TIMEOUT)
+		{
+			pingDB();
+		}
 
 		// Query to show the elapsed time since last ping for all ActiveFAM records
 		string strElapsedSQL = "SELECT [ID], DATEDIFF(minute,[LastPingTime],GetDate()) as Elapsed "
@@ -3773,6 +3771,19 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			// IUnknownVector to hold the FileRecords to return
 			IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
 			ASSERT_RESOURCE_ALLOCATION("ELI30401", ipFiles != __nullptr);
+
+			// Revert files before attempting to get the files to process
+			if (m_bAutoRevertLockedFiles && !m_bRevertInProgress)
+			{
+				// Begin a transaction
+				TransactionGuard tgRevert(ipConnection);
+
+				// Revert files
+				revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
+
+				// Commit the reverted files
+				tgRevert.CommitTrans();
+			}
 
 			bool bTransactionSuccessful = false;
 

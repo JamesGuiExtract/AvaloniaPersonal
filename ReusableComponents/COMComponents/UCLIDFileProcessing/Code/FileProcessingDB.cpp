@@ -1822,33 +1822,7 @@ STDMETHODIMP CFileProcessingDB::RegisterActiveFAM(long lActionID, VARIANT_BOOL v
 
 		// set FAM registered flag
 		m_bFAMRegistered = true;
-
-		// Call revertTimedOutProcessingFAMs before starting processing to ensure that any stuck
-		// files are reverted right away.
-		if (asCppBool(vbProcessing))
-		{
-			// Revert files that got stuck in processing.
-			if (m_bAutoRevertLockedFiles && !m_bRevertInProgress)
-			{
-				// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-				ADODB::_ConnectionPtr ipConnection = __nullptr;
-		
-				BEGIN_CONNECTION_RETRY();
-
-				ipConnection = getDBConnection();
-
-				// Begin a transaction
-				TransactionGuard tgRevert(ipConnection);
-
-				// Revert files
-				revertTimedOutProcessingFAMs(true, ipConnection);
-
-				// Commit the reverted files
-				tgRevert.CommitTrans();
-
-				END_CONNECTION_RETRY(ipConnection, "ELI34186");
-			}
-		}
+		m_dwLastPingTime = 0;
 
 		// Start thread here
 		AfxBeginThread(maintainLastPingTimeForRevert, this);

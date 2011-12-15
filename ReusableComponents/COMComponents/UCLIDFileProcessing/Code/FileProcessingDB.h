@@ -388,6 +388,9 @@ private:
 	// and will log changes of the m_nUPIID
 	bool m_bFAMRegistered;
 
+	// The tick count from the last time the ping time was updated.
+	volatile DWORD m_dwLastPingTime;
+
 	// Indicates whether the DB schema is currently being validated or upgraded.
 	volatile bool m_bValidatingOrUpdatingSchema;
 
@@ -732,7 +735,7 @@ private:
 	static UINT maintainLastPingTimeForRevert(void* pData);
 
 	// Method updates the ActiveFAM LastPingTime for the currently registered FAM
-	void pingDB(bool bDBLocked);
+	void pingDB();
 
 	// Method that creates a thread to send the mail message
 	void emailMessage(const string& strMessage);
