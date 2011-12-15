@@ -1479,8 +1479,13 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 			throw UCLIDException("ELI21505", "A USB counter must be selected.");
 		}
 
-		if (m_strFKBVersion.empty() && (isUsingCounter() || m_bSwipingRule))
+		if (fClearDirty == TRUE && m_strFKBVersion.empty() && (isUsingCounter() || m_bSwipingRule))
 		{
+			// [FlexIDSCore:4744]
+			// We only want to throw and exception when fClearDirty is true because this method gets
+			// called for "temporary saving" with the auto-save-on-timer feature. The auto-save
+			// method calls to this method will have fClearDirty set to false.
+
 			throw UCLIDException("ELI32484", "An FKB version must be specified for a swiping rule or a "
 				"ruleset that decrements counters.");
 		}

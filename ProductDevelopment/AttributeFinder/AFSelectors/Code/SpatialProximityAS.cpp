@@ -22,8 +22,6 @@ const CRect grectNULL					= CRect(0, 0, 0, 0);
 //--------------------------------------------------------------------------------------------------
 CSpatialProximityAS::CSpatialProximityAS()
 : m_bDirty(false)
-, m_nXResolution(0)
-, m_nYResolution(0)
 , m_ipDocText(NULL)
 {
 	try
@@ -334,9 +332,8 @@ STDMETHODIMP CSpatialProximityAS::raw_SelectAttributes(IIUnknownVector *pAttrIn,
 		ASSERT_ARGUMENT("ELI22563", ipAFDoc != __nullptr);
 		ASSERT_ARGUMENT("ELI22564", pAttrOut != __nullptr);
 
-		// Reset the resolution.  These will be recalculated when needed.
-		m_nXResolution = 0;
-		m_nYResolution = 0;
+		// Clear any cached resolutions. These will be recalculated when needed.
+		m_mapPageResolutions.clear();
 
 		// Store the document text so it can be used during processing.
 		m_ipDocText = ipAFDoc->Text;
@@ -929,14 +926,28 @@ long CSpatialProximityAS::getExpansionOffset(const BorderInfo &borderInfo, long 
 	// Convert the expansion amount into pixels from the units specified.
 	if (borderInfo.m_eUnits == kInches)
 	{
-		// If using inches, obtain the image's resolution so it can be used for conversion.
-		if (m_nXResolution == 0 || m_nYResolution == 0)
+		int nXResolution = 0;
+		int nYResolution = 0;
+
+		if (dExpansionOffset != 0)
 		{
-			getImageXAndYResolution(asString(m_ipDocText->SourceDocName), 
-				m_nXResolution, m_nYResolution);
-			if (m_nXResolution == 0 || m_nYResolution == 0)
+			// If using inches as a unit and an expansion offset of != 0 is specified, obtain the
+			// image's resolution so it can be used for conversion.
+			if (m_mapPageResolutions.find(nPage) != m_mapPageResolutions.end())
 			{
-				throw UCLIDException("ELI22686", "Failed to obtain image resolution!");
+				nXResolution = m_mapPageResolutions[nPage].first;
+				nYResolution = m_mapPageResolutions[nPage].second;
+			}
+			else
+			{
+				getImageXAndYResolution(asString(m_ipDocText->SourceDocName), 
+					nXResolution, nYResolution, nPage);
+				if (nXResolution == 0 || nYResolution == 0)
+				{
+					throw UCLIDException("ELI22686", "Failed to obtain image resolution!");
+				}
+
+				m_mapPageResolutions[nPage] = pair<int, int>(nXResolution, nYResolution);
 			}
 		}
 
@@ -944,11 +955,11 @@ long CSpatialProximityAS::getExpansionOffset(const BorderInfo &borderInfo, long 
 		if (borderInfo.m_eExpandDirection == kExpandLeft || 
 			borderInfo.m_eExpandDirection == kExpandRight)
 		{
-			dExpansionOffset *= m_nXResolution;
+			dExpansionOffset *= nXResolution;
 		}
 		else
 		{
-			dExpansionOffset *= m_nYResolution;
+			dExpansionOffset *= nYResolution;
 		}
 	}
 	else if (borderInfo.m_eUnits == kCharacters)

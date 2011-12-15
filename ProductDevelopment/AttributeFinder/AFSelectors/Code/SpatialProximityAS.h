@@ -191,9 +191,8 @@ private:
 	// The text of the document currently being processed
 	ISpatialStringPtr m_ipDocText;
 
-	// The DPI of the document currently being processed.
-	int m_nXResolution;
-	int m_nYResolution;
+	// A cache the DPI (X & Y) of each page of the document currently being processed.
+	map<int, pair<int, int> > m_mapPageResolutions;
 
 	// An AFUtility instance to execute attribute queries.
 	IAFUtilityPtr m_ipAFUtility;
