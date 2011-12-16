@@ -654,17 +654,21 @@ end;
 function RegisterLoginNPShellExtension(strExtension)
 	string szProgram;
 	string szArguments;
-begin       
+begin    
   	SdShowMsg("Setup is registering shell extension.", TRUE);
    
    	szProgram = SUPPORTDIR ^ "\\RegisterExtensionDotNet40_x86.exe";
-   	szArguments = "-i "  + PROGRAMFILES ^ EXTRACT_DIR ^ strExtension;
+   	szArguments = "-i \""  + PROGRAMFILES ^ EXTRACT_DIR ^ strExtension + "\"";
 	LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
+
+  	SdShowMsg("Setup is registering shell extension.", FALSE);
 
 	// Register for 64 bit also
 	if ( SYSINFO.bIsWow64 ) then
+	  	SdShowMsg("Setup is registering 64 bit shell extension.", TRUE);
    		szProgram = SUPPORTDIR ^ "\\RegisterExtensionDotNet40_x64.exe";
-		LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
+		LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT |  LAAW_OPTION_SHOW_HOURGLASS); 
+		SdShowMsg("Setup is registering 64 bit shell extension.", TRUE);
 	endif;
 	
   	SdShowMsg("Setup is registering shell extension.", FALSE);
