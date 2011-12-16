@@ -335,6 +335,22 @@ namespace Extract.Imaging.Forms
             }
 
             /// <summary>
+            /// Gets a value indicating whether the word highlight tool is in a valid auto-fit
+            /// operation.
+            /// </summary>
+            /// <value>
+            /// <see langword="true"/> if the word highlight tool is in a valid auto-fit operation.
+            /// otherwise, <see langword="false"/>.
+            /// </value>
+            public bool IsValidAutoFitOperation
+            {
+                get
+                {
+                    return InAutoFitMode && _trackingStartLocation != null;
+                }
+            }
+
+            /// <summary>
             /// Gets a value indicating whether OCR or word zone data is currently being loaded in
             /// the background.
             /// </summary>
@@ -406,7 +422,7 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
-                    if (InAutoFitMode)
+                    if (IsValidAutoFitOperation)
                     {
                         // If the mouse has moved less that 2 client pixels since the last time we
                         // started calculating an auto zone, allow the previous calculation to complete
@@ -440,7 +456,7 @@ namespace Extract.Imaging.Forms
                         // based on the current mouse location.
                         StartOperation(() => AutoFitOperation(points[0], points[1]));
                     }
-                    else
+                    else if (!InAutoFitMode)
                     {
                         // Ensure that if auto-fit mode is re-activated, it will start
                         // re-calculating a zone even if the mouse has not moved.

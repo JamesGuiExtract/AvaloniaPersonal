@@ -2878,12 +2878,12 @@ namespace Extract.Imaging.Forms
                         _wordHighlightManager.UpdateTracking(mouseX, mouseY);
                     }
 
-                    if (_wordHighlightManager.InAutoFitMode)
+                    if (_wordHighlightManager.IsValidAutoFitOperation)
                     {
                         Pen dashedPen = ExtractPens.GetThickDashedPen(GetHighlightDrawColor());
                         DrawTrackingLine(e, dashedPen);
                     }
-                    else
+                    else if (!_wordHighlightManager.InAutoFitMode)
                     {
                         DrawTrackingRectangleBorder(e, Color.DimGray);
                     }
