@@ -8,7 +8,6 @@
 <FILE>;..\PropertyAddressFinder\PropertyAddressFinder.dat
 <FILE>;..\RegularExpression\RegularExpression.dat
 <FILE>;..\SelectPageRegion\SelectPageRegion.dat
-<FILE>;..\StringPatternMatcher\StringPatternMatcher.dat
 <FILE>;..\ValueAfterClue\ValueAfterClue.dat
 <FILE>;..\ValueBeforeClue\ValueBeforeClue.dat
 <FILE>;..\ValueFromList\ValueFromList.dat
