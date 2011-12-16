@@ -439,7 +439,7 @@ STDMETHODIMP CReturnAddrFinder::raw_GetComponentDescription(BSTR * pstrComponent
 	{
 		ASSERT_ARGUMENT("ELI19583", pstrComponentDescription != __nullptr)
 
-		*pstrComponentDescription = _bstr_t("Return address finder").Detach();
+		*pstrComponentDescription = _bstr_t("Z_Legacy Return address finder").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07543")
 
@@ -560,6 +560,10 @@ STDMETHODIMP CReturnAddrFinder::Save(IStream * pStream, BOOL fClearDirty)
 
 	try
 	{
+		// This finder is obsolete so throw exception if this method is called
+		UCLIDException ue("ELI34196", "Return address finder is obsolete and cannot be saved.");
+		throw ue;
+
 		// Check license state
 		validateLicense();
 		const unsigned long nCurrentVersion = 1;

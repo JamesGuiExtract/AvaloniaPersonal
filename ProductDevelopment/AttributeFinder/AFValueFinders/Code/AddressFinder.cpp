@@ -188,7 +188,7 @@ STDMETHODIMP CAddressFinder::raw_GetComponentDescription(BSTR * pstrComponentDes
 	{
 		ASSERT_ARGUMENT("ELI19574", pstrComponentDescription != __nullptr)
 
-		*pstrComponentDescription = _bstr_t("Address finder").Detach();
+		*pstrComponentDescription = _bstr_t("Z_Legacy Address finder").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08806")
 
@@ -285,6 +285,10 @@ STDMETHODIMP CAddressFinder::Save(IStream * pStream, BOOL fClearDirty)
 
 	try
 	{
+		// This finder is obsolete so throw exception if this method is called
+		UCLIDException ue("ELI34195", "Address finder is obsolete and cannot be saved.");
+		throw ue;
+
 		// Check license state
 		validateLicense();
 		const unsigned long nCurrentVersion = 1;

@@ -142,6 +142,10 @@ STDMETHODIMP CLegalDescSplitter::Save(IStream * pStream, BOOL fClearDirty)
 
 	try
 	{
+		// This splitter is obsolete so throw exception if this method is called
+		UCLIDException ue("ELI34192", "Legal description splitter is obsolete and cannot be saved.");
+		throw ue;
+
 		// Check license state
 		validateLicense();
 
@@ -198,6 +202,10 @@ STDMETHODIMP CLegalDescSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAFD
 	{
 		try
 		{
+			// This splitter is obsolete so throw exception if this method is called
+			UCLIDException ue("ELI34188", "Legal description splitter is obsolete.");
+			throw ue;
+
 			validateLicense();
 
 			//Create local copies of  Attribute and subattribues
@@ -261,7 +269,7 @@ STDMETHODIMP CLegalDescSplitter::raw_GetComponentDescription(BSTR * pstrComponen
 	{
 		ASSERT_ARGUMENT("ELI19564", pstrComponentDescription != __nullptr)
 
-		*pstrComponentDescription = _bstr_t("Split a legal description").Detach();
+		*pstrComponentDescription = _bstr_t("Z_Legacy Split a legal description").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07920")
 

@@ -155,6 +155,11 @@ namespace Extract.Redaction.Verification
 
             // Set the auto tool
             _autoToolComboBox.Enabled = _autoToolCheckBox.Checked;
+            if (_autoToolComboBox.Enabled && _autoToolComboBox.SelectedIndex == -1)
+            {
+                _autoToolComboBox.Text =
+                    Enum.GetName(typeof(AutoTool), AutoTool.Selection);
+            }
 
             _ocrTradeOffLabel.Enabled = _OCRCheckBox.Checked;
             _ocrTradeOffLabel2.Enabled = _OCRCheckBox.Checked;

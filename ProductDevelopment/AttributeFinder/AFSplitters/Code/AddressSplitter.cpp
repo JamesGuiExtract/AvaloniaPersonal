@@ -168,7 +168,7 @@ STDMETHODIMP CAddressSplitter::raw_GetComponentDescription(BSTR * pstrComponentD
 	{
 		ASSERT_ARGUMENT("ELI19562", pstrComponentDescription != __nullptr)
 
-		*pstrComponentDescription = _bstr_t("Split an address").Detach();
+		*pstrComponentDescription = _bstr_t("Z_Legacy Split an address").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07169")
 
@@ -300,6 +300,10 @@ STDMETHODIMP CAddressSplitter::Save(IStream *pStream, BOOL fClearDirty)
 
 	try
 	{
+		// This splitter is obsolete so throw exception if this method is called
+		UCLIDException ue("ELI34191", "Address splitter is obsolete and cannot be saved.");
+		throw ue;
+
 		// Check license state
 		validateLicense();
 

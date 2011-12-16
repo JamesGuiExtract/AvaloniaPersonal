@@ -159,7 +159,7 @@ STDMETHODIMP CLegalDescriptionFinder::raw_GetComponentDescription(BSTR * pstrCom
 	{
 		ASSERT_ARGUMENT("ELI19580", pstrComponentDescription != __nullptr)
 
-		*pstrComponentDescription = _bstr_t("Legal description finder").Detach();
+		*pstrComponentDescription = _bstr_t("Z_Legacy Legal description finder").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05682")
 
@@ -302,6 +302,10 @@ STDMETHODIMP CLegalDescriptionFinder::Save(IStream *pStream, BOOL fClearDirty)
 
 	try
 	{
+		// This finder is obsolete so throw exception if this method is called
+		UCLIDException ue("ELI34194", "Legal Description finder is obsolete and cannot be saved.");
+		throw ue;
+
 		// Check license state
 		validateLicense();
 

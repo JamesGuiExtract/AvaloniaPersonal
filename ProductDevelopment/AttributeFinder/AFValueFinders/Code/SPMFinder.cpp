@@ -88,6 +88,10 @@ STDMETHODIMP CSPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 
 	try
 	{
+		// This rule is obsolete so throw exception if this method is called
+		UCLIDException ue("ELI34189", "String pattern matcher finder is obsolete.");
+		throw ue;
+
 		validateLicense();
 
 		IAFDocumentPtr ipAFDoc(pAFDoc);
@@ -765,7 +769,7 @@ STDMETHODIMP CSPMFinder::raw_GetComponentDescription(BSTR * pstrComponentDescrip
 	{
 		ASSERT_ARGUMENT("ELI19584", pstrComponentDescription != __nullptr)
 
-		*pstrComponentDescription = _bstr_t("String pattern matcher finder").Detach();
+		*pstrComponentDescription = _bstr_t("Z_Legacy String pattern matcher finder").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07011")
 
@@ -1015,6 +1019,11 @@ STDMETHODIMP CSPMFinder::Save(IStream *pStream, BOOL fClearDirty)
 
 	try
 	{
+		// This rule is obsolete so throw exception if this method is called
+		UCLIDException ue("ELI34190",
+			"String pattern matcher finder is obsolete and cannot be saved.");
+		throw ue;
+
 		validateLicense();
 
 		// Create a bytestream and stream this object's data into it

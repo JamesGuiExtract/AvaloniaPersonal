@@ -345,7 +345,7 @@ STDMETHODIMP CGrantorGranteeFinderV2::raw_GetComponentDescription(BSTR * pstrCom
 	{
 		ASSERT_ARGUMENT("ELI19609", pstrComponentDescription != __nullptr)
 
-		*pstrComponentDescription = _bstr_t("Grantor-Grantee finder version 2").Detach();
+		*pstrComponentDescription = _bstr_t("Z_Legacy Grantor-Grantee finder version 2").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12862");
 
@@ -553,6 +553,10 @@ STDMETHODIMP CGrantorGranteeFinderV2::Save(IStream *pStream, BOOL fClearDirty)
 
 	try
 	{
+		// This finder is obsolete so throw exception if this method is called
+		UCLIDException ue("ELI34193", "Grantor-Grantee finder is obsolete and cannot be saved.");
+		throw ue;
+
 		// Check license state
 		validateLicense();
 

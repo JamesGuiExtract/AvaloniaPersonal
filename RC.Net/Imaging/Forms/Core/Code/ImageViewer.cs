@@ -3438,6 +3438,11 @@ namespace Extract.Imaging.Forms
             {
                 base.OnMouseWheel(e);
 
+                if (!IsImageAvailable)
+                {
+                    return;
+                }
+
                 // Check if an interactive mouse tracking event is occurring
                 if (_trackingData == null)
                 {

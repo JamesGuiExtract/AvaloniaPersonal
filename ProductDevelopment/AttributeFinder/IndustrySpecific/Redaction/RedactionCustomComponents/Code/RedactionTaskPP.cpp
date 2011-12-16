@@ -673,6 +673,6 @@ void CRedactionTaskPP::putAttributeNames(IVariantVectorPtr ipAttributeNames)
 //-------------------------------------------------------------------------------------------------
 void CRedactionTaskPP::validateLicense()
 {
-	VALIDATE_LICENSE(gnIDSHIELD_AUTOREDACTION_OBJECT, "ELI28600", "Redaction Task PP");
+	VALIDATE_LICENSE(gnIDSHIELD_CORE_OBJECTS, "ELI28600", "Redaction Task PP");
 }
 //-------------------------------------------------------------------------------------------------
