@@ -4538,20 +4538,23 @@ namespace Extract.DataEntry
                 }
                 else if (_dataEntryApp.AutoZoomMode == AutoZoomMode.ZoomOutIfNecessary)
                 {
-                    // Determine the amount the current view must be resized to get back to the last
-                    // manual zoom level.
-                    int widthAdjustment = _lastManualZoomSize.Width - currentViewRegion.Width;
-                    widthAdjustment = widthAdjustment > 0 ? 0 : widthAdjustment;
-
-                    int heightAdjustment = _lastManualZoomSize.Height - currentViewRegion.Height;
-                    heightAdjustment = heightAdjustment > 0 ? 0 : heightAdjustment;
-
-                    // If the current zoom is further out than the last manual zoom, set 
-                    // selectedImageRegion as currentViewRegion "zoomed" back in to the last manual
-                    // zoom level.
-                    if (widthAdjustment < 0 || heightAdjustment < 0)
+                    if (!_lastManualZoomSize.IsEmpty)
                     {
-                        currentViewRegion.Inflate(widthAdjustment, heightAdjustment);
+                        // Determine the amount the current view must be resized to get back to the last
+                        // manual zoom level.
+                        int widthAdjustment = _lastManualZoomSize.Width - currentViewRegion.Width;
+                        widthAdjustment = widthAdjustment > 0 ? 0 : widthAdjustment;
+
+                        int heightAdjustment = _lastManualZoomSize.Height - currentViewRegion.Height;
+                        heightAdjustment = heightAdjustment > 0 ? 0 : heightAdjustment;
+
+                        // If the current zoom is further out than the last manual zoom, set 
+                        // selectedImageRegion as currentViewRegion "zoomed" back in to the last manual
+                        // zoom level.
+                        if (widthAdjustment < 0 || heightAdjustment < 0)
+                        {
+                            currentViewRegion.Inflate(widthAdjustment, heightAdjustment);
+                        }
                     }
 
                     // If the selected object is completely visible in currentViewRegion use the

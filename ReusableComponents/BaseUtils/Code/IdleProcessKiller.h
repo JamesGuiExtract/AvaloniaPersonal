@@ -43,10 +43,6 @@ private:
 	// The number of consecutive times the process has been at zero cpu usage
 	int m_iZeroCpuCount;
 
-	// Added to investigate issue where IdleProcessKiller is not killing processes
-	// (LegacyRCAndUtils:5945)
-	int m_iLowCpuCount;
-
 	// The number of consecutive zero cpu usage checks before a process is considered idle
 	int m_iMaxZeroCpuCount;
 

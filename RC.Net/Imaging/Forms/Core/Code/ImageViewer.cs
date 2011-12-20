@@ -2318,9 +2318,7 @@ namespace Extract.Imaging.Forms
 
                                 if (File.Exists(ocrFileName))
                                 {
-                                    SpatialString ocrSpatialString = new SpatialString();
-                                    ocrSpatialString.LoadFrom(ocrFileName, false);
-                                    _ocrData = new ThreadSafeSpatialString(this, ocrSpatialString);
+                                    _ocrData = ThreadSafeSpatialString.LoadFromFile(this, ocrFileName);
                                 }
                             }
                         }

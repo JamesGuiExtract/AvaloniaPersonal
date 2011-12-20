@@ -1,6 +1,7 @@
 ﻿using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
@@ -16,6 +17,8 @@ namespace Extract.Imaging
     /// </summary>
     public class ThreadSafeSpatialString
     {
+        #region Fields
+
         /// <summary>
         /// A <see cref="Control"/> in the UI thread where this instance may be used. This instance
         /// may also be used in any other thread that is MTA but cannot be used in an STA thread
@@ -28,6 +31,9 @@ namespace Extract.Imaging
         /// than one if this instance was created as a join of multiple SpatialStrings).
         /// </summary>
         string[] _ocrData;
+
+        // The name of the uss file that the SpatialString should be loaded from.
+        string _ussFileName;
 
         /// <summary>
         /// A cached <see cref="SpatialString"/> instance that is able to be used in the UI thread.
@@ -57,6 +63,18 @@ namespace Extract.Imaging
         /// thread.
         /// </summary>
         object _lock = new object();
+
+        #endregion Fields
+
+        #region Constructors
+
+        /// <summary>
+        /// Private constructor; Prevents a default instance of the 
+        /// <see cref="ThreadSafeSpatialString"/> class from being created.
+        /// </summary>
+        ThreadSafeSpatialString()
+        {
+        }
 
         /// <overloads>
         /// Initializes a new instance of the <see cref="ThreadSafeSpatialString"/> class.
@@ -153,7 +171,7 @@ namespace Extract.Imaging
                 if (_uiControl.InvokeRequired)
                 {
                     ExtractException.Assert("ELI32642",
-                        "Cannot create a string in a STA thread other than the UI thread.",
+                        "Cannot create a string in a STA mode except if in the UI thread.",
                         Thread.CurrentThread.GetApartmentState() == ApartmentState.MTA);
 
                     _backgroundSpatialString = spatialString;
@@ -168,6 +186,42 @@ namespace Extract.Imaging
                 throw ex.AsExtract("ELI32643");
             }
         }
+
+        #endregion Constructors
+
+        #region Static Methods
+
+        /// <summary>
+        /// Creates a ThreadSafeSpatialString using a uss file.
+        /// </summary>
+        /// <param name="uiControl">A <see cref="Control"/> in the UI thread where this instance
+        /// may be used. This instance may also be used in any other thread that is MTA but cannot
+        /// be used in an STA thread other than the one hosting this control.</param>
+        /// <param name="ussFileName">Name of the uss file containing the <see cref="SpatialString"/>
+        /// to be loaded.</param>
+        /// <returns>The <see cref="ThreadSafeSpatialString"/> instance.</returns>
+        public static ThreadSafeSpatialString LoadFromFile(Control uiControl, string ussFileName)
+        {
+            try
+            {
+                ExtractException.Assert("ELI34199", "Unable to find file.", File.Exists(ussFileName));
+
+                ThreadSafeSpatialString threadSafeString = new ThreadSafeSpatialString();
+
+                threadSafeString._uiControl = uiControl;
+                threadSafeString._ussFileName = ussFileName;
+
+                return threadSafeString;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34198");
+            }
+        }
+
+        #endregion Static Methods
+
+        #region Properties
 
         /// <summary>
         /// Gets a <see cref="SpatialString"/> instance usable in the calling thread.
@@ -225,12 +279,28 @@ namespace Extract.Imaging
             }
         }
 
+        #endregion Properties
+
+        #region Private Members
+
         /// <summary>
         /// Contructs a <see cref="SpatialString"/> instance usable by the calling thread.
         /// </summary>
         /// <returns>A <see cref="SpatialString"/> instance usable by the calling thread.</returns>
         SpatialString BuildSpatialString()
         {
+            SpatialString spatialString;
+
+            // If we have a uss file, it is much faster to load the spatial string from that uss
+            // file rather than to stringize the byte stream of an existing spatial string and
+            // reload it.
+            if (!string.IsNullOrEmpty(_ussFileName))
+            {
+                spatialString = new SpatialString();
+                spatialString.LoadFrom(_ussFileName, false);
+                return spatialString;
+            }
+
             // We need the stringized data in order to create a new SpatialString instance for the
             // calling thread. Obtain it from the cached SpatialString created for the other
             // threading if necessary.
@@ -241,7 +311,7 @@ namespace Extract.Imaging
 
             // Construct a SpatialString for each element in _ocrData and append them together to
             // obtain a unified result.
-            SpatialString spatialString = new SpatialString();
+            spatialString = new SpatialString();
             foreach (string ocrData in _ocrData.Where(data => !string.IsNullOrEmpty(data)))
             {
                 spatialString.Append(
@@ -345,5 +415,7 @@ namespace Extract.Imaging
                 }
             }
         }
+
+        #endregion Private Members
     }
 }
