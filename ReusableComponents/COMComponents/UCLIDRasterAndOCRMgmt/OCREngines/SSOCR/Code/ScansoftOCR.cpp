@@ -635,7 +635,8 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 	for (int i = 0; i < nSize; i++)
 	{
 		long nPage = ipPageNumbers->GetItem(i).lVal;
-		if (getImageViewPerspective(asString(strImageFileName), nPage) != TOP_LEFT)
+		int nViewPerspective = getImageViewPerspective(asString(strImageFileName), nPage);
+		if (nViewPerspective != TOP_LEFT && nViewPerspective != BOTTOM_LEFT)
 		{
 			UCLIDException ue("ELI34135",
 				"Cannot OCR document pages with non-standard view perspective; "
@@ -828,7 +829,8 @@ ISpatialStringPtr CScansoftOCR::recognizePrintedTextInImageZone(BSTR strImageFil
 	// pages with non-standar view perspectives.
 	for (int nPage = lStartPage; nPage <= lEndPage; nPage++)
 	{
-		if (getImageViewPerspective(asString(strImageFileName), nPage) != TOP_LEFT)
+		int nViewPerspective = getImageViewPerspective(asString(strImageFileName), nPage);
+		if (nViewPerspective != TOP_LEFT && nViewPerspective != BOTTOM_LEFT)
 		{
 			UCLIDException ue("ELI34156",
 				"Cannot OCR document pages with non-standard view perspective; "

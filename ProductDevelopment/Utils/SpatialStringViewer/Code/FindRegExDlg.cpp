@@ -363,6 +363,9 @@ void FindRegExDlg::computeMatches()
 			continue;
 		}
 
+		// Get whether to include characters in the specified font range, or outside of it.
+		VARIANT_BOOL vbIncludeFontRange = asVariantBool(m_cmbIncludeFontSize.GetCurSel() == 0);
+
 		for (long i=0; i < nSize; i++)
 		{
 			// Get the start and end positions from the match
@@ -381,7 +384,8 @@ void FindRegExDlg::computeMatches()
 				ISpatialStringPtr ipSubStr = ipTemp->GetSubString(nStart, nEnd);
 				ASSERT_RESOURCE_ALLOCATION("ELI15637", ipSubStr != __nullptr);
 
-				if (ipSubStr->ContainsCharacterOutsideFontRange(m_nFontMin, m_nFontMax) == VARIANT_TRUE)
+				if (ipSubStr->ContainsCharacterOutsideFontRange(m_nFontMin, m_nFontMax) ==
+					vbIncludeFontRange)
 				{
 					continue;
 				}
