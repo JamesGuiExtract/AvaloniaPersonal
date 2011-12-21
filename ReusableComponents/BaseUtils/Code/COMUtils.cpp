@@ -4,6 +4,7 @@
 #include "cpputil.h"
 #include "EncryptedFileManager.h"
 #include "UCLIDException.h"
+#include "TemporaryFileName.h"
 
 #include <AtlBase.h>
 #include <objBase.h>
@@ -723,74 +724,125 @@ void readStreamFromStorage(IStream** ppStream, IStoragePtr ipStorage, BSTR bstrS
 void writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, BSTR bstrObjectName, 
 				  bool bClearDirty, string strSignature)
 {
+	TemporaryFileName *pTempOutFile = __nullptr;
+
 	try
 	{
-		ASSERT_ARGUMENT("ELI25598", ipObject != __nullptr);
-
-		// Create a directory for the file if necessary
-		string strFileName = asString(bstrFileName);
-		createDirectory( getDirectoryFromFullPath(strFileName) );
-
-		// Create the file storage object
-		IStoragePtr ipStorage;
-		HRESULT hr = waitForStgFileCreate(bstrFileName, &ipStorage, gdwSTORAGE_CREATE_MODE);
-		if (ipStorage == __nullptr || FAILED(hr))
-		{
-			UCLIDException ue("ELI25588", "Unable to create file storage object.");
-			ue.addDebugInfo("File name", strFileName);
-			ue.addHresult(hr);
-			throw ue;
-		}
-
 		try
 		{
-			// Create a stream within the storage object to store the object
-			IStreamPtr ipStream;
-			hr = ipStorage->CreateStream(bstrObjectName, gdwSTREAM_CREATE_MODE, 0, 0, &ipStream);
-			if (ipStream == __nullptr || FAILED(hr))
+			ASSERT_ARGUMENT("ELI25598", ipObject != __nullptr);
+
+			// Create a directory for the file if necessary
+			string strPermanentFileName = asString(bstrFileName);
+			string strDirectory = getDirectoryFromFullPath(strPermanentFileName);
+			createDirectory(strDirectory);
+
+			// [LegacyRCAndUtils:6255]
+			// To avoid corrupting existing files, if writing to an existing file, save first to a
+			// temporary filename, then overwrite the original only if the write is successful.
+			string strFileName;
+			if (isValidFile(strPermanentFileName))
 			{
-				UCLIDException ue("ELI25589", "Unable to create stream object.");
+				pTempOutFile = new TemporaryFileName(true);
+				strFileName = pTempOutFile->getName();
+			}
+			else
+			{
+				strFileName = strPermanentFileName;
+			}
+
+			// Create the file storage object
+			IStoragePtr ipStorage;
+			HRESULT hr = waitForStgFileCreate(get_bstr_t(strFileName), &ipStorage, gdwSTORAGE_CREATE_MODE);
+			if (ipStorage == __nullptr || FAILED(hr))
+			{
+				UCLIDException ue("ELI25588", "Unable to create file storage object.");
 				ue.addDebugInfo("File name", strFileName);
-				ue.addDebugInfo("Stream name", asString(bstrObjectName));
 				ue.addHresult(hr);
 				throw ue;
 			}
 
-			// Write file signature to stream if specified
-			if (!strSignature.empty())
-			{
-				CComBSTR bstrSignature(strSignature.c_str());
-				bstrSignature.WriteToStream(ipStream);
-			}
-
-			// Save the object to the stream
-			hr = ipObject->Save(ipStream, asMFCBool(bClearDirty));
-			if (FAILED(hr))
-			{
-				string strMessage = "Unable to save " + asString(bstrObjectName) + ".";
-				HANDLE_HRESULT(hr, "ELI25590", strMessage, ipObject, IID_IPersistStream);
-			}
-
-			// Ensure the stream and storage are closed [LRCAU #5078]
-			ipStream = __nullptr;
-			ipStorage = __nullptr;
-		}
-		catch (...)
-		{
-			// The object could not be streamed successfully. Delete the output file.
 			try
 			{
-				if (isValidFile(strFileName))
+				// Create a stream within the storage object to store the object
+				IStreamPtr ipStream;
+				hr = ipStorage->CreateStream(bstrObjectName, gdwSTREAM_CREATE_MODE, 0, 0, &ipStream);
+				if (ipStream == __nullptr || FAILED(hr))
 				{
-					deleteFile(strFileName);
+					UCLIDException ue("ELI25589", "Unable to create stream object.");
+					ue.addDebugInfo("File name", strFileName);
+					ue.addDebugInfo("Stream name", asString(bstrObjectName));
+					ue.addHresult(hr);
+					throw ue;
+				}
+
+				// Write file signature to stream if specified
+				if (!strSignature.empty())
+				{
+					CComBSTR bstrSignature(strSignature.c_str());
+					bstrSignature.WriteToStream(ipStream);
+				}
+
+				// Save the object to the stream
+				hr = ipObject->Save(ipStream, asMFCBool(bClearDirty));
+				if (FAILED(hr))
+				{
+					string strMessage = "Unable to save " + asString(bstrObjectName) + ".";
+					HANDLE_HRESULT(hr, "ELI25590", strMessage, ipObject, IID_IPersistStream);
+				}
+
+				// Ensure the stream and storage are closed [LRCAU #5078]
+				ipStream = __nullptr;
+				ipStorage = __nullptr;
+
+				// If we wrote to a temporary file, now the the write succeeded, overwrite the
+				// original file with the temp copy.
+				if (pTempOutFile != __nullptr)
+				{
+					try
+					{
+						try
+						{
+							copyFile(strFileName, strPermanentFileName);
+						}
+						CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34201");
+					}
+					catch (UCLIDException& ue)
+					{
+						throw UCLIDException("ELI34202",
+							"Unable to save " + strPermanentFileName + ".", ue);
+					}
+
+					delete pTempOutFile;
+					pTempOutFile = __nullptr;
 				}
 			}
-			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27023")
+			catch (...)
+			{
+				// The object could not be streamed successfully. Delete the output file.
+				try
+				{
+					if (isValidFile(strFileName))
+					{
+						deleteFile(strFileName);
+					}
+				}
+				CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27023")
 
-			throw;
+				throw;
+			}
 		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25597")
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25597")
+	catch (UCLIDException &ue)
+	{
+		if (pTempOutFile != __nullptr)
+		{
+			delete pTempOutFile;
+		}
+
+		throw ue;
+	}
 }
 
 //-------------------------------------------------------------------------------------------------
