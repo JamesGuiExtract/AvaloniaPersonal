@@ -673,9 +673,6 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 			}
 			catch(UCLIDException& uex)
 			{
-				uex.addDebugInfo("Input Image File", strImageFileName);
-				uex.addDebugInfo("Output Image File", strOutputImageName);
-
 				// Need to clear annotation tags if any where applied
 				if (bAnnotationsAppliedToPage)
 				{
@@ -700,6 +697,16 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 						ex.log();
 					}
 					hContainer = NULL;
+				}
+
+				uex.addDebugInfo("Input Image File", strImageFileName);
+				uex.addDebugInfo("Output Image File", strOutputImageName);
+				uex.addDebugInfo("Attempt", asString(i+1));
+
+				if (i < gnOUTPUT_IMAGE_RETRIES - 1)
+				{
+					uex.log();
+					continue;
 				}
 
 				throw uex;

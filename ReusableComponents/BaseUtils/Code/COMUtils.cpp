@@ -536,7 +536,7 @@ HRESULT EXPORT_BaseUtils waitForStgFileAccess(BSTR strFileName, IStorage** ppSto
 		// Open the file storage
 		IStoragePtr ipStorage = __nullptr;
 		STGOPTIONS options = {gSTORAGE_VERSION};
-		StgOpenStorageEx(strFileName, gdwSTORAGE_ACCESS_MODE, STGFMT_DOCFILE, 0, &options, 
+		hr = StgOpenStorageEx(strFileName, gdwSTORAGE_ACCESS_MODE, STGFMT_DOCFILE, 0, &options, 
 			0, IID_IStorage, (void**)&ipStorage);
 
 		// Check the return value

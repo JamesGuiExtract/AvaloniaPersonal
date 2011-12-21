@@ -43,8 +43,9 @@ const string gmapCOLUMN_STATUS[][2] =
 
 // constants for the query to get the total number of files referenced in the database
 const string gstrTOTAL_FILECOUNT_FIELD = "FileCount";
-const string gstrTOTAL_FAMFILE_QUERY = "SELECT COUNT(ID) as " +
-	gstrTOTAL_FILECOUNT_FIELD + " FROM FAMFile";
+const string gstrTOTAL_FAMFILE_QUERY = "SELECT SUM (row_count) AS " + gstrTOTAL_FILECOUNT_FIELD +
+	" FROM sys.dm_db_partition_stats "
+	"WHERE object_id=OBJECT_ID('FAMFile') AND (index_id=0 or index_id=1)";
 
 // Query to retrieve the last 1000 exceptions for failed files on the specified action.
 const string gstrFAILED_FILES_EXCEPTIONS_QUERY =
@@ -531,7 +532,7 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 		if (ipRecordSet->RecordCount == 1)
 		{
 			// get the file count
-			llFileCount = (long long)getLongField(ipRecordSet->Fields, gstrTOTAL_FILECOUNT_FIELD);
+			llFileCount = getLongLongField(ipRecordSet->Fields, gstrTOTAL_FILECOUNT_FIELD);
 
 			m_editFileTotal.SetWindowText(commaFormatNumber(llFileCount).c_str());
 		}
