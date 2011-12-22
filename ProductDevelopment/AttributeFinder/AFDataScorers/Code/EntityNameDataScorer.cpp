@@ -809,6 +809,13 @@ void CEntityNameDataScorer::logResults(long nScore, string strItemScored, bool b
 
 	// Open the log file
 	ofstream ofsLogFile( strLogFile.c_str(), (ios::out | ios::app) );
+	if (!ofsLogFile.is_open())
+	{
+		UCLIDException ue("ELI34206", "Log file could not be opened.");
+		ue.addDebugInfo("Filename", strLogFile);
+		ue.addWin32ErrorInfo();
+		throw ue;
+	}
 
 	// Get the output string
 	string	strPipe( "|" );

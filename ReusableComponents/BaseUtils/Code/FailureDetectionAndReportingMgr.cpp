@@ -36,6 +36,14 @@ void FailureDetectionAndReportingMgr::notifyExceptionLogged(const UCLIDException
 			TemporaryFileName tmpFile(false, NULL, ".tmp", false);
 			strTempFileName = tmpFile.getName();
 			ofstream outfile(strTempFileName.c_str());
+			if (!outfile.is_open())
+			{
+				UCLIDException ue("ELI34213", "Output file could not be opened.");
+				ue.addDebugInfo("Filename", strTempFileName);
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
+
 			outfile << strEx;
 			outfile.close();
 			waitForFileToBeReadable(strTempFileName);
@@ -78,6 +86,14 @@ void FailureDetectionAndReportingMgr::notifyExceptionDisplayed(const UCLIDExcept
 			TemporaryFileName tmpFile(false, NULL, ".tmp", false);
 			strTempFileName = tmpFile.getName();
 			ofstream outfile(strTempFileName.c_str());
+			if (!outfile.is_open())
+			{
+				UCLIDException ue("ELI34214", "Output file could not be opened.");
+				ue.addDebugInfo("Filename", strTempFileName);
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
+
 			outfile << strEx;
 			outfile.close();
 			waitForFileToBeReadable(strTempFileName);

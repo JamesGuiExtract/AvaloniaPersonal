@@ -975,6 +975,13 @@ void CEAVGeneratorDlg::saveAttributesToEAV(const CString& zFileName)
 
 	// open the output EAV file
 	ofstream ofs(zFileName, ios::out | ios::trunc);
+	if (!ofs.is_open())
+	{
+		UCLIDException ue("ELI34216", "Output file could not be opened.");
+		ue.addDebugInfo("Filename", (LPCTSTR)zFileName);
+		ue.addWin32ErrorInfo();
+		throw ue;
+	}
 
 	// retrieve all attributes and walk through them to validate
 	int nCount = m_listAttributes.GetItemCount();

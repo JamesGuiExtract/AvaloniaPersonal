@@ -320,6 +320,13 @@ void FilterSchemeDefinition::writeToFile(const string& strFSDFileFullName)
 
 	// always overwrite if the file exists
 	ofstream ofs(strFSDFileFullName.c_str(), ios::out | ios::trunc);
+	if (!ofs.is_open())
+	{
+		UCLIDException ue("ELI34232", "Output file could not be opened.");
+		ue.addDebugInfo("Filename", strFSDFileFullName);
+		ue.addWin32ErrorInfo();
+		throw ue;
+	}
 
 	// first line is for FilteringDisabled
 	string strDisabled(m_bCurrentSchemeDisabled?"1":"0"); 

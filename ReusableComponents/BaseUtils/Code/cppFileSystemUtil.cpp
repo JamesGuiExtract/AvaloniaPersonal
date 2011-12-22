@@ -267,6 +267,7 @@ void writeToFile(const string& strData, const string& strOutputFileName)
 		// create the output file stream
 		// [FlexIDSCore:3797] Open as binary to prevent each "\n" char from being converted to "\r\n"
 		ofstream ofs(strOutputFileName.c_str(), ofstream::binary);
+		bOpened = ofs.is_open();
 
 		if (bOpened)
 		{

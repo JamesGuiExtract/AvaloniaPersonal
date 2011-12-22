@@ -270,6 +270,13 @@ STDMETHODIMP CRemoveEntriesFromList::SaveEntriesToFile(BSTR strFileFullName)
 
 		// Always overwrite if the file exists
 		ofstream ofs( strFileToSave.c_str(), ios::out | ios::trunc );
+		if (!ofs.is_open())
+		{
+			UCLIDException ue("ELI34207", "Output file could not be opened.");
+			ue.addDebugInfo("Filename", strFileToSave);
+			ue.addWin32ErrorInfo();
+			throw ue;
+		}
 		
 		// Iterate through the vector
 		string strValue("");

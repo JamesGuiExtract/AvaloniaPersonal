@@ -150,6 +150,14 @@ void CIndexConverterDlg::runTask(IProgress* pProgress, int nTaskID)
 			// output to the eav file
 			{
 				ofstream ofs(strEAVFileName.c_str(), ios::out | ios::app);
+				if (!ofs.is_open())
+				{
+					UCLIDException ue("ELI34217", "Output file could not be opened.");
+					ue.addDebugInfo("Filename", strEAVFileName);
+					ue.addWin32ErrorInfo();
+					throw ue;
+				}
+
 				ofs << strAttribute << endl;
 				ofs.close();
 				waitForFileToBeReadable(strEAVFileName);

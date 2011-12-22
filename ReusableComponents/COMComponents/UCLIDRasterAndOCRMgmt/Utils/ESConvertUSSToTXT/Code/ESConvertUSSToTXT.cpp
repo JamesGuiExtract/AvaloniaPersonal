@@ -260,6 +260,13 @@ void CESConvertUSSToTXTApp::convertUSSFile(const string strInputFileName,
 
 			// Open the output file
 			oFile.open( strOutputFileName.c_str() );
+			if (!oFile.is_open())
+			{
+				UCLIDException ue("ELI34229", "Output file could not be opened.");
+				ue.addDebugInfo("Filename", strOutputFileName);
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
 
 			// Write the text to the output file
 			string strText = asString( ipSS->String );
@@ -269,6 +276,13 @@ void CESConvertUSSToTXTApp::convertUSSFile(const string strInputFileName,
 		{
 			// Open the output file
 			oFile.open( strOutputFileName.c_str() );
+			if (!oFile.is_open())
+			{
+				UCLIDException ue("ELI34230", "Output file could not be opened.");
+				ue.addDebugInfo("Filename", strOutputFileName);
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
 
 			// Write an empty string to the output file
 			oFile << "";

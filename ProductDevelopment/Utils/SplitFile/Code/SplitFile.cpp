@@ -99,6 +99,14 @@ int main(int argc, char* argv[])
 			string strOutputFileName = strFilePrefix + '.' + asString(iFileNumber);
 
 			ofstream outputFile(strOutputFileName.c_str());
+			if (!outputFile.is_open())
+			{
+				UCLIDException ue("ELI34226", "Output file could not be opened.");
+				ue.addDebugInfo("Filename", strOutputFileName);
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
+
 			cout << "Creating: " << strOutputFileName << endl;
 
 			for ( int i = 0; i < iNumLines && !inputFile.eof(); i++ )

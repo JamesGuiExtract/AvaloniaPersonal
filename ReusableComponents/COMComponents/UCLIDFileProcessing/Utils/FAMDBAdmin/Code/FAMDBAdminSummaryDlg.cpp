@@ -406,6 +406,13 @@ void CFAMDBAdminSummaryDlg::OnContextViewFailed()
 		{
 			TemporaryFileName tempFile(false, __nullptr, ".uex", false);
 			ofstream outputStream(tempFile.getName(), ios::out | ios::trunc);
+			if (!outputStream.is_open())
+			{
+				UCLIDException ue("ELI34227", "Output file could not be opened.");
+				ue.addDebugInfo("Filename", tempFile.getName());
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
 
 			bool firstLine = true;
 			while (outputLines.size() > 0)

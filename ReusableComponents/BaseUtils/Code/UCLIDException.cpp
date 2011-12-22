@@ -2087,6 +2087,14 @@ void UCLIDException::logExceptionRemotely(const string& strRemoteAddress) const
 			// Get a temporary file and write the exception data to it
 			TemporaryFileName tempFile(false, "", "", false);
 			ofstream fOut(tempFile.getName().c_str());
+			if (!fOut.is_open())
+			{
+				UCLIDException ue("ELI34215", "Output file could not be opened.");
+				ue.addDebugInfo("Filename", tempFile.getName());
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
+
 			fOut << asStringizedByteStream();
 			fOut.close();
 

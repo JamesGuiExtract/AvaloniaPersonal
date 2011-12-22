@@ -273,6 +273,13 @@ void FilterOptionsDefinition::writeToFile(const string& strFODFileFullName)
 	// save current info to the FOD file specified
 	// Always overwrite the file no matter it exists or not
 	ofstream ofs(strFODFileFullName.c_str(), ios::out | ios::trunc);
+	if (!ofs.is_open())
+	{
+		UCLIDException ue("ELI34231", "Output file could not be opened.");
+		ue.addDebugInfo("Filename", strFODFileFullName);
+		ue.addWin32ErrorInfo();
+		throw ue;
+	}
 
 	// section for chars always enabled
 	writeLine(ofs, "[" + CHARS_ALWAYS_ENABLED + "]");

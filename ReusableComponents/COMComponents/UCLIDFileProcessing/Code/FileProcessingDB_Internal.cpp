@@ -2919,97 +2919,111 @@ void CFileProcessingDB::clear(bool retainUserValues)
 {
 	try
 	{
-		// Get the connection pointer
-		_ConnectionPtr ipConnection = getDBConnection();
-
-		// If the ActiveFAM table does exist will need check for active processing
-		// since part of checking will be to revert timed out FAMS need to lock the database
-		// LegacyRCAndUtils #5940
-		if (doesTableExist(ipConnection, gstrACTIVE_FAM))
+		try
 		{
-			// Make sure processing is not active
-			// This check needs to be done with the database locked since it will attempt to revert
-			// timed out FAM's as part of the check for active processing
+			// Get the connection pointer
+			_ConnectionPtr ipConnection = getDBConnection();
 
-			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
-				gstrMAIN_DB_LOCK);
+			// If the ActiveFAM table does exist will need check for active processing
+			// since part of checking will be to revert timed out FAMS need to lock the database
+			// LegacyRCAndUtils #5940
+			if (doesTableExist(ipConnection, gstrACTIVE_FAM))
+			{
+				// Make sure processing is not active
+				// This check needs to be done with the database locked since it will attempt to revert
+				// timed out FAM's as part of the check for active processing
 
-			// since we are clearing the database locking
-			// it will really have no effect so pass true so we
-			// can make sure there is no active processing 
-			assertProcessingNotActiveForAnyAction(true);
+				// Lock the database for this instance
+				LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+					gstrMAIN_DB_LOCK);
+
+				// since we are clearing the database locking
+				// it will really have no effect so pass true so we
+				// can make sure there is no active processing 
+				assertProcessingNotActiveForAnyAction(true);
+			}
+		
+			CSingleLock lock(&m_mutex, TRUE);
+
+			// Begin a transaction
+			TransactionGuard tg(ipConnection);
+
+			// Get a list of the action names to preserve
+			vector<string> vecActionNames;
+			if (retainUserValues)
+			{
+				// Read all actions from the DB
+				IStrToStrMapPtr ipMapActions = getActions(ipConnection);
+				ASSERT_RESOURCE_ALLOCATION("ELI25184", ipMapActions != __nullptr);
+				IVariantVectorPtr ipActions = ipMapActions->GetKeys();
+				ASSERT_RESOURCE_ALLOCATION("ELI25185", ipActions != __nullptr);
+
+				// Iterate over the actions
+				long lSize = ipActions->Size;
+				vecActionNames.reserve(lSize);
+				for (int i = 0; i < lSize; i++)
+				{
+					// Get each action name and add it to the vector
+					_variant_t action = ipActions->Item[i];
+					vecActionNames.push_back( asString(action.bstrVal) );
+				}
+			}
+
+			string strAdminPW;
+
+			// Only get the admin password if we are not retaining user values and the
+			// Login table already exists [LRCAU #5780]
+			if (!retainUserValues && doesTableExist(ipConnection, "Login"))
+			{
+				// Need to store the admin login and add it back after re-adding the table
+				getEncryptedPWFromDB(strAdminPW, true);
+			}
+
+			// Drop the tables
+			dropTables(retainUserValues);
+
+			// Add the tables back
+			addTables(!retainUserValues);
+
+			// Setup the tables that require initial values
+			initializeTableValues(!retainUserValues);
+
+			// Add any retained actions
+			for (unsigned int i = 0; i < vecActionNames.size(); i++)
+			{
+				defineNewAction(getDBConnection(), vecActionNames[i]);
+			}
+
+			// Add the admin user back with admin PW
+			if (!strAdminPW.empty())
+			{
+				storeEncryptedPasswordAndUserName(strAdminPW, true, false, false);
+			}
+
+			tg.CommitTrans();
+
+			// Add the Product specific db after the base tables have been committed
+			addProductSpecificDB();
+
+			// Reset the database connection
+			resetDBConnection();
+
+			// Shrink the database
+			executeCmdQuery(getDBConnection(), gstrSHRINK_DATABASE);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26870");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (ue.getTopText().find("permission") != string::npos)
+		{
+			throw UCLIDException("ELI34204",
+				"You do not appear to have sufficient permissions to clear the database.",
+				ue);
 		}
 		
-		CSingleLock lock(&m_mutex, TRUE);
-
-		// Begin a transaction
-		TransactionGuard tg(ipConnection);
-
-		// Get a list of the action names to preserve
-		vector<string> vecActionNames;
-		if (retainUserValues)
-		{
-			// Read all actions from the DB
-			IStrToStrMapPtr ipMapActions = getActions(ipConnection);
-			ASSERT_RESOURCE_ALLOCATION("ELI25184", ipMapActions != __nullptr);
-			IVariantVectorPtr ipActions = ipMapActions->GetKeys();
-			ASSERT_RESOURCE_ALLOCATION("ELI25185", ipActions != __nullptr);
-
-			// Iterate over the actions
-			long lSize = ipActions->Size;
-			vecActionNames.reserve(lSize);
-			for (int i = 0; i < lSize; i++)
-			{
-				// Get each action name and add it to the vector
-				_variant_t action = ipActions->Item[i];
-				vecActionNames.push_back( asString(action.bstrVal) );
-			}
-		}
-
-		string strAdminPW;
-
-		// Only get the admin password if we are not retaining user values and the
-		// Login table already exists [LRCAU #5780]
-		if (!retainUserValues && doesTableExist(ipConnection, "Login"))
-		{
-			// Need to store the admin login and add it back after re-adding the table
-			getEncryptedPWFromDB(strAdminPW, true);
-		}
-
-		// Drop the tables
-		dropTables(retainUserValues);
-
-		// Add the tables back
-		addTables(!retainUserValues);
-
-		// Setup the tables that require initial values
-		initializeTableValues(!retainUserValues);
-
-		// Add any retained actions
-		for (unsigned int i = 0; i < vecActionNames.size(); i++)
-		{
-			defineNewAction(getDBConnection(), vecActionNames[i]);
-		}
-
-		// Add the admin user back with admin PW
-		if (!strAdminPW.empty())
-		{
-			storeEncryptedPasswordAndUserName(strAdminPW, true, false, false);
-		}
-
-		tg.CommitTrans();
-
-		// Add the Product specific db after the base tables have been committed
-		addProductSpecificDB();
-
-		// Reset the database connection
-		resetDBConnection();
-
-		// Shrink the database
-		executeCmdQuery(getDBConnection(), gstrSHRINK_DATABASE);
+		throw ue;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26870");
 }
 //-------------------------------------------------------------------------------------------------
 IStrToStrMapPtr CFileProcessingDB::getActions(_ConnectionPtr ipConnection)

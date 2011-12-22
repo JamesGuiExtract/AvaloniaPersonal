@@ -988,6 +988,13 @@ void CSpatialString::saveToTXTFile(const string& strFileName)
 {
     // save the output to a text file
     ofstream ofs(strFileName.c_str());
+	if (!ofs.is_open())
+	{
+		UCLIDException ue("ELI34222", "Output file could not be opened.");
+		ue.addDebugInfo("Filename", strFileName);
+		ue.addWin32ErrorInfo();
+		throw ue;
+	}
 
     // replace any \r\n with \r since ofstream inserts
     // \r in front of any \n existing in the output string.

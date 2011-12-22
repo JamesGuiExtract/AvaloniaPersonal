@@ -476,6 +476,13 @@ STDMETHODIMP CTranslateValue::SaveTranslationsToFile(BSTR strFileFullName, BSTR 
 	
 		// always overwrite if the file exists
 		ofstream ofs(strFileToSave.c_str(), ios::out | ios::trunc);
+		if (!ofs.is_open())
+		{
+			UCLIDException ue("ELI34212", "Output file could not be opened.");
+			ue.addDebugInfo("Filename", strFileToSave);
+			ue.addWin32ErrorInfo();
+			throw ue;
+		}
 		
 		// iterate through the vector
 		string strToBeTranslated(""), strTranslation("");

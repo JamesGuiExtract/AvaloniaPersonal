@@ -1149,6 +1149,13 @@ void CScansoftOCR2::logDebugInfo(const string& strText,
 
 	// write the string length and vector length to the output file
 	ofstream outfile(strLogFile.c_str());
+	if (!outfile.is_open())
+	{
+		UCLIDException ue("ELI34218", "Log file could not be opened.");
+		ue.addDebugInfo("Filename", strLogFile);
+		ue.addWin32ErrorInfo();
+		throw ue;
+	}
 
 	// write information about the type of debug info:
 	long nLength = (pvecLetters == NULL) ? strText.length() : pvecLetters->size();

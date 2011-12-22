@@ -2558,6 +2558,13 @@ void CEntityFinder::logResults(string strInitial, string strFinal)
 
 	// Open the log file
 	ofstream ofsLogFile( strLogFile.c_str(), (ios::out | ios::app) );
+	if (!ofsLogFile.is_open())
+	{
+		UCLIDException ue("ELI34208", "Log file could not be opened.");
+		ue.addDebugInfo("Filename", strLogFile);
+		ue.addWin32ErrorInfo();
+		throw ue;
+	}
 
 	// Get the output string
 	string	strPipe( "|" );

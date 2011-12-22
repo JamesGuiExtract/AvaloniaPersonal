@@ -786,6 +786,13 @@ LRESULT CLocateImageRegionPP::OnBnClickedBtnSaveList(WORD wNotifyCode, WORD wID,
 
 			// always overwrite if the file exists
 			ofstream ofs(strFileToSave.c_str(), ios::out | ios::trunc);
+			if (!ofs.is_open())
+			{
+				UCLIDException ue("ELI34209", "Output file could not be opened.");
+				ue.addDebugInfo("Filename", strFileToSave);
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
 
 			// iterate through List of clues
 			int nTotalClues = m_listClues.GetItemCount();

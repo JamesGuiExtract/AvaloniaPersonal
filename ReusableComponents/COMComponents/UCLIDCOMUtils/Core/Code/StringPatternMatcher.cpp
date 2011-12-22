@@ -396,6 +396,14 @@ void CStringPatternMatcher::match(BSTR bstrText, BSTR bstrPattern,
 #ifdef LOGGING_ENABLED
 	{
 		ofstream outfile(gpszLOG_FILE, ios::app);
+		if (!outfile.is_open())
+		{
+			UCLIDException ue("ELI34219", "Log file could not be opened.");
+			ue.addDebugInfo("Filename", gpszLOG_FILE);
+			ue.addWin32ErrorInfo();
+			throw ue;
+		}
+
 		outfile << "Searching for pattern: ";
 		outfile << strPattern << endl;
 
@@ -583,6 +591,13 @@ bool CStringPatternMatcher::processTokens(unsigned long nStartToken,
 #ifdef LOGGING_ENABLED
 		{
 			ofstream outfile(gpszLOG_FILE, ios::app);
+			if (!outfile.is_open())
+			{
+				UCLIDException ue("ELI34220", "Log file could not be opened.");
+				ue.addDebugInfo("Filename", gpszLOG_FILE);
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
 
 			string strMsg = "Searching for token ";
 			strMsg += asString(nStartToken);
@@ -611,6 +626,13 @@ bool CStringPatternMatcher::processTokens(unsigned long nStartToken,
 #ifdef LOGGING_ENABLED
 		{
 			ofstream outfile(gpszLOG_FILE, ios::app);
+			if (!outfile.is_open())
+			{
+				UCLIDException ue("ELI34221", "Log file could not be opened.");
+				ue.addDebugInfo("Filename", gpszLOG_FILE);
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
 			
 			if (bTokenOriginallyFound)
 			{

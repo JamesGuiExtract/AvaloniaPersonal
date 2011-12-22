@@ -92,6 +92,14 @@ STDMETHODIMP CEFMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 		// Store strings in temporary file
 		TemporaryFileName	tfnInput(true);
 		ofstream outfile( tfnInput.getName().c_str() );
+		if (!outfile.is_open())
+		{
+			UCLIDException ue("ELI34228", "Output file could not be opened.");
+			ue.addDebugInfo("Filename", tfnInput.getName());
+			ue.addWin32ErrorInfo();
+			throw ue;
+		}
+
 		bool bWriteNewline = false;
 		vector<string>::const_iterator iter;
 		for (iter = vecData.begin(); iter != vecData.end(); iter++)

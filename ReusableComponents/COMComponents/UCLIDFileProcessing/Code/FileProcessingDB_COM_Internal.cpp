@@ -2361,6 +2361,13 @@ bool CFileProcessingDB::ExportFileList_Internal(bool bDBLocked, BSTR strQuery, B
 
 				// Open the output file
 				ofstream ofsOutput(strOutFileName.c_str(), ios::out | ios::trunc);
+				if (!ofsOutput.is_open())
+				{
+					UCLIDException ue("ELI34205", "Output file could not be opened.");
+					ue.addDebugInfo("Filename", strOutFileName);
+					ue.addWin32ErrorInfo();
+					throw ue;
+				}
 
 				// Setup the counter for the number of records
 				long nNumRecords = 0;

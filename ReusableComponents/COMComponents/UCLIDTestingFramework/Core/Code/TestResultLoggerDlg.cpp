@@ -188,6 +188,14 @@ UINT notepadProc(LPVOID pData)
 		{
 			// always overwrite if the file exists
 			ofstream ofs(g_tmpTxtFileName.getName().c_str(), ios::out | ios::trunc);
+			if (!ofs.is_open())
+			{
+				UCLIDException ue("ELI34223", "Output file could not be opened.");
+				ue.addDebugInfo("Filename", g_tmpTxtFileName.getName());
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
+
 			ofs << strOutput;
 
 			// Close the file and wait for it to be readable
@@ -927,6 +935,14 @@ void TestResultLoggerDlg::openCompareDiff(const string& strSource)
 		{
 			// always overwrite if the file exists
 			ofstream ofs(g_tmpTxtFileName.getName().c_str(), ios::out | ios::trunc);
+			if (!ofs.is_open())
+			{
+				UCLIDException ue("ELI34224", "Output file could not be opened.");
+				ue.addDebugInfo("Filename", g_tmpTxtFileName.getName());
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
+
 			ofs << vecStrings[0];
 			ofs.close();
 
@@ -939,6 +955,14 @@ void TestResultLoggerDlg::openCompareDiff(const string& strSource)
 		{
 			// always overwrite if the file exists
 			ofstream ofs(g_tmpTxtFileNameB.getName().c_str(), ios::out | ios::trunc);
+			if (!ofs.is_open())
+			{
+				UCLIDException ue("ELI34225", "Output file could not be opened.");
+				ue.addDebugInfo("Filename", g_tmpTxtFileNameB.getName());
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
+
 			ofs << vecStrings[1];
 			ofs.close();
 			

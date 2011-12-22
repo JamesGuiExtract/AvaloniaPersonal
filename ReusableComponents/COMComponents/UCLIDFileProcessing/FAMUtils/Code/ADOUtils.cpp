@@ -579,7 +579,7 @@ void dropConstraint(const _ConnectionPtr& ipDBConnection, const string& strTable
 	string strDropSQL = "ALTER TABLE [" + strTableName + "] DROP CONSTRAINT [" + strConstraint + "]";
 
 	// Drop the contraint
-	executeCmdQuery(ipDBConnection, strDropSQL, true);
+	executeCmdQuery(ipDBConnection, strDropSQL, false);
 }
 //-------------------------------------------------------------------------------------------------
 void dropFKContraintsOnTables(const _ConnectionPtr& ipDBConnection, const vector<string>& vecTables)
