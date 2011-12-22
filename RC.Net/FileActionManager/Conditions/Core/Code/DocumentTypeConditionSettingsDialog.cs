@@ -99,6 +99,8 @@ namespace Extract.FileActionManager.Conditions
                     _documentTypeListBox.Items.AddRange(Settings.DocumentTypes);
                     _industry = Settings.Industry;
                 }
+
+                UpdateButtons();
             }
             catch (Exception ex)
             {
@@ -184,6 +186,8 @@ namespace Extract.FileActionManager.Conditions
                             _documentTypeListBox.Items.Add(documentType);
                         }
                     }
+
+                    UpdateButtons();
                 }
             }
             catch (Exception ex)
@@ -206,6 +210,8 @@ namespace Extract.FileActionManager.Conditions
                 {
                     _documentTypeListBox.Items.RemoveAt(_documentTypeListBox.SelectedIndex);
                 }
+
+                UpdateButtons();
             }
             catch (Exception ex)
             {
@@ -224,10 +230,30 @@ namespace Extract.FileActionManager.Conditions
             try
             {
                 _documentTypeListBox.Items.Clear();
+
+                UpdateButtons();
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI32757");
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that selected index of <see cref="_documentTypeListBox"/> changed.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleSelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateButtons();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34203");
             }
         }
 
@@ -264,6 +290,16 @@ namespace Extract.FileActionManager.Conditions
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Updates the button enabled state based on the items in _documentTypeListBox.
+        /// </summary>
+        void UpdateButtons()
+        {
+            bool itemSelected = _documentTypeListBox.SelectedItems.Count == 1;
+            _removeButton.Enabled = itemSelected;
+            _clearButton.Enabled = _documentTypeListBox.Items.Count > 0;
         }
 
         #endregion Private Members

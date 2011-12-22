@@ -614,6 +614,11 @@ namespace Extract.FileActionManager.Utilities
                     process.Dispose();
                 }
 
+                // [DotNetRCAndUtils:695]
+                // Stop will require the ProcessFiles thread to lock _lock, so don't call Stop from
+                // within the lock; Only check if we should stop within the lock.
+                bool stopService = false;
+
                 // Mutex around the active thread count decrement
                 lock (_lock)
                 {
@@ -627,8 +632,13 @@ namespace Extract.FileActionManager.Utilities
                     {
                         // All threads failed due to authentication requirement
                         // call Stop to stop the service
-                        Stop();
+                        stopService = true;
                     }
+                }
+
+                if (stopService)
+                {
+                    Stop();
                 }
             }
         }

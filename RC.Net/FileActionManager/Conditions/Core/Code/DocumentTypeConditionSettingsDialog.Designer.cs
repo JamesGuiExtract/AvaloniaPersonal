@@ -185,6 +185,7 @@
             this._documentTypeListBox.Name = "_documentTypeListBox";
             this._documentTypeListBox.Size = new System.Drawing.Size(333, 251);
             this._documentTypeListBox.TabIndex = 36;
+            this._documentTypeListBox.SelectedIndexChanged += new System.EventHandler(this.HandleSelectedIndexChanged);
             // 
             // _buttonOk
             // 
