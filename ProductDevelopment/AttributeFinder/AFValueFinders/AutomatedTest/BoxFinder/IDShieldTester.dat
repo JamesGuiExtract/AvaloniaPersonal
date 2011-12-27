@@ -128,6 +128,6 @@
 // Tests: [FlexIDSCore:4468]
 <TESTFOLDER>;.\Test26.rsd;.\AutomatedTestFiles\003\;$DirOf(<SourceDocName>)\..\ActualVOA\Test26.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test26.voa
 
-// Pads the box which is searched for included text to ensure it doesn't exclude text near the edges of the box.
+// Ensures none of the clue is included if only some characters of the clue are part of the found text.
 // Tests: [FlexIDSCore:4716]
 <TESTFOLDER>;.\Test27.rsd;.\AutomatedTestFiles\002\;$DirOf(<SourceDocName>)\..\ActualVOA\Test27.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test27.voa
