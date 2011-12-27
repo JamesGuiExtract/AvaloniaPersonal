@@ -273,6 +273,10 @@ private:
 	// PROMISE: Returns a vector of page numbers to search from the specified document text
 	vector<int> getPagesToSearch(ISpatialStringPtr ipDocText);
 
+	// Gets the boundary CRect for the character at the specified index of the string. If the
+	// specified character is non-spatial, a rect at 0,0 with a width & height of 0 is returned.
+	CRect getLetterRect(ISpatialStringPtr ipString, int nIndex);
+
 	// PROMISE: Reset all data members to default values
 	void resetDataMembers();
 

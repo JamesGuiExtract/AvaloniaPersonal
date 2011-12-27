@@ -10,6 +10,7 @@
 #include <ComponentLicenseIDs.h>
 #include <Misc.h>
 #include <AFTagManager.h>
+#include <CPPLetter.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -1818,22 +1819,8 @@ IAttributePtr CBoxFinder::createTextResult(IAFDocumentPtr ipAFDoc, ILongRectangl
 	ASSERT_ARGUMENT("ELI20226", ipBox != __nullptr);
 	ASSERT_ARGUMENT("ELI20227", ipClue != __nullptr);
 
-	// [FlexIDSCore:4716]
-	// The box finder is not including text that intersects the box boundary in order to prevent
-	// grabbing text near the border of bordering boxes. However, if the box coordinates are far
-	// enough off, this can prevent text that is in the box from being selected. Therefore, pad
-	// the search box a bit when searching for text.
-	ICopyableObjectPtr ipCopyThis(ipBox);
-	ASSERT_RESOURCE_ALLOCATION("ELI34166", ipCopyThis != __nullptr);
-	
-	ILongRectanglePtr ipPaddedBox = ipCopyThis->Clone();
-	ASSERT_RESOURCE_ALLOCATION("ELI34167", ipPaddedBox != __nullptr);
-	
-	ipPaddedBox->Offset(-4, -4);
-	ipPaddedBox->Expand(8, 8);
-
 	// Return the spatial string text found within the box
-	ISpatialStringPtr ipText =  getSpatialStringSearcher()->GetDataInRegion(ipPaddedBox, VARIANT_FALSE);
+	ISpatialStringPtr ipText =  getSpatialStringSearcher()->GetDataInRegion(ipBox, VARIANT_FALSE);
 	ASSERT_RESOURCE_ALLOCATION("ELI19785", ipText != __nullptr);
 
 	// Expand clue list to replace any file names with the clues from the specified file
@@ -1864,33 +1851,61 @@ IAttributePtr CBoxFinder::createTextResult(IAFDocumentPtr ipAFDoc, ILongRectangl
 	}
 	else if (m_bIncludeClueText == false && m_eClueLocation == kSameBox)
 	{
-		// If the user has requested not to include the clue in the result,
-		// but the clue is in the same box as the desired data, the first instance
-		// of the clue found on the box should be removed from the found text.
+		// If the user has requested not to include the clue in the result, but the clue is in the
+		// same box as the desired data, the should be removed from the found text.
 		long nStart = -1;
 		long nEnd = -1;
 
-		// Search for the first instance of the clue in the box text
-		if (m_bCluesAreRegularExpressions)
+		// Get the bounds of each spatial character in the clue.
+		ILongRectanglePtr ipClueBounds = ipClue->GetOCRImageBounds();
+		ASSERT_RESOURCE_ALLOCATION("ELI34235", ipClueBounds != __nullptr);
+
+		CRect clueBounds;
+		ipClueBounds->GetBounds(&(clueBounds.left), &(clueBounds.top),
+			&(clueBounds.right), &(clueBounds.bottom));
+
+		vector<CRect> vecClueLetterRects;
+		long nClueLength = ipClue->Size;
+		for (long i = 0; i < nClueLength; i++)
 		{
-			// Search for clue as regular expression
-			ipText->FindFirstItemInRegExpVector(ipExpandedClues, 
-				asVariantBool(m_bCluesAreCaseSensitive), 
-				asVariantBool(m_bFirstBoxOnly), nStart + 1, ipParser, &nStart, &nEnd);
-		}
-		else
-		{
-			// Search for clue as string
-			ipText->FindFirstItemInVector(ipExpandedClues, 
-				asVariantBool(m_bCluesAreCaseSensitive), 
-				asVariantBool(m_bFirstBoxOnly),
-				nStart + 1, &nStart, &nEnd);
+			CRect rectLetter = getLetterRect(ipClue, i);
+			if (!asCppBool(rectLetter.IsRectNull()))
+			{
+				vecClueLetterRects.push_back(rectLetter);
+			}
 		}
 
-		// Remove it.
-		if (nStart != -1)
+		// Loop through each character in the found text to find any that are spatially identical to
+		// characters in the clue, which should be removed.
+		long nTextLength = ipText->Size;
+		for (long i = 0; i < nTextLength; i++)
 		{
-			ipText->Remove(nStart, nEnd);
+			CRect rectLetter = getLetterRect(ipText, i);
+			if (!asCppBool(rectLetter.IsRectNull()))
+			{
+				for each (CRect rectClueLetter in vecClueLetterRects)
+				{
+					if (rectLetter == rectClueLetter)
+					{
+						// This character is a part of the clue. Remove it.
+						ipText->Remove(i, i);
+						if (!asCppBool(ipText->HasSpatialInfo()))
+						{
+							// If there is nothing left in the box text except non-spatial text,
+							// consider all of text part of the clue and clear it out.
+							ipText->ReplaceAndDowngradeToNonSpatial("");
+							nTextLength = 0;
+						}
+						else
+						{
+							i--;
+							nTextLength--;
+						}
+
+						break;
+					}
+				}
+			}
 		}
 	}
 
@@ -1968,6 +1983,23 @@ vector<int> CBoxFinder::getPagesToSearch(ISpatialStringPtr ipDocText)
 	}
 
 	return vecPages;
+}
+//-------------------------------------------------------------------------------------------------
+CRect CBoxFinder::getLetterRect(ISpatialStringPtr ipString, int nIndex)
+{
+	ILetterPtr ipLetter;
+	if (ipString->GetNextOCRImageSpatialLetter(nIndex, &ipLetter) != nIndex)
+	{
+		// If the character at the specified index is not spatial, return an empty rect.
+		return CRect(); 
+	}
+	ASSERT_RESOURCE_ALLOCATION("ELI34236", ipLetter != __nullptr);
+
+	CPPLetter cppLetter;
+	ILongRectanglePtr ipCharBounds = ipLetter->GetCppLetter(&cppLetter);
+
+	return CRect(cppLetter.m_ulLeft, cppLetter.m_ulTop, cppLetter.m_ulRight,
+		cppLetter.m_ulBottom);
 }
 //-------------------------------------------------------------------------------------------------
 void CBoxFinder::resetDataMembers()
