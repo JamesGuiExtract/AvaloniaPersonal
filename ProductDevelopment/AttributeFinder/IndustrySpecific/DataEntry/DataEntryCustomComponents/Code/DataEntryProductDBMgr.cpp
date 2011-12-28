@@ -4,6 +4,7 @@
 #include "DataEntryProductDBMgr.h"
 #include "DataEntryProductDBMgr.h"
 #include "DataEntry_DB_SQL.h"
+#include "DataEntry_DB_SQL_80.h"
 
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
@@ -231,6 +232,65 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema(IFileProcessin
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28992");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema80(IFileProcessingDB *pDB)
+{
+	try
+	{
+		AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+		// Make DB a smart pointer
+		IFileProcessingDBPtr ipDB(pDB);
+		ASSERT_RESOURCE_ALLOCATION("ELI34261", ipDB != NULL);
+
+		// Create the connection object
+		_ConnectionPtr ipDBConnection(__uuidof( Connection ));
+		ASSERT_RESOURCE_ALLOCATION("ELI34262", ipDBConnection != NULL);
+
+		string strDatabaseServer = asString(ipDB->DatabaseServer);
+		string strDatabaseName = asString(ipDB->DatabaseName);
+
+		// create the connection string
+		string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
+
+		ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
+
+		// Create the vector of Queries to execute
+		vector<string> vecCreateQueries;
+
+		vecCreateQueries.push_back(gstrCREATE_DATAENTRY_DATA_80);
+		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_FAMFILE_80);
+		vecCreateQueries.push_back(gstrADD_FK_DATAENTRYDATA_FAMUSER_80);
+		vecCreateQueries.push_back(gstrADD_FK_DATAENTRYDATA_ACTION_80);
+		vecCreateQueries.push_back(gstrADD_FK_DATAENTRYDATA_MACHINE_80);
+		vecCreateQueries.push_back(gstrCREATE_FILEID_DATETIMESTAMP_INDEX_80);
+
+		vecCreateQueries.push_back(gstrCREATE_DATAENTRY_COUNTER_DEFINITION_80);
+
+		vecCreateQueries.push_back(gstrCREATE_DATAENTRY_COUNTER_TYPE_80);
+		vecCreateQueries.push_back(gstrPOPULATE_DATAENTRY_COUNTER_TYPES_80);
+
+		vecCreateQueries.push_back(gstrCREATE_DATAENTRY_COUNTER_VALUE_80);
+		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_INSTANCE_80);
+		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_ID_80);
+		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_TYPE_80);
+
+		vecCreateQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" +
+			gstrDATA_ENTRY_SCHEMA_VERSION_NAME + "', '2')");
+		vecCreateQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" +
+			gstrSTORE_DATAENTRY_PROCESSING_HISTORY + "', '" + gstrSTORE_HISTORY_DEFAULT_SETTING +
+			"')");
+		vecCreateQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" +
+			gstrENABLE_DATA_ENTRY_COUNTERS + "', '" +
+			gstrENABLE_DATA_ENTRY_COUNTERS_DEFAULT_SETTING + "')");
+
+		// Execute the queries to create the data entry table
+		executeVectorOfSQL(ipDBConnection, vecCreateQueries);
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34260");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CDataEntryProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcessingDB *pDB)

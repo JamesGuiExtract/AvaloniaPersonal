@@ -220,6 +220,7 @@
     <ClInclude Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\FAMDBHelperFunctions.h" />
     <ClInclude Include="DataEntry_DB_SQL.h" />
     <ClInclude Include="DataEntryProductDBMgr.h" />
+    <ClInclude Include="DataEntry_DB_SQL_80.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
