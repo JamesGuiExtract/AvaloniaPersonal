@@ -4,6 +4,7 @@
 #include "RedactionCustomComponents.h"
 #include "IDShieldProductDBMgr.h"
 #include "IDShield_DB_SQL.h"
+#include "IDShield_DB_SQL_80.h"
 #include "FAMDBHelperFunctions.h"
 
 #include <UCLIDException.h>
@@ -236,6 +237,53 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_AddProductSpecificSchema(IFileProcessing
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18686");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CIDShieldProductDBMgr::raw_AddProductSpecificSchema80(IFileProcessingDB *pDB)
+{
+	try
+	{
+		AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+		// Make DB a smart pointer
+		IFileProcessingDBPtr ipDB(pDB);
+		ASSERT_RESOURCE_ALLOCATION("ELI34254", ipDB != NULL);
+
+		// Create the connection object
+		ADODB::_ConnectionPtr ipDBConnection(__uuidof( Connection ));
+		ASSERT_RESOURCE_ALLOCATION("ELI34255", ipDBConnection != NULL);
+
+		string strDatabaseServer = asString(ipDB->DatabaseServer);
+		string strDatabaseName = asString(ipDB->DatabaseName);
+
+		// create the connection string
+		string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
+
+		ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
+
+		// Create the vector of Queries to execute
+		vector<string> vecCreateQueries;
+
+		vecCreateQueries.push_back(gstrCREATE_IDSHIELD_DATA_80);
+		vecCreateQueries.push_back(gstrADD_FK_IDSHIELD_FAMFILE_80);
+		vecCreateQueries.push_back(gstrADD_CHECK_FK_IDSHIELDDATA_FAMFILE_80);
+		vecCreateQueries.push_back(gstrADD_FK_IDSHIELDDATA_FAMUSER_80);
+		vecCreateQueries.push_back(gstrADD_CHECK_FK_IDSHIELDDATA_FAMUSER_80);
+		vecCreateQueries.push_back(gstrADD_FK_IDSHIELDDATA_MACHINE_80);
+		vecCreateQueries.push_back(gstrADD_CHECK_FK_IDSHIELDDATA_MACHINE_80);
+		vecCreateQueries.push_back(gstrCREATE_FILEID_DATETIMESTAMP_INDEX_80);
+		vecCreateQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" +
+			gstrID_SHIELD_SCHEMA_VERSION_NAME + "', '2')");
+		vecCreateQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" +
+			gstrSTORE_IDSHIELD_PROCESSING_HISTORY + "', '" + gstrSTORE_HISTORY_DEFAULT_SETTING +
+			"')");
+
+		// Execute the queries to create the id shield table
+		executeVectorOfSQL(ipDBConnection, vecCreateQueries);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34256");
 
 	return S_OK;
 }

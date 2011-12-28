@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -91,7 +89,7 @@ BEGIN
     GROUPBOX        "Convert from 6.0 or 7.0 database",IDC_STATIC,7,7,238,56
     COMBOBOX        IDC_COMBO_FROM_SERVER,49,21,189,77,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO_FROM_DB,49,42,189,77,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Convert to 8.0 database",IDC_STATIC,7,70,238,56
+    GROUPBOX        "Convert to 9.0 database",IDC_STATIC,7,70,238,56
     COMBOBOX        IDC_COMBO_TO_SERVER,49,84,189,77,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO_TO_DB,49,105,189,77,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Retain transition and queue history data",IDC_CHECK_RETAIN_HISTORY_DATA,
@@ -153,7 +151,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
@@ -168,7 +166,6 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 246
         TOPMARGIN, 7
-        BOTTOMMARGIN, 221
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -179,12 +176,12 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "&About ConvertFAMDB..."
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

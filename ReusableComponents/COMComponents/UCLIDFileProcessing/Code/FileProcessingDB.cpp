@@ -1068,7 +1068,7 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName)
 		if (isBlankDB())
 		{
 			// If this is a blank database, return without an exception; this will result in
-			// ShowLogin being called and, therefore, the prompt ot initialized the database.
+			// ShowLogin being called and, therefore, the prompt to initialize the database.
 			return S_OK;
 		}
 		
@@ -1093,6 +1093,61 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17469");
+
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::CreateNew80DB(BSTR bstrNewDBName)
+{	
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Close any existing connection. P13 #4666
+		closeDBConnection();
+
+		// Database server needs to be set in order to create a new database
+		if (m_strDatabaseServer.empty())
+		{
+			UCLIDException ue("ELI34233", "Database server must be set!");
+			ue.addDebugInfo("New DB name", asString(bstrNewDBName));
+			throw ue;
+		}
+
+		// Set the database name to the given database name
+		m_strDatabaseName = asString(bstrNewDBName);
+		
+		if (m_strDatabaseName.empty())
+		{
+			UCLIDException ue("ELI34234", "Database name must not be empty!");
+			throw ue;
+		}
+		
+		// Create a connection object to the master db to create the database
+		ADODB::_ConnectionPtr ipDBConnection(__uuidof(Connection)); 
+
+		// Open a connection to the the master database on the database server
+		ipDBConnection->Open(createConnectionString(m_strDatabaseServer, "master").c_str(),
+			"", "", adConnectUnspecified);
+
+		// Query to create the database
+		string strCreateDB = "CREATE DATABASE [" + m_strDatabaseName + "]";
+
+		// Execute the query to create the new database
+		ipDBConnection->Execute(strCreateDB.c_str(), NULL, adCmdText | adExecuteNoRecords);
+
+		// Close the connections
+		ipDBConnection->Close();
+
+		// Initialize the new database
+		init80DB();
+
+		// The only reason an 80 DB is created is for the purpose of updating the schema. Set
+		// this flag so that any calls to validateDBSchemaVersion during this update are ignored.
+		m_bValidatingOrUpdatingSchema = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34263");
 
 }
 //-------------------------------------------------------------------------------------------------

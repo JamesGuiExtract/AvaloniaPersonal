@@ -335,6 +335,7 @@
     <ClInclude Include="FAMDBHelperFunctions.h" />
     <ClInclude Include="FAMDB_SQL.h" />
     <ClInclude Include="FAMDBUtils.h" />
+    <ClInclude Include="FAMDB_SQL_80.h" />
     <ClInclude Include="FAMTagManager.h" />
     <ClInclude Include="FilePriorityHelper.h" />
     <ClInclude Include="FileProcessingDB.h" />

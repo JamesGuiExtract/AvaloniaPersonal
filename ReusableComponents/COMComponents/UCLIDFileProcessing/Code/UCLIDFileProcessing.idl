@@ -1174,6 +1174,10 @@ library UCLID_FILEPROCESSINGLib
 			[in] long lActionID, [in] VARIANT_BOOL vbQueueing, [in] EFTPAction eFTPAction,
 			[in] BSTR bstrServerAddress, [in] BSTR bstrUserName, [in] BSTR bstrArg1,
 			[in] BSTR bstrArg2, [in] long nRetries, [in] BSTR bstrException);
+
+		// PROMISE: To create a new database in the currently set DatabaseServer withthe name bstrNewDBName
+		// REQUIRES: DatabaseServer property must be set to a valid database server.
+		[id(103), helpstring("method CreateNew80DB")] HRESULT CreateNew80DB([in] BSTR bstrNewDBName);
 	};
 
 	[
@@ -1226,6 +1230,12 @@ library UCLID_FILEPROCESSINGLib
 			[in] IFileProcessingDB* pDB, [in] _Connection* pConnection, [in] long nFAMDBSchemaVersion,
 			[in, out] long* pnProdSchemaVersion, [in, out] long* pnNumSteps,
 			[in] IProgressStatus* pProgressStatus);
+
+		// PROMISE: To create the required tables and relationships for the product that is 
+		//			implementing this interface as of the schema that existed for the IDS/Flex 8.0
+		//			release.
+		[id(7), helpstring("method AddProductSpecificSchema80")] HRESULT AddProductSpecificSchema80(
+			[in] IFileProcessingDB* pDB);
 	};
 
 	[

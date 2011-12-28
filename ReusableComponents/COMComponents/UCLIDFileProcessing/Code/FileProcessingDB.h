@@ -148,6 +148,7 @@ public:
 	STDMETHOD(get_DatabaseName)(BSTR* pVal);
 	STDMETHOD(put_DatabaseName)(BSTR newVal);
 	STDMETHOD(CreateNewDB)(BSTR bstrNewDBName);
+	STDMETHOD(CreateNew80DB)(BSTR bstrNewDBName);
 	STDMETHOD(ConnectLastUsedDBThisProcess)();
 	STDMETHOD(SetDBInfoSetting)(BSTR bstrSettingName, BSTR bstrSettingValue, VARIANT_BOOL vbSetIfExists);
 	STDMETHOD(GetDBInfoSetting)(BSTR bstrSettingName, VARIANT_BOOL vbThrowIfMissing,
@@ -535,12 +536,21 @@ private:
 	// NOTE:	If the operation is to be transactional the BeginTransaction should be done before calling
 	void addTables(bool bAddUserTables);
 
+	// PROMISE:	To Add all tables in the database with the schema that existed as of the release of
+	//			Flex/IDS 8.0.
+	// NOTE:	If the operation is to be transactional the BeginTransaction should be done before calling
+	void addTables80();
+
 	// PROMISE: Retrieves a vector of SQL queries that creates all the tables for the current DB schema.
 	vector<string> getTableCreationQueries(bool bIncludeUserTables);
 	
 	// PROMISE:	To set the initial values for QueueEventCode, ActionState and DBInfo
 	// NOTE:	If the operation is to be transactional the BeginTransaction should be done before calling
 	void initializeTableValues(bool bInitializeUserTables);
+
+	// PROMISE:	To set the initial values for QueueEventCode, ActionState and DBInfo according to
+	// the schema that existed as of the release of Flex/IDS 8.0.
+	void initializeTableValues80();
 
 	// PROMISE: Gets the default values for each of the DBInfo values managed by the FAM DB.
 	map<string, string> getDBInfoDefaultValues();
@@ -662,12 +672,16 @@ private:
 	// Adds the schema for each of the licensed product specific managers
 	void addProductSpecificDB();
 
+	// Adds the schema for each of the licensed product specific managers with the schema that
+	// existed as of the release of Flex/IDS 8.0.
+	void addProductSpecificDB80();
+
 	// Try's to read the sql server time using the provided connection and if it fails returns false
 	bool isConnectionAlive(_ConnectionPtr ipConnection);
 
 	// Recreates the connection for the current thread. If there is no connection object for 
 	// the current thread it will be created using the getDBConnection method. If the creation of
-	// the connection object fails it will be reattempted for gdRETRY_TIMEOUT (120sec). If after the
+	// the connection object fails it will be reattempted for gdRETRY_TIMEOUT (120sec) If after the
 	// timeout it was still not possible to create the connection object false will be returned,
 	// otherwise true will be returned.
 	bool reConnectDatabase();
@@ -685,9 +699,11 @@ private:
 	// Internal close all DB connections
 	void closeAllDBConnections();
 
-
 	// Internal clear DB function
 	void clear(bool retainUserValues = false);
+
+	// Internal DB initialization function for the 8.0 schema.
+	void init80DB();
 
 	// Internal getActions
 	IStrToStrMapPtr getActions(_ConnectionPtr ipConnection);

@@ -257,6 +257,7 @@
     <ClInclude Include="IDShieldProductDBMgr.h" />
     <ClInclude Include="IDShieldVOAFileContentsCondition.h" />
     <ClInclude Include="IDShieldVOAFileContentsConditionPP.h" />
+    <ClInclude Include="IDShield_DB_SQL_80.h" />
     <ClInclude Include="ImageOutputDlg.h" />
     <ClInclude Include="MetadataDlg.h" />
     <ClInclude Include="RedactionAppearanceDlg.h" />

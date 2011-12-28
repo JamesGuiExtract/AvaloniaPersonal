@@ -69,7 +69,7 @@ private:
 	// Adds the actions found in the Action table on the ipSourceDBConnection to the
 	// New database using the FileProcessingDB method AddNewAction - so all the 
 	// columns will be created in the FAMFile
-	void addActionsToNewDB(IFileProcessingDBPtr ipFAMDB, _ConnectionPtr ipSourceDBConnection);
+	void addActionsToNewDB80(_ConnectionPtr ipSourceDBConnection, _ConnectionPtr ipDestDBConnection);
 
 	// Copies the records from the source to the dest
 	// This will also convert ASCName to ActionID, MachineName to MachineID and UserName to FAMUserID
@@ -88,6 +88,28 @@ private:
 	// This function will change the settings in the DBInfo table to the values that were in the 
 	// old database except for the Version settings ( FAMDBSchemaVersion and IDShieldSchemaVersion)
 	void copyDBInfoSettings(IFileProcessingDBPtr ipFAMDB, _ConnectionPtr ipSourceDBConnection);
+
+	// Internal define new action function
+	long defineNewAction80(_ConnectionPtr ipConnection, const string& strActionName);
+
+	// Returns a record set containing the action with the specified name. The record set will be
+	// empty if no such action exists. Code to work with the schema that existed as of the
+	// Flex/IDS 8.0 release.
+	_RecordsetPtr getActionSet80(_ConnectionPtr ipConnection, const string &strAction);
+
+	// Adds an action with the specified name to the specified record set. Returns the action ID of
+	// the newly created action. Code to work with the schema that existed as of the Flex/IDS 8.0
+	// release.
+	long addActionToRecordset80(_ConnectionPtr ipConnection, _RecordsetPtr ipRecordset, 
+		const string &strAction);
+
+	// Gets the last modified/added row from the specified table. Code to work with the schema that
+	// existed as of the Flex/IDS 8.0 release.
+	long getLastTableID80(const _ConnectionPtr& ipDBConnection, string strTableName);
+
+	// Adds action related columns and indexes to the FPMFile table. Code to work with the schema
+	// that existed as of the Flex/IDS 8.0 release.
+	void addActionColumn80(const _ConnectionPtr& ipConnection, const string& strAction);
 
 	// Get a connection object using the given server and database
 	_ConnectionPtr getConnection(const string& strServer, const string& strDatabase);

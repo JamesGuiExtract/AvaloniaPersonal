@@ -20,7 +20,7 @@
 #endif
 
 
-static std::string gstrDEFAULT_DATABASE_SUFFIX = "_8_0";
+static std::string gstrDEFAULT_DATABASE_SUFFIX = "_9_0";
 const int gi5_0DB_SCHEMA_VERSION = 7;
 const int gi7_0DB_SCHEMA_VERSION = 8;
 
@@ -321,7 +321,7 @@ void CConvertFAMDBDlg::convertDatabase()
 		m_eventConvertStarted.signal();
 
 		// Log exception to indicate that a database is being converted
-		UCLIDException ue("ELI28525", "Application Trace: Converting DB to 8.0");
+		UCLIDException ue("ELI28525", "Application Trace: Converting DB to 9.0");
 		ue.addDebugInfo("From Server", (LPCSTR) m_zFromServer);
 		ue.addDebugInfo("From DB", (LPCSTR) m_zFromDB);
 		ue.addDebugInfo("To Server", (LPCSTR) m_zToServer);
@@ -339,7 +339,7 @@ void CConvertFAMDBDlg::convertDatabase()
 		_lastCodePos = "10";
 
 		// Create the new database
-		ipFAMDB->CreateNewDB((LPCSTR) m_zToDB);
+		ipFAMDB->CreateNew80DB((LPCSTR) m_zToDB);
 		_lastCodePos = "20";
 
 		// Create the connection object for new database
@@ -359,12 +359,16 @@ void CConvertFAMDBDlg::convertDatabase()
 		// There are 8 steps + 2 for converting the IDShield table if the table exists + 
 		// 2 for retaining history (QueueEvent and FAST tables)
 		long nNumberOfSteps = 8 + (bConvertIDShieldTable ? 2 : 0) + (bRetainHistory ? 2 : 0); 
+		// Add 5 more steps to account for converting from 8.0 to 9.0. We won't be able to show
+		// progress through these steps, but it will give a better indication of time remaining than
+		// if this phase had only 1 assigned step.
+		nNumberOfSteps += 5;
 		long nCurrentStep = 2;
 
 		updateCurrentStep("Creating actions ", nCurrentStep, nNumberOfSteps);
 		
-		// Add the actions from the old DB to the new DB using the FAMDB object
-		addActionsToNewDB(ipFAMDB, ipOldDB);
+		// Copy the actions from the old DB to the new DB
+		addActionsToNewDB80(ipOldDB, ipNewDB);
 		_lastCodePos = "50";
 
 		updateCurrentStep("Updating DBInfo settings", nCurrentStep, nNumberOfSteps);
@@ -439,10 +443,27 @@ void CConvertFAMDBDlg::convertDatabase()
 			_lastCodePos = "120";
 		}
 
+		updateCurrentStep("Finalizing conversion...", nCurrentStep, nNumberOfSteps);
+
+		// Create a new FAMDB object for converting from 8.0 to 9.0
+		ipFAMDB.CreateInstance(CLSID_FileProcessingDB);
+		ASSERT_RESOURCE_ALLOCATION("ELI34258", ipFAMDB != __nullptr);
+
+		IProgressStatusPtr ipProgressStatus(CLSID_ProgressStatus);
+		ASSERT_RESOURCE_ALLOCATION("ELI34259", ipProgressStatus != __nullptr);
+
+		ipProgressStatus->InitProgressStatus("", 0, 100, VARIANT_FALSE);
+
+		ipFAMDB->DatabaseServer = (LPCSTR) m_zToServer;
+		ipFAMDB->DatabaseName = (LPCSTR) m_zToDB;
+		ipFAMDB->UpgradeToCurrentSchema(ipProgressStatus);
+
+		_lastCodePos = "130";
+
 		m_staticCurrentStep.SetWindowText("");
 
 		// Log exception to indicate that a database convertion is complete
-		UCLIDException ueCompleted("ELI28526", "Application Trace: DB has been converted to 8.0");
+		UCLIDException ueCompleted("ELI28526", "Application Trace: DB has been converted to 9.0");
 		ueCompleted.addDebugInfo("From Server", (LPCSTR) m_zFromServer);
 		ueCompleted.addDebugInfo("From DB", (LPCSTR) m_zFromDB);
 		ueCompleted.addDebugInfo("To Server", (LPCSTR) m_zToServer);
@@ -498,14 +519,15 @@ _ConnectionPtr CConvertFAMDBDlg::getConnection(const string& strServer, const st
 
 }
 //-------------------------------------------------------------------------------------------------
-void CConvertFAMDBDlg::addActionsToNewDB(IFileProcessingDBPtr ipFAMDB, _ConnectionPtr ipSourceDBConnection)
+void CConvertFAMDBDlg::addActionsToNewDB80(_ConnectionPtr ipSourceDBConnection,
+										 _ConnectionPtr ipDestDBConnection)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI00028");
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20034", ipFAMDB != __nullptr);
-		ASSERT_ARGUMENT("ELI20035", ipSourceDBConnection != __nullptr);
+		ASSERT_ARGUMENT("ELI34244", ipSourceDBConnection != __nullptr);
+		ASSERT_ARGUMENT("ELI34245", ipDestDBConnection != __nullptr);
 
 		// Create the source action set
 		_RecordsetPtr ipSourceActionSet( __uuidof( Recordset ));
@@ -541,7 +563,7 @@ void CConvertFAMDBDlg::addActionsToNewDB(IFileProcessingDBPtr ipFAMDB, _Connecti
 			_lastCodePos = "60_" + strActionName;
 
 			// Create the action in the new database
-			ipFAMDB->DefineNewAction(strActionName.c_str());
+			defineNewAction80(ipDestDBConnection, strActionName);
 			_lastCodePos = "70_" + strActionName;
 
 			// Move to the next action
@@ -725,6 +747,122 @@ void CConvertFAMDBDlg::copyDBInfoSettings(IFileProcessingDBPtr ipFAMDB, _Connect
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28606");
+}
+//--------------------------------------------------------------------------------------------------
+long CConvertFAMDBDlg::defineNewAction80(_ConnectionPtr ipConnection, const string& strActionName)
+{
+	try
+	{
+		// Create a pointer to a recordset containing the action
+		_RecordsetPtr ipActionSet = getActionSet80(ipConnection, strActionName);
+		ASSERT_RESOURCE_ALLOCATION("ELI34246", ipActionSet != NULL);
+
+		// Check to see if action exists
+		if (ipActionSet->adoEOF == VARIANT_FALSE)
+		{
+			// Build error string (P13 #3931)
+			CString zText;
+			zText.Format("The action '%s' already exists, and therefore cannot be added again.", 
+				strActionName.c_str());
+			UCLIDException ue("ELI34247", LPCTSTR(zText));
+			throw ue;
+		}
+
+		// Create a new action and return its ID
+		return addActionToRecordset80(ipConnection, ipActionSet, strActionName);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34248");
+}
+//--------------------------------------------------------------------------------------------------
+_RecordsetPtr CConvertFAMDBDlg::getActionSet80(_ConnectionPtr ipConnection, const string &strAction)
+{
+	// Create a pointer to a recordset
+	_RecordsetPtr ipActionSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI34249", ipActionSet != NULL);
+
+	// Setup select statement to open Action Table
+	string strActionSelect = "SELECT ID, ASCName FROM Action WHERE ASCName = '" + strAction + "'";
+
+	// Open the Action table in the database
+	ipActionSet->Open(strActionSelect.c_str(), _variant_t((IDispatch *)ipConnection, true), 
+		adOpenDynamic, adLockOptimistic, adCmdText);
+
+	return ipActionSet;
+}
+//--------------------------------------------------------------------------------------------------
+long CConvertFAMDBDlg::addActionToRecordset80(_ConnectionPtr ipConnection, 
+											 _RecordsetPtr ipRecordset, const string &strAction)
+{
+	try
+	{
+		// Add a new record
+		ipRecordset->AddNew();
+
+		// Set the values of the ASCName field
+		setStringField(ipRecordset->Fields, "ASCName", strAction);
+
+		// Add the record to the Action Table
+		ipRecordset->Update();
+
+		// Get the ID of the new Action
+		long lActionId = getLastTableID80(ipConnection, "Action");
+
+		// Add column to the FAMFile table
+		addActionColumn80(ipConnection, strAction);
+
+		return lActionId;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34250")
+}
+//-------------------------------------------------------------------------------------------------
+long CConvertFAMDBDlg::getLastTableID80(const _ConnectionPtr& ipDBConnection, string strTableName)
+{
+	ASSERT_ARGUMENT("ELI34251", ipDBConnection != NULL);
+
+	_RecordsetPtr ipRSet;
+	// Build SQL string to get the last ID for the given table
+	string strGetIDSQL = "SELECT IDENT_CURRENT ('" + strTableName + "') AS CurrentID";
+
+	// Execute the command 
+	ipRSet = ipDBConnection->Execute( strGetIDSQL.c_str(), NULL, adCmdUnknown );
+	ASSERT_RESOURCE_ALLOCATION("ELI34252", ipRSet != NULL );
+
+	// The ID field in all of the tables is a 32 bit int so
+	// the value returned by this function can be changed to type long
+	return (long) getLongLongField( ipRSet->Fields, "CurrentID" );
+}
+//--------------------------------------------------------------------------------------------------
+void CConvertFAMDBDlg::addActionColumn80(const _ConnectionPtr& ipConnection, const string& strAction)
+{
+
+	// Add new Column to FAMFile table
+	// Create SQL statement to add the column to FAMFile
+	string strAddColSQL = "Alter Table FAMFile Add ASC_" + strAction + " nvarchar(1)";
+
+	// Run the SQL to add column to FAMFile
+	executeCmdQuery(ipConnection, strAddColSQL);
+
+	// Create the query and update the file status for all files to unattempted
+	string strUpdateSQL = "UPDATE FAMFile SET ASC_" + strAction + " = 'U' FROM FAMFile";
+	executeCmdQuery(ipConnection, strUpdateSQL);
+
+	// Create index on the new column
+	string strCreateIDX = "Create Index IX_ASC_" + strAction + " on FAMFile (ASC_" 
+		+ strAction + ")";
+	executeCmdQuery(ipConnection, strCreateIDX);
+
+	// Add foreign key contraint for the new column to reference the ActionState table
+	string strAddContraint = "ALTER TABLE FAMFile WITH CHECK ADD CONSTRAINT FK_ASC_" 
+		+ strAction + " FOREIGN KEY(ASC_" + 
+		strAction + ") REFERENCES ActionState(Code)";
+
+	// Create the foreign key
+	executeCmdQuery(ipConnection, strAddContraint);
+
+	// Add the default contraint for the column
+	string strDefault = "ALTER TABLE FAMFile ADD CONSTRAINT DF_ASC_" 
+		+ strAction + " DEFAULT 'U' FOR ASC_" + strAction;
+	executeCmdQuery(ipConnection, strDefault);
 }
 //-------------------------------------------------------------------------------------------------
 bool CConvertFAMDBDlg::isInputDataValid()

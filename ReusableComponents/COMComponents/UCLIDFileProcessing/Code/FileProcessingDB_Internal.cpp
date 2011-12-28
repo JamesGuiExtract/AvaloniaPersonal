@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "FileProcessingDB.h"
 #include "FAMDB_SQL.h"
+#include "FAMDB_SQL_80.h"
 #include "FPCategories.h"
 #include "FAMDBHelperFunctions.h"
 
@@ -1117,6 +1118,80 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18011");
 }
 //--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::addTables80()
+{
+	try
+	{
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrCREATE_DB_INFO_TABLE_80);
+		vecQueries.push_back(gstrCREATE_FAM_TAG_TABLE_80);
+		vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_TABLE_80);
+		vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_VALUE_INDEX_80);
+		vecQueries.push_back(gstrCREATE_ACTION_TABLE_80);
+		vecQueries.push_back(gstrCREATE_LOCK_TABLE_80);
+		vecQueries.push_back(gstrCREATE_ACTION_STATE_TABLE_80);
+		vecQueries.push_back(gstrCREATE_FAM_FILE_TABLE_80);
+		vecQueries.push_back(gstrCREATE_FAM_FILE_ID_PRIORITY_INDEX_80);
+		vecQueries.push_back(gstrCREATE_FAM_FILE_INDEX_80);
+		vecQueries.push_back(gstrCREATE_QUEUE_EVENT_CODE_TABLE_80);
+		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_TABLE_80);
+		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATE_TRANSITION_TABLE_80);
+		vecQueries.push_back(gstrCREATE_QUEUE_EVENT_TABLE_80);
+		vecQueries.push_back(gstrCREATE_QUEUE_EVENT_INDEX_80);
+		vecQueries.push_back(gstrCREATE_MACHINE_TABLE_80);
+		vecQueries.push_back(gstrCREATE_FAM_USER_TABLE_80);
+		vecQueries.push_back(gstrCREATE_FAM_FILE_ACTION_COMMENT_TABLE_80);
+		vecQueries.push_back(gstrCREATE_FILE_ACTION_COMMENT_INDEX_80);
+		vecQueries.push_back(gstrCREATE_FAM_SKIPPED_FILE_TABLE_80);
+		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX_80);
+		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_UPI_INDEX_80);
+		vecQueries.push_back(gstrCREATE_FAM_FILE_TAG_TABLE_80);
+		vecQueries.push_back(gstrCREATE_FILE_TAG_INDEX_80);
+		vecQueries.push_back(gstrCREATE_PROCESSING_FAM_TABLE_80);
+		vecQueries.push_back(gstrCREATE_PROCESSING_FAM_UPI_INDEX_80);
+		vecQueries.push_back(gstrCREATE_LOCKED_FILE_TABLE_80);
+		vecQueries.push_back(gstrCREATE_FPS_FILE_TABLE_80);
+		vecQueries.push_back(gstrCREATE_FPS_FILE_NAME_INDEX_80);
+		vecQueries.push_back(gstrCREATE_FAM_SESSION_80);
+		vecQueries.push_back(gstrCREATE_INPUT_EVENT_80);
+		vecQueries.push_back(gstrCREATE_INPUT_EVENT_INDEX_80);
+		vecQueries.push_back(gstrCREATE_LOGIN_TABLE_80);
+		vecQueries.push_back(gstrADD_STATISTICS_ACTION_FK_80);
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATE_TRANSITION_ACTION_FK_80);
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATE_TRANSITION_FAM_FILE_FK_80);
+		vecQueries.push_back(gstrADD_QUEUE_EVENT_FAM_FILE_FK_80);
+		vecQueries.push_back(gstrADD_QUEUE_EVENT_QUEUE_EVENT_CODE_FK_80);
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATE_TRANSITION_MACHINE_FK_80);
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATE_TRANSITION_FAM_USER_FK_80);
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATE_TRANSITION_ACTION_STATE_TO_FK_80);
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATE_TRANSITION_ACTION_STATE_FROM_FK_80);
+		vecQueries.push_back(gstrADD_QUEUE_EVENT_MACHINE_FK_80);
+		vecQueries.push_back(gstrADD_QUEUE_EVENT_FAM_USER_FK_80);
+		vecQueries.push_back(gstrADD_QUEUE_EVENT_ACTION_FK_80);
+		vecQueries.push_back(gstrADD_FILE_ACTION_COMMENT_ACTION_FK_80);
+		vecQueries.push_back(gstrADD_FILE_ACTION_COMMENT_FAM_FILE_FK_80);
+		vecQueries.push_back(gstrADD_SKIPPED_FILE_FAM_FILE_FK_80);
+		vecQueries.push_back(gstrADD_SKIPPED_FILE_ACTION_FK_80);
+		vecQueries.push_back(gstrADD_FILE_TAG_FAM_FILE_FK_80);
+		vecQueries.push_back(gstrADD_FILE_TAG_TAG_ID_FK_80);
+		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTION_FK_80);
+		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTION_STATE_FK_80);
+		vecQueries.push_back(gstrADD_LOCKED_FILE_FAMFILE_FK_80);
+		vecQueries.push_back(gstrADD_LOCKED_FILE_PROCESSINGFAM_FK_80);
+		vecQueries.push_back(gstrADD_FAM_SESSION_MACHINE_FK_80);
+		vecQueries.push_back(gstrADD_FAM_SESSION_FAMUSER_FK_80);
+		vecQueries.push_back(gstrADD_FAM_SESSION_FPSFILE_FK_80);
+		vecQueries.push_back(gstrADD_INPUT_EVENT_ACTION_FK_80);
+		vecQueries.push_back(gstrADD_INPUT_EVENT_MACHINE_FK_80);
+		vecQueries.push_back(gstrADD_INPUT_EVENT_FAMUSER_FK_80);
+
+		// Execute all of the queries
+		executeVectorOfSQL(getDBConnection(), vecQueries);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34240");
+}
+//--------------------------------------------------------------------------------------------------
 vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTables)
 {
 	vector<string> vecQueries;
@@ -1227,6 +1302,142 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 		executeVectorOfSQL(getDBConnection(), vecQueries);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27606")
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::initializeTableValues80()
+{
+	try
+	{
+		vector<string> vecQueries;
+
+		// Add valid action states to the Action State table
+		vecQueries.push_back("INSERT INTO [ActionState] ([Code], [Meaning]) "
+			"VALUES('C', 'Complete')");
+
+		vecQueries.push_back("INSERT INTO [ActionState] ([Code], [Meaning]) "
+			"VALUES('F', 'Failed')");
+
+		vecQueries.push_back("INSERT INTO [ActionState] ([Code], [Meaning]) "
+			"VALUES('P', 'Pending')");
+
+		vecQueries.push_back("INSERT INTO [ActionState] ([Code], [Meaning]) "
+			"VALUES('R', 'Processing')");
+
+		vecQueries.push_back("INSERT INTO [ActionState] ([Code], [Meaning]) "
+			"VALUES('U', 'Unattempted')");
+
+		vecQueries.push_back("INSERT INTO [ActionState] ([Code], [Meaning]) "
+			"VALUES('S', 'Skipped')");
+
+		// Add Valid Queue event codes the QueueEventCode table
+		vecQueries.push_back("INSERT INTO [QueueEventCode] ([Code], [Description]) "
+			"VALUES('A', 'File added to queue')");
+		
+		vecQueries.push_back("INSERT INTO [QueueEventCode] ([Code], [Description]) "
+			"VALUES('D', 'File deleted from queue')");
+
+		vecQueries.push_back("INSERT INTO [QueueEventCode] ([Code], [Description]) "
+			"VALUES('F', 'Folder was deleted')");
+
+		vecQueries.push_back("INSERT INTO [QueueEventCode] ([Code], [Description]) "
+			"VALUES('M', 'File was modified')");
+
+		vecQueries.push_back("INSERT INTO [QueueEventCode] ([Code], [Description]) "
+			"VALUES('R', 'File was renamed')");
+
+		// Add the schema version to the DBInfo table
+		string strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrFAMDB_SCHEMA_VERSION +
+			"', '23')";
+		vecQueries.push_back(strSQL);
+
+		// Add Command Timeout setting
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrCOMMAND_TIMEOUT +
+			"', '" + asString(glDEFAULT_COMMAND_TIMEOUT) + "')";
+		vecQueries.push_back(strSQL);
+
+		// Add Update Queue Event Table setting
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrUPDATE_QUEUE_EVENT_TABLE 
+			+ "', '1')";
+		vecQueries.push_back(strSQL);
+
+		// Add Update Queue Event Table setting
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrUPDATE_FAST_TABLE + "', '1')";
+		vecQueries.push_back(strSQL);
+
+		// Add Auto Delete File Action Comment On Complete setting
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_DELETE_FILE_ACTION_COMMENT
+			+ "', '0')";
+		vecQueries.push_back(strSQL);
+
+		// Add Require Password To Process All Skipped Files setting (default to true)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED
+			+ "', '1')";
+		vecQueries.push_back(strSQL);
+
+		// Add Allow Dynamic Tag Creation setting (default to false)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrALLOW_DYNAMIC_TAG_CREATION
+			+ "', '0')";
+		vecQueries.push_back(strSQL);
+
+		// Add AutoRevertLockedFiles setting (default to true)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_LOCKED_FILES
+			+ "', '1')";
+		vecQueries.push_back(strSQL);
+
+		// Add AutoRevertTimeOutInMinutes setting (default to 60 minutes)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_TIME_OUT_IN_MINUTES
+			+ "', '60')";
+		vecQueries.push_back(strSQL);
+			
+		// Add AutoRevertNotifyEmailList setting (default to empy string)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_NOTIFY_EMAIL_LIST
+			+ "', '')";
+		vecQueries.push_back(strSQL);
+
+		// Add NumberOfConnectionRetries setting (default to empy string)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrNUMBER_CONNECTION_RETRIES
+			+ "', '10')";
+		vecQueries.push_back(strSQL);
+			
+		// Add ConnectionRetryTimeout setting (default to empy string)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrCONNECTION_RETRY_TIMEOUT
+			+ "', '120')";
+		vecQueries.push_back(strSQL);
+
+		// Add StoreFAMSessionHistory setting (default to true)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrSTORE_FAM_SESSION_HISTORY
+			+ "', '1')";
+		vecQueries.push_back(strSQL);
+
+		// Add the EnableInputEventTracking setting (default to false)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrENABLE_INPUT_EVENT_TRACKING
+			+ "', '0')";
+		vecQueries.push_back(strSQL);
+
+		// Add the InputEventHistorySize setting (default to 30 days)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrINPUT_EVENT_HISTORY_SIZE
+			+ "', '30')";
+		vecQueries.push_back(strSQL);
+
+		// Add RequireAuthenticationBeforeRun setting (default to false)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrREQUIRE_AUTHENTICATION_BEFORE_RUN
+			+ "', '0')";
+		vecQueries.push_back(strSQL);
+
+		// Add Auto Create Actions setting (default to false)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_CREATE_ACTIONS
+			+ "', '0')";
+		vecQueries.push_back(strSQL);
+
+		// Add Skip Authentication For Services On Machines
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrSKIP_AUTHENTICATION_ON_MACHINES + "', '')";
+		vecQueries.push_back(strSQL);
+
+		// Execute all of the queries
+		executeVectorOfSQL(getDBConnection(), vecQueries);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34239")
 }
 //-------------------------------------------------------------------------------------------------
 map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
@@ -2707,6 +2918,28 @@ void CFileProcessingDB::addProductSpecificDB()
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27608")
 }
 //--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::addProductSpecificDB80()
+{
+	try
+	{
+		// Get vector of all license product specific managers
+		IIUnknownVectorPtr ipProdSpecMgrs = getLicensedProductSpecificMgrs();
+		ASSERT_RESOURCE_ALLOCATION("ELI34241", ipProdSpecMgrs != __nullptr);
+
+		// Loop through all of the objects and call the AddProductSpecificSchema
+		long nSize = ipProdSpecMgrs->Size();
+		for (long n = 0; n < nSize; n++)
+		{
+			UCLID_FILEPROCESSINGLib::IProductSpecificDBMgrPtr ipMgr = ipProdSpecMgrs->At(n);
+			ASSERT_RESOURCE_ALLOCATION("ELI34242", ipMgr != __nullptr);
+
+			// Add the schema from the product specific db manager
+			ipMgr->AddProductSpecificSchema80(getThisAsCOMPtr());
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34243")
+}
+//--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isConnectionAlive(_ConnectionPtr ipConnection)
 {
 	try
@@ -3018,6 +3251,49 @@ void CFileProcessingDB::clear(bool retainUserValues)
 		if (ue.getTopText().find("permission") != string::npos)
 		{
 			throw UCLIDException("ELI34204",
+				"You do not appear to have sufficient permissions to clear the database.",
+				ue);
+		}
+		
+		throw ue;
+	}
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::init80DB()
+{
+	try
+	{
+		try
+		{
+			// Get the connection pointer
+			_ConnectionPtr ipConnection = getDBConnection();
+
+			CSingleLock lock(&m_mutex, TRUE);
+
+			// Begin a transaction
+			TransactionGuard tg(ipConnection);
+
+			// Add the tables back
+			addTables80();
+
+			// Setup the tables that require initial values
+			initializeTableValues80();
+
+			tg.CommitTrans();
+
+			// Add the Product specific db after the base tables have been committed
+			addProductSpecificDB80();
+
+			// Shrink the database
+			executeCmdQuery(getDBConnection(), gstrSHRINK_DATABASE);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34237");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (ue.getTopText().find("permission") != string::npos)
+		{
+			throw UCLIDException("ELI34238",
 				"You do not appear to have sufficient permissions to clear the database.",
 				ue);
 		}
