@@ -229,7 +229,7 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 		long lIndex = m_comboActions.GetCurSel();
 		if (lIndex == CB_ERR)
 		{
-			MessageBox("You must select and action to set.", "No Action", MB_OK | MB_ICONERROR);
+			MessageBox("You must select an action to set.", "No Action", MB_OK | MB_ICONERROR);
 			m_comboActions.SetFocus();
 			return;
 		}

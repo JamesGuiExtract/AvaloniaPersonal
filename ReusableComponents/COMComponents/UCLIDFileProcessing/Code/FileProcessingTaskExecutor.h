@@ -103,7 +103,8 @@ private:
 	class StandbyThread : public CWinThread
 	{
 	public:
-		StandbyThread(Win32Event& eventCancelProcessing, unique_ptr<ProcessingTask>& upProcessingTask);
+		StandbyThread(Win32Event& eventCancelProcessing,
+			UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipFileProcessingTask);
 		~StandbyThread();
 
 		// Initialized the instance
@@ -130,7 +131,7 @@ private:
 		// complete.
 		Win32Event m_eventStandbyEnded;
 
-		unique_ptr<ProcessingTask>& m_upProcessingTask;
+		UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr m_ipFileProcessingTask;
 	};
 
 	///////////
@@ -144,6 +145,9 @@ private:
 	// Signaled if standby mode has ended and the executor should not longer wait on any standby
 	// calls that are blocking.
 	Win32Event m_eventEndStandby;
+
+	// Signaled after the standby thread is initialized and is available to be ended.
+	Win32Event m_eventStandbyRunning;
 
 	// List of tasks that will be used to process a file
 	vector< unique_ptr<ProcessingTask> > m_vecProcessingTasks;

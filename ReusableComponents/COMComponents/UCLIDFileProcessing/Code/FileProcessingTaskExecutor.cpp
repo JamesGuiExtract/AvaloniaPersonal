@@ -13,13 +13,13 @@
 // StandbyThread
 //-------------------------------------------------------------------------------------------------
 CFileProcessingTaskExecutor::StandbyThread::StandbyThread(Win32Event& eventCancelProcessing,
-	unique_ptr<ProcessingTask>& upProcessingTask)
+	UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipFileProcessingTask)
 : m_eventCancelProcessing(eventCancelProcessing)
-, m_upProcessingTask(upProcessingTask)
+, m_ipFileProcessingTask(ipFileProcessingTask)
 {
 	try
 	{
-		ASSERT_RESOURCE_ALLOCATION("ELI33938", upProcessingTask.get() != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI33938", m_ipFileProcessingTask != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33939");
 }
@@ -28,6 +28,7 @@ CFileProcessingTaskExecutor::StandbyThread::~StandbyThread()
 {
 	try
 	{
+		m_ipFileProcessingTask = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33942")
 }
@@ -43,7 +44,7 @@ int CFileProcessingTaskExecutor::StandbyThread::Run()
 	try
 	{
 		// The Standby call may block if this is a cancellable task.
-		if (!asCppBool(m_upProcessingTask->Task->Standby()) && !m_eventStandbyEnding.isSignaled())
+		if (!asCppBool(m_ipFileProcessingTask->Standby()) && !m_eventStandbyEnding.isSignaled())
 		{
 			m_eventCancelProcessing.signal();
 		}
@@ -83,7 +84,8 @@ CFileProcessingTaskExecutor::CFileProcessingTaskExecutor() :
 	m_ipCurrentTask(NULL),
 	m_bInitialized(false),
 	m_ipDB(NULL),
-	m_ipFAMTagManager(NULL)
+	m_ipFAMTagManager(NULL),
+	m_eventStandbyRunning(false)
 {
 }
 //--------------------------------------------------------------------------------------------------
@@ -347,7 +349,10 @@ STDMETHODIMP CFileProcessingTaskExecutor::Standby(VARIANT_BOOL *pVal)
 				{
 					if (iterTask->get()->Enabled)
 					{
-						StandbyThread *pStandbyThread = new StandbyThread(eventCancelProcessing, *iterTask);
+						UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipTask = (*iterTask)->Task;
+						ASSERT_RESOURCE_ALLOCATION("ELI34264", ipTask != __nullptr);
+
+						StandbyThread *pStandbyThread = new StandbyThread(eventCancelProcessing, ipTask);
 						vecStandbyThreads.push_back(pStandbyThread);
 
 						pStandbyThread->CreateThread();
@@ -356,6 +361,8 @@ STDMETHODIMP CFileProcessingTaskExecutor::Standby(VARIANT_BOOL *pVal)
 			}
 		
 			HANDLE pEventHandles[] = { eventCancelProcessing.getHandle(), m_eventEndStandby.getHandle() };
+
+			m_eventStandbyRunning.signal();
 		
 			// Wait for either processing to be cancelled or standby mode to end.
 			dwWaitResult = WaitForMultipleObjects(2, pEventHandles, FALSE, INFINITE);
@@ -403,6 +410,9 @@ STDMETHODIMP CFileProcessingTaskExecutor::EndStandby()
 
 	try
 	{
+		// Ensure standby has started before we try to stop it to prevent a race condition.
+		m_eventStandbyRunning.wait();
+
 		m_eventEndStandby.signal();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33928");
