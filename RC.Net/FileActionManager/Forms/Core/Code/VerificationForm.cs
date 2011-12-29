@@ -845,17 +845,45 @@ namespace Extract.FileActionManager.Forms
             }
             set
             {
-                // Lock to prevent a race condition in Standby whereby the form could be disposed
-                // after checking that the UI thread and form are still there but before it accesses
-                // the form.
-                lock (_lockFormChange)
+                try
                 {
-                    if (_form != null)
+                    // Lock to prevent a race condition in Standby whereby the form could be disposed
+                    // after checking that the UI thread and form are still there but before it accesses
+                    // the form.
+                    lock (_lockFormChange)
                     {
-                        _form.Dispose();
-                    }
+                        if (value != _form)
+                        {
+                            if (!_formIsClosing && _form != null)
+                            {
+                                try
+                                {
+                                    // [FlexIDSCore:4965]
+                                    // Close the form here rather than calling dispose. Close is
+                                    // safer because close can be called a second time in case of a
+                                    // race condition, but still results in the form being disposed.
+                                    _form.BeginInvoke(new ParameterlessDelegate(_form.Close));
+                                }
+                                catch (Exception ex)
+                                {
+                                    // [FlexIDSCore:4965]
+                                    // If the form is now disposed, ignore the exception.
+                                    if (!_form.IsDisposed)
+                                    {
+                                        throw ex.AsExtract("ELI34267");
+                                    }
+                                }
 
-                    _form = value;
+                                _formIsClosing = true;
+                            }
+
+                            _form = value;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI34265");
                 }
             }
         }
@@ -944,9 +972,25 @@ namespace Extract.FileActionManager.Forms
             }
             finally
             {
-                _canceledEvent.Set();
+                try
+                {
+                    _canceledEvent.Set();
 
-                MainForm = null;
+                    try
+                    {
+                        MainForm = null;
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractLog("ELI34270");
+                    }
+
+                    _closedEvent.Set();
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractLog("ELI34271");
+                }
             }
         }
 
@@ -1029,8 +1073,33 @@ namespace Extract.FileActionManager.Forms
                         // it to close.
                         _initializedEvent.Reset();
 
-                        // Call Close via Invoke (Synchronous call)
-                        MainForm.Invoke(new ParameterlessDelegate(MainForm.Close));
+                        lock (_lockFormChange)
+                        {
+                            // [FlexIDSCore:4965]
+                            // Ensure MainForm hasn't already been disposed before attempting to
+                            // close it.
+                            if (_formIsClosing || MainForm == null)
+                            {
+                                break;
+                            }
+
+                            try
+                            {
+                                // Call Close via BeginInvoke (Asynchronous call)
+                                MainForm.BeginInvoke(new ParameterlessDelegate(MainForm.Close));
+
+                                _formIsClosing = true;
+                            }
+                            catch (Exception ex)
+                            {
+                                // [FlexIDSCore:4965]
+                                // If the form is now disposed, ignore the exception.
+                                if (!MainForm.IsDisposed)
+                                {
+                                    throw ex.AsExtract("ELI34268");
+                                }
+                            }
+                        }
                     }
 
                     Thread.Sleep(100);
@@ -1059,7 +1128,6 @@ namespace Extract.FileActionManager.Forms
             {
                 // Ensure the thread is set to null so that it will be re-initialized on the next call to Init.
                 _uiThread = null;
-                _closedEvent.Set();
             }
         }
 
