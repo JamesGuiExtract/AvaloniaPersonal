@@ -40,11 +40,11 @@ static const string gstrOTHER_ROUTING_REGEX = "(?<=\\b(?:\\d\\w{0,2}|\\w?\\d\\w?
 
 // Registry keys for MICR finder settings
 static const string gstrMICR_FINDER_KEY =  gstrAF_REG_ROOT_FOLDER_PATH
-	+ string("\\AFValueFinders\\MicrFinder");
+	+ string("\\AFValueFinders\\MicrFinder90");
 static const string gstrMICR_FINDER_FLAGS_KEY = "Flags";
 
 // Default value for the MICR flags registry key
-static const int giMICR_FINDER_FLAGS_DEFAULT = emrfExtendedMicrSearch + emrfEnforceAbaParsing;
+static const int giMICR_FINDER_FLAGS_DEFAULT = emrfEnforceAbaParsing;
 
 //-------------------------------------------------------------------------------------------------
 // Local helper functions
@@ -1212,6 +1212,9 @@ void CMicrFinder::findMICRZones(ISpatialStringPtr ipSpatialString, const vector<
 				ipReader->flags = getMicrReaderFlags();
 				_lastCodePos = "110_E_" + strCount;
 
+				bool bAtLeastOneOrientationSucceeded = false;
+				unique_ptr<UCLIDException> upUexFirst(__nullptr);
+
 				// Now loop through the each version of the image and attempt to find the MICR
 				for(map<int, ICiImagePtr>::iterator mapIt = mapRotationToImage.begin();
 					mapIt != mapRotationToImage.end(); mapIt++)
@@ -1304,16 +1307,29 @@ void CMicrFinder::findMICRZones(ISpatialStringPtr ipSpatialString, const vector<
 								ipImage->Close();
 							}
 							_lastCodePos = "110_E_" + strCount + "_40";
+
+							bAtLeastOneOrientationSucceeded = true;
 						}
 						CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25430");
 					}
 					catch(UCLIDException& uex)
 					{
 						// Add debug info
-						uex.addDebugInfo("Image File", strImageName);
-						uex.addDebugInfo("Rotation", mapIt->first);
-						uex.addDebugInfo("Page Number", *it);
-						throw uex;
+						UCLIDException uexOuter("ELI34278",
+							"Failure when searching for MICR numbers.", uex);
+						uexOuter.addDebugInfo("Image File", strImageName);
+						uexOuter.addDebugInfo("Rotation", mapIt->first);
+						uexOuter.addDebugInfo("Page Number", *it);
+
+						// [FlexIDSCore:4955-4957]
+						// If errors are encountered with any individual orientation, log the error,
+						// then move on. An exception will be thrown only if all orientations failed.
+						if (upUexFirst.get() == __nullptr)
+						{
+							upUexFirst.reset(new UCLIDException(uexOuter));
+						}
+
+						uexOuter.log();
 					}
 				} // End for each rotated image
 
@@ -1328,6 +1344,13 @@ void CMicrFinder::findMICRZones(ISpatialStringPtr ipSpatialString, const vector<
 					}
 				}
 				mapRotationToImage.clear();
+
+				// Throw the first exception encountered if the MICR finder failed for all
+				// orientations.
+				if (!bAtLeastOneOrientationSucceeded && upUexFirst.get() != __nullptr)
+				{
+					throw UCLIDException(*upUexFirst);
+				}
 			}
 			catch(...)
 			{
