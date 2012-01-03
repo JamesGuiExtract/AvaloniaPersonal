@@ -24,37 +24,37 @@ namespace Extract.ReportViewer
         /// <summary>
         /// Relative path to the reports folder (relative to the current applications directory).
         /// </summary>
-        private static readonly string _REPORT_FOLDER_PATH =
+        static readonly string _REPORT_FOLDER_PATH =
             Path.Combine(FileSystemMethods.CommonApplicationDataPath, "Reports");
 
         /// <summary>
         /// Folder which contains the standard reports
         /// </summary>
-        private static readonly string _STANDARD_REPORT_FOLDER =
+        static readonly string _STANDARD_REPORT_FOLDER =
             Path.Combine(_REPORT_FOLDER_PATH, "Standard reports");
 
         /// <summary>
         /// Folder which contains the saved reports
         /// </summary>
-        private static readonly string _SAVED_REPORT_FOLDER =
+        static readonly string _SAVED_REPORT_FOLDER =
             Path.Combine(_REPORT_FOLDER_PATH, "Saved reports");
 
         /// <summary>
         /// The current version of the <see cref="ExtractReport"/> object.
         /// </summary>
-        private static readonly int _VERSION = 2;
+        static readonly int _VERSION = 2;
 
         /// <summary>
         /// The root node of the XML data contained in the parameter file associated
         /// with the report file.
         /// </summary>
-        private static readonly string _ROOT_NODE_NAME = "ExtractReportParameterData";
+        static readonly string _ROOT_NODE_NAME = "ExtractReportParameterData";
 
         /// <summary>
         /// The parameters node of the XML data contained in the parameter file
         /// associated with the report file.
         /// </summary>
-        private static readonly string _PARAMETERS_NODE_NAME = "ReportParameters";
+        static readonly string _PARAMETERS_NODE_NAME = "ReportParameters";
 
         #endregion Constants
 
@@ -324,9 +324,26 @@ namespace Extract.ReportViewer
         }
 
         /// <summary>
+        /// Refreshes the report so that it reflects up-to-date data in the database.
+        /// </summary>
+        public void Refresh()
+        {
+            try
+            {
+                _report.Refresh();
+                SetDatabaseConnection();
+                SetParameters(false);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34275");
+            }
+        }
+
+        /// <summary>
         /// Sets the database connection for the report document object.
         /// </summary>
-        private void SetDatabaseConnection()
+        void SetDatabaseConnection()
         {
             // Set up the log on info for the report
             TableLogOnInfo logOnInfo = new TableLogOnInfo();
@@ -352,35 +369,38 @@ namespace Extract.ReportViewer
         /// or not.</param>
         /// <returns><see langword="true"/> if parameters have been set and
         /// <see langword="false"/> otherwise.</returns>
-        private bool SetParameters(bool promptForParameters)
+        bool SetParameters(bool promptForParameters)
         {
             try
             {
-                // Show the wait cursor while parsing the parameter file
-                using (Extract.Utilities.Forms.TemporaryWaitCursor waitCursor
-                    = new Extract.Utilities.Forms.TemporaryWaitCursor())
+                if (promptForParameters || MissingParameterValue())
                 {
-                    // Parse the parameter file
-                    ParseParameterFile();
-                }
-
-                // Check if prompting
-                if (promptForParameters)
-                {
-                    // Display the parameter prompt
-                    if (!DisplayParameterPrompt())
+                    // Show the wait cursor while parsing the parameter file
+                    using (Extract.Utilities.Forms.TemporaryWaitCursor waitCursor
+                        = new Extract.Utilities.Forms.TemporaryWaitCursor())
                     {
-                        return false;
+                        // Parse the parameter file
+                        ParseParameterFile();
                     }
-                }
-                // Not prompting, need to check for missing parameter values
-                else if (MissingParameterValue())
-                {
-                    // Not prompting, throw an exception
-                    ExtractException ee = new ExtractException("ELI23723",
-                        "Parameter values missing in the XML file!");
-                    ee.AddDebugData("XML File Name", ComputeXmlFileName(), false);
-                    throw ee;
+
+                    // Check if prompting
+                    if (promptForParameters)
+                    {
+                        // Display the parameter prompt
+                        if (!DisplayParameterPrompt())
+                        {
+                            return false;
+                        }
+                    }
+                    // Not prompting, need to check for missing parameter values
+                    else if (MissingParameterValue())
+                    {
+                        // Not prompting, throw an exception
+                        ExtractException ee = new ExtractException("ELI23723",
+                            "Parameter values missing in the XML file!");
+                        ee.AddDebugData("XML File Name", ComputeXmlFileName(), false);
+                        throw ee;
+                    }
                 }
 
                 // Get the collection of parameters
@@ -485,7 +505,7 @@ namespace Extract.ReportViewer
         /// <returns>The number of parameters that were set.</returns>
         /// <exception cref="ExtractException">If the specified parameter was not
         /// set on the report.</exception>
-        private int SetParameterValues(ParameterFieldDefinitions parameters,
+        int SetParameterValues(ParameterFieldDefinitions parameters,
             string parameterName, object value)
         {
             return SetParameterValues(parameters, parameterName, value, true);
@@ -502,7 +522,7 @@ namespace Extract.ReportViewer
         /// If <see langword="false"/> then no exception will be thrown and the
         /// return value will be 0.</param>
         /// <returns>The number of parameters that were set.</returns>
-        private int SetParameterValues(ParameterFieldDefinitions parameters,
+        int SetParameterValues(ParameterFieldDefinitions parameters,
             string parameterName, object value, bool exceptionIfNotSet)
         {
             // Loop through all the parameters on the report looking for
@@ -537,7 +557,7 @@ namespace Extract.ReportViewer
         /// </summary>
         /// <param name="parameter">The parameter to set.</param>
         /// <param name="value">The value to set on the parameter.</param>
-        private static void SetParameterValue(ParameterFieldDefinition parameter, object value)
+        static void SetParameterValue(ParameterFieldDefinition parameter, object value)
         {
             try
             {
@@ -562,7 +582,7 @@ namespace Extract.ReportViewer
         /// </summary>
         /// <returns><see langword="true"/> if a parameter did not have its value
         /// set and <see langword="false"/> otherwise.</returns>
-        private bool MissingParameterValue()
+        bool MissingParameterValue()
         {
             foreach (IExtractReportParameter parameter in _parameters.Values)
             {
@@ -578,7 +598,7 @@ namespace Extract.ReportViewer
         /// <summary>
         /// Parses the parameter XML file.
         /// </summary>
-        private void ParseParameterFile()
+        void ParseParameterFile()
         {
             string xmlFileName = ComputeXmlFileName();
 
@@ -639,7 +659,7 @@ namespace Extract.ReportViewer
         /// Builds the name of the XML file related to the current report.
         /// </summary>
         /// <returns>The name of the XML file for the current report.</returns>
-        private string ComputeXmlFileName()
+        string ComputeXmlFileName()
         {
             string xmlFileName = _reportFileName;
             xmlFileName = Path.GetDirectoryName(xmlFileName) + Path.DirectorySeparatorChar +
@@ -652,7 +672,7 @@ namespace Extract.ReportViewer
         /// </summary>
         /// <param name="xmlReader">The <see cref="XmlTextReader"/> to
         /// read the parameters from.</param>
-        private void ReadParameters(XmlTextReader xmlReader)
+        void ReadParameters(XmlTextReader xmlReader)
         {
             // Read the parameters
             while (xmlReader.Read())
@@ -818,7 +838,7 @@ namespace Extract.ReportViewer
                         }
 
                         // Add the parameter to the collection
-                        _parameters.Add(paramName, param);
+                        _parameters[paramName] = param;
                     }
                     catch (Exception ex)
                     {
@@ -983,7 +1003,7 @@ namespace Extract.ReportViewer
         /// </summary>
         /// <returns><see langword="true"/> if the user clicked OK in parameter
         /// dialog and <see langword="false"/> if the user canceled.</returns>
-        private bool DisplayParameterPrompt()
+        bool DisplayParameterPrompt()
         {
             // Ensure there are parameters to display
             if (_parameters.Count > 0)
@@ -1005,7 +1025,7 @@ namespace Extract.ReportViewer
         /// </summary>
         /// <param name="parameters">The collection of parameters to count.</param>
         /// <returns>The count of "non-linked" parameters on the report.</returns>
-        private static int GetNonLinkedParameterCount(ParameterFieldDefinitions parameters)
+        static int GetNonLinkedParameterCount(ParameterFieldDefinitions parameters)
         {
             try
             {
@@ -1045,7 +1065,7 @@ namespace Extract.ReportViewer
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        private void Dispose(bool disposing)
+        void Dispose(bool disposing)
         {
             // Dispose of managed objects
             if (disposing)

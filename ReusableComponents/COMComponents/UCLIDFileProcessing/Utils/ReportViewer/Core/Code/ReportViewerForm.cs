@@ -585,6 +585,8 @@ namespace Extract.ReportViewer
             {
                 if (_report != null)
                 {
+                    _report.Refresh();
+
                     AttachReportToReportViewer();
                 }
             }
