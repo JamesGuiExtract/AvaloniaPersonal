@@ -331,7 +331,7 @@ namespace Extract.ReportViewer
         /// </summary>
         /// <param name="name">The name of the parameter.</param>
         public DateParameter(string name)
-            : this(name, DateTime.Now)
+            : this(name, DateTime.Now, true)
         {
         }
 
@@ -341,9 +341,24 @@ namespace Extract.ReportViewer
         /// <param name="name">The name of the parameter.</param>
         /// <param name="defaultValue">Sets the default value for
         /// the report parameter.</param>
-        public DateParameter(string name, DateTime defaultValue)
+        /// <param name="showTime"><see langword="true"/> to show the date and time;
+        /// <see langword="false"/> to show only the date.</param>
+        public DateParameter(string name, DateTime defaultValue, bool showTime)
             : base(name, defaultValue)
         {
+            ShowTime = showTime;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to show the time time.
+        /// </summary>
+        /// <value><see langword="true"/> to show the date and time; <see langword="false"/> to show
+        /// only the date.
+        /// </value>
+        public bool ShowTime
+        {
+            get;
+            set;
         }
 
         /// <summary>

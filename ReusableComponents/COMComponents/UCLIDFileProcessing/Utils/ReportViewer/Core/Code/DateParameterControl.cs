@@ -72,6 +72,11 @@ namespace Extract.ReportViewer
                     _dateParameter = dateParameter;
                     _parameterName.Text = _dateParameter.ParameterName;
                     _parameterValue.Value = _dateParameter.ParameterValue;
+                    if (!_dateParameter.ShowTime)
+                    {
+                        _parameterValue.CustomFormat =
+                            _parameterValue.CustomFormat.Replace(" HH:mm", "");
+                    }
                 }
             }
             catch (Exception ex)

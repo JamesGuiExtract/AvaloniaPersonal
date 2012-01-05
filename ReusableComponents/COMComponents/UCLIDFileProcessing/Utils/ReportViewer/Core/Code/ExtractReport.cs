@@ -734,15 +734,26 @@ namespace Extract.ReportViewer
 
                             case "DateParameter":
                                 {
+                                    // Get whether to show the time (or just the date).
+                                    xmlReader.MoveToAttribute("ShowTime");
+                                    bool showTime = true;
+
+                                    if (xmlReader.Name.Equals("ShowTime", StringComparison.Ordinal))
+                                    {
+                                        showTime = Convert.ToBoolean(xmlReader.Value,
+                                            CultureInfo.InvariantCulture);
+                                    }
+
                                     if (string.IsNullOrEmpty(defaultVal))
                                     {
-                                        param = new DateParameter(paramName);
+                                        param = new DateParameter(paramName, DateTime.Now, showTime);
                                     }
                                     else
                                     {
                                         DateTime temp = Convert.ToDateTime(defaultVal,
                                             CultureInfo.InvariantCulture);
-                                        param = new DateParameter(paramName, temp);
+
+                                        param = new DateParameter(paramName, temp, showTime);
                                     }
                                 }
                                 break;
