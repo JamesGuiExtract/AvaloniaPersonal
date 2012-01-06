@@ -1,0 +1,72 @@
+<HTML>
+
+<HEAD>
+<TITLE>8.0.4 Patch/Upgrade Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.0.4<br>Patch/Upgrade Testing </h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>SCRs:</b> DotNetRC #763
+	<LI><b>Issue:</b> The GetAbsolutePath() method is used to expand a relative path into 
+	a fully-qualified absolute path.  The root path used in the code is 
+	Application.GetExecutablePath. Everywhere in the Extract code base that GetAbsolutePath 
+	is called, CommonComponents is the desired result.  This causes a problem when our 
+	software is being used via API, especially in a web form when the <b>Application</b> 
+	object is a web browser</li>
+	<LI><b>Solution:</b> Modify the code in GetAbsolutePath() to return the path to 
+	the <b>CommonComponents</b> folder. </li>
+</ul>
+<p>
+<h3>Tests</h3>
+<OL>
+	<LI><b>Installation</b>
+	<ul>
+		<li>Confirm that the installation batch file runs without error.
+		<li>Confirm that the batch file can be run from a drive other than the
+		drive containing the CommonComponents folder (i.e. if the CommonComponents
+		folder is on the C drive, confirm that the install can be run on the D drive).
+		<li>Confirm that the batch file can be run from a folder within the Extract Systems
+		folder in ProgramFiles (Mike sometimes creates a folder parallel to
+		CommonComponents called Patches with subfolders for each patch applied and
+		will run the install.bat from the subfolder).
+		<li>Confirm that updated files exist on the test machine.
+	</ul>
+<p>
+	<LI><b>Testing</b>
+	<ul>
+		<li>Excercise a partial <a href="../../SanityTests/SanityTests.html">Sanity Test</a>
+		checklist on a 32 bit desktop OS.</li>
+		<ul>
+			<li>Basic exercise of utility functionality
+			<li>ID Shield demo
+		</ul>
+		<li>Excercise a partial <a href="../../SanityTests/SanityTests.html">Sanity Test</a>
+		checklist on a 64 bit server OS.</li>
+		<ul>
+			<li>Basic exercise of utility functionality
+			<li>ID Shield demo
+		</ul>
+		<li>Excercise the following <b>tasks</b>:
+		<ul>
+			<li>Redaction: Create metadata xml
+			<li>Redaction: Extend redactions to surround context
+			<li>Redaction: Verify sensitive data
+		</ul>
+		<li>Excercise the following <b>utilities</b>:
+		<ul>
+			<li>IDShieldStatisticsReporter.exe
+			<li>ReportViewer.exe
+			<li>RunFPSFile.exe
+			<li>SplitMultipageImage.exe
+		</ul>
+		<li>Exercise the <b>C# sample project</b> originally provided to Fairfax County by Jeff.
+	</ul>
+</OL>
+</BODY>
+</HTML>
