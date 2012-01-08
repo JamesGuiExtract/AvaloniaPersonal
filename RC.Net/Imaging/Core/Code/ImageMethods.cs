@@ -679,10 +679,32 @@ namespace Extract.Imaging
         {
             try
             {
+                ConvertPdfToTif(inputFile, outputFile);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34310");
+            }
+        }
+
+        /// <summary>
+        /// Converts the PDF to tif.
+        /// </summary>
+        /// <param name="inputFile">The input file.</param>
+        /// <param name="outputFile">The output file.</param>
+        /// <param name="useAlternateMethod"><see langword="true"/> to use the alternate method of
+        /// conversion; otherwise <see langword="false"/>.</param>
+        public static void ConvertPdfToTif(string inputFile, string outputFile,
+            bool useAlternateMethod)
+        {
+            try
+            {
                 LicenseUtilities.ValidateLicense(LicenseIdName.PdfReadWriteFeature,
                     "ELI32223", "Convert PDF to TIF");
 
-                var arguments = new string[] { inputFile, outputFile, "/tif" };
+                var arguments = useAlternateMethod
+                    ? new string[] { inputFile, outputFile, "/tif", "/am" }
+                    : new string[] { inputFile, outputFile, "/tif" };
                 SystemMethods.RunExtractExecutable(_IMAGE_FORMAT_CONVERTER, arguments);
             }
             catch (Exception ex)

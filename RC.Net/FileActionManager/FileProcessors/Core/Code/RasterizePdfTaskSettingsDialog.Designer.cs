@@ -44,6 +44,7 @@
             this._browseOutputFile = new Extract.Utilities.Forms.BrowseButton();
             this._pathTagsButtonPdfFile = new Extract.Utilities.Forms.PathTagsButton();
             this._browsePdfFile = new Extract.Utilities.Forms.BrowseButton();
+            this._checkUseAltMethod = new System.Windows.Forms.CheckBox();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             this._groupDeleteFailed.SuspendLayout();
@@ -113,7 +114,7 @@
             // 
             this._buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._buttonCancel.Location = new System.Drawing.Point(353, 207);
+            this._buttonCancel.Location = new System.Drawing.Point(353, 239);
             this._buttonCancel.Name = "_buttonCancel";
             this._buttonCancel.Size = new System.Drawing.Size(75, 23);
             this._buttonCancel.TabIndex = 9;
@@ -123,7 +124,7 @@
             // _buttonOk
             // 
             this._buttonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonOk.Location = new System.Drawing.Point(272, 207);
+            this._buttonOk.Location = new System.Drawing.Point(272, 239);
             this._buttonOk.Name = "_buttonOk";
             this._buttonOk.Size = new System.Drawing.Size(75, 23);
             this._buttonOk.TabIndex = 8;
@@ -135,7 +136,7 @@
             // 
             this._groupDeleteFailed.Controls.Add(this._radioIgnoreError);
             this._groupDeleteFailed.Controls.Add(this._radioFailTask);
-            this._groupDeleteFailed.Location = new System.Drawing.Point(12, 136);
+            this._groupDeleteFailed.Location = new System.Drawing.Point(12, 161);
             this._groupDeleteFailed.Name = "_groupDeleteFailed";
             this._groupDeleteFailed.Size = new System.Drawing.Size(358, 65);
             this._groupDeleteFailed.TabIndex = 10;
@@ -208,13 +209,24 @@
             this._browsePdfFile.TextControl = this._textPdfFile;
             this._browsePdfFile.UseVisualStyleBackColor = true;
             // 
+            // _checkUseAltMethod
+            // 
+            this._checkUseAltMethod.AutoSize = true;
+            this._checkUseAltMethod.Location = new System.Drawing.Point(12, 136);
+            this._checkUseAltMethod.Name = "_checkUseAltMethod";
+            this._checkUseAltMethod.Size = new System.Drawing.Size(186, 17);
+            this._checkUseAltMethod.TabIndex = 11;
+            this._checkUseAltMethod.Text = "Use alternate rasterization method";
+            this._checkUseAltMethod.UseVisualStyleBackColor = true;
+            // 
             // RasterizePdfTaskSettingsDialog
             // 
             this.AcceptButton = this._buttonOk;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._buttonCancel;
-            this.ClientSize = new System.Drawing.Size(440, 242);
+            this.ClientSize = new System.Drawing.Size(440, 274);
+            this.Controls.Add(this._checkUseAltMethod);
             this.Controls.Add(this._textPdfFile);
             this.Controls.Add(this._groupDeleteFailed);
             this.Controls.Add(this._buttonOk);
@@ -258,5 +270,6 @@
         private System.Windows.Forms.RadioButton _radioIgnoreError;
         private System.Windows.Forms.RadioButton _radioFailTask;
         private System.Windows.Forms.GroupBox _groupDeleteFailed;
+        private System.Windows.Forms.CheckBox _checkUseAltMethod;
     }
 }

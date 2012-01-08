@@ -68,6 +68,14 @@ namespace Extract.FileActionManager.FileProcessors
         /// the converted file.
         /// </value>
         bool ChangeSourceDocName { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to use the alternate method of rasterization.
+        /// </summary>
+        /// <value><see langword="true"/> to use the alternate method of rasterization; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        bool UseAlternateMethod { get; set; }
     }
 
     /// <summary>
@@ -89,8 +97,10 @@ namespace Extract.FileActionManager.FileProcessors
 
         /// <summary>
         /// Current task version.
+        /// <para><b>Version 2</b></para>
+        /// Added UseAlternateMethod.
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
 
         #endregion Constants
 
@@ -120,6 +130,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// Whether or not the source doc name should be modified in the database.
         /// </summary>
         bool _changeSourceDocName;
+
+        /// <summary>
+        /// Indicates whether to use the alternate method of rasterization.
+        /// </summary>
+        bool _useAlternateMethod;
 
         /// <summary>
         /// Indicates that settings have been changed, but not saved.
@@ -290,6 +305,26 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether to use the alternate method of rasterization.
+        /// </summary>
+        /// <value><see langword="true"/> to use the alternate method of rasterization; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool UseAlternateMethod
+        {
+            get
+            {
+                return _useAlternateMethod;
+            }
+
+            set
+            {
+                _dirty |= _useAlternateMethod != value;
+                _useAlternateMethod = value;
+            }
+        }
+
         #endregion IRasterizePdfTask Members
 
         #region ICategorizedComponent Members
@@ -317,7 +352,8 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 using (var dialog = new RasterizePdfTaskSettingsDialog(
-                    _pdfFile, _destinationFile, _deletePdf, _failTask, _changeSourceDocName))
+                    _pdfFile, _destinationFile, _deletePdf, _failTask, _changeSourceDocName,
+                    _useAlternateMethod))
                 {
                     if (dialog.ShowDialog() == DialogResult.OK)
                     {
@@ -327,6 +363,7 @@ namespace Extract.FileActionManager.FileProcessors
                         DeletePdfFile = dialog.DeletePdf;
                         FailTaskIfDeleteFails = dialog.FailIfDeleteFails;
                         ChangeSourceDocName = dialog.ChangeSourceDocName;
+                        UseAlternateMethod = dialog.UseAlternateMethod;
 
                         return true;
                     }
@@ -523,7 +560,11 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 // Convert to TIF
-                ImageMethods.ConvertPdfToTif(pdfFile, destFile);
+                // Since ImageMethod's (and ImageFormatConverter's) "alternate method" is Nuance,
+                // but Nuance produces better results on color PDFs and does not suffer from
+                // [DotNetRCAndUtils:742], in terms of this task the default method will be Nuance
+                // and the alternate will be LeadTools.
+                ImageMethods.ConvertPdfToTif(pdfFile, destFile, !_useAlternateMethod);
 
                 // Delete PDF if specified
                 if (_deletePdf)
@@ -657,6 +698,10 @@ namespace Extract.FileActionManager.FileProcessors
                     _deletePdf = reader.ReadBoolean();
                     _failTask = reader.ReadBoolean();
                     _changeSourceDocName = reader.ReadBoolean();
+                    if (reader.Version >= 2)
+                    {
+                        _useAlternateMethod = reader.ReadBoolean();
+                    }
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -689,6 +734,7 @@ namespace Extract.FileActionManager.FileProcessors
                     writer.Write(_deletePdf);
                     writer.Write(_failTask);
                     writer.Write(_changeSourceDocName);
+                    writer.Write(_useAlternateMethod);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -756,6 +802,7 @@ namespace Extract.FileActionManager.FileProcessors
                 _deletePdf = task._deletePdf;
                 _failTask = task._failTask;
                 _changeSourceDocName = task._changeSourceDocName;
+                _useAlternateMethod = task._useAlternateMethod;
             }
             catch (Exception ex)
             {

@@ -71,6 +71,14 @@ namespace Extract.FileActionManager.FileProcessors
         /// </value>
         public bool ChangeSourceDocName { get; private set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether to use the alternate method of rasterization.
+        /// </summary>
+        /// <value><see langword="true"/> to use the alternate method of rasterization; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool UseAlternateMethod { get; private set; }
+
         #endregion Fields
 
         #region Constructors
@@ -79,7 +87,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// Initializes a new instance of the <see cref="RasterizePdfTaskSettingsDialog"/> class.
         /// </summary>
         public RasterizePdfTaskSettingsDialog()
-            : this(null, null, false, true, false)
+            : this(null, null, false, true, false, false)
         {
         }
 
@@ -94,8 +102,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// the PDF file there is an error.</param>
         /// <param name="changeSourceDocName">Whether or not the SourceDocName should be
         /// updated after conversion.</param>
+        /// <param name="useAlternateMethod"><see langword="true"/> to use the alternate method of
+        /// rasterization; otherwise, <see langword="false"/>.</param>
         public RasterizePdfTaskSettingsDialog(string pdfFile, string convertedFile,
-            bool deletePdf, bool failIfDeleteFails, bool changeSourceDocName)
+            bool deletePdf, bool failIfDeleteFails, bool changeSourceDocName,
+            bool useAlternateMethod)
         {
             try
             {
@@ -114,6 +125,8 @@ namespace Extract.FileActionManager.FileProcessors
                 // Changing source doc name is only valid if the input PDF file is SourceDocName
                 ChangeSourceDocName = PdfFile.Equals(_DEFAULT_PDF_FILE, StringComparison.Ordinal)
                     && changeSourceDocName;
+
+                UseAlternateMethod = useAlternateMethod;
             }
             catch (Exception ex)
             {
@@ -146,6 +159,7 @@ namespace Extract.FileActionManager.FileProcessors
                     _DEFAULT_PDF_FILE, StringComparison.Ordinal);
                 _checkModifySourceDoc.Checked = _checkModifySourceDoc.Enabled
                     && ChangeSourceDocName;
+                _checkUseAltMethod.Checked = UseAlternateMethod;
             }
             catch (Exception ex)
             {
@@ -208,6 +222,7 @@ namespace Extract.FileActionManager.FileProcessors
                 ChangeSourceDocName = _checkModifySourceDoc.Enabled && _checkModifySourceDoc.Checked;
                 DeletePdf = _checkDeletePdf.Checked;
                 FailIfDeleteFails = _radioFailTask.Checked;
+                UseAlternateMethod = _checkUseAltMethod.Checked;
 
                 DialogResult = DialogResult.OK;
             }

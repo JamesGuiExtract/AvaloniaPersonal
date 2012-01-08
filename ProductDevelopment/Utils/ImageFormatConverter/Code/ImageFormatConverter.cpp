@@ -22,6 +22,10 @@
 #include <EncryptionEngine.h>
 #include <RegistryPersistenceMgr.h>
 #include <RegConstants.h>
+#include <KernelAPI.h>
+#include "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\OcrConstants.h"
+#include "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\OcrMethods.h"
+#include "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\ScansoftErr.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -43,6 +47,82 @@ const L_INT giJPG_COMPRESS_DEFAULT = 50;
 const string gstrIMAGE_FORMAT_CONVERTER = "\\ImageFormatConverter";
 const string gstrEXPAND_FOR_PDF = "ExpandImageForPdfConversion";
 const string gstrDEFAULT_EXPAND_FOR_PDF = "1";
+
+//-------------------------------------------------------------------------------------------------
+// Macros
+//-------------------------------------------------------------------------------------------------
+
+// the following macro is used to simplify the process of throwing exception 
+// when a RecAPI call has failed
+#define THROW_UE(strELICode, strExceptionText, rc) \
+	{ \
+		UCLIDException ue(strELICode, strExceptionText); \
+		loadScansoftRecErrInfo(ue, rc); \
+		throw ue; \
+	}
+
+// the following macro is used to simplify the process of checking the return code
+// from the RecApi calls and throwing exception if the return code is not REC_OK
+#define THROW_UE_ON_ERROR(strELICode, strExceptionText, RecAPICall) \
+	{ \
+		RECERR rc = ##RecAPICall; \
+		if (rc != REC_OK) \
+		{ \
+			THROW_UE(strELICode, strExceptionText, rc); \
+		} \
+	}
+
+//-------------------------------------------------------------------------------------------------
+// RecMemoryReleaser
+//-------------------------------------------------------------------------------------------------
+template<typename MemoryType>
+RecMemoryReleaser<MemoryType>::RecMemoryReleaser(MemoryType* pMemoryType)
+ : m_pMemoryType(pMemoryType)
+{
+
+}
+//-------------------------------------------------------------------------------------------------
+template<>
+RecMemoryReleaser<tagIMGFILEHANDLE>::~RecMemoryReleaser()
+{
+	try
+	{
+		// The image may have been closed before the call to destructor. Don't both checking error
+		// code.
+		kRecCloseImgFile(m_pMemoryType);
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI34283");
+}
+//-------------------------------------------------------------------------------------------------
+template<>
+RecMemoryReleaser<RECPAGESTRUCT>::~RecMemoryReleaser()
+{
+	try
+	{
+		RECERR rc = kRecFreeRecognitionData(m_pMemoryType);
+
+		// log any errors
+		if (rc != REC_OK)
+		{
+			UCLIDException ue("ELI34284", 
+				"Application trace: Unable to release recognition data. Possible memory leak.");
+			loadScansoftRecErrInfo(ue, rc);
+			ue.log();
+		}
+
+		rc = kRecFreeImg(m_pMemoryType);
+
+		// log any errors
+		if (rc != REC_OK)
+		{
+			UCLIDException ue("ELI34285", 
+				"Application trace: Unable to release page image. Possible memory leak.");
+			loadScansoftRecErrInfo(ue, rc);
+			ue.log();
+		}
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI34286");
+}
 
 //-------------------------------------------------------------------------------------------------
 // CImageFormatConverterApp
@@ -181,6 +261,185 @@ bool expandImageWhenConvertingPdf()
 
 	return asCppBool(regMgr.getKeyValue(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF,
 		gstrDEFAULT_EXPAND_FOR_PDF));
+}
+//-------------------------------------------------------------------------------------------------
+void initNuanceEngineAndLicense()
+{
+	try
+	{
+		// initialize the OEM license using the license file that is expected to exist
+		// in the same directory as this DLL 
+		RECERR rc = kRecSetLicense(__nullptr, gpszOEM_KEY);
+		if (rc != REC_OK && rc != API_INIT_WARN)
+		{
+			// create the exception object to throw to outer scope
+			try
+			{
+				THROW_UE("ELI34307", "Unable to load Nuance engine license file!", rc);
+			}
+			catch (UCLIDException& ue)
+			{
+				loadScansoftRecErrInfo(ue, rc);
+				throw ue;
+			}
+		}
+
+		// Initialization of OCR engine	
+		rc = kRecInit("Extract Systems", "ImageFormatConverter");
+		if (rc != REC_OK && rc != API_INIT_WARN)
+		{
+			// create the exception object to throw to outer scope
+			THROW_UE("ELI34308", "Unable to initialize Nuance engine!", rc);
+		}
+
+		// if rc is API_INIT_WARN, ensure that the required modules are available
+		if (rc == API_INIT_WARN)
+		{
+			LPKRECMODULEINFO pModules;
+			size_t size;
+			THROW_UE_ON_ERROR("ELI34298", "Unable to obtain modules information from the Nuance engine!",
+				kRecGetModulesInfo(&pModules, &size));
+			
+			// if a required library module is not there, do not continue.
+			if (pModules[INFO_MOR].Version <= 0)
+			{
+				THROW_UE("ELI34299", "Unable to find required MOR module for Nuance engine to run.", rc);
+			}
+			if(pModules[INFO_MTX].Version <= 0)
+			{
+				THROW_UE("ELI34300", "Unable to find required MTX module for Nuance engine to run.", rc);
+			}
+			if (pModules[INFO_PLUS2W].Version <= 0)
+			{
+				THROW_UE("ELI34301", "Unable to find required PLUS2W module for Nuance engine to run.", rc);
+			}
+			if (pModules[INFO_PLUS3W].Version <= 0)
+			{
+				THROW_UE("ELI34302", "Unable to find required PLUS3W module for Nuance engine to run.", rc);
+			}
+			if (pModules[INFO_HNR].Version <= 0)
+			{
+				THROW_UE("ELI34303", "Unable to find required HNR module for Nuance engine to run.", rc);
+			}
+			if (pModules[INFO_RER].Version <= 0)
+			{
+				THROW_UE("ELI34304", "Unable to find required RER module for Nuance engine to run.", rc);
+			}
+			if(pModules[INFO_DOT].Version <= 0)
+			{
+				THROW_UE("ELI34305", "Unable to find required DOT module for Nuance engine to run.", rc);
+			}
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34306")
+}
+//-------------------------------------------------------------------------------------------------
+// Will perform the image conversion
+void nuanceConvertImage(const string strInputFileName, const string strOutputFileName, 
+				  EConverterFileType eOutputType)
+{
+	IMF_FORMAT nFormat(FF_TIFNO);
+	int nPage(0);
+
+	try
+	{
+		try
+		{
+			// initialize the Nuance engine and any necessary licensing thereof
+			initNuanceEngineAndLicense();
+
+			// Set format and temp file extension based on the ouput type. If the extension doesn't
+			// match the format, the nuance engine will throw and error when saving.
+			string strExt;
+			switch (eOutputType)
+			{
+				case kFileType_Tif:
+					nFormat = FF_TIFG4;
+					strExt = ".tif";
+					break;
+
+				case kFileType_Pdf:
+					nFormat = FF_PDF_SUPERB;
+					strExt = ".pdf";
+					break;
+
+				case kFileType_Jpg:
+					nFormat = FF_JPG_SUPERB;
+					strExt = ".jpg";
+					break;
+			}
+
+			// Create a temporary file into which the results should be written until the entire
+			// document has been output.
+			unique_ptr<TemporaryFileName> pTempOutputFile(new TemporaryFileName(true, NULL, strExt.c_str()));
+			string strTempOutputFileName = pTempOutputFile->getName();
+			// If the destination file name exists before Nuance tries to open it, it will throw an error.
+			deleteFile(strTempOutputFileName);
+
+			THROW_UE_ON_ERROR("ELI34294", "Unable to set image conversion method.",
+				kRecSetImgConvMode(0, CNV_AUTO));
+
+			HIMGFILE hInputImage;
+			THROW_UE_ON_ERROR("ELI34295", "Unable to open source image file.",
+				kRecOpenImgFile(strInputFileName.c_str(), &hInputImage, IMGF_READ, FF_SIZE));
+
+			// Ensure that the memory stored for the image file is released
+			RecMemoryReleaser<tagIMGFILEHANDLE> inputImageFileMemoryReleaser(hInputImage);
+
+			HIMGFILE hOutputImage;
+			THROW_UE_ON_ERROR("ELI34296", "Unable to create destination image file.",
+				kRecOpenImgFile(strTempOutputFileName.c_str(), &hOutputImage, IMGF_RDWR, FF_SIZE));
+
+			// Ensure that the memory stored for the image file is released
+			RecMemoryReleaser<tagIMGFILEHANDLE> outputImageFileMemoryReleaser(hOutputImage);
+
+			int nPageCount(0);
+			THROW_UE_ON_ERROR("ELI34297", "Unable to determine page count.",
+				kRecGetImgFilePageCount(hInputImage, &nPageCount));
+
+			if (nPageCount > 1 && eOutputType == kFileType_Jpg)
+			{
+				throw UCLIDException("ELI34293", "Cannot output multi-page image in jpg format.");
+			}
+
+			for (nPage = 0; nPage < nPageCount; nPage++)
+			{
+				// NOTE: RecAPI uses zero-based page number indexes
+				HPAGE hImagePage;
+				loadPageFromImageHandle(strInputFileName, hInputImage, nPage, &hImagePage);
+
+				// Ensure that the memory stored for the image page is released.
+				RecMemoryReleaser<RECPAGESTRUCT> pageMemoryReleaser(hImagePage);
+
+				if (eOutputType == kFileType_Jpg)
+				{
+					THROW_UE_ON_ERROR("ELI34291", "Cannot save to image page in jpg format.",
+						kRecSaveImgForce(0, hOutputImage, nFormat, hImagePage, II_CURRENT, FALSE));
+				}
+				else
+				{
+					THROW_UE_ON_ERROR("ELI34292", "Cannot save to image page in the specified format.",
+						kRecSaveImg(0, hOutputImage, nFormat, hImagePage, II_CURRENT, TRUE));
+				}
+			}
+
+			nPage = -1;
+
+			// Although RecMemoryReleaser will close the file as well, if it is not closed before
+			// copying it to the permanent location, it may be corrupted.
+			kRecCloseImgFile(hOutputImage);
+
+			copyFile(strTempOutputFileName, strOutputFileName);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34281");
+	}
+	catch (UCLIDException &ue)
+	{
+		ue.addDebugInfo("Source image", strInputFileName);
+		ue.addDebugInfo("Page", asString(nPage + 1));
+		ue.addDebugInfo("Format", asString((int)nFormat));
+		throw ue;
+	}
 }
 //-------------------------------------------------------------------------------------------------
 // Will perform the image conversion and will also retain the existing annotations
@@ -516,13 +775,16 @@ void usage()
 					"The optional argument /vp [perspective_id] will set the view perspective of "
 					"the output to the specified value (1-8) or to 1 (top-left) if the "
 					"perspective_id is not specified.\n"
+					"The optional argument /am will use an alternate method to perform the \n"
+					"conversion. This option is not compatible with any other optional argument \n"
+					" except '/ef'. \n"
 					"The optional argument (/ef <filename>) fully specifies the location \n"
 					"of an exception log that will store any thrown exception.  Without \n"
 					"an exception log, any thrown exception will be displayed.\n\n";
 		strUsage += "Usage:\n";
 		strUsage += "ImageFormatConverter.exe <strInput> <strOutput> <out_type> [/retain] "
 					"[/user \"<Password>\"] [/owner \"<Password>\" <Permissions>] [/vp [perspective_id]] "
-					"[/ef <filename>]\n"
+					"[/am] [/ef <filename>]\n"
 					"where:\n"
 					"out_type is /pdf, /tif or /jpg,\n"
 					"<Password> is the password to apply (user and/or owner) to the PDF (requires out_type = /pdf).\n"
@@ -622,6 +884,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 				long nOwnerPermissions = 0;
 				bool bEncryptedPasswords = false;
 				long nViewPerspective = 0;
+				bool bUseNuance = false;
 				for (size_t i=3; i < uiParamCount; i++)
 				{
 					string strTemp = vecParams[i];
@@ -697,6 +960,10 @@ BOOL CImageFormatConverterApp::InitInstance()
 							}
 						}
 					}
+					else if (strTemp == "/am")
+					{
+						bUseNuance = true;
+					}
 					else if (strTemp == "/ef")
 					{
 						i++;
@@ -751,20 +1018,34 @@ BOOL CImageFormatConverterApp::InitInstance()
 				LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 				validateLicense();
 
-				if (bRetainAnnotations)
+				if (bUseNuance)
 				{
-					// Unlock Leads document support
-					unlockDocumentSupport();
+					if (bRetainAnnotations || !strUserPassword.empty() || !strOwnerPassword.empty() ||
+						nOwnerPermissions != 0 || nViewPerspective != 0)
+					{
+						usage();
+						return FALSE;
+					}
+
+					nuanceConvertImage(strInputName, strOutputName, eOutputType);
 				}
+				else
+				{
+					if (bRetainAnnotations)
+					{
+						// Unlock Leads document support
+						unlockDocumentSupport();
+					}
 
-				// Unlock support for PDF Reading and Writing
-				// (Only unlocks if PDF support is licensed)
-				initPDFSupport();
+					// Unlock support for PDF Reading and Writing
+					// (Only unlocks if PDF support is licensed)
+					initPDFSupport();
 
-				// Convert the file
-				convertImage(strInputName, strOutputName, eOutputType, bRetainAnnotations,
-					this->m_hInstance, strUserPassword, strOwnerPassword, nOwnerPermissions,
-					nViewPerspective);
+					// Convert the file
+					convertImage(strInputName, strOutputName, eOutputType, bRetainAnnotations,
+						this->m_hInstance, strUserPassword, strOwnerPassword, nOwnerPermissions,
+						nViewPerspective);
+				}
 
 				// No UI needed, just return
 			}
