@@ -725,6 +725,8 @@ void writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, BSTR bstrO
 				  bool bClearDirty, string strSignature)
 {
 	TemporaryFileName *pTempOutFile = __nullptr;
+	IStreamPtr ipStream(__nullptr);
+	IStoragePtr ipStorage(__nullptr);
 
 	try
 	{
@@ -752,7 +754,6 @@ void writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, BSTR bstrO
 			}
 
 			// Create the file storage object
-			IStoragePtr ipStorage;
 			HRESULT hr = waitForStgFileCreate(get_bstr_t(strFileName), &ipStorage, gdwSTORAGE_CREATE_MODE);
 			if (ipStorage == __nullptr || FAILED(hr))
 			{
@@ -765,7 +766,6 @@ void writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, BSTR bstrO
 			try
 			{
 				// Create a stream within the storage object to store the object
-				IStreamPtr ipStream;
 				hr = ipStorage->CreateStream(bstrObjectName, gdwSTREAM_CREATE_MODE, 0, 0, &ipStream);
 				if (ipStream == __nullptr || FAILED(hr))
 				{
@@ -819,6 +819,10 @@ void writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, BSTR bstrO
 			}
 			catch (...)
 			{
+				// Ensure the stream and storage are closed [LRCAU #5078]
+				ipStream = __nullptr;
+				ipStorage = __nullptr;
+
 				// The object could not be streamed successfully. Delete the output file.
 				try
 				{

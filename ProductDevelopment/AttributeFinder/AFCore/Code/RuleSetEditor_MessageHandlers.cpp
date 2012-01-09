@@ -1769,7 +1769,9 @@ void CRuleSetEditor::OnTimer(UINT nIDEvent)
 
 		CDialog::OnTimer(nIDEvent);
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI05506")
+	// [FlexIDSCore:4974]
+	// The user should not be harassed for problems with the auto-save; log instead.
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI05506")
 }
 //-------------------------------------------------------------------------------------------------
 LRESULT CRuleSetEditor::OnItemchangedListRules(WPARAM wParam, LPARAM lParam) 
