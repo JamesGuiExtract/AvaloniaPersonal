@@ -365,7 +365,25 @@ namespace Extract.Redaction.Verification
             }
             set
             {
-                _dirty = value;
+                try
+                {
+                    if (value != _dirty)
+                    {
+                        if (value == false)
+                        {
+                            // [FlexIDSCore:4747]
+                            // If marking the grid as not dirty, also clear the running list of deleted
+                            // items so they don't get reported on with subsequent saves.
+                            _deletedItems.Clear();
+                        }
+
+                        _dirty = value;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI34317");
+                }
             }
         }
 

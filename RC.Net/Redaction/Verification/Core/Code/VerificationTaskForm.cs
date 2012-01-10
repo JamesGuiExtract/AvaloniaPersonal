@@ -834,23 +834,17 @@ namespace Extract.Redaction.Verification
                             return SaveRedactedImage(memento);
                         }
 
-                        // If there isn't a VOA file for the document, create a temporary VOA file
-                        // to supply to _redactedOutputTask.
-                        if (!File.Exists(memento.AttributesFile))
-                        {
-                            tempVoaFile = new TemporaryFile(".voa", true);
-                            _redactedOutputTask.VOAFileName = tempVoaFile.FileName;
+                        // Whether or not there is a VOA file for the document, create a temporary
+                        // VOA file from the memento to supply redactions to _redactedOutputTask
+                        // even if the main VOA file wasn't saved.
+                        tempVoaFile = new TemporaryFile(".voa", true);
+                        _redactedOutputTask.VOAFileName = tempVoaFile.FileName;
 
-                            RedactionFileChanges changes = _redactionGridView.SaveChanges(memento.SourceDocument);
-                            _currentVoa.SaveVerificationSession(tempVoaFile.FileName,
-                                changes, new TimeInterval(DateTime.Now, 0), _settings, _standAloneMode);
+                        RedactionFileChanges changes = _redactionGridView.SaveChanges(memento.SourceDocument);
+                        _currentVoa.SaveVerificationSession(tempVoaFile.FileName,
+                            changes, new TimeInterval(DateTime.Now, 0), _settings, _standAloneMode);
 
-                            _redactedOutputTask.VOAFileName = tempVoaFile.FileName;
-                        }
-                        else
-                        {
-                            _redactedOutputTask.VOAFileName = memento.AttributesFile;
-                        }
+                        _redactedOutputTask.VOAFileName = tempVoaFile.FileName;
 
                         _redactedOutputTask.OutputFileName = saveFileDialog.FileName;
 
@@ -1377,16 +1371,11 @@ namespace Extract.Redaction.Verification
         /// modified or if changes were successfully discarded or saved.</returns>
         bool WarnIfDirty()
         {
-            // If the user is in standalone mode, the current document doesn't have a VOA file and
-            // they are configured no to create one, there's no need to prompt about a dirty file.
-            if (_standAloneMode &&
-                _config.Settings.OnDemandCreateVOAFileMode == OnDemandCreateVOAFileMode.DoNotCreate)
+            // [FlexIDSCore:4708]
+            // If in stand-alone mode, there are different prompts that need to be displayed.
+            if (_standAloneMode)
             {
-                VerificationMemento memento = GetCurrentDocument();
-                if (memento != null && !File.Exists(memento.AttributesFile))
-                {
-                    return false;
-                }
+                return WarnIfDirtyStandAlone();
             }
 
             // Check if the viewed document is dirty
@@ -1444,6 +1433,107 @@ namespace Extract.Redaction.Verification
                             // Resume the slideshow
                             StartSlideshow();
                         }
+                    }
+                }
+            }
+            else
+            {
+                UpdateMemento();
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Displays a warning message that allows the user to save or discard any changes to the
+        /// data file and to output a redacted image. For use  when redaction verification is in
+        /// stand-alone mode. If no changes have been made, no message is displayed.
+        /// </summary>
+        /// <returns><see langword="true"/> if the user chose to cancel or the user tried to save 
+        /// with invalid data; <see langword="false"/> if the currently viewed document was not 
+        /// modified or if changes were successfully discarded or saved.</returns>
+        bool WarnIfDirtyStandAlone()
+        {
+            ExtractException.Assert("ELI34314", "Internal logic error.", _standAloneMode);
+
+            // Check if the viewed document is dirty
+            if (_redactionGridView.Dirty)
+            {
+                bool voaSaveNeeded = true;
+
+                VerificationMemento memento = GetCurrentDocument();
+
+                // If the current document doesn't have a VOA file and they are configured not to
+                // create one, there's no need to prompt about a dirty file.
+                if (_config.Settings.OnDemandCreateVOAFileMode == OnDemandCreateVOAFileMode.DoNotCreate)
+                {
+                    if (memento != null && !File.Exists(memento.AttributesFile))
+                    {
+                        voaSaveNeeded = false;
+                    }
+                }
+
+                if (voaSaveNeeded)
+                {
+                    using (CustomizableMessageBox messageBox = new CustomizableMessageBox())
+                    {
+                        // Prompt for if the data file already exists.
+                        if (File.Exists(memento.AttributesFile))
+                        {
+                            messageBox.Caption = "Save changes?";
+                            messageBox.Text = "Changes made to this document's data file have not been saved." +
+                                              Environment.NewLine + Environment.NewLine +
+                                              "Would you like to save them now?";
+
+                            messageBox.AddButton("Save data", "Save", false);
+                            messageBox.AddButton("Discard changes", "Discard", false);
+                        }
+                        // Prompt for if the data file doesn't yet exist.
+                        else
+                        {
+                            messageBox.Caption = "Create ID Shield data file?";
+                            messageBox.Text = "Would you like to create an ID Shield data file for this document?";
+                            
+                            messageBox.AddButton("Save data file", "Save", false);
+                            messageBox.AddButton("Don't save", "Discard", false);
+                        }
+                        
+                        messageBox.AddButton("Cancel", "Cancel", true);
+
+                        string result = messageBox.Show(this);
+                        if (result == "Cancel")
+                        {
+                            return true;
+                        }
+                        else if (result == "Save")
+                        {
+                            TimeInterval screenTime = StopScreenTimeTimer();
+                            Save(screenTime);
+                        }
+                    }
+                }
+
+                // A second prompt for whether a redacted document should be output. Displayed
+                // regardless of whether the voa file was saved (unless the close was cancelled).
+                using (CustomizableMessageBox messageBox = new CustomizableMessageBox())
+                {
+                    messageBox.Caption = "Output redacted document?";
+                    messageBox.Text = "You have made changes since last creating a redacted document." +
+                                      Environment.NewLine + Environment.NewLine +
+                                      "Would you like to create one now?";
+
+                    messageBox.AddButton("Output redacted document", "Save", false);
+                    messageBox.AddButton("Close without outputting", "Discard", false);
+                    messageBox.AddButton("Cancel", "Cancel", true);
+
+                    string result = messageBox.Show(this);
+                    if (result == "Cancel")
+                    {
+                        return true;
+                    }
+                    else if (result == "Save")
+                    {
+                        SaveRedactedImage(memento);
                     }
                 }
             }

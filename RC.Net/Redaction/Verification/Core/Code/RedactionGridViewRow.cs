@@ -624,6 +624,7 @@ namespace Extract.Redaction.Verification
             _layerObjectsDirty = false;
             _typeDirty = false;
             _exemptionsDirty = false;
+            _redactedDirty = false;
         }
 
         /// <summary>

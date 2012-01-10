@@ -598,18 +598,9 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
-                // Try to remove the converted file if we can
-                if (!string.IsNullOrWhiteSpace(destFile))
-                {
-                    try
-                    {
-                        FileSystemMethods.DeleteFile(destFile);
-                    }
-                    catch (Exception ex2)
-                    {
-                        ex2.ExtractLog("ELI32242");
-                    }
-                }
+                // [DotNetRCAndUtils:766]
+                // ImageMethods.ConvertPdfToTif will only write the output to the final destination
+                // if the rasterization succeeded; no need to delete destFile here.
 
                 var ee = ex.AsExtract("ELI32230");
                 ee.AddDebugData("File ID", pFileRecord.FileID, false);
