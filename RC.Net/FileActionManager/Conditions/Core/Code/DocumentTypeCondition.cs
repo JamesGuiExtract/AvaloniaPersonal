@@ -286,6 +286,10 @@ namespace Extract.FileActionManager.Conditions
                 {
                     return MetIfTrue;
                 }
+                else if (docTypeCount == 0 && DocumentTypes.Contains("Unknown"))
+                {
+                    return MetIfTrue;
+                }
                 else if (docTypes
                     .Where(docType => DocumentTypes.Contains(docType))
                     .Any())

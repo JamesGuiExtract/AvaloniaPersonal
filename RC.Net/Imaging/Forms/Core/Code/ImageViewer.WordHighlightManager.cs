@@ -1,11 +1,11 @@
 ﻿using Extract.Drawing;
+using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
@@ -1684,12 +1684,15 @@ namespace Extract.Imaging.Forms
                         OcrTradeoff ocrTradeoff = OcrTradeoff.Balanced;
                         string imageFile = string.Empty;
 
-                        ExecuteInUIThread(() =>
+                        if (LicenseUtilities.IsLicensed(LicenseIdName.OcrOnClientFeature))
                         {
-                            autoOcr = _imageViewer.AutoOcr;
-                            ocrTradeoff = _imageViewer.OcrTradeoff;
-                            imageFile = _imageViewer.ImageFile;
-                        });
+                            ExecuteInUIThread(() =>
+                            {
+                                autoOcr = _imageViewer.AutoOcr;
+                                ocrTradeoff = _imageViewer.OcrTradeoff;
+                                imageFile = _imageViewer.ImageFile;
+                            });
+                        }
 
                         if (autoOcr)
                         {

@@ -1,8 +1,8 @@
+using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
@@ -186,25 +186,33 @@ namespace Extract.Redaction.Verification
                 _autoToolComboBox.Text = Enum.GetName(typeof(AutoTool), autoTool);
                 _autoZoomCheckBox.Checked = _config.Settings.AutoZoom;
                 _autoZoomScaleTrackBar.Value = _config.Settings.AutoZoomScale;
-                _OCRCheckBox.Checked = _config.Settings.AutoOcr;
 
-                switch (_config.Settings.OcrTradeoff)
+                if (LicenseUtilities.IsLicensed(LicenseIdName.OcrOnClientFeature))
                 {
-                    case Imaging.OcrTradeoff.Accurate:
-                        _ocrTradeOffComboBox.SelectedItem = "Accurate";
-                        break;
+                    _OCRCheckBox.Checked = _config.Settings.AutoOcr;
 
-                    case Imaging.OcrTradeoff.Balanced:
-                        _ocrTradeOffComboBox.SelectedItem = "Balanced";
-                        break;
+                    switch (_config.Settings.OcrTradeoff)
+                    {
+                        case Imaging.OcrTradeoff.Accurate:
+                            _ocrTradeOffComboBox.SelectedItem = "Accurate";
+                            break;
 
-                    case Imaging.OcrTradeoff.Fast:
-                        _ocrTradeOffComboBox.SelectedItem = "Fast";
-                        break;
+                        case Imaging.OcrTradeoff.Balanced:
+                            _ocrTradeOffComboBox.SelectedItem = "Balanced";
+                            break;
 
-                    default:
-                        _ocrTradeOffComboBox.SelectedItem = "Balanced";
-                        break;
+                        case Imaging.OcrTradeoff.Fast:
+                            _ocrTradeOffComboBox.SelectedItem = "Fast";
+                            break;
+
+                        default:
+                            _ocrTradeOffComboBox.SelectedItem = "Balanced";
+                            break;
+                    }
+                }
+                else
+                {
+                    _OCRCheckBox.Enabled = false;
                 }
 
                 // If the slideshow is enabled, populate all _runKeyOptions which can be recognized

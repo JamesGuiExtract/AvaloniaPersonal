@@ -482,8 +482,16 @@ namespace Extract.Redaction.Verification
                     // All turned-on items will be output (even clues, etc)
                     // The redaction text is "<ExemptionCodes>"
                     _redactedOutputTask = new RedactionTaskClass();
-                    _redactedOutputTask.AttributeNames = null;
+
+                    VariantVector attributesToRedact = new VariantVector();
                     _redactedOutputTask.RedactionText = "<ExemptionCodes>";
+
+                    foreach (var level in _iniSettings.ConfidenceLevels)
+                    {
+                        attributesToRedact.PushBack(level.Query);
+                    }
+                    _redactedOutputTask.AttributeNames = attributesToRedact;
+
 
                     // Cached whether PDF support is used since we will be checking this with every save.
                     _isPDFLicensed = LicenseUtilities.IsLicensed(LicenseIdName.PdfReadWriteFeature);
@@ -2057,7 +2065,7 @@ namespace Extract.Redaction.Verification
         /// the next document is opened.</param>
         void GoToNextDocument(bool promptForSlideshowAdvance, DocumentNavigationTarget navigationTarget)
         {
-            if (_standAloneMode)
+            if (_standAloneMode || !_imageViewer.IsImageAvailable)
             {
                 return;
             }
@@ -2433,6 +2441,9 @@ namespace Extract.Redaction.Verification
 
                 // Magnifier window
                 _imageViewer.Shortcuts[Keys.F12] = (() => _magnifierToolStripButton.PerformClick());
+                
+                // Thumbnails window
+                _imageViewer.Shortcuts[Keys.F10] = (() => _thumbnailsToolStripButton.PerformClick());
 
                 if (!_settings.General.VerifyAllPages)
                 {

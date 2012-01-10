@@ -23,9 +23,6 @@ const int gnNUMBER_ATTEMPTS_BEFORE_FAIL = 3;
 // (currently only used in the getNumberOfPagesInImage method
 const int gnSLEEP_BETWEEN_RETRY_MS = 200;
 
-// number of times to retry saving an output image if the page count is wrong (P16 #2593)
-const int gnOUTPUT_IMAGE_RETRIES = 3;
-
 //--------------------------------------------------------------------------------------------------
 // Structs
 //--------------------------------------------------------------------------------------------------

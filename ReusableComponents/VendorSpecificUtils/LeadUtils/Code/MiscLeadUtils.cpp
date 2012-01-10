@@ -18,6 +18,7 @@
 #include <ByteStream.h>
 #include <ByteStreamManipulator.h>
 #include <EncryptionEngine.h>
+#include <ValueRestorer.h>
 
 #include <cmath>
 #include <cstdio>
@@ -412,7 +413,13 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		bool bSuccessful = false;
 		bool bAnnotationsAppliedToDocument = false;
 		_lastCodePos = "40";
-		for (int i=0; i < gnOUTPUT_IMAGE_RETRIES; i++)
+
+		// [FlexIDSCore:4963]
+		// Per discussion with Arvind, use the file access retries for any failure applying the
+		// redactions, but be sure not to nest saveImagePage retries inside of these retries
+		bool bSavingImagePage = false;
+
+		for (int i=0; i < iRetryCount; i++)
 		{
 			// Write the output to a temporary file so that the creation of the
 			// redacted image appears as an atomic operation [FlexIDSCore #3547]
@@ -630,8 +637,13 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 
 						if (!bAnnotationsAppliedToPage)
 						{
-							// Save the image page
-							saveImagePage(hBitmap, tempOutFile.getName(), fileInfo, sfOptions);
+							{
+								ValueRestorer<bool>(bSavingImagePage, false);
+								bSavingImagePage = true;
+
+								// Save the image page
+								saveImagePage(hBitmap, tempOutFile.getName(), fileInfo, sfOptions);
+							}
 						}
 						else
 						{
@@ -642,8 +654,13 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 							throwExceptionIfNotSuccess(nRet, "ELI14611", 
 								"Could not save redaction annotation objects.");
 
-							// Save the image page with the annotations
-							saveImagePage(hBitmap, tempOutFile.getName(), fileInfo, sfOptions);
+							{
+								ValueRestorer<bool>(bSavingImagePage, false);
+								bSavingImagePage = true;
+
+								// Save the image page with the annotations
+								saveImagePage(hBitmap, tempOutFile.getName(), fileInfo, sfOptions);
+							}
 
 							// Set annotations added to document flag [FlexIDSCore #3131]
 							bAnnotationsAppliedToDocument = true;
@@ -703,9 +720,14 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 				uex.addDebugInfo("Output Image File", strOutputImageName);
 				uex.addDebugInfo("Attempt", asString(i+1));
 
-				if (i < gnOUTPUT_IMAGE_RETRIES - 1)
+				if (!bSavingImagePage && i < iRetryCount - 1)
 				{
-					uex.log();
+					if (i == 0)
+					{
+						uex.log();
+					}
+
+					Sleep(iRetryTimeout);
 					continue;
 				}
 

@@ -169,11 +169,14 @@ BOOL CAddRuleDlg::OnInitDialog()
 
 		// Initialize the buttons' enabled/disabled states
 		setButtonStates();
+
+		// [FlexIDSCore:4777]
+		GetDlgItem(IDC_COMBO_RULE)->SetFocus();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04404")
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+	return FALSE;  // return TRUE unless you set the focus to a control
+	               // EXCEPTION: OCX Property Pages should return FALSE
 }
 //-------------------------------------------------------------------------------------------------
 void CAddRuleDlg::OnBtnConfigureRule2() 

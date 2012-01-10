@@ -895,6 +895,7 @@ namespace Extract.Redaction.Verification
             // 
             this._slideshowPlayToolStripMenuItem.Name = "_slideshowToolStripMenuItem";
             this._slideshowPlayToolStripMenuItem.Size = new System.Drawing.Size(258, 22);
+            this._slideshowPlayToolStripMenuItem.ShortcutKeyDisplayString = "F5";
             this._slideshowPlayToolStripMenuItem.Text = "&Slideshow play";
             this._slideshowPlayToolStripMenuItem.Click += new System.EventHandler(this.HandleSlideshowPlayUIClick);
             // 
@@ -1532,6 +1533,7 @@ namespace Extract.Redaction.Verification
             this._thumbnailsToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._thumbnailsToolStripButton.Name = "_thumbnailsToolStripButton";
             this._thumbnailsToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._thumbnailsToolStripButton.Text = "Show/Hide thumbnails (F10)";
             // 
             // _magnifierToolStripButton
             // 
@@ -1540,7 +1542,7 @@ namespace Extract.Redaction.Verification
             this._magnifierToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._magnifierToolStripButton.Name = "_magnifierToolStripButton";
             this._magnifierToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._magnifierToolStripButton.Text = "Show/Hide magnifier";
+            this._magnifierToolStripButton.Text = "Show/Hide magnifier (F12)";
             // 
             // _pageNavigationToolStrip
             // 
@@ -1688,7 +1690,7 @@ namespace Extract.Redaction.Verification
             // 
             // _angularRedactionToolStripButton
             // 
-            this._angularRedactionToolStripButton.BaseToolTipText = "Create angular redaction";
+            this._angularRedactionToolStripButton.BaseToolTipText = "Create angular redaction (H)";
             this._angularRedactionToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._angularRedactionToolStripButton.Enabled = false;
             this._angularRedactionToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -1698,7 +1700,7 @@ namespace Extract.Redaction.Verification
             // 
             // _rectangularRedactionToolStripButton
             // 
-            this._rectangularRedactionToolStripButton.BaseToolTipText = "Create rectangular redaction";
+            this._rectangularRedactionToolStripButton.BaseToolTipText = "Create rectangular redaction (H)";
             this._rectangularRedactionToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._rectangularRedactionToolStripButton.Enabled = false;
             this._rectangularRedactionToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -1708,7 +1710,7 @@ namespace Extract.Redaction.Verification
             // 
             // _wordRedactionToolStripButton
             // 
-            this._wordRedactionToolStripButton.BaseToolTipText = "Create word redaction";
+            this._wordRedactionToolStripButton.BaseToolTipText = "Create word redaction (H)";
             this._wordRedactionToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._wordRedactionToolStripButton.Enabled = false;
             this._wordRedactionToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;

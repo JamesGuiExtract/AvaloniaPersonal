@@ -725,7 +725,20 @@ namespace Extract.Redaction.Verification
                 index = ~index;
             }
 
-            _redactions.Insert(index, row);
+            // [FlexIDSCore:4979]
+            // If these was no previous selection, the insert call may end up selecting (and thus
+            // marking viewed) another item in the set before the new one is selected.
+            // De-activate before adding the new item to prevent this from happening.
+            bool wasActive = Active;
+            Active = false;
+            try
+            {
+                _redactions.Insert(index, row);
+            }
+            finally
+            {
+                Active = wasActive;
+            }
 
             _dirty = true;
             return index;
@@ -1026,8 +1039,14 @@ namespace Extract.Redaction.Verification
             }
 
             // Prevent this method from calling itself
-            _imageViewer.LayerObjects.Selection.LayerObjectAdded -= HandleSelectionLayerObjectAdded;
-            _imageViewer.LayerObjects.Selection.LayerObjectDeleted -= HandleSelectionLayerObjectDeleted;
+            // It may be better to de-activate here if active, but it's late in the 9.0 release
+            // cycle, so I'm opting to keep code as close a possible to its previous state.
+            bool wasActive = Active;
+            if (wasActive)
+            {
+                _imageViewer.LayerObjects.Selection.LayerObjectAdded -= HandleSelectionLayerObjectAdded;
+                _imageViewer.LayerObjects.Selection.LayerObjectDeleted -= HandleSelectionLayerObjectDeleted;
+            }
             try
             {
                 // Mark all selected rows as visited
@@ -1045,8 +1064,11 @@ namespace Extract.Redaction.Verification
             }
             finally
             {
-                _imageViewer.LayerObjects.Selection.LayerObjectAdded += HandleSelectionLayerObjectAdded;
-                _imageViewer.LayerObjects.Selection.LayerObjectDeleted += HandleSelectionLayerObjectDeleted;
+                if (wasActive && Active)
+                {
+                    _imageViewer.LayerObjects.Selection.LayerObjectAdded += HandleSelectionLayerObjectAdded;
+                    _imageViewer.LayerObjects.Selection.LayerObjectDeleted += HandleSelectionLayerObjectDeleted;
+                }
             }
         }
 
