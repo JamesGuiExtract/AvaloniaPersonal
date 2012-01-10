@@ -1,0 +1,4 @@
+<TEST_RULE_1>===(?n)
+  When[\S\s]{0,5}Recorded\s*
+  (?'Type'[\S\s]{1,20}?)
+  \s*to
