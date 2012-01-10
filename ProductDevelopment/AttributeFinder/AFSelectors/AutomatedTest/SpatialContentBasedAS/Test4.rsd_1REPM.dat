@@ -1,0 +1,4 @@
+<ASM_GRANTEE>===(?n)
+  value\s*received[\S\s]*Grants[\S\s]{0,50}to
+  (?'Grantee'[\S\s]{1,50}?)
+  \r\n

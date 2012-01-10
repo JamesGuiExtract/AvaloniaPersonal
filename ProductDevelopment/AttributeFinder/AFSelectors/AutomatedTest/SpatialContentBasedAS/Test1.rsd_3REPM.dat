@@ -1,0 +1,4 @@
+<ASM_ORIGINAL_GRANTOR>===(?n)
+  certain[\S\s]{0,20}mortgage[\S\s]{0,50}executed[\S\s]{0,20}\bby\b
+  (?'OriginalGrantor'[\S\s]{1,250}?)
+  \r\nto

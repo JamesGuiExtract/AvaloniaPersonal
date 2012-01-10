@@ -1,0 +1,4 @@
+<ASM_GRANTOR>===(?n)
+  to
+  (?'Grantor'[\S\s]{1,250}?)
+  and\s*recorded
