@@ -339,7 +339,9 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 				  EConverterFileType eOutputType)
 {
 	IMF_FORMAT nFormat(FF_TIFNO);
+	bool bOutputImageOpened(false);
 	int nPage(0);
+	unique_ptr<HIMGFILE> uphOutputImage(__nullptr);
 
 	try
 	{
@@ -386,12 +388,13 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 			// Ensure that the memory stored for the image file is released
 			RecMemoryReleaser<tagIMGFILEHANDLE> inputImageFileMemoryReleaser(hInputImage);
 
-			HIMGFILE hOutputImage;
+			// Don't use RecMemoryReleaser on the output image because we will need to manually
+			// close it at the end of this method to be able to copy it to its permanent location.
+			uphOutputImage.reset(new HIMGFILE);
 			THROW_UE_ON_ERROR("ELI34296", "Unable to create destination image file.",
-				kRecOpenImgFile(strTempOutputFileName.c_str(), &hOutputImage, IMGF_RDWR, FF_SIZE));
+				kRecOpenImgFile(strTempOutputFileName.c_str(), uphOutputImage.get(), IMGF_RDWR, FF_SIZE));
 
-			// Ensure that the memory stored for the image file is released
-			RecMemoryReleaser<tagIMGFILEHANDLE> outputImageFileMemoryReleaser(hOutputImage);
+			bOutputImageOpened = true;
 
 			int nPageCount(0);
 			THROW_UE_ON_ERROR("ELI34297", "Unable to determine page count.",
@@ -414,20 +417,20 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 				if (eOutputType == kFileType_Jpg)
 				{
 					THROW_UE_ON_ERROR("ELI34291", "Cannot save to image page in jpg format.",
-						kRecSaveImgForce(0, hOutputImage, nFormat, hImagePage, II_CURRENT, FALSE));
+						kRecSaveImgForce(0, *uphOutputImage, nFormat, hImagePage, II_CURRENT, FALSE));
 				}
 				else
 				{
 					THROW_UE_ON_ERROR("ELI34292", "Cannot save to image page in the specified format.",
-						kRecSaveImg(0, hOutputImage, nFormat, hImagePage, II_CURRENT, TRUE));
+						kRecSaveImg(0, *uphOutputImage, nFormat, hImagePage, II_CURRENT, TRUE));
 				}
 			}
 
 			nPage = -1;
 
-			// Although RecMemoryReleaser will close the file as well, if it is not closed before
-			// copying it to the permanent location, it may be corrupted.
-			kRecCloseImgFile(hOutputImage);
+			// Close manually; if it is not closed before copying it to the permanent location, it
+			// may be copied in a corrupted state.
+			kRecCloseImgFile(*uphOutputImage);
 
 			copyFile(strTempOutputFileName, strOutputFileName);
 		}
@@ -435,6 +438,17 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 	}
 	catch (UCLIDException &ue)
 	{
+		// We need to close the out image file if the output image file was opened but we didn't
+		// make it to the "happy case" close call.
+		if (bOutputImageOpened && nPage != -1)
+		{
+			try
+			{
+				kRecCloseImgFile(*uphOutputImage);
+			}
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI34312");
+		}
+
 		ue.addDebugInfo("Source image", strInputFileName);
 		ue.addDebugInfo("Page", asString(nPage + 1));
 		ue.addDebugInfo("Format", asString((int)nFormat));

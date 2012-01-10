@@ -134,7 +134,7 @@ namespace Extract.ReportViewer
 
                 SetDatabaseConnection();
 
-                _canceledInitialization = !SetParameters(promptForParameters);
+                _canceledInitialization = !SetParameters(promptForParameters, false);
             }
             catch (Exception ex)
             {
@@ -332,7 +332,7 @@ namespace Extract.ReportViewer
             {
                 _report.Refresh();
                 SetDatabaseConnection();
-                SetParameters(false);
+                SetParameters(false, true);
             }
             catch (Exception ex)
             {
@@ -367,13 +367,15 @@ namespace Extract.ReportViewer
         /// </summary>
         /// <param name="promptForParameters">Whether to force a prompt for parameter values
         /// or not.</param>
+        /// <param name="isRefresh"><see langword="true"/> parameters are being set for a report
+        /// refresh, <see langword="false"/> if they are being set for the inital load.</param>
         /// <returns><see langword="true"/> if parameters have been set and
         /// <see langword="false"/> otherwise.</returns>
-        bool SetParameters(bool promptForParameters)
+        bool SetParameters(bool promptForParameters, bool isRefresh)
         {
             try
             {
-                if (promptForParameters || MissingParameterValue())
+                if (promptForParameters || !isRefresh)
                 {
                     // Show the wait cursor while parsing the parameter file
                     using (Extract.Utilities.Forms.TemporaryWaitCursor waitCursor
