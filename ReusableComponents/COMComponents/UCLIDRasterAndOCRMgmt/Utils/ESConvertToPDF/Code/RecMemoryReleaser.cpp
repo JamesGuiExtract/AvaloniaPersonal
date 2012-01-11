@@ -23,16 +23,43 @@ RecMemoryReleaser<RECDOCSTRUCT>::~RecMemoryReleaser()
 {
 	try
 	{
-		// close the document
-		RECERR rc = RecCloseDoc(0, m_pMemoryType);
+		// [LegacyRCAndUtils:6184]
+		// Exceptions are being thrown in some cases trying to close the document. I am adding
+		// retries here in case there is a chance that a subsequent call to RecCloseDoc would work.
+		static const int nRetries = 0;
 
-		// log any errors
-		if (rc != REC_OK)
+		for (int i = 0; i < nRetries; i++)
 		{
-			UCLIDException ue("ELI18584",
-				"Application trace: Unable to close document. Possible memory leak.");
-			loadScansoftRecErrInfo(ue, rc);
-			ue.log();
+			try
+			{
+				try
+				{
+					// close the document
+					RECERR rc = RecCloseDoc(0, m_pMemoryType);
+
+					// log any errors
+					if (rc != REC_OK)
+					{
+						UCLIDException ue("ELI18584",
+							"Application trace: Unable to close document. Possible memory leak.");
+						loadScansoftRecErrInfo(ue, rc);
+						ue.log();
+					}
+
+					return;
+				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34320");
+			}
+			catch (UCLIDException &ue)
+			{
+				// After all retry attempts, throw the exception so it gets logged.
+				if (i == nRetries - 1)
+				{
+					throw ue;
+				}
+
+				Sleep(200);
+			}
 		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18591");

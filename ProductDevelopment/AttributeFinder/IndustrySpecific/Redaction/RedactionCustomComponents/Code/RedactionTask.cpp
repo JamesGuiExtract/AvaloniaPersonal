@@ -2063,6 +2063,14 @@ void CRedactionTask::assignIds(IIUnknownVectorPtr ipAttributes, long lNextId,
             IAttributePtr ipAttribute = ipAttributes->At(i);
             ASSERT_RESOURCE_ALLOCATION("ELI28362", ipAttribute);
 
+			// [FlexIDSCore:4901]
+			// Don't added id attributes for metadata attributes.
+			string strAttributeName = asString(ipAttribute->Name);
+			if (!strAttributeName.empty() && strAttributeName.substr(0, 1) == "_")
+			{
+				continue;
+			}
+
             // Check if this attribute already has an attribute id
             IAttributePtr ipIdAttribute = getIdAttribute(ipAttribute);
             if (ipIdAttribute == __nullptr)

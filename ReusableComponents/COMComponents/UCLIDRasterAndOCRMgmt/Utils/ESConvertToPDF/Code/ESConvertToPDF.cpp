@@ -236,23 +236,6 @@ void CESConvertToPDFApp::convertToSearchablePDF()
 		setIntSetting(strOutputFormat + ".Compatibility", R2ID_PDFA);
 	}
 
-	// create temporary OmniPage document file.
-	// file will be automatically deleted when tfnDocument goes out of scope.
-	TemporaryFileName tfnDocument(true, "", ".opd", true);
-
-	// create output document
-	HDOC hDoc;
-	rc = RecCreateDoc(0, tfnDocument.getName().c_str(), &hDoc, 0);
-	if (rc != REC_OK)
-	{
-		UCLIDException ue("ELI18586", "Unable to create output document.");
-		loadScansoftRecErrInfo(ue, rc);
-		throw ue;
-	}
-
-	// ensure the output document is closed when the memory releaser object goes out of scope
-	RecMemoryReleaser<RECDOCSTRUCT> outputDocumentMemoryReleaser(hDoc);
-
 	// Get the retry count and timeout
 	int iRetryCount(-1), iRetryTimeout(-1);
 	getFileAccessRetryCountAndTimeout(iRetryCount, iRetryTimeout);
@@ -320,83 +303,107 @@ void CESConvertToPDFApp::convertToSearchablePDF()
 		throw ue;
 	}
 
-	// iterate through each page
-	HPAGE hPage;
-	for(int i=0; i<iPages; i++)  
+	// create temporary OmniPage document file.
+	// file will be automatically deleted when tfnDocument goes out of scope.
+	TemporaryFileName tfnDocument(true, "", ".opd", true);
+
+	// [LegacyRCAndUtils:6184]
+	// At times the outputDocumentMemoryReleaser destructor is throwning an exception and I'm
+	// wondering if something it was using was already destructed by the time it went out of scope
+	// (though I can't see what that would be). Perhaps by constructing later (and thus destroying
+	// it sooner) will prevent the issue. Also adding a new scope for outputDocumentMemoryReleaser
+	// here to make it clear that it should go out of scope before tfnDocument.
 	{
-		// load the ith page
-		loadPageFromImageHandle(m_strInputFile, hInputFile, i, &hPage);
-
-		try
+		HDOC hDoc;
+		rc = RecCreateDoc(0, tfnDocument.getName().c_str(), &hDoc, 0);
+		if (rc != REC_OK)
 		{
-			try
-			{
-				// recognize the text on this page
-				rc = kRecRecognize(0, hPage, 0);
-				if (rc != REC_OK && rc != NO_TXT_WARN && rc != ZONE_NOTFOUND_ERR)
-				{
-					// log an error
-					UCLIDException ue("ELI18589", "Unable to recognize text on page.");
-					loadScansoftRecErrInfo(ue, rc);
-					ue.addDebugInfo("Input filename", m_strInputFile);
-					ue.addDebugInfo("Page number", i+1);
-
-					// add page size information [P13 #4603]
-					if(rc == IMG_SIZE_ERR)
-					{
-						addPageSizeDebugInfo(ue, hInputFile, i);
-					}
-
-					throw ue;
-				}
-			}
-			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18628");
-		}
-		catch(UCLIDException ue)
-		{
-			// free the memory allocated for this page
-			rc = kRecFreeImg(hPage);
-
-			// log any errors
-			if (rc != REC_OK)
-			{
-				UCLIDException ue2("ELI18629", "Application trace: Unable to release page image. "
-					"Possible memory leak.");
-				loadScansoftRecErrInfo(ue2, rc);
-				ue2.addDebugInfo("Input filename", m_strInputFile);
-				ue2.addDebugInfo("Page number", i+1);
-				ue2.log();
-			}
-
-			// throw the original exception
+			UCLIDException ue("ELI18586", "Unable to create output document.");
+			loadScansoftRecErrInfo(ue, rc);
 			throw ue;
 		}
 
-		// add this page to the output document
-		// NOTE: After this call, the memory allocated for hPage is now managed by the engine.
-		// It is important not to release it.
-		rc = RecInsertPage(0, hDoc, hPage, i);
+		// ensure the output document is closed when the memory releaser object goes out of scope
+		RecMemoryReleaser<RECDOCSTRUCT> outputDocumentMemoryReleaser(hDoc);
+
+		// iterate through each page
+		HPAGE hPage;
+		for(int i=0; i<iPages; i++)  
+		{
+			// load the ith page
+			loadPageFromImageHandle(m_strInputFile, hInputFile, i, &hPage);
+
+			try
+			{
+				try
+				{
+					// recognize the text on this page
+					rc = kRecRecognize(0, hPage, 0);
+					if (rc != REC_OK && rc != NO_TXT_WARN && rc != ZONE_NOTFOUND_ERR)
+					{
+						// log an error
+						UCLIDException ue("ELI18589", "Unable to recognize text on page.");
+						loadScansoftRecErrInfo(ue, rc);
+						ue.addDebugInfo("Input filename", m_strInputFile);
+						ue.addDebugInfo("Page number", i+1);
+
+						// add page size information [P13 #4603]
+						if(rc == IMG_SIZE_ERR)
+						{
+							addPageSizeDebugInfo(ue, hInputFile, i);
+						}
+
+						throw ue;
+					}
+				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18628");
+			}
+			catch(UCLIDException ue)
+			{
+				// free the memory allocated for this page
+				rc = kRecFreeImg(hPage);
+
+				// log any errors
+				if (rc != REC_OK)
+				{
+					UCLIDException ue2("ELI18629", "Application trace: Unable to release page image. "
+						"Possible memory leak.");
+					loadScansoftRecErrInfo(ue2, rc);
+					ue2.addDebugInfo("Input filename", m_strInputFile);
+					ue2.addDebugInfo("Page number", i+1);
+					ue2.log();
+				}
+
+				// throw the original exception
+				throw ue;
+			}
+
+			// add this page to the output document
+			// NOTE: After this call, the memory allocated for hPage is now managed by the engine.
+			// It is important not to release it.
+			rc = RecInsertPage(0, hDoc, hPage, i);
+			if (rc != REC_OK)
+			{
+				// log an error
+				UCLIDException ue("ELI18788", "Unable to add page to output document.");
+				loadScansoftRecErrInfo(ue, rc);
+				ue.addDebugInfo("Input filename", m_strInputFile);
+				ue.addDebugInfo("Page number", i+1);
+				throw ue;
+			}
+		}
+
+		// convert document to searchable pdf
+		rc = RecConvert2Doc(0, hDoc, m_strOutputFile.c_str());
 		if (rc != REC_OK)
 		{
 			// log an error
-			UCLIDException ue("ELI18788", "Unable to add page to output document.");
+			UCLIDException ue("ELI18590", "Unable to convert document to searchable pdf.");
 			loadScansoftRecErrInfo(ue, rc);
 			ue.addDebugInfo("Input filename", m_strInputFile);
-			ue.addDebugInfo("Page number", i+1);
+			ue.addDebugInfo("Output filename", m_strOutputFile);
 			throw ue;
 		}
-	}
-
-	// convert document to searchable pdf
-	rc = RecConvert2Doc(0, hDoc, m_strOutputFile.c_str());
-	if (rc != REC_OK)
-	{
-		// log an error
-		UCLIDException ue("ELI18590", "Unable to convert document to searchable pdf.");
-		loadScansoftRecErrInfo(ue, rc);
-		ue.addDebugInfo("Input filename", m_strInputFile);
-		ue.addDebugInfo("Output filename", m_strOutputFile);
-		throw ue;
 	}
 
 	// Make sure the file can be read
