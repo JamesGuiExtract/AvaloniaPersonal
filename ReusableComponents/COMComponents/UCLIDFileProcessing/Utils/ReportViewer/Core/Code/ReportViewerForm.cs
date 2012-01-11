@@ -613,7 +613,14 @@ namespace Extract.ReportViewer
             _crystalReportViewer.Visible = false;
             _pleaseWaitLabel.Visible = true;
             _progressBar.Visible = true;
-            this.Refresh();
+
+            // [DotNetRCAndUtils:762]
+            // Implmented the idea suggested in this thread to prevent exceptions from Crystal
+            // Reports mouse move events:
+            // http://social.msdn.microsoft.com/Forums/en/vscrystalreports/thread/98bb4330-e3e5-46e2-abbb-76c730dddeab
+            _crystalReportViewer.Dock = DockStyle.None;
+
+            Refresh();
 
             // Attach the report to the control and move to the first page
             // (this forces the data to be loaded into the control)
@@ -637,8 +644,12 @@ namespace Extract.ReportViewer
             _emailReportToolStripMenuItem.Enabled = true;
             _refreshToolStripMenuItem.Enabled = true;
 
-            // Invalidate the form
-            this.Invalidate();
+            // First, refresh the form with _crystalReportViewer.Dock == None.
+            Refresh();
+
+            // Now, re-apply the Fill dock style
+            _crystalReportViewer.Dock = DockStyle.Fill;
+            Invalidate();
         }
 
         /// <summary>
