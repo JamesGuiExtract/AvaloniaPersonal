@@ -91,6 +91,12 @@ namespace Extract.ReportViewer
         Dictionary<string, IExtractReportParameter> _parameters =
             new Dictionary<string, IExtractReportParameter>();
 
+        /// <summary>
+        /// Temporarily stores the parameters chosen by the user when prompted so that they can be
+        /// used when refreshing the report.
+        /// </summary>
+        string _activeParametersXml;
+
         #endregion Fields
 
         #region Constructors
@@ -375,34 +381,40 @@ namespace Extract.ReportViewer
         {
             try
             {
-                if (promptForParameters || !isRefresh)
+                // Show the wait cursor while parsing the parameter file
+                using (Extract.Utilities.Forms.TemporaryWaitCursor waitCursor
+                    = new Extract.Utilities.Forms.TemporaryWaitCursor())
                 {
-                    // Show the wait cursor while parsing the parameter file
-                    using (Extract.Utilities.Forms.TemporaryWaitCursor waitCursor
-                        = new Extract.Utilities.Forms.TemporaryWaitCursor())
+                    // If the user had previously specified parameters for this report, start with those.
+                    if (isRefresh && !string.IsNullOrEmpty(_activeParametersXml))
+                    {
+                        ParseParameterXml(_activeParametersXml);
+                    }
+                    // Otherwise load defaults from the permanent XML file.
+                    else
                     {
                         // Parse the parameter file
                         ParseParameterFile();
                     }
+                }
 
-                    // Check if prompting
-                    if (promptForParameters)
+                // Check if prompting
+                if (promptForParameters)
+                {
+                    // Display the parameter prompt
+                    if (!DisplayParameterPrompt())
                     {
-                        // Display the parameter prompt
-                        if (!DisplayParameterPrompt())
-                        {
-                            return false;
-                        }
+                        return false;
                     }
-                    // Not prompting, need to check for missing parameter values
-                    else if (MissingParameterValue())
-                    {
-                        // Not prompting, throw an exception
-                        ExtractException ee = new ExtractException("ELI23723",
-                            "Parameter values missing in the XML file!");
-                        ee.AddDebugData("XML File Name", ComputeXmlFileName(), false);
-                        throw ee;
-                    }
+                }
+                // Not prompting, need to check for missing parameter values
+                else if (MissingParameterValue())
+                {
+                    // Not prompting, throw an exception
+                    ExtractException ee = new ExtractException("ELI23723",
+                        "Parameter values missing in the XML file!");
+                    ee.AddDebugData("XML File Name", ComputeXmlFileName(), false);
+                    throw ee;
                 }
 
                 // Get the collection of parameters
@@ -485,6 +497,13 @@ namespace Extract.ReportViewer
                     numberOfParameters == numberOfParametersSet,
                     "Report Parameter Count", reportParameters.Count,
                     "Parameters Set Count", numberOfParametersSet);
+
+                // If the user entered parameters, keep track of which parameters they chose so they
+                // can be used if the report is refreshed.
+                if (promptForParameters)
+                {
+                    _activeParametersXml = GetXml();
+                }
 
                 return true;
             }
@@ -614,6 +633,15 @@ namespace Extract.ReportViewer
             // Load the XML file into a string
             string xml = File.ReadAllText(xmlFileName, Encoding.ASCII);
 
+            ParseParameterXml(xml);
+        }
+
+        /// <summary>
+        /// Parses the parameter XML.
+        /// </summary>
+        /// <param name="xml"></param>
+        void ParseParameterXml(string xml)
+        {
             // Parse the XML file
             using (StringReader reader = new StringReader(xml))
             {
@@ -1001,6 +1029,53 @@ namespace Extract.ReportViewer
 
                 throw ee;
             }
+            finally
+            {
+                if (xmlWriter != null)
+                {
+                    xmlWriter.Close();
+                    xmlWriter = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the parameters as a string in XML format.
+        /// </summary>
+        /// <returns>The XML string.</returns>
+        string GetXml()
+        {
+            XmlWriter xmlWriter = null;
+            try
+            {
+                StringBuilder xmlString = new StringBuilder();
+                XmlWriterSettings xmlSettings = new XmlWriterSettings();
+                xmlSettings.OmitXmlDeclaration = true;
+                xmlWriter = XmlWriter.Create(xmlString, xmlSettings);
+
+                // Write the root node
+                xmlWriter.WriteStartElement(_ROOT_NODE_NAME);
+                xmlWriter.WriteAttributeString("Version",
+                    _VERSION.ToString(CultureInfo.InvariantCulture));
+
+                // Write the parameters node
+                xmlWriter.WriteStartElement(_PARAMETERS_NODE_NAME);
+
+                // Write the parameters
+                foreach (IExtractReportParameter parameter in _parameters.Values)
+                {
+                    parameter.WriteToXml(xmlWriter);
+                }
+
+                xmlWriter.Close();
+                xmlWriter = null;
+
+                return xmlString.ToString();
+	        }
+	        catch (Exception ex)
+	        {
+		        throw ex.AsExtract("ELI34318");
+	        }
             finally
             {
                 if (xmlWriter != null)

@@ -81,7 +81,8 @@ FLEX Index,0
 -    Server/SDK,$FlexServer
 
 ID Shield,0
--    Client (Verify redactions only),$IDShield:$OCROnClient:6045:6047
+-    Client/No OCR (Verify redactions only),$IDShield:6045:6047
+-    Client (Verify redactions w/client OCR),$IDShield:$OCROnClient:6045:6047
 -    Server (OCR + run rules + auto-redact),$IDShield:6044:6045:$FlexShieldServerCore
 
 LabDE,0

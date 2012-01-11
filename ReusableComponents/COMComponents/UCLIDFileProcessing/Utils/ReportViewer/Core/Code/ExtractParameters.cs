@@ -25,10 +25,10 @@ namespace Extract.ReportViewer
     public interface IExtractReportParameter
     {
         /// <summary>
-        /// Writes the report parameter object to the <see cref="XmlTextWriter"/>.
+        /// Writes the report parameter object to the <see cref="XmlWriter"/>.
         /// </summary>
-        /// <param name="writer">The <see cref="XmlTextWriter"/> to write the object to.</param>
-        void WriteToXml(XmlTextWriter writer);
+        /// <param name="writer">The <see cref="XmlWriter"/> to write the object to.</param>
+        void WriteToXml(XmlWriter writer);
 
         /// <summary>
         /// Return <see langword="true"/> if there is a current value set.
@@ -153,11 +153,11 @@ namespace Extract.ReportViewer
 
         /// <summary>
         /// Writes the <see cref="ExtractReportParameter{T}"/> to the specified
-        /// <see cref="XmlTextWriter"/>.
+        /// <see cref="XmlWriter"/>.
         /// </summary>
-        /// <param name="writer">The <see cref="XmlTextWriter"/> to write the
+        /// <param name="writer">The <see cref="XmlWriter"/> to write the
         /// paramter to.</param>
-        public abstract void WriteToXml(XmlTextWriter writer);
+        public abstract void WriteToXml(XmlWriter writer);
 
         /// <summary>
         /// Indicates whether the <see cref="ExtractReportParameter{T}"/> has had
@@ -251,11 +251,11 @@ namespace Extract.ReportViewer
 
         /// <summary>
         /// Writes the <see cref="TextParameter"/> to the specified
-        /// <see cref="XmlTextWriter"/>.
+        /// <see cref="XmlWriter"/>.
         /// </summary>
-        /// <param name="writer">The <see cref="XmlTextWriter"/> to write the
+        /// <param name="writer">The <see cref="XmlWriter"/> to write the
         /// paramter to.</param>
-        public override void WriteToXml(XmlTextWriter writer)
+        public override void WriteToXml(XmlWriter writer)
         {
             try
             {
@@ -299,11 +299,11 @@ namespace Extract.ReportViewer
 
         /// <summary>
         /// Writes the <see cref="NumberParameter"/> to the specified
-        /// <see cref="XmlTextWriter"/>.
+        /// <see cref="XmlWriter"/>.
         /// </summary>
-        /// <param name="writer">The <see cref="XmlTextWriter"/> to write the
+        /// <param name="writer">The <see cref="XmlWriter"/> to write the
         /// paramter to.</param>
-        public override void WriteToXml(XmlTextWriter writer)
+        public override void WriteToXml(XmlWriter writer)
         {
             try
             {
@@ -363,11 +363,11 @@ namespace Extract.ReportViewer
 
         /// <summary>
         /// Writes the <see cref="DateParameter"/> to the specified
-        /// <see cref="XmlTextWriter"/>.
+        /// <see cref="XmlWriter"/>.
         /// </summary>
-        /// <param name="writer">The <see cref="XmlTextWriter"/> to write the
+        /// <param name="writer">The <see cref="XmlWriter"/> to write the
         /// paramter to.</param>
-        public override void WriteToXml(XmlTextWriter writer)
+        public override void WriteToXml(XmlWriter writer)
         {
             try
             {
@@ -449,39 +449,64 @@ namespace Extract.ReportViewer
         Last10Hours = 9,
 
         /// <summary>
+        /// Include all records in the last 24 hours
+        /// </summary>
+        Last24Hours = 10,
+
+        /// <summary>
+        /// Include all records in the last 1 minute
+        /// </summary>
+        Last1Minute = 11,
+
+        /// <summary>
+        /// Include all records in the last ten hours
+        /// </summary>
+        Last3Minutes = 12,
+
+        /// <summary>
+        /// Include all records in the last ten hours
+        /// </summary>
+        Last10Minutes = 13,
+
+        /// <summary>
+        /// Include all records in the last ten hours
+        /// </summary>
+        Last30Minutes = 14,
+        
+        /// <summary>
         /// Sun. through Sat. of the current week (if today = Wed. 12/24/2008 then
         /// the range will be 12/21/2008 - 12/27/2008).
         /// </summary>
-        CurrentWeek = 10,
+        CurrentWeek = 15,
 
         /// <summary>
         /// Include all dates in the current month (if today = Wed. 12/24/2008 then
         /// the range will be 12/01/2008 - 12/31/2008).
         /// </summary>
-        CurrentMonth = 11,
+        CurrentMonth = 16,
 
         /// <summary>
         /// Include all dates in the current year (if today = Wed. 12/24/2008 then
         /// the range will be 01/01/2008 - 12/31/2008).
         /// </summary>
-        CurrentYear = 12,
+        CurrentYear = 17,
 
         /// <summary>
         /// Includes only records for today (if today = Wed. 12/24/2008 then
         /// the range will be 12/24/2008 - 12/24/2008).
         /// </summary>
-        Today = 13,
+        Today = 18,
 
         /// <summary>
         /// Includes only records for yesterday (if today = Wed. 12/24/2008 then
         /// the range will be 12/23/2008 - 12/23/2008).
         /// </summary>
-        Yesterday = 14,
+        Yesterday = 19,
 
         /// <summary>
         /// A custom date range, user must specify min and max values for the range.
         /// </summary>
-        Custom = 15
+        Custom = 20,
     }
 
     /// <summary>
@@ -857,6 +882,38 @@ namespace Extract.ReportViewer
                     }
                     break;
 
+                case DateRangeValue.Last30Minutes:
+                    {
+                        // Set max to current time and min to 30 minutes previous
+                        _min = currentDateTime.Subtract(new TimeSpan(0, 30, 0));
+                        _max = currentDateTime;
+                    }
+                    break;
+
+                case DateRangeValue.Last10Minutes:
+                    {
+                        // Set max to current time and min to 10 minutes previous
+                        _min = currentDateTime.Subtract(new TimeSpan(0, 10, 0));
+                        _max = currentDateTime;
+                    }
+                    break;
+
+                case DateRangeValue.Last3Minutes:
+                    {
+                        // Set max to current time and min to 3 minutes previous
+                        _min = currentDateTime.Subtract(new TimeSpan(0, 3, 0));
+                        _max = currentDateTime;
+                    }
+                    break;
+
+                case DateRangeValue.Last1Minute:
+                    {
+                        // Set max to current time and min to 1 minute previous
+                        _min = currentDateTime.Subtract(new TimeSpan(0, 1, 0));
+                        _max = currentDateTime;
+                    }
+                    break;
+
                 case DateRangeValue.Last2Hours:
                     {
                         // Set max to current time and min to 2 hour previous
@@ -877,6 +934,14 @@ namespace Extract.ReportViewer
                     {
                         // Set max to current time and min to 10 hour previous
                         _min = currentDateTime.Subtract(new TimeSpan(10, 0, 0));
+                        _max = currentDateTime;
+                    }
+                    break;
+
+                case DateRangeValue.Last24Hours:
+                    {
+                        // Set max to current time and min to 24 hour previous
+                        _min = currentDateTime.Subtract(new TimeSpan(24, 0, 0));
                         _max = currentDateTime;
                     }
                     break;
@@ -946,11 +1011,11 @@ namespace Extract.ReportViewer
 
         /// <summary>
         /// Writes the <see cref="DateRangeParameter"/> to the specified
-        /// <see cref="XmlTextWriter"/>.
+        /// <see cref="XmlWriter"/>.
         /// </summary>
-        /// <param name="writer">The <see cref="XmlTextWriter"/> to write the
+        /// <param name="writer">The <see cref="XmlWriter"/> to write the
         /// paramter to.</param>
-        public override void WriteToXml(XmlTextWriter writer)
+        public override void WriteToXml(XmlWriter writer)
         {
             try
             {
@@ -1162,11 +1227,11 @@ namespace Extract.ReportViewer
 
         /// <summary>
         /// Writes the <see cref="ValueListParameter"/> to the specified
-        /// <see cref="XmlTextWriter"/>.
+        /// <see cref="XmlWriter"/>.
         /// </summary>
-        /// <param name="writer">The <see cref="XmlTextWriter"/> to write the
+        /// <param name="writer">The <see cref="XmlWriter"/> to write the
         /// paramter to.</param>
-        public override void WriteToXml(XmlTextWriter writer)
+        public override void WriteToXml(XmlWriter writer)
         {
             try
             {
