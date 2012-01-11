@@ -14,15 +14,466 @@ Final final SCRs<br>
 <hr>
 
 <UL>
-   	<LI><b>[FlexIDSCore #xxxx]</b> TBD
+   	<LI><b>[DataEntry #1073]</b> Auto-Zoom
+	<ul>
+		<li>Exercise verification for <b>Demo_FlexIndex</b>.
+		<li>When the first image appears, resize the window so that the image will fit 
+		comfortably in its pane.
+		<li>Modify the auto-zoom options to <b>Zoom out if necessary to fit current 
+		selection</b>.
+		<li>Stop and restart verification.
+		<li>Confirm that for the first field (probably <b>Parcel Number</b>), the image 
+		has not zoomed in close to the found text.
+	</ul>
+<p>
+   	<LI><b>[DataEntry #1074]</b> Extract Image Viewer.
+	<ul>
+		<li>Select a large image that has an associated USS file.
+		<li>Open the image using <b>ExtractImageViewer.exe</b>.
+		<li>Confirm that the loading is not unusually slow.
+	</ul>
+<p>
+   	<LI><b>[DotNet #437]</b> Confirm that SQLCDBEditor is automatically associated with 
+	<b>*.sdf</b> files.
+<p>
+   	<LI><b>[DotNet #689]</b> Document Type Condition property page
+	<ul>
+		<li>Confirm that the <b>Remove</b> button is only enabled when something 
+		is selected in the list box.
+		<li>Confirm that the <b>Clear</b> button is only enabled when the list 
+		box is non-empty.
+	</ul>
+<p>
+   	<LI><b>[DotNet #695]</b> FAM Service and multiple FPS files
+	<ul>
+		<li>Configure <b>FAM service</b> to exercise FPS files against two 
+		different databases.
+		<li>Configure each database to require user authentication.
+		<li>Configure each database such that the test machine is <b>not</b> 
+		given an exemption.  Note that no processing should occur.
+		<li>Restart the service.
+		<li>Confirm that the FAM service and the appropriate number of 
+		<b>FAMProcess.exe</b> instances start briefly.
+		<li>Confirm that the <b>FAMProcess.exe</b> instances stop.
+		<li>Confirm that the UEX log notes that the <b>FAMProcess.exe</b> instances 
+		cannot run due to authentication.
+		<li>Confirm that the FAM service stops completely.
+	</ul>
+<p>
+   	<LI><b>[DotNet #756]</b> Verification Without OCR On Client License
+	<ul>
+		<li>Confirm that a separate verification package is defined and available 
+		that does not provide <b>OCR On Client</b> capability.
+		<li>Exercise verification without <b>OCR On Client</b> and confirm that 
+		no unexpected errors are seen.
+		<li>Confirm that the <b>word redaction</b> tool gracefully doesn't work.
+	</ul>
+<p>
+   	<LI><b>[DotNet #757]</b> Confirm that the <b>FTP</b> report no longer has lines that 
+	are too long when zoomed in close.
+<p>
+   	<LI><b>[DotNet #759]</b> Extract Debug Data
+	<ul>
+		<li>Exercise <b>ExtractDebugData.exe</b> with the <b>/s</b> option.
+		<li>Confirm that the selected exceptions are successfully written to a 
+		separate log file.
+	</ul>
+<p>
+   	<LI><b>[DotNet #764, LegacyRC #6269, #6270]</b> Rasterizing PDFs
+	<ul>
+		<li>Exercise the PDF image(s) in <b>I:\Common\Testing\PVCS_Testing\DotNetRCAndUtils\764</b>. 
+		<ul>
+			<li>Confirm that conversion to a TIF with the normal method using
+			<b>ImageFormatConverter</b> yields a blank TIF.
+			<li>Confirm that conversion to a TIF with the alternate method using
+			<b>ImageFormatConverter</b> yields a non-blank TIF.
+			<li>Confirm that conversion to a TIF with the normal method using
+			<b>Core: Rasterize PDF</b> yields a non-blank TIF.
+			<li>Confirm that conversion to a TIF with the alternate method using
+			<b>Core: Rasterize PDF</b> yields a blank TIF.
+		</ul>
+		<li>Confirm that no <b>ImageFormatConverter</b> crashes are seen.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #3425]</b> Reports Without Data
+	<ul>
+		<li>Confirm that the <b>Documents processed on machines</b> report does not 
+		contain any unneeded labels.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #3461]</b> Incorrect Report Percentages
+	<ul>
+		<li>Confirm that the <b>ID Shield verification document, page and redaction 
+		counts (by user)</b> report presents correct percentages.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #3850]</b> Deprecated Rule Objects
+	<ul>
+		<li>Confirm that the following rule objects have been deprecated
+		<ul>
+			<li>Legal description splitter
+			<li>String pattern matcher finder
+		</ul>
+		<li>Confirm that a rule set that contains a deprecated rule object throws 
+		an exception if <b>saved</b>.
+		<li>Confirm that a rule set that contains a deprecated rule object throws 
+		an exception if <b>run</b>.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4044]</b> Verification
+	<ul>
+		<li>Verify some documents.
+		<li>Press <b>CTRL+S</b> while scrolling the mouse wheel.
+		<li>Confirm that no exceptions are seen.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4249, #4250, #4251, #4252]</b> Wrapping Filenames on Reports
+	<ul>
+		<li>Verify some documents with extremely long paths and filenames.
+		<li>Confirm that the <b>ID Shield list of documents verified by specific user</b> 
+		report properly displays the long filenames.
+		<li>Confirm that the two detailed reports for specific documents properly display 
+		the long filenames.
+		<li>Confirm that the <b>ID Shield detailed report for specific document</b> 
+		report has the proper title.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4382, #4615]</b> Spatial Proximity Attribute Selector
+	<ul>
+		<li>Confirm that the automated tests for the <b>SPAS</b> all pass.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4400]</b> MICR
+	<ul>
+		<li>Confirm that the automated tests for the <b>MICR Finder</b> all pass.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4509]</b> Verification Options
+	<ul>
+		<li>Open verification.
+		<li>Open the <b>Options</b> dialog and uncheck the <b>Enable ___ tool 
+		after highlight</b> option.
+		<li>Reopen the <b>Options</b> dialog and check the <b>Enable</b> option.  
+		Do not select a tool.
+		<li>Confirm that the <b>Selection</b> tool is chosen by default.
+		<li>Click <b>OK</b> and confirm that no error is seen.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4543]</b> Verification
+	<ul>
+		<li>Open verification with an image zoomed fit-to-page and the thumbnail 
+		viewer turned off.
+		<li>Create a manual redaction using the word redaction tool in pixel-fitting 
+		mode to create a highlight entirely outside the image.
+		<li>Confirm that no <b>ELI31351: Nullable object must have a value</b> 
+		exception is displayed or logged.
+		<li>Confirm that no <b>ELI21133: Unable to draw image</b> exception is 
+		displayed or logged.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4716, #4962]</b> Automated Tests
+	<ul>
+		<li>Confirm that the automated tests for <b>Box Finder</b> all pass.
+		<li>Confirm that the automated tests for <b>Merge Attributes</b> all pass.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4742]</b> Confirm that the property page for <b>Redaction: 
+	Create redacted image</b> can be opened with an <b>ID Shield Client</b> license.
+<p>
+   	<LI><b>[FlexIDSCore #4744]</b> Rule Set Editor
+	<ul>
+		<li>Open a <b>version 8.0</b> rule set that specifies a counter but not 
+		an FKB version.
+		<li>Leave the RSD file open for at least one minute.
+		<li>Confirm that no <b>Unable to save Ruleset</b> exceptions are logged 
+		or displayed.
+		<li>Confirm that no <b>File cannot be deleted</b> exceptions are logged 
+		or displayed.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4749]</b> Confirm that <b>Spatial Proximity Attribute Selector</b> 
+	uses resolution of individual pages.
+<p>
+   	<LI><b>[FlexIDSCore #4767]</b> ID Shield On Demand
+	<ul>
+		<li>Run the Demo_FlexIndex rules on the Demo_FlexIndex images.
+		<li>Open one of the images using <b>ID Shield On Demand</b>.
+		<li>Add one or more manual redactions and save the result.
+		<li>Confirm that that only redactions in the output file are the manual 
+		redactions.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4768]</b> FAM Doc Type Condition and Unknown
+	<ul>
+		<li>Configure a FAM Doc Type condition to match for documents with an 
+		<b>Unknown</b> document type.
+		<li>Modify a VOA file to include a <b>DocumentType</b> attribute with 
+		<b>Unknown</b> as the value.
+		<li>Confirm that this document matches the condition.
+		<li>Modify a VOA file to remove any existing <b>DocumentType</b> attribute.
+		<li>Confirm that this document also matches the condition.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4777]</b> Confirm that in the <b>Rule Set Editor</b>, the finding 
+	rule drop-down box now gets focus by default after adding a new finding rule.
+<p>
+   	<LI><b>[FlexIDSCore #4937, #4944, #4547, LegacyRC #6234]</b> Background OCR
        	<ul>
-      		<li>TBD
+      		<li>Run <b>Compute.fps</b> from <b>Demo_IDShield</b>.
+		<li>Delete all of the USS files.
+		<li>Run <b>Verify.fps</b> from <b>Demo_IDShield</b>.
+		<li>Tab quickly through the files.
+		<li>Confirm that no <b>ELI11049: System error...</b> exception is logged 
+		when the verification FAM stops.
+		<li>Confirm that no <b>OCR operation failed</b> exceptions are logged.
+<p>
+		<li>Exercise the first memory leak test for verification.
+		<li>Confirm that no unusual handle leak is seen.
        	</ul>
 <p>
-   	<LI><b>[LegacyRC #xxxx]</b> TBD
+   	<LI><b>[FlexIDSCore #4941]</b> Out Of Memory From SRICA
+	<ul>
+		<li>Review Endurance Test UEX logs and confirm that no <b>ELI26617: Out of 
+		memory</b> exceptions are logged.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4950]</b> Select Page Region
+	<ul>
+		<li>Exercise the RSD file at 
+		<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4950</b>.
+		<li>Confirm that the SPR rule that should find page 5 as an image region works 
+		properly.
+		<ul>
+			<li>With the associated USS file present.
+			<li>With the associated USS file not present.
+		</ul>
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4954]</b> Confirm that the <b>Files from context menu</b> file 
+	supplier works on a 64-bit operating system.
+<p>
+   	<LI><b>[FlexIDSCore #4955]</b> MICR Finder
+	<ul>
+		<li>Exercise <b>St Johns</b> rules on a small set of relevant images.  Note the 
+		processing time.
+		<li>Clear the database and delete the USS files.
+		<li>Modify the registry setting to perform an extended search.
+		<li>Exercise the images again.  Note the processing time.
+		<li>Confirm that the default settings without extended search result in 
+		significantly faster processing.
+		<li>Confirm that no unusual processing errors are logged.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4965]</b> Rapid Verification
+	<ul>
+		<li>Exercise verification.
+		<li>Quickly stop verification via the <b>close</b> button after starting 
+		processing.
+		<li>Repeat several times.
+		<li>Confirm that no <b>ELI26599: Error closing verification</b> exceptions 
+		are seen.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4974]</b> Ruleset Auto-save
+	<ul>
+		<li>Open an 8.0 ruleset that contains deprecated rule objects (IN - Marion - 
+		Trimin).
+		<li>Confirm that the ruleset cannot be saved in its present form.
+		<li>Manually remove some of the deprecated objects.
+		<li>Confirm that no errors from the auto-save process are seen.
+	</ul>
+<p>
+   	<LI><b>[LegacyRC #5273]</b> Confirm that the associated <b>Start</b> menu items are removed 
+	after uninstalling <b>Extract Systems License Manager</b>.
+<p>
+   	<LI><b>[LegacyRC #5934]</b> Connection Is No Longer Good
        	<ul>
-		<li>TBD
+		<li>Supply a large number of files.
+		<li>Run several processing instances and confirm that processing is successful.
+		<li>Stop all of the instances after a few minutes.
+		<li>Confirm that no <b>ELI15459: Connection is no longer good</b> exceptions 
+		are logged.
        	</ul>
+<p>
+   	<LI><b>[LegacyRC #6108]</b> Confirm that the <b>Document Tag Change History</b> report 
+	no longer prompts for a printer driver.
+<p>
+   	<LI><b>[LegacyRC #6124]</b> DB Admin Error Message
+       	<ul>
+		<li>Open a DB Admin database with at least one action.
+		<li>Manually set action status.
+		<li>Select a new status such as <b>Pending</b> but do not select an action.
+		<li>Click <b>OK</b>.
+		<li>Confirm that the error message is correct.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #6130]</b> Confirm that the following reports run without unusual 
+	delays.
+       	<ul>
+		<li>ID Shield project summary
+		<li>List of all actions in the project
+		<li>List of all machines in the project
+		<li>List of all users in the project
+		<li>Machines used for processing (by action)
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #6140, DotNet #765]</b> Refreshing Reports
+       	<ul>
+		<li>Verify a few documents.
+		<li>Run the <b>Detailed usage report for specific user for specific day</b> 
+		report.
+		<li>Verify more documents.
+		<li>Refresh the report.
+		<li>Confirm that new information has been added to the report.
+		<li>Confirm that no exception is seen when running a saved report from 
+		the command line.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #6147]</b> Database Settings Change History Report
+       	<ul>
+		<li>Confirm that the report is available for selection.
+		<li>Confirm that an appropriate sample image is provided.
+		<li>Exercise the report.
+		<li>Confirm that the results and formatting are correct.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #6148]</b> Source Document Name Change History Report
+       	<ul>
+		<li>Confirm that the report is available for selection.
+		<li>Confirm that an appropriate sample image is provided.
+		<li>Exercise the report.
+		<li>Confirm that the results and formatting are correct.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #6151]</b> Clearing Database Without Permissions
+       	<ul>
+		<li>Create a FLEX Index or ID Shield database.
+		<li>Log in as a non-admin user.
+		<li>Attempt to clear the database.
+		<li>Confirm that a meaningful exception is displayed.
+		<li>Confirm that multiple error messages are not displayed.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #6153]</b> Convert FAM Database Utility
+       	<ul>
+		<li>Confirm that a <b>6.0</b> database can be converted to a <b>9.0</b> database.
+		<li>Confirm that a <b>7.0</b> database can be converted to a <b>9.0</b> database.
+		<li>Confirm that an <b>8.0</b> database cannot be converted to a <b>9.0</b> 
+		database.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #6157]</b> Exporting File List Without Write Permission
+       	<ul>
+		<li>Create and populate a FLEX Index or ID Shield database.
+		<li>Log in as a non-admin user.
+		<li>Confirm that a text file cannot be written to <b>C:\</b>.
+		<li>Export a file list from the database to <b>C:\a.txt</b>.
+		<li>Confirm that a meaningful exception is displayed.
+		<li>Confirm that a success message is not presented.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #6194]</b> Confirm that the following reports do not report data 
+	from the <b>Endurance</b> database on HPQC2. The reports also should not report 
+	data from <b>HAWKEYE</b>.
+       	<ul>
+		<li>Summary of actions and associated document counts
+		<li>Summary of actions and associated page counts
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #6209]</b> Confirm that the <b>Detailed Usage Report For Specific User 
+	For Specific Day</b> report no longer requests a time value (only date) in the 
+	<b>Parameter Specification Form</b>.
+<p>
+   	<LI><b>[LegacyRC #6223]</b> Confirm that copyright information for <b>LogProcessStats.exe</b> 
+	includes an updated year.
+<p>
+   	<LI><b>[LegacyRC #6233]</b> Query Timeout Expired
+       	<ul>
+		<li>Confirm that the Endurance Test queuing machine no longer has a large 
+		number of <b>ELI30365: Query timeout expired</b> exceptions logged.
+		<li>Note the rate of file supplying when the database already contains 
+		many files.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #6235]</b> Install/Uninstall of SQL CE 3.5
+       	<ul>
+		<li>Install an older FLEX Index or ID Shield version and confirm that the FAM 
+		service is available from the management console.  Also confirm that the 
+		FAM service database can be configured.
+		<li>Uninstall the Extract Systems software, uninstalling SQL Server CE when 
+		prompted.
+		<li>Install a newer FLEX Index or ID Shield version.
+		<ul>
+			<li>Confirm that the FAM service is again available.
+			<li>Confirm that the FAM service database can be configured.
+		</ul>
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #6242, #6249]</b> Queued Action Status Change
+       	<ul>
+		<li>Prepare 3 FAMs where the first FAM processes ID Shield images, the second 
+		FAM verifies the documents, and the third FAM creates the redacted image.
+		<li>Verify a document and confirm that a redacted image is created.
+		<li>Navigate back to a previously verified document and make a change.
+		<li>Confirm that the changes are automatically applied and that the output 
+		image is overwritten.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #6243]</b> Confirm that DB Admin can set file action status of a 
+	single file back to <b>Pending</b>.
+<p>
+   	<LI><b>[LegacyRC #6248]</b> Review <b>Endurance Test</b> notes for a build after 9.0.0.156 
+	and confirm that no failures are seen due to <b>Unable to open file storage object</b>.
+<p>
+   	<LI><b>[LegacyRC #6250]</b> Confirm that the legacy Image Viewer can successfully OCR 
+	highlighted text.
+<p>
+   	<LI><b>[LegacyRC #6251]</b> Auto-Revert Error
+       	<ul>
+		<li>Confirm that the auto-revert timeout is 5 minutes.
+		<li>Kill a FAM instance that is actively processing files.
+		<li>Remove any other files from <b>Pending</b> for the relevant action.
+		<li>Wait until the auto-revert timeout has passed.
+		<li>Restart the FAM.
+		<li>Confirm that the stuck files revert to Pending and then are processed.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #6252]</b> Confirm that the <b>Core: Create Searchable PDF</b> task 
+	works properly.
+<p>
+   	<LI><b>[LegacyRC #6255]</b> COM Object Data Files
+       	<ul>
+		<li>Open a <b>version 8.0</b> master ruleset.
+		<li>Attempt to save it and confirm that an exception is displayed complaining 
+		about a missing FKB version.
+		<li>Close the exception and the RuleSet Editor.
+		<li>Confirm that the master ruleset can still be opened.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #6256]</b> Confirm that the <b>USS File Viewer</b> can successfully  
+	find characters that are not included in a specified font range.
+<p>
+   	<LI><b>[Miscellaneous]</b>
+       	<ul>
+		<li>DB Admin Queries
+	       	<ul>
+			<li>Connect to a very large database such as for the <b>Endurance Test</b>.
+			<li>Confirm that <b>Summary</b> tab refreshes quickly.
+	       	</ul>
+<p>
+		<li>FAM About Box
+	       	<ul>
+			<li>Open a FAM instance and display the <b>About box</b>.
+			<li>Confirm that no exception has been logged about an inability to 
+			locate the FKB version.
+	       	</ul>
+<p>
+		<li>String Pattern Matcher Finder
+	       	<ul>
+			<li>Confirm that no automated tests are run for <b>String Pattern 
+			Matcher Finder</b>.
+	       	</ul>
+	</ul>
 </UL>
 </BODY>
 </HTML>
