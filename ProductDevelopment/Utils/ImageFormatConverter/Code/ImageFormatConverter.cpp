@@ -338,6 +338,10 @@ void initNuanceEngineAndLicense()
 void nuanceConvertImage(const string strInputFileName, const string strOutputFileName, 
 				  EConverterFileType eOutputType)
 {
+	// [LegacyRCAndUtils:6275]
+	// Since we will be using the Nuance engine, ensure we are licensed for it.
+	VALIDATE_LICENSE( gnOCR_ON_CLIENT_FEATURE, "ELI34323", "ImageFormatConverter" );
+
 	IMF_FORMAT nFormat(FF_TIFNO);
 	bool bOutputImageOpened(false);
 	int nPage(0);

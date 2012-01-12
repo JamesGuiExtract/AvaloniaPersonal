@@ -142,9 +142,10 @@ namespace Extract.FileActionManager.FileProcessors
         bool _dirty;
 
         /// <summary>
-        /// The license id to validate in licensing calls
+        /// The license ids to validate in licensing calls
         /// </summary>
-        static readonly LicenseIdName _licenseId = LicenseIdName.PdfReadWriteFeature;
+        static readonly LicenseIdName _licenseId1 = LicenseIdName.PdfReadWriteFeature;
+        static readonly LicenseIdName _licenseId2 = LicenseIdName.OcrOnClientFeature;
 
         #endregion Fields
 
@@ -506,7 +507,8 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                LicenseUtilities.ValidateLicense(_licenseId, "ELI32248", _COMPONENT_DESCRIPTION);
+                LicenseUtilities.ValidateLicense(_licenseId1, "ELI32248", _COMPONENT_DESCRIPTION);
+                LicenseUtilities.ValidateLicense(_licenseId2, "ELI34321", _COMPONENT_DESCRIPTION);
             }
             catch (Exception ex)
             {
@@ -538,7 +540,8 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(_licenseId, "ELI32228", _COMPONENT_DESCRIPTION);
+                LicenseUtilities.ValidateLicense(_licenseId1, "ELI32228", _COMPONENT_DESCRIPTION);
+                LicenseUtilities.ValidateLicense(_licenseId2, "ELI34322", _COMPONENT_DESCRIPTION);
                 
                 // Name of the file being processed that will have it's name changed in the database
                 var fileName = pFileRecord.Name;
@@ -641,7 +644,8 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                return LicenseUtilities.IsLicensed(_licenseId);
+                return LicenseUtilities.IsLicensed(_licenseId1) &&
+                       LicenseUtilities.IsLicensed(_licenseId2);
             }
             catch (Exception ex)
             {
