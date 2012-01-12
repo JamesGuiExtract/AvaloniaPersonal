@@ -72,7 +72,8 @@ Dlg_SdFeatureTree:
 				// Stop the services first
 				ServiceStopService("Extract Systems Exception Service");
 				ServiceStopService("Extract Systems FDRS Service");
-				ServiceStopService("Extract Systems IPC Service");
+				ServiceStopService("Extract Systems IPC Service");    
+				ServiceStopService("Nuance Licensing Service");
 				
 				// Unregister the shell extension
 				UnregisterLoginNPShellExtension("Extract.Utilities.ShellExtensions.dll");
@@ -94,8 +95,13 @@ Dlg_SdFeatureTree:
 				UninstallInstallSQLCE ();
 				
 				// Register the shell extension
-				UnregisterLoginNPShellExtension("Extract.Utilities.ShellExtensions.dll");  
+				UnregisterLoginNPShellExtension("Extract.Utilities.ShellExtensions.dll");
 				
+				UninstallInliteKeyDrivers();
+   	
+		    	// Delete all lst files
+  			  	DeleteFile(PROGRAMFILES + EXTRACT_DIR + "\\*.LST");
+  
 			    // Unregister Dlls
 				szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\UnegisterAll.bat\"";
 				szCmd = "cmd";

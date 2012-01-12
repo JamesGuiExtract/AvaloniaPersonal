@@ -10,13 +10,7 @@ function OnMaintUIAfter()
 	STRING szTitle, szMsg1, szMsg2, szOption1, szOption2;
 	NUMBER bOpt1, bOpt2;
 begin
-    if ( REMOVEALLMODE) then
-    	UninstallInliteKeyDrivers();
-    	
-    	// Delete all lst files
-    	DeleteFile(PROGRAMFILES + EXTRACT_DIR + "\\*.LST");
-    endif;
-    
+   
 	Disable(STATUSEX);
 
 	bOpt1   = FALSE;

@@ -372,12 +372,19 @@ end;
 ///////////////////////////////////////////////////////////////////////////////
 function InstallInliteKeyDrivers()
 	string szProgram;
-begin  
+begin    
+	SdShowMsg("Setup is Installing Inlite drivers.", TRUE);
 	szProgram = SUPPORTDIR ^ "\\CbSetup.exe";
 	LaunchAppAndWait(szProgram, "/Q /CRYPTOKEN", LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);
 	
 	szProgram = SUPPORTDIR ^ INLITE_INSTALLER_EXE;
-	LaunchAppAndWait(szProgram, "/S ", LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);
+	LaunchAppAndWait(szProgram, "/S ", LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);    
+	
+	// Remove the Nuance Start Menu item  
+	DeleteDir( StartMenuFolder ^ "Programs\\ClearImage 7 PDK", ALLCONTENTS); 
+	DeleteDir( StartMenuFolder ^ "Programs\\ClearImage 7 PDK", ALLCONTENTS);  
+	
+	SdShowMsg("Setup is Installing Inlite drivers.", FALSE);
 end;
 
 ///////////////////////////////////////////////////////////////////////////////
