@@ -72,6 +72,21 @@ Final final SCRs<br>
    	<LI><b>[DotNet #757]</b> Confirm that the <b>FTP</b> report no longer has lines that 
 	are too long when zoomed in close.
 <p>
+   	<LI><b>[DotNet #758]</b> New Time Span Options For Reports
+	<ul>
+		<li>Exercise the new time span options for reports.
+		<ul>
+			<li>Last 24 hours
+			<li>Last 1 minute
+			<li>Last 3 minutes
+			<li>Last 10 minutes
+			<li>Last 30 minutes
+		</ul>
+		<li>Confirm that the options are ordered properly.
+		<li>Confirm that refreshing a report updates information based on the 
+		current time and the selected interval.
+	</ul>
+<p>
    	<LI><b>[DotNet #759]</b> Extract Debug Data
 	<ul>
 		<li>Exercise <b>ExtractDebugData.exe</b> with the <b>/s</b> option.
@@ -79,7 +94,18 @@ Final final SCRs<br>
 		separate log file.
 	</ul>
 <p>
-   	<LI><b>[DotNet #764, LegacyRC #6269, #6270]</b> Rasterizing PDFs
+   	<LI><b>[DotNet #762]</b> Report Viewer Errors
+	<ul>
+		<li>Create a collection of images to process where some images have very 
+		long filenames.
+		<li>Process the files using <b>ID Shield</b>.
+		<li>Exercise each defined report.
+		<li>Confirm that the long filenames are properly and completely displayed 
+		in the reports.
+		<li>Confirm that each report runs without error.
+	</ul>
+<p>
+   	<LI><b>[DotNet #764, #766, LegacyRC #6275, #6269, #6270]</b> Rasterizing PDFs
 	<ul>
 		<li>Exercise the PDF image(s) in <b>I:\Common\Testing\PVCS_Testing\DotNetRCAndUtils\764</b>. 
 		<ul>
@@ -93,6 +119,22 @@ Final final SCRs<br>
 			<b>Core: Rasterize PDF</b> yields a blank TIF.
 		</ul>
 		<li>Confirm that no <b>ImageFormatConverter</b> crashes are seen.
+<p>
+		<li>Prepare an FPS file to queue some PDFs and rasterize them into TIFs.  The 
+		task should delete the source PDF but not rename the file in the database.
+		<li>Run the FPS file and confirm that the output TIF files exist.
+		<li>Reset the <b>Completed</b> files to <b>Pending</b>.
+		<li>Re-run the FPS and confirm that all the files fail because the source 
+		documents do not exist.
+		<li>Confirm that the TIF images from the first run still exist.
+<p>
+		<li>Create an ID Shield Client license without OCR On Client.
+		<li>Rename or delete other license files.
+		<li>Confirm that <b>ImageFormatConverter</b> and <b>Core: Rasterize PDF</b> 
+		work when <b>NOT</b> using the Nuance option.
+		<li>Provide a license file that includes OCR On Client.
+		<li>Confirm that <b>ImageFormatConverter</b> and <b>Core: Rasterize PDF</b> 
+		work when using the Nuance option.
 	</ul>
 <p>
    	<LI><b>[FlexIDSCore #3425]</b> Reports Without Data
@@ -145,7 +187,8 @@ Final final SCRs<br>
 <p>
    	<LI><b>[FlexIDSCore #4400]</b> MICR
 	<ul>
-		<li>Confirm that the automated tests for the <b>MICR Finder</b> all pass.
+		<li>Confirm that the automated tests for the <b>MICR Finder</b> all pass 
+		when the <b>Inlite</b> keys are installed.
 	</ul>
 <p>
    	<LI><b>[FlexIDSCore #4509]</b> Verification Options
@@ -169,6 +212,23 @@ Final final SCRs<br>
 		exception is displayed or logged.
 		<li>Confirm that no <b>ELI21133: Unable to draw image</b> exception is 
 		displayed or logged.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4708, #4747]</b> ID Shield On Demand
+	<ul>
+		<li>Process a document that <b>does not</b> have an associated VOA file.
+		<li>Make a manual redaction and close the file.
+		<li>Confirm that a prompt is presented asking about saving an output file.
+		<li>Process a document that <b>does</b> have an associated VOA file.
+		<li>Make a manual redaction and close the file.
+		<li>Confirm that a prompt is presented asking about saving a VOA file.
+		<li>Confirm that a prompt is presented asking about saving an output file.
+		<li>Process a document that <b>does</b> have an associated VOA file.
+		<li>Delete at least one attribute and click the <b>Save</b> button.
+		<li>Cancel from the <b>Save As</b> dialog.
+		<li>Click the <b>Save</b> button again.
+		<li>Confirm that no <b>ELI28165: Unable to save verification file</b> 
+		exception is displayed.
 	</ul>
 <p>
    	<LI><b>[FlexIDSCore #4716, #4962]</b> Automated Tests
@@ -217,6 +277,30 @@ Final final SCRs<br>
    	<LI><b>[FlexIDSCore #4777]</b> Confirm that in the <b>Rule Set Editor</b>, the finding 
 	rule drop-down box now gets focus by default after adding a new finding rule.
 <p>
+   	<LI><b>[FlexIDSCore #4901]</b> Confirm that the <b>Redaction: Create redacted image</b> 
+	does not add <b>IDAndRevision</b> attributes to existing metadata attributes.
+<p>
+   	<LI><b>[FlexIDSCore #4927]</b> Verification
+	<ul>
+		<li>Configure a verification FPS file to keep processing even after the queue 
+		is empty.
+		<li>Verify a few documents until the queue is empty.
+		<li>Press <b>Ctrl+Tab</b> to advance to the next document.
+		<li>Confirm that no error is seen.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4929]</b> Verification Shortcuts and Tooltips
+	<ul>
+		<li>Confirm that <b>F10</b> works to show and hide the thumbnail pane.
+		<li>Confirm that the following tooltips include the shortcut keys.
+		<ul>
+			<li>Slideshow play
+			<li>Show/hide thumbnail pane
+			<li>Show/hide magnifier pane
+			<li>Redaction tools
+		</ul>
+	</ul>
+<p>
    	<LI><b>[FlexIDSCore #4937, #4944, #4547, LegacyRC #6234]</b> Background OCR
        	<ul>
       		<li>Run <b>Compute.fps</b> from <b>Demo_IDShield</b>.
@@ -264,6 +348,9 @@ Final final SCRs<br>
 		<li>Confirm that no unusual processing errors are logged.
 	</ul>
 <p>
+   	<LI><b>[FlexIDSCore #4963]</b> Confirm that the retry for redacted image output uses 
+	the same settings as access retries.
+<p>
    	<LI><b>[FlexIDSCore #4965]</b> Rapid Verification
 	<ul>
 		<li>Exercise verification.
@@ -274,6 +361,14 @@ Final final SCRs<br>
 		are seen.
 	</ul>
 <p>
+   	<LI><b>[FlexIDSCore #4966, #4967]</b> Splash Screens
+	<ul>
+		<li>Confirm that the <b>FLEX Index</b> installation splash screen does not 
+		contain any information about patents.
+		<li>Confirm that the <b>ID Shield</b> installation splash screen does not 
+		contain any information about patents.
+	</ul>
+<p>
    	<LI><b>[FlexIDSCore #4974]</b> Ruleset Auto-save
 	<ul>
 		<li>Open an 8.0 ruleset that contains deprecated rule objects (IN - Marion - 
@@ -282,6 +377,21 @@ Final final SCRs<br>
 		<li>Manually remove some of the deprecated objects.
 		<li>Confirm that no errors from the auto-save process are seen.
 	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4979]</b> Verification
+	<ul>
+		<li>Configure a verification FPS file to require visitation of every page.
+		<li>Verify the image and VOA file at 
+		<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4979</b>.
+		<li>Make a manual redaction on the first page.
+		<li>Confirm that <b>page 10</b> is not marked as viewed.
+	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4980]</b> Confirm that the <b>ClearImage 7 PDK</b> software is only 
+	uninstalled with the second of either FLEX Index or ID Shield uninstalls.
+<p>
+   	<LI><b>[FlexIDSCore #4981]</b> Confirm that neither FLEX Index nor ID Shield adds a Start 
+	menu item for <b>ClearImage 7 PDK</b> software.
 <p>
    	<LI><b>[LegacyRC #5273]</b> Confirm that the associated <b>Start</b> menu items are removed 
 	after uninstalling <b>Extract Systems License Manager</b>.
@@ -372,6 +482,14 @@ Final final SCRs<br>
 		<li>Confirm that a success message is not presented.
        	</ul>
 <p>
+   	<LI><b>[LegacyRC #6184, #6206]</b> Searchable PDFs and PDF/A
+       	<ul>
+		<li>Exercise a lengthy test for <b>Core: Create searchable PDF</b> and 
+		where creating PDF/A compatible images is a selected option.
+		<li>Confirm that unexpected exceptions are not seen.
+		<li>Confirm that <b>File cannot be deleted</b> exceptions are not seen.
+       	</ul>
+<p>
    	<LI><b>[LegacyRC #6194]</b> Confirm that the following reports do not report data 
 	from the <b>Endurance</b> database on HPQC2. The reports also should not report 
 	data from <b>HAWKEYE</b>.
@@ -453,22 +571,43 @@ Final final SCRs<br>
    	<LI><b>[LegacyRC #6256]</b> Confirm that the <b>USS File Viewer</b> can successfully  
 	find characters that are not included in a specified font range.
 <p>
+   	<LI><b>[LegacyRC #6259]</b> Confirm that the <b>ClearImage 7 PDK</b> can be uninstalled 
+	without error as part of the Extract Systems uninstalls.
+<p>
+   	<LI><b>[LegacyRC #6272]</b> Confirm that OCR functionality remains licensed after uninstalling 
+	our software and then reinstalling it without a reboot.  Previous problems were resolved 
+	by stopping and then restarting the <b>Nuance Licensing</b> service.
+<p>
+   	<LI><b>[LegacyRC #6274]</b> Verification Without OCR On Client
+       	<ul>
+		<li>Create an <b>ID Shield Client</b> license without <b>OCR On Client</b>.
+		<li>Confirm that this option is clearly available from the License Generator.
+		<li>Exercise verification against files with and without USS files.
+		<ul>
+			<li>Confirm that the angular and rectangular redaction tools perform 
+			as expected.
+			<li>Confirm that the word redaction tool does not work and displays 
+			no error.
+			<li>Confirm that redacted images can be created.
+		</ul>
+       	</ul>
+<p>
    	<LI><b>[Miscellaneous]</b>
        	<ul>
-		<li>DB Admin Queries
+		<li><u>DB Admin Queries</u>
 	       	<ul>
 			<li>Connect to a very large database such as for the <b>Endurance Test</b>.
 			<li>Confirm that <b>Summary</b> tab refreshes quickly.
 	       	</ul>
 <p>
-		<li>FAM About Box
+		<li><u>FAM About Box</u>
 	       	<ul>
 			<li>Open a FAM instance and display the <b>About box</b>.
 			<li>Confirm that no exception has been logged about an inability to 
 			locate the FKB version.
 	       	</ul>
 <p>
-		<li>String Pattern Matcher Finder
+		<li><u>String Pattern Matcher Finder</u>
 	       	<ul>
 			<li>Confirm that no automated tests are run for <b>String Pattern 
 			Matcher Finder</b>.
