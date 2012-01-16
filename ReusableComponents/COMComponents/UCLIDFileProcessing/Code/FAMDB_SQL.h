@@ -915,6 +915,7 @@ static const string gstrUPDATE_ACTION_STATISTICS_FOR_ACTION_FROM_DELTA =
 //		<UserID> - ID for the files are being processed under
 //		<MachineID> - ID for the machine processing the files
 //		<UPIID> - UPIID of the processing FAM
+//		<RecordFASTEntry> = 1 to record an entry in the FAST table for all file set to processing.
 static const string gstrGET_FILES_TO_PROCESS_QUERY = 
 	"DECLARE @OutputTableVar table ( \r\n"
 	"	[ID] [int] NOT NULL, \r\n"
@@ -932,10 +933,12 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 	"	( \r\n"
 	"		<SelectFilesToProcessQuery> ) AS ATABLE  \r\n"
 	"	INNER JOIN FileActionStatus on FileActionStatus.FileID = ATABLE.ID AND FileActionStatus.ActionID = <ActionID>;  \r\n"
-	"	INSERT INTO FileActionStateTransition (FileID, ActionID,  ASC_From, ASC_To,  \r\n"
-	"		DateTimeStamp, FAMUserID, MachineID, Exception, Comment) \r\n"
-	"	SELECT id, <ActionID> as ActionID, ASC_From, 'R' as ASC_To, GETDATE() AS DateTimeStamp,  \r\n"
-	"		<UserID> as UserID, <MachineID> as MachineID, '' as Exception, '' as Comment FROM @OutputTableVar; \r\n"
+	"	IF (1 = <RecordFASTEntry>) BEGIN"
+	"		INSERT INTO FileActionStateTransition (FileID, ActionID,  ASC_From, ASC_To,  \r\n"
+	"			DateTimeStamp, FAMUserID, MachineID, Exception, Comment) \r\n"
+	"		SELECT id, <ActionID> as ActionID, ASC_From, 'R' as ASC_To, GETDATE() AS DateTimeStamp,  \r\n"
+	"			<UserID> as UserID, <MachineID> as MachineID, '' as Exception, '' as Comment FROM @OutputTableVar \r\n"
+	"	END; \r\n"
 	"	INSERT INTO LockedFile(FileID,ActionID,UPIID,StatusBeforeLock) \r\n"
 	"		SELECT ID, <ActionID> as ActionID, <UPIID> AS UPIID, ASC_From AS StatusBeforeLock FROM @OutputTableVar; \r\n"
 	"	SET NOCOUNT OFF \r\n"

@@ -213,7 +213,10 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			strFileIdList += ")";
 			
 			// Execute the queries (execute the FAMFile update last)
-			executeCmdQuery(ipConnection, strFastQuery + strFileIdList);
+			if (m_bUpdateFASTTable)
+			{
+				executeCmdQuery(ipConnection, strFastQuery + strFileIdList);
+			}
 			executeCmdQuery(ipConnection, strDeleteLockedFile + strFileIdList);
 			executeCmdQuery(ipConnection, strRemoveSkippedFile + strFileIdList);
 			executeCmdQuery(ipConnection, strUpdateQueuedActionStatusChange + strFileIdList);
@@ -1506,7 +1509,7 @@ void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, con
 
 		// Set string for the ToActionID
 		string strToActionID = asString(nToActionID == -1 ? getActionID(ipConnection, strTo) : nToActionID);
-		if (bAddTransRecords)
+		if (bAddTransRecords && m_bUpdateFASTTable)
 		{
 
 			string strTransition = "INSERT INTO FileActionStateTransition "
@@ -4118,6 +4121,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 						replaceVariable(strQuery, "<UserID>", asString(getFAMUserID(ipConnection)));
 						replaceVariable(strQuery, "<MachineID>", asString(getMachineID(ipConnection)));
 						replaceVariable(strQuery, "<UPIID>", asString(m_nUPIID));
+						replaceVariable(strQuery, "<RecordFASTEntry>", m_bUpdateFASTTable ? "1" : "0");
 
 						// Loop to retry getting files until there are either no records returned 
 						// Get recordset of files to be set to processing.
