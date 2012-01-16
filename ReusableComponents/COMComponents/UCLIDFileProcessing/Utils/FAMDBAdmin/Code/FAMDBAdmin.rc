@@ -636,6 +636,8 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Manually set action status...\tCtrl+M", ID_TOOLS_MANUALLYSETACTIONSTATUS
         MENUITEM "Manually set file processing &priority...", ID_TOOLS_SETPRIORITY
+		MENUITEM SEPARATOR
+		MENUITEM "Recalculate summary &statistics", ID_TOOLS_RECALCULATE_STATS
         MENUITEM SEPARATOR
         MENUITEM "&File Action Manager...\tCtrl+F", ID_TOOLS_FILEACTIONMANAGER
         MENUITEM SEPARATOR

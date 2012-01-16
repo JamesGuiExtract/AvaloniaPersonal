@@ -60,18 +60,26 @@ using namespace ADODB;
 			} \
 			catch(UCLIDException &ue) \
 			{ \
-				if (isConnectionAlive(ipRetryConnection) || nRetryCount >= m_iNumberOfRetries) \
+				bool bConnectionAlive = isConnectionAlive(ipRetryConnection); \
+				bool bTimeout = ue.getTopText().find("timeout") != string::npos; \
+				if (((!bTimeout || !m_bRetryOnTimeout) && bConnectionAlive) \
+					|| nRetryCount >= m_iNumberOfRetries) \
 				{ \
 					throw ue; \
 				}\
 				if (!bRetryExceptionLogged) \
 				{ \
-					UCLIDException uex("ELI32030", \
-						"Application trace: Database connection failed. Attempting to reconnect.", ue); \
+					UCLIDException uex("ELI32030", bTimeout \
+						? "Application trace: Database query timed out. Re-attemping..." \
+						: "Application trace: Database connection failed. Attempting to reconnect.", \
+							ue); \
 					uex.log(); \
 					bRetryExceptionLogged = true; \
 				} \
-				reConnectDatabase(); \
+				if (!bConnectionAlive) \
+				{ \
+					reConnectDatabase(); \
+				} \
 				nRetryCount++; \
 			} \
 		} \
@@ -1704,6 +1712,11 @@ bool CFileProcessingDB::SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAc
 				// Begin a transaction
 				TransactionGuard tg(ipConnection);
 
+				// Ensure no other stats or action status change while processing.
+				lockDBTableForTransaction(ipConnection, "FileActionStatus");
+				lockDBTableForTransaction(ipConnection, "ActionStatisticsDelta");
+				lockDBTableForTransaction(ipConnection, "ActionStatistics");
+
 				// Get the action ID as as string
 				string strActionID = asString(nActionID);
 
@@ -2212,6 +2225,11 @@ bool CFileProcessingDB::CopyActionStatusFromAction_Internal(bool bDBLocked, long
 				string strTo = getActionName(ipConnection, nToAction);
 
 				TransactionGuard tg(ipConnection);
+
+				// Ensure no other stats or action status change while processing.
+				lockDBTableForTransaction(ipConnection, "FileActionStatus");
+				lockDBTableForTransaction(ipConnection, "ActionStatisticsDelta");
+				lockDBTableForTransaction(ipConnection, "ActionStatistics");
 
 				// Copy Action status and only update the FAST table if required
 				copyActionStatus(ipConnection, strFrom, strTo, m_bUpdateFASTTable, nToAction);
@@ -2960,6 +2978,11 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 
 				_RecordsetPtr ipFileSet(__uuidof(Recordset));
 				ASSERT_RESOURCE_ALLOCATION("ELI30382", ipFileSet != __nullptr);
+
+				// Ensure no other stats or action status change while processing.
+				lockDBTableForTransaction(ipConnection, "FileActionStatus");
+				lockDBTableForTransaction(ipConnection, "ActionStatisticsDelta");
+				lockDBTableForTransaction(ipConnection, "ActionStatistics");
 
 				// Open the file set
 				ipFileSet->Open(strQueryFrom.c_str(), _variant_t((IDispatch*)ipConnection, true),
@@ -6033,6 +6056,44 @@ bool CFileProcessingDB::RecordFTPEvent_Internal(bool bDBLocked, long nFileId, lo
 			END_CONNECTION_RETRY(ipConnection, "ELI33962");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33963");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::IsAnyFAMActive_Internal(bool bDBLocked, VARIANT_BOOL* pvbFAMIsActive)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI34334", pvbFAMIsActive != __nullptr);
+
+			*pvbFAMIsActive = VARIANT_FALSE;
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			if (isFAMActiveForAnyAction(bDBLocked))
+			{
+				*pvbFAMIsActive = VARIANT_TRUE;
+			}
+
+			END_CONNECTION_RETRY(ipConnection, "ELI34331");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34332");
 	}
 	catch(UCLIDException &ue)
 	{

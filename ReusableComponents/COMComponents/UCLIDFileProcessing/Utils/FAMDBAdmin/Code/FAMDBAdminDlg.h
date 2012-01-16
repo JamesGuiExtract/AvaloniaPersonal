@@ -59,6 +59,7 @@ protected:
 	afx_msg void OnManageLoginUsers();
 	afx_msg void OnManageActions();
 	afx_msg void OnToolsSetPriority();
+	afx_msg void OnRecalculateStats();
 	DECLARE_MESSAGE_MAP()
 
 	//INotifyDBConfigChanged

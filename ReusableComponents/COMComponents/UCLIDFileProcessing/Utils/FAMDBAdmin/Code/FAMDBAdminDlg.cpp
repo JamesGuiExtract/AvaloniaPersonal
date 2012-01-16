@@ -110,13 +110,14 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_HELP_FILEACTIONMANAGERHELP, &CFAMDBAdminDlg::OnHelpFileActionManagerHelp)
 	ON_WM_SIZE()
 	ON_WM_GETMINMAXINFO()
-	ON_COMMAND(ID_TOOLS_REPORTS, &CFAMDBAdminDlg::OnToolsReports)
 	ON_COMMAND(ID_TOOLS_CHECKFORNEWCOMPONENTS, &CFAMDBAdminDlg::OnToolsCheckForNewComponents)
 	ON_COMMAND(ID_MANAGE_TAGS, &CFAMDBAdminDlg::OnManageTags)
 	ON_COMMAND(ID_MANAGE_COUNTERS, &CFAMDBAdminDlg::OnManageCounters)
 	ON_COMMAND(ID_MANAGE_USERS, &CFAMDBAdminDlg::OnManageLoginUsers)
 	ON_COMMAND(ID_MANAGE_ACTIONS, &CFAMDBAdminDlg::OnManageActions)
 	ON_COMMAND(ID_TOOLS_SETPRIORITY, &CFAMDBAdminDlg::OnToolsSetPriority)
+	ON_COMMAND(ID_TOOLS_REPORTS, &CFAMDBAdminDlg::OnToolsReports)
+	ON_COMMAND(ID_TOOLS_RECALCULATE_STATS, &CFAMDBAdminDlg::OnRecalculateStats)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -825,6 +826,25 @@ void CFAMDBAdminDlg::OnToolsSetPriority()
 		dlg.DoModal();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27698");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnRecalculateStats()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+
+	try
+	{	
+		// Set the wait cursor
+		CWaitCursor wait;
+
+		// Create a new set file priority dialog
+		m_ipFAMDB->RecalculateStatistics();
+
+		m_propSheet.SetActivePage(&m_propSummaryPage);
+
+		UpdateSummaryTab();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI34327");
 }
 //-------------------------------------------------------------------------------------------------
 void CFAMDBAdminDlg::UpdateSummaryTab(long nActionID /*= -1*/)

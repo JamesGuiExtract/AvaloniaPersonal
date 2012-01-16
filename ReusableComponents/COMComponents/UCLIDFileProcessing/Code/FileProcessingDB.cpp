@@ -60,18 +60,26 @@ using namespace ADODB;
 			} \
 			catch(UCLIDException ue) \
 			{ \
-				if (isConnectionAlive(ipRetryConnection) || nRetryCount >= m_iNumberOfRetries) \
+				bool bConnectionAlive = isConnectionAlive(ipRetryConnection); \
+				bool bTimeout = ue.getTopText().find("timeout") != string::npos; \
+				if (((!bTimeout || !m_bRetryOnTimeout) && bConnectionAlive) \
+					|| nRetryCount >= m_iNumberOfRetries) \
 				{ \
 					throw ue; \
 				}\
 				if (!bRetryExceptionLogged) \
 				{ \
-					UCLIDException uex("ELI23631", \
-						"Application trace: Database connection failed. Attempting to reconnect.", ue); \
+					UCLIDException uex("ELI23631", bTimeout \
+						? "Application trace: Database query timed out. Re-attemping..." \
+						: "Application trace: Database connection failed. Attempting to reconnect.", \
+							ue); \
 					uex.log(); \
 					bRetryExceptionLogged = true; \
 				} \
-				reConnectDatabase(); \
+				if (!bConnectionAlive) \
+				{ \
+					reConnectDatabase(); \
+				} \
 				nRetryCount++; \
 			} \
 		} \
@@ -112,7 +120,8 @@ m_bFAMRegistered(false),
 m_nActionStatisticsUpdateFreqInSeconds(5),
 m_bValidatingOrUpdatingSchema(false),
 m_bProductSpecificDBSchemasAreValid(false),
-m_bRevertInProgress(false)
+m_bRevertInProgress(false),
+m_bRetryOnTimeout(true)
 {
 	try
 	{
@@ -2516,6 +2525,99 @@ STDMETHODIMP CFileProcessingDB::RecordFTPEvent(long nFileId, long nActionID,
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33988");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::RecalculateStatistics()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+		ADODB::_ConnectionPtr ipConnection = __nullptr;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		assertProcessingNotActiveForAnyAction(true);
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+		
+		IStrToStrMapPtr ipMapActions = getActions(ipConnection);
+		ASSERT_RESOURCE_ALLOCATION("ELI34335", ipMapActions != __nullptr);		
+
+		// Loop through each action to recalculate the statistics.
+		long lSize = ipMapActions->Size;
+		vector<int> vecActionIDs(lSize);
+		for (int i = 0; i < lSize; i++)
+		{
+			_bstr_t bstrKey;
+			_bstr_t bstrValue;
+			ipMapActions->GetKeyValue(i, bstrKey.GetAddress(), bstrValue.GetAddress());
+		
+			int nActionID = asLong(asString(bstrValue));
+	
+			reCalculateStats(ipConnection, nActionID);
+		}
+
+		END_CONNECTION_RETRY(ipConnection, "ELI34329")
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34328");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::IsAnyFAMActive(VARIANT_BOOL* pvbFAMIsActive)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		ASSERT_ARGUMENT("ELI34330", pvbFAMIsActive != __nullptr);
+
+		if (!IsAnyFAMActive_Internal(false, pvbFAMIsActive))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			IsAnyFAMActive_Internal(true, pvbFAMIsActive);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34333");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::put_RetryOnTimeout(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		m_bRetryOnTimeout = asCppBool(newVal);
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34337");
+
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_RetryOnTimeout(VARIANT_BOOL* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		ASSERT_ARGUMENT("ELI34338", pVal != __nullptr);
+
+		*pVal = asVariantBool(m_bRetryOnTimeout);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34339");
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -982,6 +982,11 @@ void CFileProcessingDB::reCalculateStats(_ConnectionPtr ipConnection, long nActi
 	string strActionName = getActionName(ipConnection, nActionID);	
 	string strWhere = "WHERE ActionID = " + asString(nActionID);
 
+	// Ensure no other stats or action status change until recalculation is complete.
+	lockDBTableForTransaction(ipConnection, "FileActionStatus");
+	lockDBTableForTransaction(ipConnection, "ActionStatisticsDelta");
+	lockDBTableForTransaction(ipConnection, "ActionStatistics");
+
 	// Delete existing stats for action
 	string strDeleteExistingStatsSQL = "DELETE FROM ActionStatistics " + strWhere;
 	executeCmdQuery(ipConnection, strDeleteExistingStatsSQL);
@@ -1768,13 +1773,11 @@ UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_Conn
 		_variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 		adLockOptimistic, adCmdText);
 
-	bool bRecalculated = false;
 	if (asCppBool(ipActionStatSet->adoEOF))
 	{
 		if (bDBLocked)
 		{
 			reCalculateStats(ipConnection, nActionID);
-			bRecalculated = true;
 			ipActionStatSet->Requery(adOptionUnspecified);
 		}
 		else
@@ -2187,6 +2190,13 @@ void CFileProcessingDB::unlockDB(_ConnectionPtr ipConnection, const string& strL
 
 		throw ue;
 	}
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::lockDBTableForTransaction(_ConnectionPtr ipConnection,
+	const string& strTableName)
+{
+	// Using (TABLOCKX, XLOCK) prevents any access to the table from other sessions.
+	executeCmdQuery(ipConnection, "SELECT TOP 1 * FROM " + strTableName + " WITH (TABLOCKX, XLOCK)");
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::getEncryptedPWFromDB(string &rstrEncryptedPW, bool bUseAdmin)
@@ -4302,6 +4312,39 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 		}
 		throw ue;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::isFAMActiveForAnyAction(bool bDBLocked)
+{
+	_ConnectionPtr ipConnection = getDBConnection();
+
+	// If the ActiveFAM table does not exist nothing is processing so return
+	if (!doesTableExist(ipConnection, gstrACTIVE_FAM))
+	{
+		return false;
+	}
+
+	// If Auto revert is enabled then run the revert method before checking for in processing file
+	if (m_bAutoRevertLockedFiles)
+	{
+		// Begin a transaction for the revert 
+		TransactionGuard tgRevert(ipConnection);
+
+		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
+
+		tgRevert.CommitTrans();
+	}
+
+	// Check for active processing 
+	_RecordsetPtr ipProcessingSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI34336", ipProcessingSet != __nullptr);
+
+	// Open recordset with ActiveFAM records that show processing on the action
+	string strSQL = "SELECT UPI FROM ActiveFAM";
+	ipProcessingSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+		adLockReadOnly, adCmdText);
+
+	return (ipProcessingSet->RecordCount > 0);
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::assertProcessingNotActiveForAnyAction(bool bDBLocked)

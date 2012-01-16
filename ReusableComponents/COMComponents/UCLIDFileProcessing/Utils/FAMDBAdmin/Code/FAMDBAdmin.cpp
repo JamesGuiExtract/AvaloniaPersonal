@@ -103,6 +103,13 @@ BOOL CFAMDBAdminApp::InitInstance()
 		IFileProcessingDBPtr ipFAMDB(CLSID_FileProcessingDB);
 		ASSERT_RESOURCE_ALLOCATION("ELI17526", ipFAMDB != __nullptr);
 
+		// [LegacyRCAndUtils:6261]
+		// The database will now retry on query timeout errors by default. However, the
+		// FAMDBAdmin should not retry-- it may perform database queries that take a
+		// long time to run, and retrying would mean the FAMDBAdmin could end up locked
+		// for a long period of time when there is no chance a retry will every succeed.
+		ipFAMDB->RetryOnTimeout = VARIANT_FALSE;
+
 		// Check for Server and database selected
 		if ( __argc == 3)
 		{

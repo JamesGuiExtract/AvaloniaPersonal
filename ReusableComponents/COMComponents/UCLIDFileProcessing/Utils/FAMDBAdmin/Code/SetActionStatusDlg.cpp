@@ -260,6 +260,22 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 			return;
 		}
 
+		if (asCppBool(m_ipFAMDB->IsAnyFAMActive()))
+		{
+			int nContinue = MessageBox(
+				"It is recommended that processing be stopped before modifying file "
+				"action statuses.\r\n\r\n"
+				"During this operation the database will be locked. It is possible this will "
+				"lead to processing/queuing errors if this operation takes a long time.\r\n\r\n"
+				"Proceed with the operation?",
+				"Processing is active", MB_ICONWARNING | MB_YESNO);
+
+			if (nContinue == IDNO)
+			{
+				return;
+			}
+		}
+
 		// Add application trace whenever a database modification is made
 		// [LRCAU #5052 - JDS - 12/18/2008]
 		UCLIDException uex("ELI23597", "Application trace: Database change");

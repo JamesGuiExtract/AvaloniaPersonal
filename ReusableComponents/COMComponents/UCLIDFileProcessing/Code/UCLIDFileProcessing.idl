@@ -1174,10 +1174,27 @@ library UCLID_FILEPROCESSINGLib
 			[in] long lActionID, [in] VARIANT_BOOL vbQueueing, [in] EFTPAction eFTPAction,
 			[in] BSTR bstrServerAddress, [in] BSTR bstrUserName, [in] BSTR bstrArg1,
 			[in] BSTR bstrArg2, [in] long nRetries, [in] BSTR bstrException);
-
-		// PROMISE: To create a new database in the currently set DatabaseServer withthe name bstrNewDBName
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: To create a new database in the currently set DatabaseServer with the name 
+		//			bstrNewDBName with the schema as of the ID Shield / FLEX Index 8.0 release.
 		// REQUIRES: DatabaseServer property must be set to a valid database server.
 		[id(103), helpstring("method CreateNew80DB")] HRESULT CreateNew80DB([in] BSTR bstrNewDBName);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: To recalculate statistics for all actions from the FileActionStatus table.
+		// REQUIRES: No active processing on the database.
+		[id(104), helpstring("method RecalculateStatistics")] HRESULT RecalculateStatistics();
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: To return VARIANT_TRUE if any FAM is active or VARIANT_FALSE if no FAM is active.
+		[id(105), helpstring("method IsAnyFAMActive")] HRESULT IsAnyFAMActive(
+			[out, retval]  VARIANT_BOOL* pvbFAMIsActive);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Indicates whether retries will be attempted per the CommandTimeout DBInfo setting if a
+		// query times out. Default is VARIANT_TRUE so that in cases where the FAMDBAdmin has locked tables
+		// for a long period of time, processing can eventually resume without error. For any uses where
+		// there is a legitimate reason queries may time out on its own RetryOnTimeout should be set to
+		// VARIANT_FALSE.
+		[propget, id(106), helpstring("property RetryOnTimeout")] HRESULT RetryOnTimeout([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(106), helpstring("property RetryOnTimeout")] HRESULT RetryOnTimeout([in] VARIANT_BOOL newVal);
 	};
 
 	[

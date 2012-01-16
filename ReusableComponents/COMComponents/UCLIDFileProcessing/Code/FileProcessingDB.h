@@ -222,6 +222,10 @@ public:
 	STDMETHOD(RecordFTPEvent)(long nFileId, long nActionID, VARIANT_BOOL vbQueueing,
 		EFTPAction eFTPAction, BSTR bstrServerAddress, BSTR bstrUserName, BSTR bstrArg1,
 		BSTR bstrArg2, long nRetries, BSTR bstrException);
+	STDMETHOD(RecalculateStatistics)();
+	STDMETHOD(IsAnyFAMActive)(VARIANT_BOOL* pvbFAMIsActive);
+	STDMETHOD(get_RetryOnTimeout)(VARIANT_BOOL* pVal);
+	STDMETHOD(put_RetryOnTimeout)(VARIANT_BOOL newVal);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -399,10 +403,17 @@ private:
 	// necessary to start it again.
 	volatile bool m_bRevertInProgress;
 
+	// Indicates whether retries will be attempted per the CommandTimeout DBInfo setting if a query
+	// times out.
+	bool m_bRetryOnTimeout;
+
 	//-------------------------------------------------------------------------------------------------
 	// Methods
 	//-------------------------------------------------------------------------------------------------
 	
+	// Returns true if there is any active FAM; false otherwise.
+	bool isFAMActiveForAnyAction(bool bDBLocked);
+
 	// PROMISE: Throws an exception if processing is active on the action.
 	// NOTE: If Auto revert is enabled the files will be reverted in a transaction, so this
 	//		 must be called outside of an active transaction.
@@ -596,6 +607,10 @@ private:
 	// Unlocks db using the connection provided.
 	// The caller must unlock the database on the same thread on which LockDB was called.
 	void unlockDB(_ConnectionPtr ipConnection, const string& strLockName);
+
+	// Locks the specified table to prevent all read/write access to other sessions for the duration
+	// of the active transaction
+	void lockDBTableForTransaction(_ConnectionPtr ipConnection, const string& strTableName);
 
 	// Looks up the current username in the Login table if bUseAdmin is false
 	// and looks up the admin username if bUseAdmin is true
@@ -934,6 +949,7 @@ private:
 	bool RecordFTPEvent_Internal(bool bDBLocked, long nFileId, long nActionID,
 		VARIANT_BOOL vbQueueing, EFTPAction eFTPAction, BSTR bstrServerAddress,
 		BSTR bstrUserName, BSTR bstrArg1, BSTR bstrArg2, long nRetries, BSTR bstrException);
+	bool IsAnyFAMActive_Internal(bool bDBLocked, VARIANT_BOOL* pvbFAMIsActive);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)
