@@ -1653,9 +1653,6 @@ bool CFileProcessingDB::SearchAndModifyFileStatus_Internal(bool bDBLocked,
 				// Set the return value
 				*pnNumRecordsModified = nRecordsModified;
 
-				// update the stats
-				reCalculateStats(ipConnection, nToActionID);
-
 				// Commit the changes
 				tg.CommitTrans();
 
