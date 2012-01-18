@@ -699,11 +699,14 @@ namespace Extract.Redaction.Verification
         {
             VerificationMemento memento = GetCurrentDocument();
 
+            bool savedVOAFile = false; 
+
             // Save VOA file if needed.
             if (NeedToSaveVOAFile(memento))
             {
                 TimeInterval screenTime = StopScreenTimeTimer();
                 Save(screenTime);
+                savedVOAFile = true;
             }
 
             // If in standalone, output the redacted version of the image.
@@ -712,6 +715,14 @@ namespace Extract.Redaction.Verification
                 if (!SaveRedactedImage(memento))
                 {
                     return;
+                }
+
+                if (!savedVOAFile)
+                {
+                    // [FlexIDSCore:4987]
+                    // If the VOA file doesn't need to be saved, still clear the dirty flag so that
+                    // the user doesn't get prompted to produce output when closing.
+                    _redactionGridView.Dirty = false;
                 }
             }
 

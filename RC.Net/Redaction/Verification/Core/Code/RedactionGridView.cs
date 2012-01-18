@@ -208,6 +208,12 @@ namespace Extract.Redaction.Verification
         /// Indicates whether the grid is actively tracking data.
         /// </summary>
         bool _active;
+        
+        /// <summary>
+        /// If non-zero, indicates that changes in selection in <see cref="_redactions"/> should not
+        /// be acted upon.
+        /// </summary>
+        int _preventSelectionRefCount;
 
         #endregion Fields
 
@@ -776,12 +782,34 @@ namespace Extract.Redaction.Verification
                     RedactionGridViewRow row = _redactions[i];
                     if (row.TryRemoveLayerObject(layerObject))
                     {
+                        // Determine which rows should be selected after deleting this item.
+                        List<int> remainingSelectedRows = new List<int>(
+                                SelectedRowIndexes.Where((rowIndex) => i != rowIndex));
+
                         if (row.LayerObjects.Count == 0)
                         {
                             AddToDeletedCount(row);
 
-                            _redactions.RemoveAt(i);
+                            try
+                            {
+                                // [FlexIDSCore:4989]
+                                // A new item will be automatically selected in _redactions after
+                                // deleting the specified one. Prevent handling of this selection
+                                // change to prevent causing the document page to change.
+                                _preventSelectionRefCount++;
+
+                                _redactions.RemoveAt(i);
+                            }
+                            finally
+                            {
+                                _preventSelectionRefCount--;
+                            }
                         }
+
+                        // Set selection to any rows from the previous selection that still exist.
+                        // (It is probably not possible for any rows to be in this set, but just in
+                        // case...)
+                        Select(remainingSelectedRows);
 
                         _dirty = true;
 
@@ -2360,7 +2388,10 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                UpdateSelection();
+                if (_preventSelectionRefCount == 0)
+                {
+                    UpdateSelection();
+                }
             }
             catch (Exception ex)
             {
