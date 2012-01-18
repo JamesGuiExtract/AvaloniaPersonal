@@ -135,9 +135,6 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		string strMachine = asString(getMachineID(ipConnection));
 		EActionStatus eaTo = asEActionStatus(strState);
 
-		// Get the set of all skipped files for the specified action
-		set<long> setSkippedIds = getSkippedFilesForAction(ipConnection, nActionID);
-
 		// Build main queries
 		string strUpdateFAS = "";
 		string strDeleteFromFAS = "";
@@ -199,16 +196,9 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				}
 				strFileIdList += asString(data.FileID);
 
-				// Update the stats
-				// If the current status for the file is processing but it is listed
-				// in the skipped table, then set the from action status to skipped so
-				// that skipped file counts are correctly computed
-				// do not push to the database yet
-				updateStats(ipConnection, nActionID,
-					data.FromStatus == kActionProcessing
-					&& setSkippedIds.find(data.FileID) != setSkippedIds.end() ?
-					kActionSkipped : data.FromStatus,
-					eaTo, data.FileRecord, data.FileRecord, false);
+				// Update the stats				
+				updateStats(ipConnection, nActionID, data.FromStatus, eaTo, data.FileRecord,
+					data.FileRecord, false);
 			}
 			strFileIdList += ")";
 			
@@ -987,6 +977,7 @@ void CFileProcessingDB::reCalculateStats(_ConnectionPtr ipConnection, long nActi
 
 	// Ensure no other stats or action status change until recalculation is complete.
 	lockDBTableForTransaction(ipConnection, "FileActionStatus");
+	lockDBTableForTransaction(ipConnection, "SkippedFile");
 	lockDBTableForTransaction(ipConnection, "ActionStatisticsDelta");
 	lockDBTableForTransaction(ipConnection, "ActionStatistics");
 

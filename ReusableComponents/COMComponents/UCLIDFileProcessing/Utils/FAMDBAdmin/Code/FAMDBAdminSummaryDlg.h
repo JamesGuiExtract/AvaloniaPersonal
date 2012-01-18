@@ -67,6 +67,9 @@ private:
 	// The action ID associated with the context menu click location.
 	long m_nContextMenuActionID;
 
+	// Indicates whether the user was denied permission to run the fast file count query.
+	bool m_bDeniedFastCountPermission;
+
 	//---------------------------------------------------------------------------------------------
 	// Helper methods
 	//---------------------------------------------------------------------------------------------

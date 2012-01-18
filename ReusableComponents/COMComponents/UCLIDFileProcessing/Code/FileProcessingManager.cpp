@@ -1482,6 +1482,12 @@ bool CFileProcessingManager::isDBPasswordRequired()
 		return false;
 	}
 
+	// [LegacyRCAndUtils:6285]
+	// Ensure the m_ipFPMgmtRole has been assigned a DB before calling RequiresAdminAccess.
+	// Is the better long term solution to have IAccessRequired::RequiresAdminAccess have a DB
+	// parameter for all who may need it?
+	m_ipFPMgmtRole->FPDB = getFPMDB();
+
 	// Get the AccessRequires interface for the management role to check if Admin access is required
 	IAccessRequiredPtr ipAccess(m_ipFPMgmtRole);
 	ASSERT_RESOURCE_ALLOCATION("ELI31274", ipAccess != __nullptr);

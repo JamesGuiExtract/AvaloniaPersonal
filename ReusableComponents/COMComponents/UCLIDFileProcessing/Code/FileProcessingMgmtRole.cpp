@@ -1370,6 +1370,42 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29533");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::get_FPDB(IFileProcessingDB** ppFPDB)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI34343", ppFPDB != __nullptr);
+
+		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipShallowCopy(m_pDB);
+		*ppFPDB = (IFileProcessingDB*)ipShallowCopy.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34344");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::put_FPDB(IFileProcessingDB* pFPDB)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_pDB = pFPDB;
+
+		// Set dirty flag
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34345");
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private methods

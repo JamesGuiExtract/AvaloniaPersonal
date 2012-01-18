@@ -1594,6 +1594,12 @@ bool CFileProcessingDB::SearchAndModifyFileStatus_Internal(bool bDBLocked,
 				// Begin a transaction
 				TransactionGuard tg(ipConnection);
 
+				// Ensure no other stats or action status change while processing.
+				lockDBTableForTransaction(ipConnection, "FileActionStatus");
+				lockDBTableForTransaction(ipConnection, "SkippedFile");
+				lockDBTableForTransaction(ipConnection, "ActionStatisticsDelta");
+				lockDBTableForTransaction(ipConnection, "ActionStatistics");
+
 				string strSQL = "SELECT FAMFile.ID AS FAMFileID, COALESCE(ActionStatus, 'U') AS WhereActionStatus ";
 
 				strSQL += " FROM FAMFile LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID"
@@ -1711,6 +1717,7 @@ bool CFileProcessingDB::SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAc
 
 				// Ensure no other stats or action status change while processing.
 				lockDBTableForTransaction(ipConnection, "FileActionStatus");
+				lockDBTableForTransaction(ipConnection, "SkippedFile");
 				lockDBTableForTransaction(ipConnection, "ActionStatisticsDelta");
 				lockDBTableForTransaction(ipConnection, "ActionStatistics");
 
@@ -2225,6 +2232,7 @@ bool CFileProcessingDB::CopyActionStatusFromAction_Internal(bool bDBLocked, long
 
 				// Ensure no other stats or action status change while processing.
 				lockDBTableForTransaction(ipConnection, "FileActionStatus");
+				lockDBTableForTransaction(ipConnection, "SkippedFile");
 				lockDBTableForTransaction(ipConnection, "ActionStatisticsDelta");
 				lockDBTableForTransaction(ipConnection, "ActionStatistics");
 
@@ -2978,6 +2986,7 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 
 				// Ensure no other stats or action status change while processing.
 				lockDBTableForTransaction(ipConnection, "FileActionStatus");
+				lockDBTableForTransaction(ipConnection, "SkippedFile");
 				lockDBTableForTransaction(ipConnection, "ActionStatisticsDelta");
 				lockDBTableForTransaction(ipConnection, "ActionStatistics");
 
@@ -3013,7 +3022,6 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 				string strToActionID = asString(nToActionID);
 
 				// Loop through the file Ids to change in groups of 10000 populating the SetFileActionData
-				map<string, vector<SetFileActionData>> mapFromStatusToId;
 				size_t count = vecFileIds.size();
 				size_t i = 0;
 				string strSelectQuery;
@@ -3038,6 +3046,8 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 				}
 				while (i < count)
 				{
+					map<string, vector<SetFileActionData>> mapFromStatusToId;
+
 					string strQuery = strSelectQuery + " WHERE FAMFile.ID IN (";
 					string strFileIds = asString(vecFileIds[i++]);
 					for (int j=1; i < count && j < 10000; j++)
@@ -3070,13 +3080,13 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 						ipFileSet->MoveNext();
 					}
 					ipFileSet->Close();
-				}
 
-				// Set the file action state for each vector of file data
-				for(map<string, vector<SetFileActionData>>::iterator it = mapFromStatusToId.begin();
-					it != mapFromStatusToId.end(); it++)
-				{
-					setFileActionState(ipConnection, it->second, strToAction, it->first); 
+					// Set the file action state for each vector of file data
+					for(map<string, vector<SetFileActionData>>::iterator it = mapFromStatusToId.begin();
+						it != mapFromStatusToId.end(); it++)
+					{
+						setFileActionState(ipConnection, it->second, strToAction, it->first); 
+					}
 				}
 
 				// Commit the transaction

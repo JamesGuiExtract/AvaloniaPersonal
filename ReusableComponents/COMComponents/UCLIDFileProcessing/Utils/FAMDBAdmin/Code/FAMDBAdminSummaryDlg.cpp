@@ -43,9 +43,14 @@ const string gmapCOLUMN_STATUS[][2] =
 
 // constants for the query to get the total number of files referenced in the database
 const string gstrTOTAL_FILECOUNT_FIELD = "FileCount";
-const string gstrTOTAL_FAMFILE_QUERY = "SELECT SUM (row_count) AS " + gstrTOTAL_FILECOUNT_FIELD +
+// This query executes very fast even on a large DB, but require admin permissions in the database.
+const string gstrFAST_TOTAL_FAMFILE_QUERY = "SELECT SUM (row_count) AS " + gstrTOTAL_FILECOUNT_FIELD +
 	" FROM sys.dm_db_partition_stats "
 	"WHERE object_id=OBJECT_ID('FAMFile') AND (index_id=0 or index_id=1)";
+// This query can take some time to run on a large DB, but will work for any database user with read
+// permissions.
+const string gstrSTANDARD_TOTAL_FAMFILE_QUERY = "SELECT COUNT(*) AS " + gstrTOTAL_FILECOUNT_FIELD +
+	" FROM [FAMFile]";
 
 // Query to retrieve the last 1000 exceptions for failed files on the specified action.
 const string gstrFAILED_FILES_EXCEPTIONS_QUERY =
@@ -76,7 +81,8 @@ IMPLEMENT_DYNAMIC(CFAMDBAdminSummaryDlg, CPropertyPage)
 CFAMDBAdminSummaryDlg::CFAMDBAdminSummaryDlg(void) :
 CPropertyPage(CFAMDBAdminSummaryDlg::IDD),
 m_ipFAMDB(NULL),
-m_bInitialized(false)
+m_bInitialized(false),
+m_bDeniedFastCountPermission(false)
 {
 	try
 	{
@@ -530,16 +536,53 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 		}
 
 		long long llFileCount = 0;
+		_RecordsetPtr ipRecordSet = __nullptr;
 
-		// query database for total number of files in the FAMFile table
-		_RecordsetPtr ipRecordSet = m_ipFAMDB->GetResultsForQuery(gstrTOTAL_FAMFILE_QUERY.c_str());
-		ASSERT_RESOURCE_ALLOCATION("ELI30525", ipRecordSet != __nullptr);
+		if (!m_bDeniedFastCountPermission)
+		{
+			try
+			{
+				try
+				{
+					// First attempt a fast query that requires permissions to query system views.
+					// FAMFile table
+					ipRecordSet = m_ipFAMDB->GetResultsForQuery(gstrFAST_TOTAL_FAMFILE_QUERY.c_str());
+					ASSERT_RESOURCE_ALLOCATION("ELI30525", ipRecordSet != __nullptr);
+				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34340");
+			}
+			catch (UCLIDException &ue)
+			{
+				// If there was an error unrelated to permissions, throw it on out.
+				if (ue.getTopText().find("permission") == string::npos)
+				{
+					throw ue;
+				}
+
+				// Otherwise, log an app trace and use the slower file count query.
+				UCLIDException uexOuter("ELI34341", "Application trace: Insufficient database "
+					"permissions to use fast file count query.", ue);
+				uexOuter.log();
+
+				m_bDeniedFastCountPermission = true;
+			}
+		}
+
+		if (m_bDeniedFastCountPermission)
+		{
+			// If the user had insufficient permission for the fast query, use the standard query
+			// that will work for all db readers/writers.
+			ipRecordSet = m_ipFAMDB->GetResultsForQuery(gstrSTANDARD_TOTAL_FAMFILE_QUERY.c_str());
+			ASSERT_RESOURCE_ALLOCATION("ELI34342", ipRecordSet != __nullptr);
+		}
 
 		// there should only be 1 record returned
 		if (ipRecordSet->RecordCount == 1)
 		{
-			// get the file count
-			llFileCount = getLongLongField(ipRecordSet->Fields, gstrTOTAL_FILECOUNT_FIELD);
+			// get the file count (value type depends on which file count query executed.
+			llFileCount = m_bDeniedFastCountPermission
+				? (long long)getLongField(ipRecordSet->Fields, gstrTOTAL_FILECOUNT_FIELD)
+				: getLongLongField(ipRecordSet->Fields, gstrTOTAL_FILECOUNT_FIELD);
 
 			m_editFileTotal.SetWindowText(commaFormatNumber(llFileCount).c_str());
 		}

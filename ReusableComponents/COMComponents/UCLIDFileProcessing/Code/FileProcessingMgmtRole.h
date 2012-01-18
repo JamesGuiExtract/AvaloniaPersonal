@@ -152,6 +152,8 @@ public:
 	STDMETHOD(put_LimitProcessingToSchedule)(VARIANT_BOOL bVal);
 	STDMETHOD(ProcessSingleFile)(IFileRecord* pFileRecord, IFileProcessingDB* pFPDB,
 		IFAMTagManager* pFAMTagManager);
+	STDMETHOD(get_FPDB)(IFileProcessingDB** ppFPDB);
+	STDMETHOD(put_FPDB)(IFileProcessingDB* pFPDB);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID* pClassID);
