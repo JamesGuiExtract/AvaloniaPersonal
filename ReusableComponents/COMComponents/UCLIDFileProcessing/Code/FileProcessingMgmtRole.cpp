@@ -1381,8 +1381,7 @@ STDMETHODIMP CFileProcessingMgmtRole::get_FPDB(IFileProcessingDB** ppFPDB)
 
 		ASSERT_ARGUMENT("ELI34343", ppFPDB != __nullptr);
 
-		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipShallowCopy(m_pDB);
-		*ppFPDB = (IFileProcessingDB*)ipShallowCopy.Detach();
+		*ppFPDB = m_pDB;
 
 		return S_OK;
 	}
@@ -1399,8 +1398,8 @@ STDMETHODIMP CFileProcessingMgmtRole::put_FPDB(IFileProcessingDB* pFPDB)
 
 		m_pDB = pFPDB;
 
-		// Set dirty flag
-		m_bDirty = true;
+		// Don't set the dirty flag here; A database needs to be assigned for processing, but it is
+		// not part of the configuration.
 
 		return S_OK;
 	}
