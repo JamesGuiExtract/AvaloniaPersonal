@@ -13,52 +13,44 @@
 <hr>
 
 <OL>
-	<LI><h2>[FlexIDSCore #3609, LegacyRC #5778] - CA - Santa Barbara - DFM : Various out-of-memory errors 
-	during processing</h2>
+	<LI><h2>[LegacyRC #6242, #6249] - Old Republic Title : Verification Navigation</h2>
 	<UL>
-  		<li><b>Test Setup</b>
+	  	<li><b>Goal</b>
 		<ul>
-			<li>Prepare a server-class machine such as <b>UltraTester</b> for this test.
-			<li>Both <b>Indexing</b> and <b>Redaction</b> rules will be exercised on the 
-			Santa Barbara images.
-			<li>Note that separate databases are used for <b>DayForward</b> and for 
-			<b>BackFile</b> processing.
-			<li>Note that the testing scenerio does not include any verification since 
-			the out-of-memory errors were already reproducible.
-			<li>Review the multiple FPS files found at 
-			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3609</b>
-			<ul>
-				<li><b>Queue-Process.fps</b> - watches a UNC share to supply images for 
-				processing against Indexing rules
-				<li><b>Process.fps</b> - OCR's images, runs Indexing rules, copies the image 
-				to another folder, copies the XML output from the rules to yet another 
-				folder, and sets the Redaction action to Pending
-				<li><b>Process-Redaction.fps</b> - runs the Redaction rules, has a conditional 
-				task to set Verify to Pending if this is a sensitive document, otherwise 
-				sets the Cleanup action to Pending.
-				<li><b>CleanUp.fps</b> - sleeps for 5 minutes to give verifiers an opportunity 
-				to navigate the historical documents; deletes the metadata XML, USS, VOA, 
-				and source documents
-				<li><b>Queue-BackRedaction.fps</b> - watches a UNC share
-				<li><b>Process-BackRedaction.fps</b> - OCR's images, runs the Redaction rules
-				<li><b>CleanUp-BackRedaction.fps</b> - sleeps, deletes unnecessary files
-			</ul>
-			<li>Copy a set of CA - Santa Barbara images to a testing folder.  Prepare other 
-			sets for copying into the listening folders.
-			<li>Exercise the FPS files for at least a few days.
+	   		<li>Confirm that the <b>PendingActionStatusChange</b> table works properly.
+	   		<li>Confirm that processing of ID Shield files after verification is complete 
+			works properly.
+	   		<li>Confirm that verification changes to previously verified files are 
+			correctly handled.
 		</ul>
 <p>
-	  	<li><b>Test Results - the following errors should NOT be seen</b>
+  		<li><b>Test Setup</b>
 		<ul>
-	   		<li><b>ELI04217</b> - Exception of type 'System.OutOfMemoryException' was thrown
-	   		<li><b>ELI05716</b> - Exception of type 'System.OutOfMemoryException' was thrown
-	   		<li><b>ELI06432</b> - Out of memory 
-	   		<li><b>ELI08206</b> - Out of memory 
-	   		<li><b>ELI12967</b> - COM Exception caught 
-	   		<li><b>ELI15668</b> - Exception of type 'System.OutOfMemoryException' was thrown
+			<li>Prepare a database and a collection of images for ID Shield processing 
+			and verification.
+			<ul>
+				<li>Use <b>Process</b> for processing 
+				<li>Use <b>Verify</b> for verification
+				<li>Use <b>Redact</b> for creating an output image 
+				<li>Use <b>Cleanup</b> for deleting intermediate files 
+			</ul>
+			<li>Create suitable FPS files for operation with each action defined above.
+			<li>Verify some images and confirm that appropriate output images are 
+			created.
+		</ul>
 <p>
-			<li><b>[LegacyRC #5778]</b> There also should not be any situations where the 
-			exception log is stuck with multiple processes trying to write at the same time.
+	  	<li><b>Test 1</b>
+		<ul>
+	   		<li>Verify an image, adding one or more manual redactions and confirm that 
+			an appropriate output image is created.
+	   		<li>Navigate back to a previous document and remove one or more redactions.
+	   		<li>Confirm that a new output image is created that contains the updated 
+			collection of redactions.
+		</ul>
+<p>
+	  	<li><b>Test 2</b>
+		<ul>
+	   		<li>TBD
 		</ul>
 	</UL>
 <p>
