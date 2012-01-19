@@ -710,18 +710,24 @@ namespace Extract.AttributeFinder.Rules
             {
                 string name = attribute.Name;
                 string value = attribute.Value.String;
-                
-                // Add the string value.
-                ((List<string>)expressionVariables[name + _STRING_VALUE]).Add(value);
 
-                // If the value cannot be interpreted as an integer, use and int value of zero.
-                int intValue;
-                if (!Int32.TryParse(value, out intValue))
+                // expressionVariables will always contain keys in pairs-- one key for the numeric
+                // value and one for the string value. We only need to check for one.
+                if (expressionVariables.ContainsKey(name))
                 {
-                    intValue = 0;
-                }
+                    // Add the string value.
+                    ((List<string>)expressionVariables[name + _STRING_VALUE]).Add(value);
 
-                ((List<int>)expressionVariables[name]).Add(intValue);
+                    // If the value cannot be interpreted as an integer, use and int value of zero.
+                    int intValue;
+                    if (!Int32.TryParse(value, out intValue))
+                    {
+                        intValue = 0;
+                    }
+
+                    // Add the numeric value.
+                    ((List<int>)expressionVariables[name]).Add(intValue);
+                }
             }
         }
 
