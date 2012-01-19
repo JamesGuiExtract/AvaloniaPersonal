@@ -115,55 +115,6 @@ namespace Extract.Utilities.Ftp
         }
 
         /// <summary>
-        /// Returns the local path for the file being downloaded 
-        /// </summary>
-        /// <param name="currentRemoteWorkingFolder">Current working folder on the ftp server</param>
-        /// <param name="localWorkingFolderBase">Base local working folder</param>
-        /// <param name="remoteWorkingFolderBase">Base working folder on the ftp server</param>
-        /// <returns>The local path rooted to the local working folder </returns>
-        public static string GenerateLocalPathCreateIfNotExists(string currentRemoteWorkingFolder,
-            string localWorkingFolderBase, string remoteWorkingFolderBase)
-        {
-            try
-            {
-                remoteWorkingFolderBase = NormalizeRemotePath(remoteWorkingFolderBase);
-                currentRemoteWorkingFolder = NormalizeRemotePath(currentRemoteWorkingFolder);
-
-                // Generate the path so that the directory structure rooted to 
-                // the base local working folder will be the same as the 
-                // current ftp working folder rooted to the base remote working folder.
-                string pathForFile;
-                if (remoteWorkingFolderBase == currentRemoteWorkingFolder)
-                {
-                    pathForFile = localWorkingFolderBase;
-                }
-                else
-                {
-                    pathForFile = Path.Combine(localWorkingFolderBase,
-                        currentRemoteWorkingFolder.Remove(0, remoteWorkingFolderBase.Length ));
-                }
-
-                // Convert / to \ since the ftp server path char may be different than windows
-                pathForFile = pathForFile.Replace('/', '\\');
-
-                // Make sure the local folder exists
-                if (!Directory.Exists(pathForFile))
-                {
-                    Directory.CreateDirectory(pathForFile);
-                }
-                return pathForFile;
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = new ExtractException("ELI32453", "Unable to generate local path.", ex);
-                ee.AddDebugData("RemoteWorkingFolder", currentRemoteWorkingFolder, false);
-                ee.AddDebugData("LocalWorkingFolderBase", localWorkingFolderBase, false);
-                ee.AddDebugData("remoteWorkingFolderBase", remoteWorkingFolderBase, false);
-                throw ee;
-            }
-        }
-
-        /// <summary>
         /// Normalizes a remote path by ensuring it begins and ends with '/'
         /// </summary>
         /// <param name="remotePath">The remote path to normalize</param>

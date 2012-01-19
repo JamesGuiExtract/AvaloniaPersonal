@@ -48,6 +48,7 @@ namespace Extract.ReportViewer
             this._openReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._saveReportTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._emailReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._exportReportToPDFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._exportReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -55,7 +56,6 @@ namespace Extract.ReportViewer
             this._aboutReportViewerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._pleaseWaitLabel = new System.Windows.Forms.Label();
             this._progressBar = new System.Windows.Forms.ProgressBar();
-            this._emailReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuStrip1.SuspendLayout();
@@ -208,6 +208,7 @@ namespace Extract.ReportViewer
             this._emailReportToolStripMenuItem.Name = "_emailReportToolStripMenuItem";
             this._emailReportToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
             this._emailReportToolStripMenuItem.Text = "E&mail report...";
+            this._emailReportToolStripMenuItem.Visible = false;
             this._emailReportToolStripMenuItem.Click += new System.EventHandler(this.HandleFileEmailReportClicked);
             // 
             // ReportViewerForm

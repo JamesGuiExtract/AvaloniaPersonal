@@ -173,6 +173,38 @@ namespace Extract.FileActionManager.FileSuppliers
     [ProgId("Extract.FileActionManager.FileSuppliers.FTPFileSupplier")]
     public class FtpFileSupplier : IFtpFileSupplier
     {
+        /// <summary>
+        /// Describes a file on an FTP server including its relative path in relation to the home
+        /// directory for the account.
+        /// </summary>
+        class FtpFileInfo
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="FtpFileInfo"/> class.
+            /// </summary>
+            /// <param name="ftpFile">The <see cref="FTPFile"/> instance describing the FTP file.
+            /// </param>
+            /// <param name="relativePath">The relative path from the home directory to the file's
+            /// directory expressed in the Windows file system standard ("\" for directory
+            /// separators).</param>
+            public FtpFileInfo(FTPFile ftpFile, string relativePath)
+            {
+                FtpFile = ftpFile;
+                RelativePath = relativePath;
+            }
+
+            /// <summary>
+            /// The <see cref="FTPFile"/> instance describing the FTP file.
+            /// </summary>
+            public FTPFile FtpFile { get; private set; }
+
+            /// <summary>
+            /// The relative path from the home directory to the file's directory expressed in the
+            /// Windows file system standard ("\" for directory separators).
+            /// </summary>
+            public string RelativePath { get; private set; }
+        }
+
         #region Constants
 
         /// <summary>
@@ -289,7 +321,7 @@ namespace Extract.FileActionManager.FileSuppliers
         FileActionManagerSupplierPathTags _pathTags;
 
         // Queue of files to be downloaded.
-        ConcurrentQueue<FTPFile> _filesToDownload = new ConcurrentQueue<FTPFile>();
+        ConcurrentQueue<FtpFileInfo> _filesToDownload = new ConcurrentQueue<FtpFileInfo>();
 
          // Timer used to poll the ftp site if polling is enabled.
         System.Threading.Timer _pollingTimer;
@@ -926,7 +958,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 _actionID = -1;
 
                 // Clear out any remaining files in the files to download queue
-                _filesToDownload = new ConcurrentQueue<FTPFile>();
+                _filesToDownload = new ConcurrentQueue<FtpFileInfo>();
             }
             catch (Exception ex)
             {
@@ -1357,15 +1389,17 @@ namespace Extract.FileActionManager.FileSuppliers
                 {
                     FtpMethods.InitializeFtpApiLicense(runningConnection);
 
-                    FTPFile currentFtpFile;
+                    FtpFileInfo currentFtpFileInfo;
 
                     // There are retry settings for the file supplier that will allow quicker exiting if
                     // the stop button is pressed on the FAM so change the connection to not retry.
                     runningConnection.RetryCount = 0;
 
                     // Download the files
-                    while (GetNextFileToDownload(out currentFtpFile))
+                    while (GetNextFileToDownload(out currentFtpFileInfo))
                     {
+                        FTPFile currentFtpFile = currentFtpFileInfo.FtpFile;
+
                         try
                         {
                             string remoteFileName =
@@ -1385,7 +1419,7 @@ namespace Extract.FileActionManager.FileSuppliers
                                     currentFtpFile.Name, true);
 
                                 downloadedFileName = retry.DoRetry(() =>
-                                    DownloadFileFromFtpServer(runningConnection, currentFtpFile, recorder));
+                                    DownloadFileFromFtpServer(runningConnection, currentFtpFileInfo, recorder));
 
                                 // Save the info file outside of the retry block as a failure here
                                 // shouldn't trigger the operation to be repeated.
@@ -1394,7 +1428,7 @@ namespace Extract.FileActionManager.FileSuppliers
                                     string ftpInfoFileName = downloadedFileName + ".info";
 
                                     var ftpInfoFile =
-                                            new FtpDownloadedFileInfo(ftpInfoFileName, currentFtpFile);
+                                        new FtpDownloadedFileInfo(ftpInfoFileName, currentFtpFile);
 
                                     ftpInfoFile.Save();
 
@@ -1430,7 +1464,7 @@ namespace Extract.FileActionManager.FileSuppliers
                             {
                                 // Clear out the existing queue so that a new list is generated from
                                 // scratch on the next poll.
-                                FTPFile temp;
+                                FtpFileInfo temp;
                                 while (_filesToDownload.TryDequeue(out temp));
 
                                 break;
@@ -1619,7 +1653,10 @@ namespace Extract.FileActionManager.FileSuppliers
         /// them in <see cref="_filesToDownload"/> queue
         /// </summary>
         /// <param name="dirContents">Contents of a directory on the FTP server</param>
-        void DetermineFilesToDownload(FTPFile[] dirContents)
+        /// <param name="relativePath">The relative path from the home directory to the current
+        /// directory expressed in the Windows file system standard ("\" for directory separators).
+        /// </param>
+        void DetermineFilesToDownload(FTPFile[] dirContents, string relativePath)
         {
             // Filter the directory contents for files and sub directories
             foreach (FTPFile file in dirContents)
@@ -1631,11 +1668,11 @@ namespace Extract.FileActionManager.FileSuppliers
 
                 if (FilesToDownloadFilter(file))
                 {
-                    _filesToDownload.Enqueue(file);
+                    _filesToDownload.Enqueue(new FtpFileInfo(file, relativePath));
                 }
-                else if (RecursivelyDownload && file.Dir)
+                else if (RecursivelyDownload && file.Dir && file.Children != null)
                 {
-                    DetermineFilesToDownload(file.Children);
+                    DetermineFilesToDownload(file.Children, Path.Combine(relativePath, file.Name));
                 }
             }
         }
@@ -1707,7 +1744,7 @@ namespace Extract.FileActionManager.FileSuppliers
                     }
 
                     // Fill the filesToDownload list
-                    DetermineFilesToDownload(directoryContents);
+                    DetermineFilesToDownload(directoryContents, "");
                 }
             }
             catch (Exception ex)
@@ -1750,16 +1787,16 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <summary>
         /// Gets the next file to download from the <see cref="_filesToDownload"/> Queue
         /// </summary>
-        /// <param name="nextFile">Next file to download from the queue</param>
+        /// <param name="nextFileInfo">Next file to download from the queue</param>
         /// <returns><see lang="true"/> if nextFile contains the next file
         /// and <see lang="false"/> if there are no more files to download or if supplying should 
         /// stop</returns>
-        bool GetNextFileToDownload(out FTPFile nextFile)
+        bool GetNextFileToDownload(out FtpFileInfo nextFileInfo)
         {
             // Loop until a file is removed from the queue or supplying is done
             while (!_stopSupplying.WaitOne(0))
             {
-                if (_filesToDownload.TryDequeue(out nextFile))
+                if (_filesToDownload.TryDequeue(out nextFileInfo))
                 {
                     return true;
                 }
@@ -1780,7 +1817,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 _stopSupplying.WaitOne(_WAIT_TIME_FOR_MORE_FILES_TO_BE_ADDED);
             }
 
-            nextFile = null;
+            nextFileInfo = null;
             return false;
         }
 
@@ -1889,23 +1926,25 @@ namespace Extract.FileActionManager.FileSuppliers
         /// Download a file from the ftp server
         /// </summary>
         /// <param name="runningConnection">Connection to the ftp server</param>
-        /// <param name="currentFtpFile">FTPFile object that has info for downloading the file</param>
+        /// <param name="currentFtpFileInfo">FtpFileInfo object that has info for downloading the
+        /// file.</param>
         /// <param name="recorder">The <see cref="FtpEventRecorder"/> recording the current FTP
         /// operation.</param>
         /// <returns>The <see cref="IFileRecord"/> associated with the dowloaded file if the
         /// download and supplying succeeded; otherwise <see langword="null"/>.</returns>
         string DownloadFileFromFtpServer(SecureFTPConnection runningConnection,
-            FTPFile currentFtpFile, FtpEventRecorder recorder)
+            FtpFileInfo currentFtpFileInfo, FtpEventRecorder recorder)
         {
+            FTPFile currentFtpFile = currentFtpFileInfo.FtpFile;
             string localFile = "";
 
             try
             {
                 string downloadedFileName = null;
 
-                // If not already connected connect to the FTP Server
                 if (!runningConnection.IsConnected)
                 {
+                    // Connect to the ftp server
                     runningConnection.Connect();
                 }
 
@@ -1915,9 +1954,13 @@ namespace Extract.FileActionManager.FileSuppliers
                 // Expand LocalWorkingFolder for each file separately.
                 string expandedLocalWorkingFolder = _pathTags.Expand(LocalWorkingFolder);
 
-                string localFilePath = FtpMethods.GenerateLocalPathCreateIfNotExists(
-                    runningConnection.ServerDirectory, expandedLocalWorkingFolder,
-                    _expandedRemoteDownloadFolder);
+                string localFilePath = Path.Combine(expandedLocalWorkingFolder, currentFtpFileInfo.RelativePath);
+
+                // Make sure the local folder exists
+                if (!Directory.Exists(localFilePath))
+                {
+                    Directory.CreateDirectory(localFilePath);
+                }
 
                 // Determine the full name of the local file
                 localFile = Path.Combine(localFilePath, currentFtpFile.Name);

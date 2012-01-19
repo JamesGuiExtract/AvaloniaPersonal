@@ -1115,9 +1115,13 @@ namespace Extract.FileActionManager.FileProcessors
                     downloadLocation = temporaryFile.FileName;
                 }
 
-                FtpMethods.GenerateLocalPathCreateIfNotExists(
-                    _runningConnection.ServerDirectory, Path.GetDirectoryName(downloadLocation),
-                    _runningConnection.ServerDirectory);
+                string localFilePath = Path.GetDirectoryName(downloadLocation);
+
+                // Make sure the local folder exists
+                if (!Directory.Exists(localFilePath))
+                {
+                    Directory.CreateDirectory(localFilePath);
+                }
 
                 _runningConnection.DownloadFile(downloadLocation, remoteOrOldFile);
 
