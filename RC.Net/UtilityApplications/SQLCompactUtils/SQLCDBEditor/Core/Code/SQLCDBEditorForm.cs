@@ -885,6 +885,12 @@ namespace Extract.SQLCDBEditor
                     // reopening the current database.
                     currentlyOpenTable = _listBoxTables.Text;
                 }
+                else
+                {
+                    // [DotNetRCAndUtils:774]
+                    // Do not reset _fileSaved tag if we have re-opened the same database.
+                    _fileSaved = false;
+                }
 
                 // Reset the schema updater
                 _schemaUpdater = null;
@@ -915,8 +921,6 @@ namespace Extract.SQLCDBEditor
                 LoadTable(_listBoxTables.Text);
 
                 SetWindowTitle();
-
-                _fileSaved = false;
 
                 CheckSchemaVersionAndPromptForUpdate(tableNames);
             }
