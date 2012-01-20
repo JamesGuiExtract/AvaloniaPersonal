@@ -134,46 +134,62 @@ void CRuleSetEditor::OnFileSave()
 	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
 
 	try
-	{	
-		// Validate that the rule set is unencrypted and licensed to be saved
-		validateRuleSetCanBeSaved();
+	{
+		try
+		{	
+			// Validate that the rule set is unencrypted and licensed to be saved
+			validateRuleSetCanBeSaved();
 
-		if (m_strCurrentFileName.empty())
-		{
-			// if current rule set hasn't been saved yet.
-			OnFileSaveas();
-		}
-		else 
-		{
-			bool bFileReadOnly = isFileReadOnly( m_strCurrentFileName );
-			try
+			if (m_strCurrentFileName.empty())
 			{
-				if (bFileReadOnly)
-				{
-					UCLIDException ue( "ELI09214", "File is read only." );
-					ue.addDebugInfo("FileName", m_strCurrentFileName );
-					throw ue;
-				}
-			}
-			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI09215");
-			if (bFileReadOnly)
-			{
+				// if current rule set hasn't been saved yet.
 				OnFileSaveas();
 			}
-			else
+			else 
 			{
-				if (asCppBool(m_ipRuleSet->SaveTo(get_bstr_t(m_strCurrentFileName.c_str()), 
-						VARIANT_TRUE)))
+				bool bFileReadOnly = isFileReadOnly( m_strCurrentFileName );
+				try
 				{
-					// [FlexIDSCore:4872]
-					// If the ruleset re-generated IdentifiableRuleObject GUIDs, the references
-					// to the rule object interface pointers need to be updated.
-					refreshUIFromRuleSet();
+					if (bFileReadOnly)
+					{
+						UCLIDException ue( "ELI09214", "File is read only." );
+						ue.addDebugInfo("FileName", m_strCurrentFileName );
+						throw ue;
+					}
+				}
+				CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI09215");
+				if (bFileReadOnly)
+				{
+					OnFileSaveas();
+				}
+				else
+				{
+					if (asCppBool(m_ipRuleSet->SaveTo(get_bstr_t(m_strCurrentFileName.c_str()), 
+							VARIANT_TRUE)))
+					{
+						// [FlexIDSCore:4872]
+						// If the ruleset re-generated IdentifiableRuleObject GUIDs, the references
+						// to the rule object interface pointers need to be updated.
+						refreshUIFromRuleSet();
+					}
 				}
 			}
 		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI04418");
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04418")
+	catch (UCLIDException &ue)
+	{
+		try
+		{
+			// [FlexIDSCore:4994]
+			// If we failed to save, some of the underlying rule objects my have been cloned and
+			// references need to be updated to be sure we are pointing at the current versions.
+			refreshUIFromRuleSet();
+		}
+		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI34348");
+
+		ue.display();
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void CRuleSetEditor::OnFileSaveas() 
