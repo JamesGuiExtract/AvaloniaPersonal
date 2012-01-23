@@ -1217,7 +1217,7 @@ namespace Extract.Imaging.Forms.Test
             Assert.That(!PreviousTile.Enabled);
 
             // Go to the next tile
-            imageViewer.NextTile();
+            imageViewer.SelectNextTile();
 
             // Check that the Previous tile menu item is enabled
             Assert.That(PreviousTile.Enabled);
@@ -1535,9 +1535,9 @@ namespace Extract.Imaging.Forms.Test
 
             // Go to the last tile
             imageViewer.GoToLastPage();
-            imageViewer.NextTile();
-            imageViewer.NextTile();
-            imageViewer.NextTile();
+            imageViewer.SelectNextTile();
+            imageViewer.SelectNextTile();
+            imageViewer.SelectNextTile();
 
             // The next tile menu item should be disabled
             NextTileToolStripMenuItem nextTile = FormMethods.GetFormComponent<NextTileToolStripMenuItem>(_imageViewerForm);

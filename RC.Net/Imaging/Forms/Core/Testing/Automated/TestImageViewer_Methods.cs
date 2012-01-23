@@ -550,7 +550,7 @@ namespace Extract.Imaging.Forms.Test
             imageViewer.FitMode = FitMode.FitToWidth;
 
             // Go to the next tile
-            imageViewer.NextTile();
+            imageViewer.SelectNextTile();
 
             // Get the current scroll position
             int scrollPosition = imageViewer.ScrollPosition.Y;

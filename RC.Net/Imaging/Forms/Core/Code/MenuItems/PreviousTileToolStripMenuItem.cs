@@ -73,7 +73,16 @@ namespace Extract.Imaging.Forms
 
                 if (ImageViewer != null)
                 {
-                    ImageViewer.SelectPreviousTile();
+                    // [FlexIDSCore:4999]
+                    // For reasons, when the toolstrip button or menu item to advance to the previous
+                    // document with seamless navigation, the ImageViewer doesn't always seem to be
+                    // properly refreshed at the time of this call. Specifically, the
+                    // PhysicalViewRectangle does not seem to be correct. I believe it is perhaps
+                    // reflecting its value from before the new image was loaded.
+                    // I'm working around the issue by calling SelectNextTile via BeginInvoke since
+                    // presumably after the currently queued events are processed the ImageViewer
+                    // will be properly updated.
+                    ImageViewer.BeginInvoke((MethodInvoker)(() => ImageViewer.SelectPreviousTile()));
                 }
             }
             catch (Exception ex)
