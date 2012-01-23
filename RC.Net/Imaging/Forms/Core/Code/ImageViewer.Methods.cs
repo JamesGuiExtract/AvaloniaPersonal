@@ -228,7 +228,7 @@ namespace Extract.Imaging.Forms
 
                 // Close the currently open image without raising
                 // the image file changed event.
-                if (IsImageAvailable && !CloseImage(false))
+                if (IsImageAvailable && !CloseImage(false, true))
                 {
                     return;
                 }
@@ -416,7 +416,7 @@ namespace Extract.Imaging.Forms
                 // Ensure an image is open
                 if (IsImageAvailable)
                 {
-                    CloseImage(true);
+                    CloseImage(true, true);
                 }
             }
             catch (Exception ex)
@@ -434,10 +434,14 @@ namespace Extract.Imaging.Forms
         /// <param name="raiseImageFileChangedEvent">If <see langword="true"/> will raise
         /// the <see cref="ImageFileChanged"/> event; if <see langword="false"/> will not
         /// raise the <see cref="ImageFileChanged"/> event.</param>
-        /// <exception cref="ExtractException">If there is no currently open image.</exception>
+        /// <param name="unloadImage"><see langword="true"/> to force a cached image to be unloaded
+        /// when closed, <see langword="false"/> to allow it to remain in the cache until it is no
+        /// longer in document history.</param>
         /// <returns><see langword="true"/> If the image was closed; <see langword="false"/>
-        /// if the closing event was canceled.</returns>
-        bool CloseImage(bool raiseImageFileChangedEvent)
+        /// if the closing event was canceled.
+        /// </returns>
+        /// <exception cref="ExtractException">If there is no currently open image.</exception>
+        bool CloseImage(bool raiseImageFileChangedEvent, bool unloadImage)
         {
             try
             {
@@ -462,6 +466,8 @@ namespace Extract.Imaging.Forms
                 base.BeginUpdate();
                 try
                 {
+                    string closedFileName = ImageFile;
+
                     // Dispose of all layer objects
                     _layerObjects.Clear();
 
@@ -472,6 +478,11 @@ namespace Extract.Imaging.Forms
                     if (!_cacheImages && _reader != null)
                     {
                         _reader.Dispose();
+                    }
+                    else if (_cacheImages && unloadImage &&
+                        !string.IsNullOrWhiteSpace(closedFileName))
+                    {
+                        UnloadImage(closedFileName);
                     }
 
                     _reader = null;
@@ -780,7 +791,7 @@ namespace Extract.Imaging.Forms
         /// <exception cref="ExtractException"><see cref="IsFirstTile"/> is <see langword="false"/>.
         /// </exception>
         /// <seealso cref="IsFirstTile"/>
-        public void PreviousTile()
+        void PreviousTile()
         {
             try
             {
@@ -854,7 +865,7 @@ namespace Extract.Imaging.Forms
         /// <exception cref="ExtractException"><see cref="IsLastTile"/> is <see langword="false"/>.
         /// </exception>
         /// <seealso cref="IsLastTile"/>
-        public void NextTile()
+        void NextTile()
         {
             try
             {

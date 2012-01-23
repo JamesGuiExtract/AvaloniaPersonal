@@ -72,11 +72,9 @@ namespace Extract.Imaging.Forms
             {
                 base.OnClick(e);
 
-                // Go to the next tile if an image is open and it is not on the last tile
-                ImageViewer imageViewer = base.ImageViewer;
-                if (imageViewer != null && imageViewer.IsImageAvailable && !imageViewer.IsLastTile)
+                if (ImageViewer != null)
                 {
-                    imageViewer.NextTile();
+                    ImageViewer.SelectNextTile();
                 }
             }
             catch (Exception ex)

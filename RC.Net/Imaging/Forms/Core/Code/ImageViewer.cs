@@ -1580,7 +1580,7 @@ namespace Extract.Imaging.Forms
 
                 // Close the currently open image without raising
                 // the image file changed event.
-                if (IsImageAvailable && !CloseImage(false))
+                if (IsImageAvailable && !CloseImage(false, true))
                 {
                     return;
                 }
