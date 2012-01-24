@@ -540,7 +540,7 @@ namespace Extract.Rules
                 MatchResult matchResult = new MatchResult(zones, type, text, rule);
                 
                 // Raise the MatchRedacted event
-                OnMatchRedacted(new MatchRedactedEventArgs(matchResult));
+                OnMatchRedacted(new MatchRedactedEventArgs(matchResult, true));
 
                 // Check if at the last match result (do this before the call to display next match)
                 if (_findResults != null && _nextFindResult >= _findResults.Count)
@@ -594,6 +594,8 @@ namespace Extract.Rules
                 // Show the wait cursor
                 using (new TemporaryWaitCursor())
                 {
+                    bool first = true;
+
                     // Loop through all of the match results
                     foreach (MatchResult matchResult in _matchResults)
                     {
@@ -601,7 +603,9 @@ namespace Extract.Rules
                         if (matchResult.MatchType == MatchType.Match)
                         {
                             // Raise the MatchRedacted event
-                            OnMatchRedacted(new MatchRedactedEventArgs(matchResult));
+                            OnMatchRedacted(new MatchRedactedEventArgs(matchResult, first));
+
+                            first = false;
                         }
                     }
                 }

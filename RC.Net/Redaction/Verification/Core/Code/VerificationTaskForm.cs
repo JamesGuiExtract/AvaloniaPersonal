@@ -1799,7 +1799,7 @@ namespace Extract.Redaction.Verification
             {
                 if (_helper == null)
                 {
-                    _helper = new VerificationRuleFormHelper(_imageViewer);
+                    _helper = new VerificationRuleFormHelper(_imageViewer, _redactionGridView);
                 }
 
                 if (_helper.GetOcrResults() == null)

@@ -215,6 +215,11 @@ namespace Extract.Redaction.Verification
         /// </summary>
         int _preventSelectionRefCount;
 
+        /// <summary>
+        /// Keeps track of the last rows selected before _preventSelectionRefCount went into affect.
+        /// </summary>
+        List<DataGridViewRow> _lastSelectedRows;
+
         #endregion Fields
 
         #region Events
@@ -2128,6 +2133,57 @@ namespace Extract.Redaction.Verification
             finally
             {
                 Active = true;
+            }
+        }
+
+        /// <summary>
+        /// Prevents changes in the grids data from changing selection until
+        /// <see cref="AllowSelection"/> is called.
+        /// </summary>
+        internal void PreventSelection()
+        {
+            try
+            {
+                // Keep track of the selection to restore after selection is re-allowed.
+                if (_preventSelectionRefCount == 0)
+                {
+                    _lastSelectedRows = new List<DataGridViewRow>(
+                        _dataGridView.SelectedRows.Cast<DataGridViewRow>());
+                }
+
+                _preventSelectionRefCount++;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34353");
+            }
+        }
+
+        /// <summary>
+        /// Re-allows automatic selection based on changes in the grid after a previous call to
+        /// <see cref="PreventSelection"/>.
+        /// <para><b>Note</b></para>
+        /// <see cref="PreventSelection"/> and <see cref="AllowSelection"/> should be always be
+        /// called in pairs. If one pair of this calls is nested inside another pair, selection
+        /// would still be prevented until the outer-scopes call to <see cref="AllowSelection"/>.
+        /// </summary>
+        internal void AllowSelection()
+        {
+            try
+            {
+                _preventSelectionRefCount--;
+
+                // Restore selection to the same rows that had it before selection was prevented.
+                if (_preventSelectionRefCount == 0 && _lastSelectedRows != null)
+                {
+                    Select(_lastSelectedRows
+                        .Where(row => _dataGridView.Rows.Contains(row))
+                        .Select(row => row.Index));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34352");
             }
         }
 

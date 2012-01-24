@@ -29,6 +29,8 @@ namespace Extract.Redaction.Verification
 
         readonly ImageViewer _imageViewer;
 
+        RedactionGridView _redactionGridView;
+
         #endregion Fields
 
         #region Constructors
@@ -36,9 +38,10 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Initializes a new instance of the <see cref="VerificationRuleFormHelper"/> class.
         /// </summary>
-        public VerificationRuleFormHelper(ImageViewer imageViewer)
+        public VerificationRuleFormHelper(ImageViewer imageViewer, RedactionGridView redactionGridView)
         {
             _imageViewer = imageViewer;
+            _redactionGridView = redactionGridView;
         }
 
         #endregion Constructors
@@ -136,13 +139,30 @@ namespace Extract.Redaction.Verification
             {
                 if (!IsDuplicate(e.Match))
                 {
-                    Dictionary<int, List<RasterZone>> pageToZones =
-                                RasterZone.SplitZonesByPage(e.Match.RasterZones);
-                    foreach (KeyValuePair<int, List<RasterZone>> pair in pageToZones)
+                    try
                     {
-                        RedactionLayerObject redaction = new RedactionLayerObject(_imageViewer,
-                            pair.Key, new string[] { RedactedMatchTag }, e.Match.Text, pair.Value);
-                        _imageViewer.LayerObjects.Add(redaction);
+                        // [FlexIDSCore:5014]
+                        // Select the first match, but not subsequent ones.
+                        if (!e.FirstMatch)
+                        {
+                            _redactionGridView.PreventSelection();
+                        }
+
+                        Dictionary<int, List<RasterZone>> pageToZones =
+                                    RasterZone.SplitZonesByPage(e.Match.RasterZones);
+                        foreach (KeyValuePair<int, List<RasterZone>> pair in pageToZones)
+                        {
+                            RedactionLayerObject redaction = new RedactionLayerObject(_imageViewer,
+                                pair.Key, new string[] { RedactedMatchTag }, e.Match.Text, pair.Value);
+                            _imageViewer.LayerObjects.Add(redaction);
+                        }
+                    }
+                    finally
+                    {
+                        if (!e.FirstMatch)
+                        {
+                            _redactionGridView.AllowSelection();
+                        }
                     }
                 }
             }

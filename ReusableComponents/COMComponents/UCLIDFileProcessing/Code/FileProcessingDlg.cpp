@@ -552,87 +552,105 @@ void FileProcessingDlg::OnBtnStop()
 
 	try
 	{
-		CWaitCursor wait;
-
-		// Do not auto-terminate the dialog
-		m_bStoppedManually = true;
-
-		// Log a message indicating that the user is stopping the FAM
-		UCLIDException ue("ELI15679", "Application trace: The user has stopped File Action Manager processing.");
-		ue.addDebugInfo("FPS File",
-			m_strCurrFPSFilename.empty() ? "<Not Saved>" : m_strCurrFPSFilename);
-		ue.log();
-
-		// If only the stats thread is running need to stop it here as well as update
-		// the menus and running flags
-		if ( m_bStatsOnlyRunning )
+		try
 		{
-			// Notify that the processing has been cancelled
-			OnProcessingCancelling(0, 0);
+			CWaitCursor wait;
 
-			// Stop the statistics thread
-			stopStatsThread();
+			// Do not auto-terminate the dialog
+			m_bStoppedManually = true;
 
-			// Update the status for stats only to non running
-			m_bStatsOnlyRunning = false;
-			
-			// This needs to be reset here because there will not be a processing completed message 
-			m_bRunning = false;
-			
-			// Stop run timer
-			stopRunTimer();
+			// Log a message indicating that the user is stopping the FAM
+			UCLIDException ue("ELI15679", "Application trace: The user has stopped File Action Manager processing.");
+			ue.addDebugInfo("FPS File",
+				m_strCurrFPSFilename.empty() ? "<Not Saved>" : m_strCurrFPSFilename);
+			ue.log();
 
-			// Enable the action page after processing
-			if (isPageDisplayed(kActionPage))
+			// If only the stats thread is running need to stop it here as well as update
+			// the menus and running flags
+			if ( m_bStatsOnlyRunning )
 			{
-				m_propActionPage.setEnabled(true);
-			}
+				// Notify that the processing has been cancelled
+				OnProcessingCancelling(0, 0);
 
-			// If the processing log page is shown, notify it to stop progress updates
-			if (isPageDisplayed(kProcessingLogPage))
+				// Stop the statistics thread
+				stopStatsThread();
+
+				// Update the status for stats only to non running
+				m_bStatsOnlyRunning = false;
+			
+				// This needs to be reset here because there will not be a processing completed message 
+				m_bRunning = false;
+			
+				// Stop run timer
+				stopRunTimer();
+
+				// Enable the action page after processing
+				if (isPageDisplayed(kActionPage))
+				{
+					m_propActionPage.setEnabled(true);
+				}
+
+				// If the processing log page is shown, notify it to stop progress updates
+				if (isPageDisplayed(kProcessingLogPage))
+				{
+					m_propProcessLogPage.stopProgressUpdates();
+				}
+
+				// Update the UI
+				updateMenuAndToolbar();
+				updateUI();
+
+				// Reenable the process menu since no complete message will be sent
+				CMenu* pMenu = GetMenu();
+				pMenu->EnableMenuItem(1, MF_BYPOSITION | MF_ENABLED);
+
+				// Redraw the menu bar
+				DrawMenuBar();
+
+				// Log a FAM has stopped processing message [LRCAU #5302]
+				UCLID_FILEPROCESSINGLib::IRoleNotifyFAMPtr ipRole(getFPM());
+				ASSERT_RESOURCE_ALLOCATION("ELI25564", ipRole != __nullptr);
+				ipRole->NotifyProcessingCompleted();
+			}
+			else
 			{
-				m_propProcessLogPage.stopProgressUpdates();
+				// Disable the buttons so they will not be pressed while the FAM is stopping
+				m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_RUN, FALSE);
+				m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_PAUSE, FALSE);
+				m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_STOP, FALSE);
+
+				// update the menu items
+				CMenu* pMenu = GetMenu();
+			
+				// Disable the menus so they will not be pressed while the FAM is stopping
+				pMenu->EnableMenuItem(ID_PROCESS_STARTPROCESSING, MF_BYCOMMAND | MF_GRAYED);
+				pMenu->EnableMenuItem(ID_PROCESS_PAUSEPROCESSING, MF_BYCOMMAND | MF_GRAYED);
+				pMenu->EnableMenuItem(ID_PROCESS_STOPPROCESSING, MF_BYCOMMAND | MF_GRAYED);
+
+				// Add a status message that the FAM is stopping.
+				m_statusBar.SetText("Stopping", gnSTATUS_TEXT_STATUS_PANE_ID, 0);
+			
+				// Files are processing. Stop them.
+				getFPM()->StopProcessing();
 			}
-
-			// Update the UI
-			updateMenuAndToolbar();
-			updateUI();
-
-			// Reenable the process menu since no complete message will be sent
-			CMenu* pMenu = GetMenu();
-			pMenu->EnableMenuItem(1, MF_BYPOSITION | MF_ENABLED);
-
-			// Redraw the menu bar
-			DrawMenuBar();
-
-			// Log a FAM has stopped processing message [LRCAU #5302]
-			UCLID_FILEPROCESSINGLib::IRoleNotifyFAMPtr ipRole(getFPM());
-			ASSERT_RESOURCE_ALLOCATION("ELI25564", ipRole != __nullptr);
-			ipRole->NotifyProcessingCompleted();
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI08927")
+	}
+	catch (UCLIDException &ue)
+	{
+		// [FlexIDSCore:5003]
+		// If someone clicks the stop button before a stop initiated by closing the verification
+		// window has been completed, theres no need to display an exception to the user; log
+		// instead.
+		if (ue.getTopELI() == "ELI12734")
+		{
+			ue.log();
 		}
 		else
 		{
-			// Disable the buttons so they will not be pressed while the FAM is stopping
-			m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_RUN, FALSE);
-			m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_PAUSE, FALSE);
-			m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_STOP, FALSE);
-
-			// update the menu items
-			CMenu* pMenu = GetMenu();
-			
-			// Disable the menus so they will not be pressed while the FAM is stopping
-			pMenu->EnableMenuItem(ID_PROCESS_STARTPROCESSING, MF_BYCOMMAND | MF_GRAYED);
-			pMenu->EnableMenuItem(ID_PROCESS_PAUSEPROCESSING, MF_BYCOMMAND | MF_GRAYED);
-			pMenu->EnableMenuItem(ID_PROCESS_STOPPROCESSING, MF_BYCOMMAND | MF_GRAYED);
-
-			// Add a status message that the FAM is stopping.
-			m_statusBar.SetText("Stopping", gnSTATUS_TEXT_STATUS_PANE_ID, 0);
-			
-			// Files are processing. Stop them.
-			getFPM()->StopProcessing();
+			ue.display();
 		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08927")
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::OnBtnAutoScroll() 

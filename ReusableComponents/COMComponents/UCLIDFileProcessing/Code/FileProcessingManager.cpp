@@ -338,6 +338,7 @@ STDMETHODIMP CFileProcessingManager::StopProcessing()
 		// ensure that processing is currently taking place
 		if (!m_bProcessing && !m_bSupplying)
 		{
+			// Do not change this ELI code. FileProcessingDlg::OnBtnStop is depending on it.
 			THROW_LOGIC_ERROR_EXCEPTION("ELI12734")
 		}
 
