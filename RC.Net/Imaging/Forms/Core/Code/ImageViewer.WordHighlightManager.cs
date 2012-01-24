@@ -128,12 +128,6 @@ namespace Extract.Imaging.Forms
                 new ConcurrentDictionary<int, ThreadSafeSpatialString>();
 
             /// <summary>
-            /// Indicates whether a call to OCRPage has completed and that results are now available
-            /// (if the operation completed successfully).
-            /// </summary>
-            ManualResetEvent _ocrPageComplete = new ManualResetEvent(true); 
-
-            /// <summary>
             /// The background process status message for each document page.
             /// -1 indicates a status that should be used regardless of the current image page.
             /// </summary>
@@ -248,6 +242,11 @@ namespace Extract.Imaging.Forms
             /// Indicates whether this instance has been disposed.
             /// </summary>
             volatile bool _disposed;
+
+            /// <summary>
+            /// The currently executing background OCR task (if there is one).
+            /// </summary>
+            volatile Task _currentBackgroundOCRTask;
 
             #endregion Fields
 
@@ -952,12 +951,6 @@ namespace Extract.Imaging.Forms
                             _ocrCanceler = null;
                         }
 
-                        if (_ocrPageComplete != null)
-                        {
-                            _ocrPageComplete.Dispose();
-                            _ocrPageComplete = null;
-                        }
-
                         // Not necessary since this happens in ClearData, but it appeases FXCop.
                         if (_autoFitHighlight != null)
                         {
@@ -1378,6 +1371,8 @@ namespace Extract.Imaging.Forms
                 _pageCount = 0;
                 _ocrPageData.Clear();
                 _ocrData = null;
+                _ocrCanceler = null;
+                _currentBackgroundOCRTask = null;
 
                 _clearData = false;
             }
@@ -1659,11 +1654,22 @@ namespace Extract.Imaging.Forms
 
                 SpatialString pageOcr = null;
                 ThreadSafeSpatialString ocrData;
-                if (_ocrPageData.TryGetValue(page, out ocrData) && ocrData != null)
+                bool pageAlreadyLoading = false;
+                if (_ocrPageData.TryGetValue(page, out ocrData))
                 {
-                    pageOcr = ocrData.SpatialString;
+                    if (ocrData == null)
+                    {
+                        // A null value in the map indicates OCR is currently in progress for this page.
+                        pageAlreadyLoading = true;
+                    }
+                    else
+                    {
+                        // If cached data already exists, use it.
+                        pageOcr = ocrData.SpatialString;
+                    }
                 }
-                else
+
+                if (pageOcr == null)
                 {   
                     // If OCR data is available for the document as a whole, simply grab the page
                     // needed.
@@ -1696,47 +1702,19 @@ namespace Extract.Imaging.Forms
 
                         if (autoOcr)
                         {
-                            // Launch an asynchronous task to schedule the OCR operation. This
-                            // allows us to instantly move on if cancelled and potentially also
-                            // allows the OCR operation to continue so that the results can be
-                            // retrieved later.
-                            Task ocrTask = Task.Factory.StartNew(() =>
-                                pageOcr = OCRPage(imageFile, page, ocrTradeoff));
-
-                            try
+                            if (pageAlreadyLoading && _currentBackgroundOCRTask != null)
                             {
                                 // Wait for completion as long as we don't receive a cancel request.
-                                ocrTask.Wait(_cancelToken);
-                            }
-                            catch (OperationCanceledException)
-                            {
-                                // If canceled, use ContinueWith to ensure any exceptions are
-                                // handled (which would otherwise crash the app).
-                                ocrTask.ContinueWith((canceledTask) =>
-                                    {
-                                        if (!canceledTask.Exception.InnerExceptions
-                                                .Where(ex => ex is OperationCanceledException ||
-                                                    ex.Message.Contains("cancel"))
-                                                .Any())
-                                        {
-                                            ExtractException ee = new ExtractException("ELI33373",
-                                                "OCR Operation failed.", canceledTask.Exception);
-                                            ee.AddDebugData("Document", imageFile, false);
-                                            ee.AddDebugData("Page", page, false);
-                                            ee.Log();
-                                        }
+                                _currentBackgroundOCRTask.Wait(_cancelToken);
 
-                                        canceledTask.Dispose();
-                                    }, TaskContinuationOptions.OnlyOnFaulted);
+                                if (_ocrPageData.TryGetValue(page, out ocrData) && ocrData != null &&
+                                    ocrData.SpatialString.HasSpatialInfo())
+                                {
+                                    return ocrData.SpatialString;
+                                }
                             }
-                            catch (Exception ex)
-                            {
-                                ExtractException ee = new ExtractException("ELI33374",
-                                                "OCR Operation failed.", ex);
-                                ee.AddDebugData("Document", imageFile, false);
-                                ee.AddDebugData("Page", page, false);
-                                throw  ee;
-                            }
+
+                            pageOcr = PerformBackgroundOcr(imageFile, page, ocrTradeoff);
                         }
                     }
                 }
@@ -1752,6 +1730,105 @@ namespace Extract.Imaging.Forms
             }
 
             /// <summary>
+            /// Performs a background OCR operation to get the data for the specified
+            /// <see paramref="page"/>.
+            /// </summary>
+            /// <param name="imageFile">The image file to OCR.</param>
+            /// <param name="page">The page to OCR.</param>
+            /// <param name="ocrTradeoff">The <see cref="OcrTradeoff"/> indicating the quality/speed
+            /// tradeoff to use.</param>
+            /// <returns>The <see cref="SpatialString"/> representing the OCR results for the
+            /// specified page.</returns>
+            SpatialString PerformBackgroundOcr(string imageFile, int page, OcrTradeoff ocrTradeoff)
+            {
+                SpatialString pageOcr = null;
+
+                if (_currentBackgroundOCRTask != null && _ocrCanceler != null)
+                {
+                    if (!_currentBackgroundOCRTask.IsCompleted)
+                    {
+                        _ocrCanceler.Cancel();
+                    }
+
+                    _currentBackgroundOCRTask = null;
+                }
+
+                // Indicate that data is being loaded for this page.
+                _ocrPageData[page] = null;
+
+                CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
+                _ocrCanceler = cancelTokenSource;
+                CancellationToken cancelToken = _ocrCanceler.Token;
+
+                // Launch an asynchronous task to schedule the OCR operation. This
+                // allows us to instantly move on if cancelled and potentially also
+                // allows the OCR operation to continue so that the results can be
+                // retrieved later.
+                Task ocrTask = Task.Factory.StartNew(() =>
+                    pageOcr = OCRPage(imageFile, page, ocrTradeoff, cancelToken), cancelToken);
+
+                _currentBackgroundOCRTask = ocrTask;
+
+                try
+                {
+                    // Wait for completion as long as we don't receive a cancel request.
+                    ocrTask.Wait(_cancelToken);
+
+                    _ocrCanceler = null;
+                    cancelTokenSource.Dispose();
+                }
+                catch (OperationCanceledException)
+                {
+                    ocrTask.ContinueWith((canceledTask) =>
+                    {
+                        if (cancelTokenSource == _ocrCanceler)
+                        {
+                            _ocrCanceler = null;
+                        }
+                        cancelTokenSource.Dispose();
+                    });
+
+                    // If canceled, use ContinueWith to ensure any exceptions are
+                    // handled (which would otherwise crash the app).
+                    ocrTask.ContinueWith((canceledTask) =>
+                    {
+                        if (!canceledTask.Exception.InnerExceptions
+                                .Where(ex => ex is OperationCanceledException ||
+                                    ex.Message.Contains("cancel"))
+                                .Any())
+                        {
+                            ExtractException ee = new ExtractException("ELI33373",
+                                "OCR Operation failed.", canceledTask.Exception);
+                            ee.AddDebugData("Document", imageFile, false);
+                            ee.AddDebugData("Page", page, false);
+                            ee.Log();
+                        }
+
+                        canceledTask.Dispose();
+                    }, TaskContinuationOptions.OnlyOnFaulted);
+                }
+                catch (Exception ex)
+                {
+                    ocrTask.ContinueWith((canceledTask) =>
+                    {
+                        if (cancelTokenSource == _ocrCanceler)
+                        {
+                            _ocrCanceler = null;
+                        }
+                        cancelTokenSource.Dispose();
+                    });
+
+                    ExtractException ee = new ExtractException("ELI33374",
+                                    "OCR Operation failed.", ex);
+                    ee.AddDebugData("Document", imageFile, false);
+                    ee.AddDebugData("Page", page, false);
+                    throw ee;
+                }
+
+                return pageOcr;
+            }
+
+            /// <summary>
             /// Performs OCR on the specified <see paramref="imageFile"/> and
             /// <see paramref="pageNumber"/>.
             /// </summary>
@@ -1759,25 +1836,20 @@ namespace Extract.Imaging.Forms
             /// <param name="pageNumber">The page number to be OCR'd.</param>
             /// <param name="ocrTradeoff">The <see cref="OcrTradeoff"/> indicating the quality/speed
             /// tradeoff to use.</param>
+            /// <param name="cancelToken">The <see cref="CancellationToken"/> to use to cancel this
+            /// operation if necessary.</param>
             /// <returns>
             /// A <see cref="SpatialString"/> instance representing the OCR data for
             /// the specified <see paramref="imageFile"/> and <see paramref="pageNumber"/>.
             /// </returns>
-            // Throwing an OperationCanceledException with an explicit but unreferenced argument.
-            // If throw is used with no exception, it is not thrown out as an
-            // OperationCanceledException and catch statements intended to catch it won't work.
-            SpatialString OCRPage(string imageFile, int pageNumber, OcrTradeoff ocrTradeoff)
+            SpatialString OCRPage(string imageFile, int pageNumber, OcrTradeoff ocrTradeoff,
+                CancellationToken cancelToken)
             {
                 // NOTE:
-                // This method executes on a background thread. While it is guaranted that only
-                // one instance of this method will run at any given time, any operations that
-                // occur in this method should be thread-safe with respect to the UI thread and
-                // should be tolerant to document/page changes that could occur in the UI thread.
+                // This method executes on a background thread. Any operations that occur in this
+                // method should be thread-safe with respect to the UI thread and should be tolerant
+                // to document/page changes that could occur in the UI thread.
                 // Code that needs to be run on the UI thread can be run using ExecuteInUIThread.
-
-                CancellationTokenSource cancelTokenSource = null;
-                CancellationToken cancelToken;
-                bool pageAlreadyLoading = false;
 
                 try
                 {
@@ -1787,100 +1859,41 @@ namespace Extract.Imaging.Forms
                         // First check to be sure the OCR results don't already exist or that the
                         // page isn't currently OCR'ing in another thread.
                         ThreadSafeSpatialString ocrData;
-                        if (_ocrPageData.TryGetValue(pageNumber, out ocrData))
-                        {
-                            if (ocrData != null)
-                            {
-                                return ocrData.SpatialString;
-                            }
-                            else if (_ocrManager != null && _ocrCanceler != null)
-                            {
-                                // A null entry in _ocrPageData indicates an OCR operation is in
-                                // progress for this page.
-                                pageAlreadyLoading = true;
-                            }
-                        }
-
-                        if (pageAlreadyLoading)
-                        {
-                            // If the page is already being OCR'd we'll just wait for that operation
-                            // to complete.
-                            cancelToken = _ocrCanceler.Token;
-                        }
-                        else
-                        {
-                            // Otherwise launch a new operation.
-                            cancelTokenSource = new CancellationTokenSource();
-                            _ocrCanceler = cancelTokenSource;
-                            cancelToken = _ocrCanceler.Token;
-
-                            if (_ocrManager == null)
-                            {
-                                _ocrManager = new AsynchronousOcrManager();
-                                _ocrManager.OcrProgressUpdate += HandleOcrProgressUpdate;
-                            }
-
-                            _ocrManager.Tradeoff = ocrTradeoff;
-                            _ocrManager.OcrFile(imageFile, pageNumber, pageNumber, cancelToken);
-
-                            // Indicate that data is being loaded for this page.
-                            _ocrPageData[pageNumber] = null;
-                            _ocrPageComplete.Reset();
-                        }
-                    }
-
-                    // If waiting for results from another thread, wait for _ocrPageComplete which
-                    // signals that the results are available (if OCR succeeded).
-                    if (pageAlreadyLoading)
-                    {
-                        _ocrPageComplete.WaitOne();
-
-                        cancelToken.ThrowIfCancellationRequested();
-
-                        // Retrieve the results, or re-start OCRPage if there are no results.
-                        ThreadSafeSpatialString ocrData;
                         if (_ocrPageData.TryGetValue(pageNumber, out ocrData) && ocrData != null)
                         {
                             return ocrData.SpatialString;
                         }
-                        else
-                        {
-                            // [FlexIDSCore:4944]
-                            // If the page wasn't correctly OCR'd, the initial processing was likely
-                            // cancelled which would have set _ocrPageComplete. Before retrying,
-                            // ensure _ocrPageComplete is reset.
-                            _ocrPageComplete.Reset();
 
-                            // The risk of infinite resursion is small, and in the end would be
-                            // stopped by a document change that would trip _ocrCanceler.
-                            return OCRPage(imageFile, pageNumber, ocrTradeoff);
+                        if (_ocrManager == null)
+                        {
+                            _ocrManager = new AsynchronousOcrManager();
+                            _ocrManager.OcrProgressUpdate += HandleOcrProgressUpdate;
                         }
+
+                        _ocrManager.Tradeoff = ocrTradeoff;
+                        _ocrManager.OcrFile(imageFile, pageNumber, pageNumber, cancelToken);
                     }
-                    // Otherwise run the OCR operation outside of _ocrLock so that it can be
-                    // interrupted by a new OCR operation.
-                    else
+
+                    _ocrManager.WaitForOcrCompletion();
+
+                    lock (_ocrLock)
                     {
-                        _ocrManager.WaitForOcrCompletion();
+                        cancelToken.ThrowIfCancellationRequested();
 
-                        lock (_ocrLock)
+                        // If the output is null but an exception wasn't thrown, the OCR operation
+                        // was likely cancelled by a previous operation. Worst case, this will force
+                        // another OCR attempt on a page without text.
+                        if (string.IsNullOrEmpty(_ocrManager.OcrOutput))
                         {
-                            cancelToken.ThrowIfCancellationRequested();
-
-                            // If the output is null but an exception wasn't thrown, the OCR operation
-                            // was likely cancelled by a previous operation. Worst case, this will force
-                            // another OCR attempt on a page without text.
-                            if (string.IsNullOrEmpty(_ocrManager.OcrOutput))
-                            {
-                                throw new OperationCanceledException();
-                            }
-
-                            // We have valid OCR results. Cache them.
-                            _ocrPageData[pageNumber] =
-                                new ThreadSafeSpatialString(_imageViewer, _ocrManager.OcrOutput);
+                            throw new OperationCanceledException();
                         }
 
-                        return _ocrPageData[pageNumber].SpatialString;
+                        // We have valid OCR results. Cache them.
+                        _ocrPageData[pageNumber] =
+                            new ThreadSafeSpatialString(_imageViewer, _ocrManager.OcrOutput);
                     }
+
+                    return _ocrPageData[pageNumber].SpatialString;
                 }
                 catch (OperationCanceledException)
                 {
@@ -1925,23 +1938,6 @@ namespace Extract.Imaging.Forms
                     }
 
                     throw ex.AsExtract("ELI32614");
-                }
-                finally
-                {
-                    lock (_ocrLock)
-                    {
-                        if (cancelTokenSource != null)
-                        {
-                            _ocrPageComplete.Set();
-
-                            if (_ocrCanceler == cancelTokenSource)
-                            {
-                                _ocrCanceler = null;
-                            }
-
-                            cancelTokenSource.Dispose();
-                        }
-                    }
                 }
             }
 
