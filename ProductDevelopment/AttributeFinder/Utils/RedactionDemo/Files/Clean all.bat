@@ -1,4 +1,8 @@
 @echo off
+
+C:
+CD C:\Demo_IDShield
+
 ECHO.
 ECHO Deleting all temporary demo files...
 ECHO.
