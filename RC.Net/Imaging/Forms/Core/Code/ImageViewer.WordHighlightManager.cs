@@ -1222,8 +1222,6 @@ namespace Extract.Imaging.Forms
                                     // so that its cancel token can still be checked if and when the
                                     // UI operation is finally run.
                                     _canceler = null;
-                                    new ExtractException("ELI31371",
-                                        "Application trace: Word highlight background operation aborted.").Log();
                                     break;
                                 }
                             }
@@ -1741,6 +1739,13 @@ namespace Extract.Imaging.Forms
             /// specified page.</returns>
             SpatialString PerformBackgroundOcr(string imageFile, int page, OcrTradeoff ocrTradeoff)
             {
+                // NOTE:
+                // This method executes on a background thread. While it is guaranted that only
+                // one instance of this method will run at any given time, any operations that
+                // occur in this method should be thread-safe with respect to the UI thread and
+                // should be tolerant to document/page changes that could occur in the UI thread.
+                // Code that needs to be run on the UI thread can be run using ExecuteInUIThread.
+
                 SpatialString pageOcr = null;
 
                 if (_currentBackgroundOCRTask != null && _ocrCanceler != null)
@@ -1846,10 +1851,12 @@ namespace Extract.Imaging.Forms
                 CancellationToken cancelToken)
             {
                 // NOTE:
-                // This method executes on a background thread. Any operations that occur in this
-                // method should be thread-safe with respect to the UI thread and should be tolerant
-                // to document/page changes that could occur in the UI thread.
-                // Code that needs to be run on the UI thread can be run using ExecuteInUIThread.
+                // This method executes in a background, asynchronous thread. There may be more than
+                // one instance at a time, but only one instance should be non-cancelled. Any
+                // operations that occur in this method should be thread-safe with respect to the UI
+                // thread and should be tolerant to document/page changes that could occur in the UI
+                // thread. Code that needs to be run on the UI thread can be run using
+                // ExecuteInUIThread.
 
                 try
                 {
