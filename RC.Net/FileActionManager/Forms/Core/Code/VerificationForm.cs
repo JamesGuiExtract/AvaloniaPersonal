@@ -738,6 +738,13 @@ namespace Extract.FileActionManager.Forms
 
             try
             {
+                // [FlexIDSCore:5008]
+                // If the close has been cancelled, there is nothing to do here.
+                if (e.Cancel)
+                {
+                    return;
+                }
+
                 _formIsClosing = true;
 
                 // If _closing is not set, the user has closed the form as opposed to it being

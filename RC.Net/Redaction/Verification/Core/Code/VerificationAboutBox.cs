@@ -29,6 +29,10 @@ namespace Extract.Redaction.Verification
             labelVersion.Text = String.Format(CultureInfo.CurrentCulture, "Version {0}", AssemblyVersion);
             labelCopyright.Text = AssemblyCopyright;
             labelCompanyName.Text = AssemblyCompany;
+
+            // [FlexIDSCore:5013]
+            // A temporary hack to get the verification UI to match ID Shield's version number.
+            labelVersion.Text = labelVersion.Text.Replace("Version 3", "Version 9");
         }
 
         #endregion Constructors

@@ -557,6 +557,10 @@ namespace Extract.Imaging.Forms
                     // When a new page is loaded, activate.
                     if (_imageViewer.IsImageAvailable)
                     {
+                        // [FlexIDSCore:5007]
+                        // Until the highlights for the new document are loaded, ensure any existing
+                        // hightlights are removed.
+                        DisableWordHighlights();
                         Activate();
                     }
                     // Otherwise, deactivate and reset all loaded data
@@ -603,6 +607,11 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
+                    // [FlexIDSCore:5007]
+                    // Until the highlights for the new document are loaded, ensure any existing
+                    // hightlights are removed.
+                    DisableWordHighlights();
+
                     // After changing pages, call Activate. Even if a loader task is already
                     // active, this will force highlights to be loaded for the current page first.
                     Activate();

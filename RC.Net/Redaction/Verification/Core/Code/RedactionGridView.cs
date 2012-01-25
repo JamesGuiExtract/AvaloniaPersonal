@@ -787,9 +787,10 @@ namespace Extract.Redaction.Verification
                     RedactionGridViewRow row = _redactions[i];
                     if (row.TryRemoveLayerObject(layerObject))
                     {
-                        // Determine which rows should be selected after deleting this item.
-                        List<int> remainingSelectedRows = new List<int>(
-                                SelectedRowIndexes.Where((rowIndex) => i != rowIndex));
+                        // Store the currently selected rows so selection of any non-deleted rows
+                        // can be restored after the deletion.
+                        List<DataGridViewRow> originallySelectedRows =
+                            new List<DataGridViewRow>(_dataGridView.SelectedRows.Cast<DataGridViewRow>());
 
                         if (row.LayerObjects.Count == 0)
                         {
@@ -814,7 +815,9 @@ namespace Extract.Redaction.Verification
                         // Set selection to any rows from the previous selection that still exist.
                         // (It is probably not possible for any rows to be in this set, but just in
                         // case...)
-                        Select(remainingSelectedRows);
+                        Select(originallySelectedRows
+                            .Where(selectedRow => _dataGridView.Rows.Contains(selectedRow))
+                            .Select(selectedRow => selectedRow.Index));
 
                         _dirty = true;
 
