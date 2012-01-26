@@ -132,8 +132,12 @@ void LeadToolsLineFinder::findLines(pBITMAPHANDLE pBitmap, L_UINT uFlags, vector
 {
 	L_INT32 nRet = FAILURE;
 
+	INIT_EXCEPTION_AND_TRACING("MLI03285");
+
 	try
 	{	
+		_lastCodePos = "10";
+
 		ASSERT_ARGUMENT("ELI18846", pBitmap != __nullptr);
 
 		m_bHorizontal = (uFlags == LINEREMOVE_HORIZONTAL);
@@ -151,10 +155,14 @@ void LeadToolsLineFinder::findLines(pBITMAPHANDLE pBitmap, L_UINT uFlags, vector
 		m_pBitmap = pBitmap;
 		m_pvecLines = &rvecLines;
 
+		_lastCodePos = "20";
+
 		// Call L_LineRemoveBitmap to search for lines.  lineRemoveCB will be called for
 		// each line that is discovered.  Pass a pointer to this class to the function
 		// to allow lineRemoveCB to add this line to the current collection.
 		int nRet = L_LineRemoveBitmap(m_pBitmap, &m_lr, lineRemoveCB, (LPVOID *)this, 0);
+
+		_lastCodePos = "30";
 
 		// If the exception flag is set, throw the exception.
 		if (m_bException)
@@ -169,15 +177,21 @@ void LeadToolsLineFinder::findLines(pBITMAPHANDLE pBitmap, L_UINT uFlags, vector
 		// than appropriate.  Attempt to correct such lines.
 		correctFatLines(rvecLines);
 
+		_lastCodePos = "40";
+
 		// Merge lines only after correctFatLines so that fat lines do not trigger lines to merge
 		// inappropriately
 		mergeLines(rvecLines);
+
+		_lastCodePos = "50";
 
 		// If line fragment extension is enabled, execute
 		if (m_bExtendLineFragments)
 		{
 			extendLines();
 		}
+
+		_lastCodePos = "60";
 
 		// Clear the pointers to the vector and bitmap now that processing is complete.
 		m_pvecLines = NULL;
@@ -206,84 +220,120 @@ bool LeadToolsLineFinder::isWider(const LineRect &rectLine1, const LineRect &rec
 //-------------------------------------------------------------------------------------------------
 void LeadToolsLineFinder::correctFatLines(vector<LineRect>& rvecLines)
 {
-	// Sort lines from widest to thinnest.
-	sort(rvecLines.begin(), rvecLines.end(), isWider);
-	
-	// Do not attempt to correct more than gnFAT_LINE_MAX_CHECK_PERCENT of the lines.
-	// If this document has large number of fat lines, it is likely only a small percentage of them 
-	// are correctable problems so it will be inefficient and not worthwhile to process them all.
-	size_t nCount = (m_pvecLines->size() * gnFAT_LINE_MAX_CHECK_PERCENT / 100);
+	INIT_EXCEPTION_AND_TRACING("MLI03286");
 
-	for (size_t i = 0; i < nCount; i++)
+	try
 	{
-		// If the width of this line is below gnFAT_LINE_CUTTOFF. All remaining lines will be as well.
-		if (m_pvecLines->at(i).LineWidth() < gnFAT_LINE_CUTTOFF)
+		_lastCodePos = "10";
+
+		// Sort lines from widest to thinnest.
+		sort(rvecLines.begin(), rvecLines.end(), isWider);
+	
+		// Do not attempt to correct more than gnFAT_LINE_MAX_CHECK_PERCENT of the lines.
+		// If this document has large number of fat lines, it is likely only a small percentage of them 
+		// are correctable problems so it will be inefficient and not worthwhile to process them all.
+		size_t nCount = (m_pvecLines->size() * gnFAT_LINE_MAX_CHECK_PERCENT / 100);
+
+		_lastCodePos = "20";
+
+		for (size_t i = 0; i < nCount; i++)
 		{
-			break;
-		}
+			_lastCodePos = "30";
 
-		// Create a new bitmap from the image region that was reported as a line.
-		BITMAPHANDLE hBitmapRegion;
-		LeadToolsBitmapFreeer bitmapFreeer(hBitmapRegion, true);
-		L_CopyBitmapRect(&hBitmapRegion, m_pBitmap, sizeof(BITMAPHANDLE), 
-			m_pvecLines->at(i).left, m_pvecLines->at(i).top, 
-			m_pvecLines->at(i).Width(), m_pvecLines->at(i).Height());
-
-		// Set m_pvecLines to point to a new collection of lines where L_LineRemoveBitmap is to 
-		// insert lines found within region.  lineRemoveCB uses m_pvecLines at the collection
-		// to add found lines. This container needs to be separate from the general line collection.
-		vector<LineRect> vecContainedLines;
-		m_pvecLines = &vecContainedLines;
-
-		// Search for lines within this image area using an iWall setting half the size of the
-		// original search.
-		LINEREMOVE lr(m_lr);
-		lr.iWall = m_lr.iWall / 2;
-		L_LineRemoveBitmap(&hBitmapRegion, &lr, lineRemoveCB, (LPVOID *)this, 0);
-
-		// Reset m_pvecLines to point to the original line collection
-		m_pvecLines = &rvecLines;
-
-		// Cycle through all lines contained in the region
-		for each (LineRect vecContainedLine in vecContainedLines)
-		{
-			// If a contained line overlaps sufficiently with the original
-			if (100 * vecContainedLine.LineLength() / m_pvecLines->at(i).LineLength() > gnFAT_LINE_LENGTH_OVERLAP)
+			// If the width of this line is below gnFAT_LINE_CUTTOFF. All remaining lines will be as well.
+			if (m_pvecLines->at(i).LineWidth() < gnFAT_LINE_CUTTOFF)
 			{
-				// Convert the coordinates to be relative to the page rather than the region
-				vecContainedLine.MoveToXY(m_pvecLines->at(i).left + vecContainedLine.left, 
-										  m_pvecLines->at(i).top + vecContainedLine.top);
-
-				// Replace the former (fat) line with the new (thinner) line.
-				m_pvecLines->at(i) = vecContainedLine;
 				break;
 			}
+
+			// Create a new bitmap from the image region that was reported as a line.
+			BITMAPHANDLE hBitmapRegion;
+			LeadToolsBitmapFreeer bitmapFreeer(hBitmapRegion, true);
+			L_CopyBitmapRect(&hBitmapRegion, m_pBitmap, sizeof(BITMAPHANDLE), 
+				m_pvecLines->at(i).left, m_pvecLines->at(i).top, 
+				m_pvecLines->at(i).Width(), m_pvecLines->at(i).Height());
+
+			_lastCodePos = "40";
+
+			// Set m_pvecLines to point to a new collection of lines where L_LineRemoveBitmap is to 
+			// insert lines found within region.  lineRemoveCB uses m_pvecLines at the collection
+			// to add found lines. This container needs to be separate from the general line collection.
+			vector<LineRect> vecContainedLines;
+			m_pvecLines = &vecContainedLines;
+
+			// Search for lines within this image area using an iWall setting half the size of the
+			// original search.
+			LINEREMOVE lr(m_lr);
+			lr.iWall = m_lr.iWall / 2;
+			L_LineRemoveBitmap(&hBitmapRegion, &lr, lineRemoveCB, (LPVOID *)this, 0);
+
+			_lastCodePos = "50";
+
+			// Reset m_pvecLines to point to the original line collection
+			m_pvecLines = &rvecLines;
+
+			// Cycle through all lines contained in the region
+			for each (LineRect vecContainedLine in vecContainedLines)
+			{
+				_lastCodePos = "60";
+
+				// If a contained line overlaps sufficiently with the original
+				if (100 * vecContainedLine.LineLength() / m_pvecLines->at(i).LineLength() > gnFAT_LINE_LENGTH_OVERLAP)
+				{
+					// Convert the coordinates to be relative to the page rather than the region
+					vecContainedLine.MoveToXY(m_pvecLines->at(i).left + vecContainedLine.left, 
+											  m_pvecLines->at(i).top + vecContainedLine.top);
+
+					// Replace the former (fat) line with the new (thinner) line.
+					m_pvecLines->at(i) = vecContainedLine;
+					break;
+				}
+			}
+
+			_lastCodePos = "70";
 		}
 	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34354");
 }
 //-------------------------------------------------------------------------------------------------
 void LeadToolsLineFinder::mergeLines(vector<LineRect> &rvecLines)
 {
-	vector<LineRect> vecMergedLines;
+	INIT_EXCEPTION_AND_TRACING("MLI03287");
 
-	// For each line in the set rvecLines
-	while (rvecLines.empty() == false)
+	try
 	{
-		// Remove the last item in the vector
-		LineRect rectLine = rvecLines.back();
-		rvecLines.pop_back();
+		_lastCodePos = "10";
 
-		// If it is not able to be merged, add the line to the set vecMergedLines.
-		// If it was merged, the line will be added to vecMergedLines when we encounter
-		// the last line with which it was merged.
-		if (attemptMerge(rectLine) == false)
+		vector<LineRect> vecMergedLines;
+
+		// For each line in the set rvecLines
+		while (rvecLines.empty() == false)
 		{
-			vecMergedLines.push_back(rectLine);
-		}
-	}
+			_lastCodePos = "20";
 
-	// Return the merged set of lines.
-	rvecLines = vecMergedLines;
+			// Remove the last item in the vector
+			LineRect rectLine = rvecLines.back();
+			rvecLines.pop_back();
+
+			// If it is not able to be merged, add the line to the set vecMergedLines.
+			// If it was merged, the line will be added to vecMergedLines when we encounter
+			// the last line with which it was merged.
+			if (attemptMerge(rectLine) == false)
+			{
+				_lastCodePos = "30";
+
+				vecMergedLines.push_back(rectLine);
+			}
+
+			_lastCodePos = "40";
+		}
+
+		_lastCodePos = "50";
+
+		// Return the merged set of lines.
+		rvecLines = vecMergedLines;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34355");
 }
 //-------------------------------------------------------------------------------------------------
 bool LeadToolsLineFinder::attemptMerge(LineRect &rrectLine)
@@ -395,188 +445,237 @@ bool LeadToolsLineFinder::attemptMerge(LineRect &rrectLine)
 //-------------------------------------------------------------------------------------------------
 void LeadToolsLineFinder::extendLines()
 {
-	// Processing time appears to be adversely affected at times if multiple threads are allowed
-	// to run extendLines at the same time.  Limiting this call to one thread at a time does not
-	// affect performance too much on a small number of cores since only 10-15% of total findLines 
-	// processing time is spent in extendLines.  However, on a machine with a large number of cores
-	// this function may become a bottleneck.
-	CSingleLock lg( &ms_mutex, TRUE );
+	INIT_EXCEPTION_AND_TRACING("MLI03288");
 
-	vector<LineRect> vecExtendedLines;
-
-	for (vector<LineRect>::iterator prectLine = m_pvecLines->begin();
-		prectLine != m_pvecLines->end();
-		prectLine ++)
+	try
 	{
-		// Attempt to extend each line in both directions
-		bool bModified = extendLine(*prectLine, -1);
-		bModified |= extendLine(*prectLine, 1);
+		_lastCodePos = "10";
 
-		// If the line was extended, add it to a separate vector
-		if (bModified)
+		// Processing time appears to be adversely affected at times if multiple threads are allowed
+		// to run extendLines at the same time.  Limiting this call to one thread at a time does not
+		// affect performance too much on a small number of cores since only 10-15% of total findLines 
+		// processing time is spent in extendLines.  However, on a machine with a large number of cores
+		// this function may become a bottleneck.
+		CSingleLock lg( &ms_mutex, TRUE );
+
+		vector<LineRect> vecExtendedLines;
+
+		_lastCodePos = "20";
+
+		for (vector<LineRect>::iterator prectLine = m_pvecLines->begin();
+			prectLine != m_pvecLines->end();
+			prectLine ++)
 		{
-			vecExtendedLines.push_back(*prectLine);
+			_lastCodePos = "30";
+
+			// Attempt to extend each line in both directions
+			bool bModified = extendLine(*prectLine, -1);
+			bModified |= extendLine(*prectLine, 1);
+
+			_lastCodePos = "40";
+
+			// If the line was extended, add it to a separate vector
+			if (bModified)
+			{
+				vecExtendedLines.push_back(*prectLine);
+			}
+		}
+
+		_lastCodePos = "50";
+
+		// Add extended lines into the primary vector after testing for meg
+		for (vector<LineRect>::iterator prectLine = vecExtendedLines.begin();
+			prectLine != vecExtendedLines.end();
+			prectLine ++)
+		{
+			addLine(*prectLine);
 		}
 	}
-
-	// Add extended lines into the primary vector after testing for meg
-	for (vector<LineRect>::iterator prectLine = vecExtendedLines.begin();
-		prectLine != vecExtendedLines.end();
-		prectLine ++)
-	{
-		addLine(*prectLine);
-	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34356");
 }
 //-------------------------------------------------------------------------------------------------
 bool LeadToolsLineFinder::extendLine(LineRect &rrectLine, int nDirection)
 {
-	ASSERT_ARGUMENT("ELI18997", nDirection == 1 || nDirection == -1);
+	INIT_EXCEPTION_AND_TRACING("MLI03289");
 
-	// Initialize tracking pos depending upon the specified direction to extend the line
-	int nLenPos;
-	if (nDirection == 1)
+	try
 	{
-		nLenPos = rrectLine.m_nLineBottomOrRightEnd;
-	}
-	else
-	{
-		nLenPos = rrectLine.m_nLineTopOrLeftEnd;
-	}
+		_lastCodePos = "10";
 
-	// Find the line position within the rect at the specified end
-	int nTrackPos = initializeTrackingPos(rrectLine, nDirection, gnINITIALIZATION_DIST);
+		ASSERT_ARGUMENT("ELI18997", nDirection == 1 || nDirection == -1);
 
-	// Initialize the top edge of the scan area accordingly
-	int nTrackEdge = nTrackPos - (m_nExtensionScanLines / 2);
-
-	// Variable to keep track of the distance we should skip ahead on each iteration
-	int nTrackDist = 0;
-
-	// The current gap (white pixel) accumulation
-	int nCurrentGap = 0;
-
-	// The current number of consecutive black pixels that have been found
-	int nConsecutive = 0;
-
-	// true if an error was encountered reading a pixel (offpage)
-	bool bErrorReadingPixel = false;
-
-	// Return value
-	bool bResult = false;
-
-	// Initialize the vector of scan lines to zero for each scan line
-	m_queScanLines.clear();
-	m_queScanLines.assign(m_nExtensionScanLines, 0);
-
-	// Each loop scans progressively further out along the line
-	while (!bErrorReadingPixel)
-	{
-		bool bFoundBlack = false;
-
-		// Scan the pixel for each scan line at this position
-		for (int i = 0; i < m_nExtensionScanLines; i++)
+		// Initialize tracking pos depending upon the specified direction to extend the line
+		int nLenPos;
+		if (nDirection == 1)
 		{
-			// Check pixel color
-			bool bBlackPixel = checkPixel(nLenPos, nTrackEdge + i, bErrorReadingPixel);
+			nLenPos = rrectLine.m_nLineBottomOrRightEnd;
+		}
+		else
+		{
+			nLenPos = rrectLine.m_nLineTopOrLeftEnd;
+		}
 
-			// If there was a problem reading the pixel, break out of the loop
+		// Find the line position within the rect at the specified end
+		int nTrackPos = initializeTrackingPos(rrectLine, nDirection, gnINITIALIZATION_DIST);
+
+		_lastCodePos = "20";
+
+		// Initialize the top edge of the scan area accordingly
+		int nTrackEdge = nTrackPos - (m_nExtensionScanLines / 2);
+
+		// Variable to keep track of the distance we should skip ahead on each iteration
+		int nTrackDist = 0;
+
+		// The current gap (white pixel) accumulation
+		int nCurrentGap = 0;
+
+		// The current number of consecutive black pixels that have been found
+		int nConsecutive = 0;
+
+		// true if an error was encountered reading a pixel (offpage)
+		bool bErrorReadingPixel = false;
+
+		// Return value
+		bool bResult = false;
+
+		// Initialize the vector of scan lines to zero for each scan line
+		m_queScanLines.clear();
+		m_queScanLines.assign(m_nExtensionScanLines, 0);
+
+		_lastCodePos = "30";
+
+		// Each loop scans progressively further out along the line
+		while (!bErrorReadingPixel)
+		{
+			bool bFoundBlack = false;
+
+			// Scan the pixel for each scan line at this position
+			for (int i = 0; i < m_nExtensionScanLines; i++)
+			{
+				_lastCodePos = "40";
+
+				// Check pixel color
+				bool bBlackPixel = checkPixel(nLenPos, nTrackEdge + i, bErrorReadingPixel);
+
+				_lastCodePos = "50";
+
+				// If there was a problem reading the pixel, break out of the loop
+				if (bErrorReadingPixel)
+				{
+					break;
+				}
+
+				if (bBlackPixel)
+				{
+					// Update the consecutive pixel count for this line
+					m_queScanLines[i] = m_queScanLines[i] + 1;
+
+					bFoundBlack = true;
+				}
+				else
+				{
+					// Reset the consecutive pixel count for this line
+					m_queScanLines[i] = 0;
+				}
+			}
+
+			_lastCodePos = "60";
+
 			if (bErrorReadingPixel)
 			{
+				// If there was a problem reading the pixel, break out of the loop
 				break;
 			}
-
-			if (bBlackPixel)
+			else if (bFoundBlack)
 			{
-				// Update the consecutive pixel count for this line
-				m_queScanLines[i] = m_queScanLines[i] + 1;
-
-				bFoundBlack = true;
+				// Update the overall consecutive black pixel count as long one of the scan
+				// lines had a black pixel
+				nConsecutive++;
 			}
 			else
 			{
-				// Reset the consecutive pixel count for this line
-				m_queScanLines[i] = 0;
+				// If none of the scan lines had a black pixel, increment the gap count
+				nCurrentGap++;
+				nConsecutive = 0;
+
+				// If the gap has exceeded the allowable size, break.
+				if (nCurrentGap > m_nExtensionGap)
+				{
+					_lastCodePos = "70";
+
+					break;
+				}
 			}
-		}
 
-		if (bErrorReadingPixel)
-		{
-			// If there was a problem reading the pixel, break out of the loop
-			break;
-		}
-		else if (bFoundBlack)
-		{
-			// Update the overall consecutive black pixel count as long one of the scan
-			// lines had a black pixel
-			nConsecutive++;
-		}
-		else
-		{
-			// If none of the scan lines had a black pixel, increment the gap count
-			nCurrentGap++;
-			nConsecutive = 0;
+			_lastCodePos = "80";
 
-			// If the gap has exceeded the allowable size, break.
-			if (nCurrentGap > m_nExtensionGap)
+			if (nConsecutive >= m_nExtensionConsecutiveMinimum)
 			{
-				break;
+				_lastCodePos = "90";
+
+				// Enough consecutive black pixels have been found to qualify the line for extension
+				nCurrentGap = 0;
+
+				// Extend the rect in the appropriate direction
+				if (nDirection == -1)
+				{
+					rrectLine.m_nLineTopOrLeftEnd = nLenPos;
+				}
+				else
+				{
+					rrectLine.m_nLineBottomOrRightEnd = nLenPos;
+				}
+
+				// Widen the line as necessary
+				if (nTrackEdge + (m_nExtensionScanLines / 2) < rrectLine.m_nLineTopOrLeftEdge)
+				{
+					rrectLine.m_nLineTopOrLeftEdge = nTrackEdge + (m_nExtensionScanLines / 2);
+				}
+				else if (nTrackEdge + (m_nExtensionScanLines / 2) > rrectLine.m_nLineBottomOrRightEdge)
+				{
+					rrectLine.m_nLineBottomOrRightEdge = nTrackEdge + (m_nExtensionScanLines / 2);
+				}
+
+				_lastCodePos = "100";
+
+				bResult = true;
 			}
-		}
 
-		if (nConsecutive >= m_nExtensionConsecutiveMinimum)
-		{
-			// Enough consecutive black pixels have been found to qualify the line for extension
-			nCurrentGap = 0;
+			_lastCodePos = "110";
 
-			// Extend the rect in the appropriate direction
-			if (nDirection == -1)
+			// Update the tracking postion (nTrackDist == 0 indicates the first call to updateTrackingPos
+			// for this line & direction
+			updateTrackingPos(nTrackEdge, bFoundBlack, nTrackDist == 0);
+
+			_lastCodePos = "120";
+
+			// Set nTrackDist according to whether we found a black pixel
+			if (bFoundBlack)
 			{
-				rrectLine.m_nLineTopOrLeftEnd = nLenPos;
+				nTrackDist = 1;
 			}
 			else
 			{
-				rrectLine.m_nLineBottomOrRightEnd = nLenPos;
+				nTrackDist ++;
 			}
 
-			// Widen the line as necessary
-			if (nTrackEdge + (m_nExtensionScanLines / 2) < rrectLine.m_nLineTopOrLeftEdge)
+			// Increment the scan position according to nTrackDist and the telescoping parameter
+			nLenPos += max(nTrackDist * m_nExtensionTelescoping / 100, 1) * nDirection;
+
+			// Do not allow the line to be extended over a gap larger than the m_nBridgeGapSmallerThan value
+			if ((nDirection == -1 && (rrectLine.m_nLineTopOrLeftEnd - nLenPos - nConsecutive) > m_nBridgeGapSmallerThan) ||
+				(nDirection == 1 && (nLenPos - rrectLine.m_nLineBottomOrRightEnd - nConsecutive) > m_nBridgeGapSmallerThan))
 			{
-				rrectLine.m_nLineTopOrLeftEdge = nTrackEdge + (m_nExtensionScanLines / 2);
-			}
-			else if (nTrackEdge + (m_nExtensionScanLines / 2) > rrectLine.m_nLineBottomOrRightEdge)
-			{
-				rrectLine.m_nLineBottomOrRightEdge = nTrackEdge + (m_nExtensionScanLines / 2);
+				_lastCodePos = "130";
+				break;
 			}
 
-			bResult = true;
+			_lastCodePos = "140";
 		}
 
-		// Update the tracking postion (nTrackDist == 0 indicates the first call to updateTrackingPos
-		// for this line & direction
-		updateTrackingPos(nTrackEdge, bFoundBlack, nTrackDist == 0);
-
-		// Set nTrackDist according to whether we found a black pixel
-		if (bFoundBlack)
-		{
-			nTrackDist = 1;
-		}
-		else
-		{
-			nTrackDist ++;
-		}
-
-		// Increment the scan position according to nTrackDist and the telescoping parameter
-		nLenPos += max(nTrackDist * m_nExtensionTelescoping / 100, 1) * nDirection;
-
-		// Do not allow the line to be extended over a gap larger than the m_nBridgeGapSmallerThan value
-		if ((nDirection == -1 && (rrectLine.m_nLineTopOrLeftEnd - nLenPos - nConsecutive) > m_nBridgeGapSmallerThan) ||
-			(nDirection == 1 && (nLenPos - rrectLine.m_nLineBottomOrRightEnd - nConsecutive) > m_nBridgeGapSmallerThan))
-		{
-			break;
-		}
+		return bResult;
 	}
-
-	return bResult;
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34357");
 }
 //-------------------------------------------------------------------------------------------------
 void LeadToolsLineFinder::updateTrackingPos(int &rnTrackEdge, bool bFoundBlackPixel, bool bFirst)

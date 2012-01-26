@@ -1993,12 +1993,12 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 				string strGateKeeperQuery =
 					"IF EXISTS ("
 					"	SELECT * FROM [FileActionStatus] " + strWhere +
-					"		AND [FileActionStatus].[ActionID] = <ActionIDPlaceHolder>";
+					"		AND [FileActionStatus].[ActionID] = <ActionIDPlaceHolder>)";
 				if (m_bAutoRevertLockedFiles)
 				{
 					// The ActiveFAM table will frequently have SQL locks build up against it so
 					// querying against it here can be expensive at times. Instead, 
-					strGateKeeperQuery += ") OR ([ActionStatus] = 'R' "
+					strGateKeeperQuery += " OR ([ActionStatus] = 'R' "
 					"		AND [FileActionStatus].[ActionID] = <ActionIDPlaceHolder>)";
 				}
 				strGateKeeperQuery += ") SELECT 1 AS ID ELSE SELECT 0 AS ID";
