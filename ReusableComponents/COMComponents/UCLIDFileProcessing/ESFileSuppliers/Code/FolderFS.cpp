@@ -34,7 +34,8 @@ CFolderFS::CFolderFS()
 	m_eventSupplyingStarted(),
 	m_strExpandFolderName(""),
 	m_eventResume(),
-	m_pSearchThread(NULL)
+	m_pSearchThread(NULL),
+	m_nCurrentSearchThreadID(NULL)
 {
 }
 
@@ -197,7 +198,14 @@ STDMETHODIMP CFolderFS::raw_Start(IFileSupplierTarget * pTarget, IFAMTagManager 
 				if ( !m_bNoExistingFiles )
 				{
 					// start search thread
-					m_pSearchThread = AfxBeginThread(searchFileThread, this );
+					m_pSearchThread = AfxBeginThread(searchFileThread, this, 0, CREATE_SUSPENDED );
+
+					// [LegacyRCAndUtils:6294]
+					// Since we can't count on being able to check m_pSearchThread->m_nThreadID
+					// later, make a note of what it is now.
+					m_nCurrentSearchThreadID = m_pSearchThread->m_nThreadID;
+
+					m_pSearchThread->ResumeThread();
 				}
 
 				if ( m_bAddedFiles || m_bModifiedFiles || m_bTargetOfMoveOrRename )
@@ -259,9 +267,19 @@ STDMETHODIMP CFolderFS::raw_Stop()
 		// If this is the search thread, run this method in a new thread to avoid deadlock.
 		// [FlexIDSCore #3463]
 		_lastCodePos = "10";
-		if (m_pSearchThread != __nullptr && m_pSearchThread->m_nThreadID == GetCurrentThreadId())
+		if (m_nCurrentSearchThreadID == GetCurrentThreadId())
 		{
-			AfxBeginThread(stopSearchFileThread, this);
+			if (m_eventSearchingExited.isSignaled())
+			{
+				UCLIDException ue("ELI34359",
+					"Unexpected situation encountered stopping file searching thread.");
+				ue.log();
+			}
+			else
+			{
+				AfxBeginThread(stopSearchFileThread, this);
+			}
+
 			return S_OK;
 		}
 

@@ -159,6 +159,9 @@ private:
 	// Used to pause execution in the thread, this should not be referenced unless the m_eventSearchingExited is not signaled
 	CWinThread * m_pSearchThread;
 
+	// The ID of the most recently started searching thread.
+	volatile int m_nCurrentSearchThreadID;
+
 	// Flag to indicate searching and/or listening should recurse folders
 	bool m_bRecurseFolders;
 
