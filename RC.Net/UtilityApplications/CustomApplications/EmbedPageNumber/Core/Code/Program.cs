@@ -74,6 +74,7 @@ namespace Extract.UtilityApplications.CustomApplications.EmbedPageNumber
         /// <returns>The page count or -1 if the file is not a supported image format.</returns>
         static int GetImagePageCount(string fileName)
         {
+            RasterCodecs.Startup();
             RasterCodecs codecs = null;
             CodecsImageInfo info = null;
             try
@@ -108,6 +109,8 @@ namespace Extract.UtilityApplications.CustomApplications.EmbedPageNumber
                 {
                     codecs.Dispose();
                 }
+
+                RasterCodecs.Shutdown();
             }
         }
 
