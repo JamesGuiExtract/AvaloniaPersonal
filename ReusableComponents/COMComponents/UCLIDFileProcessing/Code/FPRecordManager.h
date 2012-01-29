@@ -85,7 +85,11 @@ public:
 	bool pop(FileProcessingRecord& task, bool bWait, bool* pbProcessingActive = __nullptr);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Will return FileProcessingRecord Associated with nTaskId
-	const FileProcessingRecord& getTask(long nTaskID);
+	FileProcessingRecord getTask(long nTaskID);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: Will return an IProgressStatus indicating the progress of the task with the
+	// specified id.
+	IProgressStatus* getProgressStatus(long nTaskID);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Returns the number of files on the pending queue
 	long getNumberPending();
@@ -252,7 +256,7 @@ private:
 
 	//---------------------------------------------------------------------------------------------
 	// REQUIRE: rLockGuard must have already obtained the lock to m_objLock.
-	void changeState(FileProcessingRecord& task, CSingleLock& rLockGuard);
+	void changeState(const FileProcessingRecord& task, CSingleLock& rLockGuard);
 	//---------------------------------------------------------------------------------------------
 	void SendStatusMessage(HWND hWnd, long m_nTaskId, ERecordStatus eOldStatus, ERecordStatus eNewStatus);
 	//---------------------------------------------------------------------------------------------

@@ -235,6 +235,8 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 			*pbProcessingActive = true;
 		}
 
+		CSingleLock lockGuard(&m_objLock, TRUE);
+
 		if (m_queTaskIds.size() <= 0 && !processingQueueIsDiscarded())
 		{
 			// load from Database;
@@ -249,7 +251,6 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 		
 		// if a file is available in the queue for processing, then update the task variable with
 		// its information and return true
-		CSingleLock lockGuard(&m_objLock, TRUE);
 		if (m_queTaskIds.size() <= 0)
 		{
 			// there are no files in the queue for processing.  If the queue has
@@ -339,7 +340,7 @@ void FPRecordManager::clearEvents()
 	m_queueStopEvent.reset();
 }
 //-------------------------------------------------------------------------------------------------
-const FileProcessingRecord& FPRecordManager::getTask(long nTaskID)
+FileProcessingRecord FPRecordManager::getTask(long nTaskID)
 {
 	// Lock the mutex for the Task map while reading so it will not be 
 	// updated
@@ -353,6 +354,33 @@ const FileProcessingRecord& FPRecordManager::getTask(long nTaskID)
 	else
 	{
 		UCLIDException ue("ELI10147", "Invalid Task Id.");
+		ue.addDebugInfo("Id", nTaskID);
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+IProgressStatus* FPRecordManager::getProgressStatus(long nTaskID)
+{
+	// Lock the mutex for the Task map while reading so it will not be 
+	// updated
+	CSingleLock lockGuard(&m_readTaskMapMutex, TRUE);
+
+	TaskMap::iterator it = m_mapTasks.find(nTaskID);
+	if(it != m_mapTasks.end())
+	{
+		if (it->second.m_ipProgressStatus == __nullptr)
+		{
+			return __nullptr;
+		}
+		else
+		{
+			IProgressStatusPtr ipProgressStatus(it->second.m_ipProgressStatus);
+			return ipProgressStatus.Detach();
+		}
+	}
+	else
+	{
+		UCLIDException ue("ELI34360", "Invalid Task Id.");
 		ue.addDebugInfo("Id", nTaskID);
 		throw ue;
 	}
@@ -440,7 +468,7 @@ void FPRecordManager::SendStatusMessage(HWND hWnd, long m_nTaskId, ERecordStatus
 	::SendMessage( hWnd, FP_STATUS_CHANGE, m_nTaskId, lParam );
 }
 //-------------------------------------------------------------------------------------------------
-void FPRecordManager::changeState(FileProcessingRecord& task, CSingleLock& rLockGuard)
+void FPRecordManager::changeState(const FileProcessingRecord& task, CSingleLock& rLockGuard)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI02389");
 
@@ -844,6 +872,9 @@ bool FPRecordManager::removeTaskIfNotPendingOrCurrent(long nTaskID)
 			return false;
 		}
 	}
+
+	// Lock the mutex for the Task map while using iterator it
+	CSingleLock lockGuard(&m_readTaskMapMutex, TRUE);
 
  	// The task is not in the pending queue so it can be removed from the tasks map
 	TaskMap::iterator it = m_mapTasks.find(nTaskID);

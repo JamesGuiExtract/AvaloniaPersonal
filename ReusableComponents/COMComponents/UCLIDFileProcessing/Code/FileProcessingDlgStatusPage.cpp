@@ -767,9 +767,9 @@ void FileProcessingDlgStatusPage::updateProgressDetailsDlg()
 	if (nFileID != -1)
 	{
 		// Get the task object associated with the selected record
-		const FileProcessingRecord& task = m_pRecordMgr->getTask(nFileID);
+		FileProcessingRecord task = m_pRecordMgr->getTask(nFileID);
 		
-		// Get the progress status object to be displayed
+		// Get the progress status associated with the selected record
 		ipProgressStatus = task.m_ipProgressStatus;
 
 		// Compute the title of the progress status window
@@ -845,12 +845,8 @@ void FileProcessingDlgStatusPage::refreshProgressStatus()
 			// Get the file ID
 			long nFileID = *iter;
 
-			// Get the task object associated with the ID
-			const FileProcessingRecord& fileRecord = m_pRecordMgr->getTask(nFileID);
-
-			// Get the task's progress status object, to retrieve the text description
-			// of the current task
-			IProgressStatusPtr ipTopLevelProgressStatus = fileRecord.m_ipProgressStatus;
+			// Get the task's progress status object
+			IProgressStatusPtr ipTopLevelProgressStatus = m_pRecordMgr->getProgressStatus(nFileID);
 			
 			// Ensure that the progress status object exists. It may just have been created but not 
 			// initialized, or it may have just completed and reset. If it doesn't exist, just ignore
@@ -926,7 +922,7 @@ void FileProcessingDlgStatusPage::limitListSizeAndUpdateVars(CListCtrl& rListCtr
 void FileProcessingDlgStatusPage::moveTaskFromPendingToCurrent(long nFileID)
 {
 	// Get the task based on the ID
-	const FileProcessingRecord& task = m_pRecordMgr->getTask(nFileID);
+	FileProcessingRecord task = m_pRecordMgr->getTask(nFileID);
 
 	// append a new record and update the default columns
 	int iNewItemIndex = appendNewRecord(m_currentFilesList, task);
@@ -946,7 +942,7 @@ void FileProcessingDlgStatusPage::moveTaskFromCurrentToComplete(long nFileID)
 	removeTaskFromCurrentList(nFileID);
 
 	// Get the task based on the ID
-	const FileProcessingRecord& task = m_pRecordMgr->getTask(nFileID);
+	FileProcessingRecord task = m_pRecordMgr->getTask(nFileID);
 
 	// limit the size of the completed list as needed
 	limitListSizeAndUpdateVars(m_completedFilesList);
@@ -976,7 +972,7 @@ void FileProcessingDlgStatusPage::moveTaskFromCurrentToFailed(long nFileID)
 	removeTaskFromCurrentList(nFileID);
 
 	// Get the task based on the ID
-	const FileProcessingRecord& task = m_pRecordMgr->getTask(nFileID);
+	FileProcessingRecord task = m_pRecordMgr->getTask(nFileID);
 
 	// limit the size of the completed list as needed
 	limitListSizeAndUpdateVars(m_failedFilesList);
@@ -1132,7 +1128,7 @@ long FileProcessingDlgStatusPage::appendNewRecord(CListCtrl& rListCtrl,
 void FileProcessingDlgStatusPage::updateStatisticsVariablesWithTaskInfo(long nFileID)
 {
 	// Get the task based on the ID
-	const FileProcessingRecord& task = m_pRecordMgr->getTask(nFileID);
+	FileProcessingRecord task = m_pRecordMgr->getTask(nFileID);
 
 	// Use the try-catch because getStartTime() for the task can throw a UE if 
 	// the stopwatch is somehow reset.
