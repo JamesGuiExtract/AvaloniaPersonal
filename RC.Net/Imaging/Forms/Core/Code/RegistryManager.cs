@@ -575,25 +575,5 @@ namespace Extract.Imaging.Forms
         }
 
         #endregion RegistryManager Methods
-
-        #region RegistryManager Properties
-
-        /// <summary>
-        /// Gets the number of retries to try when saving a file
-        /// (See IDSD #331)
-        /// </summary>
-        public static int SaveRetries
-        {
-            get
-            {
-                // Get the retries key
-                int? retries = _userSpotRecognitionSubkey.GetValue(_SAVE_RETRY, 20) as int?;
-
-                // Return the value from the registry key
-                return retries ?? 20;
-            }
-        }
-
-        #endregion RegistryManager Properties
     }
 }
