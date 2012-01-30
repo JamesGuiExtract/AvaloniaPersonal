@@ -128,8 +128,13 @@ private:
 		Win32Event m_eventStandbyEnding;
 
 		// m_eventStandbyEnded is signaled once the thread has ended and endStandby call is
-		// complete.
+		// complete. Note: the main thread will not go out of scope until m_eventEndStandbyEnded is
+		// set.
 		Win32Event m_eventStandbyEnded;
+
+		// m_eventEndStandbyEnded is signaled once the endStandby call has ended and the main thread
+		// is clear to go out of scope.
+		Win32Event m_eventEndStandbyEnded;
 
 		UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr m_ipFileProcessingTask;
 	};

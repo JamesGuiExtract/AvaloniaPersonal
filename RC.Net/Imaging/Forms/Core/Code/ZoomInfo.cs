@@ -18,19 +18,12 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The scale factor applied to the image.
         /// </summary>
-        /// <remarks>This value is undefined if <see cref="_fitMode"/> is not 
-        /// <see cref="Extract.Imaging.Forms.FitMode.None"/>.</remarks>
         double _scaleFactor;
 
         /// <summary>
         /// The image orientation in degrees.
         /// </summary>
         int _orientation;
-
-        /// <summary>
-        /// The mode to scale the image within the visible area.
-        /// </summary>
-        FitMode _fitMode;
 
         #endregion Fields
 
@@ -45,13 +38,11 @@ namespace Extract.Imaging.Forms
         /// <param name="scaleFactor">The ratio of physical (client) pixel size to logical (image) 
         /// pixel size.</param>
         /// <param name="orientation">The image orientation in degrees.</param>
-        /// <param name="fitMode">The mode to scale the image within the visible area.</param>
-        public ZoomInfo(Point center, double scaleFactor, int orientation, FitMode fitMode)
+        public ZoomInfo(Point center, double scaleFactor, int orientation)
         {
             _zoomCenter = center;
             _scaleFactor = scaleFactor;
             _orientation = orientation;
-            _fitMode = fitMode;
         }
 
         #endregion Constructors
@@ -81,9 +72,7 @@ namespace Extract.Imaging.Forms
         /// Gets or sets the scale factor applied to the image.
         /// </summary>
         /// <value>The scale factor applied to the image.</value>
-        /// <returns>The scale factor applied to the image. This value is undefined if the
-        /// <see cref="FitMode"/> property is not 
-        /// <see cref="Extract.Imaging.Forms.FitMode.None"/>.</returns>
+        /// <returns>The scale factor applied to the image.</returns>
         public double ScaleFactor
         {
             get
@@ -113,23 +102,6 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        /// <summary>
-        /// Gets or sets the mode to scale the image within the visible area.
-        /// </summary>
-        /// <value>The mode to scale the image within the visible area.</value>
-        /// <returns>The mode to scale the image within the visible area.</returns>
-        public FitMode FitMode
-        {
-            get
-            {
-                return _fitMode;
-            }
-            set
-            {
-                _fitMode = value;
-            }
-        }
-
         #endregion Properties
 
         #region Methods
@@ -153,7 +125,7 @@ namespace Extract.Imaging.Forms
         /// <returns>A hash value for this <see cref="ZoomInfo"/>.</returns>
         public override int GetHashCode()
         {
-            return (int)_fitMode ^ _scaleFactor.GetHashCode() ^ _zoomCenter.GetHashCode()
+            return (int)_scaleFactor.GetHashCode() ^ _zoomCenter.GetHashCode()
                 ^ _orientation.GetHashCode();
         }
 
@@ -202,8 +174,7 @@ namespace Extract.Imaging.Forms
         /// setting as this <see cref="ZoomInfo"/>; <see langword="false"/> if they differ.</returns>
         public bool Equals(ZoomInfo other)
         {
-            if (_fitMode != other._fitMode || _scaleFactor != other._scaleFactor ||
-                _orientation != other._orientation)
+            if (_scaleFactor != other._scaleFactor ||  _orientation != other._orientation)
             {
                 return false;
             }

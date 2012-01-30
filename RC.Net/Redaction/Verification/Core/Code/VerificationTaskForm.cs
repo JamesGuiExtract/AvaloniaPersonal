@@ -365,6 +365,11 @@ namespace Extract.Redaction.Verification
         double _previousDocumentScaleFactor;
 
         /// <summary>
+        /// The <see cref="FitMode"/> in use when the last document was closed.
+        /// </summary>
+        FitMode _previousDocumentFitMode;
+
+        /// <summary>
         /// Indicates whether the verification session is being run independent of the FAM and
         /// database.
         /// </summary>
@@ -939,6 +944,7 @@ namespace Extract.Redaction.Verification
                 // is being loaded loaded in tile mode and, therefore, should share the same
                 // scale factor.
                 _previousDocumentScaleFactor = _imageViewer.ZoomInfo.ScaleFactor;
+                _previousDocumentFitMode = _imageViewer.FitMode;
             }
         }
 
@@ -991,6 +997,7 @@ namespace Extract.Redaction.Verification
 
             memento.Selection = _redactionGridView.SelectedRowIndexes;
             _previousDocumentScaleFactor = _imageViewer.ZoomInfo.ScaleFactor;
+            _previousDocumentFitMode = _imageViewer.FitMode;
         }
 
         /// <summary>
@@ -3289,13 +3296,15 @@ namespace Extract.Redaction.Verification
 
                 case DocumentNavigationTarget.FirstTile:
                     {
-                        _imageViewer.SelectFirstDocumentTile(_previousDocumentScaleFactor);
+                        _imageViewer.SelectFirstDocumentTile(
+                            _previousDocumentScaleFactor, _previousDocumentFitMode);
                     }
                     break;
 
                 case DocumentNavigationTarget.LastTile:
                     {
-                        _imageViewer.SelectLastDocumentTile(_previousDocumentScaleFactor);
+                        _imageViewer.SelectLastDocumentTile(
+                            _previousDocumentScaleFactor, _previousDocumentFitMode);
                     }
                     break;
             }
@@ -3392,7 +3401,11 @@ namespace Extract.Redaction.Verification
             try
             {
                 // Don't keep loading thumbnails if _thumbnailDockableWindow is closed.
-                _thumbnailViewer.Active = _thumbnailDockableWindow.IsOpen;
+                // [FlexIDSCore:5015]
+                // If the window is collapsed it means it is set to auto-hide. It is likely the user
+                // will want to check on them in this configuration, so go ahead and load them.
+                _thumbnailViewer.Active = _thumbnailDockableWindow.IsOpen ||
+                    _thumbnailDockableWindow.Collapsed;
             }
             catch (Exception ex)
             {
@@ -3641,7 +3654,11 @@ namespace Extract.Redaction.Verification
                     // If the thumbnail viewer is not visible when a document is opened, don't load the
                     // thumbnails. (They will get loaded if the thumbnail window is opened at a later
                     // time).
-                    _thumbnailViewer.Active = _thumbnailDockableWindow.IsOpen;
+                    // [FlexIDSCore:5015]
+                    // If the window is collapsed it means it is set to auto-hide. It is likely the user
+                    // will want to check on them in this configuration, so go ahead and load them.
+                    _thumbnailViewer.Active = _thumbnailDockableWindow.IsOpen ||
+                        _thumbnailDockableWindow.Collapsed;
                 }
             }
             catch (Exception ex)
@@ -3770,7 +3787,11 @@ namespace Extract.Redaction.Verification
                 // If the thumbnail viewer is not visible when a document is opened, don't load the
                 // thumbnails. (They will get loaded if the thumbnail window is opened at a later
                 // time).
-                _thumbnailViewer.Active = _thumbnailDockableWindow.IsOpen;
+                // [FlexIDSCore:5015]
+                // If the window is collapsed it means it is set to auto-hide. It is likely the user
+                // will want to check on them in this configuration, so go ahead and load them.
+                _thumbnailViewer.Active = _thumbnailDockableWindow.IsOpen ||
+                    _thumbnailDockableWindow.Collapsed;
 
                 _imageViewer.OpenImage(_savedMemento.DisplayImage, _standAloneMode);
 

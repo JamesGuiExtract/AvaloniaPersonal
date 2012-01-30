@@ -308,14 +308,19 @@ namespace Extract.Imaging.Forms
                     RegistryManager.AddMostRecentlyUsedImageFile(fileName);
                 }
 
+                // Set fit mode and zoom before OnImageFileChanged. Otherwise zoom can initialize
+                // based a layer object while ScaleFactor = 1 and cause the image to be scolled
+                // inappropriately once the correct fit mode/zoom is applied.
+                ShowFitMode(_fitMode);
+
+                // Update the zoom history and raise the zoom changed event
+                UpdateZoom(true, true);
+
                 // Raise the image file changed event
                 OnImageFileChanged(new ImageFileChangedEventArgs(fileName));
 
                 // Raise the on page changed event
                 OnPageChanged(new PageChangedEventArgs(_pageNumber));
-
-                // Update the zoom history and raise the zoom changed event
-                UpdateZoom(true, true);
 
                 // Restore the cursor for the active cursor tool.
                 UpdateCursor();
@@ -728,17 +733,22 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Selects the first tile in the document using the specified <see paramref="scaleFactor"/>.
+        /// Selects the first tile in the document using the specified <see paramref="scaleFactor"/>
+        /// or <see paramref="fitMode"/>.
         /// </summary>
         /// <param name="scaleFactor">The factor of zoom where 1F = 1 image pixel to 1 screen pixel,
         /// 5F = 1 image pixel to 5 screen pixels, etc.</param>
-        public void SelectFirstDocumentTile(double scaleFactor)
+        /// <param name="fitMode">The <see cref="FitMode"/> to use. If not FitMode.None, this will
+        /// override <see paramref="scaleFactor"/>.</param>
+        public void SelectFirstDocumentTile(double scaleFactor, FitMode fitMode)
         {
             try
             {
                 // Go to the first page and set the specified zoom factor.
                 SetPageNumber(1, false, true);
+
                 ScaleFactor = scaleFactor;
+                SetFitMode(fitMode, false, false, true);
 
                 // Get the visible image area
                 Rectangle tileArea = GetVisibleImageArea();
@@ -747,7 +757,7 @@ namespace Extract.Imaging.Forms
                 tileArea.Offset(PhysicalViewRectangle.Location);
 
                 // Zoom to the tile, add to the zoom history, and raise ZoomChanged event
-                ZoomToRectangle(tileArea, true, true, false);
+                ZoomToRectangle(tileArea, true, true, false, true);
             }
             catch (Exception ex)
             {
@@ -756,17 +766,22 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Selects the last tile in the document using the specified <see paramref="scaleFactor"/>.
+        /// Selects the last tile in the document using the specified <see paramref="scaleFactor"/>
+        /// or <see paramref="fitMode"/>.
         /// </summary>
         /// <param name="scaleFactor">The factor of zoom where 1F = 1 image pixel to 1 screen pixel,
         /// 5F = 1 image pixel to 5 screen pixels, etc.</param>
-        public void SelectLastDocumentTile(double scaleFactor)
+        /// <param name="fitMode">The <see cref="FitMode"/> to use. If not FitMode.None, this will
+        /// override <see paramref="scaleFactor"/>.</param>
+        public void SelectLastDocumentTile(double scaleFactor, FitMode fitMode)
         {
             try
             {
                 // Go to the last page and set the specified zoom factor.
                 SetPageNumber(PageCount, false, true);
+
                 ScaleFactor = scaleFactor;
+                SetFitMode(fitMode, false, false, true);
 
                 // Get the visible image area
                 Rectangle tileArea = GetVisibleImageArea();
@@ -775,7 +790,7 @@ namespace Extract.Imaging.Forms
                 tileArea.Offset(PhysicalViewRectangle.Right, PhysicalViewRectangle.Bottom);
 
                 // Zoom to the tile, add to the zoom history, and raise ZoomChanged event
-                ZoomToRectangle(tileArea, true, true, false);
+                ZoomToRectangle(tileArea, true, true, false, true);
             }
             catch (Exception ex)
             {
@@ -848,7 +863,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Move to the next tile, add to the zoom history, and raise ZoomChanged event
-                ZoomToRectangle(tileArea, true, true, false);
+                ZoomToRectangle(tileArea, true, true, false, true);
             }
             catch (Exception ex)
             {
@@ -921,7 +936,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Move to the next tile, add to the zoom history, and raise ZoomChanged event
-                ZoomToRectangle(tileArea, true, true, false);
+                ZoomToRectangle(tileArea, true, true, false, true);
             }
             catch (Exception ex)
             {
@@ -1083,7 +1098,7 @@ namespace Extract.Imaging.Forms
                         // objects are in view (also change fit mode if necessary)
                         Rectangle zoomRectangle = PadViewingRectangle(bounds);
                         zoomRectangle = GetTransformedRectangle(zoomRectangle, false);
-                        ZoomToRectangle(zoomRectangle, false, false, true);
+                        ZoomToRectangle(zoomRectangle, false, false, true, false);
                     }
 
                     // Update the zoom history and raise the zoom changed event
@@ -1618,11 +1633,13 @@ namespace Extract.Imaging.Forms
                 ExtractException.Assert("ELI21469", "There is no previous zoom history entry.",
                     CanZoomPrevious);
 
+                SetFitMode(FitMode.None, false, false, true);
+
                 // Get the previous zoom history entry
                 ZoomInfo zoomInfo = _imagePages[_pageNumber - 1].ZoomPrevious();
 
                 // Set the new zoom setting without updating the zoom history
-                SetZoomInfo(zoomInfo, false);
+                SetZoomInfo(zoomInfo, false, true);
             }
             catch (Exception e)
             {
@@ -1652,11 +1669,13 @@ namespace Extract.Imaging.Forms
                 ExtractException.Assert("ELI21470", "There is no subsequent zoom history entry.",
                     CanZoomNext);
 
+                SetFitMode(FitMode.None, false, false, true);
+
                 // Get the previous zoom history entry
                 ZoomInfo zoomInfo = _imagePages[_pageNumber - 1].ZoomNext();
 
                 // Set the new zoom setting without updating the zoom history
-                SetZoomInfo(zoomInfo, false);
+                SetZoomInfo(zoomInfo, false, true);
             }
             catch (Exception e)
             {
@@ -1723,6 +1742,8 @@ namespace Extract.Imaging.Forms
 
                     throw;
                 }
+
+                ShowFitMode(_fitMode);
 
                 // Center at the same point as prior to rotation
                 CenterAtPoint(center, false, false);
@@ -2364,19 +2385,20 @@ namespace Extract.Imaging.Forms
             // Get the current zoom setting
             ZoomInfo zoomInfo = GetZoomInfo();
 
-            // [DataEntry:311] Impose limits on the amount one can zoom in or out to prevent errors
-            // rendering the image.
-            if (zoomInfo.FitMode == FitMode.None &&
-                zoomInfo.ScaleFactor > _MAX_ZOOM_IN_SCALE_FACTOR)
+            if (_fitMode == FitMode.None)
             {
-                zoomInfo.ScaleFactor = _MAX_ZOOM_IN_SCALE_FACTOR;
-                SetZoomInfo(zoomInfo, false);
-            }
-            else if (zoomInfo.FitMode == FitMode.None &&
-                     zoomInfo.ScaleFactor < _MAX_ZOOM_OUT_SCALE_FACTOR)
-            {
-                zoomInfo.ScaleFactor = _MAX_ZOOM_OUT_SCALE_FACTOR;
-                SetZoomInfo(zoomInfo, false);
+                // [DataEntry:311] Impose limits on the amount one can zoom in or out to prevent errors
+                // rendering the image.
+                if (zoomInfo.ScaleFactor > _MAX_ZOOM_IN_SCALE_FACTOR)
+                {
+                    zoomInfo.ScaleFactor = _MAX_ZOOM_IN_SCALE_FACTOR;
+                    SetZoomInfo(zoomInfo, false);
+                }
+                else if (zoomInfo.ScaleFactor < _MAX_ZOOM_OUT_SCALE_FACTOR)
+                {
+                    zoomInfo.ScaleFactor = _MAX_ZOOM_OUT_SCALE_FACTOR;
+                    SetZoomInfo(zoomInfo, false);
+                }
             }
 
             // If nothing should be updated, we are done
@@ -2396,36 +2418,43 @@ namespace Extract.Imaging.Forms
                 {
                     _imagePages[_pageNumber - 1].ZoomInfo = zoomInfo;
                 }
+            }
 
-                // Raise the ZoomChanged event
-                if (raiseZoomChanged)
-                {
-                    OnZoomChanged(new ZoomChangedEventArgs(zoomInfo));
-                }
+            // In some cases (zoom previous/next, on document change) the new zoom level will have
+            // already been applied when UpdateZoom is called. There is little harm in calling
+            // OnZoomChanged twice, so for simplicities sake always raise the event here.
+            if (raiseZoomChanged)
+            {
+                OnZoomChanged(new ZoomChangedEventArgs(zoomInfo));
             }
         }
 
         /// <summary>
         /// Zooms the image to the specified rectangle and optionally updates the zoom.
         /// </summary>
-        /// <param name="rc">The rectangle to which the image should be zoomed in client 
+        /// <param name="rc">The rectangle to which the image should be zoomed in client
         /// coordinates.</param>
-        /// <param name="updateZoomHistory"><see langword="true"/> if the zoom history should be 
+        /// <param name="updateZoomHistory"><see langword="true"/> if the zoom history should be
         /// updated; <see langword="false"/> if it should not be updated.</param>
-        /// <param name="raiseZoomChanged"><see langword="true"/> if the <see cref="ZoomChanged"/> 
+        /// <param name="raiseZoomChanged"><see langword="true"/> if the <see cref="ZoomChanged"/>
         /// event should be raised; <see langword="false"/> if it should not.</param>
-        /// <param name="updateFitMode"><see langword="true"/> if the fit mode should be reset; 
+        /// <param name="updateFitMode"><see langword="true"/> if the fit mode should be reset;
         /// <see langword="false"/> if the fit mode should not be changed.</param>
+        /// <param name="preserveScaleFactor"><see langword="true"/> to preserve scale factor so
+        /// that this method cannot cause a change in the ScaleFactor.
+        /// <see langword="false"/> otherwise.</param>
         /// <exception cref="ExtractException">No image is open.</exception>
-        /// <event cref="ZoomChanged"><paramref name="raiseZoomChanged"/> was 
+        /// <event cref="ZoomChanged"><paramref name="raiseZoomChanged"/> was
         /// <see langword="true"/>.</event>
         void ZoomToRectangle(Rectangle rc, bool updateZoomHistory, bool raiseZoomChanged, 
-            bool updateFitMode)
+            bool updateFitMode, bool preserveScaleFactor)
         {
             try
             {
                 // Ensure an image is open
                 ExtractException.Assert("ELI21455", "No image is open.", base.Image != null);
+
+                double scaleFactor = ScaleFactor;
 
                 // [DataEntry:837]
                 // If a zero-size rectangle has been specified (as is the case with a minimized
@@ -2456,6 +2485,12 @@ namespace Extract.Imaging.Forms
                     {
                         SetFitMode(FitMode.FitToWidth, false, false, false);
                     }
+                }
+
+                // Preserve the previous scale factor.
+                if (preserveScaleFactor)
+                {
+                    ScaleFactor = scaleFactor;
                 }
 
                 // Update the zoom if necessary
@@ -2748,13 +2783,13 @@ namespace Extract.Imaging.Forms
             }
 
             // Go to the proper page for this object
-            SetPageNumber(_activeLinkedLayerObject.PageNumber, zoomInfo.FitMode == FitMode.FitToPage, true);
+            SetPageNumber(_activeLinkedLayerObject.PageNumber, true, true);
 
             // Set the appropriate scale factor if necessary
-            if (zoomInfo.FitMode != FitMode.FitToPage)
+            if (_fitMode != FitMode.FitToPage)
             {
                 // Check if no fit mode is specified
-                if (zoomInfo.FitMode == FitMode.None)
+                if (_fitMode == FitMode.None)
                 {
                     // Set the new scale factor for this page
                     ScaleFactor = zoomInfo.ScaleFactor;
@@ -3898,7 +3933,7 @@ namespace Extract.Imaging.Forms
         ZoomInfo GetZoomInfo()
         {
             // Return the ZoomInfo
-            return new ZoomInfo(GetVisibleImageCenter(), ScaleFactor, Orientation, _fitMode);
+            return new ZoomInfo(GetVisibleImageCenter(), ScaleFactor, Orientation);
         }
 
         /// <summary>
@@ -4041,16 +4076,14 @@ namespace Extract.Imaging.Forms
                 case FitMode.FitToPage:
 
                     // Set the fit mode
-                    base.SizeMode = RasterPaintSizeMode.FitAlways;
-                    ScaleFactor = _DEFAULT_SCALE_FACTOR;
+                    ShowFitToPage();
                     break;
 
                 case FitMode.FitToWidth:
 
                     // Set the fit mode, preserving the scroll position
                     Point scrollPosition = ScrollPosition;
-                    base.SizeMode = RasterPaintSizeMode.FitWidth;
-                    ScaleFactor = _DEFAULT_SCALE_FACTOR;
+                    ShowFitToWidth();
                     ScrollPosition = scrollPosition;
                     break;
 
@@ -4076,7 +4109,13 @@ namespace Extract.Imaging.Forms
             // Update the zoom history if necessary
             if (base.Image != null)
             {
-                UpdateZoom(updateZoomHistory, raiseZoomChanged);
+                UpdateZoom(updateZoomHistory, false);
+            }
+
+            // Raise OnZoomChanged in case a change in fit mode requires a new zoom history entry.
+            if (raiseZoomChanged)
+            {
+                OnZoomChanged(new ZoomChangedEventArgs(GetZoomInfo()));
             }
 
             // Raise the FitModeChanged event if necessary
@@ -4095,7 +4134,7 @@ namespace Extract.Imaging.Forms
         /// <event cref="ZoomChanged">Method was successful.</event>
         void SetZoomInfo(ZoomInfo zoomInfo, bool updateZoomHistory)
         {
-            SetZoomInfo(zoomInfo, updateZoomHistory, true, true);
+            SetZoomInfo(zoomInfo, updateZoomHistory, true);
         }
 
         /// <summary>
@@ -4107,12 +4146,8 @@ namespace Extract.Imaging.Forms
         /// <param name="raiseZoomChanged"><see langword="true"/> if the <see cref="ZoomChanged"/> 
         /// event should be raised if an image is open; <see langword="false"/> if it should not 
         /// be raised.</param>
-        /// <param name="raiseFitModeChanged"><see langword="true"/> if the 
-        /// <see cref="FitModeChanged"/> event should be raised; <see langword="false"/> if it 
-        /// should not be raised.</param>
         /// <event cref="ZoomChanged">Method was successful.</event>
-        void SetZoomInfo(ZoomInfo zoomInfo, bool updateZoomHistory, bool raiseZoomChanged,
-            bool raiseFitModeChanged)
+        void SetZoomInfo(ZoomInfo zoomInfo, bool updateZoomHistory, bool raiseZoomChanged)
         {
             // [FlexIDSCore:4850, 4861]
             // If the current orientation differs from the orientation specified in zoomInfo,
@@ -4125,27 +4160,12 @@ namespace Extract.Imaging.Forms
                 Rotate(orientationDelta, false, false);
             }
 
-            // Check if the fit mode is specified
-            if (zoomInfo.FitMode != FitMode.None)
-            {
-                SetFitMode(zoomInfo.FitMode, updateZoomHistory, raiseZoomChanged, raiseFitModeChanged);
-            }
-            else
-            {
-                // Reset the fit mode if it is set
-                if (_fitMode != FitMode.None)
-                {
-                    // 01/28/10 SNK Always passing raiseZoomChanged as false here to preserve
-                    // previous behavior. I'm not sure if there is a reason for it.
-                    SetFitMode(FitMode.None, false, false, raiseFitModeChanged);
-                }
-
-                // Set the new scale factor
-                ScaleFactor = zoomInfo.ScaleFactor;
-            }
+            ScaleFactor = zoomInfo.ScaleFactor;
 
             // Center at the specified point
-            CenterAtPoint(zoomInfo.Center, updateZoomHistory, raiseZoomChanged);
+            CenterAtPoint(zoomInfo.Center, false, false);
+
+            UpdateZoom(updateZoomHistory, raiseZoomChanged);
         }
 
         /// <summary>
@@ -4806,6 +4826,7 @@ namespace Extract.Imaging.Forms
         {
             // Keep track of the original zoom, tracking and PostPaintMethods so they can be restored.
             ZoomInfo? originalZoom = null;
+            FitMode? originalFitMode = null;
             TrackingData originalTrackingData = null;
             PostPaintDelegate originalTrackingUpdateCall = _trackingUpdateCall;
             Point? originalScrollPosition = null;
@@ -4824,6 +4845,7 @@ namespace Extract.Imaging.Forms
                 {
                     // We're about to change the zoom, store the original zoom & fit mode
                     originalZoom = GetZoomInfo();
+                    originalFitMode = _fitMode;
                     originalScrollPosition = ScrollPosition;
 
                     // We'll need a transformed version the tracking data if a tracking event is
@@ -4840,8 +4862,10 @@ namespace Extract.Imaging.Forms
 
                     // Zoom in on this point.
                     ZoomInfo magnifiedZoom =
-                        new ZoomInfo(transformedPoints[0], scaleFactor, Orientation, FitMode.None);
-                    SetZoomInfo(magnifiedZoom, false, false, false);
+                        new ZoomInfo(transformedPoints[0], scaleFactor, Orientation);
+
+                    SetFitMode(FitMode.None, false, false, false);
+                    SetZoomInfo(magnifiedZoom, false, false);
 
                     // Convert the center point back into client coordinates now that the image is
                     // zoomed so that we have a reference point for the center of the area to be
@@ -4880,7 +4904,7 @@ namespace Extract.Imaging.Forms
                             // ZoomInfo.ScaleFactor is only accurate when a fit mode is not set;
                             // if a fit mode is set it will need to be calculated.
                             double magnifiedZoomRatio;    
-                            switch (originalZoom.Value.FitMode)
+                            switch (originalFitMode)
                             {
                                 case FitMode.FitToWidth:
                                     {
@@ -4932,10 +4956,14 @@ namespace Extract.Imaging.Forms
             }
             finally
             {
-                // Restore the original zoom.
-                if (originalZoom.HasValue)
+                // Restore the original fit mode and zoom.
+                if (originalFitMode.HasValue && originalFitMode.Value != FitMode.None)
                 {
-                    SetZoomInfo(originalZoom.Value, false, false, false);
+                    SetFitMode(originalFitMode.Value, false, false, false);
+                }
+                else if (originalZoom.HasValue)
+                {
+                    SetZoomInfo(originalZoom.Value, false, false);
                 }
 
                 // [FlexIDS:4524]

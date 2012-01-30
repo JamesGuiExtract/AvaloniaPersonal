@@ -1477,16 +1477,11 @@ namespace Extract.Imaging.Forms
 
                         // If this is the first time the page is viewed, display the whole page
                         // [DotNetRCAndUtils #102]
-                        if (_fitMode == FitMode.None)
-                        {
-                            ShowFitToPage();
-                        }
-                        else if (_fitMode == FitMode.FitToWidth)
-                        {
-                            // This is the first time the page is viewed, show the top of the page
-                            // [DotNetRCAndUtils #202]
-                            ScrollPosition = Point.Empty;
-                        }
+                        ShowFitToPage();
+
+                        // Call ShowFitToPage/ShowFitToWidth to ensure the current ScaleFactor
+                        // matches the fit mode for the page.
+                        ShowFitMode(_fitMode);
                     }
                     else
                     {
@@ -1495,33 +1490,17 @@ namespace Extract.Imaging.Forms
 
                         // This page has been viewed before, restore the previous zoom setting
                         // [DotNetRCAndUtils #107]
+                        SetZoomInfo(zoomInfo, false);
+
                         if (_fitMode == FitMode.None)
                         {
-                            switch (zoomInfo.FitMode)
-                            {
-                                case FitMode.None:
-                                    SetZoomInfo(zoomInfo, false);
-                                    break;
-
-                                case FitMode.FitToPage:
-
-                                    ShowFitToPage();
-                                    break;
-
-                                case FitMode.FitToWidth:
-
-                                    ShowFitToWidth();
-                                    break;
-
-                                default:
-                                    throw new ExtractException("ELI21787",
-                                        "Unexpected fit mode.");
-                            }
+                            SetZoomInfo(zoomInfo, false);
                         }
-                        else if (_fitMode != zoomInfo.FitMode)
+                        else
                         {
-                            // The previous zoom entry had a different zoom history. 
-                            // Update the zoom history.
+                            ShowFitMode(_fitMode);
+
+                            // Update zoom history if the resulting zoom level is any different.
                             updateZoomHistory = true;
                         }
                     }
@@ -1741,6 +1720,20 @@ namespace Extract.Imaging.Forms
             }
         }
 
+        /// <summary>
+        /// Applies the current fit mode.
+        /// </summary>
+        /// <param name="fitMode"></param>
+        void ShowFitMode(FitMode fitMode)
+        {
+            // Call ShowFitToPage/ShowFitToWidth to ensure the current ScaleFactor matches the fit
+            // mode for the page.
+            switch (fitMode)
+            {
+                case FitMode.FitToPage:     ShowFitToPage(); break;
+                case FitMode.FitToWidth:    ShowFitToWidth(); break;
+            }
+        }
 
         /// <summary>
         /// Gets the number of pages in currently open file.
@@ -3926,7 +3919,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Zoom to the specified rectangle and update the zoom
-                ZoomToRectangle(rc, true, true, true);
+                ZoomToRectangle(rc, true, true, true, false);
             }
             catch (Exception ex)
             {

@@ -55,6 +55,9 @@ int CFileProcessingTaskExecutor::StandbyThread::Run()
 
 		// Notify endStandby that the thread is done.
 		m_eventStandbyEnded.signal();
+
+		// Ensure endStandby has gotten past m_eventStandbyEnded.wait() before going out of scope.
+		m_eventEndStandbyEnded.wait();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33943")
 
@@ -73,6 +76,9 @@ void CFileProcessingTaskExecutor::StandbyThread::endStandby()
 		// calling function before m_eventCancelProcessing.signal() is called, ensure the standby
 		// thread is done processing before returning from this call.
 		m_eventStandbyEnded.wait();
+
+		// Let main thread know it can now exit.
+		m_eventEndStandbyEnded.signal();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33944")
 }
