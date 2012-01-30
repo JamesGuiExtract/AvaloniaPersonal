@@ -235,8 +235,6 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 			*pbProcessingActive = true;
 		}
 
-		CSingleLock lockGuard(&m_objLock, TRUE);
-
 		if (m_queTaskIds.size() <= 0 && !processingQueueIsDiscarded())
 		{
 			// load from Database;
@@ -251,6 +249,7 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 		
 		// if a file is available in the queue for processing, then update the task variable with
 		// its information and return true
+		CSingleLock lockGuard(&m_objLock, TRUE);
 		if (m_queTaskIds.size() <= 0)
 		{
 			// there are no files in the queue for processing.  If the queue has
@@ -872,9 +871,6 @@ bool FPRecordManager::removeTaskIfNotPendingOrCurrent(long nTaskID)
 			return false;
 		}
 	}
-
-	// Lock the mutex for the Task map while using iterator it
-	CSingleLock lockGuard(&m_readTaskMapMutex, TRUE);
 
  	// The task is not in the pending queue so it can be removed from the tasks map
 	TaskMap::iterator it = m_mapTasks.find(nTaskID);
