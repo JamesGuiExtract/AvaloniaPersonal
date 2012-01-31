@@ -3,6 +3,7 @@
 <head>
 <title>Report Viewer - General Testing Checklist</title>
 <link type="text/css" rel="stylesheet" href="../../../../UCLIDTestingFramework/Misc/UCLIDTesting.css">
+
 <style>
   .hor {font-size:xx-small}
   .ver {font-size:xx-small; white-space: nowrap; text-align:right; writing-mode:tb-rl}
@@ -12,61 +13,52 @@
 </head>
 
 <body>
+
 <h1>Report Viewer - General<br>
+
 	<img src="../../../../UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
 
 <h2>Command-line Use</h2>
 <ul>
-	<li>Confirm that <b>ReportViewer.exe</b> exists in the CommonComponents folder.</li>
-	<li><b>ReportViewer.exe</b> can be opened when using a full license</li>
-	<li><b>ReportViewer.exe</b> can be opened when using an evaluation license</li>
+	<li><b>ReportViewer.exe</b> exists in the CommonComponents folder.</li>
+	<li><b>ReportViewer.exe</b> can be executed with a full license</li>
+	<li><b>ReportViewer.exe</b> can be executed with an evaluation license</li>
         <p>
 	<li><b>[DotNET #719]</b> New command-line option for report viewer
-	<ul>
-		<li>Confirm that the report viewer supports command-line options that allow for
-		the subject of an email to be specified and for the sender (configured in the
-		email settings) to be overwritten.</li>
-		<li>Confirm that the subject specification supports a <b>&lt;ReportName&gt;</b>
-		tag which will be replaced with the name of the report being sent.</li>
-		<li>Confirm that the &lt;ReportName&gt; tag works correctly with both standard and
-		saved reports.</li>
-	</ul></li>
-<p>
-	<li><b>[LegacyRC #5261]</b> /prompt option
-	<ul>
-		<li>Run ReportViewer specifying a server, database, report file, and <b>/prompt</b>.</li>
-		<li>Fill in data for the prompt and click okay.</li>
-		<li>Confirm that the desired report is generated.</li>
-		<li>Confirm that an exception is not thrown.</li>
-	</ul></li>
+		<ul>
+			<li>Report viewer supports command-line options that allow for
+			the subject of an email to be specified and for the sender (configured in the
+			e-mail settings) to be overwritten.</li>
+			<li>Test the <b>&lt;ReportName&gt;</b> tag the subject line;
+	                it should turn into the name of the report.</li>
+			<li>Confirm that the &lt;ReportName&gt; tag works with both standard and
+			saved reports.</li>
+		</ul>
+	</li>
+	</p>
+	<p>
+	<li><b>[LegacyRC #5261]</b> "/prompt" option
+		<ul>
+			<li>Run ReportViewer.exe, specifying a server, database, report file, and <b>/prompt</b>.</li>
+			<li>Fill in data for the <b>Parameter Entry Form</b> prompt and click OK.</li>
+			<li>The desired report is generated.</li>
+			<li>Confirm that there is no exception.</li>
+		</ul>
+	</li></p>
 </ul>
 
-<h2>FAM DB Admin Use</h2>
-<ul>
-	<li>Confirm that a <b>Open Report</b> dialog appears.</li>
-	<li>Confirm that a <b>Standard Reports</b> tab is available.</li>
-	<li>Confirm that a <b>Saved Reports</b> tab is available.</li>
-<p>
-	<li>Confirm that a <b>Report Viewer</b> thumbnail image is available - for each of the 
-    installed reports.</li>
-	<li><b>[LegacyRC #5084, #5147]</b> Missing thumbnail image
-	<ul>
-		<li>Open the Report Viewer.</li>
-		<li>Rename one of the thumbnail images for a report.</li>
-		<li>Confirm that selecting that report now displays a text message in the preview pane that
-        the image is not available.</li>
-		<li>Resize the Report Viewer.</li>
-		<li>Confirm that the text message in the preview pane remains centered.</li>
-	</ul></li>
-</ul>
+<h2>FAM DB Admin - Tools &gt; Reports...</h2>
 
 <h2>Core Reports</h2>
 <ol>
+	<li>Database settings change history</li>
 	<li>Detailed report for specific document</li>
 	<li>Detailed usage report for specific user for specific day</li>
+	<li>Document tag change history</li>
 	<li>Documents processed on machines</li>
+	<li>FTP Transfer Report</li>
 	<li>List of all actions in the project</li>
 	<li>List of all documents with specific tag</li>
 	<li>List of all file action comments in the project</li>
@@ -76,6 +68,7 @@
 	<li>List of all tags in the project</li>
 	<li>List of all users in the project</li>
 	<li>Machines used for processing (by action)</li>
+	<li>Source document name change history</li>
 	<li>Summary of actions and associated document counts</li>
 	<li>Summary of actions and associated document page counts</li>
 	<li>Summary of processing times (by action)</li>
@@ -84,70 +77,70 @@
 
 <h2>Open Report dialog</h2>
 <ul>
-	<li>Confirm that selecting a report and clicking <b>Cancel</b> does not change the displayed 
-    report.</li>
-	<li>Confirm that selecting a report and clicking <b>OK</b> displays the selected report.</li>
-	<li>Confirm that selecting a report and pressing <b>&lt;Enter&gt;</b> displays the selected 
-    report.</li>
-	<li><b>[LegacyRC #5231]</b> Confirm that <b>double-clicking</b> a report displays the selected 
-    report.</li>
-	<li>Confirm that the <b>Delete selected report</b> button is disabled for each <b>Standard 
-    report</b>.</li>
-	<li>Confirm that the <b>Delete selected report</b> button is enabled for each <b>Saved 
-    report</b>.</li>
-	<li><b>[LegacyRC #5113]</b> Resize the window and confirm that the preview image resizes 
-    smoothly.</li>
-	<li><b>[LegacyRC #5084]</b> Rename a thumbnail image and confirm that selecting the associated 
-	report changes the preview image into a meaningful text message.</li>
+	<li>An <b>Open Report</b> dialog appears over the Report Viewer window.</li>
+	<li>The <b>Standard reports</b> tab is available.</li>
+	<li>The <b>Saved reports</b> tab is available.</li>
+	<li>A <b>Report Viewer</b> thumbnail image is available for each installed report.</li>
+	<li>Selecting a report and clicking <b>Cancel</b> does not change the displayed 
+        report.</li>
+	<li>Selecting a report and clicking <b>OK</b> displays the selected report.</li>
+	<li>Selecting a report and pressing <b>&lt;Enter&gt;</b> displays the selected 
+        report.</li>
+	<li><b>Double-clicking</b> a report displays the selected 
+        report.</li>
+	<li>The <b>Delete selected report</b> button is disabled for each <b>Standard 
+        report</b> and enabled for each <b>Saved report</b>.</li>
+	<li>The preview image resizes smoothly when the window is resized.</li>
+	<li>Rename a thumbnail image; selecting the associated 
+	report changes the preview image into a meaningful text message.
+	<ul><li>Resize the window; the replacement text remains centered.</li></li></ul>
 </ul>
 
 <h2>Report Viewer user interface</h2>
 <ul>
-	<li>Confirm that the window title without a report is <b>Report Viewer</b>.</li>
+	<li>The window title without a report is <b>Report Viewer</b>.</li>
 	<li>Select a non-parameterized report such as <b>List of all actions in the project</b>.</li>
-	<li>Confirm that a <b>Parameter entry</b> dialog does not appear.</li>
-	<li>Confirm that a marquee-style wait cursor appears while the report is generated.</li>
-	<li>Confirm that the report appears in the report viewer window.</li>
-	<li>Confirm that the window title with a report is <b>Report Viewer - &lt;report 
-    name&gt;</b>.</li>
+	<li>A <b>Parameter Entry Form</b> dialog does not appear.</li>
+	<li>A marquee-style loading bar appears while the report is generated.</li>
+	<li>The report appears in the report viewer window.</li>
+	<li>The window title is now <b>Report Viewer - &lt;report name&gt;</b>.</li>
 <p>
     <li><b>[LegacyRC #5652]</b> Support for PgUp, PgDn
     <!-- fixed v 8.1.0.1 -->
     <ul>    
         <li>Open a multi-page report.</li>
-        <li>Confirm that <b>PgUp</b> and <b>PgDn</b> can be used to navigate pages.</li>
+        <li><b>PgUp</b> and <b>PgDn</b> can be used to navigate pages.</li>
     </ul></li>
+</p>
 <p>
    	<LI><b>[DotNet #380]</b> Report Viewer
     <ul>
-        <li>Select a report that provides meaningful output.</li>
-        <li>Confirm that a report template can be created.</li>
-        <li>Rename the <b>.JPG</b> report thumbnail image.</li>
-        <li>Confirm that a new report template can be created.</li>
+        <li>Generate a report with meaningful output.</li>
+        <li>Save a report template.</li>
+        <li>Rename the saved template's <b>.JPG</b> report thumbnail image.</li>
+        <li>A new report template can still be saved.</li>
     </ul></li>
+</p>
 <p>
 	<li><b>File menu</b>
 	<ul>
-		<li>Confirm that <b>Open report...</b> displays the associated dialog and allows the user 
+		<li><b>Open report...</b> displays the associated dialog and allows the user 
         to select another report.</li>
-        <li>Confirm that <b>Refresh</b> refreshes the data in the currently open report.</li>
-        <li>Confirm that the <b>F5</b> shortcut performs the same function.</li>
-		<li>Confirm that <b>Save report template...</b> displays the associated dialog and allows 
+        <li><b>Refresh</b> refreshes the data in the currently open report.
+                <ul><li>The <b>F5</b> shortcut performs the same function.</li></ul></li>
+        <li><b>Save report template...</b> displays the associated dialog and allows 
         the user to provide a report name.
-		<ul>
-			<li>Confirm that the saved report appears in the <b>Saved reports</b> tab.</li>
-			<li><b>[LegacyRC #5178]</b> Confirm that the name of the saved report cannot match an 
+		<ul><li>The saved report appears in the <b>Saved reports</b> tab.</li>
+			<li><b>[LegacyRC #5178]</b> The name of the saved report cannot match an 
             existing <b>Standard report</b>.</li>
-			<li>Confirm that if the name of the saved report matchs an existing <b>Saved 
+			<li>If the name of the saved report matches an existing <b>Saved 
             report</b>, an <b>Overwrite Existing Report</b> confirmation dialog is presented.</li>
-			<li>Confirm that clicking <b>Cancel</b> does not save the report.</li>
+			<li>Clicking <b>Cancel</b> does not save the report.</li>
 		</ul></li>
-		<li>Confirm that <b>Export to PDF...</b> displays a <b>Save As</b> dialog allowing the 
-        user to save the report to a PDF file.</li>
-		<li><b>[LegacyRC #5158]</b> Confirm that <b>Export...</b> displays a <b>Save As</b> dialog 
-        allowing the user to save the report to various formats.</li>
-		<li>Confirm that a report can be saved to each of the formats as provided below and confirm
-        that an <b>Export completed</b> message is displayed.
+		<li><b>Export to PDF...</b> displays a <b>Save As</b> dialog for a PDF file.</li>
+		<li><b>[LegacyRC #5158]</b> <b>Export...</b> displays a <b>Save As</b> dialog 
+        allowing the user to save the report in various formats.</li>
+		<li>An <b>Export completed</b> message is displayed when saving to each of the following file formats:
 		<ul>
 			<li>Crystal reports (*.rpt)</li>
 			<li>PDF (*.pdf)</li>
@@ -158,100 +151,116 @@
 			<li>Rich Text Format (*.rtf)</li>
 			<li>XML (*.xml)</li>
 		</ul></li>
-		<li>Confirm that <b>Exit</b> closes the <b>Report Viewer</b>.</li>
+		<li><b>Exit</b> closes the <b>Report Viewer</b>.</li>
 	</ul></li>
+</p>
 <p>
 	<li><b>Help menu</b>
 	<ul>
-		<li>Confirm that <b>About Report Viewer...</b> displays an appropriate About box.</li>
-		<li><b>[LegacyRC #5161]</b> Confirm that the <b>About box</b> contains an appropriate 
+		<li><b>About Report Viewer...</b> displays the About dialog window.</li>
+		<li><b>[LegacyRC #5161]</b> The <b>About box</b> contains an appropriate 
 		image and copyright information.</li>
 	</ul></li>
+</p>
 <p>
 	<li><b>Toolbar</b>
 	<ul>
-		<li>Confirm that all toolbar buttons are disabled if no report is visible.</li>
+		<li>All toolbar buttons are disabled if no report is loaded.</li>
 		<li>Open a report.</li>
-		<li>Confirm that the <b>Export Report</b> button displays the appropriate dialog.</li>
-		<li>Confirm that the <b>Print Report</b> button displays the appropriate dialog.</li>
+		<li>The <b>Export Report</b> button displays the appropriate dialog.</li>
+		<li>The <b>Print Report</b> button displays the appropriate dialog.</li>
+</p>
 <p>
-		<li>Confirm that the <b>Go To First Page</b> button is disabled for a single-page 
-        report.</li>
-		<li>Confirm that the <b>Go To First Page</b> button is disabled when displaying the first 
+		<li>The <b>Go To First Page</b> button navigates to the first page.</li>
+		<li>The <b>Go To First Page</b> button is enabled when displaying a non-first 
         page of a multi-page report.</li>
-		<li>Confirm that the <b>Go To First Page</b> button is enabled when displaying a non-first 
-        page of a multi-page report.</li>
-		<li>Confirm that the <b>Go To First Page</b> button navigates to the first page.</li>
+</p>
 <p>
-		<li>Confirm that the <b>Go To Previous Page</b> button is disabled for a single-page 
-		report.</li>
-		<li>Confirm that the <b>Go To Previous Page</b> button is disabled when displaying the 
-		first page of a multi-page report.</li>
-		<li>Confirm that the <b>Go To Previous Page</b> button is enabled when displaying a 
+		<li>The <b>Go To Previous Page</b> button navigates to the previous page.</li>
+		<li>The <b>Go To Previous Page</b> button is enabled when displaying a 
 		non-first page of a multi-page report.</li>
-		<li>Confirm that the <b>Go To Previous Page</b> button navigates to the previous page.</li>
+</p>
 <p>
-		<li>Confirm that the <b>Go To Next Page</b> button is disabled for a single-page 
-		report.</li>
-		<li>Confirm that the <b>Go To Next Page</b> button is enabled when displaying the 
+		<li>The <b>Go To Next Page</b> button navigates to the next page.</li>
+		<li>The <b>Go To Next Page</b> button is enabled when displaying the 
 		non-last page of a multi-page report.</li>
-		<li>Confirm that the <b>Go To Next Page</b> button is disabled when displaying a 
-		last page of a multi-page report.</li>
-		<li>Confirm that the <b>Go To Next Page</b> button navigates to the next page.</li>
+</p>
 <p>
-		<li>Confirm that the <b>Go To Last Page</b> button is disabled for a single-page 
-		report.</li>
-		<li>Confirm that the <b>Go To Last Page</b> button is enabled when displaying the 
+		<li>The <b>Go To Last Page</b> button navigates to the last page.</li>
+		<li>The <b>Go To Last Page</b> button is enabled when displaying the 
 		non-last page of a multi-page report.</li>
-		<li>Confirm that the <b>Go To Last Page</b> button is disabled when displaying a 
-		last page of a multi-page report.</li>
-		<li>Confirm that the <b>Go To Last Page</b> button navigates to the last page.</li>
+</p>
 <p>
-		<li>Confirm that <b>/ &lt;pagecount&gt;</b> text is provided after the <b>Go To Page</b> 
+		<li>The <b>/ &lt;pagecount&gt;</b> label exists after the <b>Go To Page</b> 
 		edit box.</li>
-		<li>Confirm that the <b>Go To Page</b> edit box is disabled for a single-page 
-		report.</li>
-		<li>Confirm that the <b>Go To Page</b> edit box is enabled when displaying a 
+		<li>The <b>Go To Page</b> edit box is enabled when displaying a 
 		multi-page report.</li>
-		<li>Confirm that the <b>Go To Page</b> edit box navigates to the specified page.</li>
-		<li>Confirm that the <b>Go To Page</b> edit box navigates to the last page if 
+		<li>The <b>Go To Page</b> edit box navigates to the specified page.</li>
+		<li>The <b>Go To Page</b> edit box navigates to the last page if 
 		the specified page number is beyond the page count.</li>
+</p>
 <p>
-		<li>Confirm that the <b>Find Text</b> button can successfully locate text in each 
+		<li>The <b>Go To</b> buttons and <b>Go To Page</b> edit box are disabled for a single-page 
+		report.</li>
+		<li>The <b>Go To First Page</b> and <b>Go To Previous Page</b> buttons are disabled when displaying the 
+		first page of a multi-page report.</li>
+		<li>The <b>Go To Next Page</b> and <b>Go To Last Page</b> buttons are disabled when displaying a 
+		last page of a multi-page report.</li>
+</p>
+<p>
+		<li>The <b>Find Text</b> button can successfully locate text in each 
 		column of each table of the report.</li>
-		<li>Confirm that the <b>Find Text</b> button does not find text located on a previous 
-		page in the report.</li>
+		<li>The <b>Find Text</b> button cannot find text located on a previous 
+		page of the report.</li>
+</p>
 <p>
-		<li>Confirm that the <b>Zoom</b> button displays a drop-down menu with <b>Page Width</b>, 
+		<li>The <b>Zoom</b> button displays a drop-down menu with <b>Page Width</b>, 
 		<b>Whole Page</b>, <b>Customize...</b>, and various percentages.</li>
-		<li>Confirm that selecting the <b>Customize</b> zoom setting displays a <b>Zooming</b> 
+		<li>Selecting the <b>Customize</b> zoom setting displays a <b>Zooming</b> 
 		dialog allowing the user to specify a custom zoom level.</li>
-		<li>Confirm that the <b>minimum</b> custom zoom factor is 25 percent. </li>
-		<li>Confirm that the <b>maximum</b> custom zoom factor is 400 percent. </li>
-		<li>Confirm that selecting one of the <b>Zoom</b> settings modifies the zoom level 
+		<li>The <b>minimum</b> custom zoom factor is 25 percent. </li>
+		<li>The <b>maximum</b> custom zoom factor is 400 percent. </li>
+		<li>Selecting one of the <b>Zoom</b> settings modifies the zoom level 
 		in the displayed report. </li>
 	</ul></li>
+</p>
 <p>
 	<li><b>Status Bar</b>
 	<ul>
-		<li>Confirm that <b>Current Page No.:</b> is correctly displayed on the status bar. </li>
-		<li>Confirm that <b>Total Page No.:</b> is correctly displayed on the status bar. </li>
-		<li>Confirm that <b>Zoom Factor:</b> is correctly displayed on the status bar. </li>
+		<li><b>Current Page No.:</b>, <b>Total Page No.:</b>, and <b>Zoom Factor:</b>
+		are accurately displayed on the status bar. </li>
 	</ul></li>
+</p>
+
+</ul>
+
+<H2>~~~ BEFORE CONTINUING! ~~~</H2>
+
+<ul style="list-style:none url();">
+  <li>
+    For individual report testing, it would be useful to prepare 2 databases.
+    <ul>
+      <li>One database with processed data under multiple actions with multiple users, multiple applied tags, and skipped documents.</li>
+      <li>One empty database with no actions, users, or tags defined.</li>
+    </ul>
+  </li>
+  <li>When going through the checklist for each report, open the report up for each database and compare the results.</li>
 </ul>
 
 <div class="page-break"></div>
 
 <h2>Common features</h2>
-<ol>
 <ul>
-      	<li><b>Test with meaningful data</b></li>
+      	<li><b>Database with meaningful data</b></li>
 <p>
 	<table border=0 cellpadding="2" cellspacing="0">
 		<tr class="first">
+			<th class="ver">Database settings change history</th>
 			<th class="ver">Detailed report for specific document</th>
 			<th class="ver">Detailed usage report for specific user for specific day</th>
+			<th class="ver">Document tag change history</th>
 			<th class="ver">Documents processed on machines</th>
+			<th class="ver">FTP Transfer Report</th>
 			<th class="ver">List of all actions in the project</th>
 			<th class="ver">List of all documents with specific tag</th>
 			<th class="ver">List of all file action comments in the project</th>
@@ -261,10 +270,12 @@
 			<th class="ver">List of all tags in the project</th>
 			<th class="ver">List of all users in the project</th>
 			<th class="ver">Machines used for processing (by action)</th>
+			<th class="ver">Source document name change history</th>
                         <th class="ver">Summary of actions and associated document counts</th>
                         <th class="ver">Summary of actions and associated document page counts</th>
                         <th class="ver">Summary of processing times (by action)</th>
 			<th class="ver">Usage report during custom date range broken down by user</th>
+			<td> </td>
                 </tr>
 		<tr>
                         <td class="hor"><input type="checkbox"></td>
@@ -283,7 +294,11 @@
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that a shadowed heading is provided at the top of the report.</td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Report has shadowed header with distinct background color.</td>
 		</tr>
 		<tr>
                         <td class="hor"><input type="checkbox"></td>
@@ -302,7 +317,11 @@
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that the first line is <b>Extract Systems</b>.</td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">1st line is <b>Extract Systems</b>.</td>
 		</tr>
 		<tr>
                         <td class="hor"><input type="checkbox"></td>
@@ -321,7 +340,11 @@
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that the second line is the title of the report.</td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">2nd line is title of report.</td>
 		</tr>
 		<tr>
                         <td class="hor"><input type="checkbox"></td>
@@ -340,7 +363,11 @@
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that there is a distinct background color.</td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><b>Database Information</b> table and contents formatted properly at 400% zoom.</td>
 		</tr>
 		<tr>
                         <td class="hor"><input type="checkbox"></td>
@@ -359,8 +386,11 @@
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
-                        <td class="hor">Confirm that the <b>Database Information</b> table and
-                        contents are formatted properly even at 400% zoom factor.</td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">The <b>Database server</b> information is accurate.</td>
 		</tr>
 		<tr>
                         <td class="hor"><input type="checkbox"></td>
@@ -379,7 +409,11 @@
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that the <b>Database server</b> information is correct.</td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">The <b>Database name</b> information is accurate.</td>
 		</tr>
 		<tr>
                         <td class="hor"><input type="checkbox"></td>
@@ -398,7 +432,12 @@
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that the <b>Database name</b> information is correct.</td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">The details table and contents are formatted 
+			properly at 400% zoom.</td>
 		</tr>
 		<tr>
                         <td class="hor"><input type="checkbox"></td>
@@ -417,8 +456,11 @@
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that the details table and contents are formatted 
-			properly even at 400% zoom factor.</td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Report has shadowed footer with distinct background color on each page.</td>
 		</tr>
 		<tr>
                         <td class="hor"><input type="checkbox"></td>
@@ -437,8 +479,12 @@
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
-                        <td class="hor">Confirm that a shadowed footer is provided at the bottom of 
-			each page.</td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">1st line, left side is <b>Printed</b> 
+                        &lt;date and time of printing&gt;.</td>
 		</tr>
 		<tr>
                         <td class="hor"><input type="checkbox"></td>
@@ -457,8 +503,12 @@
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
-                        <td class="hor">Confirm that the left side of the first line is <b>Printed</b>
-                        along with a date and time of printing.</td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">2nd line, left side is <b>By</b> 
+                        &lt;user who generated report&gt;.</td>
 		</tr>
 		<tr>
                         <td class="hor"><input type="checkbox"></td>
@@ -477,8 +527,12 @@
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
-                        <td class="hor">Confirm that the left side of the second line is <b>By</b>
-                        along with the user name of the person who generated the report.</td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">1st line, right side is name of
+                        report, same as 2nd line header.</td>
 		</tr>
 		<tr>
                         <td class="hor"><input type="checkbox"></td>
@@ -497,828 +551,695 @@
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
-                        <td class="hor">Confirm that the right side of the first line is the name of
-                        the report, identical to the second line of the header.</td>
-		</tr>
-		<tr>
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
                         <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that the right side of the second line is <b>Page 
-			<i>M</i> of <i>N</i></b>.</td>
-		</tr>
-		<tr>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that there is a distinct background color.</td>
+			<td class="hor">2nd line, right side is <b>Page 
+			<i>X</i> of <i>Y</i></b>.</td>
 		</tr>
         </table>
+</p>
+<div class="page-break"></div>
+<h2>Common features (continued)</h2>
+<p>
+      	<li><b>Empty database</b></li>
+</p>
+<p>
+	<table border=0 cellpadding="2" cellspacing="0">
+		<tr class="first">
+			<th class="ver">Database settings change history</th>
+			<th class="ver">Detailed report for specific document</th>
+			<th class="ver">Detailed usage report for specific user for specific day</th>
+			<th class="ver">Document tag change history</th>
+			<th class="ver">Documents processed on machines</th>
+			<th class="ver">FTP Transfer Report</th>
+			<th class="ver">List of all actions in the project</th>
+			<th class="ver">List of all documents with specific tag</th>
+			<th class="ver">List of all file action comments in the project</th>
+			<th class="ver">List of all machines used in the project</th>
+			<th class="ver">List of all skipped documents in the project</th>
+			<th class="ver">List of all tagged documents in the project</th>
+			<th class="ver">List of all tags in the project</th>
+			<th class="ver">List of all users in the project</th>
+			<th class="ver">Machines used for processing (by action)</th>
+			<th class="ver">Source document name change history</th>
+                        <th class="ver">Summary of actions and associated document counts</th>
+                        <th class="ver">Summary of actions and associated document page counts</th>
+                        <th class="ver">Summary of processing times (by action)</th>
+			<th class="ver">Usage report during custom date range broken down by user</th>
+			<td> </td>
+                </tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Report has shadowed header with distinct background color.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">1st line is <b>Extract Systems</b>.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">2nd line is title of report.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><b>Database Information</b> table and contents formatted properly at 400% zoom.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">The <b>Database server</b> information is accurate.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">The <b>Database name</b> information is accurate.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">The details table and contents are formatted 
+			properly at 400% zoom.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Report has shadowed footer with distinct background color on each page.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">1st line, left side is <b>Printed</b> 
+                        &lt;date and time of printing&gt;.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">2nd line, left side is <b>By</b> 
+                        &lt;user who generated report&gt;.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">1st line, right side is name of
+                        report, same as 2nd line header.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">2nd line, right side is <b>Page 
+			<i>X</i> of <i>Y</i></b>.</td>
+		</tr>
+        </table>
+</p>
+</ul>
 
 <div class="page-break"></div>
-<p>
-      	<li><b>Test with empty database</b></li>
-<p>
-	<table border=0 cellpadding="2" cellspacing="0">
-		<tr class="first">
-			<th class="ver">Detailed report for specific document</th>
-			<th class="ver">Detailed usage report for specific user for specific day</th>
-			<th class="ver">Documents processed on machines</th>
-			<th class="ver">List of all actions in the project</th>
-			<th class="ver">List of all documents with specific tag</th>
-			<th class="ver">List of all file action comments in the project</th>
-			<th class="ver">List of all machines used in the project</th>
-			<th class="ver">List of all skipped documents in the project</th>
-			<th class="ver">List of all tagged documents in the project</th>
-			<th class="ver">List of all tags in the project</th>
-			<th class="ver">List of all users in the project</th>
-			<th class="ver">Machines used for processing (by action)</th>
-                        <th class="ver">Summary of actions and associated document counts</th>
-                        <th class="ver">Summary of actions and associated document page counts</th>
-                        <th class="ver">Summary of processing times (by action)</th>
-			<th class="ver">Usage report during custom date range broken down by user</th>
-                </tr>
-		<tr>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that a shadowed heading is provided at the top of 
-			the report.</td>
-		</tr>
-		<tr>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that the first line is <b>Extract Systems</b>.</td>
-		</tr>
-		<tr>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that the second line is the title of the report.</td>
-		</tr>
-		<tr>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that there is a distinct background color.</td>
-		</tr>
-		<tr>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor">Confirm that the <b>Database Information</b> table and
-                        contents are formatted properly even at 400% zoom factor.</td>
-		</tr>
-		<tr>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that the <b>Database server</b> information is correct.</td>
-		</tr>
-		<tr>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that the <b>Database name</b> information is correct.</td>
-		</tr>
-		<tr>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that the details table and contents are formatted properly 
-			even at 400% zoom factor.</td>
-		</tr>
-		<tr>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor">Confirm that a shadowed footer is provided at the bottom of 
-			each page.</td>
-		</tr>
-		<tr>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor">Confirm that the left side of the first line is <b>Printed</b>
-                        along with a date and time of printing.</td>
-		</tr>
-		<tr>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor">Confirm that the left side of the second line is <b>By</b>
-                        along with the user name of the person who generated the report.</td>
-		</tr>
-		<tr>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor">Confirm that the right side of the first line is the name of
-                        the report, identical to the second line of the header.</td>
-		</tr>
-		<tr>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that the right side of the second line is <b>Page 
-			<i>M</i> of <i>N</i></b>.</td>
-		</tr>
-		<tr>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-                        <td class="hor"><input type="checkbox"></td>
-			<td class="hor">Confirm that there is a distinct background color.</td>
-		</tr>
-        </table>
-</ol>
 
 <h2>Report specific features</h2>
+
 <ol>
-	<li><b>Detailed report for specific document</b>
-	<ul>
-		<li>Confirm that a <b>DocumentName</b> parameter is required. 
-		<li>Confirm that a meaningful report is presented when a fully-qualified path 
-		to a processed file is provided.
-		<li>Create a saved report and confirm that the associated XML file contains a 
-		<b>TextParameter</b> node with <b>Name = &quot;DocumentName&quot;</b> 
-		and <b>Default = &quot;&lt;path&gt;&quot;</b>.
-<p>
-		<li><b>Test with meaningful data</b> 
-		<ul>
-			<li>Confirm that the <b>Document Information</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the <b>Document name</b> information is correct.
-			<li>Confirm that the <b>File size (bytes)</b> information is correct.
-			<li>Confirm that the <b>Number of pages</b> information is correct.
-			<li>Confirm that the <b>File priority</b> information is correct.
-<p>
-			<li>Confirm that the <b>Summary of status</b> 
-			table and contents are formatted properly even at 400% zoom factor.
-			<li>Confirm that an <b>Action</b> column is provided.
-			<li>Confirm that a <b>Status</b> column is provided.
-			<li>Confirm that the column headings are displayed with a distinct background color.
-			<li>Confirm that one row is provided for each <b>action</b> and that action 
-			status is correct.
-<p>
-			<li>Confirm that the <b>Queuing events</b> 
-			table and contents are formatted properly even at 400% zoom factor.
-			<li>Confirm that an <b>Event time stamp</b> column is provided.
-			<li>Confirm that an <b>Event type</b> column is provided.
-			<li>Confirm that a <b>File modify time</b> column is provided.
-			<li>Confirm that a <b>File size (bytes)</b> column is provided.
-			<li>Confirm that a <b>Machine</b> column is provided.
-			<li>Confirm that a <b>User</b> column is provided.
-			<li>Confirm that the column headings are displayed with a distinct background color.
-			<li>Confirm that one row is provided for each <b>event</b> and that each entry 
-			is appropriate.
-<p>
-			<li>Confirm that the <b>Status change events</b> 
-			table and contents are formatted properly even at 400% zoom factor.
-			<li>Confirm that an <b>Time stamp</b> column is provided.
-			<li>Confirm that an <b>Action</b> column is provided.
-			<li>Confirm that an <b>From status</b> column is provided.
-			<li>Confirm that an <b>To status</b> column is provided.
-			<li>Confirm that an <b>Machine</b> column is provided.
-			<li>Confirm that an <b>User</b> column is provided.
-			<li>Confirm that the column headings are displayed with a distinct background color.
-			<li>Confirm that one row is provided for each <b>event</b> and that each entry 
-			is appropriate.
-<p>
-			<li>Confirm that the <b>Tags applied to document</b> 
-			table and contents are formatted properly even at 400% zoom factor.
-			<ul>
-				<li>Note that the <b>Tags applied to document</b> table may not be present 
-				if no tags were applied for the specified document.
-			</ul>
-			<li>Confirm that a <b>Tag Name</b> column is provided.
-			<li>Confirm that the column heading is displayed with a distinct background color.
-			<li>Confirm that one row is provided for each <b>tag</b> and that each entry 
-			is appropriate.
-<p>
-			<li>Confirm that the <b>File action comments</b> 
-			table and contents are formatted properly even at 400% zoom factor.
-			<ul>
-				<li>Note that the <b>File action comments</b> table may not be present 
-				if no comments were applied for the specified document.
-			</ul>
-			<li>Confirm that a <b>User</b> column is provided.
-			<li>Confirm that an <b>Action</b> column is provided.
-			<li>Confirm that a <b>Time Stamp</b> column is provided.
-			<li>Confirm that a <b>Comment</b> column is provided.
-			<li>Confirm that the column headings are displayed with a distinct background color.
-			<li>Confirm that one row is provided and that the entry is appropriate.
-		</ul>
-<p>
-		<li><b>Test with empty database</b> 
-		<li><b>[LegacyRC #5360] Test with nonsense filename</b> 
-		<ul>
-			<li>Confirm that the <b>Document name</b> information is as specified.
-			<li>Confirm that the <b>File size (bytes)</b> information is empty.
-			<li>Confirm that the <b>Number of pages</b> information is empty.
-<p>
-			<li>Confirm that the <b>Summary of status</b> 
-			table and contents are formatted properly even at 400% zoom factor.
-			<li>Confirm that an <b>Action</b> column is provided.
-			<li>Confirm that an <b>Status</b> column is provided.
-			<li>Confirm that the column headings are displayed with a distinct background color.
-			<li>Confirm that one row is provided with <b>N/A</b> in each cell.
-<p>
-			<li>Confirm that the <b>Queuing events</b> 
-			table and contents are formatted properly even at 400% zoom factor.
-			<li>Confirm that an <b>Event time stamp</b> column is provided.
-			<li>Confirm that an <b>Event type</b> column is provided.
-			<li>Confirm that an <b>File modify time</b> column is provided.
-			<li>Confirm that an <b>File size (bytes)</b> column is provided.
-			<li>Confirm that an <b>Machine</b> column is provided.
-			<li>Confirm that an <b>User</b> column is provided.
-			<li>Confirm that the column headings are displayed with a distinct background color.
-			<li>Confirm that one row is provided with cells either <b>N/A</b> or empty.
-<p>
-			<li>Confirm that the <b>Status change events</b> 
-			table and contents are formatted properly even at 400% zoom factor.
-			<li>Confirm that an <b>Time stamp</b> column is provided.
-			<li>Confirm that an <b>Action</b> column is provided.
-			<li>Confirm that an <b>From status</b> column is provided.
-			<li>Confirm that an <b>To status</b> column is provided.
-			<li>Confirm that an <b>Machine</b> column is provided.
-			<li>Confirm that an <b>User</b> column is provided.
-			<li>Confirm that the column headings are displayed with a distinct background color.
-			<li>Confirm that one row is provided with cells either <b>N/A</b> or empty.
-		</ul>
-	</ul>
 
-<p>
-	<li><b>Detailed usage report by specific user for specific day</b> 
-	<ul>
-		<li>Confirm that a <b>UserName</b> parameter is required. 
-		<li>Confirm that a <b>ReportDate</b> parameter is required. 
-		<li>For a particular user name and date option:
-		<ul>
-			<li>Confirm that a meaningful report is presented.
-			<li>Create a saved report and confirm that the associated XML file 
-			contains a <b>DateRangeParameter</b> node with <b>Name = &quot;ReportingPeriod&quot;</b> 
-			and <b>Default = &quot;&lt;Range&gt;&quot;</b>.
-			<li>Confirm that the associated XML file also contains a <b>TextParameter</b> 
-			node with <b>Name = &quot;UserName&quot;</b> 
-			and <b>Default = &quot;&lt;name&gt;&quot;</b>.
-		</ul>
-<p>
-		<li><b>Test with meaningful data</b> 
-		<ul>
-			<li>Confirm that the <b>User and date</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the <b>User name</b> information is correct.
-			<li>Confirm that the <b>Date</b> information is correct.
-<p>
-			<li>Confirm that the <b>Hours and minutes</b> table and contents are 
-			formatted properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the top two rows of the table represent minutes within 
-			the hour ranging (vertically) between <b>0</b> and <b>59</b>.
-			<li>Confirm that the leftmost column displays specific hours starting with 
-			<b>6:00 AM</b> and ending with <b>6:00 PM</b>.
-			<li>Confirm that some remaining cells in the table have a <b>white</b> 
-			background to indicate <b>no input event activity</b> during the specific 
-			minute.
-			<li>Confirm that other remaining cells in the table have a <b>colored</b> 
-			background to indicate <b>input event activity</b> during the specific 
-			minute.
-<p>
-			<li>Confirm that after the <b>Hours and minutes</b> table is an entry for 
-			<b>Total minutes with input event activity</b>.
-			<li>Confirm that the total is correct based on the shaded cells in the table.
-		</ul>
-<p>
-		<li><b>Test with empty database</b> 
-		<ul>
-			<li>Confirm that the <b>User and date</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the <b>User name</b> information is <b>N/A</b>.
-			<li>Confirm that the <b>Date</b> information is correct.
-<p>
-			<li>Confirm that the <b>Hours and minutes</b> table and contents are 
-			formatted properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the top two rows of the table represent minutes within 
-			the hour ranging (vertically) between <b>0</b> and <b>59</b>.
-			<li>Confirm that the leftmost column displays specific hours starting with 
-			<b>6:00 AM</b> and ending with <b>6:00 PM</b>.
-			<li>Confirm that the remaining cells in the table have a <b>white</b> 
-			background to indicate <b>no input event activity</b> during the specific 
-			minute.
-<p>
-			<li>Confirm that after the <b>Hours and minutes</b> table is an entry for 
-			<b>Total minutes with input event activity</b>.
-			<li>Confirm that the total is <b>0</b>.
-		</ul>
-	</ul>
+<!-- Added by Chi Tran, 2012/1/30 -->
+<!-- Core Reports #1 -->
+  <li><b>Database settings change history</b>
+    <ul>
+      <li>Prompted for <b>ReportingPeriod</b> parameter.</li>
+      <li>Jump to the <b>Parameter Entry Form</b> section and perform the checklist for the parameter(s) used by this report.</li>
+      <li><b>Database Settings Changes</b> table and contents are formatted properly at 400% zoom.</li>
+      <li>Table title is displayed in white text on black.</li>
+      <li>These columns are generated: <b>Time</b>, <b>Setting Name</b>, <b>Old Value</b>, <b>New Value</b>,
+        <b>User</b>, <b>Machine</b>.</li>
+      <li>The column headings have a distinct background color.</li>
+      <p><li><b>Database with meaningful data</b>
+        <ul>
+          <li>One row is provided for each event and the information is accurate.</li>
+        </ul>
+      </li></p>
+      <p><li><b>Empty Database</b>
+        <ul>
+          <li><b>Database Settings Changes</b> table has no rows.</li>
+        </ul>
+      </li></p>
+    </ul>
+  </li>
+<!-- Added by Chi Tran, 2012/1/30 -->
 
+<!-- Core Reports #2 -->
+  <li><b>Detailed report for specific document</b>
+    <ul>
+      <li>Prompted for <b>DocumentName</b> parameter.</li>
+      <li>Jump to the <b>Parameter Entry Form</b> section and perform the checklist for the parameter(s) used by this report.</li>
+      <li>A meaningful report is presented when a fully-qualified path to a processed file is provided.</li>
+      <p><li><b>Database with meaningful data</b> (file queued and processed in database)
+        <ul>
+          <li><b>Document Information</b> table and contents are formatted properly at 400% zoom.</li>
+          <li>Table title is displayed in white text on black.</li>
+          <li><b>Document name</b>, <b>File size (bytes)</b>, <b>Number of pages</b>,
+            and <b>File priority</b> rows exist and contain accurate information.</li>
+      </p>
+          <p><li>For each table below, also confirm the following:
+            <ul>
+              <li>The table and contents are formatted properly at 400% zoom.</li>
+              <li>Table titles are displayed in white text on black.</li>
+              <li>The column headings have a distinct background color.</li>
+              <li>Rows are provided for relevant activity and information is accurate.</li>
+            </ul>
+          </li></p>
+          <p>
+            <li><b>Summary of Status</b> table. These columns are generated: <b>Action</b>, <b>Status</b>.</li>
+            <li><b>Queuing Events</b> table. These columns are generated: <b>Event time stamp</b>, <b>Event type</b>,
+              <b>File modify time</b>, <b>File size(bytes)</b>, <b>Machine</b>, <b>User</b>.</li>
+            <li><b>Status Change Events</b> table. These columns are generated: <b>Time stamp</b>,
+              <b>Action</b>, <b>From status</b>, <b>To status</b>, <b>Machine</b>, <b>User</b>.</li>
+            <li><b>Tags Applied to Document</b> table. These columns are generated: <b>Tag Name</b>.
+              <u>Note</u>: This table may not be present if no tags were applied for the specified document.</li>
+            <li><b>Document Tag Change History</b> table. The columns are generated: <b>Time</b>, <b>Tag name</b>,
+              <b>Added?</b>, <b>Machine</b>, <b>User</b>. <u>Note</u>: This table may not be present if no tags were
+              applied for the specified document.</li>
+            <li><b>File Action Comments</b> table. These columns are generated: <b>User</b>,
+              <b>Action</b>, <b>Time Stamp</b>, <b>Comment</b>. <u>Note</u>: This table
+              may not be present if no comments were applied for the specified document.</li>
+          </p>
+        </ul>
+      <p><li><b>Empty database</b> (or nonexistent filename)
+        <ul>
+          <li><b>Document name</b> contains <i>File not found: &lt;filename&gt;</i>.</li>
+          <li><b>File size (bytes)</b>, <b>Number of pages</b>, and <b>File priority</b> are empty.</li>
+          <li>There are none of the following tables: <b>Summary of status</b>, <b>Queuing events</b>, <b>Status change
+            events</b>, <b>Tags applied to document</b>, <b>Document Tag Change History</b>, <b>File action comments</b>.</li>
+        </ul>
+      </li></p>
+    </ul>
+  </li>
+
+<!-- Core Reports #3 -->
+    <li><b>Detailed usage report by specific user for specific day</b> 
+      <ul>
+        <li>Prompted for <b>UserName</b> and <b>ReportDate</b> parameters.</li>
+        <li>Jump to the <b>Parameter Entry Form</b> section and perform the checklist for the parameter(s) used by this report.</li>
+        <li><b>Report Parameters</b> table and contents are formatted properly at 400% zoom.</li>
+        <li>Table title is displayed in white text on black.</li>
+        <li><b>User</b> and <b>Date</b> information are accurate.</li>
+  <p>
+        <li><b>Database with meaningful data</b> 
+          <ul>
+            <li>The user activity table and contents are formatted properly at 400% zoom.</li>
+            <li>The table has no title.</li>
+            <li>The top row of the table represent minutes within the hour ranging (vertically)
+              between <b>0</b> and <b>59</b>.</li>
+            <li>The leftmost column displays specific hours starting with <b>6:00 AM</b> and ending
+              with <b>6:00 PM</b>.</li>
+            <li>Some cells in the table have a <b>white</b> background to indicate <b>no input event
+              activity</b> during the specific minute.</li>
+            <li>Remaining cells in the table have a <b>colored</b> background to indicate
+              <b>input event activity</b> during the specific minute.</li>
+  </p>
+  <p>
+            <li><b>Total minutes with input event activity</b> is under the <b>Hours and minutes</b> table.</li>
+            <li>The total is accurate based on the shaded cells in the table.</li>
+          </ul>
+        </li>
+  </p>
+        <li><b>Empty database</b>
+          <ul>
+            <li>The user activity table and contents are formatted properly at 400% zoom.</li>
+            <li>The table has no title.</li>
+            <li>The top row of the table represent minutes within the hour ranging (vertically)
+              between <b>0</b> and <b>59</b>.</li>
+            <li>The leftmost column displays specific hours starting with <b>6:00 AM</b> and ending
+              with <b>6:00 PM</b>.</li>
+            <li>The remaining cells in the table have a <b>white</b> background to indicate <b>no
+              input event activity</b> during the specific minute.</li>
+  <p>
+            <li><b>Total minutes with input event activity</b> is under the <b>Hours and minutes</b> table.</li>
+            <li>The total is <b>0</b>.</li>
+  </p>
+          </ul>
+        </li>
+      </ul>
+    </li>
+
+<!-- Added by Chi Tran, 2012/1/30 -->
+<!-- Core Reports #4 -->
+  <li><b>Document tag change history</b>
+    <ul>
+      <li>Prompted for <b>TagName</b> and <b>ReportingPeriod</b> parameters.</li>
+      <li>Jump to the <b>Parameter Entry Form</b> section and perform the checklist for the parameter(s) used by this report.</li>
+      <li><b>Document Tag Changes</b> table and contents are formatted properly at 400% zoom.</li>
+      <li>Table title is displayed in white text on black.</li>
+      <li>These columns are generated: <b>Time</b>, <b>Tag Name</b>, <b>Added?</b>, <b>User</b>, <b>Machine</b>.</li>
+      <li>The column headings have a distinct background color.</li>
+      <p><li><b>Database with meaningful data</b>
+        <ul>
+          <li>One row is provided for each file with a gray background color.</li>
+          <li>An additional row with accurate column information is provided without background color.</li>
+        </ul>
+      </li></p>
+      <p><li><b>Empty Database</b>
+        <ul>
+          <li><b>Document Tag Changes</b> table has one empty gray row and and one empty row without background color.</li>
+        </ul>
+      </li></p>
+    </ul>
+  </li>
+<!-- Added by Chi Tran, 2012/1/30 -->
+
+<!-- Core Reports #5 -->
 <p>
 	<li><b>Documents processed on machines</b> 
 	<ul>
-		<li>Confirm that a <b>ReportingPeriod</b> parameter is required. 
-		<li>For each of the <b>Range</b> options provided below:
-		<ul>
-			<li>Confirm that a meaningful report is presented.
-			<li>Create a saved report and confirm that the associated XML file 
-			contains a <b>DateRangeParameter</b> node with <b>Name = &quot;ReportingPeriod&quot;</b> 
-			and <b>Default = &quot;&lt;Range&gt;&quot;</b>.
-		</ul>
-		<li><b>Range</b> options: 
-		<ul>
-			<li>All 
-			<li>Previous week
-			<li>Previous month
-			<li>Previous year
-			<li>Last 30 days
-			<li>Last 7 days
-			<li>Last hour
-			<li>Last 2 hours
-			<li>Last 5 hours
-			<li>Last 10 hours
-			<li>Current week
-			<li>Current month
-			<li>Current year
-			<li>Today
-			<li>Yesterday
-		</ul>
-		<li>Create a saved report with a <b>Custom</b> date range and confirm that the 
-		associated XML file contains a <b>DateRangeParameter</b> node with <b>Name = 
-		&quot;ReportingPeriod&quot;</b>, <b>Default = &quot;Custom&quot;</b>, <b>Min = 
-		&quot;&lt;start time&gt;&quot;</b>, <b>Max = &quot;&lt;end time&gt;&quot;</b>.
+		<li>Prompted for <b>ReportingPeriod</b> parameter.</li>
+                <li>Jump to the <b>Parameter Entry Form</b> section and perform the checklist for the parameter(s) used by this report.</li>
+</p>
 <p>
-		<li><b>Test with meaningful data</b> 
+		<li><b>Database with meaningful data</b> 
 		<ul>
-			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the <b>Start time</b> information is correct.
-			<li>Confirm that the <b>End time</b> information is correct.
+			<li><b>Total number of documents processed for each action</b> 
+			  table and contents are formatted properly at 400% zoom.</li>
+                        <li>Table title is displayed in white text on black.</li>
+			<li><b>Machine</b> column information is accurate.</li>
+			<li>One additional column is provided for each <b>action</b> in 
+			  the database.</li>
+			<li>The last row in the <b>Machine</b> column is titled <b>Total</b>.</li>
+			<li><b>Total</b> information is accurate for each action and has a distinct background color.</li>
+		</ul></li>
+</p>
 <p>
-			<li>Confirm that the <b>Total number of documents processed for each action</b> 
-			table and contents are formatted properly even at 400% zoom factor.
-			<li>Confirm that the <b>Machine</b> column information is correct.
-			<li>Confirm that one additional column is provided for each <b>action</b> in 
-			the database.
-			<li>Confirm that the <b>Machine</b> name in the last row is <b>Total</b>.
-			<li>Confirm that the <b>Total</b> information is correct for each action.
-			<li>Confirm that the <b>Total</b> information is displayed with a distinct 
-			background color.
-		</ul>
-<p>
-		<li><b>Test with empty database</b> 
+		<li><b>Empty database</b> 
 		<ul>
-			<li>Confirm that the only <b>Machine</b> name is labeled <b>N/A</b>.
-			<li>Confirm that the only <b>Action</b> name is labeled <b>n/a</b>.
-			<li>Confirm that the count is <b>0</b>.
-			<li>Confirm that the <b>Total</b> is <b>0</b>.
-		</ul>
-	</ul>
+			<li><b>Total number of documents processed for each action</b> 
+			  table and contents are formatted properly at 400% zoom.</li>
+			<li>There are no rows in the table.</li>
+		</ul></li>
+	</ul></li>
+</p>
 
+<!-- Added by Chi Tran, 2012/1/30 -->
+<!-- Core Reports #6 -->
+  <li><b>FTP Transfer Report</b>
+    <ul>
+      <li>Prompted for <b>ReportingPeriod</b> and <b>DownloadOrUpload</b> parameters.</li>
+      <li>Jump to the <b>Parameter Entry Form</b> section and perform the checklist for the parameter(s) used by this report.</li>
+      <p><li><b>Database with meaningful data</b>
+        <ul>
+            <li><b>Download/Upload Summary</b> table and contents are formatted properly at 400% zoom.</li>
+            <li>Table title is displayed in white text on black.</li>
+            <li>These columns are generated: <b>Documents Downloaded/Uploaded</b>, <b>Pages Downloaded/Uploaded</b>.</li>
+            <li>The column headings have a distinct background color.</li>
+            <li>There is one row with accurate information without background color.</li>
+      </p>
+          <p>
+            <li><b>Downloaded/Uploaded Files</b> table and contents are formatted properly at 400% zoom.</li>
+            <li>Table title is displayed in white text on black.</li>
+            <li>These columns are generated: <b>FileID</b>, <b>Time</b>, <b>File Downloaded/Uploaded</b>, <b>Pages</b>.</li>
+            <li>The column headings have a distinct background color.</li>
+            <li>There is one row for each file downloaded/uploaded with accurate information without background color.</li>
+          </p>
+        </ul>
+      </li></p>
+      <p><li><b>Empty Database</b>
+        <ul>
+          <li>Each table has 1 blank row.</li>
+        </ul>
+      </li></p>
+    </ul>
+  </li>
+<!-- Added by Chi Tran, 2012/1/30 -->
+
+<!-- Core Reports #7 -->
 <p>
 
 	<li><b>List of all actions in the project</b> 
 	<ul>
-		<li>Confirm that a parameter is <b>not required</b>. 
+		<li>No prompt for parameter.</li>
+</p>
 <p>
 		<li><b>Test with meaningful data</b> 
 		<ul>
-			<li>Confirm that the column headings are displayed in a distinct background color.
-			<li>Confirm that the <b>Action ID</b> column information is correct.
-			<li>Confirm that the <b>Action</b> column information is correct.
-			<li>Confirm that one row is provided for each <b>action</b> in 
-			the database.
-<p>
-			<li>Confirm that a shadowed footer is provided at the bottom of each page.
-			<li>Confirm that the left side of the first line is <b>Printed</b> along 
-			with a date and time of printing.
-			<li>Confirm that the left side of the second line is <b>By</b> along 
-			with the user name of the person who generated the report.
-			<li>Confirm that the right side of the first line is the name of the report, 
-			identical to the second line of the header.
-			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
-			<i>N</i></b>.
-			<li>Confirm that there is a distinct background color.
+			<li><b>Action List</b> table and contents are formatted properly at 400% zoom.</li>
+                        <li>Table title is displayed in white text on black.</li>
+			<li>These columns are generated: <b>Action ID</b>, <b>Action</b>.</li>
+			<li>The column headings have a distinct background color.</li>
+			<li>Column information is accurate.</li>
+			<li>One row is provided for each <b>action</b> in the database.</li>
+</p>
 		</ul>
 <p>
 		<li><b>Test with empty database</b> 
 		<ul>
-			<li>Confirm that the <b>Action List</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the column headings are displayed in a distinct background color.
-			<li>Confirm that the <b>Action ID</b> column information is correct.
-			<li>Confirm that the <b>Action</b> column information is correct.
-			<li>Confirm that one row is provided with <b>Action ID</b> and 
-			<b>Action</b> empty.
+			<li>There are no rows in the table.</li>
 		</ul>
 	</ul>
 
+</p>
+
+<!-- Core Reports #8 -->
 <p>
 	<li><b>List of all documents with specific tag</b> 
 	<ul>
-  	   	<LI><b>[LegacyRC #5544]</b> Confirm that a meaningful error message is presented 
-		if no tags are defined.
-		<li>Confirm that a <b>TagName</b> parameter is required. 
-		<li>Confirm that the <b>Parameter Entry Form</b> includes a combo box pre-populated 
-		with the defined tags.
-		<li>Confirm that a meaningful report is presented.
-		<li>Create a saved report and confirm that the associated XML file 
-		contains a <b>TextParameter</b> node with <b>Name = &quot;TagName&quot;</b> 
-		and <b>Default = &quot;&lt;name&gt;&quot;</b>.
+		<li>Prompted for <b>TagName</b> parameter.</li>
+                <li>Jump to the <b>Parameter Entry Form</b> section and perform the checklist for the parameter(s) used by this report.</li>
+</p>
 <p>
-		<li><b>Test with meaningful data</b> 
+		<li><b>Database with meaningful data</b> 
 		<ul>
-			<li>Confirm that the <b>Files tagged:</b> table is formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the <b>Filename</b> column header is displayed in a 
-			distinct background.
-			<li>Confirm that each filename is displayed without a background color.
-			<li>Confirm that the last row displays <b>Total count of documents:</b>.
-			<li>Confirm that the last row is displayed in a distinct background color.
-			<li>Confirm that the total count is correct.
-		</ul>
+			<li><b>Files tagged:</b> table is formatted properly at 400% zoom.</li>
+                        <li>Table title is displayed in white text on black.</li>
+			<li>The <b>Filename</b> column header has a distinct background.</li>
+			<li>Each filename is displayed without a background color.</li>
+			<li>The last row displays <b>Total count of documents:</b> in a distinct background color.</li>
+			<li>The total count is accurate.</li>
+		</ul></li>
+</p>
 <p>
-		<li><b>Test with empty database</b> 
+		<li><b>Empty database</b> 
 		<ul>
-			<li>Confirm that the <b>Files tagged:</b> table is formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the <b>Filename</b> column header is displayed in a 
-			distinct background.
-			<li>Confirm that no filenames are displayed.
-			<li>Confirm that the last row displays <b>Total count of documents:</b>.
-			<li>Confirm that the last row is displayed in a distinct background color.
-			<li>Confirm that the total count is <b>0</b>.
-		</ul>
-	</ul>
+			<li>No filenames are displayed.</li>
+			<li>The total count is <b>0</b>.</li>
+		</ul></li>
+	</ul></li>
+</p>
 
-<p>
-
+<!-- Core Reports #9 -->
 	<li><b>List of all file action comments in the project</b> 
 	<ul>
-		<li>Confirm that a parameter is <b>not required</b>. 
+		<li>No prompt for parameter.</li>
 <p>
-		<li><b>Test with meaningful data</b> 
+		<li><b>Database with meaningful data</b> 
 		<ul>
-			<li>Confirm that the <b>Computer List</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the table title includes <b>File ID:</b> and <b>File Name:</b>.
-			<li>Confirm that the column headings are displayed in a distinct background color
-			<ul>
-				<li>Action Name
-				<li>User
-				<li>Date Time Stamp
-				<li>Comment
-			</ul>
-			<li>Confirm that the column information is correct
-			<ul>
-				<li>Action Name
-				<li>User
-				<li>Date Time Stamp
-				<li>Comment
-			</ul>
+			<li><b>File ID:&nbsp;&nbsp;File Name:</b> table and contents are formatted properly at 400% zoom.</li>
+                        <li>Table title is displayed in white text on black.</li>
+			<li>These columns are generated: <b>Action Name</b>, <b>User</b>, <b>Date Time Stamp</b>, <b>Comment</b>.
+                        <li>The column headings have a distinct background color.</li>
+			<li>The column information is accurate.</li>
 		</ul>
+</p>
 <p>
-		<li><b>Test with empty database</b> 
+		<li><b>Empty database</b> 
 		<ul>
-			<li>Confirm that the <b>Action List</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the table title includes <b>File ID: N/A</b> and <b>File 
-			Name: N/A</b>.
-			<li>Confirm that the column headings are displayed in a distinct background color
-			<ul>
-				<li>Action Name
-				<li>User
-				<li>Date Time Stamp
-				<li>Comment
-			</ul>
-			<li>Confirm that each column contains <b>N/A</b>.
+			<li>There is one empty row.</li>
 		</ul>
 	</ul>
 
-<p>
+</p>
 
+<!-- Core Reports #10 -->
 	<li><b>List of all machines used in the project</b> 
 	<ul>
-		<li>Confirm that a parameter is <b>not required</b>. 
+		<li>No prompt for parameter.</li>
 <p>
-		<li><b>Test with meaningful data</b> 
+		<li><b>Database with meaningful data</b> 
 		<ul>
-			<li>Confirm that the <b>Computer List</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the column headings are displayed in a distinct background color.
-			<li>Confirm that the <b>Machine ID</b> column information is correct.
-			<li>Confirm that the <b>Machine Name</b> column information is correct.
-			<li>Confirm that one row is provided for each <b>machine</b> in 
-			the database.
-		</ul>
+			<li><b>Computer List</b> table and contents are formatted properly at 400% zoom.</li>
+                        <li>Table title is displayed in white text on black.</li>
+                        <li>These columns are generated: <b>Machine ID</b>, <b>Machine Name</b>.</li>
+			<li>The column headings have a distinct background color.</li>
+			<li>Column information is accurate.</li>
+			<li>One row is provided for each <b>machine</b> in the database.</li>
+		</ul></li>
+</p>
 <p>
-		<li><b>Test with empty database</b> 
+		<li><b>Empty database</b> 
 		<ul>
-			<li>Confirm that the <b>Action List</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the column headings are displayed in a distinct background color.
-			<li>Confirm that the <b>Machine ID</b> column information is correct.
-			<li>Confirm that the <b>Machine Name</b> column information is correct.
-			<li>Confirm that one row is provided with <b>Machine ID</b> and 
-			<b>Machine Name</b> empty.
-		</ul>
-	</ul>
+			<li>There are no rows in the table.</li>
+		</ul></li>
+	</ul></li>
+</p>
 
-<p>
-
+<!-- Core Reports #11 -->
 	<li><b>List of all skipped documents in the project</b> 
 	<ul>
-		<li>Confirm that a parameter is <b>not required</b>. 
+		<li>No prompt for parameter.</li>
 <p>
-		<li><b>Test with meaningful data</b> 
+		<li><b>Database with meaningful data</b> 
 		<ul>
-			<li>Confirm that the <b>Skipped Files</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the column headings are displayed in a distinct background color
-			<ul>
-				<li>File ID
-				<li>File Name
-				<li>Action Name
-				<li>User
-				<li>Date Time Stamp
-				<li>Time Since Skipped
-			</ul>
-			<li>Confirm that the column information is correct
-			<ul>
-				<li>File ID
-				<li>File Name
-				<li>Action Name
-				<li>User
-				<li>Date Time Stamp
-				<li>Time Since Skipped
-			</ul>
-		</ul>
+			<li><b>Skipped Files</b> table and contents are formatted properly at 400% zoom.</li>
+                        <li>Table title is displayed in white text on black.</li>
+                        <li>These columns are generated: <b>File ID</b>, <b>File Name</b>, <b>Action Name</b>,
+                          <b>User</b>, <b>Date Time Stamp</b>, <b>Time Since Skipped</b>.</li>
+			<li>The column headings have a distinct background color.</li>
+			<li>Column information is accurate.</li>
+		</ul></li>
+</p>
 <p>
-		<li><b>Test with empty database</b> 
+		<li><b>Empty database</b> 
 		<ul>
-			<li>Confirm that the <b>Skipped Files</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the column headings are displayed in a distinct background color
-			<ul>
-				<li>File ID
-				<li>File Name
-				<li>Action Name
-				<li>User
-				<li>Date Time Stamp
-				<li>Time Since Skipped
-			</ul>
-			<li>Confirm that each column contains <b>N/A</b>.
-		</ul>
-      		<li><b>[LegacyRC #5786]</b> Confirm that files with long filenames are properly 
-		displayed in the report.
-	</ul>
+			<li>There are no rows in the table.</li>
+		</ul></li>
+      		<p><li><b>[LegacyRC #5786]</b> Files with long filenames are properly 
+		displayed in the report.</li></p>
+	</ul></li>
+</p>
 
-<p>
-
+<!-- Core Reports #12 -->
 	<li><b>List of all tagged documents in the project (by tag)</b> 
 	<ul>
-		<li>Confirm that a parameter is <b>not required</b>. 
+		<li>No prompt for parameter.</li>
 <p>
-		<li><b>Test with meaningful data</b> 
+		<li><b>Database with meaningful data</b> 
 		<ul>
-			<li>Confirm that the <b>Tagged Documents</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the table contains separate column headings for each tag.
-			<li>Confirm that the column headings are displayed in a distinct background color.
-			<li>Confirm that each document is presented one or more times, once for each 
-			applied tag.
-			<li>Confirm that a <b>Count of documents:</b> row is provided for each tag.
-			<li>Confirm that the counts are correct.
-			<li>Confirm that a <b>Total count of tagged documents:</b> row is provided at 
-			the end of the report.
-			<li>Confirm that the <b>total count</b> is the sum of the individual counts 
-			and may be greater than the actual number of documents.
-		</ul>
+			<li><b>Tagged Documents</b> table and contents are formatted properly at 400% zoom.</li>
+                        <li>Table title is displayed in white text on black.</li>
+			<li>The table is separated into sections by tag name.</li>
+			<li>The section headings contain the tag name and have a distinct background color.</li>
+			<li>Each document is presented once for each applied tag.</li>
+			<li>A <b>Count of documents:</b> row is provided for each tag.</li>
+			<li>The counts are accurate.</li>
+			<li>A <b>Total count of tagged documents:</b> row is provided at 
+			the end of the report.</li>
+			<li>The <b>Total count</b> is the sum of the individual counts 
+			and may be greater than the actual number of documents.</li>
+		</ul></li>
+</p>
 <p>
-		<li><b>Test with empty database</b> 
+		<li><b>Empty database</b> 
 		<ul>
-			<li>Confirm that the <b>Tagged Documents</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that a <b>Total count of tagged documents:</b> row is provided at 
-			the end of the report.
-			<li>Confirm that the <b>total count</b> is <b>0</b>.
-		</ul>
+                        <li><b>Count of documents:</b> is <b>0</b>.</li>
+			<li>The <b>Total count</b> is blank.</li>
+		</ul></li>
+</p>
 <p>
 		<li><b>[LegacyRC #5633]</b> Misleading total count
 		<ul>
@@ -1327,244 +1248,191 @@
 			<li>Apply multiple tags to at least one file.
 			<li>Exercise the report and confirm that the <b>Total count of tagged documents 
 			in the project</b> matches the number of files processed.
-		</ul>
-	</ul>
+		</ul></li>
+	</ul></li>
+</p>
 
+<!-- Core Reports #13 -->
 <p>
-
-	<li><b>List of all tags in the project (by tag)</b> 
+	<li><b>List of all tags in the project</b> 
 	<ul>
-		<li>Confirm that a parameter is <b>not required</b>. 
+		<li>No prompt for parameter.</li>
+</p>
 <p>
-		<li><b>Test with meaningful data</b> 
+		<li><b>Database with meaningful data</b> 
 		<ul>
-			<li>Confirm that the <b>Tag List</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the <b>Name</b> column heading is displayed in a distinct 
-			background color.
-			<li>Confirm that the <b>Description</b> column heading is displayed in a distinct 
-			background color.
-			<li>Confirm that each tag is displayed without a background color.
-			<li>Confirm that each description is displayed without a background color.
+			<li><b>Tag List</b> table and contents are formatted properly at 400% zoom.</li>
+                        <li>Table title is displayed in white text on black.</li>
+			<li>These columns are generated: <b>Name</b>, <b>Description</b>.</li>
+			<li>The column headings have a distinct background color.</li>
+			<li>Column information is displayed without a background color.</li>
 		</ul>
+</p>
 <p>
-		<li><b>Test with empty database</b> 
+		<li><b>Empty database</b> 
 		<ul>
-			<li>Confirm that the <b>Tagged Documents</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the <b>Name</b> column heading is displayed in a distinct 
-			background color.
-			<li>Confirm that the <b>Description</b> column heading is displayed in a distinct 
-			background color.
+			<li>There is one empty row.</li>
 		</ul>
 	</ul>
+</p>
 
-<p>
-
+<!-- Core Reports #14 -->
 	<li><b>List of all users in the project</b> 
 	<ul>
-		<li>Confirm that a parameter is <b>not required</b>. 
+		<li>No prompt for parameter.</li>
 <p>
-		<li><b>Test with meaningful data</b> 
+		<li><b>Database with meaningful data</b> 
 		<ul>
-			<li>Confirm that the <b>User List</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the column headings are displayed in a distinct background color.
-			<li>Confirm that the <b>User ID</b> column information is correct.
-			<li>Confirm that the <b>User</b> column information is correct.
-			<li>Confirm that one row is provided for each <b>user</b> in 
-			the database.
-		</ul>
+			<li><b>User List</b> table and contents are formatted properly at 400% zoom.</li>
+                        <li>Table title is displayed in white text on black.</li>
+                        <li>These columns are generated: <b>User ID</b>, <b>User</b>.
+			<li>The column headings have a distinct background color.</li>
+			<li>Column information is accurate.</li>
+			<li>One row is provided for each <b>user</b> in the database.</li>
+		</ul></li>
+</p>
 <p>
-		<li><b>Test with empty database</b> 
+		<li><b>Empty database</b> 
 		<ul>
-			<li>Confirm that the <b>User List</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the column headings are displayed in a distinct background color.
-			<li>Confirm that the <b>User ID</b> column information is correct.
-			<li>Confirm that the <b>User</b> column information is correct.
-			<li>Confirm that one row is provided with <b>User ID</b> and 
-			<b>User</b> empty.
-		</ul>
-	</ul>
+			<li>There are no rows in the table.</li>
+		</ul></li>
+	</ul></li>
+</p>
 
-<p>
-
+<!-- Core Reports #15 -->
 	<li><b>Machines used for processing (by action)</b> 
 	<ul>
-		<li>Confirm that a parameter is <b>not required</b>. 
+		<li>No prompt for parameter.</li>
 <p>
-		<li><b>Test with meaningful data</b> 
+		<li><b>Database with meaningful data</b> 
 		<ul>
-			<li>Confirm that an <b>Action: &ltaction name&gt;</b> table exists for 
-			each action in the database.
-			<li>Confirm that the <b>Action: &ltaction name&gt;</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the next row is <b>Machines used for processing</b> and is 
-			displayed in a distinct background color.
-			<li>Confirm that one row is provided for each <b>machine name</b> for each of 
-			the actions.
-			<li>Confirm that blank space is provided between each 
-			<b>Action: &ltaction name&gt;</b> table.
-		</ul>
+			<li><b>Action: &ltaction name&gt;</b> table exists for 
+			each action in the database; table and contents are formatted 
+			properly at 400% zoom.</li>
+                        <li>Table title is displayed in white text on black.</li>
+			<li>The <b>Machines used for processing</b> column header has a distinct background.</li>
+			<li>One row is provided for each <b>machine name</b> for each action.</li>
+			<li>Blank space is provided between each <b>Action: &ltaction name&gt;</b> table.
+		</ul></li>
+</p>
 <p>
-		<li><b>Test with empty database</b> 
+		<li><b>Empty database</b> 
 		<ul>
-<p>
-			<li>Confirm that an <b>Action: </b> table exists and that it 
-			is formatted properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the next row is <b>Machines used for processing</b> and is 
-			displayed in a distinct background color.
-			<li>Confirm that one row is provided with <b>empty</b> cells.
-		</ul>
-<p>
-		<li><b>Test with an unused &quot;ABC&quot; action (can be added to an empty database)</b> 
-		<ul>
-			<li>Confirm that an <b>Action: ABC</b> table exists and that it 
-			is formatted properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the next row is <b>Machines used for processing</b> and is 
-			displayed in a distinct background color.
-			<li>Confirm that one row is provided with <b>empty</b> cells.
-		</ul>
-	</ul>
+			<li>Action name is blank and there is one empty row for <b>Machines used for processing</b>.</li>
+		</ul></li>
+</p>
+	</ul></li>
 
-<p>
+<!-- Added by Chi Tran, 2012/1/30 -->
+<!-- Core Reports #16 -->
+  <li><b>Source document name change history</b>
+    <ul>
+      <li>Prompted for <b>ReportingPeriod</b> parameter.</li>
+      <li>Jump to the <b>Parameter Entry Form</b> section and perform the checklist for the parameter(s) used by this report.</li>
+      <li><b>Source Document Name Changes</b> table and contents are formatted properly at 400% zoom.</li>
+      <li>Table title is displayed in white text on black.</li>
+      <li>These columns are generated: <b>FileID</b>, <b>Time</b>, <b>User</b>, <b>Machine</b>.</li>
+      <li>The column headings have a distinct background color.</li>
+      <p><li><b>Database with meaningful data</b>
+        <ul>
+          <li>Three rows are provided for each file.
+            <ul>
+              <li>One row has column information displayed in a gray background color.</li>
+              <li>The row titled <b>Old Name</b> has a distinct background color and displays information without a background color.</li>
+              <li>The row titled <b>new Name</b> has a distinct background color and displays information without a background color.</li>
+            </ul>
+          </li>
+        </ul>
+      </li></p>
+      <p><li><b>Empty Database</b>
+        <ul>
+          <li><b>Source Document Name Changes</b> table has 2 blank rows for <b>Old Name</b> and <b>New Name</b>.</li>
+        </ul>
+      </li></p>
+    </ul>
+  </li>
+<!-- Added by Chi Tran, 2012/1/30 -->
 
+<!-- Core Reports #17 -->
 	<li><b>Summary of actions and associated document counts</b> 
 	<ul>
-		<li>Confirm that a parameter is <b>not required</b>. 
+		<li>No prompt for parameter.</li>
 <p>
-		<li><b>Test with meaningful data</b> 
+		<li><b>Database with meaningful data</b> 
 		<ul>
-			<li>Confirm that the <b>File Summary</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the column headings are displayed in a distinct background color.
-			<li>Confirm that the <b>Action</b> column information is correct.
-			<li>Confirm that the <b>Unattempted</b> column information is correct.
-			<li>Confirm that the <b>Pending</b> column information is correct.
-			<li>Confirm that the <b>Processing</b> column information is correct.
-			<li>Confirm that the <b>Complete</b> column information is correct.
-			<li>Confirm that the <b>Skipped</b> column information is correct.
-			<li>Confirm that the <b>Failed</b> column information is correct.
-			<li>Confirm that the <b>Total</b> column information is correct.
-			<li>Confirm that each <b>Total</b> is the sum of the Pending, Processing, 
-			Complete and Failed counts.
+			<li><b>File Summary</b> table and contents are formatted properly at 400% zoom.</li>
+                        <li>Table title is displayed in white text on black.</li>
+                        <li>These columns are generated: <b>Action</b>, <b>Unattempted</b>, <b>Pending</b>, <b>Processing</b>, <b>Complete</b>,
+                        <b>Skipped</b>, <b>Failed</b>, <b>Total</b>.</li>
+                        <li>The column headings have a distinct background color.</li>
+                        <li>One row is provided for each action in the database.</li>
+			<li>Column information is accurate.</li>
+			<li>Each <b>Total</b> is the sum of the Pending, Processing, Complete and Failed counts.</li>
+</p>
 <p>
-			<li>Confirm that after the <b>File Summary</b> table is an entry for 
-			<b>Total number of files referenced in the database</b>.
-			<li>Confirm that the <b>Total number of files referenced in the database</b> count 
-			is <b>&gt;=</b> the largest individual total count.
+			<li><b>Total number of files referenced in the database</b> is under the <b>File Summary</b> table.</li>
+			<li>The <b>Total number of files</b> count is <b>&gt;=</b> the largest individual total count.</li>
 			<li><b>[LegacyRC #5432]</b> Confirm that the total is not just the sum of the 
 			totals for each action, allowing files referenced by multiple actions to be 
-			counted more than once.
-		</ul>
+			counted more than once.</li>
+		</ul></li>
+</p>
 <p>
-		<li><b>Test with empty database</b> 
+		<li><b>Empty database</b> 
 		<ul>
-			<li>Confirm that the <b>File Summary</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the column headings are displayed in a distinct background color.
-			<li>Confirm that the <b>Action</b> column contains one entry with <b>N/A</b>.
-			<li>Confirm that the <b>Unattempted</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Pending</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Processing</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Complete</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Skipped</b> column information is correct.
-			<li>Confirm that the <b>Failed</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Total</b> column contains one entry with <b>0</b>.
-<p>
-			<li>Confirm that after the <b>File Summary</b> table is an entry for 
-			<b>Total number of files referenced in the database</b>.
-			<li>Confirm that the <b>Total number of files referenced in the database</b> count 
-			is <b>0</b>.
-<p>
-		</ul>
+			<li>There is one empty row.</li>
+			<li>The <b>Total number of files referenced in the database</b> count is blank.</li>
+</p>
+		</ul></li>
 <p>
 		<li><b>Test with an unused &quot;ABC&quot; action (can be added to an empty database)</b> 
 		<ul>
-			<li>Confirm that the <b>File Summary</b> table exists.
-			<li>Confirm that the <b>Action</b> column contains one entry with <b>ABC</b>.
-			<li>Confirm that the <b>Unattempted</b> column contains one entry with the same count 
-			as provided by <b>Total number of files referenced in the database</b>.
-			<li>Confirm that the <b>Pending</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Processing</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Complete</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Skipped</b> column information is correct.
-			<li>Confirm that the <b>Failed</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Total</b> column contains one entry with <b>0</b>.
+			<li>All columns contain one entry with <b>0</b>.</li>
+                        <li>The <b>Total number of files referenced in the database</b> count is <b>0</b>.</li>
 		</ul>
 	</ul>
+</p>
 
+<!-- Core Reports #18 -->
 <p>
-
 	<li><b>Summary of actions and associated document page counts</b> 
 	<ul>
-		<li>Confirm that a parameter is <b>not required</b>. 
+		<li>No prompt for parameter.</li>
+</p>
 <p>
-		<li><b>Test with meaningful data</b> 
+		<li><b>Database with meaningful data</b> 
 		<ul>
-			<li>Confirm that the <b>Page Summary</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the column headings are displayed in a distinct background color.
-			<li>Confirm that the <b>Action</b> column information is correct.
-			<li>Confirm that the <b>Unattempted</b> column information is correct.
-			<li>Confirm that the <b>Pending</b> column information is correct.
-			<li>Confirm that the <b>Processing</b> column information is correct.
-			<li>Confirm that the <b>Complete</b> column information is correct.
-			<li>Confirm that the <b>Skipped</b> column information is correct.
-			<li>Confirm that the <b>Failed</b> column information is correct.
-			<li>Confirm that the <b>Total</b> column information is correct.
-			<li>Confirm that each <b>Total</b> is the sum of the Pending, Processing, 
-			Complete and Failed counts.
+			<li><b>Page Summary</b> table and contents are formatted properly at 400% zoom.</li>
+                        <li>Table title is displayed in white text on black.</li>
+                        <li>These columns are generated: <b>Action</b>, <b>Unattempted</b>, <b>Pending</b>, <b>Processing</b>, <b>Complete</b>,
+                        <b>Skipped</b>, <b>Failed</b>, <b>Total</b>.</li>
+                        <li>The column headings have a distinct background color.</li>
+                        <li>One row is provided for each action in the database.</li>
+			<li>Column information is accurate.</li>
+			<li>Each <b>Total</b> is the sum of the Pending, Processing, Complete and Failed counts.</li>
+</p>
 <p>
-			<li>Confirm that after the <b>Page Summary</b> table is an entry for 
-			<b>Total number of pages referenced in the database</b>.
-			<li>Confirm that the <b>Total number of pages referenced in the database</b> count 
-			is <b>&gt;=</b> the largest individual total count.
+			<li><b>Total number of pages referenced in the database</b> is under the <b>File Summary</b> table.</li>
+			<li>The <b>Total number of pages</b> count is <b>&gt;=</b> the largest individual total count.</li>
 			<li><b>[LegacyRC #5432]</b> Confirm that the total is not just the sum of the 
 			totals for each action, allowing files referenced by multiple actions to be 
 			counted more than once.
 		</ul>
+</p>
 <p>
-		<li><b>Test with empty database</b> 
+		<li><b>Empty database</b> 
 		<ul>
-			<li>Confirm that the <b>Page Summary</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the column headings are displayed in a distinct background color.
-			<li>Confirm that the <b>Action</b> column contains one entry with <b>N/A</b>.
-			<li>Confirm that the <b>Unattempted</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Pending</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Processing</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Complete</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Skipped</b> column information is correct.
-			<li>Confirm that the <b>Failed</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Total</b> column contains one entry with <b>0</b>.
-<p>
-			<li>Confirm that after the <b>Page Summary</b> table is an entry for 
-			<b>Total number of pages referenced in the database</b>.
-			<li>Confirm that the <b>Total number of pages referenced in the database</b> count 
-			is <b>0</b>.
-<p>
-		</ul>
+			<li>There is one empty row.</li>
+			<li>The <b>Total number of pages referenced in the database</b> count is blank.</li>
+</p>
+		</ul></li>
 <p>
 		<li><b>Test with an unused &quot;ABC&quot; action (can be added to an empty database)</b> 
 		<ul>
-			<li>Confirm that the <b>Page Summary</b> table exists.
-			<li>Confirm that the <b>Action</b> column contains one entry with <b>ABC</b>.
-			<li>Confirm that the <b>Unattempted</b> column contains one entry with the same count 
-			as provided by <b>Total number of pages referenced in the database</b>.
-			<li>Confirm that the <b>Pending</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Processing</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Complete</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Skipped</b> column information is correct.
-			<li>Confirm that the <b>Failed</b> column contains one entry with <b>0</b>.
-			<li>Confirm that the <b>Total</b> column contains one entry with <b>0</b>.
+			<li>All columns except <b>Unattempted</b> contain one entry with <b>0</b>.</li>
+                        <li>The <b>Total number of pages referenced in the database</b> count is blank.</li>
 		</ul>
+</p>
 <p>
   	   	<LI><b>[LegacyRC #5310]</b> Page Summary report
 	       	<ul>
@@ -1576,195 +1444,209 @@
 	      		<li>Confirm that the final total matches the totals provided in the table.
 	       	</ul>
 	</ul>
+</p>
 
-<p>
-
+<!-- Core Reports #19 -->
 	<li><b>Summary of processing times (by action)</b> 
 	<ul>
-		<li>Confirm that a parameter is <b>not required</b>. 
+		<li>No prompt for parameter.</li>
 <p>
-		<li><b>Test with meaningful data</b> 
+		<li><b>Database with meaningful data</b> 
 		<ul>
-			<li>Confirm that the <b>Processing Times</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the column headings are displayed in a distinct background color.
-			<li>Confirm that the <b>Action</b> column information is correct.
-			<li>Confirm that the <b>Time*</b> column information is correct.
-			<li>Confirm that the <b>Average Time Per Document</b> column information is correct.
-			<li>Confirm that one row is provided in the table for each <b>Action</b>.
+			<li>Processing times table and contents are formatted properly at 400% zoom.</li>
+			<li>There is no table title.</li>
+                        <li>These columns are generated: <b>Action</b>, <b>Time*</b>, <b>Average Time Per Document*</b>.</li>
+			<li>The column headings have a distinct background color.</li>
+			<li>Column information is accurate.</li>
+			<li>One row is provided in the table for each <b>Action</b> with data.</li>
+</p>
 <p>
-			<li>Confirm that a <b>Total:</b> row is provided at the bottom of the table.
-			<li>Confirm that a total is provided for the <b>Time*</b> column.
+			<li>A <b>Total:</b> row is provided at the bottom of the table.</li>
+			<li>A total is displayed for the <b>Time*</b> column.</li>
+</p>
 <p>
-			<li>Confirm that after the <b>Processing Times</b> table is text for 
-			<b>*This represents machine time</b>.
-		</ul>
+			<li><b>*This represents machine time</b> is under the processing times table.
+		</ul></li>
+</p>
 <p>
-		<li><b>Test with empty database</b> 
+		<li><b>Empty database</b> 
 		<ul>
-			<li>Confirm that the <b>Processing Times</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the column headings are displayed in a distinct background color.
-			<li>Confirm that the <b>Action</b> information is <b>N/A</b>.
-			<li>Confirm that the <b>Time*</b> information is <b>0m 0s</b>.
-			<li>Confirm that the <b>Average Time Per Document</b> information is <b>0m 0s</b>.
-		</ul>
+			<li><b>Action</b> displays <b>N/A</b>.</li>
+			<li><b>Time*</b> and <b>Average Time Per Document</b> displays <b>0m 0s</b>.</li>
+		</ul></li>
+</p>
 <p>
-		<li><b>Test with an unused &quot;ABC&quot; action (can be added to an empty database)</b> 
-		<ul>
-			<li>Confirm that an <b>Processing Times</b> table exists and that it 
-			is formatted properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the column headings are displayed in a distinct background color.
-			<li>Confirm that the <b>Action</b> information is <b>ABC</b>.
-			<li>Confirm that the <b>Time*</b> information is <b>0m 0s</b>.
-			<li>Confirm that the <b>Average Time Per Document</b> information is <b>0m 0s</b>.
-		</ul>
-	</ul>
-<p>
+	</ul></li>
+</p>
+
+<!-- Core Reports #20 -->
 	<li><b>Usage report during custom date range broken down by user</b> 
 	<ul>
-		<li><b>Test with meaningful data</b> 
+                <li>Prompted for <b>ReportingPeriod</b> parameter.</li>
+                <li>Jump to the <b>Parameter Entry Form</b> section and perform the checklist for the parameter(s) used by this report.</li>
+<p>
+		<li><b>Database with meaningful data</b>
 		<ul>
-			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the <b>Start time</b> information is correct.
-			<li>Confirm that the <b>End time</b> information is correct.
-			<li>Confirm that the <b>Report duration</b> information is correct.
+                        <li>These columns are generated: <b>Date</b>, <b>Active Minutes</b>.</li>
+			<li>The column headings have a distinct background color.</li>
+			<li>Each user name is displayed in white text on a black background.</li>
+			<li>Each row under the user is accurate and displayed without background color.</li>
+</p>
 <p>
-			<li>Confirm that the column headers are displayed in a distinct 
-			background color.
-			<li>Confirm that the following information is formatted properly 
-			for each user
+			<li>The following information is presented after each user:
 			<ul>
-				<li>Confirm that the user name is displayed in white text on a 
-				black background.
-				<li>Confirm that each <b>Date</b> is displayed without a 
-				background color.
-				<li>Confirm that each <b>Active minutes</b> is displayed without a 
-				background color.
-				<li>Confirm that a <b>Total:</b> row is displayed without a 
-				background color.
-				<li>Confirm that an <b>Average:</b> row is displayed without a 
-				background color.
-			</ul>
+			<li><b>Grand total:</b> and <b>Average:</b> rows are accurate and displayed with a gray background color.</li>
+			</ul></li>
+		</ul></li>
+</p>
 <p>
-			<li>Confirm that the following information is presented after all users
-			<ul>
-				<li>Confirm that a <b>Grand total:</b> row is displayed without a 
-				background color.
-				<li>Confirm that an <b>Average:</b> row is displayed without a 
-				background color.
-			</ul>
-		</ul>
-<p>
-		<li><b>Test with empty database</b> 
+		<li><b>Empty database</b> 
 		<ul>
-			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the <b>Start date</b> information is correct.
-			<li>Confirm that the <b>End date</b> information is correct.
-			<li>Confirm that the <b>Duration</b> information is correct.
-<p>
-			<li>Confirm that the following information is presented
-			<ul>
-				<li>Confirm that a <b>Grand total: 0</b> row is displayed without a 
-				background color.
-				<li>Confirm that an <b>Average: 0.0</b> row is displayed without a 
-				background color.
-			</ul>
-		</ul>
-	</ul>
+                        <li><b>Date</b> and <b>Active Minutes</b> table has no users and blank <b>Total:</b> and <b>Average:</b> entries.</li>
+			<li><b>Grand total: </b> and <b>Average: </b> rows have blank entries.</li>
+		</ul></li>
+	</ul></li>
 </ol>
 
+<div class="page-break"></div>
+
 <h2>Parameter Entry Form</h2>
+
+<ul>
+  <li>Verify <b>Parameter Entry Form</b> behavior using an appropriate standard report.</li>
+  <li><b>Cancel</b> closes the dialog window and does not load a report.
+</ul>
+
 <ol>
-	<li><b>DocumentName</b> 
-	<ul>
-		<li>Confirm that a meaningful report is presented for 
-		<b>&lt;fully_qualified_path_to_supplied_image&gt;</b>.
-		<li>Confirm that a report without useful data is presented for each of the following:
-		<ul>
-			<li>Abc123.tif 
-			<li>&lt;supplied_image_without_fully_qualified_path&gt;
-		</ul>
-		<li>Confirm that a meaningful error message is presented if a blank name is specified.
+
+  <!-- Parameter Entry Form #1: DocumentName -->
+  <p><li><b>DocumentName</b> 
+    <ul>
+      <li>A meaningful report is presented when a fully-qualified path to a processed file is provided.</li>
+      <li>A report without useful data is presented for the following:
+        <ul>
+          <li>Abc123.tif (nonexistent file)</li>
+          <li>A file without a fully qualified path</li>
 	</ul>
-<p>
-	<li><b>ReportingPeriod</b> 
-	<ul>
-		<li>Confirm that a meaningful report (especially the times and dates in the Reporting 
-		period table) is presented for each of the <b>Range</b> options including: 
-		<ul>
-			<li>All 
-			<li>Previous week
-			<li>Previous month
-			<li>Previous year
-			<li>Last 30 days
-			<li>Last 7 days
-			<li>Last hour
-			<li>Last 2 hours
-			<li>Last 5 hours
-			<li>Last 10 hours
-			<li>Current week
-			<li>Current month
-			<li>Current year
-			<li>Today
-			<li>Yesterday
-		</ul>
-		<li>Confirm that selecting <b>Custom</b> as a range enables the <b>Begin date</b> 
-		and <b>End date</b> combo boxes.
-		<li>Confirm that selecting the <b>Begin date</b> combo box drops down a calendar control.
-		<li>Confirm that the selected <b>Begin date</b> is displayed in the combo box.
-		<li>Confirm that selecting the <b>End date</b> combo box drops down a calendar control.
-		<li>Confirm that the selected <b>End date</b> is displayed in the combo box.
-	</ul>
-<p>
-	<li><b>TagName</b> 
-	<ul>
-		<li>Confirm that a meaningful report is presented for 
-		each defined tag.
-	</ul>
-<p>
-	<li><b>VerifyUserName</b> 
-	<ul>
-		<li>Confirm that a meaningful report is presented for each of the following: 
-		<ul>
-			<li>Administrator 
-			<li>&lt;your_name&gt;
-			<li>&lt;Another_Extract_User&gt;
-			<li>&lt;nonsense_name&gt;
-		</ul>
-		<li>Confirm that a meaningful error message is presented if a blank name is specified.
-	</ul>
-<p>
+      </li>
+      <li>A meaningful error message appears if the field is left blank.</li>
+      <li>Create a saved report; the associated XML file contains a <b>ReportParameters</b> node with
+      <b>Name=&quot;DocumentName&quot;</b> and <b>Default=&quot;&lt;Path&gt;&quot;</b>.</li>
+    </ul>
+  </li></p>
+
+  <!-- Parameter Entry Form #2: DownloadOrUpload -->
+  <p><li><b>DownloadOrUpload</b> 
+    <ul>
+      <li>There is a list box with <b>Download</b> and <b>Upload</b>.</li>
+      <li>Create a saved report; the associated XML file contains a <b>ReportParameters</b> node with
+      <b>Name=&quot;DownloadOrUpload&quot;</b> and <b>Default=&quot;&lt;Download or Upload&gt;&quot;</b>.</li>
+    </ul>
+  </li></p>
+
+  <!-- Parameter Entry Form #3: ReportDate -->
+  <p><li><b>ReportDate</b> 
+    <ul>
+      <li>There is an edit box and calendar button. The default value is &lt;Today&gt;.</li>
+      <li>Selecting a date propagates correctly to the edit box.</li>
+      <li>Create a saved report; the associated XML file contains a <b>ReportParameters</b>
+      node with <b>Name=&quot;ReportDate&quot;</b> and <b>Default=&quot;&lt;Date&gt;&quot;</b>.</li>
+    </ul>
+  </li></p>
+
+  <!-- Parameter Entry Form #4: ReportingPeriod -->
+  <p><li><b>ReportingPeriod</b>
+    <ul>
+      <li>A meaningful report is presented for each of the <b>Range</b> list box options:
+        <ul>
+          <li>All</li>
+          <li>Previous week</li>
+          <li>Previous month</li>
+          <li>Previous year</li>
+          <li>Last 30 days</li>
+          <li>Last 7 days</li>
+          <li>Last hour</li>
+          <li>Last 2 hours</li>
+          <li>Last 5 hours</li>
+          <li>Last 10 hours</li>
+          <li>Last 24 hours</li>
+          <li>Last 1 minute</li>
+          <li>Last 3 minutes</li>
+          <li>Last 10 minutes</li>
+          <li>Last 30 minutes</li>
+          <li>Current week</li>
+          <li>Current month</li>
+          <li>Current year</li>
+          <li>Today</li>
+          <li>Yesterday</li>
+        </ul>
+      </li>
+      <li><b>Reporting period</b> table and contents are formatted properly at 400% zoom.</li>
+      <li><b>Start time</b> and <b>End time</b> accurately reflect the option chosen.</li>
+      <li><b>Report duration</b>, if it exists, accurately reflects the date range chosen.</li>
+      <li>Selecting <b>Custom</b> enables the <b>Begin date</b> and <b>End date</b> edit boxes and calendar buttons.
+        <ul>
+          <li>Clicking a calendar button drops down a calendar control.</li>
+          <li>Selecting a date propagates correctly to the associated edit box.</li>
+        </ul>
+      </li>
+      <li>Create a saved report; the associated XML file contains a <b>ReportParameters</b>
+      node with <b>Name=&quot;ReportingPeriod&quot;</b> and <b>Default=&quot;&lt;Range&gt;&quot;</b>.
+        <ul>
+          <li>If a <b>Custom</b> date range is chosen, the XML file contains <b>Max=&quot;&lt;Date&gt;&quot;</b> and
+          <b>Min=&quot;&lt;Date&gt;&quot;</b>.</li>
+        </ul>
+      </li>
+    </ul>
+  </li></p>
+
+  <!-- Parameter Entry Form #5: TagName -->
+  <p><li><b>TagName</b> 
+    <ul>
+      <li>There is a list box with all tags defined in the database.</li>
+      <li>A meaningful report is presented for each tag.</li>
+      <li>If there are no tags defined, the list box says <b>[No Values Found]</b>.</li>
+      <li>Create a saved report; the associated XML file contains a
+      <b>ReportParameters</b> node with <b>Name=&quot;TagName&quot;</b> and <b>Default=&quot;&lt;Tag Name&gt;&quot;</b>.
+    </ul>
+  </li></p>
+
+  <!-- Parameter Entry Form #6: UserName -->
+  <p><li><b>UserName</b> 
+    <ul>
+      <li>There is a list box with all users defined in the database.</li>
+      <li>A meaningful report is presented for the following:
+        <ul>
+          <li>Your test user</li>
+          <li>Any other user in the database</li>
+        </ul>
+      </li>
+      <li>If there are no users defined, the list box says <b>[No Values Found]</b>.</li>
+      <li>Create a saved report; the associated XML file contains a
+      <b>ReportParameters</b> node with <b>Name=&quot;UserName&quot;</b> and <b>Default=&quot;&lt;Name&gt;&quot;</b>.
+    </ul>
+  </li></p>
+
 </ol>
-<p>
+
 <h2>Miscellaneous</h2>
 <ul>
-	<li><b>[LegacyRCAndUtils #5113]</b> Report Viewer - Rescaling preview image</li>
-	<ul>
-		<li>Open the Report Viewer and select a report.</li>
-		<li>Resize the window and confirm that the preview image resizes smoothly.</li>
-	</ul>
-<p>
-	<li><b>[LegacyRCAndUtils #5114]</b> Report Viewer - Remember window position.</li>
-	<ul>
-		<li>Confirm that window size is persisted across sessions.</li>
-		<li>Confirm that window position is persisted across sessions.</li>
-	</ul>
-<p>
-	<li>Check help files - as appropriate for software and version</li>
-	<ul>
-		<li>Confirm that the <b>FLEXIndex.chm</b> screen shot for each report is consistent 
-		with the latest version.</li>
-		<li>Confirm that the <b>IDShield.chm</b> screen shot for each report is consistent 
-		with the latest version.</li>
-		<li>Confirm that the <b>LabDE.chm</b> screen shot for each report is consistent 
-		with the latest version.</li>
-	</ul>
+
+  <p><li><b>[LegacyRCAndUtils #5114]</b> Report Viewer - Remember window position
+    <ul>
+      <li>Window size persists across sessions.</li>
+      <li>Window position persists across sessions.</li>
+    </ul>
+  </li></p>
+
+  <p><li>Check help files as appropriate for software and version
+    <ul>
+      <li><b>FLEXIndex.chm</b> screen shot for each report is consistent with the latest version.</li>
+      <li><b>IDShield.chm</b> screen shot for each report is consistent with the latest version.</li>
+      <li><b>LabDE.chm</b> screen shot for each report is consistent with the latest version.</li>
+   </ul>
+  </li></p>
+
 </ul>
-</body>
-</html>
+
+</body></html>
