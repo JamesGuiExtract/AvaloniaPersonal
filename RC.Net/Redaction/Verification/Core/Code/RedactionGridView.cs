@@ -216,6 +216,11 @@ namespace Extract.Redaction.Verification
         int _preventSelectionRefCount;
 
         /// <summary>
+        /// If non-zero, indicates that the current view should not be changed.
+        /// </summary>
+        int _preventViewChangeRefCount;
+
+        /// <summary>
         /// Keeps track of the last rows selected before _preventSelectionRefCount went into affect.
         /// </summary>
         List<DataGridViewRow> _lastSelectedRows;
@@ -817,7 +822,8 @@ namespace Extract.Redaction.Verification
                         // case...)
                         Select(originallySelectedRows
                             .Where(selectedRow => _dataGridView.Rows.Contains(selectedRow))
-                            .Select(selectedRow => selectedRow.Index));
+                            .Select(selectedRow => selectedRow.Index)
+                            , false);
 
                         _dirty = true;
 
@@ -1141,7 +1147,7 @@ namespace Extract.Redaction.Verification
             try
             {
                 // Is at least one row selected?
-                if (_dataGridView.SelectedRows.Count > 0)
+                if (_dataGridView.SelectedRows.Count > 0 && _preventViewChangeRefCount == 0)
                 {
                     // If no redaction is on the currently visible page, 
                     // go to the page of the first selected redaction.
@@ -1988,10 +1994,18 @@ namespace Extract.Redaction.Verification
         /// Selects the specified indicies.
         /// </summary>
         /// <param name="indexes">The indicies.</param>
-        public void Select(IEnumerable<int> indexes)
+        /// <param name="updateZoom"><see langword="true"/> to zoom to the new selection per
+        /// auto-zoom settings; <see langword="false"/> to not disturbe the current view in the
+        /// image viewer.</param>
+        public void Select(IEnumerable<int> indexes, bool updateZoom)
         {
             try
             {
+                if (!updateZoom)
+                {
+                    _preventViewChangeRefCount++;
+                }
+
                 _dataGridView.ClearSelection();
                 foreach (int index in indexes)
                 {
@@ -2001,6 +2015,13 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI32384");
+            }
+            finally
+            {
+                if (!updateZoom)
+                {
+                    _preventViewChangeRefCount--;
+                }
             }
         }
 
@@ -2181,7 +2202,8 @@ namespace Extract.Redaction.Verification
                 {
                     Select(_lastSelectedRows
                         .Where(row => _dataGridView.Rows.Contains(row))
-                        .Select(row => row.Index));
+                        .Select(row => row.Index),
+                        false);
                 }
             }
             catch (Exception ex)

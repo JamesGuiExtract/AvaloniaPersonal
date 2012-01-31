@@ -3624,6 +3624,26 @@ namespace Extract.Imaging.Forms
             }
         }
 
+        /// <summary>
+        /// Occurs when the size of the control has changed.
+        /// </summary>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        protected override void OnSizeChanged(EventArgs e)
+        {
+            try
+            {
+                base.OnSizeChanged(e);
+
+                // [DotNetRCAndUtils:781]
+                // Ensure the current fit mode is applied properly after the window is resized.
+                ShowFitMode(_fitMode);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34361");
+            }
+        }
+
         #endregion OnEvents
 
         #region Event Handlers

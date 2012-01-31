@@ -397,6 +397,11 @@ namespace Extract.Redaction.Verification
         /// </summary>
         readonly int _originalDataGridTop;
 
+        /// <summary>
+        /// Indicates whether the form is closing.
+        /// </summary>
+        bool _formClosing;
+
         #endregion Fields
 
         #region Events
@@ -698,21 +703,26 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Saves and commits the currently viewed document.
+        /// Saves and commits the currently viewed document. This includes adding a session to the
+        /// IDShieldData table (if applicable) and commiting the any comment for the file.
         /// </summary>
         void Commit()
         {
             VerificationMemento memento = GetCurrentDocument();
 
-            bool savedVOAFile = false; 
+            bool savedVOAFile = false;
+
+            TimeInterval screenTime = StopScreenTimeTimer();
 
             // Save VOA file if needed.
             if (NeedToSaveVOAFile(memento))
             {
-                TimeInterval screenTime = StopScreenTimeTimer();
-                Save(screenTime);
+                Save(screenTime, true);
                 savedVOAFile = true;
             }
+
+            SaveRedactionCounts();
+            CommitComment();
 
             // If in standalone, output the redacted version of the image.
             if (_standAloneMode)
@@ -952,9 +962,11 @@ namespace Extract.Redaction.Verification
         /// Saves the currently viewed voa file.
         /// </summary>
         /// <param name="screenTime">The duration of time spent verifying the document.</param>
-        void Save(TimeInterval screenTime)
+        /// <param name="allowFeedbackCollection"><see langword="true"/> to allow feedback
+        /// collection, otherwise; <see langword="false"/>.</param>
+        void Save(TimeInterval screenTime, bool allowFeedbackCollection)
         {
-            bool collectFeedback = ShouldCollectFeedback();
+            bool collectFeedback = allowFeedbackCollection && ShouldCollectFeedback();
 
             // Collect original image and found data feedback if necessary (regardless of what
             // reason the file is being saved).
@@ -1157,16 +1169,11 @@ namespace Extract.Redaction.Verification
                 return;
             }
 
-            StopScreenTimeTimer();
-            SaveRedactionCounts();
-
             // Ensure slideshow timer is not running until the next document is completely loaded.
             if (_slideshowTimer.Enabled)
             {
                 StopSlideshowTimer();
             }
-
-            CommitComment();
 
             _navigationTarget = navigationTarget;
 
@@ -1382,18 +1389,19 @@ namespace Extract.Redaction.Verification
 
         /// <summary>
         /// Displays a warning message that allows the user to save or discard any changes. If no 
-        /// changes have been made, no message is displayed.
+        /// changes have been made, no message is displayed. In all cases except the case that the
+        /// user selects cancel or there is invalid data, metadata (a verification session node) is
+        /// added to the VOA file.
         /// </summary>
-        /// <returns><see langword="true"/> if the user chose to cancel or the user tried to save 
-        /// with invalid data; <see langword="false"/> if the currently viewed document was not 
-        /// modified or if changes were successfully discarded or saved.</returns>
-        bool WarnIfDirty()
+        /// <returns><see langword="false"/> if the user chose to cancel or the user tried to save 
+        /// with invalid data; otherwise true <see langword="true"/>.</returns>
+        bool PromptAndSaveIfDirty()
         {
             // [FlexIDSCore:4708]
             // If in stand-alone mode, there are different prompts that need to be displayed.
             if (_standAloneMode)
             {
-                return WarnIfDirtyStandAlone();
+                return PromptAndSaveStandAlone();
             }
 
             // Check if the viewed document is dirty
@@ -1426,7 +1434,7 @@ namespace Extract.Redaction.Verification
                             StopSlideshow(true);
                         }
 
-                        return true;
+                        return false;
                     }
                     else if (result == "Save")
                     {
@@ -1435,15 +1443,17 @@ namespace Extract.Redaction.Verification
                             // Prompt for invalid data only if in the history queue [FIDSC #3863]
                             if (WarnIfInvalid())
                             {
-                                return true;
+                                return false;
                             }
 
                             Commit();
+
+                            // We're done.
+                            return true;
                         }
                         else
                         {
-                            TimeInterval screenTime = StopScreenTimeTimer();
-                            Save(screenTime);
+                            CommitComment();
                         }
 
                         if (slideshowRunning)
@@ -1452,6 +1462,11 @@ namespace Extract.Redaction.Verification
                             StartSlideshow();
                         }
                     }
+                    else if (result == "Discard")
+                    {
+                        // If discarding changes, revert to last saved data.
+                        LoadCurrentMemento();
+                    }
                 }
             }
             else
@@ -1459,7 +1474,19 @@ namespace Extract.Redaction.Verification
                 UpdateMemento();
             }
 
-            return false;
+            // Even if the user choses not to save changes or there have been no changes,
+            // per discussion with Arvind, metadata (a verification session node) should still be
+            // saved.
+            if (_imageViewer.IsImageAvailable)
+            {
+                TimeInterval screenTime = StopScreenTimeTimer();
+                Save(screenTime, false);
+
+                // Always udpate the IDShieldData table here (if applicable).
+                SaveRedactionCounts();
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -1467,10 +1494,9 @@ namespace Extract.Redaction.Verification
         /// data file and to output a redacted image. For use  when redaction verification is in
         /// stand-alone mode. If no changes have been made, no message is displayed.
         /// </summary>
-        /// <returns><see langword="true"/> if the user chose to cancel or the user tried to save 
-        /// with invalid data; <see langword="false"/> if the currently viewed document was not 
-        /// modified or if changes were successfully discarded or saved.</returns>
-        bool WarnIfDirtyStandAlone()
+        /// <returns><see langword="false"/> if the user chose to cancel or the user tried to save
+        /// with invalid data; otherwise true <see langword="true"/>.</returns>
+        bool PromptAndSaveStandAlone()
         {
             ExtractException.Assert("ELI34314", "Internal logic error.", _standAloneMode);
 
@@ -1521,12 +1547,12 @@ namespace Extract.Redaction.Verification
                         string result = messageBox.Show(this);
                         if (result == "Cancel")
                         {
-                            return true;
+                            return false;
                         }
                         else if (result == "Save")
                         {
                             TimeInterval screenTime = StopScreenTimeTimer();
-                            Save(screenTime);
+                            Save(screenTime, true);
                         }
                     }
                 }
@@ -1547,7 +1573,7 @@ namespace Extract.Redaction.Verification
                     string result = messageBox.Show(this);
                     if (result == "Cancel")
                     {
-                        return true;
+                        return false;
                     }
                     else if (result == "Save")
                     {
@@ -1560,7 +1586,7 @@ namespace Extract.Redaction.Verification
                 UpdateMemento();
             }
 
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -1784,7 +1810,7 @@ namespace Extract.Redaction.Verification
         {
             // Do not allow saving and commiting if the imageviewer is
             // processing a tracking event
-            if (_imageViewer.IsImageAvailable && !_imageViewer.IsTracking)
+            if (_imageViewer.IsImageAvailable && !_imageViewer.IsTracking && !_formClosing)
             {
                 _redactionGridView.CommitChanges();
 
@@ -2122,13 +2148,8 @@ namespace Extract.Redaction.Verification
                 _redactionGridView.CommitChanges();
 
                 // Check if changes have been made before moving away from a history document
-                if (!WarnIfDirty())
+                if (PromptAndSaveIfDirty())
                 {
-                    StopScreenTimeTimer();
-                    SaveRedactionCounts();
-
-                    CommitComment();
-
                     if (!IsInHistory)
                     {
                         // Prevent outside sources from writing to the processing document
@@ -2173,7 +2194,7 @@ namespace Extract.Redaction.Verification
         /// the next document is opened.</param>
         void GoToNextDocument(bool promptForSlideshowAdvance, DocumentNavigationTarget navigationTarget)
         {
-            if (_standAloneMode || !_imageViewer.IsImageAvailable)
+            if (_standAloneMode || !_imageViewer.IsImageAvailable || _formClosing)
             {
                 return;
             }
@@ -2197,7 +2218,7 @@ namespace Extract.Redaction.Verification
                 }
             }
             // If the user is advancing past a previously committed document.
-            else if (!WarnIfDirty())
+            else if (PromptAndSaveIfDirty())
             {
                 AdvanceToNextDocument(navigationTarget);
             }
@@ -2617,26 +2638,32 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                _formClosing = true;
+
                 _redactionGridView.CommitChanges();
 
                 // Warn if the currently processing document is dirty
-                if (WarnIfDirty())
+                if (!PromptAndSaveIfDirty())
                 {
                     e.Cancel = true;
                 }
-                else
-                {
-                    CommitComment();
-                }
 
                 // Don't call base.OnFormClosing until we know know if the close is being canceled
-                // (if VerificationForm receives a FormClosing event, it expects that the form will
+                // (If VerificationForm receives a FormClosing event, it expects that the form will
                 // indeed close).
                 base.OnFormClosing(e);
             }
             catch (Exception ex)
             {
                 ExtractException.Display("ELI27116", ex);
+            }
+            finally
+            {
+                if (e.Cancel)
+                {
+                    // The close was cancelled. Reset _formClosing;
+                    _formClosing = false;
+                }
             }
         }
 
@@ -2772,9 +2799,26 @@ namespace Extract.Redaction.Verification
                     _redactionGridView.CommitChanges();
 
                     TimeInterval screenTime = StopScreenTimeTimer();
-                    Save(screenTime);
+                    Save(screenTime, true);
 
                     SaveRedactionCounts();
+
+                    CommitComment();
+
+                    // Keep track of the selection prior to saving.
+                    List<int> currentGridSelection = new List<int>(_redactionGridView.SelectedRowIndexes);
+
+                    // [FlexIDSCore:5028, 5029]
+                    // Re-load from file to start a new verification session. This needs to be done
+                    // to properly track changes, otherwise items that were modified before the save
+                    // may get re-output separately on the second save. 
+                    LoadCurrentMemento();
+
+                    // Restore the previous selection.
+                    _redactionGridView.Select(currentGridSelection, false);
+
+                    // Restart the screen timer to ensure all time spent verifying is accounted for.
+                    StartScreenTimeTimer();
                 }
             }
             catch (Exception ex)
@@ -2800,18 +2844,13 @@ namespace Extract.Redaction.Verification
                 {
                     _redactionGridView.CommitChanges();
 
-                    if (!WarnIfDirty())
+                    if (PromptAndSaveIfDirty())
                     {
-                        StopScreenTimeTimer();
-                        SaveRedactionCounts();
-
                         VerificationMemento memento = GetCurrentDocument();
                         _preHistoricPageVerificationTime = new Tuple<int, double>(
                             _preHistoricPageVerificationTime.Item1,
                             _preHistoricPageVerificationTime.Item2
                                 + memento.ScreenTimeThisSession + memento.OverheadTimeThisSession);
-
-                        CommitComment();
 
                         // Close current image before opening a new one. [FIDSC #3824]
                         _imageViewer.CloseImage();
@@ -3190,7 +3229,7 @@ namespace Extract.Redaction.Verification
         {
             // Restore selection of any sensitive items that were selected if the document was
             // previously viewed.
-            _redactionGridView.Select(memento.Selection);
+            _redactionGridView.Select(memento.Selection, true);
 
             if (memento.ImagePageData == null)
             {
@@ -3637,7 +3676,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                if (WarnIfDirty())
+                if (!PromptAndSaveIfDirty())
                 {
                     e.Cancel = true;
                 }

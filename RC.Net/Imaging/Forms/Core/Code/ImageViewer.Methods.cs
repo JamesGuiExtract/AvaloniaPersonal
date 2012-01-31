@@ -4071,51 +4071,51 @@ namespace Extract.Imaging.Forms
         void SetFitMode(FitMode fitMode, bool updateZoomHistory, bool raiseZoomChanged, 
             bool raiseFitModeChanged)
         {
-            switch (fitMode)
-            {
-                case FitMode.FitToPage:
-
-                    // Set the fit mode
-                    ShowFitToPage();
-                    break;
-
-                case FitMode.FitToWidth:
-
-                    // Set the fit mode, preserving the scroll position
-                    Point scrollPosition = ScrollPosition;
-                    ShowFitToWidth();
-                    ScrollPosition = scrollPosition;
-                    break;
-
-                case FitMode.None:
-
-                    // [DataEntry:837]
-                    // If a zero-size rectangle has been specified (as is the case with a minimized
-                    // window), zooming is not possible and would throw an exception if attempted.
-                    if (DisplayRectangle.Width >= 1 && DisplayRectangle.Height >= 1)
-                    {
-                        // Zoom the specified rectangle
-                        base.ZoomToRectangle(DisplayRectangle);
-                    }
-                    break;
-
-                default:
-                    throw new ExtractException("ELI21234", "Unrecognized FitMode value.");
-            }
-
             _fitMode = fitMode;
             RegistryManager.FitMode = fitMode;
 
-            // Update the zoom history if necessary
-            if (base.Image != null)
+            if (IsImageAvailable)
             {
-                UpdateZoom(updateZoomHistory, false);
-            }
+                switch (fitMode)
+                {
+                    case FitMode.FitToPage:
 
-            // Raise OnZoomChanged in case a change in fit mode requires a new zoom history entry.
-            if (raiseZoomChanged)
-            {
-                OnZoomChanged(new ZoomChangedEventArgs(GetZoomInfo()));
+                        // Set the fit mode
+                        ShowFitToPage();
+                        break;
+
+                    case FitMode.FitToWidth:
+
+                        // Set the fit mode, preserving the scroll position
+                        Point scrollPosition = ScrollPosition;
+                        ShowFitToWidth();
+                        ScrollPosition = scrollPosition;
+                        break;
+
+                    case FitMode.None:
+
+                        // [DataEntry:837]
+                        // If a zero-size rectangle has been specified (as is the case with a minimized
+                        // window), zooming is not possible and would throw an exception if attempted.
+                        if (DisplayRectangle.Width >= 1 && DisplayRectangle.Height >= 1)
+                        {
+                            // Zoom the specified rectangle
+                            base.ZoomToRectangle(DisplayRectangle);
+                        }
+                        break;
+
+                    default:
+                        throw new ExtractException("ELI21234", "Unrecognized FitMode value.");
+                }
+
+                // Update the zoom history if necessary
+                UpdateZoom(updateZoomHistory, false);
+
+                // Raise OnZoomChanged in case a change in fit mode requires a new zoom history entry.
+                if (raiseZoomChanged)
+                {
+                    OnZoomChanged(new ZoomChangedEventArgs(GetZoomInfo()));
+                }
             }
 
             // Raise the FitModeChanged event if necessary
@@ -4160,7 +4160,14 @@ namespace Extract.Imaging.Forms
                 Rotate(orientationDelta, false, false);
             }
 
-            ScaleFactor = zoomInfo.ScaleFactor;
+            if (_fitMode == FitMode.None)
+            {
+                ScaleFactor = zoomInfo.ScaleFactor;
+            }
+            else
+            {
+                ShowFitMode(_fitMode);
+            }
 
             // Center at the specified point
             CenterAtPoint(zoomInfo.Center, false, false);

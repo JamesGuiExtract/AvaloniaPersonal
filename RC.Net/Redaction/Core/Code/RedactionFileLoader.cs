@@ -127,6 +127,12 @@ namespace Extract.Redaction
         /// </summary>
         long _nextId;
 
+        /// <summary>
+        /// This class is not currently able to correctly handle saving multiple times for a given
+        /// file. Keep track of whether we have already saved.
+        /// </summary>
+        bool _alreadySaved;
+
         #endregion Fields
 
         #region Constructors
@@ -314,6 +320,8 @@ namespace Extract.Redaction
         {
             try
             {
+                _alreadySaved = false;
+
                 Initialize(fileName, sourceDocument);
 
                 if (File.Exists(fileName))
@@ -959,6 +967,9 @@ namespace Extract.Redaction
         void SaveSession(string sessionName, int lastSessionId, string fileName, 
             RedactionFileChanges changes, TimeInterval time, ComAttribute sessionData)
         {
+            ExtractException.Assert("ELI34362", "Redaction data file save not allowed.",
+                !_alreadySaved);
+
             List<SensitiveItem> sensitiveItems = new List<SensitiveItem>(_sensitiveItems);
 
             // Update any changed items (deleted, modified, and added)
@@ -977,6 +988,8 @@ namespace Extract.Redaction
 
             // Save the attributes
             SaveAttributesTo(sensitiveItems, attributes, fileName);
+
+            _alreadySaved = true;
         }
 
         /// <summary>
@@ -990,8 +1003,8 @@ namespace Extract.Redaction
         /// <returns>The attributes after changes are made.</returns>
         IUnknownVector PrepareOutput(List<SensitiveItem> sensitiveItems, RedactionFileChanges changes)
         {
-            RedactionItem[] oldDeleted;
-            RedactionItem[] oldModified;
+            IEnumerable<RedactionItem> oldDeleted;
+            IEnumerable<RedactionItem> oldModified;
 
             if (changes == null)
             {
@@ -1006,7 +1019,7 @@ namespace Extract.Redaction
             }
 
             // Get the non output redactions
-            RedactionItem[] oldNonOutput = GetNonOutputRedactions(sensitiveItems);
+            IEnumerable<RedactionItem> oldNonOutput = GetNonOutputRedactions(sensitiveItems);
 
             // Copy the original metadata attributes in to a vector
             IUnknownVector attributes = CopyMetadataAttributes();
@@ -1042,14 +1055,13 @@ namespace Extract.Redaction
         /// <param name="items">The items to be updated.</param>
         /// <param name="deleted">The attributes to delete.</param>
         /// <returns>The previous version of the deleted attributes.</returns>
-        static RedactionItem[] UpdateDeletedItems(IList<SensitiveItem> items,
+        static IEnumerable<RedactionItem> UpdateDeletedItems(IList<SensitiveItem> items,
             ICollection<RedactionItem> deleted)
         {
-            // Make an array to hold the previous version of the modified attributes
-            RedactionItem[] oldDeleted = new RedactionItem[deleted.Count];
+            // Make an list to hold the previous version of the modified attributes
+            List<RedactionItem> oldDeleted = new List<RedactionItem>(deleted.Count);
 
             // Iterate over each deleted attribute
-            int i = 0;
             foreach (RedactionItem attribute in deleted)
             {
                 long targetId = attribute.GetId();
@@ -1063,8 +1075,7 @@ namespace Extract.Redaction
                 }
 
                 // Store the previous version
-                oldDeleted[i] = items[index].Attribute;
-                i++;
+                oldDeleted.Add(items[index].Attribute);
 
                 // Remove the deleted attribute
                 items.RemoveAt(index);
@@ -1079,14 +1090,13 @@ namespace Extract.Redaction
         /// <param name="items">The items to be updated.</param>
         /// <param name="modified">The attributes to modify.</param>
         /// <returns>The previous version of the modified attributes.</returns>
-        static RedactionItem[] UpdateModifiedItems(IList<SensitiveItem> items,
+        static IEnumerable<RedactionItem> UpdateModifiedItems(IList<SensitiveItem> items,
             ICollection<RedactionItem> modified)
         {
-            // Make an array to hold the previous version of the modified attributes
-            RedactionItem[] oldModified = new RedactionItem[modified.Count];
+            // Make an list to hold the previous version of the modified attributes
+            List<RedactionItem> oldModified = new List<RedactionItem>(modified.Count);
 
             // Iterate over each modified attribute
-            int i = 0;
             foreach (RedactionItem attribute in modified)
             {
                 long targetId = attribute.GetId();
@@ -1101,8 +1111,13 @@ namespace Extract.Redaction
 
                 // Store the previous version
                 SensitiveItem old = items[index];
-                oldModified[i] = old.Attribute;
-                i++;
+
+                // [FlexIDSCore:5029]
+                // Non-redacted attributes will be collected in GetNonOutputRedactions.
+                if (attribute.Redacted)
+                {
+                    oldModified.Add(old.Attribute);
+                }
 
                 // Update the version number of the modified attribute
                 attribute.IncrementRevision();
@@ -1161,7 +1176,7 @@ namespace Extract.Redaction
         /// <param name="redactions">The redactions to check for non-output.</param>
         /// <returns>The redactions in <paramref name="redactions"/> that are marked to not be 
         /// output.</returns>
-        static RedactionItem[] GetNonOutputRedactions(IEnumerable<SensitiveItem> redactions)
+        static IEnumerable<RedactionItem> GetNonOutputRedactions(IEnumerable<SensitiveItem> redactions)
         {
             List<RedactionItem> nonOutputRedactions = new List<RedactionItem>();
             foreach (SensitiveItem item in redactions)
@@ -1173,7 +1188,7 @@ namespace Extract.Redaction
                 }
             }
 
-            return nonOutputRedactions.ToArray();
+            return nonOutputRedactions;
         }
 
         /// <summary>
@@ -1375,7 +1390,7 @@ namespace Extract.Redaction
         /// <param name="oldNonOutput">Previous versions of the attributes marked to not be 
         /// output.</param>
         void AddRevisions(ComAttribute revisions, IEnumerable<RedactionItem> oldDeleted,
-            IEnumerable<RedactionItem> oldModified, RedactionItem[] oldNonOutput)
+            IEnumerable<RedactionItem> oldModified, IEnumerable<RedactionItem> oldNonOutput)
         {
             IUnknownVector subAttributes = revisions.SubAttributes;
             foreach (RedactionItem deleted in oldDeleted)
