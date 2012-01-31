@@ -1,4 +1,8 @@
 @echo off
+
+c:
+cd C:\Demo_FlexIndex
+
 ECHO.
 ECHO Deleting all temporary demo files...
 ECHO.
