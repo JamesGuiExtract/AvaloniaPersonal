@@ -247,6 +247,16 @@ namespace Extract.Utilities.Forms
                     scanCode |= 0xe000;
                 }
 
+                // [FlexIDSCore:5036]
+                // There is a not readily reproducible situation where we end up with a 0 scanCode.
+                // Since this situation seems fairly benign, for the 9.0 release, we will simply log
+                // and move on. We can investigate this issue further following release.
+                if (scanCode == 0)
+                {
+                    new ExtractException("ELI34367", "Unexpected key code.").Log();
+                    return Keys.None;   
+                }
+
                 lock (_keyMappingLock)
                 {
                     // If this scan code has already been mapped return the mapped virtual key,

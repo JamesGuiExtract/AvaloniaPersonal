@@ -99,8 +99,10 @@ namespace Extract.FileActionManager.FileProcessors
         /// Current task version.
         /// <para><b>Version 2</b></para>
         /// Added UseAlternateMethod.
+        /// <para><b>Version 3</b></para>
+        /// Alternate method now = Nuance
         /// </summary>
-        const int _CURRENT_VERSION = 2;
+        const int _CURRENT_VERSION = 3;
 
         #endregion Constants
 
@@ -133,8 +135,10 @@ namespace Extract.FileActionManager.FileProcessors
 
         /// <summary>
         /// Indicates whether to use the alternate method of rasterization.
+        /// Nuance produces better results on color PDFs and does not suffer from
+        /// [DotNetRCAndUtils:742], so it is the default.
         /// </summary>
-        bool _useAlternateMethod;
+        bool _useAlternateMethod = true;
 
         /// <summary>
         /// Indicates that settings have been changed, but not saved.
@@ -563,11 +567,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 // Convert to TIF
-                // Since ImageMethod's (and ImageFormatConverter's) "alternate method" is Nuance,
-                // but Nuance produces better results on color PDFs and does not suffer from
-                // [DotNetRCAndUtils:742], in terms of this task the default method will be Nuance
-                // and the alternate will be LeadTools.
-                ImageMethods.ConvertPdfToTif(pdfFile, destFile, !_useAlternateMethod);
+                ImageMethods.ConvertPdfToTif(pdfFile, destFile, _useAlternateMethod);
 
                 // Delete PDF if specified
                 if (_deletePdf)
@@ -693,7 +693,13 @@ namespace Extract.FileActionManager.FileProcessors
                     _deletePdf = reader.ReadBoolean();
                     _failTask = reader.ReadBoolean();
                     _changeSourceDocName = reader.ReadBoolean();
-                    if (reader.Version >= 2)
+                    if (reader.Version == 2)
+                    {
+                        // In version 2, alternate method was LeadTools. In version >= 3 Nuance is
+                        // the alternate method.
+                        _useAlternateMethod = !reader.ReadBoolean();
+                    }
+                    else if (reader.Version >= 3)
                     {
                         _useAlternateMethod = reader.ReadBoolean();
                     }

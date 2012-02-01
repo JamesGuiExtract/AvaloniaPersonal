@@ -4142,7 +4142,20 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void StartSlideshowTimer()
         {
-            ExtractException.Assert("ELI32180", "Slideshow error.", _slideshowRunning);
+            try
+            {
+                ExtractException.Assert("ELI32180", "Slideshow error.", _slideshowRunning);
+            }
+            catch (Exception ex)
+            {
+                // [FlexIDSCore:5035]
+                // We were not able to readily reproduce a situation that generated this exception.
+                // For the 9.0 release, we will simply log and ignore this call to prevent
+                // the possibility of displaying an exception for what should be a benign case.
+                // For 10.0, the cause can be investigated further.
+                ex.ExtractLog("ELI34366");
+                return;
+            }
 
             if (!_slideshowTimer.Enabled)
             {

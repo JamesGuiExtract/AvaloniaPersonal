@@ -311,6 +311,10 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         {
             _lastCodePos = "190";
             ipFoundAttr = ipVOAAttr;
+
+			// [FlexIDSCore:5002]
+			// Do not attempt to redact metadata attributes.
+			getAFUtility()->RemoveMetadataAttributes(ipFoundAttr);
         }
         _lastCodePos = "200";
 
