@@ -28,6 +28,29 @@ if(typeof Array.prototype.map !== 'function') {
 }
 
 //--------------------------------------------------------------------------------------------------
+// Add filter function to Array
+//--------------------------------------------------------------------------------------------------
+if(typeof Array.prototype.filter !== 'function') {
+  Array.prototype.filter = function(fn /*, thisp*/) {
+    var len = this.length;
+    if (typeof fn != "function")
+      throw new TypeError();
+
+    var res = new Array();
+    var thisp = arguments[1];
+    for (var i = 0; i < len; i++) {
+      if (i in this) {
+        var val = this[i]; // in case fun mutates this
+        if (fn.call(thisp, val, i, this)) {
+          res.push(val);
+        }
+      }
+    }
+    return res;
+  };
+}
+
+//--------------------------------------------------------------------------------------------------
 // Add has function to Array
 //--------------------------------------------------------------------------------------------------
 if(typeof Array.prototype.has !== 'function') {
@@ -225,6 +248,34 @@ function writeText(fname, text) {
     // Write to the file
     f.Write(text);
     f.Close();
+}
+
+//--------------------------------------------------------------------------------------------------
+// Get array of file objects from a directory name
+//--------------------------------------------------------------------------------------------------
+function getFiles(dirname, recursive) {
+  var ret = [];
+
+  _getFiles(dirname);
+
+  function _getFiles(dirname) {
+     var folder = fso.GetFolder(dirname);
+     // Get Files in current directory  
+     var files = new Enumerator(folder.files);
+     // Loop through files  
+     for(; !files.atEnd(); files.moveNext()) {
+        ret.push(files.item());
+     }
+
+     if (recursive) {
+       var subfolders = new Enumerator(folder.SubFolders);
+
+       for(; !subfolders.atEnd(); subfolders.moveNext()) {
+          _getFiles(subfolders.item().Path);
+       }
+     }
+  }
+  return ret;
 }
 
 //--------------------------------------------------------------------------------------------------
