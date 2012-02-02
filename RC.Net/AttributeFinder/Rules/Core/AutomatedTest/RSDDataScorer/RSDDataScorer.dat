@@ -17,3 +17,11 @@
 // GetDataScore2
 // $Date.?{date(#this) < DateTime.Now.AddYears(-10)}.count()
 <TESTCASE>;Test5.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+// [FlexIDSCore:4993]
+// Tests that RSD Scorer doesn't error out if the scoring ruleset outputs an attribute that is not referenced.
+<TESTCASE>;Test6.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
+
+// Tests that RSD data scorer works when one attribute name is the subset of another.
+// $what.count() + $what1.count()
+<TESTCASE>;Test7.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
