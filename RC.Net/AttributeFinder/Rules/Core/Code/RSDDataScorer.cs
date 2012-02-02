@@ -639,7 +639,13 @@ namespace Extract.AttributeFinder.Rules
             // Any of the variables that used "$" to reference the string version of the variable
             // should be replaced with a "#" version that will be recognized by the expression
             // evaluation engine.
-            foreach (string variableName in _variableNames)
+            // [FlexIDSCore:5002]
+            // Replaces variables in reverse order of length so that if one variable name is part
+            // of another variable name, the shorter variable name doesn't get replaced where the
+            // longer one should have been.
+            foreach (string variableName in _variableNames
+                .OrderBy(name => name.Length)
+                .Reverse())
             {
                 _preparedExpression = _preparedExpression.Replace("$" + variableName, 
                     "#" + variableName + _STRING_VALUE);
