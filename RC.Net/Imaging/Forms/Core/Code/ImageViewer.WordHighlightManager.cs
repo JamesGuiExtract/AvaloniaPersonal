@@ -1677,80 +1677,86 @@ namespace Extract.Imaging.Forms
                 // Code that needs to be run on the UI thread can be run using ExecuteInUIThread.
 
                 SpatialString pageOcr = null;
-                ThreadSafeSpatialString ocrData;
-                bool pageAlreadyLoading = false;
-                if (_ocrPageData.TryGetValue(page, out ocrData))
+
+                // As long a we're not interrupted by another operation, allow for 3 attempts to
+                // get the OCR for this page.
+                for (int attempt = 0; attempt < 3; attempt++)
                 {
-                    if (ocrData == null)
-                    {
-                        // A null value in the map indicates OCR is currently in progress for this page.
-                        pageAlreadyLoading = true;
-                    }
-                    else
-                    {
-                        // If cached data already exists, use it.
-                        pageOcr = ocrData.SpatialString;
-                    }
-                }
+                    _cancelToken.ThrowIfCancellationRequested();
 
-                if (pageOcr == null)
-                {   
-                    // If OCR data is available for the document as a whole, simply grab the page
-                    // needed.
-                    if (_ocrData != null && _ocrData.SpatialString.HasSpatialInfo())
+                    ThreadSafeSpatialString ocrData;
+                    bool pageAlreadyLoading = false;
+                    if (_ocrPageData.TryGetValue(page, out ocrData))
                     {
-                        pageOcr = _ocrData.SpatialString.GetSpecifiedPages(page, page);
-
-                        if (pageOcr != null)
+                        if (ocrData == null)
                         {
-                            // Cache any valid data for the page.
-                            _ocrPageData[page] = new ThreadSafeSpatialString(_imageViewer, pageOcr);
+                            // A null value in the map indicates OCR is currently in progress for this page.
+                            pageAlreadyLoading = true;
+                        }
+                        else
+                        {
+                            // If cached data already exists, use it.
+                            pageOcr = ocrData.SpatialString;
                         }
                     }
-                    // Otherwise attempt to OCR data if _imageViewer.AutoOcr is on.
-                    else if (_ocrData == null)
+
+                    if (pageOcr == null)
                     {
-                        bool autoOcr = false;
-                        OcrTradeoff ocrTradeoff = OcrTradeoff.Balanced;
-                        string imageFile = string.Empty;
-
-                        if (LicenseUtilities.IsLicensed(LicenseIdName.OcrOnClientFeature))
+                        // If OCR data is available for the document as a whole, simply grab the page
+                        // needed.
+                        if (_ocrData != null && _ocrData.SpatialString.HasSpatialInfo())
                         {
-                            ExecuteInUIThread(() =>
+                            pageOcr = _ocrData.SpatialString.GetSpecifiedPages(page, page);
+
+                            if (pageOcr != null)
                             {
-                                autoOcr = _imageViewer.AutoOcr;
-                                ocrTradeoff = _imageViewer.OcrTradeoff;
-                                imageFile = _imageViewer.ImageFile;
-                            });
+                                // Cache any valid data for the page.
+                                _ocrPageData[page] = new ThreadSafeSpatialString(_imageViewer, pageOcr);
+                            }
                         }
-
-                        if (autoOcr)
+                        // Otherwise attempt to OCR data if _imageViewer.AutoOcr is on.
+                        else if (_ocrData == null)
                         {
-                            if (pageAlreadyLoading && _currentBackgroundOCRTask != null)
-                            {
-                                // Wait for completion as long as we don't receive a cancel request.
-                                _currentBackgroundOCRTask.Wait(_cancelToken);
+                            bool autoOcr = false;
+                            OcrTradeoff ocrTradeoff = OcrTradeoff.Balanced;
+                            string imageFile = string.Empty;
 
-                                if (_ocrPageData.TryGetValue(page, out ocrData) && ocrData != null &&
-                                    ocrData.SpatialString.HasSpatialInfo())
+                            if (LicenseUtilities.IsLicensed(LicenseIdName.OcrOnClientFeature))
+                            {
+                                ExecuteInUIThread(() =>
                                 {
-                                    return ocrData.SpatialString;
-                                }
+                                    autoOcr = _imageViewer.AutoOcr;
+                                    ocrTradeoff = _imageViewer.OcrTradeoff;
+                                    imageFile = _imageViewer.ImageFile;
+                                });
                             }
 
-                            pageOcr = PerformBackgroundOcr(imageFile, page, ocrTradeoff);
+                            if (autoOcr)
+                            {
+                                if (pageAlreadyLoading && _currentBackgroundOCRTask != null)
+                                {
+                                    // Wait for completion as long as we don't receive a cancel request.
+                                    _currentBackgroundOCRTask.Wait(_cancelToken);
+
+                                    if (_ocrPageData.TryGetValue(page, out ocrData) && ocrData != null &&
+                                        ocrData.SpatialString.HasSpatialInfo())
+                                    {
+                                        return ocrData.SpatialString;
+                                    }
+                                }
+
+                                pageOcr = PerformBackgroundOcr(imageFile, page, ocrTradeoff);
+                            }
                         }
+                    }
+
+                    if (pageOcr != null && pageOcr.HasSpatialInfo())
+                    {
+                        return pageOcr;
                     }
                 }
 
-                if (pageOcr != null && pageOcr.HasSpatialInfo())
-                {
-                    return pageOcr;
-                }
-                else
-                {
-                    return null;
-                }
+                return null;
             }
 
             /// <summary>
@@ -1884,6 +1890,7 @@ namespace Extract.Imaging.Forms
                 // thread. Code that needs to be run on the UI thread can be run using
                 // ExecuteInUIThread.
 
+                IAsyncOcrResult ocrResult = null;
                 try
                 {
                     // Set up a new OCR operation.
@@ -1904,26 +1911,28 @@ namespace Extract.Imaging.Forms
                         }
 
                         _ocrManager.Tradeoff = ocrTradeoff;
-                        _ocrManager.OcrFile(imageFile, pageNumber, pageNumber, cancelToken);
+                        ocrResult = _ocrManager.OcrFile(imageFile, pageNumber, pageNumber, cancelToken);
                     }
 
-                    _ocrManager.WaitForOcrCompletion();
+                    ocrResult.AsyncWaitHandle.WaitOne();
 
                     lock (_ocrLock)
                     {
                         cancelToken.ThrowIfCancellationRequested();
 
+                        string ocrData = (string)ocrResult.AsyncState;
+
                         // If the output is null but an exception wasn't thrown, the OCR operation
                         // was likely cancelled by a previous operation. Worst case, this will force
                         // another OCR attempt on a page without text.
-                        if (string.IsNullOrEmpty(_ocrManager.OcrOutput))
+                        if (string.IsNullOrEmpty(ocrData))
                         {
                             throw new OperationCanceledException();
                         }
 
                         // We have valid OCR results. Cache them.
                         _ocrPageData[pageNumber] =
-                            new ThreadSafeSpatialString(_imageViewer, _ocrManager.OcrOutput);
+                            new ThreadSafeSpatialString(_imageViewer, ocrData);
                     }
 
                     return _ocrPageData[pageNumber].SpatialString;
@@ -1971,6 +1980,15 @@ namespace Extract.Imaging.Forms
                     }
 
                     throw ex.AsExtract("ELI32614");
+                }
+                finally
+                {
+                    // Ensure the operation is completed and dispose of it if so.
+                    // Otherwise, we'll have to wait for the garbage collector to do so.
+                    if (ocrResult != null && ocrResult.IsCompleted)
+                    {
+                        ocrResult.Dispose();
+                    }
                 }
             }
 

@@ -106,6 +106,23 @@ namespace Extract.Imaging
     }
 
     /// <summary>
+    /// Provides a way to wait for and access the results of an asynchronous OCR operation.
+    /// <para><b>Note</b></para>
+    /// While this interface implements <see cref="IDisposable"/>, do not dispose of an instance
+    /// if <see cref="IAsyncResult.IsCompleted"/> is <see langword="false"/>.
+    /// </summary>
+    public interface IAsyncOcrResult : IAsyncResult, IDisposable
+    {
+        /// <summary>
+        /// The data from the OCR operation.
+        /// </summary>
+        string OcrData
+        {
+            get;
+        }
+    }
+
+    /// <summary>
     /// A class to manage launching OCR operations in a separate thread.  Currently
     /// only supports OCR of one document at a time.  If
     /// <see cref="OcrFile(string, int, int, CancellationToken?)"/> is called multiple times it
@@ -131,6 +148,11 @@ namespace Extract.Imaging
         /// </summary>
         static readonly int _OCR_THREAD_COMPLETION_TIMEOUT = 60000;
 
+        /// <summary>
+        /// The number of milliseconds to allow a new operation to initialize before attempting to
+        /// retrieve progress data or allowing it to be cancelled.
+        /// </summary>
+        static readonly int _OPERATION_INIT_TIME = 250;
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
@@ -139,6 +161,141 @@ namespace Extract.Imaging
             typeof(AsynchronousOcrManager).ToString();
 
         #endregion Constants
+
+        #region ASyncOcrResult
+
+        /// <summary>
+        /// Provides a way for callers wait for and access the results of an asynchronous OCR
+        /// operation.
+        /// </summary>
+        class ASyncOcrResult : IAsyncOcrResult
+        {
+            #region Fields
+
+            /// <summary>
+            /// The data from the OCR operation.
+            /// </summary>
+            public string _ocrData;
+
+            /// <summary>
+            /// Indicates whether the OCR operation is complete (including failed/cancelled).
+            /// </summary>
+            public ManualResetEvent _completeEvent = new ManualResetEvent(false);
+
+            #endregion Fields
+
+            #region IAsyncOcrResult Members
+
+            /// <summary>
+            /// The data from the OCR operation.
+            /// </summary>
+            public string OcrData
+            {
+                get
+                {
+                    return _ocrData;
+                }
+            }
+
+            #endregion IAsyncOcrResult Members
+
+            #region IAsyncResult Members
+
+            /// <summary>
+            /// Gets the data from the OCR operation.
+            /// </summary>
+            /// <returns>A user-defined object that qualifies or contains information about an
+            /// asynchronous operation.</returns>
+            public object AsyncState
+            {
+                get
+                {
+                    return _ocrData;
+                }
+            }
+
+            /// <summary>
+            /// Gets a <see cref="T:System.Threading.WaitHandle"/> that is used to wait for an
+            /// asynchronous operation to complete.
+            /// </summary>
+            /// <returns>A <see cref="T:System.Threading.WaitHandle"/> that is used to wait for an
+            /// asynchronous operation to complete.</returns>
+            public WaitHandle AsyncWaitHandle
+            {
+                get
+                {
+                    return _completeEvent;
+                }
+            }
+
+            /// <summary>
+            /// Gets a value that indicates whether the asynchronous operation completed
+            /// synchronously
+            /// <para><b>Note</b></para>
+            /// Not used by this implementation.
+            /// </summary>
+            /// <returns><see langword="true"/> if the asynchronous operation completed synchronously;
+            /// otherwise, <see langword="false"/>.</returns>
+            public bool CompletedSynchronously
+            {
+                get
+                {
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// Gets a value that indicates whether the asynchronous operation has completed.
+            /// </summary>
+            /// <returns><see langword="true"/>  if the operation is complete; otherwise,
+            /// <see langword="false"/>.</returns>
+            public bool IsCompleted
+            {
+                get
+                {
+                    return (_completeEvent.WaitOne(0));
+                }
+            }
+
+            #endregion IAsyncResult Members
+
+            #region IDisposable Members
+
+            /// <summary>
+            /// Releases all resources used by the <see cref="ASyncOcrResult"/>.
+            /// </summary>
+            public void Dispose()
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            /// <overloads>Releases resources used by the <see cref="ASyncOcrResult"/>.
+            /// </overloads>
+            /// <summary>
+            /// Releases all unmanaged resources used by the <see cref="ASyncOcrResult"/>.
+            /// </summary>
+            /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
+            /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
+            protected virtual void Dispose(bool disposing)
+            {
+                // Dispose managed objects
+                if (disposing)
+                {
+                    if (_completeEvent != null)
+                    {
+                        _completeEvent.Close();
+                        _completeEvent = null;
+                    }
+                }
+
+                // No unmanaged resources to free
+            }
+
+            #endregion IDisposable Members
+        }
+
+        #endregion ASyncOcrResult
 
         #region Fields
 
@@ -162,6 +319,11 @@ namespace Extract.Imaging
         /// The name of the file for the OCR thread to perform text recognition on.
         /// </summary>
         volatile string _fileToOcr;
+
+        /// <summary>
+        /// The <see cref="ASyncOcrResult"/> for the active operation.
+        /// </summary>
+        ASyncOcrResult _result;
 
         /// <summary>
         /// Mutex object
@@ -222,6 +384,12 @@ namespace Extract.Imaging
         /// has been canceled.
         /// </summary>
         EventWaitHandle _ocrCanceledEvent = new ManualResetEvent(false);
+
+        /// <summary>
+        /// A <see cref="ManualResetEvent"/> indicating that a new operation can be started. Will
+        /// not be set while a previous operation is initializing.
+        /// </summary>
+        EventWaitHandle _canStartNewOperation = new ManualResetEvent(true);
 
         /// <summary>
         /// Active <see cref="CancellationToken"/> that can be used to cancel the currently running
@@ -395,6 +563,14 @@ namespace Extract.Imaging
         {
             try
             {
+                // [FlexIDSCore:5043]
+                // After the initial _OPERATION_INIT_TIME, consider this operation initialized and
+                // allow it to be cancelled in favor of another.
+                if (!_canStartNewOperation.WaitOne(0))
+                {
+                    _canStartNewOperation.Set();
+                }
+
                 // If there is a valid ProgressStatus object, update progress.
                 ProgressStatus progressStatus = state as ProgressStatus;
                 if(progressStatus != null)
@@ -432,16 +608,32 @@ namespace Extract.Imaging
                     // method to exit which will in turn end the thread.
                     while (WaitHandle.WaitAny(waitHandles) != 1)
                     {
+                        // Gather the information about this task before _canStartNewOperation is
+                        // set.
+                        string fileToOcr;
+                        int startPage;
+                        int endPage;
+                        Rectangle? zonalOcrArea = null;
+                        ASyncOcrResult result = null;
+                        lock (_lock)
+                        {
+                            fileToOcr = _fileToOcr;
+                            startPage = _startPage;
+                            endPage = _endPage;
+                            zonalOcrArea = _zonalOcrArea;
+                            result = _result;
+                        }
+
                         try
                         {
                             ProgressStatus progressStatus = new ProgressStatus();
 
-                            // Create and start a timer to update progress status.  Add a 250
-                            // ms delay to allow OCR to begin, this will help with the UI
-                            // refreshing with meaningful data sooner.
+                            // Create and start a timer to update progress status.  Add a small
+                            // delay to allow OCR to begin, this will help with the UI refreshing
+                            // with meaningful data sooner.
                             // NOTE: FxCop will complain if you set the interval time < 1000
                             using (Timer timer = new Timer(new TimerCallback(Tick),
-                                progressStatus, 250, 1000))
+                                progressStatus, _OPERATION_INIT_TIME, 1000))
                             {
                                 if (_ssocr == null)
                                 {
@@ -452,37 +644,40 @@ namespace Extract.Imaging
                                     _ssocr.InitPrivateLicense(GetSpecialOcrValue());
                                 }
 
-                                // Set the currently in OCR flag to true
-                                _currentlyInOcr = true;
-
-                                SpatialString ocrText;
-                                if (_zonalOcrArea == null)
+                                SpatialString ocrText = null;
+                                if (!OcrCanceled)
                                 {
-                                    // If _zonalOcrArea has not been specified, OCR the entire area
-                                    // each page.
-                                    ocrText = _ssocr.RecognizeTextInImage(_fileToOcr,
-                                    _startPage, _endPage, EFilterCharacters.kNoFilter, "",
-                                    (EOcrTradeOff)this.Tradeoff, true, progressStatus);
-                                }
-                                else
-                                {
-                                    // If _zonalOcrArea has been specified, OCR only the area
-                                    // within this logical area of this rectangle on each page.
-                                    // [LegacyRCAndUtils:5033] TODO: This currently does not respect
-                                    // this.Tradeoff.
-                                    LongRectangleClass zonalOCRRectangle = new LongRectangleClass();
-                                    zonalOCRRectangle.SetBounds(_zonalOcrArea.Value.Left,
-                                                                _zonalOcrArea.Value.Top,
-                                                                _zonalOcrArea.Value.Right,
-                                                                _zonalOcrArea.Value.Bottom);
+                                    // Set the currently in OCR flag to true
+                                    _currentlyInOcr = true;
 
-                                    ocrText = _ssocr.RecognizeTextInImageZone(_fileToOcr,
-                                        _startPage, _endPage, zonalOCRRectangle, 0, EFilterCharacters.kNoFilter,
-                                        "", false, false, true, null);
-                                }
+                                    if (zonalOcrArea == null)
+                                    {
+                                        // If _zonalOcrArea has not been specified, OCR the entire
+                                        // area each page.
+                                        ocrText = _ssocr.RecognizeTextInImage(fileToOcr,
+                                        startPage, endPage, EFilterCharacters.kNoFilter, "",
+                                        (EOcrTradeOff)this.Tradeoff, true, progressStatus);
+                                    }
+                                    else
+                                    {
+                                        // If _zonalOcrArea has been specified, OCR only the area
+                                        // within this logical area of this rectangle on each page.
+                                        // [LegacyRCAndUtils:5033] TODO: This currently does not
+                                        // respect this.Tradeoff.
+                                        LongRectangleClass zonalOCRRectangle = new LongRectangleClass();
+                                        zonalOCRRectangle.SetBounds(zonalOcrArea.Value.Left,
+                                                                    zonalOcrArea.Value.Top,
+                                                                    zonalOcrArea.Value.Right,
+                                                                    zonalOcrArea.Value.Bottom);
 
-                                // OCR complete, set currently in OCR flag to false
-                                _currentlyInOcr = false;
+                                        ocrText = _ssocr.RecognizeTextInImageZone(fileToOcr,
+                                            startPage, endPage, zonalOCRRectangle, 0,
+                                            EFilterCharacters.kNoFilter, "", false, false, true, null);
+                                    }
+
+                                    // OCR complete, set currently in OCR flag to false
+                                    _currentlyInOcr = false;
+                                }
 
                                 // Stop the progress timer
                                 timer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -495,6 +690,7 @@ namespace Extract.Imaging
                                         // Set empty output if canceled so a call doesn't mistake it
                                         // for valid output.
                                         _ocrTextStream = "";
+                                        result._ocrData = null;
                                     }
                                     else
                                     {
@@ -502,6 +698,7 @@ namespace Extract.Imaging
                                         MiscUtils miscUtils = new MiscUtils();
                                         _ocrTextStream =
                                             miscUtils.GetObjectAsStringizedByteStream(ocrText);
+                                        result._ocrData = _ocrTextStream;
                                     }
                                 }
                             }
@@ -526,6 +723,7 @@ namespace Extract.Imaging
                             {
                                 // Set the OCR text stream to empty string
                                 _ocrTextStream = "";
+                                result._ocrData = "";
                             }
 
                             // Wrap the exception as an ExtractException
@@ -537,9 +735,19 @@ namespace Extract.Imaging
                             // Raise the OcrError event
                             OnOcrError(new OcrErrorEventArgs(ee));
                         }
+                        finally
+                        {
+                            // The OcrOperation is complete/failed/cancelled. Ensure
+                            // _canStartNewOperation is set.
+                            if (!_canStartNewOperation.WaitOne(0))
+                            {
+                                _canStartNewOperation.Set();
+                            }
+                        }
 
                         // Set the OCR document complete event to signaled
                         _ocrDocumentCompleteEvent.Set();
+                        result._completeEvent.Set();
                     }
                 }
                 finally
@@ -574,10 +782,16 @@ namespace Extract.Imaging
         /// <param name="cancelToken">A <see cref="CancellationToken"/> that can be used to cancel
         /// the currently running operation in lieu of calling <see cref="CancelOcrOperation"/>.
         /// Can be <see langword="null"/> if there is no cancel token to use.</param>
-        public void OcrFile(string fileName, int startPage, int endPage,
+        /// <returns>An <see cref="IAsyncOcrResult"/> to allow waiting for and accessing the results
+        /// of the asynchronous OCR operation.
+        /// <para><b>Note</b></para>
+        /// Do not dispose of <see cref="IAsyncOcrResult"/> if
+        /// <see cref="IAsyncResult.IsCompleted"/> is <see langword="false"/>.
+        /// </returns>
+        public IAsyncOcrResult OcrFile(string fileName, int startPage, int endPage,
             CancellationToken? cancelToken)
         {
-            OcrImageArea(fileName, startPage, endPage, null, cancelToken);
+            return OcrImageArea(fileName, startPage, endPage, null, cancelToken);
         }
 
         /// <summary>
@@ -598,9 +812,17 @@ namespace Extract.Imaging
         /// <param name="cancelToken">A <see cref="CancellationToken"/> that can be used to cancel
         /// the currently running operation in lieu of calling <see cref="CancelOcrOperation"/>.
         /// Can be <see langword="null"/> if there is no cancel token to use.</param>
-        public void OcrImageArea(string fileName, int startPage, int endPage, Rectangle? imageArea,
-            CancellationToken? cancelToken)
+        /// <returns>An <see cref="IAsyncOcrResult"/> to allow waiting for and accessing the results
+        /// of the asynchronous OCR operation.
+        /// <para><b>Note</b></para>
+        /// Do not dispose of <see cref="IAsyncOcrResult"/> if
+        /// <see cref="IAsyncResult.IsCompleted"/> is <see langword="false"/>.
+        /// </returns>
+        public IAsyncOcrResult OcrImageArea(string fileName, int startPage, int endPage,
+            Rectangle? imageArea, CancellationToken? cancelToken)
         {
+            ASyncOcrResult result = new ASyncOcrResult();
+
             try
             {
                 // Ensure that a valid file name has been passed in.
@@ -619,6 +841,9 @@ namespace Extract.Imaging
                     {
                         // Signal OCR canceled
                         _ocrCanceledEvent.Set();
+
+                        // Give the last OCR operation a chance to initialize before trying to kill it.
+                        _canStartNewOperation.WaitOne(_OPERATION_INIT_TIME);
 
                         // If currently performing an OCR task then kill the OCR engine
                         if (_currentlyInOcr)
@@ -655,14 +880,24 @@ namespace Extract.Imaging
 
                         // Set the image area to OCR
                         _zonalOcrArea = imageArea;
+
+                        _result = result;
                     }
 
                     // Before launching the OCR process, ensure the operaion has not already been
                     // cancelled.
                     if (cancelToken != null && cancelToken.Value.IsCancellationRequested)
                     {
-                        return;
+                        result._ocrData = null;
+                        result._completeEvent.Set();
+                        return result;
                     }
+
+                    // [FlexIDSCore:5043]
+                    // Prevent this operation from being cancelled until it has had time to
+                    // initialize. The intent is to prevent exceptions from cancelling the operation
+                    // while it is in the process of initializing.
+                    _canStartNewOperation.Reset();
 
                     // [DotNetRCAndUtils:302] Set the OCR complete event to unsignaled
                     // This needs to be reset here and not within OcrFileThread in order to
@@ -704,6 +939,8 @@ namespace Extract.Imaging
             {
                 throw ExtractException.AsExtractException("ELI22050", ex);
             }
+
+            return result;
         }
 
         /// <summary>
@@ -723,6 +960,9 @@ namespace Extract.Imaging
                     {
                         // Signal OCR canceled
                         _ocrCanceledEvent.Set();
+
+                        // Give the last OCR operation a chance to initialize before trying to kill it.
+                        _canStartNewOperation.WaitOne(_OPERATION_INIT_TIME);
 
                         // If currently performing an OCR task then kill the OCR engine
                         if (_currentlyInOcr)
@@ -1032,6 +1272,11 @@ namespace Extract.Imaging
                 {
                     _ocrCanceledEvent.Close();
                     _ocrCanceledEvent = null;
+                }
+                if (_canStartNewOperation != null)
+                {
+                    _canStartNewOperation.Close();
+                    _canStartNewOperation = null;
                 }
             }
 
