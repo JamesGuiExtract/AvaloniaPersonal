@@ -89,7 +89,7 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Will return an IProgressStatus indicating the progress of the task with the
 	// specified id.
-	IProgressStatus* getProgressStatus(long nTaskID);
+	IProgressStatusPtr getProgressStatus(long nTaskID);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Returns the number of files on the pending queue
 	long getNumberPending();

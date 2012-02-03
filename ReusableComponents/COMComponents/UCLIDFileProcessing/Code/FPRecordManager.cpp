@@ -358,7 +358,7 @@ FileProcessingRecord FPRecordManager::getTask(long nTaskID)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-IProgressStatus* FPRecordManager::getProgressStatus(long nTaskID)
+IProgressStatusPtr FPRecordManager::getProgressStatus(long nTaskID)
 {
 	// Lock the mutex for the Task map while reading so it will not be 
 	// updated
@@ -373,8 +373,7 @@ IProgressStatus* FPRecordManager::getProgressStatus(long nTaskID)
 		}
 		else
 		{
-			IProgressStatusPtr ipProgressStatus(it->second.m_ipProgressStatus);
-			return ipProgressStatus.Detach();
+			return IProgressStatusPtr(it->second.m_ipProgressStatus);
 		}
 	}
 	else
