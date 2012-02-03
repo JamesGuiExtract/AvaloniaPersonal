@@ -107,11 +107,20 @@ namespace Extract.Utilities.Forms
                     if (_target.Handle != m.HWnd && _target.CanFocus && !_target.ContainsFocus && 
                         ShortcutsEnabled)
                     {
-                        Keys key = ((Keys)((int)((long)m.WParam))) | Control.ModifierKeys;
-                        if (_manager[key] != null)
+                        // [FlexIDSCore:5037]
+                        // Despite the fact that an infinite message loop was supposedly fixed in
+                        // #3906 by adding a check for _target.ContainsFocus, it was still possible
+                        // to get stuck in a loop. Also check that the receiver is not a decendant
+                        // of the target.
+                        Control receivingControl = Control.FromHandle(m.HWnd);
+                        if (receivingControl != null && !_target.Contains(receivingControl))
                         {
-                            NativeMethods.BeginSendMessageToHandle(m, _target.Handle);
-                            return true;
+                            Keys key = ((Keys)((int)((long)m.WParam))) | Control.ModifierKeys;
+                            if (_manager[key] != null)
+                            {
+                                NativeMethods.BeginSendMessageToHandle(m, _target.Handle);
+                                return true;
+                            }
                         }
                     }
                 }

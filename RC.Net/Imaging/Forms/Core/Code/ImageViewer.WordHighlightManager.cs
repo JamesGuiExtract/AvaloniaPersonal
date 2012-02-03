@@ -239,6 +239,11 @@ namespace Extract.Imaging.Forms
             volatile bool _inAutoFitMode;
 
             /// <summary>
+            /// Indicates whether the ImageViewer has been destroyed.
+            /// </summary>
+            volatile bool _isImageViewerDestoryed;
+
+            /// <summary>
             /// Indicates whether this instance has been disposed.
             /// </summary>
             volatile bool _disposed;
@@ -269,6 +274,7 @@ namespace Extract.Imaging.Forms
                     _imageViewer.ImageFileChanged += HandleImageFileChanged;
                     _imageViewer.ImageFileClosing += HandleImageFileClosing;
                     _imageViewer.CursorToolChanged += HandleCursorToolChanged;
+                    _imageViewer.HandleDestroyed += HandleImageViewerHandleDestroyed;
                 }
                 catch (Exception ex)
                 {
@@ -888,6 +894,17 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException.Display("ELI31377", ex);
                 }
+            }
+
+            /// <summary>
+            /// Handles the case that the image viewer handle was destroyed.
+            /// </summary>
+            /// <param name="sender">The sender.</param>
+            /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event
+            /// data.</param>
+            void HandleImageViewerHandleDestroyed(object sender, EventArgs e)
+            {
+                _isImageViewerDestoryed = true;
             }
 
             #endregion Event Handlers
@@ -2091,6 +2108,31 @@ namespace Extract.Imaging.Forms
             }
 
             /// <summary>
+            /// Safely calls BeginInvoke on the <see cref="_imageViewer"/>; if the image viewer is
+            /// destroyed before or during this call, the call will be quietly ignored.
+            /// </summary>
+            /// <param name="method">The <see cref="Action"/> to invoke.</param>
+            IAsyncResult SafeImageViewerBeginInvoke(Action method)
+            {
+                if (!_isImageViewerDestoryed)
+                {
+                    try
+                    {
+                        return _imageViewer.BeginInvoke(method);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (!_isImageViewerDestoryed)
+                        {
+                            throw ex.AsExtract("ELI34370");
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+            /// <summary>
             /// Adds the specified <see paramref="method"/> to the UI's message queue so that it is
             /// processed by the UI without interrupting any active message handler. This method
             /// blocks until the method has been executed or until the current background operation
@@ -2116,7 +2158,7 @@ namespace Extract.Imaging.Forms
 
                 // Invoke to avoid modifying the imageViewer from outside the UI thread. Use begin
                 // invoke so the operation isn't executed in the middle of another UI event.
-                IAsyncResult result = _imageViewer.BeginInvoke((MethodInvoker)(() => 
+                IAsyncResult result = SafeImageViewerBeginInvoke(() => 
                     {
                         try
                         {
@@ -2139,7 +2181,13 @@ namespace Extract.Imaging.Forms
                             // was cancelled.
                             Interlocked.Decrement(ref _executeInUIReferenceCount);
                         }
-                    }));
+                    });
+
+                // If a null result was returned, the image viewer was destoryed; ignore the call.
+                if (result == null)
+                {
+                    return;
+                }
 
                 WaitHandle[] waitHandles = new WaitHandle[] 
                 {
@@ -2699,7 +2747,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // If appropriate, raise the BackgroundProcessStatusUpdate event in the UI thread.
-                _imageViewer.BeginInvoke((MethodInvoker) (() =>
+                SafeImageViewerBeginInvoke(() =>
                     {
                         if (_imageViewer.IsImageAvailable)
                         {
@@ -2712,7 +2760,7 @@ namespace Extract.Imaging.Forms
                                 OnBackgroundProcessStatusUpdate(status, overallProgress);
                             }
                         }
-                    }));
+                    });
             }
 
             /// <summary>

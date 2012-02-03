@@ -146,7 +146,7 @@ namespace Extract.Imaging.Forms
                     // Have the image viewer draw the area centered around the mouse zoomed in such
                     // that 1 image pixel = 1 screen pixel.
                     Point imageCenterPoint = _imageViewer.PointToClient(Control.MousePosition);
-                    _imageViewer.PaintToGraphics(e.Graphics, e.ClipRectangle, imageCenterPoint, 1F);
+                    _imageViewer.PaintToGraphics(e.Graphics, ClientRectangle, imageCenterPoint, 1F);
 
                     // Draw the imageviewer cursor with the hotspot in the center (which corresponds
                     // to the point the cursor is in the imageviewer).
