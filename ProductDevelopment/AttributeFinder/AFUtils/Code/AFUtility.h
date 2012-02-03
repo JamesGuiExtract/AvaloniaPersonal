@@ -249,6 +249,9 @@ private:
 	// PURPOSE:	To return a Variant vector containing the INI file tags
 	IVariantVectorPtr getINIFileTags();
 	//---------------------------------------------------------------------------------------------
+	// Gets the name of the AFCore INI file.
+	const char* getINIFileName();
+	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To fill the specified IIUnknownVector with attribtues read from the specified
 	//			EAV file.
 	void generateAttributesFromEAVFile(const string& strFileName,
@@ -279,6 +282,8 @@ private:
 
 	// cache of tag name/value read from the INI file and mutex for reading/writing it
 	static map<string, string> ms_mapINIFileTagNameToValue;
+
+	static string ms_strINIFileName;
 
 	static CMutex ms_Mutex;
 

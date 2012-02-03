@@ -40,6 +40,7 @@ const string strSOURCE_DOC_PATH_TAG = "<SourceDocName.Path>";
 
 // globals and statics
 map<string, string> CAFUtility::ms_mapINIFileTagNameToValue;
+string CAFUtility::ms_strINIFileName;
 CMutex CAFUtility::ms_Mutex;
 map<long, CRuleSetProfiler> CAFUtility::ms_mapProfilers;
 volatile long CAFUtility::ms_nNextProfilerHandle = 0;
@@ -1134,14 +1135,6 @@ bool CAFUtility::getTagValueFromINIFile(const string& strTagName, string& rstrTa
 			return true;
 		}
 
-		// compute the INI file name if it hasn't been computed already
-		static string ls_strINIFileName;
-		if (ls_strINIFileName.empty())
-		{
-			ls_strINIFileName = getModuleDirectory(_Module.m_hInst);
-			ls_strINIFileName += "\\UCLIDAFCore.INI";
-		}
-
 		// get the value of the tag from the INI file
 		// NOTE: This code below is not very robust because it cannot
 		// distinguish between a non-existant key in the INI file and
@@ -1149,7 +1142,7 @@ bool CAFUtility::getTagValueFromINIFile(const string& strTagName, string& rstrTa
 		const char *pszSectionName = "ExpandableTags";
 		char pszResult[1024];
 		if (GetPrivateProfileString(pszSectionName, strTag.c_str(), "", 
-			pszResult, sizeof(pszResult), ls_strINIFileName.c_str()) <= 0)
+			pszResult, sizeof(pszResult), getINIFileName()) <= 0)
 		{
 			return false;
 		}
@@ -1764,14 +1757,6 @@ IVariantVectorPtr CAFUtility::getINIFileTags()
 		IVariantVectorPtr ipVec(CLSID_VariantVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI26581", ipVec != __nullptr);
 
-		// Get the INI file
-		static string ls_strINIFileName;
-		if (ls_strINIFileName.empty())
-		{
-			ls_strINIFileName = getModuleDirectory(_Module.m_hInst);
-			ls_strINIFileName += "\\UCLIDAFCore.INI";
-		}
-
 		// get the value of the tag from the INI file
 		// NOTE: This code below is not very robust because it cannot
 		// distinguish between a non-existant key in the INI file and
@@ -1780,7 +1765,7 @@ IVariantVectorPtr CAFUtility::getINIFileTags()
 		char pszResult[2048];
 
 		long nRet = GetPrivateProfileSection(pszSectionName, pszResult, sizeof(pszResult),
-			ls_strINIFileName.c_str());
+			getINIFileName());
 
 		// if the section has tags
 		if (nRet > 0)
@@ -1806,5 +1791,19 @@ IVariantVectorPtr CAFUtility::getINIFileTags()
 		return ipVec;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26580");
+}
+//-------------------------------------------------------------------------------------------------
+const char* CAFUtility::getINIFileName()
+{
+	// Mutex while accessing static value
+	CSingleLock lg(&ms_Mutex, TRUE);
+
+	if (ms_strINIFileName.empty())
+	{
+		ms_strINIFileName = getModuleDirectory(_Module.m_hInst);
+		ms_strINIFileName += "\\UCLIDAFCore.INI";
+	}
+
+	return ms_strINIFileName.c_str();
 }
 //-------------------------------------------------------------------------------------------------
