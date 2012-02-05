@@ -131,8 +131,6 @@ private:
 
 	void validateLicense();
 
-	UCLID_DATAENTRYCUSTOMCOMPONENTSLib::IDataEntryProductDBMgrPtr CDataEntryProductDBMgr::getThisAsCOMPtr();
-
 	// Internal versions of external methods that may require database locking
 	bool AddDataEntryData_Internal(bool bDBLocked, long lFileID, long nActionID,
 		double dDuration, double dOverheadTime, long* plInstanceID);

@@ -6602,19 +6602,25 @@ namespace Extract.DataEntry
         /// </summary>
         void UnregisterForEvents()
         {
-            _imageViewer.CursorToolChanged -= HandleCursorToolChanged;
-            _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
-            _imageViewer.OcrTextHighlighted -= HandleOcrTextHighlighted;
-            _imageViewer.PreviewKeyDown -= HandleImageViewerPreviewKeyDown;
-            _imageViewer.MouseDown -= HandleImageViewerMouseDown;
-            _imageViewer.ZoomChanged -= HandleImageViewerZoomChanged;
-            _imageViewer.ScrollPositionChanged -= HandleImageViewerScrollPositionsChanged;
-            _imageViewer.PageChanged -= HandleImageViewerPageChanged;
-            _imageViewer.FitModeChanged -= HandleImageViewerFitModeChanged;
-            if (_imageViewer.CursorTool == CursorTool.SelectLayerObject)
+            // [DataEntry:1078]
+            // This will get called in the process of closing and depending on the configuration
+            // when closing, the image viewer may already have been disposed of.
+            if (!_imageViewer.IsDisposed)
             {
-                _imageViewer.CursorEnteredLayerObject -= HandleCursorEnteredLayerObject;
-                _imageViewer.CursorLeftLayerObject -= HandleCursorLeftLayerObject;
+                _imageViewer.CursorToolChanged -= HandleCursorToolChanged;
+                _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
+                _imageViewer.OcrTextHighlighted -= HandleOcrTextHighlighted;
+                _imageViewer.PreviewKeyDown -= HandleImageViewerPreviewKeyDown;
+                _imageViewer.MouseDown -= HandleImageViewerMouseDown;
+                _imageViewer.ZoomChanged -= HandleImageViewerZoomChanged;
+                _imageViewer.ScrollPositionChanged -= HandleImageViewerScrollPositionsChanged;
+                _imageViewer.PageChanged -= HandleImageViewerPageChanged;
+                _imageViewer.FitModeChanged -= HandleImageViewerFitModeChanged;
+                if (_imageViewer.CursorTool == CursorTool.SelectLayerObject)
+                {
+                    _imageViewer.CursorEnteredLayerObject -= HandleCursorEnteredLayerObject;
+                    _imageViewer.CursorLeftLayerObject -= HandleCursorLeftLayerObject;
+                }
             }
         }
 

@@ -3767,10 +3767,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _dataEntryControlHost.MinimumSize.Width + horizontalPadding +
                     SystemInformation.VerticalScrollBarWidth;
 
-                // Set the width of the scroll panel and DEP based on the resulting position of the
-                // splitter to ensure the DEP is sized so that all the controls are properly
-                // visible.
-                _scrollPanel.Width = _splitContainer.SplitterDistance;
+                // [DataEntry:3770]
+                // If the image viewer is open in a separate window, the scrollpanel & DEP don't
+                // need to be confined to the area left of the splitter position.
+                if (_imageViewerForm == null)
+                {
+                    // Set the width of the scroll panel and DEP based on the resulting position of the
+                    // splitter to ensure the DEP is sized so that all the controls are properly
+                    // visible.
+                    _scrollPanel.Width = _splitContainer.SplitterDistance;
+                }
+
                 _dataEntryControlHost.Width = _scrollPanel.Width - horizontalPadding;
 
                 // Add the DEP to an auto-scroll pane to allow scrolling if the DEP is too

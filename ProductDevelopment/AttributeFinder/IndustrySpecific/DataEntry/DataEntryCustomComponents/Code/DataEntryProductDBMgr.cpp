@@ -514,8 +514,7 @@ STDMETHODIMP CDataEntryProductDBMgr::RecordCounterValues(long* plInstanceToken,
 		if (!RecordCounterValues_Internal(false, plInstanceToken, lDataEntryDataInstanceID, pAttributes))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
-				gstrMAIN_DB_LOCK);
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(m_ipFAMDB, gstrMAIN_DB_LOCK);
 			RecordCounterValues_Internal(true, plInstanceToken,	lDataEntryDataInstanceID, pAttributes);
 		}
 
@@ -634,13 +633,6 @@ IAFUtilityPtr CDataEntryProductDBMgr::getAFUtility()
 	}
 	
 	return m_ipAFUtility;
-}
-UCLID_DATAENTRYCUSTOMCOMPONENTSLib::IDataEntryProductDBMgrPtr CDataEntryProductDBMgr::getThisAsCOMPtr()
-{
-	UCLID_DATAENTRYCUSTOMCOMPONENTSLib::IDataEntryProductDBMgrPtr ipThis;
-	ipThis = this;
-	ASSERT_RESOURCE_ALLOCATION("ELI30713", ipThis != __nullptr);
-	return this;
 }
 //-------------------------------------------------------------------------------------------------
 // Internal versions of Interface methods
