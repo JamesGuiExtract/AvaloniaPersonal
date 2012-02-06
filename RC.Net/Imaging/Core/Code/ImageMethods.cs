@@ -679,7 +679,7 @@ namespace Extract.Imaging
         {
             try
             {
-                ConvertPdfToTif(inputFile, outputFile);
+                ConvertPdfToTif(inputFile, outputFile, false);
             }
             catch (Exception ex)
             {
