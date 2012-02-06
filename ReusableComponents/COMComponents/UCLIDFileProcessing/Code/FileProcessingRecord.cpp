@@ -214,7 +214,7 @@ void FileProcessingRecord::notifyErrorTaskFailed(const string& strException)
 	m_strErrorTaskException = strException;
 }
 //---------------------------------------------------------------------------------------------
-double FileProcessingRecord::getTaskDuration() const
+double FileProcessingRecord::getTaskDuration()
 {
 	return m_stopWatch.getElapsedTime();
 }
@@ -224,7 +224,7 @@ SYSTEMTIME FileProcessingRecord::getStartTime() const
 	return m_stopWatch.getBeginTime();
 }
 //-------------------------------------------------------------------------------------------------
-double FileProcessingRecord::getErrorTaskDuration() const
+double FileProcessingRecord::getErrorTaskDuration()
 {
 	return m_stopWatchErrorTask.getElapsedTime();
 }

@@ -30,7 +30,7 @@ public:
 	// have elapsed since the stop watch was reset will be returned.
 	// If the watch has been stopped, the number of seconds that elapsed
 	// between the calls to reset() and stop() will be returned.
-	double getElapsedTime() const;
+	double getElapsedTime();
 
 	// PROMISE: To return true if the stop watch is currently running.
 	bool isRunning();
@@ -75,14 +75,17 @@ private:
 	// i.e. the time of the first start after a reset
 	SYSTEMTIME m_beginTime;
 
+	// Prevent repeated exceptions about the end time from being logged.
+	bool m_bLoggedEndTimeError;
+
 	// PURPOSE: To get the current low-res and high-res time/counter
 	// values into the provided variables
 	void getCurrentTime(SYSTEMTIME& rendTime, LARGE_INTEGER& rendCounter) const;
 	
 	// get the low-resolution elapsed time.  Resolution of returned
 	// value is 1 second.
-	double getLowResElapsedTime(const SYSTEMTIME& endTime) const;
+	double getLowResElapsedTime(const SYSTEMTIME& endTime);
 
 	// get the high-resolution elapsed time
-	double getHighResElapsedTime(const LARGE_INTEGER& endCounter) const;
+	double getHighResElapsedTime(const LARGE_INTEGER& endCounter);
 };

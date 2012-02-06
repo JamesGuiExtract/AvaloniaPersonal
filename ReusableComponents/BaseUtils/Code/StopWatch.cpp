@@ -13,7 +13,8 @@ StopWatch::StopWatch()
 :
 m_bIsRunning(false),
 m_fElapsedTime(0),
-m_bIsReset(true)
+m_bIsReset(true),
+m_bLoggedEndTimeError(false)
 {
 	// initialize static variables if not already done so
 	static bool bStaticMembersInitialized = false;
@@ -83,7 +84,7 @@ void StopWatch::start()
 	}
 }
 //-------------------------------------------------------------------------------------------------
-double StopWatch::getElapsedTime() const
+double StopWatch::getElapsedTime()
 {
 	if (m_bIsRunning && !m_bIsReset)
 	{
@@ -189,16 +190,30 @@ void StopWatch::getCurrentTime(SYSTEMTIME& rendTime, LARGE_INTEGER& rendCounter)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-double StopWatch::getLowResElapsedTime(const SYSTEMTIME& endTime) const
+double StopWatch::getLowResElapsedTime(const SYSTEMTIME& endTime)
 {
 	// if the end time is less than the start time log an exception
 	if (asULongLong(endTime) < asULongLong(m_startTime))
 	{
-		UCLIDException ue("ELI20436", "End time is less than the start time!");
+		// [LegacyRCAndUtils:6312]
+		// Prevent repeated exceptions from being logged.
+		if (!m_bLoggedEndTimeError)
+		{
+			UCLIDException ue("ELI20436", "End time is less than the start time!");
 		
-		// Log the exception for debug purposes and return 0
-		ue.log();
+			// Log the exception for debug purposes and return 0
+			ue.log();
+
+			m_bLoggedEndTimeError = true;
+		}
 		return 0.0;
+	}
+
+	// Once we appear to have a valid end time, allow another exception about the end time to be
+	// logged if it ever appears invalid again.
+	if (m_bLoggedEndTimeError)
+	{
+		m_bLoggedEndTimeError = false;
 	}
 
 	// return the elapsed time in seconds
@@ -207,18 +222,32 @@ double StopWatch::getLowResElapsedTime(const SYSTEMTIME& endTime) const
 	return (double) qwSpan / ST_SECOND;
 }
 //-------------------------------------------------------------------------------------------------
-double StopWatch::getHighResElapsedTime(const LARGE_INTEGER& endCounter) const
+double StopWatch::getHighResElapsedTime(const LARGE_INTEGER& endCounter)
 {
 	// if the end time is less than the start time log an exception
 	if (endCounter.QuadPart < m_startCounter.QuadPart)
 	{
-		UCLIDException ue("ELI20437", "End time is less than the start time!");
-		ue.addDebugInfo("Start time", asString(m_startCounter.QuadPart));
-		ue.addDebugInfo("End time", asString(endCounter.QuadPart));
+		// [LegacyRCAndUtils:6312]
+		// Prevent repeated exceptions from being logged.
+		if (!m_bLoggedEndTimeError)
+		{
+			UCLIDException ue("ELI20437", "End time is less than the start time!");
+			ue.addDebugInfo("Start time", asString(m_startCounter.QuadPart));
+			ue.addDebugInfo("End time", asString(endCounter.QuadPart));
 
-		// Log the exception for debug purposes and return 0
-		ue.log();
+			// Log the exception for debug purposes and return 0
+			ue.log();
+
+			m_bLoggedEndTimeError = true;
+		}
 		return 0.0;
+	}
+
+	// Once we appear to have a valid end time, allow another exception about the end time to be
+	// logged if it ever appears invalid again.
+	if (m_bLoggedEndTimeError)
+	{
+		m_bLoggedEndTimeError = false;
 	}
 
 	// return the elapsed time

@@ -488,7 +488,9 @@ void CUSBLicenseKeyManagerDlg::applyNewValues()
 	{
 		if ( strSMTPServer.empty())
 		{
-			UCLIDException ue("ELI11887", "SMTP Server not set in Email Settings.");
+			UCLIDException ue("ELI11887",
+				"You have configured for email alerts to be sent, but have not configured the SMTP "
+				"Server in Email Settings.");
 			throw ue;
 		}
 		CString czToList;
@@ -496,7 +498,9 @@ void CUSBLicenseKeyManagerDlg::applyNewValues()
 		if ( czToList.IsEmpty() == TRUE )
 		{
 			m_editToList.SetFocus();
-			UCLIDException ue("ELI11888", "No Address list set." );
+			UCLIDException ue("ELI11888", 
+				"You have configured for email alerts to be sent, but have not specified the "
+				"recipient address list." );
 			throw ue;
 		}
 		m_snlcSafeNetCfg.setAlertToList(czToList.operator LPCTSTR());
@@ -511,7 +515,9 @@ void CUSBLicenseKeyManagerDlg::applyNewValues()
 		m_snlcSafeNetCfg.setSendToExtract(true);
 		if ( strSMTPServer.empty())
 		{
-			UCLIDException ue("ELI11889", "SMTP Server not set in Email Settings.");
+			UCLIDException ue("ELI11889",
+				"You have configured for email alerts to be sent, but have not configured the SMTP "
+				"Server in Email Settings.");
 			throw ue;
 		}
 	}

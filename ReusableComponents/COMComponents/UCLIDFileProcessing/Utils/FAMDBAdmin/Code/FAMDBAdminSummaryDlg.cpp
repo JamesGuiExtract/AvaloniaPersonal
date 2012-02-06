@@ -553,16 +553,20 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 			}
 			catch (UCLIDException &ue)
 			{
-				// If there was an error unrelated to permissions, throw it on out.
+				// If there was an error unrelated to permissions, log it (don't throw in case there
+				// is still a chance it is related to permissions).
 				if (ue.getTopText().find("permission") == string::npos)
 				{
-					throw ue;
+					ue.log();
 				}
-
-				// Otherwise, log an app trace and use the slower file count query.
-				UCLIDException uexOuter("ELI34341", "Application trace: Insufficient database "
-					"permissions to use fast file count query.", ue);
-				uexOuter.log();
+				else
+				{
+					// Otherwise, log an app trace and use the slower file count query.
+					UCLIDException uexOuter("ELI34341", "Application trace: Insufficient database "
+						"permissions to use fast file count query; using slower version instead.",
+						ue);
+					uexOuter.log();
+				}
 
 				m_bDeniedFastCountPermission = true;
 			}

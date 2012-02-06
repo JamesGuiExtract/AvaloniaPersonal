@@ -2627,7 +2627,10 @@ UINT __cdecl FileProcessingDlg::StatisticsMgrThreadFunct( LPVOID pParam )
 
 					_lastCodePos = "80";
 				}
-				CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29166");
+				// [LegacyRCAndUtils:6311]
+				// Per discussion with Arvind, since stats are not a critical part of the FAM
+				// functionality, just log.
+				CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29166");
 			}
 			while ( pFPDlg->m_eventStatsThreadStop.wait( uiTickSpeed ) == WAIT_TIMEOUT );
 

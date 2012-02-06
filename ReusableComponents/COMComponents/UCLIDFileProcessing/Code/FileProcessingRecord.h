@@ -84,14 +84,14 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To return the number of seconds elapsed during the execution
 	// of this task (regardless of whether the task completed successfully or not)
-	double getTaskDuration() const;
+	double getTaskDuration();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the starting time of the stopwatch
 	SYSTEMTIME getStartTime() const;
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To return the number of seconds elapsed during the execution
 	// of the error task (regardless of whether the error task completed successfully or not)
-	double getErrorTaskDuration() const;
+	double getErrorTaskDuration();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the starting time of the error task stopwatch
 	SYSTEMTIME getErrorTaskStartTime() const;
