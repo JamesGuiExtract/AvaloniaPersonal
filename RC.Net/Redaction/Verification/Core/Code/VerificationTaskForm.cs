@@ -357,7 +357,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The <see cref="DocumentNavigationTarget"/> to use when opening the next document.
         /// </summary>
-        DocumentNavigationTarget _navigationTarget = DocumentNavigationTarget.LastView;
+        DocumentNavigationTarget _navigationTarget = DocumentNavigationTarget.FirstPage;
 
         /// <summary>
         /// The scale factor in use when the last document was closed.
@@ -1153,7 +1153,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void AdvanceToNextDocument()
         {
-            AdvanceToNextDocument(DocumentNavigationTarget.LastView);
+            AdvanceToNextDocument(DocumentNavigationTarget.FirstPage);
         }
 
         /// <summary>
@@ -2133,7 +2133,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void GoToPreviousDocument()
         {
-            GoToPreviousDocument(DocumentNavigationTarget.LastView);
+            GoToPreviousDocument(DocumentNavigationTarget.FirstPage);
         }
 
         /// <summary>
@@ -2181,7 +2181,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void GoToNextDocument()
         {
-            GoToNextDocument(false, DocumentNavigationTarget.LastView);
+            GoToNextDocument(false, DocumentNavigationTarget.FirstPage);
         }
 
         /// <summary>
@@ -3227,10 +3227,6 @@ namespace Extract.Redaction.Verification
         /// the sensitive items selected the last time the document was viewed)</param>
         void InitializeNavigation(VerificationMemento memento)
         {
-            // Restore selection of any sensitive items that were selected if the document was
-            // previously viewed.
-            _redactionGridView.Select(memento.Selection, true);
-
             if (memento.ImagePageData == null)
             {
                 // If the document was not previously viewed, get the ImagePageData (ZoomInfo,
@@ -3275,10 +3271,8 @@ namespace Extract.Redaction.Verification
                 case DocumentNavigationTarget.FirstPage:
                     {
                         // Go to the first redaction iff:
-                        // 1) There is not any previously selected redactions AND
-                        // 2) The first redaction is on the first page.
-                        if (!memento.Selection.Any() &&
-                            _redactionGridView.Rows.Count > 0 &&
+                        // 1) The first redaction is on the first page.
+                        if (_redactionGridView.Rows.Count > 0 &&
                             _redactionGridView.Rows[0].PageNumber == 1)
                         {
                             _redactionGridView.SelectOnly(0);
@@ -3316,12 +3310,10 @@ namespace Extract.Redaction.Verification
                 case DocumentNavigationTarget.LastPage:
                     {
                         // Go to the last redaction iff:
-                        // 1) There is not any previously selected redactions AND
-                        // 2) The last redaction is on the first page.
+                        // 1) The last redaction is on the last page.
                         int lastRow = _redactionGridView.Rows.Count - 1;
                         int lastPage = _imageViewer.PageCount;
-                        if (!memento.Selection.Any() &&
-                            _redactionGridView.Rows.Count > 0 &&
+                        if (_redactionGridView.Rows.Count > 0 &&
                             _redactionGridView.Rows[lastRow].PageNumber == lastPage)
                         {
                             _redactionGridView.SelectOnly(lastRow);
@@ -3346,10 +3338,16 @@ namespace Extract.Redaction.Verification
                             _previousDocumentScaleFactor, _previousDocumentFitMode);
                     }
                     break;
+
+                case DocumentNavigationTarget.LastView:
+                    {
+                        _redactionGridView.Select(memento.Selection, true);
+                    }
+                    break;
             }
 
             // After the navigation as been initialized, revert _navigationTarget to the default.
-            _navigationTarget = DocumentNavigationTarget.LastView;
+            _navigationTarget = DocumentNavigationTarget.FirstPage;
         }
 
         /// <summary>
