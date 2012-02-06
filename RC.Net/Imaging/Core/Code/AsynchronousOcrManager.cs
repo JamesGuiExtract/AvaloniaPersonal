@@ -1018,17 +1018,24 @@ namespace Extract.Imaging
         /// </summary>
         void CancelTokenWatchThread()
         {
-            ExtractException.Assert("ELI32623", "OCR cancel token not initialized.",
-                _cancelToken != null);
-
-            // Wait for either the _cancelToken or _ocrDocumentCompleteEvent handles to be signaled.
-            WaitHandle[] waitHandles =
-                new WaitHandle[] { _cancelToken.Value.WaitHandle, _ocrDocumentCompleteEvent };
-
-            // If the _cancelToken handle was signaled, cancel the running operation.
-            if (WaitHandle.WaitAny(waitHandles) == 0)
+            try
             {
-                CancelOcrOperation();
+                ExtractException.Assert("ELI32623", "OCR cancel token not initialized.",
+                        _cancelToken != null);
+
+                // Wait for either the _cancelToken or _ocrDocumentCompleteEvent handles to be signaled.
+                WaitHandle[] waitHandles =
+                    new WaitHandle[] { _cancelToken.Value.WaitHandle, _ocrDocumentCompleteEvent };
+
+                // If the _cancelToken handle was signaled, cancel the running operation.
+                if (WaitHandle.WaitAny(waitHandles) == 0)
+                {
+                    CancelOcrOperation();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractLog("ELI34373");
             }
         }
 

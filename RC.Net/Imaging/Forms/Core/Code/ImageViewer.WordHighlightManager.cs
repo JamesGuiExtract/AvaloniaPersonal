@@ -973,7 +973,7 @@ namespace Extract.Imaging.Forms
 
                         if (_ocrCanceler != null)
                         {
-                            _ocrCanceler.Dispose();
+                            // Don't dispose in case a AsynchronousOcrManager is still using it.
                             _ocrCanceler = null;
                         }
 
@@ -1812,7 +1812,12 @@ namespace Extract.Imaging.Forms
                     ocrTask.Wait(_cancelToken);
 
                     _ocrCanceler = null;
-                    cancelTokenSource.Dispose();
+
+                    // [FlexIDSCore:5049]
+                    // To avoid a crash that can occur if the _ocrManager's CancelTokenWatchThread
+                    // has not yet kicked off, intentionally not disposing of it here. Per this thread:
+                    // http://stackoverflow.com/questions/6960520/when-to-dispose-cancellationtokensource
+                    // The finalizer should properly handle the cleanup.
                 }
                 catch (OperationCanceledException)
                 {
@@ -1822,7 +1827,6 @@ namespace Extract.Imaging.Forms
                         {
                             _ocrCanceler = null;
                         }
-                        cancelTokenSource.Dispose();
                     });
 
                     // If canceled, use ContinueWith to ensure any exceptions are
@@ -1852,7 +1856,6 @@ namespace Extract.Imaging.Forms
                         {
                             _ocrCanceler = null;
                         }
-                        cancelTokenSource.Dispose();
                     });
 
                     ExtractException ee = new ExtractException("ELI33374",
