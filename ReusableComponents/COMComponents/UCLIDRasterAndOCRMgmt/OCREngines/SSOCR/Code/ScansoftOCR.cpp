@@ -112,6 +112,17 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImage(BSTR strImageFileName, long 
 		
 		// validate the license
 		validateLicense();
+
+		// Reset m_bKilledOcrDoNotRetry before checking/initializing the OCREngine since
+		// WhackOCREngine can otherwise be called after the OCR engine is initialized but before
+		// m_bKilledOcrDoNotRetry is reset.
+		{
+			Win32CriticalSectionLockGuard lg2(m_csKillingOCR);
+
+			// Reset the killed OCR flag to false
+			m_bKilledOcrDoNotRetry = false;
+		}
+
 		checkOCREngine();
 
 		// Get the image file name and check for .uss extension [FlexIDSCore #3242]
@@ -121,14 +132,6 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImage(BSTR strImageFileName, long 
 			UCLIDException uex("ELI24861", "Cannot OCR a '.uss' file!");
 			uex.addDebugInfo("File To OCR", stdstrImageFileName);
 			throw uex;
-		}
-
-		// scope for critical section
-		{
-			Win32CriticalSectionLockGuard lg2(m_csKillingOCR);
-
-			// Reset the killed OCR flag to false
-			m_bKilledOcrDoNotRetry = false;
 		}
 
 		// ensure the return value is not NULL
@@ -161,6 +164,17 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImage2(BSTR strImageFileName,
 		Win32CriticalSectionLockGuard lg(m_cs);
 		// validate the license
 		validateLicense();
+
+		// Reset m_bKilledOcrDoNotRetry before checking/initializing the OCREngine since
+		// WhackOCREngine can otherwise be called after the OCR engine is initialized but before
+		// m_bKilledOcrDoNotRetry is reset.
+		{
+			Win32CriticalSectionLockGuard lg2(m_csKillingOCR);
+
+			// Reset the killed OCR flag to false
+			m_bKilledOcrDoNotRetry = false;
+		}
+
 		checkOCREngine();
 
 		// Get the image file name and check for .uss extension [FlexIDSCore #3242]
@@ -170,14 +184,6 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImage2(BSTR strImageFileName,
 			UCLIDException uex("ELI24865", "Cannot OCR a '.uss' file!");
 			uex.addDebugInfo("File To OCR", stdstrImageFileName);
 			throw uex;
-		}
-
-		// scope for critical section
-		{
-			Win32CriticalSectionLockGuard lg2(m_csKillingOCR);
-
-			// Reset the killed OCR flag to false
-			m_bKilledOcrDoNotRetry = false;
 		}
 
 		// ensure the return value is not NULL
@@ -262,6 +268,17 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImageZone(BSTR strImageFileName, l
 		
 		// validate the license
 		validateLicense();
+
+		// Reset m_bKilledOcrDoNotRetry before checking/initializing the OCREngine since
+		// WhackOCREngine can otherwise be called after the OCR engine is initialized but before
+		// m_bKilledOcrDoNotRetry is reset.
+		{
+			Win32CriticalSectionLockGuard lg2(m_csKillingOCR);
+
+			// Reset the killed OCR flag to false
+			m_bKilledOcrDoNotRetry = false;
+		}
+
 		checkOCREngine();
 
 		// Get the image file name and check for .uss extension [FlexIDSCore #3242]
@@ -271,14 +288,6 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImageZone(BSTR strImageFileName, l
 			UCLIDException uex("ELI24866", "Cannot OCR a '.uss' file!");
 			uex.addDebugInfo("File To OCR", stdstrImageFileName);
 			throw uex;
-		}
-
-		// scope for critical section
-		{
-			Win32CriticalSectionLockGuard lg2(m_csKillingOCR);
-
-			// Reset the killed OCR flag to false
-			m_bKilledOcrDoNotRetry = false;
 		}
 
 		// Recognize the text on the desired page numbers
@@ -600,8 +609,14 @@ void CScansoftOCR::checkOCREngine()
 	}
 	catch(UCLIDException& uex)
 	{
-		// Log the exception that was caught
-		uex.log();
+		// [FlexIDSCore:5043]
+		// Log the exception that was caught unless the OCR engine was whacked (in which case the
+		// error isn't important to the caller and it's likely the error itself was caused by the
+		// whack call).
+		if (!m_bKilledOcrDoNotRetry)
+		{
+			uex.log();
+		}
 
 		if (m_pid > 0)
 		{

@@ -92,7 +92,7 @@ private:
 	// handle for popup error dialog from SSOCR2
 	HWND m_hwndErrorDialog;
 
-	bool m_bKilledOcrDoNotRetry;
+	volatile bool m_bKilledOcrDoNotRetry;
 
 	//////////////
 	// Methods

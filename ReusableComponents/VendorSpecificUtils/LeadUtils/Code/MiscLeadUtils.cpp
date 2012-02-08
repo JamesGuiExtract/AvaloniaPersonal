@@ -472,6 +472,15 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 						loadImagePage(strImageFileName, hBitmap, fileInfo, lfo, false);
 						_lastCodePos = "70_A_Page#" + strPageNumber;
 
+						// [FlexIDSCore:5054]
+						// The output format will not be the same as the input format for PDFs.
+						// Ensure we are saving in the correct format.
+						if (bOutputIsPdf)
+						{
+							fileInfo.Format = FILE_CCITT_GROUP4;
+							fileInfo.BitsPerPixel = 1;
+						}
+
 						bool bLoadExistingAnnotations = bRetainAnnotations
 							&& hasAnnotations(strImageFileName, lfo, iFormat);
 
