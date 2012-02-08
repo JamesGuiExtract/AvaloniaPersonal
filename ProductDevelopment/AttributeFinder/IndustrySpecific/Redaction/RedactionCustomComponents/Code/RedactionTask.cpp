@@ -585,11 +585,46 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
             nPermissions = (int) permissions;
         }
 
-        // Save redactions
-        fillImageArea(strImageToRedact, strOutputName, vecZones, 
-            m_bCarryForwardAnnotations, m_bApplyRedactionsAsAnnotations,
-            strUser, strOwner, nPermissions);
-        _lastCodePos = "400";
+		// [FlexIDSCore:4938]
+		// There appears to be a possible corruption issue in fillImageArea. We get random failures
+		// in this method, and retries that are supposed to occur in this call don't seem to
+		// happen... apparently because of the corruption.
+		// At this point it seems unlikely we will be able to find and fix the underlying cause
+		// in time for the 9.0 release. For now, add one retry nested on top of the fillImageArea
+		// retries that aren't happening to (hopefully) mask the issue.
+		bool bRetried = false;
+		do
+		{
+			try
+			{
+				try
+				{
+					// Save redactions
+					fillImageArea(strImageToRedact, strOutputName, vecZones, 
+						m_bCarryForwardAnnotations, m_bApplyRedactionsAsAnnotations,
+						strUser, strOwner, nPermissions);
+
+					// If successful, break out of the retry loop.
+					break;
+					_lastCodePos = "400";
+				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34374");
+			}
+			catch (UCLIDException &ue)
+			{
+				if (!bRetried)
+				{
+					UCLIDException uexOuter("ELI34375",
+						"Create redacted image attempt failed; retrying...", ue);
+						uexOuter.log();
+
+					bRetried = true;
+				}
+
+				throw ue;
+			}
+		}
+		while (!bRetried);
 
         // Stop the stop watch
         swProcessingTime.stop();
