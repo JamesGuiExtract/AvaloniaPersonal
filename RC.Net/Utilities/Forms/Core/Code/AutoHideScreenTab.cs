@@ -526,7 +526,17 @@ namespace Extract.Utilities.Forms
             // synchronous call to Owner.Activate.
             if (Owner != null && IsActive)
             {
-                BeginInvoke((MethodInvoker)(() => { Owner.Activate(); }));
+                BeginInvoke((MethodInvoker)(() =>
+                    {
+                        try
+                        {
+                            Owner.Activate();
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractLog("ELI34378");
+                        }
+                    }));
             }
         }
 

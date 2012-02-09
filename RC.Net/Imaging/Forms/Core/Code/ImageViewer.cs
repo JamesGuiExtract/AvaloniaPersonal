@@ -3895,7 +3895,17 @@ namespace Extract.Imaging.Forms
                 if (_ocrProgressForm != null)
                 {
                     _ocrCompleted = true;
-                    _ocrProgressForm.BeginInvoke((MethodInvoker)(() => _ocrProgressForm.Hide()));
+                    _ocrProgressForm.BeginInvoke((MethodInvoker)(() =>
+                        {
+                            try
+                            {
+                                _ocrProgressForm.Hide();
+                            }
+                            catch (Exception ex)
+                            {
+                                ex.ExtractLog("ELI34377");
+                            }
+                        }));
                 }
 
                 OnOcrLoaded(e);

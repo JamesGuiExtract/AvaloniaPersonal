@@ -241,7 +241,7 @@ namespace Extract.Imaging.Forms
             /// <summary>
             /// Indicates whether the ImageViewer has been destroyed.
             /// </summary>
-            volatile bool _isImageViewerDestoryed;
+            volatile bool _isImageViewerDestroyed;
 
             /// <summary>
             /// Indicates whether this instance has been disposed.
@@ -904,7 +904,7 @@ namespace Extract.Imaging.Forms
             /// data.</param>
             void HandleImageViewerHandleDestroyed(object sender, EventArgs e)
             {
-                _isImageViewerDestoryed = true;
+                _isImageViewerDestroyed = true;
             }
 
             #endregion Event Handlers
@@ -1304,7 +1304,7 @@ namespace Extract.Imaging.Forms
                                 // instead of when the page is changed or the document is closed.
                                 ExtractException ee = new ExtractException("ELI31365", message, ex);
 
-                                _imageViewer.Invoke((MethodInvoker)(() => ee.Display()));
+                                ee.Display();
                             }
                         }
                     }
@@ -2135,7 +2135,7 @@ namespace Extract.Imaging.Forms
             /// <param name="method">The <see cref="Action"/> to invoke.</param>
             IAsyncResult SafeImageViewerBeginInvoke(Action method)
             {
-                if (!_isImageViewerDestoryed)
+                if (!_isImageViewerDestroyed)
                 {
                     try
                     {
@@ -2143,7 +2143,7 @@ namespace Extract.Imaging.Forms
                     }
                     catch (Exception ex)
                     {
-                        if (!_isImageViewerDestoryed)
+                        if (!_isImageViewerDestroyed)
                         {
                             throw ex.AsExtract("ELI34370");
                         }
@@ -2219,6 +2219,12 @@ namespace Extract.Imaging.Forms
                 // For thread safety of fields modified in the background thread don't return until
                 // the method has been executed (or the operation has been canceled.
                 WaitHandle.WaitAny(waitHandles);
+
+                // Close the wait handle if it is no longer needed.
+                if (result.IsCompleted)
+                {
+                    result.AsyncWaitHandle.Close();
+                }
 
                 // If cancelled, end task immediately so it doesn't touch any fields used in the
                 // invoke.
@@ -2770,16 +2776,23 @@ namespace Extract.Imaging.Forms
                 // If appropriate, raise the BackgroundProcessStatusUpdate event in the UI thread.
                 SafeImageViewerBeginInvoke(() =>
                     {
-                        if (_imageViewer.IsImageAvailable)
+                        try
                         {
-                            if (page == -1 || page == _imageViewer.PageNumber)
+                            if (_imageViewer.IsImageAvailable)
                             {
-                                OnBackgroundProcessStatusUpdate(status, overallProgress);
+                                if (page == -1 || page == _imageViewer.PageNumber)
+                                {
+                                    OnBackgroundProcessStatusUpdate(status, overallProgress);
+                                }
+                                else if (_pageStatusMessages.TryGetValue(_imageViewer.PageNumber, out status))
+                                {
+                                    OnBackgroundProcessStatusUpdate(status, overallProgress);
+                                }
                             }
-                            else if (_pageStatusMessages.TryGetValue(_imageViewer.PageNumber, out status))
-                            {
-                                OnBackgroundProcessStatusUpdate(status, overallProgress);
-                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractLog("ELI34379");
                         }
                     });
             }

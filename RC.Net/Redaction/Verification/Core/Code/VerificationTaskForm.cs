@@ -4256,7 +4256,17 @@ namespace Extract.Redaction.Verification
                     // happens in the wrong order and the message doesn't get displayed.
                     // At this point, the time to investigate doesn't seem worth it; just
                     // invoke another invalidate to ensure it is displayed.
-                    BeginInvoke((MethodInvoker)(() => Invalidate()));
+                    BeginInvoke((MethodInvoker)(() =>
+                        {
+                            try
+                            {
+                                Invalidate();
+                            }
+                            catch (Exception ex)
+                            {
+                                ex.ExtractLog("ELI34376");
+                            }
+                        }));
                     return false;
                 }
             }

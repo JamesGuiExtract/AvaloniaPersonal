@@ -603,10 +603,10 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 					fillImageArea(strImageToRedact, strOutputName, vecZones, 
 						m_bCarryForwardAnnotations, m_bApplyRedactionsAsAnnotations,
 						strUser, strOwner, nPermissions);
+					_lastCodePos = "400";
 
 					// If successful, break out of the retry loop.
 					break;
-					_lastCodePos = "400";
 				}
 				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34374");
 			}

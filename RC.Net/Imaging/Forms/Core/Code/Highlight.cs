@@ -1752,6 +1752,12 @@ namespace Extract.Imaging.Forms
             // Calculate the angle of the line
             _angle = GeometryMethods.GetAngle(_startPoint, _endPoint);
 
+            // Dispose of the previous region if it exists
+            if (_region != null)
+            {
+                _region.Dispose();
+            }
+
             _region = GetAngularRegion(_startPoint, _endPoint, _height);
 
             if (TrackingData == null)
@@ -1786,8 +1792,11 @@ namespace Extract.Imaging.Forms
             // Get the corners of the specified specified region
             PointF[] vertices = GeometryMethods.GetVertices(startPoint, endPoint, height);
 
-            // Construct and return the region
-            return new Region(new GraphicsPath(vertices, _RECTANGULAR_PATH_POINT_TYPE));
+            using (GraphicsPath path = new GraphicsPath(vertices, _RECTANGULAR_PATH_POINT_TYPE))
+            {
+                // Construct and return the region
+                return new Region(path);
+            }
         }
 
         /// <summary>
