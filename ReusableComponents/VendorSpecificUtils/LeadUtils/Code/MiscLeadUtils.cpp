@@ -1895,13 +1895,54 @@ int getCompressionFactor(L_INT nFormat)
 			else
 			{
 				// If format is a known type then get default value and set the registry key
-				// to the default value
+				// to the default value.
+				// [FlexIDSCore:5055]
+				// Not specifying a compression factor for a JPEG image either causes a failure or
+				// generates a corrupt image. Per chat with LeadTools support, it is safe to use
+				// a compression factor for any JPEG related format... if it is not needed, it is
+				// not used. Therefore, adding a compression factor for any JPEG related format.
 				bool bKnownFormat = false;
 				switch(nFormat)
 				{
+				case FILE_CMP:
+				case FILE_DICOM_JPEG_GRAY:
+				case FILE_DICOM_JPEG_COLOR:
+				case FILE_EXIF_JPEG:
+				case FILE_EXIF_JPEG_411:
+				// FILE_EXIF_JPEG_422 is the same as FILE_EXIF_JPEG.
+				case FILE_FPX_JPEG:
+				case FILE_FPX_SINGLE_COLOR:
+				case FILE_FPX_JPEG_QFACTOR:
+				case FILE_J2K:
+				case FILE_JLS:
+				case FILE_JP2:
+				case FILE_JPM:
+				case FILE_JPX:
+				case FILE_JPEG:
+				case FILE_JPEG_411:
+				case FILE_JPEG_422:
+				case FILE_JPEG_LAB:
+				case FILE_JPEG_LAB_411:
+				case FILE_JPEG_LAB_422:
+				case FILE_JPEG_RGB:
+				case FILE_JXR:
+				case FILE_JXR_420:
+				case FILE_JXR_422:
+				case FILE_JXR_GRAY:
+				case FILE_JXR_CMYK:
+				case FILE_PPT_JPEG:
+				case FILE_RAS_PDF_JPEG:
+				case FILE_RAS_PDF_JPEG_411:
+				case FILE_RAS_PDF_JPEG_422:
+				case FILE_RAW_JPEG:
+				case FILE_TIF_J2K:
 				case FILE_TIF_JPEG:
 				case FILE_TIF_JPEG_411:
 				case FILE_TIF_JPEG_422:
+				case FILE_TIFX_JPEG:
+				case FILE_XPS_JPEG:
+				case FILE_XPS_JPEG_411:
+				case FILE_XPS_JPEG_422:
 					nReturn = giDEFAULT_JPEG_COMPRESSION_FLAG;
 					bKnownFormat = true;
 					break;
