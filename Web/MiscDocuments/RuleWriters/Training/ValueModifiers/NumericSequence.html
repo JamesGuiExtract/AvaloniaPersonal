@@ -1,0 +1,52 @@
+<HTML>
+    <HEAD>
+        <TITLE>Numeric Sequence Expander/Contractor Value Modifier</TITLE>
+        <link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+    </HEAD>
+    <BODY>
+        <h1>Numeric Sequence Expander/Contractor Value Modifier</h1>
+        <hr />
+        <h3>Uses</h3>
+        <ul>
+            <li>The Numeric Sequence Expander/Contractor value modifier is used to expand, contract, and sort comma-separated lists of numbers.</li>
+            <li>For example, it can be used to change the text <strong>2, 4, 3, 1</strong> into the text <strong>1-4</strong>.</li>
+            <li>Similarly, it can be used to change the text <strong>5-6, 1-4</strong> into the text <strong>1,2,3,4,5,6</strong>.</li>
+        </ul>
+        <hr />
+        <h3>Usage</h3>
+            <ul>
+                <li>To use the Numeric Sequence Expander/Contractor, you must first specify whether you want to expand or contract the numeric sequence that is input.  This is done by clicking the appropriate radio button.</li>
+                <li>When expanding a numeric sequence, checking the <strong>Sort sequence</strong> checkbox will sort the numbers in the sequence that is input.
+                    <ul>
+                        <li>You can use the drop down list next to the check box to choose whether the numbers will be sorted in ascending or descending order.</li>
+                        <li>For example, if the input text is <strong>1,2,3,4</strong> and <strong>Descending</strong> is selected, the output text will be <strong>4,3,2,1</strong>.</li>
+                        <li>Similarly, in the input text is <strong>5-6, 1-3</strong> and <strong>Ascending</strong> is selected, the output text will be <strong>1,2,3,5,6</strong>.</li>
+                    </ul>
+                </li>
+                <li>When contracting sequences, the <strong>Sort sequence</strong> checkbox is automatically selected.
+                    <ul>
+                        <li>You can still use the drop down list next to the checkbox to determine whether the contracted sequences will be displayed in ascending or descending order.</li>
+                        <li>For example, if the input text is <strong>1,2,3,4</strong> and <strong>Descending</strong> is selected, the output text will be <strong>4-1</strong>.</li>
+                        <li>Similarly, in the input text is <strong>1,2,3,4,10,11,12</strong> and <strong>Ascending</strong> is selected, the output text will be <strong>1-4,10-12</strong>.</li>
+                    </ul>
+                </li>
+                <li>Checking the <strong>Eliminate duplicates</strong> checkbox will remove duplicates from numeric sequence that is input.
+                    <ul>
+                        <li>For example, if the <strong>Eliminate duplicates</strong> checkbox is checked when contracting the text <strong>1,2,3,2,4,4,4</strong> the output text will be <strong>1-4</strong>.</li>
+                        <li>Similarly, if the <strong>Eliminate duplicates</strong> checkbox is checked when expanding the text <strong>1-3,3,3-5</strong> the output text will be <strong>1,2,3,4,5</strong>.</li>
+                    </ul>
+                </li>
+            </ul>
+        <hr />
+        <h3>Exercises</h3>
+        <ol>
+            <li>Open <strong>NumericSequence.rsd</strong> and run it on <strong>sequence1.txt</strong>.  Add a Numeric Sequence Expander/Contractor value modifier to the rule labeled <strong>Grab input</strong> that will change the found text to be as list of every number from 1 to 100.</li>
+            <li>Open <strong>NumericSequence.rsd</strong> and run it on <strong>sequence2.txt</strong>.  Add a Numeric Sequence Expander/Contractor value modifier to the rule labeled <strong>Grab input</strong> that will change the found text to be <strong>1-10</strong>.
+                <ul>
+                    <li>Uncheck the <strong>Eliminate duplicates</strong> checkbox on the value modifier that you just created. What happens to the two extra <strong>9</strong>'s from the input string?</li>
+                </ul>
+            </li>
+            <li>Open <strong>NumericSequence.rsd</strong> and run it on <strong>sequence3.txt</strong>.  Add a Numeric Sequence Expander/Contractor value modifier to the rule labeled <strong>Grab input</strong> that will change the found text to be <strong>10-1</strong>.</li>
+        </ol>
+    </BODY>
+</HTML>
