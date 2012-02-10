@@ -1,0 +1,4 @@
+<TEST_RULE_1>===(?n)
+  Property[\S\s]{0,5}address:
+  (?'Attr'[\S\s]{1,200}?)
+  In[\S\s]{0,5}witness

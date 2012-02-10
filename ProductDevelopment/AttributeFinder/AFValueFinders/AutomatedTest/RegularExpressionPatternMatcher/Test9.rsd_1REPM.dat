@@ -1,0 +1,17 @@
+<TEST_RULE_1>===(?n)
+  Property[\S\s]{0,5}address:
+  (?'Attr'[\S\s]{1,200}?)
+  In[\S\s]{0,5}witness
+
+<TEST_RULE_3>===(?n)
+  For[\S\s]{0,5}value[\S\s]{0,5}received,
+  (?'Names'[\S\s]{1,75}?)
+  of[\S\s]{0,5}the[\S\s]{0,5}beneficial
+
+<TEST_RULE_2>===(?n)
+  Original[\S\s]{0,5}
+  (   Borrower\.
+    | Borrower:
+  )
+  (?'Names'[\S\s]{1,75}?)
+  \r\n

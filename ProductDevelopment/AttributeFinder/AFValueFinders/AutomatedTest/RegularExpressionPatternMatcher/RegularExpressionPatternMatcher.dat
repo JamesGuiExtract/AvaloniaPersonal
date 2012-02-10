@@ -1,0 +1,54 @@
+// test1 A single REPM rule to capture Property address.
+// "Return first match only" checkbox is checked.
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+// test2 A single REPM rule to capture borrower name.
+// "Return first match only" is checked.
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+// test3 Two REPM rules.
+// "Return first match only" is checked.
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+// test4 The REPM rules are the same as in test3
+// "Return all matches" checked.
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav
+
+// test5 The REPM rules are the same as test3.
+// "Use following DataScorer object..." and "Return best match" are selected.
+// Minimum match score is 0.
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+// test6 Three REPM rules.
+// "Use following DataScorer object to determine validity of match" and
+// "Return best match" are selected. Minimum match score is 0.
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
+
+// test7 The REPM rules are the same as in test6.
+// "Data Scorer" and "Return all matches" are selected. Minimum match score is 1.
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
+
+// test8 The REPM rules are the same as in test6, but the order is different. 
+// "Data Scorer" and "Return first match>=10 of best match" are selected.
+// Minimum match score is 0.
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test8.eav
+
+// test9 The REPM rules are the same as in test8.
+// "Data Scorer", and "Return all matches" are selected.
+// "Minimum match score" is 11.
+<TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test9.eav
+
+// test10 The REPM rules are same as as in test9.
+// "Case Sensitive" and "Return all matches" are selected.
+<TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test10.eav
+
+// test11 The contents of the REPM rules are the same as in test10, but the case of
+// the letters are different. The settings of the checkboxes are the same as in test9.
+<TESTCASE>;Test11.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test11.eav
+
+// test12 A single REPM rule with "Return all matches" selected.
+<TESTCASE>;Test12.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test12.eav
+
+// test13 The same REPM rule as in test12 but greedy.
+// "Return all matches" and "Store ID(s) of successfully executed rules..." are checked.
+<TESTCASE>;Test13.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test13.eav
