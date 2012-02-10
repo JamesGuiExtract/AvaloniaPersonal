@@ -737,7 +737,14 @@ namespace Extract.Redaction.Verification
                     return;
                 }
 
-                if (!savedVOAFile)
+                if (savedVOAFile)
+                {
+                    // [FlexIDSCore:5070]
+                    // Start a new verificatoin session to ensure we don't save a redaction session
+                    // twice.
+                    StartNewSession();
+                }
+                else
                 {
                     // [FlexIDSCore:4987]
                     // If the VOA file doesn't need to be saved, still clear the dirty flag so that
@@ -1015,6 +1022,27 @@ namespace Extract.Redaction.Verification
             memento.Selection = _redactionGridView.SelectedRowIndexes;
             _previousDocumentScaleFactor = _imageViewer.ZoomInfo.ScaleFactor;
             _previousDocumentFitMode = _imageViewer.FitMode;
+        }
+
+        /// <summary>
+        /// Starts a new verification session by reloading data from the VOA file.
+        /// </summary>
+        void StartNewSession()
+        {
+            // Keep track of the selection prior to saving.
+            List<int> currentGridSelection = new List<int>(_redactionGridView.SelectedRowIndexes);
+
+            // [FlexIDSCore:5028, 5029]
+            // Re-load from file to start a new verification session. This needs to be done
+            // to properly track changes, otherwise items that were modified before the save
+            // may get re-output separately on the second save. 
+            LoadCurrentMemento();
+
+            // Restore the previous selection.
+            _redactionGridView.Select(currentGridSelection, false);
+
+            // Restart the screen timer to ensure all time spent verifying is accounted for.
+            StartScreenTimeTimer();
         }
 
         /// <summary>
@@ -2812,20 +2840,7 @@ namespace Extract.Redaction.Verification
 
                     CommitComment();
 
-                    // Keep track of the selection prior to saving.
-                    List<int> currentGridSelection = new List<int>(_redactionGridView.SelectedRowIndexes);
-
-                    // [FlexIDSCore:5028, 5029]
-                    // Re-load from file to start a new verification session. This needs to be done
-                    // to properly track changes, otherwise items that were modified before the save
-                    // may get re-output separately on the second save. 
-                    LoadCurrentMemento();
-
-                    // Restore the previous selection.
-                    _redactionGridView.Select(currentGridSelection, false);
-
-                    // Restart the screen timer to ensure all time spent verifying is accounted for.
-                    StartScreenTimeTimer();
+                    StartNewSession();
                 }
             }
             catch (Exception ex)
