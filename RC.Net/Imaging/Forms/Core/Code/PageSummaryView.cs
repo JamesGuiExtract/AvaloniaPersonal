@@ -388,12 +388,24 @@ namespace Extract.Imaging.Forms
         {
             if (msg.Msg == WindowsMessage.KeyDown || msg.Msg == WindowsMessage.SystemKeyDown)
             {
-                switch (keyData)
+                // If moving would move to an invalid page cell, don't process the key.
+                // (Ignore the shift key since it does not factor into navigation commands by the
+                // grid.)
+                switch (keyData & ~Keys.Shift)
                 {
                     case Keys.Down:
 
-                        // If moving would move to an invalid page cell, don't process the key.
                         if (!IsValidToMoveBy(_CELLS_PER_ROW))
+                        {
+                            return true;
+                        }
+                        break;
+
+                    case Keys.Down | Keys.Control:
+                        
+                        int remainingRows =
+                            _dataGridView.RowCount - _dataGridView.CurrentCell.RowIndex - 1;
+                        if (!IsValidToMoveBy(_CELLS_PER_ROW * remainingRows))
                         {
                             return true;
                         }
@@ -401,8 +413,17 @@ namespace Extract.Imaging.Forms
 
                     case Keys.Right:
 
-                        // If moving would move to an invalid page cell, don't process the key.
                         if (!IsValidToMoveBy(1))
+                        {
+                            return true;
+                        }
+                        break;
+
+                    case Keys.Right | Keys.Control:
+
+                        int remainingColumns =
+                            _CELLS_PER_ROW - _dataGridView.CurrentCell.ColumnIndex - 1;
+                        if (!IsValidToMoveBy(remainingColumns))
                         {
                             return true;
                         }
@@ -479,11 +500,17 @@ namespace Extract.Imaging.Forms
             try
             {
                 DataGridViewCell cell = _dataGridView.CurrentCell;
-                if (cell != null)
+                if (cell != null && _imageViewer.IsImageAvailable)
                 {
                     // Set the image viewer's page to correspond to the current cell
                     int page = GetPageNumberByIndices(cell.RowIndex, cell.ColumnIndex);
-                    if (_imageViewer.PageNumber != page)
+
+                    // [FlexIDSCore:5065]
+                    // ProcessCmdKey should prevent the possible selection of an invalid page, but
+                    // be doubly sure. I can't figure out a way to restore the previous selection, though.
+                    // Even if I reset the selection via BeginInvoke (as a different message), I
+                    // still get and error about reentrant code.
+                    if (_imageViewer.PageNumber != page && page <= _imageViewer.PageCount)
                     {
                         _imageViewer.PageNumber = page;
                     }

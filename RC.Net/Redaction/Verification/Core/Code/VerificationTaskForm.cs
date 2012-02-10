@@ -342,6 +342,11 @@ namespace Extract.Redaction.Verification
         ApplicationCommand _stopSlideshowCommand;
 
         /// <summary>
+        /// The next document command;
+        /// </summary>
+        ApplicationCommand _nextDocumentCommand;
+
+        /// <summary>
         /// Keeps track of the total number of pages for all documents committed this session and
         /// the total screen time for all documents displayed this session that are not currently
         /// in the history queue. Item1 is the total number of pages, and Item2 is the total
@@ -868,7 +873,7 @@ namespace Extract.Redaction.Verification
 
                         RedactionFileChanges changes = _redactionGridView.SaveChanges(memento.SourceDocument);
                         _currentVoa.SaveVerificationSession(tempVoaFile.FileName,
-                            changes, new TimeInterval(DateTime.Now, 0), _settings, _standAloneMode);
+                            changes, new TimeInterval(DateTime.Now, 0), _settings, _standAloneMode, true);
 
                         _redactedOutputTask.VOAFileName = tempVoaFile.FileName;
 
@@ -998,7 +1003,7 @@ namespace Extract.Redaction.Verification
             RedactionFileChanges changes = _redactionGridView.SaveChanges(memento.SourceDocument);
 
             _currentVoa.SaveVerificationSession(memento.AttributesFile, changes, screenTime,
-                _settings, _standAloneMode);
+                _settings, _standAloneMode, false);
 
             // Clear the dirty flag [FIDSC #3846]
             _redactionGridView.Dirty = false;
@@ -2309,7 +2314,7 @@ namespace Extract.Redaction.Verification
                 _commentsTextBox.Text = GetFileActionComment(memento);
 
                 _previousDocumentToolStripButton.Enabled = _historyIndex > 0;
-                _nextDocumentToolStripButton.Enabled = true;
+                _nextDocumentCommand.Enabled = IsInHistory;
 
                 _tagFileToolStripButton.Enabled = _fileDatabase != null;
                 _tagFileToolStripButton.FileId = memento.FileId;
@@ -2336,7 +2341,7 @@ namespace Extract.Redaction.Verification
                 _commentsTextBox.Text = "";
 
                 _previousDocumentToolStripButton.Enabled = false;
-                _nextDocumentToolStripButton.Enabled = false;
+                _nextDocumentCommand.Enabled = false;
 
                 _previousRedactionToolStripButton.Enabled = false;
                 _nextRedactionToolStripButton.Enabled = false;
@@ -2547,7 +2552,9 @@ namespace Extract.Redaction.Verification
                 _imageViewer.Shortcuts[Keys.Tab | Keys.Shift] = SelectPreviousItemOrPage;
 
                 // Next/previous document
-                _imageViewer.Shortcuts[Keys.Tab | Keys.Control] = GoToNextDocument;
+                _nextDocumentCommand = new ApplicationCommand(_imageViewer.Shortcuts,
+                    new Keys[] { Keys.Tab | Keys.Control }, GoToNextDocument,
+                    new ToolStripItem[] { _nextDocumentToolStripButton }, false, true, true);
                 _imageViewer.Shortcuts[Keys.Tab | Keys.Control | Keys.Shift] = GoToPreviousDocument;
 
                 // Use redaction tool
@@ -4064,6 +4071,13 @@ namespace Extract.Redaction.Verification
             {
                 if (start)
                 {
+                    // [FlexIDSCore:5058]
+                    // Prevent the slideshow from starting while a tracking event is active.
+                    if (_imageViewer.IsTracking)
+                    {
+                        return;
+                    }
+
                     if (_slideshowMessageCanceler != null)
                     {
                         // If the slideshow is being started, ensure the "Slideshow Paused" is

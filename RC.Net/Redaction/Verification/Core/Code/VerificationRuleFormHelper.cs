@@ -78,6 +78,8 @@ namespace Extract.Redaction.Verification
                     MessageBox.Show("The 'Find and redact' feature can't be used on this document because OCR data is not available.",
                         "No OCR data", MessageBoxButtons.OK, MessageBoxIcon.None,
                         MessageBoxDefaultButton.Button1, 0);
+                    
+                    return null;
                 }
                 
                 return ocrResults.SpatialString;

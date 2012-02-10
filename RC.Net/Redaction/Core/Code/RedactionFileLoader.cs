@@ -775,10 +775,15 @@ namespace Extract.Redaction
         /// <param name="settings">The settings used during verification.</param>
         /// <param name="standAloneMode"><see langword="true"/> if the verification session was run
         /// independent of the FAM and database; <see langword="false"/> otherwise.</param>
+        /// <param name="allowDuplicateSave">Ordinarily multiple saves in the same session need to
+        /// be disallowed since this class may otherwise duplicate redactions. However, in some
+        /// isolated cases this may be okay. <see langword="true"/> allows a save even if it as
+        /// already been saved. <see langword="false"/> asserts that the VOA file has not been
+        /// previously saved.</param>
         [CLSCompliant(false)]
         public void SaveVerificationSession(string fileName,
             RedactionFileChanges changes, TimeInterval time, VerificationSettings settings,
-            bool standAloneMode)
+            bool standAloneMode, bool allowDuplicateSave)
         {
             try
             {
@@ -793,7 +798,8 @@ namespace Extract.Redaction
                     : _verificationSessionId++;
 
                 // Calculate the new sensitive items
-                SaveSession(sessionName, sessionId, fileName, changes, time, sessionData);
+                SaveSession(sessionName, sessionId, fileName, changes, time, sessionData,
+                    allowDuplicateSave);
             }
             catch (Exception ex)
             {
@@ -821,7 +827,7 @@ namespace Extract.Redaction
 
                 // Calculate the new sensitive items
                 SaveSession(Constants.SurroundContextSessionMetaDataName, _surroundContextSessionId,
-                    fileName, changes, time, sessionData);
+                    fileName, changes, time, sessionData, false);
 
                 // Update the session id
                 _surroundContextSessionId++;
@@ -964,11 +970,18 @@ namespace Extract.Redaction
         /// <param name="changes">The changes made to the original VOA file.</param>
         /// <param name="time">The time elapsed during the session being saved.</param>
         /// <param name="sessionData">Additional session data to add as a sub attribute.</param>
+        /// <param name="allowDuplicateSave">Ordinarily multiple saves in the same session need to
+        /// be disallowed since this class may otherwise duplicate redactions (see [FlexIDSCore:5028,
+        /// 5029]). However, in some isolated cases this may be okay such as when IDSOD is creating
+        /// a VOA file to use for redacted output. <see langword="true"/> allows a save even if
+        /// it as already been saved. <see langword="false"/> asserts that the VOA file has not been
+        /// previously saved.</param>
         void SaveSession(string sessionName, int lastSessionId, string fileName, 
-            RedactionFileChanges changes, TimeInterval time, ComAttribute sessionData)
+            RedactionFileChanges changes, TimeInterval time, ComAttribute sessionData,
+            bool allowDuplicateSave)
         {
             ExtractException.Assert("ELI34362", "Redaction data file save not allowed.",
-                !_alreadySaved);
+                allowDuplicateSave || !_alreadySaved);
 
             List<SensitiveItem> sensitiveItems = new List<SensitiveItem>(_sensitiveItems);
 

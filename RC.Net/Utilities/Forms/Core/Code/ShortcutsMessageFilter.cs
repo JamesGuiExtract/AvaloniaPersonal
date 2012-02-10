@@ -40,6 +40,17 @@ namespace Extract.Utilities.Forms
         /// </summary>
         readonly Control _target;
 
+        /// <summary>
+        /// The last <see cref="Message"/> redirected to <see cref="_target"/>.
+        /// </summary>
+        Message _lastMessage;
+
+        /// <summary>
+        /// The <see cref="DateTime"/> the <see cref="_lastMessage"/> was redirected to
+        /// <see cref="_target"/>.
+        /// </summary>
+        DateTime _lastMessageTime;
+
         #endregion Fields
 
         #region Constructors
@@ -110,14 +121,17 @@ namespace Extract.Utilities.Forms
                         // [FlexIDSCore:5037]
                         // Despite the fact that an infinite message loop was supposedly fixed in
                         // #3906 by adding a check for _target.ContainsFocus, it was still possible
-                        // to get stuck in a loop. Also check that the receiver is not a decendant
-                        // of the target.
-                        Control receivingControl = Control.FromHandle(m.HWnd);
-                        if (receivingControl != null && !_target.Contains(receivingControl))
+                        // to get stuck in a loop. Ensure the last message is not being propagated
+                        // again within 1/10th of a second.
+                        if (m != _lastMessage ||
+                            (DateTime.Now - _lastMessageTime) > new TimeSpan(0, 0, 0, 0, 100))
                         {
                             Keys key = ((Keys)((int)((long)m.WParam))) | Control.ModifierKeys;
                             if (_manager[key] != null)
                             {
+                                _lastMessage = m;
+                                _lastMessageTime = DateTime.Now;
+
                                 NativeMethods.BeginSendMessageToHandle(m, _target.Handle);
                                 return true;
                             }
