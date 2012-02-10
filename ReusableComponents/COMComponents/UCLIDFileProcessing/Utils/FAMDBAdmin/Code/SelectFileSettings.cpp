@@ -111,7 +111,7 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 {
 	ASSERT_ARGUMENT("ELI27722", ipFAMDB != __nullptr);
 	
-	string strQueryPart1 = "SELECT " + strSelect + " FROM ";
+	string strQueryPart1 = "SELECT DISTINCT " + strSelect + " FROM ";
 	string strQuery;
 
 	if (m_vecConditions.empty())

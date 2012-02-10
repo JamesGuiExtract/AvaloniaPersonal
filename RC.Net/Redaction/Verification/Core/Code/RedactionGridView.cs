@@ -2704,6 +2704,8 @@ namespace Extract.Redaction.Verification
         /// Gets whether the <see cref="ImageViewer"/> is zoomed to the current selection in
         /// grid.
         /// </summary>
+        // Temporarily unused: [FlexIDSCore: 4858, 5067]
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal bool ZoomedToSelection
         {
             get;
@@ -2714,6 +2716,8 @@ namespace Extract.Redaction.Verification
         /// Gets the last zoom info for the current page that is not a zoom to an item that had been
         /// selected in the grid.
         /// </summary>
+        // Temporarily unused: [FlexIDSCore: 4858, 5067]
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal ZoomInfo? LastNonSelectionZoomInfo
         {
             get;

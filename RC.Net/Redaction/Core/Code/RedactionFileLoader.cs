@@ -980,8 +980,11 @@ namespace Extract.Redaction
             RedactionFileChanges changes, TimeInterval time, ComAttribute sessionData,
             bool allowDuplicateSave)
         {
-            ExtractException.Assert("ELI34362", "Redaction data file save not allowed.",
-                allowDuplicateSave || !_alreadySaved);
+            if (!allowDuplicateSave && _alreadySaved)
+            {
+                new ExtractException("ELI34362",
+                    "Unexepected VOA save detected; attribute duplication is possible.").Log();
+            }
 
             List<SensitiveItem> sensitiveItems = new List<SensitiveItem>(_sensitiveItems);
 
