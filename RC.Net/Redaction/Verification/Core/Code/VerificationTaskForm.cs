@@ -1272,8 +1272,7 @@ namespace Extract.Redaction.Verification
                 _overheadTimeInterval = _processingTimer.Restart();
                 if (thisMemento != null)
                 {
-                    double overheadTime = _processingTimer.Restart().ElapsedSeconds;
-                    thisMemento.OverheadTimeThisSession += overheadTime;
+                    thisMemento.OverheadTimeThisSession += _overheadTimeInterval.ElapsedSeconds;
                 }
             }
             // The timer will need to be started for the first document. 

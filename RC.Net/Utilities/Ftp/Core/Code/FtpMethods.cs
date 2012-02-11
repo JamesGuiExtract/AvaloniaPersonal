@@ -86,6 +86,10 @@ namespace Extract.Utilities.Ftp
                 {
                     currentFileDir = "/" + currentFileDir;
                 }
+                else if (string.IsNullOrWhiteSpace(currentFileDir))
+                {
+                    currentFileDir = "/";
+                }
 
                 // Only change the working directory if it needs to be changed.
                 if (currentFileDir != runningConnection.ServerDirectory)
