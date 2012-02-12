@@ -65,7 +65,7 @@ namespace Extract.UtilityApplications.Services
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI33126",
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI33126",
                     _OBJECT_NAME);
 
                 _endService.Reset();
