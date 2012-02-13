@@ -1,0 +1,480 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield  9.0 Testing<br> 
+Final Final Final SCRs </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of DataEntry Changes</h3>
+       	<ul>
+  	   	<LI><b>[DataEntry #1078, #1079]</b> Data Entry Verification
+		<ul>
+			<li>Exercise Demo_FLEXIndex verification.
+			<li>Open the image viewer in a separate window.
+			<li>Confirm that the data entry objects maintain an appropriate 
+			layout.
+			<li>Confirm that no crash occurs during verification of additional 
+			images.
+		</ul>
+       	</ul>
+<p>
+	<LI><h3>Descriptions of DotNet Changes</h3>
+       	<ul>
+  	   	<LI><b>[DotNet #768, #770]</b> FTP File Supplying
+		<ul>
+			<li>Exercise general FTP file supplier functionality.
+			<li>Confirm proper behavior.
+<p>
+			<li>Configure the file supplier to download recursively.
+			<li>Confirm that at least one empty folder exists within the 
+			folder hierarchy to be downloaded.
+			<li>Start queuing.
+			<li>Confirm that all files are successfully queued.
+		</ul>
+<p>
+  	   	<LI><b>[DotNet #774]</b> SQLCDBEditor
+		<ul>
+			<li>Use <b>FAM Network Manager</b> to modify the FAM Service 
+			database.
+			<li>Confirm that changes are properly saved.
+		</ul>
+<p>
+  	   	<LI><b>[DotNet #779]</b> Alternate Rasterization Methods
+		<ul>
+			<li>Confirm that the <b>alternate method</b> in the <b>Core: Rasterize 
+			PDF</b> task is now Nuance.
+			<li>Confirm that the alternate method is the default option.
+		</ul>
+<p>
+  	   	<LI><b>[DotNet #784]</b> Magnifier Window
+		<ul>
+			<li>Exercise verification with the <b>Magnifier</b> window undocked.
+			<li>Confirm that the center of the magnifier window is aligned with 
+			the cursor in the Image Viewer.
+		</ul>
+<p>
+  	   	<LI><b>[DotNet #785]</b> Processing PDF Documents
+		<ul>
+			<li>Confirm that <b>OfficeToTif.exe</b> works with a PDF document.
+			<li>Confirm that the <b>MICR Finder</b> works with a PDF document.
+		</ul>
+<p>
+  	   	<LI><b>[DotNet #792]</b> FTP Processor and Supplier
+		<ul>
+			<li>Confirm that <b>FTP Supplier</b> can retrieve files from the 
+			root directory.
+			<li>Confirm that the <b>Core: Transfer files via FTP/SFTP</b> task 
+			can upload documents to the root folder.
+			<li>Confirm that the <b>Core: Transfer files via FTP/SFTP</b> task 
+			can download documents from the root folder.
+		</ul>
+<p>
+  	   	<LI><b>[DotNet #799]</b> Extract IPC Service
+		<ul>
+			<li>Confirm that the service can be started with only a <b>FLEX 
+			Index Server</b> license.
+			<li>Confirm that the service can be started with only an <b>ID 
+			Shield Server</b> license.
+		</ul>
+       	</ul>
+<p>
+	<LI><h3>Descriptions of FlexIDSCore Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3511, #4202, #5017, #5018, #5023]</b> ID Shield Demo
+		<ul>
+			<li>Confirm that batch files force the proper working directory before 
+			executing any commands.
+			<li>Confirm that demo instructions are not version specific.
+			<li>Confirm that the database uses the <b>current</b> database schema.
+			<li>Confirm that the path used for <b>queuing</b> in the verification 
+			FPS file is correct.
+			<li>Confirm that the FPS files provided for the <b>Verify all interesting 
+			documents</b> are correct.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4215]</b> WYSIWYG Redactions
+		<ul>
+			<li>Exercise the <b>WYSIWYG Redactions</b> test with the files 
+			provided under <b>.\IndustrySpecific\Redaction\InteractiveTest\WYSIWYG 
+			redactions test</b>.
+			<li>Confirm that the expected results are seen.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4858, #5067]</b> F2 Zoom In Verification
+		<ul>
+			<li>Confirm that <b>F2</b> will zoom to the current selection.
+			<li>Confirm that subsequent <b>F2</b> will not zoom previous.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4938] (DO NOT ADD TESTER DECISION)</b> Exercise <b>Redaction: 
+		Create redacted image</b> and confirm that <b>ELI24891</b> exceptions are not 
+		logged.  Run repeated tests.
+<p>
+  	   	<LI><b>[FlexIDSCore #4985]</b> Confirm that the <b>ID Shield</b> and <b>FLEX 
+		Index</b> splash screens have a black border.
+<p>
+  	   	<LI><b>[FlexIDSCore #4987]</b> ID Shield On Demand
+		<ul>
+			<li>Configure IDSOD to not create a data file.
+			<li>Open an image that does not have a VOA file.
+			<li>Make some manual redactions and save an output image.
+			<li>Close the application.
+			<li>Confirm that the user <b>is not</b> prompted to save changes.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4989]</b> Verification
+		<ul>
+			<li>Verify a multi-page image with redactions on more than one page.
+			<li>On a page other than the last pasge with redactions, select the last 
+			redaction on the page (or create one such that it is the last one on 
+			the page).
+			<li>Delete the redaction.
+			<li>Confirm that the verification UI does not navigate to a different page.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4990, #5005, #5074]</b> DB Admin Reports
+		<ul>
+			<li>Confirm proper formatting and content for the 
+			<b>ID Shield Verification Document, Page, and Redaction Counts (By User)</b> 
+			report.
+			<li>Confirm that the <b>project verification time</b> column is removed.
+			<li>Confirm that the <b>screen verification time</b> column is now 
+			<b>verification time</b> and that the <b>OverheadTime</b> data from the 
+			<b>IDShieldData</b> table is included.
+<p>
+			<li>Confirm that the <b>Summary of Actions and Associated Document Counts</b> 
+			report can be run by a user that does not have <b>sysadmin</b> privileges 
+			for the database.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4993]</b> RSD-Based Data Scorer
+		<ul>
+			<li>Create an RSD file to be used by the RSD-based data scorer.
+			<li>Include an attribute that will not be included in the scoring 
+			expression.
+			<li>Exercise the data scorer.
+			<li>Confirm that an <b>ELI33844: Displayed: RSD data scorer failed</b> 
+			exception is not seen and that the scorer works as expected.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4994]</b> Rule Set Editor
+		<ul>
+			<li>Open an 8.0 RSD file that contains a deprecated rule object such 
+			as Grantor-Grantee Finder V2.
+			<li>Attempt to save it using <b>File - Save As</b>.
+			<li>Confirm that an error is displayed about needing an FKB version.
+			<li>Update the FKB version and remove any deprecated objects.  Add 
+			another rule, if needed in order to save.
+			<li>Attempt to save the modified ruleset using <b>File - Save As</b>.
+			<li>Confirm that the save is successful.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4995]</b> Legislation Guard
+		<ul>
+			<li>Exercise the <b>Legislation Guard</b> feature in the standard 
+			ID Shield demo.
+			<li>Verify the two <b>DOB</b> images selected.
+			<li>Confirm that updated output files are created without error.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4998]</b> Confirm that the <b>Next tile</b> and <b>Previous 
+		tile</b> buttons work properly in seamless verification mode.
+<p>
+  	   	<LI><b>[FlexIDSCore #5000, #5001, #5021, #5037, #5053]</b> Verification
+		<ul>
+			<li>Prepare a large set of images for verification.
+			<li>Delete the associated USS files.
+			<li>Exercise verification using the <b>Word</b> redaction tool and 
+			rapidly change documents.
+			<li>Confirm that no <b>ELI31365: Error loading data for word highlight 
+			tool</b> exceptions are seen.
+			<li>Confirm that no <b>ELI31371: Application trace: Word highlight background 
+			operation aborted</b> exceptions are logged.
+<p>
+			<li>Start verifying with multiple documents queued.
+			<li>Press <b>Alt+F</b> to activate the File menu.
+			<li>Press <b>Esc</b>.
+			<li>Press <b>TAB</b> repeatedly until a new document is loaded.
+			<li>Confirm that the UI is still responsive and that CPU usage is not 
+			unusually high.
+<p>
+			<li>Confirm that no crashes are seen after submitting a document.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5002]</b> Confirm that the <b>Redaction: Create redacted image</b> 
+		task does not redact metadata attributes when configured to redact <b>All</b> 
+		attributes.
+<p>
+  	   	<LI><b>[FlexIDSCore #5003]</b> Confirm that no error appears if FAM processing is 
+		quickly stopped after closing the verification window.  Run repeated tests.
+<p>
+  	   	<LI><b>[FlexIDSCore #5004]</b> Confirm that the <b>RSD data scorer</b> works properly 
+		if one attribute name is a subset of another attribute name.
+<p>
+  	   	<LI><b>[FlexIDSCore #5007]</b> Confirm that creating a redaction with the <b>Word</b> 
+		highlight tool immediately after the page changes does not throw an exception.  Run 
+		repeated tests.
+<p>
+  	   	<LI><b>[FlexIDSCore #5008]</b> Find and Redact
+		<ul>
+			<li>Prepare a set of images for verification.
+			<li>Verify an image and make a change.
+			<li>Close the verification window and <b>Cancel</b> at the save changes prompt.
+			<li>Confirm that the FAM continues processing.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5010]</b> Confirm that deleting redactions during verification does 
+		not throw an exception.  Run repeated tests.
+<p>
+  	   	<LI><b>[FlexIDSCore #5011, #5026, DotNet #781]</b> Confirm that <b>zoom</b> and 
+		<b>fit-mode</b> behavior works properly with or without tile navigation.  Run repeated 
+		tests.
+<p>
+  	   	<LI><b>[FlexIDSCore #5013]</b> Confirm that the version number provided in the 
+		verification window's <b>About</b> box matches the actual ID Shield version number.
+<p>
+  	   	<LI><b>[FlexIDSCore #5014]</b> Find and Redact
+		<ul>
+			<li>Prepare a set of images for verification.
+			<li>Exercise <b>Find and redact text</b>.
+			<li>Confirm that pages are not automatically marked as viewed just because 
+			matching text is found on that page.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5015]</b> Confirm that thumbnails are available at all times if 
+		the thumbnail window is used in <b>auto-hide</b> mode.
+<p>
+  	   	<LI><b>[FlexIDSCore #5025]</b> Confirm that closing the verification window a split 
+		second before pressing <b>Ctrl+S</b> does not <b>Commit</b> a file and still revert it 
+		to <b>Pending</b> status.  Run repeated tests.
+<p>
+  	   	<LI><b>[FlexIDSCore #5028, #5029]</b> Duplicate Redactions
+		<ul>
+			<li>Start verifying a set of images.
+			<li>Draw a manual redaction.
+			<li>Select <b>File - Save</b>.
+			<li>Press the <b>Next tile</b> button until the second pending document 
+			is displayed.
+			<li>Press the <b>Previous tile</b> button until the previous document 
+			is displayed.
+			<li>Confirm that the manual redaction <b>is not</b> duplicated.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5030]</b> Confirm that an exception is not displayed if the 
+		<b>fit-mode</b> buttons are pressed while a new image is loading.  Run repeated tests.
+<p>
+  	   	<LI><b>[FlexIDSCore #5033]</b> Saving ID Shield Metadata
+		<ul>
+			<li>Confirm that metadata XML is updated in the following circumstances when 
+			the user is not saving actual data changes.  The update should include a new 
+			verification session node.
+			<ul>
+				<li>Any time the document is closed, including moving to another 
+				document.
+				<li>When <b>File - Save</b> is selected.
+			</ul>
+			<li>Confirm that the number of verification sessions in the metadata file match 
+			the number of records in the <b>IDShieldData</b> table.
+			<li>Confirm that the session time in the VOA file matches the time recorded in 
+			the <b>IDShieldData</b> table.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5036, #5037, #3906]</b> Confirm that if <b>ELI32180</b> or 
+		<b>ELI32594</b> errors are seen during slideshow processing, the exceptions are only 
+		logged and not displayed.  Run repeated tests.
+<p>
+  	   	<LI><b>[FlexIDSCore #5038]</b> Confirm that the <b>ID Shield</b> and <b>FLEX 
+		Index</b> Help files <b>do not</b> contain a <b>New Features for LabDE 2.0</b> section 
+		under <b>Getting Started</b>.
+<p>
+  	   	<LI><b>[FlexIDSCore #5042, #5049]</b> Confirm that no error appears when closing the 
+		verification window while background OCR is in progress.  Run repeated tests.
+<p>
+  	   	<LI><b>[FlexIDSCore #5043]</b> Confirm that exercising verification requiring background 
+		OCR does not provide <b>OCR Unavailable</b> status messages.  COM exceptions should also 
+		not be logged. Run repeated tests.
+<p>
+  	   	<LI><b>[FlexIDSCore #5046]</b> Confirm that <b>starting</b> a memory leak test does not 
+		provoke an immediate FAM crash or lots of document failures.  Run repeated tests.
+<p>
+  	   	<LI><b>[FlexIDSCore #5048]</b> Confirm that navigating via next/previous document 
+		always returns the user to the first page of the document.
+<p>
+  	   	<LI><b>[FlexIDSCore #5054]</b> Confirm that <b>Apply redactions as annotations</b> works 
+		with PDF documents.  The redactions should be burned in to the image and an <b>ELI23594</b> 
+		exception should be logged.
+<p>
+  	   	<LI><b>[FlexIDSCore #5055]</b> Confirm that the <b>Redaction: Create redacted image</b> 
+		task works with JPG documents.
+<p>
+  	   	<LI><b>[FlexIDSCore #5057, #5062, #5070]</b> Confirm that repeated saves of a document 
+		from <b>ID Shield On Demand</b> cause neither an exception nor duplicated redactions.  
+		Run repeated tests.
+<p>
+  	   	<LI><b>[FlexIDSCore #5058]</b> Confirm that the verification user cannot start a slideshow 
+		session while creating or modifying a redaction.
+<p>
+  	   	<LI><b>[FlexIDSCore #5063]</b> Confirm that the <b>Next document</b> button (and 
+		associated shortcut key) is always disabled when on the current document.  Run 
+		repeated tests.
+<p>
+  	   	<LI><b>[FlexIDSCore #5066]</b> Confirm that shortcut keys such as <b>Ctrl + Right 
+		Arrow</b> cannot be used to navigate in the page summary grid to a page that does 
+		not exist.
+<p>
+  	   	<LI><b>[FlexIDSCore #5068]</b> Confirm that an exception is not thrown when using 
+		the <b>Find and Redact Text</b> feature when OCR is not available.  Run repeated tests.
+    	</ul>
+<p>
+	<LI><h3>Descriptions of LegacyRCAndUtils Changes</h3>
+       	<ul>
+  	   	<LI><b>[LegacyRC #6084]</b> DB Admin Random Subsets
+		<ul>
+			<li>Run a query to select files for which status is to be changed.
+			<li>Use the random subset selection with a specific file count.
+			<li>Confirm that the desired number of files are returned.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6261]</b> Summary Stats
+		<ul>
+			<li>Configure an FPS file to exercise a large number of very fast 
+			tasks.
+			<li>During the processing, use <b>DB Admin</b> to modify action 
+			status from <b>Pending</b> to another status.
+			<li>Confirm that a warning is presented.
+			<li>Confirm that summary statistics are still accurate.
+<p>
+			<li>Exercise the <b>Tools - Recalculate summary statistics</b> menu 
+			item in <b>DB Admin</b>.
+			<ul>
+				<li>Confirm that summary statistics are completely recomputed.  
+				This may be easier to confirm using the <b>Endurance</b> 
+				database on <b>HPQC2</b>.
+				<li>Confirm that this option is not available during active 
+				processing.
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6262, #6268]</b> Confirm that the <b>Endurance</b> test has 
+		not had any recent FAM crashes on the processing machines.
+<p>
+  	   	<LI><b>[LegacyRC #6273]</b> Nuance Licensing
+		<ul>
+			<li>Test <b>RepairNuanceLicensing.bat</b> in the <b>CommonComponents</b> 
+			folder.  Note that it will need to be run as administrator.
+			<li>Confirm that the batch file will stop and then restart the <b>Nuance 
+			Licensing</b> service.
+			<li>Ensure that licenses are reloaded by confirming that OCR works as 
+			expected.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6276]</b> Confirm that the <b>UpdateFileActionStateTransitionTable</b> 
+		entry in the <b>DBInfo</b> table is respected for using <b>Tools - Set file action 
+		status</b> from DB Admin.
+<p>
+  	   	<LI><b>[LegacyRC #6282]</b> DB Admin
+		<ul>
+			<li>Use a very large <b>Endurance</b> test database if one is available, 
+			otherwise use as large a database as possible.
+			<li>Confirm that modifying file action status status for a large number 
+			of files <b>does not</b> fail with an out-of-memory error.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6284]</b> DB Admin As Unprivileged User
+		<ul>
+			<li>Use <b>DB Admin</b> to connect to a database as a non-privileged 
+			user.  The user should have only <b>db_datareader</b> and 
+			<b>db_datawriter</b> privileges for the testing database.
+			<li>Confirm that most activities succeed.  Note that activities that 
+			involve adding or dropping tables are expected to fail.
+			<ul>
+				<li>Switch to the <b>Summary</b> tab.
+				<li>Display and then close the <b>Manage Actions</b> dialog.
+				<li>Add, Rename and Remove Actions.
+				<li>Add, Rename and Remove Counters.
+				<li>Add, Rename and Remove Tags.
+				<li>Add, Rename and Remove Users.
+				<li>Manually set action status.
+				<li>Manually set file processing priority.
+				<li>Export a file list.
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6285]</b> Processing Skipped Files
+		<ul>
+			<li>Configure a FAM to process <b>Skipped</b> files.
+			<li>Save the FPS file.
+			<li>Start processing.
+			<li>Confirm that a password prompt is displayed.
+			<li>Confirm that processing runs correctly after entering the password.
+			<li>Close and re-open the FAM.
+			<li>Start processing.
+			<li>Confirm that an <b>ELI13431: No database available</b> error is 
+			not seen.
+			<li>Close the FAM and confirm that a prompt to save changes is not seen.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6294]</b> Confirm that the FAM can process files when 
+		<b>auto-revert of stuck files</b> is disabled.
+<p>
+  	   	<LI><b>[LegacyRC #6298]</b> Confirm that no crash is seen when stopping the FAM.  
+		Run repeated tests.
+<p>
+  	   	<LI><b>[LegacyRC #6306]</b> Confirm that running the FAM does not demonstrate a 
+		large handle leak.
+<p>
+  	   	<LI><b>[LegacyRC #6311, #6312] (DO NOT ADD TESTER DECISION)</b> FAM Stats
+		<ul>
+			<li>Configure FAM processing to include display of the <b>Statistics</b> 
+			tab.
+			<li>Confirm that if a <b>ELI15459: Connection is no longer good</b> 
+			exception is logged, that it is not displayed and that processing 
+			continues.
+<p>
+			<li>Continue FAM processing that includes display of the <b>Statistics</b> 
+			tab.
+			<li>Confirm that a <b>permanent</b> license is available.
+			<li>Turn off the <b>Windows Time</b> service to disable automatic time 
+			synchronization.
+			<li>Set system time back an hour or two during processing.
+			<li>Confirm that only one <b>ELI20347: End time is less than the start 
+			time</b> exception is logged.
+		</ul>
+       	</ul>
+<p>
+	<LI><h3>Descriptions of Miscellaneous Changes</h3>
+       	<ul>
+  	   	<LI><b>Set File Action Status</b>
+		<ul>
+			<li>Connect to a large database with DB Admin.
+			<li>Exercise <b>Tools - Set file action status</b> for just a few files.
+			<li>Confirm that the operation finishes quickly.
+<p>
+			<li>Confirm that after modfying file action status, the summary tab is 
+			updated for all actions in the database.
+		</ul>
+<p>
+  	   	<LI><b>Report Viewer</b>
+		<ul>
+			<li>Open a report from DB Admin.
+			<li>Confirm that the File menu in the <b>Report Viewer</b> no longer 
+			has an <b>Email report...</b> item.
+		</ul>
+<p>
+  	   	<LI><b>Return Address Finder National Rule Set</b>
+		<ul>
+			<li>Confirm that the <b>Return Address Finder</b> test cases in the 
+			<b>Indexing</b> NRS all pass.
+		</ul>
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
