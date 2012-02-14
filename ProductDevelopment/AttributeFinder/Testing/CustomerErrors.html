@@ -50,7 +50,53 @@
 <p>
 	  	<li><b>Test 2</b>
 		<ul>
-	   		<li>TBD
+	   		<li>While processing files, run another FAM with a different action 
+			that sets files from the first FAM to 
+			<ul>
+				<li>Unattempted
+				<li>Pending
+				<li>Completed
+				<li>Failed
+				<li>Skipped
+			</ul>
+			<li>Also confirm that this exercise works if the processing file 
+			from FAM #1 is <b>cancelled</b>.
+			<li>Also confirm that this exercise works if FAM #1 was processing 
+			<b>Skipped</b> files and the processing file is <b>cancelled</b>.
+			<li>Also confirm that this exercise works if the processing file 
+			from FAM #1 <b>fails</b>.
+		</ul>
+<p>
+	  	<li><b>Test 3</b>
+		<ul>
+	   		<li>Process an image for verification.
+			<li>Process the image in a different FAM
+			<ul>
+				<li>Set the status of the file first to one status and then 
+				to a <b>second</b> before processing completes in the first FAM.
+				<li>Confirm that the <b>second</b> status is applied.
+			</ul>
+<p>
+			<li>Repeat the above test and stop processing in the first FAM before 
+			all files retrieved for processing are completed.
+			<li>Confirm that the <b>second</b> status is applied to the files 
+			that were not actually processed by the first FAM.
+<p>
+			<li>Repeat the above test but kill the first FAM before processing 
+			is complete.
+			<li>Confirm that the <b>second</b> status is applied after auto-revert.
+		</ul>
+<p>
+	  	<li><b>Test 4</b>
+		<ul>
+	   		<li>Confirm that the <b>ChangeStatus</b> column in the 
+			<b>QueuedActionStatusChange</b> database table is set to <b>I</b> for each 
+			place where queued events are not respected.
+			<ul>
+	   			<li>Set file action status from DB Admin
+				<li>Copy action status from DB Admin
+				<li>When files are deleted from the database
+			</ul>
 		</ul>
 	</UL>
 <p>
