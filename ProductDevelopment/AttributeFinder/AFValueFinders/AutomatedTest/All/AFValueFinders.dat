@@ -7,6 +7,7 @@
 <FILE>;..\LoopFinder\LoopFinder.dat
 <FILE>;..\PropertyAddressFinder\PropertyAddressFinder.dat
 <FILE>;..\RegularExpression\RegularExpression.dat
+<FILE>;..\RegularExpressionPatternMatcher\RegularExpressionPatternMatcher.dat
 <FILE>;..\SelectPageRegion\SelectPageRegion.dat
 <FILE>;..\ValueAfterClue\ValueAfterClue.dat
 <FILE>;..\ValueBeforeClue\ValueBeforeClue.dat
