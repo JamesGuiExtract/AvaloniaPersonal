@@ -25,7 +25,7 @@ set dbdir=C:\Documents and Settings\All Users\Application Data\Extract Systems\E
 
 :: replace service db
 echo.Replacing Fam Service DB...
-copy "%initdir%\ESFAMService.sdf" "%ccdir%"
+copy "%initdir%\ESFAMService.sdf" "%dbdir%"
 
 :: add queuing file to service db
 echo.Adding Queuing FAM to Service DB...
