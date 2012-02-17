@@ -24,7 +24,7 @@ set dbdir=C:\Documents and Settings\All Users\Application Data\Extract Systems\E
 set processingtime=8h
 
 :: Email address to send reports
-set recipients=joanna_lee@extractsystems.com
+set recipients=wayne_lenius@extractsystems.com
 
 :: -----------------------------------------------------------------------------
 :: Clean up
@@ -82,8 +82,8 @@ net stop ESFamService
 "%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "insert into FPSFile (NumberOfInstances, FileName, NumberOfFilesToProcess) values (1, '%cd%\run.fps', -1)" ""
 
 :: copy images into test directory
-call "%cd%\copynumberedsets" "%cd%\Images" "%cd%\Input" 1 2
-::"%cd%\copynumberedsets" "%cd%\Images" "%cd%\Input" 1 2
+call "%cd%\copynumberedsets" "%cd%\Images" "%cd%\Input" 1 6
+::"%cd%\copynumberedsets" "%cd%\Images" "%cd%\Input" 1 6
 ::start "copy numbered sets" "d:\threadscalabilitytest\copynumberedsets" "d:\threadscalabilitytest\images" "d:\threadscalability\input" 1 2
 
 :: start the FAM service
