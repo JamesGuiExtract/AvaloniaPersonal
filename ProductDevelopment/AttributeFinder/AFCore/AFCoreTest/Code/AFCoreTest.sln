@@ -576,12 +576,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabResultsCustomComponents"
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.Test", "..\..\..\..\..\RC.Net\DataEntry\Core\Testing\Automated\Extract.DataEntry.Test.csproj", "{0EB5CFB8-08D2-4137-8B70-45420515FFDA}"
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 162
+		ProjectCount = 163
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcxproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcxproj
@@ -744,6 +746,7 @@ Global
 		ProjectRelativeDiskPath160 = ..\..\..\..\DataEntry\LabDE\DEPs\StandardLabDE\Core\Code\Extract.DataEntry.DEP.StandardLabDE.csproj
 		ProjectRelativeDiskPath161 = ..\..\..\..\DataEntry\LabDE\DEPs\StandardLabDE\Testing\Automated\Extract.DataEntry.DEP.StandardLabDE.Test.csproj
 		ProjectRelativeDiskPath162 = ..\..\..\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Code\LabResultsCustomComponents.csproj
+		ProjectRelativeDiskPath163 = ..\..\..\..\..\RC.Net\DataEntry\Core\Testing\Automated\Extract.DataEntry.Test.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2712,6 +2715,18 @@ Global
 		{89C9999B-D0EB-4516-A2E2-F6DC87638839}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{89C9999B-D0EB-4516-A2E2-F6DC87638839}.Release|Win32.ActiveCfg = Release|Any CPU
 		{89C9999B-D0EB-4516-A2E2-F6DC87638839}.Release|x86.ActiveCfg = Release|Any CPU
+		{0EB5CFB8-08D2-4137-8B70-45420515FFDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EB5CFB8-08D2-4137-8B70-45420515FFDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EB5CFB8-08D2-4137-8B70-45420515FFDA}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{0EB5CFB8-08D2-4137-8B70-45420515FFDA}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{0EB5CFB8-08D2-4137-8B70-45420515FFDA}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{0EB5CFB8-08D2-4137-8B70-45420515FFDA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0EB5CFB8-08D2-4137-8B70-45420515FFDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EB5CFB8-08D2-4137-8B70-45420515FFDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EB5CFB8-08D2-4137-8B70-45420515FFDA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{0EB5CFB8-08D2-4137-8B70-45420515FFDA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{0EB5CFB8-08D2-4137-8B70-45420515FFDA}.Release|Win32.ActiveCfg = Release|Any CPU
+		{0EB5CFB8-08D2-4137-8B70-45420515FFDA}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
