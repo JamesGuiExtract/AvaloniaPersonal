@@ -1,0 +1,50 @@
+<HTML>
+<HEAD>
+<TITLE>Switching Between ZACH and ZEKE</TITLE>
+<link type="text/css" rel="stylesheet" href="../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+<BODY>
+
+	<h1>Switching Between ZACH and ZEKE</h1>
+	<hr>
+	<ul>
+		<h3>From ESXI Console</h3></li>
+		<ul>
+			<li>Click <b>F12</b> for shutdown / restart.
+			<li>Provide user name (<b>= root</b>) and password (<b>= &lt;normal local 
+			admin password&gt;</b>)
+			<li>Click <b>F11</b> to confirm the restart.
+		</ul>
+<p>
+		<h3>Reboot the Server</h3></li>
+		<ul>
+			<li>Click <b>Ctrl+C</b> at the appropriate time to enter SAS 
+			Configuration pages.
+			<li>Confirm that the page caption is <b>LSI Corporation Configuration 
+			Utility</b>.  Click <b>Enter</b>.
+			<li>Confirm that the page caption is <b>Select SAS Topology</b>.
+			<li>Select <b>SAS Topology -- SAS 2008</b>.  Click <b>Enter</b>.
+			<li>Select the desired drive
+			<ul>
+				<li>Select <b>0</b> for <b>ESXi</b> and ZEKE.
+				<li>Select <b>1</b> for <b>Windows</b> and ZACH.
+			</ul>
+			<li>Click <b>Alt+B</b> to make the selected drive the bootable drive.  
+			The effect will be one or the other of the following.
+			<ul>
+				<li><b>SATA,Boot</b> to boot ESXi
+				<li><b>SATA</b>
+<p>
+				<li><b>SATA</b>
+				<li><b>SATA,Boot</b> to boot Windows
+			</ul>
+<p>
+			<li>Click <b>Esc</b> to exit.
+			<li>Select <b>Save changes</b>.
+			<li>Click <b>Esc</b> to exit.
+			<li>Click <b>Esc</b> to exit.
+			<li>Select <b>Exit</b> and reboot the server.
+		</ul>
+	</ul>
+</body>
+</html>
