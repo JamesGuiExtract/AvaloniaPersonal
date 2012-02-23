@@ -72,9 +72,8 @@ called the <b>service machine</b>.  The machine that contains the database is re
 		and <b>Processing</b> FPS files.
         	<li>Set the service startup type to <b>Automatic</b> or <b>Automatic (Delayed)</b>.
         	<li>Restart the <b>service machine</b>.  Do not login.</li>
-        	<li>Using a different machine, open up a FAM instance connected to the processing 
-		database and activate the <b>Statistics</b> tab.</li>
-        	<li>Confirm that files are queuing and processing.</li>
+        	<li>Using a different machine, open up a DB Admin instance connected to the processing 
+		database.  Confirm that files are queuing and processing.</li>
 <p>
         	<li>Login to the <b>service machine</b>.</li>
         	<li>Confirm via <b>Task Manager</b> that the following instances are active:
@@ -106,10 +105,8 @@ called the <b>service machine</b>.  The machine that contains the database is re
         	<li>Set the ID Shield <b>Queuing</b> and <b>Processing</b> FPS files to AutoStart.
         	<li>Set the service startup type to <b>Automatic</b> or <b>Automatic (Delayed)</b>.
         	<li>Restart the <b>service machine</b>.</li>
-        	<li>Using a different machine, open up a FAM instance connected to the processing 
-		database and activate the <b>Statistics</b> tab.</li>
-        	<li>Confirm that files are queuing and processing.</li>
-        	<li>Confirm that redacted images are being created.</li>
+        	<li>Using a different machine, open up a DB Admin instance connected to the processing 
+		database.  Confirm that files are queuing and processing.</li>
 <p>
         	<li>Login to the <b>service machine</b>.</li>
         	<li>Confirm via <b>Task Manager</b> that the following instances are active:
@@ -138,9 +135,9 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			files to AutoStart.
             		<li>Set the service startup type to <b>Automatic</b>.
             		<li>Restart the <b>service machine</b>.  Do not login.</li>
-            		<li>Using a different machine, open up a FAM instance connected to the 
-			processing database and activate the <b>Statistics</b> tab.</li>
-            		<li>Confirm that files <b>are not</b> queuing and processing.</li>
+	        	<li>Using a different machine, open up a DB Admin instance connected to 
+			the processing database.  Confirm that files <b>are not</b> queuing and 
+			processing.</li>
             		<li>Add some files to the remote folder to test the listening feature.
             		<li>Confirm that files <b>are</b> queuing and processing.</li>
         	</ul>
@@ -160,8 +157,9 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			<b>Automatic (Delayed)</b>.
             		<li>Restart the <b>service machine</b>.  Do not login.</li>
             		<li>Using a different machine, open up a DB Admin instance connected to 
-			the processing database.</li>
-            		<li>Confirm that files <b>are</b> queuing and processing.</li>
+			the processing database.  Confirm that files <b>are</b> queuing and 
+			processing.</li>
+			<li>Replace the temporary license with a permanent license.
         	</ul>
     	</ul>
 <p>
@@ -170,25 +168,24 @@ called the <b>service machine</b>.  The machine that contains the database is re
         	<li><b>Specified users, two machines</b>
         	<ul>
             		<li>Confirm on the database machine that the database is clear.
-            		<li>For each service machine, execute a single instance of the ID 
-			Shield <b>Queuing</b> and <b>Processing</b> FPS files.
+            		<li>On the first service machine, execute a single instance of the 
+			ID Shield <b>Queuing</b> and <b>Processing</b> FPS files.
+            		<li>On the second service machine, execute a single instance of the 
+			ID Shield <b>Processing</b> FPS file.
             		<li>Set the service startup types to <b>Automatic</b> or 
 			<b>Automatic (Delayed)</b>.  Do not login.</li>
-            		<li>Using a different machine, open up a FAM instance connected to the 
-			processing database and activate the <b>Statistics</b> tab.</li>
-            		<li>Confirm that files are queuing and processing.</li>
-            		<li>Confirm that redacted images are being created.</li>
+	        	<li>Using a different machine, open up a DB Admin instance connected 
+			to the processing database.  Confirm that files are queuing and 
+			processing.</li>
 <p>
             		<li>Login to one of the service machines and <b>Stop</b> the 
 			<b>ESFAMProcess.exe</b> service.
             		<li>Confirm that files are continuing to process.</li>
-            		<li>Confirm that redacted images are being created.</li>
             		<li><b>Start</b> the <b>ESFAMProcess.exe</b> service.
 <p>
             		<li>Login to the other service machine and <b>Stop</b> the 
 			<b>ESFAMProcess.exe</b> service.
             		<li>Confirm that files are continuing to process.</li>
-            		<li>Confirm that redacted images are being created.</li>
         	</ul>
 <p>
         	<li><b>Specified user, scheduled processing</b>
@@ -200,14 +197,11 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			AutoStart.
             		<li>Set the service startup type to <b>Delayed</b> or <b>Automatic</b>.
             		<li>Restart the <b>service machine</b>.</li>
-            		<li>Using a different machine, open up a FAM instance connected to the 
-			processing database and activate the <b>Statistics</b> tab.</li>
-            		<li>Confirm that files <b>are</b> queuing.</li>
-            		<li>Confirm that files <b>are not</b> processing.</li>
-            		<li>Confirm that redacted images <b>are not</b> being created.</li>
+	        	<li>Using a different machine, open up a DB Admin instance connected to 
+			the processing database.  Confirm that files <b>are</b> queuing and 
+			<b>are not</b> processing.</li>
             		<li>Wait until the scheduled processing is due to start.
             		<li>Confirm that files <b>are</b> processing.</li>
-            		<li>Confirm that redacted images <b>are</b> being created.</li>
             		<li>Confirm that application traces are logged when processing starts 
 			and stops per schedule.
         	</ul>
@@ -248,10 +242,6 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			FAM service</b> service from the Services management console.
             		<li>Confirm that each running <b>FAMProcess.exe</b> instance finishes 
 			processing the active files and then stops gracefully.</li>
-            		<li><b>[DotNet #358, #414]</b> Confirm that <b>ELI28498</b> exceptions 
-			are not seen for each previously killed instance of FAMProcess.exe.  
-			It is acceptable that these exceptions are wrapped in a more meaningful 
-			exception.
         	</ul>
 <p>
         	<li><b>Restart the stopped service</b>
@@ -264,14 +254,7 @@ called the <b>service machine</b>.  The machine that contains the database is re
 <p>
         	<li><b>Run multiple FPS files, then gracefully restart the machine</b>
         	<ul>
-            		<li>Confirm on the database machine that the database is clear.
-            		<li>Set the <b>AutoRevertTimeOutInMinutes</b> field in <b>DBInfo</b> 
-			to <b>5</b>.
-            		<li>Prepare four or more FPS file instances.
-            		<li>Set the service startup type to <b>Automatic</b> or <b>Automatic 
-			(Delayed)</b>.
-            		<li>Restart the <b>service machine</b>.</li>
-            		<li>Confirm that files are processing.</li>
+            		<li>Continuing the above test, confirm that files are processing.
             		<li><b>Restart</b> the test machine from the Start menu.
             		<li>Confirm that Application trace messages are logged for <b>FAM 
 			Service stopping</b>.
@@ -282,20 +265,11 @@ called the <b>service machine</b>.  The machine that contains the database is re
             		<li>Confirm that after approximately 5 minutes, any files that were 
 			stuck in Processing mode revert to Pending and are processed by the 
 			service.
-            		<li><b>[DotNet #444]</b> Confirm that <b>ELI28497</b> is not seen in 
-			the exception log.
         	</ul>
 <p>
         	<li><b>Run multiple FPS files, then ungracefully restart the machine</b>
         	<ul>
-            		<li>Confirm on the database machine that the database is clear.
-            		<li>Set the <b>AutoRevertTimeOutInMinutes</b> field in <b>DBInfo</b> 
-			to <b>5</b>.
-            		<li>Prepare four or more FPS file instances.
-            		<li>Set the service startup type to <b>Automatic</b> or <b>Automatic 
-			(Delayed)</b>.
-            		<li>Restart the <b>service machine</b>.</li>
-            		<li>Confirm that files are processing.</li>
+            		<li>Continuing the above test, confirm that files are processing.
             		<li><b>Restart</b> the test machine by pressing the power button.
             		<li>Confirm that files are processing normally after restart.</li>
             		<li>Confirm that files stuck in <b>Processing</b> mode during the 
@@ -349,7 +323,7 @@ called the <b>service machine</b>.  The machine that contains the database is re
 <p>
             		<li>Add more entries to the <b>DependentServices</b> field using a pipe 
 			character as a delimiter.
-            		<li>Confirm that the FAM service does not start if only some of the 
+            		<li>Confirm that <b>FAMProcess.exe</b> does not start if only some of the 
 			specified dependent services have started.
             		<li>Confirm that an exception is logged after the sleep time has expired 
 			noting which dependent services have not started.
@@ -383,39 +357,38 @@ called the <b>service machine</b>.  The machine that contains the database is re
 <p>
     	<li><b>Miscellaneous</b>
     	<ul>
-        	<LI><b>SkipAuthenticationForServicesOnMachines</b>
+        	<LI><b>Authentication</b>
         	<ul>
-            		<li>Confirm that a <b>SkipAuthenticationForServicesOnMachines</b> field 
-			exists in the <b>DBInfo</b> table.
-            		<li>Enable user authentication via <b>RequireAuthenticationBeforeRun</b>.
+            		<li>Confirm that a <b>Require authentication to run</b> checkbox  
+			exists within <b>Database options...</b> on the <b>Security</b> tab.
+            		<li>Enable authentication.
             		<li>Confirm that running an FPS file in normal mode correctly requires a 
 			user to be defined in the database and to provide a password.
-            		<li>Add the test machine to the comma-separated list of machines for 
-            		<b>SkipAuthenticationForServicesOnMachines</b>.
+            		<li>Add the test machine to the <b>Skip authentication when running as a 
+			service on the following machines</b> list.
             		<li>Confirm that the FAM service runs as expected without requiring a 
 			password.
             		<li>Confirm (again) that running an FPS file in normal mode correctly 
 			requires a user to be defined in the database and to provide a password.
 <p>
-            		<li>Remove the test machine from the comma-separated list of machines for 
-            		<b>SkipAuthenticationForServicesOnMachines</b>.
+            		<li>Remove the test machine from the list.
             		<li>Prepare FPS files to be run via the FAM service against at least two 
 			databases.
-            		<li>Configure one database to <b>require</b> user authentication.
-            		<li>Configure another database to <b>not require</b> user authentication.
+            		<li>Configure one database to <b>require</b> authentication.
+            		<li>Configure another database to <b>not require</b> authentication.
             		<li>Confirm that the FAM service logs an expection for the FPS file 
-			processing files for the database that requries user authentication.
+			processing files for the database that requries authentication.
             		<li>Confirm that the other FPS file processes files as expected.
             		<li>Stop the service.
-            		<li>Configure each database to require user authentication.
+            		<li>Configure each database to require authentication.
             		<li>Restart the service.
             		<li>Confirm that the FAM service logs a stop message and stops running 
-			since no FPS file can be exercised without user authentication.
-            		<li>Add the test machine to the comma-separated lists of machines for 
-            		<b>SkipAuthenticationForServicesOnMachines</b>.
+			since no FPS file can be exercised without authentication.
+            		<li>Add the test machine to both <b>Skip authentication when running as a 
+			service on the following machines</b> lists.
             		<li>Restart the service.
             		<li>Confirm that the FAM service and processing EXEs run as expected 
-			without requiring a password.
+			without requiring passwords.
         	</ul>
     	</ul>
 </ul>
