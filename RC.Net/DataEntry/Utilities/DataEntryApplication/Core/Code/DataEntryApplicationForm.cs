@@ -337,6 +337,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// The rectangular highlight tool command.
         /// </summary>
         ApplicationCommand _selectRectangularHighlightCommand;
+
+        /// <summary>
+        /// The word highlight tool command.
+        /// </summary>
+        ApplicationCommand _selectWordHighlightCommand;
          
         /// <summary>
         /// The hide tooltips command.
@@ -983,6 +988,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     new ToolStripItem[] { _rectangularHighlightToolStripMenuItem, 
                         _rectangularHighlightToolStripButton }, false, true, false);
 
+                // Swipe word tool
+                _selectWordHighlightCommand = new ApplicationCommand(_imageViewer.Shortcuts,
+                    null, _imageViewer.SelectWordHighlightTool,
+                    new ToolStripItem[] { _wordHighlightToolStripMenuItem,
+                        _wordHighlightToolStripButton }, false, true, false);
+
                 // Fit to page
                 _imageViewer.Shortcuts[Keys.Alt | Keys.P] = _imageViewer.ToggleFitToPageMode;
 
@@ -1577,6 +1588,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _toggleHighlightCommand.Enabled = false;
                     _selectAngularHighlightCommand.Enabled = false;
                     _selectRectangularHighlightCommand.Enabled = false;
+                    _selectWordHighlightCommand.Enabled = false;
                 }
 
                 base.Text = _brandingResources.ApplicationTitle;
@@ -1809,6 +1821,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _toggleHighlightCommand.Enabled = e.SwipingEnabled;
                     _selectAngularHighlightCommand.Enabled = e.SwipingEnabled;
                     _selectRectangularHighlightCommand.Enabled = e.SwipingEnabled;
+                    _selectWordHighlightCommand.Enabled = e.SwipingEnabled;
                 }
             }
             catch (Exception ex)
