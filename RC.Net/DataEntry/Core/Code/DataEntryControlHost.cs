@@ -2074,22 +2074,25 @@ namespace Extract.DataEntry
                 // Call the base OnLoad method
                 base.OnLoad(e);
 
-                ExtractException.Assert("ELI30678", "Application data not initialized.",
-                    _dataEntryApp != null);
+                if (!_inDesignMode)
+                {
+                    ExtractException.Assert("ELI30678", "Application data not initialized.",
+                        _dataEntryApp != null);
 
-                ExtractException.Assert("ELI25377", "Highlight colors not initialized!",
-                    _highlightColors != null && _highlightColors.Length > 0);
+                    ExtractException.Assert("ELI25377", "Highlight colors not initialized!",
+                        _highlightColors != null && _highlightColors.Length > 0);
 
-                // Loop through all contained controls looking for controls that implement the 
-                // IDataEntryControl interface.  Registers events necessary to facilitate
-                // the flow of information between the controls.
-                RegisterDataEntryControls(this);
+                    // Loop through all contained controls looking for controls that implement the 
+                    // IDataEntryControl interface.  Registers events necessary to facilitate
+                    // the flow of information between the controls.
+                    RegisterDataEntryControls(this);
 
-                // Create and initialize smart tag support for all text controls.
-                InitializeSmartTagManager();
+                    // Create and initialize smart tag support for all text controls.
+                    InitializeSmartTagManager();
 
-                _dataEntryApp.ShowAllHighlightsChanged += HandleShowAllHighlightsChanged;
-                Application.Idle += HandleApplicationIdle;
+                    _dataEntryApp.ShowAllHighlightsChanged += HandleShowAllHighlightsChanged;
+                    Application.Idle += HandleApplicationIdle;
+                }
 
                 _isLoaded = true;
             }

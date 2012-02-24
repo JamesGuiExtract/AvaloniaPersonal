@@ -375,25 +375,21 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         DbConnection _dbConnection;
 
         /// <summary>
-        /// The filename of a local copy of the database made if the master database resides on
-        /// another machine.
+        /// A map for each database being used from the original source location to the local
+        /// temporary copy.
         /// </summary>
-        TemporaryFile _localDbCopy;
+        Dictionary<string, TemporaryFile> _localDbCopies = new Dictionary<string, TemporaryFile>();
 
         /// <summary>
-        /// The last time the source DB was modified (set only when caching the DB locally)
+        /// A map for each database being used of the last time the source DB was modified so that
+        /// a new copy can be retrieved if needed.
         /// </summary>
-        DateTime _lastDbModificationTime;
+        Dictionary<string, DateTime?> _lastDbModificationTimes = new Dictionary<string, DateTime?>();
 
         /// <summary>
         /// The path of the source DB.
         /// </summary>
         string _dataSourcePath;
-
-        /// <summary>
-        /// The path of the currently open local database connection.
-        /// </summary>
-        string _currentDataSourcePath;
 
         /// <summary>
         /// The connection string used to open the current database connection.
@@ -1389,10 +1385,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
 
                 // If we were using a temporary local copy of a remote database, delete it now.
-                if (_localDbCopy != null)
+                if (_localDbCopies != null)
                 {
-                    _localDbCopy.Dispose();
-                    _localDbCopy = null;
+                    CollectionMethods.ClearAndDispose(_localDbCopies);
+                    _localDbCopies = null;
                 }
 
                 // Dispose of menu items
@@ -3587,32 +3583,47 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             "can be specified, or a local datasource-- not both.",
                             string.IsNullOrEmpty(_activeDataEntryConfig.Config.Settings.DatabaseConnectionString));
 
+                        // Resolve path as lower-case to make lookups in _localDbCopies and
+                        // _lastDbModificationTimes case-insensitive.
                         _dataSourcePath =
-                            DataEntryMethods.ResolvePath(_activeDataEntryConfig.Config.Settings.LocalDataSource);
+                            DataEntryMethods.ResolvePath(_activeDataEntryConfig.Config.Settings.LocalDataSource)
+                            .ToLower(CultureInfo.CurrentCulture);
+
+                        // Keep track of whether we need to make a new copy of the source DB.
+                        bool getNewCopy = false;
+                        DateTime? lastDbModificationTime = null;
 
                         // [DataEntry:399, 688, 986]
                         // Whether or not the file is accessed via a network share, create and use a
                         // local copy. Though multiple connections are allowed to a local file, the
                         // connections cannot see each other's changes.
-                        if (_localDbCopy == null)
+                        TemporaryFile localDbCopy;
+                        if (!_localDbCopies.TryGetValue(_dataSourcePath, out localDbCopy)
+                            || localDbCopy == null)
                         {
-                            _localDbCopy = new TemporaryFile(true);
+                            localDbCopy = new TemporaryFile(true);
+                            getNewCopy = true;
                         }
-                        // Create a new connection string (and, thus, connection) if referencing a
-                        // different database path or the source database has been updated.
-                        else if (_currentDataSourcePath != _dataSourcePath ||
-                                 File.GetLastWriteTime(_dataSourcePath) > _lastDbModificationTime)
+                        // Create a new connection string (and, thus, connection) if the source
+                        // database has been updated.
+                        else if (!_lastDbModificationTimes.TryGetValue(_dataSourcePath, out lastDbModificationTime) ||
+                                 File.GetLastWriteTime(_dataSourcePath) > lastDbModificationTime.Value)
                         {
-                            TemporaryFile oldDbCopy = _localDbCopy;
-                            _localDbCopy = new TemporaryFile(true);
+                            TemporaryFile oldDbCopy = localDbCopy;
+                            localDbCopy = new TemporaryFile(true);
                             oldDbCopy.Dispose();
+                            getNewCopy = true;
                         }
 
-                        _lastDbModificationTime = File.GetLastWriteTime(_dataSourcePath);
-                        
-                        File.Copy(_dataSourcePath, _localDbCopy.FileName, true);
+                        if (getNewCopy)
+                        {
+                            File.Copy(_dataSourcePath, localDbCopy.FileName, true);
 
-                        connectionString = "Data Source='" + _localDbCopy.FileName + "';";
+                            _localDbCopies[_dataSourcePath] = localDbCopy;
+                            _lastDbModificationTimes[_dataSourcePath] = File.GetLastWriteTime(_dataSourcePath);
+                        }
+
+                        connectionString = "Data Source='" + localDbCopy.FileName + "';";
                     }
                 }
 
@@ -3624,7 +3635,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _dbConnection = null;
                 }
 
-                _currentDataSourcePath = _dataSourcePath;
                 _currentDbConnectionString = connectionString;
 
                 // As long as connection information was provieded one way or another,
