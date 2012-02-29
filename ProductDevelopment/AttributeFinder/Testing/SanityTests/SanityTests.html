@@ -10,8 +10,8 @@
 <h1>FLEX Index / ID Shield FAM Sanity Test<br>
 <img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif" />
 </h1>
-<hr />
-<p />
+<hr>
+<p>
 *Both ID Shield and FLEX Index should be installed and licensed for this test.
 <ol>
 	<li><h2>ID Shield Testing</h2>
@@ -48,13 +48,14 @@
 			<li>Verify the <b>USB License Key Manager</b> is pointed to a USB key with redaction 
 			counts available (usually LISA).
 		</ul>
-<p />
+<p>
 		<li><b>Test1 - OCR and Auto-redaction from a Folder file supplier</b>
 		<ul>
             		<li>Log in to the test machine as a domain user.
 			<li>Open <b>Auto-Redact.fps</b> and confirm that an error prompt informs you that 
 			the DB Schema version does not match.</li>
-            		<li>Open the DB Admin and connect to the database <b>sanity_test1</b>.</li>
+            		<li>Run DB Admin <b>as Administrator</b> and connect to the database 
+			<b>sanity_test1</b>.</li>
             		<li>When prompted to update the database to the current schema, click Yes.</li>
             		<li>Confirm that the database is successfully updated.</li>
             		<li>In the Database tab of the FAM, hit the Refresh button and confirm that it 
@@ -72,13 +73,15 @@
 			this.</li>
 			<li><b>Test2</b> can be started while <b>Test1</b> is executing.
 		</ul>
-<p />
+<p>
 		<li><b>Test2 - Compute redactions from a Folder file supplier</b>
 		<ul>
 			<li><b>User authentication</b> - Use <b>Compute.fps</b> to test.
 			<ul>
-                		<li>Open the DB Admin and connect to the database <b>sanity_test</b>.</li>
-                		<li>When prompted to update the database to the current schema, click No.</li>
+                		<li>Run DB Admin <b>as Administrator</b> and connect to the database 
+				<b>sanity_test</b>.</li>
+                		<li>When prompted to update the database to the current schema, click
+				<b>No</b>.</li>
                 		<li>Confirm that <b>only</b> the following menu items are enabled.
                 		<ul>
                     			<li>Database - <b>Clear</b>, <b>Update database schema</b>, 
@@ -95,9 +98,10 @@
 				does not start.
 				<li>Add the logged-in user via <b>DB Admin</b>.
 				<li>Confirm that processing starts without error.
-				<li>Remove the logged-in user via <b>DB Admin</b>.
-				<li>Modify <b>SkipAuthenticationForServiceOnMachines</b> in the 
-				<b>DBInfo</b> table to include the test machine.
+				<li>Stop processing and remove the logged-in user via <b>DB Admin</b>.
+				<li>Modify <b>Skip authentication when running as a service on 
+				the following machines</b> within the <b>Database Options</b> dialog to 
+				include the test machine.
                 		<li>Confirm that processing still does not start.
                 		<li>Configure the FAM service to run Compute.fps
 				<li>Confirm that the FPS file can be run as a service without error.
@@ -116,14 +120,16 @@
 			execute task(s)</b> tasks.
 			<li>Use the <b>File Action Manager Database Administration</b> utility to display 
 			the <b>Summary</b> tab.  Confirm that the various counts are changing.
-            		<li>Try to clear the database and confirm that you are not allowed to clear the 
-			database while files are being processed.</li>
+            		<li>Try to <b>Clear</b> the database and confirm that you are not allowed to 
+			clear the database while files are being processed.</li>
+            		<li>Try to <b>Recalculate summary statistics</b> and confirm that this is not 
+			allowed while files are being processed.</li>
 			<li><b>Test3</b> can be started while <b>Test2</b> is executing.  Note that 
 			<b>Test3</b> cannot be completed until after Test2 has completed.
 			<li>Confirm via <b>FAMDBAdmin</b> that several files are ready for verification 
 			before starting <b>Test3</b>.
 		</ul>
-<p />
+<p>
 		<li><b>Test3 - Verify redactions</b>
 		<ul>
 			<li>Open <b>Verify.fps</b> and start processing.
@@ -165,15 +171,17 @@
 			<li>Finish verifying the sensitive documents and confirm that the verification UI 
 			automatically closes.
 		</ul>
-<p />
+<p>
 		<li><b>Test4 - Special images</b>
 		<ul>
 			<li>Open <b>TestImages1.fps</b> and start processing.
 			<ul>
 				<li>Confirm that multiple file suppliers are defined.
-				<li>Confirm that <b>most</b> files are successfully queued.  Some 
+				<li>Confirm that <b>all</b> files are successfully queued.  Some 
 				files will fail queuing for acceptable reasons.
-				<li>Confirm that <b>most</b> files process successfully.
+				<li>Confirm that <b>most</b> files process successfully.  <b>19</b> 
+				files are expected to fail due to invalid format, unsupported view 
+				perspective, image too large and other acceptable reasons.
 			</ul>
 			<li>Open <b>TestImages2.fps</b> and start processing.
 			<ul>
@@ -182,17 +190,22 @@
 				<li>Rotate some images and add additional manual redactions.
 				<li>Confirm that reviewing document history shows found and 
 				added redactions each in their appropriate places.
-				<li>Confirm that <b>all</b> files process successfully.
+				<li>Confirm that <b>most</b> files process successfully.  <b>2</b> 
+				files are expected to fail.
+				<ul>
+					<li><b>2726.2149.tif</b> - invalid bits per pixel
+					<li><b>280.jpg</b> - Data CRC error
+				</ul>
 			</ul>
 		</ul>
-<p />
+<p>
 		<li><b>Analysis of ID Shield test results</b>
 		<ul>
 			<li>Confirm that the <b>Summary</b> tab displays the expected counts.
 			<li>Check for errors in the log tabs of the FAM and in the UEX log.
 		</ul>
 	</ul>
-<p />
+<p>
 	<li><h2>PDF/A conversion and PDF security</h2>
 	<ul>
 		<li>Exercise <b>Core: Convert to searchable PDF</b> and enable PDF/A conversion.
@@ -203,7 +216,7 @@
 		the files created by the <b>Verify.fps</b>.
 		<li>Confirm that other security settings are also applied as expected.
 	</ul>
-<p />
+<p>
 	<li><h2>File Encryption and Decryption</h2>
 	<ul>
 		<li>Exercise <b>Core: Encrypt / decrypt file</b> and exercise encryption.
@@ -211,36 +224,35 @@
 		<li>Exercise <b>decryption</b>.
 		<li>Confirm that the decrypted files are the same size as the original files.
 	</ul>
-<p />
-    <li><h2>Processing atypical images</h2>
-    <ul>
-        <li>For each sanity test, select 2 or 3 of the TestImages subfolders to be processed and
-        confirm correct behavior.</li>
-        <li><b>Annotated</b>
-        <ul>
-            <li>Confirm that annotations can either be retained or not.</li>
-        </ul></lI>
-        <li><b>Corrupt</b>
-        <ul>
-            <li>Confirm that files fail reasonably gracefully.</li>
-        </ul></lI>
-        <li><b>ImageTypes</b>
-        <ul>
-            <li>Confirm that reasonable things happen when you try to process these images; note
-            that some may not process successfully.</li>
-        </ul></lI>
-        <li><b>PDFVersions</b>
-        <ul>
-            <li>Confirm that all PDF versions can be processed successfully.</li>
-        </ul></lI>
-        <li><b>Rotated</b>
-        <ul>
-            <li>Confirm that you see reasonable behavior regardless of image orientation; note
-            that some documents are mirror images and that the rules will not be very successful
-            with those documents.</li>
-        </ul></lI>
-    </ul></li>
-<p />
+<p>
+    	<li><h2>Processing atypical images</h2>
+    	<ul>
+        	<li>For each sanity test, select 2 or 3 of the TestImages subfolders to be processed 
+		and confirm correct behavior.</li>
+        	<li><b>Annotated</b>
+        	<ul>
+            		<li>Confirm that annotations can either be retained or not.</li>
+        	</ul>
+        	<li><b>Corrupt</b>
+        	<ul>
+            		<li>Confirm that files fail reasonably gracefully.</li>
+        	</ul>
+        	<li><b>ImageTypes</b>
+        	<ul>
+            		<li>Confirm that reasonable things happen when you try to process these images; 
+			note that some may not process successfully.</li>
+        	</ul>
+        	<li><b>PDFVersions</b>
+        	<ul>
+            		<li>Confirm that all PDF versions can be processed successfully.</li>
+        	</ul>
+        	<li><b>Rotated</b>
+        	<ul>
+            		<li>Confirm that you see reasonable behavior regardless of image orientation; 
+			note that most view perspective examples will fail processing.</li>
+        	</ul>
+    	</ul>
+<p>
 	<li><h2>FLEX Index - Demo</h2>
 	<ul>
 		<li>Copy the <b>Demo_FlexIndex</b> folder to the test machine.
@@ -260,7 +272,7 @@
 		<li>Confirm that verification and swiping require only a <b>FLEX Index 
 		Client</b> license.
 	</ul>
-<p />
+<p>
 	<li><h2>General Tools</h2>
 	<ul>
 		<li><b>Database Administration</b>
@@ -274,42 +286,49 @@
 			<li>Confirm that <b>Database name</b> includes a <b>&lt;Browse...&gt;</b> 
 			choice that populates the combo box with names of all databases available on the 
 			selected server.
-			<p />
+<p>
 			<li>Confirm that an action can be <b>added</b> to the database.
 			<li>Confirm that an action can be <b>removed</b> from the database.
 			<ul>
 				<li>Confirm that removing an action requires double confirmation.
 			</ul>
 			<li>Confirm that an action can be <b>renamed</b> in the database.
-			<p />
+<p>
 			<li>Confirm that a tag can be <b>added</b> to the database.
 			<li>Confirm that a tag can be <b>modified</b> in the database.
 			<li>Confirm that a tag can be <b>deleted</b> from the database.
-			<p />
+<p>
 			<li>Confirm that a counter can be <b>added</b> to the database.
 			<li>Confirm that a counter can be <b>deleted</b> from the database.
 			<li>Confirm that a counter can be <b>renamed</b> in the database.
 			<li>Confirm that the value of a counter can be <b>modified</b> 
 			in the database.
-			<p />
+<p>
 			<li>Confirm that a user can be <b>added</b> to the database.
 			<li>Confirm that a user can be <b>modified</b> in the database.
 			<li>Confirm that a user can be <b>deleted</b> from the database.
 			<li>Confirm that a user password can be <b>reset</b> in the database.
-			<p />
+<p>
 			<li>Confirm that the <b>Summary</b> tab displays current counts for the actions 
 			defined in the selected database.
 			<li>Confirm that the <b>Refresh</b> button updates the current counts.
-			<p />
+<p>
 			<li>Confirm that file action status can be <b>modified</b>.
 			<li>Confirm that file processing priority can be <b>modified</b>.
-			<li>Confirm that the <b>File Action Manager</b> can be started from the Tools 
-			menu and that the active database is preselected.
+			<li>Confirm that Statistics can be <b>recalculated</b>.
+			<ul>
+				<li>Remove entry in <b>ActionStatistics</b> table.
+				<li>Click <b>Refresh</b> to confirm inaccurate values.
+				<li>Select <b>Recalculate summary statistics</b> and confirm 
+				that the summary statistics are updated.
+			</ul>
+			<li>Confirm that the <b>File Action Manager</b> can be started from the 
+			<b>Tools</b> menu and that the active database is preselected.
 			<li>Confirm that a file list can be <b>exported</b>.
 			<li>Confirm that each available <b>Report</b> can be generated.
-            		<li>Confirm that DBInfo settings can be <b>modified</b>.</li>
+            		<li>Confirm that <b>Database options</b> can be modified.</li>
 		</ul>
-<p />
+<p>
 		<li><b>Help File</b>
 		<ul>
 			<li>Confirm that the <b>ID Shield</b> help file opens without error.
@@ -325,8 +344,8 @@
             		<li>Draw some manual redactions and add some exemption codes.</li>
             		<li>Save a redacted image. Open it in the image viewer and confirm that 
 			redactions are drawn appropriately with exemption codes as redaction text.</li>
-        	</uL></lI>
-<p />
+        	</uL>
+<p>
 		<li><b>USB License Key Manager</b>
 		<ul>
 			<li>Confirm that connecting to a USB key on a remote machine (i.e. <b>LISA</b>) 
@@ -337,7 +356,7 @@
 			window with details about the local key.  Note that <b>Java</b> may need to 
 			be installed before the details are displayed.
 		</ul>
-		<p />
+<p>
 		<li><b>User License</b>
 		<ul>
 			<li>Confirm that the <b>User License</b> application when selected from the 
@@ -364,7 +383,7 @@
 			the clipboard.
 		</ul>
 	</ul>
-<p />
+<p>
 	<li><h2>Utility Applications</h2>
 	<ul>
 		<li><b>Miscellaneous Utilities</b>
@@ -374,7 +393,7 @@
 			<li>Convert FAM Database - opens without error.
 			<li>Convert FPS File - opens without error.
 		</ul>
-<p />
+<p>
 		<li><b>Detect and Report Failure</b>
 		<ul>
 			<li>Confirm that <b>FDRS</b> starts and leaves a green icon in the system tray.
@@ -384,7 +403,7 @@
 			<li>Confirm that <b>Exit</b> closes the application and removes the icon from the 
 			system tray.
 		</ul>
-<p />
+<p>
 		<li><b>FAM Network Manager</b>
 		<ul>
 			<li>Add the current test machine and confirm that <b>FAM Status</b> and 
@@ -392,7 +411,7 @@
 			<li>Add a non-existent machine and confirm that status values are <b>Not 
 			Available</b>.
 			<li>Start the FAM Service on the test machine and confirm that FAM Status 
-			changes to <b>StartPending</b>.
+			changes to <b>Running</b>.
 			<li>Confirm that the <b>Refresh status</b> toolbar button updates status 
 			for all defined machines.
 			<li>Click the <b>Auto refresh status</b> toolbar button
@@ -403,14 +422,16 @@
 			<li>Stop the FAM Service on the test machine and confirm that FAM Status 
 			changes to <b>Stopped</b>.
 		</ul>
-<p />
+<p>
 		<li><b>ID Shield Statistics Reporter</b>
 		<ul>
 	      		<li>Prepare a set of images for verification.
-			<li>Collect feedback during verification.
+			<li>Collect feedback during verification.  Note that <b>Verify.fps</b> from 
+			<b>Test3</b> is configured to collect feedback to an <b>ExpectedRedactions</b> 
+			subfolder.
 			<li>Confirm that a <b>Start menu</b> shortcut exists 
 			under <b>Utilities</b>.
-<p />
+<p>
 			<li>Confirm that the UI works as expected.
 			<li>Confirm that <b>Automated redaction</b> analysis works 
 			as expected when limiting data types to be tested.
@@ -428,7 +449,7 @@
 			<li>Confirm that appropriate files are provided in the 
 			<b>File lists</b> tab.
 		</ul>
-<p />
+<p>
 		<li><b>Image Viewer</b>
 		<ul>
 			<li><b>TIF image</b>
@@ -440,7 +461,7 @@
 				<li>Confirm that a rectangular swipe of text OCRs properly.
 				<li>Confirm that a highlight can be deleted.
 			</ul>
-<p />
+<p>
 			<li><b>PDF image</b>
 			<ul>
 				<li>Confirm that an image can be opened and rotated.
@@ -451,7 +472,7 @@
 				<li>Confirm that a highlight can be deleted.
 			</ul>
 		</ul>
-<p />
+<p>
 		<li><b>Rule Tester</b>
 		<ul>
 			<li>Confirm that the Rule Tester <b>About box</b> displays the expected version number, 
@@ -462,14 +483,14 @@
 			different <b>rsd.etf</b> file from the Redaction Demo.
 			<br>Note: For the exception to be thrown, the RDT cannot be licensed.
 		</ul>
-<p />
+<p>
 		<li><b>Test Text Function Expander</b>
 		<ul>
 			<li>Confirm that the <b>Test Text Function Expander</b> utility provides a list 
 			of functions to be tested.
 			<li>Confirm that several different functions expand correctly.
 		</ul>
-<p />
+<p>
 		<li><b>USS Viewer</b>
 		<ul>
 			<li>Confirm that a USS file can be opened.
@@ -477,17 +498,17 @@
 			<li>Confirm that <b>Find</b> finds text via regular expression.
 			<li>Confirm that <b>Find</b> finds text that is not a regular expression.
 		</ul>
-<p />
+<p>
 		<li><b>View Exception Log</b>
 		<ul>
 			<li>Confirm that the <b>UEX Viewer</b> opens the current exception log.
-	        	<li><b>[FlexIDSCore #4706]</b> Confirm that existing UEX files are renamed.
+	        	<li>Confirm that any existing UEX files are renamed.
 			<li>Confirm that if older UEX files are present, the file navigation buttons 
 			successfully open other UEX files.
 			<li>Confirm that debug information can be exported to a user-specified 
 			text file.
 		</ul>
-<p />
+<p>
 		<li><b>VOA Viewer</b>
 		<ul>
 			<li>Confirm that an <b>EAV</b> file can be opened.
