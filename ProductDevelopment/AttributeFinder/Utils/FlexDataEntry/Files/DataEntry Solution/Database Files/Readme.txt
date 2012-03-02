@@ -1,0 +1,1 @@
+The zip code data in this database was obtained from: http://federalgovernmentzipcodes.us/
