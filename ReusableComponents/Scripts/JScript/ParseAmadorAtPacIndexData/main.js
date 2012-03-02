@@ -21,11 +21,10 @@
 function main(args) {
     var inputFile = fso.getAbsolutePathName(args[0]);
     var outputDir = fso.getAbsolutePathName(args[1]);
-    var imageFiles = fso.GetFolder(fso.BuildPath(fso.getParentFolderName(outputDir), "Images")).Files;
-    var files = new Enumerator(imageFiles);
+    var imageFiles = getFiles(fso.BuildPath(fso.getParentFolderName(outputDir), "Images"), true).filter(function(f){return f.Name.match(/\.(tiff?|pdf|\d{3})$/i)});
     var imageMap = {};
-    for (; !files.atEnd(); files.moveNext()) {
-        var f = files.item();
+    for (var i=0; i < imageFiles.length; i++) {
+        var f = imageFiles[i];
         imageMap[f.Name.slice(0,4)+f.Name.slice(5,12)] = f;
     }
 
@@ -40,7 +39,7 @@ function main(args) {
     var csvlines = readAllText(inputFile).split(/\n/).map(function(s){return s.trim()});
     for (var i=0; i < csvlines.length; i++) {
         handleDebug("CSVLine", i);
-        var fields = csvlines[i].split(/\s*(?:-\d{2})?\|\s*/);
+        var fields = csvlines[i].split(/\s*(?:-(?=\d{2}\|)|\|)\s*/);
 
         // Update map of images to copy
         setCopyImage(fields);
@@ -52,7 +51,7 @@ function main(args) {
 
     // Update map of images to destinations based on doc-type(s)
     function setCopyImage(fields) {
-        var doctype = fields[3].replace(/[^\w\s]/g, "_").replace(/_+$/,"");
+        var doctype = fields[4].replace(/[^\w\s]/g, "_").replace(/_+$/,"");
         var iname = getImageName(fields[0]+fields[1]);
         if (iname == undefined) {
             return;
@@ -112,7 +111,7 @@ function main(args) {
     function writeAttr(fname, aname, avalue, atype, indent) {
         if (avalue!=undefined && avalue!="" && !(/^0+$/.test(avalue))) {
             if (fso.fileExists(fname)) {
-                indent = "\n"+indent;
+                indent = "\r\n"+indent;
             }
             appendText(fname, indent+aname+"|"+avalue+(atype? "|"+atype : ""));
         }
@@ -142,7 +141,10 @@ function main(args) {
     //--------------------------------------------------------------------------------------------------
     function makeEAVS_PARTIES(fields) {
         var typ = "";
-        switch(fields[4]) {
+        var attrType = parseInt(fields[2]);
+        letters = "AABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        attrType = letters.charAt(attrType);
+        switch(fields[5]) {
             case "R": typ = "Grantor";
             break;
             case "E": typ = "Grantee";
@@ -150,6 +152,6 @@ function main(args) {
             default: typ = "Unknown";
         }
         var fname = getEAVName(fields[0]+fields[1], typ);
-        writeAttr(fname, typ, fields[5].trim(), "", "");
+        writeAttr(fname, typ, fields[6].trim(), attrType, "");
     }
 }
