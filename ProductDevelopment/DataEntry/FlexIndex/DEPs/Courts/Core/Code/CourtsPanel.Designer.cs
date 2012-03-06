@@ -269,6 +269,7 @@
             this._plaintiffMiddleNameTableColumn,
             this._plaintiffLastNameTableColumn,
             this._plaintiffSuffixTableColumn});
+            this._plaintiffNameTable.CompatibleAttributeNames.Add("DefendantInfo");
             this._plaintiffNameTable.Location = new System.Drawing.Point(6, 19);
             this._plaintiffNameTable.Name = "_plaintiffNameTable";
             this._plaintiffNameTable.ParentDataEntryControl = null;
@@ -497,6 +498,7 @@
             this._defendantMiddleNameTableColumn,
             this._defendantLastNameTableColumn,
             this._defendantSuffixTableColumn});
+            this._defendantNameTable.CompatibleAttributeNames.Add("PlaintiffInfo");
             this._defendantNameTable.Location = new System.Drawing.Point(6, 19);
             this._defendantNameTable.Name = "_defendantNameTable";
             this._defendantNameTable.ParentDataEntryControl = null;
