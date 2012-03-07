@@ -262,6 +262,7 @@ bool UpdateVersionInfoInTmpFile(const string& sSrcFileName, const string& sTmpFi
 			string sOutBuf;
 			string sInBuf;
 			std::ifstream inFile(sSrcFileName.c_str());
+			bool bInXmlVersionNode = false;
 			if (inFile)
 			{
 				while (inFile)
@@ -303,11 +304,20 @@ bool UpdateVersionInfoInTmpFile(const string& sSrcFileName, const string& sTmpFi
 					{
 						sOutBuf = _T("[assembly: AssemblyFileVersion(\"") + sVersion + "\")]";
 					}
+					// for .net .resx resource file
+					else if (bInXmlVersionNode &&
+							 (sInBuf.find(_T("<value>1.0.0.0</value>"))) != string::npos)
+					{
+						sOutBuf = _T("    <value>" + sVersion + "</value>");
+					}
 					else
 					{
 						sOutBuf = sInBuf;
 					}
 					outFile << sOutBuf.c_str() << endl;
+
+					// for .net .resx resource file
+					bInXmlVersionNode = (sInBuf.find("<data name=\"Version\"") != string::npos);
 				}
 			}
 			else
