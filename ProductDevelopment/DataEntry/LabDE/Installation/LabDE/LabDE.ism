@@ -313,8 +313,6 @@
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>AllOtherFiles</td><td>{BF13F1DD-ACE5-414A-97D2-8A7CEE2DAC71}</td><td>COMMON_COMPONENTS</td><td>8</td><td>VersionNT&gt;=600</td><td>disabledthemes.sdb</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>AllOtherFiles1</td><td>{F83AA79F-BA73-49D4-BEAB-D1926A8BD33C}</td><td>CommonAppDataFolder</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>AllOtherFiles2</td><td>{9A597539-4F83-4E97-A226-2532791B9370}</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.DataEntry.DEP.StandardLabDE.dll</td><td>{DAF7F71B-7533-4E2B-8F3C-74BBEC214E00}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.dataentry.dep.standa</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.LabResultsCustomComponents</td><td>{39AF42D5-575F-4A4F-8BF0-0C3319DAE366}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.labresultscu</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Help</td><td>{1F3E50FE-C4F2-4F31-9D92-25BDCDA6EED2}</td><td>LABDE_HELP</td><td>8</td><td/><td>labde.chm</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -369,8 +367,6 @@
 	<table name="CreateFolder">
 		<col key="yes" def="s72">Directory_</col>
 		<col key="yes" def="s72">Component_</col>
-		<row><td>CommonAppDataFolder</td><td>AllOtherFiles1</td></row>
-		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>AllOtherFiles2</td></row>
 	</table>
 
 	<table name="CustomAction">
@@ -423,7 +419,6 @@
 		<row><td>DesktopFolder</td><td>TARGETDIR</td><td>.:Desktop</td><td/><td>3</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS</td><td>ProgramFilesFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>CommonAppDataFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
-		<row><td>FILEPROCESSINGCOMPONENTS</td><td>COMMON_COMPONENTS</td><td>FILEPR~1|FileProcessingComponents</td><td/><td>0</td><td/></row>
 		<row><td>FavoritesFolder</td><td>TARGETDIR</td><td>.:FAVORI~1|Favorites</td><td/><td>0</td><td/></row>
 		<row><td>FontsFolder</td><td>TARGETDIR</td><td>.:Fonts</td><td/><td>0</td><td/></row>
 		<row><td>GlobalAssemblyCache</td><td>TARGETDIR</td><td>.:Global~1|GlobalAssemblyCache</td><td/><td>0</td><td/></row>
@@ -439,8 +434,8 @@
 		<row><td>ProgramFiles64Folder</td><td>TARGETDIR</td><td>.:Prog64~1|Program Files 64</td><td/><td>0</td><td/></row>
 		<row><td>ProgramFilesFolder</td><td>TARGETDIR</td><td>.:PROGRA~1|program files</td><td/><td>0</td><td/></row>
 		<row><td>ProgramMenuFolder</td><td>TARGETDIR</td><td>.:Programs</td><td/><td>3</td><td/></row>
-		<row><td>REPORTS</td><td>FILEPROCESSINGCOMPONENTS</td><td>Reports</td><td/><td>0</td><td/></row>
-		<row><td>STANDARD_REPORTS</td><td>REPORTS</td><td>STANDA~1|Standard reports</td><td/><td>0</td><td/></row>
+		<row><td>REPORTS</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>Reports</td><td/><td>0</td><td/></row>
+		<row><td>STANDARD_REPORTS</td><td>REPORTS</td><td>STANDA~1|Standard Reports</td><td/><td>0</td><td/></row>
 		<row><td>SendToFolder</td><td>TARGETDIR</td><td>.:SendTo</td><td/><td>3</td><td/></row>
 		<row><td>StartMenuFolder</td><td>TARGETDIR</td><td>.:STARTM~1|Start Menu</td><td/><td>3</td><td/></row>
 		<row><td>StartupFolder</td><td>TARGETDIR</td><td>.:StartUp</td><td/><td>3</td><td/></row>
@@ -1131,8 +1126,6 @@
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
 		<row><td>DefaultFeature</td><td>AllOtherFiles</td></row>
-		<row><td>DefaultFeature</td><td>AllOtherFiles1</td></row>
-		<row><td>DefaultFeature</td><td>AllOtherFiles2</td></row>
 		<row><td>DefaultFeature</td><td>Extract.DataEntry.DEP.StandardLabDE.dll</td></row>
 		<row><td>DefaultFeature</td><td>Extract.LabResultsCustomComponents</td></row>
 		<row><td>DefaultFeature</td><td>Help</td></row>
@@ -1409,8 +1402,6 @@
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
 		<row><td>AllOtherFiles</td><td/><td/><td>_2609E52D_0837_45AF_AB4E_609D37B72624_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>AllOtherFiles1</td><td/><td/><td>_E0CEC5E2_3A1B_45B4_9D63_E57D2D3EBB6F_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>AllOtherFiles2</td><td/><td/><td>_57CB6E37_145B_48CF_86D7_E4C97A62B927_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.DataEntry.DEP.StandardLabDE.dll</td><td/><td/><td>_89E482A2_8239_4551_BA24_07F6784E8F7F_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.LabResultsCustomComponents</td><td/><td/><td>_778BE2D2_CB4F_4383_9D0D_3A3DDEE5587C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Help</td><td/><td/><td>_10883AA1_60F1_460D_A0E0_D91F6169AF21_FILTER</td><td/><td/><td/><td/></row>
