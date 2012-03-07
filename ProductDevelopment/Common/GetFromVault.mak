@@ -95,7 +95,12 @@ GetDataEntryFiles:
 	$(BUILD_DRIVE) 
 	@CD "$(DataEntryDir)"
 	$(Get) $(GetOptions) -nonworkingfolder "$(DataEntryDir)" "$$$(Branch)/Engineering/ProductDevelopment/DataEntry" "$(DataEntryVersion)"
-    @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(DataEntryVersion)"
+	@CD "$(DataEntryDir)\FlexIndex"
+	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
+	@SendFilesAsArgumentToApplication *.resx 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
+	@CD "$(DataEntryDir)\LabDE"
+	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(LabDEVersion)"
+	@SendFilesAsArgumentToApplication *.resx 1 1 $(UpdateFileVersion) "$(LabDEVersion)"
 	
 GetLabDEFiles:
 	@ECHO Getting $(LabDEDir) ...

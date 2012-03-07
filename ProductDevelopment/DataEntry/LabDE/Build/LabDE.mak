@@ -83,7 +83,8 @@ CopyFilesToInstallFolder:
 	@COPY /v "$(BinariesFolder)\Obfuscated\SqlCompactExporter.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(LabDEDir)\Misc\DisabledThemes.sdb" "$(DataEntryCoreInstallFilesDir)\Misc" 
 	@COPY /v "$(LabDEDir)\Misc\DisabledThemes.sdb" "$(DataEntryCoreInstallFilesDir)\Misc" 
-	@COPY /v "$(BinariesFolder)\DataEntryApplication.LabDE.resources" "$(LabDEInstallFiles)\Reports"
+	@COPY /v "$(BinariesFolder)\DataEntryApplication.LabDE.resources" "$(LabDEInstallFiles)\NonSelfRegFiles"
+	@XCOPY "$(LabDEDir)\Reports\*.*" "$(LabDEInstallFiles)\Reports" /v /s /e /y
 # Make .nl files to register the COM .NET files
 	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.LabResultsCustomComponents.dll" /b >"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\LabDE.nl"
 
