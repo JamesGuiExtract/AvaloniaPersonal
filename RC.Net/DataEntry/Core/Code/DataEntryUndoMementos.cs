@@ -649,9 +649,28 @@ namespace Extract.DataEntry
                 // thing that occurs as part of the undo procedure. Until all other data has been
                 // reverted, the reverted selection state may not be valid.
                 ((Control)_selectionState.DataControl).BeginInvoke((MethodInvoker)(() =>
-                    _selectionState.DataControl.ApplySelection(_selectionState)));
+                    {
+                        try
+                        {
+                            _selectionState.DataControl.ApplySelection(_selectionState);
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractDisplay("ELI34412");
+                        }
+                    }));
+
                 _dataEntryControlHost.BeginInvoke((MethodInvoker)(() =>
-                    _dataEntryControlHost.ApplySelection(_selectionState)));
+                    {
+                        try
+                        {
+                            _dataEntryControlHost.ApplySelection(_selectionState);
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractDisplay("ELI34413");
+                        }
+                    }));
             }
             catch (Exception ex)
             {

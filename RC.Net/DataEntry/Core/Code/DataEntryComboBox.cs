@@ -1655,7 +1655,8 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI30629", ex);
+                // This method is called via BeginInvoke, thus it cannot throw out the exception.
+                ex.ExtractDisplay("ELI30629");
             }
             finally
             {

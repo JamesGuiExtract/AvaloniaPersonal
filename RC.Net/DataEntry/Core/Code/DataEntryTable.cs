@@ -840,7 +840,17 @@ namespace Extract.DataEntry
                     return;
                 }
 
-                BeginInvoke((MethodInvoker)(() => BeginEdit(initialValue)));
+                BeginInvoke((MethodInvoker)(() =>
+                    {
+                        try
+                        {
+                            BeginEdit(initialValue);
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractDisplay("ELI34409");
+                        }
+                    }));
             }
             catch (Exception ex)
             {
@@ -854,11 +864,31 @@ namespace Extract.DataEntry
                 // Since the re-initialization of edit mode is being done via a begin invoke,
                 // the call to OnUpdateEnded needs to be invoked as well so that it happens
                 // after the re-initialization of edit mode.
-                BeginInvoke((MethodInvoker)(() => OnUpdateEnded(new EventArgs())));
+                BeginInvoke((MethodInvoker)(() =>
+                    {
+                        try
+                        {
+                            OnUpdateEnded(new EventArgs());
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractDisplay("ELI34408");
+                        }
+                    }));
+
                 if (AttributeStatusInfo.UndoManager.TrackOperations)
                 {
                     BeginInvoke((MethodInvoker)(() =>
-                        AttributeStatusInfo.UndoManager.ExtendCurrentOperation()));
+                    {
+                        try
+                        {
+                            AttributeStatusInfo.UndoManager.ExtendCurrentOperation();
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractDisplay("ELI34410");
+                        }
+                    }));
                 }
             }
         }

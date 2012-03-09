@@ -1637,40 +1637,48 @@ namespace Extract.DataEntry
         /// </summary>
         void UpdateAutoCompleteValuesDirect()
         {
-            // If the host reports that an update is in progress, delay updating the auto-complete
-            // list since the update may otherwise result in the auto-complete list being changed
-            // multiple times before the update is over.
-            if (DataEntryControlHost != null && DataEntryControlHost.UpdateInProgress)
+            try
             {
-                if (!_autoCompleteUpdatePending)
+                // If the host reports that an update is in progress, delay updating the auto-complete
+                // list since the update may otherwise result in the auto-complete list being changed
+                // multiple times before the update is over.
+                if (DataEntryControlHost != null && DataEntryControlHost.UpdateInProgress)
                 {
-                    _autoCompleteUpdatePending = true;
-                    DataEntryControlHost.UpdateEnded += HandleDataEntryControlHostUpdateEnded;
+                    if (!_autoCompleteUpdatePending)
+                    {
+                        _autoCompleteUpdatePending = true;
+                        DataEntryControlHost.UpdateEnded += HandleDataEntryControlHostUpdateEnded;
+                    }
+
+                    return;
+                }
+                else if (_autoCompleteUpdatePending)
+                {
+                    DataEntryControlHost.UpdateEnded -= HandleDataEntryControlHostUpdateEnded;
+                    _autoCompleteUpdatePending = false;
                 }
 
-                return;
+                // Get updated values for the auto-complete fields if an update is required.
+                AutoCompleteMode autoCompleteMode = AutoCompleteMode;
+                AutoCompleteSource autoCompleteSource = AutoCompleteSource;
+                AutoCompleteStringCollection autoCompleteList = AutoCompleteCustomSource;
+                string[] autoCompleteValues;
+                if (DataEntryMethods.UpdateAutoCompleteList(_activeValidator, ref autoCompleteMode,
+                        ref autoCompleteSource, ref autoCompleteList, out autoCompleteValues))
+                {
+                    AutoCompleteMode = autoCompleteMode;
+                    AutoCompleteSource = autoCompleteSource;
+                    AutoCompleteCustomSource = autoCompleteList;
+                }
+                else if (base.AutoCompleteMode != AutoCompleteMode.None)
+                {
+                    base.AutoCompleteMode = AutoCompleteMode.None;
+                }
             }
-            else if (_autoCompleteUpdatePending)
+            catch (Exception ex)
             {
-                DataEntryControlHost.UpdateEnded -= HandleDataEntryControlHostUpdateEnded;
-                _autoCompleteUpdatePending = false;
-            }
-
-            // Get updated values for the auto-complete fields if an update is required.
-            AutoCompleteMode autoCompleteMode = AutoCompleteMode;
-            AutoCompleteSource autoCompleteSource = AutoCompleteSource;
-            AutoCompleteStringCollection autoCompleteList = AutoCompleteCustomSource;
-            string[] autoCompleteValues;
-            if (DataEntryMethods.UpdateAutoCompleteList(_activeValidator, ref autoCompleteMode,
-                    ref autoCompleteSource, ref autoCompleteList, out autoCompleteValues))
-            {
-                AutoCompleteMode = autoCompleteMode;
-                AutoCompleteSource = autoCompleteSource;
-                AutoCompleteCustomSource = autoCompleteList;
-            }
-            else if (base.AutoCompleteMode != AutoCompleteMode.None)
-            {
-                base.AutoCompleteMode = AutoCompleteMode.None;
+                // This method is invoked via BeginInvoke, thus it cannot throw out exceptions.
+                ex.ExtractDisplay("ELI34411");
             }
         }
 

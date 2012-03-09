@@ -595,9 +595,10 @@ namespace Extract.DataEntry
         bool _isIdle = true;
 
         /// <summary>
-        /// Commands that should be executed the next time the host is idle.
+        /// Commands that should be executed the next time the host is idle along with ELI codes
+        /// that should be attributed to any exceptions.
         /// </summary>
-        Queue<MethodInvoker> _idleCommands = new Queue<MethodInvoker>();
+        Queue<Tuple<Action, string>> _idleCommands = new Queue<Tuple<Action, string>>();
 
         /// <summary>
         /// Indicates whether the form as been loaded.
@@ -1868,14 +1869,14 @@ namespace Extract.DataEntry
                         // to ensure the selected attributes get marked viewed as appropriate.
                         if (_activeDataControl != null)
                         {
-                            ExecuteOnIdle(() => _activeDataControl.IndicateActive(
+                            ExecuteOnIdle("ELI34414", () => _activeDataControl.IndicateActive(
                                 true, _imageViewer.DefaultHighlightColor));
                         }
 
                         // Ensure that nothing that happened as a result of the undo counts as part of a new
                         // operation (including any action that occured via the message queue).
-                        ExecuteOnIdle(() => AttributeStatusInfo.UndoManager.TrackOperations = true);
-                        ExecuteOnIdle(() => _inUndo = false);
+                        ExecuteOnIdle("ELI34415", () => AttributeStatusInfo.UndoManager.TrackOperations = true);
+                        ExecuteOnIdle("ELI34416", () => _inUndo = false);
                     }
                 }
             }
@@ -2371,7 +2372,7 @@ namespace Extract.DataEntry
                     var activeControlMemento =
                         new DataEntryActiveControlMemento(_activeDataControl);
 
-                    ExecuteOnIdle(() =>
+                    ExecuteOnIdle("ELI34417", () =>
                         AttributeStatusInfo.UndoManager.AddMemento(activeControlMemento));
                 }
 
@@ -3423,8 +3424,18 @@ namespace Extract.DataEntry
             {
                 if (_idleCommands.Count > 0)
                 {
-                    MethodInvoker methodInvoker = _idleCommands.Dequeue();
-                    BeginInvoke(methodInvoker);
+                    Tuple<Action, string> command = _idleCommands.Dequeue();
+                    BeginInvoke((MethodInvoker)(() =>
+                        {
+                            try
+                            {
+                                command.Item1();
+                            }
+                            catch (Exception ex)
+                            {
+                                ex.ExtractDisplay(command.Item2);
+                            }
+                        }));
                 }
                 else
                 {
@@ -3693,7 +3704,7 @@ namespace Extract.DataEntry
                             // the initial user input, don't end the current operation until the
                             // host is once again idle and therefore occurs after any other message
                             // invokes triggers by the initial operation.
-                            ExecuteOnIdle(() =>
+                            ExecuteOnIdle("ELI34418", () =>
                                 AttributeStatusInfo.UndoManager.OperationInProgress = false);
                         }
                     }
@@ -4154,16 +4165,16 @@ namespace Extract.DataEntry
         /// unchanged even if the attribute and/or tooltip is not currently in the view.</param>
         void DrawHighlights(bool ensureActiveAttributeVisible)
         {
+            // To avoid unnecessary drawing, wait until we are done loading a document or a
+            // control is done with an update before attempting to display any layer objects.
+            // Also, ensure against resursive calls.
+            if (_changingData || _drawingHighlights || ControlUpdateReferenceCount > 0)
+            {
+                return;
+            }
+
             try
             {
-                // To avoid unnecessary drawing, wait until we are done loading a document or a
-                // control is done with an update before attempting to display any layer objects.
-                // Also, ensure against resursive calls.
-                if (_changingData || _drawingHighlights || ControlUpdateReferenceCount > 0)
-                {
-                    return;
-                }
-
                 _drawingHighlights = true;
 
                 // Refresh the active control highlights if necessary.
@@ -6489,8 +6500,8 @@ namespace Extract.DataEntry
 
                 OnUpdateEnded(new EventArgs());
 
-                ExecuteOnIdle(() => AttributeStatusInfo.UndoManager.TrackOperations = true);
-                ExecuteOnIdle(() => _dirty = false);
+                ExecuteOnIdle("ELI34419", () => AttributeStatusInfo.UndoManager.TrackOperations = true);
+                ExecuteOnIdle("ELI34420", () => _dirty = false);
             }
             catch (Exception ex)
             {
@@ -6505,19 +6516,29 @@ namespace Extract.DataEntry
         /// ExecuteOnIdle ensures that all other messages that are to occur as part of the current
         /// message chain occur before the provided delegate.
         /// </summary>
-        /// <param name="methodInvoker">The delegate invoker to execute once the DEP's message pump
-        /// is empty.</param>
-        public void ExecuteOnIdle(MethodInvoker methodInvoker)
+        /// <param name="eliCode">The ELI code to attribute to any exception.</param>
+        /// <param name="action">The action to execute once the DEP's message pump is empty.</param>
+        public void ExecuteOnIdle(string eliCode, Action action)
         {
             try
             {
                 if (_isIdle)
                 {
-                    BeginInvoke(methodInvoker);
+                    BeginInvoke((MethodInvoker)(() =>
+                        {
+                            try
+                            {
+                                action();
+                            }
+                            catch (Exception ex)
+                            {
+                                ex.ExtractDisplay(eliCode);
+                            }
+                        }));
                 }
                 else
                 {
-                    _idleCommands.Enqueue(methodInvoker);
+                    _idleCommands.Enqueue(new Tuple<Action, string>(action, eliCode));
                 }
             }
             catch (Exception ex)
