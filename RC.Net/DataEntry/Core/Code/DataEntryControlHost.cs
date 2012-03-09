@@ -4617,23 +4617,37 @@ namespace Extract.DataEntry
                     yPadAmount = xPadAmount;
                 }
 
-                // Apply the padding.
-                newViewRegion = _imageViewer.PadViewingRectangle(newViewRegion,
-                        xPadAmount, yPadAmount, true);
+                if (newViewRegion != currentViewRegion || xPadAmount != 0 || yPadAmount != 0)
+                {
+                    // Apply the padding.
+                    newViewRegion = _imageViewer.PadViewingRectangle(newViewRegion,
+                            xPadAmount, yPadAmount, true);
 
-                // Translate the image coordinates into client coordinates.
-                newViewRegion =
-                    _imageViewer.GetTransformedRectangle(newViewRegion, false);
+                    // Translate the image coordinates into client coordinates.
+                    newViewRegion =
+                        _imageViewer.GetTransformedRectangle(newViewRegion, false);
 
-                // Zoom to the specified rectangle.
-                _imageViewer.ZoomToRectangle(newViewRegion);
+                    FitMode fitMode = _imageViewer.FitMode;
 
-                // If zoom has to change very much to zoom on the specified rectangle, calling
-                // GetTransformedRectangle again after the first call will likely result in a
-                // slightly different rectangle. To prevent multiple calls, keep track of the last
-                // specified selectedImageRegion, and don't re-apply auto-zoom settings after it
-                // is applied the first time.
-                _lastAutoZoomSelection = selectedImageRegion;
+                    // Zoom to the specified rectangle.
+                    _imageViewer.ZoomToRectangle(newViewRegion);
+
+                    // [DataEntry:1096]
+                    // Restore the previous fit mode if zoom operation cleared the fit mode
+                    // (Unless AutoZoom is being used which should clear the fit mode).
+                    if (fitMode != _imageViewer.FitMode &&
+                        _dataEntryApp.AutoZoomMode != AutoZoomMode.AutoZoom)
+                    {
+                        _imageViewer.FitMode = fitMode;
+                    }
+
+                    // If zoom has to change very much to zoom on the specified rectangle, calling
+                    // GetTransformedRectangle again after the first call will likely result in a
+                    // slightly different rectangle. To prevent multiple calls, keep track of the last
+                    // specified selectedImageRegion, and don't re-apply auto-zoom settings after it
+                    // is applied the first time.
+                    _lastAutoZoomSelection = selectedImageRegion;
+                }
             }
             catch (Exception ex)
             {
