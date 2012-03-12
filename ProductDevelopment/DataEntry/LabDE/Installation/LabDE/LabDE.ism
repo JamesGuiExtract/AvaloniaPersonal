@@ -1148,10 +1148,6 @@
 		<row><td>extract.dataentry.dep.standa</td><td>Extract.DataEntry.DEP.StandardLabDE.dll</td><td>EXTRAC~1.DLL|Extract.DataEntry.DEP.StandardLabDE.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.DataEntry.DEP.StandardLabDE.dll</td><td>1</td><td/></row>
 		<row><td>extract.labresultscu</td><td>Extract.LabResultsCustomComponents</td><td>EXTRAC~1.DLL|Extract.LabResultsCustomComponents.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.LabResultsCustomComponents.dll</td><td>1</td><td/></row>
 		<row><td>labde.chm</td><td>Help</td><td>LabDE.chm</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LABDE_HELP_FILES&gt;\LabDE.chm</td><td>1</td><td/></row>
-		<row><td>labde_data_entry_rates_by_us</td><td>Reports</td><td>LABDED~1.JPG|LabDE data entry rates by user.jpg</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_REPORTS_FILES&gt;\LabDE data entry rates by user.jpg</td><td>1</td><td/></row>
-		<row><td>labde_data_entry_rates_by_us1</td><td>Reports</td><td>LABDED~1.RPT|LabDE data entry rates by user.rpt</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_REPORTS_FILES&gt;\LabDE data entry rates by user.rpt</td><td>1</td><td/></row>
-		<row><td>labde_data_entry_rates_by_us2</td><td>Reports</td><td>LABDED~1.XML|LabDE data entry rates by user.xml</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_REPORTS_FILES&gt;\LabDE data entry rates by user.xml</td><td>1</td><td/></row>
-		<row><td>labde_high_effort_files_by_u</td><td>Reports</td><td>LABDEH~1.RPT|LabDE high effort files by user.rpt</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_REPORTS_FILES&gt;\LabDE high effort files by user.rpt</td><td>1</td><td/></row>
 		<row><td>labde_high_effort_files_by_u1</td><td>Reports</td><td>LABDEH~1.XML|LabDE high effort files by user.xml</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_REPORTS_FILES&gt;\LabDE high effort files by user.xml</td><td>1</td><td/></row>
 	</table>
 
@@ -1464,6 +1460,7 @@
 		<col def="S0">ExcludeFiles</col>
 		<col def="I4">ISAttributes</col>
 		<row><td>AllOtherFiles</td><td>&lt;PATH_TO_NONSELFREGFILES_FI&gt;</td><td>4</td><td/><td/><td>10</td></row>
+		<row><td>Reports</td><td>&lt;PATH_TO_REPORTS_FILES&gt;</td><td>4</td><td/><td>*.db</td><td>10</td></row>
 	</table>
 
 	<table name="ISFeatureExtended">
