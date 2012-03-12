@@ -181,7 +181,7 @@
   <data name="_componentFlag.ValidationQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
 	&lt;Attribute Name='Flag'&gt;.&lt;/Attribute&gt;
-	&lt;Attribute Name='Value'&gt;../Value&lt;/Attribute&gt;
+	&lt;RegEx Name='Value' Pattern='(?&amp;lt;=[\s&amp;gt;&amp;lt;=]{0,3})[\d\.]+'&gt;&lt;Attribute &gt;../Value&lt;/Attribute&gt;&lt;/RegEx&gt;
 	&lt;Attribute Name='Range'&gt;../Range&lt;/Attribute&gt;
 	&lt;RegEx Name='MinValue1' Pattern='([\d\.]+(?=\s?-\s?\d+))|((?&amp;lt;=&amp;gt;\s?=\s?)[\d\.]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
 	&lt;Expression Name='MinValue2'&gt;
@@ -219,8 +219,7 @@
 	&lt;Expression&gt;
 		&lt;HasProperLowFlag Type='bool'/&gt; and &lt;HasProperHighFlag Type='bool'/&gt;
 	&lt;/Expression&gt;
-&lt;/Query&gt;
-</value>
+&lt;/Query&gt;</value>
   </data>
   <metadata name="_componentOriginalName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
