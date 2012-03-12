@@ -178,6 +178,50 @@
   <metadata name="_componentRefRange.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="_componentFlag.ValidationQuery" xml:space="preserve">
+    <value>&lt;Declarations&gt;
+	&lt;Attribute Name='Flag'&gt;.&lt;/Attribute&gt;
+	&lt;Attribute Name='Value'&gt;../Value&lt;/Attribute&gt;
+	&lt;Attribute Name='Range'&gt;../Range&lt;/Attribute&gt;
+	&lt;RegEx Name='MinValue1' Pattern='([\d\.]+(?=\s?-\s?\d+))|((?&amp;lt;=&amp;gt;\s?=\s?)[\d\.]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
+	&lt;Expression Name='MinValue2'&gt;
+		string.IsNullOrWhiteSpace(&lt;MinValue1/&gt;)
+			? &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;\s?)[\d\.]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
+			: ''
+	&lt;/Expression&gt;
+	&lt;RegEx Name='MaxValue1' Pattern='((?&amp;lt;=\d+\s?-\s?)[\d\.]+)|((?&amp;lt;=&amp;lt;\s?=\s?)[\d\.]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
+	&lt;Expression Name='MaxValue2'&gt;
+		string.IsNullOrWhiteSpace(&lt;MaxValue1/&gt;)
+			? &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;\s?)[\d\.]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
+			: ''
+	&lt;/Expression&gt;
+	&lt;RegEx Name='LowFlag' Pattern='^L'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
+	&lt;RegEx Name='HighFlag' Pattern='^H'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
+	&lt;Expression Name='HasProperLowFlag'&gt;
+		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
+		(string.IsNullOrWhiteSpace(&lt;MinValue1/&gt;) and string.IsNullOrWhiteSpace(&lt;MinValue2/&gt;)) or
+		(string.IsNullOrWhiteSpace(&lt;MinValue1/&gt;) == false and
+		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;gt;= &lt;MinValue1 Type='double'/&gt;))) or
+		(string.IsNullOrWhiteSpace(&lt;MinValue2/&gt;) == false and
+		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;gt; &lt;MinValue2 Type='double'/&gt;)))
+	&lt;/Expression&gt;
+	&lt;Expression Name='HasProperHighFlag'&gt;
+		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
+		(string.IsNullOrWhiteSpace(&lt;MaxValue1/&gt;) and string.IsNullOrWhiteSpace(&lt;MaxValue2/&gt;)) or
+		(string.IsNullOrWhiteSpace(&lt;MaxValue1/&gt;) == false and
+		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;lt;= &lt;MaxValue1 Type='double'/&gt;))) or
+		(string.IsNullOrWhiteSpace(&lt;MaxValue2/&gt;) == false and
+		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;lt; &lt;MaxValue2 Type='double'/&gt;)))
+	&lt;/Expression&gt;
+&lt;/Declarations&gt;
+&lt;Query&gt;[BLANK]&lt;SQL&gt;SELECT * FROM Flag ORDER BY Flag&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query ValidValue='True' ValidationListType='ValidationListOnly' ValidationWarning='1'&gt;
+	&lt;Expression&gt;
+		&lt;HasProperLowFlag Type='bool'/&gt; and &lt;HasProperHighFlag Type='bool'/&gt;
+	&lt;/Expression&gt;
+&lt;/Query&gt;
+</value>
+  </data>
   <metadata name="_componentOriginalName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
