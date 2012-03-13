@@ -167,7 +167,7 @@
     <value>&lt;SQL&gt;SELECT LabTest.TestCode FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../../OrderCode&lt;/Attribute&gt;,1,25) AND OfficialName = SUBSTRING(&lt;Attribute&gt;..&lt;/Attribute&gt;,1,255)&lt;/SQL&gt;</value>
   </data>
   <data name="_testCode.ValidationQuery" xml:space="preserve">
-    <value>&lt;SQL&gt;SELECT LabTest.TestCode FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../../OrderCode&lt;/Attribute&gt;,1,25) ORDER BY LabTest.TestCode&lt;/SQL&gt;</value>
+    <value>&lt;SQL&gt;SELECT LabTest.TestCode FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../../OrderCode&lt;/Attribute&gt;,1,25) AND (OfficialName = SUBSTRING(&lt;Attribute&gt;..&lt;/Attribute&gt;,1,255) OR SUBSTRING(&lt;Attribute&gt;..&lt;/Attribute&gt;,1,255) NOT IN (SELECT OfficialName FROM LabTest))&lt;/SQL&gt;</value>
   </data>
   <metadata name="_componentValue.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -195,8 +195,8 @@
 			? &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;\s?)[\d\.]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
 			: ''
 	&lt;/Expression&gt;
-	&lt;RegEx Name='LowFlag' Pattern='^L'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
-	&lt;RegEx Name='HighFlag' Pattern='^H'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
+	&lt;RegEx Name='LowFlag' Pattern='^L|^A$'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
+	&lt;RegEx Name='HighFlag' Pattern='^H|^A$'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
 	&lt;Expression Name='HasProperLowFlag'&gt;
 		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
 		(string.IsNullOrWhiteSpace(&lt;MinValue1/&gt;) and string.IsNullOrWhiteSpace(&lt;MinValue2/&gt;)) or
@@ -253,6 +253,7 @@
 &lt;Query&gt;&lt;SQL&gt;SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(&lt;Attribute&gt;../Last&lt;/Attribute&gt;,1,50) + '%' AND FirstName LIKE SUBSTRING(&lt;Attribute&gt;../First&lt;/Attribute&gt;,1,30) + '%' AND (MiddleName IS NULL OR MiddleName = '' OR MiddleName LIKE SUBSTRING(&lt;Attribute&gt;../Middle&lt;/Attribute&gt;,1,30) + '%') AND LEN(CODE) = 5 ORDER BY Code&lt;/SQL&gt;&lt;/Query&gt;</value>
   </data>
   <data name="_orderingPhysicianCodeColumn.ValidationQuery" xml:space="preserve">
-    <value>&lt;SQL&gt;SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(&lt;Attribute&gt;../Last&lt;/Attribute&gt;,1,50) + '%' AND FirstName LIKE SUBSTRING(&lt;Attribute&gt;../First&lt;/Attribute&gt;,1,30) + '%' AND (MiddleName IS NULL OR MiddleName = '' OR MiddleName LIKE SUBSTRING(&lt;Attribute&gt;../Middle&lt;/Attribute&gt;,1,30) + '%' ) ORDER BY Code&lt;/SQL&gt;</value>
+    <value>[BLANK]
+&lt;SQL&gt;SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(&lt;Attribute&gt;../Last&lt;/Attribute&gt;,1,50) + '%' AND FirstName LIKE SUBSTRING(&lt;Attribute&gt;../First&lt;/Attribute&gt;,1,30) + '%' AND (MiddleName IS NULL OR MiddleName = '' OR MiddleName LIKE SUBSTRING(&lt;Attribute&gt;../Middle&lt;/Attribute&gt;,1,30) + '%' ) ORDER BY Code&lt;/SQL&gt;</value>
   </data>
 </root>

@@ -195,8 +195,8 @@
 			? &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;\s?)[\d\.]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
 			: ''
 	&lt;/Expression&gt;
-	&lt;RegEx Name='LowFlag' Pattern='^L'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
-	&lt;RegEx Name='HighFlag' Pattern='^H'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
+	&lt;RegEx Name='LowFlag' Pattern='^L|^A$'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
+	&lt;RegEx Name='HighFlag' Pattern='^H|^A$'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
 	&lt;Expression Name='HasProperLowFlag'&gt;
 		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
 		(string.IsNullOrWhiteSpace(&lt;MinValue1/&gt;) and string.IsNullOrWhiteSpace(&lt;MinValue2/&gt;)) or
