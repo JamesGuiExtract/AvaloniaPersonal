@@ -15,6 +15,7 @@
 PDRootDir=$(EngineeringRootDirectory)\ProductDevelopment
 AFRootDirectory=$(PDRootDir)\AttributeFinder
 RCDotNETDir=$(EngineeringRootDirectory)\RC.Net
+DataEntryBranding=$(RCDotNETDir)\DataEntry\Utilities\DataEntryApplication\Core\Code\BrandingResources
 PDUtilsRootDir=$(EngineeringRootDirectory)\ProductDevelopment\Utils
 IDShieldOfficeDir=$(PDRootDir)\IDShieldOffice
 DataEntryDir=$(PDRootDir)\DataEntry
@@ -51,6 +52,8 @@ GetRCdotNETFiles:
     @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(RCDotNetVersion)"
 	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(RCDotNetVersion)"
 	@SendFilesAsArgumentToApplication AssemblyInfo.cpp 1 1 $(UpdateFileVersion) "$(RCDotNetVersion)"
+	$(UpdateFileVersion)  "$(DataEntryBranding)\FlexIndex.resx" "$(FlexIndexVersion)"
+	$(UpdateFileVersion)  "$(DataEntryBranding)\LabDE.resx" "$(LabDEVersion)"
 	
 GetReusableComponentFiles:
 	@ECHO Getting $(ReusableComponentsRootDirectory) ...
