@@ -1,0 +1,174 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE 9.0 Final SCR Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> LabDE 9.0 Final SCR Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Purpose:</b> Exercise recent fixed SCRs
+   	<LI><b>Details:</b> Recently added SCRs generally do not have official test cases 
+	present within the collected checklists.  One part of validating a 9.0 
+	release candidate is to explicitly exercise these otherwise untested recent changes.
+</ul>
+<p>
+<h3>SCRs</h3>
+<OL>
+	<LI><h3>Descriptions of DataEntry Changes</h3>
+       	<ul>
+  	   	<LI><b>[DataEntry #1082]</b> Confirm that the <b>LabDE</b> splash screen does 
+		not contain any patent information.
+<p>
+  	   	<LI><b>[DataEntry #695, #1014, #1091]</b> LabDE Version Number
+		<ul>
+			<li>Confirm that <b>User License</b> provides the correct version 
+			number for a LabDE license request.
+			<li>Confirm that the <b>LabDE</b> RESX file has the correct version 
+			number.
+			<li>Confirm that the <b>LabDE About box</b> provides correct version 
+			numbers for both Application and Framework.
+			<li>Confirm that the <b>Demo_FLEXIndex About box</b> provides the correct 
+			version number.
+		</ul>
+<p>
+  	   	<LI><b>[DataEntry #1080]</b> SupportsSwiping Disabled
+		<ul>
+			<li>Confirm that the <b>Word</b> highlight tool is properly disabled 
+			when the other swiping tools are disabled.
+		</ul>
+<p>
+  	   	<LI><b>[DataEntry #1081]</b> Support For Multiple DEPs
+		<ul>
+			<li>Configure a multi-DEP scenatio where each DEP uses a different 
+			SQL CE database.
+			<li>Begin verification.  After a document is displayed, change the 
+			document type to load the document in a different DEP.
+			<li>Confirm that the DEP change is not unusually slow.
+			<li>Confirm that no exceptions are seen.
+		</ul>
+<p>
+  	   	<LI><b>[DataEntry #1087]</b> LabDE Start Menu Shortcuts
+		<ul>
+			<li>Confirm that <b>Configure FAM Service</b> opens the expected 
+			SDF file.
+			<li>Confirm that <b>View Exception Log</b> opens the expected UEX file.
+		</ul>
+<p>
+  	   	<LI><b>[DataEntry #1089]</b> Confirm that <b>DataEntryApplication.LabDE.resources</b> 
+		is installed in the CommonComponents folder.
+<p>
+  	   	<LI><b>[DataEntry #1092]</b> Data Entry Exception
+		<ul>
+			<li>Exercise verification for <b>Demo_LabDE</b>.
+			<li>Verify <b>Z151.tif</b> and validate everything except the <b>Basic 
+			Metabolic Panel</b> order.
+			<li>Add a <b>BUN</b> test with appropriate information.
+			<li>Select the next empty row in the <b>Tests</b> table and add a <b>K</b> 
+			for the missing <b>POTASSIUM</b> test.
+			<li>Confirm that an unhandled exception prompt is not displayed.
+			<li>Confirm that the remaining missing tests can be added and the 
+			verification can be completed.
+		</ul>
+<p>
+  	   	<LI><b>[DataEntry #1094]</b> DEP Versions
+		<ul>
+			<li>Confirm that the <b>FLEX Index related</b> DEPs have a proper 
+			version number.
+			<li>Confirm that the <b>LabDE related</b> DEPs have a proper 
+			version number.
+		</ul>
+<p>
+  	   	<LI><b>[DataEntry #1095, #1099, #1100]</b> LabDE Reports
+		<ul>
+	  	   	<LI>Confirm that the two standard <b>LabDE</b> reports are installed 
+			correctly and available via DB Admin.
+			<li>Confirm that preview images are available for each LabDE report.
+			<li>Confirm that the <b>LabDE Data Entry Rates By User</b> report 
+			works correctly and displays meaningful data.
+			<li>Confirm that the <b>LabDE High Effort Files By User</b> report 
+			works correctly and displays meaningful data.
+		</ul>
+<p>
+  	   	<LI><b>[DataEntry #1097]</b> Confirm that the <b>Other Products</b> section 
+		of the Demo Shield install no longer includes a reference to IcoMap.
+		<ul>
+			<li>Confirm the same for the <b>FLEX Index</b> Demo Shield install.
+			<li>Confirm the same for the <b>ID Shield</b> Demo Shield install.
+		</ul>
+<p>
+  	   	<LI><b>[DataEntry #1104]</b> Validation Queries
+		<ul>
+			<li>Confirm that the <b>H, HH or A</b> are acceptable Flag values 
+			for results that are <u>above</u> the reference range.
+			<li>Confirm that the <b>L, LL or A</b> are acceptable Flag values 
+			for results that are <u>below</u> the reference range.
+			<li>Confirm that the above results hold for both the <b>LabDE</b> and 
+			the <b>HealthNetworkLabs</b> DEPs.
+		</ul>
+<p>
+  	   	<LI><b>[DataEntry #1108]</b> Confirm that <b>Commit without saving</b> is 
+		enabled even when the <b>PreventSave</b> option is used.
+       	</ul>
+<p>
+	<LI><h3>Miscellaneous Changes</h3>
+       	<ul>
+  	   	<LI><b>Health Network Labs</b>
+		<ul>
+			<li>Exercise the DEP, Solution and config file customized for Health 
+			Network Labs.
+			<li>Confirm that the <b>OrderMapper</b> database schema is current.
+			<li>Confirm that the <b>OrderMapper</b> database <b>does not</b> 
+			contain any Physicians or Labs.
+			<li>Confirm that the <b>Order Comment</b> field is filled in properly 
+			if the logged in user is <b>Administrator</b>.
+			<li>Confirm that <b>Patient Name</b> and <b>Gender</b> can be left blank.
+			<li>Confirm that <b>Ordering Physician</b> can be left blank.
+			<li>Confirm that <b>0:00</b> is presented as a default <b>Collection Time</b>.
+			<li>Confirm that the Code column in the <b>Order</b> table is 
+			<b>Order Code</b>.
+			<li>Confirm that the <b>Test Code</b> auto-complete list shows only the codes 
+			that can be associated with the valid test name.
+		</ul>
+<p>
+  	   	<LI><b>Courts Demo</b>
+		<ul>
+			<li>Confirm that the database uses the current database schema.
+			<li>Confirm that a specialized <b>Courts</b> DEP is available.
+			<li>Exercise the demo and confirm that multiple cities can share the 
+			same zip code.
+			<ul>
+				<li>01378 for Warwick, MA or Orange, MA
+				<li>53711 for Fitchburg, WI or Madison, WI
+			</ul>
+			<li>Confirm that swiping rules work as expected.
+			<li>Confirm that date splitting works for the <b>Court DEP Date</b> and 
+			<b>Date of Birth</b> fields.
+			<li>Confirm that copying and pasting works between <b>defendant</b> and 
+			<b>plaintiff</b> tables.
+			<li><b>[DataEntry #1096]</b> Confirm that the fit-to-width and fit-to-page 
+			modes are properly persistent as the user tabs through data.
+		</ul>
+<p>
+  	   	<LI><b>LabDE Demo</b>
+		<ul>
+			<li>Confirm that the <b>Demo_LabDE</b> database uses the current database 
+			schema.
+			<li>Confirm that swiping rules work.
+			<li>Confirm that verification works and that the user name is properly 
+			added to the <b>Comments</b> field when run under the <b>Administrator</b> 
+			account.
+			<li>Confirm that <b>ReviewAKAs.fps</b> works.
+			<li>Confirm that <b>MatchToPatientAndOrders.fps</b> has been removed.
+		</ul>
+       	</ul>
+</OL>
+</BODY>
+</HTML>
