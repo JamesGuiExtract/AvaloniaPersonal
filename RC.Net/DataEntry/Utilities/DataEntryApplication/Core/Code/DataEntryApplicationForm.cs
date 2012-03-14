@@ -1680,16 +1680,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     base.Text += " (" + _actionName + ")";
                 }
 
-                // Saving the document should be allowed as long as a document is available,
-                // a data entry configuration is loaded, and PreventSave is not specified.
-                bool savingEnabled = _imageViewer.IsImageAvailable &&
-                    _activeDataEntryConfig != null &&
-                    !_activeDataEntryConfig.Config.Settings.PreventSave;
-
                 // If in standalone mode, no need to enable/disable _saveAndCommitFileCommand
                 if (!_standAloneMode)
                 {
-                    _saveAndCommitFileCommand.Enabled = savingEnabled;
+                    // [DataEntry:1108]
+                    // Enable/disable the save and commit command without respect to whether
+                    // PreventSave is set. If PreventSave is set, the option should still be
+                    // available; its behavior will just be different.
+                    _saveAndCommitFileCommand.Enabled = _imageViewer.IsImageAvailable &&
+                        _activeDataEntryConfig != null;
                 }
 
                 _hideToolTipsCommand.Enabled = _imageViewer.IsImageAvailable;
@@ -1701,7 +1700,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (!_standAloneMode && _fileProcessingDb != null)
                 {
                     _skipProcessingMenuItem.Enabled = _imageViewer.IsImageAvailable;
-                    _saveMenuItem.Enabled = savingEnabled;
+                    // Saving the document should be allowed as long as a document is available,
+                    // a data entry configuration is loaded, and PreventSave is not specified.
+                    _saveMenuItem.Enabled = _imageViewer.IsImageAvailable &&
+                        _activeDataEntryConfig != null &&
+                        !_activeDataEntryConfig.Config.Settings.PreventSave;
                     _tagFileToolStripButton.Enabled = _imageViewer.IsImageAvailable;
                 }
 
@@ -3183,8 +3186,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     enableSave &= _imageViewer.IsImageAvailable;
 
                     _saveMenuItem.Enabled = enableSave;
-                    _saveAndCommitFileCommand.Enabled = enableSave;
                 }
+
+                _saveAndCommitFileCommand.Enabled = (config != null && _isLoaded);
             }
         }
 
