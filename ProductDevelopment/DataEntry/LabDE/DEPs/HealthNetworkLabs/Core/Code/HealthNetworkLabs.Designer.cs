@@ -536,7 +536,7 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             // _messageSequenceNumberFile
             // 
             this._messageSequenceNumberFile.AttributeName = "MessageSequenceNumberFile";
-            this._messageSequenceNumberFile.AutoUpdateQuery = "<Query><SolutionDirectory/>\\MessageSequenceNumber.txt</Query>";
+            this._messageSequenceNumberFile.AutoUpdateQuery = "<Query><SolutionDirectory/>\\Corepoint Integration\\MessageSequenceNumber.txt</Query>";
             this._messageSequenceNumberFile.Location = new System.Drawing.Point(208, 0);
             this._messageSequenceNumberFile.Name = "_messageSequenceNumberFile";
             this._messageSequenceNumberFile.Size = new System.Drawing.Size(100, 20);
