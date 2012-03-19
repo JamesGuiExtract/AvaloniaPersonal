@@ -725,7 +725,7 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._componentUnits.SmartHintsEnabled = true;
             this._componentUnits.ValidationCorrectsCase = false;
             this._componentUnits.ValidationErrorMessage = "Unrecognized unit designation.";
-            this._componentUnits.ValidationQuery = "[BLANK]\r\n<SQL>SELECT * FROM Unit ORDER BY Unit</SQL>";
+            this._componentUnits.ValidationQuery = "[BLANK]\r\n<SQL>SELECT Unit FROM Unit ORDER BY Unit</SQL>";
             // 
             // _componentRefRange
             // 
