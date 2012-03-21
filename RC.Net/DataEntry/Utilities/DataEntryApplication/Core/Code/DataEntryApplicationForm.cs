@@ -369,6 +369,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         ApplicationCommand _undoCommand;
 
         /// <summary>
+        /// The redo command.
+        /// </summary>
+        ApplicationCommand _redoCommand;
+
+        /// <summary>
         /// The database connection to be used for any validation or auto-update queries requiring a
         /// database.
         /// </summary>
@@ -1070,6 +1075,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     new ToolStripItem[] { _undoToolStripButton, _undoToolStripMenuItem },
                     false, true, false);
 
+                // Redo command
+                _redoCommand = new ApplicationCommand(_imageViewer.Shortcuts,
+                    new Keys[] { Keys.Y | Keys.Control }, null,
+                    new ToolStripItem[] { _redoToolStripButton, _redoToolStripMenuItem },
+                    false, true, false);
+
                 // Disable the OpenImageToolStripSplitButton if this is not stand alone mode
                 if (!_standAloneMode)
                 {
@@ -1112,7 +1123,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _separateImageWindowToolStripMenuItem.Click += HandleSeparateImageWindow;
                 _undoToolStripButton.Click += HandleUndoClick;
                 _undoToolStripMenuItem.Click += HandleUndoClick;
+                _redoToolStripButton.Click += HandleRedoClick;
+                _redoToolStripMenuItem.Click += HandleRedoClick;
                 AttributeStatusInfo.UndoManager.UndoAvailabilityChanged += HandleUndoAvailabilityChanged;
+                AttributeStatusInfo.UndoManager.RedoAvailabilityChanged += HandleRedoAvailabilityChanged;
 
                 // [DataEntry:195] Open the form with the position and size set per the registry 
                 // settings. Do this regardless of whether the window will be maximized so that it
@@ -1694,8 +1708,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _hideToolTipsCommand.Enabled = _imageViewer.IsImageAvailable;
                 _toggleShowAllHighlightsCommand.Enabled = _imageViewer.IsImageAvailable;
                 
-                // Undo command should be unavailable until a change is actually made.
+                // Undo/redo command should be unavailable until a change is actually made.
                 _undoCommand.Enabled = false;
+                _redoCommand.Enabled = false;
 
                 if (!_standAloneMode && _fileProcessingDb != null)
                 {
@@ -2408,6 +2423,26 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// Handles the case that the user selected the "Redo" button or menu item.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The event data associated with the event.</param>
+        void HandleRedoClick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_dataEntryControlHost != null)
+                {
+                    _dataEntryControlHost.Redo();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34438");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="UndoManager.UndoAvailabilityChanged"/> event.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -2423,6 +2458,24 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 ExtractException.Display("ELI31014", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="UndoManager.RedoAvailabilityChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleRedoAvailabilityChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _redoCommand.Enabled = _imageViewer.IsImageAvailable &&
+                    AttributeStatusInfo.UndoManager.RedoOperationAvailable;
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI34437", ex);
             }
         }
 
@@ -3070,8 +3123,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             _dataEntryControlHost.AcceptSpatialInfo;
                         _removeSpatialInfoCommand.ShortcutHandler =
                             _dataEntryControlHost.RemoveSpatialInfo;
-                        _undoCommand.ShortcutHandler =
-                            _dataEntryControlHost.Undo;
+                        _undoCommand.ShortcutHandler = _dataEntryControlHost.Undo;
+                        _redoCommand.ShortcutHandler = _dataEntryControlHost.Redo;
 
                         // Set Active = true for the new DEP so that it tracks image viewer events.
                         _dataEntryControlHost.Active = true;
@@ -3133,8 +3186,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                             _dataEntryControlHost.LoadData(attributes);
 
-                            // Undo command should be unavailable until a change is actually made.
+                            // Undo/redo command should be unavailable until a change is actually made.
                             _undoCommand.Enabled = false;
+                            _redoCommand.Enabled = false;
                         }
                     }
 

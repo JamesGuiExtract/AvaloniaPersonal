@@ -590,6 +590,11 @@ namespace Extract.DataEntry
         bool _inUndo;
 
         /// <summary>
+        /// Indicates whether the host in the midst of a redo operation.
+        /// </summary>
+        bool _inRedo;
+
+        /// <summary>
         /// Indicates whether the host is currently idle (message pump is empty)
         /// </summary>
         bool _isIdle = true;
@@ -1228,7 +1233,7 @@ namespace Extract.DataEntry
 
                 // [DataEntry:1034]
                 // Ensure no user input is handled while in the process of undo-ing an operation.
-                if (_inUndo)
+                if (InUndo || InRedo)
                 {
                     if (m.Msg == WindowsMessage.KeyDown || m.Msg == WindowsMessage.KeyUp ||
                         m.Msg == WindowsMessage.LeftButtonDown ||
@@ -1508,7 +1513,7 @@ namespace Extract.DataEntry
                     // Some tasks (such as selecting the first control), must take place after the
                     // ImageFileChanged event is complete. Use BeginInvoke to schedule
                     // FinalizeDocumentLoad at the end of the current message queue.
-                    BeginInvoke(new ParameterlessDelegate(FinalizeDocumentLoad));
+                    this.SafeBeginInvoke("ELI34448", () => FinalizeDocumentLoad());
                 }
             }
             catch (Exception ex)
@@ -1750,11 +1755,8 @@ namespace Extract.DataEntry
                     {
                         // AddMemento needs to be called before changing the value so that the
                         // DataEntryModifiedAttributeMemento knows of the attribute's original value.
-                        if (AttributeStatusInfo.UndoManager.TrackOperations)
-                        {
-                            AttributeStatusInfo.UndoManager.AddMemento(
-                                new DataEntryModifiedAttributeMemento(attribute));
-                        }
+                        AttributeStatusInfo.UndoManager.AddMemento(
+                            new DataEntryModifiedAttributeMemento(attribute));
 
                         // Accepting spatial info will not trigger an EndEdit call to seperate this
                         // as an independent operation but it should considered one.
@@ -1836,27 +1838,90 @@ namespace Extract.DataEntry
         /// </summary>
         public void Undo()
         {
+            // Ensure the undo mementos from one undo/redo operation do not get confused with
+            // another.
+            if (InUndo || InRedo)
+            {
+                return;
+            }
+
+            try
+            {
+                _inUndo = true;
+                UndoOrRedo(true);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34435");
+            }
+            finally
+            {
+                ExecuteOnIdle("ELI34439", () => _inUndo = false);
+            }
+        }
+
+        /// <summary>
+        /// Re-does the changes undone in the last undo operation.
+        /// </summary>
+        public void Redo()
+        {
+            // Ensure the undo mementos from one undo/redo operation do not get confused with
+            // another.
+            if (InUndo || InRedo)
+            {
+                return;
+            }
+
+            try
+            {
+                _inRedo = true;
+                UndoOrRedo(false);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34436");
+            }
+            finally
+            {
+                ExecuteOnIdle("ELI34440", () => _inRedo = false);
+            }
+        }
+
+        /// <summary>
+        /// Reverts the changes from the last recorded operation or re-does the changes undone in
+        /// the last undo operation.
+        /// </summary>
+        /// <param name="undo"><see langword="true"/> to perform a undo operation,
+        /// <see langword="false"/> to perform a redo operation.</param>
+        public void UndoOrRedo(bool undo)
+        {
             try
             {
                 using (new TemporaryWaitCursor())
                 {
                     try
                     {
-                        AttributeStatusInfo.UndoManager.TrackOperations = false;
                         _controlUpdateReferenceCount++;
-                        _inUndo = true;
 
-                        // Before performing the undo, remove the active control status from the
-                        // the currently active control. Otherwise if undo attempts to revert the
-                        // status of currently selected attributes, it will not properly take effect
-                        // even if a different control will be active once Undo is complete.
+                        // Before performing the undo/redo, remove the active control status from
+                        // the the currently active control. Otherwise if undo attempts to revert
+                        // the status of currently selected attributes, it will not properly take
+                        // effect even if a different control will be active once the operation is
+                        // complete.
                         if (_activeDataControl != null)
                         {
                             _activeDataControl.IndicateActive(
                                 false, _imageViewer.DefaultHighlightColor);
                         }
 
-                        AttributeStatusInfo.UndoManager.Undo();
+                        if (undo)
+                        {
+                            AttributeStatusInfo.UndoManager.Undo(false);
+                        }
+                        else
+                        {
+                            AttributeStatusInfo.UndoManager.Redo(false);
+                        }
                     }
                     finally
                     {
@@ -1873,10 +1938,22 @@ namespace Extract.DataEntry
                                 true, _imageViewer.DefaultHighlightColor));
                         }
 
-                        // Ensure that nothing that happened as a result of the undo counts as part of a new
-                        // operation (including any action that occured via the message queue).
-                        ExecuteOnIdle("ELI34415", () => AttributeStatusInfo.UndoManager.TrackOperations = true);
-                        ExecuteOnIdle("ELI34416", () => _inUndo = false);
+                        // Invoke EndUndo/EndRedo on idle the to ensure that nothing that happened
+                        // as a result of the undo counts as part of a new operation. Schedule the
+                        // idle operation via BeginInvoke to ensure that the
+                        // DataEntryActiveControlMemento from DataEntryControlGotFocusInvoked does
+                        // not get scheduled before this.
+                        this.SafeBeginInvoke("ELI34447", () =>
+                        {
+                            if (undo)
+                            {
+                                ExecuteOnIdle("ELI34415", () => AttributeStatusInfo.UndoManager.EndUndo());
+                            }
+                            else
+                            {
+                                ExecuteOnIdle("ELI34444", () => AttributeStatusInfo.UndoManager.EndRedo());
+                            }
+                        });
                     }
                 }
             }
@@ -2286,6 +2363,16 @@ namespace Extract.DataEntry
                 // Keep track of the control that should be gaining focus.
                 _focusingControl = (IDataEntryControl)sender;
 
+                // As part of normal changes, we ensure the active control mementos are sent last,
+                // but as part of undo operations, they need to be sent first.
+                if (InUndo && _focusingControl != _activeDataControl)
+                {
+                    var activeControlMemento =
+                        new DataEntryActiveControlMemento(_activeDataControl);
+
+                    AttributeStatusInfo.UndoManager.AddMemento(activeControlMemento);
+                }
+
                 // Schedule the focus change to be handled via the message que. This prevents
                 // situations where focus can be called from within the GotFocus handler as warned
                 // against here:
@@ -2367,7 +2454,7 @@ namespace Extract.DataEntry
                 // changes) are triggered by IndicateActive before this "Supporting" memento is
                 // added. This ensures that the control that was active prior to the focus event
                 // that triggered the change is restored.
-                if (_activeDataControl != null && AttributeStatusInfo.UndoManager.TrackOperations)
+                if (_activeDataControl != null)
                 {
                     var activeControlMemento =
                         new DataEntryActiveControlMemento(_activeDataControl);
@@ -2574,9 +2661,10 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (_inUndo)
+                if (InUndo || InRedo)
                 {
-                    // None of the below code needs to execute when undo-ing attribute values.
+                    // None of the below code needs to execute when undo-ing or re-doing attribute
+                    // values.
                     return;
                 }
 
@@ -2922,7 +3010,7 @@ namespace Extract.DataEntry
 
                 // Disable validation on any controls in the _disabledValidationControls list.
                 Control control = e.DataEntryControl as Control;
-                if (!_inUndo && control != null && 
+                if (!InUndo && !InRedo && control != null && 
                     _disabledValidationControls.Contains(control.Name))
                 {
                     AttributeStatusInfo.EnableValidation(e.Attribute, false);
@@ -3425,17 +3513,7 @@ namespace Extract.DataEntry
                 if (_idleCommands.Count > 0)
                 {
                     Tuple<Action, string> command = _idleCommands.Dequeue();
-                    BeginInvoke((MethodInvoker)(() =>
-                        {
-                            try
-                            {
-                                command.Item1();
-                            }
-                            catch (Exception ex)
-                            {
-                                ex.ExtractDisplay(command.Item2);
-                            }
-                        }));
+                    this.SafeBeginInvoke(command.Item2, () => command.Item1());
                 }
                 else
                 {
@@ -3603,8 +3681,7 @@ namespace Extract.DataEntry
                 selectionState.DataControl != null);
 
             SelectionState lastSelectionState;
-            if (AttributeStatusInfo.UndoManager.TrackOperations &&
-                _controlSelectionState.TryGetValue(selectionState.DataControl, out lastSelectionState))
+            if (_controlSelectionState.TryGetValue(selectionState.DataControl, out lastSelectionState))
             {
                 AttributeStatusInfo.UndoManager.AddMemento(
                     new DataEntrySelectionMemento(this, lastSelectionState));
@@ -3666,6 +3743,34 @@ namespace Extract.DataEntry
         #endregion Internal Members
 
         #region Private Members
+
+        /// <summary>
+        /// Gets a value indicating whether the host in the midst of an undo operation.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if in an undo operation; otherwise, <see langword="false"/>.
+        /// </value>
+        bool InUndo
+        {
+            get
+            {
+                return (_inUndo || AttributeStatusInfo.UndoManager.InUndoOperation);
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the host in the midst of an redo operation.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if in an redo operation; otherwise, <see langword="false"/>.
+        /// </value>
+        bool InRedo
+        {
+            get
+            {
+                return (_inRedo || AttributeStatusInfo.UndoManager.InRedoOperation);
+            }
+        }
 
         /// <summary>
         /// Indicates the number of updates controls have indicated are in progress. DrawHighlights
@@ -6538,17 +6643,7 @@ namespace Extract.DataEntry
             {
                 if (_isIdle)
                 {
-                    BeginInvoke((MethodInvoker)(() =>
-                        {
-                            try
-                            {
-                                action();
-                            }
-                            catch (Exception ex)
-                            {
-                                ex.ExtractDisplay(eliCode);
-                            }
-                        }));
+                    this.SafeBeginInvoke(eliCode, () => action());
                 }
                 else
                 {

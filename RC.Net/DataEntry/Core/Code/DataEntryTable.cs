@@ -840,17 +840,7 @@ namespace Extract.DataEntry
                     return;
                 }
 
-                BeginInvoke((MethodInvoker)(() =>
-                    {
-                        try
-                        {
-                            BeginEdit(initialValue);
-                        }
-                        catch (Exception ex)
-                        {
-                            ex.ExtractDisplay("ELI34409");
-                        }
-                    }));
+                this.SafeBeginInvoke("ELI34449", () => BeginEdit(initialValue));
             }
             catch (Exception ex)
             {
@@ -864,32 +854,9 @@ namespace Extract.DataEntry
                 // Since the re-initialization of edit mode is being done via a begin invoke,
                 // the call to OnUpdateEnded needs to be invoked as well so that it happens
                 // after the re-initialization of edit mode.
-                BeginInvoke((MethodInvoker)(() =>
-                    {
-                        try
-                        {
-                            OnUpdateEnded(new EventArgs());
-                        }
-                        catch (Exception ex)
-                        {
-                            ex.ExtractDisplay("ELI34408");
-                        }
-                    }));
-
-                if (AttributeStatusInfo.UndoManager.TrackOperations)
-                {
-                    BeginInvoke((MethodInvoker)(() =>
-                    {
-                        try
-                        {
-                            AttributeStatusInfo.UndoManager.ExtendCurrentOperation();
-                        }
-                        catch (Exception ex)
-                        {
-                            ex.ExtractDisplay("ELI34410");
-                        }
-                    }));
-                }
+                this.SafeBeginInvoke("ELI34408", () => OnUpdateEnded(new EventArgs()));
+                this.SafeBeginInvoke("ELI34410", () =>
+                    AttributeStatusInfo.UndoManager.ExtendCurrentOperation());
             }
         }
 

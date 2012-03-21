@@ -1,4 +1,5 @@
 ﻿using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -648,29 +649,11 @@ namespace Extract.DataEntry
                 // Apply the reverted selection state via the message pump so that this is the last
                 // thing that occurs as part of the undo procedure. Until all other data has been
                 // reverted, the reverted selection state may not be valid.
-                ((Control)_selectionState.DataControl).BeginInvoke((MethodInvoker)(() =>
-                    {
-                        try
-                        {
-                            _selectionState.DataControl.ApplySelection(_selectionState);
-                        }
-                        catch (Exception ex)
-                        {
-                            ex.ExtractDisplay("ELI34412");
-                        }
-                    }));
+                ((Control)_selectionState.DataControl).SafeBeginInvoke("ELI34412", () =>
+                    _selectionState.DataControl.ApplySelection(_selectionState));
 
-                _dataEntryControlHost.BeginInvoke((MethodInvoker)(() =>
-                    {
-                        try
-                        {
-                            _dataEntryControlHost.ApplySelection(_selectionState);
-                        }
-                        catch (Exception ex)
-                        {
-                            ex.ExtractDisplay("ELI34413");
-                        }
-                    }));
+                _dataEntryControlHost.SafeBeginInvoke("ELI34413", () =>
+                    _dataEntryControlHost.ApplySelection(_selectionState));
             }
             catch (Exception ex)
             {

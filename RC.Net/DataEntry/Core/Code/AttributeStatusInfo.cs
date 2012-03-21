@@ -937,10 +937,7 @@ namespace Extract.DataEntry
                 // attribute.
                 if (!previouslyInitialized)
                 {
-                    if (_undoManager.TrackOperations)
-                    {
-                        _undoManager.AddMemento(new DataEntryAddedAttributeMemento(attribute));
-                    }
+                    _undoManager.AddMemento(new DataEntryAddedAttributeMemento(attribute));
 
                     OnAttributeInitialized(attribute, sourceAttributes, owningControl);
                 }
@@ -1020,10 +1017,7 @@ namespace Extract.DataEntry
 
                 // AddMemento needs to be called before changing the value so that the
                 // DataEntryModifiedAttributeMemento knows of the attribute's original value.
-                if (_undoManager.TrackOperations)
-                {
-                    _undoManager.AddMemento(modifiedAttributeMemento);
-                }
+                _undoManager.AddMemento(modifiedAttributeMemento);
 
                 attribute.Value = value;
 
@@ -1131,10 +1125,7 @@ namespace Extract.DataEntry
 
                     // AddMemento needs to be called before changing the value so that the
                     // DataEntryModifiedAttributeMemento knows of the attribute's original value.
-                    if (_undoManager.TrackOperations)
-                    {
-                        _undoManager.AddMemento(new DataEntryModifiedAttributeMemento(attribute));
-                    }
+                    _undoManager.AddMemento(new DataEntryModifiedAttributeMemento(attribute));
 
                     // If the attribute doesn't contain any spatial information, just
                     // change the text.
@@ -1479,10 +1470,7 @@ namespace Extract.DataEntry
                 {
                     // AddMemento needs to be called before changing the status so that the
                     // DataEntryAttributeStatusChangeMemento knows of the attribute's original status.
-                    if (_undoManager.TrackOperations)
-                    {
-                        _undoManager.AddMemento(new DataEntryAttributeStatusChangeMemento(attribute));
-                    }
+                    _undoManager.AddMemento(new DataEntryAttributeStatusChangeMemento(attribute));
 
                     statusInfo._hasBeenViewed = hasBeenViewed;
 
@@ -2025,10 +2013,7 @@ namespace Extract.DataEntry
                 {
                     // AddMemento needs to be called before changing the status so that the
                     // DataEntryAttributeStatusChangeMemento knows of the attribute's original status.
-                    if (_undoManager.TrackOperations)
-                    {
-                        _undoManager.AddMemento(new DataEntryAttributeStatusChangeMemento(attribute));
-                    }
+                    _undoManager.AddMemento(new DataEntryAttributeStatusChangeMemento(attribute));
 
                     statusInfo._hintType = hintType;
                 }
@@ -2080,10 +2065,7 @@ namespace Extract.DataEntry
                 {
                     // AddMemento needs to be called before changing the status so that the
                     // DataEntryAttributeStatusChangeMemento knows of the attribute's original status.
-                    if (_undoManager.TrackOperations)
-                    {
-                        _undoManager.AddMemento(new DataEntryAttributeStatusChangeMemento(attribute));
-                    }
+                    _undoManager.AddMemento(new DataEntryAttributeStatusChangeMemento(attribute));
 
                     statusInfo._isAccepted = accept;
                 }
@@ -2138,10 +2120,7 @@ namespace Extract.DataEntry
                 {
                     // AddMemento needs to be called before changing the status so that the
                     // DataEntryAttributeStatusChangeMemento knows of the attribute's original status.
-                    if (_undoManager.TrackOperations)
-                    {
-                        _undoManager.AddMemento(new DataEntryAttributeStatusChangeMemento(attribute));
-                    }
+                    _undoManager.AddMemento(new DataEntryAttributeStatusChangeMemento(attribute));
 
                     statusInfo._hintEnabled = hintEnabled;
                 }
@@ -2381,10 +2360,7 @@ namespace Extract.DataEntry
 
                 // AddMemento needs to be called before changing the value so that the
                 // DataEntryModifiedAttributeMemento knows of the attribute's original value.
-                if (_undoManager.TrackOperations)
-                {
-                    _undoManager.AddMemento(new DataEntryModifiedAttributeMemento(attribute));
-                }
+                _undoManager.AddMemento(new DataEntryModifiedAttributeMemento(attribute));
 
                 // Removing spatial info will not trigger an EndEdit call to seperate this as an
                 // independent operation but it should considered one.
@@ -2409,10 +2385,7 @@ namespace Extract.DataEntry
                 {
                     // AddMemento needs to be called before changing the status so that the
                     // DataEntryAttributeStatusChangeMemento knows of the attribute's original status.
-                    if (_undoManager.TrackOperations)
-                    {
-                        _undoManager.AddMemento(new DataEntryAttributeStatusChangeMemento(attribute));
-                    }
+                    _undoManager.AddMemento(new DataEntryAttributeStatusChangeMemento(attribute));
 
                     statusInfo._hintEnabled = false;
 

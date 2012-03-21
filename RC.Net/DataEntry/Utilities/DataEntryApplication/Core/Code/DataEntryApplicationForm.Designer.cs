@@ -27,9 +27,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._menuStrip = new System.Windows.Forms.MenuStrip();
             this._fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._zoomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._fitToPageToolStripMenuItem = new Extract.Imaging.Forms.FitToPageToolStripMenuItem();
             this._fitToWidthToolStripMenuItem = new Extract.Imaging.Forms.FitToWidthToolStripMenuItem();
             this._toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
@@ -77,6 +78,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._saveAndCommitButton = new System.Windows.Forms.ToolStripButton();
             this._tagFileToolStripButton = new Extract.FileActionManager.Forms.TagFileToolStripButton();
             this._dataEntryOperationsToolStrip = new System.Windows.Forms.ToolStrip();
+            this._undoToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this._redoToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._nextInvalidToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._nextUnviewedToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._miscImageToolStrip = new System.Windows.Forms.ToolStrip();
@@ -97,10 +100,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._viewCommandsImageViewerToolStrip = new Extract.Imaging.Forms.ViewCommandsImageViewerToolStrip();
             this._statusStrip = new System.Windows.Forms.StatusStrip();
             this._userActionToolStripStatusLabel = new Extract.Imaging.Forms.UserActionToolStripStatusLabel();
-            this._backgroundProgressStatusLabel = new Imaging.Forms.BackgroundProcessStatusLabel();
+            this._backgroundProgressStatusLabel = new Extract.Imaging.Forms.BackgroundProcessStatusLabel();
             this._resolutionToolStripStatusLabel = new Extract.Imaging.Forms.ResolutionToolStripStatusLabel();
             this._mousePositionToolStripStatusLabel = new Extract.Imaging.Forms.MousePositionToolStripStatusLabel();
-            this._undoToolStripButton = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this._splitContainer)).BeginInit();
             this._splitContainer.Panel1.SuspendLayout();
             this._splitContainer.Panel2.SuspendLayout();
@@ -119,9 +121,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             // _splitContainer
             // 
-            this._splitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._splitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._splitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this._splitContainer.Location = new System.Drawing.Point(0, 63);
             this._splitContainer.Margin = new System.Windows.Forms.Padding(0);
@@ -135,7 +137,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // _splitContainer.Panel2
             // 
             this._splitContainer.Panel2.Controls.Add(this._imageViewer);
-            this._splitContainer.Size = new System.Drawing.Size(1026, 506);
+            this._splitContainer.Size = new System.Drawing.Size(1097, 506);
             this._splitContainer.SplitterDistance = 184;
             this._splitContainer.SplitterWidth = 3;
             this._splitContainer.TabIndex = 0;
@@ -143,9 +145,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             // _documentTypePanel
             // 
-            this._documentTypePanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this._documentTypePanel.BackColor = System.Drawing.SystemColors.InactiveCaptionText;
+            this._documentTypePanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._documentTypePanel.BackColor = System.Drawing.Color.LightSteelBlue;
             this._documentTypePanel.Controls.Add(this._documentTypeLabel);
             this._documentTypePanel.Controls.Add(this._documentTypeComboBox);
             this._documentTypePanel.Location = new System.Drawing.Point(0, 0);
@@ -164,8 +166,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             // _documentTypeComboBox
             // 
-            this._documentTypeComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._documentTypeComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._documentTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._documentTypeComboBox.Enabled = false;
             this._documentTypeComboBox.Location = new System.Drawing.Point(92, 9);
@@ -177,9 +179,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             // _scrollPanel
             // 
-            this._scrollPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._scrollPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._scrollPanel.AutoScroll = true;
             this._scrollPanel.Location = new System.Drawing.Point(0, 46);
             this._scrollPanel.Name = "_scrollPanel";
@@ -193,7 +195,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._imageViewer.MinimumAngularHighlightHeight = 1;
             this._imageViewer.Name = "_imageViewer";
             this._imageViewer.RedactionMode = false;
-            this._imageViewer.Size = new System.Drawing.Size(802, 506);
+            this._imageViewer.Size = new System.Drawing.Size(910, 506);
             this._imageViewer.TabIndex = 0;
             this._imageViewer.TabStop = false;
             this._imageViewer.WordHighlightToolEnabled = true;
@@ -204,26 +206,26 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             // _toolStripContainer.ContentPanel
             // 
-            this._toolStripContainer.ContentPanel.Size = new System.Drawing.Size(1026, 0);
+            this._toolStripContainer.ContentPanel.Size = new System.Drawing.Size(1097, 0);
             this._toolStripContainer.Dock = System.Windows.Forms.DockStyle.Top;
             this._toolStripContainer.LeftToolStripPanelVisible = false;
             this._toolStripContainer.Location = new System.Drawing.Point(0, 0);
             this._toolStripContainer.Name = "_toolStripContainer";
             this._toolStripContainer.RightToolStripPanelVisible = false;
-            this._toolStripContainer.Size = new System.Drawing.Size(1026, 63);
+            this._toolStripContainer.Size = new System.Drawing.Size(1097, 63);
             this._toolStripContainer.TabIndex = 0;
             this._toolStripContainer.TabStop = false;
             this._toolStripContainer.Text = "_toolStripContainer";
             // 
             // _toolStripContainer.TopToolStripPanel
             // 
-            this._toolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommandsImageViewerToolStrip);
             this._toolStripContainer.TopToolStripPanel.Controls.Add(this._menuStrip);
             this._toolStripContainer.TopToolStripPanel.Controls.Add(this._fileCommandsToolStrip);
             this._toolStripContainer.TopToolStripPanel.Controls.Add(this._dataEntryOperationsToolStrip);
             this._toolStripContainer.TopToolStripPanel.Controls.Add(this._miscImageToolStrip);
             this._toolStripContainer.TopToolStripPanel.Controls.Add(this._basicCommandsImageViewerToolStrip);
             this._toolStripContainer.TopToolStripPanel.Controls.Add(this._pageNavigationImageViewerToolStrip);
+            this._toolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommandsImageViewerToolStrip);
             // 
             // _menuStrip
             // 
@@ -236,30 +238,38 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._helpToolStripMenuItem});
             this._menuStrip.Location = new System.Drawing.Point(0, 0);
             this._menuStrip.Name = "_menuStrip";
-            this._menuStrip.Size = new System.Drawing.Size(1026, 24);
+            this._menuStrip.Size = new System.Drawing.Size(1097, 24);
             this._menuStrip.TabIndex = 0;
             this._menuStrip.Text = "_menuStrip";
             // 
             // _fileToolStripMenuItem
             // 
             this._fileToolStripMenuItem.Name = "_fileToolStripMenuItem";
-            this._fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
+            this._fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this._fileToolStripMenuItem.Text = "&File";
             // 
             // _editToolStripMenuItem
             // 
             this._editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._undoToolStripMenuItem});
+            this._undoToolStripMenuItem,
+            this._redoToolStripMenuItem});
             this._editToolStripMenuItem.Name = "_editToolStripMenuItem";
-            this._editToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
+            this._editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this._editToolStripMenuItem.Text = "&Edit";
-            //
+            // 
             // _undoToolStripMenuItem
-            //
+            // 
             this._undoToolStripMenuItem.Name = "_undoToolStripMenuItem";
             this._undoToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+Z";
-            this._undoToolStripMenuItem.Size = new System.Drawing.Size(40, 22);
+            this._undoToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
             this._undoToolStripMenuItem.Text = "&Undo";
+            // 
+            // _redoToolStripMenuItem
+            // 
+            this._redoToolStripMenuItem.Name = "_redoToolStripMenuItem";
+            this._redoToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+Y";
+            this._redoToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this._redoToolStripMenuItem.Text = "&Redo";
             // 
             // _viewToolStripMenuItem
             // 
@@ -276,7 +286,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._toolStripSeparator10,
             this._separateImageWindowToolStripMenuItem});
             this._viewToolStripMenuItem.Name = "_viewToolStripMenuItem";
-            this._viewToolStripMenuItem.Size = new System.Drawing.Size(41, 20);
+            this._viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this._viewToolStripMenuItem.Text = "&View";
             // 
             // _zoomToolStripMenuItem
@@ -291,7 +301,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._zoomPreviousToolStripMenuItem,
             this._zoomNextToolStripMenuItem});
             this._zoomToolStripMenuItem.Name = "_zoomToolStripMenuItem";
-            this._zoomToolStripMenuItem.Size = new System.Drawing.Size(263, 22);
+            this._zoomToolStripMenuItem.Size = new System.Drawing.Size(269, 22);
             this._zoomToolStripMenuItem.Text = "&Zoom";
             // 
             // _fitToPageToolStripMenuItem
@@ -301,7 +311,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._fitToPageToolStripMenuItem.ImageViewer = null;
             this._fitToPageToolStripMenuItem.Name = "_fitToPageToolStripMenuItem";
             this._fitToPageToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._fitToPageToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this._fitToPageToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this._fitToPageToolStripMenuItem.Text = "Fit to &page";
             // 
             // _fitToWidthToolStripMenuItem
@@ -311,13 +321,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._fitToWidthToolStripMenuItem.ImageViewer = null;
             this._fitToWidthToolStripMenuItem.Name = "_fitToWidthToolStripMenuItem";
             this._fitToWidthToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._fitToWidthToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this._fitToWidthToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this._fitToWidthToolStripMenuItem.Text = "Fit to &width";
             // 
             // _toolStripSeparator3
             // 
             this._toolStripSeparator3.Name = "_toolStripSeparator3";
-            this._toolStripSeparator3.Size = new System.Drawing.Size(152, 6);
+            this._toolStripSeparator3.Size = new System.Drawing.Size(151, 6);
             // 
             // _zoomInToolStripMenuItem
             // 
@@ -326,7 +336,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._zoomInToolStripMenuItem.ImageViewer = null;
             this._zoomInToolStripMenuItem.Name = "_zoomInToolStripMenuItem";
             this._zoomInToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._zoomInToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this._zoomInToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this._zoomInToolStripMenuItem.Text = "Zoom in";
             // 
             // _zoomOutToolStripMenuItem
@@ -336,13 +346,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._zoomOutToolStripMenuItem.ImageViewer = null;
             this._zoomOutToolStripMenuItem.Name = "_zoomOutToolStripMenuItem";
             this._zoomOutToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._zoomOutToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this._zoomOutToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this._zoomOutToolStripMenuItem.Text = "Zoom out";
             // 
             // _toolStripSeparator4
             // 
             this._toolStripSeparator4.Name = "_toolStripSeparator4";
-            this._toolStripSeparator4.Size = new System.Drawing.Size(152, 6);
+            this._toolStripSeparator4.Size = new System.Drawing.Size(151, 6);
             // 
             // _zoomPreviousToolStripMenuItem
             // 
@@ -351,7 +361,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._zoomPreviousToolStripMenuItem.ImageViewer = null;
             this._zoomPreviousToolStripMenuItem.Name = "_zoomPreviousToolStripMenuItem";
             this._zoomPreviousToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._zoomPreviousToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this._zoomPreviousToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this._zoomPreviousToolStripMenuItem.Text = "Zoom previous";
             // 
             // _zoomNextToolStripMenuItem
@@ -361,7 +371,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._zoomNextToolStripMenuItem.ImageViewer = null;
             this._zoomNextToolStripMenuItem.Name = "_zoomNextToolStripMenuItem";
             this._zoomNextToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._zoomNextToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this._zoomNextToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this._zoomNextToolStripMenuItem.Text = "Zoom next";
             // 
             // _rotateToolStripMenuItem
@@ -370,7 +380,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._rotateCounterclockwiseToolStripMenuItem,
             this._rotateClockwiseToolStripMenuItem});
             this._rotateToolStripMenuItem.Name = "_rotateToolStripMenuItem";
-            this._rotateToolStripMenuItem.Size = new System.Drawing.Size(263, 22);
+            this._rotateToolStripMenuItem.Size = new System.Drawing.Size(269, 22);
             this._rotateToolStripMenuItem.Text = "&Rotate";
             // 
             // _rotateCounterclockwiseToolStripMenuItem
@@ -380,7 +390,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._rotateCounterclockwiseToolStripMenuItem.ImageViewer = null;
             this._rotateCounterclockwiseToolStripMenuItem.Name = "_rotateCounterclockwiseToolStripMenuItem";
             this._rotateCounterclockwiseToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._rotateCounterclockwiseToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this._rotateCounterclockwiseToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this._rotateCounterclockwiseToolStripMenuItem.Text = "Rotate counterclockwise";
             // 
             // _rotateClockwiseToolStripMenuItem
@@ -390,7 +400,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._rotateClockwiseToolStripMenuItem.ImageViewer = null;
             this._rotateClockwiseToolStripMenuItem.Name = "_rotateClockwiseToolStripMenuItem";
             this._rotateClockwiseToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._rotateClockwiseToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this._rotateClockwiseToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this._rotateClockwiseToolStripMenuItem.Text = "Rotate clockwise";
             // 
             // _gotoPageToolStripMenuItem
@@ -404,7 +414,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._nextPageToolStripMenuItem,
             this._lastPageToolStripMenuItem});
             this._gotoPageToolStripMenuItem.Name = "_gotoPageToolStripMenuItem";
-            this._gotoPageToolStripMenuItem.Size = new System.Drawing.Size(263, 22);
+            this._gotoPageToolStripMenuItem.Size = new System.Drawing.Size(269, 22);
             this._gotoPageToolStripMenuItem.Text = "&Goto page";
             // 
             // _firstPageToolStripMenuItem
@@ -414,7 +424,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._firstPageToolStripMenuItem.ImageViewer = null;
             this._firstPageToolStripMenuItem.Name = "_firstPageToolStripMenuItem";
             this._firstPageToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._firstPageToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this._firstPageToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this._firstPageToolStripMenuItem.Text = "First page";
             // 
             // _previousPageToolStripMenuItem
@@ -424,13 +434,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._previousPageToolStripMenuItem.ImageViewer = null;
             this._previousPageToolStripMenuItem.Name = "_previousPageToolStripMenuItem";
             this._previousPageToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._previousPageToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this._previousPageToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this._previousPageToolStripMenuItem.Text = "Previous page";
             // 
             // _toolStripSeparator5
             // 
             this._toolStripSeparator5.Name = "_toolStripSeparator5";
-            this._toolStripSeparator5.Size = new System.Drawing.Size(157, 6);
+            this._toolStripSeparator5.Size = new System.Drawing.Size(151, 6);
             // 
             // _pageNavigationToolStripMenuItem
             // 
@@ -440,13 +450,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._pageNavigationToolStripMenuItem.ImageViewer = null;
             this._pageNavigationToolStripMenuItem.Name = "_pageNavigationToolStripMenuItem";
             this._pageNavigationToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._pageNavigationToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this._pageNavigationToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this._pageNavigationToolStripMenuItem.Text = "Page n&umber...";
             // 
             // _toolStripSeparator6
             // 
             this._toolStripSeparator6.Name = "_toolStripSeparator6";
-            this._toolStripSeparator6.Size = new System.Drawing.Size(157, 6);
+            this._toolStripSeparator6.Size = new System.Drawing.Size(151, 6);
             // 
             // _nextPageToolStripMenuItem
             // 
@@ -455,7 +465,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._nextPageToolStripMenuItem.ImageViewer = null;
             this._nextPageToolStripMenuItem.Name = "_nextPageToolStripMenuItem";
             this._nextPageToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._nextPageToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this._nextPageToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this._nextPageToolStripMenuItem.Text = "Next page";
             // 
             // _lastPageToolStripMenuItem
@@ -465,7 +475,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._lastPageToolStripMenuItem.ImageViewer = null;
             this._lastPageToolStripMenuItem.Name = "_lastPageToolStripMenuItem";
             this._lastPageToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._lastPageToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this._lastPageToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this._lastPageToolStripMenuItem.Text = "Last page";
             // 
             // _nextItemToolStripMenuItem
@@ -474,7 +484,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._nextInvalidToolStripMenuItem,
             this._nextUnviewedToolStripMenuItem});
             this._nextItemToolStripMenuItem.Name = "_nextItemToolStripMenuItem";
-            this._nextItemToolStripMenuItem.Size = new System.Drawing.Size(263, 22);
+            this._nextItemToolStripMenuItem.Size = new System.Drawing.Size(269, 22);
             this._nextItemToolStripMenuItem.Text = "Goto &item";
             // 
             // _nextInvalidToolStripMenuItem
@@ -482,7 +492,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._nextInvalidToolStripMenuItem.Enabled = false;
             this._nextInvalidToolStripMenuItem.Name = "_nextInvalidToolStripMenuItem";
             this._nextInvalidToolStripMenuItem.ShortcutKeyDisplayString = "F3";
-            this._nextInvalidToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this._nextInvalidToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
             this._nextInvalidToolStripMenuItem.Text = "Next invalid";
             // 
             // _nextUnviewedToolStripMenuItem
@@ -490,19 +500,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._nextUnviewedToolStripMenuItem.Enabled = false;
             this._nextUnviewedToolStripMenuItem.Name = "_nextUnviewedToolStripMenuItem";
             this._nextUnviewedToolStripMenuItem.ShortcutKeyDisplayString = "F4";
-            this._nextUnviewedToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this._nextUnviewedToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
             this._nextUnviewedToolStripMenuItem.Text = "Next unviewed";
             // 
             // _toolStripSeparator7
             // 
             this._toolStripSeparator7.Name = "_toolStripSeparator7";
-            this._toolStripSeparator7.Size = new System.Drawing.Size(260, 6);
+            this._toolStripSeparator7.Size = new System.Drawing.Size(266, 6);
             // 
             // _hideToolTipsMenuItem
             // 
             this._hideToolTipsMenuItem.Name = "_hideToolTipsMenuItem";
             this._hideToolTipsMenuItem.ShortcutKeyDisplayString = "Esc";
-            this._hideToolTipsMenuItem.Size = new System.Drawing.Size(263, 22);
+            this._hideToolTipsMenuItem.Size = new System.Drawing.Size(269, 22);
             this._hideToolTipsMenuItem.Text = "Temporarily hide tooltips";
             // 
             // _toggleShowAllHighlightsMenuItem
@@ -510,33 +520,33 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._toggleShowAllHighlightsMenuItem.CheckOnClick = true;
             this._toggleShowAllHighlightsMenuItem.Name = "_toggleShowAllHighlightsMenuItem";
             this._toggleShowAllHighlightsMenuItem.ShortcutKeyDisplayString = "F10";
-            this._toggleShowAllHighlightsMenuItem.Size = new System.Drawing.Size(263, 22);
+            this._toggleShowAllHighlightsMenuItem.Size = new System.Drawing.Size(269, 22);
             this._toggleShowAllHighlightsMenuItem.Text = "Highlight all data in image";
             // 
             // _acceptImageHighlightMenuItem
             // 
             this._acceptImageHighlightMenuItem.Name = "_acceptImageHighlightMenuItem";
             this._acceptImageHighlightMenuItem.ShortcutKeyDisplayString = "Ctrl+T";
-            this._acceptImageHighlightMenuItem.Size = new System.Drawing.Size(263, 22);
+            this._acceptImageHighlightMenuItem.Size = new System.Drawing.Size(269, 22);
             this._acceptImageHighlightMenuItem.Text = "Accept highlight";
             // 
             // _removeImageHighlightMenuItem
             // 
             this._removeImageHighlightMenuItem.Name = "_removeImageHighlightMenuItem";
             this._removeImageHighlightMenuItem.ShortcutKeyDisplayString = "Ctrl+D";
-            this._removeImageHighlightMenuItem.Size = new System.Drawing.Size(263, 22);
+            this._removeImageHighlightMenuItem.Size = new System.Drawing.Size(269, 22);
             this._removeImageHighlightMenuItem.Text = "Remove highlight";
             // 
             // _toolStripSeparator10
             // 
             this._toolStripSeparator10.Name = "_toolStripSeparator10";
-            this._toolStripSeparator10.Size = new System.Drawing.Size(260, 6);
+            this._toolStripSeparator10.Size = new System.Drawing.Size(266, 6);
             // 
             // _separateImageWindowToolStripMenuItem
             // 
             this._separateImageWindowToolStripMenuItem.Name = "_separateImageWindowToolStripMenuItem";
             this._separateImageWindowToolStripMenuItem.ShortcutKeyDisplayString = "F11";
-            this._separateImageWindowToolStripMenuItem.Size = new System.Drawing.Size(263, 22);
+            this._separateImageWindowToolStripMenuItem.Size = new System.Drawing.Size(269, 22);
             this._separateImageWindowToolStripMenuItem.Text = "Show image in separate &window";
             // 
             // _toolsToolStripMenuItem
@@ -553,7 +563,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._toolStripSeparator9,
             this._optionsToolStripMenuItem});
             this._toolsToolStripMenuItem.Name = "_toolsToolStripMenuItem";
-            this._toolsToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this._toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this._toolsToolStripMenuItem.Text = "&Tools";
             // 
             // _zoomWindowToolStripMenuItem
@@ -563,7 +573,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._zoomWindowToolStripMenuItem.ImageViewer = null;
             this._zoomWindowToolStripMenuItem.Name = "_zoomWindowToolStripMenuItem";
             this._zoomWindowToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._zoomWindowToolStripMenuItem.Size = new System.Drawing.Size(275, 22);
+            this._zoomWindowToolStripMenuItem.Size = new System.Drawing.Size(277, 22);
             this._zoomWindowToolStripMenuItem.Text = "&Zoom window";
             // 
             // _panToolStripMenuItem
@@ -573,7 +583,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._panToolStripMenuItem.ImageViewer = null;
             this._panToolStripMenuItem.Name = "_panToolStripMenuItem";
             this._panToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._panToolStripMenuItem.Size = new System.Drawing.Size(275, 22);
+            this._panToolStripMenuItem.Size = new System.Drawing.Size(277, 22);
             this._panToolStripMenuItem.Text = "P&an";
             // 
             // _selectLayerObjectMenuItem
@@ -583,7 +593,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._selectLayerObjectMenuItem.ImageViewer = null;
             this._selectLayerObjectMenuItem.Name = "_selectLayerObjectMenuItem";
             this._selectLayerObjectMenuItem.ShortcutKeyDisplayString = "";
-            this._selectLayerObjectMenuItem.Size = new System.Drawing.Size(275, 22);
+            this._selectLayerObjectMenuItem.Size = new System.Drawing.Size(277, 22);
             this._selectLayerObjectMenuItem.Text = "&Review and select";
             // 
             // _angularHighlightToolStripMenuItem
@@ -593,7 +603,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._angularHighlightToolStripMenuItem.ImageViewer = null;
             this._angularHighlightToolStripMenuItem.Name = "_angularHighlightToolStripMenuItem";
             this._angularHighlightToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._angularHighlightToolStripMenuItem.Size = new System.Drawing.Size(275, 22);
+            this._angularHighlightToolStripMenuItem.Size = new System.Drawing.Size(277, 22);
             this._angularHighlightToolStripMenuItem.Text = "Swipe text in a&ngular zone";
             // 
             // _rectangularHighlightToolStripMenuItem
@@ -603,7 +613,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._rectangularHighlightToolStripMenuItem.ImageViewer = null;
             this._rectangularHighlightToolStripMenuItem.Name = "_rectangularHighlightToolStripMenuItem";
             this._rectangularHighlightToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._rectangularHighlightToolStripMenuItem.Size = new System.Drawing.Size(275, 22);
+            this._rectangularHighlightToolStripMenuItem.Size = new System.Drawing.Size(277, 22);
             this._rectangularHighlightToolStripMenuItem.Text = "&Swipe text in rectangular zone";
             // 
             // _wordHighlightToolStripMenuItem
@@ -613,30 +623,30 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._wordHighlightToolStripMenuItem.ImageViewer = null;
             this._wordHighlightToolStripMenuItem.Name = "_wordHighlightToolStripMenuItem";
             this._wordHighlightToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._wordHighlightToolStripMenuItem.Size = new System.Drawing.Size(275, 22);
+            this._wordHighlightToolStripMenuItem.Size = new System.Drawing.Size(277, 22);
             this._wordHighlightToolStripMenuItem.Text = "Swipe &word(s)";
             // 
             // _toolStripSeparator8
             // 
             this._toolStripSeparator8.Name = "_toolStripSeparator8";
-            this._toolStripSeparator8.Size = new System.Drawing.Size(272, 6);
+            this._toolStripSeparator8.Size = new System.Drawing.Size(274, 6);
             // 
             // _allowTabbingByGroupToolStripMenuItem
             // 
             this._allowTabbingByGroupToolStripMenuItem.Name = "_allowTabbingByGroupToolStripMenuItem";
             this._allowTabbingByGroupToolStripMenuItem.ShortcutKeyDisplayString = "F9";
-            this._allowTabbingByGroupToolStripMenuItem.Size = new System.Drawing.Size(275, 22);
+            this._allowTabbingByGroupToolStripMenuItem.Size = new System.Drawing.Size(277, 22);
             this._allowTabbingByGroupToolStripMenuItem.Text = "&Tab across rows (where supported)";
             // 
             // _toolStripSeparator9
             // 
             this._toolStripSeparator9.Name = "_toolStripSeparator9";
-            this._toolStripSeparator9.Size = new System.Drawing.Size(272, 6);
+            this._toolStripSeparator9.Size = new System.Drawing.Size(274, 6);
             // 
             // _optionsToolStripMenuItem
             // 
             this._optionsToolStripMenuItem.Name = "_optionsToolStripMenuItem";
-            this._optionsToolStripMenuItem.Size = new System.Drawing.Size(275, 22);
+            this._optionsToolStripMenuItem.Size = new System.Drawing.Size(277, 22);
             this._optionsToolStripMenuItem.Text = "&Options...";
             // 
             // _helpToolStripMenuItem
@@ -645,19 +655,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._appHelpMenuItem,
             this._aboutMenuItem});
             this._helpToolStripMenuItem.Name = "_helpToolStripMenuItem";
-            this._helpToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
+            this._helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this._helpToolStripMenuItem.Text = "&Help";
             // 
             // _appHelpMenuItem
             // 
             this._appHelpMenuItem.Name = "_appHelpMenuItem";
-            this._appHelpMenuItem.Size = new System.Drawing.Size(114, 22);
+            this._appHelpMenuItem.Size = new System.Drawing.Size(107, 22);
             this._appHelpMenuItem.Text = "&Help";
             // 
             // _aboutMenuItem
             // 
             this._aboutMenuItem.Name = "_aboutMenuItem";
-            this._aboutMenuItem.Size = new System.Drawing.Size(114, 22);
+            this._aboutMenuItem.Size = new System.Drawing.Size(107, 22);
             this._aboutMenuItem.Text = "&About";
             // 
             // _fileCommandsToolStrip
@@ -701,12 +711,35 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._dataEntryOperationsToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             this._dataEntryOperationsToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._undoToolStripButton,
+            this._redoToolStripButton,
             this._nextInvalidToolStripButton,
             this._nextUnviewedToolStripButton});
             this._dataEntryOperationsToolStrip.Location = new System.Drawing.Point(162, 24);
             this._dataEntryOperationsToolStrip.Name = "_dataEntryOperationsToolStrip";
-            this._dataEntryOperationsToolStrip.Size = new System.Drawing.Size(111, 39);
+            this._dataEntryOperationsToolStrip.Size = new System.Drawing.Size(147, 39);
             this._dataEntryOperationsToolStrip.TabIndex = 1;
+            // 
+            // _undoToolStripButton
+            // 
+            this._undoToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._undoToolStripButton.Enabled = false;
+            this._undoToolStripButton.Image = global::Extract.DataEntry.Utilities.DataEntryApplication.Properties.Resources.UndoButton;
+            this._undoToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._undoToolStripButton.Name = "_undoToolStripButton";
+            this._undoToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._undoToolStripButton.Text = "Undo last change";
+            this._undoToolStripButton.ToolTipText = "Undo last change (Ctrl+Z)";
+            // 
+            // _redoToolStripButton
+            // 
+            this._redoToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._redoToolStripButton.Enabled = false;
+            this._redoToolStripButton.Image = global::Extract.DataEntry.Utilities.DataEntryApplication.Properties.Resources.RedoButton;
+            this._redoToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._redoToolStripButton.Name = "_redoToolStripButton";
+            this._redoToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._redoToolStripButton.Text = "Redo last change";
+            this._redoToolStripButton.ToolTipText = "Redo last change (Ctrl+Y)";
             // 
             // _nextInvalidToolStripButton
             // 
@@ -737,7 +770,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._miscImageToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             this._miscImageToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._toggleShowAllHighlightsButton});
-            this._miscImageToolStrip.Location = new System.Drawing.Point(273, 24);
+            this._miscImageToolStrip.Location = new System.Drawing.Point(309, 24);
             this._miscImageToolStrip.Name = "_miscImageToolStrip";
             this._miscImageToolStrip.Size = new System.Drawing.Size(39, 39);
             this._miscImageToolStrip.TabIndex = 2;
@@ -766,7 +799,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._angularHighlightToolStripButton,
             this._rectangularHighlightToolStripButton,
             this._wordHighlightToolStripButton});
-            this._basicCommandsImageViewerToolStrip.Location = new System.Drawing.Point(312, 24);
+            this._basicCommandsImageViewerToolStrip.Location = new System.Drawing.Point(348, 24);
             this._basicCommandsImageViewerToolStrip.Name = "_basicCommandsImageViewerToolStrip";
             this._basicCommandsImageViewerToolStrip.Size = new System.Drawing.Size(219, 39);
             this._basicCommandsImageViewerToolStrip.TabIndex = 0;
@@ -842,7 +875,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._pageNavigationToolStripTextBox,
             this._nextPageToolStripButton,
             this._lastPageToolStripButton});
-            this._pageNavigationImageViewerToolStrip.Location = new System.Drawing.Point(531, 24);
+            this._pageNavigationImageViewerToolStrip.Location = new System.Drawing.Point(567, 24);
             this._pageNavigationImageViewerToolStrip.Name = "_pageNavigationImageViewerToolStrip";
             this._pageNavigationImageViewerToolStrip.Size = new System.Drawing.Size(224, 39);
             this._pageNavigationImageViewerToolStrip.TabIndex = 0;
@@ -904,7 +937,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._viewCommandsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
             this._viewCommandsImageViewerToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this._viewCommandsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this._viewCommandsImageViewerToolStrip.Location = new System.Drawing.Point(755, 24);
+            this._viewCommandsImageViewerToolStrip.Location = new System.Drawing.Point(791, 24);
             this._viewCommandsImageViewerToolStrip.Name = "_viewCommandsImageViewerToolStrip";
             this._viewCommandsImageViewerToolStrip.Size = new System.Drawing.Size(303, 39);
             this._viewCommandsImageViewerToolStrip.TabIndex = 0;
@@ -916,9 +949,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._backgroundProgressStatusLabel,
             this._resolutionToolStripStatusLabel,
             this._mousePositionToolStripStatusLabel});
-            this._statusStrip.Location = new System.Drawing.Point(0, 569);
+            this._statusStrip.Location = new System.Drawing.Point(0, 567);
             this._statusStrip.Name = "_statusStrip";
-            this._statusStrip.Size = new System.Drawing.Size(1026, 22);
+            this._statusStrip.Size = new System.Drawing.Size(1097, 24);
             this._statusStrip.TabIndex = 0;
             this._statusStrip.Text = "_statusStrip";
             // 
@@ -928,7 +961,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._userActionToolStripStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
             this._userActionToolStripStatusLabel.ImageViewer = null;
             this._userActionToolStripStatusLabel.Name = "_userActionToolStripStatusLabel";
-            this._userActionToolStripStatusLabel.Size = new System.Drawing.Size(716, 17);
+            this._userActionToolStripStatusLabel.Size = new System.Drawing.Size(670, 17);
             this._userActionToolStripStatusLabel.Spring = true;
             this._userActionToolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -962,21 +995,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._mousePositionToolStripStatusLabel.Size = new System.Drawing.Size(175, 17);
             this._mousePositionToolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // _undoToolStripButton
-            // 
-            this._undoToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._undoToolStripButton.Image = global::Extract.DataEntry.Utilities.DataEntryApplication.Properties.Resources.UndoButton;
-            this._undoToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._undoToolStripButton.Name = "_undoToolStripButton";
-            this._undoToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._undoToolStripButton.Text = "Undo last change";
-            this._undoToolStripButton.ToolTipText = "Undo last change (Ctrl+Z)";
-            // 
             // DataEntryApplicationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1026, 591);
+            this.ClientSize = new System.Drawing.Size(1097, 591);
             this.Controls.Add(this._toolStripContainer);
             this.Controls.Add(this._statusStrip);
             this.Controls.Add(this._splitContainer);
@@ -1043,6 +1066,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private System.Windows.Forms.ToolStripMenuItem _viewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _zoomToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _undoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _redoToolStripMenuItem;
         private Extract.Imaging.Forms.FitToPageToolStripMenuItem _fitToPageToolStripMenuItem;
         private Extract.Imaging.Forms.FitToWidthToolStripMenuItem _fitToWidthToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator _toolStripSeparator3;
@@ -1098,6 +1122,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private System.Windows.Forms.ComboBox _documentTypeComboBox;
         private System.Windows.Forms.Panel _documentTypePanel;
         private System.Windows.Forms.ToolStripButton _undoToolStripButton;
+        private System.Windows.Forms.ToolStripButton _redoToolStripButton;
     }
 }
 

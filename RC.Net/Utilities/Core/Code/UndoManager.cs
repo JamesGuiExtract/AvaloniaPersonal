@@ -103,6 +103,12 @@ namespace Extract.Utilities
         Stack<Stack<IUndoMemento>> _undoStack = new Stack<Stack<IUndoMemento>>();
 
         /// <summary>
+        /// Represents all operations that have been undone (while not having any major or minor
+        /// changes since).
+        /// </summary>
+        Stack<Stack<IUndoMemento>> _redoStack = new Stack<Stack<IUndoMemento>>();
+
+        /// <summary>
         /// Keeps track of mementos that need to be disposed of the next time history is cleared.
         /// </summary>
         List<IDisposable> _mementosToDispose = new List<IDisposable>();
@@ -111,6 +117,11 @@ namespace Extract.Utilities
         /// Indicates whether an operation is currently being reverted.
         /// </summary>
         bool _inUndoOperation;
+
+        /// <summary>
+        /// Indicates whether an operation is currently being redone.
+        /// </summary>
+        bool _inRedoOperation;
 
         /// <summary>
         /// Indicates whether the <see cref="UndoManager"/> should currently be tracking added
@@ -168,6 +179,12 @@ namespace Extract.Utilities
         /// revert has changed.
         /// </summary>
         public event EventHandler<EventArgs> UndoAvailabilityChanged;
+
+        /// <summary>
+        /// Indicates that the availability of an operation for the <see cref="Redo"/> method to
+        /// redo has changed.
+        /// </summary>
+        public event EventHandler<EventArgs> RedoAvailabilityChanged;
 
         #endregion Events
 
@@ -274,6 +291,50 @@ namespace Extract.Utilities
             }
         }
 
+
+        /// <summary>
+        /// Gets a value indicating whether an operation is available to redo.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if an operation is available to redo otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool RedoOperationAvailable
+        {
+            get
+            {
+                return (_redoStack.Count > 0);
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether an operation is currently being reverted.
+        /// </summary>
+        /// <value><see langword="true"/> if in an undo operation; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool InUndoOperation
+        {
+            get
+            {
+                return _inUndoOperation;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether an operation is currently being redone.
+        /// </summary>
+        /// <value><see langword="true"/> if in an redo operation; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool InRedoOperation
+        {
+            get
+            {
+                return _inRedoOperation;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -288,11 +349,42 @@ namespace Extract.Utilities
         {
             try
             {
-                if (!_inUndoOperation && _trackOperations)
+                // If we are not in an undo or redo operation, any non-supporting memento should
+                // cause all available redo operations to be cleared.
+                if (!_inUndoOperation && !_inRedoOperation && _redoStack.Count > 0 &&
+                    memento.Significance != UndoMementoSignificance.Supporting)
+                {
+                    ClearRedoOperations();
+                }
+
+                // If in an undo operation, all mementos received should be collected for an
+                // opposite redo operataion.
+                if (_inUndoOperation)
+                {
+                    if (!_currentOperation.Any(m => m.Supersedes(memento)))
+                    {
+                        _currentOperation.Push(memento);
+
+                        return;
+                    }
+                }
+                // If in a redo operation, all mementos received should be collected for an
+                // opposite undo operataion.
+                else if (_inRedoOperation)
+                {
+                    if (!_currentOperation.Any(m => m.Supersedes(memento)))
+                    {
+                        _currentOperation.Push(memento);
+
+                        return;
+                    }
+                }
+                // Otherwise, collect the memento based upon _trackOperations and the memento itself.
+                else if (_trackOperations)
                 {
                     // If a new operations has been requested and the incoming memento is a
                     // substantial change, break off the current operation and start a new one.
-                    if (_newOperationPending && !_operationInProgress &&
+                    if (!_inRedoOperation && _newOperationPending && !_operationInProgress &&
                         memento.Significance == UndoMementoSignificance.Substantial)
                     {
                         if (_currentOperation.Count > 0)
@@ -375,10 +467,19 @@ namespace Extract.Utilities
         /// <summary>
         /// Reverts the changes from the last recorded operation.
         /// </summary>
-        public void Undo()
+        /// <param name="endImmediately"><see langword="true"/> if the undo operation should
+        /// immediately (synchronously); <see langword="false"/> otherwise. If any undone mementos
+        /// may result in new mementos being added asynchronously, specify <see langword="false"/>
+        /// and call <see cref="EndUndo"/> once all such mementos have been added.</param>
+        public void Undo(bool endImmediately)
         {
             try
             {
+                ExtractException.Assert("ELI34451",
+                    "Cannot perform an undo operation while in an undo operation", !_inUndoOperation);
+                ExtractException.Assert("ELI34454",
+                    "Cannot perform an undo operation while in a redo operation", !_inRedoOperation);
+
                 _inUndoOperation = true;
                 _newOperationPending = false;
 
@@ -408,9 +509,10 @@ namespace Extract.Utilities
 
                     _mementosToDispose.AddRange(undoOperation.OfType<IDisposable>());
 
-                    if (!UndoOperationAvailable)
+                    // End the undo operation if specified.
+                    if (endImmediately)
                     {
-                        OnUndoAvailabilityChanged();
+                        EndUndo();
                     }
                 }
             }
@@ -418,9 +520,131 @@ namespace Extract.Utilities
             {
                 throw ExtractException.AsExtractException("ELI31006", ex);
             }
-            finally
+        }
+
+        /// <summary>
+        /// Ends the active undo operation (any mementos received after this point will not be
+        /// considered part of the undo operation).
+        /// </summary>
+        public void EndUndo()
+        {
+            try
             {
+                ExtractException.Assert("ELI34442",
+                    "Cannot end undo operation; no undo operation in progress.", _inUndoOperation);
+
                 _inUndoOperation = false;
+
+                if (_currentOperation.Any(memento =>
+                    memento.Significance >= UndoMementoSignificance.Minor))
+                {
+                    // Add all mementos recorded during the undo operation as a redo operation.
+                    _redoStack.Push(_currentOperation);
+                }
+
+                if (_redoStack.Count == 1)
+                {
+                    OnRedoAvailabilityChanged();
+                }
+
+                // Clear all mementos added during the undo.
+                _currentOperation = new Stack<IUndoMemento>();
+
+                if (!UndoOperationAvailable)
+                {
+                    OnUndoAvailabilityChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34441");
+            }
+        }
+
+        /// <summary>
+        /// Re-does the changes from the last operation undone.
+        /// </summary>
+        /// <param name="endImmediately"><see langword="true"/> if the redo operation should
+        /// immediately (synchronously); <see langword="false"/> otherwise. If any redone mementos
+        /// may result in new mementos being added asynchronously, specify <see langword="false"/>
+        /// and call <see cref="EndRedo"/> once all such mementos have been added.</param>
+        public void Redo(bool endImmediately)
+        {
+            try
+            {
+                ExtractException.Assert("ELI34452",
+                    "Cannot perform a redo operation while in an undo operation", !_inUndoOperation);
+                ExtractException.Assert("ELI34453",
+                    "Cannot perform a redo operation while in a redo operation", !_inRedoOperation);
+
+                _inRedoOperation = true;
+
+                ExtractException.Assert("ELI34432",
+                    "Redo operation not allowed when data has changed since last undo.",
+                    _operationInProgress == false);
+
+                Stack<IUndoMemento> redoOperation = _redoStack.Pop();
+
+                // Perform the redo
+                if (redoOperation != null)
+                {
+                    foreach (IUndoMemento memento in redoOperation)
+                    {
+                        // By undo-ing mementos that were done during an undo operation, we are redo-ing.
+                        memento.Undo();
+                    }
+
+                    _mementosToDispose.AddRange(redoOperation.OfType<IDisposable>());
+
+                    // End the redo operation if specified.
+                    if (endImmediately)
+                    {
+                        EndRedo();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI34433", ex);
+            }
+        }
+
+        /// <summary>
+        /// Ends the active redo operation (any mementos received after this point will not be
+        /// considered part of the redo operation).
+        /// </summary>
+        public void EndRedo()
+        {
+            try
+            {
+                ExtractException.Assert("ELI34443",
+                    "Cannot end redo operation; no redo operation in progress.", _inRedoOperation);
+
+                _inRedoOperation = false;
+
+                if (_currentOperation.Any(memento =>
+                    memento.Significance >= UndoMementoSignificance.Minor))
+                {
+                    // Add all mementos recorded during the redo operation as an undo operation.
+                    _undoStack.Push(_currentOperation);
+                }
+
+                if (_undoStack.Count == 1)
+                {
+                    OnUndoAvailabilityChanged();
+                }
+
+                // Clear all mementos added during the redo.
+                _currentOperation = new Stack<IUndoMemento>();
+
+                if (!RedoOperationAvailable)
+                {
+                    OnRedoAvailabilityChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34441");
             }
         }
 
@@ -435,9 +659,14 @@ namespace Extract.Utilities
                 _newOperationPending = false;
 
                 bool undoAvailabilityChange = UndoOperationAvailable;
+                bool redoAvailabilityChange = RedoOperationAvailable;
 
                 _mementosToDispose.AddRange(_currentOperation.OfType<IDisposable>());
                 foreach (Stack<IUndoMemento> operation in _undoStack)
+                {
+                    _mementosToDispose.AddRange(operation.OfType<IDisposable>());
+                }
+                foreach (Stack<IUndoMemento> operation in _redoStack)
                 {
                     _mementosToDispose.AddRange(operation.OfType<IDisposable>());
                 }
@@ -446,10 +675,15 @@ namespace Extract.Utilities
 
                 _currentOperation.Clear();
                 _undoStack.Clear();
+                _redoStack.Clear();
 
                 if (undoAvailabilityChange)
                 {
                     OnUndoAvailabilityChanged();
+                }
+                if (redoAvailabilityChange)
+                {
+                    OnRedoAvailabilityChanged();
                 }
             }
             catch (Exception ex)
@@ -507,6 +741,47 @@ namespace Extract.Utilities
             if (UndoAvailabilityChanged != null)
             {
                 UndoAvailabilityChanged(this, new EventArgs());
+            }
+        }
+
+
+        /// <summary>
+        /// Raises the <see cref="RedoAvailabilityChanged"/> event.
+        /// </summary>
+        void OnRedoAvailabilityChanged()
+        {
+            if (RedoAvailabilityChanged != null)
+            {
+                RedoAvailabilityChanged(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Clears all available redo operations.
+        /// </summary>
+        void ClearRedoOperations()
+        {
+            try
+            {
+                _newOperationPending = false;
+
+                bool redoAvailabilityChange = RedoOperationAvailable;
+
+                foreach (Stack<IUndoMemento> operation in _redoStack)
+                {
+                    _mementosToDispose.AddRange(operation.OfType<IDisposable>());
+                }
+
+                _redoStack.Clear();
+
+                if (redoAvailabilityChange)
+                {
+                    OnRedoAvailabilityChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI34430", ex);
             }
         }
 

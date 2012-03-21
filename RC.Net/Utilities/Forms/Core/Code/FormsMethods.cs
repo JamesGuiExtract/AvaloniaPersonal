@@ -466,6 +466,26 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
+        /// Invokes the specified <see paramref="action"/> asynchronously within a try/catch handler
+        /// that will display any exceptions.
+        /// </summary>
+        /// <param name="control">The <see cref="Control"/> on which the <see paramref="action"/>
+        /// should be invoked.</param>
+        /// <param name="eliCode">The ELI code to associate with any exception.</param>
+        /// <param name="action">The <see cref="Action"/> to be invoked.</param>
+        public static void BeginInvoke(Control control, string eliCode, Action action)
+        {
+            try
+            {
+                control.BeginInvoke(action);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay(eliCode);
+            }
+        }
+
+        /// <summary>
         /// Starts or stops the specified <see paramref="window"/>'s title bar and taskbar button from
         /// flashing.
         /// </summary>
@@ -584,6 +604,25 @@ namespace Extract.Utilities.Forms
         }
 
         #endregion Methods
+    }
+
+    /// <summary>
+    /// Provides extension methods for the <see cref="FormsMethods"/> class.
+    /// </summary>
+    public static class FormsExtensionMethods
+    {
+        /// <summary>
+        /// Invokes the specified <see paramref="action"/> asynchronously within a try/catch handler
+        /// that will display any exceptions.
+        /// </summary>
+        /// <param name="control">The <see cref="Control"/> on which the <see paramref="action"/>
+        /// should be invoked.</param>
+        /// <param name="eliCode">The ELI code to associate with any exception.</param>
+        /// <param name="action">The <see cref="Action"/> to be invoked.</param>
+        public static void SafeBeginInvoke(this Control control, string eliCode, Action action)
+        {
+            FormsMethods.BeginInvoke(control, eliCode, action);
+        }
     }
 
     /// <summary>

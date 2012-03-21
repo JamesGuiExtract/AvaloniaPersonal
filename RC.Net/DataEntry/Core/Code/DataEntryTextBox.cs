@@ -1768,11 +1768,8 @@ namespace Extract.DataEntry
         {
             if (SelectionStart != _lastSelectionStart || SelectionLength != _lastSelectionLength)
             {
-                if (AttributeStatusInfo.UndoManager.TrackOperations)
-                {
-                    AttributeStatusInfo.UndoManager.AddMemento(
-                        new DataEntrySelectionMemento(_dataEntryControlHost, new SelectionState(this)));
-                }
+                AttributeStatusInfo.UndoManager.AddMemento(
+                    new DataEntrySelectionMemento(_dataEntryControlHost, new SelectionState(this)));
 
                 _lastSelectionStart = SelectionStart;
                 _lastSelectionLength = SelectionLength;

@@ -395,6 +395,7 @@
   <ItemGroup>
     <Content Include="Resources\NextUnviewedButton.png" />
     <Content Include="Resources\NextInvalidButton.png" />
+    <None Include="Resources\RedoButton.png" />
     <Content Include="Resources\SaveImageButtonSmall.png" />
     <Content Include="Resources\ShowAllHighlightsButton.png" />
     <Content Include="Resources\UndoButton.png" />
