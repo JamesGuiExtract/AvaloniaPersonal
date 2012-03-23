@@ -41,6 +41,11 @@ namespace Extract.ExceptionHelper
             RemoteLog = 0x4
         }
 
+        // The signature of a stringized extract exception
+        // If the first 8 bytes of a stringized exception begin with this
+        // it is an Extract Exception
+        static readonly string _EXTRACT_EXCEPTION_SIGNATURE = "1f000000";
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -163,7 +168,16 @@ namespace Extract.ExceptionHelper
                 }
 
                 // Load the exception from disk
-                var exception = ExtractException.LoadFromFile(eliCode, fileName);
+                string hexException = File.ReadAllText(fileName);
+                Exception exception;
+                if (hexException.StartsWith(_EXTRACT_EXCEPTION_SIGNATURE))
+                {
+                   exception = ExtractException.FromStringizedByteStream("ELI34457", hexException);
+                }
+                else
+                {
+                    exception = hexException.DeserializeFromHexString<Exception>();
+                }
 
                 if (deleteExceptionFile)
                 {
