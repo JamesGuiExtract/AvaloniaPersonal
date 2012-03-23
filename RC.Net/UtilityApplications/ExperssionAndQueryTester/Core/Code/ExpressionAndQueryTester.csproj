@@ -1,0 +1,214 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{404C32F6-646B-4FC7-A1B6-6F49986EF3E0}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Extract.UtilityApplications.ExpressionAndQueryTester</RootNamespace>
+    <AssemblyName>ExpressionAndQueryTester</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>ExpressionAndQueryTester</SccProjectName>
+    <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
+    <SccAuxPath>http://white.extract.local/VaultService</SccAuxPath>
+    <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\..\Binaries\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DocumentationFile>..\..\..\..\..\Binaries\Debug\ExpressionAndQueryTester.XML</DocumentationFile>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\..\..\Binaries\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Extract">
+      <HintPath>..\..\..\..\..\Binaries\Debug\Extract.dll</HintPath>
+    </Reference>
+    <Reference Include="Extract.Drawing">
+      <HintPath>..\..\..\..\..\Binaries\Debug\Extract.Drawing.dll</HintPath>
+    </Reference>
+    <Reference Include="Extract.Interfaces">
+      <HintPath>..\..\..\..\..\binaries\debug\Extract.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Extract.Interop">
+      <HintPath>..\..\..\..\..\Binaries\Debug\Extract.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="Extract.Licensing">
+      <HintPath>..\..\..\..\Licensing\Core\Code\..\..\..\..\binaries\Debug\Extract.Licensing.dll</HintPath>
+    </Reference>
+    <Reference Include="Extract.Utilities">
+      <HintPath>..\..\..\..\..\Binaries\Debug\Extract.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="SandDock, Version=3.0.5.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL" />
+    <Reference Include="ScintillaNET">
+      <HintPath>..\..\..\..\APIs\ScintillaNET v2.4\ScintillaNET.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ExpressionAndQueryTesterForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExpressionAndQueryTesterForm.Designer.cs">
+      <DependentUpon>ExpressionAndQueryTesterForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="ExpressionAndQueryTesterForm.resx">
+      <DependentUpon>ExpressionAndQueryTesterForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\AttributeFinder\Rules\Core\Code\Extract.AttributeFinder.Rules.csproj">
+      <Project>{52C53912-5790-4F68-AB57-6CBC3EF45A14}</Project>
+      <Name>Extract.AttributeFinder.Rules</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\DataEntry\Core\Code\Extract.DataEntry.csproj">
+      <Project>{55C4FA3A-26C9-4CC0-9F11-A7E607E6ACD2}</Project>
+      <Name>Extract.DataEntry</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
+      <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
+      <Name>Extract.Utilities.Forms</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="UCLID_AFCORELib">
+      <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFUTILSLib">
+      <Guid>{AC966E48-1A26-40C7-B61E-AC4C09C9D565}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_COMLMLib">
+      <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_COMUTILSLib">
+      <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_INPUTFUNNELLib">
+      <Guid>{775ACC91-32AC-11D6-8259-0050DAD4FF55}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
+      <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_TESTINGFRAMEWORKINTERFACESLib">
+      <Guid>{B12E5F5E-6EC2-4D38-A57A-D55C4BE683C8}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

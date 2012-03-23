@@ -4,6 +4,7 @@ using Extract.Utilities;
 using Spring.Expressions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -12,7 +13,6 @@ using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
-
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.AttributeFinder.Rules
@@ -114,6 +114,14 @@ namespace Extract.AttributeFinder.Rules
         /// The variable names used in the expression.
         /// </summary>
         string[] _variableNames = new string[0];
+
+        /// <summary>
+        /// The variables for the current or most recent excecution. For every variables name; the
+        /// first value is the <see langword="int"/> cast of all attributes of the corresponding
+        /// name; the second is the <see langword="string"/> cast where the name has been suffixed
+        /// to indicate it references strings.
+        /// </summary>
+        Dictionary<string, object> _variables;
 
         /// <summary>
         /// <see langword="true"/> if changes have been made to <see cref="RSDDataScorer"/>
@@ -225,6 +233,44 @@ namespace Extract.AttributeFinder.Rules
 
         #endregion Properties
 
+        #region Methods
+
+        /// <summary>
+        /// Evaluates the expression (for testing prior to use as a IDataScorer).
+        /// </summary>
+        /// <param name="expression">The expression to evaluate.</param>
+        /// <param name="ruleSetFileName">The ruleset to use to evaluate the expression.</param>
+        /// <param name="ipAttributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s
+        /// to evaluate.</param>
+        /// <param name="variables">A <see cref="Dictionary{T, T}"/> mapping the name of
+        /// each variable instance used in evaluating the expression with the value of the variable.
+        /// </param>
+        /// <returns>The result of the expression.</returns>
+        [ComVisible(false)]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "3#")]
+        public static int EvaluateExpression(string expression, string ruleSetFileName,
+            IUnknownVector ipAttributes, out Dictionary<string, object> variables)
+        {
+            try
+            {
+                RSDDataScorer scorer = new RSDDataScorer();
+                scorer.RSDFileName = ruleSetFileName;
+                scorer.PrepareExpression(expression);
+
+                int score = scorer.GetDataScore2(ipAttributes);
+
+                variables = scorer._variables;
+
+                return score;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34468");
+            }
+        }
+
+        #endregion Methods
+
         #region IDataScorer Members
 
         /// <summary>
@@ -241,13 +287,13 @@ namespace Extract.AttributeFinder.Rules
                 IEnumerable<ComAttribute> foundAttributes = GetFoundAttributes(ruleSet, pAttribute);
 
                 // Create the dictionary used to store the expression variables.
-                Dictionary<string, object> variables = InitializeVariables();
+                InitializeVariables();
 
                 // Use the found attributes to populate the dictionary of expression variables.
-                PopulateExpressionVariables(foundAttributes, ref variables);
+                PopulateExpressionVariables(foundAttributes);
 
                 // Evaluate the expression, then convert the result to an int.
-                object result = ExpressionEvaluator.GetValue(null, _preparedExpression, variables);
+                object result = ExpressionEvaluator.GetValue(null, _preparedExpression, _variables);
                 int score = Convert.ToInt32(result, CultureInfo.CurrentCulture);
 
                 return score;
@@ -273,7 +319,7 @@ namespace Extract.AttributeFinder.Rules
             try
             {
                 // Create the dictionary used to store the expression variables.
-                Dictionary<string, object> variables = InitializeVariables();
+                InitializeVariables();
 
                 IEnumerable<ComAttribute> sourceAttributes = pAttributes.ToIEnumerable<ComAttribute>();
                 if (sourceAttributes.Any())
@@ -288,11 +334,11 @@ namespace Extract.AttributeFinder.Rules
                     }
 
                     // Use the found attributes to populate the dictionary of expression variables.
-                    PopulateExpressionVariables(foundAttributes, ref variables);
+                    PopulateExpressionVariables(foundAttributes);
                 }
 
                 // Evaluate the expression, then convert the result to an int.
-                object result = ExpressionEvaluator.GetValue(null, _preparedExpression, variables);
+                object result = ExpressionEvaluator.GetValue(null, _preparedExpression, _variables);
                 int score = Convert.ToInt32(result, CultureInfo.CurrentCulture);
 
                 return score;
@@ -687,15 +733,14 @@ namespace Extract.AttributeFinder.Rules
         /// strings.
         /// </summary>
         /// <returns>The initialized <see cref="Dictionary{T,T}"/>.</returns>
-        Dictionary<string, object> InitializeVariables()
+        void InitializeVariables()
         {
-            Dictionary<string, object> variables = new Dictionary<string, object>();
+            _variables = new Dictionary<string, object>();
             foreach (string variableName in _variableNames)
             {
-                variables[variableName] = new List<int>();
-                variables[variableName + _STRING_VALUE] = new List<string>();
+                _variables[variableName] = new List<int>();
+                _variables[variableName + _STRING_VALUE] = new List<string>();
             }
-            return variables;
         }
 
         /// <summary>
@@ -704,13 +749,7 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="attributes">The <see cref="ComAttribute"/>s whose values should be used to
         /// populate the variables.</param>
-        /// <param name="expressionVariables">A dictionary that contains 2 entries for every
-        /// variables name; the first value is the <see langword="int"/> cast of all attributes of
-        /// the corresponding name; the second is the <see langword="string"/> cast where the name
-        /// has been suffixed to indicate it references strings.</param>
-        /// <returns></returns>
-        static void PopulateExpressionVariables(IEnumerable<ComAttribute> attributes,
-            ref Dictionary<string, object> expressionVariables)
+        void PopulateExpressionVariables(IEnumerable<ComAttribute> attributes)
         {
             foreach (ComAttribute attribute in attributes)
             {
@@ -719,10 +758,10 @@ namespace Extract.AttributeFinder.Rules
 
                 // expressionVariables will always contain keys in pairs-- one key for the numeric
                 // value and one for the string value. We only need to check for one.
-                if (expressionVariables.ContainsKey(name))
+                if (_variables.ContainsKey(name))
                 {
                     // Add the string value.
-                    ((List<string>)expressionVariables[name + _STRING_VALUE]).Add(value);
+                    ((List<string>)_variables[name + _STRING_VALUE]).Add(value);
 
                     // If the value cannot be interpreted as an integer, use and int value of zero.
                     int intValue;
@@ -732,7 +771,7 @@ namespace Extract.AttributeFinder.Rules
                     }
 
                     // Add the numeric value.
-                    ((List<int>)expressionVariables[name]).Add(intValue);
+                    ((List<int>)_variables[name]).Add(intValue);
                 }
             }
         }

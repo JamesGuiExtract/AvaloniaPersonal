@@ -41,6 +41,11 @@ namespace Extract.Utilities.Forms
         /// </summary>
         ToolTip _toolTip;
 
+        /// <summary>
+        /// The tooltip message.
+        /// </summary>
+        string _tipText;
+
         #endregion Fields
 
         #region Constructors
@@ -86,8 +91,30 @@ namespace Extract.Utilities.Forms
             typeof(UITypeEditor)), Localizable(true)]
         public string TipText
         {
-            get;
-            set;
+            get
+            {
+                return _tipText;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _tipText)
+                    {
+                        _tipText = value;
+
+                        if (_toolTip != null)
+                        {
+                            _toolTip.SetToolTip(this, _tipText);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI34467");
+                }
+            }
         }
 
         /// <summary>
