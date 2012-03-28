@@ -142,7 +142,7 @@ function main(args) {
     function makeEAVS_PARTIES(fields) {
         var typ = "";
         var attrType = parseInt(fields[2]);
-        letters = "AABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var letters = "AABCDEFGHIJKLMNOPQRSTUVWXYZ";
         attrType = letters.charAt(attrType);
         switch(fields[5]) {
             case "R": typ = "Grantor";

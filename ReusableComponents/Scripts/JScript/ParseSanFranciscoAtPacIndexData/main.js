@@ -14,7 +14,7 @@
 //              inputFile - The path to the index data file
 //              outputDir - The path to the EAV output dir
 //
-// Example inputFile: K:\Common\Engineering\Sample Files\AtPac\CA - San Francisco\Set003\IndexData\OriginalsFromCustomer\sf_extract_apn.txt
+// Example inputFile: K:\Common\Engineering\Sample Files\AtPac\CA - San Francisco\Set004\IndexData\combined.txt
 //--------------------------------------------------------------------------------------------------
 
 function main(args) {
@@ -31,15 +31,70 @@ function main(args) {
         fso.createFolder(outputDir);
     }
 
-    var csvlines = readAllText(inputFile).split(/\n/).map(function(s){return s.trim()}).filter(function(l){return l.match(/^(?:[^,]*,){6}/i)});
+    // Create a map of images to destinations
+    // This is to deal with images that have multiple records and multiple doc-types
+    var imagesToCopy = {};
+
+    var csvlines = readAllText(inputFile).split(/\n/).map(function(s){return s.trim()});
     for (var i=0; i < csvlines.length; i++) {
         handleDebug("CSVLine", i);
-        var fields = csvlines[i].split(/\s*(?:-\d{2})?,\s*/);
+        var fields = csvlines[i].split(/\s*(?:-(?=\d{2},)|,)\s*/);
 
-        //makeEAVS_PIN(fields);
-        makeEAVS_PARTIES(fields);
+        // Update map of images to copy
+        setCopyImage(fields);
+
+        if (fields.length > 6) {
+          makeEAVS_PARTIES(fields);
+        } else {
+          makeEAVS_PIN(fields);
+        }
     }
     
+    copyImages(imagesToCopy);
+
+    // Update map of images to destinations based on doc-type(s)
+    function setCopyImage(fields) {
+        var doctype = fields[4].replace(/[^\w\s]/g, "_").replace(/_+$/,"");
+        var iname = getImageName(fields[0]+fields[1]);
+        if (iname == undefined) {
+            return;
+        }
+        var existRecord = imagesToCopy[iname];
+        if (existRecord) {
+            if (existRecord.has(doctype)) {
+                return;
+            } else {
+                existRecord.push(doctype);
+            }
+        } else {
+            imagesToCopy[iname] = [doctype];
+        }
+    }
+
+    function copyImages(imagesToDocTypes) {
+        for (iname in imagesToDocTypes) {
+            var doctypes = imagesToDocTypes[iname];
+            var doctype = doctypes.join(" and ");
+            var newdir = fso.BuildPath(fso.GetParentFolderName(iname), doctype);
+
+            try {
+                if (!fso.folderExists(newdir)) {
+                    fso.createFolder(newdir);
+                }
+            }
+            catch(err) {
+                handleScriptError("ParseSanFranciscoAtPacIndexData_1", "Unable to create folder!", err, "FolderName", newdir);
+            }
+
+            try {
+                fso.CopyFile(iname, newdir+"\\");
+            }
+            catch(err) {
+                handleScriptError("ParseSanFranciscoAtPacIndexData_2", "Unable to copy file!", err, "FileName", iname, "Destination", newdir);
+            }
+        }
+    }
+
     function appendText(fname, text) {
         // Open the file
         try {
@@ -89,12 +144,18 @@ function main(args) {
     //--------------------------------------------------------------------------------------------------
     function makeEAVS_PIN(fields) {
         var fname = getEAVName(fields[0]+fields[1], "PIN");
-        writeAttr(fname, "PIN", fields[4].trim(), "", "");
+        var attrType = parseInt(fields[2]);
+        var letters = "AABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        attrType = letters.charAt(attrType);
+        writeAttr(fname, "PIN", fields[5].trim(), attrType, "");
     }
 
     function makeEAVS_PARTIES(fields) {
         var typ = "";
-        switch(fields[4]) {
+        var attrType = parseInt(fields[2]);
+        var letters = "AABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        attrType = letters.charAt(attrType);
+        switch(fields[5]) {
             case "R": typ = "Grantor";
             break;
             case "E": typ = "Grantee";
@@ -103,7 +164,7 @@ function main(args) {
         }
         var fname = getEAVName(fields[0]+fields[1], typ);
         try {
-            writeAttr(fname, typ, fields[5].trim(), "", "");
+            writeAttr(fname, typ, fields[6].trim(), attrType, "");
         }
         catch(err) {
             handleScriptError("ParseSanFranciscoAtPacIndexData_5", "Error!", err, "Index Data Line", fields);

@@ -3,16 +3,16 @@
 :: functions.
 :: 
 :: Usage:
-::    BuildFinalScript main.js scriptname.js
+::    BuildFinalScript
 :: 
 :: where:
 ::    main.js = a 'main' function specific to this script
-::    
-::    scriptname.js = final script file for use
 :: 
-:: The customer-master.js file is built from the following order of files:
-::    customer-specific.js
+:: The master.js file is built from the following order of files:
+::    specific.js
 ::    ScriptWrapper.js
-:: 
-copy "%1" + "%~dp0..\ScriptWrapper.js" "%2" /B /Y
-pause
+::
+:: The master.js file is named after the batch file's parent dir
+
+for /f "delims=\" %%a in ("%~dp0") do set name=%%~nxa.js
+copy "main.js" + "%~dp0..\Common\ScriptWrapper.js" "..\%name%" /B /Y
