@@ -174,7 +174,7 @@
   </metadata>
   <data name="_componentValue.ValidationQuery" xml:space="preserve">
     <value>&lt;Query ValidationListType='AutoCompleteOnly'&gt;
-	&lt;SQL&gt;SELECT LastName + ', ' + FirstName FROM Physician  
+	&lt;SQL&gt;SELECT FirstName + ' ' + LastName FROM Physician  
 		WHERE '&lt;Attribute Parameterize='False'&gt;..&lt;/Attribute&gt;' = 'UNDER DIRECTION OF'
 	&lt;/SQL&gt;
 &lt;/Query&gt;</value>
