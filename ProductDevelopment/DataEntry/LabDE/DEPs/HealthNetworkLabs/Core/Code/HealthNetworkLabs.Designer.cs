@@ -150,7 +150,7 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._laboratoryTestTable.RowFormattingRuleFile = "Rules\\Swiping\\TestRow.rsd.etf";
             this._laboratoryTestTable.RowSwipingEnabled = true;
             this._laboratoryTestTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._laboratoryTestTable.Size = new System.Drawing.Size(585, 178);
+            this._laboratoryTestTable.Size = new System.Drawing.Size(585, 86);
             this._laboratoryTestTable.TabIndex = 1;
             // 
             // _testName
@@ -524,9 +524,9 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._testDetailsGroupBox.Controls.Add(this._testComponentTable);
             this._testDetailsGroupBox.Controls.Add(this._componentCommentLabel);
             this._testDetailsGroupBox.Controls.Add(this._componentComment);
-            this._testDetailsGroupBox.Location = new System.Drawing.Point(0, 481);
+            this._testDetailsGroupBox.Location = new System.Drawing.Point(0, 391);
             this._testDetailsGroupBox.Name = "_testDetailsGroupBox";
-            this._testDetailsGroupBox.Size = new System.Drawing.Size(593, 540);
+            this._testDetailsGroupBox.Size = new System.Drawing.Size(593, 650);
             this._testDetailsGroupBox.TabIndex = 8;
             this._testDetailsGroupBox.TabStop = false;
             this._testDetailsGroupBox.Text = "Selected Order Details";
@@ -602,7 +602,7 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._componentComment.ParentDataEntryControl = this._testComponentTable;
             this._componentComment.RemoveNewLineChars = false;
             this._componentComment.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._componentComment.Size = new System.Drawing.Size(585, 60);
+            this._componentComment.Size = new System.Drawing.Size(585, 170);
             this._componentComment.TabIndex = 9;
             this._componentComment.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
             this._componentComment.ValidationErrorMessage = "";
@@ -614,7 +614,7 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._testsGroupBox.Controls.Add(this._laboratoryTestTable);
             this._testsGroupBox.Location = new System.Drawing.Point(0, 272);
             this._testsGroupBox.Name = "_testsGroupBox";
-            this._testsGroupBox.Size = new System.Drawing.Size(593, 203);
+            this._testsGroupBox.Size = new System.Drawing.Size(593, 113);
             this._testsGroupBox.TabIndex = 7;
             this._testsGroupBox.TabStop = false;
             this._testsGroupBox.Text = "Orders";
@@ -718,6 +718,7 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._componentValue.SmartHintsEnabled = true;
             this._componentValue.ValidationErrorMessage = "Test value must be specified.";
             this._componentValue.ValidationPattern = "\\S";
+            this._componentValue.ValidationQuery = resources.GetString("_componentValue.ValidationQuery");
             // 
             // _componentUnits
             // 
@@ -742,7 +743,8 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             // _componentFlag
             // 
             this._componentFlag.AttributeName = "Flag";
-            this._componentFlag.AutoUpdateQuery = "<Attribute>../CorrectFlag</Attribute>";
+            this._componentFlag.AutoUpdateQuery = "<Expression><Attribute>../CorrectFlag</Attribute> == \'[BLANK]\' ? \'\' : <Attribute>" +
+    "../CorrectFlag</Attribute></Expression>";
             this._componentFlag.FillWeight = 35F;
             this._componentFlag.HeaderText = "Flag";
             this._componentFlag.Name = "_componentFlag";
@@ -797,7 +799,7 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
         highlightColor2};
             this.MinimumSize = new System.Drawing.Size(500, 0);
             this.Name = "HealthNetworkLabsPanel";
-            this.Size = new System.Drawing.Size(593, 1025);
+            this.Size = new System.Drawing.Size(593, 1045);
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).EndInit();
             this._patientInfoGroupBox.ResumeLayout(false);
