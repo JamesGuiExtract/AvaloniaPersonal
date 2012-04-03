@@ -196,7 +196,7 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._componentDate.HeaderText = "Collection Date";
             this._componentDate.Name = "_componentDate";
             this._componentDate.ValidationErrorMessage = "Collection date must be a valid date formatted MM/DD/YYYY";
-            this._componentDate.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(19|20)\\d{2}$";
+            this._componentDate.ValidationPattern = "(^$)|(^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(19|20)\\d{2}$)";
             // 
             // _laboratoryTestTime
             // 
@@ -207,7 +207,7 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._laboratoryTestTime.HeaderText = "Collection Time";
             this._laboratoryTestTime.Name = "_laboratoryTestTime";
             this._laboratoryTestTime.ValidationErrorMessage = "Collection time must be a valid time formatted HH:MM";
-            this._laboratoryTestTime.ValidationPattern = "^((0?[0-9])|(1[0-9])|(2[0-3])):[0-5][0-9]$";
+            this._laboratoryTestTime.ValidationPattern = "(^$)|(^((0?[0-9])|(1[0-9])|(2[0-3])):[0-5][0-9]$)";
             // 
             // _labIDLabel
             // 
