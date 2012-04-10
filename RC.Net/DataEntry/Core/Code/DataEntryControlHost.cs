@@ -3425,8 +3425,7 @@ namespace Extract.DataEntry
                     IAttribute activeAttribute = GetActiveAttribute(null);
 
                     DataEntryQuery dataEntryQuery =
-                        DataEntryQuery.Create(e.Value, activeAttribute, _dbConnection,
-                        MultipleQueryResultSelectionMode.None, true);
+                        DataEntryQuery.Create(e.Value, activeAttribute, _dbConnection);
                     QueryResult queryResult = dataEntryQuery.Evaluate();
                     e.Value = queryResult.ToString();
                 }

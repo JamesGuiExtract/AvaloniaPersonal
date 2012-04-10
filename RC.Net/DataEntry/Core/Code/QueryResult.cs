@@ -1,7 +1,8 @@
-using Extract.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -12,25 +13,32 @@ namespace Extract.DataEntry
     /// <summary>
     /// Specifies the way in which multiple query results will be handled. This includes the initial
     /// selection of results from an individual query node as well as governing the way query
-    /// results are combined with one another. Since a query result can either be a single value or
-    /// a list of values, combining query nodes may result in one or more of the following actions:
-    /// 1) Appending the string value from one query result to the string result of another.
-    /// 2) Combining value lists from 2 query results into a single, larger list
-    /// 3) Generating new query results to allow for different permutations of string values to be
+    /// results are combined with one another. The following grid demonstrates the results from a
+    /// single query node base on the selection mode:
+    /// <code>
+    ///             [A]     [A, B]      [A, B, C]
+    /// None        [A]
+    /// First       [A]     [A]         [A]
+    /// List        [A]     [A, B]      [A, B, C]
+    /// Distinct    [A]     [A, B]      [A, B, C]
+    /// </code>
+    /// Since a query result can either be a single value or a list of values, combining query nodes
+    /// may result in one of the following actions:
+    /// 1) Combining value lists from 2 query results into a single, larger list
+    /// 2) Generating new query results to allow for different permutations of string values to be
     /// created.
-    /// Primarily, these actions are governed by the use of 2 settings (List and Distinct).
-    /// These two settings cause the exact same result when dealing with the result of a single
-    /// query node, namely returning all values in a list. However, when combining with other query
-    /// results while the "List" settings will seek to simply combine value lists, the "Distinct"
-    /// setting will attempt to combine the string values from one query result in all possible ways
-    /// with the values of another query result. The following grid outlines what happens when two
-    /// query results, each with 2 values ([A,B] and [1,2]) are combined under the various 
-    /// <see cref="MultipleQueryResultSelectionMode"/> settings. (Note that if either had the 
-    /// "None" setting applied, both query results would already be empty).
+    /// Primarily, these actions are governed by the presense or lack of the Distinct selection mode.
+    /// While both "List" and "Distinct" produce the same result when applied to a single query node,
+    /// when combining with other nodes, the "Distinct" setting will attempt to combine the string
+    /// values from one query result in all possible ways with the values of another query result.
+    /// The following grid outlines what happens when two query results, each with 2 values ([A,B]
+    /// and [1,2]) are combined under the various selection mode settings. (Note that if either had
+    /// the "None" setting applied, both query results would already be empty. However, if either
+    /// result had produced only one value, it would be combined in the same fashion as with "First").
     /// <code>
     ///                             [1,2]
     ///                 First       List        Distinct
-    ///       First     [A1]        [A,1,2]     [A1,A2]
+    ///       First     [A,1]       [A,1,2]     [A1,A2]
     /// [A,B] List      [A,B,1]     [A,B,1,2]   [AB1,AB2]
     ///       Distinct  [A1,B1]     [A12,B12]   [A1,A2,B1,B2]
     /// </code>
@@ -38,7 +46,7 @@ namespace Extract.DataEntry
     public enum MultipleQueryResultSelectionMode
     {
         #region Enums
-        
+
         /// <summary>
         /// If a query returns multiple values, only the first will be reported.
         /// </summary>
@@ -71,9 +79,15 @@ namespace Extract.DataEntry
     /// <see cref="SpatialString"/> or <see langword="string"/> and may be accessed in a variety of
     /// ways.
     /// </summary>
-    internal class QueryResult : IEnumerable
+    [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
+    public class QueryResult : IEnumerable<QueryResult>
     {
         #region Fields
+
+        /// <summary>
+        /// The <see cref="QueryNode"/> this result is associated with.
+        /// </summary>
+        QueryNode _queryNode;
 
         /// <summary>
         /// A list of <see langword="string"/> values that define this result.
@@ -89,7 +103,7 @@ namespace Extract.DataEntry
         /// A list of <see cref="IAttribute"/> values that define this result.
         /// </summary>
         List<IAttribute> _attributeResults;
-        
+
         /// <summary>
         /// <see langword="true"/> if multiple values are present; <see langword="false"/>
         /// otherwise.
@@ -106,7 +120,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The <see cref="MultipleQueryResultSelectionMode"/> mode associated with this result.
         /// </summary>
-        MultipleQueryResultSelectionMode _selectionMode;
+        MultipleQueryResultSelectionMode _selectionMode = MultipleQueryResultSelectionMode.None;
 
         #endregion Fields
        
@@ -118,43 +132,55 @@ namespace Extract.DataEntry
         /// <summary>
         /// Initializes a new, empty <see cref="QueryResult"/> instance.
         /// </summary>
-        public QueryResult()
-            : this(MultipleQueryResultSelectionMode.None, "")
+        /// <param name="queryNode">The <see cref="QueryNode"/> this result is to be associated
+        /// with.</param>
+        public QueryResult(QueryNode queryNode)
+            : this(queryNode, "")
         {
         }
 
         /// <summary>
-        /// Initializes a new, empty <see cref="QueryResult"/> instance based on the provided
-        /// instance.
+        /// Initializes a new <see cref="QueryResult"/> instance based on the provided instance.
         /// </summary>
+        /// <param name="queryNode">The <see cref="QueryNode"/> this result is to be associated
+        /// with.</param>
         /// <param name="queryResult">The <see cref="QueryResult"/> the new instance should be
         /// modeled after. The new instance will be an exact copy except in the fact that it will
         /// not have access to the named results <see paramref="queryResult"/> did.</param>
-        public QueryResult(QueryResult queryResult)
-            : this()
+        public QueryResult(QueryNode queryNode, QueryResult queryResult)
+            : this(queryResult._queryNode)
         {
             try
             {
+                // When creating new copy of existing results, we don't want the selection mode to
+                // limit the number of values that already exist in this result. (multiple values
+                // may have been achieved by combining results).
+                if (queryNode.SelectionMode == MultipleQueryResultSelectionMode.None &&
+                    queryResult.HasMultipleValues)
+                {
+                    _selectionMode = MultipleQueryResultSelectionMode.List;
+                }
+
                 if (queryResult.IsAttribute)
                 {
                     _attributeResults = new List<IAttribute>(queryResult._attributeResults);
-                    Initialize<IAttribute>(queryResult.SelectionMode, _attributeResults);
+                    Initialize<IAttribute>(queryNode, _attributeResults);
                 }
                 else if (queryResult.IsSpatial)
                 {
                     _spatialResults = new List<SpatialString>(queryResult._spatialResults);
-                    Initialize<SpatialString>(queryResult.SelectionMode, _spatialResults);
+                    Initialize<SpatialString>(queryNode, _spatialResults);
                 }
                 else
                 {
                     _stringResults = new List<string>(queryResult._stringResults);
-                    Initialize<string>(queryResult.SelectionMode, _stringResults);
+                    Initialize<string>(queryNode, _stringResults);
                 }
 
                 if (queryResult._nextValue != null)
                 {
                     _hasMultipleValues = true;
-                    _nextValue = new QueryResult(queryResult._nextValue);
+                    _nextValue = new QueryResult(queryNode, queryResult._nextValue);
                 }
             }
             catch (Exception ex)
@@ -166,17 +192,17 @@ namespace Extract.DataEntry
         /// <summary>
         /// Initializes a new <see cref="QueryResult"/> instance.
         /// </summary>
-        /// <param name="selectionMode">The <see cref="MultipleQueryResultSelectionMode"/> that will
-        /// govern how this <see cref="QueryResult"/> is combined with others.</param>
+        /// <param name="queryNode">The <see cref="QueryNode"/> this result is to be associated
+        /// with.</param>
         /// <param name="stringResults">One or more <see langword="string"/> values representing the
         /// result of a <see cref="DataEntryQuery"/>.</param>
-        public QueryResult(MultipleQueryResultSelectionMode selectionMode,
-            params string[] stringResults)
+        [SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", MessageId = "string")]
+        public QueryResult(QueryNode queryNode, params string[] stringResults)
         {
             try
             {
                 _stringResults = new List<string>(stringResults);
-                Initialize<string>(selectionMode, _stringResults);
+                Initialize<string>(queryNode, _stringResults);
             }
             catch (Exception ex)
             {
@@ -187,17 +213,16 @@ namespace Extract.DataEntry
         /// <summary>
         /// Initializes a new <see cref="QueryResult"/> instance.
         /// </summary>
-        /// <param name="selectionMode">The <see cref="MultipleQueryResultSelectionMode"/> that will
-        /// govern how this <see cref="QueryResult"/> is combined with others.</param>
+        /// <param name="queryNode">The <see cref="QueryNode"/> this result is to be associated
+        /// with.</param>
         /// <param name="spatialResults">One or more <see cref="SpatialString"/> values representing
         /// the result of a <see cref="DataEntryQuery"/>.</param>
-        public QueryResult(MultipleQueryResultSelectionMode selectionMode,
-            params SpatialString[] spatialResults)
+        public QueryResult(QueryNode queryNode, params SpatialString[] spatialResults)
         {
             try
             {
                 _spatialResults = new List<SpatialString>(spatialResults);
-                Initialize<SpatialString>(selectionMode, _spatialResults);
+                Initialize<SpatialString>(queryNode, _spatialResults);
             }
             catch (Exception ex)
             {
@@ -208,17 +233,16 @@ namespace Extract.DataEntry
         /// <summary>
         /// Initializes a new <see cref="QueryResult"/> instance.
         /// </summary>
-        /// <param name="selectionMode">The <see cref="MultipleQueryResultSelectionMode"/> that will
-        /// govern how this <see cref="QueryResult"/> is combined with others.</param>
+        /// <param name="queryNode">The <see cref="QueryNode"/> this result is to be associated
+        /// with.</param>
         /// <param name="attributeResults">One or more <see cref="SpatialString"/> values representing
         /// the result of a <see cref="DataEntryQuery"/>.</param>
-        public QueryResult(MultipleQueryResultSelectionMode selectionMode,
-            params IAttribute[] attributeResults)
+        public QueryResult(QueryNode queryNode, params IAttribute[] attributeResults)
         {
             try
             {
                 _attributeResults = new List<IAttribute>(attributeResults);
-                Initialize<IAttribute>(selectionMode, _attributeResults);
+                Initialize<IAttribute>(queryNode, _attributeResults);
             }
             catch (Exception ex)
             {
@@ -503,6 +527,17 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets the <see cref="QueryNode"/> this result is associated with.
+        /// </summary>
+        public QueryNode QueryNode
+        {
+            get
+            {
+                return _queryNode;
+            }
+        }
+
+        /// <summary>
         /// Gets the <see cref="MultipleQueryResultSelectionMode"/> mode associated with this result.
         /// </summary>
         /// <reutrns>The <see cref="MultipleQueryResultSelectionMode"/> mode associated with this
@@ -517,6 +552,34 @@ namespace Extract.DataEntry
             set
             {
                 _selectionMode = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="SpatialMode"/> used by this result
+        /// </summary>
+        /// <value>
+        /// The <see cref="SpatialMode"/> used by this result.
+        /// </value>
+        public SpatialMode SpatialMode
+        {
+            get
+            {
+                return (_queryNode == null) ? SpatialMode.Normal : _queryNode.SpatialMode;
+            }
+        }
+
+        /// <summary>
+        /// Gets the properties associated with this query node that have been specified via XML
+        /// attributes.
+        /// </summary>
+        /// <value>The properties associated with this query node that have been specified via XML
+        /// attributes.</value>
+        public Dictionary<string, string> QueryNodeProperties
+        {
+            get
+            {
+                return (_queryNode == null) ? new Dictionary<string, string>() : _queryNode.Properties;
             }
         }
 
@@ -567,6 +630,35 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Removes all string info associated with all values of this <see cref="QueryResult"/>.
+        /// Spatial info is maintained.
+        /// </summary>
+        public void RemoveStringInfo()
+        {
+            try
+            {
+                if (!IsEmpty && IsSpatial)
+                {
+                    FirstSpatialStringValue.ReplaceAndDowngradeToHybrid("");
+
+                    // Do the same for all remaining values.
+                    if (NextValue != null)
+                    {
+                        NextValue.RemoveStringInfo();
+                    }
+
+                    // There is no longer any attribute or string info in this result.
+                    _attributeResults = null;
+                    _stringResults = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI34531", ex);
+            }
+        }
+
+        /// <summary>
         /// Converts a result currently represented by a list of multiple values into a single
         /// string value where each item in the list is separated by the specified delimiter.
         /// </summary>
@@ -583,6 +675,7 @@ namespace Extract.DataEntry
                 // previously had.
                 BreakOutCurrentValue();
                 _nextValue = null;
+                _hasMultipleValues = false;
             }
             catch (Exception ex)
             {
@@ -625,7 +718,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                QueryResult combinedResult = new QueryResult();
+                QueryResult combinedResult = new QueryResult(_queryNode);
                 foreach (QueryResult result in this)
                 {
                     QueryResult resultCopy = result.CreateFirstValueCopy();
@@ -656,14 +749,14 @@ namespace Extract.DataEntry
                 {
                     if (_attributeResults != null)
                     {
-                        foreach(IAttribute attribute in _attributeResults)
+                        foreach (IAttribute attribute in _attributeResults)
                         {
                             stringList.Add(attribute.Value.String);
                         }
                     }
                     else if (_spatialResults != null)
                     {
-                        foreach(SpatialString spatialString in _spatialResults)
+                        foreach (SpatialString spatialString in _spatialResults)
                         {
                             stringList.Add(spatialString.String);
                         }
@@ -728,6 +821,26 @@ namespace Extract.DataEntry
         /// <para><b>Note</b></para>
         /// The original results may be altered and should no longer be used.
         /// </summary>
+        /// <param name="results">The query <see cref="QueryResult"/>s to combine.</param>
+        public static QueryResult Combine(IEnumerable<QueryResult> results)
+        {
+            try
+            {
+                return results.Aggregate(new QueryResult(results.First()._queryNode),
+                        (result, next) => QueryResult.Combine(result, next));
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34532");
+            }
+        }
+        
+
+        /// <summary>
+        /// Combines the given results into a single result.
+        /// <para><b>Note</b></para>
+        /// The original results may be altered and should no longer be used.
+        /// </summary>
         /// <param name="resultA">The first <see cref="QueryResult"/> to be combined.</param>
         /// <param name="resultB">The second <see cref="QueryResult"/> to be combined.</param>
         /// <returns>The <see cref="QueryResult"/> representing the combination of
@@ -739,6 +852,8 @@ namespace Extract.DataEntry
                 // If resultA is empty, simply use resultB (and vice-versa)
                 if (resultA.IsEmpty)
                 {
+                    resultB._queryNode = resultA._queryNode;
+
                     return resultB;
                 }
                 else if (resultB.IsEmpty)
@@ -746,130 +861,45 @@ namespace Extract.DataEntry
                     return resultA;
                 }
 
-                // Check for the case that multiple lists should be combined rather than combining
-                // any string values.
-                if ((resultA.SelectionMode != MultipleQueryResultSelectionMode.Distinct &&
-                     (!resultB.HasMultipleValues ||
-                      resultB.SelectionMode != MultipleQueryResultSelectionMode.Distinct)) ||
-                    (resultB.SelectionMode != MultipleQueryResultSelectionMode.Distinct &&
-                     (!resultA.HasMultipleValues ||
-                      resultA.SelectionMode != MultipleQueryResultSelectionMode.Distinct)))
+                // If neither result has been broken out into a linked list and the result types
+                // are homogeneous, combine the corresponding lists.
+                if (resultA._nextValue == null && resultB._nextValue == null)
                 {
-                    // If neither result has been broken out into a linked list and the result types
-                    // are homogeneous, combine the corresponding lists.
-                    if (resultA._nextValue == null && resultB._nextValue == null)
+                    if (resultA.IsAttribute && resultB.IsAttribute)
                     {
-                        if (resultA.IsAttribute && resultB.IsAttribute)
-                        {
-                            resultA._attributeResults.AddRange(resultB._attributeResults);
-                        }
-                        else if (resultA.IsSpatial && resultB.IsSpatial)
-                        {
-                            resultA._spatialResults.AddRange(resultB._spatialResults);
-                        }
-                        else if (!resultA.IsAttribute && !resultA.IsSpatial &&
-                                 !resultA.IsAttribute && !resultA.IsSpatial &&
-                                 resultA._stringResults != null && resultB._stringResults != null)
-                        {
-                            resultA._stringResults.AddRange(resultB._stringResults);
-                        }
-                        else
-                        {
-                            resultA._nextValue = resultB;
-                        }
+                        resultA._attributeResults.AddRange(resultB._attributeResults);
                     }
-                    // Otherwise link the two lists together.
+                    else if (resultA.IsSpatial && resultB.IsSpatial)
+                    {
+                        resultA._spatialResults.AddRange(resultB._spatialResults);
+                    }
+                    else if (!resultA.IsAttribute && !resultA.IsSpatial &&
+                             !resultB.IsAttribute && !resultB.IsSpatial &&
+                             resultA._stringResults != null && resultB._stringResults != null)
+                    {
+                        resultA._stringResults.AddRange(resultB._stringResults);
+                    }
                     else
                     {
-                        QueryResult lastResultA = resultA;
-                        foreach (QueryResult nextResultA in resultA)
-                        {
-                            lastResultA = nextResultA;
-                        }
-
-                        lastResultA._nextValue = resultB;
+                        resultA._nextValue = resultB;
                     }
 
                     resultA._hasMultipleValues = true;
-                    return resultA;
                 }
-
-                // Combining the results may require creating new values. Keep track of them so
-                // they can be added to the result.
-                List<QueryResult> addedValues = new List<QueryResult>();
-
-                // This will keep track of the current value from resultA being acted upon.
-                QueryResult currentAValue = null;
-
-                // Loop to combine value strings as necessary.
-                foreach (QueryResult valueA in resultA)
+                // Otherwise link the two lists together.
+                else
                 {
-                    QueryResult valueACopy = null;
+                    QueryResult lastResultA = resultA
+                        .Cast<QueryResult>()
+                        .Last();
+                    lastResultA._nextValue = resultB;
 
-                    if (resultA.HasMultipleValues &&
-                        resultB.HasMultipleValues &&
-                        resultB.SelectionMode == MultipleQueryResultSelectionMode.Distinct)
-                    {
-                        if (valueA.SelectionMode == MultipleQueryResultSelectionMode.Distinct)
-                        {
-                            // Create a copy of valueA so that it can be combined separately with
-                            // multiple values from B.
-                            valueACopy = valueA.CreateFirstValueCopy();
-                        }
-                        else
-                        {
-                            // If value A is not distinct while B is, flatten valueA to a string
-                            // so that its results can be combined with each.
-                            valueA.FirstStringValue = valueA.ToString();
-
-                            // We no longer have multiple results from A to iterate through, so break
-                            // off any linked values it previously had.
-                            valueA.BreakOutCurrentValue();
-                            valueA._nextValue = null;
-                        }
-                    }
-                    else if (resultA.HasMultipleValues &&
-                             resultB.HasMultipleValues &&
-                             resultA.SelectionMode == MultipleQueryResultSelectionMode.Distinct)
-                    {
-                        // If value A is distinct while B is not , flatten valueB to a string
-                        // so that its results can be combined with each.
-                        resultB.FirstStringValue = resultB.ToString();
-
-                        // We no longer have multiple results from A to iterate through, so break
-                        // off any linked values it previously had.
-                        resultB.BreakOutCurrentValue();
-                        resultB._nextValue = null;
-                    }
-
-                    // For each remaining value in resultB, perform a string append with the current
-                    // value from A.
-                    foreach (QueryResult valueB in resultB)
-                    {
-                        if (currentAValue == null)
-                        {
-                            // For the first value of resultB, use the original valueA.
-                            currentAValue = valueA;
-                        }
-                        else 
-                        {
-                            // For any subsequent iterations, use a copy of the original valueA.
-                            ExtractException.Assert("ELI28921", "Internal error!",
-                                valueACopy != null);
-                            currentAValue = valueACopy.CreateFirstValueCopy();
-                            addedValues.Add(currentAValue);
-                        }
-
-                        currentAValue.AppendStringValue(valueB);
-                    }
-                }
-
-                // Attach any new values created to resultA.                
-                foreach (QueryResult addedResult in addedValues)
-                {
-                    currentAValue._nextValue = addedResult;
-                    currentAValue = addedResult;
                     resultA._hasMultipleValues = true;
+                }
+
+                if (resultB.SelectionMode == MultipleQueryResultSelectionMode.Distinct)
+                {
+                    resultA.SelectionMode = MultipleQueryResultSelectionMode.Distinct;
                 }
 
                 return resultA;
@@ -980,10 +1010,26 @@ namespace Extract.DataEntry
         #region IEnumerable Members
 
         /// <summary>
-        /// Returns an enumerator that iterates through the values of the <see cref="QueryResult"/>.
+        /// Returns an enumeration of the <see cref="QueryResult"/> values.
         /// </summary>
-        /// <returns>An enumerator for the <see cref="QueryResult"/>.</returns>
-        public IEnumerator GetEnumerator()
+        /// <returns>An enumeration of the <see cref="QueryResult"/> values.</returns>
+        public IEnumerator<QueryResult> GetEnumerator()
+        {
+            BreakOutCurrentValue();
+
+            for (QueryResult result = this;
+                 result != null && !result.IsEmpty;
+                 result = result.NextValue)
+            {
+                yield return result;
+            }
+        }
+
+        /// <summary>
+        /// Returns an enumeration of the <see cref="QueryResult"/> values.
+        /// </summary>
+        /// <returns>An enumeration of the <see cref="QueryResult"/> values.</returns>
+        IEnumerator IEnumerable.GetEnumerator()
         {
             BreakOutCurrentValue();
 
@@ -1003,20 +1049,23 @@ namespace Extract.DataEntry
         /// Initializes the <see cref="QueryResult"/> given the specified list of values.
         /// </summary>
         /// <typeparam name="T">The list <see langword="Type"/></typeparam>
-        /// <param name="selectionMode">The <see cref="MultipleQueryResultSelectionMode"/> to be
-        /// associated with this result.</param>
+        /// <param name="queryNode">The <see cref="QueryNode"/> this result is to be associated
+        /// with.</param>
         /// <param name="valuesList">The values that are to comprise this result.</param>
-        void Initialize<T>(MultipleQueryResultSelectionMode selectionMode, List<T> valuesList)
+        void Initialize<T>(QueryNode queryNode, List<T> valuesList)
         {
-            _selectionMode = selectionMode;
+            _queryNode = queryNode;
+            _selectionMode = queryNode == null
+                ? MultipleQueryResultSelectionMode.None
+                : queryNode.SelectionMode;
 
             if (valuesList.Count > 1)
             {
-                if (selectionMode == MultipleQueryResultSelectionMode.First)
+                if (_selectionMode == MultipleQueryResultSelectionMode.First)
                 {
                     valuesList.RemoveRange(1, valuesList.Count - 1);
                 }
-                else if (selectionMode == MultipleQueryResultSelectionMode.None)
+                else if (_selectionMode == MultipleQueryResultSelectionMode.None)
                 {
                     valuesList.Clear();
                 }
@@ -1039,15 +1088,15 @@ namespace Extract.DataEntry
 
                 if (IsAttribute)
                 {
-                    resultCopy = new QueryResult(SelectionMode, FirstAttributeValue);
+                    resultCopy = new QueryResult(_queryNode, FirstAttributeValue);
                 }
                 else if (IsSpatial)
                 {
-                    resultCopy = new QueryResult(SelectionMode, FirstSpatialStringValue);
+                    resultCopy = new QueryResult(_queryNode, FirstSpatialStringValue);
                 }
                 else
                 {
-                    resultCopy = new QueryResult(SelectionMode, FirstStringValue);
+                    resultCopy = new QueryResult(_queryNode, FirstStringValue);
                 }
 
                 return resultCopy;
@@ -1068,22 +1117,13 @@ namespace Extract.DataEntry
             {
                 QueryResult newResultInstance = null;
 
-                // When creating the "next" result, limit the selection mode to either "List" or
-                // "Distinct" since these are the only two settings relevant after the result was
-                // initially created and we don't want the selection mode to limit the number of
-                // values that already exist in this result.
-                MultipleQueryResultSelectionMode selectionMode =
-                    (SelectionMode == MultipleQueryResultSelectionMode.Distinct)
-                        ? MultipleQueryResultSelectionMode.Distinct
-                        : MultipleQueryResultSelectionMode.List;
-
                 if (IsAttribute)
                 {
                     IAttribute[] remainingResults = new IAttribute[_attributeResults.Count - 1];
                     _attributeResults.CopyTo(1, remainingResults, 0, remainingResults.Length);
                     _attributeResults.RemoveRange(1, _attributeResults.Count - 1);
 
-                    newResultInstance = new QueryResult(selectionMode, remainingResults);
+                    newResultInstance = new QueryResult(_queryNode, remainingResults);
                 }
                 else if (_spatialResults != null && _spatialResults.Count > 1)
                 {
@@ -1091,7 +1131,7 @@ namespace Extract.DataEntry
                     _spatialResults.CopyTo(1, remainingResults, 0, remainingResults.Length);
                     _spatialResults.RemoveRange(1, _spatialResults.Count - 1);
 
-                    newResultInstance = new QueryResult(selectionMode, remainingResults);
+                    newResultInstance = new QueryResult(_queryNode, remainingResults);
                 }
                 else if (_stringResults != null && _stringResults.Count > 1)
                 {
@@ -1099,7 +1139,7 @@ namespace Extract.DataEntry
                     _stringResults.CopyTo(1, remainingResults, 0, remainingResults.Length);
                     _stringResults.RemoveRange(1, _stringResults.Count - 1);
 
-                    newResultInstance = new QueryResult(selectionMode, remainingResults);
+                    newResultInstance = new QueryResult(_queryNode, remainingResults);
                 }
 
                 if (newResultInstance != null)

@@ -1,4 +1,3 @@
-using Extract;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -11,8 +10,6 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -189,7 +186,7 @@ namespace Extract.DataEntry
         static bool _endEditInProgress;
 
         /// <summary>
-        /// Specifies whether validation triggers are currently auto-resolving as they are loaded.
+        /// Specifies whether validation triggers are currently enabled.
         /// </summary>
         static bool _validationTriggersEnabled;
 
@@ -302,12 +299,6 @@ namespace Extract.DataEntry
         /// prevent recursion via autoUpdateQueries.
         /// </summary>
         bool _raisingAttributeValueModified;
-
-        /// <summary>
-        /// Specifies the full path (from the attribute hierarchy root).  Used to assist registering
-        /// AutoUpdateTrigger attributes more efficiently.
-        /// </summary>
-        string _fullPath;
         
         /// <summary>
         /// Specifies under what circumstances the attribute should serve as a tab stop.
@@ -497,24 +488,6 @@ namespace Extract.DataEntry
             }
         }
 
-        /// <summary>
-        /// Specifies the full path (from the attribute hierarchy root). Used to assist registering
-        /// <see cref="AutoUpdateTrigger"/> attributes more efficiently.
-        /// </summary>
-        /// <returns></returns>
-        public string FullPath
-        {
-            get
-            {
-                return _fullPath;
-            }
-
-            set
-            {
-                _fullPath = value;
-            }
-        }
-
         #endregion Properties
 
         #region Static Members
@@ -627,6 +600,9 @@ namespace Extract.DataEntry
                 _sourceDocumentPathTags = (string.IsNullOrEmpty(_sourceDocName))
                     ? new SourceDocumentPathTags()
                     : new SourceDocumentPathTags(AttributeStatusInfo.SourceDocName);
+
+                // Ensure data entry queries no longer react to changes in the attribute hierarchy.
+                AttributeQueryNode.UnregisterAll();
 
                 foreach (AutoUpdateTrigger autoUpdateTrigger in _autoUpdateTriggers.Values)
                 {
@@ -848,21 +824,7 @@ namespace Extract.DataEntry
                         sourceAttributes.PushBackIfNotContained(attribute);
 
                         _autoUpdateTriggers[attribute] = new AutoUpdateTrigger(attribute,
-                            statusInfo._autoUpdateQuery, _dbConnection, false, true);
-                    }
-                }
-
-                foreach (AutoUpdateTrigger autoUpdateTrigger in _autoUpdateTriggers.Values)
-                {
-                    if (!autoUpdateTrigger.GetIsFullyResolved())
-                    {
-                        // We need to ensure that the attribute is a part of the sourceAttributes
-                        // in order for RegisterTriggerCandidate to work. When creating a new
-                        // attribute, this won't be the case.  Add it now, even though it will still
-                        // need to be re-ordered later.
-                        sourceAttributes.PushBackIfNotContained(attribute);
-
-                        autoUpdateTrigger.RegisterTriggerCandidate(attribute);
+                            statusInfo._autoUpdateQuery, _dbConnection, false);
                     }
                 }
 
@@ -894,8 +856,7 @@ namespace Extract.DataEntry
                         sourceAttributes.PushBackIfNotContained(attribute);
 
                         _validationTriggers[attribute] = new AutoUpdateTrigger(attribute,
-                            statusInfo._validationQuery, _dbConnection, true,
-                            _validationTriggersEnabled);
+                            statusInfo._validationQuery, _dbConnection, true);
                     }
                 }
                 else
@@ -908,23 +869,6 @@ namespace Extract.DataEntry
                     if (_validationTriggers.TryGetValue(attribute, out validationTrigger))
                     {
                         validationTrigger.UpdateValue();
-                    }
-                }
-
-                if (_validationTriggersEnabled)
-                {
-                    foreach (AutoUpdateTrigger validationTrigger in _validationTriggers.Values)
-                    {
-                        if (!validationTrigger.GetIsFullyResolved())
-                        {
-                            // We need to ensure that the attribute is a part of the sourceAttributes
-                            // in order for RegisterTriggerCandidate to work. When creating a new
-                            // attribute, this won't be the case.  Add it now, even though it will
-                            // still need to be re-ordered later.
-                            sourceAttributes.PushBackIfNotContained(attribute);
-
-                            validationTrigger.RegisterTriggerCandidate(attribute);
-                        }
                     }
                 }
 
@@ -949,6 +893,20 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets whether validation triggers are currently enabled.
+        /// </summary>
+        /// <value><see langword="true"/> if validation triggers are currently enabled; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public static bool ValidationTriggersEnabled
+        {
+            get
+            {
+                return _validationTriggersEnabled;
+            }
+        }
+
+        /// <summary>
         /// Specifies whether validation triggers should be enabled or disabled.
         /// </summary>
         /// <param name="enable"><see langword="true"/> if validation triggers are to be enabled,
@@ -967,14 +925,17 @@ namespace Extract.DataEntry
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI29046", _OBJECT_NAME);
 
-                _validationTriggersEnabled = enable;
-
-                // If validation triggers are being enabled, try to register all triggers.
-                if (_validationTriggersEnabled)
+                if (enable != _validationTriggersEnabled)
                 {
-                    foreach (AutoUpdateTrigger validationTrigger in _validationTriggers.Values)
+                    _validationTriggersEnabled = enable;
+
+                    // If validation triggers are being enabled, try to register all triggers.
+                    if (_validationTriggersEnabled)
                     {
-                        validationTrigger.RegisterTriggerCandidate(null);
+                        foreach (AutoUpdateTrigger validationTrigger in _validationTriggers.Values)
+                        {
+                            validationTrigger.UpdateValue();
+                        }
                     }
                 }
             }
@@ -2401,112 +2362,10 @@ namespace Extract.DataEntry
             }
         }
 
-        /// <overloads>Obtains the full path of the <see cref="IAttribute"/> from the root of the
-        /// hierarchy.</overloads>
-        /// <summary>
-        /// Obtains the full path of the <see cref="IAttribute"/> from the root of the hierarchy.
-        /// </summary>
-        /// <param name="attribute">The <see cref="IAttribute"/> for which a path is needed.</param>
-        /// <returns>The full path of the <see cref="IAttribute"/> of blank if the specified
-        /// attribute is <see langword="null"/>.</returns>
-        [ComVisible(false)]
-        public static string GetFullPath(IAttribute attribute)
-        {
-            try
-            {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(
-                    LicenseIdName.DataEntryCoreComponents, "ELI26138", _OBJECT_NAME);
-
-                // If the specified attribute is null, just return blank.
-                if (attribute == null)
-                {
-                    return "";
-                }
-
-                // Obtain the path of this attribute's parent.
-                string parentPath = GetFullPath(GetStatusInfo(attribute)._parentAttribute);
-
-                // If the parent doesn't exist, just return this attribute's name.
-                if (string.IsNullOrEmpty(parentPath))
-                {
-                    return attribute.Name;
-                }
-                // Otherwise, append the name of this attribute to the parent attribute's path.
-                else
-                {
-                    return parentPath + "/" + attribute.Name;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI26137", ex);
-            }
-        }
-
-        /// <summary>
-        /// Obtains the full path of the specified path when the specified query is applied to it.
-        /// </summary>
-        /// <param name="startingPath">The starting path.</param>
-        /// <param name="query">The attribute query to apply to <see paramref="startingPath"/>.
-        /// </param>
-        /// <returns>The resulting full path.</returns>
-        [ComVisible(false)]
-        public static string GetFullPath(string startingPath, string query)
-        {
-            try
-            {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(
-                    LicenseIdName.DataEntryCoreComponents, "ELI26139", _OBJECT_NAME);
-
-                // Tokenize the query and process each element in order.
-                string[] pathTokens =
-                         query.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (string pathToken in pathTokens)
-                {
-                    // If the parent is specified, remove the last level from the startingPath.
-                    if (pathToken == "..")
-                    {
-                        ExtractException.Assert("ELI26105", "Invalid attribute path!",
-                            !string.IsNullOrEmpty(startingPath));
-
-                        // If the starting path has any remaining slashes, remove the end of the
-                        // paths (starting with the last slash).
-                        int lastSlash = startingPath.LastIndexOf('/');
-                        if (lastSlash >= 0)
-                        {
-                            startingPath = startingPath.Substring(0, lastSlash);
-                        }
-                        // Otherwise the starting path is now empty.
-                        else
-                        {
-                            startingPath = "";
-                        }
-                    }
-                    // Add the next specified attribute from the query to the path.
-                    else if (pathToken != ".")
-                    {
-                        if (!string.IsNullOrEmpty(startingPath))
-                        {
-                            startingPath += "/";
-                        }
-
-                        startingPath += pathToken;
-                    }
-                }
-
-                return startingPath;
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI26110", ex);
-            }
-        }
-
         /// <summary>
         /// Returns the a list of the <see cref="IAttribute"/>s which match the specified query
-        /// applied to the specified root attribute.
+        /// applied to the specified root attribute or <see langword="null"/> if the query
+        /// references the root of the attribute hierarchy.
         /// </summary>
         /// <param name="rootAttribute">The <see cref="IAttribute"/> on which the query is to be
         /// executed.</param>
@@ -2532,9 +2391,6 @@ namespace Extract.DataEntry
                 // If there is nothing left in the query, return the root attribute.
                 if (string.IsNullOrEmpty(query) || query == ".")
                 {
-                    ExtractException.Assert("ELI26140", "Invalid attribute query!",
-                        rootAttribute != null);
-
                     // Return the rootAttribute if the query is null.
                     results.Add(rootAttribute);
                     return results;
@@ -2604,14 +2460,14 @@ namespace Extract.DataEntry
                     return;
                 }
 
-                // If attributes have been modified since the last end edit, raise 
-                // IncrementalUpdate == false AttributeValueModified events now.
-                if (_attributesBeingModified.Count > 0)
+                try
                 {
-                    try
-                    {
-                        _endEditInProgress = true;
+                    _endEditInProgress = true;
 
+                    // If attributes have been modified since the last end edit, raise 
+                    // IncrementalUpdate == false AttributeValueModified events now.
+                    if (_attributesBeingModified.Count > 0)
+                    {
                         foreach (KeyValuePair<IAttribute, KeyValuePair<bool, SpatialString>>
                             modifiedAttribute in _attributesBeingModified)
                         {
@@ -2622,10 +2478,12 @@ namespace Extract.DataEntry
 
                         _attributesBeingModified.Clear();
                     }
-                    finally
-                    {
-                        _endEditInProgress = false;
-                    }
+                }
+                finally
+                {
+                    _endEditInProgress = false;
+
+                    OnEditEnded();
                 }
 
                 // Any time EndEdit is called, consider it the end of an operation.
@@ -2713,6 +2571,12 @@ namespace Extract.DataEntry
                 foreach (IAttribute attribute in 
                     DataEntryMethods.ToAttributeEnumerable(attributes, true))
                 {
+                    ReleaseAttributes(attribute.SubAttributes);
+
+                    if (attribute.Value != null)
+                    {
+                        Marshal.FinalReleaseComObject(attribute.Value);
+                    }
                     Marshal.FinalReleaseComObject(attribute);
                 }
             }
@@ -2743,6 +2607,11 @@ namespace Extract.DataEntry
         /// as having invalid data has now been marked as valid (or vice-versa).
         /// </summary>
         public static event EventHandler<ValidationStateChangedEventArgs> ValidationStateChanged;
+
+        /// <summary>
+        /// Raised at the end of an <see cref="EndEdit"/> call.
+        /// </summary>
+        public static event EventHandler<EventArgs> EditEnded;
 
         /// <summary>
         /// Raised to notify listeners that an Attribute's value was modified.
@@ -2807,6 +2676,17 @@ namespace Extract.DataEntry
             }
         }
         
+        /// <summary>
+        /// Raises the <see cref="EditEnded"/> event.
+        /// </summary>
+        static void OnEditEnded()
+        {
+            if (AttributeStatusInfo.EditEnded != null)
+            {
+                AttributeStatusInfo.EditEnded(null, new EventArgs());
+            }
+        }
+
         /// <summary>
         /// Raises the AttributeValueModified event.
         /// </summary>
@@ -3023,7 +2903,6 @@ namespace Extract.DataEntry
                 _isAccepted = source._isAccepted;
                 _hintEnabled = source._hintEnabled;
                 _parentAttribute = source._parentAttribute;
-                _fullPath = source._fullPath;
                 _tabStopMode = source._tabStopMode;
                 _persistAttribute = source._persistAttribute;
                 

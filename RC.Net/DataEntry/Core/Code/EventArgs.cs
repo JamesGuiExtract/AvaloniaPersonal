@@ -491,6 +491,48 @@ namespace Extract.DataEntry
     }
 
     /// <summary>
+    /// Provides information about an event in which an <see cref="IAttribute"/>'s value was
+    /// modified.
+    /// </summary>
+    public class QueryValueModifiedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Specifies whether the modification is part of an ongoing edit.
+        /// </summary>
+        readonly bool _incrementalUpdate;
+
+        /// <summary>
+        /// Initializes a new <see cref="QueryValueModifiedEventArgs"/> instance.
+        /// </summary>
+        /// <param name="incrementalUpdate"><see langword="true"/>if the modification is part of an
+        /// ongoing edit; <see langword="false"/> if the edit has finished.</param>
+        public QueryValueModifiedEventArgs(bool incrementalUpdate)
+        {
+            try
+            {
+                _incrementalUpdate = incrementalUpdate;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26129", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the modification is part of an ongoing edit.
+        /// </summary>
+        /// <returns><see langword="true"/>if the modification is part of an
+        /// ongoing edit; <see langword="false"/> if the edit has finished.</returns>
+        public bool IncrementalUpdate
+        {
+            get
+            {
+                return _incrementalUpdate;
+            }
+        }
+    }
+
+    /// <summary>
     /// Provides information about an event in which an <see cref="IAttribute"/> was delete from an
     /// <see cref="IDataEntryControl"/>.
     /// </summary>

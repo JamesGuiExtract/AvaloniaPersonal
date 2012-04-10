@@ -160,6 +160,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AttributeQueryNode.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>DataEntryQuery.cs</DependentUpon>
+    </Compile>
     <Compile Include="AttributeStatusInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -168,6 +172,14 @@
       <DependentUpon>AttributeStatusInfo.cs</DependentUpon>
     </Compile>
     <Compile Include="AutoUpdateTrigger.cs" />
+    <Compile Include="CachedQueryData.cs">
+	  <SubType>Code</SubType>
+      <DependentUpon>DataEntryQuery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CompositeQueryNode.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>DataEntryQuery.cs</DependentUpon>
+    </Compile>
     <Compile Include="DataEntryComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -220,11 +232,19 @@
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
     </Compile>
     <Compile Include="DataEntryUndoMementos.cs" />
+    <Compile Include="ExpressionQueryNode.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>DataEntryQuery.cs</DependentUpon>
+    </Compile>
     <Compile Include="IDataEntryApplication.cs" />
     <Compile Include="IDataEntryTableCell.cs">
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
     </Compile>
     <Compile Include="IDataEntryValidator.cs" />
+    <Compile Include="LiteralQueryNode.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>DataEntryQuery.cs</DependentUpon>
+    </Compile>
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -236,7 +256,28 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="QueryNode.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>DataEntryQuery.cs</DependentUpon>
+    </Compile>
     <Compile Include="QueryResult.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>DataEntryQuery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RegexQueryNode.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>DataEntryQuery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResultQueryNode.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>DataEntryQuery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SolutionDirectoryQueryNode.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>DataEntryQuery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SourceDocNameQueryNode.cs">
+      <SubType>Code</SubType>
       <DependentUpon>DataEntryQuery.cs</DependentUpon>
     </Compile>
     <Compile Include="SpatialHintGenerator.cs" />
@@ -266,6 +307,10 @@
     <Compile Include="DataEntryToolTip.cs">
       <DependentUpon>DataEntryControlHost.cs</DependentUpon>
       <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SqlQueryNode.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>DataEntryQuery.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

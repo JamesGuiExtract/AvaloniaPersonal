@@ -23,34 +23,34 @@ namespace Extract.DataEntry
         /// <summary>
         /// The <see cref="IAttribute"/> to be updated using the auto-update query.
         /// </summary>
-        private IAttribute _targetAttribute;
+        IAttribute _targetAttribute;
 
         /// <summary>
         /// The query divided into terms.
         /// </summary>
-        private List<DataEntryQuery> _queries = new List<DataEntryQuery>();
+        List<DataEntryQuery> _queries = new List<DataEntryQuery>();
 
         /// <summary>
         /// An auto-update query to be applied if the target attribute otherwise does not have any
         /// value.
         /// </summary>
-        private DataEntryQuery _defaultQuery;
+        DataEntryQuery _defaultQuery;
 
         /// <summary>
         /// A database for auto-update queries.
         /// </summary>
-        private DbConnection _dbConnection;
+        DbConnection _dbConnection;
 
         /// <summary>
         /// Indicates whether the trigger is to be used to update a validation list instead of the
         /// value itself.
         /// </summary>
-        private bool _validationTrigger;
+        bool _validationTrigger;
 
         /// <summary>
-        /// Indicates whether the trigger as updated the target attribute since its creation.
+        /// Indicates whether the trigger is currently updating the target attribute
         /// </summary>
-        bool _hasUpdatedValue;
+        bool _updatingValue;
 
         #endregion Fields
 
@@ -73,15 +73,12 @@ namespace Extract.DataEntry
         /// <param name="validationTrigger"><see langword="true"/> if the trigger should update the
         /// validation list associated with the <see paramref="targetAttribute"/> instead of the
         /// <see cref="IAttribute"/> value itself; <see langword="false"/> otherwise.</param>
-        /// <param name="resolveOnLoad"><see langword="true"/> if the query will fire if possible
-        /// as it is loaded, <see langword="false"/> if <see cref="RegisterTriggerCandidate"/> must
-        /// be called manually to resolve the query if attribute triggers are involved.</param>
         public AutoUpdateTrigger(IAttribute targetAttribute, string query,
-            DbConnection dbConnection, bool validationTrigger, bool resolveOnLoad)
+            DbConnection dbConnection, bool validationTrigger)
         {
             try
             {
-                ExtractException.Assert("ELI26111", "Null argument exception!", 
+                ExtractException.Assert("ELI26111", "Null argument exception!",
                     targetAttribute != null);
                 ExtractException.Assert("ELI26112", "Null argument exception!", query != null);
 
@@ -94,8 +91,7 @@ namespace Extract.DataEntry
                     query, _targetAttribute, _dbConnection,
                     _validationTrigger
                         ? MultipleQueryResultSelectionMode.List
-                        : MultipleQueryResultSelectionMode.None,
-                    resolveOnLoad);
+                        : MultipleQueryResultSelectionMode.None);
 
                 foreach (DataEntryQuery dataEntryQuery in dataEntryQueries)
                 {
@@ -115,12 +111,11 @@ namespace Extract.DataEntry
                         _queries.Add(dataEntryQuery);
                     }
 
-                    dataEntryQuery.TriggerAttributeModified += HandleQueryTriggerAttributeModified;
-                    dataEntryQuery.TriggerAttributeDeleted += HandleQueryTriggerAttributeDeleted;
+                    dataEntryQuery.QueryValueModified += HandleQueryValueModified;
                 }
 
                 // Attempt to update the value once the query has been loaded.
-                if (resolveOnLoad)
+                if (!_validationTrigger || AttributeStatusInfo.ValidationTriggersEnabled)
                 {
                     UpdateValue();
                 }
@@ -135,97 +130,7 @@ namespace Extract.DataEntry
 
         #endregion Contructors
 
-        #region Properties
-
-        /// <summary>
-        /// Inidicates whether the query is completely resolved.
-        /// </summary>
-        /// <returns><see langword="true"/> if the query is completely resolved, <see langword="false"/>
-        /// there are still trigger attributes that need to be registered..</returns>
-        public bool GetIsFullyResolved()
-        {
-            // Check to see if the default query has been resolved (if one was specifed).
-            if (_defaultQuery != null && !_defaultQuery.GetIsFullyResolved())
-            {
-                return false;
-            }
-
-            // Check to see if any query in the queries list has not yet been resolved.
-            foreach (DataEntryQuery query in _queries)
-            {
-                if (!query.GetIsFullyResolved())
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        #endregion Properties
-
         #region Methods
-
-        /// <summary>
-        /// Tests to see if the provided <see cref="IAttribute"/> matches the value query for any
-        /// unresolved term, and, if so, resolves the term using the attribute as the trigger.
-        /// </summary>
-        /// <param name="attribute">The <see cref="IAttribute"/> to potentially resolve any
-        /// unresolved terms.</param>
-        public void RegisterTriggerCandidate(IAttribute attribute)
-        {
-            try
-            {
-                AttributeStatusInfo statusInfo = null;
-
-                if (attribute != null)
-                {
-                    // If the path for the provided attribute has not been resolved, resolve it now.
-                    // (This will allow for more efficient processing of candidate triggers).
-                    statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
-                    if (string.IsNullOrEmpty(statusInfo.FullPath))
-                    {
-                        statusInfo.FullPath = AttributeStatusInfo.GetFullPath(attribute);
-                    }
-                }
-
-                bool registeredTrigger = false;
-
-                // Attempt to register the attribute as a trigger for the default query (if one was
-                // specified).
-                if (_defaultQuery != null && !_defaultQuery.GetIsFullyResolved())
-                {
-                    if (_defaultQuery.RegisterTriggerCandidate(statusInfo))
-                    {
-                        registeredTrigger = true;
-                    }
-                }
-
-                // Attempt to register the attribute as a trigger with each query.
-                foreach (DataEntryQuery query in _queries)
-                {
-                    if (!query.GetIsFullyResolved())
-                    {
-                        if (query.RegisterTriggerCandidate(statusInfo))
-                        {
-                            registeredTrigger = true;
-                        }
-                    }
-                }
-
-                // If any attribute was registered as a trigger, attempt to update the target
-                // attribute. Also attempt an update if a general registration call is being made
-                // (attribute == null) and UpdateValue has not yet been called.
-                if (registeredTrigger || (attribute == null && !_hasUpdatedValue))
-                {
-                    UpdateValue();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI26113", ex);
-            }
-        }
 
         /// <summary>
         /// Updates the target attribute's value by executing the query.
@@ -239,8 +144,7 @@ namespace Extract.DataEntry
 
                 // If the attribute's value is empty and a default query has been specified,
                 // update the attribute using the default query.
-                if (_defaultQuery != null && !_defaultQuery.Disabled &&
-                    _defaultQuery.GetIsMinimallyResolved())
+                if (_defaultQuery != null)
                 {
                     UpdateValue(_defaultQuery);
                 }
@@ -248,7 +152,7 @@ namespace Extract.DataEntry
                 // Attempt an update with all resolved queries.
                 foreach (DataEntryQuery query in _queries)
                 {
-                    if (query.GetIsMinimallyResolved() && UpdateValue(query))
+                    if (UpdateValue(query))
                     {
                         valueUpdated = true;
 
@@ -260,8 +164,6 @@ namespace Extract.DataEntry
                         }
                     }
                 }
-
-                _hasUpdatedValue = valueUpdated;
 
                 return valueUpdated;
             }
@@ -308,88 +210,41 @@ namespace Extract.DataEntry
         #region EventHandlers
 
         /// <summary>
-        /// Handles the case that the trigger <see cref="IAttribute"/> for a member query has been
-        /// modified. The query needs to be re-evaluated and applied to the target attribute as
+        /// Handles the case that data behind the query has been modified thereby likely changing
+        /// the result. The query needs to be re-evaluated and applied to the target attribute as
         /// appropriate.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">An <see cref="AttributeValueModifiedEventArgs"/> that contains the
+        /// <param name="e">An <see cref="QueryValueModifiedEventArgs"/> that contains the
         /// event data.</param>
-        void HandleQueryTriggerAttributeModified(object sender, AttributeValueModifiedEventArgs e)
+        void HandleQueryValueModified(object sender, QueryValueModifiedEventArgs e)
         {
             try
             {
-                if (!e.IncrementalUpdate)
+                // Don't do anything for an incremental update or if already updating a value for
+                // this trigger (to prevent recursion).
+                if (!e.IncrementalUpdate && !_updatingValue)
                 {
                     DataEntryQuery dataEntryQuery = (DataEntryQuery)sender;
 
+                    // Always ensure a default query applies updates as part of a full
+                    // auto-update trigger to ensure normal auto-update triggers can apply
+                    // their updates on top of any default value.
                     if (dataEntryQuery.DefaultQuery)
                     {
-                        // Always ensure a default query applies updates as part of a full
-                        // auto-update trigger to ensure normal auto-update triggers can apply
-                        // their updates on top of any default value.
                         UpdateValue();
                     }
-                    // If not a default auto-update trigger, update using only the sending and query
+                    // If not a default auto-update trigger, update using only the modified query,
                     // not the entire trigger.
-                    // Only update the value if a previous auto-update query hasn't already
-                    // updated the value or this is a validation query.
-                    // NOTE: This logic is dependent upon event delegates (or multicast
-                    // delegates more generally) being called in order. There seems to be
-                    // conflicting information on whether this is actually the case, but MSDN
-                    // indicates it is the case and it is the behavior I am seeing in practice.
-                    else if (_validationTrigger ||
-                             !e.AutoUpdatedAttributes.Contains(_targetAttribute))
+                    else
                     {
-                        // Indicate that the target attribute value has been updated by this
-                        // event if this is not a validation trigger.
-                        if (UpdateValue(dataEntryQuery) && !_validationTrigger)
-                        {
-                            e.AutoUpdatedAttributes.Add(_targetAttribute);
-                        }
+                        UpdateValue(dataEntryQuery);
                     }
                 }
             }
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI28858", ex);
-                ee.AddDebugData("Event Data", e, false);
-                throw ee;
-            }
-        }
-
-        
-        /// <summary>
-        /// Handles the case that the trigger <see cref="IAttribute"/> for a member query has been
-        /// modified. The query needs to be re-evaluated and applied to the target attribute as
-        /// appropriate.
-        /// </summary>
-        /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">An <see cref="AttributeDeletedEventArgs"/> that contains the
-        /// event data.</param>
-        void HandleQueryTriggerAttributeDeleted(object sender, AttributeDeletedEventArgs e)
-        {
-            try
-            {
-                DataEntryQuery dataEntryQuery = (DataEntryQuery)sender;
-
-                if (dataEntryQuery.DefaultQuery)
-                {
-                    // Always ensure a default query applies updates as part of a full
-                    // auto-update trigger to ensure normal auto-update triggers can apply
-                    // their updates on top of any default value.
-                    UpdateValue();
-                }
-                // If not a default auto-update trigger, update using only the sending and query
-                // not the entire trigger.
-                else 
-                {
-                    UpdateValue(dataEntryQuery);
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI28926", ex);
                 ee.AddDebugData("Event Data", e, false);
                 throw ee;
             }
@@ -411,102 +266,88 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Ensure the query is resolved.
-                if (dataEntryQuery.GetIsMinimallyResolved())
+                // Don't evaluate disable queries or validation triggers if validation triggers are
+                // not enabled.
+                if (dataEntryQuery.Disabled ||
+                    (_validationTrigger && !AttributeStatusInfo.ValidationTriggersEnabled))
                 {
-                    // If so, evaluate it.
-                    QueryResult queryResult = dataEntryQuery.Evaluate();
+                    return false;
+                }
 
-                    // Use the results to update the target attribute's validation list if the
-                    // AutoUpdateTrigger is a validation trigger.
-                    if (_validationTrigger)
+                // Prevent recursion via HandleQueryValueModified.
+                _updatingValue = true;
+
+                // Evaluate the query.
+                QueryResult queryResult = dataEntryQuery.Evaluate();
+
+                // Use the results to update the target attribute's validation list if the
+                // AutoUpdateTrigger is a validation trigger.
+                if (_validationTrigger)
+                {
+                    // Update the validation list associated with the attribute.
+                    AttributeStatusInfo statusInfo =
+                        AttributeStatusInfo.GetStatusInfo(_targetAttribute);
+
+                    // Validation queries can only be specified for attributes with a
+                    // DataEntryValidator as its validator.
+                    DataEntryValidator validator = statusInfo.Validator as DataEntryValidator;
+                    ExtractException.Assert("ELI26154", "Uninitialized or invalid validator!",
+                        validator != null);
+
+                    // Initialize the auto-complete list using the query results.
+                    if (dataEntryQuery.ValidationListType != ValidationListType.ValidationListOnly)
                     {
-                        // Update the validation list associated with the attribute.
-                        AttributeStatusInfo statusInfo =
-                            AttributeStatusInfo.GetStatusInfo(_targetAttribute);
-
-                        // Validation queries can only be specified for attributes with a
-                        // DataEntryValidator as its validator.
-                        DataEntryValidator validator = statusInfo.Validator as DataEntryValidator;
-                        ExtractException.Assert("ELI26154", "Uninitialized or invalid validator!",
-                            validator != null);
-
-                        // Initialize the auto-complete list using the query results.
-                        if (dataEntryQuery.ValidationListType != ValidationListType.ValidationListOnly)
-                        {
-                            string[] queryResultArray = queryResult.ToStringArray();
-                            validator.SetAutoCompleteValues(queryResultArray); 
-                        }
-
-                        // Initialize the validation query which will determine if an attribute is
-                        // valid.
-                        if (dataEntryQuery.ValidationListType != ValidationListType.AutoCompleteOnly)
-                        {
-                            validator.SetValidationQuery(dataEntryQuery, queryResult);
-                        }
-
-                        statusInfo.OwningControl.RefreshAttributes(false, _targetAttribute);
-
-                        return true;
+                        string[] queryResultArray = queryResult.ToStringArray();
+                        validator.SetAutoCompleteValues(queryResultArray);
                     }
-                    // If this auto-update query should only provide a default value
-                    else if (dataEntryQuery.DefaultQuery)
+
+                    // Initialize the validation query which will determine if an attribute is
+                    // valid.
+                    if (dataEntryQuery.ValidationListType != ValidationListType.AutoCompleteOnly)
                     {
-                        // If the target attribute is empty and would need a default value
-                        // (or it was when the default trigger was created) update the
-                        // attribute using the default value.
-                        if (string.IsNullOrEmpty(_targetAttribute.Value.String) ||
-                            dataEntryQuery.UpdatePending)
-                        {
-                            // If this is a default trigger that is fully resolved, it will
-                            // never need to fire again-- clear all triggers.
-                            if (dataEntryQuery.GetIsFullyResolved())
-                            {
-                                dataEntryQuery.Disabled = true;
-                                dataEntryQuery.ClearAllTriggers();
-                            }
-                            else
-                            {
-                                // If the default query is not fully resolved, flag UpdatePending
-                                // to allow it an opportunity to apply its update as query
-                                // elements become resolved.
-                                dataEntryQuery.UpdatePending = true;
-                            }
-
-                            // Apply the default query value.
-                            return ApplyQueryResult(queryResult);
-                        }
-                        else
-                        {
-                            // If the target attribute can't use a default value, disable and
-                            // disarm the query.
-                            dataEntryQuery.Disabled = true;
-                            dataEntryQuery.ClearAllTriggers();
-                            return false;
-                        }
+                        validator.SetValidationQuery(dataEntryQuery, queryResult);
                     }
-                    // A normal auto-update query- apply the query results (if there were any).
-                    else
+
+                    statusInfo.OwningControl.RefreshAttributes(false, _targetAttribute);
+
+                    return true;
+                }
+                // If this auto-update query should only provide a default value
+                else if (dataEntryQuery.DefaultQuery)
+                {
+                    // A default trigger will never need to fire again-- disable and disarm the
+                    // query.
+                    dataEntryQuery.Disabled = true;
+                    dataEntryQuery.QueryValueModified -= HandleQueryValueModified;
+
+                    // If the target attribute is empty and would need a default value (or it was
+                    // when the default trigger was created), apply the default query value.
+                    if (string.IsNullOrEmpty(_targetAttribute.Value.String))
                     {
                         return ApplyQueryResult(queryResult);
                     }
+                    else
+                    {
+                        // The target attribute can't use a default value, 
+                        dataEntryQuery.Disabled = true;
+                        return false;
+                    }
                 }
-                else if (dataEntryQuery.DefaultQuery &&
-                    string.IsNullOrEmpty(_targetAttribute.Value.String))
+                // A normal auto-update query- apply the query results (if there were any).
+                else
                 {
-                    // If the target attribute could use a default value, but the default query
-                    // is not yet resolved, set _updatePending so that it will fire
-                    // once it is resolved.
-                    dataEntryQuery.UpdatePending = true;
+                    return ApplyQueryResult(queryResult);
                 }
-
-                return false;
             }
             catch (Exception ex)
             {
                 ExtractException ee = new ExtractException("ELI26735",
                     "Failed to apply updated value!", ex);
                 throw ee;
+            }
+            finally
+            {
+                _updatingValue = false;
             }
         }
 

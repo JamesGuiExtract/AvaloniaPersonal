@@ -1,14 +1,13 @@
 ﻿using Extract.Testing.Utilities;
+using Extract.Utilities;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlServerCe;
-using System.IO;
-using System.Reflection;
 using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
-using Extract.Utilities;
 
 namespace Extract.DataEntry.Test
 {
@@ -84,8 +83,7 @@ namespace Extract.DataEntry.Test
 
             string xml = @"<SourceDocName/>";
 
-            DataEntryQuery query =
-                DataEntryQuery.Create(xml, null, null, MultipleQueryResultSelectionMode.First, true);
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
 
             QueryResult result = query.Evaluate();
 
@@ -104,8 +102,7 @@ namespace Extract.DataEntry.Test
 
             string xml = @"<SolutionDirectory/>";
 
-            DataEntryQuery query =
-                DataEntryQuery.Create(xml, null, null, MultipleQueryResultSelectionMode.First, true);
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
 
             QueryResult result = query.Evaluate();
 
@@ -125,8 +122,7 @@ namespace Extract.DataEntry.Test
 
             string xml = @"<Attribute>/ConsiderationAmount</Attribute>";
 
-            DataEntryQuery query =
-                DataEntryQuery.Create(xml, null, null, MultipleQueryResultSelectionMode.First, true);
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
 
             QueryResult result = query.Evaluate();
 
@@ -147,7 +143,7 @@ namespace Extract.DataEntry.Test
             IAttribute considerationAmountAttribute = (IAttribute)attributes.At(0);
 
             DataEntryQuery query =
-                DataEntryQuery.Create(xml, considerationAmountAttribute, null, MultipleQueryResultSelectionMode.First, true);
+                DataEntryQuery.Create(xml, considerationAmountAttribute, null);
 
             QueryResult result = query.Evaluate();
 
@@ -164,8 +160,7 @@ namespace Extract.DataEntry.Test
 
             string xml = @"<Attribute StringList=' and '>/Wagon/Sale/Customer</Attribute>";
 
-            DataEntryQuery query =
-                DataEntryQuery.Create(xml, null, null, MultipleQueryResultSelectionMode.List, true);
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
 
             QueryResult result = query.Evaluate();
 
@@ -187,8 +182,7 @@ namespace Extract.DataEntry.Test
             {
                 dbConnection.Open();
 
-                DataEntryQuery query =
-                    DataEntryQuery.Create(xml, null, dbConnection, MultipleQueryResultSelectionMode.First, true);
+                DataEntryQuery query = DataEntryQuery.Create(xml, null, dbConnection);
 
                 QueryResult result = query.Evaluate();
 
@@ -212,8 +206,7 @@ namespace Extract.DataEntry.Test
             {
                 dbConnection.Open();
 
-                DataEntryQuery query =
-                    DataEntryQuery.Create(xml, null, dbConnection, MultipleQueryResultSelectionMode.First, true);
+                DataEntryQuery query = DataEntryQuery.Create(xml, null, dbConnection);
 
                 QueryResult result = query.Evaluate();
 
@@ -230,15 +223,14 @@ namespace Extract.DataEntry.Test
             LoadDataFile(_testImages.GetFile(_FLEX_INDEX_DATA_FILE), null);
 
             string xml = @"<SQL>SELECT CAST([ID] AS NVARCHAR(8)) FROM [DocumentType] " +
-                "    <Complex Parameterize='False'>WHERE [Name] = 'Grant Deed'</Complex></SQL>";
+                "    <Composite Parameterize='False'>WHERE [Name] = 'Grant Deed'</Composite></SQL>";
 
             using (DbConnection dbConnection =
                     GetDatabaseConnection(_testImages.GetFile(_FLEX_INDEX_DATABASE)))
             {
                 dbConnection.Open();
 
-                DataEntryQuery query =
-                    DataEntryQuery.Create(xml, null, dbConnection, MultipleQueryResultSelectionMode.First, true);
+                DataEntryQuery query = DataEntryQuery.Create(xml, null, dbConnection);
 
                 QueryResult result = query.Evaluate();
 
@@ -247,35 +239,10 @@ namespace Extract.DataEntry.Test
         }
 
         /// <summary>
-        /// Tests the <see cref="ResultQueryNode"/>.
-        /// </summary>
-        [Test, Category("ResultQueryNode")]
-        public static void TestResultQueryBasic()
-        {
-            LoadDataFile(_testImages.GetFile(_FLEX_INDEX_DATA_FILE), null);
-
-            string xml = @"<Attribute Name='DocType' Exclude='True'>DocumentType</Attribute>" +
-                "    <Result Arg1='DocType'/>";
-
-            using (DbConnection dbConnection =
-                    GetDatabaseConnection(_testImages.GetFile(_FLEX_INDEX_DATABASE)))
-            {
-                dbConnection.Open();
-
-                DataEntryQuery query =
-                    DataEntryQuery.Create(xml, null, dbConnection, MultipleQueryResultSelectionMode.First, true);
-
-                QueryResult result = query.Evaluate();
-
-                Assert.That(result.ToString() == "Deed of Trust");
-            }
-        }
-
-        /// <summary>
         /// Tests the <see cref="ResultQueryNode"/> using the simple syntax.
         /// </summary>
         [Test, Category("ResultQueryNode")]
-        public static void TestResultQuerySimpleSyntax()
+        public static void TestResultQueryBasic()
         {
             LoadDataFile(_testImages.GetFile(_FLEX_INDEX_DATA_FILE), null);
 
@@ -287,8 +254,7 @@ namespace Extract.DataEntry.Test
             {
                 dbConnection.Open();
 
-                DataEntryQuery query =
-                    DataEntryQuery.Create(xml, null, dbConnection, MultipleQueryResultSelectionMode.First, true);
+                DataEntryQuery query = DataEntryQuery.Create(xml, null, dbConnection);
 
                 QueryResult result = query.Evaluate();
 
@@ -312,8 +278,7 @@ namespace Extract.DataEntry.Test
             {
                 dbConnection.Open();
 
-                DataEntryQuery query =
-                    DataEntryQuery.Create(xml, null, dbConnection, MultipleQueryResultSelectionMode.First, true);
+                DataEntryQuery query = DataEntryQuery.Create(xml, null, dbConnection);
 
                 QueryResult result = query.Evaluate();
 
@@ -322,84 +287,17 @@ namespace Extract.DataEntry.Test
         }
 
         /// <summary>
-        /// Tests the <see cref="ResultQueryNode"/> CombineLists operation. 
-        /// </summary>
-        [Test, Category("ResultQueryNode")]
-        public static void TestResultQueryCombineOperation()
-        {
-            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
-
-            string xml = @"<Declarations>" +
-                "<Attribute SelectionMode='First' Name='First'>/Wagon/Sale/Customer</Attribute>" +
-                "<Attribute SelectionMode='List' Name='All'>/Wagon/Sale/Customer</Attribute>" +
-                "</Declarations>" +
-                "<Query><Result Arg1='First' Arg2='All' Operation='CombineLists'/></Query>";
-
-            DataEntryQuery query =
-                DataEntryQuery.Create(xml, null, null, MultipleQueryResultSelectionMode.List, true);
-
-            QueryResult result = query.Evaluate();
-
-            Assert.That(result.ToString() == "BobMary");
-        }
-
-        /// <summary>
-        /// Tests the <see cref="ResultQueryNode"/> SubtractList operation.
-        /// </summary>
-        [Test, Category("ResultQueryNode")]
-        public static void TestResultQuerySubtractOperation()
-        {
-            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
-
-            string xml = @"<Declarations>" +
-                "<Attribute SelectionMode='First' Name='First'>/Wagon/Sale/Customer</Attribute>" +
-                "<Attribute SelectionMode='List' Name='All'>/Wagon/Sale/Customer</Attribute>" +
-                "</Declarations>" +
-                "<Query><Result Arg1='All' Arg2='First' Operation='SubtractList'/></Query>";
-
-            DataEntryQuery query =
-                DataEntryQuery.Create(xml, null, null, MultipleQueryResultSelectionMode.List, true);
-
-            QueryResult result = query.Evaluate();
-
-            Assert.That(result.ToString() == "Mary");
-        }
-
-        /// <summary>
-        /// Tests the <see cref="ResultQueryNode"/> CompareLists operation.
-        /// </summary>
-        [Test, Category("ResultQueryNode")]
-        public static void TestResultQueryCompareOperation()
-        {
-            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
-
-            string xml = @"<Declarations>" +
-                "<Attribute SelectionMode='List' Name='A'>/Wagon/Sale/Customer</Attribute>" +
-                "<Complex SelectionMode='List' Name='B'><Complex>Mary</Complex><Complex>Bob</Complex></Complex>" +
-                "</Declarations>" +
-                "<Query><Result Arg1='A' Arg2='B' Operation='CompareLists'/></Query>";
-
-            DataEntryQuery query =
-                DataEntryQuery.Create(xml, null, null, MultipleQueryResultSelectionMode.List, true);
-
-            QueryResult result = query.Evaluate();
-
-            Assert.That(result.ToString() == "1");
-        }
-
-        /// <summary>
-        /// Tests the <see cref="RegexQueryNode"/> with FirstMatchOnly.
+        /// Tests the <see cref="RegexQueryNode"/> with SelectionMode == First.
         /// </summary>
         [Test, Category("RegexQueryNode")]
-        public static void TestRegexQueryBasic()
+        public static void TestRegexQueryFirstMatch()
         {
             LoadDataFile(_testImages.GetFile(_LABDE_DATA_FILE), null);
 
-            string xml = @"<Regex Pattern='\&lt;[\d\.]+'>" +
+            string xml = @"<Regex Pattern='\&lt;[\d\.]+' SelectionMode='First'>" +
                 "<Attribute StringList=','>/Test/Component/Range</Attribute></Regex>";
 
-            DataEntryQuery query =
-                DataEntryQuery.Create(xml, null, null, MultipleQueryResultSelectionMode.List, true);
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
 
             QueryResult result = query.Evaluate();
 
@@ -407,18 +305,17 @@ namespace Extract.DataEntry.Test
         }
 
         /// <summary>
-        /// Tests the <see cref="RegexQueryNode"/> without FirstMatchOnly.
+        /// Tests the <see cref="RegexQueryNode"/> without SelectionMode == List.
         /// </summary>
         [Test, Category("RegexQueryNode")]
         public static void TestRegexAllMatches()
         {
             LoadDataFile(_testImages.GetFile(_LABDE_DATA_FILE), null);
 
-            string xml = @"<Regex Pattern='\&lt;[\d\.]+' FirstMatchOnly='False' StringList=' '>" +
+            string xml = @"<Regex Pattern='\&lt;[\d\.]+' StringList=' '>" +
                 "<Attribute StringList=','>/Test/Component/Range</Attribute></Regex>";
 
-            DataEntryQuery query =
-                DataEntryQuery.Create(xml, null, null, MultipleQueryResultSelectionMode.List, true);
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
 
             QueryResult result = query.Evaluate();
 
@@ -433,8 +330,7 @@ namespace Extract.DataEntry.Test
         {
             string xml = @"<Expression>'Mickey' + ' ' + 'Mouse'</Expression>";
 
-            DataEntryQuery query =
-                DataEntryQuery.Create(xml, null, null, MultipleQueryResultSelectionMode.List, true);
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
 
             QueryResult result = query.Evaluate();
 
@@ -447,10 +343,9 @@ namespace Extract.DataEntry.Test
         [Test, Category("ExpressionQueryNode")]
         public static void TestExpressionType()
         {
-            string xml = @"<Expression>2.0 + <Complex Type='Double'>2</Complex></Expression>";
+            string xml = @"<Expression>2.0 + <Composite Type='Double'>2</Composite></Expression>";
 
-            DataEntryQuery query =
-                DataEntryQuery.Create(xml, null, null, MultipleQueryResultSelectionMode.List, true);
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
 
             QueryResult result = query.Evaluate();
 
@@ -463,10 +358,9 @@ namespace Extract.DataEntry.Test
         [Test, Category("ExpressionQueryNode")]
         public static void TestExpressionTypeDefault()
         {
-            string xml = @"<Expression>2.0 + <Complex Type='Double' Default='2.0'>One</Complex></Expression>";
+            string xml = @"<Expression>2.0 + <Composite Type='Double' Default='2.0'>One</Composite></Expression>";
 
-            DataEntryQuery query =
-                DataEntryQuery.Create(xml, null, null, MultipleQueryResultSelectionMode.List, true);
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
 
             QueryResult result = query.Evaluate();
 
@@ -474,23 +368,193 @@ namespace Extract.DataEntry.Test
         }
 
         /// <summary>
-        /// A complex test to sum values from a VOA file using nested nodes of various types.
+        /// Tests the <see cref="ExpressionQueryNode"/> where a parameterized value us cast as an array.
+        /// </summary>
+        [Test, Category("ExpressionQueryNode")]
+        public static void TestExpressionArrays()
+        {
+            LoadDataFile(_testImages.GetFile(_LABDE_DATA_FILE), null);
+
+            string xml = @"<Expression>" +
+                            @"<Attribute Type='double[]'>/Test/Component/Value</Attribute>" +
+                            @".?{#this > 100.0}" +
+                        @"</Expression>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 4);
+            Assert.That(results[0].ToString() == "136");
+            Assert.That(results[1].ToString() == "101");
+            Assert.That(results[2].ToString() == "250");
+            Assert.That(results[3].ToString() == "159");
+        }
+
+        /// <summary>
+        /// Tests combining lists with <see cref="ExpressionQueryNode"/>s. 
+        /// </summary>
+        [Test, Category("ExpressionQueryNode")]
+        public static void TestExpressionCombineLists()
+        {
+            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
+
+            string xml = @"<Declarations>" +
+                "<Attribute SelectionMode='First' Name='First'>/Wagon/Sale/Customer</Attribute>" +
+                "<Attribute SelectionMode='List' Name='All'>/Wagon/Sale/Customer</Attribute>" +
+                "</Declarations>" +
+                "<Query><Expression><First Type='string[]'/> + <All Type='string[]'/></Expression></Query>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            QueryResult result = query.Evaluate();
+
+            Assert.That(result.ToString() == "BobMary");
+        }
+
+        /// <summary>
+        /// Tests subtracting lists with <see cref="ExpressionQueryNode"/>s. 
+        /// </summary>
+        [Test, Category("ExpressionQueryNode")]
+        public static void TestExpressionSubtractLists()
+        {
+            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
+
+            string xml = @"<Declarations>" +
+                "<Attribute SelectionMode='First' Name='First'>/Wagon/Sale/Customer</Attribute>" +
+                "<Attribute SelectionMode='List' Name='All'>/Wagon/Sale/Customer</Attribute>" +
+                "</Declarations>" +
+                "<Query><Expression><All Type='string[]'/> - <First Type='string[]'/></Expression></Query>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            QueryResult result = query.Evaluate();
+
+            Assert.That(result.ToString() == "Mary");
+        }
+
+        /// <summary>
+        /// Tests comparing lists with <see cref="ExpressionQueryNode"/>s. 
+        /// </summary>
+        [Test, Category("ExpressionQueryNode")]
+        public static void TestExpressionCompareLists()
+        {
+            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
+
+            string xml = @"<Declarations>" +
+                "<Attribute Name='A'>/Wagon/Sale/Customer</Attribute>" +
+                "<Composite Name='B'><Composite>Mary</Composite><Composite>Bob</Composite></Composite>" +
+                "</Declarations>" +
+                "<Query><Expression><A Type='string[]'/>.sort() == <B Type='string[]'/>.sort()</Expression></Query>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            QueryResult result = query.Evaluate();
+
+            Assert.That(result.ToString() == "True");
+        }
+
+        /// <summary>
+        /// Tests the distinct selection mode where the distinct value is referenced by another
+        /// node.
+        /// </summary>
+        [Test, Category("Composite")]
+        public static void TestDistinctNodeReference()
+        {
+            LoadDataFile(_testImages.GetFile(_LABDE_DATA_FILE), null);
+
+            string xml = @"<Expression>" +
+                            @"<Composite Type='string[]'>" +
+                                @"The value of " +
+                                @"<Attribute SelectionMode='Distinct' Name='Component'>/Test/Component</Attribute>" +
+                                @" is " +
+                                @"<Attribute Root='Component'>Value</Attribute>" +
+                            @"</Composite>[3]" +
+                        @"</Expression>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            QueryResult result = query.Evaluate();
+
+            Assert.That(result.ToString() == "The value of ECO2 is 27");
+        }
+
+        /// <summary>
+        /// A test to sum values from a VOA file using nested nodes of different types.
         /// </summary>
         [Test, Category("Composite")]
         public static void TestCompositeSumColumnValues()
         {
             LoadDataFile(_testImages.GetFile(_LABDE_DATA_FILE), null);
 
-            string xml = @"<Expression Type='Double'>" +
-                            @"<Complex Parameterize='False'>" +
-                                @"<Regex Pattern='[\d\.]+' FirstMatchOnly='False' SelectionMode='List' StringList=' + '>" +
-                                @"<Attribute SelectionMode='List' StringList=','>/Test/Component/Value</Attribute>" +
-                                @"</Regex>" +
-                            @"</Complex>" +
+            string xml = @"<Expression>" +
+                            @"<Attribute StringList=' + ' Parameterize='False'>/Test/Component/Value</Attribute>" +
+                         @"</Expression>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            QueryResult result = query.Evaluate();
+
+            Assert.That(result.ToString() == "1678.96");
+        }
+
+        /// <summary>
+        /// A test to sum values from a VOA file using nested nodes of various types.
+        /// </summary>
+        [Test, Category("Composite")]
+        public static void TestCompositeSumColumnValues2()
+        {
+            LoadDataFile(_testImages.GetFile(_LABDE_DATA_FILE), null);
+
+            string xml = @"<Expression>" +
+                            @"<Regex Pattern='[\d\.]+' StringList=' + ' Parameterize='False'>" +
+                                @"<Attribute StringList=','>/Test/Component/Value</Attribute>" +
+                            @"</Regex>" +
                         @"</Expression>";
 
-            DataEntryQuery query =
-                DataEntryQuery.Create(xml, null, null, MultipleQueryResultSelectionMode.First, true);
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            QueryResult result = query.Evaluate();
+
+            Assert.That(result.ToString() == "1678.96");
+        }
+
+        /// <summary>
+        /// A test to sum values by casting them to a double array in an expression.
+        /// </summary>
+        [Test, Category("Composite")]
+        public static void TestCompositeSumColumnValues3()
+        {
+            LoadDataFile(_testImages.GetFile(_LABDE_DATA_FILE), null);
+
+            string xml = @"<Expression>" +
+                            @"<Attribute Type='double[]'>/Test/Component/Value</Attribute>" +
+                            @".sum()" +
+                         @"</Expression>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            QueryResult result = query.Evaluate();
+
+            Assert.That(result.ToString() == "1678.96");
+        }
+
+        /// <summary>
+        /// A test to sum values from a VOA file using the distinct selection mode.
+        /// </summary>
+        [Test, Category("Composite")]
+        public static void TestCompositeSumColumnValues4()
+        {
+            LoadDataFile(_testImages.GetFile(_LABDE_DATA_FILE), null);
+
+            string xml = @"<Expression>" +
+                            @"<Composite Parameterize='False'>" +
+                                @"<Attribute SelectionMode='Distinct'>/Test/Component/Value</Attribute> + " +
+                            @"</Composite>" +
+                            @"0.0" +
+                        @"</Expression>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
 
             QueryResult result = query.Evaluate();
 

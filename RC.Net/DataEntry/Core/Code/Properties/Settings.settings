@@ -32,5 +32,8 @@
     <Setting Name="GCFrequency" Type="System.UInt32" Scope="Application">
       <Value Profile="(Default)">1</Value>
     </Setting>
+    <Setting Name="QueryCacheLimit" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">500</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

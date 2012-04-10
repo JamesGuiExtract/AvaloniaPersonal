@@ -315,8 +315,7 @@ namespace Extract.UtilityApplications.ExpressionAndQueryTester
                 InitializeAttributes(sourceAttributes);
 
                 DataEntryQuery query =
-                    DataEntryQuery.Create(queryText, rootAttribute, dbConnection,
-                        MultipleQueryResultSelectionMode.List, true);
+                    DataEntryQuery.Create(queryText, rootAttribute, dbConnection);
 
                 QueryResult result = query.Evaluate();
 
