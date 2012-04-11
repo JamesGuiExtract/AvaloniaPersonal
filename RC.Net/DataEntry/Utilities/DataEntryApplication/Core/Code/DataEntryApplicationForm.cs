@@ -634,6 +634,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _imageViewer.AutoOcr = _registry.Settings.AutoOcr;
                 _imageViewer.OcrTradeoff = _registry.Settings.OcrTradeoff;
 
+                // For prefetching purposes, allow the ImageViewer to cache images.
+                _imageViewer.CacheImages = true;
+
                 _invoker = new ControlInvoker(this);
             }
             catch (Exception ex)
@@ -858,7 +861,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         public void Prefetch(string fileName, int fileID, int actionID, FAMTagManager tagManager,
             FileProcessingDB fileProcessingDB)
         {
-            // TODO: Add prefetching code to improve load performance.
+            try
+            {
+                _imageViewer.CacheImage(fileName);
+
+                _dataEntryControlHost.Prefetch(fileName);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34533");
+            }
         }
 
         /// <summary>

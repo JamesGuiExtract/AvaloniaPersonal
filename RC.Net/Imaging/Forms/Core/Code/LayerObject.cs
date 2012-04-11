@@ -218,10 +218,6 @@ namespace Extract.Imaging.Forms
                 ExtractException.Assert("ELI21197", "Image viewer must be specified.",
                     imageViewer != null);
 
-                // Ensure an image is open
-                ExtractException.Assert("ELI21203", "No image is open.",
-                    imageViewer.IsImageAvailable);
-
                 // Store the image viewer
                 _imageViewer = imageViewer;
 
