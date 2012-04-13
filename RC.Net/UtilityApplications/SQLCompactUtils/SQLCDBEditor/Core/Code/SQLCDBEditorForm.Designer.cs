@@ -71,7 +71,7 @@ namespace Extract.SQLCDBEditor
             // toolStripMenuItem1
             // 
             toolStripMenuItem1.Name = "toolStripMenuItem1";
-            toolStripMenuItem1.Size = new System.Drawing.Size(108, 6);
+            toolStripMenuItem1.Size = new System.Drawing.Size(100, 6);
             // 
             // _toolStrip
             // 
@@ -81,7 +81,7 @@ namespace Extract.SQLCDBEditor
             this._saveToolStripButton});
             this._toolStrip.Location = new System.Drawing.Point(0, 24);
             this._toolStrip.Name = "_toolStrip";
-            this._toolStrip.Size = new System.Drawing.Size(818, 39);
+            this._toolStrip.Size = new System.Drawing.Size(780, 39);
             this._toolStrip.TabIndex = 0;
             this._toolStrip.Text = "toolStrip1";
             // 
@@ -107,7 +107,9 @@ namespace Extract.SQLCDBEditor
             // 
             // _splitContainer
             // 
-            this._splitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._splitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._splitContainer.Location = new System.Drawing.Point(0, 63);
             this._splitContainer.Name = "_splitContainer";
             // 
@@ -118,27 +120,27 @@ namespace Extract.SQLCDBEditor
             // _splitContainer.Panel2
             // 
             this._splitContainer.Panel2.Controls.Add(this._dataGridView);
-            this._splitContainer.Size = new System.Drawing.Size(818, 441);
-            this._splitContainer.SplitterDistance = 212;
+            this._splitContainer.Size = new System.Drawing.Size(780, 358);
+            this._splitContainer.SplitterDistance = 202;
             this._splitContainer.TabIndex = 1;
             // 
             // _listBoxTables
             // 
             this._listBoxTables.Dock = System.Windows.Forms.DockStyle.Fill;
             this._listBoxTables.FormattingEnabled = true;
+            this._listBoxTables.IntegralHeight = false;
             this._listBoxTables.Location = new System.Drawing.Point(0, 0);
             this._listBoxTables.Name = "_listBoxTables";
-            this._listBoxTables.Size = new System.Drawing.Size(212, 441);
+            this._listBoxTables.Size = new System.Drawing.Size(202, 358);
             this._listBoxTables.TabIndex = 0;
             // 
             // _dataGridView
             // 
-            this._dataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._dataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this._dataGridView.Location = new System.Drawing.Point(0, 0);
             this._dataGridView.Name = "_dataGridView";
-            this._dataGridView.Size = new System.Drawing.Size(602, 441);
+            this._dataGridView.Size = new System.Drawing.Size(574, 358);
             this._dataGridView.TabIndex = 0;
             this._dataGridView.CurrentCellDirtyStateChanged += new System.EventHandler(this.DataGridView_CurrentCellDirtyStateChanged);
             this._dataGridView.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.HandleDataGridViewError);
@@ -152,7 +154,7 @@ namespace Extract.SQLCDBEditor
             this._helpToolStripMenuItem});
             this._menuStrip.Location = new System.Drawing.Point(0, 0);
             this._menuStrip.Name = "_menuStrip";
-            this._menuStrip.Size = new System.Drawing.Size(818, 24);
+            this._menuStrip.Size = new System.Drawing.Size(780, 24);
             this._menuStrip.TabIndex = 2;
             this._menuStrip.Text = "menuStrip1";
             // 
@@ -165,34 +167,34 @@ namespace Extract.SQLCDBEditor
             toolStripMenuItem1,
             this._exitToolStripMenuItem});
             this._fileToolStripMenuItem.Name = "_fileToolStripMenuItem";
-            this._fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
+            this._fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this._fileToolStripMenuItem.Text = "&File";
             // 
             // _openToolStripMenuItem
             // 
             this._openToolStripMenuItem.Name = "_openToolStripMenuItem";
-            this._openToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
+            this._openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this._openToolStripMenuItem.Text = "&Open";
             this._openToolStripMenuItem.Click += new System.EventHandler(this.HandleOpenClick);
             // 
             // _saveToolStripMenuItem
             // 
             this._saveToolStripMenuItem.Name = "_saveToolStripMenuItem";
-            this._saveToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
+            this._saveToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this._saveToolStripMenuItem.Text = "&Save";
             this._saveToolStripMenuItem.Click += new System.EventHandler(this.HandleSaveClick);
             // 
             // _closeToolStripMenuItem
             // 
             this._closeToolStripMenuItem.Name = "_closeToolStripMenuItem";
-            this._closeToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
+            this._closeToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this._closeToolStripMenuItem.Text = "&Close";
             this._closeToolStripMenuItem.Click += new System.EventHandler(this.CloseToolStripMenuItem_Click);
             // 
             // _exitToolStripMenuItem
             // 
             this._exitToolStripMenuItem.Name = "_exitToolStripMenuItem";
-            this._exitToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
+            this._exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this._exitToolStripMenuItem.Text = "E&xit";
             this._exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
             // 
@@ -201,13 +203,13 @@ namespace Extract.SQLCDBEditor
             this._toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._updateToCurrentSchemaToolStripMenuItem});
             this._toolsToolStripMenuItem.Name = "_toolsToolStripMenuItem";
-            this._toolsToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this._toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this._toolsToolStripMenuItem.Text = "&Tools";
             // 
             // _updateToCurrentSchemaToolStripMenuItem
             // 
             this._updateToCurrentSchemaToolStripMenuItem.Name = "_updateToCurrentSchemaToolStripMenuItem";
-            this._updateToCurrentSchemaToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+            this._updateToCurrentSchemaToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this._updateToCurrentSchemaToolStripMenuItem.Text = "&Update to current schema...";
             this._updateToCurrentSchemaToolStripMenuItem.Click += new System.EventHandler(this.HandleUpdateToCurrentSchemaClick);
             // 
@@ -216,13 +218,13 @@ namespace Extract.SQLCDBEditor
             this._helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._aboutToolStripMenuItem});
             this._helpToolStripMenuItem.Name = "_helpToolStripMenuItem";
-            this._helpToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
+            this._helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this._helpToolStripMenuItem.Text = "&Help";
             // 
             // _aboutToolStripMenuItem
             // 
             this._aboutToolStripMenuItem.Name = "_aboutToolStripMenuItem";
-            this._aboutToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+            this._aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this._aboutToolStripMenuItem.Text = "About";
             this._aboutToolStripMenuItem.Click += new System.EventHandler(this.AboutToolStripMenuItem_Click);
             // 
@@ -230,17 +232,17 @@ namespace Extract.SQLCDBEditor
             // 
             this._statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._statusLabelSchemaInfo});
-            this._statusStrip.Location = new System.Drawing.Point(0, 482);
+            this._statusStrip.Location = new System.Drawing.Point(0, 424);
             this._statusStrip.Name = "_statusStrip";
             this._statusStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.ManagerRenderMode;
-            this._statusStrip.Size = new System.Drawing.Size(818, 22);
+            this._statusStrip.Size = new System.Drawing.Size(780, 22);
             this._statusStrip.TabIndex = 3;
             this._statusStrip.Text = "statusStrip1";
             // 
             // _statusLabelSchemaInfo
             // 
             this._statusLabelSchemaInfo.Name = "_statusLabelSchemaInfo";
-            this._statusLabelSchemaInfo.Size = new System.Drawing.Size(803, 17);
+            this._statusLabelSchemaInfo.Size = new System.Drawing.Size(765, 17);
             this._statusLabelSchemaInfo.Spring = true;
             this._statusLabelSchemaInfo.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -248,7 +250,7 @@ namespace Extract.SQLCDBEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(818, 504);
+            this.ClientSize = new System.Drawing.Size(780, 446);
             this.Controls.Add(this._statusStrip);
             this.Controls.Add(this._splitContainer);
             this.Controls.Add(this._toolStrip);
@@ -282,7 +284,6 @@ namespace Extract.SQLCDBEditor
         private System.Windows.Forms.ToolStripButton _saveToolStripButton;
         private System.Windows.Forms.SplitContainer _splitContainer;
         private System.Windows.Forms.DataGridView _dataGridView;
-        private System.Windows.Forms.ListBox _listBoxTables;
         private System.Windows.Forms.MenuStrip _menuStrip;
         private System.Windows.Forms.ToolStripMenuItem _fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _openToolStripMenuItem;
@@ -295,6 +296,7 @@ namespace Extract.SQLCDBEditor
         private System.Windows.Forms.ToolStripMenuItem _updateToCurrentSchemaToolStripMenuItem;
         private System.Windows.Forms.StatusStrip _statusStrip;
         private System.Windows.Forms.ToolStripStatusLabel _statusLabelSchemaInfo;
+        private System.Windows.Forms.ListBox _listBoxTables;
     }
 }
 

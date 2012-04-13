@@ -612,6 +612,7 @@ namespace Extract.SQLCDBEditor
             // Set the bindingSoure dataSource to the table
             bindingSource.DataSource = table;
 
+            // Generate the default column sizes.
             using (var graphics = _dataGridView.CreateGraphics())
             {
                 var font = _dataGridView.ColumnHeadersDefaultCellStyle.Font;
@@ -619,28 +620,35 @@ namespace Extract.SQLCDBEditor
                 {
                     var column = table.Columns[i];
                     var type = column.DataType;
-                    float fillWeight = 200;
+
+                    // Default fill weight will be 1 with a minimum width of 50 (~ 6 chars)
+                    float fillWeight = 1.0F;
+                    int minSize = 50;
+
                     if (type == typeof(bool))
                     {
-                        fillWeight = 100;
+                        // Bool fields do not need to scale larger with size as the table does and
+                        // can have a smaller min width.
+                        fillWeight = 0.01F;
+                        minSize = 25;
                     }
                     else if (type == typeof(string))
                     {
-                        if (column.MaxLength > 500)
+                        // For text fields that can be > 10 chars but not unlimited, scale up from
+                        // a fill weight of 1.0 logarithmically.
+                        // MaxLength 10	 = 1.2
+                        // MaxLength 50	 = 2.8
+                        // MaxLength 500 = 5.1
+                        if (column.MaxLength > 10)
                         {
-                            fillWeight = 450;
+                            
+                            fillWeight = (float)Math.Log(column.MaxLength / 3);
                         }
-                        else if (column.MaxLength > 300)
+
+                        // But cap the max fill weight at 10.
+                        if (fillWeight > 10.0F || column.MaxLength == -1)
                         {
-                            fillWeight = 400;
-                        }
-                        else if (column.MaxLength > 150)
-                        {
-                            fillWeight = 350;
-                        }
-                        else
-                        {
-                            fillWeight = 250;
+                            fillWeight = 10.0F;
                         }
                     }
 
@@ -648,9 +656,22 @@ namespace Extract.SQLCDBEditor
                     // Pad the width by 4 pixels (2 each side)
                     var temp = _dataGridView.Columns[i].HeaderText;
                     var size = graphics.MeasureString(temp, font);
-                    _dataGridView.Columns[i].MinimumWidth = (int)(size.Width + 0.5) + 4;
+                    minSize = Math.Max(minSize, (int)(size.Width + 0.5) + 4);
+                    _dataGridView.Columns[i].MinimumWidth = minSize;
                     _dataGridView.Columns[i].FillWeight = fillWeight;
                     _dataGridView.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                }
+
+                // Perform a layout to apply the default column sizes.
+                _dataGridView.PerformLayout();
+
+                // Once the default column sizes have been applied, turn off auto-sizing and set
+                // min width to a small size to allow the user almost complete control over column
+                // sizes.
+                foreach (DataGridViewColumn column in _dataGridView.Columns)
+                {
+                    column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+                    column.MinimumWidth = 25;
                 }
             }
 
