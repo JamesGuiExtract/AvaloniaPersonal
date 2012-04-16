@@ -15,15 +15,29 @@ namespace Extract.SQLCDBEditor
         {
             if (disposing)
             {
-                if (_connection != null)
+                try
                 {
-                    _connection.Dispose();
-                    _connection = null;
-                }
+                    if (_connection != null)
+                    {
+                        _connection.Dispose();
+                        _connection = null;
+                    }
 
-                if (components != null)
+                    if (!string.IsNullOrEmpty(_databaseWorkingCopyFileName) &&
+                        System.IO.File.Exists(_databaseWorkingCopyFileName))
+                    {
+                        System.IO.File.Delete(_databaseWorkingCopyFileName);
+                        _databaseWorkingCopyFileName = null;
+                    }
+
+                    if (components != null)
+                    {
+                        components.Dispose();
+                    }
+                }
+                catch (System.Exception ex)
                 {
-                    components.Dispose();
+                    ex.ExtractLog("ELI34543");
                 }
             }
             base.Dispose(disposing);

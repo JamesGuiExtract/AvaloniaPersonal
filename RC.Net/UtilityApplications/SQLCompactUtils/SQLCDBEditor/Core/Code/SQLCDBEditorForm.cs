@@ -1,5 +1,6 @@
 using Extract.Database;
 using Extract.Licensing;
+using Extract.SQLCDBEditor.Properties;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
@@ -8,6 +9,7 @@ using System.Data;
 using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -166,6 +168,20 @@ namespace Extract.SQLCDBEditor
         /// File name of the currently opened database.
         /// </summary>
         String _databaseFileName = string.Empty;
+
+        /// <summary>
+        /// The filename for a temporary copy of the database used while editing the database. This
+        /// file will overwrite _databaseFileName when saved and will be deleted when the database
+        /// is closed.
+        /// </summary>
+        string _databaseWorkingCopyFileName;
+
+        /// <summary>
+        /// The last modified time of _databaseFileName as of the time the database was last opened
+        /// or saved by this instance. Used to determine if there may be a data conflict between
+        /// edits made by this application and another application.
+        /// </summary>
+        DateTime _databaseLastModifiedTime;
 
         /// <summary>
         /// Opened connection to the current database.
@@ -872,6 +888,38 @@ namespace Extract.SQLCDBEditor
                     transaction.Dispose();
                 }
 
+                // Ensure that the main database file has not been edited since it was last
+                // opened/saved. If it has, prompt for whether to overwrite the changes from
+                // whatever else opened the database.
+                if (File.GetLastWriteTime(_databaseFileName) > _databaseLastModifiedTime)
+                {
+                    using (CustomizableMessageBox messageBox = new CustomizableMessageBox())
+                    {
+                        messageBox.Caption = "Conflict";
+                        messageBox.StandardIcon = MessageBoxIcon.Warning;
+                        messageBox.Text = "The database has been modified by an another " +
+                            "application. Do you want to overwrite those changes?";
+                        messageBox.AddButton("Overwrite", "Overwrite", false);
+                        messageBox.AddButton("Cancel", "Cancel", true);
+                        if (messageBox.Show(this) == "Cancel")
+                        {
+                            return;
+                        }
+                    }
+                }
+
+                // The database is opened without any sharing, so it needs to be closed before
+                // copying the working copy back over the main database file.
+                _connection.Close();
+
+                FileAttributes originalFileAttributes = File.GetAttributes(_databaseFileName);
+                File.Copy(_databaseWorkingCopyFileName, _databaseFileName, true);
+                // Apply the same attributes the primary database had originally.
+                File.SetAttributes(_databaseFileName, originalFileAttributes);
+                _databaseLastModifiedTime = File.GetLastWriteTime(_databaseFileName);
+
+                _connection.Open();
+
                 // Clear _dirty flag
                 _dirty = false;
 
@@ -922,12 +970,61 @@ namespace Extract.SQLCDBEditor
                 // Set the _databaseFileName
                 _databaseFileName = databaseToOpen;
 
-                // Create the connection to the database
-                _connection = new SqlCeConnection(
-                    SqlCompactMethods.BuildDBConnectionString(_databaseFileName, true));
+                // [DotNetRCAndUtils:808]
+                // Copy the database file to a separate, temporary filename to ensure the primary
+                // database file can be used by our applications at the same time it is being edited.
+                _databaseWorkingCopyFileName = Path.Combine(
+                    Path.GetDirectoryName(_databaseFileName),
+                    "~" + Path.GetFileName(_databaseFileName));
 
-                // Open the connection.
-                _connection.Open();
+                if (File.Exists(_databaseWorkingCopyFileName))
+                {
+                    try
+                    {
+                        // If there is a previous copy of the working copy, if it can be deleted
+                        // the instance that created it is not still open and it can therefore
+                        // be ignored.
+                        File.Delete(_databaseWorkingCopyFileName);
+                    }
+                    catch
+                    {
+                        // But if it couldn't be deleted, another instance of SQLCDBEditor likely
+                        // already has the database open for editing; prevent it from being opened.
+                        ExtractException ee = new ExtractException("ELI34542",
+                            "This database is currently being edited by another instance of " +
+                            ((string.IsNullOrEmpty(_customTitle)) ? _DEFAULT_TITLE : _customTitle));
+                        ee.AddDebugData("Database Filename", _databaseFileName, false);
+
+                        // Set _databaseWorkingCopyFileName to null to ensure this instance doesn't
+                        // try to delete a working copy another instance created.
+                        _databaseWorkingCopyFileName = null;
+
+                        throw ee;
+                    }
+                }
+
+                // Create a new working copy.
+                File.Copy(_databaseFileName, _databaseWorkingCopyFileName);
+                File.SetAttributes(_databaseWorkingCopyFileName, FileAttributes.Hidden);
+                _databaseLastModifiedTime = File.GetLastWriteTime(_databaseFileName);
+
+                try
+                {
+                    // Create the connection to the database
+                    _connection = new SqlCeConnection(
+                        SqlCompactMethods.BuildDBConnectionString(_databaseWorkingCopyFileName, true));
+
+                    // Open the connection.
+                    _connection.Open();
+                }
+                catch
+                {
+                    // If we failed to open a new database connection, delete the working database
+                    // file and set _databaseWorkingCopyFileName to null to ensure this instance
+                    // doesn't end up trying to delete a working copy created by another instance.
+                    FileSystemMethods.DeleteFile(_databaseWorkingCopyFileName);
+                    _databaseWorkingCopyFileName = null;
+                }
 
                 // Load the table names into the listBox
                 var tableNames = LoadTableNames();
@@ -1130,6 +1227,13 @@ namespace Extract.SQLCDBEditor
 
                 // Set to null
                 _connection = null;
+            }
+
+            if (!string.IsNullOrEmpty(_databaseWorkingCopyFileName) &&
+                File.Exists(_databaseWorkingCopyFileName))
+            {
+                File.Delete(_databaseWorkingCopyFileName);
+                _databaseWorkingCopyFileName = null;
             }
 
             SetWindowTitle();
