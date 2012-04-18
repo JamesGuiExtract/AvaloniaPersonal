@@ -13,6 +13,7 @@
 // Usage:   ParseSweetwaterCSAIndexData inputFile outputDir
 //              inputFile - The path to the index data file
 //              outputDir - The path to the EAV output dir
+//              csvType - docs, legals, parties, or related
 //
 // Example inputFiles:
 //  K:\Common\Engineering\Sample Files\CSA\WY - Sweetwater\Set001\IndexData\IndexDocs.txt
@@ -286,7 +287,7 @@ function main(args) {
         try {
             val = fields[1];
             if (val != "") {
-                writeAttr(fname, "Block", val, "", ".");
+                writeAttr(fname, "Municipality", val, "", ".");
             }
         }
         catch(err) {
@@ -295,47 +296,65 @@ function main(args) {
         try {
             val = fields[2];
             if (val != "") {
-                writeAttr(fname, "Lot", val, "", ".");
+                writeAttr(fname, "Subdivision", val, "", ".");
             }
         }
         catch(err) {
             handleScriptError("ParseSweetwaterCSAIndexData_13", "Error!", err, "Index Data Line", fields);
         }
         try {
-            val = fields[4];
+            val = fields[3];
             if (val != "") {
-                writeAttr(fname, "Range", val, "", ".");
+                writeAttr(fname, "Block", val, "", ".");
             }
         }
         catch(err) {
             handleScriptError("ParseSweetwaterCSAIndexData_14", "Error!", err, "Index Data Line", fields);
         }
         try {
-            val = fields[5];
+            val = fields[4];
             if (val != "") {
-                writeAttr(fname, "Section", val, "", ".");
+                writeAttr(fname, "Lot", val, "", ".");
             }
         }
         catch(err) {
             handleScriptError("ParseSweetwaterCSAIndexData_15", "Error!", err, "Index Data Line", fields);
         }
         try {
-            val = fields[3];
+            val = fields[6];
             if (val != "") {
-                writeAttr(fname, "Township", val, "", ".");
+                writeAttr(fname, "Range", val, "", ".");
             }
         }
         catch(err) {
             handleScriptError("ParseSweetwaterCSAIndexData_16", "Error!", err, "Index Data Line", fields);
         }
         try {
-            val = fields[6];
+            val = fields[7];
+            if (val != "") {
+                writeAttr(fname, "Section", val, "", ".");
+            }
+        }
+        catch(err) {
+            handleScriptError("ParseSweetwaterCSAIndexData_17", "Error!", err, "Index Data Line", fields);
+        }
+        try {
+            val = fields[5];
+            if (val != "") {
+                writeAttr(fname, "Township", val, "", ".");
+            }
+        }
+        catch(err) {
+            handleScriptError("ParseSweetwaterCSAIndexData_18", "Error!", err, "Index Data Line", fields);
+        }
+        try {
+            val = fields[8];
             if (val != "") {
                 writeAttr(fname, "Tract", val, "", ".");
             }
         }
         catch(err) {
-            handleScriptError("ParseSweetwaterCSAIndexData_17", "Error!", err, "Index Data Line", fields);
+            handleScriptError("ParseSweetwaterCSAIndexData_19", "Error!", err, "Index Data Line", fields);
         }
     }
 
