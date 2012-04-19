@@ -112,36 +112,36 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="_partyFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="_partyFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="_partyMiddleNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="_partyMiddleNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="_partyLastOrCompanyNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="_partyLastOrCompanyNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="_partyTypeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="_partyTypeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <data name="_partyTypeColumn.ValidationQuery" xml:space="preserve">
     <value>&lt;SQL&gt;SELECT PartyType.Name FROM DocumentTypeToPartyType INNER JOIN DocumentType ON DocumentType.ID = DocumentTypeID INNER JOIN PartyType ON PartyType.ID = PartyTypeID WHERE DocumentType.Name = &lt;Attribute&gt;../../DocumentType&lt;/Attribute&gt; UNION SELECT Name FROM PartyType WHERE 'Unknown' LIKE &lt;Attribute&gt;../../DocumentType&lt;/Attribute&gt; ORDER BY PartyType.Name&lt;/SQL&gt;</value>
   </data>
-  <metadata name="_partyMappedTo.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="_partyMappedTo.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="Lot.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="Lot.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="Block.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="Block.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="Subdivision.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="Subdivision.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <data name="dataEntryTableRow3.AutoUpdateQuery" xml:space="preserve">
@@ -151,10 +151,10 @@
     <value>&lt;SQL&gt;SELECT [Abbreviation] FROM [State] INNER JOIN [ZipCode] ON [State].[ID] = [ZipCode].[StateID] WHERE [ZipCode] = SUBSTRING(&lt;Attribute&gt;../ZipCode&lt;/Attribute&gt;,1,5)  AND LEN(&lt;Attribute TriggerUpdate='0'&gt;.&lt;/Attribute&gt;) = 0 AND ([City] = SUBSTRING(&lt;Attribute TriggerUpdate='0'&gt;../City&lt;/Attribute&gt;,1,32) OR LEN(&lt;Attribute TriggerUpdate='0'&gt;../City&lt;/Attribute&gt;) = 0)&lt;/SQL&gt;</value>
   </data>
   <data name="dataEntryTableRow5.AutoUpdateQuery" xml:space="preserve">
-    <value>&lt;SQL&gt;SELECT DISTINCT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../City&lt;/Attribute&gt;,1,32) AND SUBSTRING(&lt;Attribute TriggerUpdate='0'&gt;.&lt;/Attribute&gt;,1,5) != [ZipCode] AND ([Name] = SUBSTRING(&lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt;,1,64) OR [Abbreviation] = SUBSTRING(&lt;Result Arg1='State'/&gt;,1,2))&lt;/SQL&gt;</value>
+    <value>&lt;SQL&gt;SELECT DISTINCT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../City&lt;/Attribute&gt;,1,32) AND SUBSTRING(&lt;Attribute TriggerUpdate='0'&gt;.&lt;/Attribute&gt;,1,5) != [ZipCode] AND ([Name] = SUBSTRING(&lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt;,1,64) OR [Abbreviation] = SUBSTRING(&lt;State/&gt;,1,2))&lt;/SQL&gt;</value>
   </data>
   <data name="dataEntryTableRow5.ValidationQuery" xml:space="preserve">
-    <value>&lt;Query ValidationListType='AutoCompleteOnly'&gt;&lt;SQL&gt;SELECT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../City&lt;/Attribute&gt;,1,32) AND ([Name] = SUBSTRING(&lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt;,1,64) OR [Abbreviation] = SUBSTRING(&lt;Result Arg1='State'/&gt;,1,2))&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query ValidationListType='ValidationListOnly' ValidValue='1' ValidationMessage='ValidationMessage'&gt;&lt;SQL&gt;SELECT '1' FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../City&lt;/Attribute&gt;,1,32) AND ([Name] = SUBSTRING(&lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt;,1,64) OR [Abbreviation] = SUBSTRING(&lt;Result Arg1='State'/&gt;,1,2)) AND SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,5) = [ZipCode].[ZipCode] UNION SELECT '1' WHERE LEN(&lt;Attribute&gt;.&lt;/Attribute&gt;) = 0&lt;/SQL&gt;&lt;Complex Exclude='1' Name='ValidationMessage'&gt;Zip code does not correspond with city and state&lt;/Complex&gt;&lt;/Query&gt;</value>
+    <value>&lt;Query ValidationListType='AutoCompleteOnly'&gt;&lt;SQL&gt;SELECT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../City&lt;/Attribute&gt;,1,32) AND ([Name] = SUBSTRING(&lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt;,1,64) OR [Abbreviation] = SUBSTRING(&lt;State/&gt;,1,2))&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidValue='1' ValidationMessage='ValidationMessage'&gt;&lt;SQL&gt;SELECT '1' FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../City&lt;/Attribute&gt;,1,32) AND ([Name] = SUBSTRING(&lt;State/&gt;,1,64) OR [Abbreviation] = SUBSTRING(&lt;State/&gt;,1,2)) AND SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,5) = [ZipCode].[ZipCode] UNION SELECT '1' WHERE LEN(&lt;Attribute&gt;.&lt;/Attribute&gt;) = 0&lt;/SQL&gt;&lt;Complex Exclude='1' Name='ValidationMessage'&gt;Zip code does not correspond with city and state&lt;/Complex&gt;&lt;/Query&gt;</value>
   </data>
 </root>

@@ -56,6 +56,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._grantorsLabel = new System.Windows.Forms.Label();
             this._legalDescriptionLabel = new System.Windows.Forms.Label();
             this._documentTypeComboBox = new Extract.DataEntry.DataEntryComboBox();
+            this.dataGridViewColumn1 = new System.Windows.Forms.DataGridViewColumn();
             ((System.ComponentModel.ISupportInitialize)(this._partiesTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._legalDescriptionTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._returnAddressTable)).BeginInit();
@@ -65,8 +66,8 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             // 
             this._partiesTable.AllowDrop = true;
             this._partiesTable.AllowTabbingByRow = true;
-            this._partiesTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._partiesTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._partiesTable.AttributeName = "Party";
             this._partiesTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._partiesTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
@@ -134,8 +135,8 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             // 
             // _legalDescriptionTextBox
             // 
-            this._legalDescriptionTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._legalDescriptionTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._legalDescriptionTextBox.AttributeName = "FullText";
             this._legalDescriptionTextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this._legalDescriptionTextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
@@ -152,9 +153,10 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             // 
             // _legalDescriptionTable
             // 
+            this._legalDescriptionTable.AllowTabbingByRow = true;
             this._legalDescriptionTable.AllowUserToResizeRows = false;
-            this._legalDescriptionTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._legalDescriptionTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._legalDescriptionTable.AttributeName = "LegalDescription";
             this._legalDescriptionTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._legalDescriptionTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
@@ -172,7 +174,6 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._legalDescriptionTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._legalDescriptionTable.Size = new System.Drawing.Size(615, 68);
             this._legalDescriptionTable.TabIndex = 7;
-            this._legalDescriptionTable.AllowTabbingByRow = true;
             // 
             // Lot
             // 
@@ -230,8 +231,8 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             // _returnAddressTable
             // 
             this._returnAddressTable.AllowUserToResizeRows = false;
-            this._returnAddressTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._returnAddressTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._returnAddressTable.AttributeName = "ReturnAddress";
             this._returnAddressTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._returnAddressTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
@@ -258,7 +259,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             dataEntryTableRow4.Name = "State";
             dataEntryTableRow4.ValidationErrorMessage = "Unknown state";
             dataEntryTableRow4.ValidationQuery = "[BLANK]\r\n<SQL>SELECT [Abbreviation] FROM [State] WHERE LEN([Abbreviation]) > 0 UN" +
-                "ION SELECT [Name] FROM [State] WHERE  LEN([Name]) > 0</SQL>";
+    "ION SELECT [Name] FROM [State] WHERE  LEN([Name]) > 0</SQL>";
             dataEntryTableRow5.AttributeName = "ZipCode";
             dataEntryTableRow5.AutoUpdateQuery = resources.GetString("dataEntryTableRow5.AutoUpdateQuery");
             dataEntryTableRow5.Name = "Zip";
@@ -317,8 +318,8 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             // 
             // _documentTypeComboBox
             // 
-            this._documentTypeComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._documentTypeComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._documentTypeComboBox.AttributeName = "DocumentType";
             this._documentTypeComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._documentTypeComboBox.AutoUpdateQuery = "<Query Default=\'1\'>Unknown</Query>";
@@ -330,6 +331,12 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._documentTypeComboBox.TabIndex = 3;
             this._documentTypeComboBox.ValidationErrorMessage = "";
             this._documentTypeComboBox.ValidationQuery = "<SQL>SELECT Name FROM DocumentType ORDER BY Name</SQL>Unknown";
+            // 
+            // dataGridViewColumn1
+            // 
+            this.dataGridViewColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn1.HeaderText = "Return Address";
+            this.dataGridViewColumn1.Name = "dataGridViewColumn1";
             // 
             // DemoFlexIndexPanel
             // 
@@ -386,5 +393,6 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
         private DataEntryTableColumn _partyLastOrCompanyNameColumn;
         private DataEntryTableColumn _partyTypeColumn;
         private DataEntryTableColumn _partyMappedTo;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn1;
     }
 }
