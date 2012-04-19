@@ -34,12 +34,6 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._labNameLabel = new System.Windows.Forms.Label();
             this._laboratoryIdentifier = new Extract.DataEntry.DataEntryTextBox();
             this._labInfoPassThrough = new Extract.DataEntry.DataEntryTextBox();
-            this._laboratoryTestTable = new Extract.DataEntry.DataEntryTable();
-            this._testName = new Extract.DataEntry.DataEntryTableColumn();
-            this._orderCode = new Extract.DataEntry.DataEntryTableColumn();
-            this._testID = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentDate = new Extract.DataEntry.DataEntryTableColumn();
-            this._laboratoryTestTime = new Extract.DataEntry.DataEntryTableColumn();
             this._labIDLabel = new System.Windows.Forms.Label();
             this._labID = new Extract.DataEntry.DataEntryTextBox();
             this._testComponentTable = new Extract.DataEntry.DataEntryTable();
@@ -57,9 +51,6 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._patientMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._patientLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._patientSuffixColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._patientGender = new Extract.DataEntry.DataEntryComboBox();
-            this._patientBirthDate = new Extract.DataEntry.DataEntryTextBox();
-            this._birthDateLabel = new System.Windows.Forms.Label();
             this._patientRecordNum = new Extract.DataEntry.DataEntryTextBox();
             this._patientMRLabel = new System.Windows.Forms.Label();
             this._testDetailsGroupBox = new System.Windows.Forms.GroupBox();
@@ -75,20 +66,16 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._operatorCommentLabel = new System.Windows.Forms.Label();
             this._operatorComments = new Extract.DataEntry.DataEntryTextBox();
             this._messageSequenceNumberFile = new Extract.DataEntry.DataEntryTextBox();
-            this._physicianInfoGroupBox = new Extract.DataEntry.DataEntryGroupBox();
-            this._orderingPhysicianCodeColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._orderingPhysicianMiddleName = new Extract.DataEntry.DataEntryTableColumn();
-            this._orderingPhysicianFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._orderingPhysicianLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._orderingPhysicianTable = new Extract.DataEntry.DataEntryTable();
-            ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).BeginInit();
+            this._testID = new Extract.DataEntry.DataEntryTableColumn();
+            this._orderCode = new Extract.DataEntry.DataEntryTableColumn();
+            this._testName = new Extract.DataEntry.DataEntryTableColumn();
+            this._laboratoryTestTable = new Extract.DataEntry.DataEntryTable();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).BeginInit();
             this._patientInfoGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._patientNameTable)).BeginInit();
             this._testDetailsGroupBox.SuspendLayout();
             this._testsGroupBox.SuspendLayout();
-            this._physicianInfoGroupBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._orderingPhysicianTable)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).BeginInit();
             this.SuspendLayout();
             // 
             // _labNameLabel
@@ -126,89 +113,6 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._labInfoPassThrough.TabIndex = 5;
             this._labInfoPassThrough.ValidationErrorMessage = "";
             this._labInfoPassThrough.Visible = false;
-            // 
-            // _laboratoryTestTable
-            // 
-            this._laboratoryTestTable.AllowDrop = true;
-            this._laboratoryTestTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._laboratoryTestTable.AttributeName = "Test";
-            this._laboratoryTestTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this._laboratoryTestTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
-            this._laboratoryTestTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this._laboratoryTestTable.ColumnHintsEnabled = false;
-            this._laboratoryTestTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this._testName,
-            this._orderCode,
-            this._testID,
-            this._componentDate,
-            this._laboratoryTestTime});
-            this._laboratoryTestTable.Location = new System.Drawing.Point(6, 19);
-            this._laboratoryTestTable.Name = "_laboratoryTestTable";
-            this._laboratoryTestTable.ParentDataEntryControl = null;
-            this._laboratoryTestTable.RowFormattingRuleFile = "Rules\\Swiping\\TestRow.rsd.etf";
-            this._laboratoryTestTable.RowSwipingEnabled = true;
-            this._laboratoryTestTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._laboratoryTestTable.Size = new System.Drawing.Size(585, 86);
-            this._laboratoryTestTable.TabIndex = 1;
-            // 
-            // _testName
-            // 
-            this._testName.AttributeName = "Name";
-            this._testName.AutoUpdateQuery = resources.GetString("_testName.AutoUpdateQuery");
-            this._testName.HeaderText = "Order Name";
-            this._testName.Name = "_testName";
-            this._testName.ValidationErrorMessage = "Order name is not recognized.";
-            this._testName.ValidationQuery = resources.GetString("_testName.ValidationQuery");
-            // 
-            // _orderCode
-            // 
-            this._orderCode.AttributeName = "OrderCode";
-            this._orderCode.AutoUpdateQuery = "<SQL>SELECT Code FROM LabOrder WHERE Name = SUBSTRING(<Attribute>../Name</Attribu" +
-    "te>,1,50)</SQL>";
-            this._orderCode.FillWeight = 25F;
-            this._orderCode.HeaderText = "Code";
-            this._orderCode.Name = "_orderCode";
-            this._orderCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderCode.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
-            this._orderCode.ValidationErrorMessage = "Order code is not recognized";
-            this._orderCode.ValidationQuery = "<SQL>SELECT Code FROM LabOrder WHERE Code IS NOT NULL ORDER BY Code</SQL>";
-            // 
-            // _testID
-            // 
-            this._testID.AttributeName = "EpicCode";
-            this._testID.AutoUpdateQuery = "<SQL>SELECT EpicCode FROM LabOrder WHERE Name = SUBSTRING(<Attribute>../Name</Att" +
-    "ribute>,1,50)</SQL>";
-            this._testID.FillWeight = 1F;
-            this._testID.HeaderText = "Epic Code";
-            this._testID.Name = "_testID";
-            this._testID.TabStopMode = Extract.DataEntry.TabStopMode.Never;
-            this._testID.ValidationErrorMessage = "Order code is not recognized.";
-            this._testID.ValidationQuery = "";
-            this._testID.Visible = false;
-            // 
-            // _componentDate
-            // 
-            this._componentDate.AttributeName = "CollectionDate";
-            this._componentDate.FillWeight = 60F;
-            this._componentDate.FormattingRuleFile = "Rules\\Swiping\\CollectionDate.rsd.etf";
-            this._componentDate.HeaderText = "Collection Date";
-            this._componentDate.Name = "_componentDate";
-            this._componentDate.ValidationErrorMessage = "Collection date must be a valid date formatted MM/DD/YYYY";
-            this._componentDate.ValidationPattern = "(^$)|(^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(19|20)\\d{2}$)";
-            this._componentDate.Visible = false;
-            // 
-            // _laboratoryTestTime
-            // 
-            this._laboratoryTestTime.AttributeName = "CollectionTime";
-            this._laboratoryTestTime.AutoUpdateQuery = "<Query Default=\'1\'>0:00</Query>";
-            this._laboratoryTestTime.FillWeight = 60F;
-            this._laboratoryTestTime.FormattingRuleFile = "Rules\\Swiping\\CollectionTime.rsd.etf";
-            this._laboratoryTestTime.HeaderText = "Collection Time";
-            this._laboratoryTestTime.Name = "_laboratoryTestTime";
-            this._laboratoryTestTime.ValidationErrorMessage = "Collection time must be a valid time formatted HH:MM";
-            this._laboratoryTestTime.ValidationPattern = "(^$)|(^((0?[0-9])|(1[0-9])|(2[0-3])):[0-5][0-9]$)";
-            this._laboratoryTestTime.Visible = false;
             // 
             // _labIDLabel
             // 
@@ -362,9 +266,6 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             | System.Windows.Forms.AnchorStyles.Right)));
             this._patientInfoGroupBox.AttributeName = "PatientInfo";
             this._patientInfoGroupBox.Controls.Add(this._patientNameTable);
-            this._patientInfoGroupBox.Controls.Add(this._patientGender);
-            this._patientInfoGroupBox.Controls.Add(this._patientBirthDate);
-            this._patientInfoGroupBox.Controls.Add(this._birthDateLabel);
             this._patientInfoGroupBox.Controls.Add(this._patientRecordNum);
             this._patientInfoGroupBox.Controls.Add(this._patientMRLabel);
             this._patientInfoGroupBox.Location = new System.Drawing.Point(0, 79);
@@ -400,7 +301,7 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._patientNameTable.RowFormattingRuleFile = "Rules\\Swiping\\name.rsd.etf";
             this._patientNameTable.RowSwipingEnabled = true;
             this._patientNameTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this._patientNameTable.Size = new System.Drawing.Size(568, 46);
+            this._patientNameTable.Size = new System.Drawing.Size(586, 46);
             this._patientNameTable.TabIndex = 1;
             // 
             // _patientFirstNameColumn
@@ -438,60 +339,22 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._patientSuffixColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this._patientSuffixColumn.ValidationErrorMessage = "";
             // 
-            // _patientGender
-            // 
-            this._patientGender.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._patientGender.AttributeName = "Gender";
-            this._patientGender.Location = new System.Drawing.Point(250, 68);
-            this._patientGender.Name = "_patientGender";
-            this._patientGender.ParentDataEntryControl = this._patientInfoGroupBox;
-            this._patientGender.Size = new System.Drawing.Size(23, 21);
-            this._patientGender.TabIndex = 3;
-            this._patientGender.ValidationErrorMessage = "Specify \"M\" for male, \"F\" for female or \"U\" for unknown";
-            this._patientGender.ValidationQuery = "[BLANK]\r\n<SQL>SELECT * FROM Gender</SQL>";
-            this._patientGender.Visible = false;
-            // 
-            // _patientBirthDate
-            // 
-            this._patientBirthDate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._patientBirthDate.AttributeName = "DOB";
-            this._patientBirthDate.Location = new System.Drawing.Point(6, 84);
-            this._patientBirthDate.Name = "_patientBirthDate";
-            this._patientBirthDate.ParentDataEntryControl = this._patientInfoGroupBox;
-            this._patientBirthDate.Size = new System.Drawing.Size(253, 20);
-            this._patientBirthDate.TabIndex = 2;
-            this._patientBirthDate.ValidationErrorMessage = "Date of birth must be a valid date in the format MM/DD/YYYY";
-            this._patientBirthDate.ValidationPattern = "(^$)|(^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(18|19|20)\\d{2}" +
-    "$)";
-            // 
-            // _birthDateLabel
-            // 
-            this._birthDateLabel.AutoSize = true;
-            this._birthDateLabel.Location = new System.Drawing.Point(4, 68);
-            this._birthDateLabel.Name = "_birthDateLabel";
-            this._birthDateLabel.Size = new System.Drawing.Size(66, 13);
-            this._birthDateLabel.TabIndex = 0;
-            this._birthDateLabel.Text = "Date of Birth";
-            // 
             // _patientRecordNum
             // 
-            this._patientRecordNum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._patientRecordNum.AttributeName = "MR_Number";
             this._patientRecordNum.ClearClipboardOnPaste = true;
-            this._patientRecordNum.Location = new System.Drawing.Point(279, 84);
+            this._patientRecordNum.Location = new System.Drawing.Point(5, 87);
             this._patientRecordNum.Name = "_patientRecordNum";
             this._patientRecordNum.ParentDataEntryControl = this._patientInfoGroupBox;
-            this._patientRecordNum.Size = new System.Drawing.Size(294, 20);
+            this._patientRecordNum.Size = new System.Drawing.Size(188, 20);
             this._patientRecordNum.TabIndex = 4;
             this._patientRecordNum.ValidationErrorMessage = "Invalid medical record number";
             this._patientRecordNum.ValidationPattern = "(?i)^[MZ]?\\d+\\s?$";
             // 
             // _patientMRLabel
             // 
-            this._patientMRLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._patientMRLabel.AutoSize = true;
-            this._patientMRLabel.Location = new System.Drawing.Point(276, 68);
+            this._patientMRLabel.Location = new System.Drawing.Point(2, 71);
             this._patientMRLabel.Name = "_patientMRLabel";
             this._patientMRLabel.Size = new System.Drawing.Size(92, 13);
             this._patientMRLabel.TabIndex = 0;
@@ -535,7 +398,6 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             | System.Windows.Forms.AnchorStyles.Right)));
             this._orderNumber.AttributeName = "OrderNumber";
             this._orderNumber.ClearClipboardOnPaste = true;
-            this._orderNumber.FormattingRuleFile = "Rules\\Swiping\\ResultDate.rsd.etf";
             this._orderNumber.Location = new System.Drawing.Point(7, 32);
             this._orderNumber.Name = "_orderNumber";
             this._orderNumber.ParentDataEntryControl = this._laboratoryTestTable;
@@ -601,7 +463,6 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._testsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._testsGroupBox.Controls.Add(this._laboratoryTestTable);
-            this._testsGroupBox.Controls.Add(this._physicianInfoGroupBox);
             this._testsGroupBox.Location = new System.Drawing.Point(0, 196);
             this._testsGroupBox.Name = "_testsGroupBox";
             this._testsGroupBox.Size = new System.Drawing.Size(593, 113);
@@ -676,92 +537,63 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._messageSequenceNumberFile.ValidationErrorMessage = "Invalid value";
             this._messageSequenceNumberFile.Visible = false;
             // 
-            // _physicianInfoGroupBox
+            // _testID
             // 
-            this._physicianInfoGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this._testID.AttributeName = "EpicCode";
+            this._testID.AutoUpdateQuery = "<SQL>SELECT EpicCode FROM LabOrder WHERE Name = SUBSTRING(<Attribute>../Name</Att" +
+    "ribute>,1,50)</SQL>";
+            this._testID.FillWeight = 1F;
+            this._testID.HeaderText = "Epic Code";
+            this._testID.Name = "_testID";
+            this._testID.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this._testID.ValidationErrorMessage = "Order code is not recognized.";
+            this._testID.ValidationQuery = "";
+            this._testID.Visible = false;
+            // 
+            // _orderCode
+            // 
+            this._orderCode.AttributeName = "OrderCode";
+            this._orderCode.AutoUpdateQuery = "<SQL>SELECT Code FROM LabOrder WHERE Name = SUBSTRING(<Attribute>../Name</Attribu" +
+    "te>,1,50)</SQL>";
+            this._orderCode.FillWeight = 25F;
+            this._orderCode.HeaderText = "Code";
+            this._orderCode.Name = "_orderCode";
+            this._orderCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._orderCode.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
+            this._orderCode.ValidationErrorMessage = "Order code is not recognized";
+            this._orderCode.ValidationQuery = "<SQL>SELECT Code FROM LabOrder WHERE Code IS NOT NULL ORDER BY Code</SQL>";
+            // 
+            // _testName
+            // 
+            this._testName.AttributeName = "Name";
+            this._testName.AutoUpdateQuery = resources.GetString("_testName.AutoUpdateQuery");
+            this._testName.HeaderText = "Order Name";
+            this._testName.Name = "_testName";
+            this._testName.ValidationErrorMessage = "Order name is not recognized.";
+            this._testName.ValidationQuery = resources.GetString("_testName.ValidationQuery");
+            // 
+            // _laboratoryTestTable
+            // 
+            this._laboratoryTestTable.AllowDrop = true;
+            this._laboratoryTestTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._physicianInfoGroupBox.AttributeName = "PhysicianInfo";
-            this._physicianInfoGroupBox.Controls.Add(this._orderingPhysicianTable);
-            this._physicianInfoGroupBox.Location = new System.Drawing.Point(3, 0);
-            this._physicianInfoGroupBox.Name = "_physicianInfoGroupBox";
-            this._physicianInfoGroupBox.ParentDataEntryControl = null;
-            this._physicianInfoGroupBox.Size = new System.Drawing.Size(10, 16);
-            this._physicianInfoGroupBox.TabIndex = 6;
-            this._physicianInfoGroupBox.TabStop = false;
-            this._physicianInfoGroupBox.Text = "Ordering Physician";
-            this._physicianInfoGroupBox.Visible = false;
-            // 
-            // _orderingPhysicianCodeColumn
-            // 
-            this._orderingPhysicianCodeColumn.AttributeName = "Code";
-            this._orderingPhysicianCodeColumn.AutoUpdateQuery = "";
-            this._orderingPhysicianCodeColumn.FillWeight = 30F;
-            this._orderingPhysicianCodeColumn.HeaderText = "Code";
-            this._orderingPhysicianCodeColumn.Name = "_orderingPhysicianCodeColumn";
-            this._orderingPhysicianCodeColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderingPhysicianCodeColumn.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
-            this._orderingPhysicianCodeColumn.ValidationErrorMessage = "";
-            this._orderingPhysicianCodeColumn.ValidationQuery = "";
-            // 
-            // _orderingPhysicianMiddleName
-            // 
-            this._orderingPhysicianMiddleName.AttributeName = "Middle";
-            this._orderingPhysicianMiddleName.AutoUpdateQuery = "";
-            this._orderingPhysicianMiddleName.FillWeight = 50F;
-            this._orderingPhysicianMiddleName.HeaderText = "Middle Name";
-            this._orderingPhysicianMiddleName.Name = "_orderingPhysicianMiddleName";
-            this._orderingPhysicianMiddleName.ValidationErrorMessage = "";
-            this._orderingPhysicianMiddleName.ValidationQuery = "";
-            // 
-            // _orderingPhysicianFirstNameColumn
-            // 
-            this._orderingPhysicianFirstNameColumn.AttributeName = "First";
-            this._orderingPhysicianFirstNameColumn.AutoUpdateQuery = "";
-            this._orderingPhysicianFirstNameColumn.FillWeight = 75F;
-            this._orderingPhysicianFirstNameColumn.HeaderText = "First Name";
-            this._orderingPhysicianFirstNameColumn.Name = "_orderingPhysicianFirstNameColumn";
-            this._orderingPhysicianFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderingPhysicianFirstNameColumn.ValidationErrorMessage = "";
-            this._orderingPhysicianFirstNameColumn.ValidationQuery = "";
-            // 
-            // _orderingPhysicianLastNameColumn
-            // 
-            this._orderingPhysicianLastNameColumn.AttributeName = "Last";
-            this._orderingPhysicianLastNameColumn.AutoUpdateQuery = "";
-            this._orderingPhysicianLastNameColumn.HeaderText = "Last Name";
-            this._orderingPhysicianLastNameColumn.Name = "_orderingPhysicianLastNameColumn";
-            this._orderingPhysicianLastNameColumn.ValidationErrorMessage = "";
-            this._orderingPhysicianLastNameColumn.ValidationQuery = "";
-            // 
-            // _orderingPhysicianTable
-            // 
-            this._orderingPhysicianTable.AllowDrop = true;
-            this._orderingPhysicianTable.AllowTabbingByRow = true;
-            this._orderingPhysicianTable.AllowUserToAddRows = false;
-            this._orderingPhysicianTable.AllowUserToDeleteRows = false;
-            this._orderingPhysicianTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._orderingPhysicianTable.AttributeName = "OrderingPhysicianName";
-            this._orderingPhysicianTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this._orderingPhysicianTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
-            this._orderingPhysicianTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this._orderingPhysicianTable.ColumnHintsEnabled = false;
-            this._orderingPhysicianTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this._orderingPhysicianLastNameColumn,
-            this._orderingPhysicianFirstNameColumn,
-            this._orderingPhysicianMiddleName,
-            this._orderingPhysicianCodeColumn});
-            this._orderingPhysicianTable.CompatibleAttributeNames.Add("OtherPhysicianName");
-            this._orderingPhysicianTable.Location = new System.Drawing.Point(6, 19);
-            this._orderingPhysicianTable.MinimumNumberOfRows = 1;
-            this._orderingPhysicianTable.Name = "_orderingPhysicianTable";
-            this._orderingPhysicianTable.ParentDataEntryControl = this._physicianInfoGroupBox;
-            this._orderingPhysicianTable.RowFormattingRuleFile = "Rules\\Swiping\\name.rsd.etf";
-            this._orderingPhysicianTable.RowSwipingEnabled = true;
-            this._orderingPhysicianTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this._orderingPhysicianTable.Size = new System.Drawing.Size(2, 45);
-            this._orderingPhysicianTable.TabIndex = 1;
-            this._orderingPhysicianTable.TabStop = false;
+            this._laboratoryTestTable.AttributeName = "Test";
+            this._laboratoryTestTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this._laboratoryTestTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
+            this._laboratoryTestTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this._laboratoryTestTable.ColumnHintsEnabled = false;
+            this._laboratoryTestTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this._testName,
+            this._orderCode,
+            this._testID});
+            this._laboratoryTestTable.Location = new System.Drawing.Point(6, 19);
+            this._laboratoryTestTable.Name = "_laboratoryTestTable";
+            this._laboratoryTestTable.ParentDataEntryControl = null;
+            this._laboratoryTestTable.RowFormattingRuleFile = "Rules\\Swiping\\TestRow.rsd.etf";
+            this._laboratoryTestTable.RowSwipingEnabled = true;
+            this._laboratoryTestTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._laboratoryTestTable.Size = new System.Drawing.Size(585, 86);
+            this._laboratoryTestTable.TabIndex = 1;
             // 
             // HealthNetworkLabsPanel
             // 
@@ -787,7 +619,6 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this.MinimumSize = new System.Drawing.Size(500, 0);
             this.Name = "HealthNetworkLabsPanel";
             this.Size = new System.Drawing.Size(593, 963);
-            ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).EndInit();
             this._patientInfoGroupBox.ResumeLayout(false);
             this._patientInfoGroupBox.PerformLayout();
@@ -795,8 +626,7 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._testDetailsGroupBox.ResumeLayout(false);
             this._testDetailsGroupBox.PerformLayout();
             this._testsGroupBox.ResumeLayout(false);
-            this._physicianInfoGroupBox.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this._orderingPhysicianTable)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -804,16 +634,12 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
 
         #endregion
 
-        private Extract.DataEntry.DataEntryTable _laboratoryTestTable;
         private Extract.DataEntry.DataEntryTable _testComponentTable;
         private System.Windows.Forms.Label _labIDLabel;
         private Extract.DataEntry.DataEntryTextBox _labID;
         private Extract.DataEntry.DataEntryGroupBox _patientInfoGroupBox;
         private System.Windows.Forms.Label _patientMRLabel;
         private Extract.DataEntry.DataEntryTextBox _patientRecordNum;
-        private Extract.DataEntry.DataEntryTextBox _patientBirthDate;
-        private System.Windows.Forms.Label _birthDateLabel;
-        private Extract.DataEntry.DataEntryComboBox _patientGender;
         private System.Windows.Forms.GroupBox _testDetailsGroupBox;
         private System.Windows.Forms.GroupBox _testsGroupBox;
         private System.Windows.Forms.Label _testCommentLabel;
@@ -843,16 +669,9 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
         private DataEntryTableColumn _componentFlag;
         private DataEntryTableColumn _componentCorrectFlag;
         private DataEntryTableColumn _componentOriginalName;
+        private DataEntryTable _laboratoryTestTable;
         private DataEntryTableColumn _testName;
         private DataEntryTableColumn _orderCode;
         private DataEntryTableColumn _testID;
-        private DataEntryTableColumn _componentDate;
-        private DataEntryTableColumn _laboratoryTestTime;
-        private DataEntryGroupBox _physicianInfoGroupBox;
-        private DataEntryTable _orderingPhysicianTable;
-        private DataEntryTableColumn _orderingPhysicianLastNameColumn;
-        private DataEntryTableColumn _orderingPhysicianFirstNameColumn;
-        private DataEntryTableColumn _orderingPhysicianMiddleName;
-        private DataEntryTableColumn _orderingPhysicianCodeColumn;
     }
 }
