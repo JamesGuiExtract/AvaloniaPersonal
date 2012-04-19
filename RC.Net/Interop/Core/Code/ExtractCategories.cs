@@ -50,6 +50,16 @@ namespace Extract.Interop
         public static readonly string DatabaseManagersName = "Extract FAM Product Specific DB Managers";
 
         /// <summary>
+        /// GUID for .NET database managers
+        /// </summary>
+        public static readonly string NetDatabaseManagersGuid = "{194A6EA4-8676-46AE-BFAD-3C9AED12E92D}";
+
+        /// <summary>
+        /// Name for .NET database managers
+        /// </summary>
+        public static readonly string NetDatabaseManagersName = "Extract NET FAM Product Specific DB Managers";
+
+        /// <summary>
         /// GUID for data scorers
         /// </summary>
         public static readonly string DataScorersGuid = "{54FF3F6D-BCE2-49D5-9D53-420CE7A00E59}";

@@ -145,7 +145,10 @@ LRESULT CManageTagsTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 
 		// Create a database manager object so that we can retrieve
 		// the tags stored in the database
-		IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
+		IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI34518", ipFAMDBUtils != __nullptr);
+
+		IFileProcessingDBPtr ipDB(ipFAMDBUtils->GetFAMDBProgId().operator LPCSTR());
 		ASSERT_RESOURCE_ALLOCATION("ELI27501", ipDB != __nullptr);
 
 		// Connect database using last used settings in this instance

@@ -59,7 +59,11 @@ BOOL CFAMDBAdminApp::InitInstance()
 {
 	// COM has to be initialized because the license management code uses
 	// COM objects (ExtractTRP)
-	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	//CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	// Changed this to COINIT_APARTMENTTHREADED to get eliminate the long delay when opening
+	// oracle database
+	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+
 
 	try
 	{
@@ -100,7 +104,12 @@ BOOL CFAMDBAdminApp::InitInstance()
 		//SetRegistryKey(_T("Local AppWizard-Generated Applications"));
 
 		// Create a database object
-		IFileProcessingDBPtr ipFAMDB(CLSID_FileProcessingDB);
+		IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI34528", ipFAMDBUtils != __nullptr);
+
+		string strProgID = ipFAMDBUtils->GetFAMDBProgId();
+	
+		IFileProcessingDBPtr ipFAMDB(strProgID.c_str());
 		ASSERT_RESOURCE_ALLOCATION("ELI17526", ipFAMDB != __nullptr);
 
 		// [LegacyRCAndUtils:6261]

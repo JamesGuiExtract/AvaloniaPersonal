@@ -156,7 +156,10 @@ namespace Extract.FileActionManager.Database
             try
             {
                 // Create the database connection and set the server and database name
-                FileProcessingDB db = new FileProcessingDB();
+                FAMDBUtils dbUtils = new FAMDBUtils();
+                Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
+                FileProcessingDB db = (FileProcessingDB)Activator.CreateInstance(mgrType);
+
                 db.DatabaseServer = _server;
                 db.DatabaseName = _database;
 
@@ -610,7 +613,9 @@ namespace Extract.FileActionManager.Database
                 }
 
                 // Connect to the database and update the settings
-                FileProcessingDB db = new FileProcessingDB();
+                FAMDBUtils dbUtils = new FAMDBUtils();
+                Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
+                FileProcessingDB db = (FileProcessingDB)Activator.CreateInstance(mgrType);
                 db.DatabaseServer = _server;
                 db.DatabaseName = _database;
                 db.ResetDBConnection();

@@ -170,7 +170,7 @@ namespace Extract.ExceptionHelper
                 // Load the exception from disk
                 string hexException = File.ReadAllText(fileName);
                 Exception exception;
-                if (hexException.StartsWith(_EXTRACT_EXCEPTION_SIGNATURE))
+                if (hexException.StartsWith(_EXTRACT_EXCEPTION_SIGNATURE, StringComparison.OrdinalIgnoreCase))
                 {
                    exception = ExtractException.FromStringizedByteStream("ELI34457", hexException);
                 }

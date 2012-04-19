@@ -97,6 +97,7 @@ STDAPI DllRegisterServer(void)
 	createCOMCategory(CATID_FP_FAM_CONDITIONS, FP_FAM_CONDITIONS_CATEGORYNAME);
 	createCOMCategory(CATID_FP_FAM_REPORTS, FP_FAM_REPORTS_CATEGORYNAME);
 	createCOMCategory(CATID_FP_FAM_PRODUCT_SPECIFIC_DB_MGRS, FP_FAM_PRODUCT_SPECIFIC_DB_MGRS);
+	createCOMCategory(CATID_FP_NET_FAM_PRODUCT_SPECIFIC_DB_MGRS, FP_NET_FAM_PRODUCT_SPECIFIC_DB_MGRS);
     // registers object, typelib and all interfaces in typelib
     return _Module.RegisterServer(TRUE);
 }

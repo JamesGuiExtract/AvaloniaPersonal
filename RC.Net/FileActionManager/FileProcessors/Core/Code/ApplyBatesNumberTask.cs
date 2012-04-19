@@ -123,7 +123,10 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 // Get a db manager and connect to the database
-                FileProcessingDBClass databaseManager = new FileProcessingDBClass();
+                FAMDBUtils dbUtils = new FAMDBUtils();
+                Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
+                IFileProcessingDB databaseManager = (IFileProcessingDB)Activator.CreateInstance(mgrType);
+
                 databaseManager.ConnectLastUsedDBThisProcess();
 
                 // Create a new BatesNumberGenerator
@@ -173,7 +176,10 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 // Get a db manager and connect to the database
-                FileProcessingDBClass databaseManager = new FileProcessingDBClass();
+                FAMDBUtils dbUtils = new FAMDBUtils();
+                Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
+                FileProcessingDB databaseManager = (FileProcessingDB)Activator.CreateInstance(mgrType);
+                
                 databaseManager.ConnectLastUsedDBThisProcess();
 
                 // Create a FAM tag manager to check the file name tags

@@ -1550,6 +1550,24 @@ library UCLID_FILEPROCESSINGLib
 		[id(1), helpstring("method PromptForActionSelection")] HRESULT PromptForActionSelection(
 			[in]IFileProcessingDB* pDB, [in] BSTR strTitle, [in] BSTR strPrompt, 
 			[in]VARIANT_BOOL vbAllowTags, [out, retval] BSTR* pActionName);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the ProgID of the FAM Database type to be used
+		// NOTE: There is a .net type that support Oracle and the cpp type that supports SQL Server
+		//		 the type is determined by the registry key:
+		//			HKCU\Extract Systems\ReusableComponents\COMComponents\UCLIDFileProcessing\FileProcessingDB\DBManagerType
+		[id(2), helpstring("method GetFAMDBProgId")] HRESULT GetFAMDBProgId([out, retval] BSTR *pProgID);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the ProgID of the IDShield Product Specific Database type to be used
+		// NOTE: There is a .net type that support Oracle and the cpp type that supports SQL Server
+		//		 the type is determined by the registry key:
+		//			HKCU\Extract Systems\ReusableComponents\COMComponents\UCLIDFileProcessing\FileProcessingDB\DBManagerType
+		[id(3), helpstring("method GetIDShieldDBProgId")] HRESULT GetIDShieldDBProgId([out, retval] BSTR *pProgID);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the ProgID of the Data Entry Product Specific Database type to be used
+		// NOTE: There is a .net type that support Oracle and the cpp type that supports SQL Server
+		//		 the type is determined by the registry key:
+		//			HKCU\Extract Systems\ReusableComponents\COMComponents\UCLIDFileProcessing\FileProcessingDB\DBManagerType
+		[id(4), helpstring("method GetDataEntryDBProgId")] HRESULT GetDataEntryDBProgId([out, retval] BSTR *pProgID);
 	};
 	[
 		object,

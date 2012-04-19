@@ -1303,7 +1303,10 @@ UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFileProcessingManager::getFPMDB()
 	if ( m_ipFPMDB == __nullptr )
 	{
 		// Create the FPM Database object
-		m_ipFPMDB.CreateInstance(CLSID_FileProcessingDB);
+		UCLID_FILEPROCESSINGLib::IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI34527", ipFAMDBUtils != __nullptr);
+	
+		m_ipFPMDB.CreateInstance(ipFAMDBUtils->GetFAMDBProgId().operator LPCSTR());
 		ASSERT_RESOURCE_ALLOCATION("ELI13982", m_ipFPMDB != __nullptr );
 
 		// Tell the Record Manager about the database

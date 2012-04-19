@@ -45,6 +45,7 @@ const string FileProcessingConfigMgr::LAST_GOOD_SERVER = "LastGoodServer";
 const string FileProcessingConfigMgr::LAST_GOOD_DATABASE = "LastGoodDatabase";
 const string FileProcessingConfigMgr::USE_PRE_NORMALIZED = "UsePreNormalized";
 const string FileProcessingConfigMgr::AUTO_SAVE_FPS_FILE = "AutoSaveFPS";
+const string FileProcessingConfigMgr::DB_MANAGER_TYPE = "DBManagerType";
 
 const string FileProcessingConfigMgr::DEFAULT_WINDOW_POS_X = "10";
 const string FileProcessingConfigMgr::DEFAULT_WINDOW_POS_Y = "10";
@@ -67,6 +68,7 @@ const string FileProcessingConfigMgr::DEFAULT_LAST_GOOD_SERVER = "0";
 const string FileProcessingConfigMgr::DEFAULT_LAST_GOOD_DATABASE = "0";
 const string FileProcessingConfigMgr::DEFAULT_USE_PRE_NORMALIZED = "1";
 const string FileProcessingConfigMgr::DEFAULT_AUTO_SAVE_FPS_FILE = "0";
+const string FileProcessingConfigMgr::DEFAULT_DB_MANAGER_TYPE = "CPP";
 
 // Minimum width and height for the dialog
 const int FileProcessingConfigMgr::DLG_MIN_WIDTH = 380;
@@ -637,6 +639,22 @@ bool FileProcessingConfigMgr::getAutoSaveFPSOnRun()
 void FileProcessingConfigMgr::setAutoSaveFPSOnRun(bool bAutoSave)
 {
 	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, AUTO_SAVE_FPS_FILE, bAutoSave ? "1" : "0");
+}
+//-------------------------------------------------------------------------------------------------
+string FileProcessingConfigMgr::getDBManagerType()
+{
+	if (!m_apHKCU->keyExists(gstrFP_DB_REGISTRY_PATH, DB_MANAGER_TYPE))
+	{
+		m_apHKCU->setKeyValue(gstrFP_DB_REGISTRY_PATH, DB_MANAGER_TYPE, DEFAULT_DB_MANAGER_TYPE);
+		return DEFAULT_DB_MANAGER_TYPE;
+	}
+	return m_apHKCU->getKeyValue(gstrFP_DB_REGISTRY_PATH, DB_MANAGER_TYPE,
+		DEFAULT_DB_MANAGER_TYPE);
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingConfigMgr::setDBManagerType(const string& strDBManagerType)
+{
+	m_apHKCU->setKeyValue(gstrFP_DB_REGISTRY_PATH, DEFAULT_DB_MANAGER_TYPE, strDBManagerType);
 }
 
 //-------------------------------------------------------------------------------------------------

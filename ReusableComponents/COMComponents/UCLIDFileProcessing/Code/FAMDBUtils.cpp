@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "FAMDBUtils.h"
 #include "SelectActionDlg.h"
+#include "FileProcessingConfigMgr.h"
 
 #include <TemporaryResourceOverride.h>
 #include <UCLIDException.h>
@@ -73,6 +74,66 @@ STDMETHODIMP CFAMDBUtils::PromptForActionSelection(IFileProcessingDB* pDB, BSTR 
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14693");
 
 	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMDBUtils::GetFAMDBProgId(BSTR *pProgID)
+{
+	try
+	{
+		FileProcessingConfigMgr configMgr;
+		string strMgrType = configMgr.getDBManagerType();
+		makeLowerCase(strMgrType);
+		string strProgID = "UCLIDFileProcessing.FileProcessingDB.1";
+
+		if (strMgrType == ".net")
+		{
+			strProgID = "Extract.FileActionManager.Database.FAMDatabaseManager";
+		}
+
+		*pProgID = get_bstr_t(strProgID.c_str()).Detach();
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34519");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMDBUtils::GetIDShieldDBProgId(BSTR *pProgID)
+{
+	try
+	{
+		FileProcessingConfigMgr configMgr;
+		string strMgrType = configMgr.getDBManagerType();
+		makeLowerCase(strMgrType);
+		string strProgID = "RedactionCustomComponents.IDShieldProductDBMgr.1";
+
+		if (strMgrType == ".net")
+		{
+			strProgID = "Extract.Redaction.Database.IDShieldDatabaseManager";
+		}
+		
+		*pProgID = get_bstr_t(strProgID.c_str()).Detach();
+				return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34520");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMDBUtils::GetDataEntryDBProgId(BSTR *pProgID)
+{
+	try
+	{
+		FileProcessingConfigMgr configMgr;
+		string strMgrType = configMgr.getDBManagerType();
+		makeLowerCase(strMgrType);
+		string strProgID = "DataEntryCustomComponents.DataEntryProductDBMgr.1";
+
+		if (strMgrType == ".net")
+		{
+			strProgID = "Extract.DataEntry.Database.DataEntryDatabaseManager";
+		}
+
+		*pProgID = get_bstr_t(strProgID.c_str()).Detach();
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34521");
 }
 
 //-------------------------------------------------------------------------------------------------

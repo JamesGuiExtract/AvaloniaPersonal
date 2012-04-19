@@ -73,7 +73,10 @@ LRESULT CTagConditionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 		m_cmbAnyAll.InsertString(giANY_TAGS, "any");
 		m_cmbAnyAll.InsertString(giALL_TAGS, "all");
 
-		IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
+		// Get Database manager
+		IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI34530", ipFAMDBUtils != __nullptr);
+		IFileProcessingDBPtr ipDB(ipFAMDBUtils->GetFAMDBProgId().operator LPCSTR());
 		ASSERT_RESOURCE_ALLOCATION("ELI27568", ipDB != __nullptr);
 
 		// Connect to the last used DB

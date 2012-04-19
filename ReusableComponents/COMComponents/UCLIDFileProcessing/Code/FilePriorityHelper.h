@@ -42,7 +42,10 @@ static string getPriorityString(UCLID_FILEPROCESSINGLib::EFilePriority ePriority
 				smapPriorityToString.clear();
 
 				// Get a DB pointer
-				UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
+				UCLID_FILEPROCESSINGLib::IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);	
+				ASSERT_RESOURCE_ALLOCATION("ELI34524", ipFAMDBUtils != __nullptr);
+	
+				UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB((LPCSTR)ipFAMDBUtils->GetFAMDBProgId());
 				ASSERT_RESOURCE_ALLOCATION("ELI27633", ipDB != __nullptr);
 
 				// Get the priorities
@@ -100,7 +103,10 @@ static UCLID_FILEPROCESSINGLib::EFilePriority getPriorityFromString(const string
 				smapStringToPriority.clear();
 
 				// Get a DB pointer
-				UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
+				UCLID_FILEPROCESSINGLib::IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
+				ASSERT_RESOURCE_ALLOCATION("ELI34525", ipFAMDBUtils != __nullptr);
+	
+				UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB((LPCSTR)ipFAMDBUtils->GetFAMDBProgId());
 				ASSERT_RESOURCE_ALLOCATION("ELI27660", ipDB != __nullptr);
 
 				// Get the priorities
@@ -165,7 +171,10 @@ static void getPrioritiesVector(vector<string>& rvecPriorities)
 				svecPriorities.clear();
 
 				// Get a DB pointer
-				UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
+				UCLID_FILEPROCESSINGLib::IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
+				ASSERT_RESOURCE_ALLOCATION("ELI34526", ipFAMDBUtils != __nullptr);
+	
+				UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB((LPCSTR)ipFAMDBUtils->GetFAMDBProgId());
 				ASSERT_RESOURCE_ALLOCATION("ELI27665", ipDB != __nullptr);
 
 				// Get the priorities

@@ -2545,7 +2545,10 @@ UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr CRedactionTask::get
 {
     if (m_ipIDShieldDB == __nullptr)
     {
-        m_ipIDShieldDB.CreateInstance(CLSID_IDShieldProductDBMgr);
+		IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI34552", ipFAMDBUtils != __nullptr);
+		
+        m_ipIDShieldDB.CreateInstance((LPCSTR)ipFAMDBUtils->GetIDShieldDBProgId());
         ASSERT_RESOURCE_ALLOCATION("ELI19794", m_ipIDShieldDB != __nullptr);		
     }
     return m_ipIDShieldDB;

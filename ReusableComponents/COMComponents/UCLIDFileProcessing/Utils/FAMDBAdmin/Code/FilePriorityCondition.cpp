@@ -61,7 +61,11 @@ string FilePriorityCondition::buildQuery(const IFileProcessingDBPtr& ipFAMDB, co
 void FilePriorityCondition::setPriority(EFilePriority ePriority)
 {
 	m_ePriority = ePriority;
-	IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
+
+	// Create a database object
+	IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
+	ASSERT_RESOURCE_ALLOCATION("ELI34529", ipFAMDBUtils != __nullptr);
+	IFileProcessingDBPtr ipDB(ipFAMDBUtils->GetFAMDBProgId().operator LPCSTR());
 	ASSERT_RESOURCE_ALLOCATION("ELI33804", ipDB != __nullptr);
 	m_strPriority = asString(ipDB->AsPriorityString(ePriority));
 }

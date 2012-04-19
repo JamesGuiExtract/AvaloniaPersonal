@@ -52,6 +52,9 @@ const string gstrFAST_TOTAL_FAMFILE_QUERY = "SELECT SUM (row_count) AS " + gstrT
 const string gstrSTANDARD_TOTAL_FAMFILE_QUERY = "SELECT COUNT(*) AS " + gstrTOTAL_FILECOUNT_FIELD +
 	" FROM [FAMFile]";
 
+const string gstrSTANDARD_TOTAL_FAMFILE_QUERY_ORACLE = "SELECT COUNT(*) AS \"" + 
+	gstrTOTAL_FILECOUNT_FIELD + "\" FROM \"FAMFile\"";
+
 // Query to retrieve the last 1000 exceptions for failed files on the specified action.
 const string gstrFAILED_FILES_EXCEPTIONS_QUERY =
 	"SELECT TOP 1000 MachineName, UserName, DateTimeStamp, Exception FROM FAMFile"
@@ -71,6 +74,29 @@ const string gstrFAILED_FILES_EXCEPTIONS_QUERY =
 	"		AND FileActionStateTransition.Exception IS NOT NULL"
 	"	ORDER BY DateTimeStamp DESC";
 
+const string gstrFAILED_FILES_EXCEPTIONS_QUERY_ORACLE = 
+	"SELECT  \"MachineName\", \"UserName\", \"DateTimeStamp\", \"Exception\" FROM"
+	"(SELECT  \"MachineName\", \"UserName\", \"DateTimeStamp\", \"Exception\",  "
+	"		RANK() OVER (ORDER BY \"DateTimeStamp\" DESC) TimeRank"
+	"	FROM \"FAMFile\""
+	"	INNER JOIN \"FileActionStatus\" ON \"FAMFile\".\"ID\" = \"FileActionStatus\".\"FileID\""
+	"	INNER JOIN \"FileActionStateTransition\""
+	"		ON \"FileActionStateTransition\".\"ID\" ="
+	"		("
+	"			SELECT MAX(\"ID\") FROM \"FileActionStateTransition\""
+	"				WHERE \"FAMFile\".\"ID\" = \"FileActionStateTransition\".\"FileID\""
+	"					AND \"ActionID\" = <ActionID>"
+	"		)"
+	"	INNER JOIN \"Machine\" ON \"FileActionStateTransition\".\"MachineID\" = \"Machine\".\"ID\""
+	"	INNER JOIN \"FAMUser\" ON \"FileActionStateTransition\".\"FAMUserID\" = \"FAMUser\".\"ID\""
+	"	WHERE \"FileActionStatus\".\"ActionStatus\" = 'F'"
+	"		AND \"FileActionStatus\".\"ActionID\" = <ActionID>"
+	"		AND \"FileActionStateTransition\".\"ASC_To\" = 'F'"
+	"		AND \"FileActionStateTransition\".\"Exception\" IS NOT NULL)"
+    "  WHERE TimeRank <= 1000"
+	"	ORDER BY \"DateTimeStamp\" DESC";
+
+
 //--------------------------------------------------------------------------------------------------
 // FAMDBAdminSummary dialog
 //--------------------------------------------------------------------------------------------------
@@ -82,7 +108,8 @@ CFAMDBAdminSummaryDlg::CFAMDBAdminSummaryDlg(void) :
 CPropertyPage(CFAMDBAdminSummaryDlg::IDD),
 m_ipFAMDB(NULL),
 m_bInitialized(false),
-m_bDeniedFastCountPermission(false)
+m_bDeniedFastCountPermission(false),
+m_bUseOracleSyntax(false)
 {
 	try
 	{
@@ -372,6 +399,10 @@ void CFAMDBAdminSummaryDlg::OnContextViewFailed()
 
 		// Build and execute the query to retrieve the exceptions
 		string strQuery = gstrFAILED_FILES_EXCEPTIONS_QUERY;
+		if (m_bUseOracleSyntax)
+		{
+			strQuery = gstrFAILED_FILES_EXCEPTIONS_QUERY_ORACLE;
+		}
 		replaceVariable(strQuery, "<ActionID>", asString(m_nContextMenuActionID));
 
 		_RecordsetPtr ipRecordSet = m_ipFAMDB->GetResultsForQuery(strQuery.c_str());
@@ -457,6 +488,13 @@ void CFAMDBAdminSummaryDlg::setFAMDatabase(IFileProcessingDBPtr ipFAMDB)
 {
 	ASSERT_ARGUMENT("ELI19805", ipFAMDB != __nullptr);
 	m_ipFAMDB = ipFAMDB;
+
+	// Need to determine the datatabase type being worked with
+	IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
+	ASSERT_RESOURCE_ALLOCATION("ELI34545", ipFAMDBUtils != __nullptr);
+
+	m_bUseOracleSyntax = asString(ipFAMDBUtils->GetFAMDBProgId()) == 
+		"Extract.FileActionManager.Database.FAMDatabaseManager";
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -535,65 +573,7 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 			nActionIDToRefresh = -1;
 		}
 
-		long long llFileCount = 0;
-		_RecordsetPtr ipRecordSet = __nullptr;
-
-		if (!m_bDeniedFastCountPermission)
-		{
-			try
-			{
-				try
-				{
-					// First attempt a fast query that requires permissions to query system views.
-					// FAMFile table
-					ipRecordSet = m_ipFAMDB->GetResultsForQuery(gstrFAST_TOTAL_FAMFILE_QUERY.c_str());
-					ASSERT_RESOURCE_ALLOCATION("ELI30525", ipRecordSet != __nullptr);
-				}
-				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34340");
-			}
-			catch (UCLIDException &ue)
-			{
-				// If there was an error unrelated to permissions, log it (don't throw in case there
-				// is still a chance it is related to permissions).
-				if (ue.getTopText().find("permission") == string::npos)
-				{
-					ue.log();
-				}
-				else
-				{
-					// Otherwise, log an app trace and use the slower file count query.
-					UCLIDException uexOuter("ELI34341", "Application trace: Insufficient database "
-						"permissions to use fast file count query; using slower version instead.",
-						ue);
-					uexOuter.log();
-				}
-
-				m_bDeniedFastCountPermission = true;
-			}
-		}
-
-		if (m_bDeniedFastCountPermission)
-		{
-			// If the user had insufficient permission for the fast query, use the standard query
-			// that will work for all db readers/writers.
-			ipRecordSet = m_ipFAMDB->GetResultsForQuery(gstrSTANDARD_TOTAL_FAMFILE_QUERY.c_str());
-			ASSERT_RESOURCE_ALLOCATION("ELI34342", ipRecordSet != __nullptr);
-		}
-
-		// there should only be 1 record returned
-		if (ipRecordSet->RecordCount == 1)
-		{
-			// get the file count (value type depends on which file count query executed.
-			llFileCount = m_bDeniedFastCountPermission
-				? (long long)getLongField(ipRecordSet->Fields, gstrTOTAL_FILECOUNT_FIELD)
-				: getLongLongField(ipRecordSet->Fields, gstrTOTAL_FILECOUNT_FIELD);
-
-			m_editFileTotal.SetWindowText(commaFormatNumber(llFileCount).c_str());
-		}
-		else
-		{
-			THROW_LOGIC_ERROR_EXCEPTION("ELI30526");
-		}
+		long long llFileCount = getTotalFileCount();
 
 		// get the list of actions from the database
 		IStrToStrMapPtr ipMapActions = m_ipFAMDB->GetActions();
@@ -633,6 +613,9 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 
 			ipActionStats->GetAllStatistics(&lTotal, &lPending, &lCompleted, &lFailed, &lSkipped,
 				NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+			long long llFileCount = getTotalFileCount();
+			m_editFileTotal.SetWindowText(commaFormatNumber(llFileCount).c_str());
 
 			// Calculate the processing and unattempted totals
 			long lProcessing = lTotal - (lPending + lCompleted + lSkipped + lFailed);
@@ -676,5 +659,78 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30527");
+}
+//--------------------------------------------------------------------------------------------------
+long long CFAMDBAdminSummaryDlg::getTotalFileCount()
+{
+	long long llFileCount = 0;
+
+	_RecordsetPtr ipRecordSet = __nullptr;
+
+	if (!m_bUseOracleSyntax && !m_bDeniedFastCountPermission)
+	{
+		try
+		{
+			try
+			{
+				// First attempt a fast query that requires permissions to query system views.
+				// FAMFile table
+				ipRecordSet = m_ipFAMDB->GetResultsForQuery(gstrFAST_TOTAL_FAMFILE_QUERY.c_str());
+				ASSERT_RESOURCE_ALLOCATION("ELI30525", ipRecordSet != __nullptr);
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34340");
+		}
+		catch (UCLIDException &ue)
+		{
+			// If there was an error unrelated to permissions, log it (don't throw in case there
+			// is still a chance it is related to permissions).
+			if (ue.getTopText().find("permission") == string::npos)
+			{
+				ue.log();
+			}
+			else
+			{
+				// Otherwise, log an app trace and use the slower file count query.
+				UCLIDException uexOuter("ELI34341", "Application trace: Insufficient database "
+					"permissions to use fast file count query; using slower version instead.",
+					ue);
+				uexOuter.log();
+			}
+
+			m_bDeniedFastCountPermission = true;
+		}
+	}
+
+	if (m_bUseOracleSyntax || m_bDeniedFastCountPermission)
+	{
+		// If the user had insufficient permission for the fast query, use the standard query
+		// that will work for all db readers/writers.
+		if (m_bUseOracleSyntax)
+		{
+			ipRecordSet = m_ipFAMDB->GetResultsForQuery(gstrSTANDARD_TOTAL_FAMFILE_QUERY_ORACLE.c_str());
+		}
+		else
+		{
+			ipRecordSet = m_ipFAMDB->GetResultsForQuery(gstrSTANDARD_TOTAL_FAMFILE_QUERY.c_str());
+		}
+		ASSERT_RESOURCE_ALLOCATION("ELI34342", ipRecordSet != __nullptr);
+	}
+
+	// there should only be 1 record returned
+	// TODO: This was modified because the returned recordset from Oracle has records but the 
+	// record count value is -1 
+	if (ipRecordSet->adoEOF != VARIANT_TRUE)
+	{
+		// get the file count (value type depends on which file count query executed.
+		llFileCount = !m_bUseOracleSyntax && m_bDeniedFastCountPermission
+			? (long long)getLongField(ipRecordSet->Fields, gstrTOTAL_FILECOUNT_FIELD)
+			: getLongLongField(ipRecordSet->Fields, gstrTOTAL_FILECOUNT_FIELD);
+	}
+	else
+	{
+		THROW_LOGIC_ERROR_EXCEPTION("ELI30526");
+	}
+
+	return llFileCount;
 }
 //--------------------------------------------------------------------------------------------------

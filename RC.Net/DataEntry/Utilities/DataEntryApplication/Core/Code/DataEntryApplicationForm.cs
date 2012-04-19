@@ -826,7 +826,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (_dataEntryDatabaseManager == null && fileProcessingDB != null)
                 {
-                    _dataEntryDatabaseManager = new DataEntryProductDBMgrClass();
+                    FAMDBUtils famDBUtils = new FAMDBUtils();
+                    Type mgrType = Type.GetTypeFromProgID(famDBUtils.GetDataEntryDBProgId());
+
+                    _dataEntryDatabaseManager = (DataEntryProductDBMgr)Activator.CreateInstance(mgrType);
                     _dataEntryDatabaseManager.FAMDB = fileProcessingDB;
                 }
 

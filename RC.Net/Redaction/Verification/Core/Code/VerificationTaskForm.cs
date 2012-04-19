@@ -2491,7 +2491,10 @@ namespace Extract.Redaction.Verification
                 }
 
                 // Create the IDShield database wrapper
-                _idShieldDatabase = new IDShieldProductDBMgrClass();
+                FAMDBUtils dbUtils = new FAMDBUtils();
+                Type mgrType = Type.GetTypeFromProgID(dbUtils.GetIDShieldDBProgId());
+                _idShieldDatabase = (IDShieldProductDBMgr)Activator.CreateInstance(mgrType);
+
                 _idShieldDatabase.FAMDB = _fileDatabase;
             }
         }

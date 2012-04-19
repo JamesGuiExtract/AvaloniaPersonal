@@ -7,6 +7,7 @@ const std::string FP_FILE_SUPP_CATEGORYNAME = "Extract File Suppliers";
 const std::string FP_FAM_CONDITIONS_CATEGORYNAME = "Extract FAM Conditions";
 const std::string FP_FAM_REPORTS_CATEGORYNAME = "Extract FAM Reports";
 const std::string FP_FAM_PRODUCT_SPECIFIC_DB_MGRS = "Extract FAM Product Specific DB Managers";
+const std::string FP_NET_FAM_PRODUCT_SPECIFIC_DB_MGRS = "Extract NET FAM Product Specific DB Managers";
 
 // {6A3E6046-2BA3-458f-A74F-DE219860DEBE}
 static const GUID CATID_FP_FILE_PROCESSORS = 
@@ -27,3 +28,8 @@ static const GUID CATID_FP_FAM_REPORTS =
 // {1ED1F6BF-00DE-488a-AF8F-596403BE01D2}
 static const GUID CATID_FP_FAM_PRODUCT_SPECIFIC_DB_MGRS = 
 { 0x1ed1f6bf, 0xde, 0x488a, { 0xaf, 0x8f, 0x59, 0x64, 0x3, 0xbe, 0x1, 0xd2 } };
+
+// {194A6EA4-8676-46AE-BFAD-3C9AED12E92D}
+static const GUID CATID_FP_NET_FAM_PRODUCT_SPECIFIC_DB_MGRS = 
+{ 0x194a6ea4, 0x8676, 0x46ae, { 0xbf, 0xad, 0x3c, 0x9a, 0xed, 0x12, 0xe9, 0x2d } };
+

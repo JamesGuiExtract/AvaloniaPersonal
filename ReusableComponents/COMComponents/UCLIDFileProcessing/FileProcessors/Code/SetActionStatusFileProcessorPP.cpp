@@ -147,7 +147,10 @@ LRESULT CSetActionStatusFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, 
 
 			// create a database manager object so that we can retrieve
 			// the actions stored in the database
-			IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
+			IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
+			ASSERT_RESOURCE_ALLOCATION("ELI34523", ipFAMDBUtils != __nullptr);
+	
+			IFileProcessingDBPtr ipDB(ipFAMDBUtils->GetFAMDBProgId().operator LPCSTR());
 			ASSERT_RESOURCE_ALLOCATION("ELI15131", ipDB != __nullptr);
 
 			// Connect database using last used settings in this instance

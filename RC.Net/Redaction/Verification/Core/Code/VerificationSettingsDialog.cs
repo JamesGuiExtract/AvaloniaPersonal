@@ -51,7 +51,10 @@ namespace Extract.Redaction.Verification
 
             _settings = settings ?? new VerificationSettings();
 
-			FileProcessingDB database = new FileProcessingDB();
+            FAMDBUtils dbUtils = new FAMDBUtils();
+            Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
+            FileProcessingDB database = (FileProcessingDB)Activator.CreateInstance(mgrType);
+
 			database.ConnectLastUsedDBThisProcess();
 
             StrToStrMap actionNameToId = database.GetActions();

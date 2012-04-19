@@ -58,7 +58,10 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 base.OnLoad(e);
 
-                var dbManager = new FileProcessingDB();
+                FAMDBUtils dbUtils = new FAMDBUtils();
+                Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
+                FileProcessingDB dbManager = (FileProcessingDB)Activator.CreateInstance(mgrType);
+                
                 dbManager.ConnectLastUsedDBThisProcess();
                 var list = dbManager.GetPriorities();
                 int size = list.Size;
@@ -106,7 +109,9 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 // Convert the priority string to priority enum value
-                var dbManager = new FileProcessingDB();
+                FAMDBUtils dbUtils = new FAMDBUtils();
+                Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
+                FileProcessingDB dbManager = (FileProcessingDB)Activator.CreateInstance(mgrType);
                 dbManager.ConnectLastUsedDBThisProcess();
                 Priority = dbManager.AsEFilePriority(_priorityComboBox.Text);
                 FileName = _fileNameTextBox.Text;

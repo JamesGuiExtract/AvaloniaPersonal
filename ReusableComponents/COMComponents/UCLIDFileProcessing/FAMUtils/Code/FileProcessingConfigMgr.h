@@ -96,6 +96,8 @@ public:
 	bool getAutoSaveFPSOnRun();
 	void setAutoSaveFPSOnRun(bool bAutoSave);
 
+	string getDBManagerType();
+	void setDBManagerType(const string& strDBManagerType);
 private:
 	static const string WINDOW_POS_X;
 	static const string WINDOW_POS_Y;
@@ -121,6 +123,7 @@ private:
 	static const string FileProcessingConfigMgr::LAST_GOOD_DATABASE;
 	static const string USE_PRE_NORMALIZED;
 	static const string AUTO_SAVE_FPS_FILE;
+	static const string DB_MANAGER_TYPE;
 
 	static const string DEFAULT_WINDOW_POS_X;
 	static const string DEFAULT_WINDOW_POS_Y;
@@ -143,6 +146,7 @@ private:
 	static const string DEFAULT_LAST_GOOD_DATABASE;
 	static const string DEFAULT_USE_PRE_NORMALIZED;
 	static const string DEFAULT_AUTO_SAVE_FPS_FILE;
+	static const string DEFAULT_DB_MANAGER_TYPE;
 
 	// Dialog size bounds
 	static const int DLG_MIN_WIDTH;

@@ -70,6 +70,9 @@ private:
 	// Indicates whether the user was denied permission to run the fast file count query.
 	bool m_bDeniedFastCountPermission;
 
+	// Indicates if the queries used should use OracleSyntax
+	bool m_bUseOracleSyntax;
+
 	//---------------------------------------------------------------------------------------------
 	// Helper methods
 	//---------------------------------------------------------------------------------------------
@@ -87,4 +90,6 @@ private:
 		return strQuery;
 	}
 	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To return the total count of files in the database
+	long long getTotalFileCount();
 };

@@ -407,5 +407,27 @@ namespace Extract.Utilities
 		        throw ex.AsExtract("ELI33378");
 	        }
         }
+
+        /// <summary>
+        /// Returns an unique string to identify the current process
+        /// </summary>
+        /// <returns></returns>
+        public static string GetCurrentProcessUpi()
+        {
+            try
+            {
+                string upi = "\\";
+                upi += Environment.MachineName + "\\";
+                upi += SystemMethods.GetProcessName(SystemMethods.GetCurrentProcessId());
+                upi += SystemMethods.GetCurrentProcessId().AsString() + "\\";
+                upi += DateTime.UtcNow.ToString("MdY\\H:m:s");
+                return upi;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34517");
+            }
+        }
+
     }
 }

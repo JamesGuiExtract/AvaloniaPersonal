@@ -41,6 +41,9 @@ public:
 // IFAMDBUtils
 	STDMETHOD(PromptForActionSelection)(IFileProcessingDB* pDB, BSTR strTitle, BSTR strPrompt, 
 			VARIANT_BOOL vbAllowTags, BSTR *pActionName);
+	STDMETHOD(GetFAMDBProgId)(BSTR *pProgID);
+	STDMETHOD(GetIDShieldDBProgId)(BSTR *pProgID);
+	STDMETHOD(GetDataEntryDBProgId)(BSTR *pProgID);
 
 private:
 
