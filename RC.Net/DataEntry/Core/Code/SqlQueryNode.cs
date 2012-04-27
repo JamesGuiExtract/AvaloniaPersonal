@@ -132,11 +132,11 @@ namespace Extract.DataEntry
                     DateTime startTime = DateTime.Now;
 
                     // Create a database command using the query.
-                    using (DbCommand dbCommand = DataEntryMethods.CreateDBCommand(
+                    using (DbCommand dbCommand = DBMethods.CreateDBCommand(
                         sqlCeConnection, sqlQuery.ToString(), parameters))
                     {
                         // Execute the query.
-                        queryResults = DataEntryMethods.ExecuteDBQuery(dbCommand, ", ");
+                        queryResults = DBMethods.ExecuteDBQuery(dbCommand, ", ");
                     }
 
                     // Attempt to cache the results.

@@ -8,7 +8,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("SQLCDBEditor")]
-[assembly: AssemblyDescription("Application used to edit SQL Compact Edition database files.")]
+[assembly: AssemblyDescription("Application used to edit SQL Compact Edition database files.\r\n\r\n" +
+"The Scintilla control used by this application is Copyright 1998-2006 by Neil Hodgson <neilh@scintilla.org>\r\n" +
+"The ScintillaNET bindings are Copyright 2002-2006 by Garrett Serack")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems LLC")]
 [assembly: AssemblyProduct("SQLCDBEditor")]

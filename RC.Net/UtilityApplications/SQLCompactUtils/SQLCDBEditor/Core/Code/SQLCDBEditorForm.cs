@@ -1,153 +1,36 @@
 using Extract.Database;
+using Extract.Drawing;
 using Extract.Licensing;
 using Extract.SQLCDBEditor.Properties;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TD.SandDock;
 
 namespace Extract.SQLCDBEditor
 {
     /// <summary>
     /// This is the main form used by the SQLCDBEditor application. It will open a 
-    /// SQL Compact Database and display the tables in a list in the left pane and will
-    /// display records from the currently selected table in the pane on the right.  Changes
+    /// SQL Compact Database and display the tables and query lists in SandDock panes and will
+    /// display records from the currently selected table in the pane on the right. Changes
     /// can be made to the data in the displayed records and can be saved when the save button
     /// is clicked or when prompted before closing or opening another database.
     /// </summary>
     public partial class SQLCDBEditorForm : Form
     {
-        #region Internal Class
-
-        /// <summary>
-        /// Internal class that manages a data table, adapter and commandbuilder for each
-        /// table in the compact database
-        /// </summary>
-        class DataTableInformation : IDisposable
-        {
-            #region Fields
-
-            /// <summary>
-            /// The data table associated with this information
-            /// </summary>
-            DataTable _table;
-
-            /// <summary>
-            /// The data adapter for the data table
-            /// </summary>
-            SqlCeDataAdapter _adapter;
-
-            /// <summary>
-            /// The command builder that enables insert/update/deletes to be run
-            /// </summary>
-            SqlCeCommandBuilder _command;
-
-            #endregion Fields
-
-            #region Constructor
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="DataTableInformation"/> class
-            /// with an emtpy table.
-            /// </summary>
-            [SuppressMessage("Microsoft.Globalization", "CA1306:SetLocaleForDataTypes")]
-            public DataTableInformation()
-            {
-                _table = new DataTable();
-            }
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="DataTableInformation"/> class.
-            /// </summary>
-            /// <param name="table">The table.</param>
-            /// <param name="adapter">The adapter.</param>
-            public DataTableInformation(DataTable table, SqlCeDataAdapter adapter)
-            {
-                _table = table;
-                _adapter = adapter;
-                _command = new SqlCeCommandBuilder(adapter);
-            }
-
-            #endregion Constructor
-
-            #region Methods
-
-            /// <summary>
-            /// Updates the underlying data table using the cached adapter
-            /// </summary>
-            public void UpdateTable()
-            {
-                _adapter.Update(_table);
-            }
-
-            #endregion Methods
-
-            #region Properties
-
-            /// <summary>
-            /// Gets the data table.
-            /// </summary>
-            /// <value>The data table.</value>
-            public DataTable DataTable
-            {
-                get
-                {
-                    return _table;
-                }
-            }
-
-            #endregion Properties
-
-            #region IDisposable Members
-
-            /// <summary>
-            /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-            /// </summary>
-            public void Dispose()
-            {
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-
-            /// <summary>
-            /// Releases unmanaged and - optionally - managed resources
-            /// </summary>
-            /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources.</param>
-            void Dispose(bool disposing)
-            {
-                if (disposing)
-                {
-                    if (_command != null)
-                    {
-                        _command.Dispose();
-                        _command = null;
-                    }
-                    if (_adapter != null)
-                    {
-                        _adapter.Dispose();
-                        _adapter = null;
-                    }
-                    if (_table != null)
-                    {
-                        _table.Dispose();
-                        _table = null;
-                    }
-                }
-            }
-
-            #endregion
-        }
-
-        #endregion Internal Class
-
         #region Constants
 
         /// <summary>
@@ -156,9 +39,27 @@ namespace Extract.SQLCDBEditor
         static readonly string _OBJECT_NAME = typeof(SQLCDBEditorForm).ToString();
 
         /// <summary>
+        /// The license string for the SandDock manager
+        /// </summary>
+        static readonly string _SANDDOCK_LICENSE_STRING = @"1970|siE7SnF/jzINQg1AOTIaCXLlouA=";
+
+        /// <summary>
         /// The default title for this form.
         /// </summary>
         const string _DEFAULT_TITLE = "SQLCDBEditor";
+
+        /// <summary>
+        /// The full path to the file that contains information about persisting the 
+        /// <see cref="SQLCDBEditorForm"/>.
+        /// </summary>
+        static readonly string _FORM_PERSISTENCE_FILE = FileSystemMethods.PathCombine(
+            FileSystemMethods.ApplicationDataPath, _DEFAULT_TITLE, _DEFAULT_TITLE + ".xml");
+
+        /// <summary>
+        /// Name for the mutex used to serialize persistance of the control and form layout.
+        /// </summary>
+        static readonly string _FORM_PERSISTENCE_MUTEX_STRING =
+            "{DE40ED67-7A96-41F9-BDE8-20634534EF38";
 
         #endregion Constants
 
@@ -189,21 +90,50 @@ namespace Extract.SQLCDBEditor
         SqlCeConnection _connection;
 
         /// <summary>
-        /// Dictionary mapping each table name to a class containing the table, adapter and
-        /// commandbuilder
+        /// The list of table names in the currently open database.
         /// </summary>
-        Dictionary<string, DataTableInformation> _dictionaryOfTableInformation;
+        List<QueryAndResultsControl> _tableList = new List<QueryAndResultsControl>();
+
+        /// <summary>
+        /// The binding between <see cref="_tableList"/> and <see cref="_tablesListBox"/>
+        /// </summary>
+        BindingSource _tablesBindingSource = new BindingSource();
+
+        /// <summary>
+        /// The list of queries available for the open database.
+        /// </summary>
+        List<QueryAndResultsControl> _queryList = new List<QueryAndResultsControl>();
+
+        /// <summary>
+        /// The binding between <see cref="_queryList"/> and <see cref="_queriesListBox"/>
+        /// </summary>
+        BindingSource _queriesBindingSource = new BindingSource();
+
+        /// <summary>
+        /// The <see cref="QueryAndResultsControl"/> containing new queries that have not yet been
+        /// saved to disk.
+        /// </summary>
+        List<QueryAndResultsControl> _pendingQueryList = new List<QueryAndResultsControl>();
+
+        /// <summary>
+        /// The primary tab into which tables and queries will be opened unless otherwise specified.
+        /// </summary>
+        TabbedDocument _primaryTab;
+
+        /// <summary>
+        /// The most recently selected/active <see cref="QueryAndResultsControl"/>.
+        /// </summary>
+        QueryAndResultsControl _lastSelectedItem;
+
+        /// <summary>
+        /// The <see cref="QueryAndResultsControl"/> to be associated with a list box context menu.
+        /// </summary>
+        QueryAndResultsControl _contextMenuItem;
 
         /// <summary>
         /// Flag used to indicate that there are changes to the database that need to be saved.
         /// </summary>
         bool _dirty;
-
-        /// <summary>
-        /// Binding source used as dataGrid source, changes to the data display will be made
-        /// directly to this object.
-        /// </summary>
-        BindingSource bindingSource = new BindingSource();
 
         /// <summary>
         /// Indicates whether this is running as a standalone app or as a dialog.
@@ -224,6 +154,11 @@ namespace Extract.SQLCDBEditor
         /// The database schema updater used to update the current schema
         /// </summary>
         IDatabaseSchemaUpdater _schemaUpdater;
+
+        /// <summary>
+        /// Saves/restores window state info
+        /// </summary>
+        FormStateManager _formStateManager;
 
         #endregion Fields
 
@@ -257,11 +192,34 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                InitializeComponent();
+                if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
+                {
+                    // Load the license files from folder
+                    LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+                }
+
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
                     "ELI29538", _OBJECT_NAME);
+
+                // License SandDock before creating the form
+                SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
+
+                InitializeComponent();
+
                 _databaseFileName = databaseFileName;
                 _standAlone = standAlone;
+
+                // Establish the bindings for the table and query list boxes
+                _tablesBindingSource.DataSource = _tableList;
+                _tablesListBox.DataSource = _tablesBindingSource;
+                _queriesBindingSource.DataSource = _queryList;
+                _queriesListBox.DataSource = _queriesBindingSource;
+
+                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+                {
+                    _formStateManager = new FormStateManager(this, _FORM_PERSISTENCE_FILE,
+                        _FORM_PERSISTENCE_MUTEX_STRING, _sandDockManager, false);
+                }
             }
             catch (Exception ex)
             {
@@ -283,9 +241,6 @@ namespace Extract.SQLCDBEditor
             {
                 base.OnLoad(e);
 
-                // Set the dataGridView datasource to the bindingSource
-                _dataGridView.DataSource = bindingSource;
-
                 // Initialize the dirty flag
                 _dirty = false;
 
@@ -304,6 +259,14 @@ namespace Extract.SQLCDBEditor
                     // needing to be updated, the form will already be opened.
                     BeginInvoke((MethodInvoker)(() => { OpenDatabase(_databaseFileName); }));
                 }
+
+                _primaryTab = new TabbedDocument();
+                _primaryTab.AllowClose = false;
+                _primaryTab.Manager = _sandDockManager;
+                _primaryTab.Text = "";
+                _primaryTab.TabImage = Resources.Star;
+                _primaryTab.OpenDocument(WindowOpenMethod.OnScreen);
+                _primaryTab.Closing += HandleTabbedDocumentClosing;
             }
             catch (Exception ex)
             {
@@ -313,6 +276,66 @@ namespace Extract.SQLCDBEditor
             {
                 EnableCommands();
             }
+        }
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                try
+                {
+                    if (_formStateManager != null)
+                    {
+                        _formStateManager.Dispose();
+                        _formStateManager = null;
+                    }
+
+                    if (_connection != null)
+                    {
+                        _connection.Dispose();
+                        _connection = null;
+                    }
+
+                    if (!string.IsNullOrEmpty(_databaseWorkingCopyFileName) &&
+                        System.IO.File.Exists(_databaseWorkingCopyFileName))
+                    {
+                        System.IO.File.Delete(_databaseWorkingCopyFileName);
+                        _databaseWorkingCopyFileName = null;
+                    }
+
+                    CollectionMethods.ClearAndDispose(_tableList);
+                    CollectionMethods.ClearAndDispose(_queryList);
+                    CollectionMethods.ClearAndDispose(_pendingQueryList);
+
+                    if (_tablesBindingSource != null)
+                    {
+                        _tablesListBox.DataSource = null;
+                        _tablesBindingSource.Dispose();
+                        _tablesBindingSource = null;
+                    }
+
+                    if (_queriesBindingSource != null)
+                    {
+                        _queriesListBox.DataSource = null;
+                        _queriesBindingSource.Dispose();
+                        _queriesBindingSource = null;
+                    }
+
+                    if (components != null)
+                    {
+                        components.Dispose();
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    ex.ExtractLog("ELI34543");
+                }
+            }
+            base.Dispose(disposing);
         }
 
         #endregion Overrides
@@ -461,100 +484,444 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
-        /// Handles the SelectedValueChanged event on the listbox with table names.  This event
-        /// is only active when the list box has been filed with table names.
+        /// Handles the <see cref="T:ListBox.SelectionChanged"/> event from the
+        /// <see cref="_tablesListBox"/> and <see cref="_queriesListBox"/>.
         /// </summary>
-        /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">The event data associated with the event.</param>
-        private void ListBoxTables_SelectedValueChanged(object sender, EventArgs e)
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        private void HandleListSelectionChanged(object sender, EventArgs e)
         {
             try
             {
-                // Load the selected table into the dataGridView
-                LoadTable(_listBoxTables.Text);
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI29498", ex);
-            }
-        }
-
-        /// <summary>
-        /// Handles the CurrentCellDirtyStateChanged event.  This is used to set the _dirty flag
-        /// if when the current cell in the dataGridView is changed.
-        /// </summary>
-        /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">The event data associated with the event.</param>
-        void DataGridView_CurrentCellDirtyStateChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                // Check if the current cell in the grid is dirty
-                if (_dataGridView.IsCurrentCellDirty)
+                ListBox listBox = (ListBox)sender;
+                QueryAndResultsControl queryAndResultsControl =
+                    listBox.SelectedItem as QueryAndResultsControl;
+                if (queryAndResultsControl != null)
                 {
-                    // Set the dirty flag
-                    _dirty = true;
+                    // If the selected item was already selected, do nothing.
+                    if (listBox.SelectedItem == _lastSelectedItem &&
+                        listBox.SelectedItem == queryAndResultsControl)
+                    {
+                        return;
+                    }
 
-                    // Update menu and tool strip
-                    EnableCommands();
+                    // Clear any selection from the other list box to make it clear what the
+                    // currently selected item is.
+                    if (queryAndResultsControl.IsTable)
+                    {
+                        _queriesListBox.ClearSelected();
+                    }
+                    else
+                    {
+                        _tablesListBox.ClearSelected();
+                    }
 
-                    // Update the caption for the window to indicate that the database has been changed.
-                    SetWindowTitle();
+                    OpenTableOrQuery(queryAndResultsControl, false);
+
+                    // Return focus to the list box to prevent it from losing focus by clicking in it.
+                    listBox.Focus();
                 }
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI29512", ex);
+                ex.ExtractDisplay("ELI34603");
             }
         }
 
         /// <summary>
-        /// Handles the UserDeletedRow event of the dataGridView. This is used to set the _dirty flag
-        /// if a record is deleted from the datagrid.  
+        /// Handles the <see cref="T:ContextMenuStrip.Opening"/> event from the
+        /// <see cref="_contextMenuStrip"/>.
         /// </summary>
-        /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">The event data associated with the event.</param>
-        void DataGridView_UserDeletedRow(object sender, DataGridViewRowEventArgs e)
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.ComponentModel.CancelEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleContextMenuStripOpening(object sender, CancelEventArgs e)
         {
             try
             {
-                // Set the dirty flag
+                // If no context menu item has been identified, don't open the context menu.
+                if (_contextMenuItem == null)
+                {
+                    e.Cancel = true;
+                }
+                else
+                {
+                    // The properties of the item may not be set correctly if it is not loaded.
+                    // Load it in order to know what context menu options to display.
+                    if (!_contextMenuItem.IsLoaded)
+                    {
+                        LoadTableOrQuery(_contextMenuItem);
+                    }
+
+                    bool isEditableQuery =
+                        (!_contextMenuItem.IsTable && !_contextMenuItem.IsReadOnly);
+
+                    _renameQueryMenuItem.Visible = isEditableQuery;
+                    _deleteToolStripMenuItem.Visible = isEditableQuery;
+                    _openInSeparateTabMenuItem.Visible =
+                        _contextMenuItem.ShowSendToSeparateTabButton;
+
+                    // Invalidate the appropriate list box so that the focus rectangle gets drawn.
+                    if (_tableList.Contains(_contextMenuItem))
+                    {
+                        _tablesListBox.Invalidate();
+                    }
+                    else if (_queryList.Contains(_contextMenuItem))
+                    {
+                        _queriesListBox.Invalidate();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34604");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:ContextMenuStrip.Closed"/> event from the
+        /// <see cref="_contextMenuStrip"/>.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.ToolStripDropDownClosedEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleContextMenuStripClosed(object sender, ToolStripDropDownClosedEventArgs e)
+        {
+            try
+            {
+                // Invalidate the appropriate list box so that the focus rectangle gets cleared.
+                if (_contextMenuItem != null)
+                {
+                    if (_tableList.Contains(_contextMenuItem))
+                    {
+                        _tablesListBox.Invalidate();
+                    }
+                    else if (_queryList.Contains(_contextMenuItem))
+                    {
+                        _queriesListBox.Invalidate();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34605");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:Control.Click"/> event for the
+        /// <see cref="_openInSeparateTabMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleOpenInNewTabMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_contextMenuItem != null)
+                {
+                    OpenTableOrQuery(_contextMenuItem, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34606");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:Control.Click"/> event for the
+        /// <see cref="_renameQueryMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleRenameQueryMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_contextMenuItem != null)
+                {
+                    _contextMenuItem.Rename();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34607");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:Control.Click"/> event for the
+        /// <see cref="_copyToNewQueryToolStripMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleCopyToNewQueryMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                // The query needs to be loaded before it can be used to create a copy.
+                if (!_contextMenuItem.IsLoaded)
+                {
+                    LoadTableOrQuery(_contextMenuItem);
+                }
+
+                _contextMenuItem.CreateQueryCopy();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34608");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:Control.Click"/> event for the
+        /// <see cref="_deleteToolStripMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleDeleteMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                DeleteQuery(_contextMenuItem);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34609");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:QueryAndResultsControl.SentToSeparateTab"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleTableOrQuerySentToSeparateTab(object sender, EventArgs e)
+        {
+            try
+            {
+                OpenTableOrQuery((QueryAndResultsControl)sender, true);
+
+                // Re-activate the primary tab make it clear to the user that the control was moved
+                // and they may now open another table/query.
+                _primaryTab.Activate();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34611");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:Control.Click"/> event for the
+        /// <see cref="_newQueryToolStripButton"/>.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleNewQueryToolStripButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                var queryAndResultsControl = new QueryAndResultsControl(false);
+
+                InitializeNewQuery(queryAndResultsControl);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34612");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:QueryAndResultsControl.QueryCreated"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.SQLCDBEditor.QueryCreatedEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleQueryCreated(object sender, QueryCreatedEventArgs e)
+        {
+            try
+            {
+                InitializeNewQuery(e.QueryAndResultsControl);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34613");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:TabbedDocument.Closing"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="TD.SandDock.DockControlClosingEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleTabbedDocumentClosing(object sender, DockControlClosingEventArgs e)
+        {
+            try
+            {
+                // Don't allow the primary tab itself to be closed... only the control it contains.
+                if (e.DockControl == _primaryTab)
+                {
+                    ClearPrimaryTab();
+
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (e.DockControl.Controls.Count > 0)
+                {
+                    var queryAndResultsControl = (QueryAndResultsControl)e.DockControl.Controls[0];
+
+                    if (_pendingQueryList.Contains(queryAndResultsControl))
+                    {
+                        _pendingQueryList.Remove(queryAndResultsControl);
+                    }
+                    else
+                    {
+                        // Once a separate tab is closed, the send to separate tab button should be
+                        // available again.
+                        queryAndResultsControl.ShowSendToSeparateTabButton = true;
+
+                        // Clear the QueryAndResultsControl out of the tabbed document so that it is
+                        // not disposed of (even though the tab is closed, the QueryAndResultsControl
+                        // will still be maintained to use in whatever tab it is next opened in.
+                        e.DockControl.Controls.Clear();
+                    }
+
+                    // If the last open document is being closed, clear any existing selection in
+                    // the list boxes.
+                    if (_sandDockManager.GetDockControls()
+                            .OfType<TabbedDocument>().Count() == 2 &&
+                        _primaryTab.Controls.Count == 0)
+                    {
+                        _tablesListBox.ClearSelected();
+                        _queriesListBox.ClearSelected();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34614");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:QueryAndResultsControl.DataChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleDataChanged(object sender, EventArgs e)
+        {
+            try
+            {
                 _dirty = true;
 
-                // Update menu and tool strip
+                // If data has been changed in one table, refresh the data in all other visible
+                // tables immediately.
+                foreach (var queryAndResultsControl in _sandDockManager.GetDockControls()
+                    .OfType<TabbedDocument>()
+                    .Where(tab => tab.Controls.Count == 1)
+                    .Select(tab => (QueryAndResultsControl)tab.Controls[0])
+                    .Where(control => control != sender))
+                {
+                    // Use false so that for queries, the results get marked as stale, but don't get
+                    // automatically refreshed.
+                    queryAndResultsControl.RefreshData(false);
+                }
+
                 EnableCommands();
 
-                // Update the caption for the window to indicate that the database has been changed.
                 SetWindowTitle();
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI29527", ex);
+                ex.ExtractDisplay("ELI34615");
             }
         }
 
         /// <summary>
-        /// Handles the <see cref="DataGridView.DataError"/> event.
+        /// Handles the <see cref="T:QueryAndResultsControl.PropertyChanged"/> event.
         /// </summary>
-        /// <param name="sender">The object which sent the event.</param>
-        /// <param name="e">The data associated with the event.</param>
-        void HandleDataGridViewError(object sender, DataGridViewDataErrorEventArgs e)
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.ComponentModel.PropertyChangedEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleQueryPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             try
             {
-                // Set throw exception to false so that the exception is not rethrown
-                // after it has been displayed here
-                e.ThrowException = false;
-
-                // Wrap the exception as an ExtractException and display it
-                ExtractException ee = ExtractException.AsExtractException("ELI30291", e.Exception);
-                ee.AddDebugData("Data Row", e.RowIndex, false);
-                ee.AddDebugData("Data Column", e.ColumnIndex, false);
-                ee.Display();
+                // If the display name property has been modified, update the tab text to match it.
+                if (e.PropertyName == "DisplayName")
+                {
+                    QueryAndResultsControl queryAndResultsControl = (QueryAndResultsControl)sender;
+                    TabbedDocument documentWindow = queryAndResultsControl.Parent as TabbedDocument;
+                    if (documentWindow != null)
+                    {
+                        documentWindow.TabText = queryAndResultsControl.DisplayName;
+                    }
+                }
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI30292", ex);
+                ex.ExtractDisplay("ELI34616");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:QueryAndResultsControl.Saved"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleQuerySaved(object sender, EventArgs e)
+        {
+            try
+            {
+                // If this query has not yet been saved to disk, add it to the queries list box.
+                if (!_queryList.Contains(sender))
+                {
+                    var queryAndResultsControl = (QueryAndResultsControl)sender;
+
+                    _pendingQueryList.Remove(queryAndResultsControl);
+                    _queryList.Add(queryAndResultsControl);
+                    _queriesBindingSource.ResetBindings(false);
+                    _lastSelectedItem = null;
+                    _queriesListBox.SelectedItem = sender;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34617");
+            }
+        }
+
+        /// <summary>
+        /// Handles the query renaming.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.SQLCDBEditor.QueryRenamingEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleQueryRenaming(object sender, QueryRenamingEventArgs e)
+        {
+            try
+            {
+                if (ExistingQueryNames.Contains(e.NewName))
+                {
+                    e.Cancel = true;
+                    e.CancelReason = "Query \"" + e.NewName + "\" already exists.";
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34627");
             }
         }
 
@@ -576,7 +943,178 @@ namespace Extract.SQLCDBEditor
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI31163", ex);
+                ExtractException.Display("ELI34618", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:DockableWindow.Closing"/> event for the
+        /// <see cref="_tableDockWindow"/> and <see cref="_queryDockWindow"/>.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="TD.SandDock.DockControlClosingEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleDockWindowClosing(object sender, TD.SandDock.DockControlClosingEventArgs e)
+        {
+            try
+            {
+                // In order to allow the close (X) button to be used to "close" they query or table
+                // list panes, but still have a tab available to re-open them, cancel the close and
+                // collapse the pane instead.
+                e.Cancel = true;
+                e.DockControl.Collapsed = true;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34619");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:SandDockManager.DockControlActivated"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="TD.SandDock.DockControlEventArgs"/> instance containing
+        /// the event data.</param>
+        void HandleDockControlActivated(object sender, DockControlEventArgs e)
+        {
+            try
+            {
+                // If the activated dock control is a TabbedDocument, select the corresponding item
+                // in either the table or query list box.
+                TabbedDocument tabbedDocument = e.DockControl as TabbedDocument;
+                if (tabbedDocument != null)
+                {
+                    // If the activated tab does not have an item for either list, clear any
+                    // selection in both.
+                    if (e.DockControl.Controls.Count == 0)
+                    {
+                        _tablesListBox.ClearSelected();
+                        _queriesListBox.ClearSelected();
+                        return;
+                    }
+
+                    QueryAndResultsControl queryAndResultsControl =
+                        (QueryAndResultsControl)e.DockControl.Controls[0];
+
+                    if (_tableList.Contains(queryAndResultsControl))
+                    {
+                        _queriesListBox.ClearSelected();
+
+                        if (!_tablesListBox.SelectedItems.Contains(queryAndResultsControl))
+                        {
+                            _tablesListBox.ClearSelected();
+                            _tablesListBox.SelectedItems.Add(queryAndResultsControl);
+                        }
+                    }
+                    else if (_queryList.Contains(queryAndResultsControl))
+                    {
+                        _tablesListBox.ClearSelected();
+
+                        if (!_queriesListBox.SelectedItems.Contains(queryAndResultsControl))
+                        {
+                            _tablesListBox.ClearSelected();
+                            _queriesListBox.SelectedItems.Add(queryAndResultsControl);
+                        }
+                    }
+                }
+                else
+                {
+                    // If the activated dock control is the table or query pane, in order to allow
+                    // the pane to "uncollapse" with a single click (without requiring it to be
+                    // pinned), set the Collapsed property to false.
+                    e.DockControl.Collapsed = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34620");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:Control.MouseDown"/> event for the <see cref="_tablesListBox"/>
+        /// and <see cref="_queriesListBox"/>.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleListMouseDown(object sender, MouseEventArgs e)
+        {
+            try
+            {
+                // If the right mouse button was clicked, the context menu will open and will need
+                // to know which list item it is to be associated with. Assign _contextMenuItem for
+                // it to use.
+                if (e.Button == MouseButtons.Right)
+                {
+                    ListBox listBox = (ListBox)sender;
+                    int index = listBox.IndexFromPoint(e.Location);
+                    if (index >= 0)
+                    {
+                        _contextMenuItem = (QueryAndResultsControl)listBox.Items[index];
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34621");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:ListBox.DrawItem"/> event for the <see cref="_tablesListBox"/>
+        /// and <see cref="_queriesListBox"/>.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.DrawItemEventArgs"/> instance containing the event data.</param>
+        void HandleListBoxDrawItem(object sender, DrawItemEventArgs e)
+        {
+            try
+            {
+                // Manually draw the list box items so that the focus rectangle can be displayed for
+                // the item associated with a context menu click.
+                if (e.Index >= 0)
+                {
+                    ListBox listBox = (ListBox)sender;
+                    object listItem = listBox.Items[e.Index];
+                    string itemText = listBox.GetItemText(listItem);
+
+                    e.DrawBackground();
+                    e.Graphics.DrawString(itemText, e.Font, ExtractBrushes.GetSolidBrush(e.ForeColor),
+                        e.Bounds, StringFormat.GenericDefault);
+
+                    if (listItem == _contextMenuItem && _contextMenuStrip.Visible)
+                    {
+                        ControlPaint.DrawFocusRectangle(e.Graphics, e.Bounds);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34622");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:Control.PreviewKeyDown"/> event for the
+        /// <see cref="_tablesListBox"/> and <see cref="_queriesListBox"/>.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.PreviewKeyDownEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleQueryListPreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            try
+            {
+                if (e.KeyCode == Keys.Delete && _queriesListBox.SelectedItem != null)
+                {
+                    DeleteQuery((QueryAndResultsControl)_queriesListBox.SelectedItem);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34623");
             }
         }
 
@@ -585,238 +1123,31 @@ namespace Extract.SQLCDBEditor
         #region Private Methods
 
         /// <summary>
-        /// Method loads the given table into the dataGridView.
-        /// </summary>
-        /// <param name="tableName">Name of the table to load.</param>
-        [SuppressMessage("Microsoft.Globalization", "CA1306:SetLocaleForDataTypes")]
-        void LoadTable(string tableName)
-        {
-            DataTableInformation info;
-
-            // Check if the table to be loaded has been loaded before
-            if (!string.IsNullOrWhiteSpace(tableName))
-            {
-                info = LoadTableFromDatabase(tableName);
-
-                // Check for unique constraints
-                bool _hasUniqueContraint = false;
-                foreach (Constraint c in info.DataTable.Constraints)
-                {
-                    // Check if current constraint is unique					
-                    if (c is UniqueConstraint)
-                    {
-                        // set Flag to true;
-                        _hasUniqueContraint = true;
-                        break;
-                    }
-                }
-
-                // Set the ReadOnly and AllowUserToAddRows so that if no unique constraint
-                // the grid cannot be modified and rows cannot be added
-                _dataGridView.ReadOnly = !_hasUniqueContraint;
-                _dataGridView.AllowUserToAddRows = _hasUniqueContraint;
-            }
-            else
-            {
-                // If the table has not been created create an empty table
-
-                info = new DataTableInformation();
-            }
-
-            var table = info.DataTable;
-
-            // Set the bindingSoure dataSource to the table
-            bindingSource.DataSource = table;
-
-            // Generate the default column sizes.
-            using (var graphics = _dataGridView.CreateGraphics())
-            {
-                var font = _dataGridView.ColumnHeadersDefaultCellStyle.Font;
-                for (int i = 0; i < table.Columns.Count; i++)
-                {
-                    var column = table.Columns[i];
-                    var type = column.DataType;
-
-                    // Default fill weight will be 1 with a minimum width of 50 (~ 6 chars)
-                    float fillWeight = 1.0F;
-                    int minSize = 50;
-
-                    if (type == typeof(bool))
-                    {
-                        // Bool fields do not need to scale larger with size as the table does and
-                        // can have a smaller min width.
-                        fillWeight = 0.01F;
-                        minSize = 25;
-                    }
-                    else if (type == typeof(string))
-                    {
-                        // For text fields that can be > 10 chars but not unlimited, scale up from
-                        // a fill weight of 1.0 logarithmically.
-                        // MaxLength 10	 = 1.2
-                        // MaxLength 50	 = 2.8
-                        // MaxLength 500 = 5.1
-                        if (column.MaxLength > 10)
-                        {
-                            
-                            fillWeight = (float)Math.Log(column.MaxLength / 3);
-                        }
-
-                        // But cap the max fill weight at 10.
-                        if (fillWeight > 10.0F || column.MaxLength == -1)
-                        {
-                            fillWeight = 10.0F;
-                        }
-                    }
-
-                    // Get the head text and measure out the minimum width to display the string
-                    // Pad the width by 4 pixels (2 each side)
-                    var temp = _dataGridView.Columns[i].HeaderText;
-                    var size = graphics.MeasureString(temp, font);
-                    minSize = Math.Max(minSize, (int)(size.Width + 0.5) + 4);
-                    _dataGridView.Columns[i].MinimumWidth = minSize;
-                    _dataGridView.Columns[i].FillWeight = fillWeight;
-                    _dataGridView.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                }
-
-                // Perform a layout to apply the default column sizes.
-                _dataGridView.PerformLayout();
-
-                // Once the default column sizes have been applied, turn off auto-sizing and set
-                // min width to a small size to allow the user almost complete control over column
-                // sizes.
-                foreach (DataGridViewColumn column in _dataGridView.Columns)
-                {
-                    column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-                    column.MinimumWidth = 25;
-                }
-            }
-
-            // Reset the current cell
-            _dataGridView.CurrentCell = null;
-        }
-
-        /// <summary>
-        /// Loads the table from database.
-        /// </summary>
-        /// <param name="tableName">Name of the table to load.</param>
-        /// <returns>The loaded table.</returns>
-        [SuppressMessage("Microsoft.Globalization", "CA1306:SetLocaleForDataTypes")]
-        DataTableInformation LoadTableFromDatabase(string tableName)
-        {
-            // Check if this table has been loaded already
-            DataTableInformation info = null;
-            if (_dictionaryOfTableInformation.TryGetValue(tableName, out info))
-            {
-                // Return the loaded table
-                return info;
-            }
-
-            // Table has not been loaded before so load it
-            var table = new DataTable();
-
-            // Setup dataAdapter to get the data
-            SqlCeDataAdapter dataAdapter = new SqlCeDataAdapter("SELECT * FROM " + tableName, _connection);
-
-            // Fill the table with the data from the dataAdapter
-            dataAdapter.Fill(table);
-
-            // Fill the schema for the table for the database
-            dataAdapter.FillSchema(table, SchemaType.Source);
-
-            // Check for auto increment fields and default column values
-            foreach (DataColumn c in table.Columns)
-            {
-                // Get the information for the current column
-                using (SqlCeCommand sqlcmd = new SqlCeCommand(
-                    "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" +
-                    tableName + "' AND COLUMN_NAME = '" + c.ColumnName + "'", _connection))
-                {
-                    using (SqlCeResultSet columnsResult =
-                        sqlcmd.ExecuteResultSet(ResultSetOptions.Scrollable))
-                    {
-                        int colPos;
-
-                        // Get the first record in the result set - should only be one
-                        if (columnsResult.ReadFirst())
-                        {
-                            // If the column is an auto increment column set the seed value to next
-                            // auto increment value for the column
-                            if (c.AutoIncrement)
-                            {
-                                // Get the position of the AUTOINC_NEXT field
-                                colPos = columnsResult.GetOrdinal("AUTOINC_NEXT");
-
-                                // Set the seed to the value in the AUTOINC_NEXT field
-                                c.AutoIncrementSeed = (long)columnsResult.GetValue(colPos);
-                            }
-
-                            // Set the default for a column if one is defined
-                            colPos = columnsResult.GetOrdinal("COLUMN_HASDEFAULT");
-                            if (columnsResult.GetBoolean(colPos))
-                            {
-                                // Set the default value for the column
-                                colPos = columnsResult.GetOrdinal("COLUMN_DEFAULT");
-                                c.DefaultValue = columnsResult.GetValue(colPos);
-                            }
-                        }
-                    }
-                }
-            }
-
-            info = new DataTableInformation(table, dataAdapter);
-            _dictionaryOfTableInformation.Add(tableName, info);
-
-            return info;
-        }
-
-        /// <summary>
         /// Method loads the names of the tables in the opened database into the list box. This
         /// method does not save any changes to the database that was previously loaded. If the 
         /// database should be saved it should be done before calling this method.
         /// </summary>
+        /// <returns>The names of the tables that were loaded.</returns>
         [SuppressMessage("Microsoft.Globalization", "CA1306:SetLocaleForDataTypes")]
-        HashSet<string> LoadTableNames()
+        HashSet<string> LoadTableList()
         {
-            // Remove the handler for the SelectedValueChanged event while loading the list box
-            _listBoxTables.SelectedValueChanged -= ListBoxTables_SelectedValueChanged;
+            // Remove the handler for the SelectedIndexChanged event while loading the list box
+            _tablesListBox.SelectedIndexChanged -= HandleListSelectionChanged;
 
-            SqlCeDataAdapter tableListDataAdapter = null;
             try
             {
-                // If dictionary of table information already exist clear the values it contains.
-                if (_dictionaryOfTableInformation != null)
-                {
-                    CollectionMethods.ClearAndDispose(_dictionaryOfTableInformation);
-                }
-
-                // Create a new dictionary of table information
-                _dictionaryOfTableInformation = new Dictionary<string, DataTableInformation>();
-
                 // Create adapter for the list of tables.
-                tableListDataAdapter =
-                    new SqlCeDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES", _connection);
+                HashSet<string> tableNames = new HashSet<string>(
+                    DBMethods.ExecuteDBQuery(_connection,
+                        "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES"));
 
-                // Create a new DataTable for the table names in this database and fill it
-                var tableNameTable = new DataTable();
-                tableListDataAdapter.Fill(tableNameTable);
+                _tableList.AddRange(tableNames
+                    .Select(tableName =>
+                        new QueryAndResultsControl(tableName, _databaseFileName, true)));
 
-                // Set the member to display from the table
-                _listBoxTables.DisplayMember = "TABLE_NAME";
+                _tablesBindingSource.ResetBindings(false);
 
-                // Set the listbox datasource to the tableNameTable
-                _listBoxTables.DataSource = tableNameTable;
-
-                // Reset the _dirty flag
-                _dirty = false;
-
-                // Update menu and tool strip
-                EnableCommands();
-
-                var tableNames = new HashSet<string>();
-                foreach (DataRow row in tableNameTable.Rows)
-                {
-                    tableNames.Add(row["TABLE_NAME"].ToString());
-                }
+                _tablesListBox.ClearSelected();
 
                 return tableNames;
             }
@@ -826,13 +1157,242 @@ namespace Extract.SQLCDBEditor
             }
             finally
             {
-                if (tableListDataAdapter != null)
+                // Re-activate the SelectedIndexChanged event handler
+                _tablesListBox.SelectedIndexChanged += HandleListSelectionChanged;
+            }
+        }
+
+        /// <summary>
+        /// Loads any .sqlce files into the query list pane. The name in the pane will be the name
+        /// of the file (without the extension).
+        /// </summary>
+        void LoadQueryList()
+        {
+            // Remove the handler for the SelectedIndexChanged event while loading the list box
+            _queriesListBox.SelectedIndexChanged -= HandleListSelectionChanged;
+
+            try
+            {
+                _queryList.AddRange(
+                    Directory.EnumerateFiles(Path.GetDirectoryName(_databaseFileName), "*.sqlce")
+                    .Select(fileName => new QueryAndResultsControl(
+                        Path.GetFileNameWithoutExtension(fileName), fileName, false)));
+
+                _queriesBindingSource.ResetBindings(false);
+
+                _queriesListBox.ClearSelected();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34624");
+            }
+            finally
+            {
+                // Re-activate the SelectedIndexChanged event handler
+                _queriesListBox.SelectedIndexChanged += HandleListSelectionChanged;
+            }
+        }
+
+        /// <summary>
+        /// Opens and activates the specified <see paramref="queryAndResultsControl"/> into either
+        /// the primary tab or a separate tab.
+        /// </summary>
+        /// <param name="queryAndResultsControl">The <see cref="QueryAndResultsControl"/> to open.
+        /// </param>
+        /// <param name="openInNewTab"><see langword="true"/> to open in a separate tab that will
+        /// not be used to display any other table or query, or <see langword="false"/> to open
+        /// into the primary tab.</param>
+        void OpenTableOrQuery(QueryAndResultsControl queryAndResultsControl, bool openInNewTab)
+        {
+            // Lock control updates while the control is being loaded to prevent distracting
+            // flashing of controls while it is loading.
+            using (new LockControlUpdates(this))
+            {
+                try
                 {
-                    tableListDataAdapter.Dispose();
+                    SuspendLayout();
+
+                    OpenTableOrQueryCore(queryAndResultsControl, openInNewTab);
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI34610");
+                }
+                finally
+                {
+                    ResumeLayout(true);
+                }
+            }
+
+            // Refresh after re-enabling updates so that all the controls get drawn correctly.
+            Refresh();
+        }
+
+        /// <summary>
+        /// A helper method for <see cref="OpenTableOrQuery"/> that activates the specified
+        /// <see paramref="queryAndResultsControl"/> into either the primary tab or a separate tab.
+        /// </summary>
+        /// <param name="queryAndResultsControl">The <see cref="QueryAndResultsControl"/> to open.
+        /// </param>
+        /// <param name="openInNewTab"><see langword="true"/> to open in a separate tab that will
+        /// not be used to display any other table or query, or <see langword="false"/> to open
+        /// into the primary tab.</param>
+        void OpenTableOrQueryCore(QueryAndResultsControl queryAndResultsControl, bool openInNewTab)
+        {
+            TabbedDocument tabbedDocument = null;
+
+            // Initialize the control if it has not already been.
+            bool isAlreadyLoaded = queryAndResultsControl.IsLoaded;
+            if (!isAlreadyLoaded)
+            {
+                LoadTableOrQuery(queryAndResultsControl);
+            }
+
+            // If the control's parent is not null, it is currently open.
+            if (queryAndResultsControl.Parent != null)
+            {
+                tabbedDocument = (TabbedDocument)queryAndResultsControl.Parent;
+
+                if (openInNewTab && tabbedDocument == _primaryTab)
+                {
+                    // If opening in a new tab the control that is open in the primary tab, first
+                    // close it in the primary tab.
+                    ClearPrimaryTab();
+                    tabbedDocument = null;
+                }
+            }
+
+            // If the control is not currently open, find or create a tab to open it in.
+            if (tabbedDocument == null)
+            {
+                // Create a separate tab for it.
+                if (openInNewTab)
+                {
+                    tabbedDocument = new TabbedDocument(_sandDockManager, queryAndResultsControl,
+                        queryAndResultsControl.DisplayName);
+                    tabbedDocument.OpenWith(_primaryTab);
+                    tabbedDocument.Closing += HandleTabbedDocumentClosing;
+                }
+                // ... or close the control currently in the primary tab and open it there.
+                else
+                {
+                    if (_primaryTab.Controls.Count > 0)
+                    {
+                        _primaryTab.Controls.Clear();
+                    }
+                    _primaryTab.Controls.Add(queryAndResultsControl);
+                    _primaryTab.TabText = queryAndResultsControl.DisplayName;
+                    _primaryTab.AllowClose = true;
+                    tabbedDocument = _primaryTab;
+                }
+            }
+
+            // If the control is open in a separate tab, don't provide the option to send it to
+            // another one.
+            queryAndResultsControl.ShowSendToSeparateTabButton = (tabbedDocument == _primaryTab);
+
+            if (isAlreadyLoaded)
+            {
+                queryAndResultsControl.RefreshData(false);
+            }
+
+            tabbedDocument.Activate();
+
+            _lastSelectedItem = queryAndResultsControl;
+        }
+
+        /// <summary>
+        /// Loads and initializes the specified <see paramref="queryAndResultsControl"/>.
+        /// </summary>
+        /// <param name="queryAndResultsControl">The <see cref="QueryAndResultsControl"/> to load.
+        /// </param>
+        void LoadTableOrQuery(QueryAndResultsControl queryAndResultsControl)
+        {
+            if (queryAndResultsControl.IsLoaded)
+            {
+                return;
+            }
+
+            if (queryAndResultsControl.IsTable)
+            {
+                queryAndResultsControl.LoadTable(_connection, queryAndResultsControl.DisplayName);
+                queryAndResultsControl.DataChanged += HandleDataChanged;
+            }
+            else
+            {
+                queryAndResultsControl.LoadQuery(_connection);
+                queryAndResultsControl.PropertyChanged += HandleQueryPropertyChanged;
+                queryAndResultsControl.QuerySaved += HandleQuerySaved;
+                queryAndResultsControl.QueryRenaming += HandleQueryRenaming;
+            }
+
+            queryAndResultsControl.SentToSeparateTab += HandleTableOrQuerySentToSeparateTab;
+            queryAndResultsControl.QueryCreated += HandleQueryCreated;
+        }
+
+        /// <summary>
+        /// Closes the the specified <see paramref="queryAndResultsControl"/> and deletes any
+        /// associated sqlce file from disk.
+        /// </summary>
+        /// <param name="queryAndResultsControl">The <see cref="QueryAndResultsControl"/> to delete.
+        /// </param>
+        void DeleteQuery(QueryAndResultsControl queryAndResultsControl)
+        {
+            _queriesListBox.SelectedIndexChanged -= HandleListSelectionChanged;
+
+            try
+            {
+                if (queryAndResultsControl.IsReadOnly)
+                {
+                    return;
                 }
 
-                // Activate the SelectedValueChanged event handler
-                _listBoxTables.SelectedValueChanged += ListBoxTables_SelectedValueChanged;
+                // Only delete if they confirm when prompted.
+                if (MessageBox.Show("Are you sure you want to delete the query \""
+                        + queryAndResultsControl.Name + "\"?", "Delete query",
+                            MessageBoxButtons.OKCancel, MessageBoxIcon.Warning,
+                            MessageBoxDefaultButton.Button1, 0) == DialogResult.OK)
+                {
+                    if (File.Exists(queryAndResultsControl.FileName))
+                    {
+                        File.Delete(queryAndResultsControl.FileName);
+                    }
+
+                    // If the query is currently open, close it.
+                    TabbedDocument documentWindow = queryAndResultsControl.Parent as TabbedDocument;
+                    if (documentWindow != null)
+                    {
+                        if (documentWindow == _primaryTab)
+                        {
+                            ClearPrimaryTab();
+                        }
+                        else
+                        {
+                            documentWindow.Close();
+                        }
+                    }
+
+                    // Remove the query control from the lists and dispose of it.
+                    if (_contextMenuItem == queryAndResultsControl)
+                    {
+                        _contextMenuItem = null;
+                    }
+                    _queryList.Remove(queryAndResultsControl);
+                    _pendingQueryList.Remove(queryAndResultsControl);
+                    queryAndResultsControl.Dispose();
+                    _queriesBindingSource.ResetBindings(false);
+
+                    // Activate the primary tab to ensure the table/query list selection gets updated.
+                    _primaryTab.Activate();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34625");
+            }
+            finally
+            {
+                _queriesListBox.SelectedIndexChanged += HandleListSelectionChanged;
             }
         }
 
@@ -847,47 +1407,23 @@ namespace Extract.SQLCDBEditor
             {
                 return;
             }
+
+            var invalidDataTable = _tableList
+                    .Where(table => table.IsLoaded && !table.DataIsValid)
+                    .FirstOrDefault();
+
+            if (invalidDataTable != null)
+            {
+                OpenTableOrQuery(invalidDataTable, false);
+                invalidDataTable.ShowInvalidData();
+                new ExtractException("ELI34626", "Unable to save; table \"" +
+                    invalidDataTable.DisplayName + "\" has invalid data.").Display();
+                return;
+            }
+
             // Display wait cursor while saving the changes
             using (new TemporaryWaitCursor())
             {
-                // Check for an edit in progress on the current row in the datagrid
-                if (_dataGridView.IsCurrentRowDirty)
-                {
-                    // Change the current cell to get the changes to the current cell saved to 
-                    // the datasource
-                    _dataGridView.CurrentCell = null;
-                }
-
-                // Begin a transaction so all or none of the changes are commited
-                SqlCeTransaction transaction = _connection.BeginTransaction();
-                try
-                {
-                    // Go through all of the table information objects in the dictionary and
-                    // update them.
-                    foreach (var tableinformation in _dictionaryOfTableInformation.Values)
-                    {
-                        tableinformation.UpdateTable();
-                    }
-
-                    // Commit the transaction
-                    transaction.Commit();
-
-                    _fileSaved = true;
-                }
-                catch (Exception ex)
-                {
-                    // Rollback the transaction
-                    transaction.Rollback();
-
-                    // Throw exception that there was a problem saving the database
-                    ExtractException ee = new ExtractException("ELI29529", "Error saving database", ex);
-                    throw ee;
-                }
-                finally
-                {
-                    transaction.Dispose();
-                }
-
                 // Ensure that the main database file has not been edited since it was last
                 // opened/saved. If it has, prompt for whether to overwrite the changes from
                 // whatever else opened the database.
@@ -933,9 +1469,6 @@ namespace Extract.SQLCDBEditor
                 MessageBox.Show("Database was saved successfully.", "Database save",
                     MessageBoxButtons.OK, MessageBoxIcon.Information,
                     MessageBoxDefaultButton.Button1, 0);
-
-                // Open database to refresh the tables.
-                OpenDatabase(_databaseFileName);
             }
         }
 
@@ -952,7 +1485,7 @@ namespace Extract.SQLCDBEditor
                 if (databaseToOpen == _databaseFileName)
                 {
                     // reopening the current database.
-                    currentlyOpenTable = _listBoxTables.Text;
+                    currentlyOpenTable = _tablesListBox.Text;
                 }
                 else
                 {
@@ -1027,20 +1560,29 @@ namespace Extract.SQLCDBEditor
                 }
 
                 // Load the table names into the listBox
-                var tableNames = LoadTableNames();
+                var tableNames = LoadTableList();
+
+                CheckSchemaVersionAndPromptForUpdate(tableNames);
+
+                LoadQueryList();
 
                 // If this database was previously open reopen the same table
                 if (!string.IsNullOrEmpty(currentlyOpenTable))
                 {
-                    _listBoxTables.SelectedIndex = _listBoxTables.FindStringExact(currentlyOpenTable);
+                    _tablesListBox.SelectedIndex = _tablesListBox.FindStringExact(currentlyOpenTable);
+                }
+                else if (_tableList.Count > 0)
+                {
+                    _tablesListBox.SelectedIndex = 0;
                 }
 
-                // Load the currently selected table into the dataGridView
-                LoadTable(_listBoxTables.Text);
+                // Reset the _dirty flag
+                _dirty = false;
 
                 SetWindowTitle();
 
-                CheckSchemaVersionAndPromptForUpdate(tableNames);
+                // Update menu and tool strip
+                EnableCommands();
             }
             catch (Exception ex)
             {
@@ -1156,6 +1698,38 @@ namespace Extract.SQLCDBEditor
                     return true;
                 }
             }
+
+            IEnumerable<QueryAndResultsControl> dirtyQueryControls =
+                _queryList.Where(query => !query.IsTable && query.IsQueryDirty);
+
+            // Prompt for any dirty queries to be saved.
+            if (dirtyQueryControls.Count() > 0)
+            {
+                string prompt = (dirtyQueryControls.Count() == 1)
+                    ? "The query \"" + dirtyQueryControls.First().Name + 
+                        "\" has unsaved changes. Do you wish to save it?"
+                    : "Multiple queries have unsaved changes. Do you wish to save them?";
+
+                DialogResult result = MessageBox.Show(this, prompt, "Save queries?", MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
+                switch (result)
+                {
+                    case DialogResult.Yes:
+                        {
+                            foreach (QueryAndResultsControl dirtyQueryControl in dirtyQueryControls)
+                            {
+                                dirtyQueryControl.SaveQuery();
+                            }
+                        }
+                        break;
+
+                    case DialogResult.Cancel:
+                        {
+                            return true;
+                        }
+                }
+            }
+
             return false;
         }
 
@@ -1165,9 +1739,13 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         void EnableCommands()
         {
-            _closeToolStripMenuItem.Enabled = !string.IsNullOrEmpty(_databaseFileName);
+            bool databaseOpen = !string.IsNullOrEmpty(_databaseFileName);
+
+            _closeToolStripMenuItem.Enabled = databaseOpen;
             _saveToolStripButton.Enabled = _dirty;
             _saveToolStripMenuItem.Enabled = _dirty;
+            _newQueryToolStripButton.Enabled = databaseOpen;
+            _newQueryToolStripMenuItem.Enabled = databaseOpen;
             _updateToCurrentSchemaToolStripMenuItem.Enabled =
                 _schemaUpdater != null
                 && _schemaUpdater.IsUpdateRequired;
@@ -1178,32 +1756,25 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         void CloseDatabase()
         {
-            // Remove the handler for the SelectedValueChanged event.
-            _listBoxTables.SelectedValueChanged -= ListBoxTables_SelectedValueChanged;
-
-            // Clear the listbox
-            IDisposable d = _listBoxTables.DataSource as IDisposable;
-            if (d != null)
+            foreach (TabbedDocument tabbedDocument in _sandDockManager.GetDockControls()
+                .OfType<TabbedDocument>())
             {
-                d.Dispose();
+                if (tabbedDocument == _primaryTab)
+                {
+                    ClearPrimaryTab();
+                }
+                else
+                {
+                    tabbedDocument.Close();
+                }
             }
-            _listBoxTables.DataSource = null;
 
-            // Clear the data grid binding source
-            d = bindingSource.DataSource as IDisposable;
-            if (d != null)
-            {
-                d.Dispose();
-            }
-            bindingSource.DataSource = null;
+            CollectionMethods.ClearAndDispose(_tableList);
+            CollectionMethods.ClearAndDispose(_queryList);
+            _tablesBindingSource.ResetBindings(false);
+            _queriesBindingSource.ResetBindings(false);
 
-
-            // Clear table information
-            if (_dictionaryOfTableInformation != null)
-            {
-                CollectionMethods.ClearAndDispose(_dictionaryOfTableInformation);
-                _dictionaryOfTableInformation = null;
-            }
+            CollectionMethods.ClearAndDispose(_pendingQueryList);
 
             // Clear database file name
             _databaseFileName = "";
@@ -1248,33 +1819,41 @@ namespace Extract.SQLCDBEditor
             IDatabaseSchemaUpdater updater = null;
             if (tableNames.Contains("Settings"))
             {
-                var info = LoadTableFromDatabase("Settings");
+                // Setup dataAdapter to get the data
+                using (var table = new DataTable())
+                using (var adapter = new SqlCeDataAdapter("SELECT * FROM Settings", _connection))
+                {
+                    table.Locale = CultureInfo.CurrentCulture;
 
-                // Look for the schema manager
-                var result = info.DataTable.Select("Name = '"
-                    + DatabaseHelperMethods.DatabaseSchemaManagerKey + "'");
-                if (result.Length == 1)
-                {
-                    // Build the name to the assembly containing the manager
-                    var className = result[0]["Value"].ToString();
-                    updater =
-                        UtilityMethods.CreateTypeFromTypeName(className) as IDatabaseSchemaUpdater;
-                    if (updater == null)
+                    // Fill the table with the data from the dataAdapter
+                    adapter.Fill(table);
+
+                    // Look for the schema manager
+                    var result = table.Select("Name = '"
+                        + DatabaseHelperMethods.DatabaseSchemaManagerKey + "'");
+                    if (result.Length == 1)
                     {
-                        var ee = new ExtractException("ELI31154",
-                            "Database contained an entry for schema manager, "
-                        + "but it does not contain a schema updater.");
-                        ee.AddDebugData("Class Name", className, false);
-                        throw ee;
+                        // Build the name to the assembly containing the manager
+                        var className = result[0]["Value"].ToString();
+                        updater =
+                            UtilityMethods.CreateTypeFromTypeName(className) as IDatabaseSchemaUpdater;
+                        if (updater == null)
+                        {
+                            var ee = new ExtractException("ELI31154",
+                                "Database contained an entry for schema manager, "
+                            + "but it does not contain a schema updater.");
+                            ee.AddDebugData("Class Name", className, false);
+                            throw ee;
+                        }
                     }
-                }
-                else
-                {
-                    // No schema updater defined. Check for FPSFile table
-                    if (tableNames.Contains("FPSFile"))
+                    else
                     {
-                        updater = (IDatabaseSchemaUpdater)UtilityMethods.CreateTypeFromTypeName(
-                            "Extract.FileActionManager.Database.FAMServiceDatabaseManager");
+                        // No schema updater defined. Check for FPSFile table
+                        if (tableNames.Contains("FPSFile"))
+                        {
+                            updater = (IDatabaseSchemaUpdater)UtilityMethods.CreateTypeFromTypeName(
+                                "Extract.FileActionManager.Database.FAMServiceDatabaseManager");
+                        }
                     }
                 }
             }
@@ -1364,6 +1943,94 @@ namespace Extract.SQLCDBEditor
             {
                 ExtractException.Display("ELI31167", ex);
             }
+        }
+
+        /// <summary>
+        /// Initializes the specified <see paramref="queryAndResultsControl"/> as a new query.
+        /// </summary>
+        /// <param name="queryAndResultsControl">The query and results control to initialize.</param>
+        void InitializeNewQuery(QueryAndResultsControl queryAndResultsControl)
+        {
+            // Generate a new name based on the table or query it was copied from plus a suffixed
+            // number.
+            string databasePath = Path.GetDirectoryName(_databaseFileName);
+            string queryNameBase = queryAndResultsControl.Name;
+
+            // If queryNameBase is already suffixed with a digit, increment that number rather than
+            // appending another one.
+            int i = 2;
+            Regex digitSuffixFinder = new Regex(@"\s*\d+\s*$");
+            Match match = digitSuffixFinder.Match(queryNameBase);
+            if (match.Success)
+            {
+                int num = int.Parse(match.ToString(), CultureInfo.InvariantCulture);
+                if (num < 999)
+                {
+                    i = num + 1;
+                    queryNameBase = digitSuffixFinder.Replace(queryNameBase, "");
+                }
+            }
+
+            // Test and increment the number until a unique name is found.
+            string queryName = "";
+            do
+            {
+                ExtractException.Assert("ELI34628", "Unable to create new query name.", i < 1000);
+
+                queryName = string.Join(" ", queryNameBase, i.ToString(CultureInfo.InvariantCulture));
+                i++;
+            }
+            while (ExistingQueryNames.Contains(queryName));
+
+            queryAndResultsControl.Name = queryName;
+            queryAndResultsControl.FileName = Path.Combine(databasePath, queryName + ".sqlce");
+
+            queryAndResultsControl.PropertyChanged += HandleQueryPropertyChanged;
+            queryAndResultsControl.QuerySaved += HandleQuerySaved;
+            queryAndResultsControl.QueryRenaming += HandleQueryRenaming;
+            queryAndResultsControl.SentToSeparateTab += HandleTableOrQuerySentToSeparateTab;
+            queryAndResultsControl.QueryCreated += HandleQueryCreated;
+
+            if (!queryAndResultsControl.IsLoaded)
+            {
+                queryAndResultsControl.LoadQuery(_connection, "");
+            }
+
+            _pendingQueryList.Add(queryAndResultsControl);
+
+            OpenTableOrQuery(queryAndResultsControl, true);
+        }
+
+        /// <summary>
+        /// Gets the existing query names (both saved and pending).
+        /// </summary>
+        HashSet<string> ExistingQueryNames
+        {
+            get
+            {
+                string databasePath = Path.GetDirectoryName(_databaseFileName);
+
+                HashSet<string> existingNames = new HashSet<string>(
+                    _queryList.Select(query => query.Name)
+                    .Union(_pendingQueryList.Select(query => query.Name))
+                    .Union(Directory.EnumerateFiles(databasePath, "*.sqlce")
+                        .Select(file => Path.GetFileNameWithoutExtension(file))));
+                
+                return existingNames;
+            }
+        }
+
+        /// <summary>
+        /// Closes any control open in the primary tab.
+        /// </summary>
+        void ClearPrimaryTab()
+        {
+            _primaryTab.Controls.Clear();
+            _primaryTab.TabText = "";
+            _primaryTab.AllowClose = false;
+
+            _tablesListBox.ClearSelected();
+            _queriesListBox.ClearSelected();
         }
 
         #endregion Private Methods

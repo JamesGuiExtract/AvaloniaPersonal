@@ -7,42 +7,6 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                try
-                {
-                    if (_connection != null)
-                    {
-                        _connection.Dispose();
-                        _connection = null;
-                    }
-
-                    if (!string.IsNullOrEmpty(_databaseWorkingCopyFileName) &&
-                        System.IO.File.Exists(_databaseWorkingCopyFileName))
-                    {
-                        System.IO.File.Delete(_databaseWorkingCopyFileName);
-                        _databaseWorkingCopyFileName = null;
-                    }
-
-                    if (components != null)
-                    {
-                        components.Dispose();
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    ex.ExtractLog("ELI34543");
-                }
-            }
-            base.Dispose(disposing);
-        }
-
         #region Windows Form Designer generated code
 
         /// <summary>
@@ -51,14 +15,15 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SQLCDBEditorForm));
+            TD.SandDock.DockingRules dockingRules3 = new TD.SandDock.DockingRules();
+            TD.SandDock.DockingRules dockingRules4 = new TD.SandDock.DockingRules();
             this._toolStrip = new System.Windows.Forms.ToolStrip();
             this._openToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._saveToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this._splitContainer = new System.Windows.Forms.SplitContainer();
-            this._listBoxTables = new System.Windows.Forms.ListBox();
-            this._dataGridView = new System.Windows.Forms.DataGridView();
+            this._newQueryToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._menuStrip = new System.Windows.Forms.MenuStrip();
             this._fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -67,19 +32,30 @@ namespace Extract.SQLCDBEditor
             this._exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._updateToCurrentSchemaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._newQueryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._statusStrip = new System.Windows.Forms.StatusStrip();
             this._statusLabelSchemaInfo = new System.Windows.Forms.ToolStripStatusLabel();
+            this._sandDockManager = new TD.SandDock.SandDockManager();
+            this._tableDockWindow = new TD.SandDock.DockableWindow();
+            this._tablesListBox = new System.Windows.Forms.ListBox();
+            this._contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this._openInSeparateTabMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._copyToNewQueryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._renameQueryMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dockContainer1 = new TD.SandDock.DockContainer();
+            this._queryDockWindow = new TD.SandDock.DockableWindow();
+            this._queriesListBox = new System.Windows.Forms.ListBox();
             toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this._toolStrip.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._splitContainer)).BeginInit();
-            this._splitContainer.Panel1.SuspendLayout();
-            this._splitContainer.Panel2.SuspendLayout();
-            this._splitContainer.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._dataGridView)).BeginInit();
             this._menuStrip.SuspendLayout();
             this._statusStrip.SuspendLayout();
+            this._tableDockWindow.SuspendLayout();
+            this._contextMenuStrip.SuspendLayout();
+            this.dockContainer1.SuspendLayout();
+            this._queryDockWindow.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStripMenuItem1
@@ -92,10 +68,11 @@ namespace Extract.SQLCDBEditor
             this._toolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             this._toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._openToolStripButton,
-            this._saveToolStripButton});
+            this._saveToolStripButton,
+            this._newQueryToolStripButton});
             this._toolStrip.Location = new System.Drawing.Point(0, 24);
             this._toolStrip.Name = "_toolStrip";
-            this._toolStrip.Size = new System.Drawing.Size(780, 39);
+            this._toolStrip.Size = new System.Drawing.Size(847, 39);
             this._toolStrip.TabIndex = 0;
             this._toolStrip.Text = "toolStrip1";
             // 
@@ -119,46 +96,16 @@ namespace Extract.SQLCDBEditor
             this._saveToolStripButton.Text = "Save Database";
             this._saveToolStripButton.Click += new System.EventHandler(this.HandleSaveClick);
             // 
-            // _splitContainer
+            // _newQueryToolStripButton
             // 
-            this._splitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._splitContainer.Location = new System.Drawing.Point(0, 63);
-            this._splitContainer.Name = "_splitContainer";
-            // 
-            // _splitContainer.Panel1
-            // 
-            this._splitContainer.Panel1.Controls.Add(this._listBoxTables);
-            // 
-            // _splitContainer.Panel2
-            // 
-            this._splitContainer.Panel2.Controls.Add(this._dataGridView);
-            this._splitContainer.Size = new System.Drawing.Size(780, 358);
-            this._splitContainer.SplitterDistance = 202;
-            this._splitContainer.TabIndex = 1;
-            // 
-            // _listBoxTables
-            // 
-            this._listBoxTables.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._listBoxTables.FormattingEnabled = true;
-            this._listBoxTables.IntegralHeight = false;
-            this._listBoxTables.Location = new System.Drawing.Point(0, 0);
-            this._listBoxTables.Name = "_listBoxTables";
-            this._listBoxTables.Size = new System.Drawing.Size(202, 358);
-            this._listBoxTables.TabIndex = 0;
-            // 
-            // _dataGridView
-            // 
-            this._dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this._dataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._dataGridView.Location = new System.Drawing.Point(0, 0);
-            this._dataGridView.Name = "_dataGridView";
-            this._dataGridView.Size = new System.Drawing.Size(574, 358);
-            this._dataGridView.TabIndex = 0;
-            this._dataGridView.CurrentCellDirtyStateChanged += new System.EventHandler(this.DataGridView_CurrentCellDirtyStateChanged);
-            this._dataGridView.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.HandleDataGridViewError);
-            this._dataGridView.UserDeletedRow += new System.Windows.Forms.DataGridViewRowEventHandler(this.DataGridView_UserDeletedRow);
+            this._newQueryToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._newQueryToolStripButton.Enabled = false;
+            this._newQueryToolStripButton.Image = global::Extract.SQLCDBEditor.Properties.Resources.DbQueryLarge;
+            this._newQueryToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._newQueryToolStripButton.Name = "_newQueryToolStripButton";
+            this._newQueryToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._newQueryToolStripButton.Text = "Create New Query";
+            this._newQueryToolStripButton.Click += new System.EventHandler(this.HandleNewQueryToolStripButtonClick);
             // 
             // _menuStrip
             // 
@@ -168,7 +115,7 @@ namespace Extract.SQLCDBEditor
             this._helpToolStripMenuItem});
             this._menuStrip.Location = new System.Drawing.Point(0, 0);
             this._menuStrip.Name = "_menuStrip";
-            this._menuStrip.Size = new System.Drawing.Size(780, 24);
+            this._menuStrip.Size = new System.Drawing.Size(847, 24);
             this._menuStrip.TabIndex = 2;
             this._menuStrip.Text = "menuStrip1";
             // 
@@ -215,7 +162,8 @@ namespace Extract.SQLCDBEditor
             // _toolsToolStripMenuItem
             // 
             this._toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._updateToCurrentSchemaToolStripMenuItem});
+            this._updateToCurrentSchemaToolStripMenuItem,
+            this._newQueryToolStripMenuItem});
             this._toolsToolStripMenuItem.Name = "_toolsToolStripMenuItem";
             this._toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this._toolsToolStripMenuItem.Text = "&Tools";
@@ -226,6 +174,13 @@ namespace Extract.SQLCDBEditor
             this._updateToCurrentSchemaToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this._updateToCurrentSchemaToolStripMenuItem.Text = "&Update to current schema...";
             this._updateToCurrentSchemaToolStripMenuItem.Click += new System.EventHandler(this.HandleUpdateToCurrentSchemaClick);
+            // 
+            // _newQueryToolStripMenuItem
+            // 
+            this._newQueryToolStripMenuItem.Enabled = false;
+            this._newQueryToolStripMenuItem.Name = "_newQueryToolStripMenuItem";
+            this._newQueryToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
+            this._newQueryToolStripMenuItem.Text = "Create new query";
             // 
             // _helpToolStripMenuItem
             // 
@@ -246,27 +201,166 @@ namespace Extract.SQLCDBEditor
             // 
             this._statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._statusLabelSchemaInfo});
-            this._statusStrip.Location = new System.Drawing.Point(0, 424);
+            this._statusStrip.Location = new System.Drawing.Point(0, 476);
             this._statusStrip.Name = "_statusStrip";
             this._statusStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.ManagerRenderMode;
-            this._statusStrip.Size = new System.Drawing.Size(780, 22);
+            this._statusStrip.Size = new System.Drawing.Size(847, 22);
             this._statusStrip.TabIndex = 3;
             this._statusStrip.Text = "statusStrip1";
             // 
             // _statusLabelSchemaInfo
             // 
             this._statusLabelSchemaInfo.Name = "_statusLabelSchemaInfo";
-            this._statusLabelSchemaInfo.Size = new System.Drawing.Size(765, 17);
+            this._statusLabelSchemaInfo.Size = new System.Drawing.Size(832, 17);
             this._statusLabelSchemaInfo.Spring = true;
             this._statusLabelSchemaInfo.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // _sandDockManager
+            // 
+            this._sandDockManager.AutoSaveLayout = true;
+            this._sandDockManager.BorderStyle = TD.SandDock.Rendering.BorderStyle.None;
+            this._sandDockManager.DockSystemContainer = this;
+            this._sandDockManager.OwnerForm = this;
+            this._sandDockManager.DockControlActivated += new TD.SandDock.DockControlEventHandler(this.HandleDockControlActivated);
+            // 
+            // _tableDockWindow
+            // 
+            this._tableDockWindow.AllowCollapse = false;
+            this._tableDockWindow.Controls.Add(this._tablesListBox);
+            dockingRules3.AllowDockBottom = true;
+            dockingRules3.AllowDockLeft = true;
+            dockingRules3.AllowDockRight = true;
+            dockingRules3.AllowDockTop = true;
+            dockingRules3.AllowFloat = true;
+            dockingRules3.AllowTab = true;
+            this._tableDockWindow.DockingRules = dockingRules3;
+            this._tableDockWindow.Guid = new System.Guid("85a6af86-de66-4810-9629-cf367ab421f1");
+            this._tableDockWindow.Location = new System.Drawing.Point(0, 18);
+            this._tableDockWindow.Name = "_tableDockWindow";
+            this._tableDockWindow.ShowOptions = false;
+            this._tableDockWindow.Size = new System.Drawing.Size(233, 162);
+            this._tableDockWindow.TabIndex = 0;
+            this._tableDockWindow.Text = "Tables";
+            this._tableDockWindow.Closing += new TD.SandDock.DockControlClosingEventHandler(this.HandleDockWindowClosing);
+            // 
+            // _tablesListBox
+            // 
+            this._tablesListBox.ContextMenuStrip = this._contextMenuStrip;
+            this._tablesListBox.DisplayMember = "DisplayName";
+            this._tablesListBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._tablesListBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this._tablesListBox.FormattingEnabled = true;
+            this._tablesListBox.IntegralHeight = false;
+            this._tablesListBox.Location = new System.Drawing.Point(0, 0);
+            this._tablesListBox.Name = "_tablesListBox";
+            this._tablesListBox.Size = new System.Drawing.Size(233, 162);
+            this._tablesListBox.TabIndex = 0;
+            this._tablesListBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.HandleListBoxDrawItem);
+            this._tablesListBox.SelectedIndexChanged += new System.EventHandler(this.HandleListSelectionChanged);
+            this._tablesListBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.HandleListMouseDown);
+            // 
+            // _contextMenuStrip
+            // 
+            this._contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._openInSeparateTabMenuItem,
+            this._copyToNewQueryToolStripMenuItem,
+            this._renameQueryMenuItem,
+            this._deleteToolStripMenuItem});
+            this._contextMenuStrip.Name = "_contextMenuStrip";
+            this._contextMenuStrip.Size = new System.Drawing.Size(184, 92);
+            this._contextMenuStrip.Closed += new System.Windows.Forms.ToolStripDropDownClosedEventHandler(this.HandleContextMenuStripClosed);
+            this._contextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.HandleContextMenuStripOpening);
+            // 
+            // _openInSeparateTabMenuItem
+            // 
+            this._openInSeparateTabMenuItem.Name = "_openInSeparateTabMenuItem";
+            this._openInSeparateTabMenuItem.Size = new System.Drawing.Size(183, 22);
+            this._openInSeparateTabMenuItem.Text = "Open in separate tab";
+            this._openInSeparateTabMenuItem.Click += new System.EventHandler(this.HandleOpenInNewTabMenuItemClick);
+            // 
+            // _copyToNewQueryToolStripMenuItem
+            // 
+            this._copyToNewQueryToolStripMenuItem.Name = "_copyToNewQueryToolStripMenuItem";
+            this._copyToNewQueryToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this._copyToNewQueryToolStripMenuItem.Text = "Copy to new query";
+            this._copyToNewQueryToolStripMenuItem.Click += new System.EventHandler(this.HandleCopyToNewQueryMenuItemClick);
+            // 
+            // _renameQueryMenuItem
+            // 
+            this._renameQueryMenuItem.Name = "_renameQueryMenuItem";
+            this._renameQueryMenuItem.Size = new System.Drawing.Size(183, 22);
+            this._renameQueryMenuItem.Text = "Rename query";
+            this._renameQueryMenuItem.Click += new System.EventHandler(this.HandleRenameQueryMenuItemClick);
+            // 
+            // _deleteToolStripMenuItem
+            // 
+            this._deleteToolStripMenuItem.Name = "_deleteToolStripMenuItem";
+            this._deleteToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this._deleteToolStripMenuItem.Text = "Delete";
+            this._deleteToolStripMenuItem.Click += new System.EventHandler(this.HandleDeleteMenuItemClick);
+            // 
+            // dockContainer1
+            // 
+            this.dockContainer1.ContentSize = 233;
+            this.dockContainer1.Controls.Add(this._tableDockWindow);
+            this.dockContainer1.Controls.Add(this._queryDockWindow);
+            this.dockContainer1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.dockContainer1.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Horizontal, new TD.SandDock.LayoutSystemBase[] {
+            ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
+                        ((TD.SandDock.DockControl)(this._tableDockWindow))}, this._tableDockWindow))),
+            ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
+                        ((TD.SandDock.DockControl)(this._queryDockWindow))}, this._queryDockWindow)))});
+            this.dockContainer1.Location = new System.Drawing.Point(0, 63);
+            this.dockContainer1.Manager = this._sandDockManager;
+            this.dockContainer1.Name = "dockContainer1";
+            this.dockContainer1.Size = new System.Drawing.Size(237, 413);
+            this.dockContainer1.TabIndex = 4;
+            // 
+            // _queryDockWindow
+            // 
+            this._queryDockWindow.AllowCollapse = false;
+            this._queryDockWindow.Controls.Add(this._queriesListBox);
+            dockingRules4.AllowDockBottom = true;
+            dockingRules4.AllowDockLeft = true;
+            dockingRules4.AllowDockRight = true;
+            dockingRules4.AllowDockTop = true;
+            dockingRules4.AllowFloat = true;
+            dockingRules4.AllowTab = true;
+            this._queryDockWindow.DockingRules = dockingRules4;
+            this._queryDockWindow.Guid = new System.Guid("77c6358a-bf4e-4e01-b533-508c8c53771b");
+            this._queryDockWindow.Location = new System.Drawing.Point(0, 226);
+            this._queryDockWindow.Name = "_queryDockWindow";
+            this._queryDockWindow.ShowOptions = false;
+            this._queryDockWindow.Size = new System.Drawing.Size(233, 163);
+            this._queryDockWindow.TabIndex = 0;
+            this._queryDockWindow.Text = "Queries";
+            this._queryDockWindow.Closing += new TD.SandDock.DockControlClosingEventHandler(this.HandleDockWindowClosing);
+            // 
+            // _queriesListBox
+            // 
+            this._queriesListBox.ContextMenuStrip = this._contextMenuStrip;
+            this._queriesListBox.DisplayMember = "DisplayName";
+            this._queriesListBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._queriesListBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this._queriesListBox.FormattingEnabled = true;
+            this._queriesListBox.IntegralHeight = false;
+            this._queriesListBox.Location = new System.Drawing.Point(0, 0);
+            this._queriesListBox.Name = "_queriesListBox";
+            this._queriesListBox.Size = new System.Drawing.Size(233, 163);
+            this._queriesListBox.TabIndex = 0;
+            this._queriesListBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.HandleListBoxDrawItem);
+            this._queriesListBox.SelectedIndexChanged += new System.EventHandler(this.HandleListSelectionChanged);
+            this._queriesListBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.HandleListMouseDown);
+            this._queriesListBox.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.HandleQueryListPreviewKeyDown);
             // 
             // SQLCDBEditorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(780, 446);
+            this.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.ClientSize = new System.Drawing.Size(847, 498);
+            this.Controls.Add(this.dockContainer1);
             this.Controls.Add(this._statusStrip);
-            this.Controls.Add(this._splitContainer);
             this.Controls.Add(this._toolStrip);
             this.Controls.Add(this._menuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -277,15 +371,14 @@ namespace Extract.SQLCDBEditor
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SQLCDBEditorForm_FormClosing);
             this._toolStrip.ResumeLayout(false);
             this._toolStrip.PerformLayout();
-            this._splitContainer.Panel1.ResumeLayout(false);
-            this._splitContainer.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this._splitContainer)).EndInit();
-            this._splitContainer.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this._dataGridView)).EndInit();
             this._menuStrip.ResumeLayout(false);
             this._menuStrip.PerformLayout();
             this._statusStrip.ResumeLayout(false);
             this._statusStrip.PerformLayout();
+            this._tableDockWindow.ResumeLayout(false);
+            this._contextMenuStrip.ResumeLayout(false);
+            this.dockContainer1.ResumeLayout(false);
+            this._queryDockWindow.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -296,8 +389,6 @@ namespace Extract.SQLCDBEditor
         private System.Windows.Forms.ToolStrip _toolStrip;
         private System.Windows.Forms.ToolStripButton _openToolStripButton;
         private System.Windows.Forms.ToolStripButton _saveToolStripButton;
-        private System.Windows.Forms.SplitContainer _splitContainer;
-        private System.Windows.Forms.DataGridView _dataGridView;
         private System.Windows.Forms.MenuStrip _menuStrip;
         private System.Windows.Forms.ToolStripMenuItem _fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _openToolStripMenuItem;
@@ -310,7 +401,20 @@ namespace Extract.SQLCDBEditor
         private System.Windows.Forms.ToolStripMenuItem _updateToCurrentSchemaToolStripMenuItem;
         private System.Windows.Forms.StatusStrip _statusStrip;
         private System.Windows.Forms.ToolStripStatusLabel _statusLabelSchemaInfo;
-        private System.Windows.Forms.ListBox _listBoxTables;
+        private TD.SandDock.SandDockManager _sandDockManager;
+        private TD.SandDock.DockableWindow _tableDockWindow;
+        private TD.SandDock.DockContainer dockContainer1;
+        private TD.SandDock.DockableWindow _queryDockWindow;
+        private System.Windows.Forms.ContextMenuStrip _contextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem _openInSeparateTabMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _renameQueryMenuItem;
+        private System.Windows.Forms.ListBox _tablesListBox;
+        private System.Windows.Forms.ListBox _queriesListBox;
+        private System.Windows.Forms.ToolStripButton _newQueryToolStripButton;
+        private System.Windows.Forms.ToolStripMenuItem _newQueryToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _copyToNewQueryToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _deleteToolStripMenuItem;
+
     }
 }
 

@@ -109,6 +109,9 @@ namespace Extract.Utilities.Forms
 
         #region Constructors
 
+        /// <overloads>
+        /// Initializes a new instance of the <see cref="FormStateManager"/> class.
+        /// </overloads>
         /// <summary>
         /// Initializes a new instance of the <see cref="FormStateManager"/> class.
         /// <para><b>Note</b></para>
@@ -132,17 +135,27 @@ namespace Extract.Utilities.Forms
             : this(form, persistenceFileName,
                 mutexName, null, manageToolStrips, fullScreenTabText)
         {
+        }
 
-            try
-            {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(
-                    LicenseIdName.ExtractCoreObjects, "ELI30997", _OBJECT_NAME);
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI30998", ex);
-            }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FormStateManager"/> class.
+        /// <para><b>Note</b></para>
+        /// <see cref="FormStateManager"/> should not be created or used in design time.
+        /// </summary>
+        /// <param name="form">The <see cref="Form"/> whose state is to be managed.</param>
+        /// <param name="persistenceFileName">The name of the file to which form properties will be
+        /// maintained.</param>
+        /// <param name="mutexName">Name for the mutex used to serialize persistance of the
+        /// control and form layout.</param>
+        /// <param name="sandDockManager">If specified, this <see cref="SandDockManager"/>'s state
+        /// info will be persisted.</param>
+        /// <param name="manageToolStrips">If <see langword="true"/>, the form's
+        /// <see cref="ToolStrip"/> will be persisted.</param>
+        /// <throws><see cref="ExtractException"/> if instantiated at design-time.</throws>
+        public FormStateManager(Form form, string persistenceFileName, string mutexName,
+            SandDockManager sandDockManager, bool manageToolStrips)
+            : this(form, persistenceFileName, mutexName, sandDockManager, manageToolStrips, null)
+        {
         }
 
         /// <summary>
@@ -172,6 +185,17 @@ namespace Extract.Utilities.Forms
             {
                 ExtractException.Assert("ELI30836", "FormStateManager should not be used at design time.",
                     LicenseManager.UsageMode != LicenseUsageMode.Designtime);
+
+                try
+                {
+                    // Validate the license
+                    LicenseUtilities.ValidateLicense(
+                        LicenseIdName.ExtractCoreObjects, "ELI30997", _OBJECT_NAME);
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI30998", ex);
+                }
 
                 _form = form;
                 _originalBorderStyle = _form.FormBorderStyle;
