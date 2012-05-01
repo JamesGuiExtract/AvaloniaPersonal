@@ -789,7 +789,7 @@
 			<li>Confirm that the table title is displayed in white text on a black background.
 			<li>Confirm that the <b>Data types*</b> column information is correct.
 			<li>Confirm that the <b>Count of files with specified data types</b> column 
-			information is correct with <b>0</b> entries for each row.
+			information is correct with <b>blank</b> entries for each row.
 		</ul>
 	</ul>
 
@@ -845,7 +845,7 @@
 			<li>Confirm that one row is provided for each <b>event</b> and that each entry 
 			is appropriate.
 <p>
-			<li>Confirm that the <b>Tags Applied To Document</b> 
+			<li>Confirm that the <b>Document Tag Change History</b> 
 			table and contents are formatted properly even at 400% zoom factor.
 			<li>Confirm that a <b>Tag Name</b> column is provided.
 			<li>Confirm that the column heading is displayed with a distinct background color.
@@ -867,18 +867,18 @@
 			<li>Confirm that an <b>HC*</b> column is provided.
 			<li>Confirm that an <b>MC*</b> column is provided.
 			<li>Confirm that an <b>LC*</b> column is provided.
-			<li>Confirm that an <b>Clues</b> column is provided.
-			<li>Confirm that an <b>Manual</b> column is provided.
-			<li>Confirm that an <b>Total</b> column is provided.
-			<li>Confirm that an <b>Machine</b> column is provided.
-			<li>Confirm that an <b>User</b> column is provided.
+			<li>Confirm that a <b>Clues</b> column is provided.
+			<li>Confirm that a <b>Man*</b> column is provided.
+			<li>Confirm that a <b>Total</b> column is provided.
+			<li>Confirm that a <b>UserName</b> column is provided.
+			<li>Confirm that a <b>MachineName</b> column is provided.
 			<li>Confirm that the column headings are displayed with a distinct background color.
 			<li>Confirm that one row is provided and that each entry 
 			is appropriate.
 <p>
 			<li>Confirm that after the <b>Redaction summary</b> table is text for 
 			<b>*HC Data = High confidence data, *MC Data = Medium confidence data, *LC 
-			Data = Low confidence data</b>.
+			Data = Low confidence data, *Man = manually added data</b>.
 		</ul>
 <p>
 		<li><b>Test with empty database</b> 
@@ -886,51 +886,13 @@
 		<ul>
 			<li>Confirm that the <b>Document Information</b> table and contents are formatted 
 			properly even at 400% zoom factor.
-			<li>Confirm that the <b>Document name</b> information is as specified.
+			<li>Confirm that the <b>Document name</b> information is as specified with 
+			<b>File not found:</b>.
 			<li>Confirm that the <b>File size (bytes)</b> information is empty.
 			<li>Confirm that the <b>Number of pages</b> information is empty.
 			<li>Confirm that the <b>File priority</b> information is empty.
 <p>
-			<li>Confirm that the <b>Summary of status</b> 
-			table and contents are formatted properly even at 400% zoom factor.
-			<li>Confirm that an <b>Action</b> column is provided.
-			<li>Confirm that an <b>Status</b> column is provided.
-			<li>Confirm that the column headings are displayed with a distinct background color.
-			<li>Confirm that one row is provided with <b>N/A</b> in each cell.
-<p>
-			<li>Confirm that the <b>Queuing events</b> 
-			table and contents are formatted properly even at 400% zoom factor.
-			<li>Confirm that an <b>Event time stamp</b> column is provided.
-			<li>Confirm that an <b>Event type</b> column is provided.
-			<li>Confirm that a <b>File modify time</b> column is provided.
-			<li>Confirm that a <b>File size (bytes)</b> column is provided.
-			<li>Confirm that a <b>Machine</b> column is provided.
-			<li>Confirm that a <b>User</b> column is provided.
-			<li>Confirm that the column headings are displayed with a distinct background color.
-			<li>Confirm that one row is provided with <b>N/A</b> in each cell.
-<p>
-			<li>Confirm that the <b>Status change events</b> 
-			table and contents are formatted properly even at 400% zoom factor.
-			<li>Confirm that an <b>Time stamp</b> column is provided.
-			<li>Confirm that an <b>Action</b> column is provided.
-			<li>Confirm that an <b>From status</b> column is provided.
-			<li>Confirm that an <b>To status</b> column is provided.
-			<li>Confirm that an <b>Machine</b> column is provided.
-			<li>Confirm that an <b>User</b> column is provided.
-			<li>Confirm that the column headings are displayed with a distinct background color.
-			<li>Confirm that one row is provided with <b>empty</b> cells.
-<p>
-			<li>Confirm that the <b>Tags Applied To Document</b> 
-			table is not present.
-<p>
-			<li>Confirm that the <b>File Action Comments</b> 
-			table and contents are formatted properly even at 400% zoom factor.
-			<li>Confirm that a <b>User</b> column is provided.
-			<li>Confirm that an <b>Action</b> column is provided.
-			<li>Confirm that a <b>Time Stamp</b> column is provided.
-			<li>Confirm that a <b>Comments</b> column is provided.
-			<li>Confirm that the column headings are displayed with a distinct background color.
-			<li>Confirm that one row is provided with empty cells.
+			<li>Confirm that other tables are not present.
 		</ul>
 	</ul>
 
@@ -962,46 +924,16 @@
 			<li>Confirm that the table contains one row with <b>User:</b> in the first column 
 			and <b>&lt;name&gt;</b> in the second column.
 <p>
-			<li>Confirm that the <b>File Information</b> table and contents are 
-			formatted properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the <b>File</b> table and contents are formatted properly even 
+			at 400% zoom factor.
 			<li>Confirm that the column header is displayed in a distinct background color.
 			<li>Confirm that the single <b>File</b> column correctly displays the full path to 
 			each image.
 		</ul>
 <p>
 		<li><b>Test with empty database</b> 
-		<ul>
-			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the <b>Start time</b> information is correct.
-			<li>Confirm that the <b>End time</b> information is correct.
-<p>
-			<li>Confirm that the <b>Specific user</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the table contains one row with <b>User:</b> in the first column 
-			and <b>N/A</b> in the second column.
-<p>
-			<li>Confirm that the <b>File Information</b> table and contents are 
-			formatted properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the column header is displayed in a distinct background color.
-			<li>Confirm that there are no entries under the column header.
-		</ul>
-<p>
 		<li><b>Test with &quot;ABC&quot; (nonsense) user (can be added to an empty database)</b> 
 		<ul>
-			<li>Confirm that a shadowed heading is provided at the top of the report.
-			<li>Confirm that the first line is <b>Extract Systems</b>.
-			<li>Confirm that the second line is <b>ID Shield List Of Documents 
-			Verified By Specific User</b>.
-			<li>Confirm that there is a distinct background color.
-<p>
-			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the <b>Database server</b> information is correct.
-			<li>Confirm that the <b>Database name</b> information is correct.
-<p>
 			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
 			properly even at 400% zoom factor.
 			<li>Confirm that the <b>Start time</b> information is correct.
@@ -1010,11 +942,10 @@
 			<li>Confirm that the <b>Specific user</b> table and contents are formatted 
 			properly even at 400% zoom factor.
 			<li>Confirm that the table contains one row with <b>User:</b> in the first column 
-			and <b>ABC</b> in the second column.
+			and <b>[No Values Found]</b> in the second column.
 <p>
-			<li>Confirm that the <b>File Information</b> table and contents are 
-			formatted properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the <b>File</b> table and contents are formatted properly even 
+			at 400% zoom factor.
 			<li>Confirm that the column header is displayed in a distinct background color.
 			<li>Confirm that there are no entries under the column header.
 		</ul>
@@ -1049,10 +980,7 @@
 			percentage for the <b>Total documents in project</b> row.
 			<li>Confirm that the <b>Documents</b> column correctly displays <b>0 (0%)</b> for 
 			the other rows.
-			<li>Confirm that the <b>Pages contained</b> column correctly displays <b>0</b> without 
-			percentage for the <b>Total documents in project</b> row.
-			<li>Confirm that the <b>Pages contained</b> column correctly displays <b>0 (0%)</b> 
-			for the other rows.
+			<li>Confirm that the <b>Pages contained</b> column is <b>blank</b>.
 		</ul>
 <p>
   	   	<LI><b>[FlexIDSCore #4165]</b> Confirm that files with all redaction items toggled off 
@@ -1094,8 +1022,11 @@
 			<li>Confirm that the <b>Average:</b> counts are provided with one decimal place for 
 			the Clues, HCData, MCData, LCData, Manual and Total columns.
 			<li>Confirm that after the <b>Average</b> row, a row is included for <b>Total:</b>.
-			<li>Confirm that the <b>Average</b> counts are provided without digits to the right 
+			<li>Confirm that the <b>Average</b> counts are provided with digits to the right 
 			of the decimal point for the Clues, HCData, MCData, LCData, Manual and Total columns.
+<p>
+	  	   	<LI><b>[FlexIDSCore #4190]</b> Confirm that the numbers reported are 
+			correct if verification is done by multiple users on multiple machines.
 		</ul>
 <p>
 		<li><b>Test with empty database</b> 
@@ -1122,9 +1053,6 @@
 			<li>Confirm that the <b>Average:</b> counts are all empty.
 			<li>Confirm that after the <b>Average</b> row, a row is included for <b>Total:</b>.
 			<li>Confirm that the <b>Average</b> counts are all empty.
-<p>
-	  	   	<LI><b>[FlexIDSCore #4190]</b> Confirm that the numbers reported are 
-			correct if verification is done by multiple users on multiple machines.
 		</ul>
 	</ul>
 
@@ -1198,9 +1126,7 @@
 			an image was verified.
 		</ul>
 	</ul>
-
 <p>
-
 	<li><b>ID Shield verification times and rates (by user)</b>
 	<ul>
 		<li><b>Test with meaningful data</b> 
@@ -1216,13 +1142,9 @@
 			<li>Confirm that the column headings are displayed in a 
 			distinct background color.
 			<li>Confirm that a column exists for <b>User</b>.
-			<li>Confirm that a column exists for <b>Screen verification time</b> and that 
+			<li>Confirm that a column exists for <b>Verification time</b> and that 
 			information is formatted as <b>1h 12m 34s</b>.
-			<li>Confirm that a column exists for <b>Screen verification rate</b> and that 
-			information is formatted as <b>1,234 pages/hr</b>.
-			<li>Confirm that a column exists for <b>Project verification time*</b> and that 
-			information is formatted as <b>1h 12m 34s</b>.
-			<li>Confirm that a column exists for <b>Project verification rate*</b> and that 
+			<li>Confirm that a column exists for <b>Verification rate</b> and that 
 			information is formatted as <b>1,234 pages/hr</b>.
 			<li>Confirm that one row is provided for each <b>User</b> and that they are 
 			presented in alphabetical order.
@@ -1230,8 +1152,6 @@
 			<li>Confirm that a row exists for <b>Average</b> and that the 
 			associated counts are displayed with two digits to the right of the decimal place.
 			<li>Confirm that a row exists for <b>Total</b>.
-			<li>Confirm that after the <b>Verification time information</b> table is 
-			text for <b>*These times are estimates</b>.
 		</ul>
 <p>
 		<li><b>Test with empty database</b> 
@@ -1247,19 +1167,13 @@
 			<li>Confirm that the column headings are displayed in a 
 			distinct background color.
 			<li>Confirm that a column exists for <b>User</b>.
-			<li>Confirm that a column exists for <b>Screen verification time</b>.
-			<li>Confirm that a column exists for <b>Screen verification rate</b>.
-			<li>Confirm that a column exists for <b>Project verification time*</b>.
-			<li>Confirm that a column exists for <b>Project verification rate*</b>.
-			<li>Confirm that one row is provided with an empty user, 
-			<b>0m 0s</b> for each verification time, and <b>0 pages/hr</b> for each 
-			verification rate.
+			<li>Confirm that a column exists for <b>Verification time</b>.
+			<li>Confirm that a column exists for <b>Verification rate</b>.
+			<li>Confirm that one blank row is provided with an empty user.
 <p>
 			<li>Confirm that a row exists for <b>Average</b> and that the 
 			associated counts are displayed with two digits to the right of the decimal place.
 			<li>Confirm that a row exists for <b>Total</b>.
-			<li>Confirm that after the <b>Verification time information</b> table is 
-			text for <b>*These times are estimates</b>.
 		</ul>
 	</ul>
 </ol>
