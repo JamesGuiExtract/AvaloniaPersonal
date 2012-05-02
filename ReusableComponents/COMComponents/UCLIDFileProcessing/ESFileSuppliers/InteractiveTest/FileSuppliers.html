@@ -28,7 +28,8 @@
         	<li>Description</li> 
         	<li>Status</li> 
     	</ul></li>
-    	<li>Confirm that the Queue Setup tab includes a <b>Select skip condition</b> edit box.</li>
+    	<li>Confirm that the Queue Setup tab includes a <b>Do not queue any file that meets the following 
+	condition</b> edit box.</li>
     	<LI><b>[FlexIDSCore #4227, #4257]</b> Double-clicking read-only text boxes
     	<ul>
         	<li>On Server 2008, Server 2008 R2, or Windows 7, confirm the following behavior:
@@ -51,10 +52,11 @@
 		all are enabled.</li> 
         	<li>Confirm the dialog has a droplist.</li> 
 		<ul>
-			<LI>File from dynamic list
-			<LI>File from folder
-			<LI>File from FTP site
-			<LI>File from static list
+			<LI>Files from context menu
+			<LI>Files from dynamic list
+			<LI>Files from folder
+			<LI>Files from FTP site
+			<LI>Files from static list
 		</ul>
         	<li>Confirm that clicking on a file supplier to highlight it then pressing the 
         	<b>Remove</b> button in the Queue Setup tab deletes it.</li> 
@@ -203,34 +205,12 @@
         	files to the queue.</li>
     	</ul></li>
 <p>
-    	<LI><b>[FlexIDSCore #3734]</b> Page number checking when queuing
-    	<ul>
-        	<LI>Create a list of PDF files to be supplied to a new database via <b>Files from dynamic 
-        	list</b>.</li>
-        	<li>Queue the files and confirm that page count information is provided.</li>
-        	<li>Add new files to the end of the list.</li>
-        	<li>Queue the files again, without using the <b>Force processing</b> option.</li>
-        	<li>Confirm that page counts <b>are not</b> recomputed for the listed files that were
-        	queued previously.</li>
-        	<li>Add new files to the end of the list.</li>
-        	<li>Queue the files again, using the <b>Force processing</b> option.</li>
-        	<li>Confirm that page counts <b>are</b> recomputed for the listed files that were queued 
-        	previously.</li>
-    	</ul></li>
-<p>
     	<LI><b>[FlexIDSCore #3737]</b> Double queuing
     	<ul>
     		<li>Check first to make sure that the problem has been fixed.  
 		<li>Confirm by exercising the <b>Value From List VF</b> memory leak test that a file 
 		will not be queued twice.</li>
     	</ul>
-<p>
-    	<LI><b>[FlexIDSCore #3507, #3508, LegacyRC #5117]</b> Faster queuing of PDFs
-    	<ul>
-        	<li>Select a folder of PDF images for queuing and processing.</li>
-        	<li>Start queuing and processing.</li>
-        	<li>Confirm that queuing of PDFs does not take an inordinate amount of time.</li>
-    	</ul></li>
 </ul>
 <p>
 <b>File Suppliers</b>
@@ -401,9 +381,9 @@
             		files.</li>
         	</ul></li>
 <p>
-  	   	<LI><b>[LegacyRC #5713]</b> Confirm that <b>*.pdf</b> is an available file extension.
-        	<li><b>[LegacyRC #5751]</b>
+        	<li><b>[LegacyRC #5713, #5751]</b> PDF files
         	<ul>
+			<li>Confirm that <b>*.pdf</b> is an available file extension.
             		<li>Prepare a folder of .pdf files for queueing.</li>
             		<li>Add an additional <b>*.pdf1</b> image to the folder.</li>
             		<li>Prepare an .fps file to queue the .pdf images.</li>
@@ -421,8 +401,8 @@
        		<li><b>General settings</b>
        		<ul>
                 	<li>Confirm the presence of a <b>Remote folder to download files from</b> 
-			combo box, blank by default.</li>
-			<li>Confirm that the combo box saves recent entries.
+			text box, with <b>/</b> by default.</li>
+			<li>Confirm that the text box saves recent entries.
                 	<li>Confirm the presence of a <b>File extension specification(s)</b> combo
                 	box, blank by default.</li>
 			<li>Confirm that the combo box is pre-populated with the usual file 
@@ -471,12 +451,10 @@
                 	unchecked by default.</li>
                 	<li>Confirm that when it is checked, more settings become available in the 
                 	Connection settings grid.</li>
-                	<li>Confirm the presence of a <b>Maximum number of simultaneous connections</b>
-                	spin control with a default value of <b>1</b>.</li>
                 	<li>Confirm the presence of a <b>Number of retries</b> spin control with a default
-                	value of <b>1000</b>.</li>
-                	<li>Confirm the presence of a <b>Time between retries</b> edit box with a default
-                	value of <b>1000</b>.</li>
+                	value of <b>10</b>.</li>
+                	<li>Confirm the presence of a <b>Time between retries in milliseconds</b> edit box 
+			with a default value of <b>1000</b>.</li>
                 	<li>Confirm the presence of a <b>Test Connection</b> button.</li>
             	</ul></li>
 <p>
@@ -502,8 +480,8 @@
                 		<li>Confirm that the .info file is in XML format.</li>
                 		<li>Confirm that the .info file contains a <b>RemoteSourceDocName</b> 
 				element.</li>
-                		<li>Confirm that the .info file contains a <b>RemoteFileSize</b> element.</li>
-                		<li>Confirm that the .info file contains a <b>RemoteLastModified</b> 
+                		<li>Confirm that the .info file contains a <b>SourceDocSize</b> element.</li>
+                		<li>Confirm that the .info file contains a <b>LastModifiedTime</b> 
 				element.</li>
 <p>
                 		<li>Confirm that if the .info file exists in a local folder, it is used to 
@@ -513,8 +491,6 @@
                     			<li>Download if <b>Force processing</b> is set.</li>
                     			<li>Download if file size has changed</li>
                     			<li>Don't download if last modified information is unchanged.</li>
-                    			<li>Confirm that the <b>after download</b> action is also performed 
-					if the file is re-downloaded.</li>
                 		</ul></li>
             		</ul></li>
             	</ul></li>
@@ -529,7 +505,7 @@
 			<li>Confirm that the files are downloaded to <b>C:\LocalFTPRoot\1</b>.
 		</ul>
 <p>
-        	<li><b>[DNRCAU #743]</b> 
+        	<li><b>[DotNetRC #743]</b> 
         	<ul>
             		<li>When the FTP file supplier is configured to check for files at specified
             		times, confirm that an application trace is logged indicating that the check
@@ -543,14 +519,7 @@
             		</uL></li>
         	</uL></li>
 <p>
-        	<li><b>[DNRCAU #745]</b>
-        	<ul>
-            		<li>Set up an FPS file to simultaneously supply files via FTP and to do some
-            		processing task that will try to access the .info file.</li>
-            		<li>Run it for a while and confirm that no access violations are seen.</li>
-        	</ul></li>
-<p>
-            	<li><b>[LegacyRC #6071]</b> Polling frequency
+            	<li><b>[DotNetRC #745, LegacyRC #6071]</b> Polling frequency
             	<ul>
                 	<li>Set up an FTP file supplier to supply TIF images, append TIF to remote 
                 	filenames, and poll for new files every 2 minutes.</li>
