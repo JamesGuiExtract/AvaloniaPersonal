@@ -17,8 +17,8 @@
 		Components/UCLIDFileProcessing/ESSkipConditions/InteractiveTest</b></li> 
    		<li>The FPS files use <b>(local)</b> and <b>FAM_Condition</b> as the database server and 
 		database name, respectively.</li> 
-   		<li><b>[LegacyRC #4285]</b> For this testing checklist, use only a <b>Server</b> 
-		license file, not an <b>RDT</b> license file.</li> 
+   		<li>For this testing checklist, use only a <b>Server</b> license file, not an <b>RDT</b> 
+		license file.</li> 
 	</ul>
 <p>
    	<li><h3>Logical Conditions Functionality</h3>
@@ -62,7 +62,8 @@
 					dialog has <b>Add...</b>, <b>Delete</b>, <b>Command &gt;</b> 
 					buttons, an <b>Up</b> arrow, a <b>Down</b> arrow, an <b>OK</b> 
 					button and a <b>Cancel</b> button. 
-        		    		<li>Confirm that only the <b>Add...</b> button is initially enabled.
+        		    		<li>Confirm that only the <b>Add...</b>, <b>OK</b> and 
+					<b>Cancel</b> buttons are initially enabled.
       		  	    		<li>Confirm that pressing the <b>Add...</b> button brings up a 
 					<b>Select FAM Condition</b> dialog.
             				<li>Insert several conditions into the <b>Configure AND 
@@ -322,8 +323,7 @@
 			dialog.</li>
        	    		<li>Confirm there is an edit box with an associated <b>Tag Selector</b> 
 			button.</li> 
-       			<li><b>[LegacyRC #4781]</b> Confirm that the default filename in the 
-			edit box is <b>&lt;SourceDocName&gt;</b>.
+       			<li>Confirm that the default filename in the edit box is <b>&lt;SourceDocName&gt;</b>.
             		<li>Confirm that the <b>Tag Selector</b> button brings up a context 
 			menu.</li>
             		<li>Confirm that the context menu includes <b>&ltSourceDocName&gt</b>,
@@ -412,7 +412,7 @@
 				the current day at midnight in a <b>MM/DD/YYYY HH:MM:SS</b> format.
 				<li>Confirm that the combo box also includes <b>AM</b> or 
 				<b>PM</b> at the end of the date and time.
-				<li>Confirm that clicking either combo box causes a calendar 
+				<li>Confirm that clicking either dropdown causes a calendar 
 				control to drop down allowing the user to select a date.
 				<li>Confirm that selecting a date in the calendar control modifies 
 				the <b>MM/DD/YYYY</b> text but does not modify the time text.
@@ -461,7 +461,7 @@
 				after the radio button is selected.
 				<li>Confirm that the minimum value allowed by the spinner is <b>0</b>.
 				<li>Confirm that a meaningful error message is presented if a large number 
-				of days is selected.
+				is selected.
 				<li>Confirm that the following options are available in the combo box.
 				<ul>
 					<li>seconds
@@ -477,6 +477,10 @@
 				associated radio button is selected.
 				<li>Confirm that the following options are available in the combo box.
 				<ul>
+					<li>this minute
+					<li>last minute
+					<li>this hour
+					<li>last hour
 					<li>today
 					<li>yesterday
 					<li>this week
@@ -608,7 +612,6 @@
 			<ul>
 				<li>all
 				<li>any
-				<li><b>[LegacyRC #5492]</b> none
 			</ul>
             		<li>Confirm that there is a list box with check boxes containing 
 			each tag defined in the database.
@@ -672,6 +675,7 @@
 				<li>Core: Delete empty folder
 				<li>Core: Encrypt/decrypt file
 				<li>Core: Execute rules
+				<li>Core: Extract image area
 				<li>Core: Launch application
 				<li>Core: Manage tags
 				<li>Core: Modify PDF file
@@ -802,35 +806,25 @@
 			<li>Confirm that a modification is reflected in the list box contents.
 <p>
 			<li>Confirm that a <b>Case sensitive</b> check box is provided.
-			<li>Confirm that if the <b>Case sensitive</b> check box is checked that the 
-			attribute comparisons are conducted appropriately.
+			<ul>
+				<li>Confirm that if the <b>Case sensitive</b> check box is checked 
+				that the attribute comparisons are conducted appropriately.
+			</ul>
+			<li>Confirm that a balloon help button is provided that notes that the regular 
+			expressions by default will fully match the specified attribute 
+			field.
 			<li>Confirm that a <b>Treat search terms as regular expressions</b> check box 
 			is provided.
-			<li>Confirm that an associated balloon help button is provided that notes that 
-			the regular expressions by default will fully match the specified attribute 
-			field.
-			<li>Confirm that if the <b>regular expressions</b> check box is checked that 
-			the attribute comparisons are conducted appropriately.
+			<ul>
+				<li>Confirm that if the <b>regular expressions</b> check box is checked 
+				that the attribute comparisons are conducted appropriately.
+			</ul>
       		</ul>
 	</ul>
 <p>
    	<li><h3>Miscellaneous</h3>
 	<ul>
-		<li><b>[LegacyRC #4791]</b> FAM Condition still executes after being removed.
-		<ul>
-		   	<li>Open an existing <b>FPS</b> file.  Confirm that it properly executes files. 
-		   	<li> Configure a condition that will always be true (i.e. <b>File 
-			Existence</b> on <b>&lt;SourceDocName&gt;</b>).
-		   	<li><b>[LegacyRC #4316]</b> Confirm that <b>Double-click</b> of the Condition edit 
-			box displays the <b>configuration</b> dialog.
-	   		<li><b>[LegacyRC #4316]</b> Confirm that <b>Alt+Double-click</b> of the Condition edit 
-			box displays the <b>Configure description</b> dialog.
-		   	<li><b>[LegacyRC #4316]</b> Confirm that <b>Ctrl+Double-click</b> of the Condition edit 
-			box displays the <b>Select condition</b> dialog.
-		   	<li>Reselect a condition of <b>&lt;NONE&gt;</b>.
-		   	<li>Run the <b>FPS</b> file.
-	   		<li>Confirm that <b>all</b> files are added to the queue.
-		</ul>
+		<li><b>TBD</b>
 	</ul>
 </ul>
 </body>
