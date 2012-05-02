@@ -5,15 +5,21 @@
 //--------------------------------------------------------------------------------------------------
 // Script Description
 //--------------------------------------------------------------------------------------------------
-// Creates Legal Description EAVs out of the index data in the file named by the first argument and
-// outputs the results to files below the directory named by the second argument.
+// Creates Legal Description or PIN EAVs from the index data in the file named by the first argument
+// and outputs the results to files below the directory named by the second argument.
 //
-// Assumes "PlatFile.csv" is in same dir as inputFile and is a mapping of plat code numbers to
-// subdivision names.
+// For Legal Description:
+//   Assumes "PlatFile.csv" is in same dir as inputFile and is a mapping of plat code numbers to
+//   subdivision names.
+//
+// For PIN:
+//   Assumes "ParcelIDFile.csv" is in same dir as inputFile and is a mapping of plat code numbers to
+//   subdivision names.
 //
 // Usage:   ParseRacineTriminIndexData inputFile outputDir
 //              inputFile - The path to the index data file
 //              outputDir - The path to the EAV output dir
+//              csvType - pin, or legals
 //
 // Example inputFile:
 // K:\Common\Engineering\Sample Files\Trimin\WI - Racine\Set001\IndexData\OriginalsFromCustomer\legal00002.csv
@@ -26,22 +32,51 @@ function main(args) {
 
     var csvRegex = /(?:(?:^|,)(\s*"(?:[^"]|"")*"|[^,]*))(?=$|[\r\n,])/g;
 
-    // populate subd code to name map
-    var subdnames = readAllText(fso.BuildPath(fso.getParentFolderName(inputFile), "PlatFile.csv")).split(/\n/);
-    var subdmap = {};
-    for (var i=0; i < subdnames.length; i++) {
-        var fields = [];
-        var match = csvRegex.exec(subdnames[i]);
-        while (match != null) {
-            var val = match[1];
-            var quoted = val.match(/^\s*"((?:""|[^"])*)"$/);
-            if (quoted != null) {
-                val = quoted[1].replace(/""/g, "\"");
-            }
-            fields.push(val);
-            match = csvRegex.exec(subdnames[i]);
-        }
-        subdmap[fields[1]] = fields[2];
+    switch(args[2].toUpperCase()) {
+          case "PIN": csvType = "pin";
+          break;
+          case "LEGALS": csvType = "legals";
+          break;
+          default: return;
+    }
+
+    if (csvType == "pin") {
+      // populate pin code to name map
+      var pinnames = readAllText(fso.BuildPath(fso.getParentFolderName(inputFile), "ParcelIDFile.csv")).split(/\n/);
+      var pinmap = {};
+      for (var i=0; i < pinnames.length; i++) {
+          var fields = [];
+          var match = csvRegex.exec(pinnames[i]);
+          while (match != null) {
+              var val = match[1];
+              var quoted = val.match(/^\s*"((?:""|[^"])*)"$/);
+              if (quoted != null) {
+                  val = quoted[1].replace(/""/g, "\"");
+              }
+              fields.push(val);
+              match = csvRegex.exec(pinnames[i]);
+          }
+          pinmap[fields[0]] = fields[1];
+      }
+
+    } else if (csvType == "legals") {
+      // populate subd code to name map
+      var subdnames = readAllText(fso.BuildPath(fso.getParentFolderName(inputFile), "PlatFile.csv")).split(/\n/);
+      var subdmap = {};
+      for (var i=0; i < subdnames.length; i++) {
+          var fields = [];
+          var match = csvRegex.exec(subdnames[i]);
+          while (match != null) {
+              var val = match[1];
+              var quoted = val.match(/^\s*"((?:""|[^"])*)"$/);
+              if (quoted != null) {
+                  val = quoted[1].replace(/""/g, "\"");
+              }
+              fields.push(val);
+              match = csvRegex.exec(subdnames[i]);
+          }
+          subdmap[fields[1]] = fields[2];
+      }
     }
 
     var csvrecords = [];
@@ -66,7 +101,11 @@ function main(args) {
             match = csvRegex.exec(csvrecords[i]);
         }
 
-        makeEAVS_LEGAL(fields);
+        if (csvType == "pin") {
+          makeEAVS_PIN(fields);
+        } else if (csvType == "legals") {
+          makeEAVS_LEGAL(fields);
+        }
     }
 
     function appendText(fname, text) {
@@ -208,6 +247,20 @@ function main(args) {
         }
         catch(err) {
             handleScriptError("ParseRacineTriminIndexData_14", "Error!", err, "Index Data Line", fields);
+        }
+    }
+
+    function makeEAVS_PIN(fields) {
+        var fname = getEAVName(fields[26], "PIN");
+        var val
+        try {
+            val = fields[15];
+            if (val != "") {
+                writeAttr(fname, "PIN", pinmap[val], "", "");
+            }
+        }
+        catch(err) {
+            handleScriptError("ParseRacineTriminIndexData_15", "Error!", err, "Index Data Line", fields);
         }
     }
 
