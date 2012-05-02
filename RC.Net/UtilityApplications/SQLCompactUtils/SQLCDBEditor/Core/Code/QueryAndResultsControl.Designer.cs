@@ -15,13 +15,14 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(QueryAndResultsControl));
             this._queryScintillaBox = new ScintillaNET.Scintilla();
             this._queryAndResultsTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._buttonsFlowLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this._executeQueryButton = new System.Windows.Forms.Button();
             this._resultsSplitContainer = new System.Windows.Forms.SplitContainer();
             this._queryPanel = new System.Windows.Forms.Panel();
             this._resultsPanel = new System.Windows.Forms.Panel();
@@ -29,12 +30,11 @@
             this._parametersTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._resultsStatusLabel = new System.Windows.Forms.Label();
             this._resultsGrid = new System.Windows.Forms.DataGridView();
-            this._newQueryButton = new System.Windows.Forms.Button();
             this._showHideQueryButton = new System.Windows.Forms.Button();
             this._sendToSeparateTabButton = new System.Windows.Forms.Button();
+            this._newQueryButton = new System.Windows.Forms.Button();
             this._saveButton = new System.Windows.Forms.Button();
             this._renameButton = new System.Windows.Forms.Button();
-            this._executeQueryButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this._queryScintillaBox)).BeginInit();
             this._queryAndResultsTableLayoutPanel.SuspendLayout();
             this._buttonsFlowLayoutPanel.SuspendLayout();
@@ -94,6 +94,22 @@
             this._buttonsFlowLayoutPanel.Name = "_buttonsFlowLayoutPanel";
             this._buttonsFlowLayoutPanel.Size = new System.Drawing.Size(624, 29);
             this._buttonsFlowLayoutPanel.TabIndex = 0;
+            // 
+            // _executeQueryButton
+            // 
+            this._executeQueryButton.AutoSize = true;
+            this._executeQueryButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._executeQueryButton.Enabled = false;
+            this._executeQueryButton.Image = global::Extract.SQLCDBEditor.Properties.Resources.ExecuteQuery;
+            this._executeQueryButton.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this._executeQueryButton.Location = new System.Drawing.Point(506, 3);
+            this._executeQueryButton.Name = "_executeQueryButton";
+            this._executeQueryButton.Size = new System.Drawing.Size(72, 23);
+            this._executeQueryButton.TabIndex = 0;
+            this._executeQueryButton.Text = "Execute";
+            this._executeQueryButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._executeQueryButton.UseVisualStyleBackColor = true;
+            this._executeQueryButton.Click += new System.EventHandler(this.HandleExecuteButtonClick);
             // 
             // _resultsSplitContainer
             // 
@@ -189,53 +205,38 @@
             // 
             this._resultsGrid.AllowUserToResizeRows = false;
             this._resultsGrid.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._resultsGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._resultsGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this._resultsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this._resultsGrid.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._resultsGrid.DefaultCellStyle = dataGridViewCellStyle2;
             this._resultsGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this._resultsGrid.Location = new System.Drawing.Point(0, 19);
             this._resultsGrid.Margin = new System.Windows.Forms.Padding(0);
             this._resultsGrid.Name = "_resultsGrid";
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._resultsGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._resultsGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this._resultsGrid.Size = new System.Drawing.Size(622, 282);
             this._resultsGrid.TabIndex = 2;
             this._resultsGrid.CurrentCellDirtyStateChanged += new System.EventHandler(this.HandleResultsGridCurrentCellDirtyStateChanged);
-            // 
-            // _newQueryButton
-            // 
-            this._newQueryButton.AutoSize = true;
-            this._newQueryButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this._newQueryButton.Image = global::Extract.SQLCDBEditor.Properties.Resources.DbNewQuery;
-            this._newQueryButton.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this._newQueryButton.Location = new System.Drawing.Point(236, 3);
-            this._newQueryButton.Name = "_newQueryButton";
-            this._newQueryButton.Size = new System.Drawing.Size(121, 23);
-            this._newQueryButton.TabIndex = 5;
-            this._newQueryButton.Text = "Copy to new query";
-            this._newQueryButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this._newQueryButton.UseVisualStyleBackColor = true;
-            this._newQueryButton.Click += new System.EventHandler(this.HandleCopyToNewQueryButtonClick);
             // 
             // _showHideQueryButton
             // 
@@ -266,6 +267,21 @@
             this._sendToSeparateTabButton.UseVisualStyleBackColor = true;
             this._sendToSeparateTabButton.Click += new System.EventHandler(this.HandleSendToSeparateTabClick);
             // 
+            // _newQueryButton
+            // 
+            this._newQueryButton.AutoSize = true;
+            this._newQueryButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._newQueryButton.Image = global::Extract.SQLCDBEditor.Properties.Resources.DbNewQuery;
+            this._newQueryButton.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this._newQueryButton.Location = new System.Drawing.Point(236, 3);
+            this._newQueryButton.Name = "_newQueryButton";
+            this._newQueryButton.Size = new System.Drawing.Size(121, 23);
+            this._newQueryButton.TabIndex = 5;
+            this._newQueryButton.Text = "Copy to new query";
+            this._newQueryButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._newQueryButton.UseVisualStyleBackColor = true;
+            this._newQueryButton.Click += new System.EventHandler(this.HandleCopyToNewQueryButtonClick);
+            // 
             // _saveButton
             // 
             this._saveButton.AutoSize = true;
@@ -295,22 +311,6 @@
             this._renameButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this._renameButton.UseVisualStyleBackColor = true;
             this._renameButton.Click += new System.EventHandler(this.HandleRenameButtonClick);
-            // 
-            // _executeQueryButton
-            // 
-            this._executeQueryButton.AutoSize = true;
-            this._executeQueryButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this._executeQueryButton.Enabled = false;
-            this._executeQueryButton.Image = global::Extract.SQLCDBEditor.Properties.Resources.ExecuteQuery;
-            this._executeQueryButton.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this._executeQueryButton.Location = new System.Drawing.Point(506, 3);
-            this._executeQueryButton.Name = "_executeQueryButton";
-            this._executeQueryButton.Size = new System.Drawing.Size(72, 23);
-            this._executeQueryButton.TabIndex = 0;
-            this._executeQueryButton.Text = "Execute";
-            this._executeQueryButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this._executeQueryButton.UseVisualStyleBackColor = true;
-            this._executeQueryButton.Click += new System.EventHandler(this.HandleExecuteButtonClick);
             // 
             // QueryAndResultsControl
             // 
