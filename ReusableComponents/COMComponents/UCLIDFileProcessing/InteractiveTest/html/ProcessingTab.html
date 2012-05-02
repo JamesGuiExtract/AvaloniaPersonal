@@ -87,7 +87,7 @@
             		</ul>
         	</ul>
 <p>
-        	<li><b>[LegacyRC #4924]</b> Shortcut keys for Context menu commands
+        	<li><b>[LegacyRC #4924] NOT FIXED!</b> Shortcut keys for Context menu commands
         	<ul>
             		<li>Confirm that <b>Ctrl+X</b> works for <b>Cut</b>.
             		<li>Confirm that <b>Ctrl+C</b> works for <b>Copy</b>.
@@ -105,21 +105,11 @@
 		button enables the drop-down box.
         	<li>Confirm that the drop-down box contains the options <b>I</b> and <b>all 
 		users</b>.
-        	<LI><b>[LegacyRC #5413, #5414]</b> DB setting for requiring password before 
-		processing all skipped files
-        	<ul>
-            		<li>Confirm that a <b>Database Settings</b> field for <b>Require FAM 
-			database administrator password to process all skipped files</b> exists.
-            		<li>Confirm that the default setting is enabled.
-            		<li>Confirm that when the check box is checked, the DB Admin password 
-			<b>is required</b> in order to process all skipped files.
-            		<li>Confirm that when the check box is unchecked, the DB Admin password 
-			<b>is not required</b> in order to process all skipped files.
-        	</ul>
         	<li><b>[LegacyRC #5853]</b> Processing skipped files
         	<!-- fixed v 8.1.0.46 -->
         	<ul>
             		<li>Log in to a test machine as a domain user.
+			<li>Process the <b>Demo_IDShield</b> images.
             		<li>Verify some files; skip some.
             		<li>Log out and log back in as the local admin. Configure the .fps file 
 			to process all files skipped by any user.
@@ -176,7 +166,7 @@
                 		waiting for a file to process.</li>
                 		<li>Examine the <b>MillisecondsBetweenDBCheck</b> registry key under 
                 		<b>HKCU/Software/Extract 
-                		Systems/ReusableComponents/COMComponents/UCLIDFileProcessing/FPRecordManager</b>.</li>
+Systems/ReusableComponents/COMComponents/UCLIDFileProcessing/FPRecordManager</b>.</li>
                 		<li>Confirm that the default is <b>2000</b>.</li>
                 		<li>Confirm that changing the value to <b>20</b> increases the CPU usage 
 				while the FPS file is waiting.</li>
@@ -191,12 +181,7 @@
 			associated with the other radio button are both <b>disabled</b>.</li>
             		<li>Confirm that with the <b>Use threads</b> setting, the edit box and spin 
 			control are both enabled.</li>
-            		<li>Confirm the settings are persistent.</li>
-            		<LI><b>[LegacyRC #5491]</b> Confirm that the <b>Processing Setup</b> tab 
-			allows no more than <b>100</b> threads via the spinner control.</li>
-            		<LI><b>[LegacyRC #5491]</b> Confirm that the <b>Processing Setup</b> tab 
-			allows no more than <b>100</b> threads via the associated edit box.</li>
-        	</ul> </li>
+            		<li>Confirm the settings are persistent.</li>        	</ul> </li>
 <p>
         	<li>Confirm that the Advanced Processing Configuration dialog has a <b>Files to 
         	retrieve</b> group box
@@ -256,6 +241,7 @@
         	<li>Confirm <b>Configure description...</b> displays a Configure description dialog.</li>
         	<li>Modify the description and confirm that the new description replaces the existing 
         	description.</li>
+        	<li><b>[LegacyRC #6328]</b> Confirm that an existing description can be cleared.
         	<li>Confirm that the previously defined object settings are retained.</li>
         	<li>Modify the description and then <b>Cancel</b> the changes from the dialog. Confirm 
 		that the existing description is retained.</li>
