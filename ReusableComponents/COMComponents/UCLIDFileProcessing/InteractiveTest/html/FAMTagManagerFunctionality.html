@@ -76,7 +76,7 @@ File Action Manager - FAM Tag Manager Functionality<br>
 <p>
 	<li><b>File Suppliers</b></li>
 	<ul>
-		<li>Files from dynamic list
+		<li><u>Files from dynamic list</u>
 		<ul>
 			<li>Add an action called <b>Dynamic</b> to the Database</li>
 			<li>Open the file named <b>Test_FPSDir_DynamicList.fps</b> and run it. This FPS 
@@ -89,7 +89,7 @@ File Action Manager - FAM Tag Manager Functionality<br>
 <p>
 	<li><b>File Processors</b></li>
 	<ul>
-		<li>Copy, Move, or Delete File</li>
+		<li><u>Core: Copy, Move, or Delete File</u></li>
 		<ul>
 			<li>Add an action called <b>Copy</b> to the database</li>
 			<li>Open the file named <b>Test_Copy.fps</b> and run it. This FPS file 
@@ -98,7 +98,7 @@ File Action Manager - FAM Tag Manager Functionality<br>
 			two files, named FPSDir01COPY.TIF and FPSDir02COPY.TIF have been created.</li>
 		</ul>
 <p>
-		<li>Redact Images (no verification)</li>
+		<li><u>Redaction: Create Redacted Image</u></li>
 		<ul>
 			<li>Add an action called <b>Redact</b> to the database</li>
 			<li>Open the file named <b>Test_AutoRedact.fps</b> and run it. This FPS file 
@@ -108,7 +108,7 @@ File Action Manager - FAM Tag Manager Functionality<br>
 			FPSParentDir01_redacted.tif and FPSParentDir02_redacted.tif.</li>
 		</ul>
 <p>
-		<li>Verify Redactions</li>
+		<li><u>Redaction: Verify Sensitive Data</u></li>
 		<ul>
 			<li>Add an action called <b>Verify</b> to the database</li>
 			<li>Open the file named <b>Test_Verify.fps</b> and run it. This FPS file 
@@ -126,15 +126,17 @@ File Action Manager - FAM Tag Manager Functionality<br>
  				FPSDir02COPY_metadata.xml, FPSSubDir01_metadata.xml, and 
 				FPSSubDir02_metadata.xml.</li>
 				<li>Confirm that a directory named <b>ExpectedVOA</b> exists 
-				and that it contains files FPSDir01COPY.TIF.voa, 
-				FPSDir02COPY.TIF.voa, FPSSubDir01.TIF.voa, and FPSSubDir02.TIF.voa.</li>
+				and that it contains files FPSDir01COPY.TIF.expected.voa, 
+				FPSDir02COPY.TIF.expected.voa, FPSSubDir01.TIF.expected.voa, 
+				and FPSSubDir02.TIF.expected.voa.  Note that .found.voa files 
+				should also be present.</li>
 			</ul>
 		</ul>
 	</ul>
 <p>
 	<li><b>Skip Conditions</b></li>
 	<ul>
-		<li>Skip based on file existence
+		<li><u>File Existence Condition</u>
 		<ul>
 			<li>Add an action called <b>SkipExist</b> to the database.</li>
 			<li>Open the file named <b>Test_SkipExistence.fps</b> and run it. This 
@@ -144,7 +146,7 @@ File Action Manager - FAM Tag Manager Functionality<br>
 			was added to the list.</li>
 		</ul>
 <p>
-		<li>Skip based on file name pattern
+		<li><u>File Name Pattern Condition</u>
 		<ul>
 			<li>Add an action called <b>SkipName</b> to the database.</li>
 			<li>Open the file named <b>Test_SkipName.fps</b> and run it. This FPS 
@@ -159,7 +161,7 @@ File Action Manager - FAM Tag Manager Functionality<br>
 	<ul>
   	   	<LI><b>[LegacyRC #5644]</b> Auto-create action exception
 	       	<ul>
-	  	   	<LI>Prepare a FAM to use an <b>ExtractData_$UserName()</b> action.
+	  	   	<LI>Prepare a FAM to use an <b>ExtractData_$FullUserName()</b> action.
 			<LI>Confirm that the user name contains a space.
 	  	   	<LI>Exercise the FAM.
 			<LI>Confirm that a meaningful exception is displayed.
