@@ -218,7 +218,7 @@ namespace Extract.SQLCDBEditor
                 if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
                 {
                     _formStateManager = new FormStateManager(this, _FORM_PERSISTENCE_FILE,
-                        _FORM_PERSISTENCE_MUTEX_STRING, _sandDockManager, false);
+                        _FORM_PERSISTENCE_MUTEX_STRING, _sandDockManager, false, null);
                 }
             }
             catch (Exception ex)
