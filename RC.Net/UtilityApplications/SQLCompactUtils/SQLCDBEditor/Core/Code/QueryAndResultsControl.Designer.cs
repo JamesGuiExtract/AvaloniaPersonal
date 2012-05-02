@@ -15,19 +15,13 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(QueryAndResultsControl));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this._queryScintillaBox = new ScintillaNET.Scintilla();
             this._queryAndResultsTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._buttonsFlowLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
-            this._sendToSeparateTabButton = new System.Windows.Forms.Button();
-            this._newQueryButton = new System.Windows.Forms.Button();
-            this._showHideQueryButton = new System.Windows.Forms.Button();
-            this._saveButton = new System.Windows.Forms.Button();
-            this._renameButton = new System.Windows.Forms.Button();
-            this._executeQueryButton = new System.Windows.Forms.Button();
             this._resultsSplitContainer = new System.Windows.Forms.SplitContainer();
             this._queryPanel = new System.Windows.Forms.Panel();
             this._resultsPanel = new System.Windows.Forms.Panel();
@@ -35,6 +29,12 @@
             this._parametersTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._resultsStatusLabel = new System.Windows.Forms.Label();
             this._resultsGrid = new System.Windows.Forms.DataGridView();
+            this._newQueryButton = new System.Windows.Forms.Button();
+            this._showHideQueryButton = new System.Windows.Forms.Button();
+            this._sendToSeparateTabButton = new System.Windows.Forms.Button();
+            this._saveButton = new System.Windows.Forms.Button();
+            this._renameButton = new System.Windows.Forms.Button();
+            this._executeQueryButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this._queryScintillaBox)).BeginInit();
             this._queryAndResultsTableLayoutPanel.SuspendLayout();
             this._buttonsFlowLayoutPanel.SuspendLayout();
@@ -69,12 +69,13 @@
             this._queryAndResultsTableLayoutPanel.Controls.Add(this._resultsSplitContainer, 0, 1);
             this._queryAndResultsTableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this._queryAndResultsTableLayoutPanel.Location = new System.Drawing.Point(0, 0);
+            this._queryAndResultsTableLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
             this._queryAndResultsTableLayoutPanel.Name = "_queryAndResultsTableLayoutPanel";
             this._queryAndResultsTableLayoutPanel.RowCount = 2;
             this._queryAndResultsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this._queryAndResultsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this._queryAndResultsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this._queryAndResultsTableLayoutPanel.Size = new System.Drawing.Size(630, 338);
+            this._queryAndResultsTableLayoutPanel.Size = new System.Drawing.Size(624, 332);
             this._queryAndResultsTableLayoutPanel.TabIndex = 3;
             // 
             // _buttonsFlowLayoutPanel
@@ -91,29 +92,141 @@
             this._buttonsFlowLayoutPanel.Location = new System.Drawing.Point(0, 0);
             this._buttonsFlowLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
             this._buttonsFlowLayoutPanel.Name = "_buttonsFlowLayoutPanel";
-            this._buttonsFlowLayoutPanel.Size = new System.Drawing.Size(630, 29);
+            this._buttonsFlowLayoutPanel.Size = new System.Drawing.Size(624, 29);
             this._buttonsFlowLayoutPanel.TabIndex = 0;
             // 
-            // _sendToSeparateTabButton
+            // _resultsSplitContainer
             // 
-            this._sendToSeparateTabButton.AutoSize = true;
-            this._sendToSeparateTabButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this._sendToSeparateTabButton.Image = ((System.Drawing.Image)(resources.GetObject("_sendToSeparateTabButton.Image")));
-            this._sendToSeparateTabButton.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this._sendToSeparateTabButton.Location = new System.Drawing.Point(98, 3);
-            this._sendToSeparateTabButton.Name = "_sendToSeparateTabButton";
-            this._sendToSeparateTabButton.Size = new System.Drawing.Size(132, 23);
-            this._sendToSeparateTabButton.TabIndex = 1;
-            this._sendToSeparateTabButton.Text = "Send to separate tab";
-            this._sendToSeparateTabButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this._sendToSeparateTabButton.UseVisualStyleBackColor = true;
-            this._sendToSeparateTabButton.Click += new System.EventHandler(this.HandleSendToSeparateTabClick);
+            this._resultsSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._resultsSplitContainer.Location = new System.Drawing.Point(0, 29);
+            this._resultsSplitContainer.Margin = new System.Windows.Forms.Padding(0);
+            this._resultsSplitContainer.Name = "_resultsSplitContainer";
+            this._resultsSplitContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // _resultsSplitContainer.Panel1
+            // 
+            this._resultsSplitContainer.Panel1.BackColor = System.Drawing.SystemColors.ControlDark;
+            this._resultsSplitContainer.Panel1.Controls.Add(this._queryPanel);
+            this._resultsSplitContainer.Panel1Collapsed = true;
+            // 
+            // _resultsSplitContainer.Panel2
+            // 
+            this._resultsSplitContainer.Panel2.Controls.Add(this._resultsPanel);
+            this._resultsSplitContainer.Size = new System.Drawing.Size(624, 303);
+            this._resultsSplitContainer.SplitterDistance = 92;
+            this._resultsSplitContainer.TabIndex = 4;
+            // 
+            // _queryPanel
+            // 
+            this._queryPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this._queryPanel.Controls.Add(this._queryScintillaBox);
+            this._queryPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._queryPanel.Location = new System.Drawing.Point(0, 0);
+            this._queryPanel.Name = "_queryPanel";
+            this._queryPanel.Size = new System.Drawing.Size(150, 92);
+            this._queryPanel.TabIndex = 1;
+            // 
+            // _resultsPanel
+            // 
+            this._resultsPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this._resultsPanel.Controls.Add(this.queryAndResultTableLayoutPanel2);
+            this._resultsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._resultsPanel.Location = new System.Drawing.Point(0, 0);
+            this._resultsPanel.Margin = new System.Windows.Forms.Padding(0);
+            this._resultsPanel.Name = "_resultsPanel";
+            this._resultsPanel.Size = new System.Drawing.Size(624, 303);
+            this._resultsPanel.TabIndex = 4;
+            // 
+            // queryAndResultTableLayoutPanel2
+            // 
+            this.queryAndResultTableLayoutPanel2.ColumnCount = 1;
+            this.queryAndResultTableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.queryAndResultTableLayoutPanel2.Controls.Add(this._parametersTableLayoutPanel, 0, 0);
+            this.queryAndResultTableLayoutPanel2.Controls.Add(this._resultsStatusLabel, 0, 1);
+            this.queryAndResultTableLayoutPanel2.Controls.Add(this._resultsGrid, 0, 2);
+            this.queryAndResultTableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.queryAndResultTableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
+            this.queryAndResultTableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
+            this.queryAndResultTableLayoutPanel2.Name = "queryAndResultTableLayoutPanel2";
+            this.queryAndResultTableLayoutPanel2.RowCount = 3;
+            this.queryAndResultTableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.queryAndResultTableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.queryAndResultTableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.queryAndResultTableLayoutPanel2.Size = new System.Drawing.Size(622, 301);
+            this.queryAndResultTableLayoutPanel2.TabIndex = 3;
+            // 
+            // _parametersTableLayoutPanel
+            // 
+            this._parametersTableLayoutPanel.AutoSize = true;
+            this._parametersTableLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._parametersTableLayoutPanel.ColumnCount = 2;
+            this._parametersTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this._parametersTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this._parametersTableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._parametersTableLayoutPanel.Location = new System.Drawing.Point(0, 0);
+            this._parametersTableLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
+            this._parametersTableLayoutPanel.Name = "_parametersTableLayoutPanel";
+            this._parametersTableLayoutPanel.RowCount = 1;
+            this._parametersTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this._parametersTableLayoutPanel.Size = new System.Drawing.Size(622, 1);
+            this._parametersTableLayoutPanel.TabIndex = 3;
+            // 
+            // _resultsStatusLabel
+            // 
+            this._resultsStatusLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this._resultsStatusLabel.AutoSize = true;
+            this._resultsStatusLabel.ForeColor = System.Drawing.Color.Red;
+            this._resultsStatusLabel.Location = new System.Drawing.Point(3, 3);
+            this._resultsStatusLabel.Margin = new System.Windows.Forms.Padding(3);
+            this._resultsStatusLabel.Name = "_resultsStatusLabel";
+            this._resultsStatusLabel.Size = new System.Drawing.Size(238, 13);
+            this._resultsStatusLabel.TabIndex = 3;
+            this._resultsStatusLabel.Text = "Query has been modified since the last execution";
+            this._resultsStatusLabel.Visible = false;
+            this._resultsStatusLabel.Click += new System.EventHandler(this.HandleInvalidDataLabelClicked);
+            // 
+            // _resultsGrid
+            // 
+            this._resultsGrid.AllowUserToResizeRows = false;
+            this._resultsGrid.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._resultsGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            this._resultsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._resultsGrid.DefaultCellStyle = dataGridViewCellStyle5;
+            this._resultsGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._resultsGrid.Location = new System.Drawing.Point(0, 19);
+            this._resultsGrid.Margin = new System.Windows.Forms.Padding(0);
+            this._resultsGrid.Name = "_resultsGrid";
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._resultsGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            this._resultsGrid.Size = new System.Drawing.Size(622, 282);
+            this._resultsGrid.TabIndex = 2;
+            this._resultsGrid.CurrentCellDirtyStateChanged += new System.EventHandler(this.HandleResultsGridCurrentCellDirtyStateChanged);
             // 
             // _newQueryButton
             // 
             this._newQueryButton.AutoSize = true;
             this._newQueryButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this._newQueryButton.Image = ((System.Drawing.Image)(resources.GetObject("_newQueryButton.Image")));
+            this._newQueryButton.Image = global::Extract.SQLCDBEditor.Properties.Resources.DbNewQuery;
             this._newQueryButton.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
             this._newQueryButton.Location = new System.Drawing.Point(236, 3);
             this._newQueryButton.Name = "_newQueryButton";
@@ -137,6 +250,21 @@
             this._showHideQueryButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this._showHideQueryButton.UseVisualStyleBackColor = true;
             this._showHideQueryButton.Click += new System.EventHandler(this.HandleShowHideQueryButtonClick);
+            // 
+            // _sendToSeparateTabButton
+            // 
+            this._sendToSeparateTabButton.AutoSize = true;
+            this._sendToSeparateTabButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._sendToSeparateTabButton.Image = ((System.Drawing.Image)(resources.GetObject("_sendToSeparateTabButton.Image")));
+            this._sendToSeparateTabButton.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this._sendToSeparateTabButton.Location = new System.Drawing.Point(98, 3);
+            this._sendToSeparateTabButton.Name = "_sendToSeparateTabButton";
+            this._sendToSeparateTabButton.Size = new System.Drawing.Size(132, 23);
+            this._sendToSeparateTabButton.TabIndex = 1;
+            this._sendToSeparateTabButton.Text = "Send to separate tab";
+            this._sendToSeparateTabButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._sendToSeparateTabButton.UseVisualStyleBackColor = true;
+            this._sendToSeparateTabButton.Click += new System.EventHandler(this.HandleSendToSeparateTabClick);
             // 
             // _saveButton
             // 
@@ -184,130 +312,6 @@
             this._executeQueryButton.UseVisualStyleBackColor = true;
             this._executeQueryButton.Click += new System.EventHandler(this.HandleExecuteButtonClick);
             // 
-            // _resultsSplitContainer
-            // 
-            this._resultsSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._resultsSplitContainer.Location = new System.Drawing.Point(3, 32);
-            this._resultsSplitContainer.Name = "_resultsSplitContainer";
-            this._resultsSplitContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // _resultsSplitContainer.Panel1
-            // 
-            this._resultsSplitContainer.Panel1.BackColor = System.Drawing.SystemColors.ControlDark;
-            this._resultsSplitContainer.Panel1.Controls.Add(this._queryPanel);
-            this._resultsSplitContainer.Panel1Collapsed = true;
-            // 
-            // _resultsSplitContainer.Panel2
-            // 
-            this._resultsSplitContainer.Panel2.Controls.Add(this._resultsPanel);
-            this._resultsSplitContainer.Size = new System.Drawing.Size(624, 303);
-            this._resultsSplitContainer.SplitterDistance = 92;
-            this._resultsSplitContainer.TabIndex = 4;
-            // 
-            // _queryPanel
-            // 
-            this._queryPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this._queryPanel.Controls.Add(this._queryScintillaBox);
-            this._queryPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._queryPanel.Location = new System.Drawing.Point(0, 0);
-            this._queryPanel.Name = "_queryPanel";
-            this._queryPanel.Size = new System.Drawing.Size(150, 92);
-            this._queryPanel.TabIndex = 1;
-            // 
-            // _resultsPanel
-            // 
-            this._resultsPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this._resultsPanel.Controls.Add(this.queryAndResultTableLayoutPanel2);
-            this._resultsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._resultsPanel.Location = new System.Drawing.Point(0, 0);
-            this._resultsPanel.Name = "_resultsPanel";
-            this._resultsPanel.Size = new System.Drawing.Size(624, 303);
-            this._resultsPanel.TabIndex = 4;
-            // 
-            // queryAndResultTableLayoutPanel2
-            // 
-            this.queryAndResultTableLayoutPanel2.ColumnCount = 1;
-            this.queryAndResultTableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.queryAndResultTableLayoutPanel2.Controls.Add(this._parametersTableLayoutPanel, 0, 0);
-            this.queryAndResultTableLayoutPanel2.Controls.Add(this._resultsStatusLabel, 0, 1);
-            this.queryAndResultTableLayoutPanel2.Controls.Add(this._resultsGrid, 0, 2);
-            this.queryAndResultTableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.queryAndResultTableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
-            this.queryAndResultTableLayoutPanel2.Name = "queryAndResultTableLayoutPanel2";
-            this.queryAndResultTableLayoutPanel2.RowCount = 3;
-            this.queryAndResultTableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.queryAndResultTableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.queryAndResultTableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.queryAndResultTableLayoutPanel2.Size = new System.Drawing.Size(622, 301);
-            this.queryAndResultTableLayoutPanel2.TabIndex = 3;
-            // 
-            // _parametersTableLayoutPanel
-            // 
-            this._parametersTableLayoutPanel.AutoSize = true;
-            this._parametersTableLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this._parametersTableLayoutPanel.ColumnCount = 2;
-            this._parametersTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this._parametersTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this._parametersTableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._parametersTableLayoutPanel.Location = new System.Drawing.Point(0, 0);
-            this._parametersTableLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
-            this._parametersTableLayoutPanel.Name = "_parametersTableLayoutPanel";
-            this._parametersTableLayoutPanel.RowCount = 1;
-            this._parametersTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this._parametersTableLayoutPanel.Size = new System.Drawing.Size(622, 1);
-            this._parametersTableLayoutPanel.TabIndex = 3;
-            // 
-            // _resultsStatusLabel
-            // 
-            this._resultsStatusLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this._resultsStatusLabel.AutoSize = true;
-            this._resultsStatusLabel.ForeColor = System.Drawing.Color.Red;
-            this._resultsStatusLabel.Location = new System.Drawing.Point(3, 3);
-            this._resultsStatusLabel.Margin = new System.Windows.Forms.Padding(3);
-            this._resultsStatusLabel.Name = "_resultsStatusLabel";
-            this._resultsStatusLabel.Size = new System.Drawing.Size(238, 13);
-            this._resultsStatusLabel.TabIndex = 3;
-            this._resultsStatusLabel.Text = "Query has been modified since the last execution";
-            this._resultsStatusLabel.Visible = false;
-            this._resultsStatusLabel.Click += new System.EventHandler(this.HandleInvalidDataLabelClicked);
-            // 
-            // _resultsGrid
-            // 
-            this._resultsGrid.AllowUserToResizeRows = false;
-            this._resultsGrid.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._resultsGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            this._resultsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this._resultsGrid.DefaultCellStyle = dataGridViewCellStyle2;
-            this._resultsGrid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._resultsGrid.Location = new System.Drawing.Point(0, 19);
-            this._resultsGrid.Margin = new System.Windows.Forms.Padding(0);
-            this._resultsGrid.Name = "_resultsGrid";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._resultsGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
-            this._resultsGrid.Size = new System.Drawing.Size(622, 282);
-            this._resultsGrid.TabIndex = 2;
-            this._resultsGrid.CurrentCellDirtyStateChanged += new System.EventHandler(this.HandleResultsGridCurrentCellDirtyStateChanged);
-            // 
             // QueryAndResultsControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -317,7 +321,7 @@
             this.Controls.Add(this._queryAndResultsTableLayoutPanel);
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "QueryAndResultsControl";
-            this.Size = new System.Drawing.Size(630, 338);
+            this.Size = new System.Drawing.Size(624, 332);
             ((System.ComponentModel.ISupportInitialize)(this._queryScintillaBox)).EndInit();
             this._queryAndResultsTableLayoutPanel.ResumeLayout(false);
             this._queryAndResultsTableLayoutPanel.PerformLayout();

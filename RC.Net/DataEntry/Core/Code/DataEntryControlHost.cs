@@ -4049,9 +4049,9 @@ namespace Extract.DataEntry
                 }
 
                 // DataEntry SmartTags require a 'SmartTag' table.
-                queryCommand = DataEntryMethods.CreateDBCommand(sqlCeConnection,
+                queryCommand = DBMethods.CreateDBCommand(sqlCeConnection,
                         "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'SmartTag'", null);
-                string[] queryResults = DataEntryMethods.ExecuteDBQuery(queryCommand, "\t");
+                string[] queryResults = DBMethods.ExecuteDBQuery(queryCommand, "\t");
                 if (queryResults.Length == 0)
                 {
                     if (_smartTagManager != null)
@@ -4066,9 +4066,9 @@ namespace Extract.DataEntry
 
                 // Retrieve the smart tags...
                 queryCommand.Dispose();
-                queryCommand = DataEntryMethods.CreateDBCommand(
+                queryCommand = DBMethods.CreateDBCommand(
                         sqlCeConnection, "SELECT TagName, TagValue FROM [SmartTag]", null);
-                queryResults = DataEntryMethods.ExecuteDBQuery(queryCommand, "\t");
+                queryResults = DBMethods.ExecuteDBQuery(queryCommand, "\t");
 
                 // And put them into a dictionary that the SmartTagManager can use
                 Dictionary<string, string> smartTags = new Dictionary<string, string>();

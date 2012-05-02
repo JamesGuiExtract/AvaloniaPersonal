@@ -87,6 +87,7 @@
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="DbMethods.cs" />
     <Compile Include="EventArgs.cs" />
     <Compile Include="QueryAndResultsControl.cs">
       <SubType>UserControl</SubType>
@@ -162,14 +163,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\insert_table_add_16.png" />
-    <None Include="Resources\insert_table_add_16_hot.png" />
-    <None Include="Resources\running_process_16.png" />
     <None Include="Resources\caret_16.png" />
     <None Include="Resources\new_db_query_16.png" />
     <None Include="Resources\new_tab_16.png" />
     <None Include="Resources\db_query_16.png" />
     <None Include="Resources\db_query_32.png" />
+    <None Include="Resources\run_query_16.png" />
     <Content Include="Resources\SQLCDBEditor.ico" />
     <None Include="Resources\SaveImageButtonSmall.png" />
     <None Include="Resources\star_16.png" />

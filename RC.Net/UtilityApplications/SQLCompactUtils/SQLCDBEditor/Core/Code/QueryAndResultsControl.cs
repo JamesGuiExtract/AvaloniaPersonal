@@ -12,7 +12,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using TD.SandDock;
 
 namespace Extract.SQLCDBEditor
 {
@@ -78,17 +77,16 @@ namespace Extract.SQLCDBEditor
         /// since the last execution.
         /// </summary>
         bool _resultsChanged;
-
-        /// <summary>
-        /// Indicates the first row in a table containing invalid data, or -1 if there is no invalid
-        /// data.
-        /// </summary>
-        List<DataGridViewRow> _invalidRows = new List<DataGridViewRow>();
         
         /// <summary>
         /// Indicates whether the query text is dirty.
         /// </summary>
         bool _isQueryDirty;
+
+        /// <summary>
+        /// Indicates whether database table data is valid.
+        /// </summary>
+        bool _dataIsValid;
 
         /// <summary>
         /// Indicates if the host is in design mode or not.
@@ -121,7 +119,7 @@ namespace Extract.SQLCDBEditor
                 {
                     Name = "New Query";
                 }
-                _invalidRows.Clear();
+                DataIsValid = true;
             }
             catch (Exception ex)
             {
@@ -150,7 +148,7 @@ namespace Extract.SQLCDBEditor
                 Name = name;
                 FileName = fileName;
                 IsTable = isTable;
-                _invalidRows.Clear();
+                DataIsValid = true;
             }
             catch (Exception ex)
             {
@@ -165,7 +163,7 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// Raised when the user has modified data.
         /// </summary>
-        public event EventHandler<EventArgs> DataChanged;
+        public event EventHandler<DataChangedEventArgs> DataChanged;
 
         /// <summary>
         /// Raised to indicate that the control should be opened in a separate tab.
@@ -285,12 +283,17 @@ namespace Extract.SQLCDBEditor
                         _resultsGrid.EndEdit();
                     }
 
-                    return (_invalidRows.Count == 0);
+                    return _dataIsValid;
                 }
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI34634");
                 }
+            }
+
+            private set
+            {
+                _dataIsValid = value;
             }
         }
 
@@ -344,6 +347,31 @@ namespace Extract.SQLCDBEditor
                 {
                     throw ex.AsExtract("ELI34576");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the query exists on disk as an sqlce file.
+        /// </summary>
+        /// <value><see langword="true"/> if if query exists on disk; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool QueryFileExists
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the query is currently blank.
+        /// </summary>
+        /// <value><see langword="true"/> if the query blank; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool IsQueryBlank
+        {
+            get
+            {
+                return string.IsNullOrWhiteSpace(_queryScintillaBox.Text);
             }
         }
 
@@ -416,11 +444,12 @@ namespace Extract.SQLCDBEditor
 
                 _connection = connection;
                 _lastUsedParameters.Clear();
+                QueryFileExists = File.Exists(FileName);
 
-                // If the query doesn't yet exist on disk, immediately treat it as dirty.
-                if (!File.Exists(FileName))
+                // If the query doesn't yet exist on disk, the save button should be enabled and the
+                // query panel should be open.
+                if (!QueryFileExists)
                 {
-                    IsQueryDirty = true;
                     _saveButton.Enabled = true;
                     QueryPanelOpen = true;
                 }
@@ -470,7 +499,7 @@ namespace Extract.SQLCDBEditor
             {
                 // If the results table has not been created or it currently contains invalid data,
                 // prevent a refresh.
-                if (_resultsTable == null || !DataIsValid)
+                if (_resultsTable == null)
                 {
                     return;
                 }
@@ -483,6 +512,39 @@ namespace Extract.SQLCDBEditor
                 if (IsTable)
                 {
                     _adapter.Fill(latestDataTable);
+                    ApplySchema(latestDataTable);
+
+                    if (!DataIsValid)
+                    {
+                        // It is possible that changes from another table will make the data in the
+                        // currently invalid row(s) valid. Reset DataIsValid... any rows that are
+                        // still invalid after the refresh will trigger this to get set back to
+                        // false in the following block.
+                        DataIsValid = true;
+
+                        // If there is currently any invalid data in the table, merge the data from
+                        // the currently invalid rows into latestDataTable so that the user's edits
+                        // are preserved even if invalid.
+                        foreach (DataRow mergedRow in
+                            MergeRowsIntoTable(latestDataTable, _resultsTable.Rows
+                                .OfType<DataRow>()
+                                .Where(row => row.HasErrors)))
+                        {
+                            try
+                            {
+                                // Attempt an update on each merged-in row. If the data is still
+                                // invalid, this will throw an exception which we can ignore since
+                                // the validation icon on the row will become set.
+                                _adapter.Update(new DataRow[] { mergedRow });
+                            }
+                            catch
+                            {
+                                DataIsValid = false;
+                            }
+                        }
+
+                        UpdateResultsStatus(DataIsValid);
+                    }
                 }
                 else
                 {
@@ -547,12 +609,15 @@ namespace Extract.SQLCDBEditor
                 }
                 else
                 {
-                    // If updating the results, keep track of the last scroll position so that we
-                    // can keep the same data visiable (as much as is possible).
+                    // If updating the results, keep track of the sort order, last scroll position,
+                    // and column sized so that we can keep the same data visible.
+                    int sortedColumnIndex = (_resultsGrid.SortedColumn == null)
+                        ? -1
+                        : _resultsGrid.SortedColumn.Index;
+                    ListSortDirection sortOrder = (_resultsGrid.SortOrder == SortOrder.Descending)
+                        ? ListSortDirection.Descending
+                        : ListSortDirection.Ascending;
                     int scrollPos = _resultsGrid.FirstDisplayedScrollingRowIndex;
-
-                    // Keep track of existing column widths so that the refresh doesn't re-size
-                    // columns for database tables.
                     int[] columnWidths = _resultsGrid.Columns
                         .OfType<DataGridViewColumn>()
                         .Select(column => column.Width)
@@ -582,8 +647,6 @@ namespace Extract.SQLCDBEditor
                         _resultsTable.RowChanged += HandleRowChanged;
                         _resultsTable.RowDeleted += HandleRowChanged;
                         _resultsTable.TableNewRow += HandleTableNewRow;
-
-                        
                     }
 
                     // If this is a table or a query has been re-executed without changing, restore
@@ -602,6 +665,12 @@ namespace Extract.SQLCDBEditor
                         // Always auto-size columns if a query has changed since the last execution
                         // because the columns may no longer be the same.
                         AutoSizeColumns();
+                    }
+
+                    // Restore the previous sort order.
+                    if (sortedColumnIndex >= 0)
+                    {
+                        _resultsGrid.Sort(_resultsGrid.Columns[sortedColumnIndex], sortOrder);
                     }
 
                     // Re-apply the previous vertical scroll position for tables to try to make it
@@ -639,6 +708,7 @@ namespace Extract.SQLCDBEditor
             {
                 File.WriteAllText(FileName, _queryScintillaBox.Text);
                 IsQueryDirty = false;
+                QueryFileExists = true;
                 _saveButton.Enabled = false;
 
                 OnQuerySaved();
@@ -751,25 +821,30 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// If there is any invalid data in the table, selects and displays that data.
         /// </summary>
-        public void ShowInvalidData()
+        public string ShowInvalidData()
         {
             try
             {
-                if (_invalidRows.Count > 0)
+                DataGridViewRow firstInvalidRow = _resultsGrid.Rows
+                    .OfType<DataGridViewRow>()
+                    .FirstOrDefault(row => !string.IsNullOrEmpty(row.ErrorText));
+
+                if (firstInvalidRow != null)
                 {
                     _resultsGrid.ClearSelection();
-
-                    DataGridViewRow firstInvalidRow = _invalidRows
-                        .First(row => row != null && _resultsGrid.Rows.Contains(row));
-
                     firstInvalidRow.Selected = true;
                     int firstRowIndex = _resultsGrid.FirstDisplayedScrollingRowIndex;
                     int lastRowIndex = firstRowIndex + _resultsGrid.DisplayedRowCount(false) - 1;
-                    if (firstInvalidRow.Index < firstRowIndex || firstInvalidRow.Index > lastRowIndex)
+                    if (firstInvalidRow.Index < firstRowIndex ||
+                        firstInvalidRow.Index > lastRowIndex)
                     {
                         _resultsGrid.FirstDisplayedScrollingRowIndex = firstInvalidRow.Index;
                     }
+
+                    return firstInvalidRow.ErrorText;
                 }
+
+                return null;
             }
             catch (Exception ex)
             {
@@ -935,7 +1010,7 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                OnDataChanged();
+                OnDataChanged(false);
             }
             catch (Exception ex)
             {
@@ -1019,7 +1094,7 @@ namespace Extract.SQLCDBEditor
                 _queryChanged = true;
                 IsQueryDirty = (_lastSavedQuery != null &&
                     !_lastSavedQuery.Equals(_queryScintillaBox.Text, StringComparison.Ordinal));
-                _saveButton.Enabled = IsQueryDirty;
+                _saveButton.Enabled = IsQueryDirty || !QueryFileExists;
 
                 // Indicate that the results no longer necessarily reflect what is in the query box.
                 UpdateResultsStatus(false);
@@ -1194,17 +1269,44 @@ namespace Extract.SQLCDBEditor
 
             // Fill the table with the data from the dataAdapter
             _adapter.Fill(_resultsTable);
+            ApplySchema(_resultsTable);
 
+            // Create a command builder for the adapter that allow edits made in the _resultsGrid
+            // to be applied back to the database.
+            _commandBuilder = new SqlCeCommandBuilder();
+            _commandBuilder.DataAdapter = _adapter;
+        }
+
+        /// <summary>
+        /// Applies the schema of the specified <see paramref="table"/> to its
+        /// <see cref="DataColumn"/>s.
+        /// </summary>
+        /// <param name="table">The <see cref="DataTable"/>.</param>
+        void ApplySchema(DataTable table)
+        {
             // Fill the schema for the table for the database
-            _adapter.FillSchema(_resultsTable, SchemaType.Source);
+            _adapter.FillSchema(table, SchemaType.Source);
+
+            // The above call does not seem to always set the primary key correctly. If a primary
+            // key is not set, set it manually.
+            if (table.PrimaryKey.Length == 0)
+            {
+                string[] primaryKeyColumns = DBMethods.ExecuteDBQuery(_connection,
+                    "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.INDEXES WHERE TABLE_NAME = '"
+                    + Name + "' AND PRIMARY_KEY = 1");
+
+                table.PrimaryKey = primaryKeyColumns
+                    .Select(columnName => table.Columns[columnName])
+                    .ToArray();
+            }
 
             // Check for auto increment fields and default column values
-            foreach (DataColumn c in _resultsTable.Columns)
+            foreach (DataColumn c in table.Columns)
             {
                 // Get the information for the current column
                 using (SqlCeCommand sqlcmd = new SqlCeCommand(
                     "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" +
-                    tableName + "' AND COLUMN_NAME = '" + c.ColumnName + "'", connection))
+                    Name + "' AND COLUMN_NAME = '" + c.ColumnName + "'", _connection))
                 {
                     using (SqlCeResultSet columnsResult =
                         sqlcmd.ExecuteResultSet(ResultSetOptions.Scrollable))
@@ -1237,11 +1339,6 @@ namespace Extract.SQLCDBEditor
                     }
                 }
             }
-
-            // Create a command builder for the adapter that allow edits made in the _resultsGrid
-            // to be applied back to the database.
-            _commandBuilder = new SqlCeCommandBuilder();
-            _commandBuilder.DataAdapter = _adapter;
         }
 
         /// <summary>
@@ -1497,59 +1594,27 @@ namespace Extract.SQLCDBEditor
         /// <param name="row">The <see cref="DataRow"/> for which edits should be applied.</param>
         void UpdateRow(DataRow row)
         {
-            // Remove any rows from _invalidRows that no longer have errors.
-            if (!row.HasErrors && _invalidRows.Count > 0)
-            {
-                int index = _resultsTable.Rows.IndexOf(row);
-                if (index >= 0 && index < _resultsGrid.RowCount)
-                {
-                    var gridRow = _resultsGrid.Rows[index];
-                    if (_invalidRows.Contains(gridRow))
-                    {
-                        _invalidRows.Remove(gridRow);
-                    }
-                }
-            }
-
             // Attempt to commit the row data to the table.
             try
             {
-                _adapter.Update(_resultsTable);
-                RefreshData(true);
-                OnDataChanged();
+                // Update just the row first so that every row with invalid data gets a validation
+                // error icon and that after correcting the data, the error icon is cleared even if
+                // earlier rows have errors.
+                _adapter.Update(new DataRow[] { row } );
 
-                // If the update was successful, all data is now valid. Ensure the _invalidRows
-                // list is clear and update the result status controls.
-                _invalidRows.Clear();
+                // Then confirm that the entire table can be successfully updated (for sanity's
+                // sake-- this shouldn't result in any additional updates).
+                _adapter.Update(_resultsTable);
+                OnDataChanged(true);
+
+                // If the update was successful, all data is now valid.
+                DataIsValid = true;
                 UpdateResultsStatus(true);
             }
             catch
             {
-                // Add the offending DataGridView row to _invalidRows.
-                try
-                {
-                    int invalidRowIndex = _resultsTable.Rows.IndexOf(row);
-                    if (invalidRowIndex >= 0)
-                    {
-                        var invalidRow = _resultsGrid.Rows[invalidRowIndex];
-                        if (!_invalidRows.Contains(invalidRow))
-                        {
-                            _invalidRows.Add(invalidRow);
-                        }
-                    }
-                    else
-                    {
-                        // If we could not resolve the offending row, add null so that _invalidRows
-                        // is not empty which will cause the table's data to be flagged as invalid.
-                        _invalidRows.Add(null);
-                    }
-                }
-                catch
-                {
-                    // If we could not resolve the offending row, add null so that _invalidRows
-                    // is not empty which will cause the table's data to be flagged as invalid.
-                    _invalidRows.Add(null);
-                }
+                // Indicate that the table data is invalid.
+                DataIsValid = false;
 
                 UpdateResultsStatus(false);
 
@@ -1559,13 +1624,51 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
+        /// Merges the specified <see paramref="rowsToMerge"/> into <see paramref="dataTable"/>.
+        /// <para><b>Note</b></para>
+        /// If any of <see paramref="rowsToMerge"/> cannot be found in <see paramref="dataTable"/>
+        /// using the primary key value, the row will not be merged.
+        /// <para><b>Note</b></para>
+        /// It seemed <see cref="T:DataTable.Merge"/> should have been able to serve the purpose I
+        /// created this method for, but I couldn't get the desired results. Either it would update
+        /// all data in the grid from the DB, or it would preserve all data in the grid.
+        /// </summary>
+        /// <requires><see paramref="dataTable"/> must have a primary key.</requires>
+        /// <param name="dataTable">The <see cref="DataTable"/> into which the rows should be merged.
+        /// </param>
+        /// <param name="rowsToMerge">The rows to merge into <see paramref="dataTable"/>.</param>
+        /// <returns>The updated rows in <see paramref="dataTable"/>.</returns>
+        IEnumerable<DataRow> MergeRowsIntoTable(DataTable dataTable, IEnumerable<DataRow> rowsToMerge)
+        {
+            foreach (DataRow row in rowsToMerge)
+            {
+                DataRow correspondingRow = dataTable.Rows.Find(
+                    row[_resultsTable.PrimaryKey.First()]);
+                if (correspondingRow != null)
+                {
+                    for (int j = 0; j < row.ItemArray.Length; j++)
+                    {
+                        if (!row[j].Equals(correspondingRow[j]))
+                        {
+                            correspondingRow[j] = row[j];
+                        }
+                    }
+                }
+
+                yield return correspondingRow;
+            }
+        }
+
+        /// <summary>
         /// Raises the <see cref="DataChanged"/> event.
         /// </summary>
-        void OnDataChanged()
+        /// <param name="dataCommitted"><see langword="true"/> if the changed data was committed;
+        /// <see langword="false"/> if the change is in progress.</param>
+        void OnDataChanged(bool dataCommitted)
         {
             if (DataChanged != null)
             {
-                DataChanged(this, new EventArgs());
+                DataChanged(this, new DataChangedEventArgs(dataCommitted));
             }
         }
 

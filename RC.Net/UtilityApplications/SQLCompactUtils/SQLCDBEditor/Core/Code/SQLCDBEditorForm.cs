@@ -352,7 +352,7 @@ namespace Extract.SQLCDBEditor
             try
             {
                 // Check for unsaved changes.
-                if (CheckForSaveAndConfirm())
+                if (!CheckForSaveAndConfirm())
                 {
                     // User canceled
                     e.Cancel = true;
@@ -382,7 +382,7 @@ namespace Extract.SQLCDBEditor
             try
             {
                 // Check for unsaved changes.
-                if (CheckForSaveAndConfirm())
+                if (!CheckForSaveAndConfirm())
                 {
                     // User selected cancel to save confirmation, so nothing to do.
                     return;
@@ -452,7 +452,7 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                if (CheckForSaveAndConfirm())
+                if (!CheckForSaveAndConfirm())
                 {
                     // Operation was canceled by user when saving.
                     return;
@@ -521,6 +521,12 @@ namespace Extract.SQLCDBEditor
 
                     // Return focus to the list box to prevent it from losing focus by clicking in it.
                     listBox.Focus();
+                }
+                else
+                {
+                    // Clear _lastSelectedItem to ensure the if the same item is selected that was
+                    // last selected, that it is re-displayed.
+                    _lastSelectedItem = null;
                 }
             }
             catch (Exception ex)
@@ -773,6 +779,10 @@ namespace Extract.SQLCDBEditor
                 {
                     ClearPrimaryTab();
 
+                    _tablesListBox.ClearSelected();
+                    _queriesListBox.ClearSelected();
+                    _lastSelectedItem = null;
+
                     e.Cancel = true;
                     return;
                 }
@@ -783,7 +793,25 @@ namespace Extract.SQLCDBEditor
 
                     if (_pendingQueryList.Contains(queryAndResultsControl))
                     {
-                        _pendingQueryList.Remove(queryAndResultsControl);
+                        // If the query is unsaved, prompt to save it before allowing the tab to be
+                        // closed.
+                        if (PromptAndSaveDirtyQueries(queryAndResultsControl))
+                        {
+                            _pendingQueryList.Remove(queryAndResultsControl);
+
+                            // If the query was saved to disk, clear the QueryAndResultsControl out
+                            // of the tabbed document so that it is not disposed of.
+                            if (queryAndResultsControl.QueryFileExists)
+                            {
+                                e.DockControl.Controls.Clear();
+                            }
+                            
+                        }
+                        else
+                        {
+                            e.Cancel = true;
+                            return;
+                        }
                     }
                     else
                     {
@@ -797,13 +825,14 @@ namespace Extract.SQLCDBEditor
                         e.DockControl.Controls.Clear();
                     }
 
-                    // If the last open document is being closed, clear any existing selection in
-                    // the list boxes.
-                    if (_sandDockManager.GetDockControls()
-                            .OfType<TabbedDocument>().Count() == 2 &&
-                        _primaryTab.Controls.Count == 0)
+                    // If this control was the current selection in one of the lists, clear that
+                    // selection.
+                    if (_tablesListBox.SelectedItem == queryAndResultsControl)
                     {
                         _tablesListBox.ClearSelected();
+                    }
+                    else if (_queriesListBox.SelectedItem == queryAndResultsControl)
+                    {
                         _queriesListBox.ClearSelected();
                     }
                 }
@@ -815,28 +844,54 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
-        /// Handles the <see cref="T:QueryAndResultsControl.DataChanged"/> event.
+        /// Handles the <see cref="T:TabbedDocument.Closed"/> event.
         /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void HandleDataChanged(object sender, EventArgs e)
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandleTabbedDocumentClosed(object sender, EventArgs e)
         {
             try
             {
-                _dirty = true;
-
-                // If data has been changed in one table, refresh the data in all other visible
-                // tables immediately.
-                foreach (var queryAndResultsControl in _sandDockManager.GetDockControls()
-                    .OfType<TabbedDocument>()
-                    .Where(tab => tab.Controls.Count == 1)
-                    .Select(tab => (QueryAndResultsControl)tab.Controls[0])
-                    .Where(control => control != sender))
+                // When a tab is closed, ensure the tab that is now displayed (if any) is activated
+                // to ensure the selection in the list boxes is up-to-date.
+                if (_sandDockManager.ActiveTabbedDocument != null)
                 {
-                    // Use false so that for queries, the results get marked as stale, but don't get
-                    // automatically refreshed.
-                    queryAndResultsControl.RefreshData(false);
+                    _sandDockManager.ActiveTabbedDocument.Activate();
                 }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34639");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:QueryAndResultsControl.DataChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="DataChangedEventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleDataChanged(object sender, DataChangedEventArgs e)
+        {
+            try
+            {
+                if (e.DataCommitted)
+                {
+                    // If data has been changed in one table, refresh the data in all other visible
+                    // tables immediately.
+                    foreach (var queryAndResultsControl in _sandDockManager.GetDockControls()
+                        .OfType<TabbedDocument>()
+                        .Where(tab => tab.Controls.Count == 1)
+                        .Select(tab => (QueryAndResultsControl)tab.Controls[0])
+                        .Where(control => control != sender))
+                    {
+                        // Use false so that for queries, the results get marked as stale, but don't
+                        // get automatically refreshed.
+                        queryAndResultsControl.RefreshData(false);
+                    }
+                }
+
+                _dirty = true;
 
                 EnableCommands();
 
@@ -1272,6 +1327,7 @@ namespace Extract.SQLCDBEditor
                         queryAndResultsControl.DisplayName);
                     tabbedDocument.OpenWith(_primaryTab);
                     tabbedDocument.Closing += HandleTabbedDocumentClosing;
+                    tabbedDocument.Closed += HandleTabbedDocumentClosed;
                 }
                 // ... or close the control currently in the primary tab and open it there.
                 else
@@ -1400,12 +1456,13 @@ namespace Extract.SQLCDBEditor
         /// Method creates a transaction and saves all of the changes to the database and if there 
         /// were no errors on save, displays a dialog indicating a successful save.
         /// </summary>
-        void SaveDatabaseChanges()
+        /// <returns></returns>
+        bool SaveDatabaseChanges()
         {
             // Check for a loaded database file.
             if (string.IsNullOrEmpty(_databaseFileName))
             {
-                return;
+                return true;
             }
 
             var invalidDataTable = _tableList
@@ -1415,10 +1472,13 @@ namespace Extract.SQLCDBEditor
             if (invalidDataTable != null)
             {
                 OpenTableOrQuery(invalidDataTable, false);
-                invalidDataTable.ShowInvalidData();
-                new ExtractException("ELI34626", "Unable to save; table \"" +
-                    invalidDataTable.DisplayName + "\" has invalid data.").Display();
-                return;
+                string errorText = invalidDataTable.ShowInvalidData();
+                var ee = new ExtractException("ELI34626", "Unable to save; table \"" +
+                    invalidDataTable.DisplayName + "\" has invalid data.");
+                ee.AddDebugData("Error", errorText, false);
+                ee.Display();
+                
+                return false;
             }
 
             // Display wait cursor while saving the changes
@@ -1439,7 +1499,7 @@ namespace Extract.SQLCDBEditor
                         messageBox.AddButton("Cancel", "Cancel", true);
                         if (messageBox.Show(this) == "Cancel")
                         {
-                            return;
+                            return false;
                         }
                     }
                 }
@@ -1470,6 +1530,8 @@ namespace Extract.SQLCDBEditor
                     MessageBoxButtons.OK, MessageBoxIcon.Information,
                     MessageBoxDefaultButton.Button1, 0);
             }
+
+            return true;
         }
 
         /// <summary>
@@ -1676,7 +1738,7 @@ namespace Extract.SQLCDBEditor
         /// Method checks if the database is dirty and if it is will ask the user if they want to
         /// save changes. 
         /// </summary>
-        /// <returns>Return value is <see langword="true"/> if user selected cancel in the dialog.</returns>
+        /// <returns>Return value is <see langword="false"/> if user selected cancel in the dialog.</returns>
         [SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions")]
         bool CheckForSaveAndConfirm()
         {
@@ -1690,28 +1752,43 @@ namespace Extract.SQLCDBEditor
                 // If yes save the changes
                 if (result == DialogResult.Yes)
                 {
-                    SaveDatabaseChanges();
+                    if (!SaveDatabaseChanges())
+                    {
+                        return false;
+                    }
                 }
                 else if (result == DialogResult.Cancel)
                 {
                     // If cancel was selected there is nothing further to do
-                    return true;
+                    return false;
                 }
             }
 
-            IEnumerable<QueryAndResultsControl> dirtyQueryControls =
-                _queryList.Where(query => !query.IsTable && query.IsQueryDirty);
-
             // Prompt for any dirty queries to be saved.
+            return PromptAndSaveDirtyQueries(_queryList.Union(_pendingQueryList).ToArray());
+        }
+
+        /// <summary>
+        /// If any of the specified <see paramref="queryControls"/> have unsaved changes to queries,
+        /// prompt to save them.
+        /// </summary>
+        /// <returns>Return value is <see langword="false"/> if user selected cancel in the prompt.
+        /// </returns>
+        bool PromptAndSaveDirtyQueries(params QueryAndResultsControl[] queryControls)
+        {
+            IEnumerable<QueryAndResultsControl> dirtyQueryControls =
+                queryControls.Where(query => !query.IsTable && query.IsQueryDirty);
+
             if (dirtyQueryControls.Count() > 0)
             {
+                string caption = (dirtyQueryControls.Count() == 1) ? "Save query?" : "Save queries?";
                 string prompt = (dirtyQueryControls.Count() == 1)
-                    ? "The query \"" + dirtyQueryControls.First().Name + 
+                    ? "The query \"" + dirtyQueryControls.First().Name +
                         "\" has unsaved changes. Do you wish to save it?"
                     : "Multiple queries have unsaved changes. Do you wish to save them?";
 
-                DialogResult result = MessageBox.Show(this, prompt, "Save queries?", MessageBoxButtons.YesNoCancel,
-                    MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
+                DialogResult result = MessageBox.Show(this, prompt, caption, MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, 0);
                 switch (result)
                 {
                     case DialogResult.Yes:
@@ -1723,14 +1800,25 @@ namespace Extract.SQLCDBEditor
                         }
                         break;
 
+                    case DialogResult.No:
+                        {
+                            // Mark the query as not dirty to ensure multiple prompts aren't
+                            // displayed for the queries as the database is closing.
+                            foreach (QueryAndResultsControl dirtyQueryControl in dirtyQueryControls)
+                            {
+                                dirtyQueryControl.IsQueryDirty = false;
+                            }
+                        }
+                        break;
+
                     case DialogResult.Cancel:
                         {
-                            return true;
+                            return false;
                         }
                 }
             }
 
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -1958,7 +2046,7 @@ namespace Extract.SQLCDBEditor
 
             // If queryNameBase is already suffixed with a digit, increment that number rather than
             // appending another one.
-            int i = 2;
+            int i = queryAndResultsControl.IsQueryBlank ? 1 : 2;
             Regex digitSuffixFinder = new Regex(@"\s*\d+\s*$");
             Match match = digitSuffixFinder.Match(queryNameBase);
             if (match.Success)

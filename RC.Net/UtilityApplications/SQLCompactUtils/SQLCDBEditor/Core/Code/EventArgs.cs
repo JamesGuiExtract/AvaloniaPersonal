@@ -68,4 +68,33 @@ namespace Extract.SQLCDBEditor
             set;
         }
     }
+
+    /// <summary>
+    /// The arguments used for the <see cref="T:QueryAndResultsControl.DataChanged"/> event.
+    /// </summary>
+    internal class DataChangedEventArgs : CancelEventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataChangedEventArgs"/> class.
+        /// </summary>
+        /// <param name="dataCommitted"><see langword="true"/> if the changed data was committed;
+        /// <see langword="false"/> if the change is in progress.</param>
+        public DataChangedEventArgs(bool dataCommitted)
+            : base()
+        {
+            DataCommitted = dataCommitted;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the changed data was committed.
+        /// </summary>
+        /// <value><see langword="true"/> if the changed data was committed; <see langword="false"/>
+        /// if the change is in progress.
+        /// </value>
+        public bool DataCommitted
+        {
+            get;
+            private set;
+        }
+    }
 }

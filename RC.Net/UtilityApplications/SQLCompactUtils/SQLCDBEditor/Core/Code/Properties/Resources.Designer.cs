@@ -60,6 +60,13 @@ namespace Extract.SQLCDBEditor.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap DbNewQuery {
+            get {
+                object obj = ResourceManager.GetObject("DbNewQuery", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap DbQueryLarge {
             get {
                 object obj = ResourceManager.GetObject("DbQueryLarge", resourceCulture);
@@ -77,13 +84,6 @@ namespace Extract.SQLCDBEditor.Properties {
         internal static System.Drawing.Bitmap ExecuteQuery {
             get {
                 object obj = ResourceManager.GetObject("ExecuteQuery", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap NewDbQuery {
-            get {
-                object obj = ResourceManager.GetObject("NewDbQuery", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
