@@ -38,15 +38,15 @@
         	<li>Confirm that the FPS file automatically closes after processing is complete.</li>
     	</ul></li>
 <p>
-    	<li><b>[LegacyRC #4821]</b> Confirm that <b>ProcessFiles.exe <i>filename.fps</i> 
+    	<li>Confirm that <b>ProcessFiles.exe <i>filename.fps</i> 
     	/sleep:5000</b> on the command line results in a 5-second wait before <i>filename.fps</i> 
     	opens. </li>
-    	<li><b>[LegacyRC #3722]</b> Test <b>ProcessFiles.exe <i>filename.fps</i> /s /fc /l 
+    	<li>Test <b>ProcessFiles.exe <i>filename.fps</i> /s /fc /l 
     	&lt;listfile&gt;</b> on the command line where <i>listfile</i> is empty.  Confirm that a usage
     	message is presented.</li>
-    	<li><b>[LegacyRC #4858]</b> Test <b>ProcessFiles.exe <i>filename.fps</i> /c /fc</b> on the 
+    	<li>Test <b>ProcessFiles.exe <i>filename.fps</i> /c /fc</b> on the 
     	command line.  Confirm that the File Action Manager displays the usage message and exits.</li>
-    	<li><b>[LegacyRC #4857]</b> Test <b>ProcessFiles.exe <i>filename.fps</i> /s /fc /m:4</b> on the
+    	<li>Test <b>ProcessFiles.exe <i>filename.fps</i> /s /fc /m:4</b> on the
     	command line.  Confirm that the File Action Manager processes 4 files and closes. Run the same
     	command-line options again.  Confirm that 4 more files are processed.</li>
 <p>
@@ -197,7 +197,7 @@
         	<li>Confirm that <b>Process - Stop Processing</b> stops processing once all currently 
         	executing tasks have completed.</li> 
         	<li>Confirm that in the time period between <b>Process - Stop Processing</b> being selected
-        	and processing actually stopping, the <b>Process</b> menu is disabled.</li> 
+        	and processing actually stopping, the <b>Process</b> menu items are disabled.</li> 
 <p>
         	<li><b>[LegacyRC #5888]</b><!-- fixed v 8.1.0.x --> Don't log pause/unpause
         	<ul>
@@ -239,7 +239,7 @@
         	<li>Select the menu item and confirm that a <b>Select database to administer</b> dialog 
 		is presented.</li>
         	<li>Close the DB Admin utility.</li>
-        	<LI><b>[LegacyRC #5522]</b> Confirm that <b>Ctrl+D</b> launches DB Admin.</li>
+        	<LI>Confirm that <b>Ctrl+D</b> launches DB Admin.</li>
         	<li>Close the FAM.</li>
 <p>
         	<li>Start the FAM and <b>select</b> a Database Server and Database Name.</li>
@@ -286,6 +286,11 @@
         	<li>Double-click on a FPS file to open it.</li>
         	<li>Select <b>Help - File Action Manager Help</b>.</li>
         	<li>Confirm that the appropriate Help file is opened.</li>
+		<ul>
+			<li><u>LabDE.chm</u> if only LabDE is installed
+			<li><u>IDShield.chm</u> if only ID Shield is installed
+			<li><u>FLEXIndex.chm</u> if only FLEX Index is installed
+		</ul>
     	</ul></li>
     	<li>Confirm that the <b>Help</b> menu has an <b>About File Action Manager</b> item and the
     	initial state is enabled.</li>
@@ -295,8 +300,7 @@
 <p>
 <b>Open FPS Button</b> 
 <ul>
-    	<li><b>[LegacyRC #3307]</b> Confirm the <b>File Action Manager</b> toolbar has a <b>Open FPS
-    	file</b> toolbar button.</li>
+    	<li>Confirm the <b>File Action Manager</b> toolbar has a <b>Open FPS file</b> toolbar button.</li>
     	<li>Confirm that the toolbar button includes a drop-down menu allowing the user to open recent
     	FPS files.</li>
     	<li>Confirm that clicking on the button portion of the toolbar button displays a <b>File 
@@ -372,8 +376,8 @@
     	Connected</b>.</li>
     	<li>Confirm that the associated <b>Refresh</b> button is enabled.</li>
     	<li>Confirm that the <b>Connect to last used database</b> button is enabled.</li>
-    	<li><b>[LegacyRC #4734]</b> Confirm that the <b>Connect to last used database</b> connects to
-    	the previously used Database Server and Database Name.</li>
+    	<li>Confirm that the <b>Connect to last used database</b> connects to the previously used 
+	Database Server and Database Name.</li>
 <p>
    	<LI><b>[LegacyRC #6174]</b> FAM Title Bar
        	<ul>
@@ -628,22 +632,6 @@
         	processing</b> button turns green), the value in the <b>Pending</b> pane is 0.</li>
     	</ul></li>
 <p>
-    	<LI><b>[LegacyRC #5397]</b> FAM status bar problems with skipped files
-    	<ul>
-        	<li>Create an FPS file with a file supplier configured to <b>force processing</b>.</li>
-        	<li>Use a task that supports skipping files.</li>
-        	<li>Start processing and skip all the files. </li>
-        	<li>Confirm that the status bar shows correct numbers for skipped, pending and 
-        	processing.</li>
-        	<li>Start processing again and skip all the files again. </li>
-        	<li>Confirm that the status bar shows correct numbers for skipped, pending and 
-        	processing.</li>
-        	<li>Close the FAM instance. </li>
-        	<li>Reopen the FPS file and start processing. </li>
-        	<li>Confirm that the status bar shows correct numbers for skipped, pending and 
-        	processing.</li>
-    	</ul></li>
-<p>
     	<li><b>[LegacyRC #5982]</b> FAM Status Bar
     	<ul>
         	<li>Configure a FAM to use an empty database with two actions, A and B.</li>
@@ -761,13 +749,13 @@
         	<li>Before dismissing the error dialog, add the Compute and Verify actions to the 
         	database.</li>
         	<li>Dismiss the FAM dialog.</li>
-        	<li>Confirm that the FAM connects to the database successfully and displays all
-        	appropriate tabs.</li>
+        	<li>Confirm that after refreshing the connection, the FAM connects to the database 
+		successfully and displays all appropriate tabs.</li>
     	</ul></li>
 <p>
     	<li><b>[LegacyRC #6018]</b>
     	<ul>
-        	<li>Open the Options dialog from the menu bar.</li>
+        	<li>Open the <b>Options</b> dialog from the menu bar.</li>
         	<li>Delete the value in the Completed records text box.</li>
         	<li>Hit OK.</li>
         	<li>Confirm that you are prompted to fill in a value.</li>
