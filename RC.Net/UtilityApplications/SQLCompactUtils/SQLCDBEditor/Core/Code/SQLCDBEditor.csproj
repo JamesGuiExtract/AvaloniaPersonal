@@ -68,8 +68,8 @@
   <ItemGroup>
     <Reference Include="SandDock, Version=3.0.5.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL" />
     <Reference Include="ScintillaNET, Version=2.4.0.0, Culture=neutral, PublicKeyToken=948d6c9751444115, processorArchitecture=MSIL">
-		<HintPath>..\..\..\..\..\APIs\ScintillaNET v2.4\ScintillaNET.dll</HintPath>
-	</Reference>
+      <HintPath>..\..\..\..\..\APIs\ScintillaNET v2.4\Dist\ScintillaNET.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
