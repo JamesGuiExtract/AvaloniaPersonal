@@ -18,12 +18,12 @@
 <p>
       		<li><u><b>General Functionality</b></u>
 	       	<ul>
-			<li>Confirm that a <b>RequireAuthenticationBeforeRun</b> field 
-			is defined in the <b>DBInfo</b> table.
-			<li>Confirm that <b>RequireAuthenticationBeforeRun</b> defaults 
-			to <b>0</b>.
+			<li>Confirm that a <b>Require authentication to run</b> checkbox 
+			is defined on the <b>Security</b> tab of the <b>Database Options</b> 
+			dialog.
+			<li>Confirm that the default is <b>unchecked</b>.
 			<li>Confirm that user authentication is only active when 
-			<b>RequireAuthenticationBeforeRun = 1</b>.
+			the checkbox is checked.
 			<li>Confirm that for a user with a cleared password, clicking 
 			the <b>Start processing</b> button prompts the user to define 
 			a password.
@@ -55,10 +55,11 @@
 <p>
   	   	<LI><b>[LegacyRC #5700]</b> User Authentication
 	       	<ul>
-			<li>Set <b>RequireAuthenticationBeforeRun=1</b>.
-			<li>Confirm that the previous <b>SkipAuthenticationForServicesOnMachines</b> 
-			entry in the DBInfo table is now <b>SkipAuthenticationOnMachines</b>.
-			<li>With setting <b>empty</b>
+			<li>Set <b>Require authentication to run</b>.
+			<li>Confirm that a <b>Skip authentication when running as a service on 
+			the following machines</b> list box is defined on the <b>Security</b> tab 
+			of the <b>Database Options</b> dialog.
+			<li>With list <b>non-empty</b>
 			<ul>
 				<li>Confirm that an FPS file will not run if the logged in user 
 				is not included via <b>Manage Users</b>.
@@ -81,24 +82,10 @@
 				user is included via <b>Manage Users</b> and the appropriate 
 				password is provided.
 			</ul>
-			<li>With setting <b>non-empty</b>
-			<ul>
-				<li>Confirm that the above tests have the same result if a 
-				different machine is specified in <b>SkipAuthenticationOnMachines</b>.
-				<li>Add the name of the test machine to the 
-				<b>SkipAuthenticationOnMachines</b> field.
-				<li>Confirm that an FPS file will run even if the logged in user 
-				is not included via <b>Manage Users</b>.
-				<li>Confirm that the FAM will run as a service in local system 
-				mode.
-				<li>Confirm that the FAM will run as a service in defined 
-				user mode.
-				<li>Confirm that <b>RunFPSFile</b> will run even if the logged in 
-				user is not included via <b>Manage Users</b>.
-			</ul>
 			<li>Skipping files for <b>all</b> users
 			<ul>
-				<li>Set <b>RequirePasswordToProcessAllSkippedFiles=1</b>
+				<li>Set <b>Require FAM Database administrator password to process 
+				all skipped files</b>.
 				<li>Confirm that the FAM service will fail if the associated FPS 
 				file is configured to skip files for all users.
 			</ul>
@@ -110,7 +97,7 @@
 		<LI>see other test cases in <b>DB Admin</b> checklist.
 		<LI>see other test cases in <b>Queuing Tabs</b> checklist.
 <p>
-		<LI>Confirm that <b>MaxFilesFromDB = 1</b>.
+		<LI>Create an FPS file to <b>Retrieve 1 file at a time from the queue</b>.
 		<li>Prepare a large collection of files for processing.
 		<li>Queue and process these files using a <b>Folder file supplier</b> set to 
 		<b>Normal</b> priority.
@@ -124,15 +111,7 @@
 <p>
 	<li><h2>Skipping Files</h2>
 	<ul>
-  	   	<LI><b>[LegacyRC #5403]</b> Do not process currently skipped files
-	       	<ul>
-	      		<li>Modify the <b>MaxFilesFromDB</b> registry entry to a small number 
-			such as 3.
-	      		<li>Process and skip a larger number of files such as 10.
-	      		<li>Process skipped files.
-	      		<li>Confirm that files that are skipped again are not repeatedly 
-			presented for processing.
-	       	</ul>
+  	   	<LI><b>TBD</b>
 	</ul>
 <p>
 	<li><h2>Automatic Detection and Correction of Stuck Files</h2>
@@ -161,29 +140,33 @@
 	      		<li>Use <b>DB Admin</b> after auto-reversion to confirm that 
 			the files are back in <b>Skipped</b> mode.
 		</ul> 
+<p>
       		<li><u><b>Functionality</b></u>
 		<ul> 
-	      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
-			<b>AutoRevertLockedFiles</b> with a default of <b>1</b>.
-      			<li>Confirm that with <b>AutoRevertLockedFiles = 1</b>, stuck 
+			<li>Confirm that an <b>Automatically revert locked files</b> checkbox 
+			is defined on the <b>General</b> tab of the <b>Database Options</b> 
+			dialog.
+			<ul>
+				<li>Confirm that the default setting is <b>checked</b>.
+				<li>Confirm that an associated spinner control is included to 
+				define the number of minutes of inactivity.
+				<li>Confirm that the default is <b>60</b>.
+				<li>Confirm that the minimum is <b>5</b>.
+				<li>Confirm that the maximum is <b>1440</b>.
+			</ul>
+      			<li>Confirm that with AutoRevert <b>checked</b>, stuck 
 			files are automatically reverted to their previous status.
-	      		<li>Confirm that with <b>AutoRevertLockedFiles = 0</b>, stuck 
-			files are not automatically reverted to their previous status.
-<p>
-	      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
-			<b>AutoRevertTimeOutInMinutes</b> with a default of <b>60</b>.
-      			<li>Confirm that the minimum value for <b>AutoRevertTimeOutInMinutes</b> 
-			is <b>5</b>.
 	      		<li>Confirm that automatic reversion of stuck files is based on 
 			the timeout value.
-	      		<li><b>[LegacyRC #5500]</b> Confirm that an exception is logged and the 
-			timeout value is automatically adjusted if a value less than 5 is provided.
+	      		<li>Confirm that with AutoRevert <b>unchecked</b>, stuck 
+			files are not automatically reverted to their previous status.
 <p>
-	      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
-			<b>AutoRevertNotifyEmailList</b> with a default of <b>an empty 
-			string</b>.
+	      		<li>Confirm that the <b>General</b> tab contains a list box for 
+			<b>After reverting file status, notify the following recipients by 
+			email</b>.
+			<li>Confirm that the list is <b>empty</b> by default.
 	      		<li>Confirm that automatic reversion of stuck files sends emails 
-			to the addresses given in <b>AutoRevertNotifyEmailList</b>.
+			to the addresses given in the list.
 			<li>Confirm that the email contains the same information as 
 			in the exception log as noted below.
 <p>
@@ -191,8 +174,7 @@
 			reverted from being stuck.
       			<li>Confirm that the exception includes the number of minutes 
 			elapsed before reversion, the count of files that were reverted, 
-			the file status to which a file was reverted, and the associated 
-			action name.
+			and the file status to which a file was reverted.
 	       	</ul>
 	</ul>
 <p>
@@ -226,24 +208,15 @@
 <p>
 		<li>Confirm that scheduled processing works as expected when the 
 		FAM is running as a service.
-<p>
-		<li><b>[FlexIDSCore #3794]</b> Logging starts and stops
-		<ul>
-			<li>Confirm that an exception is logged when the FAM transitions 
-			to <b>inactive</b> status.
-			<li>Confirm that an exception is logged when the FAM transitions 
-			to <b>active</b> status.
-			<li>Confirm that the logged exceptions include the full path to 
-			the FPS file.
-		</ul>
 	</ul>
 <p>
 	<li><h2>PDF/A Conversion</h2>
 	<ul>
       		<li><u><b>User Interface</u></b>
 	       	<ul>
-	      		<li>Confirm that the property page includes a <b>Make output PDF/A 
-			compatible (this will increase the size of the PDF)</b> check box.
+	      		<li>Confirm that the <b>Core: Convert to searchable PDF</b> task 
+			property page includes a <b>Make output PDF/A compatible (this will 
+			increase the size of the PDF)</b> check box.
 			<li>Confirm that the check box is unchecked by default.
 			<li>Confirm that the task settings are persistent.
 	       	</ul>
