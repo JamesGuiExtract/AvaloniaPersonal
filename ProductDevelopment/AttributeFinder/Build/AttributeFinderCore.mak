@@ -194,10 +194,11 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY "$(RCNETDir)\APIs\Accusoft\PDFExpress\bin\PegasusImaging.WinForms.PdfXpress3.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
 	@COPY "$(RCNETDir)\APIs\Spring.NET\1.3.1\bin\net\4.0\release\Spring.Core.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
 	@COPY "$(RCNETDir)\APIs\Spring.NET\1.3.1\bin\net\4.0\release\Common.Logging.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
-	@COPY "$(RCNETDir)\APIs\Spring.NET\1.3.1\bin\net\4.0\release\SpringFrameworkLicense.txt" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" 
+	@COPY "$(RCNETDir)\APIs\Spring.NET\1.3.1\bin\net\4.0\release\SpringFrameworkLicense.txt" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY "$(RCNETDir)\APIs\LogicNP\EZShellExtensions.Net\2011\LogicNP.EZShellExtensions.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
 	@COPY "$(BinariesFolder)\Extract.Utilities.ShellExtensions.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
 	@COPY /v "$(BinariesFolder)\DataEntryCC.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY "$(RCNETDir)\APIs\ScintillaNET v2.4\Dist\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	
 # Need the .net DLLs  in the same folder as Extract.Utilities.Parsers.dll
 	@COPY /V  "$(BinariesFolder)\Obfuscated\TestTextFunctionExpander.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
