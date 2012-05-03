@@ -1259,28 +1259,20 @@ namespace Extract.SQLCDBEditor
         /// into the primary tab.</param>
         void OpenTableOrQuery(QueryAndResultsControl queryAndResultsControl, bool openInNewTab)
         {
-            // Lock control updates while the control is being loaded to prevent distracting
-            // flashing of controls while it is loading.
-            using (new LockControlUpdates(this))
+            try
             {
-                try
-                {
-                    SuspendLayout();
+                SuspendLayout();
 
-                    OpenTableOrQueryCore(queryAndResultsControl, openInNewTab);
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI34610");
-                }
-                finally
-                {
-                    ResumeLayout(true);
-                }
+                OpenTableOrQueryCore(queryAndResultsControl, openInNewTab);
             }
-
-            // Refresh after re-enabling updates so that all the controls get drawn correctly.
-            Refresh();
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34610");
+            }
+            finally
+            {
+                ResumeLayout(true);
+            }
         }
 
         /// <summary>

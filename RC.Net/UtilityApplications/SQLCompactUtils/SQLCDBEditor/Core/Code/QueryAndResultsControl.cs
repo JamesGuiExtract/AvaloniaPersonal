@@ -10,6 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -66,6 +67,11 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         List<KeyValuePair<string, string>> _lastUsedParameters
             = new List<KeyValuePair<string, string>>();
+
+        /// <summary>
+        /// The queries used to generate lists of available values for the parameter(s).
+        /// </summary>
+        List<string> _parameterQueries = new List<string>();
 
         /// <summary>
         /// Indicates whether the query itself has changed since the last execution.
@@ -195,9 +201,13 @@ namespace Extract.SQLCDBEditor
         #region Properties
 
         /// <summary>
-        /// The name of the table or query, suffixed by an asterix if a query is dirty.
+        /// Gets the name of the table or query, suffixed by an asterix if a query is dirty.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The name of the table or query, suffixed by an asterix if a query is dirty.
+        /// </returns>
+        // Don't obfuscate because this un-obfuscated property name is needed by the PropertyChanged
+        // event.
+        [ObfuscationAttribute(Exclude = true)]
         public string DisplayName
         {
             get
@@ -339,7 +349,6 @@ namespace Extract.SQLCDBEditor
                     {
                         _isQueryDirty = value;
 
-                        OnPropertyChanged("IsDirty");
                         OnPropertyChanged("DisplayName");
                     }
                 }
@@ -548,6 +557,9 @@ namespace Extract.SQLCDBEditor
                 }
                 else
                 {
+                    // Update the list of available values for any ComboBox parameter controls.
+                    RefreshParameterControls();
+
                     // Don't bother running the query at all if it is blank.
                     if (!string.IsNullOrWhiteSpace(_masterQuery))
                     {
@@ -1434,6 +1446,8 @@ namespace Extract.SQLCDBEditor
             // All queries except the last one define parameters.
             for (int i = 0; i < queries.Length - 1; i++)
             {
+                _parameterQueries.Add(queries[i]);
+
                 string prompt = queryParserRegex.Match(queries[i])
                     .ToString()
                     .Trim();
@@ -1510,6 +1524,7 @@ namespace Extract.SQLCDBEditor
             {
                 ComboBox comboBox = new ComboBox();
                 comboBox.Anchor = AnchorStyles.Left;
+                comboBox.Sorted = false;
                 comboBox.Items.AddRange(availableValues);
                 var autoCompleteList = new AutoCompleteStringCollection();
                 autoCompleteList.AddRange(availableValues.Distinct().ToArray());
@@ -1546,6 +1561,7 @@ namespace Extract.SQLCDBEditor
             _parametersTableLayoutPanel.Controls.Clear();
             _parametersTableLayoutPanel.RowCount = 1;
             _queryParameterControls.Clear();
+            _parameterQueries.Clear();
 
             CollectionMethods.ClearAndDispose(oldControls);
         }
@@ -1656,6 +1672,50 @@ namespace Extract.SQLCDBEditor
                 }
 
                 yield return correspondingRow;
+            }
+        }
+
+        /// <summary>
+        /// Updates the list of available value for any ComboBox parameter fields to reflect the
+        /// latest data in the database.
+        /// </summary>
+        void RefreshParameterControls()
+        {
+            for (int i = 0; i < _queryParameterControls.Count(); i++)
+            {
+                // Don't change the type of parameter control that already exists. Only ComboBoxes
+                // will have lists of available values that need to be updated.
+                ComboBox comboBox = _queryParameterControls[i] as ComboBox;
+                if (comboBox == null)
+                {
+                    continue;
+                }
+
+                // Save the current available value list so it can be compared to the new list.
+                string[] originalAvailableValuesList = comboBox.Items
+                    .OfType<string>()
+                    .ToArray();
+
+                try
+                {
+                    // Get the up-to-date list.
+                    string[] newAvailableValuesList =
+                        DBMethods.ExecuteDBQuery(_connection, _parameterQueries[i], null, ",");
+
+                    // If the list has changed, update the items and auto-complete list of the
+                    // ComboBox.
+                    if (!Enumerable.SequenceEqual(
+                        originalAvailableValuesList, newAvailableValuesList))
+                    {
+                        comboBox.Items.Clear();
+                        comboBox.Items.AddRange(newAvailableValuesList);
+                        var autoCompleteList = new AutoCompleteStringCollection();
+                        autoCompleteList.AddRange(newAvailableValuesList.Distinct().ToArray());
+                        comboBox.AutoCompleteCustomSource = autoCompleteList;
+                    }
+                }
+                // Ignore any exceptions and just use the previous list of available values.
+                catch {}
             }
         }
 

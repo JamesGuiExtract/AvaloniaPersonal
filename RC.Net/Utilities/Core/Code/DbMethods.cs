@@ -170,7 +170,7 @@ namespace Extract.Utilities
                             // Append a result only if there is a value to append.
                             if (!sqlReader.IsDBNull(i))
                             {
-                                string columnValue = sqlReader.GetString(i);
+                                string columnValue = sqlReader.GetValue(i).ToString();
 
                                 if (!string.IsNullOrEmpty(columnValue))
                                 {

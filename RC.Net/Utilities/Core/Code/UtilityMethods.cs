@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Globalization;
 
 namespace Extract.Utilities
 {
@@ -412,6 +413,7 @@ namespace Extract.Utilities
         /// Returns an unique string to identify the current process
         /// </summary>
         /// <returns></returns>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public static string GetCurrentProcessUpi()
         {
             try
@@ -420,7 +422,7 @@ namespace Extract.Utilities
                 upi += Environment.MachineName + "\\";
                 upi += SystemMethods.GetProcessName(SystemMethods.GetCurrentProcessId());
                 upi += SystemMethods.GetCurrentProcessId().AsString() + "\\";
-                upi += DateTime.UtcNow.ToString("MdY\\H:m:s");
+                upi += DateTime.UtcNow.ToString("MdY\\H:m:s", CultureInfo.InvariantCulture);
                 return upi;
             }
             catch (Exception ex)
