@@ -85,8 +85,6 @@
     	<li>Select <b>Create new database</b> and click the <b>Next</b> button.</li>
     	<li>Confirm that a <b>Set Admin Password message box</b> is presented.</li>
     	<li>After OK, confirm that a <b>Set Admin Password dialog</b> is presented.</li>
-    	<li>Select <b>log in to existing database</b> and click the <b>Next</b> button.</li>
-    	<li>Confirm that a <b>Set Admin Password message box</b> is presented.</li>
     	<li>Confirm that after providing matching passwords, the main <b>File Action Manager Database
     	Administration</b> window appears.</li>
     	<li>Confirm that no exceptions were logged.</li>
@@ -104,10 +102,10 @@
         	<li>Confirm that if you do not update the schema, only the following menu items are
         	enabled:
         	<ul>
-            		<li>File &gt; Clear</li>
-            		<li>File &gt; Update database schema</li>
-            		<li>File &gt; Logout</li>
-            		<li>File &gt; Exit</li>
+            		<li>Database &gt; Clear</li>
+            		<li>Database &gt; Update database schema</li>
+            		<li>Database &gt; Logout</li>
+            		<li>Database &gt; Exit</li>
             		<li>Tools &gt; Check for new components</li>
             		<li>Tools &gt; File Action Manager</li>
             		<li>Help &gt; File Action Manager Help</li>
@@ -194,7 +192,7 @@
     	<li>Confirm that the Summary tab contains an edit box for <b>Total number of files referenced
     	in the database</b>.</li>
     	<li>Confirm that the Summary tab contains an associated button for <b>Refresh</b>.</li>
-    	<li>Confirm that the Summary tab contains a list box for Actions and counts.</li>
+    	<li>Confirm that the Summary tab contains a grid for Actions and counts.</li>
     	<li>Confirm that columns are provided for <b>Action</b>, <b>Unattempted</b>, <b>Pending</b>,
     	<b>Processing</b>, <b>Complete</b>, <b>Skipped</b>, <b>Failed</b> and <b>Total</b>.</li>
 <p>
@@ -318,6 +316,10 @@
             		</ul></li>
             		<li>Confirm that there is a spin control for the number of minutes of inactivity 
 			after which to revert files.</li>
+			<ul>
+	            		<li>Confirm that the spin control has a minimum of <b>5</b> and a 
+				maximum of <b>1440</b>.</li>
+			</ul>
             		<li>Confirm that there is a list box with <b>Add</b>, <b>Modify</b>, and 
 			<b>Remove</b> buttons.</li>
             		<li>Confirm that both of those controls work as expected and that both are 
@@ -347,6 +349,8 @@
                 		<ul>
                     			<li>Confirm that there is an associated spin control for how 
 					much history to store.</li>
+		            		<li>Confirm that the spin control has a minimum of <b>1</b> 
+					and a maximum of <b>365</b>.</li>
                 		</ul></li>
                 		<li>Store database settings change history</li>
                 		<li>Store FTP event history</li>
@@ -430,10 +434,6 @@
     	<li>Confirm that <b>Actions...</b>, <b>Counters...</b>, <b>Tags...</b>, and <b>Users...</b>
     	items exist in the menu.</li>
     	<li>Confirm that all menu items are enabled.</li>
-    	<li>Confirm that <b>Ctrl+A</b> displays the <b>Manage Actions</b> dialog.</li>
-    	<li>Confirm that <b>Ctrl+C</b> displays the <b>Manage Counters</b> dialog.</li>
-    	<li>Confirm that <b>Ctrl+T</b> displays the <b>Manage Tags</b> dialog.</li>
-    	<li>Confirm that <b>Ctrl+U</b> displays the <b>Manage Users</b> dialog.</li>
 <p>
     	<li><b>Manage Actions...</b>
     	<ul>
@@ -692,16 +692,16 @@
 		down menu and vice-versa.</li>
         	<li>Confirm that the action and target status drop down boxes both default to empty.</li>
         	<li>Confirm that you are required to specify an action and target status.</li>
+        	<li>Use the <b>Apply</b> button to update the action status for <b>all files referenced 
+		in the database</b>. Confirm that the status has been updated for all files for the 
+		selected action and that the dialog remains open.</li>
         	<li>Use the <b>OK</b> button to update the action status for <b>all files referenced 
 		in the database</b>. Confirm that the status has been updated for all files for the 
 		selected action and that the dialog has closed.</li>
-        	<li><b>[LegacyRC #4423]</b> Use the <b>Apply</b> button to update the action status for
-        	<b>all files referenced in the database</b>. Confirm that the status has been updated for
-        	all files for the selected action and that the dialog remains open.</li>
         	<li>Confirm that <b>CTRL+M</b> performs the same function as selecting <b>Manually Set 
         	Action Status</b> from the <b>Action</b> menu.</li>
-        	<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed after an 
-		action status is manually set.</li>
+        	<li>Confirm that the <b>Summary</b> tab is refreshed after an action status is manually 
+		set.</li>
         	<li><b>[LegacyRC #5106] NOT FIXED!</b>Confirm that "Status of Action" radio button can 
 		be selected by using Tab and Arrow key.</li>
 <p>
@@ -736,32 +736,6 @@
         	<li>Confirm that the <b>Manually Set File Processing Priority</b> dialog contains a 
 		spinner control to specify the priority.</li>
         	<li>Confirm that file priority is set properly.</li>
-<p>
-        	<LI><b>[LegacyRC #5454]</b> Set priority based on tags
-        	<ul>
-            		<li>From the <b>Manually Set File Processing Priority</b> dialog, use the 
-			<b>Select Files</b> dialog to choose some files based on tags.</li>
-            		<li>Confirm that file priority can be set on the selected files.</li>
-        	</ul></li>
-<p>
-        	<LI><b>[LegacyRC #5496]</b> Set file priority based on two or more tags
-        	<ul>
-            		<li>Create a database and some tags.</li>
-            		<li>Use the FAM to apply a tag to some of the files.</li>
-            		<li>Configure the DB Admin <b>Manually set file processing priority</b> 
-			dialog to select files associated with any of the following tags and select 
-			<b>two or more</b> tags including at least one that has been applied to 
-			some files.</li>
-            		<li>Click OK to set the priority.</li>
-            		<li>Confirm that file processing priority is set as specified.</li>
-        	</ul></li>
-<p>
-        	<LI><b>[LegacyRC #5531]</b> Setting file priority in large database
-        	<ul>
-            		<LI>Confirm that the <b>FAM DB Admin</b> utility is not unresponsive for 
-			an extended period while setting file priority.  This should be tested 
-			with several thousand files in a database.</li>
-        	</ul></li>
 <p>
         	<li><b>[LegacyRC #5886]</b><!-- fixed v 8.1.0.73 --> Manually set priority
         	<ul>
@@ -801,14 +775,12 @@
             		<li>Failed: F</li>
         	</ul></li>
 <p>
-        	<li><b>Export a list of all files that result from this SQL query:</b> exports the 
-		proper filenames when the SQL query <i>dbo.FAMFile INNER JOIN dbo.FileActionStatus 
-		ON dbo.FAMFile.ID = dbo.FileActionStatus.FileID INNER JOIN dbo.Action ON 
-		dbo.Action.ID = dbo.FileActionStatus.ActionID WHERE dbo.Action.ASCName = 
-		'<b>ACTION_NAME</b>' AND dbo.FileActionStatus.ActionStatus = '<b>STATUS</b>'</i> 
-		is entered.  Note that <b>ACTION_NAME</b> and <b>STATUS</b> must be changed to 
-		desired values.</li>
-        	<li>Confirm that the expected list is exported.</li>
+        	<li><b>Export via SQL query:</b> Confirm that the proper filenames are exported when the 
+		SQL query <i>dbo.FAMFile INNER JOIN dbo.FileActionStatus ON dbo.FAMFile.ID = 
+		dbo.FileActionStatus.FileID INNER JOIN dbo.Action ON dbo.Action.ID = 
+		dbo.FileActionStatus.ActionID WHERE dbo.Action.ASCName = '<b>ACTION_NAME</b>' AND 
+		dbo.FileActionStatus.ActionStatus = '<b>STATUS</b>'</i> is entered.  Note that 
+		<b>ACTION_NAME</b> and <b>STATUS</b> must be changed to desired values.</li>
 <p>
         	<li><b>[LegacyRC #5842]</b><!-- fixed v 8.1.0.32 --> Confirm that when you export a 
 		list of all files in the database, the list is sorted by file ID.</li>
