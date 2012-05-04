@@ -34,6 +34,10 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._labNameLabel = new System.Windows.Forms.Label();
             this._laboratoryIdentifier = new Extract.DataEntry.DataEntryTextBox();
             this._labInfoPassThrough = new Extract.DataEntry.DataEntryTextBox();
+            this._laboratoryTestTable = new Extract.DataEntry.DataEntryTable();
+            this._testName = new Extract.DataEntry.DataEntryTableColumn();
+            this._orderCode = new Extract.DataEntry.DataEntryTableColumn();
+            this._testID = new Extract.DataEntry.DataEntryTableColumn();
             this._labIDLabel = new System.Windows.Forms.Label();
             this._labID = new Extract.DataEntry.DataEntryTextBox();
             this._testComponentTable = new Extract.DataEntry.DataEntryTable();
@@ -66,16 +70,12 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._operatorCommentLabel = new System.Windows.Forms.Label();
             this._operatorComments = new Extract.DataEntry.DataEntryTextBox();
             this._messageSequenceNumberFile = new Extract.DataEntry.DataEntryTextBox();
-            this._testID = new Extract.DataEntry.DataEntryTableColumn();
-            this._orderCode = new Extract.DataEntry.DataEntryTableColumn();
-            this._testName = new Extract.DataEntry.DataEntryTableColumn();
-            this._laboratoryTestTable = new Extract.DataEntry.DataEntryTable();
+            ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).BeginInit();
             this._patientInfoGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._patientNameTable)).BeginInit();
             this._testDetailsGroupBox.SuspendLayout();
             this._testsGroupBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).BeginInit();
             this.SuspendLayout();
             // 
             // _labNameLabel
@@ -113,6 +113,64 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._labInfoPassThrough.TabIndex = 5;
             this._labInfoPassThrough.ValidationErrorMessage = "";
             this._labInfoPassThrough.Visible = false;
+            // 
+            // _laboratoryTestTable
+            // 
+            this._laboratoryTestTable.AllowDrop = true;
+            this._laboratoryTestTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._laboratoryTestTable.AttributeName = "Test";
+            this._laboratoryTestTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this._laboratoryTestTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
+            this._laboratoryTestTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this._laboratoryTestTable.ColumnHintsEnabled = false;
+            this._laboratoryTestTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this._testName,
+            this._orderCode,
+            this._testID});
+            this._laboratoryTestTable.Location = new System.Drawing.Point(6, 19);
+            this._laboratoryTestTable.Name = "_laboratoryTestTable";
+            this._laboratoryTestTable.ParentDataEntryControl = null;
+            this._laboratoryTestTable.RowFormattingRuleFile = "Rules\\Swiping\\TestRow.rsd.etf";
+            this._laboratoryTestTable.RowSwipingEnabled = true;
+            this._laboratoryTestTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._laboratoryTestTable.Size = new System.Drawing.Size(585, 86);
+            this._laboratoryTestTable.TabIndex = 1;
+            // 
+            // _testName
+            // 
+            this._testName.AttributeName = "Name";
+            this._testName.AutoUpdateQuery = resources.GetString("_testName.AutoUpdateQuery");
+            this._testName.HeaderText = "Order Name";
+            this._testName.Name = "_testName";
+            this._testName.ValidationErrorMessage = "Order name is not recognized.";
+            this._testName.ValidationQuery = resources.GetString("_testName.ValidationQuery");
+            // 
+            // _orderCode
+            // 
+            this._orderCode.AttributeName = "OrderCode";
+            this._orderCode.AutoUpdateQuery = "<SQL>SELECT Code FROM LabOrder WHERE Name = SUBSTRING(<Attribute>../Name</Attribu" +
+    "te>,1,50)</SQL>";
+            this._orderCode.FillWeight = 25F;
+            this._orderCode.HeaderText = "Code";
+            this._orderCode.Name = "_orderCode";
+            this._orderCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._orderCode.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
+            this._orderCode.ValidationErrorMessage = "Order code is not recognized";
+            this._orderCode.ValidationQuery = "<SQL>SELECT Code FROM LabOrder WHERE Code IS NOT NULL ORDER BY Code</SQL>";
+            // 
+            // _testID
+            // 
+            this._testID.AttributeName = "EpicCode";
+            this._testID.AutoUpdateQuery = "<SQL>SELECT EpicCode FROM LabOrder WHERE Name = SUBSTRING(<Attribute>../Name</Att" +
+    "ribute>,1,50)</SQL>";
+            this._testID.FillWeight = 1F;
+            this._testID.HeaderText = "Epic Code";
+            this._testID.Name = "_testID";
+            this._testID.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this._testID.ValidationErrorMessage = "Order code is not recognized.";
+            this._testID.ValidationQuery = "";
+            this._testID.Visible = false;
             // 
             // _labIDLabel
             // 
@@ -404,8 +462,8 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._orderNumber.Size = new System.Drawing.Size(201, 20);
             this._orderNumber.SupportsSwiping = false;
             this._orderNumber.TabIndex = 2;
-            this._orderNumber.ValidationErrorMessage = "Order Number must be specified";
-            this._orderNumber.ValidationPattern = "^[\\d\\w]+\\s?$";
+            this._orderNumber.ValidationErrorMessage = "Invalid accession number";
+            this._orderNumber.ValidationPattern = "(?i)^[a-z]\\d{8}\\s?$";
             // 
             // _testCommentLabel
             // 
@@ -537,64 +595,6 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._messageSequenceNumberFile.ValidationErrorMessage = "Invalid value";
             this._messageSequenceNumberFile.Visible = false;
             // 
-            // _testID
-            // 
-            this._testID.AttributeName = "EpicCode";
-            this._testID.AutoUpdateQuery = "<SQL>SELECT EpicCode FROM LabOrder WHERE Name = SUBSTRING(<Attribute>../Name</Att" +
-    "ribute>,1,50)</SQL>";
-            this._testID.FillWeight = 1F;
-            this._testID.HeaderText = "Epic Code";
-            this._testID.Name = "_testID";
-            this._testID.TabStopMode = Extract.DataEntry.TabStopMode.Never;
-            this._testID.ValidationErrorMessage = "Order code is not recognized.";
-            this._testID.ValidationQuery = "";
-            this._testID.Visible = false;
-            // 
-            // _orderCode
-            // 
-            this._orderCode.AttributeName = "OrderCode";
-            this._orderCode.AutoUpdateQuery = "<SQL>SELECT Code FROM LabOrder WHERE Name = SUBSTRING(<Attribute>../Name</Attribu" +
-    "te>,1,50)</SQL>";
-            this._orderCode.FillWeight = 25F;
-            this._orderCode.HeaderText = "Code";
-            this._orderCode.Name = "_orderCode";
-            this._orderCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderCode.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
-            this._orderCode.ValidationErrorMessage = "Order code is not recognized";
-            this._orderCode.ValidationQuery = "<SQL>SELECT Code FROM LabOrder WHERE Code IS NOT NULL ORDER BY Code</SQL>";
-            // 
-            // _testName
-            // 
-            this._testName.AttributeName = "Name";
-            this._testName.AutoUpdateQuery = resources.GetString("_testName.AutoUpdateQuery");
-            this._testName.HeaderText = "Order Name";
-            this._testName.Name = "_testName";
-            this._testName.ValidationErrorMessage = "Order name is not recognized.";
-            this._testName.ValidationQuery = resources.GetString("_testName.ValidationQuery");
-            // 
-            // _laboratoryTestTable
-            // 
-            this._laboratoryTestTable.AllowDrop = true;
-            this._laboratoryTestTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._laboratoryTestTable.AttributeName = "Test";
-            this._laboratoryTestTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this._laboratoryTestTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
-            this._laboratoryTestTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this._laboratoryTestTable.ColumnHintsEnabled = false;
-            this._laboratoryTestTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this._testName,
-            this._orderCode,
-            this._testID});
-            this._laboratoryTestTable.Location = new System.Drawing.Point(6, 19);
-            this._laboratoryTestTable.Name = "_laboratoryTestTable";
-            this._laboratoryTestTable.ParentDataEntryControl = null;
-            this._laboratoryTestTable.RowFormattingRuleFile = "Rules\\Swiping\\TestRow.rsd.etf";
-            this._laboratoryTestTable.RowSwipingEnabled = true;
-            this._laboratoryTestTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._laboratoryTestTable.Size = new System.Drawing.Size(585, 86);
-            this._laboratoryTestTable.TabIndex = 1;
-            // 
             // HealthNetworkLabsPanel
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -619,6 +619,7 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this.MinimumSize = new System.Drawing.Size(500, 0);
             this.Name = "HealthNetworkLabsPanel";
             this.Size = new System.Drawing.Size(593, 963);
+            ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).EndInit();
             this._patientInfoGroupBox.ResumeLayout(false);
             this._patientInfoGroupBox.PerformLayout();
@@ -626,7 +627,6 @@ namespace Extract.DataEntry.DEP.HealthNetworkLabs
             this._testDetailsGroupBox.ResumeLayout(false);
             this._testDetailsGroupBox.PerformLayout();
             this._testsGroupBox.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
