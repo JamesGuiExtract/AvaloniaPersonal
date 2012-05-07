@@ -18,8 +18,8 @@ namespace Extract.SQLCDBEditor
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SQLCDBEditorForm));
-            TD.SandDock.DockingRules dockingRules3 = new TD.SandDock.DockingRules();
-            TD.SandDock.DockingRules dockingRules4 = new TD.SandDock.DockingRules();
+            TD.SandDock.DockingRules dockingRules1 = new TD.SandDock.DockingRules();
+            TD.SandDock.DockingRules dockingRules2 = new TD.SandDock.DockingRules();
             this._toolStrip = new System.Windows.Forms.ToolStrip();
             this._openToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._saveToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -45,7 +45,7 @@ namespace Extract.SQLCDBEditor
             this._copyToNewQueryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._renameQueryMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dockContainer1 = new TD.SandDock.DockContainer();
+            this._navigationDockContainer = new TD.SandDock.DockContainer();
             this._queryDockWindow = new TD.SandDock.DockableWindow();
             this._queriesListBox = new System.Windows.Forms.ListBox();
             toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
@@ -54,7 +54,7 @@ namespace Extract.SQLCDBEditor
             this._statusStrip.SuspendLayout();
             this._tableDockWindow.SuspendLayout();
             this._contextMenuStrip.SuspendLayout();
-            this.dockContainer1.SuspendLayout();
+            this._navigationDockContainer.SuspendLayout();
             this._queryDockWindow.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -227,13 +227,13 @@ namespace Extract.SQLCDBEditor
             // 
             this._tableDockWindow.AllowCollapse = false;
             this._tableDockWindow.Controls.Add(this._tablesListBox);
-            dockingRules3.AllowDockBottom = true;
-            dockingRules3.AllowDockLeft = true;
-            dockingRules3.AllowDockRight = true;
-            dockingRules3.AllowDockTop = true;
-            dockingRules3.AllowFloat = true;
-            dockingRules3.AllowTab = true;
-            this._tableDockWindow.DockingRules = dockingRules3;
+            dockingRules1.AllowDockBottom = true;
+            dockingRules1.AllowDockLeft = true;
+            dockingRules1.AllowDockRight = true;
+            dockingRules1.AllowDockTop = true;
+            dockingRules1.AllowFloat = true;
+            dockingRules1.AllowTab = true;
+            this._tableDockWindow.DockingRules = dockingRules1;
             this._tableDockWindow.Guid = new System.Guid("85a6af86-de66-4810-9629-cf367ab421f1");
             this._tableDockWindow.Location = new System.Drawing.Point(0, 18);
             this._tableDockWindow.Name = "_tableDockWindow";
@@ -299,34 +299,34 @@ namespace Extract.SQLCDBEditor
             this._deleteToolStripMenuItem.Text = "Delete";
             this._deleteToolStripMenuItem.Click += new System.EventHandler(this.HandleDeleteMenuItemClick);
             // 
-            // dockContainer1
+            // _navigationDockContainer
             // 
-            this.dockContainer1.ContentSize = 233;
-            this.dockContainer1.Controls.Add(this._tableDockWindow);
-            this.dockContainer1.Controls.Add(this._queryDockWindow);
-            this.dockContainer1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.dockContainer1.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Horizontal, new TD.SandDock.LayoutSystemBase[] {
+            this._navigationDockContainer.ContentSize = 233;
+            this._navigationDockContainer.Controls.Add(this._tableDockWindow);
+            this._navigationDockContainer.Controls.Add(this._queryDockWindow);
+            this._navigationDockContainer.Dock = System.Windows.Forms.DockStyle.Left;
+            this._navigationDockContainer.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Horizontal, new TD.SandDock.LayoutSystemBase[] {
             ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
                         ((TD.SandDock.DockControl)(this._tableDockWindow))}, this._tableDockWindow))),
             ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
                         ((TD.SandDock.DockControl)(this._queryDockWindow))}, this._queryDockWindow)))});
-            this.dockContainer1.Location = new System.Drawing.Point(0, 63);
-            this.dockContainer1.Manager = this._sandDockManager;
-            this.dockContainer1.Name = "dockContainer1";
-            this.dockContainer1.Size = new System.Drawing.Size(237, 413);
-            this.dockContainer1.TabIndex = 4;
+            this._navigationDockContainer.Location = new System.Drawing.Point(0, 63);
+            this._navigationDockContainer.Manager = this._sandDockManager;
+            this._navigationDockContainer.Name = "_navigationDockContainer";
+            this._navigationDockContainer.Size = new System.Drawing.Size(237, 413);
+            this._navigationDockContainer.TabIndex = 4;
             // 
             // _queryDockWindow
             // 
             this._queryDockWindow.AllowCollapse = false;
             this._queryDockWindow.Controls.Add(this._queriesListBox);
-            dockingRules4.AllowDockBottom = true;
-            dockingRules4.AllowDockLeft = true;
-            dockingRules4.AllowDockRight = true;
-            dockingRules4.AllowDockTop = true;
-            dockingRules4.AllowFloat = true;
-            dockingRules4.AllowTab = true;
-            this._queryDockWindow.DockingRules = dockingRules4;
+            dockingRules2.AllowDockBottom = true;
+            dockingRules2.AllowDockLeft = true;
+            dockingRules2.AllowDockRight = true;
+            dockingRules2.AllowDockTop = true;
+            dockingRules2.AllowFloat = true;
+            dockingRules2.AllowTab = true;
+            this._queryDockWindow.DockingRules = dockingRules2;
             this._queryDockWindow.Guid = new System.Guid("77c6358a-bf4e-4e01-b533-508c8c53771b");
             this._queryDockWindow.Location = new System.Drawing.Point(0, 226);
             this._queryDockWindow.Name = "_queryDockWindow";
@@ -359,7 +359,7 @@ namespace Extract.SQLCDBEditor
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.AppWorkspace;
             this.ClientSize = new System.Drawing.Size(847, 498);
-            this.Controls.Add(this.dockContainer1);
+            this.Controls.Add(this._navigationDockContainer);
             this.Controls.Add(this._statusStrip);
             this.Controls.Add(this._toolStrip);
             this.Controls.Add(this._menuStrip);
@@ -377,7 +377,7 @@ namespace Extract.SQLCDBEditor
             this._statusStrip.PerformLayout();
             this._tableDockWindow.ResumeLayout(false);
             this._contextMenuStrip.ResumeLayout(false);
-            this.dockContainer1.ResumeLayout(false);
+            this._navigationDockContainer.ResumeLayout(false);
             this._queryDockWindow.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -403,7 +403,7 @@ namespace Extract.SQLCDBEditor
         private System.Windows.Forms.ToolStripStatusLabel _statusLabelSchemaInfo;
         private TD.SandDock.SandDockManager _sandDockManager;
         private TD.SandDock.DockableWindow _tableDockWindow;
-        private TD.SandDock.DockContainer dockContainer1;
+        private TD.SandDock.DockContainer _navigationDockContainer;
         private TD.SandDock.DockableWindow _queryDockWindow;
         private System.Windows.Forms.ContextMenuStrip _contextMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem _openInSeparateTabMenuItem;

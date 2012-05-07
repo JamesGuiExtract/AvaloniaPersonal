@@ -83,6 +83,11 @@ namespace Extract.SQLCDBEditor
         /// since the last execution.
         /// </summary>
         bool _resultsChanged;
+
+        /// <summary>
+        /// Indicates whether an error was encountered the last time the query was executed.
+        /// </summary>
+        bool _queryError;
         
         /// <summary>
         /// Indicates whether the query text is dirty.
@@ -474,8 +479,13 @@ namespace Extract.SQLCDBEditor
 
                 _queryScintillaBox.Text = query;
                 _queryScintillaBox.IsReadOnly = IsReadOnly;
+                _queryScintillaBox.TextChanged += HandleQueryScintillaBoxTextChanged;
                 _lastSavedQuery = query;
                 _resultsGrid.AllowUserToAddRows = false;
+
+                // If we have gotten this far, consider the query loaded even if the query cannot be
+                // evaluated. The user will be able to edit the query to allow it to evaluate.
+                IsLoaded = true;
 
                 // Parse the query in order to define any parameters used by the query.
                 ParseQuery(connection, query);
@@ -483,14 +493,13 @@ namespace Extract.SQLCDBEditor
                 // Populate the results grid.
                 RefreshData(true);
 
-                _queryScintillaBox.TextChanged += HandleQueryScintillaBoxTextChanged;
-
                 _resultsGrid.DataSource = _resultsTable;
-
-                IsLoaded = true;
             }
             catch (Exception ex)
             {
+                _queryError = true;
+                UpdateResultsStatus(false);
+
                 throw ex.AsExtract("ELI34581");
             }
         }
@@ -557,6 +566,14 @@ namespace Extract.SQLCDBEditor
                 }
                 else
                 {
+                    // [DotNetRCAndUtils:824]
+                    // If the execute button is enabled, we already know the query needs to be
+                    // re-run. The query may be in a partially dirty state and unable to run anyway.
+                    if (_executeQueryButton.Enabled)
+                    {
+                        return;
+                    }
+
                     // Update the list of available values for any ComboBox parameter controls.
                     RefreshParameterControls();
 
@@ -976,14 +993,20 @@ namespace Extract.SQLCDBEditor
 
                 _queryAndResultsTableLayoutPanel.ResumeLayout(true);
 
-                RefreshData(true);
-
                 _queryChanged = false;
                 _resultsChanged = false;
                 UpdateResultsStatus(true);
+
+                RefreshData(true);
+
+                _queryError = false;
             }
             catch (Exception ex)
             {
+                _resultsTable.Clear();
+                _queryError = true;
+                UpdateResultsStatus(false);
+
                 ex.ExtractDisplay("ELI34590");
             }
             finally
@@ -1593,6 +1616,10 @@ namespace Extract.SQLCDBEditor
                 else if (_queryChanged)
                 {
                     _resultsStatusLabel.Text = "Query has been modified since the last execution";
+                }
+                else if (_queryError)
+                {
+                    _resultsStatusLabel.Text = "The query failed to execute.";
                 }
                 else
                 {

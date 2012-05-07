@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.SqlServerCe;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
@@ -517,10 +518,15 @@ namespace Extract.SQLCDBEditor
                         _tablesListBox.ClearSelected();
                     }
 
+                    Control previouslyActiveControl = ActiveControl;
+
                     OpenTableOrQuery(queryAndResultsControl, false);
 
                     // Return focus to the list box to prevent it from losing focus by clicking in it.
-                    listBox.Focus();
+                    if (previouslyActiveControl == _navigationDockContainer)
+                    {
+                        listBox.Focus();
+                    }
                 }
                 else
                 {
@@ -1368,7 +1374,17 @@ namespace Extract.SQLCDBEditor
             }
             else
             {
-                queryAndResultsControl.LoadQuery(_connection);
+                try
+                {
+                    queryAndResultsControl.LoadQuery(_connection);
+                }
+                catch (Exception ex)
+                {
+                    // If this is a query, go ahead and allow it to be displayed (after displaying
+                    // the exception) so that the query text may be corrected.
+                    ex.ExtractDisplay("ELI34656");
+                }
+
                 queryAndResultsControl.PropertyChanged += HandleQueryPropertyChanged;
                 queryAndResultsControl.QuerySaved += HandleQuerySaved;
                 queryAndResultsControl.QueryRenaming += HandleQueryRenaming;
@@ -1504,6 +1520,11 @@ namespace Extract.SQLCDBEditor
                 File.Copy(_databaseWorkingCopyFileName, _databaseFileName, true);
                 // Apply the same attributes the primary database had originally.
                 File.SetAttributes(_databaseFileName, originalFileAttributes);
+
+                // [DotNetRCAndUtils:825]
+                ExecutePostSaveScript(_databaseFileName + ".bat");
+                ExecutePostSaveScript(_databaseFileName + ".vbs");
+
                 _databaseLastModifiedTime = File.GetLastWriteTime(_databaseFileName);
 
                 _connection.Open();
@@ -1524,6 +1545,34 @@ namespace Extract.SQLCDBEditor
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Executes the specified <see paramref="scriptFileName"/>.
+        /// </summary>
+        /// <param name="scriptFileName">The name of the script file to execute. If there is no file
+        /// by this name, this call has no effect.</param>
+        static void ExecutePostSaveScript(string scriptFileName)
+        {
+            try
+            {
+                if (File.Exists(scriptFileName))
+                {
+                    using (var process = new Process())
+                    {
+                        process.StartInfo = new ProcessStartInfo(scriptFileName);
+                        process.StartInfo.WorkingDirectory = Path.GetDirectoryName(scriptFileName);
+                        process.Start();
+                        process.WaitForExit();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = new ExtractException("ELI34654", "Failed to execute post-save script.", ex);
+                ee.AddDebugData("Script filename", scriptFileName, false);
+                ee.Display();
+            }
         }
 
         /// <summary>
@@ -1629,6 +1678,8 @@ namespace Extract.SQLCDBEditor
                 {
                     _tablesListBox.SelectedIndex = 0;
                 }
+
+                _tablesListBox.Focus();
 
                 // Reset the _dirty flag
                 _dirty = false;
