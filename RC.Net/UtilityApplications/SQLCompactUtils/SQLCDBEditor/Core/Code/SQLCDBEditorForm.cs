@@ -1294,6 +1294,8 @@ namespace Extract.SQLCDBEditor
         {
             TabbedDocument tabbedDocument = null;
 
+            _lastSelectedItem = queryAndResultsControl;
+
             // Initialize the control if it has not already been.
             bool isAlreadyLoaded = queryAndResultsControl.IsLoaded;
             if (!isAlreadyLoaded)
@@ -1351,8 +1353,6 @@ namespace Extract.SQLCDBEditor
             }
 
             tabbedDocument.Activate();
-
-            _lastSelectedItem = queryAndResultsControl;
         }
 
         /// <summary>
@@ -1464,7 +1464,8 @@ namespace Extract.SQLCDBEditor
         /// Method creates a transaction and saves all of the changes to the database and if there 
         /// were no errors on save, displays a dialog indicating a successful save.
         /// </summary>
-        /// <returns></returns>
+        /// <returns><see langword="true"/> if the database was successfully saved; otherwise,
+        /// <see langword="false"/>.</returns>
         bool SaveDatabaseChanges()
         {
             // Check for a loaded database file.
@@ -1473,9 +1474,15 @@ namespace Extract.SQLCDBEditor
                 return true;
             }
 
+            // Ensure any active edits are committed.
+            foreach (var queryAndResultsControl in _tableList)
+            {
+                queryAndResultsControl.EndDataEdit();
+            }
+
             var invalidDataTable = _tableList
-                    .Where(table => table.IsLoaded && !table.DataIsValid)
-                    .FirstOrDefault();
+                .Where(table => table.IsLoaded && !table.DataIsValid)
+                .FirstOrDefault();
 
             if (invalidDataTable != null)
             {

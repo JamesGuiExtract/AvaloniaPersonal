@@ -35,6 +35,11 @@ namespace Extract.SQLCDBEditor
         DataTable _resultsTable = new DataTable();
 
         /// <summary>
+        /// The names of the columns that comprise the primary key for the _resultsTable;
+        /// </summary>
+        List<string> _primaryKeyColumnNames;
+
+        /// <summary>
         /// The data adapter to populate <see cref="_resultsTable"/> for database tables.
         /// </summary>
         SqlCeDataAdapter _adapter;
@@ -93,11 +98,6 @@ namespace Extract.SQLCDBEditor
         /// Indicates whether the query text is dirty.
         /// </summary>
         bool _isQueryDirty;
-
-        /// <summary>
-        /// Indicates whether database table data is valid.
-        /// </summary>
-        bool _dataIsValid;
 
         /// <summary>
         /// Indicates if the host is in design mode or not.
@@ -287,29 +287,8 @@ namespace Extract.SQLCDBEditor
         /// </value>
         public bool DataIsValid
         {
-            get
-            {
-                try
-                {
-                    // If the grid is currently being edited, apply the active edit to force the
-                    // data to be validated.
-                    if (_resultsGrid.IsCurrentCellInEditMode)
-                    {
-                        _resultsGrid.EndEdit();
-                    }
-
-                    return _dataIsValid;
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI34634");
-                }
-            }
-
-            private set
-            {
-                _dataIsValid = value;
-            }
+            get;
+            private set;
         }
 
         /// <summary>
@@ -527,6 +506,10 @@ namespace Extract.SQLCDBEditor
                 latestDataTable = new DataTable();
                 latestDataTable.Locale = CultureInfo.CurrentCulture;
 
+                // If table data is not valid prior to the merge, always consider the data changed
+                // so that it forces invalid rows to be revalidated.
+                bool dataChanged = !DataIsValid;
+
                 if (IsTable)
                 {
                     _adapter.Fill(latestDataTable);
@@ -534,34 +517,24 @@ namespace Extract.SQLCDBEditor
 
                     if (!DataIsValid)
                     {
-                        // It is possible that changes from another table will make the data in the
-                        // currently invalid row(s) valid. Reset DataIsValid... any rows that are
-                        // still invalid after the refresh will trigger this to get set back to
-                        // false in the following block.
-                        DataIsValid = true;
-
                         // If there is currently any invalid data in the table, merge the data from
                         // the currently invalid rows into latestDataTable so that the user's edits
-                        // are preserved even if invalid.
-                        foreach (DataRow mergedRow in
-                            MergeRowsIntoTable(latestDataTable, _resultsTable.Rows
-                                .OfType<DataRow>()
-                                .Where(row => row.HasErrors)))
-                        {
-                            try
-                            {
-                                // Attempt an update on each merged-in row. If the data is still
-                                // invalid, this will throw an exception which we can ignore since
-                                // the validation icon on the row will become set.
-                                _adapter.Update(new DataRow[] { mergedRow });
-                            }
-                            catch
-                            {
-                                DataIsValid = false;
-                            }
-                        }
+                        // are preserved even if invalid. Note that this call will clear any
+                        // constraints on latestDataTable.
+                        DataIsValid = MergeRowsIntoTable(latestDataTable, _resultsTable.Rows
+                            .OfType<DataRow>()
+                            .Where(row => row.HasErrors));
 
                         UpdateResultsStatus(DataIsValid);
+                    }
+                    else
+                    {
+                        // [DotNetRCAndUtils:826]
+                        // Before using latestDataTable, the constraints need to be cleared so that
+                        // if new rows are added which violates a constraint, they will be flagged
+                        // but allowed to continue to exist in the table until the user gets around
+                        // to correcting the data.
+                        RemoveConstraints(latestDataTable);
                     }
                 }
                 else
@@ -603,7 +576,6 @@ namespace Extract.SQLCDBEditor
                 }
 
                 // Check to see if the data in _resultsTable differs from the latestDataTable
-                bool dataChanged = false;
                 if (latestDataTable.Rows.Count != _resultsTable.Rows.Count)
                 {
                     dataChanged = true;
@@ -658,8 +630,7 @@ namespace Extract.SQLCDBEditor
                     {
                         _resultsTable.ColumnChanged -= HandleColumnChanged;
                         _resultsTable.RowChanged -= HandleRowChanged;
-                        _resultsTable.RowDeleted -= HandleRowChanged;
-                        _resultsTable.TableNewRow -= HandleTableNewRow;
+                        _resultsTable.RowDeleted -= HandleRowDeleted;
                     }
 
                     // Apply the latest data to the grid.
@@ -674,8 +645,7 @@ namespace Extract.SQLCDBEditor
                         // Re-register to get data changed events.
                         _resultsTable.ColumnChanged += HandleColumnChanged;
                         _resultsTable.RowChanged += HandleRowChanged;
-                        _resultsTable.RowDeleted += HandleRowChanged;
-                        _resultsTable.TableNewRow += HandleTableNewRow;
+                        _resultsTable.RowDeleted += HandleRowDeleted;
                     }
 
                     // If this is a table or a query has been re-executed without changing, restore
@@ -848,6 +818,47 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
+        /// Ends any active editing of table data.
+        /// </summary>
+        public void EndDataEdit()
+        {
+            try
+            {
+                // If the grid is currently being edited, apply the active edit to force the
+                // data to be validated.
+                if (IsTable && _resultsGrid.IsCurrentCellInEditMode)
+                {
+                    _resultsGrid.EndEdit();
+
+                    DataRow row = ((DataRowView)_resultsGrid.CurrentCell.OwningRow.DataBoundItem).Row;
+                    if (row.RowState == DataRowState.Detached)
+                    {
+                        try
+                        {
+                            // Add the row to the table if it hasn't already been added to the table.
+                            _resultsTable.Rows.Add(row);
+                        }
+                        catch (Exception ex)
+                        {
+                            if (!row.HasErrors)
+                            {
+                                row.RowError = ex.Message;
+                            }
+
+                            DataIsValid = false;
+
+                            UpdateResultsStatus(false);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34662");
+            }
+        }
+
+        /// <summary>
         /// If there is any invalid data in the table, selects and displays that data.
         /// </summary>
         public string ShowInvalidData()
@@ -922,12 +933,17 @@ namespace Extract.SQLCDBEditor
                 _resultsGrid.ReadOnly = !hasUniqueContraint;
                 _resultsGrid.AllowUserToAddRows = hasUniqueContraint;
 
+                // [DotNetRCAndUtils:826]
+                // Before using _resultsTable, the constraints need to be cleared so that if new
+                // rows are added which violates a constraint, they will be flagged but allowed to
+                // continue to exist in the table until.
+                RemoveConstraints(_resultsTable);
+
                 AutoSizeColumns();
 
                 _resultsTable.ColumnChanged += HandleColumnChanged;
                 _resultsTable.RowChanged += HandleRowChanged;
-                _resultsTable.RowDeleted += HandleRowChanged;
-                _resultsTable.TableNewRow += HandleTableNewRow;
+                _resultsTable.RowDeleted += HandleRowDeleted;
             }
             catch (Exception ex)
             {
@@ -1063,13 +1079,19 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                // In order that the column data be validated and committed right away, call EndEdit
-                // on the row. This will trigger HandleRowChanged which will validate/commit the data.
-                e.Row.EndEdit();
+                // In order that the column data be validated and committed right away after
+                // changing a cell value, call UpdateRow.
+                UpdateRow(e.Row);
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI34594");
+                // Indicate that the table data is not valid.
+                DataIsValid = false;
+
+                // Flag the offending row.
+                e.Row.RowError = ex.Message;
+
+                UpdateResultsStatus(false);
             }
         }
 
@@ -1092,20 +1114,46 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
-        /// Handles the case that a row was added.
+        /// Handles the case that a row was deleted.
         /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.Data.DataTableNewRowEventArgs"/> instance
-        /// containing the event data.</param>
-        void HandleTableNewRow(object sender, DataTableNewRowEventArgs e)
+        /// <param name="e">The <see cref="System.Data.DataRowChangeEventArgs"/> instance containing
+        /// the event data.</param>
+        void HandleRowDeleted(object sender, DataRowChangeEventArgs e)
         {
             try
             {
+                // If the deleted row had errors, the table as a whole may now be valid. Check.
+                if (e.Row.HasErrors)
+                {
+                    ValidateTableData();
+                }
+
                 UpdateRow(e.Row);
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI34593");
+                ex.ExtractDisplay("ELI34663");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:DataGridView.RowError"/> event from <see cref="_resultsGrid"/>.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.DataGridViewDataErrorEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleResultsGridDataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            try
+            {
+                e.Exception.ExtractDisplay("ELI34660");
+
+                e.ThrowException = false;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34658");
             }
         }
 
@@ -1335,6 +1383,11 @@ namespace Extract.SQLCDBEditor
                     .ToArray();
             }
 
+            // The constraints on the table (including primary key) will be removed before use.
+            // Store which columns are the primary key separately.
+            _primaryKeyColumnNames = new List<string>(table.PrimaryKey
+                .Select(column => column.ColumnName));
+
             // Check for auto increment fields and default column values
             foreach (DataColumn c in table.Columns)
             {
@@ -1373,6 +1426,24 @@ namespace Extract.SQLCDBEditor
                         }
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Removes table and column constraints for the <see paramref="dataTable"/> so that a
+        /// DataGridView using it has as much freedom as possible to allow invalid data to exist
+        /// until a user choses to correct it (needs to save.
+        /// </summary>
+        /// <param name="dataTable">The data table.</param>
+        static void RemoveConstraints(DataTable dataTable)
+        {
+            dataTable.Constraints.Clear();
+            foreach (DataColumn column in dataTable.Columns)
+            {
+                // Allow the user to enter as much text as they wish; it will be marked invalid if
+                // it is too much.
+                column.MaxLength = -1;
+                column.AllowDBNull = true;
             }
         }
 
@@ -1637,33 +1708,106 @@ namespace Extract.SQLCDBEditor
         /// <param name="row">The <see cref="DataRow"/> for which edits should be applied.</param>
         void UpdateRow(DataRow row)
         {
-            // Attempt to commit the row data to the table.
-            try
+            Exception rowException = null;
+
+            if (row.RowState == DataRowState.Detached)
             {
-                // Update just the row first so that every row with invalid data gets a validation
-                // error icon and that after correcting the data, the error icon is cleared even if
-                // earlier rows have errors.
-                _adapter.Update(new DataRow[] { row } );
+                // If the row is currently detached (i.e., new), errors such as constraint violations
+                // will not be caught by calling  _adapter.Update(). Adding it to _resultsTable
+                // right away can cause it to be sorted before the user is done entring the entire
+                // row... so add it to a temporary copy of the table with a transaction that gets
+                // rolled back to test if it would be able to be added to _resultsTable without error.
+                using (DataTable tableCopy = row.Table.Copy())
+                using (SqlCeTransaction transaction = _connection.BeginTransaction())
+                using (var adapterCopy = new SqlCeDataAdapter(_adapter.SelectCommand.CommandText, _connection))
+                {
+                    adapterCopy.InsertCommand = _commandBuilder.GetInsertCommand();
+                    adapterCopy.InsertCommand.Transaction = transaction;
 
-                // Then confirm that the entire table can be successfully updated (for sanity's
-                // sake-- this shouldn't result in any additional updates).
-                _adapter.Update(_resultsTable);
-                OnDataChanged(true);
+                    try
+                    {
+                        DataRow rowCopy = tableCopy.Rows.Add(row.ItemArray);
+                        adapterCopy.Update(new DataRow[] { rowCopy });
+                    }
+                    catch (Exception ex)
+                    {
+                        rowException = ex;
 
-                // If the update was successful, all data is now valid.
-                DataIsValid = true;
-                UpdateResultsStatus(true);
+                        // An error icon will be displayed to call attention to the problem; no need to
+                        // throw or display exception.
+                    }
+                    finally
+                    {
+                        transaction.Rollback();
+                    }
+                }
             }
-            catch
+            else
             {
-                // Indicate that the table data is invalid.
+                // Attempt to commit the row data to the table.
+                try
+                {
+                    row.EndEdit();
+
+                    // Update just the row first so that every row with invalid data gets a validation
+                    // error icon and that after correcting the data, the error icon is cleared even if
+                    // earlier rows have errors.
+                    _adapter.Update(new DataRow[] { row });
+                }
+                catch (Exception ex)
+                {
+                    rowException = ex;
+
+                    // An error icon will be displayed to call attention to the problem; no need to
+                    // throw or display exception.
+                }
+            }
+
+            if (rowException == null)
+            {
+                // The update succeeded for this row. Clear any manually added errors.
+                row.ClearErrors();
+
+                // Check to see if the table as a whole is now valid.
+                ValidateTableData();
+            }
+            else
+            {
+                // The row update failed.
+                if (!row.HasErrors)
+                {
+                    row.RowError = rowException.Message;
+                }
+
                 DataIsValid = false;
 
                 UpdateResultsStatus(false);
 
-                // An error icon will be displayed to call attention to the problem; no need to
-                // throw or display exception.
+                return;
             }
+        }
+
+        /// <summary>
+        /// Validates the table data and updates the result status controls appropriately.
+        /// </summary>
+        void ValidateTableData()
+        {
+            try
+            {
+                if (!_resultsTable.Rows.OfType<DataRow>().Any(tableRow => tableRow.HasErrors))
+                {
+                    // Then see if the entire table can be successfully updated.
+                    _adapter.Update(_resultsTable);
+                    OnDataChanged(true);
+
+                    // If the update was successful, all data is now valid.
+                    DataIsValid = true;
+                    UpdateResultsStatus(true);
+                }
+            }
+            // If there are any exceptions in this block, there is no need to display them. It
+            // just means the table data will remain marked as invalid.
+            catch { }
         }
 
         /// <summary>
@@ -1680,26 +1824,73 @@ namespace Extract.SQLCDBEditor
         /// <param name="dataTable">The <see cref="DataTable"/> into which the rows should be merged.
         /// </param>
         /// <param name="rowsToMerge">The rows to merge into <see paramref="dataTable"/>.</param>
-        /// <returns>The updated rows in <see paramref="dataTable"/>.</returns>
-        IEnumerable<DataRow> MergeRowsIntoTable(DataTable dataTable, IEnumerable<DataRow> rowsToMerge)
+        /// <returns><see langword="true"/> if the resulting data in <see paramref="dataTable"/> is
+        /// valid; otherwise, <see langword="false"/>.</returns>
+        bool MergeRowsIntoTable(DataTable dataTable, IEnumerable<DataRow> rowsToMerge)
         {
+            bool dataIsValid = true;
+
+            Dictionary<DataRow, DataRow> rowPairings = new Dictionary<DataRow, DataRow>();
+
+            // Find the corresponding row in dataTable for each rowsToMerge.
+            foreach (DataRow rowToMerge in rowsToMerge
+                .Where(row => row.RowState != DataRowState.Added))
+            {
+                // Look up the row in dataTable using the original value of the primary key, not the
+                // current version in which the primary key may have changed or may now be invalid.
+                object[] primaryKeyValue = _primaryKeyColumnNames
+                    .Select(columnName =>
+                        rowToMerge[rowToMerge.Table.Columns[columnName], DataRowVersion.Original])
+                    .ToArray();
+                DataRow destinationRow = dataTable.Rows.Find(primaryKeyValue);
+
+                // If we were un-able to find the existing row to merge into, proceeding with the
+                // merge would cause that row to be duplicated. Abort the merge.
+                ExtractException.Assert("ELI34661", "Failed to merge latest table data",
+                    destinationRow != null);
+
+                rowPairings[rowToMerge] = destinationRow;
+            }
+
+            // Once we have found corresponding rows in dataTable for all rowsToMerge, clear the
+            // constraints to allow the rows to be added even if they violate a constraint.
+            RemoveConstraints(dataTable);
+
+            // Apply each rowsToMerge to the dataTable.
             foreach (DataRow row in rowsToMerge)
             {
-                DataRow correspondingRow = dataTable.Rows.Find(
-                    row[_resultsTable.PrimaryKey.First()]);
-                if (correspondingRow != null)
+                DataRow destinationRow;
+                if (rowPairings.TryGetValue(row, out destinationRow))
                 {
+                    // If there is a corresponding row in dataTable, update it's values.
                     for (int j = 0; j < row.ItemArray.Length; j++)
                     {
-                        if (!row[j].Equals(correspondingRow[j]))
+                        if (!row[j].Equals(destinationRow[j]))
                         {
-                            correspondingRow[j] = row[j];
+                            destinationRow[j] = row[j];
                         }
                     }
                 }
+                else
+                {
+                    // If there was no corresponding row, add it as a new row.
+                    destinationRow = dataTable.Rows.Add(row.ItemArray);
+                }
 
-                yield return correspondingRow;
+                try
+                {
+                    // Attempt an update on each merged-in row. If the data is still
+                    // invalid, this will throw an exception which we can ignore since
+                    // the validation icon on the row will become set.
+                    _adapter.Update(new DataRow[] { destinationRow });
+                }
+                catch
+                {
+                    dataIsValid = false;
+                }
             }
+
+            return dataIsValid;
         }
 
         /// <summary>

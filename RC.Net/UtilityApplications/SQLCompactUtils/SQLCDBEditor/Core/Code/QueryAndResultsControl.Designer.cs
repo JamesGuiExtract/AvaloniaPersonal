@@ -15,13 +15,18 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(QueryAndResultsControl));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(QueryAndResultsControl));
             this._queryScintillaBox = new ScintillaNET.Scintilla();
             this._queryAndResultsTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._buttonsFlowLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this._showHideQueryButton = new System.Windows.Forms.Button();
+            this._sendToSeparateTabButton = new System.Windows.Forms.Button();
+            this._newQueryButton = new System.Windows.Forms.Button();
+            this._saveButton = new System.Windows.Forms.Button();
+            this._renameButton = new System.Windows.Forms.Button();
             this._executeQueryButton = new System.Windows.Forms.Button();
             this._resultsSplitContainer = new System.Windows.Forms.SplitContainer();
             this._queryPanel = new System.Windows.Forms.Panel();
@@ -30,11 +35,6 @@
             this._parametersTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._resultsStatusLabel = new System.Windows.Forms.Label();
             this._resultsGrid = new System.Windows.Forms.DataGridView();
-            this._showHideQueryButton = new System.Windows.Forms.Button();
-            this._sendToSeparateTabButton = new System.Windows.Forms.Button();
-            this._newQueryButton = new System.Windows.Forms.Button();
-            this._saveButton = new System.Windows.Forms.Button();
-            this._renameButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this._queryScintillaBox)).BeginInit();
             this._queryAndResultsTableLayoutPanel.SuspendLayout();
             this._buttonsFlowLayoutPanel.SuspendLayout();
@@ -94,6 +94,80 @@
             this._buttonsFlowLayoutPanel.Name = "_buttonsFlowLayoutPanel";
             this._buttonsFlowLayoutPanel.Size = new System.Drawing.Size(624, 29);
             this._buttonsFlowLayoutPanel.TabIndex = 0;
+            // 
+            // _showHideQueryButton
+            // 
+            this._showHideQueryButton.AutoSize = true;
+            this._showHideQueryButton.Image = global::Extract.SQLCDBEditor.Properties.Resources.DbQuerySmall;
+            this._showHideQueryButton.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this._showHideQueryButton.Location = new System.Drawing.Point(3, 3);
+            this._showHideQueryButton.Name = "_showHideQueryButton";
+            this._showHideQueryButton.Size = new System.Drawing.Size(89, 23);
+            this._showHideQueryButton.TabIndex = 7;
+            this._showHideQueryButton.Text = "Show query";
+            this._showHideQueryButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._showHideQueryButton.UseVisualStyleBackColor = true;
+            this._showHideQueryButton.Click += new System.EventHandler(this.HandleShowHideQueryButtonClick);
+            // 
+            // _sendToSeparateTabButton
+            // 
+            this._sendToSeparateTabButton.AutoSize = true;
+            this._sendToSeparateTabButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._sendToSeparateTabButton.Image = ((System.Drawing.Image)(resources.GetObject("_sendToSeparateTabButton.Image")));
+            this._sendToSeparateTabButton.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this._sendToSeparateTabButton.Location = new System.Drawing.Point(98, 3);
+            this._sendToSeparateTabButton.Name = "_sendToSeparateTabButton";
+            this._sendToSeparateTabButton.Size = new System.Drawing.Size(132, 23);
+            this._sendToSeparateTabButton.TabIndex = 1;
+            this._sendToSeparateTabButton.Text = "Send to separate tab";
+            this._sendToSeparateTabButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._sendToSeparateTabButton.UseVisualStyleBackColor = true;
+            this._sendToSeparateTabButton.Click += new System.EventHandler(this.HandleSendToSeparateTabClick);
+            // 
+            // _newQueryButton
+            // 
+            this._newQueryButton.AutoSize = true;
+            this._newQueryButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._newQueryButton.Image = global::Extract.SQLCDBEditor.Properties.Resources.DbNewQuery;
+            this._newQueryButton.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this._newQueryButton.Location = new System.Drawing.Point(236, 3);
+            this._newQueryButton.Name = "_newQueryButton";
+            this._newQueryButton.Size = new System.Drawing.Size(121, 23);
+            this._newQueryButton.TabIndex = 5;
+            this._newQueryButton.Text = "Copy to new query";
+            this._newQueryButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._newQueryButton.UseVisualStyleBackColor = true;
+            this._newQueryButton.Click += new System.EventHandler(this.HandleCopyToNewQueryButtonClick);
+            // 
+            // _saveButton
+            // 
+            this._saveButton.AutoSize = true;
+            this._saveButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._saveButton.Enabled = false;
+            this._saveButton.Image = global::Extract.SQLCDBEditor.Properties.Resources.SaveImageButtonSmall;
+            this._saveButton.Location = new System.Drawing.Point(363, 3);
+            this._saveButton.Name = "_saveButton";
+            this._saveButton.Size = new System.Drawing.Size(58, 23);
+            this._saveButton.TabIndex = 2;
+            this._saveButton.Text = "Save";
+            this._saveButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._saveButton.UseVisualStyleBackColor = true;
+            this._saveButton.Click += new System.EventHandler(this.HandleSaveButtonClick);
+            // 
+            // _renameButton
+            // 
+            this._renameButton.AutoSize = true;
+            this._renameButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._renameButton.Image = global::Extract.SQLCDBEditor.Properties.Resources.Rename;
+            this._renameButton.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this._renameButton.Location = new System.Drawing.Point(427, 3);
+            this._renameButton.Name = "_renameButton";
+            this._renameButton.Size = new System.Drawing.Size(73, 23);
+            this._renameButton.TabIndex = 4;
+            this._renameButton.Text = "Rename";
+            this._renameButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._renameButton.UseVisualStyleBackColor = true;
+            this._renameButton.Click += new System.EventHandler(this.HandleRenameButtonClick);
             // 
             // _executeQueryButton
             // 
@@ -237,80 +311,7 @@
             this._resultsGrid.Size = new System.Drawing.Size(622, 282);
             this._resultsGrid.TabIndex = 2;
             this._resultsGrid.CurrentCellDirtyStateChanged += new System.EventHandler(this.HandleResultsGridCurrentCellDirtyStateChanged);
-            // 
-            // _showHideQueryButton
-            // 
-            this._showHideQueryButton.AutoSize = true;
-            this._showHideQueryButton.Image = global::Extract.SQLCDBEditor.Properties.Resources.DbQuerySmall;
-            this._showHideQueryButton.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this._showHideQueryButton.Location = new System.Drawing.Point(3, 3);
-            this._showHideQueryButton.Name = "_showHideQueryButton";
-            this._showHideQueryButton.Size = new System.Drawing.Size(89, 23);
-            this._showHideQueryButton.TabIndex = 7;
-            this._showHideQueryButton.Text = "Show query";
-            this._showHideQueryButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this._showHideQueryButton.UseVisualStyleBackColor = true;
-            this._showHideQueryButton.Click += new System.EventHandler(this.HandleShowHideQueryButtonClick);
-            // 
-            // _sendToSeparateTabButton
-            // 
-            this._sendToSeparateTabButton.AutoSize = true;
-            this._sendToSeparateTabButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this._sendToSeparateTabButton.Image = ((System.Drawing.Image)(resources.GetObject("_sendToSeparateTabButton.Image")));
-            this._sendToSeparateTabButton.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this._sendToSeparateTabButton.Location = new System.Drawing.Point(98, 3);
-            this._sendToSeparateTabButton.Name = "_sendToSeparateTabButton";
-            this._sendToSeparateTabButton.Size = new System.Drawing.Size(132, 23);
-            this._sendToSeparateTabButton.TabIndex = 1;
-            this._sendToSeparateTabButton.Text = "Send to separate tab";
-            this._sendToSeparateTabButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this._sendToSeparateTabButton.UseVisualStyleBackColor = true;
-            this._sendToSeparateTabButton.Click += new System.EventHandler(this.HandleSendToSeparateTabClick);
-            // 
-            // _newQueryButton
-            // 
-            this._newQueryButton.AutoSize = true;
-            this._newQueryButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this._newQueryButton.Image = global::Extract.SQLCDBEditor.Properties.Resources.DbNewQuery;
-            this._newQueryButton.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this._newQueryButton.Location = new System.Drawing.Point(236, 3);
-            this._newQueryButton.Name = "_newQueryButton";
-            this._newQueryButton.Size = new System.Drawing.Size(121, 23);
-            this._newQueryButton.TabIndex = 5;
-            this._newQueryButton.Text = "Copy to new query";
-            this._newQueryButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this._newQueryButton.UseVisualStyleBackColor = true;
-            this._newQueryButton.Click += new System.EventHandler(this.HandleCopyToNewQueryButtonClick);
-            // 
-            // _saveButton
-            // 
-            this._saveButton.AutoSize = true;
-            this._saveButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this._saveButton.Enabled = false;
-            this._saveButton.Image = global::Extract.SQLCDBEditor.Properties.Resources.SaveImageButtonSmall;
-            this._saveButton.Location = new System.Drawing.Point(363, 3);
-            this._saveButton.Name = "_saveButton";
-            this._saveButton.Size = new System.Drawing.Size(58, 23);
-            this._saveButton.TabIndex = 2;
-            this._saveButton.Text = "Save";
-            this._saveButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this._saveButton.UseVisualStyleBackColor = true;
-            this._saveButton.Click += new System.EventHandler(this.HandleSaveButtonClick);
-            // 
-            // _renameButton
-            // 
-            this._renameButton.AutoSize = true;
-            this._renameButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this._renameButton.Image = global::Extract.SQLCDBEditor.Properties.Resources.Rename;
-            this._renameButton.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this._renameButton.Location = new System.Drawing.Point(427, 3);
-            this._renameButton.Name = "_renameButton";
-            this._renameButton.Size = new System.Drawing.Size(73, 23);
-            this._renameButton.TabIndex = 4;
-            this._renameButton.Text = "Rename";
-            this._renameButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this._renameButton.UseVisualStyleBackColor = true;
-            this._renameButton.Click += new System.EventHandler(this.HandleRenameButtonClick);
+            this._resultsGrid.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.HandleResultsGridDataError);
             // 
             // QueryAndResultsControl
             // 
