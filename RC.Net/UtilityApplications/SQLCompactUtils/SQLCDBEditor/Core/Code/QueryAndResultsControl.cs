@@ -1123,13 +1123,13 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
+                UpdateRow(e.Row);
+
                 // If the deleted row had errors, the table as a whole may now be valid. Check.
                 if (e.Row.HasErrors)
                 {
                     ValidateTableData();
                 }
-
-                UpdateRow(e.Row);
             }
             catch (Exception ex)
             {
@@ -1780,11 +1780,11 @@ namespace Extract.SQLCDBEditor
                 }
 
                 DataIsValid = false;
-
+                
                 UpdateResultsStatus(false);
-
-                return;
             }
+
+            _resultsGrid.Invalidate();
         }
 
         /// <summary>
