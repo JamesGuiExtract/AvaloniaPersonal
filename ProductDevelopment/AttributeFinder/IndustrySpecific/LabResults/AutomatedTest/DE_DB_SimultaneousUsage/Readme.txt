@@ -8,6 +8,6 @@ Setup:
 
 NOTE: When the test starts, after starting Process.fps and opening OrderMappingDB.sdf, it will wait 15 seconds for the rules to finish processing the first documents. Autohotkey will then begin to rapidly alternate between saving the DB and saving the next document presented in verification.
 
-There is a small random wait built into both Process.fps and OrderMappingDB.sdf.vbs which gets executed when the database is saved to try to shake up the timing of when the rules, verification, and SQLCDBEditor access the master datbase file in relation to each other to ensure at some points multiple applications are accessing the file simultaneously.
+There is a small random wait built into both Process.fps and AutoHotkeyScript to try to shake up the timing of when the rules, verification, and SQLCDBEditor access the master datbase file in relation to each other to ensure at some points multiple applications are accessing the file simultaneously.
 
 If a restart of the test is necessary, be sure to exit the AutoHotkey script from the first test (via the system try) first.
