@@ -69,11 +69,12 @@ namespace Extract.Utilities
                 {
                     _originalDatabaseFileName = originalDatabaseFileName;
 
-                     _lastModificationTime = File.GetLastWriteTime(_originalDatabaseFileName);
+                    _lastModificationTime = File.GetLastWriteTime(_originalDatabaseFileName);
 
-                     _sensitive = sensitive;
+                    _sensitive = sensitive;
                     _localTemporaryFile = new TemporaryFile(sensitive);
-                    File.Copy(originalDatabaseFileName, _localTemporaryFile.FileName, true);
+                    FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
+                        File.Copy(originalDatabaseFileName, _localTemporaryFile.FileName, true));
 
                     AddReference(referencingInstance);
                 }
@@ -111,7 +112,8 @@ namespace Extract.Utilities
                         _localTemporaryFile = new TemporaryFile(_sensitive);
 
                         _lastModificationTime = modificationTime;
-                        File.Copy(_originalDatabaseFileName, _localTemporaryFile.FileName, true);
+                        FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
+                            File.Copy(_originalDatabaseFileName, _localTemporaryFile.FileName, true));
                     }
 
                     // Update the reference for the specified orderMapperInstance so that it
@@ -299,7 +301,8 @@ namespace Extract.Utilities
                     // specified database, create a new one.                    
                     if (!_localFileCopies.TryGetValue(originalFileName, out temporaryFileCopy))
                     {
-                        temporaryFileCopy = new TemporaryFileCopy(this, originalFileName, sensitive);
+                        temporaryFileCopy =
+                            new TemporaryFileCopy(referencingInstance, originalFileName, sensitive);
                         _localFileCopies[originalFileName] = temporaryFileCopy;
                     }
 

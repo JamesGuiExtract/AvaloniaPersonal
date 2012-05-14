@@ -630,7 +630,6 @@ namespace Extract.SQLCDBEditor
                     {
                         _resultsTable.ColumnChanged -= HandleColumnChanged;
                         _resultsTable.RowChanged -= HandleRowChanged;
-                        _resultsTable.RowDeleted -= HandleRowDeleted;
                     }
 
                     // Apply the latest data to the grid.
@@ -645,7 +644,6 @@ namespace Extract.SQLCDBEditor
                         // Re-register to get data changed events.
                         _resultsTable.ColumnChanged += HandleColumnChanged;
                         _resultsTable.RowChanged += HandleRowChanged;
-                        _resultsTable.RowDeleted += HandleRowDeleted;
                     }
 
                     // If this is a table or a query has been re-executed without changing, restore
@@ -943,7 +941,6 @@ namespace Extract.SQLCDBEditor
 
                 _resultsTable.ColumnChanged += HandleColumnChanged;
                 _resultsTable.RowChanged += HandleRowChanged;
-                _resultsTable.RowDeleted += HandleRowDeleted;
             }
             catch (Exception ex)
             {
@@ -1114,26 +1111,21 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
-        /// Handles the case that a row was deleted.
+        /// Handles the results grid rows removed.
         /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.Data.DataRowChangeEventArgs"/> instance containing
-        /// the event data.</param>
-        void HandleRowDeleted(object sender, DataRowChangeEventArgs e)
+        /// <param name="e">The <see cref="System.Windows.Forms.DataGridViewRowsRemovedEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleResultsGridRowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)
         {
             try
             {
-                UpdateRow(e.Row);
-
-                // If the deleted row had errors, the table as a whole may now be valid. Check.
-                if (e.Row.HasErrors)
-                {
-                    ValidateTableData();
-                }
+                // If the deleted row(s) had errors, the table as a whole may now be valid. Check.
+                ValidateTableData();
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI34663");
+                ex.ExtractDisplay("ELI34664");
             }
         }
 
@@ -1794,16 +1786,13 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                if (!_resultsTable.Rows.OfType<DataRow>().Any(tableRow => tableRow.HasErrors))
-                {
-                    // Then see if the entire table can be successfully updated.
-                    _adapter.Update(_resultsTable);
-                    OnDataChanged(true);
+                // Then see if the entire table can be successfully updated.
+                _adapter.Update(_resultsTable);
+                OnDataChanged(true);
 
-                    // If the update was successful, all data is now valid.
-                    DataIsValid = true;
-                    UpdateResultsStatus(true);
-                }
+                // If the update was successful, all data is now valid.
+                DataIsValid = true;
+                UpdateResultsStatus(true);
             }
             // If there are any exceptions in this block, there is no need to display them. It
             // just means the table data will remain marked as invalid.

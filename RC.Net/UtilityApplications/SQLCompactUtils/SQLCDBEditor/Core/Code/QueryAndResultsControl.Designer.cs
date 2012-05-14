@@ -240,7 +240,7 @@
             this.queryAndResultTableLayoutPanel2.Name = "queryAndResultTableLayoutPanel2";
             this.queryAndResultTableLayoutPanel2.RowCount = 3;
             this.queryAndResultTableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.queryAndResultTableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.queryAndResultTableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 19F));
             this.queryAndResultTableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.queryAndResultTableLayoutPanel2.Size = new System.Drawing.Size(622, 301);
             this.queryAndResultTableLayoutPanel2.TabIndex = 3;
@@ -312,6 +312,7 @@
             this._resultsGrid.TabIndex = 2;
             this._resultsGrid.CurrentCellDirtyStateChanged += new System.EventHandler(this.HandleResultsGridCurrentCellDirtyStateChanged);
             this._resultsGrid.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.HandleResultsGridDataError);
+            this._resultsGrid.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.HandleResultsGridRowsRemoved);
             // 
             // QueryAndResultsControl
             // 

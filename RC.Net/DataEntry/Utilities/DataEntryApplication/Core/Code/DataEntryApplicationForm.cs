@@ -1656,6 +1656,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     // If there were document type specific configurations defined, apply the
                     // appropriate configuration now.
+                    bool changedDocumentType, changedDataEntryConfig;
                     if (_documentTypeConfigurations != null)
                     {
                         string documentType = GetDocumentType(attributes, false);
@@ -1670,9 +1671,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             _documentTypeComboBox.Items.Insert(0, documentType);
                         }
 
-                        bool changedDocumentType, changedDataEntryConfig;
-                        SetActiveDocumentType(documentType, true, 
+                        SetActiveDocumentType(documentType, true,
                             out changedDocumentType, out changedDataEntryConfig);
+                    }
+                    else
+                    {
+                        changedDocumentType = false;
+                        changedDataEntryConfig = false;
                     }
 
                     // Record database statistics on load
@@ -1684,6 +1689,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // If a DEP is being used, load the data into it
                     if (_dataEntryControlHost != null)
                     {
+                        if (!changedDataEntryConfig)
+                        {
+                            // [DataEntry:729]
+                            // If the data entery config didn't change, still need to call
+                            // GetDatabaseConnection to get the latest version of the database (in
+                            // case it has been updated).
+                            _dataEntryControlHost.DatabaseConnection = GetDatabaseConnection();
+                        }
+
                         _dataEntryControlHost.LoadData(attributes);
 
                         if (_documentTypeConfigurations != null)
@@ -3690,7 +3704,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                         if (getNewCopy)
                         {
-                            File.Copy(_dataSourcePath, localDbCopy.FileName, true);
+                            FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
+                                File.Copy(_dataSourcePath, localDbCopy.FileName, true));
 
                             _localDbCopies[_dataSourcePath] = localDbCopy;
                             _lastDbModificationTimes[_dataSourcePath] = File.GetLastWriteTime(_dataSourcePath);
