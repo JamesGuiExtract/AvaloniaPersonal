@@ -173,7 +173,14 @@ namespace Extract.DataEntry
         /// The properties assigned to the query node via <see cref="XmlAttribute"/>s (name/value
         /// pairs).
         /// </summary>
-        private Dictionary<string, string> _properties = new Dictionary<string, string>();
+        Dictionary<string, string> _properties = new Dictionary<string, string>();
+
+        /// <summary>
+        /// The distinct <see cref="QueryResult"/> for a node with the selection mode of "Distinct".
+        /// The value on the top of the stack is active for the current evaluation scope. The other
+        /// values are for higher scopes.
+        /// </summary>
+        Stack<QueryResult> _distinctResults = new Stack<QueryResult>();
 
         /// <summary>
         /// Initializes a new <see cref="QueryNode"/> instance.
@@ -357,20 +364,69 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Evaluates the query.
+        /// </summary>
+        /// <returns>A <see cref="QueryResult"/> representing the result of the query.</returns>
+        public abstract QueryResult Evaluate();
+
+        /// <summary>
         /// The active distinct <see cref="QueryResult"/> for a node with the selection mode of 
         /// "Distinct" that is currently being evaluated.
         /// </summary>
         internal virtual QueryResult DistinctResult
         {
-            get;
-            set;
+            get
+            {
+                try
+                {
+                    if (_distinctResults.Count == 0)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        return _distinctResults.Peek();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI34677");
+                }
+            }
         }
 
         /// <summary>
-        /// Evaluates the query.
+        /// Pushes the <see paramref="distinctResult"/> to use for the current evaluation scope.
         /// </summary>
-        /// <returns>A <see cref="QueryResult"/> representing the result of the query.</returns>
-        public abstract QueryResult Evaluate();
+        /// <param name="distinctResult">The <see cref="QueryResult"/> to use as the distinct value
+        /// for the current execution scope.</param>
+        internal virtual void PushDistinctResult(QueryResult distinctResult)
+        {
+            try
+            {
+                _distinctResults.Push(distinctResult);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34678");
+            }
+        }
+
+        /// <summary>
+        /// Pops the distinct <see cref="QueryResult"/> that had been active for the evaluation
+        /// scope that is ending.
+        /// </summary>
+        internal virtual void PopDistinctResult()
+        {
+            try
+            {
+                _distinctResults.Pop();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34679");
+            }
+        }
 
         /// <summary>
         /// Loads the <see cref="QueryNode"/> using the specified XML query string.

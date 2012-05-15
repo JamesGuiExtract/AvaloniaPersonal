@@ -173,34 +173,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// The active distinct <see cref="QueryResult"/> for a node with the selection mode of
-        /// "Distinct" that is currently being evaluated.
-        /// </summary>
-        internal override QueryResult DistinctResult
-        {
-            get
-            {
-                return base.DistinctResult;
-            }
-            set
-            {
-                try
-                {
-                    if (value != base.DistinctResult)
-                    {
-                        base.DistinctResult = value;
-
-                        OnQueryValueModified(new QueryValueModifiedEventArgs(false));
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI34498");
-                }
-            }
-        }
-
-        /// <summary>
         /// A previously calculated result that is still accurate.
         /// </summary>
         protected QueryResult CachedResult
@@ -298,6 +270,43 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI34487");
+            }
+        }
+
+        /// <summary>
+        /// Pushes the <see paramref="distinctResult"/> to use for the current evaluation scope.
+        /// </summary>
+        /// <param name="distinctResult">The <see cref="QueryResult"/> to use as the distinct value
+        /// for the current execution scope.</param>
+        internal override void PushDistinctResult(QueryResult distinctResult)
+        {
+            try
+            {
+                base.PushDistinctResult(distinctResult);
+
+                OnQueryValueModified(new QueryValueModifiedEventArgs(false));
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34665");
+            }
+        }
+
+        /// <summary>
+        /// Pops the distinct <see cref="QueryResult"/> that had been active for the evaluation
+        /// scope that is ending.
+        /// </summary>
+        internal override void PopDistinctResult()
+        {
+            try
+            {
+                base.PopDistinctResult();
+
+                OnQueryValueModified(new QueryValueModifiedEventArgs(false));
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34666");
             }
         }
 
@@ -643,7 +652,7 @@ namespace Extract.DataEntry
                 // another query, it will return the result currently being evaluated.
                 if (queryResult.SelectionMode == MultipleQueryResultSelectionMode.Distinct)
                 {
-                    queryNode.DistinctResult = distinctResult;
+                    queryNode.PushDistinctResult(distinctResult);
                 }
                 
                 // If the current child has a spatial mode of "Force", store its spatial
@@ -723,7 +732,7 @@ namespace Extract.DataEntry
             // evaluated outside the context of this loop, it returns its full results.
             if (queryResult.SelectionMode == MultipleQueryResultSelectionMode.Distinct)
             {
-                queryNode.DistinctResult = null;
+                queryNode.PopDistinctResult();
             }
         }
 

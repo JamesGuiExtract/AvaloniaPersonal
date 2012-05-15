@@ -881,7 +881,10 @@ namespace Extract.DataEntry
                     }
                     else
                     {
-                        resultA._nextValue = resultB;
+                        QueryResult lastResultA = resultA
+                            .Cast<QueryResult>()
+                            .Last();
+                        lastResultA._nextValue = resultB;
                     }
 
                     resultA._hasMultipleValues = true;

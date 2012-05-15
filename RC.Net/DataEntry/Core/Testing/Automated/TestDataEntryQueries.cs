@@ -29,6 +29,11 @@ namespace Extract.DataEntry.Test
         static readonly string _LABDE_DATA_FILE = "Resources.005.tif.voa";
 
         /// <summary>
+        /// The name of an embedded resource test LabDE data entry database file.
+        /// </summary>
+        static readonly string _LABDE_DATABASE = "Resources.OrderMappingDB.sdf";
+
+        /// <summary>
         /// The name of an embedded resource test FLEX Index VOA file.
         /// </summary>
         static readonly string _FLEX_INDEX_DATA_FILE = "Resources.Example01.tif.voa";
@@ -480,6 +485,77 @@ namespace Extract.DataEntry.Test
         }
 
         /// <summary>
+        /// Tests the distinct selection mode where the distinct value is referenced by another
+        /// node.
+        /// </summary>
+        [Test, Category("Composite")]
+        public static void TestDistinctNodeReference2()
+        {
+            IUnknownVector attributes = LoadDataFile(_testImages.GetFile(_LABDE_DATA_FILE), null);
+
+            attributes = _utility.QueryAttributes(attributes, "PhysicianInfo/OrderingPhysicianName/Last", false);
+            IAttribute physicianLastNameAttribute = (IAttribute)attributes.At(0);
+
+            string xml = "First name is \r\n" +
+                            "<SQL SelectionMode='Distinct'>\r\n" +
+                                "SELECT FirstName FROM Physician WHERE LastName = <Attribute Name='LastName'>.</Attribute>\r\n" +
+                            // [DataEntry:1124]: This bug prevented the LastName reference from working correctly unless a newline
+                            // was added after </SQL> and before the comma.
+                            "</SQL>, last name is <LastName/>.\r\n";
+
+            using (DbConnection dbConnection =
+                    GetDatabaseConnection(_testImages.GetFile(_LABDE_DATABASE)))
+            {
+                dbConnection.Open();
+
+                DataEntryQuery query = DataEntryQuery.Create(xml, physicianLastNameAttribute, dbConnection);
+
+                string[] results = query.Evaluate().ToStringArray();
+
+                Assert.That(results.Length == 3);
+                Assert.That(results[0].ToString() == "First name is JEFFREY, last name is ROGERS.");
+                Assert.That(results[1].ToString() == "First name is DAVID, last name is ROGERS.");
+                Assert.That(results[2].ToString() == "First name is JOHN, last name is ROGERS.");
+            }
+        }
+
+        /// <summary>
+        /// Tests the distinct selection mode where the distinct value is referenced by another
+        /// node.
+        /// </summary>
+        [Test, Category("Composite")]
+        public static void TestDistinctNodeReference3()
+        {
+            LoadDataFile(_testImages.GetFile(_LABDE_DATA_FILE), null);
+
+            // [DataEntry:1124]: This bug prevented anything beyond the first reference from being
+            // populated, so OrderCode would be blank.
+            string xml = "<Declarations>\r\n" +
+                            "<Attribute Name='Components'>Test/Component</Attribute>\r\n" +
+                        "</Declarations>\r\n" +
+                        "<Query>\r\n" +
+                            "Component=<Components SelectionMode='Distinct' Name='Component'/>," +
+                            "TestCode=<Attribute Root='Component'>TestCode</Attribute>," +
+                            "OrderCode=<Attribute Root='Component' >../OrderCode</Attribute>" +
+                        "</Query>\r\n";
+
+            using (DbConnection dbConnection =
+                    GetDatabaseConnection(_testImages.GetFile(_LABDE_DATABASE)))
+            {
+                dbConnection.Open();
+
+                DataEntryQuery query = DataEntryQuery.Create(xml, null, dbConnection);
+
+                string[] results = query.Evaluate().ToStringArray();
+
+                Assert.That(results.Length == 45);
+                Assert.That(results[0].ToString() == "Component=SODIUM,TestCode=NA,OrderCode=CMP1");
+                Assert.That(results[20].ToString() == "Component=RBC,TestCode=RBC,OrderCode=CBC");
+                Assert.That(results[44].ToString() == "Component=TSH,TestCode=TSH,OrderCode=TSH");
+            }
+        }
+
+        /// <summary>
         /// A test to sum values from a VOA file using nested nodes of different types.
         /// </summary>
         [Test, Category("Composite")]
@@ -495,7 +571,7 @@ namespace Extract.DataEntry.Test
 
             QueryResult result = query.Evaluate();
 
-            Assert.That(result.ToString() == "1678.96");
+            Assert.That(result.ToString() == "1668.16");
         }
 
         /// <summary>
@@ -516,7 +592,7 @@ namespace Extract.DataEntry.Test
 
             QueryResult result = query.Evaluate();
 
-            Assert.That(result.ToString() == "1678.96");
+            Assert.That(result.ToString() == "1668.16");
         }
 
         /// <summary>
@@ -536,7 +612,7 @@ namespace Extract.DataEntry.Test
 
             QueryResult result = query.Evaluate();
 
-            Assert.That(result.ToString() == "1678.96");
+            Assert.That(result.ToString() == "1668.16");
         }
 
         /// <summary>
@@ -558,7 +634,7 @@ namespace Extract.DataEntry.Test
 
             QueryResult result = query.Evaluate();
 
-            Assert.That(result.ToString() == "1678.96");
+            Assert.That(result.ToString() == "1668.16");
         }
 
         /// <summary>

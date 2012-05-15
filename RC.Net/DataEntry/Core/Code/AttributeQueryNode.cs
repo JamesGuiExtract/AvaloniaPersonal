@@ -120,7 +120,7 @@ namespace Extract.DataEntry
                 {
                     string queryString = _queryNode._attributeQueryString;
                     HashSet<IAttribute> attributeDomain = new HashSet<IAttribute>();
-                    HashSet<IAttribute> newTriggerAttributes = new HashSet<IAttribute>();
+                    HashSet<IAttribute> triggerAttributes = new HashSet<IAttribute>();
 
                     // Divide the reference path into two parts:
                     // part1 = The "up" part; references the lowest attribute in the hierarchy that
@@ -159,10 +159,9 @@ namespace Extract.DataEntry
                         foreach (IAttribute triggerAttribute in
                             AttributeStatusInfo.ResolveAttributeQuery((rootAttribute == _ROOT_ATTRIBUTE)
                                 ? null
-                                : rootAttribute, _queryNode._attributeQueryString)
-                                    .Where(attribute => !_queryNode._triggerAttributes.Contains(attribute)))
+                                : rootAttribute, _queryNode._attributeQueryString))
                         {
-                            newTriggerAttributes.Add(triggerAttribute);
+                            triggerAttributes.Add(triggerAttribute);
                         }
                     }
 
@@ -201,7 +200,7 @@ namespace Extract.DataEntry
                         _activeRegistrations.Add(registration);
                     }
 
-                    return newTriggerAttributes;
+                    return triggerAttributes;
                 }
                 catch (Exception ex)
                 {
