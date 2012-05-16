@@ -738,7 +738,7 @@ namespace Extract.SQLCDBEditor
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        void HandleNewQueryToolStripButtonClick(object sender, EventArgs e)
+        void HandleNewQueryClick(object sender, EventArgs e)
         {
             try
             {
@@ -893,7 +893,7 @@ namespace Extract.SQLCDBEditor
                     {
                         // Use false so that for queries, the results get marked as stale, but don't
                         // get automatically refreshed.
-                        queryAndResultsControl.RefreshData(false);
+                        queryAndResultsControl.RefreshData(false, false);
                     }
                 }
 
@@ -1349,7 +1349,7 @@ namespace Extract.SQLCDBEditor
 
             if (isAlreadyLoaded)
             {
-                queryAndResultsControl.RefreshData(false);
+                queryAndResultsControl.RefreshData(false, false);
             }
 
             tabbedDocument.Activate();

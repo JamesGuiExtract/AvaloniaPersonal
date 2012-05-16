@@ -461,6 +461,7 @@ namespace Extract.SQLCDBEditor
                 _queryScintillaBox.TextChanged += HandleQueryScintillaBoxTextChanged;
                 _lastSavedQuery = query;
                 _resultsGrid.AllowUserToAddRows = false;
+                _resultsGrid.AllowUserToDeleteRows = false;
 
                 // If we have gotten this far, consider the query loaded even if the query cannot be
                 // evaluated. The user will be able to edit the query to allow it to evaluate.
@@ -470,14 +471,13 @@ namespace Extract.SQLCDBEditor
                 ParseQuery(connection, query);
 
                 // Populate the results grid.
-                RefreshData(true);
+                RefreshData(true, true);
 
                 _resultsGrid.DataSource = _resultsTable;
             }
             catch (Exception ex)
             {
                 _queryError = true;
-                UpdateResultsStatus(false);
 
                 throw ex.AsExtract("ELI34581");
             }
@@ -488,7 +488,9 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         /// <param name="updateQueryResult"><see langword="true"/> to update the results or a query
         /// <see langword="false"/> to just make the visible results as out-of-date.</param>
-        public void RefreshData(bool updateQueryResult)
+        /// <param name="forceQueryExcecution"><see langword="true"/> toForce the query to be
+        /// re-executed and be updated; <see langword="false"/> otherwise.</param>
+        public void RefreshData(bool updateQueryResult, bool forceQueryExcecution)
         {
             DataTable latestDataTable = null;
 
@@ -540,9 +542,9 @@ namespace Extract.SQLCDBEditor
                 else
                 {
                     // [DotNetRCAndUtils:824]
-                    // If the execute button is enabled, we already know the query needs to be
-                    // re-run. The query may be in a partially dirty state and unable to run anyway.
-                    if (_executeQueryButton.Enabled)
+                    // We already know the query needs to be re-run. The query may be in a partially
+                    // dirty state and unable to run anyway.
+                    if ((_queryChanged || _queryError || _resultsChanged) && !forceQueryExcecution)
                     {
                         return;
                     }
@@ -575,8 +577,14 @@ namespace Extract.SQLCDBEditor
                     }
                 }
 
+                if (forceQueryExcecution)
+                {
+                    // Always refresh the results if forceQueryExcecution is true.
+                    dataChanged = true;
+                }
                 // Check to see if the data in _resultsTable differs from the latestDataTable
-                if (latestDataTable.Rows.Count != _resultsTable.Rows.Count)
+                else if (latestDataTable.Rows.Count != _resultsTable.Rows.Count ||
+                    latestDataTable.Columns.Count != _resultsTable.Columns.Count)
                 {
                     dataChanged = true;
                 }
@@ -656,28 +664,28 @@ namespace Extract.SQLCDBEditor
                         {
                             column.Width = columnWidths[column.Index];
                         }
+
+                        // Restore the previous sort order.
+                        if (sortedColumnIndex >= 0)
+                        {
+                            _resultsGrid.Sort(_resultsGrid.Columns[sortedColumnIndex], sortOrder);
+                        }
+
+                        // Re-apply the previous vertical scroll position for tables to try to make it
+                        // appear that the table was updated in-place.
+                        if (IsTable)
+                        {
+                            if (scrollPos >= 0 && scrollPos < _resultsGrid.RowCount)
+                            {
+                                _resultsGrid.FirstDisplayedScrollingRowIndex = scrollPos;
+                            }
+                        }
                     }
                     else
                     {
                         // Always auto-size columns if a query has changed since the last execution
                         // because the columns may no longer be the same.
                         AutoSizeColumns();
-                    }
-
-                    // Restore the previous sort order.
-                    if (sortedColumnIndex >= 0)
-                    {
-                        _resultsGrid.Sort(_resultsGrid.Columns[sortedColumnIndex], sortOrder);
-                    }
-
-                    // Re-apply the previous vertical scroll position for tables to try to make it
-                    // appear that the table was updated in-place.
-                    if (IsTable)
-                    {
-                        if (scrollPos >= 0 && scrollPos < _resultsGrid.RowCount)
-                        {
-                            _resultsGrid.FirstDisplayedScrollingRowIndex = scrollPos;
-                        }
                     }
 
                     _resultsGrid.Refresh();
@@ -941,6 +949,8 @@ namespace Extract.SQLCDBEditor
 
                 _resultsTable.ColumnChanged += HandleColumnChanged;
                 _resultsTable.RowChanged += HandleRowChanged;
+
+                UpdateResultsStatus(!_queryError);
             }
             catch (Exception ex)
             {
@@ -1006,11 +1016,11 @@ namespace Extract.SQLCDBEditor
 
                 _queryAndResultsTableLayoutPanel.ResumeLayout(true);
 
+                RefreshData(true, true);
+
                 _queryChanged = false;
                 _resultsChanged = false;
                 UpdateResultsStatus(true);
-
-                RefreshData(true);
 
                 _queryError = false;
             }
@@ -1039,7 +1049,7 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                RefreshData(true);
+                RefreshData(true, false);
             }
             catch (Exception ex)
             {

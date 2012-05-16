@@ -105,7 +105,7 @@ namespace Extract.SQLCDBEditor
             this._newQueryToolStripButton.Name = "_newQueryToolStripButton";
             this._newQueryToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._newQueryToolStripButton.Text = "Create New Query";
-            this._newQueryToolStripButton.Click += new System.EventHandler(this.HandleNewQueryToolStripButtonClick);
+            this._newQueryToolStripButton.Click += new System.EventHandler(this.HandleNewQueryClick);
             // 
             // _menuStrip
             // 
@@ -180,7 +180,8 @@ namespace Extract.SQLCDBEditor
             this._newQueryToolStripMenuItem.Enabled = false;
             this._newQueryToolStripMenuItem.Name = "_newQueryToolStripMenuItem";
             this._newQueryToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
-            this._newQueryToolStripMenuItem.Text = "Create new query";
+            this._newQueryToolStripMenuItem.Text = "&Create new query";
+            this._newQueryToolStripMenuItem.Click += new System.EventHandler(this.HandleNewQueryClick);
             // 
             // _helpToolStripMenuItem
             // 
