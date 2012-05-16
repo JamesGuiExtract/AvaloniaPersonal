@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!DOCTYPE FEATURE_ATTRIBUTES SYSTEM "FeatureAttributes.dtd">
+<FeatureAttributes>
+<NumParts>2</NumParts>
+<Part>
+  <NumSegments>3</NumSegments>
+  <Segment>
+    <NumAttributes>2</NumAttributes>
+    <Attribute>
+      <Name>Bearing</Name>
+      <Value>N32E</Value>
+    </Attribute>
+    <Attribute>
+      <Name>Distance</Name>
+      <Value>55</Value>
+    </Attribute>
+  </Segment>
+  <Segment>
+    <NumAttributes>2</NumAttributes>
+    <Attribute>
+      <Name>Bearing</Name>
+      <Value>N33E</Value>
+    </Attribute>
+    <Attribute>
+      <Name>Distance</Name>
+      <Value>56</Value>
+    </Attribute>
+  </Segment>
+  <Segment>
+    <NumAttributes>2</NumAttributes>
+    <Attribute>
+      <Name>Bearing</Name>
+      <Value>N34E</Value>
+    </Attribute>
+    <Attribute>
+      <Name>Distance</Name>
+      <Value>57</Value>
+    </Attribute>
+  </Segment>
+</Part>
+<Part>
+  <NumSegments>3</NumSegments>
+  <Segment>
+    <NumAttributes>2</NumAttributes>
+    <Attribute>
+      <Name>Bearing</Name>
+      <Value>N35E</Value>
+    </Attribute>
+    <Attribute>
+      <Name>Distance</Name>
+      <Value>58</Value>
+    </Attribute>
+  </Segment>
+  <Segment>
+    <NumAttributes>2</NumAttributes>
+    <Attribute>
+      <Name>Bearing</Name>
+      <Value>N36E</Value>
+    </Attribute>
+    <Attribute>
+      <Name>Distance</Name>
+      <Value>59</Value>
+    </Attribute>
+  </Segment>
+  <Segment>
+    <NumAttributes>2</NumAttributes>
+    <Attribute>
+      <Name>Bearing</Name>
+      <Value>N37E</Value>
+    </Attribute>
+    <Attribute>
+      <Name>Distance</Name>
+      <Value>60</Value>
+    </Attribute>
+  </Segment>
+</Part>
+</FeatureAttributes> 

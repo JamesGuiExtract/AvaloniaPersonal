@@ -1,0 +1,108 @@
+<html>
+
+<HEAD>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<h2><b>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+
+Node Locked Licensing
+
+</tr>
+</table>
+</b></h2>
+<p>
+
+
+<tr>
+Test setup: 
+<dir>
+<li>Install IcoMap.</li>
+<li>Open the IcoMap License Utility.</li>
+<li>Select Node Locked licensing mode. 
+<li>Close the IcoMap License Utility.</li>
+<br>There should be 1 .ESL file in the C:\Program Files\Extract Systems\CommonComponents folder: <b>ExtractSystems_IcoMap.esl</b>.</li>
+<li>Start ArcGIS.</li>
+</dir>
+</tr>
+
+<ol>
+<HR>
+<p>
+
+<li>
+Using the COM License Generator utility, create a Fully Licensed license file for IcoMap locked to the testing PC.  Copy this license file to the Common Components folder.
+</li>
+<HR>
+<p>
+
+<li>
+Start up IcoMap.<p>
+
+No licensing error should be seen.
+</li>
+<HR>
+<p>
+
+<li>
+Open a Spot Recognition Window.<p>
+
+No licensing error should be seen.
+</li>
+<HR>
+<p>
+
+<li>
+Open a Highlighted Text Window.<p>
+
+No licensing error should be seen.
+</li>
+<HR>
+<p>
+
+<li>
+Remove or rename all license files (*.LIC) located in the Common Components folder.  Start up IcoMap.<p>
+
+A licensing error regarding IcoMap should be seen.
+</li>
+<HR>
+<p>
+
+<li>
+Create a license file for <b>IcoMap 4.0</b>.  Start up IcoMap.<p>
+
+Since IcoMap 4.0 was the last version that did not support product-level licensing, a licensing error regarding IcoMap should be seen.
+</li>
+<HR>
+<p>
+
+<li>
+Replace or rename any modified license files.  Start up IcoMap.<p>
+
+No licensing error should be seen.
+</li>
+<HR>
+<p>
+
+<li>
+Open the Extensions dialog from the Tools menu.  Click the Extract Systems IcoMap item to attempt unchecking the checkbox.<p>
+
+An Extensions error message should appear that says:
+<b>"The extension could not be deactivated because it is currently in use."</b>.<p>
+
+Confirm that the extension remains checked.
+</li>
+<HR>
+<p>
+
+</ol>
+<p>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+The location of the files and any common instructions can be found <A HREF="common.html" TARGET="_blank">here</A>.
+</tr>
+</table>
+
+</html>

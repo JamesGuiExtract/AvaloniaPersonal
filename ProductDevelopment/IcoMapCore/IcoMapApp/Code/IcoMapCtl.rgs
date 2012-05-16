@@ -1,0 +1,25 @@
+HKCR
+{
+	IcoMap.IcoMapApp.1 = s 'IcoMap Class'
+	{
+		CLSID = s '{C30EE1BB-2F25-4B1D-97E2-D3665EB5FC3B}'
+	}
+	IcoMap.IcoMapApp = s 'IcoMap Class'
+	{
+		CLSID = s '{C30EE1BB-2F25-4B1D-97E2-D3665EB5FC3B}'
+		CurVer = s 'IcoMap.IcoMapApp.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {C30EE1BB-2F25-4B1D-97E2-D3665EB5FC3B} = s 'IcoMap Class'
+		{
+			ProgID = s 'IcoMap.IcoMapApp.1'
+			VersionIndependentProgID = s 'IcoMap.IcoMapApp'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{63B908D8-4D69-4408-8298-36D3645DE17B}'
+		}
+	}
+}

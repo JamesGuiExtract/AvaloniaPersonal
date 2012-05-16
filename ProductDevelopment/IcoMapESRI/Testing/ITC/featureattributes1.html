@@ -1,0 +1,217 @@
+<html>
+
+<HEAD>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<h2><b>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+
+Feature Attributes
+
+</tr>
+</table>
+</b></h2>
+<p>
+
+<ol>
+
+<li>Create two different workspaces, and test each workspace follow the same instruction
+  <ul>
+  <li>Create a Personal Geodatabase with a line feature class.
+  <li>Create a Shape file with a line feature.
+  </ul>
+<hr>
+<p>
+
+<li>
+Use IcoMap to draw the following segments on the line layer:
+<br>North 100'
+<br>N45dE 150'
+<br>Curve to the right
+<dd>R = 70'
+<dd>CB = East
+<dd>CL = 100'
+<br>S44d24'55"E 50'
+<br>South 150'
+<br>S85d10'16"W 241.90'<p>
+
+A polyline feature should get created.
+<br>Perimeter = ~803.28'
+</li>
+<HR>
+<p>
+
+<li>
+Select the 'Edit selected feature' button then select the polyline feature you just created. <p>
+
+The 'Feature Attributes' dialog should appear.<p>
+Note:
+  <ul>
+  <li>For Personal Geodatabase, the selected feature should have both Current and Stored features shown in the dialog.
+  <li>For Shape file, the selected feature should have only Current feature shown in the dialog. The stored feature part should be disabled.
+  </ul>
+</li>
+<HR>
+<p>
+
+<li>
+Delete the following segment:
+<br>South 150'
+<br>Click 'OK'<p>
+
+The second to last segment should have gone away.
+<br>Perimeter = ~653.28
+</li>
+<HR>
+<p>
+
+<li>
+Select the 'Edit selected feature' button then select the same polyline feature that was selected before. <p>
+
+The 'Feature Attributes' dialog should appear.
+</li>
+<HR>
+<p>
+
+<li>
+Select the last segment and click the 'Add Line' button. <p>
+
+The 'New line' button should have appeared
+</li>
+<HR>
+<p>
+
+<li>
+Make the line:
+<br>Bearing = South
+<br>Distance = 75<p>
+
+The new segment data should get added before the last segment
+</li>
+<HR>
+<p>
+
+<li>
+Repeat Steps 5 and 6<p>
+</li>
+<HR>
+<p>
+
+<li>
+Click the 'OK' button. <p>
+
+The segment should look the same as before.  The only difference being the line that was deleted is now two segments.
+<br>Perimeter = ~803.28'
+</li>
+<HR>
+<p>
+
+<li>
+Select the 'Edit selected feature' button then select the same polyline feature that was selected before. <p>
+
+The 'Feature Attributes' dialog should appear.
+</li>
+<HR>
+<p>
+
+<li>
+Select the 'Edit record' button and select the existing start point.  Write down the X, Y values on a piece of paper with a pen or pencil because we will use these values for the new part that we will create.  Then cancel out of the 'Edit start point' dialog box. <p>
+
+The X, Y values should be displayed on the piece of paper that you wrote them on.
+</li>
+<HR>
+<p>
+
+
+
+<li>
+Select the first open row and click the 'Append new part' button. <p>
+
+The 'Start new point' dialog box should appear.
+</li>
+<HR>
+<p>
+
+<li>
+Enter the X, Y location that you specified in step 10 then click the 'OK' button. <p>
+
+A new start point should have been added
+</li>
+<HR>
+<p>
+
+<li>
+Select the first empty row and add a line segment:
+<br>Bearing = N75d22'14"W
+<br>Distance = 78.22'<p>
+
+It should get added.
+</li>
+<HR>
+<p>
+
+<li>
+Select the first empty row and add a curve to the left:
+<br>Radius = 62.44'
+<br>Delta = 112d22'54"
+<br>CB = S62d50'02"W<p>
+
+The curve should be added
+</li>
+<HR>
+<p>
+
+<li>
+Click the 'OK' button. <p>
+
+A new part of the feature should have been added from the original start point off to the left.
+<br>Perimeter = ~1003.98
+<br> (both parts combined)
+</li>
+<HR>
+<p>
+
+<li>
+Select the 'Edit selected feature' button then select the same polyline feature that was selected before. <p>
+
+The 'Feature Attributes' dialog should appear.
+</li>
+<HR>
+<p>
+
+<li>
+Select the last Start point you added. Then Click the 'Delete' button. <p>
+
+A dialog box should appear that says "Delete starting point and all associated line and curve segments from part ###"
+</li>
+<HR>
+<p>
+
+<li>
+Click the 'Yes' button. <p>
+
+The start point, line and curve should not be listed anymore.
+</li>
+<HR>
+<p>
+
+<li>
+Click the 'OK' button. <p>
+
+The part that was deleted should no longer appear.
+</li>
+<HR>
+<p>
+
+
+
+</ol>
+<p>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+The location of the files and any common instructions can be found <A HREF="common.html" TARGET="_blank">here</A>.
+</tr>
+</table>
+</html>

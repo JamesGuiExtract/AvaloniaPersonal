@@ -1,0 +1,66 @@
+// ArcGISIcoMap.idl : IDL source for ArcGISIcoMap.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ArcGISIcoMap.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(D80801C2-7AC8-11D5-817F-0050DAD4FF55),
+	version(1.0),
+	helpstring("UCLID ArcGISIcoMap 1.0 Type Library")
+]
+library ARCGISICOMAPLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\ReusableComponents\APIs\ArcGIS\Bin\esriSystem.olb");
+	importlib("..\..\..\..\ReusableComponents\APIs\ArcGIS\Bin\esriSystemUI.olb");
+	importlib("..\..\..\..\ReusableComponents\APIs\ArcGIS\Bin\esriFramework.olb");
+	importlib("..\..\..\..\ReusableComponents\APIs\ArcGIS\Bin\esriEditor.olb");
+
+
+	[
+		object,
+		uuid(D80801CF-7AC8-11D5-817F-0050DAD4FF55),
+	
+		helpstring("IIcoMapDrawingCtrl Interface"),
+		pointer_default(unique)
+	]
+	interface IIcoMapDrawingCtrl : IUnknown
+	{
+	};
+	[
+		object,
+		uuid(85866FCE-9D61-11D5-81AD-0050DAD4FF55),
+	
+		helpstring("IEditEventsSink Interface"),
+		pointer_default(unique)
+	]
+	interface IEditEventsSink : IUnknown
+	{
+		[helpstring("method SetApplicationHook")] HRESULT SetApplicationHook([in] IApplication *pApp);
+	};
+
+
+	[
+		uuid(D80801D0-7AC8-11D5-817F-0050DAD4FF55),
+		helpstring("IcoMapDrawingCtrl Class")
+	]
+	coclass IcoMapDrawingCtrl
+	{
+		[default] interface IIcoMapDrawingCtrl;
+		interface ICommand;
+		interface ITool;
+	};
+	[
+		uuid(85866FCF-9D61-11D5-81AD-0050DAD4FF55),
+		helpstring("EditEventsSink Class")
+	]
+	coclass EditEventsSink
+	{
+		[default] interface IEditEventsSink;
+	};
+};

@@ -1,0 +1,115 @@
+// IcoMapApp.idl : IDL source for IcoMapApp.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (IcoMapApp.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(63B908D8-4D69-4408-8298-36D3645DE17B),
+	version(1.0),
+	helpstring("UCLID IcoMapApplication 1.0 Type Library")
+]
+library ICOMAPAPPLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\PlatformSpecificUtils\GISPlatInterfaces\Code\GISPlatInterfaces.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Code\Core\SpotRecognitionIR.tlb");
+
+	// Interfaces
+	[
+		object,
+		uuid(599C0F97-8C43-4F89-B6AA-7EAE4C77CCFF),
+		dual,
+		helpstring("IIcoMapApplication Interface"),
+		pointer_default(unique)
+	]
+	interface IIcoMapApplication : IDispatch
+	{
+		[helpstring("method SetDisplayAdapter")] HRESULT SetDisplayAdapter([in] IDisplayAdapter* ipDisplayAdapter);
+		[helpstring("method SetAttributeManager")] HRESULT SetAttributeManager([in] IAttributeManager* ipAttributeManager);
+		[helpstring("method SetPoint")] HRESULT SetPoint([in] double dX, [in] double dY);
+		[helpstring("method SetText")] HRESULT SetText([in] BSTR text);
+		[helpstring("method ShowIcoMapWindow")] HRESULT ShowIcoMapWindow([in] VARIANT_BOOL bShow);
+		[helpstring("method DestroyWindows")] HRESULT DestroyWindows();
+		[propget, helpstring("property Initialized")] HRESULT Initialized([out, retval] VARIANT_BOOL *pVal);
+		[helpstring("method NotifySketchModified")] HRESULT NotifySketchModified([in] long nActualNumOfSegments);
+		[helpstring("method EnableFeatureCreation")] HRESULT EnableFeatureCreation([in] VARIANT_BOOL bEnable);
+		[helpstring("method Reset")] HRESULT Reset(void);
+		[helpstring("method ProcessKeyDown")] HRESULT ProcessKeyDown([in] long lKeyCode, [in] long lShiftKey);
+		[helpstring("method ProcessKeyUp")] HRESULT ProcessKeyUp([in] long lKeyCode, [in] long lShiftKey);
+		[propget, helpstring("property EnableFeatureSelection")] HRESULT EnableFeatureSelection([out, retval] VARIANT_BOOL *pVal);
+		[helpstring("method OnFeatureSelected")] HRESULT OnFeatureSelected([in] VARIANT_BOOL bReadOnly);
+		[helpstring("method SetIcoMapAsCurrentTool")] HRESULT SetIcoMapAsCurrentTool([in] VARIANT_BOOL bIsCurrent);
+	};
+	[
+		object,
+		uuid(85420E81-9D17-4e42-BE83-B0396E8420F7),
+		helpstring("IIcoMapInputContext Interface"),
+		pointer_default(unique)
+	]
+	interface IIcoMapInputContext : IUnknown
+	{
+		[helpstring("method SetIcoMapApplication")] HRESULT SetIcoMapApplication([in] IIcoMapApplication* pIcoMapApplication);
+	};
+
+	[
+		object,
+		uuid(5B87A905-B7CD-402D-9A37-E2D6995C5282),
+		dual,
+		helpstring("INothingInputValidator Interface"),
+		pointer_default(unique)
+	]
+	interface INothingInputValidator : IDispatch
+	{
+	};
+
+	// coclasses
+	[
+		uuid(C30EE1BB-2F25-4B1D-97E2-D3665EB5FC3B),
+		helpstring("IcoMap Class")
+	]
+	coclass IcoMap
+	{
+		[default] interface IIcoMapApplication;
+		interface IInputReceiver;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(6E02F5B6-3928-47AD-A2E4-9832D991FEC5),
+		helpstring("IcoMapInputContext Class")
+	]
+	coclass IcoMapInputContext
+	{
+		[default] interface IInputContext;
+		interface IIcoMapInputContext;
+		interface ISRWEventHandler;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(E8A353F9-E03E-4A12-9812-84861BFFE3FA),
+		helpstring("IcoMapCommandRecognizer Class")
+	]
+	coclass IcoMapCommandRecognizer
+	{
+		[default] interface ILicensedComponent;
+	};
+
+	[
+		uuid(DBDD3D34-256F-4216-9800-3BA2D77771A6),
+		helpstring("NothingInputValidator Class")
+	]
+	coclass NothingInputValidator
+	{
+		[default] interface INothingInputValidator;
+		interface IInputValidator;
+		interface ICategorizedComponent;
+	};
+};

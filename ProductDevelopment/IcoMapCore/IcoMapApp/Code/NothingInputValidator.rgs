@@ -1,0 +1,26 @@
+HKCR
+{
+	IcoMapApp.NothingInputValidator.1 = s 'NothingInputValidator Class'
+	{
+		CLSID = s '{DBDD3D34-256F-4216-9800-3BA2D77771A6}'
+	}
+	IcoMapApp.NothingInputValidator = s 'NothingInputValidator Class'
+	{
+		CLSID = s '{DBDD3D34-256F-4216-9800-3BA2D77771A6}'
+		CurVer = s 'IcoMapApp.NothingInputValidator.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {DBDD3D34-256F-4216-9800-3BA2D77771A6} = s 'NothingInputValidator Class'
+		{
+			ProgID = s 'IcoMapApp.NothingInputValidator.1'
+			VersionIndependentProgID = s 'IcoMapApp.NothingInputValidator'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{63B908D8-4D69-4408-8298-36D3645DE17B}'
+		}
+	}
+}

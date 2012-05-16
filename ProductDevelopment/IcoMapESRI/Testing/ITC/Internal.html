@@ -1,0 +1,95 @@
+<html>
+
+<HEAD>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<h2><b>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+
+These test cases test drawing using internal angles.
+
+</tr>
+</table>
+</b></h2>
+<p>
+
+<ol>
+
+
+<li>
+ Click on the "Spot Recognition Window" button in the IcoMap dialog.
+<p>
+ IcoMap opens a new 'Spot Recognition' window.
+</li>
+<HR>
+<p>
+
+<li>
+Open the file <b><i>InternalAngle.tif</b></i> from the 'Spot Recognition' window.
+<p>
+The 'Spot Recognition' window displays the image you selected
+</li>
+<HR>
+<p>
+
+<li>
+Go to the 'Direction/Angle Definition' tab in the 'Options' dialog box.
+</li>
+<HR>
+<p>
+
+<li>
+Select the 'Bearing...' option in the 'Specify Direction...' group box.
+<p>
+The 'Polar Angle...' and 'Azimuth...' options should be disabled.
+</li>
+<HR>
+<p>
+
+<li>
+Select the 'Internal Angle' option in the 'Specify Angle...' group box and click the 'OK' button.
+<p>
+The 'IcoMap Options' dialog box should go away.  This will change the direction type that IcoMap will be looking for and prompt for Internal angles when you choose the 'internal/deflection angle' line tool.
+</li>
+<HR>
+<p>
+
+<li>
+Draw the parcel described in <b><i>InternalAngle.txt</b></i> using whatever means you desire.
+<P>
+As you pick on line and curve data, the lines should get drawn to the ArcMap environment.  The highlights that are selected will also change to red.
+
+</li>
+<HR>
+<p>
+
+<li>
+Finish the sketch.
+<p>
+The lines and curves you drew should get written to the ArcGIS geodatabase and the newly created shape will be selected.
+<br>Area = ~78799.17
+<br>Perimeter = ~1146.00
+</li>
+<HR>
+<p>
+
+<li>
+Click the 'Close' (X) button in the 'Spot Recognition' window.
+<p>
+IcoMap should close the 'Spot Recognition' window.
+</li>
+<HR>
+<p>
+
+
+
+</ol>
+<p>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+The location of the files and any common instructions can be found <A HREF="common.html" TARGET="_blank">here</A>.
+</tr>
+</table>
+</html>

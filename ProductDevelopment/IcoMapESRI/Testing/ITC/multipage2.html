@@ -1,0 +1,154 @@
+<html>
+
+<HEAD>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<h2><b>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+
+Drawing and saving highlights with multi-page images.
+
+</tr>
+</table>
+</b></h2>
+<p>
+
+<ol>
+
+
+<li>
+Click on the 'New Image Recognition Window' button. <p>
+
+IcoMap opens a new 'Image Recognition' dialog and brings up the 'Open' dialog box right away.
+</li>
+<HR>
+<p>
+
+<li>
+Select the file <I><b>Test019.tif</I></b> and click the 'open' button. <p>
+
+IcoMap opens the associated image to the first page.  The 'move backwards' button should be disabled.  The page number indicator should be 1
+</li>
+<HR>
+<p>
+
+<li>
+Draw the parcel on page 1 using spot recognition.  Use COGO only if the text doesn't recognize. <p>
+
+As you pick on line and curve data, the lines should get drawn to the ArcMap environment.
+</li>
+<HR>
+<p>
+
+<li>
+Finish the sketch. <p>
+
+The lines and curves you drew should get written to the ArcGIS geodatabase and the newly created shape will be selected.
+<br>Area = ~345941.43'
+<br>Perimeter = ~2928.14'
+</li>
+<HR>
+<p>
+
+<li>
+Go to page 2<p>
+
+Page 2 should be displayed in the image window.  The highlights from page 1 should not be displayed in this view.
+</li>
+<HR>
+<p>
+
+<li>
+Draw the parcel on page 2 using spot recognition.  Use COGO only if the text doesn't recognize. <p>
+
+As you pick on line and curve data, the lines should get drawn to the ArcMap environment.
+</li>
+<HR>
+<p>
+
+<li>
+Finish the sketch. <p>
+
+The lines and curves you drew should get written to the ArcGIS geodatabase and the newly created shape will be selected.
+<br>Area = ~557549.48
+<br>Perimeter = ~3125.92
+</li>
+<HR>
+<p>
+
+<li>
+Go back to page 1. <p>
+
+The image of page 1 should be displayed in the image window.  The highlights from page 2 should not be displayed.  The highlights from page 1 should be displayed.
+</li>
+<HR>
+<p>
+
+<li>
+Click the 'Save' button. <p>
+
+The 'Save' dialog box should appear.
+</li>
+<HR>
+<p>
+
+<li>
+Save the file as <I><b>Test019.tif.gdd</I></b>. <p>
+
+The file <I><b>Test019.tif.gdd</I></b> should get created
+</li>
+<HR>
+<p>
+
+<li>
+Click the 'Close' (X) button in the Image Recognition window. <p>
+
+IcoMap should close the Image Recognition window.
+</li>
+<HR>
+<p>
+
+<li>
+Click on the 'New Image Recognition Window' button. <p>
+
+IcoMap opens a new 'Image Recognition' dialog and brings up the 'Open' dialog box right away.
+</li>
+<HR>
+<p>
+
+<li>
+Select the file <I><b>Test019.tif.gdd</I></b> and click the 'open' button. <p>
+
+IcoMap opens the associated image to the first page.  The 'move backwards' button should be disabled.  The page number indicator should be 1.  All of the highlights for page 1 should be displayed.
+</li>
+<HR>
+<p>
+
+<li>
+Go to page 2<p>
+
+Page 2 should be displayed in the image window.  The highlights from page 1 should not be displayed in this view.  The highlights for page 2 should be displayed.
+</li>
+<HR>
+<p>
+
+<li>
+Click the 'Close' (X) button in the Image Recognition window. <p>
+
+IcoMap should close the Image Recognition window.
+</li>
+<HR>
+<p>
+
+
+
+</ol>
+<p>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+The location of the files and any common instructions can be found <A HREF="common.html" TARGET="_blank">here</A>.
+</tr>
+</table>
+</html>

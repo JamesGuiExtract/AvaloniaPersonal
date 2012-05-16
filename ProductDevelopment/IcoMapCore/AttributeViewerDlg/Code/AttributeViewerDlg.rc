@@ -1,0 +1,333 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\AttributeViewerDlg.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,4
+ PRODUCTVERSION 1,0,0,4
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "\0"
+            VALUE "CompanyName", "\0"
+            VALUE "FileDescription", "AttributeViewerDlg DLL\0"
+            VALUE "FileVersion", "1, 0, 0, 4\0"
+            VALUE "InternalName", "AttributeViewerDlg\0"
+            VALUE "LegalCopyright", "Copyright (C) 2001\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OLESelfRegister", "\0"
+            VALUE "OriginalFilename", "AttributeViewerDlg.DLL\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "AttributeViewerDlg Dynamic Link Library\0"
+            VALUE "ProductVersion", "1, 0, 0, 4\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_AVTOOLBAR           BITMAP  MOVEABLE PURE   "res\\Toolbar.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_AVTOOLBAR TOOLBAR DISCARDABLE  16, 15
+BEGIN
+    BUTTON      ID_ITEM_EDIT
+    SEPARATOR
+    BUTTON      ID_ITEM_DELETE
+    SEPARATOR
+    BUTTON      ID_INSERT_PART
+    BUTTON      ID_INSERT_LINE
+    BUTTON      ID_INSERT_CURVE
+    SEPARATOR
+    BUTTON      ID_ITEM_TRANSFER
+    SEPARATOR
+    BUTTON      ID_ITEM_CLOSURE
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ATTRIBUTEVIEW_DLG DIALOG DISCARDABLE  0, 0, 330, 249
+STYLE WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Feature Attributes"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "&OK",IDOK,213,228,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,273,228,50,14
+    PUSHBUTTON      "Show &Stored Attributes >>",IDC_SHOWHIDE,7,228,100,14
+    CONTROL         "List1",IDC_LIST1,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | 
+                    WS_TABSTOP,7,38,316,80
+    CONTROL         "List1",IDC_LIST2,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | 
+                    WS_TABSTOP,7,141,316,80
+    LTEXT           "Current Attributes",IDC_STATIC_CURR,7,25,69,12
+    LTEXT           "Stored Attributes",IDC_STATIC_ORIG,11,128,69,12
+    RTEXT           "Display precision of distance data can be set in the General Options.",
+                    IDC_STATIC_DISPLAY,95,18,228,19
+END
+
+IDD_VIEWEDIT_PART DIALOG DISCARDABLE  0, 0, 140, 90
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "View Starting Point"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_EDIT_X,37,19,89,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_Y,37,39,89,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&OK",IDOK,26,69,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,83,69,50,14
+    LTEXT           "X",IDC_STATIC,17,20,13,14
+    LTEXT           "Y",IDC_STATIC,17,41,13,14
+    GROUPBOX        "Starting Point",IDC_STATIC,7,7,126,55
+END
+
+IDD_VIEWEDIT_LINE DIALOG DISCARDABLE  0, 0, 170, 90
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "View Line"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_EDIT_BEARING,67,19,89,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_DISTANCE,67,39,89,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&OK",IDOK,56,69,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,113,69,50,14
+    LTEXT           "Direction",IDC_STATIC,17,20,40,14
+    LTEXT           "Distance",IDC_STATIC,17,41,40,14
+    GROUPBOX        "Line Parameters",IDC_STATIC,7,7,156,55
+END
+
+IDD_TRANSFER DIALOG DISCARDABLE  0, 0, 195, 117
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Copy Attributes"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Save C&urrent Attributes as Original (Store in Database)",
+                    IDC_RADIO_CURRENTASORIG,"Button",BS_AUTORADIOBUTTON | 
+                    BS_MULTILINE,14,17,131,29
+    CONTROL         "Save &Stored Attributes as Current (Apply to Drawing)",
+                    IDC_RADIO_ORIGASCURRENT,"Button",BS_AUTORADIOBUTTON | 
+                    BS_MULTILINE,14,55,131,29
+    DEFPUSHBUTTON   "&OK",IDOK,81,96,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,138,96,50,14
+    ICON            IDI_TO_ORIGINAL,IDC_STATIC,155,20,21,20
+    ICON            IDI_TO_CURRENT,IDC_STATIC,155,58,21,20
+    GROUPBOX        "Action",IDC_STATIC,7,7,182,82
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_AVDLG_ICON          ICON    DISCARDABLE     "res\\icon1.ico"
+IDI_TO_ORIGINAL         ICON    DISCARDABLE     "res\\to_origi.ico"
+IDI_TO_CURRENT          ICON    DISCARDABLE     "res\\to_curre.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_ATTRIBUTEVIEW_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 323
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 242
+    END
+
+    IDD_VIEWEDIT_PART, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 133
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 83
+    END
+
+    IDD_VIEWEDIT_LINE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 163
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 83
+    END
+
+    IDD_TRANSFER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 188
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 110
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_AVCONTEXTMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "Context"
+    BEGIN
+        MENUITEM "&Edit...",                    ID_ITEM_EDIT
+        MENUITEM "&Delete",                     ID_ITEM_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "Append &Part before...",             ID_INSERT_PART
+        MENUITEM "Insert &Line before...",             ID_INSERT_LINE
+        MENUITEM "Insert &Curve before...",            ID_INSERT_CURVE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_ITEM_VIEW            "View record"
+    ID_ITEM_EDIT            "Edit record"
+    ID_INSERT_PART          "Append new part"
+    ID_INSERT_LINE          "Insert new line"
+    ID_INSERT_CURVE         "Insert new curve"
+    ID_ITEM_TRANSFER        "Copy attributes"
+    ID_ITEM_DELETE          "Delete records"
+    ID_ITEM_CLOSURE         "Get closure report"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_ERR_ZOMBIE          "The feature has segments that are not associated with a Start Point."
+    IDS_ERRPOLYLINE_TOOFEW  "The polyline feature does not have any segments."
+    IDS_ERRPOLYGON_TOOFEW   "The polygon feature does not have enough segments."
+    IDS_ERRPOLYGON_BEARING  "The polygon feature is invalid because the line bearings and chord bearings are all identical."
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\AttributeViewerDlg.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

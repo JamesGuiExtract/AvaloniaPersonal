@@ -1,0 +1,129 @@
+<html>
+
+<h2><b>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+
+IcoMap Grid Tool and Query Feature
+
+</tr>
+</table>
+</b></h2>
+<p>
+
+<ol>
+
+<li>
+To install the Grid Generator:
+<ul>
+<li>Copy <b>GridGenerator.dll</b> and <b>GridGenerator.ini</b> from the GridGenerator folder ( parallel to IcoMapForArcGIS ) to the CommonComponents folder.</li>
+<li>Open ArcMap and select <b>Customize...</b> from the Tools menu.</li>
+<li>Click <b>Add from file...</b> and browse to GridGenerator.dll.</li>
+<li>Note <b>DrawGrid</b> and <b>QueryFeature</b> as Added Objects.</li>
+<li>Click the <b>Commands</b> tab and select the <b>Extract Tools</b> category.</li>
+<li>Individually drag the <b>DrawGrid</b> and <b>QueryFeature</b> items to the Extract Systems Tools toolbar.</li>
+<li>Close the <b>Customize...</b> tool.</li>
+</ul>
+</li>
+<HR>
+<p>
+
+<li>
+Testing Grid Generator licensing:
+<ul>
+<li>Create an IcoMap license file that does not include Grid Generator or Query Feature Tool.</li>
+<li>Open ArcMap.</li>
+<li>Confirm that both new tools are disabled on the Extract Systems Tools toolbar.</li>
+<li>Confirm that both new tools include <b>(Not Licensed)</b> within their tooltips.</li>
+<li>Close ArcMap.</li>
+<li>Create an IcoMap license file that includes both Grid Generator and Query Feature Tool.</li>
+<li>Open ArcMap.</li>
+<li>Confirm that both new tools are still disabled on the Extract Systems Tools toolbar.</li>
+<li>Confirm that both new tools do <b>not</b> include (Not Licensed) within their tooltips.</li>
+</ul>
+</li>
+<HR>
+<p>
+
+<li>
+Testing Grid Generator operation:
+<ul>
+<li>Open ArcMap.</li>
+<li>Click the <b>Add Data</b> button.</li>
+<li>Navigate to and select the <b>TestGrid.mdb</b> database, selecting all of the features.</li>
+<li>Edit <b>GridGenerator.ini</b> so that the Layer names match those just added from TestGrid.mdb.</li>
+<li>Close GridGenerator.ini and start editing.</li>
+<li>Select the <b>Sections</b> layer and the ArcMap <b>Sketch</b> tool.</li>
+<li>Draw a shape with four sides and finish the sketch.</li>
+<li>Select the ArcMap <b>Edit</b> tool and the newly created feature.</li>
+<li>Click on the IcoMap <b>Draw Grid</b> tool.</li>
+<li>Fill in County Code, Section, Township, and Range with numbers.  Township Direction and Range Direction can be modified if desired.</li>
+<li>Click the <b>Create Features</b> button.</li>
+<li>Confirm that squares are drawn for all layers.</li>
+</ul>
+</li>
+<HR>
+<p>
+
+<li>
+Testing Query Feature operation with Quarter_Sections:
+<ul>
+<li>Uncheck all layers except for <b>Quarter_Sections</b>.</li>
+<li>Use the ArcMap <b>Edit</b> tool to select each of the four quadrants.</li>
+<li>Click the ArcMap <b>Attributes</b> button and confirm that the <b>Quarter</b> values are: NE = 1, NW = 2, SE = 3, SW = 4.</li>
+<li>Click on the IcoMap <b>Query Feature</b> tool.</li>
+<li>Fill in County Code, Section, Township, and Range with the same numbers used before.  Select the <b>Quarter_Sections</b> layer.</li>
+<li>Test each of { 1, 2, 3, 4 } for Quarter_Section and click the Query button.</li>
+<li>Confirm that the appropriate square is selected for each Quarter_Section.</li>
+</ul>
+</li>
+<HR>
+<p>
+
+<li>
+Testing Query Feature operation with Quarter_Quarter_Sections:
+<ul>
+<li>Uncheck all layers except for <b>Quarter_Quarter_Sections</b>.</li>
+<li>Use the ArcMap <b>Edit</b> tool to select one of the sub-quadrants.</li>
+<li>Click the ArcMap <b>Attributes</b> button and confirm that for the NE Quarter, the <b>Quarter_Quarter</b> values are: NE = 11, NW = 21, SE = 31, SW = 41 for the appropriate sub-quadrants.</li>
+<li>Click on the IcoMap <b>Query Feature</b> tool.</li>
+<li>Fill in County Code, Section, Township, and Range with the same numbers used before.  Select the <b>Quarter_Quarter_Sections</b> layer.</li>
+<li>Test each of { 1x, 2x, 3x, 4x } for Quarter_Quarter_Section where x defines one of the Quarter sections ( i.e. 44 = SW corner of the SW Quarter ), and click the Query button.</li>
+<li>Confirm that the appropriate square is selected for each Quarter_Quarter_Section.</li>
+</ul>
+</li>
+<HR>
+<p>
+
+<li>
+Testing Query Feature operation with Quarter_Quarter_Quarter_Sections and QQQQ:
+<ul>
+<li>Follow the above instructions except for using Quarter_Quarter_Quarter_Sections.</li>
+<li>Confirm that the numbering scheme { 1xy, 2xy, 3xy, 4xy } remains correct for the sub-sub-quadrants.</li>
+</ul>
+<p>
+<ul>
+<li>Follow the above instructions except for using QQQQ.</li>
+<li>Confirm that the numbering scheme { 1xyz, 2xyz, 3xyz, 4xyz } remains correct for the sub-sub-sub-quadrants.</li>
+</ul>
+</li>
+<HR>
+<p>
+
+<li>
+Close ArcMap.
+<p>
+</li>
+<HR>
+<p>
+
+
+
+</ol>
+<p>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+The location of the files and any common instructions can be found <A HREF="common.html" TARGET="_blank">here</A>.
+</tr>
+</table>
+</html>

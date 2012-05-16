@@ -1,0 +1,1 @@
+2,3,2,Bearing:N32E,Distance:55,2,Bearing:N33E,Distance:56,2,Bearing:N34dE,Distance:57,3,2,Bearing:N35E,Distance:58,2,Bearing:N36E,Distance:59,2,Bearing:N37dE,Distance:60

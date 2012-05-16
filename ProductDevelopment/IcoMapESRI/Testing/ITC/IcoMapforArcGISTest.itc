@@ -1,0 +1,67 @@
+test1-1,Printing from the Highlighted Text dialog,legaltext1.html
+test1-2,Read-only files in the Legal Text dialog,legaltext2.html
+test1-3,Draw a parcel using the legal text window,legaltext3.html
+test1-4,Copy paste append,legaltext4.html
+test1-5,Non ASCII files e.g. .doc files- .rtf files- etc.,legaltext5.html
+test1-6,Hyperlinks and select features,legaltext6.html
+test1-7,Document source linking is off,legaltext7.html
+test1-8,Highlight finder,legaltext8.html
+test1-9,'Open' history for the Highlighted text window,legaltext9.html
+
+test2-1,Various functionalities associated with the Spot Recognition dialog,imagerecognition1.html
+test2-2,Editing highlights,imagerecognition2.html
+test2-3,Deleting highlights,imagerecognition3.html
+test2-4,Recognize text in a window,imagerecognition4.html
+test2-5,Recognize text in a polygon,imagerecognition10.html
+test2-6,Recognize current page,imagerecognition11.html
+test2-7,Opening multiple instances of the same image.,imagerecognition5.html
+test2-8,Zoom and pan tools.,imagerecognition6.html
+test2-9,Rotate image,imagerecognition7.html
+test2-10,Crop image into new window,imagerecognition8.html
+test2-11,Most-Recent-Used file list,imagerecognition9.html
+test2-12,Linked documents and unsaved files,UnsavedFiles.html
+
+test3-1,10 key,cogo1.html
+test3-2,Regular COGO,cogo2.html
+test3-3,Not duplicate characters for different directions.,cogo3.html
+test3-4,Enter for last value,cogo4.html
+test3-5,Reverse mode,reversemode1.html
+test3-6,Drawing in Azimuths,Azimuths.html
+test3-7,Drawing in Polar Angles,Polar.html
+test3-8,Drawing using deflection Angles,Deflection.html
+test3-9,Drawing using Internal Angles,Internal.html
+test3-10,C-Pen functionallity,c-pen.html
+
+test4-1,Multi-page tif basics,multipage1.html
+test4-2,Drawing and saving highlights with multi-page images.,multipage2.html
+
+test5-1,Customizing a curve tool,customcurves1.html
+test5-2,Resetting a curve tool to the original parameters,customcurves2.html
+test5-3,Drawing a custom curve,customcurves3.html
+
+test6-1,Delete Sketch,deletesketch1.html
+test6-2,Feature Attributes,featureattributes1.html
+
+test7-1,Installing the typical product,installation1.html
+test7-2,Installing the compact version,installation2.html
+test7-3,Custom installation,installation3.html
+
+test8-1,Node locked,licensing1.html
+test8-2,Floating,licensing2.html
+test8-3,Evaluation License (no hardware lock),licensing3.html
+test8-4,Licensing errors,licensingerrors.html
+
+test9-1,command history checklist,misc1.html
+test9-2,Tooltips and Accelerators checklist,misc2.html
+test9-3,Other things to check,misc3.html
+test9-4,Command Shortcuts,misc4.html
+test9-5,Command Shortcuts and restoring the defaults,misc5.html
+
+test10-1,Cut Polygon Features,XEditTasks1.html
+test10-2,Extend/Trim Features,XEditTasks2.html
+test10-3,Modify Feature,XEditTasks3.html
+test10-4,Auto-Complete Polygon,XEditTasks4.html
+test10-5,Select Features Using a Line,XEditTasks5.html
+test10-6,Select Features Using an Area,XEditTasks6.html
+test10-7,Create 2-Point Line Features,XEditTasks7.html
+

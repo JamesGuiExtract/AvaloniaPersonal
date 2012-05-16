@@ -1,0 +1,81 @@
+<html>
+
+<HEAD>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<h2><b>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+
+Customizing a curve tool
+
+</tr>
+</table>
+</b></h2>
+<p>
+
+<ol>
+
+<li>
+Open the 'Curve Genie' tool.<p>
+
+The 'Curve Genie' dialog box should appear.
+</li>
+<HR>
+<p>
+
+<li>
+Set the 3 parameters to Radial in bearing, Delta angle and Radius.  Click the 'Save As…' button. <p>
+
+The 'Save As Curve' dialog box should appear.
+</li>
+<HR>
+<p>
+
+<li>
+Select the radio button next to curve 8 and click 'OK'. <p>
+
+The parameters defined in step 2 should get saved to the curve definition for curve #8 in the registry.  The 'Save As Curve' dialog should disappear.
+</li>
+<HR>
+<p>
+
+<li>
+Click the 'Close' button. <p>
+
+The 'Curve Genie' dialog should disappear.
+</li>
+<HR>
+<p>
+
+<li>
+Draw a curve using curve 8 on a line layer.  Use the following parameters:
+<br>Radial in bearing - n72d14'22"e
+<br>Delta - 76d45'12"
+<br>Radius - 127.85
+<br>Make it concave to the right. <p>
+
+The curve should get drawn in ArcGIS.
+<br><I><b>NOTE: </I></b>The tooltip and the text next to the button should say "&LTRadial in bearing&GT&LTDelta&GT&LTRadius&GT"
+</li>
+<HR>
+<p>
+
+<li>
+Click the 'Finish Sketch' button. <p>
+The curve should get written to the database.  The length should be ~171.27'
+</li>
+<HR>
+<p>
+
+
+
+</ol>
+<p>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+The location of the files and any common instructions can be found <A HREF="common.html" TARGET="_blank">here</A>.
+</tr>
+</table>
+</html>

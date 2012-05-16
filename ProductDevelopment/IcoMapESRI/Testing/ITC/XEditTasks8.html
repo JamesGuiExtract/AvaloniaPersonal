@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+
+<HEAD>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<h2><b>
+<table WIDTH="100%">
+<tr BGCOLOR="#DCDCDC">
+
+Modify Feature Using DIG
+
+</tr>
+</table>
+</b></h2>
+<p>
+
+
+<ol>
+
+<li>Open IcoMap with an empty map.  Use AddData to open the <b>Sample2.mdb</b> 
+geodatabase within the Tutorial folder.  Select 'Line' and 'Polygon'.
+<hr>
+<p>
+
+<li>Change the Map Scale to <b>1:5000</b>.  Click the IcoMap toolbar button 
+and start editing within a Polygon layer.
+<hr>
+<p>
+
+<li>Open a Highlighted Text Window and open the <b>saybrook_legal.txt</b> file.
+<hr>
+<p>
+
+<li>Select a starting point and draw the entire parcel without finishing the sketch.  The error distance shown in the IcoMap status bar should be <b>0.00 FEET</b>.  The purpose of the following steps is to exercise in-place editing, swiping, and the context menu for the DIG.
+<hr>
+<p>
+
+<li>From the context menu, duplicate segment #2.  The error distance shown in the IcoMap status bar should be <b>112.47 FEET</b>.
+<hr>
+<p>
+
+<li>From the context menu, move the new segment (now #3) down.  The error distance shown in the IcoMap status bar should be <b>112.47 FEET</b>.
+<hr>
+<p>
+
+<li>Edit the distance value of segment #4 to 52.47.  The error distance shown in the IcoMap status bar should be <b>52.47 FEET</b>.
+<hr>
+<p>
+
+<li>Edit the distance value of segment #2 to 60.00.  The error distance shown in the IcoMap status bar should be <b>0.00 FEET</b>.
+<hr>
+<p>
+
+<li>Drag segment #2 down one row.  The error distance shown in the IcoMap status bar should remain <b>0.00 FEET</b>.
+<hr>
+<p>
+
+<li>Drag the new segment #2 down two rows.  The error distance shown in the IcoMap status bar should remain <b>0.00 FEET</b>.  Also, the parcel should return to
+its original shape.
+<hr>
+<p>
+
+<li>From the context menu, duplicate the curve element (segment #5).  
+The error distance shown in the IcoMap status bar should be <b>60.00 FEET</b>.
+<hr>
+<p>
+
+<li>Edit the Chord Length of the first curve to be 30.00.  The error distance shown in the IcoMap status bar should be <b>30.00 FEET</b>.
+<hr>
+<p>
+
+<li>Select the Chord Length of the second curve and click the <b>30 foot</b> item in the 
+text file.  Navigate to another row to finalize the change.  The error distance shown in the IcoMap status bar should be <b>0.00 FEET</b>.
+<hr>
+<p>
+
+<li>Edit the Chord Bearing of the first curve from <b>S47D41'18"W</b> to <b>S41D47'18"W</b>.  The error distance shown in the IcoMap status bar should be <b>3.08 FEET</b>.
+<hr>
+<p>
+
+<li>Correct the recently changed Chord Bearing by clicking the appropriate text in the 
+Text Window.  The error distance shown in the IcoMap status bar should be <b>0.00 FEET</b>.
+<hr>
+<p>
+
+<li>Stop editing without saving the changes.
+<HR>
+<p>
+
+</ol>
+
+<p>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+The location of the files and any common instructions can be found <A HREF="common.html" TARGET="_blank">here</A>.
+</tr>
+</table>
+
+</html>

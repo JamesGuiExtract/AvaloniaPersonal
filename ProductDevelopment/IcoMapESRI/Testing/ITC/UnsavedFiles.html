@@ -1,0 +1,114 @@
+<html>
+
+<HEAD>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<h2><b>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+
+Linked documents and unsaved files
+
+</tr>
+</table>
+</b></h2>
+<p>
+
+<ol>
+
+<li>
+Go to the 'General' tab in the 'IcoMap Options' dialog box and check the option to enable automatic source document linking. Click the 'OK' button to accept the change.
+<P>
+The option will be enabled and the 'IcoMap Options' dialog box will disappear. 
+</li>
+<HR>
+<p>
+
+
+<li>
+Click on the 'New Image Recognition Window' button.<p>
+
+IcoMap opens a new 'Image Recognition' dialog and brings up the 'Open' dialog box right away.
+</li>
+<HR>
+<p>
+
+<li>
+Select the file <i><b>Unsaved.tif</i></b> and click the 'open' button. <p>
+
+IcoMap opens the associated image.
+</li>
+<HR>
+<p>
+
+<li>
+Use the 'Recognize Text in Window' tool and draw a window around the legal description.  <p>
+
+The area you windowed should get recognized and output to a new 'Legal Text' window.
+</li>
+<HR>
+<p>
+
+<li>
+Draw the parcel described in the text window
+<P>
+As you pick on line and curve data, the lines should get drawn to the ArcMap environment. The highlights that are selected will also change to red.
+</li>
+<HR>
+<p>
+
+<li>
+Finish the sketch.
+<P>
+The lines and curves you drew should get written to the ArcGIS geodatabase and the newly created shape will be selected. 
+</li>
+<HR>
+<p>
+
+<li>
+Click on the ArcMap 'Identify' button then select the parcel you just created.
+<P>
+ArcMap's 'Identify Results' dialog box should appear 
+</li>
+<HR>
+<p>
+
+<li>
+Right click on the feature in the left hand window in the 'Identify Results' dialog box.
+<P>
+There should be a 'Hyperlinks' option in the floating menu.
+You will notice that the .tif image is listed and not the text file you drew the parcel 
+from.  This is because the text file was not saved.  This is a change in IcoMap.  Now 
+instead of telling the user that the document won't be linked to the feature unless the 
+file is saved it records the parent file (the image name in this case) if available.
+</li>
+<HR>
+<p>
+
+
+<li>
+Click the 'Close' (X) button in the 'Legal Text' window without saving the file. <p>
+
+IcoMap should close the 'Legal Text' window.
+</li>
+<HR>
+<p>
+
+<li>
+Click the 'Close' (X) button in the 'Image Recognition' window.<p>
+
+IcoMap should close the 'Image Recognition' window.
+</li>
+<HR>
+<p>
+
+
+</ol>
+<p>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+The location of the files and any common instructions can be found <A HREF="common.html" TARGET="_blank">here</A>.
+</tr>
+</table>
+</html>

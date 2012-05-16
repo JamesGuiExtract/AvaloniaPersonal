@@ -1,0 +1,26 @@
+HKCR
+{
+	IcoMapApp.IcoMapInputContext.1 = s 'IcoMapInputContext Class'
+	{
+		CLSID = s '{6E02F5B6-3928-47AD-A2E4-9832D991FEC5}'
+	}
+	IcoMapApp.IcoMapInputContext = s 'IcoMapInputContext Class'
+	{
+		CLSID = s '{6E02F5B6-3928-47AD-A2E4-9832D991FEC5}'
+		CurVer = s 'IcoMapApp.IcoMapInputContext.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {6E02F5B6-3928-47AD-A2E4-9832D991FEC5} = s 'IcoMapInputContext Class'
+		{
+			ProgID = s 'IcoMapApp.IcoMapInputContext.1'
+			VersionIndependentProgID = s 'IcoMapApp.IcoMapInputContext'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{63B908D8-4D69-4408-8298-36D3645DE17B}'
+		}
+	}
+}

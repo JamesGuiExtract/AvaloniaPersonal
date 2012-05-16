@@ -1,0 +1,110 @@
+<html>
+
+<h2><b>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+
+IcoMap - Advanced Concurrent Licensing
+
+</tr>
+</table>
+</b></h2>
+<p>
+
+<ol>
+
+<li>
+Prepare two separate IcoMap test machines (<b>A</b> and <b>B</b>).  Each machine should be configured for a concurrent license.<p>
+
+Confirm that the USB key contains exactly one IcoMap license.
+</li>
+<HR>
+<p>
+
+<li>
+Start ArcMap on <b>A</b>.
+<p>
+Confirm that IcoMap starts without error.  Confirm that the Extensions dialog (from Tools menu) includes <b>Extract Systems IcoMap</b> and that the entry is checked.  Close ArcMap on <b>A</b>.
+</li>
+<HR>
+<p>
+
+<li>
+Start ArcMap on <b>B</b>.
+<p>
+Confirm that IcoMap starts without error.  Confirm that the Extensions dialog (from Tools menu) includes <b>Extract Systems IcoMap</b> and that the entry is checked.  Do not close ArcMap on <b>B</b>.
+</li>
+<HR>
+<p>
+
+<li>
+Remove the USB key.
+<p>
+Confirm that IcoMap can no longer be used and that a meaningful error is provided.  Confirm that the <b>Extract Systems IcoMap</b> entry in the Extensions dialog is unchecked.  Close ArcMap on <b>B</b>.
+</li>
+<HR>
+<p>
+
+<li>
+Replace the USB key.  Start ArcMap on <b>B</b>.  Do not start IcoMap.
+<p>
+Confirm that the <b>Extract Systems IcoMap</b> entry in the Extensions dialog is unchecked.  Do not close ArcMap on <b>B</b>.
+</li>
+<HR>
+<p>
+
+<li>
+Start IcoMap on <b>B</b> from the IcoMap toolbar button.
+<p>
+Confirm that IcoMap starts without error.  Confirm that the <b>Extract Systems IcoMap</b> entry in the Extensions dialog is checked.  Do not close ArcMap on <b>B</b>.
+</li>
+<HR>
+<p>
+
+<li>
+<b>[P10 #3107]</b> Start ArcMap on <b>A</b>.
+<p>
+Confirm that ArcMap starts without error and that the <b>Extract Systems IcoMap</b> entry in the Extensions dialog is unchecked.  Do not close ArcMap on <b>A</b>.</li>
+<HR>
+<p>
+
+<li>
+Attempt to check the <b>Extract Systems IcoMap</b> entry in the Extensions dialog on <b>A</b>.
+<p>
+Confirm that the <b>Extract Systems IcoMap</b> entry in the Extensions dialog remains unchecked.  Confirm that a meaningful error message is provided.  Do not close ArcMap on <b>A</b>.<p>
+
+<b>[P10: #3111]</b> Confirm that the ArcMap Arrow tool is selected.
+</li>
+<HR>
+<p>
+
+<li>
+Uncheck the <b>Extract Systems IcoMap</b> entry in the Extensions dialog on <b>B</b>.
+<p>
+Confirm that the <b>Extract Systems IcoMap</b> entry in the Extensions dialog on <b>A</b> can be checked.  Close ArcMap on <b>A</b>.  Do not close ArcMap on <b>B</b>.
+</li>
+<HR>
+<p>
+
+<li>
+Start ArcMap on <b>A</b>.
+<p>
+Confirm that the <b>Extract Systems IcoMap</b> entry in the Extensions dialog is checked.  Confirm that IcoMap cannot be started on <b>B</b>.</li>
+<HR>
+<p>
+
+<li>
+Close ArcMap on <b>A</b>. Close ArcMap on <b>B</b>.
+<p>
+<HR>
+<p>
+
+
+</ol>
+<p>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+The location of the files and any common instructions can be found <A HREF="common.html" TARGET="_blank">here</A>.
+</tr>
+</table>
+</html>

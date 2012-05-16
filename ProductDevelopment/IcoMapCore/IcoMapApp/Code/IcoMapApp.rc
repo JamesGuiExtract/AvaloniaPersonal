@@ -1,0 +1,785 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""IcoMapApp.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,5,0,0
+ PRODUCTVERSION 2,0,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName", "UCLID Software"
+            VALUE "FileDescription", "IcoMapApp Module"
+            VALUE "FileVersion", "1, 5, 0, 0"
+            VALUE "InternalName", "IcoMapApp"
+            VALUE "LegalCopyright", "Copyright UCLID Software, 2000-2001, All rights reserved."
+            VALUE "OriginalFilename", "IcoMapApp.DLL"
+            VALUE "ProductName", "IcoMapApp Module"
+            VALUE "ProductVersion", "2, 0, 0, 0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_ICOMAPCTL           REGISTRY                "IcoMapCtl.rgs"
+IDR_ICOMAPINPUTCONTEXT  REGISTRY                "IcoMapInputContext.rgs"
+IDR_ICOMAPCOMMANDRECOGNIZER REGISTRY                "IcoMapCommandRecognizer.rgs"
+IDR_NOTHINGINPUTVALIDATOR REGISTRY                "NothingInputValidator.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BMP_Not             BITMAP                  "res\\bmpNOT.bmp"
+IDB_BMP_Check           BITMAP                  "res\\bmpCHK.bmp"
+IDB_BITMAP_SPLASH       BITMAP                  "res\\Ico_for_Arc_splash2.bmp"
+IDR_TOOLBAR_ICOMAP      BITMAP                  "res\\toolbar_.bmp"
+IDB_BMP_LINE            BITMAP                  "res\\bmpLine.bmp"
+IDB_BMP_Curve1          BITMAP                  "res\\bmpCrv1.bmp"
+IDB_BMP_Curve2          BITMAP                  "res\\bmpCrv2.bmp"
+IDB_BMP_Curve3          BITMAP                  "res\\bmpCrv3.bmp"
+IDB_BMP_Curve8          BITMAP                  "res\\bmpCrv8.bmp"
+IDB_BMP_Curve5          BITMAP                  "res\\bmpCrv5.bmp"
+IDB_BMP_Curve6          BITMAP                  "res\\bmpCrv6.bmp"
+IDB_BMP_Curve7          BITMAP                  "res\\bmpCrv7.bmp"
+IDB_BMP_Curve4          BITMAP                  "res\\bmpCrv4.bmp"
+IDB_BMP_GENIE           BITMAP                  "res\\bmpGenie.bmp"
+IDB_BMP_Reverse         BITMAP                  "res\\bmpRev.bmp"
+IDB_BMP_Right           BITMAP                  "res\\bmpRight.bmp"
+IDB_BMP_GT180           BITMAP                  "res\\bmpGT180.bmp"
+IDB_BMP_LINE_ANGLE      BITMAP                  "res\\bitmapLineAngle.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DLG_IcoMap DIALOGEX 0, 0, 292, 58
+STYLE DS_SETFONT | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_CONTROLPARENT
+CAPTION "IcoMap"
+MENU IDR_MNU_ICOMAP
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT_Input,0,45,292,13,ES_AUTOHSCROLL
+    CONTROL         "Custom1",IDC_RW_DIG,"GXWND",WS_BORDER | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP,0,1,292,42
+    CTEXT           "The Dynamic Input Grid is not available because the sketch was \r\nmodified by an external tool.\r\n\r\nYou can continue to use IcoMap without the Dynamic Input Grid.",IDC_DSTEXT,1,1,290,34,NOT WS_VISIBLE
+END
+
+IDD_GENERAL_SETTINGS DIALOGEX 0, 0, 256, 121
+STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+CAPTION "General"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    CONTROL         "&Enable automatic source document linking to every feature created",IDC_CHECK_AUTO_LINKING_SRCDOC,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,13,230,16
+    EDITTEXT        IDC_EDIT_PRECISION,12,51,25,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Spin1",IDC_SPIN_PRECISION,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,29,52,11,16
+    LTEXT           "Number of decimal digits to display in Feature Attributes.",IDC_STATIC,40,53,184,13
+    COMBOBOX        IDC_CMB_UNIT_TYPE,87,74,98,57,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Default distance unit",IDC_STATIC,12,76,72,8
+    CONTROL         "Create a field in database table for storing original feature attributes",IDC_CHECK_CREATE_ICOMAPATTR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,32,225,10
+    EDITTEXT        IDC_EDIT_PDF_RESOLUTION,12,93,25,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "X and Y resolution in dots per inch for loading PDF images",IDC_STATIC,40,95,200,13
+END
+
+IDD_KEYBOARD_SETTINGS DIALOG  0, 0, 363, 149
+STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+CAPTION "Bearing Direction Shortcuts"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Give an alphanumeric character ( excluding N, E, S, W ) to each of the following Bearing directions**:",IDC_STATIC_HEADER,10,17,319,13
+    EDITTEXT        IDC_EDIT_NW,145,45,15,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_N,164,45,15,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_NE,183,45,15,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_W,145,60,15,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_E,183,60,15,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SW,145,76,15,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_S,164,76,15,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SE,183,76,15,12,ES_AUTOHSCROLL
+    LTEXT           "N",IDC_STATIC_N,170,35,8,8
+    LTEXT           "W",IDC_STATIC_W,131,62,8,11
+    LTEXT           "S",IDC_STATIC_S,170,90,8,8
+    LTEXT           "E",IDC_STATIC_E,203,62,8,11
+    LTEXT           "NW",IDC_STATIC_NW,127,36,14,8
+    LTEXT           "NE",IDC_STATIC_NE,201,36,11,8
+    LTEXT           "SW",IDC_STATIC_SW,127,89,14,11
+    LTEXT           "SE",IDC_STATIC_SE,201,89,12,11
+    LTEXT           "** These shortcuts can only be applied if Direction is defined as Bearing ( from Direction/Angle Definition tab ).",IDC_STATIC_NOTE,7,109,350,13
+END
+
+IDD_DLG_CurveWizard DIALOG  0, 0, 237, 102
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Curve Genie"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "&Draw",IDOK,180,18,50,14
+    PUSHBUTTON      "&Save As . . .",IDC_BTN_SaveAs,180,39,50,14
+    PUSHBUTTON      "&Reset . . .",IDC_BTN_Reset,180,60,50,14
+    PUSHBUTTON      "&Close",IDCANCEL,180,81,50,14
+    COMBOBOX        IDC_CBN_Parameter1,20,20,150,90,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CBN_Parameter2,20,50,150,90,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CBN_Parameter3,20,80,150,90,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "I wish to draw a curve using these 3 parameters:",IDC_STATIC,19,10,153,8
+    LTEXT           "1.",IDC_STATIC,7,22,8,8
+    LTEXT           "2.",IDC_STATIC,7,52,8,8
+    LTEXT           "3.",IDC_STATIC,7,83,8,8
+END
+
+IDD_DLG_CurveWizardReset DIALOGEX 0, 0, 121, 161
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Reset Curves"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Select &All",IDC_BTN_SelectAll,7,119,107,14
+    CONTROL         "",IDC_CHK_Curve1,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_TABSTOP,7,10,30,24,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_CHK_Curve2,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_TABSTOP,7,38,30,24,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_CHK_Curve3,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_TABSTOP,7,66,30,24,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_CHK_Curve4,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_TABSTOP,7,94,30,24,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_CHK_Curve5,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_TABSTOP,68,10,30,24,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_CHK_Curve6,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_TABSTOP,68,38,30,24,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_CHK_Curve7,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_TABSTOP,68,66,30,24,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_CHK_Curve8,"Button",BS_AUTOCHECKBOX | BS_BITMAP | WS_TABSTOP,68,94,30,24,WS_EX_TRANSPARENT
+    DEFPUSHBUTTON   "&OK",IDOK,7,140,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,64,140,50,14
+END
+
+IDD_DLG_CurveWizardSaveAs DIALOGEX 0, 0, 121, 143
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Save As Curve"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "Curve1",IDC_RADIO_Curve1,"Button",BS_AUTORADIOBUTTON | BS_BITMAP | WS_GROUP,7,10,30,24,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_RADIO_Curve2,"Button",BS_AUTORADIOBUTTON | BS_BITMAP,7,38,30,24,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_RADIO_Curve3,"Button",BS_AUTORADIOBUTTON | BS_BITMAP,7,65,30,24,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_RADIO_Curve4,"Button",BS_AUTORADIOBUTTON | BS_BITMAP,7,94,30,24,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_RADIO_Curve5,"Button",BS_AUTORADIOBUTTON | BS_BITMAP,68,10,30,24,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_RADIO_Curve6,"Button",BS_AUTORADIOBUTTON | BS_BITMAP,68,38,30,24,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_RADIO_Curve7,"Button",BS_AUTORADIOBUTTON | BS_BITMAP,68,66,30,24,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_RADIO_Curve8,"Button",BS_AUTORADIOBUTTON | BS_BITMAP,68,94,30,24,WS_EX_TRANSPARENT
+    DEFPUSHBUTTON   "&OK",IDOK,7,122,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,64,122,50,14
+END
+
+IDD_DLG_HELP_ABOUT DIALOGEX 0, 0, 267, 146
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About IcoMap For ArcGIS"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "Close",IDOK,210,5,50,14
+    LTEXT           "IcoMap for ArcGIS\nCopyright© 1999 onward.  All rights reserved.\nExtract Systems, Madison, WI 53719",IDC_STATIC,5,5,190,25
+    EDITTEXT        IDC_EDIT_VERSION,5,120,145,15,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "&Version",IDC_STATIC,5,110,145,8
+    LTEXT           "UCLID, the UCLID logo, IcoMap, Mathematical Content Recognition, MCR, and Text-to-Vector are trademarks of Extract Systems.  ArcGIS is a registered trademark of ESRI Corporation. Windows is a registered trademark of Microsoft Corporation.",IDC_STATIC,5,35,255,35
+    LTEXT           "Mathematical Content Recognition, Text-to-Vector, and related technologies are protected by U.S. Patent #5,761,328.  Related U.S. and foreign patents pending.",IDC_STATIC,5,70,255,20
+    LTEXT           "Portions of the product use technologies licensed from Nuance Communications, Inc., and Lead Technologies, Inc.",IDC_STATIC,5,90,255,20
+END
+
+IDD_DLG_SelectFeatures DIALOG  0, 0, 275, 66
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Select Features"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_EDIT_SOURCE_DOC,7,21,243,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BTN_BROWSE,252,21,15,14
+    DEFPUSHBUTTON   "&OK",IDOK,160,46,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,217,46,50,14
+    LTEXT           "Select features associated with the following source document (hyperlink):",IDC_STATIC,7,6,242,12
+END
+
+IDD_LM_SETTINGS DIALOG  0, 0, 292, 178
+STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+CAPTION "License Management"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "&Node locked",IDC_RADIO_NODE_LOCKED,"Button",BS_AUTORADIOBUTTON | WS_GROUP,20,20,70,10
+    CONTROL         "&Concurrent license",IDC_RADIO_FLOATING,"Button",BS_AUTORADIOBUTTON | BS_MULTILINE,20,50,65,20
+    CONTROL         "&Evaluation license",IDC_RADIO_EVALUATION,"Button",BS_AUTORADIOBUTTON | BS_MULTILINE,20,110,65,20
+    EDITTEXT        IDC_EDIT_NAMING_SERVICE_IORFILE,33,86,220,15,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BUTTON_BROWSE,260,86,15,15
+    EDITTEXT        IDC_EDIT_EVALUATION,33,146,220,15,ES_AUTOHSCROLL
+    GROUPBOX        "Current License Management Mode",IDC_STATIC,10,5,275,166
+    LTEXT           "If you select this option, IcoMap will look for a hardware lock attached to this machine to validate licenses.",IDC_STATIC,100,20,175,15
+    LTEXT           "If you select this option, IcoMap will validate your license through a UCLID Concurrent License Manager installed somewhere on your network.",IDC_STATIC,100,50,175,25
+    LTEXT           "Naming Service configuration file",IDC_STATIC,33,76,125,10
+    LTEXT           "Please call UCLID Software (877-778-2543) to find out the proper activation code for the evaluation version of IcoMap.",IDC_STATIC,101,110,175,25
+    LTEXT           "Activation code",IDC_STATIC,33,136,60,10
+END
+
+IDD_SHORTCUT_SETTINGS DIALOG  0, 0, 318, 138
+STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+CAPTION "Command Shortcuts"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_EDIT_CURVE1,45,9,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_CURVE2,45,23,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_CURVE3,45,37,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_CURVE4,45,51,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_CURVE5,45,65,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_CURVE6,45,79,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_CURVE7,45,93,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_CURVE8,45,107,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_LINE,188,9,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_LINE_ANGLE,188,23,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_CUSTOM,188,37,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_RIGHT,188,51,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_LEFT,188,65,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_LESS,188,79,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_GREATER,188,93,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_FORWARD,188,107,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_REVERSE,289,9,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_FINISHSKETCH,289,23,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_FINISHPART,289,37,20,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_DELETESKETCH,289,51,20,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Restore Defaults",IDC_BUTTON_RESTORE,224,107,86,15
+    LTEXT           "Curve #1",IDC_STATIC,6,11,35,12
+    LTEXT           "Curve #2",IDC_STATIC,6,25,35,12
+    LTEXT           "Curve #3",IDC_STATIC,6,39,35,12
+    LTEXT           "Curve #4",IDC_STATIC,6,53,35,12
+    LTEXT           "Curve #5",IDC_STATIC,6,67,35,12
+    LTEXT           "Curve #6",IDC_STATIC,6,81,35,12
+    LTEXT           "Curve #7",IDC_STATIC,6,95,35,12
+    LTEXT           "Curve #8",IDC_STATIC,6,109,35,12
+    LTEXT           "Line (Direction)",IDC_STATIC,84,11,54,12
+    LTEXT           "Custom Curve",IDC_STATIC,84,39,52,12
+    LTEXT           "Concave Right",IDC_STATIC,84,53,55,12
+    LTEXT           "Concave Left",IDC_STATIC,84,67,50,12
+    LTEXT           "Delta < 180°",IDC_STATIC,84,81,46,12
+    LTEXT           "Delta > 180°",IDC_STATIC,84,95,46,12
+    LTEXT           "Forward Direction",IDC_STATIC,84,109,60,12
+    LTEXT           "Reverse Direction",IDC_STATIC,225,11,60,12
+    LTEXT           "Finish Sketch",IDC_STATIC,225,25,60,12
+    LTEXT           "Finish Part",IDC_STATIC,225,39,60,12
+    LTEXT           "Delete Sketch",IDC_STATIC,225,53,60,12
+    LTEXT           "A slash character ( '/' ) is required before each command shortcut.",IDC_STATIC,225,80,86,26
+    LTEXT           "Line (Internal/Deflection Angle)",IDC_STATIC,84,25,99,12
+END
+
+IDD_DLG_DIRECTION_SETTINGS DIALOG  0, 0, 245, 146
+STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+CAPTION "Direction/Angle Definition"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "&Bearing (e.g. N23deg34min43secW)",IDC_RADIO_Bearing,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,14,17,217,13
+    CONTROL         "&Angle in degrees (e.g. 12d23m34s, 87degrees, 36, 45.25, etc.)",IDC_RADIO_Angle,
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,14,33,217,13
+    CONTROL         "&Polar Angle ( 0° = East, increases counter-clockwise )",IDC_RADIO_PolarAngle,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,37,47,192,13
+    CONTROL         "A&zimuth ( 0° = North, increases clockwise )",IDC_RADIO_Azimuth,
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,37,61,187,13
+    CONTROL         "&Deflection Angle",IDC_RADIO_Deflection,"Button",BS_AUTORADIOBUTTON | WS_GROUP,14,103,76,11
+    CONTROL         "&Internal Angle",IDC_RADIO_Internal,"Button",BS_AUTORADIOBUTTON,14,118,78,12
+    GROUPBOX        "Specify Direction ( For Line Tool ) As",IDC_STATIC,7,7,231,73
+    GROUPBOX        "Specify Angle ( For Internal/Deflection Angle Line Tool ) As",IDC_STATIC,7,90,231,49
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DLG_IcoMap, DIALOG
+    BEGIN
+        TOPMARGIN, 1
+    END
+
+    IDD_GENERAL_SETTINGS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 249
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 114
+    END
+
+    IDD_KEYBOARD_SETTINGS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 357
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 142
+    END
+
+    IDD_DLG_CurveWizard, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 230
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 95
+    END
+
+    IDD_DLG_CurveWizardReset, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 114
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 154
+    END
+
+    IDD_DLG_CurveWizardSaveAs, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 114
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 136
+    END
+
+    IDD_DLG_HELP_ABOUT, DIALOG
+    BEGIN
+        RIGHTMARGIN, 260
+    END
+
+    IDD_DLG_SelectFeatures, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 267
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 60
+    END
+
+    IDD_LM_SETTINGS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 285
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 171
+    END
+
+    IDD_SHORTCUT_SETTINGS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 311
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 131
+    END
+
+    IDD_DLG_DIRECTION_SETTINGS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 238
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 139
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON_ICOMAP         ICON                    ".\\res\\Icomap1.ico"
+IDI_ICON_GENIE          ICON                    ".\\res\\icon_gen.ico"
+IDI_ICON_OPTIONS        ICON                    ".\\res\\icon_opt.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MNU_ICOMAP MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Close",                      ID_FILE_CLOSE
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Dynamic Input Grid",         ID_VIEW_DIG, CHECKED
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS, CHECKED
+    END
+    POPUP "&Draw"
+    BEGIN
+        POPUP "Li&ne"
+        BEGIN
+            MENUITEM "&Direction, Distance",        ID_TOOLS_DRAWINGTOOLS_LINE
+            MENUITEM "&Internal/Deflection Angle, Distance", ID_TOOLS_DRAWINGTOOLS_LINEANGLE
+        END
+        MENUITEM SEPARATOR
+        POPUP "Cur&ve"
+        BEGIN
+            MENUITEM "Curve &1",                    ID_TOOLS_DRAWINGTOOLS_CURVE1
+            MENUITEM "Curve &2",                    ID_TOOLS_DRAWINGTOOLS_CURVE2
+            MENUITEM "Curve &3",                    ID_TOOLS_DRAWINGTOOLS_CURVE3
+            MENUITEM "Curve &4",                    ID_TOOLS_DRAWINGTOOLS_CURVE4
+            MENUITEM "Curve &5",                    ID_TOOLS_DRAWINGTOOLS_CURVE5
+            MENUITEM "Curve &6",                    ID_TOOLS_DRAWINGTOOLS_CURVE6
+            MENUITEM "Curve &7",                    ID_TOOLS_DRAWINGTOOLS_CURVE7
+            MENUITEM "Curve &8",                    ID_TOOLS_DRAWINGTOOLS_CURVE8
+            MENUITEM SEPARATOR
+            MENUITEM "&Custom Curve...",            ID_TOOLS_DRAWINGTOOLS_GENIE
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Curve/Angle &Left",           ID_CURVEOPERATIONS_CURVEDIRECTION_CONCAVELEFT, CHECKED
+        MENUITEM "Curve/Angle &Right",          ID_CURVEOPERATIONS_CURVEDIRECTION_CONCAVERIGHT
+        MENUITEM SEPARATOR
+        MENUITEM "Delta angle &< 180°",         ID_CURVEOPERATIONS_DELTAANGLE_LESSTHAN180, CHECKED
+        MENUITEM "Delta angle &> 180°",         ID_CURVEOPERATIONS_DELTAANGLE_GREATERTHAN180
+        MENUITEM SEPARATOR
+        MENUITEM "Draw &Forward",               ID_TOOLS_DRAWINGDIRECTION_NORMAL, CHECKED
+        MENUITEM "Draw R&everse",               ID_TOOLS_DRAWINGDIRECTION_REVERSE
+    END
+    POPUP "&Sketch"
+    BEGIN
+        MENUITEM "Finish &Sketch",              ID_TOOLS_ACTIONS_FINISHSKETCH
+        MENUITEM "Finish &Part",                ID_TOOLS_ACTIONS_FINISHPART
+        MENUITEM "&Delete Sketch",              ID_TOOLS_ACTIONS_DELETESKETCH
+    END
+    POPUP "&Tools"
+    BEGIN
+        MENUITEM "&Edit Attributes...",         ID_TOOLS_EDITFEATURES
+        MENUITEM "&Select Features...",         ID_TOOLS_SELECTFEATURES
+        MENUITEM SEPARATOR
+        MENUITEM "O&CR Filter Schemes...",      ID_TOOLS_OCRSCHEMES
+        MENUITEM SEPARATOR
+        MENUITEM "&Options...",                 ID_TOOLS_OPTIONS
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&IcoMap Help",                ID_HELP_ICOMAPHELP
+        MENUITEM "&About IcoMap",               ID_HELP_ABOUTICOMAP
+    END
+END
+
+IDR_MNU_DRAWING_TOOLS MENU 
+BEGIN
+    POPUP "DrawingTool"
+    BEGIN
+        MENUITEM "&Line (Direction, Distance)", ID_DRAWINGTOOL_LINE
+        MENUITEM "L&ine (Internal/Deflection Angle, Distance)", ID_DRAWINGTOOL_LINE_ANGLE
+        MENUITEM "Curve &1",                    ID_DRAWINGTOOL_CURVE1
+        MENUITEM "Curve &2",                    ID_DRAWINGTOOL_CURVE2
+        MENUITEM "Curve &3",                    ID_DRAWINGTOOL_CURVE3
+        MENUITEM "Curve &4",                    ID_DRAWINGTOOL_CURVE4
+        MENUITEM "Curve &5",                    ID_DRAWINGTOOL_CURVE5
+        MENUITEM "Curve &6",                    ID_DRAWINGTOOL_CURVE6
+        MENUITEM "Curve &7",                    ID_DRAWINGTOOL_CURVE7
+        MENUITEM "Curve &8",                    ID_DRAWINGTOOL_CURVE8
+        MENUITEM SEPARATOR
+        MENUITEM "&Custom Curve...",            ID_DRAWINGTOOL_GENIE
+    END
+END
+
+IDR_MNU_DIG_CONTEXT MENU 
+BEGIN
+    POPUP "DIG Context"
+    BEGIN
+        MENUITEM "&Insert Duplicate",           ID_DIG_INSERT_DUPLICATE
+        MENUITEM "&Remove",                     ID_DIG_REMOVE
+        MENUITEM "Move &Up",                    ID_DIG_UP
+        MENUITEM "Move &Down",                  ID_DIG_DOWN
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_TOOLBAR_ICOMAP TOOLBAR  16, 15
+BEGIN
+    BUTTON      IDC_BTN_SelectFeatures
+    BUTTON      IDC_BTN_ViewEditAttributes
+    SEPARATOR
+    BUTTON      IDC_BTN_DrawingTools
+    BUTTON      IDC_BTN_ReverseMode
+    BUTTON      IDC_BTN_ToggleCurveDirection
+    BUTTON      IDC_BTN_ToggleDeltaAngle
+    SEPARATOR
+    BUTTON      IDC_BTN_FinishSketch
+    BUTTON      IDC_BTN_DeleteSketch
+    SEPARATOR
+    BUTTON      IDC_BTN_DIG
+    SEPARATOR
+    BUTTON      IDC_BTN_Options
+    BUTTON      ID_HELP_ICOMAPHELP
+    SEPARATOR
+    BUTTON      ID_LINE
+    BUTTON      ID_LINE_ANGLE
+    BUTTON      ID_CURVE1
+    BUTTON      ID_CURVE2
+    BUTTON      ID_CURVE3
+    BUTTON      ID_CURVE4
+    BUTTON      ID_CURVE5
+    BUTTON      ID_CURVE6
+    BUTTON      ID_CURVE7
+    BUTTON      ID_CURVE8
+    BUTTON      ID_GENIE
+    BUTTON      ID_REVERSE
+    BUTTON      ID_RIGHT
+    BUTTON      ID_GT180
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_GENERAL_SETTINGS DLGINIT
+BEGIN
+    IDC_CMB_UNIT_TYPE, 0x403, 5, 0
+0x6546, 0x7465, "\000" 
+    IDC_CMB_UNIT_TYPE, 0x403, 7, 0
+0x6e49, 0x6863, 0x7365, "\000" 
+    IDC_CMB_UNIT_TYPE, 0x403, 6, 0
+0x694d, 0x656c, 0x0073, 
+    IDC_CMB_UNIT_TYPE, 0x403, 6, 0
+0x6159, 0x6472, 0x0073, 
+    IDC_CMB_UNIT_TYPE, 0x403, 7, 0
+0x6843, 0x6961, 0x736e, "\000" 
+    IDC_CMB_UNIT_TYPE, 0x403, 5, 0
+0x6f52, 0x7364, "\000" 
+    IDC_CMB_UNIT_TYPE, 0x403, 6, 0
+0x694c, 0x6b6e, 0x0073, 
+    IDC_CMB_UNIT_TYPE, 0x403, 7, 0
+0x654d, 0x6574, 0x7372, "\000" 
+    IDC_CMB_UNIT_TYPE, 0x403, 12, 0
+0x6543, 0x746e, 0x6d69, 0x7465, 0x7265, 0x0073, 
+    IDC_CMB_UNIT_TYPE, 0x403, 11, 0
+0x694b, 0x6f6c, 0x656d, 0x6574, 0x7372, "\000" 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "IcoMapApp"
+END
+
+STRINGTABLE 
+BEGIN
+    IDC_BTN_ToggleCurveDirection "Toggle the curve/angle direction"
+    IDC_BTN_ToggleDeltaAngle "Toggle the curve delta angle"
+    IDC_BTN_DrawingTools    "Draw line"
+    IDC_BTN_ImageRecognition "Open a new image window"
+    IDC_BTN_LegalText       "Open a new text window"
+END
+
+STRINGTABLE 
+BEGIN
+    IDC_BTN_Options         "Set IcoMap options"
+    IDC_BTN_SelectFeatures  "Select all features linked to a document"
+    IDC_BTN_Collapse        "Hide command history"
+    IDC_BTN_NormalMode      "Input direction is forward"
+    IDC_BTN_ToggleLeft      "Curve/Angle direction is currently to the left"
+    IDC_BTN_ToggleRight     "Curve/Angle direction is currently to the right"
+    IDC_BTN_DeltaAngle_GT180 
+                            "Delta angle of the curve is currently >= 180° - toggle delta angle"
+    IDC_BTN_DeltaAngle_LT180 
+                            "Delta angle of the curve is currently <= 180° - toggle delta angle"
+END
+
+STRINGTABLE 
+BEGIN
+    IDC_BTN_ReverseMode     "Input direction is reverse"
+END
+
+STRINGTABLE 
+BEGIN
+    IDC_BTN_CONFIRM_TOGGLE  "Confirm curve/line"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_NEWLEGALTEXTWINDOW "Open a new text window"
+    ID_FILE_NEWIMAGERECOGNITIONWINDOW "Open a new image window"
+    ID_TOOLS_ACTIONS_FINISHPART "Finish current sketch part"
+    ID_TOOLS_ACTIONS_DELETESKETCH "Delete current in-process sketch"
+    ID_TOOLS_DRAWINGTOOLS_LINE "Input direction and distance for the line"
+    ID_TOOLS_DRAWINGTOOLS_LINEANGLE 
+                            "Input internal/deflection angle and distance for the line"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_TOOLS_DRAWINGTOOLS_GENIE "Create custom curve"
+    ID_TOOLS_OPTIONS        "Open options dialog"
+    ID_HELP_ICOMAPHELP      "Open IcoMap help"
+    ID_HELP_ABOUTICOMAP     "About IcoMap"
+    ID_DRAWINGTOOL_LINE     "Input direction and distance for the line"
+    ID_DRAWINGTOOL_LINE_ANGLE 
+                            "Input internal/deflection angle and distance for the line"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_TOOLS_DRAWINGDIRECTION_NORMAL "Input direction is forward"
+    ID_TOOLS_DRAWINGDIRECTION_REVERSE "Input direction is reverse"
+    ID_TOOLS_ACTIONS_FINISHSKETCH "Finish current sketch"
+    IDC_BTN_ViewEditAttributes "Edit selected feature"
+    ID_TOOLS_EDITFEATURES   "Edit selected feature"
+    IDC_BTN_DeleteSketch    "Delete current sketch"
+    IDC_BTN_FinishSketch    "Finish current sketch"
+    ID_COPY                 "Copy selected text"
+    ID_SELECT_ALL           "Select all text"
+    ID_CLEAR_ALL            "Delete all contents"
+    ID_DELETE_SELECTED      "Delete selected text only"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_CLOSE           "Close IcoMap dialog"
+    IDC_STATUS_BAR          "Status bar"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_RESTORE             "Restore IcoMap window"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_MOVE                "Move IcoMap window"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_SIZE                "Resize IcoMap window"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_MINIMIZE            "Minimize IcoMap window"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_MAXIMIZE            "Maximize IcoMap window"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CLOSE               "Close IcoMap dialog"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_DRAWINGTOOL_GENIE    "Create custom curve"
+    ID_SKETCHTOOL_FINISHSKETCH "Finish current sketch"
+    ID_SKETCHTOOL_DELETESKETCH "Delete current sketch"
+    ID_SKETCHTOOL_FINISHPART "Finish current sketch part"
+    ID_CURVEOPERATIONS_CURVEDIRECTION_CONCAVELEFT 
+                            "Along the tangent-in, the curve concaves to the left"
+    ID_CURVEOPERATIONS_CURVEDIRECTION_CONCAVERIGHT 
+                            "Along the tangent-in, the curve concaves to the right"
+    ID_CURVEOPERATIONS_DELTAANGLE_GREATERTHAN180 
+                            "Delta angle of the curve is >= 180°"
+    ID_CURVEOPERATIONS_DELTAANGLE_LESSTHAN180 
+                            "Delta angle of the curve is <= 180°"
+    ID_CURVEOPERATIONS_CONFIRMCURVE "Confirm the curve direction/bulginess"
+    ID_TOOLS_SELECTFEATURES "Select all features linked to a document"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_TOOLS_OCRSCHEMES     "Configure OCR filtering schemes"
+    ID_VIEW_DIG             "Show/Hide Dynamic Input Grid"
+    ID_VIEW_STATUS          "Show/Hide Status Bar"
+    IDC_BTN_DIG             "Show/Hide Dynamic Input Grid"
+    ID_DIG_INSERT_DUPLICATE "Insert a duplicate of this segment here"
+    ID_DIG_REMOVE           "Remove this segment"
+    ID_DIG_UP               "Move this segment up"
+    ID_DIG_DOWN             "Move this segment down"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "IcoMapApp.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

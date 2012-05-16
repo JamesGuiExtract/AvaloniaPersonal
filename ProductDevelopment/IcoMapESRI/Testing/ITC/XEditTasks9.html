@@ -1,0 +1,132 @@
+<html>
+
+<h2><b>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+
+Dynamic Input Grid (DIG) - Enhancements and Bug Fixes
+
+</tr>
+</table>
+</b></h2>
+<p>
+
+<ol>
+
+<li>
+Start ArcMap and IcoMap.
+</li>
+<HR>
+<p>
+
+<li>
+<b>[P10 #3091]</b> Start editing.<p>
+
+Confirm that IcoMap sets focus to the command prompt and that the command prompt has a yellow background.
+</li>
+<HR>
+<p>
+
+<li>
+<b>[P10 #3101]</b> Start a new sketch with a starting point.  Swipe a bearing from an image.  Use the mouse to put focus on any cell where data does not exist - such as <b>LDR</b> cell or the empty cell where <b>LDS</b> would exist if a distance was entered.<p>
+
+Confirm that IcoMap maintains focus in either the command prompt or in one of the DIG data cells.
+</li>
+<HR>
+<p>
+
+<li>
+<b>[P10 #3099]</b> Start a new sketch and draw two lines.  Use the mouse to click on the first bearing value.  Press the <b>Tab</b> key.<p>
+
+Confirm that the yellow background moves to the first distance value cell.<p>
+
+Press the <b>Tab</b> key again.<p>
+
+Confirm that the yellow background moves to the second bearing value cell.<p>
+</li>
+<HR>
+<p>
+
+<li>
+<b>[P10 #3100]</b> Continue using the new sketch from the previous test.  Press the <b>Tab</b> key until the yellow background has moved to the last data cell.  Press the <b>Tab</b> key one more time.<p>
+
+Confirm that the yellow background moves to the command prompt and that additional <b>Tab</b> keystrokes have no effect.<p>
+</li>
+<HR>
+<p>
+
+<li>
+<b>[P10 #3092]</b> Continue using the new sketch from the previous test.  Click one of the existing data cells and edit the value.  Press <b>Enter</b> to accept the edits.<p>
+
+Confirm that the yellow background moves to the command prompt and that the drawing is updated.<p>
+</li>
+<HR>
+<p>
+
+<li>
+<b>[P10 #3095]</b> Continue using the new sketch from the previous test.  With focus in the command prompt, press <b>Shift+Tab</b> to navigate to the last editable cell in the DIG.<p>
+
+Continue pressing <b>Shift+Tab</b> to navigate through the entire collection of editable cells.<p>
+
+Confirm that <b>Shift+Tab</b> has no effect once navigation has reached the first editable cell.<p>
+</li>
+<HR>
+<p>
+
+<li>
+<b>[P10 #3095]</b> Continue using the new sketch from the previous test.  With focus in the first editable cell in the DIG, press <b>Tab</b> to navigate to the next editable cell.<p>
+
+Continue pressing <b>Tab</b> to navigate through the entire collection of editable cells back to the command prompt.<p>
+
+Confirm that <b>Tab</b> has no effect once navigation has reached the command prompt.<p>
+</li>
+<HR>
+<p>
+
+<li>
+<b>[P10 #3093]</b> Continue using the new sketch from the previous test.  Click one of the existing data cells and edit the value.  Press <b>Tab</b> to accept the edits.<p>
+
+Confirm that the yellow background moves to the next editable cell and that the drawing is updated.  If the edits were made to the last editable cell in a row that the focus and yellow highlight should move to t
+he first editable cell in the next row.<p>
+
+Repeat the test using the <b>Right-Arrow</b> key to navigate to the next cell.<p>
+</li>
+<HR>
+<p>
+
+<li>
+<b>[P10 #3093]</b> Continue using the new sketch from the previous test.  Click one of the existing data cells and edit the value.  Press <b>Shift+Tab</b> to accept the edits.<p>
+
+Confirm that the yellow background moves to the previous editable cell and that the drawing is updated.  If the edits were made to the first editable cell in a row that the focus and yellow highlight should move to the last editable cell in the previous row.<p>
+
+Repeat the test using the <b>Left-Arrow</b> key to navigate to the previous cell.<p>
+</li>
+<HR>
+<p>
+
+<li>
+<b>[P10 #3098]</b> Continue using the new sketch from the previous test.  Click in one of the DIG data cells such that the yellow background moves to that cell.  Click the 'Delete sketch' button on the IcoMap toolbar.<p>
+
+Confirm that the sketch is deleted and the grid is emptied.  Also confirm that IcoMap prompts for a new starting point and that the yellow highlight is on the command prompt.<p>
+</li>
+<HR>
+<p>
+
+<li>
+Close IcoMap and ArcMap.
+<p>
+IcoMap should close gracefully. 
+</li>
+<HR>
+<p>
+
+
+
+</ol>
+<p>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+The location of the files and any common instructions can be found <A HREF="common.html" TARGET="_blank">here</A>.
+</tr>
+</table>
+</html>

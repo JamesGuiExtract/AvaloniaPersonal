@@ -1,0 +1,25 @@
+HKCR
+{
+	ArcGISIcoMap.EditEventsSink.1 = s 'EditEventsSink Class'
+	{
+		CLSID = s '{85866FCF-9D61-11D5-81AD-0050DAD4FF55}'
+	}
+	ArcGISIcoMap.EditEventsSink = s 'EditEventsSink Class'
+	{
+		CLSID = s '{85866FCF-9D61-11D5-81AD-0050DAD4FF55}'
+		CurVer = s 'ArcGISIcoMap.EditEventsSink.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {85866FCF-9D61-11D5-81AD-0050DAD4FF55} = s 'EditEventsSink Class'
+		{
+			ProgID = s 'ArcGISIcoMap.EditEventsSink.1'
+			VersionIndependentProgID = s 'ArcGISIcoMap.EditEventsSink'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D80801C2-7AC8-11D5-817F-0050DAD4FF55}'
+		}
+	}
+}

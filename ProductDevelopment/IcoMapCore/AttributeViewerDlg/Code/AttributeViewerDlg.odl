@@ -1,0 +1,44 @@
+// AttributeViewerDlg.odl : type library source for AttributeViewerDlg.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (AttributeViewerDlg.tlb).
+
+[ uuid(432B7A56-693E-42A8-B5F6-937B4CADC1BE), version(1.0) ]
+library AttributeViewerDlg
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CAttributeViewDlg
+	
+	[ uuid(623972D4-94F3-417B-A98B-14D5CF72219A) ]
+	dispinterface IAttributeViewDlg
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CAttributeViewDlg)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CAttributeViewDlg)
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CAttributeViewDlg
+
+	[ uuid(E750A13C-EAB5-4B66-8361-432B3F1B9D7C) ]
+	coclass AttributeViewDlg
+	{
+		[default] dispinterface IAttributeViewDlg;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

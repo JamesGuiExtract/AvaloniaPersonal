@@ -1,0 +1,95 @@
+<html>
+
+<HEAD>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<h2><b>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+
+These test cases test drawing in Polar angles.
+
+</tr>
+</table>
+</b></h2>
+<p>
+
+<ol>
+
+
+<li>
+ Click on the "Highlighted Text Window" button in the IcoMap dialog.
+<p>
+ IcoMap opens a new 'Highlighted Text' window and brings up the 'Open' dialog box right away.
+</li>
+<HR>
+<p>
+
+<li>
+Open the file <b><i>PolarAngle.txt</b></i> from the 'Highlighted Text' window.
+<p>
+The 'Highlighted Text' window opens the specified file and all bearings, distance, angles, and numbers are highlighted in yellow.
+</li>
+<HR>
+<p>
+
+<li>
+Go to the 'Direction/Angle Definition' tab in the 'Options' dialog box.
+</li>
+<HR>
+<p>
+
+<li>
+Select the 'Angle in degrees...' option in the 'Specify Direction...' group box.
+<p>
+The 'Polar Angle...' and 'Azimuth...' options should become enabled.
+</li>
+<HR>
+<p>
+
+<li>
+Select the 'Polar Angle...' option and click the 'OK' button.
+<p>
+The 'IcoMap Options' dialog box should go away.  This will change the direction type that IcoMap will be looking for.
+</li>
+<HR>
+<p>
+
+<li>
+Draw the parcel described in <b><i>PolarAngle.txt</b></i> using MCR.
+<P>
+As you pick on line and curve data, the lines should get drawn to the ArcMap environment.  The highlights that are selected will also change to red.  As you move the cursor from normal text to highlighted text the cursor changes from the 'I-Beam' to the 'Pointing Finger'.
+
+</li>
+<HR>
+<p>
+
+<li>
+Finish the sketch.
+<p>
+The lines and curves you drew should get written to the ArcGIS geodatabase and the newly created shape will be selected.
+<br>Area = ~2698.84'
+<br>Perimeter = ~210.38'
+</li>
+<HR>
+<p>
+
+<li>
+Click the 'Close' (X) button in the 'Highlighted Text' window.
+<p>
+IcoMap should close the 'Highlighted Text' window.
+</li>
+<HR>
+<p>
+
+
+
+</ol>
+<p>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+The location of the files and any common instructions can be found <A HREF="common.html" TARGET="_blank">here</A>.
+</tr>
+</table>
+</html>

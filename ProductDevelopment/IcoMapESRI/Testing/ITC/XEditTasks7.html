@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+
+<HEAD>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<h2><b>
+<table WIDTH="100%">
+<tr BGCOLOR="#DCDCDC">
+
+Create 2-Point Line Features
+
+</tr>
+</table>
+</b></h2>
+<p>
+
+
+<ol>
+
+<li>Open ArcCatalog. Create a new Personal Geodatabase on your local drive. Create a new Line Feature class and name it 'Road'.
+<hr>
+<p>
+
+<li>If you don't have the <I><b>Create Cogo Field</I></b> button on a toolbar in ArcCatalog, right click next to a toolbar and select <I><b>Customize...</I></b>. Select the </I></b>Command</I></b> tab. In the Categories window on the left side of the pane, click Geodatabase tools. Drag and drop the <I><b>Create COGO Fields</I></b> tool onto any of the ArcCatalog toolbars.
+<hr>
+<p>
+
+<li>Select the 'Road' feature class.<p>
+The <I><b>Create Cogo Fields</I></b> button should be enabled. Click this button. A message indicating success of creating COGO Fields should appear. Click OK to dismiss the message.
+<hr>
+<p>
+
+<li>Open ArcMap. Drag the 'Road' feature class from ArcCatelog and drop it into the ArcMap.
+<hr>
+<p>
+
+<li>Select 'Editor > Start Editing'. Select 'Task > Create 2-Point Line Features'.
+<hr>
+<p>
+
+<li>Click the 'IcoMap' button<p>
+The IcoMap dialog should appear. The highlight frame around IcoMap dialog should appear yellow.
+<HR>
+<p>
+
+<li>Use IcoMap drawing tool to draw several line segments and several curve segments on the 'Road' layer. Finish sketch.
+<HR>
+<p>
+
+<li>Right click on the 'Road' in the Table of Contents pane to bring up the context menu. Select 'Open Attribute Table'.<p>
+The Attribute Table should open. There should be multiple features displayed in the table. Each feature is actually a 'segment'. Notice that all curves should have values for <I><b>COGO Delta</I></b>, <I><b>COGO Radius</I></b>, <I><b>COGO Tangent</I></b> fields and so on.
+<HR>
+<p>
+
+<li>Stop editing without saving the changes.
+<HR>
+<p>
+
+</ol>
+
+<p>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+The location of the files and any common instructions can be found <A HREF="common.html" TARGET="_blank">here</A>.
+</tr>
+</table>
+
+</html>

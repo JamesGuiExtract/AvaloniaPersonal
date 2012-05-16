@@ -1,0 +1,10 @@
+
+<!ELEMENT FeatureAttributes (NumParts,Part+)>
+<!ELEMENT NumParts (#PCDATA)>
+<!ELEMENT Part (NumSegments,Segment+)>
+    <!ELEMENT NumSegments (#PCDATA)>
+    <!ELEMENT Segment (NumAttributes,Attribute+)>
+        <!ELEMENT NumAttributes (#PCDATA)>
+        <!ELEMENT Attribute (Name,Value)>
+            <!ELEMENT Name (#PCDATA)>
+            <!ELEMENT Value (#PCDATA)>

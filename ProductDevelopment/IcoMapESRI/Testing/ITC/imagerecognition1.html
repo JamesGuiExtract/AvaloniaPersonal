@@ -1,0 +1,78 @@
+<html>
+
+<HEAD>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<h2><b>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+
+This test case tests the various functionalities associated with the Image Recognition dialog.
+
+</tr>
+</table>
+</b></h2>
+<p>
+
+<ol>
+
+<li>
+Click on the 'New Spot Recognition Window' button.<p>
+
+IcoMap opens a new 'Spot Recognition' dialog and brings up the 'Open' dialog box right away.
+
+</li>
+<HR>
+<p>
+
+<li>
+Open the image <i><b>Test008.tif</i></b>.
+
+IcoMap opens the specified file.
+</li>
+<HR>
+<p>
+
+<li>
+Set the highlighter size using the 'Set Highlight Height' tool.  Using the bearing <i><b>"S11°26'38" E"</i></b> for a reference, the first point you pick with the left mouse button should be just above the <i><b>"S"</i></b>.  While holding the mouse button down, drag the mouse to just below the <i><b>"S"</i></b> and then let go of it.<p>
+
+As you use spot recognition to draw, you should see that the height of the highlight is the same as the distance you picked.
+</li>
+<HR>
+<p>
+
+<li>
+Draw the parcel using spot recognition.  Use COGO only if the values are not recognizing.<p>
+
+As you pick on line and curve data, the lines should get drawn to the ArcMap environment.
+</li>
+<HR>
+<p>
+
+<li>
+Finish the sketch.<p>
+
+The lines and curves you drew should get written to the ArcGIS geodatabase and the newly created shape will be selected.
+<br>Area = ~106506.71
+<br>Perimeter = ~1557.39
+</li>
+<HR>
+<p>
+
+<li>
+Click the 'Close' (X) button in the Spot Recognition window.<p>
+
+IcoMap should close the Spot Recognition window.
+</li>
+<HR>
+<p>
+
+</ol>
+<p>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+The location of the files and any common instructions can be found <A HREF="common.html" TARGET="_blank">here</A>.
+</tr>
+</table>
+</html>

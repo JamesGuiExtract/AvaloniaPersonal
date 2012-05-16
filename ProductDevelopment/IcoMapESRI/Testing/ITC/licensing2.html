@@ -1,0 +1,86 @@
+<html>
+
+<HEAD>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<h2><b>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+
+Basic Concurrent Licensing
+
+</tr>
+</table>
+</b></h2>
+<p>
+
+
+
+<tr>
+Test setup: 
+<dir>
+<li>Install Extract Systems LM on computer that will have the USB Key attached (Server). 
+<li>Attach key with 1 IcoMap license to Server.</li>
+<li>Install IcoMap.</li>
+<li>Select Concurrent licensing mode from the IcoMap License Utility.
+<li>Set LM Server to the name of the computer that will has the USB Key.
+<li>Close the IcoMap License Utility.</li>
+<br>There should be only 1 .lic file in the C:\Program Files\Extract Systems\CommonComponents folder: <b>ExtractSystems_IcoMap.lic</b>.</li>
+<li>Start ArcGIS.</li>
+</dir>
+
+<ol>
+<HR>
+<p>
+
+<li>
+Click on the IcoMap button.<p>
+
+IcoMap should start without errors.
+</li>
+<HR>
+<p>
+
+<li>
+Click on the Highlighted Text Window button.<p>
+
+The Highlighted Text Window should open without error.
+</li>
+<HR>
+<p>
+
+
+<li>
+Click on the Spot Recognition Window button.<p>
+
+The Spot Recognition Window should open without error.
+</li>
+<HR>
+
+<p>
+
+<li>
+Open the IcoMap License Utility and click the Server Status button.<p>
+
+One license should be shown as in use.
+</li>
+<HR>
+<p>
+
+<li>
+Close ArcMap, open the IcoMap License Utility and click the Server Status button.<p>
+
+No license should be in use.
+</li>
+<HR>
+<p>
+
+</ol>
+<p>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+The location of the files and any common instructions can be found <A HREF="common.html" TARGET="_blank">here</A>.
+</tr>
+</table>
+</html>

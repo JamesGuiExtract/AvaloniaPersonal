@@ -1,0 +1,194 @@
+<html>
+
+<HEAD>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<h2><b>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+
+Licensing Errors
+
+</tr>
+</table>
+</b></h2>
+<p>
+
+
+<TABLE WIDTH="100%">
+<tr>
+<h2>
+NODE LOCKED
+</h2>
+</tr>
+<tr>
+Test setup: 
+<dir>
+<li>Install IcoMap.</li>
+<li>Open the IcoMap License Utility.</li>
+<li>Select Node Locked licensing mode.
+<li>Close the IcoMapLicense Utility.</li>
+<br>There should be 1 .esl file in the C:\Program Files\Extract Systems\CommonComponents folder: <b>ExtractSystems_IcoMap.esl</b>.</li>
+<li>Start ArcGIS.</li>
+</dir>
+</tr>
+</table>
+
+<ol>
+<HR>
+<p>
+
+<li>
+Click the IcoMap button.<p>
+
+An exception dialog box should appear that says:
+<b>"IcoMap component is not licensed."</b>.
+
+<b>[P10: #3111]</b> Confirm that the ArcMap Arrow tool is selected.
+</li>
+<HR>
+<p>
+
+<li>
+Click the Highlighted Text Window button.<p>
+
+An exception dialog box should appear that says:
+<b>"IcoMap component is not licensed."</b>.
+</li>
+<HR>
+<p>
+
+<li>
+Click Spot Recognition Window button <p>
+
+An exception dialog box should appear that says:
+<b>"IcoMap component is not licensed."</b>.
+</li>
+<HR>
+<p>
+
+<li>
+Open the Extensions dialog from the Tools menu.  Click the Extract Systems IcoMap item.<p>
+
+An Extensions error message should appear that says:
+<b>"There is no valid IcoMap license file."</b>.
+</li>
+<HR>
+<p>
+</ol>
+
+<TABLE WIDTH="100%">
+<tr>
+<h2>
+CONCURRENT
+</h2>
+</tr>
+<tr>
+Test setup: 
+<dir>
+<li>Install Extract Systems LM on the computer that will have the USB Key attached. Do not attach the key.</li>
+<li>Install IcoMap.</li>
+<li>Open the IcoMap License utility.</li>
+<li>Select Concurrent licensing mode.</li>
+<li>Set LM Server to the name of the computer that will host the USB Key.</li>
+<li>Close the IcoMap License utility.</li>
+<br>There should be 1 .esl file in the C:\Program Files\Extract Systems\CommonComponents folder: <b>ExtractSystems_IcoMap.esl</b>.</li>
+<li>Start ArcGIS on the test computer.</li>
+</dir>
+</tr>
+</table>
+
+<ol>
+<HR>
+<p>
+
+<li>
+Click the IcoMap button.<p>
+
+An exception dialog box should appear that says:
+<b>"Unable to obtain USB Key license."</b>.
+</li>
+<HR>
+<p>
+
+<li>
+Click the Highlighted Text Window button.<p>
+
+An exception dialog box should appear that says:
+<b>"Unable to obtain USB Key license."</b>.
+</li>
+<HR>
+<p>
+
+<li>
+Click the Spot Recognition Window button.<p>
+
+An exception dialog box should appear that says:
+<b>"Unable to obtain USB Key license."</b>.
+</li>
+<HR>
+<p>
+</ol>
+
+<tr>
+Test setup 2: 
+<dir>
+<li>Install Extract Systems LM on computer that will have the USB Key attached (Server).</li>
+<li>Attach key with 1 IcoMap license to Server.</li>
+<li>Install IcoMap on 2 computers.</li>
+<li>On both computers, Open the IcoMap License Utility.</li>
+<li>Select Concurrent licensing mode.</li>
+<li>Set LM Server to the name of the computer that will have the USB Key.</li>
+<li>Close the IcoMapLicense Utility.</li>
+<li>Start ArcGIS on both computers.</li>
+</dir>
+</tr>
+
+<ol>
+<HR>
+<p>
+
+<li>
+On Computer 1, click the IcoMap button.<p>
+
+IcoMap should open without errors.
+</li>
+<HR>
+<p>
+
+<li>
+On Computer 2, click the IcoMap button.<p>
+
+An exception dialog box should appear that says:
+<b>"Unable to obtain USB Key license."</b>.
+</li>
+<HR>
+<p>
+
+<li>
+On Computer 2, click the Highlighted Text Window button.<p>
+
+An exception dialog box should appear that says:
+<b>"Unable to obtain USB Key license."</b>.
+</li>
+<HR>
+<p>
+
+<li>
+On Computer 2, click the Spot Recognition Window button.<p>
+
+An exception dialog box should appear that says:
+<b>"Unable to obtain USB Key license."</b>.
+</li>
+<HR>
+<p>
+</ol>
+
+<p>
+<TABLE WIDTH="100%">
+<TR BGCOLOR="#DCDCDC">
+The location of the files and any common instructions can be found <A HREF="common.html" TARGET="_blank">here</A>.
+</tr>
+</table>
+</html>

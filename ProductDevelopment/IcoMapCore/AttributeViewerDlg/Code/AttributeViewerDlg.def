@@ -1,0 +1,7 @@
+; AttributeViewerDlg.def : Declares the module parameters for the DLL.
+
+LIBRARY      "AttributeViewerDlg"
+;DESCRIPTION  'AttributeViewerDlg Windows Dynamic Link Library'
+
+EXPORTS
+    ; Explicit exports can go here

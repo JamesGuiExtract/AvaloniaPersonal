@@ -1,0 +1,25 @@
+HKCR
+{
+	ArcGISIcoMap.IcoMapDrawingCtrl.1 = s 'IcoMapDrawingCtrl Class'
+	{
+		CLSID = s '{D80801D0-7AC8-11D5-817F-0050DAD4FF55}'
+	}
+	ArcGISIcoMap.IcoMapDrawingCtrl = s 'IcoMapDrawingCtrl Class'
+	{
+		CLSID = s '{D80801D0-7AC8-11D5-817F-0050DAD4FF55}'
+		CurVer = s 'ArcGISIcoMap.IcoMapDrawingCtrl.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {D80801D0-7AC8-11D5-817F-0050DAD4FF55} = s 'IcoMapDrawingCtrl Class'
+		{
+			ProgID = s 'ArcGISIcoMap.IcoMapDrawingCtrl.1'
+			VersionIndependentProgID = s 'ArcGISIcoMap.IcoMapDrawingCtrl'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D80801C2-7AC8-11D5-817F-0050DAD4FF55}'
+		}
+	}
+}

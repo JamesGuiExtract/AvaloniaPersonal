@@ -1,0 +1,26 @@
+HKCR
+{
+	IcoMap.IcoMapCommandRecognizer.1 = s 'IcoMapCommandRecognizer Class'
+	{
+		CLSID = s '{E8A353F9-E03E-4A12-9812-84861BFFE3FA}'
+	}
+	IcoMap.IcoMapCommandRecognizer = s 'IcoMapCommandRecognizer Class'
+	{
+		CLSID = s '{E8A353F9-E03E-4A12-9812-84861BFFE3FA}'
+		CurVer = s 'IcoMap.IcoMapCommandRecognizer.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {E8A353F9-E03E-4A12-9812-84861BFFE3FA} = s 'IcoMapCommandRecognizer Class'
+		{
+			ProgID = s 'IcoMap.IcoMapCommandRecognizer.1'
+			VersionIndependentProgID = s 'IcoMap.IcoMapCommandRecognizer'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{63B908D8-4D69-4408-8298-36D3645DE17B}'
+		}
+	}
+}
