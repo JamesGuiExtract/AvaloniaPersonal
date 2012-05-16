@@ -324,7 +324,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                return QueryResult.Combine(childQueryResults);
+                return QueryResult.Combine(this, childQueryResults);
             }
             catch (Exception ex)
             {
@@ -648,11 +648,15 @@ namespace Extract.DataEntry
             // Iterate through each result that is to be evaluated as a distinct result.
             foreach (QueryResult distinctResult in GetDistinctResults(queryResult))
             {
-                // If in distinct mode, set DistinctResult so that if this node is referenced by
-                // another query, it will return the result currently being evaluated.
+                // If in distinct mode, push the current DistinctResult so that if this node is
+                // referenced by another query, it will return the result currently being evaluated.
                 if (queryResult.SelectionMode == MultipleQueryResultSelectionMode.Distinct)
                 {
                     queryNode.PushDistinctResult(distinctResult);
+                }
+                else
+                {
+                    queryNode.PushDistinctResult(null);
                 }
                 
                 // If the current child has a spatial mode of "Force", store its spatial
@@ -726,12 +730,9 @@ namespace Extract.DataEntry
 
                     yield return resultSet;
                 }
-            }
 
-            // After iterating all distinct results, reset DistinctResult back to null so that when
-            // evaluated outside the context of this loop, it returns its full results.
-            if (queryResult.SelectionMode == MultipleQueryResultSelectionMode.Distinct)
-            {
+                // After iterating all distinct results, pop the DistinctResult for this evaluation
+                // context.
                 queryNode.PopDistinctResult();
             }
         }

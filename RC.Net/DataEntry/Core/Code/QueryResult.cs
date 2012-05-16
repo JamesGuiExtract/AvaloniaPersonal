@@ -816,12 +816,41 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <overrides>
+        /// Combines the given results into a single result.
+        /// </overrides>
+        /// <summary>
+        /// Combines the given results into a single result.
+        /// </summary>
+        /// <param name="queryNode">The query node.</param>
+        /// <param name="results">The results.</param>
+        /// <returns>The combined <see cref="QueryResult"/>.</returns>
+        public static QueryResult Combine(QueryNode queryNode, IEnumerable<QueryResult> results)
+        {
+            try
+            {
+                QueryResult combinedResult = Combine(results);
+
+                combinedResult._queryNode = queryNode;
+                combinedResult._selectionMode = (queryNode == null)
+                    ? MultipleQueryResultSelectionMode.None
+                    : queryNode.SelectionMode;
+
+                return combinedResult;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34681");
+            }
+        }
+
         /// <summary>
         /// Combines the given results into a single result.
         /// <para><b>Note</b></para>
         /// The original results may be altered and should no longer be used.
         /// </summary>
         /// <param name="results">The query <see cref="QueryResult"/>s to combine.</param>
+        /// <returns>The combined <see cref="QueryResult"/>.</returns>
         public static QueryResult Combine(IEnumerable<QueryResult> results)
         {
             try

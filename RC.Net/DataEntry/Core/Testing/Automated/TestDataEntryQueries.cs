@@ -638,6 +638,288 @@ namespace Extract.DataEntry.Test
         }
 
         /// <summary>
+        /// A test to find missing AKA values using a variety of query features.
+        /// </summary>
+        [Test, Category("Composite")]
+        public static void TestCompositeFindMissingAKAs()
+        {
+            LoadDataFile(_testImages.GetFile(_LABDE_DATA_FILE), null);
+
+            string xml = @"<SQL>" +
+                        @"SELECT VOAFileData.OriginalName FROM " +
+                        @"(" +
+                            @"<Composite Parameterize='false' StringList=' UNION '> " +
+                                @"SELECT " +
+                                    @"'<Attribute SelectionMode='Distinct' Name='OriginalName'>Test/Component/OriginalName</Attribute>' AS OriginalName, " +
+                                    @"'<Attribute Root='OriginalName'>../TestCode</Attribute>' AS TestCode " +
+                            @"</Composite> " +
+                        @") AS VOAFileData " +
+                        @"INNER JOIN LabOrderTest ON LabOrderTest.TestCode = VOAFileData.TestCode " +
+                        @"INNER JOIN LabTest ON LabTest.TestCode = VOAFileData.TestCode " +
+                        @"WHERE LabTest.OfficialName &lt;&gt; VOAFileData.OriginalName " +
+                        @"AND LabOrderTest.TestCode &lt;&gt; VOAFileData.OriginalName " +
+                        @"AND NOT VOAFileData.OriginalName IN " +
+                        @"( " +
+                            @"SELECT [Name] FROM AlternateTestName WHERE TestCode = VOAFileData.TestCode " +
+                        @") " +
+                        @"</SQL>";
+
+            using (DbConnection dbConnection =
+                    GetDatabaseConnection(_testImages.GetFile(_LABDE_DATABASE)))
+            {
+                dbConnection.Open();
+
+                DataEntryQuery query = DataEntryQuery.Create(xml, null, dbConnection);
+
+                string[] results = query.Evaluate().ToStringArray();
+
+                Assert.That(results.Length == 2);
+                Assert.That(results[0].ToString() == "LYM%");
+                Assert.That(results[1].ToString() == "MON%");
+            }
+        }
+
+        /// <summary>
+        /// A test of how results combine based on the selection mode.
+        /// </summary>
+        [Test, Category("SelectionMode")]
+        public static void TestSelectionModeFirstFirst()
+        {
+            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
+
+            string xml = "<Composite SelectionMode='First'>\r\n" +
+                        "A\r\n" +
+                        "B\r\n" +
+                        "</Composite>\r\n" +
+                        "<Composite SelectionMode='First'>\r\n" +
+                        "1\r\n" +
+                        "2\r\n" +
+                        "</Composite>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 2);
+            Assert.That(results[0].ToString() == "A");
+            Assert.That(results[1].ToString() == "1");
+        }
+
+        /// <summary>
+        /// A test of how results combine based on the selection mode.
+        /// </summary>
+        [Test, Category("SelectionMode")]
+        public static void TestSelectionModeFirstList()
+        {
+            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
+
+            string xml = "<Composite SelectionMode='First'>\r\n" +
+                        "A\r\n" +
+                        "B\r\n" +
+                        "</Composite>\r\n" +
+                        "<Composite SelectionMode='List'>\r\n" +
+                        "1\r\n" +
+                        "2\r\n" +
+                        "</Composite>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 3);
+            Assert.That(results[0].ToString() == "A");
+            Assert.That(results[1].ToString() == "1");
+            Assert.That(results[2].ToString() == "2");
+        }
+
+        /// <summary>
+        /// A test of how results combine based on the selection mode.
+        /// </summary>
+        [Test, Category("SelectionMode")]
+        public static void TestSelectionModeFirstDistinct()
+        {
+            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
+
+            string xml = "<Composite SelectionMode='First'>\r\n" +
+                        "A\r\n" +
+                        "B\r\n" +
+                        "</Composite>\r\n" +
+                        "<Composite SelectionMode='Distinct'>\r\n" +
+                        "1\r\n" +
+                        "2\r\n" +
+                        "</Composite>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 2);
+            Assert.That(results[0].ToString() == "A1");
+            Assert.That(results[1].ToString() == "A2");
+        }
+
+        /// <summary>
+        /// A test of how results combine based on the selection mode.
+        /// </summary>
+        [Test, Category("SelectionMode")]
+        public static void TestSelectionModeListFirst()
+        {
+            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
+
+            string xml = "<Composite SelectionMode='List'>\r\n" +
+                        "A\r\n" +
+                        "B\r\n" +
+                        "</Composite>\r\n" +
+                        "<Composite SelectionMode='First'>\r\n" +
+                        "1\r\n" +
+                        "2\r\n" +
+                        "</Composite>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 3);
+            Assert.That(results[0].ToString() == "A");
+            Assert.That(results[1].ToString() == "B");
+            Assert.That(results[2].ToString() == "1");
+        }
+
+        /// <summary>
+        /// A test of how results combine based on the selection mode.
+        /// </summary>
+        [Test, Category("SelectionMode")]
+        public static void TestSelectionModeListList()
+        {
+            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
+
+            string xml = "<Composite SelectionMode='List'>\r\n" +
+                        "A\r\n" +
+                        "B\r\n" +
+                        "</Composite>\r\n" +
+                        "<Composite SelectionMode='List'>\r\n" +
+                        "1\r\n" +
+                        "2\r\n" +
+                        "</Composite>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 4);
+            Assert.That(results[0].ToString() == "A");
+            Assert.That(results[1].ToString() == "B");
+            Assert.That(results[2].ToString() == "1");
+            Assert.That(results[3].ToString() == "2");
+        }
+
+        /// <summary>
+        /// A test of how results combine based on the selection mode.
+        /// </summary>
+        [Test, Category("SelectionMode")]
+        public static void TestSelectionModeListDistinct()
+        {
+            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
+
+            string xml = "<Composite SelectionMode='List'>\r\n" +
+                        "A\r\n" +
+                        "B\r\n" +
+                        "</Composite>\r\n" +
+                        "<Composite SelectionMode='Distinct'>\r\n" +
+                        "1\r\n" +
+                        "2\r\n" +
+                        "</Composite>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 2);
+            Assert.That(results[0].ToString() == "AB1");
+            Assert.That(results[1].ToString() == "AB2");
+        }
+
+        /// <summary>
+        /// A test of how results combine based on the selection mode.
+        /// </summary>
+        [Test, Category("SelectionMode")]
+        public static void TestSelectionModeDistinctFirst()
+        {
+            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
+
+            string xml = "<Composite SelectionMode='Distinct'>\r\n" +
+                        "A\r\n" +
+                        "B\r\n" +
+                        "</Composite>\r\n" +
+                        "<Composite SelectionMode='First'>\r\n" +
+                        "1\r\n" +
+                        "2\r\n" +
+                        "</Composite>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 2);
+            Assert.That(results[0].ToString() == "A1");
+            Assert.That(results[1].ToString() == "B1");
+        }
+
+        /// <summary>
+        /// A test of how results combine based on the selection mode.
+        /// </summary>
+        [Test, Category("SelectionMode")]
+        public static void TestSelectionModeDistinctList()
+        {
+            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
+
+            string xml = "<Composite SelectionMode='Distinct'>\r\n" +
+                        "A\r\n" +
+                        "B\r\n" +
+                        "</Composite>\r\n" +
+                        "<Composite SelectionMode='List'>\r\n" +
+                        "1\r\n" +
+                        "2\r\n" +
+                        "</Composite>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 2);
+            Assert.That(results[0].ToString() == "A12");
+            Assert.That(results[1].ToString() == "B12");
+        }
+
+        /// <summary>
+        /// A test of how results combine based on the selection mode.
+        /// </summary>
+        [Test, Category("SelectionMode")]
+        public static void TestSelectionModeDistinctDistinct()
+        {
+            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
+
+            string xml = "<Composite SelectionMode='Distinct'>\r\n" +
+                        "A\r\n" +
+                        "B\r\n" +
+                        "</Composite>\r\n" +
+                        "<Composite SelectionMode='Distinct'>\r\n" +
+                        "1\r\n" +
+                        "2\r\n" +
+                        "</Composite>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 4);
+            Assert.That(results[0].ToString() == "A1");
+            Assert.That(results[1].ToString() == "A2");
+            Assert.That(results[2].ToString() == "B1");
+            Assert.That(results[3].ToString() == "B2");
+        }
+
+        /// <summary>
         /// Gets the database connection.
         /// </summary>
         /// <param name="databaseFileName">Name of the database file.</param>

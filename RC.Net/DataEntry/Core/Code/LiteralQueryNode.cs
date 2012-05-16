@@ -41,7 +41,8 @@ namespace Extract.DataEntry
 
                 // Treat separate lines as separate values.
                 string[] parsedQuery =
-                    expandedQuery.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+                    expandedQuery.Split(new string[] { Environment.NewLine },
+                    StringSplitOptions.RemoveEmptyEntries);
 
                 return new QueryResult(this, parsedQuery);
             }
