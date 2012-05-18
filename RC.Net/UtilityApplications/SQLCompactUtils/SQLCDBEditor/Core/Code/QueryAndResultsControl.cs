@@ -1787,6 +1787,8 @@ namespace Extract.SQLCDBEditor
             }
 
             _resultsGrid.Invalidate();
+
+            OnDataChanged(true);
         }
 
         /// <summary>
@@ -1798,7 +1800,6 @@ namespace Extract.SQLCDBEditor
             {
                 // Then see if the entire table can be successfully updated.
                 _adapter.Update(_resultsTable);
-                OnDataChanged(true);
 
                 // If the update was successful, all data is now valid.
                 DataIsValid = true;

@@ -84,6 +84,13 @@
       <DependentUpon>ExtractOcrTextInImageAreaSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="IdentifiableRuleObject.cs" />
+    <Compile Include="ModifySpatialMode.cs" />
+    <Compile Include="ModifySpatialModeSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ModifySpatialModeSettingsDialog.Designer.cs">
+      <DependentUpon>ModifySpatialModeSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="MultipleCriteriaSelector.cs" />
     <Compile Include="MultipleCriteriaSelectorSettingsDialog.cs">
       <SubType>Form</SubType>
@@ -218,6 +225,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ExtractOcrTextInImageAreaSettingsDialog.resx">
       <DependentUpon>ExtractOcrTextInImageAreaSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ModifySpatialModeSettingsDialog.resx">
+      <DependentUpon>ModifySpatialModeSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MultipleCriteriaSelectorSettingsDialog.resx">
       <DependentUpon>MultipleCriteriaSelectorSettingsDialog.cs</DependentUpon>

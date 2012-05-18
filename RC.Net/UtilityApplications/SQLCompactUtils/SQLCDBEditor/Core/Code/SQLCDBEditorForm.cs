@@ -1560,7 +1560,7 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         /// <param name="scriptFileName">The name of the script file to execute. If there is no file
         /// by this name, this call has no effect.</param>
-        static void ExecutePostSaveScript(string scriptFileName)
+        void ExecutePostSaveScript(string scriptFileName)
         {
             try
             {
@@ -1573,6 +1573,12 @@ namespace Extract.SQLCDBEditor
                         process.Start();
                         process.WaitForExit();
                     }
+
+                    // [DotNetRCAndUtils:833]
+                    // If the script launches a window of its own, it can result in another
+                    // application being active after it finishes. Ensure this application is still
+                    // active.
+                    Activate();
                 }
             }
             catch (Exception ex)

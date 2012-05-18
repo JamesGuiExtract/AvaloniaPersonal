@@ -1,0 +1,64 @@
+<SETTING>;VerificationCondition=TopLevelAttribute
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;QueryForAutomatedRedaction=TopLevelAttribute
+<SETTING>;AutomatedCondition=TopLevelAttribute
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;CreateTestOutputVOAFiles=0
+<SETTING>;TypeToBeTested=TopLevelAttribute
+
+// Modifier, downgrade, [recurs is forced as modifier], no condition
+<TESTFOLDER>;.\Test1.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test1.voa
+
+// Modifier, downgrade, [recurs is forced as modifier], for single zone attributes only.
+<TESTFOLDER>;.\Test2.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test2.voa
+
+// Modifier, downgrade, [recurs is forced as modifier], for multiple zone attributes only.
+<TESTFOLDER>;.\Test3.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test3.voa
+
+// Modifier, pseudo-spatial, [recurs is forced as modifier], [condition is forced for pseudo-spatial]
+<TESTFOLDER>;.\Test4.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test4.voa
+
+// Modifier, remove, [recurs is forced as modifier], no condition
+<TESTFOLDER>;.\Test5.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test5.voa
+
+// Modifier, remove, [recurs is forced as modifier], for single zone attributes only.
+<TESTFOLDER>;.\Test6.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test6.voa
+
+// Modifier, remove, [recurs is forced as modifier], for multiple zone attributes only.
+<TESTFOLDER>;.\Test7.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test7.voa
+
+// OutputHandler, downgrade, Top-level only, no condition
+<TESTFOLDER>;.\Test8.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test8.voa
+
+// OutputHandler, downgrade, recurs, no condition
+<TESTFOLDER>;.\Test9.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test9.voa
+
+// OutputHandler, downgrade, Top-level only, for single zone attributes only.
+<TESTFOLDER>;.\Test10.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test10.voa
+
+// OutputHandler, downgrade, recurs, for single zone attributes only.
+<TESTFOLDER>;.\Test11.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test11.voa
+
+// OutputHandler, pseudo-spatial, Top-level only, [condition is forced for pseudo-spatial]
+<TESTFOLDER>;.\Test12.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test12.voa
+
+// OutputHandler, pseudo-spatial, recurs, [condition is forced for pseudo-spatial]
+<TESTFOLDER>;.\Test13.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test13.voa
+
+// OutputHandler, remove, Top-level only, [condition is forced for pseudo-spatial]
+<TESTFOLDER>;.\Test14.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test14.voa
+
+// Pre-processor, downgrade, recurive N/A, no condition.
+<TESTFOLDER>;.\Test15.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test15.voa
+
+// Pre-processor, downgrade, recurive N/A, for multiple zone attributes only.
+<TESTFOLDER>;.\Test16.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test16.voa
+
+// Pre-processor, pseudo-spatial, recurive N/A, [condition is forced for pseudo-spatial]
+<TESTFOLDER>;.\Test17.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test17.voa
+
+// Pre-processor, remove, recurive N/A, no condition
+<TESTFOLDER>;.\Test18.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test18.voa
+
+// Pre-processor, remove, recurive N/A,for multiple zone attributes only
+<TESTFOLDER>;.\Test19.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test19.voa
