@@ -32,7 +32,8 @@
             file extensions.
         </ul> 
 <p>
-        <li>Confirm that the Stamp location group box includes an edit box for the <b>horizontal</b> position of the stamp image.
+        <li>Confirm that the Stamp location group box includes an edit box for the <b>horizontal</b> 
+	position of the stamp image.
         <li>Confirm that the Stamp location group box includes an edit box for the <b>vertical</b>
         position of the stamp image.
         <li>Confirm that the horizontal and vertical position edit boxes restrict the percentages
@@ -66,6 +67,8 @@
         <p>
             <li><b>Tests that should pass</b>
             <ul>
+                <li>Locate testing files at 
+		.\ReusableComponents\COMComponents\UCLIDFileProcessing\AutomatedTest\MemoryLeak\AddWatermark.
                 <li>Make sure that <b>Multipage.tif</b> and <b>Multipage.pdf</b> are writable.
                 <li>Open the <b>Interactive_1BitStamps.fps</b> file and press play.
                 <ul>
@@ -118,20 +121,13 @@
                 <li><b>[FlexIDSCore #4224]</b> Confirm that the Add Watermark task fails if the
                 requested page number does not exist.</li>
             </ul>
+<p>
+            <li><b>Miscellaneous</b>
+            <ul>
+        	<LI>Confirm that a watermark can be added to a read-only TIF image.
+        	<LI>Confirm that a watermark can be added to a read-only PDF image.
+            </ul>
         </ul> 
-<p>
-        <LI><b>[FlexIDSCore #3000]</b> Confirm that a watermark can be added to a read-only TIF 
-        image.
-        <LI><b>[FlexIDSCore #3000]</b> Confirm that a watermark can be added to a read-only PDF 
-        image.
-<p>
-        <LI><b>[LegacyRC #5408, #5410]</b> Errors when using Add Watermark
-        <ul>
-            <li>Process an image with many pages using the <b>Add Watermark</b> task.
-            <li>During processing, modify file/folder permissions such that the watermark cannot be
-            added to one or more of the subsequent pages.
-            <li>Confirm that an output image (with an incorrect page count) was <b>not</b> created.
-        </ul>
     </ul> 
 <p>
     <li><b>Core: Apply Bates number</b>
@@ -144,9 +140,7 @@
         <li>Confirm that the group box contains an <b>Image file on which to apply Bates number</b>
         edit box.
         <li>Confirm that the group box contains an associated button for tags.
-        <LI><b>[FlexIDSCore #3933]</b> Confirm that <b>&lt;FPSFileDir&gt;</b> is available in the
-        tag selector.
-        <li>Confirm that the <b>tags</b> button works as expected.
+        <li>Confirm that the <b>Tag Selector</b> button works as expected.
         <li>Confirm that the group box contains an associated <b>...</b> button for browsing.
         <li>Confirm that the <b>browse</b> button works as expected.
 <p>
@@ -161,8 +155,6 @@
         <li>Confirm that zero-padding is used properly if selected.
 <p>
         <li>Confirm that the property page includes a <b>Bates number format</b> group box.
-        <li>Confirm that the group box contains a <b>Prefix</b> edit box.
-        <li>Confirm that the group box contains a <b>Suffix</b> edit box.
         <li>Confirm that the group box contains a <b>Use next number for each document and add 
         separator with page number</b> radio button.
         <li>Confirm that the radio button includes an associated <b>Page number separator</b> edit
@@ -179,6 +171,10 @@
         button.
         <li>Confirm that if this radio button is selected then each page contains a different
         number.
+<p>
+        <li>Confirm that the property page includes a <b>Prefixes and suffixes</b> group box.
+        <li>Confirm that the group box contains a <b>Prefix</b> edit box.
+        <li>Confirm that the group box contains a <b>Suffix</b> edit box.
 <p>
         <li>Confirm that the property page includes a <b>Sample Bates number</b> group box.
         <li>Confirm that the group box contains a read-only edit box.
@@ -215,30 +211,16 @@
         <li>Confirm that <b>Alignment</b> settings are persistent.
 <p>
         <li>Exercise the <b>Apply Bates number</b> functionality.
-        <li>Confirm that progress status is updated correctly.
-        <li>Confirm that the task behaves appropriately beginning with an intial counter value of
-        <b>2,147,483,647</b>.</li>
+	<ul>
+        	<li>Confirm that progress status is updated correctly.
+        	<li>Confirm that the task behaves appropriately beginning with an intial counter 
+		value of <b>2,147,483,647</b>.</li>
+		<li>Confirm that a Bates number can be applied to a <b>PDF</b>.
+	</ul>
 <p>
-        <LI><b>[FlexIDSCore #3776]</b> Confirm that an appropriate error message is seen if an
-        invalid tag such as <b>&lt;SourceDocName</b> is entered in the property page.
+        <LI><b>[FlexIDSCore #3776] NOT FIXED!</b> Confirm that an appropriate error message is 
+	seen if an invalid tag such as <b>&lt;SourceDocName</b> is entered in the property page.
 <p>
-        <LI><b>[LegacyRC #5484]</b> Confirm that <b>Core: Apply Bates number</b> updates progress 
-        status.
-<p>
-        <LI><b>[LegacyRC #5489]</b> Confirm that exceptions about an image not being GDI compatible
-        are not seen during testing of <b>Core: Apply Bates number</b>.
-<p>
-        <LI><b>[LegacyRC #5579, #5580]</b> Apply Bates number
-        <ul>
-            <LI>Prepare an FPS file to act on a database without any defined counters.
-            <li>Create an <b>Apply Bates number</b> task.
-            <LI>Confirm that the property page is displayed correctly even without a counter.
-<p>
-            <li>Define some counters in the database.
-            <li>Confirm that the couter drop-down list in the <b>Apply Bates number</b> task does
-            not allow editing.
-        </ul>
-    <p>
         <li><b>[LegacyRC #5935]</b> Errors running with multiple FAMs
         <ul>
             <li>Queue a large number of files and add a counter to the database.</li>
@@ -272,37 +254,47 @@
 <p>
         <li><b>Archive file</b>
         <ul> 
-            <li>Confirm presence of a combo box for <b>Tag to associate with archived file</b>.
-            <li>Confirm presence of an associated <b>Allow overwrite</b> check box.
-<p>
-            <li>Confirm presence of an edit box for <b>File to archive</b>.
-            <li>Confirm presence of an associated <b>Tag selector</b> button.
-            <ul> 
-                <li>Confirm that <b>&lt;FPSFileDir&gt;</b> is provided in the drop down list.
-                <li>Confirm that <b>&lt;SourceDocName&gt;</b> is provided in the drop down list.
-                <li>Confirm that the usual functions are provided in the drop down list.
-                <li><b>[FlexIDSCore #4333]</b> Test one of the functions and confirm that it works
-                as expected.
-            </ul> 
-            <li>Confirm presence of an associated <b>...</b> (Browse) button.
-            <li>Confirm presence of an associated <b>Delete above file after archiving</b> check
-            box.
+            	<li>Confirm presence of a combo box for <b>Tag to associate with archived file</b>.
+            	<li>Confirm presence of an edit box for <b>File to archive</b>.
+            	<li>Confirm presence of an associated <b>Tag selector</b> button.
+            	<ul> 
+                	<li>Confirm that <b>&lt;FPSFileDir&gt;</b> is provided in the drop down list.
+                	<li>Confirm that <b>&lt;SourceDocName&gt;</b> is provided in the drop down list.
+                	<li>Confirm that the usual functions are provided in the drop down list.
+                	<li><b>[FlexIDSCore #4333]</b> Test one of the functions and confirm that it 
+			works as expected.
+            	</ul> 
+            	<li>Confirm presence of an associated <b>...</b> (Browse) button.
+            	<li>Confirm presence of an associated <b>Delete above file after archiving</b> check
+            	box.
+            	<li>Confirm presence of a <b>If the file to archive exists</b> group box.
+		<ul>
+			<li>Confirm presence of an <b>Overwrite file (task will succeed)</b> 
+			radio button.
+			<li>Confirm presence of an <b>Don't overwrite file (task will fail)</b> 
+			radio button.
+		</ul>
         </ul> 
 <p>
         <li><b>Restore file</b>
         <ul> 
-            <li>Confirm presence of a combo box for <b>Tag of file to restore</b>.
-            <li>Confirm that the <b>Allow overwrite</b> check box is disabled.
-<p>
-            <li>Confirm presence of an edit box for <b>Location to restore file to</b>.
-            <li>Confirm presence of an associated <b>Tag selector</b> button.
-            <ul> 
-                <li>Confirm that <b>&lt;FPSFileDir&gt;</b> is provided in the drop down list.
-                <li>Confirm that <b>&lt;SourceDocName&gt;</b> is provided in the drop down list.
-                <li>Confirm that the usual functions are provided in the drop down list.
-            </ul> 
-            <li>Confirm presence of an associated <b>...</b> (Browse) button.
-            <li>Confirm that the <b>Delete above file after archiving</b> check box is disabled.
+            	<li>Confirm presence of a combo box for <b>Tag of file to restore</b>.
+            	<li>Confirm presence of an edit box for <b>Location to restore file to</b>.
+            	<li>Confirm presence of an associated <b>Tag selector</b> button.
+            	<ul> 
+                	<li>Confirm that <b>&lt;FPSFileDir&gt;</b> is provided in the drop down list.
+                	<li>Confirm that <b>&lt;SourceDocName&gt;</b> is provided in the drop down list.
+                	<li>Confirm that the usual functions are provided in the drop down list.
+            	</ul> 
+            	<li>Confirm presence of an associated <b>...</b> (Browse) button.
+            	<li>Confirm that the <b>Delete above file after archiving</b> check box is disabled.
+            	<li>Confirm presence of a <b>If the file to restore exists</b> group box.
+		<ul>
+			<li>Confirm presence of an <b>Overwrite file (task will succeed)</b> 
+			radio button.
+			<li>Confirm presence of an <b>Don't overwrite file (task will fail)</b> 
+			radio button.
+		</ul>
         </ul>
 <p>
         <li><b>Functionality Tests</b>
@@ -313,15 +305,11 @@
             results to &lt;SourceDocName&gt;.voa
             <li>Configure an FPS file to enqueue the images from the RedactionDemo, execute the
             rules in an.rsd, and archive <b>&lt;SourceDocName&gt;.voa</b> with a tag of "an."
-            <li><b>[LegacyRCAndUtils #5127, #5237]</b> Confirm that the files have been archived to
-            8-digit 0-padded folders.
+            <li>Confirm that the files have been archived to 8-digit 0-padded folders.
             <li>Use the FAM to execute the.rsd on the same images and archive 
             <b>&lt;SourceDocName&gt;.voa</b> with a tag of "the." Configure the archive task to
             delete the file after archiving.
             <li>Confirm that the archived file has been deleted.
-            <li><b>[LegacyRCAndUtils #5133]</b> Configure a restore task to restore files archived
-            with a tag of "the" to <b>$DirOf(&lt;SourceDocName&gt;)\newfolder\$FileOf(&lt;SourceDocName&gt;).voa</b>. 
-            Confirm that the task was successful.
         </ul>
     </ul> 
 <p>
@@ -374,17 +362,6 @@
             <li>Let the test run for at least 5 hours
             <li>Confirm that no files fail due to <b>"Use of unlicensed function"</b> exceptions.
         </ul>
-<p>
-        <li><b>Miscellaneous</b>
-        <ul>
-            <li><b>[LegacyRC #5189]</b> Invalid compression factor on save
-            <ul>
-                <li>Create an <b>image cleanup settings</b> file.
-                <li>Exercise the <b>image cleanup settings</b> file on one or more images found
-                <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5189</b>.
-                <li>Confirm that cleaned images can be saved.
-            </ul>
-        </ul>
     </ul> 
 <p>
     <li><b>Core: Conditionally execute task(s)</b>
@@ -427,15 +404,10 @@
 <p>
                 <li>Confirm that clicking the <b>Add...</b> button displays the <b>Select Task</b> 
                 dialog. 
-                <li><b>[LegacyRC #4732]</b> Confirm that a task is added below the currently 
-                selected task. 
+                <li>Confirm that a task is added below the currently selected task. 
                 <li>Confirm that a task is added at the bottom of the list if no task is currently 
                 selected. 
                 <li>Confirm that a newly added task is selected in the list. 
-                <li><b>[LegacyRC #4834]</b> Confirm that double-clicking below the added task does
-                nothing. 
-                <li><b>[LegacyRC #4834]</b> Confirm that double-clicking in the other
-                <b>(empty)</b> list does nothing. 
 <p>
                 <li>Confirm that clicking the <b>Remove</b> button displays a confirmation dialog. 
                 <li>Confirm proper behavior of the confirmation dialog. 
@@ -450,7 +422,7 @@
                 <li>Confirm that list settings are persistent including the states of the 
                 <b>Run</b> checkboxes. 
 <p>
-                <li><b>[LegacyRC #4918] Context Menu Options</b> 
+                <li><b>Context Menu Options</b> 
                 <ul>
                     <li>Confirm <b>Cut</b> exists.
                     <li>Confirm that <b>Cut</b> is only enabled when one or more tasks are
@@ -471,9 +443,6 @@
                     tasks are already in the clipboard. 
                     <li>Confirm that single items can be successfully pasted from the clipboard. 
                     <li>Confirm <b>Paste</b> can successfully paste multiple cut or copied items.
-                    <li><b>[LegacyRC #4377]</b> Confirm that plain text cannot be pasted in the 
-                    list of tasks.  (From Notepad, copy some text into the clipboard and then try
-                    to paste the text into the list box.)
 <p>
                     <li>Confirm <b>Delete</b> exists.
                     <li>Confirm that <b>Delete</b> is only enabled when one or more tasks is
@@ -506,15 +475,10 @@
 <p>
                 <li>Confirm that clicking the <b>Add...</b> button displays the <b>Select Task</b> 
                 dialog. 
-                <li><b>[LegacyRC #4732]</b> Confirm that a task is added below the currently
-                selected task. 
+                <li>Confirm that a task is added below the currently selected task. 
                 <li>Confirm that a task is added at the bottom of the list if no task is currently
                 selected. 
                 <li>Confirm that a newly added task is selected in the list. 
-                <li><b>[LegacyRC #4834]</b> Confirm that double-clicking below the added task does
-                nothing. 
-                <li><b>[LegacyRC #4834]</b> Confirm that double-clicking in the other 
-                <b>(empty)</b> list does nothing. 
 <p>
                 <li>Confirm that clicking the <b>Remove</b> button displays a confirmation dialog. 
                 <li>Confirm proper behavior of the confirmation dialog. 
@@ -529,7 +493,7 @@
                 <li>Confirm that list settings are persistent including the states of the 
                 <b>Run</b> checkboxes. 
 <p>
-                <li><b>[LegacyRC #4918] Context Menu Options</b> 
+                <li><b>Context Menu Options</b> 
                 <ul>
                     <li>Confirm <b>Cut</b> exists.
                     <li>Confirm that <b>Cut</b> is only enabled when one or more tasks are
@@ -550,9 +514,6 @@
                     tasks are already in the clipboard. 
                     <li>Confirm that single items can be successfully pasted from the clipboard. 
                     <li>Confirm <b>Paste</b> can successfully paste multiple cut or copied items.
-                    <li><b>[LegacyRC #4377]</b> Confirm that plain text cannot be pasted in the 
-                    list of tasks.  (From Notepad, copy some text into the clipboard and then try
-                    to paste the text into the list box.)
 <p>
                     <li>Confirm <b>Delete</b> exists.
                     <li>Confirm that <b>Delete</b> is only enabled when one or more tasks is
@@ -566,21 +527,6 @@
                     <li>Confirm <b>Cancel</b> exits context menu.
                 </ul> 
             </ul> 
-<p>
-            <LI><b>[LegacyRC #5406]</b> Conditional task processing with an empty list
-            <ul>
-                <li>Create an FPS file with a conditional task with an empty list of tasks to be
-                executed if the condition is <b>false</b>.
-                <li>Confirm that the task works correctly when the condition is <b>true</b>.
-                <li>Confirm that the expected behavior of <b>nothing</b> happens when the condition
-                is <b>false</b>.
-<p>
-                <li>Create an FPS file with a conditional task with an empty list of tasks to be
-                executed if the condition is <b>true</b>.
-                <li>Confirm that the task works correctly when the condition is <b>false</b>.
-                <li>Confirm that the expected behavior of <b>nothing</b> happens when the condition
-                is <b>true</b>.
-            </ul>
         </ul> 
 <p>
         <li><b>Core: Convert to searchable PDF</b>
@@ -591,8 +537,8 @@
                 task.
                 <li>Confirm presence of an edit box to hold the name of the <b>Image (or PDF file)
                 to convert</b> file.
-                <li><b>[LegacyRC #4717]</b> Confirm that the output filename is always the input 
-                file, less the file extension if present, plus <b>.pdf</b>.
+                <li>Confirm that the output filename is always the input file, less the file 
+		extension if present, plus <b>.pdf</b>.
                 <li>Confirm presence of an associated <b>Tag Selector</b> button.
                 <li>Confirm presence of an associated <b>...</b> ( Browse ) button.
                 <li>Confirm presence of a <b>Make output PDFA/A compatible (this will increase the 
@@ -608,20 +554,17 @@
             <li><b><u>PDF/A Compliance</u></b>
             <ul>
                 <li>Convert a folder of images to PDF/A-compliant PDFs.
-                <li><b>[LegacyRC #5572]</b> confirm that <b>ELI21032: Unable to create new 
-                temporary file</b> exceptions are not seen.
-                <li><b>[LegacyRC #5598]</b> confirm that <b>ELI24978: File cannot be deleted</b> 
-                exceptions are not seen.
-                <li>Use an updated demo installation of <b>Adobe Preflight</b> to validate 
-                compliance.
+		<li>Confirm that the output files are PDF/A-compliant.
+		<ul>
+                	<li>It may be necessary to use an updated demo installation of 
+			<b>Adobe Preflight</b> to validate compliance.
+		</ul>
             </ul>
 <p>
             <li><b><u>PDF Security UI</u></b>
             <ul>
                 <li>Click the <b>Settings...</b> button.
-                <li>Confirm that a <b>Configure Pdf Security Settings</b> dialog is displayed.
-                <li>Confirm that the dialog contains an <b>Display passwords</b> check box.
-                <li>Confirm that the check box is unchecked by default.
+                <li>Confirm that a <b>Pdf security settings</b> dialog is displayed.
 <p>
                 <li>Confirm that the dialog includes a <b>User password</b> group box.
                 <li>Confirm that the group box contains an <b>Enable user password</b> check box.
@@ -631,10 +574,6 @@
                 <li>Confirm that the edit boxes are enabled only when the check box is checked.
                 <li>Confirm that red error icons are displayed to the right of the edit boxes if
                 matching passwords have not been entered.
-                <li>Confirm that the passwords <b>are</b> displayed in clear text if the <b>Display
-                passwords</b> check box is checked.
-                <li>Confirm that the passwords <b>are not</b> displayed in clear text if the 
-                <b>Display passwords</b> check box is not checked.
 <p>
                 <li>Confirm that the dialog includes an <b>Owner password</b> group box.
                 <li>Confirm that the group box contains an <b>Enable owner password</b> check box.
@@ -653,8 +592,6 @@
 <p>
                 <li>Confirm that the group box contains an <b>Allow printing in low level 
                 quality</b> check box.
-                <LI><b>[LegacyRC #5769]</b> Confirm that setting the <b>low-resolution printing</b>
-                item is persistent.
                 <li>Confirm that the group box contains an <b>Allow document modifications</b> 
                 check box.
                 <li>Confirm that the group box contains an <b>Allow copying / extraction of text 
@@ -746,31 +683,6 @@
 <p>
             <li><b><u>Miscellaneous</u></b>
             <ul>
-                <li><b>[LegacyRC #4745]</b> Confirm that the image files in the following folder
-                convert to searchable PDF without error:  I:\Common\Testing\PVCS_Testing\LegacyRC\4745
-                <LI><b>[LegacyRC #5595]</b> Core: Convert to searchable PDF
-                <ul>
-                    <LI>Exercise the FPS file and image from <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5595</b>,
-                    copying the image to <b>D:\</b>.
-                    <li>Confirm that the PDF image is converted to a searchable PDF.
-                </ul>
-                <LI><b>[LegacyRC #5599]</b> PDF/A conversion
-                <ul>
-                    <li>Create a set of images for PDF/A conversion testing.  Include several 
-                    images that are too big to OCR.
-                    <LI>Confirm that the unusually large images gracefully fail processing.
-                    <li>Confirm that the normal images are processed and converted correctly.
-                </ul>
-<p>
-                <LI><b>[LegacyRC #5669]</b> PDF/A conversion failures
-                <ul>
-                    <LI>Exercise the <b>Core: Convert to searchable PDF</b> task with the PDF/A
-                    conversion option against the <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5669</b>
-                    image file.
-                    <LI>Confirm that the image cannot be converted to a PDF/A-compliant image.
-                    <li>Confirm that a meaningful error message is logged.
-                </ul>
-<p> 
             	<li><b>[LegacyRC #5893]</b> Property page
             	<ul>
                 	<li>Open the Core: Convert to searchable PDF config dialog. Note that the 
@@ -782,35 +694,38 @@
         </ul> 
 <p>
         <li><b>Core: Convert VOA to XML</b>
-        <ul> 
+    	<ul> 
             <li>Use the Add button to select <b>Core: Convert VOA to XML</b> as the task.
             <li>Confirm presence of an edit box to hold the name of the <b>VOA input file</b>.
             <li>Confirm presence of an associated <b>Configure XML Output...</b> button.
             <ul>
-                <li>Confirm that <b>Configure XML Output...</b> displays a <b>Configure Output data
-                to XML file</b> dialog.
-                <li>Confirm that the dialog includes an edit box to hold the name of the <b>XML
-                output file</b>.
-                <li>Confirm presence of an associated <b>Tag Selector</b> button.
-                <li>Confirm presence of an associated <b>...</b> ( Browse ) button.
-                <li>Confirm presence of an <b>XML Format</b> group box.
-                <ul>
-                    <li>Confirm presence of a radio button for <b>Version 1 format with 
-                    &lt;SubAttributes&gt;</b>.
-                    <li>Confirm presence of a radio button for <b>Version 2 format with 
-                    &lt;SpatialLine&gt;</b>.
-                    <li>Confirm that <b>Version 2</b> is the default.
-                    <li>Confirm presence of a check box for <b>Formatted with attribute names</b>.
-                    <li>Confirm presence of a check box for <b>Include schema name in output</b>.
-                    <li>Confirm presence of an edit box for the schema name.
-                    <li>Confirm that the check boxes are unchecked by default.
-                    <li>Confirm that the controls are disabled if the radio button is not selected.
-                </ul>
+                	<li>Confirm that <b>Configure XML Output...</b> displays a <b>Output data
+                	to XML file settings</b> dialog.
+                	<li>Confirm that the dialog includes an edit box to hold the name of the 
+			<b>XML output file</b>.
+                	<li>Confirm presence of an associated <b>Tag Selector</b> button.
+                	<li>Confirm presence of an associated <b>...</b> ( Browse ) button.
+                	<li>Confirm presence of an <b>XML Format</b> group box.
+                	<ul>
+                    		<li>Confirm presence of a radio button for <b>Version 1 format with 
+                    		&lt;SubAttributes&gt;</b>.
+                    		<li>Confirm presence of a radio button for <b>Version 2 format with 
+                    		&lt;SpatialLine&gt;</b>.
+                    		<li>Confirm that <b>Version 2</b> is the default.
+                    		<li>Confirm presence of a check box for <b>Formatted with attribute 
+				names</b>.
+                    		<li>Confirm presence of a check box for <b>Include schema name in 
+				output</b>.
+                    		<li>Confirm presence of an edit box for the schema name.
+                    		<li>Confirm that the check boxes are unchecked by default.
+                    		<li>Confirm that the controls are disabled if the radio button is 
+				not selected.
+                	</ul>
+            		<li>Confirm presence of a <b>Remove spatial information in output</b> checkbox 
+			that is unchecked by default.
             </ul>
             <li>Confirm presence of an associated <b>Tag Selector</b> button.
             <li>Confirm presence of an associated <b>...</b> ( Browse ) button.
-            <li>Confirm presence of a <b>Remove spatial information in output</b> checkbox that is
-            unchecked by default.
             <li>Confirm that settings are persistent.
 <p>
             <li>Confirm that <b>Version 1</b> XML output can be generated from VOA files.
@@ -824,48 +739,48 @@
 <p>
         <li><b>Core: Copy, move or delete file</b>
         <ul> 
-            <li>Use the Add button to select <b>Core: Copy, move or delete file</b> as the task.
-            <li>Confirm the Configure Copy Move or Delete File dialog has a <b>Copy file</b> radio
-            button, and the setting is persistent. 
-            <li>Confirm the dialog has a <b>Move file</b> radio button, and the setting is
-            persistent. 
-            <li>Confirm the dialog has a <b>Delete file</b> button, and the setting is  persistent. 
-            <li>Confirm that the <b><i>To</i></b> group controls are disabled when the <b>Delete 
-            file</b> button is selected. 
-            <li>Confirm that there is a combo box associated with <b><i>From</i></b> in Configure
-            Copy Move or Delete File dialog.
-            <ul> 
-                <li>Confirm the combo box has an associated <b>Tag Selector</b>, and <b>...</b> 
-                (Browse) button. 
-                <li>Confirm the Tag Selector button opens a context menu to the immediate right of
-                the button.
-                <li>Confirm the context menu includes <b>&lt;SourceDocName&gt;</b>, 
-                <b>&lt;FPSFileDir&gt;</b>, and a set of functions that start with $.  
-                <li>Confirm that when an item is chosen from the context menu it either inserts at
-                the current cursor position or replaces selected text in the edit box. 
-                <li>Confirm that pressing the <b>Browse</b> button brings up an Open file dialog
-                with default file type All Files(*.*).
-            </ul>
+            	<li>Use the Add button to select <b>Core: Copy, move or delete file</b> as the task.
+            	<li>Confirm that the <b>Core: Copy, move or delete file settings</b> dialog has a 
+		<b>Copy file</b> radio button, and the setting is persistent. 
+            	<li>Confirm the dialog has a <b>Move file</b> radio button, and the setting is
+            	persistent. 
+            	<li>Confirm the dialog has a <b>Delete file</b> button, and the setting is persistent. 
+            	<li>Confirm that the <b><i>To</i></b> group controls are disabled when the <b>Delete 
+            	file</b> button is selected. 
+            	<li>Confirm that there is a combo box associated with <b><i>From</i></b> in the 
+		<b>Core: Copy, move or delete file settings</b> dialog.
+            	<ul> 
+                	<li>Confirm the combo box has an associated <b>Tag Selector</b>, and <b>...</b> 
+                	(Browse) button. 
+                	<li>Confirm the Tag Selector button opens a context menu to the immediate 
+			right of the button.
+                	<li>Confirm the context menu includes <b>&lt;SourceDocName&gt;</b>, 
+                	<b>&lt;FPSFileDir&gt;</b>, and a set of functions that start with $.  
+                	<li>Confirm that when an item is chosen from the context menu it either inserts 
+			at the current cursor position or replaces selected text in the edit box. 
+                	<li>Confirm that pressing the <b>Browse</b> button brings up an Open file dialog
+                	with default file type All Files(*.*).
+            	</ul>
 <p>
-            <li>Confirm there is a radio button for <b>Record an error and continue</b> under 
-            <i>If Source file Does Not Exist</i>. 
-            <li>Confirm there is a radio button for <b>Skip the operation without error</b> under 
-            <i>If Source file Does Not Exist</i>. 
-            <li>Confirm that the setting of the radio button is persistent. 
-            <li>Confirm there is a combo box associated with <b><i>To</i></b> in Configure Copy 
-            Move or Delete File dialog.
-            <ul> 
-                <li>Confirm the combo box has an associated <b>Tag Selector</b>, and a <b>...</b> 
-                (Browse) button. 
-                <li>Confirm the Tag Selector button opens a context menu to the immediate right of
-                the button.
-                <li>Confirm the context menu includes <b>&lt;SourceDocName&gt;</b>,
-                <b>&lt;FPSFileDir&gt;</b>, and a set of functions that start with $.   
-                <li>Confirm when an item is chosen from the context menu it either inserts at the
-                current cursor position or replaces selected text in the edit box. 
-                <li>Confirm that the Browse button brings up an Open file dialog with default file
-                type All Files(*.*).
-            </ul> 
+            	<li>Confirm there is a radio button for <b>Record an error and continue</b> under 
+            	<i>If Source file Does Not Exist</i>. 
+            	<li>Confirm there is a radio button for <b>Skip the operation without error</b> under 
+            	<i>If Source file Does Not Exist</i>. 
+            	<li>Confirm that the setting of the radio button is persistent. 
+            	<li>Confirm there is a combo box associated with <b><i>To</i></b> in the <b>Core: Copy, 
+		move or delete file settings</b> dialog.
+            	<ul> 
+                	<li>Confirm the combo box has an associated <b>Tag Selector</b>, and a <b>...</b> 
+                	(Browse) button. 
+                	<li>Confirm the Tag Selector button opens a context menu to the immediate right 
+			of the button.
+                	<li>Confirm the context menu includes <b>&lt;SourceDocName&gt;</b>,
+                	<b>&lt;FPSFileDir&gt;</b>, and a set of functions that start with $.   
+                	<li>Confirm when an item is chosen from the context menu it either inserts at the
+                	current cursor position or replaces selected text in the edit box. 
+                	<li>Confirm that the Browse button brings up an Open file dialog with default 
+			file type of <b>All Files(*.*)</b>.
+            	</ul> 
 <p>
             <li>Confirm there is a checkbox for <b>Create destination folder if not present</b>. 
             <li>Confirm the setting of the checkbox is persistent.
@@ -960,8 +875,9 @@
                 when <b>Skip the operation without error</b> is selected for <i>If Source File Does
                 Not Exist</i>.
                 <li>Confirm that the <b>Allow read only file to be deleted</b> checkbox is enabled.
-                <li><b>[FlexIDSCore #3136]</b> Confirm that read-only files can now be optionally
-                deleted.
+		<ul>
+                	<li>Confirm that read-only files can now be optionally deleted.
+		</ul>
             </ul>
 <p>
             <li>Confirm if the file name(s) and/or folder name(s) in the <u>From</u> and <u>To</u> 
@@ -1010,22 +926,22 @@
     <p>
         <li><b>Core: Delete empty folder</b>
         <ul>
-            <li>Select <b>Core: Delete empty folder</b> as the task using the Add button.</li>
-            <li>Confirm the presence of a <b>Name of folder to delete</b> edit box with an
-            associated tag selector.</li>
-            <li>Confirm that the text box defaults to <b>$DirOf(&lt;SourceDocName&gt;)</b>.</li>
-            <li>Confirm that the tag selector functions as expected.</li>
-            <li>Confirm that there is a <b>Delete parent folders recursively</b> checkbox and that
-            it is <b>unchecked</b> by default.</li>
-            <li>Confirm that iff the recursive deletion box is checked, an <b>Up to but not
-            including this folder</b> checkbox is also enabled.</li>
-            <li>Confirm that iff the Up to but not including box is checked, an associated edit
-            box, browse button, and tag selector are also enabled.</li>
-            <li>Confirm that those controls each work as expected.</li>
-        <p>
-            <li>Confirm that an empty folder can be deleted.</li>
-            <li>Confirm that parent folders can be recursively deleted.</li>
-            <li>Confirm that a limit can be placed on recursive deletion.</li>
+            	<li>Select <b>Core: Delete empty folder</b> as the task using the Add button.</li>
+            	<li>Confirm the presence of a <b>Name of folder to delete</b> edit box with an
+            	associated tag selector.</li>
+            	<li>Confirm that the text box defaults to <b>$DirOf(&lt;SourceDocName&gt;)</b>.</li>
+            	<li>Confirm that the tag selector functions as expected.</li>
+            	<li>Confirm that there is a <b>Delete parent folders recursively</b> checkbox and that
+            	it is <b>unchecked</b> by default.</li>
+            	<li>Confirm that iff the recursive deletion box is checked, an <b>Up to but not
+            	including this folder</b> checkbox is also enabled.</li>
+            	<li>Confirm that iff the <b>Up to but not including</b> box is checked, an associated 
+		edit box, browse button, and tag selector are also enabled.</li>
+            	<li>Confirm that those controls each work as expected.</li>
+<p>
+            	<li>Confirm that an empty folder can be deleted.</li>
+            	<li>Confirm that parent folders can be recursively deleted.</li>
+            	<li>Confirm that a limit can be placed on recursive deletion.</li>
         </ul></li>
 <p>
         <li><b>Core: Encrypt/Decrypt file</b>
@@ -1057,7 +973,7 @@
                     buttons.</li>
                 </ul></li>
             </ul></li>
-            <li>Confirm that you are required to proved a password in the configuration 
+            <li>Confirm that you are required to provide a password in the configuration 
             dialog.</li>
         <p>
             <li>Set up an "Encrypt file" task and hit the OK button.</li>
@@ -1086,7 +1002,8 @@
         <li><b>Core: Execute rules</b>
         <ul> 
             <li>Select <b>Core: Execute rules</b> as the task using the Add button.
-            <li>Confirm the Configure Execute Rules dialog has an edit box under Select Rules File.
+            <li>Confirm the <b>Core: Execute Rules settings</b> dialog has an edit box under 
+		Select Rules File.
             <ul> 
                 <li>Confirm presence of an associated <b>Tag Selector</b> button.
                 <ul> 
@@ -1094,8 +1011,7 @@
                     <li>Confirm that <b>&lt;SourceDocName&gt;</b> is provided in the drop down
                     list.
                     <li>Confirm that the usual functions are provided in the drop down list.
-                    <li><b>[FlexIDSCore #4333]</b> Test one of the functions and confirm that it
-                    works as expected.
+                    <li>Test one of the functions and confirm that it works as expected.
                 </ul> 
                 <li>Confirm that the edit box has an associated <b>...</b> ( Browse ) button. 
                 <li>Confirm that pressing the Browse button brings up an Open file dialog with 
@@ -1115,29 +1031,13 @@
                 option only if you're sure the rules don't require OCR results)</b>.
             </ul>
             <li>Confirm presence of a <b>Save OCR results to speed up re-processing</b> checkbox.
-            <LI><b>[FlexIDSCore #3715]</b> Confirm that the <b>Save OCR results to speed up 
+            <LI>Confirm that the <b>Save OCR results to speed up 
             re-processing</b> check box is cleared and disabled if the <b>Do not OCR any of the
             pages</b> radio button is selected.
             <li>Confirm presence of a <b>Use cleaned image if available</b> checkbox.
-            <li><b>[FlexIDSCore #3745]</b> Confirm that the <b>Use cleaned image</b> check box is
+            <li>Confirm that the <b>Use cleaned image</b> check box is
             disabled in the property page if <b>Do not OCR any of the pages</b> is selected.
             <li>Confirm that settings are persistent.
-        <p>
-            <li>Get the .fps file at 
-            <b>D:\Engineering\ReusableComponents\COMComponents\UCLIDFileProcessing\InteractiveTest\TestFiles\ExecuteRulesConfigurationTest.fps</b>.
-            Note that it is configured to connect to the local Demo_IDShield database. Confirm 
-            that:
-            <ul>
-                <li>The first Execute rules task is configured to <b>Use previously saved OCR 
-                results</b>, <b>OCR all pages of the image</b>, and <b>use a cleaned image if
-                available</b>.</li>
-                <li>The second Execute rules task is configured to <b>Use previously saved OCR
-                results</b>, <b>OCR all pages of the image</b>, <b>Save OCR results</b>, and <b>use
-                a cleaned image if available</b>.</li>
-                <li>The third Execute rules task is configured to <b>Use previously saved OCR
-                results</b>, <b>OCR pages 1-2</b>, <b>Save OCR results</b>, and <b>use a cleaned
-                image if available</b>.</li>
-            </ul></li>
 <p>
             <li>Confirm that an image OCRs before rules are executed if <b>Use previously saved OCR 
             results if available</b> is unchecked and <b>Do not OCR any of the pages</b> is not 
@@ -1145,23 +1045,9 @@
             <li>Confirm that an image with a corresponding USS file does not OCR before rules are
             executed if <b>Use previously saved OCR results if available</b> is checked. 
 <p>
-            <li><b>[FlexIDSCore #2397]</b> Exercise the <b>Execute rules</b> task on a group of
-            previously OCR'd images.  Confirm that updated progress information is provided on the 
-            <b>Files currently being processed</b> grid on the Processing Log tab.
-            <LI><b>[FlexIDSCore #3518]</b> Execute rules with no text in image
-            <ul>
-                <li>Execute rules in the FAM for images without USS files.
-                <li>Supply at least one file without recognized text (i.e. 
-                <b>K:\Common\Engineering\Sample Files\CO - SoS\Set005\Images\O_3696988.tif</b>).
-                <li>Confirm that the rules process without failing the document. 
-            </ul>
-            <li><b>[LegacyRC #4840]</b> Exercise the <b>Execute rules</b> task on a USS file
-            renamed to be a TIF image.  Confirm that the file fails processing and that only 
-            <b>one</b> relevant exception is logged.
-        <p>
             <li><b>[FlexIDSCore #4269]</b> Confirm that the tests located at
             I:\Common\Testing\PVCS_Testing\FlexIDSCore\4269 work as expected.
-        <p>
+<p>
             <li><b>[FlexIDSCore #4526]</b> Confirm that the Execute rules task can use previously
             saved OCR results when processing images with numeric extensions regardless of 
             extension length.</li>
@@ -1172,8 +1058,12 @@
 		<li>Confirm that the task is installed and available.</li>
 		<li>Confirm that the property page contains:
 		<ul>
-                    	<li>an edit box for VOA file</li>
-                    	<li>an edit box for attribute query to select attribute(s) whose spatial 
+                    	<li>An edit box for a data file.</li>
+			<ul>
+				<li>An associated <b>tag selector</b> button
+				<li>An associated <b>browse</b> button
+			</ul>
+                    	<li>An edit box for attribute query to select attribute(s) whose spatial 
 			area is to be extracted.</li>
                     	<li>A choice between using the overall bounds of an attribute or using each
                     	raster zone individually.</li>
@@ -1218,15 +1108,12 @@
                 immediate right of the button. 
                 <li>Confirm the context menu includes <b>&lt;SourceDocName&gt;</b>,
                 <b>&lt;FPSFileDir&gt;</b>, and a set of functions that start with $. 
-                <li><b>[FlexIDSCore #4333]</b> Test one of the functions and confirm that it works
-                as expected.
+                <li>Test one of the functions and confirm that it works as expected.
                 <li>Confirm that when an item is chosen from the context menu it either inserts at
                 the current cursor position or replaces selected text in the edit box. 
                 <li>Confirm that pressing the Browse button brings up an Open file dialog with
                 default file type All Files(*.*). 
                 <li>Confirm that when a file is chosen, it replaces the text in the edit box.
-                <li><b>[LegacyRCAndUtils #4910]</b> confirm that when a file is chosen, the path
-                is automatically wrapped in quotation marks.
             </ul> 
 <p>
             <li>Confirm the Configure Launch Application dialog has an edit box associated with
@@ -1237,13 +1124,13 @@
                 <li>Confirm that the <b>Tag Selector</b> button opens a context menu to the 
                 immediate right of the button.
                 <li>Confirm that the context menu includes <b>&lt;SourceDocName&gt;</b>,
-                <b>&lt;FPSFileDir&gt;</b>, and a set of functions that start with $. 
-                <li><b>[FlexIDSCore #4333]</b> Test one of the functions and confirm that it works as expected.
+                <b>&lt;FPSFileDir&gt;</b>, and a set of functions that start with <b>$</b>. 
+                <li>Test one of the functions and confirm that it works as expected.
                 <li>Confirm that when an item is chosen from the context menu it either inserts at
                 the current cursor position or replaces selected text in the edit box. 
                 <li>Confirm that the Browse button brings up a <b>Browse for Folder</b> dialog. 
-                <li><b>[FlexIDSCore #3001]</b> Confirm that cancelling from the <b>Browse for 
-                Folder</b> dialog retains the previous folder definition without error. 
+                <li>Confirm that cancelling from the <b>Browse for Folder</b> dialog retains the 
+		previous folder definition without error. 
                 <li>Confirm that the folder path is placed in the edit box.
             </ul> 
 <p>
@@ -1256,8 +1143,7 @@
                 immediate right of the button.
                 <li>Confirm that the context menu includes <b>&lt;SourceDocName&gt;</b>,
                 <b>&lt;FPSFileDir&gt;</b>, and a set of functions that start with $. 
-                <li><b>[FlexIDSCore #4333]</b> Test one of the functions and confirm that it works
-                as expected.
+                <li>Test one of the functions and confirm that it works as expected.
                 <li>Confirm that when an item is chosen from the context menu it either inserts at
                 the current cursor position or replaces selected text in the edit box. 
                 <li>Confirm that pressing the Browse button brings up an Open file dialog with
@@ -1306,26 +1192,6 @@
                 <li>Tags can be toggled for processed documents
                 <li>Dynamically created tags can be added to processed documents
             </ul>
-<p>
-            <li><b>[LegacyRC #5447]</b> Do not partially complete a task
-            <ul>
-                <li>Create three tags in the <b>DB Admin</b> utility.
-                <li>Configure a FAM task to apply all three tags.
-                <li>Delete one of the tags via <b>DB Admin</b>.
-                <li>Start processing.
-                <li>Confirm that each processed file fails.
-                <li>Confirm that neither of the two remaining tags are applied to any of the
-                processed documents.
-            </ul>
-            <li><b>[LegacyRC #5448]</b> Tag must exist for configuration
-            <ul>
-                <li>Create a tag in the <b>DB Admin</b> utility.
-                <li>Configure a FAM task to apply the tag.
-                <li>Delete the tag via <b>DB Admin</b>.
-                <li>Open the property page for the previously configured task and click <b>Ok</b>.
-                <li>Confirm that an error message is presented about the missing tag.
-                <li>Confirm that the user must <b>Cancel</b> out of the property page.
-            </ul>
         </ul> 
 <p>
         <li><b>Core: Modify PDF file</b>
@@ -1346,7 +1212,7 @@
             <li>Confirm that the tag selector button provides <b>&lt;FPSFileDir&gt;</b> and 
             <b>&lt;SourceDocName&gt;</b>.
             <li>Confirm that the tag selector button provides the usual $ functions.
-            <li><b>[FlexIDSCore #4333]</b> Test one of the functions and confirm that it works as expected.
+            <li>Test one of the functions and confirm that it works as expected.
             <li>Confirm that selections from the tag selector button are correctly applied to the
             edit box.
             <li>Confirm that the group box contains an associated <b>...</b> browse button.
@@ -1362,7 +1228,6 @@
             <li>Confirm that an informative exception is thrown if the specified PDF file does not
             exist.
             <li>Confirm that annotations are correctly <b>removed from</b> the PDF file.
-            <li>Confirm that annotations are correctly <b>retained in</b> the PDF file.
 <p>
             <li><b>[DotNet #398, #597]</b> Single threading
             <ul>
@@ -1373,9 +1238,6 @@
                 <li>Confirm that trying to run the task multi-threaded does not cause the FAM to
                 crash.</li>
             </ul>
-<p>
-            <LI><b>[LegacyRC #5729]</b> Confirm that a meaningful exception is presented when 
-            exercising <b>Core: Modify pdf file</b> with a TIF image.
         </ul> 
 <p>
         <li><b>Core: Modify Source Document Name in Database</b>
@@ -1384,12 +1246,12 @@
             exists.</li>
             <li>Confirm that the task requires a <b>server</b> license.</li>
             <li>Confirm that the task must be configured.</li>
-        <p>
+<p>
             <li>Confirm that the config page provides an edit box to specify the <b>New name for
             SourceDocName in the database</b>.</li>
             <li>Confirm that the Cancel and Close buttons work as expected.</li>
             <li>Confirm that a usage message is provided when you hit the <b>OK</b> button.</li>
-        <p>
+<p>
             <li>Confirm that you are asked to provide the admin password when starting a FAM that
             includes an enabled Modify SourceDocName task.</li>
             <li>Confirm that you are prompted for the password if the Modify SourceDocName task is
@@ -1398,7 +1260,7 @@
             SourceDocName task is disabled.</lI>
             <li>Confirm that an appropriate message is displayed if you provide a blank or
             incorrect password.</li>
-        <p>
+<p>
             <li><b>[LegacyRC #5969]</b> Single quotes in new SourceDocName
             <ul>
                 <li>Confirm that you cannot use the Modify SourceDocName for a SQL injection 
@@ -1407,7 +1269,7 @@
                 [FileActionStateTransition];UPDATE [FAMFile] SET [FileName] = 
                 '&lt;SourceDocName&gt;</li>
             </ul></li>
-        <p>
+<p>
             <li><b>[LegacyRC #5979]</b> Couldn't be run as a service
             <ul>
                 <li>Configure a database to require authentication to run.</li>
@@ -1419,13 +1281,13 @@
                 <li>Confirm that the service no longer requires the admin password.</li>
                 <li>Confirm that the same behavior happens if the database is <b>not</b> set to
                 require authentication, but the FAM includes a task that <b>does</b> require
-                administrative priveleges.</li>
+                administrative privileges.</li>
             </ul></li>
         </ul></li>
     <p>
         <li><b>Core: OCR document</b>
         <ul> 
-            <li><b>[LegacyRC #4790]</b> Pay attention during OCR tests and watch for any MFC error
+            <li>Pay attention during OCR tests and watch for any MFC error
             messages from a Scansoft internal error.  These errors should be automatically
             dismissed so any recurrence <b>must</b> be noted.
 <p>
@@ -1446,96 +1308,13 @@
             <li>Confirm that only the specified pages(s) appear in the USS file. 
             <li>Confirm that if <b>OCR specific pages</b> is selected, then pages must be defined.
 <p>
-            <li><b>[LegacyRC #4335]</b> Confirm that a warning message is displayed when opening 
-            an FPS file with a version 5.0 <b>OCR document</b> task.  A suitable FPS file can be
-            found in the following folder:  I:\Common\Testing\PVCS_Testing\LegacyRC\4335.
-            K:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set006\Images\A\B00133AAO7R.TIF
-            <li><b>[LegacyRC #3659]</b> Confirm that the image files in the following folder OCR
-            without error: I:\Common\Testing\PVCS_Testing\LegacyRC\3659
-            <li><b>[LegacyRC #4399]</b> Create an FPS file to supply and process a file for OCR. 
-            Use the file in I:\Common\Testing\PVCS_Testing\LegacyRC\4399.  Confirm that the file 
-            successfully OCRs.
-<p>
-            <li><b>[LegacyRC #4368, #4369]</b> Create an FPS file to supply and process some files
-            for OCR. Confirm that progress status is updated on the <b>Processing Log</b> tab.
-            <li><b>[LegacyRC #4393]</b> Disabling Progress Status
-            <ul>
-                <li>For 32-bit operating systems: Modify HKLM/Software/Extract Systems/ReusableComponents/COMComponents/UCLIDFileProcessing/FileProcessingRecord
-                so that DisplayProgressStatus is <b>0</b>.
-                <li>For 64-bit operating systems: Modify HKLM/Software/wow6432Node/Extract Systems/ReusableComponents/COMComponents/UCLIDFileProcessing/FileProcessingRecord
-                so that DisplayProgressStatus is <b>0</b>.
-                <li>Create an FPS file to supply and process some files for OCR.
-                <li>Confirm that progress status is <b>not updated</b> on the <b>Processing 
-                Log</b> tab.
-            </ul>
-            <li><b>[LegacyRC #4398]</b> Create an FPS file to supply and process a file for OCR. 
-            Use the file in I:\Common\Testing\PVCS_Testing\LegacyRC\4398.  Confirm that the file 
-            fails to OCR and is moved to the <b>Failed</b> grid on the Processing Log tab. Note
-            that this task takes a long time.
-            <li>Bad images - confirm that the following images OCR without error
-            <ul>
-                <li><b>I:\Common\Testing\PVCS_Testing\LegacyRC\4830</b>
-                <li><b>I:\Common\Testing\PVCS_Testing\LegacyRC\4832</b>
-                <li><b>I:\Common\Testing\PVCS_Testing\LegacyRC\4845</b>
-                <li><b>I:\Common\Testing\PVCS_Testing\LegacyRC\5118</b>
-                <li><b>I:\Common\Testing\PVCS_Testing\LegacyRC\5128</b>
-                <li><b>I:\Common\Testing\PVCS_Testing\LegacyRC\5294</b>
-            </ul>
-            <li><b>[FlexIDSCore #3242]</b> FAM crashes when uss files are queued and OCRed
-            <ul>
-                <li>Create an FPS file to supply and process <b>USS</b> files for OCR.
-                <li>Confirm that a useful error message is presented and that the FAM does not crash.
-                <li>Repeat the exercise as the SCR reports that the crash does not occur every time.
-            </ul>
-<p>
-            <li><b>[LegacyRC #5311]</b>
+            <li><b>[LegacyRC #5311] NOT FIXED</b>
             <ul>
                 <li>Make many local copies of the two images at 
-                <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5370</b>.</li>
+                <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5311</b>.</li>
                 <li>OCR them.</li>
                 <li>Confirm that the documents OCR correctly and no exceptions are seen.</lI>
             </ul></li>
-        <p>
-            <li><b>[LegacyRC #5370]</b> Skipping pages that fail OCR
-            <ul>
-                <li>Make a local copy of the <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5370</b> 
-                image files.
-                <li>Add the following registry keys under 
-                <b>HKCU\Software\Extract Systems\ReusableComponents\OCREngine\SSOCR</b>.
-                <ul>
-                    <li><b>SkipPageOnFailure</b> set to <b>0</b>.
-                    <li><b>MaxOcrPageFailurePercentage</b> set to <b>25</b>.
-                    <li><b>MaxOcrPageFailureNumber</b> set to <b>10</b>.
-                </ul>
-                <li>OCR the images and confirm that each image file fails.
-                <li>Confirm that an exception is logged for each failure with debug data that
-                includes the page number of the failed page.
-                <li>Set the <b>SkipPageOnFailure</b> registry entry to <b>1</b>.
-                <li>Re-OCR each of the image files.
-                <ul>
-                    <li><b>OneBadPageInThree.tif</b> still fails to OCR.
-                    <li><b>OneBadPageInFive.tif</b> now passes OCR.
-                    <li><b>ThreeBadPagesInTwenty.tif</b> now passes OCR.
-                    <li><b>TwelveBadPagesInFifty.tif</b> still fails to OCR.
-                    <li>Confirm that an <b>Application Trace:</b> exception is logged for each 
-                    passed image with debug data that includes the page number(s) of the failed
-                    page(s).
-                </ul>
-            </ul>
-<p>
-            <LI><b>[LegacyRC #5559]</b> Confirm that an <b>Unable to locate zones</b> exception is
-            not logged when OCR'ing a blank page.
-<p>
-            <LI><b>[LegacyRC #5728]</b> OCR Engine
-            <ul>
-                <li>OCR the images from <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5728</b>.
-                <li>Confirm that text is recognized.
-                <li>Confirm that <b>Application trace</b> exceptions are logged for some of the
-                images.
-            </ul>
-<p>
-            <LI><b>[LegacyRC #5781]</b> Confirm that the <b>OCR progress status dialog</b> displays 
-            the correct page information even after the previous document failed to OCR.
 <p>
             <li><b>[LegacyRC #5855]</b> Unnecessary errors logged on OCR failure
             <!-- fixed v 8.1.0.31 -->
@@ -1551,7 +1330,7 @@
             <li>Use the Add button to select <b>Core: Rasterize PDF</b> as the task.</li>
             <li>Confirm that the task requires configuration.</li>
             <li>Open the property page.</li>
-        <p>
+<p>
             <li>Confirm that there is a <b>PDF file</b> edit box
             <ul>
                 <li>Confirm that it defaults to <b>&lt;SourceDocName&gt;</b></li>
@@ -1579,7 +1358,7 @@
                 button.</li>
                 <li>Confirm that the <b>Fail</b> radio button is selected by default.</li>
             </ul></li>
-        <p>
+<p>
             <li>Confirm that the task fails when run on non-PDF files.</li>
             <li>Confirm that the task successfully converts a PDF into a TIF.</li>
             <li>Confirm that you are prompted to confirm before saving a configuration that 
@@ -1592,7 +1371,7 @@
             <li>Confirm that the <b>Ignore</b> option works as expected if the PDF cannot be
             deleted.</lI>
         </ul></li>
-    <p>
+<p>
         <li><b>Core: Set file action status in database</b>
         <ul> 
             <li>Use the Add button to select <b>Core: Set file-action status in database</b> as
@@ -1607,57 +1386,11 @@
                 <li>Confirm that <b>Unattempted</b> is available in the combo box. 
                 <li>Confirm that <b>Pending</b> is available in the combo box. 
                 <li>Confirm that <b>Completed</b> is available in the combo box. 
+                <li>Confirm that <b>Skipped</b> is available in the combo box. 
                 <li>Confirm that <b>Failed</b> is available in the combo box. 
-                <li><b>[LegacyRC #4812]</b> Confirm that <b>Pending</b> is the default selection. 
+                <li>Confirm that <b>Pending</b> is the default selection. 
             </ul>
             <li>Confirm that the settings are persistent.
-<p>
-            <li><b>[LegacyRC #4967]</b> Action names not always persistent
-            <ul>
-                <li>Add action name <b>Test_First</b> to the working database. 
-                <li>Add action name <b>TestLast</b> to the working database. 
-                <li>Create an FPS file with a Set File Action Status task to set <b>Test_First</b>
-                to Pending. 
-                <li>Add a second Set File Action Status task to set <b>TestLast</b> to Pending. 
-                <li>Edit the first task and confirm that the property page defaults to 
-                <b>Test_First</b>. 
-                <li>Edit the second task and confirm that the property page defaults to
-                <b>TestLast</b>. 
-            </ul>
-<p>
-            <li><b>[LegacyRC #4966]</b> Display error message if target action not found in DB
-            <ul>
-                <li>Add action name <b>Test_First</b> to the working database. 
-                <li>Create an FPS file with a Core: Set file action status task to set 
-                <b>Test_First</b> to Pending. 
-                <li>Use FAM DB Admin to remove the <b>Test_First</b> action. 
-                <li>Edit the task and confirm that an error message is displayed prompting the
-                user to select a different action.  Also confirm that no default action name is 
-                selected in the combo box. 
-            </ul>
-<p>
-            <li><b>[LegacyRCAndUtils #5096]</b> Set File Action Status adds queue event
-            <ul>
-                <li>Create a database with multiple actions including <b>Process</b> and 
-                <b>CleanUp</b>.
-                <li>Create FPS File #1 to <b>queue</b> images for <b>Process</b> action. The
-                <b>Force Processing</b> flag should be checked and <b>listening</b> for files to
-                be added to the folder should also be checked.
-                <li>Create FPS File #2 to <b>process</b> the images. Include a <b>Core: Execute 
-                rules</b> task and a <b>Core: Set file action status</b> task to set 
-                <b>CleanUp</b> status to <b>Pending</b>.
-                <li>Confirm that <b>no</b> extra file added queue events are seen.
-            </ul>
-<p>
-            <li><b>[LegacyRC #5648]</b> Support for AutoCreateAction
-            <ul>
-                <li>Enable <b>AutoCreateAction</b> in the <b>DBInfo</b> table.
-                <li>Queue some files to the database.
-                <li>Process the files such <b>Core: Set file action status</b> set file action
-                status for an action that does not exist in the database.
-                <li>Confirm that processing is successful and that the action is automatically
-                created.
-            </ul>
         </ul> 
 <p>
         <li><b>Core: Set file priority</b>
@@ -1708,7 +1441,7 @@
             <li>Confirm that the property page includes a <b>Sleep for a random amount of time 
             between 1 millisecond and specified time</b> check box.
             <li>Confirm that settings are persistent.
-    <p>
+<p>
             <li>Confirm that the task sleeps for an appropriate amount of time
             <ul>
                 <li>some number of <b>milliseconds</b>.
@@ -1720,7 +1453,7 @@
                 <li>some number of <b>hours</b>.
                 <li>some number of <b>hours</b> with a random sleep.
             </ul>
-    <p>
+<p>
             <li>Sleep is a cancellable task
             <ul>
                 <li>Configure an FPS file with a <b>Core: Sleep</b> task followed by at least one
@@ -1732,14 +1465,14 @@
                 <li>Confirm that progress status is updated as sleep proceeds.
             </ul>
         </ul> 
-    <p>
+<p>
         <li><b>Core: Transfer file via FTP/SFTP</b>
         <ul>
             <li>Confirm that a <b>Core: Transfer file via FTP/SFTP</b> tassk exists.</li>
             <li>Confirm that it requires a special license.</li>
             <li>Confirm that the configuration dialog has a <b>General Settings</b> tab and a
             <b>Connection Settings</b> tab.</li>
-        <p>
+<p>
             <li><b>General Settings</b>
             <ul>
                 <li>Confirm that there is a group box for <b>Select file operation</b> and that it
@@ -1763,12 +1496,12 @@
                     <b>&lt;SourceDocName&gt;</b> and associated tag selector and browse 
                     button.</li>
                 </ul></LI>
-            <p>
+<p>
                 <li>Confirm that all the controls work as expected.</li>
                 <li>Confirm that the <b>Local filename</b> text box is disabled when the
                 <b>Delete file</b> option is selected.</li>
             </ul></li>
-        <p>
+<p>
             <li><b>Connection Settings</b>
             <ul>
                 <li>Confirm the presence of a grid for the following settings:
@@ -1786,20 +1519,20 @@
                 <li>Confirm that when it is checked, more settings become available in the 
                 Connection settings grid.</li>
                 <li>Confirm the presence of a <b>Number of retries</b> spin control with a default
-                value of <b>1000</b>.</li>
+                value of <b>10</b>.</li>
                 <li>Confirm the prsence of a <b>Time between retries</b> edit box with a default
                 value of <b>1000</b>.</li>
                 <li>Confirm the presence of a <b>Test Connection</b> button.</li>
-            <p>
+<p>
                 <li>Confirm that all controls work as expected and all settings are persisted
                 correctly.</li>
             </ul></li>
-        <p>
+<p>
             <li>Confirm that files can be uploaded to an FTP site.</li>
             <li>Confirm that files can be downloaded from an FTP site.</li>
             <li>Confirm that files can be deleted from an FTP site.</li>
             <li>Confirm that all available connection protocols work as expected.</li>
-        <p>
+<p>
             <li>Confirm that the task will retry an operation if a failure occurs.</li>
             <li>Confirm that the task allows the use of the <b>&lt;RemoteSourceDocName&gt;</b> tag
             whose value is obtained from an associated <b>.info</b> file.</li>
