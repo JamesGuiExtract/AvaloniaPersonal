@@ -101,14 +101,14 @@
 <p>
         <LI><b>Miscellaneous</b>
         <ul>
-       		<li><b>[DotNet #442]</b> Database pointing to nonexistent FPS file
+       		<li><b>[DotNetRC #442]</b> Database pointing to nonexistent FPS file
        		<ul>
                		<li>Configure the ESFAMService database to point to a FPS file that 
 			does not exist.</li>
                		<li>Start the service and confirm that you don't see access violation 
 			errors from <b>FAMProcess.exe</b>.</li>
        		</ul></li>
-       		<li><b>[DotNet #511]</b> Sorting by filename with no filename specified
+       		<li><b>[DotNetRC #511]</b> Sorting by filename with no filename specified
        		<ul>
                		<li>Open a service database with an empty FPSFile table.</li>
                		<li>In the FPSFile table, click in the <b>NumberOfFilesToProcess</b> 
@@ -116,6 +116,13 @@
                		<li>Click in the <b>FileName</b> column header to sort the table 
 			by filename.</li>
                		<li>Confirm that no exceptions are seen.</li>
+       		</ul></li>
+       		<li><b>[DotNetRC #810]</b> Edit temporary file
+       		<ul>
+               		<li>Configure the ESFAMService database to point to a valid FPS file.
+			<li>Save the edits but <b>do not</b> close the SDF file.
+               		<li>Start the service and confirm that the <b>FAM Service</b> can 
+			process files while <b>SQLCDBEditor</b> edits the ESFAMService database.
        		</ul></li>
        	</ul></li>
 </ul>
