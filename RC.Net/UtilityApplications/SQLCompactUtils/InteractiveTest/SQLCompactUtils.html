@@ -29,6 +29,7 @@
             		a different database.</li>
             		<li>Confirm that a <b>Save Database</b> button is provided for saving 
             		database changes.</li>
+            		<li>Confirm that a <b>Create New Query</b> button is provided.</li>
 <p>
             		<li>Confirm that <b>File - Open</b> displays an Open dialog.</li>
             		<li>Confirm that the Open dialog defaults to choosing <b>Database files 
@@ -55,6 +56,8 @@
             		<li>Confirm that it is enabled when connected to a database with an 
 			out-of-date schema.</li>
             		<li>Confirm that <b>Update to current schema</b> works as expected.</lI>
+            		<li>Confirm that <b>Tools - Create new query</b> creates a numbered 
+			<b>New Query</b> tab.</li>
 <p>
             		<li>Confirm that <b>Help - About</b> displays the <b>About SQLCDBEditor</b> 
             		dialog.</li>
@@ -62,11 +65,169 @@
             		copyright date.</li>
         	</ul></li>
 <p>
+        	<LI><b>Windows</b>
+        	<ul>
+            		<li><u>Tables</u>
+			<ul>
+            			<li>Open an existing SQL Compact Database file and confirm that 
+				the <b>Tables</b> window includes one entry for each defined table.
+	            		<li>Confirm that selecting a <b>Tables</b> entry displays the 
+				contents of the table in the <b>Primary</b> tab.
+	            		<li>Confirm that the <b>context menu</b> contains the following
+				<ul>
+					<li>Open in separate tab
+					<li>Copy to new query
+				</ul>
+				<li>Confirm that the <b>context menu</b> entries have the same 
+				functionality as the corresponding toolbar buttons.
+	            		<li><b>[DotNetRC #821]</b> Confirm that the <b>Table</b> list items 
+				are visible.
+			</ul>
+            		<li><u>Queries</u>
+			<ul>
+            			<li>Open an existing SQL Compact Database file and confirm that 
+				the <b>Queries</b> window includes one entry for each <b>.sqlce</b> 
+				file found in the same folder.
+	            		<li>Confirm that selecting a <b>Queries</b> entry displays the 
+				contents of the query in the <b>Primary</b> tab.
+	            		<li>Confirm that the <b>Context menu</b> contains the following
+				<ul>
+					<li>Open in separate tab
+					<li>Copy to new query
+					<li>Rename query
+					<li>Delete
+				</ul>
+				<li>Confirm that the <b>context menu</b> entries have the same 
+				functionality as the corresponding toolbar buttons.
+				<li>Confirm that <b>Delete</b> removes the entry from the 
+				<b>Queries</b> window and also deletes the <b>.sqlce</b> file.
+	            		<li><b>[DotNetRC #821]</b> Confirm that the <b>Query</b> list items 
+				are visible.
+			</ul>
+            		<li><u>Primary tab - Table</u>
+			<ul>
+				<li>Open a <b>Tables</b> entry into the <b>Primary</b> tab.
+				<li>Confirm that the <b>Primary</b> tab includes a yellow 
+				star icon before the Table name.
+				<li>Confirm that selecting a different table replaces the 
+				existing contents of the <b>Primary</b> tab.
+	            		<li>Confirm that the <b>Primary</b> tab includes toolbar buttons.
+				<ul>
+					<li>Send to separate tab
+					<li>Copy to new query
+				</ul>
+<p>
+	            		<li>Confirm that clicking the <b>Send to separate tab</b> button 
+				moves the results to a different tab and <u>clears</u> the 
+				<b>Primary</b> tab.
+	            		<li>Confirm that clicking the <b>Copy to new query</b> button 
+				adds a new numbered entry to the <b>Queries</b> window.
+				<ul>
+					<li>Confirm that a <b>.sqlce</b> file is created and saved 
+					in the same folder as the original <b>.SDF</b> file.
+				</ul>
+	            		<li><b>[DotNetRC #829]</b> Table Re-Ordering
+				<ul>
+					<li>Sort a table by the second column (ascending).
+					<li>Add a value to the first column of the new row.
+					<li>Click in the second column.
+					<li>Confirm that the new row is not re-ordered until 
+					the user navigates out of the row.
+				</ul>
+			</ul>
+            		<li><u>Primary tab - Query</u>
+			<ul>
+				<li>Open a <b>Queries</b> entry into the <b>Primary</b> tab.
+				<li>Confirm that the <b>Primary</b> tab includes a yellow 
+				star icon before the Query name.
+				<li>Confirm that selecting a different query replaces the 
+				existing contents of the <b>Primary</b> tab.
+	            		<li><b>[DotNetRC #823]</b> Confirm that editing query text retains 
+				focus in the edit box.
+	            		<li>Confirm that the <b>Primary</b> tab includes toolbar buttons.
+				<ul>
+					<li>Hide query <b>or</b> Show query
+					<li>Send to separate tab
+					<li>Copy to new query
+					<li>Save
+					<li>Rename
+					<li>Execute
+				</ul>
+<p>
+	            		<li>Confirm that clicking the <b>Show query</b> button 
+				opens a multi-line edit box containing the formatted SQL text.
+				<ul>
+					<li>Confirm that the button label changes to <b>Hide 
+					query</b>.
+					<li>Confirm that the query results, if any, remain 
+					displayed.
+				</ul>
+	            		<li>Confirm that clicking the <b>Hide query</b> button 
+				closes the multi-line edit box containing the formatted SQL text.
+				<ul>
+					<li>Confirm that the button label changes to <b>Show 
+					query</b>.
+					<li>Confirm that the query results, if any, remain 
+					displayed.
+				</ul>
+	            		<li>Confirm that clicking the <b>Send to separate tab</b> button 
+				moves the results to a different tab and <u>clears</u> the 
+				<b>Primary</b> tab.
+	            		<li>Confirm that clicking the <b>Copy to new query</b> button 
+				adds a new numbered entry to the <b>Queries</b> window.
+				<ul>
+					<li>Confirm that a <b>.sqlce</b> file is created and saved 
+					in the same folder as the original <b>.SDF</b> file after 
+					a query is saved.
+				</ul>
+	            		<li><b>[DotNetRC #824, #832]</b> Re-evaluating Queries
+				<ul>
+					<li>Open and edit a query such that the query is not valid.
+					<li>Click on another table or query and then back to the 
+					editing query.
+					<li>Confirm that an error <b>is not</b> displayed as a 
+					result of re-evaluating the invalid query.
+					<li>Also confirm that if a query fails to evaluate when 
+					first opened (whether it is because the query is bad, or 
+					the DB schema is no longer in sync with the query), the tab 
+					for the query will now open so that a user can correct it.
+					<li>Modify the field order of a query and confirm that 
+					the results are updated properly after executing the query.
+					Test this situation several times.
+				</ul>
+	            		<li><b>[DotNetRC #830]</b> Confirm that a row cannot be deleted from 
+				the results grid of a query.
+			</ul>
+            		<li><u>Tab Window</u>
+			<ul>
+	            		<li>Confirm that tabs can be reordered via drag-and-drop.
+	            		<li>Confirm that tabs can be docked side by side.
+	            		<li>Confirm that tabs can be docked up and down.
+				<li>Confirm that more than two tabs can be redocked.
+				<li>Confirm that the <b>Save</b> and <b>Execute</b> buttons 
+				are disabled if the loaded query has not been modified.
+				<li>Confirm that the tab label for a modified query includes 
+				a trailing <b>*</b>.
+				<li>Confirm that the <b>Tab Window</b> includes left-pointing 
+				and right-pointing triangle buttons allowing scrolling between 
+				tabs when many tabs are open.
+				<li>Confirm that <b>Ctrl+Tab</b> navigates between tabs.
+				<li>Confirm that the <b>Tab Window</b> includes an <b>X</b> button 
+				allowing the active tab to be closed.
+			</ul>
+		</ul>
+<p>
         	<LI><b>Miscellaneous</b>
         	<ul>
+            		<li><b>[DataEntry #1123] NOT FIXED</b> Local OrderMapper Databases
+            		<ul>
+                		<li>Exercise the <b>DE_DB_SimultaneousUsage</b> test found in 
+				AttributeFinder\IndustrySpecific\LabResults\AutomatedTest.</li>
+                		<li>Confirm that the temporary SDF files are cleaned up.</li>
+            		</ul></li>
             		<li><b>[DotNetRC #400]</b> Confirm that the application retains focus after 
             		closing the <b>Database save</b> message.</li>
-            		<li><b>[DotNetRC #401]</b> Active edits are saved.
+            		<li><b>[DotNetRC #401]</b> Active edits are saved
             		<ul>
                 		<li>Edit a row without moving focus from the row.</li>
                 		<li>Confirm that the pencil icon is still visible in the row 
@@ -77,6 +238,131 @@
             		<li><b>[DotNetRC #409]</b> Confirm that the application does not close if 
 			after prompting to save changes after attempting to close the editor, the 
 			save operation fails.</li>
+            		<li><b>[DotNetRC #805]</b> Horizontal scrollbar
+			<ul>
+				<li>Confirm that a horizontal scrollbar is available is <b>Table</b> 
+				results are too wide.
+				<li>Confirm that a horizontal scrollbar is available is <b>Query</b> 
+				results are too wide.
+				<li>Confirm that results columns can be resized.
+			</ul>
+            		<li><b>[DotNetRC #811]</b> Confirm that the <b>status bar</b> does not 
+			obscure the bottom row of the results.
+            		<li><b>[DotNetRC #815]</b> Realtime Modification of Data
+			<ul>
+				<li>Open a database with tables such that a value in table A is 
+				a foreign key in table B.
+				<li>Modify data in table A and confirm that a corresponding change 
+				is noted immediately in table B.
+				<li>Confirm that a database with invalid data cannot be saved.
+				<li>Confirm that a <b>Query results are out of date</b> label is 
+				displayed if a data change is made that affects query results.
+				<li>Confirm that the label is cleared after re-executing the query.
+				<li>Confirm that a <b>Query has been modified since the last 
+				execution</b> label is displayed after the query is modified.
+				<li>Confirm that parameter controls are disabled until after 
+				the query has been re-executed.
+				<li>Confirm that query parameters need to be re-entered only if 
+				the prompt for the parameter has changed.
+				<li>Confirm that query results are automatically updated as 
+				parameter values are modified.
+			</ul>
+            		<li><b>[DotNetRC #816]</b> Confirm that form and panel size and position 
+			persist across application sessions.
+            		<li><b>[DotNetRC #817]</b> Invalid Data
+			<ul>
+				<li>Open a database and a table with multiple rows.
+				<li>Modify data such that several rows contain invalid data.
+				<li>Confirm that each invalid row includes an error icon.
+				<li>Confirm no unexpected UI behavior if the user attempts to save 
+				the database with invalid data.
+			</ul>
+            		<li><b>[DotNetRC #818]</b> Saving Queries
+			<ul>
+				<li>Open a database and create a new query.
+				<li>Close the query tab and confirm that a <b>Save changes</b> prompt 
+				is provided.
+				<li>Create another new query.
+				<li>Close the application and confirm that a <b>Save changes</b> 
+				prompt is provided.
+			</ul>
+            		<li><b>[DotNetRC #819]</b> Concurrency Error
+			<ul>
+				<li>Open a database with tables such that a value in table <b>A</b> is 
+				a foreign key in table <b>B</b>.
+				<li>Modify a foreign key in table <b>B</b> such that it is not valid.
+				<li>In table <b>A</b>, change the value that had been present before 
+				the edit in table <b>B</b>.
+				<li>In table <b>B</b>, change the invalid value to match the new value 
+				of the foreign key.
+				<li>Confirm that the database changes can be saved.
+			</ul>
+            		<li><b>[DotNetRC #825, #833]</b> Post-Update Actions
+            		<ul>
+                		<li>Confirm that a file parallel to the database will be executed 
+				each time the database is saved.  Note that the filename must match 
+				the name of the database file plus have an extra extension.
+				<li>Confirm that the <b>Editor</b> retains active focus after each 
+				file execution.
+				<ul>
+                			<li><b>Name.sdf.bat</b>
+                			<li><b>Name.sdf.vbs</b>
+				</ul>
+            		</ul></li>
+            		<li><b>[DotNetRC #826]</b> Validation Error
+            		<ul>
+                		<li>Open <b>OrderMappingDB</b> database.
+				<li>Open the <b>SmartTag</b> table.
+				<li>Enter a new tag where the <b>TagName</b> matches an existing 
+				entry.
+				<li>Confirm that a validation error icon is displayed for the added 
+				row.
+				<li>Confirm that the user can continue editing.
+            		</ul></li>
+            		<li><b>[DotNetRC #827]</b> Inconsistent Behavior
+			<ul>
+				<li>Open an <b>HNL OrderMapping</b> database.
+				<li>Open the <b>LabOrder</b> and <b>LabOrderTest</b> tables 
+				side by side.
+				<li>Modify the <b>STALB</b> Code in the <b>LabOrder</b> table.
+				<li>Confirm that the two <b>LabOrderTest</b> items change immediately.
+				<li>Revert the <b>OrderCode</b> for one of the <b>STALB</b> items 
+				in <b>LabOrderTest</b>.
+				<li>Confirm that an error icon is displayed.
+				<li>Revert the <b>STALB</b> Code in the <b>LabOrder</b> table.
+				<li>Confirm that the two <b>LabOrderTest</b> items change immediately.
+				<li>Modify the <b>HPVSB</b> Code in the <b>LabOrder</b> table.
+				<li>Confirm that the one <b>LabOrderTest</b> item changes immediately.
+				<li>Modify the <b>OrderCode</b> for the <b>HPVSB</b> item in 
+				<b>LabOrderTest</b>.
+				<li>Confirm that an error icon is displayed.
+				<li>Adjust the <b>HPVSB</b> Code in the <b>LabOrder</b> table to 
+				match the changed value in the <b>LabOrderTest</b> table.
+				<li>Confirm that the error icon goes away.
+			</ul>
+            		<li><b>[DotNetRC #828]</b> Invalid Data State
+            		<ul>
+                		<li>Open a table with at least one foreign key.
+				<li>Sort by one of the columns.
+				<li>In the last row, change the foreign key value to an invalid value.  
+				Confirm that the row has been marked invalid.
+				<li>In the new row of the table, add data that is invalid (such as a 
+				bad foreign key) that will be sorted toward the top of the table 
+				based on the value in the sorted column.
+				<li>Tab out of the row to cause the row to be sorted.
+				<li>Confirm that after the sort has completed the error icons are 
+				still properly displayed on the invalid rows.
+				<li>Delete the two invalid rows.
+				<li>Confirm that the table as a whole is no longer marked invalid.
+            		</ul></li>
+            		<li><b>[DotNetRC #834]</b> Dirty Flag
+            		<ul>
+                		<li>Open an SDF file.
+				<li>Confirm that a table is opened.
+				<li>Open a different table.
+				<li>Confirm that the database is not dirty and can be closed without 
+				displaying an <b>save changes</b> prompt.
+            		</ul></li>
             		<li><b>[FlexIDSCore #4139]</b> Editing tables with no unique key.
             		<ul>
                 		<li>Open a database that contains a table that has no unique key. One
