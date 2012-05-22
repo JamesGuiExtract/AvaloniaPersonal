@@ -16,13 +16,14 @@
 //   Assumes "ParcelIDFile.csv" is in same dir as inputFile and is a mapping of plat code numbers to
 //   subdivision names.
 //
-// Usage:   ParseRacineTriminIndexData inputFile outputDir
+// Usage:   ParseRacineTriminIndexData inputFile outputDir csvType
 //              inputFile - The path to the index data file
 //              outputDir - The path to the EAV output dir
 //              csvType - pin, or legals
 //
 // Example inputFile:
 // K:\Common\Engineering\Sample Files\Trimin\WI - Racine\Set001\IndexData\OriginalsFromCustomer\legal00002.csv
+// K:\Common\Engineering\Sample Files\Trimin\WI - Racine\Set002\IndexData\LEGAL00002.csv
 //--------------------------------------------------------------------------------------------------
 
 function main(args) {
@@ -146,7 +147,13 @@ function main(args) {
     // Specific type functions
     //--------------------------------------------------------------------------------------------------
     function makeEAVS_LEGAL(fields) {
-        var fname = getEAVName(fields[26], "LegalDescription");
+        var fnamefield;
+        if (fields.length > 28) {
+          fnamefield = fields[29]
+        } else {
+          fnamefield = fields[26]
+        }
+        var fname = getEAVName(fnamefield, "LegalDescription");
         var val = "n.a."
         writeAttr(fname, "LegalDescription", val, "", "");
         try {
