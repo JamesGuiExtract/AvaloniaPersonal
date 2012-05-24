@@ -21,10 +21,9 @@
 <ul>
    	<li>Double-click on the EXE within the CommonComponents folder.  Confirm that a usage 
 	message is provided.
-   	<li><b>[LegacyRC #4931]</b> Confirm that a non-default icon is provided for the application.
    	<li>Confirm that a DOS Window does not appear on the task bar when the application is running.
-	<li>Use image files from the UCLIDFileProcessing/AutomatedTest/MemoryLeak/ConvertToSearchablePDF 
-	folder for the following tests.
+	<li>Use image files from the <b>./ReusableComponents/COMComponents/UCLIDFileProcessing/
+	AutomatedTest/MemoryLeak/ConvertToSearchablePDF</b> folder for the following tests.
 	<ul>
    		<li>Confirm that <b>ESConvertToPDF 0001.tif 0001.pdf</b> 
 		creates a searchable PDF file that is a copy of the TIF file.
@@ -43,7 +42,7 @@
    		<li>Confirm that <b>ESConvertToPDF PDF_Image_ABC.pdf PDF_Image2.pdf</b> 
 		displays an error message and does not create a searchable PDF file.
    		<li>Confirm that <b>ESConvertToPDF PDF_Image_ABC.pdf PDF_Image2.pdf 
-		/ef PDF_Error.uex</b> creates the UEX file, does not display an error message 
+		/ef C:\PDF_Error.uex</b> creates the UEX file, does not display an error message 
 		and does not create a searchable PDF file.
    		<li>Make an extra copy of <b>PDF_Image.pdf</b>.
    		<li>Confirm that <b>ESConvertToPDF PDF_Image.pdf PDF_Image2.pdf /R</b> 
@@ -56,8 +55,7 @@
 		<li><b>/pdfa</b> - the output file will be PDF/A-compliant
 	</ul>
 <p>
-	<li><b>[LegacyRC #5739]</b> Confirm that <b>ESConvertToPDF.exe</b> supports the following 
-	command-line options
+	<li>Confirm that <b>ESConvertToPDF.exe</b> supports the following command-line options
 	<ul>
 		<li><b>/user &quot;&lt;password&gt;&quot;</b> for specifying a user password
 		<li><b>/owner &quot;&lt;password&gt;&quot; &lt;Permissions&gt;</b> for 
@@ -86,7 +84,7 @@
 <ul>
    	<li>Double-click on the EXE within the <b>CommonComponents</b> folder.  Confirm that a usage 
 	message is provided.
-   	<li><b>[LegacyRC #4936]</b> Special licensing required
+   	<li><b>Special licensing required</b>
 	<ul>
    		<li>Confirm that <b>ESConvertUSSToTXT</b> does not run with only an 
 		<b>RDT</b> license.
@@ -124,7 +122,7 @@
 		contains two entries.
 	</ul>
 <p>
-	<LI><b>[LegacyRC #5338]</b> - Exercise new options
+	<LI><b>Specified USB Counters</b>
 	<ul>
 		<li>Confirm that <b>/Indexing</b> works to decrement the Indexing counter for 
 		each page of the document.
@@ -136,7 +134,7 @@
    	</LI>
 </ul>
 </li>
-<br />
+<p>
 
 <!-- *********************************************** -->
 <li><h2>ESOCR</h2>
@@ -152,8 +150,8 @@
 		four arguments.</li>
     		<li>Confirm that ESOCR supports infile and outfile arguments with an optional 
 		<b>/se</b> argument.</li>
-		<li><b>[LegacyRC #4986]</b> Confirm that ESOCR supports both absolute and relative 
-		paths for both infile and outfile arguments.</li>
+		<li>Confirm that ESOCR supports both absolute and relative paths for both infile 
+		and outfile arguments.</li>
   	</ul></li>
 <p>
   	<li><h2>Error Conditions</h2></li>
@@ -176,36 +174,35 @@
   	</ul></li>
 </ul>
 </li>
-<br />
+<p>
 
 <!-- *********************************************** -->
 <li><h2>FAM DB Lock Checker</h2>
 <ul>
    	<li>Confirm that the title bar reads <b>FAMDBLockChecker</b>.</li>
-    <li>Confirm the presence of an editable <b>Server</b> text box.</li>
-    <li>Confirm the presence of an editable <b>Database</b> text box.</li>
-    <li>Confirm the presence of an editable <b>Check lock on average once every</b> text box.</li>
-    <li>Confirm the presence of a <b>Run</b> button.</li>
-    <li>Confirm the presence of read-only edit boxes for <b># Checks</b>, <b># Locks seen</b>, and
-    <b>%</b>.</li>
+    	<li>Confirm the presence of an editable <b>Server</b> text box.</li>
+    	<li>Confirm the presence of an editable <b>Database</b> text box.</li>
+    	<li>Confirm the presence of an editable <b>Check lock on average once every</b> text box.</li>
+    	<li>Confirm the presence of a <b>Run</b> button.</li>
+    	<li>Confirm the presence of read-only edit boxes for <b># Checks</b>, <b># Locks seen</b>, and
+    	<b>%</b>.</li>
 <p>
-    <li>Confirm that the utility can connect to and monitor a local database.</li>
-    <li>Confirm that the utility can connect to and monitor a remote database.</li>
-    <li>Confirm that the utility gracefully handles it when disconnected from the database.</li>
+    	<li>Confirm that the utility can connect to and monitor a local database.</li>
+    	<li>Confirm that the utility can connect to and monitor a remote database.</li>
+    	<li>Confirm that the utility gracefully handles it when disconnected from the database.</li>
 <p>
-    <li>Queue a nontrivial number of files for an action.</li>
-    <li>Set up an FPS file to process those files with a short sleep task.</li> 
-    <li>Set up the FAMDBLockChecker to monitor the database.</li>
-    <li>Run the FPS file while the DB lock checker is monitoring and note how many locks are 
-    seen.</li>
-    <li>Requeue the files and reconfigure the FPS file to run an Apply Bates Number task.</li>
-    <li>Run the FPS file while the DB lock checker is monitoring and note how many locks are 
-    seen.</li>
-    <li>Confirm that the database is locked more frequently with the Bates number task than the
-    sleep task.</li>
+    	<li>Queue a nontrivial number of files for an action.</li>
+    	<li>Set up an FPS file to process those files with a short sleep task.</li> 
+    	<li>Set up the FAMDBLockChecker to monitor the database.</li>
+    	<li>Run the FPS file while the DB lock checker is monitoring and note how many locks are seen.</li>
+    	<li>Requeue the files and reconfigure the FPS file to run an Apply Bates Number task.</li>
+    	<li>Run the FPS file while the DB lock checker is monitoring and note how many locks are 
+    	seen.</li>
+    	<li>Confirm that the database is locked more frequently with the Bates number task than the
+    	sleep task.</li>
 </ul>
 </li>
-<br />
+<p>
 
 <!-- *********************************************** -->
 <li><h2>Find String</h2>
@@ -242,7 +239,7 @@
 <ul>
         <li><b>General</b>
         <ul>
-		<li>Confirm that <b>GetWordLengthDist</b> requires a suitable license file. (RDT License)
+		<li>Confirm that <b>GetWordLengthDist</b> requires an <b>RDT</b> license file.
 		<li>Confirm that GetWordLengthDist displays a <b>usage</b> message if other than 
 		2-6 arguments are provided on the command-line.
 	</ul>
@@ -317,7 +314,6 @@
 		Settings Editor...</b>.
 	   	<li>Confirm that <b>About Image Cleanup Settings Editor...</b> displays an About box.
 	   	<li>Confirm that the <b>About box</b> includes the current version number.
-  	   	<LI><b>[LegacyRC #5482]</b> Confirm that the version number is fully visible.
 	</ul>
 <p>
 	<li><b>Cleanup operations to perform</b>
@@ -426,21 +422,21 @@
 	<b>Test</b> action.
 	<li>Exercise each cleanup option.
 	<ul>
-		<li>Exercise <b>1_FillStripes.fps</b>.  Add a new static list file 
+		<li>Exercise <b>MemoryLeak_1.fps</b>.  Add a new static list file 
 		supplier and clean <b>striped.tif</b>.
 		<li>Open <b>striped.tif</b> and <b>striped.clean.tif</b> in separate Spot 
 		Recognition Windows.
 		<li>Zoom in closely to a text region and confirm that the characters 
 		no longer have one-pixel wide vertical white stripes.
 <p>
-		<li>Exercise <b>2_RemoveHalftones.fps</b>.  Add a new static list file 
+		<li>Exercise <b>MemoryLeak_2.fps</b>.  Add a new static list file 
 		supplier and clean <b>halftones.tif</b>.
 		<li>Open <b>halftones.tif</b> and <b>halftones.clean.tif</b> in separate Spot 
 		Recognition Windows.
 		<li>Confirm that the shaded regions on page 1 were removed.
 		<li>Confirm that page 2 is still clean and readable.
 <p>
-		<li>Exercise <b>3_BorderSmoothDeleteDespeckle.fps</b>.  Add a new static list file 
+		<li>Exercise <b>MemoryLeak_3.fps</b>.  Add a new static list file 
 		supplier and clean <b>BorderSmoothDeleteDespeckle.tif</b>.
 		<li>Open <b>BorderSmoothDeleteDespeckle.tif</b> and 
 		<b>BorderSmoothDeleteDespeckle.clean.tif</b> 
@@ -455,24 +451,15 @@
 			<li>Confirm that the three specks near the top left corner of the image 
 			were removed.  Confirm that most periods and commas were also removed.
 		</ul>
-<p>
-		<li><b>[LegacyRC #4824]</b> Clean Borders shifts the image.
-		<ul>
-			<li>Confirm that the before and after images in the above test show 
-			no pixel shifting.
-			<li>Exercise <b>3_BorderSmoothDeleteDespeckle.fps</b> with an image 
-			that does not have a border.  Confirm that the before and after images 
-			also show no pixel shifting.
-		</ul>
 	</ul>
 </ul>
 </li>
-<br />
+<p>
 
 <!-- *********************************************** -->
 <li><h2>Image Format Converter - Functionality</h2>
 <ul>
-   	<li>Execute the following test cases from a command window.  A TIF image and a PDF image 
+   	<li>Execute the following test cases from a command window.  Single-page TIF and PDF images 
 	will be needed for these tests.</li>
    	<li>Confirm that <b>ImageFormatConverter</b> without additional arguments provides 
 	a usage message.</li>
@@ -487,49 +474,7 @@
    	<li>Confirm that other output types such as <b>/bmp</b> are not supported and provide 
 	a meaningful error message.</li>
 <p>
-	<li><b>[LegacyRC #5206]</b> Proper handling of large images
-	<ul>
-		<li>Work with the images in <b>I:\Common\Engineering\ProductTesting\ManyPage Images</b>
-	   	<li>Confirm that the 275-page TIF can be converted to a PDF without error. 
-	   	<li>Confirm that the resulting PDF has 275 pages. 
-	   	<li>Confirm that the 275-page PDF can be converted back to a TIF without error. 
-	   	<li>Confirm that the resulting TIF has 275 pages. 
-	</ul>
-<p>
-   	<LI><b>[LegacyRC #5292]</b> Converting TIFs to PDFs
-       	<ul>
-		<li>Make a local copy of the <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5292</b> 
-		image files.
-		<li>Confirm that each image can be converted to a PDF.
-       	</ul>
-<p>
-   	<LI><b>[LegacyRC #5298]</b> PDF page sizes from Image Format Converter
-       	<ul>
-		<li>Make a local copy of the <b>Old Republic Title\RedactionDemo\Set003</b> 
-		image files.  Use <b>Image Format Converter</b> to convert them from PDF 
-		format to TIF.
-		<li>Open each image file in the Image Viewer.  Confirm that pages of different 
-		size are displayed without black areas.
-		<li>Write basic rules using Extract Lines.  Confirm that spatial information for 
-		OCR'd text is correct for both legal-size and letter-size pages.
-       	</ul>
-<p>
-   	<LI><b>[LegacyRC #5318]</b> Image Format Converter
-       	<ul>
-      		<li>Execute <b>ImageFormatConverter.exe /?</b> from a command window.
-      		<li>Confirm that a usage message is displayed.
-      		<li>Confirm that <b>two optional arguments</b> text is displayed.
-      		<li>Confirm that the <b>/retain</b> option is documented.
-      		<li>Confirm that both options are documented in the help file.
-       	</ul>
-<p>
-   	<LI><b>[LegacyRC #5588</b> Confirm that ImageFormatConverter.exe will create the output 
-	folder if it does not exist.
-   	<LI><b>[LegacyRC #5589]</b> Confirm that ImageFormatConverter.exe requires a <b>FLEX 
-	Index / ID Shield Core</b> license in order to convert a TIF file to a TIF file.
-<p>
-	<li><b>[LegacyRC #5739]</b> Confirm that <b>ImageFormatConverter.exe</b> supports the following 
-	command-line options
+	<li><b>Command-line options</b>
 	<ul>
 		<li><b>/user &quot;&lt;password&gt;&quot;</b> for specifying a user password
 		<li><b>/owner &quot;&lt;password&gt;&quot; &lt;Permissions&gt;</b> for 
@@ -550,13 +495,6 @@
 		Note that the <b>/enc</b> switch is only for private use.
 	</ul>
 <p>
-   	<LI><b>[LegacyRC #5823]</b> Multipage TIF converts to blank PDF
-       	<ul>
-		<li>Use <b>ImageFormatConverter.exe</b> to convert the image from 
-		<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5823</b> to a PDF.
-		<li>Confirm that the output PDF does not have blank pages.
-       	</ul>
-<p>
 	<li><b>Image conversion for same type</b>
 	<ul>
 		<li>Referenced images can be found in 
@@ -568,15 +506,15 @@
 		without error. 
 	</ul>
 <p>
-    <li><b>[LegacyRC #5859]</b> ImageFormatConverter PDF output
-    <!-- fixed v 8.1.0.34 -->
-    <ul>
-        <li>Use ImageFormatConverter.exe to convert a file to PDF format.
-        <li>Confirm that the output PDF uses Group 4 compression.
-    </ul>    
+    	<li><b>[LegacyRC #5859]</b> ImageFormatConverter PDF output
+    	<!-- fixed v 8.1.0.34 -->
+    	<ul>
+        	<li>Use <b>ImageFormatConverter.exe</b> to convert a file to PDF format.
+        	<li>Confirm that the output PDF uses Group 4 compression.
+    	</ul>    
 </ul>
 </li>
-<br />
+<p>
 
 <!-- *********************************************** -->
 <li><h2>Image Format Converter - Error Logging</h2>
@@ -606,7 +544,7 @@
 	</ul>
 </ul>
 </li>
-<br />
+<p>
 
 <!-- *********************************************** -->
 <li><h2>Log Process Stats</h2>
@@ -634,75 +572,37 @@
         </ul>
 </ul>
 </li>
-<br />
+<p>
 
 <!-- *********************************************** -->
 <li><h2>Office To TIF</h2>
 <ul>
    	<li>Confirm that <b>Office2007ToTif.exe</b> and <b>OfficeToTif.exe</b> are installed.</li>
-    <li>Confirm that running <b>OfficeToTif.exe /?</b> on the command line displays an appropriate
-    usage message.</li>
-    <li>On a machine with <b>Office 2007</b> and the <b>print to PDF</b> extension installed, 
-    confirm that OfficeToTif.exe can convert the following document types to TIF:
-    <ul>
-        <li>.doc</li>
-        <li>.docx</li>
-        <li>.ppt</li>
-        <li>.pptx</li>
-        <li>.xls</li>
-        <li>.xlsx</li>
-    </ul></li>
-    <li>On a machine with <b>Office 2010</b> installed, confirm that OfficeToTif.exe can convert
-    the following document types to TIF:
-    <ul>
-        <li>.doc</li>
-        <li>.docx</li>
-        <li>.ppt</li>
-        <li>.pptx</li>
-        <li>.xls</li>
-        <li>.xlsx</li>
-    </ul></li>
+    	<li>Confirm that running <b>OfficeToTif.exe /?</b> on the command line displays an appropriate
+    	usage message.</li>
+    	<li>On a machine with <b>Office 2007</b> and the <b>print to PDF</b> extension installed, 
+    	confirm that OfficeToTif.exe can convert the following document types to TIF:
+    	<ul>
+        	<li>.doc</li>
+        	<li>.docx</li>
+        	<li>.ppt</li>
+        	<li>.pptx</li>
+        	<li>.xls</li>
+        	<li>.xlsx</li>
+    	</ul></li>
+    	<li>On a machine with <b>Office 2010</b> installed, confirm that OfficeToTif.exe can convert
+    	the following document types to TIF:
+    	<ul>
+        	<li>.doc</li>
+        	<li>.docx</li>
+        	<li>.ppt</li>
+        	<li>.pptx</li>
+        	<li>.xls</li>
+        	<li>.xlsx</li>
+    	</ul></li>
 </ul>
 </li>
-<br />
-
-<!-- *********************************************** -->
-<li><h2>RedactFromXML</h2>
-<ul>
-    <li><u>Functionality</u>
-    <ul>
-        <LI>Verify some images, making additions and changes to the found redactions.</li>
-        <li>Create the metadata XML files after verification is complete.</li>
-        <li>Confirm that the <b>RedactFromXml</b> application creates proper redacted images
-        <ul>
-            <li>Check redaction placement</li>
-            <li>Confirm that deleted redactions are not applied</li>
-            <li>Check that disabled redactions are not applied</li>
-            <li>Check proper redaction color</li>
-            <li>Check redaction text and exemption codes</li>
-            <li>Check annotation settings</li>
-        </ul></li>
-        <li>Confirm that <b>RedactFromXml</b> command-line parameters can override the 
-        annotation settings in the VOA file.
-        <ul>
-            <li><b>/a</b> - for apply as annotations</li>
-            <li><b>/r</b> - for retain existing annotations</li>
-        </ul></li>
-    </ul></li>
-    <li><u>Old Versions</u> - see .\Testing\PVCS_Testing\FlexIDSCore\3975
-    <ul>
-        <li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 1</b> metadata.</li>
-        <li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 2</b> metadata.</li>
-        <li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 3</b> metadata.</li>
-    </ul></li>
-    <p>
-    <li><u>Miscellaneous</u>
-    <ul>
-        <LI><b>[FlexIDSCore #4032]</b> Confirm that <b>Redact From XML</b> outputs redaction 
-        text.</li>
-    </ul></li>
-</ul></li>
-<br />
+<p>
 
 <!-- *********************************************** -->
 <li><h2>Set Operations</h2>
@@ -724,7 +624,7 @@
             <li>Confirm that the exception complains about the presence of duplicate items in one
             of the lists.</li>
         </ul>
-    <p>
+<p>
         <li><b>Fixed SCRs</b>
         <ul>
             <li><b>[LegacyRC #4990, DotNetRC #620]</b> Confirm that SetOperations.exe works
@@ -740,7 +640,7 @@
         </ul></li>
 </ul>
 </li>
-<br />
+<p>
 
 <!-- *********************************************** -->
 <li><h2>Split File</h2>
@@ -762,36 +662,6 @@
         </ul>
 </ul>
 </li>
-<br />
-
-<!-- *********************************************** -->
-<li><h2>Other</h2>
-<ul>
-   	<li><b>[LegacyRC #4419]</b> Create and run a multiple-thread FPS file that OCRs documents.  
-	<ul>
-		<li>Use Task Manager to kill <b>ProcessFiles.exe</b>.</li> 
-		<li>Repeat this process if necessary until more than one instance of <b>SSOCR2.exe</b> 
-		is running without an active ProcessFiles.exe instance.</li> 
-		<li>Confirm that <b>KillOCRInstances.bat</b> from the CommonComponents folder 
-		successfully closes each open SSOCR2.exe instance.</li>
-		<li>Prepare additional instances of SSOCR2.exe.  Confirm that 
-		<b>KillOCRInstances.bat /q</b> successfully closes each open SSOCR2.exe 
-		instance without a confirmation prompt.</li>
-		<li>Confirm that <b>KillOCRInstances.bat /?</b> displays a usage message.</li>
-		<li>Confirm that <b>KillOCRInstances.bat /Z</b> or another undefined command-line 
-		argument displays an error with the usage message.</li>
-	</ul>
-<p>
-   	<li><b>[LegacyRC #4969]</b> Sleep EXE does not open a DOS window.  
-	<ul>
-		<li>Use the FAM to process some files.</li> 
-		<li>Include a <b>Launch Application</b> task that calls <b>Sleep.exe 5s</b>.</li> 
-		<li>Confirm that a five-second delay is noted during processing of each file.
-		<li>Confirm that a DOS window is not displayed.
-	</ul>
-</ul>
-</li>
-
 </ol>
 </body>
 </html>
