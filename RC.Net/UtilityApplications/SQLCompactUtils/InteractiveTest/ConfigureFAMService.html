@@ -70,10 +70,10 @@
 			respawning.</li>
                		<li>Confirm that a value of <b>0</b> means that FAMProcess.exe will 
 			not respawn.</li>
-               		<li>Confirm that a value of -1 means that the default value from the 
+               		<li>Confirm that a value of <b>-1</b> means that the default value from the 
                		<b>Settings</b> table will be used.</li>
                		<li>Confirm that the setting works as expected.</li>
-               		<li>Confirm that this column defaults to -1 when a new row is added to 
+               		<li>Confirm that this column defaults to <b>-1</b> when a new row is added to 
 			the table.</li>
        		</ul></li>
        	</ul></li>
@@ -87,16 +87,6 @@
         	<b>120000</b>.</li>
         	<li>Confirm that the default value for <b>DependentServices</b> is empty.</li>
        		<li>Confirm that the default value for <b>NumberOfFilesToProcess</b> is <b>1000</b>.</li>
-<p>
-       		<li><b>[DotNet #425]</b> Checking for DBNull
-       		<ul>
-              		<li>Add some dependent services and save the changes.</li>
-               		<li>Exit the application.</li>
-               		<li>Edit the database again and clear the dependent services.</li>
-               		<li>Save the changes and exit the application.</li>
-               		<li>Confirm that the service will run without logging an 
-               		<b>ELI29151</b> exception about a DBNull value.</li>
-       		</ul></li>
        	</ul></li>
 <p>
         <LI><b>Miscellaneous</b>
@@ -108,7 +98,7 @@
                		<li>Start the service and confirm that you don't see access violation 
 			errors from <b>FAMProcess.exe</b>.</li>
        		</ul></li>
-       		<li><b>[DotNetRC #511]</b> Sorting by filename with no filename specified
+       		<li><b>[DotNetRC #508]</b> Sorting by filename with no filename specified
        		<ul>
                		<li>Open a service database with an empty FPSFile table.</li>
                		<li>In the FPSFile table, click in the <b>NumberOfFilesToProcess</b> 
