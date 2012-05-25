@@ -12,14 +12,13 @@
 	<li><h2>CMPI - General</h2>
      	<ul>
            	<li>Confirm that <b>CreateMultiPageImage</b> requires a suitable license file.
-           	<li><b>[LegacyRCAndUtils #4345]</b> Confirm that <b>CreateMultiPageImage /?</b> displays 
-		usage text.
+           	<li>Confirm that <b>CreateMultiPageImage /?</b> displays usage text.
           	<li>Confirm that CreateMultiPageImage displays a <b>usage</b> message if other 
 		than 2, 3, 5, or 6 arguments are provided on the command-line.
       	</ul>
      	</li>
 <p>
-	<li><h2>CMPI - Can handle large number of files properly</h2>
+	<li><h2>[LegacyRC #5805] Handle large number of files properly</h2>
 	<ul>
 		<li>The batch file <b>test_2000and11000pages.bat</b> that is found in
 		the <b>InteractiveTest</b> folder will run the following tests automatically.
@@ -35,97 +34,62 @@
 	The batch file <b>test_CreateMultiPageImage.bat</b> that is found in
 	the <b>InteractiveTest</b> folder will run the following tests
 	automatically.  In order to use it, copy the three images and the
-	batch file to a local folder and run it.
-	<br><br>
+	batch file to a local folder and run it.  The following input file formats are tested.
+<p>
       	<ul>
            	<li><b>Name_Dot_DDD_Dot_Tif</b>.  
-            	<ul>
-                 	<li>Delete any existing <b>A.tif</b>.</li>  
-                    	<li>Copy test pages as <b>A.001.tif</b>, <b>A.002.tif</b>, <b>A.003.tif</b>.  
-			Run the application.</li>  
-                    	<li>Confirm that a three-page <b>A.tif</b> file exists.</li>
-             	</ul>
-<p>
              	<li><b>Name_Dot_DDD</b>.  
-             	<ul>
-                    	<li>Delete any existing <b>A.tif</b>.</li>  
-                    	<li>Copy test pages as <b>A.001</b>, <b>A.002</b>, <b>A.003</b>.  
-			Run the application.</li>
-                    	<li>Confirm that a three-page <b>A.tif</b> file exists.</li>
-             	</ul>
-<p>
              	<li><b>Name_Hyphen_D_Dot_Tif</b>.  
-             	<ul>
-                    	<li>Delete any existing <b>A.tif</b>.</li>  
-                    	<li>Copy test pages as <b>A-1.tif</b>, <b>A-2.tif</b>, <b>A-3.tif</b>.  
-			Run the application.</li>
-                    	<li>Confirm that a three-page <b>A.tif</b> file exists.</li>
-             	</ul>
-<p>
             	<li><b>Name_Underscore_P_D_Dot_Tif</b>.  
-            	<ul>
-                    	<li>Delete any existing <b>A.tif</b>.</li>  
-                    	<li>Copy test pages as <b>A_P1.tif</b>, <b>A_P2.tif</b>, <b>A_P3.tif</b>.  
-			Run the application.</li>
-                  	<li>Confirm that a three-page <b>A.tif</b> file exists.</li>
-             	</ul>
-<p>
              	<li><b>Name_Underscore_DDDD_Dot_Tif</b>.  
-             	<ul>
-                    	<li>Delete any existing <b>A.tif</b>.</li>  
-                    	<li>Copy test pages as <b>A_0001.tif</b>, <b>A_0002.tif</b>, <b>A_0003.tif</b>. 
-			Run the application.</li>
-                  	<li>Confirm that a three-page <b>A.tif</b> file exists.</li>
-             	</ul>
-<p>
              	<li><b>DDDDDDDD_Dot_Tif</b>.  
-             	<ul>
-                    	<li>Delete any existing <b>A.tif</b>.</li>  
-                    	<li>Copy test pages as <b>00000001.tif</b>, <b>00000002.tif</b>, 
-			<b>00000003.tif</b>.  Run the application.</li>
-                    	<li>Confirm that a three-page <b>A.tif</b> file exists.</li>
-             	</ul>
-             	<li><b>Name_Dot_DDDD [LRCAU #5845]</b>.  
-             	<ul>
-                    	<li>Delete any existing <b>A.tif</b>.</li>  
-                    	<li>Copy test pages as <b>A.0001</b>, <b>A.0002</b>, <b>A.0003</b>.  
-			Run the application.</li>
-                    	<li>Confirm that a three-page <b>A.tif</b> file exists.</li>
-             	</ul>
-<p>
-             	<li><b>Name_Dot_DDDDD [LRCAU #5845]</b>.  
-             	<ul>
-                    	<li>Delete any existing <b>A.tif</b>.</li>  
-                    	<li>Copy test pages as <b>A.00001</b>, <b>A.00002</b>, <b>A.00003</b>.  
-			Run the application.</li>
-                    	<li>Confirm that a three-page <b>A.tif</b> file exists.</li>
-             	</ul>
      	</ul>
      	</li>
 <p>
      	<li><h2>CMPI - File Names From Input File - using InputFiles.txt</h2>
       	<ul>
 		<li>Create a collection of single page images and an associated text file 
-		to exercise the following command-line arguments.
+		to exercise the following command-line arguments.  Note that the text file cannot 
+		have a blank line at end-of-file.
            	<li><b>Command-line Arguments</b>
 		<ul>
 			<li><b>Input file name</b> - the text file that is the source of the 
 			following data items
+			<ul>
+				<li>&quot;D:\Testing\InputFile.txt&quot;, if <b>Input path</b> 
+				parameter is not specified
+			</ul>
 			<li><b>Delimiter</b> - the character used to separate one column of 
 			data from another
+			<ul>
+				<li>&quot;,&quot;
+			</ul>
 			<li><b>Column number for output image name</b> - which 1-relative column 
 			of data from the input file will be used to provide output filenames
+			<ul>
+				<li>2
+			</ul>
 			<li><b>Column number for input image name</b> - which 1-relative column 
 			of data from the input file will be used to provide input filenames
+			<ul>
+				<li>1
+			</ul>
 			<li><b>Output path</b> - the folder that will receive the output images
+			<ul>
+				<li>&quot;D:\Testing\Output&quot;, if <b>Input path</b> 
+				parameter is not specified
+			</ul>
 			<li><b>Input path</b> - optional argument to specify the folder that 
 			contains the input images, allows input image name to use relative paths 
 			instead of absolute paths
+			<ul>
+				<li>&quot;D:\Testing&quot;
+			</ul>
 		</ul>
        	</ul>
      	</li>
 <p>
-	<li><h2>CMPI - Lists count of files that succeeded and failed [LRCAU #5846]</h2></li>
+	<li><h2>[LegacyRC #5846] CMPI - Lists count of files that succeeded and failed</h2></li>
 	<ul>
 		<li>Create a temporary folder for this test</li>
 		<li>Open a command window and change to the temporary folder</li>
@@ -134,20 +98,15 @@
 		<li>Run CreateMultiPageImage against this folder.</li>
 		<li>Confirm that the output says that 1 file was processed, that 0 files
 		completed successfully and 1 file failed.</li>
-		<li>Open the exception log and confirm that there is a new entry with ELICode
-		<b>ELI3012</b> and a message that says <b>Unable to create multi page image</b>.</li>
+		<li>Open the exception log and confirm that there is a new entry with ELI Code
+		<b>ELI30102</b> and a message that says <b>Unable to create multi page image</b>.</li>
 		<li>Copy Page1.tif and Page2.tif from the earlier testing into the temp folder.</li>
 		<li>Rename Page1.tif to b.001 and rename Page2.tif to b.002.</li>
 		<li>Run CreateMultiPageImage against this folder.</li>
 		<li>Confirm that the output says that 2 file was processed, that 1 file
 		completed successfully and 1 file failed.</li>
-		<li>Open the exception log and confirm that there is a new entry with ELICode
-		<b>ELI3012</b> and a message that says <b>Unable to create multi page image</b>.</li>
-		<li>Run CreateMultiPageImage against this folder.</li>
-		<li>Confirm that the output says that 2 file was processed, that 0 files
-		completed successfully and 2 files failed.</li>
-		<li>Open the exception log and confirm that there are 2 new entries with ELICode
-		<b>ELI3012</b> and a message that says <b>Unable to create multi page image</b>.</li>
+		<li>Open the exception log and confirm that there is a new entry with ELI Code
+		<b>ELI30102</b> and a message that says <b>Unable to create multi page image</b>.</li>
 	</ul>
 <p>
      	<li><h2>CMPI - Miscellaneous Items</h2>
@@ -158,8 +117,6 @@
 		<b>ID Shield</b> Help file.
             	<li>Confirm that CreateMultiPageImage documentation is available in the 
 		<b>LabDE</b> Help file.
-            	<li>Confirm that CreateMultiPageImage documentation includes either a 
-		Start menu path or a fully-qualified path to the EXE.
      	</ul>
      	</li>
 <p>
@@ -173,7 +130,6 @@
 		error message.
       		<li>Confirm that a processing a folder with a combination of TIF and PDF 
 		successfully processes TIFs until the first PDF image is found.
-		<li>Confirm that a meaningful error message is presented.
 <p>
 		<li>Confirm that using the <b>/ef &lt;LogFile&gt;</b> option is 
 		effective at writing exceptions to the specified log file.
@@ -189,11 +145,6 @@
 <p>
 		<li>Confirm that the utility can be used with the FAM to process 
 		individual images via the <b>Core: Launch external application</b> task.
-<p>
-  	   	<LI><b>[LegacyRC #5590]</b> Confirm that a relative path to the image is 
-		supported.
-  	   	<LI><b>[LegacyRC #5591]</b> Confirm that a meaningful error message is 
-		displayed when trying to split a PDF image.
        	</ul>
 </ol>
 </body>
