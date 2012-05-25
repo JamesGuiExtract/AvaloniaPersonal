@@ -1,0 +1,71 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0 Hotfix 01 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0 Hotfix 01 Testing<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> Health Network Labs
+   	<LI><b>SCRs:</b> DotNetRC #805, #810-#819, #821, #823-#829
+   	<LI><b>Issue:</b> Editing a SQL Compact database would be easier if the modifications were 
+	made to a temporary copy of the file.  More functionality for customers would be available 
+	if the utility had an MDI interface to display tables and query results.  Also, adding the 
+	capability to create and edit queries would facilitate updates to customers' AKA databases.
+</ul>
+<p>
+<h3>Hotfix Tests</h3>
+<OL>
+	<LI><b>Test Setup</b>
+	<ul>
+		<LI>Prepare a test machine with <b>FLEX Index 9.0.0.200</b> and/or <b>ID 
+		Shield 9.0.0.200</b>.
+		<LI>Prepare another test machine with <b>LabDE 9.0.0.200</b>.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Tests</b>
+	<ul>
+		<LI><b>Installation</b>
+		<ul>
+			<li>Confirm that the hotfix installs properly on FLEX Index and/or 
+			ID Shield <b>build 200</b> by exercising <b>Configure FAM Service</b>.
+	       		<ul>
+				<li>An MDI interface is presented.
+				<li>The <b>Settings</b> table can be modified.
+				<li>The <b>FPSFile</b> table can be modified.
+				<li>A query can be modified and saved.
+	       		</ul>
+			<li>Confirm that the hotfix installs properly on LabDE <b>build 200</b> by 
+			exercising <b>Configure FAM Service</b>.
+	       		<ul>
+				<li>An MDI interface is presented.
+				<li>The <b>Settings</b> table can be modified.
+				<li>The <b>FPSFile</b> table can be modified.
+				<li>A query can be modified and saved.
+	       		</ul>
+       		</ul>
+	   	</LI>
+<p>
+		<LI><b>Functionality</b>
+		<ul>
+			<li>Exercise the <b>SQLCDBEditor</b> portion of the <a 
+	href="../../../../../RC.Net/UtilityApplications/SQLCompactUtils/InteractiveTest/SQLCompactUtils.html"> 
+			<b>SQL Compact Utilities</b></a> checklist.
+			<li>Exercise the <b>DE_DB_SimultaneousUsage</b> test from the 
+			<b>.\IndustrySpecific\LabResults\AutomatedText</b> folder.
+	       	</ul>
+   		</LI>
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
