@@ -9,19 +9,11 @@
          <IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>	
 <hr>
-<h3><u>Purpose</u></h3>
-<ul>
-    	<li><b>[LegacyRC #5051]</b> Automatically reconnect database connections if connection is lost. 
-    	<li><b>[LegacyRC #5053]</b> FAM UI is unresponsive if database connection is lost or locked.
-<p>
-    	<li>Exercise various scenarios where database connectivity is lost.
-    	<li>Exercise various scenarios where network connectivity is lost.
-</ul>
-<p>
 <h3><u>Setup</u></h3>
 <ul>
 	<li>Create the following <b>StopSQL</b> batch file.  This will repeatedly stop the SQL service 
-	for two minutes and start the SQL service for two minutes.</li>
+	for two minutes and start the SQL service for two minutes.  The batch file should be saved in 
+	the <b>.\Program Files\Extract Systems\CommonComponents</b> folder.</li>
     	<ul> 
        		<li>rem Stop SQL Server batch file 
        		<li>:begin
@@ -33,7 +25,8 @@
     	</ul> 
 <p>
 	<li>Create the following <b>StopNetwork</b> batch file.  This will repeatedly disable the network card 
-	for one minute and enable the network card for five minutes.</li>
+	for one minute and enable the network card for five minutes.  The batch file should be saved in 
+	the <b>.\Program Files\Extract Systems\CommonComponents</b> folder.</li>
     	<ul> 
        		<li>rem Stop network batch file 
        		<li>:begin
@@ -66,32 +59,10 @@
        		<li>Confirm that <b>processing</b> gracefully restarts after each SQL outage.
     	</ul> 
 <p>
-    	<li><b>Scenario 2</b> :  Remote images, local database, local processing - 2 PCs
-    	<ul> 
-       		<li>Create a local database for the test images.
-       		<li>Create a FAM instance to queue and process the test images.
-       		<li>Start queuing and processing.
-       		<li>Begin using the <b>StopSQL</b> batch file on the local test machine.
-<p>
-       		<li>Confirm that <b>queuing</b> gracefully restarts after the first SQL outage.
-       		<li>Confirm that <b>processing</b> gracefully restarts after each SQL outage.
-    	</ul> 
-<p>
-    	<li><b>Scenario 3</b> :  Remote images and database, local processing - 2 PCs
+    	<li><b>Scenario 2</b> :  Remote images and database, local processing - 2 PCs
     	<ul> 
        		<li>Create a remote database for the remote images.
        		<li>Create a FAM instance to queue and process the test images.
-       		<li>Start queuing and processing.
-       		<li>Begin using the <b>StopSQL</b> batch file on the remote test machine.
-<p>
-       		<li>Confirm that <b>queuing</b> gracefully restarts after the first SQL outage.
-       		<li>Confirm that <b>processing</b> gracefully restarts after each SQL outage.
-    	</ul> 
-<p>
-    	<li><b>Scenario 4</b> :  Remote images, remote database, local processing - 3 PCs
-    	<ul> 
-       		<li>Create a database for the test images on a remote machine.
-       		<li>Create a FAM instance to queue and process the test images from another remote machine.
        		<li>Start queuing and processing.
        		<li>Begin using the <b>StopSQL</b> batch file on the remote test machine.
 <p>
@@ -115,22 +86,6 @@
        		<li>Confirm that <b>USB counter</b> is not affected.
     	</ul> 
 <p>
-<ul>
-    	<li><b>[LegacyRC #5076]</b> Testing file processing timeout
-    	<ul> 
-       		<li>Prepare a <b>Scenario 1</b> testing setup.
-       		<li>Modify the <b>ConnectionRetryTimeout</b> setting in the <b>DBInfo</b> table to 30.
-       		<li>Modify the <b>NumberOfConnectionRetries</b> setting in the <b>DBInfo</b> table to 1.
-       		<li>Start queuing and processing.
-       		<li>Manually stop network connection from the command line using "ipconfig/release".
-<p>
-       		<li>Confirm that after processing times out, the files are automatically moved to the 
-		<b>failed</b> grid on the Processing Log page.
-		<br>Note: It may take up to 5 or more minutes for the files to be moved to the <b>failed</b> grid.
-    	</ul> 
-</ul> 
-
-<p>
     	<li><b>Scenario 2</b> :  Remote images, local database, local processing - 2 PCs
     	<ul> 
        		<li>Create a local database for the test images.
@@ -141,7 +96,8 @@
 <p>
        		<li>Confirm that <b>queuing</b> gracefully restarts after the first network outage.
        		<li>Confirm that <b>processing</b> gracefully restarts after each network outage.
-			<br>Note: It is expected behavior that a few files fail, the objective of this test is to confirm that queueing and processing starts again automatically.
+		Note: It is expected behavior that a few files fail, the objective of this test is 
+		to confirm that queueing and processing starts again automatically.
 <p>				
        		<li>Confirm that connection to the <b>USB counter</b> gracefully restarts after each 
 		network outage.
@@ -158,10 +114,9 @@
        		<li>Confirm that <b>queuing</b> gracefully restarts after the first network outage.
        		<li>Confirm that <b>processing</b> gracefully restarts after each network outage.
        		<li>Confirm that connection to the <b>USB counter</b> gracefully restarts after each 
-		network outage.
-			<br>Note: A bunch of files should fail.
+		network outage.  <b>Note:</b> A bunch of files should fail.
+	</ul>
 <p>
-		</ul>
     	<li><b>Scenario 4</b> :  Remote images, local database, local processing - 2 PCs
     	<ul> 
        		<li>Create a local database for the test images.
@@ -174,8 +129,7 @@
        		<li>Confirm that <b>queuing</b> gracefully restarts after the first network outage.
        		<li>Confirm that <b>processing</b> gracefully restarts after each network outage.
        		<li>Confirm that connection to the <b>USB counter</b> gracefully restarts after each 
-		network outage.
-		<br>Note: A file should fail.
+		network outage.  <b>Note:</b> A file should fail.
     	</ul> 
 </ul>
 <p>
