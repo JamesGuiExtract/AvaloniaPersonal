@@ -57,7 +57,7 @@ function main(args) {
               fields.push(val);
               match = csvRegex.exec(pinnames[i]);
           }
-          pinmap[fields[0]] = fields[1];
+          pinmap[fields[2]] = fields[1];
       }
 
     } else if (csvType == "legals") {
@@ -261,7 +261,7 @@ function main(args) {
         var fname = getEAVName(fields[26], "PIN");
         var val
         try {
-            val = fields[15];
+            val = fields[0];
             if (val != "") {
                 writeAttr(fname, "PIN", pinmap[val], "", "");
             }
