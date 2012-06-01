@@ -90,7 +90,6 @@
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="DbMethods.cs" />
     <Compile Include="EventArgs.cs" />
     <Compile Include="QueryAndResultsControl.cs">
       <SubType>UserControl</SubType>

@@ -1,3 +1,4 @@
+using Extract.Database;
 using Extract.Drawing;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
@@ -3111,6 +3112,12 @@ namespace Extract.DataEntry
         {
             try
             {
+                // Ignore events from any thread but the UI thread.
+                if (InvokeRequired)
+                {
+                    return;
+                }
+
                 if (AttributeStatusInfo.IsAttributePersistable(e.Attribute))
                 {
                     OnDataChanged();
@@ -3179,6 +3186,12 @@ namespace Extract.DataEntry
         {
             try
             {
+                // Ignore events from any thread but the UI thread.
+                if (InvokeRequired)
+                {
+                    return;
+                }
+
                 // If the attribute is now marked as viewed.
                 if (e.IsDataViewed)
                 {
@@ -3208,6 +3221,12 @@ namespace Extract.DataEntry
         {
             try
             {
+                // Ignore events from any thread but the UI thread.
+                if (InvokeRequired)
+                {
+                    return;
+                }
+
                 // Update the invalid count to reflect the new state of the attribute.
                 UpdateInvalidCount(e.DataValidity != DataValidity.Valid);
 

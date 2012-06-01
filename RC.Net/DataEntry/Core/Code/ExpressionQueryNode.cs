@@ -145,6 +145,11 @@ namespace Extract.DataEntry
                     }
                 }
 
+                if (FlushCache)
+                {
+                    _cachedExpressions.Clear();
+                }
+
                 // If there is a cached compiled IExpression for this expression, retrieve it.
                 string expressionText = expressionBuilder.ToString();
                 IExpression expression;
@@ -160,10 +165,13 @@ namespace Extract.DataEntry
 
                     expression = Expression.Parse(expressionText);
 
-                    double executionTime = (DateTime.Now - startTime).TotalMilliseconds;
-                    cachedExpression = new CachedQueryData<IExpression>(expression, executionTime);
+                    if (AllowCaching && !FlushCache)
+                    {
+                        double executionTime = (DateTime.Now - startTime).TotalMilliseconds;
+                        cachedExpression = new CachedQueryData<IExpression>(expression, executionTime);
 
-                    _cachedExpressions.CacheData(expressionText, cachedExpression);
+                        _cachedExpressions.CacheData(expressionText, cachedExpression);
+                    }
                 }
 
                 // Evaluate the expression.

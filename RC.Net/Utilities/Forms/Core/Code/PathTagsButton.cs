@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 
@@ -66,6 +67,12 @@ namespace Extract.Utilities.Forms
         ContextMenuStrip _dropDown;
 
         /// <summary>
+        /// The menu items added and handled by this class. Any menu items not in this list will
+        /// have been added in the <see cref="MenuOpening"/> event by another class.
+        /// </summary>
+        List<ToolStripItem> _ownedItems = new List<ToolStripItem>();
+
+        /// <summary>
         /// The list of document tags to be displayed in the context menu drop down.
         /// </summary>
         IPathTags _pathTags;
@@ -77,6 +84,11 @@ namespace Extract.Utilities.Forms
         PathTagsButtonDisplayStyle _displayStyle = PathTagsButtonDisplayStyle.ImageOnly;
 
         /// <summary>
+        /// Whether or not path tags should be displayed in the drop down.
+        /// </summary>
+        bool _displayPathTags = true;
+
+        /// <summary>
         /// Whether or not function tags should be displayed in the drop down.
         /// </summary>
         bool _displayFunctionTags = true;
@@ -84,6 +96,14 @@ namespace Extract.Utilities.Forms
         #endregion PathTagsButton Fields
 
         #region PathTagsButton Events
+
+        /// <summary>
+        /// Raised as the menu is opening; allows for custom menu items to be added or for the menu
+        /// to be cancelled.
+        /// </summary>
+        [Category("Action")]
+        [Description("Occurs when the menu is opening.")]
+        public event EventHandler<PathTagsMenuOpeningEventArgs> MenuOpening;
 
         /// <summary>
         /// Occurs when a tag is selected.
@@ -215,10 +235,28 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
-        /// Gets/sets whether function tags should be displayed in the drop down.
+        /// Gets/sets whether path tags should be displayed in the drop down.
         /// </summary>
         [Category("Behavior")]
         [Description("The path tags that are available for selection.")]
+        [DefaultValue(true)]
+        public bool DisplayPathTags
+        {
+            get
+            {
+                return _displayPathTags;
+            }
+            set
+            {
+                _displayPathTags = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets whether function tags should be displayed in the drop down.
+        /// </summary>
+        [Category("Behavior")]
+        [Description("The function tags that are available for selection.")]
         [DefaultValue(true)]
         public bool DisplayFunctionTags
         {
@@ -342,46 +380,62 @@ namespace Extract.Utilities.Forms
 
             try
             {
-                // Create the drop down if it is not already created
-                if (_dropDown == null)
+                // Create a new menu item each time as _dropDown may have been modified by a
+                // MenuOpening handler last time.
+                if (_dropDown != null)
                 {
-                    // Create a context menu for the drop down
-                    _dropDown = new ContextMenuStrip();
-                    _dropDown.ShowImageMargin = false;
-                    _dropDown.ItemClicked += HandleItemClicked;
+                    _dropDown.Dispose();
+                }
 
-                    // Add the menu items to the drop down
-                    ToolStripItemCollection items = _dropDown.Items;
+                // Create a context menu for the drop down
+                _dropDown = new ContextMenuStrip();
+                _dropDown.ShowImageMargin = false;
+                _dropDown.ItemClicked += HandleItemClicked;
 
+                // Add the menu items to the drop down
+                ToolStripItemCollection items = _dropDown.Items;
+
+                if (_displayPathTags)
+                {
                     // Add the doc tags
                     foreach (string docTag in PathTags.Tags)
                     {
                         items.Add(new ToolStripMenuItem(docTag));
                     }
+                }
 
-                    // Check if displaying function tags
-                    if (_displayFunctionTags)
+                // Check if displaying function tags
+                if (_displayFunctionTags)
+                {
+                    // Only add the separator if there was at least one doc tag
+                    if (items.Count > 0)
                     {
-                        // Only add the separator if there was at least one doc tag
-                        if (items.Count > 0)
-                        {
-                            items.Add(new ToolStripSeparator());
-                        }
+                        items.Add(new ToolStripSeparator());
+                    }
 
-                        // Add the function tags
-                        foreach (string function in _functionTags)
-                        {
-                            items.Add(new ToolStripMenuItem(function));
-                        }
+                    // Add the function tags
+                    foreach (string function in _functionTags)
+                    {
+                        items.Add(new ToolStripMenuItem(function));
                     }
                 }
 
-                // Get the right-top coordinate of the button
-                Rectangle clientRectangle = this.ClientRectangle;
-                Point rightTop = new Point(clientRectangle.Right, clientRectangle.Top);
+                // Keep track of which items were added by this class (as opposed to MenuOpening
+                // handlers).
+                _ownedItems.AddRange(items.Cast<ToolStripItem>());
 
-                // Show the context menu at the top right of the button
-                _dropDown.Show(PointToScreen(rightTop));
+                // Allow MenuOpening handlers to add their own custom options or cancel the menu.
+                var eventArgs = new PathTagsMenuOpeningEventArgs(_dropDown);
+                OnMenuOpening(eventArgs);
+                if (!eventArgs.Cancel)
+                {
+                    // Get the right-top coordinate of the button
+                    Rectangle clientRectangle = this.ClientRectangle;
+                    Point rightTop = new Point(clientRectangle.Right, clientRectangle.Top);
+
+                    // Show the context menu at the top right of the button
+                    _dropDown.Show(PointToScreen(rightTop));
+                }
             }
             catch (Exception ex)
             {
@@ -402,6 +456,19 @@ namespace Extract.Utilities.Forms
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="E:MenuOpening"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="PathTagsMenuOpeningEventArgs"/> instance containing the
+        /// event data.</param>
+        protected virtual void OnMenuOpening(PathTagsMenuOpeningEventArgs e)
+        {
+            if (MenuOpening != null)
+            {
+                MenuOpening(this, e);
+            }
+        }
+
         #endregion PathTagsButton OnEvents
 
         #region PathTagsButton Event Handlers
@@ -419,7 +486,7 @@ namespace Extract.Utilities.Forms
             {
                 // Check if a tag was selected (the separator's Text will be the empty string)
                 string tagName = e.ClickedItem.Text;
-                if (!string.IsNullOrEmpty(tagName))
+                if (_ownedItems.Contains(e.ClickedItem) && !string.IsNullOrEmpty(tagName))
                 {
                     if (TextControl != null)
                     {
@@ -493,6 +560,38 @@ namespace Extract.Utilities.Forms
             get
             {
                 return _tag;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Provides data for the <see cref="PathTagsButton.MenuOpening"/> event.
+    /// </summary>
+    public class PathTagsMenuOpeningEventArgs : CancelEventArgs
+    {
+        /// <summary>
+        /// The <see cref="ContextMenuStrip"/>.
+        /// </summary>
+        readonly ContextMenuStrip _contextMenuStrip;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PathTagsMenuOpeningEventArgs"/> class.
+        /// </summary>
+        /// <param name="contextMenuStrip"></param>
+        public PathTagsMenuOpeningEventArgs(ContextMenuStrip contextMenuStrip)
+        {
+            _contextMenuStrip = contextMenuStrip;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ContextMenuStrip"/>.
+        /// </summary>
+        /// <returns></returns>
+        public ContextMenuStrip ContextMenuStrip
+        {
+            get
+            {
+                return _contextMenuStrip;
             }
         }
     }

@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
+using System.Threading;
 
 namespace Extract.DataEntry
 {
@@ -127,49 +128,53 @@ namespace Extract.DataEntry
         /// <summary>
         /// The filename of the currently open document.
         /// </summary>
+        [ThreadStatic]
         static string _sourceDocName;
 
         /// <summary>
         /// Used to expand path tags.
         /// </summary>
-        static SourceDocumentPathTags _sourceDocumentPathTags = new SourceDocumentPathTags();
+        [ThreadStatic]
+        static SourceDocumentPathTags _sourceDocumentPathTags;
 
         /// <summary>
         /// The active attribute hierarchy.
         /// </summary>
+        [ThreadStatic]
         static IUnknownVector _attributes;
 
         /// <summary>
         /// A database available for use in validation or auto-update queries.
         /// </summary>
+        [ThreadStatic]
         static DbConnection _dbConnection;
 
         /// <summary>
         /// Caches the info object for each <see cref="IAttribute"/> for quick reference later on.
         /// </summary>
-        static Dictionary<IAttribute, AttributeStatusInfo> _statusInfoMap =
-            new Dictionary<IAttribute, AttributeStatusInfo>();
+        [ThreadStatic]
+        static Dictionary<IAttribute, AttributeStatusInfo> _statusInfoMap;
 
         /// <summary>
         /// A dictionary that keeps track of which attribute collection each attribute belongs to.
         /// Used to help in assigning _parentAttribute fields.
         /// </summary>
-        static Dictionary<IUnknownVector, IAttribute> _subAttributesToParentMap =
-            new Dictionary<IUnknownVector, IAttribute>();
+        [ThreadStatic]
+        static Dictionary<IUnknownVector, IAttribute> _subAttributesToParentMap;
 
         /// <summary>
         /// A dictionary of auto-update triggers that exist on the attributes stored in the keys of
         /// this dictionary.
         /// </summary>
-        static Dictionary<IAttribute, AutoUpdateTrigger> _autoUpdateTriggers =
-            new Dictionary<IAttribute, AutoUpdateTrigger>();
+        [ThreadStatic]
+        static Dictionary<IAttribute, AutoUpdateTrigger> _autoUpdateTriggers;
 
         /// <summary>
         /// A dictionary of validation triggers that exist on the attributes stored in the keys of
         /// this dictionary.
         /// </summary>
-        static Dictionary<IAttribute, AutoUpdateTrigger> _validationTriggers =
-            new Dictionary<IAttribute, AutoUpdateTrigger>();
+        [ThreadStatic]
+        static Dictionary<IAttribute, AutoUpdateTrigger> _validationTriggers;
 
         /// <summary>
         /// Keeps track of the attributes that have been modified since the last time EndEdit was
@@ -177,27 +182,35 @@ namespace Extract.DataEntry
         /// the spatial information has changed and what the original attribute value was in case
         /// it needs to be reverted.
         /// </summary>
-        static Dictionary<IAttribute, KeyValuePair<bool, SpatialString>> _attributesBeingModified =
-            new Dictionary<IAttribute, KeyValuePair<bool, SpatialString>>();
+        [ThreadStatic]
+        static Dictionary<IAttribute, KeyValuePair<bool, SpatialString>> _attributesBeingModified;
 
         /// <summary>
         /// Keeps track of whether EndEdit is currently being processed.
         /// </summary>
+        [ThreadStatic]
         static bool _endEditInProgress;
 
         /// <summary>
         /// Specifies whether validation triggers are currently enabled.
         /// </summary>
+        [ThreadStatic]
         static bool _validationTriggersEnabled;
 
         /// <summary>
         /// Manages change history and provides ability to undo changes.
         /// </summary>
+        [ThreadStatic]
         static UndoManager _undoManager = new UndoManager();
 
         #endregion static fields
 
         #region Instance fields
+
+//        /// <summary>
+//        /// 
+//        /// </summary>
+//        Thread _owningThread;
 
         /// <summary>
         /// Indicates whether the object has been modified since being loaded via the 
@@ -341,6 +354,8 @@ namespace Extract.DataEntry
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI24485", _OBJECT_NAME);
+
+//                _owningThread = Thread.CurrentThread;
             }
             catch (Exception ex)
             {
@@ -351,6 +366,17 @@ namespace Extract.DataEntry
         #endregion Constructors
 
         #region Properties
+
+//        /// <summary>
+//        /// Gets the owning thread.
+//        /// </summary>
+//        public Thread OwningThread
+//        {
+//            get
+//            {
+//                return _owningThread;
+//            }
+//        }
 
         /// <summary>
         /// Gets the <see cref="IDataEntryControl"/> in charge of displaying the associated
@@ -549,6 +575,8 @@ namespace Extract.DataEntry
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI26109", _OBJECT_NAME);
 
+                InitializeStatics();
+
                 ExtractException.Assert("ELI29196", "Null attribute exception!", attribute != null);
 
                 AttributeStatusInfo statusInfo;
@@ -592,6 +620,8 @@ namespace Extract.DataEntry
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI26133", _OBJECT_NAME);
+
+                InitializeStatics();
 
                 _statusInfoMap.Clear();
                 _subAttributesToParentMap.Clear();
@@ -694,6 +724,8 @@ namespace Extract.DataEntry
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI26134", _OBJECT_NAME);
+
+                InitializeStatics();
 
                 // Create a new statusInfo instance (or retrieve an existing one).
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
@@ -2380,6 +2412,8 @@ namespace Extract.DataEntry
         {
             try
             {
+                InitializeStatics();
+
                 List<IAttribute> results = new List<IAttribute>();
 
                 // Trim off any leading slash.
@@ -2455,6 +2489,8 @@ namespace Extract.DataEntry
         {
             try
             {
+                InitializeStatics();
+
                 if (_endEditInProgress)
                 {
                     return;
@@ -2593,6 +2629,10 @@ namespace Extract.DataEntry
         /// <summary>
         /// An event that indicates an attribute is being initialized into an 
         /// <see cref="IDataEntryControl"/>.
+        /// <para><b>Note</b></para>
+        /// The static members of this class are ThreadStatic. Handlers of this event must be able
+        /// to distinguish and ignore events raised on a thread other than the one they are
+        /// concerned with.
         /// </summary>
         public static event EventHandler<AttributeInitializedEventArgs> AttributeInitialized;
 
@@ -2600,17 +2640,29 @@ namespace Extract.DataEntry
         /// Fired to notify listeners that an <see cref="IAttribute"/> that was previously marked 
         /// as unviewed has now been marked as viewed (or vice-versa).
         /// </summary>
+        /// <para><b>Note</b></para>
+        /// The static members of this class are ThreadStatic. Handlers of this event must be able
+        /// to distinguish and ignore events raised on a thread other than the one they are
+        /// concerned with.
         public static event EventHandler<ViewedStateChangedEventArgs> ViewedStateChanged;
 
         /// <summary>
         /// Fired to notify listeners that an <see cref="IAttribute"/> that was previously marked 
         /// as having invalid data has now been marked as valid (or vice-versa).
         /// </summary>
+        /// <para><b>Note</b></para>
+        /// The static members of this class are ThreadStatic. Handlers of this event must be able
+        /// to distinguish and ignore events raised on a thread other than the one they are
+        /// concerned with.
         public static event EventHandler<ValidationStateChangedEventArgs> ValidationStateChanged;
 
         /// <summary>
         /// Raised at the end of an <see cref="EndEdit"/> call.
         /// </summary>
+        /// <para><b>Note</b></para>
+        /// The static members of this class are ThreadStatic. Handlers of this event must be able
+        /// to distinguish and ignore events raised on a thread other than the one they are
+        /// concerned with.
         public static event EventHandler<EventArgs> EditEnded;
 
         /// <summary>
@@ -2628,6 +2680,24 @@ namespace Extract.DataEntry
         #region Private Methods
 
         /// <summary>
+        /// Ensures all ThreadStatic variables are initialized.
+        /// </summary>
+        static void InitializeStatics()
+        {
+            if (_sourceDocumentPathTags == null)
+            {
+                _sourceDocumentPathTags = new SourceDocumentPathTags();
+                _statusInfoMap = new Dictionary<IAttribute, AttributeStatusInfo>();
+                _subAttributesToParentMap = new Dictionary<IUnknownVector, IAttribute>();
+                _autoUpdateTriggers = new Dictionary<IAttribute, AutoUpdateTrigger>();
+                _validationTriggers = new Dictionary<IAttribute, AutoUpdateTrigger>();
+                _attributesBeingModified =
+                    new Dictionary<IAttribute, KeyValuePair<bool, SpatialString>>();
+                _undoManager = new UndoManager();
+            }
+        }
+
+        /// <summary>
         /// Raises the <see cref="ViewedStateChanged"/> event.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> associated with the event.</param>
@@ -2636,10 +2706,10 @@ namespace Extract.DataEntry
         /// unviewed.</param>
         static void OnViewedStateChanged(IAttribute attribute, bool dataIsViewed)
         {
-            if (AttributeStatusInfo.ViewedStateChanged != null)
+            var eventHandler = AttributeStatusInfo.ViewedStateChanged;
+            if (eventHandler != null)
             {
-                ViewedStateChanged(null,
-                    new ViewedStateChangedEventArgs(attribute, dataIsViewed));
+                eventHandler(null, new ViewedStateChangedEventArgs(attribute, dataIsViewed));
             }
         }
 
@@ -2651,10 +2721,10 @@ namespace Extract.DataEntry
         /// attribute's value is now valid.</param>
         static void OnValidationStateChanged(IAttribute attribute, DataValidity dataValidity)
         {
-            if (AttributeStatusInfo.ValidationStateChanged != null)
+            var eventHandler = AttributeStatusInfo.ValidationStateChanged;
+            if (eventHandler != null)
             {
-                ValidationStateChanged(null,
-                    new ValidationStateChangedEventArgs(attribute, dataValidity));
+                eventHandler(null, new ValidationStateChangedEventArgs(attribute, dataValidity));
             }
         }
 
@@ -2669,9 +2739,10 @@ namespace Extract.DataEntry
         static void OnAttributeInitialized(IAttribute attribute,
             IUnknownVector sourceAttributes, IDataEntryControl dataEntryControl)
         {
-            if (AttributeStatusInfo.AttributeInitialized != null)
+            var eventHandler = AttributeStatusInfo.AttributeInitialized;
+            if (eventHandler != null)
             {
-                AttributeInitialized(null,
+                eventHandler(null,
                     new AttributeInitializedEventArgs(attribute, sourceAttributes, dataEntryControl));
             }
         }
@@ -2681,9 +2752,10 @@ namespace Extract.DataEntry
         /// </summary>
         static void OnEditEnded()
         {
-            if (AttributeStatusInfo.EditEnded != null)
+            var eventHandler = AttributeStatusInfo.EditEnded;
+            if (eventHandler != null)
             {
-                AttributeStatusInfo.EditEnded(null, new EventArgs());
+                eventHandler(null, new EventArgs());
             }
         }
 
@@ -2703,14 +2775,16 @@ namespace Extract.DataEntry
         void OnAttributeValueModified(IAttribute attribute, bool incrementalUpdate,
             bool acceptSpatialInfo, bool spatialInfoChanged)
         {
+            var eventHandler = AttributeValueModified;
+
             // Don't raise the event if it is already being raised (prevents recursion).
-            if (this.AttributeValueModified != null && !_raisingAttributeValueModified)
+            if (eventHandler != null && !_raisingAttributeValueModified)
             {
                 try
                 {
                     _raisingAttributeValueModified = true;
 
-                    AttributeValueModified(this,
+                    eventHandler(this,
                         new AttributeValueModifiedEventArgs(
                             attribute, incrementalUpdate, acceptSpatialInfo, spatialInfoChanged));
                 }
@@ -2727,9 +2801,10 @@ namespace Extract.DataEntry
         /// <param name="attribute">The <see cref="IAttribute"/> that was deleted.</param>
         void OnAttributeDeleted(IAttribute attribute)
         {
-            if (this.AttributeDeleted != null)
+            var eventHandler = AttributeDeleted;
+            if (eventHandler != null)
             {
-                AttributeDeleted(this, new AttributeDeletedEventArgs(attribute));
+                eventHandler(this, new AttributeDeletedEventArgs(attribute));
             }
         }
 

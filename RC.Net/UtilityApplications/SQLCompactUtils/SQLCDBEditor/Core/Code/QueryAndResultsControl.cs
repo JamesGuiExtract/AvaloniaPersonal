@@ -1,4 +1,5 @@
-﻿using Extract.Utilities;
+﻿using Extract.Database;
+using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;

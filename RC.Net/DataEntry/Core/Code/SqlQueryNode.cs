@@ -1,9 +1,9 @@
-﻿using Extract.DataEntry.Properties;
+﻿using Extract.Database;
+using Extract.DataEntry.Properties;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlServerCe;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -28,7 +28,8 @@ namespace Extract.DataEntry
         /// <summary>
         /// Provides access to settings in the config file.
         /// </summary>
-        static ConfigSettings<Settings> _config = new ConfigSettings<Settings>();
+        static ConfigSettings<Extract.DataEntry.Properties.Settings> _config =
+            new ConfigSettings<Extract.DataEntry.Properties.Settings>();
 
         /// <summary>
         /// Cached SQL query results for frequently used or expensive queries.
@@ -38,6 +39,15 @@ namespace Extract.DataEntry
                 _config.Settings.QueryCacheLimit, CachedQueryData<string[]>.GetScore);
 
         #endregion Statics
+
+        #region Fields
+
+        /// <summary>
+        /// A string that indicates the following element in a query is a parameter.
+        /// </summary>
+        string _parameterMarker;
+
+        #endregion Fields
 
         #region Constructors
 
@@ -61,6 +71,11 @@ namespace Extract.DataEntry
                 }
 
                 _lastDBConnection = dbConnection;
+
+                _parameterMarker = (dbConnection.GetType().ToString()
+                    .IndexOf("Oracle", StringComparison.OrdinalIgnoreCase) == -1)
+                    ? "@"   // MS SQL & SQL CE
+                    : ":";  // Oracle
             }
             catch (Exception ex)
             {
@@ -83,11 +98,9 @@ namespace Extract.DataEntry
         {
             try
             {
-                SqlCeConnection sqlCeConnection = DatabaseConnection as SqlCeConnection;
-
                 ExtractException.Assert("ELI26733",
-                    "Unable to evaluate query without SQL CE database connection!",
-                    sqlCeConnection != null);
+                    "Unable to evaluate query without database connection!",
+                    DatabaseConnection != null);
 
                 StringBuilder sqlQuery = new StringBuilder();
 
@@ -105,7 +118,8 @@ namespace Extract.DataEntry
                     {
                         // If parameterizing, don't add the query result directly, rather add a
                         // parameter name to the query and add the key/value pair to parameters.
-                        string key = "@" + parameters.Count.ToString(CultureInfo.InvariantCulture);
+                        string key = _parameterMarker +
+                            parameters.Count.ToString(CultureInfo.InvariantCulture);
                         string value = childQueryResult.ToString();
 
                         cacheKey += value + ":";
@@ -118,6 +132,11 @@ namespace Extract.DataEntry
                     }
                 }
 
+                if (FlushCache)
+                {
+                    _cachedResults.Clear();
+                }
+
                 // If there are cached results for this query, retrieve them.
                 string[] queryResults;
                 CachedQueryData<string[]> cachedResults;
@@ -127,25 +146,33 @@ namespace Extract.DataEntry
                     queryResults = cachedResults.Data;
                 }
                 // Otherwise, execute the query and submit the results for caching.
-                else
+                else if (!string.IsNullOrWhiteSpace(sqlQuery.ToString()))
                 {
                     DateTime startTime = DateTime.Now;
 
                     // Create a database command using the query.
                     using (DbCommand dbCommand = DBMethods.CreateDBCommand(
-                        sqlCeConnection, sqlQuery.ToString(), parameters))
+                        DatabaseConnection, sqlQuery.ToString(), parameters))
                     {
                         // Execute the query.
                         queryResults = DBMethods.ExecuteDBQuery(dbCommand, ", ");
                     }
 
-                    // Attempt to cache the results.
-                    double executionTime = (DateTime.Now - startTime).TotalMilliseconds;
-                    cachedResults = new CachedQueryData<string[]>(queryResults, executionTime);
-                    _cachedResults.CacheData(cacheKey, cachedResults);
+                    if (AllowCaching && !FlushCache)
+                    {
+                        // Attempt to cache the results.
+                        double executionTime = (DateTime.Now - startTime).TotalMilliseconds;
+                        cachedResults = new CachedQueryData<string[]>(queryResults, executionTime);
+                        _cachedResults.CacheData(cacheKey, cachedResults);
+                    }
+                }
+                else
+                {
+                    // If the query is blank, just return an emptry result (not an error condition).
+                    queryResults = new string[0];
                 }
 
-                return new QueryResult(this, queryResults); ;
+                return new QueryResult(this, queryResults);
             }
             catch (Exception ex)
             {

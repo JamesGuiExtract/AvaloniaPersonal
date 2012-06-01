@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.Licensing;
+using System;
 using System.Collections.Generic;
 using System.Xml;
 
@@ -118,6 +119,15 @@ namespace Extract.DataEntry
     /// </summary>
     public abstract class QueryNode
     {
+        #region Constants
+
+        /// <summary>
+        /// The name of the object to be used in the validate license calls.
+        /// </summary>
+        static readonly string _OBJECT_NAME = typeof(QueryNode).ToString();
+
+        #endregion Constants
+
         /// <summary>
         /// The unparsed XML text that defines the query.
         /// </summary>
@@ -133,6 +143,17 @@ namespace Extract.DataEntry
         /// in an <see cref="SqlQueryNode"/> or <see cref="ExpressionQueryNode"/>.
         /// </summary>
         bool _parameterize = true;
+
+        /// <summary>
+        /// Indicates whether the result from evaluating query node may be cached for perfomance
+        /// reasons if it is a node type that supports caching.
+        /// </summary>
+        bool _allowCaching = true;
+
+        /// <summary>
+        /// Indicates whether to flush the current node type's cache when this node is evaluated.
+        /// </summary>
+        bool _flushCache = false;
 
         /// <summary>
         /// Specifies the way in which spatial information will be persisted from this
@@ -187,6 +208,19 @@ namespace Extract.DataEntry
         /// </summary>
         protected QueryNode()
         {
+            try
+            {
+                // Validate the license
+                // Since DataEntryQueries are not being used outside the DE framework (in rule
+                // objects) and really should be abstracted out of Extract.DataEntry at some point,
+                // don't license with a data entry license.
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI34721", _OBJECT_NAME);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34722");
+            }
         }
 
         /// <summary>
@@ -219,7 +253,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Gets or sets whether the query node should be should be parameterized if it is used
+        /// Gets or sets whether the query node should be parameterized if it is used
         /// in an <see cref="SqlQueryNode"/> or <see cref="ExpressionQueryNode"/>.
         /// </summary>
         /// <value><see langword="true"/> if the query's result should be parameterized when
@@ -235,6 +269,51 @@ namespace Extract.DataEntry
             set
             {
                 _parameterize = value;
+            }
+        }
+
+
+        /// <summary>
+        /// Gets or sets whether the result from evaluating query node may be cached for perfomance
+        /// reasons if it is a node type that supports caching. In some situations it may be
+        /// desireable to force re-evaluation of query, such as for an SQL query node that is
+        /// updating a database.
+        /// <b><para>Note</para></b>
+        /// A value of <see langwor="true"/> does not guarantee that a result will be cached, only
+        /// that it is eligible to be cached.
+        /// </summary>
+        /// <value><see langword="true"/> if the query node's result is eligible to be cached for
+        /// performance; <see langword="false"/> to force re-evaluation every time.</value>
+        public bool AllowCaching
+        {
+            get
+            {
+                return _allowCaching;
+            }
+
+            set
+            {
+                _allowCaching = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to flush the current node type's cache when this
+        /// node is evaluated.
+        /// </summary>
+        /// <value><see langword="true"/> if to flush the current node type's cache when this;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        public bool FlushCache
+        {
+            get
+            {
+                return _flushCache;
+            }
+
+            set
+            {
+                _flushCache = value;
             }
         }
 
@@ -498,6 +577,18 @@ namespace Extract.DataEntry
                 if (_properties.TryGetValue("Parameterize", out xmlAttributeValue))
                 {
                     Parameterize = xmlAttributeValue.ToBoolean();
+                }
+
+                // Allow caching unless the AllowCaching attribute is present and specifies not to.
+                if (_properties.TryGetValue("AllowCaching", out xmlAttributeValue))
+                {
+                    AllowCaching = xmlAttributeValue.ToBoolean();
+                }
+
+                // Flush the cache when evaluating if the FlushCache attribute is set.
+                if (_properties.TryGetValue("FlushCache", out xmlAttributeValue))
+                {
+                    FlushCache = xmlAttributeValue.ToBoolean();
                 }
 
                 // Include unless otherwise specified.

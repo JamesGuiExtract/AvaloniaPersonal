@@ -29,6 +29,7 @@ namespace Extract.DataEntry
             /// <see cref="IAttribute"/>(s) beneath them. Used to quickly assign newly initialized
             /// attributes to the query node(s) that reference them.
             /// </summary>
+            [ThreadStatic]
             static Dictionary<IAttribute, AttributeReferenceManager> _descendantQueryReferences
                 = new Dictionary<IAttribute, AttributeReferenceManager>();
 
@@ -37,6 +38,7 @@ namespace Extract.DataEntry
             /// (from the root). Needed because null can't be used as the key in
             /// _descendantQueryReferences.
             /// </summary>
+            [ThreadStatic]
             static IAttribute _ROOT_ATTRIBUTE = new UCLID_AFCORELib.Attribute();
 
             #endregion Statics
@@ -95,6 +97,8 @@ namespace Extract.DataEntry
             {
                 try
                 {
+                    InitializeStatics();
+
                     _descendantQueryReferences.Clear();
                 }
                 catch (Exception ex)
@@ -118,6 +122,8 @@ namespace Extract.DataEntry
             {
                 try
                 {
+                    InitializeStatics();
+
                     string queryString = _queryNode._attributeQueryString;
                     HashSet<IAttribute> attributeDomain = new HashSet<IAttribute>();
                     HashSet<IAttribute> triggerAttributes = new HashSet<IAttribute>();
@@ -242,6 +248,8 @@ namespace Extract.DataEntry
             {
                 try
                 {
+                    InitializeStatics();
+
                     // Register to be notified with this attribute is deleted so that any
                     // registrations for the attribute or its descendants can be removed.
                     AttributeStatusInfo statusInfo = AttributeStatusInfo.GetStatusInfo(e.Attribute);
@@ -312,11 +320,26 @@ namespace Extract.DataEntry
             #region Private Members
 
             /// <summary>
+            /// Ensures all ThreadStatic variables are initialized.
+            /// </summary>
+            static void InitializeStatics()
+            {
+                if (_descendantQueryReferences == null)
+                {
+                    _descendantQueryReferences =
+                        new Dictionary<IAttribute, AttributeReferenceManager>();
+                    _ROOT_ATTRIBUTE = new UCLID_AFCORELib.Attribute();
+                }
+            }
+
+            /// <summary>
             /// Gets all existing root attributes for the <see cref="_queryNode"/>.
             /// </summary>
             /// <returns>All existing root attributes for the <see cref="_queryNode"/>.</returns>
             IEnumerable<IAttribute> GetRootAttributes()
             {
+                InitializeStatics();
+
                 // If there is no defined root attribute result, use the root of the hierarchy for
                 // absolute paths, or the specified root attribute for relative paths.
                 if (_queryNode._rootAttributeResultQuery == null)

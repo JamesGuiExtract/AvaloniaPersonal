@@ -220,6 +220,13 @@ namespace Extract.DataEntry
         {
             try
             {
+                // Validate the license
+                // Since DataEntryQueries are not being used outside the DE framework (in rule
+                // objects) and really should be abstracted out of Extract.DataEntry at some point,
+                // don't license with a data entry license.
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI34729", _OBJECT_NAME);
+
                 ExtractException.Assert("ELI23693",
                     "MultipleMatchSelectionMode.All is not valid for selecting one attribute!",
                             selectionMode != MultipleMatchSelectionMode.All);
@@ -1008,6 +1015,10 @@ namespace Extract.DataEntry
         {
             try
             {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI34730", _OBJECT_NAME);
+
                 autoCompleteValues = new string[] { };
 
                 // If there is no active validator, simply turn off auto-complete if it is not

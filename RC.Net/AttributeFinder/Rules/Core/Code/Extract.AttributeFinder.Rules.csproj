@@ -49,11 +49,18 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ScintillaNET, Version=2.4.0.0, Culture=neutral, PublicKeyToken=948d6c9751444115, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\APIs\ScintillaNET v2.4\ScintillaNET.dll</HintPath>
+    </Reference>
     <Reference Include="Spring.Core, Version=1.3.1.40711, Culture=neutral, PublicKeyToken=65e474d141e25e07, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\Spring.NET\1.3.1\bin\net\4.0\release\Spring.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\APIs\SqlCompact_3.5\Desktop\System.Data.SqlServerCe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -69,12 +76,25 @@
     <Compile Include="ConfigurableObjectControl.Designer.cs">
       <DependentUpon>ConfigurableObjectControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="DataQueryRuleObject.cs" />
+    <Compile Include="DataQueryRuleObjectSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DataQueryRuleObjectSettingsDialog.Designer.cs">
+      <DependentUpon>DataQueryRuleObjectSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="DuplicateAndSeparateTrees.cs" />
     <Compile Include="DuplicateAndSeparateTreesSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="DuplicateAndSeparateTreesSettingsDialog.Designer.cs">
       <DependentUpon>DuplicateAndSeparateTreesSettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ExpressionAndQueryTesterForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExpressionAndQueryTesterForm.Designer.cs">
+      <DependentUpon>ExpressionAndQueryTesterForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ExtractOcrTextInImageArea.cs" />
     <Compile Include="ExtractOcrTextInImageAreaSettingsDialog.cs">
@@ -109,6 +129,11 @@
       <DependentUpon>NumericSequencerSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="RSDDataScorer.cs" />
     <Compile Include="RSDDataScorerSettingsDialog.cs">
       <SubType>Form</SubType>
@@ -195,6 +220,14 @@
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Database\Core\Code\Extract.Database.csproj">
+      <Project>{D0465C3D-527B-4B21-8E07-79A6CB762CC9}</Project>
+      <Name>Extract.Database</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\DataEntry\Core\Code\Extract.DataEntry.csproj">
+      <Project>{55C4FA3A-26C9-4CC0-9F11-A7E607E6ACD2}</Project>
+      <Name>Extract.DataEntry</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
       <Name>Extract.Interop</Name>
@@ -220,8 +253,14 @@
     <EmbeddedResource Include="ConfigurableObjectControl.resx">
       <DependentUpon>ConfigurableObjectControl.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="DataQueryRuleObjectSettingsDialog.resx">
+      <DependentUpon>DataQueryRuleObjectSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DuplicateAndSeparateTreesSettingsDialog.resx">
       <DependentUpon>DuplicateAndSeparateTreesSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExpressionAndQueryTesterForm.resx">
+      <DependentUpon>ExpressionAndQueryTesterForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ExtractOcrTextInImageAreaSettingsDialog.resx">
       <DependentUpon>ExtractOcrTextInImageAreaSettingsDialog.cs</DependentUpon>
@@ -235,12 +274,22 @@
     <EmbeddedResource Include="NumericSequencerSettingsDialog.resx">
       <DependentUpon>NumericSequencerSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="RSDDataScorerSettingsDialog.resx">
       <DependentUpon>RSDDataScorerSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ValueConditionSelectorSettingsDialog.resx">
       <DependentUpon>ValueConditionSelectorSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\EAVGenerator.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\EAVGenerator.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

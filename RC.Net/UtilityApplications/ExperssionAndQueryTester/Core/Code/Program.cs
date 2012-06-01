@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Extract.AttributeFinder.Rules;
+using Extract.Licensing;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using Extract.Licensing;
 
 namespace Extract.UtilityApplications.ExpressionAndQueryTester
 {

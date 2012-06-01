@@ -88,8 +88,7 @@ namespace Extract.AttributeFinder.Rules
         #region Fields
 
         /// <summary>
-        /// An <see cref="FileActionManagerPathTags"/> instance with the AreaID tag added to expand
-        /// the output filename.
+        /// An <see cref="AttributeFinderPathTags"/> to expand the RSD filename.
         /// </summary>
         AttributeFinderPathTags _pathTags = new AttributeFinderPathTags();
 

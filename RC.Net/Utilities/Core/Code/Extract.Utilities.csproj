@@ -80,7 +80,6 @@
   <ItemGroup>
     <Compile Include="DataCache.cs" />
     <Compile Include="DateTimeMethods.cs" />
-    <Compile Include="DbMethods.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>

@@ -65,16 +65,42 @@
     <DocumentationFile>..\..\..\..\Binaries\Release\Extract.Database.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Extract.Drawing, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
+    <Reference Include="Extract.Interfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL" />
+    <Reference Include="Extract.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="SandDock, Version=3.0.5.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DatabaseConnectionControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DatabaseConnectionControl.Designer.cs">
+      <DependentUpon>DatabaseConnectionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DatabaseConnectionInfo.cs" />
     <Compile Include="DatabaseHelperMethods.cs" />
+    <Compile Include="DataConnectionConfiguration.cs" />
+    <Compile Include="DbMethods.cs" />
     <Compile Include="IDatabaseSchemaUpdater.cs" />
+    <Compile Include="IDataConnectionConfiguration.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="SqlCompactMethods.cs" />
     <Compile Include="SqlCompactTableMappings.cs" />
     <Compile Include="SqlDatabaseMethods.cs" />
@@ -82,6 +108,18 @@
     <Compile Include="RegistryManager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\APIs\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj">
+      <Project>{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}</Project>
+      <Name>Microsoft.Data.ConnectionUI.Dialog</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\APIs\MSSQLConnectionDialog\ConnectionUI\Microsoft.Data.ConnectionUI.csproj">
+      <Project>{139729CD-0F06-48E8-9F4A-08E78BB6575F}</Project>
+      <Name>Microsoft.Data.ConnectionUI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj">
+      <Project>{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}</Project>
+      <Name>Microsoft.Data.ConnectionUI.SqlCeDataProvider</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
@@ -93,6 +131,10 @@
     <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
+      <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
+      <Name>Extract.Utilities.Forms</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -131,6 +173,18 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DatabaseConnectionControl.resx">
+      <DependentUpon>DatabaseConnectionControl.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
