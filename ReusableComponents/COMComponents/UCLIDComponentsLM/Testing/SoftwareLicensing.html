@@ -137,6 +137,7 @@
 		<li>Close the application.</li>
 		<li>Restore the system time.</li>
 		<li>Restart the application and confirm that the license state is still corrupt.</li>
+		<li><b>Does not stay corrupt if time set back &gt;= original time.</b></li>
 	</ul>
 <p>
    	<li>A corrupt license stays corrupt - #3.</li>
@@ -147,6 +148,7 @@
 		<li>Reboot the system.</li>
 		<li>Restore the system time.</li>
 		<li>Restart the application and confirm that the license state is still corrupt.</li>
+		<li><b>Does not stay corrupt if time set back &gt;= original time.</b></li>
 	</ul>
 <p>
    	<li>An <b>Unlock</b> file can expire.</li>
@@ -168,7 +170,7 @@
 		does not run.</li>
 	</ul>
 <p>
-   	<li><b>[LegacyRC #4390]</b> An <b>Unlock</b> file can have leading and trailing whitespace.</li>
+   	<li>An <b>Unlock</b> file can have leading and trailing whitespace.</li>
 	<ul>
    		<li>Establish a corrupted license.</li>
 		<li>Reboot the system.</li>
@@ -323,8 +325,8 @@
 		Shield Rule Writing</b>.
       		<li>Create, save and exercise a <b>Simple Rules</b> rule set.
       		<li>Confirm absence of a <b>This is a swiping rule</b> checkbox. 
-      		<li>Confirm that a <b>Swiping</b> rule can be saved <b>only</b> with an 
-		RDT license.
+      		<li>Confirm that a <b>Swiping</b> rule without a USB counter can be saved 
+		<b>only</b> with an RDT license.
       		<li>Confirm that rule execution is allowed without a counter if 
 		the RSD file is a swiping rule. 
        	</ul>
@@ -335,8 +337,7 @@
 	<li><h3>Simple Rule Writing</h3>
 	<ul>
 		<li>Create an <b>ID Shield Rule Writing (Simple Rules passwords!)</b> license file.
-		<li><b>[FlexIDSCore #4924]</b> Confirm that <b>only</b> the following rule objects 
-		are available.
+		<li>Confirm that <b>only</b> the following rule objects are available.
 		<ul>
 			<li>Advanced replace string
 			<li>Change case
@@ -365,7 +366,7 @@
 <!-- *********************************************** -->
 <li><h3>Miscellaneous</h3>
 <ul>
-  	<li>Encrypted Component ID
+  	<li><b>Encrypted Component ID</b>
 	<ul>
 	   	<li>Install FLEX Index or ID Shield without creating a license file.
 	   	<li>Confirm that the test machine has a drive mapping to <b>\\fnp\internal</b> 
@@ -379,7 +380,7 @@
 		information in the displayed exception includes an encrypted <b>Component ID</b> item.
 	</ul>
 <p>
-	<li>License Expiration
+	<li><b>License Expiration</b>
 	<ul>
 		<li>Confirm that the <b>Windows Time</b> service is disabled.</li>
 	   	<li>Create a license file that expires <b>today</b>.</li>
@@ -409,7 +410,7 @@
 	</ul>
 	</li>
 <p>
-   	<LI><b>[LegacyRC #5020]</b> Creation of license files using either JAKE or FNP2
+   	<LI><b>Creation of license files using either JAKE or FNP2</b>
        	<ul>
 		<li>Log in to a test machine that is connected to the <b>extract.local</b> domain.
 		<li>Copy the I:\Common\Engineering\Tools\SecureClients\COMLicense_InternalTesting\Current 
