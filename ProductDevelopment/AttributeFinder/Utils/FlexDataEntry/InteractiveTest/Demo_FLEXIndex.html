@@ -131,71 +131,13 @@
 <p>
     <LI><h2>Bug Fixes</h2>
     <UL>
-        <li><b>Pre-8.0 bug fixes</b>
-        <ol>
-            <li><b>[DataEntry #890]</b> Resizing address rows
-            <!-- fixed v 8.0.0.26 -->
-            <ul>
-                <li>Confirm that the rows and columns in the return address table cannot be
-                resized.</li>
-            </ul></li>
-        <p>
-            <li><b>[DataEntry #892]</b> Selecting multiple rows in address table
-            <!-- fixed v 8.0.0.26 -->
-            <ul>
-                <li>Confirm that multiple rows of the address table can be selected and
-                deleted.</li>
-            </ul></li>
-        <p>
-            <li><b>[DataEntry #898]</b> No spatial information for type
-            <!-- fixed v 8.0.0.41 -->
-            <ul>
-                <li>Confirm that text in the <b>Type</b> column of the <b>Party</b> table does not
-                include spatial information.</li>
-            </ul></li>
-        <p>
-            <li><b>[DataEntry #899]</b> Deleting rows
-            <!-- fixed v 8.0.0.42 -->
-            <ul>
-                <li>Confirm that entire rows can be deleted without error from the party and legal
-                description tables.</li>
-            </ul></li>
-        <p>
-            <li><b>[DataEntry #911]</b> Delete behavior in address table
-            <!-- fixed v 8.0.0.45 -->
-            <ul>
-                <li>Open an image with a <b>Return Address</b>.</li>
-                <li>Click on the <b>City</b> field and hit <b>DEL</b>.</li>
-                <li>Click the <b>Down</b> arrow and confirm that the city remains deleted.</li>
-                <li>Click on the <b>State</b> field and hit <b>DEL</b>.</li>
-                <li>Click the <b>Down</b> arrow and confirm that the state remains deleted.</li>
-                <li>Click on the <b>ZipCode</b> field and hit <b>DEL</b>.</li>
-                <li>Click the <b>Up</b> arrow and confirm that the zip code remains deleted.</li>
-            </ul></li>
-        <p>
-            <LI><b>[DataEntry #922]</b> Crash when switching between apps
-            <!-- fixed v LabDE 1.5.0.128 -->
-            <ul>
-                <li>Do lots of task switching while verification is active.</li>
-                <li>Confirm that the FAM does not crash.</li>
-            </ul></li>
-        <p>
-            <LI><b>[LegacyRC #5805]</b> FAM processing now active per schedule
-            <!-- fixed v 8.0.0.60 -->
-            <ul>
-                <li>Exercise <b>ExtractData.fps</b> from <b>Demo_FLEXIndex</b>.</li>
-                <li>Confirm that after completion, the exception log does not contain 
-                an entry for <b>File Action Manager now active per schedule</b>.</li>
-            </ul></li>
-        </ol></li>
-        <p>
-        <li><b>Pre-9.0 bug fixes</b>
+        <li><b>9.0 bug fixes</b>
         <ol>
             <li><b>[DataEntry #1024]</b> CPU pegged
             <!-- fixed v 8.1.0.90 -->
             <ul>
                 <li>Exercise <b>ExtractData.fps</b> from <b>Demo_FLEXIndex</b>.</li>
-                <li>Open verification. Click in the city cell of the Return Address table.</li>
+                <li>Open verification. Click in the city cell of the <b>Return Address</b> table.</li>
                 <li>Click in another field in a different control (not the same table.</li>
                 <li>Confirm that CPU usage remains normal.</li>
                 <li>Click around different controls in the DEP and confirm that CPU usage remains
@@ -207,7 +149,7 @@
             <ul>
                 <li>Open Example01 from the FLEX Index demo.</li>
                 <li>Add some rows to the party table.</li>
-                <li>Select the Parcel Number field.</li>
+                <li>Select the <b>Parcel Number</b> field.</li>
                 <li>Press <b>F3</b>. It should take you to the St. Louis cell.</LI>
                 <li>Swipe something.</li>
                 <li>Press the <b>Undo</b> button repeatedly.</li>
