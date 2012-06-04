@@ -17,21 +17,22 @@
        	<ul>
 		<li>Install ID Shield as <b>local admin</b>.
 		<li>Create a user account that does not have administrator privileges.
-       		<li>TBD
+       		<li>Confirm that basic <b>FLEX Index</b> and <b>ID Shield</b> functions 
+		work as intended.
        	</ul>
 <p>
 	<LI><h2>SQL Server</h2>
        	<ul>
 	        <li><b>[LegacyRC #6180]</b> dbo schema issues
         	<ul>
-            	<li>As local admin, create an empty database in the Management
-            	Studio.</li>
-            	<li>Grant db_owner permissions for the database to the FAM Admins 
-            	group.</li>
-            	<li>Log in as a member of that group and try to log in to the
-            	database using the DB Admin.</li>
-            	<li>Confirm that DB Admin is able to create all the appropriate
-            	tables.</li>
+            		<li>As local admin, create an empty database in SQL Management
+            		Studio.</li>
+            		<li>Grant <b>db_owner</b> permissions for the database to the FAM Admins 
+            		group.</li>
+            		<li>Log in as a member of that group and try to log in to the
+            		database using <b>DB Admin</b>.</li>
+            		<li>Confirm that DB Admin is able to create all the appropriate
+            		tables.</li>
         	</uL></lI>
        	</ul>
 <p>
@@ -39,7 +40,7 @@
        	<ul>
   	   	<LI><b>[LegacyRC #5902, #6037, #6038, #6039, #6040, #6041]</b> 
         	<ul>
-			<li>Confirm that the logged-in user does nto have <b>administrator</b> 
+			<li>Confirm that the logged-in user does not have <b>administrator</b> 
 			privileges.
 			<li>Open the UEX Viewer.
 			<li>Confirm that the error log opens without error.
@@ -47,6 +48,10 @@
 			checkbox acts and persists as expected.
 			<li>Confirm that <b>USB License Key Manager</b> allows the 
 			non-privileged user to set and persist the License Server.
+			<ul>
+				<li>This works when utility is run as administrator.
+				<li>This does not work when utility is run as non-administrator.
+			</ul>
 			<li>Confirm that <b>Configure Email Settings</b> can be 
 			exercised without error.
 			<li>Exercise <b>Compute.fps</b> from the ID Shield demo.
@@ -69,6 +74,16 @@
                     	notifications...</b> context menu option.</li>
 		</ul></li>
 <p>
+		<li><b>[LegacyRC #6044]</b> Cleanup Image
+		<ul>
+                    	<li>As an unprivileged user, confirm that image cleanup can be run successfully 
+			from the command line.</li>
+			<ul>
+				<li>An Inlite <b>Image Cleanup</b> key will need to be plugged in to 
+				a USB port.
+			</ul>
+		</ul></li>
+<p>
 		<li><b>[LegacyRC #6046]</b> Test Harness
 		<ul>
                     	<li>As an unprivileged user, run all the automated tests and confirm that 
@@ -78,7 +93,7 @@
 <p>
 	<LI><h2>Miscellaneous</h2>
        	<ul>
-		<li><b>[LegacyRC 5890]</b> UEX log permissions
+		<li><b>[LegacyRC #5890]</b> UEX log permissions
 		<ul>
                     	<li>Log in as local admin to a machine with UAC enabled; remove any existing
                     	UEX logs.</li>
