@@ -19,38 +19,46 @@ to install FLEX Index.
 <ul>
 	<li><b>Purpose & Machine Setup</b>
 	<ul>
-		<li>Measure the maximum database throughput as more processing machines are added to the
-        database.
+		<li>Measure the maximum database throughput as more processing machines are added.
 		<li>Select a test machine to serve as the image and database host.
 		<li>Collect a large folder of files to process; typically we use the Utah images.  
-		<li>Queue all of the images; note that the files must be queued via UNC path or mapped
-        drive. Save a copy of the database with all files queued.
-		<li>Configure an FPS file to run a Set File Action Status task. In the advanced processing
-        settings, set it to grab 1000 files from the database at a time.
+		<li>Queue all of the images; note that the files must be queued via UNC path or 
+		mapped drive. Save a copy of the database with all files queued.
+		<li>Configure an FPS file to run a Set File Action Status task. In the advanced 
+		processing settings, set it to grab 1000 files from the database at a time.
+		<li>Select a group of processing machines <b>or</b> a group of virtual machines 
+		for use in the test.
 	</ul>
 <p>
 	<li><b>Test Execution</b>
 	<ul>
 		<li>Before each test:
-        <ul>
-            <li>Delete the old database and replace it with a clean copy with all files queued.
-            <li>Reboot all test machines from the previous test.
-            <li>Add one more machine to the pool of processing machines.
-        </ul>
-        <li>On each processing machine, start the test FPS file.
+        	<ul>
+            		<li>Restore the unprocessed database from SQL Management Studio.
+            		<li>Reboot all test machines from the previous test.
+            		<li>Add one more machine or VM to the pool of processing machines.
+        	</ul>
+        	<li>On each processing machine, start the test FPS file.
 	</ul>
 <p>
 	<li><b>Test Results</b>
 	<ul>
 		<li>Record the starting and ending processing times in an appropriate spreadsheet; see
-        I:\Common\Testing\Product Testing\FLEX_Index_90\ScalabilityTests\MachineScalability for an
-        example.
-        <br>
-		<li>Create a chart to display the rate of documents processed per day for each test
-        configuration.
-    </ul>
-</ul>
-<p>
+        	I:\Common\Testing\Product Testing\FLEX_Index_90\ScalabilityTests\DatabaseScalability 
+		for an example.
+		<li>Create a chart to display the rate of documents processed per day for each test 
+		configuration.
+        	<ul>
+            		<li>1 test machine or VM
+            		<li>2 test machines or VMs
+            		<li>3 test machines or VMs
+            		<li>4 test machines or VMs
+            		<li>5 test machines or VMs
+            		<li>6 test machines or VMs
+            		<li>7 test machines or VMs
+            		<li>8 test machines or VMs
+        	</ul>
+    	</ul>
 </ul>
 </ol>
 </body>
