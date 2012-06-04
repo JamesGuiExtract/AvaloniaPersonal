@@ -18,8 +18,8 @@
 	<LI><h2>Install Options</h2>
 	<p>
 	<UL>
-	  	<LI>Confirm that <b>not agreeing</b> with the terms of the license agreement halts 
-		the installation with no files copied to the system.
+	  	<LI>Confirm that the user cannot continue with the installation if they <b>do not</b> 
+		agree with the terms of the license.
   		<LI>Confirm that a FLEX Index <b>Custom</b> SDK installation allows installation 
 		of the <b>SDK Redistribution Components</b> to the \FlexIndex\Redist folder.
 		<ul>
@@ -31,13 +31,12 @@
 	  	<LI>Confirm that a FLEX Index <b>Compact</b> SDK installation does not install 
 		<b>Tutorials</b> or <b>Help</b>.
 <p>
-	  	<LI><b>[FlexIDSCore #2856]</b> Confirm that a newer version of FLEX Index cannot be 
-		installed on a test machine with an older version of any Extract Systems software.
-	  	<LI><b>[FlexIDSCore #2856]</b> Confirm that a newer version of ID Shield cannot be 
-		installed on a test machine with an older version of any Extract Systems software.
-	  	<LI><b>[LegacyRC #4663]</b> Confirm that a newer version of Extract Systems LM 
-		cannot be installed on a test machine with an older version of any Extract Systems 
-		software.
+	  	<LI>Confirm that a newer version of FLEX Index cannot be installed on a test machine 
+		with an older version of any Extract Systems software.
+	  	<LI>Confirm that a newer version of ID Shield cannot be installed on a test machine 
+		with an older version of any Extract Systems software.
+	  	<LI>Confirm that a newer version of Extract Systems LM cannot be installed on a test 
+		machine with an older version of any Extract Systems software.
     	</ul>
 <p>
 	<LI><h2>Product-Level Licensing</h2>
@@ -140,14 +139,14 @@
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
-				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 			</tr>
 			<tr align="center">
 				<th><font size="2">Convert FAM Database</font></th>
+				<td><font size="2"><li>No
 				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>No
 				<td><font size="2"><li>Yes
@@ -167,7 +166,7 @@
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
-				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 			</tr>
             		<tr align="center">
@@ -194,7 +193,7 @@
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
-				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 			</tr>
 			<tr align="center">
@@ -203,7 +202,7 @@
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
-				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 			</tr>
 			<tr align="center">
@@ -212,7 +211,7 @@
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
-				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 			</tr>
 			<tr align="center">
@@ -247,9 +246,10 @@
 		<li>Create the license file using the <b>COM License Generator</b> utility. Copy this 
 		file to the LicenseFiles folder.  Remove or rename any other <b>.lic</b> files from the 
 		folder.</li>
-		<li>Open the <b>File Action Manager</b>.  Select any action from the current database 
-		and then click <i>Process files in the queue for this action</i>. Click on the 
-		Processing Setup tab and then click <i>Add...</i>
+		<li>Open the <b>File Action Manager</b>.  Select <b>Tools - Check for new components</b>.  
+		This clears and renews the cache of file processors.
+		<li>Select any action from the current database and then click <i>Process files in the 
+		queue for this action</i>. Click on the Processing Setup tab and then click <i>Add...</i>
 		<li>Confirm that <b>only</b> the file processors marked as "Yes" in the table below are 
 		contained in the drop down menu labeled <i>Select Task</i>.
 		<li>Close the <b>File Action Manager</b>.
@@ -502,7 +502,7 @@
 			<th><font size="2">Redaction: Create redacted text
 			<td><font size="2"><li>No
 			<td><font size="2"><li>No
-			<td><font size="2"><li>No
+			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>N/A
@@ -615,7 +615,7 @@
 				<th><font size="2">ESOCR
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
-				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
@@ -647,7 +647,7 @@
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
 				<td><font size="2"><li>Yes
 				<td><font size="2">.\CommonComponents\<br>FAMDBLockChecker.exe
 			</tr>
@@ -675,7 +675,7 @@
 				<th><font size="2">OCR in Image Viewer
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
-				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
@@ -695,9 +695,9 @@
 			</tr>
 			<tr align="center">
 				<th><font size="2">Run FPS File
-				<td><font size="2"><li>No
 				<td><font size="2"><li>Yes
-				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>No
 				<td><font size="2"><li>Yes
@@ -759,7 +759,7 @@
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
 				<td><font size="2"><li>Yes
 				<td><font size="2">.\CommonComponents\<br>TestTextFunctionExpander.exe
 			</tr>
@@ -879,23 +879,6 @@
             		<li>Confirm that the <b>Extract Systems FAM Service</b> is installed.</li>
             		<li>Confirm that the <b>Extract Systems FDRS Service</b> is installed.</li>
             		<li>Confirm that the <b>Extract Systems IPC Service</b> is installed.</li>
-	       	</ul>
-<p>
-  	   	<LI><b>[LegacyRC #5029]</b> Max Files Per SSOCR2 instance registry item 
-	       	<ul>
-	      		<li>Check the <b>HKLM/Software/ReusableComponents/COMComponents/UCLIDRasterAndOCRMgmt/OCREngines/SSOCR/MaxFilesPerInstance</b> 
-			registry key.
-		       	<ul>
-				<li>Confirm that the key <b>is not</b> present on a clean system.
-				<li>Confirm that the key <b>is</b> present after ID Shield installation.
-				<li>Confirm that the key <b>is not</b> present after ID Shield is uninstalled.
-		       	</ul>
-	       	</ul>
-<p>
-  	   	<LI><b>[LegacyRC #5554]</b> OCR engine version 16.3
-	       	<ul>
-	  	   	<LI>Confirm that <b>KernelAPI.dll</b> has a <b>16.3.9559.1746</b> 
-			version number.
 	       	</ul>
 <p>
   	   	<LI><b>[LegacyRC #6002]</b> Lead Tools version 17
