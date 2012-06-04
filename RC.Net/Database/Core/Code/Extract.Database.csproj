@@ -65,9 +65,6 @@
     <DocumentationFile>..\..\..\..\Binaries\Release\Extract.Database.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Extract.Drawing, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
-    <Reference Include="Extract.Interfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL" />
-    <Reference Include="Extract.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="SandDock, Version=3.0.5.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL" />
@@ -123,6 +120,18 @@
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Drawing\Core\Code\Extract.Drawing.csproj">
+      <Project>{865B9A25-1D27-4445-9CC7-7BF88D736BA8}</Project>
+      <Name>Extract.Drawing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
+      <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
+      <Name>Extract.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Interop\Core\Code\Extract.Interop.csproj">
+      <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
+      <Name>Extract.Interop</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
