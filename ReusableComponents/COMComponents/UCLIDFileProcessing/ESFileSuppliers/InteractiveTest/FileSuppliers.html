@@ -390,6 +390,28 @@
             		<li>Confirm that the *.pdf1 image is not queued.</li>
             		<li>Confirm the same correct behavior for *.tif and *.tif1 files.</li>
         	</ul></li>
+<p>
+  	   	<LI><b>[LegacyRC #6230]</b> Multiple Folder Suppliers
+		<ul>
+			<li>Prepare a queuing FPS file with two <b>Files from folder</b> suppliers.
+			<li>Configure one to listen for <b>TIF</b> images in a folder.
+			<li>Configure one to listen for <b>PDF</b> images in a folder.
+			<li>Confirm that adding a mixture of file types to the folder still 
+			queues each added file.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6231]</b> File Filters
+		<ul>
+			<li>Confirm that the all image types file filters no longer include 
+			<b>*.ext.*</b> where image.tif.uss would be included as an image.
+			<ul>
+				<li><b>Files from folder</b> file supplier
+				<li><b>Core: Apply Bates number</b> task
+				<li><b>Image Cleanup Settings Editor</b> utility
+			</ul>
+			<li>Confirm that the file filters include <b>*.tiff</b> as part of the 
+			TIF selection.
+		</ul>
     	</ul></li>
 <p>
     	<li>Select <b>Files from FTP site</b> as the file supplier in the Select File Supplier dialog,
@@ -528,6 +550,18 @@
                 	downloaded.</li>
                 	<li>Confirm that in another 2 minutes, the *.tif.tif.tif files are downloaded.</li>
             	</ul></li>
+<p>
+  	   	<LI><b>[DotNet #750, #751, #752, #753]</b> FTP File Supplier
+		<ul>
+			<li>Confirm that if a download operation fails, an already existing 
+			destination file is not overwritten or deleted.
+			<li>Confirm that path tags for <b>Local Working Folder</b> are evaluated 
+			for each file at download time.
+			<li>Confirm that a <b>path tags</b> button is available for the remote 
+			folder field.
+			<li>Confirm that an FTP file supplier configured to poll at set times 
+			logs only one polling event for each time.
+		</ul>
 <p>
   	   	<LI><b>[LegacyRC #6102]</b> Confirm that a wait cursor is presented when testing the 
 		connection.
