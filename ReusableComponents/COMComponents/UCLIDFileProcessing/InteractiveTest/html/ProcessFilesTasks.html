@@ -1308,21 +1308,33 @@
             <li>Confirm that only the specified pages(s) appear in the USS file. 
             <li>Confirm that if <b>OCR specific pages</b> is selected, then pages must be defined.
 <p>
-            <li><b>[LegacyRC #5311] NOT FIXED</b>
-            <ul>
-                <li>Make many local copies of the two images at 
-                <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5311</b>.</li>
-                <li>OCR them.</li>
-                <li>Confirm that the documents OCR correctly and no exceptions are seen.</lI>
-            </ul></li>
+  	   	<LI><b>[FlexIDSCore #4906]</b> View Perspective
+		<ul>
+			<li>Exercise OCR on the <b>TestImages\Rotated</b> subfolder from the ID 
+			Shield Sanity test.
+			<li>Confirm that the images with non-standard view perspective fail OCR 
+			with a meaningful exception.
+		</ul>
 <p>
-            <li><b>[LegacyRC #5855]</b> Unnecessary errors logged on OCR failure
-            <!-- fixed v 8.1.0.31 -->
-            <ul>
-                <li>Open the image at <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5855</b>
-                <li>Attempt to OCR the image. Note that it should fail.
-                <li>Confirm that only a reasonable number of errors are logged.
-            </ul>            
+            	<li><b>[LegacyRC #5311] NOT FIXED</b>
+            	<ul>
+                	<li>Make many local copies of the two images at 
+                	<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5311</b>.</li>
+                	<li>OCR them.</li>
+                	<li>Confirm that the documents OCR correctly and no exceptions are seen.</lI>
+            	</ul></li>
+<p>
+  	   	<LI><b>[LegacyRC #5314]</b> Exercise OCR or rule execution against some blank 
+		pages and confirm that an <b>Application Trace</b> exception is logged for each 
+		example.
+<p>
+            	<li><b>[LegacyRC #5855]</b> Unnecessary errors logged on OCR failure
+            	<!-- fixed v 8.1.0.31 -->
+            	<ul>
+                	<li>Open the image at <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5855</b>
+                	<li>Attempt to OCR the image. Note that it should fail.
+                	<li>Confirm that only a reasonable number of errors are logged.
+            	</ul>
         </ul>
 <p>
         <li><b>Core: Rasterize PDF</b>
