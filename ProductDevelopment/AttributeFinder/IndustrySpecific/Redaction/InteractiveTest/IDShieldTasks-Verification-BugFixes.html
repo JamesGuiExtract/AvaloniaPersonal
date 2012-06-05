@@ -37,28 +37,6 @@
                 	<li>Confirm that only one copy of the exemption code is present.</li>
             	</ul></li>
 <p>
-            	<LI><b>[FlexIDSCore #3857, #3863]</b> Commit conditions for skipped documents
-            	<!-- fixed v 7.1.1.87, 8.0.0.2 -->
-            	<ul>
-                	<li>Configure an FPS file to require the user to view all pages or 
-			specify types for all redactions.</li>
-                	<li>Open a document.</li>
-                	<li>Make a change but make sure that the conditions in <b>step 1</b> 
-			are not met.</li>
-                	<li>Skip the document.</li>
-                	<li>When prompted, choose <b>Save changes</b>.</li>
-                	<li>Confirm that the document is skipped and no other prompts are 
-			presented.</li>
-<p>
-                	<li>Open another document.</li>
-                	<li>Make a change and make sure that the conditions in <b>step 1</b> 
-			are met.</li>
-                	<li>Save the changes without commit.</li>
-                	<li>Skip the document.</li>
-                	<li>Confirm that the document is skipped and no prompts are 
-			presented.</li>
-            	</ul></li>
-<p>
 		<LI><b>[FlexIDSCore #4105, #4166, #4541, #4562, #4565, #4725]</b> 
 		Redaction resizing
         	<ul>
@@ -495,6 +473,49 @@
 			disabled.
 			<li>Confirm that the image returns to its original orientation.
         	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4931, #4933]</b> Tab Order During Verification
+		<ul>
+			<li>Confirm that new redactions are added to the data grid in the order 
+			in which they appear in the document.
+			<li>Verify the image located at 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4931</b>.
+			<ul>
+				<li>Tab to page 5 of the image.
+				<li>Redact the Old Republic title number at the top.
+				<li>Continue tabbing.
+				<li>Confirm that tab navigation is not caught in an infinite 
+				loop.
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4937]</b> Word Redaction Tool
+		<ul>
+			<li>Exercise <b>Compute.fps</b> from <b>Demo_IDShield</b>.
+			<li>Verify documents with the <b>Zoom</b> tool selected.
+			<li>Tab through documents until <b>TestImage010.tif</b>.
+			<li>Navigate back to <b>TestImage009.tif</b>, switch to the 
+			<b>Word</b> redaction tool and mouse over some text.
+			<li>Confirm proper behavior.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4939]</b> Disable Backwards Navigation
+		<ul>
+			<li>Modify the <b>HKCU\Software\Extract 
+			Systems\AttributeFinder\IndustrySpecific\Redaction
+			\RedactionCustomComponents\IDShield\NumPreviousDocsToQueue</b> 
+			registry key to <b>0</b>.
+			<li>Exercise verification and confirm that backwards navigation 
+			is disabled.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4942]</b> Unable To Load VOA File
+		<ul>
+			<li>Exercise verification with the image and VOA file from 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4942</b>.
+			<li>Confirm that the VOA file can be loaded and changes 
+			can be saved as appropriate.
+		</ul>
 <p>
             <li><b>[DotNet #673]</b> FormStateManager
             <ul>
