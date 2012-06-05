@@ -11,7 +11,7 @@
 // CAFDocument
 //-------------------------------------------------------------------------------------------------
 CAFDocument::CAFDocument()
-: m_ipText(__nullptr),
+: m_ipAttribute(__nullptr),
   m_ipStringTags(__nullptr),
   m_ipObjectTags(__nullptr)
 {
@@ -55,18 +55,15 @@ STDMETHODIMP CAFDocument::get_Text(ISpatialString **pVal)
 	{
 		validateLicense();
 
-		if (m_ipText == __nullptr)
-		{
-			m_ipText.CreateInstance(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI05870", m_ipText != __nullptr);
-		}
+		ISpatialStringPtr ipText = getAttribute()->Value;
+		ASSERT_RESOURCE_ALLOCATION("ELI34817", ipText != __nullptr);
 
-		ISpatialStringPtr ipShallowCopy = m_ipText;
+		ISpatialStringPtr ipShallowCopy = ipText;
 		*pVal = ipShallowCopy.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05845");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAFDocument::put_Text(ISpatialString *newVal)
@@ -77,11 +74,11 @@ STDMETHODIMP CAFDocument::put_Text(ISpatialString *newVal)
 	{
 		validateLicense();
 
-		m_ipText = newVal;
+		getAttribute()->Value = newVal;
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05846");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAFDocument::get_StringTags(IStrToStrMap **pVal)
@@ -100,10 +97,10 @@ STDMETHODIMP CAFDocument::get_StringTags(IStrToStrMap **pVal)
 
 		IStrToStrMapPtr ipShallowCopy = m_ipStringTags;
 		*pVal = ipShallowCopy.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05847");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAFDocument::put_StringTags(IStrToStrMap *newVal)
@@ -115,10 +112,10 @@ STDMETHODIMP CAFDocument::put_StringTags(IStrToStrMap *newVal)
 		validateLicense();
 
 		m_ipStringTags = newVal;
+		
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05848");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAFDocument::get_ObjectTags(IStrToObjectMap **pVal)
@@ -137,10 +134,10 @@ STDMETHODIMP CAFDocument::get_ObjectTags(IStrToObjectMap **pVal)
 
 		IStrToObjectMapPtr ipShallowCopy = m_ipObjectTags;
 		*pVal = ipShallowCopy.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05849");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAFDocument::put_ObjectTags(IStrToObjectMap *newVal)
@@ -152,10 +149,41 @@ STDMETHODIMP CAFDocument::put_ObjectTags(IStrToObjectMap *newVal)
 		validateLicense();
 
 		m_ipObjectTags = newVal;
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05850");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFDocument::get_Attribute(IAttribute **pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
-	return S_OK;
+	try
+	{
+		validateLicense();
+
+		UCLID_AFCORELib::IAttributePtr ipShallowCopy = getAttribute();
+		*pVal = (IAttribute*)ipShallowCopy.Detach();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34803");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFDocument::put_Attribute(IAttribute *newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		m_ipAttribute = newVal;
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34804");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -196,12 +224,12 @@ STDMETHODIMP CAFDocument::raw_CopyFrom(IUnknown *pObject)
 		UCLID_AFCORELib::IAFDocumentPtr ipSource(pObject);
 		ASSERT_RESOURCE_ALLOCATION("ELI08201", ipSource != __nullptr);
 	
-		ISpatialStringPtr ipSS = ipSource->GetText();
-		if (ipSS)
+		UCLID_AFCORELib::IAttributePtr ipAttribute = ipSource->Attribute;
+		if (ipAttribute)
 		{
-			ICopyableObjectPtr ipCopyObj(ipSS);
-			ASSERT_RESOURCE_ALLOCATION("ELI08326", ipCopyObj != __nullptr);
-			m_ipText = ipCopyObj->Clone();
+			ICopyableObjectPtr ipCopyObj(ipAttribute);
+			ASSERT_RESOURCE_ALLOCATION("ELI34806", ipCopyObj != __nullptr);
+			m_ipAttribute = ipCopyObj->Clone();
 		}
 		IStrToStrMapPtr ipSTS = ipSource->GetStringTags();
 		if (ipSTS)
@@ -217,10 +245,10 @@ STDMETHODIMP CAFDocument::raw_CopyFrom(IUnknown *pObject)
 			ASSERT_RESOURCE_ALLOCATION("ELI08328", ipCopyObj != __nullptr);
 			m_ipObjectTags = ipCopyObj->Clone();
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08202");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAFDocument::raw_Clone(IUnknown **pObject)
@@ -242,14 +270,25 @@ STDMETHODIMP CAFDocument::raw_Clone(IUnknown **pObject)
 	
 		// Return the new object to the caller
 		*pObject = ipObjCopy.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05854");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
 // Private functions
+//-------------------------------------------------------------------------------------------------
+UCLID_AFCORELib::IAttributePtr CAFDocument::getAttribute()
+{
+	if (m_ipAttribute == __nullptr)
+	{
+		m_ipAttribute.CreateInstance(CLSID_Attribute);
+		ASSERT_RESOURCE_ALLOCATION("ELI34802", m_ipAttribute != __nullptr);
+	}
+
+	return m_ipAttribute;
+}
 //-------------------------------------------------------------------------------------------------
 void CAFDocument::validateLicense()
 {

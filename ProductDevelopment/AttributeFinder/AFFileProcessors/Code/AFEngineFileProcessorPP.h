@@ -40,6 +40,9 @@ BEGIN_MSG_MAP(CAFEngineFileProcessorPP)
 	COMMAND_HANDLER(IDC_RADIO_OCR_SPECIFIED, BN_CLICKED, OnClickedRadioSpecificPages)
 	COMMAND_HANDLER(IDC_RADIO_OCR_NONE, BN_CLICKED, OnClickedRadioOcrNone)
 	COMMAND_HANDLER(IDC_BTN_DOCTAGS_AFE, BN_CLICKED, OnClickedBtnRulesFileDocTags)
+	COMMAND_HANDLER(IDC_BTN_DOCTAGS_DATA_INPUT, BN_CLICKED, OnClickedBtnDataInputDocTags)
+	COMMAND_HANDLER(IDC_BTN_BROWSE_DATA_INPUT, BN_CLICKED, OnClickedBtnBrowseDataInput)
+	COMMAND_HANDLER(IDC_CHK_PROVIDE_INPUT, BN_CLICKED, OnClickedCheckUseDataInput)
 	// REFLECT_NOTIFICATIONS needed by ImageButtonWithSytle
 	REFLECT_NOTIFICATIONS()
 END_MSG_MAP()
@@ -57,6 +60,9 @@ END_MSG_MAP()
 	LRESULT OnClickedRadioAllPages(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedRadioSpecificPages(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedRadioOcrNone(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedBtnDataInputDocTags(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedBtnBrowseDataInput(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedCheckUseDataInput(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 private:
 
@@ -72,6 +78,9 @@ private:
 	ATLControls::CButton m_radioSpecificPages;
 	ATLControls::CButton m_radioOcrNone;
 	ATLControls::CEdit m_editSpecificPages;
+	ATLControls::CEdit m_editDataInputFileName;
+	ATLControls::CButton m_chkUseDataInputFile;
+	CImageButtonWithStyle m_btnDataInputSelectTag;
 
 	///////////
 	// Methods

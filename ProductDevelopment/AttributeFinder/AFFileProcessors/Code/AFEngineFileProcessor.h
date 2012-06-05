@@ -72,6 +72,10 @@ END_CATEGORY_MAP()
 	STDMETHOD(put_OCRCertainPages)(/*[in]*/ BSTR strSpecificPages);
 	STDMETHOD(get_UseCleanedImage)(VARIANT_BOOL* pVal);
 	STDMETHOD(put_UseCleanedImage)(VARIANT_BOOL newVal);
+	STDMETHOD(get_UseDataInputFile)(/*[out, retval]*/ VARIANT_BOOL *pVal);
+	STDMETHOD(put_UseDataInputFile)(/*[in]*/ VARIANT_BOOL newVal);
+	STDMETHOD(get_DataInputFileName)(/*[out, retval]*/ BSTR *pVal);
+	STDMETHOD(put_DataInputFileName)(/*[in]*/ BSTR newVal);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
@@ -122,6 +126,9 @@ private:
 	EOCRPagesType m_eOCRPagesType;
 
 	string m_strSpecificPages;
+
+	bool m_bUseDataInputFile;
+	string m_strDataInputFileName;
 
 	IOCRUtilsPtr m_ipOCRUtils;
 	IOCREnginePtr m_ipOCREngine;

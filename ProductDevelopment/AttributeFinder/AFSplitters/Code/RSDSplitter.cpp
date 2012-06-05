@@ -194,7 +194,7 @@ STDMETHODIMP CRSDSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAFDocumen
 		IAFDocumentPtr ipAFSplitterDoc(CLSID_AFDocument);
 		ASSERT_RESOURCE_ALLOCATION("ELI07618", ipAFSplitterDoc != __nullptr);
 
-		ipAFSplitterDoc->Text = ipTopLevelAttribute->Value;
+		ipAFSplitterDoc->Attribute = ipTopLevelAttribute;
 
 		// [FlexIDSCore:2587]
 		// Copy the the document's string tags to the ipAFSplitterDoc the splitter will use.

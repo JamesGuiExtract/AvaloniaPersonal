@@ -93,6 +93,21 @@ STDMETHODIMP CAFEngineFileProcessorPP::Apply(void)
 				return S_FALSE;
 			}
 
+			_bstr_t bstrDataInputFileName;
+			m_editDataInputFileName.GetWindowText(bstrDataInputFileName.GetAddress());
+
+			// Ensure the data input file name is long enough if it is being used
+			// (at least 8 characters - c:\a.voa)
+			if (m_chkUseDataInputFile.GetCheck() == BST_CHECKED &&
+				bstrDataInputFileName.length() < 8)
+			{
+				MessageBox("Data input file name must be at least 8 characters.", "Invalid Data File",
+					MB_OK | MB_ICONERROR);
+				m_editDataInputFileName.SetSel(0, -1);
+				m_editDataInputFileName.SetFocus();
+				return S_FALSE;
+			}
+
 			// Set the default OCR to all pages
 			EOCRPagesType ocrType = kOCRAllPages;
 
@@ -141,6 +156,11 @@ STDMETHODIMP CAFEngineFileProcessorPP::Apply(void)
 			// Store the rules file name
 			ipAFEFileProc->RuleSetFileName = bstrRulesFileName;
 
+			// Store the data input file name.
+			ipAFEFileProc->UseDataInputFile =
+				asVariantBool(m_chkUseDataInputFile.GetCheck() == BST_CHECKED);
+			ipAFEFileProc->DataInputFileName = bstrDataInputFileName;
+
 			// Store the OCR type
 			ipAFEFileProc->OCRPagesType = (UCLID_AFFILEPROCESSORSLib::EOCRPagesType) ocrType;
 
@@ -182,6 +202,11 @@ LRESULT CAFEngineFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM 
 		m_btnRuleFileSelectTag.SubclassDlgItem(IDC_BTN_DOCTAGS_AFE, CWnd::FromHandle(m_hWnd));
 		m_btnRuleFileSelectTag.SetIcon(::LoadIcon(_Module.m_hInstResource,
 			MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
+		m_chkUseDataInputFile = GetDlgItem(IDC_CHK_PROVIDE_INPUT);
+		m_editDataInputFileName = GetDlgItem(IDC_EDIT_INPUT_DATA);
+		m_btnDataInputSelectTag.SubclassDlgItem(IDC_BTN_DOCTAGS_DATA_INPUT, CWnd::FromHandle(m_hWnd));
+		m_btnDataInputSelectTag.SetIcon(::LoadIcon(_Module.m_hInstResource,
+			MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
 
 		UCLID_AFFILEPROCESSORSLib::IAFEngineFileProcessorPtr ipAFEFileProc = m_ppUnk[0];
 		if (ipAFEFileProc)
@@ -189,6 +214,15 @@ LRESULT CAFEngineFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM 
 			// Get the rules file name and set the edit box
 			string strRuleFileName = asString(ipAFEFileProc->RuleSetFileName);
 			m_editRuleFileName.SetWindowText(strRuleFileName.c_str());
+
+			VARIANT_BOOL bEnableDataInput = ipAFEFileProc->UseDataInputFile;
+			m_chkUseDataInputFile.SetCheck(asBSTChecked(bEnableDataInput));
+			string strDataInputFileName = asString(ipAFEFileProc->DataInputFileName);
+			m_editDataInputFileName.SetWindowText(strDataInputFileName.c_str());
+
+			m_editDataInputFileName.EnableWindow(bEnableDataInput);
+			m_btnDataInputSelectTag.EnableWindow(bEnableDataInput);
+			GetDlgItem(IDC_BTN_BROWSE_DATA_INPUT).EnableWindow(bEnableDataInput);
 
 			// Set the check box states
 			m_chkReadUSS.SetCheck(asBSTChecked(ipAFEFileProc->ReadUSSFile));
@@ -335,6 +369,65 @@ LRESULT CAFEngineFileProcessorPP::OnClickedBtnRulesFileDocTags(WORD wNotifyCode,
 			m_editRuleFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26657");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CAFEngineFileProcessorPP::OnClickedBtnDataInputDocTags(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnDataInputSelectTag,
+			m_editDataInputFileName);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI34813");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CAFEngineFileProcessorPP::OnClickedBtnBrowseDataInput(WORD wNotifyCode, 
+													 WORD wID, HWND hWndCtl, 
+													 BOOL& bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{	
+		// Open the file dialog
+		CFileDialog fileDlg(TRUE, ".voa", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+			 OFN_PATHMUSTEXIST, gstrVOA_FILE_FILTER.c_str(), CWnd::FromHandle(m_hWnd));
+		
+		// Pass the pointer of dialog to create ThreadFileDlg object
+		ThreadFileDlg tfd(&fileDlg);
+
+		// If the user clicked on OK, then update the data input filename in the editbox
+		if (tfd.doModal() == IDOK)
+		{
+			m_editDataInputFileName.SetWindowText(fileDlg.GetPathName());
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI34814");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CAFEngineFileProcessorPP::OnClickedCheckUseDataInput(WORD wNotifyCode, 
+													 WORD wID, HWND hWndCtl, 
+													 BOOL& bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{	
+		VARIANT_BOOL bEnable = asVariantBool(m_chkUseDataInputFile.GetCheck() == BST_CHECKED);
+
+		m_editDataInputFileName.EnableWindow(bEnable);
+		m_btnDataInputSelectTag.EnableWindow(bEnable);
+		GetDlgItem(IDC_BTN_BROWSE_DATA_INPUT).EnableWindow(bEnable);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI34815");
 
 	return 0;
 }

@@ -26,6 +26,8 @@ const std::string gstrRSD_FILE_OPEN_FILTER =	"Ruleset definition files (*.rsd;*.
 												"Ruleset definition files (*.rsd)|*.rsd|"
 												"Encrypted ruleset files (*rsd.etf)|*rsd.etf|"
 												"All Files (*.*)|*.*||";
+const string gstrVOA_FILE_FILTER =	"VOA Files (*.voa;*.evoa;*.eav)|*.voa;*.evoa;*.eav|"
+									"All Files (*.*)|*.*||";
 
 const std::string gstrAF_REG_EAVGENERATOR_FOLDER_PATH = 
 	gstrAF_REG_UTILS_FOLDER_PATH + std::string("\\EAVGenerator");

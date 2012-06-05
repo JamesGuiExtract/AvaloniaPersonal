@@ -104,6 +104,7 @@
       <DependentUpon>ExtractOcrTextInImageAreaSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="IdentifiableRuleObject.cs" />
+    <Compile Include="InputFinder.cs" />
     <Compile Include="ModifySpatialMode.cs" />
     <Compile Include="ModifySpatialModeSettingsDialog.cs">
       <SubType>Form</SubType>

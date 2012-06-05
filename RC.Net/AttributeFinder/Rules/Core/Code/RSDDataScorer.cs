@@ -717,7 +717,7 @@ namespace Extract.AttributeFinder.Rules
 
                 // Turn the supplied attribute into an AFDocument to run the rules against.
                 AFDocument afDoc = new AFDocument();
-                afDoc.Text = attribute.Value;
+                afDoc.Attribute = attribute;
 
                 IUnknownVector foundAttributes = ruleSet.ExecuteRulesOnText(afDoc, null, null);
 

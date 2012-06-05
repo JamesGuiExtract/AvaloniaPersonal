@@ -66,6 +66,12 @@ library UCLID_AFFILEPROCESSORSLib
 		// If a cleaned image should be used for OCR (if available)
 		[propget, id(6), helpstring("property UseCleanedImage")] HRESULT UseCleanedImage([out, retval] VARIANT_BOOL* pVal);
 		[propput, id(6), helpstring("property UseCleanedImage")] HRESULT UseCleanedImage([in] VARIANT_BOOL newVal);
+		// Whether to provide input attributes to the ruleset.
+		[propget, id(7), helpstring("property UseDataInputFile")] HRESULT UseDataInputFile([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(7), helpstring("property UseDataInputFile")] HRESULT UseDataInputFile([in] VARIANT_BOOL newVal);
+		// The VOA file to include as input attributes (attributes will be added as children to AFDocument::Attribute).
+		[propget, id(8), helpstring("property DataInputFileName")] HRESULT DataInputFileName([out, retval] BSTR *pVal);
+		[propput, id(8), helpstring("property DataInputFileName")] HRESULT DataInputFileName([in] BSTR newVal);
 	};
 
 	[

@@ -106,6 +106,8 @@ library UCLID_AFCORELib
 		[propput, id(2), helpstring("property StringTags")] HRESULT StringTags([in] IStrToStrMap* newVal);
 		[propget, id(3), helpstring("property ObjectTags")] HRESULT ObjectTags([out, retval] IStrToObjectMap* *pVal);
 		[propput, id(3), helpstring("property ObjectTags")] HRESULT ObjectTags([in] IStrToObjectMap* newVal);
+		[propget, id(4), helpstring("property Attribute")] HRESULT Attribute([out, retval] IAttribute* *pVal);
+		[propput, id(4), helpstring("property Attribute")] HRESULT Attribute([in] IAttribute* newVal);
 	};
 	[
 		object,

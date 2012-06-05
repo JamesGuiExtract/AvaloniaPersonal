@@ -41,6 +41,8 @@ public:
 	STDMETHOD(put_StringTags)(/*[in]*/ IStrToStrMap* newVal);
 	STDMETHOD(get_Text)(/*[out, retval]*/ ISpatialString* *pVal);
 	STDMETHOD(put_Text)(/*[in]*/ ISpatialString* newVal);
+	STDMETHOD(get_Attribute)(/*[out, retval]*/ IAttribute* *pVal);
+	STDMETHOD(put_Attribute)(/*[in]*/ IAttribute* newVal);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown ** pObject);
@@ -53,12 +55,13 @@ private:
 	//////////
 	// Variables
 	//////////
-	ISpatialStringPtr m_ipText;
+	UCLID_AFCORELib::IAttributePtr m_ipAttribute;
 	IStrToStrMapPtr m_ipStringTags;
 	IStrToObjectMapPtr m_ipObjectTags;
 
 	//////////
 	// Methods
 	//////////
+	UCLID_AFCORELib::IAttributePtr getAttribute();
 	void validateLicense();
 };

@@ -22,7 +22,8 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 // 1 - First version of this object
 // 2 - Added m_bUseCleanedImage option to object
 //     Also added support for ocr type: kNoOCR
-const unsigned long gnCurrentVersion = 2;
+// 3 - Added m_bUseDataInputFile and m_strDataInputFileName
+const unsigned long gnCurrentVersion = 3;
 
 //-------------------------------------------------------------------------------------------------
 // CAFEngineFileProcessor
@@ -177,6 +178,18 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 		}
 
 		_lastCodePos = "70";
+
+		if (m_bUseDataInputFile)
+		{
+			// Expand the tags for the data input file
+			string strDataInputFile = asString(
+				ipTagManager->ExpandTags(m_strDataInputFileName.c_str(), strInputFile.c_str()));
+
+			IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
+			ipAttributes->LoadFrom(strDataInputFile.c_str(), VARIANT_FALSE);
+
+			ipAFDoc->Attribute->SubAttributes->Append(ipAttributes);
+		}
 
 		// Based upon whether OCR will need to be run, determine the total number
 		// of items to use for progress status updates
@@ -609,6 +622,65 @@ STDMETHODIMP CAFEngineFileProcessor::put_UseCleanedImage(VARIANT_BOOL newVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28072")
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFEngineFileProcessor::get_UseDataInputFile(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+		
+		*pVal = asVariantBool(m_bUseDataInputFile);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34809")
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFEngineFileProcessor::put_UseDataInputFile(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		m_bUseDataInputFile = (newVal == VARIANT_TRUE);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34810")
+
+	return S_OK;
+}//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFEngineFileProcessor::get_DataInputFileName(BSTR *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		*pVal = _bstr_t(m_strDataInputFileName.c_str()).Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34807")
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFEngineFileProcessor::put_DataInputFileName(BSTR newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		m_strDataInputFileName = asString(newVal);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34808")
+
+	return S_OK;
+}
 
 //-------------------------------------------------------------------------------------------------
 // ICategorizedComponent
@@ -643,12 +715,14 @@ STDMETHODIMP CAFEngineFileProcessor::raw_CopyFrom(IUnknown *pObject)
 		UCLID_AFFILEPROCESSORSLib::IAFEngineFileProcessorPtr ipSource(pObject);
 		ASSERT_RESOURCE_ALLOCATION("ELI10991", ipSource != __nullptr);
 
-		m_strRuleFileNameForFileProcessing = ipSource->RuleSetFileName;
-		m_bReadUSSFileIfExist = ipSource->ReadUSSFile == VARIANT_TRUE;
-		m_bCreateUssFileIfNonExist = ipSource->CreateUSSFile == VARIANT_TRUE;
+		m_strRuleFileNameForFileProcessing = asString(ipSource->RuleSetFileName);
+		m_bReadUSSFileIfExist = asCppBool(ipSource->ReadUSSFile);
+		m_bCreateUssFileIfNonExist = asCppBool(ipSource->CreateUSSFile);
 		m_eOCRPagesType = (EOCRPagesType)ipSource->OCRPagesType;
-		m_strSpecificPages = ipSource->OCRCertainPages;
-		m_bUseCleanedImage = ipSource->UseCleanedImage == VARIANT_TRUE;
+		m_strSpecificPages = asString(ipSource->OCRCertainPages);
+		m_bUseCleanedImage = asCppBool(ipSource->UseCleanedImage);
+		m_bUseDataInputFile = asCppBool(ipSource->UseDataInputFile);
+		m_strDataInputFileName = asString(ipSource->DataInputFileName);
 
 		// Set dirty flag since this object has changed
 		m_bDirty = true;
@@ -808,6 +882,12 @@ STDMETHODIMP CAFEngineFileProcessor::Load(IStream *pStream)
 			dataReader >> m_bUseCleanedImage;
 		}
 
+		if (nDataVersion >= 3)
+		{
+			dataReader >> m_bUseDataInputFile;
+			dataReader >> m_strDataInputFileName;
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -844,6 +924,9 @@ STDMETHODIMP CAFEngineFileProcessor::Save(IStream *pStream, BOOL fClearDirty)
 
 		dataWriter << m_bUseCleanedImage;
 		
+		dataWriter << m_bUseDataInputFile;
+		dataWriter << m_strDataInputFileName;
+
 		dataWriter.flushToByteStream();
 
 		// Write the bytestream data into the IStream object
@@ -880,6 +963,8 @@ void CAFEngineFileProcessor::clear()
 	m_eOCRPagesType = kOCRAllPages;
 	m_strSpecificPages = "";
 	m_bUseCleanedImage = true;
+	m_bUseDataInputFile = false;
+	m_strDataInputFileName = "<SourceDocName>.voa";
 }
 //-------------------------------------------------------------------------------------------------
 void CAFEngineFileProcessor::validateLicense()

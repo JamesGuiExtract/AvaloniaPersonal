@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -100,41 +98,47 @@ IDR_AFCONVERTVOATOXMLTASKPP REGISTRY                "AFConvertVOAToXMLTaskPP.rgs
 // Dialog
 //
 
-IDD_AFENGINEFILEPROCESSORPP DIALOGEX 0, 0, 320, 150
+IDD_AFENGINEFILEPROCESSORPP DIALOGEX 0, 0, 320, 192
 STYLE DS_SETFONT | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     LTEXT           "Select Rules File :",IDC_STATIC,5,5,58,8
     EDITTEXT        IDC_EDIT_RULE_FILE,5,17,276,12,ES_AUTOHSCROLL
-	PUSHBUTTON		"SelectDocTag",IDC_BTN_DOCTAGS_AFE,286,16,10,14,BS_ICON
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_DOCTAGS_AFE,286,16,10,14,BS_ICON
     PUSHBUTTON      "...",IDC_BTN_BROWSE_AFE,300,16,15,14
     CONTROL         "Use previously saved OCR results if available",IDC_CHK_FROM_USS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,35,297,12
-	GROUPBOX		"OCR settings", IDC_STATIC, 5, 50, 310, 95
-    CONTROL         "OCR all pages of the image",IDC_RADIO_OCR_ALL,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,61,102,10
-    CONTROL         "OCR specific pages :",IDC_RADIO_OCR_SPECIFIED,"Button",BS_AUTORADIOBUTTON,12,74,83,10
-	CONTROL			"Do not OCR any of the pages", IDC_RADIO_OCR_NONE,"Button",BS_AUTORADIOBUTTON,12,87,120,10
-	LTEXT			"( Use this option only if you're sure the rules don't require OCR results )",
-					IDC_STATIC, 22,100,250,10
-    EDITTEXT        IDC_EDIT_PAGES,95,73,117,12,ES_AUTOHSCROLL
-	CONTROL			"Save OCR results to speed up re-processing in the future", IDC_CHK_SAVE_RESULTS,
-					"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,115,200,12
-	CONTROL			"Use cleaned image if available", IDC_CHK_USE_CLEAN_IMAGE,
-					"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,128,120,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,34,311,12
+    GROUPBOX        "Rule input",IDC_STATIC,5,49,311,43
+    CONTROL         "Make the results of the following data file available to the rules",IDC_CHK_PROVIDE_INPUT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,60,211,10
+    EDITTEXT        IDC_EDIT_INPUT_DATA,12,74,269,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_DOCTAGS_DATA_INPUT,286,72,10,14,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_DATA_INPUT,300,72,15,14
+    GROUPBOX        "OCR settings",IDC_STATIC,5,96,310,95
+    CONTROL         "OCR all pages of the image",IDC_RADIO_OCR_ALL,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,107,102,10
+    CONTROL         "OCR specific pages :",IDC_RADIO_OCR_SPECIFIED,"Button",BS_AUTORADIOBUTTON,12,120,83,10
+    EDITTEXT        IDC_EDIT_PAGES,95,119,117,12,ES_AUTOHSCROLL
+    CONTROL         "Do not OCR any of the pages",IDC_RADIO_OCR_NONE,"Button",BS_AUTORADIOBUTTON,12,133,120,10
+    LTEXT           "( Use this option only if you're sure the rules don't require OCR results )",IDC_STATIC,22,146,250,10
+    CONTROL         "Save OCR results to speed up re-processing in the future",IDC_CHK_SAVE_RESULTS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,161,200,12
+    CONTROL         "Use cleaned image if available",IDC_CHK_USE_CLEAN_IMAGE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,174,120,12
 END
 
-IDD_AFCONVERTVOATOXMLTASKPP DIALOGEX 0,0,320,55
+IDD_AFCONVERTVOATOXMLTASKPP DIALOGEX 0, 0, 320, 55
 STYLE DS_SETFONT | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
-FONT 8, "MS Sans Serif",0,0,0x1
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-	LTEXT			"Select VOA input file:",IDC_STATIC,5,5,90,8
-	EDITTEXT		IDC_EDIT_INPUT_VOA_FILE,5,18,276,12,ES_AUTOHSCROLL
-	PUSHBUTTON		"SelectDocTag",IDC_BTN_VOA_FILE_DOC_TAGS,286,17,10,14,BS_ICON
+    LTEXT           "Select VOA input file:",IDC_STATIC,5,5,90,8
+    EDITTEXT        IDC_EDIT_INPUT_VOA_FILE,5,18,276,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_VOA_FILE_DOC_TAGS,286,17,10,14,BS_ICON
     PUSHBUTTON      "...",IDC_BTN_BROWSE_VOA_FILE,300,17,15,14
-	PUSHBUTTON		"Configure XML Output...",IDC_BTN_CONFIGURE_XML_OUTPUT,5,35,95,15
+    PUSHBUTTON      "Configure XML Output...",IDC_BTN_CONFIGURE_XML_OUTPUT,5,35,95,15
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -152,14 +156,14 @@ IDI_ICON_SELECT_DOC_TAG ICON                    "res\\SelectDocTagArrow.ico"
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_AFENGINEFILEPROCESSORPP, DIALOG
     BEGIN
         LEFTMARGIN, 5
-        RIGHTMARGIN, 302
+        RIGHTMARGIN, 316
         TOPMARGIN, 5
-        BOTTOMMARGIN, 93
+        BOTTOMMARGIN, 154
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -170,7 +174,7 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_PROJNAME            "AFFileProcessors"
     IDS_TITLEAFEngineFileProcessorPP "Title"
@@ -178,7 +182,7 @@ BEGIN
     IDS_DOCSTRINGAFEngineFileProcessorPP "Your Help String"
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

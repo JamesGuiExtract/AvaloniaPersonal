@@ -309,6 +309,8 @@ namespace Extract.AttributeFinder.Rules
 
         #endregion Properties
 
+        #region IOutputHandler
+
         /// <summary>
         /// Processes the output (<see paramref="pAttributes"/>) by 
         /// </summary>
@@ -332,6 +334,8 @@ namespace Extract.AttributeFinder.Rules
                 throw ex.CreateComVisible("ELI34787", "Failed to evaluate data query.");
             }
         }
+
+        #endregion IOutputHandler
 
         #region IConfigurableObject Members
 
