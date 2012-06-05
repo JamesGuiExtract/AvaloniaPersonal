@@ -819,6 +819,22 @@
 				<li>Confirm that if the <b>regular expressions</b> check box is checked 
 				that the attribute comparisons are conducted appropriately.
 			</ul>
+<p>
+	  	   	<LI><b>[FlexIDSCore #4764]</b> VOA File Contents Condition
+			<ul>
+				<li>Prepare a condition to evaluate 
+				<b>\Engineering\ReusableComponents\COMComponents\UCLIDFileProcessing 
+				\ESSkipConditions\InteractiveTest\Images\TestImage009.tif.voa</b>.
+				<ul>
+					<li>Condition will be met if at least one attribute matches 
+					<b>*</b>.
+					<li>Attribute's value matches one of the entries in the list.
+					<li>Treat search terms as regular expressions.
+				</ul>
+				<li>Confirm that <b>[\S\s]*LAST</b> as the sole list entry succeeds.
+				<li>Add <b>Social Security</b> at the top of the list.
+				<li>Confirm that the condition still succeeds.
+			</ul>
       		</ul>
 	</ul>
 <p>
