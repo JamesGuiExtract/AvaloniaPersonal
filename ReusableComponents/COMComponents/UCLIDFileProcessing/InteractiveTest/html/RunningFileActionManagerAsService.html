@@ -390,6 +390,14 @@ called the <b>service machine</b>.  The machine that contains the database is re
             		<li>Confirm that the FAM service and processing EXEs run as expected 
 			without requiring passwords.
         	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6225, #6226]</b> Deadlock When Stopping FAM Service
+		<ul>
+			<li>Exercise a <b>Thread Scalability</b> test with many FAMs and two 
+			threads each.  Confirm that the <b>FAM service</b> can be stopped.
+			<li>Confirm during and after processing that the number of 
+			<b>Processing</b> files is never negative.
+		</ul>
     	</ul>
 </ul>
 </body> 
