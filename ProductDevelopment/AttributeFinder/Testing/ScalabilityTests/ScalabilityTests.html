@@ -11,16 +11,16 @@
 <img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
-<p>
-* ID Shield and Extract Systems LM should be installed and licensed for these tests. It is not necessary 
-to install FLEX Index.
+<b>ID Shield</b> and <b>Extract Systems LM</b> should be installed and licensed for these tests. It is 
+not necessary to install FLEX Index.
+<hr>
 <ol>
 <li><h2>Test #1 - Thread Scalability</h2>
 <ul>
 	<li><b>Purpose & Machine Setup</b>
 	<ul>
 		<li>Measure the linear scalability of ID Shield processing on a multi-core server 
-		(i.e. <b>UltraTester</b>) as the number of threads is increased.
+		(i.e. <b>Zach</b> or <b>UltraTester</b>) as the number of threads is increased.
 		<li>Select a different test machine to serve as the image host and the database host.
 		<li>Select a folder of customer images to process.  
 		<li>Duplicate the files as needed on the image host so that auto-redaction processing 
@@ -38,7 +38,32 @@ to install FLEX Index.
 		drive.
 	</ul>
 <p>
-	<li><b>Test Execution</b>
+	<li><b>Automated Test Execution</b>
+	<ul>
+		<li>Review the files and folders in 
+		<b>.\AttributeFinder\Testing\ScalabilityTests\ThreadScalabilityTest</b>.
+		<li>Edit and update <b>runtest2.bat</b> for processing time and email recipients.
+		<li>Create a <b>named</b> collection of FPS files from <b>run.fps</b> as run00.fps, 
+		run01.fps, run02.fps, etc.  Note that each file (except 00) should be configured to 
+		use the specified number of threads.  FPS files should be created beyond the number of 
+		available cores.
+		<li>Update the FAM Service database with one instance each of:
+		<ul>
+			<li>q.fps
+			<li>run00.fps
+		</ul>
+		<li>Exercise <b>initialize.bat</b>.
+		<li>Create a <b>scheduled task</b>.
+		<ul>
+			<li>Exercise <b>runtest2.bat</b> from the ThreadScalabilityTest folder
+			<li>Run the task at startup.
+			<li>Run the task even if no user is logged in.
+		</ul>
+		<li>Reboot the server test machine to start processing.
+		<li>Update the results spreadsheet with values from the emailed reports.
+	</ul>
+<p>
+	<li><b>OLD Manual Test Execution</b>
 	<ul>
 		<li>Reset the database back to a files queued state.
 		<ul>
@@ -57,10 +82,8 @@ to install FLEX Index.
 	<li><b>Test Results</b>
 	<ul>
 		<li>Record the starting and ending processing times in an appropriate spreadsheet.<br>
-		See <b>I:\Common\Testing\Product Testing\FLEX_Index_70\ScalabilityTests\Thread_Scalability.xls</b> 
-		as an example.
-		<li>Create a chart to display ID Shield processing rate in <b>pages per day</b> against 
-		the <b>number of processing threads</b>.
+		See <b>I:\Common\Testing\Product Testing\FLEX_Index_90\ScalabilityTests\Thread_Scalability.xls</b> 
+		as an example.  An empty spreadsheet is also present in the ThreadScalabilityTest folder.
 		<li>The expected result is a graph that is linear up to almost the number of 
 		available threads.  As the number of threads continues to increase the improvement 
 		in overall processing rate slows down.  Eventually, the overhead associated with 
@@ -73,7 +96,8 @@ to install FLEX Index.
 	<li><b>Purpose & Machine Setup</b>
 	<ul>
 		<li>Measure the linear scalability of ID Shield processing on multiple quad-core  
-		test machines (i.e. <b>HPQCx</b>) as the number of machines is increased.
+		test machines or virtual machines (i.e. <b>HPQCx</b>) as the number of machines is 
+		increased.
 		<li>Select one non-processing test machine to serve as the image host and the 
 		database host.
 		<li>Select a folder of customer images to process.  
@@ -113,7 +137,7 @@ to install FLEX Index.
 	<li><b>Test Results</b>
 	<ul>
 		<li>Record the starting and ending processing times in an appropriate spreadsheet.<br>
-		See <b>I:\Common\Testing\Product Testing\FLEX_Index_70\ScalabilityTests\Machine_Scalability.xls</b> 
+		See <b>I:\Common\Testing\Product Testing\FLEX_Index_90\ScalabilityTests\Machine_Scalability.xls</b> 
 		as an example.
 		<li>Create a chart to display ID Shield processing rate in <b>pages per day</b> against 
 		the <b>number of processing machines</b>.
@@ -128,8 +152,8 @@ to install FLEX Index.
 	<li><b>Purpose & Machine Setup</b>
 	<ul>
 		<li>Determine the absolute maximum processing rate for ID Shield on a multi-core server 
-		(i.e. <b>UltraTester</b>) by modifying the number of FAM instances and the number 
-		of threads.
+		(i.e. <b>Zach</b> or <b>UltraTester</b>) by modifying the number of FAM instances and 
+		the number of threads.
 		<li>Compute processing rates for many different combinations and note the 
 		combination with the highest overall processing rate.
 		<li>Select a different test machine to serve as the image host and the database host.
@@ -150,7 +174,43 @@ to install FLEX Index.
 		drive.
 	</ul>
 <p>
-	<li><b>Test Execution</b>
+	<li><b>Automated Test Execution</b>
+	<ul>
+		<li>Review the files and folders in <b>.\AttributeFinder\Testing\ScalabilityTests\
+		ThreadScalabilityTest</b>.
+		<li>Edit and update <b>runtest.bat</b> for processing time and email recipients.
+		<li>Create a <b>named</b> collection of FPS files from <b>run.fps</b> as run01.fps, 
+		run02.fps, run03.fps, etc.  Note that each file should be configured to use the 
+		specified number of threads.
+		<li>Update the FAM Service database with one instance each of:
+		<ul>
+			<li><b>q.fps</b>
+			<li><b>run01.fps</b> or the <u>runXX.fps</u> file with the desired number 
+			of threads
+		</ul>
+		<li>Exercise <b>initialize.bat</b>.
+		<li>Create a <b>scheduled task</b>.
+		<ul>
+			<li>Exercise <b>runtest.bat</b> from the ThreadScalabilityTest folder
+			<li>Run the task at startup.
+			<li>Run the task even if no user is logged in.
+		</ul>
+		<li>Reboot the server test machine to start processing.
+		<li>Update the results spreadsheet with values from the emailed reports.
+		<li><b>Adjustments</b>
+		<ul>
+			<li>Exercise <u>only</u> the desired combinations of number of threads and 
+			numbers of instances.  There is no need to verify that one and two instances 
+			of single-thread FAMs are less effective than approximately the number of 
+			available processing cores.
+			<li>When the desired numbers of instances have been exercised for a specific 
+			number of threads, stop the scheduled task, modify <b>ESFAMService.sdf</b> to 
+			use the appropriate initial number of instances for the new number of threads, 
+			run <b>initialize.bat</b>, and restart the scheduled task.
+		</ul>
+	</ul>
+<p>
+	<li><b>OLD Manual Test Execution</b>
 	<ul>
 		<li>Reset the database back to a files queued state.
 		<ul>
@@ -171,11 +231,11 @@ to install FLEX Index.
 	<ul>
 		<li>Record the starting and ending processing times in an appropriate spreadsheet.<br>
 		See <b>I:\Common\Testing\Product 
-		Testing\FLEX_Index_70\ScalabilityTests\Maximum_Server_Rate_Tests_70.xls</b> 
+		Testing\FLEX_Index_80\ProcessingRateTests\Maximum_Server_Rate_Tests_80.xls</b> 
 		as an example.
 		<li>The expected result is a table that shows a peak performance for each 
 		selected number of threads or number of FAM instances.
-		<li>One combination will be absolute maximum processing rate.
+		<li>One combination will be the maximum processing rate.
 	</ul>
 </ul>
 </ol>
