@@ -172,12 +172,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Interfaces", "..\..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.SecureFileDeleters", "..\..\..\..\RC.Net\Utilities\SecureFileDeleters\Core\Code\Extract.Utilities.SecureFileDeleters.csproj", "{4E71D915-E822-4620-8E86-EB8255A96F82}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MSDataConnectionDialog", "MSDataConnectionDialog", "{8B38C2BB-D3E0-4948-92DA-0A0876B200DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI", "..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUI\Microsoft.Data.ConnectionUI.csproj", "{139729CD-0F06-48E8-9F4A-08E78BB6575F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.Dialog", "..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj", "{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.SqlCeDataProvider", "..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj", "{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}"
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 77
+		ProjectCount = 81
 		ProjectRelativeDiskPath1 = ..\..\AutoIncrementVssLabel\AutoIncrementVssLabel.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\CalcTotalMemLeak\CalcTotalMemLeak.vcxproj
 		ProjectRelativeDiskPath3 = ..\..\ChangeCase\ChangeCase.vcxproj
@@ -255,6 +263,10 @@ Global
 		ProjectRelativeDiskPath75 = ..\..\..\..\RC.Net\Encryption\Core\Code\Extract.Encryption.vcxproj
 		ProjectRelativeDiskPath76 = ..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.csproj
 		ProjectRelativeDiskPath77 = ..\..\..\..\RC.Net\Utilities\SecureFileDeleters\Core\Code\Extract.Utilities.SecureFileDeleters.csproj
+		ProjectRelativeDiskPath78 = Utils.sln
+		ProjectRelativeDiskPath79 = ..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUI\Microsoft.Data.ConnectionUI.csproj
+		ProjectRelativeDiskPath80 = ..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj
+		ProjectRelativeDiskPath81 = ..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1191,8 +1203,49 @@ Global
 		{4E71D915-E822-4620-8E86-EB8255A96F82}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{4E71D915-E822-4620-8E86-EB8255A96F82}.Release|Win32.ActiveCfg = Release|Any CPU
 		{4E71D915-E822-4620-8E86-EB8255A96F82}.Release|x86.ActiveCfg = Release|Any CPU
+		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|Win32.ActiveCfg = Release|Any CPU
+		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|x86.ActiveCfg = Release|Any CPU
+		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Release|Win32.ActiveCfg = Release|Any CPU
+		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Release|x86.ActiveCfg = Release|Any CPU
+		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}.Release|Win32.ActiveCfg = Release|Any CPU
+		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{139729CD-0F06-48E8-9F4A-08E78BB6575F} = {8B38C2BB-D3E0-4948-92DA-0A0876B200DB}
+		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA} = {8B38C2BB-D3E0-4948-92DA-0A0876B200DB}
+		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31} = {8B38C2BB-D3E0-4948-92DA-0A0876B200DB}
 	EndGlobalSection
 EndGlobal
