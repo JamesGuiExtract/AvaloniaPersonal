@@ -586,7 +586,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.Court
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionAndQueryTester", "..\..\..\..\..\RC.Net\UtilityApplications\ExperssionAndQueryTester\Core\Code\ExpressionAndQueryTester.csproj", "{404C32F6-646B-4FC7-A1B6-6F49986EF3E0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MSSQLConnectionDialog", "MSSQLConnectionDialog", "{4CAFD9CC-640F-4836-B388-D370B6219488}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MSDataConnectionDialog", "MSDataConnectionDialog", "{4CAFD9CC-640F-4836-B388-D370B6219488}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI", "..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUI\Microsoft.Data.ConnectionUI.csproj", "{139729CD-0F06-48E8-9F4A-08E78BB6575F}"
 EndProject
