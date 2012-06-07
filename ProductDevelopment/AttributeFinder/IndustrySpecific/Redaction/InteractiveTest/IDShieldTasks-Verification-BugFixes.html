@@ -474,6 +474,15 @@
 			<li>Confirm that the image returns to its original orientation.
         	</ul>
 <p>
+	   	<LI><b>[FlexIDSCore #4927]</b> Verification
+		<ul>
+			<li>Configure a verification FPS file to keep processing even after the 
+			queue is empty.
+			<li>Verify a few documents until the queue is empty.
+			<li>Press <b>Ctrl+Tab</b> to advance to the next document.
+			<li>Confirm that no error is seen.
+		</ul>
+<p>
   	   	<LI><b>[FlexIDSCore #4931, #4933]</b> Tab Order During Verification
 		<ul>
 			<li>Confirm that new redactions are added to the data grid in the order 
@@ -517,16 +526,49 @@
 			can be saved as appropriate.
 		</ul>
 <p>
-            <li><b>[DotNet #673]</b> FormStateManager
-            <ul>
-                <li>Run ID Shield verification via the FAM</li>
-                <li>Run ID Shield verification via RunFPS on a machine where the current user has
-                never used RunFPS.</li>
-                <li>Confirm that the toolstrips are loaded correctly.</li>
-                <li>Delete the user.config file under <b>C:\Users\[Username]\AppData\Local\[ApplicationName]_Application\[GibberishFolderName]\[VersionString]</b>.  Note that this path may be incorrect.</li>
-                <li>Open verification in the application whose config file has been deleted.</li>
-                <li>Confirm that the toolstrips are loaded correctly.</li>
-            </ul></li>
+   		<LI><b>[FlexIDSCore #4944, #4547, LegacyRC #6234]</b> Background OCR
+       		<ul>
+      			<li>Run <b>Compute.fps</b> from <b>Demo_IDShield</b>.
+			<li>Delete all of the USS files.
+			<li>Run <b>Verify.fps</b> from <b>Demo_IDShield</b>.
+			<li>Tab quickly through the files.
+			<li>Confirm that no <b>ELI11049: System error...</b> exception is 
+			logged when the verification FAM stops.
+			<li>Confirm that no <b>OCR operation failed</b> exceptions are logged.
+<p>
+			<li>Exercise the first memory leak test for verification.
+			<li>Confirm that no unusual handle leak is seen.
+       		</ul>
+<p>
+	   	<LI><b>[FlexIDSCore #4965]</b> Rapid Verification
+		<ul>
+			<li>Exercise verification.
+			<li>Quickly stop verification via the <b>close</b> button after starting 
+			processing.
+			<li>Repeat several times.
+			<li>Confirm that no <b>ELI26599: Error closing verification</b> exceptions 
+			are seen.
+		</ul>
+<p>
+	   	<LI><b>[FlexIDSCore #4979]</b> Verification
+		<ul>
+			<li>Configure a verification FPS file to require visitation of every page.
+			<li>Verify the image and VOA file at 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4979</b>.
+			<li>Make a manual redaction on the first page.
+			<li>Confirm that <b>page 10</b> is not marked as viewed.
+		</ul>
+<p>
+            	<li><b>[DotNetRC #673]</b> FormStateManager
+            	<ul>
+                	<li>Run ID Shield verification via the FAM</li>
+                	<li>Run ID Shield verification via RunFPS on a machine where the current user 
+			has never used RunFPS.</li>
+                	<li>Confirm that the toolstrips are loaded correctly.</li>
+                	<li>Delete the user.config file under <b>C:\Users\[Username]\AppData\Local\[ApplicationName]_Application\[GibberishFolderName]\[VersionString]</b>.  Note that this path may be incorrect.</li>
+                	<li>Open verification in the application whose config file has been deleted.</li>
+                	<li>Confirm that the toolstrips are loaded correctly.</li>
+            	</ul></li>
         </ul></li>
 <p>
    	<li><b>Current (10.0 release cycle) bugs</b>
