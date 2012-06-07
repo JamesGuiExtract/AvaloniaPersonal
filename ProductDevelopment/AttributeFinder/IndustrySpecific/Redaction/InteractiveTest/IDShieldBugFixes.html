@@ -17,7 +17,8 @@
 <p>
 	<LI><h2>Redaction: Create redacted image</h2>
     	<UL>
-        	<LI><b>TBD</b>
+	   	<LI><b>[FlexIDSCore #4901]</b> Confirm that the <b>Redaction: Create redacted image</b> 
+		does not add <b>IDAndRevision</b> attributes to existing metadata attributes.
     	</UL>
 <p>
     	<LI><h2>Redaction: Extend redactions to surround context</h2>
@@ -28,7 +29,12 @@
 
     	<LI><h2>Redaction: Verify sensitive data</h2>
     	<UL>
-        	<LI><b>TBD</b>
+	   	<LI><b>[FlexIDSCore #4044]</b> Verification
+		<ul>
+			<li>Verify some documents.
+			<li>Press <b>CTRL+S</b> while scrolling the mouse wheel.
+			<li>Confirm that no exceptions are seen.
+		</ul>
     	</UL>
 <p>
 
@@ -49,7 +55,71 @@
 
     	<LI><h2>Miscellaneous</h2>
     	<UL>
-        	<LI><b>TBD</b>
+	   	<LI><b>[DotNet #762]</b> Report Viewer Errors
+		<ul>
+			<li>Create a collection of images to process where some images have very 
+			long filenames.
+			<li>Process the files using <b>ID Shield</b>.
+			<li>Exercise each defined report.
+			<li>Confirm that the long filenames are properly and completely displayed 
+			in the reports.
+			<li>Confirm that each report runs without error.
+		</ul>
+<p>
+	   	<LI><b>[DotNet #764, #766, LegacyRC #6275, #6269, #6270]</b> Rasterizing PDFs
+		<ul>
+			<li>Exercise the PDF image(s) in <b>I:\Common\Testing\PVCS_Testing\DotNetRCAndUtils\764</b>. 
+			<ul>
+				<li>Confirm that conversion to a TIF with the normal method using
+				<b>ImageFormatConverter</b> yields a blank TIF.
+				<li>Confirm that conversion to a TIF with the alternate method using
+				<b>ImageFormatConverter</b> yields a non-blank TIF.
+				<li>Confirm that conversion to a TIF with the normal method using
+				<b>Core: Rasterize PDF</b> yields a non-blank TIF.
+				<li>Confirm that conversion to a TIF with the alternate method using
+				<b>Core: Rasterize PDF</b> yields a blank TIF.
+			</ul>
+			<li>Confirm that no <b>ImageFormatConverter</b> crashes are seen.
+<p>
+			<li>Prepare an FPS file to queue some PDFs and rasterize them into TIFs.  The 
+			task should delete the source PDF but not rename the file in the database.
+			<li>Run the FPS file and confirm that the output TIF files exist.
+			<li>Reset the <b>Completed</b> files to <b>Pending</b>.
+			<li>Re-run the FPS and confirm that all the files fail because the source 
+			documents do not exist.
+			<li>Confirm that the TIF images from the first run still exist.
+<p>
+			<li>Create an ID Shield Client license without OCR On Client.
+			<li>Rename or delete other license files.
+			<li>Confirm that <b>ImageFormatConverter</b> and <b>Core: Rasterize PDF</b> 
+			work when <b>NOT</b> using the Nuance option.
+			<li>Provide a license file that includes OCR On Client.
+			<li>Confirm that <b>ImageFormatConverter</b> and <b>Core: Rasterize PDF</b> 
+			work when using the Nuance option.
+		</ul>
+<p>
+	   	<LI><b>[FlexIDSCore #4509]</b> Verification Options
+		<ul>
+			<li>Open verification.
+			<li>Open the <b>Options</b> dialog and uncheck the <b>Enable ___ tool 
+			after highlight</b> option.
+			<li>Reopen the <b>Options</b> dialog and check the <b>Enable</b> option.  
+			Do not select a tool.
+			<li>Confirm that the <b>Selection</b> tool is chosen by default.
+			<li>Click <b>OK</b> and confirm that no error is seen.
+		</ul>
+<p>
+   		<LI><b>[FlexIDSCore #4543]</b> Verification
+		<ul>
+			<li>Open verification with an image zoomed fit-to-page and the thumbnail 
+			viewer turned off.
+			<li>Create a manual redaction using the word redaction tool in pixel-fitting 
+			mode to create a highlight entirely outside the image.
+			<li>Confirm that no <b>ELI31351: Nullable object must have a value</b> 
+			exception is displayed or logged.
+			<li>Confirm that no <b>ELI21133: Unable to draw image</b> exception is 
+			displayed or logged.
+		</ul>
     	</UL>
 </UL>
 </HTML>
