@@ -21,6 +21,9 @@
             		<li>Confirm that with no database file defined, <b>sqlcdbeditor.exe</b> 
 			brings up the application with no database file open.</li>
             		<li>Confirm that <b>sqlcdbeditor.exe /?</b> brings up a usage message.</li>
+<p>
+		   	<LI><b>[DotNetRC #437]</b> Confirm that SQLCDBEditor is automatically 
+			associated with <b>*.sdf</b> files.
         	</ul></li>
 <p>
        		<LI><b>Toolbar and Menus</b>
@@ -433,6 +436,23 @@
     	<LI><h2>SQLCompactImporter</h2>
     	<ul>
         	<li>TBD</li>
+    	</ul></li>
+<p>
+    	<LI><h2>Miscellaneous</h2>
+    	<ul>
+	   	<LI><b>[LegacyRC #6235]</b> Install/Uninstall of SQL CE 3.5
+       		<ul>
+			<li>Install an older FLEX Index or ID Shield version and confirm that the 
+			FAM service is available from the management console.  Also confirm that 
+			the FAM service database can be configured.
+			<li>Uninstall the Extract Systems software, uninstalling SQL Server CE 
+			when prompted.
+			<li>Install a newer FLEX Index or ID Shield version.
+			<ul>
+				<li>Confirm that the FAM service is again available.
+				<li>Confirm that the FAM service database can be configured.
+			</ul>
+       		</ul>
     	</ul></li>
 </ol>
 </body> 
