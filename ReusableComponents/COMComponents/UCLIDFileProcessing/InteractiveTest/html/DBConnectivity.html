@@ -137,7 +137,7 @@
 <ul>
     	<li><b>Connecting to SQL Server 2005</b>
     	<ul> 
-       		<li>Install <b>SQL Server 2005 (not Express)</b> on a clean test machine.
+       		<li>Install <b>SQL Server 2005 (or Express)</b> on a clean test machine.
        		<li>Install <b>ID Shield</b>.
        		<li>Confirm that <b>FAM DB Admin</b> can successfully create and modify a database.
        		<li>Confirm that <b>Demo_IDShield</b> can successfully process and verify images.
@@ -162,6 +162,18 @@
        		<li>Confirm that a test machine can successfully process images by connecting to a 
 		<b>SQL Server 2008</b> database located on a different computer.
     	</ul> 
+</ul>
+<p>
+<h3><u>Miscellaneous</u></h3>
+<ul>
+   	<LI><b>[LegacyRC #5934]</b> Connection Is No Longer Good
+       	<ul>
+		<li>Supply a large number of files.
+		<li>Run several processing instances and confirm that processing is successful.
+		<li>Stop all of the instances after a few minutes.
+		<li>Confirm that no <b>ELI15459: Connection is no longer good</b> exceptions 
+		are logged.
+       	</ul>
 </ul>
 </body> 
 </html>
