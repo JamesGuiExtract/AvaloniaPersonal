@@ -124,66 +124,81 @@
         </ul></li>
     </UL></li>
 <p>
-    <LI><h2>Contents of XML Output</h2>
-    <UL>
-        <LI>TBD</li>
-    </UL></li>
+    	<LI><h2>Contents of XML Output</h2>
+    	<UL>
+        	<LI>TBD</li>
+    	</UL></li>
 <p>
-    <LI><h2>Bug Fixes</h2>
-    <UL>
-        <li><b>9.0 bug fixes</b>
-        <ol>
-            <li><b>[DataEntry #1024]</b> CPU pegged
-            <!-- fixed v 8.1.0.90 -->
-            <ul>
-                <li>Exercise <b>ExtractData.fps</b> from <b>Demo_FLEXIndex</b>.</li>
-                <li>Open verification. Click in the city cell of the <b>Return Address</b> table.</li>
-                <li>Click in another field in a different control (not the same table.</li>
-                <li>Confirm that CPU usage remains normal.</li>
-                <li>Click around different controls in the DEP and confirm that CPU usage remains
-                normal.</li>
-            </ul></li>
-        <p>
-            <li><b>[DataEntry #1029]</b> Wrong control active after undo
-            <!-- fixed v 8.1.0.102 -->
-            <ul>
-                <li>Open Example01 from the FLEX Index demo.</li>
-                <li>Add some rows to the party table.</li>
-                <li>Select the <b>Parcel Number</b> field.</li>
-                <li>Press <b>F3</b>. It should take you to the St. Louis cell.</LI>
-                <li>Swipe something.</li>
-                <li>Press the <b>Undo</b> button repeatedly.</li>
-                <li>Confirm that focus moves to the party table as appropriate.</li>
-            </ul></li>
-        <p>
-            <li><b>[DataEntry #1030]</b> Undo and Return Address field
-            <!-- fixed v 8.1.0.102 -->
-            <ul>
-                <li>Open a FLEX Index demo image for verification.</li>
-                <li>Select all the cells in the Return Address table.</li>
-                <li>Swipe an address.</li>
-                <Li>After the address has been split, hit undo.</li>
-                <li>Confirm that whatever data was previously in the table is restored.</li>
-                <li>Confirm that the return address table is still part of the tab order.</li>
-            </ul></li>
-        <p>
-            <li><b>[DataEntry #1031, #1033]</b> Undo and text boxes
-            <!-- fixed v 8.1.0.102 -->
-            <ul>
-                <li>Open a document on which a parcel number was found.</li>
-                <li>Swipe something multiline. It should replace the current value.</li>
-                <li>Hit undo.</li>
-                <li>Swipe something multiline again.</li>
-                <li>Hit undo.</li>
-                <li>Confirm that the swiped text is removed.</li>
-            <p>
-                <li>Place the cursor at the end of a text box field.</li>
-                <li>Swipe some additional text. Confirm that it is correctly appended.</li>
-                <li>Press undo.</li>
-                <li>Confirm that the appended text is correctly removed.</li>
-            </ul></lI>
-        </ol></li>
-    </UL></li>
+    	<LI><h2>Bug Fixes</h2>
+    	<UL>
+        	<li><b>9.0 bug fixes</b>
+        	<ol>
+            		<li><b>[DataEntry #1024]</b> CPU pegged
+            		<!-- fixed v 8.1.0.90 -->
+            		<ul>
+                		<li>Exercise <b>ExtractData.fps</b> from <b>Demo_FLEXIndex</b>.</li>
+                		<li>Open verification. Click in the city cell of the <b>Return Address</b> 
+				table.</li>
+                		<li>Click in another field in a different control (not the same table.</li>
+                		<li>Confirm that CPU usage remains normal.</li>
+                		<li>Click around different controls in the DEP and confirm that CPU usage 
+				remains normal.</li>
+            		</ul></li>
+<p>
+            		<li><b>[DataEntry #1029]</b> Wrong control active after undo
+            		<!-- fixed v 8.1.0.102 -->
+            		<ul>
+                		<li>Open <b>Example01.tif</b> from the FLEX Index demo.</li>
+                		<li>Add some rows to the party table.</li>
+                		<li>Select the <b>Parcel Number</b> field.</li>
+                		<li>Press <b>F3</b>. It should take you to the St. Louis cell.</LI>
+                		<li>Swipe something.</li>
+                		<li>Press the <b>Undo</b> button repeatedly.</li>
+                		<li>Confirm that focus moves to the party table as appropriate.</li>
+            		</ul></li>
+<p>
+            		<li><b>[DataEntry #1030]</b> Undo and Return Address field
+            		<!-- fixed v 8.1.0.102 -->
+            		<ul>
+                		<li>Open a FLEX Index demo image for verification.</li>
+                		<li>Select all the cells in the Return Address table.</li>
+                		<li>Swipe an address.</li>
+                		<li>After the address has been split, hit undo.</li>
+                		<li>Confirm that whatever data was previously in the table is 
+				restored.</li>
+                		<li>Confirm that the return address table is still part of the tab 
+				order.</li>
+            		</ul></li>
+<p>
+            		<li><b>[DataEntry #1031, #1033]</b> Undo and text boxes
+            		<!-- fixed v 8.1.0.102 -->
+            		<ul>
+                		<li>Open a document on which a parcel number was found.</li>
+                		<li>Swipe something multiline. It should replace the current value.</li>
+                		<li>Hit undo.</li>
+                		<li>Swipe something multiline again.</li>
+                		<li>Hit undo.</li>
+                		<li>Confirm that the swiped text is removed.</li>
+<p>
+                		<li>Place the cursor at the end of a text box field.</li>
+                		<li>Swipe some additional text. Confirm that it is correctly appended.</li>
+                		<li>Press undo.</li>
+                		<li>Confirm that the appended text is correctly removed.</li>
+            		</ul></li>
+<p>
+   			<LI><b>[DataEntry #1073]</b> Auto-Zoom
+			<ul>
+				<li>Exercise verification for <b>Demo_FlexIndex</b>.
+				<li>When the first image appears, resize the window so that the image 
+				will fit comfortably in its pane.
+				<li>Modify the auto-zoom options to <b>Zoom out if necessary to fit the 
+				current selection</b>.
+				<li>Stop and restart verification.
+				<li>Confirm that for the first field (probably <b>Parcel Number</b>), the 
+				image has not zoomed in close to the found text.
+			</ul>
+        	</ol></li>
+    	</UL></li>
 </OL>
 </BODY>
 </HTML>
