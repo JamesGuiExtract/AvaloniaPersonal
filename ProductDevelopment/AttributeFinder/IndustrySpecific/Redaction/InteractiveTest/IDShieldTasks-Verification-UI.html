@@ -1289,6 +1289,16 @@
 <p> 
     	<li><b>Miscellaneous</b>
     	<ul>
+	   	<LI><b>[DotNet #756]</b> Verification Without OCR On Client License
+		<ul>
+			<li>Confirm that a separate verification package is defined and 
+			available that does not provide <b>OCR On Client</b> capability.
+			<li>Exercise verification without <b>OCR On Client</b> and confirm 
+			that no unexpected errors are seen.
+			<li>Confirm that the <b>word redaction</b> tool gracefully doesn't 
+			work.
+		</ul>
+<p>
         	<li><b>[FlexIDSCore #4729]</b>
         	<ul>
             		<li>In verification, create a new redaction.</li>
@@ -1462,6 +1472,32 @@
             		<li>Confirm that no exception is seen.</li>
             		<li>Confirm appropriate behavior in data entry as well.</li>
         	</ul></li>
+<p>
+	   	<LI><b>[FlexIDSCore #4929]</b> Verification Shortcuts and Tooltips
+		<ul>
+			<li>Confirm that <b>F10</b> works to show and hide the thumbnail pane.
+			<li>Confirm that the following tooltips include the shortcut keys.
+			<ul>
+				<li>Slideshow play
+				<li>Show/hide thumbnail pane
+				<li>Show/hide magnifier pane
+				<li>Redaction tools
+			</ul>
+		</ul>
+<p>
+	   	<LI><b>[LegacyRC #6274]</b> Verification Without OCR On Client
+       		<ul>
+			<li>Create an <b>ID Shield Client</b> license without <b>OCR On Client</b>.
+			<li>Confirm that this option is clearly available from the License Generator.
+			<li>Exercise verification against files with and without USS files.
+			<ul>
+				<li>Confirm that the angular and rectangular redaction tools perform 
+				as expected.
+				<li>Confirm that the word redaction tool does not work and displays 
+				no error.
+				<li>Confirm that redacted images can be created.
+			</ul>
+       		</ul>
     	</ul></li>
     </ul></li>
 </ul>
