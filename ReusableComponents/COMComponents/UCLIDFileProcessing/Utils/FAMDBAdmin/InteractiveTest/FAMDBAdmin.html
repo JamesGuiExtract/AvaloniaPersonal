@@ -263,7 +263,16 @@
             		<li>Confirm that counters, tags and users have been removed from the database.</li>
             		<li>Confirm that the original login password is still effective.</li>
         	</ul></li>
-        <p>
+<p>
+	   	<LI><b>[LegacyRC #6151]</b> Clearing Database Without Permissions
+       		<ul>
+			<li>Create a FLEX Index or ID Shield database.
+			<li>Log in as a non-admin user.
+			<li>Attempt to clear the database.
+			<li>Confirm that a meaningful exception is displayed.
+			<li>Confirm that multiple error messages are not displayed.
+       		</ul>
+<p>
             	<li><b>[LegacyRC #6163]</b> Confirm that the DB Admin does <b>not</b> allow you to clear 
 		the database in the following situations:
                 <ul>
@@ -732,6 +741,9 @@
 			<li>Click <b>OK</b>.
 			<li>Confirm that the expected number of files had a change in status.
         	</ul>
+<p>
+	   	<LI><b>[LegacyRC #6243]</b> Confirm that DB Admin can set file action status of a 
+		single file back to <b>Pending</b>.
     	</ul></li>
 <p>
     	<li><b>Manually set file processing priority...</b>
@@ -792,10 +804,13 @@
 		dbo.FileActionStatus.ActionStatus = '<b>STATUS</b>'</i> is entered.  Note that 
 		<b>ACTION_NAME</b> and <b>STATUS</b> must be changed to desired values.</li>
 <p>
-        	<li><b>[LegacyRC #5842]</b><!-- fixed v 8.1.0.32 --> Confirm that when you export a 
-		list of all files in the database, the list is sorted by file ID.</li>
+        	<li><b>[LegacyRC #5842]</b>
+		<!-- fixed v 8.1.0.32 --> 
+		Confirm that when you export a list of all files in the database, the list is sorted 
+		by file ID.</li>
 <p>
-        	<li><b>[LegacyRC #5884, #5885]</b><!-- fixed v 8.1.0.73 --> Exporting file lists
+        	<li><b>[LegacyRC #5884, #5885]</b> Exporting file lists
+		<!-- fixed v 8.1.0.73 --> 
         	<ul>
             		<li>Export a list of files associated with <b>any</b> of a set of tags.</li>
             		<li>Export a list of files associated with <b>none</b> of a set of tags.</li>
@@ -803,6 +818,16 @@
 			of all files.</li>
             		<li>Confirm that no errors are seen.</li>
         	</ul></li>
+<p>
+	   	<LI><b>[LegacyRC #6157]</b> Exporting File List Without Write Permission
+       		<ul>
+			<li>Create and populate a FLEX Index or ID Shield database.
+			<li>Log in as a non-admin user.
+			<li>Confirm that a text file cannot be written to <b>C:\</b>.
+			<li>Export a file list from the database to <b>C:\a.txt</b>.
+			<li>Confirm that a meaningful exception is displayed.
+			<li>Confirm that a success message is not presented.
+       		</ul>
     	</ul></li>
 <p>
     	<li><b>Reports</b>
