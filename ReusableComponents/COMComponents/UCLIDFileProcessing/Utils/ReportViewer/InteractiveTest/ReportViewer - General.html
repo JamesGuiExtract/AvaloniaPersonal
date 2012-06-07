@@ -958,7 +958,12 @@
     <li><b>Detailed usage report by specific user for specific day</b> 
       <ul>
         <li>Prompted for <b>UserName</b> and <b>ReportDate</b> parameters.</li>
-        <li>Jump to the <b>Parameter Entry Form</b> section and perform the checklist for the parameter(s) used by this report.</li>
+	<ul>
+	   	<LI><b>[LegacyRC #6209]</b> Confirm that the report no longer requests a time value 
+		(only date) in the <b>Parameter Specification Form</b>.
+	</ul>
+        <li>Jump to the <b>Parameter Entry Form</b> section and perform the checklist for the parameter(s) 
+	used by this report.</li>
         <li><b>Report Parameters</b> table and contents are formatted properly at 400% zoom.</li>
         <li>Table title is displayed in white text on black.</li>
         <li><b>User</b> and <b>Date</b> information are accurate.</li>
@@ -976,7 +981,19 @@
             <li>Remaining cells in the table have a <b>colored</b> background to indicate
               <b>input event activity</b> during the specific minute.</li>
   </p>
-  <p>
+<p>
+   	<LI><b>[LegacyRC #6140, DotNetRC #765]</b> Refreshing Reports
+       	<ul>
+		<li>Verify a few documents.
+		<li>Run the <b>Detailed usage report for specific user for specific day</b> 
+		report.
+		<li>Verify more documents.
+		<li>Refresh the report.
+		<li>Confirm that new information has been added to the report.
+		<li>Confirm that no exception is seen when running a saved report from 
+		the command line.
+       	</ul>
+<p>
             <li><b>Total minutes with input event activity</b> is under the <b>Hours and minutes</b> table.</li>
             <li>The total is accurate based on the shaded cells in the table.</li>
           </ul>
