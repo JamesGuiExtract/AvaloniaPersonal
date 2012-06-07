@@ -100,6 +100,24 @@
             		<li>Save again and reopen the RSD file. Confirm that the rule is
             		still unchecked.</li>
         	</ul></li>
+<p>
+	   	<LI><b>[FlexIDSCore #4974]</b> Ruleset Auto-save
+		<ul>
+			<li>Open an 8.0 ruleset that contains deprecated rule objects (IN - 
+			Marion - Trimin).
+			<li>Confirm that the ruleset cannot be saved in its present form.
+			<li>Manually remove some of the deprecated objects.
+			<li>Confirm that no errors from the auto-save process are seen.
+		</ul>
+<p>
+	   	<LI><b>[LegacyRC #6255]</b> COM Object Data Files
+       		<ul>
+			<li>Open a <b>version 8.0</b> master ruleset.
+			<li>Attempt to save it and confirm that an exception is displayed 
+			complaining about a missing FKB version.
+			<li>Close the exception and the RuleSet Editor.
+			<li>Confirm that the master ruleset can still be opened.
+       		</ul>
     	</ul>
     	<h2>Save As</h2>
     	<ul>
@@ -161,7 +179,8 @@
                 		<li>Confirm that old rules with no FKB version specified use the root 
 				of ComponentData.</li>
                 		<li>Confirm that a ruleset saved with a legacy FKB version installed 
-				to the root of ComponentData will confirm the version number in 				<b>FKBVersion.txt</b>.</li>
+				to the root of ComponentData will confirm the version number in 
+				<b>FKBVersion.txt</b>.</li>
                 		<li>Confirm that if a non-default ComponentDataDir is specified in 
 				RDTConfig, it is assumed to include the full path (including any 
 				needed version number).</li>
@@ -192,6 +211,17 @@
            		<li><b>OK</b> - Save changes and exits dialog.</li>
            		<li><b>Cancel</b> - Cancels changes and exits</li>
             		<li><b>X</b> button ignores changes and exits dialog.</li>
+<p>
+   			<LI><b>[FlexIDSCore #4744]</b> Rule Set Editor
+			<ul>
+				<li>Open a <b>version 8.0</b> rule set that specifies a counter but 
+				not an FKB version.
+				<li>Leave the RSD file open for at least one minute.
+				<li>Confirm that no <b>Unable to save Ruleset</b> exceptions are 
+				logged or displayed.
+				<li>Confirm that no <b>File cannot be deleted</b> exceptions are 
+				logged or displayed.
+			</ul>
 <p>
   	   		<LI><b>[FlexIDSCore #4775, #4828, #4830, #4831, #4832, #4836, #4837]</b> FKB Updates
         		<ul>
