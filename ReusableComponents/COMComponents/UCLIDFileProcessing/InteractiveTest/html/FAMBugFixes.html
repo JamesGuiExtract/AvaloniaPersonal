@@ -120,6 +120,17 @@
 		changes.
 		<li>Confirm that the FAM closes without error.
        	</ul>
+<p>
+   	<LI><b>[LegacyRC #6251]</b> Auto-Revert Error
+       	<ul>
+		<li>Confirm that the auto-revert timeout is 5 minutes.
+		<li>Kill a FAM instance that is actively processing files.
+		<li>Remove any other files from <b>Pending</b> for the relevant action.
+		<li>Wait until the auto-revert timeout has passed.
+		<li>Restart the FAM.
+		<li>Confirm that the stuck files revert to <b>Pending</b> and then are 
+		processed.
+       	</ul>
 </ul>
 </body> 
 </html>
