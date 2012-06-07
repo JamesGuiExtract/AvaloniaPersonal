@@ -282,6 +282,18 @@
 			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3620</b>.
   			<li>Confirm that nothing is found since a check is not on page 1.
   		</ul>
+<p>
+	   	<LI><b>[FlexIDSCore #4955]</b> MICR Finder
+		<ul>
+			<li>Exercise <b>St Johns</b> rules on a small set of relevant images.  
+			Note the processing time.
+			<li>Clear the database and delete the USS files.
+			<li>Modify the registry setting to perform an extended search.
+			<li>Exercise the images again.  Note the processing time.
+			<li>Confirm that the default settings without extended search result in 
+			significantly faster processing.
+			<li>Confirm that no unusual processing errors are logged.
+		</ul>
     	</ul>
   	</li>
 <p>
@@ -499,6 +511,18 @@
         	<ul>
 			<li>Confirm that no attribute is found.
         	</ul>
+<p>
+	   	<LI><b>[FlexIDSCore #4950]</b> Select Page Region
+		<ul>
+			<li>Exercise the RSD file at 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4950</b>.
+			<li>Confirm that the SPR rule that should find page 5 as an image 
+			region works properly.
+			<ul>
+				<li>With the associated USS file present.
+				<li>With the associated USS file not present.
+			</ul>
+		</ul>
     	</ul>
   	</li>
 </ol>
