@@ -347,6 +347,8 @@
             		<li>Confirm that both controls work as expected.</li>
             		<li>Confirm that all settings are correctly propagated back to the <b>DBInfo</b>
             		table.</li>
+  	   		<LI><b>[LegacyRC #6292]</b> Confirm that the FAM can process files when 
+			<b>auto-revert of stuck files</b> is disabled.
         	</ul></li>
         	<li><b>History tab</b>
         	<ul>
@@ -744,6 +746,30 @@
 <p>
 	   	<LI><b>[LegacyRC #6243]</b> Confirm that DB Admin can set file action status of a 
 		single file back to <b>Pending</b>.
+<p>
+  	   	<LI><b>[LegacyRC #6261]</b> Summary Stats
+		<ul>
+			<li>Configure an FPS file to exercise a large number of very fast 
+			tasks.
+			<li>During the processing, use <b>DB Admin</b> to modify action 
+			status from <b>Pending</b> to another status.
+			<li>Confirm that a warning is presented.
+			<li>Confirm that summary statistics are still accurate.
+<p>
+			<li>Exercise the <b>Tools - Recalculate summary statistics</b> menu 
+			item in <b>DB Admin</b>.
+			<ul>
+				<li>Confirm that summary statistics are completely recomputed.  
+				This may be easier to confirm using the <b>Endurance</b> 
+				database on <b>HPQC2</b>.
+				<li>Confirm that this option is not available during active 
+				processing.
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6276]</b> Confirm that the <b>UpdateFileActionStateTransitionTable</b> 
+		entry in the <b>DBInfo</b> table is respected for using <b>Tools - Manually set action 
+		status</b> from DB Admin.
     	</ul></li>
 <p>
     	<li><b>Manually set file processing priority...</b>
@@ -997,6 +1023,12 @@
     	selected percentage is correct.</li>
     	<li>Confirm that when a <b>count</b> from a large group is chosen, that the actual selected 
     	count is correct.</li>
+   	<LI><b>[LegacyRC #6084]</b> DB Admin Random Subsets
+	<ul>
+		<li>Run a query to select files for which status is to be changed.
+		<li>Use the random subset selection with a specific file count.
+		<li>Confirm that the desired number of files are returned.
+	</ul>
 </ul>
 <p>
 <h2>Miscellaneous and bugfixes</h2>
@@ -1056,6 +1088,26 @@
         	<li>Quickly use the context menu to set action status again.</li>
         	<li>Confirm that the Summary tab was refreshed.</li>
     	</ul></li>
+<p>
+   	<LI><b>[LegacyRC #6284]</b> DB Admin As Unprivileged User
+	<ul>
+		<li>Use <b>DB Admin</b> to connect to a database as a non-privileged 
+		user.  The user should have only <b>db_datareader</b> and 
+		<b>db_datawriter</b> privileges for the testing database.
+		<li>Confirm that most activities succeed.  Note that activities that 
+		involve adding or dropping tables are expected to fail.
+		<ul>
+			<li>Switch to the <b>Summary</b> tab.
+			<li>Display and then close the <b>Manage Actions</b> dialog.
+			<li>Add, Rename and Remove Actions.
+			<li>Add, Rename and Remove Counters.
+			<li>Add, Rename and Remove Tags.
+			<li>Add, Rename and Remove Users.
+			<li>Manually set action status.
+			<li>Manually set file processing priority.
+			<li>Export a file list.
+		</ul>
+	</ul>
 </ul>
 </body>
 </html>
