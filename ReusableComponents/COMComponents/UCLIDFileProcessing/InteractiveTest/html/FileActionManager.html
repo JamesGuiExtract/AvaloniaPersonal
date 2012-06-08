@@ -767,6 +767,20 @@
 <p>
     	<li><b>[LegacyRC #6162]</b> Confirm that the FAM title bar is in the form <b> 
 	&lt;FPSFileName&gt; - &lt;DatabaseName&gt; on &lt;DBServerName&gt; - File Action Manager</b>.</li>
+<p>
+   	<LI><b>[LegacyRC #6285]</b> Processing Skipped Files
+	<ul>
+		<li>Configure a FAM to process <b>Skipped</b> files.
+		<li>Save the FPS file.
+		<li>Start processing.
+		<li>Confirm that a password prompt is displayed.
+		<li>Confirm that processing runs correctly after entering the password.
+		<li>Close and re-open the FAM.
+		<li>Start processing.
+		<li>Confirm that an <b>ELI13431: No database available</b> error is 
+		not seen.
+		<li>Close the FAM and confirm that a prompt to save changes is not seen.
+	</ul>
 </ul>
 </body>
 </html>
