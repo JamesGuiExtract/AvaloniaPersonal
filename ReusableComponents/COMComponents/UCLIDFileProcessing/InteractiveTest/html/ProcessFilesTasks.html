@@ -1335,6 +1335,16 @@
                 	<li>Attempt to OCR the image. Note that it should fail.
                 	<li>Confirm that only a reasonable number of errors are logged.
             	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6273]</b> Nuance Licensing
+		<ul>
+			<li>Test <b>RepairNuanceLicensing.bat</b> in the <b>CommonComponents</b> 
+			folder.  Note that it will need to be run as administrator.
+			<li>Confirm that the batch file will stop and then restart the <b>Nuance 
+			Licensing</b> service.
+			<li>Ensure that licenses are reloaded by confirming that OCR works as 
+			expected.
+		</ul>
         </ul>
 <p>
         <li><b>Core: Rasterize PDF</b>
@@ -1361,6 +1371,8 @@
             database after conversion</b>.</li>
             <li>Confirm that there is an unchecked checkbox to <b>Delete PDF file after
             rasterization</b>.
+            <li>Confirm that there is a <b>checked</b> checkbox to <b>Use alternate rasterization 
+		method</b>.</li>
             <ul>
                 <li>Confirm that there is an <b>If the file cannot be deleted</b> group box and
                 that it is enabled iff the <b>Delete</b> checkbox is checked.</li>
@@ -1560,6 +1572,14 @@
 				<li>Configure the task to upload the file to 
 				<b>.\asdf\$FileOf(&lt;SourceDocName&gt;)</b>.
 				<li>Confirm that each file ends up in the expected <b>asdf</b> folder.
+			</ul>
+<p>
+	  	   	<LI><b>[DotNet #792]</b> FTP Processor
+			<ul>
+				<li>Confirm that the <b>Core: Transfer files via FTP/SFTP</b> task 
+				can upload documents to the root folder.
+				<li>Confirm that the <b>Core: Transfer files via FTP/SFTP</b> task 
+				can download documents from the root folder.
 			</ul>
 		</ul></li>
         </ul></li>
