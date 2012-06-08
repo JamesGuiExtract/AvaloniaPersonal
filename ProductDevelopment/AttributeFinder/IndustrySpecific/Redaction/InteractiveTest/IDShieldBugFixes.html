@@ -19,6 +19,9 @@
     	<UL>
 	   	<LI><b>[FlexIDSCore #4901]</b> Confirm that the <b>Redaction: Create redacted image</b> 
 		does not add <b>IDAndRevision</b> attributes to existing metadata attributes.
+<p>
+  	   	<LI><b>[FlexIDSCore #4938] NOT FIXED</b> Exercise <b>Redaction: Create redacted image</b> 
+		and confirm that <b>ELI24891</b> exceptions are not logged.  Run repeated tests.
     	</UL>
 <p>
     	<LI><h2>Redaction: Extend redactions to surround context</h2>
@@ -35,6 +38,67 @@
 			<li>Press <b>CTRL+S</b> while scrolling the mouse wheel.
 			<li>Confirm that no exceptions are seen.
 		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4989]</b> Verification
+		<ul>
+			<li>Verify a multi-page image with redactions on more than one page.
+			<li>On a page other than the last pasge with redactions, select the last 
+			redaction on the page (or create one such that it is the last one on 
+			the page).
+			<li>Delete the redaction.
+			<li>Confirm that the verification UI does not navigate to a different page.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5000, #5001, #5021, #5037, #5053]</b> Verification
+		<ul>
+			<li>Prepare a large set of images for verification.
+			<li>Delete the associated USS files.
+			<li>Exercise verification using the <b>Word</b> redaction tool and 
+			rapidly change documents.
+			<li>Confirm that no <b>ELI31365: Error loading data for word highlight 
+			tool</b> exceptions are seen.
+			<li>Confirm that no <b>ELI31371: Application trace: Word highlight background 
+			operation aborted</b> exceptions are logged.
+<p>
+			<li>Start verifying with multiple documents queued.
+			<li>Press <b>Alt+F</b> to activate the File menu.
+			<li>Press <b>Esc</b>.
+			<li>Press <b>TAB</b> repeatedly until a new document is loaded.
+			<li>Confirm that the UI is still responsive and that CPU usage is not 
+			unusually high.
+<p>
+			<li>Confirm that no crashes are seen after submitting a document.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5003]</b> Confirm that no error appears if FAM processing is 
+		quickly stopped after closing the verification window.  Run repeated tests.
+<p>
+  	   	<LI><b>[FlexIDSCore #5007]</b> Confirm that creating a redaction with the <b>Word</b> 
+		highlight tool immediately after the page changes does not throw an exception.  Run 
+		repeated tests.
+<p>
+  	   	<LI><b>[FlexIDSCore #5025]</b> Confirm that closing the verification window a split 
+		second before pressing <b>Ctrl+S</b> does not <b>Commit</b> a file and still revert it 
+		to <b>Pending</b> status.  Run repeated tests.
+<p>
+  	   	<LI><b>[FlexIDSCore #5028, #5029]</b> Duplicate Redactions
+		<ul>
+			<li>Start verifying a set of images.
+			<li>Draw a manual redaction.
+			<li>Select <b>File - Save</b>.
+			<li>Press the <b>Next tile</b> button until the second pending document 
+			is displayed.
+			<li>Press the <b>Previous tile</b> button until the previous document 
+			is displayed.
+			<li>Confirm that the manual redaction <b>is not</b> duplicated.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5030]</b> Confirm that an exception is not displayed if the 
+		<b>fit-mode</b> buttons are pressed while a new image is loading.  Run repeated tests.
+<p>
+  	   	<LI><b>[FlexIDSCore #5043]</b> Confirm that exercising verification requiring background 
+		OCR does not provide <b>OCR Unavailable</b> status messages.  COM exceptions should also 
+		not be logged. Run repeated tests.
     	</UL>
 <p>
 
