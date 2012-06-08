@@ -67,6 +67,19 @@
 <p>
   	   	<LI><b>[FlexIDSCore #4908]</b> Confirm that the <b>RSD Data Scorer</b> 
 		executes all attribute rules in the target ruleset.
+<p>
+  	   	<LI><b>[FlexIDSCore #4993]</b> RSD-Based Data Scorer
+		<ul>
+			<li>Create an RSD file to be used by the RSD-based data scorer.
+			<li>Include an attribute that will not be included in the scoring 
+			expression.
+			<li>Exercise the data scorer.
+			<li>Confirm that an <b>ELI33844: Displayed: RSD data scorer failed</b> 
+			exception is not seen and that the scorer works as expected.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5004]</b> Confirm that the <b>RSD data scorer</b> works 
+		properly if one attribute name is a subset of another attribute name.
 	</ul>
 	</li>
 </ol>
