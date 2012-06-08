@@ -259,10 +259,6 @@
             <LI>Confirm that all three check boxes are unchecked by default.</li>
             <li>Confirm that the <b>Enable PDF security</b> check box has an associated 
             <b>Settings...</b> button.</li>
-            <LI><b>[FlexIDSCore #4153]</b> 
-            <!-- fixed v 8.0.0.45 -->
-            Confirm that a meaningful exception is displayed if <b>PDF Security</b> is enabled but 
-            the property page is not configured.</li>
 <p>
             <li>Confirm that clicking the <b>Settings...</b> button displays a <b>Configure Pdf 
             Security Settings</b> dialog.</li>
@@ -415,35 +411,18 @@
         <p>
             <li>Set some exemption codes for the redactions.</li>
             <li>Confirm that the output images include the appropriate exemption codes.</li>
-            <li><b>[FlexIDSCore #3431]</b> Confirm that an output file can be created with a 
-            redaction containing all FOIA exemption codes.</li>
-            <li>Confirm that PDF security settings are ignored if TIF images are output.</li>
-            <li><b>[FlexIDSCore #3751]</b> 
-            <!-- fixed v 7.1.1.64 -->
-            Confirm that creating a redacted image adds the following metadata information to the 
-            .voa file
-            <ul>
-                <li>The user and machine that performed the redaction.</li>
-                <li>The start time and total time taken creating the redacted image.</li>
-                <li>The input and output files.</li>
-                <li>The redacted attributes.</li>
-                <li>The output options.</li>
-                <li>Confirm that each attribute in the VOA file is assigned an ID, regardless of
-                whether or not that particular attribute is redacted.</li>
-            </ul></li>
 <p>
-            <LI><b>[FlexIDSCore #3756]</b> Create redacted image task
-            <!-- fixed v 7.1.1.64 -->
-            <ul>
-                <li>Redact an image by redacting <b>All</b> data categories.</li>
-                <li>Review the <b>ID Shield detailed report for speciic document</b> report and 
-                confirm that appropriate attributes were redacted.</li>
-            </ul></li>
-<p>
-		<li><b>[FIDSC #4916]</b> Confirm processing the PDF at 
+		<LI><b>[FlexIDSCore #4916]</b> Confirm processing the PDF at 
 		<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4916</b> with a <b>Redaction: Create 
 		redacted image</b> task does not result in missing redactions or noticably lower 
 		image quality in the output.</li>
+<p>
+  	   	<LI><b>[FlexIDSCore #5054]</b> Confirm that <b>Apply redactions as annotations</b> 
+		works with PDF documents.  The redactions should be burned in to the image and an 
+		<b>ELI23594</b> exception should be logged.
+<p>
+  	   	<LI><b>[FlexIDSCore #5055]</b> Confirm that the <b>Redaction: Create redacted 
+		image</b> task works with JPG documents.
         </ul></li>
 <p>
         <li><b>Annotation Support</b>
