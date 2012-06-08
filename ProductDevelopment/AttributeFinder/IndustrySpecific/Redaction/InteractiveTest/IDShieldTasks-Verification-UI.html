@@ -273,6 +273,14 @@
 				(except for F5) <b>do</b> stop the slideshow.</li>
                         	<li>Confirm that the slideshow options are not displayed 
 				if the slideshow is disabled in the task configuration.</li>
+<p>
+  	   			<LI><b>[FlexIDSCore #3906, #5036, #5037]</b> Confirm that if 
+				<b>ELI32180</b> or <b>ELI32594</b> errors are seen during 
+				slideshow processing, the exceptions are only logged and not 
+				displayed.  Run repeated tests.
+  	   			<LI><b>[FlexIDSCore #5058]</b> Confirm that the verification 
+				user cannot start a slideshow session while creating or 
+				modifying a redaction.
                     	</ul></li>
                     	<li>Confirm that <b>Options...</b> brings up the Options dialog.</li>
                     	<li>Confirm that verification options are honored even for the 
@@ -387,6 +395,9 @@
 			help file.</li>
                     	<li>Confirm that <b>About ID Shield</b> brings up the about 
 			box with the appropriate copyright and version information.</li>
+  	   		<LI><b>[FlexIDSCore #5013]</b> Confirm that the version number 
+			provided in the verification window's <b>About</b> box matches 
+			the actual ID Shield version number.
            	</ul></li>
     	</ul></li>
 <p>
@@ -409,8 +420,9 @@
 			verification history.</li>
                     	<li>Confirm that the <b>Previous document</b> button navigates 
 			to previously saved and committed documents.</li>
-                    	<li>Confirm that the <b>Next document</b> button is enabled 
-			even when viewing the current document.</li>
+  	   		<LI><b>[FlexIDSCore #5063]</b> Confirm that the <b>Next document</b> 
+			button (and associated shortcut key) is always disabled when on the 
+			current document.  Run repeated tests.
                     	<li>Confirm that the <b>Next document</b> button navigates 
 			forward through the history queue.</li>
                     	<li>Confirm that the <b>Next document</b> button prompts you 
@@ -638,6 +650,9 @@
             	<li>Confirm that the <b>current</b> page has a <b>blue</b> background.</li>
             	<li>Confirm that a vertical scrollbar is presented for a document with 
 		many pages and that it autoscrolls as the user tabs through the pages.</li>
+  	   	<LI><b>[FlexIDSCore #5065]</b> Confirm that shortcut keys such as <b>Ctrl + 
+		Right Arrow</b> cannot be used to navigate in the page summary grid to a page 
+		that does not exist.
 <p>
             	<li>Confirm that the data window status bar displays the <b>Seconds 
 		verifying this document</b> and </b>Average pages/hour</b>.</li>
@@ -646,6 +661,9 @@
 <p>
   	   	<LI><b>[FlexIDSCore #4932]</b> Confirm that read-only items in the Data Grid have 
 		a gray background when unselected and a gray text color when selected.
+<p>
+  	   	<LI><b>[FlexIDSCore #5010]</b> Confirm that deleting redactions during verification 
+		does not throw an exception.  Run repeated tests.
         </ul></li>
     </ul></li>
 <p>
@@ -921,6 +939,10 @@
                     		<Li>Confirm that <b>Alt+Right</b> performs the same 
 				function.</li>
 <p>
+  	   			<LI><b>[FlexIDSCore #5011, #5026, DotNet #781]</b> Confirm 
+				that <b>zoom</b> and <b>fit-mode</b> behavior works properly 
+				with or without tile navigation.  Run repeated tests.
+<p>
                     		<li>Confirm that the <b>Fit-to-page</b> button fits 
 				the document to the viewable area of the image viewer.</li>
                     		<li>Confirm that the button remains depressed while the 
@@ -972,6 +994,9 @@
                     		<li>Confirm that the <b>Show/Hide thumbnails</b> 
 				button correctly toggles the appearance of the thumbnail 
 				viewer.</li>
+  	   			<LI><b>[FlexIDSCore #5015]</b> Confirm that thumbnails 
+				are available at all times if the thumbnail window is 
+				used in <b>auto-hide</b> mode.
                     		<li>Confirm that the <b>Show/Hide magnifier</b> button 
 				correctly toggles the appearance of the magnifier.</li>
                 	</ul></li>
@@ -1045,6 +1070,13 @@
                 	<li>Confirm that the magnifier does not prevent the image viewer 
 			from refreshing as appropriate (e.g., after drawing a box with 
 			the zoom tool).</li>
+<p>
+	  	   	<LI><b>[DotNetRC #784]</b> Magnifier Window
+			<ul>
+				<li>Exercise verification with the <b>Magnifier</b> window undocked.
+				<li>Confirm that the center of the magnifier window is aligned with 
+				the cursor in the Image Viewer.
+			</ul>
             	</ul></li>
 <p>
             	<li>Confirm that the image viewer <b>context menu</b> can be used to 
@@ -1066,6 +1098,10 @@
             	<li>Confirm that the <b>Ctrl+F4</b> shortcut has no effect.</li>
             	<li>Confirm that the <b>F2</b> shortcut centers the image viewer on the 
 		currently selected redaction.</li>
+		<ul>
+			<li>Confirm that <b>F2</b> will zoom to the current selection.
+			<li>Confirm that subsequent <b>F2</b> will not zoom previous.
+		</ul>
         </ul></li>
     </ul></li>
 <p>
@@ -1381,7 +1417,7 @@
 			are resized inward.</li>
         	</ul></li>
 <p>
-        	<li><b>[FlexIDSCore #4847]</b> Document Navigation
+        	<li><b>[FlexIDSCore #4847, #5048]</b> Document Navigation
         	<ul>
             		<li>Create a local copy of the PVCS_Testing folder for this SCR.</li>
             		<li>Open the FPS file and modify it to supply the two files in the
@@ -1393,6 +1429,8 @@
             		<li>Restart the FAM.</li>
             		<li>Use Ctrl+Tab and Ctrl+Shift+Tab to navigate back and forth
             		repeatedly.</li>
+  	   		<LI>Confirm that navigating via next/previous document always returns 
+			the user to the first page of the document.
             		<li>Confirm that no errors or crashes are seen.</li>
         	</ul></li>
 <p>
