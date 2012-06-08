@@ -110,6 +110,18 @@
 			<li>Confirm that no errors from the auto-save process are seen.
 		</ul>
 <p>
+  	   	<LI><b>[FlexIDSCore #4994]</b> Rule Set Editor
+		<ul>
+			<li>Open an 8.0 RSD file that contains a deprecated rule object such 
+			as Grantor-Grantee Finder V2.
+			<li>Attempt to save it using <b>File - Save As</b>.
+			<li>Confirm that an error is displayed about needing an FKB version.
+			<li>Update the FKB version and remove any deprecated objects.  Add 
+			another rule, if needed in order to save.
+			<li>Attempt to save the modified ruleset using <b>File - Save As</b>.
+			<li>Confirm that the save is successful.
+		</ul>
+<p>
 	   	<LI><b>[LegacyRC #6255]</b> COM Object Data Files
        		<ul>
 			<li>Open a <b>version 8.0</b> master ruleset.
