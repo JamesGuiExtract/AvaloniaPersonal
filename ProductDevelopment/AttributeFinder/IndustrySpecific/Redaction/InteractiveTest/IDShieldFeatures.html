@@ -221,6 +221,23 @@
         <li><u>Miscellaneous</u>
         <ul>
             	<li>Confirm that an <b>ID Shield Client</b> license is sufficient.</li>
+<p>
+  	   	<LI><b>[FlexIDSCore #5008]</b> Find and Redact
+		<ul>
+			<li>Prepare a set of images for verification.
+			<li>Verify an image and make a change.
+			<li>Close the verification window and <b>Cancel</b> at the save changes prompt.
+			<li>Confirm that the FAM continues processing.
+		</ul>
+  	   	<LI><b>[FlexIDSCore #5014]</b> Find and Redact
+		<ul>
+			<li>Prepare a set of images for verification.
+			<li>Exercise <b>Find and redact text</b>.
+			<li>Confirm that pages are not automatically marked as viewed just because 
+			matching text is found on that page.
+		</ul>
+  	   	<LI><b>[FlexIDSCore #5068]</b> Confirm that an exception is not thrown when using 
+		the <b>Find and Redact Text</b> feature when OCR is not available.  Run repeated tests.
         </ul></li>
     </ul></li>
 <p>
@@ -353,6 +370,22 @@
 		<li>Confirm that the changes are automatically applied and that the output 
 		image is overwritten.
     	</ul>
+<p>
+  	<LI><h2>Saving ID Shield Metadata</h2>
+	<ul>
+		<li>Confirm that metadata XML is updated in the following circumstances when 
+		the user is not saving actual data changes.  The update should include a new 
+		verification session node.
+		<ul>
+			<li>Any time the document is closed, including moving to another 
+			document.
+			<li>When <b>File - Save</b> is selected.
+		</ul>
+		<li>Confirm that the number of verification sessions in the metadata file match 
+		the number of records in the <b>IDShieldData</b> table.
+		<li>Confirm that the session time in the VOA file matches the time recorded in 
+		the <b>IDShieldData</b> table.
+	</ul>
 </ul>
 </body> 
 </html>
