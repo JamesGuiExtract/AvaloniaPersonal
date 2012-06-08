@@ -279,6 +279,14 @@
 			uninstalls normally.
 		</ul>
 <p>
+  	   	<LI><b>[DotNet #799]</b> Extract IPC Service
+		<ul>
+			<li>Confirm that the service can be started with only a <b>FLEX 
+			Index Server</b> license.
+			<li>Confirm that the service can be started with only an <b>ID 
+			Shield Server</b> license.
+		</ul>
+<p>
 	   	<LI><b>[FlexIDSCore #4954]</b> Confirm that the <b>Files from context menu</b> 
 		file supplier works on a 64-bit operating system.
     	</ul> 
@@ -540,9 +548,9 @@
             		<ul>
                 		<li>Event code should be Q.</li>
                 		<li>Arg1 should be the directory</li>
-                		<li>Arg2 should be the number of files found.</lI>
-            		</uL></li>
-        	</uL></li>
+                		<li>Arg2 should be the number of files found.</li>
+            		</ul></li>
+        	</ul></li>
 <p>
             	<li><b>[DotNetRC #745, LegacyRC #6071]</b> Polling frequency
             	<ul>
@@ -564,6 +572,24 @@
 			folder field.
 			<li>Confirm that an FTP file supplier configured to poll at set times 
 			logs only one polling event for each time.
+		</ul>
+<p>
+  	   	<LI><b>[DotNet #768, #770]</b> FTP File Supplying
+		<ul>
+			<li>Exercise general FTP file supplier functionality.
+			<li>Confirm proper behavior.
+<p>
+			<li>Configure the file supplier to download recursively.
+			<li>Confirm that at least one empty folder exists within the 
+			folder hierarchy to be downloaded.
+			<li>Start queuing.
+			<li>Confirm that all files are successfully queued.
+		</ul>
+<p>
+  	   	<LI><b>[DotNet #792]</b> FTP Supplier
+		<ul>
+			<li>Confirm that <b>FTP Supplier</b> can retrieve files from the 
+			root directory.
 		</ul>
 <p>
   	   	<LI><b>[LegacyRC #6102]</b> Confirm that a wait cursor is presented when testing the 
