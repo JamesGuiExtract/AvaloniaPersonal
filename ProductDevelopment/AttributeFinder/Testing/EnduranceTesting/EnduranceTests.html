@@ -197,6 +197,14 @@
 	   	<LI><b>[LegacyRC #6248]</b> Review <b>Endurance Test</b> notes and confirm that 
 		no failures are seen due to <b>Unable to open file storage object</b> exceptions.
 <p>
+  	   	<LI><b>[LegacyRC #6282]</b> DB Admin
+		<ul>
+			<li>Use a very large <b>Endurance</b> test database if one is available, 
+			otherwise use as large a database as possible.
+			<li>Confirm that modifying file action status status for a large number 
+			of files <b>does not</b> fail with an out-of-memory error.
+		</ul>
+<p>
 		<li>Connect to the <b>Endurance Test</b> or another large database.
 		<li>Confirm that <b>Summary</b> tab refreshes quickly.
 	</ul>
