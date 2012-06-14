@@ -11,10 +11,10 @@
 </h1>
 <hr>
 <ol>
-    <li><h2>Change Case</h2>
-    <ul>
-        <li>See <b>Value Modifiers - Change Case</b><br>
-    </ul>
+    	<li><h2>Change Case</h2>
+    	<ul>
+        	<li>See <b>Value Modifiers - Change Case</b><br>
+    	</ul>
 <p>
     	<li><h2>Conditionally Handle Output</h2>
     	<ul>
@@ -54,7 +54,7 @@
 <p>
     <li><h2>Merge attribute trees</h2>
     <ul>
-        <li><b>Configure</b> button displays <b>Configure Merge attribute trees</b> dialog.</li>
+        <li><b>Configure</b> button displays <b>Merge attribute trees settings</b> dialog.</li>
         <li>Confirm existence of an <b>Attributes to be merged query</b> edit box.</li>
         <li>Confirm existence of a <b>Merge into</b> group box.</li>
         <ul>
@@ -81,7 +81,7 @@
 <p>
     	<li><h2>Merge attributes</h2>
     	<ul>
-        	<li><b>Configure</b> button displays <b>Configure Merge attributes</b> dialog.</li>
+        	<li><b>Configure</b> button displays <b>Merge attributes settings</b> dialog.</li>
         	<li>Merge criteria</li>
         	<ul>
             		<li><b>Merge attributes matching this query</b> edit box is editable.</li>
@@ -103,7 +103,7 @@
             		<ul>
                 		<li>Associated list box is enabled when selected.</li>
                 		<li>Associated list box is disabled when not selected.</li>
-                		<li><b>Add...</b> button displays <b>Text</b> dialog.</li>
+                		<li><b>Edit...</b> button displays <b>Text</b> dialog.</li>
                 		<ul>
                     			<li><b>Specify the text</b> edit box is editable.</li>
                     			<li><b>OK</b> button saves changes and exits dialog.</li>
@@ -150,33 +150,6 @@
         	<li><b>Cancel</b> button ignores changes and exits the dialog.</li>
         	<li><b>X</b> button ignores changes and exits the dialog.</li>
 <p>
-        	<li><b>[FlexIDSCore #3141]</b> Merge attributes on skewed images
-        	<ul>
-            		<li>Exercise RSD file and images from 
-			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3141</b>.
-            		<li>Confirm that merging works properly for each image.
-        	</ul>
-        	<li><b>[FlexIDSCore #3328]</b> Merge attributes fails on non-spatial attributes
-        	<ul>
-            		<li>Open the RSD file attached to the SCR.
-            		<li>Exercise it on any image.
-            		<li>Confirm that no exception is thrown to require spatial information.
-        	</ul>
-        	<LI><b>[FlexIDSCore #3509]</b> Merge Attributes
-        	<ul>
-            		<li>Exercise <b>runtest.rsd</b> and the image from 
-			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3509</b>.
-            		<li>Confirm that a single <b>Test succeeded</b> attribute is found with 
-			spatial information of <b>Larry</b>.
-        	</ul>
-        	<LI><b>[FlexIDSCore #3580]</b> Merge Attributes
-        	<ul>
-            		<li>Exercise <b>test.rsd</b> and the image from 
-			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3580</b>.
-            		<li>Confirm that no <b>Internal logic error!</b> exceptions are seen.
-        	</ul>
-        	<LI><b>[FlexIDSCore #3801]</b> Confirm that the property page validates attribute 
-		names and types.
         	<li><b>[FlexIDSCore #4263]</b>
         	<!-- fixed v 8.1.0.14 -->
         	<ul>
@@ -262,8 +235,6 @@
         <li>Changes made are persistent.</li>
         <li><b>Cancel</b> button ignores changes and exits dialog.</li>
         <li><b>X</b> button ignores changes and exits dialog.
-        <li><b>[FlexIDSCore #3812]</b> Confirm that <b>Name</b> and <b>Type</b> values must be
-        valid identifiers (i.e. <b>[-A-Za-z][_A-Za-z0-9]*</b>).
     </ul>
 <p>
     <li><h2>Move and Modify Attributes</h2>
@@ -360,33 +331,6 @@
         <li>Changes made are persistent.</li>
         <li><b>Cancel</b> button ignores changes and exits dialog.</li>
         <li><b>X</b> button ignores changes and exits dialog.
-<p>
-        <LI><b>[FlexIDSCore #2655, #3557, #3559]</b> Output To XML
-        <ul>
-            <li>Create an RSD file that contains an <b>Output to XML</b> output handler. Confirm
-            that <b>Include schema name in output</b> is unchecked.
-            <li>Save the RSD file.
-            <li>Reload the same RSD file.
-            <li>Configure the output handler.
-            <li>Change nothing and click <b>OK</b>.
-            <li>Confirm that an <b>Unspecified schema name</b> error message is not displayed.
-<p>
-            <li>Confirm that <b>Remove spatial information in output</b> is available in the
-            property page.
-            <li>Confirm that the setting is persistent.
-            <li>Confirm that with the option <b>off</b>, spatial information is provided in the XML
-            file.
-            <li>Confirm that with the option <b>on</b>, spatial information is not provided in the
-            XML file.
-<p>
-            <li>Create an RSD file that contains an <b>Output to XML</b> output handler. Select
-            <b>Version 1</b> format.
-            <li>Save the RSD file.
-            <li>Reload the same RSD file.
-            <li>Configure the output handler.
-            <li>Confirm that the checkboxes associated with <b>Version 2</b> format are not 
-            enabled.
-        </ul>
     </ul>
 <p>
     <li><h2>Reformat Person Names</h2>
@@ -411,8 +355,7 @@
 <p>
     <li><h2>Remove Attributes</h2>
     <ul>
-        <li><b>Configure</b> button opens <b>Configure Spatial Content Attribute Selector</b> 
-        dialog box when selected
+        <li><b>Configure</b> button opens <b>Remove attributes settings</b> dialog box when selected.
         <ul>
             <li>Select Attributes whose spatial zones (contains | don't contain) the following is
             selectable.</li>
@@ -560,8 +503,8 @@
             </ul>
             <li><b>Cancel</b> button ignores changes and exits dialog.</li>
             <li><b>X</b> button ignores changes and exits dialog.</li>
-            <li><b>[LegacyRC #1073]</b> Confirm that lists of clues can be loaded dynamically from 
-            .dat and .dat.etf files.
+            <li><b>[FlexIDSCore #1073]</b> Confirm that lists of clues can be loaded 
+		dynamically from <b>.dat</b> and <b>.dat.etf</b> files.
         </ul>
     <p>    
         <li><b>Remove</b> button displays <b>Confirm Delete</b> dialog.
@@ -602,7 +545,7 @@
             <li>Saved output file is created correctly.</li>
         </ul>
 <p>    
-        <li><b>Strings are case sensitive</b> check box is checkable.</li>
+        <li><b>Above defined text is Case-Sensitive</b> check box is checkable.</li>
         <li><b>OK</b> button saves changes and exits dialog.</li>
         <li><b>Cancel</b> button ignores changes and exits dialog.</li>
         <li><b>X</b> button ignores changes and exits dialog.</li>
@@ -736,28 +679,9 @@
         <li><b>Configure</b> button disabled.
     </ul>
 <p>
-    <li><h2>Select With UI</h2>
-    <ul>
-        <li><b>Configure</b> button disabled.
-    </ul>
-<p>
     <li><h2>Translate Values or Types</h2>
     <ul>
         <li>See <b>Value Modifiers - Translate Values or Types</b></li>
-    </ul>
-<p>
-    <li><h2>Miscellaneous</h2>
-    <ul>
-        <li><b>[LegacyRC #4771]</b> Rectangular Bounds outside of page bounds
-        <ul>
-            <li>Save the ruleset and image attached to the SCR.
-            <li>Open the ruleset and the <b>Rule Tester</b>.
-            <li>Open the image in the <b>Spot Recognition Window</b>.
-            <li>From the <b>Spot Recognition Window</b>, <b>Send text to the Rule Tester window</b>.
-            <li><b>Execute rules</b>.
-            <li>Open <b>output.xml</b> in the same folder as the image. Confirm that the
-            <b>SpatialLineZone</b> and <b>SpatialLineBounds</b> elements are all &gt;= 0.
-        </ul>
     </ul>
 </ol>    
 </body>
