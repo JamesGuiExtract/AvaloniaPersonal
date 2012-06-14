@@ -175,7 +175,7 @@
     <ul>
         <li>Use the <b>Rotation2.rsd</b> file containing 5 attributes to exercise various included 
         region and rotation combinations.  The rules are tuned for the 
-        <b>K:\Common\Engineering\Sample Files\The_Fund\FL - Hendry\Set001\Images\Multi-Page\M\00693.01927.tif</b> image.</li>
+        <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3063\00693.01927.tif</b> image.</li>
         <li>Recognize all pages of text via <b>Process Entire Image</b>.</li>
         <li>Selecting the <b>Margin_0</b> attribute in the Rule Tester, confirm that the 
         <b>three</b> document stamp items are highlighted properly.</li>
@@ -201,45 +201,6 @@
 <p>
     <li><h2><b>Miscellaneous</b></h2>
     <ul>
-        <li><b>[FlexIDSCore #3063]</b> Throws exception when no text to operate on.
-        <ul>
-            <li>Open <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3063\spr.rsd</b></li>
-            <li>Run the ruleset on 
-            <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3063\00008879_00001.tif</b></li>
-            <li>Ensure that a <b>System error: Unable to allocate necessary resources.</b> 
-            exception is not logged.</li>
-            <li><b>[FlexIDSCore #3726]</b> Confirm that an <b>ELI04164: COM exception caught.</b> 
-            exception is not logged.</li>
-        </ul></li>
-<p>
-        <LI><b>[FlexIDSCore #3733]</b> Select page region
-        <ul>
-            <li>Create a rule set with a <b>Select page region</b> preprocessor configured to 
-            return text from all pages with restricted scope.</li>
-            <li>Exercise the rule set on a blank USS file.</li>
-            <li>Confirm that a <b>GetFirstPageNumber() requires spatial or hybrid mode</b> 
-            exception is not seen.</li>
-            <li>Modify the preprocessor to return text from all pages containing particular 
-            text.</li>
-            <li>Confirm that a <b>GetPages is not valid for a non-spatial string</b> exception is 
-            not seen.</li>
-        </ul></li>
-<p>
-        <li><b>[FlexIDSCore #3944, #4011, #4013, #4061]</b> Select Page Region
-        <ul>
-            <li>Configure a <b>Select Page Region</b> object to find an image region around a 
-            rectangle.  This can be done via <b>Exclude</b>.</li>
-            <li>Confirm that the expected region is excluded.</li>
-<p>
-            <li>Confirm that <b>Select Page Region</b> can be configured to select <b>All 
-            pages</b> without a dummy restriction.</li>
-            <li>Confirm that proper results are seen with no restriction and <b>Re-OCR</b> or 
-            <b>Image region</b>.</li>
-            <li>Confirm that an older <b>Select Page Region</b> rule with specified pages and 
-            re-OCR or image region has its settings updated to reflect actual behavior.</li>
-            <li>Confirm that the proper page numbers are provided with the found attributes when 
-            excluding specified pages.</li>
-        </ul></li>
     </ul></li>
 </ul>
 </body>
