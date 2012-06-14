@@ -30,24 +30,24 @@
    	<li>Confirm that the <b>Loop options</b> group box contains a check box for <b>Log exception if 
 	above maximum number of iterations is reached</b>.
 <p>
-      	<li>Click the <b>Commands &gt;</b> button for <b>Execute pre processor</b>
+      	<li>Click the <b>Commands &gt;</b> button for <b>Execute Preprocessor</b>
       	<ul>
           	<li>Confirm that a drop-down menu appears with
 	      	<ul>
-			<li><b>Select Document Preprocessor...</b>
-			<li><b>Configure Document Preprocessor...</b>
+			<li><b>Select Preprocessor...</b>
+			<li><b>Configure Preprocessor...</b>
 			<li><b>Configure description...</b>
 			<li><b>Cancel</b>
 	      	</ul>
 <p>
-          	<li>Choose <b>Select Document Preprocessor...</b>
-          	<li>Confirm that the <b>Select Document Preprocessor</b> dialog appears.
+          	<li>Choose <b>Select Preprocessor...</b>
+          	<li>Confirm that the <b>Select Preprocessor</b> dialog appears.
           	<li>Select and configure a <b>Document Preprocessor</b>.
 		<li>Confirm that both the description text and the component name of the preprocessor are 
 		displayed in the read-only edit box.
           	<li>Confirm that the object and settings are persistent after saving an RSD file.
 <p>
-          	<li>Choose <b>Configure Document Preprocessor...</b>.  This option should be disabled 
+          	<li>Choose <b>Configure Preprocessor...</b>.  This option should be disabled 
 		if no document preprocessor has been selected.
           	<li>Confirm that the appropriate property page appears.
           	<li>Confirm that the previously defined settings are presented.
@@ -185,24 +185,24 @@
 	      	</ul>
       	</ul></li>
 <p>
-      	<li>Click the <b>Commands &gt;</b> button for <b>Execute pre processor</b>
+      	<li>Click the <b>Commands &gt;</b> button for <b>Execute preprocessor</b>
       	<ul>
           	<li>Confirm that a drop-down menu appears with
 	      	<ul>
-			<li><b>Select Document Preprocessor...</b>
-			<li><b>Configure Document Preprocessor...</b>
+			<li><b>Select Preprocessor...</b>
+			<li><b>Configure Preprocessor...</b>
 			<li><b>Configure description...</b>
 			<li><b>Cancel</b>
 	      	</ul>
 <p>
-          	<li>Choose <b>Select Document Preprocessor...</b>
-          	<li>Confirm that the <b>Select Document Preprocessor</b> dialog appears.
+          	<li>Choose <b>Select Preprocessor...</b>
+          	<li>Confirm that the <b>Select Preprocessor</b> dialog appears.
           	<li>Select and configure a <b>Document Preprocessor</b>.
 		<li>Confirm that both the description text and the component name of the preprocessor are 
 		displayed in the read-only edit box.
           	<li>Confirm that the object and settings are persistent after saving an RSD file.
 <p>
-          	<li>Choose <b>Configure Document Preprocessor...</b>.  This option should be disabled 
+          	<li>Choose <b>Configure Preprocessor...</b>.  This option should be disabled 
 		if no document preprocessor has been selected.
           	<li>Confirm that the appropriate property page appears.
           	<li>Confirm that the previously defined settings are presented.
@@ -257,20 +257,20 @@
       	<ul>
           	<li>Confirm that a drop-down menu appears with
 	      	<ul>
-			<li><b>Select Document Preprocessor...</b>
-			<li><b>Configure Document Preprocessor...</b>
+			<li><b>Select Preprocessor...</b>
+			<li><b>Configure Preprocessor...</b>
 			<li><b>Configure description...</b>
 			<li><b>Cancel</b>
 	      	</ul>
 <p>
-          	<li>Choose <b>Select Document Preprocessor...</b>
-          	<li>Confirm that the <b>Select Document Preprocessor</b> dialog appears.
+          	<li>Choose <b>Select Preprocessor...</b>
+          	<li>Confirm that the <b>Select Preprocessor</b> dialog appears.
           	<li>Select and configure a <b>Document Preprocessor</b>.
 		<li>Confirm that both the description text and the component name of the preprocessor are 
 		displayed in the read-only edit box.
           	<li>Confirm that the object and settings are persistent after saving an RSD file.
 <p>
-          	<li>Choose <b>Configure Document Preprocessor...</b>.  This option should be disabled 
+          	<li>Choose <b>Configure Preprocessor...</b>.  This option should be disabled 
 		if no document preprocessor has been selected.
           	<li>Confirm that the appropriate property page appears.
           	<li>Confirm that the previously defined settings are presented.
@@ -307,35 +307,6 @@
 <p>
 <h3><b>Miscellaneous</b></h3>
 <ul>
-	<li><b>[FlexIDSCore #3196]</b> Loop Preprocessor exceptions</li>
-	<ul>
-		<li>Exercise the <b>Loop Preprocessor</b> such that an exception is thrown 
-		by one of the components. One possibility is to include an invalid regular 
-		expression.</li>
-      		<li>Confirm that descriptive exception information is provided.</li>
-      		<li>Create an RSD file test.rsd with a <b>Loop Preprocessor</b> configured such 
-		that it will reach the maximum number of iterations before its condition is 
-		fulfilled.  Make sure that the option to throw an exception if it reaches the 
-		maximum number of iterations is checked.</li>
-      		<li>Configure another RSD file to find from test.rsd and test it on an image.</li>
-      		<li>Confirm that an exception is thrown and that it contains information about 
-		the RSD file containing the loop and the input file that was being processed when 
-		the exception was thrown.</li>
-      	</ul>
-<p>
-	<li><b>[FlexIDSCore #3191]</b> Loop Preprocessor UI should open config on doubleclick</li>
-	<ul>
-		<li>Open a new RuleSet Editor window.</li>
-		<li>Create a Loop Preprocessor.</li>
-		<li>Configure it with a preprocessor and condition.</li>
-		<li>Confirm that double-clicking on the read-only text boxes (<b>Execute Preprocessor</b>,
-		or <b>while this condition is</b>) opens the corresponding <b>Configure</b> dialog.</li>
-		<li>Confirm that double-clicking on them while holding the <b>&lt;Ctrl&gt;</b> key 
-		opens the corresponding <b>Select</b> dialog.</li>
-		<li>Confirm that double-clicking on them while holding the <b>&lt;Alt&gt;</b> key 
-		opens the corresponding <b>Configure Description</b> dialog.</li>
-	</ul>
-<p>
     <LI><b>[FlexIDSCore #4227, #4257]</b> Double-clicking read-only text boxes
     <!-- fixed v 8.1.0.5 -->
     <ul>
