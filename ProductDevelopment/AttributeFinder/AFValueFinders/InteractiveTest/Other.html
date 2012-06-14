@@ -11,23 +11,9 @@
 </h1>
 <hr>
 <ol>
-	<li><h2><b>Address Finder</b></h2>
-    	<ul>
-    		<li>Confirm that the <b>Configure</b> button is inactive.</li>
-    		<li>Confirm that an RSD file using <b>Address finder</b> will not run.</li>
-    	</ul>
-  	</li>
-<p>
 	<li><h2><b>Check Finder</b></h2>
     	<ul>
     		<li>Confirm that the <b>Configure</b> button is inactive.</li>
-<p>
-  	   	<LI><b>[FlexIDSCore #3523]</b> Select Page Region page limits
-	       	<ul>
-	      		<li>Exercise the image and RSD file in 
-			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3523</b>.
-	      		<li>Confirm that the <b>Check Finder</b> rules run only on page 3.
-	       	</ul>
     	</ul>
   	</li>
 <p>
@@ -43,8 +29,6 @@
 		 	<li>If left blank, does not throw an exception.</li>
 	  	</ul>
 	  	<li>Settings are persistent.</li>
-      		<li><b>[FlexIDSCore #3810]</b> Confirm that <b>Name</b> and <b>Type</b> values must 
-		be valid identifiers (i.e. <b>[-A-Za-z][_A-Za-z0-9]*</b>).
     	</ul>
   	</li>
 <p>
@@ -87,18 +71,6 @@
       		</li>
       		<li><b>Extract each line (excluding line breaks) as a unique value for the 
 		current attribute</b> radio button is working.</li>
-		<li><b>[FlexIDSCore #3181]</b> Confirm that <b>Extract lines</b> returns nothing 
-		if extracting a nonexistent line.</li>
-		<ul>
-			<li>Open a new Rule Set Editor window.</li>
-			<li>Create an attribute (any name) and a <b>Conditionally Find Value</b> 
-			rule.  Use <b>Extract lines</b> as the finding rule condition; configure 
-			it to extract line 15. As the rule to be run, select a [\s\S]* regular 
-			expression rule.</li>
-			<li>Open the <b>Rule Tester</b> and select <b>Text from manual 
-			input</b>. Enter 10 lines of input.</li>
-			<li>Run the test; confirm that no value is returned.</li>
-		</ul>
     	</ul>
   	</li>
 <p>
@@ -130,8 +102,6 @@
       		</li>
       		<li><b>Cancel</b> button ignores changes and exits the dialog.</li>
       		<li><b>X</b> button ignores changes and exits the dialog.</li>
-      		<li><b>[FlexIDSCore #3813]</b> Confirm that <b>Attribute name</b> must be a valid 
-		identifier (i.e. <b>[-A-Za-z][_A-Za-z0-9]*</b>).
 <p>
         	<li><b>[FlexIDSCore #4645]</b> Confirm that the <B>Find from RSD</b>
         	value finder requires that the full path of the called RSD file be
@@ -183,22 +153,6 @@
     	</ul>
   	</li>
 <p>
-  	<li><h2><b>Grantor-Grantee Finder Version 2</b></h2>
-    	<ul>
-      		<li><b>Configure</b> button displays <b>Configure Grantor-Grantee Finder 
-		Ver 2</b> dialog.</li>
-    		<li>Confirm that an RSD file using <b>Grantor-Grantee finder ver. 2</b> will 
-		not run.</li>
-    	</ul>
-  	</li>
-<p>
-  	<li><h2><b>Legal Description Finder</b></h2>
-    	<ul>
-      		<li><b>Configure</b> button is inactive.</li>
-    		<li>Confirm that an RSD file using <b>Legal Description Finder</b> will not run.</li>
-    	</ul>
-  	</li>
-<p>
   	<li><h2><b>Locate Image Region</b></h2>
     	<ul>
       		<li>See <b>Document Preprocessor - Locate Image Region</b>.</li>
@@ -218,71 +172,17 @@
   		</ul>
 	  	<li>Confirm that settings are persistent.</li>
 <p>
-  		<li><b>[FlexIDSCore #3288]</b> Second routing number found by MICR finder
-  		<ul>
-  			<li>Exercise the <b>MICR Finder</b>.
-  			<li>Confirm that the second routing number sub-attribute is generally found.
-  			<li>Confirm that the sub-attribute name is <b>OtherRouting</b>.
-  			<li>Exercise the images noted in the SCR.
-  			<li>Confirm that information is found appropriately.
-  		</ul>
-  		<li><b>[FlexIDSCore #3287]</b> MICR Finder "Image is not initialized"
-  		<ul>
-  			<li>Configure a MICR finder rule and exercise it on images including:
-  			<ul>
-  				<li>the image attached to the SCR
-  				<li>K:\Common\Engineering\Sample Files\St Johns\Set002\Images\HApp_18283_2_224727.tif
-  				<li>K:\Common\Engineering\Sample Files\St Johns\Set002\Images\HApp_18283_1_258217.tif
-  				<li>K:\Common\Engineering\Sample Files\St Johns\Set002\Images\HApp_18264_1_227248.tif
-  				<li>K:\Common\Engineering\Sample Files\St Johns\Set002\Images\HApp_18225_3_259883.tif
-  			</ul>
-  			<li>Confirm that no exceptions are thrown.
-  		</ul>
-  		<li><b>[FlexIDSCore #3289]</b> MICR Finder - bad parameter exception
-  		<ul>
-  			<li>Create an RSD file and an FPS file configured to run a MICR 
-			finder rule.
-  			<li>Exercise it against the images in St Johns\Set002. Plan on 
-			this taking more than one day.
-  			<li>Confirm that no unusual exceptions are thrown.
-  		</ul>
-  		<li><b>[FlexIDSCore #3326]</b> Finding vertical check
-  		<ul>
-  			<li>Exercise the <b>MICR Finder</b> against the image in 
-			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3326</b>.
-  			<li>Confirm that the vertical check and MICR text are found.
-  		</ul>
   		<li><b>[FlexIDSCore #3490]</b> MICR Finder - registry control for speed / accuracy
   		<ul>
   			<li>Create an RSD file and an FPS file configured to run a MICR finder rule.
   			<li>Create or confirm existence of a registry key at <b>HKCU\Software\Extract
-			Systems\AttributeFinder\AFValueFinders\MicrFinder</b> with <b>Flags = &quot;23&quot;</b>.
+			Systems\AttributeFinder\AFValueFinders\MicrFinder</b> with <b>Flags = &quot;16&quot;</b>.
   			<li>Exercise it against a subset of images in St Johns\Set002.  Note the 
 			processing time and the capture rate.
-  			<li>Exercise it against the same subset of images but with <b>Flags = &quot;20&quot;</b>.  
-			Confirm that the processing time is significantly less.
+  			<li>Exercise it against the same subset of images but with <b>Flags = &quot;23&quot;</b>.  
+			Confirm that the processing time is increased.
   			<li>Confirm that the overall capture rate is nearly the same.
   		</ul>
-  	   	<LI><b>[FlexIDSCore #3502]</b> MICR Finder and bad images
-	       	<ul>
-	      		<li>Exercise the delivered <b>St Johns</b> rules against the images in 
-			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3502</b>.
-	      		<li>Confirm that <b>Internal error: Function/Method requirements not met</b> 
-			exceptions are not seen.
-	       	</ul>
-  	   	<LI><b>[FlexIDSCore #3522]</b> Select Page Region page limits
-	       	<ul>
-	      		<li>Exercise the image and RSD file in 
-			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3522</b>.
-	      		<li>Confirm that the <b>MICR Finder</b> rules run only on page 3.
-	       	</ul>
-  		<li><b>[FlexIDSCore #3620]</b> Obeying preprocessor limits
-  		<ul>
-  			<li>Exercise the RSD file and image in 
-			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3620</b>.
-  			<li>Confirm that nothing is found since a check is not on page 1.
-  		</ul>
-<p>
 	   	<LI><b>[FlexIDSCore #4955]</b> MICR Finder
 		<ul>
 			<li>Exercise <b>St Johns</b> rules on a small set of relevant images.  
@@ -322,7 +222,7 @@
 			specified file using <b>Notepad</b>.
 			<li>Confirm that balloon help is provided to indicate file 
 			syntax and various limitations on behavior.
-			<li>Confirm that a checkbox is provided (checked by default) 
+			<li>Confirm that a checkbox is provided (unchecked by default) 
 			that allows return of no attributes and no error if the 
 			tag to be expanded does not exist.
 			<li>Confirm that the <b>Match Options</b> group box contains 
@@ -409,8 +309,7 @@
         	</ul>
       		</li>
       		<li><b>Case sensitive</b> check box is checkable.</li>
-		<li><b>[FlexIDSCore #3091] Create sub-attributes for named group matches</b> check 
-		box is checkable.</li>
+		<li><b>Create sub-attributes for named group matches</b> check box is checkable.</li>
       		<li><b>OK</b> button saves changes and exits the dialog.
         	<ul>
 		  	<li><b>OK</b> button displays <b>Please provide non-empty regular 
@@ -424,24 +323,6 @@
       		</li>
       		<li><b>Cancel</b> button ignores changes and exits the dialog.</li>
       		<li><b>X</b> button ignores changes and exits the dialog.</li>
-<p>
-  	   	<LI><b>[FlexIDSCore #3754]</b> Configuration error
-	       	<ul>
-			<li>Insert a new <b>Regular expression</b> rule in the <b>Ruleset 
-			Editor</b>.
-			<li>Type something in the regular expression text box in the 
-			Configuration dialog and press <b>OK</b>.
-			<li>Press <b>Configure...</b> again.
-			<li>Select the <b>Read regular expression from file</b> radio button 
-			and type something that is not a file path into the edit box.
-			<li>Press <b>OK</b>.
-			<li>Press <b>OK</b> in the error dialog and then press <b>Cancel</b> 
-			in the Configuration dialog.
-			<li>Press <b>Configure...</b> again.
-			<li>Confirm that the original regular expression text has been retained 
-			and that the <b>Read regular expression from file</b> radio button is 
-			no longer selected.
-	       	</ul>
 <p>
   	   	<LI><b>[FlexIDSCore #4072, #4774]</b> First Match Only
         	<ul>
@@ -478,21 +359,8 @@
     	</ul>
   	</li>
 <p>
-  	<li><h2><b>Return Address Finder</b></h2>
-    	<ul>
-      		<li><b>Configure</b> button displays <b>Configure Return Address Finder</b> dialog.</li>
-    		<li>Confirm that an RSD file using <b>Return address finder</b> will not run.</li>
-    	</ul>
-  	</li>
-<p>
   	<li><h2><b>Select Page Region</b></h2>
     	<ul>
-      		<li><b>[FlexIDSCore #4013]</b> Exercise the RSD file and image from 
-		<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4013</b>.
-		<ul>
-			<li>Confirm that the finding rules work properly.
-		</ul>
-<p>
   	   	<LI><b>[FlexIDSCore #4014]</b> Exercise the RSD file and image found at 
 		<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4014</b>.
         	<ul>

@@ -16,8 +16,7 @@
 <hr>
 <h2>Box Finder Rule</h2>
 <ul>
-	<li>Confirm that <b>Configure...</b> button displays the <b>Configure Box
-    Finder</b> dialog.
+	<li>Confirm that <b>Configure...</b> button displays the <b>Box finder settings</b> dialog.
 	<li><b>Clues</b> group box
     <ul>
         <li>Confirm that a list box for <b>Clues to find box</b> is provided.
@@ -33,10 +32,9 @@
         </ul>
         <li>Graphical <b>UP</b> arrow button moves the selected item up in the list box.
         <li>Graphical <b>DOWN</b> arrow button moves the selected item down in the list box.
-		<li>Graphical <b>UP</b> and <b>DOWN</b> arrow buttons become inactive when reaching top 
+	<li>Graphical <b>UP</b> and <b>DOWN</b> arrow buttons become inactive when reaching top 
         or bottom of the list.</li>
-        <li><b>[FlexIDSCore #2875]</b> Confirm that double-clicking on a list box entry displays a
-        pre-populated <b>Text</b> dialog.
+        <li>Confirm that double-clicking on a list box entry displays the <b>Modify</b> dialog.
 <p>
         <li>Confirm that the <b>Case sensitive</b> checkbox is always enabled.
         <li>Confirm that the <b>Case sensitive</b> checkbox is unchecked by default.
@@ -52,15 +50,7 @@
         the associated cell.
         <li>Confirm that group box settings are persistent.
 <p>
-        <li><b>[FlexIDSCore #2876]</b> Refresh and z-order.
-        <ul>
-            <li>Add a clue to the list and make sure that it is selected.
-            <li>Use <b>Alt+Tab</b> to activate a different application.
-            <li>Use <b>Alt+Tab</b> to reactivate the RuleSet Editor.
-            <li>Confirm that the balloon help icon <b>does not</b> obscure the selected clue.
-        </ul>
-<p>
-        <li><b>[FlexIDSCore #2878]</b> Support for clues from file via <b>file://</b>.
+        <li>Support for clues from file via <b>file://</b>.
         <ul>
             <li>Clear the <b>Clues to find box:</b> list box and specify a file name beginning
             with <b>file://</b> inside the <b>Text</b> dialog and click the <b>OK</b> button.
@@ -77,6 +67,14 @@
             dialog. Modify the text in the edit box to a file name (including the file:// header) 
             and click the <b>OK</b> button.
             <li>Confirm that the entry is added to the list.
+        </ul>
+<p>
+        <li><b>[FlexIDSCore #2876] NOT FIXED</b> Refresh and z-order.
+        <ul>
+            <li>Add a clue to the list and make sure that it is selected.
+            <li>Use <b>Alt+Tab</b> to activate a different application.
+            <li>Use <b>Alt+Tab</b> to reactivate the RuleSet Editor.
+            <li>Confirm that the balloon help icon <b>does not</b> obscure the selected clue.
         </ul>
     </ul>
 <p>
@@ -121,14 +119,6 @@
         	maximum height.
         	<li>Confirm that group box settings are persistent.
 <p>
-        	<li><b>[FlexIDSCore #2874]</b> Maximum page width.
-        	<ul>
-            		<li>Exercise the <b>RSD</b> file and the image associated with the SCR.
-            		<li>Confirm that no box is found.
-            		<li>Modify the maximum width to <b>12</b> percent and confirm that one box 
-			<b>is</b> found.
-        	</ul>
-<p>
   	   	<LI><b>[FlexIDSCore #4589]</b> More Precise Box Finder Box Sizes
         	<ul>
             		<li>Confirm that decimal percentages are supported in 
@@ -167,28 +157,11 @@
 </ul>
 <h2>Miscellaneous</h2>
 <ul>
-    <li><b>[FlexIDSCore #2795, #3069]</b> 
-    <ul>
-        <li>Run the RSD file in the PVCS_testing folder for #3069 on the image in the same folder
-        and confirm that no errors are seen.</li>
-    </ul></li>
-<p>
-	<li><b>[FlexIDSCore #2882]</b> Box not found correctly.
-    <ul>
-        <li>Copy the image and RSD file located in 
-    <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\2882</b>.
-        <li>Modify the RSD file so that the Box Finder clue list contains a 
-    single <b>social</b> clue.
-        <li>Confirm that the redaction is found correctly.
-    </ul>
-<p>
-   	<LI><b>[FlexIDSCore #3865]</b> Box Finder
-    <ul>
-    <LI>Exercise the RSD file and image from 
-    <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3865</b>.
-    <li>Confirm that all <b>6</b> of the address boxes on the first page 
-    are found.
-    </ul>
+    	<li><b>[FlexIDSCore #2795, #3069]</b> 
+    	<ul>
+        	<li>Run the RSD file in the PVCS_testing folder for #3069 on the image in the same 
+		folder and confirm that no errors are seen.</li>
+    	</ul></li>
 </ul>
 </body>
 </html>
