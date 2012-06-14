@@ -11,16 +11,10 @@
 <hr>
 
 <ol>
-        <li><h2>Split an Address</h2>
-          <ul>
-            <li><b>Configure</b> button displays <b>Configure Split an Address</b> dialog.</li>
-            <li>Confirm that an RSD file using <b>Address splitter</b> will not run.</li>
-          </ul>
-<p>
   	<li><h2>Split Attributes Using RSD File</h2>
    	<ul>
-            	<li><b>Configure</b> button displays <b>Configure Split Attributes using 
-        	RSD file</b> dialog.</li>
+            	<li><b>Configure</b> button displays <b>Split Attributes using RSD file 
+		settings</b> dialog.</li>
             	<li><b>Provide the RSD File...</b> edit box is editable.</li>
             	<li><b>...</b> button displays standard windows file <b>Open</b> dialog.
               	<ul>
@@ -55,14 +49,6 @@
 			<li>Remove the dDocument Classifier from the RSD splitter.
 			<li>Confirm that the same results are seen.
         	</ul>
-<p>
-             	<LI><b>[FlexIDSCore #3875]</b> Internal logic error
-               	<ul>
-                  	<li>Exercise the image and RSD file in 
-            		<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3875</b>.
-                  	<li>Confirm that an <b>ELI09534: Internal logic error</b> exception is 
-            		not seen.
-               	</ul>
      	</ul>
 <p>
         <li><h2>Split Attributes Using Tokens</h2>
@@ -135,21 +121,12 @@
               </li>
               <li><b>Cancel</b> button ignores changes and exits the dialog.</li>
               <li><b>X</b> button ignores changes and exits the dialog.</li>
-<p>
-              <li><b>[FlexIDSCore #2699]</b> Splitter Retains Spatial Information
-              <ul>
-                  <li>Open <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\2699\splitusingtoken.rsd</b>.
-                  <li>Exercise the RSD file using the image file or USS file also attached 
-            to the SCR.
-                  <li>Review the Rule Tester output and confirm that each sub-attribute is 
-            spatial with the appropriate text highlighted in the image window.
-              </ul>
         </ul>
 <p>
         <li><h2>Split Date and/or Time</h2>
           <ul>
-            <li><b>Configure</b> button displays <b>Configure Split Date and/or 
-        Time</b> dialog.</li>
+            <li><b>Configure</b> button displays <b>Split Date and/or Time settings</b> 
+		dialog.</li>
             <li><b>Number (i.e. 8)</b> radio button is selectable.</li>
             <li><b>Name (i.e. August)</b> radio button is selectable.</li>
             <li><b>Four Digits (i.e. 2004)</b> radio button is selectable.</li>
@@ -189,23 +166,6 @@
               <li><b>OK</b> button saves changes and exits the dialog.</li>
               <li><b>Cancel</b> button ignores changes and exits dialog.</li>
               <li><b>X</b> button ignores changes and exits dialog.</li>
-<p>
-              <li><b>[FlexIDSCore #2507]</b> Date Splitter kills Spatial Information
-        <ul>
-            <li>Use the scanner to create <b>DateSplitterTest.tif</b> from 
-            <b>DateSplitterTest.rtf</b>.
-            <li>Use the Rule Tester to exercise <b>DateSplitterTest.tif</b> using 
-            <b>Spatial1.rsd</b>.
-                  <li><b>[FlexIDSCore #2826]</b> Add an XML Output Handler to the RSD file.  No 
-            error should be seen while performing the following tests.
-            <li>Exercise various Date Splitter settings in the RSD file for 
-            month name and number, day of week, and formatted output.
-            <li>Confirm that each test item retains spatial information for 
-            each sub-attribute.
-            <li>Confirm that the spatial information for each sub-attribute is 
-            either the whole spatial region from the input ( a hybrid string ), 
-            or is the correct spatial sub-string. 
-        </ul>
           </ul>
 <p>
         <li><h2>Split the Name of a Company or Person</h2>
@@ -220,8 +180,9 @@
 <p>
       <li><h2>Split region into content areas</h2>
         <ul>
-              <li><b>Configure</b> button displays <b>Configure Split region into content areas</b> dialog.</li>
-              <li>Filter results</li>
+              <li><b>Configure</b> button displays <b>Split region into content areas settings</b> 
+		dialog.</li>
+              <li><u>Filter results</u></li>
         <ul>
             <li><b>Minimum width of areas to be returned</b> edit box is editable.</li>
             <ul>
@@ -253,7 +214,7 @@
                 <li>Default value is <b>60</b>.</li>
             </ul>
         </ul>
-              <li>Result properties</li>
+              <li><u>Result properties</u></li>
         <ul>
             <li><b>Exclude pixel content of lines from content areas</b> check box is enabled.</li>
             <li><b>If the text in the final area is not OCR'd well, attempt to re-OCR the are 
@@ -274,86 +235,6 @@
               <li><b>Cancel</b> button ignores changes and exits the dialog.</li>
               <li><b>X</b> button ignores changes and exits the dialog.</li>
 <p>
-             <LI><b>[FlexIDSCore #3144, #3439, #3441, #3467, #3611]</b> Split Region
-        Into Content Areas
-               <ul>
-            <li>Open the ruleset at 
-            <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3144\splitregion.rsd</b>.</li>
-                  <li>Exercise the rules against 
-            <b>I:\Common\Testing\Rotated_Images\Image152_VP6.tif</b>.
-            <li>Ensure that highlights are over text and rotated correctly. 									<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3144\screenshot.bmp</b>
-            is an example of incorrect behavior.</li>
-                  <li>Exercise the <b>test.rsd</b> rules against the test image 
-            (both) found in <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3439</b>.
-            <li>Confirm that a content region is found even when the 
-            <b>Exclude pixel content of lines from content areas</b> 
-            setting is true.
-            <li>Confirm that a property page setting is available for 
-            <b>Minimum width of areas to be returned</b>.
-            <li>Confirm that the default setting is <b>3</b> in units 
-            of average character width.
-            <li>Confirm that all of the <b>Split region into content area</b> 
-            automated tests pass.
-               </ul>
-<p>
-             <LI><b>[FlexIDSCore #3171, #3527]</b> Split Region Into Content Areas
-               <ul>
-                  <li>Configure the object.
-                  <li>Confirm that the edit boxes associated with the <b>Filter results</b> 
-            check boxes are enabled and disabled in tandem with the checked states.
-<p>
-                  <li>Exercise the image and RSD file in 
-            <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3527</b>.
-                  <li>Confirm that the Drivers License highlights appear in the proper position.
-               </ul>
-<p>
-             <LI><b>[FlexIDSCore #3436]</b> Split Into Content Areas
-               <ul>
-                  <li>Exercise <b>test.rsd</b> and the sample image from 
-            <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3436</b>.
-                  <li>Confirm that both the found attributes and the found sub-attributes 
-            properly highlight the entirety of the sensitive data.
-               </ul>
-<p>
-             <LI><b>[FlexIDSCore #3553, #3560]</b> Split region into content areas
-               <ul>
-                  <li>Exercise the COC image and RSD file 
-            from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3553</b>.
-                  <li>Confirm that content areas are returned.
-<p>
-                  <li>Exercise the LEA image and RSD file 
-            from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3553</b>.
-                  <li>Confirm that content areas are returned.
-               </ul>
-<p>
-             <LI><b>[FlexIDSCore #3819]</b> Confirm that <b>Split Region Into Content Areas</b> uses 
-        the same method to compute average character confidence as the <b>USS File Viewer</b>.
-<p>
-             <LI><b>[FlexIDSCore #3828]</b> As value modifier to Locate Image Region
-               <ul>
-                  <li>Exercise <b>lir_splitregion.rsd</b> and the sample image from 
-            <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3828</b>.
-                  <li>Confirm that an <b>ELI22068: Unexpected exception caught!</b> 
-            exception is not thrown.
-               </ul>
-<p>
-             <LI><b>[FlexIDSCore #3829]</b> Used with Locate Image Region
-               <ul>
-                  <li>Exercise the RSD file and image from 
-            <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3829</b>.
-                  <li>Confirm that an <b>ELI16742: Invalid bounds for Long Rectangle after 
-            rotation</b> exception is not thrown.
-               </ul>
-<p>
-        <li><b>[FlexIDSCore #4049]</b> Split region into content areas
-        <ul>
-            <li>Exercise the RSD file from 
-            <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4049</b> with an image 
-            that has no USS file.
-            <li>Confirm that a <b>GetSpatialPageInfos() requires a string with 
-            spatial info</b> exception is not seen.
-        </ul>
-<p>
         <li><b>[FlexIDSCore #4278]</b>
         <!-- fixed v 8.1.0.21 -->
         <ul>
@@ -366,10 +247,11 @@
                 <li>Run <b>Disable gflags.bat</b>.
             </ul>
             <p>
-            <li>Exercise <b>Test1</b> from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4278</b>
+            <li>Exercise <b>Test2</b> from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4278</b>
             <br><b>Note:</b> This test requires that the <b>RDT</b> be installed and licensed. It
             also requires that you have the <b>Demo_IDShield</b> database on the local machine.
             <ul>
+		<li>Note that this test will take about <b>2 days</b> to finish.
                 <li>Unzip the contents of <b>Test2.zip</b> to your processing location.
                 <li>Run <b>CopyFileSets.bat</b>. Note that you will need around <b>5GB</b> of free
                 space for the copied files.
