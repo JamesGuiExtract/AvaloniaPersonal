@@ -68,7 +68,7 @@
 <p>
     <li><h2>Extract or remove leftmost characters</h2>
     <ul>
-        <li><b>Configure</b> button displays <b>Configure Extract or Remove Leftmost Characters</b>
+        <li><b>Configure</b> button displays <b>Extract or remove leftmost characters settings</b>
         dialog.
         <li><b>Extract Characters</b> radio button is selectable.
         <li><b>Remove Characters</b> radio button is selectable.
@@ -85,7 +85,7 @@
 <p>
     <li><h2>Extract or remove middle characters</h2>
     <ul>
-        <li><b>Configure</b> button displays <b>Configure Extract or Remove Middle Characters</b>
+        <li><b>Configure</b> button displays <b>Extract or remove middle characters settings</b>
         dialog.
         <li><b>Extract Characters</b> radio button is selectable.
         <li><b>Remove Characters</b> radio button is selectable.
@@ -110,8 +110,8 @@
 <p>
     <li><h2>Extract or remove rightmost characters</h2>
     <ul>
-        <li><b>Configure</b> button displays <b>Configure Extract or Remove Rightmost 
-        Characters</b> dialog.
+        <li><b>Configure</b> button displays <b>Extract or remove rightmost characters 
+	settings</b> dialog.
         <li><b>Extract Characters</b> radio button is selectable.
         <li><b>Remove Characters</b> radio button is selectable.
         <li><b>Number of Characters to limit</b> edit box is editable.
@@ -133,8 +133,8 @@
 <p>
     <li><h2>Find SSNs within image area</h2>
     <ul>
-        <li>Confirm that <b>Configure</b> button displays <b>Configure Find SSNs within image 
-        area</b> dialog.
+        <li>Confirm that <b>Configure</b> button displays <b>Find SSNs within image 
+        area settings</b> dialog.
         <li>Confirm that the <b>Subattribute name</b> edit box is editable.
         <li>Confirm that the <b>Subattribute name</b> default entry is SSN.
         <li>Confirm that the <b>Discard spatial information for individual characters</b> checkbox 
@@ -150,12 +150,9 @@
         <li>Confirm that <b>X</b> button ignores changes and exits the dialog.
         <li>Confirm that settings are persistent.
 <p>
-        <li><b>[FlexIDSCore #3755]</b> Confirm that the property page cannot be configured to 
-        assign an invalid subattribute name.
-    <p>
         <LI><b>[FlexIDSCore #3025]</b>
         <!-- fixed v 8.1.0.11 -->
-	    <ul>
+	<ul>
             <li>Execute the .rsd file at I:\Common\Testing\PVCS_Testing\FlexIDSCore\3025 against
             the image in the same folder.
             <li>Confirm that appropriate results are seen (i.e., the modifier does not find results
@@ -165,7 +162,7 @@
 <p>
     <li><h2>Insert characters</h2>
     <ul>
-        <li><b>Configure</b> button displays <b>Configure Insert Characters</b> dialog.
+        <li><b>Configure</b> button displays <b>Insert characters settings</b> dialog.
         <li><b>Characters to insert:</b> edit box is editable.
         <li>Exception thrown if <b>Characters to insert:</b> edit box is empty.
         <li><b>Always append to end of string</b> radio button is selectable.
@@ -228,7 +225,7 @@
 <p>
     	<li><h2>OCR image area</h2>
     	<ul>
-        	<li>Confirm that <b>Configure</b> button displays <b>Configure OCR image area</b> dialog.
+        	<li>Confirm that <b>Configure</b> button displays <b>OCR image area settings</b> dialog.
 <p>
         	<li>Confirm that the <b>Filter options</b> group box includes selectable checkboxes for
         	<b>Alphabetic characters</b>,  <b>Digits</b>, <b>Period</b>, <b>Hyphen</b>, 
@@ -252,19 +249,6 @@
         	<li>Confirm that <b>X</b> button ignores changes and exits the dialog.
         	<li>Confirm that settings are persistent.
 <p>
-        	<li><b>[FlexIDSCore #3021]</b> OCR Image Area throws an exception when OCRing white space
-        	<ul>
-            		<li>Open a RuleSet Editor window and configure a locate image region rule to find 
-			the image region within 1.5 lines above	and 17 characters in either direction of 
-			a regular expression clue [S5]{2}N
-            		<li>Add an OCR Image Region value modifier. Configure it to filter digits, hyphen, 
-			and underscore, look for machine-printed text, and discard attributes if no text 
-			is found.
-            		<li>Run the rule on this image: 
-			K:\Common\Engineering\Sample Files\LoganSystems\VA - Judgments\Set001\Images\02340241.tif
-            		<li>Confirm that no exceptions were logged.
-        	</ul>
-<p>
   	   	<LI><b>[FlexIDSCore #4406]</b> OCR Image Area With ICR Option
         	<ul>
             		<li>Exercise the RSD file and image found at 
@@ -287,7 +271,7 @@
 <p>
     <li><h2>Pad value</h2>
     <ul>
-        <li><b>Configure</b> button displays <b>Configure Pad Value</b> dialog.
+        <li><b>Configure</b> button displays <b>Pad value settings</b> dialog.
         <li><b>Required</b> edit box is editable.
         <ul>
             <li>Exception is thrown if <b>Required</b> is empty.
@@ -311,7 +295,7 @@
 <p>
     <li><h2>Remove characters</h2>
     <ul>
-        <li><b>Configure</b> button displays <b>Configure Remove Characters</b> dialog.
+        <li><b>Configure</b> button displays <b>Remove characters settings</b> dialog.
         <li><b>Space</b> check box is checkable.
         <li><b>Tab</b> check box is checkable.
         <li><b>New Line</b> check box is checkable.
@@ -344,14 +328,6 @@
     <li><h2>Replace strings</h2>
     <ul>
         <li>See <b>Document Preprocessor - Replace Strings</b> checklist.
-        <li><b>[FlexIDSCore #2318]</b> Use of VM loses spatial information
-        <ul>
-            <li>Create a simple RSD file with a Regular Expression rule that finds a five-digit zip
-            code ( for Image1.tif.uss, <b>(?:\D)9\d{4}</b> is effective ).
-            <li>Confirm that the rule finds and highlights a zip code. 
-            <li>Add a <b>Replace Strings Value Modifier</b> to modify the first digit. 
-            <li>Confirm that the modified result is still properly highlighted in the image. 
-        </ul>
     </ul>
 <p>
     <li><h2>Split region into content areas</h2>
@@ -361,12 +337,12 @@
 <p>
     <li><h2>String tokenizer</h2>
     <ul>
-        <li><b>Configure</b> button displays <b>Configure String Tokenizer</b> dialog.
+        <li><b>Configure</b> button displays <b>String tokenizer settings</b> dialog.
         <li><b>Delimiter for parsing input string into tokens</b> edit box is editable.
         <ul>
-            <li>Input is limited to one character.
-            <li><b>[FlexIDSCore #1950]</b> A special character such as <b>š</b> can be used even
-            though it is displayed as a thick vertical bar.
+            	<li>Input is limited to one character.
+            	<li>A special character such as <b>š</b> can be used even though it is displayed 
+		as a thick vertical bar.
         </ul>
         <li><b>Result expression defined</b> edit box is editable.
         <li>Balloon help is functional.
@@ -389,7 +365,7 @@
 <p>
     <li><h2>Translate to closest value in list</h2>
     <ul>
-        <li><b>Configure</b> button displays <b>Configure Translate to Closest Value in List</b>
+        <li><b>Configure</b> button displays <b>Translate to closest value in list settings</b>
         dialog.
         <li><b>Add</b> button displays <b>Text</b> dialog.
         <ul>
@@ -437,7 +413,7 @@
                 <li>Saved output file is created correctly.
             </ul>
         </ul>
-        <li><b>Strings are case sensitive</b> check box is checkable.
+        <li><b>String comparison is Case Sensitive</b> check box is checkable.
         <li><b>Force selection of best match</b> check box is checkable.
         <li><b>OK</b> button saves changes and exits dialog.
         <li><b>Cancel</b> button ignores changes and exits dialog.
@@ -446,7 +422,7 @@
 <p>
     <li><h2>Translate values or types</h2>
     <ul>
-        <li><b>Configure</b> button displays <b>Configure Translate Values or Types</b> dialog.
+        <li><b>Configure</b> button displays <b>Translate values or types settings</b> dialog.
         <li><b>Value</b> radio button is selectable.
         <li><b>Type</b> radio button is selectable.
         <li><b>Add</b> button displays <b>Enter Translation String Pair</b> dialog.
@@ -509,17 +485,7 @@
         <li><b>Cancel</b> button ignores changes and exits the dialog.
         <li><b>X</b> button ignores changes and exits the dialog.
 <p>
-        <li><b>[FlexIDSCore #3305]</b> Confirm that it is possible to translate from blank values
-        and types.
-        <li><b>[FlexIDSCore #3811]</b> Confirm that <b>Name</b> and <b>Type</b> values must be 
-        valid identifiers (i.e. <b>[-A-Za-z][_A-Za-z0-9]*</b>).
-<p>
-        <LI><b>[FlexIDSCore #3220]</b> Broken for some values
-        <ul>
-            <li>Exercise the ruleset from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3245</b>.
-            <li>Provide <b>VLDL-CALC</b> text.
-            <li>Confirm that the text does not get translated to <b>LDL-CALC</b>.
-        </ul>
+        <li>Confirm that it is possible to translate from blank values and types.
     </ul>
 </ol>
 </body>
