@@ -19,17 +19,6 @@
 <ul>
 	<li><b>String to find</b> edit box is editable.</li>
   	<li><b>Replace with</b> edit box is editable.</li>
-	<ul>
-		<li><b>[FlexIDSCore #3114]</b> Advanced Replace String garbling text</li>
-		<ul>
-			<li>Open the ruleset located at <b>I:\Common\Testing\PVCS_Testing\LegacyRC\3114\example_adv.rsd</b>.</li>
-			<li>Run the ruleset on the text in <b>I:\Common\Testing\PVCS_Testing\LegacyRC\3114\example.txt</b>.</li>
-			<li>Ensure that the resulting attribute text reads: 
-			<b>Dec 04 Oct 15 June 12 Feb 12</b>, and has not been garbled. 
-			Wrong output would be <b>Dec 04 Oct 15 Junc 52 Fec 52</b>.</li>
-		</ul>
-	</ul>
-<p>		  
       	<li>Confirm the icon on the right side of <b>String to find</b> text
      	can be clicked to display the balloon help.</li>
       	<li>Confirm the icon on the right side of <b>Replace with</b> text
@@ -40,7 +29,7 @@
           	<li>Put the cursor at any position inside <b>String to find</b> edit 
 		box and select one of the tags, it will be inserted at this position.</li>
           	<li>Select all characters inside <b>String to find</b> edit box and 
-            	select one of the tags; it will replace all characters inside the edit box.</li>
+            	select one of the tags; the selected text will be an argument for the function.</li>
      	</ul>
       	<li>Confirm the drop down menu on the right side of <b>Replace with</b> edit box 
 	displays a list of tags and utility functions.</li>
@@ -48,7 +37,7 @@
           	<li>Put the cursor at any position inside <b> Replace with</b> edit box and 
 		select one of the tags, it will be inserted at this position.</li> 
           	<li>Select all characters inside <b>Replace with</b> edit box and select 
-		one of the tags; it will replace all characters inside the edit box.</li>
+		one of the tags; the selected text will be an argument for the function.</li>
      	</ul>
       	<li>Confirm the browse button on the rightmost side of <b>String to find</b> edit 
 	box displays an open file dialog.</li>
@@ -95,19 +84,6 @@
 <p>
 <h3><b>Miscellaneous</b></h3>
 <ul>
-	<li><b>[FlexIDSCore #3086]</b> Advanced replace string with specified occurrence settings 
-	loses spatial information
-	<ul>
-		<li>Open the ruleset located at 
-		<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3086\example.rsd</b>.</li>
-		<li>Run the ruleset on the associated image.</li>
-		<li>Confirm that spatial information is retained if the rule is set to replace
-		<ul>
-			<li>All occurrences
-			<li>First occurrence
-			<li>Last occurrence
-			<li>Specified occurrence
-		</ul>
-	</ul>
+</ul>
 </body>
 </html>
