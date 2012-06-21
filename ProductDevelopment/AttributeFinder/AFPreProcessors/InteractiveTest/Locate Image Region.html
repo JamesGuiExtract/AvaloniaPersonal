@@ -25,16 +25,6 @@
 			<ul>
 				<li><b>Inside</b> is listed.</li>
 				<li><b>Outside</b> is listed.</li>
-				<ul>
-					<li><b>[FlexIDSCore #2076]</b> Locate Image Region PP: 
-					Text Outside of Region can be found on all pages.</li>
-					<ul>
-						<li>Open <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\2076\findtextoutsideregion.rsd</b></li>
-						<li>Run the ruleset on <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\2076\00053.tif</b></li>
-						<li>Ensure that the text from page 2 is included in 
-						the found attribute.</li>
-					</ul>
-				</ul>
 			</ul>
 			</li>
 			<li>Selecting <b>Text</b> disables the <b>Assign the following text to 
@@ -49,14 +39,6 @@
 			<li>Selecting <b>Image Region</b> enables the <b>Assign text to 
 			the following region</b> edit box.
 			<li><b>Assign text to the following region</b> edit box is editable.</li>
-			<li><b>[FlexIDSCore #2335]</b> Image region created outside of image.</li>
-			<ul>
-				<li>Obtain the ruleset located at <b>$/Engineering/Rules/IDShield/NM 
-				- Chaves - PDS/Rules</b></li>
-				<li>Run <b>Master.rsd</b> on <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\2335\562.374.pg1.tif</b>.</li>
-				<li>Ensure that an image region outside the image itself (see <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\2335\imageregionoffpage.jpg</b> for an example) 
-				is NOT created.</li>
-			</ul>
 		</ul>
           	</li>
      	</ul>
@@ -134,7 +116,7 @@
 	(do not include a file name entry) and double click one of the entries 
 	to bring up the <b>Text</b> dialog. Modify the text in the edit box to a 
 	file name (including the file:// header) and click the <b>OK</b> button.
-        <li>Confirm that the entry is added to the list.
+        <li>Confirm that the entry is added to the list and removes all other entries.
       	<li>Confirm that the <b>Modify</b> button displays a pre-populated 
 	<b>Text</b> dialog.
         <ul>
@@ -285,72 +267,6 @@
 </ul>
 <h3>Miscellaneous</h3>
 <ul>
-   	<LI><b>[FlexIDSCore #3051]</b> Locate Image Region
-       	<ul>
-      		<li>Exercise <b>Locate Image Region</b> using opposite page edges as 
-		part of the region boundaries.
-		<ul>
-	      		<li>Left of page containing Clues expanded Right by <i>x</i> 
-			characters, as Right boundary.
-	      		<li>Right of page containing Clues expanded Left by <i>x</i> 
-			characters, as Left boundary.
-	      		<li>Top of page containing Clues expanded Down by <i>x</i> 
-			spatial lines, as Bottom boundary.
-	      		<li>Bottom of page containing Clues expanded Up by <i>x</i> 
-			spatial lines, as Top boundary.
-		</ul>
-       	</ul>
-<p>
-   	<LI><b>[FlexIDSCore #3090]</b> Locate image region rearranges text
-       	<ul>
-      		<li>Exercise the ruleset and image from 
-		<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3090</b>.
-		<li>Confirm that the text is returned in order.
-       	</ul>
-<p>
-   	<LI><b>[FlexIDSCore #3101]</b> Locate image region with intersecting words
-       	<ul>
-      		<li>Exercise the ruleset and image from 
-		<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3101</b>.
-		<li>Confirm that the appropriate amount of text is returned.
-       	</ul>
-<p>
-   	<LI><b>[FlexIDSCore #3165, #3545, #3555]</b> Locate Image Region
-       	<ul>
-      		<li>Exercise <b>test.rsd</b> from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3165</b>.
-		<ul>
-	      		<li>Confirm that the <b>AllBecauseNoRegion</b> attribute is found.
-	      		<li>Confirm that the <b>AllBecauseInvalidRegion</b> attribute is found.
-	      		<li>Confirm that the <b>NoneBecauseNoRegion</b> attribute is not found.
-	      		<li>Confirm that the <b>NoneBecauseInvalidRegion</b> attribute is not found.
-		</ul>
-<p>
-      		<li>Exercise <b>example.rsd</b> from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3545</b>.
-		<ul>
-	      		<li>Confirm that <b>no</b> attributes are found.
-		</ul>
-<p>
-      		<li>Exercise <b>test.rsd</b> and the sample image 
-		from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3555</b>.
-		<ul>
-	      		<li>Confirm that the <b>Locate Image Region</b> rule uses <b>top of page 
-			containing clues</b> as the top boundary.
-	      		<li>Confirm that attributes are found and that no exception is thrown.
-		</ul>
-       	</ul>
-<p>
-   	<LI><b>[FlexIDSCore #3529]</b> Locate Image Region and invalid settings
-       	<ul>
-      		<li>Open an RSD file with a <b>Locate Image Region</b> rule configured 
-		to find a text region.
-      		<li>Modify the object to return an image region. 
-      		<li>Click OK and confirm that a validation error is presented. 
-      		<li>Close the validation error message and <b>Cancel</b> the 
-		configuration changes. 
-      		<li>Re-open the object property page and confirm that the valid settings 
-		are presented. 
-       	</ul>
-<p>
     	<li><b>[FlexIDSCore #3083]</b> Load list out of memory exception
     	<!-- fixed v 8.1.0.4 -->
     	<ul>
