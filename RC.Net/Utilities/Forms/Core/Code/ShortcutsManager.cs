@@ -63,6 +63,12 @@ namespace Extract.Utilities.Forms
         {
             try
             {
+                if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
+                {
+                    // Load the license files from folder
+                    LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+                }
+
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23155",
                     _OBJECT_NAME);

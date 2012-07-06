@@ -20,6 +20,7 @@ namespace Extract.SQLCDBEditor
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SQLCDBEditorForm));
             TD.SandDock.DockingRules dockingRules1 = new TD.SandDock.DockingRules();
             TD.SandDock.DockingRules dockingRules2 = new TD.SandDock.DockingRules();
+            TD.SandDock.DockingRules dockingRules3 = new TD.SandDock.DockingRules();
             this._toolStrip = new System.Windows.Forms.ToolStrip();
             this._openToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._saveToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -48,6 +49,8 @@ namespace Extract.SQLCDBEditor
             this._navigationDockContainer = new TD.SandDock.DockContainer();
             this._queryDockWindow = new TD.SandDock.DockableWindow();
             this._queriesListBox = new System.Windows.Forms.ListBox();
+            this._pluginDockableWindow = new TD.SandDock.DockableWindow();
+            this._pluginsListBox = new System.Windows.Forms.ListBox();
             toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this._toolStrip.SuspendLayout();
             this._menuStrip.SuspendLayout();
@@ -56,6 +59,7 @@ namespace Extract.SQLCDBEditor
             this._contextMenuStrip.SuspendLayout();
             this._navigationDockContainer.SuspendLayout();
             this._queryDockWindow.SuspendLayout();
+            this._pluginDockableWindow.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStripMenuItem1
@@ -239,7 +243,7 @@ namespace Extract.SQLCDBEditor
             this._tableDockWindow.Location = new System.Drawing.Point(0, 18);
             this._tableDockWindow.Name = "_tableDockWindow";
             this._tableDockWindow.ShowOptions = false;
-            this._tableDockWindow.Size = new System.Drawing.Size(233, 162);
+            this._tableDockWindow.Size = new System.Drawing.Size(233, 93);
             this._tableDockWindow.TabIndex = 0;
             this._tableDockWindow.Text = "Tables";
             this._tableDockWindow.Closing += new TD.SandDock.DockControlClosingEventHandler(this.HandleDockWindowClosing);
@@ -254,7 +258,7 @@ namespace Extract.SQLCDBEditor
             this._tablesListBox.IntegralHeight = false;
             this._tablesListBox.Location = new System.Drawing.Point(0, 0);
             this._tablesListBox.Name = "_tablesListBox";
-            this._tablesListBox.Size = new System.Drawing.Size(233, 162);
+            this._tablesListBox.Size = new System.Drawing.Size(233, 93);
             this._tablesListBox.TabIndex = 0;
             this._tablesListBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.HandleListBoxDrawItem);
             this._tablesListBox.SelectedIndexChanged += new System.EventHandler(this.HandleListSelectionChanged);
@@ -305,12 +309,15 @@ namespace Extract.SQLCDBEditor
             this._navigationDockContainer.ContentSize = 233;
             this._navigationDockContainer.Controls.Add(this._tableDockWindow);
             this._navigationDockContainer.Controls.Add(this._queryDockWindow);
+            this._navigationDockContainer.Controls.Add(this._pluginDockableWindow);
             this._navigationDockContainer.Dock = System.Windows.Forms.DockStyle.Left;
             this._navigationDockContainer.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Horizontal, new TD.SandDock.LayoutSystemBase[] {
             ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
                         ((TD.SandDock.DockControl)(this._tableDockWindow))}, this._tableDockWindow))),
             ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
-                        ((TD.SandDock.DockControl)(this._queryDockWindow))}, this._queryDockWindow)))});
+                        ((TD.SandDock.DockControl)(this._queryDockWindow))}, this._queryDockWindow))),
+            ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
+                        ((TD.SandDock.DockControl)(this._pluginDockableWindow))}, this._pluginDockableWindow)))});
             this._navigationDockContainer.Location = new System.Drawing.Point(0, 63);
             this._navigationDockContainer.Manager = this._sandDockManager;
             this._navigationDockContainer.Name = "_navigationDockContainer";
@@ -329,10 +336,10 @@ namespace Extract.SQLCDBEditor
             dockingRules2.AllowTab = true;
             this._queryDockWindow.DockingRules = dockingRules2;
             this._queryDockWindow.Guid = new System.Guid("77c6358a-bf4e-4e01-b533-508c8c53771b");
-            this._queryDockWindow.Location = new System.Drawing.Point(0, 226);
+            this._queryDockWindow.Location = new System.Drawing.Point(0, 157);
             this._queryDockWindow.Name = "_queryDockWindow";
             this._queryDockWindow.ShowOptions = false;
-            this._queryDockWindow.Size = new System.Drawing.Size(233, 163);
+            this._queryDockWindow.Size = new System.Drawing.Size(233, 93);
             this._queryDockWindow.TabIndex = 0;
             this._queryDockWindow.Text = "Queries";
             this._queryDockWindow.Closing += new TD.SandDock.DockControlClosingEventHandler(this.HandleDockWindowClosing);
@@ -347,12 +354,47 @@ namespace Extract.SQLCDBEditor
             this._queriesListBox.IntegralHeight = false;
             this._queriesListBox.Location = new System.Drawing.Point(0, 0);
             this._queriesListBox.Name = "_queriesListBox";
-            this._queriesListBox.Size = new System.Drawing.Size(233, 163);
+            this._queriesListBox.Size = new System.Drawing.Size(233, 93);
             this._queriesListBox.TabIndex = 0;
             this._queriesListBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.HandleListBoxDrawItem);
             this._queriesListBox.SelectedIndexChanged += new System.EventHandler(this.HandleListSelectionChanged);
             this._queriesListBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.HandleListMouseDown);
             this._queriesListBox.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.HandleQueryListPreviewKeyDown);
+            // 
+            // _pluginDockableWindow
+            // 
+            this._pluginDockableWindow.AllowCollapse = false;
+            this._pluginDockableWindow.Controls.Add(this._pluginsListBox);
+            dockingRules3.AllowDockBottom = true;
+            dockingRules3.AllowDockLeft = true;
+            dockingRules3.AllowDockRight = true;
+            dockingRules3.AllowDockTop = true;
+            dockingRules3.AllowFloat = true;
+            dockingRules3.AllowTab = true;
+            this._pluginDockableWindow.DockingRules = dockingRules3;
+            this._pluginDockableWindow.Guid = new System.Guid("7ed945d9-f840-4970-8a04-7de7b125ba79");
+            this._pluginDockableWindow.Location = new System.Drawing.Point(0, 296);
+            this._pluginDockableWindow.Name = "_pluginDockableWindow";
+            this._pluginDockableWindow.ShowOptions = false;
+            this._pluginDockableWindow.Size = new System.Drawing.Size(233, 93);
+            this._pluginDockableWindow.TabIndex = 0;
+            this._pluginDockableWindow.Text = "Plugins";
+            // 
+            // _pluginsListBox
+            // 
+            this._pluginsListBox.ContextMenuStrip = this._contextMenuStrip;
+            this._pluginsListBox.DisplayMember = "DisplayName";
+            this._pluginsListBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._pluginsListBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this._pluginsListBox.FormattingEnabled = true;
+            this._pluginsListBox.IntegralHeight = false;
+            this._pluginsListBox.Location = new System.Drawing.Point(0, 0);
+            this._pluginsListBox.Name = "_pluginsListBox";
+            this._pluginsListBox.Size = new System.Drawing.Size(233, 93);
+            this._pluginsListBox.TabIndex = 1;
+            this._pluginsListBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.HandleListBoxDrawItem);
+            this._pluginsListBox.SelectedIndexChanged += new System.EventHandler(this.HandleListSelectionChanged);
+            this._pluginsListBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.HandleListMouseDown);
             // 
             // SQLCDBEditorForm
             // 
@@ -380,6 +422,7 @@ namespace Extract.SQLCDBEditor
             this._contextMenuStrip.ResumeLayout(false);
             this._navigationDockContainer.ResumeLayout(false);
             this._queryDockWindow.ResumeLayout(false);
+            this._pluginDockableWindow.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -415,6 +458,8 @@ namespace Extract.SQLCDBEditor
         private System.Windows.Forms.ToolStripMenuItem _newQueryToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _copyToNewQueryToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _deleteToolStripMenuItem;
+        private TD.SandDock.DockableWindow _pluginDockableWindow;
+        private System.Windows.Forms.ListBox _pluginsListBox;
 
     }
 }

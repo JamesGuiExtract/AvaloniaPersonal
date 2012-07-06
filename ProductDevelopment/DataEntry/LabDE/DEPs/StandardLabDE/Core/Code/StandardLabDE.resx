@@ -145,6 +145,7 @@
 	&lt;/Expression&gt;
 	&lt;Complex Name='ValidationMessage'&gt;Missing mandatory test(s): &lt;MissingTests StringList=', '/&gt;&lt;/Complex&gt;
 &lt;/Declarations&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT Name FROM LabOrder WHERE EpicCode IS NOT NULL ORDER BY Name&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query ValidationListType='ValidationListOnly' ValidValue='' ValidationMessage='ValidationMessage' ValidationWarning='1'&gt;
 	&lt;MissingTests/&gt;
 &lt;/Query&gt;</value>

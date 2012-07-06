@@ -18,10 +18,32 @@ using System.Windows.Forms;
 namespace Extract.SQLCDBEditor
 {
     /// <summary>
+    /// The available types of <see cref="QueryAndResultsControl"/>s.
+    /// </summary>
+    internal enum QueryAndResultsType
+    {
+        /// <summary>
+        /// Displays and allows for editing of database queries.
+        /// </summary>
+        Table,
+
+        /// <summary>
+        /// Allows for editing and execution of queries.
+        /// </summary>
+        Query,
+
+        /// <summary>
+        /// Provides custom behavior.
+        /// </summary>
+        Plugin
+    }
+
+    /// <summary>
     /// A control which allow for the viewing/editing of a database table or query as well as
     /// modification of a query.
     /// </summary>
-    internal partial class QueryAndResultsControl : UserControl, INotifyPropertyChanged
+    internal partial class QueryAndResultsControl : UserControl, INotifyPropertyChanged,
+        ISQLCDBEditorPluginManager
     {
         #region Fields
 
@@ -101,6 +123,16 @@ namespace Extract.SQLCDBEditor
         bool _isQueryDirty;
 
         /// <summary>
+        /// The <see cref="SQLCDBEditorPlugin"/> being hosted by this instance.
+        /// </summary>
+        SQLCDBEditorPlugin _plugin;
+
+        /// <summary>
+        /// Indicates whether the control has been loaded.
+        /// </summary>
+        bool _loaded;
+
+        /// <summary>
         /// Indicates if the host is in design mode or not.
         /// </summary>
         readonly bool _inDesignMode;
@@ -115,9 +147,9 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryAndResultsControl"/> class.
         /// </summary>
-        /// <param name="isTable"><see langword="true"/> if the control is to represent a database
-        /// table, <see langword="false"/> if it is to respresent a query.</param>
-        public QueryAndResultsControl(bool isTable)
+        /// <param name="queryAndResultsType">The <see cref="QueryAndResultsType"/> of this
+        /// instance.</param>
+        public QueryAndResultsControl(QueryAndResultsType queryAndResultsType)
         {
             try
             {
@@ -126,8 +158,8 @@ namespace Extract.SQLCDBEditor
                 InitializeComponent();
 
                 _resultsTable.Locale = CultureInfo.CurrentCulture;
-                IsTable = isTable;
-                if (!isTable)
+                QueryAndResultsType = queryAndResultsType;
+                if (QueryAndResultsType == QueryAndResultsType.Query)
                 {
                     Name = "New Query";
                 }
@@ -145,9 +177,10 @@ namespace Extract.SQLCDBEditor
         /// <param name="name">The name of the table or query.</param>
         /// <param name="fileName">Name of the database file if this control represents a
         /// database table or the query text otherwise.</param> 
-        /// <param name="isTable"><see langword="true"/> if the control is to represent a database
-        /// table, <see langword="false"/> if it is to respresent a query.</param>
-        public QueryAndResultsControl(string name, string fileName, bool isTable)
+        /// <param name="queryAndResultsType">The <see cref="QueryAndResultsType"/> of this
+        /// instance.</param>
+        public QueryAndResultsControl(string name, string fileName,
+            QueryAndResultsType queryAndResultsType)
             : base()
         {
             try
@@ -159,12 +192,39 @@ namespace Extract.SQLCDBEditor
                 _resultsTable.Locale = CultureInfo.CurrentCulture;
                 Name = name;
                 FileName = fileName;
-                IsTable = isTable;
+                QueryAndResultsType = queryAndResultsType;
                 DataIsValid = true;
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI34574");
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QueryAndResultsControl"/> class.
+        /// </summary>
+        /// <param name="plugin">The <see cref="SQLCDBEditorPlugin"/> to host in this instance.
+        /// </param>
+        public QueryAndResultsControl(SQLCDBEditorPlugin plugin)
+            : base()
+        {
+            try
+            {
+                _inDesignMode = LicenseManager.UsageMode == LicenseUsageMode.Designtime;
+
+                InitializeComponent();
+
+                _resultsTable.Locale = CultureInfo.CurrentCulture;
+                Name = plugin.DisplayName;
+                _plugin = plugin;
+                _plugin.DataChanged += HandlePluginDataChanged;
+                QueryAndResultsType = QueryAndResultsType.Plugin;
+                DataIsValid = true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34842");
             }
         }
 
@@ -201,6 +261,11 @@ namespace Extract.SQLCDBEditor
         /// Raised to indicate a query has been saved.
         /// </summary>
         public event EventHandler<EventArgs> QuerySaved;
+
+        /// <summary>
+        /// Raised to indicate the selection in the query or results grid has changed.
+        /// </summary>
+        public event EventHandler<GridSelectionEventArgs> SelectionChanged;
 
         #endregion Events
 
@@ -243,13 +308,9 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
-        /// Gets a value indicating whether this control represents a database table.
+        /// Gets the <see cref="QueryAndResultsType"/> of this instance.
         /// </summary>
-        /// <value>
-        /// <see langword="true"/> if this instance represents a database table;
-        /// <see langword="false"/> if it represents a database query.
-        /// </value>
-        public bool IsTable
+        public QueryAndResultsType QueryAndResultsType
         {
             get;
             private set;
@@ -382,8 +443,8 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                ExtractException.Assert("ELI34577", "Cannot load a query as a database table",
-                    IsTable);
+                ExtractException.Assert("ELI34577", "Cannot load as a database table",
+                    QueryAndResultsType == QueryAndResultsType.Table);
 
                 _connection = connection;
 
@@ -434,10 +495,13 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                ExtractException.Assert("ELI34580", "", !IsTable);
+                ExtractException.Assert("ELI34580", "Cannot load as a query",
+                    QueryAndResultsType == QueryAndResultsType.Query);
 
-                _connection = connection;
-                _lastUsedParameters.Clear();
+                // Use ControlDark for the background color to provide a border around to query edit
+                // box.
+                _resultsSplitContainer.Panel1.BackColor = System.Drawing.SystemColors.ControlDark;
+
                 QueryFileExists = File.Exists(FileName);
 
                 // If the query doesn't yet exist on disk, the save button should be enabled and the
@@ -457,30 +521,104 @@ namespace Extract.SQLCDBEditor
                     _saveButton.Visible = false;
                 }
 
-                _queryScintillaBox.Text = query;
-                _queryScintillaBox.IsReadOnly = IsReadOnly;
-                _queryScintillaBox.TextChanged += HandleQueryScintillaBoxTextChanged;
-                _lastSavedQuery = query;
-                _resultsGrid.AllowUserToAddRows = false;
-                _resultsGrid.AllowUserToDeleteRows = false;
+                LoadQueryCore(connection, query);
 
-                // If we have gotten this far, consider the query loaded even if the query cannot be
-                // evaluated. The user will be able to edit the query to allow it to evaluate.
-                IsLoaded = true;
-
-                // Parse the query in order to define any parameters used by the query.
-                ParseQuery(connection, query);
-
-                // Populate the results grid.
-                RefreshData(true, true);
-
-                _resultsGrid.DataSource = _resultsTable;
+                if (_resultsGrid.RowCount > 0)
+                {
+                    _resultsGrid.Rows[0].Selected = true;
+                }
             }
             catch (Exception ex)
             {
                 _queryError = true;
 
                 throw ex.AsExtract("ELI34581");
+            }
+        }
+
+        /// <summary>
+        /// Loads the requests grid using the <see paramref="query"/>. This is logic that is shared
+        /// between query and plugin types.
+        /// </summary>
+        /// <param name="connection">The connection to the database.</param>
+        /// <param name="query">The query.</param>
+        void LoadQueryCore(SqlCeConnection connection, string query)
+        {
+            ExtractException.Assert("ELI34580", "No query can be loaded from this control type.",
+                QueryAndResultsType == QueryAndResultsType.Query ||
+                QueryAndResultsType == QueryAndResultsType.Plugin);
+
+            _connection = connection;
+            _lastUsedParameters.Clear();
+
+            _queryScintillaBox.Text = query;
+            _queryScintillaBox.IsReadOnly = IsReadOnly;
+            _queryScintillaBox.TextChanged += HandleQueryScintillaBoxTextChanged;
+            _lastSavedQuery = query;
+            _resultsGrid.AllowUserToAddRows = false;
+            _resultsGrid.AllowUserToDeleteRows = false;
+
+            // If we have gotten this far, consider the query loaded even if the query cannot be
+            // evaluated. The user will be able to edit the query to allow it to evaluate.
+            IsLoaded = true;
+
+            // Parse the query in order to define any parameters used by the query.
+            ParseQuery(connection, query);
+
+            // Populate the results grid.
+            RefreshData(true, true);
+
+            _resultsGrid.DataSource = _resultsTable;
+        }
+
+        /// <summary>
+        /// Loads a plugin into this instance.
+        /// </summary>
+        /// <param name="connection">The connection to the database.</param>
+        public void LoadPlugin(SqlCeConnection connection)
+        {
+            try
+            {
+                ExtractException.Assert("ELI34580", "Cannot load as a plugin",
+                    QueryAndResultsType == QueryAndResultsType.Plugin);
+
+                // Put the query results in Panel1 (if the plugin has a query) and the plugin
+                // control in Panel2.
+                _resultsSplitContainer.Panel1.Controls.Clear();
+                _resultsSplitContainer.Panel2.Controls.Clear();
+
+                if (!string.IsNullOrEmpty(_plugin.Query))
+                {
+                    _resultsSplitContainer.Panel1.Controls.Add(_resultsPanel);
+                    _resultsSplitContainer.Panel1Collapsed = false;
+                }
+                else
+                {
+                    _resultsSplitContainer.Panel1Collapsed = true;
+                }
+
+                _resultsSplitContainer.Panel2.Controls.Add(_plugin);
+                _plugin.Dock = DockStyle.Fill;
+
+                // Selected rows in the query control will be passed to the plugin a row at a time,
+                // so allow only full row selection.
+                _resultsGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+
+                // Hide the buttons used by the query control type.
+                _newQueryButton.Visible = false;
+                _showHideQueryButton.Visible = false;
+                _renameButton.Visible = false;
+                _saveButton.Visible = false;
+                _executeQueryButton.Visible = false;
+
+                // LoadQueryCore will initialize the query results grid. 
+                LoadQueryCore(connection, _plugin.Query);
+                
+                _plugin.LoadPlugin(this, connection);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34823");
             }
         }
 
@@ -513,7 +651,7 @@ namespace Extract.SQLCDBEditor
                 // so that it forces invalid rows to be revalidated.
                 bool dataChanged = !DataIsValid;
 
-                if (IsTable)
+                if (QueryAndResultsType == QueryAndResultsType.Table)
                 {
                     _adapter.Fill(latestDataTable);
                     ApplySchema(latestDataTable);
@@ -540,7 +678,7 @@ namespace Extract.SQLCDBEditor
                         RemoveConstraints(latestDataTable);
                     }
                 }
-                else
+                else if (QueryAndResultsType == QueryAndResultsType.Query)
                 {
                     // [DotNetRCAndUtils:824]
                     // We already know the query needs to be re-run. The query may be in a partially
@@ -550,35 +688,14 @@ namespace Extract.SQLCDBEditor
                         return;
                     }
 
-                    // Update the list of available values for any ComboBox parameter controls.
-                    RefreshParameterControls();
-
-                    // Don't bother running the query at all if it is blank.
-                    if (!string.IsNullOrWhiteSpace(_masterQuery))
-                    {
-                        // Obtain any query parameters from the _queryParameterControls.
-                        Dictionary<string, string> parameters = new Dictionary<string, string>();
-                        for (int i = 0; i < _queryParameterControls.Count; i++)
-                        {
-                            string parameterKey = "@" + i.ToString(CultureInfo.InvariantCulture);
-                            string parameterValue = _queryParameterControls[i].Text;
-
-                            parameters[parameterKey] = parameterValue;
-                            _lastUsedParameters[i] = new KeyValuePair<string, string>(
-                                _lastUsedParameters[i].Key, parameterValue);
-                        }
-
-                        // Populate latestDataTable with the query results.
-                        using (SqlCeCommand command = (SqlCeCommand)DBMethods.CreateDBCommand(
-                            _connection, _masterQuery, parameters))
-                        using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(command))
-                        {
-                            adapter.Fill(latestDataTable);
-                        }
-                    }
+                    RefreshQuery(latestDataTable);
+                }
+                else if (QueryAndResultsType == QueryAndResultsType.Plugin)
+                {
+                    RefreshQuery(latestDataTable);
                 }
 
-                if (forceQueryExcecution)
+                if (QueryAndResultsType == QueryAndResultsType.Query && forceQueryExcecution)
                 {
                     // Always refresh the results if forceQueryExcecution is true.
                     dataChanged = true;
@@ -610,7 +727,7 @@ namespace Extract.SQLCDBEditor
                     return;
                 }
 
-                if (!IsTable && !updateQueryResult)
+                if (QueryAndResultsType == QueryAndResultsType.Query && !updateQueryResult)
                 {
                     // If a query and the query results shouldn't be automatically updated, mark
                     // them as out-of-date.
@@ -619,77 +736,11 @@ namespace Extract.SQLCDBEditor
                 }
                 else
                 {
-                    // If updating the results, keep track of the sort order, last scroll position,
-                    // and column sized so that we can keep the same data visible.
-                    int sortedColumnIndex = (_resultsGrid.SortedColumn == null)
-                        ? -1
-                        : _resultsGrid.SortedColumn.Index;
-                    ListSortDirection sortOrder = (_resultsGrid.SortOrder == SortOrder.Descending)
-                        ? ListSortDirection.Descending
-                        : ListSortDirection.Ascending;
-                    int scrollPos = _resultsGrid.FirstDisplayedScrollingRowIndex;
-                    int[] columnWidths = _resultsGrid.Columns
-                        .OfType<DataGridViewColumn>()
-                        .Select(column => column.Width)
-                        .ToArray();
+                    UpdateResultsGrid(latestDataTable);
 
-                    // While refreshing, don't handle data changed events so that the changes are
-                    // not interpreted as edits by the user.
-                    if (IsTable)
-                    {
-                        _resultsTable.ColumnChanged -= HandleColumnChanged;
-                        _resultsTable.RowChanged -= HandleRowChanged;
-                    }
-
-                    // Apply the latest data to the grid.
-                    _resultsGrid.DataSource = null;
-                    _resultsTable.Dispose();
-                    _resultsTable = latestDataTable;
+                    // After applying the results to the grid, they are now in use and we don't want
+                    // to dispose of them.
                     latestDataTable = null;
-                    _resultsGrid.DataSource = _resultsTable;
-
-                    if (IsTable)
-                    {
-                        // Re-register to get data changed events.
-                        _resultsTable.ColumnChanged += HandleColumnChanged;
-                        _resultsTable.RowChanged += HandleRowChanged;
-                    }
-
-                    // If this is a table or a query has been re-executed without changing, restore
-                    // the previous column sizes that had
-                    if ((IsTable || !_queryChanged) &&
-                        columnWidths.Length == _resultsGrid.Columns.Count)
-                    {
-                        // Re-apply the previous column widths.
-                        foreach (DataGridViewColumn column in _resultsGrid.Columns)
-                        {
-                            column.Width = columnWidths[column.Index];
-                        }
-
-                        // Restore the previous sort order.
-                        if (sortedColumnIndex >= 0)
-                        {
-                            _resultsGrid.Sort(_resultsGrid.Columns[sortedColumnIndex], sortOrder);
-                        }
-
-                        // Re-apply the previous vertical scroll position for tables to try to make it
-                        // appear that the table was updated in-place.
-                        if (IsTable)
-                        {
-                            if (scrollPos >= 0 && scrollPos < _resultsGrid.RowCount)
-                            {
-                                _resultsGrid.FirstDisplayedScrollingRowIndex = scrollPos;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // Always auto-size columns if a query has changed since the last execution
-                        // because the columns may no longer be the same.
-                        AutoSizeColumns();
-                    }
-
-                    _resultsGrid.Refresh();
                 }
             }
             catch (Exception ex)
@@ -701,6 +752,121 @@ namespace Extract.SQLCDBEditor
                 if (latestDataTable != null)
                 {
                     latestDataTable.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Applies the result data/results to the grid and resets the column sizes and scroll
+        /// position as appropriate.
+        /// </summary>
+        /// <param name="latestDataTable">A <see cref="DataTable"/> containing the latest
+        /// data/results.</param>
+        void UpdateResultsGrid(DataTable latestDataTable)
+        {
+            // If updating the results, keep track of the sort order, last scroll position,
+            // and column sized so that we can keep the same data visible.
+            int sortedColumnIndex = (_resultsGrid.SortedColumn == null)
+                ? -1
+                : _resultsGrid.SortedColumn.Index;
+            ListSortDirection sortOrder = (_resultsGrid.SortOrder == SortOrder.Descending)
+                ? ListSortDirection.Descending
+                : ListSortDirection.Ascending;
+            int scrollPos = _resultsGrid.FirstDisplayedScrollingRowIndex;
+            int[] columnWidths = _resultsGrid.Columns
+                .OfType<DataGridViewColumn>()
+                .Select(column => column.Width)
+                .ToArray();
+
+            // While refreshing, don't handle data changed events so that the changes are
+            // not interpreted as edits by the user.
+            if (QueryAndResultsType == QueryAndResultsType.Table)
+            {
+                _resultsTable.ColumnChanged -= HandleColumnChanged;
+                _resultsTable.RowChanged -= HandleRowChanged;
+            }
+
+            // Apply the latest data to the grid.
+            _resultsGrid.DataSource = null;
+            _resultsTable.Dispose();
+            _resultsTable = latestDataTable;
+            _resultsGrid.DataSource = _resultsTable;
+
+            if (QueryAndResultsType == QueryAndResultsType.Table)
+            {
+                // Re-register to get data changed events.
+                _resultsTable.ColumnChanged += HandleColumnChanged;
+                _resultsTable.RowChanged += HandleRowChanged;
+            }
+
+            // If this is a table or a query has been re-executed without changing, restore
+            // the previous column sizes that had
+            if (((QueryAndResultsType != QueryAndResultsType.Query) || !_queryChanged) &&
+                columnWidths.Length == _resultsGrid.Columns.Count)
+            {
+                // Re-apply the previous column widths.
+                foreach (DataGridViewColumn column in _resultsGrid.Columns)
+                {
+                    column.Width = columnWidths[column.Index];
+                }
+
+                // Restore the previous sort order.
+                if (sortedColumnIndex >= 0)
+                {
+                    _resultsGrid.Sort(_resultsGrid.Columns[sortedColumnIndex], sortOrder);
+                }
+
+                // Re-apply the previous vertical scroll position for tables to try to make it
+                // appear that the table was updated in-place.
+                if (QueryAndResultsType != QueryAndResultsType.Query)
+                {
+                    if (scrollPos >= 0 && scrollPos < _resultsGrid.RowCount)
+                    {
+                        _resultsGrid.FirstDisplayedScrollingRowIndex = scrollPos;
+                    }
+                }
+            }
+            else
+            {
+                // Always auto-size columns if a query has changed since the last execution
+                // because the columns may no longer be the same.
+                AutoSizeColumns();
+            }
+
+            _resultsGrid.Refresh();
+        }
+
+        /// <summary>
+        /// Re-executes the query and populates <see paramref="latestDataTable"/> with the results.
+        /// </summary>
+        /// <param name="latestDataTable">The <see cref="DataTable"/> that should be populated with
+        /// the query results.</param>
+        void RefreshQuery(DataTable latestDataTable)
+        {
+            // Update the list of available values for any ComboBox parameter controls.
+            RefreshParameterControls();
+
+            // Don't bother running the query at all if it is blank.
+            if (!string.IsNullOrWhiteSpace(_masterQuery))
+            {
+                // Obtain any query parameters from the _queryParameterControls.
+                Dictionary<string, string> parameters = new Dictionary<string, string>();
+                for (int i = 0; i < _queryParameterControls.Count; i++)
+                {
+                    string parameterKey = "@" + i.ToString(CultureInfo.InvariantCulture);
+                    string parameterValue = _queryParameterControls[i].Text;
+
+                    parameters[parameterKey] = parameterValue;
+                    _lastUsedParameters[i] = new KeyValuePair<string, string>(
+                        _lastUsedParameters[i].Key, parameterValue);
+                }
+
+                // Populate latestDataTable with the query results.
+                using (SqlCeCommand command = (SqlCeCommand)DBMethods.CreateDBCommand(
+                    _connection, _masterQuery, parameters))
+                using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(command))
+                {
+                    adapter.Fill(latestDataTable);
                 }
             }
         }
@@ -732,7 +898,8 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                ExtractException.Assert("ELI34583", "", !IsTable && !IsReadOnly);
+                ExtractException.Assert("ELI34583", "Only editable queries may be renamed.",
+                    (QueryAndResultsType == QueryAndResultsType.Query) && !IsReadOnly);
 
                 string originalName = Name;
                 string newName = Name;
@@ -795,23 +962,35 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                var queryAndResultsControl = new QueryAndResultsControl(false);
+                var queryAndResultsControl = new QueryAndResultsControl(QueryAndResultsType.Query);
 
-                if (IsTable)
+                switch (QueryAndResultsType)
                 {
-                    // Create a query selecting all columns explicity.
-                    string query = "SELECT ";
+                    case QueryAndResultsType.Table:
+                        {
+                            // Create a query selecting all columns explicity.
+                            string query = "SELECT ";
 
-                    query += string.Join("\r\n\t,", _resultsTable.Columns
-                        .OfType<DataColumn>()
-                        .Select(column => "[" + column.ColumnName + "]"));
-                    query += "\r\n\tFROM [" + Name + "]";
+                            query += string.Join("\r\n\t,", _resultsTable.Columns
+                                .OfType<DataColumn>()
+                                .Select(column => "[" + column.ColumnName + "]"));
+                            query += "\r\n\tFROM [" + Name + "]";
 
-                    queryAndResultsControl.LoadQuery(_connection, query);
-                }
-                else
-                {
-                    queryAndResultsControl.LoadQuery(_connection, _queryScintillaBox.Text);
+                            queryAndResultsControl.LoadQuery(_connection, query);
+                        }
+                        break;
+
+                    case QueryAndResultsType.Query:
+                        {
+                            queryAndResultsControl.LoadQuery(_connection, _queryScintillaBox.Text);
+                        }
+                        break;
+
+                    default:
+                        {
+                            ExtractException.ThrowLogicException("ELI34824");
+                        }
+                        break;
                 }
 
                 queryAndResultsControl.Name = Name;
@@ -833,7 +1012,8 @@ namespace Extract.SQLCDBEditor
             {
                 // If the grid is currently being edited, apply the active edit to force the
                 // data to be validated.
-                if (IsTable && _resultsGrid.IsCurrentCellInEditMode)
+                if (QueryAndResultsType == QueryAndResultsType.Table &&
+                    _resultsGrid.IsCurrentCellInEditMode)
                 {
                     _resultsGrid.EndEdit();
 
@@ -901,6 +1081,45 @@ namespace Extract.SQLCDBEditor
 
         #endregion Methods
 
+        #region ISQLCDBEditorPluginManager Members
+
+        /// <summary>
+        /// Creates a new <see cref="Button"/> in the plugin toolstrip for use by the plugin.
+        /// </summary>
+        /// <returns>The <see cref="Button"/>.</returns>
+        public Button GetNewButton()
+        {
+            try
+            {
+                Button button = new Button();
+                button.AutoSize = true;
+                _buttonsFlowLayoutPanel.Controls.Add(button);
+
+                return button;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34825");
+            }
+        }
+
+        /// <summary>
+        /// Causes the results of the <see cref="SQLCDBEditorPlugin.Query"/> to be refreshed.
+        /// </summary>
+        public void RefreshQueryResults()
+        {
+            try
+            {
+                RefreshData(true, false);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34826");
+            }
+        }
+
+        #endregion ISQLCDBEditorPluginManager Members
+
         #region Overrides
 
         /// <summary>
@@ -917,7 +1136,6 @@ namespace Extract.SQLCDBEditor
                 if (!_inDesignMode)
                 {
                     Dock = DockStyle.Fill;
-                    Size = Parent.ClientSize;
                     _queryScintillaBox.ConfigurationManager.Configure();
                     _queryScintillaBox.Lexing.Colorize();
                 }
@@ -952,6 +1170,12 @@ namespace Extract.SQLCDBEditor
                 _resultsTable.RowChanged += HandleRowChanged;
 
                 UpdateResultsStatus(!_queryError);
+
+                _loaded = true;
+
+                // SelectionChanged events are not fired before _loaded == true, so fire a selection
+                // change event now that the form is loaded.
+                OnSelectionChanged();
             }
             catch (Exception ex)
             {
@@ -1304,6 +1528,49 @@ namespace Extract.SQLCDBEditor
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI34601");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:DataGridView.SelectionChanged"/> event for the
+        /// <see cref="_resultsGrid"/>.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleResultsGridSelectionChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // If a selection changed event is fired before the form is loaded, it may result
+                // in layout problems for the plugin that is not yet at its appropriate size.
+                if (_loaded)
+                {
+                    OnSelectionChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34827");
+            }
+        }
+
+        /// <summary>
+        /// Handles the<see cref="T:SQLCDBEditorPlugin.DataChanged"/> event for the
+        /// <see cref="_plugin"/>.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.SQLCDBEditor.DataChangedEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandlePluginDataChanged(object sender, DataChangedEventArgs e)
+        {
+            try
+            {
+                OnDataChanged(e.DataCommitted);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34828");
             }
         }
 
@@ -1678,7 +1945,7 @@ namespace Extract.SQLCDBEditor
             else
             {
                 // If the results are not necessarily up-to-date, update the label indicating why.
-                if (IsTable)
+                if (QueryAndResultsType == QueryAndResultsType.Table)
                 {
                     ExtractException.Assert("ELI34602", "Unexpected table state.", !DataIsValid);
                     _resultsStatusLabel.Text = "Invalid has been entered. (click here to view)";
@@ -1945,9 +2212,10 @@ namespace Extract.SQLCDBEditor
         /// <see langword="false"/> if the change is in progress.</param>
         void OnDataChanged(bool dataCommitted)
         {
-            if (DataChanged != null)
+            var eventHandler = DataChanged;
+            if (eventHandler != null)
             {
-                DataChanged(this, new DataChangedEventArgs(dataCommitted));
+                eventHandler(this, new DataChangedEventArgs(dataCommitted));
             }
         }
 
@@ -1956,9 +2224,10 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         void OnSentToSeparateTab()
         {
-            if (SentToSeparateTab != null)
+            var eventHandler = SentToSeparateTab;
+            if (eventHandler != null)
             {
-                SentToSeparateTab(this, new EventArgs());
+                eventHandler(this, new EventArgs());
             }
         }
 
@@ -1968,9 +2237,10 @@ namespace Extract.SQLCDBEditor
         /// <param name="propertyName">The name of the property that has changed.</param>
         void OnPropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
+            var eventHandler = PropertyChanged;
+            if (eventHandler != null)
             {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                eventHandler(this, new PropertyChangedEventArgs(propertyName));
             }
         }
 
@@ -1981,9 +2251,10 @@ namespace Extract.SQLCDBEditor
         /// that has been created.</param>
         void OnQueryCreated(QueryAndResultsControl queryAndResultsControl)
         {
-            if (QueryCreated != null)
+            var eventHandler = QueryCreated;
+            if (eventHandler != null)
             {
-                QueryCreated(this, new QueryCreatedEventArgs(queryAndResultsControl));
+                eventHandler(this, new QueryCreatedEventArgs(queryAndResultsControl));
             }
         }
 
@@ -1994,9 +2265,10 @@ namespace Extract.SQLCDBEditor
         /// instance containing the event data.</param>
         void OnQueryRenaming(QueryRenamingEventArgs eventArgs)
         {
-            if (QueryRenaming != null)
+            var eventHandler = QueryRenaming;
+            if (eventHandler != null)
             {
-                QueryRenaming(this, eventArgs);
+                eventHandler(this, eventArgs);
             }
         }
 
@@ -2005,9 +2277,28 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         void OnQuerySaved()
         {
-            if (QuerySaved != null)
+            var eventHandler = QuerySaved;
+            if (eventHandler != null)
             {
-                QuerySaved(this, new EventArgs());
+                eventHandler(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="SelectionChanged"/> event.
+        /// </summary>
+        void OnSelectionChanged()
+        {
+            var eventHandler = SelectionChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this,
+                    new GridSelectionEventArgs(_resultsGrid.SelectedRows
+                        .OfType<DataGridViewRow>()
+                        .Select(gridRow => gridRow.DataBoundItem)
+                        .OfType<DataRowView>()
+                        .Select(dataRow => dataRow.Row)
+                        .OfType<DataRow>()));
             }
         }
 

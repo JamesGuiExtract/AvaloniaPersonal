@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 
 namespace Extract.SQLCDBEditor
 {
@@ -72,7 +74,7 @@ namespace Extract.SQLCDBEditor
     /// <summary>
     /// The arguments used for the <see cref="T:QueryAndResultsControl.DataChanged"/> event.
     /// </summary>
-    internal class DataChangedEventArgs : CancelEventArgs
+    public class DataChangedEventArgs : CancelEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DataChangedEventArgs"/> class.
@@ -92,6 +94,33 @@ namespace Extract.SQLCDBEditor
         /// if the change is in progress.
         /// </value>
         public bool DataCommitted
+        {
+            get;
+            private set;
+        }
+    }
+
+    /// <summary>
+    /// The arguments used for the <see cref="T:QueryAndResultsControl.SelectionChanged"/> event.
+    /// </summary>
+    public class GridSelectionEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GridSelectionEventArgs"/> class.
+        /// </summary>
+        /// <param name="selectedRows">The <see cref="DataRow"/>s associated with the currently
+        /// selected <see cref="System.Windows.Forms.DataGridViewRow"/>s.</param>
+        public GridSelectionEventArgs(IEnumerable<DataRow> selectedRows)
+            : base()
+        {
+            SelectedRows = new List<DataRow>(selectedRows);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DataRow"/>s associated with the currently selected
+        /// <see cref="System.Windows.Forms.DataGridViewRow"/>s.
+        /// </summary>
+        public IEnumerable<DataRow> SelectedRows
         {
             get;
             private set;

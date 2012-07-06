@@ -117,6 +117,16 @@ namespace Extract.SQLCDBEditor
         List<QueryAndResultsControl> _pendingQueryList = new List<QueryAndResultsControl>();
 
         /// <summary>
+        /// The list of plugins available for the open database.
+        /// </summary>
+        List<QueryAndResultsControl> _pluginList = new List<QueryAndResultsControl>();
+
+        /// <summary>
+        /// The binding between <see cref="_pluginList"/> and <see cref="_pluginsListBox"/>
+        /// </summary>
+        BindingSource _pluginsBindingSource = new BindingSource();
+
+        /// <summary>
         /// The primary tab into which tables and queries will be opened unless otherwise specified.
         /// </summary>
         TabbedDocument _primaryTab;
@@ -161,6 +171,11 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         FormStateManager _formStateManager;
 
+        /// <summary>
+        /// Indicates if the host is in design mode or not.
+        /// </summary>
+        readonly bool _inDesignMode;
+
         #endregion Fields
 
         #region Constructors
@@ -193,7 +208,9 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
+                _inDesignMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
+
+                if (_inDesignMode)
                 {
                     // Load the license files from folder
                     LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
@@ -215,6 +232,8 @@ namespace Extract.SQLCDBEditor
                 _tablesListBox.DataSource = _tablesBindingSource;
                 _queriesBindingSource.DataSource = _queryList;
                 _queriesListBox.DataSource = _queriesBindingSource;
+                _pluginsBindingSource.DataSource = _pluginList;
+                _pluginsListBox.DataSource = _pluginsBindingSource;
 
                 if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
                 {
@@ -244,6 +263,12 @@ namespace Extract.SQLCDBEditor
 
                 // Initialize the dirty flag
                 _dirty = false;
+
+                // The plugin list should be closed until a database is open with available plugins.
+                if (!_inDesignMode && (_pluginDockableWindow.DockSituation != DockSituation.None))
+                {
+                    _pluginDockableWindow.Close();
+                }
 
                 if (!_standAlone)
                 {
@@ -310,6 +335,7 @@ namespace Extract.SQLCDBEditor
 
                     CollectionMethods.ClearAndDispose(_tableList);
                     CollectionMethods.ClearAndDispose(_queryList);
+                    CollectionMethods.ClearAndDispose(_pluginList);
                     CollectionMethods.ClearAndDispose(_pendingQueryList);
 
                     if (_tablesBindingSource != null)
@@ -324,6 +350,13 @@ namespace Extract.SQLCDBEditor
                         _queriesListBox.DataSource = null;
                         _queriesBindingSource.Dispose();
                         _queriesBindingSource = null;
+                    }
+
+                    if (_pluginsBindingSource != null)
+                    {
+                        _pluginsListBox.DataSource = null;
+                        _pluginsBindingSource.Dispose();
+                        _pluginsBindingSource = null;
                     }
 
                     if (components != null)
@@ -509,13 +542,34 @@ namespace Extract.SQLCDBEditor
 
                     // Clear any selection from the other list box to make it clear what the
                     // currently selected item is.
-                    if (queryAndResultsControl.IsTable)
+                    switch (queryAndResultsControl.QueryAndResultsType)
                     {
-                        _queriesListBox.ClearSelected();
-                    }
-                    else
-                    {
-                        _tablesListBox.ClearSelected();
+                        case QueryAndResultsType.Table:
+                            {
+                                _queriesListBox.ClearSelected();
+                                _pluginsListBox.ClearSelected();
+                            }
+                            break;
+
+                        case QueryAndResultsType.Query:
+                            {
+                                _tablesListBox.ClearSelected();
+                                _pluginsListBox.ClearSelected();
+                            }
+                            break;
+
+                        case QueryAndResultsType.Plugin:
+                            {
+                                _tablesListBox.ClearSelected();
+                                _queriesListBox.ClearSelected();
+                            }
+                            break;
+
+                        default:
+                            {
+                                ExtractException.ThrowLogicException("ELI34829");
+                            }
+                            break;
                     }
 
                     Control previouslyActiveControl = ActiveControl;
@@ -567,12 +621,15 @@ namespace Extract.SQLCDBEditor
                     }
 
                     bool isEditableQuery =
-                        (!_contextMenuItem.IsTable && !_contextMenuItem.IsReadOnly);
+                        (_contextMenuItem.QueryAndResultsType == QueryAndResultsType.Query) && 
+                        !_contextMenuItem.IsReadOnly;
 
                     _renameQueryMenuItem.Visible = isEditableQuery;
                     _deleteToolStripMenuItem.Visible = isEditableQuery;
                     _openInSeparateTabMenuItem.Visible =
                         _contextMenuItem.ShowSendToSeparateTabButton;
+                    _copyToNewQueryToolStripMenuItem.Visible =
+                        _contextMenuItem.QueryAndResultsType != QueryAndResultsType.Plugin;
 
                     // Invalidate the appropriate list box so that the focus rectangle gets drawn.
                     if (_tableList.Contains(_contextMenuItem))
@@ -582,6 +639,10 @@ namespace Extract.SQLCDBEditor
                     else if (_queryList.Contains(_contextMenuItem))
                     {
                         _queriesListBox.Invalidate();
+                    }
+                    else if (_pluginList.Contains(_contextMenuItem))
+                    {
+                        _pluginsListBox.Invalidate();
                     }
                 }
             }
@@ -612,6 +673,10 @@ namespace Extract.SQLCDBEditor
                     else if (_queryList.Contains(_contextMenuItem))
                     {
                         _queriesListBox.Invalidate();
+                    }
+                    else if (_pluginList.Contains(_contextMenuItem))
+                    {
+                        _pluginsListBox.Invalidate();
                     }
                 }
             }
@@ -742,7 +807,7 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                var queryAndResultsControl = new QueryAndResultsControl(false);
+                var queryAndResultsControl = new QueryAndResultsControl(QueryAndResultsType.Query);
 
                 InitializeNewQuery(queryAndResultsControl);
             }
@@ -787,6 +852,7 @@ namespace Extract.SQLCDBEditor
 
                     _tablesListBox.ClearSelected();
                     _queriesListBox.ClearSelected();
+                    _pluginsListBox.ClearSelected();
                     _lastSelectedItem = null;
 
                     e.Cancel = true;
@@ -840,6 +906,10 @@ namespace Extract.SQLCDBEditor
                     else if (_queriesListBox.SelectedItem == queryAndResultsControl)
                     {
                         _queriesListBox.ClearSelected();
+                    }
+                    else if (_pluginsListBox.SelectedItem == queryAndResultsControl)
+                    {
+                        _pluginsListBox.ClearSelected();
                     }
                 }
             }
@@ -1052,6 +1122,7 @@ namespace Extract.SQLCDBEditor
                     {
                         _tablesListBox.ClearSelected();
                         _queriesListBox.ClearSelected();
+                        _pluginsListBox.ClearSelected();
                         return;
                     }
 
@@ -1061,6 +1132,7 @@ namespace Extract.SQLCDBEditor
                     if (_tableList.Contains(queryAndResultsControl))
                     {
                         _queriesListBox.ClearSelected();
+                        _pluginsListBox.ClearSelected();
 
                         if (!_tablesListBox.SelectedItems.Contains(queryAndResultsControl))
                         {
@@ -1071,11 +1143,23 @@ namespace Extract.SQLCDBEditor
                     else if (_queryList.Contains(queryAndResultsControl))
                     {
                         _tablesListBox.ClearSelected();
+                        _pluginsListBox.ClearSelected();
 
                         if (!_queriesListBox.SelectedItems.Contains(queryAndResultsControl))
                         {
-                            _tablesListBox.ClearSelected();
+                            _queriesListBox.ClearSelected();
                             _queriesListBox.SelectedItems.Add(queryAndResultsControl);
+                        }
+                    }
+                    else if (_pluginList.Contains(queryAndResultsControl))
+                    {
+                        _tablesListBox.ClearSelected();
+                        _queriesListBox.ClearSelected();
+
+                        if (!_pluginsListBox.SelectedItems.Contains(queryAndResultsControl))
+                        {
+                            _pluginsListBox.ClearSelected();
+                            _pluginsListBox.SelectedItems.Add(queryAndResultsControl);
                         }
                     }
                 }
@@ -1204,7 +1288,8 @@ namespace Extract.SQLCDBEditor
 
                 _tableList.AddRange(tableNames
                     .Select(tableName =>
-                        new QueryAndResultsControl(tableName, _databaseFileName, true)));
+                        new QueryAndResultsControl(tableName, _databaseFileName,
+                            QueryAndResultsType.Table)));
 
                 _tablesBindingSource.ResetBindings(false);
 
@@ -1237,7 +1322,8 @@ namespace Extract.SQLCDBEditor
                 _queryList.AddRange(
                     Directory.EnumerateFiles(Path.GetDirectoryName(_databaseFileName), "*.sqlce")
                     .Select(fileName => new QueryAndResultsControl(
-                        Path.GetFileNameWithoutExtension(fileName), fileName, false)));
+                        Path.GetFileNameWithoutExtension(fileName), fileName,
+                            QueryAndResultsType.Query)));
 
                 _queriesBindingSource.ResetBindings(false);
 
@@ -1251,6 +1337,41 @@ namespace Extract.SQLCDBEditor
             {
                 // Re-activate the SelectedIndexChanged event handler
                 _queriesListBox.SelectedIndexChanged += HandleListSelectionChanged;
+            }
+        }
+
+        /// <summary>
+        /// Loads any .plugin files into the plugin list pane.
+        /// </summary>
+        void LoadPluginList()
+        {
+            // Remove the handler for the SelectedIndexChanged event while loading the list box
+            _pluginsListBox.SelectedIndexChanged -= HandleListSelectionChanged;
+
+            try
+            {
+                _pluginList.AddRange(
+                    Directory.EnumerateFiles(Path.GetDirectoryName(_databaseFileName), "*.plugin")
+                    .Select(fileName => 
+                        UtilityMethods.CreateTypeFromAssembly<SQLCDBEditorPlugin>(fileName))
+                    .Where(plugin => plugin != null)
+                    .Select(plugin => new QueryAndResultsControl(plugin)));
+
+                _pluginsBindingSource.ResetBindings(false);
+
+                _pluginsListBox.ClearSelected();
+
+                // The plugin pane should be visible only if there are available plugins.
+                UpdatePluginPaneVisibility();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34624");
+            }
+            finally
+            {
+                // Re-activate the SelectedIndexChanged event handler
+                _pluginsListBox.SelectedIndexChanged += HandleListSelectionChanged;
             }
         }
 
@@ -1367,27 +1488,46 @@ namespace Extract.SQLCDBEditor
                 return;
             }
 
-            if (queryAndResultsControl.IsTable)
+            switch (queryAndResultsControl.QueryAndResultsType)
             {
-                queryAndResultsControl.LoadTable(_connection, queryAndResultsControl.DisplayName);
-                queryAndResultsControl.DataChanged += HandleDataChanged;
-            }
-            else
-            {
-                try
-                {
-                    queryAndResultsControl.LoadQuery(_connection);
-                }
-                catch (Exception ex)
-                {
-                    // If this is a query, go ahead and allow it to be displayed (after displaying
-                    // the exception) so that the query text may be corrected.
-                    ex.ExtractDisplay("ELI34656");
-                }
+                case QueryAndResultsType.Table:
+                    {
+                        queryAndResultsControl.LoadTable(_connection, queryAndResultsControl.DisplayName);
+                        queryAndResultsControl.DataChanged += HandleDataChanged;
+                    }
+                    break;
 
-                queryAndResultsControl.PropertyChanged += HandleQueryPropertyChanged;
-                queryAndResultsControl.QuerySaved += HandleQuerySaved;
-                queryAndResultsControl.QueryRenaming += HandleQueryRenaming;
+                case QueryAndResultsType.Query:
+                    {
+                        try
+                        {
+                            queryAndResultsControl.LoadQuery(_connection);
+                        }
+                        catch (Exception ex)
+                        {
+                            // If this is a query, go ahead and allow it to be displayed (after displaying
+                            // the exception) so that the query text may be corrected.
+                            ex.ExtractDisplay("ELI34656");
+                        }
+
+                        queryAndResultsControl.PropertyChanged += HandleQueryPropertyChanged;
+                        queryAndResultsControl.QuerySaved += HandleQuerySaved;
+                        queryAndResultsControl.QueryRenaming += HandleQueryRenaming;
+                    }
+                    break;
+
+                case QueryAndResultsType.Plugin:
+                    {
+                        queryAndResultsControl.DataChanged += HandleDataChanged;
+                        queryAndResultsControl.LoadPlugin(_connection);
+                    }
+                    break;
+
+                default:
+                    {
+                        ExtractException.ThrowLogicException("ELI34830");
+                    }
+                    break;
             }
 
             queryAndResultsControl.SentToSeparateTab += HandleTableOrQuerySentToSeparateTab;
@@ -1679,10 +1819,10 @@ namespace Extract.SQLCDBEditor
 
                 // Load the table names into the listBox
                 var tableNames = LoadTableList();
-
                 CheckSchemaVersionAndPromptForUpdate(tableNames);
 
                 LoadQueryList();
+                LoadPluginList();
 
                 // If this database was previously open reopen the same table
                 if (!string.IsNullOrEmpty(currentlyOpenTable))
@@ -1835,7 +1975,8 @@ namespace Extract.SQLCDBEditor
         bool PromptAndSaveDirtyQueries(params QueryAndResultsControl[] queryControls)
         {
             IEnumerable<QueryAndResultsControl> dirtyQueryControls =
-                queryControls.Where(query => !query.IsTable && query.IsQueryDirty);
+                queryControls.Where(query =>
+                    query.QueryAndResultsType == QueryAndResultsType.Query && query.IsQueryDirty);
 
             if (dirtyQueryControls.Count() > 0)
             {
@@ -1917,8 +2058,10 @@ namespace Extract.SQLCDBEditor
 
             CollectionMethods.ClearAndDispose(_tableList);
             CollectionMethods.ClearAndDispose(_queryList);
+            CollectionMethods.ClearAndDispose(_pluginList);
             _tablesBindingSource.ResetBindings(false);
             _queriesBindingSource.ResetBindings(false);
+            _pluginsBindingSource.ResetBindings(false);
 
             CollectionMethods.ClearAndDispose(_pendingQueryList);
 
@@ -1952,6 +2095,8 @@ namespace Extract.SQLCDBEditor
                 File.Delete(_databaseWorkingCopyFileName);
                 _databaseWorkingCopyFileName = null;
             }
+
+            UpdatePluginPaneVisibility();
 
             SetWindowTitle();
         }
@@ -2177,6 +2322,29 @@ namespace Extract.SQLCDBEditor
 
             _tablesListBox.ClearSelected();
             _queriesListBox.ClearSelected();
+        }
+
+        /// <summary>
+        /// Updates the plugin pane visibility based upon whether there are any available plugins.
+        /// </summary>
+        void UpdatePluginPaneVisibility()
+        {
+            bool shouldBeVisible =
+                !string.IsNullOrEmpty(_databaseFileName) && (_pluginList.Count > 0);
+
+            if (shouldBeVisible != (_pluginDockableWindow.DockSituation != DockSituation.None))
+            {
+                if (shouldBeVisible)
+                {
+                    _pluginDockableWindow.Open();
+                    _pluginDockableWindow.Closing += HandleDockWindowClosing;
+                }
+                else
+                {
+                    _pluginDockableWindow.Closing -= HandleDockWindowClosing;
+                    _pluginDockableWindow.Close();
+                }
+            }
         }
 
         #endregion Private Methods

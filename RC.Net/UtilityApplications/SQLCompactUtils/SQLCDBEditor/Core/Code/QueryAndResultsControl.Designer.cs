@@ -103,7 +103,7 @@
             this._showHideQueryButton.Location = new System.Drawing.Point(3, 3);
             this._showHideQueryButton.Name = "_showHideQueryButton";
             this._showHideQueryButton.Size = new System.Drawing.Size(89, 23);
-            this._showHideQueryButton.TabIndex = 7;
+            this._showHideQueryButton.TabIndex = 0;
             this._showHideQueryButton.Text = "Show query";
             this._showHideQueryButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this._showHideQueryButton.UseVisualStyleBackColor = true;
@@ -133,7 +133,7 @@
             this._newQueryButton.Location = new System.Drawing.Point(236, 3);
             this._newQueryButton.Name = "_newQueryButton";
             this._newQueryButton.Size = new System.Drawing.Size(121, 23);
-            this._newQueryButton.TabIndex = 5;
+            this._newQueryButton.TabIndex = 2;
             this._newQueryButton.Text = "Copy to new query";
             this._newQueryButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this._newQueryButton.UseVisualStyleBackColor = true;
@@ -148,7 +148,7 @@
             this._saveButton.Location = new System.Drawing.Point(363, 3);
             this._saveButton.Name = "_saveButton";
             this._saveButton.Size = new System.Drawing.Size(58, 23);
-            this._saveButton.TabIndex = 2;
+            this._saveButton.TabIndex = 3;
             this._saveButton.Text = "Save";
             this._saveButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this._saveButton.UseVisualStyleBackColor = true;
@@ -179,7 +179,7 @@
             this._executeQueryButton.Location = new System.Drawing.Point(506, 3);
             this._executeQueryButton.Name = "_executeQueryButton";
             this._executeQueryButton.Size = new System.Drawing.Size(72, 23);
-            this._executeQueryButton.TabIndex = 0;
+            this._executeQueryButton.TabIndex = 5;
             this._executeQueryButton.Text = "Execute";
             this._executeQueryButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this._executeQueryButton.UseVisualStyleBackColor = true;
@@ -195,16 +195,17 @@
             // 
             // _resultsSplitContainer.Panel1
             // 
-            this._resultsSplitContainer.Panel1.BackColor = System.Drawing.SystemColors.ControlDark;
+            this._resultsSplitContainer.Panel1.BackColor = System.Drawing.SystemColors.Control;
             this._resultsSplitContainer.Panel1.Controls.Add(this._queryPanel);
             this._resultsSplitContainer.Panel1Collapsed = true;
+            this._resultsPanel.TabIndex = 1;
             // 
             // _resultsSplitContainer.Panel2
             // 
             this._resultsSplitContainer.Panel2.Controls.Add(this._resultsPanel);
             this._resultsSplitContainer.Size = new System.Drawing.Size(624, 303);
             this._resultsSplitContainer.SplitterDistance = 92;
-            this._resultsSplitContainer.TabIndex = 4;
+            this._resultsSplitContainer.TabIndex = 2;
             // 
             // _queryPanel
             // 
@@ -225,7 +226,7 @@
             this._resultsPanel.Margin = new System.Windows.Forms.Padding(0);
             this._resultsPanel.Name = "_resultsPanel";
             this._resultsPanel.Size = new System.Drawing.Size(624, 303);
-            this._resultsPanel.TabIndex = 4;
+            this._resultsPanel.TabIndex = 3;
             // 
             // queryAndResultTableLayoutPanel2
             // 
@@ -243,7 +244,7 @@
             this.queryAndResultTableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 19F));
             this.queryAndResultTableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.queryAndResultTableLayoutPanel2.Size = new System.Drawing.Size(622, 301);
-            this.queryAndResultTableLayoutPanel2.TabIndex = 3;
+            this.queryAndResultTableLayoutPanel2.TabIndex = 1;
             // 
             // _parametersTableLayoutPanel
             // 
@@ -259,7 +260,7 @@
             this._parametersTableLayoutPanel.RowCount = 1;
             this._parametersTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this._parametersTableLayoutPanel.Size = new System.Drawing.Size(622, 1);
-            this._parametersTableLayoutPanel.TabIndex = 3;
+            this._parametersTableLayoutPanel.TabIndex = 2;
             // 
             // _resultsStatusLabel
             // 
@@ -309,10 +310,11 @@
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this._resultsGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this._resultsGrid.Size = new System.Drawing.Size(622, 282);
-            this._resultsGrid.TabIndex = 2;
+            this._resultsGrid.TabIndex = 3;
             this._resultsGrid.CurrentCellDirtyStateChanged += new System.EventHandler(this.HandleResultsGridCurrentCellDirtyStateChanged);
             this._resultsGrid.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.HandleResultsGridDataError);
             this._resultsGrid.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.HandleResultsGridRowsRemoved);
+            this._resultsGrid.SelectionChanged += new System.EventHandler(this.HandleResultsGridSelectionChanged);
             // 
             // QueryAndResultsControl
             // 
