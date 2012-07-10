@@ -128,9 +128,11 @@ namespace Extract.SQLCDBEditor
         SQLCDBEditorPlugin _plugin;
 
         /// <summary>
-        /// Indicates whether the control has been loaded.
+        /// Indicates whether the initial <see cref="Control.Layout"/> call (after loading) has
+        /// completed. Used to determine the right time to compute the initial size of the columns
+        /// or plugin.
         /// </summary>
-        bool _loaded;
+        bool _initialLayoutComplete;
 
         /// <summary>
         /// Indicates if the host is in design mode or not.
@@ -613,8 +615,6 @@ namespace Extract.SQLCDBEditor
 
                 // LoadQueryCore will initialize the query results grid. 
                 LoadQueryCore(connection, _plugin.Query);
-                
-                _plugin.LoadPlugin(this, connection);
             }
             catch (Exception ex)
             {
@@ -826,7 +826,7 @@ namespace Extract.SQLCDBEditor
                     }
                 }
             }
-            else
+            else if (_initialLayoutComplete)
             {
                 // Always auto-size columns if a query has changed since the last execution
                 // because the columns may no longer be the same.
@@ -1164,22 +1164,49 @@ namespace Extract.SQLCDBEditor
                 // continue to exist in the table until.
                 RemoveConstraints(_resultsTable);
 
-                AutoSizeColumns();
-
                 _resultsTable.ColumnChanged += HandleColumnChanged;
                 _resultsTable.RowChanged += HandleRowChanged;
 
                 UpdateResultsStatus(!_queryError);
-
-                _loaded = true;
-
-                // SelectionChanged events are not fired before _loaded == true, so fire a selection
-                // change event now that the form is loaded.
-                OnSelectionChanged();
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI34589");
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.Layout"/> event.
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.LayoutEventArgs"/> that contains the event data.</param>
+        protected override void OnLayout(LayoutEventArgs e)
+        {
+            try
+            {
+                base.OnLayout(e);
+
+                // If this is the first time Layout has been raised since loading, this control is now its final size.
+                // It is now okay to auto-size the columns or plugin.
+                if (IsLoaded && !_initialLayoutComplete)
+                {
+                    _initialLayoutComplete = true;
+
+                    AutoSizeColumns();
+
+                    if (QueryAndResultsType == QueryAndResultsType.Plugin)
+                    {
+                        _plugin.LoadPlugin(this, _connection);
+
+                        // SelectionChanged will not have been registered by the plugin until
+                        // _plugin.LoadPlugin is called, so fire a selection event now so that the
+                        // plugin registers the initial selection.
+                        OnSelectionChanged();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI34844");
             }
         }
 
@@ -1542,12 +1569,7 @@ namespace Extract.SQLCDBEditor
         {
             try
             {
-                // If a selection changed event is fired before the form is loaded, it may result
-                // in layout problems for the plugin that is not yet at its appropriate size.
-                if (_loaded)
-                {
-                    OnSelectionChanged();
-                }
+                OnSelectionChanged();
             }
             catch (Exception ex)
             {
