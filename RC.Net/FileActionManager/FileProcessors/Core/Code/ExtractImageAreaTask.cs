@@ -522,7 +522,7 @@ namespace Extract.FileActionManager.FileProcessors
                 string sourceDocName = pFileRecord.Name;
 
                 // Initialize the path tag instances with sourceDocName.
-                string dataFileName = pFAMTM.ExpandTags(DataFileName, sourceDocName);
+                string dataFileName = pFAMTM.ExpandTagsAndFunctions(DataFileName, sourceDocName);
                 OutputPathTags.UpdateTagValues(sourceDocName, pFAMTM.FPSFileDir);
 
                 // Extract image areas.

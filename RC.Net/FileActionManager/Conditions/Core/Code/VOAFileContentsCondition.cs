@@ -894,7 +894,7 @@ namespace Extract.FileActionManager.Conditions
                 // Validating the settings also initializes objects used by the condition.
                 ValidateSettings();
 
-                string voaFileName = pFAMTagManager.ExpandTags(VOAFileName, pFileRecord.Name);
+                string voaFileName = pFAMTagManager.ExpandTagsAndFunctions(VOAFileName, pFileRecord.Name);
 
                 if (!File.Exists(voaFileName))
                 {

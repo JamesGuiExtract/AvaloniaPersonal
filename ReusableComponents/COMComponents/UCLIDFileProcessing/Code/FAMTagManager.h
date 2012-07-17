@@ -49,6 +49,7 @@ public:
 	STDMETHOD(get_FPSFileDir)(BSTR *strFPSDir);
 	STDMETHOD(put_FPSFileDir)(BSTR strFPSDir);
 	STDMETHOD(ExpandTags)(BSTR bstrInput, BSTR bstrSourceName, BSTR *pbstrOutput);
+	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, BSTR bstrSourceName, BSTR *pbstrOutput);
 	STDMETHOD(GetBuiltInTags)(IVariantVector* *ppTags);
 	STDMETHOD(GetINIFileTags)(IVariantVector* *ppTags);
 	STDMETHOD(GetAllTags)(IVariantVector* *ppTags);
@@ -72,6 +73,8 @@ private:
 	//			The returned strings will include the < and > chars
 	void getTagNames(const std::string& strInput, 
 		std::vector<std::string>& rvecTagNames) const;
+
+	void expandTags(std::string &strInput, const std::string &strSourceDocName);
 
 	void validateLicense();
 };

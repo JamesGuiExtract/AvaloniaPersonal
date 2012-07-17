@@ -1532,6 +1532,11 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: To return VARIANT_TRUE if there are any tags in the
 		//			strInput, regardless of whether they are valid tag names
 		[id(7), helpstring("method StringContainsTags")] HRESULT StringContainsTags([in] BSTR strInput, [out, retval] VARIANT_BOOL* pbValue);
+		// PROMISE: To return a string that is equivalent in content to strInput
+		// bstrSourceName is the source doc name used in expand <SourceDocName>, it should be passed in as a parameter because
+		// different thread will have different source doc name [P13: 3901]
+		[id(8), helpstring("method ExpandTagsAndFunctions")] HRESULT ExpandTagsAndFunctions(
+			[in] BSTR bstrInput, [in] BSTR bstrSourceName, [out, retval] BSTR* pbstrOutput);
 
 	};
 

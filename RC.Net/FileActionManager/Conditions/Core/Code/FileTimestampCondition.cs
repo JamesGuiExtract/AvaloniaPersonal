@@ -770,7 +770,7 @@ namespace Extract.FileActionManager.Conditions
                 bool comparisonIsTrue;
 
                 // Get the timestamp DateTime to test.
-                string file1Name = pFAMTagManager.ExpandTags(File1Name, pFileRecord.Name);
+                string file1Name = pFAMTagManager.ExpandTagsAndFunctions(File1Name, pFileRecord.Name);
                 DateTime file1DateTime = GetFileDateTime(file1Name, File1Property);
 
                 if (ComparisonMethod == TimestampComparisonMethod.RangeComparison)
@@ -803,7 +803,7 @@ namespace Extract.FileActionManager.Conditions
 
                         case TimestampComparisonMethod.FileComparison:
                             {
-                                string file2Name = pFAMTagManager.ExpandTags(File2Name, pFileRecord.Name);
+                                string file2Name = pFAMTagManager.ExpandTagsAndFunctions(File2Name, pFileRecord.Name);
                                 comparisonDateTime = GetFileDateTime(file2Name, File2Property);
                             }
                             break;

@@ -8,6 +8,7 @@
 #include <LicenseMgmt.h>
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
+#include <TextFunctionExpander.h>
 
 //--------------------------------------------------------------------------------------------------
 // Tag names
@@ -96,43 +97,37 @@ STDMETHODIMP CFAMTagManager::ExpandTags(BSTR bstrInput, BSTR bstrSourceName, BST
 		std::string strInput = asString(bstrInput);
 		std::string strSourceDocName = asString(bstrSourceName);
 
-		bool bSourceDocNameTagFound = strInput.find(strSOURCE_DOC_NAME_TAG) != string::npos;
-		bool bFPSFileDirTagFound = strInput.find(strFPS_FILE_DIR_TAG) != string::npos;
-
-		// expand the strSOURCE_DOC_NAME_TAG tag with the appropriate value
-		if (bSourceDocNameTagFound)
-		{
-			// if there is no current sourcedoc file, this tag cannot
-			// be expanded.
-			if (strSourceDocName == "")
-			{
-				string strMsg = "There is no source document available to expand the ";
-				strMsg += strSOURCE_DOC_NAME_TAG;
-				strMsg += " tag!";
-				UCLIDException ue("ELI14387", strMsg);
-				ue.addDebugInfo("strInput", strInput);
-				throw ue;
-			}
-			replaceVariable(strInput, strSOURCE_DOC_NAME_TAG, strSourceDocName);
-		}
-
-		if (bFPSFileDirTagFound)
-		{
-			if (m_strFPSDir == "")
-			{
-				string strMsg = "There is no FPS File Name available to expand the ";
-				strMsg += strFPS_FILE_DIR_TAG;
-				strMsg += " tag!";
-				UCLIDException ue("ELI14388", strMsg);
-				ue.addDebugInfo("strInput", strInput);
-				throw ue;
-			}
-			replaceVariable(strInput, strFPS_FILE_DIR_TAG, m_strFPSDir);
-		}
+		expandTags(strInput, strSourceDocName);
 
 		*pbstrOutput = _bstr_t(strInput.c_str()).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14389");
+
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::ExpandTagsAndFunctions(BSTR bstrInput, BSTR bstrSourceName, BSTR *pbstrOutput)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI34849", pbstrOutput != __nullptr);
+
+		// Check license
+		validateLicense();
+
+		// The code is used to expand tags, currently it support <SourceDocName> 
+		// and <FPSFile>
+		std::string strInput = asString(bstrInput);
+		std::string strSourceDocName = asString(bstrSourceName);
+
+		expandTags(strInput, strSourceDocName);
+
+		TextFunctionExpander tfe;
+		strInput = tfe.expandFunctions(strInput); 
+
+		*pbstrOutput = _bstr_t(strInput.c_str()).Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34850");
 
 	return S_OK;
 }
@@ -338,6 +333,43 @@ void CFAMTagManager::getTagNames(const string& strInput,
 		// continue searching at the next position
 		rvecTagNames.push_back(strTagName);
 		nSearchStartPos = nTagEndPos + 1;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocName)
+{
+	bool bSourceDocNameTagFound = rstrInput.find(strSOURCE_DOC_NAME_TAG) != string::npos;
+	bool bFPSFileDirTagFound = rstrInput.find(strFPS_FILE_DIR_TAG) != string::npos;
+
+	// expand the strSOURCE_DOC_NAME_TAG tag with the appropriate value
+	if (bSourceDocNameTagFound)
+	{
+		// if there is no current sourcedoc file, this tag cannot
+		// be expanded.
+		if (strSourceDocName == "")
+		{
+			string strMsg = "There is no source document available to expand the ";
+			strMsg += strSOURCE_DOC_NAME_TAG;
+			strMsg += " tag!";
+			UCLIDException ue("ELI14387", strMsg);
+			ue.addDebugInfo("strInput", rstrInput);
+			throw ue;
+		}
+		replaceVariable(rstrInput, strSOURCE_DOC_NAME_TAG, strSourceDocName);
+	}
+
+	if (bFPSFileDirTagFound)
+	{
+		if (m_strFPSDir == "")
+		{
+			string strMsg = "There is no FPS File Name available to expand the ";
+			strMsg += strFPS_FILE_DIR_TAG;
+			strMsg += " tag!";
+			UCLIDException ue("ELI14388", strMsg);
+			ue.addDebugInfo("strInput", rstrInput);
+			throw ue;
+		}
+		replaceVariable(rstrInput, strFPS_FILE_DIR_TAG, m_strFPSDir);
 	}
 }
 //-------------------------------------------------------------------------------------------------

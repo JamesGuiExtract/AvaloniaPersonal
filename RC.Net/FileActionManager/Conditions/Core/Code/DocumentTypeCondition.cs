@@ -255,7 +255,7 @@ namespace Extract.FileActionManager.Conditions
                 LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI32735",
                     _COMPONENT_DESCRIPTION);
 
-                string voaFileName = pFAMTagManager.ExpandTags(VOAFileName, pFileRecord.Name);
+                string voaFileName = pFAMTagManager.ExpandTagsAndFunctions(VOAFileName, pFileRecord.Name);
 
                 if (!File.Exists(voaFileName))
                 {
