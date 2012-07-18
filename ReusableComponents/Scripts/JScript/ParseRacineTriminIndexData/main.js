@@ -13,8 +13,7 @@
 //   subdivision names.
 //
 // For PIN:
-//   Assumes "ParcelIDFile.csv" is in same dir as inputFile and is a mapping of plat code numbers to
-//   subdivision names.
+//   Assumes "ParcelIDFile.csv" is in same dir as inputFile and is a mapping of parcel code numbers to PINs.
 //
 // Usage:   ParseRacineTriminIndexData inputFile outputDir csvType
 //              inputFile - The path to the index data file
