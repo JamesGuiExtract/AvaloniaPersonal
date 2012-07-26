@@ -1,16 +1,44 @@
-﻿using System;
+﻿using Extract.Imaging;
+using Extract.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Xml;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
-using UCLID_RASTERANDOCRMGMTLib;
+
+using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
+using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
+using System.Runtime.Serialization;
 
 namespace Extract.DataEntry
 {
+    /// <summary>
+    /// An exception indicating that the current evaluation should be aborted and an empty
+    /// result should be returned.
+    /// </summary>
+    // This exception is to be created only by data queries. A standard set of constructors is not
+    // necesssary.
+    [Serializable] 
+    [SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors")]
+    public class QueryAbortEvaluationException : Exception
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QueryAbortEvaluationException"/> class.
+        /// </summary>
+        // This exception is to be created only by data queries. External access to constructor is
+        // not necessary.
+        [SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors")]
+        internal QueryAbortEvaluationException()
+            : base()
+        {
+        }
+    }
+
     /// <summary>
     /// A <see cref="QueryNode"/> that is comprised of one or more child
     /// <see cref="QueryNode"/>s.
@@ -600,10 +628,22 @@ namespace Extract.DataEntry
                     }
                 }
 
+                // If specified, turn spatial data into a string result.
+                if (SpatialField != null)
+                {
+                    result = GetAttributeSpatialFieldValue(result);
+                }
+
                 // Cache the result for efficiency in the case of repeated calls.
                 CachedResult = new QueryResult(this, result);
 
                 return result;
+            }
+            catch (QueryAbortEvaluationException)
+            {
+                // [DataEntry:1126]
+                // If the evaluation of this node has been aborted, return an empty result.
+                return new QueryResult(this);
             }
             catch (Exception ex)
             {
@@ -638,6 +678,14 @@ namespace Extract.DataEntry
             // Get the first query node and evaluate it.
             QueryNode queryNode = queryNodes.Dequeue();
             QueryResult queryResult = queryNode.Evaluate();
+
+            // [DataEntry:1126]
+            // If the AbortIfEmpty flag is set and the result is empty, abort the evaluation (ignore
+            // the result of all other nodes).
+            if (queryResult.IsEmpty && queryNode.AbortIfEmpty)
+            {
+                throw new QueryAbortEvaluationException();
+            }
 
             // Flatten the result into a delimited string if specified.
             if (queryNode.StringListDelimiter != null)
@@ -768,6 +816,127 @@ namespace Extract.DataEntry
                 }
 
                 yield return queryResult;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="QueryResult"/> as a string that describes the specified spatial
+        /// field of <see paramref="result"/>.
+        /// </summary>
+        /// <returns>A <see cref="QueryResult"/> describing the spatial field, or an empty result if
+        /// <see paramref="result"/> is not spatial.</returns>
+        QueryResult GetAttributeSpatialFieldValue(QueryResult result)
+        {
+            try
+            {
+                // Compile an enumeration of all spatial results.
+                IEnumerable<SpatialString> spatialResults = result.Select(value =>
+                    value.IsSpatial
+                        ? (value.IsAttribute
+                            ? value.FirstAttributeValue.Value
+                            : value.FirstSpatialStringValue)
+                        : null);
+
+                // Convert each spatial result into a string value corresponding to the SpatialField
+                // property.
+                QueryResult results;
+                results = new QueryResult(this,
+                    spatialResults.Select(spatialString =>
+                    {
+                        // If non-spatial, return blank.
+                        if (spatialString == null || !spatialString.HasSpatialInfo())
+                        {
+                            return "";
+                        }
+
+                        if (SpatialField == Extract.DataEntry.SpatialField.Page)
+                        {
+                            return spatialString.GetFirstPageNumber()
+                                .ToString(CultureInfo.InvariantCulture);
+                        }
+                        else if (SpatialField == Extract.DataEntry.SpatialField.Left ||
+                                 SpatialField == Extract.DataEntry.SpatialField.Top ||
+                                 SpatialField == Extract.DataEntry.SpatialField.Right ||
+                                 SpatialField == Extract.DataEntry.SpatialField.Bottom)
+                        {
+                            ILongRectangle bounds = spatialString.GetOriginalImageBounds();
+
+                            switch (SpatialField)
+                            {
+                                case Extract.DataEntry.SpatialField.Left:
+                                    return bounds.Left.ToString(CultureInfo.InvariantCulture);
+
+                                case Extract.DataEntry.SpatialField.Top:
+                                    return bounds.Top.ToString(CultureInfo.InvariantCulture);
+
+                                case Extract.DataEntry.SpatialField.Right:
+                                    return bounds.Right.ToString(CultureInfo.InvariantCulture);
+
+                                case Extract.DataEntry.SpatialField.Bottom:
+                                    return bounds.Bottom.ToString(CultureInfo.InvariantCulture);
+
+                                default:
+                                    return "";
+                            }
+                        }
+                        else
+                        {
+                            RasterZone rasterZone = RasterZone.GetBoundingRasterZone(
+                                spatialString.GetOriginalImageRasterZones()
+                                    .ToIEnumerable<ComRasterZone>()
+                                    .Select(comRasterZone => new RasterZone(comRasterZone)),
+                                spatialString.GetFirstPageNumber());
+
+                            if (rasterZone == null)
+                            {
+                                return "";
+                            }
+                            else
+                            {
+                                switch (SpatialField)
+                                {
+                                    case Extract.DataEntry.SpatialField.Page:
+                                        return rasterZone.PageNumber
+                                            .ToString(CultureInfo.InvariantCulture);
+
+                                    case Extract.DataEntry.SpatialField.StartX:
+                                        return rasterZone.StartX
+                                            .ToString(CultureInfo.InvariantCulture);
+
+                                    case Extract.DataEntry.SpatialField.StartY:
+                                        return rasterZone.StartY
+                                            .ToString(CultureInfo.InvariantCulture);
+
+                                    case Extract.DataEntry.SpatialField.EndX:
+                                        return rasterZone.EndX
+                                            .ToString(CultureInfo.InvariantCulture);
+
+                                    case Extract.DataEntry.SpatialField.EndY:
+                                        return rasterZone.EndY
+                                            .ToString(CultureInfo.InvariantCulture);
+
+                                    case Extract.DataEntry.SpatialField.Height:
+                                        return rasterZone.Height
+                                            .ToString(CultureInfo.InvariantCulture);
+
+                                    default:
+                                        return "";
+                                }
+                            }
+                        }
+                    })
+                .ToArray());
+                return results;
+            }
+            catch (Exception ex)
+            {
+                // Treat an error getting the spatial field the same as if the value didn't have any
+                // spatial info and return blank after logging the exception.
+                var ee = new ExtractException("ELI34852", "Error calculating spatial field", ex);
+                ee.AddDebugData("Field", SpatialField.ToString(), false);
+                ee.Log();
+
+                return new QueryResult(this);
             }
         }
 

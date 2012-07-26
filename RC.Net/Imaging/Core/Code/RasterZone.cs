@@ -478,6 +478,89 @@ namespace Extract.Imaging
         }
 
         /// <summary>
+        /// Gets a bounding <see cref="RasterZone"/> for all of the <see paramref="rasterZones"/>
+        /// on the specified <see paramref="pageNumber"/>.
+        /// </summary>
+        /// <param name="rasterZones">The source <see cref="RasterZone"/>s.</param>
+        /// <param name="pageNumber">The page number for which a <see cref="RasterZone"/> is needed.
+        /// </param>
+        /// <returns>A <see cref="RasterZone"/> bounding all <see paramref="rasterZones"/> on the
+        /// specified <see paramref="pageNumber"/>.</returns>
+        public static RasterZone GetBoundingRasterZone(IEnumerable<RasterZone> rasterZones,
+            int pageNumber)
+        {
+            try
+            {
+                List<RasterZone> pageRasterZones;
+                if (RasterZone.SplitZonesByPage(rasterZones).TryGetValue(pageNumber,
+                    out pageRasterZones))
+                {
+                    // If there's only one zone on the line, simply use it.
+                    if (pageRasterZones.Count == 1)
+                    {
+                        return pageRasterZones[0];
+                    }
+
+                    // Otherwise, find a bounding rectangle for the zones in a coordinate
+                    // system aligned with the zones' average angle.
+                    double angle;
+                    RectangleF bounds =
+                        RasterZone.GetAngledBoundingRectangle(pageRasterZones, out angle);
+
+                    // Create a start and end point for the zone in the raster zones' coordinate
+                    // system.
+                    float verticalMidPoint = bounds.Top + bounds.Height / 2F;
+                    PointF[] points = new PointF[]
+                                        {
+                                            new PointF(bounds.Left, verticalMidPoint),
+                                            new PointF(bounds.Right, verticalMidPoint)
+                                        };
+
+                    // Translate these points into the image coordinate system.
+                    using (Matrix transform = new Matrix())
+                    {
+                        transform.Rotate((float)angle);
+                        transform.TransformPoints(points);
+                    }
+
+                    // Adjust coordinates to ensure the raster zone doesn't shrink from points that
+                    // are rounded off in the wrong direction.
+                    int startX = (int)((points[0].X < points[1].X)
+                        ? points[0].X
+                        : Math.Ceiling(points[0].X));
+                    int startY = (int)((points[0].Y < points[1].Y)
+                        ? points[0].Y
+                        : Math.Ceiling(points[0].Y));
+                    int endX = (int)((points[1].X < points[0].X)
+                        ? points[1].X
+                        : Math.Ceiling(points[1].X));
+                    int endY = (int)((points[1].Y < points[0].Y)
+                        ? points[1].Y
+                        : Math.Ceiling(points[1].Y));
+                    int height = (int)Math.Ceiling(bounds.Height);
+
+                    // If the height is odd, the top and bottom of the zone will be a .5 value. When
+                    // such a zone is displayed, those values will be rounded off, potentially
+                    // exposing pixel content. Expand the zone by a pixel to prevent this.
+                    if (height % 2 == 1)
+                    {
+                        height++;
+                    }
+
+                    return new RasterZone(startX, startY, endX, endY, height, pageNumber);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34851");
+            }
+        }
+
+        /// <summary>
         /// Creates a bounding rectangle for the specified collection of zones in a coordinate
         /// system aligned with the zones' average angle.
         /// </summary>

@@ -1,6 +1,7 @@
 ﻿using Extract.Licensing;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Xml;
 
 namespace Extract.DataEntry
@@ -38,6 +39,62 @@ namespace Extract.DataEntry
         /// No spatial information should be persisted from the node.
         /// </summary>
         None = 3
+    }
+
+    /// <summary>
+    /// Specifies fields of the bounds of a spatial result that can be returned as text.
+    /// </summary>
+    public enum SpatialField
+    {
+        /// <summary>
+        /// The page number (first page, if it spans multiple).
+        /// </summary>
+        Page,
+
+        /// <summary>
+        /// The X coordinate of the left side.
+        /// </summary>
+        Left,
+
+        /// <summary>
+        /// The Y coordinate of the top side.
+        /// </summary>
+        Top,
+
+        /// <summary>
+        /// The X coordinate of the right side.
+        /// </summary>
+        Right,
+
+        /// <summary>
+        /// The Y coordinate of the bottom side.
+        /// </summary>
+        Bottom,
+
+        /// <summary>
+        /// The X coordinate of the start point.
+        /// </summary>
+        StartX,
+
+        /// <summary>
+        /// The Y coordinate of the start point.
+        /// </summary>
+        StartY,
+
+        /// <summary>
+        /// The X coordinate of the end point.
+        /// </summary>
+        EndX,
+
+        /// <summary>
+        /// The Y coordinate of the end point.
+        /// </summary>
+        EndY,
+
+        /// <summary>
+        /// The height of the zone.
+        /// </summary>
+        Height
     }
 
     /// <summary>
@@ -162,6 +219,11 @@ namespace Extract.DataEntry
         SpatialMode _spatialMode = SpatialMode.Normal;
 
         /// <summary>
+        /// Specifies a field of the bounds of a spatial result that can be returned as text.
+        /// </summary>
+        SpatialField? _spatialField;
+
+        /// <summary>
         /// The <see cref="MultipleQueryResultSelectionMode"/> that should be used to determine how
         /// multiple resulting values should be handled.
         /// </summary>
@@ -189,6 +251,12 @@ namespace Extract.DataEntry
         /// string value where each value is separated by the specified delimiter.
         /// </summary>
         string _stringListDelimiter;
+
+        /// <summary>
+        /// Specifies whether the parent node should abort processing if the result of this node is
+        /// empty.
+        /// </summary>
+        bool _abortIfEmpty;
 
         /// <summary>
         /// The properties assigned to the query node via <see cref="XmlAttribute"/>s (name/value
@@ -339,6 +407,26 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets a <see cref="SpatialField"/> of the bounds of a spatial result to return
+        /// as text.
+        /// </summary>
+        /// <value>
+        /// The <see cref="SpatialField"/> of the bounds of a spatial result to return as text.
+        /// </value>
+        public SpatialField? SpatialField
+        {
+            get
+            {
+                return _spatialField;
+            }
+
+            set
+            {
+                _spatialField = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or set the name by which this result can be looked up a later time.
         /// Can be <see langword="null"/>, in which case the results will not be accessible
         /// independently from the overal query result.
@@ -439,6 +527,27 @@ namespace Extract.DataEntry
             get
             {
                 return _stringListDelimiter;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the parent node should abort processing if the
+        /// result of this node is empty.
+        /// </summary>
+        /// <value>If <see langword="true"/> and the result of this node is empty, the parent node
+        /// should return an empty result as well rather than attempting to evaluate; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool AbortIfEmpty
+        {
+            get
+            {
+                return _abortIfEmpty;
+            }
+
+            set
+            {
+                _abortIfEmpty = value;
             }
         }
 
@@ -573,6 +682,13 @@ namespace Extract.DataEntry
                     }
                 }
 
+                // Convert a spatial parameter to text if specified.
+                if (_properties.TryGetValue("SpatialField", out xmlAttributeValue))
+                {
+                    _spatialField = (SpatialField)TypeDescriptor.GetConverter(typeof(SpatialField))
+                        .ConvertFromString(xmlAttributeValue);
+                }
+
                 // Parameterize unless the parameterize attribute is present and specifies not to.
                 if (_properties.TryGetValue("Parameterize", out xmlAttributeValue))
                 {
@@ -625,6 +741,13 @@ namespace Extract.DataEntry
                 if (_properties.TryGetValue("StringList", out xmlAttributeValue))
                 {
                     _stringListDelimiter = xmlAttributeValue;
+                }
+
+                // If set and the result of this node is empty, the parent should return empty
+                // without attempting evaluation.
+                if (_properties.TryGetValue("AbortIfEmpty", out xmlAttributeValue))
+                {
+                    AbortIfEmpty = xmlAttributeValue.ToBoolean();
                 }
             }
             catch (Exception ex)

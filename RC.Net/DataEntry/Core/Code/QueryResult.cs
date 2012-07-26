@@ -924,6 +924,7 @@ namespace Extract.DataEntry
                     QueryResult lastResultA = resultA
                         .Cast<QueryResult>()
                         .Last();
+
                     lastResultA._nextValue = resultB;
 
                     resultA._hasMultipleValues = true;
@@ -1149,7 +1150,7 @@ namespace Extract.DataEntry
             {
                 QueryResult newResultInstance = null;
 
-                if (IsAttribute)
+                if (IsAttribute && _attributeResults.Count > 1)
                 {
                     IAttribute[] remainingResults = new IAttribute[_attributeResults.Count - 1];
                     _attributeResults.CopyTo(1, remainingResults, 0, remainingResults.Length);

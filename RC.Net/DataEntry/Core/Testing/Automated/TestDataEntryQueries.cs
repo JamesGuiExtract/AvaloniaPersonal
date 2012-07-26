@@ -173,6 +173,45 @@ namespace Extract.DataEntry.Test
         }
 
         /// <summary>
+        /// Tests the SpatialField attribute.
+        /// </summary>
+        [Test, Category("AttributeQueryNode")]
+        public static void TestAttributeSpatialField()
+        {
+            LoadDataFile(_testImages.GetFile(_FLEX_INDEX_DATA_FILE), null);
+
+            string xml = "<Attribute Name='ConsiderationAmount'>/ConsiderationAmount</Attribute>\r\n" +
+                         "<ConsiderationAmount SpatialField='Page'/>\r\n" +
+                         "<ConsiderationAmount SpatialField='Left'/>\r\n" +
+                         "<ConsiderationAmount SpatialField='Top'/>\r\n" +
+                         "<ConsiderationAmount SpatialField='Right'/>\r\n" +
+                         "<ConsiderationAmount SpatialField='Bottom'/>\r\n" +
+                         "<ConsiderationAmount SpatialField='StartX'/>\r\n" +
+                         "<ConsiderationAmount SpatialField='StartY'/>\r\n" +
+                         "<ConsiderationAmount SpatialField='EndX'/>\r\n" +
+                         "<ConsiderationAmount SpatialField='EndY'/>\r\n" +
+                         "<ConsiderationAmount SpatialField='Height'/>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 11);
+            Assert.That(results[0].ToString() == "192800.00");
+            Assert.That(results[1].ToString() == "2");
+            Assert.That(results[2].ToString() == "559");
+            Assert.That(results[3].ToString() == "1259");
+            Assert.That(results[4].ToString() == "741");
+            Assert.That(results[5].ToString() == "1292");
+            Assert.That(results[6].ToString() == "559");
+            Assert.That(results[7].ToString() == "1276");
+            Assert.That(results[8].ToString() == "741");
+            Assert.That(results[9].ToString() == "1276");
+            Assert.That(results[10].ToString() == "32");
+        }
+
+
+        /// <summary>
         /// Tests the <see cref="SqlQueryNode"/>
         /// </summary>
         [Test, Category("TestSqlQuery")]
@@ -457,6 +496,25 @@ namespace Extract.DataEntry.Test
             QueryResult result = query.Evaluate();
 
             Assert.That(result.ToString() == "True");
+        }
+
+        /// <summary>
+        /// A test of the AbortIfEmpty attribute.
+        /// </summary>
+        [Test, Category("ExpressionQueryNode")]
+        public static void TestExpressionAbortIfEmpty()
+        {
+            LoadDataFile(_testImages.GetFile(_LABDE_DATA_FILE), null);
+
+            string xml = @"Empty:<Expression> " +
+	                        @"0 + <Attribute StringList=' + ' Parameterize='False' AbortIfEmpty='True'>/Test/Component/Garbage</Attribute>" +
+                         @"</Expression>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            QueryResult result = query.Evaluate();
+
+            Assert.That(result.ToString() == "Empty:");
         }
 
         /// <summary>

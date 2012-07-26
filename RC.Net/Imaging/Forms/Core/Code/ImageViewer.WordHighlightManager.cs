@@ -7,7 +7,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -2644,62 +2643,9 @@ namespace Extract.Imaging.Forms
                 // the average angle of all the zones.
                 foreach (List<RasterZone> lineRasterZones in rasterZonesByLine.Values)
                 {
-                    if (lineRasterZones.Count == 1)
-                    {
-                        // If there's only one zone on the line, simply use it.
-                        wordOutputZones.Add(lineRasterZones[0]);
-                    }
-                    else
-                    {
-                        // Otherwise, find a bounding rectangle for the zones in a coordinate
-                        // system aligned with the zones' average angle.
-                        double angle;
-                        RectangleF bounds =
-                            RasterZone.GetAngledBoundingRectangle(lineRasterZones, out angle);
-
-                        // Create a start and end point for the zone in the raster zones' coordinate
-                        // system.
-                        float verticalMidPoint = bounds.Top + bounds.Height / 2F;
-                        PointF[] points = new PointF[]
-                                    {
-                                        new PointF(bounds.Left, verticalMidPoint),
-                                        new PointF(bounds.Right, verticalMidPoint)
-                                    };
-
-                        // Translate these points into the image coordinate system.
-                        using (Matrix transform = new Matrix())
-                        {
-                            transform.Rotate((float)angle);
-                            transform.TransformPoints(points);
-                        }
-
-                        // Adjust coordinates to ensure the raster zone doesn't shrink from points that are
-                        // rounded off in the wrong direction.
-                        int startX = (int)((points[0].X < points[1].X) 
-                            ? points[0].X
-                            :Math.Ceiling(points[0].X));
-                        int startY = (int)((points[0].Y < points[1].Y) 
-                            ? points[0].Y
-                            : Math.Ceiling(points[0].Y));
-                        int endX = (int)((points[1].X < points[0].X) 
-                            ? points[1].X
-                            : Math.Ceiling(points[1].X));
-                        int endY = (int)((points[1].Y < points[0].Y) 
-                            ? points[1].Y
-                            : Math.Ceiling(points[1].Y));
-                        int height = (int)Math.Ceiling(bounds.Height);
-
-                        // If the height is odd, the top and bottom of the zone will be a .5 value. When such a
-                        // zone is displayed, those values will be rounded off, potentially exposing pixel
-                        // content. Expand the zone by a pixel to prevent this.
-                        if (height % 2 == 1)
-                        {
-                            height++;
-                        }
-
-                        wordOutputZones.Add(new RasterZone(startX, startY, endX, endY, height,
-                            _imageViewer.PageNumber));
-                    }
+                    RasterZone rasterZone = RasterZone.GetBoundingRasterZone(
+                        lineRasterZones, _imageViewer.PageNumber);
+                    wordOutputZones.Add(rasterZone);
                 }
 
                 return wordOutputZones;
