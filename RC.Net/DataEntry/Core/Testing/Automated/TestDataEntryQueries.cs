@@ -699,17 +699,25 @@ namespace Extract.DataEntry.Test
         /// A test to find missing AKA values using a variety of query features.
         /// </summary>
         [Test, Category("Composite")]
-        public static void TestCompositeFindMissingAKAs()
+        public static void TestCompositeFindMissingAlternateTestNames()
         {
-            LoadDataFile(_testImages.GetFile(_LABDE_DATA_FILE), null);
+            string sourceDocName = _testImages.GetFile(_LABDE_DATA_FILE);
+            LoadDataFile(sourceDocName, null);
 
             string xml = @"<SQL>" +
-                        @"SELECT VOAFileData.OriginalName FROM " +
+                        @"SELECT VOAFileData.* FROM " +
                         @"(" +
                             @"<Composite Parameterize='false' StringList=' UNION '> " +
                                 @"SELECT " +
                                     @"'<Attribute SelectionMode='Distinct' Name='OriginalName'>Test/Component/OriginalName</Attribute>' AS OriginalName, " +
-                                    @"'<Attribute Root='OriginalName'>../TestCode</Attribute>' AS TestCode " +
+                                    @"'<Attribute Root='OriginalName'>../TestCode</Attribute>' AS TestCode, " +
+                                    @"'<SourceDocName/>' AS SourceDocName, " +
+                                    @"'<OriginalName SpatialField='Page'/>' AS Page, " +
+                                    @"'<OriginalName SpatialField='StartX'/>' AS StartX, " +
+                                    @"'<OriginalName SpatialField='StartY'/>' AS StartY, " +
+                                    @"'<OriginalName SpatialField='EndX'/>' AS EndX, " +
+                                    @"'<OriginalName SpatialField='EndY'/>' AS EndY, " +
+                                    @"'<OriginalName SpatialField='Height'/>' AS Height " +
                             @"</Composite> " +
                         @") AS VOAFileData " +
                         @"INNER JOIN LabOrderTest ON LabOrderTest.TestCode = VOAFileData.TestCode " +
@@ -732,8 +740,8 @@ namespace Extract.DataEntry.Test
                 string[] results = query.Evaluate().ToStringArray();
 
                 Assert.That(results.Length == 2);
-                Assert.That(results[0].ToString() == "LYM%");
-                Assert.That(results[1].ToString() == "MON%");
+                Assert.That(results[0].ToString() == "LYM%, JLYM, " + sourceDocName + ", 1, 173, 1757, 314, 1757, 46");
+                Assert.That(results[1].ToString() == "MON%, KMONO, " + sourceDocName + ", 1, 170, 1808, 317, 1808, 48");
             }
         }
 
