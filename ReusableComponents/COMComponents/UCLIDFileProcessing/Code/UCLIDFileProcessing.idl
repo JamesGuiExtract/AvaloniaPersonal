@@ -18,8 +18,8 @@ library UCLID_FILEPROCESSINGLib
 	importlib("stdole2.tlb");
 	importlib("..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
 	importlib("..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
-	importlib("c:\Program Files\Common Files\System\ADO\msado27.tlb");
-
+	importlib("Common Files\System\ADO\msado27.tlb");
+	
 	/////////////////////////
 	// forward declarations
 	/////////////////////////

@@ -32,7 +32,7 @@
 #import "..\..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
 using namespace UCLID_COMUTILSLib;
 
-#import "c:\Program Files\Common Files\System\ADO\msado27.tlb" \
+#import "Common Files\System\ADO\msado27.tlb" \
 	rename ("EOF", "adoEOF")
 using namespace ADODB;
 
@@ -41,9 +41,6 @@ using namespace UCLID_FILEPROCESSINGLib;
 
 #import "..\..\..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" named_guids 
 using namespace UCLID_COMLMLib;
-
-#import "c:\Program Files\Common Files\System\ADO\msado27.tlb" \
-	rename ("EOF", "adoEOF")
 
 #import "..\..\..\ESSkipConditions\Code\ESSkipConditions.tlb" named_guids
 using namespace EXTRACT_FAMCONDITIONSLib;

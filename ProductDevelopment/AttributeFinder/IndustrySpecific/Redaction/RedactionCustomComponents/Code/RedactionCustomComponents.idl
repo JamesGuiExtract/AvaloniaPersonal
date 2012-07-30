@@ -21,7 +21,7 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
     importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
     importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFILEPROCESSING.tlb");
     importlib("..\..\..\..\AFCore\Code\AFCore.tlb");
-    importlib("c:\Program Files\Common Files\System\ADO\msado27.tlb");
+    importlib("Common Files\System\ADO\msado27.tlb");
     importlib("..\..\..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.tlb");
 
 

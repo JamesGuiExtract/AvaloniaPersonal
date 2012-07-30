@@ -44,7 +44,7 @@ using namespace UCLID_SSOCRLib;
 #import "..\..\..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb" named_guids
 using namespace UCLID_INPUTFUNNELLib;
 
-#import "c:\Program Files\Common Files\System\ADO\msado27.tlb" \
+#import "Common Files\System\ADO\msado27.tlb" \
 	rename ("EOF", "adoEOF")
 using namespace ADODB;
 

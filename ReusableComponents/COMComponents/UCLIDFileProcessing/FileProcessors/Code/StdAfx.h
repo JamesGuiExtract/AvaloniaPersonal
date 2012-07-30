@@ -34,7 +34,7 @@ using namespace UCLID_RASTERANDOCRMGMTLib;
 #import "..\..\..\UCLIDImageUtils\Code\UCLIDImageUtils.tlb" named_guids
 using namespace UCLID_IMAGEUTILSLib;
 
-#import "c:\Program Files\Common Files\System\ADO\msado27.tlb" \
+#import "Common Files\System\ADO\msado27.tlb" \
 	rename ("EOF", "adoEOF")
 using namespace ADODB;
 

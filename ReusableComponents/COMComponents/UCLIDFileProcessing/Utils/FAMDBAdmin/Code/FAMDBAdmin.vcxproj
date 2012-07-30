@@ -58,6 +58,8 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\..\Release\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">..\..\..\..\..\..\binaries\$(Configuration)\</OutDir>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(VCInstallDir)PlatformSDK\bin;$(VSInstallDir)\SDK\v2.0\bin;$(VCInstallDir)bin;$(ExecutablePath);$(MSBuildProgramFiles32)</ExecutablePath>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(VCInstallDir)PlatformSDK\bin;$(VSInstallDir)\SDK\v2.0\bin;$(VCInstallDir)bin;$(ExecutablePath);$(MSBuildProgramFiles32)</ExecutablePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -158,7 +160,7 @@
     <ClCompile Include="FAMDBAdminSummaryDlg.cpp" />
     <ClCompile Include="FAMDBAdminUtils.cpp" />
     <ClCompile Include="FileProcessingAddActionDlg.cpp" />
-	<ClCompile Include="FileTagCondition.cpp" />
+    <ClCompile Include="FileTagCondition.cpp" />
     <ClCompile Include="FileTagConditionDlg.cpp" />
     <ClCompile Include="ManageActionsDlg.cpp" />
     <ClCompile Include="ManageTagsDlg.cpp" />
@@ -190,7 +192,7 @@
     <ClInclude Include="FAMDBAdminSummaryDlg.h" />
     <ClInclude Include="FAMDBAdminUtils.h" />
     <ClInclude Include="FileProcessingAddActionDlg.h" />
-	<ClInclude Include="FileTagCondition.h" />
+    <ClInclude Include="FileTagCondition.h" />
     <ClInclude Include="FileTagConditionDlg.h" />
     <ClInclude Include="ManageActionsDlg.h" />
     <ClInclude Include="ManageTagsDlg.h" />

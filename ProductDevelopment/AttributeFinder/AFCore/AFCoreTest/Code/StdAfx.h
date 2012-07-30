@@ -31,7 +31,7 @@ using namespace UCLID_TESTINGFRAMEWORKINTERFACESLib;
 	rename("LoadImage", "LoadRasterImage")
 using namespace UCLID_RASTERANDOCRMGMTLib;
 
-#import "c:\Program Files\Common Files\System\ADO\msado27.tlb" \
+#import "Common Files\System\ADO\msado27.tlb" \
 	rename ("EOF", "adoEOF")
 using namespace ADODB;
 

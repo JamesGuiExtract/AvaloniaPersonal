@@ -38,7 +38,7 @@ using namespace UCLID_COMUTILSLib;
 #import "..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.tlb" named_guids 
 using namespace Extract_Utilities_Email;
 
-#import "c:\Program Files\Common Files\System\ADO\msado27.tlb" \
+#import "Common Files\System\ADO\msado27.tlb" \
 	rename ("EOF", "adoEOF")
 using namespace ADODB;
 

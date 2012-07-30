@@ -29,7 +29,7 @@
 #include <afxcmn.h>			// MFC support for Windows Common Controls
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
-#import "c:\Program Files\Common Files\System\ADO\msado27.tlb" rename("EOF", "adoEOF")
+#import "Common Files\System\ADO\msado27.tlb" rename("EOF", "adoEOF")
 using namespace ADODB;
 
 #import "..\..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids 

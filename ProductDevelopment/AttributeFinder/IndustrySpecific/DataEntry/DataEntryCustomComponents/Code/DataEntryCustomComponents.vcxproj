@@ -64,6 +64,8 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">DataEntryCC</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">DataEntryCC</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">DataEntryCC</TargetName>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(VCInstallDir)PlatformSDK\bin;$(VSInstallDir)\SDK\v2.0\bin;$(VCInstallDir)bin;$(ExecutablePath);$(MSBuildProgramFiles32)</ExecutablePath>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(VCInstallDir)PlatformSDK\bin;$(VSInstallDir)\SDK\v2.0\bin;$(VCInstallDir)bin;$(ExecutablePath);$(MSBuildProgramFiles32)</ExecutablePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <CustomBuildStep>

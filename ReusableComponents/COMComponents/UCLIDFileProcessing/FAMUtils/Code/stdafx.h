@@ -40,4 +40,4 @@
 #import "..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
 using namespace UCLID_COMUTILSLib;
 
-#import "c:\Program Files\Common Files\System\ADO\msado27.tlb" rename ("EOF", "adoEOF")
+#import "Common Files\System\ADO\msado27.tlb" rename ("EOF", "adoEOF")
