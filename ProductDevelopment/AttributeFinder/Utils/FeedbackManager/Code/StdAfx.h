@@ -45,6 +45,6 @@ using namespace UCLID_AFCORELib;
 //#import "FeedbackMgr.tlb"
 
 // Required for ADO support
-#import "c:\program files\common files\system\ado\msado27.tlb" \
+#import "common files\system\ado\msado27.tlb" \
 	no_namespace \
 	rename ("EOF", "adoEOF")

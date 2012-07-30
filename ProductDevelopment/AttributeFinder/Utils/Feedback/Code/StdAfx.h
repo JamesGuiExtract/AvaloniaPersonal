@@ -40,7 +40,7 @@ using namespace UCLID_AFCORELib;
 using namespace UCLID_FEEDBACKMANAGERLib;
 
 // Required for ADO support
-#import "c:\program files\common files\system\ado\msado27.tlb" \
+#import "common files\system\ado\msado27.tlb" \
 	no_namespace \
 	rename ("EOF", "adoEOF")
 
