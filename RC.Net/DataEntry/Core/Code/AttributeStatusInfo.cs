@@ -201,16 +201,11 @@ namespace Extract.DataEntry
         /// Manages change history and provides ability to undo changes.
         /// </summary>
         [ThreadStatic]
-        static UndoManager _undoManager = new UndoManager();
+        static UndoManager _undoManager;
 
         #endregion static fields
 
         #region Instance fields
-
-//        /// <summary>
-//        /// 
-//        /// </summary>
-//        Thread _owningThread;
 
         /// <summary>
         /// Indicates whether the object has been modified since being loaded via the 
@@ -354,8 +349,6 @@ namespace Extract.DataEntry
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI24485", _OBJECT_NAME);
-
-//                _owningThread = Thread.CurrentThread;
             }
             catch (Exception ex)
             {
@@ -366,17 +359,6 @@ namespace Extract.DataEntry
         #endregion Constructors
 
         #region Properties
-
-//        /// <summary>
-//        /// Gets the owning thread.
-//        /// </summary>
-//        public Thread OwningThread
-//        {
-//            get
-//            {
-//                return _owningThread;
-//            }
-//        }
 
         /// <summary>
         /// Gets the <see cref="IDataEntryControl"/> in charge of displaying the associated
@@ -527,6 +509,11 @@ namespace Extract.DataEntry
         {
             get
             {
+                if (_undoManager == null)
+                {
+                    InitializeStatics();
+                }
+
                 return _undoManager;
             }
         }
