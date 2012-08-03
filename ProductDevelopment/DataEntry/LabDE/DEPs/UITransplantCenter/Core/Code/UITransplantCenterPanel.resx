@@ -1,0 +1,300 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <metadata name="_resultCodeLabel.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="_testNameLabel.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="panelGroupBox.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="_collectionDateColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="_collectionTimeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="_resultDateColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="_resultTimeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="_laboratoryIdentifier.AutoUpdateQuery" xml:space="preserve">
+    <value>&lt;Query Default='1'&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../../LabName&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../../LabAddress/City&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../../LabAddress/State&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../../LabAddress/ZipCode&lt;/Attribute&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabCode IS NOT NULL AND LabCode = SUBSTRING(&lt;Attribute&gt;../LabCode&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + REPLACE(REPLACE(REPLACE(REPLACE(&lt;Attribute&gt;../../LabName&lt;/Attribute&gt;, ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%') + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute&gt;../../LabName&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 10) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute&gt;../../LabName&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 10) + '%' and City LIKE &lt;Attribute&gt;../../LabAddress/City&lt;/Attribute&gt;&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute&gt;../../LabName&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 3) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Zip LIKE SUBSTRING(&lt;Attribute&gt;../../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;</value>
+  </data>
+  <data name="_epicDOBTextBox.ValidationQuery" xml:space="preserve">
+    <value>&lt;Declarations&gt;
+&lt;Complex Name='Mismatch'&gt;Patient DOB from Epic doesn't match DOB from document.&lt;/Complex&gt;
+&lt;/Declarations&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidationMessage='Mismatch'&gt;
+&lt;Attribute&gt;../DOB&lt;/Attribute&gt;
+&lt;/Query&gt;</value>
+  </data>
+  <data name="_epicPatientFirstNameColumn.ValidationQuery" xml:space="preserve">
+    <value>&lt;Declarations&gt;
+&lt;Complex Name='Mismatch'&gt;Patient name from Epic doesn't match name from document.&lt;/Complex&gt;
+&lt;/Declarations&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidationMessage='Mismatch'&gt;
+&lt;Attribute&gt;../../Name/First&lt;/Attribute&gt;
+&lt;/Query&gt;</value>
+  </data>
+  <data name="_epicPatientLastNameColumn.ValidationQuery" xml:space="preserve">
+    <value>&lt;Declarations&gt;
+&lt;Complex Name='Mismatch'&gt;Patient name from Epic doesn't match name from document.&lt;/Complex&gt;
+&lt;/Declarations&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidationMessage='Mismatch'&gt;
+&lt;Attribute&gt;../../Name/Last&lt;/Attribute&gt;
+&lt;/Query&gt;</value>
+  </data>
+  <data name="_testNameTextBox.AutoUpdateQuery" xml:space="preserve">
+    <value>&lt;Query&gt;&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) AND LabTest.TestCode = SUBSTRING(&lt;Attribute&gt;TestCode&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest, AlternateTestName, LabOrderTest WHERE LabTest.TestCode = AlternateTestName.TestCode AND LabTest.TestCode = LabOrderTest.TestCode AND LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) AND AlternateTestName.Name = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,50)&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) AND LabTest.TestCode = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;</value>
+  </data>
+  <metadata name="_orderNumberColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="_testName.ValidationQuery" xml:space="preserve">
+    <value>&lt;Declarations&gt;
+	&lt;SQL Name='MandatoryTests'&gt;SELECT TestCode FROM LabOrderTest
+		INNER JOIN LabOrder ON LabOrderTest.OrderCode = LabOrder.Code
+		WHERE LabOrder.Code = &lt;Attribute&gt;../OrderCode&lt;/Attribute&gt; AND Mandatory = 1&lt;/SQL&gt;
+	&lt;Attribute Name='ExistingTests' SelectionMode='List'&gt;../Component/TestCode&lt;/Attribute&gt;
+	&lt;Expression Name='MissingTests'&gt;
+		(&lt;MandatoryTests  Type='string[]'/&gt; - &lt;ExistingTests Type='string[]'/&gt;).sort()
+	&lt;/Expression&gt;
+	&lt;Complex Name='ValidationMessage'&gt;Missing mandatory test(s): &lt;MissingTests StringList=', '/&gt;&lt;/Complex&gt;
+&lt;/Declarations&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT Name FROM LabOrder WHERE Code IS NOT NULL ORDER BY Name&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidValue='' ValidationMessage='ValidationMessage' ValidationWarning='1'&gt;
+	&lt;MissingTests/&gt;
+&lt;/Query&gt;</value>
+  </data>
+  <metadata name="_testValueColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="_testUnitsColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="_testRefRangeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="_testFlagColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="_testFlagColumn.ValidationQuery" xml:space="preserve">
+    <value>&lt;Declarations&gt;
+	&lt;Attribute Name='Flag'&gt;.&lt;/Attribute&gt;
+	&lt;Expression Name='RawValue'&gt;
+		&lt;RegEx Pattern='[\s&amp;gt;&amp;lt;=]{0,3}[\d\.]+'&gt;&lt;Attribute &gt;../Value&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','')
+	&lt;/Expression&gt;
+	&lt;Expression Name='ValueOperator'&gt;
+		&lt;RawValue/&gt;.Contains('&amp;gt;') 
+		? '&amp;gt;'
+		: &lt;RawValue/&gt;.Contains('&amp;lt;') 
+			? '&amp;lt;'
+			: ''
+	&lt;/Expression&gt;
+	&lt;Expression Name='Value'&gt;&lt;RawValue/&gt;.Replace('&amp;gt;', '').Replace('&amp;lt;', '').Replace(' ', '')&lt;/Expression&gt;
+	&lt;Attribute Name='Range'&gt;../Range&lt;/Attribute&gt;
+	&lt;Expression Name='MinValue1' &gt;
+		(&lt;ValueOperator/&gt; == '&amp;gt;')
+			? &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;(\s?=)?\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
+			: &lt;RegEx Pattern='([\d\.,]+(?=\s?-\s?\d+))|((?&amp;lt;=&amp;gt;\s?=\s?)[\d\.,]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
+	&lt;/Expression&gt;
+	&lt;Expression Name='MinValue2'&gt;
+		string.IsNullOrWhiteSpace(&lt;MinValue1/&gt;)
+			? &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
+			: ''
+	&lt;/Expression&gt;
+	&lt;Expression Name='MaxValue1' &gt;
+		(&lt;ValueOperator/&gt; == '&amp;lt;')
+			? &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;(\s?=)?\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
+			: &lt;RegEx Pattern='((?&amp;lt;=\d+\s?-\s?)[\d\.,]+)|((?&amp;lt;=&amp;lt;\s?=\s?)[\d\.,]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
+	&lt;/Expression&gt;
+	&lt;Expression Name='MaxValue2'&gt;
+		string.IsNullOrWhiteSpace(&lt;MaxValue1/&gt;)
+			? &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
+			: ''
+	&lt;/Expression&gt;
+	&lt;RegEx Name='LowFlag' Pattern='^L|^A$'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
+	&lt;RegEx Name='HighFlag' Pattern='^H|^A$'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
+	&lt;Expression Name='HasProperLowFlag'&gt;
+		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
+		(string.IsNullOrWhiteSpace(&lt;MinValue1/&gt;) and string.IsNullOrWhiteSpace(&lt;MinValue2/&gt;)) or
+		(string.IsNullOrWhiteSpace(&lt;MinValue1/&gt;) == false and
+		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;gt;= &lt;MinValue1 Type='double'/&gt;))) or
+		(string.IsNullOrWhiteSpace(&lt;MinValue2/&gt;) == false and
+		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;gt; &lt;MinValue2 Type='double'/&gt;)))
+	&lt;/Expression&gt;
+	&lt;Expression Name='HasProperHighFlag'&gt;
+		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
+		(string.IsNullOrWhiteSpace(&lt;MaxValue1/&gt;) and string.IsNullOrWhiteSpace(&lt;MaxValue2/&gt;)) or
+		(string.IsNullOrWhiteSpace(&lt;MaxValue1/&gt;) == false and
+		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;lt;= &lt;MaxValue1 Type='double'/&gt;))) or
+		(string.IsNullOrWhiteSpace(&lt;MaxValue2/&gt;) == false and
+		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;lt; &lt;MaxValue2 Type='double'/&gt;)))
+	&lt;/Expression&gt;
+	&lt;Expression Name='SpecialRangeCheck'&gt;
+		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) or !string.IsNullOrWhiteSpace(&lt;MinValue1/&gt;) or !string.IsNullOrWhiteSpace(&lt;MinValue2/&gt;)) and
+		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) or !string.IsNullOrWhiteSpace(&lt;MaxValue1/&gt;) or !string.IsNullOrWhiteSpace(&lt;MaxValue2/&gt;))
+	&lt;/Expression&gt;
+&lt;/Declarations&gt;
+&lt;Query&gt;[BLANK]&lt;SQL&gt;SELECT * FROM Flag ORDER BY Flag&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query ValidValue='True' ValidationListType='ValidationListOnly' ValidationWarning='1'&gt;
+	&lt;Expression&gt;
+		&lt;HasProperLowFlag Type='bool'/&gt; and &lt;HasProperHighFlag Type='bool'/&gt; and &lt;SpecialRangeCheck Type='bool'/&gt;
+	&lt;/Expression&gt;
+&lt;/Query&gt;</value>
+  </data>
+  <metadata name="_resultStatusColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="_testNameTextBox.ValidationQuery" xml:space="preserve">
+    <value>&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) ORDER BY LabTest.OfficialName&lt;/SQL&gt;</value>
+  </data>
+  <data name="_resultCodeTextBox.AutoUpdateQuery" xml:space="preserve">
+    <value>&lt;Query&gt;
+	&lt;SQL&gt;SELECT LabTest.TestCode FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../../OrderCode&lt;/Attribute&gt;,1,25) AND OfficialName = SUBSTRING(&lt;Attribute&gt;..&lt;/Attribute&gt;,1,255)&lt;/SQL&gt;
+&lt;/Query&gt;
+&lt;Query&gt;
+	&lt;SQL&gt;
+		SELECT TestCode FROM LabOrderTest
+			WHERE OrderCode IN
+			(
+				SELECT OrderCode FROM LabOrderTest
+					WHERE OrderCode = &lt;Attribute&gt;../../OrderCode&lt;/Attribute&gt;
+					GROUP BY OrderCode HAVING COUNT(*) = 1
+			)
+	&lt;/SQL&gt;
+&lt;/Query&gt;</value>
+  </data>
+  <data name="_resultCodeTextBox.ValidationQuery" xml:space="preserve">
+    <value>&lt;SQL&gt;SELECT LabTest.TestCode FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../../OrderCode&lt;/Attribute&gt;,1,25) ORDER BY LabTest.TestCode&lt;/SQL&gt;</value>
+  </data>
+</root>
