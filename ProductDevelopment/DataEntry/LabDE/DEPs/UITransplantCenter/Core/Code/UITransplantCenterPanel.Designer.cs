@@ -716,7 +716,7 @@
             this._testComment.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._testComment.AttributeName = "Comment";
-            this._testComment.AutoUpdateQuery = "<Query Default=\'1\'>Verified by $FullUserName() on $Now(%m/%d/%Y).</Query>";
+            this._testComment.AutoUpdateQuery = "<Query Default=\'1\'>Verified by $FullUserName(1) on $Now(%m/%d/%Y).</Query>";
             this._testComment.Location = new System.Drawing.Point(6, 263);
             this._testComment.Multiline = true;
             this._testComment.Name = "_testComment";
@@ -972,7 +972,7 @@
             this._defaultLabIdentifier.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._defaultLabIdentifier.AttributeName = "LabIdentifier";
-            this._defaultLabIdentifier.AutoUpdateQuery = "";
+            this._defaultLabIdentifier.AutoUpdateQuery = "<Attribute SelectionMode=\'First\'>../Panel/LabIdentifier</Attribute>";
             this._defaultLabIdentifier.Location = new System.Drawing.Point(296, 0);
             this._defaultLabIdentifier.Name = "_defaultLabIdentifier";
             this._defaultLabIdentifier.Size = new System.Drawing.Size(10, 20);
