@@ -89,10 +89,6 @@
             this._epicPatientMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._epicPatientLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._epicPatientSuffixColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._collectionDateColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._collectionTimeColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._resultDateColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._resultTimeColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._orderNumberColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._testName = new Extract.DataEntry.DataEntryTableColumn();
             this._testID = new Extract.DataEntry.DataEntryTableColumn();
@@ -103,6 +99,10 @@
             this._resultStatusColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._defaultLabID = new Extract.DataEntry.DataEntryTextBox();
             this._defaultLabIdentifier = new Extract.DataEntry.DataEntryTextBox();
+            this._collectionDateColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._collectionTimeColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._resultDateColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._resultTimeColumn = new Extract.DataEntry.DataEntryTableColumn();
             _resultCodeLabel = new System.Windows.Forms.Label();
             _testNameLabel = new System.Windows.Forms.Label();
             panelGroupBox = new System.Windows.Forms.GroupBox();
@@ -180,6 +180,7 @@
             this._panelTable.Location = new System.Drawing.Point(7, 20);
             this._panelTable.Name = "_panelTable";
             this._panelTable.ParentDataEntryControl = null;
+            this._panelTable.RowFormattingRuleFile = "";
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
             dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -825,49 +826,6 @@
             this._epicPatientSuffixColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this._epicPatientSuffixColumn.ValidationErrorMessage = "";
             // 
-            // _collectionDateColumn
-            // 
-            this._collectionDateColumn.AttributeName = "CollectionDate";
-            this._collectionDateColumn.AutoUpdateQuery = "";
-            this._collectionDateColumn.FillWeight = 95.86145F;
-            this._collectionDateColumn.HeaderText = "Collection Date";
-            this._collectionDateColumn.Name = "_collectionDateColumn";
-            this._collectionDateColumn.ValidationErrorMessage = "Collection date must be a valid date formatted MM/DD/YYYY";
-            this._collectionDateColumn.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(19|20)\\d{2}$";
-            // 
-            // _collectionTimeColumn
-            // 
-            this._collectionTimeColumn.AttributeName = "CollectionTime";
-            this._collectionTimeColumn.AutoUpdateQuery = "<Expression>\r\n\t(String.IsNullOrEmpty(<RegEx Pattern=\'^(0|1)?\\d[0-5]\\d$\'><Attribut" +
-    "e Name=\'Value\'>.</Attribute></RegEx>))\r\n\t\t? <Value/>\r\n\t\t: <Value/>.Insert(<Value" +
-    "/>.Length - 2, \':\')\r\n</Expression>";
-            this._collectionTimeColumn.FillWeight = 100.7867F;
-            this._collectionTimeColumn.HeaderText = "Collection Time";
-            this._collectionTimeColumn.Name = "_collectionTimeColumn";
-            this._collectionTimeColumn.ValidationErrorMessage = "Collection time must be a valid time formatted HH:MM";
-            this._collectionTimeColumn.ValidationPattern = "^((0?[0-9])|(1[0-9])|(2[0-3])):[0-5][0-9]$";
-            // 
-            // _resultDateColumn
-            // 
-            this._resultDateColumn.AttributeName = "ResultDate";
-            this._resultDateColumn.FillWeight = 103.1914F;
-            this._resultDateColumn.HeaderText = "Result Date";
-            this._resultDateColumn.Name = "_resultDateColumn";
-            this._resultDateColumn.ValidationErrorMessage = "Result date must be a valid date formatted MM/DD/YYYY";
-            this._resultDateColumn.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(19|20)\\d{2}$";
-            // 
-            // _resultTimeColumn
-            // 
-            this._resultTimeColumn.AttributeName = "ResultTime";
-            this._resultTimeColumn.AutoUpdateQuery = "<Expression>\r\n\t(String.IsNullOrEmpty(<RegEx Pattern=\'^(0|1)?\\d[0-5]\\d$\'><Attribut" +
-    "e Name=\'Value\'>.</Attribute></RegEx>))\r\n\t\t? <Value/>\r\n\t\t: <Value/>.Insert(<Value" +
-    "/>.Length - 2, \':\')\r\n</Expression>";
-            this._resultTimeColumn.FillWeight = 100.1605F;
-            this._resultTimeColumn.HeaderText = "Result Time";
-            this._resultTimeColumn.Name = "_resultTimeColumn";
-            this._resultTimeColumn.ValidationErrorMessage = "Result time must be a valid time formatted HH:MM";
-            this._resultTimeColumn.ValidationPattern = "^((0?[0-9])|(1[0-9])|(2[0-3])):[0-5][0-9]$";
-            // 
             // _orderNumberColumn
             // 
             this._orderNumberColumn.AttributeName = "OrderNumber";
@@ -982,6 +940,53 @@
             this._defaultLabIdentifier.ValidationQuery = "";
             this._defaultLabIdentifier.Visible = false;
             // 
+            // _collectionDateColumn
+            // 
+            this._collectionDateColumn.AttributeName = "CollectionDate";
+            this._collectionDateColumn.AutoUpdateQuery = "";
+            this._collectionDateColumn.FillWeight = 95.86145F;
+            this._collectionDateColumn.FormattingRuleFile = "Rules\\Swiping\\CollectionDate.rsd.etf";
+            this._collectionDateColumn.HeaderText = "Collection Date";
+            this._collectionDateColumn.Name = "_collectionDateColumn";
+            this._collectionDateColumn.ValidationErrorMessage = "Collection date must be a valid date formatted MM/DD/YYYY";
+            this._collectionDateColumn.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(19|20)\\d{2}$";
+            // 
+            // _collectionTimeColumn
+            // 
+            this._collectionTimeColumn.AttributeName = "CollectionTime";
+            this._collectionTimeColumn.AutoUpdateQuery = "<Expression>\r\n\t(String.IsNullOrEmpty(<RegEx Pattern=\'^(0|1)?\\d[0-5]\\d$\'><Attribut" +
+    "e Name=\'Value\'>.</Attribute></RegEx>))\r\n\t\t? <Value/>\r\n\t\t: <Value/>.Insert(<Value" +
+    "/>.Length - 2, \':\')\r\n</Expression>";
+            this._collectionTimeColumn.FillWeight = 100.7867F;
+            this._collectionTimeColumn.FormattingRuleFile = "Rules\\Swiping\\CollectionTime.rsd.etf";
+            this._collectionTimeColumn.HeaderText = "Collection Time";
+            this._collectionTimeColumn.Name = "_collectionTimeColumn";
+            this._collectionTimeColumn.ValidationErrorMessage = "Collection time must be a valid time formatted HH:MM";
+            this._collectionTimeColumn.ValidationPattern = "^((0?[0-9])|(1[0-9])|(2[0-3])):[0-5][0-9]$";
+            // 
+            // _resultDateColumn
+            // 
+            this._resultDateColumn.AttributeName = "ResultDate";
+            this._resultDateColumn.FillWeight = 103.1914F;
+            this._resultDateColumn.FormattingRuleFile = "Rules\\Swiping\\ResultDate.rsd.etf";
+            this._resultDateColumn.HeaderText = "Result Date";
+            this._resultDateColumn.Name = "_resultDateColumn";
+            this._resultDateColumn.ValidationErrorMessage = "Result date must be a valid date formatted MM/DD/YYYY";
+            this._resultDateColumn.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(19|20)\\d{2}$";
+            // 
+            // _resultTimeColumn
+            // 
+            this._resultTimeColumn.AttributeName = "ResultTime";
+            this._resultTimeColumn.AutoUpdateQuery = "<Expression>\r\n\t(String.IsNullOrEmpty(<RegEx Pattern=\'^(0|1)?\\d[0-5]\\d$\'><Attribut" +
+    "e Name=\'Value\'>.</Attribute></RegEx>))\r\n\t\t? <Value/>\r\n\t\t: <Value/>.Insert(<Value" +
+    "/>.Length - 2, \':\')\r\n</Expression>";
+            this._resultTimeColumn.FillWeight = 100.1605F;
+            this._resultTimeColumn.FormattingRuleFile = "Rules\\Swiping\\ResultTime.rsd.etf";
+            this._resultTimeColumn.HeaderText = "Result Time";
+            this._resultTimeColumn.Name = "_resultTimeColumn";
+            this._resultTimeColumn.ValidationErrorMessage = "Result time must be a valid time formatted HH:MM";
+            this._resultTimeColumn.ValidationPattern = "^((0?[0-9])|(1[0-9])|(2[0-3])):[0-5][0-9]$";
+            // 
             // UITransplantCenterPanel
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -1071,10 +1076,6 @@
         private DataEntryTableColumn _epicPatientMiddleNameColumn;
         private DataEntryTableColumn _epicPatientLastNameColumn;
         private DataEntryTableColumn _epicPatientSuffixColumn;
-        private DataEntryTableColumn _collectionDateColumn;
-        private DataEntryTableColumn _collectionTimeColumn;
-        private DataEntryTableColumn _resultDateColumn;
-        private DataEntryTableColumn _resultTimeColumn;
         private DataEntryTableColumn _orderNumberColumn;
         private DataEntryTableColumn _testName;
         private DataEntryTableColumn _testID;
@@ -1085,5 +1086,9 @@
         private DataEntryTableColumn _resultStatusColumn;
         private DataEntryTextBox _defaultLabID;
         private DataEntryTextBox _defaultLabIdentifier;
+        private DataEntryTableColumn _collectionDateColumn;
+        private DataEntryTableColumn _collectionTimeColumn;
+        private DataEntryTableColumn _resultDateColumn;
+        private DataEntryTableColumn _resultTimeColumn;
     }
 }
