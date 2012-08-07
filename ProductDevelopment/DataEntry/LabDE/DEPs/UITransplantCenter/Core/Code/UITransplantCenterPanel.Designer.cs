@@ -89,6 +89,12 @@
             this._epicPatientMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._epicPatientLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._epicPatientSuffixColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._defaultLabID = new Extract.DataEntry.DataEntryTextBox();
+            this._defaultLabIdentifier = new Extract.DataEntry.DataEntryTextBox();
+            this._collectionDateColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._collectionTimeColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._resultDateColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._resultTimeColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._orderNumberColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._testName = new Extract.DataEntry.DataEntryTableColumn();
             this._testID = new Extract.DataEntry.DataEntryTableColumn();
@@ -97,12 +103,6 @@
             this._testRefRangeColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._testFlagColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._resultStatusColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._defaultLabID = new Extract.DataEntry.DataEntryTextBox();
-            this._defaultLabIdentifier = new Extract.DataEntry.DataEntryTextBox();
-            this._collectionDateColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._collectionTimeColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._resultDateColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._resultTimeColumn = new Extract.DataEntry.DataEntryTableColumn();
             _resultCodeLabel = new System.Windows.Forms.Label();
             _testNameLabel = new System.Windows.Forms.Label();
             panelGroupBox = new System.Windows.Forms.GroupBox();
@@ -826,19 +826,96 @@
             this._epicPatientSuffixColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this._epicPatientSuffixColumn.ValidationErrorMessage = "";
             // 
+            // _defaultLabID
+            // 
+            this._defaultLabID.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._defaultLabID.AttributeName = "LabCode";
+            this._defaultLabID.AutoUpdateQuery = "";
+            this._defaultLabID.Location = new System.Drawing.Point(312, 0);
+            this._defaultLabID.Name = "_defaultLabID";
+            this._defaultLabID.Size = new System.Drawing.Size(10, 20);
+            this._defaultLabID.SupportsSwiping = false;
+            this._defaultLabID.TabIndex = 10;
+            this._defaultLabID.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
+            this._defaultLabID.ValidationErrorMessage = "Missing or unknown laboratory ID";
+            this._defaultLabID.ValidationQuery = "";
+            this._defaultLabID.Visible = false;
+            // 
+            // _defaultLabIdentifier
+            // 
+            this._defaultLabIdentifier.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._defaultLabIdentifier.AttributeName = "LabIdentifier";
+            this._defaultLabIdentifier.AutoUpdateQuery = "<Attribute SelectionMode=\'First\'>../Panel/LabIdentifier</Attribute>";
+            this._defaultLabIdentifier.Location = new System.Drawing.Point(296, 0);
+            this._defaultLabIdentifier.Name = "_defaultLabIdentifier";
+            this._defaultLabIdentifier.Size = new System.Drawing.Size(10, 20);
+            this._defaultLabIdentifier.SupportsSwiping = false;
+            this._defaultLabIdentifier.TabIndex = 9;
+            this._defaultLabIdentifier.ValidationErrorMessage = "";
+            this._defaultLabIdentifier.ValidationQuery = "";
+            this._defaultLabIdentifier.Visible = false;
+            // 
+            // _collectionDateColumn
+            // 
+            this._collectionDateColumn.AttributeName = "CollectionDate";
+            this._collectionDateColumn.AutoUpdateQuery = "";
+            this._collectionDateColumn.FillWeight = 95.86145F;
+            this._collectionDateColumn.FormattingRuleFile = "Rules\\Swiping\\CollectionDate.rsd.etf";
+            this._collectionDateColumn.HeaderText = "Collection Date";
+            this._collectionDateColumn.Name = "_collectionDateColumn";
+            this._collectionDateColumn.ValidationErrorMessage = "Collection date must be a valid date formatted MM/DD/YYYY";
+            this._collectionDateColumn.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(19|20)\\d{2}$";
+            // 
+            // _collectionTimeColumn
+            // 
+            this._collectionTimeColumn.AttributeName = "CollectionTime";
+            this._collectionTimeColumn.AutoUpdateQuery = "<Expression>\r\n\t(String.IsNullOrEmpty(<RegEx Pattern=\'^[0-2]?\\d[0-5]\\d$\'><Attribut" +
+    "e Name=\'Value\'>.</Attribute></RegEx>))\r\n\t\t? <Value/>\r\n\t\t: <Value/>.Insert(<Value" +
+    "/>.Length - 2, \':\')\r\n</Expression>";
+            this._collectionTimeColumn.FillWeight = 100.7867F;
+            this._collectionTimeColumn.FormattingRuleFile = "Rules\\Swiping\\CollectionTime.rsd.etf";
+            this._collectionTimeColumn.HeaderText = "Collection Time";
+            this._collectionTimeColumn.Name = "_collectionTimeColumn";
+            this._collectionTimeColumn.ValidationErrorMessage = "Collection time must be a valid time formatted HH:MM";
+            this._collectionTimeColumn.ValidationPattern = "^((0?[0-9])|(1[0-9])|(2[0-3])):[0-5][0-9]$";
+            // 
+            // _resultDateColumn
+            // 
+            this._resultDateColumn.AttributeName = "ResultDate";
+            this._resultDateColumn.FillWeight = 103.1914F;
+            this._resultDateColumn.FormattingRuleFile = "Rules\\Swiping\\ResultDate.rsd.etf";
+            this._resultDateColumn.HeaderText = "Result Date";
+            this._resultDateColumn.Name = "_resultDateColumn";
+            this._resultDateColumn.ValidationErrorMessage = "Result date must be a valid date formatted MM/DD/YYYY";
+            this._resultDateColumn.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(19|20)\\d{2}$";
+            // 
+            // _resultTimeColumn
+            // 
+            this._resultTimeColumn.AttributeName = "ResultTime";
+            this._resultTimeColumn.AutoUpdateQuery = "<Expression>\r\n\t(String.IsNullOrEmpty(<RegEx Pattern=\'^[0-2]?\\d[0-5]\\d$\'><Attribut" +
+    "e Name=\'Value\'>.</Attribute></RegEx>))\r\n\t\t? <Value/>\r\n\t\t: <Value/>.Insert(<Value" +
+    "/>.Length - 2, \':\')\r\n</Expression>";
+            this._resultTimeColumn.FillWeight = 100.1605F;
+            this._resultTimeColumn.FormattingRuleFile = "Rules\\Swiping\\ResultTime.rsd.etf";
+            this._resultTimeColumn.HeaderText = "Result Time";
+            this._resultTimeColumn.Name = "_resultTimeColumn";
+            this._resultTimeColumn.ValidationErrorMessage = "Result time must be a valid time formatted HH:MM";
+            this._resultTimeColumn.ValidationPattern = "^((0?[0-9])|(1[0-9])|(2[0-3])):[0-5][0-9]$";
+            // 
             // _orderNumberColumn
             // 
             this._orderNumberColumn.AttributeName = "OrderNumber";
             this._orderNumberColumn.FillWeight = 50F;
             this._orderNumberColumn.HeaderText = "Order #";
             this._orderNumberColumn.Name = "_orderNumberColumn";
+            this._orderNumberColumn.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._orderNumberColumn.ValidationErrorMessage = "Invalid value";
             // 
             // _testName
             // 
             this._testName.AttributeName = "Name";
-            this._testName.AutoUpdateQuery = "<Query><SQL>SELECT Name FROM LabOrder WHERE Code = SUBSTRING(<Attribute>../OrderC" +
-    "ode</Attribute>,1,25)</SQL></Query>";
+            this._testName.AutoUpdateQuery = resources.GetString("_testName.AutoUpdateQuery");
             this._testName.FillWeight = 120F;
             this._testName.HeaderText = "Order Name";
             this._testName.Name = "_testName";
@@ -909,83 +986,6 @@
             this._resultStatusColumn.UseComboBoxCells = true;
             this._resultStatusColumn.ValidationErrorMessage = "Invalid value";
             this._resultStatusColumn.ValidationQuery = "C\r\nF\r\nP\r\nR\r\nX";
-            // 
-            // _defaultLabID
-            // 
-            this._defaultLabID.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._defaultLabID.AttributeName = "LabCode";
-            this._defaultLabID.AutoUpdateQuery = "";
-            this._defaultLabID.Location = new System.Drawing.Point(312, 0);
-            this._defaultLabID.Name = "_defaultLabID";
-            this._defaultLabID.Size = new System.Drawing.Size(10, 20);
-            this._defaultLabID.SupportsSwiping = false;
-            this._defaultLabID.TabIndex = 10;
-            this._defaultLabID.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
-            this._defaultLabID.ValidationErrorMessage = "Missing or unknown laboratory ID";
-            this._defaultLabID.ValidationQuery = "";
-            this._defaultLabID.Visible = false;
-            // 
-            // _defaultLabIdentifier
-            // 
-            this._defaultLabIdentifier.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._defaultLabIdentifier.AttributeName = "LabIdentifier";
-            this._defaultLabIdentifier.AutoUpdateQuery = "<Attribute SelectionMode=\'First\'>../Panel/LabIdentifier</Attribute>";
-            this._defaultLabIdentifier.Location = new System.Drawing.Point(296, 0);
-            this._defaultLabIdentifier.Name = "_defaultLabIdentifier";
-            this._defaultLabIdentifier.Size = new System.Drawing.Size(10, 20);
-            this._defaultLabIdentifier.SupportsSwiping = false;
-            this._defaultLabIdentifier.TabIndex = 9;
-            this._defaultLabIdentifier.ValidationErrorMessage = "";
-            this._defaultLabIdentifier.ValidationQuery = "";
-            this._defaultLabIdentifier.Visible = false;
-            // 
-            // _collectionDateColumn
-            // 
-            this._collectionDateColumn.AttributeName = "CollectionDate";
-            this._collectionDateColumn.AutoUpdateQuery = "";
-            this._collectionDateColumn.FillWeight = 95.86145F;
-            this._collectionDateColumn.FormattingRuleFile = "Rules\\Swiping\\CollectionDate.rsd.etf";
-            this._collectionDateColumn.HeaderText = "Collection Date";
-            this._collectionDateColumn.Name = "_collectionDateColumn";
-            this._collectionDateColumn.ValidationErrorMessage = "Collection date must be a valid date formatted MM/DD/YYYY";
-            this._collectionDateColumn.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(19|20)\\d{2}$";
-            // 
-            // _collectionTimeColumn
-            // 
-            this._collectionTimeColumn.AttributeName = "CollectionTime";
-            this._collectionTimeColumn.AutoUpdateQuery = "<Expression>\r\n\t(String.IsNullOrEmpty(<RegEx Pattern=\'^(0|1)?\\d[0-5]\\d$\'><Attribut" +
-    "e Name=\'Value\'>.</Attribute></RegEx>))\r\n\t\t? <Value/>\r\n\t\t: <Value/>.Insert(<Value" +
-    "/>.Length - 2, \':\')\r\n</Expression>";
-            this._collectionTimeColumn.FillWeight = 100.7867F;
-            this._collectionTimeColumn.FormattingRuleFile = "Rules\\Swiping\\CollectionTime.rsd.etf";
-            this._collectionTimeColumn.HeaderText = "Collection Time";
-            this._collectionTimeColumn.Name = "_collectionTimeColumn";
-            this._collectionTimeColumn.ValidationErrorMessage = "Collection time must be a valid time formatted HH:MM";
-            this._collectionTimeColumn.ValidationPattern = "^((0?[0-9])|(1[0-9])|(2[0-3])):[0-5][0-9]$";
-            // 
-            // _resultDateColumn
-            // 
-            this._resultDateColumn.AttributeName = "ResultDate";
-            this._resultDateColumn.FillWeight = 103.1914F;
-            this._resultDateColumn.FormattingRuleFile = "Rules\\Swiping\\ResultDate.rsd.etf";
-            this._resultDateColumn.HeaderText = "Result Date";
-            this._resultDateColumn.Name = "_resultDateColumn";
-            this._resultDateColumn.ValidationErrorMessage = "Result date must be a valid date formatted MM/DD/YYYY";
-            this._resultDateColumn.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(19|20)\\d{2}$";
-            // 
-            // _resultTimeColumn
-            // 
-            this._resultTimeColumn.AttributeName = "ResultTime";
-            this._resultTimeColumn.AutoUpdateQuery = "<Expression>\r\n\t(String.IsNullOrEmpty(<RegEx Pattern=\'^(0|1)?\\d[0-5]\\d$\'><Attribut" +
-    "e Name=\'Value\'>.</Attribute></RegEx>))\r\n\t\t? <Value/>\r\n\t\t: <Value/>.Insert(<Value" +
-    "/>.Length - 2, \':\')\r\n</Expression>";
-            this._resultTimeColumn.FillWeight = 100.1605F;
-            this._resultTimeColumn.FormattingRuleFile = "Rules\\Swiping\\ResultTime.rsd.etf";
-            this._resultTimeColumn.HeaderText = "Result Time";
-            this._resultTimeColumn.Name = "_resultTimeColumn";
-            this._resultTimeColumn.ValidationErrorMessage = "Result time must be a valid time formatted HH:MM";
-            this._resultTimeColumn.ValidationPattern = "^((0?[0-9])|(1[0-9])|(2[0-3])):[0-5][0-9]$";
             // 
             // UITransplantCenterPanel
             // 
@@ -1076,6 +1076,12 @@
         private DataEntryTableColumn _epicPatientMiddleNameColumn;
         private DataEntryTableColumn _epicPatientLastNameColumn;
         private DataEntryTableColumn _epicPatientSuffixColumn;
+        private DataEntryTextBox _defaultLabID;
+        private DataEntryTextBox _defaultLabIdentifier;
+        private DataEntryTableColumn _collectionDateColumn;
+        private DataEntryTableColumn _collectionTimeColumn;
+        private DataEntryTableColumn _resultDateColumn;
+        private DataEntryTableColumn _resultTimeColumn;
         private DataEntryTableColumn _orderNumberColumn;
         private DataEntryTableColumn _testName;
         private DataEntryTableColumn _testID;
@@ -1084,11 +1090,5 @@
         private DataEntryTableColumn _testRefRangeColumn;
         private DataEntryTableColumn _testFlagColumn;
         private DataEntryTableColumn _resultStatusColumn;
-        private DataEntryTextBox _defaultLabID;
-        private DataEntryTextBox _defaultLabIdentifier;
-        private DataEntryTableColumn _collectionDateColumn;
-        private DataEntryTableColumn _collectionTimeColumn;
-        private DataEntryTableColumn _resultDateColumn;
-        private DataEntryTableColumn _resultTimeColumn;
     }
 }

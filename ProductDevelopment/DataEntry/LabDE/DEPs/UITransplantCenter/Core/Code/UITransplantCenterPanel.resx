@@ -179,6 +179,11 @@
   <metadata name="_orderNumberColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="_testName.AutoUpdateQuery" xml:space="preserve">
+    <value>&lt;Query&gt;&lt;SQL&gt;SELECT Name FROM LabOrder WHERE Code = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT Name FROM LabOrder WHERE Code = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
+</value>
+  </data>
   <data name="_testName.ValidationQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
 	&lt;SQL Name='MandatoryTests'&gt;SELECT TestCode FROM LabOrderTest
@@ -210,9 +215,11 @@
   <data name="_testFlagColumn.ValidationQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
 	&lt;Attribute Name='Flag'&gt;.&lt;/Attribute&gt;
+	&lt;!--Allow for value of #, #-#, &gt;#, &lt;#, &gt;=#, &lt;=#, &gt;/=#, &lt;=#--&gt;
 	&lt;Expression Name='RawValue'&gt;
-		&lt;RegEx Pattern='[\s&amp;gt;&amp;lt;=]{0,3}[\d\.]+'&gt;&lt;Attribute &gt;../Value&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','')
+		&lt;RegEx Pattern='[\s&amp;gt;&amp;lt;/=]{0,3}[\d\.]+'&gt;&lt;Attribute &gt;../Value&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
 	&lt;/Expression&gt;
+	&lt;!--ValueOperator is non-empty if the value is expressed in terms of a range. Example &gt;30--&gt;
 	&lt;Expression Name='ValueOperator'&gt;
 		&lt;RawValue/&gt;.Contains('&amp;gt;') 
 		? '&amp;gt;'
@@ -220,49 +227,66 @@
 			? '&amp;lt;'
 			: ''
 	&lt;/Expression&gt;
+	&lt;!--After extracting the ValueOperator, convert the value into a single number--&gt;
 	&lt;Expression Name='Value'&gt;&lt;RawValue/&gt;.Replace('&amp;gt;', '').Replace('&amp;lt;', '').Replace(' ', '')&lt;/Expression&gt;
 	&lt;Attribute Name='Range'&gt;../Range&lt;/Attribute&gt;
-	&lt;Expression Name='MinValue1' &gt;
+	&lt;!--Allow for range of #, #-#, &gt;#, &lt;#, &gt;=#, &lt;=#, &gt;/=#, &lt;=#--&gt;
+	&lt;Expression Name='MinValueOrEqual' &gt;
 		(&lt;ValueOperator/&gt; == '&amp;gt;')
-			? &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;(\s?=)?\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
-			: &lt;RegEx Pattern='([\d\.,]+(?=\s?-\s?\d+))|((?&amp;lt;=&amp;gt;\s?=\s?)[\d\.,]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
+			&lt;!--If the value is a "greater than" range, allow the number to be greater then or equal to the min value.--&gt;
+			? &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;(\s?/?=)?\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
+			&lt;!--Otherwise, --&gt;
+			: &lt;RegEx Pattern='(^\s*([\d\.,]+)\s*$)|([\d\.,]+(?=\s?-\s?\d+))|((?&amp;lt;=&amp;gt;\s?/?=\s?)[\d\.,]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
 	&lt;/Expression&gt;
-	&lt;Expression Name='MinValue2'&gt;
-		string.IsNullOrWhiteSpace(&lt;MinValue1/&gt;)
+	&lt;Expression Name='MinValueNotEqual'&gt;
+		string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;)
 			? &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
 			: ''
 	&lt;/Expression&gt;
-	&lt;Expression Name='MaxValue1' &gt;
+	&lt;Expression Name='MaxValueOrEqual' &gt;
 		(&lt;ValueOperator/&gt; == '&amp;lt;')
-			? &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;(\s?=)?\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
-			: &lt;RegEx Pattern='((?&amp;lt;=\d+\s?-\s?)[\d\.,]+)|((?&amp;lt;=&amp;lt;\s?=\s?)[\d\.,]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
+			? &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;(\s?/?=)?\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
+			: &lt;RegEx Pattern='(^\s*([\d\.,]+)\s*$)|((?&amp;lt;=\d+\s?-\s?)[\d\.,]+)|((?&amp;lt;=&amp;lt;\s?/?=\s?)[\d\.,]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
 	&lt;/Expression&gt;
-	&lt;Expression Name='MaxValue2'&gt;
-		string.IsNullOrWhiteSpace(&lt;MaxValue1/&gt;)
+	&lt;Expression Name='MaxValueNotEqual'&gt;
+		string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;)
 			? &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
 			: ''
 	&lt;/Expression&gt;
 	&lt;RegEx Name='LowFlag' Pattern='^L|^A$'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
 	&lt;RegEx Name='HighFlag' Pattern='^H|^A$'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
 	&lt;Expression Name='HasProperLowFlag'&gt;
+		&lt;!--If we don't have a value and a range minimum to compare consider low range boundary validated--&gt;
 		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
-		(string.IsNullOrWhiteSpace(&lt;MinValue1/&gt;) and string.IsNullOrWhiteSpace(&lt;MinValue2/&gt;)) or
-		(string.IsNullOrWhiteSpace(&lt;MinValue1/&gt;) == false and
-		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;gt;= &lt;MinValue1 Type='double'/&gt;))) or
-		(string.IsNullOrWhiteSpace(&lt;MinValue2/&gt;) == false and
-		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;gt; &lt;MinValue2 Type='double'/&gt;)))
+		(string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;)) or
+		&lt;!--Compare using &gt;= check if appropriate--&gt;
+		(string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) == false and
+		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;gt;= &lt;MinValueOrEqual Type='double'/&gt;))) or
+		&lt;!--Compare using &gt; check if appropriate--&gt;
+		(string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;) == false and
+		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;gt; &lt;MinValueNotEqual Type='double'/&gt;)))
 	&lt;/Expression&gt;
 	&lt;Expression Name='HasProperHighFlag'&gt;
+		&lt;!--If we don't have a value and a range maximum to compare consider high range boundary validated--&gt;
 		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
-		(string.IsNullOrWhiteSpace(&lt;MaxValue1/&gt;) and string.IsNullOrWhiteSpace(&lt;MaxValue2/&gt;)) or
-		(string.IsNullOrWhiteSpace(&lt;MaxValue1/&gt;) == false and
-		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;lt;= &lt;MaxValue1 Type='double'/&gt;))) or
-		(string.IsNullOrWhiteSpace(&lt;MaxValue2/&gt;) == false and
-		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;lt; &lt;MaxValue2 Type='double'/&gt;)))
+		(string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;)) or
+		&lt;!--Compare using &gt;= check if appropriate--&gt;
+		(string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) == false and
+		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;lt;= &lt;MaxValueOrEqual Type='double'/&gt;))) or
+		&lt;!--Compare using &gt; check if appropriate--&gt;
+		(string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;) == false and
+		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;lt; &lt;MaxValueNotEqual Type='double'/&gt;)))
 	&lt;/Expression&gt;
+	&lt;!--Prevents use of inappropriate flag when the range has only a min or a max value--&gt;
 	&lt;Expression Name='SpecialRangeCheck'&gt;
-		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) or !string.IsNullOrWhiteSpace(&lt;MinValue1/&gt;) or !string.IsNullOrWhiteSpace(&lt;MinValue2/&gt;)) and
-		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) or !string.IsNullOrWhiteSpace(&lt;MaxValue1/&gt;) or !string.IsNullOrWhiteSpace(&lt;MaxValue2/&gt;))
+		&lt;!--Consider the special range check validated if there is no value or range specified--&gt;
+		(string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
+		 (string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;) and
+		  string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;))) or
+		  &lt;!--Disallow a low flag if no range minimum is specified--&gt;
+		((string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) or !string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) or !string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;)) and
+		  &lt;!--Disallow a high flag if no range maximum is specified--&gt;
+		 (string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) or !string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) or !string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;)))
 	&lt;/Expression&gt;
 &lt;/Declarations&gt;
 &lt;Query&gt;[BLANK]&lt;SQL&gt;SELECT * FROM Flag ORDER BY Flag&lt;/SQL&gt;&lt;/Query&gt;
