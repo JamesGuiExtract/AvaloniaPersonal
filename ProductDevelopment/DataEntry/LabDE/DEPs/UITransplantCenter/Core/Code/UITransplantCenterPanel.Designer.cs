@@ -77,6 +77,7 @@
             this._patientRecordNum = new Extract.DataEntry.DataEntryTextBox();
             this._patientMRLabel = new System.Windows.Forms.Label();
             this._testDetailsGroupBox = new System.Windows.Forms.GroupBox();
+            this._componentLevelStatus = new Extract.DataEntry.DataEntryTextBox();
             this._testNameTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._laboratoryTestTable = new Extract.DataEntry.DataEntryTable();
             this._orderNumberColumn = new Extract.DataEntry.DataEntryTableColumn();
@@ -87,6 +88,10 @@
             this._testRefRangeColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._testFlagColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._resultStatusColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentLevelFlag = new Extract.DataEntry.DataEntryTextBox();
+            this._componentLevelRange = new Extract.DataEntry.DataEntryTextBox();
+            this._componentLevelUnits = new Extract.DataEntry.DataEntryTextBox();
+            this._componentLevelValue = new Extract.DataEntry.DataEntryTextBox();
             this._resultCodeTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._testCommentLabel = new System.Windows.Forms.Label();
             this._testCommentTextBox = new Extract.DataEntry.DataEntryTextBox();
@@ -103,11 +108,6 @@
             this._testsGroupBox = new System.Windows.Forms.GroupBox();
             this._defaultLabID = new Extract.DataEntry.DataEntryTextBox();
             this._defaultLabIdentifier = new Extract.DataEntry.DataEntryTextBox();
-            this._componentLevelStatus = new Extract.DataEntry.DataEntryTextBox();
-            this._componentLevelFlag = new Extract.DataEntry.DataEntryTextBox();
-            this._componentLevelRange = new Extract.DataEntry.DataEntryTextBox();
-            this._componentLevelUnits = new Extract.DataEntry.DataEntryTextBox();
-            this._componentLevelValue = new Extract.DataEntry.DataEntryTextBox();
             _resultCodeLabel = new System.Windows.Forms.Label();
             _testNameLabel = new System.Windows.Forms.Label();
             panelGroupBox = new System.Windows.Forms.GroupBox();
@@ -633,6 +633,18 @@
             this._testDetailsGroupBox.TabStop = false;
             this._testDetailsGroupBox.Text = "Test Details";
             // 
+            // _componentLevelStatus
+            // 
+            this._componentLevelStatus.AttributeName = "Status";
+            this._componentLevelStatus.AutoUpdateQuery = "<Attribute>../../Status</Attribute>";
+            this._componentLevelStatus.Location = new System.Drawing.Point(376, 52);
+            this._componentLevelStatus.Name = "_componentLevelStatus";
+            this._componentLevelStatus.ParentDataEntryControl = this._testNameTextBox;
+            this._componentLevelStatus.Size = new System.Drawing.Size(10, 20);
+            this._componentLevelStatus.TabIndex = 29;
+            this._componentLevelStatus.ValidationErrorMessage = "Invalid value";
+            this._componentLevelStatus.Visible = false;
+            // 
             // _testNameTextBox
             // 
             this._testNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -788,6 +800,54 @@
             this._resultStatusColumn.UseComboBoxCells = true;
             this._resultStatusColumn.ValidationErrorMessage = "Invalid value";
             this._resultStatusColumn.ValidationQuery = "C\r\nF\r\nP\r\nR\r\nX";
+            // 
+            // _componentLevelFlag
+            // 
+            this._componentLevelFlag.AttributeName = "Flag";
+            this._componentLevelFlag.AutoUpdateQuery = "<Attribute>../../Flag</Attribute>";
+            this._componentLevelFlag.Location = new System.Drawing.Point(360, 52);
+            this._componentLevelFlag.Name = "_componentLevelFlag";
+            this._componentLevelFlag.ParentDataEntryControl = this._testNameTextBox;
+            this._componentLevelFlag.Size = new System.Drawing.Size(10, 20);
+            this._componentLevelFlag.TabIndex = 28;
+            this._componentLevelFlag.ValidationErrorMessage = "Invalid value";
+            this._componentLevelFlag.Visible = false;
+            // 
+            // _componentLevelRange
+            // 
+            this._componentLevelRange.AttributeName = "Range";
+            this._componentLevelRange.AutoUpdateQuery = "<Attribute>../../Range</Attribute>";
+            this._componentLevelRange.Location = new System.Drawing.Point(343, 52);
+            this._componentLevelRange.Name = "_componentLevelRange";
+            this._componentLevelRange.ParentDataEntryControl = this._testNameTextBox;
+            this._componentLevelRange.Size = new System.Drawing.Size(10, 20);
+            this._componentLevelRange.TabIndex = 27;
+            this._componentLevelRange.ValidationErrorMessage = "Invalid value";
+            this._componentLevelRange.Visible = false;
+            // 
+            // _componentLevelUnits
+            // 
+            this._componentLevelUnits.AttributeName = "Units";
+            this._componentLevelUnits.AutoUpdateQuery = "<Attribute>../../Units</Attribute>";
+            this._componentLevelUnits.Location = new System.Drawing.Point(327, 52);
+            this._componentLevelUnits.Name = "_componentLevelUnits";
+            this._componentLevelUnits.ParentDataEntryControl = this._testNameTextBox;
+            this._componentLevelUnits.Size = new System.Drawing.Size(10, 20);
+            this._componentLevelUnits.TabIndex = 26;
+            this._componentLevelUnits.ValidationErrorMessage = "Invalid value";
+            this._componentLevelUnits.Visible = false;
+            // 
+            // _componentLevelValue
+            // 
+            this._componentLevelValue.AttributeName = "Value";
+            this._componentLevelValue.AutoUpdateQuery = "<Attribute>../../Value</Attribute>";
+            this._componentLevelValue.Location = new System.Drawing.Point(310, 52);
+            this._componentLevelValue.Name = "_componentLevelValue";
+            this._componentLevelValue.ParentDataEntryControl = this._testNameTextBox;
+            this._componentLevelValue.Size = new System.Drawing.Size(10, 20);
+            this._componentLevelValue.TabIndex = 25;
+            this._componentLevelValue.ValidationErrorMessage = "Invalid value";
+            this._componentLevelValue.Visible = false;
             // 
             // _resultCodeTextBox
             // 
@@ -1000,66 +1060,6 @@
             this._defaultLabIdentifier.ValidationErrorMessage = "";
             this._defaultLabIdentifier.ValidationQuery = "";
             this._defaultLabIdentifier.Visible = false;
-            // 
-            // _componentLevelStatus
-            // 
-            this._componentLevelStatus.AttributeName = "Flag";
-            this._componentLevelStatus.AutoUpdateQuery = "<Attribute>../../Status</Attribute>";
-            this._componentLevelStatus.Location = new System.Drawing.Point(376, 52);
-            this._componentLevelStatus.Name = "_componentLevelStatus";
-            this._componentLevelStatus.ParentDataEntryControl = this._testNameTextBox;
-            this._componentLevelStatus.Size = new System.Drawing.Size(10, 20);
-            this._componentLevelStatus.TabIndex = 29;
-            this._componentLevelStatus.ValidationErrorMessage = "Invalid value";
-            this._componentLevelStatus.Visible = false;
-            // 
-            // _componentLevelFlag
-            // 
-            this._componentLevelFlag.AttributeName = "Flag";
-            this._componentLevelFlag.AutoUpdateQuery = "<Attribute>../../Flag</Attribute>";
-            this._componentLevelFlag.Location = new System.Drawing.Point(360, 52);
-            this._componentLevelFlag.Name = "_componentLevelFlag";
-            this._componentLevelFlag.ParentDataEntryControl = this._testNameTextBox;
-            this._componentLevelFlag.Size = new System.Drawing.Size(10, 20);
-            this._componentLevelFlag.TabIndex = 28;
-            this._componentLevelFlag.ValidationErrorMessage = "Invalid value";
-            this._componentLevelFlag.Visible = false;
-            // 
-            // _componentLevelRange
-            // 
-            this._componentLevelRange.AttributeName = "Range";
-            this._componentLevelRange.AutoUpdateQuery = "<Attribute>../../Range</Attribute>";
-            this._componentLevelRange.Location = new System.Drawing.Point(343, 52);
-            this._componentLevelRange.Name = "_componentLevelRange";
-            this._componentLevelRange.ParentDataEntryControl = this._testNameTextBox;
-            this._componentLevelRange.Size = new System.Drawing.Size(10, 20);
-            this._componentLevelRange.TabIndex = 27;
-            this._componentLevelRange.ValidationErrorMessage = "Invalid value";
-            this._componentLevelRange.Visible = false;
-            // 
-            // _componentLevelUnits
-            // 
-            this._componentLevelUnits.AttributeName = "Units";
-            this._componentLevelUnits.AutoUpdateQuery = "<Attribute>../../Units</Attribute>";
-            this._componentLevelUnits.Location = new System.Drawing.Point(327, 52);
-            this._componentLevelUnits.Name = "_componentLevelUnits";
-            this._componentLevelUnits.ParentDataEntryControl = this._testNameTextBox;
-            this._componentLevelUnits.Size = new System.Drawing.Size(10, 20);
-            this._componentLevelUnits.TabIndex = 26;
-            this._componentLevelUnits.ValidationErrorMessage = "Invalid value";
-            this._componentLevelUnits.Visible = false;
-            // 
-            // _componentLevelValue
-            // 
-            this._componentLevelValue.AttributeName = "Value";
-            this._componentLevelValue.AutoUpdateQuery = "<Attribute>../../Value</Attribute>";
-            this._componentLevelValue.Location = new System.Drawing.Point(310, 52);
-            this._componentLevelValue.Name = "_componentLevelValue";
-            this._componentLevelValue.ParentDataEntryControl = this._testNameTextBox;
-            this._componentLevelValue.Size = new System.Drawing.Size(10, 20);
-            this._componentLevelValue.TabIndex = 25;
-            this._componentLevelValue.ValidationErrorMessage = "Invalid value";
-            this._componentLevelValue.Visible = false;
             // 
             // UITransplantCenterPanel
             // 
