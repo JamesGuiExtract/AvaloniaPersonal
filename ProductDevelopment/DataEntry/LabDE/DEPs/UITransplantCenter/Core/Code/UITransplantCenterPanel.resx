@@ -300,7 +300,9 @@
     <value>True</value>
   </metadata>
   <data name="_testNameTextBox.ValidationQuery" xml:space="preserve">
-    <value>&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) ORDER BY LabTest.OfficialName&lt;/SQL&gt;</value>
+    <value>&lt;Query ValidationListType='ValidationListOnly'&gt;
+&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) ORDER BY LabTest.OfficialName&lt;/SQL&gt;
+&lt;/Query&gt;</value>
   </data>
   <data name="_resultCodeTextBox.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query&gt;
@@ -319,6 +321,8 @@
 &lt;/Query&gt;</value>
   </data>
   <data name="_resultCodeTextBox.ValidationQuery" xml:space="preserve">
-    <value>&lt;SQL&gt;SELECT LabTest.TestCode FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../../OrderCode&lt;/Attribute&gt;,1,25) ORDER BY LabTest.TestCode&lt;/SQL&gt;</value>
+    <value>&lt;Query ValidationListType='ValidationListOnly'&gt;
+&lt;SQL&gt;SELECT LabTest.TestCode FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../../OrderCode&lt;/Attribute&gt;,1,25) ORDER BY LabTest.TestCode&lt;/SQL&gt;
+&lt;/Query&gt;</value>
   </data>
 </root>
