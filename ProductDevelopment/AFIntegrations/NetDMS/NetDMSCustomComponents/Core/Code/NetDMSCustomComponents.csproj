@@ -13,7 +13,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>false</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\..\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <SccProjectName>NetDMSCustomComponents</SccProjectName>
     <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
     <SccAuxPath>http://white.extract.local/VaultService</SccAuxPath>
@@ -23,25 +23,25 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\binaries\debug\</OutputPath>
+    <OutputPath>..\..\..\..\..\..\binaries\debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\..\..\..\binaries\debug\NetDMSCustomComponents.XML</DocumentationFile>
+    <DocumentationFile>..\..\..\..\..\..\binaries\debug\NetDMSCustomComponents.XML</DocumentationFile>
     <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\..\binaries\release\</OutputPath>
+    <OutputPath>..\..\..\..\..\..\binaries\release\</OutputPath>
     <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\..\..\..\binaries\release\NetDMSCustomComponents.XML</DocumentationFile>
+    <DocumentationFile>..\..\..\..\..\..\binaries\release\NetDMSCustomComponents.XML</DocumentationFile>
     <RegisterForComInterop>true</RegisterForComInterop>
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
@@ -50,22 +50,22 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DexFlow.Client">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\DexFlow.Client.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\DexFlow.Client.dll</HintPath>
     </Reference>
     <Reference Include="DexFlow.Framework">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\DexFlow.Framework.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\DexFlow.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Dx_DocContent">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\Dx_DocContent.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\Dx_DocContent.dll</HintPath>
     </Reference>
     <Reference Include="Dx_DocDescriptor">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\Dx_DocDescriptor.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\Dx_DocDescriptor.dll</HintPath>
     </Reference>
     <Reference Include="Extract.Drawing">
-      <HintPath>..\..\..\..\..\Binaries\Debug\Extract.Drawing.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Binaries\Debug\Extract.Drawing.dll</HintPath>
     </Reference>
     <Reference Include="Extract.Interfaces">
-      <HintPath>..\..\..\..\..\binaries\debug\Extract.Interfaces.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\binaries\debug\Extract.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="Interop.Weak.UCLID_AFCORELib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -94,7 +94,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="ScriptingSupport">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\ScriptingSupport.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\ScriptingSupport.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -109,7 +109,7 @@
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
     <Reference Include="WorkflowContext">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\WorkflowContext.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\RC.Net\APIs\NetDMS\Bin\WorkflowContext.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -149,35 +149,35 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Core\Code\Extract.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Encryption\Core\Code\Extract.Encryption.vcxproj">
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Encryption\Core\Code\Extract.Encryption.vcxproj">
       <Project>{C79815C7-A80A-41AA-AB02-F6AC83EFA579}</Project>
       <Name>Extract.Encryption</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.csproj">
       <Project>{B2D07DE4-9192-4531-8854-DE03CE9B0B57}</Project>
       <Name>Extract.Imaging</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
       <Name>Extract.Interop</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj">
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
       <Name>Extract.Licensing</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Redaction\Core\Code\Extract.Redaction.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Redaction\Core\Code\Extract.Redaction.csproj">
       <Project>{44B108A6-5A58-4F2C-8126-BAF763A304BF}</Project>
       <Name>Extract.Redaction</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
     </ProjectReference>
@@ -213,14 +213,14 @@
     <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" /out:"Interop.Weak.UCLID_COMLMLib.dll"
-call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" /out:"Interop.Weak.UCLID_COMUTILSLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll
-call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb" /out:"Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll
-call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb" /out:"Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll
-call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb" /out:"Interop.Weak.UCLID_INPUTFUNNELLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll /reference:Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll /reference:Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll
-call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFileProcessing.tlb" /out:"Interop.Weak.UCLID_FILEPROCESSINGLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll /reference:Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll /reference:Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll /reference:Interop.Weak.UCLID_INPUTFUNNELLib.dll
-call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\AttributeFinder\AFCore\Code\AFCore.tlb" /out:"Interop.Weak.UCLID_AFCORELib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll /reference:Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll /reference:Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll /reference:Interop.Weak.UCLID_INPUTFUNNELLib.dll
-call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\AttributeFinder\AFUtils\Code\AFUtils.tlb" /out:"Interop.Weak.UCLID_AFUTILSLib.dll"  /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll /reference:Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll /reference:Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll /reference:Interop.Weak.UCLID_INPUTFUNNELLib.dll /reference:Interop.Weak.UCLID_AFCORELib.dll</PreBuildEvent>
+    <PreBuildEvent>call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" /out:"Interop.Weak.UCLID_COMLMLib.dll"
+call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" /out:"Interop.Weak.UCLID_COMUTILSLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll
+call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb" /out:"Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll
+call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb" /out:"Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll
+call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb" /out:"Interop.Weak.UCLID_INPUTFUNNELLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll /reference:Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll /reference:Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll
+call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFileProcessing.tlb" /out:"Interop.Weak.UCLID_FILEPROCESSINGLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll /reference:Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll /reference:Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll /reference:Interop.Weak.UCLID_INPUTFUNNELLib.dll
+call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\AttributeFinder\AFCore\Code\AFCore.tlb" /out:"Interop.Weak.UCLID_AFCORELib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll /reference:Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll /reference:Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll /reference:Interop.Weak.UCLID_INPUTFUNNELLib.dll
+call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\AttributeFinder\AFUtils\Code\AFUtils.tlb" /out:"Interop.Weak.UCLID_AFUTILSLib.dll"  /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll /reference:Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll /reference:Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll /reference:Interop.Weak.UCLID_INPUTFUNNELLib.dll /reference:Interop.Weak.UCLID_AFCORELib.dll</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

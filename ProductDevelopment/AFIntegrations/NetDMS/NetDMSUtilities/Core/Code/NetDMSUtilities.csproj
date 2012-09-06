@@ -13,7 +13,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\..\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <SccProjectName>NetDMSUtilities</SccProjectName>
     <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
     <SccAuxPath>http://white.extract.local/VaultService</SccAuxPath>
@@ -23,25 +23,25 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\binaries\debug\</OutputPath>
+    <OutputPath>..\..\..\..\..\..\binaries\debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\..\..\..\binaries\debug\NetDMSUtilities.xml</DocumentationFile>
+    <DocumentationFile>..\..\..\..\..\..\binaries\debug\NetDMSUtilities.xml</DocumentationFile>
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\..\binaries\release\</OutputPath>
+    <OutputPath>..\..\..\..\..\..\binaries\release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\..\..\..\binaries\release\NetDMSUtilities.xml</DocumentationFile>
+    <DocumentationFile>..\..\..\..\..\..\binaries\release\NetDMSUtilities.xml</DocumentationFile>
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup>
@@ -62,23 +62,23 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Core\Code\Extract.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.csproj">
       <Project>{B2D07DE4-9192-4531-8854-DE03CE9B0B57}</Project>
       <Name>Extract.Imaging</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj">
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
       <Name>Extract.Licensing</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Redaction\Core\Code\Extract.Redaction.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Redaction\Core\Code\Extract.Redaction.csproj">
       <Project>{44B108A6-5A58-4F2C-8126-BAF763A304BF}</Project>
       <Name>Extract.Redaction</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
     </ProjectReference>
