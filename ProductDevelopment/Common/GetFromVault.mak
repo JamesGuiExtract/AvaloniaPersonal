@@ -21,6 +21,7 @@ IDShieldOfficeDir=$(PDRootDir)\IDShieldOffice
 DataEntryDir=$(PDRootDir)\DataEntry
 LabDEDir=$(DataEntryDir)\LabDE
 LaserFicheDir=$(PDRootDir)\AFIntegrations\Laserfiche
+NetDMSDir=$(PDRootDir)\AFIntegrations\NetDMS
 RulesDir=$(EngineeringRootDirectory)\Rules
 Branch=
 
@@ -124,6 +125,16 @@ GetLaserFicheFiles:
     $(Get) $(GetOptions) -nonworkingfolder "$(LaserFicheDir)" $$$(Branch)/Engineering/ProductDevelopment/AFIntegrations/Laserfiche "$(LaserficheVersion)"
     @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(LaserficheVersion)"
 	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(LaserficheVersion)"
+
+GetNetDMSFiles: 
+    @IF NOT EXIST "$(NetDMSDir)" @MKDIR "$(NetDMSDir)"
+    @ECHO Getting files from NetDMS folder
+    @ECHO Please wait...
+	$(BUILD_DRIVE) 
+    @CD "$(NetDMSDir)"
+    $(Get) $(GetOptions) -nonworkingfolder "$(NetDMSDir)" $$$(Branch)/Engineering/ProductDevelopment/AFIntegrations/NetDMS "$(FlexIDSNetDMSVersion)"
+    @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(FlexIDSNetDMSVersion)"
+	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(FlexIDSNetDMSVersion)"
 
 GetComponentDataFiles:
 	@ECHO Getting ComponentDataFiles $(FKBVersion)

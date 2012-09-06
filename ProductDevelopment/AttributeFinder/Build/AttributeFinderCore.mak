@@ -357,7 +357,7 @@ BuildDataEntryMergeModule: CreateVersionISImportFile BuildAFCoreMergeModule
 	$(SetProductVerScript) "$(LabDEInstallRootDir)\DataEntry\DataEntry.ism" "$(LabDEVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(LabDEInstallRootDir)\DataEntry\DataEntry.ism"
 
-GetAllFiles: GetPDCommonFiles GetReusableComponentFiles GetRCdotNETFiles GetAttributeFinderFiles GetPDUtilsFiles GetDataEntryFiles GetDataEntryInstall
+GetAllFiles: GetPDCommonFiles GetReusableComponentFiles GetRCdotNETFiles GetAttributeFinderFiles GetNetDMSFiles GetPDUtilsFiles GetDataEntryFiles GetDataEntryInstall
 
 DoEverythingNoGet: SetupBuildEnv CleanUpMergeModulesFromPreviousBuilds RegisterClearImage_7_0 BuildAFCoreMergeModule BuildDataEntryMergeModule CopyCommonFiles BuildFKBUpdateIfRequired
     @ECHO.

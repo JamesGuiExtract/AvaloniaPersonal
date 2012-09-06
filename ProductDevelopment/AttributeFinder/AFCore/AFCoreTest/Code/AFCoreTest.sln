@@ -598,9 +598,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLCDBEditor.Plugins.Altern
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.UITransplantCenter", "..\..\..\..\DataEntry\LabDE\DEPs\UITransplantCenter\Core\Code\Extract.DataEntry.DEP.UITransplantCenter.csproj", "{76DADA14-AF4A-4B30-A88A-B9245103F1B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetDMSCustomComponents", "..\..\..\..\AFIntegrations\NetDMSCustomComponents\Core\Code\NetDMSCustomComponents.csproj", "{60F8B7A8-CEBE-4AB3-9AEE-5EDC38081C48}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetDMSCustomComponents", "..\..\..\..\AFIntegrations\NetDMS\NetDMSCustomComponents\Core\Code\NetDMSCustomComponents.csproj", "{60F8B7A8-CEBE-4AB3-9AEE-5EDC38081C48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetDMSUtilities", "..\..\..\..\AFIntegrations\NetDMSUtilities\Core\Code\NetDMSUtilities.csproj", "{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetDMSUtilities", "..\..\..\..\AFIntegrations\NetDMS\NetDMSUtilities\Core\Code\NetDMSUtilities.csproj", "{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}"
 EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
@@ -781,8 +781,8 @@ Global
 		ProjectRelativeDiskPath171 = ..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj
 		ProjectRelativeDiskPath172 = ..\..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCDBEditor\Core\Plugins\AlternateTestNameManager\Core\Code\SQLCDBEditor.Plugins.AlternateTestNameManager.csproj
 		ProjectRelativeDiskPath173 = ..\..\..\..\DataEntry\LabDE\DEPs\UITransplantCenter\Core\Code\Extract.DataEntry.DEP.UITransplantCenter.csproj
-		ProjectRelativeDiskPath174 = ..\..\..\..\AFIntegrations\NetDMSCustomComponents\Core\Code\NetDMSCustomComponents.csproj
-		ProjectRelativeDiskPath175 = ..\..\..\..\AFIntegrations\NetDMSUtilities\Core\Code\NetDMSUtilities.csproj
+		ProjectRelativeDiskPath174 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSCustomComponents\Core\Code\NetDMSCustomComponents.csproj
+		ProjectRelativeDiskPath175 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSUtilities\Core\Code\NetDMSUtilities.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
