@@ -213,7 +213,8 @@
     <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" /out:"Interop.Weak.UCLID_COMLMLib.dll"
+    <PreBuildEvent>call echo "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" /out:"Interop.Weak.UCLID_COMLMLib.dll"
+call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" /out:"Interop.Weak.UCLID_COMLMLib.dll"
 call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" /out:"Interop.Weak.UCLID_COMUTILSLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll
 call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb" /out:"Interop.Weak.UCLID_RASTERANDOCRMGMTLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll
 call "$(FrameworkSDKRoot)Bin\tlbimp.exe" "$(ProjectDir)..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb" /out:"Interop.Weak.UCLID_TESTINGFRAMEWORKINTERFACESLib.dll" /reference:Interop.Weak.UCLID_COMLMLib.dll /reference:Interop.Weak.UCLID_COMUTILSLib.dll

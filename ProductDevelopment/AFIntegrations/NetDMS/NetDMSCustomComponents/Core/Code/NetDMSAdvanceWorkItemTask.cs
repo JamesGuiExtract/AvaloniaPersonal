@@ -7,6 +7,7 @@ using Interop.Weak.UCLID_COMLMLib;
 using Interop.Weak.UCLID_COMUTILSLib;
 using Interop.Weak.UCLID_FILEPROCESSINGLib;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -487,18 +488,27 @@ namespace NetDMSCustomComponents
         {
             // Check to be sure that all other documents in this folder have completed processing
             // for on the current action.
-            string actionName = null;
-            foreach (string documentFileName in
-                Directory.EnumerateFiles(Path.GetDirectoryName(fileName))
+            string actionName = fileProcessingDB.GetActionName(actionId);
+            string parcelDirectory = Path.GetDirectoryName(fileName);
+            string indexFileName = Path.Combine(parcelDirectory, "Index.txt");
+            ExtractException.Assert("ELI34944", "Parcel index file is missing!",
+                File.Exists(indexFileName));
+
+            foreach (string documentFileName in File.ReadAllLines(indexFileName)
                     .Where(documentFileName =>
-                        !documentFileName.EndsWith(".uss", StringComparison.OrdinalIgnoreCase) &&
-                        !documentFileName.EndsWith(".voa", StringComparison.OrdinalIgnoreCase) &&
-                        !documentFileName.Equals(fileName, StringComparison.OrdinalIgnoreCase)))
+                        !fileName.EndsWith(documentFileName, StringComparison.OrdinalIgnoreCase)))
             {
-                actionName = actionName ?? fileProcessingDB.GetActionName(actionId);
-                int documentFileId = fileProcessingDB.GetFileID(documentFileName);
+                string fullDocumentPath = Path.Combine(parcelDirectory, documentFileName);
+                int documentFileId = fileProcessingDB.GetFileID(fullDocumentPath);
+
                 EActionStatus documentActionStatus =
                     fileProcessingDB.GetFileStatus(documentFileId, actionName, false);
+
+                ExtractException.Assert("ELI34947", _COMPONENT_DESCRIPTION + " must be run " +
+                    "in an FPS configured to run on a single thread and that retrieves one " +
+                    "file at a time. Only one instance of this FPS file can be run across " +
+                    "all machines targeting the same NetDMS project.",
+                    documentActionStatus != EActionStatus.kActionProcessing);
 
                 if (documentActionStatus != EActionStatus.kActionCompleted)
                 {
@@ -506,11 +516,17 @@ namespace NetDMSCustomComponents
                 }
             }
 
+            // Look up the node to advance the work item from using the id encoded in the path
+            // rather than using the node the document is currently in. This avoids the possibility
+            // that the parcel gets advance from a different node than it was in when the document
+            // was exported.
+            string[] fileNameParts = Path.GetFileName(parcelDirectory).Split('-');
+            long nodeISN = Int64.Parse(fileNameParts[1], CultureInfo.InvariantCulture);
+            INode node = GetNetDMSObject<INode>(SystemTables.Node, nodeISN);
+            IParcel parcel = GetNetDMSObject<IParcel>(SystemTables.Parcel, document.ParcelISN);
+
             // Use the NetDMS to move the parcel to the next node in the NetDMS workflow using
             // "SendAuto".
-            IParcel parcel = GetNetDMSObject<IParcel>(SystemTables.Parcel, document.ParcelISN);
-            INode node = GetNetDMSObject<INode>(SystemTables.Node, parcel.NodeISN);
-
             INode destNode;
             IUser destUser;
             API.SendWorkItemAuto(TaskClient, Session.User, Session.Project, node, parcel,

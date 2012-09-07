@@ -354,6 +354,7 @@ namespace NetDMSCustomComponents
         {
             try
             {
+                // The path will be formatted [RootPath]\[ProjectISN]\[ParcelISN]-[NodeISN]\[DocISN].tif
                 long projectISN = Int64.Parse(
                     Path.GetFileName(
                         Path.GetDirectoryName(   // Project ISN
@@ -385,8 +386,8 @@ namespace NetDMSCustomComponents
             {
                 ConnectToCorrespondingProject(fileName);
 
-                long documentISN = Int64.Parse(Path.GetFileNameWithoutExtension(fileName),
-                    CultureInfo.InvariantCulture);
+                long documentISN = Int64.Parse(
+                    Path.GetFileNameWithoutExtension(fileName), CultureInfo.InvariantCulture);
                 return GetNetDMSObject<IDocument>(SystemTables.Document, documentISN);
             }
             catch (Exception ex)
