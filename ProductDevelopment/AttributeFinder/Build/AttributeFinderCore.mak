@@ -77,12 +77,12 @@ LabelCommonFolder:
 BuildPDUtils: BuildAttributeFinderCore
 	@ECHO Building PD Utils...
     @CD "$(PDUtilsRootDir)\UCLIDUtilApps\Code"
-    @devenv Utils.sln /BUILD $(BuildConfig) /USEENV
+    @devenv Utils.sln /BUILD $(BuildConfig) 
 
 BuildAttributeFinderCore:  
 	@ECHO Building AFCore...
     @CD "$(AFRootDirectory)\AFCore\AFCoreTest\Code"
-    @devenv AFCoreTest.sln /BUILD $(BuildConfig) /USEENV
+    @devenv AFCoreTest.sln /BUILD $(BuildConfig) 
 	
 UnregisterClearImage5_7:
 	@ECHO Unregistering ClearImage 5_7...
