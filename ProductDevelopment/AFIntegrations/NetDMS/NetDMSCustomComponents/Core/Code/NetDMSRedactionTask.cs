@@ -561,7 +561,10 @@ namespace NetDMSCustomComponents
 
             try
             {
-                string voaFileName = pFAMTM.ExpandTagsAndFunctions(DataFileName, pFileRecord.Name);
+                // [FlexIDSIntegrations:330]
+                // Should be: string voaFileName = pFAMTM.ExpandTagsAndFunctions(DataFileName, pFileRecord.Name);
+                // Make it that for the next release.
+                string voaFileName = pFAMTM.ExpandTags(DataFileName, pFileRecord.Name);
 
                 foreach (RedactionArea redactionArea in
                     _netDMSMethods.GetDocumentRedactionAreas(pFileRecord.Name, voaFileName))
