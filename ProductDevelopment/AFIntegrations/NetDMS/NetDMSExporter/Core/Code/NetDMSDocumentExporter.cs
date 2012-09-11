@@ -49,11 +49,19 @@ namespace NetDMSExporter
                         Directory.CreateDirectory(parcelExportPath);
                     }
 
+                    // Our folder watcher doesn't not seem to be able to pick up documents exported
+                    // directly to the export folder. To allow for our folder watcher to pick up the
+                    // file, first export it to a temporary file name, then copy it into the export
+                    string tempFileName = Path.GetTempFileName();
+                    int pageCount;
+                    docContent.ExportToMultiTIFF(tempFileName, out pageCount);
+
                     string exportFileName =
                         document.ISN.ToString(CultureInfo.InvariantCulture) + ".tif";
                     string exportFullPath = Path.Combine(parcelExportPath, exportFileName);
-                    int pageCount;
-                    docContent.ExportToMultiTIFF(exportFullPath, out pageCount);
+                    File.Copy(tempFileName, exportFullPath);
+                    File.Delete(tempFileName);
+
                     exportedDocuments.Add(exportFileName);
                 }
                 finally
