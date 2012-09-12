@@ -232,7 +232,7 @@ namespace Extract.DataEntryPrompt.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("DataEntryPrompt\\Data.csv")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DataEntryPrompt.csv")]
         public string DataFileName {
             get {
                 return ((string)(this["DataFileName"]));

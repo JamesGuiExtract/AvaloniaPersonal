@@ -62,14 +62,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConfigSettings.cs" />
     <Compile Include="DataEntryPromptForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="DataEntryPromptForm.Designer.cs">
       <DependentUpon>DataEntryPromptForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ExtractSettingsBase.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="DataEntryPromptForm.resx">

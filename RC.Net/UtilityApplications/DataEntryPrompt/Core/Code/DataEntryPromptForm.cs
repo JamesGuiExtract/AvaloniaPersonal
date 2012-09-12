@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -31,18 +32,14 @@ namespace Extract.DataEntryPrompt
         #region Fields
 
         /// <summary>
-        /// 
-        /// </summary>
-        ConfigSettings<Extract.DataEntryPrompt.Properties.Settings> _config =
-            new ConfigSettings<Extract.DataEntryPrompt.Properties.Settings>(null, false, true);
-
-        /// <summary>
-        /// 
+        /// Maps the name of each defined field to the <see cref="TextBox"/> that will accept its
+        /// input.
         /// </summary>
         Dictionary<string, TextBox> _dataFields = new Dictionary<string, TextBox>();
 
         /// <summary>
-        /// 
+        /// Maps each <see cref="TextBox"/> to a <see cref="Regex"/> that will validate its entry if
+        /// a validation regex has been specified for the field.
         /// </summary>
         Dictionary<TextBox, Regex> _validationRegexes = new Dictionary<TextBox, Regex>();
 
@@ -52,7 +49,7 @@ namespace Extract.DataEntryPrompt
         ErrorProvider _errorProvider = new ErrorProvider();
 
         /// <summary>
-        /// 
+        /// The record ID to assign to the next record entered.
         /// </summary>
         int _recordId = 1;
 
@@ -83,20 +80,22 @@ namespace Extract.DataEntryPrompt
         {
             base.OnLoad(e);
 
-            Text = _config.Settings.Title;
-            _okButton.Text = _config.Settings.OKButtonLabel;
-            _cancelButton.Text = _config.Settings.CancelButtonLabel;
+            Text = Properties.Settings.Default.Title;
+            _okButton.Text = Properties.Settings.Default.OKButtonLabel;
+            _cancelButton.Text = Properties.Settings.Default.CancelButtonLabel;
 
+            // Initialize up to 10 fields that have been defined in the config file.
             int controlIndex = 0;
             for (int i = 1; i <= 10; i++)
             {
                 string propertyName = "Field" + i.ToString(CultureInfo.InvariantCulture);
                 string validationPropertyName = propertyName + "Validation";
 
-                string fieldName = (string)_config.Settings[propertyName];
+                string fieldName = (string)Properties.Settings.Default[propertyName];
                     
                 if (!string.IsNullOrEmpty(fieldName))
                 {
+                    // Add the field label
                     Label label = new Label();
                     label.AutoSize = true;
                     label.Anchor = AnchorStyles.Left;
@@ -104,6 +103,7 @@ namespace Extract.DataEntryPrompt
                     _tableLayoutPanel.Controls.Add(label, 0, controlIndex++);
                     _tableLayoutPanel.SetColumnSpan(label, 2);
 
+                    // Add the text box to accept input.
                     TextBox textBox = new TextBox();
                     textBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
                     textBox.Margin = new Padding(textBox.Margin.Left,
@@ -115,7 +115,9 @@ namespace Extract.DataEntryPrompt
 
                     _dataFields[fieldName] = textBox;
 
-                    string validationString = (string)_config.Settings[validationPropertyName];
+                    // Add a regex for validation if one is defined.
+                    string validationString =
+                        (string)Properties.Settings.Default[validationPropertyName];
                     if (!string.IsNullOrEmpty(validationString))
                     {
                         _validationRegexes[textBox] = new Regex(validationString);
@@ -169,7 +171,7 @@ namespace Extract.DataEntryPrompt
                     }
                 }
 
-                Trace.Assert(!string.IsNullOrEmpty(_config.Settings.DataFileName), 
+                Trace.Assert(!string.IsNullOrEmpty(Properties.Settings.Default.DataFileName),
                     "Data file name not specified.");
 
                 string dataFileName = GetDataFileName();
@@ -178,18 +180,19 @@ namespace Extract.DataEntryPrompt
                     new[] { RecordId }.Concat(_dataFields.Values
                         .Select(box => Quote(box.Text))));
                 File.AppendAllLines(dataFileName, new[] { data });
-                
-                if (!string.IsNullOrEmpty(_config.Settings.PostEntryCommandLine))
+
+                if (!string.IsNullOrEmpty(Properties.Settings.Default.PostEntryCommandLine))
                 {
                     using (var process = new Process())
                     {
-                        process.StartInfo = new ProcessStartInfo(_config.Settings.PostEntryCommandLine,
-                            GetEvaluatedArguments());
+                        process.StartInfo = new ProcessStartInfo(
+                            Properties.Settings.Default.PostEntryCommandLine,
+                            GetEvaluatedCommandLineArguments());
                         process.Start();
                     }
                 }
 
-                if (_config.Settings.KeepOpen)
+                if (Properties.Settings.Default.KeepOpen)
                 {
                     ClearData(true);
                 }
@@ -215,7 +218,7 @@ namespace Extract.DataEntryPrompt
         {
             try
             {
-                if (_config.Settings.KeepOpen)
+                if (Properties.Settings.Default.KeepOpen)
                 {
                     ClearData(false);
                 }
@@ -273,10 +276,12 @@ namespace Extract.DataEntryPrompt
         }
 
         /// <summary>
-        /// Clears the data.
+        /// Clears the data from all text boxes and increments the record number if specified by
+        /// <see paramref="incermentId"/>
         /// </summary>
-        /// <param name="IncrementId"></param>
-        void ClearData(bool IncrementId)
+        /// <param name="incermentId"><see langword="true"/> if the record ID should be incremented;
+        /// otherwise, <see langword="false"/>.</param>
+        void ClearData(bool incermentId)
         {
             foreach (TextBox textBox in _dataFields.Values)
             {
@@ -285,21 +290,24 @@ namespace Extract.DataEntryPrompt
                 textBox.Text = "";
             }
 
+            // Reset focus to the first field.
             _dataFields.First().Value.Focus();
 
-            if (IncrementId)
+            if (incermentId)
             {
                 _recordId++;
             }
         }
 
         /// <summary>
-        /// Gets the name of the data file.
+        /// Gets the name of the data file (comma delimited) to store the data.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The name of the data file (comma delimited) to store the data.</returns>
         string GetDataFileName()
         {
-            string dataFileName = _config.Settings.DataFileName;
+            // Expand any environment variables that are used in the path.
+            string dataFileName =
+                Environment.ExpandEnvironmentVariables(Properties.Settings.Default.DataFileName);
 
             // Ensure that fileName is not null or empty
             Trace.Assert(!string.IsNullOrEmpty(dataFileName),
@@ -308,16 +316,20 @@ namespace Extract.DataEntryPrompt
             // Check if the filename is a relative path
             if (!Path.IsPathRooted(dataFileName))
             {
-                dataFileName = Path.Combine(_COMMON_APPLICATION_DATA_PATH, dataFileName);
-                dataFileName = Path.GetFullPath(dataFileName);
+                dataFileName = Path.Combine(
+                    Path.GetDirectoryName(
+                        Assembly.GetExecutingAssembly().Location),
+                    dataFileName);
             }
 
+            // Create the directory for the file if it does not yet exist.
             string directoryName = Path.GetDirectoryName(dataFileName);
             if (!Directory.Exists(directoryName))
             {
                 Directory.CreateDirectory(directoryName);
             }
 
+            // Initialize the data file if it does not yet exist.
             if (!File.Exists(dataFileName))
             {
                 string columnHeaders = string.Join(",",
@@ -330,12 +342,13 @@ namespace Extract.DataEntryPrompt
         }
 
         /// <summary>
-        /// Gets the evaluated arguments.
+        /// Gets the command-line arguments with an fields or record id parameters evaluated.
         /// </summary>
-        /// <returns></returns>
-        string GetEvaluatedArguments()
+        /// <returns>The command-line arguments with an fields or record id parameters evaluated.
+        /// </returns>
+        string GetEvaluatedCommandLineArguments()
         {
-            string arguments = _config.Settings.PostEntryCommandLineArguments.Replace(
+            string arguments = Properties.Settings.Default.PostEntryCommandLineArguments.Replace(
                 "%RecordID%", RecordId);
             foreach (string fieldName in _dataFields.Keys)
             {
