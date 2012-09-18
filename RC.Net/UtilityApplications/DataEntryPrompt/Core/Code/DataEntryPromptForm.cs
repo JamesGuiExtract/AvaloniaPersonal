@@ -106,6 +106,7 @@ namespace Extract.DataEntryPrompt
                     // Add the text box to accept input.
                     TextBox textBox = new TextBox();
                     textBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+                    // Allow for space for the error icon to be displayed.
                     textBox.Margin = new Padding(textBox.Margin.Left,
                         textBox.Margin.Top,
                         textBox.Margin.Right + 16,
@@ -285,7 +286,8 @@ namespace Extract.DataEntryPrompt
         {
             foreach (TextBox textBox in _dataFields.Values)
             {
-                // Ensure the text changes so that it is evaluated.
+                // Ensure the text changes so that the value is validated and reported as invalid if
+                // necessary.
                 textBox.Text = " ";
                 textBox.Text = "";
             }
