@@ -16,6 +16,7 @@
 #include <RegistryPersistenceMgr.h>
 #include <mathUtil.h>
 #include <MiscLeadUtils.h>
+#include <StringCSIS.h>
 
 #include <cmath>
 
@@ -41,6 +42,9 @@ const string gstrOVERLAP_MINUMUM_PERCENT_KEY = "RasterZoneOverlapMinimum";
 const string gstrOVERLAP_MINUMUM_DEFAULT_VALUE = "10";
 
 const string gstrDOCTYPEQUERY = "DocumentType";
+
+// Surrounds preliminarily expanded custom report arguments.
+const string gstrPRELIM_ARG_MARKER = "$$$";
 
 //-------------------------------------------------------------------------------------------------
 // These output files will be written to "$DirOf(tcl file)\\Analysis - (Timestamp)"
@@ -207,6 +211,42 @@ m_ipTestOutputVOAVector(NULL)
 
 		m_ipAttrFinderEngine.CreateInstance(CLSID_AttributeFinderEngine);
 		ASSERT_RESOURCE_ALLOCATION("ELI15206", m_ipAttrFinderEngine != __nullptr);
+
+		// Map the result fields to names for use by custom reports.
+		m_mapStatisticFields["TotalExpectedRedactions"] = &m_ulTotalExpectedRedactions;
+		m_mapStatisticFields["NumCorrectRedactions"] = &m_ulNumCorrectRedactions;
+		m_mapStatisticFields["NumOverRedactions"] = &m_ulNumOverRedactions;
+		m_mapStatisticFields["NumUnderRedactions"] = &m_ulNumUnderRedactions;
+		m_mapStatisticFields["NumMisses"] = &m_ulNumMisses;
+		m_mapStatisticFields["TotalFilesProcessed"] = &m_ulTotalFilesProcessed;
+		m_mapStatisticFields["NumFilesWithExpectedRedactions"] = &m_ulNumFilesWithExpectedRedactions;
+		m_mapStatisticFields["NumFilesSelectedForReview"] = &m_ulNumFilesSelectedForReview;
+		m_mapStatisticFields["NumFilesAutomaticallyRedacted"] = &m_ulNumFilesAutomaticallyRedacted;
+		m_mapStatisticFields["NumExpectedRedactionsInReviewedFiles"] = &m_ulNumExpectedRedactionsInReviewedFiles;
+		m_mapStatisticFields["NumExpectedRedactionsInRedactedFiles"] = &m_ulNumExpectedRedactionsInRedactedFiles;
+		m_mapStatisticFields["NumFilesWithExistingVOA"] = &m_ulNumFilesWithExistingVOA;
+		m_mapStatisticFields["NumFilesWithOverlappingExpectedRedactions"] = &m_ulNumFilesWithOverlappingExpectedRedactions;
+		m_mapStatisticFields["TotalPages"] = &m_ulTotalPages;
+		m_mapStatisticFields["NumPagesWithExpectedRedactions"] = &m_ulNumPagesWithExpectedRedactions;
+		m_mapStatisticFields["DocsClassified"] = &m_ulDocsClassified;
+
+		m_mapStatisticFields["AutomatedTotalExpectedRedactions"] = &automatedStatistics.m_ulTotalExpectedRedactions;
+		m_mapStatisticFields["AutomatedExpectedRedactionsInSelectedFiles"] = &automatedStatistics.m_ulExpectedRedactionsInSelectedFiles;
+		m_mapStatisticFields["AutomatedFoundRedactions"] = &automatedStatistics.m_ulFoundRedactions;
+		m_mapStatisticFields["AutomatedNumCorrectRedactions"] = &automatedStatistics.m_ulNumCorrectRedactions;
+		m_mapStatisticFields["AutomatedNumFalsePositives"] = &automatedStatistics.m_ulNumFalsePositives;
+		m_mapStatisticFields["AutomatedNumOverRedactions"] = &automatedStatistics.m_ulNumOverRedactions;
+		m_mapStatisticFields["AutomatedNumUnderRedactions"] = &automatedStatistics.m_ulNumUnderRedactions;
+		m_mapStatisticFields["AutomatedNumMisses"] = &automatedStatistics.m_ulNumMisses;
+
+		m_mapStatisticFields["VerificationTotalExpectedRedactions"] = &verificationStatistics.m_ulTotalExpectedRedactions;
+		m_mapStatisticFields["VerificationExpectedRedactionsInSelectedFiles"] = &verificationStatistics.m_ulExpectedRedactionsInSelectedFiles;
+		m_mapStatisticFields["VerificationFoundRedactions"] = &verificationStatistics.m_ulFoundRedactions;
+		m_mapStatisticFields["VerificationNumCorrectRedactions"] = &verificationStatistics.m_ulNumCorrectRedactions;
+		m_mapStatisticFields["VerificationNumFalsePositives"] = &verificationStatistics.m_ulNumFalsePositives;
+		m_mapStatisticFields["VerificationNumOverRedactions"] = &verificationStatistics.m_ulNumOverRedactions;
+		m_mapStatisticFields["VerificationNumUnderRedactions"] = &verificationStatistics.m_ulNumUnderRedactions;
+		m_mapStatisticFields["VerificationNumMisses"] = &verificationStatistics.m_ulNumMisses;
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI15179");
 }
@@ -245,6 +285,22 @@ STDMETHODIMP CIDShieldTester::get_OutputFileDirectory(BSTR *pVal)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28679")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CIDShieldTester::GenerateCustomReport(BSTR bstrReportTemplate)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		generateCustomReport(asString(bstrReportTemplate));
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI34968");
+
+	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -376,10 +432,11 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			m_ulNumFilesAutomaticallyRedacted = 0;
 			m_ulNumExpectedRedactionsInReviewedFiles = 0;
 			m_ulNumExpectedRedactionsInRedactedFiles = 0;
-			m_iNumFilesWithExistingVOA = 0;
+			m_ulNumFilesWithExistingVOA = 0;
 			m_ulNumFilesWithOverlappingExpectedRedactions = 0;
 			m_ulTotalPages = 0;
 			m_ulNumPagesWithExpectedRedactions = 0;
+			m_ulDocsClassified = 0;
 			m_bOutputHybridStats = false;
 			m_bOutputAutomatedStatsOnly = false;
 			m_apRedactionTester.reset();
@@ -573,9 +630,16 @@ void CIDShieldTester::interpretLine(const string& strLineText,
 	}
 	else if( vecTokens[0] == "<TESTFOLDER>" )
 	{
-		// Create the output directory if this is the first test folder to run.
-		if (!isValidFolder(m_strOutputFileDirectory))
+		if (isValidFolder(m_strOutputFileDirectory))
 		{
+			// Remove all files from the output directory if it already exists, to ensure old
+			// results don't end up alongside new results.
+			vector<string> vecSubDirs;
+			getAllSubDirsAndDeleteAllFiles(m_strOutputFileDirectory, vecSubDirs);
+		}
+		else
+		{
+			// Create the director if it does not yet exist.
 			createDirectory(m_strOutputFileDirectory);
 		}
 
@@ -628,6 +692,7 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 	// Tokenize on the =
 	vector<string> vecTokens;
 	StringTokenizer::sGetTokens(strSettingsText, '=', vecTokens);
+	bool bOutputFilesFolderIsSet = false;
 
 	if ( vecTokens.size() == 2 )
 	{
@@ -774,8 +839,29 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 		}
 		else if (vecTokens[0] == "OutputFilesFolder")
 		{
-			// Update m_strOutputFileDirectory based on the specified folder.
-			getOutputDirectory(vecTokens[1]);
+			if (bOutputFilesFolderIsSet)
+			{
+				throw UCLIDException("ELI34969", "Output directory specified multiple times.");
+			}
+			if (!vecTokens[1].empty())
+			{
+				// Update m_strOutputFileDirectory based on the specified folder.
+				getOutputDirectory(vecTokens[1]);
+				bOutputFilesFolderIsSet = true;
+			}
+		}
+		else if (vecTokens[0] == "ExplicitOutputFilesFolder")
+		{
+			if (bOutputFilesFolderIsSet)
+			{
+				throw UCLIDException("ELI34970", "Output directory specified multiple times.");
+			}
+			if (!vecTokens[1].empty())
+			{
+				// Set m_strOutputFileDirectory without using a timestamp-based analysis sub-folder.
+				m_strOutputFileDirectory = vecTokens[1];
+				bOutputFilesFolderIsSet = true;
+			}
 		}
 		else if (vecTokens[0] == "OutputAutomatedStatsOnly")
 		{
@@ -973,7 +1059,7 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 				m_ipAFUtility->RemoveMetadataAttributes(ipFoundAttributes);
 
 				// Increment the number of files that read from an existing VOA.
-				m_iNumFilesWithExistingVOA++;
+				m_ulNumFilesWithExistingVOA++;
 			}
 			// VOA file does not exist - so compute VOA file by running rules
 			else
@@ -1792,7 +1878,7 @@ void CIDShieldTester::displaySummaryStatistics()
 	}
 
 	// Compute the number of correct redactions based on whether this is hyrbid stats or not
-	unsigned long ulTotalNumberOfCorrectRedactions = automatedStatistics.m_ulNumCorrectRedactions +
+	m_ulNumCorrectRedactions = automatedStatistics.m_ulNumCorrectRedactions +
 		verificationStatistics.m_ulExpectedRedactionsInSelectedFiles;
 
 	strStatisticSummary += "\r\nFinal results of above workflow:\r\n";
@@ -1800,8 +1886,8 @@ void CIDShieldTester::displaySummaryStatistics()
 	// Note for number of redactions found
 	zTemp.Format(
 		"\tSensitive data items redacted after processing: %d (%0.1f%%)",
-			ulTotalNumberOfCorrectRedactions, getRatioAsPercentOfTwoLongs(
-				ulTotalNumberOfCorrectRedactions, m_ulTotalExpectedRedactions));
+			m_ulNumCorrectRedactions, getRatioAsPercentOfTwoLongs(
+				m_ulNumCorrectRedactions, m_ulTotalExpectedRedactions));
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticSummary += zTemp + "\r\n";
 
@@ -1823,7 +1909,7 @@ void CIDShieldTester::displaySummaryStatistics()
 		{
 			// Use integer division to get a whole number ratio as a result
 			zTemp.Format("\tRatio of correctly redacted items to false positives: %0.1f",
-				((double)ulTotalNumberOfCorrectRedactions /
+				((double)m_ulNumCorrectRedactions /
 				 (double)automatedStatistics.m_ulNumFalsePositives));
 		}
 		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
@@ -1884,7 +1970,7 @@ void CIDShieldTester::displaySummaryStatistics()
 	bool bOneHundredPercentSuccess = false;
 	bOneHundredPercentSuccess = 
 		automatedStatistics.m_bTestCaseResult && verificationStatistics.m_bTestCaseResult &&
-		(m_ulTotalExpectedRedactions == ulTotalNumberOfCorrectRedactions);
+		(m_ulTotalExpectedRedactions == m_ulNumCorrectRedactions);
 
 	m_ipResultLogger->EndTestCase(bOneHundredPercentSuccess ? VARIANT_TRUE : VARIANT_FALSE);
 
@@ -1894,6 +1980,168 @@ void CIDShieldTester::displaySummaryStatistics()
 
 	// Display the document type statistics
 	displayDocumentTypeStats();
+}
+//-------------------------------------------------------------------------------------------------
+void CIDShieldTester::generateCustomReport(string strReportTemplate)
+{
+	// Use the template filename without extension as the report name.
+	string strReportName = getFileNameWithoutExtension(strReportTemplate);
+
+	m_ipResultLogger->StartTestCase("", strReportName.c_str(), kSummaryTestCase);
+
+    string strReport;
+	ifstream ifs(strReportTemplate.c_str());
+	CommentedTextFileReader fileReader(ifs, "//", false);
+
+	// Evaluate and expand field arguments and mathematical expressions in each line of the report
+	// template.
+	do
+	{
+		string strLine = evaluateCustomReportParamters(fileReader.getLineText());
+
+		if (!strLine.empty())
+		{
+			m_ipResultLogger->AddTestCaseNote(strLine.c_str());
+		}
+		strReport += (string)strLine + "\r\n";
+	}
+	while (!ifs.eof());
+
+	ifs.close();
+
+	m_ipResultLogger->EndTestCase(VARIANT_TRUE);
+
+	// Output the printed statistics to a file so they can be viewed later without running
+	// the test again.
+	appendToFile(strReport, m_strOutputFileDirectory + "\\" + strReportName + ".txt");
+}
+//-------------------------------------------------------------------------------------------------
+string CIDShieldTester::evaluateCustomReportParamters(const string& strSourceLine)
+{
+	stringCSIS strLineCSIS(strSourceLine, false);
+
+	// Iterate through the line and evaluate all fields, enclosing the fields in
+	// gstrPRELIM_ARG_MARKER so that mathemetical expressions can be found afterward.
+	for (auto iterStatisticsFields = m_mapStatisticFields.begin();
+			iterStatisticsFields != m_mapStatisticFields.end();
+			iterStatisticsFields++)
+	{
+		string textToFind = "%" + iterStatisticsFields->first + "%";
+		for (size_t pos = strLineCSIS.find(textToFind);
+			pos != string::npos;
+			pos =  strLineCSIS.find(textToFind, pos + 1))
+		{
+			string replacement = wrapPrelimArg(asString(*iterStatisticsFields->second));
+			strLineCSIS = stringCSIS(
+				((string)strLineCSIS).replace(pos, textToFind.length(), replacement));
+		}
+	}
+
+	// No longer need to search the line case-insensitively.
+	string strLine = (string)strLineCSIS;
+
+	// Search for and evaluate any simple mathematical expression where two arguments are separated
+	// by a single mathematical argument charater. Floating point values are supported for all
+	// types in case of a compound mathematical expression. Supported operations are *, /, +, - and %
+	// where % will add a % sign to the resulting value and will be last in precedence so that it is
+	// always executed last.
+	size_t pos, len;
+	string strResult;
+
+	// Evaluate multiplication, division, percentage operations first.
+	vector<char> vecOperations;
+	vecOperations.push_back('*');
+	vecOperations.push_back('/');
+	while (evaluateCustomReportMathematicalExpression(strLine, vecOperations, pos, len, strResult))
+	{
+		strLine = strLine.replace(pos, len, wrapPrelimArg(strResult));
+	}
+
+	// Evaluate addition, subtraction operations
+	vecOperations.clear();
+	vecOperations.push_back('+');
+	vecOperations.push_back('-');
+	while (evaluateCustomReportMathematicalExpression(strLine, vecOperations, pos, len, strResult))
+	{
+		strLine = strLine.replace(pos, len, wrapPrelimArg(strResult));
+	}
+
+	vecOperations.clear();
+	vecOperations.push_back('%');
+	while (evaluateCustomReportMathematicalExpression(strLine, vecOperations, pos, len, strResult))
+	{
+		strLine = strLine.replace(pos, len, wrapPrelimArg(strResult));
+	}
+
+	// Now that all expressions have been evaluated, remove the gstrPRELIM_ARG_MARKERs.
+	replaceVariable(strLine, gstrPRELIM_ARG_MARKER, "");
+
+	return strLine;
+}
+//-------------------------------------------------------------------------------------------------
+bool CIDShieldTester::evaluateCustomReportMathematicalExpression(const string &strLine,
+	const vector<char> &vecAllowedOperations, size_t &rnPos, size_t &rnLen, string &strResult)
+{
+	char cOperation;
+
+	// Find the first instance of any of the specified vecAllowedOperations
+	size_t nFirstPosEnd = string::npos;
+	for (size_t i = 0; i < vecAllowedOperations.size(); i++)
+	{
+		size_t pos = strLine.find(wrapPrelimArg(string(1, vecAllowedOperations[i])));
+		if (pos != string::npos && (nFirstPosEnd == string::npos || pos < nFirstPosEnd))
+		{
+			nFirstPosEnd = pos;
+			cOperation = vecAllowedOperations[i];
+		}
+	}
+
+	// 
+	if (nFirstPosEnd != string::npos)
+	{
+		size_t nFirstPos = strLine.rfind("$", nFirstPosEnd - 1) + 1;
+		rnPos = nFirstPos - 3;
+		string strFirstValue = ((string)strLine).substr(nFirstPos, nFirstPosEnd - nFirstPos);
+		double dArg1 = asDouble(strFirstValue);
+
+		size_t nSecondPos = nFirstPosEnd + 7;
+		size_t nSecondPosEnd = strLine.find("$", nSecondPos);
+		string strSecondValue = ((string)strLine).substr(nSecondPos, nSecondPosEnd - nSecondPos);
+		double dArg2 = asDouble(strSecondValue);
+		rnLen = nSecondPosEnd - rnPos + 3;
+
+		CString zResult;
+
+		switch (cOperation)
+		{
+			case '*': 
+				zResult.Format("%0.2f", dArg1 * dArg2);
+				break;
+			case '/':
+				zResult.Format("%0.2f", dArg1 / dArg2);
+				break;
+			case '%':
+				zResult.Format("%0.1f%%", dArg1 / dArg2 * 100.0);
+				break;
+			case '+': 
+				zResult.Format("%0.2f", dArg1 + dArg2);
+				break;
+			case '-':
+				zResult.Format("%0.2f", dArg1 - dArg2);
+				break;
+		}
+
+		strResult = (LPCTSTR)zResult;
+
+		return true;
+	}
+
+	return false;
+}
+//-------------------------------------------------------------------------------------------------
+string CIDShieldTester::wrapPrelimArg(const string &strArgument)
+{
+	return gstrPRELIM_ARG_MARKER + strArgument + gstrPRELIM_ARG_MARKER;
 }
 //-------------------------------------------------------------------------------------------------
 string CIDShieldTester::displayStatisticsSection(
@@ -1968,7 +2216,7 @@ void CIDShieldTester::displayDocumentTypeStats()
 
 	m_ipResultLogger->StartTestCase("", strDocumentTypeLabel.c_str(), kSummaryTestCase);
 	map<string,int>::const_iterator iter;
-	long nDocsClassified = 0;
+	m_ulDocsClassified = 0;
 
 	// Iterate through the document classifier map that was created above
 	for( iter = m_mapDocTypeCount.begin(); iter != m_mapDocTypeCount.end(); ++iter )
@@ -1985,7 +2233,7 @@ void CIDShieldTester::displayDocumentTypeStats()
 		strStatsForLogFile += strType + "\r\n";
 
 		// Total number of documents classified
-		nDocsClassified+= iNumber;
+		m_ulDocsClassified += iNumber;
 	}
 
 	// Output the printed statistics to a file so they can be viewed later without running

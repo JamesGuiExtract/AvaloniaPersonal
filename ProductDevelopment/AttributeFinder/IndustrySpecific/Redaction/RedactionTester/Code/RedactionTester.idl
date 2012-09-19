@@ -30,6 +30,7 @@ library EXTRACTREDACTIONTESTERLib
 	{
 		// PURPOSE: Gets the directory test results are written to
 		[propget, id(1), helpstring("property OutputFileDirectory")] HRESULT OutputFileDirectory([out, retval] BSTR *pVal);
+		[id(2), helpstring("method GenerateCustomReport")] HRESULT GenerateCustomReport([in] BSTR bstrReportTemplate);
 	};
 
 	[

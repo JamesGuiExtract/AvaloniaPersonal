@@ -89,6 +89,7 @@ END_COM_MAP()
 
 // IIDShieldTester
 	STDMETHOD(get_OutputFileDirectory)(BSTR *pVal);
+	STDMETHOD(GenerateCustomReport)(BSTR bstrReportTemplate);
 
 // ISupportsErrorInfo
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
@@ -186,12 +187,14 @@ private:
 
 	// counters
 	unsigned long m_ulTotalExpectedRedactions, m_ulNumCorrectRedactions, 
-		m_ulNumOverRedactions, m_ulNumUnderRedactions,
-		m_ulNumMisses, m_ulTotalFilesProcessed, m_ulNumFilesWithExpectedRedactions,
-		m_ulNumFilesSelectedForReview, m_ulNumExpectedRedactionsInReviewedFiles,
-		m_ulNumExpectedRedactionsInRedactedFiles, m_ulNumFilesAutomaticallyRedacted, 
-		m_ulNumFilesWithOverlappingExpectedRedactions, m_ulTotalPages,
-		m_ulNumPagesWithExpectedRedactions;
+		m_ulNumOverRedactions, m_ulNumUnderRedactions, m_ulNumMisses,
+		m_ulTotalFilesProcessed, m_ulNumFilesWithExpectedRedactions, m_ulNumFilesSelectedForReview,
+		m_ulNumExpectedRedactionsInReviewedFiles, m_ulNumExpectedRedactionsInRedactedFiles,
+		m_ulNumFilesAutomaticallyRedacted, m_ulNumFilesWithOverlappingExpectedRedactions,
+		m_ulTotalPages, m_ulNumPagesWithExpectedRedactions, m_ulDocsClassified;
+
+	// Map of field names available in a custom report to their unsigned long values.
+	map<string, unsigned long*> m_mapStatisticFields;
 
 	// Map to keep track of document types
 	map<string, int> m_mapDocTypeCount;
@@ -215,6 +218,7 @@ private:
 
 	// Directory for output log files
 	string m_strOutputFileDirectory;
+	string m_strExplicitOutputFileDirectory;
 
 	// Doc types to select for verification
 	set<string> m_setDocTypesToBeVerified;
@@ -224,7 +228,7 @@ private:
 
 	// Count of the number of files that use an existing VOA file. This is used in the disclaimer
 	// note about multiply classified documents.
-	int m_iNumFilesWithExistingVOA;
+	unsigned long m_ulNumFilesWithExistingVOA;
 
 	/////////////////
 	// Methods
@@ -254,6 +258,21 @@ private:
 	// PROMISE: Display statistics for the test run and display calculated percentages where
 	//			appropriate. Also output the document type(s) of the files.
 	void displaySummaryStatistics();
+
+	// Creates a custom report using the specified report template.
+	void generateCustomReport(string strReportTemplate);
+
+	// Evaluates and expands all field parameters and mathmatical expressions in a report line.
+	string evaluateCustomReportParamters(const string& strSourceLine);
+
+	// Locates the first instance of one of the specified mathmematical expressions in a line of a
+	// custom report, evaluates it, and returns the expression's location, length and result.
+	bool evaluateCustomReportMathematicalExpression(const string &strLine,
+		const vector<char>& vecAllowedOperations, size_t &rnPos, size_t &rnLen, string &strResult);
+
+	// Wraps preliminarly expanded custom report arguments to make them easily identifiable for
+	// evaluating mathematical expressions.
+	string CIDShieldTester::wrapPrelimArg(const string &strArgument);
 
 	// PROMISE: Logs the statistics associcated with the specified TestCaseStatistics instance.
 	string displayStatisticsSection(const CIDShieldTester::TestCaseStatistics& sectionStatistics,

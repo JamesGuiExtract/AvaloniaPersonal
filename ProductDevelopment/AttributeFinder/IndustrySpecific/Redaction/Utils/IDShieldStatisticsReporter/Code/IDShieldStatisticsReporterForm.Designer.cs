@@ -64,6 +64,7 @@ namespace Extract.IDShieldStatisticsReporter
             this._label2 = new System.Windows.Forms.Label();
             this._reviewTab = new System.Windows.Forms.TabPage();
             this._reviewTabControl = new System.Windows.Forms.TabControl();
+            this._customReportTab = new System.Windows.Forms.TabPage();
             this._statisticsTab = new System.Windows.Forms.TabPage();
             this._statisticsTextBox = new System.Windows.Forms.TextBox();
             this._fileListTab = new System.Windows.Forms.TabPage();
@@ -74,7 +75,9 @@ namespace Extract.IDShieldStatisticsReporter
             this._fileListSelectionComboBox = new System.Windows.Forms.ComboBox();
             this._label5 = new System.Windows.Forms.Label();
             this._resultsSelectionComboBox = new System.Windows.Forms.ComboBox();
-            this._label4 = new System.Windows.Forms.Label();
+            this._reviewLabel = new System.Windows.Forms.Label();
+            this._customReportTextBox = new System.Windows.Forms.TextBox();
+            this._printButton = new System.Windows.Forms.Button();
             this._tabControl.SuspendLayout();
             this._feedbackDataTab.SuspendLayout();
             this._feedbackGroupBox.SuspendLayout();
@@ -82,15 +85,16 @@ namespace Extract.IDShieldStatisticsReporter
             this._analysisGroupBox.SuspendLayout();
             this._reviewTab.SuspendLayout();
             this._reviewTabControl.SuspendLayout();
+            this._customReportTab.SuspendLayout();
             this._statisticsTab.SuspendLayout();
             this._fileListTab.SuspendLayout();
             this.SuspendLayout();
             // 
             // _tabControl
             // 
-            this._tabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._tabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._tabControl.Controls.Add(this._feedbackDataTab);
             this._tabControl.Controls.Add(this._analyzeTab);
             this._tabControl.Controls.Add(this._reviewTab);
@@ -113,8 +117,8 @@ namespace Extract.IDShieldStatisticsReporter
             // 
             // _feedbackGroupBox
             // 
-            this._feedbackGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._feedbackGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._feedbackGroupBox.Controls.Add(this._feedbackAdvancedOptions);
             this._feedbackGroupBox.Controls.Add(this._feedbackBrowseButton);
             this._feedbackGroupBox.Controls.Add(this._feedbackFolderTextBox);
@@ -135,7 +139,7 @@ namespace Extract.IDShieldStatisticsReporter
             this._feedbackAdvancedOptions.TabIndex = 3;
             this._feedbackAdvancedOptions.Text = "Advanced options...";
             this._feedbackAdvancedOptions.UseVisualStyleBackColor = true;
-            this._feedbackAdvancedOptions.Click += new System.EventHandler(this.OnFeedbackAdvancedOptionsClick);
+            this._feedbackAdvancedOptions.Click += new System.EventHandler(this.HandleFeedbackAdvancedOptionsClick);
             // 
             // _feedbackBrowseButton
             // 
@@ -151,13 +155,13 @@ namespace Extract.IDShieldStatisticsReporter
             // 
             // _feedbackFolderTextBox
             // 
-            this._feedbackFolderTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._feedbackFolderTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._feedbackFolderTextBox.Location = new System.Drawing.Point(9, 37);
             this._feedbackFolderTextBox.Name = "_feedbackFolderTextBox";
             this._feedbackFolderTextBox.Size = new System.Drawing.Size(429, 20);
             this._feedbackFolderTextBox.TabIndex = 1;
-            this._feedbackFolderTextBox.TextChanged += new System.EventHandler(this.OnFeedbackFolderTextBoxTextChanged);
+            this._feedbackFolderTextBox.TextChanged += new System.EventHandler(this.HandleFeedbackFolderTextBoxTextChanged);
             // 
             // _label1
             // 
@@ -189,12 +193,12 @@ namespace Extract.IDShieldStatisticsReporter
             this._analyzeButton.TabIndex = 1;
             this._analyzeButton.Text = "Analyze";
             this._analyzeButton.UseVisualStyleBackColor = true;
-            this._analyzeButton.Click += new System.EventHandler(this.OnAnalyzeButtonClick);
+            this._analyzeButton.Click += new System.EventHandler(this.HandleAnalyzeButtonClick);
             // 
             // _analysisGroupBox
             // 
-            this._analysisGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._analysisGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._analysisGroupBox.Controls.Add(this._redactManualDataCheckBox);
             this._analysisGroupBox.Controls.Add(this._verificationFileConditionButton);
             this._analysisGroupBox.Controls.Add(this._automatedFileConditionButton);
@@ -231,7 +235,7 @@ namespace Extract.IDShieldStatisticsReporter
             this._verificationFileConditionButton.TabIndex = 10;
             this._verificationFileConditionButton.Text = "Verification file selection condition...";
             this._verificationFileConditionButton.UseVisualStyleBackColor = true;
-            this._verificationFileConditionButton.Click += new System.EventHandler(this.OnVerificationFileConditionButtonClick);
+            this._verificationFileConditionButton.Click += new System.EventHandler(this.HandleVerificationFileConditionButtonClick);
             // 
             // _automatedFileConditionButton
             // 
@@ -241,7 +245,7 @@ namespace Extract.IDShieldStatisticsReporter
             this._automatedFileConditionButton.TabIndex = 9;
             this._automatedFileConditionButton.Text = "Automated file selection condition...";
             this._automatedFileConditionButton.UseVisualStyleBackColor = true;
-            this._automatedFileConditionButton.Click += new System.EventHandler(this.OnAutomatedFileConditionButtonClick);
+            this._automatedFileConditionButton.Click += new System.EventHandler(this.HandleAutomatedFileConditionButtonClick);
             // 
             // _redactLCDataCheckBox
             // 
@@ -284,8 +288,8 @@ namespace Extract.IDShieldStatisticsReporter
             // 
             // _dataTypesTextBox
             // 
-            this._dataTypesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._dataTypesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._dataTypesTextBox.Location = new System.Drawing.Point(9, 69);
             this._dataTypesTextBox.Name = "_dataTypesTextBox";
             this._dataTypesTextBox.Size = new System.Drawing.Size(460, 20);
@@ -300,12 +304,12 @@ namespace Extract.IDShieldStatisticsReporter
             this._limitTypesCheckBox.TabIndex = 2;
             this._limitTypesCheckBox.Text = "Limit data types to be tested to";
             this._limitTypesCheckBox.UseVisualStyleBackColor = true;
-            this._limitTypesCheckBox.CheckedChanged += new System.EventHandler(this.OnLimitTypesCheckBoxCheckedChanged);
+            this._limitTypesCheckBox.CheckedChanged += new System.EventHandler(this.HandleLimitTypesCheckBoxCheckedChanged);
             // 
             // _analysisTypeComboBox
             // 
-            this._analysisTypeComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._analysisTypeComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._analysisTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._analysisTypeComboBox.FormattingEnabled = true;
             this._analysisTypeComboBox.Items.AddRange(new object[] {
@@ -316,7 +320,7 @@ namespace Extract.IDShieldStatisticsReporter
             this._analysisTypeComboBox.Name = "_analysisTypeComboBox";
             this._analysisTypeComboBox.Size = new System.Drawing.Size(356, 21);
             this._analysisTypeComboBox.TabIndex = 1;
-            this._analysisTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.OnAnalysisTypeComboBoxSelectedIndexChanged);
+            this._analysisTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.HandleAnalysisTypeComboBoxSelectedIndexChanged);
             // 
             // _label2
             // 
@@ -329,9 +333,10 @@ namespace Extract.IDShieldStatisticsReporter
             // 
             // _reviewTab
             // 
+            this._reviewTab.Controls.Add(this._printButton);
             this._reviewTab.Controls.Add(this._reviewTabControl);
             this._reviewTab.Controls.Add(this._resultsSelectionComboBox);
-            this._reviewTab.Controls.Add(this._label4);
+            this._reviewTab.Controls.Add(this._reviewLabel);
             this._reviewTab.Location = new System.Drawing.Point(4, 22);
             this._reviewTab.Name = "_reviewTab";
             this._reviewTab.Size = new System.Drawing.Size(488, 287);
@@ -341,16 +346,28 @@ namespace Extract.IDShieldStatisticsReporter
             // 
             // _reviewTabControl
             // 
-            this._reviewTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._reviewTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._reviewTabControl.Controls.Add(this._customReportTab);
             this._reviewTabControl.Controls.Add(this._statisticsTab);
             this._reviewTabControl.Controls.Add(this._fileListTab);
             this._reviewTabControl.Location = new System.Drawing.Point(6, 40);
             this._reviewTabControl.Name = "_reviewTabControl";
             this._reviewTabControl.SelectedIndex = 0;
-            this._reviewTabControl.Size = new System.Drawing.Size(479, 244);
+            this._reviewTabControl.Size = new System.Drawing.Size(479, 219);
             this._reviewTabControl.TabIndex = 2;
+            // 
+            // _customReportTab
+            // 
+            this._customReportTab.Controls.Add(this._customReportTextBox);
+            this._customReportTab.Location = new System.Drawing.Point(4, 22);
+            this._customReportTab.Name = "_customReportTab";
+            this._customReportTab.Padding = new System.Windows.Forms.Padding(3);
+            this._customReportTab.Size = new System.Drawing.Size(471, 193);
+            this._customReportTab.TabIndex = 2;
+            this._customReportTab.Text = "Custom report";
+            this._customReportTab.UseVisualStyleBackColor = true;
             // 
             // _statisticsTab
             // 
@@ -365,9 +382,9 @@ namespace Extract.IDShieldStatisticsReporter
             // 
             // _statisticsTextBox
             // 
-            this._statisticsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._statisticsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._statisticsTextBox.Location = new System.Drawing.Point(7, 7);
             this._statisticsTextBox.Multiline = true;
             this._statisticsTextBox.Name = "_statisticsTextBox";
@@ -413,14 +430,14 @@ namespace Extract.IDShieldStatisticsReporter
             // 
             // _fileListListBox
             // 
-            this._fileListListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._fileListListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._fileListListBox.Location = new System.Drawing.Point(6, 71);
             this._fileListListBox.Name = "_fileListListBox";
             this._fileListListBox.Size = new System.Drawing.Size(458, 95);
             this._fileListListBox.TabIndex = 3;
-            this._fileListListBox.DoubleClick += new System.EventHandler(this.OnFileListListBoxDoubleClick);
+            this._fileListListBox.DoubleClick += new System.EventHandler(this.HandleFileListListBoxDoubleClick);
             // 
             // _label6
             // 
@@ -433,15 +450,15 @@ namespace Extract.IDShieldStatisticsReporter
             // 
             // _fileListSelectionComboBox
             // 
-            this._fileListSelectionComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._fileListSelectionComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._fileListSelectionComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._fileListSelectionComboBox.FormattingEnabled = true;
             this._fileListSelectionComboBox.Location = new System.Drawing.Point(6, 26);
             this._fileListSelectionComboBox.Name = "_fileListSelectionComboBox";
             this._fileListSelectionComboBox.Size = new System.Drawing.Size(458, 21);
             this._fileListSelectionComboBox.TabIndex = 1;
-            this._fileListSelectionComboBox.SelectedIndexChanged += new System.EventHandler(this.OnFileListSelectionComboBoxSelectedIndexChanged);
+            this._fileListSelectionComboBox.SelectedIndexChanged += new System.EventHandler(this.HandleFileListSelectionComboBoxSelectedIndexChanged);
             // 
             // _label5
             // 
@@ -454,24 +471,48 @@ namespace Extract.IDShieldStatisticsReporter
             // 
             // _resultsSelectionComboBox
             // 
-            this._resultsSelectionComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._resultsSelectionComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._resultsSelectionComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._resultsSelectionComboBox.FormattingEnabled = true;
             this._resultsSelectionComboBox.Location = new System.Drawing.Point(115, 12);
             this._resultsSelectionComboBox.Name = "_resultsSelectionComboBox";
             this._resultsSelectionComboBox.Size = new System.Drawing.Size(360, 21);
             this._resultsSelectionComboBox.TabIndex = 1;
-            this._resultsSelectionComboBox.SelectedIndexChanged += new System.EventHandler(this.OnResultsSelectionComboBoxSelectedIndexChanged);
+            this._resultsSelectionComboBox.SelectedIndexChanged += new System.EventHandler(this.HandleResultsSelectionComboBoxSelectedIndexChanged);
             // 
-            // _label4
+            // _reviewLabel
             // 
-            this._label4.AutoSize = true;
-            this._label4.Location = new System.Drawing.Point(3, 15);
-            this._label4.Name = "_label4";
-            this._label4.Size = new System.Drawing.Size(106, 13);
-            this._label4.TabIndex = 0;
-            this._label4.Text = "Review anaylsis from";
+            this._reviewLabel.AutoSize = true;
+            this._reviewLabel.Location = new System.Drawing.Point(3, 15);
+            this._reviewLabel.Name = "_reviewLabel";
+            this._reviewLabel.Size = new System.Drawing.Size(106, 13);
+            this._reviewLabel.TabIndex = 0;
+            this._reviewLabel.Text = "Review anaylsis from";
+            // 
+            // _customReportTextBox
+            // 
+            this._customReportTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._customReportTextBox.Location = new System.Drawing.Point(6, 7);
+            this._customReportTextBox.Multiline = true;
+            this._customReportTextBox.Name = "_customReportTextBox";
+            this._customReportTextBox.ReadOnly = true;
+            this._customReportTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._customReportTextBox.Size = new System.Drawing.Size(458, 180);
+            this._customReportTextBox.TabIndex = 1;
+            // 
+            // _printButton
+            // 
+            this._printButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._printButton.Location = new System.Drawing.Point(406, 261);
+            this._printButton.Name = "_printButton";
+            this._printButton.Size = new System.Drawing.Size(75, 23);
+            this._printButton.TabIndex = 3;
+            this._printButton.Text = "Print";
+            this._printButton.UseVisualStyleBackColor = true;
+            this._printButton.Click += new System.EventHandler(this.HandlePrintButton_Click);
             // 
             // IDShieldStatisticsReporterForm
             // 
@@ -493,6 +534,8 @@ namespace Extract.IDShieldStatisticsReporter
             this._reviewTab.ResumeLayout(false);
             this._reviewTab.PerformLayout();
             this._reviewTabControl.ResumeLayout(false);
+            this._customReportTab.ResumeLayout(false);
+            this._customReportTab.PerformLayout();
             this._statisticsTab.ResumeLayout(false);
             this._statisticsTab.PerformLayout();
             this._fileListTab.ResumeLayout(false);
@@ -524,7 +567,7 @@ namespace Extract.IDShieldStatisticsReporter
         private System.Windows.Forms.CheckBox _redactMCDataCheckBox;
         private System.Windows.Forms.CheckBox _redactHCDataCheckBox;
         private System.Windows.Forms.Button _analyzeButton;
-        private System.Windows.Forms.Label _label4;
+        private System.Windows.Forms.Label _reviewLabel;
         private System.Windows.Forms.ComboBox _resultsSelectionComboBox;
         private System.Windows.Forms.TabControl _reviewTabControl;
         private System.Windows.Forms.TabPage _statisticsTab;
@@ -537,6 +580,9 @@ namespace Extract.IDShieldStatisticsReporter
         private System.Windows.Forms.TextBox _fileListCountTextBox;
         private System.Windows.Forms.Label _label7;
         private System.Windows.Forms.CheckBox _redactManualDataCheckBox;
+        private System.Windows.Forms.TabPage _customReportTab;
+        private System.Windows.Forms.TextBox _customReportTextBox;
+        private System.Windows.Forms.Button _printButton;
     }
 }
 

@@ -9,12 +9,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
-using System.Xml;
 using UCLID_COMUTILSLib;
 using UCLID_REDACTIONCUSTOMCOMPONENTSLib;
 using UCLID_TESTINGFRAMEWORKINTERFACESLib;
@@ -99,7 +99,13 @@ namespace Extract.IDShieldStatisticsReporter
         /// A <see cref="IDShieldVOAFileContentsCondition"/> used to configure the verification
         /// conditions.
         /// </summary>
-       IDShieldVOAFileContentsCondition _verificationConditionObject;
+        IDShieldVOAFileContentsCondition _verificationConditionObject;
+
+        /// <summary>
+        /// Specifies the filename of a template that should be used to generate a custom report
+        /// when analysis is run.
+        /// </summary>
+        string _customReportTemplate;
 
         /// <summary>
         /// The results folder based on the current feedback folder settings and result
@@ -182,6 +188,8 @@ namespace Extract.IDShieldStatisticsReporter
 
                 _idShieldTester.SetResultLogger(this);
 
+                InitializeTesterSettings();
+
                 if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
                 {
                     // Loads/save UI state properties
@@ -200,6 +208,104 @@ namespace Extract.IDShieldStatisticsReporter
 
         #endregion Constructors
 
+        #region Properties
+
+        /// <summary>
+        /// Gets the <see cref="IDShieldTesterSettings"/>.
+        /// </summary>
+        /// <value>The <see cref="IDShieldTesterSettings"/>.</value>
+        public IDShieldTesterSettings TesterSettings
+        {
+            get
+            {
+                return _testerSettings;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IDShieldTesterFolder"/>.
+        /// </summary>
+        /// <value>The [TestFolder].</value>
+        public IDShieldTesterFolder TestFolder
+        {
+            get
+            {
+                return _testFolder;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the filename of a template that should be used to generate a custom report
+        /// when analysis is run.
+        /// </summary>
+        /// <value>
+        /// The the filename of the custom report template.
+        /// </value>
+        public string CustomReportTemplate
+        {
+            get
+            {
+                return _customReportTemplate;
+            }
+
+            set
+            {
+                _customReportTemplate = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether analysis should be run automatically when the
+        /// application is launched.
+        /// </summary><value><see langword="true"/> if analysis should be run automatically when the
+        /// application is launched;otherwise, <see langword="false"/>.
+        /// </value>
+        public bool AutoRun
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether analysis should be run automatically when the
+        /// application is launched without displaying the UI or any message boxes and then
+        /// immediately exit. 
+        /// </summary>
+        /// <value><see langword="true"/> if  analysis should be run automatically and silently;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        public bool Silent
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the name of a report to print every time analysis is run.
+        /// </summary>
+        /// <value>
+        /// The the name of a report to print every time analysis is run.
+        /// </value>
+        public string ReportToPrint
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the name of the log file to log all exceptions to.
+        /// </summary>
+        /// <value>
+        /// The name of the log file to log all exceptions to.
+        /// </value>
+        public string LogFileName
+        {
+            get;
+            set;
+        }
+
+        #endregion Properties
+
         #region Overrides
 
         /// <summary>
@@ -211,6 +317,26 @@ namespace Extract.IDShieldStatisticsReporter
         {
             try
             {
+                // If running in silent mode, ensure the main form functions, but is not displayed.
+                if (Silent)
+                {
+                    // Makes form invisible.
+                    Opacity = 0;
+
+                    // ...and we don't want it to appear in the task bar
+                    ShowInTaskbar = false;
+
+                    // ...and we don't want it to have a close button
+                    // (for sanity, not sure if it would be possible to use it with opacity = 0)
+                    ControlBox = false;
+
+                    // ...and we don't want the user to be able to alt-tab to it
+                    FormBorderStyle = FormBorderStyle.FixedToolWindow;
+
+                    // ...and we don't want the user to be able to do anything in it.
+                    Enabled = false;
+                }
+
                 base.OnLoad(e);
 
                 if (LicenseUtilities.IsLicensed(LicenseIdName.RuleDevelopmentToolkitObjects))
@@ -220,38 +346,6 @@ namespace Extract.IDShieldStatisticsReporter
                 else
                 {
                     _limitTypesCheckBox.Text += " (separate types using a comma)";
-                }
-
-                // If at least one test folder specification was found, use the first, otherwise
-                // create a new one to use.
-                Collection<IDShieldTesterFolder> testFolders = _testerSettings.GetTestFolders();
-                if (testFolders.Count > 0)
-                {
-                    _testFolder = testFolders[0];
-                }
-                else
-                {
-                    _testFolder = new IDShieldTesterFolder();
-                    _testerSettings.AddTestFolder(_testFolder);
-                }
-
-                // When generating stats with tool, we only want to see the final stats
-                _testerSettings.OutputFinalStatsOnly = true;
-
-                // We need file lists.
-                _testerSettings.OutputAttributeNamesFileLists = true;
-
-                // We want output files to be created.
-                _testerSettings.CreateTestOutputVoaFiles = true;
-
-                // Initialize the found and expected data locations as necessary.
-                if (string.IsNullOrEmpty(_testFolder.FoundDataLocation))
-                {
-                    _testFolder.FoundDataLocation = "<SourceDocName>.found.voa";
-                }
-                if (string.IsNullOrEmpty(_testFolder.ExpectedDataLocation))
-                {
-                    _testFolder.ExpectedDataLocation = "<SourceDocName>.expected.voa";
                 }
 
                 // Determine the type of test being done.
@@ -305,10 +399,15 @@ namespace Extract.IDShieldStatisticsReporter
                 _dataTypesTextBox.Enabled = _limitTypesCheckBox.Checked;
                 UpdateControlsBasedOnAnalysisType();
                 PopulateResultsList();
+
+                if (AutoRun)
+                {
+                    Analyze();
+                }
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI28656", ex);
+                ReportException(ex.AsExtract(("ELI28656")));
             }
         }
 
@@ -462,6 +561,12 @@ namespace Extract.IDShieldStatisticsReporter
                     ActiveControl = _feedbackFolderTextBox;
                     _feedbackFolderTextBox.SelectAll();
 
+                    if (Silent)
+                    {
+                        throw new ExtractException("ELI34966",
+                            "Feedback data folder has not been specified");
+                    }
+                    
                     MessageBox.Show("Specify a valid feedback folder.",
                         "Configuration error", MessageBoxButtons.OK, MessageBoxIcon.Warning,
                         MessageBoxDefaultButton.Button1, 0);
@@ -470,7 +575,10 @@ namespace Extract.IDShieldStatisticsReporter
                 }
 
                 _testFolder.TestFolderName = _feedbackFolderTextBox.Text;
-                _testerSettings.OutputFilesFolder = _feedbackFolderTextBox.Text;
+                if (string.IsNullOrEmpty(_testerSettings.ExplicitOutputFilesFolder))
+                {
+                    _testerSettings.OutputFilesFolder = _feedbackFolderTextBox.Text;
+                }
                 _testerSettings.OutputHybridStats = _analysisTypeComboBox.Text == _HYBRID;
                 _testerSettings.OutputAutomatedStatsOnly =
                     (_analysisTypeComboBox.Text == _AUTOMATED_REDACTION);
@@ -517,6 +625,11 @@ namespace Extract.IDShieldStatisticsReporter
                         ActiveControl = _dataTypesTextBox;
                         _dataTypesTextBox.SelectAll();
 
+                        if (Silent)
+                        {
+                            throw new ExtractException("ELI34967", "Invalid data types filter");
+                        }
+
                         MessageBox.Show("Specify a comma delimited list of types to be tested or " +
                                         "uncheck  the \"Limit data types to be tested box\".",
                             "Configuration error", MessageBoxButtons.OK, MessageBoxIcon.Warning,
@@ -559,7 +672,7 @@ namespace Extract.IDShieldStatisticsReporter
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        void OnAutomatedFileConditionButtonClick(object sender, EventArgs e)
+        void HandleAutomatedFileConditionButtonClick(object sender, EventArgs e)
         {
             try
             {
@@ -579,7 +692,7 @@ namespace Extract.IDShieldStatisticsReporter
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI28659", ex);
                 ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ReportException(ee);
             }
         }
 
@@ -588,7 +701,7 @@ namespace Extract.IDShieldStatisticsReporter
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        void OnVerificationFileConditionButtonClick(object sender, EventArgs e)
+        void HandleVerificationFileConditionButtonClick(object sender, EventArgs e)
         {
             try
             {
@@ -608,7 +721,7 @@ namespace Extract.IDShieldStatisticsReporter
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI28660", ex);
                 ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ReportException(ee);
             }
         }
 
@@ -617,99 +730,17 @@ namespace Extract.IDShieldStatisticsReporter
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        void OnAnalyzeButtonClick(object sender, EventArgs e)
+        void HandleAnalyzeButtonClick(object sender, EventArgs e)
         {
-            TemporaryFile settingsFile = null;
-            TemporaryFile tclFile = null;
-
             try
             {
-                using (new TemporaryWaitCursor())
-                {
-                    // Create a temporary tcl and dat file that will be used for this test.
-                    settingsFile = new TemporaryFile(".dat", false);
-                    tclFile = new TemporaryFile(".tcl", false);
-
-                    if (!ApplySettings(settingsFile.FileName))
-                    {
-                        // If the settings could not be applied, don't run the test
-                        return;
-                    }
-
-                    string tclFileContents = _IDSHIELD_TESTER_PROGID + ";;" + settingsFile.FileName;
-                    File.WriteAllText(tclFile.FileName, tclFileContents);
-                    
-                    VariantVectorClass testParameters = new VariantVectorClass();
-                    testParameters.PushBack(_IDSHIELD_TESTER_PROGID);
-                    testParameters.PushBack(settingsFile.FileName);
-
-                    // Initialize all per-test fields.
-                    _testCaseCount = 0;
-                    _testCaseFailureCount = 0;
-                    _testComponentException = null;
-                    _currentTestCaseFile = null;
-
-                    _idShieldTester.RunAutomatedTests(testParameters, tclFile.FileName);
-
-                    // If an exception was thrown executing the overall test (usually due to a
-                    // settings file issue), throw the exception from here.
-                    if (_testComponentException != null)
-                    {
-                        throw _testComponentException;
-                    }
-
-                    // Re-populate the results list and automatically select the results that were
-                    // just generated.
-                    PopulateResultsList();
-
-                    string folderToSelect = Path.GetFileName(_idShieldTester.OutputFileDirectory);
-                    folderToSelect = folderToSelect.Remove(0, _ANAYLYSIS_FOLDER_PREFIX.Length);
-                    int indexToSelect = _resultsSelectionComboBox.FindStringExact(folderToSelect);
-                    _resultsSelectionComboBox.SelectedIndex = indexToSelect;
-
-                    _tabControl.SelectTab(_reviewTab);
-                    _reviewTabControl.SelectTab(_statisticsTab);
-
-                    // Display a message to indicate how many test cases were successfully executed.
-                    string resultMessage = _testCaseCount.ToString(CultureInfo.CurrentCulture) +
-                                           " test cases completed successfully";
-                    if (_testCaseFailureCount > 0)
-                    {
-                        int succeededCount = _testCaseCount - _testCaseFailureCount;
-
-                        resultMessage = succeededCount.ToString(CultureInfo.CurrentCulture) +
-                                        " of " + _testCaseCount.ToString(CultureInfo.CurrentCulture) +
-                                        " test cases completed successfully";
-                    }
-
-                    MessageBox.Show(resultMessage, "Test Result", MessageBoxButtons.OK,
-                        MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
-                }
+                Analyze();
             }
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI28661", ex);
                 ee.AddDebugData("Event data", e, false);
-                ee.Display();
-            }
-            finally
-            {
-                try
-                {
-                    if (settingsFile != null)
-                    {
-                        settingsFile.Dispose();
-                    }
-
-                    if (tclFile != null)
-                    {
-                        tclFile.Dispose();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ExtractException.Log("ELI28570", ex);
-                }
+                ReportException(ee);
             }
         }
 
@@ -718,7 +749,7 @@ namespace Extract.IDShieldStatisticsReporter
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        void OnFeedbackAdvancedOptionsClick(object sender, EventArgs e)
+        void HandleFeedbackAdvancedOptionsClick(object sender, EventArgs e)
         {
             try
             {
@@ -730,7 +761,7 @@ namespace Extract.IDShieldStatisticsReporter
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI28662", ex);
                 ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ReportException(ee);
             }
         }
 
@@ -739,7 +770,7 @@ namespace Extract.IDShieldStatisticsReporter
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        void OnAnalysisTypeComboBoxSelectedIndexChanged(object sender, EventArgs e)
+        void HandleAnalysisTypeComboBoxSelectedIndexChanged(object sender, EventArgs e)
         {
             try
             {
@@ -749,7 +780,7 @@ namespace Extract.IDShieldStatisticsReporter
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI28663", ex);
                 ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ReportException(ee);
             }
         }
 
@@ -758,7 +789,7 @@ namespace Extract.IDShieldStatisticsReporter
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        void OnLimitTypesCheckBoxCheckedChanged(object sender, EventArgs e)
+        void HandleLimitTypesCheckBoxCheckedChanged(object sender, EventArgs e)
         {
             try
             {
@@ -768,7 +799,7 @@ namespace Extract.IDShieldStatisticsReporter
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI28664", ex);
                 ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ReportException(ee);
             }
         }
 
@@ -777,7 +808,7 @@ namespace Extract.IDShieldStatisticsReporter
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        void OnResultsSelectionComboBoxSelectedIndexChanged(object sender, EventArgs e)
+        void HandleResultsSelectionComboBoxSelectedIndexChanged(object sender, EventArgs e)
         {
             try
             {
@@ -785,24 +816,14 @@ namespace Extract.IDShieldStatisticsReporter
                 newOutputFolder = Path.Combine(_feedbackFolderTextBox.Text, newOutputFolder);
                 _currentResultsFolder = Directory.Exists(newOutputFolder) ? newOutputFolder : "";
 
-                string statisticsFileName = Path.Combine(_currentResultsFolder, "statistics.txt");
-
-                if (File.Exists(statisticsFileName))
-                {
-                    _statisticsTextBox.Text = File.ReadAllText(statisticsFileName);
-                }
-                else
-                {
-                    _statisticsTextBox.Text = "";
-                }
-
+                PopulateStatisitics();
                 PopulateFileLists();
             }
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI28665", ex);
                 ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ReportException(ee);
             }
         }
 
@@ -811,7 +832,7 @@ namespace Extract.IDShieldStatisticsReporter
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        void OnFeedbackFolderTextBoxTextChanged(object sender, EventArgs e)
+        void HandleFeedbackFolderTextBoxTextChanged(object sender, EventArgs e)
         {
             try
             {
@@ -821,7 +842,7 @@ namespace Extract.IDShieldStatisticsReporter
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI28666", ex);
                 ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ReportException(ee);
             }
         }
 
@@ -830,7 +851,7 @@ namespace Extract.IDShieldStatisticsReporter
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        void OnFileListSelectionComboBoxSelectedIndexChanged(object sender, EventArgs e)
+        void HandleFileListSelectionComboBoxSelectedIndexChanged(object sender, EventArgs e)
         {
             try
             {
@@ -852,7 +873,7 @@ namespace Extract.IDShieldStatisticsReporter
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI28667", ex);
                 ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ReportException(ee);
             }
         }
 
@@ -861,7 +882,7 @@ namespace Extract.IDShieldStatisticsReporter
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        void OnFileListListBoxDoubleClick(object sender, EventArgs e)
+        void HandleFileListListBoxDoubleClick(object sender, EventArgs e)
         {
             try
             {
@@ -915,84 +936,43 @@ namespace Extract.IDShieldStatisticsReporter
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI28669", ex);
                 ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ReportException(ee);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_printButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandlePrintButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_reviewTabControl.SelectedTab == _customReportTab &&
+                    !string.IsNullOrEmpty(_customReportTextBox.Text))
+                {
+                    Print(CustomReportName);
+                }
+                else if (_reviewTabControl.SelectedTab == _statisticsTab &&
+                    !string.IsNullOrEmpty(_statisticsTextBox.Text))
+                {
+                    Print("Statistics");
+                }
+                else if (_reviewTabControl.SelectedTab == _fileListTab &&
+                    !string.IsNullOrEmpty(_fileListSelectionComboBox.Text))
+                {
+                    Print(_fileListSelectionComboBox.Text);
+                }
+            }
+            catch (Exception ex)
+            {
+                ReportException(ex.AsExtract("ELI34962"));
             }
         }
 
         #endregion Event handlers
-
-        #region Methods
-
-        /// <summary>
-        /// Uses the currently seleted analysis type to update dependent controls as necessary.
-        /// </summary>
-        void UpdateControlsBasedOnAnalysisType()
-        {
-            _automatedFileConditionButton.Enabled =
-                (_analysisTypeComboBox.Text != _STANDARD_VERIFICATION);
-
-            _verificationFileConditionButton.Enabled =
-                (_analysisTypeComboBox.Text != _AUTOMATED_REDACTION);
-        }
-
-        /// <summary>
-        /// Populates all test results to the results combo based on the currently specified
-        /// feedback folder.
-        /// </summary>
-        void PopulateResultsList()
-        {
-            _resultsSelectionComboBox.Items.Clear();
-
-            if (Directory.Exists(_feedbackFolderTextBox.Text))
-            {
-                // If a valid folder is entered, persist the value next time the statistics reporter
-                // is opened.
-                _config.Settings.LastFeedbackFolder = _feedbackFolderTextBox.Text;
-
-                string[] outputFolders = Directory.GetDirectories(_feedbackFolderTextBox.Text,
-                    _ANAYLYSIS_FOLDER_PREFIX + "*", SearchOption.TopDirectoryOnly);
-
-                foreach (string folder in outputFolders)
-                {
-                    if (File.Exists(Path.Combine(folder, "statistics.txt")))
-                    {
-                        string listEntry = Path.GetFileName(folder);
-                        listEntry = listEntry.Remove(0, _ANAYLYSIS_FOLDER_PREFIX.Length);
-                        _resultsSelectionComboBox.Items.Add(listEntry);
-                    }
-                }
-            }
-
-            PopulateFileLists();
-        }
-
-        /// <summary>
-        /// Populates all all file lists to the file list combo based on the currently selected
-        /// test results folder.
-        /// </summary>
-        void PopulateFileLists()
-        {
-            _fileListSelectionComboBox.Items.Clear();
-
-            if (Directory.Exists(_currentResultsFolder))
-            {
-                string[] fileLists = Directory.GetFiles(
-                    _currentResultsFolder, "*.txt", SearchOption.TopDirectoryOnly);
-
-                foreach (string file in fileLists)
-                {
-                    if (!file.EndsWith("statistics.txt", StringComparison.OrdinalIgnoreCase))
-                    {
-                        _fileListSelectionComboBox.Items.Add(Path.GetFileName(file));
-                    }
-                }
-            }
-
-            _fileListListBox.Items.Clear();
-            _fileListCountTextBox.Text = "";
-        }
-
-        #endregion Methods
 
         #region ITestResultLogger Members
 
@@ -1180,5 +1160,383 @@ namespace Extract.IDShieldStatisticsReporter
         }
 
         #endregion ITestResultLogger
+
+        #region Private Members
+
+        /// <summary>
+        /// Gets the name of the statistics report file.
+        /// </summary>
+        /// <value>
+        /// The name of the statistics report file.
+        /// </value>
+        string StatisticsReportFileName
+        {
+            get
+            {
+                return Path.Combine(_currentResultsFolder, "statistics.txt");
+            }
+        }
+
+        /// <summary>
+        /// Gets the name of the custom report file.
+        /// </summary>
+        /// <value>
+        /// The name of the custom report file.
+        /// </value>
+        string CustomReportName
+        {
+            get
+            {
+                return Path.GetFileNameWithoutExtension(CustomReportTemplate);
+            }
+        }
+
+        /// <summary>
+        /// Initializes the tester settings.
+        /// </summary>
+        void InitializeTesterSettings()
+        {
+            // If at least one test folder specification was found, use the first, otherwise
+            // create a new one to use.
+            Collection<IDShieldTesterFolder> testFolders = _testerSettings.GetTestFolders();
+            if (testFolders.Count > 0)
+            {
+                _testFolder = testFolders[0];
+            }
+            else
+            {
+                _testFolder = new IDShieldTesterFolder();
+                _testerSettings.AddTestFolder(_testFolder);
+            }
+
+            // When generating stats with tool, we only want to see the final stats
+            _testerSettings.OutputFinalStatsOnly = true;
+
+            // We need file lists.
+            _testerSettings.OutputAttributeNamesFileLists = true;
+
+            // We want output files to be created.
+            _testerSettings.CreateTestOutputVoaFiles = true;
+
+            // Initialize the found and expected data locations as necessary.
+            if (string.IsNullOrEmpty(_testFolder.FoundDataLocation))
+            {
+                _testFolder.FoundDataLocation = "<SourceDocName>.found.voa";
+            }
+            if (string.IsNullOrEmpty(_testFolder.ExpectedDataLocation))
+            {
+                _testFolder.ExpectedDataLocation = "<SourceDocName>.expected.voa";
+            }
+        }
+
+        /// <summary>
+        /// Analyzes the specified feedback data, generates reports and displays the results.
+        /// </summary>
+        void Analyze()
+        {
+            TemporaryFile settingsFile = null;
+            TemporaryFile tclFile = null;
+
+            try
+            {
+                using (new TemporaryWaitCursor())
+                {
+                    // Create a temporary tcl and dat file that will be used for this test.
+                    settingsFile = new TemporaryFile(".dat", false);
+                    tclFile = new TemporaryFile(".tcl", false);
+
+                    if (!ApplySettings(settingsFile.FileName))
+                    {
+                        // If the settings could not be applied, don't run the test
+                        return;
+                    }
+
+                    string tclFileContents = _IDSHIELD_TESTER_PROGID + ";;" + settingsFile.FileName;
+                    File.WriteAllText(tclFile.FileName, tclFileContents);
+
+                    VariantVectorClass testParameters = new VariantVectorClass();
+                    testParameters.PushBack(_IDSHIELD_TESTER_PROGID);
+                    testParameters.PushBack(settingsFile.FileName);
+
+                    // Initialize all per-test fields.
+                    _testCaseCount = 0;
+                    _testCaseFailureCount = 0;
+                    _testComponentException = null;
+                    _currentTestCaseFile = null;
+
+                    _idShieldTester.RunAutomatedTests(testParameters, tclFile.FileName);
+
+                    if (!string.IsNullOrEmpty(CustomReportTemplate))
+                    {
+                        try
+                        {
+                            ExtractException.Assert("ELI34964",
+                                "Custom report template file does not exist.",
+                                File.Exists(CustomReportTemplate));
+
+                            _idShieldTester.GenerateCustomReport(CustomReportTemplate);
+                        }
+                        catch (Exception ex)
+                        {
+                            ReportException(ex.AsExtract("ELI34965"));
+                        }
+                    }
+
+                    // If an exception was thrown executing the overall test (usually due to a
+                    // settings file issue), throw the exception from here.
+                    if (_testComponentException != null)
+                    {
+                        throw _testComponentException;
+                    }
+
+                    // Re-populate the results list and automatically select the results that were
+                    // just generated.
+                    PopulateResultsList();
+
+                    string folderToSelect = Path.GetFileName(_idShieldTester.OutputFileDirectory);
+                    if (string.IsNullOrEmpty(_testerSettings.ExplicitOutputFilesFolder))
+                    {
+                        folderToSelect = folderToSelect.Remove(0, _ANAYLYSIS_FOLDER_PREFIX.Length);
+                        int indexToSelect = _resultsSelectionComboBox.FindStringExact(folderToSelect);
+                        _resultsSelectionComboBox.SelectedIndex = indexToSelect;
+                    }
+                    else
+                    {
+                        _currentResultsFolder = _testerSettings.ExplicitOutputFilesFolder;
+
+                        PopulateStatisitics();
+                        PopulateFileLists();
+                    }
+
+                    _tabControl.SelectTab(_reviewTab);
+                    if (_reviewTabControl.TabPages.Contains(_customReportTab))
+                    {
+                        _reviewTabControl.SelectTab(_customReportTab);
+                    }
+                    else
+                    {
+                        _reviewTabControl.SelectTab(_statisticsTab);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(ReportToPrint))
+                {
+                    Print(ReportToPrint);
+                }
+
+                // Display a message to indicate how many test cases were successfully executed.
+                string resultMessage = _testCaseCount.ToString(CultureInfo.CurrentCulture) +
+                                       " test cases completed successfully";
+                if (_testCaseFailureCount > 0)
+                {
+                    int succeededCount = _testCaseCount - _testCaseFailureCount;
+
+                    resultMessage = succeededCount.ToString(CultureInfo.CurrentCulture) +
+                                    " of " + _testCaseCount.ToString(CultureInfo.CurrentCulture) +
+                                    " test cases completed successfully";
+                }
+
+                if (Silent)
+                {
+                    Close();
+                }
+                else
+                {
+                    MessageBox.Show(resultMessage, "Test Result", MessageBoxButtons.OK,
+                        MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34963");
+            }
+            finally
+            {
+                try
+                {
+                    if (settingsFile != null)
+                    {
+                        settingsFile.Dispose();
+                    }
+
+                    if (tclFile != null)
+                    {
+                        tclFile.Dispose();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ExtractException.Log("ELI28570", ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Uses the currently seleted analysis type to update dependent controls as necessary.
+        /// </summary>
+        void UpdateControlsBasedOnAnalysisType()
+        {
+            _automatedFileConditionButton.Enabled =
+                (_analysisTypeComboBox.Text != _STANDARD_VERIFICATION);
+
+            _verificationFileConditionButton.Enabled =
+                (_analysisTypeComboBox.Text != _AUTOMATED_REDACTION);
+        }
+
+        /// <summary>
+        /// Populates all test results to the results combo based on the currently specified
+        /// feedback folder.
+        /// </summary>
+        void PopulateResultsList()
+        {
+            if (string.IsNullOrEmpty(CustomReportTemplate))
+            {
+                if (_reviewTabControl.TabPages.Contains(_customReportTab))
+                {
+                    _reviewTabControl.TabPages.Remove(_customReportTab);
+                }
+            }
+            else
+            {
+                _customReportTab.Text = CustomReportName;
+            }
+
+            if (string.IsNullOrEmpty(_testerSettings.ExplicitOutputFilesFolder))
+            {
+                _resultsSelectionComboBox.Items.Clear();
+
+                if (Directory.Exists(_feedbackFolderTextBox.Text))
+                {
+                    // If a valid folder is entered, persist the value next time the statistics reporter
+                    // is opened.
+                    _config.Settings.LastFeedbackFolder = _feedbackFolderTextBox.Text;
+
+                    string[] outputFolders = Directory.GetDirectories(_feedbackFolderTextBox.Text,
+                        _ANAYLYSIS_FOLDER_PREFIX + "*", SearchOption.TopDirectoryOnly);
+
+                    foreach (string folder in outputFolders)
+                    {
+                        if (File.Exists(Path.Combine(folder, "statistics.txt")))
+                        {
+                            string listEntry = Path.GetFileName(folder);
+                            listEntry = listEntry.Remove(0, _ANAYLYSIS_FOLDER_PREFIX.Length);
+                            _resultsSelectionComboBox.Items.Add(listEntry);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                _reviewLabel.Visible = false;
+                _resultsSelectionComboBox.Visible = false;
+                int addedHeight = _reviewTabControl.Top - _resultsSelectionComboBox.Top;
+                _reviewTabControl.Location = new Point(_reviewTabControl.Location.X,
+                    _reviewTabControl.Location.Y - addedHeight);
+                _reviewTabControl.Height += addedHeight;
+            }
+
+            PopulateFileLists();
+        }
+
+        /// <summary>
+        /// Populates the statisitics.
+        /// </summary>
+        void PopulateStatisitics()
+        {
+            if (!string.IsNullOrEmpty(CustomReportTemplate))
+            {
+                string customReportFileName =
+                    Path.Combine(_currentResultsFolder, CustomReportName + ".txt");
+
+                if (File.Exists(customReportFileName))
+                {
+                    _customReportTextBox.Text = File.ReadAllText(customReportFileName);
+                }
+                else
+                {
+                    _customReportTextBox.Text = "";
+                }
+            }
+
+            if (File.Exists(StatisticsReportFileName))
+            {
+                _statisticsTextBox.Text = File.ReadAllText(StatisticsReportFileName);
+            }
+            else
+            {
+                _statisticsTextBox.Text = "";
+            }
+        }
+
+        /// <summary>
+        /// Populates all all file lists to the file list combo based on the currently selected
+        /// test results folder.
+        /// </summary>
+        void PopulateFileLists()
+        {
+            _fileListSelectionComboBox.Items.Clear();
+
+            if (Directory.Exists(_currentResultsFolder))
+            {
+                string[] fileLists = Directory.GetFiles(
+                    _currentResultsFolder, "*.txt", SearchOption.TopDirectoryOnly);
+
+                foreach (string file in fileLists)
+                {
+                    if (!file.EndsWith("statistics.txt", StringComparison.OrdinalIgnoreCase) &&
+                        (string.IsNullOrEmpty(CustomReportName) || !file.EndsWith(
+                            CustomReportName + ".txt", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        _fileListSelectionComboBox.Items.Add(Path.GetFileName(file));
+                    }
+                }
+            }
+
+            _fileListListBox.Items.Clear();
+            _fileListCountTextBox.Text = "";
+        }
+
+        /// <summary>
+        /// Prints the specified report.
+        /// </summary>
+        /// <param name="reportName">Name of the report to print.</param>
+        void Print(string reportName)
+        {
+            string fileName = Path.Combine(_currentResultsFolder,
+                Path.GetFileNameWithoutExtension(reportName) + ".txt");
+
+            using (var process = new Process())
+            {
+                process.StartInfo = new ProcessStartInfo("notepad", "/p " + fileName.Quote());
+                process.StartInfo.UseShellExecute = true;
+                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                process.Start();
+            }
+        }
+
+        /// <summary>
+        /// Displays the exception unless in silent mode, in which case the exception is logged.
+        /// </summary>
+        /// <param name="ee">The <see cref="ExtractException"/> to display or log.</param>
+        void ReportException(ExtractException ee)
+        {
+            if (Silent)
+            {
+                if (!string.IsNullOrEmpty(LogFileName))
+                {
+                    ee.Log(LogFileName);
+                }
+                else
+                {
+                    ee.Log();
+                }
+            }
+            else
+            {
+                ee.Display();
+            }
+        }
+
+        #endregion Private Members
     }
 }

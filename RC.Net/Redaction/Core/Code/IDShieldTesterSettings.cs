@@ -725,6 +725,13 @@ namespace Extract.Redaction
             new IDShieldTesterSetting<string>("OutputFilesFolder");
 
         /// <summary>
+        /// Specifies the folder where the test results will be output; a timestamp-based subfolder
+        /// will not be used.
+        /// </summary>
+        IDShieldTesterSetting<string> _explicitOutputFilesFolder =
+            new IDShieldTesterSetting<string>("ExplicitOutputFilesFolder");
+
+        /// <summary>
         /// The collection of possible parameters in an ID Shield settings (.dat) file.
         /// </summary>
         Collection<IDShieldTesterParameter> _parameters = new Collection<IDShieldTesterParameter>();
@@ -776,6 +783,7 @@ namespace Extract.Redaction
                 _parameters.Add(_outputAutomatedStatsOnly);
                 _parameters.Add(_typesToBeTested);
                 _parameters.Add(_outputFilesFolder);
+                _parameters.Add(_explicitOutputFilesFolder);
                 _parameters.Add(new IDShieldTesterFolder());
 
                 // If a settings file name was provided, read in the settings from the file.
@@ -1052,7 +1060,31 @@ namespace Extract.Redaction
 
             set
             {
+                ExtractException.Assert("ELI34971",
+                    "Either OutputFilesFolder or ExplicitOutputFilesFolder should be set; not both",
+                    !_explicitOutputFilesFolder.Populated);
                 _outputFilesFolder.Value = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the folder to which test results will be output. A timestamp-based subfolder
+        /// file will not be used.
+        /// </summary>
+        /// <value>The folder to which test results will be output..</value>
+        public string ExplicitOutputFilesFolder
+        {
+            get
+            {
+                return _explicitOutputFilesFolder.Value;
+            }
+
+            set
+            {
+                ExtractException.Assert("ELI34972",
+                    "Either OutputFilesFolder or ExplicitOutputFilesFolder should be set; not both",
+                    !_outputFilesFolder.Populated);
+                _explicitOutputFilesFolder.Value = value;
             }
         }
 
