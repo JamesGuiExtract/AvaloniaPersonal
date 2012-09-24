@@ -1020,22 +1020,7 @@ namespace Extract.SQLCDBEditor
                     DataRow row = ((DataRowView)_resultsGrid.CurrentCell.OwningRow.DataBoundItem).Row;
                     if (row.RowState == DataRowState.Detached)
                     {
-                        try
-                        {
-                            // Add the row to the table if it hasn't already been added to the table.
-                            _resultsTable.Rows.Add(row);
-                        }
-                        catch (Exception ex)
-                        {
-                            if (!row.HasErrors)
-                            {
-                                row.RowError = ex.Message;
-                            }
-
-                            DataIsValid = false;
-
-                            UpdateResultsStatus(false);
-                        }
+                        _resultsTable.Rows.Add(row);
                     }
                 }
             }
@@ -1650,6 +1635,9 @@ namespace Extract.SQLCDBEditor
             // to be applied back to the database.
             _commandBuilder = new SqlCeCommandBuilder();
             _commandBuilder.DataAdapter = _adapter;
+            _adapter.InsertCommand = _commandBuilder.GetInsertCommand();
+            _adapter.DeleteCommand = _commandBuilder.GetDeleteCommand();
+            _adapter.UpdateCommand = _commandBuilder.GetUpdateCommand();            
         }
 
         /// <summary>
@@ -2002,6 +1990,9 @@ namespace Extract.SQLCDBEditor
         {
             Exception rowException = null;
 
+            // Clear any errors already associated with the row and re-check for errors.
+            row.ClearErrors();
+
             if (row.RowState == DataRowState.Detached)
             {
                 // If the row is currently detached (i.e., new), errors such as constraint violations
@@ -2010,16 +2001,15 @@ namespace Extract.SQLCDBEditor
                 // row... so add it to a temporary copy of the table with a transaction that gets
                 // rolled back to test if it would be able to be added to _resultsTable without error.
                 using (DataTable tableCopy = row.Table.Copy())
-                using (SqlCeTransaction transaction = _connection.BeginTransaction())
-                using (var adapterCopy = new SqlCeDataAdapter(_adapter.SelectCommand.CommandText, _connection))
+                using (SqlCeTransaction transaction = _connection.BeginTransaction(IsolationLevel.Serializable))
                 {
-                    adapterCopy.InsertCommand = _commandBuilder.GetInsertCommand();
-                    adapterCopy.InsertCommand.Transaction = transaction;
+                    _adapter.InsertCommand.Transaction = transaction;
+                    _adapter.UpdateCommand.Transaction = transaction;
 
                     try
                     {
                         DataRow rowCopy = tableCopy.Rows.Add(row.ItemArray);
-                        adapterCopy.Update(new DataRow[] { rowCopy });
+                        _adapter.Update(new[] { rowCopy });
                     }
                     catch (Exception ex)
                     {
@@ -2031,6 +2021,8 @@ namespace Extract.SQLCDBEditor
                     finally
                     {
                         transaction.Rollback();
+                        _adapter.InsertCommand.Transaction = null;
+                        _adapter.UpdateCommand.Transaction = null;
                     }
                 }
             }
@@ -2057,9 +2049,6 @@ namespace Extract.SQLCDBEditor
 
             if (rowException == null)
             {
-                // The update succeeded for this row. Clear any manually added errors.
-                row.ClearErrors();
-
                 // Check to see if the table as a whole is now valid.
                 ValidateTableData();
             }
@@ -2136,7 +2125,7 @@ namespace Extract.SQLCDBEditor
 
                 // If we were un-able to find the existing row to merge into, proceeding with the
                 // merge would cause that row to be duplicated. Abort the merge.
-                ExtractException.Assert("ELI34661", "Failed to merge latest table data",
+                ExtractException.Assert("ELI34661", "Failed to apply changes.",
                     destinationRow != null);
 
                 rowPairings[rowToMerge] = destinationRow;
