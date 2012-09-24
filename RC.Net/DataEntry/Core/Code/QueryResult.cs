@@ -265,14 +265,13 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    if (IsAttribute && _attributeResults[0].Value.HasSpatialInfo())
+                    if (_spatialResults != null && _spatialResults.Count > 0)
                     {
-                        return true;
+                        return _spatialResults[0].HasSpatialInfo();
                     }
-                    else if (_spatialResults != null && _spatialResults.Count > 0 &&
-                        _spatialResults[0].HasSpatialInfo())
+                    else if (IsAttribute)
                     {
-                        return true;
+                        return _attributeResults[0].Value.HasSpatialInfo();
                     }
                     else
                     {
@@ -349,9 +348,22 @@ namespace Extract.DataEntry
                     // to the query result to not affect the original attribute.
                     if (IsAttribute && _spatialResults == null)
                     {
+                        bool isSpatial = _attributeResults[0].Value.HasSpatialInfo();
                         _spatialResults = new List<SpatialString>();
                         ICopyableObject copySource = (ICopyableObject)_attributeResults[0].Value;
                         _spatialResults.Add((SpatialString)copySource.Clone());
+
+                        // [DataEntry:1137]
+                        // Because the SpatialString class will remove spatial info for blank
+                        // strings yet it is important for the attribute value spatial mode to match
+                        // the spatial mode of the SpatialString value, add back any spatial info
+                        // that was removed as part of the Clone method.
+                        if (isSpatial && !_spatialResults[0].HasSpatialInfo())
+                        {
+                            _spatialResults[0].AddRasterZones(
+                                _attributeResults[0].Value.GetOCRImageRasterZones(),
+                                _attributeResults[0].Value.SpatialPageInfos);
+                        }
                     }
 
                     return _spatialResults[0];
@@ -404,7 +416,18 @@ namespace Extract.DataEntry
                     {
                         if (IsSpatial)
                         {
-                            FirstSpatialStringValue.ReplaceAndDowngradeToHybrid(value);
+                            // [DataEntry:1137]
+                            // Because the SpatialString class will remove spatial info for blank
+                            // strings, allow for the case that the spatial mode of
+                            // FirstSpatialStringValue does not match IsSpatial.
+                            if (FirstSpatialStringValue.HasSpatialInfo())
+                            {
+                                FirstSpatialStringValue.ReplaceAndDowngradeToHybrid(value);
+                            }
+                            else
+                            {
+                                FirstSpatialStringValue.ReplaceAndDowngradeToNonSpatial(value);
+                            }
                         }
                         else if (_stringResults != null && _stringResults.Count > 0)
                         {
