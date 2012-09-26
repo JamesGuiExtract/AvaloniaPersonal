@@ -381,6 +381,12 @@ namespace Extract.DataEntry
         /// event data.</param>
         protected virtual void HandleQueryValueModified(object sender, QueryValueModifiedEventArgs e)
         {
+            // [DataEntry:1133]
+            // Even when _handlingQueryValueChange is true, clear the CachedResult if the attribute
+            // has been modified to ensure any currently executing query returns an accurate result.
+            // Do no re-raise OnQueryValueModified, however, which can lead to infinite recursion.
+            CachedResult = null;
+
             // Prevent recursion that can occur if there are references to a distinct node.
             if (_handlingQueryValueChange)
             {
@@ -390,8 +396,6 @@ namespace Extract.DataEntry
             try
             {
                 _handlingQueryValueChange = true;
-
-                CachedResult = null;
 
                 OnQueryValueModified(e);
             }

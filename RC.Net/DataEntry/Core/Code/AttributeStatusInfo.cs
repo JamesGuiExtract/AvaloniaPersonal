@@ -2763,12 +2763,20 @@ namespace Extract.DataEntry
             bool acceptSpatialInfo, bool spatialInfoChanged)
         {
             var eventHandler = AttributeValueModified;
+            bool alreadyRaisingAttributeValueModified = _raisingAttributeValueModified;
 
-            // Don't raise the event if it is already being raised (prevents recursion).
-            if (eventHandler != null && !_raisingAttributeValueModified)
+            if (eventHandler != null)
             {
                 try
                 {
+                    // [DataEntry:1133]
+                    // If we are already raising the AttributeValueModified event, raise it again
+                    // to ensure that any queries that depend on the value return the correct
+                    // results. However, set incrementalUpdate to true in this case to prevent
+                    // the change from causing the original auto-update trigger from being fired
+                    // again (thus preventing infinite recursion).
+                    incrementalUpdate |= alreadyRaisingAttributeValueModified;
+
                     _raisingAttributeValueModified = true;
 
                     eventHandler(this,
@@ -2777,7 +2785,10 @@ namespace Extract.DataEntry
                 }
                 finally
                 {
-                    _raisingAttributeValueModified = false;
+                    if (!alreadyRaisingAttributeValueModified)
+                    {
+                        _raisingAttributeValueModified = false;
+                    }
                 }
             }
         }
