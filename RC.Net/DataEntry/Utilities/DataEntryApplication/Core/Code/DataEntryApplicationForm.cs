@@ -1861,7 +1861,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // Enable/disable and deselect the highlight cursor tools as needed.
                     if (!e.SwipingEnabled &&
                         (_imageViewer.CursorTool == CursorTool.AngularHighlight ||
-                         _imageViewer.CursorTool == CursorTool.RectangularHighlight))
+                         _imageViewer.CursorTool == CursorTool.RectangularHighlight ||
+                         _imageViewer.CursorTool == CursorTool.WordHighlight))
                     {
                         _imageViewer.CursorTool = CursorTool.None;
                     }

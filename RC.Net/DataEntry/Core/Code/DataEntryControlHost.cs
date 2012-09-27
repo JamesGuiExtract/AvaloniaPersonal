@@ -4343,6 +4343,10 @@ namespace Extract.DataEntry
                 {
                     _imageViewer.CursorTool = CursorTool.RectangularHighlight;
                 }
+                else if (_lastCursorTool == CursorTool.WordHighlight)
+                {
+                    _imageViewer.CursorTool = CursorTool.WordHighlight;
+                }
             }
 
             // Raise the event for registered listeners
