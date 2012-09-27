@@ -53,5 +53,11 @@
     <Setting Name="OcrTradeoff" Type="Extract.Imaging.OcrTradeoff" Scope="User">
       <Value Profile="(Default)">Balanced</Value>
     </Setting>
+    <Setting Name="DisableAutoUpdateQueries" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="DisableValidationQueries" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

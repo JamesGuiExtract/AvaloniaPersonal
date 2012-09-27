@@ -545,6 +545,30 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether auto-update queries should be disabled.
+        /// </summary>
+        /// <value><see langword="true"/> to disable auto-update queries; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public static bool DisableAutoUpdateQueries
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether validation queries should be disabled.
+        /// </summary>
+        /// <value><see langword="true"/> to disable validation queries; otherwise, 
+        /// <see langword="false"/>.
+        /// </value>
+        public static bool DisableValidationQueries
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Returns the <see cref="AttributeStatusInfo"/> object associated with the provided
         /// <see cref="IAttribute"/>.  A new <see cref="AttributeStatusInfo"/> instance is
         /// created if necessary.
@@ -815,81 +839,7 @@ namespace Extract.DataEntry
                 // Add a mapping for the attribute's subattributes for future reference.
                 _subAttributesToParentMap[attribute.SubAttributes] = attribute;
 
-                // Find any existing auto-update trigger.
-                AutoUpdateTrigger existingAutoUpdateTrigger = null;
-                _autoUpdateTriggers.TryGetValue(attribute, out existingAutoUpdateTrigger);
-
-                if ((autoUpdateQuery != null && autoUpdateQuery != statusInfo._autoUpdateQuery) ||
-                    (statusInfo._autoUpdateQuery != null && existingAutoUpdateTrigger == null))
-                {
-                    // Dispose of any previously existing auto-update trigger.
-                    if (existingAutoUpdateTrigger != null)
-                    {
-                        existingAutoUpdateTrigger.Dispose();
-                        _autoUpdateTriggers.Remove(attribute);
-                    }
-
-                    if (autoUpdateQuery != null)
-                    {
-                        statusInfo._autoUpdateQuery = autoUpdateQuery;
-                    }
-
-                    if (!string.IsNullOrEmpty(statusInfo._autoUpdateQuery))
-                    {
-                        // We need to ensure that the attribute is a part of the sourceAttributes
-                        // in order for AutoUpdateTrigger to creation to work. When creating a new
-                        // attribute, this won't be the case.  Add it now, even though it will still
-                        // need to be re-ordered later.
-                        sourceAttributes.PushBackIfNotContained(attribute);
-
-                        _autoUpdateTriggers[attribute] = new AutoUpdateTrigger(attribute,
-                            statusInfo._autoUpdateQuery, _dbConnection, false);
-                    }
-                }
-
-                // Find any existing validation trigger.
-                AutoUpdateTrigger existingValidationTrigger = null;
-                _validationTriggers.TryGetValue(attribute, out existingValidationTrigger);
-
-                if ((validationQuery != null && validationQuery != statusInfo._validationQuery) ||
-                    (statusInfo._validationQuery != null && existingValidationTrigger == null))
-                {
-                    // Dispose of any previously existing validation trigger.
-                    if (existingValidationTrigger != null)
-                    {
-                        existingValidationTrigger.Dispose();
-                        _validationTriggers.Remove(attribute);
-                    }
-
-                    if (validationQuery != null)
-                    {
-                        statusInfo._validationQuery = validationQuery;
-                    }
-
-                    if (!string.IsNullOrEmpty(statusInfo._validationQuery))
-                    {
-                        // We need to ensure that the attribute is a part of the sourceAttributes
-                        // in order for AutoUpdateTrigger to creation to work. When creating a new
-                        // attribute, this won't be the case.  Add it now, even though it will still
-                        // need to be re-ordered later.
-                        sourceAttributes.PushBackIfNotContained(attribute);
-
-                        _validationTriggers[attribute] = new AutoUpdateTrigger(attribute,
-                            statusInfo._validationQuery, _dbConnection, true);
-                    }
-                }
-                else
-                {
-                    // If a validation trigger is in place, use it to update the control's
-                    // validationlist now since by virtue of the fact that the attribute is being
-                    // re-initialized, the control was likely previously displaying a different
-                    // attribute with a different validation list.
-                    AutoUpdateTrigger validationTrigger = null;
-                    if (_validationTriggers.TryGetValue(attribute, out validationTrigger))
-                    {
-                        validationTrigger.UpdateValue();
-                    }
-                }
+                LoadDataQueries(attribute, sourceAttributes, autoUpdateQuery, validationQuery, statusInfo);
 
                 // [DataEntry:173] Trim any whitespace from the beginning and end.
                 // [DataEntry:167]
@@ -2743,6 +2693,106 @@ namespace Extract.DataEntry
             if (eventHandler != null)
             {
                 eventHandler(null, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Loads the auto-update and validation data queries for the specified attribute.
+        /// </summary>
+        /// <param name="attribute">The attribute for which queries should be loaded.</param>
+        /// <param name="sourceAttributes">The vector of <see cref="IAttribute"/>s to which the
+        /// specified <see cref="IAttribute"/> is a member.</param>
+        /// <param name="autoUpdateQuery">A query which will cause the <see cref="IAttribute"/>'s
+        /// value to automatically be updated using values from other <see cref="IAttribute"/>s
+        /// and/or a database query.</param>
+        /// <param name="validationQuery">A query which will cause the validation list for the 
+        /// validator associated with the attribute to be updated using values from other
+        /// <see cref="IAttribute"/>'s and/or a database query.</param>
+        /// <param name="statusInfo">The <see cref="AttributeStatusInfo"/> for this
+        /// <see paramref="attribute"/>.</param>
+        static void LoadDataQueries(IAttribute attribute, IUnknownVector sourceAttributes,
+            string autoUpdateQuery, string validationQuery, AttributeStatusInfo statusInfo)
+        {
+            if (!DisableAutoUpdateQueries)
+            {
+                // Find any existing auto-update trigger.
+                AutoUpdateTrigger existingAutoUpdateTrigger = null;
+                _autoUpdateTriggers.TryGetValue(attribute, out existingAutoUpdateTrigger);
+
+                if ((autoUpdateQuery != null && autoUpdateQuery != statusInfo._autoUpdateQuery) ||
+                    (statusInfo._autoUpdateQuery != null && existingAutoUpdateTrigger == null))
+                {
+                    // Dispose of any previously existing auto-update trigger.
+                    if (existingAutoUpdateTrigger != null)
+                    {
+                        existingAutoUpdateTrigger.Dispose();
+                        _autoUpdateTriggers.Remove(attribute);
+                    }
+
+                    if (autoUpdateQuery != null)
+                    {
+                        statusInfo._autoUpdateQuery = autoUpdateQuery;
+                    }
+
+                    if (!string.IsNullOrEmpty(statusInfo._autoUpdateQuery))
+                    {
+                        // We need to ensure that the attribute is a part of the sourceAttributes
+                        // in order for AutoUpdateTrigger to creation to work. When creating a new
+                        // attribute, this won't be the case.  Add it now, even though it will still
+                        // need to be re-ordered later.
+                        sourceAttributes.PushBackIfNotContained(attribute);
+
+                        _autoUpdateTriggers[attribute] = new AutoUpdateTrigger(attribute,
+                            statusInfo._autoUpdateQuery, _dbConnection, false);
+                    }
+                }
+            }
+
+            if (!DisableValidationQueries)
+            {
+                // Find any existing validation trigger.
+                AutoUpdateTrigger existingValidationTrigger = null;
+                _validationTriggers.TryGetValue(attribute, out existingValidationTrigger);
+
+                if ((validationQuery != null && validationQuery != statusInfo._validationQuery) ||
+                    (statusInfo._validationQuery != null && existingValidationTrigger == null))
+                {
+                    // Dispose of any previously existing validation trigger.
+                    if (existingValidationTrigger != null)
+                    {
+                        existingValidationTrigger.Dispose();
+                        _validationTriggers.Remove(attribute);
+                    }
+
+                    if (validationQuery != null)
+                    {
+                        statusInfo._validationQuery = validationQuery;
+                    }
+
+                    if (!string.IsNullOrEmpty(statusInfo._validationQuery))
+                    {
+                        // We need to ensure that the attribute is a part of the sourceAttributes
+                        // in order for AutoUpdateTrigger to creation to work. When creating a new
+                        // attribute, this won't be the case.  Add it now, even though it will still
+                        // need to be re-ordered later.
+                        sourceAttributes.PushBackIfNotContained(attribute);
+
+                        _validationTriggers[attribute] = new AutoUpdateTrigger(attribute,
+                            statusInfo._validationQuery, _dbConnection, true);
+                    }
+                }
+                else
+                {
+                    // If a validation trigger is in place, use it to update the control's
+                    // validationlist now since by virtue of the fact that the attribute is being
+                    // re-initialized, the control was likely previously displaying a different
+                    // attribute with a different validation list.
+                    AutoUpdateTrigger validationTrigger = null;
+                    if (_validationTriggers.TryGetValue(attribute, out validationTrigger))
+                    {
+                        validationTrigger.UpdateValue();
+                    }
+                }
             }
         }
 

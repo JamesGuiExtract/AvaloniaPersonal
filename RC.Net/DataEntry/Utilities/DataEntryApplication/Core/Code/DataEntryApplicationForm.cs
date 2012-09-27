@@ -541,6 +541,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _brandingResources = new BrandingResourceManager(
                     DataEntryMethods.ResolvePath(_applicationConfig.Settings.ApplicationResourceFile));
 
+                AttributeStatusInfo.DisableAutoUpdateQueries =
+                    _applicationConfig.Settings.DisableAutoUpdateQueries;
+
+                AttributeStatusInfo.DisableValidationQueries =
+                    _applicationConfig.Settings.DisableValidationQueries;
+
                 // Since SpotIR compatibility is not required for data entry applications, avoid the
                 // performance hit it exacts.
                 Highlight.SpotIRCompatible = false;
@@ -2927,6 +2933,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 // Tie the newly created DEP to this application and its ImageViewer.
                 dataEntryControlHost.DataEntryApplication = (IDataEntryApplication)this;
+                dataEntryControlHost.Config = config;
                 dataEntryControlHost.ImageViewer = _imageViewer;
 
                 // If HighlightConfidenceBoundary settings has been specified in the config file and

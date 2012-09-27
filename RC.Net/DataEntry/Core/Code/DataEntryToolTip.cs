@@ -529,14 +529,14 @@ namespace Extract.DataEntry
                     // Calculate the initial anchorpoint for the tooltip 
                     double toolTipRotation;
                     _highlightAnchorPoint = GetAnchorPoint(pageOfRasterZones,
-                        highlightAnchorAlignment, tooltipStandoffAngle, _TOOLTIP_STANDOFF_DISTANCE,
-                        out toolTipRotation);
+                        highlightAnchorAlignment, tooltipStandoffAngle,
+                        (int)_host.Config.Settings.TooltipFontSize, out toolTipRotation);
 
                     // TODO: This isn't the most efficient means of calculating the highlight's
                     // center position given the work that's already been done in the previous call.
                     Point highlightCenterPoint = GetAnchorPoint(pageOfRasterZones,
-                        highlightCenterAlignment, tooltipStandoffAngle, _TOOLTIP_STANDOFF_DISTANCE,
-                        out toolTipRotation);
+                        highlightCenterAlignment, tooltipStandoffAngle,
+                        (int)_host.Config.Settings.TooltipFontSize, out toolTipRotation);
 
                     // Create the TextLayerObject
                     _textLayerObject = new TextLayerObject(_host.ImageViewer, _page,

@@ -238,21 +238,6 @@ namespace Extract.DataEntry
         static readonly string _OBJECT_NAME = typeof(DataEntryControlHost).ToString();
 
         /// <summary>
-        /// The default font size to be used for tooltips.
-        /// </summary>
-        const float _TOOLTIP_FONT_SIZE = 13F;
-
-        /// <summary>
-        /// The number of image pixels a tooltip or error icon should be placed from the highlight.
-        /// </summary>
-        const int _TOOLTIP_STANDOFF_DISTANCE = (int)_TOOLTIP_FONT_SIZE;
-
-        /// <summary>
-        /// The font family used to display data.
-        /// </summary>
-        const string _DATA_FONT_FAMILY = "Verdana";
-
-        /// <summary>
         /// The width/height in inches of the icon to be shown in the image viewer to indicate
         /// invalid data.
         /// </summary>
@@ -714,9 +699,6 @@ namespace Extract.DataEntry
                     _ocrManager = new SynchronousOcrManager();
                 }
 
-                // Initialize the font to use for tooltips
-                _toolTipFont = new Font(_DATA_FONT_FAMILY, _TOOLTIP_FONT_SIZE);
-
                 // Specify the default highlight colors.
                 HighlightColor[] highlightColors = {new HighlightColor(89, Color.LightSalmon),
                                                     new HighlightColor(100, Color.LightGreen)};
@@ -773,6 +755,20 @@ namespace Extract.DataEntry
             {
                 _dataEntryApp = value;
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the configuration settings for the data entry panel.
+        /// </summary>
+        /// <value>
+        /// The configuration settings for the data entry panel.
+        /// </value>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        internal ConfigSettings<Properties.Settings> Config
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -2259,6 +2255,14 @@ namespace Extract.DataEntry
 
                     ExtractException.Assert("ELI25377", "Highlight colors not initialized!",
                         _highlightColors != null && _highlightColors.Length > 0);
+
+                    if (Config == null)
+                    {
+                        Config = new ConfigSettings<Properties.Settings>();
+                    }
+
+                    // Initialize the font to use for tooltips
+                    _toolTipFont = new Font(Config.Settings.FontFamily, Config.Settings.TooltipFontSize);
 
                     // Loop through all contained controls looking for controls that implement the 
                     // IDataEntryControl interface.  Registers events necessary to facilitate
@@ -3965,6 +3969,14 @@ namespace Extract.DataEntry
                 // Register each child control.
                 RegisterDataEntryControls(control);
 
+                // [DataEntry:1139]
+                // Set the font of each control whether or not it is a data entry control to ensure
+                // the fonts are consistent.
+                control.Font = new Font(Config.Settings.FontFamily,
+                    (Config.Settings.ControlFontSize > 0)
+                        ? Config.Settings.ControlFontSize
+                        : base.Font.Size);
+
                 // Check to see if this control is an IDataEntryControl itself.
                 IDataEntryControl dataControl = control as IDataEntryControl;
                 if (dataControl == null)
@@ -3974,9 +3986,6 @@ namespace Extract.DataEntry
                 else
                 {
                     dataControl.DataEntryControlHost = this;
-
-                    // Set the font of data controls to the _DATA_FONT_FAMILY.
-                    control.Font = new Font(_DATA_FONT_FAMILY, base.Font.Size);
 
                     // Register for needed events from data entry controls
                     control.GotFocus += HandleControlGotFocus;
@@ -6103,7 +6112,7 @@ namespace Extract.DataEntry
                 // The anchor point for the error icon should be to the right of attribute.
                 double errorIconRotation;
                 Point errorIconAnchorPoint = GetAnchorPoint(rasterZones, AnchorAlignment.Right, 90,
-                    _TOOLTIP_STANDOFF_DISTANCE, out errorIconRotation);
+                    (int)Config.Settings.TooltipFontSize, out errorIconRotation);
 
                 // Create the error icon
                 ImageLayerObject errorIcon = new ImageLayerObject(_imageViewer, page,

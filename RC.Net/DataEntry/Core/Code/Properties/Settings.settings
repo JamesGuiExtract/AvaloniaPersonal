@@ -35,5 +35,14 @@
     <Setting Name="QueryCacheLimit" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">500</Value>
     </Setting>
+    <Setting Name="FontFamily" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Verdana</Value>
+    </Setting>
+    <Setting Name="ControlFontSize" Type="System.Single" Scope="Application">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="TooltipFontSize" Type="System.Single" Scope="Application">
+      <Value Profile="(Default)">13</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
