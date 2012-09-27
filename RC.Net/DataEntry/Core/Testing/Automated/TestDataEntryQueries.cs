@@ -479,6 +479,8 @@ namespace Extract.DataEntry.Test
 
         /// <summary>
         /// Tests comparing lists with <see cref="ExpressionQueryNode"/>s. 
+        /// <para><b>Tests</b></para>
+        /// DataEntry:1084
         /// </summary>
         [Test, Category("ExpressionQueryNode")]
         public static void TestExpressionCompareLists()

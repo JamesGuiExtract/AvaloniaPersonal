@@ -260,7 +260,9 @@ namespace Extract.DataEntry
                     string path = String.Empty;
                     for (IAttribute attribute = e.Attribute;
                          attribute != null;
-                         attribute = AttributeStatusInfo.GetParentAttribute(attribute))
+                         attribute = (attribute == _ROOT_ATTRIBUTE)
+                            ? null
+                            : AttributeStatusInfo.GetParentAttribute(attribute) ?? _ROOT_ATTRIBUTE)
                     {
                         // Get the references relative to the current attribute.
                         AttributeReferenceManager descendantReferences;
