@@ -59,11 +59,11 @@ BOOL CFAMDBAdminApp::InitInstance()
 {
 	// COM has to be initialized because the license management code uses
 	// COM objects (ExtractTRP)
-	//CoInitializeEx(NULL, COINIT_MULTITHREADED);
-	// Changed this to COINIT_APARTMENTTHREADED to get eliminate the long delay when opening
-	// oracle database
-	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
-
+	// [LegacyRCAndUtils:6341]
+	// This was changed to initialize as apartment threaded in April 2012 to solve a long delay
+	// when initializing an Oracle DB via the entity framework. However, this change breaks the
+	// schema update process which passes a progress status COM object to another thread.
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
 	try
 	{
