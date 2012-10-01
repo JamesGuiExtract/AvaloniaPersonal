@@ -1054,6 +1054,83 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Move any currently selected layer objects into view.
+        /// </summary>
+        /// <param name="autoZoom"><see langword="true"/> if the ScaleFactor should be adjusted per
+        /// <see cref="AutoZoomScale"/>; <see langword="false"/> if the ScaleFactor
+        /// should remain the same while bringing the selection into view.</param>
+        public void BringSelectionIntoView(bool autoZoom)
+        {
+            try
+            {
+                // Not need to attempt a zoom operation if there is not current selection.
+                if (!_layerObjects.Selection.Any())
+                {
+                    return;
+                }
+
+                // If no redaction is on the currently visible page, go to the page of the first
+                // selected redaction.
+                if (!SelectedLayerObjectsOnVisiblePage.Any())
+                {
+                    PageNumber = FirstPageOfSelection;
+                }
+
+                _autoZooming = true;
+
+                var selectedLayerObjectsOnPage = _layerObjects.Selection
+                    .Where(layerObject => layerObject.Visible &&
+                        layerObject.PageNumber == PageNumber);
+
+                if (autoZoom)
+                {
+                    // Get combined area of all the selected layer objects on the current page
+                    Rectangle newZoomRect = LayerObject.GetCombinedBounds(selectedLayerObjectsOnPage);
+
+                    // Adjust the area by the auto zoom scale
+                    int padding = (AutoZoomScale - 1) * _AUTO_ZOOM_PADDING_MULTIPLIER + _MIN_AUTO_ZOOM_PADDING;
+                    newZoomRect = PadViewingRectangle(newZoomRect, padding, padding, false);
+                    newZoomRect = GetTransformedRectangle(newZoomRect, false);
+
+                    // Zoom to appropriate area
+                    ZoomToRectangle(newZoomRect);
+
+                    AutoZoomed = true;
+                }
+                else if (!AutoZoomed && !IsSelectionInView)
+                {
+                    CenterOnLayerObjects(selectedLayerObjectsOnPage.ToArray());
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34978");
+            }
+            finally
+            {
+                _autoZooming = false;
+            }
+        }
+
+        /// <summary>
+        /// Restores the last active zoom level prior to the last <see cref="BringSelectionIntoView"/> call.
+        /// </summary>
+        public void RestoreNonSelectionZoom()
+        {
+            try
+            {
+                if (AutoZoomed && _lastNonAutoZoomInfo != null)
+                {
+                    ZoomInfo = _lastNonAutoZoomInfo.Value;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34979");
+            }
+        }
+
+        /// <summary>
         /// Centers the view on the specified layer objects.
         /// </summary>
         /// <param name="layerObjects">The layer objects on which to center. Must all be on the 
@@ -2499,6 +2576,38 @@ namespace Extract.Imaging.Forms
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI27034", ex);
+            }
+        }
+
+        /// <summary>
+        /// Updates the state of the <see cref="AutoZoomed"/> and
+        /// <see cref="_lastNonAutoZoomInfo"/> based on the current zoom level.
+        /// </summary>
+        /// <param name="zoomFactorChanged"><see langword="true"/> if the zoom factor has changed;
+        /// <see langword="false"/> if only the scroll position has changed.</param>
+        void UpdateAutoZoomState(bool zoomFactorChanged)
+        {
+            // Set AutoZoomed = false if:
+            // 1) AutoZoomed is true
+            // 2) The image viewer is not in the process of _autoZooming.
+            // 3) The image viewer is not currently painting to an external graphics object.
+            // 4) Either the zoom factor has changed or at least one of the selected layer objects
+            //    is no longer in view.
+            if (AutoZoomed && !_autoZooming && !_paintingToGraphics)
+            {
+                if (zoomFactorChanged || !IsSelectionInView)
+                {
+                    AutoZoomed = false;
+                }
+            }
+
+            // Update _lastNonAutoZoomInfo if:
+            // 1) AutoZoomed is false
+            // 2) The image viewer is not in the process of _autoZooming.
+            // 3) The image viewer is not currently painting to an external graphics object.
+            if (!AutoZoomed && !_autoZooming && !_paintingToGraphics)
+            {
+                _lastNonAutoZoomInfo = GetZoomInfo();
             }
         }
 

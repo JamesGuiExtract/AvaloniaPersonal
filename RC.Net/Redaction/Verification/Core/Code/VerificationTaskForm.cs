@@ -3778,24 +3778,16 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // [FlexIDSCore: 4858, 5067]
-                // A proper fix for this behavior is too risky at this point in the release cycle.
-                // For 9.0, I am removing the behavior which restores the preivous zoom after
-                // hitting F2 again as this seems a better option than leaving flaky behavior. 
-//                // If not currently zoomed to the current selection and there has been a ZoomInfo
-//                // for the current page that is not a zoom to selection, return to that ZoomInfo.
-//                if (_redactionGridView.ZoomedToSelection)
-//                {
-//                    if (_redactionGridView.LastNonSelectionZoomInfo != null)
-//                    {
-//                        _imageViewer.ZoomInfo = _redactionGridView.LastNonSelectionZoomInfo.Value;
-//                    }
-//                }
-//                // Otherwise, zoom to the current selection.
-//                else
-//                {
-                    _redactionGridView.BringSelectionIntoView(true, false);
-//                }
+                // If not currently zoomed to the current selection and there has been a ZoomInfo
+                // for the current page that is not a zoom to selection, return to that ZoomInfo.
+                if (_imageViewer.AutoZoomed)
+                {
+                    _imageViewer.RestoreNonSelectionZoom();
+                }
+                else
+                {
+                    _imageViewer.BringSelectionIntoView(true);
+                }
             }
             catch (Exception ex)
             {

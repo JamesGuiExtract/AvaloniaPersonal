@@ -510,10 +510,20 @@ namespace Extract.Imaging.Forms
             }
             set
             {
-                _isVisible = value;
+                try
+                {
+                    if (value != _isVisible)
+                    {
+                        _isVisible = value;
 
-                // Raise the visibility changed event
-                _imageViewer.LayerObjects.RaiseLayerObjectVisibilityChangedEvent(this);
+                        // Raise the visibility changed event
+                        _imageViewer.LayerObjects.RaiseLayerObjectVisibilityChangedEvent(this);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI34984");
+                }
             }
         }
 

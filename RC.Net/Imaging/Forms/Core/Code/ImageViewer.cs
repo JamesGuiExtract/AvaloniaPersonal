@@ -16,6 +16,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 using System.IO;
+using System.Linq;
 using System.Security.Permissions;
 using System.Windows.Forms;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -136,6 +137,23 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <seealso cref="_IMAGE_FILE_TYPES"/>
         const int _IMAGE_FILE_TYPE_DEFAULT_INDEX = 9;
+
+        /// <summary>
+        /// The minimum amount of padding to apply when calculating the padding around a
+        /// selected layer objects during auto-zoom.
+        /// </summary>
+        const int _MIN_AUTO_ZOOM_PADDING = 25;
+
+        /// <summary>
+        /// The amount to multiply the <see cref="AutoZoomScale"/> when calculating the padding 
+        /// around a view.
+        /// </summary>
+        const int _AUTO_ZOOM_PADDING_MULTIPLIER = 60;
+
+        /// <summary>
+        /// The default value for the <see cref="AutoZoomScale"/>.
+        /// </summary>
+        static readonly int _DEFAULT_AUTO_ZOOM_SCALE = 5;
 
         #endregion Constants
 
@@ -472,6 +490,24 @@ namespace Extract.Imaging.Forms
         /// The visible rotation in degrees from the original image of the current page.
         /// </summary>
         int _orientation;
+
+        /// <summary>
+        /// Indicates whether the <see cref="ImageViewer"/> is zoomed to the current selection in
+        /// grid.
+        /// </summary>
+        bool _autoZoomed;
+
+        /// <summary>
+        /// Indicates whether a zoom to selection operation is in progress so that
+        /// <see cref="AutoZoomed"/> is set at the appropriate times.
+        /// </summary>
+        bool _autoZooming;
+
+        /// <summary>
+        /// The <see cref="ZoomInfo"/> from the last case in which <see cref="AutoZoomed"/>
+        /// was <see langword="false"/>.
+        /// </summary>
+        ZoomInfo? _lastNonAutoZoomInfo;
 
         #endregion Fields
 
@@ -1269,6 +1305,133 @@ namespace Extract.Imaging.Forms
             get
             {
                 return base.Image != null && _imagePages[_pageNumber - 1].CanZoomNext;
+            }
+        }
+
+        /// <summary>
+        /// Gets the default value for the <see cref="AutoZoomScale"/>.
+        /// </summary>
+        public static int DefaultAutoZoomScale
+        {
+            get
+            {
+                return _DEFAULT_AUTO_ZOOM_SCALE;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the amount to zoom out when <see cref="AutoZoomed"/> is 
+        /// <see langword="true"/>.
+        /// </summary>
+        /// <value>The amount to zoom out when <see cref="AutoZoomed"/> is
+        /// <see langword="true"/>.
+        /// </value>
+        public int AutoZoomScale
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets whether the <see cref="ImageViewer"/> is zoomed to the current selection in
+        /// grid.
+        /// </summary>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool AutoZoomed
+        {
+            get
+            {
+                return (_autoZoomed && IsSelectionInView);
+            }
+
+            private set
+            {
+                _autoZoomed = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the selected <see cref="LayerObjects"/> on the visible page.
+        /// </summary>
+        public IEnumerable<LayerObject> SelectedLayerObjectsOnVisiblePage
+        {
+            get
+            {
+                try
+                {
+                    return _layerObjects.Selection
+                        .Where(layerObject => layerObject.Visible &&
+                            layerObject.PageNumber == PageNumber);
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI34981");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether all selected layer objects on the current page are in
+        /// view.
+        /// </summary>
+        /// <value><see langword="true"/> if all selected layer objects on the current page are in
+        /// view.; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool IsSelectionInView
+        {
+            get
+            {
+                try
+                {
+                    // If there is a selection, but there are no layer objects from the selection
+                    // on the current page, the selection is not in view.
+                    if (_layerObjects.Selection.Any() && !SelectedLayerObjectsOnVisiblePage.Any())
+                    {
+                        return false;
+                    }
+
+                    Rectangle visibleImageArea = GetTransformedRectangle(GetVisibleImageArea(), true);
+
+                    bool isAnySelectedObjectOutOfView = SelectedLayerObjectsOnVisiblePage
+                        .Where(layerObject => !layerObject.IsVisible(visibleImageArea))
+                        .Any();
+
+                    return !isAnySelectedObjectOutOfView;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI34982");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the first page of the current selection.
+        /// </summary>
+        /// <value>The first page of the current selection or -1 if there are no currently selected
+        /// layer objects.</value>
+        int FirstPageOfSelection
+        {
+            get
+            {
+                try
+                {
+                    if (!_layerObjects.Selection.Any())
+                    {
+                        return -1;
+                    }
+                    else
+                    {
+                        return _layerObjects.Selection
+                            .Select(layerObject => layerObject.PageNumber)
+                            .Min();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI34983");
+                }
             }
         }
 
@@ -3182,6 +3345,8 @@ namespace Extract.Imaging.Forms
         /// </param>
         void OnZoomChanged(ZoomChangedEventArgs e)
         {
+            UpdateAutoZoomState(true);
+
             if (ZoomChanged != null)
             {
                 ZoomChanged(this, e);
@@ -3587,6 +3752,8 @@ namespace Extract.Imaging.Forms
         {
             try
             {
+                UpdateAutoZoomState(false);
+
                 base.OnScrollPositionChanged(e);
 
                 // Store the scroll position [DNRCAU #262 - JDS]

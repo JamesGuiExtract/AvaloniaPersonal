@@ -67,23 +67,6 @@ namespace Extract.Redaction.Verification
         /// </summary>
         static readonly string[] _CATEGORIES = Enum.GetNames(typeof(CategoryIndex));
 
-        /// <summary>
-        /// The minimum amount of padding to apply when calculating the padding around an 
-        /// auto-zoom.
-        /// </summary>
-        const int _MIN_PADDING = 25;
-
-        /// <summary>
-        /// The amount to multiply the <see cref="AutoZoomScale"/> when calculating the padding 
-        /// around a view.
-        /// </summary>
-        const int _PADDING_MULTIPLIER = 60;
-
-        /// <summary>
-        /// The default value for the <see cref="AutoZoomScale"/>.
-        /// </summary>
-        const int _DEFAULT_AUTO_ZOOM_SCALE = 5;
-
         #endregion Constants
 
         #region Fields
@@ -150,7 +133,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The zoom setting when <see cref="_autoZoom"/> is <see langword="true"/>.
         /// </summary>
-        int _autoZoomScale = _DEFAULT_AUTO_ZOOM_SCALE;
+        int _autoZoomScale = ImageViewer.DefaultAutoZoomScale;
 
         /// <summary>
         /// The confidence level associated with redactions and clues.
@@ -197,12 +180,6 @@ namespace Extract.Redaction.Verification
         /// The cell style for the page cell of rows that have been visited and are read-only.
         /// </summary>
         DataGridViewCellStyle _visitedReadOnlyPageCellStyle;
-
-        /// <summary>
-        /// Indicates whether an auto-zoom operation is in progress so that the grid can keep track
-        /// of whether the image viewer is currently zoomed to the selection.
-        /// </summary>
-        bool _performingAutoZoom;
 
         /// <summary>
         /// Indicates whether the grid is actively tracking data.
@@ -472,7 +449,18 @@ namespace Extract.Redaction.Verification
             }
             set
             {
-                _autoZoomScale = value;
+                try
+                {
+                    _autoZoomScale = value;
+                    if (_imageViewer != null)
+                    {
+                        _imageViewer.AutoZoomScale = value;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI34980");
+                }
             }
         }
 
@@ -483,7 +471,7 @@ namespace Extract.Redaction.Verification
         /// <see langword="false"/> if the property should not be serialized.</returns>
         bool ShouldSerializeAutoZoomScale()
         {
-            return _autoZoom && _autoZoomScale != _DEFAULT_AUTO_ZOOM_SCALE;
+            return _autoZoom && _autoZoomScale != ImageViewer.DefaultAutoZoomScale;
         }
 
         /// <summary>
@@ -491,7 +479,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void ResetAutoZoomScale()
         {
-            _autoZoomScale = _DEFAULT_AUTO_ZOOM_SCALE;
+            _autoZoomScale = ImageViewer.DefaultAutoZoomScale;
         }
 
         /// <summary>
@@ -1118,7 +1106,7 @@ namespace Extract.Redaction.Verification
                 // Select only those layer objects that correspond to selected rows
                 UpdateLayerObjectSelection();
 
-                BringSelectionIntoView(false, false);
+                BringSelectionIntoView();
 
                 _imageViewer.Invalidate();
             }
@@ -1136,68 +1124,20 @@ namespace Extract.Redaction.Verification
         /// Centers the view on redactions selected on the current page; if there are no
         /// redactions selected on the current page, uses the first page with a selected redaction.
         /// </summary>
-        /// <param name="forceAutoZoom"><see langword="true"/> to perform auto-zoom even if
-        /// <see cref="_autoZoom"/> is <see langword="false"/>.</param>
-        /// <param name="alwaysShiftZoom"><see langword="true"/> if the zoom should be adjusted
-        /// regardless of whether redactions are already in view; <see langword="false"/> if the
-        /// zoom should only be adjusted if in auto-zoom mode is on or if at least one redaction
-        /// on the page is not fully visible.</param>
-        public void BringSelectionIntoView(bool forceAutoZoom, bool alwaysShiftZoom)
+        public void BringSelectionIntoView()
         {
             try
             {
                 // Is at least one row selected?
                 if (_dataGridView.SelectedRows.Count > 0 && _preventViewChangeRefCount == 0)
                 {
-                    // If no redaction is on the currently visible page, 
-                    // go to the page of the first selected redaction.
-                    LayerObject[] selected = GetSelectedLayerObjectsOnVisiblePage();
-                    if (selected.Length == 0)
-                    {
-                        _imageViewer.PageNumber = GetFirstSelectedPage();
-
-                        selected = GetSelectedLayerObjectsOnVisiblePage();
-                    }
-
-                    if (_autoZoom || forceAutoZoom)
-                    {
-                        // Auto-zoom is on, zoom around all layer objects on the current page.
-                        PerformAutoZoom(selected);
-                    }
-                    else if (alwaysShiftZoom || ContainsNonVisibleLayerObject(selected))
-                    {
-                        _imageViewer.CenterOnLayerObjects(selected);
-                    }
+                    _imageViewer.BringSelectionIntoView(_autoZoom);
                 }
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI28857", ex);
             }
-        }
-
-        /// <summary>
-        /// Determines if the specified layer objects contains at least one layer object that is 
-        /// not within the visible view of the user.
-        /// </summary>
-        /// <param name="layerObjects">The layer objects to test for visibility.</param>
-        /// <returns><see langword="true"/> if at least one of the <paramref name="layerObjects"/> 
-        /// is outside the user's view; <see langword="false"/> if all the 
-        /// <paramref name="layerObjects"/> are in view.</returns>
-        bool ContainsNonVisibleLayerObject(IEnumerable<LayerObject> layerObjects)
-        {
-            Rectangle visibleArea = _imageViewer.GetVisibleImageArea();
-            visibleArea = _imageViewer.GetTransformedRectangle(visibleArea, true);
-
-            foreach (LayerObject layerObject in layerObjects)
-            {
-                if (!layerObject.IsVisible(visibleArea))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         /// <summary>
@@ -1225,79 +1165,6 @@ namespace Extract.Redaction.Verification
                 {
                     layerObject.Selected = shouldBeSelected;
                 }
-            }
-        }
-
-        /// <summary>
-        /// Determines whether any redaction is on the currently visible page.
-        /// </summary>
-        /// <returns><see langword="true"/> if there is a redaction on the currently visible page;
-        /// <see langword="false"/> if there are no redactions or all redactions are on 
-        /// non-visible pages.</returns>
-        LayerObject[] GetSelectedLayerObjectsOnVisiblePage()
-        {
-            List<LayerObject> result = new List<LayerObject>();
-
-            // Get the current page number
-            int currentPage = _imageViewer.PageNumber;
-            foreach (RedactionGridViewRow row in SelectedRows)
-            {
-                foreach (LayerObject layerObject in row.LayerObjects)
-                {
-                    if (layerObject.PageNumber == currentPage)
-                    {
-                        result.Add(layerObject);
-                    }
-                }
-            }
-
-            return result.ToArray();
-        }
-
-        /// <summary>
-        /// The one-based first page on which selected redactions appear.
-        /// </summary>
-        /// <returns>The one-based first page on which selected redactions appear; or -1 if there 
-        /// are no redactions.</returns>
-        int GetFirstSelectedPage()
-        {
-            int firstPage = -1;
-            foreach (RedactionGridViewRow row in SelectedRows)
-            {
-                if (firstPage > row.PageNumber || firstPage == -1)
-                {
-                    firstPage = row.PageNumber;
-                }
-            }
-
-            return firstPage;
-        }
-
-        /// <summary>
-        /// Zooms around the specified layer objects.
-        /// </summary>
-        void PerformAutoZoom(IEnumerable<LayerObject> layerObjects)
-        {
-            try
-            {
-                _performingAutoZoom = true;
-
-                // Get combined area of all the selected layer objects on the current page
-                Rectangle area = LayerObject.GetCombinedBounds(layerObjects);
-
-                // Adjust the area by the auto zoom scale
-                int padding = (_autoZoomScale - 1) * _PADDING_MULTIPLIER + _MIN_PADDING;
-                area = _imageViewer.PadViewingRectangle(area, padding, padding, false);
-                area = _imageViewer.GetTransformedRectangle(area, false);
-
-                // Zoom to appropriate area
-                _imageViewer.ZoomToRectangle(area);
-
-                ZoomedToSelection = true;
-            }
-            finally
-            {
-                _performingAutoZoom = false;
             }
         }
 
@@ -2575,50 +2442,6 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Handles the <see cref="ImageViewer"/> ZoomChanged event.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="Extract.Imaging.Forms.ZoomChangedEventArgs"/> instance
-        /// containing the event data.</param>
-        void HandleZoomChanged(object sender, ZoomChangedEventArgs e)
-        {
-            try
-            {
-                // If not in an auto-zoom operation, set the new zoom level as the last
-                // non-selection zoom.
-                if (!_performingAutoZoom && _imageViewer.ZoomHistoryCount > 0)
-                {
-                    ZoomedToSelection = false;
-                    LastNonSelectionZoomInfo = _imageViewer.ZoomInfo;
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI33671");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="ImageViewer"/> PageChanged event.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="Extract.Imaging.Forms.PageChangedEventArgs"/> instance
-        /// containing the event data.</param>
-        void HandlePageChanged(object sender, PageChangedEventArgs e)
-        {
-            try
-            {
-                // Upon loading a new page, there is no LastNonSelectionZoomInfo for the current
-                // page.
-                LastNonSelectionZoomInfo = null;
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI33680");
-            }
-        }
-
-        /// <summary>
         /// Handles the KeyUp event from the _dataGridView in order to allow it to be suppressed.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -2670,8 +2493,6 @@ namespace Extract.Redaction.Verification
                         Active = false;
                         _imageViewer.ImageFileChanged -= HandleImageFileChanged;
                         _imageViewer.ImageFileClosing -= HandleImageFileClosing;
-                        _imageViewer.PageChanged -= HandlePageChanged;
-                        _imageViewer.ZoomChanged -= HandleZoomChanged;
                         _imageViewer.Shortcuts[Keys.T] = null;
                     }
 
@@ -2681,10 +2502,9 @@ namespace Extract.Redaction.Verification
                     // Register for events
                     if (_imageViewer != null)
                     {
+                        _imageViewer.AutoZoomScale = _autoZoomScale;
                         _imageViewer.ImageFileChanged += HandleImageFileChanged;
                         _imageViewer.ImageFileClosing += HandleImageFileClosing;
-                        _imageViewer.PageChanged += HandlePageChanged;
-                        _imageViewer.ZoomChanged += HandleZoomChanged;
                         _imageViewer.Shortcuts[Keys.T] = SelectDropDownTypeList;
                     }
                 }
@@ -2697,34 +2517,6 @@ namespace Extract.Redaction.Verification
         }
 
         #endregion IImageViewerControl Members
-
-        #region Internal Members
-
-        /// <summary>
-        /// Gets whether the <see cref="ImageViewer"/> is zoomed to the current selection in
-        /// grid.
-        /// </summary>
-        // Temporarily unused: [FlexIDSCore: 4858, 5067]
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal bool ZoomedToSelection
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// Gets the last zoom info for the current page that is not a zoom to an item that had been
-        /// selected in the grid.
-        /// </summary>
-        // Temporarily unused: [FlexIDSCore: 4858, 5067]
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal ZoomInfo? LastNonSelectionZoomInfo
-        {
-            get;
-            private set;
-        }
-
-        #endregion Internal Members
 
         #region Private Members
 
