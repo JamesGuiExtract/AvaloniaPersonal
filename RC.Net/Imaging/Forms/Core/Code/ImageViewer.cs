@@ -3312,9 +3312,10 @@ namespace Extract.Imaging.Forms
         /// data.</param>
         void OnImageFileChanged(ImageFileChangedEventArgs e)
         {
-            if (ImageFileChanged != null)
+            var eventHandler = ImageFileChanged;
+            if (eventHandler != null)
             {
-                ImageFileChanged(this, e);
+                eventHandler(this, e);
             }
 
             // Update the anti-aliasing behavior based on registry settings
@@ -3332,9 +3333,10 @@ namespace Extract.Imaging.Forms
         /// the event data.</param>
         void OnImageFileClosing(ImageFileClosingEventArgs e)
         {
-            if (ImageFileClosing != null)
+            var eventHandler = ImageFileClosing;
+            if (eventHandler != null)
             {
-                ImageFileClosing(this, e);
+                eventHandler(this, e);
             }
         }
 
@@ -3347,9 +3349,10 @@ namespace Extract.Imaging.Forms
         {
             UpdateAutoZoomState(true);
 
-            if (ZoomChanged != null)
+            var eventHandler = ZoomChanged;
+            if (eventHandler != null)
             {
-                ZoomChanged(this, e);
+                eventHandler(this, e);
             }
         }
 
@@ -3360,9 +3363,10 @@ namespace Extract.Imaging.Forms
         /// data.</param>
         void OnOrientationChanged(OrientationChangedEventArgs e)
         {
-            if (OrientationChanged != null)
+            var eventHandler = OrientationChanged;
+            if (eventHandler != null)
             {
-                OrientationChanged(this, e);
+                eventHandler(this, e);
             }
         }
 
@@ -3373,9 +3377,10 @@ namespace Extract.Imaging.Forms
         /// data.</param>
         void OnCursorToolChanged(CursorToolChangedEventArgs e)
         {
-            if (CursorToolChanged != null)
+            var eventHandler = CursorToolChanged;
+            if (eventHandler != null)
             {
-                CursorToolChanged(this, e);
+                eventHandler(this, e);
             }
         }
 
@@ -3386,9 +3391,10 @@ namespace Extract.Imaging.Forms
         /// </param>
         void OnFitModeChanged(FitModeChangedEventArgs e)
         {
-            if (FitModeChanged != null)
+            var eventHandler = FitModeChanged;
+            if (eventHandler != null)
             {
-                FitModeChanged(this, e);
+                eventHandler(this, e);
             }
         }
 
@@ -3399,9 +3405,10 @@ namespace Extract.Imaging.Forms
         /// </param>
         void OnPageChanged(PageChangedEventArgs e)
         {
-            if (PageChanged != null)
+            var eventHandler = PageChanged;
+            if (eventHandler != null)
             {
-                PageChanged(this, e);
+                eventHandler(this, e);
             }
         }
 
@@ -3412,9 +3419,10 @@ namespace Extract.Imaging.Forms
         /// event data.</param>
         void OnOpeningImage(OpeningImageEventArgs e)
         {
-            if (OpeningImage != null)
+            var eventHandler = OpeningImage;
+            if (eventHandler != null)
             {
-                OpeningImage(this, e);
+                eventHandler(this, e);
             }
         }
 
@@ -3425,9 +3433,10 @@ namespace Extract.Imaging.Forms
         /// the event data.</param>
         void OnLoadingNewImage(LoadingNewImageEventArgs e)
         {
-            if (LoadingNewImage != null)
+            var eventHandler = LoadingNewImage;
+            if (eventHandler != null)
             {
-                LoadingNewImage(this, e);
+                eventHandler(this, e);
             }
         }
 
@@ -3438,9 +3447,10 @@ namespace Extract.Imaging.Forms
         /// event.</param>
         void OnDisplayingPrintDialog(DisplayingPrintDialogEventArgs e)
         {
-            if (DisplayingPrintDialog != null)
+            var eventHandler = DisplayingPrintDialog;
+            if (eventHandler != null)
             {
-                DisplayingPrintDialog(this, e);
+                eventHandler(this, e);
             }
         }
 
@@ -3451,9 +3461,10 @@ namespace Extract.Imaging.Forms
         /// </param>
         void OnFileOpenError(FileOpenErrorEventArgs e)
         {
-            if (FileOpenError != null)
+            var eventHandler = FileOpenError;
+            if (eventHandler != null)
             {
-                FileOpenError(this, e);
+                eventHandler(this, e);
             }
         }
 
@@ -3464,9 +3475,10 @@ namespace Extract.Imaging.Forms
         /// event.</param>
         void OnCursorEnteredLayerObject(LayerObjectEventArgs e)
         {
-            if (CursorEnteredLayerObject != null)
+            var eventHandler = CursorEnteredLayerObject;
+            if (eventHandler != null)
             {
-                CursorEnteredLayerObject(this, e);
+                eventHandler(this, e);
             }
         }
 
@@ -3477,9 +3489,10 @@ namespace Extract.Imaging.Forms
         /// event.</param>
         void OnCursorlLeftLayerObject(LayerObjectEventArgs e)
         {
-            if (CursorLeftLayerObject != null)
+            var eventHandler = CursorLeftLayerObject;
+            if (eventHandler != null)
             {
-                CursorLeftLayerObject(this, e);
+                eventHandler(this, e);
             }
         }
 
@@ -3489,9 +3502,10 @@ namespace Extract.Imaging.Forms
         /// <param name="e">The data associated with the event.</param>
         void OnImageExtracted(ImageExtractedEventArgs e)
         {
-            if (ImageExtracted != null)
+            var eventHandler = ImageExtracted;
+            if (eventHandler != null)
             {
-                ImageExtracted(this, e);
+                eventHandler(this, e);
             }
         }
 
@@ -3500,9 +3514,10 @@ namespace Extract.Imaging.Forms
         /// </summary>
         void OnAllowHighlightStatusChanged()
         {
-            if (AllowHighlightStatusChanged != null)
+            var eventHandler = AllowHighlightStatusChanged;
+            if (eventHandler != null)
             {
-                AllowHighlightStatusChanged(this, new EventArgs());
+                eventHandler(this, new EventArgs());
             }
         }
 
@@ -3513,9 +3528,10 @@ namespace Extract.Imaging.Forms
         /// instance containing the event data.</param>
         void OnExtendedNavigationCheck(ExtendedNavigationCheckEventArgs e)
         {
-            if (ExtendedNavigationCheck != null)
+            var eventHandler = ExtendedNavigationCheck;
+            if (eventHandler != null)
             {
-                ExtendedNavigationCheck(this, e);
+                eventHandler(this, e);
             }
         }
 
@@ -3526,10 +3542,11 @@ namespace Extract.Imaging.Forms
         /// instance containing the event data.</param>
         void OnExtendedNavigation(ExtendedNavigationEventArgs e)
         {
-            if (ExtendedNavigation != null)
+            var eventHandler = ExtendedNavigation;
+            if (eventHandler != null)
             {
                 foreach (EventHandler<ExtendedNavigationEventArgs> handler
-                    in ExtendedNavigation.GetInvocationList())
+                    in eventHandler.GetInvocationList())
                 {
                     handler(this, e);
                     
@@ -3551,9 +3568,10 @@ namespace Extract.Imaging.Forms
         /// containing the event data.</param>
         void OnBackgroundProcessStatusUpdate(BackgroundProcessStatusUpdateEventArgs eventArgs)
         {
-            if (BackgroundProcessStatusUpdate != null)
+            var eventHandler = BackgroundProcessStatusUpdate;
+            if (eventHandler != null)
             {
-                BackgroundProcessStatusUpdate(this, eventArgs);
+                eventHandler(this, eventArgs);
             }
         }
 
@@ -3564,9 +3582,10 @@ namespace Extract.Imaging.Forms
         /// instance containing the event data.</param>
         void OnOcrLoaded(OcrTextEventArgs eventArgs)
         {
-            if (OcrLoaded != null)
+            var eventHandler = OcrLoaded;
+            if (eventHandler != null)
             {
-                OcrLoaded(this, eventArgs);
+                eventHandler(this, eventArgs);
             }
         }
 
@@ -3577,9 +3596,10 @@ namespace Extract.Imaging.Forms
         /// instance containing the event data.</param>
         void OnOcrTextHighlighted(OcrTextEventArgs eventArgs)
         {
-            if (OcrTextHighlighted != null)
+            var eventHandler = OcrTextHighlighted;
+            if (eventHandler != null)
             {
-                OcrTextHighlighted(this, eventArgs);
+                eventHandler(this, eventArgs);
             }
         }
 

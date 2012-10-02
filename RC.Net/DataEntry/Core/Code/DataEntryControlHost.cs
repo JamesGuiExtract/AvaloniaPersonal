@@ -338,6 +338,11 @@ namespace Extract.DataEntry
             new Dictionary<IDataEntryControl, List<IAttribute>>();
 
         /// <summary>
+        /// Keeps track of the overall bounds of the current selection for each page.
+        /// </summary>
+        Dictionary<int, Rectangle> _selectionBounds = new Dictionary<int, Rectangle>();
+
+        /// <summary>
         /// Indicates if the user has temporarily hid all tooltips.
         /// </summary>
         bool _temporarilyHidingTooltips;
@@ -574,15 +579,49 @@ namespace Extract.DataEntry
         Size _lastManualZoomSize;
 
         /// <summary>
+        /// The size of the visible image region (in image coordinates) the last time the view
+        /// was zoomed to the current selection either via the F2 shortcut or the auto-zoom mode.
+        /// </summary>
+        Size _lastZoomToSelectionSize;
+
+        /// <summary>
         /// Indicates whether the image viewer is currently being zoomed automatically per AutoZoom
         /// settings or by programmatically changing pages.
         /// </summary>
         bool _performingProgrammaticZoom;
 
         /// <summary>
-        /// Keeps track of the last region specified to be zoomed to by EnforceAutoZoom
+        /// Indicates whether the view is currently zoomed to the current selection either via the
+        /// F2 shortcut or the auto-zoom mode.
         /// </summary>
-        Rectangle _lastAutoZoomSelection;
+        bool _zoomedToSelection;
+
+        /// <summary>
+        /// Indicates whether the view is currently zoomed to the current selection via the F2
+        /// shortcut.
+        /// </summary>
+        bool _manuallyZoomedToSelection;
+
+        /// <summary>
+        /// Indicates the page number on which the view was last zoomed to the selection.
+        /// </summary>
+        int _zoomToSelectionPage;
+
+        /// <summary>
+        /// Keeps track of the last region specified to be zoomed to by EnforceAutoZoom or the F2
+        /// toggle auto-zoom shortcut.
+        /// </summary>
+        Rectangle _lastViewArea;
+
+        /// <summary>
+        /// The last page area viewed without being zoomed to the current selection.
+        /// </summary>
+        Rectangle? _lastNonZoomedToSelectionViewArea;
+
+        /// <summary>
+        /// The last fit mode in affect prior to being zoomed to the current selection.
+        /// </summary>
+        FitMode? _lastNonZoomedToSelectionFitMode;
 
         /// <summary>
         /// A <see cref="ToolTip"/> used to display notifications to the user.
@@ -2060,6 +2099,65 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Toggles the view between zoomed to the current selection and set to the last view area
+        /// where zoom to selection was not in effect.
+        /// </summary>
+        public void ToggleZoomToSelection()
+        {
+            try
+            {
+                // If auto-zoom is currently in effect for the page we are currently on and there is
+                // a _lastNonZoomedToSelectionViewArea, restore the view area to
+                // _lastNonZoomedToSelectionViewArea.
+                if (_zoomedToSelection && _zoomToSelectionPage == _imageViewer.PageNumber &&
+                    _lastNonZoomedToSelectionViewArea.HasValue)
+                {
+                    _performingProgrammaticZoom = true;
+                    Rectangle viewRegion =
+                        _imageViewer.GetTransformedRectangle(
+                            _lastNonZoomedToSelectionViewArea.Value, false);
+                    _imageViewer.ZoomToRectangle(viewRegion);
+                    
+                    // If there was a fit mode in effect before the zoom to selection, restore it as well.
+                    if (_lastNonZoomedToSelectionFitMode.HasValue)
+                    {
+                        _imageViewer.FitMode = _lastNonZoomedToSelectionFitMode.Value;
+                    }
+
+                    _lastViewArea = _lastNonZoomedToSelectionViewArea.Value;
+                    _zoomedToSelection = false;
+                    _manuallyZoomedToSelection = false;
+                }
+                else
+                {
+                    // Ensure we are on the same page as the selection.
+                    if (!_selectionBounds.Keys.Contains(_imageViewer.PageNumber))
+                    {
+                        if (!_selectionBounds.Any())
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            _imageViewer.PageNumber = _selectionBounds.Keys.First();
+                        }
+                    }
+
+                    // Force an auto-zoom to the selection bounds on the current page.
+                    EnforceAutoZoomSettings(_selectionBounds[_imageViewer.PageNumber], true);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34985");
+            }
+            finally
+            {
+                _performingProgrammaticZoom = false;
+            }
+        }
+
+        /// <summary>
         /// Resets any existing highlight data and clears the attributes from all controls.
         /// </summary>
         public void ClearData()
@@ -2086,6 +2184,8 @@ namespace Extract.DataEntry
                 {
                     dataControl.ClearCachedData();
                 }
+
+                _selectionBounds.Clear();
 
                 // Dispose of all tooltips
                 List<IAttribute> tooltipAttributes = new List<IAttribute>(_attributeToolTips.Keys);
@@ -2161,6 +2261,10 @@ namespace Extract.DataEntry
                 _selectedAttributesWithDirectHints = 0;
                 _selectedAttributesWithIndirectHints = 0;
                 _selectedAttributesWithoutHighlights = 0;
+
+                _zoomedToSelection = false;
+                _manuallyZoomedToSelection = false;
+                _zoomToSelectionPage = 0;
 
                 // Raise the ItemSelectionChanged event to notify listeners that there are no
                 // longer attributes selected.
@@ -3470,14 +3574,24 @@ namespace Extract.DataEntry
             {
                 if (!_performingProgrammaticZoom)
                 {
-                    Size zoomSize = _imageViewer.GetTransformedRectangle(
-                        _imageViewer.GetVisibleImageArea(), true).Size;
+                    Rectangle viewArea = _imageViewer.GetTransformedRectangle(
+                        _imageViewer.GetVisibleImageArea(), true);
+                    Size zoomSize = viewArea.Size;
 
-                    // Before assigning _lastManualZoomSize, be sure the size > 0 in both dimensions
-                    // (will be zero if image viewer window is minimized).
-                    if (zoomSize.Width > 0 && zoomSize.Height > 0)
+                    // Before assigning _lastNonAutoZoomViewArea and _lastManualZoomSize, be sure
+                    // the size > 0 in both dimensions (will be zero if image viewer window is
+                    // minimized).
+                    if (zoomSize.Width > 0 && zoomSize.Height > 0 && !_zoomedToSelection)
                     {
                         _lastManualZoomSize = zoomSize;
+
+                        // Ensure an F2 toggle out of auto-zoom will always zoom out compared to the
+                        // last auto-zoom level.
+                        if (zoomSize.Width > _lastZoomToSelectionSize.Width)
+                        {
+                            _lastNonZoomedToSelectionViewArea = viewArea;
+                            _lastNonZoomedToSelectionFitMode = _imageViewer.FitMode;
+                        }
                     }
                 }
             }
@@ -3498,10 +3612,19 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (!_performingProgrammaticZoom)
+                if (!_performingProgrammaticZoom && !_zoomedToSelection)
                 {
-                    _lastManualZoomSize = _imageViewer.GetTransformedRectangle(
-                        _imageViewer.GetVisibleImageArea(), true).Size;
+                    Rectangle viewArea = _imageViewer.GetTransformedRectangle(
+                        _imageViewer.GetVisibleImageArea(), true);
+                    _lastManualZoomSize = viewArea.Size;
+
+                    // Ensure an F2 toggle out of auto-zoom will always zoom out compared to the
+                    // last auto-zoom level.
+                    if (viewArea.Size.Width > _lastZoomToSelectionSize.Width)
+                    {
+                        _lastNonZoomedToSelectionViewArea = viewArea;
+                        _lastNonZoomedToSelectionFitMode = _imageViewer.FitMode;
+                    }
                 }
             }
             catch (Exception ex)
@@ -3581,7 +3704,7 @@ namespace Extract.DataEntry
             {
                 // If the fit mode was changed, enforce auto-zoom on the next selection even if
                 // the next selection is the same.
-                _lastAutoZoomSelection = new Rectangle();
+                _lastViewArea = new Rectangle();
             }
             catch (Exception ex)
             {
@@ -4438,7 +4561,7 @@ namespace Extract.DataEntry
 
                 // Keep track of the unified bounds of the highlights and any associated tooltip on
                 // each page.
-                Dictionary<int, Rectangle> unifiedBounds = new Dictionary<int, Rectangle>();
+                _selectionBounds.Clear();
 
                 // Reset the selected attribute counts before iterating the attributes
                 _selectedAttributesWithAcceptedHighlights = 0;
@@ -4565,15 +4688,15 @@ namespace Extract.DataEntry
 
                             // If there is not yet an entry for this page in unifiedBounds, create a
                             // new one.
-                            if (!unifiedBounds.ContainsKey(highlight.PageNumber))
+                            if (!_selectionBounds.ContainsKey(highlight.PageNumber))
                             {
-                                unifiedBounds[highlight.PageNumber] = highlight.GetBounds();
+                                _selectionBounds[highlight.PageNumber] = highlight.GetBounds();
                             }
                             // Otherwise add to the existing entry for this page
                             else
                             {
-                                unifiedBounds[highlight.PageNumber] = Rectangle.Union(
-                                    unifiedBounds[highlight.PageNumber], highlight.GetBounds());
+                                _selectionBounds[highlight.PageNumber] = Rectangle.Union(
+                                    _selectionBounds[highlight.PageNumber], highlight.GetBounds());
                             }
 
                             // Combine the highlight bounds with the error icon bounds (if present).
@@ -4581,8 +4704,8 @@ namespace Extract.DataEntry
                                 GetErrorIconOnPage(attribute, highlight.PageNumber);
                             if (errorIcon != null)
                             {
-                                unifiedBounds[highlight.PageNumber] = Rectangle.Union(
-                                    unifiedBounds[highlight.PageNumber], errorIcon.GetBounds());
+                                _selectionBounds[highlight.PageNumber] = Rectangle.Union(
+                                    _selectionBounds[highlight.PageNumber], errorIcon.GetBounds());
                             }
                         }
                     }
@@ -4676,11 +4799,11 @@ namespace Extract.DataEntry
                     foreach (KeyValuePair<IAttribute, DataEntryToolTip> attributeTooltip in
                         _attributeToolTips)
                     {
-                        unifiedBounds[pageToShow] = Rectangle.Union(unifiedBounds[pageToShow],
+                        _selectionBounds[pageToShow] = Rectangle.Union(_selectionBounds[pageToShow],
                             attributeTooltip.Value.TextLayerObject.GetBounds());
                     }
 
-                    EnforceAutoZoomSettings(unifiedBounds[pageToShow]);
+                    EnforceAutoZoomSettings(_selectionBounds[pageToShow], false);
                 }
 
                 // Update _displayedHighlights with the new set of highlights.
@@ -4741,12 +4864,15 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="selectedImageRegion">A <see cref="Rectangle"/> describing the image region
         /// of the currently selected object (including tooltips).</param>
-        void EnforceAutoZoomSettings(Rectangle selectedImageRegion)
+        /// <param name="forceZoomToSelection"><see langword="true"/> to force a zoom to selection
+        /// regardless of the current AutoZoomMode; <see langword="false"/> to zoom according to the
+        /// current AutoZoomMode.</param>
+        void EnforceAutoZoomSettings(Rectangle selectedImageRegion, bool forceZoomToSelection)
         {
             try
             {
                 // If we are trying to enforce auto-zoom on the same selection as last time, return.
-                if (_lastAutoZoomSelection == selectedImageRegion)
+                if (!forceZoomToSelection && _lastViewArea == selectedImageRegion)
                 {
                     return;
                 }
@@ -4769,7 +4895,11 @@ namespace Extract.DataEntry
                 int xPadAmount = 3;
                 int yPadAmount = 3;
 
-                if (_dataEntryApp.AutoZoomMode == AutoZoomMode.NoZoom)
+                AutoZoomMode autoZoomMode = forceZoomToSelection
+                    ? AutoZoomMode.AutoZoom
+                    : _dataEntryApp.AutoZoomMode;
+
+                if (autoZoomMode == AutoZoomMode.NoZoom)
                 {
                     // If the selected object is already completely visible, there is nothing to do.
                     if (currentViewRegion.Contains(newViewRegion))
@@ -4794,9 +4924,11 @@ namespace Extract.DataEntry
                     newViewRegion = currentViewRegion;
                     newViewRegion.Offset(xOffset, yOffset);
                 }
-                else if (_dataEntryApp.AutoZoomMode == AutoZoomMode.ZoomOutIfNecessary)
+                else if (autoZoomMode == AutoZoomMode.ZoomOutIfNecessary)
                 {
-                    if (!_lastManualZoomSize.IsEmpty)
+                    // If the user has used F2 to zoom in, don't jump back to _lastManualZoomSize
+                    // when changing selection.
+                    if (!_manuallyZoomedToSelection && !_lastManualZoomSize.IsEmpty)
                     {
                         // Determine the amount the current view must be resized to get back to the last
                         // manual zoom level.
@@ -4829,20 +4961,22 @@ namespace Extract.DataEntry
                     {
                         // If selectedImageRegion is not completely contained in the current view,
                         // adjust the view to include the extents of the selected object.
+                        // If the user has used F2 to zoom in, don't jump back to _lastManualZoomSize
+                        // when changing selection.
                         int totalWidth = xPadAmount * 2 + selectedImageRegion.Width;
-                        if (totalWidth < _lastManualZoomSize.Width)
+                        if (!_manuallyZoomedToSelection && (totalWidth < _lastManualZoomSize.Width))
                         {
                             xPadAmount += (_lastManualZoomSize.Width - totalWidth) / 2;
                         }
 
                         int totalHeight = yPadAmount * 2 + selectedImageRegion.Width;
-                        if (totalHeight < _lastManualZoomSize.Width)
+                        if (!_manuallyZoomedToSelection && (totalHeight < _lastManualZoomSize.Width))
                         {
                             yPadAmount += (_lastManualZoomSize.Width - totalHeight) / 2;
                         }
                     }
                 }
-                else // _dataEntryApp.AutoZoomMode == AutoZoomMode.AutoZoom
+                else // autoZoomMode == AutoZoomMode.AutoZoom
                 {
                     // Determine the maximum amount of context space that can be added based on a
                     // percentage of the smaller dimension.
@@ -4850,9 +4984,9 @@ namespace Extract.DataEntry
                         _imageViewer.ImageHeight);
                     int maxPadAmount = (int)(smallerDimension * _AUTO_ZOOM_MAX_CONTEXT) / 2;
 
-                    // If using auto-zoom, translate the zoomContext percentage into a value that
-                    // grows exponentially from 0 to 1 so that the more _dataEntryApp.AutoZoomContext
-                    // approaches 1, the text pixels are being padded.
+                    // If zooming to the current selection, translate the zoomContext percentage
+                    // into a value that grows exponentially from 0 to 1 so that the more
+                    // _dataEntryApp.AutoZoomContext approaches 1, the text pixels are being padded.
                     double padFactor = Math.Pow(_dataEntryApp.AutoZoomContext, 2);
 
                     // Calculate the pad amounts as a fraction of the maxPadAmount specified determined
@@ -4863,9 +4997,19 @@ namespace Extract.DataEntry
 
                 if (newViewRegion != currentViewRegion || xPadAmount != 0 || yPadAmount != 0)
                 {
+                    // Update the zoomed-to-selection state variables.
+                    _zoomedToSelection = (autoZoomMode != AutoZoomMode.NoZoom);
+                    _manuallyZoomedToSelection = forceZoomToSelection || (_zoomedToSelection && _manuallyZoomedToSelection);
+                    if (_zoomedToSelection)
+                    {
+                        _zoomToSelectionPage = _imageViewer.PageNumber;
+                    }
+
                     // Apply the padding.
                     newViewRegion = _imageViewer.PadViewingRectangle(newViewRegion,
                             xPadAmount, yPadAmount, true);
+
+                    _lastZoomToSelectionSize = newViewRegion.Size;
 
                     // Translate the image coordinates into client coordinates.
                     newViewRegion =
@@ -4879,8 +5023,7 @@ namespace Extract.DataEntry
                     // [DataEntry:1096]
                     // Restore the previous fit mode if zoom operation cleared the fit mode
                     // (Unless AutoZoom is being used which should clear the fit mode).
-                    if (fitMode != _imageViewer.FitMode &&
-                        _dataEntryApp.AutoZoomMode != AutoZoomMode.AutoZoom)
+                    if (fitMode != _imageViewer.FitMode && autoZoomMode != AutoZoomMode.AutoZoom)
                     {
                         _imageViewer.FitMode = fitMode;
                     }
@@ -4888,9 +5031,9 @@ namespace Extract.DataEntry
                     // If zoom has to change very much to zoom on the specified rectangle, calling
                     // GetTransformedRectangle again after the first call will likely result in a
                     // slightly different rectangle. To prevent multiple calls, keep track of the last
-                    // specified selectedImageRegion, and don't re-apply auto-zoom settings after it
-                    // is applied the first time.
-                    _lastAutoZoomSelection = selectedImageRegion;
+                    // specified selectedImageRegion, and don't re-apply zoomed-to-selection settings
+                    // after it is applied the first time.
+                    _lastViewArea = selectedImageRegion;  
                 }
             }
             catch (Exception ex)
@@ -6963,7 +7106,7 @@ namespace Extract.DataEntry
                 if (pageNumber != _imageViewer.PageNumber)
                 {
                     _performingProgrammaticZoom = true;
-                    _lastAutoZoomSelection = new Rectangle();
+                    _lastViewArea = new Rectangle();
                     _imageViewer.PageNumber = pageNumber;
                 }
             }

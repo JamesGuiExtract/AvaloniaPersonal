@@ -1102,6 +1102,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     new ToolStripItem[] { _redoToolStripButton, _redoToolStripMenuItem },
                     false, true, false);
 
+                _imageViewer.Shortcuts[Keys.F2] = ToggleAutoZoom;
+
                 // Disable the OpenImageToolStripSplitButton if this is not stand alone mode
                 if (!_standAloneMode)
                 {
@@ -2624,9 +2626,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// verification of the file completed.</param>
         protected virtual void OnFileComplete(EFileProcessingResult fileProcessingResult)
         {
-            if (FileComplete != null)
+            var eventHandler = FileComplete;
+            if (eventHandler != null)
             {
-                FileComplete(this, new FileCompleteEventArgs(fileProcessingResult));
+                eventHandler(this, new FileCompleteEventArgs(fileProcessingResult));
             }
         }
 
@@ -2635,9 +2638,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         protected void OnShowAllHighlightsChanged()
         {
-            if (ShowAllHighlightsChanged != null)
+            var eventHandler = ShowAllHighlightsChanged;
+            if (eventHandler != null)
             {
-                ShowAllHighlightsChanged(this, new EventArgs());
+                eventHandler(this, new EventArgs());
             }
         }
 
@@ -3412,6 +3416,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _showAllHighlights ? CheckState.Checked : CheckState.Unchecked;
 
             OnShowAllHighlightsChanged();
+        }
+
+        /// <summary>
+        /// Toggles whether the view is auto-zoomed to the current selection.
+        /// </summary>
+        void ToggleAutoZoom()
+        {
+            if (_dataEntryControlHost != null)
+            {
+                _dataEntryControlHost.ToggleZoomToSelection();
+            }
         }
 
         /// <summary>

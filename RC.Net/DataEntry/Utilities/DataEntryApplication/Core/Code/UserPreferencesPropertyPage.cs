@@ -261,12 +261,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             _zoomContextTrackBar.Value =
                    (int)(_userPreferences.AutoZoomContext * _zoomContextTrackBar.Maximum);
 
-            bool enableContextControl = (_userPreferences.AutoZoomMode == AutoZoomMode.AutoZoom);
-            _zoomContextTrackBar.Enabled = enableContextControl;
-            _zoomContextLabel.Enabled = enableContextControl;
-            _leastContextLabel.Enabled = enableContextControl;
-            _mostContextLabel.Enabled = enableContextControl;
-
             _dirty = false;
         }
 
@@ -299,12 +293,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                // Enable/disable the auto-zoom context control as appropriate
-                _zoomContextTrackBar.Enabled = _autoZoomRadioButton.Checked;
-                _zoomContextLabel.Enabled = _autoZoomRadioButton.Checked;
-                _leastContextLabel.Enabled = _autoZoomRadioButton.Checked;
-                _mostContextLabel.Enabled = _autoZoomRadioButton.Checked;
-
                 OnPropertyPageModified();
             }
             catch (Exception ex)
