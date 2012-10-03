@@ -12,8 +12,10 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using System.Xml.XPath;
+using TD.SandDock;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_DATAENTRYCUSTOMCOMPONENTSLib;
@@ -36,6 +38,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
     public partial class DataEntryApplicationForm : Form, IVerificationForm, IDataEntryApplication
     {
         #region Constants
+
+        /// <summary>
+        /// The license string for the SandDock manager
+        /// </summary>
+        static readonly string _SANDDOCK_LICENSE_STRING = @"1970|siE7SnF/jzINQg1AOTIaCXLlouA=";
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
@@ -528,6 +535,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI23668", _OBJECT_NAME);
 
+                // License SandDock before creating the form
+                SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
+
                 // Initialize the root directory the DataEntry framework should use when resolving
                 // relative paths.
                 DataEntryMethods.SolutionRootDirectory = Path.GetDirectoryName(configFileName);
@@ -949,6 +959,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         " (" + _actionName + ")";
                 }
 
+                _magnifierToolStripButton.DockableWindow = _magnifierDockableWindow;
+
                 // Establish shortcut keys
 
                 // Open an image
@@ -1069,6 +1081,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         ? CheckState.Checked
                         : CheckState.Unchecked;
 
+                // Toggle showing magnifier pane.
+                _imageViewer.Shortcuts[Keys.F12] = (() => _magnifierToolStripButton.PerformClick());
+
                 // Hide any visible toolTips
                 _hideToolTipsCommand = new ApplicationCommand(_imageViewer.Shortcuts,
                     new Keys[] { Keys.Escape }, null,
@@ -1184,10 +1199,18 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Establish connections between the image viewer and all image viewer controls.
                 _imageViewer.EstablishConnections(this);
 
+                // Not sure how to default the magnifier window to open floating by default except
+                // to manually open it as floating, then close it prior to loading any saved layout
+                // (which will override the default situation, if present).
+                _magnifierDockableWindow.OpenFloating();
+
                 if (_registry.Settings.ShowSeparateImageWindow)
                 {
                     OpenSeparateImageWindow();
                 }
+
+                _magnifierDockableWindow.Close();
+                _sandDockManager.LoadLayout();
 
                 // Adjust UI elements to reflect the current configuration.
                 SetUIConfiguration(_activeDataEntryConfig);
@@ -1354,6 +1377,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
                 }
 
+                _sandDockManager.SaveLayout();
+
                 // Don't call base.OnFormClosing until we know know if the close is being canceled
                 // (if VerificationForm receives a FormClosing event, it expects that the form will
                 // indeed close).
@@ -1401,6 +1426,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     _imageViewerForm.Dispose();
                     _imageViewerForm = null;
+                }
+
+                if (_magnifierDockableWindow != null)
+                {
+                    _magnifierDockableWindow.Dispose();
+                    _magnifierDockableWindow = null;
                 }
 
                 if (components != null)
@@ -3472,83 +3503,95 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _imageViewerForm = new Form();
                 _imageViewerForm.Text = _brandingResources.ApplicationTitle + " Image Window";
                 _imageViewerForm.Icon = Icon;
+                _imageViewerForm.SuspendLayout();
 
-                // Create a shortcut filter to handle shortcuts when the image viewer is displayed
-                // in a separate window to prevent the shortcut keys from being passed back to the
-                // main window (thereby activating it and dropping the image window to the
-                // background).
-                _imageWindowShortcutsMessageFilter = new ShortcutsMessageFilter(
-                    ShortcutsEnabled, _imageViewer.Shortcuts, this);
-
-                if (_inputEventTrackingEnabled)
+                try
                 {
-                    _imageWindowShortcutsMessageFilter.MessageHandled +=
-                        HandleMessageFilterMessageHandled;
+                    // Create a shortcut filter to handle shortcuts when the image viewer is
+                    // displayed in a separate window to prevent the shortcut keys from being passed
+                    // back to the main window (thereby activating it and dropping the image window
+                    // to the background).
+                    _imageWindowShortcutsMessageFilter = new ShortcutsMessageFilter(
+                        ShortcutsEnabled, _imageViewer.Shortcuts, this);
+
+                    if (_inputEventTrackingEnabled)
+                    {
+                        _imageWindowShortcutsMessageFilter.MessageHandled +=
+                            HandleMessageFilterMessageHandled;
+                    }
+
+                    // Move the image viewer to the new form.
+                    _splitContainer.Panel2.MoveControls(_imageViewerForm, _imageViewer);
+
+                    // Create a new SandDockManager and DockContainer for the new form, and move the
+                    // _magnifierDockableWindow over to it.
+                    _sandDockManager = _sandDockManager.MoveSandDockToNewForm(_imageViewerForm);
+
+                    // Create a toolstrip container to hold the image viewer related toolstrips.
+                    ToolStripContainer imageViewerFormToolStripContainer = new ToolStripContainer();
+                    imageViewerFormToolStripContainer.Name = "_toolStripContainer";
+                    imageViewerFormToolStripContainer.BottomToolStripPanelVisible = false;
+                    imageViewerFormToolStripContainer.Dock = DockStyle.Top;
+                    // Initialize to a very large size to ensure the toolstrips do not get added in
+                    // in multiple rows.
+                    imageViewerFormToolStripContainer.Size = new Size(9999, 9999);
+
+                    // Move the toolstrips.
+                    _toolStripContainer.TopToolStripPanel.MoveControls(
+                        imageViewerFormToolStripContainer.TopToolStripPanel, _miscImageToolStrip,
+                        _basicCommandsImageViewerToolStrip, _pageNavigationImageViewerToolStrip,
+                        _viewCommandsImageViewerToolStrip);
+                    // Size the toolstrip container correctly.
+                    imageViewerFormToolStripContainer.TopToolStripPanel.AutoSize = true;
+                    imageViewerFormToolStripContainer.Size =
+                        imageViewerFormToolStripContainer.TopToolStripPanel.Size;
+
+                    // Add the toolstrip container to the new form and show it.
+                    _imageViewerForm.Controls.Add(imageViewerFormToolStripContainer);
+                    _imageViewerForm.Show();
+
+                    // Initialize the position using previously stored registry settings or
+                    // the previous desktop location of the image viewer.
+                    Point location = new Point(_registry.Settings.ImageWindowPositionX,
+                        _registry.Settings.ImageWindowPositionY);
+                    Rectangle workingArea = Screen.GetWorkingArea(location);
+                    if (location.X != -1 && location.Y != -1 && workingArea.Contains(location))
+                    {
+                        _imageViewerForm.DesktopLocation = location;
+                    }
+                    else
+                    {
+                        location = new Point(DesktopLocation.X + _splitContainer.SplitterDistance,
+                            DesktopLocation.Y + 10);
+                        _imageViewerForm.DesktopLocation = location;
+                    }
+
+                    // Initialize the size using previously stored registry settings or
+                    // the previous size of the image viewer.
+                    Size size = new Size(_registry.Settings.ImageWindowWidth,
+                        _registry.Settings.ImageWindowHeight);
+                    if (size.Width > 0 && size.Height > 0 && workingArea.Contains(location))
+                    {
+                        _imageViewerForm.Size = size;
+                    }
+                    else
+                    {
+                        Size clientSize = _splitContainer.Panel2.Size;
+                        clientSize.Height += imageViewerFormToolStripContainer.Height;
+                        _imageViewerForm.ClientSize = clientSize;
+                    }
+
+                    // Collapse the pane the image viewer was removed from.
+                    _splitContainer.Panel2Collapsed = true;
+
+                    if (_registry.Settings.ImageWindowMaximized)
+                    {
+                        _imageViewerForm.WindowState = FormWindowState.Maximized;
+                    }
                 }
-
-                // Move the image viewer to the new form.
-                MoveControls(_splitContainer.Panel2, _imageViewerForm, _imageViewer);
-
-                // Create a toolstrip container to hold the image viewer related toolstrips.
-                ToolStripContainer imageViewerFormToolStripContainer = new ToolStripContainer();
-                imageViewerFormToolStripContainer.Name = "_toolStripContainer";
-                imageViewerFormToolStripContainer.BottomToolStripPanelVisible = false;
-                imageViewerFormToolStripContainer.Dock = DockStyle.Top;
-                // Initialize to a very large size to ensure the toolstrips do not get added in
-                // in multiple rows.
-                imageViewerFormToolStripContainer.Size = new Size(9999, 9999);
-
-                // Move the toolstrips.
-                MoveControls(_toolStripContainer.TopToolStripPanel,
-                    imageViewerFormToolStripContainer.TopToolStripPanel, _miscImageToolStrip,
-                    _basicCommandsImageViewerToolStrip, _pageNavigationImageViewerToolStrip,
-                    _viewCommandsImageViewerToolStrip);
-                // Size the toolstrip container correctly.
-                imageViewerFormToolStripContainer.TopToolStripPanel.AutoSize = true;
-                imageViewerFormToolStripContainer.Size =
-                    imageViewerFormToolStripContainer.TopToolStripPanel.Size;
-
-                // Add the toolstrip container to the new form and show it.
-                _imageViewerForm.Controls.Add(imageViewerFormToolStripContainer);
-                _imageViewerForm.Show();
-
-                // Initialize the position using previously stored registry settings or
-                // the previous desktop location of the image viewer.
-                Point location = new Point(_registry.Settings.ImageWindowPositionX,
-                    _registry.Settings.ImageWindowPositionY);
-                Rectangle workingArea = Screen.GetWorkingArea(location);
-                if (location.X != -1 && location.Y != -1 && workingArea.Contains(location))
+                finally
                 {
-                    _imageViewerForm.DesktopLocation = location;
-                }
-                else
-                {
-                    location = new Point(DesktopLocation.X + _splitContainer.SplitterDistance,
-                        DesktopLocation.Y + 10);
-                    _imageViewerForm.DesktopLocation = location;
-                }
-
-                // Initialize the size using previously stored registry settings or
-                // the previous size of the image viewer.
-                Size size = new Size(_registry.Settings.ImageWindowWidth,
-                    _registry.Settings.ImageWindowHeight);
-                if (size.Width > 0 && size.Height > 0 && workingArea.Contains(location))
-                {
-                    _imageViewerForm.Size = size;
-                }
-                else
-                {
-                    Size clientSize = _splitContainer.Panel2.Size;
-                    clientSize.Height += imageViewerFormToolStripContainer.Height;
-                    _imageViewerForm.ClientSize = clientSize;
-                }
-
-                // Collapse the pane the image viewer was removed from.
-                _splitContainer.Panel2Collapsed = true;
-
-                if (_registry.Settings.ImageWindowMaximized)
-                {
-                    _imageViewerForm.WindowState = FormWindowState.Maximized;
+                    _imageViewerForm.ResumeLayout(true);
                 }
 
                 // Ensure the image viewer gets focus.
@@ -3590,22 +3633,33 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 imageViewerForm.Resize -= HandleImageViewerFormResize;
                 imageViewerForm.Move -= HandleImageViewerFormMove;
 
-                // Restore the pane for the image viewer, and move the image viewer back into it.
-                _splitContainer.Panel2Collapsed = false;
-                MoveControls(imageViewerForm, _splitContainer.Panel2, _imageViewer);
+                SuspendLayout();
 
-                // Move the image viewer toolstrips back into the main application window.
-                ToolStripContainer imageViewerFormToolStripContainer =
-                    (ToolStripContainer)imageViewerForm.Controls["_toolStripContainer"];
+                try
+                {
+                    // Restore the pane for the image viewer, and move the image viewer back into it.
+                    _splitContainer.Panel2Collapsed = false;
+                    imageViewerForm.MoveControls(_splitContainer.Panel2, _imageViewer);
 
-                MoveControls(imageViewerFormToolStripContainer.TopToolStripPanel,
-                    _toolStripContainer.TopToolStripPanel, _miscImageToolStrip,
-                    _basicCommandsImageViewerToolStrip, _pageNavigationImageViewerToolStrip,
-                    _viewCommandsImageViewerToolStrip);
+                    _sandDockManager = _sandDockManager.MoveSandDockToNewForm(_splitContainer.Panel2);
 
-                // Get rid of the separate image viewer form.
-                imageViewerForm.Close();
-                imageViewerForm.Dispose();
+                    // Move the image viewer toolstrips back into the main application window.
+                    ToolStripContainer imageViewerFormToolStripContainer =
+                        (ToolStripContainer)imageViewerForm.Controls["_toolStripContainer"];
+
+                    imageViewerFormToolStripContainer.TopToolStripPanel.MoveControls(
+                        _toolStripContainer.TopToolStripPanel, _miscImageToolStrip,
+                        _basicCommandsImageViewerToolStrip, _pageNavigationImageViewerToolStrip,
+                        _viewCommandsImageViewerToolStrip);
+
+                    // Get rid of the separate image viewer form.
+                    imageViewerForm.Close();
+                    imageViewerForm.Dispose();
+                }
+                finally
+                {
+                    ResumeLayout(true);
+                }
             }
         }
 
@@ -3619,48 +3673,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             return true;
         }
         
-        /// <summary>
-        /// Moves the specified child controls from specified source to the specified destination.
-        /// Controls will be added in a single row from left to right.
-        /// </summary>
-        /// <param name="sourceControl">The <see cref="Control"/> that currently contains the
-        /// controls to be moved.</param>
-        /// <param name="destinationControl">The <see cref="Control"/> that is to contain the
-        /// controls to be moved.</param>
-        /// <param name="controlsToMove">The <see cref="Control"/>s that are to be moved.</param>
-        static void MoveControls(Control sourceControl, Control destinationControl,
-            params Control[] controlsToMove)
-        {
-            // Keep track of the position to try to add the next control.
-            Point locationToAdd = new Point(0, 0);
-
-            // If the destination already has child controls use the right side of the last control
-            // as the initial location to add.
-            foreach (Control control in destinationControl.Controls)
-            {
-                Point location = control.Location;
-                location.Offset(control.Width, 0);
-
-                if ((location.Y > locationToAdd.Y) ||
-                    (location.Y == locationToAdd.Y && location.X > locationToAdd.X))
-                {
-                    locationToAdd = location;
-                }
-            }
-
-            // Add each control, updating the location to add as we go.
-            foreach (Control control in controlsToMove)
-            {
-                sourceControl.Controls.Remove(control);
-
-                control.Location = locationToAdd;
-                destinationControl.Controls.Add(control);
-
-                locationToAdd = control.Location;
-                locationToAdd.Offset(control.Width, 0);
-            }
-        }
-
         /// <summary>
         /// Attempts to open a database connection for use by the DEP for validation and
         /// auto-updates if connection information is specfied in the config settings.

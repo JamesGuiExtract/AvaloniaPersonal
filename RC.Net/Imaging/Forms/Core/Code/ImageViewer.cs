@@ -3272,12 +3272,13 @@ namespace Extract.Imaging.Forms
                     clip.Intersect(e.Graphics.Clip);
 
                     // Draw each layerObject in order of the layer object collection's z-order.
-                    foreach (LayerObject layerObject in _layerObjects.InZOrder)
+                    foreach (LayerObject layerObject in _layerObjects.InZOrder
+                        .Where(layerObject => 
+                            layerObject.Visible &&
+                            layerObject.PageNumber == _pageNumber &&
+                            (!_paintingToGraphics || layerObject.ShowInMagnifier)))
                     {
-                        if (layerObject.Visible && layerObject.PageNumber == _pageNumber)
-                        {
-                            layerObject.Paint(e.Graphics, clip);
-                        }
+                        layerObject.Paint(e.Graphics, clip);
                     }
                 }
 

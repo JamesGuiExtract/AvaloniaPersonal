@@ -148,6 +148,11 @@ namespace Extract.Imaging.Forms
         bool _render = true;
 
         /// <summary>
+        /// Indicates whether the layer object should appear in a <see cref="MagnifierControl"/>.
+        /// </summary>
+        bool _showInMagnifier = true;
+
+        /// <summary>
         /// The pen used for drawing the selection border around selected layer objects.
         /// </summary>
         static Pen _selectionPen;
@@ -588,6 +593,25 @@ namespace Extract.Imaging.Forms
             set
             {
                 _render = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the layer object should appear in a
+        /// <see cref="MagnifierControl"/>.
+        /// </summary>
+        /// <value><see langword="true"/> if the layer object should appear in a
+        /// <see cref="MagnifierControl"/>; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool ShowInMagnifier
+        {
+            get
+            {
+                return _showInMagnifier;
+            }
+            set
+            {
+                _showInMagnifier = value;
             }
         }
 

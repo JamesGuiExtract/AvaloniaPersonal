@@ -46,6 +46,7 @@ namespace Extract.Imaging.Forms
         protected ImageLayerObject()
         {
             // Needed for serialization
+            ShowInMagnifier = false;
         }
 
         /// <summary>
@@ -74,6 +75,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
+                ShowInMagnifier = false;
                 _image = image;
                 _size = size;
                 _orientation = orientation;

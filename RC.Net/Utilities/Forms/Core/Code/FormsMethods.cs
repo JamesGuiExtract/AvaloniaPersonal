@@ -2,7 +2,9 @@ using Extract.Licensing;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
+using TD.SandDock;
 
 namespace Extract.Utilities.Forms
 {
@@ -603,6 +605,134 @@ namespace Extract.Utilities.Forms
             }
         }
 
+        /// <summary>
+        /// Moves the specified child controls from specified source to the specified destination.
+        /// Controls will be added in a single row from left to right.
+        /// </summary>
+        /// <param name="sourceControl">The <see cref="Control"/> that currently contains the
+        /// controls to be moved.</param>
+        /// <param name="destinationControl">The <see cref="Control"/> that is to contain the
+        /// controls to be moved.</param>
+        /// <param name="controlsToMove">The <see cref="Control"/>s that are to be moved.</param>
+        public static void MoveControls(Control sourceControl, Control destinationControl,
+            params Control[] controlsToMove)
+        {
+            try
+            {
+                // Keep track of the position to try to add the next control.
+                Point locationToAdd = new Point(0, 0);
+
+                // If the destination already has child controls use the right side of the last control
+                // as the initial location to add.
+                foreach (Control control in destinationControl.Controls)
+                {
+                    Point location = control.Location;
+                    location.Offset(control.Width, 0);
+
+                    if ((location.Y > locationToAdd.Y) ||
+                        (location.Y == locationToAdd.Y && location.X > locationToAdd.X))
+                    {
+                        locationToAdd = location;
+                    }
+                }
+
+                // Add each control, updating the location to add as we go.
+                foreach (Control control in controlsToMove)
+                {
+                    sourceControl.Controls.Remove(control);
+
+                    control.Location = locationToAdd;
+                    destinationControl.Controls.Add(control);
+
+                    locationToAdd = control.Location;
+                    locationToAdd.Offset(control.Width, 0);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34986");
+            }
+        }
+
+        /// <summary>
+        /// Moves the specified <see paramref="sandDockManager"/> and all of its
+        /// <see cref="DockContainer"/>s and <see cref="DockControl"/>s to the specified 
+        /// <see paramref="destinationControl"/> in a new form.
+        /// <para><b>Note</b></para>
+        /// This method will dispose of the supplied <see paramref="sandDockManager"/> and its
+        /// <see cref="DockControl"/>(s) in the process.
+        /// This method does not support moving individual dock containers to separate destination
+        /// controls.
+        /// </summary>
+        /// <param name="sandDockManager">The <see cref="SandDockManager"/> to move.</param>
+        /// <param name="destinationControl">The destination <see cref="Control"/> into which the
+        /// <see cref="DockContainer"/>(s) should be added.</param>
+        /// <returns>The new <see cref="SandDockManager"/>. The original
+        /// <see paramref="sandDockManager"/> will have been disposed of and should no longer be
+        /// used.</returns>
+        public static SandDockManager MoveSandDockToNewForm(SandDockManager sandDockManager,
+            Control destinationControl)
+        {
+            try
+            {
+                // Retrieve the current layout so it can be restored once all dockable windows have
+                // been moved to the new form.
+                string layout = sandDockManager.GetLayout();
+
+                // The only way I can get controls to show up in the new form is if I re-create a
+                // new SandDockManager and DockContainers in the new form. If the dock controls are
+                // moved into an existing SandDockManager and DockContainers, for whatever reason
+                // they don't show up.
+                SandDockManager newSandDockManager = new SandDockManager();
+                newSandDockManager.OwnerForm = (Form)destinationControl.TopLevelControl;
+
+                var controlsToMove = sandDockManager.GetDockControls();
+
+                // sandDockManager.GetDockContainers() will not return containers for which there
+                // are no open windows. Therefore, open all windows prior to iterating the dock
+                // containers. newSandDockManager.SetLayout() will restore the proper control state.
+                foreach (DockControl control in controlsToMove.Where(control => !control.IsOpen))
+                {
+                    control.Open();
+                }
+
+                // Iterate each dock container to re-create a copy for the new form. Call order
+                // seems to be very important in this loop:
+                // 1) Create the new container
+                // 2) Move the controls into it.
+                // 3) Set the new layout system and manager.
+                // 4) Add the new dock container into destinationControl.
+                foreach (DockContainer dockContainer in sandDockManager.GetDockContainers())
+                {
+                    Control oldParentContainer = dockContainer.Parent;
+                    DockContainer newDockContainer = new DockContainer();
+                    DockControl[] dockControls = controlsToMove
+                        .Where(control => control.Parent == dockContainer)
+                        .ToArray();
+
+                    MoveControls(dockContainer, newDockContainer, dockControls);
+
+                    newDockContainer.LayoutSystem = dockContainer.LayoutSystem;
+                    newDockContainer.Manager = newSandDockManager;
+                    destinationControl.Controls.Add(newDockContainer);
+
+                    oldParentContainer.Controls.Remove(dockContainer);
+                    dockContainer.Dispose();
+                }
+
+                // Restore the same layout that existed in the last form.
+                newSandDockManager.SetLayout(layout);
+
+                sandDockManager.Dispose();
+
+                return newSandDockManager;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34987");
+            }
+        }
+
         #endregion Methods
     }
 
@@ -622,6 +752,43 @@ namespace Extract.Utilities.Forms
         public static void SafeBeginInvoke(this Control control, string eliCode, Action action)
         {
             FormsMethods.BeginInvoke(control, eliCode, action);
+        }
+
+        /// <summary>
+        /// Moves the specified child controls from specified source to the specified destination.
+        /// Controls will be added in a single row from left to right.
+        /// </summary>
+        /// <param name="sourceControl">The <see cref="Control"/> that currently contains the
+        /// controls to be moved.</param>
+        /// <param name="destinationControl">The <see cref="Control"/> that is to contain the
+        /// controls to be moved.</param>
+        /// <param name="controlsToMove">The <see cref="Control"/>s that are to be moved.</param>
+        public static void MoveControls(this Control sourceControl, Control destinationControl,
+            params Control[] controlsToMove)
+        {
+            FormsMethods.MoveControls(sourceControl, destinationControl, controlsToMove);
+        }
+
+        /// <summary>
+        /// Moves the specified <see paramref="sandDockManager"/> and all of its
+        /// <see cref="DockContainer"/>s and <see cref="DockControl"/>s to the specified 
+        /// <see paramref="destinationControl"/> in a new form.
+        /// <para><b>Note</b></para>
+        /// This method will dispose of the supplied <see paramref="sandDockManager"/> and its
+        /// <see cref="DockControl"/>(s) in the process.
+        /// This method does not support moving individual dock containers to separate destination
+        /// controls.
+        /// </summary>
+        /// <param name="sandDockManager">The <see cref="SandDockManager"/> to move.</param>
+        /// <param name="destinationControl">The destination <see cref="Control"/> into which the
+        /// <see cref="DockContainer"/>(s) should be added.</param>
+        /// <returns>The new <see cref="SandDockManager"/>. The original
+        /// <see paramref="sandDockManager"/> will have been disposed of and should no longer be
+        /// used.</returns>
+        public static SandDockManager MoveSandDockToNewForm(this SandDockManager sandDockManager,
+            Control destinationControl)
+        {
+            return FormsMethods.MoveSandDockToNewForm(sandDockManager, destinationControl);
         }
     }
 

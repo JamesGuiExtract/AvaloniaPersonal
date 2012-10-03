@@ -73,6 +73,7 @@ namespace Extract.Imaging.Forms
         protected TextLayerObject()
         {
             // Needed for serialization
+            ShowInMagnifier = false;
         }
 
         /// <summary>
@@ -136,6 +137,8 @@ namespace Extract.Imaging.Forms
         {
             try
             {
+                ShowInMagnifier = false;
+
                 _text = text;
                 SetFont(font);
 
