@@ -588,11 +588,19 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="distinctResult">The <see cref="QueryResult"/> to use as the distinct value
         /// for the current execution scope.</param>
-        internal virtual void PushDistinctResult(QueryResult distinctResult)
+        /// <returns><see langword="true"/> if the query result was modified as a result; otherwise,
+        /// <see langword="false"/>.</returns>
+        internal virtual bool PushDistinctResult(QueryResult distinctResult)
         {
             try
             {
+                bool valueChanged = (_distinctResults.Count == 0)
+                    ? (distinctResult != null)
+                    : (distinctResult != _distinctResults.Peek());
+
                 _distinctResults.Push(distinctResult);
+
+                return valueChanged;
             }
             catch (Exception ex)
             {
@@ -604,11 +612,19 @@ namespace Extract.DataEntry
         /// Pops the distinct <see cref="QueryResult"/> that had been active for the evaluation
         /// scope that is ending.
         /// </summary>
-        internal virtual void PopDistinctResult()
+        /// <returns><see langword="true"/> if the query result was modified as a result; otherwise,
+        /// <see langword="false"/>.</returns>
+        internal virtual bool PopDistinctResult()
         {
             try
             {
-                _distinctResults.Pop();
+                QueryResult distinctResult = _distinctResults.Pop();
+
+                bool valueChanged = (_distinctResults.Count == 0)
+                    ? (distinctResult != null)
+                    : (distinctResult != _distinctResults.Peek());
+
+                return valueChanged;
             }
             catch (Exception ex)
             {

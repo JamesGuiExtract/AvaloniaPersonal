@@ -331,8 +331,13 @@ namespace Extract.DataEntry
                 {
                     ValidationQuery? validationFailure = null;
 
+                    // [DataEntry:1131]
+                    // Make a copy of this collection before iterating since it is possible for
+                    // _validationQueries to be updated with new results while iterating.
+                    var validationQueries = new List<ValidationQuery>(_validationQueries.Values);
+
                     // Evaluate each validation query looking for one that does not return valid.
-                    foreach (ValidationQuery validationQuery in _validationQueries.Values)
+                    foreach (ValidationQuery validationQuery in validationQueries)
                     {
                         if (!Validate(ref value, validationQuery))
                         {

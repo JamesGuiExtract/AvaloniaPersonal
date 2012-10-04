@@ -306,13 +306,21 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="distinctResult">The <see cref="QueryResult"/> to use as the distinct value
         /// for the current execution scope.</param>
-        internal override void PushDistinctResult(QueryResult distinctResult)
+        /// <returns><see langword="true"/> if the query result was modified as a result; otherwise,
+        /// <see langword="false"/>.</returns>
+        internal override bool PushDistinctResult(QueryResult distinctResult)
         {
             try
             {
-                base.PushDistinctResult(distinctResult);
-
-                OnQueryValueModified(new QueryValueModifiedEventArgs(false));
+                if (base.PushDistinctResult(distinctResult))
+                {
+                    OnQueryValueModified(new QueryValueModifiedEventArgs(false));
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             catch (Exception ex)
             {
@@ -324,13 +332,21 @@ namespace Extract.DataEntry
         /// Pops the distinct <see cref="QueryResult"/> that had been active for the evaluation
         /// scope that is ending.
         /// </summary>
-        internal override void PopDistinctResult()
+        /// <returns><see langword="true"/> if the query result was modified as a result; otherwise,
+        /// <see langword="false"/>.</returns>
+        internal override bool PopDistinctResult()
         {
             try
             {
-                base.PopDistinctResult();
-
-                OnQueryValueModified(new QueryValueModifiedEventArgs(false));
+                if (base.PopDistinctResult())
+                {
+                    OnQueryValueModified(new QueryValueModifiedEventArgs(false));
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             catch (Exception ex)
             {

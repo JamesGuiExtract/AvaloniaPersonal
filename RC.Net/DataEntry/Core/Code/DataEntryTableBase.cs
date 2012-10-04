@@ -1756,15 +1756,28 @@ namespace Extract.DataEntry
                         DataGridViewCell cell = tableElement as DataGridViewCell;
                         if (cell != null)
                         {
-                            cell.Value = attribute.Value.String;
-
-                            // If the cell is in edit mode, the value needs to be applied to the edit
-                            // control as well.
-                            if (cell.IsInEditMode)
+                            // Don't refresh the value if the value hasn't actually changed. Doing so is not
+                            // only in-efficient but it can cause un-intended side effects if an
+                            // auto-complete list is active.
+                            if (cell.Value.ToString() != attribute.Value.String)
                             {
-                                cell.DataGridView.RefreshEdit();
+                                cell.Value = attribute.Value.String;
+
+                                // If the cell is in edit mode, the value needs to be applied to the edit
+                                // control as well.
+                                if (cell.IsInEditMode)
+                                {
+                                    cell.DataGridView.RefreshEdit();
+                                }
+                            }
+                            else
+                            {
+                                // While the value hasn't changed, it could now be invalid due to a
+                                // change in another field that affects a validation query for this one.
+                                ValidateCell((IDataEntryTableCell)cell, false);
                             }
 
+                            // Consider the attribute refreshed even if the text value didn't change.
                             refreshedAttribute = true;
                         }
                     }
@@ -2425,14 +2438,12 @@ namespace Extract.DataEntry
             {
                 // Only IDataEntryTableCells need to be monitored for edits.
                 IDataEntryTableCell dataEntryCell = base.CurrentCell as IDataEntryTableCell;
-                if (dataEntryCell != null && dataEntryCell.Attribute != null)
+                if (dataEntryCell != null && dataEntryCell.Attribute != null &&
+                    base.CurrentCell.Value.ToString() != _editingControl.Text)
                 {
                     // Since DataGridViewCells are not normally modified in real-time as text is
                     // changed, apply changes from the editing control to the cell here.
-                    if (base.CurrentCell.Value.ToString() != _editingControl.Text)
-                    {
-                        base.CurrentCell.Value = _editingControl.Text;
-                    }
+                    base.CurrentCell.Value = _editingControl.Text;
                 }
             }
             catch (Exception ex)

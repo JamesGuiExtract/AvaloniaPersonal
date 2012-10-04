@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Security.Permissions;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -1264,38 +1265,35 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (_attribute == null)
+                if (_attribute != null && attributes.Contains(_attribute))
                 {
-                    return;
-                }
-
-                foreach (IAttribute attribute in attributes)
-                {
-                    if (_attribute == attribute)
+                    // Don't update the value if the value hasn't actually changed. Doing so is not
+                    // only in-efficient but it can cause un-intended side effects if an
+                    // auto-complete list is active.
+                    string newValue = (_attribute.Value != null) ? _attribute.Value.String : "";
+                    if (newValue != Text || spatialInfoUpdated)
                     {
                         Text = (_attribute.Value != null) ? _attribute.Value.String : "";
+                    }
 
-                        // In case the value itself didn't change but the validation list did, explicitly
-                        // check validation here.
-                        UpdateValidation();
+                    // In case the value itself didn't change but the validation list did,
+                    // explicitly check validation here.
+                    UpdateValidation();
 
-                        // Raise the AttributesSelected event to re-notify the host of the spatial
-                        // information associated with the attribute in case the spatial info has
-                        // changed.
-                        OnAttributesSelected();
+                    // Raise the AttributesSelected event to re-notify the host of the spatial
+                    // information associated with the attribute in case the spatial info has
+                    // changed.
+                    OnAttributesSelected();
 
-                        // Update the font according to the viewed status. Perform the font change
-                        // asynchronously othersize the it results in memory corruption related to
-                        // auto-complete lists (probably related to the window handle recreation it
-                        // triggers). Compare against _fontStyle instead of the current font since
-                        // a font change could be pending in the message queue.
-                        bool hasBeenViewed = AttributeStatusInfo.HasBeenViewed(_attribute, false);
-                        if ((_fontStyle == FontStyle.Bold) == hasBeenViewed)
-                        {
-                            SetFontStyle(hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
-                        }
-
-                        return;
+                    // Update the font according to the viewed status. Perform the font change
+                    // asynchronously othersize the it results in memory corruption related to
+                    // auto-complete lists (probably related to the window handle recreation it
+                    // triggers). Compare against _fontStyle instead of the current font since
+                    // a font change could be pending in the message queue.
+                    bool hasBeenViewed = AttributeStatusInfo.HasBeenViewed(_attribute, false);
+                    if ((_fontStyle == FontStyle.Bold) == hasBeenViewed)
+                    {
+                        SetFontStyle(hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
                     }
                 }
             }
