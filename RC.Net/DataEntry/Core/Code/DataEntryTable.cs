@@ -1652,8 +1652,14 @@ namespace Extract.DataEntry
                 else if (SelectedCells.Count == 1 && CurrentCell != null)
                 {
                     // Cell selection
-                    return _cellSwipingEnabled && 
-                        Columns[CurrentCell.ColumnIndex] is DataEntryTableColumn;
+                    if (_cellSwipingEnabled)
+                    {
+                        var column = Columns[CurrentCell.ColumnIndex] as DataEntryTableColumn;
+                        if (column != null && column.SupportsSwiping)
+                        {
+                            return true;
+                        }
+                    }
                 }
 
                 return false;

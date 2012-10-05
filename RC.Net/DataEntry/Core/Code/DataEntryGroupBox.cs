@@ -379,8 +379,8 @@ namespace Extract.DataEntry
             {
                 if (value)
                 {
-                    throw new ExtractException("ELI26033", 
-                        "DataEntryGroup box does not support swiping!");
+                    throw new ExtractException("ELI26033",
+                        "DataEntryGroupBox does not support swiping!");
                 }
             }
         }
@@ -404,8 +404,29 @@ namespace Extract.DataEntry
                 if (value)
                 {
                     throw new ExtractException("ELI29012",
-                        "DataEntryGroup box does not support pasting!");
+                        "DataEntryGroupBox does not support pasting!");
                 }
+            }
+        }
+
+        /// <summary>
+        /// <see cref="DataEntryCopyButton"/> does not support selection; the value of this property
+        /// will always be <see langword="false"/>.
+        /// </summary>
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool HighlightSelectionInChildControls
+        {
+            get
+            {
+                return false;
+            }
+            
+            set
+            {
+                throw new ExtractException("ELI34991",
+                    "DataEntryGroupBox does not support selection!");
             }
         }
 
@@ -428,7 +449,7 @@ namespace Extract.DataEntry
                 if (value)
                 {
                     throw new ExtractException("ELI26654",
-                        "DataEntryGroup box does not support being disabled!");
+                        "DataEntryGroupBox does not support being disabled!");
                 }
             }
         }

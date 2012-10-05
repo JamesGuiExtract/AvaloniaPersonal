@@ -502,6 +502,11 @@ namespace Extract.DataEntry
                         RootAttribute = null;
                     }
                 }
+
+                // [DataEntry:1146]
+                // Call Evaluate to resolve all existing attributes referenced by this node and
+                // register it to be assigned any added attributes matching the reference path.
+                Evaluate();
             }
             catch (Exception ex)
             {

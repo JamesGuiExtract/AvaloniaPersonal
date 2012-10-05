@@ -629,13 +629,17 @@ namespace Extract.DataEntry
                 else if (base.SelectedCells.Count > 0)
                 {
                     // Cell selection
-                    return _cellSwipingEnabled;
+                    if (_cellSwipingEnabled)
+                    {
+                        var row = Rows[CurrentCell.RowIndex] as DataEntryTableRow;
+                        if (row != null && row.SupportsSwiping)
+                        {
+                            return true;
+                        }
+                    }
                 }
-                else
-                {
-                    // No selection
-                    return false;
-                }
+
+                return false;
             }
 
             set 

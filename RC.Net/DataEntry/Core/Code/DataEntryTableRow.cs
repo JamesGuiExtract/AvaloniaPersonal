@@ -105,6 +105,12 @@ namespace Extract.DataEntry
         bool _smartHintsEnabled;
 
         /// <summary>
+        /// Specifies whether if the cells in the row will accept as input the
+        /// <see cref="SpatialString"/> associated with an image swipe.
+        /// </summary>
+        bool _supportsSwiping = true;
+
+        /// <summary>
         /// Specifies whether the current instance is running in design mode
         /// </summary>
         bool _inDesignMode;
@@ -654,6 +660,29 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Specifies whether if the cells in the row will accept as input the
+        /// <see cref="SpatialString"/> associated with an image swipe.
+        /// </summary>
+        /// <value><see langword="true"/> if the cells in the row will accept as input the
+        /// <see cref="SpatialString"/> associated with an image swipe; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        [Category("Data Entry Table Row")]
+        [DefaultValue(true)]
+        public bool SupportsSwiping
+        {
+            get
+            {
+                return _supportsSwiping;
+            }
+
+            set
+            {
+                _supportsSwiping = value;
+            }
+        }
+
         #endregion Properties
 
         #region Overrides
@@ -684,6 +713,7 @@ namespace Extract.DataEntry
                 row.ValidationIsCaseSensitive = this.ValidationIsCaseSensitive;
                 row.RemoveNewLineChars = this.RemoveNewLineChars;
                 row.SmartHintsEnabled = this.SmartHintsEnabled;
+                row.SupportsSwiping = this.SupportsSwiping;
 
                 return row;
             }

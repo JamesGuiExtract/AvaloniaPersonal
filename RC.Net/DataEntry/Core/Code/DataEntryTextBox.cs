@@ -79,6 +79,12 @@ namespace Extract.DataEntry
         bool _clearClipboardOnPaste;
 
         /// <summary>
+        /// Specifies whether descendant attributes in other controls should be highlighted when
+        /// this attribute is selected.
+        /// </summary>
+        bool _highlightSelectionInChildControls;
+
+        /// <summary>
         /// The attribute mapped to this control.
         /// </summary>
         IAttribute _attribute;
@@ -1046,6 +1052,27 @@ namespace Extract.DataEntry
             set
             {
                 _clearClipboardOnPaste = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether descendant attributes in other controls should be highlighted when
+        /// this attribute is selected.
+        /// </summary>
+        /// <value><see langword="true"/> if descendant attributes in other controls should be
+        /// highlighted when this attribute is selected; <see langword="false"/> otherwise.</value>
+        [Category("Data Entry Control")]
+        [DefaultValue(false)]
+        public bool HighlightSelectionInChildControls
+        {
+            get
+            {
+                return _highlightSelectionInChildControls;
+            }
+
+            set
+            {
+                _highlightSelectionInChildControls = value;
             }
         }
 

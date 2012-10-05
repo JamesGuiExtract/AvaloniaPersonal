@@ -692,7 +692,7 @@ namespace Extract.DataEntry
                 if (value)
                 {
                     throw new ExtractException("ELI26973",
-                        "DataEntryCopyButton box does not support swiping!");
+                        "DataEntryCopyButton does not support swiping!");
                 }
             }
         }
@@ -714,7 +714,28 @@ namespace Extract.DataEntry
             set
             {
                 throw new ExtractException("ELI29011",
-                    "DataEntryCopyButton box does not support pasting!");
+                    "DataEntryCopyButton does not support pasting!");
+            }
+        }
+
+        /// <summary>
+        /// <see cref="DataEntryCopyButton"/> does not support selection; the value of this property
+        /// will always be <see langword="false"/>.
+        /// </summary>
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool HighlightSelectionInChildControls
+        {
+            get
+            {
+                return false;
+            }
+
+            set
+            {
+                throw new ExtractException("ELI34990",
+                    "DataEntryCopyButton does not support selection!");
             }
         }
 

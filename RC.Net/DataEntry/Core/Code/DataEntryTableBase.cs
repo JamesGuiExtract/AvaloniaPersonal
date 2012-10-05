@@ -78,6 +78,11 @@ namespace Extract.DataEntry
         bool _clearClipboardOnPaste;
 
         /// <summary>
+        /// Specifies whether descendant attributes in other controls should be highlighted.
+        /// </summary>
+        bool _highlightSelectionInChildControls = true;
+
+        /// <summary>
         /// Specifies whether the table will attempt to generate a hint by indicating the other
         /// attributes sharing the same row.
         /// </summary>
@@ -1547,6 +1552,26 @@ namespace Extract.DataEntry
             set
             {
                 _clearClipboardOnPaste = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether descendant attributes in other controls should be highlighted.
+        /// </summary>
+        /// <value><see langword="true"/> if descendant attributes should be highlighted when this
+        /// table is selected; <see langword="false"/> otherwise.</value>
+        [Category("Data Entry Control")]
+        [DefaultValue(true)]
+        public bool HighlightSelectionInChildControls
+        {
+            get
+            {
+                return _highlightSelectionInChildControls;
+            }
+
+            set
+            {
+                _highlightSelectionInChildControls = value;
             }
         }
 

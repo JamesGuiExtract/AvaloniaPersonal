@@ -4584,7 +4584,9 @@ namespace Extract.DataEntry
                         _activeDataControl, out activeToolTipAttributes);
 
                     // Loop through all active attributes to retrieve their highlights.
-                    foreach (IAttribute attribute in selectionState.Attributes)
+                    foreach (IAttribute attribute in selectionState.Attributes
+                        .Where(attribute => selectionState.DataControl.HighlightSelectionInChildControls ||
+                            AttributeStatusInfo.GetOwningControl(attribute) == selectionState.DataControl))
                     {
                         // Find any highlight CompositeHighlightLayerObject that has been created for
                         // this data entry control.

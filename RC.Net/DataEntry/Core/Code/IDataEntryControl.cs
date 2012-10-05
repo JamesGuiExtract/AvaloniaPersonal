@@ -131,6 +131,17 @@ namespace Extract.DataEntry
             set;
         }
 
+        /// <summary>
+        /// Gets or sets whether descendant attributes in other controls should be highlighted.
+        /// </summary>
+        /// <value><see langword="true"/> if descendant attributes in other controls;
+        /// <see langword="false"/> otherwise.</value>
+        bool HighlightSelectionInChildControls
+        {
+            get;
+            set;
+        }
+
         #endregion Properties
 
         #region Methods
