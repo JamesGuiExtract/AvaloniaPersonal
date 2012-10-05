@@ -95,6 +95,11 @@ string GetOSKey()
 			{
 				strKeyString = "W7";
 			}
+			// Minor version of 2 is Windows 7
+			else if (osvi.dwMinorVersion == 2)
+			{
+				strKeyString = "W8";
+			}
 		}
 	}
 	// Check for Windows Server 2003 versions - not interested in Windows Home Server
@@ -122,6 +127,10 @@ string GetOSKey()
 		else if (osvi.dwMinorVersion == 1)
 		{
 			strKeyString = "W08R2";
+		}
+		else if (osvi.dwMinorVersion == 2)
+		{
+			strKeyString = "WS12";
 		}
 	}
 	return strKeyString;
