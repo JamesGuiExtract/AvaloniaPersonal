@@ -1635,9 +1635,6 @@ namespace Extract.SQLCDBEditor
             // to be applied back to the database.
             _commandBuilder = new SqlCeCommandBuilder();
             _commandBuilder.DataAdapter = _adapter;
-            _adapter.InsertCommand = _commandBuilder.GetInsertCommand();
-            _adapter.DeleteCommand = _commandBuilder.GetDeleteCommand();
-            _adapter.UpdateCommand = _commandBuilder.GetUpdateCommand();            
         }
 
         /// <summary>
@@ -2003,6 +2000,15 @@ namespace Extract.SQLCDBEditor
                 using (DataTable tableCopy = row.Table.Copy())
                 using (SqlCeTransaction transaction = _connection.BeginTransaction(IsolationLevel.Serializable))
                 {
+                    if (_adapter.InsertCommand == null)
+                    {
+                        _adapter.InsertCommand = _commandBuilder.GetInsertCommand();
+                    }
+                    if (_adapter.UpdateCommand == null)
+                    {
+                        _adapter.UpdateCommand = _commandBuilder.GetUpdateCommand();
+                    }
+
                     _adapter.InsertCommand.Transaction = transaction;
                     _adapter.UpdateCommand.Transaction = transaction;
 
