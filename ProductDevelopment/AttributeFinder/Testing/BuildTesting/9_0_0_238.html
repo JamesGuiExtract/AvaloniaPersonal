@@ -1,0 +1,255 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0.0.238 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0.0.238 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DataEntry #427]</b> Performance degradation due to auto-update and 
+		validation queries
+        	<ul>
+            		<li>Use <b>Testing DEP</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #731]</b> Swipe of multiple attributes triggers DataEntryApplication
+		session corruption
+        	<ul>
+            		<li>Process an <b>Advanced Health</b> document.
+			<li>Swipe text that results in multiple attributes for the same field.
+			<li>Confirm that further processing does not result in <b>COM object 
+			that has been separated from its underlying RCW cannot be used</b> 
+			exceptions.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #875]</b> Saving Document Removes Fit-to-Width Setting
+        	<ul>
+            		<li>Open a document with auto-zoom set to zoom out if necessary.
+            		<li>Click the <b>Fit-to-width</b> button.
+            		<li>Save the document.
+            		<li>Confirm that the <b>fit-to-width</b> setting is retained for the 
+			next document.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1085]</b> StringList Attribute
+        	<ul>
+            		<li>NUnit test case ?
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1086]</b> Distinct Selection Mode
+        	<ul>
+            		<li>NUnit test case ?
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1107]</b> Declared Nodes Get Evaluated Multiple Times
+        	<ul>
+            		<li>TBD
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1116, #1117]</b> RCW Exceptions With Undo / Redo
+        	<ul>
+            		<li>Exercise <b>Undo</b> and <b>Redo</b>.
+            		<li>Confirm that no exceptions are seen.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1120]</b> Confirm that <b>pre-fetch</b> has been 
+		implemented for DataEntry verification.
+<p>
+  	   	<LI><b>[DataEntry #1122]</b> Health Network Labs Auto-Update Queries
+        	<ul>
+            		<li>Exercise <b>Health Network Labs</b> rules and images.
+            		<li>Select the Last Name cell for a new Physician, press <b>SPACE</b> 
+			and <b>down arrow</b> to display a list and select a last name.
+            		<li>Confirm that the rest of the Physician information is added to 
+			the cells in the row.
+            		<li>Select a Physician and remove the Physician Code.
+            		<li>Confirm that this is invalid.
+            		<li>Select the Order Code cell for a new order, press <b>SPACE</b> 
+			and <b>down arrow</b> to display a list and select an order code.
+            		<li>Confirm that the rest of the Order information is added to 
+			the cells in the row.
+            		<li>Select a test that has a Value and a Ref Range such that the Value 
+			is within the accepted range.
+            		<li>Modify the Value and confirm that a Flag value is automatically set.
+            		<li>Modify the Ref Range such that the Value is back within range.
+            		<li>Confirm that the Flag reflects this change.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1124]</b> Distinct Node Reference Not Working
+        	<ul>
+            		<li>TBD
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1128]</b> Null Reference Exception For Second Start
+        	<ul>
+            		<li>Start an FPS file with DataEntry verification.
+            		<li>Stop verification.
+            		<li>Re-start verification without closing the FAM.
+            		<li>Confirm that verification re-starts without error.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1134]</b> Collection Modified Exception For UITC DEP
+        	<ul>
+            		<li>Exercise the rasterized image at 
+			<b>I:\Common\Testing\PVCS_Testing\DataEntry\1134</b>.
+			<li>Confirm that an <b>ELI24463 - Collection was modified</b> exception 
+			is not seen.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #830]</b> SQLCDBEditor - Internal Logic Error
+        	<ul>
+            		<li>Open an <b>OrderMapping</b> database.
+            		<li>Select a table.
+            		<li>Click the <b>Copy to new query</b> button.
+            		<li>Save the new query.
+            		<li>Delete a row from tghe displayed results.
+            		<li>Confirm that a row is not deleted.
+            		<li>Confirm that an <b>ELI34630 - Internal logic error</b> exception 
+			is not displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #837]</b> SQLCDBEditor - Concurrency Error
+        	<ul>
+            		<li>Open the <b>AlternateTestName</b> table.
+            		<li>Click in the <b>TestCode</b> column of the new row and enter 
+			a code.
+            		<li>Bring another application into focus.  Position the application 
+			such that the <b>Name</b> cell of the new row is visible.
+            		<li>Click directly on the <b>Name</b> cell to bring the editor 
+			back into focus.
+            		<li>Click again on the cell to enter edit mode.
+            		<li>Type a name that is not already present for the code.
+            		<li>Tab back to the code cell.
+            		<li>Confirm that the row is <b>not</b> marked invalid with a 
+			concurrency violation.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #838, #839]</b> SQLCDBEditor - Add Support For Plugins
+        	<ul>
+            		<li>Confirm that <b>.plugin</b> files will be displayed when stored 
+			beside a database file.
+            		<li>Confirm that available plugins are listed in a SandDock pane 
+			similar to tables and queries.
+            		<li>Confirm that the plugin pane is displayed only if plugins are 
+			available for the database.
+            		<li>Confirm that candidate AKAs can be reviewed and added to the 
+			<b>AlternateTestName</b> table.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5091]</b> Modify Spatial Mode
+        	<ul>
+            		<li>Confirm that this rule object is a <b>value modifier</b>.
+            		<li>Confirm that this rule object is a <b>document preprocessor</b>.
+            		<li>Confirm that this rule object is an <b>output handler</b>.
+            		<li>Confirm proper behavior of the rule object user interface.
+			<li>Exercise one or more suitable <b>Memory Leak</b> tests.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5142]</b> Additional Support For Text Functions
+        	<ul>
+            		<li>Confirm that the following objects support expansion of text functions.
+			<ul>
+				<li><b>Core: Extract image area</b> task
+				<li><b>Document type condition</b>
+				<li><b>File timestamp condition</b>
+				<li><b>VOA file contents condition</b>
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6044]</b> Cleanup Image And UAC
+        	<ul>
+            		<li>Install SQL Server and ID Shield on a machine with UAC enabled.
+			<li>Log in as a user without administrator privileges.
+			<li>Insert the <b>Image Cleanup</b> key in a USB port.
+			<li>Confirm that <b>CleanupImage.exe</b> can be run from the command line.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6155, #6219]</b> Thread Scalability Test
+        	<ul>
+            		<li>Exercise a thread scalability test.
+            		<li>Review the exception log and confirm that no <b>ELI17697</b> exceptions 
+			were seen with underlying <b>ELI25395</b> exceptions.
+			<li>Confirm that no OCR license errors were logged.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Miscellaneous</h3>
+   	<ul>
+  	   	<LI><b>[FlexIDSCore #5157]</b> Core: Execute rules task
+	    	<ul>
+            		<li>Confirm that the property page includes a <b>Rule input</b> group box.
+	      		<li>Confirm that the group box includes a <b>Make the results of the 
+			following data file available to the rules</b> check box.
+	      		<li>Confirm that the group box includes an associated edit box.
+	      		<li>Confirm that the edit box is enabled only if the checkbox is checked.
+	      		<li>Confirm that the default string in the edit box is 
+			<b>&lt;SourceDocName&gt;.voa</b>.
+	      		<li>Confirm that the group box includes a tag selector button next to the 
+			edit box.
+	      		<li>Confirm that the tag selector button is enabled only if the checkbox 
+			is checked.
+	      		<li>Confirm that the tag selector button drops down the expected set of 
+			functions.
+	      		<li>Confirm that the group box contains a browse button next to the tag 
+			selector button.
+	      		<li>Confirm that the browse button is enabled only if the checkbox is checked.
+	      		<li>Confirm that the browse button works correctly.
+       		</ul>
+  	   	<LI><b>[FlexIDSCore #5159]</b> Input Finder Value Finder
+	    	<ul>
+            		<li>Confirm that the rule object <b>does not</b> have a property page.
+       		</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
