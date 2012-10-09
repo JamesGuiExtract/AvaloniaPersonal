@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Linq;
 using System.Security.Permissions;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
@@ -3472,6 +3473,11 @@ namespace Extract.DataEntry
                                 pastedData = true;
                             }
                         }
+
+                        if (pastedData)
+                        {
+                            CurrentCell = SelectedCells.OfType<DataGridViewCell>().Last();
+                        }
                     }
 
                     if (!pastedData)
@@ -3525,6 +3531,8 @@ namespace Extract.DataEntry
                                 cell.Value = Clipboard.GetText();
                             }
                         }
+
+                        CurrentCell = SelectedCells.OfType<DataGridViewCell>().Last();
 
                         return true;
                     }

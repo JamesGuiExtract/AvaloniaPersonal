@@ -1141,6 +1141,7 @@ namespace Extract.DataEntry
                 }
 
                 IDataEntryTableCell dataEntryCell = base.CurrentCell as IDataEntryTableCell;
+                DataGridViewTextBoxEditingControl textEditingControl = null;
 
                 if (e.Control != null && dataEntryCell != null)
                 {
@@ -1161,9 +1162,7 @@ namespace Extract.DataEntry
                     // changes to the value.
                     else if (dataEntryCell.Attribute != null)
                     {
-                        DataGridViewTextBoxEditingControl textEditingControl =
-                            (DataGridViewTextBoxEditingControl)_editingControl;
-
+                        textEditingControl = (DataGridViewTextBoxEditingControl)_editingControl;
                         textEditingControl.TextChanged += HandleCellTextChanged;
                         IDataEntryValidator validator =
                             AttributeStatusInfo.GetStatusInfo(dataEntryCell.Attribute).Validator;
@@ -1198,6 +1197,19 @@ namespace Extract.DataEntry
                             textEditingControl.AutoCompleteCustomSource = autoCompleteList;
                         }
                     }
+                }
+                
+                // [DataEntry:1109]
+                // If textEditingControl has not been set it means the field is not in a
+                // DataEntryTableRow or DataEntryTableColumn or it is in the new row of a table.
+                // In either case, at this time an auto-complete list should not be displayed.
+                // Displaying it now while in the new row can cause behavioral issues in the
+                // auto-complete box when it is re-displayed once the new row is initialized
+                // via DataEntryTable.BeginEdit.
+                if (textEditingControl == null)
+                {
+                    textEditingControl = (DataGridViewTextBoxEditingControl)_editingControl;
+                    textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
                 }
             }
             catch (Exception ex)
@@ -1787,13 +1799,6 @@ namespace Extract.DataEntry
                             if (cell.Value.ToString() != attribute.Value.String)
                             {
                                 cell.Value = attribute.Value.String;
-
-                                // If the cell is in edit mode, the value needs to be applied to the edit
-                                // control as well.
-                                if (cell.IsInEditMode)
-                                {
-                                    cell.DataGridView.RefreshEdit();
-                                }
                             }
                             else
                             {
@@ -1802,6 +1807,13 @@ namespace Extract.DataEntry
                                 ValidateCell((IDataEntryTableCell)cell, false);
                             }
 
+                            // If the cell is in edit mode, the value needs to be applied to the edit
+                            // control as well.
+                            if (cell.IsInEditMode && _editingControl.Text != attribute.Value.String)
+                            {
+                                cell.DataGridView.RefreshEdit();
+                            }
+                            
                             // Consider the attribute refreshed even if the text value didn't change.
                             refreshedAttribute = true;
                         }
