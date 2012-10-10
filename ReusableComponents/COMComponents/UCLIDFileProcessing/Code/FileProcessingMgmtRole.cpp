@@ -143,7 +143,9 @@ CFileProcessingMgmtRole::CFileProcessingMgmtRole()
   m_ipRoleNotifyFAM(NULL),
   m_threadDataSemaphore(2,2),
   m_bProcessing(false),
-  m_bProcessingSingleFile(false)
+  m_bProcessingSingleFile(false),
+  m_ipProcessingSingleFileRecord(__nullptr),
+  m_upProcessingSingleFileTask(__nullptr)
 {
 	try
 	{
@@ -1284,8 +1286,12 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 				"Cannot process single file when processing is already in progress.");
 		}
 
-		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(pFileRecord);
-		ASSERT_ARGUMENT("ELI29536", ipFileRecord != __nullptr);
+		// Ensure m_bProcessingSingleFile will be reset to false.
+		ValueRestorer<volatile bool> restorer(m_bProcessingSingleFile, false);
+		m_bProcessingSingleFile = true;
+
+		m_ipProcessingSingleFileRecord = pFileRecord;
+		ASSERT_ARGUMENT("ELI29536", m_ipProcessingSingleFileRecord != __nullptr);
 
 		m_pDB = pFPDB;
 		ASSERT_ARGUMENT("ELI29552", m_pDB != __nullptr);
@@ -1293,19 +1299,14 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 		m_pFAMTagManager = pFAMTagManager;
 		ASSERT_ARGUMENT("ELI29553", m_pFAMTagManager != __nullptr);
 
-		// Ensure m_bProcessingSingleFile will be reset to false.
-		ValueRestorer<volatile bool> restorer(m_bProcessingSingleFile, false);
-
-		m_bProcessingSingleFile = true;
-
 		// Get the action id
-		long lActionID = ipFileRecord->ActionID;
+		long lActionID = m_ipProcessingSingleFileRecord->ActionID;
 
 		// Get the current action status-- allow an attempt to auto-revert locked files if the file
 		// is in the processing state.
 		string strActionName = getFPMDB()->GetActionName(lActionID);
-		UCLID_FILEPROCESSINGLib::EActionStatus easCurrent =
-			getFPMDB()->GetFileStatus(ipFileRecord->FileID, strActionName.c_str(), VARIANT_TRUE);
+		UCLID_FILEPROCESSINGLib::EActionStatus easCurrent = getFPMDB()->GetFileStatus(
+			m_ipProcessingSingleFileRecord->FileID, strActionName.c_str(), VARIANT_TRUE);
 
 		// If file is not in the correct state to process (depending on the skipped file
 		// setting), throw an exception.
@@ -1319,7 +1320,7 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 		}
 
 		// Set action ID to the record manager
-		m_pRecordMgr->setActionID(ipFileRecord->ActionID);
+		m_pRecordMgr->setActionID(m_ipProcessingSingleFileRecord->ActionID);
 
 		// Clear the record manager to ensure no files except the one specified will be processed.
 		m_pRecordMgr->clear(false);
@@ -1335,36 +1336,29 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 		ProcessingThreadData threadData;
 		threadData.m_pFPMgmtRole = this;
 
-		// Initialize the task executor
-		UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipExecutor = 
-			threadData.m_ipTaskExecutor;
-		ASSERT_RESOURCE_ALLOCATION("ELI29555", ipExecutor != __nullptr);
-		ipExecutor->Init(m_ipFileProcessingTasks, m_pRecordMgr->getActionID(), getFPMDB(),
-			getFAMTagManager());
+		m_upProcessingSingleFileTask.reset(new FileProcessingRecord(m_ipProcessingSingleFileRecord));
+		ASSERT_RESOURCE_ALLOCATION("ELI34999", m_upProcessingSingleFileTask.get())
 
-		// Create a FileProcessingRecord for the file and add it to the record manager's queue.
-		getFPMDB()->SetFileStatusToProcessing(ipFileRecord->FileID, ipFileRecord->ActionID);
-		FileProcessingRecord task(ipFileRecord);
+		unsigned long ulStackSize = getProcessingThreadStackSize();
+		threadData.m_pThread = AfxBeginThread(processSingleFileThread, &threadData, 0, ulStackSize);
+		ASSERT_RESOURCE_ALLOCATION("ELI35000", threadData.m_pThread != __nullptr);
 
-		// Though the record manager is in a sense unnecessary when processing a single file,
-		// because of the close way it is tied to processing, exceptions will be raised if the file
-		// does not follow the same code-path through push and pop prior to processing.
-		m_pRecordMgr->push(task);
-		m_pRecordMgr->pop(task, false);
+		// wait for the thread to end
+		threadData.m_threadEndedEvent.wait();
 
-		// Process the file
-		processTask(task, &threadData);
+		// Retrieve any exception thrown and caught in the thread.
+		string strException = m_upProcessingSingleFileTask->m_strException;
 
-		ipExecutor->Close();
-
+		m_upProcessingSingleFileTask.reset(__nullptr);
+		m_ipProcessingSingleFileRecord = __nullptr;
 		m_bProcessingSingleFile = false;
 
 		// Exceptions that occured while processing a file in processTask will not be thrown out.
 		// Throw the exception here if necessary.
-		if (!task.m_strException.empty())
+		if (!strException.empty())
 		{
 			UCLIDException ue;
-			ue.createFromString("ELI29557", task.m_strException);
+			ue.createFromString("ELI29557", strException);
 			throw ue;
 		}
 	}
@@ -2445,13 +2439,16 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 			
 			if (!bDontStartThreads)
 			{
+				unsigned long ulStackSize = getProcessingThreadStackSize();
+
 				// begin the threads to process files in parallel
 				for (int i = 0; i < nNumThreads; i++)
 				{
 					ProcessingThreadData* pThreadData = m_vecProcessingThreadData[i];
 
 					// begin the thread
-					pThreadData->m_pThread = AfxBeginThread(fileProcessingThreadProc, pThreadData);
+					pThreadData->m_pThread =
+						AfxBeginThread(fileProcessingThreadProc, pThreadData, 0, ulStackSize);
 					ASSERT_RESOURCE_ALLOCATION("ELI11075", pThreadData->m_pThread != __nullptr);
 
 					// wait for the thread to start
@@ -2564,3 +2561,84 @@ unsigned long CFileProcessingMgmtRole::timeTillNextProcessingChange( ERunningSta
 	return dwTimeTilNextChange;
 }
 //-------------------------------------------------------------------------------------------------
+UINT CFileProcessingMgmtRole::processSingleFileThread(void *pData)
+{
+	try
+	{
+		CoInitializeEx(NULL, COINIT_MULTITHREADED);
+		
+		// Initialize thread data, mgmnt role and file record from pData.
+		ProcessingThreadData *pThreadData = static_cast<ProcessingThreadData *>(pData);
+		ASSERT_ARGUMENT("ELI34993", pThreadData != __nullptr);
+
+		CFileProcessingMgmtRole *pMgmtRole = pThreadData->m_pFPMgmtRole;
+		ASSERT_RESOURCE_ALLOCATION("ELI34994", pMgmtRole != __nullptr);
+
+		ASSERT_RESOURCE_ALLOCATION("ELI34995", pMgmtRole->m_upProcessingSingleFileTask.get() != __nullptr);
+		FileProcessingRecord &task(*(pMgmtRole->m_upProcessingSingleFileTask.get()));
+
+		try
+		{
+			try
+			{
+				UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipExecutor = 
+					pThreadData->m_ipTaskExecutor;
+				ASSERT_RESOURCE_ALLOCATION("ELI34996", ipExecutor != __nullptr);
+
+				pThreadData->m_ipTaskExecutor->Init(pMgmtRole->m_ipFileProcessingTasks,
+					pMgmtRole->m_pRecordMgr->getActionID(),
+					pMgmtRole->getFPMDB(), pMgmtRole->getFAMTagManager());
+
+				// Create a FileProcessingRecord for the file and add it to the record manager's queue.
+				pMgmtRole->getFPMDB()->SetFileStatusToProcessing(
+					pMgmtRole->m_ipProcessingSingleFileRecord->FileID,
+					pMgmtRole->m_ipProcessingSingleFileRecord->ActionID);
+
+				// Though the record manager is in a sense unnecessary when processing a single file,
+				// because of the close way it is tied to processing, exceptions will be raised if the file
+				// does not follow the same code-path through push and pop prior to processing.
+				pMgmtRole->m_pRecordMgr->push(task);
+				pMgmtRole->m_pRecordMgr->pop(task, false);
+
+				// Process the file
+				pMgmtRole->processTask(task, pThreadData);
+
+				ipExecutor->Close();
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34997")
+		}
+		catch (UCLIDException &ue)
+		{
+			// Use the task's exception member to pass out any exception to the calling thread.
+			task.m_strException = ue.asStringizedByteStream();
+		}
+
+		// notify interested parties that the thread has ended
+		pThreadData->m_threadEndedEvent.signal();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI34998");
+
+	CoUninitialize();
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+unsigned long CFileProcessingMgmtRole::getProcessingThreadStackSize()
+{
+	unsigned long ulMinStackSize = 1048576;
+	int nTaskCount = m_ipFileProcessingTasks->Size();
+	for (int i = 0; i < nTaskCount ; i++)
+	{
+		// Get the current object as ObjectWithDescription
+		IObjectWithDescriptionPtr ipOWD = m_ipFileProcessingTasks->At(i);
+		ASSERT_RESOURCE_ALLOCATION("ELI35031", ipOWD != __nullptr);
+
+		UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipFileProcessor(ipOWD->Object);
+		ASSERT_RESOURCE_ALLOCATION("ELI35032", ipOWD != __nullptr);
+
+		// Check the object for requires admin access
+		ulMinStackSize = max(ulMinStackSize, ipFileProcessor->MinStackSize);
+	}
+
+	return ulMinStackSize;
+}

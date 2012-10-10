@@ -208,6 +208,20 @@ namespace NetDMSCustomComponents
         #region IFileProcessingTask Members
 
         /// <summary>
+        /// Gets the minimum stack size needed for the thread in which this task is to be run.
+        /// </summary>
+        /// <value>
+        /// The the minimum stack size needed for the thread in which this task is to be run.
+        /// </value>
+        public uint MinStackSize
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
+        /// <summary>
         /// Stops processing the current file.
         /// </summary>
         public void Cancel()

@@ -419,6 +419,57 @@ STDMETHODIMP CConditionalTask::raw_Standby(VARIANT_BOOL* pVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33901");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CConditionalTask::get_MinStackSize(unsigned long *pnMinStackSize)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI35007", pnMinStackSize != __nullptr);
+
+		validateLicense();
+
+		unsigned long ulMinStackSize;
+
+		// Check the MinStackSize parameter for all "true" and "false" tasks so that the returned
+		// value is the maximum of any task that may be called by this condition.
+		if (m_ipTasksForTrue != __nullptr)
+		{
+			int nTaskCount = m_ipTasksForTrue->Size();
+			for (int i = 0; i < nTaskCount ; i++)
+			{
+				IObjectWithDescriptionPtr ipOWD = m_ipTasksForTrue->At(i);
+				ASSERT_RESOURCE_ALLOCATION("ELI35033", ipOWD != __nullptr);
+
+				UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipFileProcessor(ipOWD->Object);
+				ASSERT_RESOURCE_ALLOCATION("ELI35034", ipOWD != __nullptr);
+
+				ulMinStackSize = max(ulMinStackSize, ipFileProcessor->MinStackSize);
+			}
+		}
+
+		if (m_ipTasksForFalse != __nullptr)
+		{
+			int nTaskCount = m_ipTasksForFalse->Size();
+			for (int i = 0; i < nTaskCount ; i++)
+			{
+				IObjectWithDescriptionPtr ipOWD = m_ipTasksForFalse->At(i);
+				ASSERT_RESOURCE_ALLOCATION("ELI35035", ipOWD != __nullptr);
+
+				UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipFileProcessor(ipOWD->Object);
+				ASSERT_RESOURCE_ALLOCATION("ELI35036", ipOWD != __nullptr);
+
+				ulMinStackSize = max(ulMinStackSize, ipFileProcessor->MinStackSize);
+			}
+		}
+
+		*pnMinStackSize = ulMinStackSize;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35008");
+}
 	
 //-------------------------------------------------------------------------------------------------
 // IAccessRequired interface implementation

@@ -1,6 +1,7 @@
 // FileProcessingMgmtRole.h : Declaration of the CFileProcessingMgmtRole
 
 #pragma once
+#include "stdafx.h"
 #include "FPRecordManager.h"
 #include "resource.h"
 
@@ -187,6 +188,9 @@ private:
 	// this function will return.
 	static UINT processManager(void* pData);
 
+	// Thread procedure which handles the Init, ProcessFile and Close of a single file.
+	static UINT processSingleFileThread(void *pData);
+
 	/////////////
 	// Variables
 	/////////////
@@ -196,6 +200,12 @@ private:
 
 	// A flag to indicate a single file is currently being processed via ProcessSingleFile
 	volatile bool m_bProcessingSingleFile;
+
+	// The IFileRecord for the currently processing file via ProcessSingleFile (if any).
+	UCLID_FILEPROCESSINGLib::IFileRecordPtr m_ipProcessingSingleFileRecord;
+
+	// The FileProcessingRecord for the currently processing file via ProcessSingleFile (if any).
+	unique_ptr<FileProcessingRecord> m_upProcessingSingleFileTask;
 
 	// Event used to signal that processing should be resumed after a pause
 	Win32Event m_eventResume;
@@ -394,6 +404,10 @@ private:
 	//			to wait for that change
 	unsigned long timeTillNextProcessingChange(ERunningState &eNextRunningState);
 
+	// Gets the stack size for any processing thread based on the MinStackSize value for all
+	// FileProcessingTasks to be run.
+	unsigned long getProcessingThreadStackSize();
+	
 	void validateLicense();
 };
 //-------------------------------------------------------------------------------------------------

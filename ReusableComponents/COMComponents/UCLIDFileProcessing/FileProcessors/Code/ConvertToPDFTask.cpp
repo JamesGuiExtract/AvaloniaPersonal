@@ -363,6 +363,23 @@ STDMETHODIMP CConvertToPDFTask::raw_Standby(VARIANT_BOOL* pVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33903");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CConvertToPDFTask::get_MinStackSize(unsigned long *pnMinStackSize)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI35009", pnMinStackSize != __nullptr);
+
+		validateLicense();
+
+		*pnMinStackSize = 0;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35010");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IAccessRequired interface implementation

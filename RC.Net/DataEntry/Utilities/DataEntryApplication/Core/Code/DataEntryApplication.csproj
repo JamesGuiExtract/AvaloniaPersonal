@@ -431,6 +431,8 @@
   -->
   <PropertyGroup>
     <PostBuildEvent>CALL CommonDebugPostBuild.bat "$(TargetPath)"
+CALL "$(DevEnvDir)..\..\VC\bin\vcvars32.bat"
+CALL "$(DevEnvDir)..\..\VC\bin\EDITBIN.EXE" /STACK:4194304 "$(TargetPath)"
 </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

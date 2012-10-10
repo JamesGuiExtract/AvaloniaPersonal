@@ -407,6 +407,26 @@ STDMETHODIMP CAFEngineFileProcessor::raw_Standby(VARIANT_BOOL* pVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33893");
 }
 
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFEngineFileProcessor::get_MinStackSize(unsigned long *pnMinStackSize)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI35029", pnMinStackSize != __nullptr);
+
+		validateLicense();
+
+		// [FlexIDSCore:3088]
+		// Use a larger stack size for any processing thread that will be running rules.
+		*pnMinStackSize = 4194304;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35030");
+}
+
 //-------------------------------------------------------------------------------------------------
 // IAccessRequired interface implementation
 //-------------------------------------------------------------------------------------------------

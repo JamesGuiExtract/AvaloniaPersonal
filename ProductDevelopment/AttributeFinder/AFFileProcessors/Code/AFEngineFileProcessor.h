@@ -95,6 +95,7 @@ END_CATEGORY_MAP()
 	STDMETHOD(raw_Cancel)();
 	STDMETHOD(raw_Close)();
 	STDMETHOD(raw_Standby)(VARIANT_BOOL* pVal);
+	STDMETHOD(get_MinStackSize)(unsigned long *pnMinStackSize);
 
 // IAccessRequired
 	STDMETHOD(raw_RequiresAdminAccess)(VARIANT_BOOL* pbResult);

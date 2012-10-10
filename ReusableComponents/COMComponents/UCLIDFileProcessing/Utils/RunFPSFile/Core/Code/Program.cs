@@ -3,8 +3,11 @@ using Extract.Utilities;
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
+using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.RunFPSFile
@@ -104,23 +107,59 @@ namespace Extract.FileActionManager.RunFPSFile
 
                 if (_ignoreDb)
                 {
+                    // [FlexIDSCore:3088]
+                    // Set the stack size of the processing thread to be 1 MB or the maximum of the
+                    // processing task's MinStackSize properties.
+                    int stackSize = (int)
+                        fileProcessingManager.FileProcessingMgmtRole.FileProcessors
+                        .ToIEnumerable<IObjectWithDescription>()
+                        .Select(objectWithDescription => objectWithDescription.Object)
+                        .OfType<IFileProcessingTask>()
+                        .Select(fileProcessingTask => fileProcessingTask.MinStackSize)
+                        .Max();
+                    stackSize = Math.Max(stackSize, 1048576);
+
                     // If no database interaction is required, the processingManager does not need
                     // to manage the processing. Execute the processingManager tasks directly.
+                    ExtractException processingException = null;
+                    Thread processingThread = new Thread(new ThreadStart(() =>
+                        {
+                            try
+                            {
+                                // Create a new copy of FileProcessingManagerClass on the processing
+                                // thead to do the processing;
+                                var fileProcessingManager2 = new FileProcessingManagerClass();
+                                fileProcessingManager2.LoadFrom(_fpsFileName, false);
 
-                    FAMTagManagerClass tagManager = new FAMTagManagerClass();
-                    tagManager.FPSFileDir = Path.GetDirectoryName(_fpsFileName);
+                                FAMTagManagerClass tagManager = new FAMTagManagerClass();
+                                tagManager.FPSFileDir = Path.GetDirectoryName(_fpsFileName);
 
-                    // Setup file record for call to InitProcessClose
-					FileRecordClass fileRecord = new FileRecordClass();
-                    fileRecord.Name = _sourceDocName;
-					fileRecord.FileID = 0;
+                                // Setup file record for call to InitProcessClose
+                                FileRecordClass fileRecord = new FileRecordClass();
+                                fileRecord.Name = _sourceDocName;
+                                fileRecord.FileID = 0;
 
-                    // Use a local task executor to directly execute the file processing tasks.
-                    FileProcessingTaskExecutorClass taskExecutor =
-                        new FileProcessingTaskExecutorClass();
-					taskExecutor.InitProcessClose(fileRecord,
-                        fileProcessingManager.FileProcessingMgmtRole.FileProcessors, 0, null,
-                        tagManager, null, false);
+                                // Use a local task executor to directly execute the file processing
+                                // tasks.
+                                FileProcessingTaskExecutorClass taskExecutor =
+                                    new FileProcessingTaskExecutorClass();
+                                taskExecutor.InitProcessClose(fileRecord,
+                                    fileProcessingManager2.FileProcessingMgmtRole.FileProcessors, 0,
+                                    null, tagManager, null, false);
+                            }
+                            catch (Exception ex)
+                            {
+                                processingException = ex.AsExtract("ELI35037");
+                            }
+                        }), stackSize);
+                    
+                    processingThread.Start();
+                    processingThread.Join();
+
+                    if (processingException != null)
+                    {
+                        throw processingException;
+                    }
                 }
                 else
                 {

@@ -374,6 +374,23 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #region IFileProcessingTask Members
 
         /// <summary>
+        /// Gets the minimum stack size needed for the thread in which this task is to be run.
+        /// </summary>
+        /// <value>
+        /// The the minimum stack size needed for the thread in which this task is to be run.
+        /// </value>
+        public uint MinStackSize
+        {
+            get
+            {
+                // [FlexIDSCore:3088]
+                // Use a larger stack size for any processing thread that will be running rules...
+                // swiping rules in this case.
+                return 4194304;
+            }
+        }
+
+        /// <summary>
         /// Initializes the <see cref="DataEntryApplicationForm"/> to receive documents for
         /// processing.
         /// </summary>

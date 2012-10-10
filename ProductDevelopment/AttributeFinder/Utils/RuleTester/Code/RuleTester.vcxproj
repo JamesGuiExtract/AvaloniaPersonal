@@ -91,6 +91,7 @@
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
+      <StackReserveSize>4194304</StackReserveSize>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>..\..\..\..\..\ReusableComponents\BaseUtils\Code\manifest.xml;%(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -139,6 +140,7 @@
       <ProgramDatabaseFile>.\..\Debug/RuleTester.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
+      <StackReserveSize>4194304</StackReserveSize>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>..\..\..\..\..\ReusableComponents\BaseUtils\Code\manifest.xml;%(AdditionalManifestFiles)</AdditionalManifestFiles>

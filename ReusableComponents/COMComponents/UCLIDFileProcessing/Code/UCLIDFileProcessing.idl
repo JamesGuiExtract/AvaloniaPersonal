@@ -320,6 +320,12 @@ library UCLID_FILEPROCESSINGLib
 		//				value of Standby will be ignored; however, Standby should promptly return
 		//				in this case to avoid needlessly keeping a thread alive.
 		[id(15), helpstring("method Standby")] HRESULT Standby([out, retval] VARIANT_BOOL* pVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		Specifies the minimum stack size needed for the thread in which this task
+		//				is to be run. The stack size for each processing thread will be the max
+		//				value of the Windows default stack size (1048576 or 1MB) and all the individual
+		//				MinStackSize values of the processing tasks.
+		[propget, id(16), helpstring("property MinStackSize")] HRESULT MinStackSize([out, retval] unsigned long* pnMinStackSize);
 	};
 
 	[
