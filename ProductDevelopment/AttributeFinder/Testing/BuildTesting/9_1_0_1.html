@@ -1,0 +1,272 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.1.0.1 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.1.0.1 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DataEntry #266]</b> Standard LabDE Terminology
+        	<ul>
+			<li>Exercise <b>Demo_LabDE</b>.
+            		<li>Confirm that <b>Test</b> items are collected into <b>Order</b> 
+			items.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #495]</b> Disable Swiping Into Code Fields
+        	<ul>
+            		<li>Confirm that swiping into specific columns of a table can be disabled.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #621]</b> Unhandled Exception When Pasting
+        	<ul>
+			<li>Exercise <b>Demo_LabDE</b> rules on <b>003.tif</b>.
+			<li>Verify <b>003.tif</b>.
+			<li>Click in <b>Test Name</b> field in starred row.
+			<li>Repeatedly click <b>Ctrl+V</b> to paste any text and <b>Enter</b>.
+            		<li>Confirm that no <b>Unhandled exception</b> is seen.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1080]</b> Word Swiping Tool Not Disabled When SupportsSwiping 
+		Is False
+        	<ul>
+            		<li>Navigate to a field for which the angular and rectangular swiping tools 
+			are enabled.
+            		<li>Select the <b>Word</b> swiping tool.
+            		<li>Navigate to a field for which the angular and rectangular swiping tools 
+			are disabled.
+			<li>Confirm that the <b>Word</b> swiping tool is also disabled.
+            		<li>Confirm that the <b>Word</b> swiping tool also cannot be used.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1109]</b> Auto-Complete Behavior In New Row Of Tables
+        	<ul>
+            		<li>Exercise the following in each type of cell for which auto-complete 
+			is available
+	        	<ul>
+        	    		<li>Type a single character in the cell
+        	    		<li>Confirm that the appropriate auto-complete list is displayed.
+        	    		<li>Confirm that clicking the <b>down</b> arrow selects each 
+				successive option.
+        	    		<li>Confirm that clicking <b>Tab</b> populates the selected option.
+        		</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1130]</b> Parameter To Turn Off Highlighting Of Sub-Attributes
+        	<ul>
+            		<li>Exercise <b>UITC</b> rules and images.
+            		<li>TBD
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1131, #1144]</b> Collection Modified Exception
+        	<ul>
+            		<li>Exercise <b>UITC</b> rules and images.
+            		<li>Modify an <b>Order Name</b>.
+			<li>Confirm that an <b>ELI24463 - Collection was modified</b> exception 
+			is not seen.
+			<li>Exercise <b>Demo_FLEXIndex</b> and modify a zip code.
+			<li>Confirm that an <b>ELI24463 - Collection was modified</b> exception 
+			is not seen.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1132]</b> Attributes That Do Not Exist Cannot Be Referenced 
+		Relative To Root
+        	<ul>
+            		<li>Confirm that an attribute query element can reference an attribute path 
+			relative to the root and pipck up attributes added on that path after the 
+			query element is loaded.
+			<li><b>Examples:</b>
+			<ul>
+				<li>/LabIdentifier
+				<li>/LabInfo/LabIdentifier
+				<li>../LabIdentifier (referenced from /LabName)
+				<li>../../LabInfo/LabIdentifier (referenced from /LabInfo/LabName)
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1133]</b> Caching Causes Incorrect Expression Evaluation
+        	<ul>
+            		<li>Exercise <b>UITC</b> rules and images.
+            		<li>Swipe a value such as <b>1212</b> into a time field.
+            		<li>Confirm that the text is translated into a valid time such as 
+			<b>12:12</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1137]</b> Queries Result In SpatialString Downgrade Errors
+        	<ul>
+            		<li>Exercise the rasterized image at 
+			<b>I:\Common\Testing\PVCS_Testing\DataEntry\1137</b>.
+			<li>Change the <b>A</b> flag in the <b>Lymphocytes Nfr Bld Auto</b> 
+			test to Blank.
+			<li>Confirm that an <b>ELI17164 - Cannot downgrade a non-spatial string to 
+			a hybrid string</b> exception is not seen.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1138]</b> Unresolved Query Error In UITC
+        	<ul>
+            		<li>TBD
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1139]</b> Expose Font In Config File
+        	<ul>
+            		<li>Confirm that the font used by the Data Entry framework can be modified 
+			from the default of <b>13 point Verdana</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1140]</b> Expose DisableQueries In Config File
+        	<ul>
+            		<li>Confirm that a <b>DisableQueries</b> item can be specified 
+			in the Data Entry config file.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1141]</b> Long Delay After Deleting Panel In UITC DEP
+        	<ul>
+            		<li>Load the image in 
+			<b>I:\Common\Testing\PVCS_Testing\DataEntry\1141</b> and note the approximate 
+			time required for loading.
+			<li>Delete the panel.
+			<li>Note the approximate time required for the user interface to again become 
+			responsive.
+			<li>Confirm that this time is less than the loading time.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1142]</b> Support Magnifier Window
+        	<ul>
+            		<li>Confirm that a dockable <b>Magnifier Window</b> is available.
+			<li>Confirm that a menu item is available to toggle display of the 
+			Magnifier Window.
+			<li>Confirm that the position and docking state of the <b>Magnifier 
+			Window</b> are persistent across sessions.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1143]</b> F2 Zoom To Selection
+        	<ul>
+            		<li>Confirm that <b>F2</b> correctly toggles zooming to the current 
+			selection.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1146]</b> Auto-update queries
+        	<ul>
+            		<li>Exercise <b>UITC</b> verification.
+			<li>TBD
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #670]</b> Exception Service Requires Net.Tcp Port Sharing
+        	<ul>
+            		<li>Confirm that the <b>Net.Tcp Port Sharing</b> service is automatically 
+			started when the <b>Extract Systems Exception Service</b> service is 
+			started.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #786]</b> Installation of ESFAMService
+        	<ul>
+            		<li>Confirm that <b>ESFAMService.exe</b> is installed with <b>FLEX Index</b> 
+			and <b>ID Shield</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #808]</b> Confirm that the <b>FAM Network Manager</b> page in the Help 
+		file contains additional configuration information for connecting to remote machines.
+<p>
+  	   	<LI><b>[DotNet #852, #853]</b> SQLCDBEditor
+        	<ul>
+            		<li>Open the <b>OrderMapper</b> database.
+			<li>Confirm that selecting each of the following tables is successful.
+			<ul>
+				<li>Flag
+				<li>Gender
+				<li>TypicalOrderHeading
+				<li>Unit
+			</ul>
+<p>
+			<li>Add or confirm presence of the <b>AlternateTestNameManager.plugin</b> 
+			file to the <b>Database Files</b> folder under Demo_LabDE.
+			<li>Confirm that <b>SQLCDBEditor.exe.config</b> includes 
+			<b>loadFromRemoteSources = true</b> in the <b>runtime</b> node.
+			<li>Open the <b>OrderMapper</b> database.
+			<li>Confirm that the plugin is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4964, #5147]</b> Documentation Updates
+        	<ul>
+			<li>Confirm that CHM file notes that FAM can run as a service with an 
+			evaluation license for a local database, with local files, and using 
+			the local system account.
+			<li>Confirm proper behavior of the link to <b>Redaction: Merge ID 
+			Shield Data Files</b> in the <b>How To Set Up Processing Tasks</b> page.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4805]</b> Repeating F2 In Verification
+        	<ul>
+            		<li>Exercise <b>Compute.fps</b> from <b>Demo_IDShield</b>.
+			<li>Start verification and click <b>F2</b> several times.
+			<li>Confirm that the view does not continue to zoom in.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6338]</b> OSSI.exe And Windows 8
+        	<ul>
+            		<li>Confirm that each element of the FLEX Index and ID Shield software 
+			can be installed on a clean <b>Windows 8</b> test machine.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6341]</b> Updating Database Schema
+        	<ul>
+            		<li>Confirm that the database schema in the sanity test databases can be 
+			updated without error.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6348]</b> Confirm that a <b>Sanity Test</b> can be executed 
+		on a <b>Windows 8</b> test machine.
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
