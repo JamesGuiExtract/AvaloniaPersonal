@@ -383,10 +383,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             get
             {
-                // [FlexIDSCore:3088]
-                // Use a larger stack size for any processing thread that will be running rules...
-                // swiping rules in this case.
-                return 4194304;
+                return 0;
             }
         }
 
@@ -417,7 +414,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _actionID = nActionID;
 
                 // Ask the manager to create and display the data entry form.
-                _dataEntryFormManager.ShowForm(CreateDataEntryForm);
+                // [FlexIDSCore:3088]
+                // Use a larger (4MB) stack size for the form for swiping rules... rule execution
+                // may use more than the default 1MB stack size.
+                _dataEntryFormManager.ShowForm(CreateDataEntryForm, 0x400000);
             }
             catch (Exception ex)
             {

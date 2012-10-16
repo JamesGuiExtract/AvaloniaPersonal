@@ -419,8 +419,8 @@ STDMETHODIMP CAFEngineFileProcessor::get_MinStackSize(unsigned long *pnMinStackS
 		validateLicense();
 
 		// [FlexIDSCore:3088]
-		// Use a larger stack size for any processing thread that will be running rules.
-		*pnMinStackSize = 4194304;
+		// Use a larger (4MB) stack size for any processing thread that will be running rules.
+		*pnMinStackSize = 0x400000;
 
 		return S_OK;
 	}

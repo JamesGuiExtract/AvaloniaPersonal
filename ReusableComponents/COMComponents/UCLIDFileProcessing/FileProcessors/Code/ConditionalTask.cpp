@@ -430,7 +430,7 @@ STDMETHODIMP CConditionalTask::get_MinStackSize(unsigned long *pnMinStackSize)
 
 		validateLicense();
 
-		unsigned long ulMinStackSize;
+		unsigned long ulMinStackSize = 0;
 
 		// Check the MinStackSize parameter for all "true" and "false" tasks so that the returned
 		// value is the maximum of any task that may be called by this condition.
@@ -443,7 +443,7 @@ STDMETHODIMP CConditionalTask::get_MinStackSize(unsigned long *pnMinStackSize)
 				ASSERT_RESOURCE_ALLOCATION("ELI35033", ipOWD != __nullptr);
 
 				UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipFileProcessor(ipOWD->Object);
-				ASSERT_RESOURCE_ALLOCATION("ELI35034", ipOWD != __nullptr);
+				ASSERT_RESOURCE_ALLOCATION("ELI35034", ipFileProcessor != __nullptr);
 
 				ulMinStackSize = max(ulMinStackSize, ipFileProcessor->MinStackSize);
 			}
@@ -458,7 +458,7 @@ STDMETHODIMP CConditionalTask::get_MinStackSize(unsigned long *pnMinStackSize)
 				ASSERT_RESOURCE_ALLOCATION("ELI35035", ipOWD != __nullptr);
 
 				UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipFileProcessor(ipOWD->Object);
-				ASSERT_RESOURCE_ALLOCATION("ELI35036", ipOWD != __nullptr);
+				ASSERT_RESOURCE_ALLOCATION("ELI35036", ipFileProcessor != __nullptr);
 
 				ulMinStackSize = max(ulMinStackSize, ipFileProcessor->MinStackSize);
 			}

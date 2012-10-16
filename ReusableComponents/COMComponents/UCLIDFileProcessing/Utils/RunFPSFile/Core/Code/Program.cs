@@ -117,7 +117,6 @@ namespace Extract.FileActionManager.RunFPSFile
                         .OfType<IFileProcessingTask>()
                         .Select(fileProcessingTask => fileProcessingTask.MinStackSize)
                         .Max();
-                    stackSize = Math.Max(stackSize, 1048576);
 
                     // If no database interaction is required, the processingManager does not need
                     // to manage the processing. Execute the processingManager tasks directly.

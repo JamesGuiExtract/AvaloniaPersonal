@@ -2625,7 +2625,7 @@ UINT CFileProcessingMgmtRole::processSingleFileThread(void *pData)
 //-------------------------------------------------------------------------------------------------
 unsigned long CFileProcessingMgmtRole::getProcessingThreadStackSize()
 {
-	unsigned long ulMinStackSize = 1048576;
+	unsigned long ulMinStackSize = 0;
 	int nTaskCount = m_ipFileProcessingTasks->Size();
 	for (int i = 0; i < nTaskCount ; i++)
 	{
@@ -2634,7 +2634,7 @@ unsigned long CFileProcessingMgmtRole::getProcessingThreadStackSize()
 		ASSERT_RESOURCE_ALLOCATION("ELI35031", ipOWD != __nullptr);
 
 		UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipFileProcessor(ipOWD->Object);
-		ASSERT_RESOURCE_ALLOCATION("ELI35032", ipOWD != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI35032", ipFileProcessor != __nullptr);
 
 		// Check the object for requires admin access
 		ulMinStackSize = max(ulMinStackSize, ipFileProcessor->MinStackSize);

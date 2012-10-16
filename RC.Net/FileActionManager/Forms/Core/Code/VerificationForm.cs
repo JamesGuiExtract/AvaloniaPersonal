@@ -88,14 +88,14 @@ namespace Extract.FileActionManager.Forms
         /// <summary>
         /// If <see langword="true"/>, the <see cref="_form"/> is in the process of being closed. 
         /// <see cref="ShowDocument"/> should not be called when in this state and any call to 
-        /// <see cref="ShowForm"/> needs to wait for the previous form to finish closing.
+        /// ShowForm needs to wait for the previous form to finish closing.
         /// </summary>
         volatile bool _closing;
 
         /// <summary>
         /// If <see langword="true"/>, the FormClosing event has been received.
         /// <see cref="ShowDocument"/> should not be called when in this state and any call to 
-        /// <see cref="ShowForm"/> needs to wait for the previous form to finish closing.
+        /// ShowForm needs to wait for the previous form to finish closing.
         /// </summary>
         volatile bool _formIsClosing;
 
@@ -212,7 +212,7 @@ namespace Extract.FileActionManager.Forms
         {
             try
             {
-                Thread validationThread = CreateUserInterfaceThread(ValidationThread, creator);
+                Thread validationThread = CreateUserInterfaceThread(ValidationThread, creator, 0);
 
                 validationThread.Join();
 
@@ -231,12 +231,14 @@ namespace Extract.FileActionManager.Forms
         /// <param name="threadStart">A delegate that represents the functionality of the thread.
         /// </param>
         /// <param name="creator">Creates the <see cref="IVerificationForm"/>.</param>
+        /// <param name="minStackSize">The minimum stack size needed for the thread in which this
+        /// verification form is to be run (0 for default)</param>
         /// <returns>A thread with a single-threaded apartment.</returns>
         static Thread CreateUserInterfaceThread(ParameterizedThreadStart threadStart, 
-            CreateForm creator)
+            CreateForm creator, int minStackSize)
         {
             // Create thread
-            Thread thread = new Thread(threadStart);
+            Thread thread = new Thread(threadStart, minStackSize);
 
             // [DataEntry:292] Some .Net control functionality such as clipboard and 
             // auto-complete depends upon the STA threading model.
@@ -251,6 +253,18 @@ namespace Extract.FileActionManager.Forms
         /// that callers from all threads will share.
         /// </summary>
         public void ShowForm(CreateForm creator)
+        {
+            ShowForm(creator, 0);
+        }
+
+        /// <summary>
+        /// Creates a <see cref="_form"/> instance running in a separate thread
+        /// that callers from all threads will share.
+        /// </summary>
+        /// <param name="creator">Used to create the <typeparamref name="TForm"/>.</param>
+        /// <param name="minStackSize">The minimum stack size needed for the thread in which this
+        /// verification form is to be run (0 for default)</param>
+        public void ShowForm(CreateForm creator, int minStackSize)
         {
             lock (_lock)
             {
@@ -273,8 +287,8 @@ namespace Extract.FileActionManager.Forms
                         _exceptionThrownEvent.Reset();
                         _closedEvent.Reset();
 
-                        _uiThread = 
-                            CreateUserInterfaceThread(VerificationApplicationThread, creator);
+                        _uiThread = CreateUserInterfaceThread(VerificationApplicationThread,
+                            creator, minStackSize);
 
                         // Wait until the form is initialized (or an error interrupts initialization) 
                         // before returning.
