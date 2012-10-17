@@ -6,7 +6,7 @@ using System.Text;
 using System.Security.Cryptography;
 using System.IO;
 
-namespace NetDMSCustomComponents
+namespace Extract.NetDMSCustomComponents
 {
     /// <summary>
     /// A class to provide AES encryption for NetDMS passwords. Based on the code in this

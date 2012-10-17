@@ -13,7 +13,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace NetDMSCustomComponents
+namespace Extract.NetDMSCustomComponents
 {
     /// <summary>
     /// The interface definition for <see cref="NetDMSAdvanceWorkItemTask"/>.
@@ -50,7 +50,10 @@ namespace NetDMSCustomComponents
         /// <summary>
         /// The license id to validate in licensing calls
         /// </summary>
-        const LicenseIdName _LICENSE_ID = LicenseIdName.FlexIndexIDShieldCoreObjects;
+        // [FlexIDSIntegrations:331]
+        // Prior to the 9.1 release, this ID should be changed to NetdmsComponents;
+        //const LicenseIdName _LICENSE_ID = LicenseIdName.NetdmsComponents;
+        const LicenseIdName _LICENSE_ID = LicenseIdName.FileActionManagerObjects;
 
         #endregion Constants
 

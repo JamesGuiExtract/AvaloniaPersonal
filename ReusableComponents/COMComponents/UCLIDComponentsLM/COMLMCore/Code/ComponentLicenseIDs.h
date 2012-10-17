@@ -241,3 +241,8 @@ const unsigned int gnLASERFICHE_DESKTOP_REDACTION		= gnBASE_OFFSET + 102;
 
 // IDS for LF: Background service:
 const unsigned int gnLASERFICHE_SERVICE_REDACTION		= gnBASE_OFFSET + 103;
+
+//-------------------------------------------------------------------------------------------------
+// Constants for items licensed for NetDMS integration
+//-------------------------------------------------------------------------------------------------
+const unsigned int gnNETDMS_COMPONENTS					= gnBASE_OFFSET + 110;

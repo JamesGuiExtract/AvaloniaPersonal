@@ -9,7 +9,7 @@ using System.Linq;
 using UCLID_COMUTILSLib;
 using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 
-namespace NetDMSUtilities
+namespace Extract.NetDMSUtilities
 {
     /// <summary>
     /// Represents and area of a document to redact.

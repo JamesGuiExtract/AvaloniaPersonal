@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 
-namespace NetDMSExporter
+namespace Extract.NetDMSExporter
 {
     /// <summary>
     /// Provides logic to export document from NetDMS work items for processing by Extract Systems

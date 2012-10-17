@@ -12,7 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace NetDMSCustomComponents
+namespace Extract.NetDMSCustomComponents
 {
     /// <summary>
     /// The interface definition for the settings used by <see cref="NetDMSClassBase"/>.

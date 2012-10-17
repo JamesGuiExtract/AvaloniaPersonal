@@ -1,18 +1,17 @@
 ﻿using DexFlow.Framework;
 using Dx_DocContent;
 using Dx_DocDescriptor;
-using Extract;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.NetDMSUtilities;
 using Interop.Weak.UCLID_COMLMLib;
 using Interop.Weak.UCLID_COMUTILSLib;
 using Interop.Weak.UCLID_FILEPROCESSINGLib;
-using NetDMSUtilities;
 using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace NetDMSCustomComponents
+namespace Extract.NetDMSCustomComponents
 {
     /// <summary>
     /// The interface definition for <see cref="NetDMSRedactionTask"/>.
@@ -61,6 +60,13 @@ namespace NetDMSCustomComponents
         /// The license id to validate in licensing calls
         /// </summary>
         const LicenseIdName _LICENSE_ID = LicenseIdName.FlexIndexIDShieldCoreObjects;
+
+//        /// <summary>
+//        /// The second license id to validate in licensing calls
+//        /// </summary>
+//        // [FlexIDSIntegrations:331]
+//        // Prior to the 9.1 release, this ID should be uncommented and used.
+//        const LicenseIdName _LICENSE_ID = LicenseIdName.NetdmsComponents;
 
         #endregion Constants
 
@@ -182,6 +188,7 @@ namespace NetDMSCustomComponents
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI34909", _COMPONENT_DESCRIPTION);
+                //LicenseUtilities.ValidateLicense(_LICENSE_ID2, "ELI35081", _COMPONENT_DESCRIPTION);
 
                 // Make a clone to update settings and only copy if ok
                 NetDMSRedactionTask cloneOfThis = (NetDMSRedactionTask)Clone();
@@ -347,6 +354,7 @@ namespace NetDMSCustomComponents
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI34915", _COMPONENT_DESCRIPTION);
+                //LicenseUtilities.ValidateLicense(_LICENSE_ID2, "ELI35082", _COMPONENT_DESCRIPTION);
 
                 Connect();
             }
@@ -379,6 +387,7 @@ namespace NetDMSCustomComponents
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI34917", _COMPONENT_DESCRIPTION);
+                //LicenseUtilities.ValidateLicense(_LICENSE_ID2, "ELI35083", _COMPONENT_DESCRIPTION);
 
                 IDocument document = GetCorrespondingDocument(pFileRecord.Name);
 
@@ -416,7 +425,8 @@ namespace NetDMSCustomComponents
         {
             try
             {
-                return LicenseUtilities.IsLicensed(_LICENSE_ID);
+                return LicenseUtilities.IsLicensed(_LICENSE_ID)
+                    /*&& LicenseUtilities.IsLicensed(_LICENSE_ID2)*/;
             }
             catch (Exception ex)
             {

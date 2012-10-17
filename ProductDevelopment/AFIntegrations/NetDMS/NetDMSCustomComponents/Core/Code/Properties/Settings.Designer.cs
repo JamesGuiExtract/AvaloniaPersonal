@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace NetDMSCustomComponents.Properties {
+namespace Extract.NetDMSCustomComponents.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

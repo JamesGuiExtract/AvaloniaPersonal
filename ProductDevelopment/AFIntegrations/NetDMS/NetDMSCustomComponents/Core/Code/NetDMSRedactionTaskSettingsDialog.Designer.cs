@@ -1,4 +1,4 @@
-﻿namespace NetDMSCustomComponents
+﻿namespace Extract.NetDMSCustomComponents
 {
     partial class NetDMSRedactionTaskSettingsDialog
     {

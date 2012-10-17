@@ -7,7 +7,7 @@ using System;
 using System.Globalization;
 using System.Windows.Forms;
 
-namespace NetDMSCustomComponents
+namespace Extract.NetDMSCustomComponents
 {
     /// <summary>
     /// A <see cref="UserControl"/> that allows configuration of an <see cref="NetDMSClassBase"/>

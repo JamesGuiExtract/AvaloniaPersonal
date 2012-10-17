@@ -8,8 +8,8 @@
     <ProjectGuid>{B708716C-A498-4517-BB35-C638A72F5529}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NetDMSExporter</RootNamespace>
-    <AssemblyName>NetDMSExporter</AssemblyName>
+    <RootNamespace>Extract.NetDMSExporter</RootNamespace>
+    <AssemblyName>Extract.NetDMSExporter</AssemblyName>
     <TargetFrameworkVersion>v3.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -28,7 +28,7 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\..\..\..\..\binaries\debug\NetDMSExporter.XML</DocumentationFile>
+    <DocumentationFile>..\..\..\..\..\..\binaries\debug\Extract.NetDMSExporter.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,7 +38,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
-    <DocumentationFile>..\..\..\..\..\..\binaries\release\NetDMSExporter.XML</DocumentationFile>
+    <DocumentationFile>..\..\..\..\..\..\binaries\release\Extract.NetDMSExporter.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>

@@ -5,7 +5,7 @@ using System;
 using System.Globalization;
 using System.Windows.Forms;
 
-namespace NetDMSCustomComponents
+namespace Extract.NetDMSCustomComponents
 {
     /// <summary>
     /// A <see cref="Form"/> for configuring a <see cref="NetDMSRedactionTask"/> instance.
@@ -33,8 +33,8 @@ namespace NetDMSCustomComponents
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects, "ELI34869",
-                    _OBJECT_NAME);
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects,
+                    "ELI34869", _OBJECT_NAME);
 
                 Settings = settings;
 

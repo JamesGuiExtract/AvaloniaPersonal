@@ -5,7 +5,7 @@ using System;
 using System.Globalization;
 using System.Windows.Forms;
 
-namespace NetDMSCustomComponents
+namespace Extract.NetDMSCustomComponents
 {
     /// <summary>
     /// A <see cref="Form"/> for configuring a <see cref="NetDMSAdvanceWorkItemTask"/> instance.
