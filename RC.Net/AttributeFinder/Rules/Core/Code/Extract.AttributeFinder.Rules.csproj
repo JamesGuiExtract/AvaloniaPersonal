@@ -76,6 +76,13 @@
     <Compile Include="ConfigurableObjectControl.Designer.cs">
       <DependentUpon>ConfigurableObjectControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="DataEntryPreloader.cs" />
+    <Compile Include="DataEntryPreloaderSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DataEntryPreloaderSettingsDialog.Designer.cs">
+      <DependentUpon>DataEntryPreloaderSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="DataQueryRuleObject.cs" />
     <Compile Include="DataQueryRuleObjectSettingsDialog.cs">
       <SubType>Form</SubType>
@@ -229,6 +236,18 @@
       <Project>{55C4FA3A-26C9-4CC0-9F11-A7E607E6ACD2}</Project>
       <Name>Extract.DataEntry</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\DataEntry\Utilities\DataEntryApplication\Core\Code\DataEntryApplication.csproj">
+      <Project>{25920A74-6A5D-4054-BEA5-F4ADE228D864}</Project>
+      <Name>DataEntryApplication</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
+      <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>
+      <Name>Extract.FileActionManager.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
+      <Project>{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}</Project>
+      <Name>Extract.Imaging.Forms</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
       <Name>Extract.Interop</Name>
@@ -253,6 +272,9 @@
   <ItemGroup>
     <EmbeddedResource Include="ConfigurableObjectControl.resx">
       <DependentUpon>ConfigurableObjectControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataEntryPreloaderSettingsDialog.resx">
+      <DependentUpon>DataEntryPreloaderSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DataQueryRuleObjectSettingsDialog.resx">
       <DependentUpon>DataQueryRuleObjectSettingsDialog.cs</DependentUpon>

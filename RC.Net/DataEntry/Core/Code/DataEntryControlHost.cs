@@ -1466,7 +1466,8 @@ namespace Extract.DataEntry
         /// Loads the provided data in the <see cref="IDataEntryControl"/>s.
         /// </summary>
         /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s
-        /// that represent the document's data.</param>
+        /// that represent the document's data or <see langword="null"/> to clear all data from the
+        /// DEP, remove data validation warnings and to disable the DEP.</param>
         public void LoadData(IUnknownVector attributes)
         {
             try
@@ -1475,7 +1476,7 @@ namespace Extract.DataEntry
 
                 using (new TemporaryWaitCursor())
                 {
-                    // De-activate any existing control that is active to prevent problems with
+                    // De-activate any existing control that is active to prevent problemswith
                     // last selected control remaining active when the next document is loaded.
                     if (_activeDataControl != null)
                     {
@@ -1504,7 +1505,7 @@ namespace Extract.DataEntry
 
                     bool imageIsAvailable = _imageViewer.IsImageAvailable;
 
-                    if (imageIsAvailable)
+                    if (imageIsAvailable && attributes != null)
                     {
                         // Calculate the size the error icon for invalid data should be on each
                         // page and create a SpatialPageInfo entry for each page.
@@ -1517,7 +1518,10 @@ namespace Extract.DataEntry
                                 (int)(_ERROR_ICON_SIZE * _imageViewer.ImageDpiY));
                         }
                         SetImageViewerPageNumber(1);
+                    }
 
+                    if (attributes != null)
+                    {
                         // [DataEntry:693]
                         // The attributes need to be released with FinalReleaseComObject to prevent
                         // handle leaks.
@@ -1608,9 +1612,9 @@ namespace Extract.DataEntry
                         dataEntryControl.PropagateAttribute(null, false, false);
                     }
 
-                    // After all the data is loaded, re-enable validation triggers.
-                    if (_imageViewer.IsImageAvailable)
+                    if (attributes != null)
                     {
+                        // After all the data is loaded, re-enable validation triggers.
                         AttributeStatusInfo.EnableValidationTriggers(true);
                     }
 
@@ -1642,7 +1646,10 @@ namespace Extract.DataEntry
 
                     _changingData = false;
 
-                    DrawHighlights(true);
+                    if (imageIsAvailable)
+                    {
+                        DrawHighlights(true);
+                    }
 
                     // [DataEntry:432]
                     // Some tasks (such as selecting the first control), must take place after the
@@ -1677,6 +1684,40 @@ namespace Extract.DataEntry
             finally
             {
                 LockControlUpdates(false);
+            }
+        }
+
+        /// <summary>
+        /// Commands the <see cref="DataEntryControlHost"/> to finalize and return the attribute
+        /// vector. This does not perform any validation of the data.
+        /// </summary>
+        /// <returns>An <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s representing the
+        /// current data.
+        /// </returns>
+        // Since this method has side-effects, it should not be a property.
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public IUnknownVector GetData()
+        {
+            try
+            {
+                // Notify AttributeStatusInfo that the current edit is over so that a
+                // non-incremental value modified event can be raised.
+                AttributeStatusInfo.EndEdit();
+
+                // Create a copy of the data to be saved so that attributes that should
+                // not be persisted can be removed.
+                ICopyableObject copyThis = _attributes;
+                _mostRecentlySaveAttributes = (IUnknownVector)copyThis.Clone();
+
+                PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
+
+                return _mostRecentlySaveAttributes;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI35073", "Unable to get data!", ex);
+                ee.AddDebugData("Filename", _imageViewer.ImageFile, false);
+                throw ee;
             }
         }
 

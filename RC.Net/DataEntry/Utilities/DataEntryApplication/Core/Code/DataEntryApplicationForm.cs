@@ -486,6 +486,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         string _fileProcessingDBComment;
 
+        /// <summary>
+        /// Indicates if the form should be invisible (for the purposes of loading data instead of
+        /// verification).
+        /// </summary>
+        bool _invisible;
+
         #endregion Fields
 
         #region Constructors
@@ -695,7 +701,108 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
         }
 
+        /// <summary>
+        /// Gets the active <see cref="DataEntryControlHost"/>.
+        /// </summary>
+        public DataEntryControlHost ActiveDataEntryControlHost
+        {
+            get
+            {
+                return (_activeDataEntryConfig == null)
+                    ? null
+                    : _activeDataEntryConfig.DataEntryControlHost;
+            }
+        }
+
         #endregion Properties
+
+        #region Public Methods
+
+        /// <summary>
+        /// Specifies that the form should be invisible (for the purposes of loading data instead of
+        /// verification).
+        /// </summary>
+        public void MakeInvisible()
+        {
+            try
+            {
+                if (!_invisible)
+                {
+                    this.MakeFormInvisible();
+
+                    if (_magnifierDockableWindow.IsOpen)
+                    {
+                        _magnifierDockableWindow.Close();
+                    }
+
+                    if (_imageViewerForm != null)
+                    {
+                        CloseSeparateImageWindow();
+                    }
+
+                    _invisible = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35080");
+            }
+        }
+
+        /// <summary>
+        /// Loads the type of the correct config for document.
+        /// </summary>
+        /// <param name="attributes">The attributes representing the document data.</param>
+        /// <returns><see langword="true"/> if the configuration was changed based on the data;
+        /// otherwise, <see langword="false"/>.</returns>
+        public bool LoadCorrectConfigForData(IUnknownVector attributes)
+        {
+            try
+            {
+                // If there were document type specific configurations defined, apply the
+                // appropriate configuration now.
+                bool changedDocumentType, changedDataEntryConfig;
+                if (_documentTypeConfigurations != null)
+                {
+                    string documentType = GetDocumentType(attributes, false);
+
+                    // If there is a default configuration, add the original document type to the
+                    // document type combo and allow the document to be saved with the undefined
+                    // document type.
+                    if (_defaultDataEntryConfig != null &&
+                        _documentTypeComboBox.FindStringExact(documentType) == -1)
+                    {
+                        _temporaryDocumentType = documentType;
+                        _documentTypeComboBox.Items.Insert(0, documentType);
+                    }
+
+                    SetActiveDocumentType(documentType, true,
+                        out changedDocumentType, out changedDataEntryConfig);
+
+                    if (_dataEntryControlHost != null && !changedDataEntryConfig)
+                    {
+                        // [DataEntry:729]
+                        // If the data entery config didn't change, still need to call
+                        // GetDatabaseConnection to get the latest version of the database (in case
+                        // it has been updated).
+                        _dataEntryControlHost.DatabaseConnection = GetDatabaseConnection();
+                    }
+                }
+                else
+                {
+                    changedDocumentType = false;
+                    changedDataEntryConfig = false;
+                }
+
+                return changedDataEntryConfig;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35079");
+            }
+        }
+
+        #endregion Public Methods
 
         #region Methods
 
@@ -1199,18 +1306,23 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Establish connections between the image viewer and all image viewer controls.
                 _imageViewer.EstablishConnections(this);
 
-                // Not sure how to default the magnifier window to open floating by default except
-                // to manually open it as floating, then close it prior to loading any saved layout
-                // (which will override the default situation, if present).
-                _magnifierDockableWindow.OpenFloating();
-
-                if (_registry.Settings.ShowSeparateImageWindow)
+                // Don't allow the image viewer to be show in a seperate window or the magnifier to
+                // be shown if the form is in invisible mode.
+                if (!_invisible)
                 {
-                    OpenSeparateImageWindow();
-                }
+                    // Not sure how to default the magnifier window to open floating by default except
+                    // to manually open it as floating, then close it prior to loading any saved layout
+                    // (which will override the default situation, if present).
+                    _magnifierDockableWindow.OpenFloating();
 
-                _magnifierDockableWindow.Close();
-                _sandDockManager.LoadLayout();
+                    if (_registry.Settings.ShowSeparateImageWindow)
+                    {
+                        OpenSeparateImageWindow();
+                    }
+
+                    _magnifierDockableWindow.Close();
+                    _sandDockManager.LoadLayout();
+                }
 
                 // Adjust UI elements to reflect the current configuration.
                 SetUIConfiguration(_activeDataEntryConfig);
@@ -1377,7 +1489,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
                 }
 
-                _sandDockManager.SaveLayout();
+                if (!_invisible)
+                {
+                    _sandDockManager.SaveLayout();
+                }
 
                 // Don't call base.OnFormClosing until we know know if the close is being canceled
                 // (if VerificationForm receives a FormClosing event, it expects that the form will
@@ -1693,31 +1808,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         attributes.LoadFrom(dataFilename, false);
                     }
 
-                    // If there were document type specific configurations defined, apply the
-                    // appropriate configuration now.
-                    bool changedDocumentType, changedDataEntryConfig;
-                    if (_documentTypeConfigurations != null)
-                    {
-                        string documentType = GetDocumentType(attributes, false);
-
-                        // If there is a default configuration, add the original document type to
-                        // the document type combo and allow the document to be saved with the
-                        // undefined document type.
-                        if (_defaultDataEntryConfig != null &&
-                            _documentTypeComboBox.FindStringExact(documentType) == -1)
-                        {
-                            _temporaryDocumentType = documentType;
-                            _documentTypeComboBox.Items.Insert(0, documentType);
-                        }
-
-                        SetActiveDocumentType(documentType, true,
-                            out changedDocumentType, out changedDataEntryConfig);
-                    }
-                    else
-                    {
-                        changedDocumentType = false;
-                        changedDataEntryConfig = false;
-                    }
+                    LoadCorrectConfigForData(attributes);
 
                     // Record database statistics on load
                     if (!_standAloneMode && _fileProcessingDb != null)
@@ -1728,15 +1819,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // If a DEP is being used, load the data into it
                     if (_dataEntryControlHost != null)
                     {
-                        if (!changedDataEntryConfig)
-                        {
-                            // [DataEntry:729]
-                            // If the data entery config didn't change, still need to call
-                            // GetDatabaseConnection to get the latest version of the database (in
-                            // case it has been updated).
-                            _dataEntryControlHost.DatabaseConnection = GetDatabaseConnection();
-                        }
-
                         _dataEntryControlHost.LoadData(attributes);
 
                         if (_documentTypeConfigurations != null)
@@ -1752,7 +1834,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     if (_dataEntryControlHost != null)
                     {
-                        _dataEntryControlHost.LoadData(new IUnknownVectorClass());
+                        _dataEntryControlHost.LoadData(null);
                     }
                 }
 
@@ -3493,6 +3575,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         void OpenSeparateImageWindow()
         {
+            // Do not allow the image window to be moved to a separate form if invisible.
+            if (_invisible)
+            {
+                return;
+            }
+
             // Store mode in registry so the next time it will re-open in the same state.
             _registry.Settings.ShowSeparateImageWindow = true;
             _separateImageWindowToolStripMenuItem.CheckState = CheckState.Checked;

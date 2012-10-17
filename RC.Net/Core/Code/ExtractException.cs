@@ -106,6 +106,13 @@ namespace Extract
         readonly object _thisLock = new object();
 
         /// <summary>
+        /// Keeps track of exceptions that were to be displayed since a call to
+        /// <see cref="BlockExceptionDisplays"/>.
+        /// </summary>
+        [ThreadStatic]
+        static List<ExtractException> _blockedExceptionDisplays;
+
+        /// <summary>
         /// The ELI code associated with this ExtractException object.
         /// </summary>
         readonly string _eliCode;
@@ -451,6 +458,15 @@ namespace Extract
             // Ensure the display function does not throw any exceptions
             try
             {
+                // If the display of exceptions are being blocked on this thread, log the exception,
+                // and add it to _blockedExceptionDisplays for later access.
+                if (_blockedExceptionDisplays != null)
+                {
+                    Log();
+                    _blockedExceptionDisplays.Add(this);
+                    return;
+                }
+
                 // Update the encrypted stack trace information with the stack trace associated with
                 // this ExtractException object, if this hasn't already been done.
                 RecordStackTrace();
@@ -469,8 +485,11 @@ namespace Extract
             }
             catch (Exception e)
             {
-                // Display exception that should be displayed.
-                MessageBox.Show(ToString(), "Exception");
+                if (_blockedExceptionDisplays == null)
+                {
+                    // Display exception that should be displayed.
+                    MessageBox.Show(ToString(), "Exception");
+                }
 
                 // Log the exception that caused a problem displaying with COMUCLIDException object.
                 NativeMethods.LogException("ELI22361", e.Message);
@@ -729,6 +748,53 @@ namespace Extract
             // contained in this ExtractException object.
             UCLID_EXCEPTIONMGMTLib.COMUCLIDException uex = AsCppException();
             return uex.AsStringizedByteStream();
+        }
+
+        /// <summary>
+        /// Blocks the display of any exceptions on this thread until
+        /// <see cref="EndBlockExceptionDisplays"/> is called. Exceptions on this thread that would
+        /// have been displayed will instead be logged, but will also be kept and returned by
+        /// <see cref="EndBlockExceptionDisplays"/> in the case that they need to be displayed or
+        /// thrown at a later time. Exceptions will still be displayed on any other thread where
+        /// this method has not been called.
+        /// </summary>
+        public static void BlockExceptionDisplays()
+        {
+            try
+            {
+                ExtractException.Assert("ELI35042", 
+                    "Already blocking exception display on this thread.",
+                    _blockedExceptionDisplays == null);
+
+                _blockedExceptionDisplays = new List<ExtractException>();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35043");
+            }
+        }
+
+        /// <summary>
+        /// Ends blocking of exception displays on this thread.
+        /// </summary>
+        /// <returns>All <see cref="ExtractException"/>s that would have otherwise displayed prior
+        /// to this call.</returns>
+        public static ExtractException[] EndBlockExceptionDisplays()
+        {
+            try
+            {
+                ExtractException.Assert("ELI35044",
+                           "Exception displays were not being blocked on this thread.",
+                           _blockedExceptionDisplays != null);
+
+                var blockExceptionDisplays = _blockedExceptionDisplays.ToArray();
+                _blockedExceptionDisplays = null;
+                return blockExceptionDisplays;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35045");
+            }
         }
 
         #endregion Public methods

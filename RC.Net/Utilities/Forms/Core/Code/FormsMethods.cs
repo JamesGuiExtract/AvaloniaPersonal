@@ -733,6 +733,36 @@ namespace Extract.Utilities.Forms
             }
         }
 
+        /// <summary>
+        /// Makes the form invisible.
+        /// </summary>
+        /// <param name="form">The form to make invisible.</param>
+        public static void MakeFormInvisible(Form form)
+        {
+            try
+            {
+                // Makes form invisible.
+                form.Opacity = 0;
+
+                // ...and we don't want it to appear in the task bar
+                form.ShowInTaskbar = false;
+
+                // ...and we don't want it to have a close button
+                // (for sanity, not sure if it would be possible to use it with opacity = 0)
+                form.ControlBox = false;
+
+                // ...and we don't want the user to be able to alt-tab to it
+                form.FormBorderStyle = FormBorderStyle.FixedToolWindow;
+                
+                // ...and we don't want the user to be able to do anything in it.
+                form.Enabled = false;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35078");
+            }
+        }
+
         #endregion Methods
     }
 
@@ -789,6 +819,15 @@ namespace Extract.Utilities.Forms
             Control destinationControl)
         {
             return FormsMethods.MoveSandDockToNewForm(sandDockManager, destinationControl);
+        }
+
+        /// <summary>
+        /// Makes the form invisible.
+        /// </summary>
+        /// <param name="form">The form to make invisible.</param>
+        public static void MakeFormInvisible(this Form form)
+        {
+            FormsMethods.MakeFormInvisible(form);
         }
     }
 

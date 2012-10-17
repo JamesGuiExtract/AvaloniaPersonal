@@ -576,7 +576,7 @@ namespace Extract.AttributeFinder.Rules
             catch (Exception ex)
             {
                 throw ex.CreateComVisible("ELI33869",
-                    "Error checking configuration of value multiple criteria selector.");
+                    "Error checking configuration of '" + _COMPONENT_DESCRIPTION + "'.");
             }
         }
 

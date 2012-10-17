@@ -1208,8 +1208,11 @@ namespace Extract.DataEntry
                 // via DataEntryTable.BeginEdit.
                 if (textEditingControl == null)
                 {
-                    textEditingControl = (DataGridViewTextBoxEditingControl)_editingControl;
-                    textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
+                    textEditingControl = _editingControl as DataGridViewTextBoxEditingControl;
+                    if (textEditingControl != null)
+                    {
+                        textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
+                    }
                 }
             }
             catch (Exception ex)
@@ -1422,6 +1425,34 @@ namespace Extract.DataEntry
             }
 
             return keyProcessed;
+        }
+
+        /// <summary>
+        /// Handles the case that there was an error displaying data in a table cell. Any error that
+        /// would display is converted to and displayed as an <see cref="ExtractException"/>.
+        /// </summary>
+        /// <param name="displayErrorDialogIfNoHandler"></param>
+        /// <param name="e"></param>
+        protected override void OnDataError(bool displayErrorDialogIfNoHandler, DataGridViewDataErrorEventArgs e)
+        {
+            try
+            {
+                // Call the base OnDataError with false to prevent the error from displaying.
+                base.OnDataError(false, e);
+
+                // Create and display an ExtractExceptions using the data from the event args.
+                var ee = e.Exception.AsExtract("ELI35074");
+                DataGridViewCell cell = Rows[e.RowIndex].Cells[e.ColumnIndex];
+                ee.AddDebugData("Value", cell.Value.ToString(), false);
+                ee.AddDebugData("Row index", e.RowIndex, false);
+                ee.AddDebugData("Column index", e.ColumnIndex, false);
+                ee.AddDebugData("Context", e.Context.ToString(), false);
+                ee.Display();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35075");
+            }
         }
 
         #endregion Overrides
