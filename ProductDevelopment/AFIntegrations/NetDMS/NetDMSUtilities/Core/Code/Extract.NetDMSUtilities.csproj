@@ -8,8 +8,8 @@
     <ProjectGuid>{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Extract.NetDMSUtilities</RootNamespace>
-    <AssemblyName>Extract.NetDMSUtilities</AssemblyName>
+    <RootNamespace>NetDMSUtilities</RootNamespace>
+    <AssemblyName>NetDMSUtilities</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
@@ -29,7 +29,7 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\..\..\..\..\binaries\debug\Extract.NetDMSUtilities.xml</DocumentationFile>
+    <DocumentationFile>..\..\..\..\..\..\binaries\debug\NetDMSUtilities.xml</DocumentationFile>
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -41,7 +41,7 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\..\..\..\..\binaries\release\Extract.NetDMSUtilities.xml</DocumentationFile>
+    <DocumentationFile>..\..\..\..\..\..\binaries\release\NetDMSUtilities.xml</DocumentationFile>
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup>
