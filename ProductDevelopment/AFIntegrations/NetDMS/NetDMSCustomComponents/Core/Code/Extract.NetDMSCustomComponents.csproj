@@ -8,13 +8,13 @@
     <ProjectGuid>{60F8B7A8-CEBE-4AB3-9AEE-5EDC38081C48}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NetDMSCustomComponents</RootNamespace>
-    <AssemblyName>NetDMSCustomComponents</AssemblyName>
+    <RootNamespace>Extract.NetDMSCustomComponents</RootNamespace>
+    <AssemblyName>Extract.NetDMSCustomComponents</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-    <SccProjectName>NetDMSCustomComponents</SccProjectName>
+    <SccProjectName>Extract.NetDMSCustomComponents</SccProjectName>
     <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
     <SccAuxPath>http://white.extract.local/VaultService</SccAuxPath>
     <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
@@ -29,7 +29,7 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\..\..\..\..\binaries\debug\NetDMSCustomComponents.XML</DocumentationFile>
+    <DocumentationFile>..\..\..\..\..\..\binaries\debug\Extract.NetDMSCustomComponents.xml</DocumentationFile>
     <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -41,7 +41,7 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\..\..\..\..\binaries\release\NetDMSCustomComponents.XML</DocumentationFile>
+    <DocumentationFile>..\..\..\..\..\..\binaries\release\Extract.NetDMSCustomComponents.xml</DocumentationFile>
     <RegisterForComInterop>true</RegisterForComInterop>
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
@@ -119,7 +119,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <None Include="app.config" />
-    <None Include="IDShieldScript.cs" />
     <Compile Include="NetDMSAdvanceWorkItemTaskSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -181,7 +180,7 @@
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\NetDMSUtilities\Core\Code\NetDMSUtilities.csproj">
+    <ProjectReference Include="..\..\..\NetDMSUtilities\Core\Code\Extract.NetDMSUtilities.csproj">
       <Project>{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}</Project>
       <Name>NetDMSUtilities</Name>
     </ProjectReference>

@@ -600,9 +600,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.UITra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.NetDMSCustomComponents", "..\..\..\..\AFIntegrations\NetDMS\NetDMSCustomComponents\Core\Code\Extract.NetDMSCustomComponents.csproj", "{60F8B7A8-CEBE-4AB3-9AEE-5EDC38081C48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.NetDMSUtilities", "..\..\..\..\AFIntegrations\NetDMS\NetDMSUtilities\Core\Code\Extract.NetDMSUtilities.csproj", "{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.NetDMSExporter", "..\..\..\..\AFIntegrations\NetDMS\NetDMSExporter\Core\Code\Extract.NetDMSExporter.csproj", "{B708716C-A498-4517-BB35-C638A72F5529}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.NetDMSUtilities", "..\..\..\..\AFIntegrations\NetDMS\NetDMSUtilities\Core\Code\Extract.NetDMSUtilities.csproj", "{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}"
 EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
@@ -783,8 +783,8 @@ Global
 		ProjectRelativeDiskPath171 = ..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj
 		ProjectRelativeDiskPath172 = ..\..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCDBEditor\Core\Plugins\AlternateTestNameManager\Core\Code\SQLCDBEditor.Plugins.AlternateTestNameManager.csproj
 		ProjectRelativeDiskPath173 = ..\..\..\..\DataEntry\LabDE\DEPs\UITransplantCenter\Core\Code\Extract.DataEntry.DEP.UITransplantCenter.csproj
-		ProjectRelativeDiskPath174 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSCustomComponents\Core\Code\Extract.NetDMSCustomComponents.csproj
-		ProjectRelativeDiskPath175 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSUtilities\Core\Code\Extract.NetDMSUtilities.csproj
+		ProjectRelativeDiskPath174 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSUtilities\Core\Code\Extract.NetDMSUtilities.csproj
+		ProjectRelativeDiskPath175 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSCustomComponents\Core\Code\Extract.NetDMSCustomComponents.csproj
 		ProjectRelativeDiskPath176 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSExporter\Core\Code\Extract.NetDMSExporter.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -2874,18 +2874,6 @@ Global
 		{60F8B7A8-CEBE-4AB3-9AEE-5EDC38081C48}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{60F8B7A8-CEBE-4AB3-9AEE-5EDC38081C48}.Release|Win32.ActiveCfg = Release|Any CPU
 		{60F8B7A8-CEBE-4AB3-9AEE-5EDC38081C48}.Release|x86.ActiveCfg = Release|Any CPU
-		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Release|Win32.ActiveCfg = Release|Any CPU
-		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Release|x86.ActiveCfg = Release|Any CPU
 		{B708716C-A498-4517-BB35-C638A72F5529}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B708716C-A498-4517-BB35-C638A72F5529}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B708716C-A498-4517-BB35-C638A72F5529}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -2898,6 +2886,18 @@ Global
 		{B708716C-A498-4517-BB35-C638A72F5529}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{B708716C-A498-4517-BB35-C638A72F5529}.Release|Win32.ActiveCfg = Release|Any CPU
 		{B708716C-A498-4517-BB35-C638A72F5529}.Release|x86.ActiveCfg = Release|Any CPU
+		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Release|Win32.ActiveCfg = Release|Any CPU
+		{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
