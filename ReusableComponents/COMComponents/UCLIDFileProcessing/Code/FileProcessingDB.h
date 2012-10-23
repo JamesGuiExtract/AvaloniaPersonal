@@ -106,7 +106,8 @@ public:
 	STDMETHOD(GetActions)(IStrToStrMap** pmapActionNameToID);
 	STDMETHOD(AddFile)(BSTR strFile, BSTR strAction, EFilePriority ePriority,
 		VARIANT_BOOL bForceStatusChange, VARIANT_BOOL bFileModified, EActionStatus eNewStatus, 
-		VARIANT_BOOL* pbAlreadyExists, EActionStatus* pPrevStatus, IFileRecord** ppFileRecord);
+		VARIANT_BOOL bSkipPageCount, VARIANT_BOOL* pbAlreadyExists, EActionStatus* pPrevStatus,
+		IFileRecord** ppFileRecord);
 	STDMETHOD(RemoveFile)(BSTR strFile, BSTR strAction);
 	STDMETHOD(RemoveFolder)(BSTR strFolder, BSTR strAction);
 	STDMETHOD(NotifyFileProcessed)(long nFileID, BSTR strAction);
@@ -852,7 +853,7 @@ private:
 	bool GetActions_Internal(bool bDBLocked, IStrToStrMap * * pmapActionNameToID);
 	bool AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR strAction, EFilePriority ePriority,
 		VARIANT_BOOL bForceStatusChange, VARIANT_BOOL bFileModified,
-		EActionStatus eNewStatus, VARIANT_BOOL * pbAlreadyExists,
+		EActionStatus eNewStatus, VARIANT_BOOL bSkipPageCount, VARIANT_BOOL * pbAlreadyExists,
 		EActionStatus *pPrevStatus, IFileRecord* * ppFileRecord);
 	bool RemoveFile_Internal(bool bDBLocked, BSTR strFile, BSTR strAction);
 	bool NotifyFileProcessed_Internal(bool bDBLocked, long nFileID,  BSTR strAction);

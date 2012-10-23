@@ -676,11 +676,13 @@ library UCLID_FILEPROCESSINGLib
 		//				The file will be added to the database if it is not in the database
 		//				and the current status of the file is not kActionProcessing the status of the file
 		//				will be changed to eNewStatus
+		//			if the bSkipPageCount is VARIANT_TRUE
+		//				When files are queued, no attempt will be made to check the page count.
 		// 
 		[id(4), helpstring("method AddFile")] HRESULT AddFile([in] BSTR strFile, [in] BSTR strAction, 
 			[in] EFilePriority ePriority, [in] VARIANT_BOOL bForceStatusChange, [in] VARIANT_BOOL bFileModified, 
-			[in] EActionStatus eNewStatus, [out] VARIANT_BOOL* pbAlreadyExists, [out] EActionStatus* pPrevStatus, 
-			[out, retval] IFileRecord** ppFileRecord);
+			[in] EActionStatus eNewStatus, [in] VARIANT_BOOL bSkipPageCount, [out] VARIANT_BOOL* pbAlreadyExists,
+			[out] EActionStatus* pPrevStatus, [out, retval] IFileRecord** ppFileRecord);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE:	Remove the file by setting the given actions's status to "U" if the current state is "P"
 		//			Also a record will always be added to the QueueEvent table
@@ -1376,6 +1378,9 @@ library UCLID_FILEPROCESSINGLib
 		[id(4), helpstring("method GetSupplyingCounts")] HRESULT GetSupplyingCounts([out] long* plNumSupplied,
 			[out] long* plNumSupplyingErrors);
 		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Specifies whether an attempt will be made to check the page count when files are queued.
+		[propget, id(5), helpstring("property SkipPageCount")] HRESULT SkipPageCount([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(5), helpstring("property SkipPageCount")] HRESULT SkipPageCount([in] VARIANT_BOOL newVal);
 	};
 
 	[

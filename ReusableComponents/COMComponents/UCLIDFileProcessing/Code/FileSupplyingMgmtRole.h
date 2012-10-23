@@ -98,6 +98,8 @@ public:
 	STDMETHOD(put_FAMCondition)(IObjectWithDescription* newVal);
 	STDMETHOD(SetDirty)(VARIANT_BOOL newVal);
 	STDMETHOD(GetSupplyingCounts)(long* plNumSupplied, long* plNumSupplyingErrors);
+	STDMETHOD(get_SkipPageCount)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_SkipPageCount)(VARIANT_BOOL newVal);
 
 // IFileSupplierTarget Methods
 	STDMETHOD(NotifyFileAdded)(BSTR bstrFile,  IFileSupplier* pSupplier,
@@ -130,6 +132,9 @@ private:
 
 	// Skip Condition
 	IObjectWithDescriptionPtr m_ipFAMCondition;
+
+	// Indicates whether the page count check should be skipped when queuing files.
+	bool m_bSkipPageCount;
 
 	// Action Name being supplied
 	string m_strAction;

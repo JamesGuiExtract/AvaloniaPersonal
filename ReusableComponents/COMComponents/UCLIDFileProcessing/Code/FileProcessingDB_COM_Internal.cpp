@@ -783,8 +783,9 @@ bool CFileProcessingDB::GetActions_Internal(bool bDBLocked, IStrToStrMap * * pma
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR strAction, EFilePriority ePriority,
 										VARIANT_BOOL bForceStatusChange, VARIANT_BOOL bFileModified,
-										EActionStatus eNewStatus, VARIANT_BOOL * pbAlreadyExists,
-										EActionStatus *pPrevStatus, IFileRecord* * ppFileRecord)
+										EActionStatus eNewStatus, VARIANT_BOOL bSkipPageCount,
+										VARIANT_BOOL * pbAlreadyExists, EActionStatus *pPrevStatus,
+										IFileRecord* * ppFileRecord)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI03278");
 
@@ -868,23 +869,32 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					// to perform an additional call here.
 					llFileSize = (long long)getSizeOfFile(strFileName);
 
-					// get the file type
-					EFileType efType = getFileType(strFileName);
-
-					// if it is an image file OR unknown file [p13 #4816] attempt to
-					// get the number of pages
-					if (efType == kImageFile || efType == kUnknown)
+					// [LegacyRCAndUtils:6354]
+					// Check page count only if bSkipPageCount == VARIANT_FALSE
+					if (asCppBool(bSkipPageCount))
 					{
-						try
+						nPages = 0;
+					}
+					else
+					{
+						// get the file type
+						EFileType efType = getFileType(strFileName);
+
+						// if it is an image file OR unknown file [p13 #4816] attempt to
+						// get the number of pages
+						if (efType == kImageFile || efType == kUnknown)
 						{
-							// Get the number of pages in the file if it is an image file
-							nPages = getNumberOfPagesInImage(strFileName);
-						}
-						catch(...)
-						{
-							// if there is an error this may not be a valid image file but we still want
-							// to put it in the database
-							nPages = 0;
+							try
+							{
+								// Get the number of pages in the file if it is an image file
+								nPages = getNumberOfPagesInImage(strFileName);
+							}
+							catch(...)
+							{
+								// if there is an error this may not be a valid image file but we
+								// still want to put it in the database
+								nPages = 0;
+							}
 						}
 					}
 				}

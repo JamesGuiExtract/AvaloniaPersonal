@@ -263,8 +263,9 @@ STDMETHODIMP CFileProcessingDB::GetActions(IStrToStrMap * * pmapActionNameToID)
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePriority ePriority,
 										VARIANT_BOOL bForceStatusChange, VARIANT_BOOL bFileModified,
-										EActionStatus eNewStatus, VARIANT_BOOL * pbAlreadyExists,
-										EActionStatus *pPrevStatus, IFileRecord* * ppFileRecord)
+										EActionStatus eNewStatus, VARIANT_BOOL bSkipPageCount,
+										VARIANT_BOOL * pbAlreadyExists, EActionStatus *pPrevStatus,
+										IFileRecord* * ppFileRecord)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -274,13 +275,13 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 		validateLicense();
 
 		if (!AddFile_Internal(false, strFile, strAction, ePriority, bForceStatusChange, bFileModified,
-			eNewStatus, pbAlreadyExists, pPrevStatus, ppFileRecord))
+			eNewStatus, bSkipPageCount, pbAlreadyExists, pPrevStatus, ppFileRecord))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			AddFile_Internal(true, strFile, strAction, ePriority, bForceStatusChange, bFileModified,
-				eNewStatus, pbAlreadyExists, pPrevStatus, ppFileRecord);
+				eNewStatus, bSkipPageCount, pbAlreadyExists, pPrevStatus, ppFileRecord);
 		}
 		return S_OK;
 	}

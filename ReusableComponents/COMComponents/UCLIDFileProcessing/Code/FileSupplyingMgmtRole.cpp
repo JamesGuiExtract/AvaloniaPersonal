@@ -28,7 +28,8 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+const unsigned long gnCurrentVersion = 2;
+// Version 2: Added m_bSkipPageCount
 
 //-------------------------------------------------------------------------------------------------
 // Macro for logging queue event exceptions in the UI and in the file 
@@ -404,10 +405,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::Start(IFileProcessingDB* pDB, long lActionI
 			UCLIDException uexOuter("ELI13759", "Unable to start all file suppliers!", ue);
 			throw uexOuter;
 		}
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14229")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileSupplyingMgmtRole::Stop(void)
@@ -462,10 +463,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::Stop(void)
 		}
 		// Notify the FAM that supplying is complete
 		m_ipRoleNotifyFAM->NotifySupplyingCompleted();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14230")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileSupplyingMgmtRole::Pause(void)
@@ -517,10 +518,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::Pause(void)
 				}
 			}
 		}
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14231")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileSupplyingMgmtRole::Resume(void)
@@ -572,10 +573,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::Resume(void)
 				}
 			}
 		}
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14232")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileSupplyingMgmtRole::get_Enabled(VARIANT_BOOL* pVal)
@@ -587,6 +588,8 @@ STDMETHODIMP CFileSupplyingMgmtRole::get_Enabled(VARIANT_BOOL* pVal)
 		validateLicense();
 		
 		*pVal = ( asVariantBool(m_bEnabled) );
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14141")
 }
@@ -602,6 +605,8 @@ STDMETHODIMP CFileSupplyingMgmtRole::put_Enabled(VARIANT_BOOL newVal)
 		m_bEnabled = (newVal == VARIANT_TRUE);
 		
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14142")
 }
@@ -616,6 +621,8 @@ STDMETHODIMP CFileSupplyingMgmtRole::Clear(void)
 
 		// call the internal method
 		clear();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14235")
 }
@@ -661,6 +668,8 @@ STDMETHODIMP CFileSupplyingMgmtRole::ValidateStatus(void)
 				throw ue;
 			}
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14357")
 }
@@ -686,10 +695,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::get_FileSuppliers(IIUnknownVector* *pVal)
 
 		IIUnknownVectorPtr ipShallowCopy = m_ipFileSuppliers;
 		*pVal = ipShallowCopy.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13700")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileSupplyingMgmtRole::put_FileSuppliers(IIUnknownVector *newVal)
@@ -705,10 +714,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::put_FileSuppliers(IIUnknownVector *newVal)
 		m_ipFileSuppliers = newVal;
 
 		m_bDirty = true;
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13701")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileSupplyingMgmtRole::get_FAMCondition(IObjectWithDescription* *pVal)
@@ -728,10 +737,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::get_FAMCondition(IObjectWithDescription* *p
 
 		IObjectWithDescriptionPtr ipShallowCopy = m_ipFAMCondition;
 		*pVal = ipShallowCopy.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13533")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileSupplyingMgmtRole::put_FAMCondition(IObjectWithDescription *newVal)
@@ -745,10 +754,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::put_FAMCondition(IObjectWithDescription *ne
 
 		m_ipFAMCondition = newVal;
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13534")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileSupplyingMgmtRole::SetDirty(VARIANT_BOOL newVal)
@@ -760,6 +769,8 @@ STDMETHODIMP CFileSupplyingMgmtRole::SetDirty(VARIANT_BOOL newVal)
 		validateLicense();
 		
 		m_bDirty = (newVal == VARIANT_TRUE);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19428")
 }
@@ -784,6 +795,43 @@ STDMETHODIMP CFileSupplyingMgmtRole::GetSupplyingCounts(long *plNumSupplied, lon
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28472")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileSupplyingMgmtRole::get_SkipPageCount(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI35093", pVal != __nullptr);
+
+		*pVal = asVariantBool(m_bSkipPageCount);
+
+		return S_OK;
+
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35094")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileSupplyingMgmtRole::put_SkipPageCount(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		m_bSkipPageCount = asCppBool(newVal);
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35095")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -851,7 +899,8 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplie
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
 			ipFileRecord = getFPMDB()->AddFile(bstrSimplifiedName, m_strAction.c_str(), 
 				ePriority, vbForceProcessing, VARIANT_FALSE,
-				UCLID_FILEPROCESSINGLib::kActionPending, &vbAlreadyExists, &easPrev );	
+				UCLID_FILEPROCESSINGLib::kActionPending, asVariantBool(m_bSkipPageCount),
+				&vbAlreadyExists, &easPrev );	
 
 			bool bAlreadyExists = asCppBool(vbAlreadyExists);
 
@@ -1044,7 +1093,8 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRenamed(BSTR bstrOldFile, BSTR bs
 				// Add the new filename to the db
 				ipFileRecord = getFPMDB()->AddFile(bstrNewSimplifiedName, m_strAction.c_str(), 
 					ePriority, ipFSData->ForceProcessing, VARIANT_FALSE,
-					UCLID_FILEPROCESSINGLib::kActionPending, &bAlreadyExists, &easPrev );		
+					UCLID_FILEPROCESSINGLib::kActionPending, asVariantBool(m_bSkipPageCount),
+					&bAlreadyExists, &easPrev );		
 				bIsAdded = true;
 			}
 
@@ -1145,7 +1195,8 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileModified(BSTR bstrFile, IFileSupp
 			UCLID_FILEPROCESSINGLib::EActionStatus easPrev;
 			ipFileRecord = getFPMDB()->AddFile(bstrSimplifiedName, m_strAction.c_str(),
 				ePriority, ipFSData->ForceProcessing, VARIANT_TRUE,
-				UCLID_FILEPROCESSINGLib::kActionPending, &bAlreadyExists, &easPrev );
+				UCLID_FILEPROCESSINGLib::kActionPending, asVariantBool(m_bSkipPageCount),
+				&bAlreadyExists, &easPrev );
 		
 			if (m_hWndOfUI != __nullptr)
 			{
@@ -1562,6 +1613,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::Load(IStream *pStream)
 
 		// Read Enabled status
 		dataReader >> m_bEnabled;
+		if (nDataVersion >= 2)
+		{
+			dataReader >> m_bSkipPageCount;
+		}
 
 		// Read in the collected File Suppliers
 		IPersistStreamPtr ipFSObj;
@@ -1572,10 +1627,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::Load(IStream *pStream)
 		IPersistStreamPtr ipFAMObj;
 		readObjectFromStream( ipFAMObj, pStream, "ELI14448" );
 		m_ipFAMCondition = ipFAMObj;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19391");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileSupplyingMgmtRole::Save(IStream *pStream, BOOL fClearDirty)
@@ -1594,6 +1649,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Save the enabled flag
 		dataWriter << m_bEnabled;
+		dataWriter << m_bSkipPageCount;
 		dataWriter.flushToByteStream();
 
 		// Write the bytestream data into the IStream object
@@ -1630,10 +1686,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::Save(IStream *pStream, BOOL fClearDirty)
 		{
 			m_bDirty = false;
 		}
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19392");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileSupplyingMgmtRole::GetSizeMax(ULARGE_INTEGER *pcbSize)
@@ -1791,6 +1847,7 @@ void CFileSupplyingMgmtRole::clear()
 	}
 
 	m_bEnabled = false;
+	m_bSkipPageCount = false;
 
 	m_bDirty = false;
 

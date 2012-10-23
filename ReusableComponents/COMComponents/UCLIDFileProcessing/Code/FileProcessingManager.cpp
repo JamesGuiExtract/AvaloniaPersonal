@@ -1062,8 +1062,9 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 					UCLID_FILEPROCESSINGLib::EActionStatus easOriginal;
 					ipFileRecord = getFPMDB()->AddFile(bstrSourceDocName, bstrActionName,
 						(UCLID_FILEPROCESSINGLib::EFilePriority)eFilePriority, vbForceProcessing,
-						VARIANT_FALSE, UCLID_FILEPROCESSINGLib::kActionPending, &vbAlreadyExists,
-						&easOriginal);
+						VARIANT_FALSE, UCLID_FILEPROCESSINGLib::kActionPending,
+						(m_ipFSMgmtRole == __nullptr) ? VARIANT_FALSE : m_ipFSMgmtRole->SkipPageCount,
+						&vbAlreadyExists, &easOriginal);
 				}
 				else if (bProcess)
 				{

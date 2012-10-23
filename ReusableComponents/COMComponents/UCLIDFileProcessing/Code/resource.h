@@ -163,17 +163,17 @@
 #define IDC_RADIO_PROCESS_SKIPPED_FILES 350
 #define IDC_COMBO_SKIPPED_SCOPE         351
 #define IDC_STATIC_SKIPPED              352
-#define IDR_MENU_FAM_MRU				353
-#define IDR_MENU_FAM_GRID_CONTEXT		354
-#define ID_GRID_CONTEXT_COPY_FILENAME	355
-#define ID_GRID_CONTEXT_OPEN_FILE		356
-#define ID_GRID_CONTEXT_OPEN_FILE_LOCATION	357
+#define IDR_MENU_FAM_MRU                353
+#define IDR_MENU_FAM_GRID_CONTEXT       354
+#define ID_GRID_CONTEXT_COPY_FILENAME   355
+#define ID_GRID_CONTEXT_OPEN_FILE       356
+#define ID_GRID_CONTEXT_OPEN_FILE_LOCATION 357
 #define IDD_DIALOG_ADVANCED_TASK_SETTINGS 358
 #define IDC_BUTTON_TASK_ADVANCED_SETTINGS 359
-#define IDC_EDIT_NUM_FILES_FROM_DB		360
-#define IDC_SPIN_NUM_FILES				361
-#define IDC_SPIN_MAX_NUM_RECORDS		362
-#define IDC_CHECK_AUTO_SAVE_FPS			363
+#define IDC_EDIT_NUM_FILES_FROM_DB      360
+#define IDC_SPIN_NUM_FILES              361
+#define IDC_SPIN_MAX_NUM_RECORDS        362
+#define IDC_CHECK_AUTO_SAVE_FPS         363
 #define IDC_BUTTON_DB_NAME_BROWSE       1000
 #define IDC_EDIT_DB_SERVER              1001
 #define IDC_EDIT_DB_NAME                1002
@@ -188,11 +188,13 @@
 #define IDC_STATIC_PROCESSING_SCHEDULE  2003
 #define IDC_LIST_SCHEDULE               2004
 #define IDD_DIALOG_SET_SCHEDULE         2005
+#define IDD_DLG_QUEUE_ADV_PROP          2006
 #define IDC_BUTTON_SELECT_ALL           2007
 #define IDC_BUTTON_SELECT_NONE          2008
 #define IDC_BTN_ACTION_TAG              2009
 #define IDC_CUSTOM1                     2010
-#define IDC_CHECK1                      2011
+#define IDC_CHK_SKIP_PAGE_COUNT         2011
+#define IDC_BTN_ADVANCED                2012
 #define IDC_BTN_RUN                     32768
 #define IDC_BTN_STOP                    32769
 #define IDC_BTN_AUTO_SCROLL             32770
@@ -220,25 +222,25 @@
 #define ID_CONTEXT_CUT                  32799
 #define ID_CONTEXT_CANCEL               32800
 #define ID_TOOLS_DATABASEADMINISTRATIONUTILITY 32802
-#define ID_BTN_FAM_OPEN                32803
+#define ID_BTN_FAM_OPEN                 32803
 #define ID_BTN_FAM_SAVE                 32804
-#define ID_FAM_MRU_FILE1				32805
-#define ID_FAM_MRU_FILE2				32806
-#define ID_FAM_MRU_FILE3				32807
-#define ID_FAM_MRU_FILE4				32808
-#define ID_FAM_MRU_FILE5				32809
-#define ID_FAM_MRU_FILE6				32810
-#define ID_FAM_MRU_FILE7				32811
-#define ID_FAM_MRU_FILE8				32812
-#define ID_MNU_FAM_MRU					32813
+#define ID_FAM_MRU_FILE1                32805
+#define ID_FAM_MRU_FILE2                32806
+#define ID_FAM_MRU_FILE3                32807
+#define ID_FAM_MRU_FILE4                32808
+#define ID_FAM_MRU_FILE5                32809
+#define ID_FAM_MRU_FILE6                32810
+#define ID_FAM_MRU_FILE7                32811
+#define ID_FAM_MRU_FILE8                32812
+#define ID_MNU_FAM_MRU                  32813
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        2006
+#define _APS_NEXT_RESOURCE_VALUE        2013
 #define _APS_NEXT_COMMAND_VALUE         32814
-#define _APS_NEXT_CONTROL_VALUE         2012
+#define _APS_NEXT_CONTROL_VALUE         2013
 #define _APS_NEXT_SYMED_VALUE           2001
 #endif
 #endif

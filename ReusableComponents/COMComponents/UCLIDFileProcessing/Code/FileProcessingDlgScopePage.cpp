@@ -7,6 +7,7 @@
 #include "FileProcessingDlgScopePage.h"
 #include "FileProcessingManager.h"
 #include "FPCategories.h"
+#include "FileProcessingAdvQueueDlg.h"
 
 #include <FileProcessingConfigMgr.h>
 #include <TemporaryResourceOverride.h>
@@ -219,6 +220,7 @@ void FileProcessingDlgScopePage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BTN_REMOVE, m_btnRemove);
 	DDX_Control(pDX, IDC_BTN_CONFIGURE, m_btnConfigure);
 	DDX_Control(pDX, IDC_BTN_ADD, m_btnAdd);
+	DDX_Control(pDX, IDC_BTN_ADVANCED, m_btnAdvanced);
 	DDX_Text(pDX, IDC_EDIT_CONDITION, m_zConditionDescription);
 	DDX_Control(pDX, IDC_BTN_FAMCONDITION, m_btnSelectCondition);
 	DDX_Control(pDX, IDC_EDIT_CONDITION, m_editSelectCondition);
@@ -228,6 +230,7 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgScopePage, CPropertyPage)
 	ON_BN_CLICKED(IDC_BTN_ADD, OnBtnAdd)
 	ON_BN_CLICKED(IDC_BTN_REMOVE, OnBtnRemove)
 	ON_BN_CLICKED(IDC_BTN_CONFIGURE, OnBtnConfigure)
+	ON_BN_CLICKED(IDC_BTN_ADVANCED, &FileProcessingDlgScopePage::OnBnClickedBtnAdvanced)
 	ON_WM_SIZE()
 	ON_WM_CREATE()
 	ON_COMMAND(ID_CONTEXT_CUT, &FileProcessingDlgScopePage::OnContextCut)
@@ -481,7 +484,7 @@ void FileProcessingDlgScopePage::OnSize(UINT nType, int cx, int cy)
 		static int nLen1, nLen2, nAddButtonWidth;
 		CRect rectDlg;
 		CRect rectLabelGrid, rectGrid;
-		CRect rectAddButton, rectRemoveButton, rectConfigureButton;
+		CRect rectAddButton, rectRemoveButton, rectConfigureButton, rectAdvancedButton;
 		CRect rectLabelCondition, rectConditionDescription, rectSelectCondition;
 
 		// Get original sizes and positions
@@ -491,6 +494,8 @@ void FileProcessingDlgScopePage::OnSize(UINT nType, int cx, int cy)
 		ScreenToClient(&rectRemoveButton);
 		getDlgItemWindowRect(IDC_BTN_CONFIGURE, rectConfigureButton);
 		ScreenToClient(&rectConfigureButton);
+		getDlgItemWindowRect(IDC_BTN_ADVANCED, rectAdvancedButton);
+		ScreenToClient(&rectAdvancedButton);
 		getDlgItemWindowRect(IDC_STATIC_SUPPLIER, rectLabelGrid);
 		ScreenToClient(&rectLabelGrid);
 		getDlgItemWindowRect(IDC_GRID, rectGrid);
@@ -532,6 +537,8 @@ void FileProcessingDlgScopePage::OnSize(UINT nType, int cx, int cy)
 		rectRemoveButton.left = rectAddButton.left;
 		rectConfigureButton.right = rectAddButton.right;
 		rectConfigureButton.left = rectAddButton.left;
+		rectAdvancedButton.right = rectAddButton.right;
+		rectAdvancedButton.left = rectAddButton.left;
 
 		// Adjust position of FAM Condition description
 		long height = rectConditionDescription.Height();
@@ -559,6 +566,7 @@ void FileProcessingDlgScopePage::OnSize(UINT nType, int cx, int cy)
 		m_btnAdd.MoveWindow( &rectAddButton );
 		m_btnRemove.MoveWindow( &rectRemoveButton );
 		m_btnConfigure.MoveWindow( &rectConfigureButton );
+		m_btnAdvanced.MoveWindow( &rectAdvancedButton );
 
 		// Move the FAM Condition controls to their new positions
 		m_btnSelectCondition.MoveWindow(&rectSelectCondition);
@@ -880,6 +888,22 @@ LRESULT FileProcessingDlgScopePage::OnGridSelChange(WPARAM wParam, LPARAM lParam
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30517");
 
 	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlgScopePage::OnBnClickedBtnAdvanced()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		FileProcessingAdvQueueDlg advQueueDlg(this);
+		advQueueDlg.m_bSkipPageCount = asMFCBool(getFSMgmtRole()->SkipPageCount);
+		if (advQueueDlg.DoModal() == IDOK)
+		{
+			getFSMgmtRole()->SkipPageCount = asVariantBool(advQueueDlg.m_bSkipPageCount);
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35092");
 }
 
 //-------------------------------------------------------------------------------------------------

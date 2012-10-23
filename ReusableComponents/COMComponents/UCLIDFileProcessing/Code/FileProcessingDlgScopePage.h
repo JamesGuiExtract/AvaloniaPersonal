@@ -56,6 +56,7 @@ public:
 	CButton	m_btnAdd;
 	CButton	m_btnRemove;
 	CButton	m_btnConfigure;
+	CButton	m_btnAdvanced;
 	CString	m_zConditionDescription;
 	CButton	m_btnSelectCondition;
 	CEdit m_editSelectCondition;
@@ -75,6 +76,7 @@ protected:
 	afx_msg void OnBtnAdd();
 	afx_msg void OnBtnRemove();
 	afx_msg void OnBtnConfigure();
+	afx_msg void OnBnClickedBtnAdvanced();
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnBtnSelectCondition();
