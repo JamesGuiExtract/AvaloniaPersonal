@@ -657,6 +657,7 @@
             this._testNameTextBox.ParentDataEntryControl = this._laboratoryTestTable;
             this._testNameTextBox.Size = new System.Drawing.Size(527, 20);
             this._testNameTextBox.TabIndex = 1;
+            this._testNameTextBox.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
             this._testNameTextBox.ValidationErrorMessage = "Invalid value";
             this._testNameTextBox.ValidationQuery = resources.GetString("_testNameTextBox.ValidationQuery");
             // 
@@ -907,7 +908,7 @@
             this._testComment.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._testComment.Size = new System.Drawing.Size(666, 47);
             this._testComment.TabIndex = 2;
-            this._testComment.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
+            this._testComment.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._testComment.ValidationErrorMessage = "";
             // 
             // _orderCommentLabel
@@ -980,8 +981,8 @@
             this._orderNumberColumn.FillWeight = 50F;
             this._orderNumberColumn.HeaderText = "Order #";
             this._orderNumberColumn.Name = "_orderNumberColumn";
-            this._orderNumberColumn.TabStopMode = Extract.DataEntry.TabStopMode.Never;
-            this._orderNumberColumn.ValidationErrorMessage = "Invalid value";
+            this._orderNumberColumn.ValidationErrorMessage = "Order number is required";
+            this._orderNumberColumn.ValidationPattern = "^\\d+\\s?$";
             // 
             // _testName
             // 
