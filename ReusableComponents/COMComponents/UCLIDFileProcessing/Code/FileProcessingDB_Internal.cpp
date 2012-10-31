@@ -237,6 +237,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 													string strAction, const string& strState,
 													const string& strException,
 													bool bAllowQueuedStatusOverride,
+													bool bQueueChangeIfProcessing,
 													long nActionID, bool bRemovePreviousSkipped,
 													const string& strFASTComment)
 {
@@ -319,62 +320,93 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			// applying the queued change or ignoring it).
 			string strNewState = strState;
 			string strNewFASTComment = strFASTComment;
-			long nQueuedStatusChangeID = getLongField(ipFileSetFields, "QueuedStatusChangeID");
 
-			_lastCodePos = "151";
+			long nQueuedStatusChangeID = -1;
 
-			if (nQueuedStatusChangeID >= 0)
+			// If the status change is to be queued when the file is currently processing and the
+			// file is currently processing, update the QueuedActionStatusChange table and return.
+			if (bQueueChangeIfProcessing && strPrevStatus == "R" && strNewState != "R")
 			{
-				// Open the relevant record in QueuedActionStatusChange.
-				_lastCodePos = "152";
-				_RecordsetPtr ipQueuedChangeSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI34184", ipQueuedChangeSet != __nullptr);
+				string strActionID = asString(nActionID);
+				string strFAMUser = asString(getFAMUserID(ipConnection));
+				string strMachine = asString(getMachineID(ipConnection));
 
-				string strQueuedActionStatusSQL =
-					"SELECT [ASC_To], [ChangeStatus] FROM [QueuedActionStatusChange] WHERE [ID] = " +
-					asString(nQueuedStatusChangeID);
+				// Any previous pending entry in the QueuedActionStatusChange table for
+				// this file and status should be set to "O" to indicate the previously
+				// queued change has been overridden by this one.
+				executeCmdQuery(ipConnection,
+						"UPDATE [QueuedActionStatusChange] SET [ChangeStatus] = 'O'"
+						" WHERE [ChangeStatus] = 'P' AND [ActionID] = " + strActionID +
+						" AND [FileID] = " +  strFileId + ";\r\n");
 
-				ipQueuedChangeSet->Open(strQueuedActionStatusSQL.c_str(),
-					_variant_t((IDispatch *)ipConnection,true),
-					adOpenDynamic, adLockOptimistic, adCmdText);
+				// Add a new QueuedActionStatusChange entry to queue this change.
+				executeCmdQuery(ipConnection, "INSERT INTO [QueuedActionStatusChange]"
+						" (FileID, ActionID, ASC_To, DateTimeStamp, MachineID, FAMUserID, UPI, ChangeStatus)"
+						" VALUES(" + strFileId + ", " + strActionID + ", '" + strNewState +
+						"', GETDATE(), " + strMachine + ", " + strFAMUser +
+						", '" + m_strUPI + "', 'P');");
 
-				_lastCodePos = "153";
+				return easRtn;
+			}
+			else
+			{
+				nQueuedStatusChangeID = getLongField(ipFileSetFields, "QueuedStatusChangeID");
 
-				if (bAllowQueuedStatusOverride)
+				_lastCodePos = "151";
+
+				if (nQueuedStatusChangeID >= 0)
 				{
-					_lastCodePos = "154";
-					string strOverrideState = getStringField(ipQueuedChangeSet->Fields, "ASC_To");
+					// Open the relevant record in QueuedActionStatusChange.
+					_lastCodePos = "152";
+					_RecordsetPtr ipQueuedChangeSet(__uuidof(Recordset));
+					ASSERT_RESOURCE_ALLOCATION("ELI34184", ipQueuedChangeSet != __nullptr);
 
-					// If overrides from the QueuedChange table are allowed, update the target state
-					// and apply a comment that notes the override.
-					if (strOverrideState != strState)
+					string strQueuedActionStatusSQL =
+						"SELECT [ASC_To], [ChangeStatus] FROM [QueuedActionStatusChange] WHERE [ID] = " +
+						asString(nQueuedStatusChangeID);
+
+					ipQueuedChangeSet->Open(strQueuedActionStatusSQL.c_str(),
+						_variant_t((IDispatch *)ipConnection,true),
+						adOpenDynamic, adLockOptimistic, adCmdText);
+
+					_lastCodePos = "153";
+
+					if (bAllowQueuedStatusOverride)
 					{
-						strNewState = strOverrideState;
-						strNewFASTComment = "Transition to " + strState + " overridden";
+						_lastCodePos = "154";
+						string strOverrideState = getStringField(ipQueuedChangeSet->Fields, "ASC_To");
+
+						// If overrides from the QueuedChange table are allowed, update the target state
+						// and apply a comment that notes the override.
+						if (strOverrideState != strState)
+						{
+							strNewState = strOverrideState;
+							strNewFASTComment = "Transition to " + strState + " overridden";
+						}
+
+						_lastCodePos = "155";
+						setStringField(ipQueuedChangeSet->Fields, "ChangeStatus", "C");
+						ipQueuedChangeSet->Update();
+					}
+					else
+					{
+						// If overrides from the QueuedChange table are not allowed, mark the
+						// QueuedChange record as ignored.
+						nQueuedStatusChangeID = -1;
+					
+						_lastCodePos = "156";
 					}
 
-					_lastCodePos = "155";
-					setStringField(ipQueuedChangeSet->Fields, "ChangeStatus", "C");
-					ipQueuedChangeSet->Update();
-				}
-				else
-				{
-					// If overrides from the QueuedChange table are not allowed, mark the
-					// QueuedChange record as ignored.
-					nQueuedStatusChangeID = -1;
-					
-					_lastCodePos = "156";
-				}
+					// While there should only ever be on pending row in QueuedActionStatusChange for
+					// each FileID/ActionID pair, this call ensures sure that all pending changes for
+					// this file are reset here (whether or not the change was applied.
+					executeCmdQuery(ipConnection,
+						"UPDATE [QueuedActionStatusChange] SET [ChangeStatus] = 'I'"
+						"WHERE [ChangeStatus] = 'P' AND [ActionID] = " + asString(nActionID) +
+						" AND [FileID] = " + asString(nFileID));
 
-				// While there should only ever be on pending row in QueuedActionStatusChange for
-				// each FileID/ActionID pair, this call ensures sure that all pending changes for
-				// this file are reset here (whether or not the change was applied.
-				executeCmdQuery(ipConnection,
-					"UPDATE [QueuedActionStatusChange] SET [ChangeStatus] = 'I'"
-					"WHERE [ChangeStatus] = 'P' AND [ActionID] = " + asString(nActionID) +
-					" AND [FileID] = " + asString(nFileID));
-
-				_lastCodePos = "157";
+					_lastCodePos = "157";
+				}
 			}
 
 			// Get the current record
@@ -504,6 +536,23 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		return easRtn;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30395");
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::setStatusForFile(_ConnectionPtr ipConnection, long nFileID, string strAction,
+	EActionStatus eStatus, bool bQueueChangeIfProcessing, EActionStatus *poldStatus)
+{
+	try
+	{
+		// Change the status for the given file and return the previous state
+		EActionStatus oldStatus = setFileActionState(ipConnection, nFileID, strAction,
+			asStatusString(eStatus), "", false, bQueueChangeIfProcessing);
+
+		if (poldStatus != __nullptr)
+		{
+			*poldStatus = oldStatus;
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35102");
 }
 //--------------------------------------------------------------------------------------------------
 EActionStatus CFileProcessingDB::asEActionStatus  (const string& strStatus)
@@ -3586,7 +3635,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 			// processing when the FAM crashed are applied now.
 			setFileActionState(ipConnection, getLongField(ipFields, "FileID"), 
 				strActionName, strRevertToStatus, 
-				"", true, getLongField(ipFields, "ActionID"), false, strFASTComment);
+				"", true, false, getLongField(ipFields, "ActionID"), false, strFASTComment);
 
 			ipFileSet->MoveNext();
 		}
@@ -4085,6 +4134,16 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			StopWatch swTransactionRetryTimeout;
 			swTransactionRetryTimeout.start();
 
+			// [LegacyRCAndUtils:6350]
+			// For any calls that may involve changing file status, since such changes involve
+			// making changes across several tables, it is important that the status of the
+			// records associated with the file don't change via other threads/processes in the
+			// midst of this call, otherwise the file records may be inconsisent. For example a
+			// file could appear complete in the FileActionStatus table, but still be in the
+			// LockedFile table. Use repeatable read to ensure the relevant records do not
+			// change before this call is complete.
+			ipConnection->IsolationLevel = adXactRepeatableRead;
+
 			// Retry the transaction until successfull
 			while (!bTransactionSuccessful)
 			{
@@ -4204,6 +4263,12 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 							asString(m_dGetFilesToProcessTransactionTimeout));
 						throw uex;
 					}
+
+					// In the case that the the exception is because the database has gotten into an
+					// inconsistent state (as with LegacyRCAndUtiles:6350), use a small sleep here to
+					// prevent thousands (or millions) of successive failures which may bog down the
+					// DB and burn through table IDs.
+					Sleep(100);
 				}
 			}
 			return ipFiles;

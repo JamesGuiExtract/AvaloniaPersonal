@@ -524,10 +524,13 @@ private:
 	//			pending change for the file, that change will be applied. If
 	//			bAllowQueuedStatusOverride is false, the QueuedActionStatusChange will be ignored
 	//			and the status will be set to strState.
+	//			If bQueueChangeIfProcessing is true and the document is already processing, queue
+	//			the new strState via the QueuedActionStatusChange table such that when it is done
+	//			processing it will be moved into that state.
 	EActionStatus setFileActionState(_ConnectionPtr ipConnection, long nFileID,
 		string strAction, const string& strState, const string& strException,
-		bool bAllowQueuedStatusOverride, long nActionID = -1, bool bRemovePreviousSkipped = false, 
-		const string& strFASTComment = "");
+		bool bAllowQueuedStatusOverride, bool bQueueChangeIfProcessing, long nActionID = -1,
+		bool bRemovePreviousSkipped = false, const string& strFASTComment = "");
 
 	// PROMISE: To set the specified group of files' action state for the specified action.
 	// NOTE:	This will clear the skipped file state for any file ID in the list if
@@ -536,6 +539,15 @@ private:
 	//			create a transaction guard.
 	void setFileActionState(_ConnectionPtr ipConnection,
 		const vector<SetFileActionData>& vecFileData, string strAction, const string& strState);
+
+	// A helper function for SetFileActionState that sets the status for the specified file ID to
+	// the specified state on the specified action.
+	// If bQueueChangeIfProcessing is true and the file is currently in the processing state on the
+	// specified action, the new state will be queued via the QueuedActionStatusChange table such
+	// that when it is done processing it will be moved into that state.
+	// poldStatus will return the previous action status of the document if not null.
+	void setStatusForFile(_ConnectionPtr ipConnection, long nFileID,  string strAction,
+		EActionStatus eStatus, bool bQueueChangeIfProcessing, EActionStatus *poldStatus = __nullptr);
 
 	// PROMISE: Recalculates the statistics for the given Action ID using the connection provided.
 	void reCalculateStats(_ConnectionPtr ipConnection, long nActionID);

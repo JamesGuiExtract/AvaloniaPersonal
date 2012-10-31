@@ -815,6 +815,16 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 
+				// [LegacyRCAndUtils:6350]
+				// For any calls that may involve changing file status, since such changes involve
+				// making changes across several tables, it is important that the status of the
+				// records associated with the file don't change via other threads/processes in the
+				// midst of this call, otherwise the file records may be inconsisent. For example a
+				// file could appear complete in the FileActionStatus table, but still be in the
+				// LockedFile table. Use repeatable read to ensure the relevant records do not
+				// change before this call is complete.
+				ipConnection->IsolationLevel = adXactRepeatableRead;
+
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
@@ -993,118 +1003,28 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 					_lastCodePos = "100";
 
-					// if Force processing is set need to update the status or if the previous status for this action was unattempted
-					if (bForceStatusChange == VARIANT_TRUE || *pPrevStatus == kActionUnattempted)
-					{
-						_lastCodePos = "100.2";
+					// Call setStatusForFile to handle updating all tables related to the status
+					// change, as appropriate.
+					setStatusForFile(ipConnection, nID, strActionName, kActionPending, true);
 
-						// If the previous state is "R" it should not be changed unless the FAM that was
-						// processing it has timed out.
-						bool bAttemptedRevert = false;
-						while (*pPrevStatus == kActionProcessing)
-						{
-							// If auto-revert is to be attempted, but we have not attempted it yet.
-							if (m_bAutoRevertLockedFiles && !bAttemptedRevert)
-							{
-								revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
+					_lastCodePos = "110";
 
-								// Requery to see if the attempt had an effect on the file in question.
-								ipFileActionStatusSet->Requery(adOptionUnspecified);
+					// set the fields to the new file Record
+					// (only update the priority if force processing)
+					setFieldsFromFileRecord(ipFields, ipNewFileRecord, asCppBool(bForceStatusChange));
 
-								if (!asCppBool(ipFileActionStatusSet->adoEOF))
-								{
-									// Update the action status to reflect the attempt.
-									*pPrevStatus = asEActionStatus(getStringField(ipFileActionStatusSet->Fields, "ActionStatus"));
+					_lastCodePos = "120";
 
-									// Re-test to see if the record is still marked as processing.
-									bAttemptedRevert = true;
-									continue;
-								}
-							}
+					// It can be assumed after the call to setFieldsFromFileRecord that the record
+					// is in the FileActionStatus table for this action at least.
+					string strPriority = asString(getLongField(ipFields, "Priority"));
+					string strUpdatePrioritySQL = "UPDATE FileActionStatus SET Priority = " +
+						strPriority + " WHERE FileID = " + asString(nID) +
+						" AND Priority <> " + strPriority;
 
-							UCLIDException ue("ELI30364", "Cannot force status from Processing.");
-							ue.addDebugInfo("File", strFileName);
-							ue.addDebugInfo("Action Name", strActionName);
-							throw ue;
-						}
+					executeCmdQuery(ipConnection, strUpdatePrioritySQL);
 
-						// set the fields to the new file Record
-						// (only update the priority if force processing)
-						setFieldsFromFileRecord(ipFields, ipNewFileRecord, asCppBool(bForceStatusChange));
-
-						string strPriority = asString(getLongField(ipFields, "Priority"));
-
-						_lastCodePos = "110";
-
-						// Update the record
-						ipFileSet->Update();
-
-						_lastCodePos = "120";
-
-						// Update the FileActionStatus record to have the new status
-						string strStatusSQL;
-						if ( *pPrevStatus == kActionUnattempted)
-						{
-							strStatusSQL = "INSERT INTO FileActionStatus "
-								"(FileID, ActionID, ActionStatus, Priority) "
-								"VALUES( " + asString(nID) + ", " + asString(nActionID) + ", '" + strNewStatus +
-								"', " + strPriority + ")";
-						}
-						else
-						{
-							strStatusSQL = "UPDATE FileActionStatus SET ActionStatus = '" + strNewStatus +
-								"', Priority = " + strPriority + " WHERE FileID = " + asString(nID) +
-								" AND ActionID = " + asString(nActionID) + " AND ActionStatus != '" +
-								strNewStatus + "'";
-						}
-
-						// Update or insert the status 
-						long nRecordsAffected = executeCmdQuery(ipConnection, strStatusSQL);
-
-						string strUpdatePrioritySQL = "UPDATE FileActionStatus SET Priority = " +
-							strPriority + " WHERE FileID = " + asString(nID) +
-							" AND Priority <> " + strPriority;
-
-						executeCmdQuery(ipConnection, strUpdatePrioritySQL);
-
-						// if no records were affected the previous status should be changed to the
-						// new status, since if no records were affected it was changed by another 
-						// process to the new status.
-						if (nRecordsAffected == 0)
-						{
-							// Change previous status to new status
-							*pPrevStatus = eNewStatus;
-						}
-
-						// If the previous status was skipped, remove the record from the skipped file table
-						if (*pPrevStatus == kActionSkipped)
-						{
-							removeSkipFileRecord(ipConnection, nID, nActionID);
-						}
-
-						// add an Action State Transition if the previous state was not unattempted or was not the
-						// same as the new status and the FAST table should be updated
-						if (*pPrevStatus != kActionUnattempted && *pPrevStatus != eNewStatus
-							&& m_bUpdateFASTTable)
-						{
-							addFileActionStateTransition(ipConnection, nID, nActionID,
-								asStatusString(*pPrevStatus), strNewStatus, "", "");
-						}
-						_lastCodePos = "140";
-
-						// update the statistics
-						updateStats(ipConnection, nActionID, *pPrevStatus, eNewStatus, ipNewFileRecord, ipOldRecord);
-
-						_lastCodePos = "150";
-					}
-					else
-					{
-						// Set the file size and and page count for the file record to
-						// the file size and page count stored in the database
-						ipNewFileRecord->FileSize = ipOldRecord->FileSize;
-						ipNewFileRecord->Pages = ipOldRecord->Pages;
-						_lastCodePos = "152";
-					}
+					_lastCodePos = "150";
 				}
 
 				// Set the new file Record ID to nID;
@@ -1273,12 +1193,22 @@ bool CFileProcessingDB::NotifyFileProcessed_Internal(bool bDBLocked, long nFileI
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 
+				// [LegacyRCAndUtils:6350]
+				// For any calls that may involve changing file status, since such changes involve
+				// making changes across several tables, it is important that the status of the
+				// records associated with the file don't change via other threads/processes in the
+				// midst of this call, otherwise the file records may be inconsisent. For example a
+				// file could appear complete in the FileActionStatus table, but still be in the
+				// LockedFile table. Use repeatable read to ensure the relevant records do not
+				// change before this call is complete.
+				ipConnection->IsolationLevel = adXactRepeatableRead;
+
 				// Begin a transaction
 				TransactionGuard tg(ipConnection);
 
 				// change the given files state to completed unless there is a pending state in the
 				// QueuedActionStatusChange table.
-				setFileActionState(ipConnection, nFileID, asString(strAction), "C", "", true, -1);
+				setFileActionState(ipConnection, nFileID, asString(strAction), "C", "", true, false);
 
 				tg.CommitTrans();
 
@@ -1317,6 +1247,16 @@ bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked,long nFileID,  
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 
+				// [LegacyRCAndUtils:6350]
+				// For any calls that may involve changing file status, since such changes involve
+				// making changes across several tables, it is important that the status of the
+				// records associated with the file don't change via other threads/processes in the
+				// midst of this call, otherwise the file records may be inconsisent. For example a
+				// file could appear complete in the FileActionStatus table, but still be in the
+				// LockedFile table. Use repeatable read to ensure the relevant records do not
+				// change before this call is complete.
+				ipConnection->IsolationLevel = adXactRepeatableRead;
+
 				// Begin a transaction
 				TransactionGuard tg(ipConnection);
 
@@ -1328,7 +1268,7 @@ bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked,long nFileID,  
 
 				// change the given files state to Failed unless there is a pending state in the
 				// QueuedActionStatusChange table.
-				setFileActionState(ipConnection, nFileID, asString(strAction), "F", strLogString, true);
+				setFileActionState(ipConnection, nFileID, asString(strAction), "F", strLogString, true, false);
 
 				tg.CommitTrans();
 
@@ -1362,13 +1302,23 @@ bool CFileProcessingDB::SetFileStatusToPending_Internal(bool bDBLocked, long nFi
 
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
+
+				// [LegacyRCAndUtils:6350]
+				// For any calls that may involve changing file status, since such changes involve
+				// making changes across several tables, it is important that the status of the
+				// records associated with the file don't change via other threads/processes in the
+				// midst of this call, otherwise the file records may be inconsisent. For example a
+				// file could appear complete in the FileActionStatus table, but still be in the
+				// LockedFile table. Use repeatable read to ensure the relevant records do not
+				// change before this call is complete.
+				ipConnection->IsolationLevel = adXactRepeatableRead;
 				
 				// Begin a transaction
 				TransactionGuard tg(ipConnection);
 				
 				// change the given files state to Pending
 				setFileActionState(ipConnection, nFileID, asString(strAction), "P", "", 
-					asCppBool(vbAllowQueuedStatusOverride));
+					asCppBool(vbAllowQueuedStatusOverride), false);
 
 				tg.CommitTrans();
 
@@ -1405,12 +1355,22 @@ bool CFileProcessingDB::SetFileStatusToUnattempted_Internal(bool bDBLocked, long
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 
+				// [LegacyRCAndUtils:6350]
+				// For any calls that may involve changing file status, since such changes involve
+				// making changes across several tables, it is important that the status of the
+				// records associated with the file don't change via other threads/processes in the
+				// midst of this call, otherwise the file records may be inconsisent. For example a
+				// file could appear complete in the FileActionStatus table, but still be in the
+				// LockedFile table. Use repeatable read to ensure the relevant records do not
+				// change before this call is complete.
+				ipConnection->IsolationLevel = adXactRepeatableRead;
+
 				// Begin a transaction
 				TransactionGuard tg(ipConnection);
 
 				// change the given files state to unattempted
 				setFileActionState(ipConnection, nFileID, asString(strAction), "U", "",
-					asCppBool(vbAllowQueuedStatusOverride));
+					asCppBool(vbAllowQueuedStatusOverride), false);
 
 				tg.CommitTrans();
 
@@ -1437,26 +1397,36 @@ bool CFileProcessingDB::SetFileStatusToSkipped_Internal(bool bDBLocked, long nFi
 	{
 		try
 		{
-		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-		ADODB::_ConnectionPtr ipConnection = __nullptr;
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 		
-		BEGIN_CONNECTION_RETRY();
+			BEGIN_CONNECTION_RETRY();
 		
-		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
 
-		// Begin a transaction
-		TransactionGuard tg(ipConnection);
+			// [LegacyRCAndUtils:6350]
+			// For any calls that may involve changing file status, since such changes involve
+			// making changes across several tables, it is important that the status of the
+			// records associated with the file don't change via other threads/processes in the
+			// midst of this call, otherwise the file records may be inconsisent. For example a
+			// file could appear complete in the FileActionStatus table, but still be in the
+			// LockedFile table. Use repeatable read to ensure the relevant records do not
+			// change before this call is complete.
+			ipConnection->IsolationLevel = adXactRepeatableRead;
 
-		// Change the given files state to Skipped
-		setFileActionState(ipConnection, nFileID, asString(strAction), "S", "",
-			asCppBool(vbAllowQueuedStatusOverride), -1, asCppBool(bRemovePreviousSkipped));
+			// Begin a transaction
+			TransactionGuard tg(ipConnection);
 
-		tg.CommitTrans();
+			// Change the given files state to Skipped
+			setFileActionState(ipConnection, nFileID, asString(strAction), "S", "",
+				asCppBool(vbAllowQueuedStatusOverride), false, -1, asCppBool(bRemovePreviousSkipped));
 
-		END_CONNECTION_RETRY(ipConnection, "ELI26938");
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30639");
+			tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI26938");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30639");
 	}
 	catch(UCLIDException &ue)
 	{
@@ -1657,7 +1627,7 @@ bool CFileProcessingDB::SearchAndModifyFileStatus_Internal(bool bDBLocked,
 					}
 
 					setFileActionState(ipConnection, nFileID, strToAction, strToStatus, "", false,
-						nToActionID, true);
+						false, nToActionID, true);
 
 					// Update modified records count
 					nRecordsModified++;
@@ -1840,66 +1810,16 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 
 			BEGIN_CONNECTION_RETRY();
 
-				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
 
-				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+			// Begin a transaction
+			TransactionGuard tg(ipConnection);
 
-				// If vbQueueChangeIfProcessing, check to see if the file is currently processing.
-				if (asCppBool(vbQueueChangeIfProcessing))
-				{
-					string strActionID = asString(getActionID(ipConnection, asString(strAction)));
+			setStatusForFile(ipConnection, nID, asString(strAction), eStatus,
+				asCppBool(vbQueueChangeIfProcessing), poldStatus);
 
-					string strFileSQL = "SELECT FAMFile.ID, COALESCE(ActionStatus, 'U') AS ActionStatus "
-					"FROM FAMFile LEFT JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID "
-					" AND FileActionStatus.ActionID = " + strActionID + " WHERE FAMFile.ID = " 
-					+ asString(nID);
-
-					_RecordsetPtr ipFileSet(__uuidof(Recordset));
-					ASSERT_RESOURCE_ALLOCATION("ELI34168", ipFileSet != __nullptr);
-					ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-						adLockOptimistic, adCmdText);
-
-					// If the file was found in the DB
-					if (ipFileSet->adoEOF == VARIANT_FALSE)
-					{
-						// Check to see if its current status is processing.
-						string strStatus = getStringField(ipFileSet->Fields, "ActionStatus");
-						if (strStatus == "R")
-						{
-							string strActionStatus = asStatusString(eStatus);
-							string strFileID = asString(nID);
-
-							// Any previous pending entry in the QueuedActionStatusChange table for
-							// this file and status should be set to "O" to indicate the previously
-							// queued change has been overridden by this one.
-							executeCmdQuery(ipConnection,
-								"UPDATE [QueuedActionStatusChange] SET [ChangeStatus] = 'O'"
-								"WHERE [ChangeStatus] = 'P' AND [ActionID] = " + strActionID +
-								" AND [FileID] = " + asString(nID));
-
-							// Add a new QueuedActionStatusChange entry to queue this change.
-							executeCmdQuery(ipConnection, "INSERT INTO [QueuedActionStatusChange] "
-								"(FileID, ActionID, ASC_To, DateTimeStamp, MachineID, FAMUserID, UPI, ChangeStatus) "
-								"VALUES(" + asString(nID) + ", " + strActionID + ", '" +
-								asStatusString(eStatus) + "', GETDATE(), " +
-								asString(getMachineID(ipConnection)) + ", " +
-								asString(getFAMUserID(ipConnection)) + ", '" + m_strUPI + "', 'P')");
-
-							*poldStatus = kActionProcessing;
-						}
-					}
-				}
-
-				if (*poldStatus == kActionUnattempted)
-				{
-					// change the status for the given file and return the previous state
-					*poldStatus =setFileActionState(ipConnection, nID, asString(strAction),
-						asStatusString(eStatus), "", false);
-				}
-
-				tg.CommitTrans();
+			tg.CommitTrans();
 
 			END_CONNECTION_RETRY(ipConnection, "ELI23536");
 		}
@@ -2724,6 +2644,16 @@ bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID,
 
 				ipConnection = getDBConnection();
 
+				// [LegacyRCAndUtils:6350]
+				// For any calls that may involve changing file status, since such changes involve
+				// making changes across several tables, it is important that the status of the
+				// records associated with the file don't change via other threads/processes in the
+				// midst of this call, otherwise the file records may be inconsisent. For example a
+				// file could appear complete in the FileActionStatus table, but still be in the
+				// LockedFile table. Use repeatable read to ensure the relevant records do not
+				// change before this call is complete.
+				ipConnection->IsolationLevel = adXactRepeatableRead;
+
 				// Get the action name
 				string strActionName = getActionName(ipConnection, nActionID);
 
@@ -2732,7 +2662,7 @@ bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID,
 
 				// Set the file state to skipped unless there is a pending state in the
 				// QueuedActionStatusChange table.
-				setFileActionState(ipConnection, nFileID, strActionName, "S", "", true, nActionID);
+				setFileActionState(ipConnection, nFileID, strActionName, "S", "", true, false, nActionID);
 
 				tg.CommitTrans();
 
@@ -4054,7 +3984,7 @@ bool CFileProcessingDB::SetStatusForFilesWithTags_Internal(bool bDBLocked, IVari
 					// This call should not be made from file processing and the new state should
 					// overrule any pending state for the file in the QueuedActionStatusChange table.
 					setFileActionState(ipConnection, nFileID, strToAction, strStatus, "", false,
-						nToActionID);
+						false, nToActionID);
 
 					// Move to next record
 					ipFileSet->MoveNext();
