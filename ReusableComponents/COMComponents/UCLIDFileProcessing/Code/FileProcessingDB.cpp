@@ -688,7 +688,7 @@ STDMETHODIMP CFileProcessingDB::ResetDBLock(void)
 		validateDBSchemaVersion();
 
 		// Begin Transaction
-		TransactionGuard tg(ipConnection);
+		TransactionGuard tg(ipConnection, adXactChaos);
 
 		// Delete all Lock records
 		string strDelete = gstrDELETE_DB_LOCK;

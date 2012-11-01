@@ -248,6 +248,17 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		ASSERT_ARGUMENT("ELI30390", ipConnection != __nullptr);
 		ASSERT_ARGUMENT("ELI30391", !strAction.empty() || nActionID != -1);
 
+		// Per [LegacyRCAndUtils:6350], ensure the isolation level here is high enough so that
+		// other threads/processes don't modify records related to the file action state in the
+		// midst of this call.
+		if (ipConnection->IsolationLevel < adXactRepeatableRead)
+		{
+			UCLIDException ue("ELI35103",
+				"Database connection does not have sufficient isolation level.");
+			ue.addDebugInfo("IsolationLevel", ipConnection->IsolationLevel);
+			throw ue;
+		}
+
 		_lastCodePos = "10";
 		EActionStatus easRtn = kActionUnattempted;
 
@@ -902,7 +913,7 @@ void CFileProcessingDB::addASTransFromSelect(_ConnectionPtr ipConnection,
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26937");
 }
 //--------------------------------------------------------------------------------------------------
-_ConnectionPtr  CFileProcessingDB::getDBConnection()
+_ConnectionPtr CFileProcessingDB::getDBConnection()
 {
 	INIT_EXCEPTION_AND_TRACING("MLI00018");
 	try
@@ -2043,7 +2054,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 				// Lock while updating the lock table and m_bDBLocked variable
 				CSingleLock lock(&m_mutex, TRUE);
 
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipLockTable(__uuidof(Recordset));
@@ -2305,7 +2316,7 @@ void CFileProcessingDB::storeEncryptedPasswordAndUserName(const string& strEncry
 	unique_ptr<TransactionGuard> apTg;
 	if (bCreateTransactionGuard)
 	{
-		apTg.reset(new TransactionGuard(getDBConnection()));
+		apTg.reset(new TransactionGuard(getDBConnection(), adXactChaos));
 		ASSERT_RESOURCE_ALLOCATION("ELI29896", apTg.get() != __nullptr);
 	}
 
@@ -3137,7 +3148,7 @@ void CFileProcessingDB::resetDBConnection()
 		_lastCodePos = "10";
 
 		CSingleLock lock(&m_mutex, TRUE);
-		
+
 		// Close all the DB connections and clear the map [LRCAU# 5659]
 		closeAllDBConnections();
 
@@ -3232,7 +3243,7 @@ void CFileProcessingDB::clear(bool retainUserValues)
 			CSingleLock lock(&m_mutex, TRUE);
 
 			// Begin a transaction
-			TransactionGuard tg(ipConnection);
+			TransactionGuard tg(ipConnection, adXactChaos);
 
 			// Get a list of the action names to preserve
 			vector<string> vecActionNames;
@@ -3324,7 +3335,7 @@ void CFileProcessingDB::init80DB()
 			CSingleLock lock(&m_mutex, TRUE);
 
 			// Begin a transaction
-			TransactionGuard tg(ipConnection);
+			TransactionGuard tg(ipConnection, adXactChaos);
 
 			// Add the tables back
 			addTables80();
@@ -4119,7 +4130,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			if (m_bAutoRevertLockedFiles && !m_bRevertInProgress)
 			{
 				// Begin a transaction
-				TransactionGuard tgRevert(ipConnection);
+				TransactionGuard tgRevert(ipConnection, adXactRepeatableRead);
 
 				// Revert files
 				revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
@@ -4134,21 +4145,11 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			StopWatch swTransactionRetryTimeout;
 			swTransactionRetryTimeout.start();
 
-			// [LegacyRCAndUtils:6350]
-			// For any calls that may involve changing file status, since such changes involve
-			// making changes across several tables, it is important that the status of the
-			// records associated with the file don't change via other threads/processes in the
-			// midst of this call, otherwise the file records may be inconsisent. For example a
-			// file could appear complete in the FileActionStatus table, but still be in the
-			// LockedFile table. Use repeatable read to ensure the relevant records do not
-			// change before this call is complete.
-			ipConnection->IsolationLevel = adXactRepeatableRead;
-
 			// Retry the transaction until successfull
 			while (!bTransactionSuccessful)
 			{
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead);
 
 				try
 				{
@@ -4340,7 +4341,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 	if (m_bAutoRevertLockedFiles)
 	{
 		// Begin a transaction for the revert 
-		TransactionGuard tgRevert(ipConnection);
+		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead);
 
 		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
@@ -4388,7 +4389,7 @@ bool CFileProcessingDB::isFAMActiveForAnyAction(bool bDBLocked)
 	if (m_bAutoRevertLockedFiles)
 	{
 		// Begin a transaction for the revert 
-		TransactionGuard tgRevert(ipConnection);
+		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead);
 
 		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
@@ -4421,7 +4422,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAnyAction(bool bDBLocked)
 	if (m_bAutoRevertLockedFiles)
 	{
 		// Begin a transaction for the revert 
-		TransactionGuard tgRevert(ipConnection);
+		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead);
 
 		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 

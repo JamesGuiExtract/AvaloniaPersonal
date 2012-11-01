@@ -682,7 +682,7 @@ bool CIDShieldProductDBMgr::AddIDShieldData_Internal(bool bDBLocked, long lFileI
 				+ asString(lNumPagesAutoAdvanced) + ")";
 
 			// Create a transaction guard
-			TransactionGuard tg(ipConnection);
+			TransactionGuard tg(ipConnection, adXactChaos);
 
 			// If not storing previous history need to delete it
 			if (!m_bStoreIDShieldProcessingHistory)

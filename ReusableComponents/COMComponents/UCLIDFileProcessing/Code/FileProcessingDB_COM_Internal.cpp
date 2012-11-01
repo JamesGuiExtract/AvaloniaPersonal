@@ -668,7 +668,7 @@ bool CFileProcessingDB::DefineNewAction_Internal(bool bDBLocked, BSTR strAction,
 				validateDBSchemaVersion();
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				*pnID = getKeyID(ipConnection, "Action", "ASCName", strActionName);
 
@@ -716,7 +716,7 @@ bool CFileProcessingDB::DeleteAction_Internal(bool bDBLocked, BSTR strAction)
 				assertProcessingNotActiveForAction(bDBLocked, ipConnection, nActionID);
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Delete the action
 				string strDeleteActionQuery = "DELETE FROM Action WHERE ASCName = '" + asString(strAction) + "'";
@@ -815,16 +815,6 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 
-				// [LegacyRCAndUtils:6350]
-				// For any calls that may involve changing file status, since such changes involve
-				// making changes across several tables, it is important that the status of the
-				// records associated with the file don't change via other threads/processes in the
-				// midst of this call, otherwise the file records may be inconsisent. For example a
-				// file could appear complete in the FileActionStatus table, but still be in the
-				// LockedFile table. Use repeatable read to ensure the relevant records do not
-				// change before this call is complete.
-				ipConnection->IsolationLevel = adXactRepeatableRead;
-
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
@@ -846,7 +836,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				long nID = 0;
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead);
 
 				// Set the action name from the parameter
 				string strActionName = asString(strAction);
@@ -1097,7 +1087,7 @@ bool CFileProcessingDB::RemoveFile_Internal(bool bDBLocked, BSTR strFile, BSTR s
 					adLockOptimistic, adCmdText);
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead);
 
 				// Setup action name and action id
 				string strActionName = asString(strAction);
@@ -1193,18 +1183,8 @@ bool CFileProcessingDB::NotifyFileProcessed_Internal(bool bDBLocked, long nFileI
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 
-				// [LegacyRCAndUtils:6350]
-				// For any calls that may involve changing file status, since such changes involve
-				// making changes across several tables, it is important that the status of the
-				// records associated with the file don't change via other threads/processes in the
-				// midst of this call, otherwise the file records may be inconsisent. For example a
-				// file could appear complete in the FileActionStatus table, but still be in the
-				// LockedFile table. Use repeatable read to ensure the relevant records do not
-				// change before this call is complete.
-				ipConnection->IsolationLevel = adXactRepeatableRead;
-
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead);
 
 				// change the given files state to completed unless there is a pending state in the
 				// QueuedActionStatusChange table.
@@ -1247,18 +1227,8 @@ bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked,long nFileID,  
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 
-				// [LegacyRCAndUtils:6350]
-				// For any calls that may involve changing file status, since such changes involve
-				// making changes across several tables, it is important that the status of the
-				// records associated with the file don't change via other threads/processes in the
-				// midst of this call, otherwise the file records may be inconsisent. For example a
-				// file could appear complete in the FileActionStatus table, but still be in the
-				// LockedFile table. Use repeatable read to ensure the relevant records do not
-				// change before this call is complete.
-				ipConnection->IsolationLevel = adXactRepeatableRead;
-
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead);
 
 				// [LegacyRCAndUtils:6054]
 				// Store the full log string which contains additional info which may be useful.
@@ -1302,19 +1272,9 @@ bool CFileProcessingDB::SetFileStatusToPending_Internal(bool bDBLocked, long nFi
 
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
-
-				// [LegacyRCAndUtils:6350]
-				// For any calls that may involve changing file status, since such changes involve
-				// making changes across several tables, it is important that the status of the
-				// records associated with the file don't change via other threads/processes in the
-				// midst of this call, otherwise the file records may be inconsisent. For example a
-				// file could appear complete in the FileActionStatus table, but still be in the
-				// LockedFile table. Use repeatable read to ensure the relevant records do not
-				// change before this call is complete.
-				ipConnection->IsolationLevel = adXactRepeatableRead;
 				
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead);
 				
 				// change the given files state to Pending
 				setFileActionState(ipConnection, nFileID, asString(strAction), "P", "", 
@@ -1353,20 +1313,10 @@ bool CFileProcessingDB::SetFileStatusToUnattempted_Internal(bool bDBLocked, long
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
-
-				// [LegacyRCAndUtils:6350]
-				// For any calls that may involve changing file status, since such changes involve
-				// making changes across several tables, it is important that the status of the
-				// records associated with the file don't change via other threads/processes in the
-				// midst of this call, otherwise the file records may be inconsisent. For example a
-				// file could appear complete in the FileActionStatus table, but still be in the
-				// LockedFile table. Use repeatable read to ensure the relevant records do not
-				// change before this call is complete.
-				ipConnection->IsolationLevel = adXactRepeatableRead;
+				ipConnection = getDBConnection();;
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead);
 
 				// change the given files state to unattempted
 				setFileActionState(ipConnection, nFileID, asString(strAction), "U", "",
@@ -1405,18 +1355,8 @@ bool CFileProcessingDB::SetFileStatusToSkipped_Internal(bool bDBLocked, long nFi
 			// Get the connection for the thread and save it locally.
 			ipConnection = getDBConnection();
 
-			// [LegacyRCAndUtils:6350]
-			// For any calls that may involve changing file status, since such changes involve
-			// making changes across several tables, it is important that the status of the
-			// records associated with the file don't change via other threads/processes in the
-			// midst of this call, otherwise the file records may be inconsisent. For example a
-			// file could appear complete in the FileActionStatus table, but still be in the
-			// LockedFile table. Use repeatable read to ensure the relevant records do not
-			// change before this call is complete.
-			ipConnection->IsolationLevel = adXactRepeatableRead;
-
 			// Begin a transaction
-			TransactionGuard tg(ipConnection);
+			TransactionGuard tg(ipConnection, adXactRepeatableRead);
 
 			// Change the given files state to Skipped
 			setFileActionState(ipConnection, nFileID, asString(strAction), "S", "",
@@ -1489,7 +1429,7 @@ bool CFileProcessingDB::GetFileStatus_Internal(bool bDBLocked, long nFileID,  BS
 						asCppBool(vbAttemptRevertIfLocked))
 					{
 						// Begin a transaction
-						TransactionGuard tg(ipConnection);
+						TransactionGuard tg(ipConnection, adXactRepeatableRead);
 
 						revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
@@ -1572,13 +1512,7 @@ bool CFileProcessingDB::SearchAndModifyFileStatus_Internal(bool bDBLocked,
 				string strWhereActionID = asString(nWhereActionID);
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
-
-				// Ensure no other stats or action status change while processing.
-				lockDBTableForTransaction(ipConnection, "FileActionStatus");
-				lockDBTableForTransaction(ipConnection, "SkippedFile");
-				lockDBTableForTransaction(ipConnection, "ActionStatisticsDelta");
-				lockDBTableForTransaction(ipConnection, "ActionStatistics");
+				TransactionGuard tg(ipConnection, adXactIsolated);
 
 				string strSQL = "SELECT FAMFile.ID AS FAMFileID, COALESCE(ActionStatus, 'U') AS WhereActionStatus ";
 
@@ -1693,13 +1627,7 @@ bool CFileProcessingDB::SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAc
 				string strWhere = " WHERE ActionStatus  <> '" + strActionStatus + "'";
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
-
-				// Ensure no other stats or action status change while processing.
-				lockDBTableForTransaction(ipConnection, "FileActionStatus");
-				lockDBTableForTransaction(ipConnection, "SkippedFile");
-				lockDBTableForTransaction(ipConnection, "ActionStatisticsDelta");
-				lockDBTableForTransaction(ipConnection, "ActionStatistics");
+				TransactionGuard tg(ipConnection, adXactIsolated);
 
 				// Get the action ID as as string
 				string strActionID = asString(nActionID);
@@ -1814,7 +1742,7 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 			ipConnection = getDBConnection();
 
 			// Begin a transaction
-			TransactionGuard tg(ipConnection);
+			TransactionGuard tg(ipConnection, adXactRepeatableRead);
 
 			setStatusForFile(ipConnection, nID, asString(strAction), eStatus,
 				asCppBool(vbQueueChangeIfProcessing), poldStatus);
@@ -2046,7 +1974,7 @@ bool CFileProcessingDB::RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BS
 					")";
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead);
 
 				// add transition records to the database
 				addASTransFromSelect(ipConnection, strActionName, nActionID, "U", "", "", strWhere, "");
@@ -2109,7 +2037,7 @@ bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
 				validateDBSchemaVersion();
 				
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// return a new object with the statistics
 				UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats =  
@@ -2158,13 +2086,7 @@ bool CFileProcessingDB::CopyActionStatusFromAction_Internal(bool bDBLocked, long
 				string strFrom = getActionName(ipConnection, nFromAction);
 				string strTo = getActionName(ipConnection, nToAction);
 
-				TransactionGuard tg(ipConnection);
-
-				// Ensure no other stats or action status change while processing.
-				lockDBTableForTransaction(ipConnection, "FileActionStatus");
-				lockDBTableForTransaction(ipConnection, "SkippedFile");
-				lockDBTableForTransaction(ipConnection, "ActionStatisticsDelta");
-				lockDBTableForTransaction(ipConnection, "ActionStatistics");
+				TransactionGuard tg(ipConnection, adXactIsolated);
 
 				// Copy Action status and only update the FAST table if required
 				copyActionStatus(ipConnection, strFrom, strTo, m_bUpdateFASTTable, nToAction);
@@ -2214,7 +2136,7 @@ bool CFileProcessingDB::RenameAction_Internal(bool bDBLocked, long nActionID, BS
 				string strOld = getActionName(ipConnection, nActionID);
 				string strNew = asString(strNewActionName);
 
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Change the name of the action in the action table
 				string strSQL = "UPDATE Action SET ASCName = '" + strNew + "' WHERE ID = " + asString(nActionID);
@@ -2434,7 +2356,7 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 				ASSERT_RESOURCE_ALLOCATION("ELI19792", ipDBInfoSet != __nullptr);
 
 				// Begin Transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Open recordset for the DBInfo Settings
 				ipDBInfoSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
@@ -2644,21 +2566,11 @@ bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID,
 
 				ipConnection = getDBConnection();
 
-				// [LegacyRCAndUtils:6350]
-				// For any calls that may involve changing file status, since such changes involve
-				// making changes across several tables, it is important that the status of the
-				// records associated with the file don't change via other threads/processes in the
-				// midst of this call, otherwise the file records may be inconsisent. For example a
-				// file could appear complete in the FileActionStatus table, but still be in the
-				// LockedFile table. Use repeatable read to ensure the relevant records do not
-				// change before this call is complete.
-				ipConnection->IsolationLevel = adXactRepeatableRead;
-
 				// Get the action name
 				string strActionName = getActionName(ipConnection, nActionID);
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead);
 
 				// Set the file state to skipped unless there is a pending state in the
 				// QueuedActionStatusChange table.
@@ -2714,7 +2626,7 @@ bool CFileProcessingDB::SetFileActionComment_Internal(bool bDBLocked, long nFile
 					adLockOptimistic, adCmdText);
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// If no records returned then there is no comment for this pair currently
 				// add the new comment to the table (do not add empty comments)
@@ -2851,7 +2763,7 @@ bool CFileProcessingDB::ClearFileActionComment_Internal(bool bDBLocked, long nFi
 				validateDBSchemaVersion();
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Clear the comment
 				clearFileActionComment(ipConnection, nFileID, nActionID);
@@ -2919,16 +2831,10 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 				validateDBSchemaVersion();
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactIsolated);
 
 				_RecordsetPtr ipFileSet(__uuidof(Recordset));
 				ASSERT_RESOURCE_ALLOCATION("ELI30382", ipFileSet != __nullptr);
-
-				// Ensure no other stats or action status change while processing.
-				lockDBTableForTransaction(ipConnection, "FileActionStatus");
-				lockDBTableForTransaction(ipConnection, "SkippedFile");
-				lockDBTableForTransaction(ipConnection, "ActionStatisticsDelta");
-				lockDBTableForTransaction(ipConnection, "ActionStatistics");
 
 				// Open the file set
 				ipFileSet->Open(strQueryFrom.c_str(), _variant_t((IDispatch*)ipConnection, true),
@@ -3255,7 +3161,7 @@ bool CFileProcessingDB::TagFile_Internal(bool bDBLocked, long nFileID, BSTR bstr
 				validateDBSchemaVersion();
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Get the tag ID (this will also validate the ID)
 				long nTagID = getTagID(ipConnection, strTagName);
@@ -3326,7 +3232,7 @@ bool CFileProcessingDB::UntagFile_Internal(bool bDBLocked, long nFileID, BSTR bs
 				validateDBSchemaVersion();
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				long nTagID = 0;
 
@@ -3415,7 +3321,7 @@ bool CFileProcessingDB::ToggleTagOnFile_Internal(bool bDBLocked, long nFileID, B
 				validateDBSchemaVersion();
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Get the tag ID (this will also validate the ID)
 				long nTagID = getTagID(ipConnection, strTagName);
@@ -3483,7 +3389,7 @@ bool CFileProcessingDB::AddTag_Internal(bool bDBLocked, const string& strTagName
 				validateDBSchemaVersion();
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipTagSet(__uuidof(Recordset));
@@ -3566,7 +3472,7 @@ bool CFileProcessingDB::DeleteTag_Internal(bool bDBLocked, BSTR bstrTagName)
 				validateDBSchemaVersion();
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipTagSet(__uuidof(Recordset));
@@ -3642,7 +3548,7 @@ bool CFileProcessingDB::ModifyTag_Internal(bool bDBLocked, BSTR bstrOldTagName, 
 				validateDBSchemaVersion();
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				string strQueryBase = "SELECT [TagName], [TagDescription] FROM [Tag] WHERE [TagName] = '";
 
@@ -3956,7 +3862,7 @@ bool CFileProcessingDB::SetStatusForFilesWithTags_Internal(bool bDBLocked, IVari
 				string strToAction = getActionName(ipConnection, nToActionID);
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead);
 
 				_RecordsetPtr ipFileSet(__uuidof(Recordset));
 				ASSERT_RESOURCE_ALLOCATION("ELI30386", ipFileSet != __nullptr);
@@ -4027,7 +3933,7 @@ bool CFileProcessingDB::ExecuteCommandQuery_Internal(bool bDBLocked, BSTR bstrQu
 				ipConnection = getDBConnection();
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Execute the query
 				long nRecordsAffected = executeCmdQuery(ipConnection, strQuery);
@@ -4076,7 +3982,7 @@ bool CFileProcessingDB::UnregisterActiveFAM_Internal(bool bDBLocked)
 			m_bFAMRegistered = false;
 
 			// Set the transaction guard
-			TransactionGuard tg(getDBConnection());
+			TransactionGuard tg(getDBConnection(), adXactRepeatableRead);
 
 			// Make sure there are no linked records in the LockedFile table 
 			// and if there are records reset there status to StatusBeforeLock if there current
@@ -4131,7 +4037,7 @@ bool CFileProcessingDB::SetPriorityForFiles_Internal(bool bDBLocked, BSTR bstrSe
 				validateDBSchemaVersion();
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Recordset to search for file IDs
 				_RecordsetPtr ipFileSet(__uuidof(Recordset));
@@ -4240,7 +4146,7 @@ bool CFileProcessingDB::AddUserCounter_Internal(bool bDBLocked, BSTR bstrCounter
 				ipConnection = getDBConnection();
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Build a query to check for the existence of the specified counter
 				string strCheckDuplicateCounter = "SELECT [CounterName] FROM "
@@ -4319,7 +4225,7 @@ bool CFileProcessingDB::RemoveUserCounter_Internal(bool bDBLocked, BSTR bstrCoun
 				ipConnection = getDBConnection();
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -4379,7 +4285,7 @@ bool CFileProcessingDB::RenameUserCounter_Internal(bool bDBLocked, BSTR bstrCoun
 				ipConnection = getDBConnection();
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -4461,7 +4367,7 @@ bool CFileProcessingDB::SetUserCounterValue_Internal(bool bDBLocked, BSTR bstrCo
 				ipConnection = getDBConnection();
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -4768,7 +4674,7 @@ bool CFileProcessingDB::OffsetUserCounter_Internal(bool bDBLocked, BSTR bstrCoun
 				validateDBSchemaVersion();
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead);
 
 				// Recordset to get the counters and values from
 				_RecordsetPtr ipCounterSet(__uuidof(Recordset));
@@ -4845,7 +4751,7 @@ bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstr
 				validateDBSchemaVersion();
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Get FPSFileID, MachineID, and UserID (this will add records if they don't exist)
 				long nFPSFileID = getKeyID(ipConnection, gstrFPS_FILE, "FPSFileName",
@@ -4899,7 +4805,7 @@ bool CFileProcessingDB::RecordFAMSessionStop_Internal(bool bDBLocked)
 				validateDBSchemaVersion();
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Execute the update query
 				executeCmdQuery(ipConnection, strFAMSessionQuery);
@@ -4946,7 +4852,7 @@ bool CFileProcessingDB::RecordInputEvent_Internal(bool bDBLocked, BSTR bstrTimeS
 				}
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				string strTimeStamp = asString(bstrTimeStamp);
 				string strActionId = asString(nActionID);
@@ -5113,7 +5019,7 @@ bool CFileProcessingDB::AddLoginUser_Internal(bool bDBLocked, BSTR bstrUserName)
 				validateDBSchemaVersion();
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Check to see if the new user already exists in the database
 				if (doesLoginUserNameExist(ipConnection, strUserName))
@@ -5173,7 +5079,7 @@ bool CFileProcessingDB::RemoveLoginUser_Internal(bool bDBLocked, BSTR bstrUserNa
 				validateDBSchemaVersion();
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Delet the specified user from the login table
 				executeCmdQuery(ipConnection, "DELETE FROM Login WHERE UserName = '" + strUserName + "'");
@@ -5235,7 +5141,7 @@ bool CFileProcessingDB::RenameLoginUser_Internal(bool bDBLocked, BSTR bstrUserNa
 				}
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Change old username to new user name in the table.
 				executeCmdQuery(ipConnection, "UPDATE Login SET UserName = '" + strNewUserName + 
@@ -5288,7 +5194,7 @@ bool CFileProcessingDB::ClearLoginUserPassword_Internal(bool bDBLocked, BSTR bst
 				validateDBSchemaVersion();
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Clear the password for the given user in the login table
 				executeCmdQuery(ipConnection, "UPDATE Login SET Password = '' WHERE UserName = '" + strUserName + "'");
@@ -5375,7 +5281,7 @@ bool CFileProcessingDB::AutoCreateAction_Internal(bool bDBLocked, BSTR bstrActio
 				validateDBSchemaVersion();
 
 				// Begin a transaction
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Create a pointer to a recordset containing the action
 				_RecordsetPtr ipActionSet = getActionSet(ipConnection, strActionName);
@@ -5580,7 +5486,7 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				throw ue;
 			}
 
-			TransactionGuard tg(ipConnection);
+			TransactionGuard tg(ipConnection, adXactChaos);
 
 			// Defines the signature for a function which will upgrade the FAM DB schema from one schema
 			// number to the next.
@@ -5766,7 +5672,7 @@ bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRe
 				ipConnection = getDBConnection();
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -5894,7 +5800,7 @@ bool CFileProcessingDB::SetDBInfoSettings_Internal(bool bDBLocked, bool bUpdateH
 				validateDBSchemaVersion();
 
 				// Set the transaction guard
-				TransactionGuard tg(ipConnection);
+				TransactionGuard tg(ipConnection, adXactChaos);
 
 				if (bUpdateHistory)
 				{
@@ -5963,7 +5869,7 @@ bool CFileProcessingDB::RecordFTPEvent_Internal(bool bDBLocked, long nFileId, lo
 			validateDBSchemaVersion();
 
 			// Set the transaction guard
-			TransactionGuard tg(ipConnection);
+			TransactionGuard tg(ipConnection, adXactChaos);
 
 			string strMachineId = asString(getMachineID(ipConnection));
 			string strUserId = asString(getFAMUserID(ipConnection));

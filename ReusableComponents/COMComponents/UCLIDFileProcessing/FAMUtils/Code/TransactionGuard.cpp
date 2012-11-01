@@ -9,10 +9,13 @@
 //-------------------------------------------------------------------------------------------------
 // TransactionGuard
 //-------------------------------------------------------------------------------------------------
-TransactionGuard::TransactionGuard(ADODB::_ConnectionPtr ipConnection)
+TransactionGuard::TransactionGuard(ADODB::_ConnectionPtr ipConnection,
+	IsolationLevelEnum isolationLevel)
 : m_ipConnection(ipConnection)
 {
 	ASSERT_ARGUMENT("ELI14624", ipConnection != __nullptr );
+
+	ipConnection->IsolationLevel = isolationLevel;
 	
 	// Start a transaction
 	ipConnection->BeginTrans();
@@ -31,6 +34,9 @@ TransactionGuard::~TransactionGuard()
 			// Rollback the open transaction
 			m_ipConnection->RollbackTrans();
 		}
+
+		// Restore the connection isolation level to the ADO default of adXactChaos.
+		m_ipConnection->IsolationLevel = adXactChaos;
 
 		m_ipConnection = __nullptr;
 	}
