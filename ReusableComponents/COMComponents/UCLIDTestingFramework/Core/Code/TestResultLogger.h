@@ -65,6 +65,8 @@ public:
 	STDMETHOD(raw_AddTestCaseCompareData) (BSTR strTitle, BSTR strLabel1, BSTR strInput1, BSTR strLabel2, BSTR strInput2);
 	STDMETHOD(get_AddEntriesToTestLogger)(VARIANT_BOOL* pvbAddEntries);
 	STDMETHOD(put_AddEntriesToTestLogger)(VARIANT_BOOL vbAddEntries);
+	STDMETHOD(raw_AddTestCaseOCRConfidence)(ISpatialString *pInputText);
+	STDMETHOD(raw_GetSummaryOCRConfidenceData)(long *pnDocCount, double *pdOCRConfidence);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);

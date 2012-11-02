@@ -117,6 +117,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDTestingFramework", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.vcxproj", "{B1376860-A6F2-432F-AA51-C14AEC90AFCF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDTestingFrameworkCore", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Core\Code\UCLIDTestingFrameworkCore.vcxproj", "{A2E13543-A708-49E3-BA6E-4FC6DFE31E7C}"
@@ -785,9 +786,9 @@ Global
 		ProjectRelativeDiskPath171 = ..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj
 		ProjectRelativeDiskPath172 = ..\..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCDBEditor\Core\Plugins\AlternateTestNameManager\Core\Code\SQLCDBEditor.Plugins.AlternateTestNameManager.csproj
 		ProjectRelativeDiskPath173 = ..\..\..\..\DataEntry\LabDE\DEPs\UITransplantCenter\Core\Code\Extract.DataEntry.DEP.UITransplantCenter.csproj
-		ProjectRelativeDiskPath174 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSUtilities\Core\Code\Extract.NetDMSUtilities.csproj
-		ProjectRelativeDiskPath175 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSCustomComponents\Core\Code\Extract.NetDMSCustomComponents.csproj
-		ProjectRelativeDiskPath176 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSExporter\Core\Code\Extract.NetDMSExporter.csproj
+		ProjectRelativeDiskPath174 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSCustomComponents\Core\Code\Extract.NetDMSCustomComponents.csproj
+		ProjectRelativeDiskPath175 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSExporter\Core\Code\Extract.NetDMSExporter.csproj
+		ProjectRelativeDiskPath176 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSUtilities\Core\Code\Extract.NetDMSUtilities.csproj
 		ProjectRelativeDiskPath177 = ..\..\..\..\DataEntry\FlexIndex\DEPs\Fresno\Core\Code\Extract.DataEntry.DEP.Fresno.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

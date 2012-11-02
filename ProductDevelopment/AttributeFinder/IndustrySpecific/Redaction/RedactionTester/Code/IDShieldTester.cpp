@@ -1050,6 +1050,9 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 			ASSERT_RESOURCE_ALLOCATION("ELI15205", ipAFDoc != __nullptr);
 			bool bCalculatedFoundValues = false;
 
+			// Used for keeping track of OCR confidence
+			ISpatialStringPtr ipInputText = __nullptr;
+
 			if ( ::isFileOrFolderValid( strFoundVOAFile ) )
 			{
 				// VOA file exists - so read found attributes from VOA file
@@ -1060,6 +1063,16 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 
 				// Increment the number of files that read from an existing VOA.
 				m_ulNumFilesWithExistingVOA++;
+
+				// If it exists, use the uss file to get the document text to check OCR confidence.
+				string strUSSFile = strImageFile + ".uss";
+				if (isValidFile(strUSSFile))
+				{
+					ipInputText.CreateInstance(CLSID_SpatialString);
+					ASSERT_RESOURCE_ALLOCATION("ELI0", ipInputText != __nullptr);
+
+					ipInputText->LoadFrom(strUSSFile.c_str(), VARIANT_FALSE);
+				}
 			}
 			// VOA file does not exist - so compute VOA file by running rules
 			else
@@ -1068,6 +1081,8 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 				ipFoundAttributes = m_ipAttrFinderEngine->FindAttributes(ipAFDoc, strSourceDoc.c_str(), 
 					-1, strRulesFile.c_str(), NULL, VARIANT_FALSE, NULL);
 				ASSERT_RESOURCE_ALLOCATION("ELI15204", ipFoundAttributes != __nullptr);
+
+				ipInputText = ipAFDoc->Text;
 
 				// This flag means that the AFDoc contains the document types for this file.
 				bCalculatedFoundValues = true;
@@ -1119,6 +1134,8 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 				m_ipResultLogger->AddTestCaseDetailNote( get_bstr_t( strTitle.c_str() ),
 					get_bstr_t( strNote.c_str() ) ) ;
 			}
+
+			m_ipResultLogger->AddTestCaseOCRConfidence(ipInputText);
 
 			m_ipResultLogger->EndTestCase(bResult ? VARIANT_TRUE : VARIANT_FALSE);
 		}
@@ -1793,6 +1810,19 @@ void CIDShieldTester::displaySummaryStatistics()
 	zTemp.Format("\tPages tested: %d", m_ulTotalPages);
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticSummary += zTemp + "\r\n";
+
+	// Report the overall OCR confidence of the documents tested.
+	long nOCRDocCount;
+	double dOCRConfidence;
+	m_ipResultLogger->GetSummaryOCRConfidenceData(&nOCRDocCount, &dOCRConfidence);
+
+	if (nOCRDocCount > 0)
+	{
+		zTemp.Format("\tAverage OCR confidence of %ld documents: %.1f%%",
+			nOCRDocCount, dOCRConfidence);
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticSummary += zTemp + "\r\n";
+	}
 
 	// Calculate the number of files with expected redactions
 	zTemp.Format("\tFiles containing sensitive data items: %d (%0.1f%%)",	

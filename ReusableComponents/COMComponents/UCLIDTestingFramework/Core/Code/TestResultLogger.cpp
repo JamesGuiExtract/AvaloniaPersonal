@@ -44,6 +44,7 @@ static const string gstrEXCEPTION_HEX = "Hex";
 static const string gstrSUMMARY_TAG = "Summary";
 static const string gstrCOMPONENT_EXCEPTION = "ComponentException";
 static const string gstrTEST_CASE_COMPARE = "TestCaseCompareData";
+static const string gstrTEST_CASE_OCR_CONFIDENCE = "TestCaseOCRConfidence";
 
 //-------------------------------------------------------------------------------------------------
 // CTestResultLogger
@@ -851,6 +852,64 @@ STDMETHODIMP CTestResultLogger::put_AddEntriesToTestLogger(VARIANT_BOOL vbAddEnt
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26637");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CTestResultLogger::raw_AddTestCaseOCRConfidence(ISpatialString *pInputText)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
+
+	try
+	{
+		validateLicense();
+
+		ISpatialStringPtr ipInputText(pInputText);
+
+		// As long as there is spatial info associated with the document, keep track of the
+		// average OCR confidence.
+		if (ipInputText != __nullptr && ipInputText->GetMode() == kSpatialMode)
+		{
+			long nAvgConfidence = 0;
+			ipInputText->GetCharConfidence(__nullptr, __nullptr, &nAvgConfidence);
+
+			m_componentLevelStats.recordOcrConfidence(ipInputText->Size, nAvgConfidence);
+
+			string strAvgConfidence = "Average OCR confidence (document): "
+				+ asString(nAvgConfidence) + "%";
+
+			m_outputFile << getStartTag(gstrTEST_CASE_OCR_CONFIDENCE) << endl;
+			writeHTMLText(strAvgConfidence);
+			m_outputFile << getEndTag(gstrTEST_CASE_OCR_CONFIDENCE) << endl;
+
+			if (m_bAddEntriesForCurrentTestCase)
+			{
+				// update the UI
+				m_pDlg->addTestCaseNote(strAvgConfidence);
+			}
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35111");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CTestResultLogger::raw_GetSummaryOCRConfidenceData(long *pnDocCount, double *pdOCRConfidence)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI35108", pnDocCount != __nullptr);
+		ASSERT_ARGUMENT("ELI35109", pdOCRConfidence != __nullptr);
+
+		m_componentLevelStats.getOcrConfidence(pnDocCount, pdOCRConfidence);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35110");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent
@@ -1069,6 +1128,22 @@ void CTestResultLogger::addSummaryTestCase(const TestCaseStats& stats)
 	m_outputFile << getEndTag(gstrLINE) << endl;
 
 	m_pDlg->addTestCaseNote((LPCTSTR)zTemp);
+
+	// Report average OCR confidence for the test.
+	long nOCRDocCount;
+	double dOCRConfidence;
+	m_componentLevelStats.getOcrConfidence(&nOCRDocCount, &dOCRConfidence);
+	if (nOCRDocCount > 0)
+	{
+		zTemp.Format("Average OCR confidence of %ld documents: %.1f%%",
+			nOCRDocCount, dOCRConfidence);
+	
+		m_outputFile << getStartTag(gstrLINE) << endl;
+		writeHTMLText((LPCTSTR)zTemp);
+		m_outputFile << getEndTag(gstrLINE) << endl;
+
+		m_pDlg->addTestCaseNote((LPCTSTR)zTemp);
+	}
 
 	m_outputFile << getEndTag(gstrSUMMARY_TAG) << endl;
 

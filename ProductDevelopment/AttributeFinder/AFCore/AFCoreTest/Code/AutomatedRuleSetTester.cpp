@@ -1208,6 +1208,9 @@ void CAutomatedRuleSetTester::processTestCase(const string& strRSDFile,
 			strNoteFile = strEAVFileDir + strBaseFileName + ".nte";
 			m_ipResultLogger->AddTestCaseFile(get_bstr_t(strNoteFile.c_str()));
 
+			// Used for keeping track of OCR confidence
+			ISpatialStringPtr ipInputText = __nullptr;
+
 			// make sure current Attributes Vector is empty
 			m_ipCurrentAttributes->Clear();
 
@@ -1222,6 +1225,7 @@ void CAutomatedRuleSetTester::processTestCase(const string& strRSDFile,
 				m_ipCurrentAttributes = m_ipAttrFinderEngine->FindAttributes( ipAFDoc, 
 					get_bstr_t(strInputFile.c_str()), -1, get_bstr_t(strRSDFile.c_str()), 
 					NULL, VARIANT_FALSE, NULL);
+				ipInputText = ipAFDoc->Text;
 
 				// add document classification information
 				string strDocType = getDocumentClassificationInfo(ipAFDoc);
@@ -1246,8 +1250,19 @@ void CAutomatedRuleSetTester::processTestCase(const string& strRSDFile,
 
 				// VOA file exists so load the expected attributes from the voa file
 				m_ipCurrentAttributes = getAttributesFromFile(strVOAFile);
+
+				// If it exists, use the uss file to get the document text to check OCR confidence.
+				string strUSSFile = strImageFile + ".uss";
+				if (isValidFile(strUSSFile))
+				{
+					ipInputText.CreateInstance(CLSID_SpatialString);
+					ASSERT_RESOURCE_ALLOCATION("ELI0", ipInputText != __nullptr);
+
+					ipInputText->LoadFrom(strUSSFile.c_str(), VARIANT_FALSE);
+				}
 			}
 
+			m_ipResultLogger->AddTestCaseOCRConfidence(ipInputText);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI06119");
 	}

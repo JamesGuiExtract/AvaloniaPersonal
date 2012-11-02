@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
+using UCLID_RASTERANDOCRMGMTLib;
 using UCLID_REDACTIONCUSTOMCOMPONENTSLib;
 using UCLID_TESTINGFRAMEWORKINTERFACESLib;
 
@@ -132,6 +133,11 @@ namespace Extract.IDShieldStatisticsReporter
         /// An exception that was thrown when trying to execute the ID Shield component test.
         /// </summary>
         ExtractException _testComponentException;
+
+        /// <summary>
+        /// Keeps track of the OCR confidence for each document for which there is recognized text.
+        /// </summary>
+        List<Tuple<int, int>> _ocrConfidenceData = new List<Tuple<int, int>>();
 
         /// <summary>
         /// The ID Shield Tester instance used to conduct tests.
@@ -982,8 +988,15 @@ namespace Extract.IDShieldStatisticsReporter
         /// <param name="strComponentTestException">The stringized version of the exception.</param>
         public void AddComponentTestException(string strComponentTestException)
         {
-            _testComponentException =
-                ExtractException.FromStringizedByteStream("ELI28675", strComponentTestException);
+            try 
+	        {	        
+		        _testComponentException =
+                        ExtractException.FromStringizedByteStream("ELI28675", strComponentTestException);
+	        }
+	        catch (Exception ex)
+	        {
+		        throw ex.CreateComVisible("ELI35104", "Failed to add test case exception.");
+	        }
         }
 
         /// <summary>
@@ -1066,7 +1079,7 @@ namespace Extract.IDShieldStatisticsReporter
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI28676", ex);
+                throw ex.CreateComVisible("ELI28676", ex.Message);
             }
         }
 
@@ -1142,11 +1155,18 @@ namespace Extract.IDShieldStatisticsReporter
         [CLSCompliant(false)]
         public void StartTestCase(string strTestCaseID, string strTestCaseDescription, ETestCaseType ETestCaseType)
         {
-            // Note that summary info is added at the end which calls this method with a type of kSummaryTestCase.
-            // Don't include these in the test case count.
-            if (ETestCaseType != ETestCaseType.kSummaryTestCase)
+            try
             {
-                _testCaseCount++;
+                // Note that summary info is added at the end which calls this method with a type of kSummaryTestCase.
+                // Don't include these in the test case count.
+                if (ETestCaseType != ETestCaseType.kSummaryTestCase)
+                {
+                    _testCaseCount++;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI35105", "Failed to start new test case.");
             }
         }
 
@@ -1157,6 +1177,66 @@ namespace Extract.IDShieldStatisticsReporter
         public void StartTestHarness(string strHarnessDescription)
         {
             // Nothing to do.
+        }
+
+        /// <summary>
+        /// Submits the recognized text from the document to keep track of OCR confidence.
+        /// </summary>
+        /// <param name="pInputText">A <see cref="SpatialString"/> representing the recognized text
+        /// from the document.</param>
+        [CLSCompliant(false)]
+        public void AddTestCaseOCRConfidence(SpatialString pInputText)
+        {
+            try
+            {
+                if (pInputText != null && pInputText.GetMode() == ESpatialStringMode.kSpatialMode &&
+                    pInputText.Size > 0)
+                {
+                    int minConfidence = 0;
+                    int maxConfidence = 0;
+                    int avgConfidence = 0;
+                    pInputText.GetCharConfidence(ref minConfidence, ref maxConfidence, ref avgConfidence);
+
+                    _ocrConfidenceData.Add(new Tuple<int, int>(pInputText.Size, avgConfidence));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI35106", "Failed to record OCR confidence.");
+            }
+        }
+
+        /// <summary>
+        /// Gets the overall OCR confidence for the test.
+        /// </summary>
+        /// <param name="pnDocCount">Returns the number of documents for which there was recognized
+        /// text.</param>
+        /// <param name="pdOCRConfidence">Returns the overall OCR confidence.</param>
+        public void GetSummaryOCRConfidenceData(out int pnDocCount, out double pdOCRConfidence)
+        {
+            try
+            {
+                pnDocCount = _ocrConfidenceData.Count;
+                pdOCRConfidence = 0;
+
+                // If any OCR confidence data was collected, output the average OCR confidence.
+                if (pnDocCount > 0)
+                {
+                    double dCharCount = 0;
+                    foreach (var item in _ocrConfidenceData)
+                    {
+                        double dDocCharCount = (double)item.Item1;
+                        dCharCount += dDocCharCount;
+                        pdOCRConfidence += (dDocCharCount * item.Item2);
+                    }
+
+                    pdOCRConfidence /= dCharCount;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI35107", "Failed to get average OCR confidence");
+            }
         }
 
         #endregion ITestResultLogger
@@ -1263,6 +1343,7 @@ namespace Extract.IDShieldStatisticsReporter
                     _testCaseFailureCount = 0;
                     _testComponentException = null;
                     _currentTestCaseFile = null;
+                    _ocrConfidenceData.Clear();
 
                     _idShieldTester.RunAutomatedTests(testParameters, tclFile.FileName);
 

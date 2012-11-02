@@ -20,6 +20,7 @@ library UCLID_TESTINGFRAMEWORKINTERFACESLib
 	importlib("stdole32.tlb");
 	importlib("stdole2.tlb");
 	importlib("..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
 
 	//----------------------------------------------------------------------------------------------
 	//-E N U M S------------------------------------------------------------------------------------
@@ -100,6 +101,12 @@ library UCLID_TESTINGFRAMEWORKINTERFACESLib
 		[propput, id(14), helpstring("property AddEntriesToTestLogger")]
 			HRESULT AddEntriesToTestLogger([in] VARIANT_BOOL vbAddEntries);
 		//------------------------------------------------------------------------------------------
+		// Submits the recognized text from the document to keep track of OCR confidence.
+		[id(15), helpstring("method AddTestCaseOCRConfidence")] HRESULT AddTestCaseOCRConfidence([in] ISpatialString *pInputText);
+		//------------------------------------------------------------------------------------------
+		// Gets the overall OCR confidence for the test.
+		[id(16), helpstring("method GetSummaryOCRConfidenceData")] HRESULT GetSummaryOCRConfidenceData([out] long *pnDocCount,
+			[out] double *pdOCRConfidence);
 	};
 	[
 		object,

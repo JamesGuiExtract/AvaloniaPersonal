@@ -26,6 +26,13 @@ extern CComModule _Module;
 #import "..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
 using namespace UCLID_COMUTILSLib;
 
+#import "..\..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" named_guids 
+using namespace UCLID_COMLMLib;
+
+#import "..\..\..\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb" named_guids \
+	rename("LoadImage", "LoadRasterImage")
+using namespace UCLID_RASTERANDOCRMGMTLib;
+
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 

@@ -22,12 +22,12 @@ extern CComModule _Module;
 #import "..\..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb"
 using namespace UCLID_COMUTILSLib;
 
-#import "..\..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb" named_guids 
-using namespace UCLID_TESTINGFRAMEWORKINTERFACESLib;
-
 #import "..\..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb" named_guids raw_property_prefixes("raw_get_", "raw_put_", "raw_putref_") \
 	rename("LoadImage", "LoadRasterImage")
 using namespace UCLID_RASTERANDOCRMGMTLib;
+
+#import "..\..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb" named_guids 
+using namespace UCLID_TESTINGFRAMEWORKINTERFACESLib;
 
 #import "..\..\..\Code\Core\SpotRecognitionIR.tlb"
 using namespace UCLID_SPOTRECOGNITIONIRLib;
