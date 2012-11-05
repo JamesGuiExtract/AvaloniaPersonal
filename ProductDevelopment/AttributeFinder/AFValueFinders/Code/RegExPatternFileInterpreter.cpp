@@ -183,6 +183,7 @@ bool RegExPatternFileInterpreter::foundPattern(IRegularExprParserPtr ipRegExpPar
 				}
 				// if not found perform check for Best Match
 			case UCLID_AFVALUEFINDERSLib::kReturnBestMatch:
+				// [FlexIDSCore:4992] Return only the first match with the "best" score.
 				if (nThisDataScore > nHighestScore)
 				{
 					// reset the "best attributes" list
@@ -191,18 +192,6 @@ bool RegExPatternFileInterpreter::foundPattern(IRegularExprParserPtr ipRegExpPar
 
 					// reset the best attribute pattern ID
 					strPatternIDs = m_vecPatterns[nIndex].m_strPatternID;
-				}
-				else if (nThisDataScore == nHighestScore)
-				{
-					// append to the "best attributes" list
-					ipResultAttributes->Append(ipFoundAttributes);
-					
-					// append to the best attribute pattern ID's
-					if (!strPatternIDs.empty())
-					{
-						strPatternIDs += "|";
-					}
-					strPatternIDs += m_vecPatterns[nIndex].m_strPatternID;
 				}
 
 				break;

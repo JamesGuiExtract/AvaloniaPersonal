@@ -301,7 +301,8 @@ namespace Extract.AttributeFinder.Rules
                 SpatialString extractedText = null;
 
                 // Loop through every raster zone to be extracted for this attribute.
-                foreach (RasterZone rasterZone in GetZonesToExtract(pAttributeToBeModified.Value))
+                foreach (RasterZone rasterZone in
+                    GetZonesToExtract(pAttributeToBeModified.Value, sourceString))
                 {
                     int page = rasterZone.PageNumber;
                     LongRectangle bounds = rasterZone.GetRectangularBounds(
@@ -312,12 +313,12 @@ namespace Extract.AttributeFinder.Rules
                     // If this is the first zone, initialize extractedText with the result.
                     if (extractedText == null)
                     {
-                        extractedText = searcher.GetDataInRegion(bounds, true);
+                        extractedText = searcher.GetDataInRegion(bounds, false);
                     }
                     // Otherwise, append this result to the existing value.
                     else
                     {
-                        extractedText.Append(searcher.GetDataInRegion(bounds, true));
+                        extractedText.Append(searcher.GetDataInRegion(bounds, false));
                     }
                 }
 
@@ -589,9 +590,11 @@ namespace Extract.AttributeFinder.Rules
         /// Gets the <see cref="RasterZone"/>s from which OCR text is to be extracted.
         /// </summary>
         /// <param name="spatialString">The attribute's value.</param>
+        /// <param name="documentSource">The document's source text.</param>
         /// <returns>The <see cref="RasterZone"/>s from which OCR text should be extracted.
         /// </returns>
-        IEnumerable<RasterZone> GetZonesToExtract(SpatialString spatialString)
+        IEnumerable<RasterZone> GetZonesToExtract(SpatialString spatialString,
+            SpatialString documentSource)
         {
             if (spatialString.HasSpatialInfo())
             {
@@ -599,12 +602,20 @@ namespace Extract.AttributeFinder.Rules
                 foreach (SpatialString pageText in
                     spatialString.GetPages().ToIEnumerable<SpatialString>())
                 {
+                    // [FlexIDSCore:5093] Don't process any pages without spatial info.
+                    int page = pageText.GetFirstPageNumber();
+                    if (documentSource.GetSpecifiedPages(page, page).IsEmpty())
+                    {
+                        continue;
+                    }
+
                     // If using the overall bounds, there will be only one result for each page:
                     // the overall attribute bounds.
                     if (UseOverallBounds)
                     {
                         RasterZone rasterZone = new RasterZone();
-                        rasterZone.CreateFromLongRectangle(pageText.GetOCRImageBounds(),
+                        rasterZone.CreateFromLongRectangle(
+                            pageText.GetTranslatedImageBounds(documentSource.SpatialPageInfos),
                             pageText.GetFirstPageNumber());
 
                         yield return rasterZone;
@@ -612,7 +623,8 @@ namespace Extract.AttributeFinder.Rules
                     else
                     {
                         foreach (RasterZone rasterZone in
-                            pageText.GetOCRImageRasterZones().ToIEnumerable<RasterZone>())
+                            pageText.GetTranslatedImageRasterZones(documentSource.SpatialPageInfos)
+                                .ToIEnumerable<RasterZone>())
                         {
                             yield return rasterZone;
                         }

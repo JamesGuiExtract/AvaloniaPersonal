@@ -220,7 +220,7 @@ BEGIN
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP,15,136,105,10
     CONTROL         "Use the root ancestor's name",IDC_RADIO_ROOT_NAME,
                     "Button",BS_AUTORADIOBUTTON,15,147,150,10
-    CONTROL         "Use This:",IDC_RADIO_SPECIFY_NAME,"Button",BS_AUTORADIOBUTTON,15,158,45,10
+    CONTROL         "Use this:",IDC_RADIO_SPECIFY_NAME,"Button",BS_AUTORADIOBUTTON,15,158,45,10
     EDITTEXT        IDC_EDIT_SPECIFY_NAME,60,157,105,12,ES_AUTOHSCROLL
     CONTROL         "Retain the attribute's type",IDC_RADIO_RETAIN_TYPE,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP,16,197,105,10
