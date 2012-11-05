@@ -1066,10 +1066,10 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 
 				// If it exists, use the uss file to get the document text to check OCR confidence.
 				string strUSSFile = strImageFile + ".uss";
-				if (isValidFile(strUSSFile))
+				if (isValidFile(strUSSFile))	
 				{
 					ipInputText.CreateInstance(CLSID_SpatialString);
-					ASSERT_RESOURCE_ALLOCATION("ELI0", ipInputText != __nullptr);
+					ASSERT_RESOURCE_ALLOCATION("ELI35112", ipInputText != __nullptr);
 
 					ipInputText->LoadFrom(strUSSFile.c_str(), VARIANT_FALSE);
 				}

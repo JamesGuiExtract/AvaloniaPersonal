@@ -1256,7 +1256,7 @@ void CAutomatedRuleSetTester::processTestCase(const string& strRSDFile,
 				if (isValidFile(strUSSFile))
 				{
 					ipInputText.CreateInstance(CLSID_SpatialString);
-					ASSERT_RESOURCE_ALLOCATION("ELI0", ipInputText != __nullptr);
+					ASSERT_RESOURCE_ALLOCATION("ELI35113", ipInputText != __nullptr);
 
 					ipInputText->LoadFrom(strUSSFile.c_str(), VARIANT_FALSE);
 				}
