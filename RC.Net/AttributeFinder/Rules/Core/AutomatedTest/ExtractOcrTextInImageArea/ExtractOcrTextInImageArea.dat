@@ -24,3 +24,15 @@
 
 // Original image, separate zones, exclude lines, 2 lines of text
 <TESTCASE>;Test9.rsd;..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test9.eav
+
+// FlexIDSCore:5093- Tests that exceptions aren't throw when processing empty pages.
+<TESTCASE>;Test10.rsd;Images\36487.TIF.uss;;Test10.eav
+
+// FlexIDSCore:5094- Tests that exceptions aren't throw on rotated image pages (overall bounds)
+<TESTCASE>;Test11.rsd;Images\50260_page_0023.tif.uss;;Test11.eav
+
+// FlexIDSCore:5094- Tests that exceptions aren't throw on rotated image pages (individual zones)
+<TESTCASE>;Test12.rsd;Images\50260_page_0023.tif.uss;;Test12.eav
+
+// FlexIDSCore:5150- Tests that text is extracted from the correct region on rotated image pages.
+<TESTCASE>;Test13.rsd;Images\00681.pdf.tif;;Test13.eav
