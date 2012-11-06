@@ -124,6 +124,8 @@
     <value>False</value>
   </metadata>
   <data name="label1.Text" xml:space="preserve">
-    <value>In order to avoid advancing a work item before all documents in the work item have been processed, the work item will only be advanced if all other documents in the same directory as this document have completed processing on this action.</value>
+    <value>In order to avoid advancing a work item before all documents in the work item have been processed, the work item will only be advanced if all other documents in the same directory as this document have completed processing on this action.
+
+NOTE: This task must not run on multiple threads or processes simultaneously and the "Files to retrieve" setting must be set to 1.</value>
   </data>
 </root>

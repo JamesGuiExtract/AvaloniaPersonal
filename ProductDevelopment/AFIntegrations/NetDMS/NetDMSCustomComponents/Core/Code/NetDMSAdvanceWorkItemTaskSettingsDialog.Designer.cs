@@ -43,7 +43,7 @@
             // 
             // groupBox1
             // 
-            groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             groupBox1.Controls.Add(this._netDMSConnectionSettingsControl);
             groupBox1.Location = new System.Drawing.Point(12, 12);
@@ -60,14 +60,14 @@
             groupBox2.Controls.Add(this.label1);
             groupBox2.Location = new System.Drawing.Point(12, 242);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new System.Drawing.Size(367, 78);
+            groupBox2.Size = new System.Drawing.Size(367, 115);
             groupBox2.TabIndex = 1;
             groupBox2.TabStop = false;
             // 
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(224, 328);
+            this._okButton.Location = new System.Drawing.Point(224, 364);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 2;
@@ -79,7 +79,7 @@
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(305, 328);
+            this._cancelButton.Location = new System.Drawing.Point(305, 364);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 3;
@@ -101,7 +101,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.Location = new System.Drawing.Point(8, 15);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(353, 58);
+            this.label1.Size = new System.Drawing.Size(353, 95);
             this.label1.TabIndex = 0;
             this.label1.Text = resources.GetString("label1.Text");
             // 
@@ -110,7 +110,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(392, 363);
+            this.ClientSize = new System.Drawing.Size(392, 399);
             this.Controls.Add(groupBox2);
             this.Controls.Add(groupBox1);
             this.Controls.Add(this._okButton);

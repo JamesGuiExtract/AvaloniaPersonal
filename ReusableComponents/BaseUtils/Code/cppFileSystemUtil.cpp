@@ -78,7 +78,7 @@ ISecureFileDeleterPtr getSecureFileDeleter(bool bForceUseSecureDeleter)
 		// Check for and attempt creation of SecureDeleteAllSensitiveFiles setting if necessary.
 		if (!machineCfgMgr.keyExists(sstrRegPath, gstrSECURE_DELETE_ALL))
 		{
-			machineCfgMgr.createKey(sstrRegPath, gstrDEFAULT_SECURE_DELETE_ALL,
+			machineCfgMgr.createKey(sstrRegPath, gstrSECURE_DELETE_ALL,
 				gstrDEFAULT_SECURE_DELETE_ALL);
 		}
 		
