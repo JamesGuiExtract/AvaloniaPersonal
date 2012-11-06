@@ -52,3 +52,8 @@
 // test13 The same REPM rule as in test12 but greedy.
 // "Return all matches" and "Store ID(s) of successfully executed rules..." are checked.
 <TESTCASE>;Test13.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test13.eav
+
+// Return first > 10 or best.
+// Two rules find matches that score 9
+// Result should be the first match
+<TESTCASE>;Test14.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test14.eav
