@@ -274,6 +274,7 @@ namespace Extract.Imaging.Forms
                     _imageViewer.ImageFileClosing += HandleImageFileClosing;
                     _imageViewer.CursorToolChanged += HandleCursorToolChanged;
                     _imageViewer.HandleDestroyed += HandleImageViewerHandleDestroyed;
+                    _imageViewer.LayerObjects.DeletingLayerObjects += HandleDeletingLayerObjects;
                 }
                 catch (Exception ex)
                 {
@@ -1111,8 +1112,6 @@ namespace Extract.Imaging.Forms
                         HandleCursorEnteredLayerObject;
                     _imageViewer.CursorLeftLayerObject +=
                         HandleCursorLeftLayerObject;
-                    _imageViewer.LayerObjects.DeletingLayerObjects +=
-                        HandleDeletingLayerObjects;
                 }
             }
 
@@ -1131,8 +1130,6 @@ namespace Extract.Imaging.Forms
                         HandleCursorEnteredLayerObject;
                     _imageViewer.CursorLeftLayerObject -=
                         HandleCursorLeftLayerObject;
-                    _imageViewer.LayerObjects.DeletingLayerObjects -=
-                        HandleDeletingLayerObjects;
 
                     HideWordHighlights(true);
                 }

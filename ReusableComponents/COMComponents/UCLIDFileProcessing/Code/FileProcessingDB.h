@@ -318,6 +318,12 @@ private:
 	// The DB Lock time out in seconds
 	long m_lDBLockTimeout;
 
+	// The action ID this instance is currently registered against.
+	volatile int m_nActiveActionID;
+
+	// Keeps track of the last time this instance checked stats.
+	CTime m_timeLastStatsCheck;
+
 	// Registry configuration manager
 	FileProcessingConfigMgr m_regFPCfgMgr;
 
@@ -384,15 +390,16 @@ private:
 
 	IMiscUtilsPtr m_ipMiscUtils;
 
-	// Events used for the LastPingThread
-	Win32Event m_eventStopPingThread;
+	// Events used for the ping and statistics maintainence threads.
+	Win32Event m_eventStopMaintainenceThreads;
 	Win32Event m_eventPingThreadExited;
+	Win32Event m_eventStatsThreadExited;
 
 	// Flag to indicate that the FAM has been registered for auto revert
 	// if this is false and then pingDB just returns without doing anything
 	// if this is true pingDB updates the LastPingTime in ActiveFAM record 
 	// and will log changes of the m_nUPIID
-	bool m_bFAMRegistered;
+	volatile bool m_bFAMRegistered;
 
 	// The tick count from the last time the ping time was updated.
 	volatile DWORD m_dwLastPingTime;
@@ -778,6 +785,10 @@ private:
 	// the database pData should be a pointer to the database object
 	static UINT maintainLastPingTimeForRevert(void* pData);
 
+	// Thread function that ensures the ActionStatisticsDelta table is folded into ActionStatistics
+	// on a regular basis even if this instance is not querying stats for the active action.
+	static UINT maintainActionStatistics(void* pData);
+
 	// Method updates the ActiveFAM LastPingTime for the currently registered FAM
 	void pingDB();
 
@@ -836,6 +847,9 @@ private:
 	// Returns recordset opened as static containing the status record the file with nFileID and 
 	// action nActionID. If the status is unattempted the recordset will be empty
 	_RecordsetPtr getFileActionStatusSet(_ConnectionPtr& ipConnection, long nFileID, long nActionID);
+
+	// Determines if ActionStatistics is due to be update from the ActionStatisticsDelta table.
+	bool isStatisticsUpdateFromDeltaNeeded(const _ConnectionPtr& ipConnection, const long nActionID);
 
 	// Method to add the current records from the ActionStatisticsDelta table to the 
 	// ActionStatistics table

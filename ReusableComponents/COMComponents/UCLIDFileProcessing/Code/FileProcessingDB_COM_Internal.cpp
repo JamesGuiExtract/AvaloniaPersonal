@@ -3969,17 +3969,21 @@ bool CFileProcessingDB::UnregisterActiveFAM_Internal(bool bDBLocked)
 		try
 		{
 			// Stop thread here
-			m_eventStopPingThread.signal();
+			m_eventStopMaintainenceThreads.signal();
 
-			// Wait for exit event at least the Ping timeout 
-			if (m_eventPingThreadExited.wait(gnPING_TIMEOUT) == WAIT_TIMEOUT)
+			// Wait for the ping and statistics maintainence threads to exit.
+			HANDLE handles[2];
+			handles[0] = m_eventPingThreadExited.getHandle();
+			handles[1] = m_eventStatsThreadExited.getHandle();
+			if (WaitForMultipleObjects(2, (HANDLE *)&handles, TRUE, WAIT_TIMEOUT) != WAIT_OBJECT_0)
 			{
 				UCLIDException ue("ELI27857", "Application Trace: Timed out waiting for thread to exit.");
 				ue.log();
 			}
-
+			
 			// set FAMRegistered flag to false since thread has exited
 			m_bFAMRegistered = false;
+			m_nActiveActionID = -1;
 
 			// Set the transaction guard
 			TransactionGuard tg(getDBConnection(), adXactRepeatableRead);

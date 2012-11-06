@@ -23,8 +23,13 @@ namespace Extract.Rules
         /// Determines whether the specified match has already been found.
         /// </summary>
         /// <param name="match">The match to check for duplication.</param>
-        /// <returns><see langword="true"/> if the specified <paramref name="match"/> has 
-        /// already been found; <see langword="false"/> has not yet been found.</returns>
-        bool IsDuplicate(MatchResult match);
+        /// <param name="usePreviousSourceRedactions"><see langword="true"/> if the method can
+        /// assume the document contains the same data as on the previous call to this method,
+        /// <see langword="false"/> if the method should rescan the document.</param>
+        /// <returns>
+        ///   <see langword="true"/> if the specified <paramref name="match"/> has
+        /// already been found; <see langword="false"/> has not yet been found.
+        /// </returns>
+        bool IsDuplicate(MatchResult match, bool usePreviousSourceRedactions);
     }
 }

@@ -1923,6 +1923,8 @@ UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_Conn
 		lNumPagesSkipped, llNumBytes, llNumBytesPending, llNumBytesComplete, llNumBytesFailed, 
 		llNumBytesSkipped);
 
+	m_timeLastStatsCheck = CTime::GetCurrentTime();
+
 	// Return the ActionStats pointer,
 	return ipActionStats;
 }
@@ -3754,12 +3756,12 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 		CFileProcessingDB *pDB = static_cast<CFileProcessingDB *>(pData);
 		ASSERT_ARGUMENT("ELI27746", pDB != __nullptr);
 
-		// Enclose so that the exited event can always be signaled if it can be.
+		// Enclose so that the exited event can always be signaled
 		try
 		{
 			try
 			{
-				while (pDB->m_eventStopPingThread.wait(gnPING_TIMEOUT) == WAIT_TIMEOUT)
+				while (pDB->m_eventStopMaintainenceThreads.wait(gnPING_TIMEOUT) == WAIT_TIMEOUT)
 				{
 					// Surround call to PingDB with code from the BEGIN_CONNECTION_RETRY macro to
 					// ensure the ping thread has an opportunity to reconnect just as the processing
@@ -3768,8 +3770,7 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 					// even after taking out a lock on the database, the active FAM's registration
 					// will be invalidated preventing further processing.
 					ADODB::_ConnectionPtr ipConnection = __nullptr;
-					bool bRetryExceptionLogged = false;
-					bool bRetrySuccess = false;
+					bool bSuccess = false;
 					bool bLock = false;
 					do
 					{
@@ -3795,13 +3796,13 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 									pDB->pingDB();
 								}
 
-								bRetrySuccess = true;
+								bSuccess = true;
 							}
 							CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34116")
 						}
 						catch (UCLIDException &ue)
 						{
-							if (pDB->m_eventStopPingThread.wait(0) != WAIT_TIMEOUT)
+							if (pDB->m_eventStopMaintainenceThreads.wait(0) != WAIT_TIMEOUT)
 							{
 								break;
 							}
@@ -3832,7 +3833,7 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 							catch (...) {}
 						}
 					}
-					while (!bRetrySuccess);
+					while (!bSuccess);
 				}
 			}
 			catch (...)
@@ -3840,6 +3841,7 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 				// If we cannot succeed in pinging the database, consider this instance to be
 				// unregistered which will prevent any further processing.
 				pDB->m_bFAMRegistered = false;
+				pDB->m_nActiveActionID = -1;
 
 				throw;
 			}
@@ -3852,6 +3854,116 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 		CoUninitialize();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27745");
+
+	return 0;
+}
+//--------------------------------------------------------------------------------------------------
+UINT CFileProcessingDB::maintainActionStatistics(void *pData)
+{
+	try
+	{
+		CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
+		// Stagger the start of the maintainence threads so that, at least initially, the threads
+		// aren't firing at the same time. Use a random time so that if a bunch of processes are
+		// started simultaneously, they don't all hit the DB at the same time.
+		unsigned int nTimeToSleep;
+		rand_s(&nTimeToSleep);
+		// Somewhere between 1/4 and 3/4 of gnPING_TIMEOUT.
+		nTimeToSleep = (nTimeToSleep % (gnPING_TIMEOUT / 2)) + (gnPING_TIMEOUT / 4);
+		Sleep(nTimeToSleep);
+
+		CFileProcessingDB *pDB = static_cast<CFileProcessingDB *>(pData);
+		ASSERT_ARGUMENT("ELI35126", pDB != __nullptr);
+
+		// Enclose so that the exited event can always be signaled if it can be.
+		try
+		{
+			while (pDB->m_eventStopMaintainenceThreads.wait(gnPING_TIMEOUT) == WAIT_TIMEOUT)
+			{
+				// Surround call to update stats with code from the BEGIN_CONNECTION_RETRY macro to
+				// ensure this thread has an opportunity to reconnect just as the processing does.
+				// Unlike BEGIN_CONNECTION_RETRY, it will continue to try to re-establish connection
+				// indefinitely.
+				ADODB::_ConnectionPtr ipConnection = __nullptr;
+				bool bSuccess = false;
+				bool bLocked = false;
+
+				do
+				{
+					try
+					{
+						try
+						{
+							// If GetStats has been called recently by pDB (via the FAM, etc),
+							// there is no need to update ActionStatistics on this background
+							// thread.
+							CTimeSpan timeSinceLastStatsCheck =
+								CTime::GetCurrentTime() - pDB->m_timeLastStatsCheck;
+							if (timeSinceLastStatsCheck.GetTotalSeconds() <
+								pDB->m_nActionStatisticsUpdateFreqInSeconds)
+							{
+								bSuccess = true;
+								continue;
+							}
+
+							ipConnection = pDB->getDBConnection();
+
+							// Check that an update is needed before any attempt at locking the DB.
+							int nActionID = pDB->m_nActiveActionID;
+							if (nActionID >= 0 && 
+								pDB->isStatisticsUpdateFromDeltaNeeded(ipConnection, nActionID))
+							{
+								// A Lock is needed to update the ActionStatistics table.
+								LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(
+									pDB, gstrMAIN_DB_LOCK);
+
+								bLocked = true;
+
+								// Begin a transaction
+								TransactionGuard tg(ipConnection, adXactChaos);
+
+								pDB->updateActionStatisticsFromDelta(ipConnection, nActionID);
+
+								tg.CommitTrans();
+							}
+
+							bSuccess = true;
+						}
+						CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35127")
+					}
+					catch (UCLIDException &ue)
+					{
+						if (pDB->m_eventStopMaintainenceThreads.wait(0) != WAIT_TIMEOUT)
+						{
+							break;
+						}
+
+						// If the statistics update failed despite having a lock and a good
+						// connection, we're in a bad state.
+						if (bLocked && pDB->isConnectionAlive(ipConnection))
+						{ 
+							throw ue;
+						}
+
+						try
+						{
+							// Unlike with END_CONNECTION_RETRY, failed reconnections here
+							// shouldn't be fatal. Just keep trying until processing is
+							// stopped or we finally get a connection.
+							pDB->reConnectDatabase();
+						}
+						catch (...) {}
+					}
+				}
+				while (!bSuccess);
+			}
+		}
+		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI35128");
+
+		pDB->m_eventStatsThreadExited.signal();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI35129");
 
 	return 0;
 }
@@ -4492,6 +4604,39 @@ void CFileProcessingDB::assertNotActiveBeforeSchemaUpdate()
 				"of File Action Manager is active in the database");
 		}
 	}
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::isStatisticsUpdateFromDeltaNeeded(const _ConnectionPtr& ipConnection, const long nActionID)
+{
+	// Create a pointer to a recordset
+	_RecordsetPtr ipActionStatSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI35130", ipActionStatSet != __nullptr);
+
+	// Select the existing Statistics record if it exists
+	string strSelectStat = "SELECT * FROM ActionStatistics WHERE ActionID = " + asString(nActionID);
+
+	// Open the recordset for the statisics with the record for ActionID if it exists
+	ipActionStatSet->Open(strSelectStat.c_str(), 
+		_variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+		adLockOptimistic, adCmdText);
+
+	if (!asCppBool(ipActionStatSet->adoEOF))
+	{
+		// Get the fields from the action stat set
+		FieldsPtr ipFields = ipActionStatSet->Fields;
+		ASSERT_RESOURCE_ALLOCATION("ELI35131", ipFields != __nullptr);
+
+		// Check the last updated time stamp 
+		CTime timeCurrent = getSQLServerDateTimeAsCTime(ipConnection);
+		CTime timeLastUpdated = getTimeDateField(ipFields, "LastUpdateTimeStamp");
+		CTimeSpan ts = timeCurrent - timeLastUpdated;
+		if (ts.GetTotalSeconds() > m_nActionStatisticsUpdateFreqInSeconds)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::updateActionStatisticsFromDelta(const _ConnectionPtr& ipConnection, const long nActionID)

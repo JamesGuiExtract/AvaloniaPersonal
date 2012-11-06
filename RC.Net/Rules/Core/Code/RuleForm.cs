@@ -856,7 +856,7 @@ namespace Extract.Rules
                 {
                     // If removeDuplicates is true, remove this result from _findResults if it 
                     // is a duplicate, count it as new if it is not a duplicate.
-                    bool isDuplicate = _helper.IsDuplicate(_findResults[i].MatchResult);
+                    bool isDuplicate = _helper.IsDuplicate(_findResults[i].MatchResult, i != 0);
                     if (isDuplicate)
                     {
                         // Remove the duplicate.

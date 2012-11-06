@@ -121,7 +121,8 @@ m_nActionStatisticsUpdateFreqInSeconds(5),
 m_bValidatingOrUpdatingSchema(false),
 m_bProductSpecificDBSchemasAreValid(false),
 m_bRevertInProgress(false),
-m_bRetryOnTimeout(true)
+m_bRetryOnTimeout(true),
+m_nActiveActionID(-1)
 {
 	try
 	{
@@ -1882,15 +1883,18 @@ STDMETHODIMP CFileProcessingDB::RegisterActiveFAM(long lActionID, VARIANT_BOOL v
 				+ (asCppBool(vbProcessing) ? "1" : "0") + "') ",
 			false, (long*)&m_nUPIID);
 
-		m_eventStopPingThread.reset();
+		m_eventStopMaintainenceThreads.reset();
 		m_eventPingThreadExited.reset();
+		m_eventStatsThreadExited.reset();
 
 		// set FAM registered flag
 		m_bFAMRegistered = true;
 		m_dwLastPingTime = 0;
+		m_nActiveActionID = lActionID;
 
 		// Start thread here
 		AfxBeginThread(maintainLastPingTimeForRevert, this);
+		AfxBeginThread(maintainActionStatistics, this);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27726");
 }

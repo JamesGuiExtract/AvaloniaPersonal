@@ -4,6 +4,7 @@ using Extract.Rules;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 using RedactionLayerObject = Extract.Imaging.Forms.Redaction;
@@ -30,6 +31,11 @@ namespace Extract.Redaction.Verification
         readonly ImageViewer _imageViewer;
 
         RedactionGridView _redactionGridView;
+
+        /// <summary>
+        /// The collective <see cref="RasterZone"/>s of all redactions currently on the document.
+        /// </summary>
+        RasterZoneCollection _existingRasterZones;
 
         #endregion Fields
 
@@ -94,26 +100,36 @@ namespace Extract.Redaction.Verification
         /// Determines whether the specified match has already been found.
         /// </summary>
         /// <param name="match">The match to check for duplication.</param>
+        /// <param name="usePreviousSourceRedactions"><see langword="true"/> if the method can
+        /// assume the document contains the same data as on the previous call to this method,
+        /// <see langword="false"/> if the method should rescan the document.</param>
         /// <returns><see langword="true"/> if the specified <paramref name="match"/> has 
         /// already been found; <see langword="false"/> has not yet been found.</returns>
-        public bool IsDuplicate(MatchResult match)
+        public bool IsDuplicate(MatchResult match, bool usePreviousSourceRedactions)
         {
             try
             {
-                // Get the raster zones of all redactions
-                RasterZoneCollection redactionZones = new RasterZoneCollection();
-                foreach (LayerObject layerObject in _imageViewer.LayerObjects)
+                // Get the raster zones of all redactions if they have not yet been retrieved or the
+                // caller indicates the document document redactions should be re-scanned.
+                if (_existingRasterZones == null || !usePreviousSourceRedactions)
                 {
-                    RedactionLayerObject redaction = layerObject as RedactionLayerObject;
-                    if (redaction != null)
+                    _existingRasterZones = new RasterZoneCollection();
+                    
+                    // [FlexIDSCore:5167]
+                    // When looking for duplicate redactions, consider only redactions that are
+                    // turned on.
+                    foreach (RedactionLayerObject redaction in _redactionGridView.Rows
+                        .OfType<RedactionGridViewRow>()
+                        .Where(row => row.Redacted)
+                        .SelectMany(row => row.LayerObjects.OfType<RedactionLayerObject>()))
                     {
-                        redactionZones.AddRange(redaction.GetRasterZones());
+                        _existingRasterZones.AddRange(redaction.GetRasterZones());
                     }
                 }
 
                 // Calculate the overlap between the redaction and the match result
                 RasterZoneCollection matchZones = new RasterZoneCollection(match.RasterZones);
-                double overlapArea = redactionZones.GetAreaOverlappingWith(matchZones);
+                double overlapArea = _existingRasterZones.GetAreaOverlappingWith(matchZones);
 
                 // If the overlap is greater than 95%, it is duplicate
                 return overlapArea / matchZones.GetArea() > 0.95;
@@ -139,7 +155,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                if (!IsDuplicate(e.Match))
+                if (!IsDuplicate(e.Match, !e.FirstMatch))
                 {
                     try
                     {
@@ -157,6 +173,11 @@ namespace Extract.Redaction.Verification
                             RedactionLayerObject redaction = new RedactionLayerObject(_imageViewer,
                                 pair.Key, new string[] { RedactedMatchTag }, e.Match.Text, pair.Value);
                             _imageViewer.LayerObjects.Add(redaction);
+
+                            // So that this loop can call IsDuplicate with
+                            // usePreviousSourceRedactions == true when FirstMatch is false, update 
+                            // _existingRasterZones as matches are redacted.
+                            _existingRasterZones.AddRange(pair.Value);
                         }
                     }
                     finally

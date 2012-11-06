@@ -202,6 +202,12 @@ namespace Extract.Redaction.Verification
         /// </summary>
         List<DataGridViewRow> _lastSelectedRows;
 
+        /// <summary>
+        /// Caches the page info map from initial call to <see cref="GetPageInfoMap"/> for the
+        /// current image.
+        /// </summary>
+        LongToObjectMap _pageInfoMap;
+
         #endregion Fields
 
         #region Events
@@ -1464,23 +1470,29 @@ namespace Extract.Redaction.Verification
         /// <returns>The page info map for the currently open image.</returns>
         LongToObjectMap GetPageInfoMap()
         {
-            // Iterate over each page of the image.
-            LongToObjectMap pageInfoMap = new LongToObjectMap();
-            for (int i = 1; i <= _imageViewer.PageCount; i++)
+            // [FlexIDSCore:4996]
+            // Some situations end up calling into this method many times and this is an expensive
+            // operation. Cache the map for future use.
+            if (_pageInfoMap == null)
             {
-                ImagePageProperties pageProperties = _imageViewer.GetPageProperties(i);
+                // Iterate over each page of the image.
+                _pageInfoMap = new LongToObjectMap();
+                for (int i = 1; i <= _imageViewer.PageCount; i++)
+                {
+                    ImagePageProperties pageProperties = _imageViewer.GetPageProperties(i);
 
-                // Create the spatial page info for this page
-                SpatialPageInfo pageInfo = new SpatialPageInfo();
-                int width = pageProperties.Width;
-                int height = pageProperties.Height;
-                pageInfo.SetPageInfo(width, height, EOrientation.kRotNone, 0);
+                    // Create the spatial page info for this page
+                    SpatialPageInfo pageInfo = new SpatialPageInfo();
+                    int width = pageProperties.Width;
+                    int height = pageProperties.Height;
+                    pageInfo.SetPageInfo(width, height, EOrientation.kRotNone, 0);
 
-                // Add it to the map
-                pageInfoMap.Set(i, pageInfo);
+                    // Add it to the map
+                    _pageInfoMap.Set(i, pageInfo);
+                }
             }
 
-            return pageInfoMap;
+            return _pageInfoMap;
         }
 
         /// <summary>
@@ -2111,6 +2123,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                _pageInfoMap = null;
                 _dataGridView.Enabled = _imageViewer.IsImageAvailable;
             }
             catch (Exception ex)

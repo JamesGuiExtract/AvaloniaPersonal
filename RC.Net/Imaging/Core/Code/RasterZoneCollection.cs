@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using UCLID_COMUTILSLib;
 
 using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
@@ -16,6 +17,13 @@ namespace Extract.Imaging
         #region Fields
 
         readonly List<RasterZone> _zones;
+        
+        /// <summary>
+        /// Keeps track of a corresponding <see cref="ComRasterZone"/>s for each
+        /// <see cref="RasterZone"/> in <see cref="_zones"/>.
+        /// </summary>
+        readonly Dictionary<RasterZone, ComRasterZone> _comRasterZones =
+            new Dictionary<RasterZone, ComRasterZone>();
 
         #endregion Fields
 
@@ -26,7 +34,14 @@ namespace Extract.Imaging
         /// </summary>
         public RasterZoneCollection()
         {
-            _zones = new List<RasterZone>();
+            try
+            {
+                _zones = new List<RasterZone>();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35115");
+            }
         }
 
         /// <summary>
@@ -34,7 +49,14 @@ namespace Extract.Imaging
         /// </summary>
         public RasterZoneCollection(int capacity)
         {
-            _zones = new List<RasterZone>(capacity);
+            try
+            {
+                _zones = new List<RasterZone>(capacity);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35116");
+            }
         }
 
         /// <summary>
@@ -42,7 +64,14 @@ namespace Extract.Imaging
         /// </summary>
         public RasterZoneCollection(IEnumerable<RasterZone> zones)
         {
-            _zones = new List<RasterZone>(zones);
+            try
+            {
+                _zones = new List<RasterZone>(zones);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35117");
+            }
         }
 
         /// <summary>
@@ -51,12 +80,19 @@ namespace Extract.Imaging
         [CLSCompliant(false)]
         public RasterZoneCollection(IUnknownVector vector)
         {
-            int count = vector.Size();
-            _zones = new List<RasterZone>(count);
-            for (int i = 0; i < count; i++)
+            try
             {
-                ComRasterZone zone = (ComRasterZone)vector.At(i);
-                _zones.Add(new RasterZone(zone));
+                int count = vector.Size();
+                _zones = new List<RasterZone>(count);
+                for (int i = 0; i < count; i++)
+                {
+                    ComRasterZone zone = (ComRasterZone)vector.At(i);
+                    _zones.Add(new RasterZone(zone));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35118");
             }
         }
 
@@ -134,13 +170,10 @@ namespace Extract.Imaging
         {
             try
             {
-                ComRasterZone[] myZones = GetAsComArray(_zones);
-                ComRasterZone[] otherZones = GetAsComArray(zones);
-
                 double area = 0.0;
-                foreach (ComRasterZone myZone in myZones)
+                foreach (ComRasterZone myZone in _zones.Select(zone => GetComRasterZone(zone)))
                 {
-                    foreach (ComRasterZone otherZone in otherZones)
+                    foreach (ComRasterZone otherZone in zones.Select(zone => GetComRasterZone(zone)))
                     {
                         area += myZone.GetAreaOverlappingWith(otherZone);
                     }
@@ -155,34 +188,22 @@ namespace Extract.Imaging
         }
 
         /// <summary>
-        /// Creates an array of COM raster zones from the specified collection of raster zones.
+        /// Gets a <see cref="ComRasterZone"/> that corresponds to the specified
+        /// <see paramref="zone"/>.
         /// </summary>
-        /// <param name="zones">The zones from which to create an array of COM raster zones.</param>
-        /// <returns>An array of COM raster zones from the specified collection of 
-        /// <paramref name="zones"/>.</returns>
-        static ComRasterZone[] GetAsComArray(IEnumerable<RasterZone> zones)
+        /// <param name="zone">The <see cref="RasterZone"/> for which a <see cref="ComRasterZone"/>
+        /// is needed.</param>
+        /// <returns>The <see cref="ComRasterZone"/>.</returns>
+        ComRasterZone GetComRasterZone(RasterZone zone)
         {
-            IList<RasterZone> list = zones as IList<RasterZone>;
-            ComRasterZone[] result;
-            if (list != null)
+            ComRasterZone comRasterZone = null;
+            if (!_comRasterZones.TryGetValue(zone, out comRasterZone))
             {
-                result = new ComRasterZone[list.Count];
-                for (int i = 0; i < list.Count; i++)
-                {
-                    result[i] = list[i].ToComRasterZone();
-                }
+                comRasterZone = zone.ToComRasterZone();
+                _comRasterZones[zone] = comRasterZone;
             }
-            else
-            {
-                List<ComRasterZone> comZones = new List<ComRasterZone>();
-                foreach (RasterZone zone in zones)
-                {
-                    comZones.Add(zone.ToComRasterZone());
-                }
-                result = comZones.ToArray();
-            }
-            
-            return result;
+
+            return comRasterZone;
         }
 
         #endregion Methods
@@ -198,7 +219,14 @@ namespace Extract.Imaging
         /// <param name="item">The object to locate in the <see cref="IList{T}"/>.</param>
         public int IndexOf(RasterZone item)
         {
-            return _zones.IndexOf(item);
+            try
+            {
+                return _zones.IndexOf(item);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35119");
+            }
         }
 
         /// <summary>
@@ -208,7 +236,14 @@ namespace Extract.Imaging
         /// <param name="index">The zero-based index at which item should be inserted.</param>
         public void Insert(int index, RasterZone item)
         {
-            _zones.Insert(index, item);
+            try
+            {
+                _zones.Insert(index, item);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35120");
+            }
         }
 
         /// <summary>
@@ -217,7 +252,16 @@ namespace Extract.Imaging
         /// <param name="index">The zero-based index of the item to remove.</param>
         public void RemoveAt(int index)
         {
-            _zones.RemoveAt(index);
+            try
+            {
+                _comRasterZones.Remove(_zones[index]);
+
+                _zones.RemoveAt(index);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35121");
+            }
         }
 
         /// <summary>
@@ -249,7 +293,14 @@ namespace Extract.Imaging
         /// <param name="item">The object to add to the <see cref="ICollection{T}"/>.</param>
         public void Add(RasterZone item)
         {
-            _zones.Add(item);
+            try
+            {
+                _zones.Add(item);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35122");
+            }
         }
 
         /// <summary>
@@ -257,7 +308,15 @@ namespace Extract.Imaging
         /// </summary>
         public void Clear()
         {
-            _zones.Clear();
+            try
+            {
+                _zones.Clear();
+                _comRasterZones.Clear();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35123");
+            }
         }
 
         /// <summary>
@@ -269,7 +328,14 @@ namespace Extract.Imaging
         /// <param name="item">The object to locate in the <see cref="ICollection{T}"/>.</param>
         public bool Contains(RasterZone item)
         {
-            return _zones.Contains(item);
+            try
+            {
+                return _zones.Contains(item);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35124");
+            }
         }
 
         /// <summary>
@@ -281,7 +347,14 @@ namespace Extract.Imaging
         /// <param name="arrayIndex">The zero-based index in array at which copying begins.</param>
         public void CopyTo(RasterZone[] array, int arrayIndex)
         {
-            _zones.CopyTo(array, arrayIndex);
+            try
+            {
+                _zones.CopyTo(array, arrayIndex);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35125");
+            }
         }
 
         /// <summary>
@@ -323,7 +396,16 @@ namespace Extract.Imaging
         /// <param name="item">The object to remove from the <see cref="ICollection{T}"/>.</param>
         public bool Remove(RasterZone item)
         {
-            return _zones.Remove(item);
+            try
+            {
+                _comRasterZones.Remove(item);
+
+                return _zones.Remove(item);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35114");
+            }
         }
 
         #endregion ICollection<RasterZone> Members
