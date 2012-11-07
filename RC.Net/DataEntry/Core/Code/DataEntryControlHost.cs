@@ -6819,9 +6819,19 @@ namespace Extract.DataEntry
             // If saving should be or can be prevented by invalid data, check for invalid data.
             if (_invalidDataSaveMode != InvalidDataSaveMode.Allow)
             {
-                // Attempt to find any attributes that haven't passed validation.
-                IAttribute firstInvalidAttribute = GetNextInvalidAttribute(
-                    _invalidDataSaveMode != InvalidDataSaveMode.AllowWithWarnings);
+                // Find the first attribute that doesn't pass validation.
+                IAttribute firstInvalidAttribute = null;
+                if (AttributeStatusInfo.GetDataValidity(currentlySelectedAttribute.Last())
+                    != DataValidity.Valid)
+                {
+                    firstInvalidAttribute = currentlySelectedAttribute.Last();
+                }
+                else
+                {
+                    firstInvalidAttribute = GetNextInvalidAttribute(
+                        _invalidDataSaveMode != InvalidDataSaveMode.AllowWithWarnings);
+                }
+
                 IAttribute invalidAttribute = firstInvalidAttribute;
 
                 // Loop as long as more invalid attributes are found (for the case that we need to
@@ -6833,6 +6843,24 @@ namespace Extract.DataEntry
                     
                     try
                     {
+                        using (new TemporaryWaitCursor())
+                        {
+                            // Obtain the complete genealogy needed to propagate the invalid attribute.
+                            Stack<IAttribute> attributesToPropagate =
+                                GetAttributeGenealogy(invalidAttribute);
+
+                            // Indicate a manual focus event so that HandleControlGotFocus allows the
+                            // new attribute selection rather than overriding it.
+                            _manualFocusEvent = true;
+
+                            // Propagate and select the invalid attribute.
+                            PropagateAttributes(attributesToPropagate, true, false);
+
+                            // Since this loop is being run within an event handler, DoEvents needs
+                            // to be called to allow the attribute propogation to occur.
+                            Application.DoEvents();
+                        }
+
                         // Generate an exception which can be displayed to the user.
                         AttributeStatusInfo.Validate(invalidAttribute, true);
                     }

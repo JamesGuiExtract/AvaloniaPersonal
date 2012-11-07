@@ -509,6 +509,11 @@ namespace Extract.Imaging.Forms
         /// </summary>
         ZoomInfo? _lastNonAutoZoomInfo;
 
+        /// <summary>
+        /// Indicates whether the fit mode is currently being adjusted.
+        /// </summary>
+        bool _updatingFitMode;
+
         #endregion Fields
 
         #region Delegates
@@ -1850,16 +1855,32 @@ namespace Extract.Imaging.Forms
         /// <remarks>This method does not change the fit mode.</remarks>
         void ShowFitToPage()
         {
-            base.SizeMode = RasterPaintSizeMode.FitAlways;
-            ScaleFactor = _DEFAULT_SCALE_FACTOR;
-
-            // [DataEntry:837]
-            // If a zero-size rectangle has been specified (as is the case with a minimized
-            // window), zooming is not possible and would throw an exception if attempted.
-            if (DisplayRectangle.Width >= 1 && DisplayRectangle.Height >= 1)
+            // Calls that adjust the fit mode can cause some recursion that is not infinite, but
+            // that is unnecessary.
+            if (_updatingFitMode)
             {
-                // Zoom the specified rectangle
-                base.ZoomToRectangle(DisplayRectangle);
+                return;
+            }
+
+            try
+            {
+                _updatingFitMode = true;
+
+                base.SizeMode = RasterPaintSizeMode.FitAlways;
+                ScaleFactor = _DEFAULT_SCALE_FACTOR;
+
+                // [DataEntry:837]
+                // If a zero-size rectangle has been specified (as is the case with a minimized
+                // window), zooming is not possible and would throw an exception if attempted.
+                if (DisplayRectangle.Width >= 1 && DisplayRectangle.Height >= 1)
+                {
+                    // Zoom the specified rectangle
+                    base.ZoomToRectangle(DisplayRectangle);
+                }
+            }
+            finally
+            {
+                _updatingFitMode = false;
             }
         }
 
@@ -1870,16 +1891,43 @@ namespace Extract.Imaging.Forms
         /// <remarks>This method does not change the fit mode.</remarks>
         void ShowFitToWidth()
         {
-            base.SizeMode = RasterPaintSizeMode.FitWidth;
-            ScaleFactor = _DEFAULT_SCALE_FACTOR;
 
-            // [DataEntry:837]
-            // If a zero-size rectangle has been specified (as is the case with a minimized
-            // window), zooming is not possible and would throw an exception if attempted.
-            if (DisplayRectangle.Width >= 1 && DisplayRectangle.Height >= 1)
+            // Calls that adjust the fit mode can cause some recursion that is not infinite, but
+            // that is unnecessary.
+            if (_updatingFitMode)
             {
-                // Zoom the specified rectangle
-                base.ZoomToRectangle(DisplayRectangle);
+                return;
+            }
+
+            try
+            {
+                _updatingFitMode = true;
+
+                // Set the fit mode, preserving the scroll position
+                int scrollPosition = ScrollPosition.Y;
+                double initialScaleFactor = ScaleFactor;
+
+                base.SizeMode = RasterPaintSizeMode.FitWidth;
+                ScaleFactor = _DEFAULT_SCALE_FACTOR;
+
+                // [DataEntry:837]
+                // If a zero-size rectangle has been specified (as is the case with a minimized
+                // window), zooming is not possible and would throw an exception if attempted.
+                if (DisplayRectangle.Width >= 1 && DisplayRectangle.Height >= 1)
+                {
+                    // Zoom the specified rectangle
+                    base.ZoomToRectangle(DisplayRectangle);
+                }
+
+                // [DataEntry:837]
+                // The scoll position must be ajusted by the factor of change in the ScaleFactor. 
+                double factorOfScaleChange = ScaleFactor / initialScaleFactor;
+                scrollPosition = (int)(scrollPosition * factorOfScaleChange);
+                ScrollPosition = new Point(0, scrollPosition);
+            }
+            finally
+            {
+                _updatingFitMode = false;
             }
         }
 

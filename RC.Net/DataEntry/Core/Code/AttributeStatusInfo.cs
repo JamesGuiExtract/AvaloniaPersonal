@@ -751,9 +751,15 @@ namespace Extract.DataEntry
                 bool reorder = false;
                 if (displayOrder != null)
                 {
+                    // [DataEntry:1004]
+                    // Since this value will be compared using the string class, pad zeros so that tab
+                    // indicies of up to 999 can be compared.
+                    string paddedDisplayOrder =
+                        string.Format(CultureInfo.InvariantCulture, "{0:D3}", displayOrder.Value);
+
                     // Set/update the displayOrder value if necessary.
                     string fullDisplayOrder = DataEntryMethods.GetTabIndex((Control)owningControl) +
-                        "." + ((int)displayOrder).ToString(CultureInfo.CurrentCulture);
+                        "." + paddedDisplayOrder;
 
                     // If the displayOrder value has changed, sourceAttributes need to be reordered.
                     if (statusInfo._displayOrder != fullDisplayOrder)
@@ -1893,9 +1899,15 @@ namespace Extract.DataEntry
                     "Cannot update display order without owning control!",
                     statusInfo._owningControl != null);
 
+                // [DataEntry:1004]
+                // Since this value will be compared using the string class, pad zeros so that tab
+                // indicies of up to 999 can be compared.
+                string paddedDisplayOrder =
+                        string.Format(CultureInfo.InvariantCulture, "{0:D3}", displayOrder);
+
                 statusInfo._displayOrder = 
                     DataEntryMethods.GetTabIndex((Control)statusInfo._owningControl) + "." +
-                    displayOrder.ToString(CultureInfo.CurrentCulture);
+                    paddedDisplayOrder;
             }
             catch (Exception ex)
             {

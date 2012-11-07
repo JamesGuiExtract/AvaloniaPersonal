@@ -4189,16 +4189,12 @@ namespace Extract.Imaging.Forms
                 {
                     case FitMode.FitToPage:
 
-                        // Set the fit mode
                         ShowFitToPage();
                         break;
 
                     case FitMode.FitToWidth:
 
-                        // Set the fit mode, preserving the scroll position
-                        Point scrollPosition = ScrollPosition;
                         ShowFitToWidth();
-                        ScrollPosition = scrollPosition;
                         break;
 
                     case FitMode.None:

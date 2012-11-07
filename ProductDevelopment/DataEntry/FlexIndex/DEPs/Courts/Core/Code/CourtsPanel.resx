@@ -117,60 +117,61 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="_judgeFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="_judgeFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_judgeMiddleNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_judgeMiddleNameColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_judgeLastNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_judgeLastNameColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_judgeSuffixColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_judgeSuffixColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_plaintiffFirstNameTableColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_plaintiffFirstNameTableColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_plaintiffMiddleNameTableColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_plaintiffMiddleNameTableColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_plaintiffLastNameTableColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_plaintiffLastNameTableColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_plaintiffSuffixTableColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_plaintiffSuffixTableColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="dataEntryTableRow3.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;SQL&gt;SELECT [Abbreviation] FROM [State] INNER JOIN [ZipCode] ON [State].[ID] = [ZipCode].[StateID] WHERE [ZipCode] = SUBSTRING(&lt;Attribute&gt;../ZipCode&lt;/Attribute&gt;,1,5)  AND LEN(&lt;Attribute TriggerUpdate='0'&gt;.&lt;/Attribute&gt;) = 0 AND ([City] = SUBSTRING(&lt;Attribute TriggerUpdate='0'&gt;../City&lt;/Attribute&gt;,1,32) OR LEN(&lt;Attribute TriggerUpdate='0'&gt;../City&lt;/Attribute&gt;) = 0)&lt;/SQL&gt;</value>
   </data>
   <data name="dataEntryTableRow4.AutoUpdateQuery" xml:space="preserve">
-    <value>&lt;SQL&gt;SELECT DISTINCT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../City&lt;/Attribute&gt;,1,32) AND SUBSTRING(&lt;Attribute TriggerUpdate='0'&gt;.&lt;/Attribute&gt;,1,5) != [ZipCode] AND ([Name] = SUBSTRING(&lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt;,1,64) OR [Abbreviation] = SUBSTRING(&lt;Result Arg1='State'/&gt;,1,2))&lt;/SQL&gt;</value>
+    <value>&lt;SQL&gt;SELECT DISTINCT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../City&lt;/Attribute&gt;,1,32) AND SUBSTRING(&lt;Attribute TriggerUpdate='0'&gt;.&lt;/Attribute&gt;,1,5) != [ZipCode] AND ([Name] = SUBSTRING(&lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt;,1,64) OR [Abbreviation] = SUBSTRING(&lt;State/&gt;,1,2))&lt;/SQL&gt;</value>
   </data>
   <data name="dataEntryTableRow4.ValidationQuery" xml:space="preserve">
-    <value>&lt;Query ValidationListType='AutoCompleteOnly'&gt;&lt;SQL&gt;SELECT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../City&lt;/Attribute&gt;,1,32) AND ([Name] = SUBSTRING(&lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt;,1,64) OR [Abbreviation] = SUBSTRING(&lt;Result Arg1='State'/&gt;,1,2))&lt;/SQL&gt;&lt;/Query&gt;</value>
+    <value>&lt;Query ValidationListType='AutoCompleteOnly'&gt;&lt;SQL&gt;SELECT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../City&lt;/Attribute&gt;,1,32) AND ([Name] = SUBSTRING(&lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt;,1,64) OR [Abbreviation] = SUBSTRING(&lt;State/&gt;,1,2))&lt;/SQL&gt;&lt;/Query&gt;</value>
   </data>
-  <metadata name="_defendantFirstNameTableColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="_defendantFirstNameTableColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_defendantMiddleNameTableColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_defendantMiddleNameTableColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_defendantLastNameTableColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_defendantLastNameTableColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_defendantSuffixTableColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_defendantSuffixTableColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="dataEntryTableRow7.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;SQL&gt;SELECT [Abbreviation] FROM [State] INNER JOIN [ZipCode] ON [State].[ID] = [ZipCode].[StateID] WHERE [ZipCode] = SUBSTRING(&lt;Attribute&gt;../ZipCode&lt;/Attribute&gt;,1,5)  AND LEN(&lt;Attribute TriggerUpdate='0'&gt;.&lt;/Attribute&gt;) = 0 AND ([City] = SUBSTRING(&lt;Attribute TriggerUpdate='0'&gt;../City&lt;/Attribute&gt;,1,32) OR LEN(&lt;Attribute TriggerUpdate='0'&gt;../City&lt;/Attribute&gt;) = 0)&lt;/SQL&gt;</value>
   </data>
   <data name="dataEntryTableRow8.AutoUpdateQuery" xml:space="preserve">
-    <value>&lt;SQL&gt;SELECT DISTINCT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../City&lt;/Attribute&gt;,1,32) AND SUBSTRING(&lt;Attribute TriggerUpdate='0'&gt;.&lt;/Attribute&gt;,1,5) != [ZipCode] AND ([Name] = SUBSTRING(&lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt;,1,64) OR [Abbreviation] = SUBSTRING(&lt;Result Arg1='State'/&gt;,1,2))&lt;/SQL&gt;</value>
+    <value>&lt;SQL&gt;SELECT DISTINCT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../City&lt;/Attribute&gt;,1,32) AND SUBSTRING(&lt;Attribute TriggerUpdate='0'&gt;.&lt;/Attribute&gt;,1,5) != [ZipCode] AND ([Name] = SUBSTRING(&lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt;,1,64) OR [Abbreviation] = SUBSTRING(&lt;State/&gt;,1,2))&lt;/SQL&gt;</value>
   </data>
   <data name="dataEntryTableRow8.ValidationQuery" xml:space="preserve">
     <value>&lt;Query ValidationListType='AutoCompleteOnly'&gt;
-&lt;SQL&gt;SELECT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../City&lt;/Attribute&gt;,1,32) AND ([Name] = SUBSTRING(&lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt;,1,64) OR [Abbreviation] = SUBSTRING(&lt;Result Arg1='State'/&gt;,1,2))&lt;/SQL&gt;
+&lt;SQL&gt;SELECT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../City&lt;/Attribute&gt;,1,32) AND ([Name] = SUBSTRING(&lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt;,1,64) OR [Abbreviation] = SUBSTRING(&lt;State/&gt;,1,2))&lt;/SQL&gt;
 &lt;/Query&gt;</value>
   </data>
 </root>

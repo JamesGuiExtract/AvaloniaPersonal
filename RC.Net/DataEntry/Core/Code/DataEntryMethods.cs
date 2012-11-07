@@ -851,18 +851,23 @@ namespace Extract.DataEntry
         {
             try
             {
+                // [DataEntry:1004]
+                // Since this value will be compared using the string class, pad zeros so that tab
+                // indicies of up to 999 can be compared.
+                string paddedTabIndex =
+                    string.Format(CultureInfo.InvariantCulture, "{0:D3}", control.TabIndex);
+
                 if (control.Parent != null && !(control.Parent is DataEntryControlHost))
                 {
                     // Recursively include the tab index of all ancestors beneath the
                     // DataEntryControlHost
-                    return GetTabIndex(control.Parent) + "." +
-                        control.TabIndex.ToString(CultureInfo.CurrentCulture);
+                    return GetTabIndex(control.Parent) + "." + paddedTabIndex;
                 }
                 else
                 {
                     // There are no parents, just return a string representing this control's
                     // TabIndex.
-                    return control.TabIndex.ToString(CultureInfo.CurrentCulture);
+                    return paddedTabIndex;
                 }
             }
             catch (Exception ex)

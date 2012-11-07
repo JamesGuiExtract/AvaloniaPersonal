@@ -1875,7 +1875,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 // [DataEntry:414]
                 // A document should only be allowed to be closed in FAM mode
-                _closeFileCommand.Enabled = (_standAloneMode && _imageViewer.IsImageAvailable);;
+                _closeFileCommand.Enabled = (_standAloneMode && _imageViewer.IsImageAvailable);
 
                 _documentTypeComboBox.Enabled = _imageViewer.IsImageAvailable;
 
@@ -1887,7 +1887,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 ExtractException ee = new ExtractException("ELI24228",
-                    "Failed to output document data!", ex);
+                    "Failed to " + 
+                    (_imageViewer.IsImageAvailable ? "load" : "clear") + 
+                    " document data!", ex);
                 ee.AddDebugData("Event data", e, false);
                 DisplayCriticalException(ee);
             }
@@ -3928,7 +3930,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             ref _counterStatisticsToken, 0, attributes);
                     }
                 }
-                else if (!_recordedDatabaseData)
+                else if (!_recordedDatabaseData && CurrentlyRecordingStatistics)
                 {
                     // Don't count input when a document is not open.
                     if (_inputEventTracker != null)

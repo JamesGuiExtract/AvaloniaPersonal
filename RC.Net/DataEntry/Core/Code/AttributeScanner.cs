@@ -322,6 +322,7 @@ namespace Extract.DataEntry
 
                     // Initialize the current cutoff to use to null.
                     string currentCutoffDisplayOrder = null;
+                    bool atStartIndex = false;
 
                     // If this is the starting attribute apply the attribute's display order as the
                     // cutoff value.
@@ -329,6 +330,7 @@ namespace Extract.DataEntry
                     {
                         currentCutoffDisplayOrder = statusInfo.DisplayOrder;
                         appliedCutoffDisplayOrder = currentCutoffDisplayOrder;
+                        atStartIndex = true;
                     }
                     // If the starting attribute is not a decendent of this specific attribute, ignore
                     // the specified starting point.
@@ -339,8 +341,11 @@ namespace Extract.DataEntry
 
                     AttributeScanner childScanNode = null;
 
-                    // If this attribute has sub-attributes, perform a scan of the sub-attributes
-                    if (attribute.SubAttributes.Size() > 0)
+                    // [DataEntry:1106]
+                    // Iff:
+                    // - Scanning forward or this isn't the starting point.
+                    // - This attribute has sub-attributes, perform a scan of the sub-attributes
+                    if ((_forward || !atStartIndex) && attribute.SubAttributes.Size() > 0)
                     {
                         childScanNode = GetScanNode(attribute.SubAttributes, _startingPoint, _firstPass);
                         currentCutoffDisplayOrder = childScanNode.Scan(currentCutoffDisplayOrder);
