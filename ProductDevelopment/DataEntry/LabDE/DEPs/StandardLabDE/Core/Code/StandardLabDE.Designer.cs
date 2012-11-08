@@ -439,7 +439,7 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._epicPatientNameTable.RowSwipingEnabled = true;
             this._epicPatientNameTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this._epicPatientNameTable.Size = new System.Drawing.Size(567, 46);
-            this._epicPatientNameTable.TabIndex = 11;
+            this._epicPatientNameTable.TabIndex = 2;
             // 
             // _epicPatientFirstNameColumn
             // 
@@ -561,7 +561,7 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._patientGender.Name = "_patientGender";
             this._patientGender.ParentDataEntryControl = this._patientInfoGroupBox;
             this._patientGender.Size = new System.Drawing.Size(54, 21);
-            this._patientGender.TabIndex = 3;
+            this._patientGender.TabIndex = 4;
             this._patientGender.ValidationErrorMessage = "Specify \"M\" for male, \"F\" for female or \"U\" for unknown";
             this._patientGender.ValidationQuery = "<SQL>SELECT * FROM Gender</SQL>";
             // 
@@ -574,7 +574,7 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._patientBirthDate.Name = "_patientBirthDate";
             this._patientBirthDate.ParentDataEntryControl = this._patientInfoGroupBox;
             this._patientBirthDate.Size = new System.Drawing.Size(283, 20);
-            this._patientBirthDate.TabIndex = 2;
+            this._patientBirthDate.TabIndex = 3;
             this._patientBirthDate.ValidationErrorMessage = "Date of birth must be a valid date in the format MM/DD/YYYY";
             this._patientBirthDate.ValidationPattern = "(^$)|(^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(18|19|20)\\d{2}" +
     "$)";
@@ -597,7 +597,7 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._patientRecordNum.Name = "_patientRecordNum";
             this._patientRecordNum.ParentDataEntryControl = this._patientInfoGroupBox;
             this._patientRecordNum.Size = new System.Drawing.Size(186, 20);
-            this._patientRecordNum.TabIndex = 4;
+            this._patientRecordNum.TabIndex = 5;
             this._patientRecordNum.ValidationErrorMessage = "Invalid medical record number";
             this._patientRecordNum.ValidationPattern = "(?i)^[MZ]?\\d+\\s?$";
             // 
