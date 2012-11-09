@@ -381,6 +381,7 @@
     <ClInclude Include="COMUtils.h" />
     <ClInclude Include="cpputil.h" />
     <ClInclude Include="CpuUsage.h" />
+    <ClInclude Include="CsisUtils.h" />
     <ClInclude Include="CursorToolTipCtrl.h" />
     <ClInclude Include="DateUtil.h" />
     <ClInclude Include="DocTagUtils.h" />

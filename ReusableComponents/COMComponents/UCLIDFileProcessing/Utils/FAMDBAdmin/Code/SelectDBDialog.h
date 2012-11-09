@@ -44,9 +44,14 @@ public:
 	DBInfoCombo m_comboDBName;
 	CString m_zServerName;
 	CString m_zDBName;
+	CString m_zAdvConnStrProperties;
 	EDBOptions m_eOptionsDatabaseGroup;
 
+	afx_msg void OnCbnKillfocusComboSelectDbServer();
 	afx_msg void OnBnClickedClose();
+	afx_msg void OnBnClickedButtonAdvanced();
+	afx_msg void OnChangeServerName();
+	afx_msg void OnChangeDBName();
 
 private:
 	HICON m_hIcon;
@@ -55,6 +60,8 @@ private:
 	IFileProcessingDBPtr m_ipFAMDB;
 
 	unique_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
-public:
-	afx_msg void OnCbnKillfocusComboSelectDbServer();
+
+	// If advance connection properties are specified and they reference the server or database,
+	// update it with the current server and database name.
+	void updateAdvConnStrProperties();
 };

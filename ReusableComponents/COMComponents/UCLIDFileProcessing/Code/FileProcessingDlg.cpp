@@ -1231,7 +1231,7 @@ void FileProcessingDlg::OnFileNew()
 		getFPM()->Clear();
 
 		// Update the database page Server and DBName
-		m_propDatabasePage.setServerAndDBName("", "");
+		m_propDatabasePage.setConnectionInfo("", "", "");
 		
 		// With all of the data cleared a new database config file should be selected before the action tab is displayed
 		// so if it is displayed it should be removed
@@ -1580,6 +1580,13 @@ void FileProcessingDlg::OnToolsFAMDBAdmin()
 		{
 			strParameters = "\"" + strServer + "\" \""
 				+ asString(getDBPointer()->DatabaseName) + "\"";
+
+			string strAdvConnStrProperties =
+				asString(getDBPointer()->AdvancedConnectionStringProperties);
+			if (!strAdvConnStrProperties.empty())
+			{
+				strParameters += " \"" + strAdvConnStrProperties + "\"";
+			}
 		}
 
 		// Start the File Action Manager
@@ -1660,13 +1667,20 @@ void FileProcessingDlg::OnSelectFAMMRUPopupMenu(UINT nID)
 // INotifyDBConfigChanged class
 //--------------------------------------------------------------------------------------------------
 void FileProcessingDlg::OnDBConfigChanged(const std::string& strServer, 
-										  const std::string& strDatabase)
+										  const std::string& strDatabase,
+										  const std::string& strAdvConnStrProperties)
 { 
 	try
 	{
+		// Set the database status on the database page
+		m_propDatabasePage.setDBConnectionStatus(gstrCONNECTING);
+		emptyWindowsMessageQueue();
+		CWaitCursor cWait;
+
 		// Set the configuration file for the database
 		getDBPointer()->DatabaseServer = strServer.c_str();
 		getDBPointer()->DatabaseName = strDatabase.c_str();
+		getDBPointer()->AdvancedConnectionStringProperties = strAdvConnStrProperties.c_str();
 
 		// when the DB changes update the FPManager as well
 		// [p13 #4581 && #4580]
@@ -1675,6 +1689,7 @@ void FileProcessingDlg::OnDBConfigChanged(const std::string& strServer,
 		//		 the Server or DBName do not exist
 		getFPM()->DatabaseServer = strServer.c_str();
 		getFPM()->DatabaseName = strDatabase.c_str();
+		getFPM()->AdvancedConnectionStringProperties = strAdvConnStrProperties.c_str();
 
 		// Reset the database connection
 		getDBPointer()->ResetDBConnection();
@@ -2393,7 +2408,9 @@ void FileProcessingDlg::loadSettingsFromManager()
 	// set the database file for the datatabase page
 	if (isPageDisplayed(kDatabasePage))
 	{
-		m_propDatabasePage.setServerAndDBName(asString(getFPM()->DatabaseServer), asString(getFPM()->DatabaseName));
+		m_propDatabasePage.setConnectionInfo(asString(getFPM()->DatabaseServer), 
+											 asString(getFPM()->DatabaseName),
+											 asString(getFPM()->AdvancedConnectionStringProperties));
 	}
 
 	// If the action page is displayed refresh the data 

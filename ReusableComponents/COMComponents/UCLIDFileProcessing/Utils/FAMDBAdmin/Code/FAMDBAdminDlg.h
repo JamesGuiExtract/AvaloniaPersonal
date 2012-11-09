@@ -64,7 +64,8 @@ protected:
 
 	//INotifyDBConfigChanged
 public:
-	virtual void OnDBConfigChanged(const string& strServer, const string& strDatabase);
+	virtual void OnDBConfigChanged(const string& strServer, const string& strDatabase,
+		const string& strAdvConnStrProperties);
 
 	// Method called to cause the summary tab to refresh its data
 	// If nActionID is -1, all actions are refreshed. Otherwise, only the action with the specified

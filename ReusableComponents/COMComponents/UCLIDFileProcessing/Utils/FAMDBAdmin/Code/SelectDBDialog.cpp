@@ -11,6 +11,8 @@
 #include <DotNetUtils.h>
 #include <ExtractMFCUtils.h>
 #include <UCLIDException.h>
+#include <DialogAdvanced.h>
+#include <ADOUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // SelectDBDialog dialog
@@ -22,6 +24,7 @@ SelectDBDialog::SelectDBDialog(IFileProcessingDBPtr ipFAMDB, CWnd* pParent /*=NU
 	: CDialog(SelectDBDialog::IDD, pParent),
 	m_zServerName(""),
 	m_zDBName(""),
+	m_zAdvConnStrProperties(""),
 	m_eOptionsDatabaseGroup(kLoginExisting),
 	m_ipFAMDB(ipFAMDB),
 	m_comboServerName(DBInfoCombo::kServerName),
@@ -57,6 +60,7 @@ void SelectDBDialog::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO_SELECT_DB_NAME, m_comboDBName);
 	DDX_CBString(pDX, IDC_COMBO_SELECT_DB_SERVER, m_zServerName);
 	DDX_CBString(pDX, IDC_COMBO_SELECT_DB_NAME, m_zDBName);
+	DDX_Text(pDX, IDC_EDIT_CONN_STR, m_zAdvConnStrProperties);
 	DDX_Radio(pDX, IDC_RADIO_LOGIN_EXISTING, (int &)m_eOptionsDatabaseGroup);
 }
 
@@ -66,6 +70,11 @@ void SelectDBDialog::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(SelectDBDialog, CDialog)
 	ON_BN_CLICKED(IDCLOSE, &SelectDBDialog::OnBnClickedClose)
 	ON_CBN_KILLFOCUS(IDC_COMBO_SELECT_DB_SERVER, &SelectDBDialog::OnCbnKillfocusComboSelectDbServer)
+	ON_BN_CLICKED(IDC_BUTTON_CONN_STR, &SelectDBDialog::OnBnClickedButtonAdvanced)
+	ON_CBN_EDITCHANGE(IDC_COMBO_SELECT_DB_SERVER, OnChangeServerName)
+	ON_CBN_SELCHANGE(IDC_COMBO_SELECT_DB_SERVER, OnChangeServerName)
+	ON_CBN_EDITCHANGE(IDC_COMBO_SELECT_DB_NAME, OnChangeDBName)
+	ON_CBN_SELCHANGE(IDC_COMBO_SELECT_DB_NAME, OnChangeDBName)
 	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
@@ -84,20 +93,23 @@ BOOL SelectDBDialog::OnInitDialog()
 		// Load the Server and database from the FAMDB
 		m_zServerName = asString(m_ipFAMDB->DatabaseServer).c_str();
 		m_zDBName = asString(m_ipFAMDB->DatabaseName).c_str();
+		m_zAdvConnStrProperties = asString(m_ipFAMDB->AdvancedConnectionStringProperties).c_str();
 
 		// If the server and database in the FAMDB are empty set them from the registry
 		if ( m_zServerName.IsEmpty() && m_zDBName.IsEmpty() )
 		{
-			string strServer, strDatabase;
-			ma_pCfgMgr->getLastGoodDBSettings(strServer, strDatabase);
+			string strServer, strDatabase, strAdvConnStrProperties;
+			ma_pCfgMgr->getLastGoodDBSettings(strServer, strDatabase, strAdvConnStrProperties);
 
 			// Set the values in the database object
 			m_ipFAMDB->DatabaseServer = strServer.c_str();
 			m_ipFAMDB->DatabaseName = strDatabase.c_str();
+			m_ipFAMDB->AdvancedConnectionStringProperties = strAdvConnStrProperties.c_str();
 
 			// Set the member values
 			m_zServerName = strServer.c_str();
 			m_zDBName = strDatabase.c_str();
+			m_zAdvConnStrProperties = strAdvConnStrProperties.c_str();
 		}
 
 		// Set the server for the DB name combo
@@ -154,8 +166,9 @@ void SelectDBDialog::OnOK()
 		UpdateData();
 
 		// Set the Database server and name
-		m_ipFAMDB->DatabaseServer = m_zServerName.operator LPCSTR();
-		m_ipFAMDB->DatabaseName = m_zDBName.operator LPCSTR();
+		m_ipFAMDB->DatabaseServer = (LPCSTR)m_zServerName;
+		m_ipFAMDB->DatabaseName = (LPCSTR)m_zDBName;
+		m_ipFAMDB->AdvancedConnectionStringProperties = (LPCSTR)m_zAdvConnStrProperties;
 
 		//  Check for create database
 		if ( m_eOptionsDatabaseGroup == kCreateNew )
@@ -241,3 +254,88 @@ void SelectDBDialog::OnCbnKillfocusComboSelectDbServer()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18119");
 }
 //-------------------------------------------------------------------------------------------------
+void SelectDBDialog::OnBnClickedButtonAdvanced()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		CDialogAdvanced dlgAdvanced((LPCTSTR)m_zServerName, (LPCTSTR)m_zDBName, 
+			(LPCSTR)m_zAdvConnStrProperties);
+		if (dlgAdvanced.DoModal() == IDOK)
+		{
+			m_zAdvConnStrProperties = dlgAdvanced.getAdvConnStrProperties().c_str();
+			
+			string strServer;
+			if (dlgAdvanced.getServer(strServer))
+			{
+				m_zServerName = strServer.c_str();
+			}
+			string strDatabase;
+			if (dlgAdvanced.getDatabase(strDatabase))
+			{
+				m_zDBName = strDatabase.c_str();
+			}
+
+			UpdateData(FALSE);
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18119");
+}
+//--------------------------------------------------------------------------------------------------
+void SelectDBDialog::OnChangeServerName()
+{
+	try
+	{
+		UpdateData(TRUE);
+
+		updateAdvConnStrProperties();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35143");
+}
+//--------------------------------------------------------------------------------------------------
+void SelectDBDialog::OnChangeDBName()
+{
+	try
+	{
+		UpdateData(TRUE);
+
+		updateAdvConnStrProperties();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35144");
+}
+
+//-------------------------------------------------------------------------------------------------
+// Private Members
+//-------------------------------------------------------------------------------------------------
+void SelectDBDialog::updateAdvConnStrProperties()
+{
+	string strAdvConnStrProperties = (LPCTSTR)m_zAdvConnStrProperties;
+
+	if (findConnectionStringProperty(strAdvConnStrProperties, gstrSERVER))
+	{
+		updateConnectionStringProperties(strAdvConnStrProperties,
+			gstrSERVER + "=" + (LPCTSTR)m_zServerName);
+	}
+	if (findConnectionStringProperty(strAdvConnStrProperties, gstrDATA_SOURCE))
+	{
+		updateConnectionStringProperties(strAdvConnStrProperties,
+			gstrDATA_SOURCE + "=" + (LPCTSTR)m_zServerName);
+	}
+	if (findConnectionStringProperty(strAdvConnStrProperties, gstrDATABASE))
+	{
+		updateConnectionStringProperties(strAdvConnStrProperties,
+			gstrDATABASE + "=" + (LPCTSTR)m_zDBName);
+	}
+	if (findConnectionStringProperty(strAdvConnStrProperties, gstrINITIAL_CATALOG))
+	{
+		updateConnectionStringProperties(strAdvConnStrProperties,
+			gstrINITIAL_CATALOG + "=" + (LPCTSTR)m_zDBName);
+	}
+
+	m_zAdvConnStrProperties = strAdvConnStrProperties.c_str();
+
+	// Update only the text of the connection string control to avoid resetting selection in the
+	// database or server controls.
+	GetDlgItem(IDC_EDIT_CONN_STR)->SetWindowText(m_zAdvConnStrProperties);
+}

@@ -14,7 +14,8 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 14;
+const unsigned long gnCurrentVersion = 15;
+// Version 15: Added AdvancedConnectionStringProperties
 const int gnOLD_CONVERT_VERSION = 10;
 
 //-------------------------------------------------------------------------------------------------
@@ -180,6 +181,14 @@ STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 			}
 		}
 
+		// Get advanced connection string properties
+		if (nDataVersion > 14)
+		{
+			string strAdvConnStrProperties;
+			dataReader >> strAdvConnStrProperties;
+			getFPMDB()->AdvancedConnectionStringProperties = strAdvConnStrProperties.c_str();
+		}
+
 		// Read in the collected File Supplying Management Role
 		IPersistStreamPtr ipFSObj;
 		readObjectFromStream( ipFSObj, pStream, "ELI14399" );
@@ -237,6 +246,9 @@ STDMETHODIMP CFileProcessingManager::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << asString(getFPMDB()->DatabaseName);
 
 		dataWriter << m_nMaxFilesFromDB;
+
+		// Save the advanced connection string properties
+		dataWriter << asString(getFPMDB()->AdvancedConnectionStringProperties);
 		
 		// Flush the stream
 		dataWriter.flushToByteStream();

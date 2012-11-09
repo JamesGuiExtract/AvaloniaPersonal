@@ -36,6 +36,7 @@ CFileProcessingManager::CFileProcessingManager()
 : m_ipFPMDB(NULL),
 m_strPreviousDBServer(""),
 m_strPreviousDBName(""),
+m_strPreviousAdvConnStrProperties(""),
 m_isDBConnectionReady(false),
 m_nNumberOfFilesToExecute(0),
 m_bCancelling(false),
@@ -1186,6 +1187,51 @@ STDMETHODIMP CFileProcessingManager::AuthenticateService(BSTR bstrValue)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32366");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::get_AdvancedConnectionStringProperties(BSTR *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI35135", pVal != __nullptr);
+
+		*pVal = getFPMDB()->AdvancedConnectionStringProperties.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35136");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::put_AdvancedConnectionStringProperties(BSTR newVal)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		string strNewVal = asString(newVal);
+
+		// check if the newVal is not blank and if it is a new database name
+		if (strNewVal != "" && strNewVal != m_strPreviousAdvConnStrProperties)
+		{
+			if (m_strPreviousAdvConnStrProperties != "")
+			{
+				m_bDirty = true;
+			}
+
+			m_strPreviousAdvConnStrProperties = strNewVal;
+		}
+
+		getFPMDB()->AdvancedConnectionStringProperties = newVal;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35138");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IRoleNotifyFAM Methods
@@ -1369,10 +1415,12 @@ void CFileProcessingManager::clear()
 		// clear the last server and database string
 		m_strPreviousDBServer = "";
 		m_strPreviousDBName = "";
+		m_strPreviousAdvConnStrProperties = "";
 
 		// reset the database config file
 		getFPMDB()->DatabaseServer = "";
 		getFPMDB()->DatabaseName = "";
+		getFPMDB()->AdvancedConnectionStringProperties = "";
 		getFPMDB()->ResetDBConnection();
 
 		m_nMaxFilesFromDB = gnMAX_NUMBER_OF_FILES_FROM_DB;
@@ -1420,14 +1468,22 @@ bool CFileProcessingManager::isActionNameInDatabase(const string& strAction)
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus)
 {
+	string strMessageName = m_strFPSFileName.empty()
+				? "File Action Manager"
+				: getFileNameFromFullPath(m_strFPSFileName);
+
+	string strFileName = m_strFPSFileName.empty()
+				? "<Not Saved>"
+				: getFileNameFromFullPath(m_strFPSFileName);
+
 	switch(eStatus)
 	{
 	case kStart:
 		{
 			// Log the info that processing is starting processing
-			UCLIDException ue("ELI15680", "Application trace: File Action Manager has started processing.");
-			ue.addDebugInfo("FPS File",
-				m_strFPSFileName.empty() ? "<Not Saved>" : m_strFPSFileName);
+			UCLIDException ue("ELI15680",
+				"Application trace: " + strMessageName + " has started processing.");
+			ue.addDebugInfo("FPS File", strFileName);
 			ue.log();
 
 			if (m_bRecordFAMSessions)
@@ -1440,18 +1496,18 @@ void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus)
 	case kBeginStop:
 		{
 			// Log the info that processing is beginning to stop processing
-			UCLIDException ue("ELI28831", "Application trace: File Action Manager is stopping processing.");
-			ue.addDebugInfo("FPS File",
-				m_strFPSFileName.empty() ? "<Not Saved>" : m_strFPSFileName);
+			UCLIDException ue("ELI28831",
+				"Application trace: " + strMessageName + " is stopping processing.");
+			ue.addDebugInfo("FPS File", strFileName);
 			ue.log();
 		}
 		break;
 	case kEndStop:
 		{
 			// Log the info that processing has stopped processing
-			UCLIDException ue("ELI15678", "Application trace: File Action Manager has stopped processing.");
-			ue.addDebugInfo("FPS File",
-				m_strFPSFileName.empty() ? "<Not Saved>" : m_strFPSFileName);
+			UCLIDException ue("ELI15678",
+				"Application trace: " + strMessageName + " has stopped processing.");
+			ue.addDebugInfo("FPS File", strFileName);
 			ue.log();
 
 			if (m_bRecordFAMSessions)

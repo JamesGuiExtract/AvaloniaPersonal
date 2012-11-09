@@ -23,7 +23,8 @@ public:
 	//			a new server and database have been selected.  
 	// NOTE:	When implementing this method the setDBConnectionStatus should be called 
 	//			to update the DB status field on the database page
-	virtual void OnDBConfigChanged(const string& strServer, const string& strDatabase) = 0;
+	virtual void OnDBConfigChanged(const string& strServer, const string& strDatabase,
+		const string& strAdvConnStrProperties) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -45,10 +46,11 @@ public:
 	//			Notify object.
 	void setDBConnectionStatus(const string& strStatusString);
 
-	// PROMISE: Set the name SQL server and DBName
+	// PROMISE: Set the name SQL server, DBName and any advanced connetion string properties to use.
 	//			If the bNotifyObjects flag is true and an object has been set with 
 	//			setNotifyDBConfigChanged then the OnDBConfigChanged method will be called
-	void setServerAndDBName(const string& strSQLServer, const string& strDBName, bool bNotifyObjects = true);
+	void setConnectionInfo(const string& strSQLServer, const string& strDBName,
+		const string& strAdvConnStrProperties, bool bNotifyObjects = true);
 
 	// PROMISE: To set the object to notify when the configuration file has changed.
 	void setNotifyDBConfigChanged(IDBConfigNotifications* pNotifyObject );
@@ -78,19 +80,23 @@ protected:
 	afx_msg void OnBnClickedButtonRefresh();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnBnClickedButtonLastUsedDb();
+	afx_msg void OnBnClickedButtonAdvConnStrProperties();
 	virtual BOOL OnInitDialog();
 
 private:
 	// Control Values
 	CString m_zServer;
 	CString m_zDBName;
+	CString m_zAdvConnStrProperties;
 
 	// Control Variables
 	CButton m_btnBrowseDB;
 	CButton m_btnSqlServerBrowse;
 	CEdit m_editDBServer;
 	CEdit m_editDBName;
+	CEdit m_editAdvConnStrProperties;
 	CEdit m_editConnectStatus;
+	CButton m_btnAdvConnStrProperties;
 	CButton m_btnRefresh;
 	CButton m_btnConnectLastUsedDB;
 
@@ -115,4 +121,10 @@ private:
 	// PROMISE: To call the OnDBConfigChanged for the m_pNotifyDBConfigChangedObject object if it is 
 	//			not NULL;
 	void notifyObjects();
+
+	// Applies a new server name setting (updates advanced connection properties if necessary).
+	void setServer(const string& strServer);
+
+	// Applies a new database name setting (updates advanced connection properties if necessary).
+	void setDatabase(const string& strDatabase);
 };

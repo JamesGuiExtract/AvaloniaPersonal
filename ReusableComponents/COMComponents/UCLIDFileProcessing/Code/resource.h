@@ -174,6 +174,10 @@
 #define IDC_SPIN_NUM_FILES              361
 #define IDC_SPIN_MAX_NUM_RECORDS        362
 #define IDC_CHECK_AUTO_SAVE_FPS         363
+
+// Database Page ID's
+// These ID's need to be the same in every .h project that uses the Database Page object
+// These ID's are defined int FAMUtils
 #define IDC_BUTTON_DB_NAME_BROWSE       1000
 #define IDC_EDIT_DB_SERVER              1001
 #define IDC_EDIT_DB_NAME                1002
@@ -182,6 +186,10 @@
 #define IDC_BUTTON_REFRESH              1005
 #define IDC_BUTTON_SQL_SERVER_BROWSE    1006
 #define IDC_BUTTON_LAST_USED_DB         1007
+#define IDC_EDIT_CONN_STR               1008
+#define IDC_BUTTON_CONN_STR             1009
+// End Database Page ID's
+
 #define IDR_FILEPROCESSINGTASKEXECUTOR  2000
 #define IDC_CHECK_LIMIT_PROCESSING      2001
 #define IDC_BUTTON_SET_SCHEDULE         2002

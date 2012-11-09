@@ -915,6 +915,8 @@ void CFileProcessingDB::addASTransFromSelect(_ConnectionPtr ipConnection,
 //--------------------------------------------------------------------------------------------------
 _ConnectionPtr CFileProcessingDB::getDBConnection()
 {
+	string strConnectionString;
+
 	INIT_EXCEPTION_AND_TRACING("MLI00018");
 	try
 	{
@@ -965,8 +967,28 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 				m_strCurrentConnectionStatus = gstrNOT_CONNECTED;
 
 				// Create the connection string with the current server and database
-				string strConnectionString = createConnectionString(m_strDatabaseServer, 
+				strConnectionString = createConnectionString(m_strDatabaseServer, 
 					m_strDatabaseName);
+
+				// If any advanced connection string properties are specified, update/override the
+				// default connection string.
+				if (!m_strAdvConnStrProperties.empty())
+				{
+					updateConnectionStringProperties(strConnectionString, m_strAdvConnStrProperties);
+					
+					// Log an application trace to indicate this process in connecting with advanced
+					// connection string properties. Only do this once per process unless the
+					// connection string changes.
+					CSingleLock lock(&ms_mutexMainLock, TRUE);
+					if (ms_strLastUsedAdvConnStr != strConnectionString)
+					{
+						UCLIDException ue("ELI35133", "Application trace: Attempting connection with "
+							"advanced connection string attributes.");
+						ue.addDebugInfo("Connection string", strConnectionString, true);
+						ue.log();
+						ms_strLastUsedAdvConnStr = strConnectionString;
+					}
+				}
 
 				_lastCodePos = "40";
 
@@ -1016,6 +1038,8 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 		// Update the connection Status string 
 		// TODO:  may want to get more detail as to what is the problem
 		m_strCurrentConnectionStatus = gstrUNABLE_TO_CONNECT_TO_SERVER;
+
+		ue.addDebugInfo("Connection string", strConnectionString, true);
 
 		// throw the exception to the outer scope
 		throw ue;

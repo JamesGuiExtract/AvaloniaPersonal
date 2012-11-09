@@ -62,10 +62,13 @@ public:
 
 	// Gets the last good settings saved in the registry for the server and database for
 	// FAMDBAdmin
-	void getLastGoodDBSettings(string& strServer, string& strDatabase);
+	void getLastGoodDBSettings(string& strServer, string& strDatabase,
+		string& strAdvConnStrProperties);
 	
-	// Saves the server and database as the last good settings in the registry
-	void setLastGoodDBSettings(const string& strServer, const string& strDatabase);
+	// Saves the server, database and connection string attributes as the last good settings in the
+	// registry
+	void setLastGoodDBSettings(const string& strServer, const string& strDatabase,
+		const string& strAdvConnStrProperties);
 
 	// Return the number of milliseconds to sleep between checking the DB for new files
 	long getMillisecondsBetweenDBCheck();
@@ -121,6 +124,7 @@ private:
 	static const string AUTO_SCROLLING;
 	static const string FileProcessingConfigMgr::LAST_GOOD_SERVER;
 	static const string FileProcessingConfigMgr::LAST_GOOD_DATABASE;
+	static const string FileProcessingConfigMgr::LAST_GOOD_ADV_CONN_STR_PROPERTIES;
 	static const string USE_PRE_NORMALIZED;
 	static const string AUTO_SAVE_FPS_FILE;
 	static const string DB_MANAGER_TYPE;
@@ -144,6 +148,7 @@ private:
 	static const string DEFAULT_AUTO_SCROLLING;
 	static const string DEFAULT_LAST_GOOD_SERVER;
 	static const string DEFAULT_LAST_GOOD_DATABASE;
+	static const string DEFAULT_LAST_GOOD_ADV_CONN_STR_PROPERTIES;
 	static const string DEFAULT_USE_PRE_NORMALIZED;
 	static const string DEFAULT_AUTO_SAVE_FPS_FILE;
 	static const string DEFAULT_DB_MANAGER_TYPE;
@@ -160,4 +165,10 @@ private:
 
 	// Method to initialize the HKCU registry persistance manager
 	void initHKCU();
+
+	// Returns the result of encrypting the input string
+	string getEncryptedString(const string strInput);
+
+	// Returns the result of decrypting the input string
+	string getDecryptedString(const string strInput);
 };

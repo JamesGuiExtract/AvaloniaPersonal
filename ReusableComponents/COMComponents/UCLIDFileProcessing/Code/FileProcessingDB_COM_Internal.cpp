@@ -3975,7 +3975,7 @@ bool CFileProcessingDB::UnregisterActiveFAM_Internal(bool bDBLocked)
 			HANDLE handles[2];
 			handles[0] = m_eventPingThreadExited.getHandle();
 			handles[1] = m_eventStatsThreadExited.getHandle();
-			if (WaitForMultipleObjects(2, (HANDLE *)&handles, TRUE, WAIT_TIMEOUT) != WAIT_OBJECT_0)
+			if (WaitForMultipleObjects(2, (HANDLE *)&handles, TRUE, gnPING_TIMEOUT) != WAIT_OBJECT_0)
 			{
 				UCLIDException ue("ELI27857", "Application Trace: Timed out waiting for thread to exit.");
 				ue.log();

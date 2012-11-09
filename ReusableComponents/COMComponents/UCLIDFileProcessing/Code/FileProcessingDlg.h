@@ -88,7 +88,8 @@ public:
 
 // INotifyDBConfigChanged class
 public:
-	void OnDBConfigChanged(const string& strServer, const string& strDatabase);
+	void OnDBConfigChanged(const string& strServer, const string& strDatabase,
+		const string& strAdvConnStrProperties);
 
 protected:
 // Overrides

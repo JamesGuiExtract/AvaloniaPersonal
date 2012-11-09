@@ -467,6 +467,13 @@ library UCLID_FILEPROCESSINGLib
 		//			from a valid Extract service.
 		[id(55), helpstring("method AuthenticateService")] HRESULT AuthenticateService(
 			[in] BSTR bstrValue);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Gets and sets database connection string properties that should override or be used
+		// in additional to the default connection string properties.
+		[propput, id(56), helpstring("property AdvancedConnectionStringProperties")]
+			HRESULT AdvancedConnectionStringProperties([in] BSTR newVal);		
+		[propget, id(56), helpstring("property AdvancedConnectionStringProperties")]
+			HRESULT AdvancedConnectionStringProperties([out, retval] BSTR* pVal);	
 	};
 
 	[
@@ -1203,6 +1210,13 @@ library UCLID_FILEPROCESSINGLib
 		// VARIANT_FALSE.
 		[propget, id(106), helpstring("property RetryOnTimeout")] HRESULT RetryOnTimeout([out, retval] VARIANT_BOOL* pVal);
 		[propput, id(106), helpstring("property RetryOnTimeout")] HRESULT RetryOnTimeout([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Gets and sets database connection string properties that should override or be used
+		// in additional to the default connection string properties.
+		[propput, id(107), helpstring("property AdvancedConnectionStringProperties")]
+			HRESULT AdvancedConnectionStringProperties([in] BSTR newVal);		
+		[propget, id(107), helpstring("property AdvancedConnectionStringProperties")]
+			HRESULT AdvancedConnectionStringProperties([out, retval] BSTR* pVal);	
 	};
 
 	[

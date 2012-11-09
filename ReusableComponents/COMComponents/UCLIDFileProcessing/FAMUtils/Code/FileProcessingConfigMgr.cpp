@@ -43,6 +43,7 @@ const string FileProcessingConfigMgr::DB_LOCK_TIMEOUT = "DBLockTimeout";
 const string FileProcessingConfigMgr::AUTO_SCROLLING = "AutoScrolling";
 const string FileProcessingConfigMgr::LAST_GOOD_SERVER = "LastGoodServer";
 const string FileProcessingConfigMgr::LAST_GOOD_DATABASE = "LastGoodDatabase";
+const string FileProcessingConfigMgr::LAST_GOOD_ADV_CONN_STR_PROPERTIES = "LastGoodAdvConnStrProperties";
 const string FileProcessingConfigMgr::USE_PRE_NORMALIZED = "UsePreNormalized";
 const string FileProcessingConfigMgr::AUTO_SAVE_FPS_FILE = "AutoSaveFPS";
 const string FileProcessingConfigMgr::DB_MANAGER_TYPE = "DBManagerType";
@@ -66,6 +67,7 @@ const string FileProcessingConfigMgr::DEFAULT_DB_LOCK_TIMEOUT = "300"; // 5 min
 const string FileProcessingConfigMgr::DEFAULT_AUTO_SCROLLING = "1";
 const string FileProcessingConfigMgr::DEFAULT_LAST_GOOD_SERVER = "0";
 const string FileProcessingConfigMgr::DEFAULT_LAST_GOOD_DATABASE = "0";
+const string FileProcessingConfigMgr::DEFAULT_LAST_GOOD_ADV_CONN_STR_PROPERTIES = "";
 const string FileProcessingConfigMgr::DEFAULT_USE_PRE_NORMALIZED = "1";
 const string FileProcessingConfigMgr::DEFAULT_AUTO_SAVE_FPS_FILE = "0";
 const string FileProcessingConfigMgr::DEFAULT_DB_MANAGER_TYPE = "CPP";
@@ -100,6 +102,32 @@ static const string gstrSQL_SERVER_REG_PATH = "SOFTWARE\\Microsoft\\Microsoft SQ
 
 // Key name that contains the instance names of installed SQL servers
 static const string gstrSQL_SERVER_INSTALLED_INSTANCES_KEY = "InstalledInstances";
+
+// Define four UCLID passwords used for encrypting the password
+// NOTE: These passwords were not exposed at the header file level because
+//		 no user of this class needs to know that these passwords exist
+// These passwords are also uses in the FileProcessingDB.cpp
+const unsigned long	gulPasswordKey1 = 0x99474F69;
+const unsigned long	gulPasswordKey2 = 0x4DF44632;
+const unsigned long	gulPasswordKey3 = 0x9A4B51F2;
+const unsigned long	gulPasswordKey4 = 0x1EFC7784;
+
+//--------------------------------------------------------------------------------------------------
+// FILE-SCOPE FUNCTIONS
+//--------------------------------------------------------------------------------------------------
+// NOTE: This function is purposely not exposed at header file level as a class
+//		 method, as no user of this class needs to know that such a function
+//		 exists.
+void getPassword(ByteStream& rPasswordBytes)
+{
+	ByteStreamManipulator bsm(ByteStreamManipulator::kWrite, rPasswordBytes);
+	
+	bsm << gulPasswordKey1;
+	bsm << gulPasswordKey2;
+	bsm << gulPasswordKey3;
+	bsm << gulPasswordKey4;
+	bsm.flushToByteStream(8);
+}
 
 //-------------------------------------------------------------------------------------------------
 // FileProcessingConfigMgr
@@ -546,11 +574,13 @@ void FileProcessingConfigMgr::setAutoScrolling(bool bAutoScroll)
 	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, AUTO_SCROLLING, bAutoScroll ? "1" : "0");
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingConfigMgr::getLastGoodDBSettings(string& strServer, string& strDatabase)
+void FileProcessingConfigMgr::getLastGoodDBSettings(string& strServer, string& strDatabase,
+	string& strAdvConnStrProperties)
 {
 	// Set server and datbase to empty values
 	strServer = "";
 	strDatabase = "";
+	strAdvConnStrProperties = "";
 	
 	// Get the server
 	if(m_apHKCU->keyExists(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_SERVER)) 
@@ -565,15 +595,27 @@ void FileProcessingConfigMgr::getLastGoodDBSettings(string& strServer, string& s
 		strDatabase = m_apHKCU->getKeyValue(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_DATABASE,
 			DEFAULT_LAST_GOOD_DATABASE);
 	}
+
+	// Get the additional connection string attributes
+	if(m_apHKCU->keyExists(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_ADV_CONN_STR_PROPERTIES)) 
+	{
+		strAdvConnStrProperties = getDecryptedString(m_apHKCU->getKeyValue(gstrFAM_DBADMIN_REG_PATH,
+			LAST_GOOD_ADV_CONN_STR_PROPERTIES, DEFAULT_LAST_GOOD_ADV_CONN_STR_PROPERTIES));
+	}
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingConfigMgr::setLastGoodDBSettings(const string& strServer, const string& strDatabase)
+void FileProcessingConfigMgr::setLastGoodDBSettings(const string& strServer,
+	const string& strDatabase, const string& strAdvConnStrProperties)
 {
 	// Store Server
 	m_apHKCU->setKeyValue(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_SERVER, strServer);
 
 	// Store Database
 	m_apHKCU->setKeyValue(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_DATABASE, strDatabase);
+
+	// Store connection string attributes
+	m_apHKCU->setKeyValue(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_ADV_CONN_STR_PROPERTIES,
+		getEncryptedString(strAdvConnStrProperties));
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingConfigMgr::getLocalSQLServerInstances(vector<string>& vecLocalInstances)
@@ -678,4 +720,59 @@ void FileProcessingConfigMgr::initHKCU()
 		m_apHKCU.reset(new RegistryPersistenceMgr(HKEY_CURRENT_USER, ""));
 		ASSERT_RESOURCE_ALLOCATION("ELI30015", m_apHKCU.get() != __nullptr);
 	}
+}
+//--------------------------------------------------------------------------------------------------
+string FileProcessingConfigMgr::getEncryptedString(const string strInput)
+{
+	if (strInput.empty())
+	{
+		return "";
+	}
+
+	// Put the input string into the byte manipulator
+	ByteStream bytes;
+	ByteStreamManipulator bytesManipulator(ByteStreamManipulator::kWrite, bytes);
+
+	bytesManipulator << strInput;
+
+	// Convert information to a stream of bytes
+	// with length divisible by 8 (in variable called 'bytes')
+	bytesManipulator.flushToByteStream(8);
+
+	// Get the password 'key' based on the 4 hex global variables
+	ByteStream pwBS;
+	getPassword(pwBS);
+
+	// Do the encryption
+	ByteStream encryptedBS;
+	MapLabel encryptionEngine;
+	encryptionEngine.setMapLabel(encryptedBS, bytes, pwBS);
+
+	// Return the encrypted value
+	return encryptedBS.asString();
+}
+//--------------------------------------------------------------------------------------------------
+string FileProcessingConfigMgr::getDecryptedString(const string strInput)
+{
+	if (strInput.empty())
+	{
+		return "";
+	}
+
+	// Get the password 'key' based on the 4 hex global variables
+	ByteStream passwordBS;
+	getPassword(passwordBS);
+
+	// Stream to hold the decrypted valud
+	ByteStream decryptedBS;
+
+	MapLabel encryptionEngine;
+	encryptionEngine.getMapLabel(decryptedBS, strInput, passwordBS);
+	ByteStreamManipulator bsm(ByteStreamManipulator::kRead, decryptedBS);
+
+	string strDecrypted = "";
+	bsm >> strDecrypted;
+
+	// Return the decrypted value
+	return strDecrypted;
 }

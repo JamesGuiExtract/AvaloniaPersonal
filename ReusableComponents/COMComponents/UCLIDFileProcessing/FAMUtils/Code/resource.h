@@ -14,11 +14,16 @@
 #define IDC_BUTTON_REFRESH              1005
 #define IDC_BUTTON_SQL_SERVER_BROWSE    1006
 #define IDC_BUTTON_LAST_USED_DB			1007
+#define IDC_EDIT_CONN_STR               1008
+#define IDC_BUTTON_CONN_STR             1009
+#define IDC_EDIT_ADDITIONAL_CONN_STR_ATTR 1010
+#define IDC_BUTTON_DEFAULT				1011
 // End of shared ID's
 
 #define IDC_COMBO_LIST                  2001
 #define IDD_DIALOG_SELECT               2002
 #define IDC_STATIC_COMBO                2003
+#define IDD_DIALOG_CONN_STR             2004
 
 // Next default values for new objects
 // 
@@ -26,7 +31,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        2004
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         2004
-#define _APS_NEXT_SYMED_VALUE           2004
+#define _APS_NEXT_CONTROL_VALUE         2005
+#define _APS_NEXT_SYMED_VALUE           2005
 #endif
 #endif

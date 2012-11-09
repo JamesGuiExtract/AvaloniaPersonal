@@ -7,13 +7,10 @@
 #include <cpputil.h>
 #include <COMUtils.h>
 #include <VectorOperations.h>
+#include <StringTokenizer.h>
 
 using namespace ADODB;
 using namespace std;
-
-// Constants for Connection String
-static const string& gstrSERVER = "Server";
-static const string& gstrDATABASE = "Database";
 
 // Settings that don't change if included in the connection string
 static const string& gstrPROVIDER = "Provider=SQLNCLI10";
@@ -446,7 +443,8 @@ CTime getSQLServerDateTimeAsCTime(const _ConnectionPtr& ipDBConnection)
 	return getTimeDateField(ipFields, "CurrDateTime");
 }
 //-------------------------------------------------------------------------------------------------
-string createConnectionString(const string& strServer, const string& strDatabase)
+string createConnectionString(const string& strServer, const string& strDatabase,
+	const string& strAdvancedConnectionStringProperties)
 {
 	ASSERT_ARGUMENT("ELI17471", !strServer.empty());
 	ASSERT_ARGUMENT("ELI17472", !strDatabase.empty());
@@ -467,7 +465,123 @@ string createConnectionString(const string& strServer, const string& strDatabase
 	strConnectionString += gstrMARS_CONNECTION + ";";
 	strConnectionString += gstrDATA_TYPE_COMPATIBILITY;
 
+	// If anything is specified in strAdvancedConnectionStringProperties, update the
+	// strConnectionString with the advanced values.
+	if (!strAdvancedConnectionStringProperties.empty())
+	{
+		updateConnectionStringProperties(strConnectionString, strAdvancedConnectionStringProperties);
+	}
+
 	return strConnectionString;
+}
+//-------------------------------------------------------------------------------------------------
+csis_map<string>::type getConnectionStringProperties(const string& strConnectionString)
+{
+	// A map that provides case-insensitive lookup of property names.
+	csis_map<string>::type mapProperties;
+	
+	// Split out and interate through each property in the connection string.
+	vector<string> vecTokens;
+	StringTokenizer	s(';');
+	s.parse(strConnectionString, vecTokens);
+
+	for (size_t i = 0; i < vecTokens.size(); i++)
+	{
+		string strVariable = vecTokens[i];
+		if (strVariable.empty())
+		{
+			continue;
+		}
+
+		// Extract the name and value of each property.
+		int nSplitPos = strVariable.find('=');
+		if (nSplitPos == string::npos)
+		{
+			UCLIDException ue("ELI35142", "Error parsing connection string");
+			ue.addDebugInfo("Connection string", strConnectionString, true);
+			ue.addDebugInfo("Variable", strVariable, true);
+			throw ue;
+		}
+
+		string strName = strVariable.substr(0, nSplitPos);
+		string strValue = strVariable.substr(nSplitPos + 1);
+		mapProperties[strName] = strValue;
+	}
+
+	return mapProperties;
+}
+//-------------------------------------------------------------------------------------------------
+bool findConnectionStringProperty(const string& strConnectionString, const string& strName,
+																string *pstrValue /*= __nullptr*/)
+{
+	csis_map<string>::type mapSourceProperties =
+		getConnectionStringProperties(strConnectionString);
+
+	auto itProperty = mapSourceProperties.find(strName);
+	if (itProperty == mapSourceProperties.end())
+	{
+		// The property was not found in the connection string.
+		return false;
+	}
+	else
+	{
+		// The property was not found; assign the value to pstrValue if non-null.
+		if (pstrValue != __nullptr)
+		{
+			*pstrValue = itProperty->second;
+		}
+		return true;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void updateConnectionStringProperties(string& rstrConnectionString, const string& strNewProperties)
+{
+	// Retrieve the properties of both the existing connecton string and the new properties.
+	csis_map<string>::type mapSourceProperties = getConnectionStringProperties(rstrConnectionString);
+	csis_map<string>::type mapNewProperties = getConnectionStringProperties(strNewProperties);
+
+	// The server can be specified with either "Server" or "Data source". If strNewProperties
+	// specifies one, don't let the final result contain the other as well.
+	if (findConnectionStringProperty(strNewProperties, gstrDATA_SOURCE))
+	{
+		mapSourceProperties.erase(gstrSERVER);
+	}
+	else if (findConnectionStringProperty(strNewProperties, gstrSERVER))
+	{
+		mapSourceProperties.erase(gstrDATA_SOURCE);
+	}
+
+	// The database can be specified with either "Database" or "Initial Catalog". If strNewProperties
+	// specifies one, don't let the final result contain the other as well.
+	if (findConnectionStringProperty(strNewProperties, gstrINITIAL_CATALOG))
+	{
+		mapSourceProperties.erase(gstrDATABASE);
+	}
+	else if (findConnectionStringProperty(strNewProperties, gstrDATABASE))
+	{
+		mapSourceProperties.erase(gstrINITIAL_CATALOG);
+	}
+
+	// Use mapNewProperties as the primary values; but fill in any values from mapSourceProperties
+	// that don't exist in mapNewProperties.
+	mapNewProperties.insert(mapSourceProperties.begin(), mapSourceProperties.end());
+
+	// Use mapNewProperties to create the updated connection string.
+	string strNewConnectionString;
+	for (csis_map<string>::type::iterator it = mapNewProperties.begin();
+		it != mapNewProperties.end(); it++)
+	{
+		if (!strNewConnectionString.empty())
+		{
+			strNewConnectionString += ";";
+		}
+
+		strNewConnectionString += it->first;
+		strNewConnectionString += "=";
+		strNewConnectionString += it->second;
+	}
+
+	rstrConnectionString = strNewConnectionString;
 }
 //-------------------------------------------------------------------------------------------------
 long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQuery,

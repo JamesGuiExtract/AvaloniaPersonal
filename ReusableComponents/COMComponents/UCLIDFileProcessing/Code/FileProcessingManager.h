@@ -96,6 +96,8 @@ public:
 	STDMETHOD(get_MaxFilesFromDB)(long* pVal);
 	STDMETHOD(put_MaxFilesFromDB)(long newVal);
 	STDMETHOD(AuthenticateService)(BSTR bstrValue);
+	STDMETHOD(get_AdvancedConnectionStringProperties)(BSTR *pVal);
+	STDMETHOD(put_AdvancedConnectionStringProperties)(BSTR newVal);
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -167,11 +169,12 @@ private:
 	// Is database connection ready
 	bool m_isDBConnectionReady;
 
-	// previous DB server and previous DB name 
+	// previous DB server, DB name and AdvConnStrProperties
 	// added as per [p13 #4581 & #4580] so that
 	// the dirty flag can be properly set
 	string m_strPreviousDBServer;
 	string m_strPreviousDBName;
+	string m_strPreviousAdvConnStrProperties;
 
 	CMutex m_mutexLockFilter;
 

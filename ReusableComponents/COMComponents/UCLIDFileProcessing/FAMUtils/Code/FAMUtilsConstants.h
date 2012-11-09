@@ -1,6 +1,7 @@
 #pragma once
 
 // Connection Status Strings
+const string gstrCONNECTING = "Connecting...";
 const string gstrNOT_CONNECTED = "Not Connected";
 const string gstrCONNECTION_ESTABLISHED = "Connection successfully established!";
 const string gstrWRONG_SCHEMA = "Database found, but schema version is not compatible with this application!";

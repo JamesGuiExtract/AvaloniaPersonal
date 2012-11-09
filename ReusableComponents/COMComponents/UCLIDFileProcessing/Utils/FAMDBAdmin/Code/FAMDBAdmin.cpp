@@ -25,9 +25,9 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 //-------------------------------------------------------------------------------------------------
 void usage()
 {
-	string strUsage = "This application can be used with two optional arguments,\n";
+	string strUsage = "This application can be used with two or three optional arguments,\n";
 		strUsage += "Usage:\n";
-		strUsage += "FAMDBAdmin.exe [<Server> <Database>]\n";
+		strUsage += "FAMDBAdmin.exe [<Server> <Database> [<AdvancedConnectionStringProperties]\n";
 		AfxMessageBox(strUsage.c_str());
 }
 
@@ -68,7 +68,7 @@ BOOL CFAMDBAdminApp::InitInstance()
 	try
 	{
 		// Display usage if not a valid number of arguments specified
-		if (__argc != 1 && __argc != 3)
+		if (__argc != 1 && __argc != 3 && __argc != 4)
 		{
 			usage();
 			return FALSE;
@@ -120,7 +120,7 @@ BOOL CFAMDBAdminApp::InitInstance()
 		ipFAMDB->RetryOnTimeout = VARIANT_FALSE;
 
 		// Check for Server and database selected
-		if ( __argc == 3)
+		if ( __argc >= 3)
 		{
 			// Catch exceptions and display then just let the select dialog box be opened with the 
 			// same data
@@ -131,6 +131,12 @@ BOOL CFAMDBAdminApp::InitInstance()
 
 				// Second arg is the database
 				ipFAMDB->DatabaseName = __argv[2];
+
+				// Optional third parameter is advanced connection string properties.
+				if (__argc == 4)
+				{
+					ipFAMDB->AdvancedConnectionStringProperties = __argv[3];
+				}
  
 				VARIANT_BOOL bLoginCanceled = VARIANT_FALSE;
 				VARIANT_BOOL bLoginValid = VARIANT_FALSE;

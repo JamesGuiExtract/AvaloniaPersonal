@@ -94,6 +94,7 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 //-------------------------------------------------------------------------------------------------
 std::string CFileProcessingDB::ms_strCurrServerName = "";
 std::string CFileProcessingDB::ms_strCurrDBName = "";
+std::string CFileProcessingDB::ms_strLastUsedAdvConnStr = "";
 CMutex CFileProcessingDB::ms_mutexMainLock;
 CMutex CFileProcessingDB::ms_mutexUserCounterLock;
 CMutex CFileProcessingDB::ms_mutexPingDBLock;
@@ -107,6 +108,7 @@ m_hUIWindow(NULL),
 m_strCurrentConnectionStatus(gstrNOT_CONNECTED),
 m_strDatabaseServer(""),
 m_strDatabaseName(""),
+m_strAdvConnStrProperties(""),
 m_lFAMUserID(0),
 m_lMachineID(0),
 m_iCommandTimeout(glDEFAULT_COMMAND_TIMEOUT),
@@ -2623,6 +2625,39 @@ STDMETHODIMP CFileProcessingDB::get_RetryOnTimeout(VARIANT_BOOL* pVal)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34339");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::put_AdvancedConnectionStringProperties(BSTR newVal)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		string strLastValue = m_strAdvConnStrProperties;
+		m_strAdvConnStrProperties = asString(newVal);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35141");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_AdvancedConnectionStringProperties(BSTR *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI35139", pVal != __nullptr);
+
+		*pVal = _bstr_t(m_strAdvConnStrProperties.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35140");
 }
 
 //-------------------------------------------------------------------------------------------------

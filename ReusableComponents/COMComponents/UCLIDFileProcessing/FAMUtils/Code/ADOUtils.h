@@ -5,12 +5,21 @@
 #include "FAMUtils.h"
 
 #include <StopWatch.h>
+#include <CsisUtils.h>
 
 #include <string>
 #include <vector>
 
 using namespace ADODB;
 using namespace std;
+
+//-------------------------------------------------------------------------------------------------
+// Constants
+//-------------------------------------------------------------------------------------------------
+static const string& gstrSERVER = "Server";
+static const string& gstrDATABASE = "Database";
+static const string& gstrDATA_SOURCE = "Data Source";
+static const string& gstrINITIAL_CATALOG = "Initial Catalog";
 
 //-------------------------------------------------------------------------------------------------
 // PURPOSE:	 (Based on the FileProcessingDB macro, but generalized for use with any ADO::Connection)
@@ -188,7 +197,24 @@ FAMUTILS_API string getSQLServerDateTime( const _ConnectionPtr& ipDBConnection )
 FAMUTILS_API CTime getSQLServerDateTimeAsCTime(const _ConnectionPtr& ipDBConnection);
 
 // Returns the connection string using the given server and database.
-FAMUTILS_API string createConnectionString(const string& strServer, const string& strDatabase);
+// If strAdditionalConnectionStringComponents is non=empty it will be added to the end of the
+// connection string.
+FAMUTILS_API string createConnectionString(const string& strServer, const string& strDatabase,
+	const string& strAdvancedConnectionStringProperties = "");
+
+// Gets a case-insensitive map of all connection string property names to the associated values.
+FAMUTILS_API csis_map<string>::type getConnectionStringProperties(const string& strConnectionString);
+
+// Attempts to case-insensitively find the specified property in the specified connection string.
+// Returns true if the propety is found. If pstrValue is non-null and the property is found,
+// pstrValue will be assigned the value of the property.
+FAMUTILS_API bool findConnectionStringProperty(const string& strConnectionString,
+	const string& strName, string *pstrValue = __nullptr);
+
+// Appends or overrides the properties of rstrConnectionString with the properties specified in
+// strNewProperties.
+FAMUTILS_API void updateConnectionStringProperties(string& rstrConnectionString,
+	const string& strNewProperties);
 
 // PROMISE:	To execute the SQL Query and return the number of records affected
 // NOTES:	strSQLQuery must be a query that returns no records

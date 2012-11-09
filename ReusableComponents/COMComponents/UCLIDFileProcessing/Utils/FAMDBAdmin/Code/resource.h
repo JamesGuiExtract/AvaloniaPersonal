@@ -40,6 +40,10 @@
 #define IDC_BUTTON_REFRESH              1005
 #define IDC_BUTTON_SQL_SERVER_BROWSE    1006
 #define IDC_BUTTON_LAST_USED_DB         1007
+#define IDC_EDIT_CONN_STR               1008
+#define IDC_BUTTON_CONN_STR             1009
+#define IDC_EDIT_ADDITIONAL_CONN_STR_ATTR 1010
+#define IDC_BUTTON_DEFAULT              1011
 // End Database Page ID's
 
 // This ID's are the same as in BaseUtils resource.h

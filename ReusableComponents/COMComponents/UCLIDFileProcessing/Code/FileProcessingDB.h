@@ -227,6 +227,8 @@ public:
 	STDMETHOD(IsAnyFAMActive)(VARIANT_BOOL* pvbFAMIsActive);
 	STDMETHOD(get_RetryOnTimeout)(VARIANT_BOOL* pVal);
 	STDMETHOD(put_RetryOnTimeout)(VARIANT_BOOL newVal);
+	STDMETHOD(get_AdvancedConnectionStringProperties)(BSTR *pVal);
+	STDMETHOD(put_AdvancedConnectionStringProperties)(BSTR newVal);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -336,11 +338,18 @@ private:
 	// The database to connect to
 	string m_strDatabaseName;
 
+	// Database connection string properties that should override or be used in additional to the
+	// default connection string properties.
+	string m_strAdvConnStrProperties;
+
 	// Saves the last set server name in the current process
 	static string ms_strCurrServerName;
 
 	// Saves the last set Database name in the current process
 	static string ms_strCurrDBName;
+
+	// The last connection string that was used by this process.
+	static string ms_strLastUsedAdvConnStr;
 
 	// Contains the timeout for query execution
 	int m_iCommandTimeout;

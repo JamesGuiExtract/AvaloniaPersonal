@@ -70,7 +70,10 @@ void usage()
 						"OPTIONS:\n"
 						"/r - register .fps files to open by default with ProcessFiles.exe then exit\n"
 						"/u - unregister .fps files to not open with ProcessFiles.exe then exit\n"
-						"/sd <Server name> <Database name> - sets inital server and database in FAM to <Server Name>\n"
+						"/sd <Server name> <Database name> - sets initial server and database in FAM to <Server Name>\n"
+						"/a <Advanced connection string properties> - specifies advanced connection\n"
+						"   string properties that should override or be used in additional to the\n"
+						"   default connection string properties.\n"
 						"\tand <Database name>. This option has to be the only option specified.\n"
 						"/? - display usage information\n"
 						"<filename> [/s][/c][/fc][/m:<nnn>][/d <Directory Name>][/l<List File Name>][/service][/sleep:<ms>]\n"
@@ -226,166 +229,206 @@ BOOL CProcessFilesApp::InitInstance()
 			string strFileListName("");
 			string strServer("");
 			string strDatabase("");
+			string strAdvConnStrProperties("");
 			bool bRunOnInit = false;
 			bool bCloseOnComplete = false;
 			bool bForceCloseOnComplete = false;
 			bool bRunningAsService = false;
 			int iExecuteCount = 0;
 			int iSleepTime = 0;
+			bool bConnectionSpecified = false;
 
 			if (__argc >= 2)
 			{
-				// Check for the /sd switch
-				if (_stricmp(__argv[1], "/sd") == 0)
+				int i;
+				for (i = 1; i < __argc; i++)
 				{
-					// This is the only switch allowed
-					if (__argc != 4)
+					// Check for the /sd switch
+					if (_stricmp(__argv[i], "/sd") == 0)
 					{
-						usage();
-						return FALSE;
-					}
-					strServer = __argv[2];
-					strDatabase = __argv[3];
-				}
-				else
-				{
-					// Build the absolute path to the file name so that
-					// it will be loaded with the fully qualified path name
-					strFileName =  buildAbsolutePath(__argv[1]);
+						bConnectionSpecified = true;
 
-					int i;
-					for (i = 2; i < __argc; i++)
-					{
-						// Check for /s - Auto start switch
-						if (_stricmp(__argv[i], "/s") == 0)
+						// Must have 2 additional parameters to specify server and database
+						// properties.
+						if ( i+2 < __argc )
 						{
-							bRunOnInit = true;
-						}
-						// Check for /c - Close on complete switch
-						else if (_stricmp(__argv[i], "/c") == 0)
-						{
-							// as per [p13 #4858] if
-							// the user has already specified /fc
-							// then display usage and exit
-							if (bForceCloseOnComplete)
-							{
-								// display usage and return
-								usage();
-								return FALSE;
-							}
-							bCloseOnComplete = true;
-						}
-						// Check for /fc - force close switch
-						else if ( _stricmp(__argv[i], "/fc") == 0)
-						{
-							// as per [p13 #4858] if
-							// the user has already specified /c
-							// then display usage and exit
-							if (bCloseOnComplete)
-							{
-								// display usage and return
-								usage();
-								return FALSE;
-							}
-							bForceCloseOnComplete = true;
-						}
-						// Check for /d <Folder Name> switch
-						else if ( _stricmp(__argv[i], "/d") == 0 )
-						{
-							// Must have folder name following this switch
-							if ( i+1 < __argc )
-							{
-								i++;
-								strDirName = __argv[i];
-
-								// Check that the folder does exist
-								if ( !isValidFolder(strDirName) )
-								{
-									usage();
-									return FALSE;
-								}
-							}
-							else
-							{
-								// there is a missing argument
-								usage();
-								return FALSE;
-							}
-						}
-						// Check for the /m:<nnn> switch
-						else if ( _strnicmp( __argv[i], "/m:", 3) == 0)
-						{					
-							string strTmp = __argv[i];
-
-							// Extract the number
-							iExecuteCount = atoi(strTmp.substr(3).c_str());
-						}
-						// Check for the /l <FileListFile> - list file
-						else if ( _stricmp(__argv[i], "/l") == 0 )
-						{
-							// Must have the name of the file list file
-							if ( i+1 < __argc )
-							{
-								i++;
-								strFileListName = __argv[i];
-
-								// Make sure the file exists
-								if ( !isValidFile(strFileListName) )
-								{
-									usage();
-									return FALSE;
-								}
-							}
-							else
-							{
-								// there is a missing argument
-								usage();
-								return FALSE;
-							}
-						}
-						// Check for the service switch
-						else if ( _stricmp(__argv[i], "/service") == 0 )
-						{
-							bRunningAsService = true;
-						}
-						// [P13:4821] Check for sleep time specification
-						else if ( _strnicmp( __argv[i], "/sleep:", 7) == 0)
-						{
-							string strSleepTime = __argv[i];
-							// Retrieve the portion of the argument following "/sleep:"
-							strSleepTime = strSleepTime.substr(7);
-							
-							try
-							{
-								try
-								{
-									// Attempt to convert the string to an int.
-									iSleepTime = asLong(strSleepTime);
-
-									// Ensure a positive value was specified
-									if (iSleepTime < 0)
-									{
-										UCLIDException ue("ELI20318", "Sleep time cannot be negative!");
-										ue.addDebugInfo("Specified value", strSleepTime);
-										throw ue;
-									}
-								}
-								CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20316");
-							}
-							catch (UCLIDException &ue)
-							{
-								// Indicate a bad sleep value was specified
-								UCLIDException uexOuter("ELI20317","Invalid sleep value specified!", ue);
-								uexOuter.display();
-								usage();
-								return FALSE;
-							}
+							i++;
+							strServer = __argv[i];
+							i++;
+							strDatabase = __argv[i];
 						}
 						else
 						{
 							usage();
 							return FALSE;
 						}
+
+						continue;
+					}
+					else if (_stricmp(__argv[i], "/a") == 0)
+					{
+						bConnectionSpecified = true;
+
+						// Must have an additional parameter to specify connection string
+						// properties.
+						if ( i+1 < __argc )
+						{
+							i++;
+							strAdvConnStrProperties = __argv[i];
+						}
+						else
+						{
+							// there is a missing argument
+							usage();
+							return FALSE;
+						}
+						continue;
+					}
+						
+					// Database connection specifications cannot be combined with any other
+					// switches.
+					if (bConnectionSpecified)
+					{
+						usage();
+						return FALSE;
+					}
+
+					// The FPS filename must be the first argument if database connection info is not specified.
+					// Build the absolute path to the file name so that
+					// it will be loaded with the fully qualified path name
+					if (i == 1)
+					{
+						strFileName =  buildAbsolutePath(__argv[1]);
+					}
+					// Check for /s - Auto start switch
+					else if (_stricmp(__argv[i], "/s") == 0)
+					{
+						bRunOnInit = true;
+					}
+					// Check for /c - Close on complete switch
+					else if (_stricmp(__argv[i], "/c") == 0)
+					{
+						// as per [p13 #4858] if
+						// the user has already specified /fc
+						// then display usage and exit
+						if (bForceCloseOnComplete)
+						{
+							// display usage and return
+							usage();
+							return FALSE;
+						}
+						bCloseOnComplete = true;
+					}
+					// Check for /fc - force close switch
+					else if ( _stricmp(__argv[i], "/fc") == 0)
+					{
+						// as per [p13 #4858] if
+						// the user has already specified /c
+						// then display usage and exit
+						if (bCloseOnComplete)
+						{
+							// display usage and return
+							usage();
+							return FALSE;
+						}
+						bForceCloseOnComplete = true;
+					}
+					// Check for /d <Folder Name> switch
+					else if ( _stricmp(__argv[i], "/d") == 0 )
+					{
+						// Must have folder name following this switch
+						if ( i+1 < __argc )
+						{
+							i++;
+							strDirName = __argv[i];
+
+							// Check that the folder does exist
+							if ( !isValidFolder(strDirName) )
+							{
+								usage();
+								return FALSE;
+							}
+						}
+						else
+						{
+							// there is a missing argument
+							usage();
+							return FALSE;
+						}
+					}
+					// Check for the /m:<nnn> switch
+					else if ( _strnicmp( __argv[i], "/m:", 3) == 0)
+					{					
+						string strTmp = __argv[i];
+
+						// Extract the number
+						iExecuteCount = atoi(strTmp.substr(3).c_str());
+					}
+					// Check for the /l <FileListFile> - list file
+					else if ( _stricmp(__argv[i], "/l") == 0 )
+					{
+						// Must have the name of the file list file
+						if ( i+1 < __argc )
+						{
+							i++;
+							strFileListName = __argv[i];
+
+							// Make sure the file exists
+							if ( !isValidFile(strFileListName) )
+							{
+								usage();
+								return FALSE;
+							}
+						}
+						else
+						{
+							// there is a missing argument
+							usage();
+							return FALSE;
+						}
+					}
+					// Check for the service switch
+					else if ( _stricmp(__argv[i], "/service") == 0 )
+					{
+						bRunningAsService = true;
+					}
+					// [P13:4821] Check for sleep time specification
+					else if ( _strnicmp( __argv[i], "/sleep:", 7) == 0)
+					{
+						string strSleepTime = __argv[i];
+						// Retrieve the portion of the argument following "/sleep:"
+						strSleepTime = strSleepTime.substr(7);
+							
+						try
+						{
+							try
+							{
+								// Attempt to convert the string to an int.
+								iSleepTime = asLong(strSleepTime);
+
+								// Ensure a positive value was specified
+								if (iSleepTime < 0)
+								{
+									UCLIDException ue("ELI20318", "Sleep time cannot be negative!");
+									ue.addDebugInfo("Specified value", strSleepTime);
+									throw ue;
+								}
+							}
+							CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20316");
+						}
+						catch (UCLIDException &ue)
+						{
+							// Indicate a bad sleep value was specified
+							UCLIDException uexOuter("ELI20317","Invalid sleep value specified!", ue);
+							uexOuter.display();
+							usage();
+							return FALSE;
+						}
+					}
+					else
+					{
+						usage();
+						return FALSE;
 					}
 				}
 			}
@@ -494,6 +537,12 @@ BOOL CProcessFilesApp::InitInstance()
 			{
 				ipFileProcMgr->DatabaseServer = strServer.c_str();
 				ipFileProcMgr->DatabaseName = strDatabase.c_str();
+			}
+
+			if (!strAdvConnStrProperties.empty())
+			{
+				ipFileProcMgr->AdvancedConnectionStringProperties =
+					strAdvConnStrProperties.c_str();
 			}
 
 			// Show the UI

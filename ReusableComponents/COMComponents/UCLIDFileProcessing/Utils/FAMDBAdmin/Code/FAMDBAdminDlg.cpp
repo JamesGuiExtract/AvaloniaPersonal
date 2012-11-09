@@ -162,15 +162,16 @@ BOOL CFAMDBAdminDlg::OnInitDialog()
 		// Get the server and datatabase from the FAMDB
 		string strServer = asString(m_ipFAMDB->DatabaseServer);
 		string strDatabase = asString(m_ipFAMDB->DatabaseName);
+		string strAdvConnStrProperties = asString(m_ipFAMDB->AdvancedConnectionStringProperties);
 
 		string strCaption = strDatabase + " on " + strServer + " - " + gstrTITLE;
 		SetWindowText(strCaption.c_str());
 
 		// Save the good settings to the registry
-		ma_pCfgMgr->setLastGoodDBSettings(strServer, strDatabase);
+		ma_pCfgMgr->setLastGoodDBSettings(strServer, strDatabase, strAdvConnStrProperties);
 
 		// Set the Server and DB names
-		m_propDatabasePage.setServerAndDBName(strServer, strDatabase);
+		m_propDatabasePage.setConnectionInfo(strServer, strDatabase, strAdvConnStrProperties);
 
 		// If the DB is not connected and valid, if it is because the schema is out of date, prompt
 		// to updgrade now.
@@ -430,7 +431,8 @@ void CFAMDBAdminDlg::OnDatabaseUpdateSchema()
 
 			if (m_bSchemaUpdateSucceeded)
 			{
-				OnDBConfigChanged(asString(m_ipFAMDB->DatabaseServer), asString(m_ipFAMDB->DatabaseName));
+				OnDBConfigChanged(asString(m_ipFAMDB->DatabaseServer), asString(m_ipFAMDB->DatabaseName),
+					asString(m_ipFAMDB->AdvancedConnectionStringProperties));
 
 				// Set the database status
 				setUIDatabaseStatus();
@@ -695,6 +697,12 @@ void CFAMDBAdminDlg::OnToolsFileActionManager()
 		string strParameters = "/sd " + asString(m_ipFAMDB->DatabaseServer) + 
 			" \"" + asString(m_ipFAMDB->DatabaseName) + "\"";
 
+		string strAdvConnStrProperties = asString(m_ipFAMDB->AdvancedConnectionStringProperties);
+		if (!strAdvConnStrProperties.empty())
+		{
+			strParameters += " /a \"" + strAdvConnStrProperties + "\"";
+		}
+
 		// Start the File Action Manager with the /sd switch
 		runEXE(strEXEPath, strParameters);
 	}
@@ -863,11 +871,17 @@ void CFAMDBAdminDlg::UpdateSummaryTab(long nActionID /*= -1*/)
 //-------------------------------------------------------------------------------------------------
 //INotifyDBConfigChanged
 //-------------------------------------------------------------------------------------------------
-void CFAMDBAdminDlg::OnDBConfigChanged(const std::string& strServer, const std::string& strDatabase)
+void CFAMDBAdminDlg::OnDBConfigChanged(const std::string& strServer, const std::string& strDatabase,
+	const std::string& strAdvConnStrProperties)
 {
 	// Must set flags if this fails but will still want the exception info
 	try
 	{
+		// Set the database status on the database page
+		m_propDatabasePage.setDBConnectionStatus(gstrCONNECTING);
+		emptyWindowsMessageQueue();
+		CWaitCursor cWait;
+
 		// Preset the DB good flag to false
 		m_bIsDBGood = false;
 		m_bDBSchemaIsNotCurrent = false;
