@@ -61,24 +61,41 @@ NOTE: Setup and Configuration details are provided on the <a href="Basic.html">b
 		<ul>
 			<li>Queue files and run rules
 			<li>Apply redactions
+		</ul>
+		<li>Prepare a single-threaded FPS file to support the following:
+		<ul>
 			<li>Advance the work item through NetDMS
 		</ul>
-		<li>Prepare the FAM Service to run the FPS file.
-		<li>From the <b>WorkFlow User Console</b>, create a work item and use <b>Capture - 
-		File pickup</b> to add a TIF image.
-		<li>Confirm that the image is queued and processed as expected.
-		<li>Confirm that redactions are applied as expected.
-		<li>Confirm that the work item advances through NetDMS as expected.
+		<li>Prepare the FAM Service to run the FPS files.
+		<li>From the <b>WorkFlow User Console</b>, create one or more work items and use 
+		<b>Capture - File pickup</b> to add TIF images.
+		<li>Send the work items to be processed.
+		<li>Confirm that the images are queued and processed as expected.
+		<li>Confirm that the work items advance through NetDMS as expected.
 	</ul>
 <p>
-	<li><h3>Scenario: Process TIF and PDF Images</h3>
+	<li><h3>Scenario: Other File Types</h3>
 	<ul>
-		<li>From the <b>WorkFlow User Console</b>, create a work item and use <b>Capture - 
-		File pickup</b> to add one or more TIF images.
-		<li>From the <b>WorkFlow User Console</b>, create a work item and use <b>Capture - 
-		File pickup</b> to add one or more PDF images.
-		<li>Confirm that both types of images can be processed via automatic redaction.
-		<li>Confirm that both types of images can be processed via verification before redaction.
+		<li>For each of the following file types, use the <b>WorkFlow User Console</b> to 
+		create a work item and use <b>Capture - File pickup</b> to add the image.  Note that 
+		<b>I:\Common\Testing\Product Testing\IDShield_Sanity\TestImages\ImageTypes</b> 
+		contains examples of each file type.
+		<ul>
+			<li>PDF
+			<li>PNG
+			<li>JPG
+			<li>BMP
+		</ul>
+		<li>Confirm that the following image types <b>can</b> be processed.
+		<ul>
+			<li>JPG
+			<li>BMP
+		</ul>
+		<li>Confirm that the following image types <b>cannot</b> be processed.
+		<ul>
+			<li>PDF
+			<li>PNG
+		</ul>
 	</ul>
 <p>
 	<li><h3>Scenario: Hybrid Processing</h3>
@@ -107,10 +124,22 @@ NOTE: Setup and Configuration details are provided on the <a href="Basic.html">b
 <p>
 	<li><h3>Scenario: ID Shield As Automatic Node</h3>
 	<ul>
-		<li>Modify the configuration of the <b>Extract</b> node to be an automatic node.
-		<li>Confirm that processing of images for automatic redaction works as expected.
-		<li>Confirm that processing of images for verification before redaction works as 
-		expected.
+		<li>Create a new <b>automatic</b> node for ID Shield processing.
+		<ul>
+			<li>Assign the <b>ID Shield Export</b> script on the <b>General</b> tab.
+			<li>Assign an appropriate user on the <b>Groups and Users</b> tab.
+		</ul>
+		<li>Add <b>Links</b> to other existing nodes such that work items can be sent to the 
+		new node and received from the new node.
+		<li>Modify the new node's configuration settings.
+		<ul>
+			<li>Add a <b>Send Rule</b> for each predecessor node.
+			<li>Add a <b>Work Item In</b> Event to Execute a Custom Script.  Using the 
+			existing <b>ID Shield Export</b> script is acceptable.
+		</ul>
+		<li>Create a suitable work item within a predecessor node.
+		<li>Click the <b>Send Manual</b> button and select the new automatic node.
+		<li>Confirm that processing of the work item works as expected.
 	</ul>
 <p>
 	<li><h3>Scenario: Processing Parcels Containing Multiple Image Files</h3>
@@ -186,6 +215,29 @@ NOTE: Setup and Configuration details are provided on the <a href="Basic.html">b
 			<li>Click the <b>Send Auto</b> button to push the work item to <b>ID 
 			Shield</b> for processing.
 			<li>Confirm that TBD.
+		</ul>
+<p>
+		<li>No output node available
+		<ul>
+			<li>Create a suitable work item and add an associated image.
+			<li>Modify the <b>ID Shield</b> node's configuration to remove 
+			the connection to the subsequent node.
+			<li>Click the <b>Send Manual</b> button to push the work item to <b>ID 
+			Shield</b> for processing.
+			<li>Confirm that the <b>NetDMS: Advance work item</b> task fails 
+			with a meaningful exception.
+		</ul>
+<p>
+		<li>Cannot advance a missing work item
+		<ul>
+			<li>Create a suitable work item and add an associated image.
+			<li>Click the <b>Send Auto</b> button to push the work item to <b>ID 
+			Shield</b> for processing.
+			<li>Confirm that the <b>NetDMS: Apply redactions</b> task succeeds.
+			<li>Use <b>Parcel Monitor</b> from <b>WorkFlow Configuration Manager</b> 
+			to <b>Distribute</b> the work item a different node.
+			<li>Confirm that the <b>NetDMS: Advance work item</b> task fails 
+			with a meaningful exception.
 		</ul>
 <p>
 		<li>TBD
