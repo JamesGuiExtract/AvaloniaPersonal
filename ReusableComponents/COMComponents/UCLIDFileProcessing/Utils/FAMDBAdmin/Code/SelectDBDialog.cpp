@@ -72,9 +72,9 @@ BEGIN_MESSAGE_MAP(SelectDBDialog, CDialog)
 	ON_CBN_KILLFOCUS(IDC_COMBO_SELECT_DB_SERVER, &SelectDBDialog::OnCbnKillfocusComboSelectDbServer)
 	ON_BN_CLICKED(IDC_BUTTON_CONN_STR, &SelectDBDialog::OnBnClickedButtonAdvanced)
 	ON_CBN_EDITCHANGE(IDC_COMBO_SELECT_DB_SERVER, OnChangeServerName)
-	ON_CBN_SELCHANGE(IDC_COMBO_SELECT_DB_SERVER, OnChangeServerName)
 	ON_CBN_EDITCHANGE(IDC_COMBO_SELECT_DB_NAME, OnChangeDBName)
-	ON_CBN_SELCHANGE(IDC_COMBO_SELECT_DB_NAME, OnChangeDBName)
+	ON_CBN_SELCHANGE(IDC_COMBO_SELECT_DB_SERVER, OnSelChangeServerName)
+	ON_CBN_SELCHANGE(IDC_COMBO_SELECT_DB_NAME, OnSelChangeDBName)
 	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
@@ -303,6 +303,42 @@ void SelectDBDialog::OnChangeDBName()
 		updateAdvConnStrProperties();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35144");
+}
+//--------------------------------------------------------------------------------------------------
+void SelectDBDialog::OnSelChangeServerName()
+{
+	try
+	{
+		// Get index of selection
+		int iIndex = m_comboServerName.GetCurSel();
+
+		if (iIndex >= 0)
+		{
+			// Retrieve name of the newly selected value.
+			m_comboServerName.GetLBText(iIndex, m_zServerName);
+
+			updateAdvConnStrProperties();
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35145");
+}
+//--------------------------------------------------------------------------------------------------
+void SelectDBDialog::OnSelChangeDBName()
+{
+	try
+	{
+		// Get index of selection
+		int iIndex = m_comboDBName.GetCurSel();
+
+		if (iIndex >= 0)
+		{
+			// Retrieve name of the newly selected value.
+			m_comboDBName.GetLBText(iIndex, m_zDBName);
+
+			updateAdvConnStrProperties();
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35146");
 }
 
 //-------------------------------------------------------------------------------------------------

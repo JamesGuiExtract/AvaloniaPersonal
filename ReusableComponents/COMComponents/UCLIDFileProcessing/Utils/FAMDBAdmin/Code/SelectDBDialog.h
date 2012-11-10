@@ -52,6 +52,8 @@ public:
 	afx_msg void OnBnClickedButtonAdvanced();
 	afx_msg void OnChangeServerName();
 	afx_msg void OnChangeDBName();
+	afx_msg void OnSelChangeServerName();
+	afx_msg void OnSelChangeDBName();
 
 private:
 	HICON m_hIcon;
