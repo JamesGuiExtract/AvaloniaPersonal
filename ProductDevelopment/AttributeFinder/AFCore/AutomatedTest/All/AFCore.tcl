@@ -14,5 +14,5 @@ EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueModifiers\AutomatedTest
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueModifiers\AutomatedTest\SplitRegionIntoContentAreas\IDShieldTester.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFSelectors\AutomatedTest\SpatialProximityAS\IDShieldTester.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFOutputHandlers\AutomatedTest\MergeAttributes\IDShieldTester.dat
-EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\..\RC.Net\AttributeFinder\Rules\Core\AutomatedTest\ModifySpatialMode\TopLevelAttributes.dat
-EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\..\RC.Net\AttributeFinder\Rules\Core\AutomatedTest\ModifySpatialMode\SubAttributes.dat
+EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\..\..\RC.Net\AttributeFinder\Rules\Core\AutomatedTest\ModifySpatialMode\TopLevelAttributes.dat
+EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\..\..\RC.Net\AttributeFinder\Rules\Core\AutomatedTest\ModifySpatialMode\SubAttributes.dat
