@@ -1,0 +1,259 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.1.0.15 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.1.0.15 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DataEntry #691]</b> Scrolling With Fit-To-Width
+        	<ul>
+            		<li>Open a document.
+			<li>Zoom in close to something.
+			<li>Use <b>Alt+W</b> or the toolbar to change to fit-to-width.
+			<li>Confirm that the correct zoom action is performed.
+			<li>Confirm that the vertical scroll position does not change.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #729]</b> Order Mapper Should Update Temporary Database Copy
+        	<ul>
+            		<li>Retest.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1104]</b> Tab Order Wrong With Many Sibling Fields
+        	<ul>
+            		<li>Exercise a DEP with more than 10 sibling fields.
+            		<li>Confirm that the <b>tab order</b> behavior is acceptable.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1106]</b> Tab Loop In Courts Demo
+        	<ul>
+            		<li>Open <b>Demo_Courts</b>.
+            		<li>Select a <b>plaintiff</b> or <b>defendant</b> field.
+            		<li>Navigate backwards via Shift+Tab.
+            		<li>Confirm that navigation is not stuck in the currently selected plaintiff 
+			or defendant.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1112]</b> Null Object Reference Exception
+        	<ul>
+            		<li>Configure a FAM for DataEntry verification such that processing 
+			continues even after the queue is empty.
+            		<li>Queue a single file.
+            		<li>Delete or rename the file.
+            		<li>Run verification and confirm that the file fails because it is not 
+			found.
+            		<li>Confirm that the verification title bar does not display the name of 
+			the failed document.
+            		<li>Close the verification window.
+            		<li>Confirm that an <b>ELI29864 - Object reference not set to an instance 
+			of an object.</b> exception is not seen.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1148]</b> Confirm that <b>ExtractData.fps</b> from Demo_LabDE 
+		works as expected.
+<p>
+  	   	<LI><b>[DataEntry #1149]</b> Demo_LabDE Unexpected Exception
+        	<ul>
+            		<li>Verify an image.
+            		<li>Tab through some Test cells.
+            		<li>Select a <b>Units</b> cell.
+            		<li>Tab to <b>Reference Range</b>.
+            		<li>Tab again.
+            		<li>Type <b>H</b>, <b>L</b>, <b>A</b> trying to set a <b>Flag</b>.
+            		<li>Confirm that the cell accepts the modifications without an exception.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1155]</b> DEP InvalidSaveMode.PromptForEach
+        	<ul>
+            		<li>Verify an image from <b>Fresno</b>.
+            		<li>Modify data such that multiple cells contain invalid data.
+            		<li>Try to save the results and confirm that a prompt is provided for 
+			<b>each</b> invalid cell.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #854]</b> Install Microsoft Data DLLs
+        	<ul>
+            		<li>Confirm that the following DLLs are installed to CommonComponents.
+			<ul>
+				<li>Microsoft.Data.ConnectionUI
+				<li>Microsoft.Data.ConnectionUI.Dialog
+				<li>Microsoft.Data.ConnectionUI.SqlCeDataProvider
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #855]</b> DataQueryRuleObject - COM Exception
+        	<ul>
+			<li>Install and license the <b>RDT</b>.
+			<li>Check for new components.
+			<li>Review the UEX log.
+            		<li>Confirm that no <b>COM Exception caught</b> exceptions are logged.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4996]</b> Find and Redact Text
+        	<ul>
+			<li>Verify the image at <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4996</b>.
+			<li>Use the <b>Find and redact text</b> tool to search for examples of 
+			<b>Attorney</b>.
+			<li>Confirm that the verification window refreshes in a timely fashion.
+			<li>Select the <b>Redact All</b> option.
+			<li>Confirm that the verification window refreshes in a timely fashion.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5164]</b> Data Entry Preloader Output Handler
+        	<ul>
+			<li>Confirm that <b>Data entry preloader</b> is available as an output handler.
+			<li>Confirm that the configuration dialog includes a <b>Configuration file 
+			name</b> edit box.
+			<li>Confirm that the configuration dialog includes an associated <b>tag 
+			selector</b> button.
+			<li>Confirm that the configuration dialog includes an associated <b>browse</b> 
+			button.
+            		<li>Confirm that settings are persistent.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5165]</b> OCR Confidence
+        	<ul>
+			<li>Exercise the <b>AutomatedTest</b> portion of the <b>Redaction NRS</b>.
+			<li>Confirm that the <b>Summary of Statistics</b> results include information 
+			about <b>Average OCR confidence</b> of the counted number of documents.
+			<li>Exercise the <b>CaptureRateTest</b> portion of the <b>Redaction NRS</b>.
+			<li>Confirm that the <b>Average OCR confidence</b> information is included in 
+			both the <b>Summary Statistics</b> results and the <b>Summary of Statistics</b> 
+			results.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5166]</b> Word Redaction Tool
+        	<ul>
+			<li>Open a multi-page document for verification.
+			<li>Activate the <b>Word</b> highlight tool and confirm that it is working.
+			<li>Activate any other tool so that the Word highlight tool is no longer 
+			active.
+			<li>Select <b>Edit - Discard changes</b>.
+			<li>Re-activate the <b>Word</b> highlight tool.
+			<li>Confirm that it is working.
+			<li>Change pages and confirm that the <b>Word</b> highlight tool works on 
+			the new page.
+			<li>Return to the original page and use the tool to click and drag around 
+			multiple words.
+			<li>Confirm proper behavior without an exception.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5167]</b> Find and Redact Text
+        	<ul>
+			<li>Open a document for verification.
+			<li>Use the <b>Find and Redact</b> tool to search for a term present in 
+			the document.
+			<li>Click the <b>Redact</b> button to redact the first occurrence.
+			<li>Turn off the redaction.
+			<li>Reset the search and search again.
+			<li>Click the <b>Redact All</b> button to redact all occurrences.
+			<li>Confirm that all occurrences are redacted.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6317]</b> Registry Key For Secure Delete
+        	<ul>
+            		<li>Confirm creation of the following registry key: 
+			<b>HKEY_LOCAL_MACHINE\SOFTWARE\Extract Systems\ReusableComponents\
+			Extract.Utilities\SecureDeleteAllSensitiveFiles</b>.
+			<li>Confirm that the default setting is <b>False</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6327]</b> Database Scalability Test Statistics
+        	<ul>
+            		<li>Configure and start a database scalability test.
+			<li>Allow the test to run unattended over a weekend.
+			<li>Refresh the database status and confirm that the <b>ActionStatistics</b> 
+			table is updated without timing out.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6332]</b> FAM Database Tab
+        	<ul>
+            		<li>Confirm that the FAM <b>Database</b> tab includes an <b>Advanced...</b> 
+			button.
+            		<li>Confirm that clicking the Advanced button displays a dialog containing 
+			a text box.
+            		<li>Confirm that the contents of the text box are appended to the connection 
+			string used to connect to the processing database.
+            		<li>Confirm that meaningful exceptions are logged when a non-empty string 
+			is defined in the text box.
+			<li>Check support for a <b>Failover Database</b> using this setting.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6350]</b> FAM Queuing Freezes
+        	<ul>
+            		<li>Prepare a FPS file for supplying files as would be done for a backup 
+			operation.
+			<li>Allow the queuing operating to run for several hours.
+			<li>Review the UEX logs
+			<li>Confirm that no unusual exceptions were logged.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6354]</b> Queue Setup Tab
+        	<ul>
+            		<li>Confirm that the <b>Queue Setup</b> tab includes an <b>Advanced...</b> 
+			button.
+			<li>Confirm that clicking the button displays an <b>Advanced queuing options</b> 
+			dialog.
+			<li>Confirm that the dialog includes a <b>Skip check for number of pages when 
+			queuing files</b> check box.
+			<li>Confirm that the dialog includes a <b>recommended if supplied files are not 
+			images</b> label.
+			<li>Confirm that settings are persistent.
+			<li>Confirm that queuing is significantly faster when not checking for page 
+			count.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
