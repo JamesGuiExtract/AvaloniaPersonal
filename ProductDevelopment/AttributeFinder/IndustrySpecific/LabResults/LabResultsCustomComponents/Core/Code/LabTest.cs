@@ -96,7 +96,9 @@ namespace Extract.LabResultsCustomComponents
             }
             set
             {
-                _testCode = value.ToUpperInvariant();
+                _testCode = (value == null)
+                    ? null
+                    : value.ToUpperInvariant();
             }
         }
 

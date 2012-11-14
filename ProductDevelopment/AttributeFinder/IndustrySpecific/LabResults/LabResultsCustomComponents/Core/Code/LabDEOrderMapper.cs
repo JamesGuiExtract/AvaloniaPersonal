@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.SqlServerCe;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -52,11 +53,12 @@ namespace Extract.LabResultsCustomComponents
         static readonly int _DB_CONNECTION_RETRIES = 5;
 
         /// <summary>
-        /// The algorithm to find the best possible groupings in GetFinalGrouping is NP-complete.
-        /// To prevent a runaway computation from exhausting all memory, the algorithm will be
-        /// capped at this many possible grouping combinations to be considering at one time.
+        /// A couple algorithms used in the order mapper to find the best combinations of objects
+        /// are NP-complete. To prevent a runaway computation from exhausting all memory, these
+        /// algorithms will be capped at this many possible grouping combinations to be considering
+        /// at one time.
         /// </summary>
-        static readonly int _COMBINATION_ALGORITHM_SAFETY_CUTOFF = 5000;
+        internal static readonly int _COMBINATION_ALGORITHM_SAFETY_CUTOFF = 5000;
 
         #endregion Constants
 
@@ -1254,6 +1256,26 @@ namespace Extract.LabResultsCustomComponents
             if (bestMatchCount == 0)
             {
                 bestMatchedTests.Add(unmatchedTests[0]);
+            }
+            else
+            {
+                // bestMatchedTests contains copies of the original source tests. Now that this set
+                // is finalized, find the corresponding tests from the source parameter and use them
+                // after assign the mapped test codes.
+                // This is so the caller can compare the resulting tests to the source tests by
+                // reference.
+                for (int i = 0; i < bestMatchedTests.Count; i++)
+                {
+                    LabTest bestMatchedTest = bestMatchedTests[i];
+
+                    LabTest sourceTest = unmatchedTests
+                        .Where(test => test.Name == bestMatchedTest.Name)
+                        .First();
+
+                    sourceTest.TestCode = bestMatchedTest.TestCode;
+
+                    bestMatchedTests[i] = sourceTest;
+                }
             }
 
             return new KeyValuePair<string, List<LabTest>>(bestOrderId, bestMatchedTests);

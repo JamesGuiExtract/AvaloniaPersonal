@@ -408,6 +408,7 @@ namespace Extract.SQLCDBEditor
             this.Controls.Add(this._menuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this._menuStrip;
+            this.MinimumSize = new System.Drawing.Size(575, 300);
             this.Name = "SQLCDBEditorForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SQLCDBEditor";

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlServerCe;
+using System.Linq;
 using System.Text;
 
 namespace Extract.LabResultsCustomComponents
@@ -38,43 +39,32 @@ namespace Extract.LabResultsCustomComponents
 
         /// <summary>
         /// A collection of mandatory tests mapping all possible test names
-        /// (the official and alternate names) to their test code.
+        /// (the official and alternate names) to their possible associated test codes.
         /// </summary>
-        readonly Dictionary<string, string> _mandatoryTests = new Dictionary<string,string>();
+        readonly Dictionary<string, List<string>> _mandatoryTests
+            = new Dictionary<string, List<string>>();
 
         /// <summary>
         /// A collection of non-mandatory tests mapping all possible test names
-        /// (the official and alternate names) to their test code.
+        /// (the official and alternate names) to their their possible associated test codes.
         /// </summary>
-        readonly Dictionary<string, string> _otherTests = new Dictionary<string,string>();
+        readonly Dictionary<string, List<string>> _otherTests
+            = new Dictionary<string, List<string>>();
 
         /// <summary>
-        /// A collection containing the test codes for all mandatory tests for this order
-        /// <para><b>Note:</b></para>
-        /// The <see cref="object"/> value in this collection is a static value just used
-        /// as a place holder. This dictionary is being used like a set for fast test code
-        /// lookup
+        /// A set containing the test codes for all mandatory tests for this order
         /// </summary>
-        readonly Dictionary<string, object> _mandatoryTestCodes = new Dictionary<string,object>();
+        readonly HashSet<string> _mandatoryTestCodes = new HashSet<string>();
 
         /// <summary>
-        /// A collection containing the test codes for all non-mandatory tests for this order
-        /// <para><b>Note:</b></para>
-        /// The <see cref="object"/> value in this collection is a static value just used
-        /// as a place holder. This dictionary is being used like a set for fast test code
-        /// lookup
+        /// A set containing the test codes for all non-mandatory tests for this order
         /// </summary>
-        readonly Dictionary<string, object> _otherTestCodes = new Dictionary<string, object>();
+        readonly HashSet<string> _otherTestCodes = new HashSet<string>();
 
         /// <summary>
-        /// A collection containing all the test codes for this order (mandatory and non-mandatory)
+        /// A set containing all the test codes for this order (mandatory and non-mandatory)
         /// </summary>
-        readonly Dictionary<string, object> _allTestCodes = new Dictionary<string, object>();
-
-        /// <summary>
-        /// place holder object used for the two dictionaries that are used as sets
-        /// </summary>
-        static readonly object _object = new object();
+        readonly HashSet<string> _allTestCodes = new HashSet<string>();
 
         #endregion Fields
 
@@ -119,20 +109,24 @@ namespace Extract.LabResultsCustomComponents
             foreach (string testCode in mandatoryTestCodes)
             {
                 // Add the test code to the mandatory test code collection
-                _mandatoryTestCodes.Add(testCode, _object);
+                _mandatoryTestCodes.Add(testCode);
 
                 // Add the test code to the all test code collection
-                _allTestCodes.Add(testCode, _object);
+                _allTestCodes.Add(testCode);
 
                 // Get all names for this test code
                 List<string> testNames = GetTestNames(dbConnection, testCode);
                 foreach (string testName in testNames)
                 {
-                    if (!_mandatoryTests.ContainsKey(testName))
+                    // Add each name for this test code to the mandatory collection
+                    List<string> testCodes = null;
+                    if (!_mandatoryTests.TryGetValue(testName, out testCodes))
                     {
-                        // Add each name for this test code to the mandatory collection
-                        _mandatoryTests.Add(testName, testCode);
+                        testCodes = new List<string>();
+                        _mandatoryTests[testName] = testCodes;
                     }
+
+                    testCodes.Add(testCode);
                 }
             }
         }
@@ -148,20 +142,24 @@ namespace Extract.LabResultsCustomComponents
             foreach (string testCode in otherTestCodes)
             {
                 // Add the test code to the other test code collection
-                _otherTestCodes.Add(testCode, _object);
+                _otherTestCodes.Add(testCode);
 
                 // Add the test code to the all test code collection
-                _allTestCodes.Add(testCode, _object);
+                _allTestCodes.Add(testCode);
 
                 // Get all names for this test code
                 List<string> testNames = GetTestNames(dbConnection, testCode);
                 foreach (string testName in testNames)
                 {
-                    if (!_otherTests.ContainsKey(testName))
+                    // Add each name for this test code to the other collection
+                    List<string> testCodes;
+                    if (!_otherTests.TryGetValue(testName, out testCodes))
                     {
-                        // Add each name for this test code to the other collection
-                        _otherTests.Add(testName, testCode);
+                        testCodes = new List<string>();
+                        _otherTests[testName] = testCodes;
                     }
+
+                    testCodes.Add(testCode);
                 }
             }
         }
@@ -247,29 +245,10 @@ namespace Extract.LabResultsCustomComponents
         /// <paramref name="tests"/> does not contain all mandatory tests.</returns>
         public bool ContainsAllMandatoryTests(IEnumerable<LabTest> tests)
         {
-            List<string> mandatoryCodes = new List<string>();
-            foreach (LabTest test in tests)
-            {
-                string testCode;
-                if (_mandatoryTests.TryGetValue(test.Name, out testCode))
-                {
-                    mandatoryCodes.Add(testCode);
-                }
-            }
+            bool containsAllMandtory = 
+                TestMapper.AllMandatoryTestsExist(tests, _mandatoryTestCodes, _mandatoryTests);
 
-            // Clone the mandatory codes collection
-            Dictionary<string, object> cloneMandatoryCodes =
-                new Dictionary<string, object>(_mandatoryTestCodes);
-            foreach (string testCode in mandatoryCodes)
-            {
-                object temp;
-                if (cloneMandatoryCodes.TryGetValue(testCode, out temp))
-                {
-                    cloneMandatoryCodes.Remove(testCode);
-                }
-            }
-
-            return cloneMandatoryCodes.Count == 0;
+            return containsAllMandtory;
         }
 
         /// <summary>
@@ -285,28 +264,8 @@ namespace Extract.LabResultsCustomComponents
         /// <returns>A subset of <paramref name="tests"/> that match this order.</returns>
         public List<LabTest> GetMatchingTests(IEnumerable<LabTest> tests)
         {
-            // Clone the all test codes collection 
-            Dictionary<string, object> allTestCodes = new Dictionary<string, object>(_allTestCodes);
-
-            // Build a list of matching tests
-            List<LabTest> matchingTests = new List<LabTest>();
-            foreach (LabTest test in tests)
-            {
-                // Check if the test matches any mandatory or non-mandatory test
-                // and that the test it matched has not already been added to
-                // the matching set
-                string testCode;
-                if ((_mandatoryTests.TryGetValue(test.Name, out testCode)
-                    || _otherTests.TryGetValue(test.Name, out testCode))
-                    && allTestCodes.ContainsKey(testCode))
-                {
-                    // Remove the code from the all tests collection to prevent duplicate tests
-                    // being added to the matching group [DataEntry #813]
-                    allTestCodes.Remove(testCode);
-                    test.TestCode = testCode;
-                    matchingTests.Add(test);
-                }
-            }
+            List<LabTest> matchingTests = TestMapper.FindBestMapping(
+                tests, _mandatoryTestCodes, _allTestCodes, _mandatoryTests.Union(_otherTests));
 
             return matchingTests;
         }
