@@ -156,7 +156,7 @@ LRESULT COutputToVOAPP::OnClickedSelectDocTag(WORD wNotifyCode, WORD wID, HWND h
 
 	try
 	{
-		ChooseDocTagForEditBox(IAFUtilityPtr(CLSID_AFUtility), m_btnSelectDocTag, m_editFileName);
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_AFUtility), m_btnSelectDocTag, m_editFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12009");
 

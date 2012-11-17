@@ -237,7 +237,7 @@ LRESULT CSetActionStatusFileProcessorPP::OnClickedBtnActionTag(WORD wNotifyCode,
 
 	try
 	{
-		ChooseDocTagForComboBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnActionTag,
+		ChooseDocTagForComboBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnActionTag,
 			m_cmbActionName, m_dwActionSel);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29124")

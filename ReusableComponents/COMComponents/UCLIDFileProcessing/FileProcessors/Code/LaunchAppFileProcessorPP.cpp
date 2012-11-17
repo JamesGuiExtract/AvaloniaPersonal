@@ -182,7 +182,7 @@ LRESULT CLaunchAppFileProcessorPP::OnClickedBtnCmdLineSelectTag(WORD wNotifyCode
 
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnCmdLineSelectTag,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnCmdLineSelectTag,
 			m_editCmdLine);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12209");
@@ -214,7 +214,7 @@ LRESULT CLaunchAppFileProcessorPP::OnClickedBtnWorkingDirSelectTag(WORD wNotifyC
 
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnWorkingDirSelectTag,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnWorkingDirSelectTag,
 			m_editWorkingDir);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12211");
@@ -266,7 +266,7 @@ LRESULT CLaunchAppFileProcessorPP::OnClickedBtnParametersSelectTag(WORD wNotifyC
 
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnParametersSelectTag,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnParametersSelectTag,
 			m_editParameters);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI25467");

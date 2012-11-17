@@ -22,6 +22,7 @@ class ATL_NO_VTABLE CAFUtility :
 	public CComCoClass<CAFUtility, &CLSID_AFUtility>,
 	public ISupportErrorInfo,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
+	public IDispatchImpl<ITagUtility, &IID_ITagUtility, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<IAFUtility, &IID_IAFUtility, &LIBID_UCLID_AFUTILSLib>
 {
 public:
@@ -36,6 +37,7 @@ BEGIN_COM_MAP(CAFUtility)
 	COM_INTERFACE_ENTRY(IAFUtility)
 	COM_INTERFACE_ENTRY2(IDispatch,IAFUtility)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
+	COM_INTERFACE_ENTRY(ITagUtility)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
 END_COM_MAP()
 
@@ -45,6 +47,15 @@ public:
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
+
+// ITagUtility
+	STDMETHOD(raw_ExpandTags)(BSTR bstrInput, LPVOID pData, BSTR* pbstrOutput);
+	STDMETHOD(raw_ExpandTagsAndFunctions)(BSTR bstrInput, LPVOID pData, BSTR *pbstrOutput);
+	STDMETHOD(raw_GetBuiltInTags)(IVariantVector** ppTags);
+	STDMETHOD(raw_GetINIFileTags)(IVariantVector** ppTags);
+	STDMETHOD(raw_GetAllTags)(IVariantVector** ppTags);
+	STDMETHOD(raw_GetFunctionNames)(IVariantVector** ppFunctionNames);
+	STDMETHOD(raw_GetFormattedFunctionNames)(IVariantVector** ppFunctionNames);
 
 // IAFUtility
 	STDMETHOD(GetNameToAttributesMap)(
@@ -121,12 +132,6 @@ public:
 		/*[out, retval]*/ VARIANT_BOOL* pRetVal);
 	STDMETHOD(SortAttributesSpatially)(
 		/*[in, out]*/ IIUnknownVector* pAttributes);
-	STDMETHOD(GetBuiltInTags)( 
-		/*[out, retval]*/ IVariantVector** ppTags);
-	STDMETHOD(GetINIFileTags)( 
-		/*[out, retval]*/ IVariantVector** ppTags);
-	STDMETHOD(GetAllTags)( 
-		/*[out, retval]*/ IVariantVector** ppTags);
 	STDMETHOD(get_ShouldCacheRSD)(
 		/*[out, retval]*/ VARIANT_BOOL *pvbCacheRSD);
 	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, IAFDocument *pDoc, BSTR *pbstrOutput);
@@ -223,6 +228,7 @@ private:
 	void expandDocTypeTag(string& rstrInput, IAFDocumentPtr& ripDoc);
 	void expandINIFileTags(string& rstrInput, IAFDocumentPtr& ripDoc);
 	void expandAFDocTags(string& rstrInput, IAFDocumentPtr& ripDoc);
+	void expandCommonComponentsDir(string& rstrInput);
 	//---------------------------------------------------------------------------------------------
 	// REQUIRE: strTagName has the '<' and '>' as the first and last chars
 	// PROMISE:	To return the value of strTagName, as specified in the INI file.

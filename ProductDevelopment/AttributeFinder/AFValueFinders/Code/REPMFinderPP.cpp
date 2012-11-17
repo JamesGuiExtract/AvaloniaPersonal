@@ -511,7 +511,7 @@ LRESULT CREPMFinderPP::OnClickedSelectDocTag(WORD wNotifyCode, WORD wID, HWND hW
 
 	try
 	{
-		ChooseDocTagForEditBox(IAFUtilityPtr(CLSID_AFUtility), m_btnSelectDocTag, m_editRuleFile);
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_AFUtility), m_btnSelectDocTag, m_editRuleFile);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI33319");
 

@@ -1,4 +1,3 @@
-#include "TextFunctionExpander.h"
 #include "ComUtils.h"
 #include "QuickMenuChooser.h"
 #include "VectorOperations.h"
@@ -149,10 +148,22 @@ static const CString ChooseDocTag(const T &ipTagUtility, const U &btnTagButton, 
 		int nFirstFunctionIndex = vecChoices.size();
 
 		// Add utility functions
-		TextFunctionExpander tfe;
-		vector<string> vecFunctions = tfe.getAvailableFunctions();
-		vector<string> vecFormattedFunctions = vecFunctions;
-		tfe.formatFunctions(vecFormattedFunctions);
+		vector<string> vecFunctions;
+		IVariantVectorPtr ipFunctionNames = ipTagUtility->GetFunctionNames();
+		size_t nSize = ipFunctionNames->Size;
+		for (size_t i = 0; i < nSize; i++)
+		{
+			vecFunctions.push_back(asString(ipFunctionNames->Item[i].bstrVal));
+		}
+
+		vector<string> vecFormattedFunctions;
+		IVariantVectorPtr ipFormattedFunctionNames = ipTagUtility->GetFormattedFunctionNames();
+		nSize = ipFormattedFunctionNames->Size;
+		for (size_t i = 0; i < nSize; i++)
+		{
+			vecFormattedFunctions.push_back(asString(ipFormattedFunctionNames->Item[i].bstrVal));
+		}
+
 		addVectors(vecChoices, vecFormattedFunctions);
 
 		// Create the menu

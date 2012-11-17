@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "UCLIDCOMUtils.h"
 #include "MiscUtils.h"
+#include "TextFunctionExpander.h"
 
 #include <ExtractMFCUtils.h>
 #include <cpputil.h>
@@ -15,7 +16,6 @@
 #include <StringTokenizer.h>
 #include <ComponentLicenseIDs.h>
 #include <PromptDlg.h>
-#include <TextFunctionExpander.h>
 #include <Misc.h>
 
 // add license management function
@@ -31,8 +31,9 @@ const string gstrMISC_UTILS_REG_PATH =
 const string gstrDEFAULT_PARSER_KEY_NAME = "Default";
 const string gstrDEFAULT_PARSER_PROG_ID = "ESRegExParser.DotNetRegExParser.1";
 
-// Source document name tag
+// Tag names
 const std::string strSOURCE_DOC_NAME_TAG = "<SourceDocName>";
+const std::string strCOMMON_COMPONENTS_DIR_TAG = "<CommonComponentsDir>";
 
 //-------------------------------------------------------------------------------------------------
 // CMiscUtils
@@ -1013,27 +1014,12 @@ STDMETHODIMP CMiscUtils::GetExpandedTags(BSTR bstrString, BSTR bstrSourceDocName
 		ASSERT_ARGUMENT("ELI22713", bstrString != __nullptr);
 		ASSERT_ARGUMENT("ELI22714", bstrSourceDocName != __nullptr);
 
-		// Convert to std strings
 		string strString = asString(bstrString);
-		string strSourceDocName = asString(bstrSourceDocName);
-
-		// Check if the source document name tag was found
-		bool bSourceDocNameTagFound = strString.find(strSOURCE_DOC_NAME_TAG) != string::npos;
-		if (bSourceDocNameTagFound)
-		{
-			// Ensure a source document was specified
-			if (strSourceDocName == "")
-			{
-				throw UCLIDException("ELI22715", "Cannot expand tag without source document.");
-			}
-
-			// Replace the source document tag
-			replaceVariable(strString, strSOURCE_DOC_NAME_TAG, strSourceDocName);
-		}
 
 		// Expand the tag functions
 		TextFunctionExpander tfe;
-		string strExpanded = tfe.expandFunctions(strString); 
+		string strExpanded =
+			tfe.expandFunctions(strString, getThisAsCOMPtr(), bstrSourceDocName); 
 
 		// Return the result
 		*pbstrExpanded = _bstr_t(strExpanded.c_str()).Detach();
@@ -1043,7 +1029,33 @@ STDMETHODIMP CMiscUtils::GetExpandedTags(BSTR bstrString, BSTR bstrSourceDocName
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI22712");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CMiscUtils::GetExpansionFunctionNames(IVariantVector** ppFunctionNames)
+STDMETHODIMP CMiscUtils::GetFunctionNames(IVariantVector** ppFunctionNames)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Get the available expansion functions
+		TextFunctionExpander tfe;
+		vector<string> vecFunctions = tfe.getAvailableFunctions();
+		
+		// Populate an IVariantVector of BSTRs
+		UCLID_COMUTILSLib::IVariantVectorPtr ipFunctions(CLSID_VariantVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI35194", ipFunctions != __nullptr);
+		for each (string function in vecFunctions)
+		{
+			ipFunctions->PushBack(function.c_str());
+		}
+
+		// Return the result
+		*ppFunctionNames = (IVariantVector*) ipFunctions.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35195");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::GetFormattedFunctionNames(IVariantVector** ppFunctionNames)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -1068,6 +1080,175 @@ STDMETHODIMP CMiscUtils::GetExpansionFunctionNames(IVariantVector** ppFunctionNa
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI22716");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::GetBuiltInTags(IVariantVector** ppTags)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI35196", ppTags != __nullptr);
+
+		validateLicense();
+
+		UCLID_COMUTILSLib::IVariantVectorPtr ipTags(CLSID_VariantVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI35197", ipTags != __nullptr);
+
+		ipTags->PushBack(get_bstr_t(strSOURCE_DOC_NAME_TAG));
+		ipTags->PushBack(get_bstr_t(strCOMMON_COMPONENTS_DIR_TAG));
+
+		*ppTags = (IVariantVector *)ipTags.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35198");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::GetINIFileTags(IVariantVector** ppTags)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI35199", ppTags != __nullptr);
+
+		validateLicense();
+
+		UCLID_COMUTILSLib::IVariantVectorPtr ipTags(CLSID_VariantVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI35200", ipTags != __nullptr);
+
+		*ppTags = (IVariantVector *)ipTags.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35201");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::GetAllTags(IVariantVector** ppTags)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI35202", ppTags != __nullptr);
+
+		validateLicense();
+
+		UCLID_COMUTILSLib::IVariantVectorPtr ipTags(CLSID_VariantVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI35203", ipTags != __nullptr);
+
+		*ppTags = (IVariantVector *)ipTags.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35204");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::ExpandTags(BSTR bstrInput, LPVOID pData, BSTR* pbstrOutput)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI35213", bstrInput != __nullptr);
+		ASSERT_ARGUMENT("ELI35215", pbstrOutput != __nullptr);
+
+		validateLicense();
+
+		string strInput = asString(bstrInput);
+		string strSourceDocName = asString((BSTR)pData);
+
+		// Check if the source document name tag was found
+		bool bSourceDocNameTagFound = strInput.find(strSOURCE_DOC_NAME_TAG) != string::npos;
+		if (bSourceDocNameTagFound)
+		{
+			// Ensure a source document was specified
+			if (strSourceDocName == "")
+			{
+				throw UCLIDException("ELI35205", "Cannot expand tag without source document.");
+			}
+
+			// Replace the source document tag
+			replaceVariable(strInput, strSOURCE_DOC_NAME_TAG, strSourceDocName);
+		}
+
+		// Check if the common components directory tag was found
+		bool bCommonComponentsDirFound = strInput.find(strCOMMON_COMPONENTS_DIR_TAG) != string::npos;
+		if (bCommonComponentsDirFound)
+		{
+			const string strCommonComponentsDir = getModuleDirectory("BaseUtils.dll");
+
+			// Replace the common components dir tag
+			replaceVariable(strInput, strCOMMON_COMPONENTS_DIR_TAG, strCommonComponentsDir);
+		}
+
+		*pbstrOutput = _bstr_t(strInput.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35206");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::ExpandTagsAndFunctions(BSTR bstrInput, LPVOID pData, BSTR* pbstrOutput)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI35216", bstrInput != __nullptr);
+		ASSERT_ARGUMENT("ELI35218", pbstrOutput != __nullptr);
+
+		validateLicense();
+
+		UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility(this);
+		ASSERT_RESOURCE_ALLOCATION("ELI35208", ipTagUtility != __nullptr);
+
+		string strInput = asString(bstrInput);
+
+		// Get the available expansion functions
+		TextFunctionExpander tfe;
+		string strOutput = tfe.expandFunctions(strInput, ipTagUtility, pData);
+
+		// Return the result
+		*pbstrOutput = _bstr_t(strOutput.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35209");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::ExpandTagsAndFunctions(BSTR bstrInput,
+	ITagUtility *pTagUtility, LPVOID pData, BSTR* pbstrOutput)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI35219", bstrInput != __nullptr);
+		ASSERT_ARGUMENT("ELI35220", pTagUtility != __nullptr);
+		ASSERT_ARGUMENT("ELI35222", pbstrOutput != __nullptr);
+
+		validateLicense();
+
+		UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility(pTagUtility);
+		ASSERT_RESOURCE_ALLOCATION("ELI35211", ipTagUtility != __nullptr);
+
+		string strInput = asString(bstrInput);
+
+		// Get the available expansion functions
+		TextFunctionExpander tfe;
+		string strOutput = tfe.expandFunctions(strInput, ipTagUtility, pData);
+
+		// Expand any tags that were not nested within functions.
+		strOutput = asString(ipTagUtility->ExpandTags(strOutput.c_str(), pData));
+
+		// Return the result
+		*pbstrOutput = _bstr_t(strOutput.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35212");
 }
 
 //-------------------------------------------------------------------------------------------------

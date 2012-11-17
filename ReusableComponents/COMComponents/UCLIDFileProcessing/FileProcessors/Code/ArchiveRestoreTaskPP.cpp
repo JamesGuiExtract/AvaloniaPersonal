@@ -266,7 +266,7 @@ LRESULT CArchiveRestoreTaskPP::OnClickedBtnArchiveDocTag(WORD wNotifyCode, WORD 
 		m_btnArchiveFolderDocTags.GetWindowRect(&rect);
 
 		// Display the doc tag menu without the SourceDocName [LRCAU #5242]
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnArchiveFolderDocTags,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnArchiveFolderDocTags,
 			m_editArchiveFolder, false);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24610");
@@ -306,7 +306,7 @@ LRESULT CArchiveRestoreTaskPP::OnClickedBtnFileDocTag(WORD wNotifyCode, WORD wID
 	try
 	{
 		// display the doc tag menu and get the user's selection
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSourceFileDoctTags,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnSourceFileDoctTags,
 			m_editSourceFile);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24613");

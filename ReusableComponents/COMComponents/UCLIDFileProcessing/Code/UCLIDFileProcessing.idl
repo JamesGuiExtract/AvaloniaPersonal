@@ -1522,26 +1522,11 @@ library UCLID_FILEPROCESSINGLib
 		// FPS file full name
 		[propget, id(1), helpstring("property FPSFileDir")] HRESULT FPSFileDir([out, retval] BSTR *strFPSFileDir);
 		[propput, id(1), helpstring("property FPSFileDir")] HRESULT FPSFileDir([in] BSTR strFPSFileDir);
+		//-----------------------------------------------------------------------------------------
 		// PROMISE: To return a string that is equivalent in content to strInput
 		// bstrSourceName is the source doc name used in expand <SourceDocName>, it should be passed in as a parameter because
 		// different thread will have different source doc name [P13: 3901]
 		[id(2), helpstring("method ExpandTags")] HRESULT ExpandTags([in] BSTR bstrInput, [in] BSTR bstrSourceName, [out, retval] BSTR* pbstrOutput);
-		// PROMISE: To return a string that is equivalent in content to strInput
-		// PURPOSE: To return a list of all the tags built-in to AttributeFinder (i.e. FPSFileDir...)
-		// REQUIRE: NONE
-		// PROMISE: If there are no built-in tags an empty vector (not NULL) will be returned
-		[id(3), helpstring("method GetBuiltInTags")] HRESULT GetBuiltInTags([out, retval] IVariantVector** ppTags);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To return a list of all the tags specified by the user in their INI file
-		// REQUIRE: NONE
-		// PROMISE: If there are tags in the .ini file an empty vector (not NULL) will be returned
-		[id(4), helpstring("method GetINIFileTags")] HRESULT GetINIFileTags([out, retval] IVariantVector** ppTags);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To return a list of all the available AttributeFinderTags
-		// REQUIRE: NONE
-		// PROMISE: This will be a combined list of all the tags in GetBuiltInTags + the tags in 
-		//			GetBuiltINIFileTags
-		[id(5), helpstring("method GetAllTags")] HRESULT GetAllTags([out, retval] IVariantVector** ppTags);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To return VARIANT_TRUE if there are any invalid or incomplete
 		//			tags in strInput, and to return VARIANT_FALSE otherwise.
@@ -1803,6 +1788,7 @@ library UCLID_FILEPROCESSINGLib
 	{
 		[default] interface IFAMTagManager;
 		interface ILicensedComponent;
+		interface ITagUtility;
 	};
 	[
 		uuid(A7BD9DDF-04BC-46f3-9965-26E9AEF06091),

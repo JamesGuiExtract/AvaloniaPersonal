@@ -11,7 +11,6 @@
 #include <LicenseMgmt.h>
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
-#include <TextFunctionExpander.h>
 
 #include <cstdio>
 #include <fstream>
@@ -1794,12 +1793,10 @@ IIUnknownVectorPtr CAutomatedRuleSetTester::processInlineEAVString(const string 
 //-------------------------------------------------------------------------------------------------
 const string CAutomatedRuleSetTester::expandTagsAndTFE(const string &strInput, string &strSourceDocName)
 {
-	string strExpanded = m_ipFAMTagManager->ExpandTags( strInput.c_str(), strSourceDocName.c_str());
+	string strExpanded = asString(
+		m_ipFAMTagManager->ExpandTagsAndFunctions(strInput.c_str(),
+		_bstr_t(strSourceDocName.c_str()).GetBSTR()));
 
-	// Expand the functions
-	TextFunctionExpander tfe;
-	strExpanded = tfe.expandFunctions(strExpanded); 
-	
 	return strExpanded;
 }
 //-------------------------------------------------------------------------------------------------

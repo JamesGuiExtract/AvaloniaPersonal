@@ -428,7 +428,7 @@ LRESULT CRedactionTaskPP::OnClickedSelectImageFileTag(WORD wNotifyCode, WORD wID
 
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectImageFileTag,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnSelectImageFileTag,
 			m_editOutputFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28595");

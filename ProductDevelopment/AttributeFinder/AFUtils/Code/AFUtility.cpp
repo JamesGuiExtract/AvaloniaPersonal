@@ -16,7 +16,6 @@
 #include <StringTokenizer.h>
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
-#include <TextFunctionExpander.h>
 
 /////////////
 // Key Names
@@ -37,6 +36,7 @@ const string strSOURCE_DOC_NAME_TAG = "<SourceDocName>";
 const string strSOURCE_DOC_EXT_TAG = "<SourceDocName.Extension>";
 const string strSOURCE_DOC_FILENAME_TAG = "<SourceDocName.FileName>";
 const string strSOURCE_DOC_PATH_TAG = "<SourceDocName.Path>";
+const string strCOMMON_COMPONENTS_DIR_TAG = "<CommonComponentsDir>";
 
 // globals and statics
 map<string, string> CAFUtility::ms_mapINIFileTagNameToValue;
@@ -367,7 +367,32 @@ STDMETHODIMP CAFUtility::GetAttributesAsString(IIUnknownVector *pAttributes, BST
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFUtility::raw_ExpandTags(BSTR strInput, LPVOID pData, BSTR *pstrOutput)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
+	try
+	{
+		validateLicense();
+
+		// get the document as a smart pointer
+		IAFDocumentPtr ipDoc((IAFDocument *)pData);
+		ASSERT_RESOURCE_ALLOCATION("ELI35164", ipDoc != __nullptr);
+
+		// Get the string from the input
+		string stdstrInput = asString(strInput);
+
+		// Expand the tags
+		expandTags(stdstrInput, ipDoc);
+
+		// return the string with the replacements made
+		*pstrOutput = _bstr_t(stdstrInput.c_str()).Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35165");
+
+	return S_OK;
+}
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAFUtility::ExpandTags(BSTR strInput, IAFDocument *pDoc, BSTR *pstrOutput)
 {
@@ -609,7 +634,7 @@ STDMETHODIMP CAFUtility::SortAttributesSpatially(IIUnknownVector* pAttributes)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFUtility::GetBuiltInTags(IVariantVector** ppTags)
+STDMETHODIMP CAFUtility::raw_GetBuiltInTags(IVariantVector** ppTags)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -629,7 +654,7 @@ STDMETHODIMP CAFUtility::GetBuiltInTags(IVariantVector** ppTags)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFUtility::GetINIFileTags(IVariantVector** ppTags)
+STDMETHODIMP CAFUtility::raw_GetINIFileTags(IVariantVector** ppTags)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -647,7 +672,7 @@ STDMETHODIMP CAFUtility::GetINIFileTags(IVariantVector** ppTags)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFUtility::GetAllTags(IVariantVector** ppTags)
+STDMETHODIMP CAFUtility::raw_GetAllTags(IVariantVector** ppTags)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -703,6 +728,27 @@ STDMETHODIMP CAFUtility::get_ShouldCacheRSD(VARIANT_BOOL *pvbCacheRSD)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI24008");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFUtility::raw_ExpandTagsAndFunctions(BSTR bstrInput, LPVOID pData, BSTR *pbstrOutput)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI35168", pbstrOutput != __nullptr);
+
+		validateLicense();
+
+		UCLID_COMUTILSLib::ITagUtilityPtr ipThis(this);
+		ASSERT_RESOURCE_ALLOCATION("ELI35169", ipThis != __nullptr);
+
+		_bstr_t bstrOutput = m_ipMiscUtils->ExpandTagsAndFunctions(
+			bstrInput, ipThis, pData);
+
+		*pbstrOutput = bstrOutput.Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35170");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAFUtility::ExpandTagsAndFunctions(BSTR bstrInput, IAFDocument *pDoc,
 												BSTR *pbstrOutput)
 {
@@ -710,28 +756,61 @@ STDMETHODIMP CAFUtility::ExpandTagsAndFunctions(BSTR bstrInput, IAFDocument *pDo
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI35171", pbstrOutput != __nullptr);
+
 		validateLicense();
 
-		// get the document as a smart pointer
-		IAFDocumentPtr ipDoc(pDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI26443", ipDoc != __nullptr);
+		UCLID_COMUTILSLib::ITagUtilityPtr ipThis(this);
+		ASSERT_RESOURCE_ALLOCATION("ELI35172", ipThis != __nullptr);
 
-		// Get the string from the input
-		string strInput = asString(bstrInput);
+		_bstr_t bstrOutput = m_ipMiscUtils->ExpandTagsAndFunctions(
+			bstrInput, ipThis, pDoc);
 
-		// Expand the tags
-		expandTags(strInput, ipDoc);
-
-		// Expand the text functions
-		TextFunctionExpander tfe;
-		strInput = tfe.expandFunctions(strInput);
-
-		// return the string with the replacements made
-		*pbstrOutput = _bstr_t(strInput.c_str()).Detach();
-
-		return S_OK;
+		*pbstrOutput = bstrOutput.Detach();
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26166");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35173");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFUtility::raw_GetFunctionNames(IVariantVector** ppFunctionNames)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI35174", ppFunctionNames != __nullptr);
+
+		validateLicense();
+
+		ITagUtilityPtr ipTagUtility(m_ipMiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI35175", ipTagUtility != __nullptr);
+
+		IVariantVectorPtr ipFunctions = ipTagUtility->GetFunctionNames();
+		ASSERT_RESOURCE_ALLOCATION("ELI35176", ipFunctions != __nullptr);
+
+		*ppFunctionNames = ipFunctions.Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35177");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFUtility::raw_GetFormattedFunctionNames(IVariantVector** ppFunctionNames)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI35178", ppFunctionNames != __nullptr);
+
+		validateLicense();
+
+		ITagUtilityPtr ipTagUtility(m_ipMiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI35179", ipTagUtility != __nullptr);
+
+		IVariantVectorPtr ipFunctions = ipTagUtility->GetFormattedFunctionNames();
+		ASSERT_RESOURCE_ALLOCATION("ELI35180", ipFunctions != __nullptr);
+
+		*ppFunctionNames = ipFunctions.Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35181");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAFUtility::StartProfilingRule(BSTR bstrName, BSTR bstrType,
@@ -1223,6 +1302,19 @@ void CAFUtility::expandINIFileTags(string& rstrInput,
 	}
 }
 //-------------------------------------------------------------------------------------------------
+void CAFUtility::expandCommonComponentsDir(string& rstrInput)
+{
+	bool bCommonComponentsDirFound = rstrInput.find(strCOMMON_COMPONENTS_DIR_TAG) != string::npos;
+
+	if (bCommonComponentsDirFound)
+	{
+		const string strCommonComponentsDir = getModuleDirectory("BaseUtils.dll");
+
+		// Replace the common components dir tag
+		replaceVariable(rstrInput, strCOMMON_COMPONENTS_DIR_TAG, strCommonComponentsDir);
+	}
+}
+//-------------------------------------------------------------------------------------------------
 vector<string> CAFUtility::getTagNames(const string& strInput) const
 {
 	// Create the result vector
@@ -1609,6 +1701,7 @@ void CAFUtility::expandTags(string& rstrInput, IAFDocumentPtr ipDoc)
 		expandDocTypeTag(rstrInput, ipDoc);
 		expandComponentDataDirTag(rstrInput);
 		expandAFDocTags(rstrInput, ipDoc);
+		expandCommonComponentsDir(rstrInput);
 
 		// at this time, ensure that there are no more tags left
 		vector<string> vecTagNames = getTagNames(rstrInput);
@@ -1742,6 +1835,7 @@ IVariantVectorPtr CAFUtility::getBuiltInTags()
 		ipVec->PushBack(get_bstr_t(strCOMPONENT_DATA_DIR_TAG));
 		ipVec->PushBack(get_bstr_t(strSOURCE_DOC_NAME_TAG));
 		ipVec->PushBack(get_bstr_t(gstrRULE_EXEC_ID_TAG));
+		ipVec->PushBack(get_bstr_t(strCOMMON_COMPONENTS_DIR_TAG));
 
 		// Return the vector
 		return ipVec;

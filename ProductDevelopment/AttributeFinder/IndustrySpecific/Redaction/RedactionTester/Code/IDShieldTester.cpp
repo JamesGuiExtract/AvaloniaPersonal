@@ -11,7 +11,6 @@
 #include <StringTokenizer.h>
 #include <ComUtils.h>
 #include <LicenseMgmt.h>
-#include <TextFunctionExpander.h>
 #include <ComponentLicenseIDs.h>
 #include <RegistryPersistenceMgr.h>
 #include <mathUtil.h>
@@ -202,14 +201,15 @@ bool testAttributeCondition(IIUnknownVectorPtr ipAttributes,
 //-------------------------------------------------------------------------------------------------
 CIDShieldTester::CIDShieldTester() :
 m_bOutputAttributeNameFilesList(false),
-m_ipTestOutputVOAVector(NULL)
+m_ipTestOutputVOAVector(NULL),
+m_ipAFUtility(CLSID_AFUtility),
+m_ipFAMTagManager(CLSID_FAMTagManager),
+m_ipAttrFinderEngine(CLSID_AttributeFinderEngine)
 {
 	try
 	{
-		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
 		ASSERT_RESOURCE_ALLOCATION("ELI15178", m_ipAFUtility != __nullptr);
-
-		m_ipAttrFinderEngine.CreateInstance(CLSID_AttributeFinderEngine);
+		ASSERT_RESOURCE_ALLOCATION("ELI35184", m_ipFAMTagManager != __nullptr);
 		ASSERT_RESOURCE_ALLOCATION("ELI15206", m_ipAttrFinderEngine != __nullptr);
 
 		// Map the result fields to names for use by custom reports.
@@ -255,6 +255,9 @@ CIDShieldTester::~CIDShieldTester()
 {
 	try
 	{
+		m_ipAFUtility = __nullptr;
+		m_ipFAMTagManager = __nullptr;
+		m_ipAttrFinderEngine = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16555");
 }
@@ -936,16 +939,12 @@ void CIDShieldTester::handleTestFolder(const string& strRulesFile, const string&
 		{
 			strOCRResults = strImageFileName;
 		}
+
+		string strFoundVOAFileWithExpandedTags = asString(m_ipFAMTagManager->ExpandTagsAndFunctions(
+			strFoundVOAFileWithTags.c_str(), strImageFileName.c_str()));
+		string strExpectedVOAFileWithExpandedTags = asString(m_ipFAMTagManager->ExpandTagsAndFunctions(
+			strExpectedVOAFileWithTags.c_str(), strImageFileName.c_str()));
 		
-		// Replace <SourceDocName> with the image file name for the ExpectedVOA and FoundVOA files
-		replaceVariable(strFoundVOAFileWithTags, "<SourceDocName>", strImageFileName);
-		replaceVariable(strExpectedVOAFileWithTags, "<SourceDocName>", strImageFileName);
-
-		// Run a TextFunctionExpander to replace the remaining $DirOf style tags
-		TextFunctionExpander tfe;
-		string strFoundVOAFileWithExpandedTags = tfe.expandFunctions( strFoundVOAFileWithTags );
-		string strExpectedVOAFileWithExpandedTags = tfe.expandFunctions( strExpectedVOAFileWithTags );
-
 		// Execute the test case.
 		handleTestCase( strAbsoluteRulesFile, strImageFileName, strOCRResults, 
 			strFoundVOAFileWithExpandedTags, strExpectedVOAFileWithExpandedTags, nTestCastNum++, 

@@ -4,7 +4,6 @@
 
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
-#include <TextFunctionExpander.h>
 #include <cpputil.h>
 #include <QuickMenuChooser.h>
 #include <ComUtils.h>
@@ -32,29 +31,12 @@ CRedactionCustomComponentsUtils::~CRedactionCustomComponentsUtils()
 //--------------------------------------------------------------------------------------------------
 const string CRedactionCustomComponentsUtils::ExpandTagsAndTFE(IFAMTagManagerPtr ipFAMTM, const string& strFile, const string& strSourceDocName)
 {
-	// verify valid arguments
-	ASSERT_ARGUMENT("ELI15152", ipFAMTM != __nullptr);
+	ITagUtilityPtr ipFAMTagUtility(ipFAMTM);
+	ASSERT_RESOURCE_ALLOCATION("ELI35182", ipFAMTagUtility != __nullptr);
 
-	//////////////////////////////////////////////////////////////////////////
-	// Get the FAMTagManager Pointer and expand tags in m_strFileName, 
-	// If the <FPSFiledir> points to C:\RedactionDemo\FPS
-	// e.g. m_strFileName = "<FPSFileDir>\123.dat"
-	// after expanding: strFile = "C:\RedactionDemo\FPS\123.dat"
-	//////////////////////////////////////////////////////////////////////////
-
-	// Pass the file name with the tags(strFile) and the source doc name(strSourceDocName) as parameters to Expandtags
-	// If file name contains <SourceDocName>, ExpandTags() will use strSourceDocName to expand it [P13: 3901]
-	_bstr_t bstrFile = ipFAMTM->ExpandTags( _bstr_t(strFile.c_str()), _bstr_t(strSourceDocName.c_str()) );
-	string strExpandedFile = asString(bstrFile);
-
-	////////////////////////////////////////////////////////////////////////////
-	// Expand function in strFile
-	// e.g. Before expanding: strFile = "$DirOf(C:\123.dat)\$FileOf(C:\123.dat)"
-	// After expanding: strFileName = "C:\123.dat"
-	////////////////////////////////////////////////////////////////////////////
-
-	TextFunctionExpander tfe;
-	strExpandedFile = tfe.expandFunctions(strExpandedFile); 
+	string strExpandedFile = asString(
+		ipFAMTagUtility->ExpandTagsAndFunctions(strFile.c_str(),
+			_bstr_t(strSourceDocName.c_str()).GetBSTR()));
 
 	return strExpandedFile;
 }

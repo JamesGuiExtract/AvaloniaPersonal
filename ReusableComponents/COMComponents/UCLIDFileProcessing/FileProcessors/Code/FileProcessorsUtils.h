@@ -1,6 +1,5 @@
 #include <string>
 
-#include <TextFunctionExpander.h>
 #include <ComUtils.h>
 #include <QuickMenuChooser.h>
 #include <VectorOperations.h>

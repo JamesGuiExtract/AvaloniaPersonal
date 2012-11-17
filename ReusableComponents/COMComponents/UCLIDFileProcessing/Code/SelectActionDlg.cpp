@@ -283,7 +283,7 @@ void SelectActionDlg::OnBnClickActionTag()
 
 	try
 	{
-		ChooseDocTagForComboBox(UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr(CLSID_FAMTagManager),
+		ChooseDocTagForComboBox(ITagUtilityPtr(CLSID_FAMTagManager),
 			m_btnActionTag, m_cmbAction, m_dwActionSel, false);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29111")

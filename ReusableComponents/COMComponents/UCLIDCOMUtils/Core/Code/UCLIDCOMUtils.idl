@@ -22,6 +22,11 @@ library UCLID_COMUTILSLib
 	importlib("..\..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
 
 	//---------------------------------------------------------------------------------------------
+	//-Forward declarations -----------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------
+	interface ITagUtility;
+
+	//---------------------------------------------------------------------------------------------
 	//-E N U M S ----------------------------------------------------------------------------------
 	//---------------------------------------------------------------------------------------------
 	typedef 
@@ -1068,10 +1073,11 @@ library UCLID_COMUTILSLib
 		[id(25), helpstring("method GetExpandedTags")] HRESULT GetExpandedTags(
 			[in] BSTR bstrString, [in] BSTR bstrSourceDocName, [out, retval] BSTR* pbstrExpanded);
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Returns an IVariantVector of BSTRs containing the name of expansion functions
-		// EXAMPLE: May return values such as "$DirOf()", "$InsertBeforeExt()", etc.
-		[id(26), helpstring("method GetExpansionFunctionNames")] HRESULT GetExpansionFunctionNames(
-			[out, retval] IVariantVector** ppFunctionNames);
+		// PURPOSE: Expands path tags and functions in bstrInput using the supplied data in pData.
+		//			(pData type is specific to implementing class)
+		[id(26), helpstring("method ExpandTagsAndFunctions")] HRESULT ExpandTagsAndFunctions(
+			[in] BSTR bstrInput, [in] ITagUtility *pTagUtility, [in] LPVOID pData,
+			[out, retval] BSTR* pbstrOutput);
 	};
 	[
 		object,
@@ -1227,6 +1233,49 @@ library UCLID_COMUTILSLib
 		[propget, id(2), helpstring("property Y")] HRESULT Y([out, retval] double *pVal);
 		[propput, id(2), helpstring("property Y")] HRESULT Y([in] double newVal);
 	};
+
+	[
+		object,
+		uuid(AB81830E-AD16-4267-AE51-D8ACE3A2F067),
+		dual,
+		helpstring("ITagUtility Interface"),
+		pointer_default(unique)
+	]
+	interface ITagUtility : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	Expands path tags in bstrInput using the supplied data in pData. 
+		//			[LegacyRCAndUtils:6337] 11/17/2012 SNK 
+		//		    NOTE: pData type is specific to implementing class (such as SourceDocName or 
+		//			and IAFDocument instance). While this is admitedly not the best design, it
+		//			allows for modifying path tag expansion so that it occurs per parameter within
+		//			path tag functions with as little changes as possible to existing code.
+		[id(1), helpstring("method ExpandTags")] HRESULT ExpandTags([in] BSTR bstrInput,
+			[in] LPVOID pData, [out, retval] BSTR* pbstrOutput);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	Expands path tags and functions in bstrInput using the supplied data in pData.
+		//			(pData type is specific to implementing class)
+		[id(2), helpstring("method ExpandTagsAndFunctions")] HRESULT ExpandTagsAndFunctions(
+			[in] BSTR bstrInput, [in] LPVOID pData, [out, retval] BSTR* pbstrOutput);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return a list of all the tags 
+		// REQUIRE: NONE
+		// PROMISE: If there are no built-in tags an empty vector (not NULL) will be returned
+		[id(3), helpstring("method GetBuiltInTags")] HRESULT GetBuiltInTags([out, retval] IVariantVector** ppTags);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return a list of all the tags 
+		// REQUIRE: NONE
+		// PROMISE: If there are no built-in tags an empty vector (not NULL) will be returned
+		[id(4), helpstring("method GetINIFileTags")] HRESULT GetINIFileTags([out, retval] IVariantVector** ppTags);
+		//-----------------------------------------------------------------------------------------
+		[id(5), helpstring("method GetAllTags")] HRESULT GetAllTags([out, retval] IVariantVector** ppTags);
+		//-----------------------------------------------------------------------------------------
+		[id(6), helpstring("method GetFunctionNames")] HRESULT GetFunctionNames(
+			[out, retval] IVariantVector** ppFunctionNames);
+		//-----------------------------------------------------------------------------------------
+		[id(7), helpstring("method GetFormattedFunctionNames")] HRESULT GetFormattedFunctionNames(
+			[out, retval] IVariantVector** ppFunctionNames);
+	}	
 
 	//---------------------------------------------------------------------------------------------
 	// IProgressStatus ----------------------------------------------------------------------------
@@ -1515,8 +1564,8 @@ library UCLID_COMUTILSLib
 		// PURPOSE:	To return boolean flag indicating if the object requires admin access to run
 		[id(2001), helpstring("method RequiresAdminAccess")] HRESULT RequiresAdminAccess(
 			[out, retval] VARIANT_BOOL* pbResult);			
-	}	
-	
+	}
+
 	//---------------------------------------------------------------------------------------------
 	//-C O C L A S S E S --------------------------------------------------------------------------
 	//---------------------------------------------------------------------------------------------
@@ -1657,6 +1706,7 @@ library UCLID_COMUTILSLib
 	coclass MiscUtils
 	{
 		[default] interface IMiscUtils;
+		interface ITagUtility;
 	};
 	[
 		uuid(6781EC39-F065-4019-AB6A-64FBA17E9832),

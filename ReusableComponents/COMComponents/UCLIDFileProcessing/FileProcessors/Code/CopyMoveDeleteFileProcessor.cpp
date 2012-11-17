@@ -12,7 +12,6 @@
 #include <TemporaryResourceOverride.h>
 #include <misc.h>
 #include <ComUtils.h>
-#include <TextFunctionExpander.h>
 #include <ComponentLicenseIDs.h>
 
 #include <math.h>

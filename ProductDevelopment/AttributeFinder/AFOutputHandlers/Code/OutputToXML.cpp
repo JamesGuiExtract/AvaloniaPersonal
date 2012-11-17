@@ -10,7 +10,6 @@
 #include <comutils.h>
 #include <cpputil.h>
 #include <LicenseMgmt.h>
-#include <TextFunctionExpander.h>
 #include <UCLIDException.h>
 
 //-------------------------------------------------------------------------------------------------
@@ -766,34 +765,27 @@ string COutputToXML::expandFileName(IAFDocumentPtr ipDoc)
 
 		string strFileName;
 
-		// Check for expanding FAM tags or AF tags
 		if (m_bFAMTags)
 		{
-			// Get the FAM tag manager
-			IFAMTagManagerPtr ipFamTags(CLSID_FAMTagManager);
-			ASSERT_RESOURCE_ALLOCATION("ELI26301", ipFamTags != __nullptr);
+			ITagUtilityPtr ipTagUtility(CLSID_FAMTagManager);
+			ASSERT_RESOURCE_ALLOCATION("ELI26301", ipTagUtility != __nullptr);
 
 			// Get the source doc name from the AF doc object
 			ISpatialStringPtr ipString = ipDoc->Text;
 			ASSERT_RESOURCE_ALLOCATION("ELI26302", ipString != __nullptr);
 			_bstr_t bstrSourceDoc = ipString->SourceDocName;
-
-			// Get the expanded file name
-			strFileName = asString(ipFamTags->ExpandTags(m_strFileName.c_str(), bstrSourceDoc));
+			
+			strFileName = asString(ipTagUtility->ExpandTagsAndFunctions(
+				m_strFileName.c_str(), bstrSourceDoc.Detach()));
 		}
 		else
 		{
-			// Get the AFUtils tag manager
-			IAFUtilityPtr ipAFTags(CLSID_AFUtility);
-			ASSERT_RESOURCE_ALLOCATION("ELI26303", ipAFTags != __nullptr);
+			ITagUtilityPtr ipTagUtility(CLSID_AFUtility);
+			ASSERT_RESOURCE_ALLOCATION("ELI26301", ipTagUtility != __nullptr);
 
-			// Get the expanded file name
-			strFileName = asString(ipAFTags->ExpandTags(m_strFileName.c_str(), ipDoc));
+			strFileName = asString(ipTagUtility->ExpandTagsAndFunctions(
+				m_strFileName.c_str(), ipDoc));
 		}
-
-		// Expand the text functions
-		TextFunctionExpander tfe;
-		strFileName = tfe.expandFunctions(strFileName);
 
 		return strFileName;
 	}

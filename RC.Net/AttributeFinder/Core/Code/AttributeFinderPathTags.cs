@@ -99,7 +99,7 @@ namespace Extract.AttributeFinder
             try
             {
                 // Get the Attribute Finder tags
-                AFUtility utility = new AFUtility();
+                ITagUtility utility = (ITagUtility)new AFUtility();
                 VariantVector tags = utility.GetAllTags();
 
                 // Get the tag count

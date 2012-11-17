@@ -9,7 +9,6 @@
 #include <cpputil.h>
 #include <LicenseMgmt.h>
 #include <ComUtils.h>
-#include <TextFunctionExpander.h>
 #include <ComponentLicenseIDs.h>
 
 //--------------------------------------------------------------------------------------------------

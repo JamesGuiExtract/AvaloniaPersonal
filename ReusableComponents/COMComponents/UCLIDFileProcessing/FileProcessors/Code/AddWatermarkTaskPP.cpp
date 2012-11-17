@@ -344,7 +344,7 @@ LRESULT CAddWatermarkTaskPP::OnClickedBtnInputImageDocTag(WORD wNotifyCode, WORD
 	try
 	{
 		// display the doc tag menu and get the user's selection
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnInputImageDocTag,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnInputImageDocTag,
 			m_editInputImage);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19985");
@@ -385,7 +385,7 @@ LRESULT CAddWatermarkTaskPP::OnClickedBtnStampImageDocTag(WORD wNotifyCode, WORD
 	try
 	{
 		// display the doc tag menu and get the user's selection
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnStampImageDocTag,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnStampImageDocTag,
 			m_editStampImage);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19987");

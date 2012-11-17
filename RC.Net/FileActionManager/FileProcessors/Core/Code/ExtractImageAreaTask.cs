@@ -234,7 +234,7 @@ namespace Extract.FileActionManager.FileProcessors
                     if (_outputPathTags == null)
                     {
                         _outputPathTags = new FileActionManagerPathTags();
-                        _outputPathTags.AddCustomTag(_AREA_ID_TAG, ExpandAreaIDTag);
+                        _outputPathTags.AddCustomTag(_AREA_ID_TAG, ExpandAreaIDTag, true);
                     }
 
                     return _outputPathTags;

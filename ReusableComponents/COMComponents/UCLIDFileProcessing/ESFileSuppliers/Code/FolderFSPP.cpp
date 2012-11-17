@@ -211,7 +211,7 @@ LRESULT CFolderFSPP::OnBnClickedBtnSelectFolderTag(WORD /*wNotifyCode*/, WORD /*
 {
 	AFX_MANAGE_STATE(AfxGetModuleState());
 
-	if (ChooseDocTagForComboBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectFolderDocTag,
+	if (ChooseDocTagForComboBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnSelectFolderDocTag,
 			m_cmbFolder, m_dwSel, false))
 	{
 		m_bDirty = true;

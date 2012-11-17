@@ -17,7 +17,6 @@
 #include <RegistryPersistenceMgr.h>
 #include <StopWatch.h>
 #include <StringTokenizer.h>
-#include <TextFunctionExpander.h>
 #include <UCLIDException.h>
 
 using namespace ADODB;

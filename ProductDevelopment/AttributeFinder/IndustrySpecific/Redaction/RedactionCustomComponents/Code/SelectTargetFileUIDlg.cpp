@@ -106,7 +106,7 @@ LRESULT CSelectTargetFileUIDlg::OnBnClickedBtnSelectDocTag(WORD wNotifyCode, WOR
 
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectDocTag,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnSelectDocTag,
 			m_editFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI17506");

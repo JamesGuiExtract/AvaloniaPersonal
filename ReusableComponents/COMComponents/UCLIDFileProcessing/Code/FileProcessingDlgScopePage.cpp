@@ -17,7 +17,6 @@
 #include <CommentedTextFileReader.h>
 #include <string>
 #include <vector>
-#include <TextFunctionExpander.h>
 #include <misc.h>
 #include <COMUtils.h>
 

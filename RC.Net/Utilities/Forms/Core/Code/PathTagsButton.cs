@@ -290,8 +290,8 @@ namespace Extract.Utilities.Forms
             else
             {
                 // Get the function tag names
-                MiscUtils miscUtils = new MiscUtils();
-                VariantVector functions = miscUtils.GetExpansionFunctionNames();
+                ITagUtility miscUtils = (ITagUtility)new MiscUtils();
+                VariantVector functions = miscUtils.GetFormattedFunctionNames();
 
                 // Construct an array of the function tags
                 int size = functions.Size;

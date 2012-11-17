@@ -35,7 +35,10 @@ namespace Extract.Utilities
         /// <param name="tag">The tag name.</param>
         /// <param name="expandTagMethod">The <see cref="ExpandTag"/> implementation that should be
         /// used to provide the replacement value.</param>
-        void AddCustomTag(string tag, ExpandTag expandTagMethod);
+        /// <param name="delayedExpansion"><see langword="true"/> if the tag should not be expanded
+        /// until all other tags and functions have been expanded; otherwise, <see langword="false"/>.
+        /// </param>
+        void AddCustomTag(string tag, ExpandTag expandTagMethod, bool delayedExpansion);
 
         /// <summary>
         /// Expands the tags in the specified path.

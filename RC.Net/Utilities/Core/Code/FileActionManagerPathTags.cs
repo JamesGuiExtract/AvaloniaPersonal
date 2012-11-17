@@ -27,6 +27,11 @@ namespace Extract.Utilities
         /// Constant string for the remote source doc tag.
         /// </summary>
         public static readonly string RemoteSourceDocumentTag = "<RemoteSourceDocName>";
+        
+        /// <summary>
+        /// Constant string for the common components directory tag.
+        /// </summary>
+        public static readonly string CommonComponentsDirectoryTag = "<CommonComponentsDir>";
 
         #endregion Constants
 
@@ -121,9 +126,10 @@ namespace Extract.Utilities
         static Dictionary<string, string> GetTagsToValues(string sourceDocument,
             string fpsDirectory)
         {
-            Dictionary<string, string> tagsToValues = new Dictionary<string,string>(2);
+            Dictionary<string, string> tagsToValues = new Dictionary<string,string>(3);
             tagsToValues.Add(SourceDocumentTag, sourceDocument);
             tagsToValues.Add(FpsFileDirectoryTag, fpsDirectory);
+            tagsToValues.Add(CommonComponentsDirectoryTag, FileSystemMethods.CommonComponentsPath);
             return tagsToValues;
         }
 
@@ -137,10 +143,11 @@ namespace Extract.Utilities
         static Dictionary<string, string> GetTagsToValues(string sourceDocument,
             string fpsDirectory, string remoteSourceDocName)
         {
-            Dictionary<string, string> tagsToValues = new Dictionary<string, string>(3);
+            Dictionary<string, string> tagsToValues = new Dictionary<string, string>(4);
             tagsToValues.Add(SourceDocumentTag, sourceDocument);
             tagsToValues.Add(FpsFileDirectoryTag, fpsDirectory);
             tagsToValues.Add(RemoteSourceDocumentTag, remoteSourceDocName);
+            tagsToValues.Add(CommonComponentsDirectoryTag, FileSystemMethods.CommonComponentsPath);
             return tagsToValues;
         }
 

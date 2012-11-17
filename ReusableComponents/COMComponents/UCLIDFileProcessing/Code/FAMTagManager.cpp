@@ -8,25 +8,28 @@
 #include <LicenseMgmt.h>
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
-#include <TextFunctionExpander.h>
 
 //--------------------------------------------------------------------------------------------------
 // Tag names
 //--------------------------------------------------------------------------------------------------
 const std::string strSOURCE_DOC_NAME_TAG = "<SourceDocName>";
 const std::string strFPS_FILE_DIR_TAG = "<FPSFileDir>";
+const std::string strCOMMON_COMPONENTS_DIR_TAG = "<CommonComponentsDir>";
 
 //--------------------------------------------------------------------------------------------------
 // CFAMTagManager
 //--------------------------------------------------------------------------------------------------
 CFAMTagManager::CFAMTagManager()
+: m_ipMiscUtils(CLSID_MiscUtils)
 {
+	ASSERT_RESOURCE_ALLOCATION("ELI35226", m_ipMiscUtils != __nullptr);
 }
 //--------------------------------------------------------------------------------------------------
 CFAMTagManager::~CFAMTagManager()
 {
 	try
 	{
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16523");
 }
@@ -63,10 +66,10 @@ STDMETHODIMP CFAMTagManager::get_FPSFileDir(BSTR *strFPSDir)
 		ASSERT_ARGUMENT("ELI24981", strFPSDir != __nullptr);
 
 		*strFPSDir = _bstr_t(m_strFPSDir.c_str()).Detach();
+
+		return S_OK;		
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14383");
-
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CFAMTagManager::put_FPSFileDir(BSTR strFPSDir)
@@ -77,13 +80,13 @@ STDMETHODIMP CFAMTagManager::put_FPSFileDir(BSTR strFPSDir)
 		validateLicense();
 
 		m_strFPSDir = asString(strFPSDir);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14384");
-
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFAMTagManager::ExpandTags(BSTR bstrInput, BSTR bstrSourceName, BSTR *pbstrOutput)
+STDMETHODIMP CFAMTagManager::raw_ExpandTags(BSTR bstrInput, LPVOID pData, BSTR *pbstrOutput)
 {
 	try
 	{
@@ -95,18 +98,18 @@ STDMETHODIMP CFAMTagManager::ExpandTags(BSTR bstrInput, BSTR bstrSourceName, BST
 		// The code is used to expand tags, currently it support <SourceDocName> 
 		// and <FPSFile>
 		std::string strInput = asString(bstrInput);
-		std::string strSourceDocName = asString(bstrSourceName);
+		std::string strSourceDocName = asString((BSTR)pData);
 
 		expandTags(strInput, strSourceDocName);
 
 		*pbstrOutput = _bstr_t(strInput.c_str()).Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14389");
-
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFAMTagManager::ExpandTagsAndFunctions(BSTR bstrInput, BSTR bstrSourceName, BSTR *pbstrOutput)
+STDMETHODIMP CFAMTagManager::ExpandTags(BSTR bstrInput, BSTR bstrSourceName, BSTR *pbstrOutput)
 {
 	try
 	{
@@ -122,17 +125,59 @@ STDMETHODIMP CFAMTagManager::ExpandTagsAndFunctions(BSTR bstrInput, BSTR bstrSou
 
 		expandTags(strInput, strSourceDocName);
 
-		TextFunctionExpander tfe;
-		strInput = tfe.expandFunctions(strInput); 
-
 		*pbstrOutput = _bstr_t(strInput.c_str()).Detach();
+	
+		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34850");
-
-	return S_OK;
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14389");
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFAMTagManager::GetBuiltInTags(IVariantVector* *ppTags)
+STDMETHODIMP CFAMTagManager::raw_ExpandTagsAndFunctions(BSTR bstrInput, LPVOID pData,
+	BSTR *pbstrOutput)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI35227", pbstrOutput != __nullptr);
+
+		// Check license
+		validateLicense();
+
+		ITagUtilityPtr ipThis(this);
+		ASSERT_RESOURCE_ALLOCATION("ELI35228", ipThis != __nullptr);
+
+		_bstr_t bstrOutput = m_ipMiscUtils->ExpandTagsAndFunctions(
+			bstrInput, ipThis, pData);
+
+		*pbstrOutput = bstrOutput.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35229");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::ExpandTagsAndFunctions(BSTR bstrInput, BSTR bstrSourceName, BSTR *pbstrOutput)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI35230", pbstrOutput != __nullptr);
+
+		// Check license
+		validateLicense();
+
+		ITagUtilityPtr ipThis(this);
+		ASSERT_RESOURCE_ALLOCATION("ELI35231", ipThis != __nullptr);
+
+		_bstr_t bstrOutput = m_ipMiscUtils->ExpandTagsAndFunctions(
+			bstrInput, ipThis, bstrSourceName);
+
+		*pbstrOutput = bstrOutput.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35232");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::raw_GetBuiltInTags(IVariantVector* *ppTags)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -145,18 +190,19 @@ STDMETHODIMP CFAMTagManager::GetBuiltInTags(IVariantVector* *ppTags)
 		ASSERT_RESOURCE_ALLOCATION("ELI14396", ipVec != __nullptr);
 
 		// Push the current tags into vector, currrently we
-		// only have <SourceDocName> and <FPSFileDir>
+		// only have <SourceDocName>, <FPSFileDir> and <CommonComponentsDir>
 		ipVec->PushBack(get_bstr_t(strSOURCE_DOC_NAME_TAG));
 		ipVec->PushBack(get_bstr_t(strFPS_FILE_DIR_TAG));
+		ipVec->PushBack(get_bstr_t(strCOMMON_COMPONENTS_DIR_TAG));
 
 		*ppTags = ipVec.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14390");
-	
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFAMTagManager::GetINIFileTags(IVariantVector* *ppTags)
+STDMETHODIMP CFAMTagManager::raw_GetINIFileTags(IVariantVector* *ppTags)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -171,13 +217,13 @@ STDMETHODIMP CFAMTagManager::GetINIFileTags(IVariantVector* *ppTags)
 		// Currently we do not have any INI file tags
 
 		*ppTags = ipVec.Detach();	
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14391");
-	
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFAMTagManager::GetAllTags(IVariantVector* *ppTags)
+STDMETHODIMP CFAMTagManager::raw_GetAllTags(IVariantVector* *ppTags)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -186,7 +232,7 @@ STDMETHODIMP CFAMTagManager::GetAllTags(IVariantVector* *ppTags)
 		// Check license
 		validateLicense();
 
-		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipThis(this);
+		ITagUtilityPtr ipThis(this);
 		ASSERT_RESOURCE_ALLOCATION("ELI14397", ipThis != __nullptr);
 
 		// Call GetBuiltInTags() and GetINIFileTags()
@@ -196,10 +242,52 @@ STDMETHODIMP CFAMTagManager::GetAllTags(IVariantVector* *ppTags)
 		ipVec1->Append(ipVec2);
 
 		*ppTags = ipVec1.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14392");
-	
-	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::raw_GetFunctionNames(IVariantVector** ppFunctionNames)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI35233", ppFunctionNames != __nullptr);
+
+		ITagUtilityPtr ipTagUtility(m_ipMiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI35234", ipTagUtility != __nullptr);
+
+		IVariantVectorPtr ipFunctions = ipTagUtility->GetFunctionNames();
+		ASSERT_RESOURCE_ALLOCATION("ELI35235", ipFunctions != __nullptr);
+
+		*ppFunctionNames = ipFunctions.Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35236");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::raw_GetFormattedFunctionNames(IVariantVector** ppFunctionNames)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI35237", ppFunctionNames != __nullptr);
+
+		ITagUtilityPtr ipTagUtility(m_ipMiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI35238", ipTagUtility != __nullptr);
+
+		IVariantVectorPtr ipFunctions = ipTagUtility->GetFormattedFunctionNames();
+		ASSERT_RESOURCE_ALLOCATION("ELI35239", ipFunctions != __nullptr);
+
+		*ppFunctionNames = ipFunctions.Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35240");
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CFAMTagManager::StringContainsInvalidTags(BSTR strInput, VARIANT_BOOL *pbValue)
@@ -221,6 +309,7 @@ STDMETHODIMP CFAMTagManager::StringContainsInvalidTags(BSTR strInput, VARIANT_BO
 		// if we reached here, that means that all tags defined were valid.
 		// so return true.
 		*pbValue = VARIANT_FALSE;
+
 		return S_OK;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14393");
@@ -256,10 +345,10 @@ STDMETHODIMP CFAMTagManager::StringContainsTags(BSTR strInput, VARIANT_BOOL *pbV
 
 		// return true as long as there's at least one tag
 		*pbValue = vecTagNames.empty() ? VARIANT_FALSE : VARIANT_TRUE;
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14395");
-	
-	return S_OK;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -340,6 +429,7 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 {
 	bool bSourceDocNameTagFound = rstrInput.find(strSOURCE_DOC_NAME_TAG) != string::npos;
 	bool bFPSFileDirTagFound = rstrInput.find(strFPS_FILE_DIR_TAG) != string::npos;
+	bool bCommonComponentsDirFound = rstrInput.find(strCOMMON_COMPONENTS_DIR_TAG) != string::npos;
 
 	// expand the strSOURCE_DOC_NAME_TAG tag with the appropriate value
 	if (bSourceDocNameTagFound)
@@ -370,6 +460,14 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 			throw ue;
 		}
 		replaceVariable(rstrInput, strFPS_FILE_DIR_TAG, m_strFPSDir);
+	}
+
+	if (bCommonComponentsDirFound)
+	{
+		const string strCommonComponentsDir = getModuleDirectory("BaseUtils.dll");
+
+		// Replace the common components dir tag
+		replaceVariable(rstrInput, strCOMMON_COMPONENTS_DIR_TAG, strCommonComponentsDir);
 	}
 }
 //-------------------------------------------------------------------------------------------------

@@ -188,7 +188,7 @@ LRESULT CAFConvertVOAToXMLTaskPP::OnClickedBtnDocTags(WORD wNotifyCode,
 
 	try
 	{	
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnVOAFileSelectTag,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnVOAFileSelectTag,
 			m_editVOAFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26250");

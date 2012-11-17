@@ -9,7 +9,6 @@
 #include <AFTagManager.h>
 #include <ComponentLicenseIDs.h>
 #include <ComUtils.h>
-#include <TextFunctionExpander.h>
 #include <DocTagUtils.h>
 
 //-------------------------------------------------------------------------------------------------
@@ -249,11 +248,11 @@ LRESULT COutputToXMLPP::OnClickedSelectDocTag(WORD wNotifyCode, WORD wID, HWND h
 	{
 		if (m_bFAMTags)
 		{
-			ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectDocTag, m_editFileName);
+			ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnSelectDocTag, m_editFileName);
 		}
 		else
 		{
-			ChooseDocTagForEditBox(IAFUtilityPtr(CLSID_AFUtility), m_btnSelectDocTag, m_editFileName);
+			ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_AFUtility), m_btnSelectDocTag, m_editFileName);
 		}
 		
 	}

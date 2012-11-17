@@ -3888,6 +3888,9 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 	{
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
+		CFileProcessingDB *pDB = static_cast<CFileProcessingDB *>(pData);
+		ASSERT_ARGUMENT("ELI35126", pDB != __nullptr);
+
 		// Stagger the start of the maintainence threads so that, at least initially, the threads
 		// aren't firing at the same time. Use a random time so that if a bunch of processes are
 		// started simultaneously, they don't all hit the DB at the same time.
@@ -3895,10 +3898,7 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 		rand_s(&nTimeToSleep);
 		// Somewhere between 1/4 and 3/4 of gnPING_TIMEOUT.
 		nTimeToSleep = (nTimeToSleep % (gnPING_TIMEOUT / 2)) + (gnPING_TIMEOUT / 4);
-		Sleep(nTimeToSleep);
-
-		CFileProcessingDB *pDB = static_cast<CFileProcessingDB *>(pData);
-		ASSERT_ARGUMENT("ELI35126", pDB != __nullptr);
+		pDB->m_eventStopMaintainenceThreads.wait(nTimeToSleep);
 
 		// Enclose so that the exited event can always be signaled if it can be.
 		try

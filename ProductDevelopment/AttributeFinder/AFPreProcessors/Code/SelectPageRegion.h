@@ -160,7 +160,7 @@ private:
 	ISpatialStringSearcherPtr m_ipSpatialStringSearcher;
 
 	// Utility Functions
-	IAFUtilityPtr m_ipAFUtility;
+	ITagUtilityPtr m_ipAFTagUtility;
 
 	// For RegEx parser.
 	IMiscUtilsPtr m_ipMiscUtils;

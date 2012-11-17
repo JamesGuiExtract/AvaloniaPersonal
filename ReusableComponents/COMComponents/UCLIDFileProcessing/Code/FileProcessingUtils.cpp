@@ -3,7 +3,6 @@
 #include "FileProcessingUtils.h"
 
 #include <LicenseMgmt.h>
-#include <TextFunctionExpander.h>
 #include <cpputil.h>
 #include <ComUtils.h>
 
@@ -32,22 +31,17 @@ const string CFileProcessingUtils::ExpandTagsAndTFE(UCLID_FILEPROCESSINGLib::IFA
 	// after expanding: strFile = "C:\RedactionDemo\FPS\123.dat"
 	//////////////////////////////////////////////////////////////////////////
 
-	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipTag = UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr(pFAMTM);
-	ASSERT_RESOURCE_ALLOCATION("ELI18001", ipTag != __nullptr);
+	IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
+	ASSERT_RESOURCE_ALLOCATION("ELI35241", ipMiscUtils != __nullptr);
+
+	ITagUtilityPtr ipTag(pFAMTM);
+	ASSERT_RESOURCE_ALLOCATION("ELI35242", ipTag != __nullptr);
 
 	// Pass the file name with the tags(strFile) and the source doc name(strSourceDocName) as parameters to Expandtags
 	// If file name contains <SourceDocName>, ExpandTags() will use strSourceDocName to expand it [P13: 3901]
-	_bstr_t bstrFile = ipTag->ExpandTags( _bstr_t(strFile.c_str()), _bstr_t(strSourceDocName.c_str()) );
+	_bstr_t bstrFile = ipMiscUtils->ExpandTagsAndFunctions(_bstr_t(strFile.c_str()), ipTag,
+		_bstr_t(strSourceDocName.c_str()).Detach());
 	string strExpandedFile = asString(bstrFile);
-
-	////////////////////////////////////////////////////////////////////////////
-	// Expand function in strFile
-	// e.g. Before expanding: strFile = "$DirOf(C:\123.dat)\$FileOf(C:\123.dat)"
-	// After expanding: strFileName = "C:\123.dat"
-	////////////////////////////////////////////////////////////////////////////
-
-	TextFunctionExpander tfe;
-	strExpandedFile = tfe.expandFunctions(strExpandedFile); 
 
 	return strExpandedFile;
 }

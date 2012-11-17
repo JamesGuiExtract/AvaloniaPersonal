@@ -194,7 +194,7 @@ LRESULT CManageTagsTaskPP::OnClickedBtnTagsDocTags(WORD wNotifyCode, WORD wID,
 
 	try
 	{
-		ChooseDocTagForComboBox(IFAMTagManagerPtr(CLSID_FAMTagManager),m_btnTagsDocTags,
+		ChooseDocTagForComboBox(ITagUtilityPtr(CLSID_FAMTagManager),m_btnTagsDocTags,
 			m_comboTags, m_dwComboTagsSel);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31988");

@@ -58,17 +58,19 @@ CSelectPageRegion::CSelectPageRegion()
 	// For getImagePixelHeightAndWidth.
 	initPDFSupport();
 
-	m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-	ASSERT_RESOURCE_ALLOCATION("ELI09753", m_ipAFUtility != __nullptr);
+	m_ipAFTagUtility.CreateInstance(CLSID_AFUtility);
+	ASSERT_RESOURCE_ALLOCATION("ELI09753", m_ipAFTagUtility != __nullptr);
 
 	m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-	ASSERT_RESOURCE_ALLOCATION("ELI32932", m_ipAFUtility != __nullptr);
+	ASSERT_RESOURCE_ALLOCATION("ELI32932", m_ipMiscUtils != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CSelectPageRegion::~CSelectPageRegion()
 {
 	try
 	{
+		m_ipAFTagUtility = __nullptr;
+		m_ipMiscUtils = __nullptr;
 		m_ipSpatialStringSearcher = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16326");
@@ -1397,7 +1399,7 @@ bool CSelectPageRegion::isRegExFoundOnPage(string strPageText, const IAFDocument
 	try
 	{
 		string rootTag = "<RSDFileDir>";
-		strRootFolder = m_ipAFUtility->ExpandTags(rootTag.c_str(), ipAFDoc );
+		strRootFolder = m_ipAFTagUtility->ExpandTags(rootTag.c_str(), ipAFDoc);
 	}
 	catch(...)
 	{

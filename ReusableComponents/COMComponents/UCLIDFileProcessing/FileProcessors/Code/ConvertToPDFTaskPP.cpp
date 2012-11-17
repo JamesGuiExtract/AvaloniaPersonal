@@ -218,7 +218,7 @@ LRESULT CConvertToPDFTaskPP::OnClickedBtnInputImageDocTag(WORD wNotifyCode, WORD
 
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnInputImageDocTag,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnInputImageDocTag,
 			m_editInputImage);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19217");

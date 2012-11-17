@@ -253,7 +253,7 @@ LRESULT CFilterIDShieldDataFileTaskPP::OnClickedButtonInputTags(WORD wNotifyCode
 
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnInputTags,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnInputTags,
 			m_editVOAFileToRead);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24839");
@@ -294,7 +294,7 @@ LRESULT CFilterIDShieldDataFileTaskPP::OnClickedButtonOutputTags(WORD wNotifyCod
 
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnOutputTags,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnOutputTags,
 			m_editVOAFileToWrite);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24841");

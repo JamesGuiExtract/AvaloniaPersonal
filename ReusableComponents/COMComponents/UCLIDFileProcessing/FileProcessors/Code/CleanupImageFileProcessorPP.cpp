@@ -123,7 +123,7 @@ LRESULT CCleanupImageFileProcessorPP::OnClickedBtnFileSelectTag(WORD wNotifyCode
 
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectTag,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnSelectTag,
 			m_edtSettingsFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI17353");

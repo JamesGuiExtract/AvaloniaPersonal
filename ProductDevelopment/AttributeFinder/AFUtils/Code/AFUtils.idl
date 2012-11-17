@@ -483,22 +483,6 @@ library UCLID_AFUTILSLib
 		//-----------------------------------------------------------------------------------------
 		[id(23), helpstring("method SortAttributesSpatially")] HRESULT SortAttributesSpatially( [in, out] IIUnknownVector* pAttributes);
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To return a list of all the tags built-in to AttributeFinder (i.e. RSDFileDir...)
-		// REQUIRE: NONE
-		// PROMISE: If there are no built-in tags an empty vector (not NULL) will be returned
-		[id(24), helpstring("method GetBuiltInTags")] HRESULT GetBuiltInTags( [out, retval] IVariantVector** ppTags);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To return a list of all the tags specified by the user in their UCLIDAFCore.ini file
-		// REQUIRE: NONE
-		// PROMISE: If there are tags in the .ini file an empty vector (not NULL) will be returned
-		[id(25), helpstring("method GetINIFileTags")] HRESULT GetINIFileTags( [out, retval] IVariantVector** ppTags);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To return a list of all the available AttributeFinderTags
-		// REQUIRE: NONE
-		// PROMISE: This will be a combined list of all the tags in GetBuiltInTags + the tags in 
-		//			GetBuiltINIFileTags
-		[id(26), helpstring("method GetAllTags")] HRESULT GetAllTags( [out, retval] IVariantVector** ppTags);
-		//-----------------------------------------------------------------------------------------
 		// Takes a delimited string and converts each token into an attribute and then stores it in the vector
 		[id(27), helpstring("method GetAttributesFromDelimitedString")] HRESULT
 			GetAttributesFromDelimitedString([in] BSTR bstrFileName, [in] BSTR bstrDelimiter,
@@ -761,6 +745,7 @@ library UCLID_AFUTILSLib
 	{
 		[default] interface IAFUtility;
 		interface ILicensedComponent;
+		interface ITagUtility;
 	};
 
 	[

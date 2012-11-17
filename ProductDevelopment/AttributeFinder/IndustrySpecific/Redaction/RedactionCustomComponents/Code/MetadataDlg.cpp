@@ -151,7 +151,7 @@ void CMetadataDlg::OnBnClickedButtonSelectMetaTag()
 {
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectMetaTag,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnSelectMetaTag,
 			m_editMetaOutputName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24537")

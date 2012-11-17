@@ -178,7 +178,7 @@ void CImageOutputDlg::OnBnClickedButtonSelectImageTag()
 {
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectImgTag,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnSelectImgTag,
 			m_editOutputImageName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24541")

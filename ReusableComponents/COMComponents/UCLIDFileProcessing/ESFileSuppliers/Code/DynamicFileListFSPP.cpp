@@ -127,7 +127,7 @@ LRESULT CDynamicFileListFSPP::OnBnClickedBtnSelectDocTag(WORD wNotifyCode, WORD 
 
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectDocTag,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnSelectDocTag,
 			m_editFileName, false);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13970");

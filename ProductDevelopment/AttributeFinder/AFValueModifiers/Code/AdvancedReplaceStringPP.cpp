@@ -274,7 +274,7 @@ LRESULT CAdvancedReplaceStringPP::OnClickedSelectFindDocTag(WORD wNotifyCode, WO
 
 	try
 	{
-		ChooseDocTagForEditBox(IAFUtilityPtr(CLSID_AFUtility), m_btnSelectFindDocTag, m_editFindString);
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_AFUtility), m_btnSelectFindDocTag, m_editFindString);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14511");
 
@@ -287,7 +287,7 @@ LRESULT CAdvancedReplaceStringPP::OnClickedSelectReplaceDocTag(WORD wNotifyCode,
 
 	try
 	{
-		ChooseDocTagForEditBox(IAFUtilityPtr(CLSID_AFUtility), m_btnSelectFindDocTag, m_editReplaceString);
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_AFUtility), m_btnSelectFindDocTag, m_editReplaceString);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14512");
 

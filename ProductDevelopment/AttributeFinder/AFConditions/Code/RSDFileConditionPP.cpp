@@ -133,7 +133,7 @@ LRESULT CRSDFileConditionPP::OnClickedSelectDocTag(WORD wNotifyCode, WORD wID, H
 
 	try
 	{
-		ChooseDocTagForEditBox(IAFUtilityPtr(CLSID_AFUtility), m_btnSelectDocTag, m_editRSDFileName);
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_AFUtility), m_btnSelectDocTag, m_editRSDFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15715");
 

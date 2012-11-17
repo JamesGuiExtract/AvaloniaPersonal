@@ -147,6 +147,8 @@ private:
 
 	IAFUtilityPtr m_ipAFUtility;
 
+	IFAMTagManagerPtr m_ipFAMTagManager;
+
 	// Object to find attributes if necessary
 	IAttributeFinderEnginePtr	m_ipAttrFinderEngine;
 

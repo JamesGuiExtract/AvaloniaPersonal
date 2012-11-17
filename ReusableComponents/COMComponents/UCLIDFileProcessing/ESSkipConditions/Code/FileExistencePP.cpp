@@ -134,7 +134,7 @@ LRESULT CFileExistencePP::OnBnClickedBtnSelectDocTag(WORD wNotifyCode, WORD wID,
 
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectDocTag, m_FileName);
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnSelectDocTag, m_FileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13577");
 

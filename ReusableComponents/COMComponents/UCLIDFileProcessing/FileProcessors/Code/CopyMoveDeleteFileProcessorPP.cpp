@@ -361,7 +361,7 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnClickedBtnSrcSelectTag(WORD wNotifyCod
 
 	try
 	{
-		ChooseDocTagForComboBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSrcSelectTag, m_cmbSrc,
+		ChooseDocTagForComboBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnSrcSelectTag, m_cmbSrc,
 			m_dwSelSrc);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12189");
@@ -394,7 +394,7 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnClickedBtnDstSelectTag(WORD wNotifyCod
 
 	try
 	{
-		ChooseDocTagForComboBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnDstSelectTag, m_cmbDst,
+		ChooseDocTagForComboBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnDstSelectTag, m_cmbDst,
 			m_dwSelDst);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12191");

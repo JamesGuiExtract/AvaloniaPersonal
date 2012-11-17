@@ -126,7 +126,7 @@ LRESULT CFindFromRSDPP::OnClickedSelectDocTag(WORD wNotifyCode, WORD wID, HWND h
 
 	try
 	{
-		ChooseDocTagForEditBox(IAFUtilityPtr(CLSID_AFUtility), m_btnSelectDocTag, m_editRSDFileName);
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_AFUtility), m_btnSelectDocTag, m_editRSDFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12007");
 

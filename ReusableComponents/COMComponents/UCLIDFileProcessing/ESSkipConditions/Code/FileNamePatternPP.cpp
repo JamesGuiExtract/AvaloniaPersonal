@@ -166,7 +166,7 @@ LRESULT CFileNamePatternPP::OnBnClickedBtnSelectDocTag(WORD wNotifyCode, WORD wI
 
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectDocTag,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnSelectDocTag,
 			m_FileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13659");
@@ -180,7 +180,7 @@ LRESULT CFileNamePatternPP::OnBnClickedBtnSelectDocTag2(WORD wNotifyCode, WORD w
 
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectDocTag2,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnSelectDocTag2,
 			m_RegFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13660");

@@ -265,7 +265,7 @@ void CFeedbackDlg::OnBnClickedButtonSelectFeedbackFolderTag()
 {
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnFeedbackFolderTag,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnFeedbackFolderTag,
 			m_editFeedbackFolder);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24545")

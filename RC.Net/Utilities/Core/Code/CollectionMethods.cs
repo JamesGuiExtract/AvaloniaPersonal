@@ -247,6 +247,31 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Converts <see paramref="enumerable"/> into an <see cref="VariantVector"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of object in the enumerable.</typeparam>
+        /// <param name="enumerable">The <see cref="IEnumerable{T}"/> to convert.</param>
+        /// <returns>An <see cref="VariantVector"/> of type <see paramref="T"/>.</returns>
+        [CLSCompliant(false)]
+        public static VariantVector ToVariantVector<T>(this IEnumerable<T> enumerable)
+        {
+            try
+            {
+                VariantVector vector = new VariantVector();
+                foreach (T value in enumerable)
+                {
+                    vector.PushBack(value);
+                }
+
+                return vector;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI35186", ex);
+            }
+        }
+
+        /// <summary>
         /// Converts <see paramref="comVector"/> into an <see cref="IEnumerable"/>.
         /// </summary>
         /// <typeparam name="T">The type of object in the vector.</typeparam>

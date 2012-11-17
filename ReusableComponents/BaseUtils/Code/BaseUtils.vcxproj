@@ -302,7 +302,6 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="TemporaryResourceOverride.cpp" />
-    <ClCompile Include="TextFunctionExpander.cpp" />
     <ClCompile Include="ThreadSafeLogFile.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -385,6 +384,7 @@
     <ClInclude Include="CursorToolTipCtrl.h" />
     <ClInclude Include="DateUtil.h" />
     <ClInclude Include="DocTagUtils.h" />
+    <ClInclude Include="QuickMenuChooser.h" />
     <ClInclude Include="VectorOperations.h" />
     <ClInclude Include="WindowPersistenceMgr.h" />
     <ClInclude Include="EncryptedFileManager.h" />
@@ -449,7 +449,6 @@
     <ClInclude Include="ProgressDlgTaskRunner.h" />
     <ClInclude Include="Prompt2Dlg.h" />
     <ClInclude Include="PromptDlg.h" />
-    <ClInclude Include="QuickMenuChooser.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="RegConstants.h" />
     <ClInclude Include="RegExLoader.h" />
@@ -471,7 +470,6 @@
     <ClInclude Include="TaskManager.h" />
     <ClInclude Include="TemporaryFileName.h" />
     <ClInclude Include="TemporaryResourceOverride.h" />
-    <ClInclude Include="TextFunctionExpander.h" />
     <ClInclude Include="ThreadSafeLogFile.h" />
     <ClInclude Include="TimedRetryDlg.h" />
     <ClInclude Include="TimeIntervalMerger.h" />

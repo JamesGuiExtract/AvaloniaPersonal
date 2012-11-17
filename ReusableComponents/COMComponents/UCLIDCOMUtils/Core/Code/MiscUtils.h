@@ -14,6 +14,7 @@ class ATL_NO_VTABLE CMiscUtils :
 	public CComCoClass<CMiscUtils, &CLSID_MiscUtils>,
 	public ISupportErrorInfo,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
+	public IDispatchImpl<ITagUtility, &IID_ITagUtility, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<IMiscUtils, &IID_IMiscUtils, &LIBID_UCLID_COMUTILSLib>
 {
 public:
@@ -26,6 +27,7 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 BEGIN_COM_MAP(CMiscUtils)
 	COM_INTERFACE_ENTRY(IMiscUtils)
 	COM_INTERFACE_ENTRY2(IDispatch, IMiscUtils)
+	COM_INTERFACE_ENTRY(ITagUtility)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
 END_COM_MAP()
 
@@ -35,6 +37,15 @@ public:
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
+
+// ITagUtility
+	STDMETHOD(ExpandTags)(BSTR bstrInput, LPVOID pData, BSTR* pbstrOutput);
+	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, LPVOID pData, BSTR* pbstrOutput);
+	STDMETHOD(GetBuiltInTags)(IVariantVector** ppTags);
+	STDMETHOD(GetINIFileTags)(IVariantVector** ppTags);
+	STDMETHOD(GetAllTags)(IVariantVector** ppTags);
+	STDMETHOD(GetFunctionNames)(IVariantVector** ppFunctionNames);
+	STDMETHOD(GetFormattedFunctionNames)(IVariantVector** ppFunctionNames);
 
 // IMiscUtils
 	STDMETHOD(AutoEncryptFile)(/*[in]*/ BSTR strFile, /*[in]*/ BSTR strRegistryKey);
@@ -89,7 +100,8 @@ public:
 	STDMETHOD(GetObjectFromStringizedByteStream)(BSTR bstrByteStream, IUnknown** ppObject);
 
 	STDMETHOD(GetExpandedTags)(BSTR bstrString, BSTR bstrSourceDocName, BSTR* pbstrExpanded);
-	STDMETHOD(GetExpansionFunctionNames)(IVariantVector** ppFunctionNames);
+	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, ITagUtility *pTagUtility, LPVOID pData,
+		BSTR* pbstrOutput);
 
 	// PROMISE:	Determines whether the specified object supports configuration either via
 	//			ISpecifyPropertyPages or IConfigurableObject

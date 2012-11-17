@@ -482,7 +482,7 @@ void FileProcessingDlgTaskPage::OnBtnErrorSelectDocTag()
 
 	try
 	{
-		ChooseDocTagForEditBox(UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr(CLSID_FAMTagManager),
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager),
 			m_btnErrorSelectTag, m_editErrorLog);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16079")

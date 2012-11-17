@@ -365,7 +365,7 @@ LRESULT CAFEngineFileProcessorPP::OnClickedBtnRulesFileDocTags(WORD wNotifyCode,
 
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnRuleFileSelectTag,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnRuleFileSelectTag,
 			m_editRuleFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26657");
@@ -379,7 +379,7 @@ LRESULT CAFEngineFileProcessorPP::OnClickedBtnDataInputDocTags(WORD wNotifyCode,
 
 	try
 	{
-		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnDataInputSelectTag,
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnDataInputSelectTag,
 			m_editDataInputFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI34813");
