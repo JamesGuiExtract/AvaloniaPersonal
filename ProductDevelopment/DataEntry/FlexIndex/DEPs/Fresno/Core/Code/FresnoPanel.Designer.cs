@@ -122,16 +122,16 @@
             this._storagePressureComboBox = new Extract.DataEntry.DataEntryComboBox();
             this._storageTemperatureComboBox = new Extract.DataEntry.DataEntryComboBox();
             this._componentTable = new Extract.DataEntry.DataEntryTable();
-            this._componentWeightColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentEhsColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentCasColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._mapNumberTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._gridNumberTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._locationConfidentialComboBox = new Extract.DataEntry.DataEntryComboBox();
             this._tradeSecretComboBox = new Extract.DataEntry.DataEntryComboBox();
             this._extremelyHazardousSubstanceComboBox = new Extract.DataEntry.DataEntryComboBox();
             this._curiesTextBox = new Extract.DataEntry.DataEntryTextBox();
+            this._componentWeightColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentEhsColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentCasColumn = new Extract.DataEntry.DataEntryTableColumn();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -690,6 +690,7 @@
             this._hazardousMaterialTypeComboBox.Location = new System.Drawing.Point(158, 215);
             this._hazardousMaterialTypeComboBox.Name = "_hazardousMaterialTypeComboBox";
             this._hazardousMaterialTypeComboBox.Size = new System.Drawing.Size(129, 21);
+            this._hazardousMaterialTypeComboBox.SupportsSwiping = false;
             this._hazardousMaterialTypeComboBox.TabIndex = 121;
             this._hazardousMaterialTypeComboBox.ValidationErrorMessage = "Hazardous material type is a required field";
             this._hazardousMaterialTypeComboBox.ValidationPattern = "\\S";
@@ -704,6 +705,7 @@
             this._radioactiveComboBox.Location = new System.Drawing.Point(425, 215);
             this._radioactiveComboBox.Name = "_radioactiveComboBox";
             this._radioactiveComboBox.Size = new System.Drawing.Size(129, 21);
+            this._radioactiveComboBox.SupportsSwiping = false;
             this._radioactiveComboBox.TabIndex = 123;
             this._radioactiveComboBox.ValidationErrorMessage = "Invalid value";
             this._radioactiveComboBox.ValidationQuery = "[BLANK]\r\nNo\r\nYes";
@@ -718,6 +720,7 @@
             this._physicalStateComboBox.Location = new System.Drawing.Point(158, 265);
             this._physicalStateComboBox.Name = "_physicalStateComboBox";
             this._physicalStateComboBox.Size = new System.Drawing.Size(129, 21);
+            this._physicalStateComboBox.SupportsSwiping = false;
             this._physicalStateComboBox.TabIndex = 127;
             this._physicalStateComboBox.ValidationErrorMessage = "Physical state is a required field";
             this._physicalStateComboBox.ValidationPattern = "\\S";
@@ -745,6 +748,7 @@
             this._fireTextBox.ParentDataEntryControl = this._federalHazardCategoriesGroupBox;
             this._fireTextBox.ReadOnly = true;
             this._fireTextBox.Size = new System.Drawing.Size(15, 21);
+            this._fireTextBox.SupportsSwiping = false;
             this._fireTextBox.TabIndex = 101;
             this._fireTextBox.ValidationErrorMessage = "Invalid value";
             this._fireTextBox.ValidationQuery = "<Query ValidationListType=\'AutoCompleteOnly\'>\r\n[BLANK]\r\nX\r\n</Query>";
@@ -783,6 +787,7 @@
             this._chronicHealthTextBox.ParentDataEntryControl = this._federalHazardCategoriesGroupBox;
             this._chronicHealthTextBox.ReadOnly = true;
             this._chronicHealthTextBox.Size = new System.Drawing.Size(15, 21);
+            this._chronicHealthTextBox.SupportsSwiping = false;
             this._chronicHealthTextBox.TabIndex = 109;
             this._chronicHealthTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._chronicHealthTextBox.ValidationErrorMessage = "Invalid value";
@@ -799,6 +804,7 @@
             this._acuteHealthTextBox.ParentDataEntryControl = this._federalHazardCategoriesGroupBox;
             this._acuteHealthTextBox.ReadOnly = true;
             this._acuteHealthTextBox.Size = new System.Drawing.Size(15, 21);
+            this._acuteHealthTextBox.SupportsSwiping = false;
             this._acuteHealthTextBox.TabIndex = 107;
             this._acuteHealthTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._acuteHealthTextBox.ValidationErrorMessage = "Invalid value";
@@ -815,6 +821,7 @@
             this._pressureReleaseTextBox.ParentDataEntryControl = this._federalHazardCategoriesGroupBox;
             this._pressureReleaseTextBox.ReadOnly = true;
             this._pressureReleaseTextBox.Size = new System.Drawing.Size(15, 21);
+            this._pressureReleaseTextBox.SupportsSwiping = false;
             this._pressureReleaseTextBox.TabIndex = 105;
             this._pressureReleaseTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._pressureReleaseTextBox.ValidationErrorMessage = "Invalid value";
@@ -831,6 +838,7 @@
             this._reactiveTextBox.ParentDataEntryControl = this._federalHazardCategoriesGroupBox;
             this._reactiveTextBox.ReadOnly = true;
             this._reactiveTextBox.Size = new System.Drawing.Size(15, 21);
+            this._reactiveTextBox.SupportsSwiping = false;
             this._reactiveTextBox.TabIndex = 103;
             this._reactiveTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._reactiveTextBox.ValidationErrorMessage = "Invalid value";
@@ -896,6 +904,7 @@
             this._unitsComboBox.Location = new System.Drawing.Point(158, 425);
             this._unitsComboBox.Name = "_unitsComboBox";
             this._unitsComboBox.Size = new System.Drawing.Size(129, 21);
+            this._unitsComboBox.SupportsSwiping = false;
             this._unitsComboBox.TabIndex = 140;
             this._unitsComboBox.ValidationErrorMessage = "Units is a required field";
             this._unitsComboBox.ValidationPattern = "\\S";
@@ -1011,6 +1020,7 @@
             this._railCarTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._railCarTextBox.ReadOnly = true;
             this._railCarTextBox.Size = new System.Drawing.Size(15, 21);
+            this._railCarTextBox.SupportsSwiping = false;
             this._railCarTextBox.TabIndex = 133;
             this._railCarTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._railCarTextBox.ValidationErrorMessage = "Invalid value";
@@ -1027,6 +1037,7 @@
             this._tankWagonTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._tankWagonTextBox.ReadOnly = true;
             this._tankWagonTextBox.Size = new System.Drawing.Size(15, 21);
+            this._tankWagonTextBox.SupportsSwiping = false;
             this._tankWagonTextBox.TabIndex = 131;
             this._tankWagonTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._tankWagonTextBox.ValidationErrorMessage = "Invalid value";
@@ -1043,6 +1054,7 @@
             this._toteBinTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._toteBinTextBox.ReadOnly = true;
             this._toteBinTextBox.Size = new System.Drawing.Size(15, 21);
+            this._toteBinTextBox.SupportsSwiping = false;
             this._toteBinTextBox.TabIndex = 129;
             this._toteBinTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._toteBinTextBox.ValidationErrorMessage = "Invalid value";
@@ -1059,6 +1071,7 @@
             this._plasticBottleTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._plasticBottleTextBox.ReadOnly = true;
             this._plasticBottleTextBox.Size = new System.Drawing.Size(15, 21);
+            this._plasticBottleTextBox.SupportsSwiping = false;
             this._plasticBottleTextBox.TabIndex = 127;
             this._plasticBottleTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._plasticBottleTextBox.ValidationErrorMessage = "Invalid value";
@@ -1075,6 +1088,7 @@
             this._glassBottleTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._glassBottleTextBox.ReadOnly = true;
             this._glassBottleTextBox.Size = new System.Drawing.Size(15, 21);
+            this._glassBottleTextBox.SupportsSwiping = false;
             this._glassBottleTextBox.TabIndex = 125;
             this._glassBottleTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._glassBottleTextBox.ValidationErrorMessage = "Invalid value";
@@ -1091,6 +1105,7 @@
             this._cylinderTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._cylinderTextBox.ReadOnly = true;
             this._cylinderTextBox.Size = new System.Drawing.Size(15, 21);
+            this._cylinderTextBox.SupportsSwiping = false;
             this._cylinderTextBox.TabIndex = 123;
             this._cylinderTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._cylinderTextBox.ValidationErrorMessage = "Invalid value";
@@ -1107,6 +1122,7 @@
             this._boxTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._boxTextBox.ReadOnly = true;
             this._boxTextBox.Size = new System.Drawing.Size(15, 21);
+            this._boxTextBox.SupportsSwiping = false;
             this._boxTextBox.TabIndex = 121;
             this._boxTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._boxTextBox.ValidationErrorMessage = "Invalid value";
@@ -1123,6 +1139,7 @@
             this._bagTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._bagTextBox.ReadOnly = true;
             this._bagTextBox.Size = new System.Drawing.Size(15, 21);
+            this._bagTextBox.SupportsSwiping = false;
             this._bagTextBox.TabIndex = 119;
             this._bagTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._bagTextBox.ValidationErrorMessage = "Invalid value";
@@ -1139,6 +1156,7 @@
             this._fiberDrumTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._fiberDrumTextBox.ReadOnly = true;
             this._fiberDrumTextBox.Size = new System.Drawing.Size(15, 21);
+            this._fiberDrumTextBox.SupportsSwiping = false;
             this._fiberDrumTextBox.TabIndex = 117;
             this._fiberDrumTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._fiberDrumTextBox.ValidationErrorMessage = "Invalid value";
@@ -1155,6 +1173,7 @@
             this._siloTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._siloTextBox.ReadOnly = true;
             this._siloTextBox.Size = new System.Drawing.Size(15, 21);
+            this._siloTextBox.SupportsSwiping = false;
             this._siloTextBox.TabIndex = 115;
             this._siloTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._siloTextBox.ValidationErrorMessage = "Invalid value";
@@ -1171,6 +1190,7 @@
             this._carboyTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._carboyTextBox.ReadOnly = true;
             this._carboyTextBox.Size = new System.Drawing.Size(15, 21);
+            this._carboyTextBox.SupportsSwiping = false;
             this._carboyTextBox.TabIndex = 113;
             this._carboyTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._carboyTextBox.ValidationErrorMessage = "Invalid value";
@@ -1187,6 +1207,7 @@
             this._canTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._canTextBox.ReadOnly = true;
             this._canTextBox.Size = new System.Drawing.Size(15, 21);
+            this._canTextBox.SupportsSwiping = false;
             this._canTextBox.TabIndex = 111;
             this._canTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._canTextBox.ValidationErrorMessage = "Invalid value";
@@ -1203,6 +1224,7 @@
             this._plasticNonMetalicDrumTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._plasticNonMetalicDrumTextBox.ReadOnly = true;
             this._plasticNonMetalicDrumTextBox.Size = new System.Drawing.Size(15, 21);
+            this._plasticNonMetalicDrumTextBox.SupportsSwiping = false;
             this._plasticNonMetalicDrumTextBox.TabIndex = 109;
             this._plasticNonMetalicDrumTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._plasticNonMetalicDrumTextBox.ValidationErrorMessage = "Invalid value";
@@ -1219,6 +1241,7 @@
             this._steelDrumTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._steelDrumTextBox.ReadOnly = true;
             this._steelDrumTextBox.Size = new System.Drawing.Size(15, 21);
+            this._steelDrumTextBox.SupportsSwiping = false;
             this._steelDrumTextBox.TabIndex = 107;
             this._steelDrumTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._steelDrumTextBox.ValidationErrorMessage = "Invalid value";
@@ -1235,6 +1258,7 @@
             this._tankInsideBuildingTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._tankInsideBuildingTextBox.ReadOnly = true;
             this._tankInsideBuildingTextBox.Size = new System.Drawing.Size(15, 21);
+            this._tankInsideBuildingTextBox.SupportsSwiping = false;
             this._tankInsideBuildingTextBox.TabIndex = 105;
             this._tankInsideBuildingTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._tankInsideBuildingTextBox.ValidationErrorMessage = "Invalid value";
@@ -1251,6 +1275,7 @@
             this._undergroundTankTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._undergroundTankTextBox.ReadOnly = true;
             this._undergroundTankTextBox.Size = new System.Drawing.Size(15, 21);
+            this._undergroundTankTextBox.SupportsSwiping = false;
             this._undergroundTankTextBox.TabIndex = 103;
             this._undergroundTankTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._undergroundTankTextBox.ValidationErrorMessage = "Invalid value";
@@ -1267,6 +1292,7 @@
             this._aboveGroundTankTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._aboveGroundTankTextBox.ReadOnly = true;
             this._aboveGroundTankTextBox.Size = new System.Drawing.Size(15, 21);
+            this._aboveGroundTankTextBox.SupportsSwiping = false;
             this._aboveGroundTankTextBox.TabIndex = 101;
             this._aboveGroundTankTextBox.ValidationErrorMessage = "Invalid value";
             this._aboveGroundTankTextBox.ValidationQuery = "<Query ValidationListType=\'AutoCompleteOnly\'>\r\n[BLANK]\r\nX\r\n</Query>";
@@ -1282,6 +1308,7 @@
             this._storagePressureComboBox.Location = new System.Drawing.Point(158, 744);
             this._storagePressureComboBox.Name = "_storagePressureComboBox";
             this._storagePressureComboBox.Size = new System.Drawing.Size(94, 21);
+            this._storagePressureComboBox.SupportsSwiping = false;
             this._storagePressureComboBox.TabIndex = 145;
             this._storagePressureComboBox.ValidationErrorMessage = "Storage pressure is a required field";
             this._storagePressureComboBox.ValidationPattern = "\\S";
@@ -1296,6 +1323,7 @@
             this._storageTemperatureComboBox.Location = new System.Drawing.Point(425, 744);
             this._storageTemperatureComboBox.Name = "_storageTemperatureComboBox";
             this._storageTemperatureComboBox.Size = new System.Drawing.Size(129, 21);
+            this._storageTemperatureComboBox.SupportsSwiping = false;
             this._storageTemperatureComboBox.TabIndex = 147;
             this._storageTemperatureComboBox.ValidationErrorMessage = "Storage temperature is a required field";
             this._storageTemperatureComboBox.ValidationPattern = "\\S";
@@ -1322,52 +1350,6 @@
             this._componentTable.Size = new System.Drawing.Size(547, 126);
             this._componentTable.TabIndex = 148;
             this._componentTable.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleTable_CellValueChanged);
-            // 
-            // _componentWeightColumn
-            // 
-            this._componentWeightColumn.AttributeName = "Weight";
-            this._componentWeightColumn.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>/Component_WT_Default</Attribute></Query>";
-            this._componentWeightColumn.FillWeight = 15F;
-            this._componentWeightColumn.HeaderText = "Weight %";
-            this._componentWeightColumn.Name = "_componentWeightColumn";
-            this._componentWeightColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._componentWeightColumn.ValidationErrorMessage = "Component weight is required and must be numerical";
-            this._componentWeightColumn.ValidationPattern = "^[\\d\\.]+$";
-            // 
-            // _componentNameColumn
-            // 
-            this._componentNameColumn.AttributeName = "Name";
-            this._componentNameColumn.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>/Component_Name_Default</Attribute></Query>";
-            this._componentNameColumn.FillWeight = 50F;
-            this._componentNameColumn.HeaderText = "Hazardous Component";
-            this._componentNameColumn.Name = "_componentNameColumn";
-            this._componentNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._componentNameColumn.ValidationErrorMessage = "Component name is a required field";
-            this._componentNameColumn.ValidationPattern = "\\S";
-            this._componentNameColumn.ValidationQuery = "<Query ValidationListType=\'AutoCompleteOnly\'>\r\n<SQL>SELECT [Value] FROM [Previous" +
-    "lyUsedFieldValue] WHERE [FieldName] = \'Component_Name\'</SQL>\r\n</Query>";
-            // 
-            // _componentEhsColumn
-            // 
-            this._componentEhsColumn.AttributeName = "EHS";
-            this._componentEhsColumn.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>/Component_EHS_Default</Attribute></Query>";
-            this._componentEhsColumn.FillWeight = 15F;
-            this._componentEhsColumn.HeaderText = "EHS";
-            this._componentEhsColumn.Name = "_componentEhsColumn";
-            this._componentEhsColumn.UseComboBoxCells = true;
-            this._componentEhsColumn.ValidationErrorMessage = "Invalid value";
-            this._componentEhsColumn.ValidationQuery = "[BLANK]\r\nYes\r\nNo";
-            // 
-            // _componentCasColumn
-            // 
-            this._componentCasColumn.AttributeName = "CAS";
-            this._componentCasColumn.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>/Component_CAS_Default</Attribute></Query>";
-            this._componentCasColumn.FillWeight = 20F;
-            this._componentCasColumn.HeaderText = "CAS #";
-            this._componentCasColumn.Name = "_componentCasColumn";
-            this._componentCasColumn.ValidationErrorMessage = "Invalid value";
-            this._componentCasColumn.ValidationQuery = "<Query ValidationListType=\'AutoCompleteOnly\'>\r\n<SQL>SELECT [Value] FROM [Previous" +
-    "lyUsedFieldValue] WHERE [FieldName] = \'Component_CAS\'</SQL>\r\n</Query>";
             // 
             // _mapNumberTextBox
             // 
@@ -1401,6 +1383,7 @@
             this._locationConfidentialComboBox.Location = new System.Drawing.Point(200, 135);
             this._locationConfidentialComboBox.Name = "_locationConfidentialComboBox";
             this._locationConfidentialComboBox.Size = new System.Drawing.Size(87, 21);
+            this._locationConfidentialComboBox.SupportsSwiping = false;
             this._locationConfidentialComboBox.TabIndex = 111;
             this._locationConfidentialComboBox.ValidationErrorMessage = "Invalid value";
             this._locationConfidentialComboBox.ValidationQuery = "[BLANK]\r\nNo\r\nYes\r\n";
@@ -1414,6 +1397,7 @@
             this._tradeSecretComboBox.Location = new System.Drawing.Point(425, 162);
             this._tradeSecretComboBox.Name = "_tradeSecretComboBox";
             this._tradeSecretComboBox.Size = new System.Drawing.Size(129, 21);
+            this._tradeSecretComboBox.SupportsSwiping = false;
             this._tradeSecretComboBox.TabIndex = 117;
             this._tradeSecretComboBox.ValidationErrorMessage = "Invalid value";
             this._tradeSecretComboBox.ValidationQuery = "[BLANK]\r\nNo\r\nYes";
@@ -1427,6 +1411,7 @@
             this._extremelyHazardousSubstanceComboBox.Location = new System.Drawing.Point(425, 188);
             this._extremelyHazardousSubstanceComboBox.Name = "_extremelyHazardousSubstanceComboBox";
             this._extremelyHazardousSubstanceComboBox.Size = new System.Drawing.Size(129, 21);
+            this._extremelyHazardousSubstanceComboBox.SupportsSwiping = false;
             this._extremelyHazardousSubstanceComboBox.TabIndex = 119;
             this._extremelyHazardousSubstanceComboBox.ValidationErrorMessage = "Invalid value";
             this._extremelyHazardousSubstanceComboBox.ValidationQuery = "[BLANK]\r\nNo\r\nYes";
@@ -1443,6 +1428,53 @@
             this._curiesTextBox.ValidationErrorMessage = "Curies must be numerical";
             this._curiesTextBox.ValidationPattern = "^[\\d\\.\\-]*$";
             this._curiesTextBox.TextChanged += new System.EventHandler(this.HandleControl_TextChanged);
+            // 
+            // _componentWeightColumn
+            // 
+            this._componentWeightColumn.AttributeName = "Weight";
+            this._componentWeightColumn.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>/Component_WT_Default</Attribute></Query>";
+            this._componentWeightColumn.FillWeight = 15F;
+            this._componentWeightColumn.HeaderText = "Weight %";
+            this._componentWeightColumn.Name = "_componentWeightColumn";
+            this._componentWeightColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._componentWeightColumn.ValidationErrorMessage = "Component weight is required and must be numerical";
+            this._componentWeightColumn.ValidationPattern = "^[\\d\\.]+$";
+            // 
+            // _componentNameColumn
+            // 
+            this._componentNameColumn.AttributeName = "Name";
+            this._componentNameColumn.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>/Component_Name_Default</Attribute></Query>";
+            this._componentNameColumn.FillWeight = 50F;
+            this._componentNameColumn.HeaderText = "Hazardous Component";
+            this._componentNameColumn.Name = "_componentNameColumn";
+            this._componentNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._componentNameColumn.ValidationErrorMessage = "Component name is a required field";
+            this._componentNameColumn.ValidationPattern = "\\S";
+            this._componentNameColumn.ValidationQuery = "<Query ValidationListType=\'AutoCompleteOnly\'>\r\n<SQL>SELECT [Value] FROM [Previous" +
+    "lyUsedFieldValue] WHERE [FieldName] = \'Component_Name\'</SQL>\r\n</Query>";
+            // 
+            // _componentEhsColumn
+            // 
+            this._componentEhsColumn.AttributeName = "EHS";
+            this._componentEhsColumn.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>/Component_EHS_Default</Attribute></Query>";
+            this._componentEhsColumn.FillWeight = 15F;
+            this._componentEhsColumn.HeaderText = "EHS";
+            this._componentEhsColumn.Name = "_componentEhsColumn";
+            this._componentEhsColumn.SupportsSwiping = false;
+            this._componentEhsColumn.UseComboBoxCells = true;
+            this._componentEhsColumn.ValidationErrorMessage = "Invalid value";
+            this._componentEhsColumn.ValidationQuery = "[BLANK]\r\nYes\r\nNo";
+            // 
+            // _componentCasColumn
+            // 
+            this._componentCasColumn.AttributeName = "CAS";
+            this._componentCasColumn.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>/Component_CAS_Default</Attribute></Query>";
+            this._componentCasColumn.FillWeight = 20F;
+            this._componentCasColumn.HeaderText = "CAS #";
+            this._componentCasColumn.Name = "_componentCasColumn";
+            this._componentCasColumn.ValidationErrorMessage = "Invalid value";
+            this._componentCasColumn.ValidationQuery = "<Query ValidationListType=\'AutoCompleteOnly\'>\r\n<SQL>SELECT [Value] FROM [Previous" +
+    "lyUsedFieldValue] WHERE [FieldName] = \'Component_CAS\'</SQL>\r\n</Query>";
             // 
             // FresnoPanel
             // 

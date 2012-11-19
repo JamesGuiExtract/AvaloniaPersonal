@@ -212,6 +212,16 @@
   <metadata name="_componentRefRange.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="_componentRefRange.ValidationQuery" xml:space="preserve">
+    <value>&lt;Query ValidationListType='ValidationListOnly'&gt;
+[BLANK]
+&lt;SQL&gt;SELECT DISTINCT '&lt;Attribute Parameterize='False'&gt;.&lt;/Attribute&gt;'
+ FROM LabOrderTest 
+ WHERE OrderCode=&lt;Attribute&gt;../../OrderCode&lt;/Attribute&gt;
+ AND TestCode=&lt;Attribute&gt;../TestCode&lt;/Attribute&gt;
+ AND AllowRefRange=1&lt;/SQL&gt;
+&lt;/Query&gt;</value>
+  </data>
   <metadata name="_componentCorrectFlag.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
