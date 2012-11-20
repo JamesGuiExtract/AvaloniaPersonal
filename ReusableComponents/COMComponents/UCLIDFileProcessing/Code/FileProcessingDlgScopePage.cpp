@@ -1004,6 +1004,7 @@ void FileProcessingDlgScopePage::setButtonStates()
 	m_btnAdd.EnableWindow(bEnabled);
 	m_btnSelectCondition.EnableWindow(bEnabled);
 	m_editSelectCondition.EnableWindow(bEnabled);
+	m_btnAdvanced.EnableWindow(bEnabled);
 
 	// Check for selection of supplier item in the Grid
 	int iSelIndex = m_wndGrid.GetCurrentRow();

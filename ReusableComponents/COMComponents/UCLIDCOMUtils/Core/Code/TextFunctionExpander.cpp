@@ -298,6 +298,12 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 				}
 				catch (UCLIDException &ue)
 				{
+					// This code to parse tokens is now attempted universally for all functions
+					// and the parsed tokens are passed on to the functions... but not all functions
+					// have multiple parameters that need to be parsed. In case multiple parameters
+					// are not needed, for now just keep track of any error that occurred when
+					// parsing so that it can be reported as part of any exception thrown by the
+					// function.
 					apTokenParsingException.reset(new UCLIDException(ue));
 				}
 
@@ -413,13 +419,17 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 	}
 	catch (UCLIDException &ue)
 	{
+		// If there was an error parsing the function parameters, it is most likely the cause of the
+		// exception here; add the parsing exception as the inner exception.
 		if (apTokenParsingException.get() != __nullptr)
 		{
 			UCLIDException ueOuter("ELI35224", ue.getTopText(), *apTokenParsingException);
 			for each (NamedValueTypePair debugData in ue.getDebugVector())
 			{
-				ueOuter.addDebugInfo(debugData.GetName(), debugData.GetPair().getStringValue());
+				ueOuter.addDebugInfo(debugData.GetName(), debugData.GetPair());
 			}
+
+			throw ueOuter;
 		}
 
 		throw ue;

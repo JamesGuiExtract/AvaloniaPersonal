@@ -14,7 +14,7 @@ class ATL_NO_VTABLE CMiscUtils :
 	public CComCoClass<CMiscUtils, &CLSID_MiscUtils>,
 	public ISupportErrorInfo,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
-	public IDispatchImpl<ITagUtility, &IID_ITagUtility, &LIBID_UCLID_COMLMLib>,
+	public IDispatchImpl<ITagUtility, &IID_ITagUtility, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IMiscUtils, &IID_IMiscUtils, &LIBID_UCLID_COMUTILSLib>
 {
 public:

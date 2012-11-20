@@ -22,7 +22,7 @@ class ATL_NO_VTABLE CAFUtility :
 	public CComCoClass<CAFUtility, &CLSID_AFUtility>,
 	public ISupportErrorInfo,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
-	public IDispatchImpl<ITagUtility, &IID_ITagUtility, &LIBID_UCLID_COMLMLib>,
+	public IDispatchImpl<ITagUtility, &IID_ITagUtility, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IAFUtility, &IID_IAFUtility, &LIBID_UCLID_AFUTILSLib>
 {
 public:

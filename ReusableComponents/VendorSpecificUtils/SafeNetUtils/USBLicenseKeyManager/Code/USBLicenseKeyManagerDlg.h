@@ -83,6 +83,8 @@ private:
 	ISmtpEmailSettingsPtr m_ipEmailSettings;
 	
 	CListCtrl m_listCounterValues;
+
+	string m_strLastServerName;
 };
 
 //{{AFX_INSERT_LOCATION}}

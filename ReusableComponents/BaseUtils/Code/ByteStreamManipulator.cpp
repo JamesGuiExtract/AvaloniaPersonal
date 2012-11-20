@@ -460,7 +460,7 @@ ByteStreamManipulator& operator >> (ByteStreamManipulator& rManipulator, long& r
 	}
 
 	// ensure that the required amount of bytes can be read.
-	if (rManipulator.byteStream.getLength() - rManipulator.getCurPos() < sizeof(long))
+	if (rManipulator.byteStream.getLength() - rManipulator.getCurPos() < sizeof(rlData))
 	{
 		throw UCLIDException("ELI00470", 
 			"Internal error in ByteStreamManipulator >> operator - cannot read a long item!");
@@ -488,17 +488,15 @@ ByteStreamManipulator& operator >> (ByteStreamManipulator& rManipulator, __int64
 			"Internal error in ByteStreamManipulator >> operator - rlData!");
 	}
 
-	unsigned long ulDataSize = sizeof(__int64);
-
 	// ensure that the required amount of bytes can be read.
-	if (rManipulator.byteStream.getLength() - rManipulator.getCurPos() < ulDataSize)
+	if (rManipulator.byteStream.getLength() - rManipulator.getCurPos() < sizeof(rllData))
 	{
 		throw UCLIDException("ELI28629", 
 			"Internal error in ByteStreamManipulator >> operator - cannot read a longlong item!");
 	}
 	
-	memcpy((char *) &rllData, (char *) rManipulator.pszByteStreamCursor, sizeof(ulDataSize));
-	rManipulator.pszByteStreamCursor += sizeof(ulDataSize);
+	memcpy((char *) &rllData, (char *) rManipulator.pszByteStreamCursor, sizeof(rllData));
+	rManipulator.pszByteStreamCursor += sizeof(rllData);
 	
 	return rManipulator;
 }
@@ -521,7 +519,7 @@ ByteStreamManipulator& operator >> (ByteStreamManipulator& rManipulator,
 	}
 
 	// ensure that the required amount of bytes can be read.
-	if (rManipulator.byteStream.getLength() - rManipulator.getCurPos() < sizeof(unsigned long))
+	if (rManipulator.byteStream.getLength() - rManipulator.getCurPos() < sizeof(rulData))
 	{
 		throw UCLIDException("ELI00473", 
 			"Internal error in ByteStreamManipulator >> operator - cannot read an unsigned long item!");
@@ -578,7 +576,7 @@ ByteStreamManipulator& operator >> (ByteStreamManipulator& rManipulator, double&
 	}
 
 	// ensure that the required amount of bytes can be read.
-	if (rManipulator.byteStream.getLength() - rManipulator.getCurPos() < sizeof(double))
+	if (rManipulator.byteStream.getLength() - rManipulator.getCurPos() < sizeof(rdData))
 	{
 		throw UCLIDException("ELI00476", 
 			"Internal error in ByteStreamManipulator >> operator - cannot read a double item!");
@@ -608,7 +606,7 @@ ByteStreamManipulator& operator >> (ByteStreamManipulator& rManipulator,
 	}
 
 	// ensure that the required amount of bytes can be read.
-	if (rManipulator.byteStream.getLength() - rManipulator.getCurPos() < sizeof(unsigned char))
+	if (rManipulator.byteStream.getLength() - rManipulator.getCurPos() < sizeof(rucData))
 	{
 		throw UCLIDException("ELI00479", 
 			"Internal error in ByteStreamManipulator >> operator - cannot read an unsigned char item!");

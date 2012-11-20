@@ -1074,7 +1074,11 @@ library UCLID_COMUTILSLib
 			[in] BSTR bstrString, [in] BSTR bstrSourceDocName, [out, retval] BSTR* pbstrExpanded);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Expands path tags and functions in bstrInput using the supplied data in pData.
-		//			(pData type is specific to implementing class)
+		//			[LegacyRCAndUtils:6337] 11/17/2012 SNK 
+		//		    NOTE: pData type is specific to the calling class (such as SourceDocName or 
+		//			and IAFDocument instance). While this is admitedly not the best design, it
+		//			allows for modifying path tag expansion so that it occurs per parameter within
+		//			path tag functions with as little changes as possible to existing code.
 		[id(26), helpstring("method ExpandTagsAndFunctions")] HRESULT ExpandTagsAndFunctions(
 			[in] BSTR bstrInput, [in] ITagUtility *pTagUtility, [in] LPVOID pData,
 			[out, retval] BSTR* pbstrOutput);

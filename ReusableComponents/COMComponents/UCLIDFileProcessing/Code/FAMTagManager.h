@@ -14,7 +14,7 @@ class ATL_NO_VTABLE CFAMTagManager :
 	public CComCoClass<CFAMTagManager, &CLSID_FAMTagManager>,
 	public ISupportErrorInfo,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
-	public IDispatchImpl<ITagUtility, &IID_ITagUtility, &LIBID_UCLID_COMLMLib>,
+	public IDispatchImpl<ITagUtility, &IID_ITagUtility, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IFAMTagManager, &IID_IFAMTagManager, &LIBID_UCLID_FILEPROCESSINGLib>
 {
 public:

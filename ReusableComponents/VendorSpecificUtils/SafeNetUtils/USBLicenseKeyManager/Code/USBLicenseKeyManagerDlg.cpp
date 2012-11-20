@@ -52,7 +52,8 @@ const double gdWAIT_SECONDS_RESET = 30;
 CUSBLicenseKeyManagerDlg::CUSBLicenseKeyManagerDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CUSBLicenseKeyManagerDlg::IDD, pParent),
 	m_bIsKeyServerValid(false),
-	m_ipEmailSettings(CLSID_SmtpEmailSettings)
+	m_ipEmailSettings(CLSID_SmtpEmailSettings),
+	m_strLastServerName("")
 {
 	try
 	{
@@ -116,6 +117,8 @@ BOOL CUSBLicenseKeyManagerDlg::OnInitDialog()
 		// Set the option for the license server
 		string strContactServerName = m_snlcSafeNetCfg.getContactServerName();
 		makeUpperCase(strContactServerName);
+		m_strLastServerName = strContactServerName;
+
 		string strComputerName = getComputerName();
 		makeUpperCase(strComputerName);
 		if ( strContactServerName == strComputerName)
@@ -483,6 +486,16 @@ void CUSBLicenseKeyManagerDlg::applyNewValues()
 		strServerName = czServerName;
 	}
 	m_snlcSafeNetCfg.setServerName(strServerName);
+	makeUpperCase(strServerName);
+	if (strServerName != m_strLastServerName)
+	{
+		UCLIDException ue("ELI35248", "Application trace: USB license key server changed.");
+		ue.addDebugInfo("Old server", m_strLastServerName);
+		ue.addDebugInfo("New server", strServerName);
+		ue.log();
+		m_strLastServerName = strServerName;
+	}
+
 	string strSMTPServer = asString(m_ipEmailSettings->Server);
 	if ( m_checkEmailAlert.GetCheck() == BST_CHECKED)
 	{
