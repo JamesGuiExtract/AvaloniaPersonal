@@ -360,22 +360,11 @@ void CESConvertToPDFApp::convertToSearchablePDF()
 			}
 			catch(UCLIDException ue)
 			{
-				// free the memory allocated for this page
-				rc = kRecFreeImg(hPage);
-
-				// log any errors
-				if (rc != REC_OK)
-				{
-					UCLIDException ue2("ELI18629", "Application trace: Unable to release page image. "
-						"Possible memory leak.");
-					loadScansoftRecErrInfo(ue2, rc);
-					ue2.addDebugInfo("Input filename", m_strInputFile);
-					ue2.addDebugInfo("Page number", i+1);
-					ue2.log();
-				}
-
-				// throw the original exception
-				throw ue;
+				// [LegacyRCAndUtils:6363]
+				// Rather than abort the entire conversion of OCR fails on a given page, simply
+				// log the exception and let the conversion complete (albeit without searchable text
+				// on this page.
+				ue.log();
 			}
 
 			// add this page to the output document
