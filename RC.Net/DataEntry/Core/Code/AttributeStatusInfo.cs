@@ -8,6 +8,7 @@ using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Windows.Forms;
@@ -2410,7 +2411,27 @@ namespace Extract.DataEntry
                     for (int i = 0; i < count; i++)
                     {
                         IAttribute attribute = (IAttribute)attributesToQuery.At(i);
-                        if (query.Equals(attribute.Name, StringComparison.OrdinalIgnoreCase))
+
+                        // Anything prior to (or in the abscense of) an @ char is a filter on the
+                        // attribute name, whereas anything after is a filter on the attribute type.
+                        var queryFilters = query.Split('@');
+                        string nameFilter = queryFilters[0];
+                        string typeFilter = (queryFilters.Length == 1) ? "" : queryFilters[1];
+
+                        // Check if the attribute should be eliminated based on the type filter.
+                        if (!string.IsNullOrEmpty(typeFilter) && typeFilter != "*")
+                        {
+                            var types = attribute.Type.Split('+').Distinct();
+                            if (!types.Contains(typeFilter, StringComparer.OrdinalIgnoreCase))
+                            {
+                                continue;
+                            }
+                        }
+                        
+                        // If the query element is empty, * or the query element matches the
+                        // attribute name, select it.
+                        if (string.IsNullOrEmpty(nameFilter) || nameFilter == "*" ||
+                            nameFilter.Equals(attribute.Name, StringComparison.OrdinalIgnoreCase))
                         {
                             results.AddRange(
                                 ResolveAttributeQuery(attribute, nextQuery));

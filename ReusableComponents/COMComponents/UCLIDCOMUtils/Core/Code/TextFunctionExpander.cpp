@@ -7,6 +7,7 @@
 #include <COMUtils.h>
 
 #include <list>
+#include <stack>
 
 using namespace std;
 
@@ -156,284 +157,341 @@ TextFunctionExpander::TextFunctionExpander()
 const string TextFunctionExpander::expandFunctions(const string& str,
 	UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility, LPVOID pData) const
 {
-	unique_ptr<UCLIDException> apTokenParsingException;
-
 	try
 	{
-		try
-		{
-			string strRet;
+		// Define a stack to keep track of data relevant to each function scope as str is expanded.
+		stack<expansionScopeData> stackScopeData;
+		stackScopeData.push(expansionScopeData());
 
-			unsigned long ulSearchPos = 0;
-			while (1)
-			{
-				// find the beginning of the next function if there is one
-				unsigned long ulFuncStart = str.find( '$', ulSearchPos );
+		// The current position of str for from which to search for the next section to expand.
+		unsigned long ulSearchPos = 0;
+
+		// Keeps track of data related to the next function in str to be expanded.
+		bool bSearchForNextFunc = true;
+		unsigned long ulFuncStart = string::npos;
+		string strNextFunction;
+		string strNextFuncToken;
 		
-				if (ulFuncStart == string::npos)
+		// Loop until str is fully expanded.
+		while (true)
+		{
+			// Get the data relative to the current function scope.
+			expansionScopeData& currentScope = stackScopeData.top();
+
+			// If necessary, find the beginning of the next function if there is one
+			if (bSearchForNextFunc)
+			{
+				ulFuncStart = findNextFunction(str, ulSearchPos, strNextFunction, strNextFuncToken);
+
+				// Don't bother searching again until the found function is processed.
+				bSearchForNextFunc = false;
+			}
+			
+			// Keep track of the end of the next section of str to be processed. This may be the
+			// start or end of a function or a token delimiting function parameters.
+			unsigned long ulSectionEnd = ulFuncStart;
+
+			// If parsing the argument for a function that takes multiple parameters, look for the
+			// next token that delimits parameters.
+			unsigned long ulNextToken = string::npos;
+			if (currentScope.bAcceptsMultipleArgs)
+			{
+				ulNextToken = str.find(currentScope.strFuncToken, ulSearchPos);
+				ulSectionEnd = (ulSectionEnd == string::npos) ? ulNextToken
+					: (ulNextToken == string::npos) ? ulSectionEnd
+						: min(ulSectionEnd, ulNextToken);
+			}
+
+			// If within the scope of a function, look for the closing paren that ends this scope.
+			unsigned long ulNextScopeClose = string::npos;
+			if (!currentScope.strFunction.empty())
+			{
+				ulNextScopeClose = str.find(')', ulSearchPos);
+				ulSectionEnd = (ulSectionEnd == string::npos) ? ulNextScopeClose
+					: (ulNextScopeClose == string::npos) ? ulSectionEnd
+						: min(ulSectionEnd, ulNextScopeClose);
+			}
+
+			// If the section from ulSearchPos to ulSectionEnd is non-empty, expand any tags it
+			// contains and add it to the running result for the current scope.
+			if (ulSectionEnd == string::npos || ulSectionEnd > ulSearchPos)
+			{
+				string strNextSection = str.substr(ulSearchPos, (ulSectionEnd == string::npos)
+					? string::npos
+					: ulSectionEnd - ulSearchPos);
+				strNextSection =
+					asString(ipTagUtility->ExpandTags(get_bstr_t(strNextSection), pData));
+				currentScope.strResult += strNextSection;
+			}
+
+			if (ulSectionEnd == string::npos)
+			{
+				// There are no more arguments or function scope changes for the rest of str, return
+				// the result for the current (top) scope.
+				if (!currentScope.strFunction.empty())
 				{
-					// there are no more functions so append any 
-					// remaining text to the return string and exit
-					strRet += str.substr( ulSearchPos, string::npos );
-					break;
+					UCLIDException ue("ELI35254", "Missing cloing parenthesis for path tag function.");
+					ue.addDebugInfo("Function", currentScope.strFunction);
+					ue.addDebugInfo("Full string", str);
 				}
 
-				// check if the location begins with one of the functions
-				unsigned int nNumFunctions = g_vecFunctions.size();
-				unsigned long ulTemp = ulFuncStart + 1;
-				string strFunction = "";
-				string strToken = ",";
-				for ( unsigned int i = 0; i < nNumFunctions ; i++ )
-				{
-					unsigned long ulNamePos = str.find( g_vecFunctions[i], ulTemp );
-					if ( ulNamePos == ulTemp )
-					{
-						// Set the function
-						strFunction = g_vecFunctions[i];
-
-						// Check for {}
-						unsigned long ulBracketPos = ulNamePos + strFunction.length();
-						if (ulBracketPos < str.length() && str[ulBracketPos] == '{')
-						{
-							// Find the closing bracket
-							unsigned long ulClosingBracket = str.find_first_of("}", ulBracketPos+1);
-							bool bMatched = ulClosingBracket != string::npos;
-							if (!bMatched || ulClosingBracket - ulBracketPos > 2)
-							{
-								string strMessage = bMatched
-									? "Token length too long (only single token supported) "
-									: "Unmatched '{' ";
-								strMessage += "in function string.";
-								UCLIDException uex("ELI29707", strMessage);
-								uex.addDebugInfo("Function String", str.substr(ulNamePos,
-									bMatched ? ulClosingBracket : ulBracketPos));
-								throw uex;
-							}
-							else if (ulClosingBracket - ulBracketPos == 1)
-							{
-								UCLIDException uex("ELI29709", "Missing token definition.");
-								uex.addDebugInfo("Function String", str.substr(ulNamePos, ulClosingBracket));
-								throw uex;
-							}
-
-							// Get the alternate token
-							strToken = str[ulBracketPos+1];
-						}
-
-						break;
-					}
-				}
-
-				if (strFunction.empty())
-				{
-					// a function was not found so $ is part of the file name
-					// advance to the next char and continue loop
-					strRet += str.substr( ulSearchPos, ulFuncStart - ulSearchPos + 1);
-					ulSearchPos = ulTemp;
-					continue;
-				}
-
-				// append any text before the new function to the 
-				// return string
-				if (ulFuncStart != ulSearchPos)
-				{
-					strRet += str.substr( ulSearchPos, ulFuncStart - ulSearchPos );
-				}
-
-				ulSearchPos = ulTemp;
-
-				// find the beginning of the function argument i.e. '('
-				unsigned long ulArgStart = str.find( '(', ulSearchPos );
-				if (ulArgStart == string::npos)
+				return currentScope.strResult;
+			}
+			else if (ulSectionEnd == ulFuncStart)
+			{
+				// A new function scope comes before anything else.
+				
+				// Find the beginning of the function argument i.e. '('
+				ulSearchPos = str.find('(', ulSearchPos);
+				if (ulSearchPos == string::npos)
 				{
 					UCLIDException ue("ELI11767", "Invalid Text Function Syntax - no (.");
 					ue.addDebugInfo("Text", str);
 					throw ue;
 				}
+				ulSearchPos++;
 
-				ulSearchPos = ulArgStart + 1;
+				// Create the scope for the nested function.
+				expansionScopeData nestedScope;
+				nestedScope.ulArgStartPos = ulSearchPos;
+				nestedScope.strFunction = strNextFunction;
+				nestedScope.strFuncToken = strNextFuncToken;
+				// If the parameter list for the function contains a comma, it can accept multiple
+				// parameters and, therefore, its argument needs to be searched for the argument
+				// delimiter token.
+				nestedScope.bAcceptsMultipleArgs =
+					(g_mapParameters[nestedScope.strFunction].find(',') != string::npos);
+				stackScopeData.push(nestedScope);
+				
+				// Now that we've created a scope for this function, we will need to look for the
+				// next function (if any) in the next iteration.
+				bSearchForNextFunc = true;
+				continue;
+			}
+			else
+			{
+				// The current function argument ends before anything else. (the function scope
+				// has closed or the argument delimiting token was encountered)
 
-				// find the end of the function argument i.e. the matching ')'
-				// Note there may be multiple "()" pairs between the opening '(' 
-				// and the closing ')', hence the use of getCloseScopePos
-				unsigned long ulArgEnd = getCloseScopePos(str, ulArgStart, '(', ')');
-				if (ulArgEnd == string::npos)
+				// Add the expanded argument the currentScope's argument list.
+				currentScope.vecExpandedArgs.push_back(currentScope.strResult);
+
+				// Advance ulSearchPos
+				ulSearchPos = ulSectionEnd + 1;
+
+				if (ulSectionEnd == ulNextToken)
 				{
-					UCLIDException ue("ELI11768", "Invalid Text Function Syntax - no ).");
-					ue.addDebugInfo("Text", str);
-					throw ue;
+					// Another argument for this function scope follows; reset the running result
+					// to prepare for the next argument.
+					currentScope.strResult = "";
+					continue;
 				}
-				// currently getCloseScopePos() returns the close pos +1
-				ulArgEnd--;
-				ulSearchPos = ulArgEnd + 1;
+			}
 
-				// get the argument to the functions
-				string strArg = str.substr( ulArgStart + 1, ulArgEnd - (ulArgStart + 1) );
-		
-				// Tokenize the string into strSource, strInsert
-				string strExpandedArg;
-				vector<string> vecExpandedParameters;
+			// If we've gotten here, we've closed the scope on currentScope.strFunction.
+			// For functions that accept 1 argument, an empty vecExpandedArgs is equivilant to "".
+			string strExpandedArg = (currentScope.vecExpandedArgs.size() == 0) 
+				? "" 
+				: currentScope.vecExpandedArgs[0];
+			
+			// Evaluate the function.
+			string strFuncResult;
+			try
+			{
 				try
 				{
-					try
+					
+					if (currentScope.strFunction == gstrFUNC_DIR_OF)
 					{
-						StringTokenizer::sGetTokens(strArg, strToken, vecExpandedParameters);
-
-						for (size_t j = 0; j < vecExpandedParameters.size(); j++)
-						{
-							string& strParameter = vecExpandedParameters[0];
-
-							// recurse to expand any functions in the argument
-							strParameter = expandFunctions(strParameter, ipTagUtility, pData);
-
-							strParameter = asString(ipTagUtility->ExpandTags(get_bstr_t(strParameter), pData));
-						}
-
-						if (vecExpandedParameters.size() == 1)
-						{
-							strExpandedArg = vecExpandedParameters[0];
-						}
+						strFuncResult += expandDirOf(strExpandedArg);
 					}
-					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35225");
+					else if (currentScope.strFunction == gstrFUNC_FILE_NO_EXT_OF)
+					{
+						strFuncResult += expandFileNoExtOf(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_FILE_OF)
+					{
+						strFuncResult += expandFileOf(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_DIR_NO_DRIVE_OF)
+					{
+						strFuncResult += expandDirNoDriveOf(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_DRIVE_OF)
+					{
+						strFuncResult += expandDriveOf(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_EXT_OF)
+					{
+						strFuncResult += expandExtOf(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_LEFT)
+					{
+						strFuncResult += expandLeft(currentScope.vecExpandedArgs);
+					}
+					else if (currentScope.strFunction == gstrFUNC_INSERT_BEFORE_EXT)
+					{
+						strFuncResult += expandInsertBeforeExt(currentScope.vecExpandedArgs);
+					}
+					else if (currentScope.strFunction == gstrFUNC_CHANGE_EXT)
+					{
+						strFuncResult += expandChangeExt(currentScope.vecExpandedArgs);
+					}
+					else if (currentScope.strFunction == gstrFUNC_MID)
+					{
+						strFuncResult += expandMid(currentScope.vecExpandedArgs);
+					}
+					else if (currentScope.strFunction == gstrFUNC_REPLACE)
+					{
+						strFuncResult += expandReplace(currentScope.vecExpandedArgs);
+					}
+					else if (currentScope.strFunction == gstrFUNC_RIGHT)
+					{
+						strFuncResult += expandRight(currentScope.vecExpandedArgs);
+					}
+					else if (currentScope.strFunction == gstrFUNC_PAD_VALUE)
+					{
+						strFuncResult += expandPadValue(currentScope.vecExpandedArgs);
+					}
+					else if (currentScope.strFunction == gstrFUNC_OFFSET)
+					{
+						strFuncResult += expandOffset(currentScope.vecExpandedArgs);
+					}
+					else if (currentScope.strFunction == gstrFUNC_TRIM_AND_CONSOLIDATE_WS)
+					{
+						strFuncResult += expandTrimAndConsolidateWS(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_ENV)
+					{
+						strFuncResult += expandEnv(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_NOW)
+					{
+						strFuncResult += expandNow(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_RANDOM_ALPHA_NUMERIC)
+					{
+						strFuncResult += expandRandomAlphaNumeric(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_USER_NAME)
+					{
+						strFuncResult += expandUserName(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_FULL_USER_NAME)
+					{
+						strFuncResult += expandFullUserName(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_THREAD_ID)
+					{
+						strFuncResult += expandThreadId(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_PROCESS_ID)
+					{
+						strFuncResult += expandProcessId(strExpandedArg);
+					}
+					else
+					{
+						UCLIDException ue("ELI11769", "Invalid Text Function!");
+						throw ue;
+					}
 				}
-				catch (UCLIDException &ue)
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35255");
+			}
+			catch (UCLIDException &ue)
+			{
+				try
 				{
-					// This code to parse tokens is now attempted universally for all functions
-					// and the parsed tokens are passed on to the functions... but not all functions
-					// have multiple parameters that need to be parsed. In case multiple parameters
-					// are not needed, for now just keep track of any error that occurred when
-					// parsing so that it can be reported as part of any exception thrown by the
-					// function.
-					apTokenParsingException.reset(new UCLIDException(ue));
+					ue.addDebugInfo("Function", currentScope.strFunction);
+					string strUnExpandedArg = str.substr(currentScope.ulArgStartPos,
+						ulSearchPos - currentScope.ulArgStartPos - 1);
+					ue.addDebugInfo(currentScope.bAcceptsMultipleArgs ? "Arguments" : "Argument",
+						strUnExpandedArg);
+					for (size_t i = 0; i < currentScope.vecExpandedArgs.size(); i++)
+					{
+						ue.addDebugInfo("Expanded argument", currentScope.vecExpandedArgs[i]);
+					}
 				}
+				catch (...) {}
 
-				if (strExpandedArg.empty())
-				{
-					// recurse to expand any functions in the argument
-					strExpandedArg = expandFunctions(strArg, ipTagUtility, pData);
+				throw ue;
+			}
 
-					strExpandedArg = asString(ipTagUtility->ExpandTags(get_bstr_t(strExpandedArg), pData));
-				}
+			// Exit the current function scope.
+			stackScopeData.pop();
+			
+			// Append the function result to the running result of the parent scope.
+			stackScopeData.top().strResult += strFuncResult;
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35223")
+}
+//-------------------------------------------------------------------------------------------------
+int TextFunctionExpander::findNextFunction(const string& str, unsigned long ulSearchPos,
+	string &rstrFunction, string &rstrToken) const
+{
+	// find the beginning of the next function if there is one
+	unsigned long ulFuncStart = str.find('$', ulSearchPos);
 
-				// evaluate the function and append the result to the return 
-				// text (expanded string)
-				if (strFunction == gstrFUNC_DIR_OF)
+	while (ulFuncStart != string::npos)
+	{
+		// check if the location begins with one of the functions
+		unsigned int nNumFunctions = g_vecFunctions.size();
+		for ( unsigned int i = 0; i < nNumFunctions ; i++ )
+		{
+			unsigned long ulNamePos = str.find(g_vecFunctions[i], ulFuncStart + 1);
+			if (ulNamePos == ulFuncStart + 1)
+			{
+				// Set the function
+				rstrFunction = g_vecFunctions[i];
+
+				// Check for {}
+				unsigned long ulBracketPos = ulNamePos + rstrFunction.length();
+				if (ulBracketPos < str.length() && str[ulBracketPos] == '{')
 				{
-					strRet += expandDirOf(strExpandedArg);
-				}
-				else if (strFunction == gstrFUNC_FILE_NO_EXT_OF)
-				{
-					strRet += expandFileNoExtOf(strExpandedArg);
-				}
-				else if (strFunction == gstrFUNC_FILE_OF)
-				{
-					strRet += expandFileOf(strExpandedArg);
-				}
-				else if (strFunction == gstrFUNC_DIR_NO_DRIVE_OF)
-				{
-					strRet += expandDirNoDriveOf(strExpandedArg);
-				}
-				else if (strFunction == gstrFUNC_DRIVE_OF)
-				{
-					strRet += expandDriveOf(strExpandedArg);
-				}
-				else if (strFunction == gstrFUNC_EXT_OF)
-				{
-					strRet += expandExtOf(strExpandedArg);
-				}
-				else if (strFunction == gstrFUNC_LEFT)
-				{
-					strRet += expandLeft(strExpandedArg, vecExpandedParameters);
-				}
-				else if (strFunction == gstrFUNC_INSERT_BEFORE_EXT)
-				{
-					strRet += expandInsertBeforeExt(strExpandedArg, vecExpandedParameters);
-				}
-				else if (strFunction == gstrFUNC_CHANGE_EXT)
-				{
-					strRet += expandChangeExt(strExpandedArg, vecExpandedParameters);
-				}
-				else if (strFunction == gstrFUNC_MID)
-				{
-					strRet += expandMid(strExpandedArg, vecExpandedParameters);
-				}
-				else if (strFunction == gstrFUNC_REPLACE)
-				{
-					strRet += expandReplace(strExpandedArg, vecExpandedParameters);
-				}
-				else if (strFunction == gstrFUNC_RIGHT)
-				{
-					strRet += expandRight(strExpandedArg, vecExpandedParameters);
-				}
-				else if (strFunction == gstrFUNC_PAD_VALUE)
-				{
-					strRet += expandPadValue(strExpandedArg, vecExpandedParameters);
-				}
-				else if (strFunction == gstrFUNC_OFFSET)
-				{
-					strRet += expandOffset(strExpandedArg, vecExpandedParameters);
-				}
-				else if (strFunction == gstrFUNC_TRIM_AND_CONSOLIDATE_WS)
-				{
-					strRet += expandTrimAndConsolidateWS(strExpandedArg);
-				}
-				else if (strFunction == gstrFUNC_ENV)
-				{
-					strRet += expandEnv(strExpandedArg);
-				}
-				else if (strFunction == gstrFUNC_NOW)
-				{
-					strRet += expandNow(strExpandedArg);
-				}
-				else if (strFunction == gstrFUNC_RANDOM_ALPHA_NUMERIC)
-				{
-					strRet += expandRandomAlphaNumeric(strExpandedArg);
-				}
-				else if (strFunction == gstrFUNC_USER_NAME)
-				{
-					strRet += expandUserName(strExpandedArg);
-				}
-				else if (strFunction == gstrFUNC_FULL_USER_NAME)
-				{
-					strRet += expandFullUserName(strExpandedArg);
-				}
-				else if (strFunction == gstrFUNC_THREAD_ID)
-				{
-					strRet += expandThreadId(strExpandedArg);
-				}
-				else if (strFunction == gstrFUNC_PROCESS_ID)
-				{
-					strRet += expandProcessId(strExpandedArg);
+					// Find the closing bracket
+					unsigned long ulClosingBracket = str.find_first_of("}", ulBracketPos+1);
+					bool bMatched = ulClosingBracket != string::npos;
+					if (!bMatched || ulClosingBracket - ulBracketPos > 2)
+					{
+						string strMessage = bMatched
+							? "Token length too long (only single token supported) "
+							: "Unmatched '{' ";
+						strMessage += "in function string.";
+						UCLIDException uex("ELI29707", strMessage);
+						uex.addDebugInfo("Function String", str.substr(ulNamePos,
+							bMatched ? ulClosingBracket : ulBracketPos));
+						throw uex;
+					}
+					else if (ulClosingBracket - ulBracketPos == 1)
+					{
+						UCLIDException uex("ELI29709", "Missing token definition.");
+						uex.addDebugInfo("Function String", str.substr(ulNamePos, ulClosingBracket));
+						throw uex;
+					}
+
+					// Get the alternate token
+					rstrToken = str[ulBracketPos+1];
 				}
 				else
 				{
-					UCLIDException ue("ELI11769", "Invalid Text Function!");
-					ue.addDebugInfo("Function", strFunction);
-					throw ue;
+					rstrToken = ",";
 				}
-			}
 
-			return strRet;
+				break;
+			}
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35223")
-	}
-	catch (UCLIDException &ue)
-	{
-		// If there was an error parsing the function parameters, it is most likely the cause of the
-		// exception here; add the parsing exception as the inner exception.
-		if (apTokenParsingException.get() != __nullptr)
+
+		if (rstrFunction.empty())
 		{
-			UCLIDException ueOuter("ELI35224", ue.getTopText(), *apTokenParsingException);
-			for each (NamedValueTypePair debugData in ue.getDebugVector())
-			{
-				ueOuter.addDebugInfo(debugData.GetName(), debugData.GetPair());
-			}
-
-			throw ueOuter;
+			ulFuncStart = str.find('$', ulFuncStart + 1);
 		}
-
-		throw ue;
+		else
+		{
+			break;
+		}
 	}
+
+	return ulFuncStart;
 }
 //-------------------------------------------------------------------------------------------------
 const vector<string>& TextFunctionExpander::getAvailableFunctions() const
@@ -516,8 +574,7 @@ const string TextFunctionExpander::expandFileNoExtOf(const string& str) const
 	return getFileNameWithoutExtension(str, false);
 }
 //-------------------------------------------------------------------------------------------------
-const string TextFunctionExpander::expandInsertBeforeExt(const string& str,
-														 vector<string>& vecParameters) const
+const string TextFunctionExpander::expandInsertBeforeExt(vector<string>& vecParameters) const
 {
 	// Check for proper number of tokens
 	if (vecParameters.size() == 2)
@@ -531,7 +588,6 @@ const string TextFunctionExpander::expandInsertBeforeExt(const string& str,
 		{
 			// Create and throw exception
 			UCLIDException ue( "ELI19657", "InsertBeforeExt function cannot operate on an empty string!");
-			ue.addDebugInfo("Arguments", str);
 			throw ue;
 		}
 
@@ -569,13 +625,12 @@ const string TextFunctionExpander::expandInsertBeforeExt(const string& str,
 	{
 		// Create and throw exception
 		UCLIDException ue( "ELI19656", "InsertBeforeExt function has invalid number of arguments!");
-		ue.addDebugInfo("Arguments", str);
 		ue.addDebugInfo("NumOfArgs", vecParameters.size());
 		throw ue;
 	}
 }
 //-------------------------------------------------------------------------------------------------
-const string TextFunctionExpander::expandOffset(const string& str, vector<string>& vecParameters) const
+const string TextFunctionExpander::expandOffset(vector<string>& vecParameters) const
 {
 	unsigned int i = 0;
 	for ( ; i < vecParameters.size(); i++)
@@ -606,7 +661,6 @@ const string TextFunctionExpander::expandOffset(const string& str, vector<string
 	else
 	{
 		UCLIDException ue("ELI12624", "Offset Function has invalid number of arguments!");
-		ue.addDebugInfo("Args", str);
 		ue.addDebugInfo("NumOfArgs", vecParameters.size());
 		ue.addDebugInfo("ArgsExpected", 2);
 		throw ue;
@@ -625,7 +679,7 @@ const string TextFunctionExpander::expandOffset(const string& str, vector<string
 	}
 }
 //-------------------------------------------------------------------------------------------------
-const string TextFunctionExpander::expandPadValue(const string& str, vector<string>& vecParameters) const
+const string TextFunctionExpander::expandPadValue(vector<string>& vecParameters) const
 {
 	unsigned int i = 0;
 	for( ; i < vecParameters.size(); i++)
@@ -645,7 +699,6 @@ const string TextFunctionExpander::expandPadValue(const string& str, vector<stri
 		else
 		{
 			UCLIDException ue("ELI12576", "PadValue Function has invalid padding character argument!");
-			ue.addDebugInfo("Args", str);
 			ue.addDebugInfo("PaddingChar", vecParameters[1]);
 			throw ue;
 		}
@@ -667,13 +720,12 @@ const string TextFunctionExpander::expandPadValue(const string& str, vector<stri
 	else
 	{
 		UCLIDException ue("ELI12575", "PadValue Function has invalid number of arguments!");
-		ue.addDebugInfo("Args", str);
 		ue.addDebugInfo("NumOfArgs", vecParameters.size());
 		throw ue;
 	}
 }
 //-------------------------------------------------------------------------------------------------
-const string TextFunctionExpander::expandReplace(const string& str, vector<string>& vecParameters) const
+const string TextFunctionExpander::expandReplace(vector<string>& vecParameters) const
 {
 	// Check for proper number of tokens
 	if (vecParameters.size() == 3)
@@ -688,7 +740,6 @@ const string TextFunctionExpander::expandReplace(const string& str, vector<strin
 		{
 			// Create and throw exception
 			UCLIDException ue( "ELI15712", "Replace function cannot operate on an empty string!");
-			ue.addDebugInfo("Arguments", str);
 			throw ue;
 		}
 
@@ -697,7 +748,6 @@ const string TextFunctionExpander::expandReplace(const string& str, vector<strin
 		{
 			// Create and throw exception
 			UCLIDException ue( "ELI15713", "Replace function cannot search for an empty string!");
-			ue.addDebugInfo("Arguments", str);
 			throw ue;
 		}
 
@@ -711,7 +761,6 @@ const string TextFunctionExpander::expandReplace(const string& str, vector<strin
 	{
 		// Create and throw exception
 		UCLIDException ue( "ELI15711", "Replace function has invalid number of arguments!");
-		ue.addDebugInfo("Arguments", str);
 		ue.addDebugInfo("NumOfArgs", vecParameters.size());
 		throw ue;
 	}
@@ -808,7 +857,6 @@ const string TextFunctionExpander::expandRandomAlphaNumeric(const string &str) c
 	{
 		UCLIDException uex("ELI29489",
 			"Invalid number string specified for RandomAlphaNumeric function.");
-		uex.addDebugInfo("Argument", str);
 		throw uex;
 	}
 
@@ -821,7 +869,6 @@ const string TextFunctionExpander::expandUserName(const string& str) const
 	if (!str.empty())
 	{
 		UCLIDException uex("ELI28764", "$UserName() does not accept arguments.");
-		uex.addDebugInfo("Argument", str);
 		throw uex;
 	}
 
@@ -833,7 +880,6 @@ const string TextFunctionExpander::expandFullUserName(const string& str) const
 	if (!str.empty() && (str != "0" && str != "1"))
 	{
 		UCLIDException uex("ELI28765", "Invalid argument for $FullUserName().");
-		uex.addDebugInfo("Argument", str);
 		throw uex;
 	}
 
@@ -841,7 +887,7 @@ const string TextFunctionExpander::expandFullUserName(const string& str) const
 	return getFullUserName(bThrowException);
 }
 //-------------------------------------------------------------------------------------------------
-const string TextFunctionExpander::expandLeft(const string& str, vector<string>& vecParameters) const
+const string TextFunctionExpander::expandLeft(vector<string>& vecParameters) const
 {
 	// Check for appropriate number of tokens
 	if (vecParameters.size() == 2)
@@ -870,13 +916,12 @@ const string TextFunctionExpander::expandLeft(const string& str, vector<string>&
 	{
 		// Create and throw exception
 		UCLIDException ue( "ELI29958", "Left function has invalid number of arguments!");
-		ue.addDebugInfo("Arguments", str);
 		ue.addDebugInfo("NumOfArgs", vecParameters.size());
 		throw ue;
 	}
 }
 //-------------------------------------------------------------------------------------------------
-const string TextFunctionExpander::expandMid(const string& str, vector<string>& vecParameters) const
+const string TextFunctionExpander::expandMid(vector<string>& vecParameters) const
 {
 	// Get the string
 	const string& strTemp = vecParameters[0];
@@ -940,13 +985,12 @@ const string TextFunctionExpander::expandMid(const string& str, vector<string>& 
 	{
 		// Create and throw exception
 		UCLIDException ue("ELI29961", "Mid function has invalid number of arguments!");
-		ue.addDebugInfo("Arguments", str);
 		ue.addDebugInfo("NumOfArgs", nParamCount);
 		throw ue;
 	}
 }
 //-------------------------------------------------------------------------------------------------
-const string TextFunctionExpander::expandRight(const string& str, vector<string>& vecParameters) const
+const string TextFunctionExpander::expandRight(vector<string>& vecParameters) const
 {
 	// Check for appropriate number of tokens
 	if (vecParameters.size() == 2)
@@ -986,13 +1030,12 @@ const string TextFunctionExpander::expandRight(const string& str, vector<string>
 	{
 		// Create and throw exception
 		UCLIDException ue( "ELI29963", "Right function has invalid number of arguments!");
-		ue.addDebugInfo("Arguments", str);
 		ue.addDebugInfo("NumOfArgs", vecParameters.size());
 		throw ue;
 	}
 }
 //-------------------------------------------------------------------------------------------------
-const string TextFunctionExpander::expandChangeExt(const string& str, vector<string>& vecParameters) const
+const string TextFunctionExpander::expandChangeExt(vector<string>& vecParameters) const
 {
 	// Check for proper number of tokens
 	if (vecParameters.size() == 2)
@@ -1006,7 +1049,6 @@ const string TextFunctionExpander::expandChangeExt(const string& str, vector<str
 		{
 			// Create and throw exception
 			UCLIDException ue( "ELI30019", "ChangeExt function cannot operate on an empty string!");
-			ue.addDebugInfo("Arguments", str);
 			throw ue;
 		}
 
@@ -1040,7 +1082,6 @@ const string TextFunctionExpander::expandChangeExt(const string& str, vector<str
 	{
 		// Create and throw exception
 		UCLIDException ue( "ELI30022", "ChangeExt function has invalid number of arguments!");
-		ue.addDebugInfo("Arguments", str);
 		ue.addDebugInfo("NumOfArgs", vecParameters.size());
 		throw ue;
 	}
@@ -1051,7 +1092,6 @@ const string TextFunctionExpander::expandThreadId(const string& str) const
 	if (!str.empty())
 	{
 		UCLIDException uex("ELI32498", "$ThreadId() does not accept arguments.");
-		uex.addDebugInfo("Argument", str);
 		throw uex;
 	}
 
@@ -1063,7 +1103,6 @@ const string TextFunctionExpander::expandProcessId(const string& str) const
 	if (!str.empty())
 	{
 		UCLIDException uex("ELI32499", "$ProcessId() does not accept arguments.");
-		uex.addDebugInfo("Argument", str);
 		throw uex;
 	}
 

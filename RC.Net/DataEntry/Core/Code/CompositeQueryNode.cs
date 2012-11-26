@@ -648,10 +648,14 @@ namespace Extract.DataEntry
                     }
                 }
 
-                // If specified, turn spatial data into a string result.
+                // If specified, turn spatial or attribute field into a string result.
                 if (SpatialField != null)
                 {
-                    result = GetAttributeSpatialFieldValue(result);
+                    result = GetSpatialFieldValue(result);
+                }
+                else if (AttributeField != null)
+                {
+                    result = GetAttributeFieldValue(result);
                 }
 
                 // Cache the result for efficiency in the case of repeated calls.
@@ -845,7 +849,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <returns>A <see cref="QueryResult"/> describing the spatial field, or an empty result if
         /// <see paramref="result"/> is not spatial.</returns>
-        QueryResult GetAttributeSpatialFieldValue(QueryResult result)
+        QueryResult GetSpatialFieldValue(QueryResult result)
         {
             try
             {
@@ -954,6 +958,58 @@ namespace Extract.DataEntry
                 // spatial info and return blank after logging the exception.
                 var ee = new ExtractException("ELI34852", "Error calculating spatial field", ex);
                 ee.AddDebugData("Field", SpatialField.ToString(), false);
+                ee.Log();
+
+                return new QueryResult(this);
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="QueryResult"/> as a string that describes the specified attribute
+        /// field of <see paramref="result"/>.
+        /// </summary>
+        /// <returns>A <see cref="QueryResult"/> describing the attribute field, or an empty result
+        /// if <see paramref="result"/> is not and attribute.</returns>
+        QueryResult GetAttributeFieldValue(QueryResult result)
+        {
+            try
+            {
+                // Compile an enumeration of all attribute results.
+                IEnumerable<IAttribute> attributeResults = result
+                    .Where(value => value.IsAttribute)
+                    .Select(value => value.FirstAttributeValue);
+
+                // Convert each attribute result into a string value corresponding to the
+                // AttributeField property.
+                QueryResult results;
+                results = new QueryResult(this,
+                    attributeResults.SelectMany(attribute =>
+                    {
+                        if (AttributeField == Extract.DataEntry.AttributeField.Name)
+                        {
+                            return new[] { attribute.Name };
+                        }
+                        else if (AttributeField == Extract.DataEntry.AttributeField.Type)
+                        {
+                            IEnumerable<string> types = attribute.Type.Split('+').Distinct();
+                            return types;
+                        }
+                        else
+                        {
+                            return new[] {""};
+                        }
+                    })
+                .Where (value => !string.IsNullOrEmpty(value))
+                .ToArray());
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                // Treat an error getting the attribute field the same as if the value didn't have any
+                // spatial info and return blank after logging the exception.
+                var ee = new ExtractException("ELI35252", "Error retrieving attribute field", ex);
+                ee.AddDebugData("Field", AttributeField.ToString(), false);
                 ee.Log();
 
                 return new QueryResult(this);

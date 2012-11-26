@@ -516,7 +516,7 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    if (IsSpatial || !string.IsNullOrEmpty(FirstStringValue))
+                    if (IsAttribute || IsSpatial || !string.IsNullOrEmpty(FirstStringValue))
                     {
                         return false;
                     }

@@ -122,9 +122,37 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    InitializeStatics();
+                    var triggerAttributes = new HashSet<IAttribute>();
 
                     string queryString = _queryNode._attributeQueryString;
+                    foreach (string queryPart in queryString.Split('|'))
+                    {
+                        triggerAttributes.UnionWith(Register(queryPart.Trim()));
+                    }
+
+                    return triggerAttributes;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35253");
+                }
+            }
+
+            /// <summary>
+            /// Resolves all existing attributes matching the specified <see paramref="queryString"/>
+            /// and registers a reference to be assigned all added attribute's matching
+            /// <see paramref="queryString"/>.
+            /// </summary>
+            /// <param name="queryString">The query string.</param>
+            /// <returns>
+            /// The existing <see cref="IAttribute"/>s matching the <see paramref="queryString"/>.
+            /// </returns>
+            public HashSet<IAttribute> Register(string queryString)
+            {
+                try
+                {
+                    InitializeStatics();
+
                     HashSet<IAttribute> attributeDomain = new HashSet<IAttribute>();
                     HashSet<IAttribute> triggerAttributes = new HashSet<IAttribute>();
 
@@ -165,7 +193,7 @@ namespace Extract.DataEntry
                         foreach (IAttribute triggerAttribute in
                             AttributeStatusInfo.ResolveAttributeQuery((rootAttribute == _ROOT_ATTRIBUTE)
                                 ? null
-                                : rootAttribute, _queryNode._attributeQueryString))
+                                : rootAttribute, queryString))
                         {
                             triggerAttributes.Add(triggerAttribute);
                         }

@@ -98,6 +98,23 @@ namespace Extract.DataEntry
     }
 
     /// <summary>
+    /// Specifies non-value fields of an attribute to can be returned as text.
+    /// </summary>
+    public enum AttributeField
+    {
+        /// <summary>
+        /// The attribute name
+        /// </summary>
+        Name,
+
+        /// <summary>
+        /// The attribute type. If the attribute has multiple types (delimited by a +), the
+        /// each type will be returned as a separate element in a list.
+        /// </summary>
+        Type
+    }
+
+    /// <summary>
     /// For <see cref="DataEntryQuery"/>'s representing a validation list, specifies for what
     /// purpose the query result should be used.
     /// </summary>
@@ -222,6 +239,11 @@ namespace Extract.DataEntry
         /// Specifies a field of the bounds of a spatial result that can be returned as text.
         /// </summary>
         SpatialField? _spatialField;
+
+        /// <summary>
+        /// Specifies a non-value field of an attribute to that can be returned as text.
+        /// </summary>
+        AttributeField? _attributeField;
 
         /// <summary>
         /// The <see cref="MultipleQueryResultSelectionMode"/> that should be used to determine how
@@ -423,6 +445,25 @@ namespace Extract.DataEntry
             set
             {
                 _spatialField = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a non-value fields of an attribute to return as text.
+        /// </summary>
+        /// <value>
+        /// The non-value fields of an attribute to return as text.
+        /// </value>
+        public AttributeField? AttributeField
+        {
+            get
+            {
+                return _attributeField;
+            }
+
+            set
+            {
+                _attributeField = value;
             }
         }
 
@@ -702,6 +743,16 @@ namespace Extract.DataEntry
                 if (_properties.TryGetValue("SpatialField", out xmlAttributeValue))
                 {
                     _spatialField = (SpatialField)TypeDescriptor.GetConverter(typeof(SpatialField))
+                        .ConvertFromString(xmlAttributeValue);
+                }
+
+                // Convert an attribute parameter to text if specified.
+                if (_properties.TryGetValue("AttributeField", out xmlAttributeValue))
+                {
+                    ExtractException.Assert("ELI35251", "SpatialField and AttributeField attributes " +
+                        "cannot be used together in the same node.", !_spatialField.HasValue);
+
+                    _attributeField = (AttributeField)TypeDescriptor.GetConverter(typeof(AttributeField))
                         .ConvertFromString(xmlAttributeValue);
                 }
 

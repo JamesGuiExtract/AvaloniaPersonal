@@ -29,6 +29,9 @@ public:
 	const string expandFunctions(const string& str,
 		UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility, LPVOID pData) const;
 
+	int findNextFunction(const string& str, unsigned long ulSearchPos, string &rstrFunction,
+		string &rstrToken) const;
+
 	// PURPOSE: to return a list of all functions that 
 	//			this method supports i.e. "dirof", "fileof", "extof"
 	// REQUIRE: NONE
@@ -70,20 +73,20 @@ private:
 	// $RandomAlphaNumeric(5) = A10FP
 	// &UserName() = jsmith
 	// &FullUserName() = John Smith
-	const string expandChangeExt(const string& str, vector<string>& vecParameters) const;
+	const string expandChangeExt(vector<string>& vecParameters) const;
 	const string expandDirOf(const string&) const;
 	const string expandDirNoDriveOf(const string&) const;
 	const string expandDriveOf(const string&) const;
 	const string expandExtOf(const string&) const;
 	const string expandFileOf(const string&) const;
 	const string expandFileNoExtOf(const string&) const;
-	const string expandInsertBeforeExt(const string& str, vector<string>& vecParameters) const;
-	const string expandLeft(const string& str, vector<string>& vecParameters) const;
-	const string expandMid(const string& str, vector<string>& vecParameters) const;
-	const string expandOffset(const string& str, vector<string>& vecParameters) const;
-	const string expandPadValue(const string& str, vector<string>& vecParameters) const;
-	const string expandReplace(const string& str, vector<string>& vecParameters) const;
-	const string expandRight(const string& str, vector<string>& vecParameters) const;
+	const string expandInsertBeforeExt(vector<string>& vecParameters) const;
+	const string expandLeft(vector<string>& vecParameters) const;
+	const string expandMid(vector<string>& vecParameters) const;
+	const string expandOffset(vector<string>& vecParameters) const;
+	const string expandPadValue(vector<string>& vecParameters) const;
+	const string expandReplace(vector<string>& vecParameters) const;
+	const string expandRight(vector<string>& vecParameters) const;
 	const string expandEnv(const string& str) const;
 	const string expandNow(const string& str) const;
 	const string expandRandomAlphaNumeric(const string& str) const;
@@ -92,6 +95,29 @@ private:
 	const string expandTrimAndConsolidateWS(const string& str) const;
 	const string expandThreadId(const string& str) const;
 	const string expandProcessId(const string& str) const;
+
+	// Contains data pertaining to a function scope in the main loop in expandFunctions.
+	struct expansionScopeData
+	{
+		// The result for scope.
+		unsigned long ulArgStartPos;
+		string strResult;
+		string strFunction;
+		string strFuncToken;
+		string strUnExpandedArg;
+		vector<string> vecExpandedArgs;
+		bool bAcceptsMultipleArgs;
+
+		expansionScopeData::expansionScopeData()
+			: ulArgStartPos(0)
+			, strResult("")
+			, strFunction("")
+			, strFuncToken(",")
+			, vecExpandedArgs(0)
+			, bAcceptsMultipleArgs(false)
+		{
+		}
+	};
 
 	// Random object used for "$RandomAlphaNumeric()" calls
 	static Random ms_Rand;

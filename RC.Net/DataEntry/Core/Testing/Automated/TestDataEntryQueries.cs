@@ -210,6 +210,87 @@ namespace Extract.DataEntry.Test
             Assert.That(results[10].ToString() == "32");
         }
 
+        /// <summary>
+        /// Tests the AttributeField attribute.
+        /// </summary>
+        [Test, Category("AttributeQueryNode")]
+        public static void TestAttributeAttributeField()
+        {
+            LoadDataFile(_testImages.GetFile(_FLEX_INDEX_DATA_FILE), null);
+
+            string xml = "<Attribute AttributeField='Name'>/ConsiderationAmount</Attribute>\r\n" +
+                         "<Composite AttributeField='Type'>\r\n" +
+                         "<Attribute>/ConsiderationAmount</Attribute>\r\n" +
+                         "<Attribute>/DocumentType</Attribute>\r\n" +
+                         "</Composite>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 4);
+            Assert.That(results[0].ToString() == "ConsiderationAmount");
+            Assert.That(results[1].ToString() == "Numeric");
+            Assert.That(results[2].ToString() == "Dollar");
+            Assert.That(results[3].ToString() == "String");
+        }
+
+        /// <summary>
+        /// Tests the * and @ elements of query syntax
+        /// </summary>
+        [Test, Category("AttributeQueryNode")]
+        public static void TestAttributeQuerySyntax()
+        {
+            LoadDataFile(_testImages.GetFile(_FLEX_INDEX_DATA_FILE), null);
+
+            string xml = "<Attribute>@Numeric</Attribute>\r\n" +
+                         "<Attribute>*@Dollar</Attribute>\r\n" +
+                         "<Attribute>DocumentType@String</Attribute>\r\n" +
+                         "<Attribute>LegalDescription/*</Attribute>\r\n" +
+                         "<Attribute>ReturnAddress/@Company</Attribute>\r\n" +
+                         "<Attribute>*/@FULL</Attribute>\r\n" +
+                         "<Attribute>*/Recipient2@FULL</Attribute>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 10);
+            Assert.That(results[0].ToString() == "192800.00");
+            Assert.That(results[1].ToString() == "192800.00");
+            Assert.That(results[2].ToString() == "Deed of Trust");
+            Assert.That(results[3].ToString().StartsWith("LOT 123", StringComparison.Ordinal));
+            Assert.That(results[4].ToString() == "123");
+            Assert.That(results[5].ToString() == "ARBOR OAKS NO. 2");
+            Assert.That(results[6].ToString() == "CitiMortgage, Inc.");
+            Assert.That(results[7].ToString() == "123");
+            Assert.That(results[8].ToString() == "Attn: Document Processing");
+            Assert.That(results[9].ToString() == "Attn: Document Processing");
+        }
+
+        /// <summary>
+        /// Tests the | element to combine different attribute queries.
+        /// </summary>
+        [Test, Category("AttributeQueryNode")]
+        public static void TestAttributeQueryOrSyntax()
+        {
+            LoadDataFile(_testImages.GetFile(_FLEX_INDEX_DATA_FILE), null);
+
+            string xml = "<Attribute>@Numeric|*@Dollar|DocumentType@String|LegalDescription/*|ReturnAddress/@Company|*/@FULL|*/Recipient2@FULL</Attribute>";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 7);
+            Assert.That(results[0].ToString() == "192800.00");
+            Assert.That(results[1].ToString() == "Deed of Trust");
+            Assert.That(results[2].ToString().StartsWith("LOT 123", StringComparison.Ordinal));
+            Assert.That(results[3].ToString() == "123");
+            Assert.That(results[4].ToString() == "ARBOR OAKS NO. 2");
+            Assert.That(results[5].ToString() == "CitiMortgage, Inc.");
+            Assert.That(results[6].ToString() == "Attn: Document Processing");
+        }
 
         /// <summary>
         /// Tests the <see cref="SqlQueryNode"/>
