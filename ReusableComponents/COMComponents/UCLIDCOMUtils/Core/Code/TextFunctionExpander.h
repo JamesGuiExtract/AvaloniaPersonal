@@ -29,6 +29,10 @@ public:
 	const string expandFunctions(const string& str,
 		UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility, LPVOID pData) const;
 
+	// PURPOSE: Returns the position of the next path tag function in str to expand starting at or
+	//			following ulSearchPos.
+	//			If found, rstrFunction returns the name of the function and rstrToken returns
+	//			the token to be used to delimit separate parameters.
 	int findNextFunction(const string& str, unsigned long ulSearchPos, string &rstrFunction,
 		string &rstrToken) const;
 
