@@ -23,6 +23,11 @@ namespace Extract.Utilities
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(SystemMethods).ToString();
 
+        /// <summary>
+        /// "This operation returned because the timeout period expired."
+        /// </summary>
+        static int _OPERATION_TIMEOUT_EXIT_CODE = 1460;
+
         #endregion Constants
 
         /// <summary>
@@ -273,9 +278,11 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="exeFile">The exe file.</param>
         /// <param name="arguments">The arguments.</param>
-        public static void RunExecutable(string exeFile, IEnumerable<string> arguments)
+        /// <returns>The exit code of the process or 1460 ("This operation returned because the
+        /// timeout period expired.") if timeToWait has expired.</returns>
+        public static int RunExecutable(string exeFile, IEnumerable<string> arguments)
         {
-            RunExecutable(exeFile, arguments, int.MaxValue);
+            return RunExecutable(exeFile, arguments, int.MaxValue);
         }
 
         /// <summary>
@@ -286,7 +293,9 @@ namespace Extract.Utilities
         /// <param name="exeFile">The exe file.</param>
         /// <param name="arguments">The arguments.</param>
         /// <param name="timeToWait">The time to wait.</param>
-        public static void RunExecutable(string exeFile, IEnumerable<string> arguments,
+        /// <returns>The exit code of the process or 1460 ("This operation returned because the
+        /// timeout period expired.") if timeToWait has expired.</returns>
+        public static int RunExecutable(string exeFile, IEnumerable<string> arguments,
             int timeToWait)
         {
             try
@@ -309,7 +318,14 @@ namespace Extract.Utilities
                         .Select(s => (s.Contains(' ') && s[0] != '"') ? s.Quote() : s)
                         .ToArray()));
                     process.Start();
-                    process.WaitForExit(timeToWait);
+                    if (process.WaitForExit(timeToWait))
+                    {
+                        return process.ExitCode;
+                    }
+                    else
+                    {
+                        return _OPERATION_TIMEOUT_EXIT_CODE;
+                    }
                 }
             }
             catch (Exception ex)
@@ -325,7 +341,9 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="exeFile">The executable to run.</param>
         /// <param name="arguments">The command line arguments for the executable.</param>
-        public static void RunExtractExecutable(string exeFile,  IEnumerable<string> arguments)
+        /// <returns>The exit code of the process or 1460 ("This operation returned because the
+        /// timeout period expired.") if timeToWait has expired.</returns>
+        public static int RunExtractExecutable(string exeFile,  IEnumerable<string> arguments)
         {
             try
             {
@@ -336,13 +354,15 @@ namespace Extract.Utilities
                     args.Add(tempFile.FileName);
 
                     // Run the executable and wait for it to exit
-                    RunExecutable(exeFile, args);
+                    int exitCode = RunExecutable(exeFile, args);
 
                     var info = new FileInfo(tempFile.FileName);
                     if (info.Length > 0)
                     {
                         throw ExtractException.LoadFromFile("ELI31875", tempFile.FileName);
                     }
+
+                    return exitCode;
                 }
             }
             catch (Exception ex)

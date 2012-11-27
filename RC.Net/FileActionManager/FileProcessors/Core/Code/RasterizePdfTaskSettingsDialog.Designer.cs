@@ -214,9 +214,9 @@
             this._checkUseAltMethod.AutoSize = true;
             this._checkUseAltMethod.Location = new System.Drawing.Point(12, 136);
             this._checkUseAltMethod.Name = "_checkUseAltMethod";
-            this._checkUseAltMethod.Size = new System.Drawing.Size(186, 17);
+            this._checkUseAltMethod.Size = new System.Drawing.Size(201, 17);
             this._checkUseAltMethod.TabIndex = 11;
-            this._checkUseAltMethod.Text = "Use alternate rasterization method";
+            this._checkUseAltMethod.Text = "Try alternate rasterization method first";
             this._checkUseAltMethod.UseVisualStyleBackColor = true;
             // 
             // RasterizePdfTaskSettingsDialog

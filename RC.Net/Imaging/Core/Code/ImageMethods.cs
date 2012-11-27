@@ -705,7 +705,18 @@ namespace Extract.Imaging
                 var arguments = useAlternateMethod
                     ? new string[] { inputFile, outputFile, "/tif", "/am" }
                     : new string[] { inputFile, outputFile, "/tif" };
-                SystemMethods.RunExtractExecutable(_IMAGE_FORMAT_CONVERTER, arguments);
+                int exitCode = SystemMethods.RunExtractExecutable(_IMAGE_FORMAT_CONVERTER, arguments);
+                
+                // [DotNetRCAndUtils:849]
+                // If _IMAGE_FORMAT_CONVERTER does not return 0, the conversion did not succeed
+                // (likely crashed).
+                if (exitCode != 0)
+                {
+                    var ee = new ExtractException("ELI35266",
+                        "PDF conversion process terminiated abnormally.");
+                    ee.AddDebugData("Exit code", exitCode, false);
+                    throw ee;
+                }
             }
             catch (Exception ex)
             {

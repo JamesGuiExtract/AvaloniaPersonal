@@ -1402,16 +1402,12 @@ namespace Extract.FileActionManager.FileSuppliers
 
                         try
                         {
-                            string remoteFileName =
-                                FtpMethods.NormalizeRemotePath(_expandedRemoteDownloadFolder)
-                                    + currentFtpFile.Name;
-
                             // Call the DownloadFileFromFtpServer retry within a FtpEventRecorder//
                             // block so that an FTP event history row will be added upon success or
                             // after all retries have been exhausted.
                             using (var recorder = new FtpEventRecorder(this, runningConnection,
                                 _fileProcessingDB, _actionID, true,
-                                EFTPAction.kDownloadFileFromFtpServer, null, remoteFileName))
+                                EFTPAction.kDownloadFileFromFtpServer, null, currentFtpFile.Path))
                             {
                                 string downloadedFileName = null;
 

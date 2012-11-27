@@ -581,8 +581,20 @@ namespace Extract.FileActionManager.FileProcessors
                     throw ee;
                 }
 
-                // Convert to TIF
-                ImageMethods.ConvertPdfToTif(pdfFile, destFile, _useAlternateMethod);
+                try
+                {
+                    ImageMethods.ConvertPdfToTif(pdfFile, destFile, _useAlternateMethod);
+                }
+                catch (Exception ex)
+                {
+                    var ee = new ExtractException("ELI35267",
+                        (_useAlternateMethod ? "Alternate" : "Normal") +
+                        " rasterization method failed; attempting " +
+                        (_useAlternateMethod ? "normal method." : "alternate method."), ex);
+                    ee.Log();
+
+                    ImageMethods.ConvertPdfToTif(pdfFile, destFile, !_useAlternateMethod);
+                }
 
                 // Delete PDF if specified
                 if (_deletePdf)
