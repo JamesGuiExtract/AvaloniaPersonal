@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.Licensing;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -62,9 +63,20 @@ namespace Extract.DataEntryPrompt
         /// </summary>
         public DataEntryPromptForm()
         {
-            InitializeComponent();
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                    "ELI35256", "Data entry prompt utility is not licensed.");
 
-            _errorProvider.BlinkStyle = ErrorBlinkStyle.NeverBlink;
+                InitializeComponent();
+
+                _errorProvider.BlinkStyle = ErrorBlinkStyle.NeverBlink;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35258");
+            }
         }
 
         #endregion Constructors
@@ -78,73 +90,81 @@ namespace Extract.DataEntryPrompt
         /// </param>
         protected override void OnLoad(EventArgs e)
         {
-            base.OnLoad(e);
-
-            Text = Properties.Settings.Default.Title;
-            _okButton.Text = Properties.Settings.Default.OKButtonLabel;
-            _cancelButton.Text = Properties.Settings.Default.CancelButtonLabel;
-
-            // Initialize up to 10 fields that have been defined in the config file.
-            int controlIndex = 0;
-            for (int i = 1; i <= 10; i++)
+            try
             {
-                string propertyName = "Field" + i.ToString(CultureInfo.InvariantCulture);
-                string validationPropertyName = propertyName + "Validation";
+                base.OnLoad(e);
 
-                string fieldName = (string)Properties.Settings.Default[propertyName];
-                    
-                if (!string.IsNullOrEmpty(fieldName))
+                Text = Properties.Settings.Default.Title;
+                _okButton.Text = Properties.Settings.Default.OKButtonLabel;
+                _cancelButton.Text = Properties.Settings.Default.CancelButtonLabel;
+
+                // Initialize up to 10 fields that have been defined in the config file.
+                int controlIndex = 0;
+                for (int i = 1; i <= 10; i++)
                 {
-                    // Add the field label
-                    Label label = new Label();
-                    label.AutoSize = true;
-                    label.Anchor = AnchorStyles.Left;
-                    label.Text = fieldName;
-                    _tableLayoutPanel.Controls.Add(label, 0, controlIndex++);
-                    _tableLayoutPanel.SetColumnSpan(label, 2);
+                    string propertyName = "Field" + i.ToString(CultureInfo.InvariantCulture);
+                    string validationPropertyName = propertyName + "Validation";
 
-                    // Add the text box to accept input.
-                    TextBox textBox = new TextBox();
-                    textBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-                    // Allow for space for the error icon to be displayed.
-                    textBox.Margin = new Padding(textBox.Margin.Left,
-                        textBox.Margin.Top,
-                        textBox.Margin.Right + 16,
-                        textBox.Margin.Bottom);
-                    _tableLayoutPanel.Controls.Add(textBox, 0, controlIndex++);
-                    _tableLayoutPanel.SetColumnSpan(textBox, 2);
+                    string fieldName = (string)Properties.Settings.Default[propertyName];
 
-                    _dataFields[fieldName] = textBox;
-
-                    // Add a regex for validation if one is defined.
-                    string validationString =
-                        (string)Properties.Settings.Default[validationPropertyName];
-                    if (!string.IsNullOrEmpty(validationString))
+                    if (!string.IsNullOrEmpty(fieldName))
                     {
-                        _validationRegexes[textBox] = new Regex(validationString);
-                        textBox.TextChanged += HandleTextBox_TextChanged;
+                        // Add the field label
+                        Label label = new Label();
+                        label.AutoSize = true;
+                        label.Anchor = AnchorStyles.Left;
+                        label.Text = fieldName;
+                        _tableLayoutPanel.Controls.Add(label, 0, controlIndex++);
+                        _tableLayoutPanel.SetColumnSpan(label, 2);
+
+                        // Add the text box to accept input.
+                        TextBox textBox = new TextBox();
+                        textBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+                        // Allow for space for the error icon to be displayed.
+                        textBox.Margin = new Padding(textBox.Margin.Left,
+                            textBox.Margin.Top,
+                            textBox.Margin.Right + 16,
+                            textBox.Margin.Bottom);
+                        _tableLayoutPanel.Controls.Add(textBox, 0, controlIndex++);
+                        _tableLayoutPanel.SetColumnSpan(textBox, 2);
+
+                        _dataFields[fieldName] = textBox;
+
+                        // Add a regex for validation if one is defined.
+                        string validationString =
+                            (string)Properties.Settings.Default[validationPropertyName];
+                        if (!string.IsNullOrEmpty(validationString))
+                        {
+                            _validationRegexes[textBox] = new Regex(validationString);
+                            textBox.TextChanged += HandleTextBox_TextChanged;
+                        }
                     }
                 }
+
+                ExtractException.Assert("ELI35263", "No fields have been defined in config file.",
+                    _dataFields.Count > 0);
+
+                ClearData(false);
+
+                string dataFileName = GetDataFileName();
+
+                var dataFileLines = File.ReadLines(dataFileName)
+                    .Where(line => !string.IsNullOrEmpty(line))
+                    .Skip(1)
+                    .ToArray();
+
+                if (dataFileLines.Length > 0)
+                {
+                    _recordId = dataFileLines
+                        .Select(line => line.Split(',')[0])
+                        .Select(id => Int32.Parse(id, CultureInfo.InvariantCulture))
+                        .Max();
+                    _recordId++;
+                }
             }
-
-            Trace.Assert(_dataFields.Count > 0, "No fields have been defined in config file.");
-
-            ClearData(false);
-
-            string dataFileName = GetDataFileName();
-
-            var dataFileLines = File.ReadLines(dataFileName)
-                .Where(line => !string.IsNullOrEmpty(line))
-                .Skip(1)
-                .ToArray();
-
-            if (dataFileLines.Length > 0)
+            catch (Exception ex)
             {
-                _recordId = dataFileLines
-                    .Select(line => line.Split(',')[0])
-                    .Select(id => Int32.Parse(id, CultureInfo.InvariantCulture))
-                    .Max();
-                _recordId++;
+                ex.ExtractDisplay("ELI35259");
             }
         }
 
@@ -172,8 +192,8 @@ namespace Extract.DataEntryPrompt
                     }
                 }
 
-                Trace.Assert(!string.IsNullOrEmpty(Properties.Settings.Default.DataFileName),
-                    "Data file name not specified.");
+                ExtractException.Assert("ELI35264", "Data file name not specified.",
+                    !string.IsNullOrEmpty(Properties.Settings.Default.DataFileName));
 
                 string dataFileName = GetDataFileName();
 
@@ -205,7 +225,7 @@ namespace Extract.DataEntryPrompt
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                ex.ExtractDisplay("ELI35260");
             }
         }
 
@@ -231,7 +251,7 @@ namespace Extract.DataEntryPrompt
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                ex.ExtractDisplay("ELI35261");
             }
         }
 
@@ -257,7 +277,7 @@ namespace Extract.DataEntryPrompt
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                ex.ExtractDisplay("ELI35262");
             }
         }
 
@@ -293,7 +313,7 @@ namespace Extract.DataEntryPrompt
             }
 
             // Reset focus to the first field.
-            _dataFields.First().Value.Focus();
+            ActiveControl = _dataFields.First().Value;
 
             if (incermentId)
             {
@@ -312,8 +332,8 @@ namespace Extract.DataEntryPrompt
                 Environment.ExpandEnvironmentVariables(Properties.Settings.Default.DataFileName);
 
             // Ensure that fileName is not null or empty
-            Trace.Assert(!string.IsNullOrEmpty(dataFileName),
-                "File name must not be null or empty string.");
+            ExtractException.Assert("ELI35265", "File name must not be null or empty string.",
+                !string.IsNullOrEmpty(dataFileName));
 
             // Check if the filename is a relative path
             if (!Path.IsPathRooted(dataFileName))
