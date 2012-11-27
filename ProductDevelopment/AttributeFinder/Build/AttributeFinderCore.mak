@@ -82,7 +82,8 @@ BuildPDUtils: BuildAttributeFinderCore
 BuildAttributeFinderCore:  
 	@ECHO Building AFCore...
     @CD "$(AFRootDirectory)\AFCore\AFCoreTest\Code"
-    @devenv AFCoreTest.sln /BUILD $(BuildConfig) 
+    @devenv AFCoreTest.sln /BUILD $(BuildConfig)
+	cscript "$(CommonDirectory)\Make DEPs Compatible.vbs" "$(BinariesFolder)"
 	
 UnregisterClearImage5_7:
 	@ECHO Unregistering ClearImage 5_7...
