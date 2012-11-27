@@ -3157,7 +3157,7 @@
 		<row><td>ID_STRING15</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>1394518507</td></row>
 		<row><td>ID_STRING2</td><td>1033</td><td>UTILIT~1|Utilities</td><td>0</td><td/><td>1788731720</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>NEWSHO~1|NewShortcut1</td><td>0</td><td/><td>1788699080</td></row>
-		<row><td>ID_STRING4</td><td>1033</td><td>VEWEXC~1|Vew Exception Log</td><td>0</td><td/><td>1788721640</td></row>
+		<row><td>ID_STRING4</td><td>1033</td><td>VIEWEX~1|View Exception Log</td><td>0</td><td/><td>-576664821</td></row>
 		<row><td>ID_STRING5</td><td>1033</td><td>VOAFIL~1|VOA File Viewer</td><td>0</td><td/><td>1788719624</td></row>
 		<row><td>ID_STRING6</td><td>1033</td><td>USSFIL~1|USS File Viewer</td><td>0</td><td/><td>1788709416</td></row>
 		<row><td>ID_STRING7</td><td>1033</td><td>RULETE~1|Rule Tester</td><td>0</td><td/><td>1788682824</td></row>
@@ -3729,7 +3729,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
 		<row><td>ProductCode</td><td>{0E412937-E4FA-4737-A321-00AED69497C7}</td><td/></row>
-		<row><td>ProductName</td><td>Extract Systems LabDE</td><td/></row>
+		<row><td>ProductName</td><td>LabDE</td><td/></row>
 		<row><td>ProductVersion</td><td>1.0.0.0</td><td/></row>
 		<row><td>REBOOT</td><td>Suppress</td><td/></row>
 		<row><td>STANDARD_USE_SETUPEXE</td><td>##IDS_STANDARD_USE_SETUPEXE##</td><td/></row>
