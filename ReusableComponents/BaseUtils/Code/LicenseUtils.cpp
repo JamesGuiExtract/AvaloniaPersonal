@@ -33,13 +33,13 @@ const unsigned long	gulUCLIDKey15 = 0x3C6D1A3E;
 const unsigned long	gulUCLIDKey16 = 0x6EDC5C7D;
 
 // Disk Serial Number expected for Extract Network drive
-//const unsigned long gulDOMAIN_PATH_SERIAL_NUMBER = 3901997708;	// for ROVER
 const unsigned long gulDOMAIN_PATH_SERIAL_NUMBER_FNP = 1558792743;		// for FNP
-const unsigned long gulDOMAIN_PATH_SERIAL_NUMBER_JAKE = 2628579598;		// for Jake
+const unsigned long gulDOMAIN_PATH_SERIAL_NUMBER_ESITDC01 = 15240731;		// for es-it-dc-01  - Jake's replacement
 
 // Associated Network path
 const string gstrDOMAIN_PATH_FNP = "\\fnp2\\internal";		// for FNP
-const string gstrDOMAIN_PATH_JAKE = "\\jake\\internal";		// for Jake
+const string gstrDOMAIN_PATH_ESITDC01 = "\\es-it-dc-01\\internal";		// for es-it-dc-01  - Jake's replacement
+const string gstrDOMAIN_PATH_ESITDC01_JAKE = "\\es-it-dc-01\\Jake-Internal"; // 2nd share that is the same as Internal
 
 //-------------------------------------------------------------------------------------------------
 // Local functions
@@ -116,8 +116,6 @@ void getUEPassword(ByteStream& rPasswordBytes)
 //-------------------------------------------------------------------------------------------------
 bool isInternalToolsLicensed()
 {
-	bool bReturn = false;
-
 	// Check FNP
 	string strDrive = getMappedDrive( gstrDOMAIN_PATH_FNP );
 	if (strDrive.length() > 0)
@@ -132,28 +130,33 @@ bool isInternalToolsLicensed()
 		// Compare serial numbers
 		if (ulTemp == gulDOMAIN_PATH_SERIAL_NUMBER_FNP)
 		{
-			bReturn = true;
+			return true;
 		}
 	}
 
-	// Check Jake if FNP check failed
-	strDrive = bReturn ? "" : getMappedDrive(gstrDOMAIN_PATH_JAKE);
+	// Check ES-IT-DC-01 if FNP check failed
+	strDrive = getMappedDrive(gstrDOMAIN_PATH_ESITDC01);
+	if ( strDrive == "" )
+	{
+		// There are 2 possible drive mappings that go to the same drive
+		strDrive = getMappedDrive(gstrDOMAIN_PATH_ESITDC01_JAKE);
+	}
 	if (strDrive.length() > 0)
 	{
-		// Append a backslasg character
+		// Append a backslash character
 		strDrive += "\\";
 
-		// Get Jake's disk serial number
+		// Get ES-IT-DC-01's disk serial number
 		unsigned long ulTemp = 0;
 		GetVolumeInformation(strDrive.c_str(), NULL, NULL, &ulTemp, NULL, NULL, NULL, NULL);
 
 		// Compare serial numbers
-		if (ulTemp == gulDOMAIN_PATH_SERIAL_NUMBER_JAKE)
+		if (ulTemp == gulDOMAIN_PATH_SERIAL_NUMBER_ESITDC01)
 		{
-			bReturn = true;
+			return true;
 		}
 	}
 
-	return bReturn;
+	return false;
 }
 //-------------------------------------------------------------------------------------------------

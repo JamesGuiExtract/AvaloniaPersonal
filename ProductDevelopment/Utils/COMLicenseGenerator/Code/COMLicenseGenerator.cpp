@@ -312,7 +312,7 @@ BOOL CCOMLicenseGeneratorApp::InitInstance()
 	}
 #endif
 
-	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 
 	// force loading of the COMLMCore.Dll right now so that a following call to
 	// GetModuleHandle() to determine the COMLMCore.DLL's location does not fail
