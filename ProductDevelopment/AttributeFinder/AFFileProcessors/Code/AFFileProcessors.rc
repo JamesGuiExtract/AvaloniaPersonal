@@ -110,8 +110,8 @@ BEGIN
     CONTROL         "Use previously saved OCR results if available",IDC_CHK_FROM_USS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,34,311,12
     GROUPBOX        "Rule input",IDC_STATIC,5,49,311,43
-    CONTROL         "Make the results of the following data file available to the rules",IDC_CHK_PROVIDE_INPUT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,60,211,10
+    CONTROL         "Make the contents of the following data file available to the rules",IDC_CHK_PROVIDE_INPUT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,60,218,10
     EDITTEXT        IDC_EDIT_INPUT_DATA,12,74,269,12,ES_AUTOHSCROLL
     PUSHBUTTON      "SelectDocTag",IDC_BTN_DOCTAGS_DATA_INPUT,286,72,10,14,BS_ICON
     PUSHBUTTON      "...",IDC_BTN_BROWSE_DATA_INPUT,300,72,15,14
@@ -164,6 +164,10 @@ BEGIN
         RIGHTMARGIN, 316
         TOPMARGIN, 5
         BOTTOMMARGIN, 154
+    END
+
+    IDD_AFCONVERTVOATOXMLTASKPP, DIALOG
+    BEGIN
     END
 END
 #endif    // APSTUDIO_INVOKED

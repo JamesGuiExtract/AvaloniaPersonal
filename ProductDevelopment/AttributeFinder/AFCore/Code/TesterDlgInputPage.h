@@ -26,9 +26,18 @@ public:
 	// PROMISE: Attempts to read in the specified file. If strFileName is not specified or empty it
 	// will use the text in IDC_EDIT_FILE as the source file name.
 	void inputFileChanged(string strFileName = "");
+
+	// PROMISE: Sets the last used data input file.
+	void dataInputFileChanged(string strDataInputFileName = "");
 	
 	// get current text from the input page
 	ISpatialStringPtr getText();
+
+	// Indicates whether an existing voa file should be passed to the rule object.
+	bool useDataInputFile();
+
+	// Returns the name of the voa file to be passed to the rule object.
+	string getDataInputFileName();
 
 // Dialog Data
 	//{{AFX_DATA(TesterDlgInputPage)
@@ -40,6 +49,9 @@ public:
 	CButton m_btnBrowse;
 	CStatic m_labelInput;
 	CStatic m_labelFileName;
+	CButton m_chkUseDataInputFile;
+	CEdit m_editDataInputFileName;
+	CButton m_btnDataInputBrowse;
 	//}}AFX_DATA
 
 
@@ -61,6 +73,9 @@ protected:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSelchangeComboInput();
 	afx_msg void OnKillFocusEditFile();
+	afx_msg void OnKillFocusEditDataInputFile();
+	afx_msg void OnCheckUseDataInput();
+	afx_msg void OnBtnBrowseDataInput();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 

@@ -16,10 +16,18 @@ public:
 	string getLastFileOpenDirectory(void);
 	void setLastFileOpenDirectory(const string& strFileDir);
 
+	//	Gets and sets the last data (voa) input directory
+	string getLastDataInputFileOpenDirectory(void);
+	void setLastDataInputFileOpenDirectory(const string& strDataInputFileDir);
+
 	//	Gets the last file name
 	//	Sets the last file name
 	string getLastFileName(void);
 	void setLastFileName(const string& strFileName);
+
+	//	Gets and sets the last data (voa) input file name
+	string getLastDataInputFileName(void);
+	void setLastDataInputFileName(const string& strDataInputFileName);
 
 	// Returns the left and top values of the window position
 	// Stores the left and top values of the window position
@@ -86,6 +94,8 @@ private:
 	// Registry keys for information persistence
 	static const string LAST_FILE_OPEN_DIR;
 	static const string LAST_FILE_NAME;
+	static const string LAST_DATA_FILE_OPEN_DIR;
+	static const string LAST_DATA_FILE_NAME;
 	static const string WINDOW_POS_X;
 	static const string WINDOW_POS_Y;
 	static const string WINDOW_SIZE_X;
@@ -101,6 +111,8 @@ private:
 
 	static const string DEFAULT_LAST_FILE_OPEN_DIR;
 	static const string DEFAULT_LAST_FILE_NAME;
+	static const string DEFAULT_LAST_DATA_FILE_OPEN_DIR;
+	static const string DEFAULT_LAST_DATA_FILE_NAME;
 	static const string DEFAULT_WINDOW_POS_X;
 	static const string DEFAULT_WINDOW_POS_Y;
 	static const string DEFAULT_WINDOW_SIZE_X;

@@ -7,6 +7,7 @@
 #include "TesterConfigMgr.h"
 #include "msword9.h"
 #include "AFInternalUtils.h"
+#include "Common.h"
 
 #include <TemporaryResourceOverride.h>
 #include <UCLIDException.h>
@@ -14,6 +15,7 @@
 #include <Win32Util.h>
 #include <ComUtils.h>
 #include <LicenseMgmt.h>
+#include <LoadFileDlgThread.h>
 
 #include <io.h>
 
@@ -65,6 +67,9 @@ void TesterDlgInputPage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, ID_BROWSE, m_btnBrowse);
 	DDX_Control(pDX, IDC_STATIC_INPUT, m_labelInput);
 	DDX_Control(pDX, IDC_STATIC_FILENAME, m_labelFileName);
+	DDX_Control(pDX, IDC_CHK_PROVIDE_INPUT, m_chkUseDataInputFile);
+	DDX_Control(pDX, IDC_EDIT_INPUT_DATA, m_editDataInputFileName);
+	DDX_Control(pDX, IDC_BTN_BROWSE_DATA_INPUT, m_btnDataInputBrowse);
 	//}}AFX_DATA_MAP
 }
 //-------------------------------------------------------------------------------------------------
@@ -81,6 +86,9 @@ BEGIN_MESSAGE_MAP(TesterDlgInputPage, CPropertyPage)
 	ON_BN_CLICKED(ID_BROWSE, OnBrowse)
 	ON_CBN_SELCHANGE(IDC_COMBO_INPUT, OnSelchangeComboInput)
 	ON_EN_KILLFOCUS(IDC_EDIT_FILE, OnKillFocusEditFile)
+	ON_EN_KILLFOCUS(IDC_EDIT_INPUT_DATA, OnKillFocusEditDataInputFile)
+	ON_BN_CLICKED(IDC_CHK_PROVIDE_INPUT, OnCheckUseDataInput)
+	ON_BN_CLICKED(IDC_BTN_BROWSE_DATA_INPUT, OnBtnBrowseDataInput)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -164,6 +172,37 @@ void TesterDlgInputPage::resizeControls()
 			m_editFile.MoveWindow(&rectFileName);
 			m_editFile.ShowWindow(TRUE);
 
+			// position the input data file checkbox
+			CRect rectChkProvideInput;
+			m_chkUseDataInputFile.GetWindowRect(&rectChkProvideInput);
+			ScreenToClient(&rectChkProvideInput);
+			long nChkProvideInputHeight = rectChkProvideInput.Height();
+			rectChkProvideInput.top = rectFileName.bottom + giCONTROL_SPACING;
+			rectChkProvideInput.bottom = rectChkProvideInput.top + nChkProvideInputHeight;
+			m_chkUseDataInputFile.MoveWindow(&rectChkProvideInput);
+
+			// position the input data file browse button
+			CRect rectBtnDataInputBrowse;
+			m_btnDataInputBrowse.GetWindowRect(&rectBtnDataInputBrowse);
+			ScreenToClient(&rectBtnDataInputBrowse);
+			long nEditDataInputBrowseWidth = rectBtnDataInputBrowse.Width();
+			long nEditDataInputBrowseHeight = rectBtnDataInputBrowse.Height();
+			rectBtnDataInputBrowse.top = rectChkProvideInput.bottom + giCONTROL_SPACING;
+			rectBtnDataInputBrowse.right = rectDlg.right - giCONTROL_SPACING;
+			rectBtnDataInputBrowse.bottom = rectBtnDataInputBrowse.top + nEditDataInputBrowseHeight;
+			rectBtnDataInputBrowse.left = rectBtnDataInputBrowse.right - nEditDataInputBrowseWidth;
+			m_btnDataInputBrowse.MoveWindow(&rectBtnDataInputBrowse);
+
+			// position the input data file editbox
+			CRect rectEditDataInput;
+			m_editDataInputFileName.GetWindowRect(&rectEditDataInput);
+			ScreenToClient(&rectEditDataInput);
+			long nEditDataInputHeight = rectEditDataInput.Height();
+			rectEditDataInput.top = rectChkProvideInput.bottom + giCONTROL_SPACING;
+			rectEditDataInput.right = rectBtnDataInputBrowse.left - giCONTROL_SPACING;
+			rectEditDataInput.bottom = rectEditDataInput.top + nEditDataInputHeight;
+			m_editDataInputFileName.MoveWindow(&rectEditDataInput);
+
 			// resize the perform OCR checkbox
 			CRect rectPerformOCR;
 			m_checkOCR.GetWindowRect(&rectPerformOCR);
@@ -171,7 +210,7 @@ void TesterDlgInputPage::resizeControls()
 			long nPerformOCRHeight = rectPerformOCR.Height();
 			long nPerformOCRWidth = rectPerformOCR.Width();
 			rectPerformOCR.left = giCONTROL_SPACING;
-			rectPerformOCR.top = rectFileName.bottom + giCONTROL_SPACING;
+			rectPerformOCR.top = rectEditDataInput.bottom + giCONTROL_SPACING;
 			rectPerformOCR.right = rectPerformOCR.left + nPerformOCRWidth;
 			rectPerformOCR.bottom = rectPerformOCR.top + nPerformOCRHeight;
 			m_checkOCR.MoveWindow(&rectPerformOCR);
@@ -181,13 +220,44 @@ void TesterDlgInputPage::resizeControls()
 		}
 		else
 		{
+			// position the input data file checkbox
+			CRect rectChkProvideInput;
+			m_chkUseDataInputFile.GetWindowRect(&rectChkProvideInput);
+			ScreenToClient(&rectChkProvideInput);
+			long nChkProvideInputHeight = rectChkProvideInput.Height();
+			rectChkProvideInput.top = rectCombo.bottom + giCONTROL_SPACING;
+			rectChkProvideInput.bottom = rectChkProvideInput.top + nChkProvideInputHeight;
+			m_chkUseDataInputFile.MoveWindow(&rectChkProvideInput);
+
+			// position the input data file browse button
+			CRect rectBtnDataInputBrowse;
+			m_btnDataInputBrowse.GetWindowRect(&rectBtnDataInputBrowse);
+			ScreenToClient(&rectBtnDataInputBrowse);
+			long nEditDataInputBrowseWidth = rectBtnDataInputBrowse.Width();
+			long nEditDataInputBrowseHeight = rectBtnDataInputBrowse.Height();
+			rectBtnDataInputBrowse.top = rectChkProvideInput.bottom + giCONTROL_SPACING;
+			rectBtnDataInputBrowse.right = rectDlg.right - giCONTROL_SPACING;
+			rectBtnDataInputBrowse.bottom = rectBtnDataInputBrowse.top + nEditDataInputBrowseHeight;
+			rectBtnDataInputBrowse.left = rectBtnDataInputBrowse.right - nEditDataInputBrowseWidth;
+			m_btnDataInputBrowse.MoveWindow(&rectBtnDataInputBrowse);
+
+			// position the input data file editbox
+			CRect rectEditDataInput;
+			m_editDataInputFileName.GetWindowRect(&rectEditDataInput);
+			ScreenToClient(&rectEditDataInput);
+			long nEditDataInputHeight = rectEditDataInput.Height();
+			rectEditDataInput.top = rectChkProvideInput.bottom + giCONTROL_SPACING;
+			rectEditDataInput.right = rectBtnDataInputBrowse.left - giCONTROL_SPACING;
+			rectEditDataInput.bottom = rectEditDataInput.top + nEditDataInputHeight;
+			m_editDataInputFileName.MoveWindow(&rectEditDataInput);
+
 			// there are no filename related controls.  The edit
 			// box appears directly underneath the combo box
 			m_checkOCR.ShowWindow(FALSE);
 			m_labelFileName.ShowWindow(FALSE);
 			m_editFile.ShowWindow(FALSE);
 			m_btnBrowse.ShowWindow(FALSE);
-			nTopOfEditControl = rectCombo.bottom + giCONTROL_SPACING;
+			nTopOfEditControl = rectEditDataInput.bottom + giCONTROL_SPACING;
 		}
 
 		// resize the input edit box 
@@ -406,6 +476,78 @@ void TesterDlgInputPage::OnKillFocusEditFile()
 		inputFileChanged();		
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29888")
+}
+//--------------------------------------------------------------------------------------------------
+void TesterDlgInputPage::OnKillFocusEditDataInputFile()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
+
+	try
+	{
+		void dataInputFileChanged();		
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35268")
+}
+//-------------------------------------------------------------------------------------------------
+void TesterDlgInputPage::OnCheckUseDataInput()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
+
+	try
+	{
+		VARIANT_BOOL bEnable = asVariantBool(m_chkUseDataInputFile.GetCheck() == BST_CHECKED);
+
+		m_editDataInputFileName.EnableWindow(bEnable);
+		GetDlgItem(IDC_BTN_BROWSE_DATA_INPUT)->EnableWindow(bEnable);
+
+		CString	zFileName;
+		m_editFile.GetWindowText(zFileName);
+
+		CString zDataInputFileName;
+		m_editDataInputFileName.GetWindowText(zDataInputFileName);
+
+		// If a zFileName has been specified, but zDataInputFileName has not been, a sensible
+		// initial value for zDataInputFileName would be the default voa file name for zFileName.
+		if (asCppBool(bEnable) && !zFileName.IsEmpty() && zDataInputFileName.IsEmpty())
+		{
+			m_editDataInputFileName.SetWindowText(zFileName + ".voa");
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35270")
+}
+//-------------------------------------------------------------------------------------------------
+void TesterDlgInputPage::OnBtnBrowseDataInput()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
+
+	try
+	{
+		// Show the file dialog to select the file to be opened
+		string strLastDataFileName = m_pTesterConfigMgr->getLastDataInputFileName();
+
+		// Open the file dialog
+		CFileDialog fileDlg(TRUE, ".voa", strLastDataFileName.c_str(), OFN_ENABLESIZING |
+			 OFN_EXPLORER | OFN_PATHMUSTEXIST, gstrVOA_FILE_FILTER.c_str(), CWnd::FromHandle(m_hWnd));
+		
+		// Modify the initial directory
+		string strLastDataFileDir = m_pTesterConfigMgr->getLastDataInputFileOpenDirectory();
+		fileDlg.m_ofn.lpstrInitialDir = strLastDataFileDir.c_str();
+
+		// Pass the pointer of dialog to create ThreadFileDlg object
+		ThreadFileDlg tfd(&fileDlg);
+
+		// If the user clicked on OK, then update the data input filename in the editbox
+		if (tfd.doModal() == IDOK)
+		{
+			m_editDataInputFileName.SetWindowText(fileDlg.GetPathName());
+			
+			dataInputFileChanged((LPCTSTR)fileDlg.GetPathName());
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35271")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -689,6 +831,29 @@ void TesterDlgInputPage::inputFileChanged(string strFileName/* = */)
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI05251")
 }
 //-------------------------------------------------------------------------------------------------
+void TesterDlgInputPage::dataInputFileChanged(string strDataInputFileName/* = */)
+{
+	try
+	{
+		// If no filename is specified, use the text in m_editFile.
+		if (strDataInputFileName.empty())
+		{
+			CString	zDataInputFile;
+			m_editDataInputFileName.GetWindowText(zDataInputFile);
+			strDataInputFileName = (LPCTSTR)zDataInputFile;
+		}
+
+		if (isValidFile(strDataInputFileName))
+		{
+			string strDir = getDirectoryFromFullPath(strDataInputFileName);
+			m_pTesterConfigMgr->setLastDataInputFileOpenDirectory(strDir);
+
+			m_pTesterConfigMgr->setLastDataInputFileName(strDataInputFileName);
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35269")
+}
+//-------------------------------------------------------------------------------------------------
 IOCREnginePtr TesterDlgInputPage::getOCREngine()
 {
 	if(!m_ipOCREngine)
@@ -713,3 +878,17 @@ IOCREnginePtr TesterDlgInputPage::getOCREngine()
 
 	return m_ipOCREngine;
 }
+//-------------------------------------------------------------------------------------------------
+bool TesterDlgInputPage::useDataInputFile()
+{
+	return (m_chkUseDataInputFile.GetCheck() == BST_CHECKED);
+}
+//-------------------------------------------------------------------------------------------------
+string TesterDlgInputPage::getDataInputFileName()
+{
+	CString	zDataInputFileName;
+	m_editDataInputFileName.GetWindowText(zDataInputFileName);
+
+	return string((LPCTSTR)zDataInputFileName);
+}
+//-------------------------------------------------------------------------------------------------

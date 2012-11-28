@@ -435,6 +435,18 @@ void RuleTesterDlg::OnButtonExecute()
 		ASSERT_RESOURCE_ALLOCATION("ELI18407", ipAFDoc != __nullptr);
 		ipAFDoc->Text = ipCopyInputText;
 
+		// If an existing voa file should be passed to the rules, attach the voa file attributes to
+		// ipAFDoc.
+		if (m_testerDlgInputPage.useDataInputFile())
+		{
+			string strDataInputFile = m_testerDlgInputPage.getDataInputFileName();
+
+			IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
+			ipAttributes->LoadFrom(strDataInputFile.c_str(), VARIANT_FALSE);
+
+			ipAFDoc->Attribute->SubAttributes->Append(ipAttributes);
+		}
+
 		// Use temporary Vector to hold the attributes that are currently being displayed
 		IIUnknownVectorPtr ipTmpAttrs(NULL);
 		if ( m_ipAttributes != __nullptr )

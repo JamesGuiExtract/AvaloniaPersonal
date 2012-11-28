@@ -17,6 +17,8 @@ using namespace std;
 // Registry keys
 const string TesterConfigMgr::LAST_FILE_OPEN_DIR = "LastFileOpenDirectory";
 const string TesterConfigMgr::LAST_FILE_NAME = "LastFileName";
+const string TesterConfigMgr::LAST_DATA_FILE_OPEN_DIR = "LastDataInputFileOpenDirectory";
+const string TesterConfigMgr::LAST_DATA_FILE_NAME = "LastDataInputFileName";
 const string TesterConfigMgr::WINDOW_POS_X = "WindowPositionX";
 const string TesterConfigMgr::WINDOW_POS_Y = "WindowPositionY";
 const string TesterConfigMgr::WINDOW_SIZE_X = "WindowSizeX";
@@ -32,6 +34,8 @@ const string TesterConfigMgr::AUTO_EXPAND_ATTRIBUTES = "AutoExpandAttributes";
 
 const string TesterConfigMgr::DEFAULT_LAST_FILE_OPEN_DIR = ".";
 const string TesterConfigMgr::DEFAULT_LAST_FILE_NAME = "";
+const string TesterConfigMgr::DEFAULT_LAST_DATA_FILE_OPEN_DIR = ".";
+const string TesterConfigMgr::DEFAULT_LAST_DATA_FILE_NAME = "";
 const string TesterConfigMgr::DEFAULT_WINDOW_POS_X = "10";
 const string TesterConfigMgr::DEFAULT_WINDOW_POS_Y = "10";
 const string TesterConfigMgr::DEFAULT_WINDOW_SIZE_X = "280";
@@ -92,6 +96,39 @@ void TesterConfigMgr::setLastFileName(const string& strFileName)
 {
 	m_pCfgMgr->setKeyValue( m_strSectionFolderName, LAST_FILE_NAME, 
 		strFileName );
+}
+//-------------------------------------------------------------------------------------------------
+string TesterConfigMgr::getLastDataInputFileOpenDirectory(void)
+{
+	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, LAST_DATA_FILE_OPEN_DIR))
+	{
+		m_pCfgMgr->createKey(m_strSectionFolderName, LAST_DATA_FILE_OPEN_DIR, DEFAULT_LAST_DATA_FILE_OPEN_DIR);
+		return DEFAULT_LAST_DATA_FILE_OPEN_DIR;
+	}
+
+	return m_pCfgMgr->getKeyValue(m_strSectionFolderName, LAST_DATA_FILE_OPEN_DIR, DEFAULT_LAST_DATA_FILE_OPEN_DIR);
+}
+//-------------------------------------------------------------------------------------------------
+void TesterConfigMgr::setLastDataInputFileOpenDirectory(const string& strDataInputFileDir)
+{
+	m_pCfgMgr->setKeyValue(m_strSectionFolderName, LAST_DATA_FILE_OPEN_DIR, strDataInputFileDir);
+}
+//-------------------------------------------------------------------------------------------------
+string TesterConfigMgr::getLastDataInputFileName(void)
+{
+	if (!m_pCfgMgr->keyExists( m_strSectionFolderName, LAST_DATA_FILE_NAME))
+	{
+		m_pCfgMgr->createKey( m_strSectionFolderName, LAST_DATA_FILE_NAME, DEFAULT_LAST_DATA_FILE_NAME);
+		return DEFAULT_LAST_DATA_FILE_NAME;
+	}
+
+	return m_pCfgMgr->getKeyValue( m_strSectionFolderName, LAST_DATA_FILE_NAME, DEFAULT_LAST_DATA_FILE_NAME);
+}
+//-------------------------------------------------------------------------------------------------
+void TesterConfigMgr::setLastDataInputFileName(const string& strDataInputFileName)
+{
+	m_pCfgMgr->setKeyValue( m_strSectionFolderName, LAST_DATA_FILE_NAME, 
+		strDataInputFileName);
 }
 //-------------------------------------------------------------------------------------------------
 void TesterConfigMgr::getWindowPos(long &lPosX, long &lPosY)
