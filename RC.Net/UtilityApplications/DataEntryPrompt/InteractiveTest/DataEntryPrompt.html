@@ -1,0 +1,70 @@
+<HTML>
+
+<HEAD>
+<TITLE>DataEntryPrompt - Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" 
+href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>DataEntryPrompt - Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<h2>NOTE: This utility uses DataEntryPrompt.exe.config.</h2>
+<hr>
+
+<ol>
+  	<li><h2>Operation and Basic Errors</h2></li>
+  	<ul>
+    		<li><b>[DotNet #844]</b> Confirm that <b>DataEntryPrompt.exe</b> requires a license file.</li>
+    		<li>Confirm that a meaningful error is presented if <b>DataEntryPrompt.exe.config</b> 
+		is not present.</li>
+  	</ul>
+<p>
+  	<li><h2>Config File Usage</h2></li>
+  	<ul>
+    		<li>Confirm that the <b>OK</b> button label depends on the <b>OKButtonLabel</b> field.</li>
+    		<li>Confirm that the <b>Cancel</b> button label depends on the <b>CancelButtonLabel</b> field.</li>
+<p>
+    		<li>Confirm that the <b>Field1</b> field specifies the label for the corresponding edit box.</li>
+		<ul>
+			<li>Confirm that the field is not presented if the config file definition is not present.
+		</ul>
+    		<li>Confirm that the <b>Field1Validation</b> field specifies the validation requirement for 
+		the corresponding edit box.</li>
+		<ul>
+			<li>Confirm that no validation is performed if the config file definition is not present.
+		</ul>
+    		<li>Repeat the above tests for the following fields:
+		<ul>
+			<li><b>Field2</b>
+			<li><b>Field3</b>
+			<li><b>Field4</b>
+			<li><b>Field5</b>
+			<li><b>Field6</b>
+			<li><b>Field7</b>
+			<li><b>Field8</b>
+			<li><b>Field9</b>
+			<li><b>Field10</b>
+		</ul>
+<p>
+    		<li>Confirm that the <b>Title</b> field specifies the window caption.</li>
+    		<li>Confirm that the <b>KeepOpen</b> field specifies whether or not the utility 
+		stays open after the user clicks the <b>OK</b> or <b>Cancel</b> button.</li>
+    		<li>Confirm that the <b>DataFileName</b> field specifies the name of the output file 
+		that stores the entered data in a comma-separated format.</li>
+    		<li>Confirm that the <b>PostEntryCommandLine</b> field specifies the name of an application 
+		to be run after the user clicks the <b>OK</b> button.</li>
+    		<li>Confirm that the <b>PostEntryCommandLineArguments</b> field specifies the 
+		command-line arguments associated with the <b>PostEntryCommandLine</b> application.</li>
+  	</ul>
+<p>
+  	<li><h2>Miscellaneous</h2></li>
+  	<ul>
+		<li>TBD
+  	</ul>
+</ol>
+</body>
+</html>
