@@ -63,6 +63,7 @@ END_COM_MAP()
 	STDMETHOD(put_FPSFile)(BSTR bstrFPSFile);
 	STDMETHOD(get_AuthenticationRequired)(VARIANT_BOOL* vbAuthenticationRequired);
 	STDMETHOD(AuthenticateService)(BSTR bstrValue);
+	STDMETHOD(get_KeepProcessingAsFilesAdded)(VARIANT_BOOL *pbValue);
 
 private:
 	//----------------------------------------------------------------------------------------------

@@ -224,6 +224,18 @@ namespace Extract.FileActionManager.FileSuppliers
         const int _CURRENT_VERSION = 6;
 
         /// <summary>
+        /// If the supplier fails and a polling mode is enabled, how long to wait before attempting
+        /// to reconnect.
+        /// </summary>
+        static readonly TimeSpan _RESTART_ATTEMPT_FREQUENCY = new TimeSpan(0, 0, 5);
+
+        /// <summary>
+        /// If the supplier fails and a polling mode is enabled, the highest frequently logging
+        /// should occur for successive download attempt failures.
+        /// </summary>
+        static readonly TimeSpan _RESTART_LOG_FREQUENCY = new TimeSpan(1, 0, 0);
+
+        /// <summary>
         /// The license id to validate in licensing calls
         /// </summary>
         static readonly LicenseIdName _licenseId = LicenseIdName.FtpSftpFileTransfer;
@@ -310,9 +322,36 @@ namespace Extract.FileActionManager.FileSuppliers
         // poll of the ftp server.
         ManualResetEvent _doneAddingFilesToQueue = new ManualResetEvent(false);
 
+        /// <summary>
+        /// Event to indicate the file supplier should be restarted.
+        /// </summary>
+        AutoResetEvent _restartSupplying = new AutoResetEvent(false);
+
+        /// <summary>
+        /// Event that indicate that <see cref="_restarterThread"/> should be stopped.
+        /// </summary>
+        ManualResetEvent _stopRestarter = new ManualResetEvent(false);
+
         // Thread that has been created to manage the download of files
         // from the ftp server
         Thread _ftpDownloadManagerThread;
+
+        /// <summary>
+        /// The thread that handles restarting the supplier when necessary.
+        /// </summary>
+        Thread _restarterThread;
+        
+        /// <summary>
+        /// The last time an exception was logged indicating the supplier is being restarted since
+        /// consecutive failures of the supplier began. Once a complete check and download complete,
+        /// this will be reset.
+        /// </summary>
+        DateTime? _lastRestartLogTime;
+
+        /// <summary>
+        /// The number of consecutive failures of the supplier to check for and download files.
+        /// </summary>
+        int _restartCount;
 
         // RemoteDownloadFolder with tags expanded
         string _expandedRemoteDownloadFolder;
@@ -918,8 +957,6 @@ namespace Extract.FileActionManager.FileSuppliers
                 // Notify the FtpEventRecorder to recheck the DBInfo setting for whether to log FTP events
                 FtpEventRecorder.RecheckFtpLoggingStatus();
 
-                InitializeEventsForStart();
-
                 _pathTags = new FileActionManagerSupplierPathTags(pFAMTM.FPSFileDir);
                 
                 // Per discussion with Arvind, remote download folder should be expanded only once
@@ -929,9 +966,14 @@ namespace Extract.FileActionManager.FileSuppliers
                 // Set the file target
                 _fileTarget = pTarget;
 
-                StartFileDownloadManagementThread();
-                
-                StartPolling();
+                // If a polling method is specified, start a thread to handle restarting the supplier
+                // upon failure.
+                if (PollingMethod != FileSuppliers.PollingMethod.NoPolling)
+                {
+                    StartRestarter();
+                }
+
+                StartHelper();
             }
             catch (Exception ex)
             {
@@ -946,19 +988,9 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                StopPolling();
-
                 StopThreads();
 
-                // Wait for the DownloadManagerThread to stop
-                _ftpDownloadManagerThread.Join();
-                _ftpDownloadManagerThread = null;
-
-                _fileProcessingDB = null;
-                _actionID = -1;
-
-                // Clear out any remaining files in the files to download queue
-                _filesToDownload = new ConcurrentQueue<FtpFileInfo>();
+                StopHelper();
             }
             catch (Exception ex)
             {
@@ -1217,6 +1249,16 @@ namespace Extract.FileActionManager.FileSuppliers
                     _doneAddingFilesToQueue.Dispose();
                     _doneAddingFilesToQueue = null;
                 }
+                if (_restartSupplying != null)
+                {
+                    _restartSupplying.Dispose();
+                    _restartSupplying = null;
+                }
+                if (_stopRestarter != null)
+                {
+                    _stopRestarter.Dispose();
+                    _stopRestarter = null;
+                }
             }
 
             // Dispose of unmanaged resources
@@ -1304,24 +1346,76 @@ namespace Extract.FileActionManager.FileSuppliers
                 {
                     _pollFtpServerForFiles.Reset();
                     _doneAddingFilesToQueue.Reset();
-                    
+
                     // Start the file download threads
                     List<Task> downloadThreads = StartFileDownloadThreads();
 
                     GetFilesToDownload();
 
                     WaitForDownloadThreadsToFinish(downloadThreads);
+
+                    // If a check attempt and any necessary download succeed after a previous
+                    // failure, log that an attempt has once again succeed.
+                    if (_restartCount > 0)
+                    {
+                        var ee = new ExtractException("ELI35288",
+                            "Application trace: FTP file supplier restart successful after " +
+                            _restartCount.ToString(CultureInfo.CurrentCulture) + " attempt(s).");
+                        ee.Log();
+
+                        // Make sure any subsequent failure is logged regardless of how long ago the
+                        // last failure occured.
+                        _restartCount = 0;
+                        _lastRestartLogTime = null;
+                    }
                 }
                 while (WaitForNextPollingTime());
             }
             catch (Exception ex)
             {
-                ex.ExtractLog("ELI32197");
+                // If a failure has occured and a polling method is enabled, attempt to restart the
+                // supplier.
+                if (PollingMethod != FileSuppliers.PollingMethod.NoPolling)
+                {
+                    if (!_lastRestartLogTime.HasValue ||
+                        DateTime.Now - _lastRestartLogTime > _RESTART_LOG_FREQUENCY)
+                    {
+                        ExtractException ee;
+                        if (_restartCount == 0)
+                        {
+                            ee = new ExtractException("ELI32197",
+                                "FTP file supplier error; attempting to restart.", ex);
+                        }
+                        else
+                        {
+                            ee = new ExtractException("ELI35289",
+                                "FTP file supplier errors and restarts continue.", ex);
+                            ee.AddDebugData("Restart attempts", _restartCount, false);
+                        }
+
+                        ee.Log();
+                        _lastRestartLogTime = DateTime.Now;
+                    }
+
+                    _restartCount++;
+                    _restartSupplying.Set();
+                }
+                // Otherwise ensure the restater thread is stopped and indicate that the supplier has failed.
+                else
+                {
+                    StopRestarter();
+
+                    _fileTarget.NotifyFileSupplyingFailed(this,
+                        ex.AsExtract("ELI35286").AsStringizedByteStream());
+                }
+
+                return;
             }
-            finally
-            {
-                _fileTarget.NotifyFileSupplyingDone(this);
-            }
+
+            // The supplier has exitied
+            StopRestarter();
+
+            _fileTarget.NotifyFileSupplyingDone(this);
         }
 
         /// <summary>
@@ -1359,6 +1453,12 @@ namespace Extract.FileActionManager.FileSuppliers
                 if (PollingMethod == PollingMethod.NoPolling)
                 {
                     return false;
+                }
+
+                // If the last check failed before completing, go ahead and start the check right away.
+                if (_restartCount > 0)
+                {
+                    return !_stopSupplying.WaitOne(0);
                 }
 
                 // Wait for either stop suppling event or for a poll FTP server event
@@ -1815,6 +1915,120 @@ namespace Extract.FileActionManager.FileSuppliers
 
             nextFileInfo = null;
             return false;
+        }
+
+        /// <summary>
+        /// Starts the supplier. Assumes all fields from the public Start method have been applied.
+        /// </summary>
+        void StartHelper()
+        {
+            InitializeEventsForStart();
+
+            StartFileDownloadManagementThread();
+
+            StartPolling();
+        }
+
+        /// <summary>
+        /// Stops the supplier. Assumes the download threads have already been told to stop.
+        /// </summary>
+        void StopHelper()
+        {
+            StopPolling();
+
+            if (_ftpDownloadManagerThread != null)
+            {
+                // Wait for the DownloadManagerThread to stop
+                _ftpDownloadManagerThread.Join();
+                _ftpDownloadManagerThread = null;
+            }
+
+            _fileProcessingDB = null;
+            _actionID = -1;
+
+            // Clear out any remaining files in the files to download queue
+            _filesToDownload = new ConcurrentQueue<FtpFileInfo>();
+        }
+
+        /// <summary>
+        /// Starts <see cref="_restarterThread"/> in order to perform a restart of the supplier
+        /// when necessary.
+        /// </summary>
+        void StartRestarter()
+        {
+            _restartCount = 0;
+            _lastRestartLogTime = null;
+            _restarterThread = new Thread(RestarterThread);
+            _restarterThread.Start();
+        }
+
+        /// <summary>
+        /// The method run in <see cref="_restarterThread"/> in order to perform a restart of the
+        /// supplier when necessary.
+        /// </summary>
+        void RestarterThread()
+        {
+            try
+            {
+                // Loop once for every restart; break out if _stopSupplying or _stopRestarter are signaled.
+                while (WaitHandle.WaitAny(
+                    new EventWaitHandle[] { _restartSupplying, _stopSupplying, _stopRestarter }) == 0)
+                {
+                    try
+                    {
+                        // Save the file processed DB and action ID to use after restart.
+                        var fileProcessingDB = _fileProcessingDB;
+                        var actionID = _actionID;
+
+                        // Completely shut everything down.
+                        StopHelper();
+
+                        // Wait a bit so that successive failures don't result in a tight loop.
+                        _stopRestarter.WaitOne((int)_RESTART_ATTEMPT_FREQUENCY.TotalMilliseconds);
+
+                        // As long as a stop hasn't been requested since stopping, restart.
+                        if (!_stopSupplying.WaitOne(0) && !_stopRestarter.WaitOne(0))
+                        {
+                            _fileProcessingDB = fileProcessingDB;
+                            _actionID = actionID;
+
+                            StartHelper();
+                        }
+                        else
+                        {
+                            // If the supplier was stopped externally since the restart request, don't
+                            // restart; notify _fileTarget that the supplier is now done.
+                            _fileTarget.NotifyFileSupplyingDone(this);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        var ee = new ExtractException("ELI35287", "FTP file supplier restart failed", ex);
+                        _fileTarget.NotifyFileSupplyingFailed(this, ee.AsStringizedByteStream());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = new ExtractException("ELI35290",
+                    "FTP file supplier restarter thread failed.", ex);
+                ee.Log();
+            }
+        }
+        
+
+        /// <summary>
+        /// Stops <see cref="_restarterThread"/> in the case that the supplier so that restarts no
+        /// longer occur.
+        /// </summary>
+        void StopRestarter()
+        {
+            if (_restarterThread != null)
+            {
+                _stopRestarter.Set();
+                _restarterThread.Join();
+                _restarterThread = null;
+            }
         }
 
         /// <summary>

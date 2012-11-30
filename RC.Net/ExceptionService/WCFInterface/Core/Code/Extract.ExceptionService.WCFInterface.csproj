@@ -12,9 +12,9 @@
     <AssemblyName>Extract.ExceptionService.WcfInterface</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SccProjectName>Extract.Exception.Service.WCFInterface</SccProjectName>
+    <SccProjectName>Extract.ExceptionService.WCFInterface</SccProjectName>
     <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
-    <SccAuxPath>http://white/VaultService</SccAuxPath>
+    <SccAuxPath>http://white.extract.local/VaultService</SccAuxPath>
     <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
     <TargetFrameworkProfile />
   </PropertyGroup>

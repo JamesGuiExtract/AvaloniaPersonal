@@ -52,6 +52,10 @@ interface IFileProcessingManagerProcess : IDispatch
 	[id(9), helpstring("method AuthenticateService")] HRESULT AuthenticateService(
 		[in] BSTR bstrValue);
 	//----------------------------------------------------------------------------------------------
+	// Gets whether the FAMProcess is configured to keep processing as files are added to the queue.
+	[propget, id(10), helpstring("property KeepProcessingAsFilesAdded")] HRESULT KeepProcessingAsFilesAdded(
+		[out, retval]  VARIANT_BOOL *pbValue);
+	//----------------------------------------------------------------------------------------------
 };
 
 [

@@ -305,11 +305,35 @@ STDMETHODIMP CFileProcessingManagerProcess::get_AuthenticationRequired(VARIANT_B
 STDMETHODIMP CFileProcessingManagerProcess::AuthenticateService(BSTR bstrValue)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
+	
 	try
 	{
 		m_ipFPM->AuthenticateService(bstrValue);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32301");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManagerProcess::get_KeepProcessingAsFilesAdded(VARIANT_BOOL *pbValue)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+	
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI35272", pbValue != __nullptr);
+
+		IFileActionMgmtRolePtr ipActionMgmtRole(m_ipFPM->FileProcessingMgmtRole);
+		ASSERT_RESOURCE_ALLOCATION("ELI35284", ipActionMgmtRole);
+		
+		*pbValue = asVariantBool(asCppBool(ipActionMgmtRole->Enabled) &&
+			asCppBool(m_ipFPM->FileProcessingMgmtRole->KeepProcessingAsAdded));
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35273");
 }
 
 //--------------------------------------------------------------------------------------------------

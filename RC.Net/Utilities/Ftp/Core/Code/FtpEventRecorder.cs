@@ -465,7 +465,7 @@ namespace Extract.Utilities.Ftp
         void RecordFtpEvent()
         {
             // If an FTP event was tracked, log it to the FTPEventHistory table.
-            if (!IgnoreEvent && _ftpEvent != null)
+            if (!IgnoreEvent && _fileProcessingDB != null && _ftpEvent != null)
             {
                 // Assign argument1 and argument2 depending on the type of event.
                 string argument1 = null;

@@ -249,6 +249,15 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 
 				// Set flag indicating that supplying was started
 				m_bSupplying = true;
+
+				if (m_nNumberOfFilesToExecute > 0)
+				{
+					UCLIDException("ELI35276", "Application trace: Inadvisable configuration-- It "
+						"is not recommended to specify that a FAM instance stop or restart after "
+						"processing a specified number of files if file supplying enabled. If the "
+						"specified number is reached and supplying is still active, the FAM will "
+						"not be able to stop/restart.").log();
+				}
 			}
 
 			// start the file processing
@@ -1241,7 +1250,15 @@ STDMETHODIMP CFileProcessingManager::NotifyProcessingCompleted(void)
 
 	m_bProcessing = false;
 	
-	if ( !m_bSupplying )
+	if (m_bSupplying)
+	{
+		if (m_nNumberOfFilesToExecute > 0)
+		{
+			UCLIDException("ELI35277", "Application trace: The specified number of files have been "
+				"processed, but supplying is active so this instance will not stop or restart.").log();
+		}
+	}
+	else
 	{
 		// Unregister Active FAM to reset file back to previous state if any remaining
 		m_ipFPMDB->UnregisterActiveFAM();

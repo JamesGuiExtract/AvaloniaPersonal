@@ -460,26 +460,32 @@ namespace Extract.FileActionManager.Utilities
                         Thread.Sleep(2000);
                     }
 
-                    // Get the count of files processed (if limiting processing to a
-                    // specified number of files)
-                    int filesProcessed = 0;
-                    if (numberOfFilesToProcess != 0 && !process.HasExited && famProcess != null)
+                    // [DotNetRCAndUtils:835]
+                    // Ensure that processing does not stop when the FAM process is configured to
+                    // keep processing as files are added.
+                    if (!famProcess.KeepProcessingAsFilesAdded)
                     {
-                        int processedSuccessfully;
-                        int processingErrors;
-                        int filesSupplied;
-                        int supplyingErrors;
-                        famProcess.GetCounts(out processedSuccessfully, out processingErrors,
-                            out filesSupplied, out supplyingErrors);
-                        filesProcessed = processedSuccessfully + processingErrors;
-                    }
+                        // Get the count of files processed (if limiting processing to a
+                        // specified number of files)
+                        int filesProcessed = 0;
+                        if (numberOfFilesToProcess != 0 && !process.HasExited && famProcess != null)
+                        {
+                            int processedSuccessfully;
+                            int processingErrors;
+                            int filesSupplied;
+                            int supplyingErrors;
+                            famProcess.GetCounts(out processedSuccessfully, out processingErrors,
+                                out filesSupplied, out supplyingErrors);
+                            filesProcessed = processedSuccessfully + processingErrors;
+                        }
 
-                    // If the number of files to proces is 0 OR the number of files actually
-                    // processed is less than the number of files specified, then just
-                    // exit the loop and do not respawn a new FAM instance
-                    if (numberOfFilesToProcess == 0 || filesProcessed < numberOfFilesToProcess)
-                    {
-                        break;
+                        // If the number of files to proces is 0 OR the number of files actually
+                        // processed is less than the number of files specified, then just
+                        // exit the loop and do not respawn a new FAM instance
+                        if (numberOfFilesToProcess == 0 || filesProcessed < numberOfFilesToProcess)
+                        {
+                            break;
+                        }
                     }
 
                     // Release the current FAM process before looping around and spawning a new one

@@ -91,7 +91,7 @@ void addRangeToVector(vector<T>& rvecSource, const string& str)
 				{
 					if (nDashIndex != iter->find_last_of('-'))
 					{
-						throw new UCLIDException("ELI32500", "Multiple dashes where one is expected");
+						throw UCLIDException("ELI32500", "Multiple dashes where one is expected");
 					}
 
 					long nStartIndex = asUnsignedLong(iter->substr(0, nDashIndex));

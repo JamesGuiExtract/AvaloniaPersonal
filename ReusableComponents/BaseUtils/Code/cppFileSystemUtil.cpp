@@ -181,7 +181,7 @@ ISecureFileDeleterPtr getSecureFileDeleter(bool bForceUseSecureDeleter)
 		// If secure deletion is to be used in this case, return sipSecureFileDeleter.
 		if (sipSecureFileDeleter == __nullptr)
 		{
-			throw new UCLIDException("ELI32864", "A secure deletion provider has not been specified.");
+			throw UCLIDException("ELI32864", "A secure deletion provider has not been specified.");
 		}
 		return sipSecureFileDeleter;
 	}
