@@ -2,8 +2,11 @@
 using Extract.DataEntry;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Data.Common;
+using System.Data.SqlClient;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
@@ -635,11 +638,12 @@ namespace Extract.AttributeFinder.Rules
 
             try
             {
-                if (!string.IsNullOrWhiteSpace(DataProviderName) &&
-                    !string.IsNullOrWhiteSpace(DataConnectionString))
-                {
-                    dbConnection = DatabaseConnectionInfo.OpenConnection(_pathTags);
-                }
+                // Get a database connection. If an SQL CE DB, the database will be opened under a
+                // a temporary name (prefixed with '~').
+                string databaseWorkingCopyFileName;
+                string originalSQLCEDBFileName;
+                dbConnection = GetDatabaseConnection(out databaseWorkingCopyFileName, 
+                    out originalSQLCEDBFileName);
 
                 // Initialize data and execute the query
                 AttributeStatusInfo.ResetData(sourceDocName, sourceAttributes, dbConnection);
@@ -648,7 +652,28 @@ namespace Extract.AttributeFinder.Rules
                 DataEntryQuery query = DataEntryQuery.Create(Query, null, dbConnection);
 
                 QueryResult result = query.Evaluate();
-                
+
+                // Close the database connection if one was opened.
+                if (dbConnection != null)
+                {
+                    dbConnection.Close();
+                }
+
+                // If the database was an SQL CE database that was opened under a working copy name,
+                // copy the working copy back over the master.
+                if (!string.IsNullOrEmpty(databaseWorkingCopyFileName) &&
+                    !string.IsNullOrEmpty(originalSQLCEDBFileName))
+                {
+                    FileAttributes originalFileAttributes =
+                        File.GetAttributes(originalSQLCEDBFileName);
+                    FileSystemMethods.MoveFile(databaseWorkingCopyFileName, originalSQLCEDBFileName,
+                        true);
+
+                    // Apply the same attributes the primary database had originally.
+                    FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
+                        File.SetAttributes(originalSQLCEDBFileName, originalFileAttributes));
+                }
+
                 return result;
             }
             catch (Exception ex)
@@ -663,6 +688,106 @@ namespace Extract.AttributeFinder.Rules
                     dbConnection.Dispose();
                 }
             }
+        }
+
+        /// <summary>
+        /// Opens the configured database (if any). If the database is an SQL Compact database, it
+        /// will be copied to a working copy name (prefixed with '~') and
+        /// <see paramref="workingCopyFileName"/> and <see paramref="originalFileName"/>
+        /// will indicate the working and original database file names.
+        /// </summary>
+        /// <param name="workingCopyFileName">The working copy of an SQL Compact database.</param>
+        /// <param name="originalFileName">The original filename of an SQL Compact database that was
+        /// opened under a working copy.</param>
+        /// <returns>A <see cref="DbConnection"/> if a database connection was specified;
+        /// <see langword="false"/> otherwise.</returns>
+        DbConnection GetDatabaseConnection(out string workingCopyFileName, out string originalFileName)
+        {
+            // Initialize the out parameters to null.
+            workingCopyFileName = null;
+            originalFileName = null;
+
+            // If a database connection is configured, attempt to open it.
+            if (!string.IsNullOrWhiteSpace(DataProviderName) &&
+                !string.IsNullOrWhiteSpace(DataConnectionString))
+            {
+                // [FlexIDSCore:5176]
+                // If the database is an SQL compact database, copy the database file to a separate,
+                // temporary filename to ensure the primary database file can be used by our
+                // applications at the same time it is being edited (unless that other application
+                // happens to also be editing the database.
+                if (DatabaseConnectionInfo.DataProvider.ShortDisplayName.StartsWith(
+                    "SqlCe", StringComparison.OrdinalIgnoreCase))
+                {
+                    DatabaseConnectionInfo tempDatabaseConnectionInfo =
+                        new DatabaseConnectionInfo(DatabaseConnectionInfo);
+
+                    var connectionStringBuilder = new SqlConnectionStringBuilder(DataConnectionString);
+                    originalFileName = _pathTags.Expand(connectionStringBuilder.DataSource);
+                    
+                    workingCopyFileName = Path.Combine(
+                        Path.GetDirectoryName(originalFileName),
+                        "~" + Path.GetFileName(originalFileName));
+
+                    if (File.Exists(workingCopyFileName))
+                    {
+                        try
+                        {
+                            // If there is a previous copy of the working copy, if it can be deleted
+                            // the instance that created it is not still open and it can therefore
+                            // be ignored.
+                            FileSystemMethods.DeleteFileNoRetry(workingCopyFileName);
+                        }
+                        catch
+                        {
+                            // But if it couldn't be deleted, another instance of SQLCDBEditor likely
+                            // already has the database open for editing; prevent it from being opened.
+                            ExtractException ee = new ExtractException("ELI35291",
+                                "This database is currently being edited by another process.");
+                            ee.AddDebugData("Database Filename", originalFileName, false);
+
+                            throw ee;
+                        }
+                    }
+
+                    // Create the new working copy.
+                    string sourceFileName = originalFileName;
+                    string destinationFileName = workingCopyFileName;
+                    FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
+                        File.Copy(sourceFileName, destinationFileName));
+                    File.SetAttributes(workingCopyFileName, FileAttributes.Hidden);
+
+                    // Set the new connection string.
+                    connectionStringBuilder.DataSource = workingCopyFileName;
+                    tempDatabaseConnectionInfo.ConnectionString =
+                        connectionStringBuilder.ConnectionString;
+
+                    try
+                    {
+                        // The path is already expanded, so there is no need to provide _pathTags.
+                        return tempDatabaseConnectionInfo.OpenConnection();
+                    }
+                    catch
+                    {
+                        // Cleanup the working copy.
+                        FileSystemMethods.DeleteFile(workingCopyFileName);
+
+                        // Ensure the outer scope won't attempt to "clean up" a temporary database
+                        // created by a different process.
+                        workingCopyFileName = null;
+                        originalFileName = null;
+                        
+                        throw;
+                    }
+                }
+                else
+                {
+                    return DatabaseConnectionInfo.OpenConnection(_pathTags);
+                }
+            }
+
+            // A database connection has not been configured.
+            return null;
         }
 
         /// <summary>

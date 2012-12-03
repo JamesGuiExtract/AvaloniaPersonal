@@ -81,7 +81,10 @@ namespace Extract.Utilities.SecureFileDeleters
         /// overwritten prior to deletion. If <see langword="false"/>, problems overwriting the file
         /// will be logged if the <see cref="Properties.Settings.LogSecureDeleteErrors"/> value is
         /// <see langword="true"/>, otherwise they will be ignored.</param>
-        public override void SecureDeleteFile(string fileName, bool throwIfUnableToDeleteSecurely)
+        /// <param name="doRetries"><see langword="true"/> if retries should be attempted when
+        /// sharing violations occur; <see langword="false"/> otherwise.</param>
+        public override void SecureDeleteFile(string fileName, bool throwIfUnableToDeleteSecurely,
+            bool doRetries)
         {
             try
             {
@@ -89,7 +92,7 @@ namespace Extract.Utilities.SecureFileDeleters
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI32837",
                     _COMPONENT_DESCRIPTION);
 
-                base.SecureDeleteFile(fileName, throwIfUnableToDeleteSecurely);
+                base.SecureDeleteFile(fileName, throwIfUnableToDeleteSecurely, doRetries);
             }
             catch (Exception ex)
             {

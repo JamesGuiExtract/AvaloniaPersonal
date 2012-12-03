@@ -2262,7 +2262,7 @@ bool deleteFile(const char* pszFileName, bool bAllowReadonly,
 		{
 			try
 			{
-				ipSecureFileDeleter->SecureDeleteFile(pszFileName, bThrowIfUnableToDeleteSecurely);
+				ipSecureFileDeleter->SecureDeleteFile(pszFileName, bThrowIfUnableToDeleteSecurely, true);
 				return true;
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32921");

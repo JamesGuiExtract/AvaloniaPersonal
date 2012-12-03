@@ -339,7 +339,7 @@ namespace Extract.Utilities
             try
             {
                 MoveFile(source, destination, overwrite,
-                    _registry.Settings.SecureDeleteAllSensitiveFiles);
+                    _registry.Settings.SecureDeleteAllSensitiveFiles, true);
             }
             catch (Exception ex)
             {
@@ -358,8 +358,10 @@ namespace Extract.Utilities
         /// <paramref name="destination"/> exists.</param>
         /// <param name="secureMoveFile"><see langword="true"/> to delete the old file securely
         /// when moving the file to a different volume; <see langword="false"/> otherwise.</param>
+        /// <param name="doRetries"><see langword="true"/> if retries should be attempted when
+        /// sharing violations occur; <see langword="false"/> otherwise.</param>
         public static void MoveFile(string source, string destination, bool overwrite,
-            bool secureMoveFile)
+            bool secureMoveFile, bool doRetries)
         {
             try
             {
@@ -388,8 +390,16 @@ namespace Extract.Utilities
                     throw ee;
                 }
 
-                // Attempt to overwrite the file. This is slower than moving the file.
-                File.Copy(source, destination, true);
+                // Attempt to overwrite the file with a copy. This is slower than moving the file.
+                if (doRetries)
+                {
+                    PerformFileOperationWithRetryOnSharingViolation(() =>
+                        File.Copy(source, destination, true));
+                }
+                else
+                {
+                    File.Copy(source, destination, true);
+                }
 
                 // Ensure the source file is writeable before trying to delete it.
                 FileAttributes attributes = File.GetAttributes(source);
@@ -399,7 +409,7 @@ namespace Extract.Utilities
                     File.SetAttributes(source, attributes);
                 }
 
-                DeleteFile(source, secureMoveFile);
+                DeleteFile(source, secureMoveFile, false, doRetries);
             }
             catch (Exception ex)
             {
@@ -850,6 +860,26 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Deletes the specified <see paramref="fileName"/> without doing any retries if a sharing
+        /// violation occurs.
+        /// <para><b>Note</b></para>
+        /// The value of the SecureDeleteAllSensitiveFiles registry entry will dictate whether the
+        /// file is deleted securely.
+        /// </summary>
+        /// <param name="fileName">The name of the file to delete.</param>
+        public static void DeleteFileNoRetry(string fileName)
+        {
+            try
+            {
+                DeleteFile(fileName, _registry.Settings.SecureDeleteAllSensitiveFiles, false, false);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35292");
+            }
+        }
+
+        /// <summary>
         /// Deletes the specified <see paramref="fileName"/>.
         /// </summary>
         /// <param name="fileName">The name of the file to delete.</param>
@@ -859,7 +889,7 @@ namespace Extract.Utilities
         {
             try
             {
-                DeleteFile(fileName, secureDeleteFile, false);
+                DeleteFile(fileName, secureDeleteFile, false, true);
             }
             catch (Exception ex)
             {
@@ -876,20 +906,31 @@ namespace Extract.Utilities
         /// <param name="throwIfUnableToDeleteSecurely">If <see langword="true"/>, when securely
         /// deleteing a file, but the file could not be securely overwritten, an exception will be
         /// throw before attempting the actual deletion.</param>
+        /// <param name="doRetries"><see langword="true"/> if retries should be attempted when
+        /// sharing violations occur; <see langword="false"/> otherwise.</param>
         public static void DeleteFile(string fileName, bool secureDeleteFile,
-            bool throwIfUnableToDeleteSecurely)
+            bool throwIfUnableToDeleteSecurely, bool doRetries)
         {
             try 
 	        {
                 if (secureDeleteFile)
                 {
-                    GetSecureFileDeleter().SecureDeleteFile(fileName, throwIfUnableToDeleteSecurely);
+                    // Retries are handled within SecureDeleteFile.
+                    GetSecureFileDeleter().SecureDeleteFile(fileName, throwIfUnableToDeleteSecurely,
+                        doRetries);
                 }
                 else
                 {
-                    // The secure file deleter takes care of sharing violation retires, so the
-                    // retry logic here should encapsulate only normal deletions.
-                    PerformFileOperationWithRetryOnSharingViolation(() => File.Delete(fileName));
+                    if (doRetries)
+                    {
+                        // The secure file deleter takes care of sharing violation retires, so the
+                        // retry logic here should encapsulate only normal deletions.
+                        PerformFileOperationWithRetryOnSharingViolation(() => File.Delete(fileName));
+                    }
+                    else
+                    {
+                        File.Delete(fileName);
+                    }
                 }
 	        }
 	        catch (Exception ex)

@@ -219,9 +219,6 @@ namespace Extract.Utilities
                 {
                     if (value != _maxCacheCount)
                     {
-                        ExtractException.Assert("ELI34472", "MaxCacheCount must be greater than zero.",
-                            value > 0);
-
                         _maxCacheCount = value;
                         _qualifyingIndex = (_maxCacheCount * _qualifyingPercentile / 100);
                     }
@@ -328,6 +325,11 @@ namespace Extract.Utilities
         {
             try
             {
+                if (_maxCacheCount == 0)
+                {
+                    return false;
+                }
+
                 // If data that is already cached is being-recached, re-add the data in case it has
                 // been updated.
                 DataItem existingData;

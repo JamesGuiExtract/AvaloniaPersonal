@@ -41,6 +41,8 @@ namespace Extract.Interfaces
         /// overwritten prior to deletion. If <see langword="false"/>, problems overwriting the file
         /// will be logged if the LogSecureDeleteError registry value is true, otherwise they will
         /// be ignored.</param>
-        void SecureDeleteFile(string fileName, bool throwIfUnableToDeleteSecurely);
+        /// <param name="doRetries"><see langword="true"/> if retries should be attempted when
+        /// sharing violations occur; <see langword="false"/> otherwise.</param>
+        void SecureDeleteFile(string fileName, bool throwIfUnableToDeleteSecurely, bool doRetries);
     }
 }

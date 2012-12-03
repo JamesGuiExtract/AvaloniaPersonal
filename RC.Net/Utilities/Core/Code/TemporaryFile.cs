@@ -268,7 +268,7 @@ namespace Extract.Utilities
                         // and allocating memory in finalizers is not advised.
                         // Secure deletion would cause memory allocation as well. (really, the file
                         // should have been deleted along with the managed resources).
-                        FileSystemMethods.DeleteFile(_fileName, false, false);
+                        FileSystemMethods.DeleteFile(_fileName, false, false, true);
                     }
                 }
             }

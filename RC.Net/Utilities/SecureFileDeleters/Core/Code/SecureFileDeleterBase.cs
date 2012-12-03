@@ -173,7 +173,10 @@ namespace Extract.Utilities.SecureFileDeleters
         /// overwritten prior to deletion. If <see langword="false"/>, problems overwriting the file
         /// will be logged if the <see cref="Properties.Settings.LogSecureDeleteErrors"/> value is
         /// <see langword="true"/>, otherwise they will be ignored.</param>
-        public virtual void SecureDeleteFile(string fileName, bool throwIfUnableToDeleteSecurely)
+        /// <param name="doRetries"><see langword="true"/> if retries should be attempted when
+        /// sharing violations occur; <see langword="false"/> otherwise.</param>
+        public virtual void SecureDeleteFile(string fileName, bool throwIfUnableToDeleteSecurely,
+            bool doRetries)
         {
             try
             {
@@ -185,36 +188,17 @@ namespace Extract.Utilities.SecureFileDeleters
 
                 Collection<ExtractException> exceptions = new Collection<ExtractException>();
 
-                FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
+                if (doRetries)
                 {
-                    // Overwrite the file as configured. This includes setting the file size to zero
-                    // after completing the overwriting.
-                    if (OverwritePasses.Count() > 0)
+                    FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
                     {
-                        // Throws any exceptions, if so configured. Otherwise they are added to the
-                        // passed collection.
-                        OverwriteFile(fileName, throwIfUnableToDeleteSecurely, exceptions);
-                    }
-
-                    // Keep track of the file name through rename repetitions.
-                    string currentFileName = fileName;
-
-                    // Obfuscate the file name and timestamps as configured.
-                    if (Obfuscate)
-                    {
-                        // Any exceptions are added to the passed collection.
-                        ObfuscateFileAttributes(fileName, exceptions);
-
-                        if (RenameRepetitions > 0)
-                        {
-                            // Any exceptions are added to the passed collection.
-                            currentFileName = RenameFile(fileName, RenameRepetitions, exceptions);
-                        }
-                    }
-
-                    // Finally, delete the file.
-                    File.Delete(currentFileName);
-                });
+                        SecureDeleteFileHelper(fileName, throwIfUnableToDeleteSecurely, exceptions);
+                    });
+                }
+                else
+                {
+                    SecureDeleteFileHelper(fileName, throwIfUnableToDeleteSecurely, exceptions);
+                }
 
                 // If the file was deleted, there were no proplems overwriting the file or
                 // throwIfUnableToDeleteSecurely is false. Log any the excpetions if specified.
@@ -238,6 +222,51 @@ namespace Extract.Utilities.SecureFileDeleters
                 ee.AddDebugData("Filename", fileName, false);
                 throw ee;
             }
+        }
+
+        /// <summary>
+        /// A helper function for <see cref="SecureDeleteFile"/> that makes one attempt at securely
+        /// deleting <see paramref="fileName"/>.
+        /// </summary>
+        /// <param name="fileName">Name of the file to securely delete.</param>
+        /// <param name="throwIfUnableToDeleteSecurely"><see langword="true"/> if an exception should
+        /// be thrown before actually deleting the file if the file could not be securely
+        /// overwritten prior to deletion. If <see langword="false"/>, problems overwriting the file
+        /// will be logged if the <see cref="Properties.Settings.LogSecureDeleteErrors"/> value is
+        /// <see langword="true"/>, otherwise they will be ignored.</param>
+        /// <param name="exceptions">If <see paramref="throwIfUnableToDeleteSecurely"/> is 
+        /// <see langword="false"/>, any exceptions encountered should be added to this
+        /// <see cref="Collection{T}"/>.</param>
+        private void SecureDeleteFileHelper(string fileName, bool throwIfUnableToDeleteSecurely,
+            Collection<ExtractException> exceptions)
+        {
+            // Overwrite the file as configured. This includes setting the file size to zero
+            // after completing the overwriting.
+            if (OverwritePasses.Count() > 0)
+            {
+                // Throws any exceptions, if so configured. Otherwise they are added to the
+                // passed collection.
+                OverwriteFile(fileName, throwIfUnableToDeleteSecurely, exceptions);
+            }
+
+            // Keep track of the file name through rename repetitions.
+            string currentFileName = fileName;
+
+            // Obfuscate the file name and timestamps as configured.
+            if (Obfuscate)
+            {
+                // Any exceptions are added to the passed collection.
+                ObfuscateFileAttributes(fileName, exceptions);
+
+                if (RenameRepetitions > 0)
+                {
+                    // Any exceptions are added to the passed collection.
+                    currentFileName = RenameFile(fileName, RenameRepetitions, exceptions);
+                }
+            }
+
+            // Finally, delete the file.
+            File.Delete(currentFileName);
         }
 
         #endregion Methods

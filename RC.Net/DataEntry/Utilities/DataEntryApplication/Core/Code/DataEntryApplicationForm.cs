@@ -778,15 +778,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     SetActiveDocumentType(documentType, true,
                         out changedDocumentType, out changedDataEntryConfig);
-
-                    if (_dataEntryControlHost != null && !changedDataEntryConfig)
-                    {
-                        // [DataEntry:729]
-                        // If the data entery config didn't change, still need to call
-                        // GetDatabaseConnection to get the latest version of the database (in case
-                        // it has been updated).
-                        _dataEntryControlHost.DatabaseConnection = GetDatabaseConnection();
-                    }
                 }
                 else
                 {
@@ -1808,7 +1799,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         attributes.LoadFrom(dataFilename, false);
                     }
 
-                    LoadCorrectConfigForData(attributes);
+                    if (!LoadCorrectConfigForData(attributes) && _dataEntryControlHost != null)
+                    {
+                        // [DataEntry:729]
+                        // If the data entery config didn't change, still need to call
+                        // GetDatabaseConnection to get the latest version of the database (in case
+                        // it has been updated).
+                        _dataEntryControlHost.DatabaseConnection = GetDatabaseConnection();
+                    }
 
                     // Record database statistics on load
                     if (!_standAloneMode && _fileProcessingDb != null)
@@ -3787,6 +3785,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             string.IsNullOrEmpty(_activeDataEntryConfig.Config.Settings.LocalDataSource));
 
                         connectionString = _activeDataEntryConfig.Config.Settings.DatabaseConnectionString;
+
+                        // If a DB connection is open but the connectionString has changed, close
+                        // the current connection.
+                        if (_dbConnection != null && _currentDbConnectionString != connectionString)
+                        {
+                            _dbConnection.Dispose();
+                            _dbConnection = null;
+                        }
                     }
                     // A local datasource has been specfied; compute the connection string.
                     else if (!string.IsNullOrEmpty(_activeDataEntryConfig.Config.Settings.LocalDataSource))
@@ -3804,6 +3810,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // Keep track of whether we need to make a new copy of the source DB.
                         bool getNewCopy = false;
                         DateTime? lastDbModificationTime = null;
+                        TemporaryFile oldDbCopy = null;
 
                         // [DataEntry:399, 688, 986]
                         // Whether or not the file is accessed via a network share, create and use a
@@ -3821,14 +3828,26 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         else if (!_lastDbModificationTimes.TryGetValue(_dataSourcePath, out lastDbModificationTime) ||
                                  File.GetLastWriteTime(_dataSourcePath) > lastDbModificationTime.Value)
                         {
-                            TemporaryFile oldDbCopy = localDbCopy;
+                            oldDbCopy = localDbCopy;
                             localDbCopy = new TemporaryFile(true);
-                            oldDbCopy.Dispose();
                             getNewCopy = true;
                         }
 
                         if (getNewCopy)
                         {
+                            // Before opening the new connection, close the old one.
+                            if (_dbConnection != null)
+                            {
+                                _dbConnection.Dispose();
+                                _dbConnection = null;
+                            }
+
+                            // Delete the old SQL CE working copy (if one exists).
+                            if (oldDbCopy != null)
+                            {
+                                oldDbCopy.Dispose();
+                            }
+
                             FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
                                 File.Copy(_dataSourcePath, localDbCopy.FileName, true));
 
@@ -3838,14 +3857,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                         connectionString = "Data Source='" + localDbCopy.FileName + "';";
                     }
-                }
-
-                // If a DB connection is open but the connectionString has changed, close
-                // the current connection.
-                if (_dbConnection != null && _currentDbConnectionString != connectionString)
-                {
-                    _dbConnection.Dispose();
-                    _dbConnection = null;
                 }
 
                 _currentDbConnectionString = connectionString;

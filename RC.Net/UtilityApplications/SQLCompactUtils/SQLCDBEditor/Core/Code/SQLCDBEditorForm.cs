@@ -329,7 +329,7 @@ namespace Extract.SQLCDBEditor
                     if (!string.IsNullOrEmpty(_databaseWorkingCopyFileName) &&
                         System.IO.File.Exists(_databaseWorkingCopyFileName))
                     {
-                        System.IO.File.Delete(_databaseWorkingCopyFileName);
+                        FileSystemMethods.DeleteFile(_databaseWorkingCopyFileName);
                         _databaseWorkingCopyFileName = null;
                     }
 
@@ -1559,7 +1559,7 @@ namespace Extract.SQLCDBEditor
                 {
                     if (File.Exists(queryAndResultsControl.FileName))
                     {
-                        File.Delete(queryAndResultsControl.FileName);
+                        FileSystemMethods.DeleteFile(queryAndResultsControl.FileName);
                     }
 
                     // If the query is currently open, close it.
@@ -1774,15 +1774,14 @@ namespace Extract.SQLCDBEditor
                         // If there is a previous copy of the working copy, if it can be deleted
                         // the instance that created it is not still open and it can therefore
                         // be ignored.
-                        File.Delete(_databaseWorkingCopyFileName);
+                        FileSystemMethods.DeleteFileNoRetry(_databaseWorkingCopyFileName);
                     }
                     catch
                     {
                         // But if it couldn't be deleted, another instance of SQLCDBEditor likely
                         // already has the database open for editing; prevent it from being opened.
                         ExtractException ee = new ExtractException("ELI34542",
-                            "This database is currently being edited by another instance of " +
-                            ((string.IsNullOrEmpty(_customTitle)) ? _DEFAULT_TITLE : _customTitle));
+                            "This database is currently being edited by another process.");
                         ee.AddDebugData("Database Filename", _databaseFileName, false);
 
                         // Set _databaseWorkingCopyFileName to null to ensure this instance doesn't
@@ -2092,7 +2091,7 @@ namespace Extract.SQLCDBEditor
             if (!string.IsNullOrEmpty(_databaseWorkingCopyFileName) &&
                 File.Exists(_databaseWorkingCopyFileName))
             {
-                File.Delete(_databaseWorkingCopyFileName);
+                FileSystemMethods.DeleteFile(_databaseWorkingCopyFileName);
                 _databaseWorkingCopyFileName = null;
             }
 
