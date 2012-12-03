@@ -122,16 +122,16 @@
             this._storagePressureComboBox = new Extract.DataEntry.DataEntryComboBox();
             this._storageTemperatureComboBox = new Extract.DataEntry.DataEntryComboBox();
             this._componentTable = new Extract.DataEntry.DataEntryTable();
+            this._componentWeightColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentEhsColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentCasColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._mapNumberTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._gridNumberTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._locationConfidentialComboBox = new Extract.DataEntry.DataEntryComboBox();
             this._tradeSecretComboBox = new Extract.DataEntry.DataEntryComboBox();
             this._extremelyHazardousSubstanceComboBox = new Extract.DataEntry.DataEntryComboBox();
             this._curiesTextBox = new Extract.DataEntry.DataEntryTextBox();
-            this._componentWeightColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentEhsColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentCasColumn = new Extract.DataEntry.DataEntryTableColumn();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -980,22 +980,25 @@
             this._otherTextBox.AttributeName = "Other";
             this._otherTextBox.AutoUpdateQuery = "<Expression>\r\n\tstring.IsNullOrWhiteSpace(<Attribute>../Other_Container</Attribute" +
     ">) ? \'\' : \'X\'\r\n</Expression>";
-            this._otherTextBox.Location = new System.Drawing.Point(28, 258);
+            this._otherTextBox.Location = new System.Drawing.Point(322, 258);
             this._otherTextBox.Name = "_otherTextBox";
             this._otherTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
-            this._otherTextBox.Size = new System.Drawing.Size(10, 21);
-            this._otherTextBox.TabIndex = 137;
+            this._otherTextBox.ReadOnly = true;
+            this._otherTextBox.Size = new System.Drawing.Size(15, 21);
+            this._otherTextBox.TabIndex = 135;
+            this._otherTextBox.TabStop = false;
             this._otherTextBox.ValidationErrorMessage = "Invalid value";
-            this._otherTextBox.Visible = false;
+            this._otherTextBox.Click += new System.EventHandler(this.HandleToggleTextBox_Click);
+            this._otherTextBox.TextChanged += new System.EventHandler(this.HandleControl_TextChanged);
             // 
             // _otherContainerTextBox
             // 
             this._otherContainerTextBox.AttributeName = "Other_Container";
-            this._otherContainerTextBox.Location = new System.Drawing.Point(322, 258);
+            this._otherContainerTextBox.Location = new System.Drawing.Point(343, 258);
             this._otherContainerTextBox.Name = "_otherContainerTextBox";
             this._otherContainerTextBox.ParentDataEntryControl = this._storageContainerGroupBox;
             this._otherContainerTextBox.Size = new System.Drawing.Size(137, 21);
-            this._otherContainerTextBox.TabIndex = 135;
+            this._otherContainerTextBox.TabIndex = 136;
             this._otherContainerTextBox.TabStop = false;
             this._otherContainerTextBox.ValidationErrorMessage = "Invalid value";
             // 
@@ -1351,6 +1354,52 @@
             this._componentTable.TabIndex = 148;
             this._componentTable.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleTable_CellValueChanged);
             // 
+            // _componentWeightColumn
+            // 
+            this._componentWeightColumn.AttributeName = "Weight";
+            this._componentWeightColumn.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>/Component_WT_Default</Attribute></Query>";
+            this._componentWeightColumn.FillWeight = 15F;
+            this._componentWeightColumn.HeaderText = "Weight %";
+            this._componentWeightColumn.Name = "_componentWeightColumn";
+            this._componentWeightColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._componentWeightColumn.ValidationErrorMessage = "Component weight is required and must be numerical";
+            this._componentWeightColumn.ValidationPattern = "^[\\d\\.]+$";
+            // 
+            // _componentNameColumn
+            // 
+            this._componentNameColumn.AttributeName = "Name";
+            this._componentNameColumn.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>/Component_Name_Default</Attribute></Query>";
+            this._componentNameColumn.FillWeight = 50F;
+            this._componentNameColumn.HeaderText = "Hazardous Component";
+            this._componentNameColumn.Name = "_componentNameColumn";
+            this._componentNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._componentNameColumn.ValidationErrorMessage = "Component name is a required field";
+            this._componentNameColumn.ValidationPattern = "\\S";
+            this._componentNameColumn.ValidationQuery = "<Query ValidationListType=\'AutoCompleteOnly\'>\r\n<SQL>SELECT [Value] FROM [Previous" +
+    "lyUsedFieldValue] WHERE [FieldName] = \'Component_Name\'</SQL>\r\n</Query>";
+            // 
+            // _componentEhsColumn
+            // 
+            this._componentEhsColumn.AttributeName = "EHS";
+            this._componentEhsColumn.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>/Component_EHS_Default</Attribute></Query>";
+            this._componentEhsColumn.FillWeight = 15F;
+            this._componentEhsColumn.HeaderText = "EHS";
+            this._componentEhsColumn.Name = "_componentEhsColumn";
+            this._componentEhsColumn.UseComboBoxCells = true;
+            this._componentEhsColumn.ValidationErrorMessage = "Invalid value";
+            this._componentEhsColumn.ValidationQuery = "[BLANK]\r\nYes\r\nNo";
+            // 
+            // _componentCasColumn
+            // 
+            this._componentCasColumn.AttributeName = "CAS";
+            this._componentCasColumn.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>/Component_CAS_Default</Attribute></Query>";
+            this._componentCasColumn.FillWeight = 20F;
+            this._componentCasColumn.HeaderText = "CAS #";
+            this._componentCasColumn.Name = "_componentCasColumn";
+            this._componentCasColumn.ValidationErrorMessage = "Invalid value";
+            this._componentCasColumn.ValidationQuery = "<Query ValidationListType=\'AutoCompleteOnly\'>\r\n<SQL>SELECT [Value] FROM [Previous" +
+    "lyUsedFieldValue] WHERE [FieldName] = \'Component_CAS\'</SQL>\r\n</Query>";
+            // 
             // _mapNumberTextBox
             // 
             this._mapNumberTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -1428,53 +1477,6 @@
             this._curiesTextBox.ValidationErrorMessage = "Curies must be numerical";
             this._curiesTextBox.ValidationPattern = "^[\\d\\.\\-]*$";
             this._curiesTextBox.TextChanged += new System.EventHandler(this.HandleControl_TextChanged);
-            // 
-            // _componentWeightColumn
-            // 
-            this._componentWeightColumn.AttributeName = "Weight";
-            this._componentWeightColumn.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>/Component_WT_Default</Attribute></Query>";
-            this._componentWeightColumn.FillWeight = 15F;
-            this._componentWeightColumn.HeaderText = "Weight %";
-            this._componentWeightColumn.Name = "_componentWeightColumn";
-            this._componentWeightColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._componentWeightColumn.ValidationErrorMessage = "Component weight is required and must be numerical";
-            this._componentWeightColumn.ValidationPattern = "^[\\d\\.]+$";
-            // 
-            // _componentNameColumn
-            // 
-            this._componentNameColumn.AttributeName = "Name";
-            this._componentNameColumn.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>/Component_Name_Default</Attribute></Query>";
-            this._componentNameColumn.FillWeight = 50F;
-            this._componentNameColumn.HeaderText = "Hazardous Component";
-            this._componentNameColumn.Name = "_componentNameColumn";
-            this._componentNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._componentNameColumn.ValidationErrorMessage = "Component name is a required field";
-            this._componentNameColumn.ValidationPattern = "\\S";
-            this._componentNameColumn.ValidationQuery = "<Query ValidationListType=\'AutoCompleteOnly\'>\r\n<SQL>SELECT [Value] FROM [Previous" +
-    "lyUsedFieldValue] WHERE [FieldName] = \'Component_Name\'</SQL>\r\n</Query>";
-            // 
-            // _componentEhsColumn
-            // 
-            this._componentEhsColumn.AttributeName = "EHS";
-            this._componentEhsColumn.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>/Component_EHS_Default</Attribute></Query>";
-            this._componentEhsColumn.FillWeight = 15F;
-            this._componentEhsColumn.HeaderText = "EHS";
-            this._componentEhsColumn.Name = "_componentEhsColumn";
-            this._componentEhsColumn.SupportsSwiping = false;
-            this._componentEhsColumn.UseComboBoxCells = true;
-            this._componentEhsColumn.ValidationErrorMessage = "Invalid value";
-            this._componentEhsColumn.ValidationQuery = "[BLANK]\r\nYes\r\nNo";
-            // 
-            // _componentCasColumn
-            // 
-            this._componentCasColumn.AttributeName = "CAS";
-            this._componentCasColumn.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>/Component_CAS_Default</Attribute></Query>";
-            this._componentCasColumn.FillWeight = 20F;
-            this._componentCasColumn.HeaderText = "CAS #";
-            this._componentCasColumn.Name = "_componentCasColumn";
-            this._componentCasColumn.ValidationErrorMessage = "Invalid value";
-            this._componentCasColumn.ValidationQuery = "<Query ValidationListType=\'AutoCompleteOnly\'>\r\n<SQL>SELECT [Value] FROM [Previous" +
-    "lyUsedFieldValue] WHERE [FieldName] = \'Component_CAS\'</SQL>\r\n</Query>";
             // 
             // FresnoPanel
             // 
