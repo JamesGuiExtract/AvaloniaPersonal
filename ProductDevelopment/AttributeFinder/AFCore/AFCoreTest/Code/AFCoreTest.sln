@@ -585,7 +585,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extract.DataEntry.DEPs", "E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.Courts", "..\..\..\..\DataEntry\FlexIndex\DEPs\Courts\Core\Code\Extract.DataEntry.DEP.Courts.csproj", "{4E6AEDAD-E73D-4BAB-9B2A-4E0BF8026FAD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionAndQueryTester", "..\..\..\..\..\RC.Net\UtilityApplications\ExperssionAndQueryTester\Core\Code\ExpressionAndQueryTester.csproj", "{404C32F6-646B-4FC7-A1B6-6F49986EF3E0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionAndQueryTester", "..\..\..\..\..\RC.Net\UtilityApplications\ExpressionAndQueryTester\Core\Code\ExpressionAndQueryTester.csproj", "{404C32F6-646B-4FC7-A1B6-6F49986EF3E0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MSDataConnectionDialog", "MSDataConnectionDialog", "{4CAFD9CC-640F-4836-B388-D370B6219488}"
 EndProject
@@ -779,7 +779,7 @@ Global
 		ProjectRelativeDiskPath164 = ..\..\..\..\DataEntry\LabDE\DEPs\HealthNetworkLabs\Core\Code\Extract.DataEntry.DEP.HealthNetworkLabs.csproj
 		ProjectRelativeDiskPath165 = ..\..\..\..\DataEntry\FlexIndex\DEPs\DemoFlexIndex\Core\Code\Extract.DataEntry.DEP.DemoFlexIndex.csproj
 		ProjectRelativeDiskPath166 = ..\..\..\..\DataEntry\FlexIndex\DEPs\Courts\Core\Code\Extract.DataEntry.DEP.Courts.csproj
-		ProjectRelativeDiskPath167 = ..\..\..\..\..\RC.Net\UtilityApplications\ExperssionAndQueryTester\Core\Code\ExpressionAndQueryTester.csproj
+		ProjectRelativeDiskPath167 = ..\..\..\..\..\RC.Net\UtilityApplications\ExpressionAndQueryTester\Core\Code\ExpressionAndQueryTester.csproj
 		ProjectRelativeDiskPath168 = AFCoreTest.sln
 		ProjectRelativeDiskPath169 = ..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUI\Microsoft.Data.ConnectionUI.csproj
 		ProjectRelativeDiskPath170 = ..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj
