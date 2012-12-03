@@ -259,16 +259,28 @@ namespace Extract.FileActionManager.Utilities
                         "Specified db manager is either null or not a FAMServiceDatabaseManager.");
                 }
 
-                int sleepTime = int.Parse(dbManager.Settings[FAMServiceDatabaseManager.SleepTimeOnStartupKey],
-                    CultureInfo.InvariantCulture);
-                if (sleepTime <= 0)
+                // [DotNetRCAndUtils:858]
+                // Only honor SleepTimeOnStartup during the first 15 minutes of machine up time.
+                if (SystemMethods.SystemUptime.TotalMinutes < 15)
                 {
-                    var ee = new ExtractException("ELI31139", "Sleep time on startup must be > 0.");
-                    ee.AddDebugData("Sleep Time", sleepTime, false);
-                    throw ee;
-                }
+                    int sleepTime = int.Parse(dbManager.Settings[FAMServiceDatabaseManager.SleepTimeOnStartupKey],
+                        CultureInfo.InvariantCulture);
+                    if (sleepTime <= 0)
+                    {
+                        var ee = new ExtractException("ELI31139", "Sleep time on startup must be > 0.");
+                        ee.AddDebugData("Sleep Time", sleepTime, false);
+                        throw ee;
+                    }
 
-                _stopProcessing.WaitOne(sleepTime);
+                    _stopProcessing.WaitOne(sleepTime);
+                }
+                else
+                {
+                    var ee = new ExtractException("ELI35295", "Application trace: SleepTimeOnStart "
+                        + "ignored since system in not in the process of starting up.");
+                    ee.AddDebugData("System uptime", SystemMethods.SystemUptime, false);
+                    ee.Log();
+                }
 
                 // Get the collection of ServiceController's for the dependent services
                 List<ServiceController> dependentServices = GetDependentServiceControllers(dbManager);

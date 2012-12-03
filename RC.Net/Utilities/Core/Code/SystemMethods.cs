@@ -376,5 +376,25 @@ namespace Extract.Utilities
                 throw ee;
             }
         }
+
+        /// <summary>
+        /// Gets the time elapsed since the system was last started or rebooted.
+        /// </summary>
+        /// <returns>The <see cref="TimeSpan"/> elapsed since the system was last started or
+        /// rebooted.</returns>
+        public static TimeSpan SystemUptime
+        {
+            get
+            {
+                try
+                {
+                    return NativeMethods.SystemUptime;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35294");
+                }
+            }
+        }
     }
 }

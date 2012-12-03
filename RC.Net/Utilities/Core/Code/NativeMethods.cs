@@ -427,6 +427,18 @@ namespace Extract.Utilities
             ref uint length);
 
         /// <summary>
+        /// Gets the number of milliseconds that have elapsed since the system was started.
+        /// </summary>
+        /// <returns>The number of milliseconds that have elapsed since the system was started.
+        /// </returns>
+        [DllImport("kernel32.dll")]
+        static extern long GetTickCount64();
+
+        #endregion NativeMethods P/Invokes
+
+        #region NativeMethods Methods
+
+        /// <summary>
         /// Encrypts a given string using the internal Extract Systems passwords for encrypting
         /// Exception debug strings.
         /// </summary>
@@ -487,10 +499,6 @@ namespace Extract.Utilities
             // Return the encrypted text
             return encryptedText;
         }
-
-        #endregion NativeMethods P/Invokes
-
-        #region NativeMethods Methods
 
         /// <summary>
         /// Retrieves a string from the specified section in an initialization file.
@@ -632,6 +640,30 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI32871");
+            }
+        }
+
+        /// <summary>
+        /// Gets the time elapsed since the system was last started or rebooted.
+        /// </summary>
+        /// <returns>The <see cref="TimeSpan"/> elapsed since the system was last started or
+        /// rebooted.</returns>
+        public static TimeSpan SystemUptime
+        {
+            get
+            {
+                try
+                {
+                    long millisecondsUptime = GetTickCount64();
+
+                    // 100 nanoseconds * 10,000 = 1 millisecond
+                    TimeSpan systemUptime = new TimeSpan(millisecondsUptime * 10000);
+                    return systemUptime;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35293");
+                }
             }
         }
 
