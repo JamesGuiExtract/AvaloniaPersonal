@@ -86,8 +86,8 @@
                 		<ul>
                     			<li>Database - <b>Clear</b>, <b>Update database schema</b>, 
 					<b>Logout</b>, and <b>Exit</b>.</li>
-                    			<li>Tools - <b>Check for new components</b> and <b>File Action 
-					Manager</b>.</li>
+                    			<li>Tools - <b>Check for new components</b>, <b>File Action 
+					Manager</b>, and <b>Recalculate summary statistics</b>.</li>
                     			<li>Help - <b>File Action Manager Help</b> and <b>About this 
 					application</b>.</li>
                 		</ul></li>
@@ -177,8 +177,7 @@
 			<li>Open <b>TestImages1.fps</b> and start processing.
 			<ul>
 				<li>Confirm that multiple file suppliers are defined.
-				<li>Confirm that <b>all</b> files are successfully queued.  Some 
-				files will fail queuing for acceptable reasons.
+				<li>Confirm that <b>all</b> files are successfully queued.
 				<li>Confirm that <b>most</b> files process successfully.  <b>19</b> 
 				files are expected to fail due to invalid format, unsupported view 
 				perspective, image too large and other acceptable reasons.
@@ -190,11 +189,10 @@
 				<li>Rotate some images and add additional manual redactions.
 				<li>Confirm that reviewing document history shows found and 
 				added redactions each in their appropriate places.
-				<li>Confirm that <b>most</b> files process successfully.  <b>2</b> 
-				files are expected to fail.
+				<li>Confirm that <b>most</b> files process successfully.  <b>1</b> 
+				file is expected to fail.
 				<ul>
 					<li><b>2726.2149.tif</b> - invalid bits per pixel
-					<li><b>280.jpg</b> - Data CRC error
 				</ul>
 			</ul>
 		</ul>
@@ -317,7 +315,7 @@
 			<li>Confirm that file processing priority can be <b>modified</b>.
 			<li>Confirm that Statistics can be <b>recalculated</b>.
 			<ul>
-				<li>Remove entry in <b>ActionStatistics</b> table.
+				<li>Modify an entry in the <b>ActionStatistics</b> table.
 				<li>Click <b>Refresh</b> to confirm inaccurate values.
 				<li>Select <b>Recalculate summary statistics</b> and confirm 
 				that the summary statistics are updated.
@@ -335,6 +333,8 @@
 			<li>Confirm that the <b>ID Shield</b> help file contains the expected contents.
 			<li>Confirm that the <b>FLEX Index</b> help file opens without error.
 			<li>Confirm that the <b>FLEX Index</b> help file contains the expected contents.
+			<li>Confirm that the <b>LabDE</b> help file opens without error.
+			<li>Confirm that the <b>LabDE</b> help file contains the expected contents.
 		</ul>
 <p>
 		<li><b>ID Shield On Demand</b>
@@ -381,6 +381,8 @@
 			option also takes you to the manual license request instructions.
 			<li>Confirm that the three buttons copy the appropriate information onto 
 			the clipboard.
+			<li>Confirm that the <b>Open License Folder</b> button opens the appropriate 
+			folder for the test machine.
 		</ul>
 	</ul>
 <p>
@@ -406,6 +408,7 @@
 <p>
 		<li><b>FAM Network Manager</b>
 		<ul>
+			<li>Follow the instructions in the <b>Help</b> file for proper machine setup.
 			<li>Add the current test machine and confirm that <b>FAM Status</b> and 
 			<b>FDRS Status</b> are both correct.
 			<li>Add a non-existent machine and confirm that status values are <b>Not 
@@ -556,7 +559,7 @@
 				<li>setting of a Swiping rule flag
 				<li>text to be saved via a <b>Comments</b> tab
 			</ul>
-			<li>Confirm that <b>Tools - Rule Tester</b> displays the Rule Tester dialog.
+			<li>Confirm that <b>Tools - Open Rule Tester</b> displays the Rule Tester dialog.
 			<li>Confirm that <b>Tools - Execute Test Harnesss</b> displays the Test Harness dialog 
 			and the Test Result Logger window.
 			<li>Confirm that <b>Tools - Check For New Components</b> displays a message box 
