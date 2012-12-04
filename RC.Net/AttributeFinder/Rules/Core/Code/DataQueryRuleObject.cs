@@ -736,7 +736,7 @@ namespace Extract.AttributeFinder.Rules
                             // If there is a previous copy of the working copy, if it can be deleted
                             // the instance that created it is not still open and it can therefore
                             // be ignored.
-                            FileSystemMethods.DeleteFileNoRetry(workingCopyFileName);
+                            FileSystemMethods.DeleteFile(workingCopyFileName);
                         }
                         catch
                         {
