@@ -3054,6 +3054,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 dataEntryControlHost.Config = config;
                 dataEntryControlHost.ImageViewer = _imageViewer;
 
+                QueryNode.QueryCacheLimit = _applicationConfig.Settings.QueryCacheLimit;
+
                 // If HighlightConfidenceBoundary settings has been specified in the config file and
                 // the controlHost has exactly two confidence tiers, use the provided value as the
                 // minimum OCR confidence value in order to highlight text as confidently OCR'd

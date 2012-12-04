@@ -625,6 +625,16 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets the maximum number of results any given SQL node type should be able to
+        /// cache.
+        /// </summary>
+        internal static int QueryCacheLimit
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Pushes the <see paramref="distinctResult"/> to use for the current evaluation scope.
         /// </summary>
         /// <param name="distinctResult">The <see cref="QueryResult"/> to use as the distinct value

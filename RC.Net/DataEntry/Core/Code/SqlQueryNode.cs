@@ -26,17 +26,11 @@ namespace Extract.DataEntry
         static DbConnection _lastDBConnection;
 
         /// <summary>
-        /// Provides access to settings in the config file.
-        /// </summary>
-        static ConfigSettings<Extract.DataEntry.Properties.Settings> _config =
-            new ConfigSettings<Extract.DataEntry.Properties.Settings>();
-
-        /// <summary>
         /// Cached SQL query results for frequently used or expensive queries.
         /// </summary>
         static DataCache<string, CachedQueryData<string[]>> _cachedResults =
             new DataCache<string, CachedQueryData<string[]>>(
-                _config.Settings.QueryCacheLimit, CachedQueryData<string[]>.GetScore);
+                QueryNode.QueryCacheLimit, CachedQueryData<string[]>.GetScore);
 
         #endregion Statics
 

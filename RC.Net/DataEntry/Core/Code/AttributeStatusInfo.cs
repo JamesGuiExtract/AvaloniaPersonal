@@ -327,6 +327,11 @@ namespace Extract.DataEntry
         /// </summary>
         List<IAttribute> _tabGroup;
 
+        /// <summary>
+        /// Indicates whether the attribute has been initialized and has not been deleted.
+        /// </summary>
+        bool _initialized;
+
         #endregion Instance fields
 
         #region Constructors
@@ -830,11 +835,6 @@ namespace Extract.DataEntry
                     }
                 }
 
-                // If an entry doesn't exist in _subAttributesToParentMap for this attribute's
-                // sub-attributes, this is the first time it has been initialized.
-                bool previouslyInitialized = 
-                    _subAttributesToParentMap.ContainsKey(attribute.SubAttributes);
-
                 // If the attribute's source attributes have known parent, use it to generate the
                 // attribute to parent mapping.
                 IAttribute parentAttribute;
@@ -846,21 +846,27 @@ namespace Extract.DataEntry
                 // Add a mapping for the attribute's subattributes for future reference.
                 _subAttributesToParentMap[attribute.SubAttributes] = attribute;
 
+                // Raise the AttributeInitialized event if it hasn't already been raised for this
+                // attribute.
+                // [DataEntry:876]
+                // On attribute initialized needs to be called before LoadDataQueries so that
+                // and undo memento for adding the attribute is added to the undo stack before an
+                // undo memento for modifying the value (as LoadDataQueries may do).
+                if (!statusInfo._initialized)
+                {
+                    statusInfo._initialized = true;
+
+                    _undoManager.AddMemento(new DataEntryAddedAttributeMemento(attribute));
+
+                    OnAttributeInitialized(attribute, sourceAttributes, owningControl);
+                }
+
                 LoadDataQueries(attribute, sourceAttributes, autoUpdateQuery, validationQuery, statusInfo);
 
                 // [DataEntry:173] Trim any whitespace from the beginning and end.
                 // [DataEntry:167]
                 // Accessing the value also ensures the value is accessed and, thus, created.
                 attribute.Value.Trim(" \t\r\n", " \t\r\n");
-
-                // Raise the AttributeInitialized event if it hasn't already been raised for this
-                // attribute.
-                if (!previouslyInitialized)
-                {
-                    _undoManager.AddMemento(new DataEntryAddedAttributeMemento(attribute));
-
-                    OnAttributeInitialized(attribute, sourceAttributes, owningControl);
-                }
             }
             catch (Exception ex)
             {
@@ -1148,6 +1154,8 @@ namespace Extract.DataEntry
 
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
+                statusInfo._initialized = false;
+
                 // Dispose of any auto-update trigger for the attribute.
                 AutoUpdateTrigger autoUpdateTrigger = null;
                 if (_autoUpdateTriggers.TryGetValue(attribute, out autoUpdateTrigger))
@@ -1403,7 +1411,10 @@ namespace Extract.DataEntry
 
                 // If the viewed status of the attribute has changed from its previous value,
                 // raise the ViewedStateChanged event to notify listeners of the new status.
-                if (statusInfo._isViewable && statusInfo._hasBeenViewed != hasBeenViewed)
+                // Ensure an item's viewed status doesn't change after it has been deleted (i.e.,
+                // it no longer exists.
+                if (statusInfo._isViewable && statusInfo._hasBeenViewed != hasBeenViewed &&
+                    statusInfo._initialized)
                 {
                     // AddMemento needs to be called before changing the status so that the
                     // DataEntryAttributeStatusChangeMemento knows of the attribute's original status.
@@ -1496,7 +1507,11 @@ namespace Extract.DataEntry
 
                 // If the validation status of the attribute has changed from its previous value,
                 // raise the ValidationStateChanged event to notify listeners of the new status.
-                if (statusInfo._isViewable && statusInfo._dataValidity != dataValidity)
+                // [DataEntry:876]
+                // Ensure an item's validity doesn't change after it has been deleted (i.e., it is
+                // no longer initialized)
+                if (statusInfo._isViewable && statusInfo._dataValidity != dataValidity &&
+                    statusInfo._initialized)
                 {
                     statusInfo._dataValidity = dataValidity;
 

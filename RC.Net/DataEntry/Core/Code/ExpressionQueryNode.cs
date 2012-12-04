@@ -23,16 +23,11 @@ namespace Extract.DataEntry
         #region Statics
 
         /// <summary>
-        /// Provides access to settings in the config file.
-        /// </summary>
-        static ConfigSettings<Settings> _config = new ConfigSettings<Settings>();
-
-        /// <summary>
         /// A cache of compiled queries that are frequently used and/or expensive.
         /// </summary>
         static DataCache<string, CachedQueryData<IExpression>> _cachedExpressions =
             new DataCache<string, CachedQueryData<IExpression>>(
-                _config.Settings.QueryCacheLimit, CachedQueryData<IExpression>.GetScore);
+                QueryNode.QueryCacheLimit, CachedQueryData<IExpression>.GetScore);
 
         #endregion Statics
 
