@@ -1489,6 +1489,37 @@ bool CSpatialString::getIsEndOfLine(long nIndex)
     }
 }
 //-------------------------------------------------------------------------------------------------
+bool CSpatialString::getIsEndOfLine(size_t index, CRect rectCurrentLineZone)
+{
+	// Check to see if this is the end of the line based on the char value or page number first.
+	// This will not take into account the spatial location of of the next character.
+    if (getIsEndOfLine(index))
+    {
+        return true;
+    }
+	
+	// [DataEntry:1119]
+	// Otherwise, if the next character of a line is a spatial character that is either completely
+	// above or below rectCurrentZone or whose right side is less that the right side of
+	// rectCurrentLineZone, this should be considered the end of the line.
+	index++;
+	if (index < m_vecLetters.size() && m_vecLetters[index].m_bIsSpatial)
+	{
+		// Get the spatial area of the next character.
+		CRect rectNextLetter(m_vecLetters[index].m_ulLeft, m_vecLetters[index].m_ulTop,
+			m_vecLetters[index].m_ulRight, m_vecLetters[index].m_ulBottom);
+							
+		if (rectNextLetter.top > rectCurrentLineZone.bottom || 
+			rectNextLetter.bottom < rectCurrentLineZone.top || 
+			rectNextLetter.right < rectCurrentLineZone.right)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+//-------------------------------------------------------------------------------------------------
 void CSpatialString::updateString(const std::string& strText)
 {
     // Reset everything except m_strSourceDocName
@@ -1820,6 +1851,16 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
                 // Ignore non-spatial characters.
                 if (!m_vecLetters[j].m_bIsSpatial)
                 {
+					// [DataEntry:1119]
+					// Even though this char is non-spatial, still check to see if the subsequent
+					// char(s) indicate that this is the end of a line.
+					if (getIsEndOfLine(j))
+					{
+						j++;
+						bEndOfLine = true;
+						break;
+					}
+
                     j++;
                     continue;
                 }
@@ -1883,7 +1924,7 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
 
                 // If this character is the last of the current line, break off the raster zone (but
                 // move on to the next char).
-                if (getIsEndOfLine(j))
+                if (getIsEndOfLine(j, rectCurrentZone))
                 {
                     bEndOfLine = true;
                     j++;
