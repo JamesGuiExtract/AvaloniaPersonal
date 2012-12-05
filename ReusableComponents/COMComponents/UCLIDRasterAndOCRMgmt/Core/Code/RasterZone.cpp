@@ -484,8 +484,27 @@ STDMETHODIMP CRasterZone::GetRectangularBounds(ILongRectangle *pPageBounds,
 		// calculate the angle of the line dy/dx
 		double dAngle = atan2((double) (m_nEndY - m_nStartY), (double) (m_nEndX  - m_nStartX));
 		
-		double dDeltaX = ((m_nHeight) / 2.0) * sin(dAngle);
-		double dDeltaY = ((m_nHeight) / 2.0) * cos(dAngle);
+		// [FlexIDSCore:4569]
+		// Though it might seem more accurate to use floating point division (divide by 2.0 rather
+		// than 2), due to how CreateFromLongRectangle works, this in fact leads to inappropriate 
+		// inflation of the zone. I think perhaps that CreateFromLongRectangle (specifically the fix
+		// for LegacyRCAndUtils:5827) may be the real source of the problem, but the most recent
+		// change was made here in association with the fix for #6217. However, the primary change
+		// was on the .Net side and I think the change here to floating point division may have just
+		// been to make it consistent with the math in other places and not because it had a direct
+		// impact on #6217. In fact, I see no ill effects in the WYSIWYG test by changing this back
+		// to integer division.
+		// Here is an example of how floating point division leads to zone inflation:
+		// Height = 11, StartY = 100
+		// 11 / 2 * 1 = 5					11 / 2.0 * 1 = 5.5
+		// p1.y = 100 + 5 = 115				p1.y = (int)(100 + 5.5) = 115	
+		// p3.y = 100 - 5 = 105				p3.y = (int)(100 - 5.5) = 104
+		// CreateFromLongRectangle:
+		// H = 115 - 105 + 1 = 11			H = 115 - 104 + 1 = 12
+		// H % 2 == 1						H % 2 == 0 --> H++
+		// H = 11							H = 13
+		double dDeltaX = (m_nHeight / 2) * sin(dAngle);
+		double dDeltaY = (m_nHeight / 2) * cos(dAngle);
 		
 		// calculate the 4 points
 		p1.x = (long) (m_nStartX - dDeltaX);
