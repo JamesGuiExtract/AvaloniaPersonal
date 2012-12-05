@@ -213,13 +213,22 @@
     <value>True</value>
   </metadata>
   <data name="_componentRefRange.ValidationQuery" xml:space="preserve">
-    <value>&lt;Query ValidationListType='ValidationListOnly'&gt;
-[BLANK]
-&lt;SQL&gt;SELECT DISTINCT '&lt;Attribute Parameterize='False'&gt;.&lt;/Attribute&gt;'
+    <value>&lt;Declarations&gt;
+	&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt;
+	&lt;Expression Name='ValidationMessage'&gt;
+		string.IsNullOrEmpty(&lt;Value/&gt;)
+			? 'Reference range is required for this result.'
+			: 'Reference range is not allowed for this result.'
+	&lt;/Expression&gt;
+&lt;/Declarations&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidationMessage='ValidationMessage' ValidValue='1'&gt;
+&lt;SQL&gt;SELECT '1'
  FROM LabOrderTest 
  WHERE OrderCode=&lt;Attribute&gt;../../OrderCode&lt;/Attribute&gt;
  AND TestCode=&lt;Attribute&gt;../TestCode&lt;/Attribute&gt;
- AND AllowRefRange=1&lt;/SQL&gt;
+ AND (LEN(&lt;Value/&gt;) &gt; 0 OR RequireRefRange=0)
+ AND (LEN(&lt;Value/&gt;)=0 OR AllowRefRange=1)
+&lt;/SQL&gt;
 &lt;/Query&gt;</value>
   </data>
   <metadata name="_componentCorrectFlag.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
