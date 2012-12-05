@@ -13,8 +13,9 @@ Const namespaceURI = "urn:schemas-microsoft-com:asm.v1"
 Dim objArgs
 Set objArgs = WScript.Arguments
 
+
 if objArgs.Count <> 1 then
-    stdout.WriteLine "Expects the path to the ProcessFiles.exe and DataEntryApplication.exe as argument"
+    WScript.Echo "Expects the path to the ProcessFiles.exe and DataEntryApplication.exe as argument"
     WScript.Quit(1) 
 end if
 
@@ -22,7 +23,7 @@ Set wshShell = CreateObject("WScript.Shell")
 Set fileSys = CreateObject("Scripting.FileSystemObject")
 
 if not fileSys.FolderExists(objArgs(0)) then
-    stdout.WriteLine "Folder: " + objArgs(0) + " does not exist"
+    WScript.Echo "Folder: " + objArgs(0) + " does not exist"
     WScript.Quit(2)
 end if
 
@@ -34,7 +35,7 @@ For Each targetApplication In targetApplications
     ApplyConfig(commonComponents & "\" & targetApplication & ".config")
 Next
 
-stdout.WriteLine "Config files updated for DEP compatablitiy."
+WScript.Echo "Config files updated for DEP compatablitiy."
 
 
 Function ApplyConfig(filename)
