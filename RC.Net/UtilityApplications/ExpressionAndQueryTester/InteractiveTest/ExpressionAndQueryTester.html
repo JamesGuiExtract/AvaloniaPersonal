@@ -1,0 +1,207 @@
+<HTML>
+
+<HEAD>
+<TITLE>ExpressionAndQueryTester - Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" 
+href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>ExpressionAndQueryTester - Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<b>NOTE:</b> Additional query and expression examples can be found in the <b>Data queries.doc</b> 
+document in .\Engineering\RC.Net\DataEntry\Core\Requirements
+<hr>
+
+<ul>
+  	<li><h2>User Interface</h2></li>
+  	<ul>
+		<li>Confirm that the window caption is <b>Expression And Query Tester</b>.
+    		<li>Confirm that a <b>VOA filename (data to test)</b> edit box is provided.
+		<li>Confirm that an associated browse button is provided.
+		<li>Confirm that the edit box is updated with the selected VOA filename.
+    		<li>Confirm that another button is provided that brings up the <b>VOA File Viewer</b>.
+		<li><u>Data Scorer</u>
+		<ul>
+			<li>Confirm that a (default) <b>Test RSD data scorer expression</b> radio button 
+			is provided.
+			<li>Confirm that an <b>Attribute(s) to score</b> edit box is provided.
+			<li>Confirm that an <b>RSD Filename</b> edit box is provided.
+			<li>Confirm that an associated browse button is provided.
+			<li><b>[DotNetRC #861]</b> Confirm that the <b>Open</b> dialog allows 
+			browsing for <b>*.RSD</b> or <b>*.RSD.ETF</b> files.
+			<li>Confirm that the edit box is updated with the selected filename.
+			<li>Confirm that the <b>Test</b> button is enabled only when all three of the 
+			following fields are populated.
+			<ul>
+				<li>VOA filename
+				<li>RSD filename
+				<li>Expression
+			</ul>
+		</ul>
+		<li><u>Data Scorer</u>
+		<ul>
+			<li>Confirm that a <b>Test data query</b> radio button is provided.
+			<li>Confirm that 
+			<li>Confirm that 
+		</ul>
+		<li>Confirm that a large, unlabeled edit box is provided for the user to define either 
+		a data scorer expression or a data query.
+  	</ul>
+<p>
+  	<li><h2>Data Scorer Performance</h2></li>
+  	<ul>
+    		<li><u>Setup</u>
+		<ul>
+			<li>Set the VOA filename to <b>AllText.voa</b>.
+			<li><b>Clear</b> the Attribute(s) to score field.
+			<li>Set the RSD Filename to <b>TestCases.rsd</b>.
+		</ul>
+    		<li><u>Expressions</u>
+		<ul>
+			<li>Confirm that <b>#Wayne.count()</b> yields:
+			<ul>
+				<li><b>Overall score</b> = <b>6</b>
+				<li><b>6</b> individual <b>Wayne</b> attributes
+			</ul>
+			<li>Confirm that <b>#Short.count()</b> yields:
+			<ul>
+				<li><b>Overall score</b> = <b>13</b>
+				<li><b>13</b> individual <b>Short</b> attributes
+			</ul>
+			<li>Confirm that <b>#Short.sum()</b> yields:
+			<ul>
+				<li><b>Overall score</b> = <b>351</b>
+				<li><b>13</b> individual <b>Short</b> attributes
+			</ul>
+			<li>Confirm that <b>#Short.distinct().count()</b> yields:
+			<ul>
+				<li><b>Overall score</b> = <b>11</b>
+				<li><b>11</b> individual <b>Short</b> attributes
+			</ul>
+			<li>Confirm that <b>#Short.min()</b> yields:
+			<ul>
+				<li><b>Overall score</b> = <b>1</b>
+				<li><b>13</b> individual <b>Short</b> attributes
+			</ul>
+			<li>Confirm that <b>#Short.max()</b> yields:
+			<ul>
+				<li><b>Overall score</b> = <b>88</b>
+				<li><b>13</b> individual <b>Short</b> attributes
+			</ul>
+			<li>Confirm that <b>#Short.average()</b> yields:
+			<ul>
+				<li><b>Overall score</b> = <b>27</b>
+				<li><b>13</b> individual <b>Short</b> attributes
+			</ul>
+			<li>Confirm that <b>#Short.sort()[0]</b> yields:
+			<ul>
+				<li><b>Overall score</b> = <b>1</b>
+				<li><b>13</b> individual <b>Short</b> attributes
+			</ul>
+			<li>Confirm that <b>#Short.distinct().sort().reverse()[1]</b> 
+			yields:
+			<ul>
+				<li><b>Overall score</b> = <b>51</b>
+				<li><b>13</b> individual <b>Short</b> attributes
+			</ul>
+		</ul>
+    		<li><u>Operations</u>
+		<ul>
+			<li><b>Addition:</b> Confirm that <b>#Short.count() + #Wayne.count()</b> yields:
+			<ul>
+				<li><b>Overall score</b> = <b>19</b>
+				<li><b>13</b> individual <b>Short</b> attributes
+				<li><b>6</b> individual <b>Wayne</b> attributes
+			</ul>
+			<li><b>Subtraction:</b> Confirm that <b>#Short.count() - #Wayne.count()</b> yields:
+			<ul>
+				<li><b>Overall score</b> = <b>7</b>
+				<li><b>13</b> individual <b>Short</b> attributes
+				<li><b>6</b> individual <b>Wayne</b> attributes
+			</ul>
+			<li><b>Multiplication:</b> Confirm that <b>#Short.count() * #Wayne.count()</b> 
+			yields:
+			<ul>
+				<li><b>Overall score</b> = <b>78</b>
+				<li><b>13</b> individual <b>Short</b> attributes
+				<li><b>6</b> individual <b>Wayne</b> attributes
+			</ul>
+			<li><b>Division:</b> Confirm that <b>#Short.max() / #Wayne.count()</b> yields:
+			<ul>
+				<li><b>Overall score</b> = <b>14</b>
+				<li><b>13</b> individual <b>Short</b> attributes
+				<li><b>6</b> individual <b>Wayne</b> attributes
+			</ul>
+			<li><b>Modulus:</b> Confirm that <b>#Short.max() / #Short.count()</b> yields:
+			<ul>
+				<li><b>Overall score</b> = <b>10</b>
+				<li><b>13</b> individual <b>Short</b> attributes
+			</ul>
+			<li><b>Exponent:</b> Confirm that <b>#Short.max() ^ #Short[6]</b> yields:
+			<ul>
+				<li><b>Overall score</b> = <b>681472</b>
+				<li><b>13</b> individual <b>Short</b> attributes
+			</ul>
+<p>
+			<li><b>Error:</b> Confirm that <b>#Short.max() ^ #Short[5]</b> yields:
+			<ul>
+				<li><b>ELI33843: RSD data scorer failed</b> exception
+				<li>Confirm that an <b>ELI21061: Value was either too large or too 
+				small for an Int32</b> exception is also included.
+			</ul>
+		</ul>
+  	</ul>
+<p>
+  	<li><h2>Data Query Performance</h2></li>
+  	<ul>
+    		<li><u>Setup</u>
+		<ul>
+			<li>Set the VOA filename to <b>All.voa</b>.
+			<li><b>Clear</b> the <b>Root attribute</b> field.
+			<li>Click the <b>Configure connection</b> button
+			<ul>
+				<li>Use the <b>Change...</b> button if necessary to set the 
+				<b>Data source</b> to <b>Microsoft SQL Server (SqlClient)</b>.
+				<li>Choose <b>(local)</b> or another appropriate <b>Server name</b>.
+				<li>Choose <b>Demo_IDShield</b> or another appropriate database name.  
+				Note that the database should already have content.
+				<li>Click the <b>Test Connection</b> button before confirming the 
+				settings.
+				<li>Confirm that the <b>Data source</b> and <b>Connection string</b> 
+				fields include meaningful information.
+			</ul>
+			<li>
+		</ul>
+    		<li><u>Expressions and Queries</u>
+		<ul>
+			<li>Confirm that <b>&lt;Attribute&gt;/Short&lt;/Attribute&gt;</b> yields:
+			<ul>
+				<li><b>13</b> individual attributes where each attribute is a 
+				two-character numeric string.
+			</ul>
+			<li>Confirm that <b>&lt;Expression&gt;&lt;Attribute 
+			Type='int[]'&gt;/Short&lt;/Attribute&gt;&lt;/Expression&gt;</b> yields:
+			<ul>
+				<li><b>13</b> individual attributes where each attribute is a number.  
+				Note that zero-padding should no longer be seen.
+			</ul>
+			<li>Confirm that <b>&lt;SQL&gt;SELECT TOP 4 Filename FROM FAMFile&lt;/SQL&gt;</b> 
+			yields:
+			<ul>
+				<li><b>4</b> individual attributes where each attribute is a 
+				fully-qualified path to a Demo_IDShield test image (assuming that the 
+				<b>Demo_IDShield</b> database was used during setup.
+			</ul>
+			<li>Confirm that <b>&lt;Regex Pattern='[\d]+'&gt;The answer to the ultimate 
+			question of life is 42&lt;/Regex&gt;</b> yields:
+			<ul>
+				<li><b>42</b>
+			</ul>
+  	</ul>
+</ul>
+</body>
+</html>
