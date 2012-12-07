@@ -1,0 +1,73 @@
+{\rtf1\ansi\ansicpg1252\deff0\deflang1033\deflangfe1033{\fonttbl{\f0\fswiss\fprq2\fcharset0 Trebuchet MS;}{\f1\froman\fprq2\fcharset0 Times New Roman;}}
+{\stylesheet{ Normal;}{\s1 heading 1;}}
+{\*\generator Msftedit 5.41.21.2509;}\viewkind4\uc1\pard\nowidctlpar\qc\b\f0\fs32 ID Shield Demo Application Instructions\par
+\pard\nowidctlpar\b0\fs24\par
+\ul\b Background\par
+\ulnone\b0 These instructions assume that the ID Shield Demo is in the \ldblquote C:\\Demo_IDShield\rdblquote  folder.\par
+\par
+\ul\b Common information for all ID Shield demos:\par
+\pard\nowidctlpar\fi-360\li360\ulnone\b0\f1 1.\tab\f0 The input images are in the \ldblquote C:\\Demo_IDShield\\Input\rdblquote  folder.\par
+\f1 2.\tab\f0 The output images will be produced in the \ldblquote C:\\Demo_IDShield\\Output\rdblquote  folder.\par
+\f1 3.\tab\f0 All FPS files that produce redacted documents have an inbuilt task that\rquote s turned off by default that can be turned on to apply a stamp on the output document and/or convert the output redacted document to a searchable PDF.  Consult internal support or development team members if you need help turning the stamp/searchable PDF feature on/off.\par
+\f1 4.\tab\f0 All FPS files that produce redacted documents from the verification process will be writing out the metadata / audit XML files to the C:\\Demo_IDShield\\Output folder.\par
+\f1 5.\tab\f0 All FPS files that run rules will be creating the rules output in both VOA and XML format in the C:\\Demo_IDShield\\Input folder.\par
+\pard\nowidctlpar\par
+\pard\keepn\nowidctlpar\s1\ul\b Installation Instructions\par
+\pard{\pntext\f0 1.\tab}{\*\pn\pnlvlbody\pnf0\pnindent360\pnstart1\pndec{\pntxta.}}
+\nowidctlpar\tx0\tx360\ulnone\b0 Uninstall all Extract Systems products.\par
+\pard{\pntext\f0 2.\tab}{\*\pn\pnlvlbody\pnf0\pnindent360\pnstart1\pndec{\pntxta.}}
+\nowidctlpar\fi-360\li360\tx0\tx360 Install the latest version of Extract Systems LM using Setup.exe from the Extract Systems LM folder.\par
+{\pntext\f0 3.\tab}Install the latest version of ID Shield using Setup.exe from the ID Shield folder.\par
+{\pntext\f0 4.\tab}Get an ID Shield Server license file from the Engineering team or create one.\par
+{\pntext\f0 5.\tab}Launch the USBKeyLicenseManager and point it to the location of the USB key (either on the local machine or a remote machine on the network)\par
+{\pntext\f0 6.\tab}Confirm that SQL Server Express is installed.\par
+{\pntext\f0 7.\tab}Copy the "Demo_IDShield" folder from the CD to the root of the C drive "C:\\"\par
+\pard\nowidctlpar\tx360\par
+\pard\keepn\nowidctlpar\s1\ul\b Demo Preparation Instructions (to be executed before each demo)\par
+\pard\nowidctlpar\tx0\tx360\ulnone\b0 1.\tab Close all applications\par
+\pard\nowidctlpar\fi-360\li360\tx360 2.\tab Decide which type of demo you want to run.  Your options are listed below.  If you want to run the same kind of demo you most recently ran, then you can skip this step and move on to step 3 below.\par
+\pard\nowidctlpar\fi-360\li1440\tx360\tx1440\f1 a.\tab\ul\f0 Fully automated redaction demo:\ulnone   To configure your machine for this demo, browse to the \ldblquote C:\\Demo_IDShield\\DemoFiles\\Installs\\AutoRedact\rdblquote  folder and run \ldblquote Install.bat\rdblquote .\par
+\pard\nowidctlpar\fi-360\li1440\f1 b.\tab\ul\f0 Verify all interesting docs demo\ulnone : In this demo, all documents that contain HC/MC/LC/clues are flagged for verification.  To configure your machine for this demo, browse to the \ldblquote C:\\Demo_IDShield\\DemoFiles\\Installs\\VerifyAllInterestingDocs\rdblquote  folder and run \ldblquote Install.bat\rdblquote .\par
+\f1 c.\tab\ul\f0 Hybrid demo\ulnone : In this demo 30 images are processed, some of them get auto-redacted (because they only contain HC data), and some of them get selected for verification (because they have MC, LC, or clues, in addition to possibly also having HC data), and some of them neither get auto-redacted nor selected for review (because they are not sensitive documents).  This is the preferred configuration to deploy ID Shield.  The \ldblquote Hybrid\rdblquote  demo also comes with a \ldblquote\ul Legislation Guard\ulnone\rdblquote  demo extension that can be shown optionally if you decide it\rquote s important.  To configure your machine for this demo, browse to the \ldblquote C:\\Demo_IDShield\\DemoFiles\\Installs\\HybridDemo\rdblquote  folder and run \ldblquote Install.bat\rdblquote .\par
+\pard\nowidctlpar\fi-360\li360\tx360 3.\tab The next step is to clean the documents.  Based upon your audience, you need to decide whether you want to want to run the entire demo like it would be done in production mode, or whether you want to do a faster demo where pre-OCRed documents are used.  \par
+\pard\nowidctlpar\fi-360\li1440\tx360\tx1440\f1 a.\tab\f0 Browse to the \ldblquote C:\\Demo_IDShield\rdblquote  folder.\par
+\pard\nowidctlpar\fi-360\li1440\f1 b.\tab\f0 If you want to process all documents from scratch, run \ldblquote Clean all.bat\rdblquote .\par
+\f1 c.\tab\f0 If you want to skip the OCR phase of processing and use pre-OCRed images, run \ldblquote Clean (keep USS).bat\rdblquote .\par
+\pard\nowidctlpar\tx0\tx360 4.\tab To learn about which images are selected for review, and which images showcase which types of rules, please study the two .txt files that are in the input folder.\par
+\pard\nowidctlpar 5.\tab Practice, practice, practice!\par
+\pard\keepn\nowidctlpar\s1\ul\b\par
+Showing the \ldblquote Fully Automated Redaction\rdblquote  demo\par
+\pard{\pntext\f0 1.\tab}{\*\pn\pnlvlbody\pnf0\pnindent360\pnstart1\pndec{\pntxta.}}
+\nowidctlpar\fi-360\li360\tx360\ulnone\b0 Execute all steps mentioned in the "Demo preparation instructions" section.\par
+{\pntext\f0 2.\tab}Double-click on the \ldblquote\b Automatically Perform Redactions.fps\b0\rdblquote  file in the C:\\Demo_IDShield\\FPS folder, and click the run button in the File Action Manager.  This causes the OCR, rule-running, and automatic redaction of all low confidence, medium confidence and high confidence data.\par
+{\pntext\f0 3.\tab}The images in the Input folder will be processed automatically and the redacted images will be produced in the Output folder.\par
+\pard\keepn\nowidctlpar\s1\ul\b\par
+Showing the \ldblquote Verify All Interesting Docs\rdblquote  demo\par
+\pard{\pntext\f0 1.\tab}{\*\pn\pnlvlbody\pnf0\pnindent360\pnstart1\pndec{\pntxta.}}
+\nowidctlpar\fi-360\li360\tx360\ulnone\b0 Execute all steps mentioned in the "Demo preparation instructions" section.\par
+{\pntext\f0 2.\tab}Double-click on the \ldblquote\b Compute Redactions.fps\b0\rdblquote  in the C:\\Demo_IDShield\\FPS folder.  This starts OCR and rule execution.  Wait for all files to complete processing.\par
+{\pntext\f0 3.\tab}Double-click on the \ldblquote\b Verify Redactions.fps\b0\rdblquote  in the C:\\Demo_IDShield\\FPS folder.  This starts the verification process and will bring up each of the interesting documents (documents that contain at least one HC/MC/LC or clue item).\par
+{\pntext\f0 4.\tab}Cover the features of the verification UI, and what kinds of rules are finding the data on each of the documents.\par
+\pard\keepn\nowidctlpar\s1\par
+\ul\b Showing the \ldblquote Hybrid\rdblquote  demo\par
+\pard{\pntext\f0 1.\tab}{\*\pn\pnlvlbody\pnf0\pnindent360\pnstart1\pndec{\pntxta.}}
+\nowidctlpar\tx360\ulnone\b0 Execute all steps mentioned in the "Demo preparation instructions" section.\par
+\pard{\pntext\f0 2.\tab}{\*\pn\pnlvlbody\pnf0\pnindent360\pnstart1\pndec{\pntxta.}}
+\nowidctlpar\fi-360\li360\tx360 Double-click on the \ldblquote\b Standard - Compute and Auto Redact.fps\b0\rdblquote  in the C:\\Demo_IDShield\\FPS folder.  This starts OCR and rule execution and also automatically redacts any documents that only contain HC data items.  Wait for all files to complete processing.\par
+{\pntext\f0 3.\tab}Navigate to the C:\\Demo_IDShield\\Output folder and quickly review / point out that some images were automatically redacted.\par
+{\pntext\f0 4.\tab}Double-click on the \ldblquote\b Standard - Verify Redactions.fps\b0\rdblquote  in the C:\\Demo_IDShield\\FPS folder.  This starts the verification process and will bring up each of the interesting documents (documents that contain at least one HC/MC/LC or clue item) that didn\rquote t go through automated redaction.\par
+{\pntext\f0 5.\tab}Cover the features of the verification UI, and what kinds of rules are finding the data on each of the documents.\par
+{\pntext\f0 6.\tab}Optional extension to the Hybrid demo that demonstrates the Legislation Guard feature:\par
+\pard{\pntext\f0 a.\tab}{\*\pn\pnlvlbody\pnf0\pnindent360\pnstart1\pnlcltr{\pntxta.}}
+\nowidctlpar\fi-360\li1080\tx360 The above steps showed automated + verification of just SSNs.  Now tell the customer to pretend that the legislation has changed and also requires the redaction of DOBs.  The steps below show a simple variation of the Legislation Guard feature whereby we can go back and search for DOBs and apply them onto previously processed documents where only SSNs were redacted.  Remind the customer that ID Shield can support many more sophisticated implementations of the Legislation Guard feature, and cite a few examples.\par
+{\pntext\f0 b.\tab}Double-click on the \ldblquote\b Legislation Guard - Compute and Auto Redact DOB.fps\b0\rdblquote  in the C:\\Demo_IDShield\\FPS folder.  This starts OCR and rule execution for the DOB field and also automatically redacts any documents that only contain high confidence DOB items.  Wait for all files to complete processing.\par
+{\pntext\f0 c.\tab}Navigate to the C:\\Demo_IDShield\\Output folder and point out to the user that the DOB in TestImage001.tif got auto-redacted.\par
+{\pntext\f0 d.\tab}Double-click on the \ldblquote\b Legislation Guard - Verify DOB Redactions.fps\b0\rdblquote  in the C:\\Demo_IDShield\\FPS folder.  This starts the verification process and will bring up each of the interesting documents (documents that contain at least one HC/MC/LC or clue item) that contain DOBs but didn\rquote t go through automated redaction.\par
+\pard\keepn\nowidctlpar\s1\ul\b\par
+Other features\par
+\ulnone\b0 Depending upon the audience you are demonstrating to, please select and highlight other important server side or client side (user interface) ID Shield features.  Become familiar with the new features added to every release and try to incorporate their mention into your demos to cater to your audience appropriately.\par
+\ul\b\par
+\pard\keepn\nowidctlpar\s1\tx360 Keyboard Shortcuts\ulnone\b0\par
+The ID Shield product has been designed with the power user in mind to make the production mode use of the product as efficient as possible.  Please search the ID Shield help file for "Shotcuts" and familiarize yourself with using the shortcuts so that you can make your demo as seemless and smooth as possible.\par
+}
+ 

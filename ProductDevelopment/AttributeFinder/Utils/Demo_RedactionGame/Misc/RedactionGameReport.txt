@@ -1,0 +1,9 @@
+------------------------------
+Accuracy results
+------------------------------
+
+Your redaction accuracy        : %NumCorrectRedactionsByDocument%%%TotalExpectedRedactions%
+ID Shield's redaction accuracy : 100%
+
+You found       : %NumCorrectRedactionsByDocument% sensitive items
+ID Shield found : %TotalExpectedRedactions% sensitive items
