@@ -303,8 +303,8 @@
             this._targetOrRootAttributesInfoTip.Name = "_targetOrRootAttributesInfoTip";
             this._targetOrRootAttributesInfoTip.Size = new System.Drawing.Size(16, 16);
             this._targetOrRootAttributesInfoTip.TabIndex = 15;
-            this._targetOrRootAttributesInfoTip.TipText = "Leave blank to score all attribute or specify an attribute query to\r\nspecify a su" +
-    "bset of attributes to score.";
+            this._targetOrRootAttributesInfoTip.TipText = "Leave blank to score all attributes or specify an attribute query to\r\nspecify a s" +
+    "ubset of attributes to score.";
             // 
             // _rsdOrDbFileNameBrowseButton
             // 
@@ -365,7 +365,7 @@
             this.Controls.Add(label1);
             this.MinimumSize = new System.Drawing.Size(400, 325);
             this.Name = "ExpressionAndQueryTesterForm";
-            this.Text = "Expression and query tester";
+            this.Text = "Expression And Query Tester";
             ((System.ComponentModel.ISupportInitialize)(this._expressionOrQueryScintillaBox)).EndInit();
             this.panel1.ResumeLayout(false);
             this._splitContainer.Panel1.ResumeLayout(false);

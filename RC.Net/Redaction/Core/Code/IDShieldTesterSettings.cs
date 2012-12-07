@@ -713,6 +713,13 @@ namespace Extract.Redaction
             new IDShieldTesterSetting<bool>("OutputAutomatedStatsOnly");
 
         /// <summary>
+        /// Specifies whether to generate stats based on verifiers reviewing all pages of sensitive
+        /// documents or only the pages that contain sensitive data.
+        /// </summary>
+        IDShieldTesterSetting<string> _verificationSelection =
+            new IDShieldTesterSetting<string>("VerificationSelection");
+
+        /// <summary>
         /// Specifies attribute types to which are to be included in the test.
         /// </summary>
         IDShieldTesterSetting<string> _typesToBeTested =
@@ -765,6 +772,7 @@ namespace Extract.Redaction
                 // Initialize typically used defaults.
                 _verificationCondition.Value = "HCData|MCData|LCData|Clues";
                 _queryForAutomatedRedaction.Value = "HCData|MCData|LCData";
+                _verificationSelection.Value = "ByDocument";
 
                 _settingsFileName = settingsFileName;
 
@@ -781,6 +789,7 @@ namespace Extract.Redaction
                 _parameters.Add(_outputFinalStatsOnly);
                 _parameters.Add(_outputHybridStats);
                 _parameters.Add(_outputAutomatedStatsOnly);
+                _parameters.Add(_verificationSelection);
                 _parameters.Add(_typesToBeTested);
                 _parameters.Add(_outputFilesFolder);
                 _parameters.Add(_explicitOutputFilesFolder);
@@ -1026,6 +1035,28 @@ namespace Extract.Redaction
             set
             {
                 _outputAutomatedStatsOnly.Value = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether to generate stats based on verifiers reviewing all pages of
+        /// sensitive documents or only the pages that contain sensitive data.
+        /// </summary>
+        /// <value>
+        /// "ByDocument" = Verifiers review all pages of documents with sensitive data
+        /// "ByPage" = Verifiers review only pages with sensitive data.
+        /// "ByDocumentAndPage" = Stats are computed for both methods.
+        /// </value>
+        public string VerificationSelection
+        {
+            get
+            {
+                return _verificationSelection.Value;
+            }
+
+            set
+            {
+                _verificationSelection.Value = value;
             }
         }
         

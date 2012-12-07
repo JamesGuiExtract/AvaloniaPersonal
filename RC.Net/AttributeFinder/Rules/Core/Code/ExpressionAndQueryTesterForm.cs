@@ -269,7 +269,7 @@ namespace Extract.AttributeFinder.Rules
                     _targetOrRootAttributesInfoTip.TipText =
                         "Leave blank to score all attribute or specify an attribute query to \r\n" +
                         "specify a subset of attributes to score.";
-                    _rsdOrDbFilenameLabel.Text = "RSD Filename";
+                    _rsdOrDbFilenameLabel.Visible = true;
                     _rsdOrDbFileNameTextBox.Visible = true;
                     _rsdOrDbFileNameBrowseButton.Visible = true;
                     _databaseConnectionControl.Visible = false;
@@ -282,11 +282,10 @@ namespace Extract.AttributeFinder.Rules
                     _targetOrRootAttributesInfoTip.TipText =
                         "If a root attribute is needed, specify the attribute query to select it.\r\n" +
                         "If the query matches multiple attributes, the first match will be used.";
-                    _rsdOrDbFilenameLabel.Text = "DataEntry DB Filename";
+                    _rsdOrDbFilenameLabel.Visible = false;
                     _rsdOrDbFileNameTextBox.Visible = false;
                     _rsdOrDbFileNameBrowseButton.Visible = false;
                     _databaseConnectionControl.Visible = true;
-                    _rsdOrDbFileNameBrowseButton.FileFilter = "SQL CE Database (*.sdf)|*.sdf";
                     _expressionOrQueryScintillaBox.ConfigurationManager.Language = "xml";
                     _splitContainer.Top = _databaseConnectionControl.Bottom + 6;
                 }

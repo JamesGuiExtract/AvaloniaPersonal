@@ -133,6 +133,7 @@ private:
 		// Statistics counters
 		unsigned long m_ulTotalExpectedRedactions;
 		unsigned long m_ulExpectedRedactionsInSelectedFiles;
+		unsigned long m_ulExpectedRedactionsInSelectedPages;
 		unsigned long m_ulFoundRedactions;
 		unsigned long m_ulNumCorrectRedactions;
 		unsigned long m_ulNumFalsePositives;
@@ -181,6 +182,13 @@ private:
 	// Specifies whether only automated statistics should be calculated.
 	bool m_bOutputAutomatedStatsOnly;
 
+	// Specifies to output stats assuming verifiers visited all pages of any document containing any
+	// sensitive data.
+	bool m_bOutputVerificationByDocumentStats;
+	
+	// Specifies to output stats assuming visited only pages that contained any sensitive data.
+	bool m_bOutputVerificationByPageStats;
+
 	// Statistics for files selected for automated redaction
 	CIDShieldTester::TestCaseStatistics automatedStatistics;
 
@@ -188,9 +196,10 @@ private:
 	CIDShieldTester::TestCaseStatistics verificationStatistics;
 
 	// counters
-	unsigned long m_ulTotalExpectedRedactions, m_ulNumCorrectRedactions, 
-		m_ulNumOverRedactions, m_ulNumUnderRedactions, m_ulNumMisses,
+	unsigned long m_ulTotalExpectedRedactions, m_ulNumCorrectRedactionsByDocument, 
+		m_ulNumCorrectRedactionsByPage, m_ulNumOverRedactions, m_ulNumUnderRedactions, m_ulNumMisses,
 		m_ulTotalFilesProcessed, m_ulNumFilesWithExpectedRedactions, m_ulNumFilesSelectedForReview,
+		m_ulNumPagesInFilesSelectedForReview, m_ulNumPagesSelectedForReview,
 		m_ulNumExpectedRedactionsInReviewedFiles, m_ulNumExpectedRedactionsInRedactedFiles,
 		m_ulNumFilesAutomaticallyRedacted, m_ulNumFilesWithOverlappingExpectedRedactions,
 		m_ulTotalPages, m_ulNumPagesWithExpectedRedactions, m_ulDocsClassified;
@@ -286,6 +295,12 @@ private:
 	bool updateStatisticsAndDetermineTestCaseResult(IIUnknownVectorPtr ipExpectedAttributes,
 													 IIUnknownVectorPtr ipFoundAttributes,
 													 const string& strSourceDoc);
+
+	// PROMISE: This method counts all expected attributes that are on a page that has at least one
+	//			HC/MC/LC/Clue attribute on the same page.
+	unsigned long countExpectedAttributesOnSelectedPages(IIUnknownVectorPtr ipExpectedAttributes,
+														 IIUnknownVectorPtr ipFoundAttributes,
+														 unsigned long &rnSelectedPages);
 	
 	// PROMISE: This method updates the count for m_ulNumFilesSelectedForReview 
 	//			and m_ulNumExpectedRedactionsInReviewedFiles. Returns true if the
@@ -293,7 +308,8 @@ private:
 	bool analyzeDataForVerificationBasedRedaction(IIUnknownVectorPtr ipExpectedAttributes,
 												  IIUnknownVectorPtr ipFoundAttributes,
 												  bool bSelectedForVerification,
-												  const string& strSourceDoc);
+												  const string& strSourceDoc,
+												  unsigned long ulNumPagesInDoc);
 
 	// PROMISE: This method updates m_ulNumCorrectRedactions and m_ulNumFalsePositives using
 	//			the analyzeExpectedAndFoundAttributes() method.
@@ -314,10 +330,14 @@ private:
 	//			to compare each raster zone and compare them using spatiallyMatches.
 	// ARGS:	bDocumentSelected indicates whether the document was selected for automatic
 	//			redaction or verification (depending on the test being executed).
+	//			ipExpectedAttributesOnSelectedPages indicates that when stats are being generated
+	//			based on verifiers visiting only pages containing senstive data, what expected
+	//			attributes exist on those pages. It can be null if ByPage stats are not needed.
 	// RETURNS: The statistics calculated from running the analysis.
 	CIDShieldTester::TestCaseStatistics analyzeExpectedAndFoundAttributes(
 											IIUnknownVectorPtr ipExpectedAttributes, 
-											IIUnknownVectorPtr ipFoundAttributes, 
+											IIUnknownVectorPtr ipFoundAttributes,
+											unsigned long ulExpectedAttributesOnSelectedPages,
 											bool bDocumentSelected,
 											const string& strSourceDoc);
 

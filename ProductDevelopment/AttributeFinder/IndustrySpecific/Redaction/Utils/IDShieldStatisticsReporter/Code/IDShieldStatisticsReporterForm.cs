@@ -50,6 +50,21 @@ namespace Extract.IDShieldStatisticsReporter
         const string _HYBRID = "Hybrid";
 
         /// <summary>
+        /// Stats should be produced assuming verifiers review all pages of sensitive documents.
+        /// </summary>
+        const string _VERIFICATION_SELECTION_DOCUMENT = "ByDocument";
+
+        /// <summary>
+        /// Stats should be produced assuming verifiers review only sensitive pages.
+        /// </summary>
+        const string _VERIFICATION_SELECTION_PAGE = "ByPage";
+
+        /// <summary>
+        /// Stats should be produced for both methods.
+        /// </summary>
+        const string _VERIFICATION_SELECTION_BOTH = "ByDocumentAndPage";
+
+        /// <summary>
         /// The ProgID of the IDShieldTester COM class.
         /// </summary>
         const string _IDSHIELD_TESTER_PROGID = "EXTRACTRedactionTester.IDShieldTester.1";
@@ -377,6 +392,19 @@ namespace Extract.IDShieldStatisticsReporter
                     _analysisTypeComboBox.Text = _STANDARD_VERIFICATION;
                 }
 
+                if (_testerSettings.VerificationSelection == _VERIFICATION_SELECTION_DOCUMENT)
+                {
+                    _verificationSelectionComboBox.SelectedIndex = 0;
+                }
+                else if (_testerSettings.VerificationSelection == _VERIFICATION_SELECTION_PAGE)
+                {
+                    _verificationSelectionComboBox.SelectedIndex = 1;
+                }
+                else if (_testerSettings.VerificationSelection == _VERIFICATION_SELECTION_BOTH)
+                {
+                    _verificationSelectionComboBox.SelectedIndex = 2;
+                }
+
                 // Populate the types to be tested 
                 if (!string.IsNullOrEmpty(_testerSettings.TypesToBeTested))
                 {
@@ -588,6 +616,18 @@ namespace Extract.IDShieldStatisticsReporter
                 _testerSettings.OutputHybridStats = _analysisTypeComboBox.Text == _HYBRID;
                 _testerSettings.OutputAutomatedStatsOnly =
                     (_analysisTypeComboBox.Text == _AUTOMATED_REDACTION);
+
+                switch (_verificationSelectionComboBox.SelectedIndex)
+                {
+                    case 0: _testerSettings.VerificationSelection = _VERIFICATION_SELECTION_DOCUMENT;
+                        break;
+
+                    case 1: _testerSettings.VerificationSelection = _VERIFICATION_SELECTION_PAGE;
+                        break;
+
+                    case 2: _testerSettings.VerificationSelection = _VERIFICATION_SELECTION_BOTH;
+                        break;
+                }
 
                 // Initialize the automated redaction condition
                 if (!_testerSettings.OutputAutomatedStatsOnly && !_testerSettings.OutputHybridStats)
@@ -1461,6 +1501,9 @@ namespace Extract.IDShieldStatisticsReporter
                 (_analysisTypeComboBox.Text != _STANDARD_VERIFICATION);
 
             _verificationFileConditionButton.Enabled =
+                (_analysisTypeComboBox.Text != _AUTOMATED_REDACTION);
+
+            _verificationSelectionComboBox.Enabled =
                 (_analysisTypeComboBox.Text != _AUTOMATED_REDACTION);
         }
 
