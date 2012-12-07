@@ -993,28 +993,40 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 					_lastCodePos = "100";
 
-					// Call setStatusForFile to handle updating all tables related to the status
-					// change, as appropriate.
-					setStatusForFile(ipConnection, nID, strActionName, kActionPending, true);
+					// If Force processing is set need to update the status or if the previous status for this action was unattempted
+					if (bForceStatusChange == VARIANT_TRUE || *pPrevStatus == kActionUnattempted)
+					{
+						// Call setStatusForFile to handle updating all tables related to the status
+						// change, as appropriate.
+						setStatusForFile(ipConnection, nID, strActionName, kActionPending, true);
 
-					_lastCodePos = "110";
+						_lastCodePos = "110";
 
-					// set the fields to the new file Record
-					// (only update the priority if force processing)
-					setFieldsFromFileRecord(ipFields, ipNewFileRecord, asCppBool(bForceStatusChange));
+						// set the fields to the new file Record
+						// (only update the priority if force processing)
+						setFieldsFromFileRecord(ipFields, ipNewFileRecord, asCppBool(bForceStatusChange));
 
-					_lastCodePos = "120";
+						_lastCodePos = "120";
 
-					// It can be assumed after the call to setFieldsFromFileRecord that the record
-					// is in the FileActionStatus table for this action at least.
-					string strPriority = asString(getLongField(ipFields, "Priority"));
-					string strUpdatePrioritySQL = "UPDATE FileActionStatus SET Priority = " +
-						strPriority + " WHERE FileID = " + asString(nID) +
-						" AND Priority <> " + strPriority;
+						// It can be assumed after the call to setFieldsFromFileRecord that the record
+						// is in the FileActionStatus table for this action at least.
+						string strPriority = asString(getLongField(ipFields, "Priority"));
+						string strUpdatePrioritySQL = "UPDATE FileActionStatus SET Priority = " +
+							strPriority + " WHERE FileID = " + asString(nID) +
+							" AND Priority <> " + strPriority;
 
-					executeCmdQuery(ipConnection, strUpdatePrioritySQL);
+						executeCmdQuery(ipConnection, strUpdatePrioritySQL);
 
-					_lastCodePos = "150";
+						_lastCodePos = "150";
+					}
+					else
+					{
+						// Set the file size and and page count for the file record to
+						// the file size and page count stored in the database
+						ipNewFileRecord->FileSize = ipOldRecord->FileSize;
+						ipNewFileRecord->Pages = ipOldRecord->Pages;
+						_lastCodePos = "152";
+					}
 				}
 
 				// Set the new file Record ID to nID;

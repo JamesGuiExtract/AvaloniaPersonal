@@ -274,13 +274,14 @@ namespace Extract.AttributeFinder.Rules
         /// to indicate progress.</param>
         public void ModifyValue(ComAttribute pAttributeToBeModified, AFDocument pOriginInput, ProgressStatus pProgressStatus)
         {
+            SpatialString sourceString = null;
+
             try
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI33710", _COMPONENT_DESCRIPTION);
 
                 // Initialize sourceString either from the uss file or from pOriginInput.
-                SpatialString sourceString;
                 if (UseOriginalDocumentOcr)
                 {
                     string ussFileName = pOriginInput.Text.SourceDocName + ".uss";
@@ -331,6 +332,23 @@ namespace Extract.AttributeFinder.Rules
             finally
             {
                 _searchers.Clear();
+
+                // [FlexIDSCore:5143]
+                // Though the interwebs has lots of advice stating not to used FinalReleaseComObject
+                // (and instead leave it up to garbage collection), garbage collection seems not to
+                // be able to keep up in some usages of this rule. Since there is no risk of
+                // sourceString being used, use a heavy hand to release it here. 
+                try
+                {
+                    if (sourceString != null && UseOriginalDocumentOcr)
+                    {
+                        Marshal.FinalReleaseComObject(sourceString);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractLog("ELI35305");
+                }
             }
         }
 
