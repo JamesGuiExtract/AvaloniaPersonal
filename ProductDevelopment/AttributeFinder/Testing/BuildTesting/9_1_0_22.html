@@ -1,0 +1,307 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.1.0.22 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.1.0.22 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DataEntry #729]</b> Order Mapper Updates
+        	<ul>
+            		<li>Confirm that the temporary local copy of the <b>Order Mapper</b> database 
+			is updated when the master database is updated.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1125, #1158]</b> Query Syntax
+        	<ul>
+            		<li>Exercise the <b>Expression And Query Tester</b>.
+            		<li>Confirm that wildcards (<b>*</b>) are supported for attribute names used in 
+			attribute queries.
+            		<li>Confirm that type lookup (<b>@</b>) is supported for attributes used in 
+			attribute queries.
+			<li>Confirm that attribute names and types can be output.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1147]</b> Order Mapper AKA Conflicts
+        	<ul>
+            		<li>Exercise the RSD files from <b>I:\Common\Testing\PVCS_Testing\DataEntry\1147</b>.
+			An image file is not needed.
+            		<li>Confirm that each RSD file produces a single <b>Test</b> attribute each with 
+			two <b>Component</b> subattributes.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1152]</b> Order Mapper In Demo_LabDE
+        	<ul>
+            		<li>Copy <b>Demo_LabDE</b> to the test machine.
+			<li>Open the included OrderMapper database in SQLCDBEditor.
+            		<li>Confirm that no schema update is needed.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1154]</b> LabDE Installation
+        	<ul>
+            		<li>Confirm that the Start menu shortcut to the exception viewer is spelled 
+			correctly.
+            		<li>Confirm that <b>DataEntryApplication.LabDE.resources</b> is installed.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #806]</b> Wrong File Path In FTPEventHistory
+        	<ul>
+            		<li>Download files via <b>FTP File Supplier</b> from a subfolder of the 
+			root download folder.
+            		<li>Confirm that the <b>Arg1</b> field in the <b>FTPEventHistory</b> table 
+			contains the subfolders between root and the folder that contains the file.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #835]</b> ESFAMService Failed To Respawn
+        	<ul>
+            		<li>Exercise the FAM service configured so that several respawns of 
+			the FAM service will be necessary.
+            		<li>Confirm that all files complete processing.
+			<li>Confirm that appropriate application traces are logged for restarts 
+			of ESFAMService.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #836]</b> FTP File Supplier Quits Retries
+        	<ul>
+            		<li>Confirm that after a supplying failure, the reconnection and retry 
+			properly confirms existence of the remote source folder.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #844, #845]</b> Data Entry Prompt
+        	<ul>
+            		<li>Confirm that <b>DataEntryPrompt.exe</b> and 
+			<b>DataEntryPrompt.exe.config</b> are installed to the CommonComponents 
+			folder.
+			<li>Confirm that any basic license file is sufficient to run the utility.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #847]</b> DataEntryPrompt - First Field Needs Initial Focus
+        	<ul>
+            		<li>Confirm that the first field automatically gets focus when the form 
+			is first loaded.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #849]</b> Rasterize PDF Task Should Not Modify SourceDocName 
+		Or Delete Source File If Conversion Fails
+        	<ul>
+            		<li>Exercise the task on the source file in 
+			<b>I:\Common\Testing\PVCS_Testing\DotNetRCAndUtils\849</b>.
+            		<li>Confirm that the rasterization fails.
+            		<li>Confirm that <b>SourceDocName</b> is not modified.
+            		<li>Confirm that the source image is not deleted.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #851]</b> Core: Rasterize PDF Task
+        	<ul>
+            		<li>Confirm that the checkbox label is now <b>Try alternate rasterization 
+			method first</b>.
+			<li>Confirm that both methods are tried (if necessary) if the checkbox is 
+			<b>checked</b>.
+			<li>Confirm that both methods are tried (if necessary) if the checkbox is 
+			<b>unchecked</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #858]</b> FAM Service
+        	<ul>
+            		<li>Configure an FPS file for use by FAM service.
+			<li>Reboot the test machine.
+			<li>Start the FAM service within <b>15 minutes</b> of the reboot.
+			<li>Confirm that the <b>SleepTimeOnStart</b> setting is honored.
+			<li>Stop the FAM service.
+			<li>Restart the FAM service but only <b>after</b> the 15-minute delay.
+			<li>Confirm that the FAM service starts without delay.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5158]</b> Supply VOA File With Rule Tester
+        	<ul>
+			<li><u>User Interface</u>
+			<ul>
+            			<li>Confirm that the <b>Input</b> tab contains a <b>Make the contents 
+				of the following data file available to the rules</b> checkbox.
+				<li>Confirm that an associated edit box is available.
+				<li>Confirm that an associated browse button is available.
+				<li>Confirm that both the edit box and the browse button are disabled 
+				while the checkbox is unchecked.
+				<li>Confirm that the controls shift position properly based on the 
+				selected <b>Input</b> type.
+				<li>Confirm that the edit box is updated based on the selected VOA file.
+				<li>Confirm that the edit box can be directly modified.
+			</ul>
+<p>
+			<li><u>Performance</u>
+			<ul>
+				<li>Create a simple RSD file and use <b>Rule Tester</b> to confirm that 
+				results are as expected.
+				<li>Add a VOA file to the Rule Tester and confirm that results are 
+				unchanged.
+				<li>Modify the RSD to add another attribute with an <b>Input finder</b> 
+				rule.
+				<li>Use <b>Rule Tester</b> to confirm that the new attribute includes  
+				the following:
+				<ul>
+					<li>The entire document text as the attribute value
+					<li>The collected attributes from the VOA file as subattributes
+				</ul>
+				<li>Modify the rules to act on one or more of the attributes provided 
+				from the VOA file.  Confirm proper behavior.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5162]</b> NUnit DLLs
+        	<ul>
+			<li>Confirm that the following <b>test</b> DLLs are installed with RDT.
+			<ul>
+            			<li>Extract.DataEntry.Test.dll
+            			<li>Extract.Encryption.Test.dll
+            			<li>Extract.FileActionManager.Database.Test.dll
+            			<li>Extract.Geometry.Test.dll
+            			<li>Extract.Imaging.Forms.Test.dll
+            			<li>Extract.SetOperations.Test.dll
+            			<li>Extract.Test.dll
+            			<li>Extract.Utilities.Test.dll
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5172]</b> Confirm that <b>ExpressionAndQueryTester.exe</b> is 
+		installed with RDT.
+<p>
+  	   	<LI><b>[FlexIDSCore #5176]</b> Confirm that the <b>Data Query OH</b> uses a copy of 
+		the SQL CE database.
+<p>
+  	   	<LI><b>[LegacyRC #6288]</b> COM License Generator
+        	<ul>
+            		<li>Exercise a recent version of <b>COMLicenseGenerator.exe</b>.
+			<li>Remove any drive mappings to <b>FNP2</b> and <b>ES-IT-DC-01</b>.
+			<li>Confirm that <b>COMLicenseGenerator.exe</b> does not run.
+			<li>Add a drive mapping to <b>ES-IT-DC-01</b>.
+			<li>Confirm that <b>COMLicenseGenerator.exe</b> does run.
+			<li>Remove the drive mapping to <b>ES-IT-DC-01</b>.
+			<li>Add a drive mapping to <b>FNP2</b>.
+			<li>Confirm that <b>COMLicenseGenerator.exe</b> does run.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6327]</b> Database Scalability Test Statistics
+        	<ul>
+            		<li>Configure and start a database scalability test.
+			<li>Allow the test to run unattended over a weekend.
+			<li>Refresh the database status and confirm that the <b>ActionStatistics</b> 
+			table is updated without timing out.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6331]</b> Path Tag Functions
+        	<ul>
+            		<li>Create some test images that contain commas in the filenames.
+			<li>Process these images including some text functions such as 
+			<b>$DirOf()</b> within the workflow.
+			<li>Confirm that processing completes successfully.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6336]</b> USB License Key Manager
+        	<ul>
+            		<li>Change the location of the USB key.
+			<li>Confirm that a meaningful application trace message is logged.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6337]</b> Path Tags Expansion
+        	<ul>
+            		<li>Exercise the image and VOA at 
+			<b>I:\Common\Testing\PVCS_Testing\LegacyRC\6337</b>.
+			<li>Use a <b>Core: Copy move or delete file</b> task to copy the 
+			VOA file to a subdirectory of the image folder.
+			<li>Confirm that even with a parenthesis in the filename, the VOA file 
+			is still copied to the proper location.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6342]</b> Processing Time For Sentinel Cloud Test
+        	<ul>
+            		<li>Exercise the processing test with a known sleep time between key 
+			decrements.
+			<li>Confirm that the <b>Processing Log</b> reports the expected 
+			processing time for each file.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6351]</b> DB Admin Log Info For Counters
+        	<ul>
+            		<li>Open a database in <b>DB Admin</b>.
+			<li>Add a counter and retain the default counter value of <b>0</b>.
+			<li>Confirm that the logged <b>Application Trace</b> includes 
+			complete and correct information.
+			<li>Set a new value for the counter.
+			<li>Confirm that the logged <b>Application Trace</b> includes 
+			complete and correct information.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6358]</b> Confirm that the <b>Advanced...</b> button on the 
+		<b>Queue Setup</b> tab is disabled when the FAM is actively queuing or processing.
+<p>
+  	   	<LI><b>[LegacyRC #6359]</b> CommonComponentsDir
+        	<ul>
+            		<li>Confirm that <b>&lt;CommonComponentsDir&gt;</b> is available in the 
+			<b>TestTextFunctionExpander.exe</b> tag selector.
+			<li>Confirm that the proper directory is provided on a <b>32-bit</b> 
+			operating system.
+			<li>Confirm that the proper directory is provided on a <b>64-bit</b> 
+			operating system.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6363]</b> Create Searchable PDF
+        	<ul>
+            		<li>Exercise the task with a copy of the images from 
+			<b>I:\Common\Testing\PVCS_Testing\LegacyRC\6363</b>.
+			<li>Confirm that the <b>Processing Log</b> reports the expected 
+			processing time for each file.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
