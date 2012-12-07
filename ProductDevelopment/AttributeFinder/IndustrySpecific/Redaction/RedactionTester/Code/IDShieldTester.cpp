@@ -214,13 +214,16 @@ m_ipAttrFinderEngine(CLSID_AttributeFinderEngine)
 
 		// Map the result fields to names for use by custom reports.
 		m_mapStatisticFields["TotalExpectedRedactions"] = &m_ulTotalExpectedRedactions;
-		m_mapStatisticFields["NumCorrectRedactions"] = &m_ulNumCorrectRedactions;
+		m_mapStatisticFields["NumCorrectRedactionsByDocument"] = &m_ulNumCorrectRedactionsByDocument;
+		m_mapStatisticFields["NumCorrectRedactionsByPage"] = &m_ulNumCorrectRedactionsByPage;
 		m_mapStatisticFields["NumOverRedactions"] = &m_ulNumOverRedactions;
 		m_mapStatisticFields["NumUnderRedactions"] = &m_ulNumUnderRedactions;
 		m_mapStatisticFields["NumMisses"] = &m_ulNumMisses;
 		m_mapStatisticFields["TotalFilesProcessed"] = &m_ulTotalFilesProcessed;
 		m_mapStatisticFields["NumFilesWithExpectedRedactions"] = &m_ulNumFilesWithExpectedRedactions;
 		m_mapStatisticFields["NumFilesSelectedForReview"] = &m_ulNumFilesSelectedForReview;
+		m_mapStatisticFields["NumPagesInFilesSelectedForReview"] = &m_ulNumPagesInFilesSelectedForReview;
+		m_mapStatisticFields["NumPagesSelectedForReview"] = &m_ulNumPagesSelectedForReview;
 		m_mapStatisticFields["NumFilesAutomaticallyRedacted"] = &m_ulNumFilesAutomaticallyRedacted;
 		m_mapStatisticFields["NumExpectedRedactionsInReviewedFiles"] = &m_ulNumExpectedRedactionsInReviewedFiles;
 		m_mapStatisticFields["NumExpectedRedactionsInRedactedFiles"] = &m_ulNumExpectedRedactionsInRedactedFiles;
@@ -241,6 +244,7 @@ m_ipAttrFinderEngine(CLSID_AttributeFinderEngine)
 
 		m_mapStatisticFields["VerificationTotalExpectedRedactions"] = &verificationStatistics.m_ulTotalExpectedRedactions;
 		m_mapStatisticFields["VerificationExpectedRedactionsInSelectedFiles"] = &verificationStatistics.m_ulExpectedRedactionsInSelectedFiles;
+		m_mapStatisticFields["VerificationExpectedRedactionsInSelectedPages"] = &verificationStatistics.m_ulExpectedRedactionsInSelectedPages;
 		m_mapStatisticFields["VerificationFoundRedactions"] = &verificationStatistics.m_ulFoundRedactions;
 		m_mapStatisticFields["VerificationNumCorrectRedactions"] = &verificationStatistics.m_ulNumCorrectRedactions;
 		m_mapStatisticFields["VerificationNumFalsePositives"] = &verificationStatistics.m_ulNumFalsePositives;
@@ -425,13 +429,16 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			m_setDocTypesToBeVerified.clear();
 			m_setDocTypesToBeAutomaticallyRedacted.clear();
 			m_ulTotalExpectedRedactions = 0;
-			m_ulNumCorrectRedactions = 0;
+			m_ulNumCorrectRedactionsByDocument = 0;
+			m_ulNumCorrectRedactionsByPage = 0;
 			m_ulNumOverRedactions = 0;
 			m_ulNumUnderRedactions = 0;
 			m_ulNumMisses = 0;
 			m_ulTotalFilesProcessed = 0;
 			m_ulNumFilesWithExpectedRedactions = 0;
 			m_ulNumFilesSelectedForReview = 0;
+			m_ulNumPagesInFilesSelectedForReview = 0;
+			m_ulNumPagesSelectedForReview = 0;
 			m_ulNumFilesAutomaticallyRedacted = 0;
 			m_ulNumExpectedRedactionsInReviewedFiles = 0;
 			m_ulNumExpectedRedactionsInRedactedFiles = 0;
@@ -442,6 +449,8 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			m_ulDocsClassified = 0;
 			m_bOutputHybridStats = false;
 			m_bOutputAutomatedStatsOnly = false;
+			m_bOutputVerificationByDocumentStats = true;
+			m_bOutputVerificationByPageStats = false;
 			m_apRedactionTester.reset();
 			m_apVerificationTester.reset();
 			automatedStatistics.reset();
@@ -870,6 +879,36 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 		{
 			m_bOutputAutomatedStatsOnly = (vecTokens[1] == "1");
 		}
+		// [FlexIDSCore:5171]
+		// Specifies if verifiers are presented every page from sensitive documents or only pages
+		// that contain sensitive data (or to show stats using both methods).
+		else if (vecTokens[0] == "VerificationSelection")
+		{
+			string strSetting = vecTokens[1];
+
+			if (strSetting == "ByDocument")
+			{
+				m_bOutputVerificationByDocumentStats = true;
+				m_bOutputVerificationByPageStats = false;
+			}
+			else if (strSetting == "ByPage")
+			{
+				m_bOutputVerificationByDocumentStats = false;
+				m_bOutputVerificationByPageStats = true;
+			}
+			else if (strSetting == "ByDocumentAndPage")
+			{
+				m_bOutputVerificationByDocumentStats = true;
+				m_bOutputVerificationByPageStats = true;
+			}
+			else
+			{
+				UCLIDException ue("ELI35297", "Invalid VerificationSelection setting. Valid options "
+					"are \"ByDocument\", \"ByPage\" and \"ByDocumentAndPage\"");
+				ue.addDebugInfo("Setting", strSetting);
+				throw ue;
+			}
+		}
 		else
 		{
 			UCLIDException ue("ELI15176", "Invalid Settings token in DAT file.");
@@ -1177,7 +1216,8 @@ bool CIDShieldTester::updateStatisticsAndDetermineTestCaseResult(IIUnknownVector
 		m_ulNumFilesWithExpectedRedactions++;
 	}
 
-	m_ulTotalPages += getNumberOfPagesInImage(strSourceDoc);
+	unsigned long ulNumPages = getNumberOfPagesInImage(strSourceDoc);
+	m_ulTotalPages += ulNumPages;
 
 	// if user wants a list of files with HCData, MCData, LCData, etc. then
 	// gather the attribute names from the found attributes and
@@ -1284,30 +1324,104 @@ bool CIDShieldTester::updateStatisticsAndDetermineTestCaseResult(IIUnknownVector
 		// Analyze the attributes for verification based redaction. Include documents that were
 		// not otherwise selected for either process in hybrid mode.
 		return analyzeDataForVerificationBasedRedaction(ipExpectedAttributes, ipFoundAttributes,
-				bSelectedForVerification, strSourceDoc);
+				bSelectedForVerification, strSourceDoc, ulNumPages);
 	}
+}
+//-------------------------------------------------------------------------------------------------
+unsigned long CIDShieldTester::countExpectedAttributesOnSelectedPages(
+															IIUnknownVectorPtr ipExpectedAttributes,
+															IIUnknownVectorPtr ipFoundAttributes,
+															unsigned long &rulSelectedPages)
+{
+	// Loop to find the set of pages selected for review because sensitive data or clues have been
+	// found on them.
+	set<long> setSelectedPages;
+	long nCount = ipFoundAttributes->Size();
+	for (long i = 0; i < nCount; i++)
+	{
+		IAttributePtr ipAttribute = ipFoundAttributes->At(i);
+		ASSERT_RESOURCE_ALLOCATION("ELI35298", ipAttribute != __nullptr);
+
+		ISpatialStringPtr ipValue = ipAttribute->Value;
+		ASSERT_RESOURCE_ALLOCATION("ELI35299", ipValue != __nullptr);
+
+		if (asCppBool(ipValue->HasSpatialInfo()))
+		{
+			setSelectedPages.insert(ipValue->GetFirstPageNumber());
+		}
+	}
+	rulSelectedPages = setSelectedPages.size();
+
+	unsigned long ulExpectedAttributesOnSelectedPages = 0;
+
+	// Loop through all expected attributes to find the ones that exist on any of the pages
+	// selected for review.
+	nCount = ipExpectedAttributes->Size();
+	for (long i = 0; i < nCount; i++)
+	{
+		IAttributePtr ipAttribute = ipExpectedAttributes->At(i);
+		ASSERT_RESOURCE_ALLOCATION("ELI35301", ipAttribute != __nullptr);
+
+		ISpatialStringPtr ipValue = ipAttribute->Value;
+		ASSERT_RESOURCE_ALLOCATION("ELI35302", ipValue != __nullptr);
+
+		if (asCppBool(ipValue->HasSpatialInfo()))
+		{
+			IIUnknownVectorPtr ipPages = ipValue->GetPages();
+			ASSERT_RESOURCE_ALLOCATION("ELI35303", ipPages != __nullptr);
+			
+			// If the expected attribute spans multiple pages, check if any of the selected pages is
+			// a selected page.
+			long nPageCount = ipPages->Size();
+			for (long j = 0; j < nPageCount; j++)
+			{
+				ISpatialStringPtr ipPageValue = ipPages->At(j);
+				ASSERT_RESOURCE_ALLOCATION("ELI35304", ipPageValue != __nullptr);
+
+				long nPageNum = ipPageValue->GetFirstPageNumber();
+				if (setSelectedPages.find(nPageNum) != setSelectedPages.end())
+				{
+					ulExpectedAttributesOnSelectedPages++;
+					break;
+				}
+			}
+		}
+	}
+
+	return ulExpectedAttributesOnSelectedPages;
 }
 //-------------------------------------------------------------------------------------------------
 bool CIDShieldTester::analyzeDataForVerificationBasedRedaction(
 														IIUnknownVectorPtr ipExpectedAttributes,
 														IIUnknownVectorPtr ipFoundAttributes,
 														bool bSelectedForVerification,
-														const string& strSourceDoc)
+														const string& strSourceDoc,
+														unsigned long ulNumPagesInDoc)
 {
 	ASSERT_ARGUMENT("ELI18507", ipExpectedAttributes != __nullptr);
 	ASSERT_ARGUMENT("ELI18508", ipFoundAttributes != __nullptr);
 
+	// If m_bOutputVerificationByPageStats, find all the expected attributes that exist on selected
+	// pages.
+	unsigned long ulSelectedPages = ulNumPagesInDoc;
+	unsigned long ulExpectedAttributesOnSelectedPages = m_bOutputVerificationByPageStats
+		? countExpectedAttributesOnSelectedPages(ipExpectedAttributes, ipFoundAttributes, ulSelectedPages)
+		: 0;
+
 	// analyze the expected and found attributes 
 	CIDShieldTester::TestCaseStatistics testCaseStatistics = analyzeExpectedAndFoundAttributes(
-		ipExpectedAttributes, ipFoundAttributes, bSelectedForVerification, strSourceDoc);
+		ipExpectedAttributes, ipFoundAttributes, ulExpectedAttributesOnSelectedPages,
+		bSelectedForVerification, strSourceDoc);
 
 	// update total statistics
 	verificationStatistics += testCaseStatistics;
 
 	if (bSelectedForVerification)
 	{
-		// increment the number of files that would be selected for review
+		// increment the number of files and pages that would be selected for review
 		m_ulNumFilesSelectedForReview++;
+		m_ulNumPagesInFilesSelectedForReview += ulNumPagesInDoc;
+		m_ulNumPagesSelectedForReview += ulSelectedPages;
 
 		// Get the size of the expected attribute collection
 		long lExpectedSize = ipExpectedAttributes->Size();
@@ -1353,7 +1467,8 @@ bool CIDShieldTester::analyzeDataForAutomatedRedaction(IIUnknownVectorPtr ipExpe
 
 	// analyze the expected and found attributes 
 	CIDShieldTester::TestCaseStatistics testCaseStatistics = analyzeExpectedAndFoundAttributes(
-		ipExpectedAttributes, ipFoundAttributes, bSelectedForAutomatedProcess, strSourceDoc);
+		ipExpectedAttributes, ipFoundAttributes, 0, bSelectedForAutomatedProcess,
+		strSourceDoc);
 
 	// update total statistics
 	automatedStatistics += testCaseStatistics;
@@ -1484,6 +1599,7 @@ bool CIDShieldTester::spatiallyMatches(ISpatialStringPtr ipExpectedSS,
 //-------------------------------------------------------------------------------------------------
 CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttributes(
 	IIUnknownVectorPtr ipExpectedAttributes, IIUnknownVectorPtr ipFoundAttributes,
+	unsigned long ulExpectedAttributesOnSelectedPages,
 	bool bDocumentSelected, const string& strSourceDoc)
 {
 	ASSERT_ARGUMENT("ELI18511", ipExpectedAttributes != __nullptr);
@@ -1501,7 +1617,10 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 		ipAutoRedactedAttributes = m_ipAFUtility->QueryAttributes(
 			ipFoundAttributes, m_strRedactionQuery.c_str(), VARIANT_FALSE);
 
+		// If verifying all pages of sensitive docs, all expected attributes will be reviewed,
+		// otherwise only those that are on selected pages will be reviewed.
 		testCaseStatistics.m_ulExpectedRedactionsInSelectedFiles = ipExpectedAttributes->Size();
+		testCaseStatistics.m_ulExpectedRedactionsInSelectedPages = ulExpectedAttributesOnSelectedPages;
 		testCaseStatistics.m_ulFoundRedactions = ipAutoRedactedAttributes->Size();
 	}
 	// If the document was not selected for verification the total number of auto-redacted
@@ -1869,6 +1988,17 @@ void CIDShieldTester::displaySummaryStatistics()
 
 		strStatisticSummary += "\tManually review: Files that contain "
 			+ m_strVerificationQuantifier + " " + strDataTypes + "\r\n";
+		
+		// In the case that both verification selection methods are being used, it is better
+		// explained simply by seeing the two separate final results sections that are output.
+		if (m_bOutputVerificationByDocumentStats && !m_bOutputVerificationByPageStats)
+		{
+			strStatisticSummary += "\tAll pages of documents with sensitive data reviewed.\r\n";
+		}
+		else if (!m_bOutputVerificationByDocumentStats && m_bOutputVerificationByPageStats)
+		{
+			strStatisticSummary += "\tOnly pages with sensitive data reviewed.\r\n";
+		}
 	}
 
 	if (m_bOutputAutomatedStatsOnly || m_bOutputHybridStats)
@@ -1906,55 +2036,108 @@ void CIDShieldTester::displaySummaryStatistics()
 			getSetAsDelimitedList(m_setTypesToBeTested) + "\r\n";
 	}
 
-	// Compute the number of correct redactions based on whether this is hyrbid stats or not
-	m_ulNumCorrectRedactions = automatedStatistics.m_ulNumCorrectRedactions +
-		verificationStatistics.m_ulExpectedRedactionsInSelectedFiles;
+	bool bOutputBothByDocumentAndByPageStats =
+		m_bOutputVerificationByDocumentStats && m_bOutputVerificationByPageStats;
 
-	strStatisticSummary += "\r\nFinal results of above workflow:\r\n";
-
-	// Note for number of redactions found
-	zTemp.Format(
-		"\tSensitive data items redacted after processing: %d (%0.1f%%)",
-			m_ulNumCorrectRedactions, getRatioAsPercentOfTwoLongs(
-				m_ulNumCorrectRedactions, m_ulTotalExpectedRedactions));
-	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
-	strStatisticSummary += zTemp + "\r\n";
-
-	if (m_bOutputAutomatedStatsOnly || m_bOutputHybridStats)
+	// Final results section(s):
+	// Loop once for stats based on all pages of sensitive documents being reviewed and again based
+	// on only sensitive pages being reviewed. One or the other iteration may be bypassed depending
+	// on the VerificationSelection setting.
+	for (int i = 0; i < 2; i++)
 	{
-		// Note for the number of false positives found
-		zTemp.Format("\tFalse positives in redacted images: %d ",
-			automatedStatistics.m_ulNumFalsePositives);
-		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
-		strStatisticSummary += zTemp + "\r\n";
+		bool bOutputtingByDocumentStats = (i == 0);
 
-		// if m_ulNumFalsePositives == 0, append "(ROCE = n/a)"
-		if(automatedStatistics.m_ulNumFalsePositives <= 0)
+		// Check if this iteration can be skipped per the VerificationSelection setting.
+		if ((bOutputtingByDocumentStats && !m_bOutputVerificationByDocumentStats) ||
+			(!bOutputtingByDocumentStats && !m_bOutputVerificationByPageStats))
 		{
-			zTemp = "\tRatio of correctly redacted items to false positives: n/a";
+			continue;
 		}
-		// else ROCE > 0, append "(ROCE = N)"
+
+		// Compute the number of correct redactions based on whether this is hyrbid stats or not
+		unsigned long ulNumCorrectRedactions;
+		if (bOutputtingByDocumentStats)
+		{
+			ulNumCorrectRedactions = automatedStatistics.m_ulNumCorrectRedactions +
+				verificationStatistics.m_ulExpectedRedactionsInSelectedFiles;
+			m_ulNumCorrectRedactionsByDocument = ulNumCorrectRedactions;
+		}
 		else
 		{
-			// Use integer division to get a whole number ratio as a result
-			zTemp.Format("\tRatio of correctly redacted items to false positives: %0.1f",
-				((double)m_ulNumCorrectRedactions /
-				 (double)automatedStatistics.m_ulNumFalsePositives));
+			ulNumCorrectRedactions = automatedStatistics.m_ulNumCorrectRedactions +
+				verificationStatistics.m_ulExpectedRedactionsInSelectedPages;
+			m_ulNumCorrectRedactionsByPage = ulNumCorrectRedactions;
 		}
+
+		strStatisticSummary += "\r\nFinal results of above workflow";
+		if (bOutputBothByDocumentAndByPageStats)
+		{
+			strStatisticSummary += bOutputtingByDocumentStats
+				? " (entire document with sensitive data reviewed)"
+				: " (only pages with sensitive data reviewed)";
+		}
+		strStatisticSummary += ":\r\n";
+
+		// Note for number of redactions found
+		zTemp.Format(
+			"\tSensitive data items redacted after processing: %d (%0.1f%%)",
+				ulNumCorrectRedactions, getRatioAsPercentOfTwoLongs(
+					ulNumCorrectRedactions, m_ulTotalExpectedRedactions));
 		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 		strStatisticSummary += zTemp + "\r\n";
+
+		if (!m_bOutputAutomatedStatsOnly)
+		{
+			if (bOutputtingByDocumentStats)
+			{
+				// Label for number of files selected for review
+				zTemp.Format("\tFiles selected for review: %d (%0.1f%%) containing %d (%0.1f%%) pages",
+					m_ulNumFilesSelectedForReview, getRatioAsPercentOfTwoLongs(
+						m_ulNumFilesSelectedForReview, m_ulTotalFilesProcessed),
+					m_ulNumPagesInFilesSelectedForReview, getRatioAsPercentOfTwoLongs(
+						m_ulNumPagesInFilesSelectedForReview, m_ulTotalPages));
+			}
+			else
+			{
+				// Label for number of pages selected for review
+				zTemp.Format("\tPages selected for review: %d (%0.1f%%)",
+					m_ulNumPagesSelectedForReview, getRatioAsPercentOfTwoLongs(
+						m_ulNumPagesSelectedForReview, m_ulTotalPages));
+			}
+
+			m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+			strStatisticSummary += zTemp + "\r\n";
+		}
+
+		if (m_bOutputAutomatedStatsOnly || m_bOutputHybridStats)
+		{
+			// Note for the number of false positives found
+			zTemp.Format("\tFalse positives in redacted images: %d ",
+				automatedStatistics.m_ulNumFalsePositives);
+			m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+			strStatisticSummary += zTemp + "\r\n";
+
+			// if m_ulNumFalsePositives == 0, append "(ROCE = n/a)"
+			if(automatedStatistics.m_ulNumFalsePositives <= 0)
+			{
+				zTemp = "\tRatio of correctly redacted items to false positives: n/a";
+			}
+			// else ROCE > 0, append "(ROCE = N)"
+			else
+			{
+				// Use integer division to get a whole number ratio as a result
+				zTemp.Format("\tRatio of correctly redacted items to false positives: %0.1f",
+					((double)ulNumCorrectRedactions /
+					 (double)automatedStatistics.m_ulNumFalsePositives));
+			}
+			m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+			strStatisticSummary += zTemp + "\r\n";
+		}
 	}
 
 	if (m_bOutputHybridStats || !m_bOutputAutomatedStatsOnly)
 	{
 		strStatisticSummary += "\r\nVerification efficiency:\r\n";
-
-		// Label for Number of files selected for review
-		zTemp.Format("\tFiles selected for review: %d (%0.1f%%)",
-			m_ulNumFilesSelectedForReview, getRatioAsPercentOfTwoLongs(
-				m_ulNumFilesSelectedForReview, m_ulTotalFilesProcessed));
-		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
-		strStatisticSummary += zTemp + "\r\n";
 
 		if (m_bOutputHybridStats)
 		{
@@ -1996,10 +2179,18 @@ void CIDShieldTester::displaySummaryStatistics()
 
 	// If the number of correct redactions match the number of total expected redactions, then 
 	// the test was 100% successful.
-	bool bOneHundredPercentSuccess = false;
-	bOneHundredPercentSuccess = 
-		automatedStatistics.m_bTestCaseResult && verificationStatistics.m_bTestCaseResult &&
-		(m_ulTotalExpectedRedactions == m_ulNumCorrectRedactions);
+	bool bOneHundredPercentSuccess =
+		automatedStatistics.m_bTestCaseResult && verificationStatistics.m_bTestCaseResult;
+	if (m_bOutputVerificationByDocumentStats)
+	{
+		bOneHundredPercentSuccess &=
+			(m_ulTotalExpectedRedactions == m_ulNumCorrectRedactionsByDocument);
+	}
+	if (m_bOutputVerificationByPageStats)
+	{
+		bOneHundredPercentSuccess &=
+			(m_ulTotalExpectedRedactions == m_ulNumCorrectRedactionsByPage);
+	}	
 
 	m_ipResultLogger->EndTestCase(bOneHundredPercentSuccess ? VARIANT_TRUE : VARIANT_FALSE);
 
@@ -2897,6 +3088,7 @@ CIDShieldTester::TestCaseStatistics::TestCaseStatistics()
 : m_bTestCaseResult(true)
 , m_ulTotalExpectedRedactions(0)
 , m_ulExpectedRedactionsInSelectedFiles(0)
+, m_ulExpectedRedactionsInSelectedPages(0)
 , m_ulFoundRedactions(0)
 , m_ulNumCorrectRedactions(0)
 , m_ulNumFalsePositives(0)
@@ -2911,6 +3103,7 @@ void CIDShieldTester::TestCaseStatistics::reset()
 	m_bTestCaseResult = true;
 	m_ulTotalExpectedRedactions = 0;
 	m_ulExpectedRedactionsInSelectedFiles = 0;
+	m_ulExpectedRedactionsInSelectedPages = 0;
 	m_ulFoundRedactions = 0;
 	m_ulNumCorrectRedactions = 0;
 	m_ulNumFalsePositives = 0;
@@ -2925,6 +3118,7 @@ CIDShieldTester::TestCaseStatistics& CIDShieldTester::TestCaseStatistics::operat
 	m_bTestCaseResult = (m_bTestCaseResult && otherTestCase.m_bTestCaseResult);
 	m_ulTotalExpectedRedactions += otherTestCase.m_ulTotalExpectedRedactions;
 	m_ulExpectedRedactionsInSelectedFiles += otherTestCase.m_ulExpectedRedactionsInSelectedFiles;
+	m_ulExpectedRedactionsInSelectedPages += otherTestCase.m_ulExpectedRedactionsInSelectedPages;
 	m_ulFoundRedactions += otherTestCase.m_ulFoundRedactions;
 	m_ulNumCorrectRedactions += otherTestCase.m_ulNumCorrectRedactions;
 	m_ulNumFalsePositives += otherTestCase.m_ulNumFalsePositives;
