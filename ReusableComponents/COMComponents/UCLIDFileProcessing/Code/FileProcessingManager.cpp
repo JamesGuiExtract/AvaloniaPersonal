@@ -250,13 +250,16 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 				// Set flag indicating that supplying was started
 				m_bSupplying = true;
 
-				if (m_nNumberOfFilesToExecute > 0)
+				if (m_nNumberOfFilesToExecute > 0 &&
+					ipProcessingActionMgmtRole->Enabled == VARIANT_TRUE)
 				{
-					UCLIDException("ELI35276", "Application trace: Inadvisable configuration-- It "
-						"is not recommended to specify that a FAM instance stop or restart after "
+					UCLIDException ue("ELI35276", "Application trace: Inadvisable configuration-- "
+						"It is not recommended to specify that a FAM instance stop or restart after "
 						"processing a specified number of files if file supplying enabled. If the "
 						"specified number is reached and supplying is still active, the FAM will "
-						"not be able to stop/restart.").log();
+						"not be able to stop/restart.");
+					ue.addDebugInfo("FPS File", m_strFPSFileName);
+					ue.log();
 				}
 			}
 
@@ -1254,8 +1257,10 @@ STDMETHODIMP CFileProcessingManager::NotifyProcessingCompleted(void)
 	{
 		if (m_nNumberOfFilesToExecute > 0)
 		{
-			UCLIDException("ELI35277", "Application trace: The specified number of files have been "
-				"processed, but supplying is active so this instance will not stop or restart.").log();
+			UCLIDException ue("ELI35277", "Application trace: The specified number of files have been "
+				"processed, but supplying is active so this instance will not stop or restart.");
+			ue.addDebugInfo("FPS File", m_strFPSFileName);
+			ue.log();
 		}
 	}
 	else

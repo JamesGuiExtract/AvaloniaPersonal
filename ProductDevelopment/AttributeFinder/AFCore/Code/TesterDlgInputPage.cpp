@@ -512,7 +512,10 @@ void TesterDlgInputPage::OnCheckUseDataInput()
 		// initial value for zDataInputFileName would be the default voa file name for zFileName.
 		if (asCppBool(bEnable) && !zFileName.IsEmpty() && zDataInputFileName.IsEmpty())
 		{
-			m_editDataInputFileName.SetWindowText(zFileName + ".voa");
+			CString zDefaultInput = zFileName;
+			zDefaultInput.Replace(".uss", "");
+			zDefaultInput += ".voa";
+			m_editDataInputFileName.SetWindowText(zDefaultInput);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35270")
