@@ -3912,6 +3912,7 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 				ADODB::_ConnectionPtr ipConnection = __nullptr;
 				bool bSuccess = false;
 				bool bLocked = false;
+				int nActionID = -1;
 
 				do
 				{
@@ -3934,7 +3935,7 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 							ipConnection = pDB->getDBConnection();
 
 							// Check that an update is needed before any attempt at locking the DB.
-							int nActionID = pDB->m_nActiveActionID;
+							nActionID = pDB->m_nActiveActionID;
 							if (nActionID >= 0 && 
 								pDB->isStatisticsUpdateFromDeltaNeeded(ipConnection, nActionID))
 							{
@@ -3958,6 +3959,8 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 					}
 					catch (UCLIDException &ue)
 					{
+						ue.addDebugInfo("ActionID", nActionID);
+
 						if (pDB->m_eventStopMaintainenceThreads.wait(0) != WAIT_TIMEOUT)
 						{
 							break;
@@ -3969,6 +3972,10 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 						{ 
 							throw ue;
 						}
+
+						UCLIDException uexOuter("ELI35306", 
+							"Stats maintenance thread error, reattempting...", ue);
+						uexOuter.log();
 
 						try
 						{
