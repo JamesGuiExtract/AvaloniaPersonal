@@ -12,7 +12,7 @@ href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UC
 <IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
-<h2>NOTE: This utility uses DataEntryPrompt.exe.config.</h2>
+<h2>NOTE: This utility uses DataEntryPrompt.exe.config from Demo_RedactionGame.</h2>
 <hr>
 
 <ol>
@@ -23,47 +23,75 @@ href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UC
 		is not present.</li>
   	</ul>
 <p>
-  	<li><h2>Config File Usage</h2></li>
+  	<li><h2>Redaction Game</h2></li>
   	<ul>
-    		<li>Confirm that the <b>OK</b> button label depends on the <b>OKButtonLabel</b> field.</li>
-    		<li>Confirm that the <b>Cancel</b> button label depends on the <b>CancelButtonLabel</b> field.</li>
-<p>
-    		<li>Confirm that the <b>Field1</b> field specifies the label for the corresponding edit box.</li>
+		<li><u>User Interface</u>
 		<ul>
-			<li>Confirm that the field is not presented if the config file definition is not present.
+			<li>Copy <b>DataEntryPrompt.exe.config</b> from 
+			<b>I:\Common\Engineering\ProductReleases\FlexIndex\External\Current\9.0.0.200\OtherDemos\Demo_RedactionGame\Misc</b> to the <b>CommonComponents</b> folder.
+			<li>Confirm that the window caption is <b>ID Shield Redaction Game</b>.
+			<li>Confirm that the following fields are defined:
+			<ul>
+				<li>FirstName
+				<li>LastName
+				<li>Company
+				<li>Title
+				<li>Email
+				<li>PhoneNumber
+				<li>Comments
+			</ul>
+			<li>Confirm that a red error icon is present next to each empty field (except for 
+			Comments).
 		</ul>
-    		<li>Confirm that the <b>Field1Validation</b> field specifies the validation requirement for 
-		the corresponding edit box.</li>
+		<li><u>Field Validation</u>
 		<ul>
-			<li>Confirm that no validation is performed if the config file definition is not present.
+			<li>Confirm that <b>FirstName</b>, <b>LastName</b>, <b>Company</b> and <b>Title</b> 
+			require <b>any</b> alphanumeric text to be entered.
+			<li>Confirm that the <b>Email</b> field requires a text string configured as an 
+			email address to be entered.
+			<li>Confirm that the following strings are <b>valid</b> for <b>PhoneNumber</b>.
+			<ul>
+				<li>(608) 216-7950
+				<li>608 216 7950
+				<li>608.216.7950
+				<li>608-216-7950
+				<li>6082167950
+			</ul>
+			<li>Confirm that the following strings are <b>invalid</b> for <b>PhoneNumber</b>.
+			<ul>
+				<li>608 216 79501
+				<li>(608 216-7950
+				<li>011.216.7950
+			</ul>
 		</ul>
-    		<li>Repeat the above tests for the following fields:
+		<li><u>Other Configuration</u>
 		<ul>
-			<li><b>Field2</b>
-			<li><b>Field3</b>
-			<li><b>Field4</b>
-			<li><b>Field5</b>
-			<li><b>Field6</b>
-			<li><b>Field7</b>
-			<li><b>Field8</b>
-			<li><b>Field9</b>
-			<li><b>Field10</b>
+	    		<li>Confirm that the <b>Title</b> field specifies the window caption.</li>
+    			<li>Confirm that the <b>OKButtonLabel</b> field specifies the text on the OK button.</li>
+    			<li>Confirm that the <b>CancelButtonLabel</b> field specifies the text on the Cancel 
+			button.</li>
+    			<li>Confirm that the <b>DataFileName</b> field specifies the name of the output file 
+			that stores the entered data in a comma-separated format.</li>
+    			<li>Confirm that the <b>PostEntryCommandLine</b> field specifies the name of an 
+			application to be run after the user clicks the <b>OK</b> button.</li>
+    			<li>Confirm that the <b>PostEntryCommandLineArguments</b> field specifies the 
+			command-line arguments associated with the <b>PostEntryCommandLine</b> application.</li>
+    			<li>Confirm that the <b>KeepOpen</b> field specifies whether or not the utility 
+			stays open after the user clicks the <b>OK</b> or <b>Cancel</b> button.</li>
+			<ul>
+				<li>Confirm that the fields are cleared after <b>OK</b> or <b>Cancel</b>.
+				<li>Confirm that the output file is updated <b>only</b> after <b>OK</b>.
+			</ul>
 		</ul>
-<p>
-    		<li>Confirm that the <b>Title</b> field specifies the window caption.</li>
-    		<li>Confirm that the <b>KeepOpen</b> field specifies whether or not the utility 
-		stays open after the user clicks the <b>OK</b> or <b>Cancel</b> button.</li>
-    		<li>Confirm that the <b>DataFileName</b> field specifies the name of the output file 
-		that stores the entered data in a comma-separated format.</li>
-    		<li>Confirm that the <b>PostEntryCommandLine</b> field specifies the name of an application 
-		to be run after the user clicks the <b>OK</b> button.</li>
-    		<li>Confirm that the <b>PostEntryCommandLineArguments</b> field specifies the 
-		command-line arguments associated with the <b>PostEntryCommandLine</b> application.</li>
   	</ul>
 <p>
   	<li><h2>Miscellaneous</h2></li>
   	<ul>
-		<li>TBD
+		<li>Confirm that multiple results can be written to the <b>DataFileName</b> file.
+		<li>Add field names and optional validation for <b>Field8</b>, <b>Field9</b> and 
+		<b>Field10</b>.
+		<li>Confirm that appropriate output is seen in the CSV file.
+		<li>Confirm that any additional fields defined in the <b>config</b> file are ignored.
   	</ul>
 </ol>
 </body>
