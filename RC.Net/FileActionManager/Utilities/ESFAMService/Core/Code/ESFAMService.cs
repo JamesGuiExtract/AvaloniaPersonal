@@ -402,6 +402,8 @@ namespace Extract.FileActionManager.Utilities
         {
             FileProcessingManagerProcessClass famProcess = null;
             Process process = null;
+            string fpsFileName = "";
+            int processID = 0;
             try
             {
                 // Get the processing thread arguments
@@ -426,14 +428,15 @@ namespace Extract.FileActionManager.Utilities
                 {
                     // Create the FAM process
                     famProcess = new FileProcessingManagerProcessClass();
-                    int pid = famProcess.ProcessID;
-                    process = Process.GetProcessById(pid);
+                    processID = famProcess.ProcessID;
+                    process = Process.GetProcessById(processID);
 
                     // Provide the service authentication
                     famProcess.AuthenticateService(LicenseUtilities.GetMapLabelValue(new MapLabel()));
 
                     // Set the FPS file name
-                    famProcess.FPSFile = arguments.FpsFileName;
+                    fpsFileName = arguments.FpsFileName;
+                    famProcess.FPSFile = fpsFileName;
 
                     // Check if authentication is required
                     if (famProcess.AuthenticationRequired)
@@ -446,7 +449,7 @@ namespace Extract.FileActionManager.Utilities
 
                         ExtractException ee = new ExtractException("ELI29208",
                             "Authentication is required to launch this FPS file.");
-                        ee.AddDebugData("FPS File Name", arguments.FpsFileName, false);
+                        ee.AddDebugData("FPS File Name", fpsFileName, false);
                         throw ee;
                     }
 
@@ -458,8 +461,8 @@ namespace Extract.FileActionManager.Utilities
 
                         ExtractException ee = new ExtractException("ELI29808",
                             "Application trace: Started new FAM instance.");
-                        ee.AddDebugData("FPS Filename", arguments.FpsFileName, false);
-                        ee.AddDebugData("Process ID", pid, false);
+                        ee.AddDebugData("FPS Filename", fpsFileName, false);
+                        ee.AddDebugData("Process ID", processID, false);
                         ee.AddDebugData("Number Of Files To Process", numberOfFilesToProcess, false);
                         ee.Log();
                     }
@@ -470,6 +473,14 @@ namespace Extract.FileActionManager.Utilities
                         && !process.HasExited && famProcess.IsRunning)
                     {
                         Thread.Sleep(2000);
+                    }
+
+                    // [LegacyRCAndUtils:6367]
+                    // If stop processing has been called, don't bother to check whether famProcess
+                    // has ended naturally because we already know we need the process to stop.
+                    if (_stopProcessing != null && _stopProcessing.WaitOne(0))
+                    {
+                        break;
                     }
 
                     // [DotNetRCAndUtils:835]
@@ -517,29 +528,17 @@ namespace Extract.FileActionManager.Utilities
                         while (process != null && !process.HasExited)
                         {
                             Thread.Sleep(1000);
+
+                            // If stop processing has been called exit the loop respawn loop.
                             if (_stopProcessing != null && _stopProcessing.WaitOne(0))
                             {
-                                // If stop processing has been called and this process is
-                                // still hanging around, kill it
-                                if (!process.HasExited)
-                                {
-                                    try
-                                    {
-                                        process.Kill();
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        ExtractException.Log("ELI30030", ex);
-                                    }
-                                }
-
                                 break;
                             }
                         }
                     }
 
-                    // If there is a valid Process handle, dispose of it
-                    if (process != null)
+                    // If there is a valid process handle for an exited process, dispose of it
+                    if (process != null && process.HasExited)
                     {
                         process.Dispose();
                         process = null;
@@ -612,6 +611,10 @@ namespace Extract.FileActionManager.Utilities
                             {
                                 try
                                 {
+                                    var ee = new ExtractException("ELI35308", "Killing hung process.");
+                                    ee.AddDebugData("FPS Filename", fpsFileName, false);
+                                    ee.AddDebugData("Process ID", processID, false);
+                                    ee.Log();
                                     process.Kill();
                                 }
                                 catch (Exception ex)
