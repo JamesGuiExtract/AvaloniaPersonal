@@ -1,0 +1,232 @@
+<HTML>
+
+<HEAD>
+<TITLE>Advanced Health DEP Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> DEP Testing - Advanced Health </h1>
+<hr>
+
+<OL>
+	<LI><h3>DEP Layout</h3>
+       	<ul>
+		<LI>Confirm that the DEP includes a <b>Comments (for operator's use)</b> 
+		multi-line edit box.
+		<li>Confirm that the DEP includes a <b>Result Status</b> drop-down combo box 
+		with the following entries available.
+		<ul>
+			<li>Corrected
+			<li>Final
+			<li>Preliminary
+			<li>Reviewed
+		</ul>
+		<li>Confirm that <b>Final</b> is the default option.
+		<li>Confirm that the DEP includes an <b>Image name</b> read-only edit box.
+		<li>Confirm that the DEP includes an associated <b>Copy</b> button.
+		<li>Confirm that a red warning icon is next to the Copy button.
+		<li>Confirm that the DEP includes a <b>Patient Information</b> group box.
+		<ul>
+			<li>a <b>From Lab Result:</b> single-row table with column headings 
+			for:
+			<ul>
+				<li>First Name
+				<li>Middle Name
+				<li>Last Name
+				<li>Suffix
+			</ul>
+			<li>a <b>From Epic Care:</b> single-row table with the same column 
+			headings.
+			<ul>
+				<li>Confirm that a red warning icon at the right side of the 
+				First Name cell.
+				<li>Confirm that a red warning icon at the right side of the 
+				Last Name cell.
+			</ul>
+			<li>a <b>Date of Birth</b> edit box
+			<li>a <b>Gender</b> drop-down combo box with the following entries 
+			available:
+			<ul>
+				<li>F
+				<li>M
+				<li>U
+			</ul>
+			<li>a <b>Medical Record #</b> edit box.
+			<li>Confirm that a red warning icon is next to the edit box.
+		</ul>
+		<li>Confirm that the DEP includes a <b>Physicians</b> group box.
+		<ul>
+			<li>an <b>Ordering:</b> single-row table with column headings 
+			for:
+			<ul>
+				<li>Last Name
+				<li>First Name
+				<li>Middle Name
+				<li>Code
+			</ul>
+			<li>a <b>Copy To:</b> single-row table with the same column 
+			headings.
+		</ul>
+		<li>Confirm that the DEP includes an <b>Orders</b> group box.
+		<ul>
+			<li>a multiple-row table with column headings for:
+			<ul>
+				<li>Order Name
+				<li>Epic Code
+				<li>Collection Date
+				<li>Collection Time
+			</ul>
+		</ul>
+		<li>Confirm that the DEP includes a <b>Selected Order Details</b> group box.
+		<ul>
+			<li>an <b>Order Number</b> edit box.
+			<li>a <b>Result Date</b> edit box.
+			<li>a <b>Result Time</b> edit box.
+			<li>a <b>Lab Name</b> edit box.
+			<li>a <b>Lab Code</b> edit box.
+			<li>a multiple-line <b>Comment</b> edit box.
+			<li>a multiple-row table with column headings for:
+			<ul>
+				<li>Test Name
+				<li>Code
+				<li>Value
+				<li>Units
+				<li>Ref. Range
+				<li>Flag
+				<li>Comment
+			</ul>
+		</ul>
+       	</ul>
+<p>
+	<li><h3>Auto-Update Queries</h3></li>
+	<UL>
+		<li>Confirm that the following default text is automatically placed in the 
+		<b>Selected Order Details - Comment</b> field for each Order.
+		<ul>
+			<li>Verified by &lt;User_Name&gt; on &lt;Date&gt;.
+		</ul>
+       	</ul>
+<p>
+	<li><h3>Validation</h3></li>
+	<UL>
+		<li>Confirm that the image cannot be saved and committed while one or more red 
+		warning icons remain visible.
+		<li>Confirm that the <b>Image name</b> information must be copied to the Clipboard 
+		via the <b>Copy</b> button.
+		<li>Confirm that a <b>First Name</b> and a <b>Last Name</b> are required in the 
+		<b>Patient Information - From Epic Care:</b> field.
+		<li>Confirm that a <b>Medical Record #</b> is required.
+		<li>Confirm that each of the following fields are required for each <b>Order</b>.
+		<ul>
+			<li>Order Name
+			<li>Epic Code
+			<li>Collection Date
+			<li>Collection Time
+		</ul>
+		<li>Confirm that each of the following fields are required for each <b>Selected 
+		Order Details</b> item.
+		<ul>
+			<li>Order Number
+			<li>Result Date
+		</ul>
+       	</ul>
+<p>
+	<LI><h3>Miscellaneous</h3>
+       	<ul>
+  	   	<LI><b>[DataEntry #691]</b> Scrolling With Fit-To-Width
+        	<ul>
+            		<li>Open a document.
+			<li>Zoom in close to something.
+			<li>Use <b>Alt+W</b> or the toolbar to change to fit-to-width.
+			<li>Confirm that the correct zoom action is performed.
+			<li>Confirm that the vertical scroll position does not change.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #731]</b> Swipe of multiple attributes triggers DataEntryApplication
+		session corruption
+        	<ul>
+            		<li>Process an <b>Advanced Health</b> document.
+			<li>Swipe text that results in multiple attributes for the same field.
+			<li>Confirm that further processing does not result in <b>COM object 
+			that has been separated from its underlying RCW cannot be used</b> 
+			exceptions.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #875]</b> Saving Document Removes Fit-to-Width Setting
+        	<ul>
+            		<li>Open a document with auto-zoom set to zoom out if necessary.
+            		<li>Click the <b>Fit-to-width</b> button.
+            		<li>Save the document.
+            		<li>Confirm that the <b>fit-to-width</b> setting is retained for the 
+			next document.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1080]</b> Word Swiping Tool Not Disabled When SupportsSwiping 
+		Is False
+        	<ul>
+            		<li>Navigate to a field for which the angular and rectangular swiping tools 
+			are enabled.
+            		<li>Select the <b>Word</b> swiping tool.
+            		<li>Navigate to a field for which the angular and rectangular swiping tools 
+			are disabled.
+			<li>Confirm that the <b>Word</b> swiping tool is also disabled.
+            		<li>Confirm that the <b>Word</b> swiping tool also cannot be used.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1112]</b> Null Object Reference Exception
+        	<ul>
+            		<li>Configure a FAM for DataEntry verification such that processing 
+			continues even after the queue is empty.
+            		<li>Queue a single file.
+            		<li>Delete or rename the file.
+            		<li>Run verification and confirm that the file fails because it is not 
+			found.
+            		<li>Confirm that the verification title bar does not display the name of 
+			the failed document.
+            		<li>Close the verification window.
+            		<li>Confirm that an <b>ELI29864 - Object reference not set to an instance 
+			of an object.</b> exception is not seen.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1116, #1117]</b> RCW Exceptions With Undo / Redo
+        	<ul>
+            		<li>Exercise <b>Undo</b> and <b>Redo</b>.
+            		<li>Confirm that no exceptions are seen.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1128]</b> Null Reference Exception For Second Start
+        	<ul>
+            		<li>Start an FPS file with DataEntry verification.
+            		<li>Stop verification.
+            		<li>Re-start verification without closing the FAM.
+            		<li>Confirm that verification re-starts without error.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1142]</b> Support Magnifier Window
+        	<ul>
+            		<li>Confirm that a dockable <b>Magnifier Window</b> is available.
+			<li>Confirm that a menu item is available to toggle display of the 
+			Magnifier Window.
+			<li>Confirm that the position and docking state of the <b>Magnifier 
+			Window</b> are persistent across sessions.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1143]</b> F2 Zoom To Selection
+        	<ul>
+            		<li>Confirm that <b>F2</b> correctly toggles zooming to the current 
+			selection.
+        	</ul>
+<p>
+		<LI><b>[DataEntry #1151]</b> Magnifier Window
+		<ul>
+			<li>Verify an image.
+			<li>Click <b>F12</b> to display the Magnifier Window.
+			<li>Confirm that no unexpected behavior is seen if the window is floating.
+			<li>Confirm that no unexpected behavior is seen if the window is docked.
+		</ul>
+	</ul>
+</OL>
+</BODY>
+</HTML>

@@ -1,0 +1,64 @@
+<HTML>
+
+<HEAD>
+<TITLE>UITC DEP Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> DEP Testing - UITC </h1>
+<hr>
+
+<OL>
+	<LI><h3>DEP Layout</h3>
+       	<ul>
+		<LI>TBD
+       	</ul>
+<p>
+	<li><h3>Auto-Update Queries</h3></li>
+	<UL>
+		<li>TBD
+       	</ul>
+<p>
+	<LI><h3>Miscellaneous</h3>
+       	<ul>
+  	   	<LI><b>[DataEntry #1104]</b> Tab Order Wrong With Many Sibling Fields
+        	<ul>
+            		<li>Exercise a DEP with more than 10 sibling fields.
+            		<li>Confirm that the <b>tab order</b> behavior is acceptable.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1130]</b> Parameter To Turn Off Highlighting Of Sub-Attributes
+        	<ul>
+            		<li>Exercise <b>UITC</b> rules and images.
+            		<li>TBD
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1131]</b> Collection Modified Exception
+        	<ul>
+            		<li>Exercise <b>UITC</b> rules and images.
+            		<li>Modify an <b>Order Name</b>.
+			<li>Confirm that an <b>ELI24463 - Collection was modified</b> exception 
+			is not seen.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1133]</b> Caching Causes Incorrect Expression Evaluation
+        	<ul>
+            		<li>Exercise <b>UITC</b> rules and images.
+            		<li>Swipe a value such as <b>1212</b> into a time field.
+            		<li>Confirm that the text is translated into a valid time such as 
+			<b>12:12</b>.
+        	</ul>
+<p>
+		<LI><b>[DataEntry #1138]</b> Unresolved Query error
+		<ul>
+			<li>With a <b>UITC</b> DEP and testing setup, exercise the image 
+			and VOA file from <b>I:\Common\Testing\PVCS_Testing\DataEntry\1138</b>.
+			<li>Delete the first row in the <b>Panels</b> table.
+			<li>Confirm that no exception is displayed.
+		</ul>
+	</ul>
+</OL>
+</BODY>
+</HTML>
