@@ -179,25 +179,23 @@
   <metadata name="_orderNumberColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="_testName.AutoUpdateQuery" xml:space="preserve">
-    <value>&lt;Query&gt;&lt;SQL&gt;SELECT Name FROM LabOrder WHERE Code = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query&gt;&lt;SQL&gt;SELECT Name FROM LabOrder WHERE Code = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
+  <metadata name="_testDisplayName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="_testDisplayName.AutoUpdateQuery" xml:space="preserve">
+    <value>&lt;Query&gt;&lt;SQL&gt;SELECT DisplayName FROM LabOrder WHERE Code = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT DisplayName FROM LabOrder WHERE Code = SUBSTRING(&lt;Attribute&gt;../EpicCode&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
 </value>
   </data>
-  <data name="_testName.ValidationQuery" xml:space="preserve">
+  <data name="_testDisplayName.ValidationQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
-	&lt;SQL Name='MandatoryTests'&gt;SELECT TestCode FROM LabOrderTest
-		INNER JOIN LabOrder ON LabOrderTest.OrderCode = LabOrder.Code
-		WHERE LabOrder.Code = &lt;Attribute&gt;../OrderCode&lt;/Attribute&gt; AND Mandatory = 1&lt;/SQL&gt;
-	&lt;Attribute Name='ExistingTests' SelectionMode='List'&gt;../Component/TestCode&lt;/Attribute&gt;
-	&lt;Expression Name='MissingTests'&gt;
-		(&lt;MandatoryTests  Type='string[]'/&gt; - &lt;ExistingTests Type='string[]'/&gt;).sort()
-	&lt;/Expression&gt;
-	&lt;Complex Name='ValidationMessage'&gt;Missing mandatory test(s): &lt;MissingTests StringList=', '/&gt;&lt;/Complex&gt;
+	&lt;Complex Name='ValidationMessage'&gt;No test result has been entered for this order.&lt;/Complex&gt;
 &lt;/Declarations&gt;
-&lt;Query&gt;&lt;SQL&gt;SELECT Name FROM LabOrder WHERE Code IS NOT NULL ORDER BY Name&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query ValidationListType='ValidationListOnly' ValidValue='' ValidationMessage='ValidationMessage' ValidationWarning='1'&gt;
-	&lt;MissingTests/&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT DisplayName FROM LabOrder WHERE Code IS NOT NULL ORDER BY Name&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidValue='True' ValidationMessage='ValidationMessage' ValidationWarning='1'&gt;
+	&lt;Expression&gt;
+		!string.IsNullOrEmpty(&lt;Attribute SelectionMode='First'&gt;../Component/TestCode&lt;/Attribute&gt;)
+	&lt;/Expression&gt;
 &lt;/Query&gt;</value>
   </data>
   <metadata name="_testValueColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">

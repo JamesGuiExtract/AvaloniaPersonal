@@ -102,6 +102,7 @@
             this._defaultLabIdentifier = new Extract.DataEntry.DataEntryTextBox();
             this._orderNumberColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._testName = new Extract.DataEntry.DataEntryTableColumn();
+            this._testDisplayName = new Extract.DataEntry.DataEntryTableColumn();
             this._testID = new Extract.DataEntry.DataEntryTableColumn();
             this._testValueColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._testUnitsColumn = new Extract.DataEntry.DataEntryTableColumn();
@@ -127,7 +128,7 @@
             _resultCodeLabel.Location = new System.Drawing.Point(6, 16);
             _resultCodeLabel.Name = "_resultCodeLabel";
             _resultCodeLabel.Size = new System.Drawing.Size(56, 13);
-            _resultCodeLabel.TabIndex = 14;
+            _resultCodeLabel.TabIndex = 0;
             _resultCodeLabel.Text = "Test Code";
             // 
             // _testNameLabel
@@ -136,7 +137,7 @@
             _testNameLabel.Location = new System.Drawing.Point(145, 16);
             _testNameLabel.Name = "_testNameLabel";
             _testNameLabel.Size = new System.Drawing.Size(59, 13);
-            _testNameLabel.TabIndex = 24;
+            _testNameLabel.TabIndex = 2;
             _testNameLabel.Text = "Test Name";
             // 
             // panelGroupBox
@@ -149,7 +150,7 @@
             panelGroupBox.Location = new System.Drawing.Point(0, 380);
             panelGroupBox.Name = "panelGroupBox";
             panelGroupBox.Size = new System.Drawing.Size(693, 142);
-            panelGroupBox.TabIndex = 4;
+            panelGroupBox.TabIndex = 9;
             panelGroupBox.TabStop = false;
             panelGroupBox.Text = "Panels";
             // 
@@ -255,7 +256,7 @@
             this._labID.ParentDataEntryControl = this._panelTable;
             this._labID.Size = new System.Drawing.Size(110, 20);
             this._labID.SupportsSwiping = false;
-            this._labID.TabIndex = 2;
+            this._labID.TabIndex = 4;
             this._labID.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
             this._labID.ValidationErrorMessage = "Missing or unknown laboratory ID";
             this._labID.ValidationQuery = "<SQL>SELECT LabCode FROM LabAddresses WHERE LabCode IS NOT NULL AND LEN(LabCode) " +
@@ -272,7 +273,7 @@
             this._laboratoryIdentifier.ParentDataEntryControl = this._panelTable;
             this._laboratoryIdentifier.Size = new System.Drawing.Size(537, 20);
             this._laboratoryIdentifier.SupportsSwiping = false;
-            this._laboratoryIdentifier.TabIndex = 1;
+            this._laboratoryIdentifier.TabIndex = 2;
             this._laboratoryIdentifier.ValidationErrorMessage = "";
             this._laboratoryIdentifier.ValidationQuery = "[BLANK]\r\n<SQL>SELECT LabName FROM LabAddresses ORDER BY LabName</SQL>";
             // 
@@ -283,7 +284,7 @@
             this._labIDLabel.Location = new System.Drawing.Point(559, 98);
             this._labIDLabel.Name = "_labIDLabel";
             this._labIDLabel.Size = new System.Drawing.Size(53, 13);
-            this._labIDLabel.TabIndex = 0;
+            this._labIDLabel.TabIndex = 3;
             this._labIDLabel.Text = "Lab Code";
             // 
             // _labNameLabel
@@ -292,7 +293,7 @@
             this._labNameLabel.Location = new System.Drawing.Point(7, 98);
             this._labNameLabel.Name = "_labNameLabel";
             this._labNameLabel.Size = new System.Drawing.Size(56, 13);
-            this._labNameLabel.TabIndex = 3;
+            this._labNameLabel.TabIndex = 1;
             this._labNameLabel.Text = "Lab Name";
             // 
             // _patientInfoGroupBox
@@ -316,7 +317,7 @@
             this._patientInfoGroupBox.Name = "_patientInfoGroupBox";
             this._patientInfoGroupBox.ParentDataEntryControl = null;
             this._patientInfoGroupBox.Size = new System.Drawing.Size(696, 234);
-            this._patientInfoGroupBox.TabIndex = 3;
+            this._patientInfoGroupBox.TabIndex = 8;
             this._patientInfoGroupBox.TabStop = false;
             this._patientInfoGroupBox.Text = "Patient Information";
             // 
@@ -326,7 +327,7 @@
             this.label1.Location = new System.Drawing.Point(7, 190);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(122, 13);
-            this.label1.TabIndex = 16;
+            this.label1.TabIndex = 10;
             this.label1.Text = "Date of Birth (From Epic)";
             // 
             // _epicDOBTextBox
@@ -338,7 +339,7 @@
             this._epicDOBTextBox.Name = "_epicDOBTextBox";
             this._epicDOBTextBox.ParentDataEntryControl = this._patientInfoGroupBox;
             this._epicDOBTextBox.Size = new System.Drawing.Size(369, 20);
-            this._epicDOBTextBox.TabIndex = 5;
+            this._epicDOBTextBox.TabIndex = 11;
             this._epicDOBTextBox.ValidationErrorMessage = "Date of birth must be a valid date in the format MM/DD/YYYY";
             this._epicDOBTextBox.ValidationPattern = "(^$)|(^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(18|19|20)\\d{2}" +
     "$)";
@@ -350,7 +351,7 @@
             this._epicPatientNameLabel.Location = new System.Drawing.Point(6, 85);
             this._epicPatientNameLabel.Name = "_epicPatientNameLabel";
             this._epicPatientNameLabel.Size = new System.Drawing.Size(79, 13);
-            this._epicPatientNameLabel.TabIndex = 14;
+            this._epicPatientNameLabel.TabIndex = 2;
             this._epicPatientNameLabel.Text = "From EpicCare:";
             // 
             // _labResultPatientNameLabel
@@ -359,7 +360,7 @@
             this._labResultPatientNameLabel.Location = new System.Drawing.Point(6, 16);
             this._labResultPatientNameLabel.Name = "_labResultPatientNameLabel";
             this._labResultPatientNameLabel.Size = new System.Drawing.Size(87, 13);
-            this._labResultPatientNameLabel.TabIndex = 13;
+            this._labResultPatientNameLabel.TabIndex = 0;
             this._labResultPatientNameLabel.Text = "From Lab Result:";
             // 
             // _epicPatientNameTable
@@ -413,7 +414,7 @@
             this._epicPatientNameTable.RowSwipingEnabled = true;
             this._epicPatientNameTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this._epicPatientNameTable.Size = new System.Drawing.Size(666, 46);
-            this._epicPatientNameTable.TabIndex = 1;
+            this._epicPatientNameTable.TabIndex = 3;
             // 
             // _epicPatientFirstNameColumn
             // 
@@ -504,7 +505,7 @@
             this._patientNameTable.RowSwipingEnabled = true;
             this._patientNameTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this._patientNameTable.Size = new System.Drawing.Size(666, 46);
-            this._patientNameTable.TabIndex = 0;
+            this._patientNameTable.TabIndex = 1;
             // 
             // _patientFirstNameColumn
             // 
@@ -550,7 +551,7 @@
             this._genderLabel.Location = new System.Drawing.Point(396, 150);
             this._genderLabel.Name = "_genderLabel";
             this._genderLabel.Size = new System.Drawing.Size(42, 13);
-            this._genderLabel.TabIndex = 10;
+            this._genderLabel.TabIndex = 6;
             this._genderLabel.Text = "Gender";
             // 
             // _patientGender
@@ -561,7 +562,7 @@
             this._patientGender.Name = "_patientGender";
             this._patientGender.ParentDataEntryControl = this._patientInfoGroupBox;
             this._patientGender.Size = new System.Drawing.Size(54, 21);
-            this._patientGender.TabIndex = 3;
+            this._patientGender.TabIndex = 7;
             this._patientGender.ValidationErrorMessage = "Specify \"M\" for male, \"F\" for female or \"U\" for unknown";
             this._patientGender.ValidationQuery = "<SQL>SELECT * FROM Gender</SQL>";
             // 
@@ -574,7 +575,7 @@
             this._patientBirthDate.Name = "_patientBirthDate";
             this._patientBirthDate.ParentDataEntryControl = this._patientInfoGroupBox;
             this._patientBirthDate.Size = new System.Drawing.Size(369, 20);
-            this._patientBirthDate.TabIndex = 2;
+            this._patientBirthDate.TabIndex = 5;
             this._patientBirthDate.ValidationErrorMessage = "Date of birth must be a valid date in the format MM/DD/YYYY";
             this._patientBirthDate.ValidationPattern = "(^$)|(^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(18|19|20)\\d{2}" +
     "$)";
@@ -585,7 +586,7 @@
             this._birthDateLabel.Location = new System.Drawing.Point(5, 150);
             this._birthDateLabel.Name = "_birthDateLabel";
             this._birthDateLabel.Size = new System.Drawing.Size(152, 13);
-            this._birthDateLabel.TabIndex = 0;
+            this._birthDateLabel.TabIndex = 4;
             this._birthDateLabel.Text = "Date of Birth (From Lab Result)";
             // 
             // _patientRecordNum
@@ -597,7 +598,7 @@
             this._patientRecordNum.Name = "_patientRecordNum";
             this._patientRecordNum.ParentDataEntryControl = this._patientInfoGroupBox;
             this._patientRecordNum.Size = new System.Drawing.Size(199, 20);
-            this._patientRecordNum.TabIndex = 4;
+            this._patientRecordNum.TabIndex = 9;
             this._patientRecordNum.ValidationErrorMessage = "Invalid medical record number";
             this._patientRecordNum.ValidationPattern = "(?i)^[MZ]?\\d+\\s?$";
             // 
@@ -608,7 +609,7 @@
             this._patientMRLabel.Location = new System.Drawing.Point(471, 150);
             this._patientMRLabel.Name = "_patientMRLabel";
             this._patientMRLabel.Size = new System.Drawing.Size(92, 13);
-            this._patientMRLabel.TabIndex = 0;
+            this._patientMRLabel.TabIndex = 8;
             this._patientMRLabel.Text = "Medical Record #";
             // 
             // _testDetailsGroupBox
@@ -629,7 +630,7 @@
             this._testDetailsGroupBox.Location = new System.Drawing.Point(0, 852);
             this._testDetailsGroupBox.Name = "_testDetailsGroupBox";
             this._testDetailsGroupBox.Size = new System.Drawing.Size(696, 125);
-            this._testDetailsGroupBox.TabIndex = 6;
+            this._testDetailsGroupBox.TabIndex = 11;
             this._testDetailsGroupBox.TabStop = false;
             this._testDetailsGroupBox.Text = "Test Details";
             // 
@@ -641,7 +642,7 @@
             this._componentLevelStatus.Name = "_componentLevelStatus";
             this._componentLevelStatus.ParentDataEntryControl = this._testNameTextBox;
             this._componentLevelStatus.Size = new System.Drawing.Size(10, 20);
-            this._componentLevelStatus.TabIndex = 29;
+            this._componentLevelStatus.TabIndex = 10;
             this._componentLevelStatus.ValidationErrorMessage = "Invalid value";
             this._componentLevelStatus.Visible = false;
             // 
@@ -656,7 +657,7 @@
             this._testNameTextBox.Name = "_testNameTextBox";
             this._testNameTextBox.ParentDataEntryControl = this._laboratoryTestTable;
             this._testNameTextBox.Size = new System.Drawing.Size(527, 20);
-            this._testNameTextBox.TabIndex = 1;
+            this._testNameTextBox.TabIndex = 3;
             this._testNameTextBox.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
             this._testNameTextBox.ValidationErrorMessage = "Invalid value";
             this._testNameTextBox.ValidationQuery = resources.GetString("_testNameTextBox.ValidationQuery");
@@ -683,6 +684,7 @@
             this._laboratoryTestTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this._orderNumberColumn,
             this._testName,
+            this._testDisplayName,
             this._testID,
             this._testValueColumn,
             this._testUnitsColumn,
@@ -722,7 +724,7 @@
             this._componentLevelFlag.Name = "_componentLevelFlag";
             this._componentLevelFlag.ParentDataEntryControl = this._testNameTextBox;
             this._componentLevelFlag.Size = new System.Drawing.Size(10, 20);
-            this._componentLevelFlag.TabIndex = 28;
+            this._componentLevelFlag.TabIndex = 9;
             this._componentLevelFlag.ValidationErrorMessage = "Invalid value";
             this._componentLevelFlag.Visible = false;
             // 
@@ -734,7 +736,7 @@
             this._componentLevelRange.Name = "_componentLevelRange";
             this._componentLevelRange.ParentDataEntryControl = this._testNameTextBox;
             this._componentLevelRange.Size = new System.Drawing.Size(10, 20);
-            this._componentLevelRange.TabIndex = 27;
+            this._componentLevelRange.TabIndex = 8;
             this._componentLevelRange.ValidationErrorMessage = "Invalid value";
             this._componentLevelRange.Visible = false;
             // 
@@ -746,7 +748,7 @@
             this._componentLevelUnits.Name = "_componentLevelUnits";
             this._componentLevelUnits.ParentDataEntryControl = this._testNameTextBox;
             this._componentLevelUnits.Size = new System.Drawing.Size(10, 20);
-            this._componentLevelUnits.TabIndex = 26;
+            this._componentLevelUnits.TabIndex = 7;
             this._componentLevelUnits.ValidationErrorMessage = "Invalid value";
             this._componentLevelUnits.Visible = false;
             // 
@@ -758,7 +760,7 @@
             this._componentLevelValue.Name = "_componentLevelValue";
             this._componentLevelValue.ParentDataEntryControl = this._testNameTextBox;
             this._componentLevelValue.Size = new System.Drawing.Size(10, 20);
-            this._componentLevelValue.TabIndex = 25;
+            this._componentLevelValue.TabIndex = 6;
             this._componentLevelValue.ValidationErrorMessage = "Invalid value";
             this._componentLevelValue.Visible = false;
             // 
@@ -770,7 +772,7 @@
             this._resultCodeTextBox.Name = "_resultCodeTextBox";
             this._resultCodeTextBox.ParentDataEntryControl = this._testNameTextBox;
             this._resultCodeTextBox.Size = new System.Drawing.Size(113, 20);
-            this._resultCodeTextBox.TabIndex = 0;
+            this._resultCodeTextBox.TabIndex = 1;
             this._resultCodeTextBox.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
             this._resultCodeTextBox.ValidationErrorMessage = "Invalid value";
             this._resultCodeTextBox.ValidationQuery = resources.GetString("_resultCodeTextBox.ValidationQuery");
@@ -781,7 +783,7 @@
             this._testCommentLabel.Location = new System.Drawing.Point(6, 55);
             this._testCommentLabel.Name = "_testCommentLabel";
             this._testCommentLabel.Size = new System.Drawing.Size(75, 13);
-            this._testCommentLabel.TabIndex = 13;
+            this._testCommentLabel.TabIndex = 4;
             this._testCommentLabel.Text = "Test Comment";
             // 
             // _testCommentTextBox
@@ -797,7 +799,7 @@
             this._testCommentTextBox.RemoveNewLineChars = false;
             this._testCommentTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._testCommentTextBox.Size = new System.Drawing.Size(666, 47);
-            this._testCommentTextBox.TabIndex = 2;
+            this._testCommentTextBox.TabIndex = 5;
             this._testCommentTextBox.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
             this._testCommentTextBox.ValidationErrorMessage = "";
             // 
@@ -807,7 +809,7 @@
             this._operatorCommentLabel.Location = new System.Drawing.Point(6, 11);
             this._operatorCommentLabel.Name = "_operatorCommentLabel";
             this._operatorCommentLabel.Size = new System.Drawing.Size(146, 13);
-            this._operatorCommentLabel.TabIndex = 6;
+            this._operatorCommentLabel.TabIndex = 3;
             this._operatorCommentLabel.Text = "Comments (for operator\'s use)";
             // 
             // _operatorComments
@@ -822,7 +824,7 @@
             this._operatorComments.RemoveNewLineChars = false;
             this._operatorComments.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._operatorComments.Size = new System.Drawing.Size(666, 46);
-            this._operatorComments.TabIndex = 0;
+            this._operatorComments.TabIndex = 4;
             this._operatorComments.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
             this._operatorComments.ValidationErrorMessage = "Invalid value";
             // 
@@ -832,7 +834,7 @@
             this._filenameLabel.Location = new System.Drawing.Point(6, 80);
             this._filenameLabel.Name = "_filenameLabel";
             this._filenameLabel.Size = new System.Drawing.Size(65, 13);
-            this._filenameLabel.TabIndex = 8;
+            this._filenameLabel.TabIndex = 5;
             this._filenameLabel.Text = "Image name";
             // 
             // _filename
@@ -848,7 +850,7 @@
             this._filename.ReadOnly = true;
             this._filename.Size = new System.Drawing.Size(596, 20);
             this._filename.SupportsSwiping = false;
-            this._filename.TabIndex = 1;
+            this._filename.TabIndex = 6;
             this._filename.TabStop = false;
             this._filename.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._filename.ValidationErrorMessage = "";
@@ -862,7 +864,7 @@
             this._copyButton.Name = "_copyButton";
             this._copyButton.ParentDataEntryControl = null;
             this._copyButton.Size = new System.Drawing.Size(55, 23);
-            this._copyButton.TabIndex = 2;
+            this._copyButton.TabIndex = 7;
             this._copyButton.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._copyButton.Text = "Copy";
             this._copyButton.UseVisualStyleBackColor = true;
@@ -888,7 +890,7 @@
             this._orderCode.Name = "_orderCode";
             this._orderCode.ParentDataEntryControl = this._laboratoryTestTable;
             this._orderCode.Size = new System.Drawing.Size(120, 20);
-            this._orderCode.TabIndex = 1;
+            this._orderCode.TabIndex = 2;
             this._orderCode.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
             this._orderCode.ValidationErrorMessage = "Order code is not recognized.";
             this._orderCode.ValidationQuery = "<Query ValidationListType=\'ValidationListOnly\'>\r\n<SQL>SELECT Code FROM LabOrder W" +
@@ -907,7 +909,7 @@
             this._testComment.RemoveNewLineChars = false;
             this._testComment.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._testComment.Size = new System.Drawing.Size(666, 47);
-            this._testComment.TabIndex = 2;
+            this._testComment.TabIndex = 4;
             this._testComment.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._testComment.ValidationErrorMessage = "";
             // 
@@ -917,7 +919,7 @@
             this._orderCommentLabel.Location = new System.Drawing.Point(5, 247);
             this._orderCommentLabel.Name = "_orderCommentLabel";
             this._orderCommentLabel.Size = new System.Drawing.Size(80, 13);
-            this._orderCommentLabel.TabIndex = 7;
+            this._orderCommentLabel.TabIndex = 3;
             this._orderCommentLabel.Text = "Order Comment";
             // 
             // _orderCodeLabel
@@ -926,7 +928,7 @@
             this._orderCodeLabel.Location = new System.Drawing.Point(5, 203);
             this._orderCodeLabel.Name = "_orderCodeLabel";
             this._orderCodeLabel.Size = new System.Drawing.Size(61, 13);
-            this._orderCodeLabel.TabIndex = 14;
+            this._orderCodeLabel.TabIndex = 1;
             this._orderCodeLabel.Text = "Order Code";
             // 
             // _testsGroupBox
@@ -941,7 +943,7 @@
             this._testsGroupBox.Location = new System.Drawing.Point(0, 528);
             this._testsGroupBox.Name = "_testsGroupBox";
             this._testsGroupBox.Size = new System.Drawing.Size(696, 318);
-            this._testsGroupBox.TabIndex = 5;
+            this._testsGroupBox.TabIndex = 10;
             this._testsGroupBox.TabStop = false;
             this._testsGroupBox.Text = "Orders";
             // 
@@ -954,7 +956,7 @@
             this._defaultLabID.Name = "_defaultLabID";
             this._defaultLabID.Size = new System.Drawing.Size(10, 20);
             this._defaultLabID.SupportsSwiping = false;
-            this._defaultLabID.TabIndex = 10;
+            this._defaultLabID.TabIndex = 2;
             this._defaultLabID.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
             this._defaultLabID.ValidationErrorMessage = "Missing or unknown laboratory ID";
             this._defaultLabID.ValidationQuery = "";
@@ -970,7 +972,7 @@
             this._defaultLabIdentifier.Name = "_defaultLabIdentifier";
             this._defaultLabIdentifier.Size = new System.Drawing.Size(10, 20);
             this._defaultLabIdentifier.SupportsSwiping = false;
-            this._defaultLabIdentifier.TabIndex = 9;
+            this._defaultLabIdentifier.TabIndex = 1;
             this._defaultLabIdentifier.ValidationErrorMessage = "";
             this._defaultLabIdentifier.ValidationQuery = "";
             this._defaultLabIdentifier.Visible = false;
@@ -987,18 +989,30 @@
             // _testName
             // 
             this._testName.AttributeName = "Name";
-            this._testName.AutoUpdateQuery = resources.GetString("_testName.AutoUpdateQuery");
-            this._testName.FillWeight = 120F;
-            this._testName.HeaderText = "Order Name";
+            this._testName.AutoUpdateQuery = "<Query><SQL>SELECT Name FROM LabOrder WHERE Code = SUBSTRING(<Attribute>../EpicCo" +
+    "de</Attribute>,1,25)</SQL></Query>\r\n";
+            this._testName.FillWeight = 1F;
+            this._testName.HeaderText = "Official Name";
             this._testName.Name = "_testName";
-            this._testName.ValidationErrorMessage = "Order name is not recognized.";
-            this._testName.ValidationQuery = resources.GetString("_testName.ValidationQuery");
+            this._testName.ValidationErrorMessage = "";
+            this._testName.ValidationQuery = "";
+            this._testName.Visible = false;
+            // 
+            // _testDisplayName
+            // 
+            this._testDisplayName.AttributeName = "DisplayName";
+            this._testDisplayName.AutoUpdateQuery = resources.GetString("_testDisplayName.AutoUpdateQuery");
+            this._testDisplayName.FillWeight = 120F;
+            this._testDisplayName.HeaderText = "Order Name";
+            this._testDisplayName.Name = "_testDisplayName";
+            this._testDisplayName.ValidationErrorMessage = "Order name is not recognized.";
+            this._testDisplayName.ValidationQuery = resources.GetString("_testDisplayName.ValidationQuery");
             // 
             // _testID
             // 
             this._testID.AttributeName = "EpicCode";
-            this._testID.AutoUpdateQuery = "<SQL>SELECT EpicCode FROM LabOrder WHERE Name = SUBSTRING(<Attribute>../Name</Att" +
-    "ribute>,1,50)</SQL>";
+            this._testID.AutoUpdateQuery = "<SQL>SELECT Code FROM LabOrder WHERE DisplayName = SUBSTRING(<Attribute>../Displa" +
+    "yName</Attribute>,1,50)</SQL>";
             this._testID.FillWeight = 45F;
             this._testID.HeaderText = "Epic Code";
             this._testID.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.Last;
@@ -1167,6 +1181,7 @@
         private DataEntryTextBox _componentLevelValue;
         private DataEntryTableColumn _orderNumberColumn;
         private DataEntryTableColumn _testName;
+        private DataEntryTableColumn _testDisplayName;
         private DataEntryTableColumn _testID;
         private DataEntryTableColumn _testValueColumn;
         private DataEntryTableColumn _testUnitsColumn;
