@@ -2,23 +2,177 @@
 
 <HEAD>
 <TITLE>Fresno DEP Testing</TITLE>
-<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 </HEAD>
 
 <BODY>
 
-<h1> DEP Testing - Fresno </h1>
+<h1> DEP Testing - Fresno <br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
 <hr>
 
 <OL>
 	<LI><h3>DEP Layout</h3>
        	<ul>
-		<LI>TBD
+		<LI>Confirm that the DEP includes a read-only <b>Facility ID</b> edit box.
+		<li>Confirm that the DEP includes a <b>Chemical Location</b> edit box.
+		<li>Confirm that the DEP includes a <b>Chemical Name</b> edit box.
+		<li>Confirm that the DEP includes a <b>Common Name</b> edit box.
+		<li>Confirm that the DEP includes a <b>CAS Number</b> edit box.
+		<li>Confirm that the DEP includes a <b>Location Confidential EPCRA</b> drop-down 
+		combo box with the following options.
+		<ul>
+			<li>&lt;blank&gt;
+			<li>No
+			<li>Yes
+		</ul>
+		<li>Confirm that the DEP includes a <b>Map Number</b> edit box.
+		<li>Confirm that the DEP includes a <b>Grid Number</b> edit box.
+		<li>Confirm that the DEP includes a <b>Trade Secret EPCRA</b> drop-down 
+		combo box with the following options.
+		<ul>
+			<li>&lt;blank&gt;
+			<li>No
+			<li>Yes
+		</ul>
+		<li>Confirm that the DEP includes a <b>Extemely Hazardous Substance (EHS)</b> 
+		drop-down combo box with the following options.
+		<ul>
+			<li>&lt;blank&gt;
+			<li>No
+			<li>Yes
+		</ul>
+		<li>Confirm that the DEP includes a <b>Hazardous Material Type</b> drop-down 
+		combo box with the following options.
+		<ul>
+			<li>&lt;blank&gt;
+			<li>a.Pure
+			<li>b.Mixture
+			<li>c.Waste
+		</ul>
+		<li>Confirm that the DEP includes a <b>Radioactive</b> drop-down 
+		combo box with the following options.
+		<ul>
+			<li>&lt;blank&gt;
+			<li>No
+			<li>Yes
+		</ul>
+		<li>Confirm that the DEP includes a <b>Curies</b> edit box.
+		<li>Confirm that the DEP includes a <b>Physical State</b> drop-down 
+		combo box with the following options.
+		<ul>
+			<li>&lt;blank&gt;
+			<li>a.Solid
+			<li>b.Liquid
+			<li>c.Gas
+		</ul>
+		<li>Confirm that the DEP includes a <b>Largest Container</b> edit box.
+		<li>Confirm that the DEP includes a <b>Federal Hazard Categories</b> group box 
+		containing the following checkboxes.
+		<ul>
+			<li>Fire
+			<li>Reactive
+			<li>Pressure Release
+			<li>Acute Health
+			<li>Chronic Health
+		</ul>
+		<li>Confirm that the DEP includes an <b>Average Daily Amount</b> edit box.
+		<li>Confirm that the DEP includes a <b>Maximum Daily</b> edit box.
+		<li>Confirm that the DEP includes an <b>Annual Waste Amount</b> edit box.
+		<li>Confirm that the DEP includes a <b>State Waste Code</b> edit box.
+		<li>Confirm that the DEP includes a <b>Units</b> drop-down combo box with the 
+		following options available.
+		<ul>
+			<li>&lt;blank&gt;
+			<li>a.Gallons
+			<li>b.Cubic Feet
+			<li>c.Pounds
+			<li>d.Tons
+		</ul>
+		<li>Confirm that the DEP includes a <b>Days on Site</b> edit box.
+		<li>Confirm that the DEP includes a <b>Storage Container</b> group box 
+		containing the following checkboxes.
+		<ul>
+			<li>Above Ground Tank
+			<li>Plastic/Nonmetallic Drum
+			<li>Underground Tank
+			<li>Can
+			<li>Tank Inside Building
+			<li>Carboy
+			<li>Steel Drum
+			<li>Silo
+			<li>Fiber Drum
+			<li>Glass Bottle
+			<li>Bag
+			<li>Plastic Bottle
+			<li>Box
+			<li>Tote Bin
+			<li>Cylinder
+			<li>Tank Wagon
+			<li>Rail Car
+			<li>Confirm that the group box also contains an <b>Other</b> checkbox 
+			with an associated edit box.
+		</ul>
+		<li>Confirm that the DEP includes a <b>Storage Pressure</b> drop-down combo box 
+		with the following options available.
+		<ul>
+			<li>&lt;blank&gt;
+			<li>a.Ambient
+			<li>b.Above Ambient
+			<li>c.Below Ambient
+		</ul>
+		<li>Confirm that the DEP includes a <b>Storage Temperature</b> drop-down combo box 
+		with the following options available.
+		<ul>
+			<li>&lt;blank&gt;
+			<li>a.Ambient
+			<li>b.Above Ambient
+			<li>c.Below Ambient
+			<li>d.Cryogenic
+		</ul>
+		<li>Confirm that the DEP includes a multiple row table containing the following 
+		column headings.
+		<ul>
+			<li>Weight %
+			<li>Hazardous Component
+			<li>EHS
+			<li>CAS #
+		</ul>
+       	</ul>
+<p>
+	<li><h3>Validation</h3></li>
+	<UL>
+		<li>Confirm that the following fields display a red error icon if no data is provided.
+		<ul>
+			<li>Chemical Location
+			<li>Chemical Name
+			<li>Common Name
+			<li>Largest Container
+			<li>Average Daily Amount
+			<li>Maximum Daily
+		</ul>
+		<li>Confirm that the following fields display a red error icon if the provided value 
+		is not one of the available options.
+		<ul>
+			<li>Location Confidential EPCRA
+			<li>Trade Secret EPCRA
+			<li>Extremely Hazardous Substance (EHS)
+			<li>Hazardous Material Type
+			<li>Radioactive
+			<li>Physical State
+			<li>Units
+			<li>Storage Pressure
+			<li>Storage Temperature
+		</ul>
+		<li>Confirm that valid entries for the <b>Curies</b> edit box include: decimal digits 
+		or <b>n/a</b>.
+		<li>Confirm that valid entries for the <b>Weight %</b> column include: decimal digits.
        	</ul>
 <p>
 	<li><h3>Auto-Update Queries</h3></li>
 	<UL>
-		<li>TBD
+		<li><b>N/A</b>
        	</ul>
 <p>
 	<LI><h3>Miscellaneous</h3>
