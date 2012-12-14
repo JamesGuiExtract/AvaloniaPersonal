@@ -109,6 +109,9 @@ ID Shield for Laserfiche,0
 -    Desktop Redaction (includes verification),$LaserficheDesktop
 -    Server Redaction (includes desktop redaction),$LaserficheServer
 
+NetDMS Integration
+-    NetDMS Components,6110
+
 // Remove the IcoMap lines when placing this file in the license generator folder
 IcoMap for ArcGIS,0
 -    IcoMap 4.2,$IcoMapForArcGIS
