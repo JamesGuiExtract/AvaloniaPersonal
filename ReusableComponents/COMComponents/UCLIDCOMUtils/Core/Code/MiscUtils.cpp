@@ -1019,7 +1019,7 @@ STDMETHODIMP CMiscUtils::GetExpandedTags(BSTR bstrString, BSTR bstrSourceDocName
 		// Expand the tag functions
 		TextFunctionExpander tfe;
 		string strExpanded =
-			tfe.expandFunctions(strString, getThisAsCOMPtr(), bstrSourceDocName); 
+			tfe.expandFunctions(strString, getThisAsCOMPtr(), bstrSourceDocName, __nullptr); 
 
 		// Return the result
 		*pbstrExpanded = _bstr_t(strExpanded.c_str()).Detach();
@@ -1145,7 +1145,8 @@ STDMETHODIMP CMiscUtils::GetAllTags(IVariantVector** ppTags)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35204");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CMiscUtils::ExpandTags(BSTR bstrInput, LPVOID pData, BSTR* pbstrOutput)
+STDMETHODIMP CMiscUtils::ExpandTags(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData,
+	BSTR* pbstrOutput)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -1157,7 +1158,7 @@ STDMETHODIMP CMiscUtils::ExpandTags(BSTR bstrInput, LPVOID pData, BSTR* pbstrOut
 		validateLicense();
 
 		string strInput = asString(bstrInput);
-		string strSourceDocName = asString((BSTR)pData);
+		string strSourceDocName = asString(bstrSourceDocName);
 
 		// Check if the source document name tag was found
 		bool bSourceDocNameTagFound = strInput.find(strSOURCE_DOC_NAME_TAG) != string::npos;
@@ -1190,7 +1191,8 @@ STDMETHODIMP CMiscUtils::ExpandTags(BSTR bstrInput, LPVOID pData, BSTR* pbstrOut
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35206");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CMiscUtils::ExpandTagsAndFunctions(BSTR bstrInput, LPVOID pData, BSTR* pbstrOutput)
+STDMETHODIMP CMiscUtils::ExpandTagsAndFunctions(BSTR bstrInput, BSTR bstrSourceDocName,
+	IUnknown *pData, BSTR* pbstrOutput)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -1208,7 +1210,7 @@ STDMETHODIMP CMiscUtils::ExpandTagsAndFunctions(BSTR bstrInput, LPVOID pData, BS
 
 		// Get the available expansion functions
 		TextFunctionExpander tfe;
-		string strOutput = tfe.expandFunctions(strInput, ipTagUtility, pData);
+		string strOutput = tfe.expandFunctions(strInput, ipTagUtility, bstrSourceDocName, pData);
 
 		// Return the result
 		*pbstrOutput = _bstr_t(strOutput.c_str()).Detach();
@@ -1219,7 +1221,7 @@ STDMETHODIMP CMiscUtils::ExpandTagsAndFunctions(BSTR bstrInput, LPVOID pData, BS
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::ExpandTagsAndFunctions(BSTR bstrInput,
-	ITagUtility *pTagUtility, LPVOID pData, BSTR* pbstrOutput)
+	ITagUtility *pTagUtility, BSTR bstrSourceDocName, IUnknown *pData, BSTR* pbstrOutput)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -1238,10 +1240,10 @@ STDMETHODIMP CMiscUtils::ExpandTagsAndFunctions(BSTR bstrInput,
 
 		// Get the available expansion functions
 		TextFunctionExpander tfe;
-		string strOutput = tfe.expandFunctions(strInput, ipTagUtility, pData);
+		string strOutput = tfe.expandFunctions(strInput, ipTagUtility, bstrSourceDocName, pData);
 
 		// Expand any tags that were not nested within functions.
-		strOutput = asString(ipTagUtility->ExpandTags(strOutput.c_str(), pData));
+		strOutput = asString(ipTagUtility->ExpandTags(strOutput.c_str(), bstrSourceDocName, pData));
 
 		// Return the result
 		*pbstrOutput = _bstr_t(strOutput.c_str()).Detach();

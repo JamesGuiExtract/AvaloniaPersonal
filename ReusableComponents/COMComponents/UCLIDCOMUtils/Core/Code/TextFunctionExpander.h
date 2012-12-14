@@ -27,7 +27,7 @@ public:
 	//			All arguments must be valid for their function
 	// PROMISE: 
 	const string expandFunctions(const string& str,
-		UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility, LPVOID pData) const;
+		UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility, BSTR bstrSourceDocName, IUnknown *pData) const;
 
 	// PURPOSE: Returns the position of the next path tag function in str to expand starting at or
 	//			following ulSearchPos.

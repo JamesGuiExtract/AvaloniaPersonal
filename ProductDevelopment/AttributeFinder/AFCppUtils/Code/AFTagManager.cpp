@@ -25,7 +25,8 @@ const std::string AFTagManager::expandTagsAndFunctions(const std::string& strTex
 	ASSERT_RESOURCE_ALLOCATION("ELI35162", ipTagExpander != __nullptr);
 
 	// Expand tags and functions in strText
-	string strOut = asString(ipTagExpander->ExpandTagsAndFunctions(get_bstr_t(strText), ipAFDoc));
+	string strOut =
+		asString(ipTagExpander->ExpandTagsAndFunctions(get_bstr_t(strText), "", ipAFDoc));
 
 	return strOut;
 }

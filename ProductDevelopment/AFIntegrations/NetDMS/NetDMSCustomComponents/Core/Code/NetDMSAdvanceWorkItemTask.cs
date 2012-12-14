@@ -50,10 +50,12 @@ namespace Extract.NetDMSCustomComponents
         /// <summary>
         /// The license id to validate in licensing calls
         /// </summary>
-        // [FlexIDSIntegrations:331]
-        // Prior to the 9.1 release, this ID should be changed to NetdmsComponents;
-        //const LicenseIdName _LICENSE_ID = LicenseIdName.NetdmsComponents;
         const LicenseIdName _LICENSE_ID = LicenseIdName.FileActionManagerObjects;
+
+        /// <summary>
+        /// The license id to validate in licensing calls
+        /// </summary>
+        const LicenseIdName _LICENSE_ID2 = LicenseIdName.NetdmsComponents;
 
         #endregion Constants
 
@@ -118,6 +120,7 @@ namespace Extract.NetDMSCustomComponents
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI34856", _COMPONENT_DESCRIPTION);
+                LicenseUtilities.ValidateLicense(_LICENSE_ID2, "ELI35309", _COMPONENT_DESCRIPTION);
 
                 // Make a clone to update settings and only copy if ok
                 NetDMSAdvanceWorkItemTask cloneOfThis = (NetDMSAdvanceWorkItemTask)Clone();
@@ -283,6 +286,7 @@ namespace Extract.NetDMSCustomComponents
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI34861", _COMPONENT_DESCRIPTION);
+                LicenseUtilities.ValidateLicense(_LICENSE_ID2, "ELI35310", _COMPONENT_DESCRIPTION);
 
                 Connect();
             }
@@ -315,6 +319,7 @@ namespace Extract.NetDMSCustomComponents
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI34863", _COMPONENT_DESCRIPTION);
+                LicenseUtilities.ValidateLicense(_LICENSE_ID2, "ELI35311", _COMPONENT_DESCRIPTION);
 
                 IDocument document = GetCorrespondingDocument(pFileRecord.Name);
 
@@ -352,7 +357,8 @@ namespace Extract.NetDMSCustomComponents
         {
             try
             {
-                return LicenseUtilities.IsLicensed(_LICENSE_ID);
+                return LicenseUtilities.IsLicensed(_LICENSE_ID)
+                       && LicenseUtilities.IsLicensed(_LICENSE_ID2);
             }
             catch (Exception ex)
             {

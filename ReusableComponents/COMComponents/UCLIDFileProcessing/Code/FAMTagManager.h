@@ -48,8 +48,8 @@ public:
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 
 // ITagUtility
-	STDMETHOD(raw_ExpandTags)(BSTR bstrInput, LPVOID pData, BSTR *pbstrOutput);
-	STDMETHOD(raw_ExpandTagsAndFunctions)(BSTR bstrInput, LPVOID pData, BSTR *pbstrOutput);
+	STDMETHOD(raw_ExpandTags)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, BSTR *pbstrOutput);
+	STDMETHOD(raw_ExpandTagsAndFunctions)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, BSTR *pbstrOutput);
 	STDMETHOD(raw_GetBuiltInTags)(IVariantVector* *ppTags);
 	STDMETHOD(raw_GetINIFileTags)(IVariantVector* *ppTags);
 	STDMETHOD(raw_GetAllTags)(IVariantVector* *ppTags);

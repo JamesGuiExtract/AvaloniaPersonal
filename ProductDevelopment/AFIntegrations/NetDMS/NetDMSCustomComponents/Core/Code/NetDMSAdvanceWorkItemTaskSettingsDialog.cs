@@ -35,6 +35,8 @@ namespace Extract.NetDMSCustomComponents
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects, "ELI34880",
                     _OBJECT_NAME);
+                LicenseUtilities.ValidateLicense(LicenseIdName.NetdmsComponents, "ELI35312",
+                    _OBJECT_NAME);
 
                 Settings = settings;
 

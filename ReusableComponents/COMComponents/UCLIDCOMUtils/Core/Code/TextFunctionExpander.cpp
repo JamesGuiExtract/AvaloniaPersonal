@@ -155,7 +155,7 @@ TextFunctionExpander::TextFunctionExpander()
 }
 //-------------------------------------------------------------------------------------------------
 const string TextFunctionExpander::expandFunctions(const string& str,
-	UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility, LPVOID pData) const
+	UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility, BSTR bstrSourceDocName, IUnknown *pData) const
 {
 	try
 	{
@@ -220,7 +220,7 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 					? string::npos
 					: ulSectionEnd - ulSearchPos);
 				strNextSection =
-					asString(ipTagUtility->ExpandTags(get_bstr_t(strNextSection), pData));
+					asString(ipTagUtility->ExpandTags(get_bstr_t(strNextSection), bstrSourceDocName, pData));
 				currentScope.strResult += strNextSection;
 			}
 

@@ -65,14 +65,15 @@ namespace Extract.Utilities
 
         /// <summary>
         /// Expands path tags in <see paramref="bstrInput"/> using the supplied data in
-        /// <see paramref="pData"/>.
+        /// <see cref="bstrSourceDocName"/> and <see paramref="pData"/>.
         /// </summary>
         /// <param name="bstrInput">The text to expand.</param>
-        /// <param name="pData">The data needed to expand the path tags.
+        /// <param name="bstrSourceDocName">The current source document name.</param>
+        /// <param name="pData">Additional data needed to expand the path tags (if needed).
         /// <para><b>Note:</b></para>
         /// The type of pData is specific to implementing class.</param>
         /// <returns>The expanded text.</returns>
-        public string ExpandTags(string bstrInput, IntPtr pData)
+        public string ExpandTags(string bstrInput, string bstrSourceDocName, object pData)
         {
             try
             {
@@ -106,15 +107,16 @@ namespace Extract.Utilities
         /// in <see paramref="pData"/>.
         /// </summary>
         /// <param name="bstrInput">The text to expand.</param>
+        /// <param name="bstrSourceDocName">The current source document name.</param>
         /// <param name="pData">The data needed to expand the path tags.
         /// <para><b>Note:</b></para>
         /// The type of pData is specific to implementing class.</param>
         /// <returns>The expanded text.</returns>
-        public string ExpandTagsAndFunctions(string bstrInput, IntPtr pData)
+        public string ExpandTagsAndFunctions(string bstrInput, string bstrSourceDocName, object pData)
         {
             try
             {
-                string output = _utility.ExpandTagsAndFunctions(bstrInput, this, pData);
+                string output = _utility.ExpandTagsAndFunctions(bstrInput, this, bstrSourceDocName, pData);
 
                 // Expand _delayedExpansionCustomTags tags last so the custom tag expansion method
                 // knows what the rest of the expanded path is. (excluding the expansion of custom tags)
@@ -286,7 +288,7 @@ namespace Extract.Utilities
             {
                 // Don't need to pass any data to expand tags since all tags will be expanded by
                 // this class.
-                string result = _utility.ExpandTagsAndFunctions(path, this, IntPtr.Zero);
+                string result = _utility.ExpandTagsAndFunctions(path, this, "", null);
 
                 // Expand _delayedExpansionCustomTags tags last so the custom tag expansion method
                 // knows what the rest of the expanded path is. (excluding the expansion of custom tags)

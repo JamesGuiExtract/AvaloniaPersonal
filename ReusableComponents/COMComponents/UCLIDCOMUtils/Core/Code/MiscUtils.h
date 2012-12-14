@@ -39,8 +39,8 @@ public:
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 
 // ITagUtility
-	STDMETHOD(ExpandTags)(BSTR bstrInput, LPVOID pData, BSTR* pbstrOutput);
-	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, LPVOID pData, BSTR* pbstrOutput);
+	STDMETHOD(ExpandTags)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, BSTR* pbstrOutput);
+	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, BSTR* pbstrOutput);
 	STDMETHOD(GetBuiltInTags)(IVariantVector** ppTags);
 	STDMETHOD(GetINIFileTags)(IVariantVector** ppTags);
 	STDMETHOD(GetAllTags)(IVariantVector** ppTags);
@@ -100,8 +100,8 @@ public:
 	STDMETHOD(GetObjectFromStringizedByteStream)(BSTR bstrByteStream, IUnknown** ppObject);
 
 	STDMETHOD(GetExpandedTags)(BSTR bstrString, BSTR bstrSourceDocName, BSTR* pbstrExpanded);
-	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, ITagUtility *pTagUtility, LPVOID pData,
-		BSTR* pbstrOutput);
+	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, ITagUtility *pTagUtility,
+		BSTR bstrSourceDocName, IUnknown *pData, BSTR* pbstrOutput);
 
 	// PROMISE:	Determines whether the specified object supports configuration either via
 	//			ISpecifyPropertyPages or IConfigurableObject

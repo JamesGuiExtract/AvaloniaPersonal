@@ -25,7 +25,7 @@ const string CFileProcessorsUtils::ExpandTagsAndTFE(IFAMTagManager *pFAMTM, cons
 	ASSERT_RESOURCE_ALLOCATION("ELI35245", ipFAMTagUtility != __nullptr);
 
 	string strExpandedFile = asString(
-		ipFAMTagUtility->ExpandTagsAndFunctions(strFile.c_str(), _bstr_t(strSourceDocName.c_str()).GetBSTR()));
+		ipFAMTagUtility->ExpandTagsAndFunctions(strFile.c_str(), _bstr_t(strSourceDocName.c_str()).GetBSTR(), __nullptr));
 
 	return strExpandedFile;
 }

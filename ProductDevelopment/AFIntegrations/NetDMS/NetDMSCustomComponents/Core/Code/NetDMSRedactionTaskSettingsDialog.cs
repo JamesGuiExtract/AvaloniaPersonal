@@ -35,6 +35,8 @@ namespace Extract.NetDMSCustomComponents
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects,
                     "ELI34869", _OBJECT_NAME);
+                LicenseUtilities.ValidateLicense(LicenseIdName.NetdmsComponents,
+                    "ELI35313", _OBJECT_NAME);
 
                 Settings = settings;
 

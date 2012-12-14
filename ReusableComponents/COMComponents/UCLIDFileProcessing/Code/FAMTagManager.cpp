@@ -86,7 +86,8 @@ STDMETHODIMP CFAMTagManager::put_FPSFileDir(BSTR strFPSDir)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14384");
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFAMTagManager::raw_ExpandTags(BSTR bstrInput, LPVOID pData, BSTR *pbstrOutput)
+STDMETHODIMP CFAMTagManager::raw_ExpandTags(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData,
+											BSTR *pbstrOutput)
 {
 	try
 	{
@@ -95,10 +96,10 @@ STDMETHODIMP CFAMTagManager::raw_ExpandTags(BSTR bstrInput, LPVOID pData, BSTR *
 		// Check license
 		validateLicense();
 
-		// The code is used to expand tags, currently it support <SourceDocName> 
+		// The code is used to expand tags, currently it supports <SourceDocName> 
 		// and <FPSFile>
 		std::string strInput = asString(bstrInput);
-		std::string strSourceDocName = asString((BSTR)pData);
+		std::string strSourceDocName = asString(bstrSourceDocName);
 
 		expandTags(strInput, strSourceDocName);
 
@@ -132,8 +133,8 @@ STDMETHODIMP CFAMTagManager::ExpandTags(BSTR bstrInput, BSTR bstrSourceName, BST
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14389");
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFAMTagManager::raw_ExpandTagsAndFunctions(BSTR bstrInput, LPVOID pData,
-	BSTR *pbstrOutput)
+STDMETHODIMP CFAMTagManager::raw_ExpandTagsAndFunctions(BSTR bstrInput, BSTR bstrSourceDocName,
+														IUnknown *pData, BSTR *pbstrOutput)
 {
 	try
 	{
@@ -146,7 +147,7 @@ STDMETHODIMP CFAMTagManager::raw_ExpandTagsAndFunctions(BSTR bstrInput, LPVOID p
 		ASSERT_RESOURCE_ALLOCATION("ELI35228", ipThis != __nullptr);
 
 		_bstr_t bstrOutput = m_ipMiscUtils->ExpandTagsAndFunctions(
-			bstrInput, ipThis, pData);
+			bstrInput, ipThis, bstrSourceDocName, pData);
 
 		*pbstrOutput = bstrOutput.Detach();
 
@@ -168,7 +169,7 @@ STDMETHODIMP CFAMTagManager::ExpandTagsAndFunctions(BSTR bstrInput, BSTR bstrSou
 		ASSERT_RESOURCE_ALLOCATION("ELI35231", ipThis != __nullptr);
 
 		_bstr_t bstrOutput = m_ipMiscUtils->ExpandTagsAndFunctions(
-			bstrInput, ipThis, bstrSourceName);
+			bstrInput, ipThis, bstrSourceName, __nullptr);
 
 		*pbstrOutput = bstrOutput.Detach();
 

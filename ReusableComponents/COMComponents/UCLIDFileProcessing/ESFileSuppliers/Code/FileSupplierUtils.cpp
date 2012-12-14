@@ -26,7 +26,7 @@ const std::string CFileSupplierUtils::ExpandTagsAndTFE(IFAMTagManager *pFAMTM, c
 
 	string strExpandedFile = asString(
 		ipFAMTagUtility->ExpandTagsAndFunctions(strFile.c_str(),
-			_bstr_t(strSourceDocName.c_str()).GetBSTR()));
+			_bstr_t(strSourceDocName.c_str()).GetBSTR(), __nullptr));
 
 	return strExpandedFile;
 }

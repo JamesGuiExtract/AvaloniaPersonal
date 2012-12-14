@@ -61,12 +61,10 @@ namespace Extract.NetDMSCustomComponents
         /// </summary>
         const LicenseIdName _LICENSE_ID = LicenseIdName.FlexIndexIDShieldCoreObjects;
 
-//        /// <summary>
-//        /// The second license id to validate in licensing calls
-//        /// </summary>
-//        // [FlexIDSIntegrations:331]
-//        // Prior to the 9.1 release, this ID should be uncommented and used.
-//        const LicenseIdName _LICENSE_ID = LicenseIdName.NetdmsComponents;
+        /// <summary>
+        /// The second license id to validate in licensing calls
+        /// </summary>
+        const LicenseIdName _LICENSE_ID2 = LicenseIdName.NetdmsComponents;
 
         #endregion Constants
 
@@ -188,7 +186,7 @@ namespace Extract.NetDMSCustomComponents
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI34909", _COMPONENT_DESCRIPTION);
-                //LicenseUtilities.ValidateLicense(_LICENSE_ID2, "ELI35081", _COMPONENT_DESCRIPTION);
+                LicenseUtilities.ValidateLicense(_LICENSE_ID2, "ELI35081", _COMPONENT_DESCRIPTION);
 
                 // Make a clone to update settings and only copy if ok
                 NetDMSRedactionTask cloneOfThis = (NetDMSRedactionTask)Clone();
@@ -354,7 +352,7 @@ namespace Extract.NetDMSCustomComponents
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI34915", _COMPONENT_DESCRIPTION);
-                //LicenseUtilities.ValidateLicense(_LICENSE_ID2, "ELI35082", _COMPONENT_DESCRIPTION);
+                LicenseUtilities.ValidateLicense(_LICENSE_ID2, "ELI35082", _COMPONENT_DESCRIPTION);
 
                 Connect();
             }
@@ -387,7 +385,7 @@ namespace Extract.NetDMSCustomComponents
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI34917", _COMPONENT_DESCRIPTION);
-                //LicenseUtilities.ValidateLicense(_LICENSE_ID2, "ELI35083", _COMPONENT_DESCRIPTION);
+                LicenseUtilities.ValidateLicense(_LICENSE_ID2, "ELI35083", _COMPONENT_DESCRIPTION);
 
                 IDocument document = GetCorrespondingDocument(pFileRecord.Name);
 
@@ -426,7 +424,7 @@ namespace Extract.NetDMSCustomComponents
             try
             {
                 return LicenseUtilities.IsLicensed(_LICENSE_ID)
-                    /*&& LicenseUtilities.IsLicensed(_LICENSE_ID2)*/;
+                       && LicenseUtilities.IsLicensed(_LICENSE_ID2);
             }
             catch (Exception ex)
             {
@@ -585,10 +583,7 @@ namespace Extract.NetDMSCustomComponents
 
             try
             {
-                // [FlexIDSIntegrations:330]
-                // Should be: string voaFileName = pFAMTM.ExpandTagsAndFunctions(DataFileName, pFileRecord.Name);
-                // Make it that for the next release.
-                string voaFileName = pFAMTM.ExpandTags(DataFileName, pFileRecord.Name);
+                string voaFileName = pFAMTM.ExpandTagsAndFunctions(DataFileName, pFileRecord.Name);
 
                 foreach (RedactionArea redactionArea in
                     _netDMSMethods.GetDocumentRedactionAreas(pFileRecord.Name, voaFileName))

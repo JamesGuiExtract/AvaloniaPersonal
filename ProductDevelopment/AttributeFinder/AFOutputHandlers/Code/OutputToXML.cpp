@@ -776,7 +776,7 @@ string COutputToXML::expandFileName(IAFDocumentPtr ipDoc)
 			_bstr_t bstrSourceDoc = ipString->SourceDocName;
 			
 			strFileName = asString(ipTagUtility->ExpandTagsAndFunctions(
-				m_strFileName.c_str(), bstrSourceDoc.Detach()));
+				m_strFileName.c_str(), bstrSourceDoc.Detach(), __nullptr));
 		}
 		else
 		{
@@ -784,7 +784,7 @@ string COutputToXML::expandFileName(IAFDocumentPtr ipDoc)
 			ASSERT_RESOURCE_ALLOCATION("ELI26301", ipTagUtility != __nullptr);
 
 			strFileName = asString(ipTagUtility->ExpandTagsAndFunctions(
-				m_strFileName.c_str(), ipDoc));
+				m_strFileName.c_str(), "", ipDoc));
 		}
 
 		return strFileName;

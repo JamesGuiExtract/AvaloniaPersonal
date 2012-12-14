@@ -40,7 +40,7 @@ const string CFileProcessingUtils::ExpandTagsAndTFE(UCLID_FILEPROCESSINGLib::IFA
 	// Pass the file name with the tags(strFile) and the source doc name(strSourceDocName) as parameters to Expandtags
 	// If file name contains <SourceDocName>, ExpandTags() will use strSourceDocName to expand it [P13: 3901]
 	_bstr_t bstrFile = ipMiscUtils->ExpandTagsAndFunctions(_bstr_t(strFile.c_str()), ipTag,
-		_bstr_t(strSourceDocName.c_str()).Detach());
+		_bstr_t(strSourceDocName.c_str()).Detach(), __nullptr);
 	string strExpandedFile = asString(bstrFile);
 
 	return strExpandedFile;

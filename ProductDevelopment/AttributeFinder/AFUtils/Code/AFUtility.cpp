@@ -368,7 +368,8 @@ STDMETHODIMP CAFUtility::GetAttributesAsString(IIUnknownVector *pAttributes, BST
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFUtility::raw_ExpandTags(BSTR strInput, LPVOID pData, BSTR *pstrOutput)
+STDMETHODIMP CAFUtility::raw_ExpandTags(BSTR strInput, BSTR bstrSourceDocName, IUnknown *pData,
+	BSTR *pstrOutput)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -377,7 +378,7 @@ STDMETHODIMP CAFUtility::raw_ExpandTags(BSTR strInput, LPVOID pData, BSTR *pstrO
 		validateLicense();
 
 		// get the document as a smart pointer
-		IAFDocumentPtr ipDoc((IAFDocument *)pData);
+		IAFDocumentPtr ipDoc(pData);
 		ASSERT_RESOURCE_ALLOCATION("ELI35164", ipDoc != __nullptr);
 
 		// Get the string from the input
@@ -728,7 +729,8 @@ STDMETHODIMP CAFUtility::get_ShouldCacheRSD(VARIANT_BOOL *pvbCacheRSD)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI24008");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFUtility::raw_ExpandTagsAndFunctions(BSTR bstrInput, LPVOID pData, BSTR *pbstrOutput)
+STDMETHODIMP CAFUtility::raw_ExpandTagsAndFunctions(BSTR bstrInput, BSTR bstrSourceDocName,
+	IUnknown *pData, BSTR *pbstrOutput)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -742,7 +744,7 @@ STDMETHODIMP CAFUtility::raw_ExpandTagsAndFunctions(BSTR bstrInput, LPVOID pData
 		ASSERT_RESOURCE_ALLOCATION("ELI35169", ipThis != __nullptr);
 
 		_bstr_t bstrOutput = m_ipMiscUtils->ExpandTagsAndFunctions(
-			bstrInput, ipThis, pData);
+			bstrInput, ipThis, bstrSourceDocName, pData);
 
 		*pbstrOutput = bstrOutput.Detach();
 	}
@@ -764,7 +766,7 @@ STDMETHODIMP CAFUtility::ExpandTagsAndFunctions(BSTR bstrInput, IAFDocument *pDo
 		ASSERT_RESOURCE_ALLOCATION("ELI35172", ipThis != __nullptr);
 
 		_bstr_t bstrOutput = m_ipMiscUtils->ExpandTagsAndFunctions(
-			bstrInput, ipThis, pDoc);
+			bstrInput, ipThis, "", pDoc);
 
 		*pbstrOutput = bstrOutput.Detach();
 	}
