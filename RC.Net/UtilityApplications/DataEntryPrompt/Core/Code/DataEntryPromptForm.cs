@@ -204,6 +204,13 @@ namespace Extract.DataEntryPrompt
 
                 if (!string.IsNullOrEmpty(Properties.Settings.Default.PostEntryCommandLine))
                 {
+                    if (!File.Exists(Properties.Settings.Default.PostEntryCommandLine))
+                    {
+                        var ee = new ExtractException("ELI35314", "PostEntryCommandLine target not found");
+                        ee.AddDebugData("Filename", Properties.Settings.Default.PostEntryCommandLine, false);
+                        throw ee;
+                    }
+
                     using (var process = new Process())
                     {
                         process.StartInfo = new ProcessStartInfo(
