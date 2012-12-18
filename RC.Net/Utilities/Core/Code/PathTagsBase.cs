@@ -65,7 +65,7 @@ namespace Extract.Utilities
 
         /// <summary>
         /// Expands path tags in <see paramref="bstrInput"/> using the supplied data in
-        /// <see cref="bstrSourceDocName"/> and <see paramref="pData"/>.
+        /// <see paramref="bstrSourceDocName"/> and <see paramref="pData"/>.
         /// </summary>
         /// <param name="bstrInput">The text to expand.</param>
         /// <param name="bstrSourceDocName">The current source document name.</param>
