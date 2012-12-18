@@ -2635,7 +2635,6 @@ STDMETHODIMP CFileProcessingDB::put_AdvancedConnectionStringProperties(BSTR newV
 	{
 		validateLicense();
 
-		string strLastValue = m_strAdvConnStrProperties;
 		m_strAdvConnStrProperties = asString(newVal);
 
 		return S_OK;

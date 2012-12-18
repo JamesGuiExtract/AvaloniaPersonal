@@ -1677,12 +1677,8 @@ void FileProcessingDlg::OnDBConfigChanged(const std::string& strServer,
 		emptyWindowsMessageQueue();
 		CWaitCursor cWait;
 
-		// Set the configuration file for the database
-		getDBPointer()->DatabaseServer = strServer.c_str();
-		getDBPointer()->DatabaseName = strDatabase.c_str();
-		getDBPointer()->AdvancedConnectionStringProperties = strAdvConnStrProperties.c_str();
-
-		// when the DB changes update the FPManager as well
+		// The connection parameters only need to be change on the FPM since the FPM will set these
+		// values of the DB.
 		// [p13 #4581 && #4580]
 		// NOTE: do this before the call to ResetDBConnection
 		//		 because ResetDBConnection will throw exception if
@@ -2408,9 +2404,12 @@ void FileProcessingDlg::loadSettingsFromManager()
 	// set the database file for the datatabase page
 	if (isPageDisplayed(kDatabasePage))
 	{
+		// While in the process of setting the connection info from the FPS file, don't allow it to
+		// flag the FileProcessingManager as dirty.
 		m_propDatabasePage.setConnectionInfo(asString(getFPM()->DatabaseServer), 
 											 asString(getFPM()->DatabaseName),
-											 asString(getFPM()->AdvancedConnectionStringProperties));
+											 asString(getFPM()->AdvancedConnectionStringProperties),
+											 false);
 	}
 
 	// If the action page is displayed refresh the data 

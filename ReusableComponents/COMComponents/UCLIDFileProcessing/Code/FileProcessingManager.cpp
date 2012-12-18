@@ -33,9 +33,6 @@ const std::string gstrSTREAM_NAME = "FileProcessingManager";
 //-------------------------------------------------------------------------------------------------
 CFileProcessingManager::CFileProcessingManager()
 : m_ipFPMDB(NULL),
-m_strPreviousDBServer(""),
-m_strPreviousDBName(""),
-m_strPreviousAdvConnStrProperties(""),
 m_isDBConnectionReady(false),
 m_nNumberOfFilesToExecute(0),
 m_bCancelling(false),
@@ -854,20 +851,12 @@ STDMETHODIMP CFileProcessingManager::put_DatabaseServer(/*[in]*/ BSTR newVal)
 	{
 		// convert the newVal to std::string
 		string strNewVal = asString(newVal);
+		string strOldVal = asString(getFPMDB()->DatabaseServer);
 
 		// check if the newVal is not blank and if it is a new server name
-		if (strNewVal != "" && strNewVal != m_strPreviousDBServer)
+		if (strNewVal != "" && strNewVal != strOldVal)
 		{
-			// as long as the last server was not blank then
-			// the server has changed, set dirty flag
-			// [p13 #4581 & #4580]
-			if (m_strPreviousDBServer != "")
-			{
-				m_bDirty = true;
-			}
-
-			// anytime server name changes, change the last server to new name
-			m_strPreviousDBServer = strNewVal;
+			m_bDirty = true;
 		}
 
 		getFPMDB()->DatabaseServer = newVal;
@@ -896,20 +885,12 @@ STDMETHODIMP CFileProcessingManager::put_DatabaseName(/*[in]*/ BSTR newVal)
 	{
 		// convert the newVal to std::string
 		string strNewVal = asString(newVal);
+		string strOldVal = asString(getFPMDB()->DatabaseServer);
 
 		// check if the newVal is not blank and if it is a new database name
-		if (strNewVal != "" && strNewVal != m_strPreviousDBName)
+		if (strNewVal != "" && strNewVal != strOldVal)
 		{
-			// as long as the last database was not blank then
-			// the database has changed, set dirty flag
-			// [p13 #4581 & #4580]
-			if (m_strPreviousDBName != "")
-			{
-				m_bDirty = true;
-			}
-
-			// anytime database name changes, change the last database to new name
-			m_strPreviousDBName = strNewVal;
+			m_bDirty = true;
 		}
 
 		getFPMDB()->DatabaseName = newVal;
@@ -1225,19 +1206,15 @@ STDMETHODIMP CFileProcessingManager::put_AdvancedConnectionStringProperties(BSTR
 		validateLicense();
 
 		string strNewVal = asString(newVal);
+		string strOldVal = asString(getFPMDB()->AdvancedConnectionStringProperties);
 
-		// check if the newVal is not blank and if it is a new database name
-		if (strNewVal != "" && strNewVal != m_strPreviousAdvConnStrProperties)
+		// check if the new advanced connection string differs from the old one.
+		if (strNewVal != strOldVal)
 		{
-			if (m_strPreviousAdvConnStrProperties != "")
-			{
-				m_bDirty = true;
-			}
+			m_bDirty = true;
 
-			m_strPreviousAdvConnStrProperties = strNewVal;
+			getFPMDB()->AdvancedConnectionStringProperties = newVal;
 		}
-
-		getFPMDB()->AdvancedConnectionStringProperties = newVal;
 
 		return S_OK;
 	}
@@ -1432,11 +1409,6 @@ void CFileProcessingManager::clear()
 
 		// reset the record manager
 		m_recordMgr.clear(true);
-
-		// clear the last server and database string
-		m_strPreviousDBServer = "";
-		m_strPreviousDBName = "";
-		m_strPreviousAdvConnStrProperties = "";
 
 		// reset the database config file
 		getFPMDB()->DatabaseServer = "";
