@@ -1116,8 +1116,8 @@ namespace Extract.SQLCDBEditor
                 TabbedDocument tabbedDocument = e.DockControl as TabbedDocument;
                 if (tabbedDocument != null)
                 {
-                    // If the activated tab does not have an item for either list, clear any
-                    // selection in both.
+                    // If the activated tab does not have an item for any list, clear any
+                    // selection in all.
                     if (e.DockControl.Controls.Count == 0)
                     {
                         _tablesListBox.ClearSelected();
@@ -1161,6 +1161,13 @@ namespace Extract.SQLCDBEditor
                             _pluginsListBox.ClearSelected();
                             _pluginsListBox.SelectedItems.Add(queryAndResultsControl);
                         }
+                    }
+                    else
+                    {
+                        // This does not yet belong to any list. Clear any selection in all lists.
+                        _tablesListBox.ClearSelected();
+                        _queriesListBox.ClearSelected();
+                        _pluginsListBox.ClearSelected();
                     }
                 }
                 else

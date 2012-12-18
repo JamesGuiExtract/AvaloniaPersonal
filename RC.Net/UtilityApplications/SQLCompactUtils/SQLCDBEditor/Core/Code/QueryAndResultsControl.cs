@@ -1365,14 +1365,51 @@ namespace Extract.SQLCDBEditor
         /// instance containing the event data.</param>
         void HandleResultsGridRowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)
         {
+            DataRow row = null;
+
+            // [DotNetRCAndUtils:865]
+            // Unlike with adds and edits which can be allowed to remain in an invalid state until
+            // corrected, deletes must be committed immediately and an error must be displayed if
+            // the delete is not valid as there is no way to flag as invalid a row that isn't there.
             try
             {
-                // If the deleted row(s) had errors, the table as a whole may now be valid. Check.
-                ValidateTableData();
+                // If this is not a table or is not loaded, don't attempt to process deletes that
+                // may be triggered by low-level refreshes of the _resultsGrid. Even after IsLoaded
+                // is true, in the process of adding this control into the editor, it can cause data
+                // refreshes that should be ignored; ActiveControl being set is an indicator that
+                // this control is loaded and is being modified by the user.
+                if (QueryAndResultsType == QueryAndResultsType.Table &&
+                    IsLoaded && ActiveControl != null)
+                {
+                    row = _resultsTable.Rows[e.RowIndex];
+                    _adapter.Update(new[] { row });
+
+                    // If the deleted row(s) had errors, the table as a whole may now be valid. Check.
+                    ValidateTableData();
+                }
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI34664");
+                try
+                {
+                    // If the deletion failed, the change needs to be undone so that the row
+                    // re-appears in the grid. Otherwise the data in the grid will not match the
+                    // underlying data.
+                    if (row != null)
+                    {
+                        row.RejectChanges();
+                    }
+
+                    ex.ExtractDisplay("ELI34664");
+                }
+                catch (Exception ex2)
+                {
+                    // If the deletion could not be undone, the data is now out of sync; we are in
+                    // a bad state.
+                    var ee = new ExtractException("ELI35315",
+                        "Error processing delete; table may not save correctly.", ex2);
+                    ee.Display();
+                }
             }
         }
 
