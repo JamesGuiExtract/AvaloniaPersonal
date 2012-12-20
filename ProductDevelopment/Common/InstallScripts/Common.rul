@@ -89,7 +89,8 @@
 	prototype UnregisterLoginNPShellExtension(STRING);   
 	prototype InstallFKB();
 	prototype UninstallFKB();
-	prototype InstallNuanceLicense();
+	prototype InstallNuanceLicense(); 
+	prototype SetNuanceServicePermissions();
 
     // your global variables
     BOOL gbInstalled;
@@ -766,4 +767,31 @@ begin
 	DeleteDir( StartMenuFolder ^ "Programs\\Nuance", ALLCONTENTS);
 		
 	SdShowMsg("Setup is Installing Nuance Licenses", FALSE);                          
+	
+	SetNuanceServicePermissions();
 end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: SetNuanceServicePermissions
+//
+//  Purpose: This runs a batch file to change the permissions on the Nuance
+// 				service
+//			 
+///////////////////////////////////////////////////////////////////////////////
+function SetNuanceServicePermissions()
+	string szRegAllCmdLine;
+begin      
+	SdShowMsg("Setup is Setting permissions for Nuance Service", TRUE);
+	szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR ^ "SetNuanceServicePermissions.bat";
+	
+	LaunchAppAndWait( szRegAllCmdLine, "/s", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+ 	
+	SdShowMsg("Setup is Setting permissions for Nuance Service", FALSE);                          
+end;
+
+function  OnRMFilesInUse (szMessage)
+begin 
+	return IDIGNORE;
+end  ;
+
