@@ -562,6 +562,28 @@ void updateConnectionStringProperties(string& rstrConnectionString, const string
 		mapSourceProperties.erase(gstrINITIAL_CATALOG);
 	}
 
+	// Determine if any properties have been add or modified in mapNewProperties vs
+	// mapSourceProperties.
+	bool bModifiedProperty = false;
+	for (auto iterNew = mapNewProperties.begin();
+		 iterNew != mapNewProperties.end(); iterNew++)
+	{
+		auto iterSource = mapSourceProperties.find(iterNew->first);
+		if (iterSource == mapSourceProperties.end() || (iterSource->second != iterNew->second))
+		{
+			bModifiedProperty = true;
+			break;
+		}
+	}
+
+	// If no property has been modified, don't re-generate the connection string. The properties
+	// will likely end up in a different order and make it hard for callers to determine if there
+	// has been a meaninful change to the connection string.
+	if (!bModifiedProperty)
+	{
+		return;
+	}
+
 	// Use mapNewProperties as the primary values; but fill in any values from mapSourceProperties
 	// that don't exist in mapNewProperties.
 	mapNewProperties.insert(mapSourceProperties.begin(), mapSourceProperties.end());

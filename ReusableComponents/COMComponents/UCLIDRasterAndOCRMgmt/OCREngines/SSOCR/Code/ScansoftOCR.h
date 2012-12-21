@@ -100,6 +100,7 @@ private:
 	void validateLicense();
 
 	void initOCREngineLicense(std::string strKey);
+	void resetNuanceLicensing();
 	IScansoftOCR2Ptr getOCREngine();
 	void killOCREngine();
 	void checkOCREngine();

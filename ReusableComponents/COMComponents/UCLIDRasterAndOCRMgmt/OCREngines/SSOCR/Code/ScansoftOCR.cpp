@@ -12,6 +12,7 @@
 #include <RegistryPersistenceMgr.h>
 #include <UCLIDException.h>
 #include <MiscLeadUtils.h>
+#include <MutexUtils.h>
 
 #include <memory>
 #include <string>
@@ -58,6 +59,9 @@ const char* gpszSSOCR2_VISTA_ERROR_TEXT = "SSOCR2 Module";
 
 // number of milliseconds to wait before closing the SSOCR2 error dialog
 const unsigned long gulSSOCR2_ERROR_CLOSE_WAIT = 2000;
+
+// Global mutex to ensure only one instance of 
+const string gstr_NUANCE_LICENSE_RESET_MUTEX_NAME = "Global\\64EAE541-363A-481B-B51D-B1DDAB52AEB8";
 
 //-------------------------------------------------------------------------------------------------
 // CScansoftOCR
@@ -440,6 +444,67 @@ void CScansoftOCR::initOCREngineLicense(string strKey)
 	ipPLComponent->InitPrivateLicense(strKey.c_str());
 }
 //-------------------------------------------------------------------------------------------------
+void CScansoftOCR::resetNuanceLicensing()
+{
+	try
+	{
+		// Since this will stop and restart the Nuance licensing service, ensure that only one
+		// instance of this method is running at once on this machine.
+		unique_ptr<CMutex> pMutex;
+		pMutex.reset(getGlobalNamedMutex(gstr_NUANCE_LICENSE_RESET_MUTEX_NAME));
+		ASSERT_RESOURCE_ALLOCATION("ELI35319", pMutex.get() != __nullptr);
+		CSingleLock lock(pMutex.get(), TRUE);
+
+		// Before attempting to reset, make sure other instance of resetNuanceLicensing didn't
+		// already correct the situation. Otherwise, this would shutdown the licensing service for
+		// the first thread after it had already repaired it.
+		m_ipOCREngine.CreateInstance(CLSID_ScansoftOCR2);
+		if (m_ipOCREngine != __nullptr)
+		{
+			return;
+		}
+
+		UCLIDException("ELI35316", "Application trace: Failed to initialize OCR engine; "
+			"attempting reset of Nuance licensing.").log();
+
+		string strCommonComponents = getModuleDirectory("BaseUtils.dll");
+		string strParams = "/C \"" + strCommonComponents + "\\RepairNuanceLicensing.bat\" nopause";
+
+		SHELLEXECUTEINFO shellExecInfo = {0};
+		shellExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+		shellExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+		shellExecInfo.hwnd = __nullptr;
+		shellExecInfo.lpVerb = "open";
+		shellExecInfo.lpFile = "cmd.exe";		
+		shellExecInfo.lpParameters = strParams.c_str();	
+		shellExecInfo.lpDirectory = strCommonComponents.c_str();
+		shellExecInfo.nShow = SW_HIDE;
+		shellExecInfo.hInstApp = __nullptr;	
+
+		if (!asCppBool(ShellExecuteEx(&shellExecInfo)))
+		{
+			UCLIDException ue("ELI35320", "Nuance license repair utility failed.");
+			ue.addDebugInfo("Return code", (int)shellExecInfo.hInstApp);
+			throw ue;
+		}
+
+		if (WaitForSingleObject(shellExecInfo.hProcess, 20000) != 0)
+		{
+			UCLIDException ue("ELI35321", "Nuance license repair utility timeout.");
+			throw ue;
+		}
+
+		// Make sure the licenses have had a chance to initialize before continuing.
+		Sleep(2000);
+
+		m_ipOCREngine.CreateInstance(CLSID_ScansoftOCR2);
+		ASSERT_RESOURCE_ALLOCATION("ELI35317", m_ipOCREngine != __nullptr);
+
+		UCLIDException("ELI35318", "Application trace: Nuance licensing reset successful.").log();
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35322");
+}
+//-------------------------------------------------------------------------------------------------
 IScansoftOCR2Ptr CScansoftOCR::getOCREngine()
 {
 	// if the maximum number of image recognitions per OCR engine instance
@@ -454,7 +519,12 @@ IScansoftOCR2Ptr CScansoftOCR::getOCREngine()
 	if (m_ipOCREngine == __nullptr)
 	{
 		m_ipOCREngine.CreateInstance(CLSID_ScansoftOCR2);
-		ASSERT_RESOURCE_ALLOCATION("ELI11088", m_ipOCREngine != __nullptr);
+
+		if (m_ipOCREngine == __nullptr)
+		{
+			// Will re-attempt instantiating m_ipOCREngine as well.
+			resetNuanceLicensing();
+		}
 
 		m_pid = m_ipOCREngine->GetPID();
 

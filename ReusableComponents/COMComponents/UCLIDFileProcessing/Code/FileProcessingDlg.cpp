@@ -2404,12 +2404,9 @@ void FileProcessingDlg::loadSettingsFromManager()
 	// set the database file for the datatabase page
 	if (isPageDisplayed(kDatabasePage))
 	{
-		// While in the process of setting the connection info from the FPS file, don't allow it to
-		// flag the FileProcessingManager as dirty.
 		m_propDatabasePage.setConnectionInfo(asString(getFPM()->DatabaseServer), 
 											 asString(getFPM()->DatabaseName),
-											 asString(getFPM()->AdvancedConnectionStringProperties),
-											 false);
+											 asString(getFPM()->AdvancedConnectionStringProperties));
 	}
 
 	// If the action page is displayed refresh the data 

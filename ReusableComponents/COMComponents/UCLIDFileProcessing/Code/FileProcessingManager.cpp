@@ -885,7 +885,7 @@ STDMETHODIMP CFileProcessingManager::put_DatabaseName(/*[in]*/ BSTR newVal)
 	{
 		// convert the newVal to std::string
 		string strNewVal = asString(newVal);
-		string strOldVal = asString(getFPMDB()->DatabaseServer);
+		string strOldVal = asString(getFPMDB()->DatabaseName);
 
 		// check if the newVal is not blank and if it is a new database name
 		if (strNewVal != "" && strNewVal != strOldVal)
