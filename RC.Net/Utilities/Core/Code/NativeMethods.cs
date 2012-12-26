@@ -654,10 +654,30 @@ namespace Extract.Utilities
             {
                 try
                 {
-                    long millisecondsUptime = GetTickCount64();
+                    TimeSpan systemUptime;
 
-                    // 100 nanoseconds * 10,000 = 1 millisecond
-                    TimeSpan systemUptime = new TimeSpan(millisecondsUptime * 10000);
+                    // [DotNetRCAndUtils:866]
+                    // GetTickCount64 is not available on XP/Server 2003
+                    if (Environment.OSVersion.Version.Major >= 6)
+                    {
+                        long millisecondsUptime = GetTickCount64();
+
+                        // 100 nanoseconds * 10,000 = 1 millisecond
+                        systemUptime = new TimeSpan(millisecondsUptime * 10000);
+                    }
+                    else
+                    {
+                        // The "System Up Time" performance counter is another way to get up time,
+                        // but not all users have permission to read them on >= Vista.
+                        using (var uptimeCounter = new PerformanceCounter("System", "System Up Time"))
+                        {
+                            // The first call to NextValue will return 0. Call an extra time first to
+                            // avoid this issue.
+                            uptimeCounter.NextValue();
+                            systemUptime = TimeSpan.FromSeconds(uptimeCounter.NextValue());
+                        }
+                    }
+
                     return systemUptime;
                 }
                 catch (Exception ex)
