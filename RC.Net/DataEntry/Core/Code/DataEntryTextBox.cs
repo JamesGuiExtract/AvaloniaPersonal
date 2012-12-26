@@ -1695,10 +1695,6 @@ namespace Extract.DataEntry
                     AutoCompleteSource = autoCompleteSource;
                     AutoCompleteCustomSource = autoCompleteList;
                 }
-                else if (base.AutoCompleteMode != AutoCompleteMode.None)
-                {
-                    base.AutoCompleteMode = AutoCompleteMode.None;
-                }
             }
             catch (Exception ex)
             {

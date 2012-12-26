@@ -1,14 +1,9 @@
-using Extract.Licensing;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlServerCe;
-using System.Globalization;
-using System.Text;
-using System.Xml;
 using UCLID_AFCORELib;
-using UCLID_COMUTILSLib;
+using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.DataEntry
 {
@@ -18,6 +13,16 @@ namespace Extract.DataEntry
     /// </summary>
     internal partial class AutoUpdateTrigger : IDisposable
     {
+        #region Constants
+
+        /// <summary>
+        /// The special query result that should cause the text of a field to be blanked out. (As
+        /// opposed to a query result of "" which will not update the field.)
+        /// </summary>
+        static readonly string _BLANK_VALUE = "[BLANK]";
+
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
@@ -364,11 +369,23 @@ namespace Extract.DataEntry
 
             if (!string.IsNullOrEmpty(stringResult) || queryResult.IsSpatial)
             {
+                bool isBlank = string.Equals(stringResult, _BLANK_VALUE,
+                    StringComparison.CurrentCultureIgnoreCase);
+
                 // Update the attribute's value.
                 if (queryResult.IsSpatial)
                 {
-                    AttributeStatusInfo.SetValue(_targetAttribute,
-                        queryResult.ToSpatialString(), false, true);
+                    SpatialString spatialString = queryResult.ToSpatialString();
+                    if (isBlank)
+                    {
+                        spatialString.ReplaceAndDowngradeToHybrid("");
+                    }
+
+                    AttributeStatusInfo.SetValue(_targetAttribute, spatialString, false, true);
+                }
+                else if (isBlank)
+                {
+                    AttributeStatusInfo.SetValue(_targetAttribute, "", false, true);
                 }
                 else
                 {
