@@ -103,8 +103,15 @@
 				the following machines</b> within the <b>Database Options</b> dialog to 
 				include the test machine.
                 		<li>Confirm that processing still does not start.
-                		<li>Configure the FAM service to run Compute.fps
-				<li>Confirm that the FPS file can be run as a service without error.
+                		<li>Configure the FAM service to run <b>Compute.fps</b>.
+				<ul>
+					<li>Confirm that the service starts without delay and without error, 
+					ignoring the <b>SleepTimeOnStart</b> setting.
+					<li>Stop the service and configure it for <b>Manual</b> start.
+					<li>Restart the machine.
+					<li>Start the service and confirm that the <b>SleepTimeOnStart</b> 
+					setting is respected.
+				</ul>
                 		<li>Stop the service and modify the database options so that authentication 
 				is not required to run.</li>
 			</ul>
