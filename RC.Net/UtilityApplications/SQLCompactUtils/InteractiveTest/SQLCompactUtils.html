@@ -220,7 +220,7 @@
 			</ul>
 		</ul>
 <p>
-        	<LI><b>Miscellaneous</b>
+        	<LI><b>OLD Miscellaneous</b>
         	<ul>
             		<li><b>[DataEntry #1123] NOT FIXED</b> Local OrderMapper Databases
             		<ul>
@@ -373,6 +373,86 @@
 				database.</li>
                 		<li>Confirm that a table with no unique key cannot be edited.</li>
             		</ul></li>
+		</ul>
+<p>
+        	<LI><b>NEW Miscellaneous</b>
+        	<ul>
+	  	   	<LI><b>[DotNet #830]</b> SQLCDBEditor - Internal Logic Error
+        		<ul>
+            			<li>Open an <b>OrderMapping</b> database.
+            			<li>Select a table.
+	            		<li>Click the <b>Copy to new query</b> button.
+        	    		<li>Save the new query.
+            			<li>Delete a row from tghe displayed results.
+            			<li>Confirm that a row is not deleted.
+	            		<li>Confirm that an <b>ELI34630 - Internal logic error</b> exception 
+				is not displayed.
+        		</ul>
+<p>
+	  	   	<LI><b>[DotNet #837]</b> SQLCDBEditor - Concurrency Error
+        		<ul>
+            			<li>Open the <b>AlternateTestName</b> table.
+            			<li>Click in the <b>TestCode</b> column of the new row and enter 
+				a code.
+       	 	   		<li>Bring another application into focus.  Position the application 
+				such that the <b>Name</b> cell of the new row is visible.
+            			<li>Click directly on the <b>Name</b> cell to bring the editor 
+				back into focus.
+        	    		<li>Click again on the cell to enter edit mode.
+            			<li>Type a name that is not already present for the code.
+            			<li>Tab back to the code cell.
+	            		<li>Confirm that the row is <b>not</b> marked invalid with a 
+				concurrency violation.
+        		</ul>
+<p>
+	  	   	<LI><b>[DotNet #838, #839]</b> SQLCDBEditor - Add Support For Plugins
+        		<ul>
+            			<li>Confirm that <b>.plugin</b> files will be displayed when stored 
+				beside a database file.
+	            		<li>Confirm that available plugins are listed in a SandDock pane 
+				similar to tables and queries.
+            			<li>Confirm that the plugin pane is displayed only if plugins are 
+				available for the database.
+	            		<li>Confirm that candidate AKAs can be reviewed and added to the 
+				<b>AlternateTestName</b> table.
+        		</ul>
+<p>
+	  	   	<LI><b>[DotNet #852, #853]</b> SQLCDBEditor
+        		<ul>
+            			<li>Open the <b>OrderMapper</b> database.
+				<li>Confirm that selecting each of the following tables is successful.
+				<ul>
+					<li>Flag
+					<li>Gender
+					<li>TypicalOrderHeading
+					<li>Unit
+				</ul>
+<p>
+				<li>Add or confirm presence of the <b>AlternateTestNameManager.plugin</b> 
+				file to the <b>Database Files</b> folder under Demo_LabDE.
+				<li>Confirm that <b>SQLCDBEditor.exe.config</b> includes 
+				<b>loadFromRemoteSources = true</b> in the <b>runtime</b> node.
+				<li>Open the <b>OrderMapper</b> database.
+				<li>Confirm that the plugin is displayed.
+        		</ul>
+<p>
+	  	   	<LI><b>[DotNet #856]</b> Confirm that the <b>SQLCDBEditor</b> window has a useful 
+			minimum size and cannot be minimized smaller than the toolbar.
+<p>
+	  	   	<LI><b>[DotNet #865]</b> SQL CDB Editor
+        		<ul>
+				<li>Copy <b>Fresno.sdf</b> from 
+				<b>I:\Common\Testing\PVCS_Testing\DotNetRCAndUtils\865</b> to a working 
+				folder and open it.
+				<li>Select all the rows in the <b>FileName</b> table and delete them.
+				<li>Select all the rows in the <b>FileNameToValue</b> table and delete them.
+				<li>Select all the rows in the <b>PreviouslyUsedFieldValue</b> table and 
+				delete them.
+				<li>Save the changed file.
+				<li>Exit <b>SQLCDBEditor.exe</b>.
+				<li>Reopen the changed file.
+            			<li>Confirm that the <b>FileName</b> table is empty.
+        		</ul>
 		</ul>
        	</ul></li>
 <p>
