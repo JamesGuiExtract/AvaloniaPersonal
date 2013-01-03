@@ -480,10 +480,10 @@ void LicenseManagement::validateLicense(unsigned long ulLicenseID, const string&
 	{
 		validateState();
 	}
-	catch(...)
+	catch(UCLIDException &ue)
 	{
 		UCLIDException extractException(strELICode, strComponentName +
-			" component is not licensed - license state is corrupt.");
+			" component is not licensed - license state is corrupt.", ue);
 		extractException.addDebugInfo("Component Name", strComponentName);
 		UCLIDException uexOuter(gstrLICENSE_CORRUPTION_ELI,
 			"License state is corrupt!", extractException);
@@ -734,23 +734,31 @@ void LicenseManagement::updateLicenseData( LMData& rData )
 //-------------------------------------------------------------------------------------------------
 void LicenseManagement::validateState()
 {
-	// If the time rollback preventer has been initialized, then check its state
-	if (m_upTrpRunning.get() != __nullptr)
+	try
 	{
-		CSingleLock (&m_lock, TRUE);
-
+		// If the time rollback preventer has been initialized, then check its state
 		if (m_upTrpRunning.get() != __nullptr)
 		{
-			// Check that both TRP is running and the valid handle is set
-			CSingleLock lRunning(m_upTrpRunning.get(), FALSE);
-			CSingleLock lValid(m_upValidState.get(), FALSE);
+			CSingleLock (&m_lock, TRUE);
 
-			if (lRunning.Lock(0) == TRUE || lValid.Lock(0) == TRUE)
+			if (m_upTrpRunning.get() != __nullptr)
 			{
-				throw UCLIDException("ELI13089", "Extract Systems license state has been corrupted!");
+				// Check that both TRP is running and the valid handle is set
+				CSingleLock lRunning(m_upTrpRunning.get(), FALSE);
+				CSingleLock lValid(m_upValidState.get(), FALSE);
+
+				if (lRunning.Lock(0) == TRUE)
+				{
+					throw UCLIDException("ELI13089", "Extract Systems license state has been corrupted!");
+				}
+				else if (lValid.Lock(0) == TRUE)
+				{
+					throw UCLIDException("ELI35323", "Extract Systems license state has been corrupted!");
+				}
 			}
 		}
 	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35324");
 }
 //-------------------------------------------------------------------------------------------------
 bool LicenseManagement::internalIsLicensed(unsigned long ulComponentID)

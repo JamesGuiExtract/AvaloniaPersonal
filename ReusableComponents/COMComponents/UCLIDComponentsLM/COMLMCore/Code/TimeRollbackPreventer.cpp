@@ -60,6 +60,9 @@ const string gstrDateTimeSubfolderFile = "\\Windows\\{EFF9AEFC-3046-48BC-84D1-E9
 // of seconds between 30 and 300
 const unsigned long gulTRP_TIMER_MIN = 30;
 const unsigned long gulTRP_TIMER_MAX = 300;
+// Allow a grace period of up to 3 * TRP timer MAX discrepancy between the two recorded times before
+// declaring the license corrupted.
+const unsigned long gulTRP_TIMER_GRACE = gulTRP_TIMER_MAX * 3;
 
 // Modulo constant for random additions to DT strings
 const unsigned long gulMODULO_CONSTANT = 53;
@@ -244,6 +247,8 @@ void TimeRollbackPreventer::checkDateTimeItems()
 		string	strRemoteData1;
 		string	strLocalData2;
 		string	strRemoteData2;
+		string strDateTimeFilePath;
+		bool bLocalSystemPath;
 		{
 			// Protect the read accesses
 			CSingleLock lg( getReadWriteMutex() );
@@ -255,7 +260,9 @@ void TimeRollbackPreventer::checkDateTimeItems()
 				throw ue;
 			}
 
-			string strDateTimeFilePath = getDateTimeFilePath();
+			strDateTimeFilePath = getDateTimeFilePath();
+			bLocalSystemPath = (strstr(strDateTimeFilePath.c_str(), "config\\systemprofile") != NULL);
+
 			strLocalData1 = getLocalDateTimeString(strDateTimeFilePath);
 			strRemoteData1 = getRemoteDateTimeString(ITEM_SECTION_NAME1, LAST_TIME_USED);
 
@@ -283,12 +290,20 @@ void TimeRollbackPreventer::checkDateTimeItems()
 		// both Date-Time values were decrypted
 		if (bLocal && bRemote)
 		{
-			// Compare decrypted times
-			if (tmLocal == tmRemote)
+			// Compare decrypted times.
+			// [LegacyRCAndUtils:6333]
+			// Compare "local" and "remote" times... but allow for some grace period in case at
+			// least one or two updates did not occur (as apparently can happen per #6333).
+			// Also, if reading from the local system security profile, we apparently have problems
+			// being able to store a consistent "local" time... so drop the requirement for tmLocal
+			// and tmRemote to correspond to each other in this case.
+			CTimeSpan tmsDiff = tmLocal - tmRemote;
+			if (bLocalSystemPath || abs(tmsDiff.GetTotalSeconds()) <= gulTRP_TIMER_GRACE)
 			{
 				// Current time must be greater than saved times
 				CTime currentTime = CTime::GetCurrentTime();
-				if (currentTime < tmLocal)
+				CTime tmComparisonTime = max(tmLocal, tmRemote);
+				if (currentTime < tmComparisonTime)
 				{
 					strELI = "ELI07444";
 					bFail = true;
@@ -367,12 +382,20 @@ void TimeRollbackPreventer::checkDateTimeItems()
 
 			if (bLocal && bRemote)
 			{
-				// Compare decrypted times
-				if (tmLocal == tmRemote)
+				// Compare decrypted times.
+				// [LegacyRCAndUtils:6333]
+				// Compare "local" and "remote" times... but allow for some grace period in case at
+				// least one or two updates did not occur (as apparently can happen per #6333).
+				// Also, if reading from the local system security profile, we apparently have problems
+				// being able to store a consistent "local" time... so drop the requirement for tmLocal
+				// and tmRemote to correspond to each other in this case.
+				CTimeSpan tmsDiff = tmLocal - tmRemote;
+				if (bLocalSystemPath || abs(tmsDiff.GetTotalSeconds()) <= gulTRP_TIMER_GRACE)
 				{
 					// Current time must be greater than saved times
 					CTime currentTime = CTime::GetCurrentTime();
-					if (currentTime < tmLocal)
+					CTime tmComparisonTime = max(tmLocal, tmRemote);
+					if (currentTime < tmComparisonTime)
 					{
 						ue.addDebugInfo("Trace", "ELI10985");
 						bFail = true;
@@ -419,6 +442,8 @@ void TimeRollbackPreventer::checkDateTimeItems()
 		// the we will invalidate the license state.
 		if (bFail)
 		{
+			ue.addDebugInfo("Path", strDateTimeFilePath, true);
+
 			// Make sure that the exception gets logged
 			ue.log();
 
@@ -991,7 +1016,7 @@ bool TimeRollbackPreventer::putLocalDateTimeString(const string& strDTFile,
 					if (!SetFileAttributes( strDTFile.c_str(), FILE_ATTRIBUTE_NORMAL ))
 					{
 						// Removing Hidden attribute failed
-						bResult = false;
+						throw UCLIDException("ELI35325", "Application trace: Attribute update failed.");
 					}
 				}
 
@@ -1009,29 +1034,30 @@ bool TimeRollbackPreventer::putLocalDateTimeString(const string& strDTFile,
 			if (!fileDT2.Open( strDTFile.c_str(), uiFlags, &e ))
 			{
 				// Open and/or creation failed
-				bResult = false;
+				throw UCLIDException("ELI35326", "Application trace: Unable to access data.");
 			}
-			else
-			{
-				// Write the string to the file
-				fileDT2.WriteString( strEncrypted.c_str() );
-				fileDT2.Close();
-				waitForFileToBeReadable(strDTFile);
 
-				// Set Hidden attribute
-				if (!SetFileAttributes( strDTFile.c_str(), FILE_ATTRIBUTE_HIDDEN ))
-				{
-					// Setting Hidden attribute failed
-					bResult = false;
-				}
+			// Write the string to the file
+			fileDT2.WriteString( strEncrypted.c_str() );
+			fileDT2.Close();
+			waitForFileToBeReadable(strDTFile);
+
+			// Set Hidden attribute
+			if (!SetFileAttributes( strDTFile.c_str(), FILE_ATTRIBUTE_HIDDEN ))
+			{
+				// Setting Hidden attribute failed
+				UCLIDException("ELI35327", "Application trace: Attribute update failed.").log();
 			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10698")
 	}
-	catch(UCLIDException ue)
+	catch(UCLIDException &ue)
 	{
+		string strMessage = ue.getTopText();
+		string strELI = ue.getTopELI();
+
 		// Make sure that the exception gets logged
-		ue.log();
+		UCLIDException(strELI, strMessage).log();
 		bResult = false;
 	}
 
@@ -1059,7 +1085,7 @@ bool TimeRollbackPreventer::putRemoteDateTimeString(const string& strPath, const
 				else
 				{
 					// Do not create the key, just return false
-					bResult = false;
+					throw UCLIDException("ELI35328", "Application trace: Key already exists.");
 				}
 			}
 			else
@@ -1070,10 +1096,13 @@ bool TimeRollbackPreventer::putRemoteDateTimeString(const string& strPath, const
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10699")
 	}
-	catch(UCLIDException ue)
+	catch(UCLIDException &ue)
 	{
+		string strMessage = ue.getTopText();
+		string strELI = ue.getTopELI();
+
 		// Make sure that the exception gets logged
-		ue.log();
+		UCLIDException(strELI, strMessage).log();
 		bResult = false;
 	}
 
@@ -1173,22 +1202,32 @@ void TimeRollbackPreventer::writeDateTime(const string& strLocal, const string& 
 	string strOutFile1 = getDateTimeFilePath();
 	string strOutFile2 = strOutFile1 + ".old";
 	
+	// NOTE: putLocalDateTimeString and putRemoteDateTimeString handle all exceptions and return
+	// false if an exception was encountered.
+	// Even if either "local" write fails, still attempt to update the remote time. The added grace
+	// between local and remote times now allows for intermittent failures... if we didn't continue
+	// to try to update the "remote" time despite the local failure, it may open up some easier
+	// paths to circumvent temporary licensing.
+
 	// Write to the backup locations
-	putLocalDateTimeString(strOutFile2, strLocal, true);
-	putRemoteDateTimeString(ITEM_SECTION_NAME2, LAST_TIME_USED,	strRemote, true);
+	bool bBackupSuccess = putLocalDateTimeString(strOutFile2, strLocal, true);
+	bBackupSuccess &= putRemoteDateTimeString(ITEM_SECTION_NAME2, LAST_TIME_USED, strRemote, true);
 
 	// Write to the new locations
-	putLocalDateTimeString(strOutFile1, strLocal, bForceCreation);
-	putRemoteDateTimeString(ITEM_SECTION_NAME1, LAST_TIME_USED,	strRemote, bForceCreation);
+	bool bSuccess = putLocalDateTimeString(strOutFile1, strLocal, bForceCreation);
+	bSuccess &= putRemoteDateTimeString(ITEM_SECTION_NAME1, LAST_TIME_USED,	strRemote, bForceCreation);
 
-	// delete the backup locations
-	try
+	// [LegacyRCAndUtils:6333]
+	// Delete the backup locations if the new locations were successfully written or the backup
+	// locations were not.
+	if (bSuccess || !bBackupSuccess)
 	{
-		deleteLocalDateTimeString(strOutFile2);
-		deleteRemoteDateTimeString(ITEM_SECTION_NAME2);
-	}
-	catch(...)
-	{
+		try
+		{
+			deleteLocalDateTimeString(strOutFile2);
+			deleteRemoteDateTimeString(ITEM_SECTION_NAME2);
+		}
+		catch(...) {}
 	}
 }
 //-------------------------------------------------------------------------------------------------
