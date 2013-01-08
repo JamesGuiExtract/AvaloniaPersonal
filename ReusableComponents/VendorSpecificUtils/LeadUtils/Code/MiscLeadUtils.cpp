@@ -4,6 +4,7 @@
 #include "ImageConversion.h"
 #include "LeadToolsBitmapFreeer.h"
 #include "LeadToolsFormatHelpers.h"
+#include "ExtractZoneAsImage.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -33,6 +34,9 @@ const string gstrLEADTOOLS_SERIALIZATION_PATH = "\\VendorSpecificUtils\\LeadUtil
 const string gstrSERIALIZATION_KEY = "Serialization"; 
 const string gstrDEFAULT_SERIALIZATION = "0"; 
 
+const string gstrSKIP_IMAGE_AREA_CONFIRMATION_KEY = "SkipImageAreaConfirmation";
+const string gstrDEFAULT_SKIP_IMAGE_AREA_CONFIRMATION = "0";
+
 // Path to the leadtools compression flag folder
 const string gstrLEADTOOLS_COMPRESSION_VALUE_FOLDER =
 	"\\VendorSpecificUtils\\LeadUtils\\CompressionFlags";
@@ -46,6 +50,10 @@ const int giDEFAULT_PDF_RESOLUTION = 300;
 
 // The maximum opacity (ie. completely opaque)
 L_INT giMAX_OPACITY = 255;
+
+// The tolerance for confirmImageAreas that indicates how many pixels away an image area can be
+// compared to where it is expected to be.
+const int giZONE_CONFIRMATION_TOLERANCE = 2;
 
 //-------------------------------------------------------------------------------------------------
 // Predefined Local Functions
@@ -295,19 +303,19 @@ void throwExceptionIfNotSuccess(L_INT iErrorCode, const string& strELICode,
 //-------------------------------------------------------------------------------------------------
 void fillImageArea(const string& strImageFileName, const string& strOutputImageName, long nLeft, 
 	long nTop, long nRight, long nBottom, long nPage, const COLORREF color, 
-	bool bRetainAnnotations, bool bApplyAsAnnotations, const string& strUserPassword,
-	const string& strOwnerPassword, int nPermissions)
+	bool bRetainAnnotations, bool bApplyAsAnnotations, bool bConfirmApplication,
+	const string& strUserPassword, const string& strOwnerPassword, int nPermissions)
 {
 	fillImageArea(strImageFileName, strOutputImageName, nLeft, nTop, nRight, nBottom, nPage,
-		color, 0, "", 0, bRetainAnnotations, bApplyAsAnnotations, strUserPassword,
-		strOwnerPassword, nPermissions);
+		color, 0, "", 0, bRetainAnnotations, bApplyAsAnnotations, bConfirmApplication,
+		strUserPassword, strOwnerPassword, nPermissions);
 }
 //-------------------------------------------------------------------------------------------------
 void fillImageArea(const string& strImageFileName, const string& strOutputImageName, long nLeft, 
 	long nTop, long nRight, long nBottom, long nPage, const COLORREF crFillColor, 
 	const COLORREF crBorderColor, const string& strText, const COLORREF crTextColor, 
-	bool bRetainAnnotations, bool bApplyAsAnnotations, const string& strUserPassword,
-	const string& strOwnerPassword, int nPermissions)
+	bool bRetainAnnotations, bool bApplyAsAnnotations, bool bConfirmApplication,
+	const string& strUserPassword, const string& strOwnerPassword, int nPermissions)
 {
 	vector<PageRasterZone> vecZones;
 	PageRasterZone zone;
@@ -322,13 +330,14 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 	zone.m_crTextColor = crTextColor;
 	vecZones.push_back(zone);
 	fillImageArea(strImageFileName, strOutputImageName, vecZones, bRetainAnnotations, 
-		bApplyAsAnnotations, strUserPassword, strOwnerPassword, nPermissions);
+		bApplyAsAnnotations, bConfirmApplication, strUserPassword, strOwnerPassword,
+		nPermissions);
 }
 //-------------------------------------------------------------------------------------------------
 void fillImageArea(const string& strImageFileName, const string& strOutputImageName, 
 				   vector<PageRasterZone>& rvecZones, bool bRetainAnnotations, 
-				   bool bApplyAsAnnotations, const string& strUserPassword,
-				   const string& strOwnerPassword, int nPermissions)
+				   bool bApplyAsAnnotations, bool bConfirmApplication,
+				   const string& strUserPassword, const string& strOwnerPassword, int nPermissions)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI02774");
 	try
@@ -418,6 +427,13 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		// Per discussion with Arvind, use the file access retries for any failure applying the
 		// redactions, but be sure not to nest saveImagePage retries inside of these retries
 		bool bSavingImagePage = false;
+
+		// If skipImageAreaConfirmation registry value is set, don't honor bConfirmApplication.
+		bConfirmApplication &= !skipImageAreaConfirmation();
+
+		// Indicates whether the appication of text has been skipped for any redaction in order to
+		// validate applied image areas per bConfirmApplication.
+		bool bSkippedApplicationOfText = false;
 
 		for (int i=0; i < iRetryCount; i++)
 		{
@@ -624,17 +640,39 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 									throwExceptionIfNotSuccess(nRet, "ELI14610", 
 										"Could not insert redaction annotation object.");
 
-									// Apply annotation text
-									applyAnnotationText((*it), hContainer, ltDC.m_hDC,
-										fileInfo.YResolution, rect);
+									// Apply annotation text unless bConfirmApplication is true.
+									// In that case, skip application of the text until after the
+									// zone itself has been validated.
+									if (!it->m_strText.empty())
+									{
+										if (bConfirmApplication)
+										{
+											bSkippedApplicationOfText = true;
+										}
+										else
+										{
+											applyAnnotationText((*it), hContainer, ltDC.m_hDC,
+												fileInfo.YResolution, rect);
+										}
+									}
 
 									bAnnotationsAppliedToPage = true;
 								}
 								else
 								{
+									// Apply annotation text unless bConfirmApplication is true.
+									// In that case, skip application of the text until after the
+									// zone itself has been validated.
+									bool bApplyText = !it->m_strText.empty();
+									if (bApplyText && bConfirmApplication)
+									{
+										bApplyText = false;
+										bSkippedApplicationOfText = true;
+									}
+
 									// Draw the redaction
 									drawRedactionZone(ltDC.m_hDC, *it,
-										fileInfo.YResolution, brushes, pens);
+										fileInfo.YResolution, brushes, pens, bApplyText);
 								}
 								_lastCodePos = "70_E_Page#" + strPageNumber;
 							} // end if this zone is on this page
@@ -783,6 +821,28 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		}
 		else
 		{
+			// [FlexIDSCore:5190]
+			// If the filled image areas are to be confirmed, do so before the output is converted
+			// to PDF.
+			if (bConfirmApplication)
+			{
+				confirmImageAreas(strOutputWorking, rvecZones, bApplyAsAnnotations);
+
+				// If any redaction text was skipped in order to be able to confirm the zones, the
+				// fillImageArea call will need to be repeated, this time with bConfirmApplication
+				// as false. (The assumption is if we were able to apply redactions correctly the
+				// first time, we will be able to do so the second time as well.
+				if (bSkippedApplicationOfText)
+				{
+					fillImageArea(strImageFileName, strOutputImageName, rvecZones, bRetainAnnotations, 
+						   bApplyAsAnnotations, false, strUserPassword, strOwnerPassword, nPermissions);
+
+					// Return right away since the output will have already been converted to PDF if
+					// necessary.
+					return;
+				}
+			}
+
 			if (bOutputIsPdf)
 			{
 				convertTIFToPDF(pPDFOut->getName(), strOutputImageName,
@@ -802,6 +862,194 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25288");
+}
+//-------------------------------------------------------------------------------------------------
+void confirmImageAreas(const string& strImageFileName, vector<PageRasterZone>& rvecZones,
+					 bool bAppiedAsAnnotations)
+{
+	try
+	{
+		// Check if an annotation license is required
+		if (bAppiedAsAnnotations)
+		{
+			if (!LicenseManagement::isAnnotationLicensed())
+			{
+				UCLIDException ue("ELI35331", "Validation of annotations is not licensed.");
+				ue.addDebugInfo("Redaction Source", strImageFileName);
+				throw ue;
+			}
+
+			// Ensure document support is licensed
+			unlockDocumentSupport();
+		}
+
+		LicenseManagement::verifyFileTypeLicensed(strImageFileName);
+
+		// Sort the vector of zones by page
+		// (Assuming this is called from fillImageArea, the zones should already be sorted... but
+		// sorting them again causes no harm).
+		sort(rvecZones.begin(), rvecZones.end(), compareZoneByPage);
+
+		char* pszInputFile = (char*) strImageFileName.c_str();
+
+		// (getFileInformation contains file access retry logic)
+		FILEINFO fileInfo;
+		getFileInformation(strImageFileName, true, fileInfo);
+
+		// Get the number of pages
+		long nNumberOfPages = fileInfo.TotalPages;
+
+		// Cache the file format
+		int iFormat = fileInfo.Format;
+
+		// Get initialized LOADFILEOPTION struct.
+		// IgnoreViewPerspective to avoid a black region at the bottom of the image
+		LOADFILEOPTION lfo =
+			GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
+
+		// Validate each zone
+		validateRedactionZones(rvecZones, nNumberOfPages);
+
+		L_INT nRet = 0;
+
+		// Process the image one page at a time
+		for (long i=1; i <= nNumberOfPages; i++)
+		{
+			string strPageNumber = asString(i);
+
+			// Set the load option for the current page
+			lfo.PageNumber = i;
+
+			// Set FILEINFO_FORMATVALID (this will speed up the L_LoadBitmap calls)
+			fileInfo = GetLeadToolsSizedStruct<FILEINFO>(FILEINFO_FORMATVALID);
+			fileInfo.Format = iFormat;
+
+			// Get a bitmap handle and wrap it with a bitmap freer
+			BITMAPHANDLE hBitmap = {0};
+			LeadToolsBitmapFreeer freer(hBitmap);
+
+			// Load the bitmap (loadImagePage contains file access retry logic)
+			loadImagePage(strImageFileName, hBitmap, fileInfo, lfo, false);
+
+			// If checking redactions that have been applied as annotations, check them by burning
+			// them into hBitmap, then checking the pixels in hBitmap.
+			if (bAppiedAsAnnotations && hasAnnotations(strImageFileName, lfo, iFormat))
+			{
+				// Annotation container to hold existing annotations
+				HANNOBJECT hFileContainer = __nullptr; 
+				try
+				{
+					// Load any existing annotations on this page
+					nRet = L_AnnLoad(pszInputFile, &hFileContainer, &lfo);
+					throwExceptionIfNotSuccess(nRet, "ELI35332", 
+						"Could not load annotations.", strImageFileName);
+
+					ASSERT_RESOURCE_ALLOCATION("ELI35333", hFileContainer != __nullptr);
+
+					// Apply the annotations to hBitmap so the pixels colors can be verified.
+					nRet = L_AnnRealize(&hBitmap, NULL, hFileContainer, FALSE);
+					throwExceptionIfNotSuccess(nRet, "ELI35334", 
+						"Failed to apply validate annotation.", strImageFileName);
+				}
+				catch(...)
+				{
+					if (hFileContainer != __nullptr)
+					{
+						try
+						{
+							// Destroy the annotation container
+							throwExceptionIfNotSuccess(L_AnnDestroy(hFileContainer, ANNFLAG_RECURSE), 
+								"ELI35335",	"Application trace: Unable to destroy annotation container.");
+						}
+						catch(UCLIDException& ex)
+						{
+							ex.log();
+						}
+						hFileContainer = NULL;
+					}
+
+					throw;
+				}
+			}
+
+			// Create a new device context manager for this page
+			LeadtoolsDCManager ltDC;
+			int nZoneId = 1;
+
+			// Check each zone on the page.
+			for (vector<PageRasterZone>::iterator it = rvecZones.begin(); it != rvecZones.end(); it++)
+			{
+				// Get the page from the zone
+				long nZonePage = it->m_nPage;
+
+				// Check if this page is greater than the current page
+				if (nZonePage > i)
+				{
+					// If we have passed the current page, just break from the loop
+					break;
+				}
+				else if (nZonePage == i)
+				{
+					// Create a bitmap to store the contents of the image zone to check.
+					BITMAPHANDLE hBitmapImageZone = {0};
+					LeadToolsBitmapFreeer zoneFreer(hBitmapImageZone, true);
+
+					// Extract the zone into hBitmapImageZone. Do not allow the resulting zone to be
+					// resized on skewed zones otherwize the coordinates of the redaction in the
+					// zone will be different from what we expect due to padded pixels around the
+					// edge.
+					extractZoneAsBitmap(&hBitmap, it->m_nStartX, it->m_nStartY, it->m_nEndX,
+						it->m_nEndY, it->m_nHeight, &hBitmapImageZone, false);
+
+					// Loop though each row of the extracted zone to confirm the image area has been
+					// applied.
+					for (int nRow = giZONE_CONFIRMATION_TOLERANCE;
+						 nRow < hBitmapImageZone.Height - giZONE_CONFIRMATION_TOLERANCE;
+						 nRow++)
+					{
+						// Loop through each pixel in the row.
+						for (int nCol = giZONE_CONFIRMATION_TOLERANCE;
+							 nCol < hBitmapImageZone.Width - giZONE_CONFIRMATION_TOLERANCE;
+							 nCol++)
+						{
+							// Get the color of the current pixel.
+							COLORREF crPixel =  L_GetPixelColor(&hBitmapImageZone, nRow, nCol);
+
+							if (crPixel == it->m_crFillColor)
+							{
+								// If the pixel is the fill color, this pixel is okay.
+								continue;
+							}
+							else if (crPixel == it->m_crBorderColor &&
+								(nRow == giZONE_CONFIRMATION_TOLERANCE ||
+								 nCol == giZONE_CONFIRMATION_TOLERANCE ||
+								 nRow == hBitmapImageZone.Height - giZONE_CONFIRMATION_TOLERANCE - 1 ||
+								 nCol == hBitmapImageZone.Width - giZONE_CONFIRMATION_TOLERANCE - 1))
+							{
+								// If the pixel is the border color and the pixel is within
+								// giZONE_CONFIRMATION_TOLERANCE of the edge of the zone, it is okay.
+								continue;
+							}
+
+							// If we got here, the current pixel does not appear to reflect a
+							// properly applied image area.
+							UCLIDException ue("ELI35336", "Redaction validation failed.");
+							ue.addDebugInfo("Page", it->m_nPage);
+							ue.addDebugInfo("StartX", it->m_nStartX);
+							ue.addDebugInfo("StartY", it->m_nStartY);
+							ue.addDebugInfo("EndX", it->m_nEndX);
+							ue.addDebugInfo("EndY", it->m_nEndY);
+							ue.addDebugInfo("X", nCol);
+							ue.addDebugInfo("Y", nRow);
+							ue.addDebugInfo("Value", crPixel);
+							throw ue;
+						}
+					}
+				}
+			}
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35337");
 }
 //-------------------------------------------------------------------------------------------------
 void createMultiPageImage(vector<string> vecImageFiles, string strOutputFileName, 
@@ -1151,6 +1399,35 @@ bool isLeadToolsSerialized()
 
 	return asCppBool(rpm.getKeyValue( gstrLEADTOOLS_SERIALIZATION_PATH, gstrSERIALIZATION_KEY,
 		gstrDEFAULT_SERIALIZATION)); 
+}
+//-------------------------------------------------------------------------------------------------
+bool skipImageAreaConfirmation()
+{
+	// Avoid repeated hits to the registry.
+	static bool bInitialized = false;
+	static bool bSkipImageAreaConfirmation = false;
+
+	if (!bInitialized)
+	{
+		// Setup Registry persistence item
+		RegistryPersistenceMgr rpm(HKEY_LOCAL_MACHINE, gstrRC_REG_PATH);
+
+		// Check for registry key
+		if (!rpm.keyExists(gstrLEADTOOLS_SERIALIZATION_PATH, gstrSKIP_IMAGE_AREA_CONFIRMATION_KEY))
+		{
+			// Create key if not found, default to false
+			rpm.createKey(gstrLEADTOOLS_SERIALIZATION_PATH, gstrSKIP_IMAGE_AREA_CONFIRMATION_KEY,
+				gstrDEFAULT_SKIP_IMAGE_AREA_CONFIRMATION);
+			bSkipImageAreaConfirmation = asCppBool(gstrDEFAULT_SKIP_IMAGE_AREA_CONFIRMATION);
+		}
+
+		bSkipImageAreaConfirmation = asCppBool(rpm.getKeyValue(gstrLEADTOOLS_SERIALIZATION_PATH,
+			gstrSKIP_IMAGE_AREA_CONFIRMATION_KEY, gstrDEFAULT_SKIP_IMAGE_AREA_CONFIRMATION));
+
+		bInitialized = true;
+	}
+
+	return bSkipImageAreaConfirmation;
 }
 //-------------------------------------------------------------------------------------------------
 void convertTIFToPDF(const string& strTIF, const string& strPDF, bool bRetainAnnotations,
@@ -2139,15 +2416,16 @@ string encryptString(const string& strString)
 	return encrypted.asString();
 }
 //-------------------------------------------------------------------------------------------------
-void drawRedactionZone(HDC hDC, const PageRasterZone& rZone, int nYResolution)
+void drawRedactionZone(HDC hDC, const PageRasterZone& rZone, int nYResolution,
+					   bool bApplyText /*= true*/)
 {
 	BrushCollection brushes;
 	PenCollection pens;
-	drawRedactionZone(hDC, rZone, nYResolution, brushes, pens);
+	drawRedactionZone(hDC, rZone, nYResolution, brushes, pens, bApplyText);
 }
 //-------------------------------------------------------------------------------------------------
 void drawRedactionZone(HDC hDC, const PageRasterZone& rZone, int nYResolution,
-					   BrushCollection& rBrushes, PenCollection& rPens)
+					   BrushCollection& rBrushes, PenCollection& rPens, bool bApplyText/* = true*/)
 {
 	try
 	{
@@ -2179,7 +2457,7 @@ void drawRedactionZone(HDC hDC, const PageRasterZone& rZone, int nYResolution,
 		}
 
 		// If there is text to add, add it
-		if ( rZone.m_strText.size() > 0 )
+		if (bApplyText && rZone.m_strText.size() > 0)
 		{
 			addTextToImage(hDC, rZone, nYResolution);
 		}

@@ -2090,7 +2090,8 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToOriginalIma
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo(
-    UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone, ILongToObjectMapPtr ipNewPageInfoMap/*= NULL*/)
+    UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone, ILongToObjectMapPtr ipNewPageInfoMap/*= NULL*/,
+	bool bAdjust/* = true */)
 {
     try
     {
@@ -2110,14 +2111,69 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo
 
         // Return the a new raster zone containing the translated data
         return translateToNewPageInfo(lStartX, lStartY, lEndX, lEndY, lHeight, lPageNum,
-            ipNewPageInfo);
+            ipNewPageInfo, bAdjust);
     }
     CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28178");
 }
 //-------------------------------------------------------------------------------------------------
+RECT getBoundingRectangle(long nStartX, long nStartY, long nEndX, 
+						  long nEndY, long nHeight, double dSlope)
+{
+	// temp variables for storing the coordinates of vertices of the Zone
+	long lX1 = 0, lY1 = 0, lX2 = 0, lY2 = 0, lX3 = 0, lY3 = 0, lX4 = 0, lY4 = 0;
+		
+	long lDiffX  = 0;
+	long lDiffY  = 0;
+	lDiffX = long ((nHeight / 2) * sin(dSlope));
+	lDiffY = long ((nHeight / 2) * cos(dSlope));
+	
+	lX1 = nStartX - lDiffX;
+	lY1 = nStartY + lDiffY;
+	
+	lX2 = nStartX + lDiffX;
+	lY2 = nStartY - lDiffY;
+	
+	lX3 = nEndX + lDiffX;
+	lY3 = nEndY - lDiffY;
+	
+	lX4 = nEndX - lDiffX;
+	lY4 = nEndY + lDiffY;
+	
+	// for coordinates of the Zone	along X-axis & Y-axis											
+	long lLeft= 0,lTop = 0,lRight  = 0, lBottom = 0;
+	
+	// identify the Left coordinate along X-axis
+	lLeft = min(min(lX1,lX2),min(lX3,lX4));
+	lLeft = max( 0, lLeft );
+	
+	// identify the Top coordinate along Y-axis
+	lTop = min(min(lY1,lY2),min(lY3,lY4));
+	lTop = max( 0, lTop );
+	
+	// identify the Right coordinate along X-axis
+	lRight = max(max(lX1,lX2),max(lX3,lX4));
+
+	// identify the Bottom coordinate along Y-axis
+	lBottom = max(max(lY1,lY2),max(lY3,lY4));
+	
+	// Checking for the -ve values which are not valid
+	if (lLeft < 0 || lTop < 0 || lRight < 0 || lBottom < 0)
+	{
+		UCLIDException ue("ELI02835", "Invalid Zone coordinates.");
+		ue.addDebugInfo("Left", lLeft);
+		ue.addDebugInfo("Top", lTop);
+		ue.addDebugInfo("Right", lRight);
+		ue.addDebugInfo("Bottom", lBottom);
+		throw ue;			
+	}
+
+	RECT rect = {lLeft, lTop, lRight, lBottom};
+	return rect;
+}
+//-------------------------------------------------------------------------------------------------
 UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo(
     long lStartX, long lStartY, long lEndX, long lEndY, long lHeight, int nPage,
-    UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipNewPageInfo)
+    UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipNewPageInfo, bool bAdjust)
 {
     try
     {
@@ -2189,6 +2245,24 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo
         double np1Y = p1X*sintheta + p1Y*costheta;
         double np2X = p2X*costheta - p2Y*sintheta;
         double np2Y = p2X*sintheta + p2Y*costheta;
+
+//		if (bAdjust)
+//		{
+//			np1X /= costheta;
+//			np1Y *= costheta;
+//			np2X /= costheta;
+//			np2Y *= costheta;
+////
+//			double nnp1X = np1X*costheta + (np1Y - p1Y) * sintheta;
+//			double nnp1Y = np1Y/costheta + (np1X - p1X) * sintheta;
+//			double nnp2X = np2X*costheta + (np2Y - p2Y) * sintheta;
+//			double nnp2Y = np2Y/costheta + (np2X - p2X) * sintheta;
+//
+//			np1X = nnp1X;
+//			np1Y = nnp1Y;
+//			np2X = nnp2X;
+//			np2Y = nnp2Y;
+//		}
 
         // In order to move the coordinate system origin back to the top-left of the image we will
         // need to invert the x and y coordinates of the center if the new image coordinate system is

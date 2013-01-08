@@ -602,7 +602,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 					// Save redactions
 					fillImageArea(strImageToRedact, strOutputName, vecZones, 
 						m_bCarryForwardAnnotations, m_bApplyRedactionsAsAnnotations,
-						strUser, strOwner, nPermissions);
+						true, strUser, strOwner, nPermissions);
 					_lastCodePos = "400";
 
 					// If successful, break out of the retry loop.
