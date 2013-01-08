@@ -189,6 +189,11 @@ CreateRedactionDemoInstall:
 	@ECHO Creating Redaction Demo Install Directory ...
 	@CD "$(RedactionDemoBuildDir)"
 	@nmake /F $(RedactionDemoBuildDir)\RedactionDemo.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" DoEverything
+	
+CreateOtherDemos:
+	@ECHO Creating other demos...
+	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Other Demos" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Other Demos"
+	@XCOPY  "$(AFRootDirectory)\Utils\Demo_RedactionGame\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Other Demos" /v /s /e /y
 
 CreateLabDEInstall:
 	@Echo Building LabDE...
@@ -197,7 +202,7 @@ CreateLabDEInstall:
 	
 CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateDemoShieldInstall CreateLabDEInstall
 
-DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall
+DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall CreateOtherDemos
 
 GetAllFiles: GetPDCommonFiles GetAttributeFinderFiles GetRCdotNETFiles GetReusableComponentFiles GetPDUtilsFiles GetComponentDataFiles GetDemo_IDShieldRules GetDemo_FLEXIndexRules GetDataEntryFiles GetDataEntryInstall GetNetDMSFiles
 
