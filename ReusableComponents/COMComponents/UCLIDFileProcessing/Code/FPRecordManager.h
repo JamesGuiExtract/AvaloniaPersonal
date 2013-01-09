@@ -191,6 +191,7 @@ private:
 
 	typedef list<long> TaskIdList;
 	TaskIdList m_queTaskIds;
+	TaskIdList m_queFinishedTasks;
 
 	typedef map<long, FileProcessingRecord> TaskMap;
 	TaskMap m_mapTasks;
@@ -198,8 +199,6 @@ private:
 	long m_nMaxStoredRecords;
 	bool m_bRestrictNumStoredRecords;
 	
-	TaskIdList m_queFinishedTasks;
-
 	// the number of bytes in the list
 	LONGLONG m_nNumBytes;
 
@@ -270,12 +269,14 @@ private:
 	//			found method will return false.
 	bool getTask(long nTaskID, FileProcessingRecord& task);
 
-	// PROMISE: To remove the task from the m_mapTasks if the task is not current or pending.
-	//			returns true if task was not pending or current and was removed from the queue.
-	//			returns false if task is pending or current
-	//			if task is not pending or current and not in the task map an exception will be logged and
-	//			false will be returned.
-	bool removeTaskIfNotPendingOrCurrent(long nTaskID);
+	// PROMISE: To remove the task from the m_mapTasks if the task is not current or in either the
+	//			pending or finished lists.
+	//			returns true if task was not current or in either list and was removed from the
+	//			queue.
+	//			returns false if task is current or in either list.
+	//			if task is not pending or current and not in the task map an exception will be
+	//			logged and false will be returned.
+	bool removeTaskIfNotCurrentOrInLists(long nTaskID);
 
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: To get the default sleep time and max sleep time from the DB config and compute

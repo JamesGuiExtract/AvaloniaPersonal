@@ -141,6 +141,8 @@ END_MESSAGE_MAP()
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgStatusPage::clear()
 {
+	CSingleLock lg(&m_mutex, TRUE);
+
 	// Clear lists
 	m_currentFilesList.DeleteAllItems();
 	m_completedFilesList.DeleteAllItems();
@@ -579,6 +581,8 @@ void FileProcessingDlgStatusPage::OnNMRclkFileLists(NMHDR* pNMHDR, LRESULT* pRes
 			THROW_LOGIC_ERROR_EXCEPTION("ELI32083");
 		}
 
+		CSingleLock lg(&m_mutex, TRUE);
+
 		vector<int> vecSelected = getIndexOfAllSelectedItems(*pList);
 		if (vecSelected.empty())
 		{
@@ -838,6 +842,8 @@ void FileProcessingDlgStatusPage::refreshProgressStatus()
 {
 	try
 	{
+		CSingleLock lg(&m_mutex, TRUE);
+
 		// Iterate through all the current tasks, and update their progress information
 		vector<long>::const_iterator iter;
 		for (iter = m_vecCurrFileIds.begin(); iter != m_vecCurrFileIds.end(); iter++)
@@ -881,42 +887,80 @@ void FileProcessingDlgStatusPage::refreshProgressStatus()
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgStatusPage::limitListSizeAndUpdateVars(CListCtrl& rListCtrl)
 {
-	// if we did not need to remove an entry from this list, just exit
-	if (!limitListSizeIfNeeded(rListCtrl, m_pCfgMgr))
-	{
-		return;
-	}
+	INIT_EXCEPTION_AND_TRACING("MLI03290");
 
-	long lId = 0;
+	try
+	{
+		_lastCodePos = "10";
+	
+		CSingleLock lg(&m_mutex, TRUE);
 
-	// delete the associated data in other vectors, depending upon 
-	// which list control we are deleting data from
-	if (&rListCtrl == &m_currentFilesList)
-	{
-		auto it = m_vecCurrFileIds.begin();
-		lId = *it;
-		m_vecCurrFileIds.erase(it);
-	}
-	else if (&rListCtrl == &m_completedFilesList)
-	{
-		auto it = m_vecCompFileIds.begin();
-		lId = *it;
-		m_vecCompFileIds.erase(it);
-	}
-	else if (&rListCtrl == &m_failedFilesList)
-	{
-		auto it = m_vecFailFileIds.begin();
-		lId = *it;
-		m_vecFailFileIds.erase(it);
-		m_vecFailedUEXCodes.erase(m_vecFailedUEXCodes.begin());
-	}
-	else
-	{
-		// we should never reach here
-		THROW_LOGIC_ERROR_EXCEPTION("ELI14919")
-	}
+		// if we did not need to remove an entry from this list, just exit
+		if (!limitListSizeIfNeeded(rListCtrl, m_pCfgMgr))
+		{
+			return;
+		}
 
-	removeFileNameForFileId(lId);
+		_lastCodePos = "20";
+
+		long lId = -1;
+
+		// delete the associated data in other vectors, depending upon 
+		// which list control we are deleting data from
+		if (&rListCtrl == &m_currentFilesList)
+		{
+			_lastCodePos = "30";
+			auto it = m_vecCurrFileIds.begin();
+			if (it != m_vecCurrFileIds.end())
+			{
+				_lastCodePos = "31";
+				lId = *it;
+				m_vecCurrFileIds.erase(it);
+			}
+		}
+		else if (&rListCtrl == &m_completedFilesList)
+		{
+			_lastCodePos = "40";
+			auto it = m_vecCompFileIds.begin();
+			if (it != m_vecCompFileIds.end())
+			{
+				_lastCodePos = "41";
+				lId = *it;
+				m_vecCompFileIds.erase(it);
+			}
+		}
+		else if (&rListCtrl == &m_failedFilesList)
+		{
+			_lastCodePos = "50";
+			auto it = m_vecFailFileIds.begin();
+			if (it != m_vecFailFileIds.end())
+			{
+				_lastCodePos = "51";
+				lId = *it;
+				m_vecFailFileIds.erase(it);
+				_lastCodePos = "52";
+				m_vecFailedUEXCodes.erase(m_vecFailedUEXCodes.begin());
+			}
+		}
+		else
+		{
+			// we should never reach here
+			THROW_LOGIC_ERROR_EXCEPTION("ELI14919")
+		}
+
+		_lastCodePos = "60";
+
+		if (lId == -1)
+		{
+			UCLIDException ue("ELI35340", "Application trace: Unable to clear item from file list.");
+			throw ue;
+		}
+
+		_lastCodePos = "70";
+		
+		removeFileNameForFileId(lId);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35338");
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgStatusPage::moveTaskFromPendingToCurrent(long nFileID)
@@ -1027,6 +1071,8 @@ void FileProcessingDlgStatusPage::moveTaskFromCurrentToFailed(long nFileID)
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgStatusPage::removeTaskFromCurrentList(long nFileID)
 {
+	CSingleLock lg(&m_mutex, TRUE);
+
 	// Figure out it's location in the currently processing vector
 	int iPos = getTaskPosFromVector(m_vecCurrFileIds, nFileID);
 
@@ -1039,6 +1085,8 @@ long FileProcessingDlgStatusPage::appendNewRecord(CListCtrl& rListCtrl,
 												  const FileProcessingRecord& task,
 												  bool bErrorTaskEntry/* = false*/)
 {
+	CSingleLock lg(&m_mutex, TRUE);
+
 	// insert a new record in the list, and update the leftmost column
 	// with the date
 	int iNewItemIndex = rListCtrl.InsertItem(rListCtrl.GetItemCount(),
@@ -1266,6 +1314,8 @@ void FileProcessingDlgStatusPage::updateCurrColWidths()
 //-------------------------------------------------------------------------------------------------
 int FileProcessingDlgStatusPage::getTaskPosFromVector(const std::vector<long>& vecToSearch, long nFileID)
 {
+	CSingleLock lg(&m_mutex, TRUE);
+
 	int vecSize = vecToSearch.size();
 	for( int i = 0; i < vecSize; i++)
 	{
@@ -1295,7 +1345,7 @@ void FileProcessingDlgStatusPage::stopProgressUpdates()
 //-------------------------------------------------------------------------------------------------
 string FileProcessingDlgStatusPage::getFileNameForFileId(long fileId)
 {
-	CSingleLock lg(&m_mutexFileNameMap, TRUE);
+	CSingleLock lg(&m_mutex, TRUE);
 	auto it = m_mapFileIdToFileName.find(fileId);
 	if (it != m_mapFileIdToFileName.end())
 	{
@@ -1307,17 +1357,24 @@ string FileProcessingDlgStatusPage::getFileNameForFileId(long fileId)
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgStatusPage::addFileNameToFileIdMap(long fileId, const string& strFileName)
 {
-	CSingleLock lg(&m_mutexFileNameMap, TRUE);
+	CSingleLock lg(&m_mutex, TRUE);
 	m_mapFileIdToFileName[fileId] = strFileName;
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgStatusPage::removeFileNameForFileId(long fileId)
 {
-	CSingleLock lg(&m_mutexFileNameMap, TRUE);
-	auto it = m_mapFileIdToFileName.find(fileId);
-	if (it != m_mapFileIdToFileName.end())
+	// [FlexIDSCore:5194]
+	// Ensure another instance of the file ID in question is not in any of the lists before removing
+	// it from the map.
+	if (find(m_vecCurrFileIds.begin(), m_vecCurrFileIds.end(), fileId) == m_vecCurrFileIds.end() ||
+		find(m_vecCompFileIds.begin(), m_vecCompFileIds.end(), fileId) == m_vecCompFileIds.end() ||
+		find(m_vecFailFileIds.begin(), m_vecFailFileIds.end(), fileId) == m_vecFailFileIds.end())
 	{
-		m_mapFileIdToFileName.erase(it);
+		auto it = m_mapFileIdToFileName.find(fileId);
+		if (it != m_mapFileIdToFileName.end())
+		{
+			m_mapFileIdToFileName.erase(it);
+		}
 	}
 }
 //-------------------------------------------------------------------------------------------------

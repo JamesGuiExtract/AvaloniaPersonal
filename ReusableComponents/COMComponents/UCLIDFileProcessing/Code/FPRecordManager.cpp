@@ -686,59 +686,39 @@ void FPRecordManager::changeState(const FileProcessingRecord& task, CSingleLock&
 				TaskIdList::iterator queIt;
 				for(queIt = m_queTaskIds.begin(); queIt != m_queTaskIds.end(); queIt++)
 				{
-					_lastCodePos = "420";
+					_lastCodePos = "380";
 					if(*queIt == nTaskID)
 					{	
-						_lastCodePos = "490";
+						_lastCodePos = "390";
 						m_queTaskIds.erase(queIt);
+						break;
 					}
 				}					
-				
-				// Lock the task map mutex while updating task map
-				{
-					_lastCodePos = "380";
-					CSingleLock lockGuard(&m_readTaskMapMutex, TRUE);
 
-					_lastCodePos = "390";
+				_lastCodePos = "400";
 
-					// Remove the task from map
-					if (!removeTaskIfNotPendingOrCurrent(nTaskID))
-					{
-						UCLIDException ue("ELI25346", "Application trace: Unable to remove TaskID from map.");
-						ue.addDebugInfo("Old Status", statusAsString(eOldStatus));
-						ue.addDebugInfo("New Status", statusAsString(eNewStatus));
-						ue.addDebugInfo("Action Name", m_strAction);
-						ue.addDebugInfo("File Name", task.getFileName());
-						ue.addDebugInfo("File ID", nTaskID);
-						ue.log();
-					}
-					_lastCodePos = "410";
-				}
+				// [FlexIDSCore:5186]
+				// It is not an error if nTaskID is not removed from m_mapTasks as a result of this
+				// call. There may still be additional instances of this task in the m_queTaskIds or
+				// m_queFinishedTasks list for which the map entry is still needed.
+				removeTaskIfNotCurrentOrInLists(nTaskID);
+
+				_lastCodePos = "410";
 			}
 
 			_lastCodePos = "500";
 			// If an old task has to be removed
 			if (bRemoveOldTask)
 			{
-				// Lock the task map mutex while updating task map
-				{
-					CSingleLock lockGuard(&m_readTaskMapMutex, TRUE);
-					_lastCodePos = "510";
+				_lastCodePos = "510";
 
-					// Remove task from map
-					if (!removeTaskIfNotPendingOrCurrent(nRemoveTaskId))
-					{
-						UCLIDException ue("ELI25345", "Application trace: Unable to remove TaskID from map.");
-						ue.addDebugInfo("Task to be removed", nRemoveTaskId);
-						ue.addDebugInfo("Old Status", statusAsString(eOldStatus));
-						ue.addDebugInfo("New Status", statusAsString(eNewStatus));
-						ue.addDebugInfo("Action Name", m_strAction);
-						ue.addDebugInfo("File Name", task.getFileName());
-						ue.addDebugInfo("File ID", nTaskID);
-						ue.log();
-					}
-					_lastCodePos = "520";
-				}
+				// [FlexIDSCore:5186]
+				// It is not an error if nTaskID is not removed from m_mapTasks as a result of this
+				// call. There may still be additional instances of this task in the m_queTaskIds or
+				// m_queFinishedTasks list for which the map entry is still needed.
+				removeTaskIfNotCurrentOrInLists(nRemoveTaskId);
+
+				_lastCodePos = "520";
 			}
 		}
 	}
@@ -858,18 +838,20 @@ void FPRecordManager::setNumberOfFilesToProcess(long nNumberOfFiles)
 	m_nNumberOfFilesFailed = 0;
 }
 //-------------------------------------------------------------------------------------------------
-bool FPRecordManager::removeTaskIfNotPendingOrCurrent(long nTaskID)
+bool FPRecordManager::removeTaskIfNotCurrentOrInLists(long nTaskID)
 {
-	// Before removing task make sure it is not in the pending task list
-	TaskIdList::iterator itPending;
-	for (itPending = m_queTaskIds.begin(); itPending != m_queTaskIds.end(); itPending++)
+	// [FlexIDSCore:5186]
+	// Before removing task make sure it is not in the pending or finished task list.
+	// Even after removing one instance, these lists can conceivably have more than 
+	if (find(m_queTaskIds.begin(), m_queTaskIds.end(), nTaskID) != m_queTaskIds.end() ||
+		find(m_queFinishedTasks.begin(), m_queFinishedTasks.end(), nTaskID) != m_queFinishedTasks.end())
 	{
-		// If the taskID to be removed is in the pending list don't remove it
-		if ( *itPending == nTaskID )
-		{
-			return false;
-		}
+		// If the taskID to be removed is in the pending list or finished list; don't remove it.
+		return false;
 	}
+
+	// Lock the task map mutex while updating task map
+	CSingleLock lockGuard(&m_readTaskMapMutex, TRUE);
 
  	// The task is not in the pending queue so it can be removed from the tasks map
 	TaskMap::iterator it = m_mapTasks.find(nTaskID);
@@ -881,6 +863,7 @@ bool FPRecordManager::removeTaskIfNotPendingOrCurrent(long nTaskID)
 		{
 			// remove the task from the map
 			m_mapTasks.erase(it);
+
 			return true;
 		}
 		else

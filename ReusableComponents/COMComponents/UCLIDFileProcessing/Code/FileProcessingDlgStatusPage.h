@@ -109,7 +109,9 @@ private:
 
 	// Map of FileIDs to file names
 	map<long, string> m_mapFileIdToFileName;
-	CMutex m_mutexFileNameMap;
+	
+	// Mutex to synchronize access to the file ID map and lists.
+	CMutex m_mutex;
 
 	// vector of strings for UEX codes to go with failed files
 	vector<string> m_vecFailedUEXCodes;
