@@ -1,0 +1,55 @@
+<HTML>
+
+<HEAD>
+<TITLE>NUnit Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>NUnit Testing - Automated and Interactive<br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h2>Test Machine Setup</h2>
+<ul>
+	<li>Confirm that the test machine has the <b>RDT</b> installed.
+	<li>Copy the <b>Nunit-2.5.8.10295.msi</b> file from <b>\\lofton\installs\NUnit</b> to the 
+	test machine.
+	<li>Install NUnit, selecting the <b>Complete</b> option.
+	<li>Modify the Start Menu shortcut to use <b>NUnit-x86.exe</b> since Extract Systems 
+	software is 32-bit software.
+	<li>Add the following NUnit DLLs to the GAC.  The DLLs can be found at 
+	<b>C:\Program Files (x86)\NUnit 2.5.8\bin\net-2.0\framework</b>.  The GAC folder is 
+	<b>C:\Windows\assembly</b>.
+	<ul>
+		<li>nunit.framework.dll
+		<li>nunit.mocks.dll
+	</ul>
+</ul>
+
+<h2>Test Execution</h2>
+<ul>
+	<li>Load the comprehensive <b>Extract-All.nunit</b> testing project from <b>CommonComponents</b> 
+	that loads the following DLLs.
+	<ul>
+		<li>Extract.DataEntry.Test.dll
+		<li>Extract.Encryption.Test.dll
+		<li>Extract.FileActionManager.Database.Test.dll
+		<li>Extract.Geometry.Test.dll
+		<li>Extract.Imaging.Forms.Test.dll
+		<ul>
+			<li>Automated
+			<li>Interactive
+		</ul>
+		<li>Extract.SetOperations.Test.dll
+		<li>Extract.Test.dll
+		<li>Extract.Utilities.Test.dll
+	</ul>
+	<li>Confirm that the project loads without error.
+	<li>Exercise the automated and interactive tests.  Each is expected to complete 
+	without error.
+</ul>
+</BODY>
+</HTML>
