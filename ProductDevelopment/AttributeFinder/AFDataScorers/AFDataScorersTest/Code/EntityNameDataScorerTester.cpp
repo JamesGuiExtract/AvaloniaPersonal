@@ -35,7 +35,8 @@ STDMETHODIMP CEntityNameDataScorerTester::InterfaceSupportsErrorInfo(REFIID riid
 {
 	static const IID* arr[] = 
 	{
-		&IID_ITestableComponent
+		&IID_ITestableComponent,
+		&IID_ILicensedComponent
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{

@@ -70,7 +70,9 @@ STDMETHODIMP CTranslateToClosestValueInList::InterfaceSupportsErrorInfo(REFIID r
 		&IID_ICategorizedComponent,
 		&IID_ICopyableObject,
 		&IID_ILicensedComponent,
-		&IID_IMustBeConfiguredObject
+		&IID_IMustBeConfiguredObject,
+		&IID_IIdentifiableRuleObject,
+		&IID_IPersistStream
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{

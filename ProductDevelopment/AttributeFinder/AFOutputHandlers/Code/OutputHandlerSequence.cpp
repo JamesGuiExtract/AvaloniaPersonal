@@ -46,7 +46,8 @@ STDMETHODIMP COutputHandlerSequence::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IMustBeConfiguredObject,
 		&IID_IPersistStream,
-		&IID_IMultipleObjectHolder
+		&IID_IMultipleObjectHolder,
+		&IID_IIdentifiableRuleObject
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{

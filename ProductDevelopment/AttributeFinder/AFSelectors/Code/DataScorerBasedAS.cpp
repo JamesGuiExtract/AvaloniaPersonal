@@ -47,7 +47,9 @@ STDMETHODIMP CDataScorerBasedAS::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IPersistStream,
 		&IID_ILicensedComponent,
-		&IID_IAttributeSelector
+		&IID_IAttributeSelector,
+		&IID_IIdentifiableRuleObject,
+		&IID_IMustBeConfiguredObject
 	};
 
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)

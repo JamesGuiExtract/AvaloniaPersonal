@@ -62,7 +62,9 @@ STDMETHODIMP CAdvancedReplaceString::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_ILicensedComponent,
 		&IID_IMustBeConfiguredObject,
-		&IID_IDocumentPreprocessor
+		&IID_IDocumentPreprocessor,
+		&IID_IIdentifiableRuleObject,
+		&IID_IPersistStream
 	};
 
 	for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)

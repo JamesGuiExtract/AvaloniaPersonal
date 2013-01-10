@@ -39,7 +39,9 @@ STDMETHODIMP CRemoveInvalidEntries::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_IOutputHandler,
 		&IID_ICategorizedComponent,
 		&IID_ICopyableObject,
-		&IID_ILicensedComponent
+		&IID_ILicensedComponent,
+		&IID_IPersistStream,
+		&IID_IIdentifiableRuleObject
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{

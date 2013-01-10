@@ -64,7 +64,8 @@ STDMETHODIMP CBlockFinder::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICategorizedComponent,
 		&IID_ICopyableObject,
 		&IID_IMustBeConfiguredObject,
-		&IID_ILicensedComponent
+		&IID_ILicensedComponent,
+		&IID_IIdentifiableRuleObject
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{

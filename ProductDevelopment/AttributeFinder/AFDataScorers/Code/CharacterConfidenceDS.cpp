@@ -33,7 +33,8 @@ STDMETHODIMP CCharacterConfidenceDS::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_IPersistStream,
 		&IID_ILicensedComponent,
 		&IID_IDataScorer,
-		&IID_IMustBeConfiguredObject
+		&IID_IMustBeConfiguredObject,
+		&IID_IIdentifiableRuleObject
 	};
 
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)

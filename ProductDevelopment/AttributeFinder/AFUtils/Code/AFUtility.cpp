@@ -80,7 +80,8 @@ STDMETHODIMP CAFUtility::InterfaceSupportsErrorInfo(REFIID riid)
 	static const IID* arr[] = 
 	{
 		&IID_IAFUtility,
-		&IID_ILicensedComponent
+		&IID_ILicensedComponent,
+		&IID_ITagUtility
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{

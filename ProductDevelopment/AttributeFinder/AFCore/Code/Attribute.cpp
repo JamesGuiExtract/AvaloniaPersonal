@@ -78,7 +78,8 @@ STDMETHODIMP CAttribute::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_IAttribute,
 		&IID_ILicensedComponent,
 		&IID_ICopyableObject,
-		&IID_IComparableObject
+		&IID_IComparableObject,
+		&IID_IPersistStream
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{

@@ -93,7 +93,9 @@ STDMETHODIMP CScansoftOCR::InterfaceSupportsErrorInfo(REFIID riid)
 {
 	static const IID* arr[] = 
 	{
-		&IID_IOCREngine
+		&IID_IOCREngine,
+		&IID_IPrivateLicensedComponent,
+		&IID_ILicensedComponent
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
