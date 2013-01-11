@@ -607,12 +607,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.NetDMSUtilities", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.Fresno", "..\..\..\..\DataEntry\FlexIndex\DEPs\Fresno\Core\Code\Extract.DataEntry.DEP.Fresno.csproj", "{7EE21844-B318-4203-A593-6306B6BB6234}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.PeirsonAndPatterson", "..\..\..\..\DataEntry\FlexIndex\DEPs\PeirsonAndPatterson\Core\Code\Extract.DataEntry.DEP.PeirsonAndPatterson.csproj", "{8600FF47-6098-4462-95FE-60CACF8DC886}"
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 177
+		ProjectCount = 178
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcxproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcxproj
@@ -790,6 +792,7 @@ Global
 		ProjectRelativeDiskPath175 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSExporter\Core\Code\Extract.NetDMSExporter.csproj
 		ProjectRelativeDiskPath176 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSUtilities\Core\Code\Extract.NetDMSUtilities.csproj
 		ProjectRelativeDiskPath177 = ..\..\..\..\DataEntry\FlexIndex\DEPs\Fresno\Core\Code\Extract.DataEntry.DEP.Fresno.csproj
+		ProjectRelativeDiskPath178 = ..\..\..\..\DataEntry\FlexIndex\DEPs\PeirsonAndPatterson\Core\Code\Extract.DataEntry.DEP.PeirsonAndPatterson.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2914,6 +2917,18 @@ Global
 		{7EE21844-B318-4203-A593-6306B6BB6234}.Release|Win32.ActiveCfg = Release|x86
 		{7EE21844-B318-4203-A593-6306B6BB6234}.Release|x86.ActiveCfg = Release|x86
 		{7EE21844-B318-4203-A593-6306B6BB6234}.Release|x86.Build.0 = Release|x86
+		{8600FF47-6098-4462-95FE-60CACF8DC886}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8600FF47-6098-4462-95FE-60CACF8DC886}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8600FF47-6098-4462-95FE-60CACF8DC886}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8600FF47-6098-4462-95FE-60CACF8DC886}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8600FF47-6098-4462-95FE-60CACF8DC886}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{8600FF47-6098-4462-95FE-60CACF8DC886}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8600FF47-6098-4462-95FE-60CACF8DC886}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8600FF47-6098-4462-95FE-60CACF8DC886}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8600FF47-6098-4462-95FE-60CACF8DC886}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8600FF47-6098-4462-95FE-60CACF8DC886}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8600FF47-6098-4462-95FE-60CACF8DC886}.Release|Win32.ActiveCfg = Release|Any CPU
+		{8600FF47-6098-4462-95FE-60CACF8DC886}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2929,6 +2944,7 @@ Global
 		{4E6AEDAD-E73D-4BAB-9B2A-4E0BF8026FAD} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{76DADA14-AF4A-4B30-A88A-B9245103F1B9} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{7EE21844-B318-4203-A593-6306B6BB6234} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
+		{8600FF47-6098-4462-95FE-60CACF8DC886} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{139729CD-0F06-48E8-9F4A-08E78BB6575F} = {4CAFD9CC-640F-4836-B388-D370B6219488}
 		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA} = {4CAFD9CC-640F-4836-B388-D370B6219488}
 		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31} = {4CAFD9CC-640F-4836-B388-D370B6219488}
