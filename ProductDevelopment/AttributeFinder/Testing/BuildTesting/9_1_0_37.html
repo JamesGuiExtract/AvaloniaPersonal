@@ -1,0 +1,342 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.1.0.37 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.1.0.37 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DataEntry #876]</b> Next Invalid Item
+        	<ul>
+            		<li>Exercise <b>Data Entry Undo</b>.
+            		<li>Confirm that the <b>Go to next invalid</b> toolbar button remains 
+			properly enabled and disabled.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1119]</b> Artificial Carriage Returns and Bad Highlights
+        	<ul>
+            		<li>Exercise <b>Health Network Labs</b> rules and images.
+            		<li>Review a document with a long comment line.
+            		<li>Check to see if the comment line is split around 70 characters with an 
+			artificial carriage return.
+            		<li>Confirm that verification highlights remain correct.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1136, #1160]</b> Config Files
+        	<ul>
+            		<li>Confirm that the following EXEs have config file settings that include 
+			the runtime configuration.
+			<ul>
+            			<li>ProcessFiles.exe
+            			<li>DataEntryApplication.exe
+			</ul>
+			<li>Confirm that <b>QueryCacheLimit</b> can be modified in the config file via 
+			<b>Extract.DataEntry.Utilities.DataEntryApplication.Properties.Settings</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1145]</b> Confirm that <b>AlternateTestNameManager.plugin</b> is 
+		included with <b>Demo_LabDE</b>.
+<p>
+  	   	<LI><b>[DataEntry #1163]</b> Auto-complete Behavior Delayed 
+        	<ul>
+            		<li>Exercise <b>Fresno DEP</b>.
+			<li>Confirm that <b>Fresno.sdf</b> contains data.
+            		<li>Verify an image.
+            		<li>Select the <b>Chemical Location</b> cell and press the space bar.
+			<li>Confirm that the auto-complete list is displayed.
+			<li>Press backspace and space again.
+			<li>Confirm that the auto-complete list is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #840]</b> FTP File Supplier In Bad State
+        	<ul>
+            		<li>Confirm that reception of an <b>ELI34101 - Aborting FTP retry 
+			attempts because target does not exist</b> exception does not leave the 
+			file supplier running in a bad state.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #859, #860, #861]</b> Expression And Query Tester
+        	<ul>
+            		<li>Confirm that the window caption is <b>title case</b>.
+			<li>Confirm that balloon help text is <b>"... score all attributes 
+			or..."</b>.
+			<li>Confirm that the file filter for the browse button includes:
+			<ul>
+				<li>*.rsd
+				<li>*.rsd.etf
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #863]</b> Data Entry Prompt
+        	<ul>
+			<li>Copy <b>DataEntryPrompt.exe.config</b> from <b>Demo_RedactionGame</b> 
+			to CommonComponents.
+			<li>Run the <b>DataEntryPrompt</b> application and add text entries to 
+			fields to clear all validation warnings.	
+			<li>Click <b>OK</b>.
+            		<li>Confirm that the exception includes debug information stating what 
+			file cannot be found.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #865]</b> SQL CDB Editor
+        	<ul>
+			<li>Copy <b>Fresno.sdf</b> from 
+			<b>I:\Common\Testing\PVCS_Testing\DotNetRCAndUtils\865</b> to a working folder 
+			and open it.
+			<li>Select all the rows in the <b>FileName</b> table and delete them.
+			<li>Select all the rows in the <b>FileNameToValue</b> table and delete them.
+			<li>Select all the rows in the <b>PreviouslyUsedFieldValue</b> table and 
+			delete them.
+			<li>Save the changed file.
+			<li>Exit <b>SQLCDBEditor.exe</b>.
+			<li>Reopen the changed file.
+            		<li>Confirm that the <b>FileName</b> table is empty.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #866]</b> FAM Service and Dependent Services
+        	<ul>
+			<li>Configure FAM service to require one or more dependent services.
+			<li>Confirm that processing is properly restricted if the test machine 
+			has been recently rebooted.
+			<li>Confirm that processing is properly restricted if the test machine 
+			has not been recently rebooted.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3088]</b> Chained RSD Files
+        	<ul>
+            		<li>Use RDT Configuration to confirm that <b>Automatically re-encrypt 
+			out-of-date ETF files</b> is enabled.
+			<li>Exercise <b>Test.rsd</b> in the 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3088</b> folder.
+			<li>Confirm that each RSD file in the <b>Classify</b> subfolder 
+			is encrypted.
+			<li>Confirm that <b>Rule Tester</b> does not crash.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4569, LegacyRC #6217]</b> Merge Attributes and Locate Image Region
+        	<ul>
+            		<li>Exercise the associated images and rules.
+			<li>Verify some images.
+			<li>Resize some highlights and repeatedly resave the image.
+			<li>Confirm that the highlights do not continue to increase in size.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5079, #5171]</b> ID Shield Statistics Reporter
+        	<ul>
+            		<li>Confirm that the utility supports generation of statistics for 
+			a workflow where only pages that contain sensitive data are presented 
+			for review.  Note that this implies <b>require users to visit all 
+			pages in a document</b> = false.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5138]</b> Confirm that the <b>Move and modify attributes</b> 
+		output handler has correct sentence case labels for its radio buttons.
+<p>
+  	   	<LI><b>[FlexIDSCore #5143]</b> Extract OCR Text In Image Area - Memory Allocation 
+		Failure 
+        	<ul>
+            		<li>Exercise the <b>OH - Cuyahoga Probate Court - Proware</b> rules 
+			delivery from <b>2012-06-13</b>.
+			<li>Process a set of Cuyahoga sample images.
+			<li>Review the UEX log and confirm that no <b>ELI12938 - Memory 
+			Allocation Failure</b> exceptions are seen under <b>ELI33711 - Failed to 
+			extract OCR text from image area</b> exceptions.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5160]</b> .NET 3.5 on Windows 8 and Server 2012
+        	<ul>
+            		<li>Confirm that OSSI.exe properly handles a request for downloading and 
+			installing .NET 3.5 for <b>Windows 8</b>.
+            		<li>Confirm that OSSI.exe properly handles a request for downloading and 
+			installing .NET 3.5 for <b>Server 2012</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5186, #5193, #5194]</b> FAM Backups
+        	<ul>
+            		<li>Prepare one or more FPS files for file backup.
+			<li>Confirm that the FAM does not crash during operation.
+			<li>Confirm that no <b>Task ID not found in map</b> exceptions are logged.
+			<li>Confirm that right-clicking on a file in the completed list does not 
+			cause an exception.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5188]</b> Slideshow COM Exception
+        	<ul>
+            		<li>Exercise the slideshow during verification.
+			<li>Confirm that no <b>ELI17396: COM Exception caught</b> errors are displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5190]</b> Validation Of Added Redactions
+        	<ul>
+            		<li>Exercise verification for the images from 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\5190</b>.
+			<li>Confirm that added redactions are all present in the output images.
+			<li>Confirm that if any redactions are not present, the files fail 
+			processing with a meaningful exception.
+			<li>Confirm that <b>HKLM\Software\Extract 
+			Systems\ReusableComponents\VendorSpecificUtils\LeadUtils\SkipImageAreaConfirmation</b> 
+			can be set to <b>1</b> to disable this check.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSIntegrations #330, #331]</b> NetDMS
+        	<ul>
+            		<li>Confirm that the <b>NetDMS: Add redactions</b> task properly expands 
+			path tag functions.
+			<li>Confirm that the NetDMS tasks now require a specific NetDMS license.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6238]</b> FAM Service
+        	<ul>
+            		<li>Configure an FPS file with both queuing (with listening) and processing 
+			to run via <b>FAM Service</b>.
+			<li>Configure another FPS file with just processing to run via <b>FAM 
+			Service</b>.
+			<li>Configure Service settings so that an automatic restart will happen 
+			without a long delay.
+			<li>Exercise the FAM service.
+			<li>Confirm that the processing-only FPS file restarts automatically.
+			<li>Confirm that the FPS file that includes listening:
+			<ul>
+				<li>stops processing after the appropriate number of files
+				<li>continues queuing
+			</ul>
+			<li>Confirm that a meaningful exception is logged when initial processing 
+			starts.
+			<li>Confirm that another meaningful exception is logged when the 
+			configured number of files has been processed.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6333]</b> FAM Service With Evaluation License
+        	<ul>
+            		<li>Confirm that the <b>FAM Service</b> can run with an evaulation license 
+			when using local files, a local database, and the local system account.
+			<li>Test use of an evaluation license when using a domain user account.
+			<li>Test use of an evaluation license when using a domain user account plus 
+			a remote database.
+			<li>Test use of an evaluation license when using a domain user account plus 
+			a remote database and remote files.
+			<li>Confirm that limitations of the <b>FAM Service</b> with an evaulation 
+			license are documented in the Help file.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6339]</b> Nuance Licensing
+        	<ul>
+            		<li>Start processing and confirm that OCR is working properly.
+			<li>Corrupt Nuance Licensing by modifying some characters in the 
+			<b>C:\Program Data\Nuance\License Manager\info.dat</b> file.
+			<li>Confirm that the repair utility requests administrator privileges.
+			<li>Confirm that the repair utility fixes the license corruption and 
+			that processing continues.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6366]</b> FAM Queuing
+        	<ul>
+            		<li>Exercise <b>Compute.fps</b> from FAM Sanity Test.
+			<li>Add logged-in user via Manage Users and start processing.
+			<li>Stop processing and remove the user name.
+			<li>Add machine name to run as service list in db options and confirm that 
+			FAM processing will not start.
+			<li>Confirm that the FPS file will run as a service.
+			<li>Stop service processing and turn off authentication.
+			<li>Start processing via FAM.
+			<li>Confirm that the number of files completed does not reset to 0.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6367]</b> FAM Service
+        	<ul>
+            		<li>Exercise FAM Service.
+			<li>Repeatedly stop and restart the service.
+			<li>Confirm that the FAM processes all stop cleanly.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6376]</b> Advanced Connection Properties
+        	<ul>
+            		<li>Open an FPS file.
+			<li>Set the <b>default connection string</b>.
+			<li>Modify a setting.
+			<li>Close the FPS file
+			<li>Confirm that the user is prompted to save changes.
+<p>
+			<li>Confirm that setting <b>MARS Connection=False</b> causes queuing 
+			to stop adding files beyond the number of available cores.  Note that 
+			stopping processing leaves the FAM in a hung state.
+			<li>Confirm that <b>Async=True;</b> is a valid item to be specified 
+			in the advanced connection string.
+<p>
+			<li>Exercise other scenarios where the FPS file dirty flag will be set 
+			or cleared.
+			<li>Confirm proper behavior.
+<p>
+			<li>Open a version 5 FPS file.
+			<li>Specify a server and database.
+			<li>Close the FPS file.
+			<li>Confirm that the user is prompted to save changes.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6377]</b> FAM Doesn't Connect To Existing Database
+        	<ul>
+			<li>Open an FPS file from any demo.
+			<li>Confirm that the FPS file connects to the database without error.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6380]</b> Path Tags
+        	<ul>
+			<li>Open a new FPS instance.
+			<li>Configure the FAM to supply files from <b>&lt;FPSFileDirgt;</b>.
+			<li>Start supplying.
+			<li>Confirm that a meaningful exception is presented.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
