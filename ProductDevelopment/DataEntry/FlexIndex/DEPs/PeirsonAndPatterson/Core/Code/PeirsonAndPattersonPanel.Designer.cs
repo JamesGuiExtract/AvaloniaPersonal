@@ -624,6 +624,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._BusPartnerName_AssignorTextBox.Size = new System.Drawing.Size(510, 21);
             this._BusPartnerName_AssignorTextBox.TabIndex = 24;
             this._BusPartnerName_AssignorTextBox.ValidationErrorMessage = "Vendor Name – Assignor is required";
+            this._BusPartnerName_AssignorTextBox.ValidationPattern = "\\S";
             // 
             // _assignorAddressTwoColumnTable
             // 
