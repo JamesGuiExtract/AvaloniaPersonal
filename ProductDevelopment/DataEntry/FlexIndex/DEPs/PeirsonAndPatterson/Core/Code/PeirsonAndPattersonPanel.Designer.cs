@@ -480,8 +480,8 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._RealEstate_LotBlockSubdivisionNameTextBox.TabIndex = 12;
             this._RealEstate_LotBlockSubdivisionNameTextBox.ValidationErrorMessage = "Short Legal Description is required";
             this._RealEstate_LotBlockSubdivisionNameTextBox.ValidationQuery = "<Query ValidValue=\'True\'><Expression>\r\n!string.IsNullOrWhiteSpace(<Attribute>.</A" +
-    "ttribute>) or (<Attribute>/RealEstate/PropState</Attribute> in\r\n{\'WA\', \'NY\'})\r\n<" +
-    "/Expression></Query>";
+    "ttribute>) or !(<Attribute>/RealEstate/PropState</Attribute> in\r\n{\'WA\', \'NY\'})\r\n" +
+    "</Expression></Query>";
             // 
             // _Closing_MinNumTextBox
             // 
