@@ -207,6 +207,15 @@
 {'AL','DE','FL','HI','IL','IA','KY','MD','MS','NV','NC','OH','OK','OR','PA','RI','SC','UT','VA','WA','WI'})
 &lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>
+  <data name="_Closing_MinNumTextBox.ValidationQuery" xml:space="preserve">
+    <value>&lt;Declarations&gt;
+&lt;Complex Name='Required'&gt;MERS Mortgage Identification Number is required&lt;/Complex&gt;
+&lt;/Declarations&gt;
+&lt;Query ValidValue='True' ValidationMessage='Required'&gt;&lt;Expression&gt;
+	!string.IsNullOrWhiteSpace(&lt;Attribute&gt;.&lt;/Attribute&gt;) or
+	string.IsNullOrWhiteSpace(&lt;Attribute&gt;/MERSClue&lt;/Attribute&gt;)
+&lt;/Expression&gt;&lt;/Query&gt;</value>
+  </data>
   <data name="_BusPartnerName_AssignorTextBox.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query Default='1'&gt;&lt;Attribute SelectionMode='List' StringList=' AND '&gt;/BusPartnerName_Assignor_Temp&lt;/Attribute&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;Expression&gt;
