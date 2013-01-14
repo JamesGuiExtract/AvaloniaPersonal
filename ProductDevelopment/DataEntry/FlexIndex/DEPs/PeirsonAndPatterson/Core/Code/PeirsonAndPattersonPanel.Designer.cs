@@ -109,6 +109,8 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this.dataGridViewColumn19 = new System.Windows.Forms.DataGridViewColumn();
             this.dataGridViewColumn20 = new System.Windows.Forms.DataGridViewColumn();
             this.dataGridViewColumn21 = new System.Windows.Forms.DataGridViewColumn();
+            this.dataGridViewColumn22 = new System.Windows.Forms.DataGridViewColumn();
+            this.dataGridViewColumn23 = new System.Windows.Forms.DataGridViewColumn();
             label7 = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
@@ -562,7 +564,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._BusPartnerName_TrusteeTextBox.Size = new System.Drawing.Size(510, 21);
             this._BusPartnerName_TrusteeTextBox.TabIndex = 17;
             this._BusPartnerName_TrusteeTextBox.ValidationErrorMessage = "Vendor Name – Trustee is required";
-            this._BusPartnerName_TrusteeTextBox.ValidationPattern = "\\S";
+            this._BusPartnerName_TrusteeTextBox.ValidationQuery = resources.GetString("_BusPartnerName_TrusteeTextBox.ValidationQuery");
             // 
             // _BusPartnerStreetAddr_TrusteeTextBox
             // 
@@ -576,7 +578,9 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._BusPartnerStreetAddr_TrusteeTextBox.Size = new System.Drawing.Size(510, 21);
             this._BusPartnerStreetAddr_TrusteeTextBox.TabIndex = 18;
             this._BusPartnerStreetAddr_TrusteeTextBox.ValidationErrorMessage = "Vendor Street Address – Trustee is required";
-            this._BusPartnerStreetAddr_TrusteeTextBox.ValidationPattern = "\\S";
+            this._BusPartnerStreetAddr_TrusteeTextBox.ValidationQuery = "<Query ValidValue=\'True\'><Expression>\r\n!string.IsNullOrWhiteSpace(<Attribute>.</A" +
+    "ttribute>) or !(<Attribute>/RealEstate/PropState</Attribute> in {\'VA\'})\r\n</Expre" +
+    "ssion></Query>";
             // 
             // _BusPartnerName_Trustee2TextBox
             // 
@@ -940,6 +944,18 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this.dataGridViewColumn21.HeaderText = "Subject Property Address";
             this.dataGridViewColumn21.Name = "dataGridViewColumn21";
             // 
+            // dataGridViewColumn22
+            // 
+            this.dataGridViewColumn22.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn22.HeaderText = "Vendor Address - Assignor";
+            this.dataGridViewColumn22.Name = "dataGridViewColumn22";
+            // 
+            // dataGridViewColumn23
+            // 
+            this.dataGridViewColumn23.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn23.HeaderText = "Subject Property Address";
+            this.dataGridViewColumn23.Name = "dataGridViewColumn23";
+            // 
             // PeirsonAndPattersonPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 13F);
@@ -1057,5 +1073,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn19;
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn20;
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn21;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn22;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn23;
     }
 }

@@ -216,6 +216,12 @@
 	string.IsNullOrWhiteSpace(&lt;Attribute&gt;/MERSClue&lt;/Attribute&gt;)
 &lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>
+  <data name="_BusPartnerName_TrusteeTextBox.ValidationQuery" xml:space="preserve">
+    <value>&lt;Query ValidValue='True'&gt;&lt;Expression&gt;
+!string.IsNullOrWhiteSpace(&lt;Attribute&gt;.&lt;/Attribute&gt;) or !(&lt;Attribute&gt;/RealEstate/PropState&lt;/Attribute&gt; in
+{'AK','AZ','CA','CO','DC','ID','MD','MS','MO','MT','NE','NV','NC','OR','TN','TX','UT','VA','WA','WV'})
+&lt;/Expression&gt;&lt;/Query&gt;</value>
+  </data>
   <data name="_BusPartnerName_AssignorTextBox.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query Default='1'&gt;&lt;Attribute SelectionMode='List' StringList=' AND '&gt;/BusPartnerName_Assignor_Temp&lt;/Attribute&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;Expression&gt;
