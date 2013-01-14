@@ -40,11 +40,9 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             System.Windows.Forms.Label label8;
             System.Windows.Forms.Label label9;
             System.Windows.Forms.Label label10;
-            System.Windows.Forms.Label label11;
             System.Windows.Forms.Label label12;
             System.Windows.Forms.Label label13;
             System.Windows.Forms.Label label14;
-            System.Windows.Forms.Label label15;
             System.Windows.Forms.Label label16;
             System.Windows.Forms.Label label17;
             Extract.DataEntry.DataEntryTableRow dataEntryTableRow1 = new Extract.DataEntry.DataEntryTableRow();
@@ -56,6 +54,14 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             Extract.DataEntry.DataEntryTableRow dataEntryTableRow7 = new Extract.DataEntry.DataEntryTableRow();
             Extract.DataEntry.DataEntryTableRow dataEntryTableRow8 = new Extract.DataEntry.DataEntryTableRow();
             Extract.DataEntry.DataEntryTableRow dataEntryTableRow9 = new Extract.DataEntry.DataEntryTableRow();
+            Extract.DataEntry.DataEntryTableRow dataEntryTableRow10 = new Extract.DataEntry.DataEntryTableRow();
+            Extract.DataEntry.DataEntryTableRow dataEntryTableRow11 = new Extract.DataEntry.DataEntryTableRow();
+            Extract.DataEntry.DataEntryTableRow dataEntryTableRow12 = new Extract.DataEntry.DataEntryTableRow();
+            Extract.DataEntry.DataEntryTableRow dataEntryTableRow13 = new Extract.DataEntry.DataEntryTableRow();
+            System.Windows.Forms.Label label11;
+            System.Windows.Forms.Label label18;
+            System.Windows.Forms.Label label15;
+            System.Windows.Forms.Label label19;
             Extract.DataEntry.HighlightColor highlightColor1 = new Extract.DataEntry.HighlightColor();
             Extract.DataEntry.HighlightColor highlightColor2 = new Extract.DataEntry.HighlightColor();
             this._Lien_InstrNumTextBox = new Extract.DataEntry.DataEntryTextBox();
@@ -66,7 +72,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._RealEstate_LegalDescTextBox = new Extract.DataEntry.DataEntryTextBox();
             this.dataGridViewColumn1 = new System.Windows.Forms.DataGridViewColumn();
             this.dataGridViewColumn2 = new System.Windows.Forms.DataGridViewColumn();
-            this._returnAddressTable = new Extract.DataEntry.DataEntryTwoColumnTable();
+            this._realEstateAddressTable = new Extract.DataEntry.DataEntryTwoColumnTable();
             this.dataGridViewColumn3 = new System.Windows.Forms.DataGridViewColumn();
             this.dataGridViewColumn4 = new System.Windows.Forms.DataGridViewColumn();
             this._RealEstate_ParcelNumTextBox = new Extract.DataEntry.DataEntryTextBox();
@@ -76,12 +82,11 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this.dataGridViewColumn5 = new System.Windows.Forms.DataGridViewColumn();
             this._Lien_LienOriginalMortgageeTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._BusPartnerName_TrusteeTextBox = new Extract.DataEntry.DataEntryTextBox();
-            this._BusPartnerStreetAddr_TrusteeTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._BusPartnerName_Trustee2TextBox = new Extract.DataEntry.DataEntryTextBox();
             this._Lien_OrigBalAmtTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._RealEstate_PropCountyTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._BusPartnerName_AssignorTextBox = new Extract.DataEntry.DataEntryTextBox();
-            this._assignorAddressTwoColumnTable = new Extract.DataEntry.DataEntryTwoColumnTable();
+            this._assignorAddressTable = new Extract.DataEntry.DataEntryTwoColumnTable();
             this.dataGridViewColumn6 = new System.Windows.Forms.DataGridViewColumn();
             this.dataGridViewColumn7 = new System.Windows.Forms.DataGridViewColumn();
             this.dataGridViewColumn8 = new System.Windows.Forms.DataGridViewColumn();
@@ -111,6 +116,14 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this.dataGridViewColumn21 = new System.Windows.Forms.DataGridViewColumn();
             this.dataGridViewColumn22 = new System.Windows.Forms.DataGridViewColumn();
             this.dataGridViewColumn23 = new System.Windows.Forms.DataGridViewColumn();
+            this.dataGridViewColumn24 = new System.Windows.Forms.DataGridViewColumn();
+            this.dataGridViewColumn25 = new System.Windows.Forms.DataGridViewColumn();
+            this._trusteeAddressTable = new Extract.DataEntry.DataEntryTwoColumnTable();
+            this.dataGridViewColumn26 = new System.Windows.Forms.DataGridViewColumn();
+            this.dataGridViewColumn27 = new System.Windows.Forms.DataGridViewColumn();
+            this._RealEstate_SectionTextBox = new Extract.DataEntry.DataEntryTextBox();
+            this.RealEstate_TownshipTextBox = new Extract.DataEntry.DataEntryTextBox();
+            this.RealEstate_RangeTextBox = new Extract.DataEntry.DataEntryTextBox();
             label7 = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
@@ -122,21 +135,24 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             label8 = new System.Windows.Forms.Label();
             label9 = new System.Windows.Forms.Label();
             label10 = new System.Windows.Forms.Label();
-            label11 = new System.Windows.Forms.Label();
             label12 = new System.Windows.Forms.Label();
             label13 = new System.Windows.Forms.Label();
             label14 = new System.Windows.Forms.Label();
-            label15 = new System.Windows.Forms.Label();
             label16 = new System.Windows.Forms.Label();
             label17 = new System.Windows.Forms.Label();
+            label11 = new System.Windows.Forms.Label();
+            label18 = new System.Windows.Forms.Label();
+            label15 = new System.Windows.Forms.Label();
+            label19 = new System.Windows.Forms.Label();
             _recordingInformationGroupBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._returnAddressTable)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this._assignorAddressTwoColumnTable)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._realEstateAddressTable)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._assignorAddressTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._Lien_KnownAsName_TempTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._Lien_LienOriginalMortgagee_TempTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._BusPartnerName_Trustee_TempTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._BusPartnerName_Trustee2_TempTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._BusPartnerName_Assignor_TempTable)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._trusteeAddressTable)).BeginInit();
             this.SuspendLayout();
             // 
             // label7
@@ -295,19 +311,10 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             label10.TabIndex = 21;
             label10.Text = "Vendor Name – Trustee";
             // 
-            // label11
-            // 
-            label11.AutoSize = true;
-            label11.Location = new System.Drawing.Point(0, 397);
-            label11.Name = "label11";
-            label11.Size = new System.Drawing.Size(195, 13);
-            label11.TabIndex = 23;
-            label11.Text = "Vendor Street Address – Trustee";
-            // 
             // label12
             // 
             label12.AutoSize = true;
-            label12.Location = new System.Drawing.Point(0, 436);
+            label12.Location = new System.Drawing.Point(0, 516);
             label12.Name = "label12";
             label12.Size = new System.Drawing.Size(150, 13);
             label12.TabIndex = 24;
@@ -316,7 +323,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             // label13
             // 
             label13.AutoSize = true;
-            label13.Location = new System.Drawing.Point(0, 475);
+            label13.Location = new System.Drawing.Point(0, 555);
             label13.Name = "label13";
             label13.Size = new System.Drawing.Size(158, 13);
             label13.TabIndex = 25;
@@ -325,25 +332,16 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             // label14
             // 
             label14.AutoSize = true;
-            label14.Location = new System.Drawing.Point(0, 514);
+            label14.Location = new System.Drawing.Point(0, 594);
             label14.Name = "label14";
             label14.Size = new System.Drawing.Size(148, 13);
             label14.TabIndex = 26;
             label14.Text = "Subject Property County";
             // 
-            // label15
-            // 
-            label15.AutoSize = true;
-            label15.Location = new System.Drawing.Point(0, 553);
-            label15.Name = "label15";
-            label15.Size = new System.Drawing.Size(174, 13);
-            label15.TabIndex = 27;
-            label15.Text = "Legal Description (long legal)";
-            // 
             // label16
             // 
             label16.AutoSize = true;
-            label16.Location = new System.Drawing.Point(3, 799);
+            label16.Location = new System.Drawing.Point(3, 919);
             label16.Name = "label16";
             label16.Size = new System.Drawing.Size(149, 13);
             label16.TabIndex = 29;
@@ -378,7 +376,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._RealEstate_LegalDescTextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this._RealEstate_LegalDescTextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._RealEstate_LegalDescTextBox.AutoUpdateQuery = "";
-            this._RealEstate_LegalDescTextBox.Location = new System.Drawing.Point(3, 569);
+            this._RealEstate_LegalDescTextBox.Location = new System.Drawing.Point(3, 649);
             this._RealEstate_LegalDescTextBox.Multiline = true;
             this._RealEstate_LegalDescTextBox.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._RealEstate_LegalDescTextBox.Name = "_RealEstate_LegalDescTextBox";
@@ -401,25 +399,25 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this.dataGridViewColumn2.HeaderText = "Address";
             this.dataGridViewColumn2.Name = "dataGridViewColumn2";
             // 
-            // _returnAddressTable
+            // _realEstateAddressTable
             // 
-            this._returnAddressTable.AllowUserToResizeRows = false;
-            this._returnAddressTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this._realEstateAddressTable.AllowUserToResizeRows = false;
+            this._realEstateAddressTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._returnAddressTable.AttributeName = "RealEstate";
-            this._returnAddressTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this._returnAddressTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            this._returnAddressTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this._returnAddressTable.DisplayName = "Subject Property Address";
-            this._returnAddressTable.Location = new System.Drawing.Point(3, 662);
-            this._returnAddressTable.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._returnAddressTable.Name = "_returnAddressTable";
-            this._returnAddressTable.ParentDataEntryControl = null;
-            this._returnAddressTable.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            this._realEstateAddressTable.AttributeName = "RealEstate";
+            this._realEstateAddressTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this._realEstateAddressTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+            this._realEstateAddressTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this._realEstateAddressTable.DisplayName = "Subject Property Address";
+            this._realEstateAddressTable.Location = new System.Drawing.Point(3, 782);
+            this._realEstateAddressTable.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._realEstateAddressTable.Name = "_realEstateAddressTable";
+            this._realEstateAddressTable.ParentDataEntryControl = null;
+            this._realEstateAddressTable.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
             dataEntryTableRow1.AttributeName = "PropStreetAddr";
             dataEntryTableRow1.FormattingRuleFile = "..\\Rules\\Swiping\\PropStreetAddr.rsd.etf";
             dataEntryTableRow1.Name = "Street Address";
-            dataEntryTableRow1.ValidationErrorMessage = "Street address is required";
+            dataEntryTableRow1.ValidationErrorMessage = "Subject Property Street address is required";
             dataEntryTableRow1.ValidationPattern = "\\S";
             dataEntryTableRow2.AttributeName = "PropStreetUnitNum";
             dataEntryTableRow2.FormattingRuleFile = "..\\Rules\\Swiping\\PropStreetUnitNum.rsd.etf";
@@ -446,17 +444,17 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             dataEntryTableRow5.ValidationErrorMessage = "Subject Property Zip Code must be a valid 5 or 9 digit zip";
             dataEntryTableRow5.ValidationPattern = "^\\d{5}(-?\\d{4})?$";
             dataEntryTableRow5.ValidationQuery = resources.GetString("dataEntryTableRow5.ValidationQuery");
-            this._returnAddressTable.Rows.Add(dataEntryTableRow1);
-            this._returnAddressTable.Rows.Add(dataEntryTableRow2);
-            this._returnAddressTable.Rows.Add(dataEntryTableRow3);
-            this._returnAddressTable.Rows.Add(dataEntryTableRow4);
-            this._returnAddressTable.Rows.Add(dataEntryTableRow5);
-            this._returnAddressTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this._returnAddressTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this._returnAddressTable.Size = new System.Drawing.Size(511, 134);
-            this._returnAddressTable.TabIndex = 23;
-            this._returnAddressTable.TableFormattingRuleFile = "..\\Rules\\Swiping\\RealEstate.rsd.etf";
-            this._returnAddressTable.TableSwipingEnabled = true;
+            this._realEstateAddressTable.Rows.Add(dataEntryTableRow1);
+            this._realEstateAddressTable.Rows.Add(dataEntryTableRow2);
+            this._realEstateAddressTable.Rows.Add(dataEntryTableRow3);
+            this._realEstateAddressTable.Rows.Add(dataEntryTableRow4);
+            this._realEstateAddressTable.Rows.Add(dataEntryTableRow5);
+            this._realEstateAddressTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
+            this._realEstateAddressTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
+            this._realEstateAddressTable.Size = new System.Drawing.Size(511, 134);
+            this._realEstateAddressTable.TabIndex = 26;
+            this._realEstateAddressTable.TableFormattingRuleFile = "..\\Rules\\Swiping\\RealEstate.rsd.etf";
+            this._realEstateAddressTable.TableSwipingEnabled = true;
             // 
             // dataGridViewColumn3
             // 
@@ -566,22 +564,6 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._BusPartnerName_TrusteeTextBox.ValidationErrorMessage = "Vendor Name – Trustee is required";
             this._BusPartnerName_TrusteeTextBox.ValidationQuery = resources.GetString("_BusPartnerName_TrusteeTextBox.ValidationQuery");
             // 
-            // _BusPartnerStreetAddr_TrusteeTextBox
-            // 
-            this._BusPartnerStreetAddr_TrusteeTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._BusPartnerStreetAddr_TrusteeTextBox.AttributeName = "BusPartnerStreetAddr_Trustee";
-            this._BusPartnerStreetAddr_TrusteeTextBox.FormattingRuleFile = "..\\Rules\\Swiping\\BusPartnerStreetAddr_Trustee.rsd.etf";
-            this._BusPartnerStreetAddr_TrusteeTextBox.Location = new System.Drawing.Point(3, 413);
-            this._BusPartnerStreetAddr_TrusteeTextBox.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._BusPartnerStreetAddr_TrusteeTextBox.Name = "_BusPartnerStreetAddr_TrusteeTextBox";
-            this._BusPartnerStreetAddr_TrusteeTextBox.Size = new System.Drawing.Size(510, 21);
-            this._BusPartnerStreetAddr_TrusteeTextBox.TabIndex = 18;
-            this._BusPartnerStreetAddr_TrusteeTextBox.ValidationErrorMessage = "Vendor Street Address – Trustee is required";
-            this._BusPartnerStreetAddr_TrusteeTextBox.ValidationQuery = "<Query ValidValue=\'True\'><Expression>\r\n!string.IsNullOrWhiteSpace(<Attribute>.</A" +
-    "ttribute>) or !(<Attribute>/RealEstate/PropState</Attribute> in {\'VA\'})\r\n</Expre" +
-    "ssion></Query>";
-            // 
             // _BusPartnerName_Trustee2TextBox
             // 
             this._BusPartnerName_Trustee2TextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -590,7 +572,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._BusPartnerName_Trustee2TextBox.AutoUpdateQuery = "<Query Default=\'1\'><Attribute SelectionMode=\'List\' StringList=\' AND \'>/BusPartner" +
     "Name_Trustee2_Temp</Attribute></Query>";
             this._BusPartnerName_Trustee2TextBox.FormattingRuleFile = "..\\Rules\\Swiping\\BusPartnerName_Trustee2.rsd.etf";
-            this._BusPartnerName_Trustee2TextBox.Location = new System.Drawing.Point(3, 452);
+            this._BusPartnerName_Trustee2TextBox.Location = new System.Drawing.Point(3, 532);
             this._BusPartnerName_Trustee2TextBox.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._BusPartnerName_Trustee2TextBox.Name = "_BusPartnerName_Trustee2TextBox";
             this._BusPartnerName_Trustee2TextBox.Size = new System.Drawing.Size(510, 21);
@@ -606,7 +588,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             | System.Windows.Forms.AnchorStyles.Right)));
             this._Lien_OrigBalAmtTextBox.AttributeName = "Lien_OrigBalAmt";
             this._Lien_OrigBalAmtTextBox.FormattingRuleFile = "..\\Rules\\Swiping\\Lien_OrigBalAmt.rsd.etf";
-            this._Lien_OrigBalAmtTextBox.Location = new System.Drawing.Point(3, 491);
+            this._Lien_OrigBalAmtTextBox.Location = new System.Drawing.Point(3, 571);
             this._Lien_OrigBalAmtTextBox.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._Lien_OrigBalAmtTextBox.Name = "_Lien_OrigBalAmtTextBox";
             this._Lien_OrigBalAmtTextBox.Size = new System.Drawing.Size(510, 21);
@@ -620,7 +602,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             | System.Windows.Forms.AnchorStyles.Right)));
             this._RealEstate_PropCountyTextBox.AttributeName = "RealEstate_PropCounty";
             this._RealEstate_PropCountyTextBox.FormattingRuleFile = "..\\Rules\\Swiping\\RealEstate_PropCounty.rsd.etf";
-            this._RealEstate_PropCountyTextBox.Location = new System.Drawing.Point(3, 530);
+            this._RealEstate_PropCountyTextBox.Location = new System.Drawing.Point(3, 610);
             this._RealEstate_PropCountyTextBox.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._RealEstate_PropCountyTextBox.Name = "_RealEstate_PropCountyTextBox";
             this._RealEstate_PropCountyTextBox.Size = new System.Drawing.Size(510, 21);
@@ -635,29 +617,29 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._BusPartnerName_AssignorTextBox.AttributeName = "BusPartnerName_Assignor";
             this._BusPartnerName_AssignorTextBox.AutoUpdateQuery = resources.GetString("_BusPartnerName_AssignorTextBox.AutoUpdateQuery");
             this._BusPartnerName_AssignorTextBox.FormattingRuleFile = "..\\Rules\\Swiping\\BusPartnerName_Assignor.rsd.etf";
-            this._BusPartnerName_AssignorTextBox.Location = new System.Drawing.Point(3, 815);
+            this._BusPartnerName_AssignorTextBox.Location = new System.Drawing.Point(3, 935);
             this._BusPartnerName_AssignorTextBox.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._BusPartnerName_AssignorTextBox.Name = "_BusPartnerName_AssignorTextBox";
             this._BusPartnerName_AssignorTextBox.Size = new System.Drawing.Size(510, 21);
-            this._BusPartnerName_AssignorTextBox.TabIndex = 24;
+            this._BusPartnerName_AssignorTextBox.TabIndex = 27;
             this._BusPartnerName_AssignorTextBox.ValidationErrorMessage = "Vendor Name – Assignor is required";
             this._BusPartnerName_AssignorTextBox.ValidationPattern = "\\S";
             // 
-            // _assignorAddressTwoColumnTable
+            // _assignorAddressTable
             // 
-            this._assignorAddressTwoColumnTable.AllowUserToResizeRows = false;
-            this._assignorAddressTwoColumnTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this._assignorAddressTable.AllowUserToResizeRows = false;
+            this._assignorAddressTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._assignorAddressTwoColumnTable.AttributeName = "Assignor";
-            this._assignorAddressTwoColumnTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this._assignorAddressTwoColumnTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            this._assignorAddressTwoColumnTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this._assignorAddressTwoColumnTable.DisplayName = "Vendor Address - Assignor";
-            this._assignorAddressTwoColumnTable.Location = new System.Drawing.Point(3, 841);
-            this._assignorAddressTwoColumnTable.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._assignorAddressTwoColumnTable.Name = "_assignorAddressTwoColumnTable";
-            this._assignorAddressTwoColumnTable.ParentDataEntryControl = null;
-            this._assignorAddressTwoColumnTable.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            this._assignorAddressTable.AttributeName = "Assignor";
+            this._assignorAddressTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this._assignorAddressTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+            this._assignorAddressTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this._assignorAddressTable.DisplayName = "Vendor Address - Assignor";
+            this._assignorAddressTable.Location = new System.Drawing.Point(3, 961);
+            this._assignorAddressTable.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._assignorAddressTable.Name = "_assignorAddressTable";
+            this._assignorAddressTable.ParentDataEntryControl = null;
+            this._assignorAddressTable.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
             dataEntryTableRow6.AttributeName = "BusPartnerStreetAddr";
             dataEntryTableRow6.FormattingRuleFile = "..\\Rules\\Swiping\\BusPartnerStreetAddr.rsd.etf";
             dataEntryTableRow6.Name = "Street Address";
@@ -678,24 +660,24 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
     "SQL>";
             dataEntryTableRow8.FormattingRuleFile = "..\\Rules\\Swiping\\BusPartnerState.rsd.etf";
             dataEntryTableRow8.Name = "State";
-            dataEntryTableRow8.ValidationErrorMessage = " Valid Assignor State must be a valid 2 letter abbreviation";
+            dataEntryTableRow8.ValidationErrorMessage = "Assignor State must be a valid 2 letter abbreviation";
             dataEntryTableRow8.ValidationQuery = resources.GetString("dataEntryTableRow8.ValidationQuery");
             dataEntryTableRow9.AttributeName = "BusPartnerZip";
             dataEntryTableRow9.AutoUpdateQuery = "";
             dataEntryTableRow9.FormattingRuleFile = "..\\Rules\\Swiping\\BusPartnerZip.rsd.etf";
             dataEntryTableRow9.Name = "Zip";
-            dataEntryTableRow9.ValidationErrorMessage = "Valid Assignor Zip Code must be a valid 5 or 9 digit zip";
+            dataEntryTableRow9.ValidationErrorMessage = "Assignor Zip Code must be a valid 5 or 9 digit zip";
             dataEntryTableRow9.ValidationQuery = resources.GetString("dataEntryTableRow9.ValidationQuery");
-            this._assignorAddressTwoColumnTable.Rows.Add(dataEntryTableRow6);
-            this._assignorAddressTwoColumnTable.Rows.Add(dataEntryTableRow7);
-            this._assignorAddressTwoColumnTable.Rows.Add(dataEntryTableRow8);
-            this._assignorAddressTwoColumnTable.Rows.Add(dataEntryTableRow9);
-            this._assignorAddressTwoColumnTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this._assignorAddressTwoColumnTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this._assignorAddressTwoColumnTable.Size = new System.Drawing.Size(511, 112);
-            this._assignorAddressTwoColumnTable.TabIndex = 25;
-            this._assignorAddressTwoColumnTable.TableFormattingRuleFile = "..\\Rules\\Swiping\\Assignor.rsd.etf";
-            this._assignorAddressTwoColumnTable.TableSwipingEnabled = true;
+            this._assignorAddressTable.Rows.Add(dataEntryTableRow6);
+            this._assignorAddressTable.Rows.Add(dataEntryTableRow7);
+            this._assignorAddressTable.Rows.Add(dataEntryTableRow8);
+            this._assignorAddressTable.Rows.Add(dataEntryTableRow9);
+            this._assignorAddressTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
+            this._assignorAddressTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
+            this._assignorAddressTable.Size = new System.Drawing.Size(511, 112);
+            this._assignorAddressTable.TabIndex = 28;
+            this._assignorAddressTable.TableFormattingRuleFile = "..\\Rules\\Swiping\\Assignor.rsd.etf";
+            this._assignorAddressTable.TableSwipingEnabled = true;
             // 
             // dataGridViewColumn6
             // 
@@ -876,7 +858,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._BusPartnerName_Trustee2_TempTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._BusPartnerName_Trustee2_TempTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this._BusPartnerName_Trustee2Column});
-            this._BusPartnerName_Trustee2_TempTable.Location = new System.Drawing.Point(519, 453);
+            this._BusPartnerName_Trustee2_TempTable.Location = new System.Drawing.Point(518, 533);
             this._BusPartnerName_Trustee2_TempTable.Name = "_BusPartnerName_Trustee2_TempTable";
             this._BusPartnerName_Trustee2_TempTable.ParentDataEntryControl = null;
             this._BusPartnerName_Trustee2_TempTable.ReadOnly = true;
@@ -903,7 +885,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._BusPartnerName_Assignor_TempTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._BusPartnerName_Assignor_TempTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this._BusPartnerName_AssignorColumn});
-            this._BusPartnerName_Assignor_TempTable.Location = new System.Drawing.Point(519, 816);
+            this._BusPartnerName_Assignor_TempTable.Location = new System.Drawing.Point(519, 936);
             this._BusPartnerName_Assignor_TempTable.Name = "_BusPartnerName_Assignor_TempTable";
             this._BusPartnerName_Assignor_TempTable.ParentDataEntryControl = null;
             this._BusPartnerName_Assignor_TempTable.ReadOnly = true;
@@ -956,9 +938,176 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this.dataGridViewColumn23.HeaderText = "Subject Property Address";
             this.dataGridViewColumn23.Name = "dataGridViewColumn23";
             // 
+            // dataGridViewColumn24
+            // 
+            this.dataGridViewColumn24.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn24.HeaderText = "Vendor Address - Assignor";
+            this.dataGridViewColumn24.Name = "dataGridViewColumn24";
+            // 
+            // dataGridViewColumn25
+            // 
+            this.dataGridViewColumn25.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn25.HeaderText = "Subject Property Address";
+            this.dataGridViewColumn25.Name = "dataGridViewColumn25";
+            // 
+            // _trusteeAddressTable
+            // 
+            this._trusteeAddressTable.AllowUserToResizeRows = false;
+            this._trusteeAddressTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._trusteeAddressTable.AttributeName = "Trustee";
+            this._trusteeAddressTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this._trusteeAddressTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+            this._trusteeAddressTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this._trusteeAddressTable.DisplayName = "Vendor Address - Trustee";
+            this._trusteeAddressTable.Location = new System.Drawing.Point(3, 401);
+            this._trusteeAddressTable.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._trusteeAddressTable.Name = "_trusteeAddressTable";
+            this._trusteeAddressTable.ParentDataEntryControl = null;
+            this._trusteeAddressTable.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            dataEntryTableRow10.AttributeName = "BusPartnerStreetAddr";
+            dataEntryTableRow10.FormattingRuleFile = "..\\Rules\\Swiping\\BusPartnerStreetAddr.rsd.etf";
+            dataEntryTableRow10.Name = "Street Address";
+            dataEntryTableRow10.ValidationErrorMessage = "Trustee Street Address is required";
+            dataEntryTableRow10.ValidationQuery = "<Query ValidValue=\'True\'><Expression>\r\n!string.IsNullOrWhiteSpace(<Attribute>.</A" +
+    "ttribute>) or !(<Attribute>/RealEstate/PropState</Attribute> in {\'VA\'})\r\n</Expre" +
+    "ssion></Query>";
+            dataEntryTableRow11.AttributeName = "BusPartnerCity";
+            dataEntryTableRow11.AutoUpdateQuery = "";
+            dataEntryTableRow11.FormattingRuleFile = "..\\Rules\\Swiping\\BusPartnerCity.rsd.etf";
+            dataEntryTableRow11.Name = "City";
+            dataEntryTableRow11.ValidationErrorMessage = "Trustee City is required";
+            dataEntryTableRow11.ValidationQuery = "<Query ValidValue=\'True\'><Expression>\r\n!string.IsNullOrWhiteSpace(<Attribute>.</A" +
+    "ttribute>) or !(<Attribute>/RealEstate/PropState</Attribute> in {\'VA\'})\r\n</Expre" +
+    "ssion></Query>";
+            dataEntryTableRow12.AttributeName = "BusPartnerState";
+            dataEntryTableRow12.AutoUpdateQuery = "<SQL>SELECT [Abbreviation] FROM [State] WHERE [Name] = <Attribute>.</Attribute></" +
+    "SQL>";
+            dataEntryTableRow12.FormattingRuleFile = "..\\Rules\\Swiping\\BusPartnerState.rsd.etf";
+            dataEntryTableRow12.Name = "State";
+            dataEntryTableRow12.ValidationErrorMessage = "Trustee State must be a valid 2 letter abbreviation";
+            dataEntryTableRow12.ValidationQuery = resources.GetString("dataEntryTableRow12.ValidationQuery");
+            dataEntryTableRow13.AttributeName = "BusPartnerZip";
+            dataEntryTableRow13.AutoUpdateQuery = "";
+            dataEntryTableRow13.FormattingRuleFile = "..\\Rules\\Swiping\\BusPartnerZip.rsd.etf";
+            dataEntryTableRow13.Name = "Zip";
+            dataEntryTableRow13.ValidationErrorMessage = "Trustee Zip Code must be a valid 5 or 9 digit zip";
+            dataEntryTableRow13.ValidationQuery = resources.GetString("dataEntryTableRow13.ValidationQuery");
+            this._trusteeAddressTable.Rows.Add(dataEntryTableRow10);
+            this._trusteeAddressTable.Rows.Add(dataEntryTableRow11);
+            this._trusteeAddressTable.Rows.Add(dataEntryTableRow12);
+            this._trusteeAddressTable.Rows.Add(dataEntryTableRow13);
+            this._trusteeAddressTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
+            this._trusteeAddressTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
+            this._trusteeAddressTable.Size = new System.Drawing.Size(510, 112);
+            this._trusteeAddressTable.TabIndex = 18;
+            this._trusteeAddressTable.TableFormattingRuleFile = "..\\Rules\\Swiping\\Trustee.rsd.etf";
+            this._trusteeAddressTable.TableSwipingEnabled = true;
+            // 
+            // dataGridViewColumn26
+            // 
+            this.dataGridViewColumn26.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn26.HeaderText = "Vendor Address - Assignor";
+            this.dataGridViewColumn26.Name = "dataGridViewColumn26";
+            // 
+            // dataGridViewColumn27
+            // 
+            this.dataGridViewColumn27.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn27.HeaderText = "Vendor Address - Trustee";
+            this.dataGridViewColumn27.Name = "dataGridViewColumn27";
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Location = new System.Drawing.Point(90, 739);
+            label11.Name = "label11";
+            label11.Size = new System.Drawing.Size(60, 13);
+            label11.TabIndex = 37;
+            label11.Text = "Township";
+            // 
+            // label18
+            // 
+            label18.AutoSize = true;
+            label18.Location = new System.Drawing.Point(0, 739);
+            label18.Name = "label18";
+            label18.Size = new System.Drawing.Size(49, 13);
+            label18.TabIndex = 38;
+            label18.Text = "Section";
+            // 
+            // label15
+            // 
+            label15.AutoSize = true;
+            label15.Location = new System.Drawing.Point(0, 633);
+            label15.Name = "label15";
+            label15.Size = new System.Drawing.Size(174, 13);
+            label15.TabIndex = 27;
+            label15.Text = "Legal Description (long legal)";
+            // 
+            // _RealEstate_SectionTextBox
+            // 
+            this._RealEstate_SectionTextBox.AttributeName = "RealEstate_Section";
+            this._RealEstate_SectionTextBox.FormattingRuleFile = "..\\Rules\\Swiping\\RealEstate_Section.rsd.etf";
+            this._RealEstate_SectionTextBox.Location = new System.Drawing.Point(3, 755);
+            this._RealEstate_SectionTextBox.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._RealEstate_SectionTextBox.Name = "_RealEstate_SectionTextBox";
+            this._RealEstate_SectionTextBox.Size = new System.Drawing.Size(71, 21);
+            this._RealEstate_SectionTextBox.TabIndex = 23;
+            this._RealEstate_SectionTextBox.ValidationErrorMessage = "Section is required";
+            this._RealEstate_SectionTextBox.ValidationQuery = "<Query ValidValue=\'True\'><Expression>\r\n!string.IsNullOrWhiteSpace(<Attribute>.</A" +
+    "ttribute>) or !(<Attribute>/RealEstate/PropState</Attribute> in {\'MS\'})\r\n</Expre" +
+    "ssion></Query>";
+            // 
+            // RealEstate_TownshipTextBox
+            // 
+            this.RealEstate_TownshipTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.RealEstate_TownshipTextBox.AttributeName = "RealEstate_Township";
+            this.RealEstate_TownshipTextBox.FormattingRuleFile = "..\\Rules\\Swiping\\RealEstate_Township.rsd.etf";
+            this.RealEstate_TownshipTextBox.Location = new System.Drawing.Point(93, 755);
+            this.RealEstate_TownshipTextBox.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this.RealEstate_TownshipTextBox.Name = "RealEstate_TownshipTextBox";
+            this.RealEstate_TownshipTextBox.Size = new System.Drawing.Size(331, 21);
+            this.RealEstate_TownshipTextBox.TabIndex = 24;
+            this.RealEstate_TownshipTextBox.ValidationErrorMessage = "Township is required";
+            this.RealEstate_TownshipTextBox.ValidationQuery = "<Query ValidValue=\'True\'><Expression>\r\n!string.IsNullOrWhiteSpace(<Attribute>.</A" +
+    "ttribute>) or !(<Attribute>/RealEstate/PropState</Attribute> in {\'MS\'})\r\n</Expre" +
+    "ssion></Query>";
+            // 
+            // RealEstate_RangeTextBox
+            // 
+            this.RealEstate_RangeTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.RealEstate_RangeTextBox.AttributeName = "RealEstate_Range";
+            this.RealEstate_RangeTextBox.FormattingRuleFile = "..\\Rules\\Swiping\\RealEstate_Range.rsd.etf";
+            this.RealEstate_RangeTextBox.Location = new System.Drawing.Point(442, 755);
+            this.RealEstate_RangeTextBox.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this.RealEstate_RangeTextBox.Name = "RealEstate_RangeTextBox";
+            this.RealEstate_RangeTextBox.Size = new System.Drawing.Size(71, 21);
+            this.RealEstate_RangeTextBox.TabIndex = 25;
+            this.RealEstate_RangeTextBox.ValidationErrorMessage = "Range is required";
+            this.RealEstate_RangeTextBox.ValidationQuery = "<Query ValidValue=\'True\'><Expression>\r\n!string.IsNullOrWhiteSpace(<Attribute>.</A" +
+    "ttribute>) or !(<Attribute>/RealEstate/PropState</Attribute> in {\'MS\'})\r\n</Expre" +
+    "ssion></Query>";
+            // 
+            // label19
+            // 
+            label19.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            label19.AutoSize = true;
+            label19.Location = new System.Drawing.Point(441, 739);
+            label19.Name = "label19";
+            label19.Size = new System.Drawing.Size(43, 13);
+            label19.TabIndex = 25;
+            label19.Text = "Range";
+            // 
             // PeirsonAndPattersonPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 13F);
+            this.Controls.Add(this.RealEstate_RangeTextBox);
+            this.Controls.Add(label19);
+            this.Controls.Add(this.RealEstate_TownshipTextBox);
+            this.Controls.Add(this._RealEstate_SectionTextBox);
+            this.Controls.Add(label18);
+            this.Controls.Add(label11);
+            this.Controls.Add(this._trusteeAddressTable);
             this.Controls.Add(this._FullDocumentTextTextBox);
             this.Controls.Add(this._BusPartnerName_Assignor_TempTable);
             this.Controls.Add(this._BusPartnerName_Trustee2_TempTable);
@@ -967,7 +1116,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this.Controls.Add(this._Lien_KnownAsName_TempTable);
             this.Controls.Add(this.Lien_KnownAsNameTextBoxA);
             this.Controls.Add(label17);
-            this.Controls.Add(this._assignorAddressTwoColumnTable);
+            this.Controls.Add(this._assignorAddressTable);
             this.Controls.Add(this._BusPartnerName_AssignorTextBox);
             this.Controls.Add(label16);
             this.Controls.Add(label15);
@@ -977,8 +1126,6 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this.Controls.Add(label13);
             this.Controls.Add(this._BusPartnerName_Trustee2TextBox);
             this.Controls.Add(label12);
-            this.Controls.Add(this._BusPartnerStreetAddr_TrusteeTextBox);
-            this.Controls.Add(label11);
             this.Controls.Add(this._BusPartnerName_TrusteeTextBox);
             this.Controls.Add(label10);
             this.Controls.Add(this._Lien_LienOriginalMortgageeTextBox);
@@ -991,7 +1138,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this.Controls.Add(label5);
             this.Controls.Add(this._RealEstate_ParcelNumTextBox);
             this.Controls.Add(_recordingInformationGroupBox);
-            this.Controls.Add(this._returnAddressTable);
+            this.Controls.Add(this._realEstateAddressTable);
             this.Controls.Add(this._RealEstate_LegalDescTextBox);
             this.Controls.Add(label7);
             this.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -1005,16 +1152,17 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this.InvalidDataSaveMode = Extract.DataEntry.InvalidDataSaveMode.PromptForEach;
             this.MinimumSize = new System.Drawing.Size(408, 910);
             this.Name = "PeirsonAndPattersonPanel";
-            this.Size = new System.Drawing.Size(532, 954);
+            this.Size = new System.Drawing.Size(532, 1076);
             _recordingInformationGroupBox.ResumeLayout(false);
             _recordingInformationGroupBox.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._returnAddressTable)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this._assignorAddressTwoColumnTable)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._realEstateAddressTable)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._assignorAddressTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._Lien_KnownAsName_TempTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._Lien_LienOriginalMortgagee_TempTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._BusPartnerName_Trustee_TempTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._BusPartnerName_Trustee2_TempTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._BusPartnerName_Assignor_TempTable)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._trusteeAddressTable)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1025,7 +1173,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
         private DataEntryTextBox _RealEstate_LegalDescTextBox;
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn1;
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn2;
-        private DataEntryTwoColumnTable _returnAddressTable;
+        private DataEntryTwoColumnTable _realEstateAddressTable;
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn3;
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn4;
         private DataEntryTextBox _Lien_LienRecordingDateTextBox;
@@ -1039,12 +1187,11 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn5;
         private DataEntryTextBox _Lien_LienOriginalMortgageeTextBox;
         private DataEntryTextBox _BusPartnerName_TrusteeTextBox;
-        private DataEntryTextBox _BusPartnerStreetAddr_TrusteeTextBox;
         private DataEntryTextBox _BusPartnerName_Trustee2TextBox;
         private DataEntryTextBox _Lien_OrigBalAmtTextBox;
         private DataEntryTextBox _RealEstate_PropCountyTextBox;
         private DataEntryTextBox _BusPartnerName_AssignorTextBox;
-        private DataEntryTwoColumnTable _assignorAddressTwoColumnTable;
+        private DataEntryTwoColumnTable _assignorAddressTable;
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn6;
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn7;
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn8;
@@ -1075,5 +1222,13 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn21;
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn22;
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn23;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn24;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn25;
+        private DataEntryTwoColumnTable _trusteeAddressTable;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn26;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn27;
+        private DataEntryTextBox _RealEstate_SectionTextBox;
+        private DataEntryTextBox RealEstate_TownshipTextBox;
+        private DataEntryTextBox RealEstate_RangeTextBox;
     }
 }
