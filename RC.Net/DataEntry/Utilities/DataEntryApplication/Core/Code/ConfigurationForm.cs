@@ -1,10 +1,5 @@
-using Extract;
+using Extract.Utilities;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -34,6 +29,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 InitializeComponent();
 
+                _fileNameTagsButton.PathTags = new FileActionManagerPathTags();
                 _comClass = comClass;
             }
             catch (Exception ex)

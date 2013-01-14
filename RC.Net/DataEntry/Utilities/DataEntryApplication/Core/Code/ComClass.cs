@@ -81,7 +81,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// The name of the DataEntry configuration file to use for the DataEntryApplicationForm.
         /// </summary>
         string _configFileName;
-        
+
+        /// <summary>
+        /// The name of the DataEntry configuration file to use for the DataEntryApplicationForm
+        /// after evaluation of any path tags/functions.
+        /// </summary>
+        string _expandedConfigFileName;
+
         /// <summary>
         /// Specifies whether input event tracking should be logged in the database.
         /// </summary>
@@ -101,11 +107,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// The ID of the action being processed.
         /// </summary>
         int _actionID;
-
-        /// <summary>
-        /// Indicates whether DEP settings are currently being validated.
-        /// </summary>
-        bool _validatingSettings;
 
         // Object for mutexing data entry form manager creation
         static object _lock = new object();
@@ -412,6 +413,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 _fileProcessingDB = pDB;
                 _actionID = nActionID;
+                _expandedConfigFileName = pFAMTM.ExpandTagsAndFunctions(_configFileName, null);
 
                 // Ask the manager to create and display the data entry form.
                 // [FlexIDSCore:3088]
@@ -642,34 +644,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Display the configuration screen.
                 bool savedSettings = configForm.Configure();
 
-                // If the user attempted to apply settings, enter a loop to validate the settings. 
-                while (savedSettings)
-                {
-                    // Refresh the UI to prevent artifacts of the UI screen from lingering.
-                    Application.DoEvents();
-
-                    try
-                    {
-                        // Test the configuration settings.
-                        ValidateSettings();
-
-                        // If no exceptions were thrown, exit the validation loop.
-                        break;
-                    }
-                    catch (Exception ex)
-                    {
-                        ExtractException ee = new ExtractException("ELI25490",
-                            _DEFAULT_FILE_ACTION_TASK_NAME + " is not properly configured.\r\n\r\n" +
-                            "Please correct or complete configuration of all required fields.", ex);
-                        ee.Display();
-                    }
-
-                    // If an exception was thrown during ValidateSettings, re-display the
-                    // configuration screen to allow the user to correct the problem or cancel
-                    // configuration.
-                    savedSettings = configForm.Configure();
-                }
-
                 return savedSettings;
             }
             catch (Exception ex)
@@ -695,24 +669,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                try
-                {
-                    // Test the configuration settings.
-                    ValidateSettings();
-
-                    // If no exception was thrown, the calls is properly configured.
-                    return true;
-                }
-                catch (Exception)
-                {
-                    // [DataEntry:369]
-                    // Eat any exception; just trying to report if we are properly configured.
-                    // If the user needs to know why, they can re-attempt configuration.
-                }
-
-                // An exception was thrown from ValidateSettings; the class is not properly
-                // configured.
-                return false;
+                return !string.IsNullOrEmpty(_configFileName);
             }
             catch (Exception ex)
             {
@@ -754,48 +711,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <returns>A <see cref="DataEntryApplicationForm"/> using the current settings.</returns>
         IVerificationForm CreateDataEntryForm()
         {
-            // [DataEntry:928]
-            // If in the process of validating settings, don't enable either input tracking or
-            // counters since A) they are not necessary to validate the DEP can be loaded and
-            // B) there will not be a database available (as these features require).
-            if (_validatingSettings)
-            {
-                return new DataEntryApplicationForm(_configFileName, false, _fileProcessingDB,
-                    _actionID, false, false);
-            }
-            else
-            {
-                return new DataEntryApplicationForm(_configFileName, false, _fileProcessingDB,
-                    _actionID, _inputEventTrackingEnabled, _countersEnabled);
-            }
-        }
-
-        /// <summary>
-        /// Validates the current settings to ensure this <see cref="ComClass"/> instance is ready
-        /// to run as a <see cref="IFileProcessingTask"/>
-        /// </summary>
-        /// <throws><see cref="ExtractException"/> if the class is not properly configured.</throws>
-        void ValidateSettings()
-        {
-            try
-            {
-                using (new TemporaryWaitCursor())
-                {
-                    _validatingSettings = true;
-
-                    // Ask the manager to validate the DEP can be initialize using the specified
-                    // config file
-                    _dataEntryFormManager.ValidateForm(CreateDataEntryForm);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI25491", ex);
-            }
-            finally
-            {
-                _validatingSettings = false;
-            }
+            return new DataEntryApplicationForm(_expandedConfigFileName, false, _fileProcessingDB,
+                _actionID, _inputEventTrackingEnabled, _countersEnabled);
         }
 
         #endregion Private Methods

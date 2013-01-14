@@ -200,7 +200,7 @@ namespace Extract.DataEntry.Test
             Assert.That(results[0].ToString() == "192800.00");
             Assert.That(results[1].ToString() == "2");
             Assert.That(results[2].ToString() == "559");
-            Assert.That(results[3].ToString() == "1259");
+            Assert.That(results[3].ToString() == "1260");
             Assert.That(results[4].ToString() == "741");
             Assert.That(results[5].ToString() == "1292");
             Assert.That(results[6].ToString() == "559");

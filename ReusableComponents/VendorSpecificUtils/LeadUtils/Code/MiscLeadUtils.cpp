@@ -52,8 +52,10 @@ const int giDEFAULT_PDF_RESOLUTION = 300;
 L_INT giMAX_OPACITY = 255;
 
 // The tolerance for confirmImageAreas that indicates how many pixels away an image area can be
-// compared to where it is expected to be.
-const int giZONE_CONFIRMATION_TOLERANCE = 2;
+// compared to where it is expected to be and within that tolerance what percent of pixels can be
+// something other than the expected value.
+const int giZONE_CONFIRMATION_OFFSET_TOLERANCE = 2;
+const int giZONE_CONFIRMATION_PERCENT_TOLERANCE = 10;
 
 //-------------------------------------------------------------------------------------------------
 // Predefined Local Functions
@@ -929,7 +931,14 @@ void confirmImageAreas(const string& strImageFileName, vector<PageRasterZone>& r
 			LeadToolsBitmapFreeer freer(hBitmap);
 
 			// Load the bitmap (loadImagePage contains file access retry logic)
-			loadImagePage(strImageFileName, hBitmap, fileInfo, lfo, false);
+			// [FlexIDSCore:5198]
+			// Load page as a bitonal image; otherwise found pixel color may differ slightly from
+			// the expected pixel color (sometimes due to compression, other times I'm not clear
+			// why).
+			nRet = L_LoadBitmap((L_CHAR*)strImageFileName.c_str(), &hBitmap, sizeof(BITMAPHANDLE),
+				 1, ORDER_RGB, &lfo, &fileInfo);
+			throwExceptionIfNotSuccess(nRet, "ELI35342", "Could not load image page.",
+				strImageFileName);
 
 			// If checking redactions that have been applied as annotations, check them by burning
 			// them into hBitmap, then checking the pixels in hBitmap.
@@ -1001,15 +1010,24 @@ void confirmImageAreas(const string& strImageFileName, vector<PageRasterZone>& r
 					extractZoneAsBitmap(&hBitmap, it->m_nStartX, it->m_nStartY, it->m_nEndX,
 						it->m_nEndY, it->m_nHeight, &hBitmapImageZone, false);
 
+					// [FlexIDSCore:5198]
+					// Allow for a certain number of pixels to not match the expected value without
+					// determining that the redaction failed to be applied.
+					int nPixelErrorCount = 0;
+					int nPixelErrorThreshold =
+						(hBitmapImageZone.Height - 2 * giZONE_CONFIRMATION_OFFSET_TOLERANCE)
+						* ( hBitmapImageZone.Width - 2 * giZONE_CONFIRMATION_OFFSET_TOLERANCE)
+						* giZONE_CONFIRMATION_PERCENT_TOLERANCE / 100;
+
 					// Loop though each row of the extracted zone to confirm the image area has been
 					// applied.
-					for (int nRow = giZONE_CONFIRMATION_TOLERANCE;
-						 nRow < hBitmapImageZone.Height - giZONE_CONFIRMATION_TOLERANCE;
+					for (int nRow = giZONE_CONFIRMATION_OFFSET_TOLERANCE;
+						 nRow < hBitmapImageZone.Height - giZONE_CONFIRMATION_OFFSET_TOLERANCE;
 						 nRow++)
 					{
 						// Loop through each pixel in the row.
-						for (int nCol = giZONE_CONFIRMATION_TOLERANCE;
-							 nCol < hBitmapImageZone.Width - giZONE_CONFIRMATION_TOLERANCE;
+						for (int nCol = giZONE_CONFIRMATION_OFFSET_TOLERANCE;
+							 nCol < hBitmapImageZone.Width - giZONE_CONFIRMATION_OFFSET_TOLERANCE;
 							 nCol++)
 						{
 							// Get the color of the current pixel.
@@ -1021,28 +1039,31 @@ void confirmImageAreas(const string& strImageFileName, vector<PageRasterZone>& r
 								continue;
 							}
 							else if (crPixel == it->m_crBorderColor &&
-								(nRow == giZONE_CONFIRMATION_TOLERANCE ||
-								 nCol == giZONE_CONFIRMATION_TOLERANCE ||
-								 nRow == hBitmapImageZone.Height - giZONE_CONFIRMATION_TOLERANCE - 1 ||
-								 nCol == hBitmapImageZone.Width - giZONE_CONFIRMATION_TOLERANCE - 1))
+								(nRow == giZONE_CONFIRMATION_OFFSET_TOLERANCE ||
+								 nCol == giZONE_CONFIRMATION_OFFSET_TOLERANCE ||
+								 nRow == hBitmapImageZone.Height - giZONE_CONFIRMATION_OFFSET_TOLERANCE - 1 ||
+								 nCol == hBitmapImageZone.Width - giZONE_CONFIRMATION_OFFSET_TOLERANCE - 1))
 							{
 								// If the pixel is the border color and the pixel is within
-								// giZONE_CONFIRMATION_TOLERANCE of the edge of the zone, it is okay.
+								// giZONE_CONFIRMATION_OFFSET_TOLERANCE of the edge of the zone, it is okay.
 								continue;
 							}
 
-							// If we got here, the current pixel does not appear to reflect a
-							// properly applied image area.
-							UCLIDException ue("ELI35336", "Redaction validation failed.");
-							ue.addDebugInfo("Page", it->m_nPage);
-							ue.addDebugInfo("StartX", it->m_nStartX);
-							ue.addDebugInfo("StartY", it->m_nStartY);
-							ue.addDebugInfo("EndX", it->m_nEndX);
-							ue.addDebugInfo("EndY", it->m_nEndY);
-							ue.addDebugInfo("X", nCol);
-							ue.addDebugInfo("Y", nRow);
-							ue.addDebugInfo("Value", crPixel);
-							throw ue;
+							nPixelErrorCount++;
+							if (nPixelErrorCount > nPixelErrorThreshold)
+							{
+								// If we got here, the current pixel does not appear to reflect a
+								// properly applied image area.
+								UCLIDException ue("ELI35336", "Redaction validation failed.");
+								ue.addDebugInfo("Page", it->m_nPage);
+								ue.addDebugInfo("StartX", it->m_nStartX);
+								ue.addDebugInfo("StartY", it->m_nStartY);
+								ue.addDebugInfo("EndX", it->m_nEndX);
+								ue.addDebugInfo("EndY", it->m_nEndY);
+								ue.addDebugInfo("Height", it->m_nHeight);
+								ue.addDebugInfo("Row", nRow);
+								throw ue;
+							}
 						}
 					}
 				}
