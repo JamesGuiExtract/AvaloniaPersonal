@@ -45,6 +45,10 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             System.Windows.Forms.Label label14;
             System.Windows.Forms.Label label16;
             System.Windows.Forms.Label label17;
+            System.Windows.Forms.Label label11;
+            System.Windows.Forms.Label label18;
+            System.Windows.Forms.Label label15;
+            System.Windows.Forms.Label label19;
             Extract.DataEntry.DataEntryTableRow dataEntryTableRow1 = new Extract.DataEntry.DataEntryTableRow();
             Extract.DataEntry.DataEntryTableRow dataEntryTableRow2 = new Extract.DataEntry.DataEntryTableRow();
             Extract.DataEntry.DataEntryTableRow dataEntryTableRow3 = new Extract.DataEntry.DataEntryTableRow();
@@ -58,10 +62,6 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             Extract.DataEntry.DataEntryTableRow dataEntryTableRow11 = new Extract.DataEntry.DataEntryTableRow();
             Extract.DataEntry.DataEntryTableRow dataEntryTableRow12 = new Extract.DataEntry.DataEntryTableRow();
             Extract.DataEntry.DataEntryTableRow dataEntryTableRow13 = new Extract.DataEntry.DataEntryTableRow();
-            System.Windows.Forms.Label label11;
-            System.Windows.Forms.Label label18;
-            System.Windows.Forms.Label label15;
-            System.Windows.Forms.Label label19;
             Extract.DataEntry.HighlightColor highlightColor1 = new Extract.DataEntry.HighlightColor();
             Extract.DataEntry.HighlightColor highlightColor2 = new Extract.DataEntry.HighlightColor();
             this._Lien_InstrNumTextBox = new Extract.DataEntry.DataEntryTextBox();
@@ -124,6 +124,9 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._RealEstate_SectionTextBox = new Extract.DataEntry.DataEntryTextBox();
             this.RealEstate_TownshipTextBox = new Extract.DataEntry.DataEntryTextBox();
             this.RealEstate_RangeTextBox = new Extract.DataEntry.DataEntryTextBox();
+            this.dataGridViewColumn28 = new System.Windows.Forms.DataGridViewColumn();
+            this.dataGridViewColumn29 = new System.Windows.Forms.DataGridViewColumn();
+            this.dataGridViewColumn30 = new System.Windows.Forms.DataGridViewColumn();
             label7 = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
@@ -356,6 +359,43 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             label17.TabIndex = 31;
             label17.Text = "Lien Original Borrowers";
             // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Location = new System.Drawing.Point(90, 739);
+            label11.Name = "label11";
+            label11.Size = new System.Drawing.Size(60, 13);
+            label11.TabIndex = 37;
+            label11.Text = "Township";
+            // 
+            // label18
+            // 
+            label18.AutoSize = true;
+            label18.Location = new System.Drawing.Point(0, 739);
+            label18.Name = "label18";
+            label18.Size = new System.Drawing.Size(49, 13);
+            label18.TabIndex = 38;
+            label18.Text = "Section";
+            // 
+            // label15
+            // 
+            label15.AutoSize = true;
+            label15.Location = new System.Drawing.Point(0, 633);
+            label15.Name = "label15";
+            label15.Size = new System.Drawing.Size(174, 13);
+            label15.TabIndex = 27;
+            label15.Text = "Legal Description (long legal)";
+            // 
+            // label19
+            // 
+            label19.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            label19.AutoSize = true;
+            label19.Location = new System.Drawing.Point(441, 739);
+            label19.Name = "label19";
+            label19.Size = new System.Drawing.Size(43, 13);
+            label19.TabIndex = 25;
+            label19.Text = "Range";
+            // 
             // _FullDocumentTextTextBox
             // 
             this._FullDocumentTextTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -509,7 +549,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._Closing_MinNumTextBox.Size = new System.Drawing.Size(510, 21);
             this._Closing_MinNumTextBox.TabIndex = 13;
             this._Closing_MinNumTextBox.ValidationErrorMessage = "MERS Mortgage Identification Number must be an 18 digit number";
-            this._Closing_MinNumTextBox.ValidationPattern = "(^$)|(^\\d{18}$)";
+            this._Closing_MinNumTextBox.ValidationPattern = "(^$)|(^(\\d\\-?){18}$)";
             this._Closing_MinNumTextBox.ValidationQuery = resources.GetString("_Closing_MinNumTextBox.ValidationQuery");
             // 
             // _Lien_OrigDateTextBox
@@ -1016,33 +1056,6 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this.dataGridViewColumn27.HeaderText = "Vendor Address - Trustee";
             this.dataGridViewColumn27.Name = "dataGridViewColumn27";
             // 
-            // label11
-            // 
-            label11.AutoSize = true;
-            label11.Location = new System.Drawing.Point(90, 739);
-            label11.Name = "label11";
-            label11.Size = new System.Drawing.Size(60, 13);
-            label11.TabIndex = 37;
-            label11.Text = "Township";
-            // 
-            // label18
-            // 
-            label18.AutoSize = true;
-            label18.Location = new System.Drawing.Point(0, 739);
-            label18.Name = "label18";
-            label18.Size = new System.Drawing.Size(49, 13);
-            label18.TabIndex = 38;
-            label18.Text = "Section";
-            // 
-            // label15
-            // 
-            label15.AutoSize = true;
-            label15.Location = new System.Drawing.Point(0, 633);
-            label15.Name = "label15";
-            label15.Size = new System.Drawing.Size(174, 13);
-            label15.TabIndex = 27;
-            label15.Text = "Legal Description (long legal)";
-            // 
             // _RealEstate_SectionTextBox
             // 
             this._RealEstate_SectionTextBox.AttributeName = "RealEstate_Section";
@@ -1088,15 +1101,23 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
     "ttribute>) or !(<Attribute>/RealEstate/PropState</Attribute> in {\'MS\'})\r\n</Expre" +
     "ssion></Query>";
             // 
-            // label19
+            // dataGridViewColumn28
             // 
-            label19.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            label19.AutoSize = true;
-            label19.Location = new System.Drawing.Point(441, 739);
-            label19.Name = "label19";
-            label19.Size = new System.Drawing.Size(43, 13);
-            label19.TabIndex = 25;
-            label19.Text = "Range";
+            this.dataGridViewColumn28.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn28.HeaderText = "Vendor Address - Trustee";
+            this.dataGridViewColumn28.Name = "dataGridViewColumn28";
+            // 
+            // dataGridViewColumn29
+            // 
+            this.dataGridViewColumn29.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn29.HeaderText = "Vendor Address - Assignor";
+            this.dataGridViewColumn29.Name = "dataGridViewColumn29";
+            // 
+            // dataGridViewColumn30
+            // 
+            this.dataGridViewColumn30.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn30.HeaderText = "Subject Property Address";
+            this.dataGridViewColumn30.Name = "dataGridViewColumn30";
             // 
             // PeirsonAndPattersonPanel
             // 
@@ -1230,5 +1251,8 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
         private DataEntryTextBox _RealEstate_SectionTextBox;
         private DataEntryTextBox RealEstate_TownshipTextBox;
         private DataEntryTextBox RealEstate_RangeTextBox;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn28;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn29;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn30;
     }
 }

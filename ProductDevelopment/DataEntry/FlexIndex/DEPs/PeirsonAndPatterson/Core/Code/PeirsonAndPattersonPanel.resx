@@ -186,6 +186,18 @@
   <metadata name="label17.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
+  <metadata name="label11.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="label18.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="label15.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="label19.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
   <data name="_RealEstate_LegalDescTextBox.ValidationQuery" xml:space="preserve">
     <value>&lt;Query ValidValue='True'&gt;&lt;Expression&gt;
 !string.IsNullOrWhiteSpace(&lt;Attribute&gt;.&lt;/Attribute&gt;) or !(&lt;Attribute&gt;/RealEstate/PropState&lt;/Attribute&gt; in
@@ -269,16 +281,4 @@ string.IsNullOrWhiteSpace(&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt;) ?
 &lt;Attribute&gt;.&lt;/Attribute&gt; matches '^\d{5}(-?\d{4})?$' or !(&lt;Attribute&gt;/RealEstate/PropState&lt;/Attribute&gt; in {'VA'})
 &lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>
-  <metadata name="label11.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="label18.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="label15.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="label19.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
 </root>
