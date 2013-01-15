@@ -230,9 +230,9 @@
   </data>
   <data name="_BusPartnerName_AssignorTextBox.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query Default='1'&gt;&lt;Attribute SelectionMode='List' StringList=' AND '&gt;/BusPartnerName_Assignor_Temp&lt;/Attribute&gt;&lt;/Query&gt;
-&lt;Query&gt;&lt;Expression&gt;
+&lt;Query&gt;&lt;Expression SpatialMode='Force'&gt;
 string.IsNullOrWhiteSpace(&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt;) ?
-&lt;Attribute SelectionMode='List' StringList=' AND '&gt;/Lien_LienOriginalMortgagee&lt;/Attribute&gt;
+&lt;Attribute SelectionMode='List' StringList=' AND ' SpatialMode='Force'&gt;/Lien_LienOriginalMortgagee&lt;/Attribute&gt;
 : &lt;Value/&gt;
 &lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>
@@ -241,13 +241,13 @@ string.IsNullOrWhiteSpace(&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt;) ?
 [BLANK]
 &lt;SQL&gt;SELECT [Abbreviation] FROM [State] WHERE LEN([Abbreviation]) &gt; 0&lt;/SQL&gt;
 &lt;/Query&gt;
-&lt;Query ValidValue='True'&gt;&lt;Expression&gt;
+&lt;Query ValidValue='True' ValidationListType='ValidationListOnly'&gt;&lt;Expression&gt;
 !string.IsNullOrWhiteSpace(&lt;Attribute&gt;.&lt;/Attribute&gt;) or !(&lt;Attribute&gt;/RealEstate/PropState&lt;/Attribute&gt; in {'CT', 'NY'})
 &lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>
   <data name="dataEntryTableRow9.ValidationQuery" xml:space="preserve">
-    <value>&lt;Query ValidationListType='AutoCompleteOnly'&gt;&lt;SQL&gt;SELECT DISTINCT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../BusPartnerCity&lt;/Attribute&gt;,1,32) AND SUBSTRING(&lt;Attribute TriggerUpdate='0'&gt;.&lt;/Attribute&gt;,1,5) != [ZipCode] AND [Abbreviation] = SUBSTRING(&lt;Attribute&gt;../PropState&lt;/Attribute&gt;,1,2)&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query ValidValue='True'&gt;&lt;Expression&gt;
+    <value>&lt;Query ValidationListType='AutoCompleteOnly'&gt;&lt;SQL&gt;SELECT DISTINCT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../BusPartnerCity&lt;/Attribute&gt;,1,32) AND SUBSTRING(&lt;Attribute TriggerUpdate='0'&gt;.&lt;/Attribute&gt;,1,5) != [ZipCode] AND [Abbreviation] = SUBSTRING(&lt;Attribute&gt;../BusPartnerState&lt;/Attribute&gt;,1,2)&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query ValidValue='True' ValidationListType='ValidationListOnly'&gt;&lt;Expression&gt;
 &lt;Attribute&gt;.&lt;/Attribute&gt; matches '^\d{5}(-?\d{4})?$' or !(&lt;Attribute&gt;/RealEstate/PropState&lt;/Attribute&gt; in {'CT', 'NY'})
 &lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>
@@ -271,13 +271,13 @@ string.IsNullOrWhiteSpace(&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt;) ?
 [BLANK]
 &lt;SQL&gt;SELECT [Abbreviation] FROM [State] WHERE LEN([Abbreviation]) &gt; 0&lt;/SQL&gt;
 &lt;/Query&gt;
-&lt;Query ValidValue='True'&gt;&lt;Expression&gt;
+&lt;Query ValidValue='True' ValidationListType='ValidationListOnly'&gt;&lt;Expression&gt;
 !string.IsNullOrWhiteSpace(&lt;Attribute&gt;.&lt;/Attribute&gt;) or !(&lt;Attribute&gt;/RealEstate/PropState&lt;/Attribute&gt; in {'VA'})
 &lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>
   <data name="dataEntryTableRow13.ValidationQuery" xml:space="preserve">
-    <value>&lt;Query ValidationListType='AutoCompleteOnly'&gt;&lt;SQL&gt;SELECT DISTINCT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../BusPartnerCity&lt;/Attribute&gt;,1,32) AND SUBSTRING(&lt;Attribute TriggerUpdate='0'&gt;.&lt;/Attribute&gt;,1,5) != [ZipCode] AND [Abbreviation] = SUBSTRING(&lt;Attribute&gt;../PropState&lt;/Attribute&gt;,1,2)&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query ValidValue='True' &gt;&lt;Expression&gt;
+    <value>&lt;Query ValidationListType='AutoCompleteOnly'&gt;&lt;SQL&gt;SELECT DISTINCT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../BusPartnerCity&lt;/Attribute&gt;,1,32) AND SUBSTRING(&lt;Attribute TriggerUpdate='0'&gt;.&lt;/Attribute&gt;,1,5) != [ZipCode] AND [Abbreviation] = SUBSTRING(&lt;Attribute&gt;../BusPartnerState&lt;/Attribute&gt;,1,2)&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query ValidValue='True' ValidationListType='ValidationListOnly'&gt;&lt;Expression&gt;
 &lt;Attribute&gt;.&lt;/Attribute&gt; matches '^\d{5}(-?\d{4})?$' or !(&lt;Attribute&gt;/RealEstate/PropState&lt;/Attribute&gt; in {'VA'})
 &lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>

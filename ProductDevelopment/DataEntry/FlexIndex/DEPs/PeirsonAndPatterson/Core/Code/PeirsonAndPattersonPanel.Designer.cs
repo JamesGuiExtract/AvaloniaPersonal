@@ -127,6 +127,9 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this.dataGridViewColumn28 = new System.Windows.Forms.DataGridViewColumn();
             this.dataGridViewColumn29 = new System.Windows.Forms.DataGridViewColumn();
             this.dataGridViewColumn30 = new System.Windows.Forms.DataGridViewColumn();
+            this.dataGridViewColumn31 = new System.Windows.Forms.DataGridViewColumn();
+            this.dataGridViewColumn32 = new System.Windows.Forms.DataGridViewColumn();
+            this.dataGridViewColumn33 = new System.Windows.Forms.DataGridViewColumn();
             label7 = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
@@ -1119,6 +1122,24 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this.dataGridViewColumn30.HeaderText = "Subject Property Address";
             this.dataGridViewColumn30.Name = "dataGridViewColumn30";
             // 
+            // dataGridViewColumn31
+            // 
+            this.dataGridViewColumn31.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn31.HeaderText = "Vendor Address - Trustee";
+            this.dataGridViewColumn31.Name = "dataGridViewColumn31";
+            // 
+            // dataGridViewColumn32
+            // 
+            this.dataGridViewColumn32.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn32.HeaderText = "Vendor Address - Assignor";
+            this.dataGridViewColumn32.Name = "dataGridViewColumn32";
+            // 
+            // dataGridViewColumn33
+            // 
+            this.dataGridViewColumn33.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn33.HeaderText = "Subject Property Address";
+            this.dataGridViewColumn33.Name = "dataGridViewColumn33";
+            // 
             // PeirsonAndPattersonPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 13F);
@@ -1254,5 +1275,8 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn28;
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn29;
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn30;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn31;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn32;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn33;
     }
 }
