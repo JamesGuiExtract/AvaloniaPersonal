@@ -1150,7 +1150,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
         highlightColor1,
         highlightColor2};
             this.InvalidDataSaveMode = Extract.DataEntry.InvalidDataSaveMode.PromptForEach;
-            this.MinimumSize = new System.Drawing.Size(408, 910);
+            this.MinimumSize = new System.Drawing.Size(450, 910);
             this.Name = "PeirsonAndPattersonPanel";
             this.Size = new System.Drawing.Size(532, 1076);
             _recordingInformationGroupBox.ResumeLayout(false);
