@@ -1,0 +1,193 @@
+<HTML>
+
+<HEAD>
+<TITLE>Peirson & Patterson DEP Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> DEP Testing - Peirson & Patterson <br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>DEP Layout</h3>
+       	<ul>
+		<li>Confirm that the DEP includes a <b>Recording Information</b> group box.
+		<ul>
+			<li>a <b>Lien Original Recording Date</b> edit box.
+			<li>a <b>Lien Recording Instrument Number</b> edit box.
+			<li>a <b>Lien Filing/Recording Book</b> edit box.
+			<li>a <b>Lien Filing/Recording Page</b> edit box.
+		</ul>
+		<LI>Confirm that the DEP includes a <b>MERS Mortgage Identification Number</b> edit box.
+		<LI>Confirm that the DEP includes a <b>Parcel ID Number</b> edit box.
+		<LI>Confirm that the DEP includes a <b>Short Legal Description</b> edit box.
+		<LI>Confirm that the DEP includes a <b>Lien Original Loan Date</b> edit box.
+		<LI>Confirm that the DEP includes a <b>Lien Original Borrowers</b> edit box.
+		<LI>Confirm that the DEP includes a <b>Lien Original Mortgagee/Lender</b> edit box.
+		<LI>Confirm that the DEP includes a <b>Vendor Name - Trustee</b> edit box.
+		<LI>Confirm that the DEP includes a <b>Vendor Street Address - Trustee</b> multiple-row 
+		table with the following row headings.
+		<ul>
+			<li>Street Address
+			<li>City
+			<li>State
+			<li>Zip Code
+		</ul>
+		<LI>Confirm that the DEP includes a <b>Vendor Name - Trustee2</b> edit box.
+		<LI>Confirm that the DEP includes a <b>Lien Original Loan Balance</b> edit box.
+		<LI>Confirm that the DEP includes a <b>Subject Property County</b> edit box.
+		<LI>Confirm that the DEP includes a <b>Legal Description (long legal)</b> multi-line 
+		edit box.
+		<LI>Confirm that the DEP includes a <b>Section</b> edit box.
+		<LI>Confirm that the DEP includes a <b>Township</b> edit box.
+		<LI>Confirm that the DEP includes a <b>Range</b> edit box.
+		<LI>Confirm that the DEP includes a <b>Subject Property Address</b> multiple-row table 
+		with the following row headings.
+		<ul>
+			<li>Street Address
+			<li>Suite/Apt #
+			<li>City
+			<li>State
+			<li>Zip
+		</ul>
+		<LI>Confirm that the DEP includes a <b>Vendor Name - Assignor</b> edit box.
+		<LI>Confirm that the DEP includes a <b>Vendor Address - Assignor</b> multiple-row table 
+		with the following row headings.
+		<ul>
+			<li>Street Address
+			<li>City
+			<li>State
+			<li>Zip
+		</ul>
+       	</ul>
+<p>
+	<li><h3>Validation</h3></li>
+	<UL>
+		<li>Confirm that the image cannot be saved and committed while one or more red 
+		warning icons remain visible.
+		<li>Confirm that each of the following fields are required.
+		<ul>
+			<li>Lien Original Recording Date
+			<ul>
+				<li><b>MM/DD/YYYY</b> format
+			</ul>
+			<li>Lien Filing/Recording Book + Page <b>OR</b>
+			<li>Lien Recording Instrument Number
+			<li>MERS Mortgage Identification Number (if <b>MERS</b> is in the document 
+			text)
+			<ul>
+				<li>18 digits (may include dashes)
+			</ul>
+			<li>Parcel ID Number (if <b>State</b> is one of the following)
+			<ul>
+				<li>AL, DE, FL, HI, IL, IA, KY, MD, MS, NV, NC, OH, OK, OR, PA, RI, 
+				SC, UT, VA, WA, WI
+			</ul>
+			<li>Short Legal Description (if <b>State</b> is one of the following)
+			<ul>
+				<li>NY, WA
+			</ul>
+			<li>Lien Original Loan Date
+			<ul>
+				<li><b>MM/DD/YYYY</b> format
+			</ul>
+			<li>Lien Original Borrowers
+			<li>Lien Original Mortgagee/Lender
+			<li>Vendor Name - Trustee (if <b>State</b> is one of the following)
+			<ul>
+				<li>AK, AZ, CA, CO, DC, ID, MD, MS, MO, MT, NE, NV, NC, OR, TN, 
+				TX, UT, VA, WA, WV
+			</ul>
+			<li>Vendor Street Address - Trustee
+			<ul>
+				<li>if <b>State</b> is <b>VA</b>
+			</ul>
+			<li>Vendor City - Trustee
+			<ul>
+				<li>if <b>State</b> is <b>VA</b>
+			</ul>
+			<li>Vendor State - Trustee
+			<ul>
+				<li>if <b>State</b> is <b>VA</b>
+			</ul>
+			<li>Vendor Zip Code - Trustee
+			<ul>
+				<li>if <b>State</b> is <b>VA</b>
+				<li>5 or 9 digits (dash okay)
+			</ul>
+			<li>Vendor Name - Trustee2
+			<ul>
+				<li>if <b>State</b> is <b>VA</b>
+			</ul>
+			<li>Lien Original Loan Balance
+			<li>Subject Property County
+			<li>Legal Description (Long Legal) (if <b>State</b> is one of the following)
+			<ul>
+				<li>AK, AL, AR, AZ, CA, CO, CT, DC, DE, FL, HI, IA, ID, IL, IN, KS, 
+				KY, LA, MA, MD, MI, MN, MO, MS, MT, NC, ND, NE, NH, NJ, NM, NM, NV, 
+				OH, OK, OR, PA, RI, SC, SD, TN, TX, UT, VA, VT, WA, WI, WV, WY
+			</ul>
+			<li>Section
+			<ul>
+				<li>if <b>State</b> is <b>MS</b>
+			</ul>
+			<li>Township
+			<ul>
+				<li>if <b>State</b> is <b>MS</b>
+			</ul>
+			<li>Range
+			<ul>
+				<li>if <b>State</b> is <b>MS</b>
+			</ul>
+			<li>Subject Property Address (the following fields are required)
+			<ul>
+				<li><b>Street Address</b>
+				<li><b>City</b>
+				<li><b>State</b>
+				<li><b>Zip Code</b> - 5 or 9 digits (dash okay)
+			</ul>
+			<li>Vendor Name - Assignor
+			<li>Vendor Address - Assignor (the following fields are required if 
+			<b>State</b> is <b>CT</b> or <b>NY</b>)
+			<ul>
+				<li><b>Street Address</b>
+				<li><b>City</b>
+				<li><b>State</b>
+				<li><b>Zip Code</b> - 5 or 9 digits (dash okay)
+			</ul>
+		</ul>
+       	</ul>
+<p>
+	<li><h3>Auto-Update Queries</h3></li>
+	<ul>
+		<li>Confirm that auto-update queries are available for the following <b>Vendor 
+		Address - Trustee</b> fields.
+		<ul>
+			<li>State
+			<li>Zip
+		</ul>
+		<li>Confirm that auto-update queries are available for the following <b>Subject 
+		Property Address</b> fields.
+		<ul>
+			<li>State
+			<li>Zip
+		</ul>
+		<li>Confirm that auto-update queries are available for the following <b>Vendor 
+		Address - Assignor</b> fields.
+		<ul>
+			<li>State
+			<li>Zip
+		</ul>
+       	</ul>
+<p>
+	<LI><h3>Miscellaneous</h3>
+       	<ul>
+		<LI>TBD
+	</ul>
+</OL>
+</BODY>
+</HTML>
