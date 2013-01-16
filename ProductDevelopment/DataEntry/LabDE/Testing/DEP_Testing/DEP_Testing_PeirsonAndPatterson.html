@@ -184,6 +184,64 @@
 		</ul>
        	</ul>
 <p>
+	<LI><h3>XML Output</h3>
+       	<ul>
+		<LI>Process some <b>Peirson and Patterson</b> images.
+		<LI>Verify the <b>Peirson and Patterson</b> images.  Conver the VOA results to XML.
+		<ul>
+			<li>Type 2 output
+			<li>Use attribute names
+			<li>Remove spatial information
+		</ul>
+		<li>Review the XML files and confirm that the following attributes are present under 
+		a <b>FlexData</b> root attribute.  Empty fields should include <b>&lt;FullText /&gt;</b> 
+		sub-attributes.  Non-empty fields should include <b>&lt;FullText&gt;</b> sub-attributes 
+		with meaningful content.
+		<ul>
+			<li>Lien_LienRecordingDate
+			<li>Lien_InstrNum
+			<li>Lien_BookVolCabinetDesc
+			<li>Lien_PageSheetSlideInfo
+			<li>RealEstate_ParcelNum
+			<li>RealEstate_LotBlockSubdivisionName
+			<li>Closing_MinNum
+			<li>Lien_OrigDate
+			<li>Lien_KnownAsName
+			<li>Lien_LienOriginalMortgagee
+			<li>BusPartnerName_Trustee
+			<li>Trustee
+			<ul>
+				<li>BusPartnerStreetAddr
+				<li>BusPartnerCity
+				<li>BusPartnerState
+				<li>BusPartnerZip
+			</ul>
+			<li>BusPartnerName_Trustee2
+			<li>Lien_OrigBalAmt
+			<li>RealEstate_PropCounty
+			<li>RealEstate_LegalDesc
+			<li>RealEstate_Section
+			<li>RealEstate_Township
+			<li>RealEstate_Range
+			<li>RealEstate
+			<ul>
+				<li>PropStreetAddr
+				<li>PropStreetUnitNum
+				<li>PropCity
+				<li>PropState
+				<li>PropZip
+			</ul>
+			<li>BusPartnerName_Assignor
+			<li>Assignor
+			<ul>
+				<li>BusPartnerStreetAddr
+				<li>BusPartnerCity
+				<li>BusPartnerState
+				<li>BusPartnerZip
+			</ul>
+		</ul>
+	</ul>
+<p>
 	<LI><h3>Miscellaneous</h3>
        	<ul>
 		<LI>TBD
