@@ -236,7 +236,7 @@ string.IsNullOrWhiteSpace(&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt;) ?
 : &lt;Value/&gt;
 &lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>
-  <data name="dataEntryTableRow8.ValidationQuery" xml:space="preserve">
+  <data name="dataEntryTableRow9.ValidationQuery" xml:space="preserve">
     <value>&lt;Query&gt;
 [BLANK]
 &lt;SQL&gt;SELECT [Abbreviation] FROM [State] WHERE LEN([Abbreviation]) &gt; 0&lt;/SQL&gt;
@@ -245,7 +245,7 @@ string.IsNullOrWhiteSpace(&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt;) ?
 !string.IsNullOrWhiteSpace(&lt;Attribute&gt;.&lt;/Attribute&gt;) or !(&lt;Attribute&gt;/RealEstate/PropState&lt;/Attribute&gt; in {'CT', 'NY'})
 &lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>
-  <data name="dataEntryTableRow9.ValidationQuery" xml:space="preserve">
+  <data name="dataEntryTableRow10.ValidationQuery" xml:space="preserve">
     <value>&lt;Query ValidationListType='AutoCompleteOnly'&gt;&lt;SQL&gt;SELECT DISTINCT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../BusPartnerCity&lt;/Attribute&gt;,1,32) AND SUBSTRING(&lt;Attribute TriggerUpdate='0'&gt;.&lt;/Attribute&gt;,1,5) != [ZipCode] AND [Abbreviation] = SUBSTRING(&lt;Attribute&gt;../BusPartnerState&lt;/Attribute&gt;,1,2)&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query ValidValue='True' ValidationListType='ValidationListOnly'&gt;&lt;Expression&gt;
 &lt;Attribute&gt;.&lt;/Attribute&gt; matches '^\d{5}(-?\d{4})?$' or !(&lt;Attribute&gt;/RealEstate/PropState&lt;/Attribute&gt; in {'CT', 'NY'})
@@ -266,7 +266,7 @@ string.IsNullOrWhiteSpace(&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt;) ?
   <metadata name="_BusPartnerName_AssignorColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="dataEntryTableRow12.ValidationQuery" xml:space="preserve">
+  <data name="dataEntryTableRow14.ValidationQuery" xml:space="preserve">
     <value>&lt;Query&gt;
 [BLANK]
 &lt;SQL&gt;SELECT [Abbreviation] FROM [State] WHERE LEN([Abbreviation]) &gt; 0&lt;/SQL&gt;
@@ -275,7 +275,7 @@ string.IsNullOrWhiteSpace(&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt;) ?
 !string.IsNullOrWhiteSpace(&lt;Attribute&gt;.&lt;/Attribute&gt;) or !(&lt;Attribute&gt;/RealEstate/PropState&lt;/Attribute&gt; in {'VA'})
 &lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>
-  <data name="dataEntryTableRow13.ValidationQuery" xml:space="preserve">
+  <data name="dataEntryTableRow15.ValidationQuery" xml:space="preserve">
     <value>&lt;Query ValidationListType='AutoCompleteOnly'&gt;&lt;SQL&gt;SELECT DISTINCT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = SUBSTRING(&lt;Attribute&gt;../BusPartnerCity&lt;/Attribute&gt;,1,32) AND SUBSTRING(&lt;Attribute TriggerUpdate='0'&gt;.&lt;/Attribute&gt;,1,5) != [ZipCode] AND [Abbreviation] = SUBSTRING(&lt;Attribute&gt;../BusPartnerState&lt;/Attribute&gt;,1,2)&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query ValidValue='True' ValidationListType='ValidationListOnly'&gt;&lt;Expression&gt;
 &lt;Attribute&gt;.&lt;/Attribute&gt; matches '^\d{5}(-?\d{4})?$' or !(&lt;Attribute&gt;/RealEstate/PropState&lt;/Attribute&gt; in {'VA'})
