@@ -198,7 +198,6 @@
             this._resultsSplitContainer.Panel1.BackColor = System.Drawing.SystemColors.Control;
             this._resultsSplitContainer.Panel1.Controls.Add(this._queryPanel);
             this._resultsSplitContainer.Panel1Collapsed = true;
-            this._resultsPanel.TabIndex = 1;
             // 
             // _resultsSplitContainer.Panel2
             // 
@@ -315,6 +314,7 @@
             this._resultsGrid.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.HandleResultsGridDataError);
             this._resultsGrid.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.HandleResultsGridRowsRemoved);
             this._resultsGrid.SelectionChanged += new System.EventHandler(this.HandleResultsGridSelectionChanged);
+            this._resultsGrid.UserDeletingRow += new System.Windows.Forms.DataGridViewRowCancelEventHandler(this.HandleResultsGridUserDeletingRow);
             // 
             // QueryAndResultsControl
             // 

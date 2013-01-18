@@ -53,6 +53,11 @@ namespace Extract.SQLCDBEditor
         SqlCeConnection _connection;
 
         /// <summary>
+        /// The name of the loaded database table.
+        /// </summary>
+        string _tableName;
+
+        /// <summary>
         /// The data table representing the table contents or query results.
         /// </summary>
         DataTable _resultsTable = new DataTable();
@@ -449,6 +454,7 @@ namespace Extract.SQLCDBEditor
                     QueryAndResultsType == QueryAndResultsType.Table);
 
                 _connection = connection;
+                _tableName = tableName;
 
                 _showHideQueryButton.Visible = false;
                 _renameButton.Visible = false;
@@ -1354,6 +1360,76 @@ namespace Extract.SQLCDBEditor
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI34592");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataGridView.UserDeletingRow"/> event of the
+        /// <see cref="_resultsGrid"/> control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.DataGridViewRowCancelEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleResultsGridUserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
+        {
+            try
+            {
+                // [DotNetRCAndUtils:837]
+                // When the last row of a table with and auto-incrementing column is deleted, it can
+                // lead to concurrency violation exceptions. I do not have a clear understanding of
+                // the problem, but there are many threads to be found regarding this error and
+                // various possible causes such as this one:
+                // http://social.msdn.microsoft.com/Forums/en-US/winformsdatacontrols/thread/bfdb40a8-0e29-4897-8251-6368abe24516
+                // I have been unable to directly solve the problem, but what seems an acceptable
+                // alternative is that when the last row of a table is being deleted, to cancel the
+                // handling of the event, then manually clear the table data instead.
+                if (_resultsTable.Rows.Count == 1)
+                {
+                    ExtractException.Assert("ELI35343", "Data grid in unexpected state.",
+                        _resultsTable.Rows[0] == ((DataRowView)e.Row.DataBoundItem).Row);
+
+                    // The table is being programmatically cleared; no RowsRemoved event handling
+                    // should occur.
+                    _resultsGrid.RowsRemoved -= HandleResultsGridRowsRemoved;
+
+                    // Cancel the automated handling of the grid row deletion.
+                    e.Cancel = true;
+
+                    try
+                    {
+                        // Manually clear the table's data
+                        DBMethods.ExecuteDBQuery(_connection, "DELETE FROM [" + _tableName + "]");
+                    }
+                    catch (Exception ex)
+                    {
+                        ExtractException ee = ex.AsExtract("ELI35345");
+
+                        // The inner exception will be likely to contain a much more appropriate
+                        // message about the problem deleteing the row.
+                        if (ee.InnerException != null)
+                        {
+                            throw ee.InnerException;
+                        }
+                        else
+                        {
+                            throw ee;
+                        }
+                    }
+
+                    // Reload the empty table into the grid.
+                    RefreshData(true, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35344");
+            }
+            finally
+            {
+                if (e.Cancel)
+                {
+                    _resultsGrid.RowsRemoved += HandleResultsGridRowsRemoved;
+                }
             }
         }
 
