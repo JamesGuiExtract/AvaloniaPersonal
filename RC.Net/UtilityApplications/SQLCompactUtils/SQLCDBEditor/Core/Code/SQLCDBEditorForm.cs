@@ -280,10 +280,11 @@ namespace Extract.SQLCDBEditor
                 // If there is a database file set open the database.
                 if (!string.IsNullOrEmpty(_databaseFileName))
                 {
+
                     // Invoking so that the Form completes loading before the database
                     // is opened. This way if the user is prompted about a database
                     // needing to be updated, the form will already be opened.
-                    BeginInvoke((MethodInvoker)(() => { OpenDatabase(_databaseFileName); }));
+                    this.SafeBeginInvoke("ELI35346", () => { OpenDatabase(_databaseFileName); });
                 }
 
                 _primaryTab = new TabbedDocument();
@@ -1912,7 +1913,7 @@ namespace Extract.SQLCDBEditor
                 {
                     // Invoking the method here so that the update can be started after
                     // this method finishes execution
-                    BeginInvoke((MethodInvoker)(() => { UpdateToCurrentSchema(); }));
+                    this.SafeBeginInvoke("ELI35348", () => { UpdateToCurrentSchema(); });
                 }
             }
         }
@@ -2227,14 +2228,14 @@ namespace Extract.SQLCDBEditor
 
                 // Invoking so that the update method completes and then the prompt is displayed
                 // before the database is reopened.
-                BeginInvoke((MethodInvoker)(() =>
+                this.SafeBeginInvoke("ELI35349", () =>
                 {
                     MessageBox.Show(this, "Database has been updated to current schema.",
                         "Database Updated", MessageBoxButtons.OK, MessageBoxIcon.Information,
                         MessageBoxDefaultButton.Button1, 0);
 
                     OpenDatabase(tempName);
-                }));
+                });
             }
             catch (Exception ex)
             {

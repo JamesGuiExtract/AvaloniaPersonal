@@ -479,11 +479,21 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                control.BeginInvoke(action);
+                control.BeginInvoke((MethodInvoker)(() =>
+                    {
+                        try
+                        {
+                            action();
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractDisplay(eliCode);
+                        }
+                    }));
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay(eliCode);
+                throw ex.AsExtract("ELI35350");
             }
         }
 
