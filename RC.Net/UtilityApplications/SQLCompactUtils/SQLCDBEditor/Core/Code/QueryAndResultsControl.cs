@@ -1778,44 +1778,118 @@ namespace Extract.SQLCDBEditor
             _primaryKeyColumnNames = new List<string>(table.PrimaryKey
                 .Select(column => column.ColumnName));
 
-            // Check for auto increment fields and default column values
-            foreach (DataColumn c in table.Columns)
+            try
             {
-                // Get the information for the current column
-                using (SqlCeCommand sqlcmd = new SqlCeCommand(
-                    "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" +
-                    Name + "' AND COLUMN_NAME = '" + c.ColumnName + "'", _connection))
+                // Check for auto increment fields and default column values
+                foreach (DataColumn c in table.Columns)
                 {
-                    using (SqlCeResultSet columnsResult =
-                        sqlcmd.ExecuteResultSet(ResultSetOptions.Scrollable))
+                    // Get the information for the current column
+                    using (SqlCeCommand sqlcmd = new SqlCeCommand(
+                        "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" +
+                        Name + "' AND COLUMN_NAME = '" + c.ColumnName + "'", _connection))
                     {
-                        int colPos;
-
-                        // Get the first record in the result set - should only be one
-                        if (columnsResult.ReadFirst())
+                        using (SqlCeResultSet columnsResult =
+                            sqlcmd.ExecuteResultSet(ResultSetOptions.Scrollable))
                         {
-                            // If the column is an auto increment column set the seed value to next
-                            // auto increment value for the column
-                            if (c.AutoIncrement)
+                            // Get the first record in the result set - should only be one
+                            if (columnsResult.ReadFirst())
                             {
-                                // Get the position of the AUTOINC_NEXT field
-                                colPos = columnsResult.GetOrdinal("AUTOINC_NEXT");
+                                SetColumnAutoIncrement(c, columnsResult);
 
-                                // Set the seed to the value in the AUTOINC_NEXT field
-                                c.AutoIncrementSeed = (long)columnsResult.GetValue(colPos);
-                            }
-
-                            // Set the default for a column if one is defined
-                            colPos = columnsResult.GetOrdinal("COLUMN_HASDEFAULT");
-                            if (columnsResult.GetBoolean(colPos))
-                            {
-                                // Set the default value for the column
-                                colPos = columnsResult.GetOrdinal("COLUMN_DEFAULT");
-                                c.DefaultValue = columnsResult.GetValue(colPos);
+                                SetColumnDefaultValue(c, columnsResult);
                             }
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                var ee = new ExtractException("ELI35351", "Error parsing table schema; " +
+                    "auto-increment columns or columns with default values may not auto-populate.",
+                    ex);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Applies any auto-increment settings from <see paramref="columnSchema"/> to
+        /// <see paramref="dataColumn"/>.
+        /// </summary>
+        /// <param name="dataColumn">The <see cref="DataColumn"/> to which auto-increment settings
+        /// should be applied.</param>
+        /// <param name="columnSchema">The <see cref="SqlCeResultSet"/> containing schema info for
+        /// the column.</param>
+        static int SetColumnAutoIncrement(DataColumn dataColumn, SqlCeResultSet columnSchema)
+        {
+            int colPos = -1;
+            try
+            {
+                // If the column is an auto increment column set the seed value to next
+                // auto-increment value for the column.
+                if (dataColumn.AutoIncrement)
+                {
+                    // Get the position of the AUTOINC_NEXT field
+                    colPos = columnSchema.GetOrdinal("AUTOINC_NEXT");
+
+                    // Set the seed to the value in the AUTOINC_NEXT field
+                    dataColumn.AutoIncrementSeed = (long)columnSchema.GetValue(colPos);
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = new ExtractException("ELI35352", "Error parsing table schema; " +
+                    "column may not auto-increment with correct value.", ex);
+                try
+                {
+                    ee.AddDebugData("Column Name", dataColumn.ColumnName, false);
+                    if (colPos >= 0)
+                    {
+                        ee.AddDebugData("Seed", columnSchema.GetValue(colPos).ToString(), false);
+                    }
+                    ee.Display();
+                }
+                catch { }
+            }
+            return colPos;
+        }
+
+        /// <summary>
+        /// Applies any default value from <see paramref="columnSchema"/> to
+        /// <see paramref="dataColumn"/>.
+        /// </summary>
+        /// <param name="dataColumn">The <see cref="DataColumn"/> to which any default value should
+        /// be applied.</param>
+        /// <param name="columnSchema">The <see cref="SqlCeResultSet"/> containing schema info for
+        /// the column.</param>
+        static void SetColumnDefaultValue(DataColumn dataColumn, SqlCeResultSet columnSchema)
+        {
+            int colPos = -1;
+            try
+            {
+                // Set the default for a column if one is defined
+                colPos = columnSchema.GetOrdinal("COLUMN_HASDEFAULT");
+                if (columnSchema.GetBoolean(colPos))
+                {
+                    // Set the default value for the column
+                    colPos = columnSchema.GetOrdinal("COLUMN_DEFAULT");
+                    dataColumn.DefaultValue = columnSchema.GetValue(colPos);
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = new ExtractException("ELI35353", "Error parsing table schema; " +
+                    "column default value may not be applied.", ex);
+                try
+                {
+                    ee.AddDebugData("Column Name", dataColumn.ColumnName, false);
+                    if (colPos >= 0)
+                    {
+                        ee.AddDebugData("Default value", columnSchema.GetValue(colPos).ToString(),
+                            false);
+                    }
+                    ee.Display();
+                }
+                catch { }
             }
         }
 
