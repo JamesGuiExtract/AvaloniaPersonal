@@ -367,6 +367,21 @@ namespace Extract.DataEntry
         #region Properties
 
         /// <summary>
+        /// Gets a value indicating whether the attribute has been initialized and has not been
+        /// deleted.
+        /// </summary>
+        /// <value><see langword="true"/> if this attribute is initialized and has not been deleted;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        public bool IsInitialized
+        {
+            get
+            {
+                return _initialized;
+            }
+        }
+
+        /// <summary>
         /// Gets the <see cref="IDataEntryControl"/> in charge of displaying the associated
         /// <see cref="IAttribute"/>.
         /// </summary>

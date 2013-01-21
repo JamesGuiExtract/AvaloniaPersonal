@@ -646,7 +646,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // If a default configuration exists, use it to begin with.
                 _activeDataEntryConfig = _defaultDataEntryConfig;
 
-                if (!_standAloneMode && _fileProcessingDb != null)
+                if (!_standAloneMode)
                 {
                     _exitToolStripMenuItem.Text = "Stop processing";
                     _imageViewer.DefaultStatusMessage = "Waiting for next document...";
@@ -818,9 +818,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // Add the save and commit menu item (created in constructor)
             items.Add(_saveAndCommitMenuItem);
 
-            // Only add the save menu item if not running in stand alone and _fileProcessingDb is
-            // available.
-            if (!_standAloneMode && _fileProcessingDb != null)
+            // Only add the save menu item if not running in stand alone
+            if (!_standAloneMode)
             {
                 _saveMenuItem = CreateDisabledMenuItem("Save");
                 items.Add(_saveMenuItem);
@@ -1236,10 +1235,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _imageViewer.LoadingNewImage += HandleLoadingNewImage;
                 _saveAndCommitMenuItem.Click += HandleSaveAndCommitClick;
                 _saveAndCommitButton.Click += HandleSaveAndCommitClick;
-                if (!_standAloneMode && _fileProcessingDb != null)
+                if (!_standAloneMode)
                 {
                     _saveMenuItem.Click += HandleSaveClick;
-                    _skipProcessingMenuItem.Click += HandleSkipFileClick;
+
+                    if (_fileProcessingDb != null)
+                    {
+                        _skipProcessingMenuItem.Click += HandleSkipFileClick;
+                    }
                 }
                 _exitToolStripMenuItem.Click += HandleExitToolStripMenuItemClick;
                 _nextUnviewedToolStripButton.Click += HandleGoToNextUnviewedClick;
@@ -1860,15 +1863,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _undoCommand.Enabled = false;
                 _redoCommand.Enabled = false;
 
-                if (!_standAloneMode && _fileProcessingDb != null)
+                if (!_standAloneMode)
                 {
-                    _skipProcessingMenuItem.Enabled = _imageViewer.IsImageAvailable;
                     // Saving the document should be allowed as long as a document is available,
                     // a data entry configuration is loaded, and PreventSave is not specified.
                     _saveMenuItem.Enabled = _imageViewer.IsImageAvailable &&
                         _activeDataEntryConfig != null &&
                         !_activeDataEntryConfig.Config.Settings.PreventSave;
-                    _tagFileToolStripButton.Enabled = _imageViewer.IsImageAvailable;
+
+                    if (_fileProcessingDb != null)
+                    {
+                        _skipProcessingMenuItem.Enabled = _imageViewer.IsImageAvailable;
+                        _tagFileToolStripButton.Enabled = _imageViewer.IsImageAvailable;
+                    }
                 }
 
                 // [DataEntry:414]
@@ -2765,9 +2772,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                // Treat SaveAndCommit like "Save" for stand-alone mode or when there is no
-                // _fileProcessingDb.
-                if (_standAloneMode || _fileProcessingDb == null)
+                // Treat SaveAndCommit like "Save" for stand-alone mode
+                if (_standAloneMode)
                 {
                     SaveData(false);
                 }
@@ -2785,9 +2791,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     _imageViewer.CloseImage();
 
-                    // Record statistics to database that need to happen when a file is closed.
-                    RecordFileProcessingDatabaseStatistics(
-                        false, _dataEntryControlHost.MostRecentlySavedAttributes);
+                    if (_fileProcessingDb != null)
+                    {
+                        // Record statistics to database that need to happen when a file is closed.
+                        RecordFileProcessingDatabaseStatistics(
+                            false, _dataEntryControlHost.MostRecentlySavedAttributes);
+                    }
 
                     OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
                 }
@@ -3372,9 +3381,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </param>
         void SetUIConfiguration(DataEntryConfiguration config)
         {
-            // Change the text on certain controls if not running in stand alone mode or running
-            // without a _fileProcessingDb
-            if (!_standAloneMode && _fileProcessingDb != null)
+            // Change the text on certain controls if not running in stand alone mode
+            if (!_standAloneMode)
             {
                 bool enableSave = config != null && !config.Config.Settings.PreventSave;
 

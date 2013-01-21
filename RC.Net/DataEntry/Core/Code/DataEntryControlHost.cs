@@ -5770,6 +5770,16 @@ namespace Extract.DataEntry
         {
             ExtractException.Assert("ELI25173", "Null argument exception!", attribute != null);
 
+            // [DataEntry:1153]
+            // There is at least one situation in which Undo can cause a table cell's mapped
+            // attribute (which has already been deleted) to be selected. Make sure a highlight is
+            // never added for a deleted (or uninitizalized) attribute.
+            var statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
+            if (!statusInfo.IsInitialized)
+            {
+                return;
+            }
+
             List<CompositeHighlightLayerObject> highlightList;
             if (_attributeHighlights.TryGetValue(attribute, out highlightList))
             {
