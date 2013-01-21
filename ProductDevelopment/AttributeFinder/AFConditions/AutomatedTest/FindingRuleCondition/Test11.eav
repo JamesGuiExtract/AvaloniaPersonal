@@ -6,7 +6,8 @@ Test|Allegheny County\r\nValerie McDonald Roberts\r\nRecorder of Deeds\r\nPittsb
 .State|PA
 .ZipCode|15219
 Test|User / Station: M Ward - Cash Super 12\r\n\r\nPROFESSIONAL ESCROW SERVICES L L C\r\n381 MANSFIELD AVE STE 301\r\nPITTSBURGH PA 15220
-.Recipient1|PROFESSIONAL ESCROW SERVICES L L C
+.Recipient1|User / Station: M Ward - Cash Super 12
+.Recipient2|PROFESSIONAL ESCROW SERVICES L L C
 .Address1|381 MANSFIELD AVE STE 301
 .City|PITTSBURGH
 .State|PA
