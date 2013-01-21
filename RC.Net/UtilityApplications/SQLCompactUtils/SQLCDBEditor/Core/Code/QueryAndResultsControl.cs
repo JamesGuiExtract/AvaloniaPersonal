@@ -1846,9 +1846,10 @@ namespace Extract.SQLCDBEditor
                     {
                         ee.AddDebugData("Seed", columnSchema.GetValue(colPos).ToString(), false);
                     }
-                    ee.Display();
                 }
                 catch { }
+
+                ee.Display();
             }
             return colPos;
         }
@@ -1887,9 +1888,10 @@ namespace Extract.SQLCDBEditor
                         ee.AddDebugData("Default value", columnSchema.GetValue(colPos).ToString(),
                             false);
                     }
-                    ee.Display();
                 }
                 catch { }
+
+                ee.Display();
             }
         }
 
