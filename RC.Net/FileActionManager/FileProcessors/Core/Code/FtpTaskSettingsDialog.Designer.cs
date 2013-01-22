@@ -260,6 +260,7 @@
             this._ftpConnectionSettingsControl.Padding = new System.Windows.Forms.Padding(3);
             this._ftpConnectionSettingsControl.ReestablishConnectionBeforeRetry = true;
             this._ftpConnectionSettingsControl.ShowConnectionsControl = false;
+            this._ftpConnectionSettingsControl.ShowKeepConnectionOpenCheckBox = true;
             this._ftpConnectionSettingsControl.Size = new System.Drawing.Size(458, 370);
             this._ftpConnectionSettingsControl.TabIndex = 0;
             this._ftpConnectionSettingsControl.TimeBetweenRetries = 0;

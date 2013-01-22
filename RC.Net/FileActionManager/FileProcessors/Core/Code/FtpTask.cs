@@ -64,6 +64,15 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
+        /// Gets whether to keep the connection open between files.
+        /// </summary>
+        bool KeepConnectionOpen
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Number of times to retry calls to the ftp server
         /// </summary>
         int NumberOfTimesToRetry
@@ -113,8 +122,10 @@ namespace Extract.FileActionManager.FileProcessors
         /// Added <see cref="DeleteEmptyFolder"/>.
         /// <para><b>Version 4</b></para>
         /// Added <see cref="ReestablishConnectionBeforeRetry"/>
+        /// <para><b>Version 5</b></para>
+        /// Added <see cref="KeepConnectionOpen"/>
         /// </summary>
-        const int _CURRENT_VERSION = 4;
+        const int _CURRENT_VERSION = 5;
 
         /// <summary>
         /// Default wait time between retries
@@ -142,6 +153,9 @@ namespace Extract.FileActionManager.FileProcessors
 
         // Connection that is used for the settings for the ftp server
         SecureFTPConnection _configuredFtpConnection = new SecureFTPConnection();
+
+        // Gets whether to keep the connection open between files.
+        bool _keepConnectionOpen = true;
 
         // Number of times to retry
         int _numberOfTimesToRetry = _DEFAULT_NUMBER_OF_RETRIES_BEFORE_FAILURE;
@@ -295,6 +309,26 @@ namespace Extract.FileActionManager.FileProcessors
                     throw ex.AsExtract("ELI32489");
                 }
                 _dirty = true;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether to keep the connection open between files.
+        /// </summary>
+        public bool KeepConnectionOpen
+        {
+            get
+            {
+                return _keepConnectionOpen;
+            }
+
+            set
+            {
+                if (_keepConnectionOpen != value)
+                {
+                    _keepConnectionOpen = value;
+                    _dirty = true;
+                }
             }
         }
 
@@ -574,7 +608,19 @@ namespace Extract.FileActionManager.FileProcessors
         /// <see langword="false"/> to cancel processing.</returns>
         public bool Standby()
         {
-            return true;
+            try
+            {
+                if (_runningConnection.IsConnected)
+                {
+                    _runningConnection.Close();
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35355");
+            }
         }
 
         /// <summary>
@@ -767,7 +813,7 @@ namespace Extract.FileActionManager.FileProcessors
             }
             finally
             {
-                if (_runningConnection.IsConnected)
+                if (!KeepConnectionOpen && _runningConnection.IsConnected)
                 {
                     _runningConnection.Close();
                 }
@@ -866,6 +912,11 @@ namespace Extract.FileActionManager.FileProcessors
                         _reestablishConnectionBeforeRetry = reader.ReadBoolean();
                     }
 
+                    if (reader.Version >= 5)
+                    {
+                        _keepConnectionOpen = reader.ReadBoolean();
+                    }
+
                     string hexString = reader.ReadString();
                     using (MemoryStream ftpDataStream = new MemoryStream(hexString.ToByteArray()))
                     {
@@ -908,6 +959,7 @@ namespace Extract.FileActionManager.FileProcessors
                     writer.Write(_timeToWaitBetweenRetries);
                     writer.Write(_deleteEmptyFolder);
                     writer.Write(_reestablishConnectionBeforeRetry);
+                    writer.Write(_keepConnectionOpen);
 
                     // Write the Ftp connection settings to the steam
                     using (MemoryStream ftpDataStream = new MemoryStream())
@@ -1028,6 +1080,7 @@ namespace Extract.FileActionManager.FileProcessors
                 _numberOfTimesToRetry = task._numberOfTimesToRetry;
                 _deleteEmptyFolder = task._deleteEmptyFolder;
                 _reestablishConnectionBeforeRetry = task._reestablishConnectionBeforeRetry;
+                _keepConnectionOpen = task._keepConnectionOpen;
 
                 ConfiguredFtpConnection = (SecureFTPConnection)task.ConfiguredFtpConnection.Clone();
 
@@ -1311,18 +1364,12 @@ namespace Extract.FileActionManager.FileProcessors
                 // recorder doesn't interpret it that a retry was successful.
                 recorder.Active = false;
 
-                if (validateRemotePath)
+                // If the connection is closed, assume something went wrong the connection and that
+                // the problem is not that the target file or folder is missing.
+                if (validateRemotePath && _runningConnection.IsConnected)
                 {
                     try
                     {
-                        // If ReestablishConnectionBeforeRetry is set, re-open the connection before
-                        // checking for files existence.
-                        if (ReestablishConnectionBeforeRetry && _runningConnection.IsConnected)
-                        {
-                            _runningConnection.Close();
-                            _runningConnection.Connect();
-                        }
-
                         // Check if the file/folder is still there.
                         if (validateAsFile &&
                             !_runningConnection.Exists(remotePathToValidate))
@@ -1376,6 +1423,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             _numberOfTimesToRetry = _DEFAULT_NUMBER_OF_RETRIES_BEFORE_FAILURE;
             _timeToWaitBetweenRetries = _DEFAULT_WAIT_TIME_IN_MILLISECONDS_BETWEEN_RETRIES;
+            _keepConnectionOpen = true;
         }
 
         /// <summary>

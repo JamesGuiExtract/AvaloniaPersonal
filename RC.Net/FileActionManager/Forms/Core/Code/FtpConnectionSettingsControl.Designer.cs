@@ -41,6 +41,7 @@
             this._timeBetweenRetriesControl = new Extract.Utilities.Forms.NumericEntryTextBox();
             this._showAdvancedSettingsCheckBox = new System.Windows.Forms.CheckBox();
             this._reestablishConnectionBeforeRetryCheckBox = new System.Windows.Forms.CheckBox();
+            this._keepConnectionOpenCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this._numberConnections)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._numberRetriesControl)).BeginInit();
             this.SuspendLayout();
@@ -180,8 +181,20 @@
             this._reestablishConnectionBeforeRetryCheckBox.Text = "Re-establish a new connection for each retry";
             this._reestablishConnectionBeforeRetryCheckBox.UseVisualStyleBackColor = true;
             // 
+            // _keepConnectionOpenCheckBox
+            // 
+            this._keepConnectionOpenCheckBox.AutoSize = true;
+            this._keepConnectionOpenCheckBox.Location = new System.Drawing.Point(6, 245);
+            this._keepConnectionOpenCheckBox.Name = "_keepConnectionOpenCheckBox";
+            this._keepConnectionOpenCheckBox.Size = new System.Drawing.Size(199, 17);
+            this._keepConnectionOpenCheckBox.TabIndex = 4;
+            this._keepConnectionOpenCheckBox.Text = "Keep connection open between files";
+            this._keepConnectionOpenCheckBox.UseVisualStyleBackColor = true;
+            this._keepConnectionOpenCheckBox.Visible = false;
+            // 
             // FtpConnectionSettingsControl
             // 
+            this.Controls.Add(this._keepConnectionOpenCheckBox);
             this.Controls.Add(this._reestablishConnectionBeforeRetryCheckBox);
             this.Controls.Add(this._showAdvancedSettingsCheckBox);
             this.Controls.Add(this._timeBetweenRetriesControl);
@@ -217,5 +230,6 @@
         private Utilities.Forms.NumericEntryTextBox _timeBetweenRetriesControl;
         private System.Windows.Forms.CheckBox _showAdvancedSettingsCheckBox;
         private System.Windows.Forms.CheckBox _reestablishConnectionBeforeRetryCheckBox;
+        private System.Windows.Forms.CheckBox _keepConnectionOpenCheckBox;
     }
 }

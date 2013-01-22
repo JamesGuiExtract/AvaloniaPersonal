@@ -41,6 +41,22 @@ namespace Extract.FileActionManager.Forms
         }
 
         /// <summary>
+        /// Gets whether to keep the connection open between files.
+        /// </summary>
+        public bool KeepConnectionOpen
+        {
+            set
+            {
+                _keepConnectionOpenCheckBox.Checked = value;
+            }
+
+            get
+            {
+                return _keepConnectionOpenCheckBox.Checked;
+            }
+        }
+
+        /// <summary>
         /// Number of unsuccessful retries before letting the operation fail.
         /// </summary>
         public int NumberOfRetriesBeforeFailure
@@ -127,12 +143,47 @@ namespace Extract.FileActionManager.Forms
         {
             set
             {
-                _numberConnections.Visible = value;
-                _connectionsLabel.Visible = value;
+                try
+                {
+                    ExtractException.Assert("ELI35358", "Invalid FTP connection dialog configuration.",
+                                !value || !ShowKeepConnectionOpenCheckBox);
+
+                    _numberConnections.Visible = value;
+                    _connectionsLabel.Visible = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35359");
+                }
             }
             get
             {
                 return _numberConnections.Visible;
+            }
+        }
+
+        /// <summary>
+        /// Indicates if the "Keep connection open" check box should be displayed
+        /// </summary>
+        public bool ShowKeepConnectionOpenCheckBox
+        {
+            set
+            {
+                try
+                {
+                    ExtractException.Assert("ELI35356", "Invalid FTP connection dialog configuration.",
+                        !value || !ShowConnectionsControl);
+
+                    _keepConnectionOpenCheckBox.Visible = value;
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractDisplay("ELI35357");
+                }
+            }
+            get
+            {
+                return _keepConnectionOpenCheckBox.Visible;
             }
         }
                 

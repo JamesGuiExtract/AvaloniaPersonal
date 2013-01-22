@@ -128,6 +128,7 @@ namespace Extract.FileActionManager.FileProcessors
                 _ftpConnectionSettingsControl.NumberOfRetriesBeforeFailure = Settings.NumberOfTimesToRetry;
                 _ftpConnectionSettingsControl.ReestablishConnectionBeforeRetry =
                     Settings.ReestablishConnectionBeforeRetry;
+                _ftpConnectionSettingsControl.KeepConnectionOpen = Settings.KeepConnectionOpen;
 
                 UpdateControlState();
             }
@@ -193,6 +194,8 @@ namespace Extract.FileActionManager.FileProcessors
 
                 _settings.ReestablishConnectionBeforeRetry =
                     _ftpConnectionSettingsControl.ReestablishConnectionBeforeRetry;
+
+                _settings.KeepConnectionOpen = _ftpConnectionSettingsControl.KeepConnectionOpen;
 
                 // Still need to verify settings
                 DialogResult = DialogResult.OK;
