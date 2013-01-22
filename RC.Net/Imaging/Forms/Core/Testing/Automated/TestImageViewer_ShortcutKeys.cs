@@ -1083,7 +1083,7 @@ namespace Extract.Imaging.Forms.Test
 
         #endregion
 
-        #region R
+        #region Backspace
 
         /// <summary>
         /// Test that the shortcut key R changes to previous zoom history.
@@ -1106,51 +1106,13 @@ namespace Extract.Imaging.Forms.Test
             // Get the new zoom level
             double zoomLevelNew = imageViewer.ZoomInfo.ScaleFactor;
 
-            // Send the R key press - to zoom to previous history item
-            imageViewer.Shortcuts.ProcessKey(Keys.R);
+            // Send the Backspace key press - to zoom to previous history item
+            imageViewer.Shortcuts.ProcessKey(Keys.Back);
 
             // Check that the zoom level changed back to original AND
             // that the original zoom level is different than new zoom level
             Assert.That(imageViewer.ZoomInfo.ScaleFactor == zoomLevelOriginal &&
                 zoomLevelOriginal != zoomLevelNew);
-        }
-
-        #endregion
-
-        #region T
-
-        /// <summary>
-        /// Tests that the shortcut T zooms to 
-        /// the next history entry.
-        /// </summary>
-        [Test, Category("Automated")]
-        public void Automated_TZoomsNextTest()
-        {
-            // Show the image viewer form
-            _imageViewerForm.Show();
-            _imageViewerForm.BringToFront();
-
-            // Get the image viewer
-            ImageViewer imageViewer = FormMethods.GetFormComponent<ImageViewer>(_imageViewerForm);
-
-            // Open the test image
-            OpenTestImage(imageViewer);
-
-            // Zoom in and store the zoom level
-            imageViewer.ZoomIn();
-            double zoomLevelIn = imageViewer.ZoomInfo.ScaleFactor;
-
-            // Zoom previous and get the previous zoom level
-            imageViewer.ZoomPrevious();
-            double zoomLevelPrevious = imageViewer.ZoomInfo.ScaleFactor;
-
-            // Send the T key press
-            imageViewer.Shortcuts.ProcessKey(Keys.T);
-
-            // Check that the zoom level changed back to the zoomed in value AND
-            // that the previous zoom level is different than new zoom level
-            Assert.That(imageViewer.ZoomInfo.ScaleFactor == zoomLevelIn &&
-                zoomLevelIn != zoomLevelPrevious);
         }
 
         #endregion
