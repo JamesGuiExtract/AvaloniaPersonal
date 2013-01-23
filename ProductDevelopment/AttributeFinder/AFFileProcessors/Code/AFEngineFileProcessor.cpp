@@ -878,7 +878,7 @@ STDMETHODIMP CAFEngineFileProcessor::Load(IStream *pStream)
 		{
 			// Throw exception
 			UCLIDException ue( "ELI10996", 
-				"Unable to load newer Run Object On Query Output Handler!" );
+				"Unable to load newer Execute rules task!" );
 			ue.addDebugInfo( "Current Version", gnCurrentVersion );
 			ue.addDebugInfo( "Version to Load", nDataVersion );
 			throw ue;

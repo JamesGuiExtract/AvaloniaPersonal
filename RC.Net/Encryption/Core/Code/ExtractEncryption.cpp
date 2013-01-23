@@ -705,6 +705,7 @@ void ExtractEncryption::Decrypt(Stream^ cipher, Stream^ plain, String^ password)
 		{
 		case 1:
 		case 2:
+		case 3:
 			Decrypt(cipher, plain, version, ComputeHash(password, 1));
 			break;
 
