@@ -169,10 +169,12 @@ void FileProcessingDlgStatusPage::clear()
 	OnItemchangedFailedFilesList(__nullptr, &result);
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingDlgStatusPage::onStatusChange(long nFileId, ERecordStatus eOldStatus, ERecordStatus eNewStatus)
+void FileProcessingDlgStatusPage::onStatusChange(const FileProcessingRecord *pTask, ERecordStatus eOldStatus)
 {
 	// by default, assume that the transition is valid
 	bool bUnexpectedTransition = false;
+	long nFileId = pTask->getFileID();
+	ERecordStatus eNewStatus = pTask->m_eStatus;
 
 	// based upon what the old status and the new status is, update the UI
 	switch (eOldStatus)
@@ -1182,21 +1184,29 @@ void FileProcessingDlgStatusPage::updateStatisticsVariablesWithTaskInfo(long nFi
 	// the stopwatch is somehow reset.
 	try
 	{
-		// Make an interval for this task's processing time
-		SYSTEMTIME stCurrentTime;
-		GetLocalTime(&stCurrentTime);
-		TimeInterval interval(task.getStartTime(), stCurrentTime);
+		try
+		{
+			// Make an interval for this task's processing time
+			SYSTEMTIME stCurrentTime;
+			GetLocalTime(&stCurrentTime);
+			TimeInterval interval(task.getStartTime(), stCurrentTime);
 
-		// Add the processing time of this task to the total processing time
-		// The merge prevents overlaps from being counted twice.
-		m_completedFailedOrCurrentTime.merge( interval );
+			// Add the processing time of this task to the total processing time
+			// The merge prevents overlaps from being counted twice.
+			m_completedFailedOrCurrentTime.merge( interval );
 
-		// Add the data to the totals
-		m_nTotalBytesProcessed += task.getFileSize();
-		m_nTotalPagesProcessed += task.getNumberOfPages();
-		m_nTotalDocumentsProcessed++;
+			// Add the data to the totals
+			m_nTotalBytesProcessed += task.getFileSize();
+			m_nTotalPagesProcessed += task.getNumberOfPages();
+			m_nTotalDocumentsProcessed++;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI14297");
 	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS( "ELI14297" );
+	catch(UCLIDException &ue)
+	{
+		ue.addDebugInfo("TaskID", nFileID);
+		ue.log();
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgStatusPage::updateFailColWidths()

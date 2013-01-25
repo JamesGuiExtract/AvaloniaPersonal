@@ -254,10 +254,9 @@ private:
 	////////////////
 
 	//---------------------------------------------------------------------------------------------
-	// REQUIRE: rLockGuard must have already obtained the lock to m_objLock.
-	void changeState(const FileProcessingRecord& task, CSingleLock& rLockGuard);
+	void changeState(const FileProcessingRecord& task);
 	//---------------------------------------------------------------------------------------------
-	void SendStatusMessage(HWND hWnd, long m_nTaskId, ERecordStatus eOldStatus, ERecordStatus eNewStatus);
+	void SendStatusMessage(HWND hWnd, const FileProcessingRecord *pTask, ERecordStatus eOldStatus);
 	//---------------------------------------------------------------------------------------------
 	// Loads max of nNumToLoad records in the processing queue from the database
 	// returns the number of records loaded

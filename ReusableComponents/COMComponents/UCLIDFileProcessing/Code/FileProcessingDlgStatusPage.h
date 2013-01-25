@@ -33,7 +33,7 @@ public:
 	//---------------------------------------------------------------------------------------------
 	void clear();
 	//---------------------------------------------------------------------------------------------
-	void onStatusChange(long nTaskID, ERecordStatus eOldStatus, ERecordStatus eNewStatus);
+	void onStatusChange(const FileProcessingRecord *pTask, ERecordStatus eOldStatus);
 	//---------------------------------------------------------------------------------------------
 	void setRecordManager(FPRecordManager* pRecordMgr);
 	//---------------------------------------------------------------------------------------------

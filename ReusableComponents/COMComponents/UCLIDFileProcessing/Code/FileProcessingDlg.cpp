@@ -1017,14 +1017,14 @@ LRESULT FileProcessingDlg::OnStatusChange(WPARAM wParam, LPARAM lParam)
 
 	try
 	{
-
-		ERecordStatus eOldStatus = (ERecordStatus)LOWORD(lParam);
-		ERecordStatus eNewStatus = (ERecordStatus)HIWORD(lParam);
+		const FileProcessingRecord *pTask = (const FileProcessingRecord*)lParam;
+		ERecordStatus eOldStatus = (ERecordStatus)wParam;
+		ERecordStatus eNewStatus = pTask->m_eStatus;
 
 		// Make sure the page is initialized before using it
 		if (isPageDisplayed(kProcessingLogPage))
 		{
-			m_propProcessLogPage.onStatusChange(wParam, eOldStatus, eNewStatus);
+			m_propProcessLogPage.onStatusChange(pTask, eOldStatus);
 		}
 
 		if(eOldStatus == eNewStatus)

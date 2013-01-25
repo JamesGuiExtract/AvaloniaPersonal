@@ -61,7 +61,7 @@ bool FPRecordManager::push(FileProcessingRecord& task)
 	// Set initial stat of the task to pending
 	task.m_eStatus = kRecordPending;
 	CSingleLock lockGuard(&m_objLock, TRUE);
-	changeState(task, lockGuard);
+	changeState(task);
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ void FPRecordManager::discardProcessingQueue()
 void FPRecordManager::updateTask(FileProcessingRecord& task)
 {
 	CSingleLock lockGuard(&m_objLock, TRUE);
-	changeState(task, lockGuard);
+	changeState(task);
 }
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::remove(const std::string& strFileName)
@@ -162,7 +162,7 @@ void FPRecordManager::remove(const std::string& strFileName)
 		if(task.getFileName() == strFileName)
 		{
 			task.m_eStatus = kRecordNone;
-			changeState(task, lockGuard);
+			changeState(task);
 			// There should only be one instance of any filename in the queue
 			// if that is not the case we will still only delete one
 			break;
@@ -286,7 +286,7 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 
 			task = getTask(nTaskID);
 			task.m_eStatus = kRecordCurrent;
-			changeState(task, lockGuard);
+			changeState(task);
 			return true;
 		}
 
@@ -460,13 +460,13 @@ long FPRecordManager::getNumberOfFilesFailed()
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------
-void FPRecordManager::SendStatusMessage(HWND hWnd, long m_nTaskId, ERecordStatus eOldStatus, ERecordStatus eNewStatus)
+void FPRecordManager::SendStatusMessage(HWND hWnd, const FileProcessingRecord *pTask,
+	ERecordStatus eOldStatus)
 {
-	LPARAM lParam = MAKELPARAM((WORD)eOldStatus, (WORD)eNewStatus);
-	::SendMessage( hWnd, FP_STATUS_CHANGE, m_nTaskId, lParam );
+	::SendMessage(hWnd, FP_STATUS_CHANGE, eOldStatus, (LPARAM)pTask);
 }
 //-------------------------------------------------------------------------------------------------
-void FPRecordManager::changeState(const FileProcessingRecord& task, CSingleLock& rLockGuard)
+void FPRecordManager::changeState(const FileProcessingRecord& task)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI02389");
 
@@ -642,14 +642,6 @@ void FPRecordManager::changeState(const FileProcessingRecord& task, CSingleLock&
 				}
 			}
 		}
-		
-		_lastCodePos = "300";
-		// Send a notification message
-		// Notice that this method is not protected by the lockMap semaphore
-		// This is because whatever method handles this method may need to call the 
-		// get task method which requires that semaphore.  Note also that whatever code handles 
-		// this message may not call any methods such as push or pop on the queue
-		rLockGuard.Unlock();
 
 		_lastCodePos = "310";
 		// Lock the task map mutex while updating task map
@@ -667,59 +659,52 @@ void FPRecordManager::changeState(const FileProcessingRecord& task, CSingleLock&
 		if(m_hDlg != __nullptr)
 		{
 			_lastCodePos = "350";
-			SendStatusMessage(m_hDlg, nTaskID, eOldStatus, eNewStatus);
+			SendStatusMessage(m_hDlg, &task, eOldStatus);
 			_lastCodePos = "360";
 		}
 
-		// Again We must protect the queue from simultaneous access by the getTask() method
-		// from another thread
-		// This code removes a record from the map if necessary.
-		// Note that it is called after the message is processed
+		_lastCodePos = "370";
+
+		// remove the file if that is the appropriate transition
+		if(eNewStatus == kRecordNone)
 		{
-			rLockGuard.Lock();
-			_lastCodePos = "370";
-
-			// remove the file if that is the appropriate transition
-			if(eNewStatus == kRecordNone)
+			// remove the task from the pending queue first
+			TaskIdList::iterator queIt;
+			for(queIt = m_queTaskIds.begin(); queIt != m_queTaskIds.end(); queIt++)
 			{
-				// remove the task from the pending queue first
-				TaskIdList::iterator queIt;
-				for(queIt = m_queTaskIds.begin(); queIt != m_queTaskIds.end(); queIt++)
-				{
-					_lastCodePos = "380";
-					if(*queIt == nTaskID)
-					{	
-						_lastCodePos = "390";
-						m_queTaskIds.erase(queIt);
-						break;
-					}
-				}					
+				_lastCodePos = "380";
+				if(*queIt == nTaskID)
+				{	
+					_lastCodePos = "390";
+					m_queTaskIds.erase(queIt);
+					break;
+				}
+			}					
 
-				_lastCodePos = "400";
+			_lastCodePos = "400";
 
-				// [FlexIDSCore:5186]
-				// It is not an error if nTaskID is not removed from m_mapTasks as a result of this
-				// call. There may still be additional instances of this task in the m_queTaskIds or
-				// m_queFinishedTasks list for which the map entry is still needed.
-				removeTaskIfNotCurrentOrInLists(nTaskID);
+			// [FlexIDSCore:5186]
+			// It is not an error if nTaskID is not removed from m_mapTasks as a result of this
+			// call. There may still be additional instances of this task in the m_queTaskIds or
+			// m_queFinishedTasks list for which the map entry is still needed.
+			removeTaskIfNotCurrentOrInLists(nTaskID);
 
-				_lastCodePos = "410";
-			}
+			_lastCodePos = "410";
+		}
 
-			_lastCodePos = "500";
-			// If an old task has to be removed
-			if (bRemoveOldTask)
-			{
-				_lastCodePos = "510";
+		_lastCodePos = "500";
+		// If an old task has to be removed
+		if (bRemoveOldTask)
+		{
+			_lastCodePos = "510";
 
-				// [FlexIDSCore:5186]
-				// It is not an error if nTaskID is not removed from m_mapTasks as a result of this
-				// call. There may still be additional instances of this task in the m_queTaskIds or
-				// m_queFinishedTasks list for which the map entry is still needed.
-				removeTaskIfNotCurrentOrInLists(nRemoveTaskId);
+			// [FlexIDSCore:5186]
+			// It is not an error if nTaskID is not removed from m_mapTasks as a result of this
+			// call. There may still be additional instances of this task in the m_queTaskIds or
+			// m_queFinishedTasks list for which the map entry is still needed.
+			removeTaskIfNotCurrentOrInLists(nRemoveTaskId);
 
-				_lastCodePos = "520";
-			}
+			_lastCodePos = "520";
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI24633");
@@ -866,13 +851,8 @@ bool FPRecordManager::removeTaskIfNotCurrentOrInLists(long nTaskID)
 
 			return true;
 		}
-		else
-		{
-			UCLIDException ue("ELI25355", "Application trace: Task cannot be removed.");
-			ue.addDebugInfo("Record Status", statusAsString(eStatus));
-			ue.addDebugInfo("Task to be removed", nTaskID);
-			ue.log();
-		}
+		// No need for an app trace here; it is perfectly acceptable for a file to have been
+		// returned to the pending or processing state.
 	}
 	else
 	{
@@ -880,6 +860,7 @@ bool FPRecordManager::removeTaskIfNotCurrentOrInLists(long nTaskID)
 		ue.addDebugInfo("Task to be removed", nTaskID);
 		ue.log();
 	}
+
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
