@@ -695,7 +695,7 @@ STDMETHODIMP CMicrFinder::Load(IStream * pStream)
 		dataReader >> m_bSplitCheckNumber;
 		dataReader >> m_bSplitAmount;
 
-		if (nDataVersion == 2)
+		if (nDataVersion >= 2)
 		{
 			dataReader >> m_mapRotations[0];
 			dataReader >> m_mapRotations[90];
