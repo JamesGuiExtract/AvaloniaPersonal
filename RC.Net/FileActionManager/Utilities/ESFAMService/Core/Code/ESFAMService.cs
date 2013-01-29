@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading;
@@ -516,11 +517,17 @@ namespace Extract.FileActionManager.Utilities
                     // EXE's lying around.
                     if (famProcess != null) // Sanity check, it should never be null at this point
                     {
-                        // Set the object to NULL so that the EXE will exit
-                        famProcess = null;
+                        // [DNRCAU #429, 876] 
+                        // Force release the COM object so the EXE will exit
+                        try
+                        {
+                            Marshal.FinalReleaseComObject(famProcess);
+                        }
+                        finally
+                        {
+                            famProcess = null;
+                        }
 
-                        // Perform a GC to force the object to clean up
-                        // [DNRCAU #429]
                         GC.Collect();
                         GC.WaitForPendingFinalizers();
 
@@ -547,7 +554,7 @@ namespace Extract.FileActionManager.Utilities
                 while (_stopProcessing != null && !_stopProcessing.WaitOne(0));
 
                 // Check if the process is still running
-                if (process != null && !process.HasExited && famProcess.IsRunning)
+                if (process != null && !process.HasExited && famProcess != null && famProcess.IsRunning)
                 {
                     // Tell the process to stop
                     famProcess.Stop();
@@ -588,8 +595,16 @@ namespace Extract.FileActionManager.Utilities
                             Thread.Sleep(1000);
                         }
                         
+                        // [DNRCAU #876] 
                         // Release the COM object so the FAMProcess.exe is cleaned up
-                        famProcess = null;
+                        try
+                        {
+                            Marshal.FinalReleaseComObject(famProcess);
+                        }
+                        finally
+                        {
+                            famProcess = null;
+                        }
                         
                         // Perform a GC to force the object to clean up
                         GC.Collect();
