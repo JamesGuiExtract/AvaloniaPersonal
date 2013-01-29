@@ -638,11 +638,16 @@ namespace Extract.DataEntry
 
                 if (result.IsSpatial)
                 {
-                    if (SpatialMode == SpatialMode.None)
+                    if (SpatialMode.HasFlag(SpatialMode.None))
                     {
                         result.RemoveSpatialInfo();
                     }
-                    else if (SpatialMode == SpatialMode.Only)
+                    else if (SpatialMode.HasFlag(SpatialMode.IfNotBlank) &&
+                            string.IsNullOrEmpty(result.ToString()))
+                    {
+                        result.RemoveSpatialInfo();
+                    }
+                    else if (SpatialMode.HasFlag(SpatialMode.Only))
                     {
                         result.RemoveStringInfo();
                     }
@@ -736,26 +741,50 @@ namespace Extract.DataEntry
                 SpatialString forcedSpatialResult = null;
                 if (distinctResult.IsSpatial)
                 {
-                    if (distinctResult.SpatialMode == SpatialMode.Force)
-                    {
-                        if (forcedSpatialResult == null)
-                        {
-                            ICopyableObject copySource =
-                                (ICopyableObject)distinctResult.ToSpatialString();
-                            forcedSpatialResult = (SpatialString)copySource.Clone();
-                        }
-                        else
-                        {
-                            forcedSpatialResult.Append(distinctResult.FirstSpatialStringValue);
-                        }
-                    }
-                    else if (distinctResult.SpatialMode == SpatialMode.None)
+                    if (distinctResult.SpatialMode.HasFlag(SpatialMode.None))
                     {
                         distinctResult.RemoveSpatialInfo();
                     }
-                    else if (distinctResult.SpatialMode == SpatialMode.Only)
+                    else if (distinctResult.SpatialMode.HasFlag(SpatialMode.IfNotBlank) &&
+                        string.IsNullOrEmpty(distinctResult.ToString()))
                     {
-                        distinctResult.RemoveStringInfo();
+                        distinctResult.RemoveSpatialInfo();
+                    }
+                    else
+                    {
+                        if (distinctResult.SpatialMode.HasFlag(SpatialMode.Only))
+                        {
+                            distinctResult.RemoveStringInfo();
+                        }
+
+                        if (distinctResult.SpatialMode.HasFlag(SpatialMode.Force))
+                        {
+                            SpatialString spatialString = distinctResult.ToSpatialString();
+                            IUnknownVector vecRasterZones = spatialString.GetOCRImageRasterZones();
+
+                            if (forcedSpatialResult == null)
+                            {
+                                ICopyableObject copySource = (ICopyableObject)spatialString;
+                                forcedSpatialResult = (SpatialString)copySource.Clone();
+                            }
+                            else
+                            {
+                                vecRasterZones.Append(forcedSpatialResult.GetOCRImageRasterZones());
+                                forcedSpatialResult.Append(distinctResult.FirstSpatialStringValue);
+                            }
+
+                            // Because the SpatialString class will remove spatial info for
+                            // blank strings yet it is important for the attribute value spatial
+                            // mode to match the spatial mode of the SpatialString value, add
+                            // back any spatial info that was removed as part of the Clone or
+                            // Append methods.
+                            if (!forcedSpatialResult.HasSpatialInfo())
+                            {
+                                forcedSpatialResult.AddRasterZones(
+                                    vecRasterZones,
+                                    spatialString.SpatialPageInfos);
+                            }
+                        }
                     }
                 }
 

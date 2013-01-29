@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 
 namespace Extract.DataEntry
@@ -12,6 +13,13 @@ namespace Extract.DataEntry
     /// Specifies the way in which spatial information will be persisted from
     /// <see cref="QueryNode"/>s.
     /// </summary>
+    [Flags]
+    // For backward compatibility, I'm not changing the name of SpatialMode after making it flags
+    [SuppressMessage("Microsoft.Naming", "CA1714:FlagsEnumsShouldHavePluralNames")]
+    // Since "None" has a special meaning it should not be used as the name of the zero value.
+    // "None" has an active effect (to remove spatial info). "Normal" as the zero value indicates
+    // no special action should be taken on the result's spatial info.
+    [SuppressMessage("Microsoft.Design", "CA1008:EnumsShouldHaveZeroValue")]
     public enum SpatialMode
     {
         /// <summary>
@@ -23,7 +31,7 @@ namespace Extract.DataEntry
         Normal = 0,
 
         /// <summary>
-        /// If a node's result is spatial, the spatial info will be returned.  The spatial info
+        /// If a node's result is spatial, the spatial info will be returned. The spatial info
         /// will override the spatial results of the parent node or be added to any non-spatial
         /// result of the parent node.
         /// </summary>
@@ -31,14 +39,18 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Only the spatial information from the node should be persisted, not the node text.
-        /// The spatial info will be persisted as is with "Normal" mode.
         /// </summary>
         Only = 2,
 
         /// <summary>
+        /// Spatial info should not be included if the nodes text result is blank.
+        /// </summary>
+        IfNotBlank = 4,
+
+        /// <summary>
         /// No spatial information should be persisted from the node.
         /// </summary>
-        None = 3
+        None = 8
     }
 
     /// <summary>
@@ -735,17 +747,28 @@ namespace Extract.DataEntry
 
                 if (_properties.TryGetValue("SpatialMode", out xmlAttributeValue))
                 {
-                    if (xmlAttributeValue.Equals("Force", StringComparison.OrdinalIgnoreCase))
+                    var specifiedFlags = new HashSet<string>(
+                        xmlAttributeValue.Split(new [] {'|', ','}), StringComparer.OrdinalIgnoreCase);
+
+                    if (specifiedFlags.Contains("Force"))
                     {
+                        SpatialMode |= SpatialMode.Force;
+                    }
+                    if (specifiedFlags.Contains("Only"))
+                    {
+                        SpatialMode |= SpatialMode.Only;
+                    }
+                    if (specifiedFlags.Contains("IfNotBlank"))
+                    {
+                        SpatialMode |= SpatialMode.IfNotBlank;
+                    }
+                    if (specifiedFlags.Contains("None"))
+                    {
+                        ExtractException.Assert("ELI35362",
+                            "'Force' spatial mode may not be combined with any other spatial modes.",
+                            SpatialMode == SpatialMode.Normal);
+
                         SpatialMode = SpatialMode.Force;
-                    }
-                    else if (xmlAttributeValue.Equals("Only", StringComparison.OrdinalIgnoreCase))
-                    {
-                        SpatialMode = SpatialMode.Only;
-                    }
-                    else if (xmlAttributeValue.Equals("None", StringComparison.OrdinalIgnoreCase))
-                    {
-                        SpatialMode = SpatialMode.None;
                     }
                 }
 
@@ -770,6 +793,13 @@ namespace Extract.DataEntry
                 if (_properties.TryGetValue("Parameterize", out xmlAttributeValue))
                 {
                     Parameterize = xmlAttributeValue.ToBoolean();
+                }
+                else
+                {
+                    // If SpatialMode only is being used, the node should default to not being
+                    // parameterized since more than likely the text value is intended not to factor
+                    // into a query or expression at all.
+                    Parameterize = !SpatialMode.HasFlag(SpatialMode.Only);
                 }
 
                 // Allow caching unless the AllowCaching attribute is present and specifies not to.
