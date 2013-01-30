@@ -121,6 +121,8 @@ namespace Extract.AttributeFinder.Rules
 
                 _useConditionCheckBox.Checked = Settings.UseCondition;
                 _zoneCountConditionComboBox.SelectEnumValue(Settings.ZoneCountCondition);
+
+                _zoneCountConditionComboBox.Enabled = _useConditionCheckBox.Checked;
             }
             catch (Exception ex)
             {
