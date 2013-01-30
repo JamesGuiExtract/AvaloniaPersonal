@@ -57,6 +57,8 @@ IDShieldInstallMediaDir=$(IDShieldInstallRootDir)\Media\CD-ROM\DiskImages\DISK1
 
 RedactionDemoBuildDir=$(AFRootDirectory)\Utils\RedactionDemo\Build
 
+NetDMSRootDir=$(AFRootDirectory)\AFIntegrations\NetDMS
+
 LabDEBuildDir=$(PDRootDir)\DataEntry\LabDE\Build
 
 # determine the name of the release output directory based upon the build
@@ -200,7 +202,16 @@ CreateLabDEInstall:
 	@CD "$(LabDEBuildDir)"
     @nmake /F LabDE.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(LabDEVersion)" DoEverything
 	
-CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateDemoShieldInstall CreateLabDEInstall
+CreateNetDMSInstall
+	@Echo Creating NetDMS install...
+	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall"
+	@XCOPY "$(NetDMSRootDir)\NetDMSIntegrationInstall\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall" /v /s /e /y
+	@COPY "$(BinariesFolder)\Obfuscated\Extract.NetDMSExporter.dll" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall\Exporter"
+	@COPY "$(BinariesFolder)\Obfuscated\Extract.NetDMSUtilities.dll" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall\ProgramFiles"
+	@COPY "$(BinariesFolder)\Obfuscated\Extract.NetDMSCustomComponents.dll" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall\ProgramFiles"
+	@COPY "$(BinariesFolder)\Interop.Weak.*.dll" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall\ProgramFiles"
+	
+CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateDemoShieldInstall CreateLabDEInstall CreateNetDMSInstall
 
 DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall CreateOtherDemos
 
