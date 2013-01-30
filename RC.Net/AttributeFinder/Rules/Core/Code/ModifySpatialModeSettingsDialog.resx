@@ -123,36 +123,7 @@
   <metadata name="infoTip2.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
-  <metadata name="infoTip1.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="infoTip1.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="infoTip1.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAACnSURBVDhPrVMBCsAgCOzpPa2X1WZmnmbRYIFgopenV0p62ut+tVnd9CTwyZU7xtkfD3YQSOR6
-        CnkrpQxwAMg5dyTsQAq1QMFs7KW8AmDb6lvQsAPPkQZqaVxTEDoRFZxwH6JSiKbMHdiXNc8BMHat1a0x
-        uh62wACSEHUA+7IUdqIxrGMdyBysHqbSTvLWj2D1wH+CYjuDP8QuAqDGl8RdAGlcF/2R+ABXWzYReseN
-        mQAAAABJRU5ErkJggg==
-</value>
-  </data>
-  <data name="infoTip1.TipText" xml:space="preserve">
-    <value>A pseudo-spatial string is a spatial string where the characters of the text are
-distributed evenly across an image area.
-
-This can be done only when the source attribute has a single raster zone. Also,
-if the source attribute is already spatial, this option will keep the character sizes
-and positions as they are rather than re-distributing them.</value>
-  </data>
-  <metadata name="groupBox2.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="infoTip2.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
   <data name="infoTip2.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
@@ -168,4 +139,32 @@ the spatial mode modification will be performed recursively when used as a value
 
 This option doesn't apply when used as a pre-processor. </value>
   </data>
+  <metadata name="infoTip1.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="infoTip1.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAACnSURBVDhPrVMBCsAgCOzpPa2X1WZmnmbRYIFgopenV0p62ut+tVnd9CTwyZU7xtkfD3YQSOR6
+        CnkrpQxwAMg5dyTsQAq1QMFs7KW8AmDb6lvQsAPPkQZqaVxTEDoRFZxwH6JSiKbMHdiXNc8BMHat1a0x
+        uh62wACSEHUA+7IUdqIxrGMdyBysHqbSTvLWj2D1wH+CYjuDP8QuAqDGl8RdAGlcF/2R+ABXWzYReseN
+        mQAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="infoTip1.TipText" xml:space="preserve">
+    <value>A pseudo-spatial string is a spatial string where the characters of the text are
+distributed evenly across an image area. If the source attribute is already spatial,
+this option will keep the character sizes and positions as they are rather than
+re-distributing them.
+
+WARNING:
+If the source attribute has multiple zones per page, the raster zones will be
+combined into one large zone across which the text will be distributed.
+If the source attribute spans multiple pages, the attribute text will be repeated
+for each page.
+</value>
+  </data>
+  <metadata name="groupBox2.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
 </root>

@@ -248,6 +248,10 @@
       <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>
       <Name>Extract.FileActionManager.Forms</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Imaging\Core\Code\Extract.Imaging.csproj">
+      <Project>{B2D07DE4-9192-4531-8854-DE03CE9B0B57}</Project>
+      <Name>Extract.Imaging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
       <Project>{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}</Project>
       <Name>Extract.Imaging.Forms</Name>

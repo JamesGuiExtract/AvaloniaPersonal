@@ -1,13 +1,18 @@
-﻿using Extract.Interop;
+﻿using Extract.Imaging;
+using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
-using UCLID_RASTERANDOCRMGMTLib;
+
+using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
+using ESpatialStringMode = UCLID_RASTERANDOCRMGMTLib.ESpatialStringMode;
+using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 
 namespace Extract.AttributeFinder.Rules
 {
@@ -26,7 +31,12 @@ namespace Extract.AttributeFinder.Rules
         /// <summary>
         /// Condition is met when the source value has more than one raster zone.
         /// </summary>
-        Multiple = 1
+        Multiple = 1,
+
+        /// <summary>
+        /// Condition is met when the source value is contained on a single page.
+        /// </summary>
+        SinglePage = 2
     }
 
     /// <summary>
@@ -694,12 +704,24 @@ namespace Extract.AttributeFinder.Rules
             // condition.
             if (UseCondition)
             {
-                int zoneCount = spatialString.GetOCRImageRasterZones().Size();
-
-                if ((zoneCount == 1) !=
-                    (ZoneCountCondition == ModifySpatialModeRasterZoneCountCondition.Single))
+                if (ZoneCountCondition == ModifySpatialModeRasterZoneCountCondition.SinglePage)
                 {
-                    return;
+                    int pageCount = spatialString.GetPages().ToIEnumerable<SpatialString>().Count();
+
+                    if (pageCount > 1)
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    int zoneCount = spatialString.GetOCRImageRasterZones().Size();
+
+                    if ((zoneCount == 1) !=
+                        (ZoneCountCondition == ModifySpatialModeRasterZoneCountCondition.Single))
+                    {
+                        return;
+                    }
                 }
             }
 
@@ -721,13 +743,7 @@ namespace Extract.AttributeFinder.Rules
                         // Conversion to pseudo-spatial only makes sense if the value is hybrid.
                         if (spatialString.GetMode() == ESpatialStringMode.kHybridMode)
                         {
-                            IUnknownVector rasterZones = spatialString.GetOCRImageRasterZones();
-                            ExtractException.Assert("ELI34693",
-                                "Cannot use multiple raster zones to create pseudo-spatial string.",
-                                rasterZones.Size() == 1);
-
-                            spatialString.CreatePseudoSpatialString((RasterZone)rasterZones.At(0),
-                                spatialString.String, spatialString.SourceDocName, spatialString.SpatialPageInfos);
+                            ConvertHybridToPsuedoSpatial(spatialString);
                         }
                     }
                     break;
@@ -741,6 +757,73 @@ namespace Extract.AttributeFinder.Rules
             }
 
             return;
+        }
+
+        /// <summary>
+        /// Converts the provided <see paramref="spatialString"/> into a psuedo-spatial string where
+        /// the value's characters are spread evenly across the value's spatial area.
+        /// </summary>
+        /// <param name="spatialString"><see cref="SpatialString"/> to be converted to a hybrid.
+        /// </param>
+        static void ConvertHybridToPsuedoSpatial(SpatialString spatialString)
+        {
+            ExtractException.Assert("ELI35363",
+                "Cannot convert non-spatial string to psuedo-spatial string.",
+                spatialString.HasSpatialInfo());
+
+            // Get the text that will be applied to each page of the converted string.
+            string text = spatialString.String;
+            // Flatten all pages into an array to force the enumeration to occur before we modify
+            // spatialString.
+            var spatialStringPages =
+                spatialString.GetPages().ToIEnumerable<SpatialString>().ToArray();
+
+            // Loop for each page in the source spatialString. Each page's value will be constructed
+            // with all of the original text into a raster zone that encapsulates all spatial area
+            // on the page.
+            for (int i = 0; i < spatialStringPages.Length; i++)
+            {
+                IIUnknownVector comRasterZones =
+                    spatialStringPages[i].GetOCRImageRasterZones();
+
+                ComRasterZone resultRasterZone;
+                if (comRasterZones.Size() == 1)
+                {
+                    // If there's only one raster zone on the page, use it.
+                    resultRasterZone = (ComRasterZone)comRasterZones.At(0);
+                }
+                else
+                {
+                    // If there are multiple raster zones on the page, use a bounding raster zone
+                    // that includes the spatial area of all the raster zones on the page.
+                    var rasterZones = comRasterZones
+                        .ToIEnumerable<ComRasterZone>()
+                        .Select(zone => new RasterZone(zone));
+                    int page = spatialStringPages[i].GetFirstPageNumber();
+
+                    resultRasterZone =
+                        RasterZone.GetBoundingRasterZone(rasterZones, page)
+                            .ToComRasterZone();
+                }
+
+                if (i == 0)
+                {
+                    // Recreate spatialString as a pseudo-spatial string.
+                    spatialString.CreatePseudoSpatialString(resultRasterZone,
+                        text, spatialString.SourceDocName,
+                        spatialString.SpatialPageInfos);
+                }
+                else
+                {
+                    // Append the psuedo-spatial string for each subsequent page.
+                    SpatialString pageResult = new SpatialString();
+                    pageResult.CreatePseudoSpatialString(resultRasterZone,
+                        text, spatialString.SourceDocName,
+                        spatialString.SpatialPageInfos);
+
+                    spatialString.Append(pageResult);
+                }
+            }
         }
 
         #endregion Private Members

@@ -36,9 +36,11 @@ namespace Extract.AttributeFinder.Rules
                 // Assign readable values for enums to be displayed in
                 // _convertToPseudoSpatialradioButton.
                 ModifySpatialModeRasterZoneCountCondition.Single.SetReadableValue(
-                    "is a single raster zone");
+                    "there is a single raster zone");
                 ModifySpatialModeRasterZoneCountCondition.Multiple.SetReadableValue(
-                    "are multiple raster zones");
+                    "there are multiple raster zones");
+                ModifySpatialModeRasterZoneCountCondition.SinglePage.SetReadableValue(
+                    "the attribute is contained on a single page.");
             }
             catch (Exception ex)
             {
@@ -119,9 +121,6 @@ namespace Extract.AttributeFinder.Rules
 
                 _useConditionCheckBox.Checked = Settings.UseCondition;
                 _zoneCountConditionComboBox.SelectEnumValue(Settings.ZoneCountCondition);
-
-                _zoneCountConditionComboBox.Enabled =
-                    _useConditionCheckBox.Checked && !_convertToPseudoSpatialRadioButton.Checked;
             }
             catch (Exception ex)
             {
@@ -135,38 +134,6 @@ namespace Extract.AttributeFinder.Rules
 
         /// <summary>
         /// Handles the <see cref="T:CheckBox.CheckChanged"/> event for
-        /// <see cref="_convertToPseudoSpatialRadioButton"/>.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleConvertToPseudoSpatialCheckChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                if (_convertToPseudoSpatialRadioButton.Checked)
-                {
-                    _useConditionCheckBox.Checked = true;
-                    _zoneCountConditionComboBox.SelectEnumValue(
-                        ModifySpatialModeRasterZoneCountCondition.Single);
-
-                    _useConditionCheckBox.Enabled = false;
-                    _zoneCountConditionComboBox.Enabled = false;
-                }
-                else
-                {
-                    _useConditionCheckBox.Enabled = true;
-                    _zoneCountConditionComboBox.Enabled = _useConditionCheckBox.Checked;
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI34699");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="T:CheckBox.CheckChanged"/> event for
         /// <see cref="_useConditionCheckBox"/>.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -176,8 +143,7 @@ namespace Extract.AttributeFinder.Rules
         {
             try
             {
-                _zoneCountConditionComboBox.Enabled =
-                    _useConditionCheckBox.Checked && !_convertToPseudoSpatialRadioButton.Checked;
+                _zoneCountConditionComboBox.Enabled = _useConditionCheckBox.Checked;
             }
             catch (Exception ex)
             {
