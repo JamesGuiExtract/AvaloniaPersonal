@@ -202,7 +202,7 @@ CreateLabDEInstall:
 	@CD "$(LabDEBuildDir)"
     @nmake /F LabDE.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(LabDEVersion)" DoEverything
 	
-CreateNetDMSInstall
+CreateNetDMSInstall:
 	@Echo Creating NetDMS install...
 	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall"
 	@XCOPY "$(NetDMSRootDir)\NetDMSIntegrationInstall\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall" /v /s /e /y
