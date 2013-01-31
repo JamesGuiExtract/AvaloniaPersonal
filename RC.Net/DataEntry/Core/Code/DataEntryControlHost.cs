@@ -685,6 +685,12 @@ namespace Extract.DataEntry
         Queue<Tuple<Action, string>> _idleCommands = new Queue<Tuple<Action, string>>();
 
         /// <summary>
+        /// Indicates a selection state that should be applied after a currently in-progress update.
+        /// (ControlUpdateReferenceCount > 0)
+        /// </summary>
+        SelectionState _pendingSelection;
+
+        /// <summary>
         /// Indicates whether the form as been loaded.
         /// </summary>
         bool _isLoaded;
@@ -1920,32 +1926,47 @@ namespace Extract.DataEntry
                 // Keep track if any attributes were updated.
                 bool spatialInfoConfirmed = false;
 
-                // Loop through every attribute in the active control.
-                foreach (IAttribute attribute in GetActiveAttributes())
+                try
                 {
-                    // If the attribute has a spatial attribute, but the attribute's value has
-                    // not yet been accepted, interpret the edit as implicit acceptance of the
-                    // attribute's value.
-                    if (AttributeStatusInfo.GetHintType(attribute) == HintType.None &&
-                        !AttributeStatusInfo.IsAccepted(attribute))
+                    // Prevent multiple re-draws or undo mementos from being triggered until all
+                    // highlights have been accepted.
+                    ControlUpdateReferenceCount++;
+
+                    // Loop through every attribute in the active control.
+                    foreach (IAttribute attribute in GetActiveAttributes())
                     {
-                        // AddMemento needs to be called before changing the value so that the
-                        // DataEntryModifiedAttributeMemento knows of the attribute's original value.
-                        AttributeStatusInfo.UndoManager.AddMemento(
-                            new DataEntryModifiedAttributeMemento(attribute));
+                        // If the attribute has a spatial attribute, but the attribute's value has
+                        // not yet been accepted, interpret the edit as implicit acceptance of the
+                        // attribute's value.
+                        if (AttributeStatusInfo.GetHintType(attribute) == HintType.None &&
+                            !AttributeStatusInfo.IsAccepted(attribute))
+                        {
+                            // AddMemento needs to be called before changing the value so that the
+                            // DataEntryModifiedAttributeMemento knows of the attribute's original value.
+                            AttributeStatusInfo.UndoManager.AddMemento(
+                                new DataEntryModifiedAttributeMemento(attribute));
 
-                        // Accepting spatial info will not trigger an EndEdit call to seperate this
-                        // as an independent operation but it should considered one.
-                        AttributeStatusInfo.UndoManager.StartNewOperation();
+                            // Accepting spatial info will not trigger an EndEdit call to seperate this
+                            // as an independent operation but it should considered one.
+                            AttributeStatusInfo.UndoManager.StartNewOperation();
 
-                        AttributeStatusInfo.AcceptValue(attribute, true);
+                            AttributeStatusInfo.AcceptValue(attribute, true);
 
-                        // Re-create the highlight
-                        RemoveAttributeHighlight(attribute);
-                        SetAttributeHighlight(attribute, true);
+                            // Re-create the highlight
+                            RemoveAttributeHighlight(attribute);
+                            SetAttributeHighlight(attribute, true);
 
-                        spatialInfoConfirmed = true;
+                            spatialInfoConfirmed = true;
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI35364", ex);
+                }
+                finally
+                {
+                    ControlUpdateReferenceCount--;
                 }
 
                 // Re-display the highlights if changes were made.
@@ -2851,7 +2872,7 @@ namespace Extract.DataEntry
                 }
 
                 // Displays the appropriate highlights, tooltips and error icons.
-                ApplySelection(e.SelectionState);
+                ApplySelection(e.SelectionState, false);
 
                 // If an exception was thrown from EndEdit, throw it here.
                 if (endEditException != null)
@@ -3968,11 +3989,29 @@ namespace Extract.DataEntry
         /// displaying the appropriate highlights, tooltips and error icons.
         /// </summary>
         /// <param name="selectionState">The <see cref="SelectionState"/> to apply.</param>
-        internal void ApplySelection(SelectionState selectionState)
+        /// <param name="suppressSelectionFinalization"><see langword="true"/> if the highlight
+        /// refresh and raising of <see cref="ItemSelectionChanged"/> should be surpressed;
+        /// otherwise, <see langword="false"/>.</param>
+        internal void ApplySelection(SelectionState selectionState, bool suppressSelectionFinalization)
         {
             ExtractException.Assert("ELI25169", "Null argument exception!", selectionState != null);
             ExtractException.Assert("ELI31018", "Null argument exception!",
                 selectionState.DataControl != null);
+
+            // No need to bother with selection while in the middle of loading data.
+            if (_changingData)
+            {
+                return;
+            }
+
+            // [DataEntry:1176]
+            // If in the middle of an update, the application of the selection needs to be delayed
+            // until after the update is complete. ItemSelectionChanged depends on data calculated
+            // in DrawHighlights, which is skipped during updates.
+            if (ControlUpdateReferenceCount > 0)
+            {
+                _pendingSelection = selectionState;
+            }
 
             SelectionState lastSelectionState;
             if (_controlSelectionState.TryGetValue(selectionState.DataControl, out lastSelectionState))
@@ -4022,16 +4061,21 @@ namespace Extract.DataEntry
                 }
             }
 
-            // If this is the active control and the image page is not in the process of being
-            // changed, redraw all highlights.
-            if (!_changingData && selectionState.DataControl == _activeDataControl)
+            // The DrawHighlights call and ItemSelectionChanged event may be delayed if this will be
+            // done later.
+            if (!suppressSelectionFinalization)
             {
-                DrawHighlights(true);
+                // If this is the active control and the image page is not in the process of being
+                // changed, redraw all highlights.
+                if (!_changingData && selectionState.DataControl == _activeDataControl)
+                {
+                    DrawHighlights(true);
+                }
+
+                OnItemSelectionChanged();
+
+                _currentlySelectedGroupAttribute = selectionState.SelectedGroupAttribute;
             }
-
-            OnItemSelectionChanged();
-
-            _currentlySelectedGroupAttribute = selectionState.SelectedGroupAttribute;
         }
 
         #endregion Internal Members
@@ -4585,6 +4629,22 @@ namespace Extract.DataEntry
             {
                 _drawingHighlights = true;
 
+                // [DataEntry:1176]
+                // If there was a pending selection to apply, do it now before the highlights are
+                // drawn.
+                if (_pendingSelection != null)
+                {
+                    // Specify to ApplySelection that is should suppress the draw highlights call
+                    // and ItemSelectionChanged event since that event depends on data calculated in
+                    // this method; ItemSelectionChanged will be raised at the end of this method.
+                    ApplySelection(_pendingSelection, true);
+
+                    // As long as the pending selection involves the active control, ensure active
+                    // attributes are visible.
+                    ensureActiveAttributeVisible =
+                        (_pendingSelection.DataControl == _activeDataControl);
+                }
+
                 // Refresh the active control highlights if necessary.
                 if (_refreshActiveControlHighlights)
                 {
@@ -4614,142 +4674,140 @@ namespace Extract.DataEntry
                 int firstPageOfHighlights = -1;
                 int pageToShow = -1;
 
-                // Obtain the list of active attributes.
-                SelectionState selectionState;
-                if (_activeDataControl != null &&
-                    _controlSelectionState.TryGetValue(_activeDataControl, out selectionState))
+                // Obtain the current selection state as well as the list of highlights that need
+                // tooltips.
+                SelectionState selectionState = null;                
+                List<IAttribute> activeToolTipAttributes = null;
+                if (_activeDataControl != null)
                 {
-                    // Obtain the list of highlights that need tooltips.
-                    List<IAttribute> activeToolTipAttributes;
+                    _controlSelectionState.TryGetValue(_activeDataControl, out selectionState);
                     _controlToolTipAttributes.TryGetValue(
                         _activeDataControl, out activeToolTipAttributes);
+                }
 
-                    // Loop through all active attributes to retrieve their highlights.
-                    foreach (IAttribute attribute in selectionState.Attributes
-                        .Where(attribute => selectionState.DataControl.HighlightSelectionInChildControls ||
-                            AttributeStatusInfo.GetOwningControl(attribute) == selectionState.DataControl))
+                // Loop through all active attributes to retrieve their highlights.
+                foreach (IAttribute attribute in GetActiveAttributes())
+                {
+                    // Find any highlight CompositeHighlightLayerObject that has been created for
+                    // this data entry control.
+                    List<CompositeHighlightLayerObject> highlightList;
+
+                    _attributeHighlights.TryGetValue(attribute, out highlightList);
+
+                    // If the attribute has no highlights to display, move on
+                    if (highlightList == null || highlightList.Count == 0)
                     {
-                        // Find any highlight CompositeHighlightLayerObject that has been created for
-                        // this data entry control.
-                        List<CompositeHighlightLayerObject> highlightList;
-
-                        _attributeHighlights.TryGetValue(attribute, out highlightList);
-
-                        // If the attribute has no highlights to display, move on
-                        if (highlightList == null || highlightList.Count == 0)
+                        _selectedAttributesWithoutHighlights++;
+                        continue;
+                    }
+                    else
+                    {
+                        // Update the selected attribute counts appropriately.
+                        switch (AttributeStatusInfo.GetHintType(attribute))
                         {
-                            _selectedAttributesWithoutHighlights++;
-                            continue;
+                            case HintType.None:
+                                {
+                                    if (AttributeStatusInfo.IsAccepted(attribute))
+                                    {
+                                        _selectedAttributesWithAcceptedHighlights++;
+                                    }
+                                    else
+                                    {
+                                        _selectedAttributesWithUnacceptedHighlights++;
+                                    }
+                                }
+                                break;
+
+                            case HintType.Direct:
+                                {
+                                    _selectedAttributesWithDirectHints++;
+                                }
+                                break;
+
+                            case HintType.Indirect:
+                                {
+                                    _selectedAttributesWithIndirectHints++;
+                                }
+                                break;
                         }
+                    }
+
+                    // If the highlight is an in-direct hint, do not display it unless this is
+                    // the only active attribute.
+                    if (selectionState.Attributes.Count > 1 &&
+                        AttributeStatusInfo.GetHintType(attribute) == HintType.Indirect)
+                    {
+                        continue;
+                    }
+
+                    // Flag each active attribute to be highlighted
+                    newDisplayedAttributeHighlights[attribute] = true;
+
+                    // If this attribute was previously highlighted, remove it from the
+                    // _displayedAttributeHighlights collection whose contents will be hidden at
+                    // the end of this call.
+                    if (_displayedAttributeHighlights.ContainsKey(attribute))
+                    {
+                        _displayedAttributeHighlights.Remove(attribute);
+                    }
+
+                    // Display the attribute's error icon (if it has one).
+                    ShowErrorIcon(attribute, true);
+
+                    // Display a tooltip if directed to by the control and if possible.
+                    if (!_temporarilyHidingTooltips &&
+                        AttributeStatusInfo.GetHintType(attribute) != HintType.Indirect &&
+                        activeToolTipAttributes.Contains(attribute))
+                    {
+                        ShowAttributeToolTip(attribute);
+                    }
+                    // Otherwise, ensure any previous tooltip for the attribute is removed.
+                    else
+                    {
+                        RemoveAttributeToolTip(attribute);
+                    }
+
+                    // Make each highlight for an active attribute visible.
+                    // Also, display an error icon and tooltip if appropriate, as well as adjust
+                    // the view so the entire attribute is visible. (at least the portion on the
+                    // current page)
+                    foreach (CompositeHighlightLayerObject highlight in highlightList)
+                    {
+                        highlight.Visible = true;
+
+                        // Update firstPageOfHighlights if appropriate
+                        if (firstPageOfHighlights == -1 ||
+                            highlight.PageNumber < firstPageOfHighlights)
+                        {
+                            firstPageOfHighlights = highlight.PageNumber;
+                        }
+
+                        // Update pageToShow if appropriate
+                        if (highlight.PageNumber == _imageViewer.PageNumber)
+                        {
+                            pageToShow = highlight.PageNumber;
+                        }
+
+                        // If there is not yet an entry for this page in unifiedBounds, create a
+                        // new one.
+                        if (!_selectionBounds.ContainsKey(highlight.PageNumber))
+                        {
+                            _selectionBounds[highlight.PageNumber] = highlight.GetBounds();
+                        }
+                        // Otherwise add to the existing entry for this page
                         else
                         {
-                            // Update the selected attribute counts appropriately.
-                            switch (AttributeStatusInfo.GetHintType(attribute))
-                            {
-                                case HintType.None:
-                                    {
-                                        if (AttributeStatusInfo.IsAccepted(attribute))
-                                        {
-                                            _selectedAttributesWithAcceptedHighlights++;
-                                        }
-                                        else
-                                        {
-                                            _selectedAttributesWithUnacceptedHighlights++;
-                                        }
-                                    }
-                                    break;
-
-                                case HintType.Direct:
-                                    {
-                                        _selectedAttributesWithDirectHints++;
-                                    }
-                                    break;
-
-                                case HintType.Indirect:
-                                    {
-                                        _selectedAttributesWithIndirectHints++;
-                                    }
-                                    break;
-                            }
+                            _selectionBounds[highlight.PageNumber] = Rectangle.Union(
+                                _selectionBounds[highlight.PageNumber], highlight.GetBounds());
                         }
 
-                        // If the highlight is an in-direct hint, do not display it unless this is
-                        // the only active attribute.
-                        if (selectionState.Attributes.Count > 1 &&
-                            AttributeStatusInfo.GetHintType(attribute) == HintType.Indirect)
+                        // Combine the highlight bounds with the error icon bounds (if present).
+                        ImageLayerObject errorIcon =
+                            GetErrorIconOnPage(attribute, highlight.PageNumber);
+                        if (errorIcon != null)
                         {
-                            continue;
-                        }
-
-                        // Flag each active attribute to be highlighted
-                        newDisplayedAttributeHighlights[attribute] = true;
-
-                        // If this attribute was previously highlighted, remove it from the
-                        // _displayedAttributeHighlights collection whose contents will be hidden at
-                        // the end of this call.
-                        if (_displayedAttributeHighlights.ContainsKey(attribute))
-                        {
-                            _displayedAttributeHighlights.Remove(attribute);
-                        }
-
-                        // Display the attribute's error icon (if it has one).
-                        ShowErrorIcon(attribute, true);
-
-                        // Display a tooltip if directed to by the control and if possible.
-                        if (!_temporarilyHidingTooltips &&
-                            AttributeStatusInfo.GetHintType(attribute) != HintType.Indirect &&
-                            activeToolTipAttributes.Contains(attribute))
-                        {
-                            ShowAttributeToolTip(attribute);
-                        }
-                        // Otherwise, ensure any previous tooltip for the attribute is removed.
-                        else
-                        {
-                            RemoveAttributeToolTip(attribute);
-                        }
-
-                        // Make each highlight for an active attribute visible.
-                        // Also, display an error icon and tooltip if appropriate, as well as adjust
-                        // the view so the entire attribute is visible. (at least the portion on the
-                        // current page)
-                        foreach (CompositeHighlightLayerObject highlight in highlightList)
-                        {
-                            highlight.Visible = true;
-
-                            // Update firstPageOfHighlights if appropriate
-                            if (firstPageOfHighlights == -1 ||
-                                highlight.PageNumber < firstPageOfHighlights)
-                            {
-                                firstPageOfHighlights = highlight.PageNumber;
-                            }
-
-                            // Update pageToShow if appropriate
-                            if (highlight.PageNumber == _imageViewer.PageNumber)
-                            {
-                                pageToShow = highlight.PageNumber;
-                            }
-
-                            // If there is not yet an entry for this page in unifiedBounds, create a
-                            // new one.
-                            if (!_selectionBounds.ContainsKey(highlight.PageNumber))
-                            {
-                                _selectionBounds[highlight.PageNumber] = highlight.GetBounds();
-                            }
-                            // Otherwise add to the existing entry for this page
-                            else
-                            {
-                                _selectionBounds[highlight.PageNumber] = Rectangle.Union(
-                                    _selectionBounds[highlight.PageNumber], highlight.GetBounds());
-                            }
-
-                            // Combine the highlight bounds with the error icon bounds (if present).
-                            ImageLayerObject errorIcon =
-                                GetErrorIconOnPage(attribute, highlight.PageNumber);
-                            if (errorIcon != null)
-                            {
-                                _selectionBounds[highlight.PageNumber] = Rectangle.Union(
-                                    _selectionBounds[highlight.PageNumber], errorIcon.GetBounds());
-                            }
+                            _selectionBounds[highlight.PageNumber] = Rectangle.Union(
+                                _selectionBounds[highlight.PageNumber], errorIcon.GetBounds());
                         }
                     }
 
@@ -4851,6 +4909,15 @@ namespace Extract.DataEntry
 
                 // Update _displayedHighlights with the new set of highlights.
                 _displayedAttributeHighlights = newDisplayedAttributeHighlights;
+
+                // If we applied a pending selection change, we need to raise the
+                // ItemSelectionChanged event now.
+                if (_pendingSelection != null)
+                {
+                    OnItemSelectionChanged();
+                    _currentlySelectedGroupAttribute = _pendingSelection.SelectedGroupAttribute;
+                    _pendingSelection = null;
+                }
 
                 _imageViewer.Invalidate();
             }
@@ -5199,18 +5266,23 @@ namespace Extract.DataEntry
         /// <summary>
         /// Gets the <see cref="IAttribute"/>s currently selected in the _activeDataControl.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The <see cref="IAttribute"/>s currently selected in the _activeDataControl.
+        /// </returns>
         IEnumerable<IAttribute> GetActiveAttributes()
         {
-            if (_activeDataControl != null)
+            SelectionState selectionState;
+            if (_activeDataControl != null &&
+                _controlSelectionState.TryGetValue(_activeDataControl, out selectionState))
             {
-                SelectionState selectionState;
-                if (_controlSelectionState.TryGetValue(_activeDataControl, out selectionState))
+                // [DataEntry:1177]
+                // Only viewable attributes that are within the current control's selection should
+                // be considered active.
+                foreach (IAttribute attribute in selectionState.Attributes
+                    .Where(attribute => AttributeStatusInfo.IsViewable(attribute) &&
+                        (selectionState.DataControl.HighlightSelectionInChildControls ||
+                        AttributeStatusInfo.GetOwningControl(attribute) == selectionState.DataControl)))
                 {
-                    foreach (IAttribute attribute in selectionState.Attributes)
-                    {
-                        yield return attribute;
-                    }
+                    yield return attribute;
                 }
             }
         }

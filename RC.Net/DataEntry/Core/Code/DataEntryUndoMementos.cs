@@ -653,7 +653,7 @@ namespace Extract.DataEntry
                     _selectionState.DataControl.ApplySelection(_selectionState));
 
                 _dataEntryControlHost.SafeBeginInvoke("ELI34413", () =>
-                    _dataEntryControlHost.ApplySelection(_selectionState));
+                    _dataEntryControlHost.ApplySelection(_selectionState, false));
             }
             catch (Exception ex)
             {
