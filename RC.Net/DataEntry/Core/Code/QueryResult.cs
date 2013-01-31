@@ -660,9 +660,9 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (!IsEmpty && IsSpatial)
+                if (!IsEmpty)
                 {
-                    FirstSpatialStringValue.ReplaceAndDowngradeToHybrid("");
+                    FirstStringValue = "";
 
                     // Do the same for all remaining values.
                     if (NextValue != null)
@@ -672,7 +672,7 @@ namespace Extract.DataEntry
 
                     // There is no longer any attribute or string info in this result.
                     _attributeResults = null;
-                    _stringResults = null;
+                    _stringResults = new List<string>();
                 }
             }
             catch (Exception ex)

@@ -1973,6 +1973,10 @@ namespace Extract.DataEntry
                 if (spatialInfoConfirmed)
                 {
                     DrawHighlights(false);
+                    
+                    // Raise item selection changed to report on the new status of the selected
+                    // attribute(s). (i.e., that they no longer contain unaccepted highlights).
+                    OnItemSelectionChanged();
                 }
             }
             catch (Exception ex)
@@ -2022,6 +2026,10 @@ namespace Extract.DataEntry
                     _refreshActiveControlHighlights = true;
 
                     DrawHighlights(false);
+
+                    // Raise item selection changed to report on the new status of the selected
+                    // attribute(s). (i.e., that they no longer contain highlights).
+                    OnItemSelectionChanged();
                 }
             }
             catch (Exception ex)
@@ -2976,9 +2984,9 @@ namespace Extract.DataEntry
                     OnDataChanged();
                 }
 
-                // If the spatial info for the attribute has changed, re-create the highlight for
-                // the attribute with the new spatial information.
-                if (e.SpatialInfoChanged)
+                // If the spatial info for a viewable attribute has changed, re-create the highlight 
+                // for the attribute with the new spatial information.
+                if (e.SpatialInfoChanged && AttributeStatusInfo.IsViewable(e.Attribute))
                 {
                     RemoveAttributeHighlight(e.Attribute);
 
@@ -3998,12 +4006,6 @@ namespace Extract.DataEntry
             ExtractException.Assert("ELI31018", "Null argument exception!",
                 selectionState.DataControl != null);
 
-            // No need to bother with selection while in the middle of loading data.
-            if (_changingData)
-            {
-                return;
-            }
-
             // [DataEntry:1176]
             // If in the middle of an update, the application of the selection needs to be delayed
             // until after the update is complete. ItemSelectionChanged depends on data calculated
@@ -4022,6 +4024,14 @@ namespace Extract.DataEntry
 
             _controlSelectionState[selectionState.DataControl] = selectionState;
             _controlToolTipAttributes[selectionState.DataControl] = new List<IAttribute>();
+
+            // _controlSelectionState needs to be set as the data is loaded so that an initial
+            // selection state is available for all controls. However, there is no need to
+            // highlights, tooltips, and the ItemSelectionChanged while the data is loading.
+            if (_changingData)
+            {
+                return;
+            }
 
             // Once a new attribute is selected within a control, show tooltips again if they
             // were hidden.
@@ -5852,6 +5862,13 @@ namespace Extract.DataEntry
                 return;
             }
 
+            // [DataEntry:1178]
+            // Never set highlights for un-viewable attributes.
+            if (!AttributeStatusInfo.IsViewable(attribute))
+            {
+                return;
+            }
+
             List<CompositeHighlightLayerObject> highlightList;
             if (_attributeHighlights.TryGetValue(attribute, out highlightList))
             {
@@ -5909,6 +5926,13 @@ namespace Extract.DataEntry
         List<CompositeHighlightLayerObject> CreateAttributeHighlight(IAttribute attribute,
             bool makeVisible, bool isHint, bool isAccepted)
         {
+            // [DataEntry:1178]
+            // Never create highlights for un-viewable attributes.
+            if (!AttributeStatusInfo.IsViewable(attribute))
+            {
+                return new List<CompositeHighlightLayerObject>();
+            }
+
             List<CompositeHighlightLayerObject> attributeHighlights =
                 new List<CompositeHighlightLayerObject>();
 

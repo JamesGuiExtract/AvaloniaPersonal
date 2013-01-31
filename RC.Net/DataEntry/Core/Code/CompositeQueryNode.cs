@@ -638,19 +638,21 @@ namespace Extract.DataEntry
 
                 if (result.IsSpatial)
                 {
-                    if (SpatialMode.HasFlag(SpatialMode.None))
+                    if (result.SpatialMode.HasFlag(SpatialMode.None))
                     {
                         result.RemoveSpatialInfo();
                     }
-                    else if (SpatialMode.HasFlag(SpatialMode.IfNotBlank) &&
+                    else if (result.SpatialMode.HasFlag(SpatialMode.IfNotBlank) &&
                             string.IsNullOrEmpty(result.ToString()))
                     {
                         result.RemoveSpatialInfo();
                     }
-                    else if (SpatialMode.HasFlag(SpatialMode.Only))
-                    {
-                        result.RemoveStringInfo();
-                    }
+                }
+
+                if (result.SpatialMode.HasFlag(SpatialMode.Only) &&
+                    !string.IsNullOrEmpty(result.ToString()))
+                {
+                    result.RemoveStringInfo();
                 }
 
                 // If specified, turn spatial or attribute field into a string result.
@@ -752,11 +754,6 @@ namespace Extract.DataEntry
                     }
                     else
                     {
-                        if (distinctResult.SpatialMode.HasFlag(SpatialMode.Only))
-                        {
-                            distinctResult.RemoveStringInfo();
-                        }
-
                         if (distinctResult.SpatialMode.HasFlag(SpatialMode.Force))
                         {
                             SpatialString spatialString = distinctResult.ToSpatialString();
@@ -786,6 +783,12 @@ namespace Extract.DataEntry
                             }
                         }
                     }
+                }
+
+                if (distinctResult.SpatialMode.HasFlag(SpatialMode.Only) &&
+                    !string.IsNullOrEmpty(distinctResult.ToString()))
+                {
+                    distinctResult.RemoveStringInfo();
                 }
 
                 // If we are evaluating the last query node, create a new empty DistinctResultSet
