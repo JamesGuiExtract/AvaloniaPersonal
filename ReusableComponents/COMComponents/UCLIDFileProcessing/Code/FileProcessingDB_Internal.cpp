@@ -3214,18 +3214,27 @@ void CFileProcessingDB::closeAllDBConnections()
 			// recreating and opening will put it in a good state
 			try
 			{
-				_ConnectionPtr ipDBConnection = it->second;
-				_lastCodePos = "25-" + asString(nCount);
-
-				// This will close the existing connection if not already closed
-				if (ipDBConnection != __nullptr && ipDBConnection->State != adStateClosed)
+				try
 				{
-					_lastCodePos = "30";
+					_ConnectionPtr ipDBConnection = it->second;
+					_lastCodePos = "25-" + asString(nCount);
 
-					ipDBConnection->Close();
+					// This will close the existing connection if not already closed
+					if (ipDBConnection != __nullptr && ipDBConnection->State != adStateClosed)
+					{
+						_lastCodePos = "30";
+
+						ipDBConnection->Close();
+					}
 				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29884")
 			}
-			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29884")
+			catch (UCLIDException &ue)
+			{
+				UCLIDException uexOuter("ELI35366",
+					"Application trace: Failed to clean up old connection.", ue);
+				uexOuter.log();
+			}
 		}
 
 		// Clear all of the connections in all of the threads
@@ -3966,16 +3975,17 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 							break;
 						}
 
-						// If the statistics update failed despite having a lock and a good
-						// connection, we're in a bad state.
-						if (bLocked && pDB->isConnectionAlive(ipConnection))
+						if (pDB->isConnectionAlive(ipConnection))
 						{ 
-							throw ue;
-						}
+							// If the statistics update failed despite having a lock and a good
+							// connection, we're in a bad state.
+							if (bLocked)
+							{
+								throw ue;
+							}
 
-						UCLIDException uexOuter("ELI35306", 
-							"Stats maintenance thread error, reattempting...", ue);
-						uexOuter.log();
+							continue;
+						}
 
 						try
 						{

@@ -1501,7 +1501,6 @@ namespace Extract.SQLCDBEditor
                 case QueryAndResultsType.Table:
                     {
                         queryAndResultsControl.LoadTable(_connection, queryAndResultsControl.DisplayName);
-                        queryAndResultsControl.DataChanged += HandleDataChanged;
                     }
                     break;
 
@@ -1526,7 +1525,6 @@ namespace Extract.SQLCDBEditor
 
                 case QueryAndResultsType.Plugin:
                     {
-                        queryAndResultsControl.DataChanged += HandleDataChanged;
                         queryAndResultsControl.LoadPlugin(_connection);
                     }
                     break;
@@ -1538,6 +1536,7 @@ namespace Extract.SQLCDBEditor
                     break;
             }
 
+            queryAndResultsControl.DataChanged += HandleDataChanged;
             queryAndResultsControl.SentToSeparateTab += HandleTableOrQuerySentToSeparateTab;
             queryAndResultsControl.QueryCreated += HandleQueryCreated;
         }
@@ -2288,6 +2287,7 @@ namespace Extract.SQLCDBEditor
             queryAndResultsControl.QueryRenaming += HandleQueryRenaming;
             queryAndResultsControl.SentToSeparateTab += HandleTableOrQuerySentToSeparateTab;
             queryAndResultsControl.QueryCreated += HandleQueryCreated;
+            queryAndResultsControl.DataChanged += HandleDataChanged;
 
             if (!queryAndResultsControl.IsLoaded)
             {

@@ -128,6 +128,13 @@ namespace Extract.SQLCDBEditor
         bool _isQueryDirty;
 
         /// <summary>
+        /// Indicates if query execution is allowed. When <see cref="QueryModifiesData"/>, this is
+        /// set to <see langword="false"/>, unless the user explictly presses the execute button to
+        /// prevent un-intended modification of data.
+        /// </summary>
+        bool _allowQueryExcecution = true;
+
+        /// <summary>
         /// The <see cref="SQLCDBEditorPlugin"/> being hosted by this instance.
         /// </summary>
         SQLCDBEditorPlugin _plugin;
@@ -573,8 +580,17 @@ namespace Extract.SQLCDBEditor
             // Parse the query in order to define any parameters used by the query.
             ParseQuery(connection, query);
 
-            // Populate the results grid.
-            RefreshData(true, true);
+            if (QueryModifiesData)
+            {
+                // Query execution should be prevented except in the case that the execute button is
+                // manually pressed.
+                _allowQueryExcecution = false;
+            }
+            else
+            {
+                // Populate the results grid.
+                RefreshData(true, true);
+            }
 
             _resultsGrid.DataSource = _resultsTable;
         }
@@ -694,7 +710,14 @@ namespace Extract.SQLCDBEditor
                         return;
                     }
 
-                    RefreshQuery(latestDataTable);
+                    if (_allowQueryExcecution)
+                    {
+                        RefreshQuery(latestDataTable);
+                    }
+                    else
+                    {
+                        UpdateResultsStatus(false);
+                    }
                 }
                 else if (QueryAndResultsType == QueryAndResultsType.Plugin)
                 {
@@ -873,6 +896,15 @@ namespace Extract.SQLCDBEditor
                 using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(command))
                 {
                     adapter.Fill(latestDataTable);
+                }
+
+                _queryError = false;
+
+                if (QueryModifiesData)
+                {
+                    _allowQueryExcecution = false;
+
+                    OnDataChanged(true);
                 }
             }
         }
@@ -1158,7 +1190,7 @@ namespace Extract.SQLCDBEditor
                 _resultsTable.ColumnChanged += HandleColumnChanged;
                 _resultsTable.RowChanged += HandleRowChanged;
 
-                UpdateResultsStatus(!_queryError);
+                UpdateResultsStatus(!QueryModifiesData && !_queryError);
             }
             catch (Exception ex)
             {
@@ -1259,18 +1291,19 @@ namespace Extract.SQLCDBEditor
 
                 _queryAndResultsTableLayoutPanel.ResumeLayout(true);
 
+                // Query execution is allowed because the user explicitly requested it.
+                _allowQueryExcecution = true;
                 RefreshData(true, true);
 
                 _queryChanged = false;
                 _resultsChanged = false;
                 UpdateResultsStatus(true);
-
-                _queryError = false;
             }
             catch (Exception ex)
             {
                 _resultsTable.Clear();
                 _queryError = true;
+                _queryChanged = false;
                 UpdateResultsStatus(false);
 
                 ex.ExtractDisplay("ELI34590");
@@ -1729,6 +1762,30 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
+        /// Gets a value indicating whether this control is hosting a query which may add, modify or
+        /// delete data.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if this control is hosting a query which may add, modify or
+        /// delete data.; otherwise, <see langword="false"/>.
+        /// </value>
+        bool QueryModifiesData
+        {
+            get
+            {
+                if (QueryAndResultsType == QueryAndResultsType && _masterQuery != null)
+                {
+                    return Regex.IsMatch(_masterQuery, @"(\bUPDATE\b)|(\bDELETE\b)|(\bINSERT\b)",
+                        RegexOptions.IgnoreCase);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
         /// Loads the table from database.
         /// </summary>
         /// <param name="connection"></param>
@@ -2133,10 +2190,20 @@ namespace Extract.SQLCDBEditor
         /// known to be up-to-date; <see langword="false"/> otherwise.</param>
         void UpdateResultsStatus(bool resultsAreCurrent)
         {
-            if (resultsAreCurrent)
+            if (QueryModifiesData && !_queryError && !_queryChanged)
             {
-                _executeQueryButton.Enabled = false;
-                _resultsStatusLabel.Visible = false;
+                _executeQueryButton.Enabled = true;
+                _resultsStatusLabel.Text = "Query has been executed";
+
+                _resultsStatusLabel.Visible = resultsAreCurrent;
+            }
+            else if (resultsAreCurrent)
+            {
+                if (!QueryModifiesData)
+                {
+                    _executeQueryButton.Enabled = false;
+                    _resultsStatusLabel.Visible = false;
+                }
             }
             else
             {
