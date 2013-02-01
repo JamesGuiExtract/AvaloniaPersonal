@@ -34,10 +34,10 @@
 				</ol>
 			</li>
 			<p>
-				<li>After the sample images are received, they must be verified to create Expected Redactions .voa files.
+				<li>After the sample images are received, they must be verified to create Expected Redactions .evoa files.
 					<ul>
 						<li>First, the sample images are OCRed.</li>
-						<li>Next, rules are run on the OCRed sample images in order to create output .voa files that will be used to pre-populated the verification window with data.
+						<li>Next, rules are run on the OCRed sample images in order to create output .voa files that will be used to pre-populated the verification window with data.  This step is not necessary, but it does speed up the verification process.
 							<ul>
 								<li>Generally, the rules that are run on the OCRed images are rules that were previously completed for another, similar project.</li></li>
 								<li>If we have never completed a similar project before, we will run a "skeleton" rules set on the OCRed images.
@@ -46,7 +46,7 @@
 									</ul>
 							</ul>
 						</li>
-						<li>Lastly, each image is verified by a human operator and an Expected Redaction .voa file is created.</li>
+						<li>Lastly, each image is verified by a human operator and an Expected Redaction .evoa file is created.</li>
 					</ul>
 				</li>
 			</p>
@@ -102,9 +102,9 @@
 					<li>Be sure to correct and test any items that were discovered during rules review before you check in your rules.</li>
 				</ul>
 			</li>
-			<li>After your rules have been reviewed, you will need to add your rules and testing files to SourceSafe.
+			<li>After your rules have been reviewed, you will need to add your rules and testing files to Vault.
 				<ul>
-					<li>All redaction project have their own folder in SourceSafe under <b>$\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules</b>.</li>
+					<li>All redaction project have their own folder in Vault under <b>$\Engineering\Rules\IDShield</b>.</li>
 					<li>If the project folder does not exist, create it.</li>
 					<li>Add your rules to the <b>Rules</b> sub-directory of the project folder.</li>
 					<li>Add any .tcl and .dat files used for testing to the <b>TestingFiles</b> sub-directory of the project folder.</li>
