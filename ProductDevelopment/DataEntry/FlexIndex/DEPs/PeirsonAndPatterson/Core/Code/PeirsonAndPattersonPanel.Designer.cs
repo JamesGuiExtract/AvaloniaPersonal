@@ -135,6 +135,9 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this.dataGridViewColumn34 = new System.Windows.Forms.DataGridViewColumn();
             this.dataGridViewColumn35 = new System.Windows.Forms.DataGridViewColumn();
             this.dataGridViewColumn36 = new System.Windows.Forms.DataGridViewColumn();
+            this.dataGridViewColumn37 = new System.Windows.Forms.DataGridViewColumn();
+            this.dataGridViewColumn38 = new System.Windows.Forms.DataGridViewColumn();
+            this.dataGridViewColumn39 = new System.Windows.Forms.DataGridViewColumn();
             label7 = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
@@ -251,7 +254,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._Lien_LienRecordingDateTextBox.Name = "_Lien_LienRecordingDateTextBox";
             this._Lien_LienRecordingDateTextBox.Size = new System.Drawing.Size(184, 21);
             this._Lien_LienRecordingDateTextBox.TabIndex = 10;
-            this._Lien_LienRecordingDateTextBox.ValidationErrorMessage = "Enter a valid Lien Original Recording Date";
+            this._Lien_LienRecordingDateTextBox.ValidationErrorMessage = "Enter a valid Lien Original Recording Date (MM/DD/YYYY)";
             this._Lien_LienRecordingDateTextBox.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(18|19|20)\\d{2}$";
             this._Lien_LienRecordingDateTextBox.ValidationQuery = "";
             // 
@@ -571,7 +574,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._Lien_OrigDateTextBox.Name = "_Lien_OrigDateTextBox";
             this._Lien_OrigDateTextBox.Size = new System.Drawing.Size(510, 21);
             this._Lien_OrigDateTextBox.TabIndex = 14;
-            this._Lien_OrigDateTextBox.ValidationErrorMessage = "Lien Original Borrowers is required";
+            this._Lien_OrigDateTextBox.ValidationErrorMessage = "Enter a valid Lien Original Loan Date (MM/DD/YYYY)";
             this._Lien_OrigDateTextBox.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(18|19|20)\\d{2}$";
             // 
             // dataGridViewColumn5
@@ -1174,6 +1177,24 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this.dataGridViewColumn36.HeaderText = "Subject Property Address";
             this.dataGridViewColumn36.Name = "dataGridViewColumn36";
             // 
+            // dataGridViewColumn37
+            // 
+            this.dataGridViewColumn37.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn37.HeaderText = "Vendor Address - Trustee";
+            this.dataGridViewColumn37.Name = "dataGridViewColumn37";
+            // 
+            // dataGridViewColumn38
+            // 
+            this.dataGridViewColumn38.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn38.HeaderText = "Vendor Address - Assignor";
+            this.dataGridViewColumn38.Name = "dataGridViewColumn38";
+            // 
+            // dataGridViewColumn39
+            // 
+            this.dataGridViewColumn39.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn39.HeaderText = "Subject Property Address";
+            this.dataGridViewColumn39.Name = "dataGridViewColumn39";
+            // 
             // PeirsonAndPattersonPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 13F);
@@ -1315,5 +1336,8 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn34;
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn35;
         private System.Windows.Forms.DataGridViewColumn dataGridViewColumn36;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn37;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn38;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn39;
     }
 }
