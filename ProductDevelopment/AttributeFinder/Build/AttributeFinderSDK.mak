@@ -205,11 +205,11 @@ CreateLabDEInstall:
 CreateNetDMSInstall:
 	@Echo Creating NetDMS install...
 	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall"
+	@COPY "$(BinariesFolder)\Obfuscated\Extract.NetDMSExporter.dll" "$(NetDMSRootDir)\NetDMSIntegrationInstall\Exporter"
+	@COPY "$(BinariesFolder)\Obfuscated\Extract.NetDMSUtilities.dll" "$(NetDMSRootDir)\NetDMSIntegrationInstall\ProgramFiles"
+	@COPY "$(BinariesFolder)\Obfuscated\Extract.NetDMSCustomComponents.dll" "$(NetDMSRootDir)\NetDMSIntegrationInstall\ProgramFiles"
+	@COPY "$(BinariesFolder)\Interop.Weak.*.dll" "$(NetDMSRootDir)\NetDMSIntegrationInstall\ProgramFiles"
 	@XCOPY "$(NetDMSRootDir)\NetDMSIntegrationInstall\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall" /v /s /e /y
-	@COPY "$(BinariesFolder)\Obfuscated\Extract.NetDMSExporter.dll" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall\Exporter"
-	@COPY "$(BinariesFolder)\Obfuscated\Extract.NetDMSUtilities.dll" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall\ProgramFiles"
-	@COPY "$(BinariesFolder)\Obfuscated\Extract.NetDMSCustomComponents.dll" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall\ProgramFiles"
-	@COPY "$(BinariesFolder)\Interop.Weak.*.dll" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall\ProgramFiles"
 	
 CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateDemoShieldInstall CreateLabDEInstall CreateNetDMSInstall
 
