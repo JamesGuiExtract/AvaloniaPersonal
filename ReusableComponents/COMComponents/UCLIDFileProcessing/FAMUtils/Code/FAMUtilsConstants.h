@@ -43,6 +43,7 @@ static const long glDEFAULT_COMMAND_TIMEOUT = 120;
 static const int giDEFAULT_RETRY_COUNT = 10;
 static const double gdDEFAULT_RETRY_TIMEOUT = 120.0;  // seconds
 static const long gnPING_TIMEOUT = 60000; // 60 seconds
+static const long gnSTATS_MAINT_TIMEOUT = 10000; // 10 seconds
 static const long gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES = 5; // 5 minutes
 static const double gdMINIMUM_TRANSACTION_TIMEOUT = 300.0; // 5 minutes
 static const long gnDEFAULT_MIN_SLEEP_TIME_BETWEEN_DB_CHECK = 2000; // 2 seconds

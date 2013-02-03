@@ -3905,14 +3905,14 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 		// started simultaneously, they don't all hit the DB at the same time.
 		unsigned int nTimeToSleep;
 		rand_s(&nTimeToSleep);
-		// Somewhere between 1/4 and 3/4 of gnPING_TIMEOUT.
-		nTimeToSleep = (nTimeToSleep % (gnPING_TIMEOUT / 2)) + (gnPING_TIMEOUT / 4);
+		// Somewhere between 1/4 and 3/4 of gnSTATS_MAINT_TIMEOUT.
+		nTimeToSleep = (nTimeToSleep % (gnSTATS_MAINT_TIMEOUT / 2)) + (gnSTATS_MAINT_TIMEOUT / 4);
 		pDB->m_eventStopMaintainenceThreads.wait(nTimeToSleep);
 
 		// Enclose so that the exited event can always be signaled if it can be.
 		try
 		{
-			while (pDB->m_eventStopMaintainenceThreads.wait(gnPING_TIMEOUT) == WAIT_TIMEOUT)
+			while (pDB->m_eventStopMaintainenceThreads.wait(gnSTATS_MAINT_TIMEOUT) == WAIT_TIMEOUT)
 			{
 				// Surround call to update stats with code from the BEGIN_CONNECTION_RETRY macro to
 				// ensure this thread has an opportunity to reconnect just as the processing does.
