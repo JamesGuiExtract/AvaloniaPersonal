@@ -90,7 +90,8 @@
 	prototype InstallFKB();
 	prototype UninstallFKB();
 	prototype InstallNuanceLicense(); 
-	prototype SetNuanceServicePermissions();
+	prototype SetNuanceServicePermissions();     
+	prototype SetDCOMPermissions();
 
     // your global variables
     BOOL gbInstalled;
@@ -795,3 +796,20 @@ begin
 	return IDIGNORE;
 end  ;
 
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: SetDCOMPermissions
+//
+//  Purpose: This set the permissions of the SSOCR2.exe and FAMProcess.exe
+//			 
+///////////////////////////////////////////////////////////////////////////////
+function SetDCOMPermissions()   
+	string szDCOMPerm
+begin
+	szDCOMPerm = "\"" + PROGRAMFILES + EXTRACT_DIR ^ "dcomperm.exe"
+	LaunchAppAndWait( szDCOMPerm, "-al {08463A92-A444-48AF-8822-693C4F6E1F08} set level:l", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+	LaunchAppAndWait( szDCOMPerm, "-aa {08463A92-A444-48AF-8822-693C4F6E1F08} set level:l", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+	LaunchAppAndWait( szDCOMPerm, "-al {752139E2-5977-4AD2-9E26-BE3B9235524C} set level:l", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+	LaunchAppAndWait( szDCOMPerm, "-aa {752139E2-5977-4AD2-9E26-BE3B9235524C} set level:l", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+end;
