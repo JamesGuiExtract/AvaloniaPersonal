@@ -35,9 +35,10 @@ public:
 	CListCtrl m_listConditions;
 	CButton m_btnModifyCondition;
 	CButton m_btnDeleteCondition;
-	CButton m_checkRandomSubset;
-	CEdit m_editRandomAmount;
-	CComboBox m_comboRandomSubsetUnits;
+	CButton m_checkSubset;
+	CEdit m_editSubsetSize;
+	CComboBox m_comboSubsetMethod;
+	CComboBox m_comboSubsetUnits;
 	CButton m_cmbAnd;
 	CButton m_cmbOr;
 
@@ -47,7 +48,7 @@ protected:
 
 	// Message map functions
 	virtual BOOL OnInitDialog();
-	afx_msg void OnClickedCheckRandomSubset();
+	afx_msg void OnClickedCheckSubset();
 	afx_msg void OnBnClickedBtnAddCondition();
 	afx_msg void OnBnClickedBtnModifyCondition();
 	afx_msg void OnBnClickedBtnDeleteCondition();

@@ -157,6 +157,7 @@
 #define IDD_DLG_TAG_CONDITION           2105
 #define IDD_DLG_QUERY_CONDITION         2106
 #define IDD_DLG_PRIORITY_CONDITION      2107
+#define IDC_CMB_LIMIT_SCOPE_METHOD      2108
 #define ID_DATABASE_SELECT              32772
 #define ID_DATABASE_CLEAR               32773
 #define ID_DATABASE_RESETLOCK           32774
@@ -190,7 +191,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        146
 #define _APS_NEXT_COMMAND_VALUE         32802
-#define _APS_NEXT_CONTROL_VALUE         2108
+#define _APS_NEXT_CONTROL_VALUE         2109
 #define _APS_NEXT_SYMED_VALUE           2000
 #endif
 #endif

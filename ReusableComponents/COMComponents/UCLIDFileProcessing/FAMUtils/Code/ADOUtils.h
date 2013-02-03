@@ -200,7 +200,7 @@ FAMUTILS_API CTime getSQLServerDateTimeAsCTime(const _ConnectionPtr& ipDBConnect
 // If strAdditionalConnectionStringComponents is non=empty it will be added to the end of the
 // connection string.
 FAMUTILS_API string createConnectionString(const string& strServer, const string& strDatabase,
-	const string& strAdvancedConnectionStringProperties = "");
+	const string& strAdvancedConnectionStringProperties = "", bool bAllowEmptyDB = false);
 
 // Gets a case-insensitive map of all connection string property names to the associated values.
 FAMUTILS_API csis_map<string>::type getConnectionStringProperties(const string& strConnectionString);

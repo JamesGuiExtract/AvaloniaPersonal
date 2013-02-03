@@ -68,9 +68,10 @@ void CSelectFilesDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BTN_DELETE_CONDITION, m_btnDeleteCondition);
 	DDX_Control(pDX, IDC_RADIO_AND, m_cmbAnd);
 	DDX_Control(pDX, IDC_RADIO_OR, m_cmbOr);
-	DDX_Control(pDX, IDC_CHECK_LIMIT_SCOPE, m_checkRandomSubset);
-	DDX_Control(pDX, IDC_EDIT_LIMIT_SCOPE, m_editRandomAmount);
-	DDX_Control(pDX, IDC_CMB_LIMIT_SCOPE_UNITS, m_comboRandomSubsetUnits);
+	DDX_Control(pDX, IDC_CHECK_LIMIT_SCOPE, m_checkSubset);
+	DDX_Control(pDX, IDC_EDIT_LIMIT_SCOPE, m_editSubsetSize);
+	DDX_Control(pDX, IDC_CMB_LIMIT_SCOPE_UNITS, m_comboSubsetUnits);
+	DDX_Control(pDX, IDC_CMB_LIMIT_SCOPE_METHOD, m_comboSubsetMethod);
 	DDX_Control(pDX, IDC_CMB_CONDITION_TYPE, m_cmbConditionType);
 }
 //-------------------------------------------------------------------------------------------------
@@ -79,7 +80,7 @@ BEGIN_MESSAGE_MAP(CSelectFilesDlg, CDialog)
 	//}}AFX_MSG_MAP
 	ON_BN_CLICKED(IDC_SELECT_BTN_OK, &CSelectFilesDlg::OnClickedOK)
 	ON_BN_CLICKED(IDC_SELECT_BTN_CANCEL, &CSelectFilesDlg::OnClickedCancel)
-	ON_BN_CLICKED(IDC_CHECK_LIMIT_SCOPE, &CSelectFilesDlg::OnClickedCheckRandomSubset)
+	ON_BN_CLICKED(IDC_CHECK_LIMIT_SCOPE, &CSelectFilesDlg::OnClickedCheckSubset)
 	ON_BN_CLICKED(IDC_BTN_ADD_CONDITION, &CSelectFilesDlg::OnBnClickedBtnAddCondition)
 	ON_BN_CLICKED(IDC_BTN_MODIFY_CONDITION, &CSelectFilesDlg::OnBnClickedBtnModifyCondition)
 	ON_BN_CLICKED(IDC_BTN_DELETE_CONDITION, &CSelectFilesDlg::OnBnClickedBtnDeleteCondition)
@@ -123,8 +124,9 @@ BOOL CSelectFilesDlg::OnInitDialog()
 			rect.Width() - giACTION_CONJUNCTION_COL_WIDTH);
 		m_listConditions.InsertColumn(1, "", LVCFMT_LEFT, giACTION_CONJUNCTION_COL_WIDTH); 
 
-		// Default to percent as the random subset units.
-		m_comboRandomSubsetUnits.SetCurSel(0);
+		// Default subset to random and as a percentage.
+		m_comboSubsetMethod.SetCurSel(0);
+		m_comboSubsetUnits.SetCurSel(0);
 
 		// Update the controls
 		updateControls();
@@ -181,7 +183,7 @@ void CSelectFilesDlg::OnClickedOK()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26992");
 }
 //-------------------------------------------------------------------------------------------------
-void CSelectFilesDlg::OnClickedCheckRandomSubset()
+void CSelectFilesDlg::OnClickedCheckSubset()
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
 
@@ -350,15 +352,18 @@ bool CSelectFilesDlg::saveSettings()
 		// which may take a few seconds
 		CWaitCursor wait;
 
-		// Check for narrowing scope by random percentage
-		long nRandomAmount = -1;
+		// Check for narrowing scope
+		long nSubsetSize = -1;
+		bool bUseRandom = true;
 		bool bUsePercentage = true;
-		if (m_checkRandomSubset.GetCheck() == BST_CHECKED)
+		if (m_checkSubset.GetCheck() == BST_CHECKED)
 		{
+			bUseRandom = (m_comboSubsetMethod.GetCurSel() == 0);
+
 			CString zMessageUnits;
 
 			// Get the units to be used to limit the subset.
-			if (m_comboRandomSubsetUnits.GetCurSel() == 0)
+			if (m_comboSubsetUnits.GetCurSel() == 0)
 			{
 				bUsePercentage = true;
 				zMessageUnits = "percentage";
@@ -371,47 +376,48 @@ bool CSelectFilesDlg::saveSettings()
 
 			// Get the amount from the control
 			CString zTemp;
-			m_editRandomAmount.GetWindowText(zTemp);
+			m_editSubsetSize.GetWindowText(zTemp);
 
 			if (zTemp.IsEmpty())
 			{
 				MessageBox("Must not leave " + zMessageUnits + " blank!", "Empty " + zMessageUnits,
 					MB_OK | MB_ICONERROR);
-				m_editRandomAmount.SetFocus();
+				m_editSubsetSize.SetFocus();
 				return false;
 			}
 
 			// Convert string to long
-			nRandomAmount = asLong((LPCTSTR) zTemp);
+			nSubsetSize = asLong((LPCTSTR) zTemp);
 
 			if (bUsePercentage)
 			{
-				if (nRandomAmount < 1 || nRandomAmount > 99)
+				if (nSubsetSize < 1 || nSubsetSize > 99)
 				{
 					MessageBox("Percentage must be between 1 and 99 inclusive!",
 						"Invalid Percentage", MB_OK | MB_ICONERROR);
-					m_editRandomAmount.SetFocus();
+					m_editSubsetSize.SetFocus();
 					return false;
 				}
 			}
 			else
 			{
-				if (nRandomAmount < 1)
+				if (nSubsetSize < 1)
 				{
 					MessageBox("Random subset size must be at least 1!",
 						"Invalid Subset Size", MB_OK | MB_ICONERROR);
-					m_editRandomAmount.SetFocus();
+					m_editSubsetSize.SetFocus();
 					return false;
 				}
 			}
 		}
 
 		// Set the scope narrowing values
-		m_settings.setLimitByRandomCondition(nRandomAmount != -1);
-		if (nRandomAmount != -1)
+		m_settings.setLimitToSubset(nSubsetSize != -1);
+		if (nSubsetSize != -1)
 		{
-			m_settings.setRandomSubsetUsePercentage(bUsePercentage);
-			m_settings.setRandomAmount(nRandomAmount);
+			m_settings.setSubsetIsRandom(bUseRandom);
+			m_settings.setSubsetUsePercentage(bUsePercentage);
+			m_settings.setSubsetSize(nSubsetSize);
 		}
 
 		return true;
@@ -425,11 +431,12 @@ void CSelectFilesDlg::updateControls()
 
 	try
 	{
-		BOOL bRandomSubset = asMFCBool(m_checkRandomSubset.GetCheck() == BST_CHECKED);
+		BOOL bSubset = asMFCBool(m_checkSubset.GetCheck() == BST_CHECKED);
 
-		// Enable the random percentage edit control
-		m_editRandomAmount.EnableWindow(bRandomSubset);
-		m_comboRandomSubsetUnits.EnableWindow(bRandomSubset);
+		// Enable/disable the subset configuration controls depending on m_checkSubset.
+		m_comboSubsetMethod.EnableWindow(bSubset);
+		m_editSubsetSize.EnableWindow(bSubset);
+		m_comboSubsetUnits.EnableWindow(bSubset);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26997");
 }
@@ -474,12 +481,13 @@ void CSelectFilesDlg::setControlsFromSettings()
 		m_btnDeleteCondition.EnableWindow(FALSE);
 
 		// Check for limiting by random condition
-		if (m_settings.getLimitByRandomCondition())
+		if (m_settings.getLimitToSubset())
 		{
 			// Set the check box and update the text in the edit control
-			m_checkRandomSubset.SetCheck(BST_CHECKED);
-			m_comboRandomSubsetUnits.SetCurSel(m_settings.getRandomSubsetUsePercentage() ? 0 : 1);
-			m_editRandomAmount.SetWindowText(asString(m_settings.getRandomAmount()).c_str());
+			m_checkSubset.SetCheck(BST_CHECKED);
+			m_comboSubsetMethod.SetCurSel(m_settings.getSubsetIsRandom() ? 0 : 1);
+			m_comboSubsetUnits.SetCurSel(m_settings.getSubsetUsePercentage() ? 0 : 1);
+			m_editSubsetSize.SetWindowText(asString(m_settings.getSubsetSize()).c_str());
 		}
 
 		// Since changes have been made, re-update the controls

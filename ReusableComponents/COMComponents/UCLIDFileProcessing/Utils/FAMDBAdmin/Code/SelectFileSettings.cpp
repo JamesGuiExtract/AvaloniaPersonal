@@ -9,9 +9,10 @@
 //--------------------------------------------------------------------------------------------------
 SelectFileSettings::SelectFileSettings() :
 m_bAnd(true),
-m_bLimitByRandomCondition(false),
-m_bRandomSubsetUsePercentage(true),
-m_nRandomAmount(0)
+m_bLimitToSubset(false),
+m_bSubsetIsRandom(true),
+m_bSubsetUsePercentage(true),
+m_nSubsetSize(0)
 {
 }
 //--------------------------------------------------------------------------------------------------
@@ -35,9 +36,10 @@ SelectFileSettings::~SelectFileSettings()
 SelectFileSettings& SelectFileSettings::operator =(const SelectFileSettings &source)
 {
 	m_bAnd = source.m_bAnd;
-	m_bLimitByRandomCondition = source.m_bLimitByRandomCondition;
-	m_bRandomSubsetUsePercentage = source.m_bRandomSubsetUsePercentage;
-	m_nRandomAmount = source.m_nRandomAmount;
+	m_bLimitToSubset = source.m_bLimitToSubset;
+	m_bSubsetIsRandom = source.m_bSubsetIsRandom;
+	m_bSubsetUsePercentage = source.m_bSubsetUsePercentage;
+	m_nSubsetSize = source.m_nSubsetSize;
 
 	// Delete any existing conditions.
 	clearConditions();
@@ -89,17 +91,19 @@ string SelectFileSettings::getSummaryString()
 		}
 	}
 
-	if (m_bLimitByRandomCondition)
+	if (m_bLimitToSubset)
 	{
-		if (m_bRandomSubsetUsePercentage)
+		string strMethod = m_bSubsetIsRandom ? " a random " : " the top ";
+
+		if (m_bSubsetUsePercentage)
 		{
-			strSummary += ".\r\nThe scope of files will be further narrowed to a random "
-				+ asString(m_nRandomAmount) + " percent subset.";
+			strSummary += ".\r\nThe scope of files will be further narrowed to" + strMethod
+				+ asString(m_nSubsetSize) + " percent.";
 		}
 		else
 		{
-			strSummary += ".\r\nThe scope of files will be further narrowed to a random "
-				+ asString(m_nRandomAmount) + " file(s) subset.";
+			strSummary += ".\r\nThe scope of files will be further narrowed to" + strMethod
+				+ asString(m_nSubsetSize) + " file(s).";
 		}
 	}
 
@@ -131,7 +135,7 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 		}
 	}
 
-	if (m_bLimitByRandomCondition)
+	if (m_bLimitToSubset && m_bSubsetIsRandom)
 	{
 		// If choosing a random subset by specifying the number of files to select, use the query
 		// parts generated thus far to create a proceedure which will randomly select the specified
@@ -180,9 +184,9 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 			"\r\n"
 			// Calculate the number to return (using SQL's PERCENT seems to be returning unexpected
 			// results: 50% of 28 = 15)
-			"SET @rowsToReturn = " + (m_bRandomSubsetUsePercentage ? 
-				"CEILING(@@ROWCOUNT * " + asString(m_nRandomAmount)+ ".0 / 100) " :
-				asString(m_nRandomAmount)) + "\r\n"
+			"SET @rowsToReturn = " + (m_bSubsetUsePercentage ? 
+				"CEILING(@@ROWCOUNT * " + asString(m_nSubsetSize)+ ".0 / 100) " :
+				asString(m_nSubsetSize)) + "\r\n"
 			"\r\n"
 			// If the original query has an identity column, just directly return a random subset
 			// in random order since I can't come up with a good way of respecting any specified
@@ -241,10 +245,75 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 			
 		return strRandomizedQuery;
 	}
+	else if (m_bLimitToSubset && !m_bSubsetIsRandom)
+	{
+		string strTopQuery =
+			// Besides improving performance, SET NOCOUNT ON prevents "Operation is not allowed when
+			// the object is closed" errors.
+			"SET NOCOUNT ON\r\n"
+			"\r\n"
+			// Start a try block so we can explicitly set NOCOUNT OFF
+			"BEGIN TRY\r\n"
+			"\r\n"
+			// Ensure the #OriginalResults table is dropped
+			"IF OBJECT_ID('tempdb..#OriginalResults', N'U') IS NOT NULL\r\n"
+			"	DROP TABLE #OriginalResults;\r\n"
+			// This query creates table #OriginalResults with the same columns as the original query.
+			"SELECT TOP 0 " + strSelect + " INTO #OriginalResults FROM\r\n"
+			"(\r\n" + strQuery + "\r\n) AS FAMFile\r\n"
+			"DECLARE @rowsToReturn INT\r\n"
+			// Populate the table via INSERT INTO to avoid issues with ORDER BY + SELECT INTO +
+			// IDENTITY (http://support.microsoft.com/kb/273586)
+			"INSERT INTO #OriginalResults (" + strSelect + ") " + strQueryPart1 + "\r\n"
+			"(\r\n" + strQuery + "\r\n) AS FAMFile\r\n"
+			// Calculate the number to return (using SQL's PERCENT seems to be returning unexpected
+			// results: 50% of 28 = 15)
+			"SET @rowsToReturn = " + (m_bSubsetUsePercentage ? 
+				"CEILING(@@ROWCOUNT * " + asString(m_nSubsetSize)+ ".0 / 100) " :
+				asString(m_nSubsetSize)) + "\r\n"
+			"SELECT " + strSelect + 
+			" FROM (SELECT TOP (@rowsToReturn) * FROM #OriginalResults AS FAMFile) AS FAMFile " +
+			strOrderByClause + "\r\n"
+			"\r\n"
+			"DROP TABLE #OriginalResults\r\n"
+			"\r\n"
+			"SET NOCOUNT OFF\r\n"
+			"\r\n"
+			"END TRY\r\n"
+			"\r\n"
+			"BEGIN CATCH"
+			"\r\n"
+			// Ensure NOCOUNT is set to OFF
+			"SET NOCOUNT OFF\r\n"
+			"\r\n"
+			// Get the error message, severity and state
+			"	DECLARE @ErrorMessage NVARCHAR(4000);\r\n"
+			"	DECLARE @ErrorSeverity INT;\r\n"
+			"	DECLARE @ErrorState INT;\r\n"
+			"\r\n"
+			"SELECT \r\n"
+			"	@ErrorMessage = ERROR_MESSAGE(),\r\n"
+			"	@ErrorSeverity = ERROR_SEVERITY(),\r\n"
+			"	@ErrorState = ERROR_STATE();\r\n"
+			"\r\n"
+			// Check for state of 0 (cannot raise error with state 0, set to 1)
+			"IF @ErrorState = 0\r\n"
+			"	SELECT @ErrorState = 1\r\n"
+			"\r\n"
+			// Raise the error so that it will be caught at the outer scope
+			"RAISERROR (@ErrorMessage,\r\n"
+			"	@ErrorSeverity,\r\n"
+			"	@ErrorState\r\n"
+			");\r\n"
+			"\r\n"
+			"END CATCH"
+			"\r\n";
+
+		return strTopQuery;
+	}
 	else
 	{
-		// We don't need to return a sized randomized subset-- simply combine the query parts and
-		// return;
+		// We don't need to return a sized subset-- simply combine the query parts and return
 		return strQuery + strOrderByClause;
 	}
 }

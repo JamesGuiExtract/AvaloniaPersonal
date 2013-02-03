@@ -31,7 +31,7 @@ CDialogAdvanced::~CDialogAdvanced()
 	try
 	{
 	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI0");
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI35369");
 }
 //-------------------------------------------------------------------------------------------------
 void CDialogAdvanced::DoDataExchange(CDataExchange* pDX)
@@ -66,7 +66,7 @@ BOOL CDialogAdvanced::OnInitDialog()
 
 		UpdateData(FALSE);
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI0");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35370");
 	
 	return TRUE;
 }
@@ -80,10 +80,11 @@ void CDialogAdvanced::OnBnClickedButtonDefault()
 		getServer(m_strServer);
 		getDatabase(m_strDatabase);
 
-		m_zAdvConnStrProperties = createConnectionString(m_strServer, m_strDatabase).c_str();
+		m_zAdvConnStrProperties =
+			createConnectionString(m_strServer, m_strDatabase, "", true).c_str();
 		UpdateData(FALSE);
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI0");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35371");
 }
 
 //-------------------------------------------------------------------------------------------------

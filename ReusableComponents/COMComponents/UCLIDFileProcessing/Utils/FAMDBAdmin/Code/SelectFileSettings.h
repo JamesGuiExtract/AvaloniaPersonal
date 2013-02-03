@@ -25,9 +25,10 @@ private:
 	bool m_bAnd;
 
 	// Values for the random subset selection restriction
-	bool m_bLimitByRandomCondition; // Whether to narrow the selection to a random subset
-	bool m_bRandomSubsetUsePercentage; // Whether to narrow by percentage or file count
-	int m_nRandomAmount; // The size of the subset (percentage or filecount)
+	bool m_bLimitToSubset; // Whether to narrow the selection to a subset (random or top)
+	bool m_bSubsetIsRandom; // Whether the subset should be random or in order.
+	bool m_bSubsetUsePercentage; // Whether to narrow by percentage or file count
+	int m_nSubsetSize; // The size of the subset (percentage or filecount)
 
 public:
 	// Default the setting to all files
@@ -47,19 +48,22 @@ public:
 	void setConjunction(bool bAnd) { m_bAnd = bAnd; }
 	bool getConjunction() { return m_bAnd; }
 
-	void setLimitByRandomCondition(bool bLimitByRandomCondition) { m_bLimitByRandomCondition = bLimitByRandomCondition; }
-	bool getLimitByRandomCondition() { return m_bLimitByRandomCondition; }
+	void setLimitToSubset(bool bLimitToSubset) { m_bLimitToSubset = bLimitToSubset; }
+	bool getLimitToSubset() { return m_bLimitToSubset; }
 
-	void setRandomSubsetUsePercentage(bool bUsePercentage) { m_bRandomSubsetUsePercentage = bUsePercentage; }
-	bool getRandomSubsetUsePercentage() { return m_bRandomSubsetUsePercentage; }
+	void setSubsetIsRandom(bool bSubsetIsRandom) { m_bSubsetIsRandom = bSubsetIsRandom; }
+	bool getSubsetIsRandom() { return m_bSubsetIsRandom; }
 
-	void setRandomAmount(int nRandomAmount)
+	void setSubsetUsePercentage(bool bUsePercentage) { m_bSubsetUsePercentage = bUsePercentage; }
+	bool getSubsetUsePercentage() { return m_bSubsetUsePercentage; }
+
+	void setSubsetSize(int nSubsetSize)
 	{
-		m_nRandomAmount = nRandomAmount;
+		m_nSubsetSize = nSubsetSize;
 	}
-	int getRandomAmount() { return m_nRandomAmount; }
+	int getSubsetSize() { return m_nSubsetSize; }
 
-	bool selectingAllFiles() { return m_vecConditions.empty() && !m_bLimitByRandomCondition; }
+	bool selectingAllFiles() { return m_vecConditions.empty() && !m_bLimitToSubset; }
 
 	// Builds the summary string
 	string getSummaryString();

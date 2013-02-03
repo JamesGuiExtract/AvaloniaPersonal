@@ -444,10 +444,10 @@ CTime getSQLServerDateTimeAsCTime(const _ConnectionPtr& ipDBConnection)
 }
 //-------------------------------------------------------------------------------------------------
 string createConnectionString(const string& strServer, const string& strDatabase,
-	const string& strAdvancedConnectionStringProperties)
+	const string& strAdvancedConnectionStringProperties, bool bAllowEmptyDB/* = false*/)
 {
-	ASSERT_ARGUMENT("ELI17471", !strServer.empty());
-	ASSERT_ARGUMENT("ELI17472", !strDatabase.empty());
+	ASSERT_ARGUMENT("ELI17471", bAllowEmptyDB || !strServer.empty());
+	ASSERT_ARGUMENT("ELI17472", bAllowEmptyDB || !strDatabase.empty());
 
 	// Build the connection string
 	// Add the default provider
