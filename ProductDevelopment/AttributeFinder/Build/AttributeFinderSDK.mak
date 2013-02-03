@@ -57,7 +57,7 @@ IDShieldInstallMediaDir=$(IDShieldInstallRootDir)\Media\CD-ROM\DiskImages\DISK1
 
 RedactionDemoBuildDir=$(AFRootDirectory)\Utils\RedactionDemo\Build
 
-NetDMSRootDir=$(AFRootDirectory)\AFIntegrations\NetDMS
+NetDMSRootDir=$(PDRootDir)\AFIntegrations\NetDMS
 
 LabDEBuildDir=$(PDRootDir)\DataEntry\LabDE\Build
 
