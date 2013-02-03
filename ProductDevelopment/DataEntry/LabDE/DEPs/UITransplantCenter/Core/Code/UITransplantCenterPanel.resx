@@ -183,9 +183,14 @@
     <value>True</value>
   </metadata>
   <data name="_testDisplayName.AutoUpdateQuery" xml:space="preserve">
-    <value>&lt;Query&gt;&lt;SQL&gt;SELECT DisplayName FROM LabOrder WHERE Code = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query&gt;&lt;SQL&gt;SELECT DisplayName FROM LabOrder WHERE Code = SUBSTRING(&lt;Attribute&gt;../EpicCode&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
-</value>
+    <value>&lt;Query&gt;
+&lt;SQL SpatialMode='IfNotBlank'&gt;SELECT DisplayName FROM LabOrder WHERE Code = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,25)
+&lt;Attribute SpatialMode='Only|Force'&gt;../Name&lt;/Attribute&gt;&lt;/SQL&gt;
+&lt;/Query&gt;
+&lt;Query&gt;
+&lt;SQL SpatialMode='IfNotBlank'&gt;SELECT DisplayName FROM LabOrder WHERE Code = SUBSTRING(&lt;Attribute&gt;../EpicCode&lt;/Attribute&gt;,1,25)
+&lt;Attribute SpatialMode='Only|Force'&gt;../Name&lt;/Attribute&gt;&lt;/SQL&gt;
+&lt;/Query&gt;</value>
   </data>
   <data name="_testDisplayName.ValidationQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;

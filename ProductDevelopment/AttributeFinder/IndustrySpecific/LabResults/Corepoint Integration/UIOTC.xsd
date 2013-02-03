@@ -11,6 +11,20 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
+				<xs:element name="LabIdentifier" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="FullText" type="xs:string" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="LabCode" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="FullText" type="xs:string" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
 				<xs:element name="OperatorComments" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>
@@ -19,13 +33,6 @@
 					</xs:complexType>
 				</xs:element>
 				<xs:element name="Filename">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="FullText" type="xs:string" />
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="LabCode" minOccurs="0">
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="FullText" type="xs:string" />
@@ -113,6 +120,13 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
+							<xs:element name="EpicDOB" minOccurs="1">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="FullText" type="xs:string" />
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 							<xs:element name="Gender" minOccurs="1">
 								<xs:complexType>
 									<xs:sequence>
@@ -128,13 +142,6 @@
 								</xs:complexType>
 							</xs:element>
 							<xs:element name="Patient_ID" minOccurs="0">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="FullText" type="xs:string" />
-									</xs:sequence>
-								</xs:complexType>
-							</xs:element>
-							<xs:element name="EpicDOB" minOccurs="1">
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="FullText" type="xs:string" />
@@ -373,13 +380,6 @@
 								</xs:complexType>
 							</xs:element>
 							<xs:element ref="LabAddress" />
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="LabIdentifier" minOccurs="0">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="FullText" type="xs:string" />
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
