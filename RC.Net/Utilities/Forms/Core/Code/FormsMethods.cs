@@ -475,7 +475,10 @@ namespace Extract.Utilities.Forms
         /// should be invoked.</param>
         /// <param name="eliCode">The ELI code to associate with any exception.</param>
         /// <param name="action">The <see cref="Action"/> to be invoked.</param>
-        public static void BeginInvoke(Control control, string eliCode, Action action)
+        /// <param name="displayExceptions"><see langword="true"/> to display any exception caught;
+        /// <see langword="false"/> to log instead.</param>
+        public static void BeginInvoke(Control control, string eliCode, Action action,
+            bool displayExceptions = true)
         {
             try
             {
@@ -487,7 +490,14 @@ namespace Extract.Utilities.Forms
                         }
                         catch (Exception ex)
                         {
-                            ex.ExtractDisplay(eliCode);
+                            if (displayExceptions)
+                            {
+                                ex.ExtractDisplay(eliCode);
+                            }
+                            else
+                            {
+                                ex.ExtractLog(eliCode);
+                            }
                         }
                     }));
             }
@@ -789,9 +799,12 @@ namespace Extract.Utilities.Forms
         /// should be invoked.</param>
         /// <param name="eliCode">The ELI code to associate with any exception.</param>
         /// <param name="action">The <see cref="Action"/> to be invoked.</param>
-        public static void SafeBeginInvoke(this Control control, string eliCode, Action action)
+        /// <param name="displayExceptions"><see langword="true"/> to display any exception caught;
+        /// <see langword="false"/> to log instead.</param>
+        public static void SafeBeginInvoke(this Control control, string eliCode, Action action,
+            bool displayExceptions = true)
         {
-            FormsMethods.BeginInvoke(control, eliCode, action);
+            FormsMethods.BeginInvoke(control, eliCode, action, displayExceptions);
         }
 
         /// <summary>

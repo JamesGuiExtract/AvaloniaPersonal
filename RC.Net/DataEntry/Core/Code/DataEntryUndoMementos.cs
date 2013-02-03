@@ -649,8 +649,11 @@ namespace Extract.DataEntry
                 // Apply the reverted selection state via the message pump so that this is the last
                 // thing that occurs as part of the undo procedure. Until all other data has been
                 // reverted, the reverted selection state may not be valid.
+                // [DataEntry:1181]
+                // As a temporary resolution to exceptions generated in 9.1 testing, log rather than
+                // display any exceptions related to selection in undo/redo.
                 ((Control)_selectionState.DataControl).SafeBeginInvoke("ELI34412", () =>
-                    _selectionState.DataControl.ApplySelection(_selectionState));
+                    _selectionState.DataControl.ApplySelection(_selectionState), false);
 
                 _dataEntryControlHost.SafeBeginInvoke("ELI34413", () =>
                     _dataEntryControlHost.ApplySelection(_selectionState, false));
