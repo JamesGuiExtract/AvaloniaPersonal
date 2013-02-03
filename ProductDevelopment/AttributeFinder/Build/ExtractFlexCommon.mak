@@ -72,6 +72,7 @@ CopyExtractFlexCommonFiles: CleanupExtractFlexCommonFiles ObfuscateFiles
 	@COPY /V "$(BinariesFolder)\ZLibUtils.dll" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V "$(BinariesFolder)\TopoUtils.dll" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V "$(BinariesFolder)\leadutils.dll" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V "$(PDCommonDir)\dcomperm\*.*" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V "$(BinariesFolder)\UserLicense.exe" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V "$(BinariesFolder)\UEXViewer.exe" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"	
 	@COPY /V "$(BinariesFolder)\SSOCR2.Exe" "$(ExtractFlexCommonInstallFilesRootDir)\SelfRegFiles"
