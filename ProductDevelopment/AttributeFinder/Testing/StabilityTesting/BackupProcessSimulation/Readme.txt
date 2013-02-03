@@ -10,3 +10,5 @@ To test:
 2) Create a local FAM DB named "BackupSimulation" and create "Action1" and "Action2"
 3) Start the FPS files
 4) Start "CreateCopy.vbs - Run" and "Modify.vbs - Run"
+
+NOTE: It is expected that this test will result in periodic "Error reading file size" when queuing. This is because it is possible in this test for a file to be modified, but then deleted before the modified queuing event has a chance to be processed. It is not expected that there should be any other type of error or logged exceptions during this test.
