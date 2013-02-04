@@ -52,7 +52,7 @@ namespace Extract.DataEntry
             MultipleMatchSelectionMode.None;
 
         /// <summary>
-        /// 
+        /// The filename of the rule file to be used to parse swiped data.
         /// </summary>
         string _formattingRuleFileName;
 
@@ -257,14 +257,7 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    // If the a formatting rule is specified, attempt to load
-                    // an attribute finding rule.
-                    if (!_inDesignMode && !string.IsNullOrEmpty(value))
-                    {
-                        _formattingRule = (IRuleSet)new RuleSetClass();
-                        _formattingRule.LoadFrom(DataEntryMethods.ResolvePath(value), false);
-                    }
-                    else
+                    if (value != _formattingRuleFileName)
                     {
                         _formattingRule = null;
                     }
@@ -290,7 +283,27 @@ namespace Extract.DataEntry
         {
             get
             {
-                return _formattingRule;
+                try
+                {
+                    // If not in design mode and a formatting rule is specified, attempt to load an
+                    // attribute finding rule.
+                    if (!_inDesignMode && _formattingRule == null &&
+                        !string.IsNullOrEmpty(_formattingRuleFileName))
+                    {
+                        _formattingRule = (IRuleSet)new RuleSetClass();
+                        _formattingRule.LoadFrom(
+                            DataEntryMethods.ResolvePath(_formattingRuleFileName), false);
+                    }
+
+                    return _formattingRule;
+                }
+                catch (Exception ex)
+                {
+                    // If we failed to load the rule, don't attempt to load it again.
+                    _formattingRuleFileName = null;
+
+                    throw ex.AsExtract("ELI35374");
+                }
             }
         }
 
