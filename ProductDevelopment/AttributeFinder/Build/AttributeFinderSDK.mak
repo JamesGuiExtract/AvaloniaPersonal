@@ -211,7 +211,18 @@ CreateNetDMSInstall:
 	@COPY "$(BinariesFolder)\Interop.Weak.*.dll" "$(NetDMSRootDir)\NetDMSIntegrationInstall\ProgramFiles"
 	@XCOPY "$(NetDMSRootDir)\NetDMSIntegrationInstall\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\NetDMSIntegrationInstall" /v /s /e /y
 	
-CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateDemoShieldInstall CreateLabDEInstall CreateNetDMSInstall
+BuildExtractUninstaller:
+	@ECHO Creating ExtractUninstaller...
+	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_18\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Bin;;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Dotnet
+	$(SetProductVerScript) "$(PDCommonDir)\ExtractUninstaller\ExtractUninstaller.ism" "$(FlexIndexVersion)"
+    @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(PDCommonDir)\ExtractUninstaller\ExtractUninstaller.ism"
+	
+CreateExtractUninstallerFolder: BuildExtractUninstaller
+	@ECHO Copying ExtractUninstaller...
+	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\ExtractUninstaller" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\ExtractUninstaller"
+	@XCOPY "$(PDCommonDir)\ExtractUninstaller\Media\CDROM\DiskImages\DISK1\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\ExtractUninstaller" /v /s /e /y
+	
+CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateDemoShieldInstall CreateLabDEInstall CreateExtractUninstallerFolder CreateNetDMSInstall
 
 DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall CreateOtherDemos
 
