@@ -3842,6 +3842,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             localDbCopy = new TemporaryFile(true);
                             getNewCopy = true;
                         }
+                        else
+                        {
+                            // [DataEntry:1182]
+                            // The local copy is up-to-date, but it may be a different DB than is
+                            // currently in use.
+                            connectionString = "Data Source='" + localDbCopy.FileName + "';";
+                            if (connectionString != _currentDbConnectionString)
+                            {
+                                getNewCopy = true;
+                            }
+                        }
 
                         if (getNewCopy)
                         {
