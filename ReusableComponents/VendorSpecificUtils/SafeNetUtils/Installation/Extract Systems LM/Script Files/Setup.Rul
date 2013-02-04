@@ -13,6 +13,8 @@
 // Include header files /////////////////////////////////////////////////////
 #include "ifx.h"
 
+#include "..\..\..\..\..\..\ProductDevelopment\Common\InstallScripts\Common.rul"
+
 ////////////////////// string defines ////////////////////////////
     #define EXTRACT_DIR "\\Extract Systems\\CommonComponents"
     #define REG_PATH_UNINSTALL "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
@@ -54,11 +56,6 @@
     // your script function prototypes    
     prototype NUMBER ConfirmDriverUpdate();
     prototype install64SentinelDriversIfRequired();
-    prototype CheckOtherExtractProducts();
-    prototype RenameUEXFile();
-
-    // your global variables
-    BOOL gbInstalled;
 
 
 
@@ -100,6 +97,8 @@ begin
 		abort;
 	endif;
 
+	DetectDotNET_40();
+	
 	CheckOtherExtractProducts();
 	
     SHELL_OBJECT_FOLDER = @PRODUCT_NAME;	   
@@ -314,109 +313,7 @@ begin
 	endif;
 end;
 
-///////////////////////////////////////////////////////////////////////////////
-//
-//  FUNCTION:   CheckOtherExtractProducts
-//
-//  EVENT:      Checks for install of ID Shield that is a different version
-//				than the version of FLEX Index that is being installed.
-//
-///////////////////////////////////////////////////////////////////////////////
-function CheckOtherExtractProducts()
-	STRING strUninstallKey;
-	STRING strVersion;
-	NUMBER nSize, nType;
-	STRING strMsg;
-begin     
-	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
-	// check uninstall key in registry     
-	strUninstallKey = REG_PATH_UNINSTALL ^ IDSHIELD_PRODUCT_CODE;
-	
-	if (RegDBKeyExist(strUninstallKey) = 1 ) then
-		// Read the key if it does not match the version being installed exit
-		RegDBGetKeyValueEx( strUninstallKey, "DisplayVersion", nType, strVersion, nSize); 
-		
-		if ( strVersion != IFX_PRODUCT_VERSION) then
-			// A different version of ID Shield is installed than this version of Extract Systems LM so abort
-			strMsg = "ID Shield version " + strVersion + " must be uninstalled before Extract Systems LM can be installed.";	
-			MessageBox(strMsg, SEVERE);
-			gbInstalled = FALSE;
-			abort;
-		endif;
-	endif;
-
-	// check uninstall key in registry     
-	strUninstallKey = REG_PATH_UNINSTALL ^ FLEX_INDEX_PRODUCT_CODE;
-
-	if (RegDBKeyExist(strUninstallKey) = 1 ) then
-		// Read the key if it does not match the version being installed exit
-		RegDBGetKeyValueEx( strUninstallKey, "DisplayVersion", nType, strVersion, nSize); 
-		
-		if ( strVersion != IFX_PRODUCT_VERSION) then
-			// A different version of FLEX Index is installed than this version of Flex so abort
-			strMsg = "FLEX Index version " + strVersion + " must be uninstalled before Extract Systems LM can be installed.";	
-			MessageBox(strMsg, SEVERE);
-			gbInstalled = FALSE;
-			abort;
-		endif;
-	endif;
-
-	return 0;
-end;	
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// Function: RenameUEXFile
-//
-//  Purpose: This function renames exception file if it exist to
-//			 "YYYY-MM-DD HHhMMmSSs <EXCEPTION_FILE_NAME>" where the YYYY/MM/DD/etc 
-//			 are the year/month/day and other time related fields
-//	Returns 0 if no errors
-///////////////////////////////////////////////////////////////////////////////
-function RenameUEXFile()
-	STRING strSource;
-	STRING strDest;
-	NUMBER nvResult;
-	STRING strDate;
-	STRING strTime;
-	LIST listDateID;
-	LIST listTimeID;
-	STRING strMonth, strDay, strYear;
-	STRING strHour, strMinute, strSeconds;
-begin
-	strSource  = LOG_FILE_PATH ^ EXCEPTION_FILE_NAME;
-	
-	// Check if the exception file exists
-	if ( Is( FILE_EXISTS, strSource )) then  
-		// Get the date
-		GetSystemInfo ( DATE , nvResult , strDate );
-		
-		// Separate date into Month, Day, year
-		listDateID = ListCreate(STRINGLIST);
-		StrGetTokens ( listDateID , strDate , "-" );
-		ListGetFirstString ( listDateID, strMonth );
-		ListGetNextString ( listDateID, strDay );
-		ListGetNextString ( listDateID, strYear );
 
-		// Get the time
-		GetSystemInfo ( TIME , nvResult , strTime );  
-		
-		// Separate the Time into Hours, Minutes, Seconds
-		listTimeID = ListCreate(STRINGLIST);
-		StrGetTokens ( listTimeID , strTime , ":" );
-		ListGetFirstString ( listTimeID, strHour );
-		ListGetNextString ( listTimeID, strMinute );
-		ListGetNextString ( listTimeID, strSeconds );
-	
-		// Create the new filename for the exception file
-		strDest = LOG_FILE_PATH ^ "\\";
-		strDest = strDest + strYear + "-" + strMonth + "-" + strDay;
-		strDest = strDest + " " + strHour + "h" + strMinute + "m" + strSeconds + "s ";
-		strDest = strDest + EXCEPTION_FILE_NAME ;
-		
-		// Rename exception
-		RenameFile ( strSource , strDest );
-	endif;
-end;
 // --- include script file section ---
