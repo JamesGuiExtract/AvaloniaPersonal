@@ -161,7 +161,7 @@ begin
  	
     RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
 
-    //RegDBDeleteKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\InstallShield_" + PRODUCT_GUID);                      
+    RegDBDeleteKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\InstallShield_" + PRODUCT_GUID);                      
     
     //if ( BATCH_INSTALL ) then
     //	SdFinishReboot ( szTitle , szMsg1 , SYS_BOOTMACHINE , szMsg2 , 0 );
