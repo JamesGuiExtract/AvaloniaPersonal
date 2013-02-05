@@ -1456,7 +1456,7 @@ namespace Extract.DataEntry
                         .Where(attribute => attribute.Value.HasSpatialInfo()))
                     {
                         prefetchData.PreCreatedHighlights.Add(
-                            CreateAttributeHighlight(attribute, false, false, false));
+                            CreateAttributeHighlight(attribute, false, false, false, true));
                     }
 
                     _preFetchData[fileName] = prefetchData;
@@ -4025,14 +4025,6 @@ namespace Extract.DataEntry
             _controlSelectionState[selectionState.DataControl] = selectionState;
             _controlToolTipAttributes[selectionState.DataControl] = new List<IAttribute>();
 
-            // _controlSelectionState needs to be set as the data is loaded so that an initial
-            // selection state is available for all controls. However, there is no need to
-            // highlights, tooltips, and the ItemSelectionChanged while the data is loading.
-            if (_changingData)
-            {
-                return;
-            }
-
             // Once a new attribute is selected within a control, show tooltips again if they
             // were hidden.
             if (_temporarilyHidingTooltips)
@@ -5899,7 +5891,7 @@ namespace Extract.DataEntry
             }
 
             foreach (var highlight in
-                CreateAttributeHighlight(attribute, makeVisible, isHint, isAccepted))
+                CreateAttributeHighlight(attribute, makeVisible, isHint, isAccepted, false))
             {
                 _attributeHighlights[attribute].Add(highlight);
                 _highlightAttributes[highlight] = attribute;
@@ -5914,21 +5906,23 @@ namespace Extract.DataEntry
         /// Creates the <see cref="CompositeHighlightLayerObject"/>s for the highlight of the
         /// <see paremref="attribute"/>.
         /// </summary>
-        /// <param name="attribute">The <see cref="IAttribute"/> for which the highlight is needed.
-        /// </param>
+        /// <param name="attribute">The <see cref="IAttribute"/> for which the highlight is needed.</param>
         /// <param name="makeVisible"><see langword="true"/> if the hightlight should be immediately
         /// visible, otherwise <see langword="false"/>.</param>
         /// <param name="isHint"><see langword="true"/> if the hightlight should be a hint,
         /// otherwise <see langword="false"/>.</param>
         /// <param name="isAccepted"><see langword="true"/> if the hightlight should be accepted,
         /// otherwise <see langword="false"/>.</param>
-        /// <returns></returns>
+        /// <param name="prefetching"><see langword="true"/> if the attribute highlight is being
+        /// created for the purposes of prefetching; otherwise, <see langword="false"/>.</param>
+        /// <returns>The <see cref="CompositeHighlightLayerObject"/>s for the specified
+        /// <see paramref="attribute"/></returns>
         List<CompositeHighlightLayerObject> CreateAttributeHighlight(IAttribute attribute,
-            bool makeVisible, bool isHint, bool isAccepted)
+            bool makeVisible, bool isHint, bool isAccepted, bool prefetching)
         {
             // [DataEntry:1178]
             // Never create highlights for un-viewable attributes.
-            if (!AttributeStatusInfo.IsViewable(attribute))
+            if (!prefetching && !AttributeStatusInfo.IsViewable(attribute))
             {
                 return new List<CompositeHighlightLayerObject>();
             }
