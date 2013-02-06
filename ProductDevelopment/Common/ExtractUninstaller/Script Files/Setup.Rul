@@ -145,20 +145,27 @@ begin
 	bOpt1   = FALSE;
     bOpt2   = FALSE;   
     
-    /*
-    UninstallApplication("{3A9FC03D-C685-4831-94CF-4EDFD3749497}", "/qn", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN);
-    UninstallApplication("{C484CC8D-03CF-4022-89C4-DB4F02E8A15B}", "/qn", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN);
-    UninstallApplication("{4AB6A079-178B-4144-B21F-4D1AE71666A2}", "/qn", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN);
-    UninstallApplication("ClearImage 7 PDK" , "/S /A /U", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN ); 
-    */              
+	// SQL Server Compact 3.5 SP2
+	LaunchAppAndWait("MsiExec.exe", "/x{3A9FC03D-C685-4831-94CF-4EDFD3749497} /qn", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+	LaunchAppAndWait("MsiExec.exe", "/x{D4AD39AD-091E-4D33-BB2B-59F6FCB8ADC3} /qn", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
 
-	LaunchAppAndWait("MsiExec.exe", "/x{3A9FC03D-C685-4831-94CF-4EDFD3749497} /qn", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+	// SQL Server Compact 3.5 SP1
+	LaunchAppAndWait("MsiExec.exe", "/x{E59113EB-0285-4BFD-A37A-B79EAC6B8F4B} /qn", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+	LaunchAppAndWait("MsiExec.exe", "/x{F83779DF-E1F5-43A2-A7BE-732F856FADB7} /qn", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+
+	// Crystal Reports
 	LaunchAppAndWait("MsiExec.exe", "/x{C484CC8D-03CF-4022-89C4-DB4F02E8A15B} /qn", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+	
+	// SQL Server 2008 R2 Native Client
 	LaunchAppAndWait("MsiExec.exe", "/x{4AB6A079-178B-4144-B21F-4D1AE71666A2} /qn", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
-	LaunchAppAndWait("MsiExec.exe", "/x{3A9FC03D-C685-4831-94CF-4EDFD3749497} /qn", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+	LaunchAppAndWait("MsiExec.exe", "/x{2180B33F-3225-423E-BBC1-7798CFD3CD1F} /qn", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+
+	// SQL Server 2008 Native Client
+	LaunchAppAndWait("MsiExec.exe", "/x{C79A7EAB-9D6F-4072-8A6D-F8F54957CD93} /qn", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+
 	LaunchAppAndWait("\"C:\\Program Files\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s INSTALL.LOG", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
-	LaunchAppAndWait("\"C:\\Program Files (x86)\\Inlite\ClearImage 7 PDK\\UNWISE.EXE\"", "/s INSTALL.LOG", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
- 	
+	LaunchAppAndWait("\"C:\\Program Files (x86)\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s INSTALL.LOG", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+ 	 
     RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
 
     RegDBDeleteKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\InstallShield_" + PRODUCT_GUID);                      

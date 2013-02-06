@@ -44,7 +44,9 @@ begin
 	if (gbInstalled) then
 		// Removed Corepoint install because not sure if silent install works properley
    		//InstallCorepoint();
-   		InstallMSMQ();       
+   		InstallMSMQ();    
+   		
+   		SetDCOMPermissions();   
    		
    		// Disable Vista themes if this is Vista.
    		DisableVistaThemes();

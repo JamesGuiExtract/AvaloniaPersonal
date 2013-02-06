@@ -1963,7 +1963,6 @@
 		<col key="yes" def="s255">ISScriptFile</col>
 		<row><td>&lt;ISProjectDataFolder&gt;\Script Files\Setup.Rul</td></row>
 		<row><td>&lt;PATH_TO_COMMON_SCRIPT_FILES&gt;\Common.rul</td></row>
-		<row><td>&lt;PATH_TO_COMMON_SCRIPT_FILES&gt;\OnFirstUIAfter.rul</td></row>
 		<row><td>&lt;PATH_TO_COMMON_SCRIPT_FILES&gt;\OnFirstUIBefore.rul</td></row>
 		<row><td>&lt;PATH_TO_COMMON_SCRIPT_FILES&gt;\OnMaintUIAfter.rul</td></row>
 		<row><td>&lt;PATH_TO_COMMON_SCRIPT_FILES&gt;\OnMaintUIBefore.rul</td></row>
