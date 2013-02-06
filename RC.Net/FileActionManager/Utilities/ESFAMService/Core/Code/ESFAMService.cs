@@ -405,6 +405,7 @@ namespace Extract.FileActionManager.Utilities
             Process process = null;
             string fpsFileName = "";
             int processID = 0;
+            bool keepProcessing = false;
             try
             {
                 // Get the processing thread arguments
@@ -454,6 +455,12 @@ namespace Extract.FileActionManager.Utilities
                         throw ee;
                     }
 
+                    // [LegacyRCAndUtils:6389]
+                    // Check for whether the process wants to keep processing now rather than after
+                    // it is done with this batch of files, when it is not at risk of having been
+                    // shut down unexpectedly.
+                    keepProcessing = famProcess.KeepProcessingAsFilesAdded;
+
                     // Ensure that processing has not been stopped before starting processing
                     if (_stopProcessing != null && !_stopProcessing.WaitOne(0))
                     {
@@ -485,73 +492,24 @@ namespace Extract.FileActionManager.Utilities
                     }
 
                     // [DotNetRCAndUtils:835]
-                    // Ensure that processing does not stop when the FAM process is configured to
-                    // keep processing as files are added.
-                    if (!famProcess.KeepProcessingAsFilesAdded)
+                    // Avoid calling ProcessShouldRestart when the FAM process is configured to keep
+                    // processing as files are added to ensure that processing does not stop.
+                    if (!keepProcessing)
                     {
-                        // Get the count of files processed (if limiting processing to a
-                        // specified number of files)
-                        int filesProcessed = 0;
-                        if (numberOfFilesToProcess != 0 && !process.HasExited && famProcess != null)
-                        {
-                            int processedSuccessfully;
-                            int processingErrors;
-                            int filesSupplied;
-                            int supplyingErrors;
-                            famProcess.GetCounts(out processedSuccessfully, out processingErrors,
-                                out filesSupplied, out supplyingErrors);
-                            filesProcessed = processedSuccessfully + processingErrors;
-                        }
-
-                        // If the number of files to proces is 0 OR the number of files actually
-                        // processed is less than the number of files specified, then just
-                        // exit the loop and do not respawn a new FAM instance
-                        if (numberOfFilesToProcess == 0 || filesProcessed < numberOfFilesToProcess)
-                        {
-                            break;
-                        }
+                        // [LegacyRCAndUtils:6389]
+                        // Safely check the running process to see if it should be restarted.
+                        // If any exceptions are caught, they are logged rather than thrown to ensure
+                        // processing doesn't stop unexpectedly. If the FAMProcess was supposed to
+                        // stop because the queue was empty, this should not have any ill effects as
+                        // the queue will be empty and the new process will get another chance to
+                        // exit cleanly.
+                        keepProcessing = ProcessShouldRestart(famProcess, process, numberOfFilesToProcess);
                     }
 
-                    // Release the current FAM process before looping around and spawning a new one
-                    // this way the memory is released and we are not leaving extra orphaned
-                    // EXE's lying around.
-                    if (famProcess != null) // Sanity check, it should never be null at this point
-                    {
-                        // [DNRCAU #429, 876] 
-                        // Force release the COM object so the EXE will exit
-                        try
-                        {
-                            Marshal.FinalReleaseComObject(famProcess);
-                        }
-                        finally
-                        {
-                            famProcess = null;
-                        }
-
-                        GC.Collect();
-                        GC.WaitForPendingFinalizers();
-
-                        // Wait for the process to exit
-                        while (process != null && !process.HasExited)
-                        {
-                            Thread.Sleep(1000);
-
-                            // If stop processing has been called exit the loop respawn loop.
-                            if (_stopProcessing != null && _stopProcessing.WaitOne(0))
-                            {
-                                break;
-                            }
-                        }
-                    }
-
-                    // If there is a valid process handle for an exited process, dispose of it
-                    if (process != null && process.HasExited)
-                    {
-                        process.Dispose();
-                        process = null;
-                    }
+                    // Safely close the running process (any exceptions logged rather than thrown).
+                    CloseProcess(ref famProcess, ref process);
                 }
-                while (_stopProcessing != null && !_stopProcessing.WaitOne(0));
+                while (keepProcessing && _stopProcessing != null && !_stopProcessing.WaitOne(0));
 
                 // Check if the process is still running
                 if (process != null && !process.HasExited && famProcess != null && famProcess.IsRunning)
@@ -562,7 +520,8 @@ namespace Extract.FileActionManager.Utilities
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains("The remote procedure call failed"))
+                if (ex.Message.Contains("The remote procedure call failed") ||
+                    ex.Message.Contains("The RPC server is unavailable."))
                 {
                     ExtractException ee = new ExtractException("ELI29823",
                         "Unable to communicate with the underlying FAM process.", ex);
@@ -675,6 +634,129 @@ namespace Extract.FileActionManager.Utilities
                 if (stopService)
                 {
                     Stop();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks if the specified <see paramref="famProcess"/> needs to be restarted.
+        /// </summary>
+        /// <param name="famProcess">The <see cref="FileProcessingManagerProcessClass"/>.</param>
+        /// <param name="process">The <see cref="Process"/> <see paramref="famProcess"/> is running
+        /// in.</param>
+        /// <param name="numberOfFilesToProcess">The number of files to process for
+        /// this processing thread, before respawning the FAM process.</param>
+        /// <returns><see langword="true"/> if the process should be restarted, otherwise, 
+        /// <see langword="false"/>.</returns>
+        static bool ProcessShouldRestart(FileProcessingManagerProcessClass famProcess,
+            Process process, int numberOfFilesToProcess)
+        {
+            try
+            {
+                // Get the count of files processed (if limiting processing to a
+                // specified number of files)
+                int filesProcessed = 0;
+                if (numberOfFilesToProcess != 0 && !process.HasExited && famProcess != null)
+                {
+                    int processedSuccessfully;
+                    int processingErrors;
+                    int filesSupplied;
+                    int supplyingErrors;
+                    famProcess.GetCounts(out processedSuccessfully, out processingErrors,
+                        out filesSupplied, out supplyingErrors);
+                    filesProcessed = processedSuccessfully + processingErrors;
+                }
+
+                // If the number of files to proces is 0 OR the number of files actually
+                // processed is less than the number of files specified, then just
+                // exit the loop and do not respawn a new FAM instance
+                if (numberOfFilesToProcess == 0 || filesProcessed < numberOfFilesToProcess)
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("The remote procedure call failed") ||
+                    ex.Message.Contains("The RPC server is unavailable."))
+                {
+                    ExtractException ee = new ExtractException("ELI35378",
+                        "Unable to communicate with the underlying FAM process.", ex);
+                    ee.Log();
+                }
+                else
+                {
+                    // Just log any exceptions from the process threads
+                    ExtractException.Log("ELI35379", ex);
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Safely closes the specified <see paramref="famProcess"/>. Any exceptions are logged
+        /// rather than thrown.
+        /// </summary>
+        /// <param name="famProcess">The <see cref="FileProcessingManagerProcessClass"/>.</param>
+        /// <param name="process">The <see cref="Process"/> <see paramref="famProcess"/> is running
+        /// in.</param>
+        void CloseProcess(ref FileProcessingManagerProcessClass famProcess, ref Process process)
+        {
+            try
+            {
+                // Release the current FAM process before looping around and spawning a new one
+                // this way the memory is released and we are not leaving extra orphaned
+                // EXE's lying around.
+                if (famProcess != null) // Sanity check, it should never be null at this point
+                {
+                    // [DNRCAU #429, 876] 
+                    // Force release the COM object so the EXE will exit
+                    try
+                    {
+                        Marshal.FinalReleaseComObject(famProcess);
+                    }
+                    finally
+                    {
+                        famProcess = null;
+                    }
+
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+
+                    // Wait for the process to exit
+                    while (process != null && !process.HasExited)
+                    {
+                        Thread.Sleep(1000);
+
+                        // If stop processing has been called exit the loop respawn loop.
+                        if (_stopProcessing != null && _stopProcessing.WaitOne(0))
+                        {
+                            return;
+                        }
+                    }
+                }
+
+                // If there is a valid process handle for an exited process, dispose of it
+                if (process != null && process.HasExited)
+                {
+                    process.Dispose();
+                    process = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("The remote procedure call failed") ||
+                    ex.Message.Contains("The RPC server is unavailable."))
+                {
+                    ExtractException ee = new ExtractException("ELI35380",
+                        "Unable to communicate with the underlying FAM process.", ex);
+                    ee.Log();
+                }
+                else
+                {
+                    // Just log any exceptions from the process threads
+                    ExtractException.Log("ELI35381", ex);
                 }
             }
         }
