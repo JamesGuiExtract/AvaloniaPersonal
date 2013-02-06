@@ -440,7 +440,11 @@ void RegistryPersistenceMgr::createKey(const string& strFolderFullPath,
 		// To prevent our software from behaving badly when running with limited permissiongs,
 		// ignore ERROR_ACCESS_DENIED when creating a key for the first time if not in the current
 		// user hive.
-		if (ret == ERROR_ACCESS_DENIED && m_hkeyRoot != HKEY_CURRENT_USER)
+		// [LegacyRCAndUtils:6390]
+		// Ignore errors regardless of the error code if not in current user; it seems it is
+		// possible to get other errors such as ERROR_FILE_NOT_FOUND when the user doesn't have
+		// needed permissions.
+		if (m_hkeyRoot != HKEY_CURRENT_USER)
 		{
 			return;
 		}
@@ -508,7 +512,11 @@ void RegistryPersistenceMgr::createKey(const string& strFolderFullPath,
 		// To prevent our software from behaving badly when running with limited permissiongs,
 		// ignore ERROR_ACCESS_DENIED when creating a key for the first time if not in the current
 		// user hive.
-		if (ret == ERROR_ACCESS_DENIED && m_hkeyRoot != HKEY_CURRENT_USER)
+		// [LegacyRCAndUtils:6390]
+		// Ignore errors regardless of the error code if not in current user; it seems it is
+		// possible to get other errors such as ERROR_FILE_NOT_FOUND when the user doesn't have
+		// needed permissions.
+		if (m_hkeyRoot != HKEY_CURRENT_USER)
 		{
 			return;
 		}
