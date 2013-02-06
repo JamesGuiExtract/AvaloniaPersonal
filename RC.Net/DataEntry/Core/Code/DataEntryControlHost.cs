@@ -4812,36 +4812,37 @@ namespace Extract.DataEntry
                                 _selectionBounds[highlight.PageNumber], errorIcon.GetBounds());
                         }
                     }
+                }
 
-                    // If there is a hover attribute that is different from the active attribute with
-                    // a tooltip displayed, display a tooltip for the hover attribute.
-                    if (_hoverAttribute != null && 
-                            (_temporarilyHidingTooltips || 
-                             !activeToolTipAttributes.Contains(_hoverAttribute)))
+                // If there is a hover attribute that is different from the active attribute with
+                // a tooltip displayed, display a tooltip for the hover attribute.
+                if (_hoverAttribute != null &&
+                        (_temporarilyHidingTooltips ||
+                         activeToolTipAttributes == null ||
+                         !activeToolTipAttributes.Contains(_hoverAttribute)))
+                {
+                    newDisplayedAttributeHighlights[_hoverAttribute] = true;
+
+                    // If this highlight was previously displayed, remove it from the
+                    // _displayedHighlights collection whose contents will be hidden at the end
+                    // of this call.
+                    if (_displayedAttributeHighlights.ContainsKey(_hoverAttribute))
                     {
-                        newDisplayedAttributeHighlights[_hoverAttribute] = true;
+                        _displayedAttributeHighlights.Remove(_hoverAttribute);
+                    }
 
-                        // If this highlight was previously displayed, remove it from the
-                        // _displayedHighlights collection whose contents will be hidden at the end
-                        // of this call.
-                        if (_displayedAttributeHighlights.ContainsKey(_hoverAttribute))
-                        {
-                            _displayedAttributeHighlights.Remove(_hoverAttribute);
-                        }
+                    // Show the hover attribute's highlight and error icon (if one exists).
+                    ShowAttributeHighlights(_hoverAttribute, true);
 
-                        // Show the hover attribute's highlight and error icon (if one exists).
-                        ShowAttributeHighlights(_hoverAttribute, true);
+                    if (!string.IsNullOrEmpty(_hoverAttribute.Value.String))
+                    {
+                        // The tooltip should also be displayed for the hover attribute, but
+                        // don't position it along with the tooltips for currently selected
+                        // attributes.
+                        RemoveAttributeToolTip(_hoverAttribute);
+                        _hoverToolTip = new DataEntryToolTip(this, _hoverAttribute, true, null);
 
-                        if (!string.IsNullOrEmpty(_hoverAttribute.Value.String))
-                        {
-                            // The tooltip should also be displayed for the hover attribute, but
-                            // don't position it along with the tooltips for currently selected
-                            // attributes.
-                            RemoveAttributeToolTip(_hoverAttribute);
-                            _hoverToolTip = new DataEntryToolTip(this, _hoverAttribute, true, null);
-
-                            _imageViewer.LayerObjects.Add(_hoverToolTip.TextLayerObject, false);
-                        }
+                        _imageViewer.LayerObjects.Add(_hoverToolTip.TextLayerObject, false);
                     }
                 }
 
