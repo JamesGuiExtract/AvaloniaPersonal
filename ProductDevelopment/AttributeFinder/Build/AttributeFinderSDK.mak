@@ -222,7 +222,12 @@ CreateExtractUninstallerFolder: BuildExtractUninstaller
 	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\ExtractUninstaller" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\ExtractUninstaller"
 	@XCOPY "$(CommonDirectory)\ExtractUninstaller\Media\CDROM\DiskImages\DISK1\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\ExtractUninstaller" /v /s /e /y
 	
-CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateDemoShieldInstall CreateLabDEInstall CreateExtractUninstallerFolder CreateNetDMSInstall
+CopySilentInstallsDir:
+	@ECHO Copying SilentInstalls folder
+	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SilentInstalls" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SilentInstalls"
+	@XCOPY "$(AFRootDirectory)\SilentInstalls\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SilentInstalls"
+	
+CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateDemoShieldInstall CreateLabDEInstall CreateExtractUninstallerFolder CreateNetDMSInstall CopySilentInstallsDir
 
 DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall CreateOtherDemos
 
