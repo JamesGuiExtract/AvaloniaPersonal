@@ -120,7 +120,8 @@ namespace Extract.DataEntry
                 }
 
                 // Attempt to update the value once the query has been loaded.
-                if (!_validationTrigger || AttributeStatusInfo.ValidationTriggersEnabled)
+                if ((_validationTrigger || !AttributeStatusInfo.PauseAutoUpdateQueries) &&
+                    !_validationTrigger || AttributeStatusInfo.ValidationTriggersEnabled)
                 {
                     UpdateValue();
                 }
@@ -271,10 +272,13 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Don't evaluate disable queries or validation triggers if validation triggers are
+                // Don't evaluate disabled queries or validation triggers if validation triggers are
                 // not enabled.
+                // [DataEntry:1186]
+                // ... or auto-update queries if auto-update queries are paused.
                 if (dataEntryQuery.Disabled ||
-                    (_validationTrigger && !AttributeStatusInfo.ValidationTriggersEnabled))
+                    (_validationTrigger && !AttributeStatusInfo.ValidationTriggersEnabled) ||
+                    (AttributeStatusInfo.PauseAutoUpdateQueries && !_validationTrigger))
                 {
                     return false;
                 }

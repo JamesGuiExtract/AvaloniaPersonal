@@ -128,6 +128,24 @@ namespace Extract.DataEntry
         int _suppressSelectionProcessingReferenceCount;
 
         /// <summary>
+        /// A reference count of the methods that have requested to temporarily prevent refreshes of
+        /// the table data so that all data to be applied can be applied before
+        /// RefreshAttributes(bool, IAttribute) can be executed.
+        /// </summary>
+        int _suppressRefreshReferenceCount;
+
+        /// <summary>
+        /// The set of attributes that are pending to be refreshed.
+        /// </summary>
+        HashSet<IAttribute> _pendingRefreshAttributes = new HashSet<IAttribute>();
+
+        /// <summary>
+        /// Whether attribute spatial info needes to be refreshed once the supression of attribute
+        /// refreshes is released.
+        /// </summary>
+        bool _pendingSpatialRefresh;
+
+        /// <summary>
         /// Indicates whether data is currently being dragged over the table.
         /// </summary>
         bool _dragOverInProgress;
@@ -293,6 +311,86 @@ namespace Extract.DataEntry
         }
 
         #endregion SelectionProcessingSuppressor
+
+        #region RefreshSuppressor
+
+        /// <summary>
+        /// A class to manage requests to suppress processing of the
+        /// RefreshAttributes(bool, IAttribute[]) method.
+        /// Created in response to DataEntry:1188 in which refreshes in the middle of applying
+        /// attribute data caused problems.
+        /// </summary>
+        protected class RefreshSuppressor : IDisposable
+        {
+            /// <summary>
+            /// The <see cref="DataEntryTable"/> whose RefreshAttributes method is to be suppressed.
+            /// </summary>
+            readonly DataEntryTableBase _dataEntryTable;
+
+            /// <summary>
+            /// Indicates whether or not the object instance has been disposed.
+            /// </summary>
+            bool _disposed;
+
+            /// <summary>
+            /// Initializes a new <see cref="RefreshSuppressor"/> instance.
+            /// </summary>
+            /// <param name="dataEntryTable">The <see cref="DataEntryTable"/> whose RefreshAttributes
+            /// method is to be suppressed. RefreshAttributes will continue to be suppressed until
+            /// this instance is disposed of and there are no other instances of
+            /// <see cref="RefreshSuppressor"/> currently active.</param>
+            public RefreshSuppressor(DataEntryTableBase dataEntryTable)
+            {
+                try
+                {
+                    ExtractException.Assert("ELI35382", "Null argument exception!",
+                        dataEntryTable != null);
+
+                    _dataEntryTable = dataEntryTable;
+                    _dataEntryTable._suppressRefreshReferenceCount++;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI35383", ex);
+                }
+            }
+
+            /// <summary>
+            /// Relinquishes suppression of the RefreshAttributes method.
+            /// </summary>
+            public void Dispose()
+            {
+                try
+                {
+                    Dispose(true);
+                    GC.SuppressFinalize(this);
+                }
+                catch (Exception ex)
+                {
+                    ExtractException.Display("ELI35384", ex);
+                }
+            }
+
+            /// <overloads>Relinquishes suppression of the RefreshAttributes method.</overloads>
+            /// <summary>
+            /// Relinquishes suppression of the RefreshAttributes method.
+            /// </summary>
+            /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
+            /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
+            protected virtual void Dispose(bool disposing)
+            {
+                if (disposing && !_disposed)
+                {
+                    // Dispose of managed objects
+                    _dataEntryTable._suppressRefreshReferenceCount--;
+                    _disposed = true;
+                }
+
+                // Dispose of unmanaged resources
+            }
+        }
+
+        #endregion RefreshSuppressor
 
         #region Constructors
 
@@ -1818,6 +1916,15 @@ namespace Extract.DataEntry
 
                 foreach (IAttribute attribute in attributes)
                 {
+                    // If attribute refreshes are being surpressed, don't refresh now but keep track
+                    // of which attributes should be refreshed later.
+                    if (_suppressRefreshReferenceCount > 0)
+                    {
+                        _pendingRefreshAttributes.Add(attribute);
+                        _pendingSpatialRefresh |= spatialInfoUpdated;
+                        continue;
+                    }
+
                     object tableElement;
                     if (_attributeMap.TryGetValue(attribute, out tableElement))
                     {
@@ -2488,6 +2595,36 @@ namespace Extract.DataEntry
             finally
             {
                 OnUpdateEnded(new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Executes a refresh of all attributes whose refreshes had been surpressed.
+        /// Created in response to DataEntry:1188 in which refreshes in the middle of applying
+        /// attribute data caused problems.
+        /// </summary>
+        protected void ExecutePendingRefresh()
+        {
+            try
+            {
+                // If refreshes are still being supressed, there is nothing yet to do.
+                if (_suppressRefreshReferenceCount > 0)
+                {
+                    return;
+                }
+
+                IAttribute[] attributesToRefresh = _pendingRefreshAttributes
+                        .Where(attribute => _attributeMap.Keys.Contains(attribute))
+                        .ToArray();
+
+                RefreshAttributes(_pendingSpatialRefresh, attributesToRefresh);
+
+                _pendingRefreshAttributes.Clear();
+                _pendingSpatialRefresh = false;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35385");
             }
         }
 

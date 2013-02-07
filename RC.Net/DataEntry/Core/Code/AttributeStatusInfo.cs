@@ -567,11 +567,26 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Gets or sets a value indicating whether auto-update queries should be disabled.
+        /// The queries will not be loaded for any attributes.
         /// </summary>
         /// <value><see langword="true"/> to disable auto-update queries; otherwise,
         /// <see langword="false"/>.
         /// </value>
         public static bool DisableAutoUpdateQueries
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether auto-update queries should be temporarily
+        /// prevented from updating data. The queries will still be loaded for all attributes, but
+        /// they will not be triggered until un-paused.
+        /// </summary>
+        /// <value><see langword="true"/> to pause auto-update queries; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public static bool PauseAutoUpdateQueries
         {
             get;
             set;

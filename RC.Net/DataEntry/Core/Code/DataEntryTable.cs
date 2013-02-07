@@ -1725,34 +1725,37 @@ namespace Extract.DataEntry
                         AttributeName, MultipleMatchSelectionMode.All, _sourceAttributes, null,
                         this, null, false, null, null, null, null);
 
-                    // Create arrays to store the attributes associated with each row & cell.
-                    int count = mappedAttributes.Size();
-
-                    using (new SelectionProcessingSuppressor(this))
+                    using (new RefreshSuppressor(this))
                     {
-                        // Pre-populate the appropriate number of rows (otherwise the "new" row may not
-                        // be visible)
-                        if (count > 0)
+                        // Create arrays to store the attributes associated with each row & cell.
+                        int count = mappedAttributes.Size();
+
+                        using (new SelectionProcessingSuppressor(this))
                         {
-                            Rows.Add(count);
+                            // Pre-populate the appropriate number of rows (otherwise the "new" row may not
+                            // be visible)
+                            if (count > 0)
+                            {
+                                Rows.Add(count);
+                            }
                         }
-                    }
 
-                    // Loop through all attributes to populate the members of the row and cell attribute
-                    // arrays and to add the values of each into the table.
-                    for (int i = 0; i < count; i++)
-                    {
-                        ApplyAttributeToRow(i, (IAttribute)mappedAttributes.At(i), null);
-                    }
+                        // Loop through all attributes to populate the members of the row and cell attribute
+                        // arrays and to add the values of each into the table.
+                        for (int i = 0; i < count; i++)
+                        {
+                            ApplyAttributeToRow(i, (IAttribute)mappedAttributes.At(i), null);
+                        }
 
-                    // [DataEntry:393]
-                    // If the minimum number of rows are not present, add new blank rows as necessary.
-                    while (Rows.Count < _minimumNumberOfRows)
-                    {
-                        int addedRowIndex = Rows.Add();
+                        // [DataEntry:393]
+                        // If the minimum number of rows are not present, add new blank rows as necessary.
+                        while (Rows.Count < _minimumNumberOfRows)
+                        {
+                            int addedRowIndex = Rows.Add();
 
-                        // Apply the new attribute to the added row.
-                        ApplyAttributeToRow(addedRowIndex, null, null);
+                            // Apply the new attribute to the added row.
+                            ApplyAttributeToRow(addedRowIndex, null, null);
+                        }
                     }
 
                     // [DataEntry:263]
@@ -1767,6 +1770,9 @@ namespace Extract.DataEntry
                         }
                     }
                 }
+
+                // Any refreshes surpressed above can now occur.
+                ExecutePendingRefresh();
 
                 // Since the spatial information for this cell has likely changed, spatial hints need 
                 // to be updated.
@@ -2222,6 +2228,7 @@ namespace Extract.DataEntry
                 rowAttributes =
                     DataEntryControlHost.SortAttributesSpatially(rowAttributes);
 
+                using (new RefreshSuppressor(this))
                 using (new SelectionProcessingSuppressor(this))
                 {
                     // Remove all rows so they can be re-added from the cache.
@@ -2256,6 +2263,9 @@ namespace Extract.DataEntry
                         row.Selected = true;
                     }
                 }
+
+                // Any refreshes surpressed above can now occur.
+                ExecutePendingRefresh();
             }
             catch (Exception ex)
             {
@@ -2705,6 +2715,7 @@ namespace Extract.DataEntry
             // Keep track of any attribute we are replacing.
             IAttribute attributeToReplace = GetAttribute(Rows[rowIndex]);
 
+            using (new RefreshSuppressor(this))
             using (new SelectionProcessingSuppressor(this))
             {
                 // Add a new row to the table if necessary
@@ -2719,6 +2730,7 @@ namespace Extract.DataEntry
             DataEntryTableRow cachedRow;
             if (_activeCachedRows.TryGetValue(attribute, out cachedRow))
             {
+                using (new RefreshSuppressor(this))
                 using (new SelectionProcessingSuppressor(this))
                 {
                     Rows.RemoveAt(rowIndex);
@@ -2898,6 +2910,9 @@ namespace Extract.DataEntry
                 // Cache the initialized attribute's row for later use.
                 _activeCachedRows[attribute] = (DataEntryTableRow)Rows[rowIndex];
             }
+
+            // Any refreshes surpressed above can now occur.
+            ExecutePendingRefresh();
         }
 
         /// <summary>
@@ -3629,7 +3644,12 @@ namespace Extract.DataEntry
                 // in the course of populating the table. In addition to making the code more
                 // efficient, this insures hints are updated before the control host processes the
                 // selection change and re-draws the highlights.
+                // [DataEntry:1188]
+                // Also suppress all calls to RefreshAttributes(bool, IAttribute[]) while data is
+                // still being applied to the rows to prevent cases where spatial info can be
+                // incorrectly cleared by refreshing on incomplete data.
                 using (new SelectionProcessingSuppressor(this))
+                using (new RefreshSuppressor(this))
                 {
                     // Get a sorted (top to bottom) list of currently selected rows.
                     DataGridViewRow[] selectedRows = new DataGridViewRow[SelectedRows.Count];
@@ -3720,6 +3740,9 @@ namespace Extract.DataEntry
                             DataEntryMethods.AttributeAsVector(TabOrderPlaceholderAttribute));
                     }
                 }
+
+                // Any refreshes surpressed above can now occur.
+                ExecutePendingRefresh();
 
                 // Highlights the results of the swipe in the image viewer and propagates the
                 // selection to dependent controls (if appropriate)

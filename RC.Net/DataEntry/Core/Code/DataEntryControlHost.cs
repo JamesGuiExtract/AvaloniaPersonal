@@ -2106,6 +2106,11 @@ namespace Extract.DataEntry
                 {
                     try
                     {
+                        // [DataEntry:1186]
+                        // Unless paused, the changes that are undone/redone here may trigger
+                        // auto-update queries to fire which then result in data that is not in the
+                        // correct state.
+                        AttributeStatusInfo.PauseAutoUpdateQueries = true;
                         _controlUpdateReferenceCount++;
 
                         // Before performing the undo/redo, remove the active control status from
@@ -2152,11 +2157,19 @@ namespace Extract.DataEntry
                         {
                             if (undo)
                             {
-                                ExecuteOnIdle("ELI34415", () => AttributeStatusInfo.UndoManager.EndUndo());
+                                ExecuteOnIdle("ELI34415", () => 
+                                    {
+                                        AttributeStatusInfo.UndoManager.EndUndo();
+                                        AttributeStatusInfo.PauseAutoUpdateQueries = false;
+                                    });
                             }
                             else
                             {
-                                ExecuteOnIdle("ELI34444", () => AttributeStatusInfo.UndoManager.EndRedo());
+                                ExecuteOnIdle("ELI34444", () =>
+                                    {
+                                        AttributeStatusInfo.UndoManager.EndRedo();
+                                        AttributeStatusInfo.PauseAutoUpdateQueries = false;
+                                    });
                             }
                         });
                     }
@@ -2164,6 +2177,8 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
+                AttributeStatusInfo.PauseAutoUpdateQueries = false;
+
                 throw ExtractException.AsExtractException("ELI31008", ex);
             }
         }
@@ -4481,13 +4496,16 @@ namespace Extract.DataEntry
                 // complete.
                 ControlUpdateReferenceCount++;
 
-                // If a swipe did not produce any results usable by the control,
-                // notify the user.
-                if (!_activeDataControl.ProcessSwipedText(ocrText))
+                using (new TemporaryWaitCursor())
                 {
-                    ShowUserNotificationTooltip("Unable to format swiped text " +
-                        "into the current selection.");
-                    return;
+                    // If a swipe did not produce any results usable by the control,
+                    // notify the user.
+                    if (!_activeDataControl.ProcessSwipedText(ocrText))
+                    {
+                        ShowUserNotificationTooltip("Unable to format swiped text " +
+                            "into the current selection.");
+                        return;
+                    }
                 }
             }
             catch (Exception ex)
