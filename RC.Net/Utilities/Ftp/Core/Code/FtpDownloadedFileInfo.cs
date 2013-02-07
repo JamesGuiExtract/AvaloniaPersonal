@@ -88,39 +88,42 @@ namespace Extract.Utilities.Ftp
         /// </summary>
         public void Save()
         {
-            XmlTextWriter xmlWriter = null;
             try
             {
                 ExtractException.Assert("ELI32655", ".info file name cannot be empty", !string.IsNullOrEmpty(InfoFileName));
 
-                xmlWriter = new XmlTextWriter(InfoFileName, Encoding.ASCII);
-                xmlWriter.Formatting = Formatting.Indented;
-                xmlWriter.Indentation = 4;
+                // Load the info file within a retry do deal with sharing violations.
+                // [DotNetRCAndUtils:879]
+                FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
+                {
+                    XmlTextWriter xmlWriter = new XmlTextWriter(InfoFileName, Encoding.ASCII);
+                    try
+                    {
+                        xmlWriter.Formatting = Formatting.Indented;
+                        xmlWriter.Indentation = 4;
 
-                // Write the root
-                xmlWriter.WriteStartElement(_ROOT_NODE_NAME);
-                xmlWriter.WriteAttributeString("Version", _VERSION.ToString(CultureInfo.InvariantCulture));
+                        // Write the root
+                        xmlWriter.WriteStartElement(_ROOT_NODE_NAME);
+                        xmlWriter.WriteAttributeString("Version", _VERSION.ToString(CultureInfo.InvariantCulture));
 
-                // Write the remote source document element
-                xmlWriter.WriteElementString(_REMOTE_SOURCE_DOC_NAME, RemoteSourceDocName);
+                        // Write the remote source document element
+                        xmlWriter.WriteElementString(_REMOTE_SOURCE_DOC_NAME, RemoteSourceDocName);
 
-                xmlWriter.WriteElementString(_SOURCE_DOC_SIZE,
-                    RemoteFileSize.ToString(CultureInfo.InvariantCulture));
+                        xmlWriter.WriteElementString(_SOURCE_DOC_SIZE,
+                            RemoteFileSize.ToString(CultureInfo.InvariantCulture));
 
-                xmlWriter.WriteElementString(_LAST_MODIFIED,
-                    RemoteLastModifiedTime.Ticks.ToString(CultureInfo.InvariantCulture));
+                        xmlWriter.WriteElementString(_LAST_MODIFIED,
+                            RemoteLastModifiedTime.Ticks.ToString(CultureInfo.InvariantCulture));
+                    }
+                    finally
+                    {
+                        xmlWriter.Close();
+                    }
+                });
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI32654");
-            }
-            finally
-            {
-                if (xmlWriter != null)
-                {
-                    xmlWriter.Close();
-                    xmlWriter = null;
-                }
             }
         }
 
@@ -143,7 +146,13 @@ namespace Extract.Utilities.Ftp
                 }
 
                 // Load the XML file into a string
-                string xml = File.ReadAllText(InfoFileName, Encoding.ASCII);
+                // [DotNetRCAndUtils:879]
+                // Load the info file within a retry do deal with sharing violations.
+                string xml = "";
+                FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
+                    {
+                        xml = File.ReadAllText(InfoFileName, Encoding.ASCII);
+                    });
 
                 // Parse the XML file
                 using (StringReader reader = new StringReader(xml))
