@@ -645,7 +645,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._Lien_OrigBalAmtTextBox.Size = new System.Drawing.Size(510, 21);
             this._Lien_OrigBalAmtTextBox.TabIndex = 20;
             this._Lien_OrigBalAmtTextBox.ValidationErrorMessage = "Enter a valid Lien Original Loan Balance (digits with comma, decimal and dollar sign optional)";
-            this._Lien_OrigBalAmtTextBox.ValidationPattern = "^\\$?[\\d]+?(,[\\d]{1,3})*?(\\.\\d{0,2})?$";
+            this._Lien_OrigBalAmtTextBox.ValidationPattern = "^\\$?(([\\d]+)|([\\d]{1,3})(,[\\d]{3})*?)(\\.\\d{0,2})?$";
             // 
             // _RealEstate_PropCountyTextBox
             // 
