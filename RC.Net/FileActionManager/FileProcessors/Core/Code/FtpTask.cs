@@ -619,7 +619,7 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI35355");
+                throw ex.CreateComVisible("ELI35355", "Error closing closing connection.");
             }
         }
 
@@ -813,9 +813,16 @@ namespace Extract.FileActionManager.FileProcessors
             }
             finally
             {
-                if (!KeepConnectionOpen && _runningConnection.IsConnected)
+                try
                 {
-                    _runningConnection.Close();
+                    if (!KeepConnectionOpen && _runningConnection.IsConnected)
+                    {
+                        _runningConnection.Close();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractLog("ELI35386");
                 }
             }
         }
