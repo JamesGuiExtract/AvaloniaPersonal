@@ -1,5 +1,10 @@
 @ECHO OFF
 
+setlocal
+
+%~d0
+cd %~p0
+
 @ECHO Uninstalling all Extract Systems applications...
 start /wait "" ..\ExtractUninstaller\ExtractUninstaller /s
 
