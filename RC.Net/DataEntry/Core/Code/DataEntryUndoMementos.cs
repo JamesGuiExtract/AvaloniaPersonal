@@ -405,8 +405,7 @@ namespace Extract.DataEntry
             : base(affectedAttribute)
         {
             // Make a copy of the original value.
-            ICopyableObject copySource = (ICopyableObject)affectedAttribute.Value;
-            _originalValue = (SpatialString)copySource.Clone();
+            _originalValue = affectedAttribute.Value.Clone();
 
             AttributesToRefresh.Add(affectedAttribute);
         }

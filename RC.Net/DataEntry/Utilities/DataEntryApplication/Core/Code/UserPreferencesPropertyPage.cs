@@ -285,6 +285,23 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// Handles the ocr trade off selected index changed.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleOcrTradeOffSelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                OnPropertyPageModified();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35388");
+            }
+        }
+
+        /// <summary>
         /// Handles the case that a AutoZoomMode option has been selected.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>

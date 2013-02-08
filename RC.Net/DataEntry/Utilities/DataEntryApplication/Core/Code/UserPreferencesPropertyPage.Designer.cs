@@ -29,8 +29,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private void InitializeComponent()
         {
             this._tabControl = new System.Windows.Forms.TabControl();
-            this._autoZoomTab = new System.Windows.Forms.TabPage();
             this._generalTab = new System.Windows.Forms.TabPage();
+            this._ocrTradeOffLabel2 = new System.Windows.Forms.Label();
+            this._ocrTradeOffLabel = new System.Windows.Forms.Label();
+            this._ocrTradeOffComboBox = new System.Windows.Forms.ComboBox();
+            this._autoOcrCheckBox = new System.Windows.Forms.CheckBox();
+            this._autoZoomTab = new System.Windows.Forms.TabPage();
             this._mostContextLabel = new System.Windows.Forms.Label();
             this._leastContextLabel = new System.Windows.Forms.Label();
             this._zoomContextTrackBar = new System.Windows.Forms.TrackBar();
@@ -39,13 +43,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._zoomOutIfNecessaryRadioButton = new System.Windows.Forms.RadioButton();
             this._noZoomRadioButton = new System.Windows.Forms.RadioButton();
             this._autoZoomSettingLabel = new System.Windows.Forms.Label();
-            this._ocrTradeOffLabel2 = new System.Windows.Forms.Label();
-            this._ocrTradeOffLabel = new System.Windows.Forms.Label();
-            this._ocrTradeOffComboBox = new System.Windows.Forms.ComboBox();
-            this._autoOcrCheckBox = new System.Windows.Forms.CheckBox();
             this._tabControl.SuspendLayout();
-            this._autoZoomTab.SuspendLayout();
             this._generalTab.SuspendLayout();
+            this._autoZoomTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._zoomContextTrackBar)).BeginInit();
             this.SuspendLayout();
             // 
@@ -58,6 +58,64 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._tabControl.SelectedIndex = 0;
             this._tabControl.Size = new System.Drawing.Size(446, 195);
             this._tabControl.TabIndex = 1;
+            // 
+            // _generalTab
+            // 
+            this._generalTab.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this._generalTab.Controls.Add(this._ocrTradeOffLabel2);
+            this._generalTab.Controls.Add(this._ocrTradeOffLabel);
+            this._generalTab.Controls.Add(this._ocrTradeOffComboBox);
+            this._generalTab.Controls.Add(this._autoOcrCheckBox);
+            this._generalTab.Location = new System.Drawing.Point(4, 22);
+            this._generalTab.Name = "_generalTab";
+            this._generalTab.Padding = new System.Windows.Forms.Padding(3);
+            this._generalTab.Size = new System.Drawing.Size(438, 169);
+            this._generalTab.TabIndex = 1;
+            this._generalTab.Text = "General";
+            // 
+            // _ocrTradeOffLabel2
+            // 
+            this._ocrTradeOffLabel2.AutoSize = true;
+            this._ocrTradeOffLabel2.Location = new System.Drawing.Point(259, 38);
+            this._ocrTradeOffLabel2.Name = "_ocrTradeOffLabel2";
+            this._ocrTradeOffLabel2.Size = new System.Drawing.Size(42, 13);
+            this._ocrTradeOffLabel2.TabIndex = 17;
+            this._ocrTradeOffLabel2.Text = "method";
+            // 
+            // _ocrTradeOffLabel
+            // 
+            this._ocrTradeOffLabel.AutoSize = true;
+            this._ocrTradeOffLabel.Location = new System.Drawing.Point(48, 38);
+            this._ocrTradeOffLabel.Name = "_ocrTradeOffLabel";
+            this._ocrTradeOffLabel.Size = new System.Drawing.Size(78, 13);
+            this._ocrTradeOffLabel.TabIndex = 16;
+            this._ocrTradeOffLabel.Text = "OCR text using";
+            // 
+            // _ocrTradeOffComboBox
+            // 
+            this._ocrTradeOffComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._ocrTradeOffComboBox.Enabled = false;
+            this._ocrTradeOffComboBox.FormattingEnabled = true;
+            this._ocrTradeOffComboBox.Items.AddRange(new object[] {
+            "Accurate",
+            "Balanced",
+            "Fast"});
+            this._ocrTradeOffComboBox.Location = new System.Drawing.Point(132, 35);
+            this._ocrTradeOffComboBox.Name = "_ocrTradeOffComboBox";
+            this._ocrTradeOffComboBox.Size = new System.Drawing.Size(121, 21);
+            this._ocrTradeOffComboBox.TabIndex = 15;
+            this._ocrTradeOffComboBox.SelectedIndexChanged += new System.EventHandler(this.HandleOcrTradeOffSelectedIndexChanged);
+            // 
+            // _autoOcrCheckBox
+            // 
+            this._autoOcrCheckBox.AutoSize = true;
+            this._autoOcrCheckBox.Location = new System.Drawing.Point(12, 12);
+            this._autoOcrCheckBox.Name = "_autoOcrCheckBox";
+            this._autoOcrCheckBox.Size = new System.Drawing.Size(306, 17);
+            this._autoOcrCheckBox.TabIndex = 14;
+            this._autoOcrCheckBox.Text = "OCR text in background if there is no pre-existing OCR data";
+            this._autoOcrCheckBox.UseVisualStyleBackColor = false;
+            this._autoOcrCheckBox.CheckedChanged += new System.EventHandler(this.HandleAutoOcrCheckChanged);
             // 
             // _autoZoomTab
             // 
@@ -76,20 +134,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._autoZoomTab.Size = new System.Drawing.Size(438, 169);
             this._autoZoomTab.TabIndex = 0;
             this._autoZoomTab.Text = "Auto zoom";
-            // 
-            // _generalTab
-            // 
-            this._generalTab.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this._generalTab.Controls.Add(this._ocrTradeOffLabel2);
-            this._generalTab.Controls.Add(this._ocrTradeOffLabel);
-            this._generalTab.Controls.Add(this._ocrTradeOffComboBox);
-            this._generalTab.Controls.Add(this._autoOcrCheckBox);
-            this._generalTab.Location = new System.Drawing.Point(4, 22);
-            this._generalTab.Name = "_generalTab";
-            this._generalTab.Padding = new System.Windows.Forms.Padding(3);
-            this._generalTab.Size = new System.Drawing.Size(438, 169);
-            this._generalTab.TabIndex = 1;
-            this._generalTab.Text = "General";
             // 
             // _mostContextLabel
             // 
@@ -167,49 +211,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._autoZoomSettingLabel.TabIndex = 8;
             this._autoZoomSettingLabel.Text = "Center on selected text and";
             // 
-            // _ocrTradeOffLabel2
-            // 
-            this._ocrTradeOffLabel2.AutoSize = true;
-            this._ocrTradeOffLabel2.Location = new System.Drawing.Point(259, 38);
-            this._ocrTradeOffLabel2.Name = "_ocrTradeOffLabel2";
-            this._ocrTradeOffLabel2.Size = new System.Drawing.Size(42, 13);
-            this._ocrTradeOffLabel2.TabIndex = 17;
-            this._ocrTradeOffLabel2.Text = "method";
-            // 
-            // _ocrTradeOffLabel
-            // 
-            this._ocrTradeOffLabel.AutoSize = true;
-            this._ocrTradeOffLabel.Location = new System.Drawing.Point(48, 38);
-            this._ocrTradeOffLabel.Name = "_ocrTradeOffLabel";
-            this._ocrTradeOffLabel.Size = new System.Drawing.Size(78, 13);
-            this._ocrTradeOffLabel.TabIndex = 16;
-            this._ocrTradeOffLabel.Text = "OCR text using";
-            // 
-            // _ocrTradeOffComboBox
-            // 
-            this._ocrTradeOffComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this._ocrTradeOffComboBox.Enabled = false;
-            this._ocrTradeOffComboBox.FormattingEnabled = true;
-            this._ocrTradeOffComboBox.Items.AddRange(new object[] {
-            "Accurate",
-            "Balanced",
-            "Fast"});
-            this._ocrTradeOffComboBox.Location = new System.Drawing.Point(132, 35);
-            this._ocrTradeOffComboBox.Name = "_ocrTradeOffComboBox";
-            this._ocrTradeOffComboBox.Size = new System.Drawing.Size(121, 21);
-            this._ocrTradeOffComboBox.TabIndex = 15;
-            // 
-            // _autoOcrCheckBox
-            // 
-            this._autoOcrCheckBox.AutoSize = true;
-            this._autoOcrCheckBox.Location = new System.Drawing.Point(12, 12);
-            this._autoOcrCheckBox.Name = "_autoOcrCheckBox";
-            this._autoOcrCheckBox.Size = new System.Drawing.Size(306, 17);
-            this._autoOcrCheckBox.TabIndex = 14;
-            this._autoOcrCheckBox.Text = "OCR text in background if there is no pre-existing OCR data";
-            this._autoOcrCheckBox.UseVisualStyleBackColor = false;
-            this._autoOcrCheckBox.CheckedChanged += new System.EventHandler(this.HandleAutoOcrCheckChanged);
-            // 
             // UserPreferencesPropertyPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -218,10 +219,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this.Name = "UserPreferencesPropertyPage";
             this.Size = new System.Drawing.Size(450, 200);
             this._tabControl.ResumeLayout(false);
-            this._autoZoomTab.ResumeLayout(false);
-            this._autoZoomTab.PerformLayout();
             this._generalTab.ResumeLayout(false);
             this._generalTab.PerformLayout();
+            this._autoZoomTab.ResumeLayout(false);
+            this._autoZoomTab.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._zoomContextTrackBar)).EndInit();
             this.ResumeLayout(false);
 

@@ -348,22 +348,8 @@ namespace Extract.DataEntry
                     // to the query result to not affect the original attribute.
                     if (IsAttribute && _spatialResults == null)
                     {
-                        bool isSpatial = _attributeResults[0].Value.HasSpatialInfo();
                         _spatialResults = new List<SpatialString>();
-                        ICopyableObject copySource = (ICopyableObject)_attributeResults[0].Value;
-                        _spatialResults.Add((SpatialString)copySource.Clone());
-
-                        // [DataEntry:1137]
-                        // Because the SpatialString class will remove spatial info for blank
-                        // strings yet it is important for the attribute value spatial mode to match
-                        // the spatial mode of the SpatialString value, add back any spatial info
-                        // that was removed as part of the Clone method.
-                        if (isSpatial && !_spatialResults[0].HasSpatialInfo())
-                        {
-                            _spatialResults[0].AddRasterZones(
-                                _attributeResults[0].Value.GetOCRImageRasterZones(),
-                                _attributeResults[0].Value.SpatialPageInfos);
-                        }
+                        _spatialResults.Add(_attributeResults[0].Value.Clone());
                     }
 
                     return _spatialResults[0];
@@ -1023,9 +1009,8 @@ namespace Extract.DataEntry
                     }
 
                     // Initialize this result's _spatialResult as a clone of the other result.
-                    ICopyableObject copySource = (ICopyableObject)otherResult.FirstSpatialStringValue;
                     _spatialResults = new List<SpatialString>();
-                    _spatialResults.Add((SpatialString)copySource.Clone());
+                    _spatialResults.Add(otherResult.FirstSpatialStringValue.Clone());
 
                     // Remove any temporary string from both the original and clone.
                     if (assignedTemporaryString)

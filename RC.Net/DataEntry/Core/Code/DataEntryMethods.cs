@@ -750,8 +750,7 @@ namespace Extract.DataEntry
                 {
                     // Make a copy of the existing text so that the operation does not modify the
                     // original text.
-                    ICopyableObject copySource = (ICopyableObject)existingText;
-                    existingText = (SpatialString)copySource.Clone();
+                    existingText = existingText.Clone();
 
                     // So that SpatialString::Insert/Append works properly ensure the source doc
                     // names are the same.
@@ -832,6 +831,50 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI28834", ex);
+            }
+        }
+
+        /// <summary>
+        /// Clones <see paramref="source"/> in a way that ensures spatial info is not lost even if the
+        /// string value is blank.
+        /// </summary>
+        /// <param name="source">The <see cref="SpatialString"/> to be cloned.</param>
+        /// <returns>The <see cref="SpatialString"/> clone.</returns>
+        internal static SpatialString Clone(this SpatialString source)
+        {
+            return CloneSpatialString(source);
+        }
+
+        /// <summary>
+        /// Clones <see paramref="source"/> in a way that ensures spatial info is not lost even if the
+        /// string value is blank.
+        /// </summary>
+        /// <param name="source">The <see cref="SpatialString"/> to be cloned.</param>
+        /// <returns>The <see cref="SpatialString"/> clone.</returns>
+        internal static SpatialString CloneSpatialString(SpatialString source)
+        {
+            try
+            {
+                bool isSpatial = source.HasSpatialInfo();
+                ICopyableObject copySource = (ICopyableObject)source;
+
+                SpatialString clone = (SpatialString)copySource.Clone();
+
+                // [DataEntry:1137]
+                // Because the SpatialString class will remove spatial info for blank
+                // strings yet it is important for the attribute value spatial mode to match
+                // the spatial mode of the SpatialString value, add back any spatial info
+                // that was removed as part of the Clone method.
+                if (isSpatial && !clone.HasSpatialInfo())
+                {
+                    clone.AddRasterZones(source.GetOCRImageRasterZones(), source.SpatialPageInfos);
+                }
+
+                return clone;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35387");
             }
         }
 

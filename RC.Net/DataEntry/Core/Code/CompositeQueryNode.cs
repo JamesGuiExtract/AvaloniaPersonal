@@ -616,13 +616,12 @@ namespace Extract.DataEntry
                 if (forcedSpatialResult != null && forcedSpatialResult.HasSpatialInfo())
                 {
                     List<SpatialString> spatialResults = new List<SpatialString>();
-                    ICopyableObject copySource = (ICopyableObject)forcedSpatialResult;
 
                     if (result.HasMultipleValues)
                     {
                         foreach (QueryResult subResult in result)
                         {
-                            SpatialString spatialString = (SpatialString)copySource.Clone();
+                            SpatialString spatialString = forcedSpatialResult.Clone();
                             spatialString.ReplaceAndDowngradeToHybrid(subResult.FirstStringValue);
                             spatialResults.Add(spatialString);
                         }
@@ -761,8 +760,7 @@ namespace Extract.DataEntry
 
                             if (forcedSpatialResult == null)
                             {
-                                ICopyableObject copySource = (ICopyableObject)spatialString;
-                                forcedSpatialResult = (SpatialString)copySource.Clone();
+                                forcedSpatialResult = spatialString.Clone();
                             }
                             else
                             {
@@ -824,8 +822,7 @@ namespace Extract.DataEntry
                             }
                             else
                             {
-                                ICopyableObject copySource = (ICopyableObject)forcedSpatialResult;
-                                SpatialString spatialResultCopy = (SpatialString)copySource.Clone();
+                                SpatialString spatialResultCopy = forcedSpatialResult.Clone();
                                 spatialResultCopy.Append(resultSet.ForcedSpatialResult);
                                 resultSet.ForcedSpatialResult = spatialResultCopy;
                             }
