@@ -5,6 +5,7 @@
 #include <StringTokenizer.h>
 #include <UCLIDException.h>
 #include <COMUtils.h>
+#include <StringCSIS.h>
 
 #include <list>
 #include <stack>
@@ -753,6 +754,16 @@ const string TextFunctionExpander::expandReplace(vector<string>& vecParameters) 
 
 		// Do the string replacement
 		replaceVariable( strSource, strSearch, strReplace );
+
+		// [FlexIDSCore:5240]
+		// Removed use of replaceVariable call here so that the search can be made case-insensitive.
+		stringCSIS csisSource(strSource, false);
+		size_t findpos = csisSource.find(strSearch);
+		while (findpos != string::npos)
+		{
+			strSource.replace(findpos, strSearch.length(), strReplace);
+			findpos = csisSource.find(strSearch, findpos + strSearch.length());
+		}
 
 		// Return the result of the string replace
 		return strSource;
