@@ -2390,6 +2390,52 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Determines whether the specified <see paramref="attribute"/> has spatial info (including
+        /// hints).
+        /// </summary>
+        /// <param name="attribute">The  <see cref="IAttribute"/> to be checked for whether it has
+        /// spatial info.</param>
+        /// <param name="requireDirect"><see langword="true"/> to require that the attribute value
+        /// itself is spatial or that it's hint is a direct hint; <see langword="false"/> if an
+        /// itself hint is allowed to satisify this chec.</param>
+        /// <returns><see langword="true"/> the specified <see paramref="attribute"/> has spatial
+        /// info; otherwise, <see langword="false"/>.
+        /// </returns>
+        [ComVisible(false)]
+        public static bool HasSpatialInfo(IAttribute attribute, bool requireDirect)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                // [DataEntry:1192, 1194]
+                // If this attribute has been deleted, don't consider it to have any spatial info.
+                if (!statusInfo._initialized)
+                {
+                    return false;
+                }
+
+                if (attribute.Value.HasSpatialInfo())
+                {
+                    return true;
+                }
+
+                // If the attribute value itself didn't have any spatial info, hints can still
+                // qualify. (depending upon whether the caller wants indirect hints to qualify)
+                if (statusInfo._hintType == HintType.None || !statusInfo._hintEnabled)
+                {
+                    return false;
+                }
+
+                return (!requireDirect || statusInfo._hintType == HintType.Direct);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35390");
+            }
+        }
+
+        /// <summary>
         /// Returns the a list of the <see cref="IAttribute"/>s which match the specified query
         /// applied to the specified root attribute or <see langword="null"/> if the query
         /// references the root of the attribute hierarchy.

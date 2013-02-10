@@ -2148,7 +2148,7 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI24762", ex);
+                var ee = new ExtractException("ELI24762", "Error pasting clipboard data.", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
             }

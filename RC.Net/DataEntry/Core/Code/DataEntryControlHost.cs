@@ -3513,9 +3513,12 @@ namespace Extract.DataEntry
                 {
                     // Ensure an associated attribute can be found and that the highlight does not
                     // represent an indirect hint.
+                    // [DataEntry:1194]
+                    // Don't allow an attribute to become a hover attribute if the highlight is
+                    // somehow still around for an attribute that no longer has spatial info.
                     IAttribute attribute;
                     if (_highlightAttributes.TryGetValue(highlight, out attribute) &&
-                        AttributeStatusInfo.GetHintType(attribute) != HintType.Indirect)
+                        AttributeStatusInfo.HasSpatialInfo(attribute, true))
                     {
                         // If there is not currently a hover attribute or the current hover attribute
                         // is a hint while the new candidate is not, use the new attribute as the
@@ -3616,6 +3619,10 @@ namespace Extract.DataEntry
 
                         // Propagate and select the former hover attribute.
                         PropagateAttributes(attributesToPropagate, true, false);
+
+                        // The tooltip has been removed. Call DrawHighlights to ensure it is
+                        // redisplayed as part of the new selection.
+                        DrawHighlights(true);
                     }
                 }
             }
@@ -3816,7 +3823,7 @@ namespace Extract.DataEntry
                     // (unless it is an indirect hint).
                     if (_dataEntryApp.ShowAllHighlights)
                     {
-                        if (AttributeStatusInfo.GetHintType(attribute) != HintType.Indirect)
+                        if (AttributeStatusInfo.HasSpatialInfo(attribute, true))
                         {
                             ShowAttributeHighlights(attribute, true);
                         }
@@ -4830,6 +4837,16 @@ namespace Extract.DataEntry
                                 _selectionBounds[highlight.PageNumber], errorIcon.GetBounds());
                         }
                     }
+                }
+
+                // [DataEntry:1192]
+                // It is possible the _hoverAttribute has had its spatial info removed or has been
+                // deleted since becoming the _hoverAttribute. If so, don't create a tooltip for it
+                // and reset _hoverAttribute to null.
+                if (_hoverAttribute != null && 
+                    !AttributeStatusInfo.HasSpatialInfo(_hoverAttribute, true))
+                {
+                    _hoverAttribute = null;
                 }
 
                 // If there is a hover attribute that is different from the active attribute with
@@ -5898,16 +5915,15 @@ namespace Extract.DataEntry
             RemoveAttributeToolTip(attribute);
             RemoveAttributeErrorIcon(attribute);
 
-            bool isHint = AttributeStatusInfo.GetHintType(attribute) != HintType.None;
-            bool isAccepted = AttributeStatusInfo.IsAccepted(attribute);
-
             // If the attribute does not have a hint and does not have any spatial information, no
             // highlight can be generated.
-            if (!attribute.Value.HasSpatialInfo() && 
-                (!isHint || !AttributeStatusInfo.HintEnabled(attribute)))
+            if (!AttributeStatusInfo.HasSpatialInfo(attribute, false))
             {
                 return;
             }
+
+            bool isHint = AttributeStatusInfo.GetHintType(attribute) != HintType.None;
+            bool isAccepted = AttributeStatusInfo.IsAccepted(attribute);
 
             foreach (var highlight in
                 CreateAttributeHighlight(attribute, makeVisible, isHint, isAccepted, false))
@@ -6078,7 +6094,10 @@ namespace Extract.DataEntry
         {
             RemoveAttributeToolTip(attribute);
 
-            if (!string.IsNullOrEmpty(attribute.Value.String))
+            // [DataEntry:1192]
+            // Ensure tooltips don't get created for non-spatial or deleted attributes;
+            if (AttributeStatusInfo.HasSpatialInfo(attribute, true) &&
+                !string.IsNullOrEmpty(attribute.Value.String))
             {
                 _attributeToolTips[attribute] = null;
             }

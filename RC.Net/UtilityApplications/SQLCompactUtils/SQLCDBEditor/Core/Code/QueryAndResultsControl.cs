@@ -1449,6 +1449,8 @@ namespace Extract.SQLCDBEditor
                         }
                     }
 
+                    OnDataChanged(true);
+
                     // Reload the empty table into the grid.
                     RefreshData(true, true);
                 }
