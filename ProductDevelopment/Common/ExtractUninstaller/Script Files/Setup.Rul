@@ -170,6 +170,11 @@ begin
 
     RegDBDeleteKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\InstallShield_" + PRODUCT_GUID);                      
     
+    DeleteDir( StartMenuFolder ^ "Programs\\Extract Systems LM", ALLCONTENTS); 
+    DeleteDir( StartMenuFolder ^ "Programs\\Extract Systems FLEX Index", ALLCONTENTS); 
+    DeleteDir( StartMenuFolder ^ "Programs\\Extract Systems Flex Index RDT", ALLCONTENTS); 
+    DeleteDir( StartMenuFolder ^ "Programs\\Extract Systems ID Shield", ALLCONTENTS); 
+    
     //if ( BATCH_INSTALL ) then
     //	SdFinishReboot ( szTitle , szMsg1 , SYS_BOOTMACHINE , szMsg2 , 0 );
     //else
