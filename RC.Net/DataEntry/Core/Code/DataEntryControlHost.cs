@@ -2113,6 +2113,13 @@ namespace Extract.DataEntry
                         AttributeStatusInfo.PauseAutoUpdateQueries = true;
                         _controlUpdateReferenceCount++;
 
+                        // If the smart tag manager is active, de-activate it before the undo/redo
+                        // so that it doesn't try to apply any value.
+                        if (_smartTagManager.IsActive)
+                        {
+                            _smartTagManager.SafeDeactivate();
+                        }
+
                         // Before performing the undo/redo, remove the active control status from
                         // the the currently active control. Otherwise if undo attempts to revert
                         // the status of currently selected attributes, it will not properly take
@@ -2191,29 +2198,58 @@ namespace Extract.DataEntry
         {
             try
             {
-                // If auto-zoom is currently in effect for the page we are currently on and there is
-                // a _lastNonZoomedToSelectionViewArea, restore the view area to
-                // _lastNonZoomedToSelectionViewArea.
-                if (_zoomedToSelection && _zoomToSelectionPage == _imageViewer.PageNumber &&
-                    _lastNonZoomedToSelectionViewArea.HasValue)
+                // If already zoomed in on the current selection, zoom back out to the last manual
+                // zoom.
+                if (_zoomedToSelection)
                 {
-                    _performingProgrammaticZoom = true;
-                    Rectangle viewRegion =
-                        _imageViewer.GetTransformedRectangle(
-                            _lastNonZoomedToSelectionViewArea.Value, false);
-                    _imageViewer.ZoomToRectangle(viewRegion);
-                    
-                    // If there was a fit mode in effect before the zoom to selection, restore it as well.
-                    if (_lastNonZoomedToSelectionFitMode.HasValue)
+                    if (_zoomToSelectionPage != _imageViewer.PageNumber)
                     {
-                        _imageViewer.FitMode = _lastNonZoomedToSelectionFitMode.Value;
+                        _zoomedToSelection = false;
                     }
+                    else
+                    {
+                        Rectangle currentViewRegion = _imageViewer.GetTransformedRectangle(
+                            _imageViewer.GetVisibleImageArea(), true);
 
-                    _lastViewArea = _lastNonZoomedToSelectionViewArea.Value;
-                    _zoomedToSelection = false;
-                    _manuallyZoomedToSelection = false;
+                        if (!currentViewRegion.Contains(_selectionBounds[_imageViewer.PageNumber]))
+                        {
+                            _zoomedToSelection = false;
+                        }
+                        else
+                        {
+                            // If _lastNonZoomedToSelectionViewArea has not yet been set, default to
+                            // zooming out to the full page.
+                            if (!_lastNonZoomedToSelectionViewArea.HasValue)
+                            {
+                                _lastNonZoomedToSelectionViewArea = new Rectangle(0, 0,
+                                    _imageViewer.ImageWidth, _imageViewer.ImageHeight);
+                            }
+
+                            // If auto-zoom is currently in effect for the page we are currently on
+                            // and there is a _lastNonZoomedToSelectionViewArea, restore the view
+                            // area to _lastNonZoomedToSelectionViewArea.
+                            _performingProgrammaticZoom = true;
+                            Rectangle viewRegion =
+                                _imageViewer.GetTransformedRectangle(
+                                    _lastNonZoomedToSelectionViewArea.Value, false);
+                            _imageViewer.ZoomToRectangle(viewRegion);
+
+                            // If there was a fit mode in effect before the zoom to selection, restore it as well.
+                            if (_lastNonZoomedToSelectionFitMode.HasValue)
+                            {
+                                _imageViewer.FitMode = _lastNonZoomedToSelectionFitMode.Value;
+                            }
+
+                            _lastViewArea = _lastNonZoomedToSelectionViewArea.Value;
+                            _zoomedToSelection = false;
+                            _manuallyZoomedToSelection = false;
+                            return;
+                        }
+                    }
                 }
-                else
+
+                // If not zoomed in on the current selection, zoom in on it.
+                if (!_zoomedToSelection)
                 {
                     // Ensure we are on the same page as the selection.
                     if (!_selectionBounds.Keys.Contains(_imageViewer.PageNumber))
@@ -3673,9 +3709,11 @@ namespace Extract.DataEntry
                     // Before assigning _lastNonAutoZoomViewArea and _lastManualZoomSize, be sure
                     // the size > 0 in both dimensions (will be zero if image viewer window is
                     // minimized).
-                    if (zoomSize.Width > 0 && zoomSize.Height > 0 && !_zoomedToSelection)
+                    if (zoomSize.Width > 0 && zoomSize.Height > 0)
                     {
                         _lastManualZoomSize = zoomSize;
+                        _zoomedToSelection = false;
+                        _manuallyZoomedToSelection = false;
 
                         // Ensure an F2 toggle out of auto-zoom will always zoom out compared to the
                         // last auto-zoom level.
@@ -3704,6 +3742,8 @@ namespace Extract.DataEntry
         {
             try
             {
+                // Don't allow scrolling to reset _zoomedToSelection or
+                // _lastNonZoomedToSelectionViewArea.
                 if (!_performingProgrammaticZoom && !_zoomedToSelection)
                 {
                     Rectangle viewArea = _imageViewer.GetTransformedRectangle(
@@ -5019,14 +5059,6 @@ namespace Extract.DataEntry
         {
             try
             {
-                // If we are trying to enforce auto-zoom on the same selection as last time, return.
-                if (!forceZoomToSelection && _lastViewArea == selectedImageRegion)
-                {
-                    return;
-                }
-
-                _performingProgrammaticZoom = true;
-
                 // Initialize the newViewRegion as the selected object region.
                 Rectangle newViewRegion = selectedImageRegion;
 
@@ -5037,6 +5069,16 @@ namespace Extract.DataEntry
                 // Determine the current view region.
                 Rectangle currentViewRegion = _imageViewer.GetTransformedRectangle(
                         _imageViewer.GetVisibleImageArea(), true);
+
+                // If we are trying to enforce auto-zoom on the same selection as last time and the
+                // current selection is in view, there is nothing to do.
+                if (!forceZoomToSelection && _lastViewArea == selectedImageRegion &&
+                    currentViewRegion.Contains(newViewRegion))
+                {
+                    return;
+                }
+
+                _performingProgrammaticZoom = true;
 
                 // The amount of padding to be added in each direction (always add at least 3 pixels
                 // so tooltip borders do not extend offscreen.

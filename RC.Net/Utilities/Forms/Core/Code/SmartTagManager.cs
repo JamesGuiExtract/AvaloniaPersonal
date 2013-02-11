@@ -128,6 +128,22 @@ namespace Extract.Utilities.Forms
         /// </summary>
         int _activeTextLength;
 
+        /// <summary>
+        /// The <see cref="DataGridView"/> associated with the control currently being edited.
+        /// </summary>
+        DataGridView _associatedDataGridView;
+
+        /// <summary>
+        /// The <see cref="DataGridViewCell"/> associated with the control currently being edited.
+        /// </summary>
+        DataGridViewCell _associatedGridViewCell;
+
+        /// <summary>
+        /// The <see cref="AutoCompleteMode"/> that was active in <see cref="_activeTextControl"/>
+        /// before being deactivated when this manager was activeated.
+        /// </summary>
+        AutoCompleteMode _deactivatedAutoCompleteMode;
+
         #endregion Fields
 
         #region Delegates
@@ -248,6 +264,38 @@ namespace Extract.Utilities.Forms
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI28874", ex);
+            }
+        }
+
+        /// <summary>
+        /// Deactivates (hides) this control without the possibility of raising an exception.
+        /// <para><b>Note</b></para>
+        /// This call should only be used in the context of handling an exception.
+        /// </summary>
+        public void SafeDeactivate()
+        {
+            try
+            {
+                if (_activeTextControl != null)
+                {
+                    _activeTextControl.TextChanged -= HandleTextBoxControlTextChanged;
+                    _activeTextControl.LostFocus -= HandleFocusedTextControlLostFocus;
+                }
+
+                ReActivateTextControlAutoComplete(_activeTextControl);
+
+                _activeTextControl = null;
+                _associatedDataGridView = null;
+                _associatedGridViewCell = null;
+
+                if (Parent != null)
+                {
+                    Parent.Controls.Remove(this);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Log("ELI28901", ex);
             }
         }
 
@@ -401,6 +449,15 @@ namespace Extract.Utilities.Forms
                 TextBoxBase focusedTextControl = (TextBoxBase)sender;
                 focusedTextControl.TextChanged += HandleTextBoxControlTextChanged;
                 focusedTextControl.LostFocus += HandleFocusedTextControlLostFocus;
+
+                // If a DataGridViewCell is being edited, keep track of the associated table and
+                // cell because special handling may be required to apply the text.
+                var editingControl = sender as IDataGridViewEditingControl;
+                if (editingControl != null)
+                {
+                    _associatedDataGridView = editingControl.EditingControlDataGridView;
+                    _associatedGridViewCell = _associatedDataGridView.CurrentCell;
+                }
             }
             catch (Exception ex)
             {
@@ -485,6 +542,16 @@ namespace Extract.Utilities.Forms
                 // If smart tag creation or edit was detected, activate the smart tag control.
                 if (smartTagPosition >= 0)
                 {
+                    // If text control has auto-complete of its own, it needs to be deactivated
+                    // otherwise it will conflict with the auto-complete list that will be displayed
+                    // here.
+                    var textBox = textControl as TextBox;
+                    if (textBox != null && textBox.AutoCompleteMode != AutoCompleteMode.None)
+                    {
+                        _deactivatedAutoCompleteMode = textBox.AutoCompleteMode;
+                        textBox.AutoCompleteMode = AutoCompleteMode.None;
+                    }
+
                     // Initialize the font and background color so that the control blends in with
                     // the active text control.
                     Font = textControl.Font;
@@ -653,11 +720,18 @@ namespace Extract.Utilities.Forms
 
                         ApplyText(Text);
                     }
-                    
+
+                    ReActivateTextControlAutoComplete(textControl);
+
                     // Give the active text control focus before removing the smart tag control so
                     // that focus doesn't jump elsewhere in the process.
                     textControl.Focus();
                     textControl.Controls.Remove(this);
+
+                    // Don't clear the DataGridView controls until after the focus call which
+                    // otherwise would inappropriately restore these values.
+                    _associatedDataGridView = null;
+                    _associatedGridViewCell = null;
                 }
                 // The smart tag manager will remain active-- update the active text control's text
                 // and check the position of the smart tag control to ensure the text lines up
@@ -672,7 +746,12 @@ namespace Extract.Utilities.Forms
             {
                 ExtractException ee =
                     new ExtractException("ELI28880", "Failed to insert smart tag!", ex);
-                ee.Display();
+                // I have run into a situation where this was thrown (undo operation while smart tag
+                // control was active) I think I solved that, but I also don't think we need to be
+                // alarmist in this case. The situation I encountered I wasn't expecting a smart tag
+                // and if that's the case, there may not really be any bad behavior. The log will
+                // help investigate in case there is any bad behavior.
+                ee.Log();
 
                 // In case of an exception, ensure the smart tag window doesn't hang around.
                 SafeDeactivate();
@@ -688,13 +767,26 @@ namespace Extract.Utilities.Forms
         {
             TextBoxBase textControl = (TextBoxBase)Parent;
 
-            textControl.Text =
-                        textControl.Text.Remove(_activeTextPosition, _activeTextLength);
-            textControl.Text =
-                textControl.Text.Insert(_activeTextPosition, text);
+            // If a DataGridViewCell was being edited, the edit was taking place in a separate
+            // editing control which may no longer be active. If it is not, the text needs to be
+            // applied to the cell itelf.
+            if (_associatedGridViewCell != null && _associatedDataGridView.EditingControl == null)
+            {
+                string value = _associatedGridViewCell.Value.ToString();
+                value = value.Remove(_activeTextPosition, _activeTextLength);
+                value = value.Insert(_activeTextPosition, text);
+                _associatedGridViewCell.Value = value;
+            }
+            else
+            {
+                textControl.Text =
+                            textControl.Text.Remove(_activeTextPosition, _activeTextLength);
+                textControl.Text =
+                    textControl.Text.Insert(_activeTextPosition, text);
 
-            _activeTextLength = text.Length;
-            textControl.Select(_activeTextPosition + _activeTextLength, 0);
+                _activeTextLength = text.Length;
+                textControl.Select(_activeTextPosition + _activeTextLength, 0);
+            }
         }
 
         /// <summary>
@@ -736,30 +828,29 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
-        /// Deactivates (hides) this control without the possibility of raising an exception.
-        /// <para><b>Note</b></para>
-        /// This call should only be used in the context of handling an exception.
+        /// Re-activates any auto-complete that had been active for the text control before the
+        /// smart-text manager activated.
         /// </summary>
-        void SafeDeactivate()
+        void ReActivateTextControlAutoComplete(TextBoxBase textControl)
         {
             try
             {
-                if (_activeTextControl != null)
+                if (_deactivatedAutoCompleteMode != AutoCompleteMode.None)
                 {
-                    _activeTextControl.TextChanged -= HandleTextBoxControlTextChanged;
-                    _activeTextControl.LostFocus -= HandleFocusedTextControlLostFocus;
-                }
-
-                _activeTextControl = null;
-                
-                if (Parent != null)
-                {
-                    Parent.Controls.Remove(this);
+                    var textBox = textControl as TextBox;
+                    if (textBox != null)
+                    {
+                        textBox.AutoCompleteMode = _deactivatedAutoCompleteMode;
+                    }
                 }
             }
             catch (Exception ex)
             {
-                ExtractException.Log("ELI28901", ex);   
+                throw ex.AsExtract("ELI35391");
+            }
+            finally
+            {
+                _deactivatedAutoCompleteMode = AutoCompleteMode.None;
             }
         }
 

@@ -43,14 +43,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._labIDLabel = new System.Windows.Forms.Label();
             this._labID = new Extract.DataEntry.DataEntryTextBox();
             this._testComponentTable = new Extract.DataEntry.DataEntryTable();
-            this._componentName = new Extract.DataEntry.DataEntryTableColumn();
-            this._testCode = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentValue = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentUnits = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentRefRange = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentFlag = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentComment = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentOriginalName = new Extract.DataEntry.DataEntryTableColumn();
             this._patientInfoGroupBox = new Extract.DataEntry.DataEntryGroupBox();
             this._epicPatientNameLabel = new System.Windows.Forms.Label();
             this._labResultPatientNameLabel = new System.Windows.Forms.Label();
@@ -74,7 +66,15 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._copyToPhysicianLabel = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this._orderingPhysicianTable = new Extract.DataEntry.DataEntryTable();
+            this._orderingPhysicianLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._orderingPhysicianFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._orderingPhysicianMiddleName = new Extract.DataEntry.DataEntryTableColumn();
+            this._orderingPhysicianCodeColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._physicianTable = new Extract.DataEntry.DataEntryTable();
+            this._physicianLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._physicianFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._physicianMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._physicianCode = new Extract.DataEntry.DataEntryTableColumn();
             this._testDetailsGroupBox = new System.Windows.Forms.GroupBox();
             this._orderNumberLabel = new System.Windows.Forms.Label();
             this._orderNumber = new Extract.DataEntry.DataEntryTextBox();
@@ -93,14 +93,14 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._filename = new Extract.DataEntry.DataEntryTextBox();
             this._copyButton = new Extract.DataEntry.DataEntryCopyButton();
             this._messageSequenceNumberFile = new Extract.DataEntry.DataEntryTextBox();
-            this._orderingPhysicianLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._orderingPhysicianFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._orderingPhysicianMiddleName = new Extract.DataEntry.DataEntryTableColumn();
-            this._orderingPhysicianCodeColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._physicianLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._physicianFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._physicianMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._physicianCode = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentName = new Extract.DataEntry.DataEntryTableColumn();
+            this._testCode = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentValue = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentUnits = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentRefRange = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentFlag = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentComment = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentOriginalName = new Extract.DataEntry.DataEntryTableColumn();
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).BeginInit();
             this._patientInfoGroupBox.SuspendLayout();
@@ -285,91 +285,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._testComponentTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._testComponentTable.Size = new System.Drawing.Size(581, 288);
             this._testComponentTable.TabIndex = 7;
-            // 
-            // _componentName
-            // 
-            this._componentName.AttributeName = ".";
-            this._componentName.AutoUpdateQuery = resources.GetString("_componentName.AutoUpdateQuery");
-            this._componentName.FillWeight = 80F;
-            this._componentName.HeaderText = "Test Name";
-            this._componentName.Name = "_componentName";
-            this._componentName.SmartHintsEnabled = true;
-            this._componentName.ValidationErrorMessage = "Test name is invalid for the current order";
-            this._componentName.ValidationQuery = resources.GetString("_componentName.ValidationQuery");
-            // 
-            // _testCode
-            // 
-            this._testCode.AttributeName = "TestCode";
-            this._testCode.AutoUpdateQuery = resources.GetString("_testCode.AutoUpdateQuery");
-            this._testCode.FillWeight = 40F;
-            this._testCode.HeaderText = "Code";
-            this._testCode.Name = "_testCode";
-            this._testCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._testCode.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
-            this._testCode.ValidationErrorMessage = "Test code is invalid for the current order.";
-            this._testCode.ValidationQuery = resources.GetString("_testCode.ValidationQuery");
-            // 
-            // _componentValue
-            // 
-            this._componentValue.AttributeName = "Value";
-            this._componentValue.FillWeight = 40F;
-            this._componentValue.HeaderText = "Value";
-            this._componentValue.Name = "_componentValue";
-            this._componentValue.SmartHintsEnabled = true;
-            this._componentValue.ValidationErrorMessage = "Test value must be specified.";
-            this._componentValue.ValidationPattern = "\\S";
-            // 
-            // _componentUnits
-            // 
-            this._componentUnits.AttributeName = "Units";
-            this._componentUnits.FillWeight = 40F;
-            this._componentUnits.HeaderText = "Units";
-            this._componentUnits.Name = "_componentUnits";
-            this._componentUnits.SmartHintsEnabled = true;
-            this._componentUnits.ValidationCorrectsCase = false;
-            this._componentUnits.ValidationErrorMessage = "Unrecognized unit designation.";
-            this._componentUnits.ValidationQuery = "[BLANK]\r\n<SQL>SELECT * FROM Unit ORDER BY Unit</SQL>";
-            // 
-            // _componentRefRange
-            // 
-            this._componentRefRange.AttributeName = "Range";
-            this._componentRefRange.FillWeight = 65F;
-            this._componentRefRange.HeaderText = "Ref. Range";
-            this._componentRefRange.Name = "_componentRefRange";
-            this._componentRefRange.SmartHintsEnabled = true;
-            this._componentRefRange.ValidationErrorMessage = "Value is not allowed.";
-            // 
-            // _componentFlag
-            // 
-            this._componentFlag.AttributeName = "Flag";
-            this._componentFlag.FillWeight = 35F;
-            this._componentFlag.HeaderText = "Flag";
-            this._componentFlag.Name = "_componentFlag";
-            this._componentFlag.SmartHintsEnabled = true;
-            this._componentFlag.UseComboBoxCells = true;
-            this._componentFlag.ValidationErrorMessage = "Flag does not correspond with test value and range";
-            this._componentFlag.ValidationQuery = resources.GetString("_componentFlag.ValidationQuery");
-            // 
-            // _componentComment
-            // 
-            this._componentComment.AttributeName = "Comment";
-            this._componentComment.FillWeight = 50F;
-            this._componentComment.HeaderText = "Comment";
-            this._componentComment.Name = "_componentComment";
-            this._componentComment.RemoveNewLineChars = false;
-            this._componentComment.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._componentComment.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
-            this._componentComment.ValidationErrorMessage = "Bad value";
-            // 
-            // _componentOriginalName
-            // 
-            this._componentOriginalName.AttributeName = "OriginalName";
-            this._componentOriginalName.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>..</Attribute></Query>";
-            this._componentOriginalName.HeaderText = "Test Name On Document";
-            this._componentOriginalName.Name = "_componentOriginalName";
-            this._componentOriginalName.ValidationErrorMessage = "Missing AKA in the Order Mapper Database";
-            this._componentOriginalName.ValidationQuery = "";
-            this._componentOriginalName.Visible = false;
             // 
             // _patientInfoGroupBox
             // 
@@ -675,6 +590,54 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._orderingPhysicianTable.Size = new System.Drawing.Size(581, 45);
             this._orderingPhysicianTable.TabIndex = 1;
             // 
+            // _orderingPhysicianLastNameColumn
+            // 
+            this._orderingPhysicianLastNameColumn.AttributeName = "Last";
+            this._orderingPhysicianLastNameColumn.AutoUpdateQuery = "<SQL>SELECT LastName FROM Physician WHERE Code = SUBSTRING(<Attribute>../Code</At" +
+    "tribute>,1,8)</SQL>";
+            this._orderingPhysicianLastNameColumn.HeaderText = "Last Name";
+            this._orderingPhysicianLastNameColumn.Name = "_orderingPhysicianLastNameColumn";
+            this._orderingPhysicianLastNameColumn.ValidationErrorMessage = "";
+            this._orderingPhysicianLastNameColumn.ValidationQuery = "<SQL>SELECT LastName FROM Physician ORDER BY LastName</SQL>";
+            // 
+            // _orderingPhysicianFirstNameColumn
+            // 
+            this._orderingPhysicianFirstNameColumn.AttributeName = "First";
+            this._orderingPhysicianFirstNameColumn.AutoUpdateQuery = "<SQL>SELECT FirstName FROM Physician WHERE Code = SUBSTRING(<Attribute>../Code</A" +
+    "ttribute>,1,8)</SQL>";
+            this._orderingPhysicianFirstNameColumn.FillWeight = 75F;
+            this._orderingPhysicianFirstNameColumn.HeaderText = "First Name";
+            this._orderingPhysicianFirstNameColumn.Name = "_orderingPhysicianFirstNameColumn";
+            this._orderingPhysicianFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._orderingPhysicianFirstNameColumn.ValidationErrorMessage = "";
+            this._orderingPhysicianFirstNameColumn.ValidationQuery = "<SQL>SELECT FirstName FROM Physician WHERE LastName LIKE SUBSTRING(<Attribute>../" +
+    "Last</Attribute>,1,50) ORDER BY FirstName</SQL>";
+            // 
+            // _orderingPhysicianMiddleName
+            // 
+            this._orderingPhysicianMiddleName.AttributeName = "Middle";
+            this._orderingPhysicianMiddleName.AutoUpdateQuery = "<SQL>SELECT MiddleName FROM Physician WHERE Code = SUBSTRING(<Attribute>../Code</" +
+    "Attribute>,1,8)</SQL>";
+            this._orderingPhysicianMiddleName.FillWeight = 50F;
+            this._orderingPhysicianMiddleName.HeaderText = "Middle Name";
+            this._orderingPhysicianMiddleName.Name = "_orderingPhysicianMiddleName";
+            this._orderingPhysicianMiddleName.ValidationErrorMessage = "";
+            this._orderingPhysicianMiddleName.ValidationQuery = "<SQL>SELECT MiddleName FROM Physician WHERE LastName LIKE SUBSTRING(<Attribute>.." +
+    "/Last</Attribute>,1,50) AND FirstName LIKE SUBSTRING(<Attribute>../First</Attrib" +
+    "ute>,1,30) ORDER BY MiddleName</SQL>";
+            // 
+            // _orderingPhysicianCodeColumn
+            // 
+            this._orderingPhysicianCodeColumn.AttributeName = "Code";
+            this._orderingPhysicianCodeColumn.AutoUpdateQuery = resources.GetString("_orderingPhysicianCodeColumn.AutoUpdateQuery");
+            this._orderingPhysicianCodeColumn.FillWeight = 30F;
+            this._orderingPhysicianCodeColumn.HeaderText = "Code";
+            this._orderingPhysicianCodeColumn.Name = "_orderingPhysicianCodeColumn";
+            this._orderingPhysicianCodeColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._orderingPhysicianCodeColumn.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
+            this._orderingPhysicianCodeColumn.ValidationErrorMessage = "Physician code is missing or does not correspond with the specified name.";
+            this._orderingPhysicianCodeColumn.ValidationQuery = resources.GetString("_orderingPhysicianCodeColumn.ValidationQuery");
+            // 
             // _physicianTable
             // 
             this._physicianTable.AllowDrop = true;
@@ -700,6 +663,54 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._physicianTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._physicianTable.Size = new System.Drawing.Size(581, 90);
             this._physicianTable.TabIndex = 2;
+            // 
+            // _physicianLastNameColumn
+            // 
+            this._physicianLastNameColumn.AttributeName = "Last";
+            this._physicianLastNameColumn.AutoUpdateQuery = "<SQL>SELECT  LastName FROM Physician WHERE Code = SUBSTRING(<Attribute>../Code</A" +
+    "ttribute>,1,8)</SQL>";
+            this._physicianLastNameColumn.HeaderText = "Last Name";
+            this._physicianLastNameColumn.Name = "_physicianLastNameColumn";
+            this._physicianLastNameColumn.ValidationErrorMessage = "";
+            this._physicianLastNameColumn.ValidationQuery = "<SQL>SELECT LastName FROM Physician ORDER BY LastName</SQL>";
+            // 
+            // _physicianFirstNameColumn
+            // 
+            this._physicianFirstNameColumn.AttributeName = "First";
+            this._physicianFirstNameColumn.AutoUpdateQuery = "<SQL>SELECT FirstName FROM Physician WHERE Code = SUBSTRING(<Attribute>../Code</A" +
+    "ttribute>,1,8)</SQL>";
+            this._physicianFirstNameColumn.FillWeight = 75F;
+            this._physicianFirstNameColumn.HeaderText = "First Name";
+            this._physicianFirstNameColumn.Name = "_physicianFirstNameColumn";
+            this._physicianFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._physicianFirstNameColumn.ValidationErrorMessage = "";
+            this._physicianFirstNameColumn.ValidationQuery = "<SQL>SELECT FirstName FROM Physician WHERE LastName LIKE SUBSTRING(<Attribute>../" +
+    "Last</Attribute>,1,50) ORDER BY FirstName</SQL>";
+            // 
+            // _physicianMiddleNameColumn
+            // 
+            this._physicianMiddleNameColumn.AttributeName = "Middle";
+            this._physicianMiddleNameColumn.AutoUpdateQuery = "<SQL>SELECT MiddleName FROM Physician WHERE Code = SUBSTRING(<Attribute>../Code</" +
+    "Attribute>,1,8)</SQL>";
+            this._physicianMiddleNameColumn.FillWeight = 50F;
+            this._physicianMiddleNameColumn.HeaderText = "Middle Name";
+            this._physicianMiddleNameColumn.Name = "_physicianMiddleNameColumn";
+            this._physicianMiddleNameColumn.ValidationErrorMessage = "";
+            this._physicianMiddleNameColumn.ValidationQuery = "<SQL>SELECT MiddleName FROM Physician WHERE LastName LIKE SUBSTRING(<Attribute>.." +
+    "/Last</Attribute>,1,50) AND FirstName LIKE SUBSTRING(<Attribute>../First</Attrib" +
+    "ute>,1,30) ORDER BY MiddleName</SQL>";
+            // 
+            // _physicianCode
+            // 
+            this._physicianCode.AttributeName = "Code";
+            this._physicianCode.AutoUpdateQuery = resources.GetString("_physicianCode.AutoUpdateQuery");
+            this._physicianCode.FillWeight = 30F;
+            this._physicianCode.HeaderText = "Code";
+            this._physicianCode.Name = "_physicianCode";
+            this._physicianCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._physicianCode.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
+            this._physicianCode.ValidationErrorMessage = "Physician code is missing or does not correspond with the specified name.";
+            this._physicianCode.ValidationQuery = resources.GetString("_physicianCode.ValidationQuery");
             // 
             // _testDetailsGroupBox
             // 
@@ -946,101 +957,92 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._messageSequenceNumberFile.ValidationErrorMessage = "Invalid value";
             this._messageSequenceNumberFile.Visible = false;
             // 
-            // _orderingPhysicianLastNameColumn
+            // _componentName
             // 
-            this._orderingPhysicianLastNameColumn.AttributeName = "Last";
-            this._orderingPhysicianLastNameColumn.AutoUpdateQuery = "<SQL>SELECT LastName FROM Physician WHERE Code = SUBSTRING(<Attribute>../Code</At" +
-    "tribute>,1,8)</SQL>";
-            this._orderingPhysicianLastNameColumn.HeaderText = "Last Name";
-            this._orderingPhysicianLastNameColumn.Name = "_orderingPhysicianLastNameColumn";
-            this._orderingPhysicianLastNameColumn.ValidationErrorMessage = "";
-            this._orderingPhysicianLastNameColumn.ValidationQuery = "<SQL>SELECT LastName FROM Physician ORDER BY LastName</SQL>";
+            this._componentName.AttributeName = ".";
+            this._componentName.AutoUpdateQuery = resources.GetString("_componentName.AutoUpdateQuery");
+            this._componentName.FillWeight = 80F;
+            this._componentName.HeaderText = "Test Name";
+            this._componentName.Name = "_componentName";
+            this._componentName.SmartHintsEnabled = true;
+            this._componentName.ValidationErrorMessage = "Test name is invalid for the current order";
+            this._componentName.ValidationQuery = resources.GetString("_componentName.ValidationQuery");
             // 
-            // _orderingPhysicianFirstNameColumn
+            // _testCode
             // 
-            this._orderingPhysicianFirstNameColumn.AttributeName = "First";
-            this._orderingPhysicianFirstNameColumn.AutoUpdateQuery = "<SQL>SELECT FirstName FROM Physician WHERE Code = SUBSTRING(<Attribute>../Code</A" +
-    "ttribute>,1,8)</SQL>";
-            this._orderingPhysicianFirstNameColumn.FillWeight = 75F;
-            this._orderingPhysicianFirstNameColumn.HeaderText = "First Name";
-            this._orderingPhysicianFirstNameColumn.Name = "_orderingPhysicianFirstNameColumn";
-            this._orderingPhysicianFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderingPhysicianFirstNameColumn.ValidationErrorMessage = "";
-            this._orderingPhysicianFirstNameColumn.ValidationQuery = "<SQL>SELECT FirstName FROM Physician WHERE LastName LIKE SUBSTRING(<Attribute>../" +
-    "Last</Attribute>,1,50) ORDER BY FirstName</SQL>";
+            this._testCode.AttributeName = "TestCode";
+            this._testCode.AutoUpdateQuery = resources.GetString("_testCode.AutoUpdateQuery");
+            this._testCode.FillWeight = 40F;
+            this._testCode.HeaderText = "Code";
+            this._testCode.Name = "_testCode";
+            this._testCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._testCode.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
+            this._testCode.ValidationErrorMessage = "Test code is invalid for the current order.";
+            this._testCode.ValidationQuery = resources.GetString("_testCode.ValidationQuery");
             // 
-            // _orderingPhysicianMiddleName
+            // _componentValue
             // 
-            this._orderingPhysicianMiddleName.AttributeName = "Middle";
-            this._orderingPhysicianMiddleName.AutoUpdateQuery = "<SQL>SELECT MiddleName FROM Physician WHERE Code = SUBSTRING(<Attribute>../Code</" +
-    "Attribute>,1,8)</SQL>";
-            this._orderingPhysicianMiddleName.FillWeight = 50F;
-            this._orderingPhysicianMiddleName.HeaderText = "Middle Name";
-            this._orderingPhysicianMiddleName.Name = "_orderingPhysicianMiddleName";
-            this._orderingPhysicianMiddleName.ValidationErrorMessage = "";
-            this._orderingPhysicianMiddleName.ValidationQuery = "<SQL>SELECT MiddleName FROM Physician WHERE LastName LIKE SUBSTRING(<Attribute>.." +
-    "/Last</Attribute>,1,50) AND FirstName LIKE SUBSTRING(<Attribute>../First</Attrib" +
-    "ute>,1,30) ORDER BY MiddleName</SQL>";
+            this._componentValue.AttributeName = "Value";
+            this._componentValue.FillWeight = 40F;
+            this._componentValue.HeaderText = "Value";
+            this._componentValue.Name = "_componentValue";
+            this._componentValue.SmartHintsEnabled = true;
+            this._componentValue.ValidationErrorMessage = "Test value must be specified.";
+            this._componentValue.ValidationPattern = "\\S";
             // 
-            // _orderingPhysicianCodeColumn
+            // _componentUnits
             // 
-            this._orderingPhysicianCodeColumn.AttributeName = "Code";
-            this._orderingPhysicianCodeColumn.AutoUpdateQuery = resources.GetString("_orderingPhysicianCodeColumn.AutoUpdateQuery");
-            this._orderingPhysicianCodeColumn.FillWeight = 30F;
-            this._orderingPhysicianCodeColumn.HeaderText = "Code";
-            this._orderingPhysicianCodeColumn.Name = "_orderingPhysicianCodeColumn";
-            this._orderingPhysicianCodeColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderingPhysicianCodeColumn.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
-            this._orderingPhysicianCodeColumn.ValidationErrorMessage = "Physician code is missing or does not correspond with the specified name.";
-            this._orderingPhysicianCodeColumn.ValidationQuery = resources.GetString("_orderingPhysicianCodeColumn.ValidationQuery");
+            this._componentUnits.AttributeName = "Units";
+            this._componentUnits.FillWeight = 40F;
+            this._componentUnits.HeaderText = "Units";
+            this._componentUnits.Name = "_componentUnits";
+            this._componentUnits.SmartHintsEnabled = true;
+            this._componentUnits.ValidationCorrectsCase = false;
+            this._componentUnits.ValidationErrorMessage = "Unrecognized unit designation.";
+            this._componentUnits.ValidationQuery = "[BLANK]\r\n<SQL>SELECT * FROM Unit ORDER BY Unit</SQL>";
             // 
-            // _physicianLastNameColumn
+            // _componentRefRange
             // 
-            this._physicianLastNameColumn.AttributeName = "Last";
-            this._physicianLastNameColumn.AutoUpdateQuery = "<SQL>SELECT  LastName FROM Physician WHERE Code = SUBSTRING(<Attribute>../Code</A" +
-    "ttribute>,1,8)</SQL>";
-            this._physicianLastNameColumn.HeaderText = "Last Name";
-            this._physicianLastNameColumn.Name = "_physicianLastNameColumn";
-            this._physicianLastNameColumn.ValidationErrorMessage = "";
-            this._physicianLastNameColumn.ValidationQuery = "<SQL>SELECT LastName FROM Physician ORDER BY LastName</SQL>";
+            this._componentRefRange.AttributeName = "Range";
+            this._componentRefRange.FillWeight = 65F;
+            this._componentRefRange.HeaderText = "Ref. Range";
+            this._componentRefRange.Name = "_componentRefRange";
+            this._componentRefRange.SmartHintsEnabled = true;
+            this._componentRefRange.ValidationErrorMessage = "Value is not allowed.";
             // 
-            // _physicianFirstNameColumn
+            // _componentFlag
             // 
-            this._physicianFirstNameColumn.AttributeName = "First";
-            this._physicianFirstNameColumn.AutoUpdateQuery = "<SQL>SELECT FirstName FROM Physician WHERE Code = SUBSTRING(<Attribute>../Code</A" +
-    "ttribute>,1,8)</SQL>";
-            this._physicianFirstNameColumn.FillWeight = 75F;
-            this._physicianFirstNameColumn.HeaderText = "First Name";
-            this._physicianFirstNameColumn.Name = "_physicianFirstNameColumn";
-            this._physicianFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._physicianFirstNameColumn.ValidationErrorMessage = "";
-            this._physicianFirstNameColumn.ValidationQuery = "<SQL>SELECT FirstName FROM Physician WHERE LastName LIKE SUBSTRING(<Attribute>../" +
-    "Last</Attribute>,1,50) ORDER BY FirstName</SQL>";
+            this._componentFlag.AttributeName = "Flag";
+            this._componentFlag.FillWeight = 35F;
+            this._componentFlag.HeaderText = "Flag";
+            this._componentFlag.Name = "_componentFlag";
+            this._componentFlag.SmartHintsEnabled = true;
+            this._componentFlag.UseComboBoxCells = true;
+            this._componentFlag.ValidationErrorMessage = "Flag does not correspond with test value and range";
+            this._componentFlag.ValidationQuery = resources.GetString("_componentFlag.ValidationQuery");
             // 
-            // _physicianMiddleNameColumn
+            // _componentComment
             // 
-            this._physicianMiddleNameColumn.AttributeName = "Middle";
-            this._physicianMiddleNameColumn.AutoUpdateQuery = "<SQL>SELECT MiddleName FROM Physician WHERE Code = SUBSTRING(<Attribute>../Code</" +
-    "Attribute>,1,8)</SQL>";
-            this._physicianMiddleNameColumn.FillWeight = 50F;
-            this._physicianMiddleNameColumn.HeaderText = "Middle Name";
-            this._physicianMiddleNameColumn.Name = "_physicianMiddleNameColumn";
-            this._physicianMiddleNameColumn.ValidationErrorMessage = "";
-            this._physicianMiddleNameColumn.ValidationQuery = "<SQL>SELECT MiddleName FROM Physician WHERE LastName LIKE SUBSTRING(<Attribute>.." +
-    "/Last</Attribute>,1,50) AND FirstName LIKE SUBSTRING(<Attribute>../First</Attrib" +
-    "ute>,1,30) ORDER BY MiddleName</SQL>";
+            this._componentComment.AttributeName = "Comment";
+            this._componentComment.FillWeight = 50F;
+            this._componentComment.HeaderText = "Comment";
+            this._componentComment.Name = "_componentComment";
+            this._componentComment.RemoveNewLineChars = false;
+            this._componentComment.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._componentComment.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
+            this._componentComment.ValidationErrorMessage = "Bad value";
             // 
-            // _physicianCode
+            // _componentOriginalName
             // 
-            this._physicianCode.AttributeName = "Code";
-            this._physicianCode.AutoUpdateQuery = resources.GetString("_physicianCode.AutoUpdateQuery");
-            this._physicianCode.FillWeight = 30F;
-            this._physicianCode.HeaderText = "Code";
-            this._physicianCode.Name = "_physicianCode";
-            this._physicianCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._physicianCode.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
-            this._physicianCode.ValidationErrorMessage = "Physician code is missing or does not correspond with the specified name.";
-            this._physicianCode.ValidationQuery = resources.GetString("_physicianCode.ValidationQuery");
+            this._componentOriginalName.AttributeName = "OriginalName";
+            this._componentOriginalName.AutoUpdateQuery = "<Expression>\r\n(<Attribute Name=\'OriginalName\'>.</Attribute> == \'\') ? <Attribute S" +
+    "patialMode=\'Force\'>..</Attribute> : <OriginalName SpatialMode=\'Force\'/>\r\n</Expre" +
+    "ssion>";
+            this._componentOriginalName.HeaderText = "Test Name On Document";
+            this._componentOriginalName.Name = "_componentOriginalName";
+            this._componentOriginalName.ValidationErrorMessage = "Missing AKA in the Order Mapper Database";
+            this._componentOriginalName.ValidationQuery = "";
+            this._componentOriginalName.Visible = false;
             // 
             // StandardLabDEPanel
             // 
@@ -1138,14 +1140,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
         private Extract.DataEntry.DataEntryTableColumn _patientLastNameColumn;
         private Extract.DataEntry.DataEntryTableColumn _patientSuffixColumn;
         private Extract.DataEntry.DataEntryTextBox _messageSequenceNumberFile;
-        private DataEntryTableColumn _componentName;
-        private DataEntryTableColumn _testCode;
-        private DataEntryTableColumn _componentValue;
-        private DataEntryTableColumn _componentUnits;
-        private DataEntryTableColumn _componentRefRange;
-        private DataEntryTableColumn _componentFlag;
-        private DataEntryTableColumn _componentComment;
-        private DataEntryTableColumn _componentOriginalName;
         private DataEntryTableColumn _testName;
         private DataEntryTableColumn _orderCode;
         private DataEntryTableColumn _testID;
@@ -1159,5 +1153,13 @@ namespace Extract.DataEntry.DEP.StandardLabDE
         private DataEntryTableColumn _physicianFirstNameColumn;
         private DataEntryTableColumn _physicianMiddleNameColumn;
         private DataEntryTableColumn _physicianCode;
+        private DataEntryTableColumn _componentName;
+        private DataEntryTableColumn _testCode;
+        private DataEntryTableColumn _componentValue;
+        private DataEntryTableColumn _componentUnits;
+        private DataEntryTableColumn _componentRefRange;
+        private DataEntryTableColumn _componentFlag;
+        private DataEntryTableColumn _componentComment;
+        private DataEntryTableColumn _componentOriginalName;
     }
 }

@@ -1163,23 +1163,14 @@ namespace Extract.SQLCDBEditor
                     _queryScintillaBox.Lexing.Colorize();
                 }
 
-                // Check for unique constraints
-                bool hasUniqueContraint = false;
-                foreach (Constraint c in _resultsTable.Constraints)
-                {
-                    // Check if current constraint is unique					
-                    if (c is UniqueConstraint)
-                    {
-                        // set Flag to true;
-                        hasUniqueContraint = true;
-                        break;
-                    }
-                }
-
-                // Set the ReadOnly and AllowUserToAddRows so that if no unique constraint
-                // the grid cannot be modified and rows cannot be added
-                _resultsGrid.ReadOnly = !hasUniqueContraint;
-                _resultsGrid.AllowUserToAddRows = hasUniqueContraint;
+                // [DataEntry:882, 885]
+                // Make the table read only if there is no primary key. Without a primary key, rows
+                // cannot be deleted and modified data cannot be merged with changes from other
+                // tables.
+                _resultsGrid.ReadOnly =
+                    _primaryKeyColumnNames == null || _primaryKeyColumnNames.Count() == 0;
+                _resultsGrid.AllowUserToAddRows = !_resultsGrid.ReadOnly;
+                _resultsGrid.AllowUserToDeleteRows = !_resultsGrid.ReadOnly;
 
                 // [DotNetRCAndUtils:826]
                 // Before using _resultsTable, the constraints need to be cleared so that if new
@@ -2201,7 +2192,12 @@ namespace Extract.SQLCDBEditor
             }
             else if (resultsAreCurrent)
             {
-                if (!QueryModifiesData)
+                if (QueryAndResultsType == SQLCDBEditor.QueryAndResultsType.Table && _resultsGrid.ReadOnly)
+                {
+                    _resultsStatusLabel.Text = "Table is not editable because it lacks a primary key.";
+                    _resultsStatusLabel.Visible = true;
+                }
+                else if (!QueryModifiesData)
                 {
                     _executeQueryButton.Enabled = false;
                     _resultsStatusLabel.Visible = false;
