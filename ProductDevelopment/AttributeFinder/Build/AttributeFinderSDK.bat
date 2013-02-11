@@ -56,6 +56,9 @@ IF "%BUILD_FROM_SVN%"=="YES" (
 	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\..\..\Common" "$/Engineering/ProductDevelopment/Common" %1
 	CD ..\AttributeFinder\Build
 	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\" "$/Engineering/ProductDevelopment/AttributeFinder/Build" %1
+	CD %BUILD_DRIVE%\SharePoint\Build
+	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\" "$/SharePoint/Build" %1
+
 )
 
 Rem Remove previous build directory if it exists
@@ -73,14 +76,20 @@ set VERSION_NUMBER=%VERSION_NUMBER:FlexIndex Ver. =%
 IF NOT EXIST %BUILD_DRIVE%%BUILD_DIRECTORY% MKDIR %BUILD_DRIVE%%BUILD_DIRECTORY%
 SET LOGFILE=%BUILD_DRIVE%%BUILD_DIRECTORY%\%VERSION_NUMBER% AttributeFinderSDK.log
 SET LOGFILE2=%BUILD_DRIVE%%BUILD_DIRECTORY%\%VERSION_NUMBER% RDT.log
+SET LOGFILE3=%BUILD_DRIVE%%BUILD_DIRECTORY%\%VERSION_NUMBER% FlexIDSSP.log
 
 REM Copy the license file to the release folder for EncryptFile will work
 IF NOT EXIST %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%\Engineering\Binaries\Release MKDIR %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%\Engineering\Binaries\Release
 copy %BUILD_DRIVE%\BuildMachine_RDT*.lic %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%\Engineering\Binaries\Release\
 
+CD %BUILD_DRIVE%\AttributeFinder\Build
 nmake /F AttributeFinderSDK.mak BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" %BuildScriptTarget% 2>&1 | tee "%LOGFILE%"
+
 IF "%BuildScriptTarget%"=="DoBuilds" GOTO exit_script
 nmake /F RuleDevelopmentKit.mak BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" DoEverything 2>&1 | tee "%LOGFILE2%"
+
+CD %BUILD_DRIVE%\SharePoint\Build
+nmake /F FlexIDSSP.mak BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" BuildAfterAF 2>&1 | tee "%LOGFILE3%"
 
 :exit_script
 
