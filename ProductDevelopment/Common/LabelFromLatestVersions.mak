@@ -8,6 +8,7 @@ LabelCommonDir:
 	$(Label) $$/Engineering/ProductDevelopment/AFIntegrations/Laserfiche "$(LaserficheVersion)"
 	$(Label) $$/Engineering/ProductDevelopment/AFIntegrations/NetDMS "$(FlexIDSNetDMSVersion)"
 	$(Label) $$/SharePoint "$(FlexIDSSPVersion)"
+	$(Label) $$/SharePoint "$(FlexIndexVersion)"
 	$(Label) "$$/Engineering/ProductDevelopment/IDShieldOffice" "$(IDShieldOfficeVersion)"
 	$(Label) "$$/Engineering/ProductDevelopment/DataEntry" "$(DataEntryVersion)"
 	$(Label) "$$/Engineering/ProductDevelopment/DataEntry/LabDE" "$(LabDEVersion)"
