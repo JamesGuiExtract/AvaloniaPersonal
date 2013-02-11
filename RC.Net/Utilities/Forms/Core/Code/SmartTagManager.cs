@@ -551,6 +551,10 @@ namespace Extract.Utilities.Forms
                         _deactivatedAutoCompleteMode = textBox.AutoCompleteMode;
                         textBox.AutoCompleteMode = AutoCompleteMode.None;
                     }
+                    else
+                    {
+                        _deactivatedAutoCompleteMode = AutoCompleteMode.None;
+                    }
 
                     // Initialize the font and background color so that the control blends in with
                     // the active text control.
@@ -749,8 +753,8 @@ namespace Extract.Utilities.Forms
                 // I have run into a situation where this was thrown (undo operation while smart tag
                 // control was active) I think I solved that, but I also don't think we need to be
                 // alarmist in this case. The situation I encountered I wasn't expecting a smart tag
-                // and if that's the case, there may not really be any bad behavior. The log will
-                // help investigate in case there is any bad behavior.
+                // to be applied and in that case case, there is really not any bad behavior. The
+                // log will help investigate in case there is any bad behavior.
                 ee.Log();
 
                 // In case of an exception, ensure the smart tag window doesn't hang around.

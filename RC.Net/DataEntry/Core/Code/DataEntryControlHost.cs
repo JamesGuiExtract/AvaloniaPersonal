@@ -2115,7 +2115,7 @@ namespace Extract.DataEntry
 
                         // If the smart tag manager is active, de-activate it before the undo/redo
                         // so that it doesn't try to apply any value.
-                        if (_smartTagManager.IsActive)
+                        if (_smartTagManager != null && _smartTagManager.IsActive)
                         {
                             _smartTagManager.SafeDeactivate();
                         }
