@@ -1,0 +1,484 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.1 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.1 Testing <br>
+Final SCRs <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DataEntry #270, #574]</b> Confirm that the configuration dialog for the <b>Data 
+		Entry: Verify extracted data</b> task includes a path tags button.
+<p>
+  	   	<LI><b>[DataEntry #1172]</b> Weird Results With Angular Swipes
+        	<ul>
+			<li>Exercise verification using the <b>Peirson & Patterson</b> DEP with 
+			<b>60695947.pdf</b>.
+			<li>Select the <b>Lien Filing/Recording Book</b> field.
+			<li>Zoom in to the relevant area of the document stamp.
+			<li>Swipe the <b>17284</b> text.
+			<li>Confirm that the highlight covers the swiped area.
+			<li>Repeat the test with <b>60701083.pdf</b> and the <b>41970</b> text.
+			<li>Repeat the test with <b>60701083.pdf</b> and the <b>Subject Property 
+			County</b> field.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1173]</b> Confirm that the LabDE installation includes 
+		<b>Corepoint 4.3.2</b>.
+<p>
+  	   	<LI><b>[DataEntry #1174]</b> Verification With /ignoreDB
+        	<ul>
+			<li>Exercise data entry verification using <b>RunFPSFile</b> with the 
+			<b>/ignoreDB</b> switch.
+			<li>Confirm that prompts are provided for invalid data items.
+			<li>Confirm that <b>File - Save</b> closes the document.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1175]</b> Spatial Mode
+        	<ul>
+			<li>Exercise the <b>UITC</b> DEP.
+			<li>Review <b>Name</b> entries in the <b>Orders</b> table.
+			<li>Confirm that the <b>Name</b> entries have spatial information.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1176]</b> Accepting Highlights
+        	<ul>
+			<li>Exercise a DEP that includes text box controls.
+			<li>Navigate to a field where the found string includes text recognized 
+			with poor confidence.
+			<li>Confirm that <b>Ctrl+T</b> and <b>Ctrl+D</b> are effective in accepting 
+			or discarding the highlight.
+            		<li>Also confirm proper behavior for the associated menu items.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1177, #1179]</b> Accepting Highlights
+        	<ul>
+			<li>Exercise <b>UITC</b> DEP.
+			<li>Select a row in the <b>Order</b> table where the found string includes 
+			text recognized with poor confidence.
+			<li>Confirm that <b>Ctrl+T</b> accepts the highlight and turns it green.
+			<li>Confirm that the associated menu item is now disabled.
+			<li>Press <b>TAB</b> to navigate to the next row.
+            		<li>Confirm that the visible highlights are only for the newly selected row.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1178]</b> Show All Highlights
+        	<ul>
+			<li>Exercise <b>UITC</b> DEP.
+			<li>Select a row in the <b>Order</b> table.
+			<li>Confirm that <b>Ctrl+D</b> deletes the highlight.
+			<li>Press <b>F10</b> to view all highlights.
+            		<li>Confirm that highlights are not displayed for the row in which they 
+			were deleted.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1180]</b> Data Query With SpatialMode Only
+        	<ul>
+			<li>Exercise <b>UITC</b> DEP created after <b>1/31/2013</b>.
+			<li>Add a valid order name (i.e. <b>Glucose</b>) into the name cell of the 
+			new row in the <b>Order</b> table.
+			<li>Confirm that the entry is accepted and that no exception is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1182]</b> Verification With Multiple DEPs
+        	<ul>
+			<li>Create a Data Entry verification scenario containing at least two 
+			different DEPs and two different databases.  Demo_FlexIndex.sdf and 
+			OrderMappingDB.sdf are good choices.
+			<li>Queue documents that alternate between the DEPs.
+			<li>Confirm that verification back and forth between the SQL CE databases 
+			works correctly.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1183]</b> Override Rules Files From Config
+        	<ul>
+			<li>Exercise a Data Entry configuration (such as <b>Courts Demo</b>) that 
+			specifies a formatting rule for a text or combo box.
+			<li>Move the <b>Rules</b> folder to another location.
+			<li>Confirm that the demo fails with a meaningful exception.
+			<li>Modify the config file to reference the new location.
+			<li>Confirm that the demo works properly.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1184]</b> Verification With Pre-Fetch
+        	<ul>
+			<li>Exercise verification (using at least two threads) against a set of 
+			documents where there is existing spatial data.
+			<li>Confirm that each document presents appropriate spatial information.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1185]</b> Verification Tooltips
+        	<ul>
+			<li>Open a document for verification.
+			<li>Confirm that tooltips are provided for the selected field.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1186]</b> Undo Queries
+        	<ul>
+			<li>Open a <b>Demo_FLEXIndex</b> document for verification.
+			<li>Confirm that a return address is found and displayed.
+			<li>Select the first row in the <b>Return Address</b> table.
+			<li>Delete the row.
+			<li>Delete each other individual row.
+			<li>Press <b>Undo</b> once.
+			<li>Confirm that only the <b>ZipCode</b> field is restored.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1188] NOT FIXED ?</b> Copy and Paste In Verification
+        	<ul>
+			<li>Exercise <b>Demo_LabDE</b> verification.
+			<li>Open <b>C498.tif</b>.
+			<li>Select the <b>Ordering Physician</b> and copy the row.
+			<li>Paste the data into the new row of the <b>CopyTo</b> table.
+			<li>Confirm that the paste is effective.
+			<li>Confirm that no exception is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1192] NOT FIXED ?</b> Swiping Into Test Row
+        	<ul>
+			<li>Open a <b>Demo_LabDE</b> document for verification.
+			<li>Select the first test result row for an order.
+			<li>Delete the row.
+			<li>Insert a new row at the top of the table.
+			<li>Swipe the row that was deleted into the new row.
+			<li>Confirm that no exception is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1194] NOT FIXED ?</b> Verification Exception
+        	<ul>
+			<li>Open a document for verification.
+			<li>Select the <b>Review and select</b> tool.
+			<li>Click on a highlight and confirm that a tooltip is displayed.
+			<li>Click the highlight again to get the tooltip to disappear.
+			<li>Make the tooltip reappear by moving thr mouse away and then hovering 
+			over a green area.
+			<li>Type <b>Ctrl+D</b> to remove the highlight.
+			<li>Click on another field.
+			<li>Move the mouse back over where the deleted highlight had been displayed.
+			<li>Confirm that no <b>Error creating tooltip</b> exception is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1195]</b> Highlighting With Review and Select
+        	<ul>
+			<li>Open a document for verification.
+			<li>Select the <b>Review and select</b> tool.
+			<li>Select a field that does not contain spatial information.
+			<li>Hover over other data in the image that is captured in the panel 
+			and that has spatial information.
+			<li>Confirm that a tooltip is displayed.
+			<li>Confirm that a highlight is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1196]</b> Field Highlighting Removed
+        	<ul>
+			<li>Open a document for verification.
+			<li>Swipe or type to input data into a text box.
+			<li>Type <b>Ctrl+Z</b> without leaving the field.
+			<li>Confirm that original highlight for the field is retained.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1198] NOT FIXED ?</b> Ctrl++ and Ctrl+- Shortcuts
+        	<ul>
+			<li>Open a document for verification.
+			<li>Select the <b>Review and select</b> tool.
+			<li>Select a text box with spatial information.
+			<li>Click in the image, anywhere except on the highlight.
+			<li>Hold <b>Ctrl</b> and repeatedly press <b>+</b>.
+			<li>Confirm that each <b>+</b> is handled correctly.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1199]</b> Wait Cursor and Word Highlight Tool
+        	<ul>
+			<li>Open a document for verification.
+			<li>Make a selection that is processed with a swiping rule such as selecting 
+			an entire address table or a row.
+			<li>Swipe with the <b>word highlight</b> tool.
+			<li>Confirm that a wait cursor appears while processing the swipe.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1200]</b> Zoom Settings
+        	<ul>
+			<li>Open a document for verification.
+			<li>Confirm that <b>Tools - Options - Auto zoom</b> is set to 
+			<b>Zoom out if necessary</b>.
+			<li>Click on a highlighted data entry box whose capture area would force 
+			an automatic zoom out.
+			<li>Confirm that the automatic zoom out occurs.
+			<li>Click on another highlighted data entry box.
+			<li>Confirm that the zoom level is unchanged.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #864]</b> Demo_LabDE
+        	<ul>
+			<li>Open <b>OrderMapper.sdf</b> from <b>Demo_LabDE</b>.
+			<li>Confirm that an <b>AddAKAs</b> plugin is available.
+			<li>Click on the plugin.
+            		<li>Confirm that no exception is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #869]</b> SQLCDBEditor
+        	<ul>
+			<li>Open <b>DemoFlexIndex.sdf</b> from <b>Demo_FLEXIndex</b>.
+			<li>Review contents of the <b>DocumentType</b> table.
+			<li>Select the <b>ZipCode</b> table.
+            		<li>Confirm that no exception is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #873]</b> SQLCDBEditor
+        	<ul>
+			<li>Open <b>esfamservice.sdf</b> from 
+			<b>I:\Common\Testing\PVCS_Testing\DotNetRCAndUtils\873</b>.
+            		<li>Confirm that no exception is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #877]</b> SQLCDBEditor - Deleting All Rows In Table
+        	<ul>
+			<li>Open <b>OrderMapper.sdf</b> and select the <b>LabOrderTest</b> table.
+			<li>Execute the following query in a separate query tab.
+			<ul>
+				<li>DELETE FROM LabOrderTest
+			</ul>
+			<li>Switch back to the <b>LabOrderTest</b> tab.
+			<li>Confirm that the data is gone and that no exception is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5185]</b> Exceptions From FAM Backup
+        	<ul>
+			<li>Expand the testing configuration from 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\5185</b>.
+			<li>Exercise the FPS files for at least 30 minutes.
+			<li>Confirm that no <b>ELI10122: Cannot determine start time when the 
+			stop watch is reset!</b> exceptions are logged.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5196]</b> Confirm that the RDT includes <b>Extract-All.nunit</b> 
+		in CommonComponents.
+<p>
+  	   	<LI><b>[FlexIDSCore #5199]</b> Extract Uninstaller
+        	<ul>
+			<li>Confirm that <b>ExtractUninstaller.exe</b> exists on the root of 
+			the CD.
+			<li>Confirm that <b>ExtractUninstaller.exe</b> requests administrator 
+			privileges.
+			<li>Confirm that all Extract Systems software plus the following 
+			associated software packages are uninstalled with use.
+			<ul>
+				<li>SQL Server CE 3.5 SP2
+				<li>SQL Server 2008 R2 Native Client
+				<li>ClearImage PDK 7
+				<li>Crystal Reports 2008 Runtime SP1
+			</ul>
+			<li>Exercise the following scenarios and confirm that the uninstaller 
+			works as designed.  Exercise one of the options from a batch file using 
+			<b>Start /wait "" ExtractUninstaller /s</b> to exercise silent running.
+			<ul>
+				<li>Install ID Shield 8.0 + Extract Systems LM.
+				<li>Install FLEX Index 9.0.
+            			<li>Install LabDE 9.0.
+				<li>Install Extract LM, FLEX Index, ID Shield, LabDE and RDT 9.0.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5206]</b> MICR Finder
+        	<ul>
+			<li>De-select one or more of the <b>rotation</b> settings.
+			<li>Save settings and exit the Rule Set Editor.
+			<li>Open the RSD file and confirm that settings are persistent.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5207]</b> Box Finder
+        	<ul>
+			<li>Confirm that selecting a radio button in one column does not affect 
+			radio buttons in the other column.
+			<li>Confirm that <b>Box Finder</b> settings are persistent.
+			<ul>
+				<li>Initially select <b>All pages</b> and <b>Return spatial 
+				info</b>.
+				<li>Switch <b>All pages</b> to another choice.
+				<li>Click <b>OK</b>.
+			</ul>
+			<li>Confirm that <b>Box Finder</b> settings are persistent.
+			<ul>
+				<li>Prepare some initial settings.
+				<li>Modify the <b>Search Scope</b> radio button.
+				<li>Modify the <b>Return Value</b> settings.
+				<li>Click <b>OK</b>.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5235, #5238]</b> Silent Installs
+		<ul>
+			<li>Confirm that the single-product <b>SilentInstalls</b> batch files do 
+			not install <b>Extract Systems LM</b>.
+			<li>Confirm that <b>InstallAll.bat</b> does install <b>Extract Systems LM</b>.
+			<li>Confirm that the single-product <b>SilentInstalls</b> batch files work 
+			effectively against version 8.0 <b>after</b> explicit installation of 
+			<b>.NET 4.0</b>.
+			<li>Confirm that the single-product <b>SilentInstalls</b> batch files work 
+			effectively against version 9.0.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5240]</b> Confirm that <b>Expandable Tags</b> functionality 
+		does not do <b>case-sensitive</b> replacements.
+<p>
+  	   	<LI><b>[FlexIDSIntegrations #330, #331, #340]</b> NetDMS
+        	<ul>
+			<li>Confirm that the <b>NetDMSIntegrationInstall</b> folder includes 
+			a method of installing the <b>NetDMS</b> tasks.
+            		<li>Confirm that the <b>NetDMS: Add redactions</b> task properly expands 
+			path tag functions.
+			<li>Confirm that the NetDMS tasks now require a specific NetDMS license.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSIntegrations #339]</b> SharePoint
+        	<ul>
+			<li>Confirm that the <b>SharepointInstall</b> folder includes the following:
+			<ul>
+				<li>IDShieldForSPClient folder
+				<li>Extract.SharePoint.DataCapture.wsp
+				<li>Extract.SharePoint.Redaction.wsp
+				<li>Extract.SharePoint.wsp
+				<li>InstallDataCaptureForSharePoint.ps1
+				<li>InstallIdShieldForSharePoint.ps1
+				<li>SharePointDeploymentHelper.ps1
+				<li>UninstallDataCaptureForSharePoint.ps1
+				<li>UninstallIdShieldForSharePoint.ps1
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6327, #6372]</b> DB Scalability
+        	<ul>
+			<li>Start a <b>Database Scalability</b> test.
+			<li>Run the test over a weekend.
+			<li>Review the exception log and confirm that none of the following 
+			exceptions are logged.
+			<ul>
+				<li>ELI29884: Operation cannot be performed while executing 
+				asynchronously
+				<li>ELI29884: Connection object cannot be explicitly closed 
+				while in a transaction
+				<li>ELI35306: Stats maintenance thread error, reattempting
+			</ul>
+            		<li>Confirm that <b>Refresh</b> from DB Admin Summary tab works 
+			without a query timeout.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6385, #6391]</b> Select Top Option
+        	<ul>
+			<li>Open a <b>DB Admin</b> instance and connect to a populated database.
+			<li>Select the <b>Tools - Export file list</b> menu item or another 
+			item that provides access to the <b>Select Files</b> dialog.
+			<ul>
+				<li>Confirm that the <b>Subset selection</b> group box includes a 
+				<b>Further narrow the above selected scope of files to a</b> check box.
+				<li>Confirm that a dropdown combo box is provided with the following 
+				options:
+				<ul>
+					<li>a random (the default)
+					<li>the top
+				</ul>
+				<li>Confirm that an edit box is provided that allows only numeric 
+				entries.
+				<li>Confirm that a dropdown combo box is provided with the following 
+				options:
+				<ul>
+					<li>percent (the default)
+					<li>file(s)
+				</ul>
+				<li>Confirm that the combo boxes and edit box are enabled only when the 
+				checkbox is checked.
+			</ul>
+<p>
+			<li>Exercise the following combinations of settings, confirm that proper 
+			results are seen, and confirm that no exceptions are displayed.
+			<ul>
+				<li>Random 40 percent
+				<li>Random 10 files
+				<li>Top 10 files
+				<li>Top 40 percent
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6386]</b> Advanced Connection Properties
+        	<ul>
+			<li>Open a new FAM instance.
+			<li>Confirm that no database connection is made.
+			<li>Click the <b>Advanced Connection Properties...</b> button.
+			<li>Click the <b>Set to default connection string</b> button.
+			<li>Confirm that no exception is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6387]</b> Confirm that <b>UCLIDTestingFrameworkCore.dll</b> 
+		and <b>RedactionCC.dll</b> remain installed after uninstalling <b>RDT</b>.
+<p>
+  	   	<LI><b>[LegacyRC #6388]</b> Confirm that <b>Extract Systems LM</b> will not 
+		install without <b>.NET 4.0</b> already being installed.  <b>RegisterAll.bat</b> 
+		may be required.
+    	</ul>
+<p>
+	<LI><h3>Other SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DataEntry #1151]</b> Floating Magnifier Window
+        	<ul>
+			<li>Exercise Data Entry verification.
+			<li>Do general experimentation and confirm that 
+			<li>Navigate to a field where the found string includes text recognized 
+			with poor confidence.
+			<li>Confirm that <b>Ctrl+T</b> and <b>Ctrl+D</b> are effective in accepting 
+			or discarding the highlight.
+            		<li>Also confirm proper behavior for the associated menu items.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
