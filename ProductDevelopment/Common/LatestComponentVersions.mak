@@ -10,4 +10,4 @@ LabDEVersion=LabDE Ver. 9.1.0.66
 RulesVersion=Rules Ver. 9.1.0.66
 FlexIDSSPVersion=FlexIDS for SP Ver. 9.1.0.66
 FlexIDSNetDMSVersion=FlexIDS for NetDMS Ver. 9.1.0.66
-FKBVersion=FKB Ver. 12.2.0.66
+FKBVersion=FKB Ver. 13.1.0.66
