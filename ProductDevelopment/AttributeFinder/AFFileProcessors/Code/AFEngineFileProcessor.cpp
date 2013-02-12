@@ -130,7 +130,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 
 		// Expand the tags for the rules file
 		string strRulesFile = asString(
-			ipTagManager->ExpandTags(m_strRuleFileNameForFileProcessing.c_str(),
+			ipTagManager->ExpandTagsAndFunctions(m_strRuleFileNameForFileProcessing.c_str(),
 			strInputFile.c_str()));
 
 		_lastCodePos = "40";
@@ -184,7 +184,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 		{
 			// Expand the tags for the data input file
 			string strDataInputFile = asString(
-				ipTagManager->ExpandTags(m_strDataInputFileName.c_str(), strInputFile.c_str()));
+				ipTagManager->ExpandTagsAndFunctions(m_strDataInputFileName.c_str(), strInputFile.c_str()));
 
 			IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
 			ipAttributes->LoadFrom(strDataInputFile.c_str(), VARIANT_FALSE);
