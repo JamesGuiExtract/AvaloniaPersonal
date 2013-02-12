@@ -54,8 +54,11 @@ L_INT giMAX_OPACITY = 255;
 // The tolerance for confirmImageAreas that indicates how many pixels away an image area can be
 // compared to where it is expected to be and within that tolerance what percent of pixels can be
 // something other than the expected value.
+// Until a better algorithm is implemented, we need to give black zones much more tolerance for
+// error than we do white zones.
 const int giZONE_CONFIRMATION_OFFSET_TOLERANCE = 2;
-const int giZONE_CONFIRMATION_PERCENT_TOLERANCE = 10;
+const int giWHITE_ZONE_CONFIRMATION_PERCENT_TOLERANCE = 5;
+const int giBLACK_ZONE_CONFIRMATION_PERCENT_TOLERANCE = 25;
 
 //-------------------------------------------------------------------------------------------------
 // Predefined Local Functions
@@ -983,7 +986,6 @@ void confirmImageAreas(const string& strImageFileName, vector<PageRasterZone>& r
 
 			// Create a new device context manager for this page
 			LeadtoolsDCManager ltDC;
-			int nZoneId = 1;
 
 			// Check each zone on the page.
 			for (vector<PageRasterZone>::iterator it = rvecZones.begin(); it != rvecZones.end(); it++)
@@ -1010,6 +1012,12 @@ void confirmImageAreas(const string& strImageFileName, vector<PageRasterZone>& r
 					extractZoneAsBitmap(&hBitmap, it->m_nStartX, it->m_nStartY, it->m_nEndX,
 						it->m_nEndY, it->m_nHeight, &hBitmapImageZone, false);
 
+					// Until a better algorithm is implemented, we need to give black give black
+					// zones much more tolerance for error than we do white zones.
+					int nPercentTolerance = (it->m_crFillColor == RGB(0,0,0))
+						? giBLACK_ZONE_CONFIRMATION_PERCENT_TOLERANCE
+						: giWHITE_ZONE_CONFIRMATION_PERCENT_TOLERANCE;
+
 					// [FlexIDSCore:5198]
 					// Allow for a certain number of pixels to not match the expected value without
 					// determining that the redaction failed to be applied.
@@ -1017,7 +1025,7 @@ void confirmImageAreas(const string& strImageFileName, vector<PageRasterZone>& r
 					int nPixelErrorThreshold =
 						(hBitmapImageZone.Height - 2 * giZONE_CONFIRMATION_OFFSET_TOLERANCE)
 						* ( hBitmapImageZone.Width - 2 * giZONE_CONFIRMATION_OFFSET_TOLERANCE)
-						* giZONE_CONFIRMATION_PERCENT_TOLERANCE / 100;
+						* nPercentTolerance / 100;
 
 					// Loop though each row of the extracted zone to confirm the image area has been
 					// applied.
