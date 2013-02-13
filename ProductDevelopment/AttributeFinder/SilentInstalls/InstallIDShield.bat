@@ -6,7 +6,7 @@ setlocal
 cd %~p0
 
 @ECHO Uninstalling all Extract Systems applications...
-start /wait "" ..\ExtractUninstaller\ExtractUninstaller /s
+start /wait "" ..\ExtractUninstaller\ExtractUninstaller /s /f2nul
 
 IF EXIST "C:\Program Files (x86)" (
 	set ISSFILE="%~dp0IDShield64.iss"
