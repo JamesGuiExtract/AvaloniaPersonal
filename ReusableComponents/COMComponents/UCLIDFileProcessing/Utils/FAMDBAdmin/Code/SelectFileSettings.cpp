@@ -258,14 +258,27 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 			// Ensure the #OriginalResults table is dropped
 			"IF OBJECT_ID('tempdb..#OriginalResults', N'U') IS NOT NULL\r\n"
 			"	DROP TABLE #OriginalResults;\r\n"
+			"\r\n"
 			// This query creates table #OriginalResults with the same columns as the original query.
 			"SELECT TOP 0 " + strSelect + " INTO #OriginalResults FROM\r\n"
-			"(\r\n" + strQuery + "\r\n) AS FAMFile\r\n"
+			"(\r\n" + strQuery + "\r\n) AS FAMFile"
+			"\r\n"
+			// Determine if #OriginalResults contains an identity column. Add a RowNumber identity
+			// if an identity column doesn't already exist.
+			"DECLARE @queryHasIdentityColumn INT\r\n"
+			"SELECT @queryHasIdentityColumn = COUNT(object_id) FROM tempdb.SYS.IDENTITY_COLUMNS\r\n"
+			"	WHERE object_id = OBJECT_ID('tempdb..#OriginalResults')\r\n"
+			"IF @queryHasIdentityColumn = 0\r\n"
+			"	ALTER TABLE #OriginalResults ADD RowNumber INT IDENTITY\r\n"
+			"ELSE\r\n"
+			"	SET IDENTITY_INSERT #OriginalResults ON\r\n"
+			"\r\n"
 			"DECLARE @rowsToReturn INT\r\n"
 			// Populate the table via INSERT INTO to avoid issues with ORDER BY + SELECT INTO +
 			// IDENTITY (http://support.microsoft.com/kb/273586)
 			"INSERT INTO #OriginalResults (" + strSelect + ") " + strQueryPart1 + "\r\n"
-			"(\r\n" + strQuery + "\r\n) AS FAMFile\r\n"
+			"(\r\n" + strQuery + "\r\n) AS FAMFile"
+			"\r\n"
 			// Calculate the number to return (using SQL's PERCENT seems to be returning unexpected
 			// results: 50% of 28 = 15)
 			"SET @rowsToReturn = " + (m_bSubsetUsePercentage ? 

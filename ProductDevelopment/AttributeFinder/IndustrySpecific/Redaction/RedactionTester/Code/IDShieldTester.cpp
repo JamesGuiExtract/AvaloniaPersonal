@@ -201,6 +201,7 @@ bool testAttributeCondition(IIUnknownVectorPtr ipAttributes,
 //-------------------------------------------------------------------------------------------------
 CIDShieldTester::CIDShieldTester() :
 m_bOutputAttributeNameFilesList(false),
+m_bOutputDirectoryInitialized(false),
 m_ipTestOutputVOAVector(NULL),
 m_ipAFUtility(CLSID_AFUtility),
 m_ipFAMTagManager(CLSID_FAMTagManager),
@@ -455,6 +456,7 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			m_apVerificationTester.reset();
 			automatedStatistics.reset();
 			verificationStatistics.reset();
+			m_bOutputDirectoryInitialized = false;
 
 			IVariantVectorPtr ipParams(pParams);
 			ASSERT_RESOURCE_ALLOCATION("ELI15258", ipParams != __nullptr);
@@ -642,17 +644,25 @@ void CIDShieldTester::interpretLine(const string& strLineText,
 	}
 	else if( vecTokens[0] == "<TESTFOLDER>" )
 	{
-		if (isValidFolder(m_strOutputFileDirectory))
+		// [FlexIDSCore:5612]
+		// Ensure the output file directory isn't cleared after we've already output at least one
+		// folder's worth of data.
+		if (!m_bOutputDirectoryInitialized)
 		{
-			// Remove all files from the output directory if it already exists, to ensure old
-			// results don't end up alongside new results.
-			vector<string> vecSubDirs;
-			getAllSubDirsAndDeleteAllFiles(m_strOutputFileDirectory, vecSubDirs);
-		}
-		else
-		{
-			// Create the director if it does not yet exist.
-			createDirectory(m_strOutputFileDirectory);
+			if (isValidFolder(m_strOutputFileDirectory))
+			{
+				// Remove all files from the output directory if it already exists, to ensure old
+				// results don't end up alongside new results.
+				vector<string> vecSubDirs;
+				getAllSubDirsAndDeleteAllFiles(m_strOutputFileDirectory, vecSubDirs);
+			}
+			else
+			{
+				// Create the directory if it does not yet exist.
+				createDirectory(m_strOutputFileDirectory);
+			}
+
+			m_bOutputDirectoryInitialized = true;
 		}
 
 		// Verify the correct number of tokens for the TESTFOLDER case and that a verification

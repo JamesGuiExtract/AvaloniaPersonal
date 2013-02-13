@@ -458,6 +458,11 @@ namespace Extract.Utilities.Forms
                     _associatedDataGridView = editingControl.EditingControlDataGridView;
                     _associatedGridViewCell = _associatedDataGridView.CurrentCell;
                 }
+                else
+                {
+                    _associatedDataGridView = null;
+                    _associatedGridViewCell = null;
+                }
             }
             catch (Exception ex)
             {
@@ -598,7 +603,12 @@ namespace Extract.Utilities.Forms
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI28869", ex);
                 ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                // [DataEntry:1209]
+                // There are some known circumstances where this can occur, but there isn't time
+                // to properly fix for the 9.1 release and I don't think we need to be "alarmist"
+                // in this case. Worst case scenario: smart tag will not be applier and we will have
+                // a log entry to help investigate in case there is any bad behavior.
+                ee.Log();
 
                 // In case of an exception, ensure the smart tag window doesn't hang around.
                 SafeDeactivate();

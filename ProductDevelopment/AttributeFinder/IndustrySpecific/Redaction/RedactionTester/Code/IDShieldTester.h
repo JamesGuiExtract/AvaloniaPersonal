@@ -230,6 +230,7 @@ private:
 	// Directory for output log files
 	string m_strOutputFileDirectory;
 	string m_strExplicitOutputFileDirectory;
+	bool m_bOutputDirectoryInitialized;
 
 	// Doc types to select for verification
 	set<string> m_setDocTypesToBeVerified;
