@@ -1947,7 +1947,8 @@ namespace Extract.DataEntry
 
                             // If the cell is in edit mode, the value needs to be applied to the edit
                             // control as well.
-                            if (cell.IsInEditMode && _editingControl.Text != attribute.Value.String)
+                            if (cell.IsInEditMode && _editingControl != null &&
+                                _editingControl.Text != attribute.Value.String)
                             {
                                 cell.DataGridView.RefreshEdit();
                             }

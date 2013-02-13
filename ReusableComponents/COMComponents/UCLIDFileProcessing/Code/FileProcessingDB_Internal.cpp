@@ -3688,7 +3688,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 
 		// Delete the UPI record from the ActiveFAM table
 		string strQuery = "DELETE FROM ActiveFAM WHERE ID = " + asString(nUPIID); 
-		executeCmdQuery(getDBConnection(), strQuery);
+		executeCmdQuery(ipConnection, strQuery);
 
 		// Set up the logged exception if it is not null
 		if (pUE != __nullptr)
