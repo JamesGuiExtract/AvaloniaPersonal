@@ -116,8 +116,7 @@ void getBoundingRectangle(long nStartX, long nStartY, long nEndX,
 }
 //-------------------------------------------------------------------------------------------------
 void extractZoneAsBitmap(BITMAPHANDLE *phBitmap, long nStartX, long nStartY, long nEndX, long nEndY,
-									  long nHeight, BITMAPHANDLE *phSubImageBitmap,
-									  bool bAllowResize/* = true*/)
+									  long nHeight, BITMAPHANDLE *phSubImageBitmap)
 {
 	// Check bitmap handles
 	ASSERT_ARGUMENT("ELI15834", phBitmap != __nullptr);
@@ -157,9 +156,6 @@ void extractZoneAsBitmap(BITMAPHANDLE *phBitmap, long nStartX, long nStartY, lon
 			abs(rectImageZone.top - rectImageZone.bottom)); 
 		throwExceptionIfNotSuccess(nRet, "ELI03351", "Unable to copy portion of bitmap!");
 
-		// Only allow the resulting bitmapped to be sized differently if bAllowResize is true.
-		L_INT nResizeParameter = bAllowResize ? ROTATE_RESIZE : 0;
-
 		// if slope is -ve
 		if (dSlope < 0)
 		{
@@ -168,14 +164,14 @@ void extractZoneAsBitmap(BITMAPHANDLE *phBitmap, long nStartX, long nStartY, lon
 			{
 				dImageZoneAngle = -1 * ((dSlope * 180) / MathVars::PI);
 				nRet = L_RotateBitmap(&hBitmapImageZone, (L_INT32) (dImageZoneAngle * 100), 
-					nResizeParameter, RGB(255,255,255));
+					ROTATE_RESIZE, RGB(255,255,255));
 				throwExceptionIfNotSuccess(nRet, "ELI03352", "Unable to rotate image!");
 			}
 			else
 			{
 				dImageZoneAngle = -1 * (-180 + (dSlope * 180) / MathVars::PI);
 				nRet = L_RotateBitmap(&hBitmapImageZone, (L_INT32) (dImageZoneAngle * 100),
-					nResizeParameter, RGB(255,255,255));
+					ROTATE_RESIZE, RGB(255,255,255));
 				throwExceptionIfNotSuccess(nRet, "ELI03353", "Unable to rotate image!");
 			}
 		}
@@ -187,14 +183,14 @@ void extractZoneAsBitmap(BITMAPHANDLE *phBitmap, long nStartX, long nStartY, lon
 			{
 				dImageZoneAngle =  (180 - (dSlope * 180) / MathVars::PI);
 				nRet = L_RotateBitmap(&hBitmapImageZone, (L_INT32) (dImageZoneAngle * 100),
-					nResizeParameter, RGB(255,255,255));
+					ROTATE_RESIZE, RGB(255,255,255));
 				throwExceptionIfNotSuccess(nRet, "ELI03354", "Unable to rotate image!");
 			}
 			else
 			{
 				dImageZoneAngle = -1 * ((dSlope * 180) / MathVars::PI);
 				nRet = L_RotateBitmap(&hBitmapImageZone, (L_INT32) (dImageZoneAngle * 100),
-					nResizeParameter, RGB(255,255,255));
+					ROTATE_RESIZE, RGB(255,255,255));
 				throwExceptionIfNotSuccess(nRet, "ELI03355", "Unable to rotate image!");	
 			}
 		}
@@ -223,7 +219,7 @@ void extractZoneAsBitmap(BITMAPHANDLE *phBitmap, long nStartX, long nStartY, lon
 void extractZoneAsImage(BITMAPHANDLE *phBitmap, long nStartX, 
 						long nStartY, long nEndX, long nEndY,
 						long nHeight, const string& strZoneImageFileName,
-						L_INT iOutputImageFormat, bool bAllowResize/* = true*/)
+						L_INT iOutputImageFormat)
 
 {
 	// Check bitmap handle
@@ -231,8 +227,7 @@ void extractZoneAsImage(BITMAPHANDLE *phBitmap, long nStartX,
 
 	BITMAPHANDLE hBitmapImageZone;
 	LeadToolsBitmapFreeer freeer( hBitmapImageZone, true );
-	extractZoneAsBitmap(phBitmap, nStartX, nStartY, nEndX, nEndY, nHeight, &hBitmapImageZone,
-		bAllowResize);
+	extractZoneAsBitmap(phBitmap, nStartX, nStartY, nEndX, nEndY, nHeight, &hBitmapImageZone);
 	
 	L_INT nRet = L_SaveBitmap( (char*) strZoneImageFileName.c_str(), &hBitmapImageZone, 
 		iOutputImageFormat, hBitmapImageZone.BitsPerPixel, 2, NULL);

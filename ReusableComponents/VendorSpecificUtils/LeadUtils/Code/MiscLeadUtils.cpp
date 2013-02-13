@@ -1005,12 +1005,24 @@ void confirmImageAreas(const string& strImageFileName, vector<PageRasterZone>& r
 					BITMAPHANDLE hBitmapImageZone = {0};
 					LeadToolsBitmapFreeer zoneFreer(hBitmapImageZone, true);
 
-					// Extract the zone into hBitmapImageZone. Do not allow the resulting zone to be
-					// resized on skewed zones otherwize the coordinates of the redaction in the
-					// zone will be different from what we expect due to padded pixels around the
-					// edge.
+					// Extract the zone into hBitmapImageZone.
 					extractZoneAsBitmap(&hBitmap, it->m_nStartX, it->m_nStartY, it->m_nEndX,
-						it->m_nEndY, it->m_nHeight, &hBitmapImageZone, false);
+						it->m_nEndY, it->m_nHeight, &hBitmapImageZone);
+
+					// 2/12/2012 SNK
+					// On skewed redaction zones, extractZoneAsBitmap will end up leaving padding
+					// around the outside of the zone. I was unable to directly solve the issue in
+					// time for the 9.1 release. However, in almost all cases extractZoneAsBitmap
+					// does have the redaction oriented correctly and centered in the image area;
+					// threfore, if when checking the pixels of this zone, we exclude the extra area
+					// around the edge that wasn't present in the original zone, we should avoid
+					// testing any area that is not actually part of the redation.
+					int nExcessWidth = (int)sqrt(pow((double)(it->m_nEndX - it->m_nStartX), 2) +
+												 pow((double)(it->m_nEndY - it->m_nStartY), 2));
+					int nExcessHeight = hBitmapImageZone.Height - it->m_nHeight;
+
+					int nXPadding = giZONE_CONFIRMATION_OFFSET_TOLERANCE + ((nExcessWidth + 1) / 2);
+					int nYPadding = giZONE_CONFIRMATION_OFFSET_TOLERANCE + ((nExcessHeight + 1) / 2);
 
 					// Until a better algorithm is implemented, we need to give black give black
 					// zones much more tolerance for error than we do white zones.
@@ -1029,14 +1041,10 @@ void confirmImageAreas(const string& strImageFileName, vector<PageRasterZone>& r
 
 					// Loop though each row of the extracted zone to confirm the image area has been
 					// applied.
-					for (int nRow = giZONE_CONFIRMATION_OFFSET_TOLERANCE;
-						 nRow < hBitmapImageZone.Height - giZONE_CONFIRMATION_OFFSET_TOLERANCE;
-						 nRow++)
+					for (int nRow = nYPadding; nRow < hBitmapImageZone.Height - nYPadding; nRow++)
 					{
 						// Loop through each pixel in the row.
-						for (int nCol = giZONE_CONFIRMATION_OFFSET_TOLERANCE;
-							 nCol < hBitmapImageZone.Width - giZONE_CONFIRMATION_OFFSET_TOLERANCE;
-							 nCol++)
+						for (int nCol = nXPadding; nCol < hBitmapImageZone.Width - nXPadding; nCol++)
 						{
 							// Get the color of the current pixel.
 							COLORREF crPixel =  L_GetPixelColor(&hBitmapImageZone, nRow, nCol);

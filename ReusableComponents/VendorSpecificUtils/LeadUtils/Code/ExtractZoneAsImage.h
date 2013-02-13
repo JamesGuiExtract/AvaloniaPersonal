@@ -17,28 +17,18 @@
 //			It is the caller's responsibility to ensure that the correct image
 //			page is loaded into the bitmap associated with phBitmap before calling
 //			this function.
-// ARGS:	bAllowResize- If true, the resulting phSubImageBitmap will be resized as necessary to
-//			ensure all pixels in the original zone are in the result. If false, the resulting
-//			phSubImageBitmap will be the same size as the provided coordinates, but pixels in the
-//			original image zone may be cropped from the result if the zone has any rotation to 
 LEADUTILS_API void extractZoneAsImage(BITMAPHANDLE *phBitmap, long nStartX, 
 									  long nStartY, long nEndX, long nEndY,
 									  long nHeight,
 									  const std::string& strZoneImageFileName,
-									  L_INT iOutputImageFormat = FILE_BMP,
-									  bool bAllowResize = true);
+									  L_INT iOutputImageFormat = FILE_BMP);
 
 //-------------------------------------------------------------------------------------------------
 // PURPOSE:	To extract a portion of an image to a bitmap
-// ARGS:	bAllowResize- If true, the resulting phSubImageBitmap will be resized as necessary to
-//			ensure all pixels in the original zone are in the result. If false, the resulting
-//			phSubImageBitmap will be the same size as the provided coordinates, but pixels in the
-//			original image zone may be cropped from the result if the zone has any rotation to it.
 LEADUTILS_API void extractZoneAsBitmap(BITMAPHANDLE *phBitmap, long nStartX, 
 									  long nStartY, long nEndX, long nEndY,
 									  long nHeight,
-									  BITMAPHANDLE *phSubImageBitmap,
-									  bool bAllowResize = true);
+									  BITMAPHANDLE *phSubImageBitmap);
 
 //-------------------------------------------------------------------------------------------------
 LEADUTILS_API void extractPolygonAsImage(const std::string& strImageFile,
