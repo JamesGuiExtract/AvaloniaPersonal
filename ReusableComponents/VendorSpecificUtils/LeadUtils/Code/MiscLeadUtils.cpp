@@ -1017,7 +1017,8 @@ void confirmImageAreas(const string& strImageFileName, vector<PageRasterZone>& r
 					// threfore, if when checking the pixels of this zone, we exclude the extra area
 					// around the edge that wasn't present in the original zone, we should avoid
 					// testing any area that is not actually part of the redation.
-					int nExcessWidth = (int)sqrt(pow((double)(it->m_nEndX - it->m_nStartX), 2) +
+					int nExcessWidth = hBitmapImageZone.Width - 
+									   (int)sqrt(pow((double)(it->m_nEndX - it->m_nStartX), 2) +
 												 pow((double)(it->m_nEndY - it->m_nStartY), 2));
 					int nExcessHeight = hBitmapImageZone.Height - it->m_nHeight;
 
