@@ -15,32 +15,7 @@
 		<ul>
 			<li>To use the Run Object On Query output handler, you must first query the attributes that you wish to run the selected object on.
 				<ul>
-					<li>To query a single attribute, simply enter that attribute's name into the query box.</li>
-					<li>To query multiple attributes, enter each attribute's name separated by |'s.
-						<ul>
-							<li><i>PhoneNumber|Name</i> will run the selected rule object on both the <i>PhoneNumber</i> and <i>Name</i> attributes.</li>
-						</ul>
-					</li>
-					<li>To query a sub-attribute, enter the query as <i>AttributeName/SubattributeName</i>.
-						<ul>
-							<li><i>Name/Middle</i> will run the selected rule object on the <i>Middle</i> sub-attribute of <i>Name</i>.</li>
-						</ul>
-					</li>
-					<li>To query an attribute with a certain type, enter the query as <i>AttributeName@AttributeType</i> 
-						<ul>
-							<li><i>Name@Buyer</i> will run the selected rule object on the <i>Name</i> attribute if it has a type of <i>Buyer</i>.</li>
-						</ul>
-					</li>
-					<li>To query an attribute only if it has a certain sub-attribute, enter the query as <i>AttributeName{/SubattributeName}</i>.
-						<ul>
-							<li><i>PhoneNumber{/AreaCode}</i> will run the selected rule object on the <i>PhoneNumber</i> attribute only if it has an <i>AreaCode</i> sub-attribute.</li>
-						</ul>
-					</li>
-					<li>To query all attributes, enter * as the query
-						<ul>
-							<li><i>Name/*</i> will run the selected rule object on the all of the sub-attributes of <i>Name</i>.</li>
-						</ul>
-					</li>
+                    <li>To do this, enter your query into the builtin <a href="../Selectors/QueryAttribute.html">Query Attribute Selector</a>.</li>  
 				</ul>
 			</li>
 			<li>You can select the category of rule object that you want by using the drop down menu labeled <b>Select a type of object:</b></li>
