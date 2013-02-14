@@ -1,0 +1,59 @@
+<HTML>
+	<HEAD>
+		<TITLE>Query Attribute Selector</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Query Attribute Selector</h1>
+		<hr>
+		<p>
+			<h3>Query Attribute Selector</h3>
+			<ul>
+				<li>The Query Attribute Selector is an attribute selector that allows you select attributes using their name, type, or their position in the attribute hierarchy.  You can also select attributes if they have a certain sub-attribute.</li>
+					<ul>
+						<li>This selector is used by several output handlers including <b>Run object on attributes</b>, <b>Modify attributes</b>, <b>Move and modify attributes</b>, and <b>Remove attributes</b>.</li>
+					</ul>
+				</li>
+                <li>The Query Attribute Select uses a simple query syntax to define which attributes should be selected:
+                    <ul>
+                        <li>To query an attribute by name, simply enter the name of the attribute into the query box.</li>
+                            <ul>
+                                <li>The query <b>SocialSecurityNumber</b> will select all attributes with the name <i>SocialSecurityNumber</i>.</li>
+                            </ul>
+                        <li>To query an attribute by type, enter the query as <i>Attribute name@attribute type</i> 
+                            <ul>
+                                <li>The query <b>Name@Buyer</b> will select <i>Name</i> attributes only if they have a type of <i>Buyer</i>.</li>
+                            </ul>
+                        </li>
+                        <li>You can select attributes with any name by using <i>*</i>.
+                            <ul>
+                                <li>The query <b>*@Person</b> will select all attributes with a type of <i>Person</i>.</li>
+                            </ul>
+                        </li>
+                        <li>To query a sub-attribute, enter the query as <i>Attribute name/sub-attribute name</i>.
+                            <ul>
+                                <li>The query <b>Name/Middle</b> will select the <i>Middle</i> sub-attribute of <i>Name</i> attributes.</li>
+                            </ul>
+                        </li>
+                        <li>To query an attribute only if it has a certain sub-attribute, enter the query as <i>Attribute name{sub-attribute name}</i>.
+                            <ul>
+                                <li>The query <b>PhoneNumber{AreaCode}</b> will select the <i>PhoneNumber</i> attribute only if it has an <i>AreaCode</i> sub-attribute.</li>
+                            </ul>
+                        </li>
+                        <li>You can run multiple queries at once by separating them with |'s.
+                            <ul>
+                                <li><b>PhoneNumber|Name</b> will select both <i>PhoneNumber</i> and <i>Name</i> attributes.</li>
+                            </ul>
+                        </li>
+                        <li>You can combine the above syntax to create complicated queries.
+                            <ul>
+                                <li><b>Name@Seller/*/First|Name@Seller{Middle/Initial}|PhoneNumber/*@Lender</b> is a valid query.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+			</ul>
+		</p>
+		<hr>
+	</BODY>
+</HTML>
