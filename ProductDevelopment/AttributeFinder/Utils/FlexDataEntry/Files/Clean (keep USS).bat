@@ -1,7 +1,7 @@
 @echo off
 
-c:
-cd C:\Demo_FlexIndex
+C:
+CD %~dp0
 
 ECHO.
 ECHO Deleting all temporary demo files...
