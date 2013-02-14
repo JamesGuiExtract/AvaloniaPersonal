@@ -22,7 +22,7 @@ SET LM_ISS="%~dp0LM.iss"
 @ECHO.
 @ECHO Installing LabDE
 start /wait "" ..\LabDE\Setup /s /w /f1%LABDE_ISS% /f2nul
-f
+
 @ECHO.
 @ECHO Installing IDShield
 start /wait "" ..\IDShield\Setup /s /w /f1%IDSHIELD_ISS% /f2nul
