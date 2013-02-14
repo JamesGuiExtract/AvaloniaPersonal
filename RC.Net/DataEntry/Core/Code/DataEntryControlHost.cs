@@ -188,47 +188,49 @@ namespace Extract.DataEntry
     public partial class DataEntryControlHost : UserControl, IImageViewerControl,
         IMessageFilter
     {
-        /// <summary>
-        /// Encapsulates data loaded as part of a <see cref="Prefetch"/> call.
-        /// </summary>
-        class PrefetchData
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="PrefetchData"/> class.
-            /// </summary>
-            /// <param name="fileName">Name of the image file this data is associated with.</param>
-            public PrefetchData(string fileName)
-            {
-                try
-                {
-                    string dataFileName = fileName + ".voa";
-                    ExtractException.Assert("ELI34537", "Missing data file.",
-                        File.Exists(dataFileName), "FileName", dataFileName);
-
-                    DateTimeStamp = File.GetLastWriteTime(dataFileName);
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI34538");
-                }
-            }
-
-            /// <summary>
-            /// The <see cref="DateTime"/> of the data file for which this data is valid.
-            /// If the data file has a greater modified time that DateTimeStamp at the time the
-            /// prefetch data is to be used, the prefetch data should be disregarded.
-            /// </summary>
-            public DateTime DateTimeStamp;
-
-            /// <summary>
-            /// An ordered list of <see cref="CompositeHighlightLayerObject"/>s for each
-            /// spatial <see cref="IAttribute"/> in the data file (in the order the attributes
-            /// exist in the data file). After loading the data file in the UI thread, the
-            /// the spatial attributes can be assigned highlights by using the highlights at the
-            /// corresponding index in this list.
-            /// </summary>
-            public HighlightList PreCreatedHighlights = new HighlightList();
-        }
+// [DataEntry:1151]
+// Disabled highlight prefetch.
+//        /// <summary>
+//        /// Encapsulates data loaded as part of a <see cref="Prefetch"/> call.
+//        /// </summary>
+//        class PrefetchData
+//        {
+//            /// <summary>
+//            /// Initializes a new instance of the <see cref="PrefetchData"/> class.
+//            /// </summary>
+//            /// <param name="fileName">Name of the image file this data is associated with.</param>
+//            public PrefetchData(string fileName)
+//            {
+//                try
+//                {
+//                    string dataFileName = fileName + ".voa";
+//                    ExtractException.Assert("ELI34537", "Missing data file.",
+//                        File.Exists(dataFileName), "FileName", dataFileName);
+//
+//                    DateTimeStamp = File.GetLastWriteTime(dataFileName);
+//                }
+//                catch (Exception ex)
+//                {
+//                    throw ex.AsExtract("ELI34538");
+//                }
+//            }
+//
+//            /// <summary>
+//            /// The <see cref="DateTime"/> of the data file for which this data is valid.
+//            /// If the data file has a greater modified time that DateTimeStamp at the time the
+//            /// prefetch data is to be used, the prefetch data should be disregarded.
+//            /// </summary>
+//            public DateTime DateTimeStamp;
+//
+//            /// <summary>
+//            /// An ordered list of <see cref="CompositeHighlightLayerObject"/>s for each
+//            /// spatial <see cref="IAttribute"/> in the data file (in the order the attributes
+//            /// exist in the data file). After loading the data file in the UI thread, the
+//            /// the spatial attributes can be assigned highlights by using the highlights at the
+//            /// corresponding index in this list.
+//            /// </summary>
+//            public HighlightList PreCreatedHighlights = new HighlightList();
+//        }
 
         #region Constants
 
@@ -253,11 +255,13 @@ namespace Extract.DataEntry
 
         #region Fields
 
-        /// <summary>
-        /// Contains data that has been prefetched for upcoming files.
-        /// </summary>
-        static Dictionary<string, PrefetchData> _preFetchData =
-            new Dictionary<string, PrefetchData>();
+// [DataEntry:1151]
+// Disabled highlight prefetch.
+//        /// <summary>
+//        /// Contains data that has been prefetched for upcoming files.
+//        /// </summary>
+//        static Dictionary<string, PrefetchData> _preFetchData =
+//            new Dictionary<string, PrefetchData>();
 
         /// <summary>
         /// The source of application-wide settings and events.
@@ -1429,44 +1433,47 @@ namespace Extract.DataEntry
 
         #region Methods
 
-        /// <summary>
-        /// Pre-loads data to improve the load time of the specified document when it is eventually
-        /// loaded.
-        /// <para><b>Note</b></para>
-        /// This call occurs on a background thread, not the UI thread. Controls or data which cannot
-        /// be shared between threads cannot be used here.
-        /// </summary>
-        /// <param name="fileName">The file for which data should be pre-fetched.</param>
-        public void Prefetch(string fileName)
-        {
-            try
-            {
-                string dataFileName = fileName + ".voa";
-
-                if (File.Exists(dataFileName))
-                {
-                    IUnknownVector attributes = new IUnknownVector();
-                    attributes.LoadFrom(dataFileName, false);
-
-                    PrefetchData prefetchData = new PrefetchData(fileName);
-
-                    // Loop through each attribute and assign the pre-created highlight.
-                    foreach (IAttribute attribute in
-                        DataEntryMethods.ToAttributeEnumerable(attributes, true)
-                        .Where(attribute => attribute.Value.HasSpatialInfo()))
-                    {
-                        prefetchData.PreCreatedHighlights.Add(
-                            CreateAttributeHighlight(attribute, false, false, false, true));
-                    }
-
-                    _preFetchData[fileName] = prefetchData;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI34535");
-            }
-        }
+// [DataEntry:1151]
+// Disabled highlight prefetch.
+//        /// <summary>
+//        /// Pre-loads data to improve the load time of the specified document when it is eventually
+//        /// loaded.
+//        /// <para><b>Note</b></para>
+//        /// This call occurs on a background thread, not the UI thread. Controls or data which cannot
+//        /// be shared between threads cannot be used here.
+//        /// </summary>
+//        /// <param name="fileName">The file for which data should be pre-fetched.</param>
+//        public void Prefetch(string fileName)
+//        {
+//            try
+//            {
+//                
+//                string dataFileName = fileName + ".voa";
+//
+//                if (File.Exists(dataFileName))
+//                {
+//                    IUnknownVector attributes = new IUnknownVector();
+//                    attributes.LoadFrom(dataFileName, false);
+//
+//                    PrefetchData prefetchData = new PrefetchData(fileName);
+//
+//                    // Loop through each attribute and assign the pre-created highlight.
+//                    foreach (IAttribute attribute in
+//                        DataEntryMethods.ToAttributeEnumerable(attributes, true)
+//                        .Where(attribute => attribute.Value.HasSpatialInfo()))
+//                    {
+//                        prefetchData.PreCreatedHighlights.Add(
+//                            CreateAttributeHighlight(attribute, false, false, false, true));
+//                    }
+//
+//                    _preFetchData[fileName] = prefetchData;
+//                }
+//            }
+//            catch (Exception ex)
+//            {
+//                throw ex.AsExtract("ELI34535");
+//            }
+//        }
 
         /// <summary>
         /// Loads the provided data in the <see cref="IDataEntryControl"/>s.
@@ -1543,9 +1550,11 @@ namespace Extract.DataEntry
                         // Notify AttributeStatusInfo of the new attribute hierarchy
                         AttributeStatusInfo.ResetData(_imageViewer.ImageFile, _attributes, _dbConnection);
 
-                        // Retrieve pre-created highlights for the attributes if Prefetch has been
-                        // called for this file.
-                        preCreatedHighlights = RetrievePreCreatedAttributeHighlights(_attributes);
+                        // [DataEntry:1151]
+                        // Disabled highlight prefetch.
+//                        // Retrieve pre-created highlights for the attributes if Prefetch has been
+//                        // called for this file.
+//                        preCreatedHighlights = RetrievePreCreatedAttributeHighlights(_attributes);
 
                         // Enable or disable swiping as appropriate.
                         bool swipingEnabled = _activeDataControl != null &&
@@ -2636,14 +2645,16 @@ namespace Extract.DataEntry
                     _smartTagManager = null;
                 }
 
-                foreach (PrefetchData prefetchData in _preFetchData.Values)
-                {
-                    foreach (List<CompositeHighlightLayerObject> highlightList in
-                        prefetchData.PreCreatedHighlights)
-                    {
-                        CollectionMethods.ClearAndDispose(highlightList);
-                    }
-                }
+                // [DataEntry:1151]
+                // Disabled highlight prefetch.
+//                foreach (PrefetchData prefetchData in _preFetchData.Values)
+//                {
+//                    foreach (List<CompositeHighlightLayerObject> highlightList in
+//                        prefetchData.PreCreatedHighlights)
+//                    {
+//                        CollectionMethods.ClearAndDispose(highlightList);
+//                    }
+//                }
             }
 
             // Dispose of unmanaged resources
@@ -6612,48 +6623,50 @@ namespace Extract.DataEntry
 
         }
 
-        /// <summary>
-        /// Retrieves and assigns <see cref="CompositeHighlightLayerObject"/> objects that were
-        /// created for this file during a call to <see cref="Prefetch"/>.
-        /// </summary>
-        /// <param name="attributes">The <see cref="IAttribute"/>s for which the pre-created
-        /// highlights are to be retrieved.</param>
-        /// <returns>A <see cref="HighlightDictionary"/> that maps the <see paramref="attributes"/>
-        /// to their pre-created <see cref="CompositeHighlightLayerObject"/>s.</returns>
-        HighlightDictionary RetrievePreCreatedAttributeHighlights(IUnknownVector attributes)
-        {
-            ExtractException.Assert("ELI34536", "Null argument exception!", attributes != null);
-
-            HighlightDictionary preCreatedHighlights = null;
-
-            // Attempt to retrieve prefetch data for this file.
-            PrefetchData preFetchData = null;
-            if (_preFetchData.TryGetValue(_imageViewer.ImageFile, out preFetchData))
-            {
-                _preFetchData.Remove(_imageViewer.ImageFile);
-
-                string dataFileName = _imageViewer.ImageFile + ".voa";
-
-                // Don't use the prefetched data if the data file has been modified since the
-                // data was loaded.
-                if (File.GetLastWriteTime(dataFileName) == preFetchData.DateTimeStamp)
-                {
-                    preCreatedHighlights = new HighlightDictionary();
-
-                    int index = 0;
-
-                    // Loop through each attribute and compile the raster zones from each.
-                    foreach (IAttribute attribute in
-                        DataEntryMethods.ToAttributeEnumerable(attributes, true)
-                        .Where(attribute => attribute.Value.HasSpatialInfo()))
-                    {
-                        preCreatedHighlights[attribute] = preFetchData.PreCreatedHighlights[index++];
-                    }
-                }
-            }
-
-            return preCreatedHighlights;
-        }
+// [DataEntry:1151]
+// Disabled highlight prefetch.
+//        /// <summary>
+//        /// Retrieves and assigns <see cref="CompositeHighlightLayerObject"/> objects that were
+//        /// created for this file during a call to <see cref="Prefetch"/>.
+//        /// </summary>
+//        /// <param name="attributes">The <see cref="IAttribute"/>s for which the pre-created
+//        /// highlights are to be retrieved.</param>
+//        /// <returns>A <see cref="HighlightDictionary"/> that maps the <see paramref="attributes"/>
+//        /// to their pre-created <see cref="CompositeHighlightLayerObject"/>s.</returns>
+//        HighlightDictionary RetrievePreCreatedAttributeHighlights(IUnknownVector attributes)
+//        {
+//            ExtractException.Assert("ELI34536", "Null argument exception!", attributes != null);
+//
+//            HighlightDictionary preCreatedHighlights = null;
+//
+//            // Attempt to retrieve prefetch data for this file.
+//            PrefetchData preFetchData = null;
+//            if (_preFetchData.TryGetValue(_imageViewer.ImageFile, out preFetchData))
+//            {
+//                _preFetchData.Remove(_imageViewer.ImageFile);
+//
+//                string dataFileName = _imageViewer.ImageFile + ".voa";
+//
+//                // Don't use the prefetched data if the data file has been modified since the
+//                // data was loaded.
+//                if (File.GetLastWriteTime(dataFileName) == preFetchData.DateTimeStamp)
+//                {
+//                    preCreatedHighlights = new HighlightDictionary();
+//
+//                    int index = 0;
+//
+//                    // Loop through each attribute and compile the raster zones from each.
+//                    foreach (IAttribute attribute in
+//                        DataEntryMethods.ToAttributeEnumerable(attributes, true)
+//                        .Where(attribute => attribute.Value.HasSpatialInfo()))
+//                    {
+//                        preCreatedHighlights[attribute] = preFetchData.PreCreatedHighlights[index++];
+//                    }
+//                }
+//            }
+//
+//            return preCreatedHighlights;
+//        }
 
         /// <summary>
         /// Creates highlights for all <see cref="IAttribute"/>s in the provided 

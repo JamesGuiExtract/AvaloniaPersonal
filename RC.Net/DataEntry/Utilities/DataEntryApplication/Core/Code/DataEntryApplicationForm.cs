@@ -981,7 +981,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 _imageViewer.CacheImage(fileName);
 
-                _dataEntryControlHost.Prefetch(fileName);
+                // [DataEntry:1151]
+                // It appears in some cases the image viewer ends up trying to display highlights
+                // being loaded via prefetch. I don't feel comfortable that I can make a low-risk
+                // fix for this issue right now. Therefore I am disabling highlight loading as part
+                // of pre-fetch.
+                //_dataEntryControlHost.Prefetch(fileName);
             }
             catch (Exception ex)
             {
