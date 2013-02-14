@@ -784,7 +784,7 @@ function SetNuanceServicePermissions()
 	string szRegAllCmdLine;
 begin      
 	SdShowMsg("Setup is Setting permissions for Nuance Service", TRUE);
-	szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR ^ "SetNuanceServicePermissions.bat";
+	szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR ^ "SetNuanceServicePermissions.bat\"";
 	
 	LaunchAppAndWait( szRegAllCmdLine, "/s", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
  	
