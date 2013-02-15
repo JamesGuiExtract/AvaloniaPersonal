@@ -65,6 +65,7 @@ CopyExtractCommonFiles: CleanupExtractCommonFiles ObfuscateFiles
 	@COPY /V "$(BinariesFolder)\Interop.UCLID_COMUTILSLib.dll" "$(ExtractCommonInstallFilesRootDir)\DotNetFiles"
 	@COPY /V "$(BinariesFolder)\Interop.UCLID_COMLMLib.dll" "$(ExtractCommonInstallFilesRootDir)\DotNetFiles"	
 	@COPY /V "$(BinariesFolder)\UCLIDExceptionMgmt.dll" "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles"
+	@COPY "$(RCNETDir)\APIs\Divelements\SandDock\bin\SandDock.dll" "$(ExtractCommonInstallFilesRootDir)\DotNetFiles" 
 
 	@DIR "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles\*.*" /b >"$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractCommon.rl"
 	@DIR "$(ExtractCommonInstallFilesRootDir)\DotNetFiles\Extract.Utilities.Forms.dll" /b >>"$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractCommon.nl
