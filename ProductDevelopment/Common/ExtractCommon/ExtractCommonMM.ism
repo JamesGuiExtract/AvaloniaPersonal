@@ -195,6 +195,7 @@
 		<row><td>Interop.UCLID_COMUTILSLib.dl.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>{48FDF1E6-468A-4B24-A781-38783C919E8F}</td><td>COMMON_COMPONENTS.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>8</td><td/><td>interop.uclid_comutilslib.dl.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.UCLID_EXCEPTIONMGMTL.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>{ACE5B4A3-D4A6-4A05-913E-2221E8DFF890}</td><td>COMMON_COMPONENTS.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>8</td><td/><td>interop.uclid_exceptionmgmtl.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>NonSelfRegfiles.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>{9C96DB84-76D4-4DBB-9C48-5F446690D9CB}</td><td>COMMON_COMPONENTS.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>8</td><td/><td>extractcommon.rl.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>SandDock.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>{0F49EEAF-A1CD-4065-A180-F4274EFF2CA0}</td><td>COMMON_COMPONENTS.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>8</td><td/><td>sanddock.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UCLIDExceptionMgmt.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>{B93B3343-5046-472D-B83D-29AB88E7BC67}</td><td>COMMON_COMPONENTS.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>8</td><td/><td>uclidexceptionmgmt.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
@@ -387,6 +388,7 @@
 		<row><td>interop.uclid_comlmlib.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>Interop.UCLID_COMLMLib.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>INTERO~1.DLL|Interop.UCLID_COMLMLib.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_DOTNETFILES_FILES&gt;\Interop.UCLID_COMLMLib.dll</td><td>17</td><td/></row>
 		<row><td>interop.uclid_comutilslib.dl.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>Interop.UCLID_COMUTILSLib.dl.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>INTERO~1.DLL|Interop.UCLID_COMUTILSLib.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_DOTNETFILES_FILES&gt;\Interop.UCLID_COMUTILSLib.dll</td><td>17</td><td/></row>
 		<row><td>interop.uclid_exceptionmgmtl.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>Interop.UCLID_EXCEPTIONMGMTL.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>INTERO~1.DLL|Interop.UCLID_EXCEPTIONMGMTLib.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_DOTNETFILES_FILES&gt;\Interop.UCLID_EXCEPTIONMGMTLib.dll</td><td>17</td><td/></row>
+		<row><td>sanddock.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>SandDock.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>SandDock.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNETFILES_FILES&gt;\SandDock.dll</td><td>1</td><td/></row>
 		<row><td>uclidexceptionmgmt.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>UCLIDExceptionMgmt.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>UCLIDE~1.DLL|UCLIDExceptionMgmt.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FI&gt;\UCLIDExceptionMgmt.dll</td><td>1</td><td/></row>
 	</table>
 
@@ -517,6 +519,7 @@
 		<row><td>Interop.UCLID_COMUTILSLib.dl.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td/><td/><td>_7C863732_50B2_4A3D_AA0A_9C1C973CD386_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Interop.UCLID_EXCEPTIONMGMTL.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td/><td/><td>_0B19B211_382B_4408_9B05_D1477F977500_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>NonSelfRegfiles.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td/><td/><td>_F03C8C3A_0E60_4AD0_B4DA_AA4D18E5E90C_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>SandDock.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td/><td/><td>_0529F6D5_B0E5_4D21_BE9A_B6858FA3D817_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UCLIDExceptionMgmt.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td/><td/><td>_4CE3E514_F2DA_4BB1_A3C7_CD91B2CA28B1_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
@@ -1108,6 +1111,7 @@ QwBEAFIATwBNAAEATQBlAGQAaQBhAA==
 		<row><td>Interop.UCLID_COMUTILSLib.dl.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td></row>
 		<row><td>Interop.UCLID_EXCEPTIONMGMTL.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td></row>
 		<row><td>NonSelfRegfiles.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td></row>
+		<row><td>SandDock.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td></row>
 		<row><td>UCLIDExceptionMgmt.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td></row>
 	</table>
 
