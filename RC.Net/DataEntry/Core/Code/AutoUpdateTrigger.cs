@@ -270,6 +270,8 @@ namespace Extract.DataEntry
         /// <see langword="false"/> otherwise.</returns>
         bool UpdateValue(DataEntryQuery dataEntryQuery)
         {
+            QueryResult queryResult = null;
+
             try
             {
                 // Don't evaluate disabled queries or validation triggers if validation triggers are
@@ -287,7 +289,7 @@ namespace Extract.DataEntry
                 _updatingValue = true;
 
                 // Evaluate the query.
-                QueryResult queryResult = dataEntryQuery.Evaluate();
+                queryResult = dataEntryQuery.Evaluate();
 
                 // Use the results to update the target attribute's validation list if the
                 // AutoUpdateTrigger is a validation trigger.
@@ -352,6 +354,17 @@ namespace Extract.DataEntry
             {
                 ExtractException ee = new ExtractException("ELI26735",
                     "Failed to apply updated value!", ex);
+                try
+                {
+                    ee.AddDebugData("Query", dataEntryQuery.QueryText, false);
+                    ee.AddDebugData("Validation", _validationTrigger ? "True" : "False", false);
+                    ee.AddDebugData("Target", _targetAttribute.Name, false);
+                    ee.AddDebugData("Result", (queryResult == null) 
+                        ? "<Not Computed>"
+                        : queryResult.ToString(), false);
+                }
+                catch {}
+
                 throw ee;
             }
             finally
