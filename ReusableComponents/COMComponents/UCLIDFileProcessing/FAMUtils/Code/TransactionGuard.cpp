@@ -10,10 +10,16 @@
 // TransactionGuard
 //-------------------------------------------------------------------------------------------------
 TransactionGuard::TransactionGuard(ADODB::_ConnectionPtr ipConnection,
-	IsolationLevelEnum isolationLevel)
+	IsolationLevelEnum isolationLevel, CMutex *pMutex)
 : m_ipConnection(ipConnection)
+, m_pLock(__nullptr)
 {
 	ASSERT_ARGUMENT("ELI14624", ipConnection != __nullptr );
+
+	if (pMutex != __nullptr)
+	{
+		m_pLock = new CSingleLock(pMutex, TRUE);
+	}
 
 	ipConnection->IsolationLevel = isolationLevel;
 	
@@ -34,13 +40,26 @@ TransactionGuard::~TransactionGuard()
 			// Rollback the open transaction
 			m_ipConnection->RollbackTrans();
 		}
-
-		// Restore the connection isolation level to the ADO default of adXactChaos.
-		m_ipConnection->IsolationLevel = adXactChaos;
-
-		m_ipConnection = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14980");
+
+	try
+	{
+		// Restore the connection isolation level to the ADO default of adXactChaos.
+		m_ipConnection->IsolationLevel = adXactChaos;
+		
+		m_ipConnection = __nullptr;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI35397");
+
+	try
+	{
+		if (m_pLock != __nullptr)
+		{
+			delete m_pLock;
+		}
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI35398");
 }
 //-------------------------------------------------------------------------------------------------
 void TransactionGuard::CommitTrans()
@@ -52,6 +71,12 @@ void TransactionGuard::CommitTrans()
 		
 		// There is no longer a transaction in progress-- so reset the started flag
 		m_bTransactionStarted = false;
+
+		if (m_pLock != __nullptr)
+		{
+			delete m_pLock;
+			m_pLock = __nullptr;
+		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27607")
 }

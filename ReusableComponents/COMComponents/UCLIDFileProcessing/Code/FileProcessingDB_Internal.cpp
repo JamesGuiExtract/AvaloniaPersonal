@@ -2080,7 +2080,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 				// Lock while updating the lock table and m_bDBLocked variable
 				CSingleLock lock(&m_mutex, TRUE);
 
-				TransactionGuard tg(ipConnection, adXactChaos);
+				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipLockTable(__uuidof(Recordset));
@@ -2342,7 +2342,7 @@ void CFileProcessingDB::storeEncryptedPasswordAndUserName(const string& strEncry
 	unique_ptr<TransactionGuard> apTg;
 	if (bCreateTransactionGuard)
 	{
-		apTg.reset(new TransactionGuard(getDBConnection(), adXactChaos));
+		apTg.reset(new TransactionGuard(getDBConnection(), adXactChaos, __nullptr));
 		ASSERT_RESOURCE_ALLOCATION("ELI29896", apTg.get() != __nullptr);
 	}
 
@@ -3278,7 +3278,7 @@ void CFileProcessingDB::clear(bool retainUserValues)
 			CSingleLock lock(&m_mutex, TRUE);
 
 			// Begin a transaction
-			TransactionGuard tg(ipConnection, adXactChaos);
+			TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
 			// Get a list of the action names to preserve
 			vector<string> vecActionNames;
@@ -3370,7 +3370,7 @@ void CFileProcessingDB::init80DB()
 			CSingleLock lock(&m_mutex, TRUE);
 
 			// Begin a transaction
-			TransactionGuard tg(ipConnection, adXactChaos);
+			TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
 			// Add the tables back
 			addTables80();
@@ -3955,7 +3955,7 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 								bLocked = true;
 
 								// Begin a transaction
-								TransactionGuard tg(ipConnection, adXactChaos);
+								TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
 								pDB->updateActionStatisticsFromDelta(ipConnection, nActionID);
 
@@ -4283,7 +4283,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			if (m_bAutoRevertLockedFiles && !m_bRevertInProgress)
 			{
 				// Begin a transaction
-				TransactionGuard tgRevert(ipConnection, adXactRepeatableRead);
+				TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_mutex);
 
 				// Revert files
 				revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
@@ -4302,7 +4302,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			while (!bTransactionSuccessful)
 			{
 				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactRepeatableRead);
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_mutex);
 
 				try
 				{
@@ -4494,7 +4494,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 	if (m_bAutoRevertLockedFiles)
 	{
 		// Begin a transaction for the revert 
-		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead);
+		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_mutex);
 
 		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
@@ -4542,7 +4542,7 @@ bool CFileProcessingDB::isFAMActiveForAnyAction(bool bDBLocked)
 	if (m_bAutoRevertLockedFiles)
 	{
 		// Begin a transaction for the revert 
-		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead);
+		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_mutex);
 
 		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
@@ -4575,7 +4575,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAnyAction(bool bDBLocked)
 	if (m_bAutoRevertLockedFiles)
 	{
 		// Begin a transaction for the revert 
-		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead);
+		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_mutex);
 
 		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 

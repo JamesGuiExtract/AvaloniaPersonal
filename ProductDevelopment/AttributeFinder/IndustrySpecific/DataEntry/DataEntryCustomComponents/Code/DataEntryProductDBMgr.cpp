@@ -670,7 +670,7 @@ bool CDataEntryProductDBMgr::AddDataEntryData_Internal(bool bDBLocked, long lFil
 				+ asString(dOverheadTime) + ")";
 
 			// Create a transaction guard
-			TransactionGuard tg(ipConnection, adXactChaos);
+			TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
 			// If not storing previous history need to delete it
 			if (!m_bStoreDataEntryProcessingHistory)
@@ -810,7 +810,7 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* 
 			if (!bOnLoad && !strQueries.empty())
 			{
 				// Create a transaction guard
-				TransactionGuard tg(ipConnection, adXactChaos);
+				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
 				executeVectorOfSQL(ipConnection, strQueries);
 
