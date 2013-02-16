@@ -117,31 +117,32 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="_resultCodeLabel.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="_resultCodeLabel.GenerateMember" type="System.Boolean, mscorlib">
     <value>False</value>
-  </metadata>
-  <metadata name="_testNameLabel.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_testNameLabel.GenerateMember" type="System.Boolean, mscorlib">
     <value>False</value>
-  </metadata>
-  <metadata name="panelGroupBox.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="panelGroupBox.GenerateMember" type="System.Boolean, mscorlib">
     <value>False</value>
-  </metadata>
-  <metadata name="_collectionDateColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_collectionDateColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_collectionTimeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_collectionTimeColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_resultDateColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_resultDateColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_resultTimeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_resultTimeColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="_laboratoryIdentifier.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query Default='1'&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../LabName&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../LabAddress/City&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../LabAddress/State&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../LabAddress/ZipCode&lt;/Attribute&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabCode IS NOT NULL AND LabCode = SUBSTRING(&lt;Attribute&gt;../LabCode&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + REPLACE(REPLACE(REPLACE(REPLACE(&lt;Attribute&gt;../LabName&lt;/Attribute&gt;, ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%') + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(&lt;Attribute&gt;../LabName&lt;/Attribute&gt;, ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 50) + '%'&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute&gt;../LabName&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 10) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute&gt;../LabName&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 10) + '%' and City LIKE &lt;Attribute&gt;../LabAddress/City&lt;/Attribute&gt;&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute&gt;../LabName&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 3) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
@@ -171,17 +172,30 @@
 &lt;Attribute&gt;../../Name/Last&lt;/Attribute&gt;
 &lt;/Query&gt;</value>
   </data>
+  <data name="_originalNameTextBox.AutoUpdateQuery" xml:space="preserve">
+    <value>&lt;Expression SpatialMode='IfNotBlank'&gt;
+	(&lt;Attribute Name='OriginalName'&gt;.&lt;/Attribute&gt; != '') ? '' :
+	('UseName' == &lt;SQL SpatialMode='Force'&gt;SELECT DISTINCT 'UseName' FROM LabOrder
+		WHERE LEN(&lt;Attribute Name='NameOnDoc' SpatialMode='Force'&gt;../../DisplayName&lt;/Attribute&gt;) &amp;gt; 0
+		AND DisplayName &amp;lt;&amp;gt; SUBSTRING(&lt;NameOnDoc/&gt;,1,255)&lt;/SQL&gt;)
+	? &lt;NameOnDoc/&gt; :
+	('UseName' == &lt;SQL SpatialMode='Force'&gt;SELECT DISTINCT 'UseName' FROM LabTest
+		WHERE LEN(&lt;Attribute Name='NameOnDoc2' SpatialMode='Force'&gt;..&lt;/Attribute&gt;) &amp;gt; 0
+		AND OfficialName &amp;lt;&amp;gt; SUBSTRING(&lt;NameOnDoc2/&gt;,1,255)&lt;/SQL&gt;
+	? &lt;NameOnDoc2/&gt; : '')
+&lt;/Expression&gt;</value>
+  </data>
   <data name="_testNameTextBox.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query&gt;&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) AND LabTest.TestCode = SUBSTRING(&lt;Attribute&gt;TestCode&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest, AlternateTestName, LabOrderTest WHERE LabTest.TestCode = AlternateTestName.TestCode AND LabTest.TestCode = LabOrderTest.TestCode AND LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) AND AlternateTestName.Name = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,50)&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) AND LabTest.TestCode = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;</value>
   </data>
-  <metadata name="_orderNumberColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="_orderNumberColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_testDisplayName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_testDisplayName.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="_testDisplayName.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query&gt;
 &lt;SQL SpatialMode='IfNotBlank'&gt;SELECT DisplayName FROM LabOrder WHERE Code = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,25)
@@ -203,18 +217,18 @@
 	&lt;/Expression&gt;
 &lt;/Query&gt;</value>
   </data>
-  <metadata name="_testValueColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="_testValueColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_testUnitsColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_testUnitsColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_testRefRangeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_testRefRangeColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_testFlagColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_testFlagColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="_testFlagColumn.ValidationQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
 	&lt;Attribute Name='Flag'&gt;.&lt;/Attribute&gt;
@@ -299,9 +313,9 @@
 	&lt;/Expression&gt;
 &lt;/Query&gt;</value>
   </data>
-  <metadata name="_resultStatusColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="_resultStatusColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="_testNameTextBox.ValidationQuery" xml:space="preserve">
     <value>&lt;Query ValidationListType='ValidationListOnly'&gt;
 &lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) ORDER BY LabTest.OfficialName&lt;/SQL&gt;
@@ -317,7 +331,7 @@
 			WHERE OrderCode IN
 			(
 				SELECT OrderCode FROM LabOrderTest
-					WHERE OrderCode = &lt;Attribute&gt;../../OrderCode&lt;/Attribute&gt;
+					WHERE OrderCode = SUBSTRING(&lt;Attribute&gt;../../OrderCode&lt;/Attribute&gt;,1,25)
 					GROUP BY OrderCode HAVING COUNT(*) = 1
 			)
 	&lt;/SQL&gt;

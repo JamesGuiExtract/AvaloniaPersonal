@@ -66,6 +66,10 @@
             this._epicPatientLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._epicPatientSuffixColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._patientNameTable = new Extract.DataEntry.DataEntryTable();
+            this._patientFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._patientMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._patientLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._patientSuffixColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._genderLabel = new System.Windows.Forms.Label();
             this._patientGender = new Extract.DataEntry.DataEntryComboBox();
             this._patientBirthDate = new Extract.DataEntry.DataEntryTextBox();
@@ -73,7 +77,7 @@
             this._patientRecordNum = new Extract.DataEntry.DataEntryTextBox();
             this._patientMRLabel = new System.Windows.Forms.Label();
             this._testDetailsGroupBox = new System.Windows.Forms.GroupBox();
-            this._componentLevelStatus = new Extract.DataEntry.DataEntryTextBox();
+            this._originalNameTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._testNameTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._laboratoryTestTable = new Extract.DataEntry.DataEntryTable();
             this._orderNumberColumn = new Extract.DataEntry.DataEntryTableColumn();
@@ -85,6 +89,7 @@
             this._testRefRangeColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._testFlagColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._resultStatusColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentLevelStatus = new Extract.DataEntry.DataEntryTextBox();
             this._componentLevelFlag = new Extract.DataEntry.DataEntryTextBox();
             this._componentLevelRange = new Extract.DataEntry.DataEntryTextBox();
             this._componentLevelUnits = new Extract.DataEntry.DataEntryTextBox();
@@ -105,10 +110,6 @@
             this._testsGroupBox = new System.Windows.Forms.GroupBox();
             this._defaultLabID = new Extract.DataEntry.DataEntryTextBox();
             this._defaultLabIdentifier = new Extract.DataEntry.DataEntryTextBox();
-            this._patientFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._patientMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._patientLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._patientSuffixColumn = new Extract.DataEntry.DataEntryTableColumn();
             _resultCodeLabel = new System.Windows.Forms.Label();
             _testNameLabel = new System.Windows.Forms.Label();
             panelGroupBox = new System.Windows.Forms.GroupBox();
@@ -508,6 +509,41 @@
             this._patientNameTable.TabIndex = 1;
             this._patientNameTable.TabStop = false;
             // 
+            // _patientFirstNameColumn
+            // 
+            this._patientFirstNameColumn.AttributeName = "First";
+            this._patientFirstNameColumn.FillWeight = 75F;
+            this._patientFirstNameColumn.HeaderText = "First Name";
+            this._patientFirstNameColumn.Name = "_patientFirstNameColumn";
+            this._patientFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._patientFirstNameColumn.ValidationErrorMessage = "Patient first name must be specified";
+            // 
+            // _patientMiddleNameColumn
+            // 
+            this._patientMiddleNameColumn.AttributeName = "Middle";
+            this._patientMiddleNameColumn.FillWeight = 75F;
+            this._patientMiddleNameColumn.HeaderText = "Middle Name";
+            this._patientMiddleNameColumn.Name = "_patientMiddleNameColumn";
+            this._patientMiddleNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._patientMiddleNameColumn.ValidationErrorMessage = "Bad value";
+            // 
+            // _patientLastNameColumn
+            // 
+            this._patientLastNameColumn.AttributeName = "Last";
+            this._patientLastNameColumn.HeaderText = "Last Name";
+            this._patientLastNameColumn.Name = "_patientLastNameColumn";
+            this._patientLastNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._patientLastNameColumn.ValidationErrorMessage = "Patient last name must be specified.";
+            // 
+            // _patientSuffixColumn
+            // 
+            this._patientSuffixColumn.AttributeName = "Suffix";
+            this._patientSuffixColumn.FillWeight = 50F;
+            this._patientSuffixColumn.HeaderText = "Suffix";
+            this._patientSuffixColumn.Name = "_patientSuffixColumn";
+            this._patientSuffixColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._patientSuffixColumn.ValidationErrorMessage = "";
+            // 
             // _genderLabel
             // 
             this._genderLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -581,6 +617,7 @@
             // 
             this._testDetailsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this._testDetailsGroupBox.Controls.Add(this._originalNameTextBox);
             this._testDetailsGroupBox.Controls.Add(this._componentLevelStatus);
             this._testDetailsGroupBox.Controls.Add(this._componentLevelFlag);
             this._testDetailsGroupBox.Controls.Add(this._componentLevelRange);
@@ -599,17 +636,18 @@
             this._testDetailsGroupBox.TabStop = false;
             this._testDetailsGroupBox.Text = "Test Details";
             // 
-            // _componentLevelStatus
+            // _originalNameTextBox
             // 
-            this._componentLevelStatus.AttributeName = "Status";
-            this._componentLevelStatus.AutoUpdateQuery = "<Attribute>../../Status</Attribute>";
-            this._componentLevelStatus.Location = new System.Drawing.Point(376, 52);
-            this._componentLevelStatus.Name = "_componentLevelStatus";
-            this._componentLevelStatus.ParentDataEntryControl = this._testNameTextBox;
-            this._componentLevelStatus.Size = new System.Drawing.Size(10, 20);
-            this._componentLevelStatus.TabIndex = 10;
-            this._componentLevelStatus.ValidationErrorMessage = "Invalid value";
-            this._componentLevelStatus.Visible = false;
+            this._originalNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._originalNameTextBox.AttributeName = "OriginalName";
+            this._originalNameTextBox.AutoUpdateQuery = resources.GetString("_originalNameTextBox.AutoUpdateQuery");
+            this._originalNameTextBox.Location = new System.Drawing.Point(678, 32);
+            this._originalNameTextBox.Name = "_originalNameTextBox";
+            this._originalNameTextBox.ParentDataEntryControl = this._testNameTextBox;
+            this._originalNameTextBox.Size = new System.Drawing.Size(10, 20);
+            this._originalNameTextBox.TabIndex = 11;
+            this._originalNameTextBox.ValidationErrorMessage = "Invalid value";
+            this._originalNameTextBox.Visible = false;
             // 
             // _testNameTextBox
             // 
@@ -711,6 +749,7 @@
             this._testDisplayName.FillWeight = 120F;
             this._testDisplayName.HeaderText = "Order Name";
             this._testDisplayName.Name = "_testDisplayName";
+            this._testDisplayName.SmartHintsEnabled = true;
             this._testDisplayName.ValidationErrorMessage = "Order name is not recognized.";
             this._testDisplayName.ValidationQuery = resources.GetString("_testDisplayName.ValidationQuery");
             // 
@@ -737,6 +776,7 @@
             this._testValueColumn.FillWeight = 70F;
             this._testValueColumn.HeaderText = "Value";
             this._testValueColumn.Name = "_testValueColumn";
+            this._testValueColumn.SmartHintsEnabled = true;
             this._testValueColumn.ValidationErrorMessage = "Invalid value";
             // 
             // _testUnitsColumn
@@ -747,6 +787,7 @@
             this._testUnitsColumn.FillWeight = 40F;
             this._testUnitsColumn.HeaderText = "Units";
             this._testUnitsColumn.Name = "_testUnitsColumn";
+            this._testUnitsColumn.SmartHintsEnabled = true;
             this._testUnitsColumn.ValidationErrorMessage = "Invalid value";
             this._testUnitsColumn.ValidationQuery = "<Query ValidationListType=\'ValidationListOnly\'>\r\n[BLANK]\r\n<SQL>SELECT * FROM Unit" +
     " ORDER BY Unit</SQL>\r\n</Query>";
@@ -759,6 +800,7 @@
             this._testRefRangeColumn.FillWeight = 70F;
             this._testRefRangeColumn.HeaderText = "Ref. Range";
             this._testRefRangeColumn.Name = "_testRefRangeColumn";
+            this._testRefRangeColumn.SmartHintsEnabled = true;
             this._testRefRangeColumn.ValidationErrorMessage = "Invalid value";
             // 
             // _testFlagColumn
@@ -769,6 +811,7 @@
             this._testFlagColumn.FillWeight = 40F;
             this._testFlagColumn.HeaderText = "Flag";
             this._testFlagColumn.Name = "_testFlagColumn";
+            this._testFlagColumn.SmartHintsEnabled = true;
             this._testFlagColumn.UseComboBoxCells = true;
             this._testFlagColumn.ValidationErrorMessage = "Invalid value";
             this._testFlagColumn.ValidationQuery = resources.GetString("_testFlagColumn.ValidationQuery");
@@ -784,6 +827,18 @@
             this._resultStatusColumn.UseComboBoxCells = true;
             this._resultStatusColumn.ValidationErrorMessage = "Invalid value";
             this._resultStatusColumn.ValidationQuery = "C\r\nF\r\nP\r\nR\r\nX";
+            // 
+            // _componentLevelStatus
+            // 
+            this._componentLevelStatus.AttributeName = "Status";
+            this._componentLevelStatus.AutoUpdateQuery = "<Attribute>../../Status</Attribute>";
+            this._componentLevelStatus.Location = new System.Drawing.Point(376, 52);
+            this._componentLevelStatus.Name = "_componentLevelStatus";
+            this._componentLevelStatus.ParentDataEntryControl = this._testNameTextBox;
+            this._componentLevelStatus.Size = new System.Drawing.Size(10, 20);
+            this._componentLevelStatus.TabIndex = 10;
+            this._componentLevelStatus.ValidationErrorMessage = "Invalid value";
+            this._componentLevelStatus.Visible = false;
             // 
             // _componentLevelFlag
             // 
@@ -1046,41 +1101,6 @@
             this._defaultLabIdentifier.ValidationQuery = "";
             this._defaultLabIdentifier.Visible = false;
             // 
-            // _patientFirstNameColumn
-            // 
-            this._patientFirstNameColumn.AttributeName = "First";
-            this._patientFirstNameColumn.FillWeight = 75F;
-            this._patientFirstNameColumn.HeaderText = "First Name";
-            this._patientFirstNameColumn.Name = "_patientFirstNameColumn";
-            this._patientFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientFirstNameColumn.ValidationErrorMessage = "Patient first name must be specified";
-            // 
-            // _patientMiddleNameColumn
-            // 
-            this._patientMiddleNameColumn.AttributeName = "Middle";
-            this._patientMiddleNameColumn.FillWeight = 75F;
-            this._patientMiddleNameColumn.HeaderText = "Middle Name";
-            this._patientMiddleNameColumn.Name = "_patientMiddleNameColumn";
-            this._patientMiddleNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientMiddleNameColumn.ValidationErrorMessage = "Bad value";
-            // 
-            // _patientLastNameColumn
-            // 
-            this._patientLastNameColumn.AttributeName = "Last";
-            this._patientLastNameColumn.HeaderText = "Last Name";
-            this._patientLastNameColumn.Name = "_patientLastNameColumn";
-            this._patientLastNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientLastNameColumn.ValidationErrorMessage = "Patient last name must be specified.";
-            // 
-            // _patientSuffixColumn
-            // 
-            this._patientSuffixColumn.AttributeName = "Suffix";
-            this._patientSuffixColumn.FillWeight = 50F;
-            this._patientSuffixColumn.HeaderText = "Suffix";
-            this._patientSuffixColumn.Name = "_patientSuffixColumn";
-            this._patientSuffixColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientSuffixColumn.ValidationErrorMessage = "";
-            // 
             // UITransplantCenterPanel
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -1190,5 +1210,6 @@
         private DataEntryTableColumn _patientMiddleNameColumn;
         private DataEntryTableColumn _patientLastNameColumn;
         private DataEntryTableColumn _patientSuffixColumn;
+        private DataEntryTextBox _originalNameTextBox;
     }
 }
