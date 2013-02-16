@@ -1,0 +1,265 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.1 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.1 Testing <br>
+Final Final SCRs <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DataEntry #1201, #1206, #1208]</b> Smart Tag Functionality
+        	<ul>
+			<li>Exercise <b>Demo_LabDE</b> verification.
+			<li>Click on the <b>Order Name</b> cell.
+			<li>Click on the corresponding <b>Order Number</b> text box.
+			<li>Click <b>.</b> to launch the Smart Tag list.
+			<li>Confirm that the <b>Order Name</b> values do not change as 
+			<b>Smart Tag</b> choices are selected.
+			<li>Confirm that no exceptions are displayed after adding <b>.</b> 
+			comments and leaving the field.
+<p>
+			<li>Select an <b>Order</b> table row.
+			<li>Navigate to <b>Selected Order Details</b> and use <b>.</b> to 
+			open a Smart Tag list.
+			<li>With the tag list still open, click on an empty table row 
+			in the <b>Order</b> section.
+			<li>Confirm that no exceptions are displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1202]</b> OCR Accuracy Not Persistent
+        	<ul>
+			<li>Exercise Data Entry verification.
+			<li>Modify the OCR method via <b>Tools - Options - General</b>.
+			<li>Confirm that the setting is persistent across documents.
+			<li>Confirm that the setting is persistent across verification 
+			sessions.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1207]</b> Undo Of Deleted Highlight
+        	<ul>
+			<li>Exercise <b>Demo_FLEXIndex</b> verification for a document 
+			that contains both a Parcel Number and a Return Address.
+			<li>Activate the <b>Review and Select</b> tool.
+			<li>Click the Parcel Number in the document image.
+			<li>Click the highlight again.
+			<li>Type <b>Ctrl+D</b> to remove the highlight.
+			<li>Click one of the Return Address fields in the document image.
+			<li>Type <b>Ctrl+Z</b> to Undo.
+			<li>Confirm that no exceptions are displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1212, FlexIDSCore #5244]</b> Long Delay After Closing 
+		Verification
+        	<ul>
+			<li>Exercise <b>Demo_LabDE</b> verification.
+			<li>Close the verification UI with the red <b>X</b>.
+			<li>Confirm that a long delay is not seen before the FAM resets 
+			to allow processing to start again.
+			<li>Repeat the test with <b>Demo_IDShield</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1215]</b> Typing With Selected Rows
+        	<ul>
+			<li>Exercise <b>Demo_FLEXIndex</b> verification.
+			<li>Tab to the last row of the <b>Address</b> field.
+			<li>Click in the upper left corner to select all rows.
+			<li>Type any character.
+			<li>Confirm that no exceptions are displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1216] NOT FIXED ?</b> Exception During Save
+        	<ul>
+			<li>Exercise Data Entry verification.
+			<li>Select an <b>Address</b> field.
+			<li>Edit the <b>City</b> entry and delete the characters.
+			<li>Click <b>Save</b>.
+			<li>Confirm that no exceptions are displayed.
+			<li>Repeat the test by removing all Address data before <b>Save</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1223] NOT FIXED ?</b> Exceptions For Highlight All Data
+        	<ul>
+			<li>Exercise Data Entry verification.
+			<li>Click the <b>Highlight all data</b> button.
+			<li>Toggle the button state back and forth.
+			<li>Confirm that no exceptions are displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1226] NOT FIXED ?</b> LabDE Missing From Programs and Features
+        	<ul>
+			<li>Install LabDE via <b>InstallLabDE.bat</b>.
+			<li>Confirm that LabDE is present as an installed program in the Control 
+			Panel.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #874, #879]</b> FTP Task
+        	<ul>
+			<li>Confirm that the FTP task keeps the FTP connection open until either 
+			<b>Close</b> or <b>Standby</b> is called.
+			<li>Confirm that retries are attempted, if necessary, during FTP rename 
+			tasks.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #882, #885, #886]</b> SQLCDBEditor
+        	<ul>
+			<li>Open the SDF file in <b>I:\Common\Testing\PVCS_Testing\DotNetRC\882</b>.
+			<li>Open the <b>LabTestNew</b> table.
+			<li>Confirm that this table cannot be edited since it does not contain a 
+			primary key.
+			<li>Select all rows and press the <b>Delete</b> key.
+			<li>Confirm that the delete is ignored.
+<p>
+			<li>Open an SDF file for editing.
+			<li>Open a table and another tab.
+			<li>Modify table data such that the result is invalid.
+			<li>Switch tabs and switch back.
+			<li>Confirm that the displayed exception and the error icon text are similar.
+<p>
+			<li>Open an SDF file for editing.
+			<li>Open a table that contains only a single row.
+			<li>Delete the row.
+			<li>Confirm that the database is marked dirty.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #887] NOT FIXED ?</b> FTP Upload
+        	<ul>
+			<li>Confirm that the FTP upload does not hang.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5216]</b> ID Shield Tester
+        	<ul>
+			<li>Exercise the TCL file in <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\5216</b>.
+			<li>Confirm that both files exist in all three lists in the <b>Analysis</b> 
+			folder.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5229] NOT FIXED ?</b> Confirm that the 
+		<b>ExtractUninstaller</b> does not exit the task bar without later restarting 
+		it.
+<p>
+  	   	<LI><b>[FlexIDSCore #5236]</b> System Requirements in Help
+        	<ul>
+			<li>Confirm that each Help file references <b>minimum recommended</b> 
+			configurations for servers and workstations.
+			<li>Server
+			<ul>
+				<li>4 or more cores
+				<li>8 GB RAM
+				<li>Additional capability required if also serving as a 
+				database host
+			</ul>
+			<li>Workstation
+			<ul>
+				<li>2 or more cores
+				<li>2 GB RAM
+			</ul>
+			<li>Terminal Services 
+			<ul>
+				<li>1 core per client
+				<li>1 GB RAM per client
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5242]</b> Confirm that the <b>Core: Execute rules</b> task 
+		will expand both path tags and path functions.
+<p>
+  	   	<LI><b>[FlexIDSCore #5246]</b> Confirm that using a <b>SilentInstalls</b> batch 
+		file does not leave a <b>setup.log</b> file in the <b>ExtractUninstaller</b> folder.
+<p>
+  	   	<LI><b>[LegacyRC #6381]</b> Folder Listener
+        	<ul>
+			<li>Start a <b>FAM Backup</b> test.
+			<li>Run three FAMs to listen for files on three separate folders.
+			<li>Reboot one of the machines hosting a FAM.
+			<li>Confirm that after the reboot, the FAM is able to reconnect to the 
+			database.
+<p>
+			<li>Exercise a stress test of the above
+			<ul>
+				<li>Install an ID Shield build on a virtual machine.
+				<li>Prepare 3 databases on a separate machine.
+				<li>Prepare 3 FAMs
+				<ul>
+					<li>FAM A listens to folder A and supplies database A.
+					<li>FAM B listens to folder B and supplies database B.
+					<li>FAM C listens to folder C and supplies database C.
+				</ul>
+				<li>Start a PowerShell script on the virtual machine to create 
+				<b>10,000</b> empty files in each of the watched folders.
+				<li>Prepare a batch file on the database machine to stop and 
+				restart SQL Server so that it is on for 10 seconds and then 
+				off for 10 seconds.
+				<li>Confirm that when the supplying is finished, each database 
+				contains <b>10,000</b> files.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6389]</b> DB Scalability
+        	<ul>
+			<li>Start a <b>Database Scalability</b> test.
+			<li>Run the test over a weekend.
+			<li>Review the exception log and confirm that none of the following 
+			exceptions are logged.
+			<ul>
+				<li>ELI28498: The RPC server is unavailable
+			</ul>
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Other SCRs</h3>
+    	<ul>
+  	   	<LI>TBD
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
