@@ -12,7 +12,8 @@
 
 // Included header files ----------------------------------------------------
 #include "ifx.h"
-
+                             
+#define EXTRACT_DIR "\\Extract Systems\\CommonComponents"
 // Note: In order to have your InstallScript function executed as a custom
 // action by the Windows Installer, it must be prototyped as an 
 // entry-point function.
@@ -20,7 +21,8 @@
 // The keyword export identifies MyFunction() as an entry-point function.
 // The argument it accepts must be a handle to the Installer database.
     
-/* export prototype MyFunction(HWND); */
+/* export prototype MyFunction(HWND); */      
+prototype CloseApps();
 
 //---------------------------------------------------------------------------
 // OnFirstUIBefore
@@ -126,6 +128,7 @@ Dlg_SdStartCopy:
     Enable(STATUSEX);      
     */
  
+ 	CloseApps();
     return 0;
 end;
 //---------------------------------------------------------------------------
@@ -180,4 +183,18 @@ begin
     //else
 	//    SdFinish ( szTitle , szMsg1 , szMsg2 , szOpt1 , szOpt2 , bOpt1 , bOpt2 );
 	//endif;
+end;
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: CloseApps
+//
+//  Purpose: To close running apps before installing or uninstalling
+///////////////////////////////////////////////////////////////////////////////
+function CloseApps()
+	string strExtractTRPPath;
+begin
+	strExtractTRPPath = PROGRAMFILES ^ EXTRACT_DIR ^ "ExtractTRP2.exe";
+	LaunchAppAndWait(strExtractTRPPath , "/exit", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
 end;
