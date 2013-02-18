@@ -13,7 +13,7 @@ IF EXIST "C:\Program Files (x86)" (
 	set FLEXINDEX_ISS="%~dp0FlexIndex64.iss"
 	set IDSHIELD_ISS="%~dp0Idshield64.iss"
 ) ELSE (
-	set LABDE_ISSFILE="%~dp0LabDE.iss"
+	set LABDE_ISS="%~dp0LabDE.iss"
 	set FLEXINDEX_ISS="%~dp0FlexIndex.iss"
 	set IDSHIELD_ISS="%~dp0Idshield.iss"
 )
