@@ -536,7 +536,7 @@ begin
 	
 	if ( svValue != "1") then
 		gbInstalled  = FALSE;
-		MessageBox("Microsoft .NET 4.0 is must be installed before running this install.", MB_OK);
+		MessageBox("Microsoft .NET 4.0 must be installed before running this install.", MB_OK);
 		abort;
 	endif; 
 end;
