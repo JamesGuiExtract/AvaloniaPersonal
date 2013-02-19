@@ -5154,6 +5154,77 @@ namespace Extract.Imaging.Forms
             }
         }
 
+        /// <summary>
+        /// Updates <see cref="Cursor"/> based upon the current state of the current cursor tool,
+        /// state of the image viewer, key state and mouse position.
+        /// </summary>
+        public void UpdateCursor()
+        {
+            try
+            {
+                Cursor oldCursor = Cursor;
+
+                Cursor newCursor = Cursors.Default;
+
+                if (_cursors != null)
+                {
+                    if (IsTracking && _cursorTool == CursorTool.SelectLayerObject)
+                    {
+                        // Don't allow a cursor change during a tracking event with the selection cursor
+                        // active. The Highlight class uses the cursor as a flag to indicated the type
+                        // of tracking event that is active.
+                        newCursor = oldCursor;
+                    }
+                    else if (IsImageAvailable && _cursorTool == CursorTool.SelectLayerObject)
+                    {
+                        // If using the selection cursor, get the appropriate one based on the mouse
+                        // position.
+                        newCursor = GetSelectionCursor(PointToClient(MousePosition));
+                    }
+                    else if (IsTracking && _cursors.Active != null)
+                    {
+                        newCursor = _cursors.Active;
+                    }
+                    else if ((ModifierKeys == Keys.Shift) && _cursors.ShiftState != null)
+                    {
+                        newCursor = _cursors.ShiftState;
+                    }
+                    else if ((ModifierKeys == (Keys.Control | Keys.Shift)) && _cursors.CtrlShiftState != null)
+                    {
+                        newCursor = _cursors.CtrlShiftState;
+                    }
+                    else if (_cursors.Tool != null)
+                    {
+                        newCursor = _cursors.Tool;
+                    }
+                }
+
+                if (oldCursor != newCursor)
+                {
+                    // If in a tracking operation, make a call to UpdateTracking as some tracking
+                    // operations depend on the current cursor.
+                    if (IsTracking)
+                    {
+                        Point mousePosition = PointToClient(MousePosition);
+
+                        // Assign a tracking update call to update the tracking region and display
+                        // tracking graphics and invalidate to trigger the graphics to be drawn.
+                        _trackingUpdateCall =
+                            ((paintEventArgs) => UpdateTracking(paintEventArgs,
+                                mousePosition.X, mousePosition.Y));
+
+                        Invalidate();
+                    }
+
+                    Cursor = newCursor;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35399");
+            }
+        }
+
         #region Shortcut Key Methods
 
         /// <summary>
@@ -6264,70 +6335,6 @@ namespace Extract.Imaging.Forms
             }
 
             return cursor;
-        }
-
-        /// <summary>
-        /// Updates <see cref="Cursor"/> based upon the current state of the current cursor tool,
-        /// state of the image viewer, key state and mouse position.
-        /// </summary>
-        void UpdateCursor()
-        {
-            Cursor oldCursor = Cursor;
-
-            Cursor newCursor = Cursors.Default;
-
-            if (_cursors != null)
-            {
-                if (IsTracking && _cursorTool == CursorTool.SelectLayerObject)
-                {
-                    // Don't allow a cursor change during a tracking event with the selection cursor
-                    // active. The Highlight class uses the cursor as a flag to indicated the type
-                    // of tracking event that is active.
-                    newCursor = oldCursor;
-                }
-                else if (IsImageAvailable && _cursorTool == CursorTool.SelectLayerObject)
-                {
-                    // If using the selection cursor, get the appropriate one based on the mouse
-                    // position.
-                    newCursor = GetSelectionCursor(PointToClient(MousePosition));
-                }
-                else if (IsTracking && _cursors.Active != null)
-                {
-                    newCursor = _cursors.Active;
-                }
-                else if ((ModifierKeys == Keys.Shift) && _cursors.ShiftState != null)
-                {
-                    newCursor = _cursors.ShiftState;
-                }
-                else if ((ModifierKeys == (Keys.Control | Keys.Shift)) && _cursors.CtrlShiftState != null)
-                {
-                    newCursor = _cursors.CtrlShiftState;
-                }
-                else if (_cursors.Tool != null)
-                {
-                    newCursor = _cursors.Tool;
-                }
-            }
-
-            if (oldCursor != newCursor)
-            {
-                // If in a tracking operation, make a call to UpdateTracking as some tracking
-                // operations depend on the current cursor.
-                if (IsTracking)
-                {
-                    Point mousePosition = PointToClient(MousePosition);
-
-                    // Assign a tracking update call to update the tracking region and display
-                    // tracking graphics and invalidate to trigger the graphics to be drawn.
-                    _trackingUpdateCall =
-                        ((paintEventArgs) => UpdateTracking(paintEventArgs,
-                            mousePosition.X, mousePosition.Y));
-
-                    Invalidate();
-                }
-
-                Cursor = newCursor;
-            }
         }
 
         /// <summary>

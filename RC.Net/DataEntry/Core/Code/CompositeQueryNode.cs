@@ -580,7 +580,7 @@ namespace Extract.DataEntry
                         }
                         else
                         {
-                            forcedSpatialResult.Append(resultSet.ForcedSpatialResult);
+                            forcedSpatialResult.MergeAsHybridString(resultSet.ForcedSpatialResult);
                         }
                     }
                 }
@@ -765,7 +765,8 @@ namespace Extract.DataEntry
                             else
                             {
                                 vecRasterZones.Append(forcedSpatialResult.GetOCRImageRasterZones());
-                                forcedSpatialResult.Append(distinctResult.FirstSpatialStringValue);
+                                forcedSpatialResult.MergeAsHybridString(
+                                    distinctResult.FirstSpatialStringValue);
                             }
 
                             // Because the SpatialString class will remove spatial info for
@@ -823,7 +824,7 @@ namespace Extract.DataEntry
                             else
                             {
                                 SpatialString spatialResultCopy = forcedSpatialResult.Clone();
-                                spatialResultCopy.Append(resultSet.ForcedSpatialResult);
+                                spatialResultCopy.MergeAsHybridString(resultSet.ForcedSpatialResult);
                                 resultSet.ForcedSpatialResult = spatialResultCopy;
                             }
                         }

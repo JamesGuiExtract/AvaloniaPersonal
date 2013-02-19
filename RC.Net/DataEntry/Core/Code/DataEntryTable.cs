@@ -974,14 +974,15 @@ namespace Extract.DataEntry
 
                             inUpdate = true;
                             OnUpdateStarted(new EventArgs());
+                            IDataObject clipboardData = DataEntryMethods.GetClipboardData();
 
-                            if (enableRowOptions && GetDataFormatName(Clipboard.GetDataObject()) != null)
+                            if (enableRowOptions && GetDataFormatName(clipboardData) != null)
                             {
-                                PasteRowData(Clipboard.GetDataObject());
+                                PasteRowData(clipboardData);
 
                                 e.Handled = true;
                             }
-                            else if (PasteCellData(Clipboard.GetDataObject()))
+                            else if (PasteCellData(clipboardData))
                             {
                                 e.Handled = true;
                             }
@@ -1039,7 +1040,7 @@ namespace Extract.DataEntry
                     {
                         OnUpdateStarted(new EventArgs());
 
-                        if (PasteCellData(Clipboard.GetDataObject()))
+                        if (PasteCellData(DataEntryMethods.GetClipboardData()))
                         {
                             return true;
                         }
@@ -2144,7 +2145,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                PasteRowData(Clipboard.GetDataObject());
+                PasteRowData(DataEntryMethods.GetClipboardData());
             }
             catch (Exception ex)
             {
@@ -2167,7 +2168,7 @@ namespace Extract.DataEntry
 
                 InsertNewRow(true);
 
-                PasteRowData(Clipboard.GetDataObject());
+                PasteRowData(DataEntryMethods.GetClipboardData());
             }
             catch (Exception ex)
             {
@@ -2301,7 +2302,8 @@ namespace Extract.DataEntry
                 // the current table cell.
                 bool enableRowOptions = AllowRowTasks(hit.RowIndex, hit.ColumnIndex);
                 bool enablePasteOptions = false;
-                if (enableRowOptions && GetDataFormatName(Clipboard.GetDataObject()) != null)
+                if (enableRowOptions &&
+                    GetDataFormatName(DataEntryMethods.GetClipboardData()) != null)
                 {
                     enablePasteOptions = true;
                 }
@@ -3138,12 +3140,11 @@ namespace Extract.DataEntry
         {
             string rowData = GetSelectedRowData();
 
-            // If at least one row was copied, add the copied attributes to the internal
-            // "clipboard".
+            // If at least one row was copied, add the copied attributes to the clipboard.
             if (rowData != null)
             {
                 // Add the copied attributes to the clipboard
-                Clipboard.SetData(RowDataFormatName, rowData);
+                DataEntryMethods.SetClipboardData(RowDataFormatName, rowData);
             }
         }
 
@@ -3212,7 +3213,7 @@ namespace Extract.DataEntry
                         }
                     }
 
-                    Clipboard.SetData(MultiColumnDataFormatName, data);
+                    DataEntryMethods.SetClipboardData(MultiColumnDataFormatName, data);
 
                     return true;
                 } 

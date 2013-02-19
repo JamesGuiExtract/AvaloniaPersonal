@@ -1356,6 +1356,18 @@ namespace Extract.DataEntry
 
                 if (m.Msg == WindowsMessage.KeyDown || m.Msg == WindowsMessage.KeyUp)
                 {
+                    // [DataEntry:1230]
+                    // If a modifier key is going down or up, notify image viewer to update cursor
+                    // to prevent cases where the active tool gets stuck in an inappropriate state.
+                    if (m.WParam == (IntPtr)Keys.ShiftKey || m.WParam == (IntPtr)Keys.Control
+                        || m.WParam == (IntPtr)Keys.Alt)
+                    {
+                        if (_imageViewer != null)
+                        {
+                            _imageViewer.UpdateCursor();
+                        }
+                    }
+
                     // Check for shift or tab key press events
                     if (m.WParam == (IntPtr)Keys.ShiftKey)
                     {

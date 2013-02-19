@@ -1109,10 +1109,19 @@ void CSpatialString::validateAndMergeSourceDocName(const string& strSourceDocNam
     if (!strSourceDocName.empty() && !m_strSourceDocName.empty() && 
         strSourceDocName != m_strSourceDocName)
     {
-        UCLIDException ue("ELI06806", "Cannot operate on spatial strings from different sources!");
+		// [DataEntry:1232]
+		// For the time being, making this a logged application trace to avoid exceptions being
+		// thrown in the DE framework when rules were run against the document when it had a
+		// different source doc name.
+        //UCLIDException ue("ELI06806", "Cannot operate on spatial strings from different sources!");
+		UCLIDException ue("ELI06806",
+			"Application trace: Cannot operate on spatial strings from different sources!");
         ue.addDebugInfo("this.SourceDocName", m_strSourceDocName);
         ue.addDebugInfo("other.SourceDocName", strSourceDocName);
-        throw ue;
+        //throw ue;
+		ue.log();
+		m_strSourceDocName = strSourceDocName;
+		return;
     }
 
     // if this object has no source document name associated with it, but the

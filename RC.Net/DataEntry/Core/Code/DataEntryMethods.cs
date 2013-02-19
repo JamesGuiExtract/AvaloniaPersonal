@@ -1,17 +1,13 @@
-using Extract;
 using Extract.Licensing;
 using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
-using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Remoting;
-using System.Text;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
@@ -76,6 +72,16 @@ namespace Extract.DataEntry
         /// </summary>
         internal static readonly string _PFES_FOLDER = "[PFESFolder]";
 
+        /// <summary>
+        /// The number of times clipboard copy operations should be attempted before giving up.
+        /// </summary>
+        internal static readonly int _CLIPBOARD_RETRY_COUNT = 10;
+
+        /// <summary>
+        /// The number of seconds to allow back-up clipboard data to be used.
+        /// </summary>
+        internal static readonly int _SECONDS_TO_ALLOW_CLIPBOARD_BACKUP = 15;
+
         #endregion Constants
 
         #region Fields
@@ -91,6 +97,16 @@ namespace Extract.DataEntry
         /// </summary>
         private static string _solutionRootDirectory =
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+        /// <summary>
+        /// A backup copy of the last data put on the clipboard.
+        /// </summary>
+        static IDataObject _lastClipboardData = null;
+
+        /// <summary>
+        /// The time <see cref="_lastClipboardData"/> was placed on the clipboard.
+        /// </summary>
+        static DateTime _lastClipboardCopyTime = new DateTime();
 
         #endregion Fields
 
@@ -1153,6 +1169,145 @@ namespace Extract.DataEntry
             {
                 throw ExtractException.AsExtractException("ELI30115", ex);
             }
+        }
+
+        /// <summary>
+        /// Places the specified <see paramref="data"/> of the specified <see paramref="format"/>
+        /// to the clipboard with retries. A backup copy is kept for use by the DE framework even
+        /// if all attempts fail.
+        /// </summary>
+        /// <param name="formatName">The name of the data format.</param>
+        /// <param name="data">The data.</param>
+        public static void SetClipboardData(string formatName, object data)
+        {
+            try
+            {
+                using (new TemporaryWaitCursor())
+                {
+                    Exception clipboardException = null;
+
+                    // Register custom data format or get it if it's already registered
+                    DataFormats.Format format = DataFormats.GetFormat(formatName);
+
+                    // Apply the data to _lastClipboardData which can be used internally even if the
+                    // the data isn't successfully placed on the clipboard.
+                    _lastClipboardData = new DataObject(format.Name, data);
+                    _lastClipboardData.SetData(format.Name, false, data);
+
+                    // Retry loop in case copy or clipboard data validation fail.
+                    for (int i = 0; i < _CLIPBOARD_RETRY_COUNT; i++)
+                    {
+                        try
+                        {
+                            // Techinically un-necessary, but the clipboard is being flakey, so
+                            // maybe this will help?
+                            if (i > 0)
+                            {
+                                Clipboard.Clear();
+
+                                System.Threading.Thread.Sleep(200);
+                            }
+
+                            // Keep track of the time the data was copied so that we don't allow
+                            // a stale backup copy to be used later on.
+                            _lastClipboardCopyTime = DateTime.Now;
+                            Clipboard.SetDataObject(_lastClipboardData, false);
+
+                            IDataObject clipboardData = Clipboard.GetDataObject();
+                            object clipboardDataElement = clipboardData.GetData(format.Name);
+
+                            // Validate the data was placed on the clipboard under either of the two
+                            // data types currently used by the DE framework.
+                            if (data is string)
+                            {
+                                ExtractException.Assert("ELI35402", "Clipboard data failed validation.",
+                                    clipboardDataElement.Equals(data));
+                            }
+                            else
+                            {
+                                var dataArray = data as string[][];
+
+                                if (dataArray != null)
+                                {
+                                    ExtractException.Assert("ELI35406", "Clipboard data failed validation.",
+                                        ((string[][])clipboardDataElement).Length == dataArray.Length);
+                                }
+                            }
+
+                            // Success; break out of loop.
+                            clipboardException = null;
+                            return;
+                        }
+                        catch (Exception ex)
+                        {
+                            clipboardException = ex;
+                        }
+                    }
+
+                    // Throw the last exception that was caught in the retry loop.
+                    if (clipboardException != null)
+                    {
+                        throw clipboardException;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Since we have a backup copy, don't throw an exception right now.
+                var ee = new ExtractException("ELI35400", "Failed to copy data to clipboard.", ex);
+                ee.Log();
+            }
+        }
+
+        /// <summary>
+        /// Retrieves into <see paramref="data"/> data from the clipboard of the specified
+        /// <see paramref="format"/>. Will attempt to use a backup copy if the data on the clipboard
+        /// appears invalid.
+        /// </summary>
+        /// <returns>An <see cref="IDataObject"/> that represents the data currently on the
+        /// clipboard, or <see langword="null"/> if there is no data on the clipboard.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public static IDataObject GetClipboardData()
+        {
+            try 
+	        {	        
+		        IDataObject data = Clipboard.GetDataObject();
+
+                if (data != null)
+                {
+                    // If the clipboard data backup copy has expired, set it to null so that it is
+                    // not used.
+                    if (_lastClipboardData != null &&
+                        (DateTime.Now - _lastClipboardCopyTime).TotalSeconds
+                            > _SECONDS_TO_ALLOW_CLIPBOARD_BACKUP)
+                    {
+                        _lastClipboardData = data;
+                    }
+
+                    if (_lastClipboardData != null)
+                    {
+                        // Get the format; preferably a format shared with _lastClipboardData, if
+                        // possible.
+                        string format = data.GetFormats().Intersect(
+                            _lastClipboardData.GetFormats()).FirstOrDefault()
+                            ?? data.GetFormats().FirstOrDefault();
+
+                        // If the data on the clipboard matches the backup clipboard data copy, don't
+                        // bother using the real clipboard data which can be flakey; just use the backup
+                        // copy.
+                        if (_lastClipboardData != null && _lastClipboardData.GetDataPresent(format))
+                        {
+                            return _lastClipboardData;
+                        }
+                    }
+                }
+
+                return data;
+	        }
+	        catch (Exception ex)
+	        {
+		        throw ex.AsExtract("ELI35405");
+	        }
         }
 
         #endregion Static Methods
