@@ -1275,30 +1275,40 @@ namespace Extract.DataEntry
 
                 if (data != null)
                 {
-                    // If the clipboard data backup copy has expired, set it to null so that it is
-                    // not used.
-                    if (_lastClipboardData != null &&
-                        (DateTime.Now - _lastClipboardCopyTime).TotalSeconds
-                            > _SECONDS_TO_ALLOW_CLIPBOARD_BACKUP)
+                    try
                     {
-                        _lastClipboardData = data;
-                    }
-
-                    if (_lastClipboardData != null)
-                    {
-                        // Get the format; preferably a format shared with _lastClipboardData, if
-                        // possible.
-                        string format = data.GetFormats().Intersect(
-                            _lastClipboardData.GetFormats()).FirstOrDefault()
-                            ?? data.GetFormats().FirstOrDefault();
-
-                        // If the data on the clipboard matches the backup clipboard data copy, don't
-                        // bother using the real clipboard data which can be flakey; just use the backup
-                        // copy.
-                        if (_lastClipboardData != null && _lastClipboardData.GetDataPresent(format))
+                        // If the clipboard data backup copy has expired, set it to null so that it
+                        // is not used.
+                        if (_lastClipboardData != null &&
+                            (DateTime.Now - _lastClipboardCopyTime).TotalSeconds
+                                > _SECONDS_TO_ALLOW_CLIPBOARD_BACKUP)
                         {
-                            return _lastClipboardData;
+                            _lastClipboardData = data;
                         }
+
+                        if (_lastClipboardData != null)
+                        {
+                            // Get the format; preferably a format shared with _lastClipboardData,
+                            // if possible.
+                            string format = data.GetFormats().Intersect(
+                                _lastClipboardData.GetFormats()).FirstOrDefault()
+                                ?? data.GetFormats().FirstOrDefault();
+
+                            // If the data on the clipboard matches the backup clipboard data copy,
+                            // don't bother using the real clipboard data which can be flakey; just
+                            // use the backup copy.
+                            if (!string.IsNullOrEmpty(format) && _lastClipboardData != null &&
+                                _lastClipboardData.GetDataPresent(format))
+                            {
+                                return _lastClipboardData;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Don't let any attempt at being "smart" about handling the clipboard data
+                        // prevent returning the data we already have; just log in this case.
+                        ex.ExtractLog("ELI35408");
                     }
                 }
 
