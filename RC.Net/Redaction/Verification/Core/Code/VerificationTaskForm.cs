@@ -2568,7 +2568,7 @@ namespace Extract.Redaction.Verification
 
                 // Center on selected layer objects. Use forceAutoZoom parameter so that it works
                 // even if auto-zoom is disabled.
-                _imageViewer.Shortcuts[Keys.F2] = HandleToggleZoomToSelection;
+                _imageViewer.Shortcuts[Keys.F6] = HandleToggleZoomToSelection;
 
                 if (!_standAloneMode)
                 {

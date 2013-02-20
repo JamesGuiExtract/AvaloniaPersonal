@@ -1219,7 +1219,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     new ToolStripItem[] { _redoToolStripButton, _redoToolStripMenuItem },
                     false, true, false);
 
-                _imageViewer.Shortcuts[Keys.F2] = ToggleAutoZoom;
+                _imageViewer.Shortcuts[Keys.F6] = ToggleAutoZoom;
 
                 // Disable the OpenImageToolStripSplitButton if this is not stand alone mode
                 if (!_standAloneMode)
