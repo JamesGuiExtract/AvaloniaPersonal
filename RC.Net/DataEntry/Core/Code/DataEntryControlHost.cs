@@ -2211,93 +2211,98 @@ namespace Extract.DataEntry
             }
         }
 
-        /// <summary>
-        /// Toggles the view between zoomed to the current selection and set to the last view area
-        /// where zoom to selection was not in effect.
-        /// </summary>
-        public void ToggleZoomToSelection()
-        {
-            try
-            {
-                // If already zoomed in on the current selection, zoom back out to the last manual
-                // zoom.
-                if (_zoomedToSelection)
-                {
-                    if (_zoomToSelectionPage != _imageViewer.PageNumber)
-                    {
-                        _zoomedToSelection = false;
-                    }
-                    else
-                    {
-                        Rectangle currentViewRegion = _imageViewer.GetTransformedRectangle(
-                            _imageViewer.GetVisibleImageArea(), true);
-
-                        if (!currentViewRegion.Contains(_selectionBounds[_imageViewer.PageNumber]))
-                        {
-                            _zoomedToSelection = false;
-                        }
-                        else
-                        {
-                            // If _lastNonZoomedToSelectionViewArea has not yet been set, default to
-                            // zooming out to the full page.
-                            if (!_lastNonZoomedToSelectionViewArea.HasValue)
-                            {
-                                _lastNonZoomedToSelectionViewArea = new Rectangle(0, 0,
-                                    _imageViewer.ImageWidth, _imageViewer.ImageHeight);
-                            }
-
-                            // If auto-zoom is currently in effect for the page we are currently on
-                            // and there is a _lastNonZoomedToSelectionViewArea, restore the view
-                            // area to _lastNonZoomedToSelectionViewArea.
-                            _performingProgrammaticZoom = true;
-                            Rectangle viewRegion =
-                                _imageViewer.GetTransformedRectangle(
-                                    _lastNonZoomedToSelectionViewArea.Value, false);
-                            _imageViewer.ZoomToRectangle(viewRegion);
-
-                            // If there was a fit mode in effect before the zoom to selection, restore it as well.
-                            if (_lastNonZoomedToSelectionFitMode.HasValue)
-                            {
-                                _imageViewer.FitMode = _lastNonZoomedToSelectionFitMode.Value;
-                            }
-
-                            _lastViewArea = _lastNonZoomedToSelectionViewArea.Value;
-                            _zoomedToSelection = false;
-                            _manuallyZoomedToSelection = false;
-                            return;
-                        }
-                    }
-                }
-
-                // If not zoomed in on the current selection, zoom in on it.
-                if (!_zoomedToSelection)
-                {
-                    // Ensure we are on the same page as the selection.
-                    if (!_selectionBounds.Keys.Contains(_imageViewer.PageNumber))
-                    {
-                        if (!_selectionBounds.Any())
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            _imageViewer.PageNumber = _selectionBounds.Keys.First();
-                        }
-                    }
-
-                    // Force an auto-zoom to the selection bounds on the current page.
-                    EnforceAutoZoomSettings(_selectionBounds[_imageViewer.PageNumber], true);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI34985");
-            }
-            finally
-            {
-                _performingProgrammaticZoom = false;
-            }
-        }
+// [DataEntry:1242]
+// Because of an exception (which should now be correct in the commented-out code below), plus
+// general inconsistent/flakey behavior of this feature, it is being held back from the 9.1 release.
+//        /// <summary>
+//        /// Toggles the view between zoomed to the current selection and set to the last view area
+//        /// where zoom to selection was not in effect.
+//        /// </summary>
+//        public void ToggleZoomToSelection()
+//        {
+//            try
+//            {
+//                // If already zoomed in on the current selection, zoom back out to the last manual
+//                // zoom.
+//                if (_zoomedToSelection)
+//                {
+//                    if (_zoomToSelectionPage != _imageViewer.PageNumber)
+//                    {
+//                        _zoomedToSelection = false;
+//                    }
+//                    else
+//                    {
+//                        Rectangle currentViewRegion = _imageViewer.GetTransformedRectangle(
+//                            _imageViewer.GetVisibleImageArea(), true);
+//
+//                        if (_selectionBounds.Count > 0 &&
+//                            (!_selectionBounds.Keys.Contains(_imageViewer.PageNumber) ||
+//                             !currentViewRegion.Contains(_selectionBounds[_imageViewer.PageNumber])))
+//                        {
+//                            _zoomedToSelection = false;
+//                        }
+//                        else
+//                        {
+//                            // If _lastNonZoomedToSelectionViewArea has not yet been set, default to
+//                            // zooming out to the full page.
+//                            if (!_lastNonZoomedToSelectionViewArea.HasValue)
+//                            {
+//                                _lastNonZoomedToSelectionViewArea = new Rectangle(0, 0,
+//                                    _imageViewer.ImageWidth, _imageViewer.ImageHeight);
+//                            }
+//
+//                            // If auto-zoom is currently in effect for the page we are currently on
+//                            // and there is a _lastNonZoomedToSelectionViewArea, restore the view
+//                            // area to _lastNonZoomedToSelectionViewArea.
+//                            _performingProgrammaticZoom = true;
+//                            Rectangle viewRegion =
+//                                _imageViewer.GetTransformedRectangle(
+//                                    _lastNonZoomedToSelectionViewArea.Value, false);
+//                            _imageViewer.ZoomToRectangle(viewRegion);
+//
+//                            // If there was a fit mode in effect before the zoom to selection, restore it as well.
+//                            if (_lastNonZoomedToSelectionFitMode.HasValue)
+//                            {
+//                                _imageViewer.FitMode = _lastNonZoomedToSelectionFitMode.Value;
+//                            }
+//
+//                            _lastViewArea = _lastNonZoomedToSelectionViewArea.Value;
+//                            _zoomedToSelection = false;
+//                            _manuallyZoomedToSelection = false;
+//                            return;
+//                        }
+//                    }
+//                }
+//
+//                // If not zoomed in on the current selection, zoom in on it.
+//                if (!_zoomedToSelection)
+//                {
+//                    // Ensure we are on the same page as the selection.
+//                    if (!_selectionBounds.Keys.Contains(_imageViewer.PageNumber))
+//                    {
+//                        if (!_selectionBounds.Any())
+//                        {
+//                            return;
+//                        }
+//                        else
+//                        {
+//                            _imageViewer.PageNumber = _selectionBounds.Keys.First();
+//                        }
+//                    }
+//
+//                    // Force an auto-zoom to the selection bounds on the current page.
+//                    EnforceAutoZoomSettings(_selectionBounds[_imageViewer.PageNumber], true);
+//                }
+//            }
+//            catch (Exception ex)
+//            {
+//                throw ex.AsExtract("ELI34985");
+//            }
+//            finally
+//            {
+//                _performingProgrammaticZoom = false;
+//            }
+//        }
 
         /// <summary>
         /// Resets any existing highlight data and clears the attributes from all controls.
