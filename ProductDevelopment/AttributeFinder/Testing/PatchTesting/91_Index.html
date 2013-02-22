@@ -20,14 +20,25 @@ Features and Enhancements</h1>
 		<li><b>9.1.0.5</b> completed <b>10/22/2012</b>
 		<li><b>9.1.0.15</b> completed <b>11/12/2012</b>
 		<li><b>9.1.0.19</b> completed <b>11/28/2012</b>
+		<li><b>9.1.0.25</b> completed <b>12/08/2012</b>
+		<li><b>9.1.0.33</b> completed <b>12/27/2012</b>
+		<li><b>9.1.0.35</b> completed <b>01/10/2013</b>
+		<li><b>9.1.0.37</b> completed <b>01/23/2013</b>
+		<li><b>9.1.0.45</b> completed <b>02/01/2013</b>
+		<li><b>9.1.0.47</b> completed <b>02/04/2013</b>
+		<li><b>9.1.0.71</b> completed <b>02/14/2013</b>
+		<li><b>9.1.0.78</b> completed <b>02/18/2013</b>
 	</ul>
 	<li>Tested Support for Windows 8
 	<ul>
 		<li>Sanity Test with <b>9.1.0.2</b> completed <b>10/19/2012</b>
+		<li>Sanity Test with <b>9.1.0.35</b> completed <b>01/10/2013</b>
+		<li>Sanity Test with <b>9.1.0.80</b> completed <b>02/21/2013</b>
 	</ul>
 	<li>Tested Support for Windows Server 2012
 	<ul>
 		<li>Sanity Test with <b>9.0.0.241</b> completed <b>10/17/2012</b>
+		<li>Sanity Test with <b>9.1.0.47</b> completed <b>02/12/2013</b>
 	</ul>
 	<li>Tested Support for SQL Server 2012
 	<ul>
@@ -39,9 +50,13 @@ Features and Enhancements</h1>
 
 <h1>Build-Specific Testing</h1>
 <uL>
-	<li><b>9.0.0.238</b> completed <b>10/xx/2012</b>
-	<li><b>9.1.0.1</b> completed <b>10/xx/2012</b>
-	<li><b>9.1.0.15</b> completed <b>11/xx/2012</b>
+	<li><b>9.0.0.238</b> completed <b>12/19/2012</b>
+	<li><b>9.1.0.2</b> completed <b>12/16/2012</b>
+	<li><b>9.1.0.15</b> completed <b>12/18/2012</b>
+	<li><b>9.1.0.22</b> completed <b>01/25/2013</b>
+	<li><b>9.1.0.37</b> completed <b>01/31/2013</b>
+	<li><b>Final SCRs</b> completed <b>02/21/2013</b>
+	<li><b>Final Final SCRs</b> completed <b>02/xx/2013</b>
 </uL>
 
 <hr>
@@ -84,15 +99,47 @@ Features and Enhancements</h1>
 	<ul>
 		<li>Operating System: Server 2008 R2
 		<li>Date Started: 12/07/2012
-		<li>Date Completed: 12/xx/2012
+		<li><b>Date Completed: 12/10/2012</b>
 		<li>Tester: WL
 	</ul>
 <p>
-	<li>Build <b>9.1.0.x</b>
+	<li>Build <b>9.1.0.33</b>
 	<ul>
-		<li>Operating System: 
-		<li>Date Started: xx/xx/2012
-		<li>Date Completed: xx/xx/2012
+		<li>Operating System: 32-bit XP
+		<li>Date Started: 12/27/2012
+		<li><b>Date Completed: 12/28/2012</b>
+		<li>Tester: WL
+	</ul>
+<p>
+	<li>Build <b>9.1.0.35</b>
+	<ul>
+		<li>Operating System: 64-bit Windows 8
+		<li>Date Started: 01/09/2013
+		<li><b>Date Completed: 01/10/2013</b>
+		<li>Tester: WL
+	</ul>
+<p>
+	<li>Build <b>9.1.0.47</b>
+	<ul>
+		<li>Operating System: 64-bit Server 2012
+		<li>Date Started: 02/04/2013
+		<li><b>Date Completed: 02/12/2013</b>
+		<li>Tester: WL
+	</ul>
+<p>
+	<li>Build <b>9.1.0.70</b>
+	<ul>
+		<li>Operating System: 64-bit Vista
+		<li>Date Started: 02/13/2013
+		<li><b>Date Completed: 02/15/2013</b>
+		<li>Tester: WL
+	</ul>
+<p>
+	<li>Build <b>9.1.0.80</b>
+	<ul>
+		<li>Operating System: 32-bit Windows 8
+		<li>Date Started: 02/20/2013
+		<li><b>Date Completed: 02/21/2013</b>
 		<li>Tester: WL
 	</ul>
 </OL>
@@ -121,17 +168,62 @@ Features and Enhancements</h1>
 
 <hr>
 
+<h1>Scalability and Stability Testing</h1>
+<uL>
+	<li>Database Scalability
+	<ul>
+		<li>Operating System: 64-bit Windows Server 2008 R2
+		<li>Date Started: 12/07/2012
+		<li><b>Date Completed: 12/10/2012</b>
+		<li>Tester: WL
+		<li>Status: Failed to confirm fix for [LegacyRC #6327]
+	</ul>
+<p>
+	<li>ID Shield Endurance
+	<ul>
+		<li>Database and Image Host: HPQC2
+		<li>Processing Machines: HPQC3
+		<li>Date Started: 12/19/2012
+		<li><b>Date Completed: 02/22/2013</b>
+		<li>Tester: WL
+		<li>Status: 
+		<ul>
+			<li>1.75M images completed
+			<li>4.86M pages  completed
+		</ul>
+	</ul>
+<p>
+	<li>Database Stability
+	<ul>
+		<li>Operating System: 64-bit Windows 7 (VM)
+		<li>Date Started: 02/20/2013
+		<li><b>Date Completed: 02/20/2013</b>
+		<li>Tester: William
+		<li>Status: Build 9.1.0.79, Testing [LegacyRC #6381]
+	</ul>
+<p>
+	<li>FAM Stability
+	<ul>
+		<li>Operating System: 32-bit Windows 8
+		<li>Date Started: 02/19/2013
+		<li><b>Date Completed: 02/20/2013</b>
+		<li>Tester: WL
+		<li>Status: Build 9.1.0.78, Testing [LegacyRC #6398]
+	</ul>
+</uL>
+
+<hr>
 <h1>Miscellaneous</h1>
 <OL>
 	<li><b>Data entry preloader</b> rule object
 	<ul>
-		<li>User interface
-		<li>Memory leak
+		<li>User interface - completed <b>02/17/2013 (SK)</b>
+		<li>Memory leak - completed <b>02/17/2013 (SK)</b>
 	</ul>
 	<li><b>Data query rule object</b> rule object
 	<ul>
-		<li>User interface
-		<li>Memory leak
+		<li>User interface - completed <b>12/26/2012</b>
+		<li>Memory leak - completed <b>02/17/2013 (SK)</b>
 	</ul>
 	<li><b>Input finder</b> rule object
 	<ul>
@@ -139,7 +231,7 @@ Features and Enhancements</h1>
 		<li>Memory leak
 		<ul>
 			<li>Test 1 - completed <b>12/04/2012</b>
-			<li>Test 2 - completed <b>12/xx/2012</b>
+			<li>Test 2 - completed <b>12/04/2012</b>
 		</ul>
 	</ul>
 	<li><b>Modify spatial mode</b> rule object
@@ -150,18 +242,18 @@ Features and Enhancements</h1>
 <p>
 	<li><b>Core: Execute rules</b> task (enhancement)
 	<ul>
-		<li>User interface - 
-		<li>Memory leak - 
+		<li>User interface - completed <b>12/05/2012</b>
+		<li>Memory leak - completed <b>12/05/2012</b>
 	</ul>
 	<li><b>NetDMS: Add redactions</b> task
 	<ul>
 		<li>User interface - completed <b>11/09/2012</b>
-		<li>Memory leak
+		<li>Memory leak - N/A
 	</ul>
 	<li><b>NetDMS: Advance work item</b> task
 	<ul>
 		<li>User interface - completed <b>11/09/2012</b>
-		<li>Memory leak
+		<li>Memory leak - N/A
 	</ul>
 <p>
 	<li><b>Utilities</b>
@@ -169,12 +261,12 @@ Features and Enhancements</h1>
 		<li>DataEntryPrompt
 		<ul>
 			<li>Checklist created - completed <b>10/01/2012</b>
-			<li>Checklist exercised - 
+			<li>Checklist exercised - completed <b>12/11/2012</b>
 		</ul>
 		<li>Expression and Query Tester
 		<ul>
-			<li>Checklist created - 
-			<li>Checklist exercised - 
+			<li>Checklist created - completed <b>12/06/2012</b>
+			<li>Checklist exercised - completed <b>12/06/2012</b>
 		</ul>
 	</ul>
 <p>
@@ -186,26 +278,25 @@ Features and Enhancements</h1>
 		</ul>
 		<li>Add 9.1 Enhancements
 		<ul>
-			<li>SQL CDB Editor - 
-			<li>PDF Rasterization - 
-			<li>Data Entry Prompt - 
-			<li>FAM Database Advanced Button - 
-			<li>Skip Page Count When Queuing - 
-			<li>Automatically Handle Nuance Licensing Error - 
-			<li>No Service Restarts For Continuous Processing - 
-			<li>Core: Execute Rules enhancement - 
-			<li>Rule Tester enhancement - 
-			<li>ID Shield Tester enhancement - 
-			<li>Data Entry Redo - 
-			<li>Magnifier Window For Data Entry - 
+			<li>SQL CDB Editor - completed <b>01/08/2013</b>
+			<li>PDF Rasterization - completed <b>12/05/2012</b>
+			<li>Data Entry Prompt - completed <b>12/17/2012</b>
+			<li>FAM Database Advanced Button - completed <b>12/17/2012</b>
+			<li>Skip Page Count When Queuing - completed <b>12/05/2012</b>
+			<li>Automatically Handle Nuance Licensing Error - completed <b>01/08/2013</b>
+			<li>No Service Restarts For Continuous Processing - completed <b>12/04/2012</b>
+			<li>Core: Execute Rules enhancement - completed <b>12/20/2012</b>
+			<li>Rule Tester enhancement - completed <b>12/21/2012</b>
+			<li>Data Entry Redo - completed <b>12/20/2012</b>
+			<li>Magnifier Window For Data Entry - completed <b>12/20/2012</b>
 		</ul>
 		<li>Add NetDMS pages with new build tag
 		<ul>
-			<li><b>Deferred until 9.2</b>
+			<li><b>Deferred until 9.x</b>
 		</ul>
 		<li>Fix documentation-related SCRs
 		<ul>
-			<li><b>Deferred until 9.2</b>
+			<li><b>Deferred until 9.x</b>
 		</ul>
 	</ul>
 </OL>
