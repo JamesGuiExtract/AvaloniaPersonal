@@ -274,7 +274,63 @@
         </ul></li>
     </ul></li>
 <p>
-    	<LI><b>Bug fixes</b>
+    	<LI><b>Command-Line Parameters</b>
+    	<ul>
+        	<li>Confirm that <b>/Easy</b> uses automated redaction settings with everything 
+		checked.
+<p>
+        	<li>Confirm that <b>/FeedbackDataFolder &lt;Folder_Name&gt;</b> uses the specified 
+		folder as the source for the expected VOA files.
+<p>
+        	<li><b>StatisticsOutputFolder</b>
+		<ul>
+        		<li>Confirm that <b>StatisticsOutputFolder</b> uses the specified folder 
+			as the destination for all report text files.  
+			<li>Confirm that a time-stamped <b>Analysis</b> folder is not created 
+			under the <b>FeedbackDataFolder</b>.
+		</ul>
+<p>
+        	<li><b>AutoRun</b> and <b>AutoRunSilent</b>
+		<ul>
+        		<li>Confirm that <b>/AutoRun</b> simulates an immediate click of the 
+			<b>Analyze</b> button.
+	        	<li>Confirm that this option requires both <b>/FeedbackDataFolder</b> and
+			<b>/Easy</b> switches.
+        		<li>Confirm that <b>/AutoRunSilent</b> works as described above except that 
+			windows and message boxes are not displayed.
+        		<li>Confirm that for <b>/AutoRunSilent</b> the application exits immediately 
+			after running.
+		</ul>
+<p>
+        	<li><b>Print</b>
+		<ul>
+        		<li>Confirm that <b>/Print &ltreport_name&gt</b> prints the specified report 
+			whenever analysis is run.
+			<li>Confirm that only the report name is needed, without a txt extension.
+			<li>Confirm that the fully-qualified path to the report is not needed.
+			<li>Confirm that the report file must be in the <b>CommonComponents</b> 
+			folder.
+		</ul>
+<p>
+        	<li><b>CustomReport</b>
+		<ul>
+       			<li>Confirm that <b>/CustomReport &lttemplate_name&gt</b> prints the 
+			specified custom report in addition to the Statistics report.
+			<li>Confirm that the custom report is displayed in a 
+		</ul>
+<p>
+        	<li>Exercise the following <b>CustomReport</b> templates.
+		<ul>
+        		<li><b>IDSSR_Operators</b>
+        		<li><b>IDSSR_Parameters</b>
+		</ul>
+<p>
+	    	<LI><b>Command-line bug fixes</b>
+    		<ul>
+    		</ul>
+    	</ul></li>
+<p>
+    	<LI><b>General bug fixes</b>
     	<ul>
         	<li><b>[FlexIDSCore #4177]</b> Run the ID Shield Statistics Reporter and confirm that
         	the data labels in the statistics tab are not prefixed with the text <b>Number 
