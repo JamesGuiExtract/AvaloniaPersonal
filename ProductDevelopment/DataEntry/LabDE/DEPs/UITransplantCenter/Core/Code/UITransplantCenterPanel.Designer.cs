@@ -340,6 +340,7 @@
             this._epicDOBTextBox.Name = "_epicDOBTextBox";
             this._epicDOBTextBox.ParentDataEntryControl = this._patientInfoGroupBox;
             this._epicDOBTextBox.Size = new System.Drawing.Size(369, 20);
+            this._epicDOBTextBox.SupportsSwiping = false;
             this._epicDOBTextBox.TabIndex = 7;
             this._epicDOBTextBox.ValidationErrorMessage = "Date of birth must be a valid date in the format MM/DD/YYYY";
             this._epicDOBTextBox.ValidationPattern = "(^$)|(^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(18|19|20)\\d{2}" +
@@ -374,6 +375,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this._epicPatientNameTable.AttributeName = "EpicName";
             this._epicPatientNameTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this._epicPatientNameTable.CellSwipingEnabled = false;
             this._epicPatientNameTable.ClearClipboardOnPaste = true;
             this._epicPatientNameTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
             dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -412,7 +414,6 @@
             dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this._epicPatientNameTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
-            this._epicPatientNameTable.RowSwipingEnabled = true;
             this._epicPatientNameTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this._epicPatientNameTable.Size = new System.Drawing.Size(666, 46);
             this._epicPatientNameTable.TabIndex = 3;
@@ -788,6 +789,7 @@
             this._testUnitsColumn.HeaderText = "Units";
             this._testUnitsColumn.Name = "_testUnitsColumn";
             this._testUnitsColumn.SmartHintsEnabled = true;
+            this._testUnitsColumn.ValidationCorrectsCase = false;
             this._testUnitsColumn.ValidationErrorMessage = "Invalid value";
             this._testUnitsColumn.ValidationQuery = "<Query ValidationListType=\'ValidationListOnly\'>\r\n[BLANK]\r\n<SQL>SELECT * FROM Unit" +
     " ORDER BY Unit</SQL>\r\n</Query>";
@@ -1197,6 +1199,11 @@
         private DataEntryTextBox _componentLevelRange;
         private DataEntryTextBox _componentLevelUnits;
         private DataEntryTextBox _componentLevelValue;
+        private DataEntryTableColumn _patientFirstNameColumn;
+        private DataEntryTableColumn _patientMiddleNameColumn;
+        private DataEntryTableColumn _patientLastNameColumn;
+        private DataEntryTableColumn _patientSuffixColumn;
+        private DataEntryTextBox _originalNameTextBox;
         private DataEntryTableColumn _orderNumberColumn;
         private DataEntryTableColumn _testName;
         private DataEntryTableColumn _testDisplayName;
@@ -1206,10 +1213,5 @@
         private DataEntryTableColumn _testRefRangeColumn;
         private DataEntryTableColumn _testFlagColumn;
         private DataEntryTableColumn _resultStatusColumn;
-        private DataEntryTableColumn _patientFirstNameColumn;
-        private DataEntryTableColumn _patientMiddleNameColumn;
-        private DataEntryTableColumn _patientLastNameColumn;
-        private DataEntryTableColumn _patientSuffixColumn;
-        private DataEntryTextBox _originalNameTextBox;
     }
 }

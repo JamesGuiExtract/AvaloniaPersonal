@@ -141,6 +141,7 @@
   </data>
   <data name="_laboratoryIdentifier.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query Default='1'&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../LabName&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../LabAddress/City&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../LabAddress/State&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../LabAddress/ZipCode&lt;/Attribute&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;Expression&gt;string.IsNullOrWhiteSpace(&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt;) ? &lt;Attribute&gt;/LabIdentifier&lt;/Attribute&gt; : ''&lt;/Expression&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabCode IS NOT NULL AND LabCode = SUBSTRING(&lt;Attribute&gt;../LabCode&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(&lt;Attribute&gt;../LabName&lt;/Attribute&gt;, ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 50) + '%'&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute&gt;../LabName&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 10) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
