@@ -1,0 +1,50 @@
+<HTML>
+
+<HEAD>
+<TITLE>Remote Desktop Services Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>Remote Desktop Services Testing<br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h2>Test Machine Setup</h2>
+<ul>
+	<li>Confirm that the test server has a server operating system installed - usually <b>Server 2008 
+	R2</b>.
+	<li>Open <b>Server Manager</b>.
+	<li>Right-click on the <b>Roles</b> item and select <b>Add Role</b>.
+	<li>Select <b>Remote Desktop Services</b> with the following options.
+	<ul>
+		<li>Remote Desktop Session Host
+		<li>Remote Desktop Licensing
+		<li>Network Level Authentication = <b>No</b>
+<p>
+		<li>Note that <b>1 error</b> for "The computer account for the Remote Desktop license 
+		server cannot be added to the Terminal Server License Servers group in Active Directory 
+		Domain Services because access is denied." is expected.
+	</ul>
+	<li>Install and license <b>ID Shield</b> and <b>SQL Server</b>.
+	<li>Configure the <b>RemoteApp Manager</b>.  Click on the <b>Add RemoteApp Programs</b> item 
+	in the <b>Actions</b> window.
+	<li>Use the <b>RemoteApp Wizard</b> to select the following <b>Extract Systems</b> software 
+	applications to support client-side verification.
+	<ul>
+		<li>DB Administration
+		<li>File Action Manager
+		<li>Rule Tester
+		<li>View Exception Log
+	</ul>
+	<li>Copy a suitable <b>ID Shield</b> folder and prepare files for verification.
+</ul>
+
+<h2>Test Execution</h2>
+<ul>
+	<li>
+</ul>
+</BODY>
+</HTML>
