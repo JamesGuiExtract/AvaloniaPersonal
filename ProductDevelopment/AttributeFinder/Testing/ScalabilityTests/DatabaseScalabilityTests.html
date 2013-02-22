@@ -60,6 +60,34 @@ to install FLEX Index.
         	</ul>
     	</ul>
 </ul>
+<p>
+<h2>Test #2 - Database Scalability</h2>
+<ul>
+	<li><b>Purpose & Machine Setup</b>
+	<ul>
+		<li>Measure the maximum database throughput as a continuous stream of images 
+		are provided.
+		<li>Select a test machine to serve as the image and database host.
+		<li>Collect a large folder of files to process; typically we use the Utah images.  
+		<li>Queue all of the images; note that the files must be queued via UNC path or 
+		mapped drive. Save a copy of the database with all files queued.
+		<li>Configure an FPS file to run a Set File Action Status task. In the advanced 
+		processing settings, set it to grab 1000 files from the database at a time.
+		<li>Select a group of processing machines <b>or</b> a group of virtual machines 
+		for use in the test.
+	</ul>
+<p>
+	<li><b>Test Execution</b>
+	<ul>
+		<li>Before each test:
+        	<ul>
+            		<li>Restore the unprocessed database from SQL Management Studio.
+            		<li>Reboot all test machines from the previous test.
+            		<li>Add one more machine or VM to the pool of processing machines.
+        	</ul>
+        	<li>On each processing machine, start the test FPS file.
+	</ul>
+</ul>
 </ol>
 </body>
 </html>
