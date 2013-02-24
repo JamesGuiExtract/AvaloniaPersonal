@@ -25,6 +25,7 @@
 #include <cpputil.h>
 #include <COMUtils.h>
 #include <MutexUtils.h>
+#include <StringTokenizer.h>
 
 #include <io.h>
 
@@ -57,6 +58,10 @@ map<unsigned long, bool> LicenseManagement::m_mapIdToLicensed;
 Win32Event LicenseManagement::m_licenseStateIsInvalidEvent;
 unique_ptr<CMutex> LicenseManagement::m_upTrpRunning(__nullptr);
 unique_ptr<CMutex> LicenseManagement::m_upValidState(getGlobalNamedMutex(gpszGoodStateMutex));
+volatile bool LicenseManagement::m_initializedHighMemoryMode = false;
+
+const string gstrHIGH_MEM_TEST_MODE_KEY = "HighMemoryTestMode";
+const string gstrDEFAULT_HIGH_MEM_TEST_MODE = "";
 
 //-------------------------------------------------------------------------------------------------
 // LicenseManagement
@@ -338,6 +343,18 @@ void LicenseManagement::loadLicenseFilesFromFolder(std::string strDirectory,
 {
 	// prevent simultaneous access to this object from multiple threads
 	CSingleLock guard(&m_lock, TRUE);
+
+	// Check once per process whether to activate high memory test mode.
+	if (!m_initializedHighMemoryMode)
+	{
+		m_initializedHighMemoryMode = true;
+
+		try
+		{
+			initializeHighMemTestMode();
+		}
+		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI35409")
+	}
 
 	// Check for bad license state
 	validateState();
@@ -815,5 +832,60 @@ void LicenseManagement::validatePDFLicense()
 	static const unsigned long ALLOW_PDF_READWRITE_ID = gnPDF_READWRITE_FEATURE;
 
 	VALIDATE_LICENSE( ALLOW_PDF_READWRITE_ID, "ELI13431", "PDF Read Write" );
+}
+//-------------------------------------------------------------------------------------------------
+void LicenseManagement::initializeHighMemTestMode()
+{
+	// Check registry for file access timeout
+	RegistryPersistenceMgr machineCfgMgr = RegistryPersistenceMgr(HKEY_LOCAL_MACHINE, "");
+
+	// Check for existence of file access timeout
+	if (machineCfgMgr.keyExists(gstrBASEUTILS_REG_PATH, gstrHIGH_MEM_TEST_MODE_KEY))
+	{
+		string strHighMemModeProcesses = machineCfgMgr.getKeyValue(gstrBASEUTILS_REG_PATH,
+			gstrHIGH_MEM_TEST_MODE_KEY, gstrDEFAULT_HIGH_MEM_TEST_MODE);
+			
+		if (!strHighMemModeProcesses.empty())
+		{
+			// Get the current process name.
+			char szFileName[MAX_PATH] = {0};
+			::GetModuleFileName(NULL, szFileName, MAX_PATH);
+			string strThisProcessName = getFileNameWithoutExtension(szFileName);
+			const char *szThisProcessName = strThisProcessName.c_str();
+
+			// Check if this process name is listed in HighMemoryTestMode.
+			vector<string> vecProcessNames;
+			StringTokenizer	st(';');
+			st.parse(strHighMemModeProcesses.c_str(), vecProcessNames);
+
+			for (size_t i = 0; i < vecProcessNames.size(); i++)
+			{
+				if (_strcmpi(vecProcessNames[i].c_str(), szThisProcessName) == 0)
+				{
+					// See if data is being allocated on the heap at addresses with the high bit set.
+					bool bHighBitSet = (0x80000000 & (unsigned long)&vecProcessNames[i]) != 0;
+
+					if (bHighBitSet)
+					{
+						UCLIDException("ELI35410", "Application trace: MEM_TOP_DOWN memory "
+							"allocation mode is being used; high memory mode will not be enabled.")
+							.log();
+					}
+					else
+					{
+						// Allocate a permanent 2 GB of data on the heap in 1 MB chunks.
+						// (Generally you can't get away with allocating it all as one chunk).
+						for (int i = 0; i < 0x800; i++)
+						{
+							// 1 MB
+							new int[0x40000];
+						}
+
+						break;
+					}
+				}
+			}
+		}
+	}
 }
 //-------------------------------------------------------------------------------------------------

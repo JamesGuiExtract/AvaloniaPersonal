@@ -255,6 +255,10 @@ private:
 	// data contains an expiring component
 	static void startOrCloseTrpBasedOnLicenseData();
 
+	// Checks to see if high memory test mode should be activated for this processes if specified
+	// by HKLM\SOFTWARE\[Wow6432Node]\Extract Systems\ReusableComponents\BaseUtils\HighMemoryTestMode
+	static void initializeHighMemTestMode();
+
     ///////
     // Data
     ///////
@@ -288,6 +292,10 @@ private:
     // the licensed state values for components that have already been validated
     static map<unsigned long, int> m_mapIdToDayLicensed;
     static map<unsigned long, bool> m_mapIdToLicensed;
+
+	// Indicates whether in this process we have already checked on whether to activate high
+	// memory test mode.
+	static volatile bool m_initializedHighMemoryMode;
 };
 //============================================================================
 // PURPOSE: Use the following macro as a general way to check if a particular

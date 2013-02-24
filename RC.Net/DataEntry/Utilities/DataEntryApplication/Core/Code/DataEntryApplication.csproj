@@ -432,8 +432,9 @@
   <PropertyGroup>
     <PostBuildEvent>CALL CommonDebugPostBuild.bat "$(TargetPath)"
 CALL "$(DevEnvDir)..\..\VC\bin\vcvars32.bat"
-CALL "$(DevEnvDir)..\..\VC\bin\EDITBIN.EXE" /STACK:4194304 "$(TargetPath)"
-</PostBuildEvent>
+editbin /STACK:4194304 "$(TargetPath)"
+editbin /largeaddressaware "$(TargetPath)"
+sn -Ra "$(TargetPath)" "$(TargetDir)..\..\RC.Net\Core\Code\ExtractInternalKey.snk"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>CALL $(ProjectDir)BrandingResources\GenerateResourceFiles.bat "$(ProjectDir)BrandingResources" "$(TargetDir)$(TargetName)" "$(FrameworkSDKDir)"</PreBuildEvent>
