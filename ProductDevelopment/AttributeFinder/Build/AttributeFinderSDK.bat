@@ -38,14 +38,14 @@ SET BuildScriptTarget=DoEverythingNoGet
 CALL InitUserEnv.Bat
 CALL InitBuildEnv.Bat
 REM vcvars32 initializes command-line build vars so that editbin can be called to re-apply properties post-obfuscation
-CALL %VCPP_DIR%\Bin\vcvars32.bat
+CALL "%VCPP_DIR%\Bin\vcvars32.bat"
 GOTO no_get
 
 :init_build
 CALL InitUserEnv.Bat
 CALL InitBuildEnv.Bat
 REM vcvars32 initializes command-line build vars so that editbin can be called to re-apply properties post-obfuscation
-CALL %VCPP_DIR%\Bin\vcvars32.bat
+CALL "%VCPP_DIR%\Bin\vcvars32.bat"
 
 REM Get specified version of files from Common dir as well as AttributeFinder\build dir
 IF NOT EXIST ..\..\Common mkdir ..\..\Common
