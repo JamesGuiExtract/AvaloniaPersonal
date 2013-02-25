@@ -873,16 +873,22 @@ void LicenseManagement::initializeHighMemTestMode()
 					}
 					else
 					{
+						UCLIDException("ELI35411", "Application trace: Allocating 2GB of memory "
+							"for HighMemoryTestMode.").log();
+
 						// Allocate a permanent 2 GB of data on the heap in 1 MB chunks.
 						// (Generally you can't get away with allocating it all as one chunk).
 						for (int i = 0; i < 0x800; i++)
 						{
 							// 1 MB
-							new int[0x40000];
+							int* pMemory = new int[0x40000];
+							// If the memory is not every set, this code seems to be optimized out
+							// even though optimizations are supposedly disabled.
+							ZeroMemory(pMemory, 0x40000 * sizeof(int));
 						}
-
-						break;
 					}
+
+					return;
 				}
 			}
 		}
