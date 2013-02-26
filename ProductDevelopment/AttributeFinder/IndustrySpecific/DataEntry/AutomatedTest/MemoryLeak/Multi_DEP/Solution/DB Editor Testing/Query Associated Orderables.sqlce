@@ -1,0 +1,8 @@
+-- Test code
+SELECT [TestCode] FROM [LabTest] ORDER BY [TestCode]
+GO 
+
+SELECT [LabOrder].[Code], [LabOrder].[Name] FROM [LabOrder]
+	INNER JOIN [LabOrderTest] ON [LabOrder].[Code] = [LabOrderTest].[OrderCode]
+	WHERE [LabOrderTest].[TestCode] = @0
+	ORDER BY[LabOrder].[Code]
