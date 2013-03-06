@@ -21,8 +21,9 @@
 	  	<li>Create the usual drive mappings for <b>I</b> and <b>K</b>.
 		<LI>Confirm that <b>COMLicenseGenerator.exe</b> displays an error message that 
 		<b>Mscal.ocx</b> is not installed.</li>
-   		<li>Install the calendar control via <b>ocx-install.bat</b> and confirm that 
-		<b>COMLicenseGenerator.exe</b> starts without error.</li>
+		<li>Copy <b>Mscal.ocx</b> and <b>ocx-install.bat</b> to the test machine and 
+		install the calendar control.
+   		<li>Confirm that <b>COMLicenseGenerator.exe</b> starts without error.</li>
 <p>
   		<li>Remove the drive mappings for <b>I</b> and <b>K</b>.
    		<li>Navigate to <b>COMLicenseGenerator.exe</b> via UNC path (not mapped drive).  Confirm 
@@ -30,6 +31,11 @@
    		<li>Copy the contents of a specific COMLicense folder to a local folder on the 
 		test machine.  Confirm that an error message is displayed <b>Unable to run License 
 		Generator Utility</b>.</li>
+	  	<li>Create the usual drive mapping for <b>I</b>.
+   		<li>Confirm that <b>COMLicenseGenerator.exe</b> starts without error.</li>
+  		<li>Remove the drive mappings for <b>I</b>.
+	  	<li>Create the usual drive mapping for <b>K</b>.
+   		<li>Confirm that <b>COMLicenseGenerator.exe</b> starts without error.</li>
 <p>
 	   	<li>Confirm that the package group names such as FLEX Index, ID Shield, FLEX Index / ID Shield 
 		Utilities cannot be selected in the <b>Packages</b> list.</li>
