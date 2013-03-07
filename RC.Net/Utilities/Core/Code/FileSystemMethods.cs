@@ -1,6 +1,4 @@
-using Extract.Encryption;
 using Extract.Interfaces;
-using Extract.Licensing;
 using Microsoft.Win32;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -8,10 +6,10 @@ using System.Globalization;
 using System.IO;
 using System.Management;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace Extract.Utilities
 {
@@ -40,9 +38,11 @@ namespace Extract.Utilities
 
         /// <summary>
         /// The path to the common components folder.
+        /// Use the directory of this assembly to be more flexible in case in the future we allow
+        /// the software to be installed to a different directory.
         /// </summary>
-        static readonly string _COMMON_COMPONENTS_PATH = Path.Combine(
-            _EXTRACT_SYSTEMS_PATH, "CommonComponents");
+        static readonly string _COMMON_COMPONENTS_PATH =
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         /// <summary>
         /// The full path to the Extract Systems application data folder.
@@ -678,7 +678,11 @@ namespace Extract.Utilities
                 // Check if the filename is a relative path
                 if (!Path.IsPathRooted(fileName))
                 {
-                    string root = pathRoot ?? Path.GetDirectoryName(Application.ExecutablePath);
+                    // [DNRCAU #763]
+                    // Use CommonComponentsPath as the root rather than the exe directory.
+                    // Otherwise, problems will result when using this method via the API when the
+                    // external project is not built into/run from the CommonComponents directory.
+                    string root = pathRoot ?? CommonComponentsPath;
                     fileName = Path.Combine(root, fileName);
                     fileName = Path.GetFullPath(fileName);
                 }
