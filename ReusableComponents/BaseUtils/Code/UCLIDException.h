@@ -201,7 +201,12 @@ public:
 	//			bLogExceptions - if true then any exceptions thrown while creating the exception
 	//				from string will be logged to the exception file.  If false then any
 	//				exceptions thrown while creating the exception will be eaten.
-	void createFromString(const string& strELI, const string& strData, bool bLogExceptions = true);
+	//			bAddELICodeToDebugData - if strData represents a stringized UCLIDException then
+	//				if true the strELI will be added as Debug data to the UCLIDException that is 
+	//				unstringized, if false the strELI will only be used if strData is NOT a 
+	//				stringized UCLIDException
+	void createFromString(const string& strELI, const string& strData, bool bLogExceptions = true, 
+		bool bAddELICodeToDebugData = true);
 	//----------------------------------------------------------------------------------------------		
 	// PURPOSE: To return a stringized bytestream representing this object.
 	// REQUIRE: Nothing.

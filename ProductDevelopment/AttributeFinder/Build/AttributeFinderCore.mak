@@ -146,6 +146,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.FileActionManager.Conditions.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.FileActionManager.Conditions.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\ESIPCService.exe" /mapout:"$(BinariesFolder)\Map\mapESIPCService.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\ExtractDebugData.exe" /mapout:"$(BinariesFolder)\Map\mapExtractDebugData.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.ExceptionUtilities.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.ExceptionUtilities.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.AttributeFinder.Rules.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.AttributeFinder.Rules.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.LabResultsCustomComponents.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.LabResultsCustomComponents.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.NetDMSCustomComponents.dll" /mapout:"$(BinariesFolder)\Map\mapEExtract.NetDMSCustomComponents.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
@@ -257,6 +258,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
     @COPY /V "$(BinariesFolder)\OCRFilteringBase.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V "$(BinariesFolder)\DetectAndReportFailure.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V "$(BinariesFolder)\Obfuscated\ExtractDebugData.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V "$(BinariesFolder)\Obfuscated\Extract.ExceptionUtilities.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V "$(PDUtilsRootDir)\DetectAndReportFailure\Misc\DetectAndReportFailure.ini" "$(AFCoreInstallFilesRootDir)\ProgramDataFiles"
 	
 	@COPY /V "$(RCNETDir)\APIs\LogicNP\EZShellExtensions.Net\2011\*.*" "$(RequiredInstallsDir)\LogicNP"

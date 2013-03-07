@@ -273,7 +273,7 @@ UCLIDException::UCLIDException(void)
 }
 //-------------------------------------------------------------------------------------------------
 void UCLIDException::createFromString(const string& strELI, const string& strData,
-									  bool bLogExceptions)
+									  bool bLogExceptions, bool bAddELICodeToDebugData)
 {
 	try
 	{
@@ -303,7 +303,10 @@ void UCLIDException::createFromString(const string& strELI, const string& strDat
 			loadFromString(strData);
 
 			// add the CatchID debug info
-			addDebugInfo("CatchID", strELI);
+			if (bAddELICodeToDebugData)
+			{
+				addDebugInfo("CatchID", strELI);
+			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20286");
 	}
@@ -2008,46 +2011,53 @@ void UCLIDException::asString(string& rResult, bool bRecursiveCall) const
 		for (iter2 = m_vecDebugInfo.begin(); iter2 != m_vecDebugInfo.end(); iter2++)
 		{
 			rResult +=	iter2->GetName() + string(" = ");
+			string strValue = "";
+			string strType = "";
 			switch (iter2->GetPair().getType())
 			{
 			case ValueTypePair::kString:
-				rResult += iter2->GetPair().getStringValue();
-				rResult += " (string)";
+				strValue = iter2->GetPair().getStringValue();
+				strType = " (string)";
 				break;
 			case ValueTypePair::kOctets:
 				// TODO: get bytes as a string
-				rResult += "...";
-				rResult += " (octets)";
+				strValue = "...";
+				strType = " (octets)";
 				break;
 			case ValueTypePair::kInt:
-				rResult += ::asString(iter2->GetPair().getIntValue());
-				rResult += " (int)";
+				strValue = ::asString(iter2->GetPair().getIntValue());
+				strType = " (int)";
 				break;
 			case ValueTypePair::kInt64:
-				rResult += ::asString(iter2->GetPair().getInt64Value());
-				rResult += " (int64)";
+				strValue = ::asString(iter2->GetPair().getInt64Value());
+				strType = " (int64)";
 			case ValueTypePair::kLong:
-				rResult += ::asString(iter2->GetPair().getLongValue());
-				rResult += " (long)";
+				strValue = ::asString(iter2->GetPair().getLongValue());
+				strType = " (long)";
 				break;
 			case ValueTypePair::kUnsignedLong:
-				rResult += ::asString(iter2->GetPair().getUnsignedLongValue());
-				rResult += " (unsigned long)";
+				strValue = ::asString(iter2->GetPair().getUnsignedLongValue());
+				strType = " (unsigned long)";
 				break;
 			case ValueTypePair::kDouble:
-				rResult += ::asString(iter2->GetPair().getDoubleValue());
-				rResult += " (double)";
+				strValue = ::asString(iter2->GetPair().getDoubleValue());
+				strType = " (double)";
 				break;
 			case ValueTypePair::kBoolean:
-				rResult += iter2->GetPair().getBooleanValue() ? "True" : "False";
-				rResult += " (bool)";
+				strValue = iter2->GetPair().getBooleanValue() ? "True" : "False";
+				strType = " (bool)";
 				break;
 			case ValueTypePair::kNone:
-				rResult += "Unknown value (Unknown type)";
+				strValue = "Unknown value (Unknown type)";
 				break;
 			default:
-				rResult += "Unknown value (Unknown type)";
+				strValue = "Unknown value (Unknown type)";
 			}
+
+			// Check Value for Encryption
+			rResult += UCLIDException::sGetDataValue(strValue);
+			rResult += strType;
+
 			rResult += string("\n");
 		}
 	}

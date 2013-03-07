@@ -32,6 +32,7 @@
 #include <TemporaryFileName.h>
 #include <PromptDlg.h>
 #include <StringCSIS.h>
+#include <LicenseUtils.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -233,7 +234,7 @@ string CUEXViewerDlg::GetWholeExceptionString(int nIndex)
 	// Create a UCLIDException object
 	// using new ELI code for this application
 	UCLIDException	ue;
-	ue.createFromString("ELI13417", pData->strData);
+	ue.createFromString("ELI13417", pData->strData, true, false);
 
 	// Convert this item to a displayable string and return
 	string strFullText;

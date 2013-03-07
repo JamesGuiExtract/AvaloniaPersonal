@@ -1,6 +1,8 @@
-﻿using Extract.Licensing;
+﻿using Extract.ExceptionUtilities;
+using Extract.Licensing;
 using Extract.Utilities;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -9,7 +11,7 @@ using System.Text;
 
 namespace Extract.ExtractDebugData
 {
-    class ExtractDebugDataMain
+    static class ExtractDebugDataMain
     {
         /// <summary>
         /// The settings that dictate how to extract the exception data
@@ -326,8 +328,8 @@ namespace Extract.ExtractDebugData
                             lineNumber++;
                             continue;
                         }
-
-                        ReadOnlyCollection<string> tempResults = query.GetDebugData(ee);
+                        ExtractException decryptedEE = ee.AsDecryptedExtractException();
+                        ReadOnlyCollection<string> tempResults = query.GetDebugData(decryptedEE);
                         int dataItemCount = tempResults.Count;
                         if (dataItemCount > 0)
                         {
@@ -370,7 +372,7 @@ namespace Extract.ExtractDebugData
                         //      or one of the inner exceptions associated with the original UEX line
                         //      was not excluded according to the specs.
                         if (settings.OutputUnreferencedExceptions &&
-                            dataItemCount == 0 && !query.GetIsEntirelyExcluded(ee))
+                            dataItemCount == 0 && !query.GetIsEntirelyExcluded(decryptedEE))
                         {
                             unreferencedExceptionOutputFile.WriteLine(exceptionFileLines[lineNumber]);
                         }
@@ -512,6 +514,47 @@ namespace Extract.ExtractDebugData
             Console.WriteLine();
             Console.WriteLine("/a: Specifies that the results should be appended to the output file if it");
             Console.WriteLine("already exists rather than overwriting the existing file.");
+        }
+
+        /// <summary>
+        /// Extension method to create a new extract exception that has the data decrypted
+        /// </summary>
+        /// <param name="ee">Exception to decrypt</param>
+        /// <returns>An ExtractException that has the debug data decrypted (if possible) and no StackInfo</returns>
+        static ExtractException AsDecryptedExtractException(this ExtractException ee)
+        {
+            ExtractException innerException = null;
+
+            // If there is an inner exception convert it
+            if (ee.InnerException != null && ee.InnerException.GetType() == typeof(ExtractException))
+            {
+                innerException = ((ExtractException)ee.InnerException).AsDecryptedExtractException();
+            }
+            else if (ee.InnerException != null)
+            {
+                // This should not happen because the inner exception should already be 
+                // an ExtractException, but if not should convert the inner exception
+                // to ExtractException
+                ExtractException exInner = ExtractException.AsExtractException("ELI35415", ee.InnerException);
+                innerException = exInner.AsDecryptedExtractException();
+            }
+
+            // Create the new ExtractException with inner exception if required
+            ExtractException newEE = innerException == null ? 
+                new ExtractException(ee.EliCode, ee.Message) :
+                new ExtractException(ee.EliCode, ee.Message, innerException); 
+
+            // Add all of the debug information
+            foreach (DictionaryEntry de in ee.Data)
+            {
+                // Add the debug info with a call to decrypt the value if allowed
+                newEE.AddDebugData(de.Key.ToString(), ExceptionData.GetDebugValue(de.Value.ToString()), false);
+            }
+
+            // Stack is not available so it will be lost but since this is to allow searching of 
+            // encrypted debug data that will be ok
+
+            return newEE;
         }
     }
 }
