@@ -1,0 +1,172 @@
+<html>
+
+<head>
+<title>File Action Manager Sanity Tests</title>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css" />
+</head>
+
+<body>
+
+<h1>FAM Sanity Test - Internal Use<br>
+<img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif" />
+</h1>
+<hr>
+<p>
+* ID Shield, LabDE and FLEX Index should be installed and licensed for this test.<br>
+* RDT should be installed and <b>separately</b> licensed for this test.
+<p>
+	<h2>FLEX Index - Demo</h2>
+	<ul>
+		<li>Copy the <b>Demo_FlexIndex</b> folder to the test machine.
+		<li>Run <b>Clean All.bat</b> as local administrator.
+		<li>Use <b>SQL Management Studio</b> to grant <u>db_datareader</u> and <u>db_datawriter</u> 
+		privileges to Domain Users for the <b>Demo_FLEXIndex</b> database.
+		<li>Exercise <b>ExtractData.fps</b>.
+		<ul>
+			<li>Confirm that all images are processed.
+			<li>Confirm that no exceptions are thrown during rule execution.
+		</ul>
+		<li>Exercise <b>VerifyData.fps</b>.
+		<ul>
+			<li>Confirm that appropriate data are found for each image.
+			<li>Confirm that each field type can be swiped using the <b>angular 
+			redaction</b> tool.
+			<li>Confirm that each field type can be swiped using the <b>rectangular 
+			redaction</b> tool.
+			<li>Confirm that each field type can be swiped using the <b>word 
+			redaction</b> tool.
+		</ul>
+		<li>Confirm that verification and swiping require only a <b>FLEX Index 
+		Client</b> license.
+	</ul>
+<p>
+	<h2>ID Shield - Demo</h2>
+	<ul>
+		<li>Copy the <b>Demo_IDShield</b> folder to the test machine.
+		<li>Run <b>Clean all.bat</b> as local administrator.
+		<li>Use <b>SQL Management Studio</b> to grant <u>db_datareader</u> and <u>db_datawriter</u> 
+		privileges to Domain Users for the <b>Demo_IDShield</b> database.
+		<li>Run <b>install.bat</b> from DemoFiles\Installs\VerifyAllInterestingDocs.
+		<li>Exercise <b>Compute Redactions.fps</b>.
+		<ul>
+			<li>Confirm that all images are processed.
+			<li>Confirm that no exceptions are thrown during rule execution.
+		</ul>
+		<li>Exercise <b>Verify Redactions.fps</b>.
+		<ul>
+			<li>Confirm that appropriate data are found for each image.
+			<li>Confirm that manual redactions can be created using the <b>angular 
+			redaction</b> tool.
+			<li>Confirm that manual redactions can be created using the <b>rectangular 
+			redaction</b> tool.
+			<li>Confirm that manual redactions can be created using the <b>word 
+			redaction</b> tool.
+		</ul>
+		<li>Confirm that verification requires only an <b>ID Shield Client</b> license.
+	</ul>
+<p>
+	<h2>LabDE - Demo</h2>
+	<ul>
+		<li>Copy the <b>Demo_LabDE</b> folder to the test machine.
+		<li>Run <b>Clean.bat</b> as local administrator.
+		<li>Use <b>SQL Management Studio</b> to grant <u>db_datareader</u> and <u>db_datawriter</u> 
+		privileges to Domain Users for the <b>Demo_LabDE</b> database.
+		<li>Exercise <b>ExtractData.fps</b>.
+		<ul>
+			<li>Confirm that all images are processed.
+			<li>Confirm that no exceptions are thrown during rule execution.
+		</ul>
+		<li>Exercise <b>Verify.fps</b>.
+		<ul>
+			<li>Confirm that appropriate data are found for each image.
+			<li>Confirm that data can be swiped using the <b>angular 
+			redaction</b> tool.
+			<li>Confirm that data can be swiped using the <b>rectangular 
+			redaction</b> tool.
+			<li>Confirm that data can be swiped using the <b>word 
+			redaction</b> tool.
+		</ul>
+		<li>Confirm that verification and swiping require only a <b>LabDE 
+		Client</b> license.
+	</ul>
+<p>
+	<h2>Utility Applications</h2>
+	<ul>
+		<li><b>Rule Tester</b>
+		<ul>
+			<li>Temporarily rename the <b>RDT</b> license file.
+			<li>Confirm that the Rule Tester <b>About box</b> displays the expected version number, 
+			patch, and FKB update(s).
+			<li>Confirm that <b>Rule Tester</b> can exercise <b>Master.rsd.etf</b> from the 
+			Redaction Demo.
+			<li>Confirm that <b>Rule Tester</b> displays an exception when trying to exercise a 
+			different <b>rsd.etf</b> file from the Redaction Demo.
+			<li>Restore the <b>RDT</b> license file.
+		</ul>
+	</ul>
+<p>
+	<h2>Rule Development Toolkit</h2>
+	<ul>
+		<li>Confirm that a USB key is identified or a suitable license file is in place.
+		<li>Use <b>RDT Configuration</b> to confirm that automatic encryption of files is enabled.
+		<li>Confirm that <b>Automated Tests - Run all tests</b> works.
+		<li>Update test results - <b>only if</b> this build or a newer build 
+		has not already been tested.
+		<ul>
+			<li>Test results to be saved in <b>I:\Common\Testing\Product 
+			Testing\FLEX_Index_90\AutomatedTests\Automated_NRS_Tests.xls</b>
+			<li>Retrieve the National Rule Set from Vault via <b>Rules\NRSTest</b>.
+			<li><b>Automated Tests</b> - separated by section.  Add section-based SCR 
+			if new failures are noted.
+			<li><b>Redaction NRS</b> - separated by section.  Add section-based SCR 
+			if new failures are noted.
+			<li><b>Indexing NRS</b> - separated by section, if possible.  Add 
+			section-based SCR if new failures are noted.
+			<li><b>Document Classification NRS</b> - note # passed and # failed.  Add 
+			notes for new failures.
+		</ul>
+<p>
+		<li><b>Miscellaneous Tools</b>
+		<ul>
+			<li>Image Cleanup Settings Editor - opens without error.
+			<li>Index Converter - opens without error.
+			<li>RDT Configuration - opens without error.
+			<li>Test Harness - opens without error.
+		</ul>
+<p>
+		<li><b>Rule Set Editor</b>
+		<ul>
+			<li>Confirm that <b>File - Properties</b> allows 
+			<ul>
+				<li>choice of counters to decrement
+				<li>specification of USB Key Serial #'s 
+                		<li>specification of FKB Version
+				<li>setting of an Internal Use Only flag.
+				<li>setting of a Swiping rule flag
+				<li>text to be saved via a <b>Comments</b> tab
+			</ul>
+			<li>Confirm that <b>Tools - Open Rule Tester</b> displays the Rule Tester dialog.
+			<li>Confirm that <b>Tools - Execute Test Harnesss</b> displays the Test Harness dialog 
+			and the Test Result Logger window.
+			<li>Confirm that <b>Tools - Check For New Components</b> displays a message box 
+			with numbers found of the following component types.
+			<ul>
+				<li>Value Finders
+				<li>Value Modifiers
+				<li>Input Receivers
+				<li>Input Validators
+				<li>Output Handlers
+				<li>Attribute Splitters
+				<li>Document Preprocessors
+				<li>Data Scorers
+				<li>Conditions
+				<li>Selectors
+			</ul>
+			<li>Confirm that <b>Help - Attribute Finder Help</b> displays the <b>FLEX Index SDK</b> 
+			Help file.  Note that this file is out-of-date.
+			<li>Confirm that <b>Help - About FLEX Index</b> displays the expected version number, 
+			patch, and FKB update.
+		</ul>
+	</ul>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<html>
+
+<head>
+<title>File Action Manager Sanity Tests</title>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css" />
+</head>
+
+<body>
+
+<h1>FAM Sanity Test - File Suppliers<br>
+<img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif" />
+</h1>
+<hr>
+<p>
+*FTP file supplying must be specially licensed for this test.
+	<h2>Goals</h2>
+	<ul>
+		<li>Exercise each defined file supplier.
+		<li>Confirm that various configurations work as expected.
+		<li>Confirm that no unwanted exceptions are logged.
+		<li>Confirm that each file supplier works properly on various operating systems.
+	</ul>
+<p>
+	<h2>File Suppliers</h2>
+	<ol>
+		<li><b>Files from context menu</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that files of a specified type can be supplied via context menu.
+			<li>Confirm that files of a specified type can be supplied via context menu 
+			only from a specified path.
+		</ul>
+<p>
+		<li><b>Files from dynamic list</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that files can be supplied via a list specified with an absolute 
+			path.
+			<li>Confirm that files can be supplied via a list specified using expandable 
+			tags.
+		</ul>
+<p>
+		<li><b>Files from folder</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that files can be supplied recursively from a specified folder.
+			<li>Confirm that files that are added to a folder can be supplied.
+		</ul>
+<p>
+		<li><b>Files from FTP site</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that files can be supplied from the <b>ExtractTest</b> FTP account.
+			<ul>
+				<li>Exercise recursive supplying.
+				<li>Exercise periodic polling.
+				<li>Exercise polling at specified times.
+			</ul>
+		</ul>
+<p>
+		<li><b>Files from static list</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that individual files from different folders can be selected 
+			and are properly queued.
+			<li>Confirm that the <b>Open</b> dialog allows multiple selection.
+			<li>Confirm that selected items can be removed.
+			<li>Confirm that the list can be cleared.
+			<li>Confirm that the list can be populated via <b>Load List</b>.
+		</ul>
+	</ol>
+</body>
+</html>
