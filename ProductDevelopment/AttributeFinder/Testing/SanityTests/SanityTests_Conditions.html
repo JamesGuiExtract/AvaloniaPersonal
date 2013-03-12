@@ -1,0 +1,229 @@
+<html>
+
+<head>
+<title>File Action Manager Sanity Tests</title>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css" />
+</head>
+
+<body>
+
+<h1>FAM Sanity Test - FAM Conditions<br>
+<img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif" />
+</h1>
+<hr>
+<p>
+* ID Shield should be installed and licensed for this test.
+<p>
+	<h2>Goals</h2>
+	<ul>
+		<li>Exercise each defined condition object.
+		<li>Confirm that various configurations work as expected.
+		<li>Confirm that no unwanted exceptions are logged.
+		<li>Confirm that each condition works properly on various operating systems.
+	</ul>
+<p>
+	<h2>FAM Conditions</h2>
+	<ol>
+		<li><b>Compare ID Shield data files condition</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Exercise redaction verification for a few files.
+			<ul>
+				<li>Configure verification to save the VOA files to 
+				<b>&lt;SourceDocName&gt;.session1.voa</b>.
+				<li>Resize each redaction to be close to perfect.
+			</ul>
+			<li>Exercise redaction verification <b>again</b> for the same few files.
+			<ul>
+				<li>Configure verification to save the VOA files to 
+				<b>&lt;SourceDocName&gt;.session2.voa</b>.
+				<li>Adjust redactions in one file to be too small.
+				<li>Retain the ideal redactions in another file.
+				<li>Adjust redactions in another file to be too large.
+				<li>Remove redactions in another file.
+				<li>Add redactions in another file.
+			</ul>
+			<li>Exercise the condition object.
+			<ul>
+				<li>Confirm that the condition matches for the image where each 
+				VOA file contains <b>ideal</b> redactions.
+				<li>Confirm that the condition can match for the specified overlap 
+				percentage.
+				<li>Confirm that the condition <b>does not</b> match for files 
+				where redactions were added or removed.
+			</ul>
+		</ul>
+<p>
+		<li><b>Document type condition</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Exercise the <b>Demo_FlexIndex</b> images and rules.
+			<li>Confirm that some VOA files contain <b>DocumentType</b> attributes.
+			<li>Confirm that the condition can match for a document type.
+			<li>Confirm that the condition does not match if the VOA file does not 
+			contain a <b>DocumentType</b> attribute.
+		</ul>
+<p>
+		<li><b>File existence condition</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that the condition can match if a file <b>does</b> exist.
+			<ul>
+				<li>File specified via absolute path.
+				<li>File specified via expandable tags.
+			</ul>
+			<li>Confirm that the condition can match if a file <b>does not</b> exist.
+			<ul>
+				<li>File specified via absolute path.
+				<li>File specified via expandable tags.
+			</ul>
+		</ul>
+<p>
+		<li><b>File name pattern condition</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that the condition can match if a file <b>does contain</b> 
+			an expression.
+			<ul>
+				<li>Text specified via regular expression.
+			</ul>
+			<li>Confirm that the condition can match if a file <b>does not contain</b> 
+			an expression.
+			<ul>
+				<li>Text specified via case-sensitive regular expression.
+			</ul>
+			<li>Confirm that the condition can match if a file <b>does exactly match</b> 
+			an expression.
+			<ul>
+				<li>Text specified via regular expression from file.
+			</ul>
+		</ul>
+<p>
+		<li><b>File timestamp condition</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that the condition can match for a <b>modified</b> timestamp that 
+			uses a date range.
+			<li>Confirm that the condition can match for a <b>modified</b> timestamp that 
+			is <b>exactly equal to</b> a specified time.
+			<li>Confirm that the condition can match for a <b>modified</b> timestamp that 
+			is <b>before</b> a specified time.
+			<li>Confirm that the condition can match for a <b>modified</b> timestamp that 
+			is <b>after</b> a specified number of days ago.
+			<li>Confirm that the condition can match for a <b>created</b> timestamp that 
+			is <b>from or before</b> <b>this week</b>.
+			<li>Confirm that the condition can match for a <b>created</b> timestamp that 
+			is <b>equal to or after</b> the <b>created</b> timestamp of a specified file.
+		</ul>
+<p>
+		<li><b>ID Shield data file condition</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that the condition can match for finding <b>any</b> of <b>HCData</b> 
+			and <b>MCData</b>.
+			<li>Confirm that the condition can match for finding <b>only any</b> of <b>Clues</b>.
+			<li>Confirm that the condition can match for finding <b>Mortgage</b> as the 
+			document type.
+			<li>Confirm that the condition can match for finding <b>any</b> of <b>Clues</b> OR 
+			<b>Warranty Deed</b> as the document type.
+			<li>Confirm that a non-default setting can be used for the ID Shield Data File 
+			Location.
+		</ul>
+<p>
+		<li><b>Mathematical condition</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that the condition can be met <b>randomly</b>.
+			<li>Confirm that the condition can be met <b>once every</b> specified number 
+			of times.
+			<li>Confirm that the condition can be met using <b>FileID modulus</b>.
+		</ul>
+<p>
+		<li><b>Tag condition</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that the condition can be met using <b>all</b> of multiple specified 
+			tags.
+			<li>Confirm that the condition can be met using <b>any</b> of the specified tags.
+		</ul>
+<p>
+		<li><b>Task condition</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that the condition is <b>met</b> when the specified task <b>does 
+			not</b> throw an exception.
+			<li>Confirm that the condition is <b>not met</b> when the specified task <b>does</b> 
+			throw an exception.
+		</ul>
+<p>
+		<li><b>VOA file contents condition</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>TBD
+		</ul>
+	</ol>
+<p>
+	<h2>LOGICAL Conditions</h2>
+	<ul>
+		<li>Exercise the following steps - taken from the <b>FAM Conditions</b> checklist to test 
+		functionality of <b>LOGICAL Conditions</b>.
+		<li>FPS and Image files referenced below can be found in Vault under appropriate subfolders of 
+		<b>Engineering\ReusableComponents\COMComponents\UCLIDFileProcessing\ESSkipConditions\InteractiveTest</b>.
+		<li>Create a <b>FAM_Condition</b> database.
+<p>
+		<li><b>AND multiple conditions</b>
+		<ul>
+			<li>Clear the database.
+			<li>Add a <b>skip_basedonand</b> action.
+		   	<li>Open <b>Skip_AND.fps</b>.</li> 
+         		<li>Press the <b>Start processing</b> button.</li> 
+	         	<li>Confirm that TestImage.tif, TestImage015.tif, TestImage020.tif, and 
+			TestImageB.tif are queued.
+	         	<li>Confirm that TestImage05.tif and TestImage09.tif are not queued.
+		</ul>
+<p>
+		<li><b>Exactly ONE in multiple conditions</b>
+		<ul>
+			<li>Clear the database.
+         		<li>Add action <b>skip_basedonexactlyone</b> to the database. 
+	         	<li>Open <b>Skip_ExactlyOne.fps</b>.
+       			<li>Press the <b>Start processing</b> button.</li> 
+         		<li>Confirm that TestImage.tif, TestImage005.tif, TestImage009.tif, 
+			and TestImageB.tif are queued.</li> 
+         		<li>Confirm that TestImage015.tif and TestImage020.tif are not queued.
+		</ul>
+<p>
+		<li><b>NONE in multiple conditions</b>
+		<ul>
+			<li>Clear the database.
+         		<li>Add action <b>skip_basedonnoneinmultiple</b> to the database.</li> 
+	         	<li>Open <b>Skip_NoneInMultiple.fps</b>.
+       			<li>Press the <b>Start processing</b> button.</li> 
+         		<li>Confirm that TestImage005.tif, TestImage009.tif, TestImage015.tif. and 
+			TestImage020.tif are queued.
+         		<li>Confirm that TestImage.tif and TestImageB.tif are not queued.
+		</ul>
+<p>
+		<li><b>OR multiple conditions</b>
+		<ul>
+			<li>Clear the database.
+         		<li>Add action <b>skip_basedonor</b> to the database.</li> 
+	         	<li>Open <b>Skip_OR.fps</b>.
+       			<li>Press the <b>Start processing</b> button.</li> 
+        		<li>Confirm that TestImage.tif and TestImageB.tif are queued.
+       			<li>Confirm that TestImage005.tif, TestImage009.tif, TestImage015.tif, 
+			and TestImage020.tif are not queued.
+		</ul>
+	</ul>
+</body>
+</html>
