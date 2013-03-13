@@ -1,0 +1,104 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.3.0.1 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.3.0.1 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DotNet #890]</b> Extract Debug Data
+        	<ul>
+            		<li>Open <b>export.uex</b> from <b>I:\Common\Testing\PVCS_Testing\LegacyRC</b>.
+			<li>Use <b>Tools - Export debug data</b> to confirm that application trace 
+			messages are logged for each of the following USB keys.
+			<ul>
+				<li>283
+				<li>323
+				<li>417
+				<li>418
+				<li>447
+				<li>449
+			</ul>
+			<li>Create a text file (Parameter.txt) with the following contents.
+			<ul>
+				<li>I,T,ELI15935,,,323
+			</ul>
+            		<li>Use <b>ExtractDebugData.exe export.uex Parameter.txt Output.txt /s</b> from 
+			a command prompt to retrieve the application trace exceptions associated with 
+			USB key #323.  Note that fully-qualifed path information must be used on the 
+			command line.
+			<ul>
+				<li>Confirm that <b>34</b> entries are found and that each reference 
+				USB key #323.
+				<li>Confirm that results can also be retrieved for other keys.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6399]</b> UEX Viewer
+        	<ul>
+            		<li>Open <b>export.uex</b> from <b>I:\Common\Testing\PVCS_Testing\LegacyRC</b>.
+			<li>Exercise <b>Edit - Find</b>.
+			<ul>
+				<li>Confirm that <b>Name</b> fields such as <b>Item 1</b> can be 
+				searched from Debug Information.
+				<li>Confirm that <b>Value</b> fields such as <b>323</b> can be 
+				searched from Debug Information.
+				<li>Disconnect any drive mappings from FNP2 and/or ES-IT-DC-01.
+				<li>Confirm that the <b>Value</b> search no longer works since the 
+				debug information is encrypted.
+			</ul>
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
