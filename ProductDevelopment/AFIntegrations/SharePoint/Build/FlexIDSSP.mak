@@ -52,36 +52,6 @@ GetOptions=-server $(VAULT_SERVER) -repository $(VAULT_REPOSITORY) -makewritable
 LabelCommonFolder: 
     $(Label) $$/Engineering/ProductDevelopment/Common -I- -L"$(FlexIndexVersion)" -O
 
-GetExtractSharePointFiles: 
-	@ECHO Getting files for Extract.SharePoint...
-	@IF NOT EXIST "$(SharePointRootDir)" MKDIR "$(SharePointRootDir)"
-	$(BUILD_DRIVE) 
-    @CD  "$(SharePointRootDir)"
-    $(Get) $(GetOptions) -nonworkingfolder "$(SharePointRootDir)" $$$(Branch)/Engineering/ProductDevelopment/AFIntegrations/SharePoint  "$(FlexIDSSPVersion)"
-    @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
-	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
-
-GetRCNetAPISharePoint:
-	@ECHO Getting files from RC.Net\APIs\SharePoint tree...
-	@IF NOT EXIST "$(RCDotNETDir)\APIs\SharePoint" MKDIR "$(RCDotNETDir)\APIs\SharePoint"
-	$(BUILD_DRIVE) 
-    @CD  "$(RCDotNETDir)\APIs\SharePoint"
-    $(Get) $(GetOptions) -nonworkingfolder "$(RCDotNETDir)\APIs\SharePoint" $$$(Branch)/Engineering/RC.Net/APIs/SharePoint  "$(RCDotNetVersion)" 
-	
-GetRCNetExtensionMethods:
-	@ECHO Getting files from RC.Net\ExtensionMethods...
-	@IF NOT EXIST "$(RCDotNETDir)\Core\ExtensionMethods" MKDIR "$(RCDotNETDir)\Core\ExtensionMethods"
-	$(BUILD_DRIVE) 
-    @CD  "$(RCDotNETDir)\Core\ExtensionMethods"
-    $(Get) $(GetOptions) -nonworkingfolder "$(RCDotNETDir)\Core\ExtensionMethods" $$$(Branch)/Engineering/RC.Net/Core/ExtensionMethods  "$(RCDotNetVersion)" 
-
-GetRCNetCore:
-	@ECHO Getting files from RC.Net Core Files...
-	@IF NOT EXIST "$(RCDotNETDir)\Core\Code" MKDIR "$(RCDotNETDir)\Core\Code"
-	$(BUILD_DRIVE) 
-    @CD  "$(RCDotNETDir)\Core\Code"
-    $(Get) $(GetOptions) -nonworkingfolder "$(RCDotNETDir)\Core\Code" $$$(Branch)/Engineering/RC.Net/Core/Code  "$(RCDotNetVersion)" 
-
 BuildExtractSharePoint:
 	@ECHO Building Extract.SharePoint...
     @CD "$(SharePointRootDir)"
@@ -140,19 +110,7 @@ CopyFilesForSPInstallFolder: CreateSharePointPackages
 	@COPY  "$(BinariesFolder)\OriginalFiles\*.*" "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	@COPY  "$(BinariesFolder)\Map\*.xml" "$(InternalUseBuildFilesArchive)" 
 
-GetAllFiles: GetPDCommonFiles GetExtractSharePointFiles GetRCNetAPISharePoint GetRCNetExtensionMethods GetRCNetCore
-
-BuildAfterAF:GetExtractSharePointFiles DoEverythingNoGet
-
-DoEverythingNoGet: SetupBuildEnv CopyFilesForSPInstallFolder 
-    @ECHO.
-    @DATE /T
-    @TIME /T
-    @ECHO.
-    @ECHO Flex IDShield for Sharepoint Build process completed.
-    @ECHO.
-  
-DoEverything: SetupBuildEnv GetAllFiles DoEverythingNoGet
+BuildAfterAF: SetupBuildEnv CopyFilesForSPInstallFolder
     @ECHO.
     @DATE /T
     @TIME /T

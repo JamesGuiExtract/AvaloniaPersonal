@@ -74,21 +74,7 @@ SetupBuildEnv:
 	
 LabelCommonDir:
 	$(Label) $$/Engineering/ProductDevelopment/Common "$(FlexIndexVersion)"
-	$(Label) $$/Engineering/ProductDevelopment/Common "$(IcoMapESRIVersion)" 
-	$(Label) $$/Engineering/ProductDevelopment/Common "$(RCDotNetVersion)"
-	$(Label) $$/Engineering/ProductDevelopment/Common "$(LaserficheVersion)"
-	$(Label) $$/Engineering/ProductDevelopment/Common "$(IDShieldOfficeVersion)"
-	$(Label) $$/Engineering/ProductDevelopment/Common "$(LabDEVersion)"
 	
-#Do not remove the tabs in the following echo statements they are required.
-CreateVersionISImportFile:
-	@SET FlexIndexVersion=$(FlexIndexVersion)
-	@SET ReusableComponentsVersion=$(ReusableComponentsVersion)
-	@SET LaserficheVersion=$(LaserficheVersion)
-	@SET IDShieldOfficeVersion=$(IDShieldOfficeVersion)
-	@SET LabDEVersion=$(LabDEVersion)
-	@"$(CommonDirectory)\CreateExtractVersionFile" "$(CommonDirectory)\ExtractSystemsVersions.txt"
-
 DisplayTimeStamp:
 	@ECHO.
 	@DATE /T

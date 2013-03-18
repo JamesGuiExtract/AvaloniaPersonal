@@ -60,17 +60,6 @@ Sub Main
 	'Set the product version
 	pProject.ProductVersion = sVersionNumber
 	
-	'Import the version strings
-	'Create the path by using the path to the project files
-	Dim sVersionFile
-	RegExOb.Pattern = "[\s\S]+Engineering"
-	Set Matches = RegExOb.Execute(sProjectName)
-	if ( Matches.Count > 0 ) then
-		sVersionFile = Matches(0).Value + "\ProductDevelopment\Common\ExtractSystemsVersions.txt"
-		stdout.WriteLine(sVersionFile)
-		pProject.ImportStrings sVersionFile, 1033, 0
-	end if
-	
 	'Save project with the updated product version
 	pProject.SaveProject
 	'Close project

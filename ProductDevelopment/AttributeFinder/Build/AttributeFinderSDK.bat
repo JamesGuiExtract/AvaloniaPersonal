@@ -1,24 +1,21 @@
 @ECHO OFF
 
+SET Branch=
+
 IF "%~1"=="" GOTO missing_version_number_error
 IF "%~2"=="" GOTO normal_build
-IF "%~2"=="/patch" GOTO patch_build
-IF "%~2"=="/PATCH" GOTO patch_build
-IF "%~2"=="/Patch" GOTO patch_build
 IF "%~2"=="/noget" GOTO no_get_build
-GOTO invalid_second_argument_error
+
+:: Assume second argument is the branch to build
+ECHO.
+ECHO Setting Branch to %~2
+SET Branch=%2
+GOTO init_build
 
 :missing_version_number_error
 ECHO.
 ECHO ***** ERROR *****
 ECHO Please provide version number of product to build as the first argument!
-ECHO.
-GOTO exit_script
-
-:invalid_second_argument_error
-ECHO.
-ECHO ***** ERROR *****
-ECHO The second argument "%~2" is not recognized!
 ECHO.
 GOTO exit_script
 
@@ -57,9 +54,9 @@ IF "%BUILD_FROM_SVN%"=="YES" (
 	"C:\Program Files\CollabNet Subversion\svn.exe" export "%SVN_REPOSITORY%/tags/%~1/Engineering/ProductDevelopment/AttributeFinder/Build" .\ --force
 ) ELSE (
 	CD ..\..\Common
-	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\..\..\Common" "$/Engineering/ProductDevelopment/Common" %1
+	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\..\..\Common" "$%Branch%/Engineering/ProductDevelopment/Common" %1
 	CD ..\AttributeFinder\Build
-	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\" "$/Engineering/ProductDevelopment/AttributeFinder/Build" %1
+	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\" "$%Branch%/Engineering/ProductDevelopment/AttributeFinder/Build" %1
 )
 
 Rem Remove previous build directory if it exists
@@ -86,14 +83,6 @@ nmake /F AttributeFinderSDK.mak BuildConfig="Release" ProductRootDirName="%PRODU
 
 IF "%BuildScriptTarget%"=="DoBuilds" GOTO exit_script
 nmake /F RuleDevelopmentKit.mak BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" DoEverything 2>&1 | tee "%LOGFILE2%"
-
-SET LOGFILE3=%BUILD_DRIVE%%BUILD_DIRECTORY%\%VERSION_NUMBER% FlexIDSSP.log
-
-CD ..\..\..\..\SharePoint\Build
-vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\" "$/SharePoint/Build" %1
-
-CD ..\..\..\..\SharePoint\Build
-nmake /F FlexIDSSP.mak BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" BuildAfterAF 2>&1 | tee "%LOGFILE3%"
 
 :exit_script
 

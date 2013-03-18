@@ -75,6 +75,12 @@ BuildOutputDir=Debug
 !ERROR FLEX Index version being build is not current version in LatestComponentVersions.mak file.
 !ENDIF
 
+AttributeCoreTarget=DoEverythingNoGet
+
+!IF "$(BuildScriptTarget)"== "DoBuilds"
+	AttributeCoreTarget=DoBuilds
+!ENDIF
+
 BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
 
 #############################################################################
@@ -83,7 +89,7 @@ BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
 BuildAttributeFinderCore:
 	@Echo Building AttributeFinderCore...
 	@CD "$(AFRootDirectory)\Build"
-    @nmake /F AttributeFinderCore.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" DoEverythingNoGet
+    @nmake /F AttributeFinderCore.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" $(AttributeCoreTarget)
 	
 CopyFilesToInstallFolder: 
     @ECHO Copying the AttributeFinder files to installation directory...
@@ -100,7 +106,7 @@ CopyComponentVersionFile:
 	@ECHO Copying Component Version file...
     @COPY /v "$(PDRootDir)\Common\LatestComponentVersions.mak" "$(AFReleaseBleedingEdgeDir)\ComponentsVersions.txt"
 
-BuildFlexIndexSDKInstall: BuildAttributeFinderCore CopyFilesToInstallFolder CreateVersionISImportFile
+BuildFlexIndexSDKInstall: BuildAttributeFinderCore CopyFilesToInstallFolder
     @ECHO Building UCLID FlexIndex SDK installation...
 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_18\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DevEnvDir);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(FlexIndexSDKInstallRootDir)\UCLID FlexIndex SDK.ism" "$(FlexIndexVersion)"
@@ -117,7 +123,7 @@ CreateAttributeFinderInstallCD: BuildFlexIndexSDKInstall
 CreateExtractLMInstallCD: BuildAttributeFinderCore
 	@ECHO Createing License Manager Install...
 	@CD "$(ReusableComponentsRootDirectory)\VendorSpecificUtils\SafeNetUtils\Build"
-    @nmake /F LicenseManager.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" CreateFlexLMInstall
+    @nmake /F LicenseManager.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" CreateFlexLMInstall
     
 CreateFlexDataEntryInstallDir:
 	@ECHO Creating Demo_FlexIndex
@@ -169,7 +175,7 @@ CreateDemoShieldInstall:
 	@COPY "$(AFRootDirectory)\Installation\FlexInstall\Launch.ini" "$(FlexIndexInstallDir)"
 	@COPY "$(AFRootDirectory)\Installation\FlexInstall\FlexInstall.dbd" "$(FlexIndexInstallDir)"
 		
-BuildIDShieldInstall: CreateVersionISImportFile
+BuildIDShieldInstall: 
     @ECHO Building Extract Systems IDShield installation...
 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_18\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(IDShieldInstallRootDir)\IDShield.ism" "$(FlexIndexVersion)"
@@ -190,7 +196,7 @@ CreateIDShieldInstallCD: BuildIDShieldInstall
 CreateRedactionDemoInstall:
 	@ECHO Creating Redaction Demo Install Directory ...
 	@CD "$(RedactionDemoBuildDir)"
-	@nmake /F $(RedactionDemoBuildDir)\RedactionDemo.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" DoEverything
+	@nmake /F $(RedactionDemoBuildDir)\RedactionDemo.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" DoEverything
 	
 CreateOtherDemos:
 	@ECHO Creating other demos...
@@ -227,7 +233,13 @@ CopySilentInstallsDir:
 	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SilentInstalls" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SilentInstalls"
 	@XCOPY "$(AFRootDirectory)\SilentInstalls\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SilentInstalls"
 	
-CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateDemoShieldInstall CreateLabDEInstall CreateExtractUninstallerFolder CreateNetDMSInstall CopySilentInstallsDir
+CreateSharepointInstall:
+	@Echo Creating Sharepoint Installs...
+	@CD $(AFRootDirectory)\AFIntegrations\Sharepoint\Build
+	@nmake /F FlexIDSSP.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" BuildAfterAF
+	@CD \Engineering\ProductDevelopment\AttributeFinder\Build
+	
+CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtractLMInstallCD  CreateIDShieldInstallCD CreateDemoShieldInstall CreateLabDEInstall CreateExtractUninstallerFolder CreateNetDMSInstall CopySilentInstallsDir CreateSharepointInstall
 
 DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall CreateOtherDemos
 

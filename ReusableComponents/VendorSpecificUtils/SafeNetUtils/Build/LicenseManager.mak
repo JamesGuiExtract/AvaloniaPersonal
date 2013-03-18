@@ -24,11 +24,9 @@
 PDRootDir=$(EngineeringRootDirectory)\ProductDevelopment
 AFRootDirectory=$(PDRootDir)\AttributeFinder
 AFBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)
-IcoMapBleedingEdgeDir=R:\IcoMapESRI\Internal\BleedingEdge\$(IcoMapESRIVersion)\IcoMapForArcGIS
 
 LMInstallFilesRootDir=P:\LicenseManager\Files
 AFExtractLMBleedingEdgeDir=$(AFBleedingEdgeDir)\Extract Systems LM
-IcoExtractLMBleedingEdgeDir=$(IcoMapBleedingEdgeDir)\ExtractSystemsLM
 
 ExtractLMInstallRootDir=$(ReusableComponentsRootDirectory)\VendorSpecificUtils\SafeNetUtils\Installation\Extract Systems LM
 ExtractLMInstallMediaDir=$(ExtractLMInstallRootDir)\Media\CD-ROM\DiskImages\DISK1
@@ -66,19 +64,6 @@ BuildExtractLMInstall:CopyFilesToExtractLMInstall
 	$(SetProductVerScript) "$(ExtractLMInstallRootDir)\Extract Systems LM.ism" "$(ReusableComponentsVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(ExtractLMInstallRootDir)\Extract Systems LM.ism"
 	
-CopyLMInstallToProductInstallFolder: BuildExtractLMInstall
-#This label requires the ProductInstallFolder macro to be defined
-	@ECHO Copying LM Install to $(ProductInstallFolder) Directory...
-    @IF NOT EXIST "$(ProductInstallFolder)" MKDIR "$(ProductInstallFolder)"
-    @XCOPY "$(ExtractLMInstallMediaDir)\*.*" "$(ProductInstallFolder)" /v /s /e /y
-    $(VerifyDir) "$(ExtractLMInstallMediaDir)" "$(ProductInstallFolder)"
-    @DeleteFiles "$(ProductInstallFolder)\vssver.scc"
-    @ECHO.
-    @DATE /T
-    @TIME /T
-    @ECHO.
-    @ECHO Flex Index License Manager Build process completed.
-    @ECHO.
 
 CreateFlexLMInstall: BuildExtractLMInstall
 	@ECHO Copying LM Install to Flex Index Release Directory...
@@ -94,16 +79,4 @@ CreateFlexLMInstall: BuildExtractLMInstall
     @ECHO Flex Index License Manager Build process completed.
     @ECHO.
 
-CreateIcoMapLMInstall: BuildExtractLMInstall
-	@ECHO Copying LM Install to Ico Map Release Directory...
-    @IF NOT EXIST "$(IcoExtractLMBleedingEdgeDir)" MKDIR "$(IcoExtractLMBleedingEdgeDir)"
-    @XCOPY "$(ExtractLMInstallMediaDir)\*.*" "$(IcoExtractLMBleedingEdgeDir)" /v /s /e /y
-    $(VerifyDir) "$(ExtractLMInstallMediaDir)" "$(IcoExtractLMBleedingEdgeDir)"
-	@COPY /v "$(LMInstallFilesRootDir)\64BitDrivers\*.*" "$(IcoExtractLMBleedingEdgeDir)"
-    @DeleteFiles "$(IcoExtractLMBleedingEdgeDir)\vssver.scc"
-    @ECHO.
-    @DATE /T
-    @TIME /T
-    @ECHO.
-    @ECHO Ico Map License Manager Build process completed.
-    @ECHO.
+
