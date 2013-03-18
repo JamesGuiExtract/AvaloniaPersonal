@@ -225,7 +225,7 @@ function BOOL CheckProductKeyInstalled(strExpectedVersion, strProductKey, svInst
 	NUMBER i;
 begin 
 	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
-
+    
 	// Get the Expected Version	                                          
 	nPos = StrFind(strExpectedVersion, "Ver. ");
 	StrSub(strVersion, strExpectedVersion, nPos + 5 , 20 );
@@ -271,22 +271,22 @@ begin
 	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
  	
     // Check each of the expected version against any installed versions
-    if (CheckProductKeyInstalled(@FlexIndexVersion, IDSHIELD_PRODUCT_CODE, strVersion, FALSE)) then
+    if (CheckProductKeyInstalled(IFX_PRODUCT_VERSION, IDSHIELD_PRODUCT_CODE, strVersion, FALSE)) then
     	strMsg = "ID Shield version " + strVersion + " must be uninstalled before product can be installed.";	
     	bInstalled = TRUE;
-	elseif (CheckProductKeyInstalled(@FlexIndexVersion, FLEX_INDEX_PRODUCT_CODE, strVersion, FALSE)) then
+	elseif (CheckProductKeyInstalled(IFX_PRODUCT_VERSION, FLEX_INDEX_PRODUCT_CODE, strVersion, FALSE)) then
     	strMsg = "FLEX Index version " + strVersion + " must be uninstalled before product can be installed.";	
     	bInstalled = TRUE;
-	elseif (CheckProductKeyInstalled(@ReusableComponentsVersion, EXTRACT_LM_PRODUCT_CODE, strVersion, FALSE)) then 
+	elseif (CheckProductKeyInstalled(IFX_PRODUCT_VERSION, EXTRACT_LM_PRODUCT_CODE, strVersion, FALSE)) then 
 		strMsg = "Extract LM version " + strVersion + " must be uninstalled before product can be installed.";	
     	bInstalled = TRUE;
-	elseif (CheckProductKeyInstalled(@LaserficheVersion, LASERFICHE_PRODUCT_CODE, strVersion, FALSE)) then 
+	elseif (CheckProductKeyInstalled(IFX_PRODUCT_VERSION, LASERFICHE_PRODUCT_CODE, strVersion, FALSE)) then 
 		strMsg = "ID Shield for Laserfiche version " + strVersion + " must be uninstalled before product can be installed.";	
     	bInstalled = TRUE;
-	elseif (CheckProductKeyInstalled(@IDShieldOfficeVersion, IDSHIELDOFFICE_PRODUCT_CODE, strVersion, FALSE)) then 
+	elseif (CheckProductKeyInstalled(IFX_PRODUCT_VERSION, IDSHIELDOFFICE_PRODUCT_CODE, strVersion, FALSE)) then 
 		strMsg = "ID Shield Office version " + strVersion + " must be uninstalled before product can be installed.";	
     	bInstalled = TRUE;
-   	elseif (CheckProductKeyInstalled(@LabDEVersion, LABDE_PRODUCT_CODE, strVersion, FALSE)) then 
+   	elseif (CheckProductKeyInstalled(IFX_PRODUCT_VERSION, LABDE_PRODUCT_CODE, strVersion, FALSE)) then 
 		strMsg = "LabDE version " + strVersion + " must be uninstalled before product can be installed.";	
     	bInstalled = TRUE;
 	endif;    	
@@ -616,19 +616,19 @@ begin
  	
     // Check each of the expected version against any installed versions
     if ((PRODUCT_GUID!= IDSHIELD_PRODUCT_CODE) &&                                              	
-    		CheckProductKeyInstalled(@FlexIndexVersion, IDSHIELD_PRODUCT_CODE, strVersion, TRUE)) then
+    		CheckProductKeyInstalled(IFX_PRODUCT_VERSION, IDSHIELD_PRODUCT_CODE, strVersion, TRUE)) then
     	bReturnValue = TRUE;
 	elseif ((PRODUCT_GUID != FLEX_INDEX_PRODUCT_CODE) && 
-    		CheckProductKeyInstalled(@FlexIndexVersion, FLEX_INDEX_PRODUCT_CODE, strVersion, TRUE)) then
+    		CheckProductKeyInstalled(IFX_PRODUCT_VERSION, FLEX_INDEX_PRODUCT_CODE, strVersion, TRUE)) then
     	bReturnValue = TRUE;
 	elseif ((PRODUCT_GUID != LASERFICHE_PRODUCT_CODE) && 
-    		CheckProductKeyInstalled(@LaserficheVersion, LASERFICHE_PRODUCT_CODE, strVersion, TRUE)) then 
+    		CheckProductKeyInstalled(IFX_PRODUCT_VERSION, LASERFICHE_PRODUCT_CODE, strVersion, TRUE)) then 
     	bReturnValue = TRUE;
 	elseif ((PRODUCT_GUID != IDSHIELDOFFICE_PRODUCT_CODE) && 
-    		CheckProductKeyInstalled(@IDShieldOfficeVersion, IDSHIELDOFFICE_PRODUCT_CODE, strVersion, TRUE)) then 
+    		CheckProductKeyInstalled(IFX_PRODUCT_VERSION, IDSHIELDOFFICE_PRODUCT_CODE, strVersion, TRUE)) then 
     	bReturnValue = TRUE;
    	elseif ((PRODUCT_GUID != LABDE_PRODUCT_CODE) && 
-    		CheckProductKeyInstalled(@LabDEVersion, LABDE_PRODUCT_CODE, strVersion, TRUE)) then 
+    		CheckProductKeyInstalled(IFX_PRODUCT_VERSION, LABDE_PRODUCT_CODE, strVersion, TRUE)) then 
     	bReturnValue = TRUE;
 	endif;
 	
