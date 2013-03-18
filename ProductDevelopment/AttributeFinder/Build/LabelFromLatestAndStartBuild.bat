@@ -6,16 +6,16 @@ SET VersionToBuild=
 
 :: This should be called with either no arguments indicating build from main branch
 :: 	or have one argument that is the branch to build
-if "%~p1"=="" GOTO get_latest
+if "%~1"=="" GOTO get_latest
 
-SET Branch=%~p1
+SET Branch=%~1
 
 :get_latest
 
 :: Get build folders from vault to make sure they are the most current
-vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\..\..\Common" "$%Branch%/Engineering/ProductDevelopment/Common" %1
+vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\..\..\Common" "$%Branch%/Engineering/ProductDevelopment/Common"
 CD ..\AttributeFinder\Build
-vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\" "$%Branch%/Engineering/ProductDevelopment/AttributeFinder/Build" %1
+vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\" "$%Branch%/Engineering/ProductDevelopment/AttributeFinder/Build"
 
 cd "%~p0..\..\Common"
 
