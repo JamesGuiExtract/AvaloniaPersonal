@@ -1,0 +1,414 @@
+<HTML>
+
+<HEAD>
+<TITLE>ID Shield for SharePoint Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>SharePoint Testing - ID Shield<BR>
+<IMG src="TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>FPS Files</h3>
+    	<ul>
+		<li>The following FPS files are used for subsequent test cases.
+		<li>Note that appropriate actions must be added to the desired FAM database.
+        	<li><b>ID Shield</b>
+		<ul>
+	        	<li><u>General</u>
+			<ul>
+	        		<li><b>OCRAndRunRules.fps</b> and <b>ProduceRedactedImage.fps</b> 
+				should be added to <b>ESFAMService.sdf</b> for processing with 
+				the FAM service.
+			</ul>
+			<li><u>OCRAndRunRules.fps</u>
+			<ul>
+				<li>Supply TIFs and/or PDFs from the folder that will be defined 
+				as the working folder.  Files should normally be supplied from 
+				sub-folders.  Files should also normally be supplied that are 
+				added or modified.
+				<li>Core: Execute rules - use Demo_IDShield rules or rules 
+				appropriate for a specific customer.
+				<li>Core: Conditionally execute task(s)
+				<ul>
+					<li>Define a condition to check for <b>No</b> sensitive 
+					data.
+					<li>If the condition is met, Core: Set file action 
+					status so that the <b>ProduceRedactedImage</b> action is 
+					set to <b>Pending</b>.  The insensitive image will now be 
+					processed by <b>ProduceRedactedImage.fps</b>.
+					<li>If the condition is not met, Core: Set file action 
+					status so that the <b>Verify</b> action is set to 
+					<b>Pending</b>.  The sensitive image will now be verified 
+					by <b>Verify.fps</b>.
+					<li>Core: Create file to create a 
+					SourceDocName.InVerificationQueue file.  ID Shield for 
+					SharePoint is looking for this file in order to update 
+					processing status.
+				</ul>
+				<li>Log details of an error to <b>&lt;SourceDocName&gt;.uex</b>.
+				<li>Execute a <b>Core: Copy, move or delete file</b> task to copy 
+				<b>&lt;SourceDocName&gt;.uex</b> to <b>&lt;SourceDocName&gt;.failed</b>.
+				ID Shield for SharePoint is looking for this file in order to update 
+				processing status.
+			</ul>
+			<li><u>ProduceRedactedImage.fps</u>
+			<ul>
+				<li>Redaction: Create redacted image - use 
+				<b>&lt;SourceDocName&gt;.redacted</b> as the Image Output File Name.
+				ID Shield for SharePoint is looking for this file in order to update 
+				processing status.
+				<li>Core: Create file to create a SourceDocName.Processed file.  ID 
+				Shield for SharePoint is looking for this file in order to update 
+				processing status.
+				<li>Core: Copy, move or delete file to delete 
+				<b>&lt;SourceDocName&gt;.uss</b>.
+				<li>Core: Copy, move or delete file to delete 
+				<b>&lt;SourceDocName&gt;.voa</b>.
+				<li>Log details of an error to <b>&lt;SourceDocName&gt;.uex</b>.
+				<li>Execute a <b>Core: Copy, move or delete file</b> task to copy 
+				<b>&lt;SourceDocName&gt;.uex</b> to <b>&lt;SourceDocName&gt;.failed</b>.
+				ID Shield for SharePoint is looking for this file in order to update 
+				processing status.
+			</ul>
+			<li><u>Verify.fps</u>
+			<ul>
+				<li>Redaction: Verify sensitive data.
+				<li>Core: Set file action status so that the <b>ProduceRedactedImage</b> 
+				action is set to <b>Pending</b>.  The verified image will now be processed 
+				by <b>ProduceRedactedImage.fps</b>.
+			</ul>
+			<li><u>RedactNow.fps</u>
+			<ul>
+				<li>Redaction: Verify sensitive data.
+				<li>Redaction: Create redacted image - use default settings.
+				<li>Core: Create file to create a SourceDocName.Processed file.  ID 
+				Shield for SharePoint is looking for this file in order to update 
+				processing status.
+			</ul>
+		</ul>
+    	</ul></li>
+<p>
+	<LI><h3>Site Permissions</h3>
+    	<ul>
+        	<li><b>Process Folder</b>
+		<ul>
+			<li>Confirm that a user must be a member of the <b>ID Shield 
+			Administrator</b> group in order to use <b>ID Shield - Process 
+			Folder</b>.
+			<li><b>[Integrations #274]</b> Confirm that relevant exceptions 
+			are logged in the UEX file.
+		</ul>
+<p>
+        	<li><b>Redact Now</b>
+		<ul>
+			<li>Confirm that a user must be a member of the <b>ID Shield 
+			Administrator</b> group in order to use <b>Redact Now</b>.
+		</ul>
+	</ul></LI>
+<p>
+	<LI><h3>ID Shield User Interface</h3>
+    	<ul>
+        	<li>In SharePoint, navigate to a document library for testing.</li>
+        	<li>Confirm that the ID Shield ribbon is available under <b>Library 
+        	Tools</b>.</li>
+        	<li>Confirm that the ID Shield ribbon includes buttons to <b>Redact
+        	now</b> (disabled), <b>Process folder</b>, and <b>Remove 
+        	settings</b>.</li>
+        	<li>Confirm that the <b>Redact now</b> button is enabled and the others
+        	are disabled when a single document is selected.</li>
+<p>
+        	<li>Click on the <b>Process folder</b> button and confirm that it
+        	brings up the <b>Process Current Folder</b> dialog.</li>
+        	<li>Confirm the presence of an <b>Input file specification</b> group
+        	box.
+        	<ul>
+            		<li>Confirm that it contains a read-only text box for <b>Current
+            		folder</b>.</li>
+            		<li>Confirm that it contains a <b>File extension specification</b>
+            		text box.</li>
+            		<li>Try to click OK and confirm that the file extension must be
+            		specified.</li>
+        	</ul></li>
+<p>
+        	<li>Confirm the presence of a <b>Folder settings</b> group box.
+        	<ul>
+            		<li>Confirm that it contains checkboxes for
+            		<ul>
+                		<li>Reprocess previously processed files</li>
+                		<li>Recursively process files from any sub folders</li>
+                		<li>Process any files that are added</li>
+                		<li>Do not process existing files</li>
+            		</ul></li>
+            		<li>Confirm that <b>Do not process existing files</b> is enabled
+            		only when <b>Process any files that are added</b> is checked.</li>
+        	</ul></li>
+<p>
+        	<li>Confirm the presence of an <b>Output settings</b> group box.
+        	<ul>
+            		<li>Confirm that it contains radio buttons to:
+            		<ul>
+                		<li>Use same filename
+                		<ul>
+                    			<li>Confirm the presence of an associated 
+                    			<b>Prefixed/Suffixed</b> dropdown list and text box.</li>
+                		</ul></li>
+                		<li>Use sub folder
+                		<ul>
+                    			<li>with an associated text box.</li>
+                		</ul></li>
+                		<li>Use same folder
+                		<ul>
+                    			<li>Confirm the presence of an associated 
+                    			<b>Prefix/Suffix</b> dropdown list and text box.</li>
+                		</ul></li>
+                		<li>Use identical folder structure
+                		<ul>
+                    			<li>with an associated text box</li>
+                		</uL></li>
+            		</ul></li>
+            		<li>Confirm that the associated controls are enabled only when 
+            		the appropriate radio buttons are selected.</li>
+            		<li>Confirm that a valid output location is required to be
+            		specified.</li>
+        	</ul></li>
+<p>
+        	<li>Confirm that after processing settings are configured, the 
+        	document library includes an <b>ID Shield Status</b> column.</li>
+<p>
+        	<li>Click the <b>Remove settings</b> button.</li>
+        	<li>Confirm that it brings up a dialog to remove the settings on the
+        	current folder. NOTE: this dialog seems likely to be changed.</li>
+<p>
+        	<li>Select a single document and click the <b>Redact now</b> 
+        	button.</li>
+        	<li>Confirm that a message pops up informing you that the client is
+        	not running.</li>
+    	</ul></LI>
+<p>
+	<li><h3>ID Shield Processing Tests</h3></li>
+	<UL>
+        	<LI><b>ID Shield for SharePoint Client</b>
+        	<ul>
+            		<li>Make sure the client is installed. On your server, run
+            		<b>CommonComponents\IDShieldForSPClient.exe</b>.</li>
+            		<li>Confirm that an ID Shield icon appears in your system 
+            		tray.</li>
+            		<li>Right-click the system tray icon. Confirm there are two 
+            		options:
+            		<ul>
+                		<li><b>About...</b> - brings up an about box</li>
+                		<li><b>Exit</b> - causes the client to exit</li>
+            		</ul></li>
+<p>
+            		<li>In the Central Administration console, configure the client
+            		to use an appropriate FPS file (one with verification and create 
+            		redacted image tasks). NOTE: the client currently looks for 
+            		output files in the form .redacted.ext (not .ext.redacted, like
+            		the regular SP interface).</li>
+            		<li>With the client running, select a single document and click 
+            		the <b>Redact now</b> button.</li>
+            		<li>Confirm that the selected document is opened for 
+            		verification.</li>
+            		<li>Confirm that the local copy of the document was saved in the
+            		user's local temp directory.</li>
+            		<li>Confirm that the verification interface works as expected.</li>
+            		<li>Save the document.</li>
+            		<li>Confirm that the <b>Save Redacted File</b> dialog comes 
+            		up.
+            		<ul>
+                		<li>Confirm that the dialog provides the path to the 
+				original source image in SharePoint in a read-only text 
+				box.</li>
+                		<li>Confirm that it provides text box for the filename of 
+				the output file.</li>
+                		<li>Confirm that it provides a folder browser dialog to 
+				select which document library/folder/local disk to save to.</li>
+                		<li>Confirm that each of those options works as expected.</li>
+                		<li>Confirm that ID Shield-related columns are <b>not</b>
+                		added to the SP site after using the client to push a 
+				redacted image.</li>
+            		</ul></li>
+<p>
+            		<li>Set up a client machine with ID Shield installed and licensed,
+            		but not SharePoint.</li>
+            		<li>Install the IDShieldForSharePointClient on the client 
+            		machine. Run the EXE.</lI>
+            		<li>Do whatever magic is necessary to set up an appropriate trust
+            		relationship between the SP server and the client.</li>
+            		<li>On the client, navigate the SP site, select an appropriate
+            		document, and hit the Redact now button.</li>
+            		<li>Confirm that the appropriate FPS file is launched and the
+            		SP client behaves as expected.</lI>
+<p>
+	        	<li><b>[Integrations #265]</b> Error Handling
+			<ul>
+				<li>Prepare some documents for processing via <b>Redact 
+				Now</b>.
+				<li>Modify the Central Administration settings to 
+				remove the <b></b> path.
+				<li>Process a document with <b>Redact Now</b>.
+				<li>Confirm that a <b>Path to ID Shield for SP Client FPS 
+				file is not set</b> error is displayed.
+			</ul>
+	        	<li><b>[Integrations #269, #271, #298]</b> ID Shield for SP On 
+			Remote Machine
+			<ul>
+				<li>Install and exercise <b>ID Shield for SharePoint</b> 
+				on a test machine.
+				<li>Confirm that the <b>Location for ID Shield for SharePoint 
+				Client FPS file</b> setting uses a UNC path.
+				<li>Install and license <b>ID Shield</b> on a separate 
+				test machine.
+            			<li>Install the <b>IDShieldForSharePointClient</b> on the 
+				second test machine. Run the EXE.</li>
+				<li>Confirm that a document can be processed from the 
+				second test machine.
+			</ul>
+	        	<li><b>[Integrations #301, #302]</b> File Columns
+			<ul>
+				<li>Process some files.
+				<li>Confirm that for the original file locations in the library, 
+				a link is provided in the <b>Name</b> column to view the <u>original</u> 
+				image.
+				<li>Confirm that for the original file locations in the library, 
+				a link is provided in the <b>ID Shield Redacted File</b> column to 
+				view the <u>redacted</u> image.
+				<li>Confirm that for the output file locations in the library, 
+				a link is provided in the <b>Name</b> column to view the <u>redacted</u> 
+				image.
+				<li>Confirm that for the original file locations in the library, 
+				a link is provided in the <b>ID Shield Unredacted File</b> column to 
+				view the <u>original</u> image.
+			</ul>
+	        	<li><b>[Integrations #313]</b> Libraries With Whitespace
+			<ul>
+				<li>Create a new library.
+				<li>Add some documents to the library.
+				<li>Edit settings for the new library and add some 
+				whitespace inside the name.
+				<li>Confirm that the new name is accepted.
+				<li>Process a document with <b>Redact Now</b>.
+				<li>Confirm that the redacted document is saved 
+				correctly.
+			</ul>
+        	</ul></LI>
+<p>
+        	<li><b>ID Shield for SharePoint</b>
+        	<ul>
+            		<li>Confirm that when you export files from SP for processing,
+            		the local filenames are incomprehensible GUIDs.</li>
+            		<li>Confirm that an ID Shield Status column correctly displays the
+            		status of all files in folders to be processed:
+            		<ul>
+                		<li>Not Processed</li>
+                		<li>To Be Queued</li>
+                		<li>Queued For Processing</li>
+                		<li>In Verification Queue</li>
+                		<li>Complete</li>
+                		<li>Failed</li>
+            		</ul></li>
+            		<li>Confirm that the status column cannot be manually 
+            		modified.</li>
+            		<li>Confirm that a file exporter timer job exports all files with
+            		the <b>To Be Queued</b> status to the appropriate location.</li>
+            		<li>Confirm that the folder sweeper appropriately modifies the
+            		status for any file for which a .inverificationqueue file 
+            		exists.</li>
+            		<li>Confirm that the folder sweeper cleans up any file for which a
+            		<b>.processed</b> file exists.</li>
+            		<li>Confirm that when files are cleaned up, any .redacted files are
+            		pushed back into SP in the appropriate location.</li>
+            		<li>Confirm that ID Shield columns are added to SP with links from
+            		original to redacted documents and vice-versa.</li>
+            		<li>Confirm that if the folder sweeper finds a .failed file, an
+            		exception is logged notifying the user that the associated file
+            		failed to process.</li>
+            		<li>Confirm that if both a .processed and .failed file exist, the
+            		file is considered failed.</li>
+        	</ul></li>
+<p>
+        	<li>Confirm that everything works on both the main SP site and also 
+        	on any subsites.</li>
+		<li>Confirm that recursive folder watching works as expected.
+		<li><b>[Integrations #173]</b> Confirm that processing images recursively 
+		where output goes to a prefixed parallel folder works properly without 
+		<b>Object reference not set to an instance of an object</b> exceptions 
+		being logged.
+<p>
+		<li><b>[Integrations #188]</b> Confirm that folder watching with the main 
+		site works correctly.
+    	</ul></LI>
+<p>
+	<LI><h3>Miscellaneous Tests</h3>
+    	<ul>
+        	<li><b>[Integrations #149, #168, #185]</b> Exception Handling
+		<ul>
+			<li>Confirm that exceptions are logged to the exception service.
+			<li>Confirm that exceptions are always logged to the <b>SharePoint</b> 
+			log.
+			<li>Confirm that ELI codes and text are included when adding 
+			exceptions to the <b>SharePoint</b> log.
+			<li><b>[Integrations #254]</b> Confirm that exceptions are also 
+			added to the UEX log.
+		</ul>
+        	<li><b>[Integrations #163, #283]</b> Uninstall
+		<ul>
+			<li>Confirm that <b>ID Shield for SharePoint</b> settings are 
+			completely configured.
+			<li>Uninstall <b>ID Shield for SharePoint</b>.
+			<li>Reinstall <b>ID Shield for SharePoint</b>.
+			<li>Confirm that <b>ID Shield for SharePoint</b> settings are 
+			completely cleared.
+		</ul>
+        	<li><b>[Integrations #172]</b> Open With Explorer
+		<ul>
+			<li>Click the <b>Open with Explorer</b> button in the Library 
+			ribbon.
+			<li>Use the associated Explorer window to add a <b>TIF</b> image 
+			to SharePoint.
+			<li>Confirm that the image is correctly added to SharePoint.
+			<li>Confirm that the image is correctly added to the ID Shield 
+			watch folder.
+		</ul>
+        	<li><b>[Integrations #175]</b> Multiple SharePoint Sites
+		<ul>
+			<li>Confirm that more than one site can have an active <b>ID 
+			Shield</b> feature.
+		</ul>
+        	<li><b>[Integrations #177]</b> Uploading Multiple Documents
+		<ul>
+			<li>Confirm that multiple documents can be uploaded to SharePoint 
+			via the <b>Upload Multiple Documents</b> button in the Documents 
+			ribbon.
+			<li>Confirm that multiple documents can be uploaded by dropping 
+			files into SharePoint via an Explorer window.
+		</ul>
+        	<li><b>[Integrations #181]</b> Security Exceptions With Root-level Output 
+		Folder
+		<ul>
+			<li>Create a new document library and activate the <b>ID Shield</b> 
+			feature.
+			<li>Open the watch folder dialog and configure the output settings 
+			to use a parallel folder or a custom location that is also at the 
+			root level.
+			<li>Upload a file to the library.
+			<li>Add a <b>.redacted</b> and a <b>.processed</b> file.
+			<li>Confirm that the files are properly cleaned up and exported to 
+			the output folder.
+			<li>Confirm that no security exceptions are logged.
+		</ul>
+        	<li><b>[Integrations #]</b>
+		<ul>
+		</ul>
+        	<li><b>[Integrations #]</b>
+		<ul>
+		</ul>
+    	</ul></LI>
+</OL>
+</BODY>
+</HTML>
