@@ -27,9 +27,6 @@ RulesDir=$(EngineeringRootDirectory)\Rules
 Get="$(VAULT_DIR)\vault" GETLABEL 
 GetOptions=-server $(VAULT_SERVER) -repository $(VAULT_REPOSITORY) -makewritable 
 
-!IF "$(RulesBranch)" == ""
-	RulesBranch=$(Branch)
-!ENDIF
 
 GetEngineering:
 	@ECHO Getting Engineering for $(FlexIndexVersion)
