@@ -13,9 +13,9 @@ SET Branch=%~1
 :get_latest
 
 :: Get build folders from vault to make sure they are the most current
-vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\..\..\Common" "$%Branch%/Engineering/ProductDevelopment/Common"
+vault GET -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~dp0..\..\Common" "$%Branch%/Engineering/ProductDevelopment/Common"
 CD ..\AttributeFinder\Build
-vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\" "$%Branch%/Engineering/ProductDevelopment/AttributeFinder/Build"
+vault GET -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~dp0" "$%Branch%/Engineering/ProductDevelopment/AttributeFinder/Build"
 
 cd "%~p0..\..\Common"
 
