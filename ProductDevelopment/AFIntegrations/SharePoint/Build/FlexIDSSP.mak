@@ -41,10 +41,6 @@ BuildOutputDir=Debug
 
 BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
 
-Branch=
-
-Get=vault GETLABEL 
-GetOptions=-server $(VAULT_SERVER) -repository $(VAULT_REPOSITORY) -makewritable 
 
 #############################################################################
 # B U I L D    T A R G E T S

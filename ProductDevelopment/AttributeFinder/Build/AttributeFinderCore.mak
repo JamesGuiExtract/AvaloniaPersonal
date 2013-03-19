@@ -378,7 +378,7 @@ BuildDataEntryMergeModule: BuildAFCoreMergeModule
 	$(SetProductVerScript) "$(LabDEInstallRootDir)\DataEntry\DataEntry.ism" "$(FlexIndexVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(LabDEInstallRootDir)\DataEntry\DataEntry.ism"
 
-GetAllFiles: GetPDCommonFiles GetReusableComponentFiles GetRCdotNETFiles GetAttributeFinderFiles GetNetDMSFiles GetPDUtilsFiles GetDataEntryFiles GetDataEntryInstall
+GetAllFiles: GetEngineering
 
 MakeMergeModules: CleanUpMergeModulesFromPreviousBuilds BuildAFCoreMergeModule BuildDataEntryMergeModule 
 

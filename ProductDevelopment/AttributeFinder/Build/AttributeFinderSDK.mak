@@ -243,7 +243,7 @@ CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtrac
 
 DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall CreateOtherDemos
 
-GetAllFiles: GetPDCommonFiles GetAttributeFinderFiles GetRCdotNETFiles GetReusableComponentFiles GetPDUtilsFiles GetComponentDataFiles GetDemo_IDShieldRules GetDemo_FLEXIndexRules GetDataEntryFiles GetDataEntryInstall GetNetDMSFiles
+GetAllFiles: GetEngineering
 
 DoBuilds: DisplayTimeStamp SetupBuildEnv BuildAttributeFinderCore
 

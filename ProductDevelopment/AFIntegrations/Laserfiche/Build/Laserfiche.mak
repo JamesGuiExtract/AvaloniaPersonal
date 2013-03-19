@@ -88,7 +88,7 @@ CreateLaserficheInstallCD: BuildLaserficheInstall
 
 DoNecessaryBuilds: SetupBuildEnv BuildAttributeSDKandRDT
 
-GetAllFiles: GetPDCommonFiles GetAttributeFinderFiles GetRCdotNETFiles GetReusableComponentFiles GetPDUtilsFiles GetLaserFicheFiles
+GetAllFiles: GetEngineering
 
 DoEverythingNoGet: DisplayTimeStamp DoNecessaryBuilds CreateLaserficheInstallCD
     @ECHO.
