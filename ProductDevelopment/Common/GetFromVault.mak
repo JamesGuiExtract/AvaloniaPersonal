@@ -46,13 +46,13 @@ GetReusableComponents:
 GetRules:
 	@ECHO Getting Rules needed for $(FlexIndexVersion)
 	@IF NOT EXIST "$(RulesDir)\ComponentData" MKDIR "$(RulesDir)\ComponentData"
-	$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\ComponentData" $$$(Branch)/Engineering/Rules/ComponentData"  "$(FlexIndexVersion)"
+	$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\ComponentData" "$$$(Branch)/Engineering/Rules/ComponentData"  "$(FKBVersion)"
 	@IF NOT EXIST "$(RulesDir)\FLEXIndex\Demo_FLEXIndex" MKDIR "$(RulesDir)\FLEXIndex\Demo_FLEXIndex"
-	$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\FLEXIndex\Demo_FLEXIndex" $$$(Branch)/Engineering/Rules/FLEXIndex/Demo_FLEXIndex"  "$(FlexIndexVersion)"
+	$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\FLEXIndex\Demo_FLEXIndex" "$$$(Branch)/Engineering/Rules/FLEXIndex/Demo_FLEXIndex"  "$(FlexIndexVersion)" Rules/FLEXIndex/Demo_FLEXIndex
 	@IF NOT EXIST "$(RulesDir)\IDShield\Demo_IDShield" MKDIR "$(RulesDir)\IDShield\Demo_IDShield"
-	$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\IDShield\Demo_IDShield" $$$(Branch)/Engineering/Rules/IDShield/Demo_IDShield"  "$(FlexIndexVersion)"
+	$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\IDShield\Demo_IDShield" "$$$(Branch)/Engineering/Rules/IDShield/Demo_IDShield"  "$(FlexIndexVersion)" Rules/IDShield/Demo_IDShield
 	@IF NOT EXIST "$(RulesDir)\LabDE\Demo_LabDE" MKDIR "$(RulesDir)\LabDE\Demo_LabDE"
-	$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\LabDE\Demo_LabDE" $$$(Branch)/Engineering/Rules/LabDE/Demo_LabDE"  "$(FlexIndexVersion)"
+	$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\LabDE\Demo_LabDE" "$$$(Branch)/Engineering/Rules/LabDE/Demo_LabDE"  "$(FlexIndexVersion)" Rules/LabDE/Demo_LabDE
 
 GetEngineering: GetProductDevelopment GetRCDotNET GetReusableComponents GetRules
 	@ECHO Getting Engineering for $(FlexIndexVersion)
