@@ -142,7 +142,7 @@ CreateDemo_LabDE:
 	@DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\*.spm"
     @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\vssver.scc"
 
-DoEverything: DisplayTimeStamp SetupBuildEnv GetDemo_LabDERules CreateDemoShieldInstall CreateDemo_LabDE
+DoEverything: DisplayTimeStamp SetupBuildEnv CreateDemoShieldInstall CreateDemo_LabDE
     @ECHO.
     @DATE /T
     @TIME /T
