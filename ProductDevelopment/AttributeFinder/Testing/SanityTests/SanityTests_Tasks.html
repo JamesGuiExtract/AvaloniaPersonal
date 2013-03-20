@@ -1,0 +1,307 @@
+<html>
+
+<head>
+<title>File Action Manager Sanity Tests</title>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css" />
+</head>
+
+<body>
+
+<h1>FAM Sanity Test - File Processing Tasks<br>
+<img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif" />
+</h1>
+<hr>
+<p>
+*ID Shield, LabDE and FLEX Index should be installed and licensed for this test.
+	<h2>Goals</h2>
+	<ul>
+		<li>Exercise each defined task.
+		<li>Confirm that various configurations work as expected.
+		<li>Confirm that no unwanted exceptions are logged.
+		<li>Confirm that each task works properly on various operating systems.
+	</ul>
+<p>
+	<h2>File Processing Tasks</h2>
+	<ol>
+		<li><b>Core: Add watermark</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that a watermark image can be positioned in the (default) top 
+			corner of the <b>first page</b>.
+			<li>Confirm that a watermark image can be positioned in a specified position 
+			on a <b>specified page</b>.
+		</ul>
+<p>
+		<li><b>Core: Apply Bates number</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that a Bates number with default settings can be applied to 
+			documents.
+			<li>Confirm that a Bates number with non-default settings can be applied to 
+			documents.
+		</ul>
+<p>
+		<li><b>Core: Archive or restore associated file</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that files can be archived.
+			<li>Confirm that files can be restored.
+		</ul>
+<p>
+		<li><b>Core: Clean up image</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that images can be cleaned.
+			<li>Confirm that, by default, cleaned images are used for OCR.
+		</ul>
+<p>
+		<li><b>Core: Conditionally execute task(s)</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that appropriate tasks are executed when the condition is 
+			<b>met</b>.
+			<li>Confirm that appropriate tasks are executed when the condition is 
+			<b>not met</b>.
+		</ul>
+<p>
+		<li><b>Core: Convert to searchable PDF</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that a TIF image can be converted to a searchable PDF image.
+			<li>Confirm that a TIF image can be converted to a PDF/A compatible image.
+			<li>Confirm that PDF security can be enabled.
+		</ul>
+<p>
+		<li><b>Core: Convert VOA to XML</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that a VOA file can be converted to a <b>Version 1</b> XML file.
+			<li>Confirm that a VOA file can be converted to a <b>Version 2</b> XML file.
+		</ul>
+<p>
+		<li><b>Core: Copy, move or delete file</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that a file can be copied to a non-existent destination folder.
+			<li>Confirm that a file can be moved and that <b>SourceDocName</b> can be 
+			modified.
+			<li>Confirm that a read-only file can be deleted.
+			<li>Confirm that a file can be <b>securely</b> deleted.
+		</ul>
+<p>
+		<li><b>Core: Create file</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that a file can be created with specified contents.
+		</ul>
+<p>
+		<li><b>Core: Delete empty folder</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that an empty folder can be deleted along with empty parent folders.
+		</ul>
+<p>
+		<li><b>Core: Encrypt/decrypt file</b>
+		<ul>
+			<li>Confirm that encrypted files can be created.
+			<li>Exercise <b>decryption</b>.
+			<li>Confirm that the decrypted files are the same size as the original files.
+		</ul>
+<p>
+		<li><b>Core: Execute rules</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that rules can be executed from a file specified via expandable tags.
+		</ul>
+<p>
+		<li><b>Core: Extract image area</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that an image area can be extracted for a specified attribute.
+			<li>Confirm that multiple image areas can be extracted for all attributes 
+			from a particular VOA file.
+		</ul>
+<p>
+		<li><b>Core: Launch application</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that an application without parameters can be launched in 
+			<b>non-blocking</b> mode.
+			<li>Confirm that an application with parameters can be launched in 
+			<b>blocking</b> mode.
+		</ul>
+<p>
+		<li><b>Core: Manage tags</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that the specified tag can be <b>applied</b>.
+			<li>Confirm that the specified tag can be <b>removed</b>.
+		</ul>
+<p>
+		<li><b>Core: Modify PDF file</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that annotations can be removed from the specified PDF image.
+		</ul>
+<p>
+		<li><b>Core: Modify source document name in database</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that <b>SourceDocName</b> can be modified.
+		</ul>
+<p>
+		<li><b>Core: OCR document</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that the specified image can be OCR'd.
+		</ul>
+<p>
+		<li><b>Core: Rasterize PDF</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that the specified PDF can be rasterized with <b>SourceDocName</b> 
+			modified in the database.
+			<li>Confirm that the specified PDF can be rasterized with the original PDF 
+			being deleted after rasterization.
+		</ul>
+<p>
+		<li><b>Core: Set file priority</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that file priority can be changed for the specified file.
+		</ul>
+<p>
+		<li><b>Core: Set file action status in database</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that file action status can be set for <b>SourceDocName</b>.
+		</ul>
+<p>
+		<li><b>Core: Sleep</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that the FAM will sleep for a specified period.
+			<li>Confirm that the FAM will sleep for a random period.
+		</ul>
+<p>
+		<li><b>Core: Translate, rename or delete via FTP/SFTP</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that each of the following operations succeed.
+			<ul>
+				<li>Upload file
+				<li>Download file
+				<li>Rename remote file
+				<li>Delete remote file
+			</ul>
+		</ul>
+<p>
+		<li><b>Data Entry: Verify extracted data</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that verification results can be saved.
+		</ul>
+<p>
+		<li><b>Redaction: Create metadata XML</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that metadata can be saved in an XML file.
+		</ul>
+<p>
+		<li><b>Redaction: Create redacted image</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that redacted output images can be created with the following 
+			settings.
+			<ul>
+				<li>Basic black redactions
+				<li>Redactions as annotations
+				<li>White redactions with black border, with <b>REDACTED</b> as 
+				redaction text
+			</ul>
+		</ul>
+<p>
+		<li><b>Redaction: Create redacted text</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that sensitive text can be replaced by specified characters.
+			<li>Confirm that sensitive text can be surrounded with a named XML element.
+		</ul>
+<p>
+		<li><b>Redaction: Extend redactions to surround context</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that surrounding context can be redacted.
+			<li>Confirm that redaction height can be adjusted to further obscure context.
+		</ul>
+<p>
+		<li><b>Redaction: Filter ID Shield data file</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that one or more default data types can be filtered and written 
+			to the specified output file.
+			<li>Confirm that one or more custom data types can be filtered and written 
+			to the specified output file.
+		</ul>
+<p>
+		<li><b>Redaction: Merge ID Shield data files</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that two VOA files can be merged.
+			<li>Confirm that equal redactions are not duplicated in the output VOA file.
+		</ul>
+<p>
+		<li><b>Redaction: Verify sensitive data</b>
+		<ul>
+			<li>Confirm that the configuration dialog can be displayed and that settings 
+			are persistent.
+			<li>Confirm that default settings are effective:
+			<ul>
+				<li>Users must visit all pages
+				<li>Users must visit all data items
+				<li>Users must specify type
+				<li>Users can seamlessly navigate between documents
+				<li>Slideshow is enabled
+			</ul>
+			<li>Confirm that other settings are effective:
+			<ul>
+				<li>Users must specify exemption codes
+				<li>Feedback collection is enabled
+				<li>Input event tracking is enabled
+				<li>Verification window opens in full-screen mode
+				<li>User is prompted to save changes before navigating away
+			</ul>
+			<li>Confirm that <b>file action status</b> can be set after file commitment.
+		</ul>
+	</ol>
+</body>
+</html>
