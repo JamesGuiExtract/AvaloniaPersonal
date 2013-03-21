@@ -235,7 +235,7 @@ CopySilentInstallsDir:
 	
 CreateSharepointInstall:
 	@Echo Creating Sharepoint Installs...
-	@CD $(AFRootDirectory)\AFIntegrations\Sharepoint\Build
+	@CD $(PDRootDir)\AFIntegrations\Sharepoint\Build
 	@nmake /F FlexIDSSP.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" BuildAfterAF
 	@CD \Engineering\ProductDevelopment\AttributeFinder\Build
 	
