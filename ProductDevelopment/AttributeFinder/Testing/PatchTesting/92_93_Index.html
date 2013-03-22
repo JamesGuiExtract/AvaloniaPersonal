@@ -1,0 +1,243 @@
+<HTML>
+
+<HEAD>
+<TITLE>Testing of 9.2 & 9.3 Features and Enhancements</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.2 & 9.3<br> 
+Features and Enhancements</h1>
+<hr>
+
+<h1>Goals</h1>
+<ul>
+	<li><b>Version 9.2</b>
+	<ul>
+		<li>Support use of High Memory for core functionality
+	</ul>
+	<li><b>Version 9.3</b>
+	<ul>
+		<li>Support use of Extract API Outside CommonComponents
+		<li>Minor bug fixes
+	</ul>
+</ul>
+
+<hr>
+
+<h1>General</h1>
+<uL>
+	<li>Automated and NRS tests
+	<ul>
+		<li><b>9.2.0.2</b> completed <b>03/12/2013</b>
+		<li><b>9.3.0.1</b> completed <b>03/11/2013</b>
+	</ul>
+	<li>Tested Support for Use of Extract API Outside CommonComponents
+	<ul>
+		<li>API Sample Project with <b>9.3.0.1</b> completed <b>03/08/2013</b> by Steve
+	</ul>
+</uL>
+
+<hr>
+
+<h1>Complete Sanity Tests</h1>
+<ul>
+	<li>Build <b>9.3.0.1</b></a>
+	<ul>
+		<li>Operating System: 64-bit Windows Server 2003 R2
+		<li>Date Started: 03/08/2013
+		<li><b>Date Completed: 03/12/2013</b>
+		<li>Tester: WL
+	</ul>
+</ul>
+
+<hr>
+
+<h1>Other Sanity Tests</h1>
+<uL>
+	<li><b>Server</b>
+	<ul>
+		<li>N/A
+	</ul>
+	<li><b>Workstation</b>
+	<ul>
+		<li>N/A
+	</ul>
+	<li><b>Tasks</b>
+	<ul>
+		<li>9.3.0.1, 64-bit Server 2003 R2, Supertester, 03/19/2013, WL
+	</ul>
+	<li><b>Conditions</b>
+	<ul>
+		<li>9.3.0.1, 64-bit Server 2003 R2, Supertester, 03/19/2013, WL
+	</ul>
+	<li><b>Internal</b>
+	<ul>
+		<li>N/A
+	</ul>
+</uL>
+
+<hr>
+
+<h1>Other Checklists</h1>
+<uL>
+	<li><b>9.3.0.1</b>, completed <b>03/13/2013</b>
+</uL>
+
+<hr>
+
+<h1>Memory Leak Testing</h1>
+<uL>
+	<li><b>Test Harness</b>
+	<ul>
+		<li>Operating System: 64-bit Server 2012
+		<li>Date Started: 02/27/2013
+		<li><b>Date Completed: 02/28/2013</b>
+		<li>Tester: WL
+		<li>Status: Success
+		<ul>
+			<li>9.2.0.2
+			<li>MEM_TOP_DOWN enabled
+			<li>Exercised TCL file with 1024 copies of entries from AFCore.tcl
+			<li>Did not finish entire TCL file due to expected processing slowdown
+		</ul>
+<p>
+		<li>Operating System: 64-bit Server 2012
+		<li>Date Started: 02/28/2013
+		<li><b>Date Completed: 03/04/2013</b>
+		<li>Tester: WL
+		<li>Status: Success
+		<ul>
+			<li>9.2.0.2
+			<li>HighMemoryTestMode enabled
+			<li>Exercised TCL file with 1024 copies of entries from AFCore.tcl
+			<li>Did not finish entire TCL file due to expected processing slowdown
+		</ul>
+	</ul>
+</uL>
+
+<hr>
+
+<h1>Scalability and Stability Testing</h1>
+<uL>
+	<li>Database Scalability
+	<ul>
+		<li>Operating System: 64-bit Windows 7
+		<li>Date Started: 03/06/2013
+		<li><b>Date Completed: 03/11/2013</b>
+		<li>Tester: WL
+		<li>Status: Success
+		<ul>
+			<li>9.2.0.2
+			<li>HighMemoryTestMode enabled
+			<li>Stopped with full SQL Express database
+		</ul>
+	</ul>
+<p>
+	<li>ID Shield Endurance
+	<ul>
+		<li>Database and Image Host: HPQC2
+		<li>Processing Machines: HPQC6, HPQC7
+		<li>Date Started: 03/06/2013
+		<li><b>Date Completed: 03/xx/2013</b>
+		<li>Tester: WL
+		<li>Status: 
+		<ul>
+			<li>9.2.0.2
+			<li>HighMemoryTestMode enabled
+			<li>Processing just Utah images
+			<li><b>5</b> early RPC/OCR errors on processing machines 
+		</ul>
+	</ul>
+<p>
+	<li>Complex Endurance
+	<ul>
+		<li>Database and Image Host: HPQC2
+		<li>Processing Machines: PROVOLONE, DELLQC1
+		<li>Date Started: 03/07/2013
+		<li><b>Date Completed: 03/xx/2013</b>
+		<li>Tester: WL
+		<li>Status: 
+		<ul>
+			<li>9.2.0.2
+			<li>Processing Utah, Pierson & Patterson, PA-Adams, 
+			UITC, Sumter Court images with associated rules
+			<li>Exercising all supported FAM tasks
+			<li>Some Unable To Delete failures on image host due to 
+			file in use by other process
+			<li>Some early RPC/OCR errors on processing machines 
+		</ul>
+	</ul>
+<p>
+	<li>Cuyahoga Image and Rules
+	<ul>
+		<li>Operating System: 32-bit Windows 8
+		<li>Date Started: 02/25/2013
+		<li><b>Date Completed: 02/25/2013</b>
+		<li>Tester: Steve
+		<li>Status: 
+		<ul>
+			<li>9.2.0.2
+			<li>\\GANDOLF\PSRaid1\PS\Services\Proware\Big File Samples\Big Image\223100.TIF
+			<li>Exercising rules from 2012-06-13 delivery
+			<li>Processing eventually ran out of memory and crashed
+		</ul>
+<p>
+		<li>Operating System: 32-bit Windows 8
+		<li>Date Started: 02/26/2013
+		<li><b>Date Completed: 03/05/2013</b>
+		<li>Tester: Steve
+		<li>Status: 
+		<ul>
+			<li>9.2.0.2
+			<li>\\GANDOLF\PSRaid1\PS\Services\Proware\Big File Samples\Big Image\223100.TIF
+			<li>Exercising rules from 2013-02-18 delivery
+			<li>Processing completed after 7+ days
+		</ul>
+	</ul>
+</uL>
+
+<hr>
+<h1>Miscellaneous</h1>
+<OL>
+	<li><b>FAMProcess.exe</b>
+	<ul>
+		<li>Stress test completed <b>03/19/2013</b>
+	</ul>
+	<li><b>ProcessFiles.exe</b>
+	<ul>
+		<li>Stress test completed <b>03/19/2013</b>
+	</ul>
+	<li><b>Verify sensitive data</b> task
+	<ul>
+		<li>Stress test completed <b>03/19/2013</b>
+	</ul>
+<p>
+	<li><b>Utilities</b>
+	<ul>
+		<li>TestHarness
+		<ul>
+			<li>Stress test completed <b>03/04/2013</b>
+		</ul>
+		<li>VOAFileViewer
+		<ul>
+			<li>Stress test completed <b>03/15/2013</b>
+		</ul>
+	</ul>
+<p>
+	<li><b>Documentation</b>
+	<ul>
+		<li>Add 9.2 Enhancements
+		<ul>
+			<li>Support High Memory - completed <b>03/12/2013</b>
+		</ul>
+		<li>Add 9.3 Enhancements
+		<ul>
+			<li>API Integrations - completed <b>03/13/2013</b>
+			<li>Expanded Search In UEXViewer - completed <b>03/13/2013</b>
+		</ul>
+	</ul>
+</OL>
+</BODY>
+</HTML>
