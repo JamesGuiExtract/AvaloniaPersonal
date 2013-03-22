@@ -12,18 +12,26 @@ SET Branch=%~1
 
 :get_latest
 
+IF "Branch"=="" (
+	SET BATCH_COMMON_PATH=$/Engineering/ProductDevelopment/Common
+	SET BATCH_ATTRIBUTE_BUILD=$/Engineering/ProductDevelopment/AttributeFinder/Build
+) ELSE (
+	SET BATCH_COMMON_PATH=$%Branch%/Engineering/ProductDevelopment/Common
+	SET BATCH_ATTRIBUTE_BUILD=$%Branch%/Engineering/ProductDevelopment/AttributeFinder/Build
+)
+
 cd "%~p0..\..\Common"
 :: Get build folders from vault to make sure they are the most current
-vault GET -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -merge overwrite -workingfolder "%~dp0..\..\Common" "$%Branch%/Engineering/ProductDevelopment/Common"
-CD ..\AttributeFinder\Build
-vault GET -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -merge overwrite -workingfolder "%~dp0" "$%Branch%/Engineering/ProductDevelopment/AttributeFinder/Build"
+vault GET -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -merge overwrite -workingfolder "%~dp0..\..\Common" "%BATCH_COMMON_PATH%"
+CD "%~p0"
+vault GET -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -merge overwrite -workingfolder "%~dp0" "%BATCH_ATTRIBUTE_BUILD%"
 
 cd "%~p0..\..\Common"
 
 cscript IncrementBuildVersion.vbs
 
 :: Commit the modified LatestComponentVersions.mak file
-vault COMMIT -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% "$%Branch%/Engineering/ProductDevelopment/Common/LatestComponentVersions.mak"
+vault COMMIT -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% "$%BATCH_COMMON_PATH%/LatestComponentVersions.mak"
 
 :: Label
 nmake /F LabelFromLatestVersions.mak

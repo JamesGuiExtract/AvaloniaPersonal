@@ -44,20 +44,22 @@ CALL InitBuildEnv.Bat
 REM vcvars32 initializes command-line build vars so that editbin can be called to re-apply properties post-obfuscation
 CALL "%VCPP_DIR%\Bin\vcvars32.bat"
 
+REM Don't need to get the common and AttributeFinder build folders because either they will have been gotten manually or thru
+REM the LabeFromLatestAndBuild.bat file that calls this
 REM Get specified version of files from Common dir as well as AttributeFinder\build dir
-IF NOT EXIST ..\..\Common mkdir ..\..\Common
+REM IF NOT EXIST ..\..\Common mkdir ..\..\Common
 
-IF "%BUILD_FROM_SVN%"=="YES" (
-	CD ..\..\Common
-	"C:\Program Files\CollabNet Subversion\svn.exe" export "%SVN_REPOSITORY%/tags/%~1/Engineering/ProductDevelopment/Common" .\ --force
-	CD ..\AttributeFinder\Build
-	"C:\Program Files\CollabNet Subversion\svn.exe" export "%SVN_REPOSITORY%/tags/%~1/Engineering/ProductDevelopment/AttributeFinder/Build" .\ --force
-) ELSE (
-	CD ..\..\Common
-	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\..\..\Common" "$%Branch%/Engineering/ProductDevelopment/Common" %1
-	CD ..\AttributeFinder\Build
-	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\" "$%Branch%/Engineering/ProductDevelopment/AttributeFinder/Build" %1
-)
+REM IF "%BUILD_FROM_SVN%"=="YES" (
+	REM CD ..\..\Common
+	REM "C:\Program Files\CollabNet Subversion\svn.exe" export "%SVN_REPOSITORY%/tags/%~1/Engineering/ProductDevelopment/Common" .\ --force
+	REM CD ..\AttributeFinder\Build
+	REM "C:\Program Files\CollabNet Subversion\svn.exe" export "%SVN_REPOSITORY%/tags/%~1/Engineering/ProductDevelopment/AttributeFinder/Build" .\ --force
+REM ) ELSE (
+	REM CD ..\..\Common
+	REM vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\..\..\Common" "$%Branch%/Engineering/ProductDevelopment/Common" %1
+	REM CD ..\AttributeFinder\Build
+	REM vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\" "$%Branch%/Engineering/ProductDevelopment/AttributeFinder/Build" %1
+REM )
 
 Rem Remove previous build directory if it exists
 IF EXIST %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT% RMDIR /S /Q %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%
