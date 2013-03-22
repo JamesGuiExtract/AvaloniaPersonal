@@ -12,6 +12,10 @@ SET Branch=%~1
 
 :get_latest
 
+:: Get rid of the trailing \ if it is there
+SET BATCH_WORKING_FOLDER=%~dp0
+IF %BATCH_WORKING_FOLDER:~-1%==\ SET BATCH_WORKING_FOLDER=%BATCH_WORKING_FOLDER:~0,-1%
+
 IF "Branch"=="" (
 	SET BATCH_COMMON_PATH=$/Engineering/ProductDevelopment/Common
 	SET BATCH_ATTRIBUTE_BUILD=$/Engineering/ProductDevelopment/AttributeFinder/Build
@@ -22,9 +26,9 @@ IF "Branch"=="" (
 
 cd "%~p0..\..\Common"
 :: Get build folders from vault to make sure they are the most current
-vault GET -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -merge overwrite -workingfolder "%~dp0..\..\Common" "%BATCH_COMMON_PATH%"
+vault GET -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -merge overwrite -workingfolder "%BATCH_WORKING_FOLDER%\..\..\Common" "%BATCH_COMMON_PATH%"
 CD "%~p0"
-vault GET -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -merge overwrite -workingfolder "%~dp0" "%BATCH_ATTRIBUTE_BUILD%"
+vault GET -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -merge overwrite -workingfolder "%BATCH_WORKING_FOLDER%" "%BATCH_ATTRIBUTE_BUILD%"
 
 cd "%~p0..\..\Common"
 
