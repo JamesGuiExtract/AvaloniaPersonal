@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Extract.Utilities
 {
@@ -129,6 +128,48 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI29987", ex);
+            }
+        }
+
+        /// <summary>
+        /// Runs the specified <see paramref="action"/> asynchronously within a try/catch handler
+        /// that will display or log any exceptions.
+        /// </summary>
+        /// <param name="eliCode">The ELI code to associate with any exception.</param>
+        /// <param name="action">The <see cref="Action"/> to be executed.</param>
+        /// <param name="displayExceptions"><see langword="true"/> to display any exception caught;
+        /// <see langword="false"/> to log instead.</param>
+        public static void RunInBackgroundThread(string eliCode, Action action,
+            bool displayExceptions = true)
+        {
+            try
+            {
+                // Per this thread:
+                // http://social.msdn.microsoft.com/Forums/en-US/parallelextensions/thread/7b3a42e5-4ebf-405a-8ee6-bcd2f0214f85/
+                // Since nothing is waiting on this task, there is no harm in not displosing of the
+                // task.
+                Task.Factory.StartNew(() =>
+                {
+                    try
+                    {
+                        action();
+                    }
+                    catch (Exception ex)
+                    {
+                        if (displayExceptions)
+                        {
+                            ex.ExtractDisplay(eliCode);
+                        }
+                        else
+                        {
+                            ex.ExtractLog(eliCode);
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35413");
             }
         }
 

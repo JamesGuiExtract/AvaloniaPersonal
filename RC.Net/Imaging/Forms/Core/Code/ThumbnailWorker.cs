@@ -100,19 +100,36 @@ namespace Extract.Imaging.Forms
         /// </summary>
         public ThumbnailWorker(string fileName, Size thumbnailSize)
         {
-            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28489",
-                _OBJECT_NAME);
+            try
+            {
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28489",
+                    _OBJECT_NAME);
 
-            _reader = _codecs.CreateReader(fileName);
-            _pageCount = _reader.PageCount;
-            _thumbnailSize = thumbnailSize;
-            _thumbnails = new RasterImage[_pageCount];
-            _priorityEndPage = _pageCount;
+                _reader = _codecs.CreateReader(fileName);
+                _pageCount = _reader.PageCount;
+                _thumbnailSize = thumbnailSize;
+                _thumbnails = new RasterImage[_pageCount];
+                _priorityEndPage = _pageCount;
 
-            _thread = new Thread(LoadThumbnails);
+                _thread = new Thread(LoadThumbnails);
+            }
+            catch (Exception ex)
+            {
+                var ee = new ExtractException("ELI35418", "Unable to create thumbnail image.", ex);
+                throw ee;
+            }
         }
 
         #endregion Constructors
+
+        #region Events
+
+        /// <summary>
+        /// Raised when a thumbnail has finished loading.
+        /// </summary>
+        public event EventHandler<ThumbnailLoadedEventArgs> ThumbnailLoaded;
+
+        #endregion Events
 
         #region Properties
 
@@ -159,6 +176,20 @@ namespace Extract.Imaging.Forms
                 {
                     throw ExtractException.AsExtractException("ELI30744", ex);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets the page count of the document for which thumbnails are being loaded.
+        /// </summary>
+        /// <value>
+        /// The page count of the document for which thumbnails are being loaded.
+        /// </value>
+        public int PageCount
+        {
+            get
+            {
+                return _pageCount;
             }
         }
 
@@ -357,6 +388,10 @@ namespace Extract.Imaging.Forms
                         _thumbnails[page - 1] = thumbnail;
                     }
 
+                    int pageNumber = page;
+
+                    OnThumbnailLoaded(pageNumber, thumbnail);
+ 
                     page = GetNextPageToLoad();
                 }
             }
@@ -367,6 +402,21 @@ namespace Extract.Imaging.Forms
             finally
             {
                 _running = false;
+            }
+        }
+
+        /// <summary>
+        /// Raised the <see cref="ThumbnailLoaded"/> event.
+        /// </summary>
+        /// <param name="pageNumber">The page number that was loaded.</param>
+        /// <param name="thumbnailImage">The loaded thumbnail <see cref="RasterImage"/>.</param>
+        void OnThumbnailLoaded(int pageNumber, RasterImage thumbnailImage)
+        {
+            var eventHandler = ThumbnailLoaded;
+            if (eventHandler != null)
+            {
+                eventHandler(this, 
+                    new ThumbnailLoadedEventArgs(pageNumber, thumbnailImage));
             }
         }
 

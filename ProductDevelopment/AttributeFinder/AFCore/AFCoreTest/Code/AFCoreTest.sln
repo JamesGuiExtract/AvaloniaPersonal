@@ -609,12 +609,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.Fresn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.PeirsonAndPatterson", "..\..\..\..\DataEntry\FlexIndex\DEPs\PeirsonAndPatterson\Core\Code\Extract.DataEntry.DEP.PeirsonAndPatterson.csproj", "{8600FF47-6098-4462-95FE-60CACF8DC886}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaginationUtility", "..\..\..\..\..\RC.Net\UtilityApplications\PaginationUtility\Core\Code\PaginationUtility.csproj", "{A6CEC41C-8703-4687-9395-8B067AC03098}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
+		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 178
+		ProjectCount = 179
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcxproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcxproj
@@ -793,6 +801,7 @@ Global
 		ProjectRelativeDiskPath176 = ..\..\..\..\AFIntegrations\NetDMS\NetDMSUtilities\Core\Code\Extract.NetDMSUtilities.csproj
 		ProjectRelativeDiskPath177 = ..\..\..\..\DataEntry\FlexIndex\DEPs\Fresno\Core\Code\Extract.DataEntry.DEP.Fresno.csproj
 		ProjectRelativeDiskPath178 = ..\..\..\..\DataEntry\FlexIndex\DEPs\PeirsonAndPatterson\Core\Code\Extract.DataEntry.DEP.PeirsonAndPatterson.csproj
+		ProjectRelativeDiskPath179 = ..\..\..\..\..\RC.Net\UtilityApplications\PaginationUtility\Core\Code\PaginationUtility.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2929,6 +2938,18 @@ Global
 		{8600FF47-6098-4462-95FE-60CACF8DC886}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{8600FF47-6098-4462-95FE-60CACF8DC886}.Release|Win32.ActiveCfg = Release|Any CPU
 		{8600FF47-6098-4462-95FE-60CACF8DC886}.Release|x86.ActiveCfg = Release|Any CPU
+		{A6CEC41C-8703-4687-9395-8B067AC03098}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{A6CEC41C-8703-4687-9395-8B067AC03098}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{A6CEC41C-8703-4687-9395-8B067AC03098}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{A6CEC41C-8703-4687-9395-8B067AC03098}.Debug|Win32.ActiveCfg = Debug|x86
+		{A6CEC41C-8703-4687-9395-8B067AC03098}.Debug|x86.ActiveCfg = Debug|x86
+		{A6CEC41C-8703-4687-9395-8B067AC03098}.Debug|x86.Build.0 = Debug|x86
+		{A6CEC41C-8703-4687-9395-8B067AC03098}.Release|Any CPU.ActiveCfg = Release|x86
+		{A6CEC41C-8703-4687-9395-8B067AC03098}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{A6CEC41C-8703-4687-9395-8B067AC03098}.Release|Mixed Platforms.Build.0 = Release|x86
+		{A6CEC41C-8703-4687-9395-8B067AC03098}.Release|Win32.ActiveCfg = Release|x86
+		{A6CEC41C-8703-4687-9395-8B067AC03098}.Release|x86.ActiveCfg = Release|x86
+		{A6CEC41C-8703-4687-9395-8B067AC03098}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

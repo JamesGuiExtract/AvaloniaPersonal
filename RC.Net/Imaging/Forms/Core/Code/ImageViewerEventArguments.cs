@@ -640,4 +640,56 @@ namespace Extract.Imaging.Forms
             private set;
         }
     }
+
+    /// <summary>
+    /// Provides data for the <see cref="ThumbnailWorker.ThumbnailLoaded"/> event.
+    /// </summary>
+    public class ThumbnailLoadedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// The page number of the thumbnail that was loaded.
+        /// </summary>
+        int _pageNumber;
+
+        /// <summary>
+        /// TThe page number of the thumbnail that was loaded.
+        /// </summary>
+        RasterImage _thumbnailImage;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ThumbnailLoadedEventArgs"/> class.
+        /// </summary>
+        /// <param name="pageNumber">The page number of the thumbnail that was loaded.</param>
+        /// <param name="thumbnailImage">The page number of the thumbnail that was loaded.</param>
+        public ThumbnailLoadedEventArgs(int pageNumber, RasterImage thumbnailImage)
+            : base()
+        {
+            _pageNumber = pageNumber;
+            _thumbnailImage = thumbnailImage;
+        }
+
+        /// <summary>
+        /// Gets the page number of the thumbnail that was loaded.
+        /// </summary>
+        /// <value>The page number of the thumbnail that was loaded.</value>
+        public int PageNumber
+        {
+            get
+            {
+                return _pageNumber;
+            }
+        }
+
+        /// <summary>
+        /// Gets the thumbnail as a <see cref="RasterImage"/>.
+        /// </summary>
+        /// <value>The thumbnail as a <see cref="RasterImage"/>.</value>
+        public RasterImage ThumbnailImage
+        {
+            get
+            {
+                return _thumbnailImage;
+            }
+        }
+    }
 }
