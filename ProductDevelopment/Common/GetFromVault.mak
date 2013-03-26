@@ -64,10 +64,10 @@ GetEngineering: GetProductDevelopment GetRCDotNET GetReusableComponents GetRules
 	@SendFilesAsArgumentToApplication AssemblyInfo.cpp 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
 	@CD "$(RCDotNETDir)"
 	$(UpdateFileVersion)  "$(DataEntryBranding)\FlexIndex.resx" "$(FlexIndexVersion)"
-	$(UpdateFileVersion)  "$(DataEntryBranding)\LabDE.resx" "$(LabDEVersion)"
+	$(UpdateFileVersion)  "$(DataEntryBranding)\LabDE.resx" "$(FlexIndexVersion)"
 	@CD "$(DataEntryDir)\FlexIndex"
 	@SendFilesAsArgumentToApplication *.resx 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
 	@CD "$(DataEntryDir)\LabDE"
-	@SendFilesAsArgumentToApplication *.resx 1 1 $(UpdateFileVersion) "$(LabDEVersion)"
+	@SendFilesAsArgumentToApplication *.resx 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
 	
 
