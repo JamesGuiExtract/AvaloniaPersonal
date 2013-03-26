@@ -4388,6 +4388,8 @@
 		<row><td>ID_STRING40</td><td>1033</td><td>FAMNET~1|FAM Network Manager</td><td>0</td><td/><td>312442601</td></row>
 		<row><td>ID_STRING41</td><td>0</td><td>NEWSHO~1|NewShortcut2</td><td>0</td><td/><td>-199266870</td></row>
 		<row><td>ID_STRING41</td><td>1033</td><td>TESTTE~1|Test Text Function Expander</td><td>0</td><td/><td>-199244342</td></row>
+		<row><td>ID_STRING42</td><td>0</td><td>NEWSHO~1|NewShortcut10</td><td>0</td><td/><td>-777966263</td></row>
+		<row><td>ID_STRING42</td><td>1033</td><td>PAGINA~1|Pagination Utility</td><td>0</td><td/><td>-777953975</td></row>
 		<row><td>ID_STRING5</td><td>0</td><td>FEEDBA~1|FeedBack Manager</td><td>0</td><td/><td>178112137</td></row>
 		<row><td>ID_STRING5</td><td>1033</td><td>FEEDBA~1|Feedback Manager</td><td>0</td><td/><td>2040452583</td></row>
 		<row><td>ID_STRING6</td><td>0</td><td>FILEPR~1|File Action Manager</td><td>0</td><td/><td>178112137</td></row>
@@ -5064,6 +5066,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="i2">InstallMode</col>
 		<row><td>ConfigureEmailSettingsShortcut</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut1</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
+		<row><td>NewShortcut10</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut11</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut12</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut13</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
@@ -5166,6 +5169,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="I4">ISAttributes</col>
 		<row><td>ConfigureEmailSettingsShortcut</td><td>newfolder1</td><td>##ID_STRING35##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]EmailFile</td><td>/c</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut1</td><td>newfolder1</td><td>##ID_STRING17##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]VOAFileViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut10</td><td>newfolder1</td><td>##ID_STRING42##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]PaginationUtility.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut11</td><td>newfolder1</td><td>##ID_STRING26##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]UEXViewer.exe</td><td>"[CommonAppDataFolder]Extract Systems\LogFiles\ExtractException.UEX"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut12</td><td>newfolder1</td><td>##ID_STRING27##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ConvertFPSFile.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut13</td><td>newfolder1</td><td>##ID_STRING29##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ImageViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>

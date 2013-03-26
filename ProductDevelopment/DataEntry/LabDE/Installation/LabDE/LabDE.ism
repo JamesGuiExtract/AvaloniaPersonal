@@ -3154,6 +3154,7 @@
 		<row><td>ID_STRING13</td><td>1033</td><td>USBLIC~1|USB License Key Manager</td><td>0</td><td/><td>1788709576</td></row>
 		<row><td>ID_STRING14</td><td>1033</td><td>Extract Systems, LLC</td><td>0</td><td/><td>2057138863</td></row>
 		<row><td>ID_STRING15</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>1394518507</td></row>
+		<row><td>ID_STRING16</td><td>1033</td><td>PAGINA~1|Pagination Utility</td><td>0</td><td/><td>-777941655</td></row>
 		<row><td>ID_STRING2</td><td>1033</td><td>UTILIT~1|Utilities</td><td>0</td><td/><td>1788731720</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>NEWSHO~1|NewShortcut1</td><td>0</td><td/><td>1788699080</td></row>
 		<row><td>ID_STRING4</td><td>1033</td><td>VIEWEX~1|View Exception Log</td><td>0</td><td/><td>-576664821</td></row>
@@ -3784,6 +3785,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut1</td><td>Help</td><td/><td>newfolder2</td><td>2</td></row>
 		<row><td>NewShortcut10</td><td>Help</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut11</td><td>Help</td><td/><td>newfolder1</td><td>2</td></row>
+		<row><td>NewShortcut12</td><td>Help</td><td/><td>newfolder2</td><td>2</td></row>
 		<row><td>NewShortcut2</td><td>Help</td><td/><td>newfolder2</td><td>2</td></row>
 		<row><td>NewShortcut3</td><td>Help</td><td/><td>newfolder2</td><td>2</td></row>
 		<row><td>NewShortcut4</td><td>Help</td><td/><td>newfolder2</td><td>2</td></row>
@@ -3880,6 +3882,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut1</td><td>newfolder2</td><td>##ID_STRING15##</td><td>Help</td><td>[INSTALLDIR]SQLCDBEditor</td><td>"[EXTRACT_SYSTEMS_COMMON_APP_DATA]ESFAMService\ESFAMService.sdf"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut10</td><td>newfolder1</td><td>##ID_STRING12##</td><td>Help</td><td>[COMMON_COMPONENTS]UserLicense.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut11</td><td>newfolder1</td><td>##ID_STRING13##</td><td>Help</td><td>[COMMON_COMPONENTS]USBLicenseKeyManager.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut12</td><td>newfolder2</td><td>##ID_STRING16##</td><td>Help</td><td>[INSTALLDIR]PaginationUtility.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut2</td><td>newfolder2</td><td>##ID_STRING4##</td><td>Help</td><td>[COMMON_COMPONENTS]UEXViewer.exe</td><td>"[EXTRACT_SYSTEMS_COMMON_APP_DATA]LogFiles\ExtractException.UEX"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut3</td><td>newfolder2</td><td>##ID_STRING5##</td><td>Help</td><td>[COMMON_COMPONENTS]VOAFileViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut4</td><td>newfolder2</td><td>##ID_STRING6##</td><td>Help</td><td>[COMMON_COMPONENTS]USSFileViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
