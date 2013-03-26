@@ -95,6 +95,7 @@ CopyFilesToInstallFolder:
 	@COPY /V  "$(BinariesFolder)\ExpressionAndQueryTester.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V  "$(BinariesFolder)\Extract*test*.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V  "$(AFRootDirectory)\NUnitTests\*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
+	@COPY /V  "$(BinariesFolder)\Extract.DataEntry.DEP.*.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegRDTComponents\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents\RDT.rl"
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegCommonComponents\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.rl"
