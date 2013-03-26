@@ -35,7 +35,7 @@ cd "%~p0..\..\Common"
 cscript IncrementBuildVersion.vbs
 
 :: Commit the modified LatestComponentVersions.mak file
-vault COMMIT -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% "$%BATCH_COMMON_PATH%/LatestComponentVersions.mak"
+vault COMMIT -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% "%BATCH_COMMON_PATH%/LatestComponentVersions.mak"
 
 :: Label
 nmake /F LabelFromLatestVersions.mak
