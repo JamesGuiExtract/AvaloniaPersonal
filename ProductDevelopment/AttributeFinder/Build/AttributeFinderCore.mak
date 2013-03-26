@@ -157,6 +157,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe  /in:"$(BinariesFolder)\Microsoft.Data.ConnectionUI.dll" /mapout:"$(BinariesFolder)\Map\mapMicrosoft.Data.ConnectionUI.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\DataEntryPrompt.exe" /mapout:"$(BinariesFolder)\Map\mapDataEntryPrompt.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\AlternateTestNameManager.plugin" /mapout:"$(BinariesFolder)\Map\mapAlternateTestNameManager.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\PaginationUtility.exe" /mapout:"$(BinariesFolder)\Map\mapPaginationUtility.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 
 CopyCommonFiles:
 	@ECHO Copying common .NET files to installation build folders...
@@ -204,6 +205,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Database.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\SQLServerInfo.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\DataEntryPrompt.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /v  "$(BinariesFolder)\Obfuscated\PaginationUtility.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\*.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\*.exe" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V  "$(BinariesFolder)\Extract.DataEntry.DEP.DemoFlexIndex.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
