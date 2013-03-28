@@ -9,21 +9,18 @@ using System.Linq;
 namespace Extract.UtilityApplications.PaginationUtility
 {
     /// <summary>
-    /// 
+    /// Represents a potential output document as represented by a collection of
+    /// <see cref="PageThumbnailControl"/>s.
     /// </summary>
     internal class OutputDocument
     {
         #region Fields
 
         /// <summary>
-        /// 
+        /// The <see cref="PageThumbnailControl"/>s that represent the pages that are to comprise
+        /// the document.
         /// </summary>
         List<PageThumbnailControl> _pageControls = new List<PageThumbnailControl>();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        string _fileName;
 
         #endregion Fields
 
@@ -32,12 +29,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Initializes a new instance of the <see cref="OutputDocument"/> class.
         /// </summary>
-        /// <param name="fileName">Name of the file.</param>
+        /// <param name="fileName">The filename that the document is to be saved as.</param>
         public OutputDocument(string fileName)
         {
             try
             {
-                _fileName = fileName;
+                FileName = fileName;
             }
             catch (Exception ex)
             {
@@ -50,12 +47,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Events
 
         /// <summary>
-        /// 
+        /// Raised whenever a <see cref="PageThumbnailControl"/> is removed from the document.
         /// </summary>
-        public event EventHandler<PageRemovedEventArgs> PageRemoved;
+        public event EventHandler<EventArgs> PageRemoved;
 
         /// <summary>
-        /// 
+        /// Raised when the document is output.
         /// </summary>
         public event EventHandler<EventArgs> DocumentOutput;
 
@@ -64,7 +61,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Properties
 
         /// <summary>
-        /// Gets the pages.
+        /// Gets the <see cref="PageThumbnailControl"/>s that comprise the document to output.
         /// </summary>
         public ReadOnlyCollection<PageThumbnailControl> PageControls
         {
@@ -82,22 +79,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        ///
+        /// Gets or sets the filename that the document is to be saved as.
         /// </summary>
+        /// <value>
+        /// The filename that the document is to be saved as.
+        /// </value>
         public string FileName
         {
-            get
-            {
-                return _fileName;
-            }
-
-            set
-            {
-                if (value != _fileName)
-                {
-                    _fileName = value;
-                }
-            }
+            get;
+            set;
         }
 
         /// <summary>
@@ -117,14 +107,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Methods
 
         /// <summary>
-        /// Adds the page.
+        /// Adds the specified <see paramref="pageControl"/> as the last page of the document.
         /// </summary>
-        /// <param name="pageControl"></param>
+        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> representing the page
+        /// to be added.</param>
         public void AddPage(PageThumbnailControl pageControl)
         {
             try
             {
-                AddPage(pageControl, _pageControls.Count + 1);
+                InsertPage(pageControl, _pageControls.Count + 1);
             }
             catch (Exception ex)
             {
@@ -133,11 +124,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Adds the page.
+        /// Inserts the specified <see paramref="pageControl"/> as <see paramref="pageNumber"/> of
+        /// the document.
         /// </summary>
-        /// <param name="pageControl">The page.</param>
-        /// <param name="pageNumber">The page number.</param>
-        public void AddPage(PageThumbnailControl pageControl, int pageNumber)
+        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> representing the page
+        /// to be inserted.</param>
+        /// <param name="pageNumber">The page number the new page should be inserted at.</param>
+        public void InsertPage(PageThumbnailControl pageControl, int pageNumber)
         {
             try
             {
@@ -165,10 +158,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// 
+        /// Removes the specified <see paramref="pageControl"/> from the document.
         /// </summary>
-        /// <param name="pageControl"></param>
-        /// <param name="deleted"></param>
+        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> that is to be removed.</param>
+        /// <param name="deleted"><see langword="true"/> if the page is being permanently removed,
+        /// <see langword="false"/> if it is being temporarily removed such as for a drag/drop
+        /// operation.</param>
         public void RemovePage(PageThumbnailControl pageControl, bool deleted)
         {
             try
@@ -181,7 +176,10 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 pageControl.Document = null;
 
-                OnPageRemoved(pageControl.Page, deleted);
+                if (deleted)
+                {
+                    OnPageRemoved();
+                }
             }
             catch (Exception ex)
             {
@@ -190,13 +188,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Outputs this instance.
+        /// Outputs the document to the current <see cref="FileName"/>.
         /// </summary>
         public void Output()
         {
             try
             {
-                string directory = Path.GetDirectoryName(_fileName);
+                // Ensure the destination directory exists.
+                string directory = Path.GetDirectoryName(FileName);
                 if (!Directory.Exists(directory))
                 {
                     Directory.CreateDirectory(directory);
@@ -204,9 +203,9 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (InOriginalForm)
                 {
-                    // If the document is copied in its present form, it can simply be copied to
-                    // _fileName rather than require it to be re-assembled.
-                    File.Copy(_pageControls[0].Page.OriginalDocumentName, _fileName);
+                    // If the document has not been changed from its original form, it can simply be
+                    // copied to _fileName rather than require it to be re-assembled.
+                    File.Copy(_pageControls[0].Page.OriginalDocumentName, FileName);
                 }
                 else
                 {
@@ -221,6 +220,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             foreach (Page page in PageControls.Select(pageControl => pageControl.Page))
                             {
+                                // Get an image reader for the current page.
                                 ImageReader reader;
                                 if (!readers.TryGetValue(page.OriginalDocumentName, out reader))
                                 {
@@ -228,6 +228,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                                     readers[page.OriginalDocumentName] = reader;
                                 }
 
+                                // On the first page, generate a writer using the same format as the
+                                // first page.
                                 if (writer == null)
                                 {
                                     writer = codecs.CreateWriter(FileName, reader.Format, false);
@@ -270,21 +272,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Private Members
 
         /// <summary>
-        /// Called when [last page removed].
+        /// Raises the <see cref="PageRemoved"/> event.
         /// </summary>
-        /// <param name="removedPage"></param>
-        /// <param name="deleted"></param>
-        void OnPageRemoved(Page removedPage, bool deleted)
+        void OnPageRemoved()
         {
             var eventHandler = PageRemoved;
             if (eventHandler != null)
             {
-                eventHandler(this, new PageRemovedEventArgs(removedPage, deleted));
+                eventHandler(this, new EventArgs());
             }
         }
 
         /// <summary>
-        /// Called when [document output].
+        /// Raises the <see cref="DocumentOutput"/> event.
         /// </summary>
         void OnDocumentOutput()
         {

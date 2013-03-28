@@ -12,7 +12,8 @@ using System.Windows.Forms;
 namespace Extract.UtilityApplications.PaginationUtility
 {
     /// <summary>
-    /// 
+    /// A <see cref="PaginationControl"/> that represents a page in a potential output document with
+    /// a thumbnail image of the page.
     /// </summary>
     internal partial class PageThumbnailControl : PaginationControl
     {
@@ -24,12 +25,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         static readonly string _DOCUMENT_SUPPORT_KEY = "vhG42tyuh9";
         
         /// <summary>
-        /// 
+        /// The padding that should be used for an instance that is preceeded by a separtor control.
         /// </summary>
         static readonly Padding _NORMAL_PADDING = new Padding(0, 1, 0, 1);
 
         /// <summary>
-        /// 
+        /// The padding that should be used for an instance that is not preceeded by a separtor
+        /// control such that one can be added later without shifting the position of this control.
         /// </summary>
         static readonly Padding _SEPARATOR_ALLOWANCE_PADDING =
             new Padding(PaginationSeparator._SEPARATOR_WIDTH, 1, 0, 1);
@@ -39,22 +41,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Fields
 
         /// <summary>
-        /// 
+        /// The <see cref="Size"/> the thumbnail image should be.
         /// </summary>
         static Size _thumbnailSize = new Size(128, 128);
 
         /// <summary>
-        /// 
+        /// The <see cref="Page"/> represented by this instance.
         /// </summary>
         Page _page;
 
         /// <summary>
-        /// 
+        /// The <see cref="ImageViewer"/> being used to display the active page or
+        /// <see langword="null"/> if the page is not currently being displayed.
         /// </summary>
         ImageViewer _activeImageViewer;
 
         /// <summary>
-        /// 
+        /// The <see cref="ToolTip"/> to display for this instance.
         /// </summary>
         ToolTip _toolTip = new ToolTip();
 
@@ -65,8 +68,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Initializes a new instance of the <see cref="PageThumbnailControl"/> class.
         /// </summary>
-        /// <param name="document"></param>
-        /// <param name="page"></param>
+        /// <param name="document">The <see cref="OutputDocument"/> to which this instance should be
+        /// added.</param>
+        /// <param name="page">The <see cref="Page"/> represented by this instance.</param>
         public PageThumbnailControl(OutputDocument document, Page page)
             : base()
         {
@@ -80,6 +84,9 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 Document = document;
                 _page = page;
+
+                // Set the labels based on the source document name and page number, not the output
+                // Filename.
                 _fileNameLabel.Text = Path.GetFileNameWithoutExtension(_page.OriginalDocumentName);
                 _pageNumberLabel.Text = string.Format(CultureInfo.CurrentCulture, "Page {0:D}",
                     page.OriginalPageNumber);
@@ -88,7 +95,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     Document.AddPage(this);
                 }
-                page.AddReference(this);
+
+                // Add a reference to the Page so that the source document is not deleted before this
+                // instance is.
+                _page.AddReference(this);
                 _page.ThumbnailChanged += HandlePage_ThumbnailChanged;
 
                 // Turn on anti-aliasing
@@ -112,10 +122,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Properties
 
         /// <summary>
-        /// Gets or sets the output document.
+        /// Gets or sets the <see cref="OutputDocument"/> to which this instance belongs.
         /// </summary>
         /// <value>
-        /// The output document.
+        /// The <see cref="OutputDocument"/> to which this instance belongs.
         /// </value>
         public OutputDocument Document
         {
@@ -124,21 +134,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets the size of the thumbnail.
-        /// </summary>
-        /// <value>
-        /// The size of the thumbnail.
-        /// </value>
-        internal static Size ThumbnailSize
-        {
-            get
-            {
-                return _thumbnailSize;
-            }
-        }
-
-        /// <summary>
-        /// Gets the page.
+        /// Gets the <see cref="Page"/> represented by this instance.
         /// </summary>
         public Page Page
         {
@@ -149,7 +145,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// 
+        /// The page number of this instance in the <see cref="Document"/> or zero if it does not
+        /// currently part of any document.
         /// </summary>
         public int PageNumber
         {
@@ -167,11 +164,26 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets a value indicating whether [page is displayed].
+        /// Gets the size the thumbnail image should be.
         /// </summary>
         /// <value>
-        /// 	<see langword="true"/> if [page is displayed]; otherwise, <see langword="false"/>.
+        /// The size the thumbnail image should be.
         /// </value>
+        public static Size ThumbnailSize
+        {
+            get
+            {
+                return _thumbnailSize;
+            }
+        }
+
+  
+        /// <summary>
+        /// Gets a value indicating whether this page is currently being displayed in an
+        /// <see cref="ImageViewer"/>.
+        /// </summary>
+        /// <value><see langword="true"/> if page is currently being displayed; otherwise,
+        /// <see langword="false"/>.</value>
         public bool PageIsDisplayed
         {
             get
@@ -185,14 +197,21 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Methods
 
         /// <summary>
-        /// 
+        /// Displays or closed the <see cref="Page"/> in the specified <see paramref="ImageViewer"/>.
         /// </summary>
+        /// <param name="imageViewer">The <see cref="ImageViewer"/> that should diplay or close the
+        /// page.</param>
+        /// <param name="display"><see langword="true"/> to display the image;
+        /// <see langword="false"/> to close it.</param>
         public void DisplayPage(ImageViewer imageViewer, bool display)
         {
             try
             {
+                // Show the image only if this instance is currently in a PageLayoutControl.
                 if (display && ParentForm != null)
                 {
+                    // Lock updating of this form while changing images to prevent flicker as the
+                    // last image closes before this one is displayed.
                     using (new LockControlUpdates(ParentForm))
                     {
                         if (Page.OriginalDocumentName != imageViewer.ImageFile)
@@ -208,11 +227,13 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     ParentForm.Refresh();
                 }
-                else if (_activeImageViewer != null)
+                // Close the image if specified.
+                else if (!display && _activeImageViewer != null)
                 {
                     _activeImageViewer.CloseImage();
                     _activeImageViewer = null;
 
+                    // Refresh _outerPanel to remove the indication that it is currently displayed.
                     _outerPanel.Invalidate();
                 }
             }
@@ -227,16 +248,28 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Overrides
 
         /// <summary>
-        /// Gets or sets the selection area control.
+        /// Gets or sets whether this control is selected.
         /// </summary>
-        /// <value>
-        /// The selection area control.
+        /// <value><see langword="true"/> if selected; otherwise, <see langword="false"/>.
         /// </value>
-        public override Control SelectionAreaControl
+        public override bool Selected
         {
             get
             {
-                return _outerPanel;
+                return base.Selected;
+            }
+
+            set
+            {
+                if (value != base.Selected)
+                {
+                    base.Selected = value;
+
+                    // Indicate selection with the BackColor of _outerPanel
+                    _outerPanel.BackColor = value
+                        ? SystemColors.ActiveBorder
+                        : SystemColors.Control;
+                }
             }
         }
 
@@ -282,7 +315,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Raises the <see cref="E:System.Windows.Forms.Control.Layout"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="T:System.Windows.Forms.LayoutEventArgs"/> that contains the event data.</param>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.LayoutEventArgs"/> that contains the
+        /// event data.</param>
         protected override void OnLayout(LayoutEventArgs e)
         {
             try
@@ -300,7 +334,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary> 
         /// Clean up any resources being used.
         /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        /// <param name="disposing"><see langword="true"/> if managed resources should be disposed;
+        /// otherwise, <see langword="false"/>.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -338,7 +373,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Event Handlers
 
         /// <summary>
-        /// Handles the ThumbnailChanged event of the HandlePage control.
+        /// Handles the <see cref="T:Page.ThumbnailChanged"/> event of the <see cref="_page"/> control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
@@ -352,7 +387,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return;
                 }
 
-                FormsMethods.ExecuteInUIThread(this, () =>
+                // Since the thumbnail be changed by a background thread and we don't want the work
+                // of the background worker to be held up waiting on messages currently being
+                // handled in the UI thread, invoke the image change to occur on the UI thread.
+                this.SafeBeginInvoke("ELI35559", () =>
                 {
                     if (!IsDisposed)
                     {
@@ -367,7 +405,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the PageChanged event of the HandleImageViewer control.
+        /// Handles the <see cref="ImageViewer.PageChanged"/> event of the <see cref="ImageViewer"/>
+        /// control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="Extract.Imaging.Forms.PageChangedEventArgs"/> instance
@@ -381,6 +420,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _activeImageViewer.ImageChanged -= HandleImageViewer_ImageChanged;
                     _activeImageViewer.PageChanged -= HandleImageViewer_PageChanged;
                     _activeImageViewer = null;
+
+                    // Refresh _outerPanel to remove the indication that it is currently displayed.
                     _outerPanel.Invalidate();
                 }
             }
@@ -391,7 +432,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the ImageChanged event of the HandleImageViewer control.
+        /// Handles the <see cref="T:ImageViewer.ImageChanged"/> event of the <see cref="ImageViewer"/>
+        /// control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
@@ -407,6 +449,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _activeImageViewer.ImageChanged -= HandleImageViewer_ImageChanged;
                     _activeImageViewer.PageChanged -= HandleImageViewer_PageChanged;
                     _activeImageViewer = null;
+
+                    // Refresh _outerPanel to remove the indication that it is currently displayed.
                     _outerPanel.Invalidate();
                 }
             }
@@ -417,7 +461,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the Paint event of the HandleOuterPanel control.
+        /// Handles the <see cref="Control.Paint"/> event of the <see cref="_outerPanel"/> control
+        /// in order to indicate the selection state.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.Windows.Forms.PaintEventArgs"/> instance
@@ -443,7 +488,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Private Members
 
         /// <summary>
-        /// Registers for events.
+        /// Sets the <see cref="_toolTip"/> to be active for all child controls.
         /// </summary>
         /// <param name="control"></param>
         void SetToolTip(Control control)
@@ -457,15 +502,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Checks the padding.
+        /// Ensures that the padding is such that it will cause all
+        /// <see cref="PageThumbnailControl"/>s in the <see cref="PageLayoutControl"/> to align
+        /// vertically whether or not they are preceeded by a <see cref="PaginationSeparator"/>
+        /// control.
         /// </summary>
         void CheckPadding()
         {
             bool hasPaddingAllowance = Padding.Equals(_SEPARATOR_ALLOWANCE_PADDING);
             bool shouldHavePaddingAllowance =
-                PreceedingControl == null ||
-                PreceedingControl.Left > Left ||
-                PreceedingControl is PageThumbnailControl;
+                PreviousControl == null ||
+                PreviousControl.Left > Left ||
+                PreviousControl is PageThumbnailControl;
 
             if (hasPaddingAllowance != shouldHavePaddingAllowance)
             {

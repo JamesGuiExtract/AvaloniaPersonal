@@ -9,31 +9,26 @@ using System.Threading.Tasks;
 namespace Extract.UtilityApplications.PaginationUtility
 {
     /// <summary>
-    /// 
+    /// Represents a document loaded as input in its original form.
     /// </summary>
     internal class SourceDocument : IDisposable
     {
         #region Fields
 
         /// <summary>
-        /// 
-        /// </summary>
-        Dictionary<int, Page> _loadingPages = new Dictionary<int, Page>();
-
-        /// <summary>
-        /// 
+        /// The <see cref="Page"/> instances that represent the pages of the original document.
         /// </summary>
         List<Page> _pages = new List<Page>();
 
         /// <summary>
-        /// 
+        /// Keeps track of the pages for which thumbnails have yet to be loaded.
         /// </summary>
-        ThumbnailWorker _thumbnailWorker;
+        Dictionary<int, Page> _loadingPages = new Dictionary<int, Page>();
 
         /// <summary>
-        /// 
+        /// Works in a background thread to load thumbnails for this document.
         /// </summary>
-        string _fileName;
+        ThumbnailWorker _thumbnailWorker;
 
         #endregion Fields
 
@@ -42,7 +37,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Initializes a new instance of the <see cref="SourceDocument"/> class.
         /// </summary>
-        /// <param name="fileName">Name of the file.</param>
+        /// <param name="fileName">Name of the file to load.</param>
         public SourceDocument(string fileName)
         {
             try
@@ -50,10 +45,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ExtractException.Assert("ELI35545", "Missing File", File.Exists(fileName),
                     "Filename", fileName);
 
-                _fileName = fileName;
+                FileName = fileName;
 
-                _thumbnailWorker = new ThumbnailWorker(_fileName, PageThumbnailControl.ThumbnailSize);
+                _thumbnailWorker = new ThumbnailWorker(FileName, PageThumbnailControl.ThumbnailSize);
 
+                // Initialize a Page instance for each page of the document with a placeholder
+                // thumbnail that will be replaced as the _thumbnailWorker loads the thumbnails.
                 for (int pageNumber = 1; pageNumber <= _thumbnailWorker.PageCount; pageNumber++)
                 {
                     var page = new Page(this, pageNumber);
@@ -75,7 +72,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Events
         
         /// <summary>
-        /// 
+        /// Raised when this instance is disposed of.
         /// </summary>
         internal event EventHandler<EventArgs> Disposed;
 
@@ -84,7 +81,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Properties
 
         /// <summary>
-        /// Gets the pages.
+        /// Gets the <see cref="Page"/>s that comprise this document.
         /// </summary>
         public ReadOnlyCollection<Page> Pages
         {
@@ -95,14 +92,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        ///
+        /// Gets the filename of the document.
         /// </summary>
         public string FileName
         {
-            get
-            {
-                return _fileName;
-            }
+            get;
+            private set;
         }
 
         #endregion Properties
@@ -159,7 +154,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Event Handlers
 
         /// <summary>
-        /// Handles the ThumbnailLoaded event of the HandleThumbnailWorker control.
+        /// Handles the <see cref="ThumbnailWorker.ThumbnailLoaded"/> event of the
+        /// <see cref="_thumbnailWorker"/> control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="Extract.Imaging.Forms.ThumbnailLoadedEventArgs"/>
@@ -180,7 +176,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     Task.Factory.StartNew(() =>
                     {
-                        // Thumbnail worker could also be disposed from main thread.
+                        // Thumbnail worker could also be disposed from UI thread, so invoke the
+                        // call to dispose so that is it not disposed of while the UI thread is
+                        // using it.
                         var thumbnailWorker = _thumbnailWorker;
                         if (thumbnailWorker != null)
                         {
@@ -201,7 +199,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Private Members
 
         /// <summary>
-        /// 
+        /// Raises the <see cref="Disposed"/> event.
         /// </summary>
         void OnDisposed()
         {

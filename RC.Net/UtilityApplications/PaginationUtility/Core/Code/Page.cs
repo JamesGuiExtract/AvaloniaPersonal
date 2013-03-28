@@ -157,7 +157,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
-                    return _references.Any(o => o is PageThumbnailControl);
+                    return _references.Any();
                 }
                 catch (Exception ex)
                 {

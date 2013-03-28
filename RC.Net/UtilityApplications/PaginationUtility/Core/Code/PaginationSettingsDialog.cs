@@ -7,14 +7,15 @@ using System.Windows.Forms;
 namespace Extract.UtilityApplications.PaginationUtility
 {
     /// <summary>
-    /// 
+    /// Displays and allows editing of the <see cref="ConfigSettings{Settings}"/> used by the
+    /// pagination utility.
     /// </summary>
     internal partial class PaginationSettingsDialog : Form
     {
         #region Fields
 
         /// <summary>
-        /// 
+        /// The settings to be edited/displayed.
         /// </summary>
         ConfigSettings<Settings> _config;
 
@@ -25,7 +26,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Initializes a new instance of the <see cref="PaginationSettingsDialog"/> class.
         /// </summary>
-        /// <param name="config"></param>
+        /// <param name="config">The settings to be edited/displayed.</param>
         public PaginationSettingsDialog(ConfigSettings<Settings> config)
         {
             try
@@ -45,10 +46,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Properties
 
         /// <summary>
-        /// Gets or sets a value indicating whether [read only].
+        /// Gets or sets a value indicating whether the settings are read-only.
         /// </summary>
-        /// <value>
-        /// 	<see langword="true"/> if [read only]; otherwise, <see langword="false"/>.
+        /// <value><see langword="true"/> if the settings are read-only; otherwise,
+        /// <see langword="false"/>.
         /// </value>
         public bool ReadOnly
         {
@@ -75,28 +76,29 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_config != null)
                 {
                     LoadSettings(_config);
+                }
 
-                    if (ReadOnly)
-                    {
-                        _inputFolderTextBox.Enabled = false;
-                        _inputFolderBrowseButton.Enabled = false;
-                        _fileFilterComboBox.Enabled = false;
-                        _includeSubfoldersCheckBox.Enabled = false;
-                        _inputPageCountUpDown.Enabled = false;
-                        _outputFolderTextBox.Enabled = false;
-                        _outputFolderBrowseButton.Enabled = false;
-                        _randomizeOutputFileNameCheckBox.Enabled = false;
-                        _preserveOutputSubFoldersCheckBox.Enabled = false;
-                        _moveInputDocumentRadioButton.Enabled = false;
-                        _processedDocumentFolderTextBox.Enabled = false;
-                        _processedDocumentFolderBrowseButton.Enabled = false; 
-                        _deleteInputDocumentRadioButton.Enabled = false;
+                // Adjust controls appropriately if read-only.
+                if (ReadOnly)
+                {
+                    _inputFolderTextBox.Enabled = false;
+                    _inputFolderBrowseButton.Enabled = false;
+                    _fileFilterComboBox.Enabled = false;
+                    _includeSubfoldersCheckBox.Enabled = false;
+                    _inputPageCountUpDown.Enabled = false;
+                    _outputFolderTextBox.Enabled = false;
+                    _outputFolderBrowseButton.Enabled = false;
+                    _randomizeOutputFileNameCheckBox.Enabled = false;
+                    _preserveOutputSubFoldersCheckBox.Enabled = false;
+                    _moveInputDocumentRadioButton.Enabled = false;
+                    _processedDocumentFolderTextBox.Enabled = false;
+                    _processedDocumentFolderBrowseButton.Enabled = false;
+                    _deleteInputDocumentRadioButton.Enabled = false;
 
-                        _exportSettingsButton.Visible = false;
-                        _importSettingsButton.Visible = false;
-                        _okButton.Visible = false;
-                        _cancelButton.Text = "OK";
-                    }
+                    _exportSettingsButton.Visible = false;
+                    _importSettingsButton.Visible = false;
+                    _okButton.Visible = false;
+                    _cancelButton.Text = "OK";
                 }
             }
             catch (Exception ex)
@@ -110,16 +112,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Event Handlers
 
         /// <summary>
-        /// Handles the Click event of the HandleExportSettingsButton control.
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_exportSettingsButton"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
         void HandleExportSettingsButton_Click(object sender, EventArgs e)
         {
             try
             {
                 using (OpenFileDialog openFileDialog = new OpenFileDialog())
                 {
+                    // Display a dialog that allows selection of a config file (pre-existing or not).
                     openFileDialog.Filter = "Configuration files (*.config)|*.config";
                     openFileDialog.FilterIndex = 0;
                     openFileDialog.AddExtension = true;
@@ -143,6 +147,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             }
                         }
 
+                        // Output the displayed settings to newConfigName.
                         var targetConfig = new ConfigSettings<Settings>(newConfigName);
                         SaveSettings(targetConfig);
 
@@ -157,16 +162,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the Click event of the HandleImportSettingsButton control.
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_importSettingsButton"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
         void HandleImportSettingsButton_Click(object sender, EventArgs e)
         {
             try
             {
                 using (OpenFileDialog openFileDialog = new OpenFileDialog())
                 {
+                    // Display a dialog that allows selection of an existing config file.
                     openFileDialog.Filter = "Configuration files (*.config)|*.config";
                     openFileDialog.FilterIndex = 0;
                     openFileDialog.AddExtension = true;
@@ -177,6 +184,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
                     {
+                        // Load the settings into the UI.
                         var sourceConfig =
                             new ConfigSettings<Settings>(openFileDialog.FileName, false, false);
                         LoadSettings(sourceConfig);
@@ -190,10 +198,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// 
+        /// Handles the <see cref="CheckBox.CheckedChanged"/> event of the
+        /// <see cref="_includeSubfoldersCheckBox"/>.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         void HandleMoveInputDocumentRadioButton_CheckedChanged(object sender, EventArgs e)
         {
             try
@@ -208,7 +217,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the CheckedChanged event of the HandleIncludeSubfoldersCheckBox control.
+        /// Handles the <see cref="RadioButton.CheckedChanged"/> event of the
+        /// <see cref="_moveInputDocumentRadioButton"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
@@ -226,21 +236,25 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the Click event of the HandleOkButton control.
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_okButton"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
         void HandleOkButton_Click(object sender, EventArgs e)
         {
             try
             {
-                // If there are invalid settings, prompt and return without closing.
-                if (!ReadOnly && WarnIfInvalid())
+                if (!ReadOnly)
                 {
-                    return;
-                }
+                    // If there are invalid settings, prompt and return without closing.
+                    if (WarnIfInvalid())
+                    {
+                        return;
+                    }
 
-                SaveSettings(_config);
+                    SaveSettings(_config);
+                }
 
                 DialogResult = DialogResult.OK;
             }
@@ -255,9 +269,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Private Members
 
         /// <summary>
-        /// Loads the settings.
+        /// Loads the settings from the specified <see paramref="config"/> into the UI.
         /// </summary>
-        /// <param name="config"></param>
+        /// <param name="config">The <see cref="ConfigSettings{Settings}"/> to load.</param>
         void LoadSettings(ConfigSettings<Settings> config)
         {
             _inputFolderTextBox.Text = config.Settings.InputFolder;
@@ -276,9 +290,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Saves the settings.
+        /// Saves the displayed settings in to the specified <see paramref="config"/>.
         /// </summary>
-        /// <param name="config">The config.</param>
+        /// <param name="config">The <see cref="ConfigSettings{Settings}"/> to which the settings
+        /// should be applied.</param>
         void SaveSettings(ConfigSettings<Settings> config)
         {
             config.Settings.InputFolder = _inputFolderTextBox.Text;

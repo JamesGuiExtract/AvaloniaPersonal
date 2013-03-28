@@ -42,7 +42,7 @@
             this._sandDockManager = new TD.SandDock.SandDockManager();
             this._menuStrip = new System.Windows.Forms.MenuStrip();
             this._fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.restartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._restartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this._exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -371,29 +371,29 @@
             // _fileToolStripMenuItem
             // 
             this._fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.restartToolStripMenuItem,
+            this._restartToolStripMenuItem,
             this.toolStripSeparator1,
             this._exitToolStripMenuItem});
             this._fileToolStripMenuItem.Name = "_fileToolStripMenuItem";
             this._fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this._fileToolStripMenuItem.Text = "&File";
             // 
-            // restartToolStripMenuItem
+            // _restartToolStripMenuItem
             // 
-            this.restartToolStripMenuItem.Name = "restartToolStripMenuItem";
-            this.restartToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
-            this.restartToolStripMenuItem.Text = "&Restart";
-            this.restartToolStripMenuItem.Click += new System.EventHandler(this.HandleRestartToolStripMenuItem_Click);
+            this._restartToolStripMenuItem.Name = "_restartToolStripMenuItem";
+            this._restartToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._restartToolStripMenuItem.Text = "&Restart";
+            this._restartToolStripMenuItem.Click += new System.EventHandler(this.HandleRestartToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(107, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
             // 
             // _exitToolStripMenuItem
             // 
             this._exitToolStripMenuItem.Name = "_exitToolStripMenuItem";
-            this._exitToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this._exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this._exitToolStripMenuItem.Text = "E&xit";
             // 
             // _toolsToolStripMenuItem
@@ -495,7 +495,7 @@
         private System.Windows.Forms.ToolStripButton _outputFileNameBrowseToolStripButton;
         private Utilities.Forms.ToolStripSpringTextBox _outputFileNameToolStripTextBox;
         private System.Windows.Forms.ToolStripLabel _pagesToolStripLabel;
-        private System.Windows.Forms.ToolStripMenuItem restartToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _restartToolStripMenuItem;
     }
 }
 

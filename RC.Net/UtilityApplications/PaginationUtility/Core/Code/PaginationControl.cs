@@ -4,26 +4,26 @@ using System.Windows.Forms;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
+    /// <summary>
+    /// A control that can be positioned within a <see cref="PageLayoutControl"/> in order to
+    /// compose <see cref="OutputDocument"/>s.
+    /// </summary>
     internal partial class PaginationControl : UserControl
     {
         #region Fields
 
         /// <summary>
-        /// 
+        /// Indicates whether this control is in the process of raising an event passed on from a
+        /// child control.
         /// </summary>
-        bool _selected;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        bool _handlingEvent;
+        bool _raisingEvent;
 
         #endregion Fields
 
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PaginationSeparator"/> class.
+        /// Initializes a new instance of the <see cref="PaginationControl"/> class.
         /// </summary>
         public PaginationControl()
         {
@@ -42,56 +42,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Properties
 
         /// <summary>
-        /// Gets or sets the selection area control.
-        /// </summary>
-        /// <value>
-        /// The selection area control.
-        /// </value>
-        public virtual Control SelectionAreaControl
-        {
-            get
-            {
-                return this;
-            }
-        }
-
-        /// <summary>
         /// Gets or sets a value indicating whether this <see cref="PaginationControl"/> is
         /// selected.
         /// </summary>
         /// <value><see langword="true"/> if selected; otherwise, <see langword="false"/>.</value>
         public virtual bool Selected
         {
-            get
-            {
-                return _selected;
-            }
-
-            set
-            {
-                try
-                {
-                    if (value != _selected)
-                    {
-                        _selected = value;
-
-                        SelectionAreaControl.BackColor = _selected
-                            ? SystemColors.ActiveBorder
-                            : SystemColors.Control;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI35486");
-                }
-            }
+            get;
+            set;
         }
 
         /// <summary>
-        /// Gets or sets the preceeding insertion point.
+        /// Gets or sets the point at which an insertion indicator should be drawn for controls to
+        /// be dropped in front of this control.
         /// </summary>
         /// <value>
-        /// The preceeding insertion point.
+        /// The point at which an insertion indicator should be drawn for controls to be dropped in
+        /// front of this control.
         /// </value>
         public virtual Point PreceedingInsertionPoint
         {
@@ -102,10 +69,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets or sets the trailing insertion point.
+        /// Gets or sets the point at which an insertion indicator should be drawn for controls to
+        /// be dropped after this control.
         /// </summary>
         /// <value>
-        /// The trailing insertion point.
+        /// The point at which an insertion indicator should be drawn for controls to be dropped
+        /// after this control.
         /// </value>
         public virtual Point TrailingInsertionPoint
         {
@@ -120,15 +89,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// 
+        /// The <see cref="PaginationControl"/> before this instance in a
+        /// <see cref="PageLayoutControl"/>'s sequence of controls.
         /// </summary>
-        /// <returns></returns>
-        public PaginationControl PreceedingControl
+        /// <returns>The <see cref="PaginationControl"/> before this instance.</returns>
+        public PaginationControl PreviousControl
         {
             get
             {
                 try
                 {
+                    // If not currently in a PageLayoutControl, there is no previous control.
                     if (Parent == null)
                     {
                         return null;
@@ -138,10 +109,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     ExtractException.Assert("ELI35487", "Unexpected control state.",
                         index >= 0);
 
-                    var preceedingControl = (index == 0) ? null
+                    var previousControl = (index == 0) ? null
                         : Parent.Controls[index - 1];
 
-                    return preceedingControl as PaginationControl;
+                    return previousControl as PaginationControl;
                 }
                 catch (Exception ex)
                 {
@@ -151,15 +122,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// 
+        /// The <see cref="PaginationControl"/> after this instance in a
+        /// <see cref="PageLayoutControl"/>'s sequence of controls.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The <see cref="PaginationControl"/> after this instance.</returns>
         public PaginationControl NextControl
         {
             get
             {
                 try
                 {
+                    // If not currently in a PageLayoutControl, there is no previous control.
                     if (Parent == null)
                     {
                         return null;
@@ -188,13 +161,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Raises the <see cref="E:System.Windows.Forms.Control.HandleCreated"/> event.
         /// </summary>
-        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnHandleCreated(EventArgs e)
         {
             try
             {
                 base.OnHandleCreated(e);
 
+                // Register to receive key events from child controls that should be raised as if
+                // they are coming from this control.
                 RegisterForEvents(this);
             }
             catch (Exception ex)
@@ -205,45 +181,26 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         #endregion Overrides
 
-        #region Private Members
-
-        /// <summary>
-        /// Registers for events.
-        /// </summary>
-        /// <param name="control"></param>
-        void RegisterForEvents(Control control)
-        {
-            foreach (Control childControl in control.Controls)
-            {
-                childControl.Click += HandleControl_Click;
-                childControl.DoubleClick += HandleControl_DoubleClick;
-                childControl.MouseMove += HandleControl_MouseMove;
-                childControl.KeyUp += HandleControl_KeyUp;
-
-                RegisterForEvents(childControl);
-            }
-        }
-
-        #endregion Private Members
-
         #region Event Handlers
 
         /// <summary>
-        /// Handles the Click event of the HandleControl control.
+        /// Handles the <see cref="Control.Click"/> event of a child control in order that it can be
+        /// raised by this control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
         void HandleControl_Click(object sender, EventArgs e)
         {
-            if (_handlingEvent)
+            // Ensure not to re-raise an event already being raised.
+            if (_raisingEvent)
             {
                 return;
             }
 
             try
             {
-                _handlingEvent = true;
+                _raisingEvent = true;
 
                 OnClick(e);
             }
@@ -253,26 +210,28 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             finally
             {
-                _handlingEvent = false;
+                _raisingEvent = false;
             }
         }
 
         /// <summary>
-        /// Handles the DoubleClick event of the HandleControl control.
+        /// Handles the <see cref="Control.DoubleClick"/> event of a child control in order that it
+        /// can be raised by this control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
         void HandleControl_DoubleClick(object sender, EventArgs e)
         {
-            if (_handlingEvent)
+            // Ensure not to re-raise an event already being raised.
+            if (_raisingEvent)
             {
                 return;
             }
 
             try
             {
-                _handlingEvent = true;
+                _raisingEvent = true;
 
                 OnDoubleClick(e);
             }
@@ -282,26 +241,31 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             finally
             {
-                _handlingEvent = false;
+                _raisingEvent = false;
             }
         }
 
         /// <summary>
-        /// Handles the MouseMove event of the HandleControl control.
+        /// Handles the <see cref="Control.MouseMove"/> event of a child control in order that it
+        /// can be raised by this control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance
+        /// containing the event data.</param>
         void HandleControl_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_handlingEvent)
+            // Ensure not to re-raise an event already being raised.
+            if (_raisingEvent)
             {
                 return;
             }
 
             try
             {
-                _handlingEvent = true;
+                _raisingEvent = true;
 
+                // Translate the coordinates of the event so that they are relative to this control's
+                // coordinate system.
                 Point thisLocation = PointToScreen(Location);
                 Point eventLocation = PointToScreen(e.Location);
                 thisLocation.Offset(-eventLocation.X, -eventLocation.Y);
@@ -316,26 +280,28 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             finally
             {
-                _handlingEvent = false;
+                _raisingEvent = false;
             }
         }
 
         /// <summary>
-        /// Handles the KeyUp event of the HandleControl control.
+        /// Handles the <see cref="Control.KeyUp"/> event of a child control in order that it can be
+        /// raised by this control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.Windows.Forms.KeyEventArgs"/> instance containing
         /// the event data.</param>
         void HandleControl_KeyUp(object sender, KeyEventArgs e)
         {
-            if (_handlingEvent)
+            // Ensure not to re-raise an event already being raised.
+            if (_raisingEvent)
             {
                 return;
             }
 
             try
             {
-                _handlingEvent = true;
+                _raisingEvent = true;
 
                 OnKeyUp(e);
             }
@@ -345,10 +311,35 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             finally
             {
-                _handlingEvent = false;
+                _raisingEvent = false;
             }
         }
 
         #endregion Event Handlers
+
+        #region Private Members
+
+        /// <summary>
+        /// Registers to receive key events from child controls that should be raised as if
+        /// they are coming from this control.
+        /// </summary>
+        /// <param name="control">The <see cref="Control"/> whose children's events should be
+        /// forwarded.</param>
+        void RegisterForEvents(Control control)
+        {
+            foreach (Control childControl in control.Controls)
+            {
+                // If the child control raises any of these events, this control should forward the
+                // event by raising it itself.
+                childControl.Click += HandleControl_Click;
+                childControl.DoubleClick += HandleControl_DoubleClick;
+                childControl.MouseMove += HandleControl_MouseMove;
+                childControl.KeyUp += HandleControl_KeyUp;
+
+                RegisterForEvents(childControl);
+            }
+        }
+
+        #endregion Private Members
     }
 }
