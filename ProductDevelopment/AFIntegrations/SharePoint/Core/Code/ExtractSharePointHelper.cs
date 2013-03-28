@@ -35,14 +35,24 @@ namespace Extract.SharePoint
         ProcessingFailed = 3,
 
         /// <summary>
-        /// Processing of the file has completed
-        /// </summary>
-        ProcessingComplete = 4,
-
-        /// <summary>
         /// File has been queued for verification
         /// </summary>
-        QueuedForVerification = 5
+        QueuedForVerification = 4,
+
+        /// <summary>
+        /// Processing completed with redacted image
+        /// </summary>
+        Redacted = 5,
+
+        /// <summary>
+        /// Processing Completed without redacted image
+        /// </summary>
+        NoRedactions = 6,
+
+        /// <summary>
+        /// Processing completed - this is used by DataCapture
+        /// </summary>
+        ProcessingComplete = 7
     }
 
     /// <summary>
@@ -71,11 +81,17 @@ namespace Extract.SharePoint
                 case ExtractProcessingStatus.ProcessingFailed:
                     return "Processing Failed";
 
-                case ExtractProcessingStatus.ProcessingComplete:
-                    return "Processing Complete";
-
                 case ExtractProcessingStatus.QueuedForVerification:
                     return "Queued For Verification";
+
+                case ExtractProcessingStatus.Redacted:
+                    return "Redacted";
+
+                case ExtractProcessingStatus.NoRedactions:
+                    return "No Redactions";
+
+                case ExtractProcessingStatus.ProcessingComplete:
+                    return "Processing Complete";
 
                 default:
                     throw new ArgumentException("Not a valid Extract processing status.", "status");
@@ -457,6 +473,8 @@ namespace Extract.SharePoint
             if (reprocessExisting)
             {
                 statusList.AddRange(new ExtractProcessingStatus[] {
+                    ExtractProcessingStatus.Redacted,
+                    ExtractProcessingStatus.NoRedactions,
                     ExtractProcessingStatus.ProcessingComplete,
                     ExtractProcessingStatus.ProcessingFailed,
                     ExtractProcessingStatus.QueuedForProcessing,

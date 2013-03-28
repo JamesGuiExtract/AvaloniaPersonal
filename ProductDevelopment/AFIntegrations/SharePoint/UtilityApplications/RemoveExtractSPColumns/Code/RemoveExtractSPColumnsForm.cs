@@ -27,6 +27,16 @@ namespace RemoveExtractSPColumns
         internal static readonly string IdShieldUnredactedColumn = "IDShieldUnredactedFile";
         internal static readonly string IdShieldUnredactedColumnDisplay = "ID Shield Unredacted File";
 
+        internal static readonly string SensitiveItemCountColumn = "SensitiveItemCount";
+        internal static readonly string SensitiveItemCountColumnDisplay = "SensitiveItemCount";
+
+        internal static readonly string IdShieldReferenceColumn = "IDSReference";
+        internal static readonly string IdShieldReferenceColumnDisplay = "IDS Reference";
+
+        // Constants for the Extract Data Capture status field
+        internal static readonly string ExtractDataCaptureStatusColumn = "ExtractDataCaptureStatus";
+        internal static readonly string ExtractDataCaptureStatusColumnDisplay = "Extract Data Capture Status";
+        
         #endregion
 
         #region Constructors
@@ -82,6 +92,18 @@ namespace RemoveExtractSPColumns
                             if (_idshieldStatusColumn.Checked)
                             {
                                 deleteSPColumnFromList(context, item, IdShieldStatusColumn);
+                            }
+                            if (_idshieldSensitiveItemCount.Checked)
+                            {
+                                deleteSPColumnFromList(context, item, SensitiveItemCountColumn);
+                            }
+                            if (_idshieldIDSReference.Checked)
+                            {
+                                deleteSPColumnFromList(context, item, IdShieldReferenceColumn);
+                            }
+                            if (_DataCaptureStatus.Checked)
+                            {
+                                deleteSPColumnFromList(context, item, ExtractDataCaptureStatusColumn);
                             }
                         }
                     }

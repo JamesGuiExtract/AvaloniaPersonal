@@ -32,15 +32,11 @@ namespace Extract.SharePoint.Redaction
 
         // Constants for the ID Shield status field
         internal static readonly string IdShieldStatusColumn = "IDShieldStatus";
-        internal static readonly string IdShieldStatusColumnDisplay = "ID Shield Status";
+        internal static readonly string IdShieldStatusColumnDisplay = "IDS Status";
 
-        // Constants for the ID Shield redacted file field
-        internal static readonly string IdShieldRedactedColumn = "IDShieldRedactedFile";
-        internal static readonly string IdShieldRedactedColumnDisplay = "ID Shield Redacted File";
-
-        // Constants for the ID Shield unredacted file field
-        internal static readonly string IdShieldUnredactedColumn = "IDShieldUnredactedFile";
-        internal static readonly string IdShieldUnredactedColumnDisplay = "ID Shield Unredacted File";
+        // Constants for the ID Shield Reference column that replaces the redacted and unredacted columns
+        internal static readonly string IdShieldReferenceColumn = "IDSReference";
+        internal static readonly string IdShieldReferenceColumnDisplay = "IDS Reference";
 
         /// <summary>
         /// Name for the hidden list that is created to handle tracking files to ignore in
@@ -179,7 +175,7 @@ namespace Extract.SharePoint.Redaction
             IdShieldFolderProcessingSettings folderSettings)
         {
             AddIdShieldStatusColumn(siteId, folderSettings.ListId);
-            AddIdShieldRedactionInfoColumn(siteId, folderSettings.ListId, true);
+            AddIdShieldReferenceColumn(siteId, folderSettings.ListId);
             using (var site = new SPSite(siteId))
             {
                 var list = GetFolderSettingsList(site);
@@ -221,38 +217,22 @@ namespace Extract.SharePoint.Redaction
                 if (folderSettings.ProcessExisting)
                 {
                     var parentList = site.RootWeb.Lists[folderSettings.ListId];
-                    bool hasUnredacted = parentList.Fields.TryGetFieldByStaticName(IdShieldUnredactedColumn) != null;
                     ExtractSharePointHelper.MarkFilesToBeQueued(siteId, folderSettings, IdShieldStatusColumn,
-                        hasUnredacted ? IdShieldUnredactedColumn : null);
+                        IdShieldReferenceColumn);
                 }
             }
         }
 
         /// <summary>
-        /// Adds the id shield unredacted file column.
-        /// </summary>
-        /// <param name="siteId">The site id.</param>
-        /// <param name="rootListId">The root list id.</param>
-        internal static void AddIdShieldUnredactedFileColumn(Guid siteId, Guid rootListId)
-        {
-            // If we are adding the Unredacted column we also need to ensure the status column exists
-            AddIdShieldStatusColumn(siteId, rootListId);
-            AddIdShieldRedactionInfoColumn(siteId, rootListId, false);
-        }
-
-        /// <summary>
-        /// Adds either the ID Shield redacted file or unredacted file column to the specified list.
+        /// Adds IDShield reference column to the specified list.
         /// </summary>
         /// <param name="siteId">The ID of site containing the list to modify.</param>
         /// <param name="rootListId">The ID of the list to modify.</param>
-        /// <param name="redacted">If <see langword="true"/> then the ID Shield redacted file
-        /// column will be added, if <see langword="false"/> then the ID Shield unredacted
-        /// file column will be added.</param>
-        static void AddIdShieldRedactionInfoColumn(Guid siteId, Guid rootListId, bool redacted)
+        internal static void AddIdShieldReferenceColumn(Guid siteId, Guid rootListId)
         {
             using (var site = new SPSite(siteId))
             {
-                string columnName = redacted ? IdShieldRedactedColumn : IdShieldUnredactedColumn;
+                string columnName = IdShieldReferenceColumn;
 
                 // Check if the list contains the specified column
                 var list = site.RootWeb.Lists[rootListId];
@@ -262,12 +242,12 @@ namespace Extract.SharePoint.Redaction
                     var columnQuery = string.Concat("<Field Type='URL' DisplayName='",
                         columnName, "' Name='",
                         columnName, "' ReadOnly='TRUE'><Description>",
-                        "The path to the ", redacted ? "redacted" : "unredacted",
+                        "The path to the ", "redacted or unredacted",
                         " version of the file.</Description></Field>");
 
                     list.Fields.AddFieldAsXml(columnQuery, true, SPAddFieldOptions.AddFieldToDefaultView);
                     field = list.Fields[columnName];
-                    field.Title = redacted ? IdShieldRedactedColumnDisplay : IdShieldUnredactedColumnDisplay;
+                    field.Title = IdShieldReferenceColumnDisplay;
                     field.Update();
 
                     list.Update();

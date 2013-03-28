@@ -35,7 +35,12 @@
             this._unredactedColumnCheckBox = new System.Windows.Forms.CheckBox();
             this._idshieldStatusColumn = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this._idshieldSensitiveItemCount = new System.Windows.Forms.CheckBox();
+            this._idshieldIDSReference = new System.Windows.Forms.CheckBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this._DataCaptureStatus = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -56,7 +61,7 @@
             // 
             // _removeSPColumnsButton
             // 
-            this._removeSPColumnsButton.Location = new System.Drawing.Point(15, 163);
+            this._removeSPColumnsButton.Location = new System.Drawing.Point(9, 271);
             this._removeSPColumnsButton.Name = "_removeSPColumnsButton";
             this._removeSPColumnsButton.Size = new System.Drawing.Size(75, 23);
             this._removeSPColumnsButton.TabIndex = 2;
@@ -103,6 +108,8 @@
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this._idshieldStatusColumn);
+            this.groupBox1.Controls.Add(this._idshieldIDSReference);
+            this.groupBox1.Controls.Add(this._idshieldSensitiveItemCount);
             this.groupBox1.Controls.Add(this._unredactedColumnCheckBox);
             this.groupBox1.Controls.Add(this._redactedFileColumnCheckBox);
             this.groupBox1.Location = new System.Drawing.Point(9, 55);
@@ -112,11 +119,58 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "ID Shield Columns to Remove";
             // 
+            // _idshieldSensitiveItemCount
+            // 
+            this._idshieldSensitiveItemCount.AutoSize = true;
+            this._idshieldSensitiveItemCount.Checked = true;
+            this._idshieldSensitiveItemCount.CheckState = System.Windows.Forms.CheckState.Checked;
+            this._idshieldSensitiveItemCount.Location = new System.Drawing.Point(215, 27);
+            this._idshieldSensitiveItemCount.Name = "_idshieldSensitiveItemCount";
+            this._idshieldSensitiveItemCount.Size = new System.Drawing.Size(123, 17);
+            this._idshieldSensitiveItemCount.TabIndex = 3;
+            this._idshieldSensitiveItemCount.Text = "Sensitive Item Count";
+            this._idshieldSensitiveItemCount.UseVisualStyleBackColor = true;
+            // 
+            // _idshieldIDSReference
+            // 
+            this._idshieldIDSReference.AutoSize = true;
+            this._idshieldIDSReference.Checked = true;
+            this._idshieldIDSReference.CheckState = System.Windows.Forms.CheckState.Checked;
+            this._idshieldIDSReference.Location = new System.Drawing.Point(215, 50);
+            this._idshieldIDSReference.Name = "_idshieldIDSReference";
+            this._idshieldIDSReference.Size = new System.Drawing.Size(97, 17);
+            this._idshieldIDSReference.TabIndex = 3;
+            this._idshieldIDSReference.Text = "IDS Reference";
+            this._idshieldIDSReference.UseVisualStyleBackColor = true;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this._DataCaptureStatus);
+            this.groupBox2.Location = new System.Drawing.Point(9, 163);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(642, 102);
+            this.groupBox2.TabIndex = 4;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Data Capture Columns to Remove";
+            // 
+            // _DataCaptureStatus
+            // 
+            this._DataCaptureStatus.AutoSize = true;
+            this._DataCaptureStatus.Checked = true;
+            this._DataCaptureStatus.CheckState = System.Windows.Forms.CheckState.Checked;
+            this._DataCaptureStatus.Location = new System.Drawing.Point(23, 27);
+            this._DataCaptureStatus.Name = "_DataCaptureStatus";
+            this._DataCaptureStatus.Size = new System.Drawing.Size(158, 17);
+            this._DataCaptureStatus.TabIndex = 3;
+            this._DataCaptureStatus.Text = "Extract Data Capture Status";
+            this._DataCaptureStatus.UseVisualStyleBackColor = true;
+            // 
             // RemoveExtractSPColumnsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(663, 190);
+            this.ClientSize = new System.Drawing.Size(663, 302);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this._removeSPColumnsButton);
             this.Controls.Add(this._siteURLTextBox);
@@ -125,6 +179,8 @@
             this.Text = "Remove Extract Sharepoint Columns from Site";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -139,5 +195,9 @@
         private System.Windows.Forms.CheckBox _unredactedColumnCheckBox;
         private System.Windows.Forms.CheckBox _idshieldStatusColumn;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.CheckBox _idshieldIDSReference;
+        private System.Windows.Forms.CheckBox _idshieldSensitiveItemCount;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.CheckBox _DataCaptureStatus;
     }
 }

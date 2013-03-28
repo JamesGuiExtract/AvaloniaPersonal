@@ -471,8 +471,9 @@ namespace Extract.SharePoint.Redaction
                             }
                             else
                             {
+                                // No redacted file so set status to no redactions
                                 item[IdShieldHelper.IdShieldStatusColumn] =
-                                    ExtractProcessingStatus.ProcessingComplete.AsString();
+                                    ExtractProcessingStatus.NoRedactions.AsString();
                                 item.Update();
                             }
                         }
@@ -533,7 +534,7 @@ namespace Extract.SharePoint.Redaction
                         Hashtable properties = new Hashtable();
                         properties.Add(IdShieldHelper.IdShieldStatusColumn,
                             ExtractProcessingStatus.NotProcessed.AsString());
-                        properties.Add(IdShieldHelper.IdShieldUnredactedColumn, fileData.OriginalFileUrl + ", Original");
+                        properties.Add(IdShieldHelper.IdShieldReferenceColumn, fileData.OriginalFileUrl + ", Original file");
 
                         // Read the redacted file from the disk
                         byte[] bytes = File.ReadAllBytes(fileData.RedactedFile);
@@ -549,8 +550,8 @@ namespace Extract.SharePoint.Redaction
 
                         // Update the original file column with the redacted file location
                         var item = list.GetItemByUniqueId(fileData.OriginalFileId);
-                        item[IdShieldHelper.IdShieldStatusColumn] = ExtractProcessingStatus.ProcessingComplete.AsString();
-                        item[IdShieldHelper.IdShieldRedactedColumn] = fileData.DestinationUrl + ", Redacted";
+                        item[IdShieldHelper.IdShieldStatusColumn] = ExtractProcessingStatus.Redacted.AsString();
+                        item[IdShieldHelper.IdShieldReferenceColumn] = fileData.DestinationUrl + ", Redacted file";
                         
                         item.Update();
                     }
@@ -681,7 +682,7 @@ namespace Extract.SharePoint.Redaction
                     }
                     if (listId != Guid.Empty)
                     {
-                        IdShieldHelper.AddIdShieldUnredactedFileColumn(siteId, listId);
+                        IdShieldHelper.AddIdShieldReferenceColumn(siteId, listId);
                     }
                     else
                     {
