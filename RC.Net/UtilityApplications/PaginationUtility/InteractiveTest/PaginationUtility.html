@@ -1,0 +1,261 @@
+<HTML>
+
+<HEAD>
+<TITLE>Pagination Utility - Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" 
+href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>Pagination Utility - Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<ol>
+  	<li><h2>Basic Operation</h2></li>
+  	<ul>
+    		<li>Confirm that <b>PaginationUtility.exe</b> exists in the <b>CommonComponents</b> 
+		folder for a <b>FLEX Index</b> installation.
+    		<li>Confirm that <b>PaginationUtility.exe</b> exists in the <b>CommonComponents</b> 
+		folder for an <b>ID Shield</b> installation.
+    		<li>Confirm that <b>PaginationUtility.exe</b> exists in the <b>CommonComponents</b> 
+		folder for a <b>LabDE</b> installation.
+    		<li>Confirm that <b>PaginationUtility.exe</b> requires a special license file.
+		<ul>
+			<li>Confirm that a meaningful exception is displayed if an appropriate 
+			license is not present.
+		</ul>
+  	</ul>
+<p>
+  	<li><h2>General User Interface</h2></li>
+  	<ul>
+		<li>Prepare a set of images for testing.  Files in 
+		<b>K:\Common\Engineering\Sample Files\UW Transplant\Set003\Images\Rasterized\tifs</b> 
+		will work well.
+		<li>Modify <b>Settings</b> if needed to load the testing images.
+<p>
+		<li><b>Main and Image Window</b>
+		<ul>
+			<li>Confirm that <b>Pagination Utility</b> is the window caption.
+			<li>Confirm that the following menu items are defined
+			<ul>
+				<li>File - Restart
+				<li>File - Exit
+				<li>Tools - Settings
+				<li>Help - About
+			</ul>
+			<li>Confirm that an <b>Output document(s)</b> toolbar button is defined 
+			immediately below the menu bar.
+			<li>Confirm that an edit box is defined next to the toolbar button.
+			<li>Confirm that a browse button is defined next to the edit box.
+			<ul>
+				<li>Confirm that the toolbar button, edit box, and browse button 
+				are each only enabled when an entire document's collection 
+				of image pages is selected.
+				<li>Confirm that only the <b>Output document(s)</b> toolbar 
+				button is enabled if if the selected pages complete more than 
+				one output document.
+			</ul>
+			<li>Confirm that a label is visible next to the browse button.
+			<ul>
+				<li>Confirm that the label is only visible when <b>1</b> entire 
+				document's collection of image pages is selected.
+				<li>Confirm that the label displays the total number of pages 
+				to be saved to the selected document.
+			</ul>
+<p>
+			<li>Confirm that the following toolbar buttons are available for the 
+			Image Window.  Also confirm proper functionality for each button and 
+			shortcut.
+			<ul>
+				<li>Zoom window (Z)
+				<li>Pan (A)
+				<li>Zoom in (F7, Ctrl++)
+				<li>Zoom out (F8, Ctrl+-)
+				<li>Zoom previous (Back, Alt+Left)
+				<li>Zoom next (Alt+Right)
+				<li>Fit to page (P)
+				<li>Fit to width (W)
+				<li>Rotate counterclockwise (Ctrl+Shift+R)
+				<li>Rotate clockwise (Ctrl+R)
+			</ul>
+		</ul>
+<p>
+		<li><b>Context Menu</b>
+		<ul>
+			<li>Select a single page that does not constitute all pages necessary 
+			for an output document.
+			<li>Confirm that the following context menu items are available.
+			<ul>
+				<li>Cut item
+				<li>Copy item
+				<li>Delete item
+				<li>Insert copied item
+				<li>Insert document separator
+				<li>Output document
+			</ul>
+			<li>Confirm that <b>Insert copied item</b> is enabled <b>only if</b> a 
+			single page has been copied to the Clipboard.
+			<li>Confirm that <b>Insert copied items</b> is enabled <b>only if</b> 
+			multiple pages have been copied to the Clipboard.
+			<li>Confirm that <b>Output document</b> is disabled.
+			<li>Confirm that <b>Append document separator</b> is available and 
+			enabled when right-clicking outside of the thumbnail area.
+			<ul>
+				<li>Confirm that a document separator is added after the last 
+				displayed page.
+			</ul>
+		</ul>
+<p>
+		<li><b>Keyboard Navigation</b>
+		<ul>
+			<li>Confirm that <b>Up Arrow</b> moves up one row in the list of pages.
+			<li>Confirm that <b>Up Arrow</b> automatically moves to the bottom row 
+			of the list if starting from the top row.
+			<li>Confirm that <b>Down Arrow</b> moves down one row in the list of pages.
+			<li>Confirm that <b>Down Arrow</b> automatically moves to the top row 
+			of the list if starting from the bottom row.
+			<li>Confirm that <b>Left Arrow</b> moves left one column in the list 
+			of pages.
+			<li>Confirm that <b>Left Arrow</b> automatically moves to the last column 
+			on the previous row of the list if starting from the leftmost column.
+			<li>Confirm that <b>Left Arrow</b> automatically moves to the last column 
+			on the last row of the list if starting from the leftmost column of the 
+			first row.
+			<li>Confirm that <b>Right Arrow</b> moves right one column in the list 
+			of pages.
+			<li>Confirm that <b>Right Arrow</b> automatically moves to the first 
+			column on the next row of the list if starting from the rightmost column.
+			<li>Confirm that <b>Right Arrow</b> automatically moves to the first column 
+			on the first row of the list if starting from the last column of the 
+			last row.
+			<li>Confirm that <b>TAB</b> moves right one column in the list 
+			of pages.
+			<li>Confirm that <b>SHIFT+TAB</b> moves left one column in the list 
+			of pages.
+			<li>Confirm that <b>Ctrl+TAB</b> selects all of the pages in the document 
+			associated with the selected page.
+			<li>Confirm that a subsequent <b>Ctrl+TAB</b> selects all of the pages in 
+			the next document.
+			<li>Confirm that <b>PageUp</b> moves backward through the list 
+			of pages.
+			<li>Confirm that <b>PageDown</b> moves forward through the list 
+			of pages.
+			<li>
+		</ul>
+  	</ul>
+<p>
+  	<li><h2>Settings</h2></li>
+  	<ul>
+		<li>Confirm that the <b>Pagination Utility Settings</b> dialog is displayed 
+		after clicking the <b>Settings</b> toolbar button.
+		<li>Confirm that the <b>Pagination Utility Settings</b> dialog is displayed 
+		after clicking the <b>Tools - Settings</b> menu item.
+		<li>Confirm that the dialog includes a <b>Specify input directory</b> edit 
+		box and associated browse button.
+		<ul>
+			<li>Confirm that the browse button displays a <b>Browse For Folder</b> 
+			dialog and replaces any current selection in the edit box.
+		</ul>
+		<li>Confirm that the dialog includes a <b>Limit input to files of type:</b> 
+		dropdown combo box with the following options.
+		<ul>
+			<li>*.bmp;*.rle;*.dib;*.rst;*.gp4;*.mil;*.cal;*.cg4;*.flc;*.fli; 
+			*.gif;*.jpg;*.jpeg;*.pcx;*.pct;*.png;*.tga;*.tif;*.tiff;*.pdf
+			<li>*.bmp;*.rle;*.dib
+			<li>*.gif
+			<li>*.jpg;*.jpeg
+			<li>*.pcx
+			<li>*.pct
+			<li>*.pdf
+			<li>*.png
+			<li>*.tif;*.tiff
+			<li>*.txt
+			<li>*.xml
+			<li>*.*
+		</ul>
+		<li>Confirm that the dialog includes an <b>Include files from all 
+		subdirectories</b> checkbox.
+		<li>Confirm that the dialog includes a spinner control to specify how many 
+		pages are to be kept in the input pane (if available).
+		<ul>
+			<li>Confirm that the maximum number of pages is <b>999</b>.
+		</ul>
+		<li>Confirm that the dialog includes a <b>Specify output directory</b> edit 
+		box and associated browse button.
+		<ul>
+			<li>Confirm that the browse button displays a <b>Browse For Folder</b> 
+			dialog and replaces any current selection in the edit box.
+		</ul>
+		<li>Confirm that the dialog includes a <b>Randomize output filename</b> checkbox.
+		<li>Confirm that the dialog includes a <b>Preserve sub-folder structure in 
+		output directory</b> checkbox.
+		<ul>
+			<li>Confirm that the checkbox is enabled only if the <b>Include files 
+			from all subdirectories</b> checkbox is checked.
+		</ul>
+		<li>Confirm that the dialog includes an <b>After handling all pages of an input 
+		document</b> group box.
+		<ul>
+			<li>Confirm that the group box contains a <b>Move the document to the 
+			directory:</b> radio button.
+			<li>Coinfirm that the group box contains an associated edit box and 
+			browse button.
+			<li>Confirm that the edit box and browse button are enabled only when 
+			the radio button is selected.
+			<li>Confirm that the browse button displays a <b>Browse For Folder</b> 
+			dialog and replaces any current selection in the edit box.
+			<li>Confirm that the group box contains a <b>Delete the document</b> 
+			radio button.
+		</ul>
+		<li>Confirm that the dialog includes an <b>Export Settings</b> button.
+		<ul>
+			<li>Confirm that a <b>Save</b> dialog is displayed.
+			<li>Confirm that settings are saved in a <b>config</b> file.
+		</ul>
+		<li>Confirm that the dialog includes an <b>Import Settings</b> button.
+		<ul>
+			<li>Confirm that an <b>Open</b> dialog is displayed.
+			<li>Confirm that settings are available in <b>config</b> files.
+		</ul>
+  	</ul>
+<p>
+  	<li><h2>Functionality</h2></li>
+  	<ul>
+		<li><b>Input Options</b>
+		<ul>
+			<li>Confirm that <b>TIF</b> images can be used as input.
+			<li>Confirm that <b>PDF</b> images can be used as input.
+			<li>Confirm that a mixture of image types can be used as input.
+			<li>Confirm that images from subfolders can be used as input.
+			<li>TBD
+		</ul>
+		<li><b>Output Options</b>
+		<ul>
+			<li>Confirm that output filenames can include random characters.
+			<li>Confirm that output filenames can exclude random characters.
+			<li>Confirm that output files can retain sub-folder structure.
+		</ul>
+		<li><b>Post-processing Options</b>
+		<ul>
+			<li>Confirm that input files can be moved to a specified folder.
+			<li>Confirm that input files can be deleted.
+		</ul>
+		<li><b>Miscellaneous Options</b>
+		<ul>
+			<li>Confirm that all settings are properly written to a config file 
+			via <b>Export settings...</b>.
+			<li>Confirm that all settings are properly read from a config file 
+			via <b>Import settings...</b>.
+		</ul>
+  	</ul>
+<p>
+  	<li><h2>Miscellaneous</h2></li>
+  	<ul>
+		<li>TBD
+  	</ul>
+</ol>
+</body>
+</html>
