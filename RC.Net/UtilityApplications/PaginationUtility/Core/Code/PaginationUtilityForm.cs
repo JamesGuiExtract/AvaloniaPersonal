@@ -65,6 +65,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (pageData == null)
                     {
                         yield return null;
+                        continue;
                     }
 
                     string fileName = pageData.Item1;
@@ -494,7 +495,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             string outputDocumentName = GenerateOutputDocumentName(inputFileName);
             OutputDocument outputDocument = new OutputDocument(outputDocumentName);
-            outputDocument.PageRemoved += HandleOutputDocument_PageRemoved;
             outputDocument.DocumentOutput += HandleOutputDocument_DocumentOutput;
             _pendingDocuments.Add(outputDocument);
 
@@ -515,15 +515,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     Exception clipboardException = null;
 
-                    if (_currentClipboardData != null)
-                    {
-                        foreach (Page page in _currentClipboardData.GetPages(this))
-                        {
-                            page.RemoveReference(this);
-                        }
-
-                        HandleProcessedSourceDocuments();
-                    }
+                    DereferenceLastClipboardData();
 
                     // Register custom data format or get it if it's already registered
                     DataFormats.Format format = DataFormats.GetFormat(_CLIPBOARD_DATA_FORMAT);
@@ -555,7 +547,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             ExtractException.Assert("ELI35513", "Clipboard data failed validation.",
                                 validataionData != null);
 
-                            foreach (Page page in pages)
+                            foreach (Page page in pages.Where(page => page != null))
                             {
                                 page.AddReference(this);
                             }
@@ -600,14 +592,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (_currentClipboardData != null && !_currentClipboardData.Equals(clipboardData))
                 {
-                    foreach (Page page in _currentClipboardData.GetPages(this))
-                    {
-                        page.RemoveReference(this);
-                    }
-                    
-                    _currentClipboardData = null;
-
-                    HandleProcessedSourceDocuments();
+                    DereferenceLastClipboardData();
                 }
 
                 // If we found data on the clipboard, convert it to an array of Pages.
@@ -674,6 +659,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _primaryPageLayoutControl.Dock = DockStyle.Fill;
                 _primaryPageLayoutControl.ImageViewer = _imageViewer;
                 _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
+                _primaryPageLayoutControl.PageDeleted += HandlePageLayoutControl_PageDeleted;
                 _pageLayoutToolStripContainer.ContentPanel.Controls.Add(_primaryPageLayoutControl);
                 ActiveControl = _primaryPageLayoutControl;
 
@@ -749,6 +735,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _formStateManager.Dispose();
                         _formStateManager = null;
                     }
+
+                    DereferenceLastClipboardData();
 
                     if (components != null)
                     {
@@ -906,13 +894,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="OutputDocument.PageRemoved"/> event of an
-        /// <see cref="OutputDocument"/> control.
+        /// Handles the <see cref="PageLayoutControl.PageDeleted"/> event of an
+        /// <see cref="PageLayoutControl"/> control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        void HandleOutputDocument_PageRemoved(object sender, EventArgs e)
+        void HandlePageLayoutControl_PageDeleted(object sender, PageDeletedEventArgs e)
         {
             try
             {
@@ -934,12 +922,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // timely fashion.
                     GetClipboardData();
 
-                    HandleProcessedSourceDocuments();
+                    CheckIfSourceDocumentsProcessed(e.Page.SourceDocument);
 
-                    var outputDocument = (OutputDocument)sender;
-                    if (outputDocument.PageControls.Count == 0)
+                    OutputDocument outputDocument = e.OutputDocument;
+                    if (outputDocument != null && outputDocument.PageControls.Count == 0)
                     {
-                        outputDocument.PageRemoved -= HandleOutputDocument_PageRemoved;
                         outputDocument.DocumentOutput -= HandleOutputDocument_DocumentOutput;
                         _pendingDocuments.Remove(outputDocument);
                     }
@@ -965,9 +952,18 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var document = (OutputDocument)sender;
-
                 _outputDocumentNames.Add(document.FileName);
+
                 InvokeLoadMorePages();
+
+                SourceDocument[] sourceDocuments = document.PageControls
+                    .Select(pageControl => pageControl.Page.SourceDocument)
+                    .Distinct()
+                    .ToArray();
+
+                // After outputting a document, delete/move any input documents that are no longer
+                // referenced.
+                this.SafeBeginInvoke("ELI35560", () => CheckIfSourceDocumentsProcessed(sourceDocuments));
             }
             catch (Exception ex)
             {
@@ -1143,7 +1139,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 // Show a dialog that allows the user to pick a new output filename.
-                using (OpenFileDialog openFile = new OpenFileDialog())
+                using (SaveFileDialog saveFileDialog = new SaveFileDialog())
                 {
                     string initialFile = _outputFileNameToolStripTextBox.Text;
 
@@ -1151,32 +1147,35 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // invalid data, ignore any exceptions trying to initialize the default filename.
                     try
                     {
-                        openFile.InitialDirectory = Path.GetDirectoryName(initialFile);
-                        openFile.FileName = Path.GetFileName(initialFile);
+                        saveFileDialog.InitialDirectory = Path.GetDirectoryName(initialFile);
+                        saveFileDialog.FileName = Path.GetFileName(initialFile);
                     }
                     catch { }
 
-                    openFile.AddExtension = false;
-                    openFile.Multiselect = false;
-                    openFile.CheckPathExists = true;
-                    openFile.CheckFileExists = false;
+                    saveFileDialog.AddExtension = false;
+                    saveFileDialog.CheckPathExists = true;
+                    saveFileDialog.CheckFileExists = false;
 
                     // Show the dialog
-                    while (openFile.ShowDialog() == DialogResult.OK)
+                    while (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        if (!IsOutputFileNameAvailable(openFile.FileName))
+                        if (!IsOutputFileNameAvailable(saveFileDialog.FileName))
                         {
                             UtilityMethods.ShowMessageBox(
                                 "This output filename has already been used.",
                                 "Filename Unavailable", true);
 
-                            openFile.InitialDirectory = Path.GetDirectoryName(openFile.FileName);
-                            openFile.FileName = Path.GetFileName(openFile.FileName);
+                            saveFileDialog.InitialDirectory =
+                                Path.GetDirectoryName(saveFileDialog.FileName);
+                            saveFileDialog.FileName = Path.GetFileName(saveFileDialog.FileName);
                             continue;
                         }
 
                         // Return the selected file path.
-                        _outputFileNameToolStripTextBox.Text = openFile.FileName;
+                        _outputFileNameToolStripTextBox.Text = saveFileDialog.FileName;
+                        OutputDocument selectedDocument =
+                            _primaryPageLayoutControl.PartiallySelectedDocuments.Single();
+                        selectedDocument.FileName = _outputFileNameToolStripTextBox.Text;
                         break;
                     }
                 }
@@ -1651,21 +1650,45 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the processed source documents.
+        /// Removes any references to pages last copied to the clipboard so that the input document
+        /// can be deleted/moved if there are no other existing copies of the pages' document(s).
         /// </summary>
-        void HandleProcessedSourceDocuments()
+        void DereferenceLastClipboardData()
         {
-            // Check for a SourceDocument that is no longer being referenced so that it can
-            // be disposed and the input file can be deleted/moved as configured.
-            SourceDocument documentToDispose = _sourceDocuments
-                .Where(document => document.Pages.All(page => !page.HasActiveReference))
-                .SingleOrDefault();
-
-            if (documentToDispose != null)
+            if (_currentClipboardData != null)
             {
-                documentToDispose.Dispose();
+                Page[] clipboardPages = _currentClipboardData.GetPages(this).ToArray();
+                foreach (Page page in clipboardPages.Where(page => page != null))
+                {
+                    page.RemoveReference(this);
+                }
 
-                _sourceDocuments.Remove(documentToDispose);
+                CheckIfSourceDocumentsProcessed(clipboardPages
+                    .Where(page => page != null)
+                    .Select(page => page.SourceDocument)
+                    .Distinct()
+                    .ToArray());
+            }
+        }
+
+        /// <summary>
+        /// Checks to see if all pages of the specified <see paramref="soureDocuments"/> have been
+        /// processed; if so, the documents are disposed of so that the input documents get
+        /// delete/moved (as configured).
+        /// </summary>
+        /// <param name="sourceDocuments"></param>
+        void CheckIfSourceDocumentsProcessed(params SourceDocument[] sourceDocuments)
+        {
+            // Check for a sourceDocuments that is no longer being referenced so that it can
+            // be disposed and the input file can be deleted/moved as configured.
+            IEnumerable<SourceDocument> documentsToDispose = sourceDocuments
+                .Where(document => document.Pages.All(page => !page.HasActiveReference));
+
+            foreach (SourceDocument document in documentsToDispose)
+            {
+                document.Dispose();
+
+                _sourceDocuments.Remove(document);
             }
         }
 

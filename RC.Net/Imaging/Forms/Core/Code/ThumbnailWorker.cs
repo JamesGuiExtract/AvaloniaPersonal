@@ -405,21 +405,6 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        /// <summary>
-        /// Raised the <see cref="ThumbnailLoaded"/> event.
-        /// </summary>
-        /// <param name="pageNumber">The page number that was loaded.</param>
-        /// <param name="thumbnailImage">The loaded thumbnail <see cref="RasterImage"/>.</param>
-        void OnThumbnailLoaded(int pageNumber, RasterImage thumbnailImage)
-        {
-            var eventHandler = ThumbnailLoaded;
-            if (eventHandler != null)
-            {
-                eventHandler(this, 
-                    new ThumbnailLoadedEventArgs(pageNumber, thumbnailImage));
-            }
-        }
-
         #endregion Methods
 
         #region IDisposable Members
@@ -491,5 +476,24 @@ namespace Extract.Imaging.Forms
         }
 
         #endregion IDisposable Members
+
+        #region Private Members
+
+        /// <summary>
+        /// Raised the <see cref="ThumbnailLoaded"/> event.
+        /// </summary>
+        /// <param name="pageNumber">The page number that was loaded.</param>
+        /// <param name="thumbnailImage">The loaded thumbnail <see cref="RasterImage"/>.</param>
+        void OnThumbnailLoaded(int pageNumber, RasterImage thumbnailImage)
+        {
+            var eventHandler = ThumbnailLoaded;
+            if (eventHandler != null)
+            {
+                eventHandler(this,
+                    new ThumbnailLoadedEventArgs(pageNumber, thumbnailImage));
+            }
+        }
+
+        #endregion Private Members
     }
 }

@@ -47,11 +47,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Events
 
         /// <summary>
-        /// Raised whenever a <see cref="PageThumbnailControl"/> is removed from the document.
-        /// </summary>
-        public event EventHandler<EventArgs> PageRemoved;
-
-        /// <summary>
         /// Raised when the document is output.
         /// </summary>
         public event EventHandler<EventArgs> DocumentOutput;
@@ -161,10 +156,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Removes the specified <see paramref="pageControl"/> from the document.
         /// </summary>
         /// <param name="pageControl">The <see cref="PageThumbnailControl"/> that is to be removed.</param>
-        /// <param name="deleted"><see langword="true"/> if the page is being permanently removed,
-        /// <see langword="false"/> if it is being temporarily removed such as for a drag/drop
-        /// operation.</param>
-        public void RemovePage(PageThumbnailControl pageControl, bool deleted)
+        public void RemovePage(PageThumbnailControl pageControl)
         {
             try
             {
@@ -175,11 +167,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _pageControls.Remove(pageControl);
 
                 pageControl.Document = null;
-
-                if (deleted)
-                {
-                    OnPageRemoved();
-                }
             }
             catch (Exception ex)
             {
@@ -270,18 +257,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Methods
 
         #region Private Members
-
-        /// <summary>
-        /// Raises the <see cref="PageRemoved"/> event.
-        /// </summary>
-        void OnPageRemoved()
-        {
-            var eventHandler = PageRemoved;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new EventArgs());
-            }
-        }
 
         /// <summary>
         /// Raises the <see cref="DocumentOutput"/> event.

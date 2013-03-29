@@ -28,22 +28,23 @@
             // 
             // _fileNameLabel
             // 
-            this._fileNameLabel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this._fileNameLabel.AutoSize = true;
-            this._fileNameLabel.Location = new System.Drawing.Point(42, 134);
+            this._fileNameLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._fileNameLabel.AutoEllipsis = true;
+            this._fileNameLabel.Location = new System.Drawing.Point(3, 134);
             this._fileNameLabel.Name = "_fileNameLabel";
-            this._fileNameLabel.Size = new System.Drawing.Size(49, 13);
+            this._fileNameLabel.Size = new System.Drawing.Size(128, 13);
             this._fileNameLabel.TabIndex = 0;
             this._fileNameLabel.Text = "Filename";
             this._fileNameLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // _pageNumberLabel
             // 
-            this._pageNumberLabel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this._pageNumberLabel.AutoSize = true;
-            this._pageNumberLabel.Location = new System.Drawing.Point(51, 147);
+            this._pageNumberLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._pageNumberLabel.Location = new System.Drawing.Point(3, 147);
             this._pageNumberLabel.Name = "_pageNumberLabel";
-            this._pageNumberLabel.Size = new System.Drawing.Size(32, 13);
+            this._pageNumberLabel.Size = new System.Drawing.Size(128, 13);
             this._pageNumberLabel.TabIndex = 1;
             this._pageNumberLabel.Text = "Page";
             this._pageNumberLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -57,6 +58,7 @@
             this._rasterPictureBox.SizeMode = Leadtools.WinForms.RasterPictureBoxSizeMode.Fit;
             this._rasterPictureBox.TabIndex = 2;
             this._rasterPictureBox.TabStop = false;
+            this._rasterPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.HandleRasterPictureBox_Paint);
             // 
             // _tableLayoutPanel
             // 
@@ -115,7 +117,6 @@
             this.Name = "PageThumbnailControl";
             this.Size = new System.Drawing.Size(140, 166);
             this._tableLayoutPanel.ResumeLayout(false);
-            this._tableLayoutPanel.PerformLayout();
             this._borderPanel.ResumeLayout(false);
             this._borderPanel.PerformLayout();
             this._outerPanel.ResumeLayout(false);

@@ -31,10 +31,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// The number of consecutive <see cref="Control.MouseMove"/> events with the control key
         /// down needed to trigger the display of the page under the mouse. This prevents the
-        /// inadventent display of pages when trying to use keyboard navigation instead of the
+        /// inadvertent display of pages when trying to use keyboard navigation instead of the
         /// mouse.
         /// </summary>
-        static readonly int _HOVER_MOVE_EVENT_CRITERIA = 5;
+        static readonly int _HOVER_MOVE_EVENT_CRITERIA = 10;
 
         #endregion Constants
 
@@ -89,7 +89,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Context menu option that allows the selected PaginationControls to be cut.
         /// </summary>
-        readonly ToolStripMenuItem _cutMenuItem = new ToolStripMenuItem("Cut item(s)");
+        readonly ToolStripMenuItem _cutMenuItem = new ToolStripMenuItem("Cut");
 
         /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the cut operation.
@@ -99,7 +99,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Context menu option that allows the PaginationControls to be copied.
         /// </summary>
-        readonly ToolStripMenuItem _copyMenuItem = new ToolStripMenuItem("Copy item(s)");
+        readonly ToolStripMenuItem _copyMenuItem = new ToolStripMenuItem("Copy");
 
         /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the copy operation.
@@ -109,7 +109,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Context menu option that allows the PaginationControls to be deleted.
         /// </summary>
-        readonly ToolStripMenuItem _deleteMenuItem = new ToolStripMenuItem("Delete item(s)");
+        readonly ToolStripMenuItem _deleteMenuItem = new ToolStripMenuItem("Delete");
 
         /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the delete operation.
@@ -139,11 +139,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// pagination separator operation.
         /// </summary>
         ApplicationCommand _insertDocumentSeparatorCommand;
-
-        /// <summary>
-        /// Context menu option that allows the currently selected document(s) to be output.
-        /// </summary>
-        readonly ToolStripMenuItem _outputDocumentMenuItem = new ToolStripMenuItem("Output document(s)");
 
         /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the output operation.
@@ -181,6 +176,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Contructors
 
         #region Events
+
+        /// <summary>
+        /// Raised whenever a <see cref="PageThumbnailControl"/> is removed deleted or cut from
+        /// this instance.
+        /// </summary>
+        public event EventHandler<PageDeletedEventArgs> PageDeleted;
 
         /// <summary>
         /// Raised when the state of the <see cref="PaginationControl"/>s has changed.
@@ -366,7 +367,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // After each document is output, remove its page controls.
                     foreach (var page in document.PageControls.ToArray())
                     {
-                        RemovePaginationControl(page, true, true);
+                        RemovePaginationControl(page, true);
                     }
                 }
 
@@ -384,10 +385,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="control">The <see cref="PaginationControl"/> to remove.</param>
         /// <param name="dispose"><see langword="true"/> if the <see paramref="control"/> should be
         /// disposed; otherwise, <see langword="false"/>.</param>
-        /// <param name="deleted"><see langword="true"/> if the <see paramref="control"/> should be
-        /// considered deleted; <see langword="false"/> if it is being removed only temporarily.
-        /// </param>
-        public void RemovePaginationControl(PaginationControl control, bool dispose, bool deleted)
+        public void RemovePaginationControl(PaginationControl control, bool dispose)
         {
             try
             {
@@ -428,9 +426,23 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _displayedPageControl = null;
                     }
 
-                    if (removedPageControl.Document != null)
+                    OutputDocument document = removedPageControl.Document;
+
+                    if (document != null)
                     {
-                        removedPageControl.Document.RemovePage(removedPageControl, deleted);
+                        document.RemovePage(removedPageControl);
+                    }
+
+                    if (dispose)
+                    {
+                        OnPageDeleted(removedPageControl.Page, document);
+
+                        // If multiple copies existed, refresh to remove the copy indicator on any
+                        // single remaining copy.
+                        if (removedPageControl.Page.MultipleCopiesExist)
+                        {
+                            this.SafeBeginInvoke("ELI35563", () => Refresh());
+                        }
                     }
 
                     control.DoubleClick -= HandleThumbnailControl_DoubleClick;
@@ -596,14 +608,13 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _outputDocumentCommand = new ApplicationCommand(ImageViewer.Shortcuts,
                     new Keys[] { Keys.Control | Keys.S }, HandleOutputDocument,
-                    new[] { _outputDocumentMenuItem }, false, true, false);
-                _outputDocumentMenuItem.Click += HandleOutputMenuItem_Click;
+                    null, false, true, false);
 
                 ImageViewer.Shortcuts[Keys.Escape] = ClearSelection;
 
                 ImageViewer.Shortcuts[Keys.Tab] = HandleSelectNextPage;
                 ImageViewer.Shortcuts[Keys.Tab | Keys.Control] = HandleSelectNextDocument;
-                ImageViewer.Shortcuts[Keys.Tab | Keys.Shift] = HandleSelectPreviousPage;
+                ImageViewer.Shortcuts[Keys.Tab | Keys.Shift] = HandleSelectPreviousSinglePage;
                 ImageViewer.Shortcuts[Keys.Tab | Keys.Control | Keys.Shift] = HandleSelectPreviousDocument;
 
                 ImageViewer.Shortcuts[Keys.Left] = HandleSelectPreviousPage;
@@ -653,8 +664,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ContextMenuStrip.Items.Add(new ToolStripSeparator());
                 ContextMenuStrip.Items.Add(_insertCopiedMenuItem);
                 ContextMenuStrip.Items.Add(_insertDocumentSeparator);
-                ContextMenuStrip.Items.Add(new ToolStripSeparator());
-                ContextMenuStrip.Items.Add(_outputDocumentMenuItem);
                 ContextMenuStrip.Opening += HandleContextMenuStrip_Opening;
                 ContextMenuStrip.Closing += HandleContextMenuStrip_Closing;
 
@@ -775,7 +784,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 else if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
                 {
                     // Require enough successive mouse move events with the control key down to
-                    // prevent the inadventent display of pages when trying to use keyboard
+                    // prevent the inadvertent display of pages when trying to use keyboard
                     // navigation instead of the mouse.
                     if (_hoverMoveEventTotal < _HOVER_MOVE_EVENT_CRITERIA)
                     {
@@ -934,7 +943,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             index--;
                         }
-                        sourceLayoutControl.RemovePaginationControl(control, false, false);
+                        sourceLayoutControl.RemovePaginationControl(control, false);
                     }
 
                     foreach (PaginationControl control in draggedControls)
@@ -989,7 +998,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (separatorControl.PreviousControl == null)
                     {
                         PaginationControl nextControl = separatorControl.NextControl;
-                        RemovePaginationControl(separatorControl, true, true);
+                        RemovePaginationControl(separatorControl, true);
                         if (nextControl != null)
                         {
                             nextControl.PerformLayout();
@@ -997,7 +1006,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                     else if (separatorControl.PreviousControl is PaginationSeparator)
                     {
-                        RemovePaginationControl(separatorControl, true, true);
+                        RemovePaginationControl(separatorControl, true);
                     }
                 }
             }
@@ -1023,7 +1032,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         if (_displayedPageControl == null)
                         {
-                            ImageViewer.CloseImage();
+                            _hoverPageControl.DisplayPage(ImageViewer, false);
                         }
                         else
                         {
@@ -1079,7 +1088,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Whenever the context menu opens, use the current mouse position as the target of
                 // any context menu command rather than the active control.
                 Point mouseLocation = PointToClient(MousePosition);
-                var _commandTargetControl =
+                _commandTargetControl =
                     _flowLayoutPanel.GetChildAtPoint(mouseLocation) as PaginationControl;
                 if (_commandTargetControl != null && !_commandTargetControl.Selected)
                 {
@@ -1107,7 +1116,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 // Once the context menu is closed, _commandTargetControl should go back to being
                 // the _commandTargetControl.
-                _commandTargetControl = GetActivePageControl();
+                _commandTargetControl = GetActiveControl();
             }
             catch (Exception ex)
             {
@@ -1171,18 +1180,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             HandleInsertDocumentSeparator();
         }
 
-        /// <summary>
-        /// Handles the <see cref="Control.Click"/> event of the
-        /// <see cref="_outputDocumentMenuItem"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleOutputMenuItem_Click(object sender, EventArgs e)
-        {
-            HandleOutputDocument();
-        }
-
         #endregion Event Handlers
 
         #region Private Members
@@ -1204,20 +1201,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets the active <see cref="PageThumbnailControl"/>.
+        /// Gets the active <see cref="PaginationControl"/>.
         /// </summary>
         /// <param name="first"><see langword="true"/> to select the first of multiple selected
         /// pages where none of the pages are being displayed or <see langword="false"/> to select
         /// the last.</param>
-        /// <returns>The active <see cref="PageThumbnailControl"/> if there is one; otherwise,
+        /// <returns>The active <see cref="PaginationControl"/> if there is one; otherwise,
         /// <see langword="null"/></returns>
-        PageThumbnailControl GetActivePageControl(bool first = true)
+        PaginationControl GetActiveControl(bool first = true)
         {
-            if (_displayedPageControl != null)
+            if (_lastSelectedControl != null && _lastSelectedControl.Selected)
             {
-                return _displayedPageControl;
+                return _lastSelectedControl;
             }
-            
+
             var pageControl = first
                 ? SelectedControls.OfType<PageThumbnailControl>().FirstOrDefault()
                 : SelectedControls.OfType<PageThumbnailControl>().LastOrDefault();
@@ -1269,12 +1266,21 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 control.DoubleClick += HandleThumbnailControl_DoubleClick;
             }
-            else // is a separtor
+            else // is a separator
             {
-                control.Height = (control.PreviousControl != null)
-                    ? control.PreviousControl.Height
-                    : (control.NextControl != null) ? control.NextControl.Height : Height;
-                control.LocationChanged += HandleSeparatorControl_LocationChanged;
+                if (index == 0)
+                {
+                    // A separator control is meaningless as the first control, so don't bother
+                    // adding one as the first control).
+                    return false;
+                }
+                else
+                {
+                    control.Height = (control.PreviousControl != null)
+                        ? control.PreviousControl.Height
+                        : (control.NextControl != null) ? control.NextControl.Height : Height;
+                    control.LocationChanged += HandleSeparatorControl_LocationChanged;
+                }
             }
 
             return true;
@@ -1298,7 +1304,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             // controls are no longer from oldDocument.
             while (thumbnailControl != null && thumbnailControl.Document == oldDocument)
             {
-                thumbnailControl.Document.RemovePage(thumbnailControl, false);
+                thumbnailControl.Document.RemovePage(thumbnailControl);
                 newDocument.AddPage(thumbnailControl);
 
                 index++;
@@ -1349,13 +1355,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             bool allowSetActivePage, Keys? modifierKeys)
         {
             // Determine whether to select or deselect.
-            bool select = forceSelect || activeControl == null || !activeControl.Selected;
+            bool select = forceSelect || activeControl == null || !activeControl.Selected
+                || activeControl != _lastSelectedControl;
             PaginationControl lastSelectedControl = _lastSelectedControl;
 
             // Clear any currently selected controls first unless the control key is down.
             if (!modifierKeys.HasValue || (modifierKeys.Value & Keys.Control) == 0)
             {
-                ClearSelection(false);
+                ClearSelection();
             }
 
             var additionalControlSet = (additionalControls == null)
@@ -1420,18 +1427,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             control.Selected = select;
 
+            if (select)
+            {
+                _lastSelectedControl = control;
+                _commandTargetControl = control;
+            }
+
             var selectedPageControl = control as PageThumbnailControl;
 
             if (select && allowSetActivePage && selectedPageControl != null)
             {
                 // If selecting and activating a page control, display the image...
                 _displayedPageControl = selectedPageControl;
-                _commandTargetControl = selectedPageControl;
-                _lastSelectedControl = selectedPageControl;
                 selectedPageControl.DisplayPage(ImageViewer, true);
 
                 // ... and make sure it is scrolled into view.
-                if (Rectangle.Intersect(ClientRectangle, _displayedPageControl.Bounds) != 
+                if (Rectangle.Intersect(ClientRectangle, _displayedPageControl.Bounds) !=
                     _displayedPageControl.Bounds)
                 {
                     _flowLayoutPanel.ScrollControlIntoView(_displayedPageControl);
@@ -1475,7 +1486,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             // If not specified, use the active control as currentControl.
             if (currentControl == null)
             {
-                currentControl = GetActivePageControl(forward);
+                currentControl = GetActiveControl(forward);
             }
 
             // Iterate from currentControl until the next page control is encountered.
@@ -1485,7 +1496,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     ? currentControl.NextControl
                     : currentControl.PreviousControl;
 
-                while (!(currentControl is PageThumbnailControl))
+                while ((currentControl != null) && !(currentControl is PageThumbnailControl))
                 {
                     currentControl = forward
                         ? currentControl.NextControl
@@ -1515,7 +1526,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         PageThumbnailControl GetNextRowPageControl(bool down)
         {
             // If not specified, use the active control as currentControl.
-            PageThumbnailControl currentControl = GetActivePageControl(down);
+            PageThumbnailControl currentControl = _lastSelectedControl as PageThumbnailControl;
             if (currentControl == null)
             {
                 return GetNextPageControl(down);
@@ -1561,7 +1572,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             // If not specified, use the active control as the selectionTarget.
             if (selectionTarget == null)
             {
-                selectionTarget = GetActivePageControl(forward);
+                selectionTarget = GetNextPageControl(forward);
             }
 
             // If there is no selectionTarget or active control, use the first/last page control as
@@ -1584,7 +1595,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             IEnumerable<PageThumbnailControl> pageControls = selectionTarget.Document.PageControls;
             if (pageControls.All(page => page.Selected))
             {
-                PaginationControl control = forward 
+                PaginationControl control = forward
                     ? pageControls.Last()
                     : pageControls.First();
 
@@ -1635,11 +1646,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             _insertCopiedCommand.Enabled = _paginationUtility.ClipboardHasData();
 
             // Separators cannot be added next to other separators and cannot be the first control.
-            bool controlIsSepartor = _commandTargetControl is PaginationSeparator;
+            bool controlIsSeparator = _commandTargetControl is PaginationSeparator;
             bool previousControlIsSeparator = contextMenuControlIndex > 1 &&
                 _flowLayoutPanel.Controls[contextMenuControlIndex - 1] is PaginationSeparator;
-            _insertDocumentSeparatorCommand.Enabled =
-                !controlIsSepartor && !previousControlIsSeparator;
+            _insertDocumentSeparatorCommand.Enabled = contextMenuControlIndex != 0 &&
+                !controlIsSeparator && !previousControlIsSeparator;
 
             // Adjust the text of the insertion commands to be append commands if there is no
             // _commandTargetControl.
@@ -1662,25 +1673,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Clears any selection.
-        /// </summary>
-        void ClearSelection()
-        {
-            ClearSelection(true);
-        }
-
-        /// <summary>
         /// Clears any selection and closes the currently diplayed page in the
         /// <see cref="ImageViewer"/> if specfied by <see paramref="closeDisplayedPage"/>.
         /// </summary>
-        /// <param name="closeDisplayedPage"><see langword="true"/> to close the currently diplayed
-        /// page in the <see cref="ImageViewer"/>; <see langword="false"/> to leave it open.</param>
-        void ClearSelection(bool closeDisplayedPage)
+        void ClearSelection()
         {
             // Deselect all currently selected controls
             foreach (PaginationControl selectedControl in SelectedControls.ToArray())
             {
-                selectedControl.Selected = false;               
+                selectedControl.Selected = false;
 
                 if (selectedControl == _lastSelectedControl)
                 {
@@ -1694,7 +1695,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             // The close the currently displayed image if specified..
-            if (closeDisplayedPage && _displayedPageControl != null)
+            if (_displayedPageControl != null)
             {
                 _displayedPageControl.DisplayPage(ImageViewer, false);
                 _displayedPageControl = null;
@@ -1724,6 +1725,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             _paginationUtility.SetClipboardData(copiedPages);
+
+            UpdateCommandStates();
         }
 
         /// <summary>
@@ -1736,6 +1739,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             if (pageControl != null && pageControl != _hoverPageControl)
             {
+                _hoverPageControl = pageControl;
                 _hoverPageControl = pageControl;
                 pageControl.DisplayPage(ImageViewer, true);
             }
@@ -1778,6 +1782,26 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35457");
+            }
+        }
+
+        /// <summary>
+        /// Handles a UI command to select the previous page.
+        /// </summary>
+        void HandleSelectPreviousSinglePage()
+        {
+            try
+            {
+                PageThumbnailControl pageControl = GetNextPageControl(false);
+
+                if (pageControl != null)
+                {
+                    ProcessControlSelection(pageControl, null, true, true, 0);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35561");
             }
         }
 
@@ -1904,7 +1928,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 foreach (var control in SelectedControls.ToArray())
                 {
-                    RemovePaginationControl(control, true, true);
+                    RemovePaginationControl(control, true);
                 }
 
                 UpdateCommandStates();
@@ -1943,13 +1967,14 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (copiedPages != null)
                 {
+                    bool duplicatePagesExist = false;
                     int index = (_commandTargetControl == null)
                         ? -1
                         : _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
 
                     foreach (var page in copiedPages)
                     {
-                        // A null page represents a document boundary; insert a separtor.
+                        // A null page represents a document boundary; insert a separator.
                         if (page == null)
                         {
                             if (InitializePaginationControl(new PaginationSeparator(), index))
@@ -1964,9 +1989,17 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                             if (InitializePaginationControl(newPageControl, index))
                             {
+                                duplicatePagesExist |= newPageControl.Page.MultipleCopiesExist;
                                 index++;
                             }
                         }
+                    }
+
+                    // If multiple copies of a pasted page exist, refresh to add the copy indicator
+                    // on all other copies.
+                    if (duplicatePagesExist)
+                    {
+                        Refresh();
                     }
                 }
             }
@@ -1998,7 +2031,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 foreach (var control in SelectedControls.ToArray())
                 {
-                    RemovePaginationControl(control, true, true);
+                    RemovePaginationControl(control, true);
                 }
 
                 UpdateCommandStates();
@@ -2055,6 +2088,21 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35472");
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="PageDeleted"/> event.
+        /// </summary>
+        /// <param name="page">The <see cref="Page"/> that was deleted.</param>
+        /// <param name="outputDocument">Gets the <see cref="OutputDocument"/> the
+        /// <see paramref="page"/> was deleted from.</param>
+        void OnPageDeleted(Page page, OutputDocument outputDocument)
+        {
+            var eventHandler = PageDeleted;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new PageDeletedEventArgs(page, outputDocument));
             }
         }
 

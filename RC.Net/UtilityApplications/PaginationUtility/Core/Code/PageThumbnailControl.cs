@@ -25,16 +25,21 @@ namespace Extract.UtilityApplications.PaginationUtility
         static readonly string _DOCUMENT_SUPPORT_KEY = "vhG42tyuh9";
         
         /// <summary>
-        /// The padding that should be used for an instance that is preceeded by a separtor control.
+        /// The padding that should be used for an instance that is preceeded by a separator control.
         /// </summary>
         static readonly Padding _NORMAL_PADDING = new Padding(0, 1, 0, 1);
 
         /// <summary>
-        /// The padding that should be used for an instance that is not preceeded by a separtor
+        /// The padding that should be used for an instance that is not preceeded by a separator
         /// control such that one can be added later without shifting the position of this control.
         /// </summary>
         static readonly Padding _SEPARATOR_ALLOWANCE_PADDING =
             new Padding(PaginationSeparator._SEPARATOR_WIDTH, 1, 0, 1);
+
+        /// <summary>
+        /// The font to use when drawing an asterix to indicate a page is one of multiple copies.
+        /// </summary>
+        static readonly Font _COPY_INDICATOR_FONT = new Font("Sans Serif", 20);
 
         #endregion Constants
 
@@ -457,6 +462,28 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35483");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Paint"/> event of the <see cref="_rasterPictureBox"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.PaintEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleRasterPictureBox_Paint(object sender, PaintEventArgs e)
+        {
+            try
+            {
+                if (Page.MultipleCopiesExist)
+                {
+                    var brush = ExtractBrushes.GetSolidBrush(Color.SeaGreen);
+                    e.Graphics.DrawString("*", _COPY_INDICATOR_FONT, brush, new Point (0, 0));
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35562");
             }
         }
 

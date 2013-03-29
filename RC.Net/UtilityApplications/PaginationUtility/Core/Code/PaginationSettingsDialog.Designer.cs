@@ -301,7 +301,7 @@
             this._exportSettingsButton.Name = "_exportSettingsButton";
             this._exportSettingsButton.Size = new System.Drawing.Size(108, 23);
             this._exportSettingsButton.TabIndex = 15;
-            this._exportSettingsButton.Text = "Export Settings";
+            this._exportSettingsButton.Text = "Export Settings...";
             this._exportSettingsButton.UseVisualStyleBackColor = true;
             this._exportSettingsButton.Click += new System.EventHandler(this.HandleExportSettingsButton_Click);
             // 
@@ -312,7 +312,7 @@
             this._importSettingsButton.Name = "_importSettingsButton";
             this._importSettingsButton.Size = new System.Drawing.Size(108, 23);
             this._importSettingsButton.TabIndex = 16;
-            this._importSettingsButton.Text = "Import Settings";
+            this._importSettingsButton.Text = "Import Settings...";
             this._importSettingsButton.UseVisualStyleBackColor = true;
             this._importSettingsButton.Click += new System.EventHandler(this.HandleImportSettingsButton_Click);
             // 

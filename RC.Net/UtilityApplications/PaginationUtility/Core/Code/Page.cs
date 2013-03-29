@@ -29,11 +29,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         HashSet<object> _references = new HashSet<object>();
 
         /// <summary>
-        /// The <see cref="SourceDocument"/> this page is from.
-        /// </summary>
-        SourceDocument _sourceDocument;
-
-        /// <summary>
         /// The thumbnail <see cref="RasterImage"/> for this page.
         /// </summary>
         RasterImage _thumbnailImage;
@@ -58,7 +53,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _sourceDocument = sourceDocument;
+                SourceDocument = sourceDocument;
                 OriginalPageNumber = pageNumber;
                 _thumbnailImage = _LOADING_IMAGE.Clone();
             }
@@ -82,6 +77,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Properties
 
         /// <summary>
+        /// The <see cref="SourceDocument"/> this page is from.
+        /// </summary>
+        public SourceDocument SourceDocument
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Gets the document name this page originally came from.
         /// </summary>
         /// <value>
@@ -91,7 +95,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return _sourceDocument.FileName;
+                return SourceDocument.FileName;
             }
         }
 
@@ -158,6 +162,29 @@ namespace Extract.UtilityApplications.PaginationUtility
                 try
                 {
                     return _references.Any();
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35425");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether multiple copies of this page exist in the UI.
+        /// </summary>
+        /// <value><see langword="true"/> if multiple copies exist; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool MultipleCopiesExist
+        {
+            get
+            {
+                try
+                {
+                    return _references
+                        .Where(o => o is PageThumbnailControl)
+                        .Count() > 1;
                 }
                 catch (Exception ex)
                 {

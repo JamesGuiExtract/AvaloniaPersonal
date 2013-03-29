@@ -121,20 +121,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                using (OpenFileDialog openFileDialog = new OpenFileDialog())
+                using (SaveFileDialog saveFileDialog = new SaveFileDialog())
                 {
                     // Display a dialog that allows selection of a config file (pre-existing or not).
-                    openFileDialog.Filter = "Configuration files (*.config)|*.config";
-                    openFileDialog.FilterIndex = 0;
-                    openFileDialog.AddExtension = true;
-                    openFileDialog.Multiselect = false;
-                    openFileDialog.CheckFileExists = false;
-                    openFileDialog.CheckPathExists = true;
-                    openFileDialog.DefaultExt = ".config";
+                    saveFileDialog.Filter = "Configuration files (*.config)|*.config";
+                    saveFileDialog.FilterIndex = 0;
+                    saveFileDialog.AddExtension = true;
+                    saveFileDialog.CheckFileExists = false;
+                    saveFileDialog.CheckPathExists = true;
+                    saveFileDialog.DefaultExt = ".config";
 
-                    while (openFileDialog.ShowDialog() == DialogResult.OK)
+                    while (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        string newConfigName = openFileDialog.FileName;
+                        string newConfigName = saveFileDialog.FileName;
                         if (File.Exists(newConfigName))
                         {
                             DialogResult response = MessageBox.Show("Overwrite existing file?",
