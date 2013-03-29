@@ -217,7 +217,7 @@ end;
 ///////////////////////////////////////////////////////////////////////////////
 function BOOL CheckProductKeyInstalled(strExpectedVersion, strProductKey, svInstalledVersion, bCheckForSame)
 	STRING strUninstallKey;
-	STRING strVersion, strEnvVersion, strRtn;
+	STRING strEnvVersion, strRtn;
 	NUMBER nSize, nType;
 	STRING strMsg;
 	STRING strProductName;
@@ -225,11 +225,7 @@ function BOOL CheckProductKeyInstalled(strExpectedVersion, strProductKey, svInst
 	NUMBER i;
 begin 
 	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
-    
-	// Get the Expected Version	                                          
-	nPos = StrFind(strExpectedVersion, "Ver. ");
-	StrSub(strVersion, strExpectedVersion, nPos + 5 , 20 );
-	  
+  
 	// Create the path for the uninstall key
 	strUninstallKey = REG_PATH_UNINSTALL ^ strProductKey;
 	                                        
@@ -239,11 +235,11 @@ begin
 		RegDBGetKeyValueEx( strUninstallKey, "DisplayVersion", nType, svInstalledVersion, nSize); 
 
 		if (bCheckForSame) then   
-			if ( strVersion = svInstalledVersion ) then
+			if ( strExpectedVersion = svInstalledVersion ) then
 				return TRUE;                            
 			endif;
 		else
-			return strVersion != svInstalledVersion;
+			return strExpectedVersion != svInstalledVersion;
 		endif;
 	endif;
 	                    
