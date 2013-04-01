@@ -19,8 +19,9 @@
 	<ul>
 		<li>Copy the <b>Demo_FlexIndex</b> folder to the test machine.
 		<li>Run <b>Clean All.bat</b> as local administrator.
-		<li>Use <b>SQL Management Studio</b> to grant <u>db_datareader</u> and <u>db_datawriter</u> 
-		privileges to Domain Users for the <b>Demo_FLEXIndex</b> database.
+		<li>Use <b>SQL Management Studio</b> to grant <u>db_datareader</u> and 
+		<u>db_datawriter</u> privileges to Domain Users for the <b>Demo_FLEXIndex</b> 
+		database.
 		<li>Exercise <b>ExtractData.fps</b>.
 		<ul>
 			<li>Confirm that all images are processed.
@@ -44,8 +45,9 @@
 	<ul>
 		<li>Copy the <b>Demo_IDShield</b> folder to the test machine.
 		<li>Run <b>Clean all.bat</b> as local administrator.
-		<li>Use <b>SQL Management Studio</b> to grant <u>db_datareader</u> and <u>db_datawriter</u> 
-		privileges to Domain Users for the <b>Demo_IDShield</b> database.
+		<li>Use <b>SQL Management Studio</b> to grant <u>db_datareader</u> and 
+		<u>db_datawriter</u> privileges to Domain Users for the <b>Demo_IDShield</b> 
+		database.
 		<li>Run <b>install.bat</b> from DemoFiles\Installs\VerifyAllInterestingDocs.
 		<li>Exercise <b>Compute Redactions.fps</b>.
 		<ul>
@@ -69,8 +71,9 @@
 	<ul>
 		<li>Copy the <b>Demo_LabDE</b> folder to the test machine.
 		<li>Run <b>Clean.bat</b> as local administrator.
-		<li>Use <b>SQL Management Studio</b> to grant <u>db_datareader</u> and <u>db_datawriter</u> 
-		privileges to Domain Users for the <b>Demo_LabDE</b> database.
+		<li>Use <b>SQL Management Studio</b> to grant <u>db_datareader</u> and 
+		<u>db_datawriter</u> privileges to Domain Users for the <b>Demo_LabDE</b> 
+		database.
 		<li>Exercise <b>ExtractData.fps</b>.
 		<ul>
 			<li>Confirm that all images are processed.
@@ -95,20 +98,88 @@
 		<li><b>Rule Tester</b>
 		<ul>
 			<li>Temporarily rename the <b>RDT</b> license file.
-			<li>Confirm that the Rule Tester <b>About box</b> displays the expected version number, 
-			patch, and FKB update(s).
-			<li>Confirm that <b>Rule Tester</b> can exercise <b>Master.rsd.etf</b> from the 
-			Redaction Demo.
-			<li>Confirm that <b>Rule Tester</b> displays an exception when trying to exercise a 
-			different <b>rsd.etf</b> file from the Redaction Demo.
+			<li>Confirm that the Rule Tester <b>About box</b> displays the expected 
+			version number, patch, and FKB update(s).
+			<li>Confirm that <b>Rule Tester</b> can exercise <b>Master.rsd.etf</b> 
+			from the Demo_IDShield rules.
+			<li>Confirm that <b>Rule Tester</b> displays an exception when trying 
+			to exercise a different <b>rsd.etf</b> file from the Demo_IDShield rules.
 			<li>Restore the <b>RDT</b> license file.
+		</ul>
+	</ul>
+<p>
+	<h2>Licensing</h2>
+	<ul>
+		<li><b>License Generator</b>
+		<ul>
+			<li>Navigate to the appropriate version <b>COMLicense</b> folder under 
+			<b>I:\Common\Engineering\Tools\SecureClients</b>.
+			<li>Exercise <b>COMLicenseGenerator.exe</b> and confirm that an expiring 
+			server license can be created.
+			<li>Confirm that a non-expiring client license can be created.
+			<li>Confirm that an SDK license file can be created with random passwords.
+		</ul>
+		<li><b>License Evaluator</b>
+		<ul>
+			<li>Navigate to the appropriate version <b>COMLicense</b> folder under 
+			<b>I:\Common\Engineering\Tools\SecureClients</b>.
+			<li>Exercise <b>COMLicenseEval.exe</b> and confirm that the license files 
+			created above can be evaluated.
+			<ul>
+				<li>Use the SDK passwords generated above to extract the 
+				<b>User String</b> licensed components.
+			</ul>
+		</ul>
+		<li><b>USB Key</b>
+		<ul>
+			<li>Use <b>KeyManager.exe</b> in the 
+			<b>I:\Common\Engineering\Tools\SecureClients\USBKey\NewUSBKeyManagerwithSet</b> 
+			folder to exercise setting counts and adding counts to a USB key.
+			<li>Borrow the distributor key from Professional Services.
+			<li>Note original counts for the test USB key.
+			<ul>
+				<li>Indexing
+				<li>Pagination
+				<li>Redaction
+			</ul>
+			<li><u>Set counts</u>
+			<ul>
+				<li>Use <b>Field Activation Utility</b> to retrieve a license string 
+				from the test USB key.
+				<li>Use the license string to create a license string to <b>set</b> 
+				the <b>Indexing</b> counter to a new value.
+				<li>Use <b>Field Activation Utility</b> to retrieve a license string 
+				from the test USB key.
+				<li>Use the license string to create a license string to <b>set</b> 
+				the <b>Pagination</b> counter to a new value.
+				<li>Use <b>Field Activation Utility</b> to retrieve a license string 
+				from the test USB key.
+				<li>Use the license string to create a license string to <b>set</b> 
+				the <b>Redaction</b> counter to a new value.
+			</ul>
+			<li><u>Increment counts</u>
+			<ul>
+				<li>Use <b>Field Activation Utility</b> to retrieve a license string 
+				from the test USB key.
+				<li>Use the license string to create a license string to 
+				<b>increment</b> the <b>Indexing</b> counter to a new value.
+				<li>Use <b>Field Activation Utility</b> to retrieve a license string 
+				from the test USB key.
+				<li>Use the license string to create a license string to 
+				<b>increment</b> the <b>Pagination</b> counter to a new value.
+				<li>Use <b>Field Activation Utility</b> to retrieve a license string 
+				from the test USB key.
+				<li>Use the license string to create a license string to 
+				<b>increment</b> the <b>Redaction</b> counter to a new value.
+			</ul>
 		</ul>
 	</ul>
 <p>
 	<h2>Rule Development Toolkit</h2>
 	<ul>
 		<li>Confirm that a USB key is identified or a suitable license file is in place.
-		<li>Use <b>RDT Configuration</b> to confirm that automatic encryption of files is enabled.
+		<li>Use <b>RDT Configuration</b> to confirm that automatic encryption of files 
+		is enabled.
 		<li>Confirm that <b>Automated Tests - Run all tests</b> works.
 		<li>Update test results - <b>only if</b> this build or a newer build 
 		has not already been tested.
@@ -145,11 +216,12 @@
 				<li>setting of a Swiping rule flag
 				<li>text to be saved via a <b>Comments</b> tab
 			</ul>
-			<li>Confirm that <b>Tools - Open Rule Tester</b> displays the Rule Tester dialog.
-			<li>Confirm that <b>Tools - Execute Test Harnesss</b> displays the Test Harness dialog 
-			and the Test Result Logger window.
-			<li>Confirm that <b>Tools - Check For New Components</b> displays a message box 
-			with numbers found of the following component types.
+			<li>Confirm that <b>Tools - Open Rule Tester</b> displays the Rule 
+			Tester dialog.
+			<li>Confirm that <b>Tools - Execute Test Harnesss</b> displays the 
+			Test Harness dialog and the Test Result Logger window.
+			<li>Confirm that <b>Tools - Check For New Components</b> displays a 
+			message box with numbers found of the following component types.
 			<ul>
 				<li>Value Finders
 				<li>Value Modifiers
@@ -162,10 +234,10 @@
 				<li>Conditions
 				<li>Selectors
 			</ul>
-			<li>Confirm that <b>Help - Attribute Finder Help</b> displays the <b>FLEX Index SDK</b> 
-			Help file.  Note that this file is out-of-date.
-			<li>Confirm that <b>Help - About FLEX Index</b> displays the expected version number, 
-			patch, and FKB update.
+			<li>Confirm that <b>Help - Attribute Finder Help</b> displays the 
+			<b>FLEX Index SDK</b> Help file.  Note that this file is out-of-date.
+			<li>Confirm that <b>Help - About FLEX Index</b> displays the expected 
+			version number, patch, and FKB update.
 		</ul>
 	</ul>
 </body>
