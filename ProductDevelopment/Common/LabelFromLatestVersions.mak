@@ -1,7 +1,7 @@
 
 !include LatestComponentVersions.mak
 
-Label="C:\Program Files\SourceGear\Vault Client\vault" LABEL -server white.extract.local -repository "Extract"
+Label="C:\Program Files\SourceGear\Vault Client\vault" LABEL -server $(VAULT_SERVER) -repository "Extract"
 
 LabelCommonDir:
 	$(Label) "$$$(Branch)/Engineering/ProductDevelopment" "$(FlexIndexVersion)"

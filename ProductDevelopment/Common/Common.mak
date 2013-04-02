@@ -40,7 +40,7 @@ VcppLibDirs=$(VCPP_DIR)\ATLMFC\LIB;$(VCPP_DIR)\LIB;$(WINDOWS_SDK)\lib
 IncludeDirs=$(VcppIncludeDirs)
 LibDirs=$(VcppLibDirs)
 
-Label="C:\Program Files\SourceGear\Vault Client\vault" LABEL -server white.extract.local -repository "Extract"
+Label="C:\Program Files\SourceGear\Vault Client\vault" LABEL -server $(VAULT_SERVER) -repository "Extract"
 DelOptions=/Q /F /S
 ISCompile=Compile
 ISCompileOptions=-I"$(INSTALL_SHIELD_DIR)\Include"
