@@ -147,9 +147,9 @@ function detectFlexIndexSDKInstall()
 	STRING strVersion;
 begin
 	CheckOtherExtractProducts();
-	if ( CheckProductKeyInstalled(@FlexIndexVersion, IDSHIELD_PRODUCT_CODE, strVersion, TRUE) ||
-		CheckProductKeyInstalled(@FlexIndexVersion, FLEX_INDEX_PRODUCT_CODE, strVersion, TRUE)||
-		CheckProductKeyInstalled(@LabDEVersion, LABDE_PRODUCT_CODE, strVersion, TRUE)) then
+	if ( CheckProductKeyInstalled(IFX_PRODUCT_VERSION, IDSHIELD_PRODUCT_CODE, strVersion, TRUE) ||
+		CheckProductKeyInstalled(IFX_PRODUCT_VERSION, FLEX_INDEX_PRODUCT_CODE, strVersion, TRUE)||
+		CheckProductKeyInstalled(IFX_PRODUCT_VERSION, LABDE_PRODUCT_CODE, strVersion, TRUE)) then
 		return 0;
 	endif;
 	
