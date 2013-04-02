@@ -26,7 +26,7 @@ AFRootDirectory=$(PDRootDir)\AttributeFinder
 FLEXBleadingEdgeDir=R:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)
 
 LaserFicheDir=$(PDRootDir)\AFIntegrations\Laserfiche
-LaserFicheInstallDir=T:\AttributeFinder\AFIntegrations\Laserfiche\Files
+LaserFicheInstallDir=P:\AttributeFinder\AFIntegrations\Laserfiche\Files
 LaserficheReleaseBleedingEdgeDir=$(FLEXBleadingEdgeDir)\Integrations\$(LaserficheVersion)\IDShield
 LaserficheInstallRootDir=$(LaserFicheDir)\Installation\LFPlugin
 LaserficheInstallMediaDir=$(LaserficheInstallRootDir)\Media\CD-ROM\DiskImages\DISK1

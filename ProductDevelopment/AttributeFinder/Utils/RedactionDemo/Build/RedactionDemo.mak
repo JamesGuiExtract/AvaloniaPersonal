@@ -27,7 +27,7 @@ AFComponentData=$(AFRootDirectory)\ComponentData
 AFBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge
 DemoRulesDir=$(EngineeringRootDirectory)\Rules\IDShield\Demo_IDShield\Rules
 
-RedactionImageDir=T:\AttributeFinder\Demo_IDShield\Sanitized
+RedactionImageDir=P:\AttributeFinder\Demo_IDShield\Sanitized
 RedactionInstallDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Demo_IDShield
 
 # determine the name of the release output directory based upon the build
