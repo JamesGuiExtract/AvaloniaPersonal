@@ -18,7 +18,7 @@
     <ProjectGuid>{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}</ProjectGuid>
     <RootNamespace>RWUtils</RootNamespace>
     <SccProjectName>RWUtils</SccProjectName>
-    <SccAuxPath>http://white.extract.local/VaultService</SccAuxPath>
+    <SccAuxPath>http://EngSvr.extract.local/VaultService</SccAuxPath>
     <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
     <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
     <Keyword>MFCProj</Keyword>

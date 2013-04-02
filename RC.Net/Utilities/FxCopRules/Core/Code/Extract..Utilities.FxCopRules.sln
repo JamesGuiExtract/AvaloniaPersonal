@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.FxCopRule
 EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
-		VaultHost = http://white.extract.local/VaultService
+		VaultHost = http://EngSvr.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
 		ProjectCount = 1

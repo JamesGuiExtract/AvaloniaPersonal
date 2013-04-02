@@ -14,7 +14,7 @@
     <ProjectGuid>{9A06614A-0F67-4828-846B-824DBE1151F0}</ProjectGuid>
     <RootNamespace>ChangeWindowTitle</RootNamespace>
     <SccProjectName>ChangeWindowTitle</SccProjectName>
-    <SccAuxPath>http://white.extract.local/VaultService</SccAuxPath>
+    <SccAuxPath>http://EngSvr.extract.local/VaultService</SccAuxPath>
     <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
     <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
     <Keyword>MFCProj</Keyword>

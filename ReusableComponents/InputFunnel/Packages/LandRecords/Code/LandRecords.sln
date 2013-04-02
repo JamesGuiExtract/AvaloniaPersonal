@@ -616,7 +616,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UEXViewer", "..\..\..\..\..
 EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
-		VaultHost = http://white.extract.local/VaultService
+		VaultHost = http://EngSvr.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
 		ProjectCount = 47

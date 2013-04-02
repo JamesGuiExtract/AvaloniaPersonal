@@ -14,7 +14,7 @@
     <ProjectGuid>{B98B7829-F2E9-4917-A264-D0D66B3328F7}</ProjectGuid>
     <RootNamespace>ESOCR</RootNamespace>
     <SccProjectName>ESOCR</SccProjectName>
-    <SccAuxPath>http://white.extract.local/VaultService</SccAuxPath>
+    <SccAuxPath>http://EngSvr.extract.local/VaultService</SccAuxPath>
     <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
     <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
     <Keyword>MFCProj</Keyword>
