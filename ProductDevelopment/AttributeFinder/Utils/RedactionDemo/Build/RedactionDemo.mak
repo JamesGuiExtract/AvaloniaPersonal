@@ -24,10 +24,10 @@
 PDRootDir=$(EngineeringRootDirectory)\ProductDevelopment
 AFRootDirectory=$(PDRootDir)\AttributeFinder
 AFComponentData=$(AFRootDirectory)\ComponentData
-AFBleedingEdgeDir=I:\Common\Engineering\ProductReleases\FlexIndex\Internal\BleedingEdge
+AFBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge
 DemoRulesDir=$(EngineeringRootDirectory)\Rules\IDShield\Demo_IDShield\Rules
 
-RedactionImageDir=I:\Common\Engineering\ProductDevelopment\AttributeFinder\Demo_IDShield\Sanitized
+RedactionImageDir=T:\AttributeFinder\Demo_IDShield\Sanitized
 RedactionInstallDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Demo_IDShield
 
 # determine the name of the release output directory based upon the build
