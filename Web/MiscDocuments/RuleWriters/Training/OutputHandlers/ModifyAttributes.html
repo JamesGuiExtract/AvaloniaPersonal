@@ -30,6 +30,28 @@
 						<li>You can also give the new sub-attribute a type and/or value.</li>
 					</ul>
 				</li>
+                <li>When changing the value of an attribute or defining the value while creating a new sub-attribute, there are a few special variables at your disposal:
+					<ul>
+						<li><b>%Value%</b>, will be replaced by the value of the queired attribute when the rules are run.</li>
+						<li><b>%<i>Name</i>%</b>, will be replaced by the value of the <i>Name</i> sub-attribute of the queired attribute.  If the <i>Name</i> sub-attribute does not exist, the value of the entire attribute will be changes to a empty string.
+                            <ul>
+                                <li>For example, open <i>ModifyPhone.rsd</i> and run it on <i>ModifyPhone.txt</i>.</li>
+                                <li>Notice that all the found <i>PhoneNumber</i> attributes have a <i>Number</i> sub-attribute, but only some of them have a <i>AreaCode</i> sub-attribute.</li>
+                                <li>Create a Modify Attributes output handler that changes the value of <i>PhoneNumber</i> attribute to <b>%Number%</b>.</li>
+                                <li>Run the rules again, note that <i>PhoneNumber</i> now contains the value of the <i>Number</i> sub-attribute.</li>
+                                <li>Alter the Modify Attributes output handler that you just created so that it changes the value of the <i>PhoneNumber</i> to <b>(%AreaCode%) %Number%</b>.</li>
+                                <li>Run the rules again, note that <i>PhoneNumber</i> attributes that have <i>AreaCode</i> sub-attributes now contain the value of the <i>AreaCode</i> sub-attribute in parens followed by the value of the <i>Number</i> sub-attribute. Also note that the <i>PhoneNumber</i> attribute that did not have a <i>AreaCode</i> sub-attribute is now blank.</li>
+                            </ul>
+                        </li>
+                        <li>When using a sub-attribute variable, you can make the variable optional by using the <b>&#060 </b>and <b>&#062 </b> operators.
+                            <ul>
+                                <li>For example, remove any output handlers from <i>ModifyPhone.rsd</i> and run it on <i>ModifyPhone.txt</i>.</li>
+                                <li>Add a Modify Attributes output handler that changes the value of <i>PhoneNumber</i> to be <b>&#060(%AreaCode%)&#062%Number%</b>.</li>
+                                <li>Run the rules again. Notice that this time, the <i>PhoneNumber</i> attribute that does not have a <i>AreaCode</i> sub-attribute an is not blank: Instead it contains just the value of the <i>Number</i> sub-attribute.</li>
+                            </ul>
+                        </li>
+					</ul>
+				</li>
 			</ul>
 		<hr>
 		<h3>Exercises</h3>
