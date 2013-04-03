@@ -7,11 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.SourceControl", "..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LICode", "..\..\..\..\..\ProductDevelopment\VisualStudioAddins\LICode\Code\LICode.csproj", "{3C704CA9-B489-4FFE-BAAC-6E7DEA7594F9}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "LICodeSetup", "..\..\..\..\..\ProductDevelopment\VisualStudioAddins\LICode\Setup\LICodeSetup.vdproj", "{9775CA3F-83D2-4E51-BDC0-9C6E46B26853}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceControl", "..\..\..\..\..\ProductDevelopment\VisualStudioAddins\SourceControl\Code\SourceControl.csproj", "{052DB25A-500B-4E48-95EA-63086C3B1C2A}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SourceControlAddIn", "..\..\..\..\..\ProductDevelopment\VisualStudioAddins\SourceControl\Setup\SourceControlAddIn.vdproj", "{BBA2D9AB-56C6-4801-88D3-675E144D9EA6}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "LICodeSetup", "..\..\..\..\..\ProductDevelopment\VisualStudioAddIns\LICode\Setup\LICodeSetup.vdproj", "{9BFA4FF6-A432-4274-8D7B-9CCF6F9FEE5B}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SourceControlAddIn", "..\..\..\..\..\ProductDevelopment\VisualStudioAddIns\SourceControl\Setup\SourceControlAddIn.vdproj", "{E0C783B6-A7AE-4B1F-8930-A49156BE7B13}"
 EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
@@ -19,12 +19,12 @@ Global
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
 		ProjectCount = 6
-		ProjectRelativeDiskPath1 = Extract.VisualStudio.AddIns.csproj
-		ProjectRelativeDiskPath2 = ..\..\..\..\SourceControl\Core\Code\Extract.SourceControl.csproj
-		ProjectRelativeDiskPath3 = ..\..\..\..\..\ProductDevelopment\VisualStudioAddins\LICode\Code\LICode.csproj
-		ProjectRelativeDiskPath4 = ..\..\..\..\..\ProductDevelopment\VisualStudioAddins\LICode\Setup\LICodeSetup.vdproj
-		ProjectRelativeDiskPath5 = ..\..\..\..\..\ProductDevelopment\VisualStudioAddins\SourceControl\Code\SourceControl.csproj
-		ProjectRelativeDiskPath6 = ..\..\..\..\..\ProductDevelopment\VisualStudioAddins\SourceControl\Setup\SourceControlAddIn.vdproj
+		ProjectRelativeDiskPath1 = ..\..\..\..\..\ProductDevelopment\VisualStudioAddIns\SourceControl\Setup\SourceControlAddIn.vdproj
+		ProjectRelativeDiskPath2 = ..\..\..\..\..\ProductDevelopment\VisualStudioAddins\SourceControl\Code\SourceControl.csproj
+		ProjectRelativeDiskPath3 = ..\..\..\..\..\ProductDevelopment\VisualStudioAddIns\LICode\Setup\LICodeSetup.vdproj
+		ProjectRelativeDiskPath4 = ..\..\..\..\..\ProductDevelopment\VisualStudioAddins\LICode\Code\LICode.csproj
+		ProjectRelativeDiskPath5 = ..\..\..\..\SourceControl\Core\Code\Extract.SourceControl.csproj
+		ProjectRelativeDiskPath6 = Extract.VisualStudio.AddIns.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,18 +43,18 @@ Global
 		{3C704CA9-B489-4FFE-BAAC-6E7DEA7594F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C704CA9-B489-4FFE-BAAC-6E7DEA7594F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C704CA9-B489-4FFE-BAAC-6E7DEA7594F9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9775CA3F-83D2-4E51-BDC0-9C6E46B26853}.Debug|Any CPU.ActiveCfg = Debug
-		{9775CA3F-83D2-4E51-BDC0-9C6E46B26853}.Debug|Any CPU.Build.0 = Debug
-		{9775CA3F-83D2-4E51-BDC0-9C6E46B26853}.Release|Any CPU.ActiveCfg = Release
-		{9775CA3F-83D2-4E51-BDC0-9C6E46B26853}.Release|Any CPU.Build.0 = Release
 		{052DB25A-500B-4E48-95EA-63086C3B1C2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{052DB25A-500B-4E48-95EA-63086C3B1C2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{052DB25A-500B-4E48-95EA-63086C3B1C2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{052DB25A-500B-4E48-95EA-63086C3B1C2A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BBA2D9AB-56C6-4801-88D3-675E144D9EA6}.Debug|Any CPU.ActiveCfg = Debug
-		{BBA2D9AB-56C6-4801-88D3-675E144D9EA6}.Debug|Any CPU.Build.0 = Debug
-		{BBA2D9AB-56C6-4801-88D3-675E144D9EA6}.Release|Any CPU.ActiveCfg = Release
-		{BBA2D9AB-56C6-4801-88D3-675E144D9EA6}.Release|Any CPU.Build.0 = Release
+		{9BFA4FF6-A432-4274-8D7B-9CCF6F9FEE5B}.Debug|Any CPU.ActiveCfg = Debug
+		{9BFA4FF6-A432-4274-8D7B-9CCF6F9FEE5B}.Debug|Any CPU.Build.0 = Debug
+		{9BFA4FF6-A432-4274-8D7B-9CCF6F9FEE5B}.Release|Any CPU.ActiveCfg = Release
+		{9BFA4FF6-A432-4274-8D7B-9CCF6F9FEE5B}.Release|Any CPU.Build.0 = Release
+		{E0C783B6-A7AE-4B1F-8930-A49156BE7B13}.Debug|Any CPU.ActiveCfg = Debug
+		{E0C783B6-A7AE-4B1F-8930-A49156BE7B13}.Debug|Any CPU.Build.0 = Debug
+		{E0C783B6-A7AE-4B1F-8930-A49156BE7B13}.Release|Any CPU.ActiveCfg = Release
+		{E0C783B6-A7AE-4B1F-8930-A49156BE7B13}.Release|Any CPU.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
