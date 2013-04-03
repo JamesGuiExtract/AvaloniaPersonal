@@ -13,7 +13,7 @@ REM r: should be mapped to the base location that the install will be moved afte
 IF DEFINED BUILD_FINISHED_INSTALL (
 	net use r: %BUILD_FINISHED_INSTALL%
 ) ELSE (
-	net use r: \\fnp2\internal\Common\Engineering\ProductReleases
+	net use r: \\EngSvr\internal\ProductReleases
 )
 
 IF DEFINED BUILD_INSTALL_FILES (
@@ -27,6 +27,6 @@ IF DEFINED BUILD_INSTALL_FILES (
 IF DEFINED BUILD_INTERNAL_INSTALLS (
 	net use s: %BUILD_INTERNAL_INSTALLS%
 ) ELSE (
-	net use s: \\fnp2\internal\Common\Engineering\ProductReleases_InternalUseOnly
+	net use s: \\EngSvr\internal\ProductReleases_InternalUseOnly
 )
 
