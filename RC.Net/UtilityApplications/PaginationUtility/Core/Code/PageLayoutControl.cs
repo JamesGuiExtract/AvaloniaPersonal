@@ -194,7 +194,14 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 InitializeComponent();
 
-                // Set ccrolling during a drag/droop scroll event to occur 20 times / sec.
+                // When dragging files in from the Windows shell, _dropLocationIndicator receives
+                // drag/drop events if the mouse is over the indicator.
+                _dropLocationIndicator.DragDrop += Handle_DragDrop;
+                _dropLocationIndicator.DragEnter += Handle_DragEnter;
+                _dropLocationIndicator.DragOver += Handlel_DragOver;
+                _dropLocationIndicator.DragLeave += Handle_DragLeave;
+
+                // Set ccrolling during a drag/drop scroll event to occur 20 times / sec.
                 _dragDropScrollTimer = new Timer();
                 _dragDropScrollTimer.Interval = 50;
                 _dragDropScrollTimer.Tick += HandleDragDropScrollTimer_Tick;
@@ -630,7 +637,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     new[] { _copyMenuItem }, false, true, false);
                 _copyMenuItem.Click += HandleCopyMenuItem_Click;
 
-                _insertCopiedMenuItem.ShortcutKeys = Keys.Control | Keys.I;
+                _insertCopiedMenuItem.ShortcutKeys = Keys.Control | Keys.V;
                 _insertCopiedMenuItem.ShowShortcutKeys = true;
                 _insertCopiedCommand = new ApplicationCommand(ImageViewer.Shortcuts,
                     new Keys[] { Keys.Control | Keys.V }, HandleInsertCopied,
@@ -882,12 +889,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.DragEnter"/> event of a <see cref="PaginationControl"/>.
+        /// Handles the <see cref="Control.DragEnter"/> event of a child control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.Windows.Forms.DragEventArgs"/> instance containing
         /// the event data.</param>
-        void HandleFlowLayoutPanel_DragEnter(object sender, DragEventArgs e)
+        void Handle_DragEnter(object sender, DragEventArgs e)
         {
             try
             {
@@ -914,18 +921,26 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.DragLeave"/> event of a <see cref="PaginationControl"/>.
+        /// Handles the <see cref="Control.DragLeave"/> event of a child control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void HandleFlowLayoutPanel_DragLeave(object sender, EventArgs e)
+        void Handle_DragLeave(object sender, EventArgs e)
         {
             try
             {
                 SuspendLayout();
 
-                _dropLocationIndex = -1;
-                Controls.Remove(_dropLocationIndicator);
+                // During a drag/drop from the Window's shell, when the mouse is over the
+                // _dropLocationIndicator, it will cause a DragLeave event for the _flowLayoutPanel.
+                // Don't allow the drop availability to end unless the mouse is now outside the
+                // bounds of this control.
+                Point mousePosition = PointToClient(Control.MousePosition);
+                if (!Bounds.Contains(mousePosition))
+                {
+                    _dropLocationIndex = -1;
+                    Controls.Remove(_dropLocationIndicator);
+                }
             }
             catch (Exception ex)
             {
@@ -940,12 +955,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.DragOver"/> event of a <see cref="PaginationControl"/>.
+        /// Handles the <see cref="Control.DragOver"/> event of a child control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.Windows.Forms.DragEventArgs"/> instance
         /// containing the event data.</param>
-        void HandleFlowLayoutPanel_DragOver(object sender, DragEventArgs e)
+        void Handlel_DragOver(object sender, DragEventArgs e)
         {
             try
             {
@@ -1010,15 +1025,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         location = control.PreceedingInsertionPoint;
                     }
 
-                    location.Offset(-_dropLocationIndicator.Width / 2, 0);
-
-                    if (!Controls.Contains(_dropLocationIndicator))
-                    {
-                        Controls.Add(_dropLocationIndicator);
-                        _dropLocationIndicator.BringToFront();
-                    }
-                    _dropLocationIndicator.Location = location;
-                    _dropLocationIndicator.Height = control.Height;
+                    ShowDropLocationIndicator(location, control.Height);
                 }
                 else
                 {
@@ -1039,12 +1046,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.DragDrop"/> event of a <see cref="PaginationControl"/>.
+        /// Handles the <see cref="Control.DragDrop"/> event of a child control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.Windows.Forms.DragEventArgs"/> instance containing
         /// the event data.</param>
-        void HandleFlowLayoutPanel_DragDrop(object sender, DragEventArgs e)
+        void Handle_DragDrop(object sender, DragEventArgs e)
         {
             try
             {
@@ -1316,7 +1323,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI0");
+                ex.ExtractDisplay("ELI35581");
             }
         }
 
@@ -1441,7 +1448,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             foreach (PaginationControl control in selectedControls)
             {
                 if (sourceLayoutControl == this &&
-                    _flowLayoutPanel.Controls.IndexOf(control) <= targetIndex)
+                    _flowLayoutPanel.Controls.IndexOf(control) < targetIndex)
                 {
                     targetIndex--;
                 }
@@ -1492,6 +1499,49 @@ namespace Extract.UtilityApplications.PaginationUtility
                 thumbnailControl =
                     _flowLayoutPanel.Controls[index] as PageThumbnailControl;
             }
+        }
+
+        /// <summary>
+        /// Shows the <see cref="_dropLocationIndicator"/> at the specified
+        /// <see paramref="location"/>.
+        /// </summary>
+        /// <param name="location">The <see cref="Point"/> where the location indicator should be
+        /// drawn.</param>
+        /// <param name="height">The height the location indicator should be</param>
+        void ShowDropLocationIndicator(Point location, int height)
+        {
+            location.Offset(-_dropLocationIndicator.Width / 2, 0);
+
+            if (!Controls.Contains(_dropLocationIndicator))
+            {
+                Controls.Add(_dropLocationIndicator);
+                _dropLocationIndicator.BringToFront();
+            }
+            _dropLocationIndicator.Location = location;
+            _dropLocationIndicator.Height = height;
+
+            // Make sure the rectangle we are updating is large enough to intersect with bordering
+            // controls.
+            Rectangle updateRect = _dropLocationIndicator.Bounds;
+            updateRect.Inflate(5, 5);
+
+            // To make the background of _dropLocationIndicator "transparent", the controls under it
+            // should first be drawn.
+            foreach (Control paginationControl in _flowLayoutPanel.Controls)
+            {
+                if (updateRect.IntersectsWith(paginationControl.Bounds))
+                {
+                    paginationControl.Refresh();
+                }
+            }
+
+            // Now update the the region of this control under the _dropLocationIndicator.
+            Invalidate(updateRect, true);
+            Update();
+
+            // Finally, trigger the _dropLocationIndicator itself to paint on top of the
+            // "background" that has just been drawn.
+            _dropLocationIndicator.Invalidate();
         }
 
         /// <summary>
@@ -2367,7 +2417,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI0");
+                ex.ExtractDisplay("ELI35582");
             }
             finally
             {
@@ -2377,7 +2427,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 catch (Exception ex)
                 {
-                    ex.ExtractLog("ELI0");
+                    ex.ExtractLog("ELI35583");
                 }
 
                 ResumeLayout(true);
@@ -2403,7 +2453,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 //        /// <summary>
 //        /// Handles a UI command to move the current selection up from the active control.
 //        /// </summary>
-//        /// <param name="down"></param>
+//        /// <param name="down"><see langword="true"/> to move the selection down;
+//        /// <see langword="false"/> to find the next control up.</param>
 //        void HandleMoveSelectionUpOrDown(bool down)
 //        {
 //            try
@@ -2429,7 +2480,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 //            }
 //            catch (Exception ex)
 //            {
-//                ex.ExtractDisplay("ELI0");
+//                ex.ExtractDisplay("ELI35584");
 //            }
 //            finally
 //            {
@@ -2439,7 +2490,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 //                }
 //                catch (Exception ex)
 //                {
-//                    ex.ExtractLog("ELI0");
+//                    ex.ExtractLog("ELI35585");
 //                }
 //
 //                ResumeLayout(true);

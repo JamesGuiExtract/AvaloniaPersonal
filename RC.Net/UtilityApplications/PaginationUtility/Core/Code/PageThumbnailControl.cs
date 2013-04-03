@@ -540,7 +540,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                Page.ImageOrientation = _activeImageViewer.Orientation;
+                if (_activeImageViewer == null)
+                {
+                    new ExtractException("ELI35587", "Unexpected image viewer event registration").Log();
+                    var imageViewer = (ImageViewer)sender;
+                    imageViewer.ImageChanged -= HandleImageViewer_ImageChanged;
+                    imageViewer.PageChanged -= HandleImageViewer_PageChanged;
+                    imageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
+                }
+                else
+                {
+                    Page.ImageOrientation = _activeImageViewer.Orientation;
+                }
             }
             catch (Exception ex)
             {
@@ -598,7 +609,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return;
             }
 
-            // Since the thumbnail be changed by a background thread and we don't want the work
+            // Since the thumbnail may be changed by a background thread and we don't want the work
             // of the background worker to be held up waiting on messages currently being
             // handled in the UI thread, invoke the image change to occur on the UI thread.
             this.SafeBeginInvoke("ELI35559", () =>

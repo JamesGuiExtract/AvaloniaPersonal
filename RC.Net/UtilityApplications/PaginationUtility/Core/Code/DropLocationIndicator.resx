@@ -117,39 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="_topPictureBox.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAACeSURBVEhLtY+xDYAwDARdMgYlY1CyNWNQMgYl+FFSIEKw44+ll1z934mInJ0juw4cHUbQiW5Z
-        0sM2QTm6ZdSsZAvQoxPdMmhmsgXo0Ynu+5gWD/o8wLR40TMtivRMi096hkWVnmHxSx+xMNFHLMz0LRYu
-        +hYLN73HooneY9FMb7EI0VsswvQ1Cwp9zYJGX7Kg0pcs6PR5ZNJnS8FvugsxUjbYr/tG3gAAAABJRU5E
-        rkJggg==
-</value>
-  </data>
-  <data name="_topPictureBox.InitialImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAACeSURBVEhLtY+xDYAwDARdMgYlY1CyNWNQMgYl+FFSIEKw44+ll1z934mInJ0juw4cHUbQiW5Z
-        0sM2QTm6ZdSsZAvQoxPdMmhmsgXo0Ynu+5gWD/o8wLR40TMtivRMi096hkWVnmHxSx+xMNFHLMz0LRYu
-        +hYLN73HooneY9FMb7EI0VsswvQ1Cwp9zYJGX7Kg0pcs6PR5ZNJnS8FvugsxUjbYr/tG3gAAAABJRU5E
-        rkJggg==
-</value>
-  </data>
-  <data name="_bottomPictureBox.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAABoSURBVChThZBBCsAwCASlz+hrS0/9aJ+QY2ldWCE0ugpLJDEzoNlam19dDPq2dp+4GfSyQDw8
-        D4NeWoL++iACU2mZ6fEBptLyp0tLRpeWip5aFD21dPTFcnLn8VCd2BhmbXDn3Qe8jw+5qU25REfhSwAA
-        AABJRU5ErkJggg==
-</value>
-  </data>
-  <data name="_bottomPictureBox.InitialImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAABoSURBVChThZBBCsAwCASlz+hrS0/9aJ+QY2ldWCE0ugpLJDEzoNlam19dDPq2dp+4GfSyQDw8
-        D4NeWoL++iACU2mZ6fEBptLyp0tLRpeWip5aFD21dPTFcnLn8VCd2BhmbXDn3Qe8jw+5qU25REfhSwAA
-        AABJRU5ErkJggg==
-</value>
-  </data>
 </root>

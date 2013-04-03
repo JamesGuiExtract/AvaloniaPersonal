@@ -183,7 +183,6 @@
             // 
             // _imageViewer
             // 
-            this._imageViewer.AllowDrop = true;
             this._imageViewer.AutoOcr = false;
             this._imageViewer.AutoZoomScale = 0;
             this._imageViewer.Dock = System.Windows.Forms.DockStyle.Fill;

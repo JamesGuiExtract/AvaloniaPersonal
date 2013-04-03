@@ -1,5 +1,6 @@
 ﻿using Extract.Drawing;
 using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace Extract.UtilityApplications.PaginationUtility
@@ -21,9 +22,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 InitializeComponent();
 
-                // The background should be transparent so it appears the indicator is drawn on top
-                // of the underlying controls.
-                SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+                SetStyle(ControlStyles.UserPaint, true);
+                SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             }
             catch (Exception ex)
             {
@@ -45,12 +45,18 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.OnPaint(e);
 
-                int x = (Width / 2);
-                e.Graphics.DrawLine(ExtractPens.DashedBlack, x, 0, x, Height);
+                // Draw a dashed vertical line down the center.
+                int centerX = (Width / 2);
+                e.Graphics.DrawLine(ExtractPens.DashedBlack, centerX, 0, centerX, Height);
+
+                // Draw a triangle at the top and bottom (pointing toward the center).
+                e.Graphics.DrawImage(Properties.Resources.DownArrow, ClientRectangle.Location);
+                e.Graphics.DrawImage(Properties.Resources.UpArrow,
+                    new Point(ClientRectangle.Left, ClientRectangle.Bottom - Properties.Resources.UpArrow.Height));
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI35420");
+                ex.ExtractDisplay("ELI35420");
             }
         }
 
@@ -80,6 +86,34 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 ex.ExtractDisplay("ELI35421");
             }
+        }
+
+        /// <summary>
+        /// Gets the required creation parameters when the control handle is created.
+        /// Overridden in order to make the control transparent.
+        /// </summary>
+        /// <returns>A <see cref="T:System.Windows.Forms.CreateParams"/> that contains the required
+        /// creation parameters when the handle to the control is created.</returns>
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                const int WS_EX_TRANSPARENT = 0x0084;
+
+                CreateParams createParams = base.CreateParams;
+                createParams.ExStyle |= WS_EX_TRANSPARENT;
+                return createParams;
+            }
+        }
+
+        /// <summary>
+        /// Paints the background of the control.
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.PaintEventArgs"/> that contains the
+        /// event data.</param>
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+            // Do not paint background so that any controls under this one show through.
         }
 
         #endregion Overrides

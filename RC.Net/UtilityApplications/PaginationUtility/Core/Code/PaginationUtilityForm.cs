@@ -642,12 +642,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         document = OpenDocument(fileName);
                     }
 
-                    // If unable to open then document, don't throw an exception, just act as though
-                    // the data was not on the clipboard in the first place.
-                    if (document == null)
-                    {
-                        break;
-                    }
+                    ExtractException.Assert("ELI35573", "Unable to retrieve document",
+                        document != null, "Filename", fileName);
 
                     // Return null to insert a document separator before the first page.
                     yield return null;

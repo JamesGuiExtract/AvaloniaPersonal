@@ -29,10 +29,10 @@
             this._flowLayoutPanel.Name = "_flowLayoutPanel";
             this._flowLayoutPanel.Size = new System.Drawing.Size(459, 425);
             this._flowLayoutPanel.TabIndex = 0;
-            this._flowLayoutPanel.DragDrop += new System.Windows.Forms.DragEventHandler(this.HandleFlowLayoutPanel_DragDrop);
-            this._flowLayoutPanel.DragEnter += new System.Windows.Forms.DragEventHandler(this.HandleFlowLayoutPanel_DragEnter);
-            this._flowLayoutPanel.DragOver += new System.Windows.Forms.DragEventHandler(this.HandleFlowLayoutPanel_DragOver);
-            this._flowLayoutPanel.DragLeave += new System.EventHandler(this.HandleFlowLayoutPanel_DragLeave);
+            this._flowLayoutPanel.DragDrop += new System.Windows.Forms.DragEventHandler(this.Handle_DragDrop);
+            this._flowLayoutPanel.DragEnter += new System.Windows.Forms.DragEventHandler(this.Handle_DragEnter);
+            this._flowLayoutPanel.DragOver += new System.Windows.Forms.DragEventHandler(this.Handlel_DragOver);
+            this._flowLayoutPanel.DragLeave += new System.EventHandler(this.Handle_DragLeave);
             // 
             // PageLayoutControl
             // 
