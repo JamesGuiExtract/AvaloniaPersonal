@@ -131,6 +131,7 @@
             this._outputDocumentToolStripButton.Name = "_outputDocumentToolStripButton";
             this._outputDocumentToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._outputDocumentToolStripButton.Text = "Output document(s)";
+            this._outputDocumentToolStripButton.ToolTipText = "Output document(s)  (Ctrl + S)";
             this._outputDocumentToolStripButton.Click += new System.EventHandler(this.HandleOutputDocumentToolStripButton_Click);
             // 
             // _outputFileNameToolStripTextBox
@@ -381,19 +382,19 @@
             // _restartToolStripMenuItem
             // 
             this._restartToolStripMenuItem.Name = "_restartToolStripMenuItem";
-            this._restartToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._restartToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this._restartToolStripMenuItem.Text = "&Restart";
             this._restartToolStripMenuItem.Click += new System.EventHandler(this.HandleRestartToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(107, 6);
             // 
             // _exitToolStripMenuItem
             // 
             this._exitToolStripMenuItem.Name = "_exitToolStripMenuItem";
-            this._exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._exitToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this._exitToolStripMenuItem.Text = "E&xit";
             // 
             // _toolsToolStripMenuItem

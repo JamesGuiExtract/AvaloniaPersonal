@@ -1,5 +1,6 @@
 ﻿using Extract.Imaging;
 using Extract.Utilities;
+using Leadtools;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -222,7 +223,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                                     writer = codecs.CreateWriter(FileName, reader.Format, false);
                                 }
 
-                                writer.AppendImage(reader.ReadPage(page.OriginalPageNumber));
+                                RasterImage pageImage = reader.ReadPage(page.OriginalPageNumber);
+                                // Image must be rotated with forceTrueRotation to true, otherwise
+                                // the output page is not rendered with the correct orientation
+                                // (unclear why).
+                                ImageMethods.RotateImageByDegrees(
+                                    pageImage, page.ImageOrientation, true);
+                                writer.AppendImage(pageImage);
                             }
 
                             writer.Commit(false);

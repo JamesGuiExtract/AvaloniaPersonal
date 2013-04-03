@@ -1,4 +1,5 @@
-﻿using Leadtools;
+﻿using Extract.Imaging;
+using Leadtools;
 using Leadtools.Drawing;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// The thumbnail <see cref="RasterImage"/> for this page.
         /// </summary>
         RasterImage _thumbnailImage;
+
+        /// <summary>
+        /// The current orientation of the image page relative to its original orientation in
+        /// degrees.
+        /// </summary>
+        int _imageOrientation;
 
         /// <summary>
         /// <see langword="true"/> if this instance has been disposed; <see langword="false"/>
@@ -71,6 +78,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Raised when the <see cref="ThumbnailImage"/> has changed.
         /// </summary>
         public event EventHandler<EventArgs> ThumbnailChanged;
+
+        /// <summary>
+        /// Raised when the orienatation of the <see cref="ThumbnailImage"/> has changed.
+        /// </summary>
+        public event EventHandler<EventArgs> OrientationChanged;
 
         #endregion Events
 
@@ -145,6 +157,44 @@ namespace Extract.UtilityApplications.PaginationUtility
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI35424");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the orientation of the image page relative to its original orientation in
+        /// degrees.
+        /// </summary>
+        /// <value>
+        /// The orientation of the image page relative to its original orientation in degrees.
+        /// </value>
+        public int ImageOrientation
+        {
+            get
+            {
+                return _imageOrientation;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _imageOrientation)
+                    {
+                        if (ThumbnailImage != null)
+                        {
+                            ImageMethods.RotateImageByDegrees(ThumbnailImage,
+                                value - _imageOrientation);
+
+                            OnOrientationChanged();
+                        }
+
+                        _imageOrientation = value;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractDisplay("ELI35565");
                 }
             }
         }
@@ -293,6 +343,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         void OnThumbnailChanged()
         {
             var eventHandler = ThumbnailChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="OrientationChanged"/> event.
+        /// </summary>
+        void OnOrientationChanged()
+        {
+            var eventHandler = OrientationChanged;
             if (eventHandler != null)
             {
                 eventHandler(this, new EventArgs());

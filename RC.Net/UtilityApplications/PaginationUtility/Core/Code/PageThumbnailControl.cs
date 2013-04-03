@@ -105,6 +105,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // instance is.
                 _page.AddReference(this);
                 _page.ThumbnailChanged += HandlePage_ThumbnailChanged;
+                _page.OrientationChanged += HandlePage_OrientationChanged;
 
                 // Turn on anti-aliasing
                 RasterSupport.Unlock(RasterSupportType.Document, _DOCUMENT_SUPPORT_KEY);
@@ -224,9 +225,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                             imageViewer.OpenImage(Page.OriginalDocumentName, false);
                         }
                         imageViewer.PageNumber = Page.OriginalPageNumber;
+                        imageViewer.Orientation = -Page.ImageOrientation;
 
                         imageViewer.ImageChanged += HandleImageViewer_ImageChanged;
                         imageViewer.PageChanged += HandleImageViewer_PageChanged;
+                        imageViewer.OrientationChanged += HandleActiveImageViewer_OrientationChanged;
                     }
                     _activeImageViewer = imageViewer;
 
@@ -236,6 +239,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 else if (!display && _activeImageViewer != null)
                 {
                     _activeImageViewer.CloseImage();
+                    _activeImageViewer.ImageChanged -= HandleImageViewer_ImageChanged;
+                    _activeImageViewer.PageChanged -= HandleImageViewer_PageChanged;
+                    _activeImageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
                     _activeImageViewer = null;
 
                     // Refresh _outerPanel to remove the indication that it is currently displayed.
@@ -355,6 +361,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (_page != null)
                     {
+                        _page.ThumbnailChanged -= HandlePage_ThumbnailChanged;
+                        _page.OrientationChanged -= HandlePage_OrientationChanged;
                         _page.RemoveReference(this);
                         _page = null;
                     }
@@ -387,25 +395,34 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (IsDisposed)
-                {
-                    return;
-                }
-
-                // Since the thumbnail be changed by a background thread and we don't want the work
-                // of the background worker to be held up waiting on messages currently being
-                // handled in the UI thread, invoke the image change to occur on the UI thread.
-                this.SafeBeginInvoke("ELI35559", () =>
-                {
-                    if (!IsDisposed)
-                    {
-                        _rasterPictureBox.Image = _page.ThumbnailImage.Clone();
-                    }
-                });
+                UpdateThumbnail();
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35481");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:Page.OrientationChanged"/> event of the <see cref="Page"/> control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandlePage_OrientationChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateThumbnail();
+
+                if (Document != null)
+                {
+                    Document.InOriginalForm = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35566");
             }
         }
 
@@ -424,6 +441,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _activeImageViewer.ImageChanged -= HandleImageViewer_ImageChanged;
                     _activeImageViewer.PageChanged -= HandleImageViewer_PageChanged;
+                    _activeImageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
                     _activeImageViewer = null;
 
                     // Refresh _outerPanel to remove the indication that it is currently displayed.
@@ -453,6 +471,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _activeImageViewer.ImageChanged -= HandleImageViewer_ImageChanged;
                     _activeImageViewer.PageChanged -= HandleImageViewer_PageChanged;
+                    _activeImageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
                     _activeImageViewer = null;
 
                     // Refresh _outerPanel to remove the indication that it is currently displayed.
@@ -510,6 +529,25 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="ImageViewer.OrientationChanged"/> event of the
+        /// <see cref="_activeImageViewer"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.OrientationChangedEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleActiveImageViewer_OrientationChanged(object sender, OrientationChangedEventArgs e)
+        {
+            try
+            {
+                Page.ImageOrientation = _activeImageViewer.Orientation;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35564");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -548,6 +586,29 @@ namespace Extract.UtilityApplications.PaginationUtility
                     ? _SEPARATOR_ALLOWANCE_PADDING
                     : _NORMAL_PADDING;
             }
+        }
+
+        /// <summary>
+        /// Updates the thumbnail image.
+        /// </summary>
+        void UpdateThumbnail()
+        {
+            if (IsDisposed)
+            {
+                return;
+            }
+
+            // Since the thumbnail be changed by a background thread and we don't want the work
+            // of the background worker to be held up waiting on messages currently being
+            // handled in the UI thread, invoke the image change to occur on the UI thread.
+            this.SafeBeginInvoke("ELI35559", () =>
+            {
+                if (!IsDisposed)
+                {
+                    _rasterPictureBox.Image = _page.ThumbnailImage.Clone();
+                    _rasterPictureBox.Invalidate();
+                }
+            });
         }
 
         #endregion Private Members

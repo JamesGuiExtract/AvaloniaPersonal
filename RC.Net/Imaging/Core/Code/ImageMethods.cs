@@ -181,6 +181,18 @@ namespace Extract.Imaging
         /// <param name="angle">The number of degrees to rotate the image.</param>
         public static void RotateImageByDegrees(RasterImage image, int angle)
         {
+            RotateImageByDegrees(image, angle, false);
+        }
+
+        /// <summary>
+        /// Rotates the specified image by the specified number of degrees.
+        /// </summary>
+        /// <param name="image">The image to rotate.</param>
+        /// <param name="angle">The number of degrees to rotate the image.</param>
+        /// <param name="forceTrueRotation"><see langword="true"/> to force true rotation;
+        /// <see langword="false"/> to allow the view perspective to be modified instead.</param>
+        public static void RotateImageByDegrees(RasterImage image, int angle, bool forceTrueRotation)
+        {
             try
             {
                 // Validate the license
@@ -189,12 +201,13 @@ namespace Extract.Imaging
 
                 if (angle != 0)
                 {
-                    bool viewPerspectiveLicensed = !RasterSupport.IsLocked(RasterSupportType.Document);
+                    bool useViewPerspective =
+                        !forceTrueRotation && !RasterSupport.IsLocked(RasterSupportType.Document);
 
                     // Rotate the image.
                     // It is faster to rotate using the view perspective, so rotate that 
                     // way if it is licensed. Otherwise, use the slower rotate command.
-                    if (viewPerspectiveLicensed)
+                    if (useViewPerspective)
                     {
                         // Fast rotation
                         image.RotateViewPerspective(angle % 360);

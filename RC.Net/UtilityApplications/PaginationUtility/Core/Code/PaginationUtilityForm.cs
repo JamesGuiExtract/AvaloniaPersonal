@@ -577,8 +577,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Retrieves as an enumerable of <see cref="Page"/>s the data from the clipboard. This will
-        /// attempt to use a backup copy if it fails to retrieve the data on the clipboard.
+        /// Retrieves as an enumerable of <see cref="Page"/>s the data from the clipboard.
         /// </summary>
         /// <returns>An enumerable of <see cref="Page"/>s that represents the data
         /// currently on the clipboard, or <see langword="null"/> if there is no pagination utility
@@ -595,10 +594,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                     DereferenceLastClipboardData();
                 }
 
-                // If we found data on the clipboard, convert it to an array of Pages.
+                // If we found ClipboardData on the clipboard, convert it to an array of Pages.
                 if (clipboardData != null)
                 {
                     return clipboardData.GetPages(this);
+                }
+
+                // If we found FileDrop data on the clipboard, convert it to an array of Pages.
+                if (dataObject.GetDataPresent(DataFormats.FileDrop))
+                {
+                    return GetPagesFromFileDrop(dataObject);
                 }
 
                 return null;
@@ -606,6 +611,61 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35516");
+            }
+        }
+
+        /// <summary>
+        /// Retrieves as an enumerable of <see cref="Page"/>s the from the specified
+        /// <see paramref="dataObject"/> using the <see cref="DataFormats.FileDrop"/> format.
+        /// </summary>
+        /// <returns>An enumerable of <see cref="Page"/>s that represents the data
+        /// in <see paramref="dataObject"/>, or <see langword="null"/> if there is no such data in
+        /// <see paramref="dataObject"/>.</returns>
+        internal IEnumerable<Page> GetPagesFromFileDrop(IDataObject dataObject)
+        {
+            bool returnedPages = false;
+
+            string[] windowsFileList = dataObject.GetData(DataFormats.FileDrop) as string[];
+            if (windowsFileList != null)
+            {
+                foreach (string fileName in windowsFileList)
+                {
+                    // See if the document indicated is already open as a SourceDocument.
+                    SourceDocument document = _sourceDocuments
+                        .Where(doc =>
+                            doc.FileName.Equals(fileName, StringComparison.OrdinalIgnoreCase))
+                        .SingleOrDefault();
+
+                    // If not, open it as a SourceDocument.
+                    if (document == null)
+                    {
+                        document = OpenDocument(fileName);
+                    }
+
+                    // If unable to open then document, don't throw an exception, just act as though
+                    // the data was not on the clipboard in the first place.
+                    if (document == null)
+                    {
+                        break;
+                    }
+
+                    // Return null to insert a document separator before the first page.
+                    yield return null;
+
+                    // Return the each page from the document
+                    foreach (Page page in document.Pages)
+                    {
+                        returnedPages = true;
+                        yield return page;
+                    }
+                }
+            }
+
+            if (returnedPages)
+            {
+                // Return null to insert a document separator after the last page (as long as there
+                // were any pages that were returned.
+                yield return null;
             }
         }
 
