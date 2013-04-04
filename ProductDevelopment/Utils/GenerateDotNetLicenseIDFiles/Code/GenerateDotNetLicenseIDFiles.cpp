@@ -115,6 +115,7 @@ void buildReplacementVariableList(map<string, string>& rmapReplacementVariables)
 	rmapReplacementVariables["UiObject"] = "UIObject";
 	rmapReplacementVariables["Icomap"] = "IcoMap";
 	rmapReplacementVariables["Labde"] = "LabDE";
+	rmapReplacementVariables["PaginationUi"] = "PaginationUI";
 }
 //--------------------------------------------------------------------------------------------------
 void processComponentIDFile(const string& strComponentIDFile, string& rstrIdFileContents,
