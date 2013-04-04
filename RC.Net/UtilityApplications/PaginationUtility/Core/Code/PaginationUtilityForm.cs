@@ -723,7 +723,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
                 _primaryPageLayoutControl.PageDeleted += HandlePageLayoutControl_PageDeleted;
                 _pageLayoutToolStripContainer.ContentPanel.Controls.Add(_primaryPageLayoutControl);
-                ActiveControl = _primaryPageLayoutControl;
+                _primaryPageLayoutControl.Focus();
 
                 // If not using pre-determined settings, the settings dialog should be displayed
                 // first to allow the user to confirm/edit settings before input documents are
@@ -777,7 +777,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 base.OnEnter(e);
 
                 // Ensure _primaryPageLayoutControl it the control that gets focus by default.
-                ActiveControl = _primaryPageLayoutControl;
+                _primaryPageLayoutControl.Focus();
             }
             catch (Exception ex)
             {
@@ -920,7 +920,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _primaryPageLayoutControl.UpdateCommandStates();
+                try
+                {
+                    _primaryPageLayoutControl.UpdateCommandStates();
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractDisplay("ELI35594");
+                }
             }
             catch (Exception ex)
             {
@@ -936,7 +943,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         void HandleCutMenuItem_Click(object sender, EventArgs e)
         {
-            _primaryPageLayoutControl.HandleCutSelectedControls();
+            try
+            {
+                _primaryPageLayoutControl.HandleCutSelectedControls();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35595");
+            }
         }
 
         /// <summary>
@@ -947,7 +961,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         void HandleCopyMenuItem_Click(object sender, EventArgs e)
         {
-            _primaryPageLayoutControl.HandleCopySelectedControls();
+            try
+            {
+                _primaryPageLayoutControl.HandleCopySelectedControls();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35596");
+            }
         }
 
         /// <summary>
@@ -959,7 +980,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         void HandleInsertDocumentSeparator_Click(object sender, EventArgs e)
         {
-            _primaryPageLayoutControl.HandleInsertDocumentSeparator();
+            try
+            {
+                _primaryPageLayoutControl.HandleInsertDocumentSeparator();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35597");
+            }
         }
 
         /// <summary>
@@ -970,7 +998,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         void HandleInsertCopiedMenuItem_Click(object sender, EventArgs e)
         {
-            _primaryPageLayoutControl.HandleInsertCopied();
+            try
+            {
+                _primaryPageLayoutControl.HandleInsertCopied();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35598");
+            }
         }
 
         /// <summary>
@@ -981,7 +1016,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         void HandleDeleteMenuItem_Click(object sender, EventArgs e)
         {
-            _primaryPageLayoutControl.HandleDeleteSelectedItems();
+            try
+            {
+                _primaryPageLayoutControl.HandleDeleteSelectedItems();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35599");
+            }
         }
 
         /// <summary>
@@ -1378,7 +1420,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 // Don't allow the split container to handle any keyboard input, instead redirect
                 // focus back to _primaryPageLayoutControl.
-                ActiveControl = _primaryPageLayoutControl;
+                _primaryPageLayoutControl.Focus();
                 e.Handled = true;
 
                 // If an arrow key is pressed, go ahead an execute the corresponding selection

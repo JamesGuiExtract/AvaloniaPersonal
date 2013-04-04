@@ -530,6 +530,7 @@
             this.ClientSize = new System.Drawing.Size(1088, 519);
             this.Controls.Add(this._menuStrip);
             this.Controls.Add(this._splitContainer);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(575, 300);
             this.Name = "PaginationUtilityForm";
             this.Text = "Pagination Utility";

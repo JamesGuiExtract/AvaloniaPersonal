@@ -194,6 +194,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 InitializeComponent();
 
+                this.SetStyle(ControlStyles.Selectable, true);
+
                 // When dragging files in from the Windows shell, _dropLocationIndicator receives
                 // drag/drop events if the mouse is over the indicator.
                 _dropLocationIndicator.DragDrop += Handle_DragDrop;

@@ -10,9 +10,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Extract.DataEntry.DEP.StandardLabDE")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract System, LLC")]
+[assembly: AssemblyCompany("Extract Systems, LLC")]
 [assembly: AssemblyProduct("Extract.DataEntry.DEP.StandardLabDE.Properties")]
-[assembly: AssemblyCopyright("Copyright © Extract System, LLC 2009")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

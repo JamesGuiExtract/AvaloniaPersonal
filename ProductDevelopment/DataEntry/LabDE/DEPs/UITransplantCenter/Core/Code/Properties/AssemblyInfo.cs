@@ -9,9 +9,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Extract.DataEntry.DEP.UITransplantCenter")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract System, LLC")]
+[assembly: AssemblyCompany("Extract Systems, LLC")]
 [assembly: AssemblyProduct("Extract.DataEntry.DEP.UITransplantCenter")]
-[assembly: AssemblyCopyright("Copyright © Extract System, LLC 2012")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

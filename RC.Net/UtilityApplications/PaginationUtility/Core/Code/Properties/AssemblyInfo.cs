@@ -10,9 +10,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Allows document pages to be combined, split or recombined into " +
     "new output documents in a convenient visual interface.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract System, LLC")]
+[assembly: AssemblyCompany("Extract Systems, LLC")]
 [assembly: AssemblyProduct("Pagination Utility")]
-[assembly: AssemblyCopyright("Copyright © Extract System, LLC 2013")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

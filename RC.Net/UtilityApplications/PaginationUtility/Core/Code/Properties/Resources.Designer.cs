@@ -74,6 +74,13 @@ namespace Extract.UtilityApplications.PaginationUtility.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap PaginationIcon {
+            get {
+                object obj = ResourceManager.GetObject("PaginationIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap SaveImageButton {
             get {
                 object obj = ResourceManager.GetObject("SaveImageButton", resourceCulture);
