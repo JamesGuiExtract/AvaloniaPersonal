@@ -41,7 +41,7 @@
 ///////////
 !ExtractCore,6001
 !InputFunnelCore,6002:6070:$ExtractCore
-!FlexIndexAndIDShieldCore,6003:6076:$RuleWritingCore
+!FlexIndexAndIDShieldCore,6003:6051:6076:$RuleWritingCore
 !FlexIndex,6004:$FlexIndexAndIDShieldCore:$DataEntryCore
 !RedactionCore,6010
 !IDShield,6005:$FlexIndexAndIDShieldCore:$RedactionCore
@@ -100,6 +100,7 @@ FLEX Index / ID Shield Utilities,0
 -    Modify PDF (Pegasus PDF Annotation Removal),6082:6073
 -    PDF Read+Write,6073
 -    FTP/SFTP file transfer,6083
+-    Pagination Utility,6051
 
 ID Shield Office 1.0,0
 -    ID Shield Office,$IDShieldOffice

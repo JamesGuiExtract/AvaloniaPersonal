@@ -227,11 +227,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                         imageViewer.PageNumber = Page.OriginalPageNumber;
                         imageViewer.Orientation = -Page.ImageOrientation;
 
-                        imageViewer.ImageChanged += HandleImageViewer_ImageChanged;
-                        imageViewer.PageChanged += HandleImageViewer_PageChanged;
-                        imageViewer.OrientationChanged += HandleActiveImageViewer_OrientationChanged;
+                        if (_activeImageViewer == null)
+                        {
+                            imageViewer.ImageChanged += HandleImageViewer_ImageChanged;
+                            imageViewer.PageChanged += HandleImageViewer_PageChanged;
+                            imageViewer.OrientationChanged += HandleActiveImageViewer_OrientationChanged;
+
+                            _activeImageViewer = imageViewer;
+                        }
                     }
-                    _activeImageViewer = imageViewer;
 
                     ParentForm.Refresh();
                 }
@@ -278,7 +282,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     // Indicate selection with the BackColor of _outerPanel
                     _outerPanel.BackColor = value
-                        ? SystemColors.ActiveBorder
+                        ? SystemColors.ControlDark
                         : SystemColors.Control;
                 }
             }
@@ -540,18 +544,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (_activeImageViewer == null)
-                {
-                    new ExtractException("ELI35587", "Unexpected image viewer event registration").Log();
-                    var imageViewer = (ImageViewer)sender;
-                    imageViewer.ImageChanged -= HandleImageViewer_ImageChanged;
-                    imageViewer.PageChanged -= HandleImageViewer_PageChanged;
-                    imageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
-                }
-                else
-                {
-                    Page.ImageOrientation = _activeImageViewer.Orientation;
-                }
+                ExtractException.Assert("ELI35587", "Unexpected image viewer event registration",
+                    _activeImageViewer != null);
+
+                Page.ImageOrientation = _activeImageViewer.Orientation;
             }
             catch (Exception ex)
             {

@@ -18,7 +18,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
 
                 // Validate that this is licensed
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                LicenseUtilities.ValidateLicense(LicenseIdName.PaginationUIObject,
                     "ELI35543", "PaginationUtility");
 
                 Application.EnableVisualStyles();

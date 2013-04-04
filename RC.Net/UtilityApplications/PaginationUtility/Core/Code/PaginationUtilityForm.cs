@@ -299,6 +299,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         HashSet<string> _processedDocumentNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
+        /// Any documents that have failed to load and should not be retried on subsequent
+        /// iterations of LoadNextDocument.
+        /// </summary>
+        HashSet<string> _failedFileNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
         /// Indicates whether a call to check to see if more pages need to be loaded is pending.
         /// </summary>
         bool _pageLoadPending;
@@ -355,7 +361,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
                 }
 
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                LicenseUtilities.ValidateLicense(LicenseIdName.PaginationUIObject,
                     "ELI35509", _OBJECT_NAME);
 
                 // Comment back in to support multiple tabs (for scratch area, recycling bin, etc)
@@ -724,10 +730,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // loaded.
                 if (!_usingPredeterminedSettings)
                 {
-                    ShowSettingsDialog();
+                    if (ShowSettingsDialog() == DialogResult.OK)
+                    {
+                        LoadMorePages();
+                    }
                 }
-                
-                LoadMorePages();
+                else
+                {
+                    LoadMorePages();
+                }
             }
             catch (Exception ex)
             {
@@ -841,13 +852,36 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                ShowSettingsDialog();
-
-                LoadMorePages();
+                if (ShowSettingsDialog() == DialogResult.OK)
+                {
+                    LoadMorePages();
+                }
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35523");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the
+        /// <see cref="_loadNextDocumentMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleLoadNextDocumentMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!LoadNextDocument())
+                {
+                    UtilityMethods.ShowMessageBox("No more input documents were found.",
+                        "No more input documents", false);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35590");
             }
         }
 
@@ -876,13 +910,107 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Handles the <see cref="T:ToolStripMenuItem.DropDownOpening"/> event of the
+        /// <see cref="_editMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleEditMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            try
+            {
+                _primaryPageLayoutControl.UpdateCommandStates();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35591");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_cutMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleCutMenuItem_Click(object sender, EventArgs e)
+        {
+            _primaryPageLayoutControl.HandleCutSelectedControls();
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_copyMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleCopyMenuItem_Click(object sender, EventArgs e)
+        {
+            _primaryPageLayoutControl.HandleCopySelectedControls();
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the
+        /// <see cref="_insertDocumentSeparatorMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleInsertDocumentSeparator_Click(object sender, EventArgs e)
+        {
+            _primaryPageLayoutControl.HandleInsertDocumentSeparator();
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_insertCopiedMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleInsertCopiedMenuItem_Click(object sender, EventArgs e)
+        {
+            _primaryPageLayoutControl.HandleInsertCopied();
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_deleteMenuItem"/>
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleDeleteMenuItem_Click(object sender, EventArgs e)
+        {
+            _primaryPageLayoutControl.HandleDeleteSelectedItems();
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_aboutToolStripMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleAboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                AboutBox aboutBox = new AboutBox();
+                aboutBox.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35589");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="Control.Click"/> event of the
         /// <see cref="_outputDocumentToolStripButton"/> control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        void HandleOutputDocumentToolStripButton_Click(object sender, EventArgs e)
+        void HandleOutputDocuments_Click(object sender, EventArgs e)
         {
             try
             {
@@ -1038,10 +1166,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                // Enable/disable the output document button to match OutputDocumentCommandEnabled.
-                _outputDocumentToolStripButton.Enabled =
-                    _primaryPageLayoutControl.OutputDocumentCommandEnabled;
-
                 if (_primaryPageLayoutControl.PartiallySelectedDocuments.Count() == 1)
                 {
                     OutputDocument selectedDocument =
@@ -1242,14 +1366,58 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="Control.KeyDown"/> event of the <see cref="_splitContainer"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.KeyEventArgs"/> instance containing
+        /// the event data.</param>
+        void HandleSplitContainer_KeyDown(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                // Don't allow the split container to handle any keyboard input, instead redirect
+                // focus back to _primaryPageLayoutControl.
+                ActiveControl = _primaryPageLayoutControl;
+                e.Handled = true;
+
+                // If an arrow key is pressed, go ahead an execute the corresponding selection
+                // command.
+                switch (e.KeyCode)
+                {
+                    case Keys.Left:
+                        _primaryPageLayoutControl.HandleSelectPreviousPage();
+                        break;
+
+                    case Keys.Right:
+                        _primaryPageLayoutControl.HandleSelectNextPage();
+                        break;
+
+                    case Keys.Up:
+                        _primaryPageLayoutControl.HandleSelectPreviousRowPage();
+                        break;
+
+                    case Keys.Down:
+                        _primaryPageLayoutControl.HandleSelectNextRowPage();
+                        break;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35592");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
 
         /// <summary>
-        /// Shows the settings dialog.
+        /// Shows the settings dialog and applies the settings (if applicable).
         /// </summary>
-        void ShowSettingsDialog()
+        /// <returns>The <see cref="DialogResult"/>.</returns>
+        DialogResult ShowSettingsDialog()
         {
             using (var paginationSettingsDialog = new PaginationSettingsDialog(_config))
             {
@@ -1297,6 +1465,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _config.Save();
                     }
                 }
+
+                return dialogResult;
             }
         }
 
@@ -1352,6 +1522,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                     document.Dispose();
                 }
                 _sourceDocuments.Clear();
+
+                _pendingDocuments.Clear();
+                _failedFileNames.Clear();
             }
             catch (Exception ex)
             {
@@ -1600,13 +1773,31 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             while (_inputFileEnumerator.MoveNext())
             {
-                var sourceDocument = OpenDocument(_inputFileEnumerator.Current);
-
-                if (sourceDocument != null)
+                string fileName = _inputFileEnumerator.Current;
+                if (_failedFileNames.Contains(fileName))
                 {
-                    _primaryPageLayoutControl.CreateOutputDocument(sourceDocument);
+                    continue;
+                }
 
-                    return true;
+                try
+                {
+                    var sourceDocument = OpenDocument(fileName);
+
+                    if (sourceDocument != null)
+                    {
+                        _primaryPageLayoutControl.CreateOutputDocument(sourceDocument);
+
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var ee = new ExtractException("ELI35588",
+                        "Unable to load document; document will be ignored until restarted", ex);
+                    ee.AddDebugData("Filename", fileName, false);
+                    ee.Display();
+
+                    _failedFileNames.Add(fileName);
                 }
             }
 

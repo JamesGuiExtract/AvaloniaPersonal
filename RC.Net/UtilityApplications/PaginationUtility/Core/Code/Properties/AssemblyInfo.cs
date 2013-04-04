@@ -7,10 +7,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("PaginationUtility")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Allows document pages to be combined, split or recombined into " +
+    "new output documents in a convenient visual interface.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract System, LLC")]
-[assembly: AssemblyProduct("PaginationUtility")]
+[assembly: AssemblyProduct("Pagination Utility")]
 [assembly: AssemblyCopyright("Copyright © Extract System, LLC 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

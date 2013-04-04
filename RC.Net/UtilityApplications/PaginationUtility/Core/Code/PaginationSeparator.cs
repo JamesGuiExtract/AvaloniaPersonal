@@ -60,7 +60,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     // Indicate selection with the BackColor
                     BackColor = value
-                        ? SystemColors.ActiveBorder
+                        ? SystemColors.ControlDark
                         : SystemColors.Control;
                 }
             }

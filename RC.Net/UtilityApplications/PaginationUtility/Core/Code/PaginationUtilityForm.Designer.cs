@@ -42,9 +42,19 @@
             this._sandDockManager = new TD.SandDock.SandDockManager();
             this._menuStrip = new System.Windows.Forms.MenuStrip();
             this._fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._loadNextDocumentMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._outputSelectedDocumentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this._restartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this._exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._editMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._cutMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._copyMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._deleteMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this._insertCopiedMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._insertDocumentSeparatorMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -70,6 +80,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._splitContainer.BackColor = System.Drawing.SystemColors.Control;
+            this._splitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this._splitContainer.Location = new System.Drawing.Point(0, 27);
             this._splitContainer.Margin = new System.Windows.Forms.Padding(0);
             this._splitContainer.Name = "_splitContainer";
@@ -84,6 +95,7 @@
             this._splitContainer.Size = new System.Drawing.Size(1088, 492);
             this._splitContainer.SplitterDistance = 555;
             this._splitContainer.TabIndex = 0;
+            this._splitContainer.KeyDown += new System.Windows.Forms.KeyEventHandler(this.HandleSplitContainer_KeyDown);
             // 
             // _pageLayoutToolStripContainer
             // 
@@ -131,8 +143,8 @@
             this._outputDocumentToolStripButton.Name = "_outputDocumentToolStripButton";
             this._outputDocumentToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._outputDocumentToolStripButton.Text = "Output document(s)";
-            this._outputDocumentToolStripButton.ToolTipText = "Output document(s)  (Ctrl + S)";
-            this._outputDocumentToolStripButton.Click += new System.EventHandler(this.HandleOutputDocumentToolStripButton_Click);
+            this._outputDocumentToolStripButton.ToolTipText = "Output selected document(s)  (Ctrl + S)";
+            this._outputDocumentToolStripButton.Click += new System.EventHandler(this.HandleOutputDocuments_Click);
             // 
             // _outputFileNameToolStripTextBox
             // 
@@ -360,6 +372,7 @@
             // 
             this._menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._fileToolStripMenuItem,
+            this._editMenuItem,
             this._toolsToolStripMenuItem,
             this._helpToolStripMenuItem});
             this._menuStrip.Location = new System.Drawing.Point(0, 0);
@@ -371,6 +384,9 @@
             // _fileToolStripMenuItem
             // 
             this._fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._loadNextDocumentMenuItem,
+            this._outputSelectedDocumentsMenuItem,
+            this.toolStripSeparator3,
             this._restartToolStripMenuItem,
             this.toolStripSeparator1,
             this._exitToolStripMenuItem});
@@ -378,23 +394,103 @@
             this._fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this._fileToolStripMenuItem.Text = "&File";
             // 
+            // _loadNextDocumentMenuItem
+            // 
+            this._loadNextDocumentMenuItem.Name = "_loadNextDocumentMenuItem";
+            this._loadNextDocumentMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
+            this._loadNextDocumentMenuItem.Size = new System.Drawing.Size(269, 22);
+            this._loadNextDocumentMenuItem.Text = "&Load next document";
+            this._loadNextDocumentMenuItem.Click += new System.EventHandler(this.HandleLoadNextDocumentMenuItem_Click);
+            // 
+            // _outputSelectedDocumentsMenuItem
+            // 
+            this._outputSelectedDocumentsMenuItem.Name = "_outputSelectedDocumentsMenuItem";
+            this._outputSelectedDocumentsMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+            this._outputSelectedDocumentsMenuItem.Size = new System.Drawing.Size(269, 22);
+            this._outputSelectedDocumentsMenuItem.Text = "Output selected document(s)";
+            this._outputSelectedDocumentsMenuItem.Click += new System.EventHandler(this.HandleOutputDocuments_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(266, 6);
+            // 
             // _restartToolStripMenuItem
             // 
             this._restartToolStripMenuItem.Name = "_restartToolStripMenuItem";
-            this._restartToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this._restartToolStripMenuItem.Size = new System.Drawing.Size(269, 22);
             this._restartToolStripMenuItem.Text = "&Restart";
             this._restartToolStripMenuItem.Click += new System.EventHandler(this.HandleRestartToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(107, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(266, 6);
             // 
             // _exitToolStripMenuItem
             // 
             this._exitToolStripMenuItem.Name = "_exitToolStripMenuItem";
-            this._exitToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this._exitToolStripMenuItem.Size = new System.Drawing.Size(269, 22);
             this._exitToolStripMenuItem.Text = "E&xit";
+            // 
+            // _editMenuItem
+            // 
+            this._editMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._cutMenuItem,
+            this._copyMenuItem,
+            this._deleteMenuItem,
+            this.toolStripSeparator2,
+            this._insertCopiedMenuItem,
+            this._insertDocumentSeparatorMenuItem});
+            this._editMenuItem.Name = "_editMenuItem";
+            this._editMenuItem.Size = new System.Drawing.Size(39, 20);
+            this._editMenuItem.Text = "Edit";
+            this._editMenuItem.DropDownOpening += new System.EventHandler(this.HandleEditMenuItem_DropDownOpening);
+            // 
+            // _cutMenuItem
+            // 
+            this._cutMenuItem.Name = "_cutMenuItem";
+            this._cutMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
+            this._cutMenuItem.Size = new System.Drawing.Size(255, 22);
+            this._cutMenuItem.Text = "&Cut";
+            this._cutMenuItem.Click += new System.EventHandler(this.HandleCutMenuItem_Click);
+            // 
+            // _copyMenuItem
+            // 
+            this._copyMenuItem.Name = "_copyMenuItem";
+            this._copyMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
+            this._copyMenuItem.Size = new System.Drawing.Size(255, 22);
+            this._copyMenuItem.Text = "Cop&y";
+            this._copyMenuItem.Click += new System.EventHandler(this.HandleCopyMenuItem_Click);
+            // 
+            // _deleteMenuItem
+            // 
+            this._deleteMenuItem.Name = "_deleteMenuItem";
+            this._deleteMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
+            this._deleteMenuItem.Size = new System.Drawing.Size(255, 22);
+            this._deleteMenuItem.Text = "&Delete";
+            this._deleteMenuItem.Click += new System.EventHandler(this.HandleDeleteMenuItem_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(252, 6);
+            // 
+            // _insertCopiedMenuItem
+            // 
+            this._insertCopiedMenuItem.Name = "_insertCopiedMenuItem";
+            this._insertCopiedMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
+            this._insertCopiedMenuItem.Size = new System.Drawing.Size(255, 22);
+            this._insertCopiedMenuItem.Text = "&Insert copied item(s)";
+            this._insertCopiedMenuItem.Click += new System.EventHandler(this.HandleInsertCopiedMenuItem_Click);
+            // 
+            // _insertDocumentSeparatorMenuItem
+            // 
+            this._insertDocumentSeparatorMenuItem.Name = "_insertDocumentSeparatorMenuItem";
+            this._insertDocumentSeparatorMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
+            this._insertDocumentSeparatorMenuItem.Size = new System.Drawing.Size(255, 22);
+            this._insertDocumentSeparatorMenuItem.Text = "Insert document &separator";
+            this._insertDocumentSeparatorMenuItem.Click += new System.EventHandler(this.HandleInsertDocumentSeparator_Click);
             // 
             // _toolsToolStripMenuItem
             // 
@@ -422,8 +518,9 @@
             // _aboutToolStripMenuItem
             // 
             this._aboutToolStripMenuItem.Name = "_aboutToolStripMenuItem";
-            this._aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
-            this._aboutToolStripMenuItem.Text = "About";
+            this._aboutToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this._aboutToolStripMenuItem.Text = "&About...";
+            this._aboutToolStripMenuItem.Click += new System.EventHandler(this.HandleAboutToolStripMenuItem_Click);
             // 
             // PaginationUtilityForm
             // 
@@ -489,13 +586,23 @@
         private System.Windows.Forms.ToolStripMenuItem _aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripContainer _pageLayoutToolStripContainer;
         private System.Windows.Forms.ToolStrip _toolStrip;
-        private System.Windows.Forms.ToolStripButton _outputDocumentToolStripButton;
+        internal System.Windows.Forms.ToolStripButton _outputDocumentToolStripButton;
         private Extract.Imaging.Forms.ImageViewer _imageViewer;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton _outputFileNameBrowseToolStripButton;
         private Utilities.Forms.ToolStripSpringTextBox _outputFileNameToolStripTextBox;
         private System.Windows.Forms.ToolStripLabel _pagesToolStripLabel;
         private System.Windows.Forms.ToolStripMenuItem _restartToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _loadNextDocumentMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _editMenuItem;
+        internal System.Windows.Forms.ToolStripMenuItem _cutMenuItem;
+        internal System.Windows.Forms.ToolStripMenuItem _copyMenuItem;
+        internal System.Windows.Forms.ToolStripMenuItem _deleteMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        internal System.Windows.Forms.ToolStripMenuItem _insertCopiedMenuItem;
+        internal System.Windows.Forms.ToolStripMenuItem _insertDocumentSeparatorMenuItem;
+        internal System.Windows.Forms.ToolStripMenuItem _outputSelectedDocumentsMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
     }
 }
 

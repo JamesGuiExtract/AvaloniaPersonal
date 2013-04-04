@@ -165,6 +165,9 @@ const unsigned int gnID_SHIELD_OFFICE_OBJECT			= gnBASE_OFFSET + 49;
 // Special ID for the LabDE verification interface.
 const unsigned int gnLABDE_VERIFICATION_UI_OBJECT		= gnBASE_OFFSET + 50;
 
+// Special ID for the pagination UI (Pagination Utility)
+const unsigned int gnPAGINATION_UI_OBJECT				= gnBASE_OFFSET + 51;
+
 
 //-------------------------------------------------------------------------------------------------
 // Constants for individually licensed items

@@ -53,6 +53,7 @@
 6048,Run_Rules_Object
 6049,IDShield_Office_Object
 6050,LabDE_Verification_UI_Object
+6051,Pagination_UI_Object
 
 // IDs for individually licensed features
 6070,Anti_Aliasing_Feature

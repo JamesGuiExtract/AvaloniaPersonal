@@ -189,7 +189,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                LicenseUtilities.ValidateLicense(LicenseIdName.PaginationUIObject,
                     "ELI35428", _OBJECT_NAME);
 
                 InitializeComponent();
@@ -256,19 +256,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             get
             {
                 return _flowLayoutPanel.Controls.OfType<PageThumbnailControl>().Count();
-            }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the output document command is enabled.
-        /// </summary>
-        /// <value><see langword="true"/> if the output document command is enabled; otherwise,
-        /// <see langword="false"/>.</value>
-        public bool OutputDocumentCommandEnabled
-        {
-            get
-            {
-                return _outputDocumentCommand.Enabled;
             }
         }
 
@@ -627,35 +614,37 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _cutMenuItem.ShowShortcutKeys = true;
                 _cutCommand = new ApplicationCommand(ImageViewer.Shortcuts,
                     new Keys[] { Keys.Control | Keys.X }, HandleCutSelectedControls,
-                    new[] { _cutMenuItem }, false, true, false);
+                    new[] { _cutMenuItem, _paginationUtility._cutMenuItem }, false, true, false);
                 _cutMenuItem.Click += HandleCutMenuItem_Click;
 
                 _copyMenuItem.ShortcutKeys = Keys.Control | Keys.C;
                 _copyMenuItem.ShowShortcutKeys = true;
                 _copyCommand = new ApplicationCommand(ImageViewer.Shortcuts,
                     new Keys[] { Keys.Control | Keys.C }, HandleCopySelectedControls,
-                    new[] { _copyMenuItem }, false, true, false);
+                    new[] { _copyMenuItem, _paginationUtility._copyMenuItem }, false, true, false);
                 _copyMenuItem.Click += HandleCopyMenuItem_Click;
 
                 _insertCopiedMenuItem.ShortcutKeys = Keys.Control | Keys.V;
                 _insertCopiedMenuItem.ShowShortcutKeys = true;
                 _insertCopiedCommand = new ApplicationCommand(ImageViewer.Shortcuts,
                     new Keys[] { Keys.Control | Keys.V }, HandleInsertCopied,
-                    new[] { _insertCopiedMenuItem }, false, true, false);
+                    new[] { _insertCopiedMenuItem, _paginationUtility._insertCopiedMenuItem },
+                    false, true, false);
                 _insertCopiedMenuItem.Click += HandleInsertCopiedMenuItem_Click;
 
                 _deleteMenuItem.ShortcutKeys = Keys.Delete;
                 _deleteMenuItem.ShowShortcutKeys = true;
                 _deleteCommand = new ApplicationCommand(ImageViewer.Shortcuts,
                     new Keys[] { Keys.Delete }, HandleDeleteSelectedItems,
-                    new[] { _deleteMenuItem }, false, true, false);
+                    new[] { _deleteMenuItem, _paginationUtility._deleteMenuItem }, false, true, false);
                 _deleteMenuItem.Click += HandleDeleteMenuItem_Click;
 
                 _insertDocumentSeparatorMenuItem.ShortcutKeys = Keys.Control | Keys.D;
                 _insertDocumentSeparatorMenuItem.ShowShortcutKeys = true;
                 _insertDocumentSeparatorCommand = new ApplicationCommand(ImageViewer.Shortcuts,
                     new Keys[] { Keys.Control | Keys.D }, HandleInsertDocumentSeparator,
-                    new[] { _insertDocumentSeparatorMenuItem }, false, true, true);
+                    new[] { _insertDocumentSeparatorMenuItem, _paginationUtility._insertDocumentSeparatorMenuItem }, 
+                    false, true, true);
                 _insertDocumentSeparatorMenuItem.Click += HandleInsertDocumentSeparator_Click;
 
                 _outputDocumentCommand = new ApplicationCommand(ImageViewer.Shortcuts,
@@ -1201,6 +1190,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     ProcessControlSelection(_commandTargetControl, true, true);
                 }
+                else if (_commandTargetControl == null)
+                {
+                    ClearSelection();
+                }
 
                 UpdateCommandStates();
             }
@@ -1525,8 +1518,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             Rectangle updateRect = _dropLocationIndicator.Bounds;
             updateRect.Inflate(5, 5);
 
-            // To make the background of _dropLocationIndicator "transparent", the controls under it
-            // should first be drawn.
+            // To make the background of _dropLocationIndicator "transparent", update the the region
+            // of this control under the _dropLocationIndicator.
+            Invalidate(updateRect, true);
+            Update();
+
+            // Now, the pagination controls under it should be refreshed as well.
             foreach (Control paginationControl in _flowLayoutPanel.Controls)
             {
                 if (updateRect.IntersectsWith(paginationControl.Bounds))
@@ -1534,10 +1531,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     paginationControl.Refresh();
                 }
             }
-
-            // Now update the the region of this control under the _dropLocationIndicator.
-            Invalidate(updateRect, true);
-            Update();
 
             // Finally, trigger the _dropLocationIndicator itself to paint on top of the
             // "background" that has just been drawn.
@@ -1899,7 +1892,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Updates the availability of the context menu and shortcut key commands based on the
         /// current selection and control state.
         /// </summary>
-        void UpdateCommandStates()
+        internal void UpdateCommandStates()
         {
             int contextMenuControlIndex = (_commandTargetControl == null)
                 ? _flowLayoutPanel.Controls.Count
@@ -1929,17 +1922,24 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (_commandTargetControl == null)
             {
                 _insertCopiedMenuItem.Text = "Append copied item(s)";
+                _paginationUtility._insertCopiedMenuItem.Text = "Append copied item(s)";
                 _insertDocumentSeparatorMenuItem.Text = "Append document separator";
+                _paginationUtility._insertDocumentSeparatorMenuItem.Text = "Append document separator";
             }
             else
             {
                 _insertCopiedMenuItem.Text = "Insert copied item(s)";
+                _paginationUtility._insertCopiedMenuItem.Text = "Insert copied item(s)";
                 _insertDocumentSeparatorMenuItem.Text = "Insert document separator";
+                _paginationUtility._insertDocumentSeparatorMenuItem.Text = "Insert document separator";
             }
 
             // Outputting a document is only allowed if the document(s) are fully selected.
-            _outputDocumentCommand.Enabled = FullySelectedDocuments.Count() > 0 &&
+            bool enableOutputCommand = FullySelectedDocuments.Count() > 0 &&
                 PartiallySelectedDocuments.Count() == FullySelectedDocuments.Count();
+            _outputDocumentCommand.Enabled = enableOutputCommand;
+            _paginationUtility._outputDocumentToolStripButton.Enabled = enableOutputCommand;
+            _paginationUtility._outputSelectedDocumentsMenuItem.Enabled = enableOutputCommand;
 
             OnStateChanged();
         }
@@ -2071,7 +2071,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Handles a UI command to select the next page.
         /// </summary>
-        void HandleSelectNextPage()
+        internal void HandleSelectNextPage()
         {
             try
             {
@@ -2091,7 +2091,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Handles a UI command to select the previous page.
         /// </summary>
-        void HandleSelectPreviousPage()
+        internal void HandleSelectPreviousPage()
         {
             try
             {
@@ -2173,7 +2173,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Handles a UI command to select page down from the currently selected control.
         /// </summary>
-        void HandleSelectNextRowPage()
+        internal void HandleSelectNextRowPage()
         {
             try
             {
@@ -2193,7 +2193,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Handles a UI command to select page up from the currently selected control.
         /// </summary>
-        void HandleSelectPreviousRowPage()
+        internal void HandleSelectPreviousRowPage()
         {
             try
             {
@@ -2243,7 +2243,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Handles a UI command to cut the selected controls.
         /// </summary>
-        void HandleCutSelectedControls()
+        internal void HandleCutSelectedControls()
         {
             try
             {
@@ -2265,7 +2265,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Handles a UI command to copy the selected controls.
         /// </summary>
-        void HandleCopySelectedControls()
+        internal void HandleCopySelectedControls()
         {
             try
             {
@@ -2280,7 +2280,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Handles a UI command to insert the pages on the clipboard.
         /// </summary>
-        void HandleInsertCopied()
+        internal void HandleInsertCopied()
         {
             try
             {
@@ -2319,7 +2319,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Handles a UI command to delete the selected items.
         /// </summary>
-        void HandleDeleteSelectedItems()
+        internal void HandleDeleteSelectedItems()
         {
             try
             {
@@ -2339,7 +2339,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Handles a UI command to insert a document separator.
         /// </summary>
-        void HandleInsertDocumentSeparator()
+        internal void HandleInsertDocumentSeparator()
         {
             try
             {
