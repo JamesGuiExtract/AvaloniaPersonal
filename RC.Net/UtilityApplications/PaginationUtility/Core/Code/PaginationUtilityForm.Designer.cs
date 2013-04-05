@@ -150,7 +150,9 @@
             // 
             this._outputFileNameToolStripTextBox.Name = "_outputFileNameToolStripTextBox";
             this._outputFileNameToolStripTextBox.Size = new System.Drawing.Size(392, 39);
+            this._outputFileNameToolStripTextBox.Leave += new System.EventHandler(this.HandleOutputFileNameToolStripTextBox_Leave);
             this._outputFileNameToolStripTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.HandleOutputFileNameToolStripTextBox_Validating);
+            this._outputFileNameToolStripTextBox.EnabledChanged += new System.EventHandler(this.HandleOutputFileNameToolStripTextBox_EnabledChanged);
             this._outputFileNameToolStripTextBox.TextChanged += new System.EventHandler(this.HandleOutputFileNameToolStripTextBox_TextChanged);
             // 
             // _outputFileNameBrowseToolStripButton

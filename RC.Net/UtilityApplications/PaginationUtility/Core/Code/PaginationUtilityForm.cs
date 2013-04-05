@@ -498,7 +498,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     UtilityMethods.ShowMessageBox("This output filename has already been used.",
                         "Filename Unavailable", true);
-                    _outputFileNameToolStripTextBox.Focus();
                     return false;
                 }
 
@@ -506,7 +505,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     UtilityMethods.ShowMessageBox("This output filename contains invalid char(s).",
                         "Filename Invalid.", true);
-                    _outputFileNameToolStripTextBox.Focus();
                     return false;
                 }
 
@@ -1394,14 +1392,51 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (!ValidateOutputFileName())
-                {
-                    e.Cancel = true;
-                }
+                ValidateOutputFileName();
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35533");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Leave"/> event of the
+        /// <see cref="_outputFileNameToolStripTextBox"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleOutputFileNameToolStripTextBox_Leave(object sender, EventArgs e)
+        {
+            try
+            {
+                // Make sure that focus is returned to _primaryPageLayoutControl whenever the
+                // filename text box loses focus, otherwise the application may appear
+                // non-responsive.
+                _primaryPageLayoutControl.Focus();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35609");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.EnabledChanged"/> event of the
+        /// <see cref="_outputFileNameToolStripTextBox"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleOutputFileNameToolStripTextBox_EnabledChanged(object sender, EventArgs e)
+        {
+            if (!_outputFileNameToolStripTextBox.Enabled)
+            {
+                // Make sure that focus is returned to _primaryPageLayoutControl whenever the
+                // filename text box is disabled, otherwise the application may appear
+                // non-responsive.
+                _primaryPageLayoutControl.Focus();
             }
         }
 

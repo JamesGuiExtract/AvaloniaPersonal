@@ -697,6 +697,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ImageViewer.Shortcuts[Keys.End | Keys.Shift] = HandleSelectLastPage;
                 ImageViewer.Shortcuts[Keys.End | Keys.Control | Keys.Shift] = HandleSelectLastPage;
 
+                ImageViewer.Shortcuts[Keys.Oemcomma] = HandleSelectPreviousPage;
+                ImageViewer.Shortcuts[Keys.OemPeriod] = HandleSelectNextPage;
+
                 ContextMenuStrip = new ContextMenuStrip();
                 ContextMenuStrip.Items.Add(_cutMenuItem);
                 ContextMenuStrip.Items.Add(_copyMenuItem);
