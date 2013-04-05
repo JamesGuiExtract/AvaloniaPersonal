@@ -4,6 +4,7 @@ using Leadtools;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
@@ -46,6 +47,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Constructors
 
         #region Events
+
+        /// <summary>
+        /// Raised when the document is about to be output.
+        /// </summary>
+        public event EventHandler<CancelEventArgs> DocumentOutputting;
 
         /// <summary>
         /// Raised when the document is output.
@@ -178,10 +184,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Outputs the document to the current <see cref="FileName"/>.
         /// </summary>
-        public void Output()
+        /// <returns><see langword="true"/> if the document was output; otherwise
+        /// <see langword="false"/>.</returns>
+        public bool Output()
         {
             try
             {
+                CancelEventArgs eventArgs = new CancelEventArgs();
+                OnDocumentOutputting(eventArgs);
+                if (eventArgs.Cancel)
+                {
+                    return false;
+                }
+
                 // Ensure the destination directory exists.
                 string directory = Path.GetDirectoryName(FileName);
                 if (!Directory.Exists(directory))
@@ -254,6 +269,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 OnDocumentOutput();
+
+                return true;
             }
             catch (Exception ex)
             {
@@ -264,6 +281,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Methods
 
         #region Private Members
+
+        /// <summary>
+        /// Raises the <see cref="DocumentOutputting"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The <see cref="System.ComponentModel.CancelEventArgs"/> instance
+        /// containing the event data.</param>
+        void OnDocumentOutputting(CancelEventArgs eventArgs)
+        {
+            var eventHandler = DocumentOutputting;
+            if (eventHandler != null)
+            {
+                eventHandler(this, eventArgs);
+            }
+        }
 
         /// <summary>
         /// Raises the <see cref="DocumentOutput"/> event.

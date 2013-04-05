@@ -176,10 +176,37 @@ namespace Extract.Imaging.Forms
         /// <exception cref="ExtractException">Unable to open image file.</exception>
         public void OpenImage(string fileName, bool updateMruList)
         {
+            OpenImage(fileName, updateMruList, true);
+        }
+
+        /// <summary>
+        /// Opens the specified image file.
+        /// </summary>
+        /// <param name="fileName">The name of the image file to open. Cannot be 
+        /// <see langword="null"/>.</param>
+        /// <param name="updateMruList">Flag telling whether the MRU image file list
+        /// should be updated or not.</param>
+        /// <param name="refreshBeforeLoad"><see langword="true"/> if the image viewer should
+        /// refresh itself and its parent before loading the image; otherwise
+        /// <see langword="false"/>.
+        /// </param>
+        /// <event cref="ImageFileChanged">Image file opened successfully.</event>
+        /// <event cref="ZoomChanged">Image file opened successfully.</event>
+        /// <exception cref="ExtractException"><paramref name="fileName"/> is 
+        /// <see langword="null"/>.</exception>
+        /// <exception cref="ExtractException">Unable to open image file.</exception>
+        public void OpenImage(string fileName, bool updateMruList, bool refreshBeforeLoad)
+        {
             try
             {
                 // Refresh the image viewer before opening the file [IDSD #145 - JDS]
-                Refresh();
+                // [DotNetRCAndUtils:931]
+                // Using LockWindowUpdate on the parent form during an image load can cause problems.
+                // Allow refreshes before load to be disabled in lieu of LockWindowUpdate.
+                if (refreshBeforeLoad)
+                {
+                    Refresh();
+                }
 
                 // TODO: what should final state be if exceptions are thrown in different sections.
 
@@ -236,8 +263,11 @@ namespace Extract.Imaging.Forms
                 // Raise the LoadingNewImage event
                 OnLoadingNewImage(new LoadingNewImageEventArgs());
 
-                // Refresh the image viewer before opening the new image
-                RefreshImageViewerAndParent();
+                if (refreshBeforeLoad)
+                {
+                    // Refresh the image viewer before opening the new image
+                    RefreshImageViewerAndParent();
+                }
 
                 using (new TemporaryWaitCursor())
                 {

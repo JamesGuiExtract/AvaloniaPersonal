@@ -136,16 +136,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         ApplicationCommand _insertCopiedCommand;
 
         /// <summary>
-        /// Context menu option that allows the currently selected document to be renamed.
+        /// Context menu option that allows the a document separator prior to the selected page to
+        /// be toggle on or off.
         /// NOTE: The option text will be set later.
         /// </summary>
-        readonly ToolStripMenuItem _insertDocumentSeparatorMenuItem = new ToolStripMenuItem();
+        readonly ToolStripMenuItem _toggleDocumentSeparatorMenuItem = new ToolStripMenuItem();
 
         /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the insert
         /// pagination separator operation.
         /// </summary>
-        ApplicationCommand _insertDocumentSeparatorCommand;
+        ApplicationCommand _toggleDocumentSeparatorCommand;
 
         /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the output operation.
@@ -203,7 +204,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _dropLocationIndicator.DragOver += Handlel_DragOver;
                 _dropLocationIndicator.DragLeave += Handle_DragLeave;
 
-                // Set ccrolling during a drag/drop scroll event to occur 20 times / sec.
+                // Set scrolling during a drag/drop scroll event to occur 20 times / sec.
                 _dragDropScrollTimer = new Timer();
                 _dragDropScrollTimer.Interval = 50;
                 _dragDropScrollTimer.Tick += HandleDragDropScrollTimer_Tick;
@@ -365,9 +366,22 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 // Create a page control for every page in sourceDocument.
-                foreach (Page page in sourceDocument.Pages)
+                foreach (Page page in sourceDocument.Pages.ToArray())
                 {
                     AddPaginationControl(new PageThumbnailControl(outputDocument, page));
+
+                    // [DotNetRCAndUtils:928]
+                    // As pages are being added, allow the application to be responsive.
+                    Application.DoEvents();
+
+                    // [DotNetRCAndUtils:928]
+                    // The parent form will dispose of this control when closing or restarting.
+                    // If this control has been disposed of, stop loading any currently loading
+                    // document.
+                    if (IsDisposed)
+                    {
+                        return;
+                    }
                 }
 
                 // Indicate if the document is output in its present form, it can simply be copied
@@ -393,13 +407,15 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 foreach (OutputDocument document in FullySelectedDocuments.ToArray())
                 {
-                    document.Output();
+                    // If there was a problem outputting, abort the rest of the operation even if
+                    // there were more documents to have been output.
+                    if (!document.Output())
+                    {
+                        break;
+                    }
 
                     // After each document is output, remove its page controls.
-                    foreach (var page in document.PageControls.ToArray())
-                    {
-                        RemovePaginationControl(page, true);
-                    }
+                    DeleteControls(document.PageControls.ToArray());
                 }
 
                 UpdateCommandStates();
@@ -580,23 +596,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
-        /// <summary>
-        /// Clears all <see cref="PaginationControl"/>s from this instance.
-        /// </summary>
-        public void Clear()
-        {
-            try
-            {
-                _flowLayoutPanel.Controls.Clear();
-
-                UpdateCommandStates();
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI35438");
-            }
-        }
-
         #endregion Methods
 
         #region Overrides
@@ -641,13 +640,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     new[] { _deleteMenuItem, _paginationUtility._deleteMenuItem }, false, true, false);
                 _deleteMenuItem.Click += HandleDeleteMenuItem_Click;
 
-                _insertDocumentSeparatorMenuItem.ShortcutKeys = Keys.Control | Keys.D;
-                _insertDocumentSeparatorMenuItem.ShowShortcutKeys = true;
-                _insertDocumentSeparatorCommand = new ApplicationCommand(ImageViewer.Shortcuts,
-                    new Keys[] { Keys.Control | Keys.D }, HandleInsertDocumentSeparator,
-                    new[] { _insertDocumentSeparatorMenuItem, _paginationUtility._insertDocumentSeparatorMenuItem }, 
+                _toggleDocumentSeparatorCommand = new ApplicationCommand(ImageViewer.Shortcuts,
+                    new Keys[] { Keys.Space }, HandleToggleDocumentSeparator,
+                    new[] { _toggleDocumentSeparatorMenuItem, _paginationUtility._insertDocumentSeparatorMenuItem }, 
                     false, true, true);
-                _insertDocumentSeparatorMenuItem.Click += HandleInsertDocumentSeparator_Click;
+                _toggleDocumentSeparatorMenuItem.Click += HandleToggleDocumentSeparator_Click;
 
                 _outputDocumentCommand = new ApplicationCommand(ImageViewer.Shortcuts,
                     new Keys[] { Keys.Control | Keys.S }, HandleOutputDocument,
@@ -700,16 +697,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ImageViewer.Shortcuts[Keys.End | Keys.Shift] = HandleSelectLastPage;
                 ImageViewer.Shortcuts[Keys.End | Keys.Control | Keys.Shift] = HandleSelectLastPage;
 
-                ImageViewer.Shortcuts[Keys.Oemcomma] = HandleMoveSelectionBackward;
-                ImageViewer.Shortcuts[Keys.OemPeriod] = HandleMoveSelectionForward;
-
                 ContextMenuStrip = new ContextMenuStrip();
                 ContextMenuStrip.Items.Add(_cutMenuItem);
                 ContextMenuStrip.Items.Add(_copyMenuItem);
                 ContextMenuStrip.Items.Add(_deleteMenuItem);
                 ContextMenuStrip.Items.Add(new ToolStripSeparator());
                 ContextMenuStrip.Items.Add(_insertCopiedMenuItem);
-                ContextMenuStrip.Items.Add(_insertDocumentSeparatorMenuItem);
+                ContextMenuStrip.Items.Add(_toggleDocumentSeparatorMenuItem);
                 ContextMenuStrip.Opening += HandleContextMenuStrip_Opening;
                 ContextMenuStrip.Closing += HandleContextMenuStrip_Closing;
 
@@ -1090,23 +1084,30 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                var separatorControl = sender as PaginationSeparator;
-                if (separatorControl != null)
+                // Don't automatically remove leading separator controls in the middle of an
+                // operation as the rest of ongoing operation could mean the deletion is obsolete
+                // (and may, in fact, cause exceptions). Check the separator location on separate
+                // event handlers after the primary operation is complete.
+                this.SafeBeginInvoke("ELI35603", () =>
                 {
-                    if (separatorControl.PreviousControl == null)
+                    var separatorControl = sender as PaginationSeparator;
+                    if (separatorControl != null && _flowLayoutPanel.Controls.Contains(separatorControl))
                     {
-                        PaginationControl nextControl = separatorControl.NextControl;
-                        RemovePaginationControl(separatorControl, true);
-                        if (nextControl != null)
+                        if (separatorControl.PreviousControl == null)
                         {
-                            nextControl.PerformLayout();
+                            PaginationControl nextControl = separatorControl.NextControl;
+                            RemovePaginationControl(separatorControl, true);
+                            if (nextControl != null)
+                            {
+                                nextControl.PerformLayout();
+                            }
+                        }
+                        else if (separatorControl.PreviousControl is PaginationSeparator)
+                        {
+                            RemovePaginationControl(separatorControl, true);
                         }
                     }
-                    else if (separatorControl.PreviousControl is PaginationSeparator)
-                    {
-                        RemovePaginationControl(separatorControl, true);
-                    }
-                }
+                });
             }
             catch (Exception ex)
             {
@@ -1272,14 +1273,14 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Handles the <see cref="Control.Click"/> event of the
-        /// <see cref="_insertDocumentSeparatorMenuItem"/>.
+        /// <see cref="_toggleDocumentSeparatorMenuItem"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        void HandleInsertDocumentSeparator_Click(object sender, EventArgs e)
+        void HandleToggleDocumentSeparator_Click(object sender, EventArgs e)
         {
-            HandleInsertDocumentSeparator();
+            HandleToggleDocumentSeparator();
         }
 
         /// <summary>
@@ -1710,6 +1711,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                 currentControl = GetActiveControl(forward);
             }
 
+            // If there was no active control, start from the front/back of the control sequence
+            if (currentControl == null)
+            {
+                return forward
+                    ? _flowLayoutPanel.Controls.OfType<PageThumbnailControl>().FirstOrDefault()
+                    : _flowLayoutPanel.Controls.OfType<PageThumbnailControl>().LastOrDefault();
+            }
+
+            PageThumbnailControl pageControl = null;
+
             // Iterate from currentControl until the next page control is encountered.
             if (currentControl != null)
             {
@@ -1717,24 +1728,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                     ? currentControl.NextControl
                     : currentControl.PreviousControl;
 
-                while ((currentControl != null) && !(currentControl is PageThumbnailControl))
+                pageControl = currentControl as PageThumbnailControl;
+                while ((currentControl != null) && pageControl == null)
                 {
                     currentControl = forward
                         ? currentControl.NextControl
                         : currentControl.PreviousControl;
+                    pageControl = currentControl as PageThumbnailControl;
                 }
             }
 
-            // If we got to the last control withoug finding anything, restart from the front/back
-            // of the control sequence.
-            if (currentControl == null)
-            {
-                currentControl = forward
-                    ? _flowLayoutPanel.Controls.OfType<PageThumbnailControl>().FirstOrDefault()
-                    : _flowLayoutPanel.Controls.OfType<PageThumbnailControl>().LastOrDefault();
-            }
-
-            return currentControl as PageThumbnailControl;
+            return pageControl;
         }
 
         /// <summary>
@@ -1756,7 +1760,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             // vertically aligned with the current control.
             PageThumbnailControl result = null;
             for (PageThumbnailControl nextControl = GetNextPageControl(down, currentControl);
-                 nextControl != currentControl;
+                 nextControl != null;
                  nextControl = GetNextPageControl(down, nextControl))
             {
                 result = nextControl;
@@ -1767,6 +1771,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     break;
                 }
+            }
+
+            if (result == null || result.Right != currentControl.Right)
+            {
+                return null;
             }
 
             return result;
@@ -1842,15 +1851,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 selectionTarget = GetNextPageControl(forward);
             }
 
-            // If there is no selectionTarget or active control, use the first/last page control as
-            // the selection target.
-            if (selectionTarget == null)
-            {
-                selectionTarget = forward
-                    ? _flowLayoutPanel.Controls.OfType<PageThumbnailControl>().First()
-                    : _flowLayoutPanel.Controls.OfType<PageThumbnailControl>().Last();
-            }
-
             // If there are no page controls, there are no documents to select.
             if (selectionTarget == null)
             {
@@ -1910,14 +1910,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             _deleteCommand.Enabled = enableSelectionBasedCommands;
 
             // Insertied copied items requires there to be copied items.
-            _insertCopiedCommand.Enabled = _paginationUtility.ClipboardHasData();
+            _insertCopiedCommand.Enabled = PaginationUtilityForm.ClipboardHasData();
 
             // Separators cannot be added next to other separators and cannot be the first control.
             bool controlIsSeparator = _commandTargetControl is PaginationSeparator;
-            bool previousControlIsSeparator = contextMenuControlIndex > 1 &&
-                _flowLayoutPanel.Controls[contextMenuControlIndex - 1] is PaginationSeparator;
-            _insertDocumentSeparatorCommand.Enabled = contextMenuControlIndex != 0 &&
-                !controlIsSeparator && !previousControlIsSeparator;
+            _toggleDocumentSeparatorCommand.Enabled =
+                contextMenuControlIndex != 0 && !controlIsSeparator;
 
             // Adjust the text of the insertion commands to be append commands if there is no
             // _commandTargetControl.
@@ -1925,15 +1923,15 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 _insertCopiedMenuItem.Text = "Append copied item(s)";
                 _paginationUtility._insertCopiedMenuItem.Text = "Append copied item(s)";
-                _insertDocumentSeparatorMenuItem.Text = "Append document separator";
-                _paginationUtility._insertDocumentSeparatorMenuItem.Text = "Append document separator";
+                _toggleDocumentSeparatorMenuItem.Text = "Toggle ending document separator   Space";
+                _paginationUtility._insertDocumentSeparatorMenuItem.Text = "Toggle ending document separator   Space";
             }
             else
             {
                 _insertCopiedMenuItem.Text = "Insert copied item(s)";
                 _paginationUtility._insertCopiedMenuItem.Text = "Insert copied item(s)";
-                _insertDocumentSeparatorMenuItem.Text = "Insert document separator";
-                _paginationUtility._insertDocumentSeparatorMenuItem.Text = "Insert document separator";
+                _toggleDocumentSeparatorMenuItem.Text = "Toggle document separator   Space";
+                _paginationUtility._insertDocumentSeparatorMenuItem.Text = "Toggle document separator   Space";
             }
 
             // Outputting a document is only allowed if the document(s) are fully selected.
@@ -2001,6 +1999,44 @@ namespace Extract.UtilityApplications.PaginationUtility
             _paginationUtility.SetClipboardData(copiedPages);
 
             UpdateCommandStates();
+        }
+
+        /// <summary>
+        /// Deletes the specified <see paramref="paginationControls"/>.
+        /// </summary>
+        /// <param name="paginationControls">The <see cref="PaginationControl"/>s to delete.</param>
+        void DeleteControls(PaginationControl[] paginationControls)
+        {
+            int newSelectionPosition = -1;
+            foreach (var control in paginationControls)
+            {
+                // Use the index of the active control at the point it is deleted as the index to
+                // select following the deletion.
+                PageThumbnailControl pageControl = control as PageThumbnailControl;
+                if ((control.Selected && newSelectionPosition == -1) || 
+                    (pageControl != null && pageControl.PageIsDisplayed))
+                {
+                    newSelectionPosition = _flowLayoutPanel.Controls.IndexOf(control);
+                }
+
+                RemovePaginationControl(control, true);
+            }
+
+            if (newSelectionPosition != -1 &&
+                newSelectionPosition < _flowLayoutPanel.Controls.Count)
+            {
+                PaginationControl controlToSelect =
+                    _flowLayoutPanel.Controls[newSelectionPosition] as PaginationControl;
+                if (!(controlToSelect is PageThumbnailControl))
+                {
+                    controlToSelect = GetNextPageControl(true, controlToSelect);
+                }
+
+                if (controlToSelect != null && !SelectedControls.Any())
+                {
+                    ProcessControlSelection(controlToSelect, true, true);
+                }
+            }
         }
 
         /// <summary>
@@ -2251,10 +2287,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 CopySelectedPagesToClipboard();
 
-                foreach (var control in SelectedControls.ToArray())
-                {
-                    RemovePaginationControl(control, true);
-                }
+                DeleteControls(SelectedControls.ToArray());
 
                 UpdateCommandStates();
             }
@@ -2325,10 +2358,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                foreach (var control in SelectedControls.ToArray())
-                {
-                    RemovePaginationControl(control, true);
-                }
+                DeleteControls(SelectedControls.ToArray());
 
                 UpdateCommandStates();
             }
@@ -2339,19 +2369,30 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles a UI command to insert a document separator.
+        /// Handles a UI command to insert or remove a document separator from before this control.
         /// </summary>
-        internal void HandleInsertDocumentSeparator()
+        internal void HandleToggleDocumentSeparator()
         {
             try
             {
                 SuspendLayout();
 
-                int index = (_commandTargetControl == null)
+                PaginationSeparator targetSeparator = (_commandTargetControl == null)
+                    ? _flowLayoutPanel.Controls.OfType<Control>().Last() as PaginationSeparator
+                    : _commandTargetControl.PreviousControl as PaginationSeparator;
+
+                if (targetSeparator != null)
+                {
+                    RemovePaginationControl(targetSeparator, true);
+                }
+                else
+                {
+                    int index = (_commandTargetControl == null)
                     ? -1
                     : _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
 
-                InitializePaginationControl(new PaginationSeparator(), index);
+                    InitializePaginationControl(new PaginationSeparator(), index);
+                }
             }
             catch (Exception ex)
             {
@@ -2371,133 +2412,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ResumeLayout(true);
             }
         }
-
-        /// <summary>
-        /// Handles a UI command to move the current selection forward from the active control.
-        /// </summary>
-        void HandleMoveSelectionForward()
-        {
-            HandleMoveSelectionForwardOrBackward(true);
-        }
-
-        /// <summary>
-        /// Handles a UI command to move the current selection backward from the active control.
-        /// </summary>
-        void HandleMoveSelectionBackward()
-        {
-            HandleMoveSelectionForwardOrBackward(false);
-        }
-
-        /// <summary>
-        /// Handles a UI command to move the current selection forward or backward from the active
-        /// control.
-        /// </summary>
-        /// <param name="forward"><see langword="true"/> to move the current selection forward or
-        /// <see langword="false"/> to move it backward.</param>
-        void HandleMoveSelectionForwardOrBackward(bool forward)
-        {
-            try
-            {
-                SuspendLayout();
-
-                if (SelectedControls.Count() != 1)
-                {
-                    return;
-                }
-
-                int targetIndex = _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
-
-                if (forward && targetIndex >= 0 &&
-                    targetIndex < _flowLayoutPanel.Controls.Count - 1)
-                {
-                    MoveSelectedControls(this, targetIndex + 2);
-                }
-                else if (!forward && targetIndex > 0)
-                {
-                    MoveSelectedControls(this, targetIndex - 1);
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35582");
-            }
-            finally
-            {
-                try
-                {
-                    UpdateCommandStates();
-                }
-                catch (Exception ex)
-                {
-                    ex.ExtractLog("ELI35583");
-                }
-
-                ResumeLayout(true);
-            }
-        }
-
-//        /// <summary>
-//        /// Handles the move selection up from the active control.
-//        /// </summary>
-//        void HandleMoveSelectionUp()
-//        {
-//            HandleMoveSelectionUpOrDown(false);
-//        }
-//
-//        /// <summary>
-//        /// Handles the move selection down from the active control.
-//        /// </summary>
-//        void HandleMoveSelectionDown()
-//        {
-//            HandleMoveSelectionUpOrDown(false);
-//        }
-//
-//        /// <summary>
-//        /// Handles a UI command to move the current selection up from the active control.
-//        /// </summary>
-//        /// <param name="down"><see langword="true"/> to move the selection down;
-//        /// <see langword="false"/> to find the next control up.</param>
-//        void HandleMoveSelectionUpOrDown(bool down)
-//        {
-//            try
-//            {
-//                SuspendLayout();
-//
-//                if (SelectedControls.Count() != 1)
-//                {
-//                    return;
-//                }
-//
-//                int currentIndex = _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
-//
-//                PaginationControl targetControl = GetNextRowControl(down);
-//                if (targetControl != null)
-//                {
-//                    int targetIndex = _flowLayoutPanel.Controls.IndexOf(targetControl);
-//                    if (targetIndex < currentIndex)
-//                    {
-//                        MoveSelectedControls(this, targetIndex);
-//                    }
-//                }
-//            }
-//            catch (Exception ex)
-//            {
-//                ex.ExtractDisplay("ELI35584");
-//            }
-//            finally
-//            {
-//                try
-//                {
-//                    UpdateCommandStates();
-//                }
-//                catch (Exception ex)
-//                {
-//                    ex.ExtractLog("ELI35585");
-//                }
-//
-//                ResumeLayout(true);
-//            }
-//        }
 
         /// <summary>
         /// Handles a UI command to output any fully selected documents.

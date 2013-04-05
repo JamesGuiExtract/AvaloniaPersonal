@@ -151,6 +151,7 @@
             this._outputFileNameToolStripTextBox.Name = "_outputFileNameToolStripTextBox";
             this._outputFileNameToolStripTextBox.Size = new System.Drawing.Size(392, 39);
             this._outputFileNameToolStripTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.HandleOutputFileNameToolStripTextBox_Validating);
+            this._outputFileNameToolStripTextBox.TextChanged += new System.EventHandler(this.HandleOutputFileNameToolStripTextBox_TextChanged);
             // 
             // _outputFileNameBrowseToolStripButton
             // 
@@ -451,7 +452,7 @@
             // 
             this._cutMenuItem.Name = "_cutMenuItem";
             this._cutMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-            this._cutMenuItem.Size = new System.Drawing.Size(255, 22);
+            this._cutMenuItem.Size = new System.Drawing.Size(264, 22);
             this._cutMenuItem.Text = "&Cut";
             this._cutMenuItem.Click += new System.EventHandler(this.HandleCutMenuItem_Click);
             // 
@@ -459,7 +460,7 @@
             // 
             this._copyMenuItem.Name = "_copyMenuItem";
             this._copyMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this._copyMenuItem.Size = new System.Drawing.Size(255, 22);
+            this._copyMenuItem.Size = new System.Drawing.Size(264, 22);
             this._copyMenuItem.Text = "Cop&y";
             this._copyMenuItem.Click += new System.EventHandler(this.HandleCopyMenuItem_Click);
             // 
@@ -467,29 +468,28 @@
             // 
             this._deleteMenuItem.Name = "_deleteMenuItem";
             this._deleteMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this._deleteMenuItem.Size = new System.Drawing.Size(255, 22);
+            this._deleteMenuItem.Size = new System.Drawing.Size(264, 22);
             this._deleteMenuItem.Text = "&Delete";
             this._deleteMenuItem.Click += new System.EventHandler(this.HandleDeleteMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(252, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(261, 6);
             // 
             // _insertCopiedMenuItem
             // 
             this._insertCopiedMenuItem.Name = "_insertCopiedMenuItem";
             this._insertCopiedMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
-            this._insertCopiedMenuItem.Size = new System.Drawing.Size(255, 22);
+            this._insertCopiedMenuItem.Size = new System.Drawing.Size(264, 22);
             this._insertCopiedMenuItem.Text = "&Insert copied item(s)";
             this._insertCopiedMenuItem.Click += new System.EventHandler(this.HandleInsertCopiedMenuItem_Click);
             // 
             // _insertDocumentSeparatorMenuItem
             // 
             this._insertDocumentSeparatorMenuItem.Name = "_insertDocumentSeparatorMenuItem";
-            this._insertDocumentSeparatorMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
-            this._insertDocumentSeparatorMenuItem.Size = new System.Drawing.Size(255, 22);
-            this._insertDocumentSeparatorMenuItem.Text = "Insert document &separator";
+            this._insertDocumentSeparatorMenuItem.Size = new System.Drawing.Size(264, 22);
+            this._insertDocumentSeparatorMenuItem.Text = "&Toggle document separator    Space";
             this._insertDocumentSeparatorMenuItem.Click += new System.EventHandler(this.HandleInsertDocumentSeparator_Click);
             // 
             // _toolsToolStripMenuItem
@@ -503,7 +503,7 @@
             // _settingsToolStripMenuItem
             // 
             this._settingsToolStripMenuItem.Name = "_settingsToolStripMenuItem";
-            this._settingsToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this._settingsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this._settingsToolStripMenuItem.Text = "&Settings...";
             this._settingsToolStripMenuItem.Click += new System.EventHandler(this.HandleSettingsMenuItem_Click);
             // 

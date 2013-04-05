@@ -100,6 +100,29 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Removes all elements of the specified <see cref="HashSet{T}"/> and calls
+        /// <see cref="IDisposable.Dispose"/> on each element before removing it.
+        /// </summary>
+        /// <typeparam name="T">The type stored in the set.</typeparam>
+        /// <param name="set">The set of items to be cleared and disposed.</param>
+        public static void ClearAndDispose<T>(HashSet<T> set) where T : class, IDisposable
+        {
+            try
+            {
+                foreach (T item in set)
+                {
+                    item.Dispose();
+                }
+
+                set.Clear();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35601");
+            }
+        }
+
+        /// <summary>
         /// Removes all elements of the specified dictionary and calls
         /// <see cref="IDisposable.Dispose"/> on all values.
         /// <para><b>Note:</b></para>

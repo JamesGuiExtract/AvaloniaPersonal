@@ -63,20 +63,13 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI35546");
+                var ee = new ExtractException("ELI35546", "Unable to open document", ex);
+                ee.AddDebugData("Filename", fileName, false);
+                throw ee;
             }
         }
 
         #endregion Constructors
-
-        #region Events
-        
-        /// <summary>
-        /// Raised when this instance is disposed of.
-        /// </summary>
-        internal event EventHandler<EventArgs> Disposed;
-
-        #endregion Events
 
         #region Properties
 
@@ -142,11 +135,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             // Dispose of ummanaged resources
-            try
-            {
-                OnDisposed();
-            }
-            catch { }
         }
 
         #endregion IDisposable Members
@@ -195,21 +183,5 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         #endregion Event Handlers
-
-        #region Private Members
-
-        /// <summary>
-        /// Raises the <see cref="Disposed"/> event.
-        /// </summary>
-        void OnDisposed()
-        {
-            var eventHandler = Disposed;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new EventArgs());
-            }
-        }
-
-        #endregion Private Members
     }
 }

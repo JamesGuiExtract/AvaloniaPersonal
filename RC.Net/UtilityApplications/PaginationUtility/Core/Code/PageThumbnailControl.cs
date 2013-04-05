@@ -216,13 +216,29 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Show the image only if this instance is currently in a PageLayoutControl.
                 if (display && ParentForm != null)
                 {
-                    // Lock updating of this form while changing images to prevent flicker as the
-                    // last image closes before this one is displayed.
-                    using (new LockControlUpdates(ParentForm))
+                    // To prevent flicker of the image viewer tool strips while loading a new image,
+                    // if we can find a parent ToolStripContainer, lock it until the new image is
+                    // loaded.
+                    // [DotNetRCAndUtils:931]
+                    // This, and the addition of a parameter on OpenImage to prevent an initial
+                    // refresh is in place of locking the entire form which can cause the form to
+                    // fall behind other open applications when clicked.
+                    LockControlUpdates toolStripLocker = null;
+                    for (Control control = imageViewer; control != null; control = control.Parent)
+                    {
+                        var toolStripContainer = control as ToolStripContainer;
+                        if (toolStripContainer != null)
+                        {
+                            toolStripLocker = new LockControlUpdates(toolStripContainer);
+                            break;
+                        }
+                    }
+
+                    try
                     {
                         if (Page.OriginalDocumentName != imageViewer.ImageFile)
                         {
-                            imageViewer.OpenImage(Page.OriginalDocumentName, false);
+                            imageViewer.OpenImage(Page.OriginalDocumentName, false, false);
                         }
                         imageViewer.PageNumber = Page.OriginalPageNumber;
                         imageViewer.Orientation = -Page.ImageOrientation;
@@ -234,6 +250,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                             imageViewer.OrientationChanged += HandleActiveImageViewer_OrientationChanged;
 
                             _activeImageViewer = imageViewer;
+                        }
+                    }
+                    finally
+                    {
+                        if (toolStripLocker != null)
+                        {
+                            toolStripLocker.Dispose();
                         }
                     }
 
@@ -610,7 +633,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             // handled in the UI thread, invoke the image change to occur on the UI thread.
             this.SafeBeginInvoke("ELI35559", () =>
             {
-                if (!IsDisposed)
+                if (!IsDisposed && !_page.IsDisposed)
                 {
                     _rasterPictureBox.Image = _page.ThumbnailImage.Clone();
                     _rasterPictureBox.Invalidate();

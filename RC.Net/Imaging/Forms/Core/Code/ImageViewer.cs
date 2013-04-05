@@ -539,7 +539,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Occurs when the image file changes.
         /// </summary>
-        /// <seealso cref="OpenImage"/>
+        /// <seealso cref="OpenImage(string,bool)"/>
         public event EventHandler<ImageFileChangedEventArgs> ImageFileChanged;
 
         /// <summary>
@@ -2551,7 +2551,7 @@ namespace Extract.Imaging.Forms
         /// than loaded/unloaded on open/close.
         /// <para><b>Note</b></para>
         /// It is important to ensure <see cref="UnloadImage"/> is called for every image for which
-        /// either <see cref="OpenImage"/> or <see cref="CacheImage"/> is called when
+        /// either <see cref="OpenImage(string, bool)"/> or <see cref="CacheImage"/> is called when
         /// <see cref="CacheImages"/> is <see langword="true"/>.
         /// </summary>
         /// <value><see langword="true"/> if <see cref="ImageReader"/>s should be cached in memory,

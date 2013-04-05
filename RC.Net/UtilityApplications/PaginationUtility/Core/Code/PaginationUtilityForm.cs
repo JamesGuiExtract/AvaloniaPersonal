@@ -310,6 +310,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _pageLoadPending;
 
         /// <summary>
+        /// The output document the filename edit box is currently active for (if any).
+        /// </summary>
+        OutputDocument _fileNameEditableDocument;
+
+        /// <summary>
         /// The name of the file used to indicate this instance is processing documents from the
         /// configured input folder and that no other instance should be allowed to operate on the
         /// folder at the same time.
@@ -329,10 +334,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         ClipboardData _currentClipboardData = null;
 
         /// <summary>
-        /// Indicates that this instance is closing and that no more page loads or control events
-        /// should be handled.
+        /// Indicates that any active loading should be cancelled and that no more page loads or
+        /// control events should be handled.
         /// </summary>
-        bool _closing;
+        bool _cancelLoad;
 
         /// <summary>
         /// Indicates if the host is in design mode or not.
@@ -430,6 +435,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                ExtractException.Assert("ELI35607", "Specified output filename is not valid",
+                    !string.IsNullOrWhiteSpace(fileName) &&
+                    FileSystemMethods.IsFileNameValid(Path.GetFileName(fileName)),
+                    "Filename", fileName);
+
                 // If a document by this name has already been output by this instance, don't allow
                 // it whether or not that document still exists at that location.
                 if (_outputDocumentNames.Contains(fileName))
@@ -455,6 +465,56 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35511");
+            }
+        }
+
+        /// <summary>
+        /// Validates the specified <see cref="OutputDocument"/> has a name that can be used.
+        /// </summary>
+        /// <returns><see langword="true"/> if the filename is valid; <see langword="false"/> if it
+        /// is invalid.</returns>
+        bool ValidateOutputFileName()
+        {
+            if (_fileNameEditableDocument != null)
+            {
+                return ValidateOutputFileName(_fileNameEditableDocument);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Validates the specified <see cref="OutputDocument"/> has a name that can be used.
+        /// </summary>
+        /// <param name="selectedDocument">The <see cref="OutputDocument"/> whose name is to be
+        /// validated.</param>
+        /// <returns><see langword="true"/> if the filename is valid; <see langword="false"/> if it
+        /// is invalid.</returns>
+        bool ValidateOutputFileName(OutputDocument selectedDocument)
+        {
+            try
+            {
+                if (!IsOutputFileNameAvailable(_outputFileNameToolStripTextBox.Text, selectedDocument))
+                {
+                    UtilityMethods.ShowMessageBox("This output filename has already been used.",
+                        "Filename Unavailable", true);
+                    _outputFileNameToolStripTextBox.Focus();
+                    return false;
+                }
+
+                if (selectedDocument.FileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+                {
+                    UtilityMethods.ShowMessageBox("This output filename contains invalid char(s).",
+                        "Filename Invalid.", true);
+                    _outputFileNameToolStripTextBox.Focus();
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35604");
             }
         }
 
@@ -501,6 +561,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             string outputDocumentName = GenerateOutputDocumentName(inputFileName);
             OutputDocument outputDocument = new OutputDocument(outputDocumentName);
+            outputDocument.DocumentOutputting += HandelOutputDocument_DocumentOutputting;
             outputDocument.DocumentOutput += HandleOutputDocument_DocumentOutput;
             _pendingDocuments.Add(outputDocument);
 
@@ -676,18 +737,24 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <returns><see langword="true"/> if the there is data of type _CLIPBOARD_DATA_FORMAT on
         /// the clipboard, <see langword="false"/> otherwise.</returns>
-        internal bool ClipboardHasData()
+        internal static bool ClipboardHasData()
         {
             try
             {
-                IEnumerable<Page> clipboardData = GetClipboardData();
+                IDataObject dataObject = Clipboard.GetDataObject();
+                if (dataObject != null)
+                {
+                    return dataObject.GetDataPresent(_CLIPBOARD_DATA_FORMAT) ||
+                           dataObject.GetDataPresent(DataFormats.FileDrop);
+                }
 
-                return (clipboardData != null && clipboardData.Any());
+                return false;
             }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI35517");
-            }
+            // If there was an exception reading data from the clipboard, treat it as if there
+            // was not data on the clipboard.
+            catch { }
+
+            return false;
         }
 
         #endregion Methods
@@ -717,13 +784,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 //                _primaryWorkAreaTab.Text = "Input";
 //                _primaryWorkAreaTab.OpenDocument(WindowOpenMethod.OnScreen);
 
-                _primaryPageLayoutControl = new PageLayoutControl(this);
-                _primaryPageLayoutControl.Dock = DockStyle.Fill;
-                _primaryPageLayoutControl.ImageViewer = _imageViewer;
-                _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
-                _primaryPageLayoutControl.PageDeleted += HandlePageLayoutControl_PageDeleted;
-                _pageLayoutToolStripContainer.ContentPanel.Controls.Add(_primaryPageLayoutControl);
-                _primaryPageLayoutControl.Focus();
+                ResetPrimaryPageLayoutControl();
 
                 // If not using pre-determined settings, the settings dialog should be displayed
                 // first to allow the user to confirm/edit settings before input documents are
@@ -757,7 +818,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.OnClosing(e);
 
-                _closing = true;
+                _cancelLoad = true;
             }
             catch (Exception ex)
             {
@@ -802,6 +863,20 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _formStateManager.Dispose();
                         _formStateManager = null;
                     }
+
+                    if (_inputFileEnumerator != null)
+                    {
+                        _inputFileEnumerator.Dispose();
+                        _inputFileEnumerator = null;
+                    }
+
+                    if (_inputFolderWatcher != null)
+                    {
+                        _inputFolderWatcher.Dispose();
+                        _inputFolderWatcher = null;
+                    }
+
+                    CollectionMethods.ClearAndDispose(_sourceDocuments);
 
                     DereferenceLastClipboardData();
 
@@ -898,9 +973,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (PromptForRestart(false))
                 {
-                    Clear();
-
-                    LoadMorePages();
+                    Restart();
                 }
             }
             catch (Exception ex)
@@ -982,7 +1055,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _primaryPageLayoutControl.HandleInsertDocumentSeparator();
+                _primaryPageLayoutControl.HandleToggleDocumentSeparator();
             }
             catch (Exception ex)
             {
@@ -1065,61 +1138,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="SourceDocument.Disposed"/> event of a <see cref="SourceDocument"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleSourceDocument_Disposed(object sender, EventArgs e)
-        {
-            try
-            {
-                // Ensure we have not already unloaded this document.
-                var sourceDocument = (SourceDocument)sender;
-                if (!_sourceDocuments.Contains(sourceDocument))
-                {
-                    return;
-                }
-
-                // If the document came from the input folder (as opposed to having been dragged in
-                // from another folder), either move or delete the file from the input folder now
-                // that it has been processed.
-                if ((_config.Settings.IncludeSubfolders && sourceDocument.FileName.StartsWith(
-                    _config.Settings.InputFolder, StringComparison.OrdinalIgnoreCase) ||
-                    (!_config.Settings.IncludeSubfolders &&
-                        Path.GetDirectoryName(sourceDocument.FileName).Equals(
-                            _config.Settings.InputFolder, StringComparison.OrdinalIgnoreCase))))
-                {
-                    // This removes the image from the cache and releases the lock on the file.
-                    _imageViewer.UnloadImage(sourceDocument.FileName);
-
-                    if (_config.Settings.DeleteProcessedFiles)
-                    {
-                        FileSystemMethods.DeleteFile(sourceDocument.FileName);
-                    }
-                    else
-                    {
-                        string processedDocumentName = GenerateProcessedDocumentName(sourceDocument);
-
-                        string directory = Path.GetDirectoryName(processedDocumentName);
-                        if (!Directory.Exists(directory))
-                        {
-                            Directory.CreateDirectory(directory);
-                        }
-
-                        FileSystemMethods.MoveFile(sourceDocument.FileName, processedDocumentName,
-                            false);
-                        _processedDocumentNames.Add(processedDocumentName);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35526");
-            }
-        }
-
-        /// <summary>
         /// Handles the <see cref="PageLayoutControl.PageDeleted"/> event of an
         /// <see cref="PageLayoutControl"/> control.
         /// </summary>
@@ -1137,7 +1155,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // input document if appropriate.
                 this.SafeBeginInvoke("ELI35527", () =>
                 {
-                    if (_closing)
+                    if (_cancelLoad)
                     {
                         return;
                     }
@@ -1153,6 +1171,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     OutputDocument outputDocument = e.OutputDocument;
                     if (outputDocument != null && outputDocument.PageControls.Count == 0)
                     {
+                        outputDocument.DocumentOutputting -= HandelOutputDocument_DocumentOutputting;
                         outputDocument.DocumentOutput -= HandleOutputDocument_DocumentOutput;
                         _pendingDocuments.Remove(outputDocument);
                     }
@@ -1163,6 +1182,28 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35528");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="OutputDocument.DocumentOutputting"/> event of an
+        /// <see cref="OutputDocument"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.ComponentModel.CancelEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandelOutputDocument_DocumentOutputting(object sender, CancelEventArgs e)
+        {
+            try
+            {
+                if (!ValidateOutputFileName((OutputDocument)sender))
+                {
+                    e.Cancel = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35605");
             }
         }
 
@@ -1208,6 +1249,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                // Set to null until enabled and active so that any changes to the
+                // _outputFileNameToolStripTextBox in this method don't get treated as a user
+                // specified name.
+                _fileNameEditableDocument = null;
+
                 if (_primaryPageLayoutControl.PartiallySelectedDocuments.Count() == 1)
                 {
                     OutputDocument selectedDocument =
@@ -1222,6 +1268,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (_primaryPageLayoutControl.FullySelectedDocuments.Count() == 1)
                     {
                         _outputFileNameToolStripTextBox.Enabled = true;
+                        _fileNameEditableDocument = selectedDocument;
+
                         if (selectedDocument.PageControls.Count == 1)
                         {
                             _pagesToolStripLabel.Text = "1 page";
@@ -1314,6 +1362,28 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Handles the <see cref="Control.TextChanged"/> event of the
+        /// <see cref="_outputFileNameToolStripTextBox"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleOutputFileNameToolStripTextBox_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_fileNameEditableDocument != null)
+                {
+                    _fileNameEditableDocument.FileName = _outputFileNameToolStripTextBox.Text;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35606");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="Control.Validating"/> event of the
         /// <see cref="_outputFileNameToolStripTextBox"/>.
         /// </summary>
@@ -1324,24 +1394,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                OutputDocument selectedDocument =
-                    _primaryPageLayoutControl.PartiallySelectedDocuments.Single();
-
-                if (!IsOutputFileNameAvailable(_outputFileNameToolStripTextBox.Text, selectedDocument))
+                if (!ValidateOutputFileName())
                 {
-                    UtilityMethods.ShowMessageBox("This output filename has already been used.",
-                        "Filename Unavailable", true);
                     e.Cancel = true;
                 }
-
-                if (selectedDocument.FileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
-                {
-                    UtilityMethods.ShowMessageBox("This output filename contains invalid char(s).",
-                        "Filename Invalid.", true);
-                    e.Cancel = true;
-                }
-
-                selectedDocument.FileName = _outputFileNameToolStripTextBox.Text;
             }
             catch (Exception ex)
             {
@@ -1377,10 +1433,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                     saveFileDialog.AddExtension = false;
                     saveFileDialog.CheckPathExists = true;
                     saveFileDialog.CheckFileExists = false;
+                    saveFileDialog.OverwritePrompt = false;
 
                     // Show the dialog
                     while (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
+                        ExtractException.Assert("ELI35608", "Filename not editable.",
+                            _fileNameEditableDocument != null);
+
                         if (!IsOutputFileNameAvailable(saveFileDialog.FileName))
                         {
                             UtilityMethods.ShowMessageBox(
@@ -1395,9 +1455,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         // Return the selected file path.
                         _outputFileNameToolStripTextBox.Text = saveFileDialog.FileName;
-                        OutputDocument selectedDocument =
-                            _primaryPageLayoutControl.PartiallySelectedDocuments.Single();
-                        selectedDocument.FileName = _outputFileNameToolStripTextBox.Text;
+                        _fileNameEditableDocument.FileName = _outputFileNameToolStripTextBox.Text;
+                        ValidateOutputFileName();
                         break;
                     }
                 }
@@ -1492,7 +1551,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             _config.Save();
 
-                            Clear();
+                            Restart();
                         }
                         else
                         {
@@ -1542,10 +1601,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Clears all active <see cref="PaginationControl"/>s and their associated data and
         /// restores the utility to a state equivilant to just having opened the utility.
         /// </summary>
-        void Clear()
+        void Restart()
         {
             try
             {
+                _cancelLoad = true;
+
                 _inputFileEnumerator.Dispose();
                 _inputFileEnumerator = null;
                 _inputFolderWatcher.Dispose();
@@ -1556,22 +1617,57 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _imageViewer.CloseImage();
                 }
 
-                _primaryPageLayoutControl.Clear();
+                CollectionMethods.ClearAndDispose(_sourceDocuments);
 
-                foreach (SourceDocument document in _sourceDocuments)
-                {
-                    document.Disposed -= HandleSourceDocument_Disposed;
-                    document.Dispose();
-                }
-                _sourceDocuments.Clear();
+                ResetPrimaryPageLayoutControl();
 
                 _pendingDocuments.Clear();
                 _failedFileNames.Clear();
+
+                // _cancelLoad will trigger active loading to be stopped, but we can't wait for
+                // that to happen here because it is likely this is being called via an
+                // Application.DoEvents() call intended to keep the UI responsive during loading.
+                this.SafeBeginInvoke("ELI35602", () =>
+                {
+                    // By the the time is handled on the message queue, we can count on the fact
+                    // that loading will have stopped since the loading would have been triggered
+                    // by an earlier message. Go ahead and reset _cancelLoad, then start loading
+                    // again.
+                    _cancelLoad = false;
+                    LoadMorePages();
+                });
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35535");
             }
+        }
+
+        /// <summary>
+        /// Clears and disposes of any existing <see cref="_primaryPageLayoutControl"/> and
+        /// initializes a new one.
+        /// </summary>
+        void ResetPrimaryPageLayoutControl()
+        {
+            if (_primaryPageLayoutControl != null)
+            {
+                _primaryPageLayoutControl.StateChanged -= HandlePageLayoutControl_StateChanged;
+                _primaryPageLayoutControl.PageDeleted -= HandlePageLayoutControl_PageDeleted;
+                // If the control contains a lot of pagination controls, it can take a long time to
+                // remove-- I am unclear why (it has to do with more than just whether thumbnails
+                // are still being loaded. Disposing of the control first allows it to be quickly
+                // removed.
+                _primaryPageLayoutControl.Dispose();
+                _pageLayoutToolStripContainer.ContentPanel.Controls.Remove(_primaryPageLayoutControl);
+            }
+
+            _primaryPageLayoutControl = new PageLayoutControl(this);
+            _primaryPageLayoutControl.Dock = DockStyle.Fill;
+            _primaryPageLayoutControl.ImageViewer = _imageViewer;
+            _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
+            _primaryPageLayoutControl.PageDeleted += HandlePageLayoutControl_PageDeleted;
+            _pageLayoutToolStripContainer.ContentPanel.Controls.Add(_primaryPageLayoutControl);
+            _primaryPageLayoutControl.Focus();
         }
 
         /// <summary>
@@ -1813,7 +1909,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 StartInputEnumeration();
             }
 
-            while (_inputFileEnumerator.MoveNext())
+            while (!_cancelLoad && _inputFileEnumerator.MoveNext())
             {
                 string fileName = _inputFileEnumerator.Current;
                 if (_failedFileNames.Contains(fileName))
@@ -1884,7 +1980,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return null;
             }
 
-            sourceDocument.Disposed += HandleSourceDocument_Disposed;
             _sourceDocuments.Add(sourceDocument);
 
             ThreadingMethods.RunInBackgroundThread("ELI35541",
@@ -1899,13 +1994,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void LoadMorePages()
         {
-            if (_closing)
+            if (_cancelLoad)
             {
                 return;
             }
 
             bool ranOutOfDocuments = false;
-            while (!ranOutOfDocuments &&
+            while (!_cancelLoad && !ranOutOfDocuments &&
                    _primaryPageLayoutControl.PageCount < _config.Settings.InputPageCount)
             {
                 ranOutOfDocuments = !LoadNextDocument();
@@ -1923,7 +2018,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void InvokeLoadMorePages()
         {
-            if (!_pageLoadPending && !_closing)
+            if (!_pageLoadPending && !_cancelLoad)
             {
                 _pageLoadPending = true;
                 this.SafeBeginInvoke("ELI35542", () =>
@@ -1969,15 +2064,57 @@ namespace Extract.UtilityApplications.PaginationUtility
         void CheckIfSourceDocumentsProcessed(params SourceDocument[] sourceDocuments)
         {
             // Check for a sourceDocuments that is no longer being referenced so that it can
-            // be disposed and the input file can be deleted/moved as configured.
-            IEnumerable<SourceDocument> documentsToDispose = sourceDocuments
+            // the input file can be deleted/moved as configured.
+            IEnumerable<SourceDocument> processedDocuments = sourceDocuments
                 .Where(document => document.Pages.All(page => !page.HasActiveReference));
 
-            foreach (SourceDocument document in documentsToDispose)
+            foreach (SourceDocument document in processedDocuments
+                .Where(document => _sourceDocuments.Contains(document)))
             {
+                HandleProcessedSourceDocument(document);
                 document.Dispose();
 
                 _sourceDocuments.Remove(document);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see paramref="document"/> that has completed processing due to all its
+        /// pages either being output or deleted.
+        /// </summary>
+        /// <param name="document">The <see cref="SourceDocument"/> that has been processed.</param>
+        void HandleProcessedSourceDocument(SourceDocument document)
+        {
+            // If the document came from the input folder (as opposed to having been dragged in
+            // from another folder), either move or delete the file from the input folder now
+            // that it has been processed.
+            if ((_config.Settings.IncludeSubfolders && document.FileName.StartsWith(
+                _config.Settings.InputFolder, StringComparison.OrdinalIgnoreCase) ||
+                (!_config.Settings.IncludeSubfolders &&
+                    Path.GetDirectoryName(document.FileName).Equals(
+                        _config.Settings.InputFolder, StringComparison.OrdinalIgnoreCase))))
+            {
+                // This removes the image from the cache and releases the lock on the file.
+                _imageViewer.UnloadImage(document.FileName);
+
+                if (_config.Settings.DeleteProcessedFiles)
+                {
+                    FileSystemMethods.DeleteFile(document.FileName);
+                }
+                else
+                {
+                    string processedDocumentName = GenerateProcessedDocumentName(document);
+
+                    string directory = Path.GetDirectoryName(processedDocumentName);
+                    if (!Directory.Exists(directory))
+                    {
+                        Directory.CreateDirectory(directory);
+                    }
+
+                    FileSystemMethods.MoveFile(document.FileName, processedDocumentName,
+                        false);
+                    _processedDocumentNames.Add(processedDocumentName);
+                }
             }
         }
 
