@@ -26,6 +26,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Initializes a new instance of the <see cref="PaginationControl"/> class.
         /// </summary>
         public PaginationControl()
+            : base()
         {
             try
             {

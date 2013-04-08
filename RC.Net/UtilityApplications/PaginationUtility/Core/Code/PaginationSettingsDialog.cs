@@ -121,6 +121,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                // If there are invalid settings, prompt and return without exporting.
+                if (WarnIfInvalid())
+                {
+                    return;
+                }
+
                 using (SaveFileDialog saveFileDialog = new SaveFileDialog())
                 {
                     // Display a dialog that allows selection of a config file (pre-existing or not).

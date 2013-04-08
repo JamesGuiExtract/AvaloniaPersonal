@@ -298,7 +298,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region IDisposable Members
 
         /// <summary>
-        /// Releases all resources used by the <see cref="SourceDocument"/>.
+        /// Releases all resources used by the <see cref="Page"/>.
         /// </summary>
         public void Dispose()
         {

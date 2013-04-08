@@ -968,7 +968,7 @@ namespace Extract.Utilities.Forms
                     _locked = !_locked;
                     if (_invalidateOnUnlock)
                     {
-                        _control.Invalidate();
+                        _control.Invalidate(true);
                     }
                 }
             }

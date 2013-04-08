@@ -15,7 +15,7 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// A <see cref="PaginationControl"/> that represents a page in a potential output document with
     /// a thumbnail image of the page.
     /// </summary>
-    internal partial class PageThumbnailControl : PaginationControl
+    internal partial class PageThumbnailControl : NavigablePaginationControl
     {
         #region Constants
 
@@ -23,18 +23,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Licensing key to unlock document (anti-aliasing) support
         /// </summary>
         static readonly string _DOCUMENT_SUPPORT_KEY = "vhG42tyuh9";
-        
-        /// <summary>
-        /// The padding that should be used for an instance that is preceeded by a separator control.
-        /// </summary>
-        static readonly Padding _NORMAL_PADDING = new Padding(0, 1, 0, 1);
-
-        /// <summary>
-        /// The padding that should be used for an instance that is not preceeded by a separator
-        /// control such that one can be added later without shifting the position of this control.
-        /// </summary>
-        static readonly Padding _SEPARATOR_ALLOWANCE_PADDING =
-            new Padding(PaginationSeparator._SEPARATOR_WIDTH, 1, 0, 1);
 
         /// <summary>
         /// The font to use when drawing an asterix to indicate a page is one of multiple copies.
@@ -84,8 +72,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ExtractException.Assert("ELI35473", "Null argument exception.", page != null);
 
                 InitializeComponent();
-
-                Padding = _NORMAL_PADDING;
 
                 Document = document;
                 _page = page;
@@ -198,6 +184,28 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is highlighted.
+        /// </summary>
+        /// <value><see langword="true"/> if this instance is hilighted; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public override bool Highlighted
+        {
+            get
+            {
+                return base.Highlighted;
+            }
+            set
+            {
+                base.Highlighted = value;
+
+                // Refresh _outerPanel to update the indication of whether it is currently the
+                // primary selection.
+                _outerPanel.Invalidate();
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -245,8 +253,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         if (_activeImageViewer == null)
                         {
-                            imageViewer.ImageChanged += HandleImageViewer_ImageChanged;
-                            imageViewer.PageChanged += HandleImageViewer_PageChanged;
                             imageViewer.OrientationChanged += HandleActiveImageViewer_OrientationChanged;
 
                             _activeImageViewer = imageViewer;
@@ -266,13 +272,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 else if (!display && _activeImageViewer != null)
                 {
                     _activeImageViewer.CloseImage();
-                    _activeImageViewer.ImageChanged -= HandleImageViewer_ImageChanged;
-                    _activeImageViewer.PageChanged -= HandleImageViewer_PageChanged;
                     _activeImageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
                     _activeImageViewer = null;
-
-                    // Refresh _outerPanel to remove the indication that it is currently displayed.
-                    _outerPanel.Invalidate();
                 }
             }
             catch (Exception ex)
@@ -332,43 +333,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
-        /// <summary>
-        /// Raises the <see cref="E:System.Windows.Forms.Control.LocationChanged"/> event.
-        /// </summary>
-        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
-        protected override void OnLocationChanged(EventArgs e)
-        {
-            try
-            {
-                base.OnLocationChanged(e);
-
-                CheckPadding();
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35478");
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="E:System.Windows.Forms.Control.Layout"/> event.
-        /// </summary>
-        /// <param name="e">A <see cref="T:System.Windows.Forms.LayoutEventArgs"/> that contains the
-        /// event data.</param>
-        protected override void OnLayout(LayoutEventArgs e)
-        {
-            try
-            {
-                CheckPadding();
-
-                base.OnLayout(e);
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35479");
-            }
-        }
-
         /// <summary> 
         /// Clean up any resources being used.
         /// </summary>
@@ -392,6 +356,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _page.OrientationChanged -= HandlePage_OrientationChanged;
                         _page.RemoveReference(this);
                         _page = null;
+                    }
+
+                    if (_activeImageViewer != null)
+                    {
+                        _activeImageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
+                        _activeImageViewer = null;
                     }
 
                     if (components != null)
@@ -454,64 +424,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="ImageViewer.PageChanged"/> event of the <see cref="ImageViewer"/>
-        /// control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="Extract.Imaging.Forms.PageChangedEventArgs"/> instance
-        /// containing the event data.</param>
-        void HandleImageViewer_PageChanged(object sender, PageChangedEventArgs e)
-        {
-            try
-            {
-                if (_activeImageViewer != null && e.PageNumber != _page.OriginalPageNumber)
-                {
-                    _activeImageViewer.ImageChanged -= HandleImageViewer_ImageChanged;
-                    _activeImageViewer.PageChanged -= HandleImageViewer_PageChanged;
-                    _activeImageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
-                    _activeImageViewer = null;
-
-                    // Refresh _outerPanel to remove the indication that it is currently displayed.
-                    _outerPanel.Invalidate();
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35482");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="T:ImageViewer.ImageChanged"/> event of the <see cref="ImageViewer"/>
-        /// control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleImageViewer_ImageChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                if (_activeImageViewer != null &&
-                        !_activeImageViewer.ImageFile.Equals(
-                            _page.OriginalDocumentName, StringComparison.OrdinalIgnoreCase))
-                {
-                    _activeImageViewer.ImageChanged -= HandleImageViewer_ImageChanged;
-                    _activeImageViewer.PageChanged -= HandleImageViewer_PageChanged;
-                    _activeImageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
-                    _activeImageViewer = null;
-
-                    // Refresh _outerPanel to remove the indication that it is currently displayed.
-                    _outerPanel.Invalidate();
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35483");
-            }
-        }
-
-        /// <summary>
         /// Handles the <see cref="Control.Paint"/> event of the <see cref="_rasterPictureBox"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -544,7 +456,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (_activeImageViewer != null)
+                if (Highlighted)
                 {
                     var highlightBrush = ExtractBrushes.GetSolidBrush(SystemColors.Highlight);
                     e.Graphics.FillRectangle(highlightBrush, _outerPanel.ClientRectangle);
@@ -597,28 +509,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Ensures that the padding is such that it will cause all
-        /// <see cref="PageThumbnailControl"/>s in the <see cref="PageLayoutControl"/> to align
-        /// vertically whether or not they are preceeded by a <see cref="PaginationSeparator"/>
-        /// control.
-        /// </summary>
-        void CheckPadding()
-        {
-            bool hasPaddingAllowance = Padding.Equals(_SEPARATOR_ALLOWANCE_PADDING);
-            bool shouldHavePaddingAllowance =
-                PreviousControl == null ||
-                PreviousControl.Left > Left ||
-                PreviousControl is PageThumbnailControl;
-
-            if (hasPaddingAllowance != shouldHavePaddingAllowance)
-            {
-                Padding = shouldHavePaddingAllowance
-                    ? _SEPARATOR_ALLOWANCE_PADDING
-                    : _NORMAL_PADDING;
-            }
-        }
-
-        /// <summary>
         /// Updates the thumbnail image.
         /// </summary>
         void UpdateThumbnail()
@@ -633,6 +523,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             // handled in the UI thread, invoke the image change to occur on the UI thread.
             this.SafeBeginInvoke("ELI35559", () =>
             {
+                // Ensure this control has not been disposed of since invoking the thumbnail change.
                 if (!IsDisposed && !_page.IsDisposed)
                 {
                     _rasterPictureBox.Image = _page.ThumbnailImage.Clone();

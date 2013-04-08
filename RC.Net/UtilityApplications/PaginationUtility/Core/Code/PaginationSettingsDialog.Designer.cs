@@ -152,8 +152,6 @@
             "*.pdf",
             "*.png",
             "*.tif;*.tiff",
-            "*.txt",
-            "*.xml",
             "*.*"});
             this._fileFilterComboBox.Location = new System.Drawing.Point(140, 55);
             this._fileFilterComboBox.Name = "_fileFilterComboBox";

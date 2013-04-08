@@ -15,7 +15,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this._flowLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this._flowLayoutPanel = new PaginationFlowLayoutPanel();
             this.SuspendLayout();
             // 
             // _flowLayoutPanel
@@ -31,7 +31,7 @@
             this._flowLayoutPanel.TabIndex = 0;
             this._flowLayoutPanel.DragDrop += new System.Windows.Forms.DragEventHandler(this.Handle_DragDrop);
             this._flowLayoutPanel.DragEnter += new System.Windows.Forms.DragEventHandler(this.Handle_DragEnter);
-            this._flowLayoutPanel.DragOver += new System.Windows.Forms.DragEventHandler(this.Handlel_DragOver);
+            this._flowLayoutPanel.DragOver += new System.Windows.Forms.DragEventHandler(this.Handle_DragOver);
             this._flowLayoutPanel.DragLeave += new System.EventHandler(this.Handle_DragLeave);
             // 
             // PageLayoutControl
@@ -47,6 +47,6 @@
 
         #endregion
 
-        private System.Windows.Forms.FlowLayoutPanel _flowLayoutPanel;
+        private PaginationFlowLayoutPanel _flowLayoutPanel;
     }
 }

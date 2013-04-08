@@ -494,7 +494,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (!IsOutputFileNameAvailable(_outputFileNameToolStripTextBox.Text, selectedDocument))
+                if (!IsOutputFileNameAvailable(selectedDocument.FileName, selectedDocument))
                 {
                     UtilityMethods.ShowMessageBox("This output filename has already been used.",
                         "Filename Unavailable", true);
@@ -1184,6 +1184,29 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Handles the <see cref="PageLayoutControl.LoadNextDocumentRequest"/> event of the
+        /// <see cref="_primaryPageLayoutControl"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleLayoutControl_LoadNextDocumentRequest(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!LoadNextDocument())
+                {
+                    UtilityMethods.ShowMessageBox("No more input documents were found.",
+                        "No more input documents", false);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35627");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="OutputDocument.DocumentOutputting"/> event of an
         /// <see cref="OutputDocument"/>.
         /// </summary>
@@ -1201,6 +1224,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
+                e.Cancel = true;
                 ex.ExtractDisplay("ELI35605");
             }
         }
@@ -1642,10 +1666,17 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 _cancelLoad = true;
 
-                _inputFileEnumerator.Dispose();
-                _inputFileEnumerator = null;
-                _inputFolderWatcher.Dispose();
-                _inputFolderWatcher = null;
+                if (_inputFileEnumerator != null)
+                {
+                    _inputFileEnumerator.Dispose();
+                    _inputFileEnumerator = null;
+                }
+
+                if (_inputFolderWatcher != null)
+                {
+                    _inputFolderWatcher.Dispose();
+                    _inputFolderWatcher = null;
+                }
 
                 if (_imageViewer.IsImageAvailable)
                 {
@@ -1701,6 +1732,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.ImageViewer = _imageViewer;
             _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
             _primaryPageLayoutControl.PageDeleted += HandlePageLayoutControl_PageDeleted;
+            _primaryPageLayoutControl.LoadNextDocumentRequest += HandleLayoutControl_LoadNextDocumentRequest;
             _pageLayoutToolStripContainer.ContentPanel.Controls.Add(_primaryPageLayoutControl);
             _primaryPageLayoutControl.Focus();
         }
@@ -2034,16 +2066,25 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return;
             }
 
-            bool ranOutOfDocuments = false;
-            while (!_cancelLoad && !ranOutOfDocuments &&
-                   _primaryPageLayoutControl.PageCount < _config.Settings.InputPageCount)
+            if (_config.Settings.InputPageCount == 0)
             {
-                ranOutOfDocuments = !LoadNextDocument();
+                // If configured such that every document should be loaded manually, call
+                // CreateOutputDocument so that the load next document button gets added.
+                _primaryPageLayoutControl.CreateOutputDocument(null);
             }
-
-            if (!ranOutOfDocuments && _inputFolderWatcher != null)
+            else
             {
-                _inputFolderWatcher.EnableRaisingEvents = false;
+                bool ranOutOfDocuments = false;
+                while (!_cancelLoad && !ranOutOfDocuments &&
+                       _primaryPageLayoutControl.PageCount < _config.Settings.InputPageCount)
+                {
+                    ranOutOfDocuments = !LoadNextDocument();
+                }
+
+                if (!ranOutOfDocuments && _inputFolderWatcher != null)
+                {
+                    _inputFolderWatcher.EnableRaisingEvents = false;
+                }
             }
         }
 

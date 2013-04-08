@@ -505,7 +505,7 @@
             // _settingsToolStripMenuItem
             // 
             this._settingsToolStripMenuItem.Name = "_settingsToolStripMenuItem";
-            this._settingsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._settingsToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
             this._settingsToolStripMenuItem.Text = "&Settings...";
             this._settingsToolStripMenuItem.Click += new System.EventHandler(this.HandleSettingsMenuItem_Click);
             // 
