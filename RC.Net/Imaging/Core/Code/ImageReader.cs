@@ -111,7 +111,9 @@ namespace Extract.Imaging
                 // Prevent write access while reading
                 FileShare sharing = RegistryManager.LockFiles
                                         ? FileShare.Read : FileShare.ReadWrite | FileShare.Delete;
-                _stream = File.Open(fileName, FileMode.Open, FileAccess.Read, sharing);
+
+                FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
+                    _stream = File.Open(fileName, FileMode.Open, FileAccess.Read, sharing));
 
                 // Log that the image reader was created if necessary
                 if (RegistryManager.LogFileLocking)

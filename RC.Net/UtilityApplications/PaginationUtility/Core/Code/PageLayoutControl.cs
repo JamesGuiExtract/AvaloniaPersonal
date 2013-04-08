@@ -533,16 +533,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // to the output path rather than require it to be re-assembled.
                 outputDocument.InOriginalForm = true;
 
-                // If the user scrolled or manipulated the UI while pages were loading, it can
-                // trigger layout operations that make the UI unresponsive of a time at the end of
-                // loading all the pages.
-                // While I have cut down on this time by limiting when layout operations occur in
-                // the PageThumbnailControl, I haven't been able to figure out how to eliminate it.
-                // We can at least display a wait cursor while this is occuring.
-                var waitCursor = new TemporaryWaitCursor();
                 this.SafeBeginInvoke("ELI35612", () =>
                 {
-                    waitCursor.Dispose();
                     // Ensure this control has keyboard focus after loading a document.
                     Focus();
                 });
@@ -2143,7 +2135,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             // the _commandTargetControl to be one of the selected items.
             bool enableSelectionBasedCommands =
                 _commandTargetControl != null && _commandTargetControl.Selected &&
-                _commandTargetControl != _loadNextDocumentButtonControl;
+                SelectedControls.Where(control => control != _loadNextDocumentButtonControl).Any();
 
             _cutCommand.Enabled = enableSelectionBasedCommands;
             _copyCommand.Enabled = enableSelectionBasedCommands;
@@ -2343,6 +2335,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _hoverPageControl = pageControl;
                 pageControl.DisplayPage(ImageViewer, true);
                 pageControl.Highlighted = true;
+
+                // By ensuring the _hoverPageControl has keyboard focus we can prevent cases where
+                // the hover selection doesn't "release" when the control key is released because
+                // some other control (such as the load next document button) ate the event.
+                _hoverPageControl.Focus();
             }
         }
 

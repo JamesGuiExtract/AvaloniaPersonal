@@ -257,6 +257,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         FileSystemWatcher _inputFolderWatcher;
 
         /// <summary>
+        /// Indicates whether currently in a call to <see cref="LoadNextDocument(bool)"/>.
+        /// </summary>
+        bool _loadingNextDocument;
+
+        /// <summary>
         /// The <see cref="FileFilter"/> to be used to limit 
         /// </summary>
         FileFilter _fileFilter;
@@ -946,7 +951,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (!LoadNextDocument())
+                if (!_loadingNextDocument && !LoadNextDocument())
                 {
                     UtilityMethods.ShowMessageBox("No more input documents were found.",
                         "No more input documents", false);
@@ -1194,7 +1199,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (!LoadNextDocument())
+                if (!_loadingNextDocument && !LoadNextDocument())
                 {
                     UtilityMethods.ShowMessageBox("No more input documents were found.",
                         "No more input documents", false);
@@ -1961,66 +1966,100 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool LoadNextDocument()
         {
-            return LoadNextDocument(true);
+            return LoadNextDocument(false);
         }
 
         /// <summary>
         /// Loads the next input document into the UI.
         /// </summary>
-        /// <param name="restartIfEmpty"><see langword="true"/> if the enumeration should be
-        /// restarted from the beginning once we reach the end.</param>
-        bool LoadNextDocument(bool restartIfEmpty = true)
+        /// <param name="recursiveCall"><see langword="true"/> if the this is a recursive call;
+        /// <see langword="false"/> otherwise.</param>
+        bool LoadNextDocument(bool recursiveCall)
         {
-            if (_inputFileEnumerator == null)
+            // [DotNetRCAndUtils:940, 943]
+            // Don't allow multiple simultaneous calls into LoadNextDocument unless via direct
+            // recursion. Though all calls to this method should happen on the same thread, because
+            // the CreateOutputDocument call below calls Application.DoEvents, it can allow for a
+            // second call to occur while the first is still in progress.
+            if (!recursiveCall)
             {
-                StartInputEnumeration();
+                if (_loadingNextDocument)
+                {
+                    return false;
+                }
+                else
+                {
+                    _loadingNextDocument = true;
+                }
             }
 
-            while (!_cancelLoad && _inputFileEnumerator.MoveNext())
+            try
             {
-                string fileName = _inputFileEnumerator.Current;
-                if (_failedFileNames.Contains(fileName))
+                if (_inputFileEnumerator == null)
                 {
-                    continue;
+                    StartInputEnumeration();
                 }
 
-                try
+                while (!_cancelLoad && _inputFileEnumerator.MoveNext())
                 {
-                    var sourceDocument = OpenDocument(fileName);
-
-                    if (sourceDocument != null)
+                    string fileName = _inputFileEnumerator.Current;
+                    if (_failedFileNames.Contains(fileName))
                     {
-                        _primaryPageLayoutControl.CreateOutputDocument(sourceDocument);
+                        continue;
+                    }
 
+                    try
+                    {
+                        var sourceDocument = OpenDocument(fileName);
+
+                        if (sourceDocument != null)
+                        {
+                            // The will call Application.DoEvents in the midst of loading a document to
+                            // keep the UI responsive as pages are loaded. This allows an opportunity
+                            // for there to be multiple calls into LoadNextDocument at the same time.
+                            _primaryPageLayoutControl.CreateOutputDocument(sourceDocument);
+
+                            return true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        var ee = new ExtractException("ELI35588",
+                            "Unable to load document; document will be ignored until restarted", ex);
+                        ee.AddDebugData("Filename", fileName, false);
+                        ee.Display();
+
+                        _failedFileNames.Add(fileName);
+                    }
+                }
+
+                // If we reached the end of the enumeration, enable the _inputFolderWatcher to notify
+                // when any new files are added, then restart the enumeration (unless it is specified
+                // that the restart is not necessary to prevent recursion).
+                if (!recursiveCall)
+                {
+                    _inputFolderWatcher.EnableRaisingEvents = true;
+
+                    StartInputEnumeration();
+                    if (LoadNextDocument(true))
+                    {
                         return true;
                     }
                 }
-                catch (Exception ex)
-                {
-                    var ee = new ExtractException("ELI35588",
-                        "Unable to load document; document will be ignored until restarted", ex);
-                    ee.AddDebugData("Filename", fileName, false);
-                    ee.Display();
 
-                    _failedFileNames.Add(fileName);
-                }
+                return false;
             }
-
-            // If we reached the end of the enumeration, enable the _inputFolderWatcher to notify
-            // when any new files are added, then restart the enumeration (unless it is specified
-            // that the restart is not necessary to prevent recursion).
-            if (restartIfEmpty)
+            catch (Exception ex)
             {
-                _inputFolderWatcher.EnableRaisingEvents = true;
-
-                StartInputEnumeration();
-                if (LoadNextDocument(false))
+                throw ex.AsExtract("ELI35631");
+            }
+            finally
+            {
+                if (!recursiveCall)
                 {
-                    return true;
+                    _loadingNextDocument = false;
                 }
             }
-
-            return false;
         }
 
         /// <summary>
@@ -2061,7 +2100,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void LoadMorePages()
         {
-            if (_cancelLoad)
+            if (_cancelLoad || _loadingNextDocument)
             {
                 return;
             }
