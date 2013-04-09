@@ -19,181 +19,6 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// </summary>
     public partial class PaginationUtilityForm : Form
     {
-        #region ClipboardData class
-
-        /// <summary>
-        /// Represents <see cref="PaginationControl"/>s copied to the clipboard by this utility.
-        /// </summary>
-        [Serializable]
-        class ClipboardData
-        {
-            /// <summary>
-            /// A list of <see cref="Tuple"/>s where the first item indicates the input filename the
-            /// a page is from and the second item indicates the page from that document. Any
-            /// <see langword="null"/> entries in this list indicate an output document boundary
-            /// which should be represented by a <see cref="PaginationSeparator"/> when pasted into
-            /// a <see cref="PageLayoutControl"/>.
-            /// </summary>
-            List<Tuple<string, int>> _pageData;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="ClipboardData"/> class.
-            /// </summary>
-            /// <param name="pages">The <see cref="Page"/> instances to be copied to the clipboard
-            /// where any <see langword="null"/> entries indicate a document boundary.</param>
-            public ClipboardData(IEnumerable<Page> pages)
-            {
-                _pageData = new List<Tuple<string, int>>(
-                    pages.Select(page => (page == null)
-                        ? null
-                        : new Tuple<string, int>(page.OriginalDocumentName, page.OriginalPageNumber)));
-            }
-
-            /// <summary>
-            /// Gets the <see cref="IEnumerable{Page}"/> represented by this clipboard data.
-            /// </summary>
-            /// <param name="paginationUtility">The <see cref="PaginationUtilityForm"/> the data is
-            /// needed for.</param>
-            /// <returns>The <see cref="IEnumerable{Page}"/> represented by this clipboard data.
-            /// </returns>
-            public IEnumerable<Page> GetPages(PaginationUtilityForm paginationUtility)
-            {
-                // Convert each entry in _pageData into either null (for a document boundary) or a
-                // Page instance.
-                foreach(Tuple<string, int> pageData in _pageData)
-                {
-                    if (pageData == null)
-                    {
-                        yield return null;
-                        continue;
-                    }
-
-                    string fileName = pageData.Item1;
-                    int pageNumber = pageData.Item2;
-
-                    // See if the document indicated is already open as a SourceDocument.
-                    SourceDocument document = paginationUtility._sourceDocuments
-                        .Where(doc =>
-                            doc.FileName.Equals(fileName, StringComparison.OrdinalIgnoreCase))
-                        .SingleOrDefault();
-
-                    // If not, open it as a SourceDocument.
-                    if (document == null)
-                    {
-                        document = paginationUtility.OpenDocument(fileName);
-                    }
-
-                    // If unable to open then document, don't throw an exception, just act as though
-                    // the data was not on the clipboard in the first place.
-                    if (document == null)
-                    {
-                        break;
-                    }
-
-                    ExtractException.Assert("ELI35506", "Cannot find source page.",
-                        document != null && document.Pages.Count >= pageNumber,
-                        "Filename", fileName,
-                        "Page number", pageNumber);
-
-                    // Return the correct page from the SourceDocument.
-                    yield return document.Pages[pageNumber - 1];
-                }
-            }
-
-            /// <summary>
-            /// Determines whether the specified <see cref="System.Object"/> is equal to this
-            /// instance.
-            /// </summary>
-            /// <param name="obj">The <see cref="System.Object"/> to compare with this instance.
-            /// </param>
-            /// <returns><see langword="true"/> if the specified <see cref="System.Object"/> is
-            /// equal to this instance; otherwise, <see langword="false"/>.
-            /// </returns>
-            public override bool Equals(object obj)
-            {
-                try
-                {
-                    // An equivilant object must be a ClipboardData instance.
-                    var clipboardData = obj as ClipboardData;
-                    if (clipboardData == null)
-                    {
-                        return false;
-                    }
-
-                    // An equivilant object must have the same number of entries in _pageData.
-                    var pageData = clipboardData._pageData;
-                    if (pageData.Count != _pageData.Count)
-                    {
-                        return false;
-                    }
-
-                    // An equivilant object must have equivalent entries in _pageData.
-                    for (int i = 0; i < _pageData.Count; i++)
-                    {
-                        if ((pageData[i] == null) != (_pageData[i] == null))
-                        {
-                            return false;
-                        }
-
-                        if (pageData[i] != null)
-                        {
-                            if (!pageData[i].Item1.Equals(_pageData[i].Item1))
-                            {
-                                return false;
-                            }
-
-                            if (!pageData[i].Item2.Equals(_pageData[i].Item2))
-                            {
-                                return false;
-                            }
-                        }
-                    }
-
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI35507");
-                }
-            }
-
-            /// <summary>
-            /// Returns a hash code for this instance.
-            /// </summary>
-            /// <returns>
-            /// A hash code for this instance, suitable for use in hashing algorithms and data
-            /// structures like a hash table. 
-            /// </returns>
-            public override int GetHashCode()
-            {
-                int hashCode = base.GetHashCode();
-
-                try
-                {
-                    hashCode = hashCode ^ _pageData.GetHashCode();
-
-                    for (int i = 0; i < _pageData.Count; i++)
-                    {
-                        if (_pageData[i] != null)
-                        {
-                            hashCode ^= _pageData[i].Item1.GetHashCode();
-                            hashCode ^= _pageData[i].Item2.GetHashCode();
-                        }
-                    }
-
-                    return hashCode;
-                }
-                catch (Exception ex)
-                {
-                    ex.ExtractDisplay("ELI35508");
-                }
-
-                return hashCode;
-            }
-        }
-
-        #endregion ClipboardData class
-
         #region Constants
 
         /// <summary>
@@ -325,6 +150,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         OutputDocument _fileNameEditableDocument;
 
         /// <summary>
+        /// Keeps track of the last know valid filename for the currently selected
+        /// <see cref="_fileNameEditableDocument"/>.
+        /// </summary>
+        string _lastValidDocumentName;
+
+        /// <summary>
         /// The name of the file used to indicate this instance is processing documents from the
         /// configured input folder and that no other instance should be allowed to operate on the
         /// folder at the same time.
@@ -395,8 +226,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     // Loads/save UI state properties
                     _formStateManager = new FormStateManager(this, _FORM_PERSISTENCE_FILE,
-                        _FORM_PERSISTENCE_MUTEX_STRING, _sandDockManager,
-                        false, "Exit full screen (F11)");
+                        _FORM_PERSISTENCE_MUTEX_STRING, null, null);
                 }
 
                 // Allowing caching of images not only improves performance, but also locks the
@@ -423,12 +253,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// output document name.
         /// </summary>
         /// <param name="fileName">The desired output document name to use.</param>
+        /// <param name="promptForOverwrite"><see langword="true"/> if the user should be prompted
+        /// about a filename that conflicts with an existing filename; <see langword="false"/> to
+        /// disallow the conflicting name without prompting.</param>
+        /// <param name="outputImminent"><see langword="true"/> if this call is being made because
+        /// the document is currently being output; <see langword="false"/> otherwise.</param>
         /// <returns><see langword="true"/> if the filename is available to use; otherwise,
         /// <see langword="false"/>.
         /// </returns>
-        internal bool IsOutputFileNameAvailable(string fileName)
+        internal bool IsOutputFileNameAvailable(string fileName, bool promptForOverwrite,
+            bool outputImminent)
         {
-            return IsOutputFileNameAvailable(fileName, null);
+            return IsOutputFileNameAvailable(fileName, null, promptForOverwrite, outputImminent);
         }
 
         /// <summary>
@@ -438,10 +274,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="fileName">The desired output document name to use.</param>
         /// <param name="subjectDocument">The <see cref="OutputDocument"/> the filename is to be
         /// used for.</param>
+        /// <param name="promptForOverwrite"><see langword="true"/> if the user should be prompted
+        /// about a filename that conflicts with an existing filename; <see langword="false"/> to
+        /// disallow the conflicting name without prompting.</param>
+        /// <param name="outputImminent"><see langword="true"/> if this call is being made because
+        /// the document is currently being output; <see langword="false"/> otherwise.</param>
         /// <returns><see langword="true"/> if the filename is available to use; otherwise,
         /// <see langword="false"/>.
         /// </returns>
-        internal bool IsOutputFileNameAvailable(string fileName, OutputDocument subjectDocument)
+        internal bool IsOutputFileNameAvailable(string fileName, OutputDocument subjectDocument,
+            bool promptForOverwrite, bool outputImminent)
         {
             try
             {
@@ -450,9 +292,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                     FileSystemMethods.IsFileNameValid(Path.GetFileName(fileName)),
                     "Filename", fileName);
 
-                // If a document by this name has already been output by this instance, don't allow
-                // it whether or not that document still exists at that location.
-                if (_outputDocumentNames.Contains(fileName))
+                // If !promptForOverwrite and a document by this name has already been output by
+                // this instance, don't allow it whether or not that document still exists at that
+                // location.
+                // If promptForOverwrite, don't be concerned with whether a document was previously
+                // output with this name... if this path doesn't current exist, assume the user will
+                // want to output to it.
+                if (!promptForOverwrite && _outputDocumentNames.Contains(fileName))
                 {
                     return false;
                 }
@@ -462,11 +308,40 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_pendingDocuments.Any(document => document != subjectDocument &&
                     document.FileName.Equals(fileName, StringComparison.OrdinalIgnoreCase)))
                 {
+                    if (promptForOverwrite)
+                    {
+                        DialogResult response = MessageBox.Show(
+                            "A pending output document is already using this name; use this filename anyway?",
+                            "Filename conflict", MessageBoxButtons.OKCancel, MessageBoxIcon.Question,
+                            MessageBoxDefaultButton.Button2, 0);
+
+                        if (response == DialogResult.OK)
+                        {
+                            return true;
+                        }
+                    }
+
                     return false;
                 }
 
                 if (File.Exists(fileName))
                 {
+                    if (promptForOverwrite)
+                    {
+                        DialogResult response = outputImminent
+                            ? MessageBox.Show("Overwrite existing file?",
+                                "Overwrite?", MessageBoxButtons.OKCancel, MessageBoxIcon.Question,
+                                MessageBoxDefaultButton.Button2, 0)
+                            : MessageBox.Show("A file by this name already exists; use this filename anyway?",
+                                "File already exists", MessageBoxButtons.OKCancel, MessageBoxIcon.Question,
+                                MessageBoxDefaultButton.Button2, 0);
+
+                        if (response == DialogResult.OK)
+                        {
+                            return true;
+                        }
+                    }
+
                     return false;
                 }
 
@@ -487,7 +362,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             if (_fileNameEditableDocument != null)
             {
-                return ValidateOutputFileName(_fileNameEditableDocument);
+                return ValidateOutputFileName(_fileNameEditableDocument, false);
             }
 
             return true;
@@ -498,16 +373,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="selectedDocument">The <see cref="OutputDocument"/> whose name is to be
         /// validated.</param>
+        /// <param name="outputImminent"><see langword="true"/> if this call is being made because
+        /// the document is currently being output; <see langword="false"/> otherwise.</param>
         /// <returns><see langword="true"/> if the filename is valid; <see langword="false"/> if it
         /// is invalid.</returns>
-        bool ValidateOutputFileName(OutputDocument selectedDocument)
+        bool ValidateOutputFileName(OutputDocument selectedDocument, bool outputImminent)
         {
             try
             {
-                if (!IsOutputFileNameAvailable(selectedDocument.FileName, selectedDocument))
+                if (!IsOutputFileNameAvailable(
+                        selectedDocument.FileName, selectedDocument, true, outputImminent))
                 {
-                    UtilityMethods.ShowMessageBox("This output filename has already been used.",
-                        "Filename Unavailable", true);
                     return false;
                 }
 
@@ -517,6 +393,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                         "Filename Invalid.", true);
                     return false;
                 }
+
+                // If the document name passed validation, we can update _lastValidDocumentName.
+                _lastValidDocumentName = selectedDocument.FileName;
 
                 return true;
             }
@@ -1230,7 +1109,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (!ValidateOutputFileName((OutputDocument)sender))
+                if (!ValidateOutputFileName((OutputDocument)sender, true))
                 {
                     e.Cancel = true;
                 }
@@ -1296,6 +1175,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     // If there is only one document with at least one page selected, set the output
                     // filename.
+                    _lastValidDocumentName = selectedDocument.FileName;
                     _outputFileNameToolStripTextBox.Text = selectedDocument.FileName;
 
                     // If the document is fully selected, set the pages label to indicate the number
@@ -1343,6 +1223,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     // If zero or more than one document is partially selected, both output
                     // filename text box and page label should be cleared.
+                    _lastValidDocumentName = null;
                     _outputFileNameToolStripTextBox.Text = "";
                     _outputFileNameToolStripTextBox.Enabled = false;
                     _pagesToolStripLabel.Text = "";
@@ -1429,7 +1310,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                ValidateOutputFileName();
+                if (!ValidateOutputFileName() && !string.IsNullOrEmpty(_lastValidDocumentName))
+                {
+                    // If validation failed, restore the last valid filename.
+                    _outputFileNameToolStripTextBox.Text = _lastValidDocumentName;
+                }
             }
             catch (Exception ex)
             {
@@ -1513,24 +1398,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                         ExtractException.Assert("ELI35608", "Filename not editable.",
                             _fileNameEditableDocument != null);
 
-                        if (!IsOutputFileNameAvailable(saveFileDialog.FileName))
-                        {
-                            UtilityMethods.ShowMessageBox(
-                                "This output filename has already been used.",
-                                "Filename Unavailable", true);
-
-                            saveFileDialog.InitialDirectory =
-                                Path.GetDirectoryName(saveFileDialog.FileName);
-                            saveFileDialog.FileName = Path.GetFileName(saveFileDialog.FileName);
-                            continue;
-                        }
-
-                        // Return the selected file path.
+                        // Return the selected file path if it is valid
                         _outputFileNameToolStripTextBox.Text = saveFileDialog.FileName;
                         _fileNameEditableDocument.FileName = _outputFileNameToolStripTextBox.Text;
-                        ValidateOutputFileName();
-                        break;
+                        if (ValidateOutputFileName())
+                        {
+                            return;
+                        }
                     }
+
+                    // If the user cancelled, restore the name that had previously been in the text
+                    // box.
+                    _outputFileNameToolStripTextBox.Text = _lastValidDocumentName;
                 }
             }
             catch (Exception ex)
@@ -1814,7 +1693,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="fileName">The filename that should serve as the basis for the new document
         /// name.</param>
         /// <returns>The unique document name.</returns>
-        string GenerateOutputDocumentName(string fileName)
+        internal string GenerateOutputDocumentName(string fileName)
         {
             // If fileName is from the input folder and we are to preserve the sub-folder hierarchy,
             // replace the input folder with the output folder in the path.
@@ -1844,7 +1723,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     extension);
             }
 
-            if (IsOutputFileNameAvailable(fileName))
+            if (IsOutputFileNameAvailable(fileName, false, false))
             {
                 return fileName;
             }
@@ -1868,7 +1747,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             baseFilename + "_{0:D3}" + extension, number));
                 }
 
-                if (IsOutputFileNameAvailable(newFileName))
+                if (IsOutputFileNameAvailable(newFileName, false, false))
                 {
                     return newFileName;
                 }
@@ -1918,7 +1797,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     string.Format(CultureInfo.CurrentCulture,
                         baseFilename + "_{0:D3}" + extension, number));
 
-                if (IsOutputFileNameAvailable(newFileName))
+                if (IsOutputFileNameAvailable(newFileName, false, false))
                 {
                     return newFileName;
                 }

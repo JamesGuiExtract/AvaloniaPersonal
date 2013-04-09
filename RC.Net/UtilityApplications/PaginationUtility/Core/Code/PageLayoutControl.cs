@@ -725,6 +725,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                             ? 1
                             : previousPageControl.PageNumber + 1;
                         document.InsertPage(newPageControl, newPageNumber);
+
+                        // If this means the fisrt page of the document is now from a different
+                        // source document, rename the document based upon the new first page.
+                        if (newPageNumber == 1 && 
+                            (nextPageControl == null ||
+                            newPageControl.Page.SourceDocument != nextPageControl.Page.SourceDocument))
+                        {
+                            document.FileName =
+                                _paginationUtility.GenerateOutputDocumentName(
+                                    newPageControl.Page.OriginalDocumentName);
+                        }
                     }
                     else
                     {

@@ -217,6 +217,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     using (ImageCodecs codecs = new ImageCodecs())
                     {
                         ImageWriter writer = null;
+                        TemporaryFile temporaryFile = null;
                         var readers = new Dictionary<string, ImageReader>();
 
                         try
@@ -235,19 +236,51 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 // first page.
                                 if (writer == null)
                                 {
-                                    writer = codecs.CreateWriter(FileName, reader.Format, false);
+                                    if (!ImageMethods.IsTiff(reader.Format) &&
+                                             Path.GetExtension(FileName)
+                                                 .StartsWith(".tif", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        // If the image format is not tif, but the output filename
+                                        // has a tif extension, change the format to a tif.
+                                        writer = codecs.CreateWriter(FileName,
+                                            RasterImageFormat.CcittGroup4, false);
+                                    }
+                                    else if (ImageMethods.IsPdf(reader.Format) ||
+                                        Path.GetExtension(FileName)
+                                            .Equals(".pdf", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        // If the output format is PDF, first output a tif to a
+                                        // temporary file, then we will convert to a PDF at the end.
+                                        temporaryFile = new TemporaryFile(true);
+                                        writer = codecs.CreateWriter(temporaryFile.FileName,
+                                            RasterImageFormat.CcittGroup4, false);
+                                    }
+                                    else
+                                    {
+                                        writer = codecs.CreateWriter(FileName, reader.Format, false);
+                                    }
                                 }
 
                                 RasterImage pageImage = reader.ReadPage(page.OriginalPageNumber);
+
                                 // Image must be rotated with forceTrueRotation to true, otherwise
                                 // the output page is not rendered with the correct orientation
                                 // (unclear why).
                                 ImageMethods.RotateImageByDegrees(
                                     pageImage, page.ImageOrientation, true);
+
                                 writer.AppendImage(pageImage);
                             }
 
-                            writer.Commit(false);
+                            writer.Commit(true);
+
+                            // If the final output is to be a pdf, convert the temporary tif to a
+                            // pdf now.
+                            if (temporaryFile != null)
+                            {
+                                ImageMethods.ConvertTifToPdf(temporaryFile.FileName, FileName, true);
+                                temporaryFile.Dispose();
+                            }
                         }
                         finally
                         {
@@ -259,6 +292,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 }
 
                                 CollectionMethods.ClearAndDispose(readers);
+
+                                if (temporaryFile != null)
+                                {
+                                    temporaryFile.Dispose();
+                                }
                             }
                             catch (Exception ex)
                             {

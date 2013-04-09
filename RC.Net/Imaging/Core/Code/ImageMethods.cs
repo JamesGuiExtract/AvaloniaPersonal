@@ -736,6 +736,60 @@ namespace Extract.Imaging
                 throw ex.AsExtract("ELI32222");
             }
         }
+
+        /// <summary>
+        /// Converts the tif to PDF
+        /// </summary>
+        /// <param name="inputFile">The input file.</param>
+        /// <param name="outputFile">The output file.</param>
+        public static void ConvertTifToPdf(string inputFile, string outputFile)
+        {
+            try
+            {
+                ConvertTifToPdf(inputFile, outputFile, false);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35637");
+            }
+        }
+
+        /// <summary>
+        /// Converts the tif to PDF.
+        /// </summary>
+        /// <param name="inputFile">The input file.</param>
+        /// <param name="outputFile">The output file.</param>
+        /// <param name="useAlternateMethod"><see langword="true"/> to use the alternate method of
+        /// conversion; otherwise <see langword="false"/>.</param>
+        public static void ConvertTifToPdf(string inputFile, string outputFile,
+            bool useAlternateMethod)
+        {
+            try
+            {
+                LicenseUtilities.ValidateLicense(LicenseIdName.PdfReadWriteFeature,
+                    "ELI35638", "Convert PDF to TIF");
+
+                var arguments = useAlternateMethod
+                    ? new string[] { inputFile, outputFile, "/pdf", "/am" }
+                    : new string[] { inputFile, outputFile, "/pdf" };
+                int exitCode = SystemMethods.RunExtractExecutable(_IMAGE_FORMAT_CONVERTER, arguments);
+
+                // [DotNetRCAndUtils:849]
+                // If _IMAGE_FORMAT_CONVERTER does not return 0, the conversion did not succeed
+                // (likely crashed).
+                if (exitCode != 0)
+                {
+                    var ee = new ExtractException("ELI35639",
+                        "Tif conversion process terminiated abnormally.");
+                    ee.AddDebugData("Exit code", exitCode, false);
+                    throw ee;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35640");
+            }
+        }
     }
 
     /// <summary>
