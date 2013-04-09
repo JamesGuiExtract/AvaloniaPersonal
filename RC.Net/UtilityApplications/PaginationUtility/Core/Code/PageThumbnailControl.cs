@@ -323,9 +323,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.OnLoad(e);
 
-                _rasterPictureBox.Image = _page.ThumbnailImage.Clone();
+                if (_page != null)
+                {
+                    _rasterPictureBox.Image = _page.ThumbnailImage.Clone();
 
-                SetToolTip(this);
+                    SetToolTip(this);
+                }
             }
             catch (Exception ex)
             {
@@ -513,7 +516,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void UpdateThumbnail()
         {
-            if (IsDisposed)
+            if (IsDisposed || !IsHandleCreated)
             {
                 return;
             }
@@ -524,7 +527,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             this.SafeBeginInvoke("ELI35559", () =>
             {
                 // Ensure this control has not been disposed of since invoking the thumbnail change.
-                if (!IsDisposed && !_page.IsDisposed)
+                if (!IsDisposed && _page != null && !_page.IsDisposed)
                 {
                     _rasterPictureBox.Image = _page.ThumbnailImage.Clone();
                     _rasterPictureBox.Invalidate();

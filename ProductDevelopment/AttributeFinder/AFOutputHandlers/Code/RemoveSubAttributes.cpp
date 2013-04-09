@@ -688,7 +688,7 @@ UCLID_AFOUTPUTHANDLERSLib::IRemoveSubAttributesPtr CRemoveSubAttributes::getThis
 //-------------------------------------------------------------------------------------------------
 void CRemoveSubAttributes::validateLicense()
 {
-	static const unsigned long REMOVE_SUB_ATTRIBUTES_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
+	static const unsigned long REMOVE_SUB_ATTRIBUTES_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( REMOVE_SUB_ATTRIBUTES_ID, "ELI09554", 
 		"Remove SubAttributes Output Handler" );

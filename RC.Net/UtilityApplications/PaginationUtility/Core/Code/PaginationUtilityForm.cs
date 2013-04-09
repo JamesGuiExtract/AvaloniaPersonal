@@ -288,6 +288,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         HashSet<SourceDocument> _sourceDocuments = new HashSet<SourceDocument>();
 
         /// <summary>
+        /// Synchronizes access to <see cref="_sourceDocuments"/>
+        /// </summary>
+        object _sourceDocumentLock = new object();
+
+        /// <summary>
         /// The set of all <see cref="OutputDocument"/>s currently active in the UI.
         /// </summary>
         HashSet<OutputDocument> _pendingDocuments = new HashSet<OutputDocument>();
@@ -879,7 +884,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _inputFolderWatcher = null;
                     }
 
-                    CollectionMethods.ClearAndDispose(_sourceDocuments);
+                    lock (_sourceDocumentLock)
+                    {
+                        CollectionMethods.ClearAndDispose(_sourceDocuments);
+                    }
 
                     DereferenceLastClipboardData();
 
@@ -1688,7 +1696,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _imageViewer.CloseImage();
                 }
 
-                CollectionMethods.ClearAndDispose(_sourceDocuments);
+                lock (_sourceDocumentLock)
+                {
+                    CollectionMethods.ClearAndDispose(_sourceDocuments);
+                }
 
                 ResetPrimaryPageLayoutControl();
 
@@ -2072,24 +2083,37 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// opened.</returns>
         SourceDocument OpenDocument(string inputFileName)
         {
-            if (!File.Exists(inputFileName) ||
-                _sourceDocuments.Any(doc =>
-                    doc.FileName.Equals(inputFileName, StringComparison.OrdinalIgnoreCase)))
+            SourceDocument sourceDocument = null;
+
+            lock (_sourceDocumentLock)
             {
-                return null;
+                if (!File.Exists(inputFileName) ||
+                    _sourceDocuments.Any(doc =>
+                        doc.FileName.Equals(inputFileName, StringComparison.OrdinalIgnoreCase)))
+                {
+                    return null;
+                }
+
+                sourceDocument = new SourceDocument(inputFileName);
+                if (!sourceDocument.Pages.Any())
+                {
+                    sourceDocument.Dispose();
+                    return null;
+                }
+
+                _sourceDocuments.Add(sourceDocument);
             }
 
-            var sourceDocument = new SourceDocument(inputFileName);
-            if (!sourceDocument.Pages.Any())
+            ThreadingMethods.RunInBackgroundThread("ELI35541", () =>
             {
-                sourceDocument.Dispose();
-                return null;
-            }
-
-            _sourceDocuments.Add(sourceDocument);
-
-            ThreadingMethods.RunInBackgroundThread("ELI35541",
-                () => _imageViewer.CacheImage(inputFileName));
+                lock (_sourceDocumentLock)
+                {
+                    if (!_cancelLoad && _sourceDocuments.Contains(sourceDocument))
+                    {
+                        _imageViewer.CacheImage(inputFileName);
+                    }
+                }
+            });
 
             return sourceDocument;
         }
@@ -2183,13 +2207,16 @@ namespace Extract.UtilityApplications.PaginationUtility
             IEnumerable<SourceDocument> processedDocuments = sourceDocuments
                 .Where(document => document.Pages.All(page => !page.HasActiveReference));
 
-            foreach (SourceDocument document in processedDocuments
-                .Where(document => _sourceDocuments.Contains(document)))
+            lock (_sourceDocumentLock)
             {
-                HandleProcessedSourceDocument(document);
-                document.Dispose();
+                foreach (SourceDocument document in processedDocuments
+                        .Where(document => _sourceDocuments.Contains(document)))
+                {
+                    HandleProcessedSourceDocument(document);
+                    document.Dispose();
 
-                _sourceDocuments.Remove(document);
+                    _sourceDocuments.Remove(document);
+                } 
             }
         }
 

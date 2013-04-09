@@ -543,7 +543,7 @@ STDMETHODIMP CConditionalValueFinder::get_InstanceGUID(GUID *pVal)
 void CConditionalValueFinder::validateLicense()
 {
 	static const unsigned long CONDITIONAL_VALUE_FINDER_COMPONENT_ID = 
-		gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
+		gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( CONDITIONAL_VALUE_FINDER_COMPONENT_ID, "ELI10738", 
 					"Conditionally Find Value" );

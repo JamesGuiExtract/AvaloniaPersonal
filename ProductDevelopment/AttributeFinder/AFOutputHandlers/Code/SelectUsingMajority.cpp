@@ -416,7 +416,7 @@ STDMETHODIMP CSelectUsingMajority::get_InstanceGUID(GUID *pVal)
 //-------------------------------------------------------------------------------------------------
 void CSelectUsingMajority::validateLicense()
 {
-	static const unsigned long SELECT_MAJORITY_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
+	static const unsigned long SELECT_MAJORITY_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( SELECT_MAJORITY_ID, "ELI05042", "Select Majority Output Handler" );
 }

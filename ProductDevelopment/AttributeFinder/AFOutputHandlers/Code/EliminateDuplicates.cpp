@@ -306,7 +306,7 @@ STDMETHODIMP CEliminateDuplicates::get_InstanceGUID(GUID *pVal)
 //-------------------------------------------------------------------------------------------------
 void CEliminateDuplicates::validateLicense()
 {
-	static const unsigned long ELIMINATE_DUPLICATES_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
+	static const unsigned long ELIMINATE_DUPLICATES_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE(ELIMINATE_DUPLICATES_ID, "ELI05031", "Eliminate Duplicates Output Handler");
 }

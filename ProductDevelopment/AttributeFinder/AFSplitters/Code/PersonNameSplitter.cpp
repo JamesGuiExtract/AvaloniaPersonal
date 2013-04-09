@@ -965,7 +965,7 @@ IRegularExprParserPtr CPersonNameSplitter::getParser()
 //-------------------------------------------------------------------------------------------------
 void CPersonNameSplitter::validateLicense()
 {
-	static const unsigned long THIS_COMPONENT_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
+	static const unsigned long THIS_COMPONENT_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( THIS_COMPONENT_ID, "ELI05570", "Person Name Splitter" );
 }

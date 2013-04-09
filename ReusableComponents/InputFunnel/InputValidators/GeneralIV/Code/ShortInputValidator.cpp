@@ -329,7 +329,7 @@ void CShortInputValidator::setDefaults()
 //-------------------------------------------------------------------------------------------------
 void CShortInputValidator::validateLicense()
 {
-	static const unsigned long SHORTIV_COMPONENT_ID = gnINPUTFUNNEL_CORE_OBJECTS;
+	static const unsigned long SHORTIV_COMPONENT_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( SHORTIV_COMPONENT_ID, "ELI03809",
 		"Short Integer Input Validator" );

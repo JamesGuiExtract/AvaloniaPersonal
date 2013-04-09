@@ -812,7 +812,7 @@ void CTranslateValue::loadFromFile(const string& strFileName, const char& cDelim
 //-------------------------------------------------------------------------------------------------
 void CTranslateValue::validateLicense()
 {
-	static const unsigned long TRANSLATE_VALUE_RULE_COMPONENT_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
+	static const unsigned long TRANSLATE_VALUE_RULE_COMPONENT_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( TRANSLATE_VALUE_RULE_COMPONENT_ID, "ELI04205", "Translate Value Rule" );
 }

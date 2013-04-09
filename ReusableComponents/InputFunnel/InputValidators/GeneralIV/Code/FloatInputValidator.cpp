@@ -327,7 +327,7 @@ void CFloatInputValidator::setDefaults()
 //-------------------------------------------------------------------------------------------------
 void CFloatInputValidator::validateLicense()
 {
-	static const unsigned long FLOATIV_COMPONENT_ID = gnINPUTFUNNEL_CORE_OBJECTS;
+	static const unsigned long FLOATIV_COMPONENT_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( FLOATIV_COMPONENT_ID, "ELI03812",
 		"Float Input Validator" );

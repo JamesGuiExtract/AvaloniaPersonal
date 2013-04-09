@@ -604,7 +604,7 @@ STDMETHODIMP CDocTypeCondition::get_InstanceGUID(GUID *pVal)
 //-------------------------------------------------------------------------------------------------
 void CDocTypeCondition::validateLicense()
 {
-	static const unsigned long DOC_TYPE_CONDITION_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
+	static const unsigned long DOC_TYPE_CONDITION_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( DOC_TYPE_CONDITION_ID, "ELI10782", 
 		"Doc Type Condition" );

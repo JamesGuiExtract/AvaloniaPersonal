@@ -699,7 +699,7 @@ STDMETHODIMP CRunObjectOnQuery::get_InstanceGUID(GUID *pVal)
 //-------------------------------------------------------------------------------------------------
 void CRunObjectOnQuery::validateLicense()
 {
-	VALIDATE_LICENSE( gnFLEXINDEX_IDSHIELD_CORE_OBJECTS, "ELI10394", 
+	VALIDATE_LICENSE( gnRULE_WRITING_CORE_OBJECTS, "ELI10394", 
 		"Run object on attributes output handler" );
 }
 //-------------------------------------------------------------------------------------------------

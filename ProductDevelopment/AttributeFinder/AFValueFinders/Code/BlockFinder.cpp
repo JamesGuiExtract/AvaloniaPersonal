@@ -994,7 +994,7 @@ STDMETHODIMP CBlockFinder::get_InstanceGUID(GUID *pVal)
 //-------------------------------------------------------------------------------------------------
 void CBlockFinder::validateLicense()
 {
-	static const unsigned long BLOCK_FINDER_COMPONENT_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
+	static const unsigned long BLOCK_FINDER_COMPONENT_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( BLOCK_FINDER_COMPONENT_ID, "ELI05692", "Block Finder" );
 }

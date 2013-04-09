@@ -35,7 +35,7 @@ namespace Extract.AttributeFinder.Rules
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents,
+                LicenseUtilities.ValidateLicense(LicenseIdName.RuleSetEditorUIObject,
                     "ELI35060", _OBJECT_NAME);
 
                 Settings = settings;

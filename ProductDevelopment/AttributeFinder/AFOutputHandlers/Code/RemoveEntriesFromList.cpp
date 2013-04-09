@@ -584,7 +584,7 @@ STDMETHODIMP CRemoveEntriesFromList::get_InstanceGUID(GUID *pVal)
 //-------------------------------------------------------------------------------------------------
 void CRemoveEntriesFromList::validateLicense()
 {
-	static const unsigned long REMOVE_ENTRIES_FROM_LIST_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
+	static const unsigned long REMOVE_ENTRIES_FROM_LIST_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( REMOVE_ENTRIES_FROM_LIST_ID, "ELI06784", 
 		"Remove Entries From List Output Handler");

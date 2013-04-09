@@ -57,7 +57,7 @@ namespace Extract.AttributeFinder.Rules
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects,
+                LicenseUtilities.ValidateLicense(LicenseIdName.RuleSetEditorUIObject,
                     "ELI33701", _OBJECT_NAME);
 
                 Settings = settings;

@@ -597,7 +597,7 @@ STDMETHODIMP CInsertCharacters::get_InstanceGUID(GUID *pVal)
 //-------------------------------------------------------------------------------------------------
 void CInsertCharacters::validateLicense()
 {
-	static const unsigned long INSERT_CHARS_COMPONENT_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
+	static const unsigned long INSERT_CHARS_COMPONENT_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( INSERT_CHARS_COMPONENT_ID, "ELI04960", "Insert Characters" );
 }

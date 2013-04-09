@@ -351,7 +351,7 @@ STDMETHODIMP CQueryBasedAS::get_InstanceGUID(GUID *pVal)
 //-------------------------------------------------------------------------------------------------
 void CQueryBasedAS::validateLicense()
 {
-	static const unsigned long QUERY_BASED_AS_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
+	static const unsigned long QUERY_BASED_AS_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( QUERY_BASED_AS_ID, "ELI13356", "Query Based Attribute Selector" );
 }

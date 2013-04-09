@@ -1832,7 +1832,7 @@ IInputValidatorPtr CIntegerInputValidator::getThisAsInputValidatorPtr()
 //-------------------------------------------------------------------------------------------------
 void CIntegerInputValidator::validateLicense()
 {
-	static const unsigned long INTEGERIV_COMPONENT_ID = gnINPUTFUNNEL_CORE_OBJECTS;
+	static const unsigned long INTEGERIV_COMPONENT_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( INTEGERIV_COMPONENT_ID, "ELI03693",
 		"Integer Input Validator" );

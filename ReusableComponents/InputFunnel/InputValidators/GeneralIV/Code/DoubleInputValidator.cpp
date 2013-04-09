@@ -1690,7 +1690,7 @@ IInputValidatorPtr CDoubleInputValidator::getThisAsInputValidatorPtr()
 //-------------------------------------------------------------------------------------------------
 void CDoubleInputValidator::validateLicense()
 {
-	static const unsigned long DOUBLEIV_COMPONENT_ID = gnINPUTFUNNEL_CORE_OBJECTS;
+	static const unsigned long DOUBLEIV_COMPONENT_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( DOUBLEIV_COMPONENT_ID, "ELI03737",
 		"Double Input Validator" );

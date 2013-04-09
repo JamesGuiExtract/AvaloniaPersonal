@@ -419,7 +419,7 @@ STDMETHODIMP CPadValue::get_InstanceGUID(GUID *pVal)
 //-------------------------------------------------------------------------------------------------
 void CPadValue::validateLicense()
 {
-	static const unsigned long PAD_VALUE_RULE_COMPONENT_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
+	static const unsigned long PAD_VALUE_RULE_COMPONENT_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( PAD_VALUE_RULE_COMPONENT_ID, "ELI09702", "Pad Value" );
 }

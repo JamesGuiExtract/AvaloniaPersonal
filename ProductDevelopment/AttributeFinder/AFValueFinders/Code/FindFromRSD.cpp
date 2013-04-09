@@ -490,7 +490,7 @@ STDMETHODIMP CFindFromRSD::get_InstanceGUID(GUID *pVal)
 //-------------------------------------------------------------------------------------------------
 void CFindFromRSD::validateLicense()
 {
-	static const unsigned long FIND_FROM_RSD_COMPONENT_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
+	static const unsigned long FIND_FROM_RSD_COMPONENT_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( FIND_FROM_RSD_COMPONENT_ID, "ELI10238", "Find From RSD File" );
 }

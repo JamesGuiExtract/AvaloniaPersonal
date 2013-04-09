@@ -942,7 +942,7 @@ IInputValidatorPtr CDateInputValidator::getThisAsInputValidatorPtr()
 //-------------------------------------------------------------------------------------------------
 void CDateInputValidator::validateLicense()
 {
-	static const unsigned long DATEIV_COMPONENT_ID = gnINPUTFUNNEL_CORE_OBJECTS;
+	static const unsigned long DATEIV_COMPONENT_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( DATEIV_COMPONENT_ID, "ELI03821",
 		"Date Input Validator" );
