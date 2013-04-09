@@ -24,28 +24,69 @@
 	exercised via <b>File Action Manager</b>.
 </ul>
 <p>
-<h2>Installation and Licensing</h2>
+<h2>Installation and Licensing</h2> - exercise one of the following
 <ul>
-	<li>Confirm that <b>RDT_IDShieldCustomer</b> cannot be installed unless 
-	<b>ID Shield</b> is already installed.
+	<li><b>FLEX Index</b>
+	<ul>
+		<li>Confirm that <b>RDT_FLEXIndexCustomer</b> cannot be installed unless 
+		<b>FLEX Index</b> is already installed.
+		<li>Create a <b>FLEX Index Rule Writing (Simple Rules passwords!)</b> license 
+		file.
+		<ul>
+			<li>This license must be created from a <b>COMLicense_InternalTesting</b> 
+			folder.
+			<li>Be sure to check the <b>Special passwords</b> checkbox and to select 
+			the <b>Simple Rules</b> option.
+		</ul>
+		<li>Confirm that the following Start Menu shortcuts are available for 
+		<b>Extract Systems FLEX Index Customer Rule Writing Framework</b>.
+		<ul>
+			<li>Index Converter
+			<li>Rule Set Editor
+			<li>Test Harness
+		</ul>
+		<li>Confirm that <b>EncryptFile.exe</b> is not available in the CommonComponents 
+		folder.
+	</ul>
+<p>
+	<li><b>ID Shield</b>
+	<ul>
+		<li>Confirm that <b>RDT_IDShieldCustomer</b> cannot be installed unless 
+		<b>ID Shield</b> is already installed.
+		<li>Create an <b>ID Shield Rule Writing (Simple Rules passwords!)</b> license 
+		file.
+		<ul>
+			<li>This license must be created from a <b>COMLicense_InternalTesting</b> 
+			folder.
+			<li>Be sure to check the <b>Special passwords</b> checkbox and to select 
+			the <b>Simple Rules</b> option.
+		</ul>
+		<li>Confirm that the following Start Menu shortcuts are available for 
+		<b>Extract Systems ID Shield Customer Rule Writing Framework</b>.
+		<ul>
+			<li>Rule Set Editor
+			<li>Test Harness
+		</ul>
+		<li>Confirm that <b>EncryptFile.exe</b> is not available in the CommonComponents 
+		folder.
+	</ul>
 </ul>
 <p>
 <h2>Specific Objects</h2>
 <ul>
-	<li>Create an <b>ID Shield Rule Writing (Simple Rules passwords!)</b> license file.
 	<li>Exercise <b>Tools - Check for new components</b> from Rule Set Editor and 
 	confirm that the following components are found.
 	<ul>
-		<li><b>6 / 8</b> UCLID AF-API Value Finders
-		<li><b>7 / 19</b> UCLID AF-API Value Modifiers
-		<li><b>1 / ?</b> UCLID Input Funnel Input Receivers
-		<li><b>8 / 8</b> UCLID Input Funnel Input Validators
-		<li><b>10 / 17</b> UCLID AF-API Output Handlers
-		<li><b>0 / 4</b> UCLID AF-API Attribute Splitters
-		<li><b>4 / 6</b> UCLID AF-API Document Preprocessors
-		<li><b>0 / ?</b> UCLID AF-API Data Scorers
-		<li><b>0 / ?</b> UCLID AF-API Conditions
-		<li><b>0 / ?</b> UCLID AF-API Selectors
+		<li><b>9</b> UCLID AF-API Value Finders
+		<li><b>13</b> UCLID AF-API Value Modifiers
+		<li><b>1</b> UCLID Input Funnel Input Receivers
+		<li><b>8</b> UCLID Input Funnel Input Validators
+		<li><b>18</b> UCLID AF-API Output Handlers
+		<li><b>4</b> UCLID AF-API Attribute Splitters
+		<li><b>7</b> UCLID AF-API Document Preprocessors
+		<li><b>0</b> UCLID AF-API Data Scorers
+		<li><b>1</b> UCLID AF-API Conditions
+		<li><b>3</b> UCLID AF-API Selectors
 	</ul>
 	<li>Use <b>Rule Set Editor</b> and confirm that <b>only</b> the following rule 
 	objects are available.
@@ -54,6 +95,7 @@
 		<ul>
 			<li>Advanced replace string
 			<li>Conditionally preprocess
+			<li>Document classifier
 			<li>Modify spatial mode
 			<li>Remove spatial information
 			<li>Replace strings
@@ -65,6 +107,7 @@
 			<li>Conditionally find value
 			<li>Create value
 			<li>Extract lines
+			<li>Find from RSD file
 			<li>Regular expression rule
 			<li>Value after clue
 			<li>Value before clue
@@ -76,21 +119,15 @@
 			<li>Block finder
 			<li>Change case
 			<li>Conditionally modify attribute
-			<li>Extract lines
 			<li>Insert characters
 			<li>Modify spatial mode
 			<li>Pad value
 			<li>Regular expression rule
 			<li>Remove characters
-			<li>Remove invalid entries
 			<li>Remove spatial information
 			<li>Replace strings
-			<li>String tokenizer
 			<li>Translate to closest value in list
 			<li>Translate values or types
-			<li>Value after clue
-			<li>Value before clue
-			<li>Value from list
 		</ul>
 		<li><b>Input Validators</b>
 		<ul>
@@ -104,9 +141,9 @@
 		</ul>
 		<li><b>Attribute Splitters</b>
 		<ul>
+			<li>Split attributes using RSD file
 			<li>Split attributes using tokens
 			<li>Split date and/or time
-			<li>Split the name of a company or person
 			<li>Split the name of a person
 		</ul>
 		<li><b>Output Handlers</b>
@@ -119,6 +156,7 @@
 			<li>Move and modify attributes
 			<li>Output to VOA
 			<li>Output to XML
+			<li>Remove attributes
 			<li>Remove characters
 			<li>Remove entries from list
 			<li>Remove invalid entries
@@ -128,6 +166,19 @@
 			<li>Select multiple output handlers
 			<li>Select using majority
 			<li>Translate values or types
+		</ul>
+<p>
+		<li><b>Conditions</b> - via Conditionally preprocess
+		<ul>
+			<li>Multiple criteria attribute selector
+			<li>Query attribute selector
+			<li>Value condition selector
+		</ul>
+		<li><b>Attribute Selectors</b> - via Run object on attributes OH
+		<ul>
+			<li>Multiple criteria attribute selector
+			<li>Query attribute selector
+			<li>Value condition selector
 		</ul>
 	</ul>
 </ul> 
@@ -148,6 +199,15 @@
 		displayed.
 		<li>Confirm that the rule set can be loaded using <b>Rule Tester</b>.
 	</ul>
+	<li>Special handling for RSD-based objects
+	<ul>
+		<li>Confirm that the following rule objects will only operate on 
+		<b>encrypted</b> input files.
+		<ul>
+			<li><b>Find from RSD file</b> value finder
+			<li><b>Split attributes using RSD file</b> attribute splitter
+		</ul>
+	</ul>
 </ul>
 <p>
 <h2>Miscellaneous</h2>
@@ -156,7 +216,7 @@
 	<b>Rule Set Editor</b>.
 	<ul>
 		<li><b>Customer Name:</b>
-		<li><b>Delvery Date:</b>
+		<li><b>Delivery Date:</b>
 	</ul>
 </ul>
 </BODY>
