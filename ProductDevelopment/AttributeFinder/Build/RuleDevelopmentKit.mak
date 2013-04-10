@@ -31,11 +31,16 @@ RDTInstallProjectRootDir=$(EngineeringRootDirectory)\ProductDevelopment\Attribut
 RDTInstallScriptFile=$(RDTInstallProjectRootDir)\Script Files\setup.rul
 RDTInstallMediaDir=$(RDTInstallProjectRootDir)\Media\CD-ROM\DiskImages\Disk1
 
+FLEXCustomerRDTInstallProjectRoot=$(EngineeringRootDirectory)\ProductDevelopment\AttributeFinder\Installation\FlexIndexCustomerRDT
+FLEXCustomerRDTMediaDir=$(FLEXCustomerRDTInstallProjectRoot)\Media\CD_ROM\Disk1
+
 IDSInstallProjectDirectory=$(AFRootDirectory)\IndustrySpecific\Redaction\Installation\IDShieldCustomerRDT
 IDSRDTInstallMediaDir=$(IDSInstallProjectDirectory)\Media\CD-ROM\DiskImages\Disk1
 
 RDTReleaseBleedingEdgeDir=S:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)\RDT
 IDSRDTReleaseBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)\RDT_IDShieldCustomer
+FLEXCustomerRDTReleaseBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)\RDT_FLEXIndexCustomer
+
 RCDotNetDir=$(EngineeringRootDirectory)\RC.Net
 
 # determine the name of the release output directory based upon the build
@@ -99,12 +104,14 @@ CopyFilesToInstallFolder:
 	
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegRDTComponents\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents\RDT.rl"
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegCommonComponents\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.rl"
+	@DIR "$(BinariesFolder)\AFCoreTest.dll" /b >"$(BinariesFolder)\CustomerRDT.rl"
+	@DIR "$(BinariesFolder)\RedactionTester.dll" /b >"$(BinariesFolder)\IDShieldCustomerRDT.rl"
   
     @DeleteFiles "$(RDTInstallFilesRootDir)\vssver.scc"
     @DeleteFiles "$(RDTInstallFilesRootDir)\mssccprj.scc"
 
 BuildRDTInstall: DisplayTimeStamp CopyFilesToInstallFolder CopyTestFiles
-    @ECHO Buliding the RDT installation...
+    @ECHO Building the RDT installation...
 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_18\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(RDTInstallProjectRootDir)\RuleDevelopmentKit.ism" "$(FlexIndexVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(RDTInstallProjectRootDir)\RuleDevelopmentKit.ism"
@@ -116,7 +123,7 @@ CreateRDTInstallCD: BuildRDTInstall
     @DeleteFiles "$(RDTReleaseBleedingEdgeDir)\vssver.scc"
 
 BuildIDSRDTInstall: CreateRDTInstallCD
-    @ECHO Buliding the ID Shield RDT installation...
+    @ECHO Building the ID Shield RDT installation...
 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_18\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(IDSInstallProjectDirectory)\IDShieldCustomerRDT.ism" "$(FlexIndexVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(IDSInstallProjectDirectory)\IDShieldCustomerRDT.ism"
@@ -127,6 +134,18 @@ CreateIDSRDTInstallCD: BuildIDSRDTInstall
     $(VerifyDir) "$(IDSRDTInstallMediaDir)" "$(IDSRDTReleaseBleedingEdgeDir)"
     @DeleteFiles "$(IDSRDTReleaseBleedingEdgeDir)\vssver.scc"
 
+BuildFLEXCustomerRDTInstall: CreateRDTInstallCD
+	@ECHO Building the Customer FLEX Index RDT
+	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_18\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages
+	$(SetProductVerScript) "$(FLEXCustomerRDTInstallProjectRoot)\FlexIndexCustomerRDT.ism" "$(FlexIndexVersion)"
+    @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(FLEXCustomerRDTInstallProjectRoot)\FlexIndexCustomerRDT.ism"
+
+CreateFLEXCustomerRDTInstallCD: BuildFLEXCustomerRDTInstall
+    @IF NOT EXIST "$(FLEXCustomerRDTReleaseBleedingEdgeDir)" MKDIR "$(FLEXCustomerRDTReleaseBleedingEdgeDir)"
+    @XCOPY "$(FLEXCustomerRDTMediaDir)\*.*" "$(FLEXCustomerRDTReleaseBleedingEdgeDir)" /v /s /e /y
+    $(VerifyDir) "$(FLEXCustomerRDTMediaDir)" "$(FLEXCustomerRDTReleaseBleedingEdgeDir)"
+    @DeleteFiles "$(FLEXCustomerRDTReleaseBleedingEdgeDir)\vssver.scc"
+	
 CopyTestFiles:
 	@ECHO Copying Automated Test Files
     @DeleteFiles /S /Q "$(TestingFilesDirectory)\*.*"
@@ -159,7 +178,7 @@ CopyTestFiles:
 
 DoEverythingNoGet: DoEverything
 
-DoEverything: DisplayTimeStamp CreateIDSRDTInstallCD
+DoEverything: DisplayTimeStamp CreateIDSRDTInstallCD CreateFLEXCustomerRDTInstallCD
     @ECHO.
     @DATE /T
     @TIME /T
