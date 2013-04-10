@@ -151,6 +151,28 @@ STDMETHODIMP CFindFromRSD::put_RSDFileName(BSTR newVal)
 			throw UCLIDException("ELI10228", "Please provide a .rsd file name.");
 		}
 
+		// [FlexIDSCore:5276]
+		// With a simple rule-writing license, only encryped (etf) files are allowed to be referenced,
+		// not the customer's own rules.
+		if (isLimitedLicense())
+		{
+			bool isEtf = false;
+			if (strTmp.length() > 4)
+			{
+				string strExt = strTmp.substr(strTmp.length() - 4);
+				makeLowerCase(strExt);
+				isEtf = (strExt == ".etf");
+			}
+
+			if (!isEtf)
+			{
+				UCLIDException ue("ELI35642", "License validation error.\r\n\r\n"
+					"Referencing unencrypted rulesets with \"Find from RSD file\" is not allowed with "
+					"a simple rule-writing license.");
+				throw ue;
+			}
+		}
+
 		m_strRSDFileName = strTmp;
 		m_bDirty = true;
 	}
@@ -301,6 +323,7 @@ STDMETHODIMP CFindFromRSD::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 			m_cachedRuleSet.m_obj.CreateInstance(CLSID_RuleSet);
 			ASSERT_RESOURCE_ALLOCATION("ELI10957", m_cachedRuleSet.m_obj != __nullptr);
 		}
+
 		// load/reload the ruleset if necessary
 		m_cachedRuleSet.loadObjectFromFile(strRSDFile);
 
@@ -493,5 +516,19 @@ void CFindFromRSD::validateLicense()
 	static const unsigned long FIND_FROM_RSD_COMPONENT_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( FIND_FROM_RSD_COMPONENT_ID, "ELI10238", "Find From RSD File" );
+}
+//-------------------------------------------------------------------------------------------------
+bool CFindFromRSD::isLimitedLicense()
+{
+	try
+	{
+		VALIDATE_LICENSE(gnFLEXINDEX_IDSHIELD_CORE_OBJECTS, "ELI35645", "Find From RSD File");
+	}
+	catch (...)
+	{
+		return true;
+	}
+
+	return false;
 }
 //-------------------------------------------------------------------------------------------------

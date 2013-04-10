@@ -124,5 +124,9 @@ private:
 	
 	// ensure that this component is licensed
 	void validateLicense();
+
+	// Indicates if the rule is licensed only in limited fashion as part of the simple rule-writing
+	// package. In this mode only encrypted rulesets can be referenced.
+	bool isLimitedLicense();
 };
 

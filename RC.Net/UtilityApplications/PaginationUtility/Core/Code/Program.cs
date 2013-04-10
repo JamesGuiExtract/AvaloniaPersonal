@@ -1,5 +1,6 @@
 ﻿using Extract.Licensing;
 using System;
+using System.Text;
 using System.Windows.Forms;
 
 namespace Extract.UtilityApplications.PaginationUtility
@@ -31,7 +32,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 else
                 {
-                    paginationUtilityForm = new PaginationUtilityForm(args[0]);
+                    string argument = args[0];
+
+                    if (argument == "/?")
+                    {
+                        ShowUsage();
+                        return;
+                    }
+
+                    paginationUtilityForm = new PaginationUtilityForm(argument);
                 }
 
                 Application.Run(paginationUtilityForm);
@@ -40,6 +49,28 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 ex.ExtractDisplay("ELI35544");
             }
+        }
+
+        /// <summary>
+        /// Displays the usage message.
+        /// </summary>
+        static void ShowUsage()
+        {
+            StringBuilder usage = new StringBuilder();
+
+            // Add the command line syntax
+            usage.Append(Environment.GetCommandLineArgs()[0]);
+            usage.AppendLine(" </?>| [<filename>]");
+            usage.AppendLine();
+            usage.AppendLine("Options:");
+            usage.AppendLine();
+            usage.AppendLine("    /? - Display help");
+            usage.AppendLine("    filename - A config file whose settings should be used.");
+            usage.AppendLine("      (The settings will not be editable)");
+
+            // Display the usage as an error or as an information box
+            MessageBox.Show(usage.ToString(), "Usage", MessageBoxButtons.OK,
+                MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
         }
     }
 }

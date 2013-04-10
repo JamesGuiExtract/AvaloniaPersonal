@@ -127,6 +127,28 @@ STDMETHODIMP CRSDSplitter::put_RSDFileName(BSTR newVal)
 			}
 		}
 
+		// [FlexIDSCore:5276]
+		// With a simple rule-writing license, only encryped (etf) files are allowed to be referenced,
+		// not the customer's own rules.
+		if (isLimitedLicense())
+		{
+			bool isEtf = false;
+			if (strNewVal.length() > 4)
+			{
+				string strExt = strNewVal.substr(strNewVal.length() - 4);
+				makeLowerCase(strExt);
+				isEtf = (strExt == ".etf");
+			}
+
+			if (!isEtf)
+			{
+				UCLIDException ue("ELI35642", "License validation error.\r\n\r\n"
+					"Referencing unencrypted rulesets with \"Find from RSD file\" is not allowed with "
+					"a simple rule-writing license.");
+				throw ue;
+			}
+		}
+
 		// at least the file extension shall be .rsd
 		string strFileExtension = ::getExtensionFromFullPath(strNewVal, true);
 		if (strFileExtension != ".rsd" && strFileExtension != ".etf")
@@ -507,5 +529,19 @@ void CRSDSplitter::validateLicense()
 	static const unsigned long THIS_COMPONENT_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( THIS_COMPONENT_ID, "ELI05757", "RSD Splitter" );
+}
+//-------------------------------------------------------------------------------------------------
+bool CRSDSplitter::isLimitedLicense()
+{
+	try
+	{
+		VALIDATE_LICENSE(gnFLEXINDEX_IDSHIELD_CORE_OBJECTS, "ELI35647", "RSD Splitter");
+	}
+	catch (...)
+	{
+		return true;
+	}
+
+	return false;
 }
 //-------------------------------------------------------------------------------------------------

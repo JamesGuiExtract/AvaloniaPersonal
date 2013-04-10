@@ -552,7 +552,7 @@ STDMETHODIMP CConditionalAttributeModifier::get_InstanceGUID(GUID *pVal)
 void CConditionalAttributeModifier::validateLicense()
 {
 	static const unsigned long CONDITIONAL_ATTRIBUTE_MODIFIER_COMPONENT_ID = 
-		gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
+		gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( CONDITIONAL_ATTRIBUTE_MODIFIER_COMPONENT_ID, "ELI11972", 
 					"Conditionally Modify Attribute" );
