@@ -144,6 +144,7 @@
 			<li>Split attributes using RSD file
 			<li>Split attributes using tokens
 			<li>Split date and/or time
+			<li>Split the name of a company or a person
 			<li>Split the name of a person
 		</ul>
 		<li><b>Output Handlers</b>
@@ -170,9 +171,7 @@
 <p>
 		<li><b>Conditions</b> - via Conditionally preprocess
 		<ul>
-			<li>Multiple criteria attribute selector
-			<li>Query attribute selector
-			<li>Value condition selector
+			<li>Document type condition
 		</ul>
 		<li><b>Attribute Selectors</b> - via Run object on attributes OH
 		<ul>
@@ -207,6 +206,15 @@
 			<li><b>Find from RSD file</b> value finder
 			<li><b>Split attributes using RSD file</b> attribute splitter
 		</ul>
+		<li>Confirm that auto-encryption of DAT or RSD files does not work 
+		with a simple rule writing license.
+		<li>Confirm that an unencrypted file that is renamed to be an ETF file 
+		cannot be successfully referenced.
+		<li>Confirm that a path tag expression cannot be created that literally 
+		ends with <b>.etf</b> but evaluates to an expression ending with <b>.rsd</b>.
+		<li>Confirm that the <b>filename</b> property of the <b>RSDFinder</b> COM 
+		object cannot be programmatically changed unless an RDT or simple rules 
+		license is present.
 	</ul>
 </ul>
 <p>
