@@ -76,7 +76,10 @@ begin
     nSetupType = TYPICAL;	
 
 	// check installed Flex Index SDK
-	detectFlexIndexSDKInstall();
+	if (!AreOtherExtractProductsInstalled()) then
+		MessageBox("Must have version " + IFX_PRODUCT_VERSION + " of FLEX Index, ID Shield, or LabDE installed", SEVERE);
+		abort;
+	endif;
 
 Dlg_SdWelcome:
     szTitle = "";
