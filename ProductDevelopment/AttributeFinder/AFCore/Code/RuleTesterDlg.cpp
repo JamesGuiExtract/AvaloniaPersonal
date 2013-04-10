@@ -15,12 +15,17 @@
 #include <cpputil.h>
 #include <Win32Util.h>
 #include <ComUtils.h>
+#include <LicenseMgmt.h>
+#include <ComponentLicenseIDs.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+// add license management password function
+DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -358,12 +363,30 @@ void RuleTesterDlg::OnButtonExecute()
 	AFX_MANAGE_STATE(AfxGetModuleState());
 	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
 
+	bool bUsingTemporaryLicensing = false;
+
 	try
 	{
 		CWaitCursor wait;
 
 		// Disable the tool bar buttons while executing rules
 		updateButtonStates(true);
+
+		// [FlexIDSCore:5279]
+		// With a simple rule-writing license, rules are allowed to call into encrypted rulesets
+		// that contain rule objects not available to be used directly. The rule objects will not be
+		// licensed within the RuleSetEditor processes, but need to be licensed during a test.
+		// If gnFLEXINDEX_IDSHIELD_CORE_OBJECTS is not licensed, simple rules must be. For the
+		// duration of this test, use load licenses loaded with default (not simple rule writing)
+		// passwords.
+		if (!LicenseManagement::isLicensed(gnFLEXINDEX_IDSHIELD_CORE_OBJECTS))
+		{
+			bUsingTemporaryLicensing = true;
+			LicenseManagement::resetCache();
+
+			LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD,
+				gnDEFAULT_PASSWORDS );
+		}
 
 		// if using the ruleset tab load the current file listed
 		if ( m_eMode == kWithRulesetTab )
@@ -484,6 +507,36 @@ void RuleTesterDlg::OnButtonExecute()
 		updateList(ipAFDoc);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04726");
+
+	try
+	{
+		// If we had temporarily reset licensing for this test, the previous license state needs to
+		// be restored by initializing licensing with simple rule writing passwords.
+		if (bUsingTemporaryLicensing)
+		{
+			LicenseManagement::resetCache();
+
+			// Load license file(s) using Special Simple Rule Writing passwords
+			LicenseManagement::loadLicenseFilesFromFolder( LICENSE_MGMT_PASSWORD,
+				gnSIMPLE_RULE_WRITING_PASSWORDS );
+
+			// Check to see if a license file was loaded that licenses the Rule Set Editor
+			if (!LicenseManagement::isLicensed( gnRULESET_EDITOR_UI_OBJECT ))
+			{
+				// Try again with default passwords
+				LicenseManagement::loadLicenseFilesFromFolder( LICENSE_MGMT_PASSWORD,
+					gnDEFAULT_PASSWORDS );
+			}
+		}
+	}
+	catch (...)
+	{
+		// If unable to restore the correct licensing, throw an exception to abort the application
+		// to prevent the application from continuing to run in a state where the licensing isn't
+		// correct.
+		UCLIDException ue("ELI35648", "Critical license error; application will abort.");
+		throw ue;
+	}
 
 	try
 	{
