@@ -78,7 +78,7 @@ BOOL CIndexConverterApp::InitInstance()
 //-------------------------------------------------------------------------------------------------
 void CIndexConverterApp::validateLicense()
 {
-	static const unsigned long INDEXCONVERTER_ID = gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS;
+	static const unsigned long INDEXCONVERTER_ID = gnRULE_WRITING_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( INDEXCONVERTER_ID, "ELI07100", "Index Converter" );
 }
