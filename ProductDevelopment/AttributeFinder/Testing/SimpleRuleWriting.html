@@ -82,7 +82,7 @@
 		<li><b>1</b> UCLID Input Funnel Input Receivers
 		<li><b>8</b> UCLID Input Funnel Input Validators
 		<li><b>18</b> UCLID AF-API Output Handlers
-		<li><b>4</b> UCLID AF-API Attribute Splitters
+		<li><b>5</b> UCLID AF-API Attribute Splitters
 		<li><b>7</b> UCLID AF-API Document Preprocessors
 		<li><b>0</b> UCLID AF-API Data Scorers
 		<li><b>1</b> UCLID AF-API Conditions
@@ -131,6 +131,7 @@
 		</ul>
 		<li><b>Input Validators</b>
 		<ul>
+			<li>&lt;None&gt;
 			<li>Date
 			<li>Double
 			<li>Float
@@ -141,6 +142,7 @@
 		</ul>
 		<li><b>Attribute Splitters</b>
 		<ul>
+			<li>&lt;None&gt;
 			<li>Split attributes using RSD file
 			<li>Split attributes using tokens
 			<li>Split date and/or time
@@ -186,7 +188,8 @@
 <ul>
 	<li>Create an appropriate rule set.
 	<ul>
-		<li>Confirm that the rule set must have a specified counter.
+		<li>Confirm that the rule set must have a specified <b>FKB update</b>.
+		<li>Confirm that the rule set must have a specified <b>USB counter</b>.
 		<li>Confirm that the rule set cannot be an <b>internal</b> rule set.
 		<li>Confirm that the rule set cannot be a <b>swiping</b> rule set.
 		<li>Confirm that the rule set can have defined <b>Comments</b>.
@@ -196,7 +199,8 @@
 	<ul>
 		<li>Confirm that an <b>Unable to load RuleSet</b> exception is 
 		displayed.
-		<li>Confirm that the rule set can be loaded using <b>Rule Tester</b>.
+		<li>Confirm that the rule set can be tested using the built-in 
+		<b>Rule Tester</b>.
 	</ul>
 	<li>Special handling for RSD-based objects
 	<ul>
