@@ -98,7 +98,7 @@
             this._outerPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this._outerPanel.Controls.Add(this._borderPanel);
             this._outerPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._outerPanel.Location = new System.Drawing.Point(11, 1);
+            this._outerPanel.Location = new System.Drawing.Point(1, 1);
             this._outerPanel.Margin = new System.Windows.Forms.Padding(0);
             this._outerPanel.Name = "_outerPanel";
             this._outerPanel.Padding = new System.Windows.Forms.Padding(3);
@@ -115,8 +115,8 @@
             this.Controls.Add(this._outerPanel);
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "PageThumbnailControl";
-            this.Padding = new System.Windows.Forms.Padding(11, 1, 0, 1);
-            this.Size = new System.Drawing.Size(151, 168);
+            this.Padding = new System.Windows.Forms.Padding(1);
+            this.Size = new System.Drawing.Size(142, 168);
             this._tableLayoutPanel.ResumeLayout(false);
             this._borderPanel.ResumeLayout(false);
             this._borderPanel.PerformLayout();

@@ -89,6 +89,7 @@
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="PaginationLayoutEngine.cs" />
     <Compile Include="PaginationUtilityForm.ClipboardData.cs">
       <SubType>Form</SubType>
       <DependentUpon>PaginationUtilityForm.cs</DependentUpon>

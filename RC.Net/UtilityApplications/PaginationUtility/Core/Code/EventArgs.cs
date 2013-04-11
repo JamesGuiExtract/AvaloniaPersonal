@@ -44,4 +44,35 @@ namespace Extract.UtilityApplications.PaginationUtility
             private set;
         }
     }
+
+    /// <summary>
+    /// The event arguments for the <see cref="PaginationLayoutEngine.RedundantControlsFound"/> event.
+    /// </summary>
+    internal class RedundantControlsFoundEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RedundantControlsFoundEventArgs"/> class.
+        /// </summary>
+        /// <param name="redundantControls">The redundant <see cref="PaginationControl"/>s.</param>
+        public RedundantControlsFoundEventArgs(params PaginationControl[] redundantControls)
+        {
+            try
+            {
+                RedundantControls = redundantControls;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI35652", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="PaginationControl"/>s.
+        /// </summary>
+        public PaginationControl[] RedundantControls
+        {
+            get;
+            private set;
+        }
+    }
 }

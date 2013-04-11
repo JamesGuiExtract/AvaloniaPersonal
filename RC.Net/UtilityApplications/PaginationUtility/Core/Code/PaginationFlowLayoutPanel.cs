@@ -1,8 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
+using System.Windows.Forms.Layout;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -22,6 +21,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see cref="ScrollControlIntoViewManual"/>.
         /// </summary>
         bool _allowScrollToControl;
+
+        /// <summary>
+        /// The <see cref="PaginationLayoutEngine"/> that manages the layout of the
+        /// <see cref="PaginationControl"/>s.
+        /// </summary>
+        PaginationLayoutEngine _layoutEngine = new PaginationLayoutEngine();
 
         #endregion Fields
 
@@ -52,6 +57,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Methods
 
         #region Overrides
+
+        /// <summary>
+        /// Gets a cached instance of the panel's layout engine.
+        /// </summary>
+        /// <returns>The <see cref="T:System.Windows.Forms.Layout.LayoutEngine"/> for the panel's
+        /// contents. </returns>
+        public override LayoutEngine LayoutEngine
+        {
+            get
+            {
+                return _layoutEngine;
+            }
+        }
 
         /// <summary>
         /// Overrides <see cref="ScrollableControl.ScrollToControl"/> in order to prevent

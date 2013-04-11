@@ -1585,6 +1585,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _pendingDocuments.Clear();
                 _failedFileNames.Clear();
 
+                // NOTE: This invoke and possibly even _cancelLoad may now be obsolete since
+                // the Application.DoEvents() call in CreateOutputDocument has been removed; but
+                // I think at this point it is safest to leave it in.
+                // ------------------
                 // _cancelLoad will trigger active loading to be stopped, but we can't wait for
                 // that to happen here because it is likely this is being called via an
                 // Application.DoEvents() call intended to keep the UI responsive during loading.

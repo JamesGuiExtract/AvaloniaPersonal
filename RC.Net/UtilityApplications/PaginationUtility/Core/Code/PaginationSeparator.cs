@@ -9,14 +9,14 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// </summary>
     internal partial class PaginationSeparator : PaginationControl
     {
-        #region Constants
+        #region Fields
 
         /// <summary>
-        /// The width of the control. (PageThumbnailControl relies on this being a consistent value).
+        /// The overall <see cref="Size"/> all <see cref="PaginationSeparator"/>s should be.
         /// </summary>
-        internal static readonly int _SEPARATOR_WIDTH = 11;
+        static Size? _uniformSize;
 
-        #endregion Constants
+        #endregion Fields
 
         #region Constructors
 
@@ -38,6 +38,41 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         #endregion Constructors
 
+        #region Static Members
+
+        /// <summary>
+        /// Gets the overall <see cref="Size"/> all <see cref="PaginationSeparator"/>s should
+        /// be.
+        /// </summary>
+        /// <value>
+        /// The overall <see cref="Size"/> all <see cref="PaginationSeparator"/>s should be.
+        /// </value>
+        public static Size UniformSize
+        {
+            get
+            {
+                try
+                {
+                    if (_uniformSize == null)
+                    {
+                        using (var separator = new PaginationSeparator())
+                        {
+                            _uniformSize = new Size(separator.Width,
+                                PageThumbnailControl.UniformSize.Height);
+                        }
+                    }
+
+                    return _uniformSize.Value;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35658");
+                }
+            }
+        }
+
+        #endregion Static Members
+
         #region Overrides
 
         /// <summary>
@@ -58,8 +93,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     base.Selected = value;
 
-                    // Indicate selection with the BackColor
-                    BackColor = value
+                    // Indicate selection with the _outerPanel's BackColor
+                    _outerPanel.BackColor = value
                         ? SystemColors.ControlDark
                         : SystemColors.Control;
                 }
@@ -67,26 +102,24 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Raises the <see cref="E:System.Windows.Forms.Control.SizeChanged"/> event.
+        /// Retrieves the size of a rectangular area into which a control can be fitted.
         /// </summary>
-        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.
-        /// </param>
-        protected override void OnSizeChanged(EventArgs e)
+        /// <param name="proposedSize">The custom-sized area for a control.</param>
+        /// <returns>
+        /// An ordered pair of type <see cref="T:System.Drawing.Size"/> representing the width and height of a rectangle.
+        /// </returns>
+        public override Size GetPreferredSize(Size proposedSize)
         {
             try
             {
-                base.OnSizeChanged(e);
-
-                // Ensure that the width never changes.
-                if (Width != _SEPARATOR_WIDTH)
-                {
-                    Width = _SEPARATOR_WIDTH;
-                }
+                return UniformSize;
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI35497");
+                ex.ExtractDisplay("ELI35657");
             }
+
+            return base.GetPreferredSize(proposedSize);
         }
 
         #endregion Overrides

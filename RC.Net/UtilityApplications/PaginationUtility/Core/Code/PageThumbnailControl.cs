@@ -39,6 +39,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         static Size _thumbnailSize = new Size(128, 128);
 
         /// <summary>
+        /// The overall <see cref="Size"/> all <see cref="NavigablePaginationControl"/>s should be.
+        /// </summary>
+        static Size? _uniformSize;
+
+        /// <summary>
         /// The <see cref="Page"/> represented by this instance.
         /// </summary>
         Page _page;
@@ -57,6 +62,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Fields
 
         #region Constructors
+
+        /// <summary>
+        /// Prevents a default instance of the <see cref="PageThumbnailControl"/> class from being
+        /// created from an outside caller.
+        /// </summary>
+        PageThumbnailControl()
+            : base()
+        {
+            try
+            {
+                InitializeComponent();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35651");
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PageThumbnailControl"/> class.
@@ -110,6 +132,40 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         #endregion Constructors
+
+        #region Static Members
+
+        /// <summary>
+        /// Gets the overall <see cref="Size"/> all <see cref="NavigablePaginationControl"/>s should
+        /// be.
+        /// </summary>
+        /// <value>
+        /// The overall <see cref="Size"/> all <see cref="NavigablePaginationControl"/>s should be.
+        /// </value>
+        public static Size UniformSize
+        {
+            get
+            {
+                try
+                {
+                    if (_uniformSize == null)
+                    {
+                        using (var pageControl = new PageThumbnailControl())
+                        {
+                            _uniformSize = pageControl.GetPreferredSize(Size.Empty);
+                        }
+                    }
+
+                    return _uniformSize.Value;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35654");
+                }
+            }
+        }
+
+        #endregion Static Members
 
         #region Properties
 
