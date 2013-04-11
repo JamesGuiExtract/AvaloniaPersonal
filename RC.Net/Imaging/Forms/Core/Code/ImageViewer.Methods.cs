@@ -461,10 +461,31 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Closes the currently open image and raises the
+        /// <see cref="ImageFileChanged"/> event.
+        /// </summary>
+        /// /// <param name="unloadImage"><see langword="true"/> to force a cached image to be unloaded
+        /// when closed, <see langword="false"/> to allow it to remain in the cache until it is no
+        /// longer in document history.</param>
+        /// <exception cref="ExtractException">If there is no currently open image.</exception>
+        public void CloseImage(bool unloadImage)
+        {
+            try
+            {
+                // Ensure an image is open
+                if (IsImageAvailable)
+                {
+                    CloseImage(true, unloadImage);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI35661", ex);
+            }
+        }
+
+        /// <summary>
         /// Closes the currently open image.
-        /// <para><b>Requirement:</b></para>
-        /// An image must be open (<see cref="RasterImageViewer.IsImageAvailable"/>
-        /// must be <see langword="true"/>).
         /// </summary>
         /// <param name="raiseImageFileChangedEvent">If <see langword="true"/> will raise
         /// the <see cref="ImageFileChanged"/> event; if <see langword="false"/> will not

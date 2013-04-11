@@ -327,7 +327,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Close the image if specified.
                 else if (!display && _activeImageViewer != null)
                 {
-                    _activeImageViewer.CloseImage();
+                    // [DotNetRCAndUtils:956]
+                    // Do not unload the image, otherwise it may be deleted or modified by an
+                    // outside application while still available in this UI.
+                    _activeImageViewer.CloseImage(false);
                     _activeImageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
                     _activeImageViewer = null;
                 }
@@ -379,7 +382,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.OnLoad(e);
 
-                if (_page != null)
+                if (!IsDisposed && _page != null)
                 {
                     _rasterPictureBox.Image = _page.ThumbnailImage.Clone();
 
@@ -403,6 +406,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
+                    if (_toolTip != null)
+                    {
+                        _toolTip.Dispose();
+                        _toolTip = null;
+                    }
+
                     if (_rasterPictureBox != null)
                     {
                         _rasterPictureBox.Dispose();
@@ -495,7 +504,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (Page.MultipleCopiesExist)
                 {
                     var brush = ExtractBrushes.GetSolidBrush(Color.SeaGreen);
-                    e.Graphics.DrawString("*", _COPY_INDICATOR_FONT, brush, new Point (0, 0));
+                    e.Graphics.DrawString("*", _COPY_INDICATOR_FONT, brush, new Point(0, 0));
                 }
             }
             catch (Exception ex)

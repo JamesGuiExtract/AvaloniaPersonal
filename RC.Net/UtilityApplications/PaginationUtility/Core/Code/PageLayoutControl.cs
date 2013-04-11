@@ -189,11 +189,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         int _dropLocationIndex = -1;
 
         /// <summary>
-        /// The <see cref="NavigablePaginationControl"/> that is currently the primarily selected
+        /// The <see cref="PaginationControl"/> that is currently the primarily selected
         /// control. If a <see cref="PageThumbnailControl"/>, the image page will be displayed in
         /// the <see cref="ImageViewer"/>.
         /// </summary>
-        NavigablePaginationControl _primarySelection;
+        PaginationControl _primarySelection;
 
         /// <summary>
         /// The page control who's page is currently displayed as a result of the control-hover
@@ -924,23 +924,41 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             if (disposing)
             {
-                if (components != null)
+                try
                 {
-                    components.Dispose();
-                    components = null;
-                }
+                    // Allows a much quick response to remove and dispose of the controls first
+                    // rather than disposing with the controls still loaded.
+                    PaginationControl[] controls = _flowLayoutPanel.Controls
+                        .OfType<PaginationControl>()
+                        .Where(control => control != _loadNextDocumentButtonControl)
+                        .ToArray();
+                    _flowLayoutPanel.SuspendLayout();
+                    _flowLayoutPanel.Controls.Clear();
 
-                if (_dragDropScrollTimer != null)
-                {
-                    _dragDropScrollTimer.Dispose();
-                    _dragDropScrollTimer = null;
-                }
+                    foreach (Control control in controls)
+                    {
+                        control.Dispose();
+                    }
 
-                if (_loadNextDocumentButtonControl != null)
-                {
-                    _loadNextDocumentButtonControl.Dispose();
-                    _loadNextDocumentButtonControl = null;
+                    if (components != null)
+                    {
+                        components.Dispose();
+                        components = null;
+                    }
+
+                    if (_dragDropScrollTimer != null)
+                    {
+                        _dragDropScrollTimer.Dispose();
+                        _dragDropScrollTimer = null;
+                    }
+
+                    if (_loadNextDocumentButtonControl != null)
+                    {
+                        _loadNextDocumentButtonControl.Dispose();
+                        _loadNextDocumentButtonControl = null;
+                    }
                 }
+                catch { }
             }
             base.Dispose(disposing);
         }
@@ -1237,24 +1255,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (PrimarySelection != _hoverPageControl)
                     {
-                        _hoverPageControl.Highlighted = false;
+                        SetHighlightedAndDisplayed(_hoverPageControl, false);
 
-                        PageThumbnailControl primaryPageControl = null;
                         if (PrimarySelection != null)
                         {
-                            PrimarySelection.Highlighted = true;
-
-                            primaryPageControl = PrimarySelection as PageThumbnailControl;
-                            if (primaryPageControl != null)
-                            {
-                                primaryPageControl.DisplayPage(ImageViewer, true);
-                            }
-                        }
-
-                        // If the PrimarySelection is not a page control, close the last displayed page.
-                        if (primaryPageControl == null)
-                        {
-                            _hoverPageControl.DisplayPage(ImageViewer, false);
+                            SetHighlightedAndDisplayed(_primarySelection, true);
                         }
                     }
 
@@ -1483,6 +1488,13 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 OnLoadNextDocumentRequest();
+
+                // Ensure focus is restored to the load next document button.
+                this.SafeBeginInvoke("ELI35660", () =>
+                {
+                    SelectControl(_loadNextDocumentButtonControl, true, true);
+                    _loadNextDocumentButtonControl.Focus();
+                });
             }
             catch (Exception ex)
             {
@@ -1495,16 +1507,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Private Members
 
         /// <summary>
-        /// Gets or sets the <see cref="NavigablePaginationControl"/> that should be considered the
+        /// Gets or sets the <see cref="PaginationControl"/> that should be considered the
         /// primary selection and the basis for all keyboard navigation. If a
         /// <see cref="PageThumbnailControl"/> the corresponding image page will be displayed in the
         /// <see cref="ImageViewer"/> as well.
         /// </summary>
         /// <value>
-        /// The <see cref="NavigablePaginationControl"/> that should be considered the primary
+        /// The <see cref="PaginationControl"/> that should be considered the primary
         /// selection.
         /// </value>
-        NavigablePaginationControl PrimarySelection
+        PaginationControl PrimarySelection
         {
             get
             {
@@ -1517,26 +1529,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (_primarySelection != null)
                     {
-                        _primarySelection.Highlighted = false;
-                        
-                        var pageControl = _primarySelection as PageThumbnailControl;
-                        if (pageControl != null)
-                        {
-                            pageControl.DisplayPage(ImageViewer, false);
-                        }
+                        SetHighlightedAndDisplayed(_primarySelection, false);
+                    }
+
+                    if (_hoverPageControl != null && value != _hoverPageControl)
+                    {
+                        SetHighlightedAndDisplayed(_hoverPageControl, false);
                     }
 
                     _primarySelection = value;
 
                     if (_primarySelection != null)
                     {
-                        _primarySelection.Highlighted = true;
-
-                        var pageControl = _primarySelection as PageThumbnailControl;
-                        if (pageControl != null)
-                        {
-                            pageControl.DisplayPage(ImageViewer, true);
-                        }
+                        SetHighlightedAndDisplayed(_primarySelection, true);
                     }
                 }
             }
@@ -1881,11 +1886,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _commandTargetControl = control;
             }
 
-            var navigableControl = control as NavigablePaginationControl;
-
-            if (select && allowSetActivePage && navigableControl != null)
+            if (select && allowSetActivePage)
             {
-                PrimarySelection = navigableControl;
+                PrimarySelection = control;
 
                 // Make sure the selected control is scrolled into view.
                 if (Rectangle.Intersect(ClientRectangle, control.Bounds) != control.Bounds)
@@ -1939,6 +1942,30 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (control == PrimarySelection)
                 {
                     PrimarySelection = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Set the highlight state if the <see paramref="control"/> if it is a
+        /// <see cref="NavigablePaginationControl"/>.
+        /// Sets the displayed state of the image page if it is a <see cref="PageThumbnailControl"/>.
+        /// </summary>
+        /// <param name="control">The <see cref="PaginationControl"/>.</param>
+        /// <param name="highlight"><see langword="true"/> to highlight and display the
+        /// page; <see langword="false"/> to unhighlight and close the page.</param>
+        void SetHighlightedAndDisplayed(PaginationControl control, bool highlight)
+        {
+            NavigablePaginationControl navigableControl =
+                control as NavigablePaginationControl;
+            if (navigableControl != null)
+            {
+                navigableControl.Highlighted = highlight;
+
+                var pageControl = control as PageThumbnailControl;
+                if (pageControl != null)
+                {
+                    pageControl.DisplayPage(ImageViewer, highlight);
                 }
             }
         }
@@ -2117,11 +2144,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             _copyCommand.Enabled = enableSelectionBasedCommands;
             _deleteCommand.Enabled = enableSelectionBasedCommands;
 
-            // Separators cannot be added next to other separators and cannot be the first control.
-            bool controlIsSeparator = _commandTargetControl is PaginationSeparator;
-            _toggleDocumentSeparatorCommand.Enabled =
-                contextMenuControlIndex != 0 && !controlIsSeparator;
-
             // Adjust the text of the insertion commands to be append commands if there is no
             // _commandTargetControl.
             if (_commandTargetControl == null)
@@ -2131,7 +2153,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             else
             {
-                _toggleDocumentSeparatorCommand.Enabled = true;
+                // Separators cannot be added next to other separators and cannot be the first control.
+                bool controlIsSeparator = _commandTargetControl is PaginationSeparator;
+                _toggleDocumentSeparatorCommand.Enabled =
+                    contextMenuControlIndex != 0 && !controlIsSeparator;
 
                 // Insertied copied items requires there to be copied items.
                 _insertCopiedCommand.Enabled = PaginationUtilityForm.ClipboardHasData();
@@ -2294,9 +2319,11 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             if (pageControl != null && pageControl != _hoverPageControl)
             {
-                if (PrimarySelection != null && PrimarySelection.Highlighted)
+                NavigablePaginationControl navigableControl =
+                    PrimarySelection as NavigablePaginationControl;
+                if (navigableControl != null && navigableControl.Highlighted)
                 {
-                    PrimarySelection.Highlighted = false;
+                    navigableControl.Highlighted = false;
                 }
                 if (_hoverPageControl != null && _hoverPageControl.Highlighted)
                 {

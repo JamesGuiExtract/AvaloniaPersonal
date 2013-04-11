@@ -175,12 +175,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         ClipboardData _currentClipboardData = null;
 
         /// <summary>
-        /// Indicates that any active loading should be cancelled and that no more page loads or
-        /// control events should be handled.
-        /// </summary>
-        bool _cancelLoad;
-
-        /// <summary>
         /// Indicates if the host is in design mode or not.
         /// </summary>
         readonly bool _inDesignMode;
@@ -704,8 +698,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 base.OnClosing(e);
-
-                _cancelLoad = true;
             }
             catch (Exception ex)
             {
@@ -765,6 +757,12 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     lock (_sourceDocumentLock)
                     {
+                        // Unload the source documents from the image viewer to unlock the files.
+                        foreach (var document in _sourceDocuments)
+                        {
+                            _imageViewer.UnloadImage(document.FileName);
+                        }
+
                         CollectionMethods.ClearAndDispose(_sourceDocuments);
                     }
 
@@ -1045,11 +1043,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // input document if appropriate.
                 this.SafeBeginInvoke("ELI35527", () =>
                 {
-                    if (_cancelLoad)
-                    {
-                        return;
-                    }
-                    
                     // Whenever pages are removed, call GetClipboardData to remove references to
                     // and pages that were on the clipboard, but are no longer on the clipboard.
                     // This ensures input documents no longer being used are moved/deleted in a
@@ -1541,7 +1534,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 messageBox.Text += "All existing pages to be cleared and reloaded from the specified input folder.\r\n\r\n";
                 messageBox.StandardIcon = MessageBoxIcon.Question;
                 messageBox.AddButton(settingsChange ? "Apply and Restart" : "Restart", "Restart", false);
-                messageBox.AddButton("Cancel", "Cancel", false);
+                messageBox.AddButton("Cancel", "Cancel", true);
                 messageBox.Show();
 
                 return (messageBox.Result == "Restart");
@@ -1556,51 +1549,50 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _cancelLoad = true;
-
-                if (_inputFileEnumerator != null)
+                using (new TemporaryWaitCursor())
                 {
-                    _inputFileEnumerator.Dispose();
-                    _inputFileEnumerator = null;
-                }
+                    // Hide the page layout control and close the image viewer when resetting to
+                    // avoid having previous displayed controls/images visible while the restart is
+                    // in progress.
+                    // ResetPrimaryPageLayoutControl will create a new _primaryPageLayoutControl, so
+                    // there will be no need to make this one visible again.
+                    _primaryPageLayoutControl.Visible = false;
+                    if (_imageViewer.IsImageAvailable)
+                    {
+                        _imageViewer.CloseImage();
+                    }
+                    Refresh();
 
-                if (_inputFolderWatcher != null)
-                {
-                    _inputFolderWatcher.Dispose();
-                    _inputFolderWatcher = null;
-                }
+                    if (_inputFileEnumerator != null)
+                    {
+                        _inputFileEnumerator.Dispose();
+                        _inputFileEnumerator = null;
+                    }
 
-                if (_imageViewer.IsImageAvailable)
-                {
-                    _imageViewer.CloseImage();
-                }
+                    if (_inputFolderWatcher != null)
+                    {
+                        _inputFolderWatcher.Dispose();
+                        _inputFolderWatcher = null;
+                    }
 
-                lock (_sourceDocumentLock)
-                {
-                    CollectionMethods.ClearAndDispose(_sourceDocuments);
-                }
+                    lock (_sourceDocumentLock)
+                    {
+                        // Unload the source documents from the image viewer to unlock the files.
+                        foreach (var document in _sourceDocuments)
+                        {
+                            _imageViewer.UnloadImage(document.FileName);
+                        }
 
-                ResetPrimaryPageLayoutControl();
+                        CollectionMethods.ClearAndDispose(_sourceDocuments);
+                    }
 
-                _pendingDocuments.Clear();
-                _failedFileNames.Clear();
+                    ResetPrimaryPageLayoutControl();
 
-                // NOTE: This invoke and possibly even _cancelLoad may now be obsolete since
-                // the Application.DoEvents() call in CreateOutputDocument has been removed; but
-                // I think at this point it is safest to leave it in.
-                // ------------------
-                // _cancelLoad will trigger active loading to be stopped, but we can't wait for
-                // that to happen here because it is likely this is being called via an
-                // Application.DoEvents() call intended to keep the UI responsive during loading.
-                this.SafeBeginInvoke("ELI35602", () =>
-                {
-                    // By the the time is handled on the message queue, we can count on the fact
-                    // that loading will have stopped since the loading would have been triggered
-                    // by an earlier message. Go ahead and reset _cancelLoad, then start loading
-                    // again.
-                    _cancelLoad = false;
+                    _pendingDocuments.Clear();
+                    _failedFileNames.Clear();
+
                     LoadMorePages();
-                });
+                }
             }
             catch (Exception ex)
             {
@@ -1624,6 +1616,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // removed.
                 _primaryPageLayoutControl.Dispose();
                 _pageLayoutToolStripContainer.ContentPanel.Controls.Remove(_primaryPageLayoutControl);
+
+                // Perform a GC to force a cleanup of everything before loading the new
+                // _primaryPageLayoutControl
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
             }
 
             _primaryPageLayoutControl = new PageLayoutControl(this);
@@ -1894,7 +1891,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     StartInputEnumeration();
                 }
 
-                while (!_cancelLoad && _inputFileEnumerator.MoveNext())
+                while (_inputFileEnumerator.MoveNext())
                 {
                     string fileName = _inputFileEnumerator.Current;
                     if (_failedFileNames.Contains(fileName))
@@ -1991,7 +1988,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 lock (_sourceDocumentLock)
                 {
-                    if (!_cancelLoad && _sourceDocuments.Contains(sourceDocument))
+                    if (_sourceDocuments.Contains(sourceDocument))
                     {
                         _imageViewer.CacheImage(inputFileName);
                     }
@@ -2007,30 +2004,28 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void LoadMorePages()
         {
-            if (_cancelLoad || _loadingNextDocument)
+            if (_loadingNextDocument)
             {
                 return;
             }
 
-            if (_config.Settings.InputPageCount == 0)
+            bool ranOutOfDocuments = false;
+            while (!ranOutOfDocuments &&
+                    _primaryPageLayoutControl.PageCount < _config.Settings.InputPageCount)
             {
-                // If configured such that every document should be loaded manually, call
-                // CreateOutputDocument so that the load next document button gets added.
-                _primaryPageLayoutControl.CreateOutputDocument(null);
+                ranOutOfDocuments = !LoadNextDocument();
             }
-            else
-            {
-                bool ranOutOfDocuments = false;
-                while (!_cancelLoad && !ranOutOfDocuments &&
-                       _primaryPageLayoutControl.PageCount < _config.Settings.InputPageCount)
-                {
-                    ranOutOfDocuments = !LoadNextDocument();
-                }
 
-                if (!ranOutOfDocuments && _inputFolderWatcher != null)
-                {
-                    _inputFolderWatcher.EnableRaisingEvents = false;
-                }
+            if (!ranOutOfDocuments && _inputFolderWatcher != null)
+            {
+                _inputFolderWatcher.EnableRaisingEvents = false;
+            }
+
+            if (_primaryPageLayoutControl.PageCount == 0)
+            {
+                // If no documents were loaded, call CreateOutputDocument so that the load next
+                // document button gets added.
+                _primaryPageLayoutControl.CreateOutputDocument(null);
             }
         }
 
@@ -2040,7 +2035,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void InvokeLoadMorePages()
         {
-            if (!_pageLoadPending && !_cancelLoad)
+            if (!_pageLoadPending)
             {
                 _pageLoadPending = true;
                 this.SafeBeginInvoke("ELI35542", () =>
@@ -2095,6 +2090,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 foreach (SourceDocument document in processedDocuments
                         .Where(document => _sourceDocuments.Contains(document)))
                 {
+                    // Unload the document from the image viewer to unlock the file.
+                    _imageViewer.UnloadImage(document.FileName);
+
                     HandleProcessedSourceDocument(document);
                     document.Dispose();
 

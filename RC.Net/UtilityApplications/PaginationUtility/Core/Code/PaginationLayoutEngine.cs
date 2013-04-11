@@ -48,7 +48,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 List<PaginationControl> redundantControls = new List<PaginationControl>();
                 bool firstControl = true;
 
-                // Layou all PaginationControls (ignore any other kind of control).
+                // Layout all PaginationControls (ignore any other kind of control).
                 foreach (PaginationControl control in parent.Controls.OfType<PaginationControl>())
                 {
                     // Only apply layout to visible controls.
