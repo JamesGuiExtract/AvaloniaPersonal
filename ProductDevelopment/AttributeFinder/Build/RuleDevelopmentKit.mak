@@ -32,7 +32,7 @@ RDTInstallScriptFile=$(RDTInstallProjectRootDir)\Script Files\setup.rul
 RDTInstallMediaDir=$(RDTInstallProjectRootDir)\Media\CD-ROM\DiskImages\Disk1
 
 FLEXCustomerRDTInstallProjectRoot=$(EngineeringRootDirectory)\ProductDevelopment\AttributeFinder\Installation\FlexIndexCustomerRDT
-FLEXCustomerRDTMediaDir=$(FLEXCustomerRDTInstallProjectRoot)\Media\CD_ROM\Disk1
+FLEXCustomerRDTMediaDir=$(FLEXCustomerRDTInstallProjectRoot)\Media\CD_ROM\DiskImages\Disk1
 
 IDSInstallProjectDirectory=$(AFRootDirectory)\IndustrySpecific\Redaction\Installation\IDShieldCustomerRDT
 IDSRDTInstallMediaDir=$(IDSInstallProjectDirectory)\Media\CD-ROM\DiskImages\Disk1
