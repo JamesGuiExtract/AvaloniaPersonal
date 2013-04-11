@@ -1,0 +1,31 @@
+<HTML>
+    <HEAD>
+        <TITLE>Consideration Amount Finder</TITLE>
+        <link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+    </HEAD>
+    <BODY>
+        <h1>Consideration Amount Finder</h1>
+        <hr>
+        <ul>
+            <li>The Consideration Amount Finder finds various common dollar amounts that appear on land records</li>
+            <li>It can be called from <b>&ltComponentDataDir&gt\Indexing\ConsiderationAmount\main.rsd.etf.</b></li>
+            <li>There are four different attributes that you can call from the <i>main.rsd.etf</i> file, each of which find a different set of dollar amounts:
+                <ul>
+                    <p>
+                        <li><b>Principal</b> - On a mortgage or deed of trust document, this is the amount of money that the borrowers are borrowing from the lender.  In general, you will only want to run this attribute on mortgage and deed of trust documents.</li>
+                    </p>
+                    <p>
+                        <li><b>MaximumObligation</b> - On some mortgages and deed of trust documents, borrowers have the option of borrowing up to a certain amount.  This attribute finds the maximum amount the borrower can borrow.  Some customers want the maximum obligation amount to be captured instead of the principal amount.  In general, you will only want to run this attribute on mortgage and deed of trust documents.</li>
+                    </p>
+                    <p>
+                        <li><b>Consideration</b> - This is the amount that someone was paid to give up the rights to their property.  In general, it only appears on deed documents, such as grant deeds, quitclaim deeds, and warranty deeds.  As such, you will generally want to only run this attribute on deed documents.</li>
+                    </p>
+                    <p>
+                        <li><b>OriginalPrincipal</b> - Many document types, such as assignments, reconveyances, deeds, and satisfactions, will reference a previously recorded mortgage or deed of trust.  This attribute captures the principal amount of the referenced mortgage/deed of trust.  In general, you will only want to run these rules on assignments, reconveyances, deeds, and satisfactions.  Please note that deed documents will often have a consideration amount and an original principal amount.</li>
+                    </p>
+                </ul>
+            </li>
+        </ul>
+        <hr>
+    </BODY>
+</HTML>
