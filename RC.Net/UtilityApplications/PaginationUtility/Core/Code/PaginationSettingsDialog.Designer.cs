@@ -142,15 +142,8 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this._fileFilterComboBox.FormattingEnabled = true;
             this._fileFilterComboBox.Items.AddRange(new object[] {
-            "*.bmp;*.rle;*.dib;*.rst;*.gp4;*.mil;*.cal;*.cg4;*.flc;*.fli;*.gif;*.jpg;*.jpeg;*." +
-                "pcx;*.pct;*.png;*.tga;*.tif;*.tiff;*.pdf",
-            "*.bmp;*.rle;*.dib",
-            "*.gif",
-            "*.jpg;*.jpeg",
-            "*.pcx",
-            "*.pct",
+            "*.tif;*.tiff;*.pdf",
             "*.pdf",
-            "*.png",
             "*.tif;*.tiff",
             "*.*"});
             this._fileFilterComboBox.Location = new System.Drawing.Point(140, 55);

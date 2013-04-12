@@ -435,6 +435,7 @@
             this._exitToolStripMenuItem.Name = "_exitToolStripMenuItem";
             this._exitToolStripMenuItem.Size = new System.Drawing.Size(269, 22);
             this._exitToolStripMenuItem.Text = "E&xit";
+            this._exitToolStripMenuItem.Click += new System.EventHandler(this.HandleExitToolStripMenuItem_Click);
             // 
             // _editMenuItem
             // 

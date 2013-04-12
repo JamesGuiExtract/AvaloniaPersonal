@@ -674,6 +674,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (ShowSettingsDialog() == DialogResult.OK)
                     {
+                        // Cause window beneath settings dialog to update before load so as not to leave
+                        // "ghost" of settings dialog while loading.
+                        Update();
+
                         LoadMorePages();
                     }
                 }
@@ -697,6 +701,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                // [DotNetRCAndUtils:960]
+                // Dereferece clipboard data to allow documents that should be considered
+                // "processed" to be deleted/moved, but do it before any page controls are removed
+                // or disposed of, otherwise this will cause documents to moved/processed when they
+                // haven't been.
+                DereferenceLastClipboardData();
+
                 base.OnClosing(e);
             }
             catch (Exception ex)
@@ -766,8 +777,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                         CollectionMethods.ClearAndDispose(_sourceDocuments);
                     }
 
-                    DereferenceLastClipboardData();
-
                     if (components != null)
                     {
                         components.Dispose();
@@ -817,6 +826,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (ShowSettingsDialog() == DialogResult.OK)
                 {
+                    // Cause window beneath settings dialog to update before load so as not to leave
+                    // "ghost" of settings dialog while loading.
+                    Update();
+
                     LoadMorePages();
                 }
             }
@@ -867,6 +880,24 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35524");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_exitToolStripMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleExitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Close();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35662");
             }
         }
 

@@ -382,7 +382,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.OnLoad(e);
 
-                if (!IsDisposed && _page != null)
+                // [DotNetRCAndUtils:959]
+                // For reasons I don't understand, the dispose of one PageThumbnailControl can
+                // sometimes trigger the OnLoad call of a subsquent PageThumbnailControl.
+                // Ensure the page thumbnail exists before trying to use it.
+                if (!IsDisposed && _page != null && _page.ThumbnailImage != null)
                 {
                     _rasterPictureBox.Image = _page.ThumbnailImage.Clone();
 

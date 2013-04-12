@@ -946,6 +946,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                         components = null;
                     }
 
+                    if (_dropLocationIndicator != null)
+                    {
+                        _dropLocationIndicator.Dispose();
+                        _dropLocationIndicator = null;
+                    }
+
                     if (_dragDropScrollTimer != null)
                     {
                         _dragDropScrollTimer.Dispose();
