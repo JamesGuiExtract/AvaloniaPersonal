@@ -44,6 +44,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         static Size? _uniformSize;
 
         /// <summary>
+        /// Indicates the normal padding that should be used for an instance of this class.
+        /// </summary>
+        static Padding? _normalPadding;
+
+        /// <summary>
         /// The <see cref="Page"/> represented by this instance.
         /// </summary>
         Page _page;
@@ -53,11 +58,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see langword="null"/> if the page is not currently being displayed.
         /// </summary>
         ImageViewer _activeImageViewer;
-
-        /// <summary>
-        /// The <see cref="ToolTip"/> to display for this instance.
-        /// </summary>
-        ToolTip _toolTip = new ToolTip();
 
         #endregion Fields
 
@@ -120,10 +120,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 RasterPaintProperties properties = _rasterPictureBox.PaintProperties;
                 properties.PaintDisplayMode |= RasterPaintDisplayModeFlags.ScaleToGray;
                 _rasterPictureBox.PaintProperties = properties;
-
-                _toolTip.AutoPopDelay = 0;
-                _toolTip.InitialDelay = 500;
-                _toolTip.ReshowDelay = 500;
             }
             catch (Exception ex)
             {
@@ -262,9 +258,53 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Gets the normal <see cref="Padding"/> that should be used by this instance.
+        /// </summary>
+        /// <value>The normal <see cref="Padding"/> that should be used by this instance.
+        /// </value>
+        public override Padding NormalPadding
+        {
+            get
+            {
+                try
+                {
+                    if (_normalPadding == null)
+                    {
+                        using (var pageControl = new PageThumbnailControl())
+                        {
+                            _normalPadding = pageControl.Padding;
+                        }
+                    }
+
+                    return _normalPadding.Value;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35664");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
+
+        /// <summary>
+        /// Associates the specified <see paramref="toolTip"/> with this control.
+        /// </summary>
+        /// <param name="toolTip">The <see cref="ToolTip"/> to associate with this control.</param>
+        public void SetToolTip(ToolTip toolTip)
+        {
+            try
+            {
+                SetToolTip(this, toolTip);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35666");
+            }
+        }
 
         /// <summary>
         /// Displays or closed the <see cref="Page"/> in the specified <see paramref="ImageViewer"/>.
@@ -382,15 +422,23 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.OnLoad(e);
 
-                // [DotNetRCAndUtils:959]
-                // For reasons I don't understand, the dispose of one PageThumbnailControl can
-                // sometimes trigger the OnLoad call of a subsquent PageThumbnailControl.
-                // Ensure the page thumbnail exists before trying to use it.
-                if (!IsDisposed && _page != null && _page.ThumbnailImage != null)
+                try
                 {
-                    _rasterPictureBox.Image = _page.ThumbnailImage.Clone();
-
-                    SetToolTip(this);
+                    // [DotNetRCAndUtils:959]
+                    // For reasons I don't understand, the dispose of one PageThumbnailControl can
+                    // sometimes trigger the OnLoad call of a subsquent PageThumbnailControl.
+                    // Ensure the page thumbnail exists before trying to use it.
+                    if (!IsDisposed && _page != null && _page.ThumbnailImage != null)
+                    {
+                        _rasterPictureBox.Image = _page.ThumbnailImage.Clone();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // To prevent any exceptions from being needlessly displayed at times user
+                    // wouldn't otherwise know of a problem, just log exceptions setting the
+                    // thumbnail image for now. Needs to be re-visited later.
+                    ex.ExtractLog("ELI35668");
                 }
             }
             catch (Exception ex)
@@ -410,12 +458,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
-                    if (_toolTip != null)
-                    {
-                        _toolTip.Dispose();
-                        _toolTip = null;
-                    }
-
                     if (_rasterPictureBox != null)
                     {
                         _rasterPictureBox.Dispose();
@@ -567,16 +609,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Private Members
 
         /// <summary>
-        /// Sets the <see cref="_toolTip"/> to be active for all child controls.
+        /// Associates the specified <see paramref="toolTip"/> with this control.
         /// </summary>
-        /// <param name="control"></param>
-        void SetToolTip(Control control)
+        /// <param name="control">The <see cref="Control"/>.</param>
+        /// <param name="toolTip">The <see cref="ToolTip"/> to associate with this control.</param>
+        void SetToolTip(Control control, ToolTip toolTip)
         {
             foreach (Control childControl in control.Controls)
             {
-                _toolTip.SetToolTip(childControl, Page.OriginalDocumentName);
+                toolTip.SetToolTip(childControl, Page.OriginalDocumentName);
 
-                SetToolTip(childControl);
+                SetToolTip(childControl, toolTip);
             }
         }
 

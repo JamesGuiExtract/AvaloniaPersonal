@@ -265,7 +265,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// be toggled on or off.
         /// </summary>
         readonly ToolStripMenuItem _toggleDocumentSeparatorMenuItem =
-            new ToolStripMenuItem("Toggle document separator   Space");
+            new ToolStripMenuItem("Toggle document separator");
 
         /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the insert
@@ -303,6 +303,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _inUpdateOperation;
 
+        /// <summary>
+        /// The <see cref="ToolTip"/> used to display the full source document path for
+        /// <see cref="PageThumbnailControl"/>s.
+        /// </summary>
+        ToolTip _toolTip = new ToolTip();
+
+        /// <summary>
+        /// The <see cref="PageThumbnailControl"/> with which the <see cref="_toolTip"/> is
+        /// currently associated.
+        /// </summary>
+        PageThumbnailControl _toolTipControl;
+
         #endregion Fields
 
         #region Constructors
@@ -338,6 +350,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _dragDropScrollTimer = new Timer();
                 _dragDropScrollTimer.Interval = 50;
                 _dragDropScrollTimer.Tick += HandleDragDropScrollTimer_Tick;
+
+                _toolTip.AutoPopDelay = 0;
+                _toolTip.InitialDelay = 500;
+                _toolTip.ReshowDelay = 500;
 
                 _paginationUtility = paginationUtility;
                 _flowLayoutPanel.Click += HandleFlowLayoutPanel_Click;
@@ -604,7 +620,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // The removed control should no longer be considered selected.
                 if (control.Selected)
                 {
-                    SetSelected(control, false);
+                    SetSelected(control, false, true);
                 }
 
                 control.Click -= HandlePaginationControl_Click;
@@ -630,6 +646,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (removedPageControl.PageIsDisplayed && dispose)
                     {
                         removedPageControl.DisplayPage(ImageViewer, false);
+                    }
+
+                    if (removedPageControl == _toolTipControl)
+                    {
+                        _toolTip.RemoveAll();
+                        _toolTipControl = null;
                     }
 
                     OutputDocument document = removedPageControl.Document;
@@ -780,21 +802,21 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.OnLoad(e);
 
-                _cutMenuItem.ShortcutKeys = Keys.Control | Keys.X;
+                _cutMenuItem.ShortcutKeyDisplayString = "Ctrl + X";
                 _cutMenuItem.ShowShortcutKeys = true;
                 _cutCommand = new ApplicationCommand(ImageViewer.Shortcuts,
                     new Keys[] { Keys.Control | Keys.X }, HandleCutSelectedControls,
                     new[] { _cutMenuItem, _paginationUtility._cutMenuItem }, false, true, false);
                 _cutMenuItem.Click += HandleCutMenuItem_Click;
 
-                _copyMenuItem.ShortcutKeys = Keys.Control | Keys.C;
+                _copyMenuItem.ShortcutKeyDisplayString = "Ctrl + C";
                 _copyMenuItem.ShowShortcutKeys = true;
                 _copyCommand = new ApplicationCommand(ImageViewer.Shortcuts,
                     new Keys[] { Keys.Control | Keys.C }, HandleCopySelectedControls,
                     new[] { _copyMenuItem, _paginationUtility._copyMenuItem }, false, true, false);
                 _copyMenuItem.Click += HandleCopyMenuItem_Click;
 
-                _insertCopiedMenuItem.ShortcutKeys = Keys.Control | Keys.V;
+                _insertCopiedMenuItem.ShortcutKeyDisplayString = "Ctrl + V";
                 _insertCopiedMenuItem.ShowShortcutKeys = true;
                 _insertCopiedCommand = new ApplicationCommand(ImageViewer.Shortcuts,
                     new Keys[] { Keys.Control | Keys.V }, HandleInsertCopied,
@@ -802,13 +824,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                     false, true, false);
                 _insertCopiedMenuItem.Click += HandleInsertCopiedMenuItem_Click;
 
-                _deleteMenuItem.ShortcutKeys = Keys.Delete;
+                _deleteMenuItem.ShortcutKeyDisplayString = "Del";
                 _deleteMenuItem.ShowShortcutKeys = true;
                 _deleteCommand = new ApplicationCommand(ImageViewer.Shortcuts,
                     new Keys[] { Keys.Delete }, HandleDeleteSelectedItems,
                     new[] { _deleteMenuItem, _paginationUtility._deleteMenuItem }, false, true, false);
                 _deleteMenuItem.Click += HandleDeleteMenuItem_Click;
 
+                _toggleDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "Space";
+                _toggleDocumentSeparatorMenuItem.ShowShortcutKeys = true;
                 _toggleDocumentSeparatorCommand = new ApplicationCommand(ImageViewer.Shortcuts,
                     new Keys[] { Keys.Space }, HandleToggleDocumentSeparator,
                     new[] { _toggleDocumentSeparatorMenuItem, _paginationUtility._insertDocumentSeparatorMenuItem }, 
@@ -887,34 +911,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
-        /// <summary>
-        /// Processes a command key.
-        /// </summary>
-        /// <param name="msg">The window message to process.</param>
-        /// <param name="keyData">The key to process.</param>
-        /// <returns><see langword="true"/> if the character was processed by the control; 
-        /// otherwise, <see langword="false"/>.</returns>
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-        {
-            try
-            {
-                // Allow the image viewer to handle keyboard input for shortcuts.
-                if (ImageViewer.Shortcuts.ProcessKey(keyData))
-                {
-                    return true;
-                }
-
-                // This key was not processed, bubble it up to the base class.
-                return base.ProcessCmdKey(ref msg, keyData);
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI35440", ex);
-            }
-
-            return true;
-        }
-
         /// <summary> 
         /// Clean up any resources being used.
         /// </summary>
@@ -963,6 +959,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _loadNextDocumentButtonControl.Dispose();
                         _loadNextDocumentButtonControl = null;
                     }
+
+                    if (_toolTip != null)
+                    {
+                        _toolTipControl = null;
+                        _toolTip.Dispose();
+                        _toolTip = null;
+                    }
                 }
                 catch { }
             }
@@ -988,7 +991,11 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 var clickedControl = (PaginationControl)sender;
 
-                ProcessControlSelection(clickedControl, false, true);
+                // [DotNetRCAndUtils:965]
+                // Clicking on page thumbnail controls should always select unless the control key
+                // is the only modifier key.
+                bool select = !clickedControl.Selected || (Control.ModifierKeys & Keys.Control) == 0;
+                ProcessControlSelection(clickedControl, null, select, Control.ModifierKeys);
             }
             catch (Exception ex)
             {
@@ -1010,8 +1017,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (pageControl != null)
                 {
                     ProcessControlSelection(
-                        pageControl, pageControl.Document.PageControls, true, true,
-                        Control.ModifierKeys);
+                        pageControl, pageControl.Document.PageControls, true, Control.ModifierKeys);
                 }
             }
             catch (Exception ex)
@@ -1030,13 +1036,31 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                var originControl = sender as PaginationControl;
+
+                // Assigning a ToolTip instance for all page controls uses a lot of GDI handles.
+                // Instead, dynamically assign a single _toolTip instance the control the mouse is
+                // currently over.
+                if (_toolTipControl != originControl)
+                {
+                    if (_toolTipControl != null)
+                    {
+                        _toolTip.RemoveAll();
+                    }
+
+                    _toolTipControl = originControl as PageThumbnailControl;
+                    if (_toolTipControl != null)
+                    {
+                        _toolTipControl.SetToolTip(_toolTip);
+                    }
+                }
+
                 // If the mouse button is down and the sending control is already selected, start a
                 // drag-and-drop operation.
                 if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
                 {
-                    var originControl = sender as PaginationControl;
-                    if (originControl != null && originControl.Selected &&
-                        originControl != _loadNextDocumentButtonControl)
+                    
+                    if (originControl != null && originControl != _loadNextDocumentButtonControl)
                     {
                         // Don't start a drag and drop operation unless the user has dragged out of
                         // the origin control to help prevent accidental drag/drops.
@@ -1046,6 +1070,14 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         if (currentControl != null && currentControl != originControl)
                         {
+                            // [DotNetRCAndUtils:968]
+                            // If the control where the drag originated is not selected, imply
+                            // selection of that control when starting the drag operation.
+                            if (!originControl.Selected)
+                            {
+                                ProcessControlSelection(originControl);
+                            }
+
                             var dataObject = new DataObject(_DRAG_DROP_DATA_FORMAT, this);
 
                             try
@@ -1295,7 +1327,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                ProcessControlSelection(null, false, false);
+                ClearSelection();
             }
             catch (Exception ex)
             {
@@ -1350,7 +1382,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _flowLayoutPanel.GetChildAtPoint(mouseLocation) as PaginationControl;
                 if (_commandTargetControl != null && !_commandTargetControl.Selected)
                 {
-                    ProcessControlSelection(_commandTargetControl, true, true);
+                    ProcessControlSelection(_commandTargetControl);
                 }
                 else if (_commandTargetControl == null)
                 {
@@ -1684,7 +1716,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                     else if (InitializePaginationControl(control, targetIndex++))
                     {
-                        SetSelected(control, true);
+                        SetSelected(control, true, true);
                     }
                 }
 
@@ -1783,16 +1815,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="activeControl">The <see cref="PaginationControl"/> that should be
         /// considered active.</param>
-        /// <param name="forceSelect"><see langword="true"/> if selection should be applied rather
-        /// than toggled; otherwise <see langword="false"/>.</param>
-        /// <param name="allowSetActivePage"><see langword="true"/> if the
-        /// <see paramref="activeControl"/> should be able to be displayed and become the one and
-        /// only "active" page; otheriwse, <see langword="false"/>.</param>
-        void ProcessControlSelection(PaginationControl activeControl, bool forceSelect,
-            bool allowSetActivePage)
+        void ProcessControlSelection(PaginationControl activeControl)
         {
-            ProcessControlSelection(activeControl, null, forceSelect, allowSetActivePage, 
-                Control.ModifierKeys);
+            ProcessControlSelection(activeControl, null, true, Control.ModifierKeys);
         }
 
         /// <summary>
@@ -1802,26 +1827,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// considered active.</param>
         /// <param name="additionalControls">Any additional <see cref="PaginationControl"/>s whose
         /// selection state should be changed along with <see paramref="activeControl"/>.</param>
-        /// <param name="forceSelect"><see langword="true"/> if selection should be applied rather
-        /// than toggled; otherwise <see langword="false"/>.</param>
-        /// <param name="allowSetActivePage"><see langword="true"/> if the
-        /// <see paramref="activeControl"/> should be able to be displayed and become the one and
-        /// only "active" page; otheriwse, <see langword="false"/>.</param>
+        /// <param name="select"><see langword="true"/> if selection should be set,
+        /// <see langword="false"/> if it should be cleared.</param>
         /// <param name="modifierKeys">The <see cref="Keys"/> that should be used as the active
         /// modifier keys.</param>
         void ProcessControlSelection(PaginationControl activeControl,
-            IEnumerable<PaginationControl> additionalControls, bool forceSelect,
-            bool allowSetActivePage, Keys? modifierKeys)
+            IEnumerable<PaginationControl> additionalControls, bool select, Keys modifierKeys)
         {
-            // Determine whether to select or deselect.
-            bool select = forceSelect || activeControl == null || !activeControl.Selected
-                || activeControl != _lastSelectedControl;
-            PaginationControl lastSelectedControl = _lastSelectedControl;
+             PaginationControl lastSelectedControl = _lastSelectedControl;
 
             // Clear any currently selected controls first unless the control key is down.
-            if (!modifierKeys.HasValue || modifierKeys.Value == 0)
+            if ((modifierKeys & Keys.Control) == 0)
             {
-                ClearSelection();
+                ClearSelection((modifierKeys & Keys.Shift) == 0);
             }
 
             var additionalControlSet = (additionalControls == null)
@@ -1830,7 +1848,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             // If the shift key is down and activeControl is not the same as the lastSelectedControl,
             // select all controls between activeControl and lastSelectedControl.
-            if (modifierKeys.HasValue && (modifierKeys.Value & Keys.Shift) == Keys.Shift &&
+            if ((modifierKeys & Keys.Shift) == Keys.Shift &&
                 lastSelectedControl != null && activeControl != null &&
                 activeControl != lastSelectedControl)
             {
@@ -1863,13 +1881,16 @@ namespace Extract.UtilityApplications.PaginationUtility
             // Set the selection state for all controls except activeControl first.
             foreach (var control in additionalControlSet.Except(new[] { activeControl }))
             {
-                SetSelected(control, select);
+                SetSelected(control, select, true);
             }
 
             // Then select activeControl, making it the new active control if necessary.
             if (activeControl != null)
             {
-                SelectControl(activeControl, select, allowSetActivePage);
+                // Allow _lastSelectedControl to become activeControl unless the shift modifier key
+                // is down.
+                bool resetLastSelected = ((modifierKeys & Keys.Shift) == 0);
+                SelectControl(activeControl, select, resetLastSelected);
             }
         }
 
@@ -1877,23 +1898,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Selects the specified <see paramref="control"/>.
         /// </summary>
         /// <param name="control">The <see cref="PaginationControl"/> to select.</param>
-        /// <param name="select"><see langword="true"/> to select the control or
-        /// <see langword="false"/> to de-select it.</param>
-        /// <param name="allowSetActivePage"><see langword="true"/> if the
-        /// <see paramref="control"/> should be able to be displayed and become the one and
-        /// only "active" page; otheriwse, <see langword="false"/>.</param>
-        void SelectControl(PaginationControl control, bool select, bool allowSetActivePage)
+        /// <param name="select"></param>
+        /// <param name="resetLastSelected"><see langword="true"/> if <see paramref="control"/> can
+        /// become the new <see cref="_lastSelectedControl"/>; <see langword="false"/> otherwise.
+        /// </param>
+        void SelectControl(PaginationControl control, bool select, bool resetLastSelected)
         {
-            SetSelected(control, select);
+            SetSelected(control, select, resetLastSelected);
 
             if (select)
             {
-                _lastSelectedControl = control;
+                if (resetLastSelected || _lastSelectedControl == null)
+                {
+                    _lastSelectedControl = control;
+                }
                 _commandTargetControl = control;
-            }
 
-            if (select && allowSetActivePage)
-            {
                 PrimarySelection = control;
 
                 // Make sure the selected control is scrolled into view.
@@ -1902,7 +1922,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _flowLayoutPanel.ScrollControlIntoViewManual(control);
                 }
             }
-            else if (!select)
+            else
             {
                 if (control == _lastSelectedControl)
                 {
@@ -1929,13 +1949,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="control">The control for which the selection state should be set.</param>
         /// <param name="select"><see langword="true"/> to select the control;
         /// <see langword="false"/> to deselet it.</param>
-        void SetSelected(PaginationControl control, bool select)
+        /// <param name="resetLastSelected"><see langword="true"/> if
+        /// <see cref="_lastSelectedControl"/> should be reset if it is de-selected;
+        /// otherwise, <see langword="false"/>.</param>
+        void SetSelected(PaginationControl control, bool select, bool resetLastSelected)
         {
             control.Selected = select;
 
             if (!select)
             {
-                if (control == _lastSelectedControl)
+                if (resetLastSelected && control == _lastSelectedControl)
                 {
                     _lastSelectedControl = null;
                 }
@@ -2127,7 +2150,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             // Select the selectionTarget and the pageControls that make up the document it is in.
             // Do not allow handling of modifier keys since modifier keys have a different meaning
             // for document navigation.
-            ProcessControlSelection(selectionTarget, pageControls, true, true, 0);
+            ProcessControlSelection(selectionTarget, pageControls, true, 0);
         }
 
         /// <summary>
@@ -2159,10 +2182,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             else
             {
-                // Separators cannot be added next to other separators and cannot be the first control.
+                // Separators cannot be added next to other separators, cannot be the first control
+                // and should only be able to be toggle when there is a single selection.
                 bool controlIsSeparator = _commandTargetControl is PaginationSeparator;
-                _toggleDocumentSeparatorCommand.Enabled =
-                    contextMenuControlIndex != 0 && !controlIsSeparator;
+                _toggleDocumentSeparatorCommand.Enabled = contextMenuControlIndex != 0 &&
+                    !controlIsSeparator && SelectedControls.Count() == 1;
 
                 // Insertied copied items requires there to be copied items.
                 _insertCopiedCommand.Enabled = PaginationUtilityForm.ClipboardHasData();
@@ -2184,10 +2208,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void ClearSelection()
         {
+            ClearSelection(true);
+        }
+
+        /// <summary>
+        /// Clears any selection and closes the currently diplayed page in the
+        /// <see cref="ImageViewer"/> if specfied by <see paramref="closeDisplayedPage"/>.
+        /// </summary>
+        /// <param name="resetLastSelected"><see langword="true"/> if
+        /// <see cref="_lastSelectedControl"/> should be set to <see langword="null"/>;
+        /// otherwise <see langword="false"/>.</param>
+        void ClearSelection(bool resetLastSelected)
+        {
             // Deselect all currently selected controls
             foreach (PaginationControl selectedControl in SelectedControls.ToArray())
             {
-                SetSelected(selectedControl, false);
+                SetSelected(selectedControl, false, resetLastSelected);
             }
 
             // Setting the primary selection to null will also close the displayed image.
@@ -2258,7 +2294,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (controlToSelect != null && !SelectedControls.Any())
                     {
-                        ProcessControlSelection(controlToSelect, true, true);
+                        ProcessControlSelection(controlToSelect);
                     }
                 }
             }
@@ -2312,7 +2348,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             // Select the newly inserted pages.
             ProcessControlSelection(insertedPaginationControls.First(), 
-                insertedPaginationControls, true, true, null);
+                insertedPaginationControls, true, 0);
         }
 
         /// <summary>
@@ -2400,7 +2436,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (navigableControl != null)
                 {
-                    ProcessControlSelection(navigableControl, true, true);
+                    ProcessControlSelection(navigableControl);
                 }
             }
             catch (Exception ex)
@@ -2420,7 +2456,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (navigableControl != null)
                 {
-                    ProcessControlSelection(navigableControl, true, true);
+                    ProcessControlSelection(navigableControl);
                 }
             }
             catch (Exception ex)
@@ -2440,7 +2476,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (navigableControl != null)
                 {
-                    ProcessControlSelection(navigableControl, null, true, true, 0);
+                    ProcessControlSelection(navigableControl);
                 }
             }
             catch (Exception ex)
@@ -2463,7 +2499,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (navigableControl != null)
                 {
-                    ProcessControlSelection(navigableControl, true, true);
+                    ProcessControlSelection(navigableControl);
                 }
             }
             catch (Exception ex)
@@ -2486,7 +2522,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (navigableControl != null)
                 {
-                    ProcessControlSelection(navigableControl, true, true);
+                    ProcessControlSelection(navigableControl);
                 }
             }
             catch (Exception ex)
@@ -2506,7 +2542,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (navigableControl != null)
                 {
-                    ProcessControlSelection(navigableControl, true, true);
+                    ProcessControlSelection(navigableControl);
                 }
             }
             catch (Exception ex)
@@ -2526,7 +2562,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (navigableControl != null)
                 {
-                    ProcessControlSelection(navigableControl, true, true);
+                    ProcessControlSelection(navigableControl);
                 }
             }
             catch (Exception ex)

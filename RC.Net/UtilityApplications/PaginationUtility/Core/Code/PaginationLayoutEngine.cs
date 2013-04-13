@@ -61,16 +61,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         "The PaginationLayoutEngine does not respect margins.",
                         control.Margin == Padding.Empty);
 
-                    // Size the control properly.
+                    bool useExtraPadding = false;
                     var separator = control as PaginationSeparator;
-                    if (separator != null)
-                    {
-                        control.Size = PaginationSeparator.UniformSize;
-                    }
-                    else
-                    {
-                        control.Size = PageThumbnailControl.UniformSize;
-                    }
 
                     PaginationControl previousSeparator =
                         control.PreviousControl as PaginationSeparator;
@@ -81,7 +73,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // position of this control.
                         if (previousSeparator == null || firstControl)
                         {
-                            nextControlLocation.X += PaginationSeparator.UniformSize.Width;
+                            useExtraPadding = true;
                         }
 
                         firstControl = false;
@@ -97,25 +89,62 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
 
                     // Calculate the X position the next control would be at.
-                    int nextXPosition = nextControlLocation.X + control.Width;
+                    int nextXPosition = nextControlLocation.X;
                     if (separator != null)
                     {
                         // For visual consistency, make sure the last control in a row is never a
                         // separator. If this control is a separator and a following page control
                         // would wrap, wrap this separator instead.
+                        nextXPosition += PaginationSeparator.UniformSize.Width +
+                            PageThumbnailControl.UniformSize.Width;
+                    }
+                    else
+                    {
                         nextXPosition += PageThumbnailControl.UniformSize.Width;
+                        if (useExtraPadding)
+                        {
+                            // Allow for padding that will be added below.
+                            nextXPosition += PaginationSeparator.UniformSize.Width;
+                        }
                     }
 
                     // If the next control would start beyond parentDisplayRectangle, wrap.
                     if (nextXPosition > parentDisplayRectangle.Right)
                     {
                         nextControlLocation.X = parentDisplayRectangle.Left;
+
                         if (separator == null)
                         {
                             // Allow space for a separator to be added at the start of the row.
-                            nextControlLocation.X += PaginationSeparator.UniformSize.Width;
+                            useExtraPadding = true;
                         }
+
                         nextControlLocation.Y += PageThumbnailControl.UniformSize.Height;
+                    }
+
+                    // Size the control properly.
+                    if (separator != null)
+                    {
+                        control.Size = PaginationSeparator.UniformSize;
+                    }
+                    else
+                    {
+                        Padding normalPadding = ((NavigablePaginationControl)control).NormalPadding;
+
+                        if (useExtraPadding)
+                        {
+                            control.Padding = new Padding(
+                                normalPadding.Left + PaginationSeparator.UniformSize.Width,
+                                normalPadding.Top, normalPadding.Right, normalPadding.Bottom);
+                            control.Size = new Size(
+                                PageThumbnailControl.UniformSize.Width + PaginationSeparator.UniformSize.Width,
+                                PageThumbnailControl.UniformSize.Height);
+                        }
+                        else
+                        {
+                            control.Padding = normalPadding;
+                            control.Size = PageThumbnailControl.UniformSize;
+                        }
                     }
 
                     control.Location = nextControlLocation;

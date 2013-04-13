@@ -44,6 +44,19 @@ namespace Extract.UtilityApplications.PaginationUtility
             set;
         }
 
+        /// <summary>
+        /// Gets the normal <see cref="Padding"/> that should be used by this instance.
+        /// </summary>
+        /// <value>The normal <see cref="Padding"/> that should be used by this instance.
+        /// </value>
+        public virtual Padding NormalPadding
+        {
+            get
+            {
+                return DefaultPadding;
+            }
+        }
+
         #endregion Properties
     }
 }

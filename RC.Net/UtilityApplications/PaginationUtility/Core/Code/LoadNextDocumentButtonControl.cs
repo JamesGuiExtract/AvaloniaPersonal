@@ -11,6 +11,16 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// </summary>
     internal partial class LoadNextDocumentButtonControl : NavigablePaginationControl
     {
+        #region Fields
+
+        /// <summary>
+        /// Specifies the normal <see cref="Padding"/> that should be used for an instance of this
+        /// class.
+        /// </summary>
+        static Padding? _normalPadding;
+
+        #endregion Fields
+
         #region Constructors
 
         /// <summary>
@@ -71,6 +81,34 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Refresh _outerPanel to update the indication of whether it is currently the
                 // primary selection.
                 _outerPanel.Invalidate();
+            }
+        }
+
+        /// <summary>
+        /// Gets the normal <see cref="Padding"/> that should be used by this instance.
+        /// </summary>
+        /// <value>The normal <see cref="Padding"/> that should be used by this instance.
+        /// </value>
+        public override Padding NormalPadding
+        {
+            get
+            {
+                try
+                {
+                    if (_normalPadding == null)
+                    {
+                        using (var control = new LoadNextDocumentButtonControl())
+                        {
+                            _normalPadding = control.Padding;
+                        }
+                    }
+
+                    return _normalPadding.Value;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35665");
+                }
             }
         }
 

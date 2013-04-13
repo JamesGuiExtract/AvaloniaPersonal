@@ -737,6 +737,48 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Processes a command key.
+        /// </summary>
+        /// <param name="msg">The window message to process.</param>
+        /// <param name="keyData">The key to process.</param>
+        /// <returns><see langword="true"/> if the character was processed by the control; 
+        /// otherwise, <see langword="false"/>.</returns>
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            try
+            {
+                // Ignore shortcuts intended for the _outputFileNameToolStripTextBox.
+                if (!_outputFileNameToolStripTextBox.Focused ||
+                    ((keyData & Keys.Left) == 0 &&
+                     (keyData & Keys.Right) == 0 &&
+                     (keyData & Keys.Home) == 0 &&
+                     (keyData & Keys.End) == 0 &&
+                     (keyData & Keys.Delete) == 0 &&
+                     (keyData & Keys.Back) == 0 &&
+                     ((keyData & Keys.Control) == 0 || (keyData & Keys.C) == 0) &&
+                     ((keyData & Keys.Control) == 0 || (keyData & Keys.X) == 0) &&
+                     ((keyData & Keys.Control) == 0 || (keyData & Keys.V) == 0) &&
+                     ((keyData & Keys.Control) == 0 || (keyData & Keys.S) == 0)))
+                {
+                    // Otherwise, allow the image viewer to handle keyboard input for shortcuts.
+                    if (_imageViewer.Shortcuts.ProcessKey(keyData))
+                    {
+                        return true;
+                    }
+                }
+
+                // This key was not processed, bubble it up to the base class.
+                return base.ProcessCmdKey(ref msg, keyData);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI35663", ex);
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing"><see langword="true"/> if managed resources should be disposed; otherwise,
@@ -1207,6 +1249,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (_primaryPageLayoutControl.FullySelectedDocuments.Count() == 1)
                     {
                         _outputFileNameToolStripTextBox.Enabled = true;
+                        _outputFileNameBrowseToolStripButton.Enabled = true;
                         _fileNameEditableDocument = selectedDocument;
 
                         if (selectedDocument.PageControls.Count == 1)
@@ -1225,6 +1268,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // If the document is not fully selected, disable the output filename text
                         // box.
                         _outputFileNameToolStripTextBox.Enabled = false;
+                        _outputFileNameBrowseToolStripButton.Enabled = false;
 
                         IEnumerable<PageThumbnailControl> selectedPageControls =
                             selectedDocument.PageControls.Where(pageControl => pageControl.Selected);
@@ -1250,6 +1294,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _lastValidDocumentName = null;
                     _outputFileNameToolStripTextBox.Text = "";
                     _outputFileNameToolStripTextBox.Enabled = false;
+                    _outputFileNameBrowseToolStripButton.Enabled = false;
                     _pagesToolStripLabel.Text = "";
                 }
             }
