@@ -749,12 +749,24 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 // Ignore shortcuts intended for the _outputFileNameToolStripTextBox.
                 if (!_outputFileNameToolStripTextBox.Focused ||
-                    ((keyData & Keys.Left) == 0 &&
+                    ((keyData & Keys.A) == 0 &&
+                     (keyData & Keys.H) == 0 &&
+                     (keyData & Keys.K) == 0 &&
+                     (keyData & Keys.P) == 0 &&
+                     (keyData & Keys.R) == 0 &&
+                     (keyData & Keys.W) == 0 &&
+                     (keyData & Keys.Z) == 0 &&
+                     (keyData & Keys.Subtract) == 0 &&
+                     (keyData & Keys.OemMinus) == 0 &&
+                     (keyData & Keys.Add) == 0 &&
+                     (keyData & Keys.Oemplus) == 0 &&
+                     (keyData & Keys.Left) == 0 &&
                      (keyData & Keys.Right) == 0 &&
                      (keyData & Keys.Home) == 0 &&
                      (keyData & Keys.End) == 0 &&
                      (keyData & Keys.Delete) == 0 &&
                      (keyData & Keys.Back) == 0 &&
+                     (keyData & Keys.Escape) == 0 &&
                      ((keyData & Keys.Control) == 0 || (keyData & Keys.C) == 0) &&
                      ((keyData & Keys.Control) == 0 || (keyData & Keys.X) == 0) &&
                      ((keyData & Keys.Control) == 0 || (keyData & Keys.V) == 0) &&

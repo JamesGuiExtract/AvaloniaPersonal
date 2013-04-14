@@ -893,6 +893,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ImageViewer.Shortcuts[Keys.Oemcomma] = HandleSelectPreviousPage;
                 ImageViewer.Shortcuts[Keys.OemPeriod] = HandleSelectNextPage;
 
+                // Clear shortcuts that don't apply to this application.
+                ImageViewer.Shortcuts[Keys.O | Keys.Control] = null;
+                ImageViewer.Shortcuts[Keys.Control | Keys.F4] = null;
+                ImageViewer.Shortcuts[Keys.Control | Keys.P] = null;
+
                 ContextMenuStrip = new ContextMenuStrip();
                 ContextMenuStrip.Items.Add(_cutMenuItem);
                 ContextMenuStrip.Items.Add(_copyMenuItem);
