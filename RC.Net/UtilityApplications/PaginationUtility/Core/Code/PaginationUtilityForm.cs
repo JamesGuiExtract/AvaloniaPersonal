@@ -747,30 +747,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                // Ignore shortcuts intended for the _outputFileNameToolStripTextBox.
+                // When the output filename textbox has focus, allow only the Ctrl + S shortcut to
+                // be handled (saves output file). Otherwise the text box should get all input.
                 if (!_outputFileNameToolStripTextBox.Focused ||
-                    ((keyData & Keys.A) == 0 &&
-                     (keyData & Keys.H) == 0 &&
-                     (keyData & Keys.K) == 0 &&
-                     (keyData & Keys.P) == 0 &&
-                     (keyData & Keys.R) == 0 &&
-                     (keyData & Keys.W) == 0 &&
-                     (keyData & Keys.Z) == 0 &&
-                     (keyData & Keys.Subtract) == 0 &&
-                     (keyData & Keys.OemMinus) == 0 &&
-                     (keyData & Keys.Add) == 0 &&
-                     (keyData & Keys.Oemplus) == 0 &&
-                     (keyData & Keys.Left) == 0 &&
-                     (keyData & Keys.Right) == 0 &&
-                     (keyData & Keys.Home) == 0 &&
-                     (keyData & Keys.End) == 0 &&
-                     (keyData & Keys.Delete) == 0 &&
-                     (keyData & Keys.Back) == 0 &&
-                     (keyData & Keys.Escape) == 0 &&
-                     ((keyData & Keys.Control) == 0 || (keyData & Keys.C) == 0) &&
-                     ((keyData & Keys.Control) == 0 || (keyData & Keys.X) == 0) &&
-                     ((keyData & Keys.Control) == 0 || (keyData & Keys.V) == 0) &&
-                     ((keyData & Keys.Control) == 0 || (keyData & Keys.S) == 0)))
+                    (Control.ModifierKeys == Keys.Control && keyData == Keys.S))
                 {
                     // Otherwise, allow the image viewer to handle keyboard input for shortcuts.
                     if (_imageViewer.Shortcuts.ProcessKey(keyData))
