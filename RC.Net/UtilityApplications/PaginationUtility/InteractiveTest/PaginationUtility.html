@@ -16,17 +16,19 @@ href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UC
 <ol>
   	<li><h2>Basic Operation</h2></li>
   	<ul>
-    		<li>Confirm that <b>PaginationUtility.exe</b> exists in the <b>CommonComponents</b> 
-		folder for a <b>FLEX Index</b> installation.
-    		<li>Confirm that <b>PaginationUtility.exe</b> exists in the <b>CommonComponents</b> 
-		folder for an <b>ID Shield</b> installation.
-    		<li>Confirm that <b>PaginationUtility.exe</b> exists in the <b>CommonComponents</b> 
-		folder for a <b>LabDE</b> installation.
+    		<li>Confirm that <b>Pagination Utility</b> is available as a Start Menu item 
+		under <b>FLEX Index - Utilities</b>.
+    		<li>Confirm that <b>Pagination Utility</b> is available as a Start Menu item 
+		under <b>ID Shield - Utilities</b>.
+    		<li>Confirm that <b>Pagination Utility</b> is available as a Start Menu item 
+		under <b>LabDE - Utilities</b>.
     		<li>Confirm that <b>PaginationUtility.exe</b> requires a special license file.
 		<ul>
 			<li>Confirm that a meaningful exception is displayed if an appropriate 
 			license is not present.
 		</ul>
+		<li><b>[DotNet #921]</b> Confirm that <b>PaginationUtility /?</b> displays 
+		a meaningful usage message.
   	</ul>
 <p>
   	<li><h2>General User Interface</h2></li>
@@ -39,15 +41,22 @@ href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UC
 		<li><b>Main and Image Window</b>
 		<ul>
 			<li>Confirm that <b>Pagination Utility</b> is the window caption.
-			<li>Confirm that the following menu items are defined
+			<li>Confirm that the following menu items are defined and work correctly.
 			<ul>
+				<li>File - Load next document
+				<li>File - Output selected document(s)
 				<li>File - Restart
 				<li>File - Exit
-				<li>Tools - Settings
-				<li>Help - About
+				<li>Edit - Cut
+				<li>Edit - Copy
+				<li>Edit - Delete
+				<li>Edit - Insert copied item(s)
+				<li>Edit - Insert document separator
+				<li>Tools - Settings...
+				<li>Help - About...
 			</ul>
-			<li>Confirm that an <b>Output document(s)</b> toolbar button is defined 
-			immediately below the menu bar.
+			<li>Confirm that an <b>Output document(s) (Ctrl+S)</b> toolbar button is 
+			defined immediately below the menu bar.
 			<li>Confirm that an edit box is defined next to the toolbar button.
 			<li>Confirm that a browse button is defined next to the edit box.
 			<ul>
@@ -60,10 +69,11 @@ href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UC
 			</ul>
 			<li>Confirm that a label is visible next to the browse button.
 			<ul>
-				<li>Confirm that the label is only visible when <b>1</b> entire 
-				document's collection of image pages is selected.
+				<li>Confirm that the label displays the page number of the  
+				single, selected page if only one page is selected from a 
+				multi-page document.
 				<li>Confirm that the label displays the total number of pages 
-				to be saved to the selected document.
+				to be saved to the selected document if all pages are selected.
 			</ul>
 <p>
 			<li>Confirm that the following toolbar buttons are available for the 
@@ -89,48 +99,36 @@ href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UC
 			for an output document.
 			<li>Confirm that the following context menu items are available.
 			<ul>
-				<li>Cut item
-				<li>Copy item
-				<li>Delete item
-				<li>Insert copied item
-				<li>Insert document separator
-				<li>Output document
+				<li>Cut
+				<li>Copy
+				<li>Delete
+				<li>Insert copied item(s)
+				<li>Toggle document separator
 			</ul>
 			<li>Confirm that <b>Insert copied item</b> is enabled <b>only if</b> a 
 			single page has been copied to the Clipboard.
 			<li>Confirm that <b>Insert copied items</b> is enabled <b>only if</b> 
 			multiple pages have been copied to the Clipboard.
-			<li>Confirm that <b>Output document</b> is disabled.
-			<li>Confirm that <b>Append document separator</b> is available and 
-			enabled when right-clicking outside of the thumbnail area.
-			<ul>
-				<li>Confirm that a document separator is added after the last 
-				displayed page.
-			</ul>
 		</ul>
 <p>
 		<li><b>Keyboard Navigation</b>
 		<ul>
 			<li>Confirm that <b>Up Arrow</b> moves up one row in the list of pages.
-			<li>Confirm that <b>Up Arrow</b> automatically moves to the bottom row 
-			of the list if starting from the top row.
 			<li>Confirm that <b>Down Arrow</b> moves down one row in the list of pages.
-			<li>Confirm that <b>Down Arrow</b> automatically moves to the top row 
-			of the list if starting from the bottom row.
+			<li>Confirm that <b>SHIFT+Up Arrow</b> moves up one row in the 
+			list of pages and selects each intervening page.
+			<li>Confirm that <b>SHIFT+Down Arrow</b> moves down one row in the 
+			list of pages and selects each intervening page.
 			<li>Confirm that <b>Left Arrow</b> moves left one column in the list 
 			of pages.
 			<li>Confirm that <b>Left Arrow</b> automatically moves to the last column 
 			on the previous row of the list if starting from the leftmost column.
-			<li>Confirm that <b>Left Arrow</b> automatically moves to the last column 
-			on the last row of the list if starting from the leftmost column of the 
-			first row.
 			<li>Confirm that <b>Right Arrow</b> moves right one column in the list 
 			of pages.
 			<li>Confirm that <b>Right Arrow</b> automatically moves to the first 
 			column on the next row of the list if starting from the rightmost column.
-			<li>Confirm that <b>Right Arrow</b> automatically moves to the first column 
-			on the first row of the list if starting from the last column of the 
-			last row.
+			<li>Confirm that the arrow keys do not automatically wrap around when 
+			already at the top or bottom row.
 			<li>Confirm that <b>TAB</b> moves right one column in the list 
 			of pages.
 			<li>Confirm that <b>SHIFT+TAB</b> moves left one column in the list 
@@ -143,16 +141,17 @@ href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UC
 			of pages.
 			<li>Confirm that <b>PageDown</b> moves forward through the list 
 			of pages.
-			<li>
+			<li>Confirm that <b>ESCAPE</b> unselects the current selection.
+			<li>Confirm that <b>SPACE</b> toggles a document separator before the 
+			selected page.
 		</ul>
   	</ul>
 <p>
   	<li><h2>Settings</h2></li>
   	<ul>
 		<li>Confirm that the <b>Pagination Utility Settings</b> dialog is displayed 
-		after clicking the <b>Settings</b> toolbar button.
-		<li>Confirm that the <b>Pagination Utility Settings</b> dialog is displayed 
 		after clicking the <b>Tools - Settings</b> menu item.
+		<li>Confirm that the dialog uses correct tab order.
 		<li>Confirm that the dialog includes a <b>Specify input directory</b> edit 
 		box and associated browse button.
 		<ul>
@@ -201,7 +200,7 @@ href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UC
 		<ul>
 			<li>Confirm that the group box contains a <b>Move the document to the 
 			directory:</b> radio button.
-			<li>Coinfirm that the group box contains an associated edit box and 
+			<li>Confirm that the group box contains an associated edit box and 
 			browse button.
 			<li>Confirm that the edit box and browse button are enabled only when 
 			the radio button is selected.
@@ -210,15 +209,26 @@ href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UC
 			<li>Confirm that the group box contains a <b>Delete the document</b> 
 			radio button.
 		</ul>
-		<li>Confirm that the dialog includes an <b>Export Settings</b> button.
+		<li>Confirm that the dialog includes an <b>Export Settings...</b> button.
 		<ul>
-			<li>Confirm that a <b>Save</b> dialog is displayed.
+			<li>Confirm that a <b>Save As</b> dialog is displayed.
 			<li>Confirm that settings are saved in a <b>config</b> file.
 		</ul>
-		<li>Confirm that the dialog includes an <b>Import Settings</b> button.
+		<li>Confirm that the dialog includes an <b>Import Settings...</b> button.
 		<ul>
 			<li>Confirm that an <b>Open</b> dialog is displayed.
 			<li>Confirm that settings are available in <b>config</b> files.
+		</ul>
+<p>
+		<li>Confirm that the Settings dialog displays only read-only values if the 
+		utility is started with a config file as the single command-line parameter.
+		<li><b>[DotNet #932]</b> Invalid Settings
+		<ul>
+			<li>Load some documents.
+			<li>Edit Settings.
+			<li>Clear an edit box to leave the settings in an invalid state.
+			<li>Confirm that Settings cannot be saved.
+			<li>Confirm that Settings cannot be exported.
 		</ul>
   	</ul>
 <p>
@@ -250,11 +260,283 @@ href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UC
 			<li>Confirm that all settings are properly read from a config file 
 			via <b>Import settings...</b>.
 		</ul>
+		<li><b>General</b>
+		<ul>
+			<li>Confirm that <b>Help - About</b> displays a meaningful About box.
+			<li>Confirm that all of a very long filename <b>is</b> displayed in 
+			the thumbnail view as a tooltip when hovering over an image.
+			<li>Confirm that a blue border is displayed around the thumbnail that 
+			is displayed in the Image Window.
+			<li>Confirm that a dark background is displayed around the thumbnails 
+			that are selected.
+			<li>Confirm that rotated pages are also rotated in the output document.
+			<li>Confirm that corrupt or locked files are handled gracefully.
+			<li>Exercise the following types of images for input and output
+			<ul>
+				<li>TIF images
+				<li>PDF images
+				<li><b>NOT FIXED</b> Annotated TIF images
+			</ul>
+<p>
+			<li><b>[DotNet #907]</b> Display Changes With Control Key
+			<ul>
+				<li>Load some documents.
+				<li>Select page A.
+				<li>Position mouse over page B.
+				<li>Press <b>Ctrl</b> and then use arrow keys to navigate 
+				to different pages.
+				<li>Confirm that each navigated page is displayed in the 
+				Image Window.
+				<li>Move the mouse a little bit and confirm that small mouse 
+				movements <b>do not</b> affect the Image Window.
+			</ul>
+			<li><b>[DotNet #909]</b> Confirm that all of a very long filename 
+			<b>is not</b> displayed in the thumbnail view.
+			<li><b>[DotNet #920]</b> Confirm that double-clicking on a thumbnail 
+			selects all of the pages in the associated document.
+		</ul>
   	</ul>
 <p>
   	<li><h2>Miscellaneous</h2></li>
   	<ul>
-		<li>TBD
+		<li><b>[DotNet #903]</b> Confirm that the view automatically scrolls while 
+		dragging one or more pages.
+		<li><b>[DotNet #906]</b> Exceptions During Move or Copy or Paste
+		<ul>
+			<li>Load some documents.
+			<li>Exercise moving pages around.
+			<li>Confirm that no pages are lost during output.
+			<li>Exercise copying and pasting of pages.
+			<li>Confirm that no pages are lost during output.
+			<li>Confirm that no pages are lost if an exception is displayed.
+		</ul>
+		<li><b>[DotNet #908]</b> Confirm that adjusting the width of the main window 
+		does not affect the splitter position.
+		<li><b>[DotNet #911]</b> Displaying Copied Pages
+		<ul>
+			<li>Load some documents.
+			<li>Select an interesting page and <b>Copy</b> it.
+			<li>Insert the copied item.
+			<li>Select a different page.
+			<li>Select one of the two identical pages and confirm that only 
+			the selected page is highlighted.
+			<li>Select the other identical pages and confirm that only 
+			the selected page is highlighted.
+		</ul>
+		<li><b>[DotNet #912]</b> Saving Document Including Copied Pages
+		<ul>
+			<li>Load some documents.
+			<li>Select an interesting page and <b>Copy</b> it.
+			<li>Insert the copied item such that a single output document 
+			contains both identical pages.
+			<li>Select all pages of the document and confirm that it can be saved.
+		</ul>
+		<li><b>[DotNet #913]</b> Saving Documents In Batch
+		<ul>
+			<li>Load some documents.
+			<li>Add some page separators.
+			<li>Select the last page of document A.
+			<li>Press <b>SHIFT</b> and select the last page of document C.
+			<li>Confirm that all pages of documents B and C are selected and 
+			should be saveable.
+			<li>Click <b>Save</b>.
+			<li>Confirm the only documents B and C are saved.
+		</ul>
+		<li><b>[DotNet #919]</b> Page Navigation and Splitter Position
+		<ul>
+			<li>Load some documents.
+			<li>Adjust the splitter position.
+			<li>Select a page.
+			<li>Use the arrow keys to change page selection.
+			<li>Confirm that the splitter position does not change.
+		</ul>
+		<li><b>[DotNet #923]</b> Unexpected Image Viewer Event Registration Exception
+		<ul>
+			<li>Load some documents.
+			<li>Hold down the <b>Ctrl</b> key.
+			<li>Select a page.
+			<li>Continue pressing <b>Ctrl</b> and move the mouse outside the 
+			bounds of the page control.
+			<li>Confirm that no exception is displayed.
+		</ul>
+		<li><b>[DotNet #925]</b> Selection After Delete
+		<ul>
+			<li>Load some documents.
+			<li>Select a page in the middle of the view.
+			<li>Delete the selected page.
+			<li>Confirm that the next page is automatically selected.
+			<li>Confirm that navigation starts from the newly selected page.
+		</ul>
+		<li><b>[DotNet #926]</b> Rename Output File From Edit Box
+		<ul>
+			<LI>Remove any files already present in the output folder.
+			<li>Load some documents - do not adjust any document separators.
+			<li>Select page A.
+			<li>Double-click page B to select all files in a large document.
+			<li>Modify the text in the edit box to rename the output file.
+			<li>Use the <b>File - Output selected document(s)</b> menu item to 
+			save the selected document.
+			<li>Confirm that the output file is written with the new name.
+		</ul>
+		<li><b>[DotNet #929]</b> Create Large Output File
+		<ul>
+			<li>Load some documents.
+			<li>Add or adjust document separators to create an output file of 
+			at least <b>300</b> pages.
+			<li>Confirm that the output file can be created.
+		</ul>
+		<li><b>[DotNet #930]</b> Object Reference Exception
+		<ul>
+			<li>Run the utility and click <b>Cancel</b> from the <b>Settings</b> 
+			dialog.
+			<li>Select the <b>File - Restart</b> menu item.
+			<li>Click the <b>Restart</b> button.
+			<li>Confirm that the utility restarts and displays the <b>Settings</b> 
+			dialog.
+		</ul>
+		<li><b>[DotNet #931]</b> Utility Loses Focus
+		<ul>
+			<li>Load a single large document.
+			<li>Select a page.
+			<li>Double-click on a different page.
+			<li>Confirm that all pages are selected.
+			<li>Confirm that the utility remains in focus.
+		</ul>
+		<li><b>[DotNet #933]</b> Confirm that splitter position is persistent between 
+		sessions.
+		<li><b>[DotNet #934]</b> Output File Name
+		<ul>
+			<li>Load some documents.
+			<li>Drag and drop a different image from a different folder into the 
+			Thumbnail View.
+			<li>Add a document separator so that the output image contains only a 
+			few pages.
+			<li>Save the document.
+			<li>Confirm that the default name of the output document is based on the 
+			name of the dropped document (in the first page position).
+		</ul>
+		<li><b>[DotNet #935]</b> Selection After Save
+		<ul>
+			<li>Load some documents.
+			<li>Add document separators partway down the view.
+			<li>Select and save all pages in the document.
+			<li>Confirm that the next page is automatically selected.
+			<li>Confirm that the Thumbnail View keeps the selected page visible.
+		</ul>
+		<li><b>[DotNet #938]</b> Confirm that the drop indicator is automatically removed 
+		after closing the exception displayed when a non-image file is dropped into 
+		the Thumbnail View.
+		<li><b>[DotNet #940]</b> Unable To Load Document
+		<ul>
+			<li>Load some documents such that the Thumbnail View contains fewer 
+			pages than the configured maximum.
+			<li>Drag and drop a different image from a different folder into the 
+			Thumbnail View.
+			<li>Confirm that an <b>ELI35588: Unable to load document; document 
+			will be ignored until restarted</b> exception is not seen.
+		</ul>
+		<li><b>[DotNet #943]</b> Unable to load documents
+		<ul>
+			<li>Load some images.
+			<li>Add some PDF files to the Input folder.
+			<li>Modify Settings to also process PDF images.
+			<li>Accept the prompt to restart and reload documents.
+			<li>Confirm presence of the PDF images in the Thumbnail View.
+			<li>Add more TIF images to the Input folder.
+			<li>Confirm that the new TIF images can be loaded without a 
+			displayed exception.
+		</ul>
+		<li><b>[DotNet #945]</b> PDF Images
+		<ul>
+			<li>Load some PDF documents.
+			<li>Add or adjust document separators to create a multiple-page output 
+			file. 
+			<li>Create the output document.
+			<li>Confirm that the output document has the same black-on-white text 
+			as the input pages.
+		</ul>
+		<li><b>[DotNet #946]</b> Structure Size Is Invalid Exception
+		<ul>
+			<li>Load some 100+ page documents.
+			<li>Scroll down and select various pages.
+			<li>Confirm that an <b>ELI35477: The structure size is invalid</b> 
+			exception is not seen.
+		</ul>
+		<li><b>[DotNet #947]</b> Object Reference Exception
+		<ul>
+			<li>Load some documents.
+			<li>Delete a large number of pages.
+			<li>Load some 100+ page documents.
+			<li>Confirm that an <b>ELI35477: Object reference not set to an instance 
+			of an object</b> exception is not seen.
+		</ul>
+		<li><b>[DotNet #951]</b> Phantom Document Boundary
+		<ul>
+			<li>Load a single large (100's of pages) document.
+			<li>While loading, select a page and press <b>SPACE</b> to add a 
+			separator.
+			<li>Double-click on the selected page to select the entire document.
+			<li>Confirm that the document is correctly selected and highlighted.
+		</ul>
+		<li><b>[DotNet #953]</b> Crash After Restarts
+		<ul>
+			<li>Load a single large (100's of pages) document.
+			<li>Restart as soon as the document is loaded.
+			<li>Repeat several times and confirm that the application does not crash.
+<p>
+			<li>Repeat the test copying the test document and deleting all pages as 
+			soon as each document loads.
+		</ul>
+		<li><b>[DotNet #954]</b> Object Reference Exception
+		<ul>
+			<li>Load some images.
+			<li>Select the <b>File - Restart</b> menu item to restart the utility.
+			<li>Repeat several times as quickly as possible.
+			<li>Confirm that no <b>ELI35624: Object reference is not set to an 
+			instance of an object</b> exception is displayed.
+		</ul>
+		<li><b>[DotNet #955]</b> Insert Copied Item
+		<ul>
+			<li>Load some images.
+			<li>Copy a page.
+			<li>Add a document separator.
+			<li>Confirm that the copied page can be inserted via right-click on 
+			the document separator.
+		</ul>
+		<li><b>[DotNet #956]</b> Viewing Pages And Deleting Documents
+		<ul>
+			<li>Load some images.
+			<li>Select a page.
+			<li>Select a page of a different document.
+			<li>Delete all files from the <b>Input</b> folder.
+			<li>Confirm that TBD.
+		</ul>
+		<li><b>[DotNet #957]</b> Document Deleted On CLose
+		<ul>
+			<li>Load some images.
+			<li>Select a page and copy it to the Clipboard.
+			<li>Close the application.
+			<li>Confirm that document from which the page was copied remains in 
+			the <b>Input</b> folder.
+		</ul>
+		<li><b>[DotNet #965]</b> Confirm that repeated clicking of a thumbnail only 
+		retains its selection.
+		<li><b>[DotNet #966]</b> Shift Key Selection
+		<ul>
+			<li>Load some images.
+			<li>Select a thumbnail.
+			<li>Press and hold the <b>SHIFT</b> key.
+			<li>Press <b>Right Arrow</b> and confirm that <b>2</b> controls 
+			are selected.
+			<li>Press <b>Right Arrow</b> and confirm that <b>3</b> controls 
+			are selected.
+			<li>Press <b>Left Arrow</b> and confirm that <b>2</b> controls 
+			are selected.
+		</ul>
+		<li><b>[DotNet #967]</b> Confirm that toggling a document separator is only 
+		enabled if a single control is selected.
+		<li><b>[DotNet #968]</b> Confirm that a thumbnail can be dragged to a new 
+		location without first having to select it.
   	</ul>
 </ol>
 </body>
