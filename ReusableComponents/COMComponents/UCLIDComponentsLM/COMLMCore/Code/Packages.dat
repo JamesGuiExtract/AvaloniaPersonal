@@ -123,6 +123,6 @@ IcoMap for ArcGIS,0
 
 Other,0
 -    FLEX Index Rule Writing (Simple Rules passwords!),$RuleWritingCore:6027:6046:$OCROnClient
--    ID Shield Rule Writing (Simple Rules passwords!),$RuleWritingCore:6026:6046:$OCROnClient
+-    ID Shield Rule Writing (Simple Rules passwords!),$RuleWritingCore:6026:6046:$IDShield:$OCROnClient
 -    Rule Development Toolkit,$RuleDevelopmentToolkit:6078:$LabDEServer
 -    Scansoft OEM OCR,6080

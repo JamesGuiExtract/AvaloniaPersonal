@@ -1445,7 +1445,7 @@ void CAutomatedRuleSetTester::processTestFolder(const string& strRSDFile,
 //-------------------------------------------------------------------------------------------------
 void CAutomatedRuleSetTester::validateLicense()
 {
-	VALIDATE_LICENSE(gnFLEXINDEX_RULE_WRITING_OBJECTS, "ELI07287", "Automated Rule Set Tester" );
+	VALIDATE_LICENSE(gnRULE_WRITING_CORE_OBJECTS, "ELI07287", "Automated Rule Set Tester" );
 }
 //-------------------------------------------------------------------------------------------------
 const string CAutomatedRuleSetTester::getMasterTestFileName(IVariantVectorPtr ipParams, const string &strTCLFile) const

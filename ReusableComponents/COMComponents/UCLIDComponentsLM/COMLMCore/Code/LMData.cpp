@@ -1070,3 +1070,18 @@ void LMData::disableId(unsigned long ulComponentID)
 		it->second.m_bDisabled = true;
 	}
 }
+//-------------------------------------------------------------------------------------------------
+void LMData::unlicenseAll()
+{
+	// Clear all components from the map.
+	m_mapCompIDToData.clear();
+}
+//-------------------------------------------------------------------------------------------------
+void LMData::unlicenseId(unsigned long ulComponentID)
+{
+	// If the component was found, erase it
+	if (m_mapCompIDToData.find(ulComponentID) != m_mapCompIDToData.end())
+	{
+		m_mapCompIDToData.erase(ulComponentID);
+	}
+}

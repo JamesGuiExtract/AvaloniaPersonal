@@ -472,6 +472,15 @@ public:
 	// Added as per [LegacyRCAndUtils #4993]
 	void disableId(unsigned long ulComponentID);
 
+	//=======================================================================
+    // PURPOSE: Unlicenses all components
+	// Added to address [FlexIDSCore:5286]
+    void unlicenseAll();
+
+	//=======================================================================
+    // PURPOSE: Unlicenses the specified component.
+    void unlicenseId(unsigned long ulComponentID);
+
 private:
 
 ///////////////

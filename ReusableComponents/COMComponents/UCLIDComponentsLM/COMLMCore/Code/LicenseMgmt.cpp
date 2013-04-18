@@ -628,6 +628,26 @@ void LicenseManagement::disableId(unsigned long ulComponentID)
 
 	m_LicenseData.disableId(ulComponentID);
 }
+//-------------------------------------------------------------------------------------------------
+void LicenseManagement::unlicenseAll()
+{
+	CSingleLock guard(&m_lock, TRUE);
+
+	// Reset cache first so that licenses don't get validated via cache after unlicensing.
+	resetCache();
+
+	m_LicenseData.unlicenseAll();
+}
+//-------------------------------------------------------------------------------------------------
+void LicenseManagement::unlicenseId(unsigned long ulComponentID)
+{
+	CSingleLock guard(&m_lock, TRUE);
+
+	// Clear the cache for ulComponentID so that it doesn't get validated via cache after unlicensing.
+	m_mapIdToLicensed[ulComponentID] = false;
+
+	m_LicenseData.unlicenseId(ulComponentID);
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private methods

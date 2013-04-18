@@ -210,6 +210,15 @@ public:
     // Added as per [LegacyRCAndUtils #4993]
     static void disableId(unsigned long ulComponentID);
 
+	//=======================================================================
+    // PURPOSE: Unlicenses all components
+	// Added to address [FlexIDSCore:5286]
+    static void unlicenseAll();
+
+	//=======================================================================
+    // PURPOSE: Unlicenses the specified component.
+    static void unlicenseId(unsigned long ulComponentID);
+
 protected:
     //=======================================================================
     // PURPOSE: Updates the m_LicenseData object with later expiration dates

@@ -143,6 +143,8 @@
             // 
             // panelGroupBox
             // 
+            panelGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
             panelGroupBox.Controls.Add(this._panelTable);
             panelGroupBox.Controls.Add(this._labID);
             panelGroupBox.Controls.Add(this._laboratoryIdentifier);
@@ -157,6 +159,8 @@
             // 
             // _panelTable
             // 
+            this._panelTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._panelTable.AllowDrop = true;
             this._panelTable.AllowUserToResizeRows = false;
             this._panelTable.AttributeName = "Panel";
@@ -791,7 +795,7 @@
             this._testUnitsColumn.SmartHintsEnabled = true;
             this._testUnitsColumn.ValidationCorrectsCase = false;
             this._testUnitsColumn.ValidationErrorMessage = "Invalid value";
-            this._testUnitsColumn.ValidationQuery = "<Query ValidationListType=\'ValidationListOnly\'>\r\n[BLANK]\r\n<SQL>SELECT * FROM Unit" +
+            this._testUnitsColumn.ValidationQuery = "<Query ValidationListType=\'ValidationListOnly\'>\r\n[BLANK]\r\n<SQL>SELECT Unit FROM Unit" +
     " ORDER BY Unit</SQL>\r\n</Query>";
             // 
             // _testRefRangeColumn
@@ -810,7 +814,7 @@
             this._testFlagColumn.AttributeName = "Flag";
             this._testFlagColumn.AutoUpdateQuery = "<Query Default=\'true\'><Attribute SelectionMode=\'First\'>../Component/Flag</Attribu" +
     "te></Query>";
-            this._testFlagColumn.FillWeight = 40F;
+            this._testFlagColumn.FillWeight = 50F;
             this._testFlagColumn.HeaderText = "Flag";
             this._testFlagColumn.Name = "_testFlagColumn";
             this._testFlagColumn.SmartHintsEnabled = true;
@@ -1127,6 +1131,7 @@
             this.HighlightColors = new Extract.DataEntry.HighlightColor[] {
         highlightColor1,
         highlightColor2};
+            this.InvalidDataSaveMode = DataEntry.InvalidDataSaveMode.AllowWithWarnings;
             this.MinimumSize = new System.Drawing.Size(696, 0);
             this.Name = "UITransplantCenterPanel";
             this.Size = new System.Drawing.Size(696, 978);

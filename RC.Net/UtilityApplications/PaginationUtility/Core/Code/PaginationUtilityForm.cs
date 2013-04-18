@@ -175,6 +175,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         ClipboardData _currentClipboardData = null;
 
         /// <summary>
+        /// <see langword="true"/> if the user has accepted the current settings or they have been
+        /// specified via command line; otherwise <see langword="false"/>.
+        /// </summary>
+        bool _hasAcceptedSettings;
+
+        /// <summary>
         /// Indicates if the host is in design mode or not.
         /// </summary>
         readonly bool _inDesignMode;
@@ -683,6 +689,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 else
                 {
+                    // If the settings have been specified via command line, consider them accepted.
+                    _hasAcceptedSettings = true;
+
                     LoadMorePages();
                 }
             }
@@ -906,7 +915,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (PromptForRestart(false))
+                // [DotNetRCAndUtils:963, 970]
+                // If the settings have not yet been accepted, display the settings dialog.
+                if (!_hasAcceptedSettings)
+                {
+                    if (ShowSettingsDialog() == DialogResult.OK)
+                    {
+                        Restart();
+                    }
+                }
+                // Otherwise, display a prompt to have user confirm restart.
+                else if (PromptForRestart(false))
                 {
                     Restart();
                 }
@@ -1578,6 +1597,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _config.Save();
                     }
                 }
+
+                _hasAcceptedSettings |= (dialogResult == DialogResult.OK);
 
                 return dialogResult;
             }

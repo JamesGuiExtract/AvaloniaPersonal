@@ -638,7 +638,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     PrimarySelection = null;
                 }
 
-                // If the removed control was a page control, it should no longer be diplayed or be
+                // If the removed control was a page control, it should no longer be displayed or be
                 // part of any OutputDocument.
                 var removedPageControl = control as PageThumbnailControl;
                 if (removedPageControl != null)
@@ -2193,8 +2193,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _toggleDocumentSeparatorCommand.Enabled = contextMenuControlIndex != 0 &&
                     !controlIsSeparator && SelectedControls.Count() == 1;
 
-                // Insertied copied items requires there to be copied items.
-                _insertCopiedCommand.Enabled = PaginationUtilityForm.ClipboardHasData();
+                // Insertied copied items requires there to be copied items and a single selection.
+                _insertCopiedCommand.Enabled = PaginationUtilityForm.ClipboardHasData() &&
+                    SelectedControls.Count() == 1;
             }
 
             // Outputting a document is only allowed if the document(s) are fully selected.
@@ -2208,7 +2209,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Clears any selection and closes the currently diplayed page in the
+        /// Clears any selection and closes the currently displayed page in the
         /// <see cref="ImageViewer"/> if specfied by <see paramref="closeDisplayedPage"/>.
         /// </summary>
         void ClearSelection()
@@ -2217,7 +2218,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Clears any selection and closes the currently diplayed page in the
+        /// Clears any selection and closes the currently displayed page in the
         /// <see cref="ImageViewer"/> if specfied by <see paramref="closeDisplayedPage"/>.
         /// </summary>
         /// <param name="resetLastSelected"><see langword="true"/> if

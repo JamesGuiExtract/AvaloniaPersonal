@@ -382,7 +382,7 @@ void RuleTesterDlg::OnButtonExecute()
 		if (!LicenseManagement::isLicensed(gnFLEXINDEX_IDSHIELD_CORE_OBJECTS))
 		{
 			bUsingTemporaryLicensing = true;
-			LicenseManagement::resetCache();
+			LicenseManagement::unlicenseAll();
 
 			LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD,
 				gnDEFAULT_PASSWORDS );
@@ -514,7 +514,7 @@ void RuleTesterDlg::OnButtonExecute()
 		// be restored by initializing licensing with simple rule writing passwords.
 		if (bUsingTemporaryLicensing)
 		{
-			LicenseManagement::resetCache();
+			LicenseManagement::unlicenseAll();
 
 			// Load license file(s) using Special Simple Rule Writing passwords
 			LicenseManagement::loadLicenseFilesFromFolder( LICENSE_MGMT_PASSWORD,
