@@ -2116,7 +2116,22 @@ namespace Extract.UtilityApplications.PaginationUtility
             // If not specified, use the active control as the selectionTarget.
             if (selectionTarget == null)
             {
-                selectionTarget = GetNextNavigableControl(forward) as PageThumbnailControl;
+                selectionTarget = GetActiveControl(forward) as PageThumbnailControl;
+            }
+
+            // If there is no active control or the active control is not a PageThumbnailControl
+            // control, use the next navigable control.
+            if (selectionTarget == null)
+            {
+                var nextControl = GetNextNavigableControl(forward);
+                
+                // Ignore the load next document button.
+                if (nextControl == _loadNextDocumentButtonControl)
+                {
+                    nextControl = GetNextNavigableControl(forward, nextControl);
+                }
+
+                selectionTarget = nextControl as PageThumbnailControl;
             }
 
             // If there are no page controls, there are no documents to select.
