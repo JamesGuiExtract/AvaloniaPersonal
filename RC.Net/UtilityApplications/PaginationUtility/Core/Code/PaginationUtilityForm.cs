@@ -722,15 +722,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                DialogResult response = MessageBox.Show(
-                    "All existing work not already output will be lost.\r\n\r\n" +
-                    "Are you sure you want to exit?", "Exit?",
-                    MessageBoxButtons.OKCancel,
-                    MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, 0);
-                if (response == DialogResult.Cancel)
+                if (_pendingDocuments.Any(document => !document.InOriginalForm))
                 {
-                    e.Cancel = true;
-                    return;
+                    DialogResult response = MessageBox.Show(
+                        "All changes not yet output will be lost.\r\n\r\n" +
+                        "Are you sure you want to exit?", "Exit?",
+                        MessageBoxButtons.OKCancel,
+                        MessageBoxIcon.Question, MessageBoxDefaultButton.Button2, 0);
+
+                    if (response == DialogResult.Cancel)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
                 }
 
                 // [DotNetRCAndUtils:960]

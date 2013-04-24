@@ -78,6 +78,30 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Overrides
 
         /// <summary>
+        /// Gets or sets whether this control is selected.
+        /// </summary>
+        /// <value><see langword="true"/> if selected; otherwise, <see langword="false"/>.
+        /// </value>
+        public override bool Selected
+        {
+            get
+            {
+                return base.Selected;
+            }
+
+            set
+            {
+                if (value != base.Selected)
+                {
+                    base.Selected = value;
+
+                    // Invalidate so that paint occurs and new selection state is indicated.
+                    Invalidate();
+                }
+            }
+        }
+
+        /// <summary>
         /// Retrieves the size of a rectangular area into which a control can be fitted.
         /// </summary>
         /// <param name="proposedSize">The custom-sized area for a control.</param>
