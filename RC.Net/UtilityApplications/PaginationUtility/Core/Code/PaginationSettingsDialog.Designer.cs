@@ -238,7 +238,7 @@
             this._inputPageCountUpDown.IntegersOnly = true;
             this._inputPageCountUpDown.Location = new System.Drawing.Point(84, 105);
             this._inputPageCountUpDown.Maximum = new decimal(new int[] {
-            999,
+            500,
             0,
             0,
             0});
@@ -246,7 +246,7 @@
             this._inputPageCountUpDown.Size = new System.Drawing.Size(46, 20);
             this._inputPageCountUpDown.TabIndex = 7;
             this._inputPageCountUpDown.Value = new decimal(new int[] {
-            200,
+            100,
             0,
             0,
             0});

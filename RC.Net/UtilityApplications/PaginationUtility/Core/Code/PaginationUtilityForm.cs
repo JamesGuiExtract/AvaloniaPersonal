@@ -2329,7 +2329,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // Unload the document from the image viewer to unlock the file.
                     _imageViewer.UnloadImage(documentName);
 
-                    HandleProcessedSourceDocument(document.FileName);
+                    HandleProcessedSourceDocument(documentName);
                 } 
             }
         }
