@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -379,6 +380,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         public event EventHandler<PageDeletedEventArgs> PageDeleted;
 
         /// <summary>
+        /// Raised when not all pages from a document could be loaded without exceeding
+        /// _MAX_LOADED_PAGES.
+        /// </summary>
+        public event EventHandler<PagesPendingLoadEventArgs> PagesPendingLoad;
+
+        /// <summary>
         /// Raised when the state of the <see cref="PaginationControl"/>s has changed.
         /// </summary>
         public event EventHandler<EventArgs> StateChanged;
@@ -490,6 +497,41 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="LoadNextDocumentButtonControl"/>
+        /// is enabled.
+        /// </summary>
+        /// <value><see langword="true"/> if the <see cref="LoadNextDocumentButtonControl"/> is
+        /// enabled; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool EnableLoadNextDocument
+        {
+            get
+            {
+                try
+                {
+                    return _flowLayoutPanel.Controls.Contains(_loadNextDocumentButtonControl) &&
+                        _loadNextDocumentButtonControl.ButtonEnabled;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35675");
+                }
+            }
+
+            set
+            {
+                try
+                {
+                    _loadNextDocumentButtonControl.ButtonEnabled = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35676");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -530,15 +572,21 @@ namespace Extract.UtilityApplications.PaginationUtility
                         AddPaginationControl(new PaginationSeparator());
                     }
 
+                    Page[] pagesToLoad = sourceDocument.Pages.ToArray();
+
+                    // Handle case that loading pagesToLoad would exceed _MAX_LOADED_PAGES.
+                    bool allPagesCanBeLoaded = CanAllPagesBeLoaded(ref pagesToLoad);
+
                     // Create a page control for every page in sourceDocument.
-                    foreach (Page page in sourceDocument.Pages.ToArray())
+                    foreach (Page page in pagesToLoad)
                     {
                         AddPaginationControl(new PageThumbnailControl(outputDocument, page));
                     }
 
-                    // Indicate if the document is output in its present form, it can simply be copied
-                    // to the output path rather than require it to be re-assembled.
-                    outputDocument.InOriginalForm = true;
+                    // As long as all pages could be loaded, indicate that if the document is output
+                    // in its present form, it can simply be copied to the output path rather than
+                    // require it to be re-assembled.
+                    outputDocument.InOriginalForm = allPagesCanBeLoaded;
 
                     this.SafeBeginInvoke("ELI35612", () =>
                     {
@@ -592,6 +640,46 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35434");
+            }
+        }
+
+        /// <summary>
+        /// Adds the specified <see paramref="pages"/> to this instance.
+        /// <para><b>Note</b></para>
+        /// It is assumed that none of these pages are duplicates of existing ones.
+        /// </summary>
+        /// <param name="pages">The <see cref="Page"/>s to add.</param>
+        public void AddPages(params Page[] pages)
+        {
+            try
+            {
+                using (new PageLayoutControlUpdateLock(this))
+                {
+                    // While new pages are being added, remove the load next document control.
+                    RemovePaginationControl(_loadNextDocumentButtonControl, false);
+
+                    foreach (Page page in pages)
+                    {
+                        var newPageControl = new PageThumbnailControl(null, page);
+
+                        InitializePaginationControl(newPageControl, -1);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35672");
+            }
+            finally
+            {
+                try
+                {
+                    AddPaginationControl(_loadNextDocumentButtonControl);
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractDisplay("ELI35673");
+                }
             }
         }
 
@@ -2322,6 +2410,39 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Determines if all <see cref="Page"/>s <see paramref="pagesToLoad"/> can be loaded
+        /// without exceeding <see cref="PaginationUtilityForm._MAX_LOADED_PAGES"/> and if not takes
+        /// appropriate action (including adjusting the pages in <see paramref="pagesToLoad"/>).
+        /// </summary>
+        /// <param name="pagesToLoad">The <see cref="Page"/>s to load, if possible.</param>
+        /// <returns><see langword="true"/> if all pages can be loaded; otherwise,
+        /// <see langword="false"/>.</returns>
+        bool CanAllPagesBeLoaded(ref Page[] pagesToLoad)
+        {
+            int numToLoad = PaginationUtilityForm._MAX_LOADED_PAGES - PageCount;
+            int pagesInReserveCount = 0;
+            if (numToLoad < pagesToLoad.Length)
+            {
+                MessageBox.Show("No more than " +
+                    PaginationUtilityForm._MAX_LOADED_PAGES.ToString(CultureInfo.CurrentCulture) +
+                    " pages may be loaded at once.\r\n\r\n" +
+                    "Some pages have not been loaded. These pages will be loaded as\r\n" +
+                    "existing pages are output or deleted.", "Page limit reached",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
+
+                pagesInReserveCount = pagesToLoad.Length - numToLoad;
+                Page[] pagesInReserve = new Page[pagesInReserveCount];
+                Array.Copy(pagesToLoad, numToLoad, pagesInReserve, 0, pagesInReserveCount);
+                Array.Resize(ref pagesToLoad, numToLoad);
+
+                OnPagesPendingLoad(pagesInReserve);
+            }
+
+            return (pagesInReserveCount == 0);
+        }
+
+        /// <summary>
         /// Inserts the <see cref="Page"/>s from <see paramref="copiedPages"/> at the specified
         /// <see pararef="index"/>.
         /// </summary>
@@ -2671,6 +2792,20 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (copiedPages != null && _commandTargetControl != null)
                     {
+                        int pasteMaxCount = PaginationUtilityForm._MAX_LOADED_PAGES - PageCount;
+                        if (copiedPages.Count(page => page != null) > pasteMaxCount)
+                        {
+                            MessageBox.Show("No more than " +
+                                PaginationUtilityForm._MAX_LOADED_PAGES.ToString(CultureInfo.CurrentCulture) +
+                                " pages may be loaded at once.\r\n\r\n" +
+                                "The pages on the clipboard cannot be inserted until existing\r\n" +
+                                "pages are output or deleted.", "Page limit reached",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
+                            
+                            return;
+                        }
+
                         int index = _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
 
                         InsertPages(copiedPages, index);
@@ -2762,6 +2897,19 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (eventHandler != null)
             {
                 eventHandler(this, new PageDeletedEventArgs(page, outputDocument));
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="PagesPendingLoad"/> event.
+        /// </summary>
+        /// <param name="pagesPendingLoad">The <see cref="Page"/>s are pending to be loaded.</param>
+        void OnPagesPendingLoad(Page[] pagesPendingLoad)
+        {
+            var eventHandler = PagesPendingLoad;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new PagesPendingLoadEventArgs(pagesPendingLoad));
             }
         }
 

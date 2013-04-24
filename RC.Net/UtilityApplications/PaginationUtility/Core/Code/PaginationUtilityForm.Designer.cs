@@ -399,6 +399,7 @@
             // 
             // _loadNextDocumentMenuItem
             // 
+            this._loadNextDocumentMenuItem.Enabled = false;
             this._loadNextDocumentMenuItem.Name = "_loadNextDocumentMenuItem";
             this._loadNextDocumentMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
             this._loadNextDocumentMenuItem.Size = new System.Drawing.Size(269, 22);
@@ -407,6 +408,7 @@
             // 
             // _outputSelectedDocumentsMenuItem
             // 
+            this._outputSelectedDocumentsMenuItem.Enabled = false;
             this._outputSelectedDocumentsMenuItem.Name = "_outputSelectedDocumentsMenuItem";
             this._outputSelectedDocumentsMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
             this._outputSelectedDocumentsMenuItem.Size = new System.Drawing.Size(269, 22);

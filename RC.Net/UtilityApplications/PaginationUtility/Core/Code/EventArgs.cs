@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -39,6 +40,37 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Gets the <see cref="OutputDocument"/> the <see cref="Page"/> was deleted from.
         /// </summary>
         public OutputDocument OutputDocument
+        {
+            get;
+            private set;
+        }
+    }
+
+    /// <summary>
+    /// The event arguments for the <see cref="PageLayoutControl.PagesPendingLoad"/> event.
+    /// </summary>
+    internal class PagesPendingLoadEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PagesPendingLoadEventArgs"/> class.
+        /// </summary>
+        /// <param name="pages">The <see cref="Page"/>s are pending to be loaded.</param>
+        public PagesPendingLoadEventArgs(Page[] pages)
+        {
+            try
+            {
+                Pages = new ReadOnlyCollection<Page>(pages);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI35669", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Page"/>s are pending to be loaded.
+        /// </summary>
+        public ReadOnlyCollection<Page> Pages
         {
             get;
             private set;

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Extract.Drawing;
+using System;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -76,32 +78,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Overrides
 
         /// <summary>
-        /// Gets or sets whether this control is selected.
-        /// </summary>
-        /// <value><see langword="true"/> if selected; otherwise, <see langword="false"/>.
-        /// </value>
-        public override bool Selected
-        {
-            get
-            {
-                return base.Selected;
-            }
-
-            set
-            {
-                if (value != base.Selected)
-                {
-                    base.Selected = value;
-
-                    // Indicate selection with the _outerPanel's BackColor
-                    _outerPanel.BackColor = value
-                        ? SystemColors.ControlDark
-                        : SystemColors.Control;
-                }
-            }
-        }
-
-        /// <summary>
         /// Retrieves the size of a rectangular area into which a control can be fitted.
         /// </summary>
         /// <param name="proposedSize">The custom-sized area for a control.</param>
@@ -120,6 +96,43 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             return base.GetPreferredSize(proposedSize);
+        }
+
+        /// <summary>
+        /// Paints the background of the control.
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.PaintEventArgs"/> that contains the
+        /// event data.</param>
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+            try
+            {
+                // Doing all the control painting here prevents flicker when the drop indicator is
+                // drawn over this separator.
+
+                // Clears the background of the control.
+                var brush = ExtractBrushes.GetSolidBrush(SystemColors.Control);
+                Rectangle paintRectangle = ClientRectangle;
+                e.Graphics.FillRectangle(brush, paintRectangle);
+
+                // If selected, indicate selection with a darker back color excep except for 1 pixel
+                // of border.
+                paintRectangle.Inflate(-1, -1);
+                if (Selected)
+                {
+                    brush = ExtractBrushes.GetSolidBrush(SystemColors.ControlDark);
+                    e.Graphics.FillRectangle(brush, paintRectangle);
+                }
+
+                // Draw the black bar in the middle.
+                brush = ExtractBrushes.GetSolidBrush(Color.Black);
+                paintRectangle.Inflate(-3, -1);
+                e.Graphics.FillRectangle(brush, paintRectangle);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35677");
+            }
         }
 
         #endregion Overrides

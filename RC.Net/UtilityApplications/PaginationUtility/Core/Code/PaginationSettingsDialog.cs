@@ -139,21 +139,12 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     while (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        string newConfigName = saveFileDialog.FileName;
-                        if (File.Exists(newConfigName))
-                        {
-                            DialogResult response = MessageBox.Show("Overwrite existing file?",
-                                "Overwrite?", MessageBoxButtons.OKCancel, MessageBoxIcon.Question,
-                                MessageBoxDefaultButton.Button1, 0);
+                        // [DotNetRCAndUtils:973]
+                        // The saveFileDialog will have prompted about overwriting an existing file,
+                        // so no need to do so here.
 
-                            if (response == DialogResult.Cancel)
-                            {
-                                continue;
-                            }
-                        }
-
-                        // Output the displayed settings to newConfigName.
-                        var targetConfig = new ConfigSettings<Settings>(newConfigName);
+                        // Output the displayed settings to saveFileDialog.FileName.
+                        var targetConfig = new ConfigSettings<Settings>(saveFileDialog.FileName);
                         SaveSettings(targetConfig);
 
                         break;

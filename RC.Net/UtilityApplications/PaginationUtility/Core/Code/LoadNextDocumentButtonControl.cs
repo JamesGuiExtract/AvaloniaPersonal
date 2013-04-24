@@ -112,6 +112,26 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the load next document <see cref="Button"/> is
+        /// enabled.
+        /// </summary>
+        /// <value><see langword="true"/> if  the load next document <see cref="Button"/> is
+        /// enabled; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool ButtonEnabled
+        {
+            get
+            {
+                return _loadNextDocumentButton.Enabled;
+            }
+
+            set
+            {
+                _loadNextDocumentButton.Enabled = value;
+            }
+        }
+
         #endregion Properties
 
         #region Overrides

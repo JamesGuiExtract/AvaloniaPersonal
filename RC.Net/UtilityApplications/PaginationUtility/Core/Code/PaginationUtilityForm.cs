@@ -55,6 +55,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         static readonly string _CLIPBOARD_DATA_FORMAT = "ExtractPaginationClipboardDataFormat";
 
+        /// <summary>
+        /// The number of pages that can be safely loaded at once without exceeding the limit of
+        /// Window's user objects.
+        /// </summary>
+        internal static readonly int _MAX_LOADED_PAGES = 1000;
+
         #endregion Constants
 
         #region Fields
@@ -143,6 +149,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Indicates whether a call to check to see if more pages need to be loaded is pending.
         /// </summary>
         bool _pageLoadPending;
+
+        /// <summary>
+        /// The pages pending to be loaded once there is available room beneath
+        /// <see cref="_MAX_LOADED_PAGES"/>.
+        /// </summary>
+        Queue<Page> _pagesPendingLoad = new Queue<Page>();
 
         /// <summary>
         /// The output document the filename edit box is currently active for (if any).
@@ -710,8 +722,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                DialogResult response = MessageBox.Show(
+                    "All existing work not already output will be lost.\r\n\r\n" +
+                    "Are you sure you want to exit?", "Exit?",
+                    MessageBoxButtons.OKCancel,
+                    MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, 0);
+                if (response == DialogResult.Cancel)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+
                 // [DotNetRCAndUtils:960]
-                // Dereferece clipboard data to allow documents that should be considered
+                // Dereference clipboard data to allow documents that should be considered
                 // "processed" to be deleted/moved, but do it before any page controls are removed
                 // or disposed of, otherwise this will cause documents to moved/processed when they
                 // haven't been.
@@ -818,6 +841,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                         }
 
                         CollectionMethods.ClearAndDispose(_sourceDocuments);
+                    }
+
+                    if (_pagesPendingLoad != null)
+                    {
+                        foreach (var page in _pagesPendingLoad)
+                        {
+                            page.Dispose();
+                        }
+                        _pagesPendingLoad = null;
                     }
 
                     if (components != null)
@@ -1149,6 +1181,38 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35528");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="PageLayoutControl.PagesPendingLoad"/> event of an
+        /// <see cref="PageLayoutControl"/>
+        /// control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="PagesPendingLoadEventArgs"/> instance containing the
+        /// event data.</param>
+        void HandlePageLayoutControl_PagesPendingLoad(object sender, PagesPendingLoadEventArgs e)
+        {
+            try
+            {
+                foreach (Page page in e.Pages)
+                {
+                    _pagesPendingLoad.Enqueue(page);
+
+                    // So that a source document isn't considered "processed" before all pages have
+                    // been loaded into the UI, reference all pages pending load.
+                    page.AddReference(this);
+                }
+
+                // The load next document command should be disabled until all pending pages have
+                // been loaded.
+                _loadNextDocumentMenuItem.Enabled = false;
+                _primaryPageLayoutControl.EnableLoadNextDocument = false;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35674");
             }
         }
 
@@ -1699,6 +1763,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 _primaryPageLayoutControl.StateChanged -= HandlePageLayoutControl_StateChanged;
                 _primaryPageLayoutControl.PageDeleted -= HandlePageLayoutControl_PageDeleted;
+                _primaryPageLayoutControl.PagesPendingLoad -= HandlePageLayoutControl_PagesPendingLoad;
+                _primaryPageLayoutControl.LoadNextDocumentRequest -= HandleLayoutControl_LoadNextDocumentRequest;
                 // If the control contains a lot of pagination controls, it can take a long time to
                 // remove-- I am unclear why (it has to do with more than just whether thumbnails
                 // are still being loaded. Disposing of the control first allows it to be quickly
@@ -1717,6 +1783,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.ImageViewer = _imageViewer;
             _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
             _primaryPageLayoutControl.PageDeleted += HandlePageLayoutControl_PageDeleted;
+            _primaryPageLayoutControl.PagesPendingLoad += HandlePageLayoutControl_PagesPendingLoad;
             _primaryPageLayoutControl.LoadNextDocumentRequest += HandleLayoutControl_LoadNextDocumentRequest;
             _pageLayoutToolStripContainer.ContentPanel.Controls.Add(_primaryPageLayoutControl);
             _primaryPageLayoutControl.Focus();
@@ -1853,11 +1920,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// copied that is unique compared to any existing document or any document that has been
         /// created by this instance whether or not the file still exists.
         /// </summary>
-        /// <param name="sourceDocument">The <see cref="SourceDocument"/> to be moved.</param>
+        /// <param name="sourceDocumentName">The name of the source document to be moved.</param>
         /// <returns>The unique document name.</returns>
-        string GenerateProcessedDocumentName(SourceDocument sourceDocument)
+        string GenerateProcessedDocumentName(string sourceDocumentName)
         {
-            string fileName = sourceDocument.FileName;
+            string fileName = sourceDocumentName;
 
             if (fileName.StartsWith(_config.Settings.InputFolder, StringComparison.OrdinalIgnoreCase))
             {
@@ -1988,6 +2055,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                         continue;
                     }
 
+                    // Do not load hidden or system files.
+                    FileAttributes attributes = File.GetAttributes(fileName);
+                    if (attributes.HasFlag(FileAttributes.Hidden) ||
+                        attributes.HasFlag(FileAttributes.System))
+                    {
+                        continue;
+                    }
+
                     try
                     {
                         var sourceDocument = OpenDocument(fileName);
@@ -2088,6 +2163,35 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets a value indicating whether more pages can attempt to be loaded.
+        /// </summary>
+        /// <value><see langword="true"/> if more pages can attempt to be loaded; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        bool CanAttemptPageLoad
+        {
+            get
+            {
+                // True if there are pages from previously loaded documents pending and room beneath
+                // _MAX_LOADED_PAGES
+                int pendingPagesToLoadCount = Math.Min(_pagesPendingLoad.Count,
+                    _MAX_LOADED_PAGES - _primaryPageLayoutControl.PageCount);
+                if (pendingPagesToLoadCount > 0)
+                {
+                    return true;
+                }
+
+                // True if there are not the configured number of pages currently loaded.
+                if (_primaryPageLayoutControl.PageCount < _config.Settings.InputPageCount)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Loads the more pages from input folder documents until there are greater than or equal
         /// number of pages loaded as _config.Settings.InputPageCount.
         /// </summary>
@@ -2096,6 +2200,28 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (_loadingNextDocument)
             {
                 return;
+            }
+
+            // Check to see if there are any pages from previously loaded documents that are still
+            // waiting to be loaded.
+            int pendingPagesToLoadCount = Math.Min(_pagesPendingLoad.Count,
+                _MAX_LOADED_PAGES - _primaryPageLayoutControl.PageCount);
+            if (pendingPagesToLoadCount > 0)
+            {
+                Page[] pagesToLoad = new Page[pendingPagesToLoadCount];
+                for (int i = 0; i < pendingPagesToLoadCount; i++)
+                {
+                    pagesToLoad[i] = _pagesPendingLoad.Dequeue();
+                }
+                
+                _primaryPageLayoutControl.AddPages(pagesToLoad);
+
+                // Now that these pages have been loaded, they are referenced by the page controls
+                // so the reference from this object can be released.
+                foreach (Page page in pagesToLoad)
+                {
+                    page.RemoveReference(this);
+                }
             }
 
             bool ranOutOfDocuments = false;
@@ -2116,6 +2242,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // document button gets added.
                 _primaryPageLayoutControl.CreateOutputDocument(null);
             }
+
+            // As long as there are no pages pending to be loaded, enable the load next document
+            // options.
+            if (_pagesPendingLoad.Count == 0)
+            {
+                _loadNextDocumentMenuItem.Enabled = true;
+                _primaryPageLayoutControl.EnableLoadNextDocument = true;
+            }
         }
 
         /// <summary>
@@ -2131,7 +2265,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _pageLoadPending = false;
 
-                    if (_primaryPageLayoutControl.PageCount < _config.Settings.InputPageCount)
+                    if (CanAttemptPageLoad)
                     {
                         LoadMorePages();
                     }
@@ -2179,13 +2313,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                 foreach (SourceDocument document in processedDocuments
                         .Where(document => _sourceDocuments.Contains(document)))
                 {
-                    // Unload the document from the image viewer to unlock the file.
-                    _imageViewer.UnloadImage(document.FileName);
+                    string documentName = document.FileName;
 
-                    HandleProcessedSourceDocument(document);
+                    // [DotNetRCAndUtils:975]
+                    // Ensure the source document is disposed of before calling
+                    // HandleProcessedSourceDocument, otherwise the thumbnail worker may still have
+                    // a lock on the source document when the delete/move attempt occurs.
                     document.Dispose();
-
                     _sourceDocuments.Remove(document);
+
+                    // Unload the document from the image viewer to unlock the file.
+                    _imageViewer.UnloadImage(documentName);
+
+                    HandleProcessedSourceDocument(document.FileName);
                 } 
             }
         }
@@ -2194,28 +2334,29 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Handles the <see paramref="document"/> that has completed processing due to all its
         /// pages either being output or deleted.
         /// </summary>
-        /// <param name="document">The <see cref="SourceDocument"/> that has been processed.</param>
-        void HandleProcessedSourceDocument(SourceDocument document)
+        /// <param name="sourceDocumentName">The name of the source document that has been processed.
+        /// </param>
+        void HandleProcessedSourceDocument(string sourceDocumentName)
         {
             // If the document came from the input folder (as opposed to having been dragged in
             // from another folder), either move or delete the file from the input folder now
             // that it has been processed.
-            if ((_config.Settings.IncludeSubfolders && document.FileName.StartsWith(
+            if ((_config.Settings.IncludeSubfolders && sourceDocumentName.StartsWith(
                 _config.Settings.InputFolder, StringComparison.OrdinalIgnoreCase) ||
                 (!_config.Settings.IncludeSubfolders &&
-                    Path.GetDirectoryName(document.FileName).Equals(
+                    Path.GetDirectoryName(sourceDocumentName).Equals(
                         _config.Settings.InputFolder, StringComparison.OrdinalIgnoreCase))))
             {
                 // This removes the image from the cache and releases the lock on the file.
-                _imageViewer.UnloadImage(document.FileName);
+                _imageViewer.UnloadImage(sourceDocumentName);
 
                 if (_config.Settings.DeleteProcessedFiles)
                 {
-                    FileSystemMethods.DeleteFile(document.FileName);
+                    FileSystemMethods.DeleteFile(sourceDocumentName);
                 }
                 else
                 {
-                    string processedDocumentName = GenerateProcessedDocumentName(document);
+                    string processedDocumentName = GenerateProcessedDocumentName(sourceDocumentName);
 
                     string directory = Path.GetDirectoryName(processedDocumentName);
                     if (!Directory.Exists(directory))
@@ -2223,7 +2364,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         Directory.CreateDirectory(directory);
                     }
 
-                    FileSystemMethods.MoveFile(document.FileName, processedDocumentName,
+                    FileSystemMethods.MoveFile(sourceDocumentName, processedDocumentName,
                         false);
                     _processedDocumentNames.Add(processedDocumentName);
                 }
