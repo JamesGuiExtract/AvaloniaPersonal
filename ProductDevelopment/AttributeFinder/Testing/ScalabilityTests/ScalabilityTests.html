@@ -32,8 +32,8 @@ not necessary to install FLEX Index.
 <p>
 	<li><b>Database Setup</b>
 	<ul>
-		<li>Create a <b>SCALABILITY_TEST</b> database on the database host machine.
-		<li>Add a <b>Process</b> action.
+		<li>Create a <b>ThreadScalabilityTest</b> database on the database host machine.
+		<li>Add action <b>a</b>.
 		<li>Queue the files.  Note that the files must be queued via UNC path or via a mapped 
 		drive.
 	</ul>
@@ -47,15 +47,23 @@ not necessary to install FLEX Index.
 		run01.fps, run02.fps, etc.  Note that each file (except 00) should be configured to 
 		use the specified number of threads.  FPS files should be created beyond the number of 
 		available cores.
-		<li>Update the FAM Service database with one instance each of:
+		<li>Copy contents of <b>Demo_IDShield\Rules</b> folder to local <b>rules</b> folder.
+		<li>Exercise <b>initialize.bat</b>.
+		<li>Update the FAM Service database with one instance of:
 		<ul>
-			<li>q.fps
 			<li>run00.fps
 		</ul>
-		<li>Exercise <b>initialize.bat</b>.
+		<li>Exercise <b>Configure Email Settings</b>.
+		<ul>
+			<li>Outgoing mail server = <b>mail.extractsystems.com</b>.
+			<li>Provide a <b>Sender display name</b>.
+			<li>Provide a <b>Sender email address</b>.
+			<li><b>Send test email</b> to confirm proper settings.
+		</ul>
 		<li>Create a <b>scheduled task</b>.
 		<ul>
-			<li>Exercise <b>runtest2.bat</b> from the ThreadScalabilityTest folder
+			<li>Exercise <b>runtest2.bat</b> from the <b>test</b> 
+			(ThreadScalabilityTest) folder.
 			<li>Run the task at startup.
 			<li>Run the task even if no user is logged in.
 		</ul>
