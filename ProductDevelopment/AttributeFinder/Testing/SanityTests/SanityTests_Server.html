@@ -12,7 +12,7 @@
 </h1>
 <hr>
 <p>
-*ID Shield, FLEX Index, LabDE and RDT should be installed and licensed for this test.
+*ID Shield, FLEX Index, and LabDE should be installed and licensed for this test.
 <ol>
 	<li><h2>ID Shield Testing</h2>
 	<ul>
@@ -20,7 +20,8 @@
 		<ul>
 			<li>Copy images to the test machine.
 			<ul>
-				<li>Create destination folder for Sanity Test images on the test machine.
+				<li>Create destination folder for Sanity Test images on the 
+				test machine.
 				<li>Open command window on test machine and navigate to the 
 				<b>IDShield_Sanity</b> folder provided above.
 				<li>Exercise <b>\\fnp2\Internal\Common\Testing\Product 
@@ -28,49 +29,39 @@
 				using the fully-qualified path to the destination folder 
 				as the single argument.
 			</ul>
-			<li>Confirm presence of the following non-empty child folders.
+			<li>USB Counter - confirm one of the following
 			<ul>
-				<li><b>db</b> - LDF and MDF database source files.
-				<li><b>FPS</b> - files to process the images
-				<li><b>Images</b> - images to be copied into the <b>Images2</b> folder 
-				to be supplied via listening for OCR and auto-redaction processing.
-				<li><b>Images1</b> - for a Folder file supplier to use to supply images 
-				for OCR and auto-redaction processing.
-				<li><b>Images2</b> - empty folder to contain files from <b>Images</b> 
-				to be supplied via listening.
-				<li><b>Images3</b> - for a Folder file supplier to use to supply images 
-				for <b>Execute rules</b> and later verification.
-				<li><b>Rules</b> - copies of <b>Demo_IDShield</b> rules used for 
-				processing.
-				<li><b>TestImages</b> - subfolders containing different types of images 
-				for testing.
+				<li>Verify that a license file for disabling all USB keys is 
+				present on the test machine.
+				<li>Verify that the <b>USB License Key Manager</b> is pointed 
+				to a USB key with redaction counts available.
 			</ul>
-			<li>Verify the <b>USB License Key Manager</b> is pointed to a USB key with redaction 
-			counts available (usually LISA).
 		</ul>
 <p>
 		<li><b>Test1 - OCR and Auto-redaction from a Folder file supplier</b>
 		<ul>
             		<li>Log in to the test machine as a domain user.
-			<li>Open <b>Auto-Redact.fps</b> and confirm that an error prompt informs you that 
-			the DB Schema version does not match.</li>
+			<li>Open <b>Auto-Redact.fps</b> and confirm that an error prompt informs 
+			you that the DB Schema version does not match.</li>
             		<li>Run DB Admin <b>as Administrator</b> and connect to the database 
 			<b>sanity_test1</b>.</li>
-            		<li>When prompted to update the database to the current schema, click Yes.</li>
+            		<li>When prompted to update the database to the current schema, click Yes.
             		<li>Confirm that the database is successfully updated.</li>
-            		<li>In the Database tab of the FAM, hit the Refresh button and confirm that it 
-			connects to the database without error.</li>
+            		<li>In the Database tab of the FAM, hit the Refresh button and confirm that 
+			it connects to the database without error.</li>
             		<li>Start processing.
-			<li>Confirm that a few files complete the <b>OCR</b> and <b>Redact images</b> tasks.
+			<li>Confirm that a few files complete the <b>OCR</b> and <b>Redact images</b> 
+			tasks.
 			<li>Copy the files from the <b>Images</b> folder to the <b>Images2</b> folder.
 			<li>Confirm that files are also being queued from the <b>Images2</b> folder.
 			<li>Confirm that the files from <b>Images2</b> are being processed with a 
 			higher priority.</li>
-      			<li>Confirm that <b>Bates numbers</b> appear on the output images as expected.</li>
+      			<li>Confirm that <b>Bates numbers</b> appear on the output images as 
+			expected.</li>
 			<li>Stop processing.</li>
-			<li>Configure a processing schedule such that processing will not start immediately 
-			and will stop before processing finishes. You may wish to add a sleep task to ensure 
-			this.</li>
+			<li>Configure a processing schedule such that processing will not start 
+			immediately and will stop before processing finishes. You may wish to add 
+			a sleep task to ensure this.</li>
 			<li><b>Test2</b> can be started while <b>Test1</b> is executing.
 		</ul>
 <p>
@@ -86,8 +77,8 @@
                 		<ul>
                     			<li>Database - <b>Clear</b>, <b>Update database schema</b>, 
 					<b>Logout</b>, and <b>Exit</b>.</li>
-                    			<li>Tools - <b>Check for new components</b>, <b>File Action 
-					Manager</b>, and <b>Recalculate summary statistics</b>.</li>
+                    			<li>Tools - <b>Check for new components</b>, <b>Recalculate 
+					summary statistics</b>, and <b>File Action Manager</b>.</li>
                     			<li>Help - <b>File Action Manager Help</b> and <b>About this 
 					application</b>.</li>
                 		</ul></li>
@@ -105,48 +96,51 @@
                 		<li>Confirm that processing still does not start.
                 		<li>Configure the FAM service to run <b>Compute.fps</b>.
 				<ul>
-					<li>Confirm that the service starts without delay and without error, 
-					ignoring the <b>SleepTimeOnStart</b> setting.
+					<li>Confirm that the service starts without delay and without 
+					error, ignoring the <b>SleepTimeOnStart</b> setting.
 					<li>Stop the service and configure it for <b>Manual</b> start.
 					<li>Restart the machine.
-					<li>Start the service and confirm that the <b>SleepTimeOnStart</b> 
-					setting is respected.
+					<li>Start the service and confirm that the 
+					<b>SleepTimeOnStart</b> setting is respected.
 				</ul>
-                		<li>Stop the service and modify the database options so that authentication 
-				is not required to run.</li>
+                		<li>Stop the service and modify the database options so that 
+				authentication is not required to run.</li>
 			</ul>
 			<li>Open <b>Compute.fps</b> and start processing.
-			<li>After queueing is complete, use Task Manager to kill <b>ProcessFiles.exe</b> 
-			while documents are being processed. 
+			<li>After queueing is complete, use Task Manager to kill 
+			<b>ProcessFiles.exe</b> while documents are being processed. 
 			<li>Use <b>DB Admin</b> to reset the database lock.
-			<li>Use <b>DB Admin</b> to confirm that some files are stuck in <b>Processing</b>.
-			<li>Use <b>DB Admin</b> after auto-reversion to confirm that the files are back 
-			in <b>Pending</b> status.
+			<li>Use <b>DB Admin</b> to confirm that some files are stuck in 
+			<b>Processing</b>.
+			<li>Use <b>DB Admin</b> after auto-reversion to confirm that the files 
+			are back in <b>Pending</b> status.
 			<li>Open <b>Compute.fps</b> and process the remaining files.
-			<li>Confirm that a few files complete the <b>Execute rules</b> and <b>Conditionally 
-			execute task(s)</b> tasks.
-			<li>Use the <b>File Action Manager Database Administration</b> utility to display 
-			the <b>Summary</b> tab.  Confirm that the various counts are changing.
+			<li>Confirm that a few files complete the <b>Execute rules</b> and 
+			<b>Conditionally execute task(s)</b> tasks.
+			<li>Use the <b>File Action Manager Database Administration</b> utility to 
+			display the <b>Summary</b> tab.  Confirm that the various counts are 
+			changing.
             		<li>Try to <b>Clear</b> the database and confirm that you are not allowed to 
 			clear the database while files are being processed.</li>
             		<li>Try to <b>Recalculate summary statistics</b> and confirm that this is not 
 			allowed while files are being processed.</li>
 			<li><b>Test3</b> can be started while <b>Test2</b> is executing.  Note that 
 			<b>Test3</b> cannot be completed until after Test2 has completed.
-			<li>Confirm via <b>FAMDBAdmin</b> that several files are ready for verification 
-			before starting <b>Test3</b>.
+			<li>Confirm via <b>FAMDBAdmin</b> that several files are ready for 
+			verification before starting <b>Test3</b>.
 		</ul>
 <p>
 		<li><b>Test3 - Verify redactions</b>
 		<ul>
 			<li>Open <b>Verify.fps</b> and start processing.
-            		<li>Start the slideshow and confirm that it stops when you reach a page containing 
-			clues or redactable data.</li>
+            		<li>Start the slideshow and confirm that it stops when you reach a page 
+			containing clues or redactable data.</li>
 			<li>Verify a few files and add several manual redactions.
 			<li>Confirm that redactions can be deleted.
 			<li>Confirm that redactions can be rotated.
             		<li>Confirm that redactions can be auto-shrunk.</li>
-			<li>Navigate to previously verified documents and add additional manual redactions.
+			<li>Navigate to previously verified documents and add additional manual 
+			redactions.
 			<li>Confirm that the latest manual redactions are properly saved. 
 			<li><b>Find and redact user text or regular expression</b>
 			<ul>
@@ -175,8 +169,8 @@
 			<li>Confirm that reports correctly indicate which files were <b>tagged</b>.
 			<li>Confirm that reports correctly indicate which <b>comments</b> are defined.
 			<li>Modify the FPS file to process the skipped files.
-			<li>Finish verifying the sensitive documents and confirm that the verification UI 
-			automatically closes.
+			<li>Finish verifying the sensitive documents and confirm that the verification 
+			UI automatically closes.
 		</ul>
 <p>
 		<li><b>Test4 - Special images</b>
@@ -244,8 +238,8 @@
         	</ul>
         	<li><b>ImageTypes</b>
         	<ul>
-            		<li>Confirm that reasonable things happen when you try to process these images; 
-			note that some may not process successfully.</li>
+            		<li>Confirm that reasonable things happen when you try to process these 
+			images; note that some may not process successfully.</li>
         	</ul>
         	<li><b>PDFVersions</b>
         	<ul>
@@ -274,8 +268,30 @@
 			<li>Confirm that each field type can be swiped using the <b>rectangular 
 			redaction</b> tool.
 		</ul>
-		<li>Confirm that verification and swiping require only a <b>FLEX Index 
-		Client</b> license.
+	</ul>
+<p>
+	<li><h2>LabDE - Demo</h2>
+	<ul>
+		<li>Copy the <b>Demo_LabDE</b> folder to the test machine.
+		<li>Run <b>Clean.bat</b> as local administrator.
+		<li>Use <b>SQL Management Studio</b> to grant <u>db_datareader</u> and 
+		<u>db_datawriter</u> privileges to Domain Users for the <b>Demo_LabDE</b> 
+		database.
+		<li>Exercise <b>ExtractData.fps</b>.
+		<ul>
+			<li>Confirm that all images are processed.
+			<li>Confirm that no exceptions are thrown during rule execution.
+		</ul>
+		<li>Exercise <b>Verify.fps</b>.
+		<ul>
+			<li>Confirm that appropriate data are found for each image.
+			<li>Confirm that data can be swiped using the <b>angular 
+			redaction</b> tool.
+			<li>Confirm that data can be swiped using the <b>rectangular 
+			redaction</b> tool.
+			<li>Confirm that data can be swiped using the <b>word 
+			redaction</b> tool.
+		</ul>
 	</ul>
 <p>
 	<li><h2>General Tools</h2>
@@ -284,13 +300,14 @@
 		<ul>
 			<li>Confirm that <b>Database server name</b> is prepopulated with the previously 
 			selected server.
-			<li>Confirm that <b>Database name</b> is prepopulated with the previously selected 
-			database name.
-			<li>Confirm that <b>Database server name</b> includes a <b>&lt;Browse...&gt;</b> 
-			choice that populates the combo box with names of all reachable SQL Server machines.
+			<li>Confirm that <b>Database name</b> is prepopulated with the previously 
+			selected database name.
+			<li>Confirm that <b>Database server name</b> includes a 
+			<b>&lt;Browse...&gt;</b> choice that populates the combo box with names of 
+			all reachable SQL Server machines.
 			<li>Confirm that <b>Database name</b> includes a <b>&lt;Browse...&gt;</b> 
-			choice that populates the combo box with names of all databases available on the 
-			selected server.
+			choice that populates the combo box with names of all databases available 
+			on the selected server.
 <p>
 			<li>Confirm that an action can be <b>added</b> to the database.
 			<li>Confirm that an action can be <b>removed</b> from the database.
@@ -314,8 +331,8 @@
 			<li>Confirm that a user can be <b>deleted</b> from the database.
 			<li>Confirm that a user password can be <b>reset</b> in the database.
 <p>
-			<li>Confirm that the <b>Summary</b> tab displays current counts for the actions 
-			defined in the selected database.
+			<li>Confirm that the <b>Summary</b> tab displays current counts for the 
+			actions defined in the selected database.
 			<li>Confirm that the <b>Refresh</b> button updates the current counts.
 <p>
 			<li>Confirm that file action status can be <b>modified</b>.
@@ -371,8 +388,8 @@
           		<li>Confirm that selecting the "<b>I use a desktop email application...</b>" 
 			radio button and pressing <b>&lt;Next&gt;</b> takes you to step three.
 			<li>Confirm that <b>here</b> displays an email message to 
-			the specified email address.  Note that email setup can be skipped since the email 
-			will not actually be sent.
+			the specified email address.  Note that email setup can be skipped since the 
+			email will not actually be sent.
 			<li>Confirm that <b>&lt;Show manual license request instructions&gt;</b> 
 			takes you to the correct page.
 			<li>Confirm that the earlier "<b>I use web based email on this machine</b>" 
@@ -392,16 +409,18 @@
 			<li>Configure FAM Service - successfully edits <b>ESFAMService.sdf</b>.
 			<li>Convert FAM Database - opens without error.
 			<li>Convert FPS File - opens without error.
+			<li>Pagination Utility - opens without error if appropriate license file 
+			is present.
 		</ul>
 <p>
 		<li><b>Detect and Report Failure</b>
 		<ul>
 			<li>Confirm that <b>FDRS</b> starts and leaves a green icon in the system tray.
 			<li>Confirm that <b>FDRS</b> displays a context menu.
-			<li>Confirm that <b>Configure - Automatic notifications</b> displays an INI file 
-			with application settings.
-			<li>Confirm that <b>Exit</b> closes the application and removes the icon from the 
-			system tray.
+			<li>Confirm that <b>Configure - Automatic notifications</b> displays an INI 
+			file with application settings.
+			<li>Confirm that <b>Exit</b> closes the application and removes the icon from 
+			the system tray.
 		</ul>
 <p>
 		<li><b>FAM Network Manager</b>
@@ -453,19 +472,19 @@
 <p>
 		<li><b>Rule Tester</b>
 		<ul>
-			<li>Confirm that the Rule Tester <b>About box</b> displays the expected version number, 
-			patch, and FKB update(s).
-			<li>Confirm that <b>Rule Tester</b> can exercise <b>Master.rsd.etf</b> from the 
-			Redaction Demo.
-			<li>Confirm that <b>Rule Tester</b> displays an exception when trying to exercise a 
-			different <b>rsd.etf</b> file from the Redaction Demo.
+			<li>Confirm that the Rule Tester <b>About box</b> displays the expected 
+			version number, patch, and FKB update(s).
+			<li>Confirm that <b>Rule Tester</b> can exercise <b>Master.rsd.etf</b> 
+			from Demo_IDShield.
+			<li>Confirm that <b>Rule Tester</b> displays an exception when trying to 
+			exercise a different <b>rsd.etf</b> file from Demo_IDShield.
 			<br>Note: For the exception to be thrown, the RDT cannot be licensed.
 		</ul>
 <p>
 		<li><b>Test Text Function Expander</b>
 		<ul>
-			<li>Confirm that the <b>Test Text Function Expander</b> utility provides a list 
-			of functions to be tested.
+			<li>Confirm that the <b>Test Text Function Expander</b> utility provides a 
+			list of functions to be tested.
 			<li>Confirm that several different functions expand correctly.
 		</ul>
 <p>
@@ -492,66 +511,6 @@
 			<li>Confirm that an <b>EAV</b> file can be opened.
 			<li>Confirm that a <b>VOA</b> file can be opened.
 			<li>Confirm that changes made to a VOA file can be saved.
-		</ul>
-	</ul>
-<p>
-	<li><h2>Rule Development Toolkit</h2>
-	<ul>
-		<li>Confirm that <b>Automated Tests - Run all tests</b> works.
-		<li>Update test results - <b>only if</b> this build or a newer build 
-		has not already been tested
-		<ul>
-			<li>Test results to be saved in <b>I:\Common\Testing\Product 
-			Testing\FLEX_Index_90\AutomatedTests\Automated_NRS_Tests.xls</b>
-			<li>Retrieve the National Rule Set from Vault via <b>Rules\NRSTest</b>.
-			<li><b>Automated Tests</b> - separated by section.  Add section-based SCR 
-			if new failures are noted.
-			<li><b>Redaction NRS</b> - separated by section.  Add section-based SCR 
-			if new failures are noted.
-			<li><b>Indexing NRS</b> - separated by section, if possible.  Add 
-			section-based SCR if new failures are noted.
-			<li><b>Document Classification NRS</b> - note # passed and # failed.  Add 
-			notes for new failures.
-		</ul>
-<p>
-		<li><b>Miscellaneous Tools</b>
-		<ul>
-			<li>Image Cleanup Settings Editor - opens without error.
-			<li>Index Converter - opens without error.
-			<li>RDT Configuration - opens without error.
-			<li>Test Harness - opens without error.
-		</ul>
-<p>
-		<li><b>Rule Set Editor</b>
-		<ul>
-			<li>Confirm that <b>File - Properties</b> allows 
-			<ul>
-				<li>choice of counters to decrement
-				<li>specification of USB Key Serial #'s 
-                		<li>specification of FKB Version
-				<li>setting of an Internal Use Only flag.
-				<li>setting of a Swiping rule flag
-				<li>text to be saved via a <b>Comments</b> tab
-			</ul>
-			<li>Confirm that <b>Tools - Open Rule Tester</b> displays the Rule Tester dialog.
-			<li>Confirm that <b>Tools - Execute Test Harnesss</b> displays the Test Harness dialog 
-			and the Test Result Logger window.
-			<li>Confirm that <b>Tools - Check For New Components</b> displays a message box 
-			with numbers found of the following component types.
-			<ul>
-				<li><b>23</b> Value Finders
-				<li><b>25</b> Value Modifiers
-				<li><b>1</b> Input Receivers
-				<li><b>8</b> Input Validators
-				<li><b>25</b> Output Handlers
-				<li><b>8</b> Attribute Splitters
-				<li><b>10</b> Document Preprocessors
-				<li><b>3</b> Data Scorers
-				<li><b>4</b> Conditions
-				<li><b>6</b> Selectors
-			</ul>
-			<li>Confirm that <b>Help - About FLEX Index</b> displays the expected version number, 
-			patch, and FKB update.
 		</ul>
 	</ul>
 </ol>
