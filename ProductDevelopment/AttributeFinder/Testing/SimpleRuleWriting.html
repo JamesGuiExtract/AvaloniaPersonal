@@ -175,6 +175,7 @@
 		<ul>
 			<li>Document type condition
 		</ul>
+<p>
 		<li><b>Attribute Selectors</b> - via Run object on attributes OH
 		<ul>
 			<li>Multiple criteria attribute selector
@@ -220,6 +221,35 @@
 		object cannot be programmatically changed unless an RDT or simple rules 
 		license is present.
 	</ul>
+	<li><b>Test Harness</b>
+	<ul>
+		<li>Confirm that <b>TestHarness.exe</b> opens with a <b>Simple Rule 
+		Writing</b> license.
+		<li><u>FLEX Index</u>
+		<ul>
+			<li>Copy the <b>TestHarness</b> folder from 
+			<b>I:\Common\Testing\Product Testing</b>.
+			<li>Confirm that <b>APNTest.tcl</b> runs with a <b>Simple Rule 
+			Writing</b> license.
+			<ul>
+				<li>Note that some tests will pass and some fail with no 
+				changes to <b>APN.rsd</b>.
+			</ul>
+		</ul>
+		<li><u>ID Shield</u>
+		<ul>
+			<li>Copy the <b>CaptureRateTest</b> folder from 
+			<b>Rules\NRSTest\Redaction</b>.
+			<li>Modify <b>SocialSecurityNumber\LCData\LCData_CaptureRate.dat</b> 
+			to uncomment the SETTING for <b>OutputFilesFolder</b>.  Modify the 
+			path if necessary.
+			<li>Confirm that <b>NRS_Redaction_CaptureRate.tcl</b> runs with a 
+			<b>Simple Rule Writing</b> license.
+			<ul>
+				<li>Note that some tests will pass and some fail.
+			</ul>
+		</ul>
+	</ul>
 </ul>
 <p>
 <h2>Miscellaneous</h2>
@@ -229,6 +259,25 @@
 	<ul>
 		<li><b>Customer Name:</b>
 		<li><b>Delivery Date:</b>
+	</ul>
+<p>
+	<li><b>[FlexIDSCore #5286]</b> Exposing Complex Rule Objects
+	<ul>
+		<li>Confirm installation of basic software plus appropriate Customer RDT 
+		software.
+		<li>Create a typical <b>Server</b> license file.
+		<li>Create a <b>Simple Rule Writing</b> license file using <b>Simple Rules</b> 
+		passwords.
+		<li>Start Rule Set Editor and exercise <b>Tools - Check For New Components</b>.
+		<li>Confirm that only one <b>AF-API Condition</b> object is listed.
+		<ul>
+			<li>Document type condition
+		</ul>
+		<li>Create a simple rule set.
+		<li>Exercise the rule set using the built-in <b>Rule Tester</b>.
+		<li>Exercise <b>Tools - Check For New Components</b> while the Rule Tester 
+		remains active.
+		<li>Confirm that still only one <b>AF-API Condition</b> object is listed.
 	</ul>
 </ul>
 </BODY>
