@@ -117,36 +117,126 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="_resultCodeLabel.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="_resultCodeLabel.GenerateMember" type="System.Boolean, mscorlib">
     <value>False</value>
-  </metadata>
-  <metadata name="_testNameLabel.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_testNameLabel.GenerateMember" type="System.Boolean, mscorlib">
     <value>False</value>
-  </metadata>
-  <metadata name="panelGroupBox.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="panelGroupBox.GenerateMember" type="System.Boolean, mscorlib">
     <value>False</value>
-  </metadata>
-  <metadata name="_collectionDateColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_collectionDateColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_collectionTimeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_collectionTimeColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_resultDateColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_resultDateColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_resultTimeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_resultTimeColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="_laboratoryIdentifier.AutoUpdateQuery" xml:space="preserve">
-    <value>&lt;Query Default='1'&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../LabName&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../LabAddress/City&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../LabAddress/State&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../LabAddress/ZipCode&lt;/Attribute&gt;&lt;/Query&gt;
-&lt;Query&gt;&lt;Expression&gt;string.IsNullOrWhiteSpace(&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt;) ? &lt;Attribute&gt;/LabIdentifier&lt;/Attribute&gt; : ''&lt;/Expression&gt;&lt;/Query&gt;
-&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabCode IS NOT NULL AND LabCode = SUBSTRING(&lt;Attribute&gt;../LabCode&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(&lt;Attribute&gt;../LabName&lt;/Attribute&gt;, ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 50) + '%'&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute&gt;../LabName&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 10) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute&gt;../LabName&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 10) + '%' and City LIKE &lt;Attribute&gt;../LabAddress/City&lt;/Attribute&gt;&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute&gt;../LabName&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 3) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Zip LIKE SUBSTRING(&lt;Attribute&gt;../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;</value>
+    <value>&lt;Declarations&gt;
+			&lt;Regex Name='Digits' SelectionMode='FIRST' Pattern='[\d]+'&gt;&lt;Attribute&gt;../LabAddress/Address1&lt;/Attribute&gt;&lt;/Regex&gt;
+			&lt;Regex Name='Street' SelectionMode='FIRST' Pattern='((\b(?!ROAD\b)(?!BLVD\b)(?!DRIVE\b)(?!DR\.\b)(?!BOULEVARD\b)(?!AVE\b)(?!AVENUE\b)(?!PKWY\b)(?!PARKWAY\b)(?!WAY\b)(?!EAST\b)(?!SOUTH\b)(?!NORTH\b)(?!STREET\b)(?!RD\.\b)(?!AVE\.\b)(?!ST\.\b)(?!BLVD\.\b)(?!BOX\b)[A-Za-z]{3,})|(\d+(ST|ND|RD|TH)))'&gt;&lt;Attribute&gt;../LabAddress/Address1&lt;/Attribute&gt;&lt;/Regex&gt;
+			
+			&lt;Regex Name='FiveCharLab' SelectionMode='FIRST' Pattern='(\b(?!LABORATORY\b)(?!LAB\.?\b)(?!LABORATORIES\b)(?!MEDICAL\b)[-A-Za-z&amp;apos;]{5,})'&gt;&lt;Attribute&gt;../LabName&lt;/Attribute&gt;&lt;/Regex&gt;
+			&lt;Regex Name='SecondWordLab' SelectionMode='FIRST' Pattern='(?&amp;lt;=[-A-Za-z&amp;apos;]{5,}\x20)(\b(?!LABORATORY\b)(?!LAB\.?\b)(?!LABORATORIES\b)(?!MEDICAL\b)[-A-Za-z&amp;apos;]{3,})'&gt;&lt;Attribute&gt;../LabName&lt;/Attribute&gt;&lt;/Regex&gt;
+			&lt;Regex Name='FirstTwoWordsLab' SelectionMode='FIRST' Pattern='[-&amp;apos;\w]+\s[-&amp;apos;\w]+'&gt;&lt;Attribute&gt;../LabName&lt;/Attribute&gt;&lt;/Regex&gt;
+			&lt;Regex Name='LabNameUpToComma' SelectionMode='FIRST' Pattern='.*(?=,.*)'&gt;&lt;Attribute&gt;../LabName&lt;/Attribute&gt;&lt;/Regex&gt;
+			
+						
+			&lt;Expression Name='DigitsNotEmpty'&gt;
+			(&lt;Digits/&gt; == '') ? '___Empty___' : &lt;Digits/&gt;
+			&lt;/Expression&gt;
+			&lt;Expression Name='StreetNotEmpty'&gt;
+			(&lt;Street/&gt; == '') ? '___Empty___' : &lt;Street/&gt;
+			&lt;/Expression&gt;
+			&lt;Expression Name='FiveCharLabNotEmpty'&gt;
+			(&lt;FiveCharLab/&gt; == '') ? '___Empty___' : &lt;FiveCharLab/&gt;
+			&lt;/Expression&gt;
+			&lt;Expression Name='SecondWordLabNotEmpty'&gt;
+			(&lt;SecondWordLab/&gt; == '') ? '___Empty___' : &lt;SecondWordLab/&gt;
+			&lt;/Expression&gt;
+			&lt;Expression Name='FirstTwoWordsLabNotEmpty'&gt;
+			(&lt;FirstTwoWordsLab/&gt; == '') ? '___Empty___' : &lt;FirstTwoWordsLab/&gt;
+			&lt;/Expression&gt;
+			&lt;Expression Name='LabNameUpToCommaNotEmpty'&gt;
+			(&lt;LabNameUpToComma/&gt; == '') ? '___Empty___' : &lt;LabNameUpToComma/&gt;
+			&lt;/Expression&gt;
+			
+			&lt;/Declarations&gt;
+			
+			&lt;!-- Add spatial info to address fields --&gt;
+			&lt;Query Default='True'&gt;&lt;Attribute SpatialMode='Only'&gt;../LabName&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only'&gt;../LabAddress/City&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only'&gt;../LabAddress/State&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only'&gt;../LabAddress/ZipCode&lt;/Attribute&gt;&lt;/Query&gt;
+			
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabCode IS NOT NULL AND LabCode = SUBSTRING(&lt;Attribute&gt;../LabCode&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
+						
+			&lt;!-- Look for exact name match --&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE LOWER(&lt;Attribute SelectionMode='FIRST'&gt;../LabName&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			
+			&lt;!-- Look for extracted Address1 and City/Zip for match --&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE &lt;Attribute&gt;../LabAddress/Address1&lt;/Attribute&gt; and Zip LIKE SUBSTRING(&lt;Attribute&gt;../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE &lt;Attribute&gt;../LabAddress/Address1&lt;/Attribute&gt; and City LIKE LOWER(&lt;Attribute&gt;../LabAddress/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			
+			&lt;!-- Look for Digits and 3+ character non-directional and non-street string in extracted Address1 and City for match --&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE '%' + LOWER(&lt;DigitsNotEmpty/&gt;) + '%' + LOWER(&lt;StreetNotEmpty/&gt;) + '%' and City LIKE LOWER(&lt;Attribute&gt;../LabAddress/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			
+			&lt;!-- Look for Digits in extracted Address1 and matching City or 1st 5 of ZipCode for match --&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE '%' + LOWER(&lt;DigitsNotEmpty/&gt;) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE '%' + LOWER(&lt;DigitsNotEmpty/&gt;) + '%' and City LIKE '%' + LOWER(&lt;Attribute&gt;../LabAddress/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			
+			&lt;!-- Look for 3+ character non-ordinal and non-street string in extracted Address1 and City or 1st 5 of ZipCode for match --&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE '%' + LOWER(&lt;StreetNotEmpty/&gt;) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE '%' + LOWER(&lt;StreetNotEmpty/&gt;) + '%' and City LIKE LOWER(&lt;Attribute&gt;../LabAddress/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+				
+			&lt;!-- Look for Name of extracted LabName, minus common phrases, and matching LabName for match --&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + REPLACE(REPLACE(REPLACE(REPLACE(&lt;Attribute SelectionMode='FIRST'&gt;../LabName&lt;/Attribute&gt;, ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%') + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(&lt;Attribute SelectionMode='FIRST'&gt;../LabName&lt;/Attribute&gt;, ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 'CENTER', '%') + '%'&lt;/SQL&gt;&lt;/Query&gt;
+					
+			&lt;!-- Look for substring of extracted LabName and matching Street Number, City, or Zip for match --&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FirstTwoWordsLabNotEmpty/&gt;) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FirstTwoWordsLabNotEmpty/&gt;) + '%' and City LIKE '%' + LOWER(&lt;Attribute&gt;../LabAddress/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FirstTwoWordsLabNotEmpty/&gt;) + '%' and Address1 LIKE '%' + LOWER(&lt;DigitsNotEmpty/&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+						
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FiveCharLabNotEmpty/&gt;) + '%' + LOWER(&lt;SecondWordLabNotEmpty/&gt;) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FiveCharLabNotEmpty/&gt;) + '%' + LOWER(&lt;SecondWordLabNotEmpty/&gt;) + '%' and City LIKE '%' + LOWER(&lt;Attribute&gt;../LabAddress/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FiveCharLabNotEmpty/&gt;) + '%' + LOWER(&lt;SecondWordLabNotEmpty/&gt;) + '%' and Address1 LIKE '%' + LOWER(&lt;DigitsNotEmpty/&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+					
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FiveCharLabNotEmpty/&gt;) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FiveCharLabNotEmpty/&gt;) + '%' and City LIKE '%' + LOWER(&lt;Attribute&gt;../LabAddress/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FiveCharLabNotEmpty/&gt;) + '%' and Address1 LIKE '%' + LOWER(&lt;DigitsNotEmpty/&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+				
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;SecondWordLabNotEmpty/&gt;) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;SecondWordLabNotEmpty/&gt;) + '%' and City LIKE '%' + LOWER(&lt;Attribute&gt;../LabAddress/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;SecondWordLabNotEmpty/&gt;) + '%' and Address1 LIKE '%' + LOWER(&lt;DigitsNotEmpty/&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			
+			
+			&lt;!-- Look for LabName substrings after replacement and also for Zip or City --&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute SelectionMode='FIRST'&gt;../LabName&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 10) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute SelectionMode='FIRST'&gt;../LabName&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 10) + '%' and City LIKE '%' + LOWER(&lt;Attribute&gt;../LabAddress/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute SelectionMode='FIRST'&gt;../LabName&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 3) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			
+			
+			&lt;!-- Look for Digits and 3+ character non-directional and not-street string in extracted Address1 --&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE '%' + LOWER(&lt;DigitsNotEmpty/&gt;) + '%' + LOWER(&lt;StreetNotEmpty/&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			
+			&lt;!-- Look for 1st two words then 1st two words after 1st 5-letter word for match --&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FirstTwoWordsLabNotEmpty/&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FiveCharLabNotEmpty/&gt;) + '%' + LOWER(&lt;SecondWordLabNotEmpty/&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			
+			&lt;!-- Look for substring of extracted labname + extracted City in LabName for match --&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FiveCharLabNotEmpty/&gt;) + '%' + LOWER(&lt;Attribute&gt;../LabAddress/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			
+			&lt;!-- Look for entire ZipCode in extracted Zip for match --&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Zip LIKE LOWER(&lt;Attribute&gt;../LabAddress/ZipCode&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			
+			&lt;!-- Look for just first 5 of ZipCode in extracted Zip for match --&gt;
+			&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Zip LIKE SUBSTRING(&lt;Attribute&gt;../LabAddress/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;</value>
   </data>
   <data name="_epicDOBTextBox.ValidationQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
@@ -190,12 +280,12 @@
 &lt;Query&gt;&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest, AlternateTestName, LabOrderTest WHERE LabTest.TestCode = AlternateTestName.TestCode AND LabTest.TestCode = LabOrderTest.TestCode AND LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) AND AlternateTestName.Name = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,50)&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) AND LabTest.TestCode = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;</value>
   </data>
-  <metadata name="_orderNumberColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="_orderNumberColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_testDisplayName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_testDisplayName.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="_testDisplayName.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query&gt;
 &lt;SQL SpatialMode='IfNotBlank'&gt;SELECT DisplayName FROM LabOrder WHERE Code = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,25)
@@ -217,18 +307,18 @@
 	&lt;/Expression&gt;
 &lt;/Query&gt;</value>
   </data>
-  <metadata name="_testValueColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="_testValueColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_testUnitsColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_testUnitsColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_testRefRangeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_testRefRangeColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
-  <metadata name="_testFlagColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="_testFlagColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="_testFlagColumn.ValidationQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
 	&lt;Attribute Name='Flag'&gt;.&lt;/Attribute&gt;
@@ -313,9 +403,9 @@
 	&lt;/Expression&gt;
 &lt;/Query&gt;</value>
   </data>
-  <metadata name="_resultStatusColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="_resultStatusColumn.UserAddedColumn" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="_testNameTextBox.ValidationQuery" xml:space="preserve">
     <value>&lt;Query ValidationListType='ValidationListOnly'&gt;
 &lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) ORDER BY LabTest.OfficialName&lt;/SQL&gt;
