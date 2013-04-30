@@ -80,15 +80,6 @@
             this._originalNameTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._testNameTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._laboratoryTestTable = new Extract.DataEntry.DataEntryTable();
-            this._orderNumberColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._testName = new Extract.DataEntry.DataEntryTableColumn();
-            this._testDisplayName = new Extract.DataEntry.DataEntryTableColumn();
-            this._testID = new Extract.DataEntry.DataEntryTableColumn();
-            this._testValueColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._testUnitsColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._testRefRangeColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._testFlagColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._resultStatusColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._componentLevelStatus = new Extract.DataEntry.DataEntryTextBox();
             this._componentLevelFlag = new Extract.DataEntry.DataEntryTextBox();
             this._componentLevelRange = new Extract.DataEntry.DataEntryTextBox();
@@ -110,6 +101,15 @@
             this._testsGroupBox = new System.Windows.Forms.GroupBox();
             this._defaultLabID = new Extract.DataEntry.DataEntryTextBox();
             this._defaultLabIdentifier = new Extract.DataEntry.DataEntryTextBox();
+            this._orderNumberColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._testName = new Extract.DataEntry.DataEntryTableColumn();
+            this._testDisplayName = new Extract.DataEntry.DataEntryTableColumn();
+            this._testID = new Extract.DataEntry.DataEntryTableColumn();
+            this._testValueColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._testUnitsColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._testRefRangeColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._testFlagColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._resultStatusColumn = new Extract.DataEntry.DataEntryTableColumn();
             _resultCodeLabel = new System.Windows.Forms.Label();
             _testNameLabel = new System.Windows.Forms.Label();
             panelGroupBox = new System.Windows.Forms.GroupBox();
@@ -143,7 +143,7 @@
             // 
             // panelGroupBox
             // 
-            panelGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            panelGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             panelGroupBox.Controls.Add(this._panelTable);
             panelGroupBox.Controls.Add(this._labID);
@@ -159,10 +159,10 @@
             // 
             // _panelTable
             // 
-            this._panelTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
             this._panelTable.AllowDrop = true;
             this._panelTable.AllowUserToResizeRows = false;
+            this._panelTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._panelTable.AttributeName = "Panel";
             this._panelTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._panelTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
@@ -606,7 +606,7 @@
             this._patientRecordNum.Size = new System.Drawing.Size(199, 20);
             this._patientRecordNum.TabIndex = 11;
             this._patientRecordNum.ValidationErrorMessage = "Invalid medical record number";
-            this._patientRecordNum.ValidationPattern = "(?i)^[MZ]?\\d+\\s?$";
+            this._patientRecordNum.ValidationPattern = "^\\d+\\s?$";
             // 
             // _patientMRLabel
             // 
@@ -724,115 +724,6 @@
             this._laboratoryTestTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._laboratoryTestTable.Size = new System.Drawing.Size(666, 178);
             this._laboratoryTestTable.TabIndex = 0;
-            // 
-            // _orderNumberColumn
-            // 
-            this._orderNumberColumn.AttributeName = "OrderNumber";
-            this._orderNumberColumn.FillWeight = 50F;
-            this._orderNumberColumn.HeaderText = "Order #";
-            this._orderNumberColumn.Name = "_orderNumberColumn";
-            this._orderNumberColumn.SupportsSwiping = false;
-            this._orderNumberColumn.ValidationErrorMessage = "Order number is required";
-            this._orderNumberColumn.ValidationPattern = "^\\d+\\s?$";
-            // 
-            // _testName
-            // 
-            this._testName.AttributeName = "Name";
-            this._testName.AutoUpdateQuery = "<Query><SQL>SELECT Name FROM LabOrder WHERE Code = SUBSTRING(<Attribute>../EpicCo" +
-    "de</Attribute>,1,25)</SQL></Query>\r\n";
-            this._testName.FillWeight = 1F;
-            this._testName.HeaderText = "Official Name";
-            this._testName.Name = "_testName";
-            this._testName.ValidationErrorMessage = "";
-            this._testName.ValidationQuery = "";
-            this._testName.Visible = false;
-            // 
-            // _testDisplayName
-            // 
-            this._testDisplayName.AttributeName = "DisplayName";
-            this._testDisplayName.AutoUpdateQuery = resources.GetString("_testDisplayName.AutoUpdateQuery");
-            this._testDisplayName.FillWeight = 120F;
-            this._testDisplayName.HeaderText = "Order Name";
-            this._testDisplayName.Name = "_testDisplayName";
-            this._testDisplayName.SmartHintsEnabled = true;
-            this._testDisplayName.ValidationErrorMessage = "Order name is not recognized.";
-            this._testDisplayName.ValidationQuery = resources.GetString("_testDisplayName.ValidationQuery");
-            // 
-            // _testID
-            // 
-            this._testID.AttributeName = "EpicCode";
-            this._testID.AutoUpdateQuery = "<SQL>SELECT Code FROM LabOrder WHERE DisplayName = SUBSTRING(<Attribute>../Displa" +
-    "yName</Attribute>,1,50)</SQL>";
-            this._testID.FillWeight = 45F;
-            this._testID.HeaderText = "Epic Code";
-            this._testID.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.Last;
-            this._testID.Name = "_testID";
-            this._testID.TabStopMode = Extract.DataEntry.TabStopMode.Never;
-            this._testID.ValidationErrorMessage = "Order code is not recognized.";
-            this._testID.ValidationQuery = "<SQL>SELECT EpicCode FROM LabOrder WHERE EpicCode IS NOT NULL ORDER BY EpicCode</" +
-    "SQL>";
-            this._testID.Visible = false;
-            // 
-            // _testValueColumn
-            // 
-            this._testValueColumn.AttributeName = "Value";
-            this._testValueColumn.AutoUpdateQuery = "<Query Default=\'true\'><Attribute SelectionMode=\'First\'>../Component/Value</Attrib" +
-    "ute></Query>";
-            this._testValueColumn.FillWeight = 70F;
-            this._testValueColumn.HeaderText = "Value";
-            this._testValueColumn.Name = "_testValueColumn";
-            this._testValueColumn.SmartHintsEnabled = true;
-            this._testValueColumn.ValidationErrorMessage = "Invalid value";
-            // 
-            // _testUnitsColumn
-            // 
-            this._testUnitsColumn.AttributeName = "Units";
-            this._testUnitsColumn.AutoUpdateQuery = "<Query Default=\'true\'><Attribute SelectionMode=\'First\'>../Component/Units</Attrib" +
-    "ute></Query>";
-            this._testUnitsColumn.FillWeight = 40F;
-            this._testUnitsColumn.HeaderText = "Units";
-            this._testUnitsColumn.Name = "_testUnitsColumn";
-            this._testUnitsColumn.SmartHintsEnabled = true;
-            this._testUnitsColumn.ValidationCorrectsCase = false;
-            this._testUnitsColumn.ValidationErrorMessage = "Invalid value";
-            this._testUnitsColumn.ValidationQuery = "<Query ValidationListType=\'ValidationListOnly\'>\r\n[BLANK]\r\n<SQL>SELECT Unit FROM Unit" +
-    " ORDER BY Unit</SQL>\r\n</Query>";
-            // 
-            // _testRefRangeColumn
-            // 
-            this._testRefRangeColumn.AttributeName = "Range";
-            this._testRefRangeColumn.AutoUpdateQuery = "<Query Default=\'true\'><Attribute SelectionMode=\'First\'>../Component/Range</Attrib" +
-    "ute></Query>";
-            this._testRefRangeColumn.FillWeight = 70F;
-            this._testRefRangeColumn.HeaderText = "Ref. Range";
-            this._testRefRangeColumn.Name = "_testRefRangeColumn";
-            this._testRefRangeColumn.SmartHintsEnabled = true;
-            this._testRefRangeColumn.ValidationErrorMessage = "Invalid value";
-            // 
-            // _testFlagColumn
-            // 
-            this._testFlagColumn.AttributeName = "Flag";
-            this._testFlagColumn.AutoUpdateQuery = "<Query Default=\'true\'><Attribute SelectionMode=\'First\'>../Component/Flag</Attribu" +
-    "te></Query>";
-            this._testFlagColumn.FillWeight = 50F;
-            this._testFlagColumn.HeaderText = "Flag";
-            this._testFlagColumn.Name = "_testFlagColumn";
-            this._testFlagColumn.SmartHintsEnabled = true;
-            this._testFlagColumn.UseComboBoxCells = true;
-            this._testFlagColumn.ValidationErrorMessage = "Invalid value";
-            this._testFlagColumn.ValidationQuery = resources.GetString("_testFlagColumn.ValidationQuery");
-            // 
-            // _resultStatusColumn
-            // 
-            this._resultStatusColumn.AttributeName = "Status";
-            this._resultStatusColumn.AutoUpdateQuery = "<Query Default=\'True\'>F</Query>";
-            this._resultStatusColumn.FillWeight = 40F;
-            this._resultStatusColumn.HeaderText = "Status";
-            this._resultStatusColumn.Name = "_resultStatusColumn";
-            this._resultStatusColumn.TabStopMode = Extract.DataEntry.TabStopMode.Never;
-            this._resultStatusColumn.UseComboBoxCells = true;
-            this._resultStatusColumn.ValidationErrorMessage = "Invalid value";
-            this._resultStatusColumn.ValidationQuery = "C\r\nF\r\nP\r\nR\r\nX";
             // 
             // _componentLevelStatus
             // 
@@ -1107,6 +998,115 @@
             this._defaultLabIdentifier.ValidationQuery = "";
             this._defaultLabIdentifier.Visible = false;
             // 
+            // _orderNumberColumn
+            // 
+            this._orderNumberColumn.AttributeName = "OrderNumber";
+            this._orderNumberColumn.FillWeight = 50F;
+            this._orderNumberColumn.HeaderText = "Order #";
+            this._orderNumberColumn.Name = "_orderNumberColumn";
+            this._orderNumberColumn.SupportsSwiping = false;
+            this._orderNumberColumn.ValidationErrorMessage = "Order number is required";
+            this._orderNumberColumn.ValidationPattern = "^(\\d{8,})|(pr)\\s?$";
+            // 
+            // _testName
+            // 
+            this._testName.AttributeName = "Name";
+            this._testName.AutoUpdateQuery = "<Query><SQL>SELECT Name FROM LabOrder WHERE Code = SUBSTRING(<Attribute>../EpicCo" +
+    "de</Attribute>,1,25)</SQL></Query>\r\n";
+            this._testName.FillWeight = 1F;
+            this._testName.HeaderText = "Official Name";
+            this._testName.Name = "_testName";
+            this._testName.ValidationErrorMessage = "";
+            this._testName.ValidationQuery = "";
+            this._testName.Visible = false;
+            // 
+            // _testDisplayName
+            // 
+            this._testDisplayName.AttributeName = "DisplayName";
+            this._testDisplayName.AutoUpdateQuery = resources.GetString("_testDisplayName.AutoUpdateQuery");
+            this._testDisplayName.FillWeight = 120F;
+            this._testDisplayName.HeaderText = "Order Name";
+            this._testDisplayName.Name = "_testDisplayName";
+            this._testDisplayName.SmartHintsEnabled = true;
+            this._testDisplayName.ValidationErrorMessage = "Order name is not recognized.";
+            this._testDisplayName.ValidationQuery = resources.GetString("_testDisplayName.ValidationQuery");
+            // 
+            // _testID
+            // 
+            this._testID.AttributeName = "EpicCode";
+            this._testID.AutoUpdateQuery = "<SQL>SELECT Code FROM LabOrder WHERE DisplayName = SUBSTRING(<Attribute>../Displa" +
+    "yName</Attribute>,1,50)</SQL>";
+            this._testID.FillWeight = 45F;
+            this._testID.HeaderText = "Epic Code";
+            this._testID.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.Last;
+            this._testID.Name = "_testID";
+            this._testID.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this._testID.ValidationErrorMessage = "Order code is not recognized.";
+            this._testID.ValidationQuery = "<SQL>SELECT EpicCode FROM LabOrder WHERE EpicCode IS NOT NULL ORDER BY EpicCode</" +
+    "SQL>";
+            this._testID.Visible = false;
+            // 
+            // _testValueColumn
+            // 
+            this._testValueColumn.AttributeName = "Value";
+            this._testValueColumn.AutoUpdateQuery = "<Query Default=\'true\'><Attribute SelectionMode=\'First\'>../Component/Value</Attrib" +
+    "ute></Query>";
+            this._testValueColumn.FillWeight = 70F;
+            this._testValueColumn.HeaderText = "Value";
+            this._testValueColumn.Name = "_testValueColumn";
+            this._testValueColumn.SmartHintsEnabled = true;
+            this._testValueColumn.ValidationErrorMessage = "Invalid value";
+            // 
+            // _testUnitsColumn
+            // 
+            this._testUnitsColumn.AttributeName = "Units";
+            this._testUnitsColumn.AutoUpdateQuery = "<Query Default=\'true\'><Attribute SelectionMode=\'First\'>../Component/Units</Attrib" +
+    "ute></Query>";
+            this._testUnitsColumn.FillWeight = 40F;
+            this._testUnitsColumn.HeaderText = "Units";
+            this._testUnitsColumn.Name = "_testUnitsColumn";
+            this._testUnitsColumn.SmartHintsEnabled = true;
+            this._testUnitsColumn.ValidationCorrectsCase = false;
+            this._testUnitsColumn.ValidationErrorMessage = "Invalid value";
+            this._testUnitsColumn.ValidationQuery = "<Query ValidationListType=\'ValidationListOnly\'>\r\n[BLANK]\r\n<SQL>SELECT Unit FROM U" +
+    "nit ORDER BY Unit</SQL>\r\n</Query>";
+            // 
+            // _testRefRangeColumn
+            // 
+            this._testRefRangeColumn.AttributeName = "Range";
+            this._testRefRangeColumn.AutoUpdateQuery = "<Query Default=\'true\'><Attribute SelectionMode=\'First\'>../Component/Range</Attrib" +
+    "ute></Query>";
+            this._testRefRangeColumn.FillWeight = 70F;
+            this._testRefRangeColumn.HeaderText = "Ref. Range";
+            this._testRefRangeColumn.Name = "_testRefRangeColumn";
+            this._testRefRangeColumn.SmartHintsEnabled = true;
+            this._testRefRangeColumn.ValidationErrorMessage = "Invalid value";
+            // 
+            // _testFlagColumn
+            // 
+            this._testFlagColumn.AttributeName = "Flag";
+            this._testFlagColumn.AutoUpdateQuery = "<Query Default=\'true\'><Attribute SelectionMode=\'First\'>../Component/Flag</Attribu" +
+    "te></Query>";
+            this._testFlagColumn.FillWeight = 50F;
+            this._testFlagColumn.HeaderText = "Flag";
+            this._testFlagColumn.Name = "_testFlagColumn";
+            this._testFlagColumn.SmartHintsEnabled = true;
+            this._testFlagColumn.UseComboBoxCells = true;
+            this._testFlagColumn.ValidationErrorMessage = "Invalid value";
+            this._testFlagColumn.ValidationQuery = resources.GetString("_testFlagColumn.ValidationQuery");
+            // 
+            // _resultStatusColumn
+            // 
+            this._resultStatusColumn.AttributeName = "Status";
+            this._resultStatusColumn.AutoUpdateQuery = "<Query Default=\'True\'>F</Query>";
+            this._resultStatusColumn.FillWeight = 40F;
+            this._resultStatusColumn.HeaderText = "Status";
+            this._resultStatusColumn.Name = "_resultStatusColumn";
+            this._resultStatusColumn.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this._resultStatusColumn.UseComboBoxCells = true;
+            this._resultStatusColumn.ValidationErrorMessage = "Invalid value";
+            this._resultStatusColumn.ValidationQuery = "C\r\nF\r\nP\r\nR\r\nX";
+            // 
             // UITransplantCenterPanel
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -1131,7 +1131,7 @@
             this.HighlightColors = new Extract.DataEntry.HighlightColor[] {
         highlightColor1,
         highlightColor2};
-            this.InvalidDataSaveMode = DataEntry.InvalidDataSaveMode.AllowWithWarnings;
+            this.InvalidDataSaveMode = Extract.DataEntry.InvalidDataSaveMode.AllowWithWarnings;
             this.MinimumSize = new System.Drawing.Size(696, 0);
             this.Name = "UITransplantCenterPanel";
             this.Size = new System.Drawing.Size(696, 978);
