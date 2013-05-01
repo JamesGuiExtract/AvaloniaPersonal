@@ -13,9 +13,138 @@
 <hr>
 
 <UL>
+    	<LI><h2>Installation</h2>
+    	<UL>
+        	<LI>Copy the <b>Demo_IDShield</b> folder from the appropriate build folder 
+		to the test machine.
+		<li>As <b>Administrator</b>, 
+		<ul>
+			<li>Run <b>Clean all.bat</b> to create the database.
+			<li>Run <b>SQL Management Studio</b> and exercise 
+			<b>CreateDomainLogin_AddForDemoDBs.sql</b> from the 
+			<b>I:\Common\Testing\Product Testing\IDShield_Sanity</b> folder.  
+			Note that instructions to update other demo databases can be 
+			removed before executing the query.
+	    	</ul>
+    	</ul>
+<p>
+    	<LI><h2>AutoRedact</h2>
+    	<UL>
+        	<LI>Navigate to the <b>.\DemoFiles\Installs\AutoRedact</b> folder.
+		<li>Run <b>install.bat</b>.
+		<li>Confirm that FPS files have been copied to the 
+		<b>.\Demo_IDShield\FPS</b> folder.
+		<li>Confirm that image files have been copied to the 
+		<b>.\Demo_IDShield\Input</b> folder.
+		<li>Exercise <b>Automatically Perform Redactions.fps</b>.
+		<li><u>Results</u>
+		<ul>
+			<li>Confirm that files successfully queue and process.
+			<li>Confirm that the <b>Input</b> folder contains USS and VOA files 
+			for all <b>14</b> test images.
+			<li>Confirm that the <b>Output</b> folder contains TIF and XML files 
+			for all test images except for <b>TestImage009.tif</b> and 
+			<b>TestImage014.tif</b>.
+			<li>Confirm that <b>all</b> of the images in the <b>Output</b> 
+			folder contain redactions.
+			<li>Confirm that the redactions include an exemption code with 
+			type information.
+		</ul>
+    	</ul>
+<p>
+    	<LI><h2>HybridDemo</h2>
+    	<UL>
+        	<LI>Navigate to the <b>.\DemoFiles\Installs\HybridDemo</b> folder.
+		<li>Run <b>install.bat</b>.
+		<li>Confirm that FPS files have been copied to the 
+		<b>.\Demo_IDShield\FPS</b> folder.
+		<li>Confirm that image files have been copied to the 
+		<b>.\Demo_IDShield\Input</b> folder.
+		<li>Exercise <b>Standard - Compute and Auto Redact.fps</b>.
+		<li><u>Results</u>
+		<ul>
+			<li>Confirm that files successfully queue and process.
+			<li>Confirm that the <b>Input</b> folder contains USS and VOA files 
+			for all <b>30</b> test images.
+			<li>Confirm that the <b>Output</b> folder contains 8 each of 
+			TIF and XML files.
+			<li>Confirm that each TIF image contains redactions with exemption 
+			codes.
+		</ul>
+		<li>Exercise <b>Standard - Verify Redactions.fps</b>.
+		<li><u>Results</u>
+		<ul>
+			<li>Confirm that files presented for verification do not contain 
+			<b>only HCData</b> items.
+			<ul>
+				<li>TestImage013.tif contains HCData but also contains 
+				MCData and Clues items.
+			</ul>
+			<li>Confirm that all <b>18</b> files are now represented in the 
+			<b>Output</b> folder.
+		</ul>
+		<li>Exercise <b>Legislation Guard - Compute and Auto Redact.fps</b>.
+		<li><u>Results</u>
+		<ul>
+			<li>Confirm that <b>30</b> files successfully queue and process.
+			<li>Confirm that the <b>Input</b> folder contains .DOB.VOA files 
+			for all <b>30</b> test images.
+			<li>Confirm that the <b>Output</b> folder contains <b>1</b> 
+			.DOB.XML file (TestImage001.tif.dob.xml).
+			<li>Confirm that the associated TIF image contains the original 
+			SSN redactions plus one new DOB redaction.
+		</ul>
+		<li>Exercise <b>Legislation Guard - Verify DOB Redactions.fps</b>.
+		<li><u>Results</u>
+		<ul>
+			<li>Confirm that the following files are presented for verification.
+			<ul>
+				<li>TestImage008.tif - with existing SSN redaction, 1 Clue, 
+				1 MCData
+				<li>TestImage012.tif - with existing SSN redaction, 1 Clue
+				<li>TestImage018.tif - with existing SSN redaction, 1 Clue, 
+				1 MCData
+			</ul>
+			<li>Confirm that the <b>Output</b> folder contains .DOB.XML files 
+			for each of the above images.
+			<li>Confirm that the associated TIF files also contain DOB redactions.
+		</ul>
+    	</ul>
+<p>
+    	<LI><h2>VerifyAllInterestingDocs</h2>
+    	<UL>
+        	<LI>Navigate to the <b>.\DemoFiles\Installs\VerifyAllInterestingDocs</b> folder.
+		<li>Run <b>install.bat</b>.
+		<li>Confirm that FPS files have been copied to the 
+		<b>.\Demo_IDShield\FPS</b> folder.
+		<li>Confirm that image files have been copied to the 
+		<b>.\Demo_IDShield\Input</b> folder.
+		<li>Exercise <b>Compute Redactions.fps</b>.
+		<li><u>Results</u>
+		<ul>
+			<li>Confirm that files successfully queue and process.
+			<li>Confirm that the <b>Input</b> folder contains USS and VOA files 
+			for all <b>14</b> test images.
+			<li>Confirm that the <b>Output</b> folder is empty.
+		</ul>
+		<li>Exercise <b>Verify Redactions.fps</b>.  Add and resize redactions as 
+		appropriate for each image.
+		<li><u>Results</u>
+		<ul>
+			<li>Confirm that each item and each page must be visited.
+			<li>Confirm that <b>Type</b> can be blank for a manual redaction.
+			<li>Confirm that the <b>Output</b> folder contains TIF and XML files 
+			for all <b>14</b> test images.
+			<li>Confirm that <b>all</b> of the images in the <b>Output</b> 
+			folder contain redactions.
+			<li>Confirm that the redactions include an exemption code with 
+			type information.
+		</ul>
+    	</ul>
+<p>
     	<LI><h2>Miscellaneous</h2>
     	<UL>
-  	   	<LI><b>[FlexIDSCore #3511, #4202, #5017, #5018, #5023]</b> ID Shield Demo
+  	   	<LI><b>[FlexIDSCore #3511, #4202, #5017, #5018, #5023, #5295]</b> ID Shield Demo
 		<ul>
 			<li>Confirm that batch files force the proper working directory before 
 			executing any commands.
@@ -26,11 +155,6 @@
 			<li>Confirm that the FPS files provided for the <b>Verify all interesting 
 			documents</b> are correct.
 		</ul>
-    	</ul>
-<p>
-    	<LI><h2>Section</h2>
-    	<UL>
-        	<LI>TBD
     	</ul>
 </UL>
 </HTML>
