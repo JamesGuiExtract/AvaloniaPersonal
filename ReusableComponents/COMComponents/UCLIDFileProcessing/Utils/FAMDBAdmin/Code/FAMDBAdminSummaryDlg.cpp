@@ -3,7 +3,6 @@
 #include "FAMDBAdminSummaryDlg.h"
 #include "ExportFileListDlg.h"
 #include "SetActionStatusDlg.h"
-#include "ActionStatusCondition.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -107,12 +106,14 @@ IMPLEMENT_DYNAMIC(CFAMDBAdminSummaryDlg, CPropertyPage)
 CFAMDBAdminSummaryDlg::CFAMDBAdminSummaryDlg(void) :
 CPropertyPage(CFAMDBAdminSummaryDlg::IDD),
 m_ipFAMDB(NULL),
+m_ipContextMenuFileSelector(CLSID_FAMFileSelector),
 m_bInitialized(false),
 m_bDeniedFastCountPermission(false),
 m_bUseOracleSyntax(false)
 {
 	try
 	{
+		ASSERT_RESOURCE_ALLOCATION("ELI35684", m_ipContextMenuFileSelector != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI19593");
 }
@@ -121,6 +122,7 @@ CFAMDBAdminSummaryDlg::~CFAMDBAdminSummaryDlg(void)
 {
 	try
 	{
+		m_ipContextMenuFileSelector = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI19594");
 }
@@ -315,16 +317,11 @@ void CFAMDBAdminSummaryDlg::OnNMRClickListActions(NMHDR *pNMHDR, LRESULT *pResul
 				string strFailedFileCount =
 					(LPCTSTR)m_listActions.GetItemText(pNMItemActivate->iItem, giFAILED_COLUMN);
 
-				ActionStatusCondition* pCondition = new ActionStatusCondition();
-				pCondition->setStatus(m_ipFAMDB->AsEActionStatus(strActionStatus.c_str()));
-				pCondition->setStatusString(strContextActionStatusName);		
-				m_nContextMenuActionID = m_ipFAMDB->GetActionID(strContextActionName.c_str()); 
-				pCondition->setActionID(m_nContextMenuActionID);		
-				pCondition->setAction(strContextActionName);
-				pCondition->setUser(gstrANY_USER);
-				
-				m_contextMenuFileSelection.clearConditions();
-				m_contextMenuFileSelection.addCondition(pCondition);
+				m_nContextMenuActionID = m_ipFAMDB->GetActionID(strContextActionName.c_str());
+				EActionStatus esStatus = m_ipFAMDB->AsEActionStatus(strActionStatus.c_str());
+				m_ipContextMenuFileSelector->Reset();
+				m_ipContextMenuFileSelector->AddActionStatusCondition(m_ipFAMDB,
+					m_nContextMenuActionID, esStatus);
 
 				CMenu menu;
 				menu.LoadMenu(IDR_MENU_SUMMARY_CONTEXT);
@@ -355,7 +352,7 @@ void CFAMDBAdminSummaryDlg::OnContextExportFileList()
 	try
 	{
 		// Display the exporting file list dialog
-		CExportFileListDlg dlgExportFiles(m_ipFAMDB, m_contextMenuFileSelection);
+		CExportFileListDlg dlgExportFiles(m_ipFAMDB, m_ipContextMenuFileSelector);
 		dlgExportFiles.DoModal();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31253");
@@ -367,7 +364,7 @@ void CFAMDBAdminSummaryDlg::OnContextSetFileActionStatus()
 	{
 		// Display the set file action status dialog
 		CFAMDBAdminDlg *pFAMDBAdminDlg = (CFAMDBAdminDlg*)AfxGetMainWnd();
-		CSetActionStatusDlg dlgSetActionStatus(m_ipFAMDB, pFAMDBAdminDlg, m_contextMenuFileSelection);
+		CSetActionStatusDlg dlgSetActionStatus(m_ipFAMDB, pFAMDBAdminDlg, m_ipContextMenuFileSelector);
 		dlgSetActionStatus.DoModal();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31254");

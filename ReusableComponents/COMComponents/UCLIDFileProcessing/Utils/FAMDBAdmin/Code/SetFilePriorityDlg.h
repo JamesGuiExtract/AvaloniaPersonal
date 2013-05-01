@@ -6,7 +6,6 @@
 
 #include "resource.h"
 #include "afxwin.h"
-#include "SelectFileSettings.h"
 
 //-------------------------------------------------------------------------------------------------
 // CSetFilePriorityDlg dialog
@@ -45,8 +44,8 @@ private:
 	// The file action manager DB pointer
 	IFileProcessingDBPtr m_ipFAMDB;
 
-	// Settings for the priorities to modify
-	SelectFileSettings m_settings;
+	// Allows the selection of files whose priority is to be changed.
+	UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr m_ipFileSelector;
 
 	////////////
 	//Methods

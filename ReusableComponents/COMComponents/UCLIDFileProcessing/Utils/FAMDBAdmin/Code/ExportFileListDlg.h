@@ -6,7 +6,6 @@
 
 #include "resource.h"
 #include "afxwin.h"
-#include "SelectFileSettings.h"
 
 // ExportFileListDlg.h : header file
 //
@@ -20,7 +19,7 @@ public:
 // Construction
 	CExportFileListDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr pFAMDB);
 	CExportFileListDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr pFAMDB,
-		const SelectFileSettings& selectSettings);
+		UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr ipFileSelector);
 	~CExportFileListDlg();
 
 // Dialog Data
@@ -59,8 +58,8 @@ private:
 	// The file action manager DB pointer
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr m_ipFAMDB;
 
-	// Settings for the export
-	SelectFileSettings m_settings;
+	// Allows the selection of files to export
+	UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr m_ipFileSelector;
 
 	////////////
 	//Methods

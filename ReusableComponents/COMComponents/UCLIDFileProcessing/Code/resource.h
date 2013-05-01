@@ -203,6 +203,34 @@
 #define IDC_CUSTOM1                     2010
 #define IDC_CHK_SKIP_PAGE_COUNT         2011
 #define IDC_BTN_ADVANCED                2012
+#define IDR_FAMFILESELECTOR             2013
+#define IDD_DLG_SELECT_FILES            2014
+#define IDD_DLG_ACTION_STATUS_CONDITION 2015
+#define IDD_DLG_TAG_CONDITION           2016
+#define IDD_DLG_QUERY_CONDITION         2017
+#define IDD_DLG_PRIORITY_CONDITION      2018
+#define IDC_EDIT_SQL_QUERY              2019
+#define IDC_CMB_FILE_ACTION             2020
+#define IDC_CMB_FILE_STATUS             2021
+#define IDC_CMB_FILE_SKIPPED_USER       2022
+#define IDC_GROUP_SELECT                2023
+#define IDC_SLCT_FILE_QUERY_LABEL       2024
+#define IDC_SELECT_BTN_OK               2025
+#define IDC_SELECT_BTN_CANCEL           2026
+#define IDC_CMB_ANY_ALL_TAGS            2027
+#define IDC_SELECT_LIST_TAGS            2028
+#define IDC_CMB_FILE_PRIORITY           2029
+#define IDC_CHECK_LIMIT_SCOPE           2030
+#define IDC_EDIT_LIMIT_SCOPE            2031
+#define IDC_CMB_LIMIT_SCOPE_UNITS       2032
+#define IDC_LIST_CONDITIONS             2033
+#define IDC_CMB_CONDITION_TYPE          2034
+#define IDC_RADIO_AND                   2035
+#define IDC_RADIO_OR                    2036
+#define IDC_BTN_ADD_CONDITION           2037
+#define IDC_BTN_MODIFY_CONDITION        2038
+#define IDC_BTN_DELETE_CONDITION        2039
+#define IDC_CMB_LIMIT_SCOPE_METHOD      2040
 #define IDC_BTN_RUN                     32768
 #define IDC_BTN_STOP                    32769
 #define IDC_BTN_AUTO_SCROLL             32770
@@ -246,9 +274,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        2013
+#define _APS_NEXT_RESOURCE_VALUE        2041
 #define _APS_NEXT_COMMAND_VALUE         32814
-#define _APS_NEXT_CONTROL_VALUE         2013
-#define _APS_NEXT_SYMED_VALUE           2001
+#define _APS_NEXT_CONTROL_VALUE         2041
+#define _APS_NEXT_SYMED_VALUE           2041
 #endif
 #endif

@@ -1,7 +1,6 @@
 #pragma once
 #include "afxdlgs.h"
 #include "resource.h"
-#include "SelectFilesDlg.h"
 
 #include <string>
 #include <stack>
@@ -62,7 +61,7 @@ private:
 
 	// Stores file selection information based on the right-click location in the summary grid for
 	// use by the "Set file action status" and "Export file list" context menu options.
-	SelectFileSettings m_contextMenuFileSelection;
+	UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr m_ipContextMenuFileSelector;
 
 	// The action ID associated with the context menu click location.
 	long m_nContextMenuActionID;

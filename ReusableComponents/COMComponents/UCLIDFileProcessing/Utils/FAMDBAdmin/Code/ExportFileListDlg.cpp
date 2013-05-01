@@ -4,7 +4,6 @@
 #include "stdafx.h"
 #include "ExportFileListDlg.h"
 #include "FAMDBAdminUtils.h"
-#include "SelectFilesDlg.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -28,21 +27,24 @@ const string gstrSQL_DISPLAY_SELECT_VALUES = "FAMFile.FileName";
 //-------------------------------------------------------------------------------------------------
 CExportFileListDlg::CExportFileListDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB)
 : CDialog(CExportFileListDlg::IDD),
-m_ipFAMDB(ipFAMDB)
+m_ipFAMDB(ipFAMDB),
+m_ipFileSelector(CLSID_FAMFileSelector)
 {
 	//{{AFX_DATA_INIT(CExportFileListDlg)
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 	ASSERT_ARGUMENT("ELI31250", ipFAMDB != __nullptr);
+	ASSERT_ARGUMENT("ELI35686", m_ipFileSelector != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CExportFileListDlg::CExportFileListDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
-	const SelectFileSettings &selectSettings)
+	UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr ipFileSelector)
 : CDialog(CExportFileListDlg::IDD)
 , m_ipFAMDB(ipFAMDB)
-, m_settings(selectSettings)
+, m_ipFileSelector(ipFileSelector)
 {
 	ASSERT_ARGUMENT("ELI31251", ipFAMDB != __nullptr);
+	ASSERT_ARGUMENT("ELI35687", m_ipFileSelector != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CExportFileListDlg::~CExportFileListDlg()
@@ -50,6 +52,7 @@ CExportFileListDlg::~CExportFileListDlg()
 	try
 	{
 		m_ipFAMDB = __nullptr;
+		m_ipFileSelector = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27682");
 }
@@ -89,7 +92,7 @@ BOOL CExportFileListDlg::OnInitDialog()
 		updateControls();
 
 		// Update the summary with the settings string
-		m_editSummary.SetWindowText(m_settings.getSummaryString().c_str());
+		m_editSummary.SetWindowText(asString(m_ipFileSelector->GetSummaryString()).c_str());
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14730")
 
@@ -142,17 +145,16 @@ void CExportFileListDlg::OnClickedSelectFiles()
 
 	try
 	{
-		CSelectFilesDlg dlg(m_ipFAMDB, "Select filenames to export", 
-			"SELECT " + gstrSQL_DISPLAY_SELECT_VALUES + " FROM FAMFile", m_settings);
+		// Display the select files configuration dialog
+		bool bAppliedSettings = asCppBool(m_ipFileSelector->Configure(m_ipFAMDB,
+			"Select filenames to export",
+			get_bstr_t("SELECT " + gstrSQL_DISPLAY_SELECT_VALUES + " FROM FAMFile")));
 
-		// Display the dialog and save changes if user clicked OK
-		if (dlg.DoModal() == IDOK)
+		// Update the summary text if new settings were applied.
+		if (bAppliedSettings)
 		{
-			// Get the settings from the dialog
-			m_settings = dlg.getSettings();
-
-			// Update the summary description
-			m_editSummary.SetWindowText(m_settings.getSummaryString().c_str());
+			string strSummaryString = asString(m_ipFileSelector->GetSummaryString());
+			m_editSummary.SetWindowText(strSummaryString.c_str());
 		}
 
 		updateControls();
@@ -195,12 +197,12 @@ void CExportFileListDlg::OnClickedOK()
 		CWaitCursor wait;
 
 		// Build the query from the settings
-		string strQuery = m_settings.buildQuery(m_ipFAMDB, gstrSQL_SELECT_VALUES, 
+		string strQuery = m_ipFileSelector->BuildQuery(m_ipFAMDB, gstrSQL_SELECT_VALUES.c_str(),
 			" ORDER BY [FAMFile].[ID]");
 
 		// Call ExportFileList() to export the file list and get a count of exported files
 		long lNumFilesExported = m_ipFAMDB->ExportFileList(strQuery.c_str(), _bstrFileName,
-			m_settings.getRandomCondition());
+			__nullptr);
 
 		// Prompt the users that exporting files is finished and
 		// if they want to open the file contains the file list

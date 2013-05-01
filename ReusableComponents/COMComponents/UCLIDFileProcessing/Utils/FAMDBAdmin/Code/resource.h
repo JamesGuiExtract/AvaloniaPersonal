@@ -18,7 +18,6 @@
 #define IDR_ACCELERATORS                132
 #define IDD_DIALOG_SELECT_REPORT        133
 #define IDD_DIALOG_CLEAR_WARNING        134
-#define IDD_DLG_SELECT_FILES            135
 #define IDR_MANAGE_TAG_ACCELERATORS     136
 #define IDD_DIALOG_SET_PROCESSING_PRIORITY 137
 #define IDD_DIALOG_MANAGE_USER_COUNTERS 138
@@ -27,7 +26,6 @@
 #define IDR_MANAGE_ACTIONS_ACCELERATORS 141
 #define IDR_MANAGE_LOGIN_USERS_ACCELERATORS 142
 #define IDR_MENU_SUMMARY_CONTEXT        143
-#define IDD_DLG_ACTION_STATUS_CONDITION 144
 
 // Database Page ID's
 // These ID's need to be the same in every .h project that uses the Database Page object
@@ -70,11 +68,8 @@
 #define IDC_RADIO_STATUS                2016
 #define IDC_RADIO_SQL_QUERY             2017
 #define IDC_EDIT_QUERY                  2018
-#define IDC_EDIT_SQL_QUERY              2019
 #define IDC_CMB_ACTION_SET              2020
 #define IDC_RADIO_FILES_UNDER_STATUS    2021
-#define IDC_CMB_FILE_ACTION             2022
-#define IDC_CMB_FILE_STATUS             2023
 #define IDC_RADIO_NEW_STATUS            2024
 #define IDC_CMB_NEW_STATUS              2025
 #define IDC_RADIO_STATUS_OF_ACTION      2026
@@ -89,15 +84,10 @@
 #define ID_RUN_REPORT_OK                2037
 #define IDC_CHECK_RETAIN_ACTIONS        2038
 #define IDC_CAPTION                     2039
-#define IDC_CMB_FILE_SKIPPED_USER       2040
-#define IDC_GROUP_SELECT                2041
 #define IDC_EDIT_FL_SLCT_SMRY_STATUS    2042
 #define IDC_BTN_SLCT_FLS_STATUS         2043
 #define IDC_EDIT_FL_SLCT_SMRY_EXPORT    2044
 #define IDC_BTN_SLCT_FLS_EXPORT         2045
-#define IDC_SLCT_FILE_QUERY_LABEL       2046
-#define IDC_SELECT_BTN_OK               2047
-#define IDC_SELECT_BTN_CANCEL           2048
 #define IDD_DIALOG_MANAGE_TAGS          2049
 #define IDC_LIST_TAGS                   2050
 #define IDC_BTN_ADD_TAG                 2051
@@ -111,15 +101,10 @@
 #define IDC_BTN_ADD_TAG_OK              2059
 #define IDC_BTN_ADD_TAG_CANCEL          2060
 #define IDC_RADIO_TAGGED_FILES          2061
-#define IDC_CMB_ANY_ALL_TAGS            2062
-#define IDC_SELECT_LIST_TAGS            2063
 #define IDC_RADIO_FILE_PRIORITY         2064
-#define IDC_CMB_FILE_PRIORITY           2065
 #define IDC_EDIT_FL_SLCT_SMRY_PRIORITY  2066
 #define IDC_BTN_SLCT_FLS_PRIORITY       2067
 #define IDC_CMB_FL_SLCT_PRIORITY        2068
-#define IDC_CHECK_LIMIT_SCOPE           2069
-#define IDC_EDIT_LIMIT_SCOPE            2070
 #define IDC_LIST_USER_COUNTERS          2071
 #define IDC_BTN_ADD_COUNTER             2072
 #define IDC_BTN_RENAME_COUNTER          2073
@@ -131,7 +116,6 @@
 #define IDC_EDIT_COUNTER_VALUE          2079
 #define IDC_BTN_ADD_COUNTER_OK          2080
 #define IDC_BTN_ADD_COUNTER_CANCEL      2081
-#define IDC_CMB_LIMIT_SCOPE_UNITS       2082
 #define IDD_DIALOG_MANAGE_USERS         2083
 #define IDC_LIST_USERS                  2084
 #define IDC_BTN_ADD_USER                2085
@@ -147,17 +131,6 @@
 #define IDC_BTN_REFRESH_ACTIONS         2095
 #define IDC_BTN_ACTION_CLOSE            2096
 #define IDC_BTN_CLEAR_USER_PASSWORD     2097
-#define IDC_LIST_CONDITIONS             2098
-#define IDC_CMB_CONDITION_TYPE          2099
-#define IDC_RADIO_AND                   2100
-#define IDC_RADIO_OR                    2101
-#define IDC_BTN_ADD_CONDITION           2102
-#define IDC_BTN_MODIFY_CONDITION        2103
-#define IDC_BTN_DELETE_CONDITION        2104
-#define IDD_DLG_TAG_CONDITION           2105
-#define IDD_DLG_QUERY_CONDITION         2106
-#define IDD_DLG_PRIORITY_CONDITION      2107
-#define IDC_CMB_LIMIT_SCOPE_METHOD      2108
 #define ID_DATABASE_SELECT              32772
 #define ID_DATABASE_CLEAR               32773
 #define ID_DATABASE_RESETLOCK           32774

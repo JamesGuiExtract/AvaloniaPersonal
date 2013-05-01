@@ -16,6 +16,7 @@
 #include "FPCategories.h"
 #include "FAMTagManager.h"
 #include "FileProcessingTaskExecutor.h"
+#include "FAMFileSelector.h"
 
 #include <ComUtils.h>
 
@@ -26,6 +27,7 @@ OBJECT_ENTRY(CLSID_FileProcessingManager, CFileProcessingManager)
 OBJECT_ENTRY(CLSID_FileSupplierData, CFileSupplierData)
 OBJECT_ENTRY(CLSID_FAMTagManager, CFAMTagManager)
 OBJECT_ENTRY(CLSID_FileProcessingTaskExecutor, CFileProcessingTaskExecutor)
+OBJECT_ENTRY(CLSID_FAMFileSelector, CFAMFileSelector)
 END_OBJECT_MAP()
 
 class CUCLIDFileProcessingApp : public CWinApp

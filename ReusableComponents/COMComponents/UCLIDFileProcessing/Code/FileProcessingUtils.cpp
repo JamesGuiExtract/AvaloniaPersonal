@@ -45,3 +45,15 @@ const string CFileProcessingUtils::ExpandTagsAndTFE(UCLID_FILEPROCESSINGLib::IFA
 
 	return strExpandedFile;
 }
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingUtils::addStatusInComboBox(CComboBox& comboStatus)
+{
+	// Insert the action status to the ComboBox
+	// The items are inserted the same order as the EActionStatus in FAM
+	comboStatus.InsertString(0, "Unattempted");
+	comboStatus.InsertString(1, "Pending");
+	comboStatus.InsertString(2, "Processing");
+	comboStatus.InsertString(3, "Completed");
+	comboStatus.InsertString(4, "Failed");
+	comboStatus.InsertString(5, "Skipped");
+}

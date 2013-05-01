@@ -4,7 +4,6 @@
 #include "stdafx.h"
 #include "SetFilePriorityDlg.h"
 #include "FAMDBAdminUtils.h"
-#include "SelectFilesDlg.h"
 
 #include <ADOUtils.h>
 #include <cpputil.h>
@@ -29,8 +28,11 @@ const string gstrSQL_DISPLAY_SELECT_VALUES = "FAMFile.ID";
 //-------------------------------------------------------------------------------------------------
 CSetFilePriorityDlg::CSetFilePriorityDlg(IFileProcessingDBPtr ipFAMDB)
 : CDialog(CSetFilePriorityDlg::IDD),
-m_ipFAMDB(ipFAMDB)
+m_ipFAMDB(ipFAMDB),
+m_ipFileSelector(CLSID_FAMFileSelector)
 {
+	ASSERT_RESOURCE_ALLOCATION("ELI35685", m_ipFAMDB != __nullptr);
+	ASSERT_RESOURCE_ALLOCATION("ELI35683", m_ipFileSelector != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CSetFilePriorityDlg::~CSetFilePriorityDlg()
@@ -38,6 +40,7 @@ CSetFilePriorityDlg::~CSetFilePriorityDlg()
 	try
 	{
 		m_ipFAMDB = __nullptr;
+		m_ipFileSelector = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27687");
 }
@@ -85,7 +88,7 @@ BOOL CSetFilePriorityDlg::OnInitDialog()
 		m_comboPriority.SetCurSel(nIndex);
 
 		// Update the summary with the settings string
-		m_editSummary.SetWindowText(m_settings.getSummaryString().c_str());
+		m_editSummary.SetWindowText(asString(m_ipFileSelector->GetSummaryString()).c_str());
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27688");
 
@@ -98,17 +101,15 @@ void CSetFilePriorityDlg::OnClickedSelectFiles()
 
 	try
 	{
-		CSelectFilesDlg dlg(m_ipFAMDB, "Select files to modify priority", 
-			"SELECT " + gstrSQL_DISPLAY_SELECT_VALUES + " FROM FAMFile", m_settings);
+		bool bAppliedSettings = asCppBool(m_ipFileSelector->Configure(m_ipFAMDB,
+			"Select files to modify priority",
+			get_bstr_t("SELECT " + gstrSQL_DISPLAY_SELECT_VALUES + " FROM FAMFile")));
 
-		// Display the dialog and save changes if user clicked OK
-		if (dlg.DoModal() == IDOK)
+		// Update the summary text if new settings were applied.
+		if (bAppliedSettings)
 		{
-			// Get the settings from the dialog
-			m_settings = dlg.getSettings();
-
-			// Update the summary description
-			m_editSummary.SetWindowText(m_settings.getSummaryString().c_str());
+			string strSummaryString = asString(m_ipFileSelector->GetSummaryString());
+			m_editSummary.SetWindowText(strSummaryString.c_str());
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27689");
@@ -125,7 +126,8 @@ void CSetFilePriorityDlg::OnClickedOK()
 		CWaitCursor wait;
 
 		// Build the query for setting priority
-		string strQuery = m_settings.buildQuery(m_ipFAMDB, gstrSQL_SELECT_VALUE, "");
+		string strQuery =
+				asString(m_ipFileSelector->BuildQuery(m_ipFAMDB, gstrSQL_SELECT_VALUE.c_str(), ""));
 
 		// Get the priority string
 		CString zPriority;
@@ -133,7 +135,7 @@ void CSetFilePriorityDlg::OnClickedOK()
 
 		// Execute the update query
 		long nNumRecords = m_ipFAMDB->SetPriorityForFiles(strQuery.c_str(),
-			(EFilePriority)(m_comboPriority.GetCurSel()+1), m_settings.getRandomCondition());
+			(EFilePriority)(m_comboPriority.GetCurSel()+1), __nullptr);
 
 		// Prompt the users that the priority has been changed.
 		CString zPrompt;

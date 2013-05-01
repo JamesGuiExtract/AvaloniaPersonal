@@ -1216,7 +1216,11 @@ library UCLID_FILEPROCESSINGLib
 		[propput, id(107), helpstring("property AdvancedConnectionStringProperties")]
 			HRESULT AdvancedConnectionStringProperties([in] BSTR newVal);		
 		[propget, id(107), helpstring("property AdvancedConnectionStringProperties")]
-			HRESULT AdvancedConnectionStringProperties([out, retval] BSTR* pVal);	
+			HRESULT AdvancedConnectionStringProperties([out, retval] BSTR* pVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To take an EActionStatus and return the corresponding name
+		[id(108), helpstring("method AsStatusName")] HRESULT AsStatusName(
+			[in] EActionStatus eaStatus, [out, retval] BSTR* bstrStatusName);
 	};
 
 	[
@@ -1712,7 +1716,58 @@ library UCLID_FILEPROCESSINGLib
 		// if the settings were updated and VARIANT_FALSE if they were not updated.
 		[id(1), helpstring("method PromptForSettings")] HRESULT PromptForSettings(
 			[in] IFileProcessingDB* pDBManager, [out, retval] VARIANT_BOOL* pbUpdated);
-	}
+	};
+
+	[
+		object,
+		uuid(3C96B8AE-BA83-4FEB-8EC9-D060CC33F1AA),
+		dual,
+		nonextensible,
+		pointer_default(unique)
+	]
+	interface IFAMFileSelector : IDispatch
+	{
+		// PURPOSE: Displays a dialog to allow configuration of the condition and subset settings.
+		// ARGS:	bstrPrompt- Text applied to group box explaining the purpose of the settings.
+		//			bstrQueryLabel- The select clause of an SQL query to be displayed above any
+		//				query condition edit box.
+		// RETURNS:	pbNewSettingsApplied- VARIANT_TRUE if the user pressed OK to accept new
+		//				settings, otherwise VARIANT_FALSE.
+		[id(1), helpstring("method Configure")] HRESULT Configure(
+			[in] IFileProcessingDB *pFAMDB, [in] BSTR bstrPrompt, [in] BSTR bstrQueryLabel,
+			[out, retval] VARIANT_BOOL* pbNewSettingsApplied);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Adds an action status condition to the current settings.
+		// ARGS:	pFAMDB- The IFileProcessingDB the condition relates to.
+		//			nActionID- The ID of the action the condition relates to.
+		//			eStatus- The status files must be in nActionID to meet the condition's criteria.
+		[id(2), helpstring("method AddActionStatusCondition")] HRESULT AddActionStatusCondition(
+			[in] IFileProcessingDB *pFAMDB, [in] long nActionID, [in] EActionStatus eStatus);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Gets colloquial text describing the current settings.
+		// RETURNS:	pbstrSummaryString- The colloquial text describing the current settings.
+		[id(3), helpstring("method GetSummaryString")] HRESULT GetSummaryString(
+			[out, retval] BSTR* pbstrSummaryString);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Gets whether the instance is currently configured to return all files.
+		// RETURNS:	pbSelectingAllFiles- VARIANT_TRUE if currently configured to return all files,
+		//				VARIANT_FALSE if there are any conditions of subsets configured.
+		[propget, id(4), helpstring("property SelectingAllFiles")] HRESULT SelectingAllFiles(
+			[out, retval] VARIANT_BOOL* pbSelectingAllFiles);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Generates an SQL query to select files based on the current settings.
+		// ARGS:	pFAMDB- The IFileProcessingDB the query is to be used for.
+		//			bstrSelect- The columns the query should select. For example:
+		//				"FAMFile.ID, FAMFile.FileName" or "FAMFile.ID, FAMFile.Priority".
+		//				NOTE: It can be assumed that the FAMFile table will be included in the query.
+		// RETURNS: pbstrQuery- The query to select files based on the current settings.
+		[id(5), helpstring("method BuildQuery")] HRESULT BuildQuery(
+			[in] IFileProcessingDB *pFAMDB, [in] BSTR bstrSelect, [in] BSTR bstrOrderByClause,
+			[out, retval] BSTR* pbstrQuery);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Resets all configured condition and subset settings.
+		[id(6), helpstring("method Reset")] HRESULT Reset();
+	};
 
 	//----------------------------------------------------------------------------------------------
 	//-C O C L A S S E S ---------------------------------------------------------------------------
@@ -1805,6 +1860,14 @@ library UCLID_FILEPROCESSINGLib
 	coclass FileProcessingTaskExecutor
 	{
 		[default] interface IFileProcessingTaskExecutor;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(053A3AC5-2CD7-497A-9EB6-CF11E640DDE3)		
+	]
+	coclass FAMFileSelector
+	{
+		[default] interface IFAMFileSelector;
 		interface ILicensedComponent;
 	};
 };

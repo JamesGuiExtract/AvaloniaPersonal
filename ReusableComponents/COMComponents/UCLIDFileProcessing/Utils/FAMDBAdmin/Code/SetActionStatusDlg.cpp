@@ -3,8 +3,6 @@
 
 #include "stdafx.h"
 #include "SetActionStatusDlg.h"
-#include "SelectFileSettings.h"
-#include "SelectFilesDlg.h"
 #include "FAMDBAdminUtils.h"
 
 #include <UCLIDException.h>
@@ -25,21 +23,24 @@ CSetActionStatusDlg::CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessin
 										 CFAMDBAdminDlg* pFAMDBAdmin)
 : CDialog(CSetActionStatusDlg::IDD),
 m_ipFAMDB(ipFAMDB),
-m_pFAMDBAdmin(pFAMDBAdmin)
+m_pFAMDBAdmin(pFAMDBAdmin),
+m_ipFileSelector(CLSID_FAMFileSelector)
 {
 	ASSERT_ARGUMENT("ELI31255", ipFAMDB != __nullptr);
 	ASSERT_ARGUMENT("ELI27697", pFAMDBAdmin != __nullptr);
+	ASSERT_ARGUMENT("ELI35681", m_ipFileSelector != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CSetActionStatusDlg::CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
-	CFAMDBAdminDlg* pFAMDBAdmin, const SelectFileSettings &selectSettings)
+	CFAMDBAdminDlg* pFAMDBAdmin, UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr ipFileSelector)
 : CDialog(CSetActionStatusDlg::IDD)
 , m_ipFAMDB(ipFAMDB)
 , m_pFAMDBAdmin(pFAMDBAdmin)
-, m_settings(selectSettings)
+, m_ipFileSelector(ipFileSelector)
 {
 	ASSERT_ARGUMENT("ELI31256", ipFAMDB != __nullptr);
 	ASSERT_ARGUMENT("ELI31257", pFAMDBAdmin != __nullptr);
+	ASSERT_ARGUMENT("ELI35682", m_ipFileSelector != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CSetActionStatusDlg::~CSetActionStatusDlg()
@@ -47,6 +48,7 @@ CSetActionStatusDlg::~CSetActionStatusDlg()
 	try
 	{
 		m_ipFAMDB = __nullptr;
+		m_ipFileSelector = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27695");
 }
@@ -127,7 +129,7 @@ BOOL CSetActionStatusDlg::OnInitDialog()
 		updateControls();
 
 		// Update the summary edit box with the settings
-		m_editSummary.SetWindowText(m_settings.getSummaryString().c_str());
+		m_editSummary.SetWindowText(asString(m_ipFileSelector->GetSummaryString()).c_str());
 
 		// Set the focus to the select files button
 		GetDlgItem(IDC_BTN_SLCT_FLS_STATUS)->SetFocus();
@@ -197,18 +199,15 @@ void CSetActionStatusDlg::OnClickedSelectFiles()
 
 	try
 	{
-		// Create the file select dialog
-		CSelectFilesDlg dlg(m_ipFAMDB, "Select files to change action status for",
-			"SELECT FAMFile.ID FROM FAMFile", m_settings);
+		// Display the select files configuration dialog
+		bool bAppliedSettings = asCppBool(m_ipFileSelector->Configure(m_ipFAMDB,
+			"Select files to change action status for", "SELECT FAMFile.ID FROM FAMFile"));
 
-		// Display the dialog and save changes if user clicked OK
-		if (dlg.DoModal() == IDOK)
+		// Update the summary text if new settings were applied.
+		if (bAppliedSettings)
 		{
-			// Get the settings from the dialog
-			m_settings = dlg.getSettings();
-
-			// Update the summary description
-			m_editSummary.SetWindowText(m_settings.getSummaryString().c_str());
+			string strSummaryString = asString(m_ipFileSelector->GetSummaryString());
+			m_editSummary.SetWindowText(strSummaryString.c_str());
 		}
 
 		updateControls();
@@ -312,21 +311,20 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 			uex.addDebugInfo("Copy From Action", lFromActionID); 
 		}
 
-		uex.addDebugInfo("Files Selected", m_settings.getSummaryString());
+		string strSummaryString = asString(m_ipFileSelector->GetSummaryString());
+		uex.addDebugInfo("Files Selected", strSummaryString);
 
-		// If not processing all files or limiting the scope by a random subset
-		// then the operation must be performed a file at a time, otherwise
-		// just set the status for all files
-		if (!m_settings.selectingAllFiles())
+		if (!asCppBool(m_ipFileSelector->SelectingAllFiles))
 		{
 			// Get the query for updating files
 			string strSelect = "FAMFile.ID";
-			string strQuery = m_settings.buildQuery(m_ipFAMDB, strSelect, "");
+			string strQuery =
+				asString(m_ipFileSelector->BuildQuery(m_ipFAMDB, get_bstr_t(strSelect), ""));
 			uex.addDebugInfo("Query", strQuery);
 
 			// Modify the file status
 			m_ipFAMDB->ModifyActionStatusForQuery(strQuery.c_str(), (LPCTSTR)zToActionName,
-				eNewStatus, (LPCTSTR)zFromAction, m_settings.getRandomCondition());
+				eNewStatus, (LPCTSTR)zFromAction, __nullptr);
 		}
 		else
 		{

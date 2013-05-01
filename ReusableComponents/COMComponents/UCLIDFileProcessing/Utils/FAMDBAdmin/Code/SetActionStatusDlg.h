@@ -6,7 +6,6 @@
 
 #include "resource.h"
 #include "afxwin.h"
-#include "SelectFileSettings.h"
 #include "FAMDBAdminDlg.h"
 
 // SetActionStatusDlg.h : header file
@@ -22,7 +21,7 @@ public:
 	CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
 		CFAMDBAdminDlg* pFAMDBAdmin);
 	CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
-		CFAMDBAdminDlg* pFAMDBAdmin, const SelectFileSettings &selectSettings);
+		CFAMDBAdminDlg* pFAMDBAdmin, UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr ipFileSelector);
 	~CSetActionStatusDlg();
 
 // Dialog Data
@@ -68,7 +67,8 @@ private:
 	// The file action manager DB pointer
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr m_ipFAMDB;
 
-	SelectFileSettings m_settings;
+	// Allows the selection of files whose file action status is to be changed.
+	UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr m_ipFileSelector;
 
 	////////////
 	//Methods

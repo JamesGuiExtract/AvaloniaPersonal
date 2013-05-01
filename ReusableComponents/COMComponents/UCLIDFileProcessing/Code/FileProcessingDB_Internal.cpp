@@ -643,6 +643,21 @@ string CFileProcessingDB::asStatusName(const string& strStatus)
 	}
 }
 //--------------------------------------------------------------------------------------------------
+string CFileProcessingDB::asStatusName(EActionStatus eStatus)
+{
+	switch (eStatus)
+	{
+		case kActionUnattempted:	return "Unattempted";
+		case kActionPending:		return "Pending";
+		case kActionProcessing:		return "Processing";
+		case kActionCompleted:		return "Completed";
+		case kActionFailed:			return "Failed";
+		case kActionSkipped:		return "Skipped";
+
+		default: THROW_LOGIC_ERROR_EXCEPTION("ELI35690");
+	}
+}
+//--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addQueueEventRecord(_ConnectionPtr ipConnection, long nFileID, 
 											long nActionID, string strFileName, 
 											string strQueueEventCode)

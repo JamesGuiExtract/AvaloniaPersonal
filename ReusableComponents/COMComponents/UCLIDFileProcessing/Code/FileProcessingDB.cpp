@@ -1322,6 +1322,23 @@ STDMETHODIMP CFileProcessingDB::AsStatusString(EActionStatus eaStatus, BSTR *pbs
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::AsStatusName(EActionStatus eaStatus, BSTR *pbstrStatusName)
+{
+	try
+	{
+		AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI35688", pbstrStatusName != __nullptr);
+
+		*pbstrStatusName = get_bstr_t(asStatusName(eaStatus)).Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35689");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::AsEActionStatus(BSTR bstrStatus, EActionStatus *peaStatus)
 {
 	try

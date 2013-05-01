@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDFileProcessing.FAMFileSelector.1 = s 'FAMFileSelector Class'
+	{
+		CLSID = s '{053A3AC5-2CD7-497A-9EB6-CF11E640DDE3}'
+	}
+	UCLIDFileProcessing.FAMFileSelector = s 'FAMFileSelector Class'
+	{
+		CLSID = s '{053A3AC5-2CD7-497A-9EB6-CF11E640DDE3}'
+		CurVer = s 'UCLIDFileProcessing.FAMFileSelector.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {053A3AC5-2CD7-497A-9EB6-CF11E640DDE3} = s 'FAMFileSelector Class'
+		{
+			ProgID = s 'UCLIDFileProcessing.FAMFileSelector.1'
+			VersionIndependentProgID = s 'UCLIDFileProcessing.FAMFileSelector'
+			ForceRemove Programmable
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			TypeLib = s '{5FBC9199-D162-4F14-BAD9-090F6AB576C5}'
+		}
+	}
+}

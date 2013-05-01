@@ -159,6 +159,7 @@ public:
 	STDMETHOD(GetResultsForQuery)(BSTR bstrQuery, _Recordset** ppVal);
 	STDMETHOD(AsStatusString)(EActionStatus eaStatus, BSTR* pbstrStatusString);
 	STDMETHOD(AsEActionStatus)(BSTR bstrStatus, EActionStatus* peaStatus);
+	STDMETHOD(AsStatusName)(EActionStatus eaStatus, BSTR *pbstrStatusName);
 	STDMETHOD(GetFileID)(BSTR bstrFileName, long* pnFileID);
 	STDMETHOD(GetActionName)(long nActionID, BSTR* pbstrActionName);
 	STDMETHOD(NotifyFileSkipped)(long nFileID, long nActionID);
@@ -468,6 +469,9 @@ private:
 	// PROMISE: To return a user-readable name for the specified status string
 	//			("U", "P", "R", "F", "S" or "C")
 	string asStatusName(const string& strStatus);
+
+	// PROMISE: To return a user-readable name for the specified EActionStatus
+	string asStatusName(EActionStatus eStatus);
 
 	// PROMISE:	To add a single record to the QueueEvent table in the database with the given data
 	//			using the connection provided
