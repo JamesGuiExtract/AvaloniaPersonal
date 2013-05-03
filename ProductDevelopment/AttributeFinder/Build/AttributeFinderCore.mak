@@ -158,6 +158,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe  /in:"$(BinariesFolder)\DataEntryPrompt.exe" /mapout:"$(BinariesFolder)\Map\mapDataEntryPrompt.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\AlternateTestNameManager.plugin" /mapout:"$(BinariesFolder)\Map\mapAlternateTestNameManager.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\PaginationUtility.exe" /mapout:"$(BinariesFolder)\Map\mapPaginationUtility.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\FAMFileInspector.exe" /mapout:"$(BinariesFolder)\Map\mapFAMFileInspector.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 
 CopyCommonFiles:
 	@ECHO Copying common .NET files to installation build folders...
