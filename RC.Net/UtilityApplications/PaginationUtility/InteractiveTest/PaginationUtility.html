@@ -213,6 +213,14 @@ href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UC
 		<ul>
 			<li>Confirm that a <b>Save As</b> dialog is displayed.
 			<li>Confirm that settings are saved in a <b>config</b> file.
+			<li><b>[DotNet #973]</b> Double Prompt
+			<ul>
+				<li>Load some documents.
+				<li>Edit Settings.
+				<li>Export the settings to overwrite an existing 
+				<b>config</b> file.
+				<li>Confirm that only one prompt is presented.
+			</ul>
 		</ul>
 		<li>Confirm that the dialog includes an <b>Import Settings...</b> button.
 		<ul>
@@ -509,9 +517,12 @@ href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UC
 			<li>Select a page.
 			<li>Select a page of a different document.
 			<li>Delete all files from the <b>Input</b> folder.
-			<li>Confirm that TBD.
+			<li>Confirm that each image that has pages visible in the Thumbnail 
+			View remains in the Input folder.
+			<li>Confirm that each image in the Input folder that has not been 
+			loaded, is deleted. 
 		</ul>
-		<li><b>[DotNet #957]</b> Document Deleted On CLose
+		<li><b>[DotNet #957]</b> Document Deleted On Close
 		<ul>
 			<li>Load some images.
 			<li>Select a page and copy it to the Clipboard.
@@ -537,6 +548,60 @@ href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UC
 		enabled if a single control is selected.
 		<li><b>[DotNet #968]</b> Confirm that a thumbnail can be dragged to a new 
 		location without first having to select it.
+		<li><b>[DotNet #969]</b> Saving Files With Different Formats
+		<ul>
+			<li>Load some images of different kinds and confirm that the 
+			following test situations all work without error.  Other, similar 
+			tests are also encouraged.  Note that a source of different image 
+			types is: <b>I:\Common\Testing\Product Testing\IDShield_Sanity\
+			TestImages\ImageTypes</b>.
+			<ul>
+				<li>Differing bit depths of source documents
+				<li>Differing color orders (RGB versus BGR)
+				<li>Differing formats (TIF versus PDF)
+				<li>Which source document is the first page of the output 
+				document
+				<li>Whether or not the output format has been overridden 
+				by the output filename extension
+				<li>Whether the source document with the highest bit depth 
+				does not provide the first page of the output document
+			</ul>
+		</ul>
+		<li><b>[DotNet #971]</b> Ctrl+Tab
+		<ul>
+			<li>Load some documents.
+			<li>Add document separators as necessary.
+			<li>Select a page.
+			<li>Press <b>Ctrl+Tab</b> to highlight all pages of the output file.
+			<li>Confirm that the selected page does not change.
+		</ul>
+		<li><b>[DotNet #972]</b> Document Extension and Output Format
+		<ul>
+			<li>Load a <b>TIF</b> image.
+			<li>Add an ending document separator but do not otherwise modify 
+			the document.
+			<li>Select the modify the name of the output document by appending 
+			<b>.pdf</b>.
+			<li>Output the document.
+			<li>Confirm that the output document is in PDF format.
+		</ul>
+		<li><b>[DotNet #974]</b> Do Not Process Hidden Files
+		<ul>
+			<li>Prepare a set of images for loading.
+			<li>Confirm that a <b>Hidden, System</b> Thumbs.db file exists in 
+			the folder.
+			<li>Prepare and execute a script that copies all source files as 
+			randomly named TIF images into the Input folder.  The memory leak 
+			test includes a suitable script.
+			<li>Confirm that files are processed without error.
+			<li>Confirm that the <b>Hidden, System</b> files are not processed.
+		</ul>
+		<li><b>[DotNet #975]</b> File Operation Errors
+		<ul>
+			<li>Load a 1000-page image.
+			<li>Immediately delete all pages.
+			<li>Confirm that no error occurs and that all pages are deleted.
+		</ul>
   	</ul>
 </ol>
 </body>
