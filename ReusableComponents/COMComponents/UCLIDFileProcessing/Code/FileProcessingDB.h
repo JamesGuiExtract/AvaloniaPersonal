@@ -230,6 +230,7 @@ public:
 	STDMETHOD(put_RetryOnTimeout)(VARIANT_BOOL newVal);
 	STDMETHOD(get_AdvancedConnectionStringProperties)(BSTR *pVal);
 	STDMETHOD(put_AdvancedConnectionStringProperties)(BSTR newVal);
+	STDMETHOD(get_IsConnected)(VARIANT_BOOL* pbIsConnected);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);

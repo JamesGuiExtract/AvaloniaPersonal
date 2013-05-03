@@ -1221,6 +1221,11 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: To take an EActionStatus and return the corresponding name
 		[id(108), helpstring("method AsStatusName")] HRESULT AsStatusName(
 			[in] EActionStatus eaStatus, [out, retval] BSTR* bstrStatusName);
+		//-----------------------------------------------------------------------------------------
+		// RETURNS: VARIANT_TRUE to indicate the database is currently connected, otherwise
+		//			VARIANT_FAlSE
+		[propget, id(109), helpstring("property IsConnected")] HRESULT IsConnected(
+			[out, retval] VARIANT_BOOL* pbIsConnected);
 	};
 
 	[

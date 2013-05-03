@@ -2675,6 +2675,23 @@ STDMETHODIMP CFileProcessingDB::get_AdvancedConnectionStringProperties(BSTR *pVa
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35140");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_IsConnected(VARIANT_BOOL* pbIsConnected)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI35707", pbIsConnected != __nullptr);
+
+		*pbIsConnected = asCppBool(m_strCurrentConnectionStatus == gstrCONNECTION_ESTABLISHED);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35708");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods
