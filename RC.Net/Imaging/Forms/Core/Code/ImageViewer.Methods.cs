@@ -5276,6 +5276,50 @@ namespace Extract.Imaging.Forms
             }
         }
 
+        /// <summary>
+        /// Creates highlight(s) for the specified <see paramref="spatialString"/>.
+        /// </summary>
+        /// <param name="spatialString">The <see cref="SpatialString"/>.</param>
+        /// <param name="color"></param>
+        /// <returns>One or more <see cref="CompositeHighlightLayerObject"/>s representing the
+        /// location of the <see paramref="spatialString"/>.</returns>
+        [CLSCompliant(false)]
+        public IEnumerable<CompositeHighlightLayerObject> CreateHighlights(SpatialString spatialString,
+            Color color)
+        {
+            var rasterZones = spatialString
+                .GetOriginalImageRasterZones()
+                .ToIEnumerable<UCLID_RASTERANDOCRMGMTLib.RasterZone>()
+                .Select(rasterZone => new RasterZone(rasterZone));
+
+            var highlightZones = new Dictionary<int, List<RasterZone>>();
+
+            // Loop through the raster zones and group them by page.
+            foreach (RasterZone rasterZone in rasterZones)
+            {
+                // Determine the page of the raster zone.
+                int page = rasterZone.PageNumber;
+
+                if (!highlightZones.ContainsKey(page))
+                {
+                    highlightZones[page] = new List<RasterZone>();
+                }
+
+                // Add the current raster zone to the dictionary.
+                highlightZones[page].Add(rasterZone);
+            }
+
+            // Loop through each page that contained raster zones and create a separate
+            // CompositeLayerHighlight object for that page.
+            foreach (int page in highlightZones.Keys)
+            {
+                CompositeHighlightLayerObject highlight =
+                    new CompositeHighlightLayerObject(this, page, "", highlightZones[page], color);
+
+                yield return highlight;
+            }
+        }
+
         #region Shortcut Key Methods
 
         /// <summary>

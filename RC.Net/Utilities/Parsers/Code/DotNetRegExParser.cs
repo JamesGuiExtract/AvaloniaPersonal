@@ -22,23 +22,27 @@ namespace Extract.Utilities.Parsers
         /// <summary>
         /// The RegEx object to use.
         /// </summary>
-        private Regex _regexParser;
+        Regex _regexParser;
 
         /// <summary>
         /// Specifies if a search should ignore case.
         /// </summary>
-        private bool _ignoreCase = true;
+        bool _ignoreCase = true;
 
         /// <summary>
         /// Pattern to be searched for.
         /// </summary>
-        private string _pattern = "";
+        string _pattern = "";
+
+        /// <summary>
+        /// The <see cref="RegexOptions"/> that should be used for the underlying <see cref="Regex"/>.
+        /// </summary>
+        RegexOptions _regexOptions = RegexOptions.Multiline;
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(DotNetRegexParser).ToString();
+        static readonly string _OBJECT_NAME = typeof(DotNetRegexParser).ToString();
 
         #endregion
 
@@ -93,7 +97,43 @@ namespace Extract.Utilities.Parsers
             }
         }
 
-        #endregion
+        #endregion IRegularExprParser Properties
+
+        #region Public Properties
+
+        /// <summary>
+        /// Gets or sets the <see cref="RegexOptions"/> that should be used for the underlying
+        /// <see cref="Regex"/>.
+        /// </summary>
+        /// <value>
+        /// The <see cref="RegexOptions"/> that should be used for the underlying
+        /// <see cref="Regex"/>.
+        /// </value>
+        public RegexOptions RegexOptions
+        {
+            get
+            {
+                return _ignoreCase ? (_regexOptions |= RegexOptions.IgnoreCase) : _regexOptions;
+            }
+
+            set
+            {
+                _regexOptions = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the underlying <see cref="T:Regex"/> used to perform searches.
+        /// </summary>
+        public Regex Regex
+        {
+            get
+            {
+                return GetRegexParser();
+            }
+        }
+
+        #endregion Public Properties
 
         #region Public Methods
 
@@ -520,7 +560,7 @@ namespace Extract.Utilities.Parsers
                     // Expand any fuzzy search terms into the equivalent regular expression.
                     expandedPattern = FuzzySearchRegexBuilder.ExpandFuzzySearchExpressions(_pattern);
 
-                    _regexParser = new Regex(expandedPattern, GetOptions());
+                    _regexParser = new Regex(expandedPattern, RegexOptions);
                 }
 
                 return _regexParser;
@@ -534,20 +574,6 @@ namespace Extract.Utilities.Parsers
                 ee.AddDebugData("Expanded pattern", expandedPattern, true);
                 throw ee;
             }
-        }
-
-        /// <summary>
-        /// Gets the options to use when initializing a Regex object
-        /// </summary>
-        /// <returns>The option indicated with the <see cref="IgnoreCase"/> property or'd with
-        /// the Multiline option</returns>
-        private RegexOptions GetOptions()
-        {
-            if (_ignoreCase)
-            {
-                return RegexOptions.IgnoreCase | RegexOptions.Multiline;
-            }
-            return RegexOptions.Multiline;
         }
 
         #endregion

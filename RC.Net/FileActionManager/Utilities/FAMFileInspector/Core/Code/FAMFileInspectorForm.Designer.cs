@@ -32,13 +32,18 @@
             this._statusToolStripLabel = new System.Windows.Forms.ToolStripLabel();
             this._searchSplitContainer = new System.Windows.Forms.SplitContainer();
             this._selectFilesButton = new System.Windows.Forms.Button();
-            this._resultsDataGridView = new System.Windows.Forms.DataGridView();
-            this._fileNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._pagesColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._matchesColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._folderColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._fileListPanel = new System.Windows.Forms.Panel();
+            this._fileListDataGridView = new System.Windows.Forms.DataGridView();
+            this._fileListNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._fileListPagesColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._fileListMatchesColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._fileListFolderColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._showOnlyMatchesCheckBox = new System.Windows.Forms.CheckBox();
             this.dockContainer1 = new TD.SandDock.DockContainer();
             this._searchDockableWindow = new TD.SandDock.DockableWindow();
+            this._dataSearchTermsDataGridView = new System.Windows.Forms.DataGridView();
+            this._dataSearchFieldColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._dataSearchValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._clearButton = new System.Windows.Forms.Button();
             this._searchButton = new System.Windows.Forms.Button();
             this._textSearchTermsDataGridView = new System.Windows.Forms.DataGridView();
@@ -49,11 +54,11 @@
             this._sandDockManager = new TD.SandDock.SandDockManager();
             this._imageToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
+            this._navigationToolsImageViewerToolStrip = new Extract.Imaging.Forms.NavigationToolsImageViewerToolStrip();
             this._imageViewerToolsToolStrip = new System.Windows.Forms.ToolStrip();
             this.zoomWindowToolStripButton1 = new Extract.Imaging.Forms.ZoomWindowToolStripButton();
             this.panToolStripButton1 = new Extract.Imaging.Forms.PanToolStripButton();
             this._viewCommandsImageViewerToolStrip = new Extract.Imaging.Forms.ViewCommandsImageViewerToolStrip();
-            this._navigationToolsImageViewerToolStrip = new Extract.Imaging.Forms.NavigationToolsImageViewerToolStrip();
             this.BottomToolStripPanel = new System.Windows.Forms.ToolStripPanel();
             this.TopToolStripPanel = new System.Windows.Forms.ToolStripPanel();
             this.RightToolStripPanel = new System.Windows.Forms.ToolStripPanel();
@@ -76,9 +81,11 @@
             this._searchSplitContainer.Panel1.SuspendLayout();
             this._searchSplitContainer.Panel2.SuspendLayout();
             this._searchSplitContainer.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._resultsDataGridView)).BeginInit();
+            this._fileListPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._fileListDataGridView)).BeginInit();
             this.dockContainer1.SuspendLayout();
             this._searchDockableWindow.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._dataSearchTermsDataGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._textSearchTermsDataGridView)).BeginInit();
             this._imageToolStripContainer.ContentPanel.SuspendLayout();
             this._imageToolStripContainer.TopToolStripPanel.SuspendLayout();
@@ -155,6 +162,7 @@
             this._splitContainer.Size = new System.Drawing.Size(1136, 637);
             this._splitContainer.SplitterDistance = 500;
             this._splitContainer.TabIndex = 1;
+            this._splitContainer.TabStop = false;
             // 
             // _mainToolStripContainer
             // 
@@ -220,67 +228,96 @@
             this._selectFilesButton.UseVisualStyleBackColor = true;
             this._selectFilesButton.Click += new System.EventHandler(this.HandleSelectFilesButton_Click);
             // 
-            // _resultsDataGridView
+            // _fileListPanel
             // 
-            this._resultsDataGridView.AllowUserToAddRows = false;
-            this._resultsDataGridView.AllowUserToDeleteRows = false;
-            this._resultsDataGridView.AllowUserToResizeRows = false;
-            this._resultsDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this._resultsDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this._fileNameColumn,
-            this._pagesColumn,
-            this._matchesColumn,
-            this._folderColumn});
-            this._resultsDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._resultsDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this._resultsDataGridView.Location = new System.Drawing.Point(0, 0);
-            this._resultsDataGridView.Name = "_resultsDataGridView";
-            this._resultsDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this._resultsDataGridView.Size = new System.Drawing.Size(500, 326);
-            this._resultsDataGridView.TabIndex = 3;
-            this._resultsDataGridView.CurrentCellChanged += new System.EventHandler(this.HandleResultsDataGridView_CurrentCellChanged);
+            this._fileListPanel.Controls.Add(this._fileListDataGridView);
+            this._fileListPanel.Controls.Add(this._showOnlyMatchesCheckBox);
+            this._fileListPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._fileListPanel.Location = new System.Drawing.Point(0, 185);
+            this._fileListPanel.Name = "_fileListPanel";
+            this._fileListPanel.Size = new System.Drawing.Size(500, 326);
+            this._fileListPanel.TabIndex = 7;
             // 
-            // _fileNameColumn
+            // _fileListDataGridView
             // 
-            this._fileNameColumn.HeaderText = "Filename";
-            this._fileNameColumn.Name = "_fileNameColumn";
-            this._fileNameColumn.Width = 225;
+            this._fileListDataGridView.AllowUserToAddRows = false;
+            this._fileListDataGridView.AllowUserToDeleteRows = false;
+            this._fileListDataGridView.AllowUserToResizeRows = false;
+            this._fileListDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._fileListDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this._fileListDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this._fileListNameColumn,
+            this._fileListPagesColumn,
+            this._fileListMatchesColumn,
+            this._fileListFolderColumn});
+            this._fileListDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
+            this._fileListDataGridView.Location = new System.Drawing.Point(0, 29);
+            this._fileListDataGridView.Name = "_fileListDataGridView";
+            this._fileListDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this._fileListDataGridView.Size = new System.Drawing.Size(500, 297);
+            this._fileListDataGridView.TabIndex = 3;
+            this._fileListDataGridView.CurrentCellChanged += new System.EventHandler(this.HandleResultsDataGridView_CurrentCellChanged);
+            this._fileListDataGridView.SortCompare += new System.Windows.Forms.DataGridViewSortCompareEventHandler(this.HandleFileListDataGridView_SortCompare);
             // 
-            // _pagesColumn
+            // _fileListNameColumn
             // 
-            this._pagesColumn.HeaderText = "Pages";
-            this._pagesColumn.Name = "_pagesColumn";
-            this._pagesColumn.Width = 50;
+            this._fileListNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this._fileListNameColumn.HeaderText = "Filename";
+            this._fileListNameColumn.Name = "_fileListNameColumn";
+            this._fileListNameColumn.Width = 225;
             // 
-            // _matchesColumn
+            // _fileListPagesColumn
             // 
-            this._matchesColumn.HeaderText = "Matches";
-            this._matchesColumn.Name = "_matchesColumn";
-            this._matchesColumn.Width = 60;
+            this._fileListPagesColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this._fileListPagesColumn.HeaderText = "Pages";
+            this._fileListPagesColumn.Name = "_fileListPagesColumn";
+            this._fileListPagesColumn.Width = 50;
             // 
-            // _folderColumn
+            // _fileListMatchesColumn
             // 
-            this._folderColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this._folderColumn.HeaderText = "Folder";
-            this._folderColumn.Name = "_folderColumn";
+            this._fileListMatchesColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this._fileListMatchesColumn.HeaderText = "Matches";
+            this._fileListMatchesColumn.Name = "_fileListMatchesColumn";
+            this._fileListMatchesColumn.Width = 60;
+            // 
+            // _fileListFolderColumn
+            // 
+            this._fileListFolderColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this._fileListFolderColumn.HeaderText = "Folder";
+            this._fileListFolderColumn.Name = "_fileListFolderColumn";
+            // 
+            // _showOnlyMatchesCheckBox
+            // 
+            this._showOnlyMatchesCheckBox.AutoSize = true;
+            this._showOnlyMatchesCheckBox.Enabled = false;
+            this._showOnlyMatchesCheckBox.Location = new System.Drawing.Point(7, 6);
+            this._showOnlyMatchesCheckBox.Name = "_showOnlyMatchesCheckBox";
+            this._showOnlyMatchesCheckBox.Size = new System.Drawing.Size(189, 17);
+            this._showOnlyMatchesCheckBox.TabIndex = 7;
+            this._showOnlyMatchesCheckBox.Text = "Show only matching search results";
+            this._showOnlyMatchesCheckBox.UseVisualStyleBackColor = true;
+            this._showOnlyMatchesCheckBox.CheckedChanged += new System.EventHandler(this.HandleShowOnlyMatchesCheckBox_CheckedChanged);
             // 
             // dockContainer1
             // 
             this.dockContainer1.ContentSize = 181;
             this.dockContainer1.Controls.Add(this._searchDockableWindow);
-            this.dockContainer1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.dockContainer1.Dock = System.Windows.Forms.DockStyle.Top;
             this.dockContainer1.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Vertical, new TD.SandDock.LayoutSystemBase[] {
             ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 497.2955F), new TD.SandDock.DockControl[] {
                         ((TD.SandDock.DockControl)(this._searchDockableWindow))}, this._searchDockableWindow)))});
-            this.dockContainer1.Location = new System.Drawing.Point(0, 326);
+            this.dockContainer1.Location = new System.Drawing.Point(0, 0);
             this.dockContainer1.Manager = this._sandDockManager;
             this.dockContainer1.Name = "dockContainer1";
             this.dockContainer1.Size = new System.Drawing.Size(500, 185);
-            this.dockContainer1.TabIndex = 4;
+            this.dockContainer1.TabIndex = 6;
             // 
             // _searchDockableWindow
             // 
             this._searchDockableWindow.AllowCollapse = false;
+            this._searchDockableWindow.Controls.Add(this._dataSearchTermsDataGridView);
             this._searchDockableWindow.Controls.Add(this._clearButton);
             this._searchDockableWindow.Controls.Add(this._searchButton);
             this._searchDockableWindow.Controls.Add(this._textSearchTermsDataGridView);
@@ -288,24 +325,52 @@
             this._searchDockableWindow.Controls.Add(this._searchTypeComboBox);
             this._searchDockableWindow.Controls.Add(label1);
             this._searchDockableWindow.Controls.Add(this._searchModifierComboBox);
-            dockingRules1.AllowDockBottom = true;
+            dockingRules1.AllowDockBottom = false;
             dockingRules1.AllowDockLeft = false;
             dockingRules1.AllowDockRight = false;
-            dockingRules1.AllowDockTop = false;
+            dockingRules1.AllowDockTop = true;
             dockingRules1.AllowFloat = true;
             dockingRules1.AllowTab = false;
             this._searchDockableWindow.DockingRules = dockingRules1;
             this._searchDockableWindow.FloatingSize = new System.Drawing.Size(500, 163);
             this._searchDockableWindow.Guid = new System.Guid("ecd6c9fb-760e-4a1b-822c-bb83ea44d6f4");
-            this._searchDockableWindow.Location = new System.Drawing.Point(0, 22);
+            this._searchDockableWindow.Location = new System.Drawing.Point(0, 18);
             this._searchDockableWindow.Name = "_searchDockableWindow";
-            this._searchDockableWindow.PersistState = false;
             this._searchDockableWindow.ShowOptions = false;
             this._searchDockableWindow.Size = new System.Drawing.Size(500, 139);
             this._searchDockableWindow.TabIndex = 0;
             this._searchDockableWindow.Text = "Search";
             this._searchDockableWindow.Closing += new TD.SandDock.DockControlClosingEventHandler(this.HandleDockWindow_Closing);
             this._searchDockableWindow.AutoHidePopupOpened += new System.EventHandler(this.HandleDockableWindow_AutoHidePopupOpened);
+            // 
+            // _dataSearchTermsDataGridView
+            // 
+            this._dataSearchTermsDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._dataSearchTermsDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this._dataSearchTermsDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this._dataSearchFieldColumn,
+            this._dataSearchValueColumn});
+            this._dataSearchTermsDataGridView.Location = new System.Drawing.Point(3, 33);
+            this._dataSearchTermsDataGridView.Name = "_dataSearchTermsDataGridView";
+            this._dataSearchTermsDataGridView.Size = new System.Drawing.Size(494, 74);
+            this._dataSearchTermsDataGridView.TabIndex = 11;
+            this._dataSearchTermsDataGridView.Visible = false;
+            // 
+            // _dataSearchFieldColumn
+            // 
+            this._dataSearchFieldColumn.HeaderText = "Field";
+            this._dataSearchFieldColumn.Name = "_dataSearchFieldColumn";
+            this._dataSearchFieldColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._dataSearchFieldColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this._dataSearchFieldColumn.Width = 200;
+            // 
+            // _dataSearchValueColumn
+            // 
+            this._dataSearchValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this._dataSearchValueColumn.HeaderText = "Value";
+            this._dataSearchValueColumn.Name = "_dataSearchValueColumn";
             // 
             // _clearButton
             // 
@@ -321,7 +386,7 @@
             // _searchButton
             // 
             this._searchButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._searchButton.Location = new System.Drawing.Point(335, 113);
+            this._searchButton.Location = new System.Drawing.Point(341, 113);
             this._searchButton.Name = "_searchButton";
             this._searchButton.Size = new System.Drawing.Size(75, 23);
             this._searchButton.TabIndex = 9;
@@ -370,6 +435,7 @@
             this._searchTypeComboBox.Name = "_searchTypeComboBox";
             this._searchTypeComboBox.Size = new System.Drawing.Size(96, 21);
             this._searchTypeComboBox.TabIndex = 5;
+            this._searchTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.HandleSearchTypeComboBox_SelectedIndexChanged);
             // 
             // _searchModifierComboBox
             // 
@@ -388,7 +454,7 @@
             // 
             this._sandDockManager.AllowMiddleButtonClosure = false;
             this._sandDockManager.DockSystemContainer = this._mainToolStripContainer.ContentPanel;
-            this._sandDockManager.EnableTabbedDocuments = false;
+            this._sandDockManager.DocumentOverflow = TD.SandDock.DocumentOverflowMode.None;
             this._sandDockManager.OwnerForm = this;
             this._sandDockManager.DockControlActivated += new TD.SandDock.DockControlEventHandler(this.HandleSandDockManager_DockControlActivated);
             // 
@@ -437,6 +503,15 @@
             this._imageViewer.Size = new System.Drawing.Size(632, 559);
             this._imageViewer.TabIndex = 0;
             // 
+            // _navigationToolsImageViewerToolStrip
+            // 
+            this._navigationToolsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._navigationToolsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this._navigationToolsImageViewerToolStrip.Location = new System.Drawing.Point(3, 0);
+            this._navigationToolsImageViewerToolStrip.Name = "_navigationToolsImageViewerToolStrip";
+            this._navigationToolsImageViewerToolStrip.Size = new System.Drawing.Size(233, 39);
+            this._navigationToolsImageViewerToolStrip.TabIndex = 2;
+            // 
             // _imageViewerToolsToolStrip
             // 
             this._imageViewerToolsToolStrip.Dock = System.Windows.Forms.DockStyle.None;
@@ -477,15 +552,6 @@
             this._viewCommandsImageViewerToolStrip.Name = "_viewCommandsImageViewerToolStrip";
             this._viewCommandsImageViewerToolStrip.Size = new System.Drawing.Size(312, 39);
             this._viewCommandsImageViewerToolStrip.TabIndex = 1;
-            // 
-            // _navigationToolsImageViewerToolStrip
-            // 
-            this._navigationToolsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._navigationToolsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this._navigationToolsImageViewerToolStrip.Location = new System.Drawing.Point(3, 0);
-            this._navigationToolsImageViewerToolStrip.Name = "_navigationToolsImageViewerToolStrip";
-            this._navigationToolsImageViewerToolStrip.Size = new System.Drawing.Size(233, 39);
-            this._navigationToolsImageViewerToolStrip.TabIndex = 2;
             // 
             // BottomToolStripPanel
             // 
@@ -539,7 +605,7 @@
             // 
             // _searchSplitContainer.Panel2
             // 
-            this._searchSplitContainer.Panel2.Controls.Add(this._resultsDataGridView);
+            this._searchSplitContainer.Panel2.Controls.Add(this._fileListPanel);
             this._searchSplitContainer.Panel2.Controls.Add(this.dockContainer1);
             this._searchSplitContainer.Size = new System.Drawing.Size(500, 588);
             this._searchSplitContainer.SplitterDistance = 73;
@@ -575,10 +641,13 @@
             this._searchSplitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this._searchSplitContainer)).EndInit();
             this._searchSplitContainer.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this._resultsDataGridView)).EndInit();
+            this._fileListPanel.ResumeLayout(false);
+            this._fileListPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._fileListDataGridView)).EndInit();
             this.dockContainer1.ResumeLayout(false);
             this._searchDockableWindow.ResumeLayout(false);
             this._searchDockableWindow.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._dataSearchTermsDataGridView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._textSearchTermsDataGridView)).EndInit();
             this._imageToolStripContainer.ContentPanel.ResumeLayout(false);
             this._imageToolStripContainer.TopToolStripPanel.ResumeLayout(false);
@@ -622,13 +691,18 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn _textSearchTermsColumn;
         private System.Windows.Forms.Button _searchButton;
         private System.Windows.Forms.Button _clearButton;
-        private System.Windows.Forms.DataGridView _resultsDataGridView;
-        private System.Windows.Forms.DataGridViewTextBoxColumn _fileNameColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn _pagesColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn _matchesColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn _folderColumn;
+        private System.Windows.Forms.DataGridView _fileListDataGridView;
         private Extract.Imaging.Forms.ImageViewer _imageViewer;
         private TD.SandDock.DockContainer dockContainer1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _fileListNameColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _fileListPagesColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _fileListMatchesColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _fileListFolderColumn;
+        private System.Windows.Forms.CheckBox _showOnlyMatchesCheckBox;
+        private System.Windows.Forms.Panel _fileListPanel;
+        private System.Windows.Forms.DataGridView _dataSearchTermsDataGridView;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _dataSearchFieldColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _dataSearchValueColumn;
 
     }
 }
