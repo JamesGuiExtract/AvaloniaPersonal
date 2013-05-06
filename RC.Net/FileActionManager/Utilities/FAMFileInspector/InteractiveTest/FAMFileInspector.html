@@ -1,0 +1,140 @@
+<HTML>
+
+<HEAD>
+<TITLE>FAM File Inspector - Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" 
+href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>FAM File Inspector Utility<br> Testing Checklist<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<ol>
+  	<li><h2>Basic Operation</h2></li>
+  	<ul>
+    		<li>Confirm that <b>FAM File Inspector</b> is available as a Start Menu item 
+		under <b>FLEX Index - Utilities</b>.
+    		<li>Confirm that <b>FAM File Inspector</b> is available as a Start Menu item 
+		under <b>ID Shield - Utilities</b>.
+    		<li>Confirm that <b>FAM File Inspector</b> is available as a Start Menu item 
+		under <b>LabDE - Utilities</b>.
+    		<li>Confirm that <b>FAM File Inspector</b> requires only a <b>Client</b> 
+		license.
+		<ul>
+			<li>Confirm that a meaningful exception is displayed if an appropriate 
+			license is not present.
+		</ul>
+		<li>Confirm that <b>FAMFileInspector /?</b> displays a meaningful usage message.
+  	</ul>
+<p>
+  	<li><h2>General User Interface</h2></li>
+  	<ul>
+		<li><b>Main Window</b>
+		<ul>
+			<li>Confirm that <b>FAM File Inspector</b> is the window caption.
+			<li>Confirm that the following menu items are defined and work correctly.
+			<ul>
+				<li>File - TBD
+				<li>File - Exit
+				<li>Help - About...
+			</ul>
+			<li>Confirm that a <b>TBD</b> toolbar button is defined immediately 
+			below the menu bar.
+			<li>Confirm that an <b>Enter admin mode...</b> button is defined next 
+			to the menu bar.
+			<ul>
+				<li>Confirm that a <b>Login</b> prompt is displayed for the 
+				<b>Admin</b> user.
+				<li>Confirm that the user name cannot be modified.
+				<li>Confirm that a meaningful error message is displayed 
+				if an incorrect password is provided.
+				<li>Confirm that the correct password is the same password 
+				used for <b>DB Administration</b>.
+			</ul>
+			<li>TBD
+		</ul>
+<p>
+		<li><b>Image Window</b>
+		<ul>
+			<li>Confirm that the following toolbar buttons are available for the 
+			Image Window.  Also confirm proper functionality for each button and 
+			shortcut.
+			<ul>
+				<li>Zoom window (Z)
+				<li>Pan (A)
+				<li>Zoom in (F7, Ctrl++)
+				<li>Zoom out (F8, Ctrl+-)
+				<li>Zoom previous (Back, Alt+Left)
+				<li>Zoom next (Alt+Right)
+				<li>Fit to page (P)
+				<li>Fit to width (W)
+				<li>Previous highlight
+				<li>Next highlight
+				<li>First page
+				<li>Previous page
+				<li>Specified page
+				<li>Next page
+				<li>Last page
+			</ul>
+		</ul>
+  	</ul>
+<p>
+  	<li><h2>Functionality</h2></li>
+  	<ul>
+		<li><b>Input Options</b>
+		<ul>
+			<li>Confirm that <b>TIF</b> images can be used as input.
+			<li>Confirm that <b>PDF</b> images can be used as input.
+			<li>Confirm that a mixture of image types can be used as input.
+			<li>Confirm that images from subfolders can be used as input.
+			<li>TBD
+		</ul>
+		<li><b>Output Options</b>
+		<ul>
+			<li>Confirm that output filenames can include random characters.
+			<li>Confirm that output filenames can exclude random characters.
+			<li>Confirm that output files can retain sub-folder structure.
+		</ul>
+		<li><b>Post-processing Options</b>
+		<ul>
+			<li>Confirm that input files can be moved to a specified folder.
+			<li>Confirm that input files can be deleted.
+		</ul>
+		<li><b>Miscellaneous Options</b>
+		<ul>
+			<li>Confirm that all settings are properly written to a config file 
+			via <b>Export settings...</b>.
+			<li>Confirm that all settings are properly read from a config file 
+			via <b>Import settings...</b>.
+		</ul>
+		<li><b>General</b>
+		<ul>
+			<li>Confirm that <b>Help - About</b> displays a meaningful About box.
+			<li>Confirm that all of a very long filename <b>is</b> displayed in 
+			the thumbnail view as a tooltip when hovering over an image.
+			<li>Confirm that a blue border is displayed around the thumbnail that 
+			is displayed in the Image Window.
+			<li>Confirm that a dark background is displayed around the thumbnails 
+			that are selected.
+			<li>Confirm that rotated pages are also rotated in the output document.
+			<li>Confirm that corrupt or locked files are handled gracefully.
+			<li>Exercise the following types of images for input and output
+			<ul>
+				<li>TIF images
+				<li>PDF images
+				<li><b>NOT FIXED</b> Annotated TIF images
+			</ul>
+		</ul>
+  	</ul>
+<p>
+  	<li><h2>Miscellaneous</h2></li>
+  	<ul>
+		<li>TBD
+  	</ul>
+</ol>
+</body>
+</html>
