@@ -127,13 +127,17 @@
             </tr>
             <tr>
                 <td>
-                    <asp:CheckBox ID="checkAdded" runat="server" ForeColor="Black" Text="Process any files that are added"
-                        OnCheckedChanged="HandleCheckAddedChanged" AutoPostBack="true" />
                 </td>
             </tr>
             <tr>
                 <td>
-                    <%-- Indent the checkbox --%>
+                    <asp:RadioButton ID="radioFilesAdded" runat="server" GroupName="radioAddedOrByValue" Text="Process any files that are added"
+                        ForeColor="Black" OnCheckedChanged="RadioAddedOrByValueChanged" AutoPostBack="true" />
+                </td>
+            </tr>
+             <tr>
+                <td>
+                    <%--Indent the checkbox--%>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <asp:CheckBox ID="checkDoNotProcessExisting" runat="server" ForeColor="Black"
                         Text="Do not process existing files" AutoPostBack="false" />
@@ -141,8 +145,19 @@
             </tr>
             <tr>
                 <td>
+                    <asp:RadioButton ID="radioByValue" runat="server" GroupName="radioAddedOrByValue" Text="Process any files where the field "
+                        ForeColor="Black" OnCheckedChanged="RadioAddedOrByValueChanged" AutoPostBack="true" />
+                    <asp:DropDownList ID="fieldSelectionList" runat="server" ForeColor="Black" AutoPostBack="true">
+                    </asp:DropDownList>
                 </td>
             </tr>
+            <tr>
+                <td>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <asp:Label ID="Label1" runat="server" Text=" has a value of " ForeColor="Black" />
+                    <asp:TextBox ID="textValue" runat="server" Width="265"></asp:TextBox>
+                </td>
+            </tr>       
         </table>
     </asp:Panel>
     <br />

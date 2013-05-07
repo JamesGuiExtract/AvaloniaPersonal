@@ -29,6 +29,9 @@ namespace Extract.SharePoint.Redaction
         internal static readonly string ProcessExistingFiles = "ProcessExistingFiles";
         internal static readonly string OutputLocationType = "OutputLocationType";
         internal static readonly string OutputLocationString = "OutputLocationString";
+        internal static readonly string QueueWithFieldValue = "QueueWithFieldValue";
+        internal static readonly string FieldForQueuing = "FieldForQueuing";
+        internal static readonly string ValueToQueueOn = "ValueToQueueOn";
 
         // Constants for the ID Shield status field
         internal static readonly string IdShieldStatusColumn = "IDShieldStatus";
@@ -102,6 +105,10 @@ namespace Extract.SharePoint.Redaction
                         list.Fields.Add(ProcessExistingFiles, SPFieldType.Boolean, false);
                         list.Fields.Add(OutputLocationType, SPFieldType.Integer, false);
                         list.Fields.Add(OutputLocationString, SPFieldType.Text, false);
+                        list.Fields.Add(QueueWithFieldValue, SPFieldType.Boolean, false);
+                        list.Fields.Add(FieldForQueuing, SPFieldType.Text, false);
+                        list.Fields.Add(ValueToQueueOn, SPFieldType.Text, false);
+
                         list.Hidden = true;
                         list.Update();
                     }
@@ -208,6 +215,9 @@ namespace Extract.SharePoint.Redaction
                     item[ProcessExistingFiles] = folderSettings.ProcessExisting;
                     item[OutputLocationType] = (int)folderSettings.OutputLocation;
                     item[OutputLocationString] = folderSettings.OutputLocationString;
+                    item[QueueWithFieldValue] = folderSettings.QueueWithFieldValue;
+                    item[FieldForQueuing] = folderSettings.FieldForQueuing;
+                    item[ValueToQueueOn] = folderSettings.ValueToQueueOn;
 
                     // Update the item
                     item.Update();
@@ -216,7 +226,6 @@ namespace Extract.SharePoint.Redaction
                 // If processing existing files, get all files that match the criteria and set their status to be queued
                 if (folderSettings.ProcessExisting)
                 {
-                    var parentList = site.RootWeb.Lists[folderSettings.ListId];
                     ExtractSharePointHelper.MarkFilesToBeQueued(siteId, folderSettings, IdShieldStatusColumn,
                         IdShieldReferenceColumn);
                 }
@@ -299,10 +308,14 @@ namespace Extract.SharePoint.Redaction
                             bool processExisting = (bool)item[ProcessExistingFiles];
                             int outputType = (int)item[OutputLocationType];
                             string outputLocation = (string)item[OutputLocationString];
+                            bool queueWithFieldValue = (bool)item[QueueWithFieldValue];
+                            string fieldForQueuing = (string)item[FieldForQueuing];
+                            string valueToQueueOn = (string)item[ValueToQueueOn];
 
                             folderSettings.Add(url, new IdShieldFolderProcessingSettings(listId, folderId,
                                 url, extension, recursive, reprocess, added, modified, processExisting,
-                                (IdShieldOutputLocation)outputType, outputLocation));
+                                (IdShieldOutputLocation)outputType, outputLocation, queueWithFieldValue,
+                                fieldForQueuing, valueToQueueOn));
                         }
                         else
                         {

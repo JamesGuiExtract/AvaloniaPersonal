@@ -126,6 +126,7 @@
     </None>
     <None Include="Features\Extract.SharePoint.Redaction\Extract.SharePoint.Redaction.feature">
       <FeatureId>{4081877d-4627-4254-8cb6-353e1179c198}</FeatureId>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Features\Extract.SharePoint.Redaction.Administration\Extract.SharePoint.Redaction.Administration.feature">
       <FeatureId>{57ec95a1-d579-46b7-8c72-70dc64798174}</FeatureId>
@@ -183,7 +184,9 @@
     <Content Include="ADMIN\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx" />
+    <Content Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\..\RC.Net\Core\ExtensionMethods\Core\Code\Extract.ExtensionMethods.csproj">

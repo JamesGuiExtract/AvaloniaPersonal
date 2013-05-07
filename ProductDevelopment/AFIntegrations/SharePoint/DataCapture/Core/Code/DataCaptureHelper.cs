@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 
 namespace Extract.SharePoint.DataCapture
 {
@@ -25,6 +24,9 @@ namespace Extract.SharePoint.DataCapture
         internal static readonly string AddedFiles = "AddedFiles";
         internal static readonly string ModifiedFiles = "ModifiedFiles";
         internal static readonly string ProcessExistingFiles = "ProcessExistingFiles";
+        internal static readonly string QueueWithFieldValue = "QueueWithFieldValue";
+        internal static readonly string FieldForQueuing = "FieldForQueuing";
+        internal static readonly string ValueToQueueOn = "ValueToQueueOn";
 
         // Constants for the Extract Data Capture status field
         internal static readonly string ExtractDataCaptureStatusColumn = "ExtractDataCaptureStatus";
@@ -246,7 +248,7 @@ namespace Extract.SharePoint.DataCapture
                             bool processExisting = (bool)item[ProcessExistingFiles];
 
                             folderSettings.Add(url, new FolderProcessingSettings(listId, folderId,
-                                url, extension, recursive, reprocess, added, modified, processExisting));
+                                url, extension, recursive, reprocess, added, modified, processExisting, false, "", ""));
                         }
                         else
                         {

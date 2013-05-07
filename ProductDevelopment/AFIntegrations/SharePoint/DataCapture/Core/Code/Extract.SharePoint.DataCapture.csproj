@@ -153,10 +153,14 @@
       <DependentUpon>Extract.SharePoint.DataCapture.Administration.feature</DependentUpon>
     </Content>
     <Content Include="Images\Extract.SharePoint.DataCapture\DataCapture32x32.png" />
-    <Content Include="ADMIN\Extract.SharePoint.DataCapture\ConfigureExtractDataCapture.aspx" />
+    <Content Include="ADMIN\Extract.SharePoint.DataCapture\ConfigureExtractDataCapture.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Images\Extract.SharePoint.DataCapture\ExtractDataCaptureLogo.jpg" />
     <Content Include="Layouts\Extract.SharePoint.DataCapture\DataCaptureHelpers.js" />
-    <Content Include="Layouts\Extract.SharePoint.DataCapture\ProcessFolderSettings.aspx" />
+    <Content Include="Layouts\Extract.SharePoint.DataCapture\ProcessFolderSettings.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\Extract.SharePoint.DataCapture\RemoveFolderSettings.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

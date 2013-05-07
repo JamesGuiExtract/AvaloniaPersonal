@@ -1,9 +1,5 @@
-﻿using Microsoft.VisualBasic.CompilerServices;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
 // Using statements to make dealing with folder settings more readable
@@ -79,11 +75,17 @@ namespace Extract.SharePoint.Redaction
         /// <param name="outputLocation">The output location for the redacted file.</param>
         /// <param name="outputLocationString">The output location for the redacted file
         /// (this value's meaning is determined by <paramref name="outputLocation"/>.</param>
+        /// <param name="queueOnValue">Flag to indicate if a field value should be checked to determine 
+        /// if file should be queued</param>
+        /// <param name="nameOfValueField">Name of field to check for specified value</param>
+        /// <param name="valueToQueueOn">Value of field to determine file should be queued</param>
         public IdShieldFolderProcessingSettings(Guid listId, Guid folderId, string folderPath,
             string fileExtensions, bool recurse, bool reprocess, bool added, bool processExisting,
-            IdShieldOutputLocation outputLocation, string outputLocationString)
+            IdShieldOutputLocation outputLocation, string outputLocationString,
+            bool queueOnValue, string nameOfValueField, string valueToQueueOn)
             : this(listId, folderId, folderPath, fileExtensions, recurse, reprocess, added,
-            false, processExisting, outputLocation, outputLocationString)
+            false, processExisting, outputLocation, outputLocationString, 
+            queueOnValue, nameOfValueField, valueToQueueOn)
         {
         }
 
@@ -102,11 +104,16 @@ namespace Extract.SharePoint.Redaction
         /// <param name="outputLocation">The output location for the redacted file.</param>
         /// <param name="outputLocationString">The output location for the redacted file
         /// (this value's meaning is determined by <paramref name="outputLocation"/>.</param>
+        /// <param name="queueOnValue">Flag to indicate if a field value should be checked to determine 
+        /// if file should be queued</param>
+        /// <param name="fieldForQueuing">Name of field to check for specified value</param>
+        /// <param name="valueToQueueOn">Value of field to determine file should be queued</param>
         public IdShieldFolderProcessingSettings(Guid listId, Guid folderId, string folderPath,
             string fileExtensions, bool recurse, bool reprocess, bool added, bool modified,
-            bool processExisting, IdShieldOutputLocation outputLocation, string outputLocationString)
+            bool processExisting, IdShieldOutputLocation outputLocation, string outputLocationString,
+            bool queueOnValue, string fieldForQueuing, string valueToQueueOn)
             : base(listId, folderId, folderPath, fileExtensions, recurse, reprocess, added,
-            modified, processExisting)
+            modified, processExisting, queueOnValue, fieldForQueuing, valueToQueueOn)
         {
             _outputLocation = outputLocation;
             _outputLocationString = outputLocationString;

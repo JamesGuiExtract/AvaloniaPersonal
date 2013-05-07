@@ -1,9 +1,7 @@
 ﻿using Microsoft.VisualBasic.CompilerServices;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
 // Using statements to make dealing with folder settings more readable
@@ -55,8 +53,9 @@ namespace Extract.SharePoint
         /// Version 2 - Added FolderId field.
         /// Version 3 - Added ListId field.
         /// Version 4 - Added Reprocess and ProcessExisting fields.
+        /// Version 5 - Added queueWithFieldValue, fieldForQueuing, and valueToQueueOn
         /// </summary>
-        static readonly int _CURRENT_VERSION = 4;
+        static readonly int _CURRENT_VERSION = 5;
 
         #endregion Constants
 
@@ -107,6 +106,21 @@ namespace Extract.SharePoint
         /// </summary>
         bool _processExisting;
 
+        /// <summary>
+        /// Flag to indicate file should only be queued when a specified field has a specified Value
+        /// </summary>
+        Boolean _queueWithFieldValue;
+
+        /// <summary>
+        /// The name of field to check for the specified value to queue on
+        /// </summary>
+        string _fieldForQueuing;
+
+        /// <summary>
+        /// The Value for to queue on
+        /// </summary>
+        string _valueToQueueOn;
+
         #endregion Fields
 
         #region Constuctors
@@ -129,10 +143,15 @@ namespace Extract.SharePoint
         /// <param name="reprocess">Reprocess processed files.</param>
         /// <param name="added">Whether to watch files that are added.</param>
         /// <param name="processExisting">Whether existing files should be processed.</param>
+        /// <param name="queueWithFieldValue">Whether to queue based on field value</param>
+        /// <param name="fieldForQueuing">if queueWithFieldValue is <see langword="true"/> then a file will only be queued if
+        /// the this field = <see paramref="valueToQueueOn"/></param>
+        /// <param name="valueToQueueOn">Value of <see paramref="fieldForQueuing"/> that should be queued</param>
         public FolderProcessingSettings(Guid listId, Guid folderId, string folderPath,
-            string fileExtensions, bool recurse, bool reprocess, bool added, bool processExisting)
+            string fileExtensions, bool recurse, bool reprocess, bool added, bool processExisting,
+            bool queueWithFieldValue, string fieldForQueuing, string valueToQueueOn)
             : this(listId, folderId, folderPath, fileExtensions, recurse, reprocess, added,
-            false, processExisting)
+            false, processExisting,queueWithFieldValue, fieldForQueuing, valueToQueueOn)
         {
         }
 
@@ -148,9 +167,13 @@ namespace Extract.SharePoint
         /// <param name="added">Whether to watch files that are added.</param>
         /// <param name="modified">Whether to watch files that are modified.</param>
         /// <param name="processExisting">Whether existing files should be processed.</param>
+        /// <param name="queueWithFieldValue">Whether to queue based on field value</param>
+        /// <param name="fieldForQueuing">if <see paramref="queueWithFieldValue"/> is <see langword="true"/> then a file will only be queued if
+        /// the this field = <see paramref="valueToQueueOn"/></param>
+        /// <param name="valueToQueueOn">Value of <see paramref="fieldForQueuing"/> that should be queued</param>
         public FolderProcessingSettings(Guid listId, Guid folderId, string folderPath,
             string fileExtensions, bool recurse, bool reprocess, bool added, bool modified,
-            bool processExisting)
+            bool processExisting, bool queueWithFieldValue, string fieldForQueuing, string valueToQueueOn )
         {
             _listId = listId;
             _folderId = folderId;
@@ -161,6 +184,9 @@ namespace Extract.SharePoint
             ProcessModifiedFiles = modified;
             _reprocess = reprocess;
             _processExisting = processExisting;
+            _queueWithFieldValue = queueWithFieldValue;
+            _fieldForQueuing = fieldForQueuing;
+            _valueToQueueOn = valueToQueueOn;
         }
 
         /// <summary>
@@ -182,6 +208,9 @@ namespace Extract.SharePoint
 
             _folderId = Guid.Empty;
             _listId = Guid.Empty;
+            _queueWithFieldValue = false;
+            _fieldForQueuing = "";
+            _valueToQueueOn = "";
             if (version >= 2)
             {
                 _folderId = (Guid)info.GetValue("FolderId", typeof(Guid));
@@ -195,7 +224,12 @@ namespace Extract.SharePoint
                 _reprocess = info.GetBoolean("Reprocess");
                 _processExisting = info.GetBoolean("ProcessExisting");
             }
-
+            if (version >= 5)
+            {
+                _queueWithFieldValue = info.GetBoolean("QueueWithFieldValue");
+                _fieldForQueuing = info.GetString("FieldForQueuing");
+                _valueToQueueOn = info.GetString("ValueToQueueOn");
+            }
             _folderPath = info.GetString("FolderPath");
             FileExtensions = info.GetString("FileExtensions");
             _recurse = info.GetBoolean("Recurse");
@@ -342,6 +376,52 @@ namespace Extract.SharePoint
             }
         }
 
+        /// <summary>
+        /// Property that indecates if a field value should be used for queuing
+        /// </summary>
+        public Boolean QueueWithFieldValue
+        {
+            get
+            {
+                return _queueWithFieldValue;
+            }
+            set
+            {
+                _queueWithFieldValue = value;
+            }
+        }
+
+        /// <summary>
+        /// Field to check if <see cref="QueueWithFieldValue"/> is <see langword="true"/>
+        /// </summary>
+        public string FieldForQueuing
+        {
+            get
+            {
+                return _fieldForQueuing;
+            }
+            set
+            {
+                _fieldForQueuing = value;
+            }
+        }
+
+        /// <summary>
+        /// The value to check for if <see cref="QueueWithFieldValue"/> is <see langword="true"/>
+        /// </summary>
+        public string ValueToQueueOn
+        {
+            get
+            {
+                return _valueToQueueOn;
+            }
+            set
+            {
+                _valueToQueueOn = value;
+            }
+        }
+
+
         #endregion Properties
 
         #region Methods
@@ -465,6 +545,9 @@ namespace Extract.SharePoint
             info.AddValue("Modified", ProcessModifiedFiles);
             info.AddValue("Reprocess", _reprocess);
             info.AddValue("ProcessExisting", _processExisting);
+            info.AddValue("QueueWithFieldValue", _queueWithFieldValue);
+            info.AddValue("FieldForQueuing", _fieldForQueuing);
+            info.AddValue("ValueToQueueOn", _valueToQueueOn);
         }
 
         #endregion

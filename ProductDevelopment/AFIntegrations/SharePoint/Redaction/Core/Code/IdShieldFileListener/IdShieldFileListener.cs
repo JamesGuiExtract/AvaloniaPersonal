@@ -1,4 +1,5 @@
-﻿using Microsoft.SharePoint;
+﻿using Extract.Sharepoint;
+using Microsoft.SharePoint;
 using System;
 using System.Collections.Generic;
 
@@ -48,6 +49,22 @@ namespace Extract.SharePoint.Redaction
             base.ItemAdded(properties);
         }
 
+        /// <summary>
+        /// An item was updated
+        /// </summary>
+        public override void ItemUpdated(SPItemEventProperties properties)
+        {
+            try
+            {
+                HandleSharePointFileEvent(properties, FileEventType.FileModified);
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, "ELI35629");
+            }
+            base.ItemUpdated(properties);
+        }
+
         #endregion Event Handlers
 
         #region Methods
@@ -95,17 +112,14 @@ namespace Extract.SharePoint.Redaction
                 // Attempt to get the settings for the folder
                 foreach (KeyValuePair<string, IdShieldFolderProcessingSettings> pair in _folderSettings)
                 {
-                    // Set the file as "ToBeQueuedLater" iff
-                    // 1. The folder is being watched for the specified event
-                    // 2. This folder is being watched
-                    // 3. The file matches the watch pattern
-                    if ((pair.Value.EventTypes & eventType) != 0
-                            && IsFolderBeingWatched(folder, pair.Key, pair.Value.RecurseSubfolders)
-                            && pair.Value.DoesFileMatchPattern(fileName)
-                        )
+                    IdShieldFolderProcessingSettings idShieldSettings = pair.Value;
+
+                    if (shouldBeSetToBeQueued(eventType, folder, pair.Key, fileName, item, pair.Value))
                     {
+                        // Set the field to ToBeQueued
                         item[IdShieldHelper.IdShieldStatusColumn] =
                             ExtractProcessingStatus.ToBeQueued.AsString();
+
                         item.Update();
 
                         // File was set to ToBeQueuedLater, break from foreach loop
@@ -138,6 +152,80 @@ namespace Extract.SharePoint.Redaction
         }
 
         /// <summary>
+        /// Checks the conditions for queueing the file
+        /// </summary>
+        /// <param name="eventType">The type of event that is being handled</param>
+        /// <param name="folder">The folder the <see param="fileName"/> is in</param>
+        /// <param name="folderWatched">The folder the <see param="settings"/> are from</param>
+        /// <param name="fileName">Name of the files that was added or modified</param>
+        /// <param name="item">The item being added or modified</param>
+        /// <param name="settings">The settings that are used to determine if the file should be queued</param>
+        /// <returns><see langword="true"/> if file should be set to be queued <see langword="false"/> if file
+        /// should not be queued</returns>
+        bool shouldBeSetToBeQueued(
+            FileEventType eventType,
+            string folder,
+            string folderWatched,
+            string fileName,
+            SPListItem item,
+            IdShieldFolderProcessingSettings settings)
+        {
+            // If this is not an event we are handling file should not be queued
+            if ((settings.EventTypes & eventType) == 0)
+            {
+                return false;
+            }
+
+            // If folder is not being watched file should not be queued
+            if (!IsFolderBeingWatched(folder, folderWatched, settings.RecurseSubfolders))
+            {
+                return false;
+            }
+
+            // If file does not match the pattern of file being watched file should not be queued
+            if (!settings.DoesFileMatchPattern(fileName))
+            {
+                return false;
+            }
+
+            // Check if the QueueWithFieldValue settings should be checked
+            if (settings.QueueWithFieldValue)
+            {
+                // if event is not the file modified event the file should not be queued
+                if (eventType != FileEventType.FileModified)
+                {
+                    return false;
+                }
+
+                // if the value of the field does not match value we are looking for file should not be queued
+                if (!ExtractSharePointHelper.IsFieldEqual(item, settings))
+                {
+                    return false;
+                }
+
+                // if the IDShieldStatus is not processed, queue the file
+                if ((string)item[IdShieldHelper.IdShieldStatusColumn] ==
+                    ExtractProcessingStatus.NotProcessed.AsString())
+                {
+                    return true;
+                }
+
+                // No conditions were met for the QueueWithFieldValue so file should not be queued
+                return false;
+            }
+
+            // Only set file to be queued if this is a file added event
+            if (eventType == FileEventType.FileAdded)
+            {
+                return true;
+            }
+
+
+            return false;
+
+        }
+
+        /// <summary>
         /// Checks whether the specified file should be ignored. If it is in the ignore
         /// list this method will return <see langword="true"/>, it also has the side
         /// effect that the item will be removed from the ignore list.
@@ -158,8 +246,8 @@ namespace Extract.SharePoint.Redaction
                 if (list != null)
                 {
                     SPQuery q = new SPQuery();
-                    q.Query = "<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>"
-                        + fullFileUrl + "</Value></Eq></Where>";
+                    q.Query = new camlFieldRef("Title").Eq(new camlValue("Text", fullFileUrl)).Where();
+
                     SPListItemCollection items = list.GetItems(q);
                     result = items != null && items.Count > 0;
                 }

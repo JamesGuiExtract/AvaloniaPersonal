@@ -2,6 +2,9 @@
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
 using System;
+using System.Collections.Generic;
+using System.Data;
+
 
 namespace Extract.SharePoint.Redaction.Layouts
 {
@@ -52,11 +55,29 @@ namespace Extract.SharePoint.Redaction.Layouts
                     var list = site.RootWeb.Lists[new Guid(listid)];
                     hiddenListName.Value = list.Title;
 
+                    List<string> supportedTypes = new List<string>();
+
+                    supportedTypes.Add("Boolean");
+                    supportedTypes.Add("Text");
+                    supportedTypes.Add("Choice");
+
+                    // Load the list values
+                    SPFieldCollection fields = site.RootWeb.Fields;
+                    DataTable fieldList = ExtractSharePointHelper.GetFieldsListForFolder(site.RootWeb, currentFolder, supportedTypes);
+
+                    fieldSelectionList.DataSource = fieldList;
+                    fieldSelectionList.DataValueField = "InternalName";
+                    fieldSelectionList.DataTextField = "Title";
+                    fieldSelectionList.DataBind();
+                    
                     var folderSettings = IdShieldHelper.GetIdShieldFolderSettings(siteGuid);
                     if (folderSettings.Count == 0)
                     {
                         radioParallel.Checked = true;
-                        checkDoNotProcessExisting.Enabled = false;
+                        radioFilesAdded.Checked = true;
+                        checkDoNotProcessExisting.Enabled = true;
+                        fieldSelectionList.Enabled = false;
+                        textValue.Enabled = false;
                         ToggleAllOutputLocations();
                         return;
                     }
@@ -117,11 +138,18 @@ namespace Extract.SharePoint.Redaction.Layouts
                         textFileExtension.Text = temp.FileExtensions;
                         checkReprocess.Checked = temp.Reprocess;
                         bool processAdded = temp.ProcessAddedFiles;
-                        checkAdded.Checked = processAdded;
+                        if (!processAdded && !temp.QueueWithFieldValue)
+                        {
+                            processAdded = true;
+                        }
+                        radioFilesAdded.Checked = processAdded;
                         if (processAdded)
                         {
                             checkDoNotProcessExisting.Checked = !temp.ProcessExisting;
                         }
+                        radioByValue.Checked = temp.QueueWithFieldValue;
+                        fieldSelectionList.SelectedValue = temp.FieldForQueuing;
+                        textValue.Text = temp.ValueToQueueOn;
                         hiddenOutputLocation.Value = temp.OutputLocation.ToString("G");
                         switch (temp.OutputLocation)
                         {
@@ -159,7 +187,10 @@ namespace Extract.SharePoint.Redaction.Layouts
                         radioParallel.Checked = true;
                     }
 
-                    checkDoNotProcessExisting.Enabled = checkAdded.Checked;
+                    fieldSelectionList.Enabled = radioByValue.Checked;
+                    fieldSelectionList.Enabled = radioByValue.Checked;
+                    checkDoNotProcessExisting.Enabled = radioFilesAdded.Checked;
+                    
                     ToggleAllOutputLocations();
                 }
             }
@@ -239,8 +270,8 @@ namespace Extract.SharePoint.Redaction.Layouts
                 var currentFolderSettings = new IdShieldFolderProcessingSettings(
                     new Guid(hiddenListId.Value), new Guid(hiddenFolderId.Value),
                     textCurrentFolderName.Text, textFileExtension.Text, checkRecursively.Checked,
-                    checkReprocess.Checked, checkAdded.Checked, !checkDoNotProcessExisting.Checked,
-                    location, locationString);
+                    checkReprocess.Checked, radioFilesAdded.Checked, true, !checkDoNotProcessExisting.Checked,
+                    location, locationString, radioByValue.Checked, fieldSelectionList.SelectedValue, textValue.Text);
 
 
                 // Need to run with elevated privileges in order to update the
@@ -270,26 +301,21 @@ namespace Extract.SharePoint.Redaction.Layouts
         }
 
         /// <summary>
-        /// Handles the check added changed.
+        /// Handles the radio button changed event for the added or by value radio buttons
         /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected void HandleCheckAddedChanged(object sender, EventArgs e)
+        /// <param name="sender">The object which sent the event.</param>
+        /// <param name="e">The data associated with the event.</param>
+        protected void RadioAddedOrByValueChanged(object sender, EventArgs e)
         {
             try
             {
-                bool enable = checkAdded.Checked;
-                checkDoNotProcessExisting.Enabled = enable;
-                if (!enable)
-                {
-                    checkDoNotProcessExisting.Checked = false;
-                }
+                checkDoNotProcessExisting.Enabled = radioFilesAdded.Checked;
+                fieldSelectionList.Enabled = radioByValue.Checked;
+                textValue.Enabled = radioByValue.Checked;
             }
             catch (Exception ex)
             {
-                IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldWatchFolderConfiguration,
-                    "ELI31321");
-                throw;
+                IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldWatchFolderConfiguration, "ELI35678");
             }
         }
 

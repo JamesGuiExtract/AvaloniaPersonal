@@ -150,7 +150,7 @@ namespace Extract.SharePoint.DataCapture.Layouts
                 var currentFolderSettings = new FolderProcessingSettings(
                     new Guid(hiddenListId.Value), new Guid(hiddenFolderId.Value),
                     textCurrentFolderName.Text, textFileExtension.Text, checkRecursively.Checked,
-                    checkReprocess.Checked, checkAdded.Checked, !checkDoNotProcessExisting.Checked);
+                    checkReprocess.Checked, checkAdded.Checked, !checkDoNotProcessExisting.Checked, false, "", "");
 
 
                 // Need to run with elevated privileges in order to update the

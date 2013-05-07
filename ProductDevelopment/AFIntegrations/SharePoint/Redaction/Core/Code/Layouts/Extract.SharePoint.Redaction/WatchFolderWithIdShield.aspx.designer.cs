@@ -148,13 +148,13 @@ namespace Extract.SharePoint.Redaction.Layouts {
         protected global::System.Web.UI.WebControls.CheckBox checkRecursively;
         
         /// <summary>
-        /// checkAdded control.
+        /// radioFilesAdded control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox checkAdded;
+        protected global::System.Web.UI.WebControls.RadioButton radioFilesAdded;
         
         /// <summary>
         /// checkDoNotProcessExisting control.
@@ -164,6 +164,42 @@ namespace Extract.SharePoint.Redaction.Layouts {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox checkDoNotProcessExisting;
+        
+        /// <summary>
+        /// radioByValue control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton radioByValue;
+        
+        /// <summary>
+        /// fieldSelectionList control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList fieldSelectionList;
+        
+        /// <summary>
+        /// Label1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label Label1;
+        
+        /// <summary>
+        /// textValue control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox textValue;
         
         /// <summary>
         /// panelOutputSettings control.

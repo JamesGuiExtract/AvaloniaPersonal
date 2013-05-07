@@ -65,6 +65,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CamlQueryHelper.cs" />
     <Compile Include="ExtractProcessingFeatureSettings.cs" />
     <Compile Include="ExtractSharePointHelper.cs" />
     <Compile Include="ExtractSharePointLoggingService.cs" />
