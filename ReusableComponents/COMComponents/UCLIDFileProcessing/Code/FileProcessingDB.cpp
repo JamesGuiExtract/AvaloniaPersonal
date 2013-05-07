@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "FileProcessingDB.h"
 #include "FAMDB_SQL.h"
+#include "SelectDBDialog.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -2691,6 +2692,31 @@ STDMETHODIMP CFileProcessingDB::get_IsConnected(VARIANT_BOOL* pbIsConnected)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35708");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::ShowSelectDB(BSTR bstrPrompt, VARIANT_BOOL bAllowCreation,
+									VARIANT_BOOL bRequireAdminLogin, VARIANT_BOOL* pbConnected)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI35754", pbConnected != __nullptr);
+
+		// Display the initial dialog box
+		SelectDBDialog dlgSelectDB(getThisAsCOMPtr(), asString(bstrPrompt),
+			asCppBool(bAllowCreation), asCppBool(bRequireAdminLogin));
+
+		// Display the Select DB dialog and return whether it resulted in connecting to a selected
+		// database.
+		*pbConnected = asVariantBool(dlgSelectDB.DoModal() == IDOK);
+
+		return S_OK;
+
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35755")
 }
 
 //-------------------------------------------------------------------------------------------------

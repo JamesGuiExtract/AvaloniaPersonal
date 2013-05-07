@@ -13,7 +13,6 @@
 #define IDD_DLG_RENAME_ACTION           127
 #define IDD_DLG_SET_ACTION_STATUS       128
 #define IDD_DLG_LOGIN                   129
-#define IDD_DIALOG_SELECT_DB_TO_ADMINISTER 130
 #define IDD_DLG_DBSUMMARY               131
 #define IDR_ACCELERATORS                132
 #define IDD_DIALOG_SELECT_REPORT        133
@@ -54,13 +53,9 @@
 #define IDC_RDCOPYFROM                  2002
 #define IDC_CMB_STATUS                  2003
 #define IDC_CMB_COPY_FROM               2004
-#define IDC_COMBO_SELECT_DB_SERVER      2005
 #define IDC_EDIT_OLD_ACTION_NAME        2006
-#define IDC_RADIO_LOGIN_EXISTING        2007
 #define IDC_EDT_NEW_ACTION              2008
-#define IDC_RADIO_CREATE_NEW_DB         2009
 #define IDC_CMB_ACTION_STATUS           2010
-#define IDC_COMBO_SELECT_DB_NAME        2011
 #define IDC_CMB_ACTION_NAME             2012
 #define IDC_EDT_FILE_NAME               2013
 #define IDC_BTN_BROWSE_FILE             2014

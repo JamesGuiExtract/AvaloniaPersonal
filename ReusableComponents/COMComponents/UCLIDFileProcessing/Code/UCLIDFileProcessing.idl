@@ -1226,7 +1226,18 @@ library UCLID_FILEPROCESSINGLib
 		//			VARIANT_FAlSE
 		[propget, id(109), helpstring("property IsConnected")] HRESULT IsConnected(
 			[out, retval] VARIANT_BOOL* pbIsConnected);
-	};
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Displays a dialog that allows the user to select which server/database to login
+		//			to or, optionally, create.
+		// ARGS:	bstrPrompt- The title bar text for the dialog.
+		//			bAllowCreation- Whether the dialog should allow the user the option to create a
+		//				new database.
+		//			bRequireAdminLogin- Whether admin credentials are required before connected.
+		// RETURNS: Whether a database was selected and successfully connected to.		
+		[id(110), helpstring("method ShowSelectDB")] HRESULT ShowSelectDB([in] BSTR bstrPrompt,
+			[in] VARIANT_BOOL bAllowCreation, [in] VARIANT_BOOL bRequireAdminLogin, 
+			[out,retval] VARIANT_BOOL* pbConnected);
+};
 
 	[
 		object,

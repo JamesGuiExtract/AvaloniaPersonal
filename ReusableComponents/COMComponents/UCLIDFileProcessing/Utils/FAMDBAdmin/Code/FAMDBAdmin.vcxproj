@@ -163,7 +163,6 @@
     <ClCompile Include="ManageUserCountersDlg.cpp" />
     <ClCompile Include="ManageUsersDlg.cpp" />
     <ClCompile Include="RenameActionDlg.cpp" />
-    <ClCompile Include="SelectDBDialog.cpp" />
     <ClCompile Include="SetActionStatusDlg.cpp" />
     <ClCompile Include="SetFilePriorityDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -186,7 +185,6 @@
     <ClInclude Include="ManageUsersDlg.h" />
     <ClInclude Include="RenameActionDlg.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="SelectDBDialog.h" />
     <ClInclude Include="SetActionStatusDlg.h" />
     <ClInclude Include="SetFilePriorityDlg.h" />
     <ClInclude Include="stdafx.h" />

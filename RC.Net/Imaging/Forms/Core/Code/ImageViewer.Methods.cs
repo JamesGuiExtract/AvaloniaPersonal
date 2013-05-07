@@ -1199,7 +1199,7 @@ namespace Extract.Imaging.Forms
                 // Set the image viewer to the proper page for these objects
                 if (PageNumber != pageNumber)
                 {
-                    SetPageNumber(pageNumber, isFitToPage, true);
+                    SetPageNumber(pageNumber, true, true);
                 }
 
                 // Set the appropriate zoom if necessary
@@ -1465,37 +1465,15 @@ namespace Extract.Imaging.Forms
                     _layerObjects.GetIndexOfSortedLayerObjectsInRectangle(PageNumber,
                         viewRectangle, true, true);
 
-                if (objectsInViewIndex.Count == 1)
+                if (objectsInViewIndex.Count > 0)
                 {
-                    // Only 1 object in view, get the index of the object immediately after it.
-                    nextIndex = objectsInViewIndex[objectsInViewIndex.Count - 1] + 1;
-                }
-                else if (objectsInViewIndex.Count > 1)
-                {
-                    // More than one object in view
-
-                    // First check if there is an object on the same page, but not in view
-                    for (int i = 0; i < objectsInViewIndex.Count - 1; i++)
-                    {
-                        // If the index distance between two consecutive objects in
-                        // view is not 1 then there is an object that is spatially
-                        // in between these two objects, but not visible, set it as
-                        // the next object
-                        if (objectsInViewIndex[i + 1] - objectsInViewIndex[i] != 1)
-                        {
-                            nextIndex = objectsInViewIndex[i] + 1;
-                            break;
-                        }
-                    }
-
-                    // If still haven't found the next object, then get first object after
-                    // the last object in view
+                    // The first object in view should be the first selected.
                     if (nextIndex == -1)
                     {
-                        nextIndex = objectsInViewIndex[objectsInViewIndex.Count - 1] + 1;
+                        nextIndex = objectsInViewIndex[0];
                     }
                 }
-                else
+                else 
                 {
                     // No objects in the current view need to search the rest of the page
                     
@@ -1594,34 +1572,12 @@ namespace Extract.Imaging.Forms
                     _layerObjects.GetIndexOfSortedLayerObjectsInRectangle(PageNumber,
                         viewRectangle, true, true);
 
-                if (objectsInViewIndex.Count == 1)
+                if (objectsInViewIndex.Count > 0) 
                 {
-                    // Only 1 object in view, get the index of the object immediately preceding it.
-                    previousIndex = objectsInViewIndex[0] - 1;
-                }
-                else if (objectsInViewIndex.Count > 1) 
-                {
-                    // More than one object in view
-
-                    // First check if there is an object on the same page, but not in view
-                    for (int i = objectsInViewIndex.Count-1; i > 0 ; i--)
-                    {
-                        // If the index distance between two consecutive objects in
-                        // view is not 1 then there is an object that is spatially
-                        // in between these two objects, but not visible, set it as
-                        // the previous object
-                        if (objectsInViewIndex[i] - objectsInViewIndex[i - 1] != 1)
-                        {
-                            previousIndex = objectsInViewIndex[i] - 1;
-                            break;
-                        }
-                    }
-
-                    // If still haven't found the previous object, then get first object before
-                    // the first object in view
+                    // The last object in view should be the first selected.
                     if (previousIndex == -1)
                     {
-                        previousIndex = objectsInViewIndex[0] - 1;
+                        previousIndex = objectsInViewIndex[objectsInViewIndex.Count - 1];
                     }
                 }
                 else
@@ -2658,6 +2614,7 @@ namespace Extract.Imaging.Forms
             // 3) The image viewer is not currently painting to an external graphics object.
             if (!AutoZoomed && !_autoZooming && !_paintingToGraphics)
             {
+                ExtractException.Assert("ELI35757", "No image is open", IsImageAvailable);
                 _lastNonAutoZoomInfo = GetZoomInfo();
             }
         }

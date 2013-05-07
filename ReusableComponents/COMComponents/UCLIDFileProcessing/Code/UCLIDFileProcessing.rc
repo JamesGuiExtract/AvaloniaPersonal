@@ -419,6 +419,28 @@ BEGIN
     GROUPBOX        "Select all files that have the file processing priority of",IDC_GROUP_SELECT,7,7,189,33
 END
 
+IDD_DIALOG_SELECT_DB_TO_ADMINISTER DIALOGEX 0, 0, 246, 196
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Select database to administer"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    COMBOBOX        IDC_COMBO_SELECT_DB_SERVER,14,35,218,82,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Login to existing database",IDC_RADIO_LOGIN_EXISTING,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,14,77,100,10
+    CONTROL         "Create new database",IDC_RADIO_CREATE_NEW_DB,"Button",BS_AUTORADIOBUTTON,14,91,85,10
+    COMBOBOX        IDC_COMBO_SELECT_DB_NAME,14,119,218,82,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_CONN_STR,14,148,196,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    PUSHBUTTON      "...",IDC_BUTTON_CONN_STR,216,148,16,14
+    DEFPUSHBUTTON   "Next",IDOK,133,175,50,14
+    PUSHBUTTON      "Exit",IDCLOSE,189,175,50,14
+    GROUPBOX        "Server",IDC_STATIC,7,7,231,49
+    LTEXT           "Database server name",IDC_STATIC,14,21,74,8
+    GROUPBOX        "Database",IDC_DB_GROUP_BOX,7,63,231,107
+    LTEXT           "Database name",IDC_DB_NAME_LABEL,14,105,51,8
+    LTEXT           "Advanced connection properties",IDC_ADV_PROP_LABEL,14,136,104,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -455,6 +477,7 @@ IDB_BMP_PROGRESS        BITMAP                  ".\\res\\bmp_prog.bmp"
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
+IDI_ICON_FAMDBADMIN     ICON                    "res\\FAMDBAdmin.ico"
 IDI_ICON_DOWN           ICON                    "res\\icon_down.ico"
 IDI_ICON_UP             ICON                    "res\\icon_up.ico"
 IDI_ICON_PROCESS        ICON                    "res\\ProcessFiles.ico"
@@ -613,6 +636,14 @@ BEGIN
         RIGHTMARGIN, 197
         TOPMARGIN, 7
         BOTTOMMARGIN, 60
+    END
+
+    IDD_DIALOG_SELECT_DB_TO_ADMINISTER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 239
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 189
     END
 END
 #endif    // APSTUDIO_INVOKED

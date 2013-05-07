@@ -59,5 +59,12 @@ namespace Extract.FileActionManager.Utilities.Properties {
                 resourceCulture = value;
             }
         }
+        
+        internal static System.Drawing.Icon FAMFileInspector {
+            get {
+                object obj = ResourceManager.GetObject("FAMFileInspector", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
     }
 }

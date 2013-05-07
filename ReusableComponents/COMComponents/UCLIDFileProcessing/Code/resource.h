@@ -15,6 +15,8 @@
 #define IDR_FILEPROCESSINGMGMTROLE      112
 #define IDR_FAMTagManager               113
 #define IDR_FAMDBUTILS                  114
+#define IDI_ICON_FAMDBADMIN             121
+#define IDD_DIALOG_SELECT_DB_TO_ADMINISTER 122
 #define IDD_DLG_PROCESS_FILE            201
 #define IDC_LIST_FILEPROCESSORS         202
 #define IDC_BTN_ADD                     203
@@ -231,6 +233,13 @@
 #define IDC_BTN_MODIFY_CONDITION        2038
 #define IDC_BTN_DELETE_CONDITION        2039
 #define IDC_CMB_LIMIT_SCOPE_METHOD      2040
+#define IDC_COMBO_SELECT_DB_SERVER      2041
+#define IDC_RADIO_LOGIN_EXISTING        2042
+#define IDC_RADIO_CREATE_NEW_DB         2043
+#define IDC_COMBO_SELECT_DB_NAME        2044
+#define IDC_DB_NAME_LABEL               2045
+#define IDC_ADV_PROP_LABEL              2046
+#define IDC_DB_GROUP_BOX                2047
 #define IDC_BTN_RUN                     32768
 #define IDC_BTN_STOP                    32769
 #define IDC_BTN_AUTO_SCROLL             32770
@@ -274,9 +283,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        2041
+#define _APS_NEXT_RESOURCE_VALUE        2048
 #define _APS_NEXT_COMMAND_VALUE         32814
-#define _APS_NEXT_CONTROL_VALUE         2041
-#define _APS_NEXT_SYMED_VALUE           2041
+#define _APS_NEXT_CONTROL_VALUE         2048
+#define _APS_NEXT_SYMED_VALUE           2048
 #endif
 #endif

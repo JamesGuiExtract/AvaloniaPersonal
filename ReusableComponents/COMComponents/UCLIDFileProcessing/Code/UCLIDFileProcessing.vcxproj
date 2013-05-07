@@ -266,6 +266,7 @@
     <ClCompile Include="QueryConditionDlg.cpp" />
     <ClCompile Include="QueueGrid.cpp" />
     <ClCompile Include="SelectActionDlg.cpp" />
+    <ClCompile Include="SelectDBDialog.cpp" />
     <ClCompile Include="SelectFileCondition.cpp" />
     <ClCompile Include="SelectFilesDlg.cpp" />
     <ClCompile Include="SelectFileSettings.cpp" />
@@ -292,6 +293,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\FAMDBAdmin.ico" />
     <None Include="UCLIDFileProcessing.def" />
     <None Include="ActionStatistics.rgs" />
     <None Include="FAMFileSelector.rgs" />
@@ -390,6 +392,7 @@
     <ClInclude Include="QueueGrid.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SelectActionDlg.h" />
+    <ClInclude Include="SelectDBDialog.h" />
     <ClInclude Include="SelectFileCondition.h" />
     <ClInclude Include="SelectFilesDlg.h" />
     <ClInclude Include="SelectFileSettings.h" />

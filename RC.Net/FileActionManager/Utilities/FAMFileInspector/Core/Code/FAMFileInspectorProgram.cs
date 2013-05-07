@@ -1,6 +1,7 @@
 ﻿using Extract.Licensing;
 using System;
 using System.Windows.Forms;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Utilities
 {
@@ -36,7 +37,13 @@ namespace Extract.FileActionManager.Utilities
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
                     "ELI35709", _OBJECT_NAME);
 
-                Application.Run(new FAMFileInspectorForm());
+                var famFileInspectorForm = new FAMFileInspectorForm();
+
+                if (famFileInspectorForm.FileProcessingDB.ShowSelectDB(
+                        "Select database", false, false))
+                {
+                    Application.Run(famFileInspectorForm);    
+                }
             }
             catch (Exception ex)
             {

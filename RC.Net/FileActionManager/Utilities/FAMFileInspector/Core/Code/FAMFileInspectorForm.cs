@@ -1,4 +1,5 @@
 ﻿using ADODB;
+using Extract.Drawing;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Licensing;
@@ -68,6 +69,11 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         internal static int _FILE_LIST_MATCH_COLUMN_INDEX = 2;
 
+        /// <summary>
+        /// The color of highlights to show found search terms in documents.
+        /// </summary>
+        static readonly Color _HIGHLIGHT_COLOR = Color.LimeGreen;
+
         #endregion Constants
 
         #region Enums
@@ -136,11 +142,6 @@ namespace Extract.FileActionManager.Utilities
         /// Saves/restores window state info
         /// </summary>
         FormStateManager _formStateManager;
-
-        /// <summary>
-        /// The <see cref="FileProcessingDB"/> whose files are being inspected.
-        /// </summary>
-        FileProcessingDB _fileProcessingDB = new FileProcessingDB();
 
         /// <summary>
         /// The <see cref="IFAMFileSelector"/> used to specify the domain of files being inspected.
@@ -225,6 +226,8 @@ namespace Extract.FileActionManager.Utilities
                 // License SandDock before creating the form.
                 SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
 
+                FileProcessingDB = new FileProcessingDB();
+
                 InitializeComponent();
 
                 if (!_inDesignMode)
@@ -241,6 +244,8 @@ namespace Extract.FileActionManager.Utilities
                 // other windows when hovering while collapsed. (I found this behavior to be
                 // confusing)
                 _searchDockableWindow.PopupSize = 1;
+
+                LayerObject.SelectionPen = ExtractPens.GetThickDashedPen(_HIGHLIGHT_COLOR);
             }
             catch (Exception ex)
             {
@@ -253,6 +258,19 @@ namespace Extract.FileActionManager.Utilities
         #region Properties
 
         /// <summary>
+        /// Gets or sets the <see cref="FileProcessingDB"/> whose files are being inspected.
+        /// </summary>
+        /// <value>
+        /// The <see cref="FileProcessingDB"/> whose files are being inspected.
+        /// </value>
+        [CLSCompliant(false)]
+        public FileProcessingDB FileProcessingDB
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets the name database server being used.
         /// </summary>
         /// <value>
@@ -262,12 +280,12 @@ namespace Extract.FileActionManager.Utilities
         {
             get
             {
-                return _fileProcessingDB.DatabaseServer;
+                return FileProcessingDB.DatabaseServer;
             }
 
             set
             {
-                _fileProcessingDB.DatabaseServer = value;
+                FileProcessingDB.DatabaseServer = value;
             }
         }
 
@@ -281,12 +299,12 @@ namespace Extract.FileActionManager.Utilities
         {
             get
             {
-                return _fileProcessingDB.DatabaseName;
+                return FileProcessingDB.DatabaseName;
             }
 
             set
             {
-                _fileProcessingDB.DatabaseName = value;
+                FileProcessingDB.DatabaseName = value;
             }
         }
 
@@ -308,10 +326,6 @@ namespace Extract.FileActionManager.Utilities
                 // Establish image viewer connections prior to calling base.OnLoad which will
                 // potentially remove some IImageViewerControls.
                 _imageViewer.EstablishConnections(this);
-
-                // Temporary: 
-                DatabaseServer = "(local)";
-                DatabaseName = "Demo_IDShield";
 
                 UpdateFileSelectionSummary();
 
@@ -456,7 +470,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                if (_fileSelector.Configure(_fileProcessingDB, "Select the files to be listed",
+                if (_fileSelector.Configure(FileProcessingDB, "Select the files to be listed",
                     "SELECT [Filename] FROM [FAMFile]"))
                 {
                     UpdateFileSelectionSummary();
@@ -618,6 +632,56 @@ namespace Extract.FileActionManager.Utilities
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the
+        /// <see cref="_logoutToolStripMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleLogoutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Hide the main form until the user connects to a database.
+                Hide();
+                ClearSearch();
+
+                if (FileProcessingDB.ShowSelectDB("Select database", false, false))
+                {
+                    Show();
+                    StartDatabaseQuery();
+                }
+                else
+                {
+                    // If the user chose to exit from the database selection prompt, exit.
+                    Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35756");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_exitToolStripMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleExitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Close();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35753");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -708,14 +772,14 @@ namespace Extract.FileActionManager.Utilities
             // Ensure any previous background operation is canceled first.
             CancelBackgroundOperation();
 
-            if (!_fileProcessingDB.IsConnected)
+            if (!FileProcessingDB.IsConnected)
             {
-                _fileProcessingDB.ResetDBConnection();
+                FileProcessingDB.ResetDBConnection();
             }
 
             _fileListDataGridView.Rows.Clear();
 
-            string query = _fileSelector.BuildQuery(_fileProcessingDB,
+            string query = _fileSelector.BuildQuery(FileProcessingDB,
                 "[FAMFile].[ID], [FAMFile].[FileName], [FAMFile].[Pages]",
                 " ORDER BY [FAMFile].[ID]");
 
@@ -733,7 +797,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                Recordset queryResults = _fileProcessingDB.GetResultsForQuery(query);
+                Recordset queryResults = FileProcessingDB.GetResultsForQuery(query);
 
                 int fileCount = 0;
 
@@ -1159,7 +1223,7 @@ namespace Extract.FileActionManager.Utilities
                                 SpatialString resultValue =
                                     ocrText.GetSubString(match.Index, match.Index + match.Length - 1);
                                 foreach (CompositeHighlightLayerObject highlight in
-                                    _imageViewer.CreateHighlights(resultValue, Color.LimeGreen))
+                                    _imageViewer.CreateHighlights(resultValue, _HIGHLIGHT_COLOR))
                                 {
                                     _imageViewer.LayerObjects.Add(highlight);
                                 }

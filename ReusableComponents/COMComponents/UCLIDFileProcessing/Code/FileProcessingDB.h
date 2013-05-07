@@ -231,6 +231,8 @@ public:
 	STDMETHOD(get_AdvancedConnectionStringProperties)(BSTR *pVal);
 	STDMETHOD(put_AdvancedConnectionStringProperties)(BSTR newVal);
 	STDMETHOD(get_IsConnected)(VARIANT_BOOL* pbIsConnected);
+	STDMETHOD(ShowSelectDB)(BSTR bstrPrompt, VARIANT_BOOL bAllowCreation,
+		VARIANT_BOOL bRequireAdminLogin, VARIANT_BOOL* pbConnected);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);

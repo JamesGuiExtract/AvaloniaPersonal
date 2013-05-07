@@ -452,6 +452,7 @@ namespace Extract.Imaging.Forms
                         if (!selection.Contains(this))
                         {
                             selection.Add(this);
+                            _imageViewer.Invalidate();
                         }    
                     }
                     else
@@ -460,6 +461,7 @@ namespace Extract.Imaging.Forms
                         if (selection.Contains(this))
                         {
                             selection.Remove(this, true, true);
+                            _imageViewer.Invalidate();
                         }
                     }
                 }

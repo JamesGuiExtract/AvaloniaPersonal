@@ -18,7 +18,8 @@ class SelectDBDialog : public CDialog
 	DECLARE_DYNAMIC(SelectDBDialog)
 
 public:
-	SelectDBDialog(IFileProcessingDBPtr ipFAMDB, CWnd* pParent = NULL);   // standard constructor
+	SelectDBDialog(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB, string strPrompt, 
+		bool bAllowCreation, bool bRequireAdminLogin, CWnd* pParent = NULL);
 	virtual ~SelectDBDialog();
 
 // Dialog Data
@@ -46,6 +47,9 @@ public:
 	CString m_zDBName;
 	CString m_zAdvConnStrProperties;
 	EDBOptions m_eOptionsDatabaseGroup;
+	CString m_zPrompt;
+	bool m_bAllowCreation;
+	bool m_bRequireAdminLogin;
 
 	afx_msg void OnCbnKillfocusComboSelectDbServer();
 	afx_msg void OnBnClickedClose();
@@ -59,11 +63,15 @@ private:
 	HICON m_hIcon;
 
 	// FAMDB pointer to perform operations on the database
-	IFileProcessingDBPtr m_ipFAMDB;
+	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr m_ipFAMDB;
 
 	unique_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
 
 	// If advance connection properties are specified and they reference the server or database,
 	// update it with the current server and database name.
 	void updateAdvConnStrProperties();
+
+	// Hides the radio buttons to choose between loggin into an existing DB or creating a new one.
+	// (logging into an existing one will be the only option)
+	void hideCreationOption();
 };

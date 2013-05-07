@@ -2,9 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "FAMDBAdmin.h"
 #include "SelectDBDialog.h"
-#include "FAMDBAdminDlg.h"
 
 #include <cpputil.h>
 #include <COMUtils.h>
@@ -20,7 +18,8 @@
 
 IMPLEMENT_DYNAMIC(SelectDBDialog, CDialog)
 
-SelectDBDialog::SelectDBDialog(IFileProcessingDBPtr ipFAMDB, CWnd* pParent /*=NULL*/)
+SelectDBDialog::SelectDBDialog(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
+		string strPrompt, bool bAllowCreation, bool bRequireAdminLogin, CWnd* pParent /*=NULL*/)
 	: CDialog(SelectDBDialog::IDD, pParent),
 	m_zServerName(""),
 	m_zDBName(""),
@@ -28,7 +27,10 @@ SelectDBDialog::SelectDBDialog(IFileProcessingDBPtr ipFAMDB, CWnd* pParent /*=NU
 	m_eOptionsDatabaseGroup(kLoginExisting),
 	m_ipFAMDB(ipFAMDB),
 	m_comboServerName(DBInfoCombo::kServerName),
-	m_comboDBName(DBInfoCombo::kDatabaseName)
+	m_comboDBName(DBInfoCombo::kDatabaseName),
+	m_zPrompt((LPCTSTR)strPrompt.c_str()),
+	m_bAllowCreation(bAllowCreation),
+	m_bRequireAdminLogin(bRequireAdminLogin)
 {
 	try
 	{
@@ -89,6 +91,22 @@ BOOL SelectDBDialog::OnInitDialog()
 		// when the application's main window is not a dialog
 		SetIcon(m_hIcon, TRUE);			// Set big icon
 		SetIcon(m_hIcon, FALSE);		// Set small icon
+
+		// Set the window title.
+		SetWindowText(m_zPrompt);
+
+		if (!m_bAllowCreation)
+		{
+			// Hide the radio buttons to choose between logging into to an existing DB or creating
+			// a new one.
+			hideCreationOption();
+		}
+
+		if (!m_bRequireAdminLogin)
+		{
+			// If no login is required, change "Next" to "OK"
+			GetDlgItem(IDOK)->SetWindowTextA("OK");
+		}
 
 		// Load the Server and database from the FAMDB
 		m_zServerName = asString(m_ipFAMDB->DatabaseServer).c_str();
@@ -182,49 +200,40 @@ void SelectDBDialog::OnOK()
 		{
 			try
 			{
-				// Reset the database connection to get the connection representing the correct 
-				// Server and database
-				try
+				// Attempt login if m_bRequireAdminLogin
+				if (m_bRequireAdminLogin)
 				{
-					m_ipFAMDB->ResetDBConnection();
-				}
-				CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18162");
-
-				// Attempt login
-				bLoginValid = m_ipFAMDB->ShowLogin(VARIANT_TRUE, &bLoginCanceled);
-
-				// If login is valid show Admin dialog
-				if (asCppBool(bLoginValid))
-				{
-					// Hide this window
-					ShowWindow(SW_HIDE);
-					
-					// Create admin dialog
-					CFAMDBAdminDlg dlg(m_ipFAMDB);
-					if ( dlg.DoModal() == IDCANCEL )
+					// Reset the database connection to get the connection representing the correct 
+					// Server and database
+					try
 					{
-						// Exit the FAMDBAdmin app
+						m_ipFAMDB->ResetDBConnection();
+					}
+					CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18162");
+
+					bLoginValid = m_ipFAMDB->ShowLogin(VARIANT_TRUE, &bLoginCanceled);
+
+					// If login is valid, return IDOK
+					if (asCppBool(bLoginValid))
+					{
 						__super::OnOK();
 					}
-					else
+					else if (!asCppBool(bLoginCanceled))
 					{
-						// Reset the Database option to login existing
-						m_eOptionsDatabaseGroup = kLoginExisting;
-
-						// Update the UI
-						UpdateData(FALSE);
-
-						// Show this window again
-						ShowWindow(SW_SHOW);
-
-						// Call this so that this dialog will become the active dialog.
-						ActivateTopParent();
+						MessageBox("Login failed.\r\n\r\nPlease ensure you are using the correct password and try again.", 
+							"Login failed", MB_OK | MB_ICONERROR );
 					}
 				}
-				else if (!asCppBool(bLoginCanceled))
+				else
 				{
-					MessageBox("Login failed.\r\n\r\nPlease ensure you are using the correct password and try again.", 
-						"Login failed", MB_OK | MB_ICONERROR );
+					// Attempt to connect to the specified database (with no login prompt)
+					try
+					{
+						m_ipFAMDB->ResetDBConnection();
+					}
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35758");
+
+					__super::OnOK(); 
 				}
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI17535");
@@ -374,4 +383,72 @@ void SelectDBDialog::updateAdvConnStrProperties()
 	// Update only the text of the connection string control to avoid resetting selection in the
 	// database or server controls.
 	GetDlgItem(IDC_EDIT_CONN_STR)->SetWindowText(m_zAdvConnStrProperties);
+}
+//-------------------------------------------------------------------------------------------------
+void SelectDBDialog::hideCreationOption()
+{
+	CWnd *pExistingRadioButton = GetDlgItem(IDC_RADIO_LOGIN_EXISTING);
+	CWnd *pNewRadioButton = GetDlgItem(IDC_RADIO_CREATE_NEW_DB);
+	CWnd *pDBNameLabel = GetDlgItem(IDC_DB_NAME_LABEL);
+	CWnd *pDBNameCombo = GetDlgItem(IDC_COMBO_SELECT_DB_NAME);
+	CWnd *pAdvPropLabel = GetDlgItem(IDC_ADV_PROP_LABEL);
+	CWnd *pConnStrEditBox = GetDlgItem(IDC_EDIT_CONN_STR);
+	CWnd *pConnStrBrowseBtn = GetDlgItem(IDC_BUTTON_CONN_STR);
+	CWnd *pDBGroupBox = GetDlgItem(IDC_DB_GROUP_BOX);
+	CWnd *pOKButton = GetDlgItem(IDOK);
+	CWnd *pCloseButton = GetDlgItem(IDCLOSE);
+
+	CRect rect;
+	pExistingRadioButton->GetWindowRect(&rect);
+	ScreenToClient(&rect);
+	int nTop = rect.top;
+			
+	pExistingRadioButton->ShowWindow(SW_HIDE);
+	pNewRadioButton->ShowWindow(SW_HIDE);
+	
+	pDBNameLabel->GetWindowRect(&rect);
+	ScreenToClient(&rect);
+
+	int nOffset = nTop - rect.top;
+	rect.OffsetRect(0, nOffset);
+	pDBNameLabel->MoveWindow(rect);
+
+	pDBNameCombo->GetWindowRect(&rect);
+	ScreenToClient(&rect);
+	rect.OffsetRect(0, nOffset);
+	pDBNameCombo->MoveWindow(rect);
+
+	pAdvPropLabel->GetWindowRect(&rect);
+	ScreenToClient(&rect);
+	rect.OffsetRect(0, nOffset);
+	pAdvPropLabel->MoveWindow(rect);
+
+	pConnStrEditBox->GetWindowRect(&rect);
+	ScreenToClient(&rect);
+	rect.OffsetRect(0, nOffset);
+	pConnStrEditBox->MoveWindow(rect);
+
+	pConnStrBrowseBtn->GetWindowRect(&rect);
+	ScreenToClient(&rect);
+	rect.OffsetRect(0, nOffset);
+	pConnStrBrowseBtn->MoveWindow(rect);
+
+	pDBGroupBox->GetWindowRect(&rect);
+	ScreenToClient(&rect);
+	rect.bottom += nOffset;
+	pDBGroupBox->MoveWindow(rect);
+
+	pOKButton->GetWindowRect(&rect);
+	ScreenToClient(&rect);
+	rect.OffsetRect(0, nOffset);
+	pOKButton->MoveWindow(rect);
+
+	pCloseButton->GetWindowRect(&rect);
+	ScreenToClient(&rect);
+	rect.OffsetRect(0, nOffset);
+	pCloseButton->MoveWindow(rect);
+
+	GetWindowRect(&rect);
+	rect.bottom += nOffset;
+	MoveWindow(rect);
 }

@@ -4,7 +4,6 @@
 #include "stdafx.h"
 #include "FAMDBAdmin.h"
 #include "FAMDBAdminDlg.h"
-#include "SelectDBDialog.h"
 #include "FAMDBAdminDlg.h"
 
 #include <LicenseMgmt.h>
@@ -163,11 +162,21 @@ BOOL CFAMDBAdminApp::InitInstance()
 			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI17608");
 		}
 
-		// Display the initial dialog box
-		SelectDBDialog dlgSelectDB(ipFAMDB);
-		
-		// Display the Select DB dialog
-		dlgSelectDB.DoModal();
+		// Display the initial database selection dialog box
+		while (asCppBool(ipFAMDB->ShowSelectDB(
+			"Select database to administer", VARIANT_TRUE, VARIANT_TRUE)))
+		{
+			// Create admin dialog
+			CFAMDBAdminDlg dlg(ipFAMDB);
+			if (dlg.DoModal() == IDCANCEL)
+			{
+				// Exit the App
+				return FALSE;
+			}
+
+			// If CFAMDBAdminDlg's result was IDOK, the user has chosen to logout without closing;
+			// the login prompt should be re-displayed.
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14890")
 

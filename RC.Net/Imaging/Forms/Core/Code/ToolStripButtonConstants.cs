@@ -706,7 +706,7 @@ namespace Extract.Imaging.Forms
         /// Constant string for the next layer object button tool tip text.
         /// </summary>
         public const string _NEXT_LAYER_OBJECT_BUTTON_TOOL_TIP =
-            "Go to next object";
+            "Go to next item";
 
         /// <summary>
         /// Constant string for previous layer object button image.
@@ -724,7 +724,7 @@ namespace Extract.Imaging.Forms
         /// Constant string for the previous layer object button tool tip text.
         /// </summary>
         public const string _PREVIOUS_LAYER_OBJECT_BUTTON_TOOL_TIP =
-            "Go to previous object";
+            "Go to previous item";
 
         /// <summary>
         /// Constant string for delete selection button image.
