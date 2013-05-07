@@ -82,7 +82,7 @@ namespace Extract.Sharepoint
                 }
                 else if (_value.ToLower() == "no" || _value.ToLower() == "false")
                 {
-                    rtnValue += "1" + "</Value>";
+                    rtnValue += "0" + "</Value>";
                 }
                 else
                 {
