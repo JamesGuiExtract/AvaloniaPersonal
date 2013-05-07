@@ -141,9 +141,18 @@
             		<ul>
                 		<li>Reprocess previously processed files</li>
                 		<li>Recursively process files from any sub folders</li>
-                		<li>Process any files that are added</li>
                 		<li>Do not process existing files</li>
             		</ul></li>
+					<li>Confirm that it contains radio buttons for
+					<ul>
+						<li>Process any files that are added</li>
+						<li>Process any files where the field ...
+						<ul>
+							<li>Confirm the field combobox and the value text box are only enabled
+							when the <b>Process any files where the field...</b> is checked</li>
+							<li>Confirm the field combobox has names of columns that are text based, choice based or boolean</li>
+						</ul></li>
+					</ul></li>
             		<li>Confirm that <b>Do not process existing files</b> is enabled
             		only when <b>Process any files that are added</b> is checked.</li>
         	</ul></li>
@@ -302,15 +311,16 @@
         	<ul>
             		<li>Confirm that when you export files from SP for processing,
             		the local filenames are incomprehensible GUIDs.</li>
-            		<li>Confirm that an ID Shield Status column correctly displays the
+            		<li>Confirm that an IDS Status column correctly displays the
             		status of all files in folders to be processed:
             		<ul>
                 		<li>Not Processed</li>
                 		<li>To Be Queued</li>
                 		<li>Queued For Processing</li>
-                		<li>In Verification Queue</li>
-                		<li>Complete</li>
-                		<li>Failed</li>
+                		<li>Queued for Verification</li>
+                		<li>Redacted</li>
+						<li>No Redactions</li>
+                		<li>Processing Failed</li>
             		</ul></li>
             		<li>Confirm that the status column cannot be manually 
             		modified.</li>
@@ -402,12 +412,82 @@
 			the output folder.
 			<li>Confirm that no security exceptions are logged.
 		</ul>
-        	<li><b>[Integrations #]</b>
+        	<li><b>[Integrations #345</b> Add button to ribbon to set all selected files to be queued
 		<ul>
+			<li>Setup Process Folder settings for the folder you are working in, for this test set to queue by a 
+			field with a value it will never contain</li>
+			<li>Confirm <b>Process Selected</b> button is disabled when no files are selected</li>
+			<li>Add files to folder</li>
+			<li>Select a one or more files</li>
+			<li>Click <b>Process Selected</b> button on the ribbon</li>
+            <li><b>IDS Status</b> column should change to <b>To Be Queued</b></li>
+		</ul>
+        	<li><b>[Integrations #350]</b> Add ability to queue files based on the value of a field for a document</li>
+            <ul>
+                <li>Create a Yes/No column named Redact with a default value of "No" (this can be done from Library Settings)</li>
+                <li>Setup <b>Process folder</b> settings to watch for field "Redact" with value "Yes"</li>
+                <ul>
+                    <li>Add a single document</li>
+                        <ul>
+                            <li>Save without changing any values on the dialog to edit field values</li>
+                            <ul>
+                                <li><b>IDS Status</b> should be <b>Not Processed</b></li>
+                            </ul>
+                            <li>Repeat adding a file and changing the Redact field to checked</li>
+                            <ul>
+                                <li><b>IDS Status</b> should be <b>To Be Queued</b></li>
+                            </ul>
+                        </ul>
+                    <li>Add multiple documents</li>
+                    <ul>
+                        <li>All should have <b>IDS Status</b> set to <b>Not Processed</b></li>
+                    </ul>
+                    <li>Select a file that has Redact column set to <b>No</b></li>
+                    <ul>
+                        <li>Edit the properties and set Redact to checked</li>
+                        <ul>
+                            <li><b>IDS Status</b> should be <b>To Be Queued</b></li>
+                        </ul>
+                    </ul>
+                </ul>
+                <li>Repeat with the value for the field set to True</li>
+                <li>Repeat with the value for the field set to 1</li>
+                <li>Repeat with the value for the field set to No</li>
+                <li>Repeat with the value for the field set to False</li>
+                <li>Repeat with the value for the field set to 0</li>
+                <li>Repeat with a value that is not one of the previous tested, 
+                all results should be <b>Not Processed</b></li>
+                <li>Repeat with the <b>Recusively process files from any sub folders</b>, 
+                adding files to the subfolders</li>
+                <li>Repeat testing with files in different processed states and then set the 
+                     <b>Reprocess previously processed files</b>;</li>
+                <ul>
+                    <li>When the settings are saved all files that meet the field condition and don't have anything in the <b>IDS Reference </b>column should be set to <b>To Be Queued</b> </li>
+                   
+                </ul>
+                <li>Test the <b>Process any files that are added</b> option</li>
+                <ul>
+                    <li>Add a single file</li>
+                    <li>Wait at least 30 seconds before clicking save on the Field Value dialog</li>
+                    <ul>
+                        <li>There should not be an unhandled exception</li>
+                    </ul>
+                    <li>Confirm the file was set to <b>To Be Queued</b></li>
+                    <li>Add multiple files</li>
+                    <li>Confirm all the files are set to <b>To Be Queued</b></li>
+                </ul>
+                
+            </ul>
+		<ul>
+		</ul>
 		</ul>
         	<li><b>[Integrations #]</b>
 		<ul>
 		</ul>
+        	<li><b>[Integrations #]</b>
+		<ul>
+		</ul>
+		
     	</ul></LI>
 </OL>
 </BODY>
