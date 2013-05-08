@@ -1,23 +1,17 @@
 @ECHO OFF
 
-setlocal
-
-%~d0
-cd %~p0
-
 @ECHO Uninstalling all Extract Systems applications...
-start /wait "" ..\ExtractUninstaller\ExtractUninstaller /s /f2nul
+start /wait "" "%~dp0..\ExtractUninstaller\ExtractUninstaller" /s /f2nul
 
-IF EXIST "C:\Program Files (x86)" (
+IF "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 	set FLEXINDEX_ISS="%~dp0FlexIndex64.iss"
 ) ELSE (
 	set FLEXINDEX_ISS="%~dp0FlexIndex.iss"
 )
 
-
 @ECHO.
 @ECHO Installing Flex Index...
-start /wait "" "..\FlexIndex\Setup" /s /f1%FLEXINDEX_ISS% /f2nul
+start /wait "" "%~dp0..\FlexIndex\Setup" /s /f1%FLEXINDEX_ISS% /f2nul
 
 @ECHO.
 @ECHO.
