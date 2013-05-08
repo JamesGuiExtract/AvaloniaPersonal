@@ -1335,6 +1335,8 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_FTP_ACCOUNT);
 	vecQueries.push_back(gstrCREATE_FTP_EVENT_HISTORY_TABLE);
 	vecQueries.push_back(gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_TABLE);
+	vecQueries.push_back(gstrCREATE_FIELD_SEARCH_TABLE);
+	vecQueries.push_back(gstrCREATE_LAUNCH_APP_TABLE);
 
 	return vecQueries;
 }

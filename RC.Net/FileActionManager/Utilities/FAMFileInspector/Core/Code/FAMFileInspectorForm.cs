@@ -159,6 +159,12 @@ namespace Extract.FileActionManager.Utilities
         /// VOA (data) files.
         /// </summary>
         IAFUtility _afUtils = new AFUtility();
+        
+        /// <summary>
+        /// Associates pre-defined search terms from the database's FieldSearch table with their
+        /// associated queries.
+        /// </summary>
+        Dictionary<string, string> _dataSearchQueries = new Dictionary<string, string>();
 
         /// <summary>
         /// A <see cref="Task"/> that performs database query operations on a background thread.
@@ -334,6 +340,55 @@ namespace Extract.FileActionManager.Utilities
             }
         }
 
+        /// <summary>
+        /// Resets the search settings back to the defaul and clears all matches indicated in
+        /// <see cref="_fileListDataGridView"/>.
+        /// </summary>
+        public void ResetSearch()
+        {
+            try
+            {
+                _searchModifierComboBox.SelectEnumValue(SearchModifier.Any);
+                _textSearchTermsDataGridView.Rows.Clear();
+                _dataSearchTermsDataGridView.Rows.Clear();
+                _showOnlyMatchesCheckBox.Checked = false;
+                _showOnlyMatchesCheckBox.Enabled = false;
+
+                foreach (DataGridViewRow row in _fileListDataGridView.Rows)
+                {
+                    row.GetFileData().ClearSearchResults();
+                }
+                _fileListDataGridView.Invalidate();
+
+                UpdateStatusLabel();
+
+                // Populate all pre-defined search terms from the database's FieldSearch table.
+                Recordset queryResults = FileProcessingDB.GetResultsForQuery(
+                    "SELECT [FieldName], [AttributeQuery] FROM [FieldSearch] WHERE [Enabled] = 1 " +
+                    "ORDER BY [FieldName]");
+                if (!queryResults.EOF)
+                {
+                    queryResults.MoveFirst();
+                    while (!queryResults.EOF)
+                    {
+                        string fieldName = (string)queryResults.Fields[0].Value;
+                        string attributeQuery = (string)queryResults.Fields[1].Value;
+
+                        _dataSearchQueries[fieldName] = attributeQuery;
+
+                        int index = _dataSearchTermsDataGridView.Rows.Add(fieldName, "");
+                        _dataSearchTermsDataGridView.Rows[index].Cells[0].ReadOnly = true;
+
+                        queryResults.MoveNext();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35772");
+            }
+        }
+
         #endregion Methods
 
         #region Overrides
@@ -357,7 +412,7 @@ namespace Extract.FileActionManager.Utilities
 
                 // Initialize the search settings.
                 _searchTypeComboBox.SelectEnumValue(SearchType.Text);
-                ClearSearch();
+                ResetSearch();
 
                 StartDatabaseQuery();
             }
@@ -563,7 +618,11 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                if (_searchTypeComboBox.ToEnumValue<SearchType>() == SearchType.Text)
+                if (OperationIsActive)
+                {
+                    CancelBackgroundOperation();
+                }
+                else if (_searchTypeComboBox.ToEnumValue<SearchType>() == SearchType.Text)
                 {
                     StartTextSearch();
                 }
@@ -588,7 +647,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                ClearSearch();
+                ResetSearch();
             }
             catch (Exception ex)
             {
@@ -671,10 +730,11 @@ namespace Extract.FileActionManager.Utilities
             {
                 // Hide the main form until the user connects to a database.
                 Hide();
-                ClearSearch();
 
                 if (FileProcessingDB.ShowSelectDB("Select database", false, false))
                 {
+                    ResetFileSelectionSettings();
+                    ResetSearch();
                     Show();
                     StartDatabaseQuery();
                 }
@@ -737,6 +797,7 @@ namespace Extract.FileActionManager.Utilities
                 _searchTypeComboBox.Enabled = !value;
                 _textSearchTermsDataGridView.Enabled = !value;
                 _clearButton.Enabled = !value;
+                _searchProgressBar.Value = 0;
                 
                 UpdateStatusLabel();
                 Update();
@@ -751,51 +812,30 @@ namespace Extract.FileActionManager.Utilities
         {
             if (OperationIsActive)
             {
-                _statusToolStripLabel.Text = "Searching...";
+                _searchStatusLabel.Text = "Searching...";
             }
             else if (_showOnlyMatchesCheckBox.Checked)
             {
                 int resultCount = _fileListDataGridView.Rows
                     .OfType<DataGridViewRow>()
                     .Count(row => row.Visible);
-                _statusToolStripLabel.Text = string.Format(CultureInfo.CurrentCulture,
+                _searchStatusLabel.Text = string.Format(CultureInfo.CurrentCulture,
                     "Showing {0:D} search results", resultCount);
             }
             else
             {
                 if (_fileSelectionCount > _fileListDataGridView.Rows.Count)
                 {
-                    _statusToolStripLabel.Text = string.Format(CultureInfo.CurrentCulture,
+                    _searchStatusLabel.Text = string.Format(CultureInfo.CurrentCulture,
                         "Showing {0:D} of {1:D} files", _fileListDataGridView.Rows.Count,
                         _fileSelectionCount);
                 }
                 else
                 {
-                    _statusToolStripLabel.Text = string.Format(CultureInfo.CurrentCulture,
+                    _searchStatusLabel.Text = string.Format(CultureInfo.CurrentCulture,
                         "Showing {0:D} files", _fileListDataGridView.Rows.Count);
                 }
             }
-        }
-
-        /// <summary>
-        /// Clears the search settings as well as all matches indicated in
-        /// <see cref="_fileListDataGridView"/>.
-        /// </summary>
-        void ClearSearch()
-        {
-            _searchModifierComboBox.SelectEnumValue(SearchModifier.Any);
-            _textSearchTermsDataGridView.Rows.Clear();
-            _dataSearchTermsDataGridView.Rows.Clear();
-            _showOnlyMatchesCheckBox.Checked = false;
-            _showOnlyMatchesCheckBox.Enabled = false;
-
-            foreach (DataGridViewRow row in _fileListDataGridView.Rows)
-            {
-                row.GetFileData().ClearSearchResults();
-            }
-            _fileListDataGridView.Invalidate();
-
-            UpdateStatusLabel();
         }
 
         /// <summary>
@@ -966,6 +1006,9 @@ namespace Extract.FileActionManager.Utilities
                     rowToUpdate.Visible =
                         rowData.FileMatchesSearch || !_showOnlyMatchesCheckBox.Checked;
                     _fileListDataGridView.InvalidateRow(rowToUpdate.Index);
+
+                    // Update the progress bar
+                    _searchProgressBar.Value++;
                 });
             }
         }
@@ -985,7 +1028,15 @@ namespace Extract.FileActionManager.Utilities
                     .Where(pair => !string.IsNullOrWhiteSpace(pair.Key) &&
                         !string.IsNullOrWhiteSpace(pair.Value)))
             {
-                searchTerms.Add(pair.Key, pair.Value);
+                // If this is a pre-defined search term, look up the associated attribute query
+                string attributeQuery;
+                if (!_dataSearchQueries.TryGetValue(pair.Key, out attributeQuery))
+                {
+                    // Otherwise treat the term itself as the attribute query.
+                    attributeQuery = pair.Key;
+                }
+
+                searchTerms.Add(attributeQuery, pair.Value);
             }
             ExtractException.Assert("ELI35743", "No search terms specified", searchTerms.Count() > 0);
 
@@ -1076,6 +1127,9 @@ namespace Extract.FileActionManager.Utilities
                     rowToUpdate.Visible =
                         rowData.FileMatchesSearch || !_showOnlyMatchesCheckBox.Checked;
                     _fileListDataGridView.InvalidateRow(rowToUpdate.Index);
+
+                    // Update the progress bar
+                    _searchProgressBar.Value++;
                 });
             }
         }
@@ -1100,6 +1154,9 @@ namespace Extract.FileActionManager.Utilities
                 row.Visible = false;
             }
             _fileListDataGridView.Invalidate();
+
+            _searchProgressBar.Value = 0;
+            _searchProgressBar.Maximum = _fileListDataGridView.Rows.Count;
 
             // Start by showing only the matching files.
             _showOnlyMatchesCheckBox.Enabled = true;

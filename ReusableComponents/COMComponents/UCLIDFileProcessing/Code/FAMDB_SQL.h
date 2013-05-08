@@ -290,6 +290,22 @@ static const string gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_TABLE =
 	"[UPI] [nvarchar](450) NULL, "
 	"[ChangeStatus][nvarchar](1) NOT NULL)";
 
+static const string gstrCREATE_FIELD_SEARCH_TABLE =
+	"CREATE TABLE [dbo].[FieldSearch]("
+	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FieldSearch] PRIMARY KEY CLUSTERED,"
+	"[Enabled] [bit] NOT NULL DEFAULT 1,"
+	"[FieldName] [nvarchar](64) NOT NULL,"
+	"[AttributeQuery] [nvarchar](256) NOT NULL)";
+
+static const string gstrCREATE_LAUNCH_APP_TABLE =
+	"CREATE TABLE [dbo].[LaunchApp]("
+	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_LaunchApp] PRIMARY KEY CLUSTERED,"
+	"[Enabled] [bit] NOT NULL DEFAULT 1,"
+	"[AdminOnly] [bit] NOT NULL DEFAULT 0,"
+	"[AppName] [nvarchar](64) NOT NULL,"
+	"[ApplicationPath] [nvarchar](260) NOT NULL,"
+	"[Arguments] [ntext])";
+
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
 	"ON [DBInfo]([ID])";

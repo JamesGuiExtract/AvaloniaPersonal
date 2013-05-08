@@ -32,8 +32,9 @@
             this._exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._splitContainer = new System.Windows.Forms.SplitContainer();
             this._mainToolStripContainer = new System.Windows.Forms.ToolStripContainer();
-            this._statusToolStrip = new System.Windows.Forms.ToolStrip();
-            this._statusToolStripLabel = new System.Windows.Forms.ToolStripLabel();
+            this._searchStatusStrip = new System.Windows.Forms.StatusStrip();
+            this._searchStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this._searchProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this._searchSplitContainer = new System.Windows.Forms.SplitContainer();
             this._selectFilesButton = new System.Windows.Forms.Button();
             this._fileListPanel = new System.Windows.Forms.Panel();
@@ -58,14 +59,14 @@
             this._sandDockManager = new TD.SandDock.SandDockManager();
             this._imageToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
-            this._viewCommandsImageViewerToolStrip = new Extract.Imaging.Forms.ViewCommandsImageViewerToolStrip();
-            this._navigationToolsImageViewerToolStrip = new Extract.Imaging.Forms.NavigationToolsImageViewerToolStrip();
             this._imageViewerToolsToolStrip = new System.Windows.Forms.ToolStrip();
             this.zoomWindowToolStripButton1 = new Extract.Imaging.Forms.ZoomWindowToolStripButton();
             this.panToolStripButton1 = new Extract.Imaging.Forms.PanToolStripButton();
             this._highlightNavigationToolStrip = new System.Windows.Forms.ToolStrip();
             this._previousLayerObjectToolStripButton = new Extract.Imaging.Forms.PreviousLayerObjectToolStripButton();
             this._nextLayerObjectToolStripButton = new Extract.Imaging.Forms.NextLayerObjectToolStripButton();
+            this._navigationToolsImageViewerToolStrip = new Extract.Imaging.Forms.NavigationToolsImageViewerToolStrip();
+            this._viewCommandsImageViewerToolStrip = new Extract.Imaging.Forms.ViewCommandsImageViewerToolStrip();
             this.BottomToolStripPanel = new System.Windows.Forms.ToolStripPanel();
             this.TopToolStripPanel = new System.Windows.Forms.ToolStripPanel();
             this.RightToolStripPanel = new System.Windows.Forms.ToolStripPanel();
@@ -83,7 +84,7 @@
             this._mainToolStripContainer.ContentPanel.SuspendLayout();
             this._mainToolStripContainer.TopToolStripPanel.SuspendLayout();
             this._mainToolStripContainer.SuspendLayout();
-            this._statusToolStrip.SuspendLayout();
+            this._searchStatusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._searchSplitContainer)).BeginInit();
             this._searchSplitContainer.Panel1.SuspendLayout();
             this._searchSplitContainer.Panel2.SuspendLayout();
@@ -200,12 +201,12 @@
             // 
             // _mainToolStripContainer.BottomToolStripPanel
             // 
-            this._mainToolStripContainer.BottomToolStripPanel.Controls.Add(this._statusToolStrip);
+            this._mainToolStripContainer.BottomToolStripPanel.Controls.Add(this._searchStatusStrip);
             // 
             // _mainToolStripContainer.ContentPanel
             // 
             this._mainToolStripContainer.ContentPanel.Controls.Add(this._searchSplitContainer);
-            this._mainToolStripContainer.ContentPanel.Size = new System.Drawing.Size(500, 588);
+            this._mainToolStripContainer.ContentPanel.Size = new System.Drawing.Size(500, 591);
             this._mainToolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             // 
             // _mainToolStripContainer.LeftToolStripPanel
@@ -225,28 +226,33 @@
             // 
             this._mainToolStripContainer.TopToolStripPanel.Controls.Add(this._menuStrip);
             // 
-            // _statusToolStrip
+            // _searchStatusStrip
             // 
-            this._statusToolStrip.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._statusToolStrip.AutoSize = false;
-            this._statusToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._statusToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._statusToolStripLabel});
-            this._statusToolStrip.Location = new System.Drawing.Point(3, 0);
-            this._statusToolStrip.Name = "_statusToolStrip";
-            this._statusToolStrip.Size = new System.Drawing.Size(391, 25);
-            this._statusToolStrip.TabIndex = 2;
-            this._statusToolStrip.Text = "Ready";
+            this._searchStatusStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._searchStatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._searchStatusLabel,
+            this._searchProgressBar});
+            this._searchStatusStrip.Location = new System.Drawing.Point(0, 0);
+            this._searchStatusStrip.Name = "_searchStatusStrip";
+            this._searchStatusStrip.Size = new System.Drawing.Size(500, 22);
+            this._searchStatusStrip.TabIndex = 0;
             // 
-            // _statusToolStripLabel
+            // _searchStatusLabel
             // 
-            this._statusToolStripLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this._statusToolStripLabel.Name = "_statusToolStripLabel";
-            this._statusToolStripLabel.Size = new System.Drawing.Size(39, 22);
-            this._statusToolStripLabel.Text = "Ready";
-            this._statusToolStripLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this._searchStatusLabel.AutoSize = false;
+            this._searchStatusLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this._searchStatusLabel.Name = "_searchStatusLabel";
+            this._searchStatusLabel.Size = new System.Drawing.Size(281, 17);
+            this._searchStatusLabel.Spring = true;
+            this._searchStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // _searchProgressBar
+            // 
+            this._searchProgressBar.AutoSize = false;
+            this._searchProgressBar.Name = "_searchProgressBar";
+            this._searchProgressBar.Size = new System.Drawing.Size(202, 16);
+            this._searchProgressBar.Step = 1;
+            this._searchProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             // 
             // _selectFilesButton
             // 
@@ -266,7 +272,7 @@
             this._fileListPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this._fileListPanel.Location = new System.Drawing.Point(0, 185);
             this._fileListPanel.Name = "_fileListPanel";
-            this._fileListPanel.Size = new System.Drawing.Size(500, 326);
+            this._fileListPanel.Size = new System.Drawing.Size(500, 329);
             this._fileListPanel.TabIndex = 7;
             // 
             // _fileListDataGridView
@@ -517,10 +523,10 @@
             // 
             // _imageToolStripContainer.TopToolStripPanel
             // 
+            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommandsImageViewerToolStrip);
+            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._navigationToolsImageViewerToolStrip);
             this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._imageViewerToolsToolStrip);
             this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._highlightNavigationToolStrip);
-            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._navigationToolsImageViewerToolStrip);
-            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommandsImageViewerToolStrip);
             // 
             // _imageViewer
             // 
@@ -534,24 +540,6 @@
             this._imageViewer.RedactionMode = false;
             this._imageViewer.Size = new System.Drawing.Size(728, 598);
             this._imageViewer.TabIndex = 0;
-            // 
-            // _viewCommandsImageViewerToolStrip
-            // 
-            this._viewCommandsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._viewCommandsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this._viewCommandsImageViewerToolStrip.Location = new System.Drawing.Point(404, 0);
-            this._viewCommandsImageViewerToolStrip.Name = "_viewCommandsImageViewerToolStrip";
-            this._viewCommandsImageViewerToolStrip.Size = new System.Drawing.Size(324, 39);
-            this._viewCommandsImageViewerToolStrip.TabIndex = 1;
-            // 
-            // _navigationToolsImageViewerToolStrip
-            // 
-            this._navigationToolsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._navigationToolsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this._navigationToolsImageViewerToolStrip.Location = new System.Drawing.Point(171, 0);
-            this._navigationToolsImageViewerToolStrip.Name = "_navigationToolsImageViewerToolStrip";
-            this._navigationToolsImageViewerToolStrip.Size = new System.Drawing.Size(233, 39);
-            this._navigationToolsImageViewerToolStrip.TabIndex = 2;
             // 
             // _imageViewerToolsToolStrip
             // 
@@ -619,6 +607,24 @@
             this._nextLayerObjectToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._nextLayerObjectToolStripButton.Text = "Go to next match";
             // 
+            // _navigationToolsImageViewerToolStrip
+            // 
+            this._navigationToolsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._navigationToolsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this._navigationToolsImageViewerToolStrip.Location = new System.Drawing.Point(171, 0);
+            this._navigationToolsImageViewerToolStrip.Name = "_navigationToolsImageViewerToolStrip";
+            this._navigationToolsImageViewerToolStrip.Size = new System.Drawing.Size(233, 39);
+            this._navigationToolsImageViewerToolStrip.TabIndex = 2;
+            // 
+            // _viewCommandsImageViewerToolStrip
+            // 
+            this._viewCommandsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._viewCommandsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this._viewCommandsImageViewerToolStrip.Location = new System.Drawing.Point(404, 0);
+            this._viewCommandsImageViewerToolStrip.Name = "_viewCommandsImageViewerToolStrip";
+            this._viewCommandsImageViewerToolStrip.Size = new System.Drawing.Size(312, 39);
+            this._viewCommandsImageViewerToolStrip.TabIndex = 1;
+            // 
             // BottomToolStripPanel
             // 
             this.BottomToolStripPanel.Location = new System.Drawing.Point(0, 0);
@@ -673,7 +679,7 @@
             // 
             this._searchSplitContainer.Panel2.Controls.Add(this._fileListPanel);
             this._searchSplitContainer.Panel2.Controls.Add(this.dockContainer1);
-            this._searchSplitContainer.Size = new System.Drawing.Size(500, 588);
+            this._searchSplitContainer.Size = new System.Drawing.Size(500, 591);
             this._searchSplitContainer.SplitterDistance = 73;
             this._searchSplitContainer.TabIndex = 2;
             // 
@@ -697,13 +703,14 @@
             ((System.ComponentModel.ISupportInitialize)(this._splitContainer)).EndInit();
             this._splitContainer.ResumeLayout(false);
             this._mainToolStripContainer.BottomToolStripPanel.ResumeLayout(false);
+            this._mainToolStripContainer.BottomToolStripPanel.PerformLayout();
             this._mainToolStripContainer.ContentPanel.ResumeLayout(false);
             this._mainToolStripContainer.TopToolStripPanel.ResumeLayout(false);
             this._mainToolStripContainer.TopToolStripPanel.PerformLayout();
             this._mainToolStripContainer.ResumeLayout(false);
             this._mainToolStripContainer.PerformLayout();
-            this._statusToolStrip.ResumeLayout(false);
-            this._statusToolStrip.PerformLayout();
+            this._searchStatusStrip.ResumeLayout(false);
+            this._searchStatusStrip.PerformLayout();
             this._searchSplitContainer.Panel1.ResumeLayout(false);
             this._searchSplitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this._searchSplitContainer)).EndInit();
@@ -746,13 +753,6 @@
         private Imaging.Forms.ZoomWindowToolStripButton zoomWindowToolStripButton1;
         private Imaging.Forms.PanToolStripButton panToolStripButton1;
         private System.Windows.Forms.SplitContainer _searchSplitContainer;
-        private System.Windows.Forms.ToolStrip _statusToolStrip;
-        private System.Windows.Forms.ToolStripPanel BottomToolStripPanel;
-        private System.Windows.Forms.ToolStripPanel TopToolStripPanel;
-        private System.Windows.Forms.ToolStripPanel RightToolStripPanel;
-        private System.Windows.Forms.ToolStripPanel LeftToolStripPanel;
-        private System.Windows.Forms.ToolStripContentPanel ContentPanel;
-        private System.Windows.Forms.ToolStripLabel _statusToolStripLabel;
         private System.Windows.Forms.ComboBox _searchModifierComboBox;
         private System.Windows.Forms.ComboBox _searchTypeComboBox;
         private System.Windows.Forms.Label label3;
@@ -778,6 +778,14 @@
         private System.Windows.Forms.ToolStripMenuItem _logoutToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem _exitToolStripMenuItem;
+        private System.Windows.Forms.StatusStrip _searchStatusStrip;
+        private System.Windows.Forms.ToolStripStatusLabel _searchStatusLabel;
+        private System.Windows.Forms.ToolStripPanel BottomToolStripPanel;
+        private System.Windows.Forms.ToolStripPanel TopToolStripPanel;
+        private System.Windows.Forms.ToolStripPanel RightToolStripPanel;
+        private System.Windows.Forms.ToolStripPanel LeftToolStripPanel;
+        private System.Windows.Forms.ToolStripContentPanel ContentPanel;
+        private System.Windows.Forms.ToolStripProgressBar _searchProgressBar;
 
     }
 }

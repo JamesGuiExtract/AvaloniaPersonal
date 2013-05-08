@@ -43,6 +43,7 @@ namespace Extract.FileActionManager.Utilities
                         "Select database", false, false))
                 {
                     famFileInspectorForm.ResetFileSelectionSettings();
+                    famFileInspectorForm.ResetSearch();
 
                     Application.Run(famFileInspectorForm);    
                 }
