@@ -1051,3 +1051,16 @@ static const string gstrRECORD_FTP_EVENT_QUERY =
 	+		"@FTPAccountID, '" + gstrTAG_FTP_ARG1_VAR + "', " + gstrTAG_FTP_ARG2_VAR + ", "
 	+		gstrTAG_FTP_MACHINEID_VAR + ", " + gstrTAG_FTP_USERID_VAR + ", "
 	+		gstrTAG_FTP_RETRIES_VAR + ", " + gstrTAG_FTP_EXCEPTION_VAR + ")";
+
+// constants for the query to get the total number of files referenced in the database
+const string gstrTOTAL_FILECOUNT_FIELD = "FileCount";
+// This query executes very fast even on a large DB, but require admin permissions in the database.
+const string gstrFAST_TOTAL_FAMFILE_QUERY = "SELECT SUM (row_count) AS " + gstrTOTAL_FILECOUNT_FIELD +
+	" FROM sys.dm_db_partition_stats "
+	"WHERE object_id=OBJECT_ID('FAMFile') AND (index_id=0 or index_id=1)";
+// This query can take some time to run on a large DB, but will work for any database user with read
+// permissions.
+const string gstrSTANDARD_TOTAL_FAMFILE_QUERY = "SELECT COUNT(*) AS " + gstrTOTAL_FILECOUNT_FIELD +
+	" FROM [FAMFile]";
+const string gstrSTANDARD_TOTAL_FAMFILE_QUERY_ORACLE = "SELECT COUNT(*) AS \"" + 
+	gstrTOTAL_FILECOUNT_FIELD + "\" FROM \"FAMFile\"";

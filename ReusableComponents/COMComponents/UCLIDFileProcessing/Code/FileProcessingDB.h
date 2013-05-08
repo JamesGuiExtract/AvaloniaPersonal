@@ -233,6 +233,7 @@ public:
 	STDMETHOD(get_IsConnected)(VARIANT_BOOL* pbIsConnected);
 	STDMETHOD(ShowSelectDB)(BSTR bstrPrompt, VARIANT_BOOL bAllowCreation,
 		VARIANT_BOOL bRequireAdminLogin, VARIANT_BOOL* pbConnected);
+	STDMETHOD(GetFileCount)(VARIANT_BOOL bUseOracleSyntax, LONGLONG* pnFileCount);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -427,6 +428,9 @@ private:
 	// Indicates whether retries will be attempted per the CommandTimeout DBInfo setting if a query
 	// times out.
 	bool m_bRetryOnTimeout;
+
+	// Indicates whether the user was denied permission to run the fast file count query.
+	bool m_bDeniedFastCountPermission;
 
 	//-------------------------------------------------------------------------------------------------
 	// Methods
@@ -993,6 +997,7 @@ private:
 		VARIANT_BOOL vbQueueing, EFTPAction eFTPAction, BSTR bstrServerAddress,
 		BSTR bstrUserName, BSTR bstrArg1, BSTR bstrArg2, long nRetries, BSTR bstrException);
 	bool IsAnyFAMActive_Internal(bool bDBLocked, VARIANT_BOOL* pvbFAMIsActive);
+	bool GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseOracleSyntax, LONGLONG* pnFileCount);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

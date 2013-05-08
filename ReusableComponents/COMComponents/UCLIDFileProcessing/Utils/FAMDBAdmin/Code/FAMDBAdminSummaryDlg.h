@@ -66,9 +66,6 @@ private:
 	// The action ID associated with the context menu click location.
 	long m_nContextMenuActionID;
 
-	// Indicates whether the user was denied permission to run the fast file count query.
-	bool m_bDeniedFastCountPermission;
-
 	// Indicates if the queries used should use OracleSyntax
 	bool m_bUseOracleSyntax;
 
@@ -88,7 +85,4 @@ private:
 			" FROM FAMFile GROUP BY " + strActionColumn;
 		return strQuery;
 	}
-	//---------------------------------------------------------------------------------------------
-	// PURPOSE: To return the total count of files in the database
-	long long getTotalFileCount();
 };

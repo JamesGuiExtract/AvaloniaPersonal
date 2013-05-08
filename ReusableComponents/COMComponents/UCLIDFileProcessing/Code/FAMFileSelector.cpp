@@ -99,6 +99,25 @@ STDMETHODIMP CFAMFileSelector::AddActionStatusCondition(IFileProcessingDB *pFAMD
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35697");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMFileSelector::LimitToSubset(VARIANT_BOOL bRandomSubset,
+											 VARIANT_BOOL bUsePercentage, LONG nSubsetSize)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_settings.setLimitToSubset(true);
+		m_settings.setSubsetIsRandom(asCppBool(bRandomSubset));
+		m_settings.setSubsetUsePercentage(asCppBool(bUsePercentage));
+		m_settings.setSubsetSize(nSubsetSize);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35769");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFAMFileSelector::GetSummaryString(BSTR *pbstrSummaryString)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());

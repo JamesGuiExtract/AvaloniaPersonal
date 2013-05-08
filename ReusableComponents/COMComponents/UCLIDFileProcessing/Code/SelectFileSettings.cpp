@@ -247,6 +247,19 @@ string SelectFileSettings::buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDB
 	}
 	else if (m_bLimitToSubset && !m_bSubsetIsRandom)
 	{
+		// [FlexIDSCore:6422]
+		// Get the size of the subset to return up front for efficiency (prevents needing to select
+		// all files to a temp table within the query).
+		long nSubsetSize(m_nSubsetSize);
+		if (m_bSubsetUsePercentage)
+		{
+			long nFileCount = (long)ipFAMDB->GetFileCount(VARIANT_FALSE);
+			nSubsetSize = (long)((double)nFileCount * (double)m_nSubsetSize / 100.0);
+		}
+
+		strQueryPart1 =
+				"SELECT DISTINCT TOP " + asString(nSubsetSize) + " " + strSelect + " FROM ";
+
 		string strTopQuery =
 			// Besides improving performance, SET NOCOUNT ON prevents "Operation is not allowed when
 			// the object is closed" errors.
@@ -279,14 +292,8 @@ string SelectFileSettings::buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDB
 			"INSERT INTO #OriginalResults (" + strSelect + ") " + strQueryPart1 + "\r\n"
 			"(\r\n" + strQuery + "\r\n) AS FAMFile"
 			"\r\n"
-			// Calculate the number to return (using SQL's PERCENT seems to be returning unexpected
-			// results: 50% of 28 = 15)
-			"SET @rowsToReturn = " + (m_bSubsetUsePercentage ? 
-				"CEILING(@@ROWCOUNT * " + asString(m_nSubsetSize)+ ".0 / 100) " :
-				asString(m_nSubsetSize)) + "\r\n"
-			"SELECT " + strSelect + 
-			" FROM (SELECT TOP (@rowsToReturn) * FROM #OriginalResults AS FAMFile) AS FAMFile " +
-			strOrderByClause + "\r\n"
+			"SELECT " + strSelect + " FROM (SELECT * FROM #OriginalResults AS FAMFile) AS FAMFile "
+				+ strOrderByClause + "\r\n"
 			"\r\n"
 			"DROP TABLE #OriginalResults\r\n"
 			"\r\n"

@@ -149,6 +149,12 @@ namespace Extract.FileActionManager.Utilities
         IFAMFileSelector _fileSelector = new FAMFileSelector();
 
         /// <summary>
+        /// The number of files currently selected by <see cref="_fileSelector"/>. Not all may be
+        /// displayed.
+        /// </summary>
+        volatile int _fileSelectionCount;
+
+        /// <summary>
         /// An <see cref="IAFUtility"/> instance used to query for <see cref="IAttribute"/>s from
         /// VOA (data) files.
         /// </summary>
@@ -309,6 +315,26 @@ namespace Extract.FileActionManager.Utilities
         }
 
         #endregion Properties
+
+        #region Methods
+
+        /// <summary>
+        /// Resets all changes to file selection back to the default (no conditions, top 1000 files).
+        /// </summary>
+        public void ResetFileSelectionSettings()
+        {
+            try
+            {
+                _fileSelector.Reset();
+                _fileSelector.LimitToSubset(false, false, 1000);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35768");
+            }
+        }
+
+        #endregion Methods
 
         #region Overrides
 
@@ -737,8 +763,17 @@ namespace Extract.FileActionManager.Utilities
             }
             else
             {
-                _statusToolStripLabel.Text = string.Format(CultureInfo.CurrentCulture,
-                    "Showing {0:D} files", _fileListDataGridView.Rows.Count);
+                if (_fileSelectionCount > _fileListDataGridView.Rows.Count)
+                {
+                    _statusToolStripLabel.Text = string.Format(CultureInfo.CurrentCulture,
+                        "Showing {0:D} of {1:D} files", _fileListDataGridView.Rows.Count,
+                        _fileSelectionCount);
+                }
+                else
+                {
+                    _statusToolStripLabel.Text = string.Format(CultureInfo.CurrentCulture,
+                        "Showing {0:D} files", _fileListDataGridView.Rows.Count);
+                }
             }
         }
 
@@ -799,35 +834,40 @@ namespace Extract.FileActionManager.Utilities
             {
                 Recordset queryResults = FileProcessingDB.GetResultsForQuery(query);
 
-                int fileCount = 0;
+                _fileSelectionCount = 0;
 
                 // If there are any query results, populate _resultsDataGridView.
-                if (queryResults.RecordCount > 0)
+                if (!queryResults.EOF)
                 {
-                    // Continue populating up to _MAX_FILES_TO_DISPLAY.
                     queryResults.MoveFirst();
-                    while (fileCount < _MAX_FILES_TO_DISPLAY && !queryResults.EOF)
+                    while (!queryResults.EOF)
                     {
                         // Abort if the user cancelled.
                         cancelToken.ThrowIfCancellationRequested();
 
-                        // Retrieve the fields necessary for the results table.
-                        string fileName = (string)queryResults.Fields[1].Value;
-                        var fileData = new FAMFileData(fileName);
-
-                        string directory = Path.GetDirectoryName(fileName);
-                        fileName = Path.GetFileName(fileName);
-                        int pageCount =
-                            (int)queryResults.Fields[_FILE_LIST_MATCH_COLUMN_INDEX].Value;
-
-                        // Invoke the new row to be added on the UI thread.
-                        this.SafeBeginInvoke("ELI35725", () =>
+                        // Populate up to _MAX_FILES_TO_DISPLAY in the file list, but iterate all
+                        // results to obtain the overall number of files selected.
+                        if (_fileSelectionCount < _MAX_FILES_TO_DISPLAY)
                         {
-                            _fileListDataGridView.Rows.Add(fileName, pageCount, fileData, directory);
-                        });
+                            // Retrieve the fields necessary for the results table.
+                            string fileName = (string)queryResults.Fields[1].Value;
+                            var fileData = new FAMFileData(fileName);
+
+                            string directory = Path.GetDirectoryName(fileName);
+                            fileName = Path.GetFileName(fileName);
+                            int pageCount =
+                                (int)queryResults.Fields[_FILE_LIST_MATCH_COLUMN_INDEX].Value;
+
+                            // Invoke the new row to be added on the UI thread.
+                            this.SafeBeginInvoke("ELI35725", () =>
+                            {
+                                _fileListDataGridView.Rows.Add(fileName, pageCount, fileData,
+                                    directory);
+                            });
+                        }
 
                         queryResults.MoveNext();
-                        fileCount++;
+                        _fileSelectionCount++;
                     }
                 }
             }

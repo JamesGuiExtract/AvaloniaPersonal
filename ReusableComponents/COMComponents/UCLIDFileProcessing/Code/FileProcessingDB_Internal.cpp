@@ -977,6 +977,7 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 				// Since the database is being opened reset the m_lFAMUserID and m_lMachineID
 				m_lFAMUserID = 0;
 				m_lMachineID = 0;
+				m_bDeniedFastCountPermission = false;
 
 				// Set the status of the connection to not connected
 				m_strCurrentConnectionStatus = gstrNOT_CONNECTED;

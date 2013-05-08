@@ -1237,6 +1237,13 @@ library UCLID_FILEPROCESSINGLib
 		[id(110), helpstring("method ShowSelectDB")] HRESULT ShowSelectDB([in] BSTR bstrPrompt,
 			[in] VARIANT_BOOL bAllowCreation, [in] VARIANT_BOOL bRequireAdminLogin, 
 			[out,retval] VARIANT_BOOL* pbConnected);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Obtains the overall file count. If not using Oracle syntax and the user has
+		//			permission to query system view, the system views will be used to get the count
+		//			fast rather than having to iterate all files.
+		// ARGS:	bUseOracleSyntax- Whether Oracle syntax should be used to obtain the file count.
+		// RETURNS: The file count.
+		[id(111)] HRESULT GetFileCount(VARIANT_BOOL bUseOracleSyntax, [out,retval] LONGLONG* pnFileCount);
 };
 
 	[
@@ -1783,6 +1790,16 @@ library UCLID_FILEPROCESSINGLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Resets all configured condition and subset settings.
 		[id(6), helpstring("method Reset")] HRESULT Reset();
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Limits the file selected to a subset of those meeting the currently configured
+		//			conditions.
+		// ARGS:	bRandomSubset- VARIANT_TRUE if the subset should be random.
+		//			bUsePercentage- VARIANT_TRUE if the subset size is a percentage, VARIANT_FALSE
+		//				if it is the record count.
+		//			nSubsetSize- The size the subset should be (percentage or count per
+		//				bUsePercentage).
+		[id(7), helpstring("method LimitToSubset")] HRESULT LimitToSubset(
+			 [in] VARIANT_BOOL bRandomSubset, [in] VARIANT_BOOL bUsePercentage, [in] LONG nSubsetSize);
 	};
 
 	//----------------------------------------------------------------------------------------------

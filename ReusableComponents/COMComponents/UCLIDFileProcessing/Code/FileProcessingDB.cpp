@@ -2748,3 +2748,25 @@ STDMETHODIMP CFileProcessingDB::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetFileCount(VARIANT_BOOL bUseOracleSyntax, LONGLONG* pnFileCount)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI35770", pnFileCount != __nullptr);
+
+		validateLicense();
+
+		if (!GetFileCount_Internal(false, bUseOracleSyntax, pnFileCount))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			GetFileCount_Internal(true, bUseOracleSyntax, pnFileCount);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35760")
+}
+//-------------------------------------------------------------------------------------------------

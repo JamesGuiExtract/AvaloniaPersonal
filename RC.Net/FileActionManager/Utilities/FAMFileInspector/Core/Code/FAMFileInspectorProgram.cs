@@ -42,6 +42,8 @@ namespace Extract.FileActionManager.Utilities
                 if (famFileInspectorForm.FileProcessingDB.ShowSelectDB(
                         "Select database", false, false))
                 {
+                    famFileInspectorForm.ResetFileSelectionSettings();
+
                     Application.Run(famFileInspectorForm);    
                 }
             }

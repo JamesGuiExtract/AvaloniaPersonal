@@ -5974,3 +5974,102 @@ bool CFileProcessingDB::IsAnyFAMActive_Internal(bool bDBLocked, VARIANT_BOOL* pv
 	}
 	return true;
 }
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseOracleSyntax,
+											  LONGLONG* pnFileCount)
+{
+	try
+	{
+		try
+		{
+			bool bUseOracle = asCppBool(bUseOracleSyntax);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			// Create a pointer to a recordset
+			_RecordsetPtr ipResultSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI35761", ipResultSet != __nullptr);
+
+			if (bUseOracle)
+			{
+				ipResultSet->Open(gstrSTANDARD_TOTAL_FAMFILE_QUERY_ORACLE.c_str(),
+					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly,
+					adCmdText);
+			}
+			else
+			{
+				if (!m_bDeniedFastCountPermission)
+				{
+					try
+					{
+						try
+						{
+							// First attempt a fast query that requires permissions to query system
+							// views FAMFile table.
+							ipResultSet->Open(gstrFAST_TOTAL_FAMFILE_QUERY.c_str(),
+								_variant_t((IDispatch *)ipConnection, true), adOpenStatic,
+								adLockReadOnly, adCmdText);
+							ASSERT_RESOURCE_ALLOCATION("ELI35762", ipResultSet != __nullptr);
+						}
+						CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35763");
+					}
+					catch (UCLIDException &ue)
+					{
+						// If there was an error unrelated to permissions, log it (don't throw in
+						// case there is still a chance it is related to permissions).
+						if (ue.getTopText().find("permission") == string::npos)
+						{
+							ue.log();
+						}
+
+						m_bDeniedFastCountPermission = true;
+					}
+				}
+
+				if (m_bDeniedFastCountPermission)
+				{
+					// If the user had insufficient permission for the fast query, use the standard
+					// query that will work for all db readers/writers.
+					ipResultSet->Open(gstrSTANDARD_TOTAL_FAMFILE_QUERY.c_str(),
+						_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly,
+						adCmdText);
+				}
+			}
+
+			ASSERT_RESOURCE_ALLOCATION("ELI35764", ipResultSet != __nullptr);
+
+			// there should only be 1 record returned
+			// TODO: This was modified because the returned recordset from Oracle has records but the 
+			// record count value is -1 
+			if (ipResultSet->adoEOF != VARIANT_TRUE)
+			{
+				// get the file count (value type depends on which file count query executed.
+				*pnFileCount = !bUseOracle && m_bDeniedFastCountPermission
+					? (long long)getLongField(ipResultSet->Fields, gstrTOTAL_FILECOUNT_FIELD)
+					: getLongLongField(ipResultSet->Fields, gstrTOTAL_FILECOUNT_FIELD);
+			}
+			else
+			{
+				THROW_LOGIC_ERROR_EXCEPTION("ELI35765");
+			}
+
+			END_CONNECTION_RETRY(ipConnection, "ELI35766");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35767");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
