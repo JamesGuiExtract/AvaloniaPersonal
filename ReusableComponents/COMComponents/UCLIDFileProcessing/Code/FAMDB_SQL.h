@@ -294,7 +294,7 @@ static const string gstrCREATE_FIELD_SEARCH_TABLE =
 	"CREATE TABLE [dbo].[FieldSearch]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FieldSearch] PRIMARY KEY CLUSTERED,"
 	"[Enabled] [bit] NOT NULL DEFAULT 1,"
-	"[FieldName] [nvarchar](64) NOT NULL,"
+	"[FieldName] [nvarchar](64) NOT NULL UNIQUE,"
 	"[AttributeQuery] [nvarchar](256) NOT NULL)";
 
 static const string gstrCREATE_LAUNCH_APP_TABLE =
@@ -302,7 +302,7 @@ static const string gstrCREATE_LAUNCH_APP_TABLE =
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_LaunchApp] PRIMARY KEY CLUSTERED,"
 	"[Enabled] [bit] NOT NULL DEFAULT 1,"
 	"[AdminOnly] [bit] NOT NULL DEFAULT 0,"
-	"[AppName] [nvarchar](64) NOT NULL,"
+	"[AppName] [nvarchar](64) NOT NULL UNIQUE,"
 	"[ApplicationPath] [nvarchar](260) NOT NULL,"
 	"[Arguments] [ntext])";
 
