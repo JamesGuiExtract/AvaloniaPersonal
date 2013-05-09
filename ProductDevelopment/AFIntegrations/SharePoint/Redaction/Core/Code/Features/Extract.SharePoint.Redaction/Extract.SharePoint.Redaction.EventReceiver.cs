@@ -36,18 +36,18 @@ namespace Extract.SharePoint.Redaction.Features
                     {
                         // Attempt to get the ID Shield group. If it does not exist
                         // then add it.
-                        var group = web.SiteGroups[IdShieldHelper.IdShieldGroupName];
+                        var group = web.SiteGroups[IdShieldHelper.IdShieldAdministratorsGroupName];
                     }
                     catch
                     {
                         try
                         {
-                            web.SiteGroups.Add(IdShieldHelper.IdShieldGroupName,
+                            web.SiteGroups.Add(IdShieldHelper.IdShieldAdministratorsGroupName,
                                 web.CurrentUser, web.CurrentUser, "ID Shield administration group.");
-                            web.AssociatedGroups.Add(web.SiteGroups[IdShieldHelper.IdShieldGroupName]);
+                            web.AssociatedGroups.Add(web.SiteGroups[IdShieldHelper.IdShieldAdministratorsGroupName]);
                             web.Update();
 
-                            var assignment = new SPRoleAssignment(web.SiteGroups[IdShieldHelper.IdShieldGroupName]);
+                            var assignment = new SPRoleAssignment(web.SiteGroups[IdShieldHelper.IdShieldAdministratorsGroupName]);
                             var role = web.RoleDefinitions["Read"];
                             assignment.RoleDefinitionBindings.Add(role);
                             web.RoleAssignments.Add(assignment);

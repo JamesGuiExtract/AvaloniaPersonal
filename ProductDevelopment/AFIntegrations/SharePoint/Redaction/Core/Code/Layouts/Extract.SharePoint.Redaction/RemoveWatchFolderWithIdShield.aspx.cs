@@ -27,7 +27,7 @@ namespace Extract.SharePoint.Redaction.Layouts
                 }
 
                 if (!ExtractSharePointHelper.IsMember(SPContext.Current.Web,
-                    IdShieldHelper.IdShieldGroupName))
+                    IdShieldHelper.IdShieldAdministratorsGroupName))
                 {
                     SetUIToIndicateNoPermission();
                     return;

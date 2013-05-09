@@ -28,7 +28,7 @@ namespace Extract.SharePoint.Redaction.Layouts
             try
             {
                 if (!ExtractSharePointHelper.IsMember(SPContext.Current.Web,
-                    IdShieldHelper.IdShieldGroupName))
+                    IdShieldHelper.IdShieldAdministratorsGroupName))
                 {
                     HideNormalControls();
                     panelMessage.Visible = true;

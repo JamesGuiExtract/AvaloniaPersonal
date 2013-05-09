@@ -28,13 +28,6 @@ namespace Extract.SharePoint.Redaction.Layouts
                     return;
                 }
 
-                if (!ExtractSharePointHelper.IsMember(SPContext.Current.Web,
-                    IdShieldHelper.IdShieldGroupName))
-                {
-                    SetUIToIndicateNoPermission();
-                    return;
-                }
-
                 var siteId = Request.QueryString["siteid"];
                 var listId = Request.QueryString["listidvalue"];
                 var fileId = Request.QueryString["fileid"];

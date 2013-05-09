@@ -179,7 +179,9 @@
     <Content Include="Images\Extract.SharePoint.Redaction\ProcessSelected16x16.png" />
     <Content Include="Images\Extract.SharePoint.Redaction\ProcessSelected32x32.png" />
     <Content Include="Layouts\Extract.SharePoint.Redaction\RedactionHelpers.js" />
-    <Content Include="Layouts\Extract.SharePoint.Redaction\RedactNowHelper.aspx" />
+    <Content Include="Layouts\Extract.SharePoint.Redaction\RedactNowHelper.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx" />
     <Content Include="ADMIN\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx">
       <SubType>ASPXCodeBehind</SubType>
