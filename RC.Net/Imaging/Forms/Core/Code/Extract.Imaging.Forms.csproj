@@ -663,11 +663,17 @@
     <Compile Include="StatusStripItems\BackgroundProcessStatusLabel.Designer.cs">
       <DependentUpon>BackgroundProcessStatusLabel.cs</DependentUpon>
     </Compile>
-    <Compile Include="StatusStripItems\ImageViewerStatusStrip.cs">
+    <Compile Include="StatusStripItems\LayerObjectSelectionStatusLabel.Designer.cs">
+	  <DependentUpon>LayerObjectSelectionStatusLabel.cs</DependentUpon>
+    </Compile>
+	<Compile Include="StatusStripItems\ImageViewerStatusStrip.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="StatusStripItems\ImageViewerStatusStrip.Designer.cs">
       <DependentUpon>ImageViewerStatusStrip.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatusStripItems\LayerObjectSelectionStatusLabel.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="StatusStripItems\MousePositionToolStripStatusLabel.cs">
       <SubType>Component</SubType>

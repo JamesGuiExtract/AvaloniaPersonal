@@ -152,13 +152,17 @@
 #define ID_DATABASE_SET_OPTIONS         32799
 #define ID_SUMMARY_MENU_VIEW_FAILED     32800
 #define ID_TOOLS_RECALCULATE_STATS      32801
+#define ID__INSPECTFILES                32802
+#define ID_SUMMARY_MENU_INSPECT_FILES   32803
+#define ID_TOOLS_INSPECTFILES           32804
+#define ID_TOOLS_INSPECT_FILES          32805
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        146
-#define _APS_NEXT_COMMAND_VALUE         32802
+#define _APS_NEXT_COMMAND_VALUE         32806
 #define _APS_NEXT_CONTROL_VALUE         2109
 #define _APS_NEXT_SYMED_VALUE           2000
 #endif

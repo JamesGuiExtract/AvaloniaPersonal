@@ -529,6 +529,22 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
+        /// Restores the specified <see paramref="Form"/> if it is currently minimized.
+        /// </summary>
+        /// <param name="form">The <see cref="Form"/> to restore.</param>
+        public static void Restore(Form form)
+        {
+            try
+            {
+                NativeMethods.Restore(form);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35795");
+            }
+        }
+
+        /// <summary>
         /// Allows the user to select a folder using the folder browser.
         /// </summary>
         /// <param name="description">The text to display over the folder selection contro.</param>
@@ -851,6 +867,15 @@ namespace Extract.Utilities.Forms
         public static void MakeFormInvisible(this Form form)
         {
             FormsMethods.MakeFormInvisible(form);
+        }
+
+        /// <summary>
+        /// Restores the specified <see paramref="Form"/> if it is currently minimized.
+        /// </summary>
+        /// <param name="form">The <see cref="Form"/> to restore.</param>
+        public static void Restore(this Form form)
+        {
+            FormsMethods.Restore(form);
         }
     }
 

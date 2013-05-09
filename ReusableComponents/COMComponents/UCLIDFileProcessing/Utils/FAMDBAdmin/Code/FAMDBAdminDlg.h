@@ -38,6 +38,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg void OnHelpAbout();
 	afx_msg void OnExportFileLists();
+	afx_msg void OnInspectFiles();
 	afx_msg void OnExit();
 	afx_msg void OnCancel();
 	afx_msg void OnOK();
@@ -112,6 +113,9 @@ private:
 
 	// Saves/restores window position/size info to/from the registry.
 	WindowPersistenceMgr m_windowMgr;
+
+	// Allows inspection of files in the database using the FAMFileInspector utility.
+	IFAMFileInspectorPtr m_ipFAMFileInspector;
 
 	//////////
 	//Methods

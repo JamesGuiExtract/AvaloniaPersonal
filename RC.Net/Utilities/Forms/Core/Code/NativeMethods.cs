@@ -28,6 +28,11 @@ namespace Extract.Utilities.Forms
         // Flash until the window comes to the foreground
         const uint FLASHW_TIMERNOFG = 0x0000000C;
 
+        // Activates and displays the window. If the window is minimized or maximized, the system
+        // restores it to its original size and position. An application should specify this flag
+        // when restoring a minimized window.
+        const int SW_RESTORE = 0x09;
+
         #endregion Constants
 
         #region Structs
@@ -277,6 +282,15 @@ namespace Extract.Utilities.Forms
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
+
+        /// <summary>
+        /// Sets the specified window's show state.
+        /// </summary>
+        /// <param name="hWnd">A handle to the window.</param>
+        /// <param name="nCmdShow">Controls how the window is to be shown.</param>
+        /// <returns></returns>
+        [DllImport("user32.dll")]
+        private static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
 
         #endregion P/Invokes
 
@@ -642,6 +656,25 @@ namespace Extract.Utilities.Forms
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI33219");
+            }
+        }
+
+        /// <summary>
+        /// Restores the specified <see paramref="Form"/> if it is currently minimized.
+        /// </summary>
+        /// <param name="form">The <see cref="Form"/> to restore.</param>
+        public static void Restore(this Form form)
+        {
+            try
+            {
+                if (form.WindowState == FormWindowState.Minimized)
+                {
+                    ShowWindow(form.Handle, SW_RESTORE);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35794");
             }
         }
 

@@ -41,6 +41,11 @@ namespace Extract.FileActionManager.Utilities
         static readonly string _OBJECT_NAME = typeof(FAMFileInspectorForm).ToString();
 
         /// <summary>
+        /// The visible title of this application.
+        /// </summary>
+        static readonly String _APPLICATION_TITLE = "FAM File Inspector";
+
+        /// <summary>
         /// The license string for the SandDock manager
         /// </summary>
         static readonly string _SANDDOCK_LICENSE_STRING = @"1970|siE7SnF/jzINQg1AOTIaCXLlouA=";
@@ -59,11 +64,6 @@ namespace Extract.FileActionManager.Utilities
             "24440334-DE0C-46C1-920F-45D064A10DBF";
 
         /// <summary>
-        /// The maximum number of files to display at once.
-        /// </summary>
-        static readonly int _MAX_FILES_TO_DISPLAY = 1000;
-
-        /// <summary>
         /// The column from <see cref="_fileListDataGridView"/> that represents the results of the
         /// most recent search.
         /// </summary>
@@ -73,6 +73,11 @@ namespace Extract.FileActionManager.Utilities
         /// The color of highlights to show found search terms in documents.
         /// </summary>
         static readonly Color _HIGHLIGHT_COLOR = Color.LimeGreen;
+
+        /// <summary>
+        /// The maximum number of files to display at once.
+        /// </summary>
+        public static readonly int MaxFilesToDisplay = 1000;
 
         #endregion Constants
 
@@ -144,12 +149,7 @@ namespace Extract.FileActionManager.Utilities
         FormStateManager _formStateManager;
 
         /// <summary>
-        /// The <see cref="IFAMFileSelector"/> used to specify the domain of files being inspected.
-        /// </summary>
-        IFAMFileSelector _fileSelector = new FAMFileSelector();
-
-        /// <summary>
-        /// The number of files currently selected by <see cref="_fileSelector"/>. Not all may be
+        /// The number of files currently selected by <see cref="FileSelector"/>. Not all may be
         /// displayed.
         /// </summary>
         volatile int _fileSelectionCount;
@@ -239,6 +239,7 @@ namespace Extract.FileActionManager.Utilities
                 SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
 
                 FileProcessingDB = new FileProcessingDB();
+                FileSelector = new FAMFileSelector();
 
                 InitializeComponent();
 
@@ -277,6 +278,16 @@ namespace Extract.FileActionManager.Utilities
         /// </value>
         [CLSCompliant(false)]
         public FileProcessingDB FileProcessingDB
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The <see cref="IFAMFileSelector"/> used to specify the domain of files being inspected.
+        /// </summary>
+        [CLSCompliant(false)]
+        public IFAMFileSelector FileSelector
         {
             get;
             set;
@@ -331,8 +342,8 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                _fileSelector.Reset();
-                _fileSelector.LimitToSubset(false, false, 1000);
+                FileSelector.Reset();
+                FileSelector.LimitToSubset(false, false, MaxFilesToDisplay);
             }
             catch (Exception ex)
             {
@@ -389,6 +400,44 @@ namespace Extract.FileActionManager.Utilities
             }
         }
 
+        /// <summary>
+        /// Generates the displayed file list based on the <see cref="FileSelector"/>'s current
+        /// settings.
+        /// </summary>
+        public void GenerateFileList()
+        {
+            try
+            {
+                // Ensure any previous background operation is canceled first.
+                CancelBackgroundOperation();
+
+                if (!FileProcessingDB.IsConnected)
+                {
+                    FileProcessingDB.ResetDBConnection();
+                }
+
+                UpdateFileSelectionSummary();
+
+                _fileListDataGridView.Rows.Clear();
+
+                // If generating a new file list, the previous search results don't apply anymore.
+                // Unheck show search results until a new search is run.
+                _showOnlyMatchesCheckBox.Checked = false;
+                _showOnlyMatchesCheckBox.Enabled = false;
+
+                string query = FileSelector.BuildQuery(FileProcessingDB,
+                    "[FAMFile].[ID], [FAMFile].[FileName], [FAMFile].[Pages]",
+                    " ORDER BY [FAMFile].[ID]");
+
+                // Run the query on a background thread so the UI remains responsive as rows are loaded.
+                StartBackgroundOperation(() => RunDatabaseQuery(query, _queryCanceler.Token));
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35792");
+            }
+        }
+
         #endregion Methods
 
         #region Overrides
@@ -408,13 +457,11 @@ namespace Extract.FileActionManager.Utilities
                 // potentially remove some IImageViewerControls.
                 _imageViewer.EstablishConnections(this);
 
-                UpdateFileSelectionSummary();
-
                 // Initialize the search settings.
                 _searchTypeComboBox.SelectEnumValue(SearchType.Text);
                 ResetSearch();
 
-                StartDatabaseQuery();
+                GenerateFileList();
             }
             catch (Exception ex)
             {
@@ -551,12 +598,10 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                if (_fileSelector.Configure(FileProcessingDB, "Select the files to be listed",
+                if (FileSelector.Configure(FileProcessingDB, "Select the files to be listed",
                     "SELECT [Filename] FROM [FAMFile]"))
                 {
-                    UpdateFileSelectionSummary();
-
-                    StartDatabaseQuery();
+                    GenerateFileList();
                 }
             }
             catch (Exception ex)
@@ -731,12 +776,12 @@ namespace Extract.FileActionManager.Utilities
                 // Hide the main form until the user connects to a database.
                 Hide();
 
-                if (FileProcessingDB.ShowSelectDB("Select database", false, false))
+                if (FileProcessingDB.ShowSelectDB("Select database", false, true))
                 {
                     ResetFileSelectionSettings();
                     ResetSearch();
                     Show();
-                    StartDatabaseQuery();
+                    GenerateFileList();
                 }
                 else
                 {
@@ -797,7 +842,10 @@ namespace Extract.FileActionManager.Utilities
                 _searchTypeComboBox.Enabled = !value;
                 _textSearchTermsDataGridView.Enabled = !value;
                 _clearButton.Enabled = !value;
-                _searchProgressBar.Value = 0;
+                if (!value)
+                {
+                    _searchProgressBar.Visible = false;
+                }
                 
                 UpdateStatusLabel();
                 Update();
@@ -839,30 +887,6 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Starts a new database query for files based on the <see cref="_fileSelector"/>'s current
-        /// settings.
-        /// </summary>
-        void StartDatabaseQuery()
-        {
-            // Ensure any previous background operation is canceled first.
-            CancelBackgroundOperation();
-
-            if (!FileProcessingDB.IsConnected)
-            {
-                FileProcessingDB.ResetDBConnection();
-            }
-
-            _fileListDataGridView.Rows.Clear();
-
-            string query = _fileSelector.BuildQuery(FileProcessingDB,
-                "[FAMFile].[ID], [FAMFile].[FileName], [FAMFile].[Pages]",
-                " ORDER BY [FAMFile].[ID]");
-
-            // Run the query on a background thread so the UI remains responsive as rows are loaded.
-            StartBackgroundOperation(() => RunDatabaseQuery(query, _queryCanceler.Token));
-        }
-
-        /// <summary>
         /// Runs a database query to build the file list on a background thread.
         /// </summary>
         /// <param name="query">The query used to generate the file list.</param>
@@ -885,9 +909,9 @@ namespace Extract.FileActionManager.Utilities
                         // Abort if the user cancelled.
                         cancelToken.ThrowIfCancellationRequested();
 
-                        // Populate up to _MAX_FILES_TO_DISPLAY in the file list, but iterate all
+                        // Populate up to MaxFilesToDisplay in the file list, but iterate all
                         // results to obtain the overall number of files selected.
-                        if (_fileSelectionCount < _MAX_FILES_TO_DISPLAY)
+                        if (_fileSelectionCount < MaxFilesToDisplay)
                         {
                             // Retrieve the fields necessary for the results table.
                             string fileName = (string)queryResults.Fields[1].Value;
@@ -1157,6 +1181,7 @@ namespace Extract.FileActionManager.Utilities
 
             _searchProgressBar.Value = 0;
             _searchProgressBar.Maximum = _fileListDataGridView.Rows.Count;
+            _searchProgressBar.Visible = true;
 
             // Start by showing only the matching files.
             _showOnlyMatchesCheckBox.Enabled = true;
@@ -1353,7 +1378,13 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         void UpdateFileSelectionSummary()
         {
-            string summaryText = _fileSelector.GetSummaryString();
+            Text = _APPLICATION_TITLE;
+            if (FileProcessingDB.IsConnected)
+            {
+                Text = DatabaseName + " on " + DatabaseServer + " - " + Text;
+            }
+
+            string summaryText = FileSelector.GetSummaryString();
             _selectFilesSummaryLabel.Text = "Listing ";
             _selectFilesSummaryLabel.Text +=
                 summaryText.Substring(0, 1).ToLower(CultureInfo.CurrentCulture);

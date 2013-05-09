@@ -91,8 +91,9 @@ IMPLEMENT_DYNAMIC(CFAMDBAdminSummaryDlg, CPropertyPage)
 //--------------------------------------------------------------------------------------------------
 CFAMDBAdminSummaryDlg::CFAMDBAdminSummaryDlg(void) :
 CPropertyPage(CFAMDBAdminSummaryDlg::IDD),
-m_ipFAMDB(NULL),
+m_ipFAMDB(__nullptr),
 m_ipContextMenuFileSelector(CLSID_FAMFileSelector),
+m_ipFAMFileInspector(__nullptr),
 m_bInitialized(false),
 m_bUseOracleSyntax(false)
 {
@@ -108,6 +109,7 @@ CFAMDBAdminSummaryDlg::~CFAMDBAdminSummaryDlg(void)
 	try
 	{
 		m_ipContextMenuFileSelector = __nullptr;
+		m_ipFAMFileInspector = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI19594");
 }
@@ -131,6 +133,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminSummaryDlg, CPropertyPage)
 	ON_COMMAND(ID_SUMMARY_MENU_EXPORT_LIST, &OnContextExportFileList)
 	ON_COMMAND(ID_SUMMARY_MENU_SET_ACTION_STATUS, &OnContextSetFileActionStatus)
 	ON_COMMAND(ID_SUMMARY_MENU_VIEW_FAILED, &OnContextViewFailed)
+	ON_COMMAND(ID_SUMMARY_MENU_INSPECT_FILES, &OnContextInspectFiles)
 END_MESSAGE_MAP()
 //--------------------------------------------------------------------------------------------------
 
@@ -343,6 +346,26 @@ void CFAMDBAdminSummaryDlg::OnContextExportFileList()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31253");
 }
 //--------------------------------------------------------------------------------------------------
+void CFAMDBAdminSummaryDlg::OnContextInspectFiles()
+{
+	try
+	{
+		if (m_ipFAMFileInspector == __nullptr)
+		{
+			throw UCLIDException("ELI35801", "FAMFileInspector instance not found.");
+		}
+
+		m_ipFAMFileInspector->OpenFAMFileInspector(m_ipFAMDB, m_ipContextMenuFileSelector);
+		
+		// The OpenFAMFileInspector will use and modify the m_ipContextMenuFileSelector passed in.
+		// Since we don't want such changes being reflected in this window, create a new instance to
+		// use for the next use of the context menu.
+		m_ipContextMenuFileSelector = __nullptr;
+		m_ipContextMenuFileSelector.CreateInstance(CLSID_FAMFileSelector);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35788");
+}
+//--------------------------------------------------------------------------------------------------
 void CFAMDBAdminSummaryDlg::OnContextSetFileActionStatus()
 {
 	try
@@ -477,6 +500,12 @@ void CFAMDBAdminSummaryDlg::setFAMDatabase(IFileProcessingDBPtr ipFAMDB)
 
 	m_bUseOracleSyntax = asString(ipFAMDBUtils->GetFAMDBProgId()) == 
 		"Extract.FileActionManager.Database.FAMDatabaseManager";
+}
+//--------------------------------------------------------------------------------------------------
+void CFAMDBAdminSummaryDlg::setFAMFileInspector(IFAMFileInspectorPtr ipFAMFileInspector)
+{
+	ASSERT_ARGUMENT("ELI35800", ipFAMFileInspector != __nullptr);
+	m_ipFAMFileInspector = ipFAMFileInspector;
 }
 
 //--------------------------------------------------------------------------------------------------

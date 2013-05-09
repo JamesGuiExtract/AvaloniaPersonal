@@ -182,7 +182,7 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\NetDMSUtilities\Core\Code\Extract.NetDMSUtilities.csproj">
       <Project>{8F639FB8-9D92-4B02-A6B8-7B979A5CE441}</Project>
-      <Name>NetDMSUtilities</Name>
+      <Name>Extract.NetDMSUtilities</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

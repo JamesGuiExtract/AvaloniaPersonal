@@ -95,15 +95,22 @@ string SelectFileSettings::getSummaryString()
 	{
 		string strMethod = m_bSubsetIsRandom ? " a random " : " the top ";
 
-		if (m_bSubsetUsePercentage)
+		if (m_vecConditions.empty())
 		{
-			strSummary += ".\r\nThe scope of files will be further narrowed to" + strMethod
-				+ asString(m_nSubsetSize) + " percent.";
+			strSummary += ".\r\nThe scope of files will be narrowed to";
 		}
 		else
 		{
-			strSummary += ".\r\nThe scope of files will be further narrowed to" + strMethod
-				+ asString(m_nSubsetSize) + " file(s).";
+			strSummary += ".\r\nThe scope of files will be further narrowed to";
+		}
+
+		if (m_bSubsetUsePercentage)
+		{
+			strSummary += strMethod + asString(m_nSubsetSize) + " percent.";
+		}
+		else
+		{
+			strSummary += strMethod + asString(m_nSubsetSize) + " file(s).";
 		}
 	}
 

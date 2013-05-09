@@ -22,6 +22,9 @@ public:
 	// PURPOSE: To set the current database object
 	void setFAMDatabase(IFileProcessingDBPtr ipFAMDB);
 	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To set the current database object
+	void setFAMFileInspector(IFAMFileInspectorPtr ipFAMFileInspector);
+	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To retrieve the current data from the database and fill in the list control
 	//			and the total files edit box based on that data
 	// ARGS:	nActionID- If -1, all actions are refreshed. Otherwise, only the action with the
@@ -41,6 +44,7 @@ protected:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnNMRClickListActions(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnContextExportFileList();
+	afx_msg void OnContextInspectFiles();
 	afx_msg void OnContextSetFileActionStatus();
 	afx_msg void OnContextViewFailed();
 	virtual BOOL OnInitDialog();
@@ -62,6 +66,9 @@ private:
 	// Stores file selection information based on the right-click location in the summary grid for
 	// use by the "Set file action status" and "Export file list" context menu options.
 	UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr m_ipContextMenuFileSelector;
+
+	// Allows inspection of files in the database using the FAMFileInspector utility.
+	IFAMFileInspectorPtr m_ipFAMFileInspector;
 
 	// The action ID associated with the context menu click location.
 	long m_nContextMenuActionID;

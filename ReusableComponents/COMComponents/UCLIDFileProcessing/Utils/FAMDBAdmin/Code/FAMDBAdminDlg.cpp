@@ -49,6 +49,7 @@ CFAMDBAdminDlg::CFAMDBAdminDlg(IFileProcessingDBPtr ipFAMDB,CWnd* pParent /*=NUL
 : CDialog(CFAMDBAdminDlg::IDD, pParent),
 m_windowMgr(this, gstrFAMDB_REG_KEY),
 m_ipFAMDB(ipFAMDB),
+m_ipFAMFileInspector(CLSID_FAMFileInspectorComLibrary),
 m_bIsDBGood(false),
 m_ipMiscUtils(NULL),
 m_ipCategoryManager(NULL),
@@ -60,8 +61,8 @@ m_bInitialized(false)
 {
 	try
 	{
-		// Make sure there is a FAMDB object
 		ASSERT_ARGUMENT("ELI17610", m_ipFAMDB != __nullptr);
+		ASSERT_ARGUMENT("ELI35802", m_ipFAMFileInspector != __nullptr);
 
 		m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_FAMDBADMIN);
 
@@ -70,8 +71,9 @@ m_bInitialized(false)
 		// Set the Database Page notify to this object ( so the status can be updated )
 		m_propDatabasePage.setNotifyDBConfigChanged(this);
 
-		// set the database pointer for the summary page
+		// set the database and FAMFileInspector for the summary page
 		m_propSummaryPage.setFAMDatabase(m_ipFAMDB);
+		m_propSummaryPage.setFAMFileInspector(m_ipFAMFileInspector);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI17609");
 }
@@ -83,6 +85,7 @@ CFAMDBAdminDlg::~CFAMDBAdminDlg()
 		m_ipFAMDB = __nullptr;
 		m_ipMiscUtils = __nullptr;
 		m_ipCategoryManager = __nullptr;
+		m_ipFAMFileInspector = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18124")
 }
@@ -98,6 +101,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_WM_QUERYDRAGICON()
 	ON_COMMAND(ID_HELP_ABOUTTHISAPPLICATION, &CFAMDBAdminDlg::OnHelpAbout)
 	ON_COMMAND(ID_TOOLS_EXPORTFILELISTS, &CFAMDBAdminDlg::OnExportFileLists)
+	ON_COMMAND(ID_TOOLS_INSPECT_FILES, &CFAMDBAdminDlg::OnInspectFiles)
 	ON_COMMAND(ID_TOOLS_FILEACTIONMANAGER, &CFAMDBAdminDlg::OnToolsFileActionManager)
 	ON_COMMAND(ID_DATABASE_EXIT, &CFAMDBAdminDlg::OnExit)
 	ON_COMMAND(ID_DATABASE_CLEAR, &CFAMDBAdminDlg::OnDatabaseClear)
@@ -249,6 +253,17 @@ void CFAMDBAdminDlg::OnExportFileLists()
 		dlgExportFiles.DoModal();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14874");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnInspectFiles()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+	
+	try
+	{
+		m_ipFAMFileInspector->OpenFAMFileInspector(m_ipFAMDB, __nullptr);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35799");
 }
 //-------------------------------------------------------------------------------------------------
 void CFAMDBAdminDlg::OnExit()

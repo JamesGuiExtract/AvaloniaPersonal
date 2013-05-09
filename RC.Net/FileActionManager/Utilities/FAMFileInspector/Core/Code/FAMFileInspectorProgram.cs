@@ -40,7 +40,7 @@ namespace Extract.FileActionManager.Utilities
                 var famFileInspectorForm = new FAMFileInspectorForm();
 
                 if (famFileInspectorForm.FileProcessingDB.ShowSelectDB(
-                        "Select database", false, false))
+                        "Select database", false, true))
                 {
                     famFileInspectorForm.ResetFileSelectionSettings();
                     famFileInspectorForm.ResetSearch();
