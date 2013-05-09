@@ -93,13 +93,14 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._filename = new Extract.DataEntry.DataEntryTextBox();
             this._copyButton = new Extract.DataEntry.DataEntryCopyButton();
             this._messageSequenceNumberFile = new Extract.DataEntry.DataEntryTextBox();
+            this._componentCommentTextBox = new Extract.DataEntry.DataEntryTextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this._componentName = new Extract.DataEntry.DataEntryTableColumn();
             this._testCode = new Extract.DataEntry.DataEntryTableColumn();
             this._componentValue = new Extract.DataEntry.DataEntryTableColumn();
             this._componentUnits = new Extract.DataEntry.DataEntryTableColumn();
             this._componentRefRange = new Extract.DataEntry.DataEntryTableColumn();
             this._componentFlag = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentComment = new Extract.DataEntry.DataEntryTableColumn();
             this._componentOriginalName = new Extract.DataEntry.DataEntryTableColumn();
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).BeginInit();
@@ -140,7 +141,7 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             // _labInfoPassThrough
             // 
             this._labInfoPassThrough.AttributeName = "LabInfo";
-            this._labInfoPassThrough.Location = new System.Drawing.Point(208, 54);
+            this._labInfoPassThrough.Location = new System.Drawing.Point(208, 47);
             this._labInfoPassThrough.Name = "_labInfoPassThrough";
             this._labInfoPassThrough.ParentDataEntryControl = this._laboratoryTestTable;
             this._labInfoPassThrough.Size = new System.Drawing.Size(16, 20);
@@ -275,7 +276,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._componentUnits,
             this._componentRefRange,
             this._componentFlag,
-            this._componentComment,
             this._componentOriginalName});
             this._testComponentTable.Location = new System.Drawing.Point(6, 163);
             this._testComponentTable.Name = "_testComponentTable";
@@ -716,6 +716,8 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             // 
             this._testDetailsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this._testDetailsGroupBox.Controls.Add(this.label2);
+            this._testDetailsGroupBox.Controls.Add(this._componentCommentTextBox);
             this._testDetailsGroupBox.Controls.Add(this._labInfoPassThrough);
             this._testDetailsGroupBox.Controls.Add(this._labNameLabel);
             this._testDetailsGroupBox.Controls.Add(this._orderNumberLabel);
@@ -732,7 +734,7 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._testDetailsGroupBox.Controls.Add(this._testComponentTable);
             this._testDetailsGroupBox.Location = new System.Drawing.Point(0, 730);
             this._testDetailsGroupBox.Name = "_testDetailsGroupBox";
-            this._testDetailsGroupBox.Size = new System.Drawing.Size(593, 457);
+            this._testDetailsGroupBox.Size = new System.Drawing.Size(593, 523);
             this._testDetailsGroupBox.TabIndex = 8;
             this._testDetailsGroupBox.TabStop = false;
             this._testDetailsGroupBox.Text = "Selected Order Details";
@@ -957,6 +959,32 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._messageSequenceNumberFile.ValidationErrorMessage = "Invalid value";
             this._messageSequenceNumberFile.Visible = false;
             // 
+            // _componentCommentTextBox
+            // 
+            this._componentCommentTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._componentCommentTextBox.AttributeName = "Comment";
+            this._componentCommentTextBox.AutoUpdateQuery = "";
+            this._componentCommentTextBox.Location = new System.Drawing.Point(3, 470);
+            this._componentCommentTextBox.Multiline = true;
+            this._componentCommentTextBox.Name = "_componentCommentTextBox";
+            this._componentCommentTextBox.ParentDataEntryControl = this._testComponentTable;
+            this._componentCommentTextBox.RemoveNewLineChars = false;
+            this._componentCommentTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._componentCommentTextBox.Size = new System.Drawing.Size(569, 47);
+            this._componentCommentTextBox.TabIndex = 8;
+            this._componentCommentTextBox.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
+            this._componentCommentTextBox.ValidationErrorMessage = "";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(6, 454);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(51, 13);
+            this.label2.TabIndex = 11;
+            this.label2.Text = "Comment";
+            // 
             // _componentName
             // 
             this._componentName.AttributeName = ".";
@@ -1021,17 +1049,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._componentFlag.ValidationErrorMessage = "Flag does not correspond with test value and range";
             this._componentFlag.ValidationQuery = resources.GetString("_componentFlag.ValidationQuery");
             // 
-            // _componentComment
-            // 
-            this._componentComment.AttributeName = "Comment";
-            this._componentComment.FillWeight = 50F;
-            this._componentComment.HeaderText = "Comment";
-            this._componentComment.Name = "_componentComment";
-            this._componentComment.RemoveNewLineChars = false;
-            this._componentComment.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._componentComment.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
-            this._componentComment.ValidationErrorMessage = "Bad value";
-            // 
             // _componentOriginalName
             // 
             this._componentOriginalName.AttributeName = "OriginalName";
@@ -1070,7 +1087,7 @@ namespace Extract.DataEntry.DEP.StandardLabDE
         highlightColor2};
             this.MinimumSize = new System.Drawing.Size(500, 0);
             this.Name = "StandardLabDEPanel";
-            this.Size = new System.Drawing.Size(593, 1188);
+            this.Size = new System.Drawing.Size(593, 1255);
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).EndInit();
             this._patientInfoGroupBox.ResumeLayout(false);
@@ -1153,13 +1170,14 @@ namespace Extract.DataEntry.DEP.StandardLabDE
         private DataEntryTableColumn _physicianFirstNameColumn;
         private DataEntryTableColumn _physicianMiddleNameColumn;
         private DataEntryTableColumn _physicianCode;
+        private System.Windows.Forms.Label label2;
+        private DataEntryTextBox _componentCommentTextBox;
         private DataEntryTableColumn _componentName;
         private DataEntryTableColumn _testCode;
         private DataEntryTableColumn _componentValue;
         private DataEntryTableColumn _componentUnits;
         private DataEntryTableColumn _componentRefRange;
         private DataEntryTableColumn _componentFlag;
-        private DataEntryTableColumn _componentComment;
         private DataEntryTableColumn _componentOriginalName;
     }
 }

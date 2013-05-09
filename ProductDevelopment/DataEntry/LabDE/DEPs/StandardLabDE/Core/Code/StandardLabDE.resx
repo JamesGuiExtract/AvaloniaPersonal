@@ -118,14 +118,104 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="_laboratoryIdentifier.AutoUpdateQuery" xml:space="preserve">
-    <value>&lt;Query Default='1'&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../../../LabInfo/Name&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../../../LabInfo/Address/City&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../../../LabInfo/Address/State&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;&lt;/Query&gt;
+    <value>&lt;Declarations&gt;
+&lt;Regex Name='Digits' SelectionMode='FIRST' Pattern='[\d]+'&gt;&lt;Attribute&gt;../../../LabInfo/Address/Address1&lt;/Attribute&gt;&lt;/Regex&gt;
+&lt;Regex Name='Street' SelectionMode='FIRST' Pattern='((\b(?!ROAD\b)(?!BLVD\b)(?!DRIVE\b)(?!DR\.\b)(?!BOULEVARD\b)(?!AVE\b)(?!AVENUE\b)(?!PKWY\b)(?!PARKWAY\b)(?!WAY\b)(?!EAST\b)(?!SOUTH\b)(?!NORTH\b)(?!STREET\b)(?!RD\.\b)(?!AVE\.\b)(?!ST\.\b)(?!BLVD\.\b)(?!BOX\b)[A-Za-z]{3,})|(\d+(ST|ND|RD|TH)))'&gt;&lt;Attribute&gt;../../../LabInfo/Address/Address1&lt;/Attribute&gt;&lt;/Regex&gt;
+
+&lt;Regex Name='FiveCharLab' SelectionMode='FIRST' Pattern='(\b(?!LABORATORY\b)(?!LAB\.?\b)(?!LABORATORIES\b)(?!MEDICAL\b)[-A-Za-z&amp;apos;]{5,})'&gt;&lt;Attribute&gt;../../../LabInfo/Name&lt;/Attribute&gt;&lt;/Regex&gt;
+&lt;Regex Name='SecondWordLab' SelectionMode='FIRST' Pattern='(?&amp;lt;=[-A-Za-z&amp;apos;]{5,}\x20)(\b(?!LABORATORY\b)(?!LAB\.?\b)(?!LABORATORIES\b)(?!MEDICAL\b)[-A-Za-z&amp;apos;]{3,})'&gt;&lt;Attribute&gt;../../../LabInfo/Name&lt;/Attribute&gt;&lt;/Regex&gt;
+&lt;Regex Name='FirstTwoWordsLab' SelectionMode='FIRST' Pattern='[-&amp;apos;\w]+\s[-&amp;apos;\w]+'&gt;&lt;Attribute&gt;../../../LabInfo/Name&lt;/Attribute&gt;&lt;/Regex&gt;
+&lt;Regex Name='LabNameUpToComma' SelectionMode='FIRST' Pattern='.*(?=,.*)'&gt;&lt;Attribute&gt;../../../LabInfo/Name&lt;/Attribute&gt;&lt;/Regex&gt;
+
+			
+&lt;Expression Name='DigitsNotEmpty'&gt;
+(&lt;Digits/&gt; == '') ? '___Empty___' : &lt;Digits/&gt;
+&lt;/Expression&gt;
+&lt;Expression Name='StreetNotEmpty'&gt;
+(&lt;Street/&gt; == '') ? '___Empty___' : &lt;Street/&gt;
+&lt;/Expression&gt;
+&lt;Expression Name='FiveCharLabNotEmpty'&gt;
+(&lt;FiveCharLab/&gt; == '') ? '___Empty___' : &lt;FiveCharLab/&gt;
+&lt;/Expression&gt;
+&lt;Expression Name='SecondWordLabNotEmpty'&gt;
+(&lt;SecondWordLab/&gt; == '') ? '___Empty___' : &lt;SecondWordLab/&gt;
+&lt;/Expression&gt;
+&lt;Expression Name='FirstTwoWordsLabNotEmpty'&gt;
+(&lt;FirstTwoWordsLab/&gt; == '') ? '___Empty___' : &lt;FirstTwoWordsLab/&gt;
+&lt;/Expression&gt;
+&lt;Expression Name='LabNameUpToCommaNotEmpty'&gt;
+(&lt;LabNameUpToComma/&gt; == '') ? '___Empty___' : &lt;LabNameUpToComma/&gt;
+&lt;/Expression&gt;
+
+&lt;/Declarations&gt;
+
+&lt;!-- Add spatial info to address fields --&gt;
+&lt;Query Default='True'&gt;&lt;Attribute SpatialMode='Only'&gt;../../../LabInfo/Name&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only'&gt;../../../LabInfo/Address/City&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only'&gt;../../../LabInfo/Address/State&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only'&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;&lt;/Query&gt;
+
 &lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabCode IS NOT NULL AND LabCode = SUBSTRING(&lt;Attribute&gt;../LabCode&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + REPLACE(REPLACE(REPLACE(REPLACE(&lt;Attribute&gt;../../../LabInfo/Name&lt;/Attribute&gt;, ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%') + '%'&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute&gt;../../../LabInfo/Name&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 10) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute&gt;../../../LabInfo/Name&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 10) + '%' and City LIKE &lt;Attribute&gt;../../../LabInfo/Address/City&lt;/Attribute&gt;&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute&gt;../../../LabInfo/Name&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 3) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			
+&lt;!-- Look for exact name match --&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE LOWER(&lt;Attribute SelectionMode='FIRST'&gt;../../../LabInfo/Name&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+
+&lt;!-- Look for extracted Address1 and City/Zip for match --&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE &lt;Attribute&gt;../../../LabInfo/Address/Address1&lt;/Attribute&gt; and Zip LIKE SUBSTRING(&lt;Attribute&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE &lt;Attribute&gt;../../../LabInfo/Address/Address1&lt;/Attribute&gt; and City LIKE LOWER(&lt;Attribute&gt;../../../LabInfo/Address/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+
+&lt;!-- Look for Digits and 3+ character non-directional and non-street string in extracted Address1 and City for match --&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE '%' + LOWER(&lt;DigitsNotEmpty/&gt;) + '%' + LOWER(&lt;StreetNotEmpty/&gt;) + '%' and City LIKE LOWER(&lt;Attribute&gt;../../../LabInfo/Address/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+
+&lt;!-- Look for Digits in extracted Address1 and matching City or 1st 5 of ZipCode for match --&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE '%' + LOWER(&lt;DigitsNotEmpty/&gt;) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE '%' + LOWER(&lt;DigitsNotEmpty/&gt;) + '%' and City LIKE '%' + LOWER(&lt;Attribute&gt;../../../LabInfo/Address/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+
+&lt;!-- Look for 3+ character non-ordinal and non-street string in extracted Address1 and City or 1st 5 of ZipCode for match --&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE '%' + LOWER(&lt;StreetNotEmpty/&gt;) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE '%' + LOWER(&lt;StreetNotEmpty/&gt;) + '%' and City LIKE LOWER(&lt;Attribute&gt;../../../LabInfo/Address/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+	
+&lt;!-- Look for Name of extracted LabName, minus common phrases, and matching LabName for match --&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + REPLACE(REPLACE(REPLACE(REPLACE(&lt;Attribute SelectionMode='FIRST'&gt;../../../LabInfo/Name&lt;/Attribute&gt;, ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%') + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(&lt;Attribute SelectionMode='FIRST'&gt;../../../LabInfo/Name&lt;/Attribute&gt;, ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 'CENTER', '%') + '%'&lt;/SQL&gt;&lt;/Query&gt;
+		
+&lt;!-- Look for substring of extracted LabName and matching Street Number, City, or Zip for match --&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FirstTwoWordsLabNotEmpty/&gt;) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FirstTwoWordsLabNotEmpty/&gt;) + '%' and City LIKE '%' + LOWER(&lt;Attribute&gt;../../../LabInfo/Address/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FirstTwoWordsLabNotEmpty/&gt;) + '%' and Address1 LIKE '%' + LOWER(&lt;DigitsNotEmpty/&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+			
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FiveCharLabNotEmpty/&gt;) + '%' + LOWER(&lt;SecondWordLabNotEmpty/&gt;) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FiveCharLabNotEmpty/&gt;) + '%' + LOWER(&lt;SecondWordLabNotEmpty/&gt;) + '%' and City LIKE '%' + LOWER(&lt;Attribute&gt;../../../LabInfo/Address/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FiveCharLabNotEmpty/&gt;) + '%' + LOWER(&lt;SecondWordLabNotEmpty/&gt;) + '%' and Address1 LIKE '%' + LOWER(&lt;DigitsNotEmpty/&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+		
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FiveCharLabNotEmpty/&gt;) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FiveCharLabNotEmpty/&gt;) + '%' and City LIKE '%' + LOWER(&lt;Attribute&gt;../../../LabInfo/Address/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FiveCharLabNotEmpty/&gt;) + '%' and Address1 LIKE '%' + LOWER(&lt;DigitsNotEmpty/&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+	
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;SecondWordLabNotEmpty/&gt;) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;SecondWordLabNotEmpty/&gt;) + '%' and City LIKE '%' + LOWER(&lt;Attribute&gt;../../../LabInfo/Address/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;SecondWordLabNotEmpty/&gt;) + '%' and Address1 LIKE '%' + LOWER(&lt;DigitsNotEmpty/&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+
+
+&lt;!-- Look for LabName substrings after replacement and also for Zip or City --&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute SelectionMode='FIRST'&gt;../../../LabInfo/Name&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 10) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute SelectionMode='FIRST'&gt;../../../LabInfo/Name&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 10) + '%' and City LIKE '%' + LOWER(&lt;Attribute&gt;../../../LabInfo/Address/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(UPPER(&lt;Attribute SelectionMode='FIRST'&gt;../../../LabInfo/Name&lt;/Attribute&gt;), ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 3) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+
+
+&lt;!-- Look for Digits and 3+ character non-directional and not-street string in extracted Address1 --&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE '%' + LOWER(&lt;DigitsNotEmpty/&gt;) + '%' + LOWER(&lt;StreetNotEmpty/&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+
+&lt;!-- Look for 1st two words then 1st two words after 1st 5-letter word for match --&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FirstTwoWordsLabNotEmpty/&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FiveCharLabNotEmpty/&gt;) + '%' + LOWER(&lt;SecondWordLabNotEmpty/&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+
+&lt;!-- Look for substring of extracted labname + extracted City in LabName for match --&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + LOWER(&lt;FiveCharLabNotEmpty/&gt;) + '%' + LOWER(&lt;Attribute&gt;../../../LabInfo/Address/City&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+
+&lt;!-- Look for entire ZipCode in extracted Zip for match --&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Zip LIKE LOWER(&lt;Attribute&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+
+&lt;!-- Look for just first 5 of ZipCode in extracted Zip for match --&gt;
 &lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Zip LIKE SUBSTRING(&lt;Attribute&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
-</value>
+			</value>
   </data>
   <metadata name="_testName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -188,49 +278,87 @@
   <data name="_componentFlag.ValidationQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
 	&lt;Attribute Name='Flag'&gt;.&lt;/Attribute&gt;
-	&lt;RegEx Name='Value' Pattern='(?&amp;lt;=[\s&amp;gt;&amp;lt;=]{0,3})[\d\.]+'&gt;&lt;Attribute &gt;../Value&lt;/Attribute&gt;&lt;/RegEx&gt;
-	&lt;Attribute Name='Range'&gt;../Range&lt;/Attribute&gt;
-	&lt;RegEx Name='MinValue1' Pattern='([\d\.]+(?=\s?-\s?\d+))|((?&amp;lt;=&amp;gt;\s?=\s?)[\d\.]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
-	&lt;Expression Name='MinValue2'&gt;
-		string.IsNullOrWhiteSpace(&lt;MinValue1/&gt;)
-			? &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;\s?)[\d\.]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
+	&lt;!--Allow for value of #, #-#, &gt;#, &lt;#, &gt;=#, &lt;=#, &gt;/=#, &lt;=#--&gt;
+	&lt;Expression Name='RawValue'&gt;
+		&lt;RegEx Pattern='[\s&amp;gt;&amp;lt;/=]{0,3}[\d\.]+'&gt;&lt;Attribute &gt;../Value&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
+	&lt;/Expression&gt;
+	&lt;!--ValueOperator is non-empty if the value is expressed in terms of a range. Example &gt;30--&gt;
+	&lt;Expression Name='ValueOperator'&gt;
+		&lt;RawValue/&gt;.Contains('&amp;gt;') 
+		? '&amp;gt;'
+		: &lt;RawValue/&gt;.Contains('&amp;lt;') 
+			? '&amp;lt;'
 			: ''
 	&lt;/Expression&gt;
-	&lt;RegEx Name='MaxValue1' Pattern='((?&amp;lt;=\d+\s?-\s?)[\d\.]+)|((?&amp;lt;=&amp;lt;\s?=\s?)[\d\.]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
-	&lt;Expression Name='MaxValue2'&gt;
-		string.IsNullOrWhiteSpace(&lt;MaxValue1/&gt;)
-			? &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;\s?)[\d\.]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
+	&lt;!--After extracting the ValueOperator, convert the value into a single number--&gt;
+	&lt;Expression Name='Value'&gt;&lt;RawValue/&gt;.Replace('&amp;gt;', '').Replace('&amp;lt;', '').Replace(' ', '')&lt;/Expression&gt;
+	&lt;Attribute Name='Range'&gt;../Range&lt;/Attribute&gt;
+	&lt;!--Allow for range of #, #-#, &gt;#, &lt;#, &gt;=#, &lt;=#, &gt;/=#, &lt;=#--&gt;
+	&lt;Expression Name='MinValueOrEqual' &gt;
+		(&lt;ValueOperator/&gt; == '&amp;gt;')
+			&lt;!--If the value is a "greater than" range, allow the number to be greater then or equal to the min value.--&gt;
+			? &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;(\s?/?=)?\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
+			&lt;!--Otherwise, --&gt;
+			: &lt;RegEx Pattern='(^\s*([\d\.,]+)\s*$)|([\d\.,]+(?=\s?-\s?\d+))|((?&amp;lt;=&amp;gt;\s?/?=\s?)[\d\.,]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
+	&lt;/Expression&gt;
+	&lt;Expression Name='MinValueNotEqual'&gt;
+		string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;)
+			? &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
+			: ''
+	&lt;/Expression&gt;
+	&lt;Expression Name='MaxValueOrEqual' &gt;
+		(&lt;ValueOperator/&gt; == '&amp;lt;')
+			? &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;(\s?/?=)?\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
+			: &lt;RegEx Pattern='(^\s*([\d\.,]+)\s*$)|((?&amp;lt;=\d+\s?-\s?)[\d\.,]+)|((?&amp;lt;=&amp;lt;\s?/?=\s?)[\d\.,]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
+	&lt;/Expression&gt;
+	&lt;Expression Name='MaxValueNotEqual'&gt;
+		string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;)
+			? &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
 			: ''
 	&lt;/Expression&gt;
 	&lt;RegEx Name='LowFlag' Pattern='^L|^A$'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
 	&lt;RegEx Name='HighFlag' Pattern='^H|^A$'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
 	&lt;Expression Name='HasProperLowFlag'&gt;
+		&lt;!--If we don't have a value and a range minimum to compare consider low range boundary validated--&gt;
 		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
-		(string.IsNullOrWhiteSpace(&lt;MinValue1/&gt;) and string.IsNullOrWhiteSpace(&lt;MinValue2/&gt;)) or
-		(string.IsNullOrWhiteSpace(&lt;MinValue1/&gt;) == false and
-		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;gt;= &lt;MinValue1 Type='double'/&gt;))) or
-		(string.IsNullOrWhiteSpace(&lt;MinValue2/&gt;) == false and
-		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;gt; &lt;MinValue2 Type='double'/&gt;)))
+		(string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;)) or
+		&lt;!--Compare using &gt;= check if appropriate--&gt;
+		(string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) == false and
+		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;gt;= &lt;MinValueOrEqual Type='double'/&gt;))) or
+		&lt;!--Compare using &gt; check if appropriate--&gt;
+		(string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;) == false and
+		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;gt; &lt;MinValueNotEqual Type='double'/&gt;)))
 	&lt;/Expression&gt;
 	&lt;Expression Name='HasProperHighFlag'&gt;
+		&lt;!--If we don't have a value and a range maximum to compare consider high range boundary validated--&gt;
 		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
-		(string.IsNullOrWhiteSpace(&lt;MaxValue1/&gt;) and string.IsNullOrWhiteSpace(&lt;MaxValue2/&gt;)) or
-		(string.IsNullOrWhiteSpace(&lt;MaxValue1/&gt;) == false and
-		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;lt;= &lt;MaxValue1 Type='double'/&gt;))) or
-		(string.IsNullOrWhiteSpace(&lt;MaxValue2/&gt;) == false and
-		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;lt; &lt;MaxValue2 Type='double'/&gt;)))
+		(string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;)) or
+		&lt;!--Compare using &gt;= check if appropriate--&gt;
+		(string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) == false and
+		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;lt;= &lt;MaxValueOrEqual Type='double'/&gt;))) or
+		&lt;!--Compare using &gt; check if appropriate--&gt;
+		(string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;) == false and
+		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;lt; &lt;MaxValueNotEqual Type='double'/&gt;)))
+	&lt;/Expression&gt;
+	&lt;!--Prevents use of inappropriate flag when the range has only a min or a max value--&gt;
+	&lt;Expression Name='SpecialRangeCheck'&gt;
+		&lt;!--Consider the special range check validated if there is no value or range specified--&gt;
+		(string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
+		 (string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;) and
+		  string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;))) or
+		  &lt;!--Disallow a low flag if no range minimum is specified--&gt;
+		((string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) or !string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) or !string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;)) and
+		  &lt;!--Disallow a high flag if no range maximum is specified--&gt;
+		 (string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) or !string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) or !string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;)))
 	&lt;/Expression&gt;
 &lt;/Declarations&gt;
 &lt;Query&gt;[BLANK]&lt;SQL&gt;SELECT * FROM Flag ORDER BY Flag&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query ValidValue='True' ValidationListType='ValidationListOnly' ValidationWarning='1'&gt;
 	&lt;Expression&gt;
-		&lt;HasProperLowFlag Type='bool'/&gt; and &lt;HasProperHighFlag Type='bool'/&gt;
+		&lt;HasProperLowFlag Type='bool'/&gt; and &lt;HasProperHighFlag Type='bool'/&gt; and &lt;SpecialRangeCheck Type='bool'/&gt;
 	&lt;/Expression&gt;
 &lt;/Query&gt;</value>
   </data>
-  <metadata name="_componentComment.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
   <metadata name="_componentOriginalName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
