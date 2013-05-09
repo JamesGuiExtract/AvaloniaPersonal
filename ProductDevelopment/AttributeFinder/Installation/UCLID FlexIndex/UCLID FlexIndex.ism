@@ -120,6 +120,7 @@
 	<table name="AppSearch">
 		<col key="yes" def="s72">Property</col>
 		<col key="yes" def="s72">Signature_</col>
+		<row><td>ISJITCOMPILEATINSTALLPROPERTYPARENT.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ISJITPARENTSIG.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td></row>
 	</table>
 
 	<table name="Binary">
@@ -206,6 +207,7 @@
 		<row><td>Extract.FileActionMa.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{C51469D3-069A-4B38-993C-E7ED40FEC100}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.fileactionma.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.FileActionManager.Co.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{473CCDFA-A8A4-4231-BC48-3DFCC0E77333}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.fileactionmanager.co.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.FileActionManager.Da.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{45E32093-DF2C-49E3-B564-067F72C51F03}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.fileactionmanager.da.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Extract.FileActionManager.FA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{C82514CA-BF6E-4AA8-9446-5C03997C5D25}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.fileactionmanager.fa.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.FileActionManager.Fi.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{F589CCCA-148F-4E1B-BF26-F4E4F5D01B54}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.fileactionmanager.fi.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.FileActionManager.Fo.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{B6E94DCF-4228-4D6A-AA5A-B03A61948DFA}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.fileactionmanager.fo.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Office.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{59BC7F55-00F2-4F05-AA05-5C27B17DD4D5}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.office.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -499,6 +501,7 @@
 		<row><td>extract.fileactionma.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Extract.FileActionMa.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRAC~1.DLL|Extract.FileActionManager.FileProcessors.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\Extract.FileActionManager.FileProcessors.dll</td><td>17</td><td/></row>
 		<row><td>extract.fileactionmanager.co.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Extract.FileActionManager.Co.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRAC~1.DLL|Extract.FileActionManager.Conditions.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\Extract.FileActionManager.Conditions.dll</td><td>1</td><td/></row>
 		<row><td>extract.fileactionmanager.da.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Extract.FileActionManager.Da.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRAC~1.DLL|Extract.FileActionManager.Database.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\Extract.FileActionManager.Database.dll</td><td>1</td><td/></row>
+		<row><td>extract.fileactionmanager.fa.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Extract.FileActionManager.FA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRAC~1.DLL|Extract.FileActionManager.FAMFileInspector.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\Extract.FileActionManager.FAMFileInspector.dll</td><td>1</td><td/></row>
 		<row><td>extract.fileactionmanager.fi.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Extract.FileActionManager.Fi.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRAC~1.DLL|Extract.FileActionManager.FileSuppliers.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\Extract.FileActionManager.FileSuppliers.dll</td><td>1</td><td/></row>
 		<row><td>extract.fileactionmanager.fo.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Extract.FileActionManager.Fo.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRAC~1.DLL|Extract.FileActionManager.Forms.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\Extract.FileActionManager.Forms.dll</td><td>17</td><td/></row>
 		<row><td>extract.office.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Extract.Office.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRAC~1.DLL|Extract.Office.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\Extract.Office.dll</td><td>1</td><td/></row>
@@ -679,6 +682,7 @@
 		<row><td>Extract.FileActionMa.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_57E74F20_7558_4DCA_BB1E_D2C68D3689E5_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.FileActionManager.Co.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_BFCAEB47_E8B3_4EDB_B07B_07C2747479BF_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.FileActionManager.Da.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_E21FE694_DC4B_496F_9573_01B707841DAB_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Extract.FileActionManager.FA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_D5171752_69A1_4B62_842B_5C4A841E8ED4_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.FileActionManager.Fi.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_D00D298D_A76F_40EF_8819_1C2A93E55082_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.FileActionManager.Fo.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_09F1D5DD_4819_4CF3_8603_22E09C962250_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.Office.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_2121E1C5_F3BF_4E58_B186_E299B34FB16C_FILTER</td><td/><td/><td/><td/></row>
@@ -1366,6 +1370,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>Extract.FileActionMa.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>Extract.FileActionManager.Co.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>Extract.FileActionManager.Da.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
+		<row><td>Extract.FileActionManager.FA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>Extract.FileActionManager.Fi.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>Extract.FileActionManager.Fo.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>Extract.Office.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
@@ -1695,6 +1700,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>IS_COMPLUS_PROGRESSTEXT_COST</td><td>##IDS_COMPLUS_PROGRESSTEXT_COST##</td><td/></row>
 		<row><td>IS_COMPLUS_PROGRESSTEXT_INSTALL</td><td>##IDS_COMPLUS_PROGRESSTEXT_INSTALL##</td><td/></row>
 		<row><td>IS_COMPLUS_PROGRESSTEXT_UNINSTALL</td><td>##IDS_COMPLUS_PROGRESSTEXT_UNINSTALL##</td><td/></row>
+		<row><td>SecureCustomProperties.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ISJITNGENPROPERTY.CA42753B_6AFC_4293_937C_BCCFA0CC407C;ISJITCOMPILEATINSTALLPROPERTYPARENT.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/></row>
 	</table>
 
 	<table name="PublishComponent">
