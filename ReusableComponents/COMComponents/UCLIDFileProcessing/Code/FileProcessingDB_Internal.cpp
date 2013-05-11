@@ -1114,6 +1114,8 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 			eraseFromVector(vecTables, gstrFAM_TAG);
 			eraseFromVector(vecTables, gstrUSER_CREATED_COUNTER);
 			eraseFromVector(vecTables, gstrLOGIN);
+			eraseFromVector(vecTables, gstrDB_FIELD_SEARCH);
+			eraseFromVector(vecTables, gstrDB_LAUNCH_APP);
 		}
 
 		// Drop the tables in the vector
@@ -1305,6 +1307,8 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 		vecQueries.push_back(gstrCREATE_DB_INFO_TABLE);
 		vecQueries.push_back(gstrCREATE_FAM_TAG_TABLE);
 		vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_TABLE);
+		vecQueries.push_back(gstrCREATE_FIELD_SEARCH_TABLE);
+		vecQueries.push_back(gstrCREATE_LAUNCH_APP_TABLE);
 	}
 
 	// Add queries to create tables to the vector
@@ -1335,8 +1339,6 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_FTP_ACCOUNT);
 	vecQueries.push_back(gstrCREATE_FTP_EVENT_HISTORY_TABLE);
 	vecQueries.push_back(gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_TABLE);
-	vecQueries.push_back(gstrCREATE_FIELD_SEARCH_TABLE);
-	vecQueries.push_back(gstrCREATE_LAUNCH_APP_TABLE);
 
 	return vecQueries;
 }
@@ -2643,6 +2645,8 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrDB_FTP_ACCOUNT);
 	vecTables.push_back(gstrDB_FTP_EVENT_HISTORY);
 	vecTables.push_back(gstrDB_QUEUED_ACTION_STATUS_CHANGE);
+	vecTables.push_back(gstrDB_FIELD_SEARCH);
+	vecTables.push_back(gstrDB_LAUNCH_APP);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)

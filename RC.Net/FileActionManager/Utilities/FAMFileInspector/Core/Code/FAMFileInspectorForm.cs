@@ -123,6 +123,93 @@ namespace Extract.FileActionManager.Utilities
 
         #endregion Enums
 
+        #region Structs
+
+        /// <summary>
+        /// Represents an entry from the FAM DB's AppLaunch table
+        /// </summary>
+        struct AppLaunchItem
+        {
+            /// <summary>
+            /// Gets or sets the name the application should be presented to the user as.
+            /// </summary>
+            /// <value>
+            /// The name the application should be presented to the user as.
+            /// </value>
+            public string Name
+            {
+                get;
+                set;
+            }
+
+            /// <summary>
+            /// Gets or sets the full to the executable to run.
+            /// </summary>
+            /// <value>
+            /// The full to the executable to run.
+            /// </value>
+            public string ApplicationPath
+            {
+                get;
+                set;
+            }
+
+            /// <summary>
+            /// Gets or sets the command-line arguments to use for the application. The
+            /// SourceDocName path tag and path functions are supported.
+            /// </summary>
+            /// <value>
+            /// The command-line arguments to use for the application.
+            /// </value>
+            public string Arguments
+            {
+                get;
+                set;
+            }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether the application item should be available for
+            /// multiple files at once.
+            /// </summary>
+            /// <value><see langword="true"/> if the application item should be available for
+            /// multiple files at once; <see langword="false"/> if the application item should be
+            /// allowed for only one file at a time.
+            /// </value>
+            public bool AllowMultipleFiles
+            {
+                get;
+                set;
+            }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether the application supports the /ef
+            /// command-line parameter.
+            /// </summary>
+            /// <value><see langword="true"/> if the application supports the /ef command-line
+            /// parameter; otherwise, <see langword="false"/>.
+            /// </value>
+            public bool SupportsErrorHandling
+            {
+                get;
+                set;
+            }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether the launched application should block until
+            /// complete.
+            /// </summary>
+            /// <value><see langword="true"/> if application should block until
+            /// complete; <see langword="false"/> if the application run in the background without
+            /// blocking.</value>
+            public bool Blocking
+            {
+                get;
+                set;
+            }
+        }
+
+        #endregion Structs
+
         #region Delegates
 
         /// <summary>
@@ -165,6 +252,14 @@ namespace Extract.FileActionManager.Utilities
         /// associated queries.
         /// </summary>
         Dictionary<string, string> _dataSearchQueries = new Dictionary<string, string>();
+
+        /// <summary>
+        /// All application launch items that should be available as context menu options in
+        /// <see cref="_fileListDataGridView"/> and the <see cref="AppLaunchItem"/> that defines the
+        /// option's behavior.
+        /// </summary>
+        Dictionary<ToolStripMenuItem, AppLaunchItem> _appLaunchItems =
+            new Dictionary<ToolStripMenuItem, AppLaunchItem>();
 
         /// <summary>
         /// A <see cref="Task"/> that performs database query operations on a background thread.
@@ -438,6 +533,82 @@ namespace Extract.FileActionManager.Utilities
             }
         }
 
+        /// <summary>
+        /// Initializes the context menu of the file list based on the current
+        /// <see cref="FileProcessingDB"/>'s AppLaunch table.
+        /// </summary>
+        public void InitializeContextMenu()
+        {
+            try
+            {
+                // Dispose of any previous context menu option.
+                if (_fileListDataGridView.ContextMenuStrip != null)
+                {
+                    _fileListDataGridView.ContextMenuStrip.Dispose();
+                    _fileListDataGridView.ContextMenuStrip = null;
+                }
+
+                var newContextMenuStrip = new ContextMenuStrip();
+
+                // Populate context menu options for all enabled items from the database's AppLaunch
+                // table.
+                Recordset queryResults = FileProcessingDB.GetResultsForQuery(
+                    "SELECT [AppName], [ApplicationPath], [Arguments], [AllowMultipleFiles], " +
+                        "[SupportsErrorHandling], [Blocking] " +
+                    "FROM [LaunchApp] WHERE [Enabled] = 1 ORDER BY [AppName]");
+                if (!queryResults.EOF)
+                {
+                    queryResults.MoveFirst();
+                    while (!queryResults.EOF)
+                    {
+                        // Create an AppLaunchItem instance representing the settings of this item.
+                        var appLaunchItem = new AppLaunchItem();
+                        appLaunchItem.Name = (string)queryResults.Fields[0].Value;
+                        appLaunchItem.ApplicationPath = (string)queryResults.Fields[1].Value;
+                        if (!(queryResults.Fields[2].Value is System.DBNull))
+                        {
+                            appLaunchItem.Arguments =
+                                (string)(queryResults.Fields[2].Value ?? string.Empty);
+                        }
+                        appLaunchItem.AllowMultipleFiles = (bool)queryResults.Fields[3].Value;
+                        appLaunchItem.SupportsErrorHandling = (bool)queryResults.Fields[4].Value;
+                        appLaunchItem.Blocking = (bool)queryResults.Fields[5].Value;
+
+                        // Create a context menu option and add a handler for it.
+                        var menuItem = new ToolStripMenuItem(appLaunchItem.Name);
+                        menuItem.Click += HandleLaunchAppMenuItem_Click;
+
+                        _appLaunchItems.Add(menuItem, appLaunchItem);
+                        newContextMenuStrip.Items.Add(menuItem);
+
+                        queryResults.MoveNext();
+                    }
+                }
+
+                // If there is at least one enabled context menu option, attach the menu to
+                // _fileListDataGridView
+                if (newContextMenuStrip.Items.Count > 0)
+                {
+                    newContextMenuStrip.Items.Add(new ToolStripSeparator());
+                    newContextMenuStrip.Items.Add(new ToolStripMenuItem("Cancel"));
+
+                    _fileListDataGridView.ContextMenuStrip = newContextMenuStrip;
+
+                    // Handle the opening of the context menu so that the available options can be
+                    // enabled/disabled appropriately.
+                    newContextMenuStrip.Opening += HandleContextMenuStrip_Opening;
+                }
+                else
+                {
+                    newContextMenuStrip.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35821");
+            }
+        }
+
         #endregion Methods
 
         #region Overrides
@@ -461,6 +632,7 @@ namespace Extract.FileActionManager.Utilities
                 _searchTypeComboBox.SelectEnumValue(SearchType.Text);
                 ResetSearch();
 
+                InitializeContextMenu();
                 GenerateFileList();
             }
             catch (Exception ex)
@@ -488,6 +660,16 @@ namespace Extract.FileActionManager.Utilities
                 {
                     _formStateManager.Dispose();
                     _formStateManager = null;
+                }
+
+                if (_appLaunchItems != null)
+                {
+                    foreach (ToolStripMenuItem menuItem in _appLaunchItems.Keys)
+                    {
+                        menuItem.Dispose();
+                    }
+
+                    _appLaunchItems = null;
                 }
 
                 if (components != null)
@@ -763,6 +945,133 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Handles the <see cref="T:ContextMenuStripItem.Opening"/> event of the
+        /// <see cref="_fileListDataGridView"/>'s <see cref="ContextMenuStrip"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.ComponentModel.CancelEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleContextMenuStrip_Opening(object sender, CancelEventArgs e)
+        {
+            try
+            {
+                // Determine the location where the context menu was opened.
+                Point mouseLocation = _fileListDataGridView.PointToClient(MousePosition);
+                System.Windows.Forms.DataGridView.HitTestInfo hit =
+                    _fileListDataGridView.HitTest(mouseLocation.X, mouseLocation.Y);
+
+                // If the row under the right-click is not selected, do not present the menu to
+                // avoid confusion as to whether any action taken should be applied to a
+                // non-selected row beneath the context menu origin.
+                if (hit.RowIndex < 0 || !_fileListDataGridView.Rows[hit.RowIndex].Selected)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+
+                int selectionCount = _fileListDataGridView.SelectedRows.Count;
+
+                // Enable/disable each app launch item in the context menu based on the current
+                // selection.
+                foreach (KeyValuePair<ToolStripMenuItem, AppLaunchItem> app in _appLaunchItems)
+                {
+                    if (selectionCount == 0)
+                    {
+                        // If there is no selection, no options should be enabled.
+                        app.Key.Enabled = false;
+                    }
+                    else if (selectionCount > 1 && !app.Value.AllowMultipleFiles)
+                    {
+                        // Disable if multiple files are selected by the option is valid for only
+                        // one.
+                        app.Key.Enabled = false;
+                    }
+                    else
+                    {
+                        app.Key.Enabled = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35822");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of a <see cref="ToolStripMenuItem"/> for
+        /// one of the app launch context menu options.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleLaunchAppMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                AppLaunchItem appLaunchItem = _appLaunchItems[(ToolStripMenuItem)sender];
+
+                // Convert the selected files to an array so that the file list is a snapshot that
+                // won't change after processing has begun.
+                var fileNames = _fileListDataGridView.SelectedRows
+                    .OfType<DataGridViewRow>()
+                    .OrderBy(row => row.Index)
+                    .Select(row => row.GetFileData().FileName)
+                    .ToArray();
+
+                if (appLaunchItem.Blocking)
+                {
+                    // If blocking, use a modal message box to block rather than calling
+                    // RunApplication on this thread; the latter causes the for to report "not
+                    // responding" in some circumstances.
+                    CustomizableMessageBox messageBox = new CustomizableMessageBox();
+                    messageBox.UseDefaultOkButton = false;
+                    messageBox.Caption = _APPLICATION_TITLE;
+                    messageBox.Text = "Running " + appLaunchItem.Name.Quote() + "...";
+
+                    Task.Factory.StartNew(() =>
+                    {
+                        try
+                        {
+                            RunApplication(appLaunchItem, fileNames);
+                            this.SafeBeginInvoke("ELI35825", () => messageBox.Close(""));
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractDisplay("ELI35824");
+                        }
+                        finally
+                        {
+                            this.SafeBeginInvoke("ELI35826", () => messageBox.Dispose());
+                        }
+                    });
+
+                    messageBox.Show(this);
+                }
+                else
+                {
+                    // If not blocking, run the application on a background thread; allow the UI thread
+                    // to continue.
+                    Task.Factory.StartNew(() => RunApplication(appLaunchItem, fileNames));
+
+                    // Since a non-blocking app will continue to run in the background, use the
+                    // status bar to indicate the application is being launched. After 5 seconds,
+                    // revert to the normal status message.
+                    _searchStatusLabel.Text = "Started " + appLaunchItem.Name.Quote() + "...";
+                    Task.Factory.StartNew(() =>
+                    {
+                        Thread.Sleep(5000);
+                        this.SafeBeginInvoke("ELI35818", () => UpdateStatusLabel());
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35823");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="Control.Click"/> event of the
         /// <see cref="_logoutToolStripMenuItem"/>.
         /// </summary>
@@ -781,6 +1090,7 @@ namespace Extract.FileActionManager.Utilities
                     ResetFileSelectionSettings();
                     ResetSearch();
                     Show();
+                    InitializeContextMenu();
                     GenerateFileList();
                 }
                 else
@@ -1275,6 +1585,77 @@ namespace Extract.FileActionManager.Utilities
             }
 
             OperationIsActive = false;
+        }
+
+        /// <summary>
+        /// Launches the specified <see paramref="fileNames"/> in the application defined by
+        /// <see paramref="appLaunchItem"/>.
+        /// </summary>
+        /// <param name="appLaunchItem">The <see cref="AppLaunchItem"/> defining the application to
+        /// be run.</param>
+        /// <param name="fileNames">The files to be run in <see paramref="appLaunchItem"/></param>
+        void RunApplication(AppLaunchItem appLaunchItem, IEnumerable<string> fileNames)
+        {
+            try
+            {
+                // Collects any exceptions that occur when processing the files.
+                var exceptions = new List<ExtractException>();
+
+                // Process each filename in sequence.
+                foreach (string fileName in fileNames)
+                {
+                    try
+                    {
+                        // Expand the command line arguments using path tags/functions.
+                        SourceDocumentPathTags pathTags = new SourceDocumentPathTags(fileName);
+                        string arguments = pathTags.Expand(appLaunchItem.Arguments);
+
+                        if (appLaunchItem.SupportsErrorHandling)
+                        {
+                            SystemMethods.RunExtractExecutable(
+                                appLaunchItem.ApplicationPath, arguments);
+                        }
+                        else
+                        {
+                            SystemMethods.RunExecutable(
+                                appLaunchItem.ApplicationPath, arguments, int.MaxValue);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        exceptions.Add(ex.AsExtract("ELI35820"));
+                    }
+                }
+
+                if (exceptions.Count > 0)
+                {
+                    // If there was only a single file selected, just throw the exception as-is.
+                    if (fileNames.Count() == 1)
+                    {
+                        throw exceptions.First();
+                    }
+                    // If more than one file was selected report all exceptions in one aggregate
+                    // exception after processing.
+                    else
+                    {
+                        exceptions.Add(new ExtractException("ELI35819",
+                            string.Format(CultureInfo.CurrentCulture,
+                            "{0:D} file(s) failed {1}", exceptions.Count, appLaunchItem.Name.Quote())));
+                        throw ExtractException.AsAggregateException(exceptions);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35811");
+
+                // If there was an error launching a non-blocking app, ensure the status label is
+                // returned
+                if (!appLaunchItem.Blocking)
+                {
+                    this.SafeBeginInvoke("ELI35815", () => UpdateStatusLabel());
+                }
+            }
         }
 
         /// <summary>

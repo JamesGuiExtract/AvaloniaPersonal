@@ -669,7 +669,10 @@ namespace Extract.Utilities.Forms
             {
                 if (form.WindowState == FormWindowState.Minimized)
                 {
-                    ShowWindow(form.Handle, SW_RESTORE);
+                    if (ShowWindow(form.Handle, SW_RESTORE) == 0)
+                    {
+                        throw new Win32Exception(Marshal.GetLastWin32Error());
+                    }
                 }
             }
             catch (Exception ex)

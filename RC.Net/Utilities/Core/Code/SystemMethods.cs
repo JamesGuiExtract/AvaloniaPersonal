@@ -300,6 +300,33 @@ namespace Extract.Utilities
         {
             try
             {
+                string argumentString = string.Join(" ", arguments
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .Select(s => (s.Contains(' ') && s[0] != '"') ? s.Quote() : s)
+                    .ToArray());
+
+                return RunExecutable(exeFile, argumentString, timeToWait);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35807");
+            }
+        }
+
+        /// <summary>
+        /// Runs the executable. Will block until <paramref name="timeToWait"/> has exceeded
+        /// or executable completes. (if <paramref name="timeToWait"/> is
+        /// <see cref="Int32.MaxValue"/> then will block until executable completes).
+        /// </summary>
+        /// <param name="exeFile">The exe file.</param>
+        /// <param name="arguments">The arguments.</param>
+        /// <param name="timeToWait">The time to wait.</param>
+        /// <returns>The exit code of the process or 1460 ("This operation returned because the
+        /// timeout period expired.") if timeToWait has expired.</returns>
+        public static int RunExecutable(string exeFile, string arguments, int timeToWait)
+        {
+            try
+            {
                 // Verify this object is either licensed OR
                 // is called from Extract code
                 if (!LicenseUtilities.IsLicensed(LicenseIdName.ExtractCoreObjects)
@@ -312,11 +339,7 @@ namespace Extract.Utilities
 
                 using (var process = new Process())
                 {
-                    process.StartInfo = new ProcessStartInfo(exeFile,
-                        string.Join(" ", arguments
-                        .Where(s => !string.IsNullOrWhiteSpace(s))
-                        .Select(s => (s.Contains(' ') && s[0] != '"') ? s.Quote() : s)
-                        .ToArray()));
+                    process.StartInfo = new ProcessStartInfo(exeFile, arguments);
                     process.Start();
                     if (process.WaitForExit(timeToWait))
                     {
@@ -343,18 +366,42 @@ namespace Extract.Utilities
         /// <param name="arguments">The command line arguments for the executable.</param>
         /// <returns>The exit code of the process or 1460 ("This operation returned because the
         /// timeout period expired.") if timeToWait has expired.</returns>
-        public static int RunExtractExecutable(string exeFile,  IEnumerable<string> arguments)
+        public static int RunExtractExecutable(string exeFile, IEnumerable<string> arguments)
+        {
+            try
+            {
+                string argumentString = string.Join(" ", arguments
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .Select(s => (s.Contains(' ') && s[0] != '"') ? s.Quote() : s)
+                    .ToArray());
+
+                return RunExtractExecutable(exeFile, argumentString);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35810");
+            }
+        }
+
+        /// <summary>
+        /// Runs the specified executable with the specified arguments, appends a /ef [TempFile]
+        /// to the argument list. If an exception is logged to the temp file, it will be
+        /// loaded and thrown.
+        /// </summary>
+        /// <param name="exeFile">The executable to run.</param>
+        /// <param name="arguments">The command line arguments for the executable.</param>
+        /// <returns>The exit code of the process or 1460 ("This operation returned because the
+        /// timeout period expired.") if timeToWait has expired.</returns>
+        public static int RunExtractExecutable(string exeFile, string arguments)
         {
             try
             {
                 using (var tempFile = new TemporaryFile(".uex", false))
                 {
-                    var args = new List<string>(arguments);
-                    args.Add("/ef");
-                    args.Add(tempFile.FileName);
+                    arguments += " /ef " + tempFile.FileName.Quote();
 
                     // Run the executable and wait for it to exit
-                    int exitCode = RunExecutable(exeFile, args);
+                    int exitCode = RunExecutable(exeFile, arguments, int.MaxValue);
 
                     var info = new FileInfo(tempFile.FileName);
                     if (info.Length > 0)
@@ -371,7 +418,7 @@ namespace Extract.Utilities
                 ee.AddDebugData("Executable Name", exeFile, false);
 
                 // Encrypt the arguments as they may contain passwords or other information
-                ee.AddDebugData("Arguments", string.Join(", ", arguments.ToArray()), true);
+                ee.AddDebugData("Arguments", arguments, true);
 
                 throw ee;
             }

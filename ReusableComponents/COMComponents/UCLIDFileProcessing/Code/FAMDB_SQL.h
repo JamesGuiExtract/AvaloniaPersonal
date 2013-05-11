@@ -301,10 +301,14 @@ static const string gstrCREATE_LAUNCH_APP_TABLE =
 	"CREATE TABLE [dbo].[LaunchApp]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_LaunchApp] PRIMARY KEY CLUSTERED,"
 	"[Enabled] [bit] NOT NULL DEFAULT 1,"
-	"[AdminOnly] [bit] NOT NULL DEFAULT 0,"
 	"[AppName] [nvarchar](64) NOT NULL UNIQUE,"
+	"[IconPath] [nvarchar](260),"
 	"[ApplicationPath] [nvarchar](260) NOT NULL,"
-	"[Arguments] [ntext])";
+	"[Arguments] [ntext],"
+	"[AdminOnly] [bit] NOT NULL DEFAULT 0,"
+	"[AllowMultipleFiles] [bit] NOT NULL DEFAULT 0,"
+	"[SupportsErrorHandling] [bit] NOT NULL DEFAULT 0,"
+	"[Blocking] [bit] NOT NULL DEFAULT 1)";
 
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "

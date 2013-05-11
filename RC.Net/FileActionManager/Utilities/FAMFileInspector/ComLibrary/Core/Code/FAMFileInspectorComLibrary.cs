@@ -82,7 +82,14 @@ namespace Extract.FileActionManager.Utilities
                         {
                             _fileInspectorForm.Invoke((MethodInvoker)(() =>
                             {
-                                _fileInspectorForm.FileProcessingDB = fileProcessingDB;
+                                // Because the FileProcessingDB may be re-configured to connect to
+                                // a new DB from within this app and because we don't want that
+                                // affecting an outside caller still using it (DBAdmin), just copy
+                                // the connection settings rather that using the passed in
+                                // FileProcessingDB.
+                                CopyDbConnectionSettings(fileProcessingDB,
+                                    _fileInspectorForm.FileProcessingDB);
+                                _fileInspectorForm.InitializeContextMenu();
                                 if (fileSelector == null)
                                 {
                                     // No provided file selection settings should be interpreted as
@@ -120,7 +127,13 @@ namespace Extract.FileActionManager.Utilities
 
                     // A new form is needed.
                     _fileInspectorForm = new FAMFileInspectorForm();
-                    _fileInspectorForm.FileProcessingDB = fileProcessingDB;
+
+                    // Because the FileProcessingDB may be re-configured to connect to
+                    // a new DB from within this app and because we don't want that
+                    // affecting an outside caller still using it (DBAdmin), just copy
+                    // the connection settings rather that using the passed in
+                    // FileProcessingDB.
+                    CopyDbConnectionSettings(fileProcessingDB, _fileInspectorForm.FileProcessingDB);
                     if (fileSelector == null)
                     {
                         // No provided file selection settings should be interpreted as
@@ -143,5 +156,24 @@ namespace Extract.FileActionManager.Utilities
         }
 
         #endregion IFAMFileInspector
+
+        #region Private Members
+
+        /// <summary>
+        /// Copies the databases connection settings from <see paramref="sourceDb"/> to
+        /// <see paramref="targetDb"/>.
+        /// </summary>
+        /// <param name="sourceDb">The source <see cref="FileProcessingDB"/>.</param>
+        /// <param name="targetDb">The target <see cref="FileProcessingDB"/>.</param>
+        static void CopyDbConnectionSettings(FileProcessingDB sourceDb,  FileProcessingDB targetDb)
+        {
+            targetDb.CloseAllDBConnections();
+            targetDb.DatabaseServer = sourceDb.DatabaseServer;
+            targetDb.DatabaseName = sourceDb.DatabaseName;
+            targetDb.AdvancedConnectionStringProperties
+                = sourceDb.AdvancedConnectionStringProperties;
+        }
+
+        #endregion Private Members
     }
 }

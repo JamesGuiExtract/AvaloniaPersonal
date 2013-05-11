@@ -219,6 +219,33 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether an OK button will be added by default if no
+        /// buttons are manually added.
+        /// </summary>
+        /// <value><see langword="true"/> if an OK button will be added by default if no buttons
+        /// are manually added; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool UseDefaultOkButton
+        {
+            get
+            {
+                return _msgBox.UseDefaultOkButton;
+            }
+
+            set
+            {
+                try
+                {
+                    _msgBox.UseDefaultOkButton = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35827");
+                }
+            }
+        }
+
+        /// <summary>
         /// Sets or gets the ability of the user to save his/her response.
         /// </summary>
         /// <value>Whether to save the users response.</value>

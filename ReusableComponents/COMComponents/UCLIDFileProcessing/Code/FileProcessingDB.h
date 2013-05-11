@@ -63,6 +63,8 @@ static const string gstrDB_INFO_HISTORY = "DBInfoChangeHistory";
 static const string gstrDB_FTP_ACCOUNT = "FTPAccount";
 static const string gstrDB_FTP_EVENT_HISTORY = "FTPEventHistory";
 static const string gstrDB_QUEUED_ACTION_STATUS_CHANGE = "QueuedActionStatusChange";
+static const string gstrDB_FIELD_SEARCH = "FieldSearch";
+static const string gstrDB_LAUNCH_APP= "LaunchApp";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB

@@ -379,6 +379,19 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether an OK button will be added by default if no
+        /// buttons are manually added.
+        /// </summary>
+        /// <value><see langword="true"/> if an OK button will be added by default if no buttons
+        /// are manually added; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool UseDefaultOkButton
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets the message box result.
         /// </summary>
         /// <value>The message box result.</value>
@@ -516,6 +529,8 @@ namespace Extract.Utilities.Forms
 
                 _maxWidth = (int)(SystemInformation.WorkingArea.Width * 0.60);
                 _maxHeight = (int)(SystemInformation.WorkingArea.Height * 0.90);
+
+                UseDefaultOkButton = true;
             }
             catch (Exception ex)
             {
@@ -618,7 +633,10 @@ namespace Extract.Utilities.Forms
                 //This is the rectangle in which all items will be laid out
                 _maxLayoutWidth = this.ClientSize.Width - LEFT_PADDING - RIGHT_PADDING;
 
-                AddOkButtonIfNoButtonsPresent();
+                if (UseDefaultOkButton)
+                {
+                    AddOkButtonIfNoButtonsPresent();
+                }
                 DisableCloseIfMultipleButtonsAndNoCancelButton();
 
                 SetIconSizeAndVisibility();
@@ -1076,9 +1094,11 @@ namespace Extract.Utilities.Forms
         /// <returns>The total width required for the buttons along with padding.</returns>
         int GetWidthOfAllButtons()
         {
+            int count = ((_buttons.Count == 0) ? 1 : _buttons.Count);
+
             Size buttonSize = GetButtonSize();
-            int allButtonsWidth = buttonSize.Width * _buttons.Count 
-                + BUTTON_PADDING * (_buttons.Count - 1);
+            int allButtonsWidth = buttonSize.Width * count
+                + BUTTON_PADDING * (count - 1);
 
             return allButtonsWidth;
         }
@@ -1131,39 +1151,42 @@ namespace Extract.Utilities.Forms
             int firstButtonY = this.ClientSize.Height - BOTTOM_PADDING - buttonSize.Height;
             Point nextButtonLocation = new Point(firstButtonX, firstButtonY);
 
-            // Place the first button on the message box and store its value
-            // so that if no button has been defined as the default button
-            // the first button can be marked as the default.  There will always be at
-            // least one button on the message box.
-            Button firstButton = GetButton(_buttons[0], buttonSize, nextButtonLocation);
-            nextButtonLocation.X += buttonSize.Width + BUTTON_PADDING;
-
-            // Iterate through each button and set its location
-            bool foundDefaultButton = false;
-            for (int i = 1; i < _buttons.Count; i++)
+            if (Buttons.Count > 0)
             {
-                CustomizableMessageBoxButton button = _buttons[i];
+                // Place the first button on the message box and store its value
+                // so that if no button has been defined as the default button
+                // the first button can be marked as the default.  There will always be at
+                // least one button on the message box.
+                Button firstButton = GetButton(_buttons[0], buttonSize, nextButtonLocation);
+                nextButtonLocation.X += buttonSize.Width + BUTTON_PADDING;
 
-                // Get the button
-                Button buttonCtrl = GetButton(button, buttonSize, nextButtonLocation);
-
-                // Set the default button for the message box.
-                // NOTE: If more than one button is marked default, only the first one
-                // will get the default property.
-                if (!foundDefaultButton && button.IsDefaultButton)
+                // Iterate through each button and set its location
+                bool foundDefaultButton = false;
+                for (int i = 1; i < _buttons.Count; i++)
                 {
-                    _defaultButtonControl = buttonCtrl;
-                    foundDefaultButton = true;
+                    CustomizableMessageBoxButton button = _buttons[i];
+
+                    // Get the button
+                    Button buttonCtrl = GetButton(button, buttonSize, nextButtonLocation);
+
+                    // Set the default button for the message box.
+                    // NOTE: If more than one button is marked default, only the first one
+                    // will get the default property.
+                    if (!foundDefaultButton && button.IsDefaultButton)
+                    {
+                        _defaultButtonControl = buttonCtrl;
+                        foundDefaultButton = true;
+                    }
+
+                    // Move the location for next button
+                    nextButtonLocation.X += buttonSize.Width + BUTTON_PADDING;
                 }
 
-                // Move the location for next button
-                nextButtonLocation.X += buttonSize.Width + BUTTON_PADDING;
-            }
-
-            // If no default button was found, set the first button as the default
-            if (!foundDefaultButton)
-            {
-                _defaultButtonControl = firstButton;
+                // If no default button was found, set the first button as the default
+                if (!foundDefaultButton)
+                {
+                    _defaultButtonControl = firstButton;
+                }
             }
         }
 
@@ -1267,7 +1290,7 @@ namespace Extract.Utilities.Forms
             }
             else
             {
-                //This condition should never get called
+                NativeMethods.DisableCloseButton(this);
                 _allowCancel = false;
             }
         }
