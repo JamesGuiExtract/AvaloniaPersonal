@@ -543,7 +543,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="sourceDocument">The <see cref="SourceDocument"/> to be loaded as an
         /// <see cref="OutputDocument"/>.</param>
-        public void CreateOutputDocument(SourceDocument sourceDocument)
+        /// <param name="insertSeparator"><see langword="true"/> if a separator should be inserted
+        /// before creating the new; otherwise, <see langword="false"/>.</param>
+        public void CreateOutputDocument(SourceDocument sourceDocument, bool insertSeparator)
         {
             try
             {
@@ -566,8 +568,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                         .OfType<Control>()
                         .LastOrDefault();
 
-                    // If the last control is currently a page control, we need to add a separator.
-                    if (lastControl != null && lastControl is PageThumbnailControl)
+                    // If insertSeparator == true and the last control is currently a page control,
+                    // we need to add a separator.
+                    if (insertSeparator && lastControl != null && lastControl is PageThumbnailControl)
                     {
                         AddPaginationControl(new PaginationSeparator());
                     }
@@ -935,7 +938,9 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 ImageViewer.Shortcuts[Keys.Tab] = HandleSelectNextPage;
                 ImageViewer.Shortcuts[Keys.Tab | Keys.Control] = HandleSelectNextDocument;
-                ImageViewer.Shortcuts[Keys.Tab | Keys.Shift] = HandleSelectPreviousSinglePage;
+                // [DotNetRCAndUtils:984]
+                // Don't allow the shift key to expand selection when used in conjunction with tab.
+                ImageViewer.Shortcuts[Keys.Tab | Keys.Shift] = HandleSelectPreviousPageNoShift;
                 ImageViewer.Shortcuts[Keys.Tab | Keys.Control | Keys.Shift] = HandleSelectPreviousDocument;
 
                 ImageViewer.Shortcuts[Keys.Left] = HandleSelectPreviousPage;
@@ -2604,6 +2609,27 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35457");
+            }
+        }
+
+        /// <summary>
+        /// Handles a UI command to select the previous page while ignoring the shift key modifier.
+        /// </summary>
+        internal void HandleSelectPreviousPageNoShift()
+        {
+            try
+            {
+                NavigablePaginationControl navigableControl = GetNextNavigableControl(false);
+
+                if (navigableControl != null)
+                {
+                    ProcessControlSelection(navigableControl, null, true,
+                        Control.ModifierKeys & ~Keys.Shift);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35832");
             }
         }
 

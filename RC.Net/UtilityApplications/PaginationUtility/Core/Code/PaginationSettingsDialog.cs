@@ -85,6 +85,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _inputFolderBrowseButton.Enabled = false;
                     _fileFilterComboBox.Enabled = false;
                     _includeSubfoldersCheckBox.Enabled = false;
+                    _autoInsertDocumentBoundariesCheckBox.Enabled = false;
                     _inputPageCountUpDown.Enabled = false;
                     _outputFolderTextBox.Enabled = false;
                     _outputFolderBrowseButton.Enabled = false;
@@ -273,6 +274,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _inputFolderTextBox.Text = config.Settings.InputFolder;
             _fileFilterComboBox.Text = config.Settings.FileFilter;
             _includeSubfoldersCheckBox.Checked = config.Settings.IncludeSubfolders;
+            _autoInsertDocumentBoundariesCheckBox.Checked = config.Settings.AutoInsertDocumentBoundaries;
             _inputPageCountUpDown.Value = config.Settings.InputPageCount;
             _outputFolderTextBox.Text = config.Settings.OutputFolder;
             _randomizeOutputFileNameCheckBox.Checked = config.Settings.RandomizeOutputFileName;
@@ -295,6 +297,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             config.Settings.InputFolder = _inputFolderTextBox.Text;
             config.Settings.FileFilter = _fileFilterComboBox.Text;
             config.Settings.IncludeSubfolders = _includeSubfoldersCheckBox.Checked;
+            config.Settings.AutoInsertDocumentBoundaries = _autoInsertDocumentBoundariesCheckBox.Checked;
             config.Settings.InputPageCount = Decimal.ToInt32(_inputPageCountUpDown.Value);
             config.Settings.OutputFolder = _outputFolderTextBox.Text;
             config.Settings.RandomizeOutputFileName = _randomizeOutputFileNameCheckBox.Checked;

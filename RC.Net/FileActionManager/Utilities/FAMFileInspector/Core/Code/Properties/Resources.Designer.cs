@@ -66,5 +66,12 @@ namespace Extract.FileActionManager.Utilities.Properties {
                 return ((System.Drawing.Icon)(obj));
             }
         }
+        
+        internal static System.Drawing.Bitmap FAMFileInspectorImage {
+            get {
+                object obj = ResourceManager.GetObject("FAMFileInspectorImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

@@ -51,6 +51,7 @@
             this._exportSettingsButton = new System.Windows.Forms.Button();
             this._importSettingsButton = new System.Windows.Forms.Button();
             this._randomizeOutputFileNameCheckBox = new System.Windows.Forms.CheckBox();
+            this._autoInsertDocumentBoundariesCheckBox = new System.Windows.Forms.CheckBox();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
@@ -81,37 +82,37 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new System.Drawing.Point(9, 131);
+            label4.Location = new System.Drawing.Point(9, 155);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(118, 13);
-            label4.TabIndex = 9;
+            label4.TabIndex = 10;
             label4.Text = "Specify output directory";
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new System.Drawing.Point(9, 107);
+            label3.Location = new System.Drawing.Point(9, 131);
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(69, 13);
-            label3.TabIndex = 6;
+            label3.TabIndex = 7;
             label3.Text = "Keep at least";
             // 
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(136, 107);
+            label5.Location = new System.Drawing.Point(136, 131);
             label5.Name = "label5";
             label5.Size = new System.Drawing.Size(177, 13);
-            label5.TabIndex = 8;
+            label5.TabIndex = 9;
             label5.Text = "pages in the input pane (if available)";
             // 
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(337, 322);
+            this._okButton.Location = new System.Drawing.Point(337, 348);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 17;
+            this._okButton.TabIndex = 18;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButton_Click);
@@ -120,10 +121,10 @@
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(418, 322);
+            this._cancelButton.Location = new System.Drawing.Point(418, 348);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 18;
+            this._cancelButton.TabIndex = 19;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
@@ -175,10 +176,10 @@
             // 
             this._outputFolderTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._outputFolderTextBox.Location = new System.Drawing.Point(12, 147);
+            this._outputFolderTextBox.Location = new System.Drawing.Point(12, 171);
             this._outputFolderTextBox.Name = "_outputFolderTextBox";
             this._outputFolderTextBox.Size = new System.Drawing.Size(448, 20);
-            this._outputFolderTextBox.TabIndex = 10;
+            this._outputFolderTextBox.TabIndex = 11;
             // 
             // groupBox1
             // 
@@ -186,10 +187,10 @@
             this.groupBox1.Controls.Add(this._moveInputDocumentRadioButton);
             this.groupBox1.Controls.Add(this._processedDocumentFolderTextBox);
             this.groupBox1.Controls.Add(this._processedDocumentFolderBrowseButton);
-            this.groupBox1.Location = new System.Drawing.Point(12, 219);
+            this.groupBox1.Location = new System.Drawing.Point(12, 243);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(481, 94);
-            this.groupBox1.TabIndex = 14;
+            this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "After handling all pages of an input document";
             // 
@@ -199,7 +200,7 @@
             this._deleteInputDocumentRadioButton.Location = new System.Drawing.Point(6, 68);
             this._deleteInputDocumentRadioButton.Name = "_deleteInputDocumentRadioButton";
             this._deleteInputDocumentRadioButton.Size = new System.Drawing.Size(124, 17);
-            this._deleteInputDocumentRadioButton.TabIndex = 3;
+            this._deleteInputDocumentRadioButton.TabIndex = 2;
             this._deleteInputDocumentRadioButton.TabStop = true;
             this._deleteInputDocumentRadioButton.Text = "Delete the document";
             this._deleteInputDocumentRadioButton.UseVisualStyleBackColor = true;
@@ -223,7 +224,7 @@
             this._processedDocumentFolderBrowseButton.Location = new System.Drawing.Point(445, 41);
             this._processedDocumentFolderBrowseButton.Name = "_processedDocumentFolderBrowseButton";
             this._processedDocumentFolderBrowseButton.Size = new System.Drawing.Size(27, 20);
-            this._processedDocumentFolderBrowseButton.TabIndex = 2;
+            this._processedDocumentFolderBrowseButton.TabIndex = 3;
             this._processedDocumentFolderBrowseButton.Text = "...";
             this._processedDocumentFolderBrowseButton.TextControl = this._processedDocumentFolderTextBox;
             this._processedDocumentFolderBrowseButton.UseVisualStyleBackColor = true;
@@ -236,7 +237,7 @@
             0,
             0});
             this._inputPageCountUpDown.IntegersOnly = true;
-            this._inputPageCountUpDown.Location = new System.Drawing.Point(84, 105);
+            this._inputPageCountUpDown.Location = new System.Drawing.Point(84, 129);
             this._inputPageCountUpDown.Maximum = new decimal(new int[] {
             500,
             0,
@@ -244,7 +245,7 @@
             0});
             this._inputPageCountUpDown.Name = "_inputPageCountUpDown";
             this._inputPageCountUpDown.Size = new System.Drawing.Size(46, 20);
-            this._inputPageCountUpDown.TabIndex = 7;
+            this._inputPageCountUpDown.TabIndex = 8;
             this._inputPageCountUpDown.Value = new decimal(new int[] {
             100,
             0,
@@ -255,10 +256,10 @@
             // 
             this._outputFolderBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._outputFolderBrowseButton.FolderBrowser = true;
-            this._outputFolderBrowseButton.Location = new System.Drawing.Point(466, 147);
+            this._outputFolderBrowseButton.Location = new System.Drawing.Point(466, 171);
             this._outputFolderBrowseButton.Name = "_outputFolderBrowseButton";
             this._outputFolderBrowseButton.Size = new System.Drawing.Size(27, 20);
-            this._outputFolderBrowseButton.TabIndex = 11;
+            this._outputFolderBrowseButton.TabIndex = 12;
             this._outputFolderBrowseButton.Text = "...";
             this._outputFolderBrowseButton.TextControl = this._outputFolderTextBox;
             this._outputFolderBrowseButton.UseVisualStyleBackColor = true;
@@ -278,20 +279,20 @@
             // _preserveOutputSubFoldersCheckBox
             // 
             this._preserveOutputSubFoldersCheckBox.AutoSize = true;
-            this._preserveOutputSubFoldersCheckBox.Location = new System.Drawing.Point(12, 196);
+            this._preserveOutputSubFoldersCheckBox.Location = new System.Drawing.Point(12, 220);
             this._preserveOutputSubFoldersCheckBox.Name = "_preserveOutputSubFoldersCheckBox";
             this._preserveOutputSubFoldersCheckBox.Size = new System.Drawing.Size(248, 17);
-            this._preserveOutputSubFoldersCheckBox.TabIndex = 13;
+            this._preserveOutputSubFoldersCheckBox.TabIndex = 14;
             this._preserveOutputSubFoldersCheckBox.Text = "Preserve sub-folder structure in output directory";
             this._preserveOutputSubFoldersCheckBox.UseVisualStyleBackColor = true;
             // 
             // _exportSettingsButton
             // 
             this._exportSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this._exportSettingsButton.Location = new System.Drawing.Point(12, 322);
+            this._exportSettingsButton.Location = new System.Drawing.Point(12, 348);
             this._exportSettingsButton.Name = "_exportSettingsButton";
             this._exportSettingsButton.Size = new System.Drawing.Size(108, 23);
-            this._exportSettingsButton.TabIndex = 15;
+            this._exportSettingsButton.TabIndex = 16;
             this._exportSettingsButton.Text = "Export Settings...";
             this._exportSettingsButton.UseVisualStyleBackColor = true;
             this._exportSettingsButton.Click += new System.EventHandler(this.HandleExportSettingsButton_Click);
@@ -299,10 +300,10 @@
             // _importSettingsButton
             // 
             this._importSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this._importSettingsButton.Location = new System.Drawing.Point(126, 322);
+            this._importSettingsButton.Location = new System.Drawing.Point(126, 348);
             this._importSettingsButton.Name = "_importSettingsButton";
             this._importSettingsButton.Size = new System.Drawing.Size(108, 23);
-            this._importSettingsButton.TabIndex = 16;
+            this._importSettingsButton.TabIndex = 17;
             this._importSettingsButton.Text = "Import Settings...";
             this._importSettingsButton.UseVisualStyleBackColor = true;
             this._importSettingsButton.Click += new System.EventHandler(this.HandleImportSettingsButton_Click);
@@ -310,12 +311,22 @@
             // _randomizeOutputFileNameCheckBox
             // 
             this._randomizeOutputFileNameCheckBox.AutoSize = true;
-            this._randomizeOutputFileNameCheckBox.Location = new System.Drawing.Point(12, 173);
+            this._randomizeOutputFileNameCheckBox.Location = new System.Drawing.Point(12, 197);
             this._randomizeOutputFileNameCheckBox.Name = "_randomizeOutputFileNameCheckBox";
             this._randomizeOutputFileNameCheckBox.Size = new System.Drawing.Size(154, 17);
-            this._randomizeOutputFileNameCheckBox.TabIndex = 12;
+            this._randomizeOutputFileNameCheckBox.TabIndex = 13;
             this._randomizeOutputFileNameCheckBox.Text = "Randomize output filename";
             this._randomizeOutputFileNameCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // _autoInsertDocumentBoundariesCheckBox
+            // 
+            this._autoInsertDocumentBoundariesCheckBox.AutoSize = true;
+            this._autoInsertDocumentBoundariesCheckBox.Location = new System.Drawing.Point(12, 106);
+            this._autoInsertDocumentBoundariesCheckBox.Name = "_autoInsertDocumentBoundariesCheckBox";
+            this._autoInsertDocumentBoundariesCheckBox.Size = new System.Drawing.Size(400, 17);
+            this._autoInsertDocumentBoundariesCheckBox.TabIndex = 6;
+            this._autoInsertDocumentBoundariesCheckBox.Text = "Insert document separators by default whenever a new input file is encountered";
+            this._autoInsertDocumentBoundariesCheckBox.UseVisualStyleBackColor = true;
             // 
             // PaginationSettingsDialog
             // 
@@ -324,7 +335,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(505, 355);
+            this.ClientSize = new System.Drawing.Size(505, 381);
+            this.Controls.Add(this._autoInsertDocumentBoundariesCheckBox);
             this.Controls.Add(this._randomizeOutputFileNameCheckBox);
             this.Controls.Add(this._importSettingsButton);
             this.Controls.Add(this._exportSettingsButton);
@@ -381,5 +393,6 @@
         private System.Windows.Forms.Button _exportSettingsButton;
         private System.Windows.Forms.Button _importSettingsButton;
         private System.Windows.Forms.CheckBox _randomizeOutputFileNameCheckBox;
+        private System.Windows.Forms.CheckBox _autoInsertDocumentBoundariesCheckBox;
     }
 }

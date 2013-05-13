@@ -70,6 +70,7 @@
 6081,MICR_Finding_Engine_Feature
 6082,Pegasus_PdfXpress_Modify_Pdf
 6083,FTP_SFTP_File_Transfer
+6084,FileInspectorSearch
 
 // IDs for FLEX Index / ID Shield integration efforts
 6101,Laserfiche_Integration_Verification

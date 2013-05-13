@@ -231,6 +231,9 @@ const unsigned int gnPEGASUS_PDFXPRESS_MODIFY_PDF		= gnBASE_OFFSET + 82;
 // Special ID for the FTP/SFTP file transfer features that use edtFTPnet/PRO SDK
 const unsigned int gnFTP_SFTP_FILE_TRANSFER				= gnBASE_OFFSET + 83;
 
+// Special ID for the search capability of the FAM File Inspector
+const unsigned int gnFILE_INSPECTOR_SEARCH				= gnBASE_OFFSET + 84;
+
 //-------------------------------------------------------------------------------------------------
 // Constants for items licensed for FLEX Index / ID Shield integration
 //-------------------------------------------------------------------------------------------------

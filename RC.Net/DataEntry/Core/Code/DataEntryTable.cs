@@ -3162,7 +3162,13 @@ namespace Extract.DataEntry
                 // Treat a singly selected cell as plain text.
                 if (SelectedCells.Count == 1)
                 {
-                    Clipboard.SetText(SelectedCells[0].Value.ToString());
+                    // [DataEntry:1241]
+                    // Just ignore the copy if null or empty
+                    string value = SelectedCells[0].Value.ToString();
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        Clipboard.SetText(value);
+                    }
                     return true;
                 }
 

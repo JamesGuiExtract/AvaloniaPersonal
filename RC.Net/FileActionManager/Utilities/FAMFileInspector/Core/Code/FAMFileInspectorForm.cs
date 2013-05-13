@@ -464,8 +464,17 @@ namespace Extract.FileActionManager.Utilities
                 {
                     row.GetFileData().ClearSearchResults();
                 }
+                _fileListMatchesColumn.Visible = false;
                 _fileListDataGridView.Invalidate();
 
+                if (_imageViewer.IsImageAvailable)
+                {
+                    _imageViewer.LayerObjects.Clear();
+                }
+
+                _layerObjectSelectionStatusLabel.Text = "";
+                _searchErrorStatusStripLabel.Text = "";
+                _imageViewerErrorStripStatusLabel.Text = "";
                 UpdateStatusLabel();
 
                 // Populate all pre-defined search terms from the database's FieldSearch table.
@@ -623,6 +632,35 @@ namespace Extract.FileActionManager.Utilities
             try
             {
                 base.OnLoad(e);
+
+#if DEBUG
+                if (_searchSplitContainer.Location != Point.Empty)
+                {
+                    UtilityMethods.ShowMessageBox(
+                        "For some reason with this form, if _searchSplitContainer is not " +
+                        "initialized last in InitializeComponent, the components on the form " +
+                        "get re-arranged when the form is displayed outside of the designer. " +
+                        "Move the initialization of _searchSplitContainer and it's two panels " +
+                        "to just above the FAMFileInspectorForm itself below after making " +
+                        "changes in the designer.", "Incorrect layout detected", true);
+                }
+#endif
+
+                // Search capability is available only as a separately licensed feature.
+                if (!LicenseUtilities.IsLicensed(LicenseIdName.FileInspectorSearch))
+                {
+                    // Removing the entire dock container seems is the only sure-fire way I can find
+                    // to prevent the tab from showing.
+                    _searchSplitContainer.Panel2.Controls.Remove(_dockContainer);
+                    _showOnlyMatchesCheckBox.Visible = false;
+                    _fileListDataGridView.Dock = DockStyle.Fill;
+                }
+                else if (!_searchDockableWindow.IsOpen)
+                {
+                    // If this application was run without search licensed, the form state manager
+                    // will remember that the search pane was closed. Force it open.
+                    _searchDockableWindow.Open();
+                }
 
                 // Establish image viewer connections prior to calling base.OnLoad which will
                 // potentially remove some IImageViewerControls.
@@ -1072,6 +1110,43 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Handles the <see cref="Control.KeyDown"/> event of the
+        /// <see cref="_fileListDataGridView"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.KeyEventArgs"/> instance containing
+        /// the event data.</param>
+        void HandleFileListDataGridView_KeyDown(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                // Handle any use of the tab key to force the tab key to navigate by row instead of
+                // by cell.
+                if (e.KeyCode == Keys.Tab && _fileListDataGridView.CurrentRow != null)
+                {
+                    int rowIndex = _fileListDataGridView.CurrentRow.Index;
+
+                    if (e.Shift && rowIndex > 0)
+                    {
+                        _fileListDataGridView.CurrentCell =
+                            _fileListDataGridView.Rows[rowIndex - 1].Cells[0];
+                        e.Handled = true;
+                    }
+                    else if (!e.Shift && rowIndex < _fileListDataGridView.RowCount - 1)
+                    {
+                        _fileListDataGridView.CurrentCell =
+                            _fileListDataGridView.Rows[rowIndex + 1].Cells[0];
+                        e.Handled = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35830");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="Control.Click"/> event of the
         /// <see cref="_logoutToolStripMenuItem"/>.
         /// </summary>
@@ -1123,6 +1198,26 @@ namespace Extract.FileActionManager.Utilities
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the
+        /// <see cref="_aboutToolStripMenuItem"/> control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleAboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                AboutBox aboutBox = new AboutBox();
+                aboutBox.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35831");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -1155,6 +1250,7 @@ namespace Extract.FileActionManager.Utilities
                 if (!value)
                 {
                     _searchProgressBar.Visible = false;
+                    _searchErrorStatusStripLabel.Visible = true;
                 }
                 
                 UpdateStatusLabel();
@@ -1279,13 +1375,22 @@ namespace Extract.FileActionManager.Utilities
             // Create a compiled DotNetRegexParser for every search term using an escaped version of
             // the search term to allow any term to be search as a regular expression.
             var regexParsers = new List<DotNetRegexParser>();
-            foreach (string regex in searchTerms.Select(term => Regex.Escape(term)))
+            foreach (string searchTerm in searchTerms)
             {
                 DotNetRegexParser regexParser = new DotNetRegexParser();
-                regexParser.Pattern = regex;
+                if (searchTerm.StartsWith("~", StringComparison.Ordinal))
+                {
+                    regexParser.Pattern = searchTerm.Substring(1);
+                }
+                else
+                {
+                    regexParser.Pattern = Regex.Escape(searchTerm);
+                }
                 regexParser.RegexOptions |= RegexOptions.Compiled;
                 regexParsers.Add(regexParser);
             }
+
+            int missingOcrCount = 0;
 
             // Search each file in the file list.
             foreach (DataGridViewRow row in _fileListDataGridView.Rows)
@@ -1297,7 +1402,11 @@ namespace Extract.FileActionManager.Utilities
                 FAMFileData rowData = row.GetFileData();
                 rowData.ShowTextResults = true;
                 SpatialString ocrText = rowData.OcrText;
-                if (ocrText != null)
+                if (ocrText == null)
+                {
+                    missingOcrCount++;
+                }
+                else
                 {
                     string fileText = ocrText.String;
                     List<Match> allMatches = new List<Match>();
@@ -1337,14 +1446,25 @@ namespace Extract.FileActionManager.Utilities
                 // Update the row in the UI.
                 this.SafeBeginInvoke("ELI35742", () =>
                 {
-                    rowToUpdate.Visible =
-                        rowData.FileMatchesSearch || !_showOnlyMatchesCheckBox.Checked;
-                    _fileListDataGridView.InvalidateRow(rowToUpdate.Index);
+                    UpdateRowVisibility(rowData, rowToUpdate);
 
                     // Update the progress bar
                     _searchProgressBar.Value++;
                 });
             }
+
+            this.SafeBeginInvoke("ELI35828", () =>
+            {
+                if (missingOcrCount == 0)
+                {
+                    _searchErrorStatusStripLabel.Text = "";
+                }
+                else
+                {
+                    _searchErrorStatusStripLabel.Text = string.Format(CultureInfo.CurrentCulture,
+                        "{0:D} file(s) have not been OCRed", missingOcrCount);
+                }
+            });
         }
 
         /// <summary>
@@ -1397,10 +1517,19 @@ namespace Extract.FileActionManager.Utilities
             foreach (KeyValuePair<string, string> searchTerm in searchTerms)
             {
                 DotNetRegexParser regexParser = new DotNetRegexParser();
-                regexParser.Pattern = Regex.Escape(searchTerm.Value);
+                if (searchTerm.Value.StartsWith("~", StringComparison.Ordinal))
+                {
+                    regexParser.Pattern = searchTerm.Value.Substring(1);
+                }
+                else
+                {
+                    regexParser.Pattern = Regex.Escape(searchTerm.Value);
+                }
                 regexParser.RegexOptions |= RegexOptions.Compiled;
                 regexParsers.Add(searchTerm.Key, regexParser);
             }
+
+            int missingDataCount = 0;
 
             // Search each file in the file list.
             foreach (DataGridViewRow row in _fileListDataGridView.Rows)
@@ -1412,7 +1541,11 @@ namespace Extract.FileActionManager.Utilities
                 FAMFileData rowData = row.GetFileData();
                 rowData.ShowTextResults = false;
                 IUnknownVector attributes = rowData.Attributes;
-                if (attributes != null)
+                if (attributes == null)
+                {
+                    missingDataCount++;
+                }
+                else
                 {
                     var allMatches = new List<ThreadSafeSpatialString>();
 
@@ -1458,14 +1591,25 @@ namespace Extract.FileActionManager.Utilities
                 // Update the row in the UI.
                 this.SafeBeginInvoke("ELI35744", () =>
                 {
-                    rowToUpdate.Visible =
-                        rowData.FileMatchesSearch || !_showOnlyMatchesCheckBox.Checked;
-                    _fileListDataGridView.InvalidateRow(rowToUpdate.Index);
+                    UpdateRowVisibility(rowData, rowToUpdate);
 
                     // Update the progress bar
                     _searchProgressBar.Value++;
                 });
             }
+
+            this.SafeBeginInvoke("ELI35829", () =>
+            {
+                if (missingDataCount == 0)
+                {
+                    _searchErrorStatusStripLabel.Text = "";
+                }
+                else
+                {
+                    _searchErrorStatusStripLabel.Text = string.Format(CultureInfo.CurrentCulture,
+                        "Rules have not been run on {0:D} file(s)", missingDataCount);
+                }
+            });
         }
 
         /// <summary>
@@ -1487,11 +1631,13 @@ namespace Extract.FileActionManager.Utilities
                 // All rows should be hidden until they are determined to be a match.
                 row.Visible = false;
             }
+            _fileListMatchesColumn.Visible = true;
             _fileListDataGridView.Invalidate();
 
             _searchProgressBar.Value = 0;
             _searchProgressBar.Maximum = _fileListDataGridView.Rows.Count;
             _searchProgressBar.Visible = true;
+            _searchErrorStatusStripLabel.Visible = false;
 
             // Start by showing only the matching files.
             _showOnlyMatchesCheckBox.Enabled = true;
@@ -1659,6 +1805,27 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Updates the row visibility based on the row's search result and whether only search
+        /// results are being displayed.
+        /// </summary>
+        /// <param name="rowData">The row's <see cref="FAMFileData"/>.</param>
+        /// <param name="rowToUpdate">The <see cref="DataGridViewRow"/> to update.</param>
+        void UpdateRowVisibility(FAMFileData rowData, DataGridViewRow rowToUpdate)
+        {
+            rowToUpdate.Visible =
+                rowData.FileMatchesSearch || !_showOnlyMatchesCheckBox.Checked;
+            if (rowToUpdate.Visible && _fileListDataGridView.SelectedRows.Count == 1)
+            {
+                if (_fileListDataGridView.SelectedRows[0] == rowToUpdate &&
+                    _fileListDataGridView.CurrentRow != rowToUpdate)
+                {
+                    _fileListDataGridView.CurrentCell = rowToUpdate.Cells[0];
+                }
+            }
+            _fileListDataGridView.InvalidateRow(rowToUpdate.Index);
+        }
+
+        /// <summary>
         /// Updates the image displayed in the <see cref="_imageViewer"/> based on the
         /// <see pararef="currentRow"/>.
         /// </summary>
@@ -1666,6 +1833,8 @@ namespace Extract.FileActionManager.Utilities
         /// </param>
         void UpdateImageViewerDisplay(DataGridViewRow currentRow)
         {
+            _layerObjectSelectionStatusLabel.Text = "";
+            _imageViewerErrorStripStatusLabel.Text = "";
             if (_overlayTextCanceler != null)
             {
                 _overlayTextCanceler.Cancel();
@@ -1708,6 +1877,8 @@ namespace Extract.FileActionManager.Utilities
         {
             if (fileData.ShowTextResults.HasValue)
             {
+                int nonSpatialCount = 0;
+
                 // If showing the results of a text search
                 if (fileData.ShowTextResults.Value)
                 {
@@ -1725,10 +1896,17 @@ namespace Extract.FileActionManager.Utilities
                                 // Create a SpatialString representing the match.
                                 SpatialString resultValue =
                                     ocrText.GetSubString(match.Index, match.Index + match.Length - 1);
-                                foreach (CompositeHighlightLayerObject highlight in
-                                    _imageViewer.CreateHighlights(resultValue, _HIGHLIGHT_COLOR))
+                                if (resultValue.HasSpatialInfo())
                                 {
-                                    _imageViewer.LayerObjects.Add(highlight);
+                                    foreach (CompositeHighlightLayerObject highlight in
+                                        _imageViewer.CreateHighlights(resultValue, _HIGHLIGHT_COLOR))
+                                    {
+                                        _imageViewer.LayerObjects.Add(highlight);
+                                    }
+                                }
+                                else
+                                {
+                                    nonSpatialCount++;
                                 }
                             }
                         }
@@ -1741,16 +1919,39 @@ namespace Extract.FileActionManager.Utilities
                     {
                         foreach (ThreadSafeSpatialString match in matches)
                         {
-                            foreach (CompositeHighlightLayerObject highlight in
-                                _imageViewer.CreateHighlights(match.SpatialString, Color.LimeGreen))
+                            if (match.SpatialString.HasSpatialInfo())
                             {
-                                _imageViewer.LayerObjects.Add(highlight);
+                                foreach (CompositeHighlightLayerObject highlight in
+                                    _imageViewer.CreateHighlights(match.SpatialString, _HIGHLIGHT_COLOR))
+                                {
+                                    _imageViewer.LayerObjects.Add(highlight);
+                                }
+                            }
+                            else
+                            {
+                                nonSpatialCount++;
                             }
                         }
                     }
                 }
 
                 _imageViewer.Invalidate();
+
+                if (nonSpatialCount == 0)
+                {
+                    _imageViewerErrorStripStatusLabel.Text = "";
+                }
+                else
+                {
+                    _imageViewerErrorStripStatusLabel.Text = string.Format(CultureInfo.CurrentCulture,
+                        "{0:D} matches have no spatial data and cannot be displayed",
+                        nonSpatialCount);
+                }
+
+                if (_imageViewer.CanGoToNextLayerObject)
+                {
+                    _imageViewer.GoToNextVisibleLayerObject(true);
+                }
             }
         }
 

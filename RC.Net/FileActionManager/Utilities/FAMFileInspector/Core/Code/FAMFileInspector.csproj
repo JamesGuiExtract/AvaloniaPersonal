@@ -70,6 +70,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AboutBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutBox.Designer.cs">
+      <DependentUpon>AboutBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="FAMFileData.cs" />
     <Compile Include="FAMFileInspector.FormStateManager.cs">
       <SubType>Form</SubType>
@@ -83,6 +89,10 @@
     </Compile>
     <Compile Include="FAMFileInspectorProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="AboutBox.resx">
+      <DependentUpon>AboutBox.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="FAMFileInspectorForm.resx">
       <DependentUpon>FAMFileInspectorForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -234,6 +244,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\FAMFileInspector.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\preview_128_hot.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

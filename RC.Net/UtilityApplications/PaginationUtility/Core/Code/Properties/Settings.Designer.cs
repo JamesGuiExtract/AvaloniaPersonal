@@ -130,5 +130,17 @@ namespace Extract.UtilityApplications.PaginationUtility.Properties {
                 this["PreserveSubFoldersInOutput"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoInsertDocumentBoundaries {
+            get {
+                return ((bool)(this["AutoInsertDocumentBoundaries"]));
+            }
+            set {
+                this["AutoInsertDocumentBoundaries"] = value;
+            }
+        }
     }
 }
