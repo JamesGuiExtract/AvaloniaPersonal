@@ -2609,12 +2609,12 @@ namespace Extract.Imaging.Forms
             }
 
             // Update _lastNonAutoZoomInfo if:
-            // 1) AutoZoomed is false
-            // 2) The image viewer is not in the process of _autoZooming.
-            // 3) The image viewer is not currently painting to an external graphics object.
-            if (!AutoZoomed && !_autoZooming && !_paintingToGraphics)
+            // 1) An image is available
+            // 2) AutoZoomed is false
+            // 3) The image viewer is not in the process of _autoZooming.
+            // 4) The image viewer is not currently painting to an external graphics object.
+            if (IsImageAvailable && !AutoZoomed && !_autoZooming && !_paintingToGraphics)
             {
-                ExtractException.Assert("ELI35757", "No image is open", IsImageAvailable);
                 _lastNonAutoZoomInfo = GetZoomInfo();
             }
         }

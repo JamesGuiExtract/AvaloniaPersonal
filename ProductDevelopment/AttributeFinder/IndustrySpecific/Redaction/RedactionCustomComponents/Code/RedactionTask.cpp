@@ -310,11 +310,17 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         else
         {
             _lastCodePos = "190";
-            ipFoundAttr = ipVOAAttr;
+			
+			// [FlexIDSCore:5299]
+			// Items may be removed from ipFoundAttr below, so ipFoundAttr needs to be a separate
+			// vector than ipVOAAttr so meta data isn't lost after running this task. Do this as a
+			// shallow copy so that any changes to attributes in ipVOAAttr are reflected in
+			// ipFoundAttr.
+			IShallowCopyablePtr ipCopySource(ipVOAAttr);
+			ASSERT_RESOURCE_ALLOCATION("ELI35785", ipCopySource != __nullptr);
 
-			// [FlexIDSCore:5002]
-			// Do not attempt to redact metadata attributes.
-			getAFUtility()->RemoveMetadataAttributes(ipFoundAttr);
+			ipFoundAttr = ipCopySource->ShallowCopy();
+			ASSERT_RESOURCE_ALLOCATION("ELI35786", ipFoundAttr != __nullptr);
         }
         _lastCodePos = "200";
 
@@ -335,6 +341,18 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
             ISpatialStringPtr ipValue = ipAttr->Value;
             ASSERT_RESOURCE_ALLOCATION("ELI09002", ipValue != __nullptr);
             _lastCodePos = "260";
+
+			// [FlexIDSCore:5002]
+			// Do not attempt to redact non-spatial or metadata attributes.
+			string strAttributeName = asString(ipAttr->Name);
+			if (!asCppBool(ipValue->HasSpatialInfo()) ||
+				(!strAttributeName.empty() && strAttributeName[0] == '_'))
+			{
+				ipFoundAttr->Remove(i);
+				nNumAttr--;
+				i--;
+				continue;
+			}
 
             // Only cover area if value is spatial
             if (ipValue->HasSpatialInfo() == VARIANT_TRUE)
