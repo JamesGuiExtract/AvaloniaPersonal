@@ -29,6 +29,8 @@ PDCommonDir=$(PDRootDir)\Common
 SPInstallationDirectory=R:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)\Sharepoint
 InternalUseBuildFilesArchive=P:\AttributeFinder\Archive\InternalUseBuildFiles\InternalBuilds\$(FlexIndexVersion)
 
+IDShieldSPClientIntallRoot=$(SharePointRootDir)\Installation\IDShieldSPClient
+
 # determine the name of the release output directory based upon the build
 # configuration that is being built
 !IF "$(BuildConfig)" == "Release"
@@ -80,7 +82,13 @@ CreateSharePointPackages: BuildExtractSharePoint CopyOriginalFilesBeforeObfuscat
 	msbuild /t:Package $(SharePointRootDir)\Redaction\Core\Code\Extract.SharePoint.Redaction.csproj /p:Configuration=$(BuildConfig)
 	msbuild /t:Package $(SharePointRootDir)\Core\Code\Extract.SharePoint.csproj /p:Configuration=$(BuildConfig)
 
-CopyFilesForSPInstallFolder: CreateSharePointPackages
+BuildIDShieldForSPClientInstall:
+    @ECHO Building Extract Systems IDShield for Sharepoint Client installation...
+	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_18\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages
+	$(SetProductVerScript) "$(IDShieldSPClientIntallRoot)\IDShieldSPClient.ism" "$(FlexIndexVersion)"
+    @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(IDShieldSPClientIntallRoot)\IDShieldSPClient.ism"
+	
+CopyFilesForSPInstallFolder: CreateSharePointPackages BuildIDShieldForSPClientInstall
     @ECHO Copying the Sharepoint files to installation directory...
 	@IF NOT EXIST "$(SPInstallationDirectory)" @MKDIR "$(SPInstallationDirectory)"
 	@IF NOT EXIST "$(SPInstallationDirectory)\IDShieldForSPClient" @MKDIR "$(SPInstallationDirectory)\IDShieldForSPClient"
@@ -92,14 +100,7 @@ CopyFilesForSPInstallFolder: CreateSharePointPackages
 	@COPY /v "$(BinariesFolder)\Extract.SharePoint.Redaction.wsp" "$(SPInstallationDirectory)"
 	@COPY /v "$(SharePointRootDir)\Installation\PowershellScripts\*.ps1" "$(SPInstallationDirectory)"
 	
-	@COPY /v "$(BinariesFolder)\Extract.ExtensionMethods.dll" "$(SPInstallationDirectory)\IDShieldForSPClient"
-	@COPY /v "$(BinariesFolder)\Extract.SharePoint.Redaction.dll" "$(SPInstallationDirectory)\IDShieldForSPClient"
-	@COPY /v "$(BinariesFolder)\IDShieldForSPClient.exe" "$(SPInstallationDirectory)\IDShieldForSPClient"
-	@COPY /v "$(RCNETDir)\APIs\SharePoint\2010\bin\Microsoft.SharePoint.Client.dll" "$(SPInstallationDirectory)\IDShieldForSPClient"
-	@COPY /v "$(RCNETDir)\APIs\SharePoint\2010\bin\Microsoft.SharePoint.Client.Runtime.dll" "$(SPInstallationDirectory)\IDShieldForSPClient"
-	@COPY /v "$(BinariesFolder)\Extract.SharePoint.Redaction.Utilities.dll" "$(SPInstallationDirectory)\IDShieldForSPClient"
-	@COPY /v "$(BinariesFolder)\RemoveExtractSPColumns.exe" "$(SPInstallationDirectory)\IDShieldForSPClient"
-	@COPY /v "$(SharePointRootDir)\Installation\IDShieldForSPClient\*.bat" "$(SPInstallationDirectory)\IDShieldForSPClient"
+	XCOPY "$(SharePointRootDir)\Installation\IDShieldSPClient\Media\CD-ROM\DiskImages\DISK1\*.*" "$(SPInstallationDirectory)\IDShieldForSPClient"
 		
 # Copy pdb and map files to archive
 	@COPY  "$(BinariesFolder)\*.pdb" "$(InternalUseBuildFilesArchive)" 
