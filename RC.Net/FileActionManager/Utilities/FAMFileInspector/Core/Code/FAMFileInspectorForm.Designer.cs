@@ -135,7 +135,6 @@
             this._selectFilesSummaryLabel.Name = "_selectFilesSummaryLabel";
             this._selectFilesSummaryLabel.Size = new System.Drawing.Size(392, 38);
             this._selectFilesSummaryLabel.TabIndex = 0;
-            this._selectFilesSummaryLabel.Text = "One\r\nTwo\r\nThree\r\nFour\r\nFive\r\nSix\r\nSeven\r\n";
             // 
             // label1
             // 

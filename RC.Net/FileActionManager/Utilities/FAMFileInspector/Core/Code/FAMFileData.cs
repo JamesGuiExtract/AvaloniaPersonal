@@ -157,6 +157,36 @@ namespace Extract.FileActionManager.Utilities
             }
         }
 
+        /// <summary>
+        /// Gets or sets the match count for the last type of search run.
+        /// </summary>
+        /// <value>
+        /// The match count or -1 if there are no results available.
+        /// </value>
+        public int MatchCount
+        {
+            get
+            {
+                try
+                {
+                    if (ShowTextResults == null)
+                    {
+                        return -1;
+                    }
+
+                    int matchCount = ShowTextResults.Value
+                        ? (TextMatches == null) ? -1 : TextMatches.Count()
+                        : (DataMatches == null) ? -1 : DataMatches.Count();
+
+                    return matchCount;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35833");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -197,20 +227,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                if ((TextMatches == null) && (other.TextMatches == null))
-                {
-                    return 0;
-                }
-                else if (TextMatches == null)
-                {
-                    return -1;
-                }
-                else if (other.TextMatches == null)
-                {
-                    return 1;
-                }
-
-                return TextMatches.Count().CompareTo(other.TextMatches.Count());
+                return MatchCount.CompareTo(other.MatchCount);
             }
             catch (Exception ex)
             {

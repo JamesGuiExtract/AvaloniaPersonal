@@ -207,13 +207,21 @@ string SelectFileSettings::buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDB
 			// out of the #OriginalResults in the order they were inserted.
 			"ELSE\r\n"
 			"BEGIN\r\n"
+			// [DotNetRCAndUtils:995]
+			// Because SQL server may attempt to pre-compile the block even if it wouldn't otherwise
+			// be used, use dynamic SQL to prevent this from being pre-compiled and, thus, prevent
+			// it from trying to reference #OriginalResults.RowNumber when that column doesn't exist.
+			"	DECLARE @dynamic_command NVARCHAR(MAX)\r\n"
+			"	SET @dynamic_command = \r\n'"
 			"	DECLARE @randomizedRows TABLE(RowNumber INT)\r\n"
-			"	INSERT INTO @randomizedRows (#OriginalResults.RowNumber)\r\n"
-			"		SELECT TOP (@rowsToReturn) RowNumber FROM #OriginalResults ORDER BY NEWID()\r\n"
+			"		INSERT INTO @randomizedRows (#OriginalResults.RowNumber)\r\n"
+			"		SELECT TOP (' + CAST(@rowsToReturn AS NVARCHAR(16)) + ') RowNumber\r\n"
+			"			FROM #OriginalResults ORDER BY NEWID()\r\n"
 			"\r\n"
 			"	SELECT " + strSelect + " FROM #OriginalResults AS FAMFile\r\n"
 			"		INNER JOIN @randomizedRows ON FAMFile.RowNumber = [@randomizedRows].RowNumber\r\n"
-			"			ORDER BY FAMFile.RowNumber\r\n"
+			"			ORDER BY FAMFile.RowNumber'\r\n"
+			"	EXEC (@dynamic_command)\r\n"
 			"END\r\n"
 			"\r\n"
 			"DROP TABLE #OriginalResults\r\n"
@@ -288,9 +296,7 @@ string SelectFileSettings::buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDB
 			"DECLARE @queryHasIdentityColumn INT\r\n"
 			"SELECT @queryHasIdentityColumn = COUNT(object_id) FROM tempdb.SYS.IDENTITY_COLUMNS\r\n"
 			"	WHERE object_id = OBJECT_ID('tempdb..#OriginalResults')\r\n"
-			"IF @queryHasIdentityColumn = 0\r\n"
-			"	ALTER TABLE #OriginalResults ADD RowNumber INT IDENTITY\r\n"
-			"ELSE\r\n"
+			"IF @queryHasIdentityColumn = 1\r\n"
 			"	SET IDENTITY_INSERT #OriginalResults ON\r\n"
 			"\r\n"
 			"DECLARE @rowsToReturn INT\r\n"

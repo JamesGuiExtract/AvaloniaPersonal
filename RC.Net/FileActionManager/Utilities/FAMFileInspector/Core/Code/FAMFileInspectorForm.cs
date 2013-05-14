@@ -447,60 +447,48 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Resets the search settings back to the defaul and clears all matches indicated in
+        /// Resets the search settings back to the default and clears all matches indicated in
         /// <see cref="_fileListDataGridView"/>.
         /// </summary>
         public void ResetSearch()
         {
+            Recordset queryResults = null;
+
             try
             {
+                ClearSearchResults();
+
                 _searchModifierComboBox.SelectEnumValue(SearchModifier.Any);
                 _textSearchTermsDataGridView.Rows.Clear();
                 _dataSearchTermsDataGridView.Rows.Clear();
-                _showOnlyMatchesCheckBox.Checked = false;
-                _showOnlyMatchesCheckBox.Enabled = false;
-
-                foreach (DataGridViewRow row in _fileListDataGridView.Rows)
-                {
-                    row.GetFileData().ClearSearchResults();
-                }
-                _fileListMatchesColumn.Visible = false;
-                _fileListDataGridView.Invalidate();
-
-                if (_imageViewer.IsImageAvailable)
-                {
-                    _imageViewer.LayerObjects.Clear();
-                }
-
-                _layerObjectSelectionStatusLabel.Text = "";
-                _searchErrorStatusStripLabel.Text = "";
-                _imageViewerErrorStripStatusLabel.Text = "";
-                UpdateStatusLabel();
 
                 // Populate all pre-defined search terms from the database's FieldSearch table.
-                Recordset queryResults = FileProcessingDB.GetResultsForQuery(
+                queryResults = FileProcessingDB.GetResultsForQuery(
                     "SELECT [FieldName], [AttributeQuery] FROM [FieldSearch] WHERE [Enabled] = 1 " +
                     "ORDER BY [FieldName]");
-                if (!queryResults.EOF)
+                while (!queryResults.EOF)
                 {
-                    queryResults.MoveFirst();
-                    while (!queryResults.EOF)
-                    {
-                        string fieldName = (string)queryResults.Fields[0].Value;
-                        string attributeQuery = (string)queryResults.Fields[1].Value;
+                    string fieldName = (string)queryResults.Fields["FieldName"].Value;
+                    string attributeQuery = (string)queryResults.Fields["AttributeQuery"].Value;
 
-                        _dataSearchQueries[fieldName] = attributeQuery;
+                    _dataSearchQueries[fieldName] = attributeQuery;
 
-                        int index = _dataSearchTermsDataGridView.Rows.Add(fieldName, "");
-                        _dataSearchTermsDataGridView.Rows[index].Cells[0].ReadOnly = true;
+                    int index = _dataSearchTermsDataGridView.Rows.Add(fieldName, "");
+                    _dataSearchTermsDataGridView.Rows[index].Cells[0].ReadOnly = true;
 
-                        queryResults.MoveNext();
-                    }
+                    queryResults.MoveNext();
                 }
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35772");
+            }
+            finally
+            {
+                if (queryResults != null)
+                {
+                    queryResults.Close();
+                }
             }
         }
 
@@ -548,6 +536,8 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         public void InitializeContextMenu()
         {
+            Recordset queryResults = null;
+
             try
             {
                 // Dispose of any previous context menu option.
@@ -561,37 +551,36 @@ namespace Extract.FileActionManager.Utilities
 
                 // Populate context menu options for all enabled items from the database's AppLaunch
                 // table.
-                Recordset queryResults = FileProcessingDB.GetResultsForQuery(
+                queryResults = FileProcessingDB.GetResultsForQuery(
                     "SELECT [AppName], [ApplicationPath], [Arguments], [AllowMultipleFiles], " +
                         "[SupportsErrorHandling], [Blocking] " +
                     "FROM [LaunchApp] WHERE [Enabled] = 1 ORDER BY [AppName]");
-                if (!queryResults.EOF)
+                while (!queryResults.EOF)
                 {
-                    queryResults.MoveFirst();
-                    while (!queryResults.EOF)
+                    // Create an AppLaunchItem instance representing the settings of this item.
+                    var appLaunchItem = new AppLaunchItem();
+                    appLaunchItem.Name = (string)queryResults.Fields["AppName"].Value;
+                    appLaunchItem.ApplicationPath =
+                        (string)queryResults.Fields["ApplicationPath"].Value;
+                    if (!(queryResults.Fields[2].Value is System.DBNull))
                     {
-                        // Create an AppLaunchItem instance representing the settings of this item.
-                        var appLaunchItem = new AppLaunchItem();
-                        appLaunchItem.Name = (string)queryResults.Fields[0].Value;
-                        appLaunchItem.ApplicationPath = (string)queryResults.Fields[1].Value;
-                        if (!(queryResults.Fields[2].Value is System.DBNull))
-                        {
-                            appLaunchItem.Arguments =
-                                (string)(queryResults.Fields[2].Value ?? string.Empty);
-                        }
-                        appLaunchItem.AllowMultipleFiles = (bool)queryResults.Fields[3].Value;
-                        appLaunchItem.SupportsErrorHandling = (bool)queryResults.Fields[4].Value;
-                        appLaunchItem.Blocking = (bool)queryResults.Fields[5].Value;
-
-                        // Create a context menu option and add a handler for it.
-                        var menuItem = new ToolStripMenuItem(appLaunchItem.Name);
-                        menuItem.Click += HandleLaunchAppMenuItem_Click;
-
-                        _appLaunchItems.Add(menuItem, appLaunchItem);
-                        newContextMenuStrip.Items.Add(menuItem);
-
-                        queryResults.MoveNext();
+                        appLaunchItem.Arguments =
+                            (string)(queryResults.Fields["Arguments"].Value ?? string.Empty);
                     }
+                    appLaunchItem.AllowMultipleFiles =
+                        (bool)queryResults.Fields["AllowMultipleFiles"].Value;
+                    appLaunchItem.SupportsErrorHandling =
+                        (bool)queryResults.Fields["SupportsErrorHandling"].Value;
+                    appLaunchItem.Blocking = (bool)queryResults.Fields["Blocking"].Value;
+
+                    // Create a context menu option and add a handler for it.
+                    var menuItem = new ToolStripMenuItem(appLaunchItem.Name);
+                    menuItem.Click += HandleLaunchAppMenuItem_Click;
+
+                    _appLaunchItems.Add(menuItem, appLaunchItem);
+                    newContextMenuStrip.Items.Add(menuItem);
+
+                    queryResults.MoveNext();
                 }
 
                 // If there is at least one enabled context menu option, attach the menu to
@@ -615,6 +604,13 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35821");
+            }
+            finally
+            {
+                if (queryResults != null)
+                {
+                    queryResults.Close();
+                }
             }
         }
 
@@ -821,6 +817,7 @@ namespace Extract.FileActionManager.Utilities
                 if (FileSelector.Configure(FileProcessingDB, "Select the files to be listed",
                     "SELECT [Filename] FROM [FAMFile]"))
                 {
+                    ClearSearchResults();
                     GenerateFileList();
                 }
             }
@@ -1105,7 +1102,7 @@ namespace Extract.FileActionManager.Utilities
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI35823");
+                ex.ExtractDisplay("ELI35823");
             }
         }
 
@@ -1155,28 +1152,34 @@ namespace Extract.FileActionManager.Utilities
         /// </param>
         void HandleLogoutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            try
+            // Repeatedly show login dialog until successful or the user exits the app.
+            while (true)
             {
-                // Hide the main form until the user connects to a database.
-                Hide();
+                try
+                {
+                    // Hide the main form until the user connects to a database.
+                    Hide();
 
-                if (FileProcessingDB.ShowSelectDB("Select database", false, true))
-                {
-                    ResetFileSelectionSettings();
-                    ResetSearch();
-                    Show();
-                    InitializeContextMenu();
-                    GenerateFileList();
+                    if (FileProcessingDB.ShowSelectDB("Select database", false, true))
+                    {
+                        ResetFileSelectionSettings();
+                        ResetSearch();
+                        Show();
+                        InitializeContextMenu();
+                        GenerateFileList();
+                    }
+                    else
+                    {
+                        // If the user chose to exit from the database selection prompt, exit.
+                        Close();
+                    }
+
+                    break;
                 }
-                else
+                catch (Exception ex)
                 {
-                    // If the user chose to exit from the database selection prompt, exit.
-                    Close();
+                    ex.ExtractDisplay("ELI35756");
                 }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI35756");
             }
         }
 
@@ -1259,6 +1262,32 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Clears results from a previous search.
+        /// </summary>
+        void ClearSearchResults()
+        {
+            _showOnlyMatchesCheckBox.Checked = false;
+            _showOnlyMatchesCheckBox.Enabled = false;
+
+            foreach (DataGridViewRow row in _fileListDataGridView.Rows)
+            {
+                row.GetFileData().ClearSearchResults();
+            }
+            _fileListMatchesColumn.Visible = false;
+            _fileListDataGridView.Invalidate();
+
+            if (_imageViewer.IsImageAvailable)
+            {
+                _imageViewer.LayerObjects.Clear();
+            }
+
+            _layerObjectSelectionStatusLabel.Text = "";
+            _searchErrorStatusStripLabel.Text = "";
+            _imageViewerErrorStripStatusLabel.Text = "";
+            UpdateStatusLabel();
+        }
+
+        /// <summary>
         /// Updates the status label text to reflect the current state of
         /// <see cref="_fileListDataGridView"/>.
         /// </summary>
@@ -1300,50 +1329,54 @@ namespace Extract.FileActionManager.Utilities
         /// after adding each file to the list to ensure the operation hasn't been canceled.</param>
         void RunDatabaseQuery(string query, CancellationToken cancelToken)
         {
+            Recordset queryResults = null;
+
             try
             {
-                Recordset queryResults = FileProcessingDB.GetResultsForQuery(query);
+                queryResults = FileProcessingDB.GetResultsForQuery(query);
 
                 _fileSelectionCount = 0;
 
                 // If there are any query results, populate _resultsDataGridView.
-                if (!queryResults.EOF)
+                while (!queryResults.EOF)
                 {
-                    queryResults.MoveFirst();
-                    while (!queryResults.EOF)
+                    // Abort if the user cancelled.
+                    cancelToken.ThrowIfCancellationRequested();
+
+                    // Populate up to MaxFilesToDisplay in the file list, but iterate all
+                    // results to obtain the overall number of files selected.
+                    if (_fileSelectionCount < MaxFilesToDisplay)
                     {
-                        // Abort if the user cancelled.
-                        cancelToken.ThrowIfCancellationRequested();
+                        // Retrieve the fields necessary for the results table.
+                        string fileName = (string)queryResults.Fields["FileName"].Value;
+                        var fileData = new FAMFileData(fileName);
 
-                        // Populate up to MaxFilesToDisplay in the file list, but iterate all
-                        // results to obtain the overall number of files selected.
-                        if (_fileSelectionCount < MaxFilesToDisplay)
+                        string directory = Path.GetDirectoryName(fileName);
+                        fileName = Path.GetFileName(fileName);
+                        int pageCount = (int)queryResults.Fields["Pages"].Value;
+
+                        // Invoke the new row to be added on the UI thread.
+                        this.SafeBeginInvoke("ELI35725", () =>
                         {
-                            // Retrieve the fields necessary for the results table.
-                            string fileName = (string)queryResults.Fields[1].Value;
-                            var fileData = new FAMFileData(fileName);
-
-                            string directory = Path.GetDirectoryName(fileName);
-                            fileName = Path.GetFileName(fileName);
-                            int pageCount =
-                                (int)queryResults.Fields[_FILE_LIST_MATCH_COLUMN_INDEX].Value;
-
-                            // Invoke the new row to be added on the UI thread.
-                            this.SafeBeginInvoke("ELI35725", () =>
-                            {
-                                _fileListDataGridView.Rows.Add(fileName, pageCount, fileData,
-                                    directory);
-                            });
-                        }
-
-                        queryResults.MoveNext();
-                        _fileSelectionCount++;
+                            _fileListDataGridView.Rows.Add(fileName, pageCount, fileData,
+                                directory);
+                        });
                     }
+
+                    queryResults.MoveNext();
+                    _fileSelectionCount++;
                 }
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35726");
+            }
+            finally
+            {
+                if (queryResults != null)
+                {
+                    queryResults.Close();
+                }
             }
         }
 
@@ -1417,7 +1450,9 @@ namespace Extract.FileActionManager.Utilities
                     // Search the OCR text with the parser for each search term.
                     foreach (DotNetRegexParser parser in regexParsers)
                     {
-                        var matches = parser.Regex.Matches(fileText).OfType<Match>();
+                        var matches = parser.Regex.Matches(fileText)
+                            .OfType<Match>()
+                            .Where(match => match.Length > 0);
 
                         // Update FileMatchesSearch as appropriate given the results
                         switch (searchModifier)
@@ -1561,6 +1596,7 @@ namespace Extract.FileActionManager.Utilities
                             .Select(attribute => attribute.Value)
                             .SelectMany(value => parser.Value.Regex.Matches(value.String)
                                 .OfType<Match>()
+                                .Where(match => match.Length > 0)
                                 .Select(match => new ThreadSafeSpatialString(this,
                                     value.GetSubString(match.Index, match.Index + match.Length - 1))));
 
