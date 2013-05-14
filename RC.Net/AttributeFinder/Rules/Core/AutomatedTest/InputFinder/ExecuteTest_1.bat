@@ -10,5 +10,5 @@ START "ProcessFiles" "%ccdir%\ProcessFiles.exe" MemoryLeak_1.fps /s
 REM Start Logging Statistics to numbered subfolder
 START "" "%ccdir%\LogProcessStats.exe" ProcessFiles 5s .\Stats\Test_1 /el
 
-REM Supply Numbered Files for 4 hours
-CALL "CopyNumberedSets.bat" "." "Source" 1 12
+REM Supply Numbered Files
+CALL "CopyNumberedSets.bat" "." "Source" 1 100
