@@ -1122,6 +1122,7 @@
 		<row><td>USERPROFILE</td><td>TARGETDIR</td><td>.:USERPR~1|UserProfile</td><td/><td>0</td><td/></row>
 		<row><td>WindowsFolder</td><td>TARGETDIR</td><td>.:Windows</td><td/><td>0</td><td/></row>
 		<row><td>WindowsVolume</td><td>TARGETDIR</td><td>.:WinRoot</td><td/><td>0</td><td/></row>
+		<row><td>newfolder1</td><td>ProgramMenuFolder</td><td>##ID_STRING3##</td><td/><td>1</td><td/></row>
 	</table>
 
 	<table name="DrLocator">
@@ -3818,6 +3819,8 @@
 		<row><td>IDS__TargetReq_DESC_RESOLUTION</td><td>1033</td><td>The screen resolution is not adequate for running [ProductName].</td><td>0</td><td/><td>-1264744032</td></row>
 		<row><td>ID_STRING1</td><td>1033</td><td>http://www.ExtractSystems.com</td><td>0</td><td/><td>1252099305</td></row>
 		<row><td>ID_STRING2</td><td>1033</td><td>ID Shield Sharepoint Client</td><td>0</td><td/><td>1252103819</td></row>
+		<row><td>ID_STRING3</td><td>1033</td><td>IDSHIE~1|ID Shield For Sharepoint</td><td>0</td><td/><td>1923185226</td></row>
+		<row><td>ID_STRING4</td><td>1033</td><td>IDSHIE~1|ID Shield For Sharepoint Client</td><td>0</td><td/><td>1923183210</td></row>
 		<row><td>IIDS_UITEXT_FeatureUninstalled</td><td>1033</td><td>This feature will remain uninstalled.</td><td>0</td><td/><td>-1264744032</td></row>
 	</table>
 
@@ -4487,6 +4490,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="L255">FileName</col>
 		<col def="s72">DirProperty</col>
 		<col def="i2">InstallMode</col>
+		<row><td>NewShortcut1</td><td>IDShieldForSPClient.exe</td><td/><td>newfolder1</td><td>2</td></row>
 	</table>
 
 	<table name="RemoveIniFile">
@@ -4572,6 +4576,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S255">ISComments</col>
 		<col def="S255">ISShortcutName</col>
 		<col def="I4">ISAttributes</col>
+		<row><td>NewShortcut1</td><td>newfolder1</td><td>##ID_STRING4##</td><td>IDShieldForSPClient.exe</td><td>[INSTALLDIR]IDShieldForSPClient.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="Signature">
