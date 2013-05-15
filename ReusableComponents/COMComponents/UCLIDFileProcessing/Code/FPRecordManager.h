@@ -66,6 +66,10 @@ public:
 	//			Subsequent calls to processingQueueIsDiscarded() will return true.
 	void discardProcessingQueue();
 	//---------------------------------------------------------------------------------------------
+	// PROMISE:	Blocks until the processing queue has been discarded. (and the DB is no longer
+	//			needed).
+	void waitForQueueToBeDiscarded();
+	//---------------------------------------------------------------------------------------------
 	// PROMISE: If processingQueueIsDiscarded() == true, this method will return false 
 	//			immediately and the task method parameter is untouched.
 	//			If processingQueueIsDiscarded() == false and the queue contains at least one
@@ -175,6 +179,10 @@ private:
 	// This is like a bank employee telling customers in the queue inside the bank that
 	// their computers are down and so no customers can be served for now.
 	Win32Event m_queueDiscardedEvent;
+
+	// This event indicates whether discarding of the queue is complete (as opposed to
+	// m_queueDiscardedEvent which indicates that it has been started.
+	Win32Event m_queueDiscardCompleteEvent;
 
 	// This event controls whether more files should be added to the queue.  If the
 	// queue is in the stop state, that means that we will not let any more files be added

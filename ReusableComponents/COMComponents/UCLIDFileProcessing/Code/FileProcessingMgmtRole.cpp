@@ -2218,24 +2218,21 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 						switch( rtnValue)
 						{
 						case WAIT_OBJECT_0:
-							// Set the current running state to normal stop
-							pFPM->m_eCurrentRunningState = kNormalStop;
-
-							// Stop the processing
-							pFPM->stopProcessing();
-
-							// Need to wait for the watcher thread to exit
+							// Reset watcher thread exited event
 							pFPM->m_eventWatcherThreadExited.wait();
-
-							// Close the database connections
-							ipFamDB->CloseAllDBConnections();
 							break;
 						case WAIT_OBJECT_0 + 1:
 							// Reset watcher thread exited event
 							pFPM->m_eventWatcherThreadExited.reset();
 
-							// Close the database connections
-							ipFamDB->CloseAllDBConnections();
+							// Close the database connection only if paused or a scheduled stop.
+							// If a normal stop, keep the connection open until the session is
+							// finalized at the end of this function.
+							if (pFPM->m_eCurrentRunningState != kNormalStop)
+							{
+								// Close the database connections
+								ipFamDB->CloseAllDBConnections();
+							}
 
 							// If not a normal stop, log processing inactive message
 							if (pFPM->m_eCurrentRunningState != kNormalStop)
@@ -2311,10 +2308,18 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 				::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_ACTIVE, 0, 0);
 			}
 
+			// Ensure the FPRecordManager queue is discarded before finalizing
+			pFPM->m_pRecordMgr->waitForQueueToBeDiscarded();
+
 			// Notify the FAM that processing is complete
 			UCLID_FILEPROCESSINGLib::IRoleNotifyFAMPtr ipRoleNotifyFAM = pFPM->m_ipRoleNotifyFAM;
 			ASSERT_RESOURCE_ALLOCATION("ELI28315", ipRoleNotifyFAM != __nullptr);
-			ipRoleNotifyFAM->NotifyProcessingCompleted();
+			ipRoleNotifyFAM->NotifyProcessingCompleted(); // Unregisters FAM, finalizes stats.
+
+			// [LegacyRCAndUtils:6937], [FlexIDSCore:5244]
+			// Ensure NotifyProcessingCompleted (and UnregisterActiveFAM) have been called before
+			// closing the database connections.
+			ipFamDB->CloseAllDBConnections();
 
 			pFPM->m_eventProcessManagerExited.signal();
 		}

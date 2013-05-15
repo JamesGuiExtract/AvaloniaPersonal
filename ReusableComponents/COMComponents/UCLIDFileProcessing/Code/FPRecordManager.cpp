@@ -143,6 +143,14 @@ void FPRecordManager::discardProcessingQueue()
 	// Ensure the queue is cleared since we have now reverted the state of all files
 	// [FlexIDSCore #3738]
 	m_queTaskIds.clear();
+
+	// Indicate that the queue has finished being discarded (and the DB is no longer needed).
+	m_queueDiscardCompleteEvent.signal();
+}
+//-------------------------------------------------------------------------------------------------
+void FPRecordManager::waitForQueueToBeDiscarded()
+{
+	m_queueDiscardCompleteEvent.wait();
 }
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::updateTask(FileProcessingRecord& task)
@@ -336,6 +344,7 @@ void FPRecordManager::clearEvents()
 
 	m_queueClosedEvent.reset();
 	m_queueDiscardedEvent.reset();
+	m_queueDiscardCompleteEvent.reset();
 	m_queueStopEvent.reset();
 }
 //-------------------------------------------------------------------------------------------------
