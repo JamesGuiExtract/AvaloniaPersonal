@@ -25,11 +25,6 @@ namespace Extract.Utilities.Parsers
         Regex _regexParser;
 
         /// <summary>
-        /// Specifies if a search should ignore case.
-        /// </summary>
-        bool _ignoreCase = true;
-
-        /// <summary>
         /// Pattern to be searched for.
         /// </summary>
         string _pattern = "";
@@ -37,7 +32,7 @@ namespace Extract.Utilities.Parsers
         /// <summary>
         /// The <see cref="RegexOptions"/> that should be used for the underlying <see cref="Regex"/>.
         /// </summary>
-        RegexOptions _regexOptions = RegexOptions.Multiline;
+        RegexOptions _regexOptions = RegexOptions.Multiline | RegexOptions.IgnoreCase;
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
@@ -55,18 +50,32 @@ namespace Extract.Utilities.Parsers
         {
             get
             {
-                return _ignoreCase;
+                return _regexOptions.HasFlag(RegexOptions.IgnoreCase);
             }
             set
             {
-                // Only change the value if it is different from the previous value.
-                if (_ignoreCase != value)
+                try
                 {
-                    _ignoreCase = value;
+                    // Only change the value if it is different from the previous value.
+                    if (IgnoreCase != value)
+                    {
+                        if (value)
+                        {
+                            _regexOptions |= RegexOptions.IgnoreCase;
+                        }
+                        else
+                        {
+                            _regexOptions &= ~RegexOptions.IgnoreCase;
+                        }
 
-                    // Reset the RegEx parser to null since options can only be set when
-                    // creating a RegEx object.
-                    _regexParser = null;
+                        // Reset the RegEx parser to null since options can only be set when
+                        // creating a RegEx object.
+                        _regexParser = null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35837");
                 }
             }
         }
@@ -113,7 +122,7 @@ namespace Extract.Utilities.Parsers
         {
             get
             {
-                return _ignoreCase ? (_regexOptions |= RegexOptions.IgnoreCase) : _regexOptions;
+                return _regexOptions;
             }
 
             set
