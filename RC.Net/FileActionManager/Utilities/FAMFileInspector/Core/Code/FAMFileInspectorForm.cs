@@ -1162,6 +1162,8 @@ namespace Extract.FileActionManager.Utilities
 
                     if (FileProcessingDB.ShowSelectDB("Select database", false, true))
                     {
+                        // Checks schema
+                        FileProcessingDB.ResetDBConnection();
                         ResetFileSelectionSettings();
                         ResetSearch();
                         Show();

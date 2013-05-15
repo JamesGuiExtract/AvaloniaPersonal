@@ -39,13 +39,33 @@ namespace Extract.FileActionManager.Utilities
 
                 var famFileInspectorForm = new FAMFileInspectorForm();
 
-                if (famFileInspectorForm.FileProcessingDB.ShowSelectDB(
-                        "Select database", false, true))
+                bool loggedIn = false;
+                while (!loggedIn)
                 {
-                    famFileInspectorForm.ResetFileSelectionSettings();
-                    famFileInspectorForm.ResetSearch();
+                    try
+                    {
+                        if (famFileInspectorForm.FileProcessingDB.ShowSelectDB(
+                                        "Select database", false, true))
+                        {
+                            // Checks schema
+                            famFileInspectorForm.FileProcessingDB.ResetDBConnection();
+                            loggedIn = true;
 
-                    Application.Run(famFileInspectorForm);    
+                            famFileInspectorForm.ResetFileSelectionSettings();
+                            famFileInspectorForm.ResetSearch();
+
+                            Application.Run(famFileInspectorForm);
+                        }
+                        else
+                        {
+                            // User cancelled.
+                            break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractDisplay("ELI35838");
+                    }
                 }
             }
             catch (Exception ex)
