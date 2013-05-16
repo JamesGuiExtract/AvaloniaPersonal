@@ -75,6 +75,11 @@ namespace Extract.FileActionManager.Utilities
         static readonly Color _HIGHLIGHT_COLOR = Color.LimeGreen;
 
         /// <summary>
+        /// The color of the dashed border used to indicate the currently selected match.
+        /// </summary>
+        static readonly Color _SELECTION_BORDER_COLOR = Color.Red;
+
+        /// <summary>
         /// The maximum number of files to display at once.
         /// </summary>
         public static readonly int MaxFilesToDisplay = 1000;
@@ -226,6 +231,14 @@ namespace Extract.FileActionManager.Utilities
         delegate void SearchOperation<T>(T searchTerms, SearchModifier searchModifier,
             CancellationToken cancelToken);
 
+        /// <summary>
+        /// Indicates whether the <see paramref="row"/> qualifies for a particular need.
+        /// </summary>
+        /// <param name="row">The <see cref="DataGridViewRow"/> to check for qualification.</param>
+        /// <returns><see langword="true"/> if the row qualifies, otherwise,
+        /// <see langword="false"/>.</returns>
+        delegate bool RowQualifier(DataGridViewRow row);
+
         #endregion Delegates
 
         #region Fields
@@ -280,6 +293,17 @@ namespace Extract.FileActionManager.Utilities
         /// Indicates whether a background database query or file search is active.
         /// </summary>
         volatile bool _operationIsActive = true;
+
+        /// <summary>
+        /// Indicates how many calls to <see cref="OpenImageInvoked"/> are pending.
+        /// </summary>
+        volatile int _pendingOpenImageCount;
+        
+        /// <summary>
+        /// Indicates whether the last match (instead of the first) should be selected by default
+        /// when a new image is opened.
+        /// </summary>
+        bool _selectLastMatchByDefault;
 
         /// <summary>
         /// Indicates if the host is in design mode or not.
@@ -338,6 +362,13 @@ namespace Extract.FileActionManager.Utilities
 
                 InitializeComponent();
 
+                // Turn off the tab stop on the page navigation text box.
+                foreach (var textBox in _navigationToolsImageViewerToolStrip.Items
+                    .OfType<ToolStripTextBox>())
+                {
+                    textBox.TextBox.TabStop = false;
+                }
+
                 if (!_inDesignMode)
                 {
                     // Loads/save UI state properties
@@ -353,7 +384,7 @@ namespace Extract.FileActionManager.Utilities
                 // confusing)
                 _searchDockableWindow.PopupSize = 1;
 
-                LayerObject.SelectionPen = ExtractPens.GetThickDashedPen(_HIGHLIGHT_COLOR);
+                LayerObject.SelectionPen = ExtractPens.GetThickDashedPen(_SELECTION_BORDER_COLOR);
             }
             catch (Exception ex)
             {
@@ -662,6 +693,9 @@ namespace Extract.FileActionManager.Utilities
                 // potentially remove some IImageViewerControls.
                 _imageViewer.EstablishConnections(this);
 
+                _imageViewer.Shortcuts[Keys.Oemcomma] = HandlePreviousMatchCommand;
+                _imageViewer.Shortcuts[Keys.OemPeriod] = HandleNextMatchCommand;
+
                 // Initialize the search settings.
                 _searchTypeComboBox.SelectEnumValue(SearchType.Text);
                 ResetSearch();
@@ -673,6 +707,68 @@ namespace Extract.FileActionManager.Utilities
             {
                 ex.ExtractDisplay("ELI35713");
             }
+        }
+
+        /// <summary>
+        /// Processes a command key.
+        /// </summary>
+        /// <param name="msg">The window message to process.</param>
+        /// <param name="keyData">The key to process.</param>
+        /// <returns><see langword="true"/> if the character was processed by the control; 
+        /// otherwise, <see langword="false"/>.</returns>
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            try
+            {
+                if (keyData.HasFlag(Keys.Tab))
+                {
+                    bool forward = !keyData.HasFlag(Keys.Shift);
+
+                    // Use the tab key to navigate rows as long as either the file list has focus or
+                    // none of the other tab stops do.
+                    if (ProcessFileListTabKey(forward))
+                    {
+                        return true;
+                    }
+
+                    // [DotNetRCAndUtils:1005]
+                    // There are issues with the "natural" tab navigation of this form. Calculate
+                    // what the next tab stop control should be so that we can use it to override
+                    // the "natural" behavior.
+                    Control lastfocusedControl = this.GetFocusedControl();
+                    Control expectedFocusControl =
+                        FormsMethods.FindNextControl(this, lastfocusedControl, forward, true,
+                        c => c.TabStop && c.Visible && c.Enabled && !(c is ContainerControl));
+
+                    // If after processing the tab key, the focus has moved to another control (i.e.,
+                    // it wasn't handled by the control, such as a data grid view), and the control
+                    // that now has focus is not the one we expect, override the ActiveControl.
+                    this.SafeBeginInvoke("ELI35849", () =>
+                    {
+                        Control focusedControl = this.GetFocusedControl();
+                        if (focusedControl != lastfocusedControl &&
+                            focusedControl != expectedFocusControl)
+                        {
+                            ActiveControl = expectedFocusControl;
+                        }
+                    }, false);
+                }
+
+                // Allow the image viewer to handle keyboard input for shortcuts.
+                if (_imageViewer.Shortcuts.ProcessKey(keyData))
+                {
+                    return true;
+                }
+
+                // This key was not processed, bubble it up to the base class.
+                return base.ProcessCmdKey(ref msg, keyData);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI35841", ex);
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -1107,39 +1203,133 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.KeyDown"/> event of the
-        /// <see cref="_fileListDataGridView"/>.
+        /// If either the file list has focus or none of the other tab stops do, navigates the rows
+        /// of <see cref="_fileListDataGridView"/>.
         /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.Windows.Forms.KeyEventArgs"/> instance containing
-        /// the event data.</param>
-        void HandleFileListDataGridView_KeyDown(object sender, KeyEventArgs e)
+        /// <param name="forward"><see langword="true"/> to navigate forward, otherwise,
+        /// <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if the current row in <see cref="_fileListDataGridView"/>
+        /// was changed, otherwise <see langword="false"/>.</returns>
+        bool ProcessFileListTabKey(bool forward)
         {
             try
             {
-                // Handle any use of the tab key to force the tab key to navigate by row instead of
-                // by cell.
-                if (e.KeyCode == Keys.Tab && _fileListDataGridView.CurrentRow != null)
+                // Manually override navigation of the file list if either the file list has focus
+                // or none of the other tab stops do.
+                Control focusedControl = this.GetFocusedControl();
+                bool isFocusTabStopControl = (focusedControl != null) && focusedControl.TabStop &&
+                    focusedControl.Visible && focusedControl.Enabled &&
+                    !(focusedControl is ContainerControl);
+                if (_fileListDataGridView.Focused || !isFocusTabStopControl)
                 {
-                    int rowIndex = _fileListDataGridView.CurrentRow.Index;
+                    // Reset focus to the file list, if it doesn't already have it.
+                    ActiveControl = _fileListDataGridView;
 
-                    if (e.Shift && rowIndex > 0)
+                    // If we can find the next row to be selected, select it.
+                    DataGridViewRow nextRow = GetNextRow(forward, null);
+                    if (nextRow != null)
                     {
-                        _fileListDataGridView.CurrentCell =
-                            _fileListDataGridView.Rows[rowIndex - 1].Cells[0];
-                        e.Handled = true;
+                        _fileListDataGridView.CurrentCell = nextRow.Cells[0];
+
+                        return true;
                     }
-                    else if (!e.Shift && rowIndex < _fileListDataGridView.RowCount - 1)
+
+                    // The current row (if any) is the last in the current navigation direction. Tab
+                    // should now navigate away from the file list. To ensure that it does, make
+                    // sure the current cell is the last in the row in the navigation direction.
+                    DataGridViewCell currentCell = _fileListDataGridView.CurrentCell;
+                    if (currentCell != null)
                     {
-                        _fileListDataGridView.CurrentCell =
-                            _fileListDataGridView.Rows[rowIndex + 1].Cells[0];
-                        e.Handled = true;
+                        // If forward, set to last cell in row.
+                        int lastColumnIndex = _fileListDataGridView.ColumnCount - 1;
+                        if (forward && currentCell.ColumnIndex < lastColumnIndex)
+                        {
+                            _fileListDataGridView.CurrentCell =
+                                _fileListDataGridView.Rows[currentCell.RowIndex].Cells[lastColumnIndex];
+                        }
+                        // If backward, set to first cell in row.
+                        else if (!forward && currentCell.ColumnIndex > 0)
+                        {
+                            _fileListDataGridView.CurrentCell =
+                                _fileListDataGridView.Rows[currentCell.RowIndex].Cells[0];
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI35830");
+                ex.ExtractDisplay("ELI35847");
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Handles the UI command to select the previous search result.
+        /// </summary>
+        void HandlePreviousMatchCommand()
+        {
+            try
+            {
+                // If there is a previous search result in this document, go to it.
+                if (_imageViewer.CanGoToPreviousLayerObject)
+                {
+                    _imageViewer.GoToPreviousLayerObject();
+                }
+                // Otherwise, go to the next previous document with any matches.
+                else
+                {
+                    DataGridViewRow nextRow = GetNextRow(false, row => 
+                        row.GetFileData().MatchCount > 0);
+                    if (nextRow != null)
+                    {
+                        try
+                        {
+                            // Because we are navigating backward, we want the last match of the
+                            // document selected. Set _selectLastMatchByDefault to true before
+                            // selecting the next document.
+                            _selectLastMatchByDefault = true;
+                            _fileListDataGridView.CurrentCell = nextRow.Cells[0];
+                        }
+                        finally
+                        {
+                            _selectLastMatchByDefault = false;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35839");
+            }
+        }
+
+        /// <summary>
+        /// Handles the UI command to select the next search result.
+        /// </summary>
+        void HandleNextMatchCommand()
+        {
+            try
+            {
+                // If there is a subsequent search result in this document, go to it.
+                if (_imageViewer.CanGoToNextLayerObject)
+                {
+                    _imageViewer.GoToNextLayerObject();
+                }
+                // Otherwise, go to the next document with any matches.
+                else
+                {
+                    DataGridViewRow nextRow = GetNextRow(true, row =>
+                        row.GetFileData().MatchCount > 0);
+                    if (nextRow != null)
+                    {
+                        _fileListDataGridView.CurrentCell = nextRow.Cells[0];
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35840");
             }
         }
 
@@ -1843,6 +2033,46 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Gets the next <see cref="DataGridViewRow"/> with that matches the specified
+        /// <see paramref="rowQualifier"/>.
+        /// </summary>
+        /// <param name="down"><see langword="true"/> to find the next row below the current one;
+        /// <see langword="false"/> to fine the next row above the current one.</param>
+        /// <param name="rowQualifier">This <see cref="RowQualifier"/> must be
+        /// <see langword="true"/> for any return value.</param>
+        DataGridViewRow GetNextRow(bool down, RowQualifier rowQualifier)
+        {
+            var rows = _fileListDataGridView.Rows.OfType<DataGridViewRow>();
+            // If navigating backward, reverse the row enumeration.
+            if (!down)
+            {
+                rows = rows.Reverse();
+            }
+
+            // Find the current row.
+            DataGridViewRow currentRow = _fileListDataGridView.CurrentRow;
+            if (currentRow == null)
+            {
+                // If there was no current row, use the first.
+                currentRow = rows.FirstOrDefault();
+                if (rowQualifier == null || rowQualifier(currentRow))
+                {
+                    // If the first row qualifies, return it.
+                    return currentRow;
+                }
+            }
+
+            // Take the first row after current row.
+            DataGridViewRow nextRow =
+                rows.SkipWhile(row => currentRow != null && row != currentRow)
+                    .Skip(1)
+                    .Where(row => row.Visible && (rowQualifier == null || rowQualifier(row)))
+                    .FirstOrDefault();
+
+            return nextRow;
+        }
+
+        /// <summary>
         /// Updates the row visibility based on the row's search result and whether only search
         /// results are being displayed.
         /// </summary>
@@ -1883,11 +2113,9 @@ namespace Extract.FileActionManager.Utilities
 
             if (fileData != null && File.Exists(fileData.FileName))
             {
-                // ... and open it in the image viewer.
-                _imageViewer.OpenImage(fileData.FileName, false);
-
-                // Display highlights for all search terms found in the selected file.
-                ShowMatchHighlights(fileData);
+                // Open the image associated with fileData and highlight all search terms found int
+                // it.
+                OpenImage(fileData);
             }
             else // either there no current row or no file available, close any open image.
             {
@@ -1902,6 +2130,95 @@ namespace Extract.FileActionManager.Utilities
                     _overlayTextCanceler = OverlayText.ShowText(_imageViewer, "File not found",
                         Font, Color.FromArgb(100, Color.Red), null, 0);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Opens the image associated with <see paramref="fileData"/> via an asynchronous call.
+        /// </summary>
+        /// <param name="fileData">The <see cref="FAMFileData"/> associated with the image to be
+        /// opened.</param>
+        void OpenImage(FAMFileData fileData)
+        {
+            // [DotNetRCAndUtils:1012]
+            // Queue the open image call from a background thread. This will allow UI events to be
+            // handled in the meantime. If at the time the OpenImageInvoked call is made, additional
+            // open image requests have been queued up, all but the most recent will be ignored.
+            _pendingOpenImageCount++;
+            Task.Factory.StartNew(() =>
+            {
+                // Sleep a trivial amount of time to encourage the application context to allow the
+                // UI thread to handle messages in the meantime.
+                Thread.Sleep(1);
+                this.SafeBeginInvoke("ELI35844", () => OpenImageInvoked(fileData));
+            })
+            // In case of error invoking the image open, return _pendingOpenImageCount to its
+            //previous value.
+            .ContinueWith((task) => _pendingOpenImageCount--,
+                TaskContinuationOptions.OnlyOnFaulted);
+        }
+
+        /// <summary>
+        /// Helper function for <see cref="OpenImage"/>. Opens the image associated with 
+        /// <see paramref="fileData"/>.
+        /// </summary>
+        /// <param name="fileData">The <see cref="FAMFileData"/> associated with the image to be
+        /// opened.</param>
+        void OpenImageInvoked(FAMFileData fileData)
+        {
+            try
+            {
+                ExtractException.Assert("ELI35846", "Unexpected open image operation",
+                    _pendingOpenImageCount > 0);
+                
+                // If subsequent file open requests have been queued, ignore this one.
+                _pendingOpenImageCount--;
+                if (_pendingOpenImageCount > 0)
+                {
+                    return;
+                }
+
+                using (new TemporaryWaitCursor())
+                {
+                    // To prevent flicker of the image viewer tool strips while loading a new image,
+                    // if we can find a parent ToolStripContainer, lock it until the new image is
+                    // loaded.
+                    // [DotNetRCAndUtils:931]
+                    // This, and the addition of a parameter on OpenImage to prevent an initial
+                    // refresh is in place of locking the entire form which can cause the form to
+                    // fall behind other open applications when clicked.
+                    LockControlUpdates toolStripLocker = null;
+                    for (Control control = this; control != null; control = control.Parent)
+                    {
+                        var toolStripContainer = control as ToolStripContainer;
+                        if (toolStripContainer != null)
+                        {
+                            toolStripLocker = new LockControlUpdates(toolStripContainer);
+                            break;
+                        }
+                    }
+
+                    try
+                    {
+                        _imageViewer.OpenImage(fileData.FileName, false, false);
+
+                        // Display highlights for all search terms found in the selected file.
+                        ShowMatchHighlights(fileData);
+                    }
+                    finally
+                    {
+                        if (toolStripLocker != null)
+                        {
+                            toolStripLocker.Dispose();
+                        }
+                    }
+                }
+
+                Refresh();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35845");
             }
         }
 
@@ -1986,7 +2303,23 @@ namespace Extract.FileActionManager.Utilities
                         nonSpatialCount);
                 }
 
-                if (_imageViewer.CanGoToNextLayerObject)
+                // Select the first or last search result in the document depending on
+                // _selectLastMatchByDefault.
+                if (_selectLastMatchByDefault)
+                {
+                    // Can't use GoToPreviousVisibleLayerObject, because it will select the last in
+                    // the current view rather than the last in the document.
+                    LayerObject lastMatch = _imageViewer.LayerObjects
+                        .GetSortedCollection()
+                        .LastOrDefault();
+                    if (lastMatch != null)
+                    {
+                        _imageViewer.LayerObjects.Selection.Clear();
+                        _imageViewer.CenterOnLayerObjects(lastMatch);
+                        lastMatch.Selected = true;
+                    }
+                }
+                else if (_imageViewer.CanGoToNextLayerObject)
                 {
                     _imageViewer.GoToNextVisibleLayerObject(true);
                 }

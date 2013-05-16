@@ -332,7 +332,9 @@ namespace Extract.Imaging.Forms.StatusStripItems
             if (_imageViewer != null)
             {
                 // Is there a singly selected object?
-                LayerObject selectedObject = _imageViewer.LayerObjects.Selection.SingleOrDefault();
+                LayerObject selectedObject = (_imageViewer.LayerObjects.Selection.Count <= 1)
+                    ? _imageViewer.LayerObjects.Selection.SingleOrDefault()
+                    : null;
 
                 if (selectedObject != null)
                 {

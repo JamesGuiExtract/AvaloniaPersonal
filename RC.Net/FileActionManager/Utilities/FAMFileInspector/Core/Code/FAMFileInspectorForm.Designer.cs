@@ -316,7 +316,6 @@
             this._fileListDataGridView.TabIndex = 1;
             this._fileListDataGridView.CurrentCellChanged += new System.EventHandler(this.HandleResultsDataGridView_CurrentCellChanged);
             this._fileListDataGridView.SortCompare += new System.Windows.Forms.DataGridViewSortCompareEventHandler(this.HandleFileListDataGridView_SortCompare);
-            this._fileListDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.HandleFileListDataGridView_KeyDown);
             // 
             // _fileListNameColumn
             // 
@@ -602,6 +601,7 @@
             this._imageViewerToolsToolStrip.Name = "_imageViewerToolsToolStrip";
             this._imageViewerToolsToolStrip.Size = new System.Drawing.Size(84, 39);
             this._imageViewerToolsToolStrip.TabIndex = 3;
+            this._imageViewerToolsToolStrip.TabStop = false;
             // 
             // zoomWindowToolStripButton1
             // 
@@ -634,6 +634,7 @@
             this._highlightNavigationToolStrip.Name = "_highlightNavigationToolStrip";
             this._highlightNavigationToolStrip.Size = new System.Drawing.Size(84, 39);
             this._highlightNavigationToolStrip.TabIndex = 4;
+            this._highlightNavigationToolStrip.TabStop = false;
             // 
             // _previousLayerObjectToolStripButton
             // 
@@ -665,6 +666,7 @@
             this._navigationToolsImageViewerToolStrip.Name = "_navigationToolsImageViewerToolStrip";
             this._navigationToolsImageViewerToolStrip.Size = new System.Drawing.Size(233, 39);
             this._navigationToolsImageViewerToolStrip.TabIndex = 2;
+            this._navigationToolsImageViewerToolStrip.TabStop = false;
             // 
             // _viewCommandsImageViewerToolStrip
             // 
@@ -674,6 +676,7 @@
             this._viewCommandsImageViewerToolStrip.Name = "_viewCommandsImageViewerToolStrip";
             this._viewCommandsImageViewerToolStrip.Size = new System.Drawing.Size(312, 39);
             this._viewCommandsImageViewerToolStrip.TabIndex = 1;
+            this._viewCommandsImageViewerToolStrip.TabStop = false;
             // 
             // _generalImageToolStrip
             // 
@@ -685,6 +688,7 @@
             this._generalImageToolStrip.Name = "_generalImageToolStrip";
             this._generalImageToolStrip.Size = new System.Drawing.Size(48, 39);
             this._generalImageToolStrip.TabIndex = 0;
+            this._generalImageToolStrip.TabStop = false;
             // 
             // _printImageToolStripButton
             // 

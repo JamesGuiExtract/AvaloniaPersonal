@@ -125,28 +125,46 @@ namespace Extract.FileActionManager.Utilities
                         return;
                     }
 
-                    // A new form is needed.
-                    _fileInspectorForm = new FAMFileInspectorForm();
+                    // [DotNetRCAndUtils:1009]
+                    // The form needs to be launched into it's own STA thread. Otherwise there are
+                    // message handling issue that can intefere with tab order and print
+                    // functionality among other things.
+                    Thread uiThread = new Thread(() =>
+                    {
+                        try
+                        {
+                            // A new form is needed.
+                            _fileInspectorForm = new FAMFileInspectorForm();
 
-                    // Because the FileProcessingDB may be re-configured to connect to
-                    // a new DB from within this app and because we don't want that
-                    // affecting an outside caller still using it (DBAdmin), just copy
-                    // the connection settings rather that using the passed in
-                    // FileProcessingDB.
-                    CopyDbConnectionSettings(fileProcessingDB, _fileInspectorForm.FileProcessingDB);
-                    if (fileSelector == null)
-                    {
-                        // No provided file selection settings should be interpreted as
-                        // to bring the form up with no file selection conditions.
-                        _fileInspectorForm.ResetFileSelectionSettings();
-                    }
-                    else
-                    {
-                        _fileInspectorForm.FileSelector = fileSelector;
-                        _fileInspectorForm.FileSelector.LimitToSubset(false, false,
-                            FAMFileInspectorForm.MaxFilesToDisplay);
-                    }
-                    _fileInspectorForm.Show();
+                            // Because the FileProcessingDB may be re-configured to connect to
+                            // a new DB from within this app and because we don't want that
+                            // affecting an outside caller still using it (DBAdmin), just copy
+                            // the connection settings rather that using the passed in
+                            // FileProcessingDB.
+                            CopyDbConnectionSettings(fileProcessingDB,
+                                _fileInspectorForm.FileProcessingDB);
+                            if (fileSelector == null)
+                            {
+                                // No provided file selection settings should be interpreted as
+                                // to bring the form up with no file selection conditions.
+                                _fileInspectorForm.ResetFileSelectionSettings();
+                            }
+                            else
+                            {
+                                _fileInspectorForm.FileSelector = fileSelector;
+                                _fileInspectorForm.FileSelector.LimitToSubset(false, false,
+                                    FAMFileInspectorForm.MaxFilesToDisplay);
+                            }
+
+                            Application.Run(_fileInspectorForm);
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractDisplay("ELI35851");
+                        }
+                    });
+                    uiThread.SetApartmentState(ApartmentState.STA);
+                    uiThread.Start();
                 }
             }
             catch (Exception ex)

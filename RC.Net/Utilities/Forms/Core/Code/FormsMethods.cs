@@ -23,6 +23,18 @@ namespace Extract.Utilities.Forms
 
         #endregion Constants
 
+        #region Delegates
+
+        /// <summary>
+        /// Indicates whether the <see paramref="control"/> qualifies for a particular need.
+        /// </summary>
+        /// <param name="control">The <see cref="Control"/> to check for qualification.</param>
+        /// <returns><see langword="true"/> if the control qualifies, otherwise,
+        /// <see langword="false"/>.</returns>
+        public delegate bool ControlQualifier(Control control);
+
+        #endregion Delegates
+
         #region Methods
 
         /// <summary>
@@ -799,6 +811,113 @@ namespace Extract.Utilities.Forms
             }
         }
 
+        /// <summary>
+        /// Gets the focused control by traversing all nested ActiveControls.
+        /// </summary>
+        /// <param name="containerControl">The <see cref="ContainerControl"/> for which the focused
+        /// control is needed.</param>
+        /// <returns>The <see cref="Control"/> that has input focus.</returns>
+        public static Control GetFocusedControl(ContainerControl containerControl)
+        {
+            try
+            {
+                ContainerControl childContainer = containerControl.ActiveControl as ContainerControl;
+                if (childContainer == null)
+                {
+                    return containerControl.ActiveControl;
+                }
+                else
+                {
+                    return GetFocusedControl(childContainer);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35848");
+            }
+        }
+
+        /// <summary>
+        /// Gets an enumeration of <see paramref="control"/> and all child controls in order of
+        /// <see cref="Control.TabIndex"/>.
+        /// </summary>
+        /// <param name="control">The root of all <see cref="Control"/>s to be returned.</param>
+        /// <returns>The enumeration of all <see cref="Control"/>s.</returns>
+        static IEnumerable<Control> GetAllControls(Control control)
+        {
+            yield return control;
+
+            foreach (Control descendant in control.Controls
+                .OfType<Control>().OrderBy(child => child.TabIndex)
+                .SelectMany(child => GetAllControls(child)))
+            {
+                yield return descendant;
+            }
+        }
+
+        /// <summary>
+        /// Finds the next <see cref="Control"/> that is either <see paramref="root"/> or one of its
+        /// descendants that matches the specified <see paramref="qualifier"/>.
+        /// </summary>
+        /// <param name="root">The resulting control must be this <see cref="Control"/> or one of
+        /// its descendants.</param>
+        /// <param name="current">If not <see paramref="null"/>, the next match after this one in
+        /// the squence will be the one returned.</param>
+        /// <param name="forward"><see langword="true"/> to search in order of
+        /// <see cref="Control.TabIndex"/><see langword="false"/> to search in reverse order.
+        /// </param>
+        /// <param name="wrap"><see langword="true"/> wrap when the end of the sequence is reached;
+        /// otherwise, <see paramref="false"/>. This parameter is ignored if
+        /// <see paramref="current"/> is <see langword="null"/>.
+        /// </param>
+        /// <param name="qualifier">If not <see langword="null"/>, this
+        /// <see cref="ControlQualifier"/> must be <see langword="true"/> for any return value.
+        /// </param>
+        /// <returns>The next <see cref="Control"/>.</returns>
+        public static Control FindNextControl(Control root, Control current, bool forward,
+            bool wrap, ControlQualifier qualifier)
+        {
+            try
+            {
+                // If not specified, use the top-level control as the root control.
+                if (root == null)
+                {
+                    root = current.TopLevelControl;
+                }
+
+                // Get an enumeration of all controls in tab order (reversed if !forward).
+                var allControls = GetAllControls(root);
+                if (!forward)
+                {
+                    allControls = allControls.Reverse();
+                }
+
+                // Find the next qualifying control after current.
+                Control nextQualifyingControl = allControls
+                    .SkipWhile(c => current != null && c != current)
+                    .Skip(1)
+                    .Where(c => (qualifier == null) || qualifier(c))
+                    .FirstOrDefault();
+
+                // If a control was found, or not wrapping, return the result.
+                if (nextQualifyingControl != null || !wrap || current == null)
+                {
+                    return nextQualifyingControl;
+                }
+                else
+                {
+                    // Otherwise, return the first from the beginning of the enumeration.
+                    return allControls
+                        .Where(c => (qualifier == null) || qualifier(c))
+                        .FirstOrDefault();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35850");
+            }
+        }
+
         #endregion Methods
     }
 
@@ -876,6 +995,17 @@ namespace Extract.Utilities.Forms
         public static void Restore(this Form form)
         {
             FormsMethods.Restore(form);
+        }
+
+        /// <summary>
+        /// Gets the focused control by traversing all nested ActiveControls.
+        /// </summary>
+        /// <param name="containerControl">The <see cref="ContainerControl"/> for which the focused
+        /// control is needed.</param>
+        /// <returns>The <see cref="Control"/> that has input focus.</returns>
+        public static Control GetFocusedControl(this ContainerControl containerControl)
+        {
+            return FormsMethods.GetFocusedControl(containerControl);
         }
     }
 

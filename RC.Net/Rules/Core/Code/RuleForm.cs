@@ -37,6 +37,11 @@ namespace Extract.Rules
         /// </summary>
         static readonly Color _FIND_COLOR = Color.LimeGreen;
 
+        /// <summary>
+        /// The color to be used for the dashed border of the currently selected result.
+        /// </summary>
+        static readonly Color _SELECTION_BORDER_COLOR = Color.Red;
+
         #endregion Constants
 
         #region Fields
@@ -1103,7 +1108,7 @@ namespace Extract.Rules
                             new string[] { SearchResultTag }, pair.Value, _FIND_COLOR);
                     compositeHighlight.Selectable = false;
                     compositeHighlight.CanRender = false;
-                    compositeHighlight.OutlineColor = _FIND_COLOR;
+                    compositeHighlight.OutlineColor = _SELECTION_BORDER_COLOR;
 
                     // Add the find result to the collection
                     findResults.Add(new FindResult(compositeHighlight, matchResult));
