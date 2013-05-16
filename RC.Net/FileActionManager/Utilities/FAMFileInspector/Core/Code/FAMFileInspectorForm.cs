@@ -298,12 +298,6 @@ namespace Extract.FileActionManager.Utilities
         /// Indicates how many calls to <see cref="OpenImageInvoked"/> are pending.
         /// </summary>
         volatile int _pendingOpenImageCount;
-        
-        /// <summary>
-        /// Indicates whether the last match (instead of the first) should be selected by default
-        /// when a new image is opened.
-        /// </summary>
-        bool _selectLastMatchByDefault;
 
         /// <summary>
         /// Indicates if the host is in design mode or not.
@@ -693,8 +687,9 @@ namespace Extract.FileActionManager.Utilities
                 // potentially remove some IImageViewerControls.
                 _imageViewer.EstablishConnections(this);
 
-                _imageViewer.Shortcuts[Keys.Oemcomma] = HandlePreviousMatchCommand;
-                _imageViewer.Shortcuts[Keys.OemPeriod] = HandleNextMatchCommand;
+                _imageViewer.Shortcuts[Keys.F3] = _nextLayerObjectToolStripButton.PerformClick;
+                _imageViewer.Shortcuts[Keys.Shift | Keys.F3] =
+                    _previousLayerObjectToolStripButton.PerformClick;
 
                 // Initialize the search settings.
                 _searchTypeComboBox.SelectEnumValue(SearchType.Text);
@@ -736,6 +731,13 @@ namespace Extract.FileActionManager.Utilities
                     // what the next tab stop control should be so that we can use it to override
                     // the "natural" behavior.
                     Control lastfocusedControl = this.GetFocusedControl();
+                    // If the focused control is a DataGridViewEditingControl, consider the grid as
+                    // the focused control and not the editing control.
+                    var editingControl = lastfocusedControl as IDataGridViewEditingControl;
+                    if (editingControl != null)
+                    {
+                        lastfocusedControl = editingControl.EditingControlDataGridView;
+                    }
                     Control expectedFocusControl =
                         FormsMethods.FindNextControl(this, lastfocusedControl, forward, true,
                         c => c.TabStop && c.Visible && c.Enabled && !(c is ContainerControl));
@@ -1220,6 +1222,7 @@ namespace Extract.FileActionManager.Utilities
                 bool isFocusTabStopControl = (focusedControl != null) && focusedControl.TabStop &&
                     focusedControl.Visible && focusedControl.Enabled &&
                     !(focusedControl is ContainerControl);
+                isFocusTabStopControl |= (focusedControl is IDataGridViewEditingControl);
                 if (_fileListDataGridView.Focused || !isFocusTabStopControl)
                 {
                     // Reset focus to the file list, if it doesn't already have it.
@@ -1262,75 +1265,6 @@ namespace Extract.FileActionManager.Utilities
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Handles the UI command to select the previous search result.
-        /// </summary>
-        void HandlePreviousMatchCommand()
-        {
-            try
-            {
-                // If there is a previous search result in this document, go to it.
-                if (_imageViewer.CanGoToPreviousLayerObject)
-                {
-                    _imageViewer.GoToPreviousLayerObject();
-                }
-                // Otherwise, go to the next previous document with any matches.
-                else
-                {
-                    DataGridViewRow nextRow = GetNextRow(false, row => 
-                        row.GetFileData().MatchCount > 0);
-                    if (nextRow != null)
-                    {
-                        try
-                        {
-                            // Because we are navigating backward, we want the last match of the
-                            // document selected. Set _selectLastMatchByDefault to true before
-                            // selecting the next document.
-                            _selectLastMatchByDefault = true;
-                            _fileListDataGridView.CurrentCell = nextRow.Cells[0];
-                        }
-                        finally
-                        {
-                            _selectLastMatchByDefault = false;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35839");
-            }
-        }
-
-        /// <summary>
-        /// Handles the UI command to select the next search result.
-        /// </summary>
-        void HandleNextMatchCommand()
-        {
-            try
-            {
-                // If there is a subsequent search result in this document, go to it.
-                if (_imageViewer.CanGoToNextLayerObject)
-                {
-                    _imageViewer.GoToNextLayerObject();
-                }
-                // Otherwise, go to the next document with any matches.
-                else
-                {
-                    DataGridViewRow nextRow = GetNextRow(true, row =>
-                        row.GetFileData().MatchCount > 0);
-                    if (nextRow != null)
-                    {
-                        _fileListDataGridView.CurrentCell = nextRow.Cells[0];
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35840");
-            }
         }
 
         /// <summary>
@@ -2303,23 +2237,7 @@ namespace Extract.FileActionManager.Utilities
                         nonSpatialCount);
                 }
 
-                // Select the first or last search result in the document depending on
-                // _selectLastMatchByDefault.
-                if (_selectLastMatchByDefault)
-                {
-                    // Can't use GoToPreviousVisibleLayerObject, because it will select the last in
-                    // the current view rather than the last in the document.
-                    LayerObject lastMatch = _imageViewer.LayerObjects
-                        .GetSortedCollection()
-                        .LastOrDefault();
-                    if (lastMatch != null)
-                    {
-                        _imageViewer.LayerObjects.Selection.Clear();
-                        _imageViewer.CenterOnLayerObjects(lastMatch);
-                        lastMatch.Selected = true;
-                    }
-                }
-                else if (_imageViewer.CanGoToNextLayerObject)
+                if (_imageViewer.CanGoToNextLayerObject)
                 {
                     _imageViewer.GoToNextVisibleLayerObject(true);
                 }
