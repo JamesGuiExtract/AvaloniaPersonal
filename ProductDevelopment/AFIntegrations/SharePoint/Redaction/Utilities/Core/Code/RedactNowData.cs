@@ -55,6 +55,12 @@ namespace Extract.SharePoint.Redaction.Utilities
         /// <value>The FPS file location.</value>
         [DataMember(IsRequired=true)]
         public string FpsFileLocation { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the working folder location
+        /// </summary>
+        [DataMember(IsRequired=true)]
+        public string WorkingFolder { get; set; }
 
         #endregion Fields
 
@@ -77,6 +83,7 @@ namespace Extract.SharePoint.Redaction.Utilities
             ListId = data.ListId;
             FileId = data.FileId;
             FpsFileLocation = data.FpsFileLocation;
+            WorkingFolder = data.WorkingFolder;
         }
 
         /// <summary>
@@ -86,9 +93,10 @@ namespace Extract.SharePoint.Redaction.Utilities
         /// <param name="listId">The list id.</param>
         /// <param name="fileId">The file id.</param>
         /// <param name="fpsFileLocation">The FPS file location.</param>
+        /// <param name="workingFolder">The working folder that contains the file to be verifyed for the verify process</param>
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId="0#")]
-        public RedactNowData(string siteUrl, string listId, string fileId, string fpsFileLocation)
-            : this(siteUrl, new Guid(listId), new Guid(fileId), fpsFileLocation)
+        public RedactNowData(string siteUrl, string listId, string fileId, string fpsFileLocation, string workingFolder = "")
+            : this(siteUrl, new Guid(listId), new Guid(fileId), fpsFileLocation, workingFolder)
         {
         }
 
@@ -99,13 +107,15 @@ namespace Extract.SharePoint.Redaction.Utilities
         /// <param name="listId">The list id.</param>
         /// <param name="fileId">The file id.</param>
         /// <param name="fpsFileLocation">The FPS file location.</param>
+        /// <param name="workingFolder">The working folder that contains the file to be verifyed for the verify process</param>
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId="0#")]
-        public RedactNowData(string siteUrl, Guid listId, Guid fileId, string fpsFileLocation)
+        public RedactNowData(string siteUrl, Guid listId, Guid fileId, string fpsFileLocation, string workingFolder = "")
         {
             SiteUrl = siteUrl;
             ListId = listId;
             FileId = fileId;
             FpsFileLocation = fpsFileLocation;
+            WorkingFolder = workingFolder;
         }
 
         #endregion Constructors

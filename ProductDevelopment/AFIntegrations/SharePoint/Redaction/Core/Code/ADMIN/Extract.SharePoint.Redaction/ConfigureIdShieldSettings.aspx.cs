@@ -181,6 +181,7 @@ namespace Extract.SharePoint.Redaction.Administration.Layouts
                 settings.MinutesToWaitToQueuedLater = int.Parse(textTimeToWait.Text,
                     CultureInfo.CurrentCulture);
                 settings.RedactNowFpsFile = textFpsFileLocation.Text;
+                settings.VerifyFpsFile = textVerifyFPSFileLocation.Text;
                 settings.Update();
 
                 DisplaySettingsUpdatedMessage();
@@ -288,6 +289,7 @@ namespace Extract.SharePoint.Redaction.Administration.Layouts
                 }
 
                 dropRandomFolderLength.SelectedIndex = randomLength;
+                textVerifyFPSFileLocation.Text = settings.VerifyFpsFile;
             }
 
             var siteIds = settings.IdShieldSites;

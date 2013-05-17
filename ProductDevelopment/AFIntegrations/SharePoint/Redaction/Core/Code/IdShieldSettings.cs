@@ -70,6 +70,12 @@ namespace Extract.SharePoint.Redaction
         [Persisted]
         string _redactNowFpsFile;
 
+        /// <summary>
+        /// The path to the fps file to be used for verification using the Verify button
+        /// </summary>
+        [Persisted]
+        string _verifyFpsFile;
+
         #endregion Fields
 
         #region Constructors
@@ -291,6 +297,22 @@ namespace Extract.SharePoint.Redaction
             set
             {
                 _redactNowFpsFile = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the verify FPS file.
+        /// </summary>
+        /// <value>The verify FPS file</value>
+        public string VerifyFpsFile
+        {
+            get
+            {
+                return _verifyFpsFile;
+            }
+            set
+            {
+                _verifyFpsFile = value;
             }
         }
 

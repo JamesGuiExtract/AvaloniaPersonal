@@ -28,6 +28,15 @@ function showConfigureIdShield()
 function showRedactNowHelper() {
 
     // Get the current context, web and site
+    singleFileContext();
+
+    // Execute the asynch query to get the data from SP
+    context.executeQueryAsync(Function.createDelegate(this, this.OnShowRedactNowHelperSuccess),
+        Function.createDelegate(this, this.OnFailure));
+}
+
+function singleFileContext() {
+    // Get the current context, web and site
     this.context = new SP.ClientContext.get_current();
     this.web = context.get_web();
     this.site = context.get_site();
@@ -46,10 +55,6 @@ function showRedactNowHelper() {
     context.load(this.site, 'Id');
     context.load(this.web);
     context.load(this.listItem, 'UniqueId');
-
-    // Execute the asynch query to get the data from SP
-    context.executeQueryAsync(Function.createDelegate(this, this.OnShowRedactNowHelperSuccess),
-        Function.createDelegate(this, this.OnFailure));
 }
 
 // Called asynchronously, displays the SP modal dialog box with the
@@ -147,4 +152,32 @@ function OnShowUnwatchSuccess(sender, args)
 // Function to set for redaction
 function ProcessSelectedForRedaction() {
     processSelected("IDShieldStatus");
+}
+
+// Used to initial the verification
+function showVerifyNowHelper() {
+
+    // Get the current context, web and site
+    singleFileContext();
+
+    // Execute the asynch query to get the data from SP
+    context.executeQueryAsync(Function.createDelegate(this, this.OnShowVerifyNowHelperSuccess),
+        Function.createDelegate(this, this.OnFailure));
+}
+
+// Called asynchronously, displays the SP modal dialog box with the
+// Redact now helper page in a SP modal dialog box
+function OnShowVerifyNowHelperSuccess(sender, args) {
+    var siteId = this.site.get_id();
+    var fileid = this.listItem.get_item('UniqueId');
+    var options =
+    {
+        url: '/_layouts/Extract.SharePoint.Redaction/VerifyNow.aspx?'
+            + 'listidvalue=' + listid + '&fileid=' + fileid + '&siteid=' + siteId,
+        title: 'Verify',
+        allowMaximize: false,
+        showClose: true
+    };
+
+    SP.UI.ModalDialog.showModalDialog(options);
 }

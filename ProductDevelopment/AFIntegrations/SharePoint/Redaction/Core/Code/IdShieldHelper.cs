@@ -423,18 +423,7 @@ namespace Extract.SharePoint.Redaction
             {
                 if (data != null)
                 {
-                    // Build the url
-                    StringBuilder url = new StringBuilder("http://", 1024);
-                    url.Append(localHost);
-                    url.Append(":");
-                    url.Append(RedactNowData.IdShieldClientPort);
-                    url.Append("/");
-                    url.Append(RedactNowData.IdShieldForSPClientEndpoint);
-
-                    var binding = new BasicHttpBinding(BasicHttpSecurityMode.None);
-
-                    factory = new ChannelFactory<IIDShieldForSPClient>(binding,
-                        new EndpointAddress(url.ToString()));
+                    factory = CreateFactoryForClient(localHost);
 
                     IIDShieldForSPClient processFile = factory.CreateChannel();
                     processFile.ProcessFile(data);
@@ -470,5 +459,81 @@ namespace Extract.SharePoint.Redaction
             }
         }
 
+        /// <summary>
+        /// Attempts to pass the redact now data to the local instance of
+        /// ID Shield for SP client.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <param name="localHost">The local host.</param>
+        /// <returns>Returns <see langword="false"/> if the channel cannot be created
+        /// due to the end point not existing (this means the client app is not running);
+        /// <see langword="true"/> if it runs successfully.</returns>
+        internal static bool VerifyNowHelper(RedactNowData data, string localHost)
+        {
+            ChannelFactory<IIDShieldForSPClient> factory = null;
+            try
+            {
+                if (data != null)
+                {
+                    factory = CreateFactoryForClient(localHost);
+
+                    IIDShieldForSPClient processFile = factory.CreateChannel();
+                    processFile.VerifyFile(data);
+
+                    factory.Close();
+                }
+
+                return true;
+            }
+            catch (System.ServiceModel.EndpointNotFoundException)
+            {
+                // This exception indicates that the end point for the WCF channel
+                // is not available. Close the factory and return false.
+                if (factory != null)
+                {
+                    factory.Abort();
+                    factory = null;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                if (factory != null)
+                {
+                    factory.Abort();
+                    factory = null;
+                }
+
+                LogException(ex, ErrorCategoryId.IdShieldRedactNowClientLaunch, "ELI35836");
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Creates the factory to used to open a channel the IDShieldForSPClient on the client machine
+        /// </summary>
+        /// <param name="localHost">The local host ot connect to</param>
+        /// <returns>A channel factory</returns>
+        static ChannelFactory<IIDShieldForSPClient> CreateFactoryForClient(
+            string localHost )
+        {
+            ChannelFactory<IIDShieldForSPClient> factory;
+
+            // Build the url
+            StringBuilder url = new StringBuilder("http://", 1024);
+            url.Append(localHost);
+            url.Append(":");
+            url.Append(RedactNowData.IdShieldClientPort);
+            url.Append("/");
+            url.Append(RedactNowData.IdShieldForSPClientEndpoint);
+
+            var binding = new BasicHttpBinding(BasicHttpSecurityMode.None);
+
+            factory = new ChannelFactory<IIDShieldForSPClient>(binding,
+                new EndpointAddress(url.ToString()));
+            return factory;
+        }
     }
 }

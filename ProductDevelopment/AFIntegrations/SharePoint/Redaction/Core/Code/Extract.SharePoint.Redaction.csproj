@@ -111,6 +111,13 @@
     <Compile Include="ADMIN\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx.designer.cs">
       <DependentUpon>ConfigureIdShieldSettings.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\Extract.SharePoint.Redaction\VerifyNow.aspx.cs">
+      <DependentUpon>VerifyNow.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\Extract.SharePoint.Redaction\VerifyNow.aspx.designer.cs">
+      <DependentUpon>VerifyNow.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx.cs">
       <DependentUpon>WatchFolderWithIdShield.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -184,6 +191,9 @@
     </Content>
     <Content Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx" />
     <Content Include="ADMIN\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\Extract.SharePoint.Redaction\VerifyNow.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx">

@@ -76,6 +76,24 @@ namespace Extract.SharePoint.Redaction.Administration.Layouts {
         protected global::System.Web.UI.WebControls.TextBox textFpsFileLocation;
         
         /// <summary>
+        /// labelVerifyFpsFileLocation control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labelVerifyFpsFileLocation;
+        
+        /// <summary>
+        /// textVerifyFPSFileLocation control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox textVerifyFPSFileLocation;
+        
+        /// <summary>
         /// labelExceptionServer control.
         /// </summary>
         /// <remarks>

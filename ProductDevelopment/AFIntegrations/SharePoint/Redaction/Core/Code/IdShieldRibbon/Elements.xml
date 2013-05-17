@@ -100,6 +100,16 @@
                     LabelText="Process Selected"
                     TemplateAlias="idsbutton3"
 									/>
+                  <Button
+										Id="Extract.Ribbon.IdShieldTab.Groups.IdShieldSettingsGroup.VerifyNowButton"
+										Command="Extract.Redaction.Command.LaunchVerification"
+										Sequence="17"
+										Image16by16="/_layouts/images/Extract.SharePoint.Redaction/IDSO16x16.gif"
+										Image32by32="/_layouts/images/Extract.SharePoint.Redaction/IDSO32x32.gif"
+										Description="Opens verification window for selected document."
+										LabelText="Verify"
+										TemplateAlias="idsbutton4"
+									/>
                 </Controls>
 							</Group>
 						</Groups>
@@ -123,7 +133,8 @@
 									<ControlRef DisplayMode="Large" TemplateAlias="idsbutton1" />
 									<ControlRef DisplayMode="Large" TemplateAlias="idsbutton2" />
                   <ControlRef DisplayMode="Large" TemplateAlias="idsbutton3" />
-								</Row>
+                  <ControlRef DisplayMode="Large" TemplateAlias="idsbutton4" />
+                </Row>
 							</Section>
 						</Layout>
 					</GroupTemplate>
@@ -171,7 +182,12 @@
           CommandAction="javascript: ProcessSelectedForRedaction()"
           EnabledScript="javascript: atLeastOneSelectEnabled();"
 				/>
-			</CommandUIHandlers>
+        <CommandUIHandler
+					Command="Extract.Redaction.Command.LaunchVerification"
+					CommandAction="javascript: showVerifyNowHelper();"
+					EnabledScript="javascript: singleDocSelectEnabled();"
+				/>			
+      </CommandUIHandlers>
 		</CommandUIExtension>
 	</CustomAction>
 	<CustomAction Id="Extract.SharePoint.Command.LoadEnableScripts" Location="ScriptLink"

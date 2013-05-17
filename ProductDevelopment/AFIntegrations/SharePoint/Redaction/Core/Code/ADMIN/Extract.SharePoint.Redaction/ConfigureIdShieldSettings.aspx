@@ -43,6 +43,16 @@
     </tr>
     <tr>
         <td>
+            <asp:Label id="labelVerifyFpsFileLocation" runat="server" forecolor="Black"
+                text="Location for ID Shield for SharePoint Client Verification FPS file." />
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <asp:TextBox id="textVerifyFPSFileLocation" runat="server" width="450" />
+        </td>
+    </tr>    <tr>
+        <td>
             <asp:Label id="labelExceptionServer" runat="server" forecolor="Black"
                 text="IP address for server running Extract exception service" />
         </td>

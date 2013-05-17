@@ -23,7 +23,7 @@ namespace Extract.SharePoint.Redaction.Utilities
         /// </summary>
         static readonly string _FILE_ID_REPLACE = "<ReplaceFileId>";
         static readonly string _QUERY_FILE = "<View Scope='RecursiveAll'>"
-            +"<Query><Where><Eq><FieldRef Name='UniqueId' />"
+            + "<Query><Where><Eq><FieldRef Name='UniqueId' />"
             + "<Value Type='Guid'>" + _FILE_ID_REPLACE
             + "</Value></Eq></Where></Query></View>";
 
@@ -59,6 +59,24 @@ namespace Extract.SharePoint.Redaction.Utilities
             }
         }
 
+        /// <summary>
+        /// Interface method used to lanch the specified file for verification
+        /// </summary>
+        /// <param name="data">The data for the file to process.</param>
+        public void VerifyFile(RedactNowData data)
+        {
+            try
+            {
+                var thread = new Thread(VerifyFileThread);
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start(data);
+            }
+            catch (Exception ex)
+            {
+                ex.LogExceptionWithHelperApp("ELI35834");
+                throw new FaultException("Unable to process files. " + ex.Message);
+            }
+        }
         #endregion IIDShieldForSPClient Interface Methods
 
         #region Methods
@@ -222,33 +240,8 @@ namespace Extract.SharePoint.Redaction.Utilities
         {
             using (var context = new SP.ClientContext(data.SiteUrl))
             {
-                // Get the list containing the file
-                var list = context.Web.Lists.GetById(data.ListId);
-                var query = new SP.CamlQuery();
-                query.ViewXml = _QUERY_FILE.Replace(_FILE_ID_REPLACE,
-                    data.FileId.ToString("B"));
-
-                var items = list.GetItems(query);
-                context.Load(list);
-                context.Load(items);
-                context.ExecuteQuery();
-
-                if (items.Count != 1)
-                {
-                    var message = items.Count == 0 ? "File was not found."
-                        : "More than one item found with matching id.";
-
-                    // Too many items returned
-                    var ee = new ArgumentException(message);
-                    ee.Data.Add("Site URL", data.SiteUrl);
-                    ee.Data.Add("List Id", data.ListId.ToString());
-                    ee.Data.Add("File Id", data.FileId.ToString());
-
-                    throw ee;
-                }
-
                 // Get the data from the items
-                var item = items[0];
+                var item = GetListItemOfFile(context, data);
                 var fileName = item["FileLeafRef"].ToString();
                 var url = item["FileRef"].ToString();
 
@@ -273,7 +266,112 @@ namespace Extract.SharePoint.Redaction.Utilities
             }
         }
 
-        #endregion Methods
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="redactData"></param>
+        static void VerifyFileThread(object redactData)
+        {
+            try
+            {
+                var data = redactData as RedactNowData;
 
+                if (!File.Exists(data.FpsFileLocation))
+                {
+                    throw new FileNotFoundException("FPS file could not be found.", data.FpsFileLocation);
+                }
+
+                if (!Directory.Exists(data.WorkingFolder))
+                {
+                    Exception directoryEx = new DirectoryNotFoundException("Working folder could not be found.");
+                    directoryEx.Data.Add("Working Folder", data.WorkingFolder);
+                    throw directoryEx;
+                }
+
+                // Need to get the file name that should be in the verification folder (pdf files will probably be named .pdf.tif
+                string fileToVerify = GetFileToVerify(data);
+
+                var info = new ProcessStartInfo(_runFpsFileLocation,
+                    string.Concat("\"", data.FpsFileLocation, "\" \"",
+                    fileToVerify, "\" /process"));
+
+                using (var process = new Process())
+                {
+                    process.StartInfo = info;
+                    process.Start();
+                    process.WaitForExit();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Attempt to log the exception
+                ex.LogExceptionWithHelperApp("ELI35835");
+
+                // Display a message to the user
+                ex.DisplayInMessageBox();
+            }
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        static string GetFileToVerify(RedactNowData data)
+        {
+            using (var context = new SP.ClientContext(data.SiteUrl))
+            {
+                var item = GetListItemOfFile(context, data);
+                var fileName = item["FileLeafRef"].ToString();
+                var pathWithSiteID = Path.Combine(data.WorkingFolder, context.Site.Id.ToString());
+                string workingPath = Path.Combine(pathWithSiteID, data.ListId.ToString());
+                return Path.Combine(workingPath,
+                                    data.FileId.ToString() + Path.GetExtension(fileName));
+            }
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        static SP.ListItem GetListItemOfFile(SP.ClientContext context, RedactNowData data)
+        {
+            // Get the list containing the file
+            var list = context.Web.Lists.GetById(data.ListId);
+            var query = new SP.CamlQuery();
+            query.ViewXml = _QUERY_FILE.Replace(_FILE_ID_REPLACE,
+                data.FileId.ToString("B"));
+
+            var items = list.GetItems(query);
+
+            var site = context.Site;
+            context.Load(site);
+            context.Load(list);
+            context.Load(items);
+            context.ExecuteQuery();
+
+            if (items.Count != 1)
+            {
+                var message = items.Count == 0 ? "File was not found."
+                    : "More than one item found with matching id.";
+
+                // Too many items returned
+                var ee = new ArgumentException(message);
+                ee.Data.Add("Site URL", data.SiteUrl);
+                ee.Data.Add("List Id", data.ListId.ToString());
+                ee.Data.Add("File Id", data.FileId.ToString());
+
+                throw ee;
+            }
+            return items[0];
+        }
+
+        #endregion Methods
     }
+
 }
