@@ -173,6 +173,10 @@ function main(args) {
 
     function makeEAVS_PARTIES(fields) {
         var typ = "";
+        var attrType = "";
+        var attrType = parseInt(fields[2].slice(8,10));
+        var letters = "AABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        attrType = letters.charAt(attrType);
         switch(fields[4]) {
             case "R": typ = "Grantor";
             break;
@@ -183,7 +187,7 @@ function main(args) {
         var fname = getEAVName(fields[0]+fields[1], typ);
         try {
             var val = fields[5].trim().replace(/^(?:REF[#]?|EF|F|RE|RERF|RF)\s/, "");
-            writeAttr(fname, typ, val, "", "");
+            writeAttr(fname, typ, val, attrType, "");
         }
         catch(err) {
             handleScriptError("ParseSiskiyouAtPacIndexData_7", "Error!", err, "Index Data Line", fields);
