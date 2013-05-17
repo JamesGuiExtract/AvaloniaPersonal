@@ -106,6 +106,19 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Gets or sets an exception generated while searching this file.
+        /// </summary>
+        /// <value>
+        /// The exception generated while searching this file or <see langword="null"/> if there was
+        /// no error searching the file.
+        /// </value>
+        public ExtractException Exception
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets the OCR text associated with the file.
         /// </summary>
         public SpatialString OcrText
@@ -161,7 +174,8 @@ namespace Extract.FileActionManager.Utilities
         /// Gets or sets the match count for the last type of search run.
         /// </summary>
         /// <value>
-        /// The match count or -1 if there are no results available.
+        /// The match count, -1 if there are no results available or -2 if there was an error
+        /// searching this file.
         /// </value>
         public int MatchCount
         {
@@ -169,6 +183,10 @@ namespace Extract.FileActionManager.Utilities
             {
                 try
                 {
+                    if (Exception != null)
+                    {
+                        return -2;
+                    }
                     if (ShowTextResults == null)
                     {
                         return -1;
@@ -198,6 +216,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
+                Exception = null;
                 FileMatchesSearch = false;
                 ShowTextResults = null;
                 TextMatches = null;
@@ -249,6 +268,11 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
+                if (Exception != null)
+                {
+                    return "(Error)";
+                }
+
                 if (ShowTextResults.HasValue)
                 {
                     if (ShowTextResults.Value)

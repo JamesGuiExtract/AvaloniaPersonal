@@ -2058,7 +2058,7 @@ bool CFileProcessingDB::RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BS
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
+bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, bool bLockAllowed, long nActionID,
 	VARIANT_BOOL vbForceUpdate, IActionStatistics* *pStats)
 {
 	try
@@ -2081,7 +2081,8 @@ bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
 
 				// return a new object with the statistics
 				UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats =  
-					loadStats(ipConnection, nActionID, asCppBool(vbForceUpdate), bDBLocked);
+					loadStats(ipConnection, nActionID, asCppBool(vbForceUpdate), bLockAllowed,
+						bDBLocked);
 				ASSERT_RESOURCE_ALLOCATION("ELI14107", ipActionStats != __nullptr);
 
 				// Commit any changes (could have recreated the stats)
@@ -2096,7 +2097,7 @@ bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
 	}
 	catch(UCLIDException &ue)
 	{
-		if (!bDBLocked)
+		if (bLockAllowed && !bDBLocked)
 		{
 			return false;
 		}

@@ -749,6 +749,7 @@ namespace Extract.FileActionManager.Utilities
                     {
                         Control focusedControl = this.GetFocusedControl();
                         if (focusedControl != lastfocusedControl &&
+                            focusedControl != editingControl &&
                             focusedControl != expectedFocusControl)
                         {
                             ActiveControl = expectedFocusControl;
@@ -1533,7 +1534,7 @@ namespace Extract.FileActionManager.Utilities
         {
             // Create a compiled DotNetRegexParser for every search term using an escaped version of
             // the search term to allow any term to be search as a regular expression.
-            var regexParsers = new List<DotNetRegexParser>();
+            var regexParsers = new List<Regex>();
             foreach (string searchTerm in searchTerms)
             {
                 DotNetRegexParser regexParser = new DotNetRegexParser();
@@ -1546,10 +1547,11 @@ namespace Extract.FileActionManager.Utilities
                     regexParser.Pattern = Regex.Escape(searchTerm);
                 }
                 regexParser.RegexOptions |= RegexOptions.Compiled;
-                regexParsers.Add(regexParser);
+                regexParsers.Add(regexParser.Regex);
             }
 
-            int missingOcrCount = 0;
+            int notSearchedCount = 0;
+            var exceptions = new List<ExtractException>();
 
             // Search each file in the file list.
             foreach (DataGridViewRow row in _fileListDataGridView.Rows)
@@ -1557,46 +1559,56 @@ namespace Extract.FileActionManager.Utilities
                 // Abort if the user cancelled.
                 cancelToken.ThrowIfCancellationRequested();
 
-                // Obtain the OCR text for the file.
                 FAMFileData rowData = row.GetFileData();
-                rowData.ShowTextResults = true;
-                SpatialString ocrText = rowData.OcrText;
-                if (ocrText == null)
-                {
-                    missingOcrCount++;
-                }
-                else
-                {
-                    string fileText = ocrText.String;
-                    List<Match> allMatches = new List<Match>();
 
-                    // Initialize FileMatchesSearch depending on whether we are looking for any term.
-                    rowData.FileMatchesSearch = (searchModifier != SearchModifier.Any);
-
-                    // Search the OCR text with the parser for each search term.
-                    foreach (DotNetRegexParser parser in regexParsers)
+                try
+                {
+                    // Obtain the OCR text for the file.
+                    rowData.ShowTextResults = true;
+                    SpatialString ocrText = rowData.OcrText;
+                    if (ocrText == null)
                     {
-                        var matches = parser.Regex.Matches(fileText)
-                            .OfType<Match>()
-                            .Where(match => match.Length > 0);
+                        notSearchedCount++;
+                    }
+                    else
+                    {
+                        string fileText = ocrText.String;
+                        List<Match> allMatches = new List<Match>();
 
-                        // Update FileMatchesSearch as appropriate given the results
-                        switch (searchModifier)
+                        // Initialize FileMatchesSearch depending on whether we are looking for any term.
+                        rowData.FileMatchesSearch = (searchModifier != SearchModifier.Any);
+
+                        // Search the OCR text with the parser for each search term.
+                        foreach (Regex parser in regexParsers)
                         {
-                            case SearchModifier.Any: rowData.FileMatchesSearch |= matches.Any();
-                                break;
-                            case SearchModifier.All: rowData.FileMatchesSearch &= matches.Any();
-                                break;
-                            case SearchModifier.None: rowData.FileMatchesSearch &= !matches.Any();
-                                break;
+                            var matches = parser.Matches(fileText)
+                                .OfType<Match>()
+                                .Where(match => match.Length > 0);
+
+                            // Update FileMatchesSearch as appropriate given the results
+                            switch (searchModifier)
+                            {
+                                case SearchModifier.Any: rowData.FileMatchesSearch |= matches.Any();
+                                    break;
+                                case SearchModifier.All: rowData.FileMatchesSearch &= matches.Any();
+                                    break;
+                                case SearchModifier.None: rowData.FileMatchesSearch &= !matches.Any();
+                                    break;
+                            }
+
+                            // Compile all the matches regardless of whether the file is a match
+                            // overall.
+                            allMatches.AddRange(matches);
                         }
 
-                        // Compile all the matches regardless of whether the file is a match
-                        // overall.
-                        allMatches.AddRange(matches);
+                        rowData.TextMatches = allMatches;
                     }
-
-                    rowData.TextMatches = allMatches;
+                }
+                catch (Exception ex)
+                {
+                    notSearchedCount++;
+                    rowData.Exception = ex.AsExtract("ELI35852");
+                    exceptions.Add(ex.AsExtract("ELI35857"));
                 }
 
                 // Use a separate variable in the below, invoked call to update the row in the UI,
@@ -1616,14 +1628,30 @@ namespace Extract.FileActionManager.Utilities
 
             this.SafeBeginInvoke("ELI35828", () =>
             {
-                if (missingOcrCount == 0)
+                if (notSearchedCount == 0)
                 {
                     _searchErrorStatusStripLabel.Text = "";
                 }
                 else
                 {
                     _searchErrorStatusStripLabel.Text = string.Format(CultureInfo.CurrentCulture,
-                        "{0:D} file(s) have not been OCRed", missingOcrCount);
+                        "{0:D} file(s) could not be searched.", notSearchedCount);
+                }
+
+                int exceptionCount = exceptions.Count;
+                if (exceptionCount > 0)
+                {
+                    // Aggregating a large number of exceptions can bog down, potentially
+                    // making the quickly making the app appear hung. Aggregate a maximum of 10
+                    // exceptions.
+                    if (exceptionCount > 10)
+                    {
+                        exceptions.RemoveRange(10, exceptionCount - 10);
+                    }
+                    exceptions.Add(new ExtractException("ELI35853",
+                        string.Format(CultureInfo.CurrentCulture,
+                        "There were error(s) searching {0:D} file(s).", exceptionCount)));
+                    ExtractException.AsAggregateException(exceptions).Display();
                 }
             });
         }
@@ -1674,7 +1702,7 @@ namespace Extract.FileActionManager.Utilities
             // Create a dictionary for every attribute query where the value is a compiled
             // DotNetRegexParser for the corresponding search term using an escaped version of the
             // search term to allow any term to be search as a regular expression.
-            var regexParsers = new Dictionary<string, DotNetRegexParser>();
+            var regexParsers = new Dictionary<string, Regex>();
             foreach (KeyValuePair<string, string> searchTerm in searchTerms)
             {
                 DotNetRegexParser regexParser = new DotNetRegexParser();
@@ -1687,10 +1715,11 @@ namespace Extract.FileActionManager.Utilities
                     regexParser.Pattern = Regex.Escape(searchTerm.Value);
                 }
                 regexParser.RegexOptions |= RegexOptions.Compiled;
-                regexParsers.Add(searchTerm.Key, regexParser);
+                regexParsers.Add(searchTerm.Key, regexParser.Regex);
             }
 
-            int missingDataCount = 0;
+            int notSearchedCount = 0;
+            var exceptions = new List<ExtractException>();
 
             // Search each file in the file list.
             foreach (DataGridViewRow row in _fileListDataGridView.Rows)
@@ -1698,51 +1727,61 @@ namespace Extract.FileActionManager.Utilities
                 // Abort if the user cancelled.
                 cancelToken.ThrowIfCancellationRequested();
 
-                // Obtain the VOA data for the file.
                 FAMFileData rowData = row.GetFileData();
-                rowData.ShowTextResults = false;
-                IUnknownVector attributes = rowData.Attributes;
-                if (attributes == null)
-                {
-                    missingDataCount++;
-                }
-                else
-                {
-                    var allMatches = new List<ThreadSafeSpatialString>();
 
-                    // Initialize FileMatchesSearch depending on whether we are looking for any term.
-                    rowData.FileMatchesSearch = (searchModifier != SearchModifier.Any);
-
-                    // Search the specified attributes with the parser for each search term.
-                    foreach (KeyValuePair<string, DotNetRegexParser> parser in regexParsers)
+                try
+                {
+                    // Obtain the VOA data for the file.
+                    rowData.ShowTextResults = false;
+                    IUnknownVector attributes = rowData.Attributes;
+                    if (attributes == null)
                     {
-                        IEnumerable<ThreadSafeSpatialString> matches =
-                            _afUtils.QueryAttributes(attributes, parser.Key, false)
-                            .ToIEnumerable<IAttribute>()
-                            .Select(attribute => attribute.Value)
-                            .SelectMany(value => parser.Value.Regex.Matches(value.String)
-                                .OfType<Match>()
-                                .Where(match => match.Length > 0)
-                                .Select(match => new ThreadSafeSpatialString(this,
-                                    value.GetSubString(match.Index, match.Index + match.Length - 1))));
+                        notSearchedCount++;
+                    }
+                    else
+                    {
+                        var allMatches = new List<ThreadSafeSpatialString>();
 
-                        // Update FileMatchesSearch as appropriate given the results
-                        switch (searchModifier)
+                        // Initialize FileMatchesSearch depending on whether we are looking for any term.
+                        rowData.FileMatchesSearch = (searchModifier != SearchModifier.Any);
+
+                        // Search the specified attributes with the parser for each search term.
+                        foreach (KeyValuePair<string, Regex> parser in regexParsers)
                         {
-                            case SearchModifier.Any: rowData.FileMatchesSearch |= matches.Any();
-                                break;
-                            case SearchModifier.All: rowData.FileMatchesSearch &= matches.Any();
-                                break;
-                            case SearchModifier.None: rowData.FileMatchesSearch &= !matches.Any();
-                                break;
+                            IEnumerable<ThreadSafeSpatialString> matches =
+                                _afUtils.QueryAttributes(attributes, parser.Key, false)
+                                .ToIEnumerable<IAttribute>()
+                                .Select(attribute => attribute.Value)
+                                .SelectMany(value => parser.Value.Matches(value.String)
+                                    .OfType<Match>()
+                                    .Where(match => match.Length > 0)
+                                    .Select(match => new ThreadSafeSpatialString(this,
+                                        value.GetSubString(match.Index, match.Index + match.Length - 1))));
+
+                            // Update FileMatchesSearch as appropriate given the results
+                            switch (searchModifier)
+                            {
+                                case SearchModifier.Any: rowData.FileMatchesSearch |= matches.Any();
+                                    break;
+                                case SearchModifier.All: rowData.FileMatchesSearch &= matches.Any();
+                                    break;
+                                case SearchModifier.None: rowData.FileMatchesSearch &= !matches.Any();
+                                    break;
+                            }
+
+                            // Compile all the matches regardless of whether the file is a match
+                            // overall.
+                            allMatches.AddRange(matches);
                         }
 
-                        // Compile all the matches regardless of whether the file is a match
-                        // overall.
-                        allMatches.AddRange(matches);
+                        rowData.DataMatches = allMatches;
                     }
-
-                    rowData.DataMatches = allMatches;
+                }
+                catch (Exception ex)
+                {
+                    notSearchedCount++;
+                    rowData.Exception = ex.AsExtract("ELI35855");
+                    exceptions.Add(ex.AsExtract("ELI35858"));
                 }
 
                 // Use a separate variable in the below, invoked call to update the row in the UI,
@@ -1762,14 +1801,30 @@ namespace Extract.FileActionManager.Utilities
 
             this.SafeBeginInvoke("ELI35829", () =>
             {
-                if (missingDataCount == 0)
+                if (notSearchedCount == 0)
                 {
                     _searchErrorStatusStripLabel.Text = "";
                 }
                 else
                 {
                     _searchErrorStatusStripLabel.Text = string.Format(CultureInfo.CurrentCulture,
-                        "Rules have not been run on {0:D} file(s)", missingDataCount);
+                        "{0:D} file(s) could not be searched.", notSearchedCount);
+                }
+
+                int exceptionCount = exceptions.Count;
+                if (exceptionCount > 0)
+                {
+                    // Aggregating a large number of exceptions can bog down, potentially
+                    // making the quickly making the app appear hung. Aggregate a maximum of 10
+                    // exceptions.
+                    if (exceptionCount > 10)
+                    {
+                        exceptions.RemoveRange(10, exceptionCount - 10);
+                    }
+                    exceptions.Add(new ExtractException("ELI35856",
+                        string.Format(CultureInfo.CurrentCulture,
+                        "There were error(s) searching {0:D} file(s).", exceptionCount)));
+                    ExtractException.AsAggregateException(exceptions).Display();
                 }
             });
         }
@@ -1865,7 +1920,7 @@ namespace Extract.FileActionManager.Utilities
         {
             if (_queryTask != null)
             {
-                if (_queryTask.Wait(0))
+                if (_queryTask.IsCompleted)
                 {
                     // The task has already ended; dispose of it.
                     _queryTask.Dispose();
@@ -1935,7 +1990,8 @@ namespace Extract.FileActionManager.Utilities
                     }
                 }
 
-                if (exceptions.Count > 0)
+                int exceptionCount = exceptions.Count;
+                if (exceptionCount > 0)
                 {
                     // If there was only a single file selected, just throw the exception as-is.
                     if (fileNames.Count() == 1)
@@ -1946,6 +2002,13 @@ namespace Extract.FileActionManager.Utilities
                     // exception after processing.
                     else
                     {
+                        // Aggregating a large number of exceptions can bog down, potentially
+                        // making the quickly making the app appear hung. Aggregate a maximum of 10
+                        // exceptions.
+                        if (exceptionCount > 10)
+                        {
+                            exceptions.RemoveRange(10, exceptionCount - 10);
+                        }
                         exceptions.Add(new ExtractException("ELI35819",
                             string.Format(CultureInfo.CurrentCulture,
                             "{0:D} file(s) failed {1}", exceptions.Count, appLaunchItem.Name.Quote())));

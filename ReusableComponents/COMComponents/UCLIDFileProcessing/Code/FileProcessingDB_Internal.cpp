@@ -1857,7 +1857,7 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 }
 //--------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_ConnectionPtr ipConnection, 
-	long nActionID, bool bForceUpdate, bool bDBLocked)
+	long nActionID, bool bForceUpdate, bool bLockAllowed, bool bDBLocked)
 {
 	// Create a pointer to a recordset
 	_RecordsetPtr ipActionStatSet(__uuidof(Recordset));
@@ -1896,30 +1896,38 @@ UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_Conn
 	FieldsPtr ipFields = ipActionStatSet->Fields;
 	ASSERT_RESOURCE_ALLOCATION("ELI26863", ipFields != __nullptr);
 
-	// Check the last updated time stamp 
-	CTime timeCurrent = getSQLServerDateTimeAsCTime(ipConnection);
-	CTime timeLastUpdated = getTimeDateField(ipFields, "LastUpdateTimeStamp");
-	CTimeSpan ts = timeCurrent - timeLastUpdated;
-	if (bForceUpdate || ts.GetTotalSeconds() > m_nActionStatisticsUpdateFreqInSeconds)
+	bool bStatsUpdated = false;
+	// Do not attempt to flush the delta table if a lock is not allowed.
+	if (bLockAllowed)
 	{
-		if (bDBLocked)
+		// Check the last updated time stamp 
+		CTime timeCurrent = getSQLServerDateTimeAsCTime(ipConnection);
+		CTime timeLastUpdated = getTimeDateField(ipFields, "LastUpdateTimeStamp");
+		CTimeSpan ts = timeCurrent - timeLastUpdated;
+		if (bForceUpdate || ts.GetTotalSeconds() > m_nActionStatisticsUpdateFreqInSeconds)
 		{
-			// Need to update the ActionStatistics from the Delta table
-			updateActionStatisticsFromDelta(ipConnection, nActionID);
+			if (bDBLocked)
+			{
+				// Need to update the ActionStatistics from the Delta table
+				updateActionStatisticsFromDelta(ipConnection, nActionID);
 
-			ipActionStatSet->Requery(adOptionUnspecified);
+				ipActionStatSet->Requery(adOptionUnspecified);
 
-			ipFields = ipActionStatSet->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI30751", ipFields != __nullptr);
-		}
-		else
-		{
-			UCLIDException  ue("ELI30977", "DB needs to be locked to update stats.");
-			ue.addDebugInfo("ActionID", nActionID);
-			throw ue;
+				ipFields = ipActionStatSet->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI30751", ipFields != __nullptr);
+
+				bStatsUpdated = true;
+			}
+			else
+			{
+				UCLIDException  ue("ELI30977", "DB needs to be locked to update stats.");
+				ue.addDebugInfo("ActionID", nActionID);
+				throw ue;
+			}
 		}
 	}
-	else
+	
+	if (!bStatsUpdated)
 	{
 		// [LegacyRCAndUtils:6233]
 		// If m_nActionStatisticsUpdateFreqInSeconds has not expired since the last update,
