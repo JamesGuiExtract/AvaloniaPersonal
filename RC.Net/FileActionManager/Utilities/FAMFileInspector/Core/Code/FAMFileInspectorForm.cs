@@ -1628,6 +1628,8 @@ namespace Extract.FileActionManager.Utilities
 
             this.SafeBeginInvoke("ELI35828", () =>
             {
+                int exceptionCount = exceptions.Count;
+
                 if (notSearchedCount == 0)
                 {
                     _searchErrorStatusStripLabel.Text = "";
@@ -1635,10 +1637,11 @@ namespace Extract.FileActionManager.Utilities
                 else
                 {
                     _searchErrorStatusStripLabel.Text = string.Format(CultureInfo.CurrentCulture,
-                        "{0:D} file(s) could not be searched.", notSearchedCount);
+                        (exceptionCount == 0) 
+                        ? "{0:D} file(s) have not been OCRed"
+                        : "{0:D} file(s) could not be searched.", notSearchedCount);
                 }
 
-                int exceptionCount = exceptions.Count;
                 if (exceptionCount > 0)
                 {
                     // Aggregating a large number of exceptions can bog down, potentially
@@ -1801,6 +1804,8 @@ namespace Extract.FileActionManager.Utilities
 
             this.SafeBeginInvoke("ELI35829", () =>
             {
+                int exceptionCount = exceptions.Count;
+
                 if (notSearchedCount == 0)
                 {
                     _searchErrorStatusStripLabel.Text = "";
@@ -1808,10 +1813,11 @@ namespace Extract.FileActionManager.Utilities
                 else
                 {
                     _searchErrorStatusStripLabel.Text = string.Format(CultureInfo.CurrentCulture,
-                        "{0:D} file(s) could not be searched.", notSearchedCount);
+                        (exceptionCount == 0) 
+                        ? "Rules have not been run on {0:D} file(s)"
+                        : "{0:D} file(s) could not be searched.", notSearchedCount);
                 }
 
-                int exceptionCount = exceptions.Count;
                 if (exceptionCount > 0)
                 {
                     // Aggregating a large number of exceptions can bog down, potentially
