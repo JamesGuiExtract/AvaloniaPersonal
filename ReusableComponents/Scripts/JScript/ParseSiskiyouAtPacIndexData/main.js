@@ -40,7 +40,7 @@ function main(args) {
     var csvlines = readAllText(inputFile).split(/\n/).map(function(s){return s.trim()});
     for (var i=0; i < csvlines.length; i++) {
         handleDebug("CSVLine", i);
-        var fields = csvlines[i].split(/\s*(?:-\d{2})?,\s*/);
+        var fields = csvlines[i].split(/\s*,\s*/);
 
         // Update map of images to copy
         setCopyImage(fields);
@@ -61,7 +61,7 @@ function main(args) {
     // Update map of images to destinations based on doc-type(s)
     function setCopyImage(fields) {
         var doctype = fields[3].replace(/[^\w\s]/g, "_").replace(/_+$/,"");
-        var iname = getImageName(fields[0]+fields[1]);
+        var iname = getImageName(fields[0]+fields[1].replace(/-\d{2}$/,""));
         if (iname == undefined) {
             return;
         }
@@ -149,7 +149,7 @@ function main(args) {
     // Specific type functions
     //--------------------------------------------------------------------------------------------------
     function makeEAVS_PIN(fields) {
-        var fname = getEAVName(fields[0]+fields[1], "PIN");
+        var fname = getEAVName(fields[0]+fields[1].replace(/-\d{2}$/,""), "PIN");
         if (fields[4].trim() != '-') {
             try {
                 writeAttr(fname, "PIN", fields[4].trim(), "", "");
@@ -161,7 +161,7 @@ function main(args) {
     }
 
     function makeEAVS_REFERENCE(fields) {
-        var fname = getEAVName(fields[0]+fields[1], "Reference");
+        var fname = getEAVName(fields[0]+fields[1].replace(/-\d{2}$/,""), "Reference");
         try {
             var val = fields[5].trim().replace(/^(?:REF[#]?|EF|F|RE|RERF|RF)\s?(?=\d)/, "");
             writeAttr(fname, "Reference", val, "", "");
@@ -173,8 +173,7 @@ function main(args) {
 
     function makeEAVS_PARTIES(fields) {
         var typ = "";
-        var attrType = "";
-        var attrType = parseInt(fields[2].slice(8,10));
+        var attrType = parseInt(fields[1].slice(8,10));
         var letters = "AABCDEFGHIJKLMNOPQRSTUVWXYZ";
         attrType = letters.charAt(attrType);
         switch(fields[4]) {
@@ -184,7 +183,7 @@ function main(args) {
             break;
             default: typ = "Unknown";
         }
-        var fname = getEAVName(fields[0]+fields[1], typ);
+        var fname = getEAVName(fields[0]+fields[1].replace(/-\d{2}$/,""), typ);
         try {
             var val = fields[5].trim().replace(/^(?:REF[#]?|EF|F|RE|RERF|RF)\s/, "");
             writeAttr(fname, typ, val, attrType, "");
