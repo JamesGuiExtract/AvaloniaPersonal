@@ -149,10 +149,13 @@ function main(args) {
     // Specific type functions
     //--------------------------------------------------------------------------------------------------
     function makeEAVS_PIN(fields) {
+        var attrType = parseInt(fields[1].slice(8,10));
+        var letters = "AABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        attrType = letters.charAt(attrType);
         var fname = getEAVName(fields[0]+fields[1].replace(/-\d{2}$/,""), "PIN");
         if (fields[4].trim() != '-') {
             try {
-                writeAttr(fname, "PIN", fields[4].trim(), "", "");
+                writeAttr(fname, "PIN", fields[4].trim(), attrType, "");
             }
             catch(err) {
                 handleScriptError("ParseSiskiyouAtPacIndexData_5", "Error!", err, "Index Data Line", fields);
@@ -161,10 +164,13 @@ function main(args) {
     }
 
     function makeEAVS_REFERENCE(fields) {
+        var attrType = parseInt(fields[1].slice(8,10));
+        var letters = "AABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        attrType = letters.charAt(attrType);
         var fname = getEAVName(fields[0]+fields[1].replace(/-\d{2}$/,""), "Reference");
         try {
             var val = fields[5].trim().replace(/^(?:REF[#]?|EF|F|RE|RERF|RF)\s?(?=\d)/, "");
-            writeAttr(fname, "Reference", val, "", "");
+            writeAttr(fname, "Reference", val, attrType, "");
         }
         catch(err) {
             handleScriptError("ParseSiskiyouAtPacIndexData_6", "Error!", err, "Index Data Line", fields);
