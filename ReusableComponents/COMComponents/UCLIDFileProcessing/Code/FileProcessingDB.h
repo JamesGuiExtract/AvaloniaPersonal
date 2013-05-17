@@ -236,7 +236,6 @@ public:
 	STDMETHOD(ShowSelectDB)(BSTR bstrPrompt, VARIANT_BOOL bAllowCreation,
 		VARIANT_BOOL bRequireAdminLogin, VARIANT_BOOL* pbConnected);
 	STDMETHOD(GetFileCount)(VARIANT_BOOL bUseOracleSyntax, LONGLONG* pnFileCount);
-	STDMETHOD(TryGetStats)(long nActionID, IActionStatistics** pStats);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -635,12 +634,10 @@ private:
 	//			if a record does not exist and bDBLocked is true, stats will be calculate stats for the action
 	//			if the statistics loaded are out of date and bDBLocked is true, stats will be updated
 	//			from the ActionStatisticsDelta table
-	//			If bLockAllowed is false, not attempt to flush the delta table will be made. If a
-	//			lock is required for any other reason, an exception will be thrown.
 	//			if the bDBLocked is false and no record exists or stats are out of date an exception
 	//			will be thrown.
 	UCLID_FILEPROCESSINGLib::IActionStatisticsPtr loadStats(_ConnectionPtr ipConnection, 
-		long nActionID, bool bForceUpdate, bool bLockAllowed, bool bDBLocked);
+		long nActionID, bool bForceUpdate, bool bDBLocked);
 
 	// Returns the DBSchemaVersion
 	int getDBSchemaVersion();
@@ -926,8 +923,7 @@ private:
 	bool GetFilesToProcess_Internal(bool bDBLocked, BSTR strAction,  long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
 		BSTR bstrSkippedForUserName, IIUnknownVector * * pvecFileRecords);
 	bool RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BSTR strAction);
-	bool GetStats_Internal(bool bDBLocked, bool bLockAllowed, long nActionID, VARIANT_BOOL vbForceUpdate,
-		IActionStatistics* *pStats);
+	bool GetStats_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics* *pStats);
 	bool CopyActionStatusFromAction_Internal(bool bDBLocked, long  nFromAction, long nToAction);
 	bool RenameAction_Internal(bool bDBLocked, long nActionID, BSTR strNewActionName);
 	bool Clear_Internal(bool bDBLocked, VARIANT_BOOL vbRetainUserValues);

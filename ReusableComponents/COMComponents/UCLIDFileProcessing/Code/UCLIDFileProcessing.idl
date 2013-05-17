@@ -1244,12 +1244,6 @@ library UCLID_FILEPROCESSINGLib
 		// ARGS:	bUseOracleSyntax- Whether Oracle syntax should be used to obtain the file count.
 		// RETURNS: The file count.
 		[id(111)] HRESULT GetFileCount(VARIANT_BOOL bUseOracleSyntax, [out,retval] LONGLONG* pnFileCount);
-		// -----------------------------------------------------------------------------------------------
-		// PROMISE: To return a IActionStistics pointer that contains the current stats for the given
-		//			action if possible without obtaining a database lock. This will not flush the
-		//			ActionStatisticsDelta table when called.
-		[id(112), helpstring("method TryGetStats")] HRESULT TryGetStats([in] long nActionID,
-			[out, retval] IActionStatistics** pStats);
 };
 
 	[

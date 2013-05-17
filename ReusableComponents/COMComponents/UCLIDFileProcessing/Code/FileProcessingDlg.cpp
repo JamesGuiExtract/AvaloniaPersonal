@@ -2651,19 +2651,11 @@ UINT __cdecl FileProcessingDlg::StatisticsMgrThreadFunct( LPVOID pParam )
 			// finishes the stats that are displayed will be current at the time of the thread stop event being signaled.
 			// If this is the only instance and it is processing files the final stats will show that the processing is 
 			// finished instead of showing the stats as of the last timout
-			// [FlexIDSCore:5244]
-			// As a stopgap measure to try to solve the FAM hang on close that seemed to hang here,
-			// use TryGetStats which will not attempt to lock the database to get stats. In the
-			// long run, it would be best to understand why it was hanging up trying to get a lock here.
-			UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipNewActionStats = ipFPMDB->TryGetStats(nActionID);
+			UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipNewActionStats = ipFPMDB->GetStats(nActionID, VARIANT_TRUE);
 			
 			_lastCodePos = "90";
 			
-			// Only if TryGetStats could get stats should a FP_STATISTICS_UPDATE be posted.
-			if (ipNewActionStats != __nullptr)
-			{
-				pFPDlg->PostMessageA(FP_STATISTICS_UPDATE, (WPARAM) ipNewActionStats.Detach(), (LPARAM)0 );
-			}
+			pFPDlg->PostMessageA(FP_STATISTICS_UPDATE, (WPARAM) ipNewActionStats.Detach(), (LPARAM)0 );
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15001");

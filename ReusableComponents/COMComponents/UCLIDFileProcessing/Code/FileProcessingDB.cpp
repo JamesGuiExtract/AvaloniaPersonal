@@ -572,12 +572,12 @@ STDMETHODIMP CFileProcessingDB::GetStats(long nActionID, VARIANT_BOOL vbForceUpd
 	{
 		validateLicense();
 
-		if (!GetStats_Internal(false, true, nActionID, vbForceUpdate, pStats))
+		if (!GetStats_Internal(false, nActionID, vbForceUpdate, pStats))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-			GetStats_Internal(true, true, nActionID, vbForceUpdate, pStats);
+			GetStats_Internal(true, nActionID, vbForceUpdate, pStats);
 		}
 		return S_OK;
 	}
@@ -2770,33 +2770,3 @@ STDMETHODIMP CFileProcessingDB::GetFileCount(VARIANT_BOOL bUseOracleSyntax, LONG
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35760")
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::TryGetStats(long nActionID, IActionStatistics* *pStats)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		ASSERT_ARGUMENT("ELI35861", pStats != __nullptr);
-
-		validateLicense();
-
-		try
-		{
-			try
-			{
-				GetStats_Internal(false, false, nActionID, VARIANT_FALSE, pStats);
-			}
-			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35859");
-		}
-		catch (UCLIDException &ue)
-		{
-			UCLIDException uexOuter("ELI35860", "Application trace: Statistics were not updated.", ue);
-			uexOuter.log();
-
-			*pStats = __nullptr;
-		}
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35862")
-}
