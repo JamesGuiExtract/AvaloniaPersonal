@@ -1,0 +1,142 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.5.0.x Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.5.0.x Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Goals</h3>
+    	<ul>
+  	   	<LI>Document SCRs fixed for 9.5 that are not related to <b>FAM File 
+		Inspector</b>.
+		<li>Provide suitable test cases to be merged with regular checklists
+    	</ul>
+<p>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DataEntry #1241]</b> Verification and Ctrl+C
+        	<ul>
+            		<li>Verify a document.
+			<li>Select an entire table.
+			<li>Click inside an empty cell.
+			<li>Press <b>Ctrl+C</b>.
+			<li>Confirm that an <b>ELI28786: Value cannot be null</b> 
+			exception is not thrown.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1249]</b> Confirm that the <b>Comments</b> field in 
+		<b>Demo_LabDE</b> is now a paragraph field.
+<p>
+  	   	<LI><b>[DotNet #984]</b> Pagination and Shift+Tab
+        	<ul>
+            		<li>Open Pagination and load some images.
+			<li>Select a page that is not the first displayed thumbnail.
+			<li>Press <b>Shift+TAB</b>.
+			<li>Confirm that the previous page becomes selected.
+			<li>Confirm that the original page is no longer selected.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNet #986]</b> Default Document Boundaries On Load
+        	<ul>
+            		<li>Open Pagination and load some images.
+			<li>Confirm that the <b>Settings</b> dialog includes a checkbox 
+			for <b>Insert document separators by default whenever a new 
+			input file is encountered</b>.
+			<li>Confirm that the checkbox is checked by default.
+			<li>Confirm that document separators are <b>not</b> added if the 
+			checkbox is unchecked.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5292]</b> Cannot Get Orientation Exception
+        	<ul>
+            		<li>Exercise verification.
+			<li>Navigate to previous documents.
+			<li>Exercise <b>Find and Redact</b>.
+			<li>Confirm proper behavior and that no <b>ELI21220: Cannot get 
+			orientation.  No image is open.</b> exception is seen.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5298]</b> Confirm that b>Silent Installs</b> work 
+		when run from an Explorer window showing a UNC path to the install folder.
+<p>
+  	   	<LI><b>[FlexIDSCore #5299]</b> Create Redacted Image
+        	<ul>
+            		<li>Exercise a normal <b>ID Shield</b> workflow with compute 
+			and verify actions.
+			<li>Confirm that the VOA file has a <b>_VerificationSession</b> 
+			metadata node.
+			<li>Exercise redaction.
+			<li>Confirm that the VOA file contains a 
+			<b>_RedactedFileOutputSession</b> metadata node.
+			<li>Confirm that the VOA file still contains the 
+			<b>_VerificationSession</b> metadata node.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5303]</b> Invalid Object Name Exception
+        	<ul>
+            		<li>Exercise <b>Demo_IDShield</b> verification.
+			<li>Verify <b>TestImage009.tif</b> with auto-zoom enabled.
+			<li>Create an angular redaction covering the first 
+			handwritten SSN.
+			<li>Create an angular redaction covering the second 
+			handwritten SSN.
+			<li>Apply a type to the first redaction.
+			<li>Apply a type to the second redaction.
+			<li>Click <b>TAB</b>.
+			<li>Confirm that the image is saved and closed without error.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5305]</b> FAM File Inspector Shortcuts
+        	<ul>
+            		<li>Confirm that a shortcut for <b>FAM File Inspector</b> is available 
+			under <b>FLEX Index - Utilities</b>.
+            		<li>Confirm that a shortcut for <b>FAM File Inspector</b> is available 
+			under <b>ID Shield - Utilities</b>.
+            		<li>Confirm that a shortcut for <b>FAM File Inspector</b> is available 
+			under <b>LabDE - Utilities</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6422]</b> Select Files Query
+        	<ul>
+            		<li>Open <b>DB Admin</b> against a very large database.
+			<li>Measure the <b>Select Files</b> response time for a 
+			<b>random count</b> - expecting a slow time.
+			<li>Measure the <b>Select Files</b> response time for a 
+			<b>top count</b> - expecting a fast time.
+			<li>Measure the <b>Select Files</b> response time for a 
+			<b>top percent</b> - expecting a slow time for non-admin 
+			user.
+			<li>Measure the <b>Select Files</b> response time for a 
+			<b>top percent</b> - expecting a fast time for admin user.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6423, #6424, #6426]</b> DB Admin
+        	<ul>
+            		<li>Confirm that a database can be cleared.
+			<li>Confirm that <b>Ctrl+I</b> is a shortcut to open <b>FAM 
+			File Inspector</b>.
+			<li>Confirm that <b>Tools - Inspect files</b> is disabled for a 
+			database with an old schema.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6425]</b> Demo Databases
+        	<ul>
+            		<li>Confirm that the <b>Demo_FLEXIndex</b> database uses the current 
+			database schema.
+            		<li>Confirm that the <b>Demo_IDShield</b> database uses the current 
+			database schema.
+            		<li>Confirm that the <b>Demo_LabDE</b> database uses the current 
+			database schema.
+        	</ul>
+    	</ul>
+</OL>
+</BODY>
+</HTML>
