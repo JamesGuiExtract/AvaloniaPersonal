@@ -13,13 +13,13 @@ namespace Extract.SharePoint.Redaction.Utilities
         /// </summary>
         /// <param name="data">The data for the file to process.</param>
         [OperationContract]
-        void ProcessFile(RedactNowData data);
+        void ProcessFile(IDSForSPClientData data);
 
         /// <summary>
         /// Interface method used to launch the specified file for local verification
         /// </summary>
         /// <param name="data">The data for the file to process.</param>
         [OperationContract]
-        void VerifyFile(RedactNowData data);
+        void VerifyFile(IDSForSPClientData data);
     }
 }

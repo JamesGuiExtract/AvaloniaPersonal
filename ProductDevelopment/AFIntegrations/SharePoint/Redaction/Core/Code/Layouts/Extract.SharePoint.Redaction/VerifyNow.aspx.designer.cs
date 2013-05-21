@@ -7,9 +7,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Extract.SharePoint.Redaction.Layouts.Extract.SharePoint.Redaction {
+namespace Extract.SharePoint.Redaction.Layouts {
     
-    ///
+    
     public partial class VerifyNow {
         
         /// <summary>

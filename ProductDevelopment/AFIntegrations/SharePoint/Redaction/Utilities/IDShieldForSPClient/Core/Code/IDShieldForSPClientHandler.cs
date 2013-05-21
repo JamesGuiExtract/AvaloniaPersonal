@@ -44,7 +44,7 @@ namespace Extract.SharePoint.Redaction.Utilities
         /// Interface method used to launch the specified file for local processing.
         /// </summary>
         /// <param name="data">The data for the file to process.</param>
-        public void ProcessFile(RedactNowData data)
+        public void ProcessFile(IDSForSPClientData data)
         {
             try
             {
@@ -60,10 +60,10 @@ namespace Extract.SharePoint.Redaction.Utilities
         }
 
         /// <summary>
-        /// Interface method used to lanch the specified file for verification
+        /// Interface method used to launch the specified file for verification
         /// </summary>
         /// <param name="data">The data for the file to process.</param>
-        public void VerifyFile(RedactNowData data)
+        public void VerifyFile(IDSForSPClientData data)
         {
             try
             {
@@ -90,7 +90,7 @@ namespace Extract.SharePoint.Redaction.Utilities
             string fileToClean = null;
             try
             {
-                var data = redactData as RedactNowData;
+                var data = redactData as IDSForSPClientData;
 
                 // Check for valid FPS file
                 if (!File.Exists(data.FpsFileLocation))
@@ -236,7 +236,7 @@ namespace Extract.SharePoint.Redaction.Utilities
         /// <param name="data">The redact now data.</param>
         /// <returns>The name of the downloaded file and the
         /// path to the original file.</returns>
-        static KeyValuePair<string, string> ExportFileToWorkingFolder(RedactNowData data)
+        static KeyValuePair<string, string> ExportFileToWorkingFolder(IDSForSPClientData data)
         {
             using (var context = new SP.ClientContext(data.SiteUrl))
             {
@@ -267,14 +267,14 @@ namespace Extract.SharePoint.Redaction.Utilities
         }
 
         /// <summary>
-        /// 
+        /// Thread method that handles exporting the file from SharePoint and launching RunFpsFile.
         /// </summary>
-        /// <param name="redactData"></param>
-        static void VerifyFileThread(object redactData)
+        /// <param name="verifyData">Data needed for opening the Verification UI</param>
+        static void VerifyFileThread(object verifyData)
         {
             try
             {
-                var data = redactData as RedactNowData;
+                var data = verifyData as IDSForSPClientData;
 
                 if (!File.Exists(data.FpsFileLocation))
                 {
@@ -315,11 +315,11 @@ namespace Extract.SharePoint.Redaction.Utilities
         }
 
         /// <summary>
-        /// 
+        /// Gets the full path to the file to verify using the IDSForSPCLientData
         /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        static string GetFileToVerify(RedactNowData data)
+        /// <param name="data">Data about the file to verify that was sent from the server</param>
+        /// <returns>Full path to the file to verify</returns>
+        static string GetFileToVerify(IDSForSPClientData data)
         {
             using (var context = new SP.ClientContext(data.SiteUrl))
             {
@@ -334,12 +334,12 @@ namespace Extract.SharePoint.Redaction.Utilities
         }
 
         /// <summary>
-        /// 
+        /// Gets the ListItem for the file using the data
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        static SP.ListItem GetListItemOfFile(SP.ClientContext context, RedactNowData data)
+        /// <param name="context">The sharepoint context that contains the file</param>
+        /// <param name="data">The data needed to get the file</param>
+        /// <returns>The ListItem for the file</returns>
+        static SP.ListItem GetListItemOfFile(SP.ClientContext context, IDSForSPClientData data)
         {
             // Get the list containing the file
             var list = context.Web.Lists.GetById(data.ListId);

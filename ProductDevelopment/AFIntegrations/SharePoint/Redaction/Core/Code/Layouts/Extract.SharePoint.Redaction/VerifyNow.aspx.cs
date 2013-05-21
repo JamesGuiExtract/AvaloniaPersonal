@@ -11,7 +11,7 @@ using System.Text;
 using SiteFolderSettingsCollection =
 System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.Redaction.IdShieldFolderProcessingSettings>;
 
-namespace Extract.SharePoint.Redaction.Layouts.Extract.SharePoint.Redaction
+namespace Extract.SharePoint.Redaction.Layouts
 {
     /// <summary>
     /// Helper asp page used to pass data to the Verify Now protocol
@@ -95,40 +95,46 @@ namespace Extract.SharePoint.Redaction.Layouts.Extract.SharePoint.Redaction
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         protected void HandleTimerTick(object sender, EventArgs e)
         {
-            timerClose.Enabled = false;
-            var sb = new StringBuilder("<script type=\"text/javascript\">");
-
-            sb.Append("window.frameElement.commitPopup(); ");
-            sb.Append("</script>");
-            var settings = IdShieldSettings.GetIdShieldSettings(false);
-            if (settings != null && !string.IsNullOrEmpty(settings.VerifyFpsFile))
+            try
             {
-                var siteId = hiddenSiteId.Value;
-                var listId = hiddenListId.Value;
-                var fileId = hiddenFileId.Value;
-                using (var site = new SPSite(new Guid(siteId)))
+                timerClose.Enabled = false;
+                var sb = new StringBuilder("<script type=\"text/javascript\">");
+
+                sb.Append("window.frameElement.commitPopup(); ");
+                sb.Append("</script>");
+                var settings = IdShieldSettings.GetIdShieldSettings(false);
+                if (settings != null && !string.IsNullOrEmpty(settings.VerifyFpsFile))
                 {
-                    var data = new RedactNowData(site.Url, listId, fileId, settings.VerifyFpsFile, settings.LocalWorkingFolder);
-                    if (!IdShieldHelper.VerifyNowHelper(data, hiddenLocalMachineIp.Value))
+                    var siteId = hiddenSiteId.Value;
+                    var listId = hiddenListId.Value;
+                    var fileId = hiddenFileId.Value;
+                    using (var site = new SPSite(new Guid(siteId)))
                     {
-                        sb.Append("alert('ID Shield for SP client application could not be found. ");
-                        sb.Append("Please ensure that it is running and try again.'); ");
+                        var data = new IDSForSPClientData(site.Url, listId, fileId, settings.VerifyFpsFile, settings.LocalWorkingFolder);
+                        if (!IdShieldHelper.VerifyNowHelper(data, hiddenLocalMachineIp.Value))
+                        {
+                            sb.Append("alert('ID Shield for SP client application could not be found. ");
+                            sb.Append("Please ensure that it is running and try again.'); ");
+                        }
                     }
                 }
+                else
+                {
+                    sb.Append("alert('Path to ID Shield for SP Verification FPS file is not set.'); ");
+                }
+                Context.Response.Write(sb.ToString());
+                Context.Response.Flush();
+                Context.Response.End();
             }
-            else
+            catch (Exception ex)
             {
-                sb.Append("alert('Path to ID Shield for SP Verification FPS file is not set.'); ");
+                IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldRedactNowHelper, "ELI35868");
             }
-            Context.Response.Write(sb.ToString());
-            Context.Response.Flush();
-            Context.Response.End();
-
         }
 
 
         /// <summary>
-        /// Checks if the folder for the file represented by <see param="fileID"/> is being watched
+        /// Checks if the folder for the file represented by <see paramref="fileID"/> is being watched
         /// </summary>
         /// <param name="siteID">String representation of the SiteID</param>
         /// <param name="fileID">String representation of the file ID</param>
@@ -140,8 +146,8 @@ namespace Extract.SharePoint.Redaction.Layouts.Extract.SharePoint.Redaction
         }
 
         /// <summary>
-        /// Gets the folder settings for the site given by <see param="siteID"/> and the folder the
-        /// file given by <see param="fileID"/>
+        /// Gets the folder settings for the site given by <see paramref="siteID"/> and the folder the
+        /// file given by <see paramref="fileID"/>
         /// </summary>
         /// <param name="siteID">String representation of the SiteID</param>
         /// <param name="fileID">String representation of the file ID</param>

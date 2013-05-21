@@ -218,7 +218,7 @@ namespace Extract.SharePoint.Redaction.Utilities
                     var binding = new BasicHttpBinding(BasicHttpSecurityMode.None);
                     _host = new ServiceHost(typeof(IDShieldForSPClientHandler));
                     var address = string.Concat("http://localhost:",
-                        RedactNowData.IdShieldClientPort, "/", RedactNowData.IdShieldForSPClientEndpoint);
+                        IDSForSPClientData.IdShieldClientPort, "/", IDSForSPClientData.IdShieldForSPClientEndpoint);
                     _host.AddServiceEndpoint(typeof(IIDShieldForSPClient), binding, address);
                     _host.Open();
                     _host.Faulted += HandleHostFaulted;

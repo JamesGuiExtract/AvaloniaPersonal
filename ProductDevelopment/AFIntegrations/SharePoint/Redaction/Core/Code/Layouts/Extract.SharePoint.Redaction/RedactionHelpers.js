@@ -154,7 +154,7 @@ function ProcessSelectedForRedaction() {
     processSelected("IDShieldStatus");
 }
 
-// Used to initial the verification
+// Used to initialize verification
 function showVerifyNowHelper() {
 
     // Get the current context, web and site

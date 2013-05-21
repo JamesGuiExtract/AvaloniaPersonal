@@ -416,7 +416,7 @@ namespace Extract.SharePoint.Redaction
         /// <returns>Returns <see langword="false"/> if the channel cannot be created
         /// due to the end point not existing (this means the client app is not running);
         /// <see langword="true"/> if it runs successfully.</returns>
-        internal static bool RedactNowHelper(RedactNowData data, string localHost)
+        internal static bool RedactNowHelper(IDSForSPClientData data, string localHost)
         {
             ChannelFactory<IIDShieldForSPClient> factory = null;
             try
@@ -468,7 +468,7 @@ namespace Extract.SharePoint.Redaction
         /// <returns>Returns <see langword="false"/> if the channel cannot be created
         /// due to the end point not existing (this means the client app is not running);
         /// <see langword="true"/> if it runs successfully.</returns>
-        internal static bool VerifyNowHelper(RedactNowData data, string localHost)
+        internal static bool VerifyNowHelper(IDSForSPClientData data, string localHost)
         {
             ChannelFactory<IIDShieldForSPClient> factory = null;
             try
@@ -525,9 +525,9 @@ namespace Extract.SharePoint.Redaction
             StringBuilder url = new StringBuilder("http://", 1024);
             url.Append(localHost);
             url.Append(":");
-            url.Append(RedactNowData.IdShieldClientPort);
+            url.Append(IDSForSPClientData.IdShieldClientPort);
             url.Append("/");
-            url.Append(RedactNowData.IdShieldForSPClientEndpoint);
+            url.Append(IDSForSPClientData.IdShieldForSPClientEndpoint);
 
             var binding = new BasicHttpBinding(BasicHttpSecurityMode.None);
 

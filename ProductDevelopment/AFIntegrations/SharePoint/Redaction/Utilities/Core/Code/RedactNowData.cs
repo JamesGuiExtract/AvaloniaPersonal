@@ -7,8 +7,8 @@ namespace Extract.SharePoint.Redaction.Utilities
     /// <summary>
     /// Helper class to pass data from SharePoint to the redact now helper application.
     /// </summary>
-    [DataContract(Name="RedactNowData", Namespace="http://www.extractsystems.com")]
-    public sealed class RedactNowData
+    [DataContract(Name = "IDSForSPClientData", Namespace = "http://www.extractsystems.com")]
+    public sealed class IDSForSPClientData
     {
         #region Constants
 
@@ -67,17 +67,17 @@ namespace Extract.SharePoint.Redaction.Utilities
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RedactNowData"/> class.
+        /// Initializes a new instance of the <see cref="IDSForSPClientData"/> class.
         /// </summary>
-        public RedactNowData()
+        public IDSForSPClientData()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RedactNowData"/> class.
+        /// Initializes a new instance of the <see cref="IDSForSPClientData"/> class.
         /// </summary>
         /// <param name="data">The data to copy from.</param>
-        public RedactNowData(RedactNowData data)
+        public IDSForSPClientData(IDSForSPClientData data)
         {
             SiteUrl = data.SiteUrl;
             ListId = data.ListId;
@@ -87,7 +87,7 @@ namespace Extract.SharePoint.Redaction.Utilities
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RedactNowData"/> class.
+        /// Initializes a new instance of the <see cref="IDSForSPClientData"/> class.
         /// </summary>
         /// <param name="siteUrl">The site URL.</param>
         /// <param name="listId">The list id.</param>
@@ -95,13 +95,13 @@ namespace Extract.SharePoint.Redaction.Utilities
         /// <param name="fpsFileLocation">The FPS file location.</param>
         /// <param name="workingFolder">The working folder that contains the file to be verifyed for the verify process</param>
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId="0#")]
-        public RedactNowData(string siteUrl, string listId, string fileId, string fpsFileLocation, string workingFolder = "")
+        public IDSForSPClientData(string siteUrl, string listId, string fileId, string fpsFileLocation, string workingFolder = "")
             : this(siteUrl, new Guid(listId), new Guid(fileId), fpsFileLocation, workingFolder)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RedactNowData"/> class.
+        /// Initializes a new instance of the <see cref="IDSForSPClientData"/> class.
         /// </summary>
         /// <param name="siteUrl">The site URL.</param>
         /// <param name="listId">The list id.</param>
@@ -109,7 +109,7 @@ namespace Extract.SharePoint.Redaction.Utilities
         /// <param name="fpsFileLocation">The FPS file location.</param>
         /// <param name="workingFolder">The working folder that contains the file to be verifyed for the verify process</param>
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId="0#")]
-        public RedactNowData(string siteUrl, Guid listId, Guid fileId, string fpsFileLocation, string workingFolder = "")
+        public IDSForSPClientData(string siteUrl, Guid listId, Guid fileId, string fpsFileLocation, string workingFolder = "")
         {
             SiteUrl = siteUrl;
             ListId = listId;

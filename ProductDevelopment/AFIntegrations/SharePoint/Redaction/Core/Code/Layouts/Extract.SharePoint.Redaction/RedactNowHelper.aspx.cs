@@ -69,35 +69,43 @@ namespace Extract.SharePoint.Redaction.Layouts
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         protected void HandleTimerTick(object sender, EventArgs e)
         {
-            timerClose.Enabled = false;
-
-            var sb = new StringBuilder("<script type=\"text/javascript\">");
-            var settings = IdShieldSettings.GetIdShieldSettings(false);
-            if (settings != null && !string.IsNullOrEmpty(settings.RedactNowFpsFile))
+            try
             {
-                var siteId = hiddenSiteId.Value;
-                var listId = hiddenListId.Value;
-                var fileId = hiddenFileId.Value;
-                using (var site = new SPSite(new Guid(siteId)))
+                timerClose.Enabled = false;
+
+                var sb = new StringBuilder("<script type=\"text/javascript\">");
+                var settings = IdShieldSettings.GetIdShieldSettings(false);
+                if (settings != null && !string.IsNullOrEmpty(settings.RedactNowFpsFile))
                 {
-                    var data = new RedactNowData(site.Url, listId, fileId, settings.RedactNowFpsFile);
-                    if (!IdShieldHelper.RedactNowHelper(data, hiddenLocalMachineIp.Value))
+                    var siteId = hiddenSiteId.Value;
+                    var listId = hiddenListId.Value;
+                    var fileId = hiddenFileId.Value;
+                    using (var site = new SPSite(new Guid(siteId)))
                     {
-                        sb.Append("alert('ID Shield for SP client application could not be found. ");
-                        sb.Append("Please ensure that it is running and try again.'); ");
+                        var data = new IDSForSPClientData(site.Url, listId, fileId, settings.RedactNowFpsFile);
+                        if (!IdShieldHelper.RedactNowHelper(data, hiddenLocalMachineIp.Value))
+                        {
+                            sb.Append("alert('ID Shield for SP client application could not be found. ");
+                            sb.Append("Please ensure that it is running and try again.'); ");
+                        }
                     }
                 }
-            }
-            else
-            {
-                sb.Append("alert('Path to ID Shield for SP Client FPS file is not set.'); ");
-            }
-            sb.Append("window.frameElement.commitPopup(); ");
-            sb.Append("</script>");
+                else
+                {
+                    sb.Append("alert('Path to ID Shield for SP Client FPS file is not set.'); ");
+                }
+                sb.Append("window.frameElement.commitPopup(); ");
+                sb.Append("</script>");
 
-            Context.Response.Write(sb.ToString());
-            Context.Response.Flush();
-            Context.Response.End();
+                Context.Response.Write(sb.ToString());
+                Context.Response.Flush();
+                Context.Response.End();
+            }
+            catch (Exception ex)
+            {
+                IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldRedactNowHelper,
+                    "ELI35869");
+            }
         }
 
         /// <summary>

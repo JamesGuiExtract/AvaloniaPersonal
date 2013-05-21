@@ -97,6 +97,8 @@
     <Content Include="Images\Extract.SharePoint\ProcessSelected32x32.png" />
     <Content Include="Images\Extract.SharePoint\UnwatchFolder16x16.png" />
     <Content Include="Images\Extract.SharePoint\UnwatchFolder32x32.png" />
+    <Content Include="Images\Extract.SharePoint\Verify16x16.png" />
+    <Content Include="Images\Extract.SharePoint\Verify32x32.png" />
     <Content Include="Images\Extract.SharePoint\WatchFolder16x16.png" />
     <Content Include="Images\Extract.SharePoint\WatchFolder32x32.png" />
     <Content Include="Layouts\Extract.SharePoint\EnableHelpers.js" />
