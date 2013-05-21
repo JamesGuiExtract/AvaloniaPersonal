@@ -2447,7 +2447,7 @@
 		<col def="L255">Value</col>
 		<row><td>Media</td><td>IncludeActionHelp</td><td>1</td></row>
 		<row><td>Media</td><td>ProductName</td><td>ID Shield Sharepoint Client</td></row>
-		<row><td>Media</td><td>SetupFileName</td><td>Extract IDShield Sharepoint Client</td></row>
+		<row><td>Media</td><td>SetupFileName</td><td>Install Extract IDShield Sharepoint Client</td></row>
 		<row><td>Media</td><td>Title</td><td>##ID_STRING2##</td></row>
 	</table>
 
