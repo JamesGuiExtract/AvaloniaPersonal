@@ -285,6 +285,17 @@ namespace Extract.FileActionManager.Utilities
         volatile CancellationTokenSource _queryCanceler;
 
         /// <summary>
+        /// Allows background non-blocking app launch operations to be cancelled before processing
+        /// any additional files.
+        /// </summary>
+        CancellationTokenSource _appLaunchCanceler = new CancellationTokenSource();
+
+        /// <summary>
+        /// Tracks how many app launch operations are currently executing.
+        /// </summary>
+        CountdownEvent _appLaunchCountdownEvent = new CountdownEvent(0);
+
+        /// <summary>
         /// Allows any overlay text on the image viewer to be canceled.
         /// </summary>
         volatile CancellationTokenSource _overlayTextCanceler;
@@ -775,6 +786,55 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Form.Closing"/> event.
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.ComponentModel.CancelEventArgs"/> that contains
+        /// the event data.</param>
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            try
+            {
+                // Check to see if any app launch operation is still running.
+                if (!_appLaunchCountdownEvent.Wait(0))
+                {
+                    if (DialogResult.OK == MessageBox.Show(
+                        "One or more operations are still running.\r\n\r\n" +
+                        "Stop the operation(s) before the next file is processed " +
+                        "and close the application?",
+                        "Stop operation?", MessageBoxButtons.OKCancel,
+                        MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2, 0))
+                    {
+                        _appLaunchCanceler.Cancel();
+                        try
+                        {
+                            // While waiting for the background process(es) to stop, display a modal
+                            // message box.
+                            ShowMessageBoxWhileBlocking("Waiting for operation(s) to stop...",
+                                () => _appLaunchCountdownEvent.Wait());
+                        }
+                        catch { }
+                    }
+                    else
+                    {
+                        // Cancel the close to keep the background operation running.
+                        e.Cancel = true;
+                    }
+                }
+
+                if (!e.Cancel)
+                {
+                    CancelBackgroundOperation();
+                }
+
+                base.OnClosing(e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35864");
+            }
+        }
+
+        /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing"><see langword="true"/> if managed resources should be disposed;
@@ -784,6 +844,7 @@ namespace Extract.FileActionManager.Utilities
         // http://stackoverflow.com/questions/6960520/when-to-dispose-cancellationtokensource
         [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "_queryCanceler")]
         [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "_overlayTextCanceler")]
+        [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "_appLaunchCanceler")]
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -815,6 +876,12 @@ namespace Extract.FileActionManager.Utilities
                 {
                     _queryTask.Dispose();
                     _queryTask = null;
+                }
+
+                if (_appLaunchCountdownEvent != null)
+                {
+                    _appLaunchCountdownEvent.Dispose();
+                    _appLaunchCountdownEvent = null;
                 }
             }
 
@@ -1158,35 +1225,54 @@ namespace Extract.FileActionManager.Utilities
                     // If blocking, use a modal message box to block rather than calling
                     // RunApplication on this thread; the latter causes the for to report "not
                     // responding" in some circumstances.
-                    CustomizableMessageBox messageBox = new CustomizableMessageBox();
-                    messageBox.UseDefaultOkButton = false;
-                    messageBox.Caption = _APPLICATION_TITLE;
-                    messageBox.Text = "Running " + appLaunchItem.Name.Quote() + "...";
-
-                    Task.Factory.StartNew(() =>
-                    {
-                        try
-                        {
-                            RunApplication(appLaunchItem, fileNames);
-                            this.SafeBeginInvoke("ELI35825", () => messageBox.Close(""));
-                        }
-                        catch (Exception ex)
-                        {
-                            ex.ExtractDisplay("ELI35824");
-                        }
-                        finally
-                        {
-                            this.SafeBeginInvoke("ELI35826", () => messageBox.Dispose());
-                        }
-                    });
-
-                    messageBox.Show(this);
+                    ShowMessageBoxWhileBlocking("Running " + appLaunchItem.Name.Quote() + "...",
+                        () => RunApplication(appLaunchItem, fileNames, _appLaunchCanceler.Token));
                 }
                 else
                 {
-                    // If not blocking, run the application on a background thread; allow the UI thread
-                    // to continue.
-                    Task.Factory.StartNew(() => RunApplication(appLaunchItem, fileNames));
+                    // If not blocking, run the application on a background thread; allow the UI
+                    // thread to continue.
+                    try
+                    {
+                        // Increment the current _appLaunchCountdownEvent to prevent the form from
+                        // closing while the app launch item is still running. (AddCount cannot be
+                        // called when the CurrentCount is already zero.)
+                        if (!_appLaunchCountdownEvent.TryAddCount())
+                        {
+                            _appLaunchCountdownEvent.Reset(1);
+                        }
+                        
+                        Task.Factory.StartNew(() =>
+                            RunApplication(appLaunchItem, fileNames, _appLaunchCanceler.Token),
+                                _appLaunchCanceler.Token)
+                        .ContinueWith((task) =>
+                            {
+                                // Regardless of whether there was a failure, indicate that the app
+                                // launch process has finished.
+                                _appLaunchCountdownEvent.Signal();
+
+                                // Handle any failure launching the operation to prevent unhandled
+                                // exceptions from crashing the application.
+                                if (task.IsFaulted)
+                                {
+                                    Exception[] exceptions = task.Exception.InnerExceptions.ToArray();
+                                    this.SafeBeginInvoke("ELI35879", () =>
+                                    {
+                                        foreach (Exception ex in exceptions)
+                                        {
+                                            ex.ExtractDisplay("ELI35872");
+                                        }
+                                    });
+                                }
+                            });
+                    }
+                    catch
+                    {
+                        // In case the app launch task was never started, return
+                        // _appLaunchCountdownEvent to its previous value.
+                        _appLaunchCountdownEvent.Signal();
+                        throw;
+                    }
 
                     // Since a non-blocking app will continue to run in the background, use the
                     // status bar to indicate the application is being launched. After 5 seconds,
@@ -1196,7 +1282,16 @@ namespace Extract.FileActionManager.Utilities
                     {
                         Thread.Sleep(5000);
                         this.SafeBeginInvoke("ELI35818", () => UpdateStatusLabel());
-                    });
+                    })
+                    .ContinueWith((task) =>
+                    {
+                        // Handle any failure performing the status update to prevent unhandled
+                        // exceptions from crashing the application.
+                        foreach (Exception ex in task.Exception.InnerExceptions)
+                        {
+                            ex.ExtractLog("ELI35873");
+                        }
+                    }, TaskContinuationOptions.OnlyOnFaulted);
                 }
             }
             catch (Exception ex)
@@ -1654,7 +1749,20 @@ namespace Extract.FileActionManager.Utilities
                     exceptions.Add(new ExtractException("ELI35853",
                         string.Format(CultureInfo.CurrentCulture,
                         "There were error(s) searching {0:D} file(s).", exceptionCount)));
-                    ExtractException.AsAggregateException(exceptions).Display();
+
+                    
+                    // Since for some reason invoking ExtractDisplay does not always block the UI
+                    // thread, also disable the form until the exception is acknowledged.
+                    try
+                    {
+                        Enabled = false;
+
+                        ExtractException.AsAggregateException(exceptions).Display();
+                    }
+                    finally
+                    {
+                        Enabled = true;
+                    }
                 }
             });
         }
@@ -1830,7 +1938,19 @@ namespace Extract.FileActionManager.Utilities
                     exceptions.Add(new ExtractException("ELI35856",
                         string.Format(CultureInfo.CurrentCulture,
                         "There were error(s) searching {0:D} file(s).", exceptionCount)));
-                    ExtractException.AsAggregateException(exceptions).Display();
+
+                    // Since for some reason invoking ExtractDisplay does not always block the UI
+                    // thread, also disable the form until the exception is acknowledged.
+                    try
+                    {
+                        Enabled = false;
+
+                        ExtractException.AsAggregateException(exceptions).Display();
+                    }
+                    finally
+                    {
+                        Enabled = false;
+                    }
                 }
             });
         }
@@ -1894,17 +2014,17 @@ namespace Extract.FileActionManager.Utilities
                         () => OperationIsActive = false),
                         TaskContinuationOptions.NotOnFaulted);
                 _queryTask.ContinueWith((task) =>
-                    this.SafeBeginInvoke("ELI35722",
-                        () =>
+                {
+                    Exception[] exceptions = task.Exception.InnerExceptions.ToArray();
+                    this.SafeBeginInvoke("ELI35722", () =>
+                    {
+                        OperationIsActive = false;
+                        foreach (Exception ex in exceptions)
                         {
-                            OperationIsActive = false;
-
-                            foreach (Exception ex in task.Exception.InnerExceptions)
-                            {
-                                ex.ExtractDisplay("ELI35723");
-                            }
-                        }),
-                        TaskContinuationOptions.OnlyOnFaulted);
+                            ex.ExtractDisplay("ELI35874");
+                        }
+                    });
+                }, TaskContinuationOptions.OnlyOnFaulted);
 
                 // Kick off the background search and return.
                 _queryTask.Start();
@@ -1963,7 +2083,10 @@ namespace Extract.FileActionManager.Utilities
         /// <param name="appLaunchItem">The <see cref="AppLaunchItem"/> defining the application to
         /// be run.</param>
         /// <param name="fileNames">The files to be run in <see paramref="appLaunchItem"/></param>
-        void RunApplication(AppLaunchItem appLaunchItem, IEnumerable<string> fileNames)
+        /// <param name="cancelToken">A <see cref="CancellationToken"/> the that should be checked
+        /// before each file to see if the operation has been canceled.</param>
+        void RunApplication(AppLaunchItem appLaunchItem, IEnumerable<string> fileNames,
+            CancellationToken cancelToken)
         {
             try
             {
@@ -1973,21 +2096,32 @@ namespace Extract.FileActionManager.Utilities
                 // Process each filename in sequence.
                 foreach (string fileName in fileNames)
                 {
+                    cancelToken.ThrowIfCancellationRequested();
+
                     try
                     {
                         // Expand the command line arguments using path tags/functions.
                         SourceDocumentPathTags pathTags = new SourceDocumentPathTags(fileName);
-                        string arguments = pathTags.Expand(appLaunchItem.Arguments);
+
+                        string applicationPath = appLaunchItem.ApplicationPath;
+                        if (!string.IsNullOrEmpty(applicationPath))
+                        {
+                            applicationPath = pathTags.Expand(applicationPath);
+                        }
+
+                        string arguments = appLaunchItem.Arguments;
+                        if (!string.IsNullOrEmpty(arguments))
+                        {
+                            arguments = pathTags.Expand(arguments);
+                        }
 
                         if (appLaunchItem.SupportsErrorHandling)
                         {
-                            SystemMethods.RunExtractExecutable(
-                                appLaunchItem.ApplicationPath, arguments);
+                            SystemMethods.RunExtractExecutable(applicationPath, arguments);
                         }
                         else
                         {
-                            SystemMethods.RunExecutable(
-                                appLaunchItem.ApplicationPath, arguments, int.MaxValue);
+                            SystemMethods.RunExecutable(applicationPath, arguments, int.MaxValue);
                         }
                     }
                     catch (Exception ex)
@@ -2017,22 +2151,86 @@ namespace Extract.FileActionManager.Utilities
                         }
                         exceptions.Add(new ExtractException("ELI35819",
                             string.Format(CultureInfo.CurrentCulture,
-                            "{0:D} file(s) failed {1}", exceptions.Count, appLaunchItem.Name.Quote())));
+                            "{0:D} file(s) failed {1}", exceptionCount, appLaunchItem.Name.Quote())));
                         throw ExtractException.AsAggregateException(exceptions);
                     }
                 }
             }
+            catch (OperationCanceledException)
+            {
+                // If canceled, the user didn't want to wait around for the operation to complete;
+                // they don't need to see an excepton about the operation being canceled.
+            }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI35811");
-
-                // If there was an error launching a non-blocking app, ensure the status label is
-                // returned
-                if (!appLaunchItem.Blocking)
+                this.SafeBeginInvoke("ELI35815", () =>
                 {
-                    this.SafeBeginInvoke("ELI35815", () => UpdateStatusLabel());
-                }
+                    // [DotNetRCAndUtils:1029]
+                    // Exceptions should be displayed on the UI thread, blocking it which prevents
+                    // the form from being closed which can lead to a crash. Since for some reason
+                    // invoking ExtractDisplay does not always block the UI thread, also disable
+                    // the form until the exception is acknowledged.
+                    try
+                    {
+                        Enabled = false;
+                        
+                        ex.ExtractDisplay("ELI35811");
+                    }
+                    finally
+                    {
+                        Enabled = true;
+                    }
+
+                    // If there was an error launching a non-blocking app, ensure the status label is
+                    // returned
+                    if (!appLaunchItem.Blocking)
+                    {
+                        UpdateStatusLabel();
+                    }
+                });
             }
+        }
+
+        /// <summary>
+        /// Shows a modal, non-closeable message box with the specified <see param="messageText"/>
+        /// while the specified <see param="action"/> runs on a background thread.
+        /// </summary>
+        /// <param name="messageText">The message to be displayed.</param>
+        /// <param name="action">The action to run on a background thread.</param>
+        void ShowMessageBoxWhileBlocking(string messageText, Action action)
+        {
+            CustomizableMessageBox messageBox = new CustomizableMessageBox();
+            messageBox.UseDefaultOkButton = false;
+            messageBox.Caption = _APPLICATION_TITLE;
+            messageBox.Text = messageText;
+
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    action();
+                    this.SafeBeginInvoke("ELI35875", () => messageBox.Close(""));
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractDisplay("ELI35876");
+                }
+                finally
+                {
+                    this.SafeBeginInvoke("ELI35877", () => messageBox.Dispose());
+                }
+            })
+            .ContinueWith((task) =>
+            {
+                // Handle any exceptions to prevent unhandled exceptions from crashing the
+                // application.
+                foreach (Exception ex in task.Exception.InnerExceptions)
+                {
+                    ex.ExtractLog("ELI35878");
+                }
+            }, TaskContinuationOptions.OnlyOnFaulted);
+
+            messageBox.Show(this);
         }
 
         /// <summary>
@@ -2157,8 +2355,17 @@ namespace Extract.FileActionManager.Utilities
             })
             // In case of error invoking the image open, return _pendingOpenImageCount to its
             //previous value.
-            .ContinueWith((task) => _pendingOpenImageCount--,
-                TaskContinuationOptions.OnlyOnFaulted);
+            .ContinueWith((task) =>
+            {
+                _pendingOpenImageCount--;
+
+                // Handle any exceptions to prevent unhandled exceptions from crashing the
+                // application.
+                foreach (Exception ex in task.Exception.InnerExceptions)
+                {
+                    ex.ExtractLog("ELI35870");
+                }
+            }, TaskContinuationOptions.OnlyOnFaulted);
         }
 
         /// <summary>
