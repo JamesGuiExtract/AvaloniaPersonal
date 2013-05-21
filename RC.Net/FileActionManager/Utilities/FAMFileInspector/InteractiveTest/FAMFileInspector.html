@@ -29,31 +29,129 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			license is not present.
 		</ul>
 		<li>Confirm that <b>FAMFileInspector /?</b> displays a meaningful usage message.
+		<li>Confirm that double-clicking on <b>FAMFileInspector.exe</b> displays a 
+		the usual <b>Select database</b> dialog.
+		<ul>
+			<li>Confirm that the <b>FAM DB Admin</b> password is required to 
+			connect to the selected database.
+		</ul>
   	</ul>
 <p>
   	<li><h2>General User Interface</h2></li>
   	<ul>
 		<li><b>Main Window</b>
 		<ul>
-			<li>Confirm that <b>FAM File Inspector</b> is the window caption.
+			<li>Confirm that <b>&lt;Database_Name&gt; on &lt;Database_Server&gt; - 
+			FAM File Inspector</b> is the window caption.
 			<li>Confirm that the following menu items are defined and work correctly.
 			<ul>
-				<li>File - TBD
-				<li>File - Exit
+				<li>Database - Logout
+				<li>Database - Exit
 				<li>Help - About...
 			</ul>
-			<li>Confirm that a <b>TBD</b> toolbar button is defined immediately 
-			below the menu bar.
-			<li>Confirm that an <b>Enter admin mode...</b> button is defined next 
-			to the menu bar.
+			<li>Confirm that no toolbar is defined for the main window.
+			<li><u>Group Box</u>
 			<ul>
-				<li>Confirm that a <b>Login</b> prompt is displayed for the 
-				<b>Admin</b> user.
-				<li>Confirm that the user name cannot be modified.
-				<li>Confirm that a meaningful error message is displayed 
-				if an incorrect password is provided.
-				<li>Confirm that the correct password is the same password 
-				used for <b>DB Administration</b>.
+				<li>Confirm that an unlabelled group box is defined that 
+				includes a text description of the files listed below.
+				<li>Confirm that a <b>Change...</b> button is defined.
+				<li>Confirm that the <b>Change...</b> button displays the 
+				<b>Select Files</b> dialog.
+				<li>Confirm that the <b>Select Files</b> result is displayed 
+				in the group box.
+			</ul>
+			<li><u>Search</u>
+			<ul>
+				<li>Confirm that a <b>Search</b> area is provided in the 
+				Main window.
+				<li>Confirm that a special <b>File Inspector Search</b> 
+				license is required for <b>Search</b> to be available.
+				<li>Confirm that an <b>X</b> is provided to hide the Search.
+				<li>Confirm that when hidden, a <b>Search</b> button is 
+				provided and that the button reopens the Search area.
+				<li><b>[DotNetRC #997]</b> Confirm that balloon help is 
+				available describing how to use <b>regular expressions</b> 
+				within search items.
+				<li>Confirm that a drop-down combo box is provided with the 
+				following options.
+				<ul>
+					<li>any
+					<li>all
+					<li>none 
+				</ul>
+				<li>Confirm that another drop-down combo box is provided 
+				with the following options.
+				<ul>
+					<li>words
+					<li>extracted data
+				</ul>
+				<li>Confirm that a list box is provided to display the 
+				<b>search</b> terms.
+				<li>Confirm that the list box displays a scroll bar when 
+				needed.
+				<li>Confirm that a <b>Search</b> button is provided.
+				<li>Confirm that a meaningful error is displayed if no 
+				search terms have been provided and the <b>Search</b> 
+				button is pressed.
+				<li>Confirm that a <b>Clear</b> button is available.
+				<li>Confirm that <b>Clear</b> removes all search terms and 
+				resets the search results.
+<p>
+				<li><u>Searching for Words</u>
+				<ul>
+					<li>Define two or more words or phrases for searching.
+					<li>Search for <b>any</b> and confirm that some results 
+					are available.
+					<li>Confirm that the <b>Show only matching search 
+					results</b> checkbox is enabled and checked by default 
+					when a search is executed.
+					<li>Confirm that the file list automatically updates 
+					as expected when the checkbox is:
+					<ul>
+						<li>unchecked
+						<li>checked
+					</ul>
+					<li>Confirm that the following columns are provided in 
+					the file list.
+					<ul>
+						<li>Filename
+						<li>Pages
+						<li>Matches
+						<li>Folder
+					</ul>
+					<li>Select a file that contains exactly one match.
+					<ul>
+						<li>Confirm that the found search term is 
+						highlighted in green with a dotted red border.
+						<li>Confirm that the match navigation toolbar 
+						buttons are both disabled.
+					</ul>
+					<li>Select a file that contains more than one match.
+					<ul>
+						<li>Confirm that the found search terms are 
+						highlighted in green.
+						<li>Confirm that the default selected match 
+						is the first match.
+						<li>Confirm that the match navigation toolbar 
+						buttons remain enabled and disabled as 
+						appropriate.
+						<li>Step through the matches and confirm that 
+						the selected match retains the dotted red 
+						border.
+						<li>Confirm that the zoom level is unchanged 
+						during match navigation.
+						<li>Confirm that the Image Window status bar 
+						includes <b>Match <i>M</i> of <i>N</i></b> 
+						information that is updated as the selection 
+						changes.
+					</ul>
+				</ul>
+<p>
+				<li><u>Searching for Extracted Data</u>
+				<ul>
+					<li>Confirm that file list design and behavior is the 
+					same as seen with <b>searching for words</b>.
+				</ul>
 			</ul>
 			<li>TBD
 		</ul>
@@ -61,79 +159,311 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 		<li><b>Image Window</b>
 		<ul>
 			<li>Confirm that the following toolbar buttons are available for the 
-			Image Window.  Also confirm proper functionality for each button and 
-			shortcut.
+			Image Window.  Also confirm proper functionality for each button.  
+			Also confirm that each button works correctly if the utility starts 
+			from <b>CommonComponents</b> or from <b>DB Admin</b>.
 			<ul>
-				<li>Zoom window (Z)
-				<li>Pan (A)
-				<li>Zoom in (F7, Ctrl++)
-				<li>Zoom out (F8, Ctrl+-)
-				<li>Zoom previous (Back, Alt+Left)
-				<li>Zoom next (Alt+Right)
-				<li>Fit to page (P)
-				<li>Fit to width (W)
-				<li>Previous highlight
-				<li>Next highlight
+				<li>Zoom window
+				<li>Pan
+				<li>Go to previous match
+				<li>Go to next match
 				<li>First page
 				<li>Previous page
 				<li>Specified page
 				<li>Next page
 				<li>Last page
+				<li>Zoom in
+				<li>Zoom out
+				<li>Zoom previous
+				<li>Zoom next
+				<li>Fit to page
+				<li>Fit to width
+				<li>Rotate counterclockwise
+				<li>Rotate clockwise
+				<li>Print image
 			</ul>
+			<li>Confirm that selection of a single image file in the file list 
+			displays that image in the Image Window.
+			<li>Confirm that selection of multiple image files in the file list 
+			displays the last-selected image in the Image Window.
 		</ul>
   	</ul>
 <p>
   	<li><h2>Functionality</h2></li>
   	<ul>
-		<li><b>Input Options</b>
-		<ul>
-			<li>Confirm that <b>TIF</b> images can be used as input.
-			<li>Confirm that <b>PDF</b> images can be used as input.
-			<li>Confirm that a mixture of image types can be used as input.
-			<li>Confirm that images from subfolders can be used as input.
-			<li>TBD
-		</ul>
-		<li><b>Output Options</b>
-		<ul>
-			<li>Confirm that output filenames can include random characters.
-			<li>Confirm that output filenames can exclude random characters.
-			<li>Confirm that output files can retain sub-folder structure.
-		</ul>
-		<li><b>Post-processing Options</b>
-		<ul>
-			<li>Confirm that input files can be moved to a specified folder.
-			<li>Confirm that input files can be deleted.
-		</ul>
-		<li><b>Miscellaneous Options</b>
-		<ul>
-			<li>Confirm that all settings are properly written to a config file 
-			via <b>Export settings...</b>.
-			<li>Confirm that all settings are properly read from a config file 
-			via <b>Import settings...</b>.
-		</ul>
 		<li><b>General</b>
 		<ul>
+			<li>Confirm that <b>Database - Logout</b> displays a meaningful About box.
 			<li>Confirm that <b>Help - About</b> displays a meaningful About box.
-			<li>Confirm that all of a very long filename <b>is</b> displayed in 
-			the thumbnail view as a tooltip when hovering over an image.
-			<li>Confirm that a blue border is displayed around the thumbnail that 
-			is displayed in the Image Window.
-			<li>Confirm that a dark background is displayed around the thumbnails 
-			that are selected.
-			<li>Confirm that rotated pages are also rotated in the output document.
-			<li>Confirm that corrupt or locked files are handled gracefully.
-			<li>Exercise the following types of images for input and output
+		</ul>
+		<li><b>File Selection</b>
+		<ul>
+			<li>Confirm that utility behavior is as expected for files that are 
+			selected with each of the following restrictions.
 			<ul>
-				<li>TIF images
-				<li>PDF images
-				<li><b>NOT FIXED</b> Annotated TIF images
+				<li>Action status condition
+				<li>Priority condition
+				<li>Query condition
+				<li>Tag condition
+				<li>Multiple conditions
+				<li><b>[DotNetRC #995]</b> using a Random percent
+				<li>using a Random count
+				<li>using a Top percent
+				<li>using a Top count
+			</ul>
+		</ul>
+		<li><b>Sorting Search Results</b>
+		<ul>
+			<li>Confirm that results of searching <b>words</b> can be sorted by 
+			each of the following columns.
+			<ul>
+				<li>Filename
+				<li>Pages
+				<li>Matches
+				<li>Folder
+			</ul>
+			<li>Confirm that results of searching <b>extracted data</b> can be 
+			sorted by each of the following columns.
+			<ul>
+				<li>Filename
+				<li>Pages
+				<li><b>[DotNetRC #999]</b> Matches
+				<li>Folder
+			</ul>
+		</ul>
+		<li><b>Searching for Words</b>
+		<ul>
+			<li><u>Multiple Words</u>
+			<ul>
+				<li>Define two or more words or phrases for searching 
+				against a database of no more than 1000 files.
+				<li>Add the search results for <b>any</b>, <b>all</b> and 
+				<b>none</b>.
+				<li>Add the number of files that have not been OCRed.
+				<li>Confirm that the total matches the number of files in 
+				the database.
+			</ul>
+		</ul>
+		<li><b>Searching via Regular Expressions</b>
+		<ul>
+			<li>Confirm that searching for words allows regular expressions 
+			that are preceded by a <b>~</b> (tilde) character.
+			<li>Confirm that searching for extracted data allows regular 
+			expressions in the <b>Value</b> column that are preceded by a 
+			<b>~</b> (tilde) character.
+		</ul>
+		<li><b>Searching via Attribute Queries</b>
+		<ul>
+			<li>Confirm that <b>&lt;field_name&gt;</b> in the <b>Field</b> 
+			column finds all attributes with an appropriate value among 
+			the file list.
+			<li>Confirm that <b>&lt;field_name&gt;/*</b> in the <b>Field</b> 
+			column finds all sub-attributes with an appropriate value among 
+			the file list.
+			<li>Confirm that <b>*@&lt;type_name&gt;</b> in the <b>Field</b> 
+			column finds attributes with an appropriate value among the 
+			file list.
+			<li>Confirm that <b>*&lt;field_name&gt;/*</b> in the <b>Field</b> 
+			column finds all sub-attributes with an appropriate value among 
+			the file list.
+		</ul>
+		<li><b>Shortcuts</b>
+		<ul>
+			<li>Confirm that the following shortcuts are defined.
+			<ul>
+				<li><b>F3</b> - to move to the next match within the 
+				selected document
+				<li><b>Shift+F3</b> - to move to the previous match within 
+				the selected document
+				<li><b>TAB</b> - advance to the next document if within 
+				the file list
+				<li><b>Shift+TAB</b> - move to the previous document if 
+				within the file list
+				<li><b>TAB</b> - move to the next control in the natural 
+				tab order if not within the file list
+				<li><b>Shift+TAB</b> - move to the previous control in 
+				the natural tab order if not within the file list
+			</ul>
+		</ul>
+  	</ul>
+<p>
+  	<li><h2>Launch App</h2></li>
+  	<ul>
+		<li><b>Database Setup</b>
+		<ul>
+			<li>Confirm that the <b>LaunchApp</b> table contains the 
+			following columns.
+			<ul>
+				<li>ID
+				<li>Enabled
+				<li>AppName
+				<li>IconPath
+				<li>ApplicationPath
+				<li>Arguments
+				<li>AdminOnly
+				<li>AllowMultipleFiles
+				<li>SupportsErrorHandling
+				<li>Blocking
+			</ul>
+			<li>Exercise the following test cases with an appropriate entry 
+			in the <b>LaunchApp</b> table (i.e. &lt;blank&gt;, True, 
+			Edit Text, &lt;blank&gt;, &quot;C:\Windows\System32\Notepad.exe&quot;, 
+			&quot;D:\a.txt&quot;, True, True, True, True against a Demo_IDShield 
+			database).  Note that this assumes existence of <b>D:\a.txt</b>.
+			<ul>
+				<li>Confirm that an <b>Edit Text</b> entry is available 
+				in a context menu within the file list.
+				<li>Confirm that the context menu also includes a 
+				<b>Cancel</b> item.
+				<li>Select the <b>Edit Text</b> item.
+				<ul>
+					<li>Confirm that a modeless <b>FAM File Inspector</b> 
+					dialog is displayed with <b>Running 
+					&quot;Edit Text&quot;...</b> as text.
+					<li>Confirm that a Notepad instance is started to 
+					edit <b>D:\a.txt</b>.
+				</ul>
+				<li>Highlight multiple files in the file list and select the 
+				same <b>Edit Text</b> item.
+				<ul>
+					<li>Confirm that a single Notepad instance is opened 
+					for each selected file.
+					<li>Confirm that the instances are opened in sequence 
+					since the <b>Blocking</b> option is <b>True</b>.
+				</ul>
+				<li>Modify the <b>Blocking</b> option to <b>False</b>.
+				<li>Repeat the multiple selection test noted above.
+				<li>Confirm that all Notepad instances appear at the same time.
+				<li>Modify the <b>Enabled</b> option to <b>False</b>.
+				<ul>
+					<li>Confirm that the <b>Edit Text</b> item does not 
+					appear.
+					<li>Modify the <b>Enabled</b> option to <b>True</b>.
+				</ul>
+				<li>Modify the <b>AllowMultipleFiles</b> option to <b>False</b>.
+				<li>Repeat the multiple selection test noted above.
+				<li>Confirm that the <b>Edit Text</b> item is not available.
+				<li>Select a single file and confirm that the <b>Edit Text</b> 
+				item works as expected.
+				<li>Clear the <b>Arguments</b> optin and confirm that an empty 
+				Notepad instance is opened.
+				<li>Log in as a non-admin user and confirm that the admin 
+				password for <b>DB Admin</b> is required.
+			</ul>
+		</ul>
+  	</ul>
+<p>
+  	<li><h2>Field Search</h2></li>
+  	<ul>
+		<li><b>Database Setup</b>
+		<ul>
+			<li>Confirm that the <b>FieldSearch</b> table contains the 
+			following columns.
+			<ul>
+				<li>ID
+				<li>Enabled
+				<li>FieldName
+				<li>AttributeQuery
+			</ul>
+			<li>Exercise the following test cases with an appropriate entry 
+			in the <b>FieldSearch</b> table (i.e. &lt;blank&gt;, True, 
+			High Confidence, HCData against a Demo_IDShield database).
+			<ul>
+				<li>Confirm that a <b>High Confidence</b> item is 
+				pre-defined (with an empty Value cell) under the 
+				<b>extracted data</b> Search.
+				<li>Confirm that adding <b>~\d{4}</b> to the Value cell 
+				yields appropriate results for a Search.
+				<li>Confirm that modifying the <b>AttributeQuery</b> 
+				string to <b>Clues</b> yields Search results for Clues 
+				attributes.
+				<li>Confirm that modifying the <b>AttributeQuery</b> 
+				string to an empty string yields no Search results.
+				<li>Confirm that modifying the <b>Enabled</b> string 
+				to <b>False</b> removes the pre-defined entry.
 			</ul>
 		</ul>
   	</ul>
 <p>
   	<li><h2>Miscellaneous</h2></li>
   	<ul>
-		<li>TBD
+		<li><b>[DotNetRC #993]</b> Database Schema Error
+		<ul>
+			<li>Inspect a database with an out-of-date schema.
+			<li>Confirm that a meaningful error is displayed.
+			<li>Close the exception.
+			<li>Confirm that the utility does not open.
+		</ul>
+<p>
+		<li><b>[DotNetRC #996]</b> Microsoft .NET Framework Error
+		<ul>
+			<li>Inspect a valid database.
+			<li>Logout.
+			<li>Select a database with an out-of-date schema.
+			<li>Confirm that a meaningful error is displayed.
+			<li>Confirm that a <b>Microsoft .NET Framework</b> error is not 
+			displayed.
+		</ul>
+<p>
+		<li><b>[DotNetRC #998]</b> Invalid Index
+		<ul>
+			<li>Inspect <b>Demo_IDShield</b> database.
+			<li>Prepare two search items for extarcted data.
+			<ul>
+				<li>Field = <b>Clues</b>, Value = <b>~.*</b>
+				<li>Field = <b>MCData</b>, Value = <b>~.*</b>
+			</ul>
+			<li>Click <b>Search</b>
+			<li>Confirm that search results are found.
+			<li>Confirm that no <b>ELI06463: Invalid index!</b> exception 
+			is displayed.
+		</ul>
+<p>
+		<li><b>[DotNetRC #1000]</b> Connection Is No Longer Good
+		<ul>
+			<li>Restore an 8.0 database (i.e. 80_Database from Testing folder).
+			<li>Start Fam File Inspector from CommonComponents.
+			<li>Log in to the 8.0 database.
+			<li>Confirm that a meaningful error about database schema is 
+			displayed.
+		</ul>
+<p>
+		<li><b>[DotNetRC #1001, #1002, #1006, #1012]</b> TAB Navigation
+		<ul>
+			<li>Inspect a database.
+			<li>Confirm that <b>TAB</b> provides appropriate navigation between 
+			controls.
+			<li>Make a change in the Image Window (i.e. Zoom or Pan).
+			<li>Confirm that <b>TAB</b> continues appropriate navigation 
+			between controls.
+			<li>Tab to the last file in the list.
+			<li>Press <b>TAB</b> a few more times.
+			<li>Confirm that there is no image flicker.
+			<li>Continue to quickly press <b>TAB</b> while occasionally clicking 
+			an earlier file list entry.
+			<li>Stop the key and mouse clicks and confirm that there is no 
+			built-up cache of events to be handled.
+		</ul>
+<p>
+		<li><b>[DotNetRC #1011]</b> FAM File Inspector In A Bad State
+		<ul>
+			<li>Inspect a database.
+			<li>Do some random searches and tab through the results.
+			<li>Do another search for a nonsense word and choose <b>none</b> in 
+			the combo box.
+			<li>Tab through documents and click in the file list at the same time.
+			<li>Confirm that the application remains responsive and does not 
+			display an exception.
+		</ul>
+<p>
+		<li><b>[DotNetRC #1017]</b> Failures For Specific Files
+		<ul>
+			<li>Inspect a database.
+			<li>Rename one or more of the USS files.
+			<li>Do a simple search that should find something is the renamed files.
+			<li>Confirm that the search completes and that a meaningful error 
+			message is displayed describing how many errors were noted for the search.
+		</ul>
   	</ul>
 </ol>
 </body>
