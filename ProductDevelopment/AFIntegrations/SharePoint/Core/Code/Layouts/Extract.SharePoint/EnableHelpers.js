@@ -131,4 +131,21 @@ function itemQueuingFailed() {
     alert("Queuing failed: " + args.get_message());
     inProgress = false;
     window.location.href = window.location.href;
-}                    
+}
+
+
+// This function was to be used for Verify button but so far 
+// have not gotten it to work.
+//function singleDocSelectedAndQueuedForVerification(columnName) {
+//    var items = SP.ListOperation.Selection.getSelectedItems();
+//    var count = CountDictionary(items);
+//    if (count != 1) {
+//        return false;
+//    }
+
+//    var listID = SP.ListOperation.Selection.getSelectedList();
+//    var listItem = web.get_lists().getById(listID).getItemById(items[0].id);
+//    var status = listItem.get_item(columnName);
+
+//    return status == 'Queued For Verification';
+//}
