@@ -291,6 +291,16 @@ namespace Extract.SharePoint.Redaction.Utilities
                 // Need to get the file name that should be in the verification folder (pdf files will probably be named .pdf.tif
                 string fileToVerify = GetFileToVerify(data);
 
+                // For pdf files check for rasterized version of the file
+                if (Path.GetExtension(fileToVerify).ToLower() == ".pdf")
+                {
+                    // check if that file exists with a .pdf.tif extension
+                    if (File.Exists(fileToVerify + ".tif"))
+                    {
+                        fileToVerify = fileToVerify + ".tif";
+                    }
+                }
+
                 var info = new ProcessStartInfo(_runFpsFileLocation,
                     string.Concat("\"", data.FpsFileLocation, "\" \"",
                     fileToVerify, "\" /process"));

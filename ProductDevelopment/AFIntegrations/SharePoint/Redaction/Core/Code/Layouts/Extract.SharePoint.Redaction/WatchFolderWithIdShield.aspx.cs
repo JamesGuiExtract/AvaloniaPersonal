@@ -140,7 +140,7 @@ namespace Extract.SharePoint.Redaction.Layouts
                         bool processAdded = temp.ProcessAddedFiles;
                         if (!processAdded && !temp.QueueWithFieldValue)
                         {
-                            processAdded = true;
+                            radioManualSelect.Checked = true; ;
                         }
                         radioFilesAdded.Checked = processAdded;
                         if (processAdded)

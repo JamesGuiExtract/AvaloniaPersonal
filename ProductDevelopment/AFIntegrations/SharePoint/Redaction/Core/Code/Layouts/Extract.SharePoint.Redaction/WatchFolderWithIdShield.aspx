@@ -158,7 +158,12 @@
                     <asp:TextBox ID="textValue" runat="server" Width="265"></asp:TextBox>
                 </td>
             </tr>       
-        </table>
+            <tr>
+                <td>
+                    <asp:RadioButton ID="radioManualSelect" runat="server" GroupName="radioAddedOrByValue" Text="I will select files to process."
+                        ForeColor="Black" OnCheckedChanged="RadioAddedOrByValueChanged" AutoPostBack="true" />
+                </td>
+            </tr>        </table>
     </asp:Panel>
     <br />
     <asp:Panel ID="panelOutputSettings" runat="server" GroupingText="Output settings"
