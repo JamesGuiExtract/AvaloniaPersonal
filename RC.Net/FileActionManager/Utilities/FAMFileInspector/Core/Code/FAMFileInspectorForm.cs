@@ -1949,7 +1949,7 @@ namespace Extract.FileActionManager.Utilities
                     }
                     finally
                     {
-                        Enabled = false;
+                        Enabled = true;
                     }
                 }
             });
