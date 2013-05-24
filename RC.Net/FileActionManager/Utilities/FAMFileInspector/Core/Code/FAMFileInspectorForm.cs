@@ -1721,7 +1721,12 @@ namespace Extract.FileActionManager.Utilities
                 });
             }
 
-            this.SafeBeginInvoke("ELI35828", () =>
+            // [DotNetRCAndUtils:1029]
+            // Exceptions should be displayed on the UI thread, blocking it which prevents the form
+            // from being closed which can lead to a crash. Using BeginInvoke does not always block
+            // the UI thread (not sure why) so use Invoke instead to guarantee the UI thread is
+            // blocked.
+            this.Invoke((MethodInvoker)(() =>
             {
                 int exceptionCount = exceptions.Count;
 
@@ -1750,21 +1755,10 @@ namespace Extract.FileActionManager.Utilities
                         string.Format(CultureInfo.CurrentCulture,
                         "There were error(s) searching {0:D} file(s).", exceptionCount)));
 
-                    
-                    // Since for some reason invoking ExtractDisplay does not always block the UI
-                    // thread, also disable the form until the exception is acknowledged.
-                    try
-                    {
-                        Enabled = false;
 
-                        ExtractException.AsAggregateException(exceptions).Display();
-                    }
-                    finally
-                    {
-                        Enabled = true;
-                    }
+                    ExtractException.AsAggregateException(exceptions).Display();
                 }
-            });
+            }));
         }
 
         /// <summary>
@@ -1910,7 +1904,12 @@ namespace Extract.FileActionManager.Utilities
                 });
             }
 
-            this.SafeBeginInvoke("ELI35829", () =>
+            // [DotNetRCAndUtils:1029]
+            // Exceptions should be displayed on the UI thread, blocking it which prevents the form
+            // from being closed which can lead to a crash. Using BeginInvoke does not always block
+            // the UI thread (not sure why) so use Invoke instead to guarantee the UI thread is
+            // blocked.
+            this.Invoke((MethodInvoker)(() =>
             {
                 int exceptionCount = exceptions.Count;
 
@@ -1939,20 +1938,9 @@ namespace Extract.FileActionManager.Utilities
                         string.Format(CultureInfo.CurrentCulture,
                         "There were error(s) searching {0:D} file(s).", exceptionCount)));
 
-                    // Since for some reason invoking ExtractDisplay does not always block the UI
-                    // thread, also disable the form until the exception is acknowledged.
-                    try
-                    {
-                        Enabled = false;
-
-                        ExtractException.AsAggregateException(exceptions).Display();
-                    }
-                    finally
-                    {
-                        Enabled = true;
-                    }
+                    ExtractException.AsAggregateException(exceptions).Display();
                 }
-            });
+            }));
         }
 
         /// <summary>
@@ -2163,31 +2151,22 @@ namespace Extract.FileActionManager.Utilities
             }
             catch (Exception ex)
             {
-                this.SafeBeginInvoke("ELI35815", () =>
+                // [DotNetRCAndUtils:1029]
+                // Exceptions should be displayed on the UI thread, blocking it which prevents the
+                // form from being closed which can lead to a crash. Using BeginInvoke does not
+                // always block the UI thread (not sure why) so use Invoke instead to guarantee the
+                // UI thread is blocked.
+                this.Invoke((MethodInvoker)(() =>
                 {
-                    // [DotNetRCAndUtils:1029]
-                    // Exceptions should be displayed on the UI thread, blocking it which prevents
-                    // the form from being closed which can lead to a crash. Since for some reason
-                    // invoking ExtractDisplay does not always block the UI thread, also disable
-                    // the form until the exception is acknowledged.
-                    try
-                    {
-                        Enabled = false;
-                        
-                        ex.ExtractDisplay("ELI35811");
-                    }
-                    finally
-                    {
-                        Enabled = true;
-                    }
-
+                    ex.ExtractDisplay("ELI35811");
+                    
                     // If there was an error launching a non-blocking app, ensure the status label is
                     // returned
                     if (!appLaunchItem.Blocking)
                     {
                         UpdateStatusLabel();
                     }
-                });
+                }));
             }
         }
 
