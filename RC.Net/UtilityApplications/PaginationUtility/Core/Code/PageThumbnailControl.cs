@@ -350,6 +350,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (_activeImageViewer == null)
                         {
                             imageViewer.OrientationChanged += HandleActiveImageViewer_OrientationChanged;
+                            imageViewer.ImageChanged += HandleImageViewer_ImageChanged;
+                            imageViewer.PageChanged += HandleImageViewer_PageChanged;
 
                             _activeImageViewer = imageViewer;
                         }
@@ -371,8 +373,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // Do not unload the image, otherwise it may be deleted or modified by an
                     // outside application while still available in this UI.
                     _activeImageViewer.CloseImage(false);
-                    _activeImageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
-                    _activeImageViewer = null;
+                    DeactivateImageViewer();
                 }
             }
             catch (Exception ex)
@@ -604,6 +605,52 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="T:ImageViewer.ImageChanged"/> event of the
+        /// <see cref="_activeImageViewer"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleImageViewer_ImageChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // [DotNetRCAndUtils:1039]
+                // If the page has changed, the displayed page is no longer the one associated with
+                // this instance; don't allow rotation of the displayed page to affect the rotation
+                // of this page.
+                DeactivateImageViewer();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35881");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="T:ImageViewer.PageChanged"/> event of the
+        /// <see cref="_activeImageViewer"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.PageChangedEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleImageViewer_PageChanged(object sender, PageChangedEventArgs e)
+        {
+            try
+            {
+                // [DotNetRCAndUtils:1039]
+                // If the page has changed, the displayed page is no longer the one associated with
+                // this instance; don't allow rotation of the displayed page to affect the rotation
+                // of this page.
+                DeactivateImageViewer();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35882");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -645,6 +692,21 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _rasterPictureBox.Invalidate();
                 }
             });
+        }
+
+        /// <summary>
+        /// Deactivates <see cref="_activeImageViewer"/> when <see cref="Page"/> is no longer being
+        /// displayed.
+        /// </summary>
+        void DeactivateImageViewer()
+        {
+            if (_activeImageViewer != null)
+            {
+                _activeImageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
+                _activeImageViewer.ImageChanged -= HandleImageViewer_ImageChanged;
+                _activeImageViewer.PageChanged -= HandleImageViewer_PageChanged;
+                _activeImageViewer = null;
+            }
         }
 
         #endregion Private Members
