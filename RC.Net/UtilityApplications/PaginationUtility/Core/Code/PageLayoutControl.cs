@@ -559,21 +559,31 @@ namespace Extract.UtilityApplications.PaginationUtility
                         return;
                     }
 
-                    // Don't use an UpdateOperation here so that the UI can remain responsive as large
-                    // documents are being loaded.
-                    OutputDocument outputDocument = _paginationUtility.CreateOutputDocument(
-                        sourceDocument.FileName);
-
                     Control lastControl = _flowLayoutPanel.Controls
                         .OfType<Control>()
                         .LastOrDefault();
+                    var lastPageControl = lastControl as PageThumbnailControl;
+                    OutputDocument outputDocument = null;
+                    bool usingExistingDocument = false;
 
                     // If insertSeparator == true and the last control is currently a page control,
                     // we need to add a separator.
-                    if (insertSeparator && lastControl != null && lastControl is PageThumbnailControl)
+                    if (insertSeparator && lastPageControl != null)
                     {
                         AddPaginationControl(new PaginationSeparator());
                     }
+                    else if (lastPageControl != null)
+                    {
+                        // [DotNetRCAndUtils:1049]
+                        // If separators are not being inserted, but the last control is a document
+                        // page, append to that page's document rather than create a new
+                        // OutputDocument.
+                        outputDocument = lastPageControl.Document;
+                        usingExistingDocument = true;
+                    }
+
+                    outputDocument = outputDocument ?? _paginationUtility.CreateOutputDocument(
+                        sourceDocument.FileName);
 
                     Page[] pagesToLoad = sourceDocument.Pages.ToArray();
 
@@ -586,10 +596,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         AddPaginationControl(new PageThumbnailControl(outputDocument, page));
                     }
 
-                    // As long as all pages could be loaded, indicate that if the document is output
-                    // in its present form, it can simply be copied to the output path rather than
-                    // require it to be re-assembled.
-                    outputDocument.InOriginalForm = allPagesCanBeLoaded;
+                    // As long as all pages could be loaded and we haven't appended to the end of an
+                    // existing document, indicate that if the document is output in its present
+                    // form, it can simply be copied to the output path rather than require it to be
+                    // re-assembled.
+                    outputDocument.InOriginalForm = allPagesCanBeLoaded && !usingExistingDocument;
 
                     this.SafeBeginInvoke("ELI35612", () =>
                     {
