@@ -303,7 +303,7 @@
   </metadata>
   <data name="_componentFlag.ValidationQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
-	&lt;Attribute Name='Flag'&gt;.&lt;/Attribute&gt;
+	&lt;RegEx Name='Flag' Pattern='^A$'&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt;
 	&lt;!--Allow for value of #, #-#, &gt;#, &lt;#, &gt;=#, &lt;=#, &gt;/=#, &lt;=#--&gt;
 	&lt;Expression Name='RawValue'&gt;
 		&lt;RegEx Pattern='[\s&amp;gt;&amp;lt;/=]{0,3}[\d\.]+'&gt;&lt;Attribute &gt;../Value&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
@@ -342,46 +342,33 @@
 			? &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
 			: ''
 	&lt;/Expression&gt;
-	&lt;RegEx Name='LowFlag' Pattern='^L|^A$'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
-	&lt;RegEx Name='HighFlag' Pattern='^H|^A$'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
-	&lt;Expression Name='HasProperLowFlag'&gt;
+	&lt;Expression Name='InRangeLow'&gt;
 		&lt;!--If we don't have a value and a range minimum to compare consider low range boundary validated--&gt;
 		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
 		(string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;)) or
 		&lt;!--Compare using &gt;= check if appropriate--&gt;
 		(string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) == false and
-		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;gt;= &lt;MinValueOrEqual Type='double'/&gt;))) or
+			(&lt;Value Type='double'/&gt; &amp;gt;= &lt;MinValueOrEqual Type='double'/&gt;)) or
 		&lt;!--Compare using &gt; check if appropriate--&gt;
 		(string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;) == false and
-		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;gt; &lt;MinValueNotEqual Type='double'/&gt;)))
+			(&lt;Value Type='double'/&gt; &amp;gt; &lt;MinValueNotEqual Type='double'/&gt;))
 	&lt;/Expression&gt;
-	&lt;Expression Name='HasProperHighFlag'&gt;
+	&lt;Expression Name='InRangeHigh'&gt;
 		&lt;!--If we don't have a value and a range maximum to compare consider high range boundary validated--&gt;
 		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
 		(string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;)) or
 		&lt;!--Compare using &gt;= check if appropriate--&gt;
 		(string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) == false and
-		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;lt;= &lt;MaxValueOrEqual Type='double'/&gt;))) or
+			(&lt;Value Type='double'/&gt; &amp;lt;= &lt;MaxValueOrEqual Type='double'/&gt;)) or
 		&lt;!--Compare using &gt; check if appropriate--&gt;
 		(string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;) == false and
-		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;lt; &lt;MaxValueNotEqual Type='double'/&gt;)))
-	&lt;/Expression&gt;
-	&lt;!--Prevents use of inappropriate flag when the range has only a min or a max value--&gt;
-	&lt;Expression Name='SpecialRangeCheck'&gt;
-		&lt;!--Consider the special range check validated if there is no value or range specified--&gt;
-		(string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
-		 (string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;) and
-		  string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;))) or
-		  &lt;!--Disallow a low flag if no range minimum is specified--&gt;
-		((string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) or !string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) or !string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;)) and
-		  &lt;!--Disallow a high flag if no range maximum is specified--&gt;
-		 (string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) or !string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) or !string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;)))
+			(&lt;Value Type='double'/&gt; &amp;lt; &lt;MaxValueNotEqual Type='double'/&gt;))
 	&lt;/Expression&gt;
 &lt;/Declarations&gt;
 &lt;Query&gt;[BLANK]&lt;SQL&gt;SELECT * FROM Flag ORDER BY Flag&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query ValidValue='True' ValidationListType='ValidationListOnly' ValidationWarning='1'&gt;
 	&lt;Expression&gt;
-		&lt;HasProperLowFlag Type='bool'/&gt; and &lt;HasProperHighFlag Type='bool'/&gt; and &lt;SpecialRangeCheck Type='bool'/&gt;
+		string.IsNullOrWhitespace(&lt;Flag/&gt;) == (&lt;InRangeHigh/&gt; and &lt;InRangeLow/&gt;)
 	&lt;/Expression&gt;
 &lt;/Query&gt;</value>
   </data>

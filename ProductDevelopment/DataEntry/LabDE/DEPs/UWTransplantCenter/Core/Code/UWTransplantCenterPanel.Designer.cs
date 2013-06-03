@@ -79,6 +79,8 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._physicianMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._physicianCode = new Extract.DataEntry.DataEntryTableColumn();
             this._testDetailsGroupBox = new System.Windows.Forms.GroupBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this._componentComment = new Extract.DataEntry.DataEntryTextBox();
             this._testCommentLabel = new System.Windows.Forms.Label();
             this._testComment = new Extract.DataEntry.DataEntryTextBox();
             this._testsGroupBox = new System.Windows.Forms.GroupBox();
@@ -94,8 +96,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._componentRefRange = new Extract.DataEntry.DataEntryTableColumn();
             this._componentFlag = new Extract.DataEntry.DataEntryTableColumn();
             this._componentOriginalName = new Extract.DataEntry.DataEntryTableColumn();
-            this.label2 = new System.Windows.Forms.Label();
-            this._componentComment = new Extract.DataEntry.DataEntryTextBox();
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).BeginInit();
             this._patientInfoGroupBox.SuspendLayout();
@@ -764,6 +764,32 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._testDetailsGroupBox.TabStop = false;
             this._testDetailsGroupBox.Text = "Selected Order Details";
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(5, 416);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(51, 13);
+            this.label2.TabIndex = 9;
+            this.label2.Text = "Comment";
+            // 
+            // _componentComment
+            // 
+            this._componentComment.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._componentComment.AttributeName = "Comment";
+            this._componentComment.AutoUpdateQuery = "";
+            this._componentComment.Location = new System.Drawing.Point(5, 432);
+            this._componentComment.Multiline = true;
+            this._componentComment.Name = "_componentComment";
+            this._componentComment.ParentDataEntryControl = this._testComponentTable;
+            this._componentComment.RemoveNewLineChars = false;
+            this._componentComment.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._componentComment.Size = new System.Drawing.Size(569, 47);
+            this._componentComment.TabIndex = 8;
+            this._componentComment.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
+            this._componentComment.ValidationErrorMessage = "";
+            // 
             // _testCommentLabel
             // 
             this._testCommentLabel.AutoSize = true;
@@ -926,6 +952,8 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             // _componentFlag
             // 
             this._componentFlag.AttributeName = "Flag";
+            this._componentFlag.AutoUpdateQuery = "<Expression>(<Attribute Name=\'Flag\'>.</Attribute> == \'Abnormal\') ? \'A\' : <Flag/><" +
+    "/Expression>";
             this._componentFlag.FillWeight = 35F;
             this._componentFlag.HeaderText = "Flag";
             this._componentFlag.Name = "_componentFlag";
@@ -945,32 +973,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._componentOriginalName.ValidationErrorMessage = "Missing AKA in the Order Mapper Database";
             this._componentOriginalName.ValidationQuery = "";
             this._componentOriginalName.Visible = false;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(5, 416);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(51, 13);
-            this.label2.TabIndex = 9;
-            this.label2.Text = "Comment";
-            // 
-            // _componentComment
-            // 
-            this._componentComment.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._componentComment.AttributeName = "Comment";
-            this._componentComment.AutoUpdateQuery = "";
-            this._componentComment.Location = new System.Drawing.Point(5, 432);
-            this._componentComment.Multiline = true;
-            this._componentComment.Name = "_componentComment";
-            this._componentComment.ParentDataEntryControl = this._testComponentTable;
-            this._componentComment.RemoveNewLineChars = false;
-            this._componentComment.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._componentComment.Size = new System.Drawing.Size(569, 47);
-            this._componentComment.TabIndex = 8;
-            this._componentComment.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
-            this._componentComment.ValidationErrorMessage = "";
             // 
             // UWTransplantCenterPanel
             // 
@@ -1072,6 +1074,8 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         private DataEntryTableColumn _laboratoryTestTime;
         private DataEntryTableColumn _componentResultDate;
         private DataEntryTableColumn _componentResultTime;
+        private System.Windows.Forms.Label label2;
+        private DataEntryTextBox _componentComment;
         private DataEntryTableColumn _componentName;
         private DataEntryTableColumn _testCode;
         private DataEntryTableColumn _componentValue;
@@ -1079,7 +1083,5 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         private DataEntryTableColumn _componentRefRange;
         private DataEntryTableColumn _componentFlag;
         private DataEntryTableColumn _componentOriginalName;
-        private System.Windows.Forms.Label label2;
-        private DataEntryTextBox _componentComment;
     }
 }
