@@ -399,8 +399,12 @@ namespace Extract.SharePoint
                         for (int i = 0; i < items.Count; ++i)
                         {
                             var item = items[i];
-                            item[fieldName] = defaultStatus;
-                            item.Update();
+
+                            ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35890", item.File, "IDS Status changed", () =>
+                            {
+                                item[fieldName] = defaultStatus;
+                                item.Update();
+                            });
                         }
                     }
 
@@ -538,8 +542,11 @@ namespace Extract.SharePoint
                     if (folderSettings.DoesFileMatchPattern(item.File.Name) && 
                         (!folderSettings.QueueWithFieldValue) || IsFieldEqual(item, folderSettings))
                     {
-                        item[extractStatusColumn] = toBeQueued;
-                        item.Update();
+                        ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35891", item.File, "IDS Status changed", () =>
+                        {
+                            item[extractStatusColumn] = toBeQueued;
+                            item.Update();
+                        });
                     }
                 }
             }
@@ -694,6 +701,54 @@ namespace Extract.SharePoint
             return "";
         }
 
+
+        /// <summary>
+        /// Method checks out the given file if checkout is required and performs the action
+        /// </summary>
+        /// <param name="eliCode">ELI code to use if there is an error.</param>
+        /// <param name="file">The SPFile object of the file perform action on</param>
+        /// <param name="checkinComment">Comment to use when checking in the file</param>
+        /// <param name="action">The action to perform with check out and check in if required</param>
+        public static void DoWithCheckoutIfRequired(string eliCode, SPFile file, string checkinComment, Action action)
+        {
+            SPUser currUser = null;
+            try
+            {
+                // Get the current user
+                currUser = file.Web.CurrentUser;
+
+                // If the file does not require checkout or is already checked out by the current user 
+                // perform the action and return
+                if (!file.RequiresCheckout || (file.CheckedOutByUser != null && file.CheckedOutByUser.ToString() == currUser.ToString()))
+                {
+                    action();
+                    return;
+                }
+
+                // Check out the file
+                file.CheckOut();
+
+                try
+                {
+                    // Perform the action
+                    action();
+
+                    // Check in the file
+                    file.CheckIn(checkinComment);
+                }
+                finally
+                {
+                    // Undo the checkout
+                    file.UndoCheckOut();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.LogExceptionWithHelperApp(eliCode);
+            }
+        }
+
         #endregion Methods
     }
+
 }

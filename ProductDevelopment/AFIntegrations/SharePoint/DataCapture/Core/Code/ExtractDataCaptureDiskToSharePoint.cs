@@ -208,10 +208,13 @@ namespace Extract.SharePoint.DataCapture
                     DataCaptureHelper.LogException(exception, ErrorCategoryId.DataCaptureDiskToSharePoint,
                         "ELI31498");
 
-                    // Update the data capture status column (do this last so that the above exception is still logged
-                    // even if updating the column fails).
-                    item[DataCaptureHelper.ExtractDataCaptureStatusColumn] = failedString;
-                    item.Update();
+                    ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35900", item.File, "Updated Data Capture Status.", () =>
+                    {
+                        // Update the data capture status column (do this last so that the above exception is still logged
+                        // even if updating the column fails).
+                        item[DataCaptureHelper.ExtractDataCaptureStatusColumn] = failedString;
+                        item.Update();
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -239,9 +242,12 @@ namespace Extract.SharePoint.DataCapture
                     var list = site.RootWeb.Lists[pair.Key];
                     var item = list.GetItemByUniqueId(pair.Value);
 
-                    // Update the data capture status column
-                    item[DataCaptureHelper.ExtractDataCaptureStatusColumn] = queuedString;
-                    item.Update();
+                    ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35901", item.File, "Updated Data Capture status.", () =>
+                    {
+                        // Update the data capture status column
+                        item[DataCaptureHelper.ExtractDataCaptureStatusColumn] = queuedString;
+                        item.Update();
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -419,9 +425,12 @@ namespace Extract.SharePoint.DataCapture
                                 }
                             }
 
-                            item[DataCaptureHelper.ExtractDataCaptureStatusColumn] =
-                                ExtractProcessingStatus.ProcessingComplete.AsString();
-                            item.Update();
+                            ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35902", item.File, "Updated Data Capture status.", () =>
+                            {
+                                item[DataCaptureHelper.ExtractDataCaptureStatusColumn] =
+                                    ExtractProcessingStatus.ProcessingComplete.AsString();
+                                item.Update();
+                            });
                         }
                         catch (Exception ex)
                         {
@@ -431,10 +440,13 @@ namespace Extract.SharePoint.DataCapture
                                 {
                                     item = list.GetItemByUniqueId(item.UniqueId);
 
-                                    // Attempt to set status to failed if anything went wrong
-                                    item[DataCaptureHelper.ExtractDataCaptureStatusColumn] =
-                                        ExtractProcessingStatus.ProcessingFailed.AsString();
-                                    item.Update();
+                                    ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35903", item.File, "Updated Data Capture status.", () =>
+                                    {
+                                        // Attempt to set status to failed if anything went wrong
+                                        item[DataCaptureHelper.ExtractDataCaptureStatusColumn] =
+                                            ExtractProcessingStatus.ProcessingFailed.AsString();
+                                        item.Update();
+                                    });
                                 }
                                 catch
                                 {

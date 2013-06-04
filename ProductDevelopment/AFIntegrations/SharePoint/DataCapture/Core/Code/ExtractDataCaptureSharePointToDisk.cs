@@ -196,9 +196,12 @@ namespace Extract.SharePoint.DataCapture
                                     file.UniqueId.ToString() + Path.GetExtension(file.Name));
                                 File.WriteAllBytes(outFileName, bytes);
 
-                                // Mark the item as queued
-                                item[DataCaptureHelper.ExtractDataCaptureStatusColumn] = queued;
-                                item.Update();
+                                ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35898", file, "Updated Data Capture status.", () =>
+                                {
+                                    // Mark the item as queued
+                                    item[DataCaptureHelper.ExtractDataCaptureStatusColumn] = queued;
+                                    item.Update();
+                                });
                             }
                         }
                     }

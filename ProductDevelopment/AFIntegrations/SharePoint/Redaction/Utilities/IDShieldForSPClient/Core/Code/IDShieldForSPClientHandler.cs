@@ -291,15 +291,12 @@ namespace Extract.SharePoint.Redaction.Utilities
                 // Need to get the file name that should be in the verification folder (pdf files will probably be named .pdf.tif
                 string fileToVerify = GetFileToVerify(data);
 
-                // For pdf files check for rasterized version of the file
-                if (Path.GetExtension(fileToVerify).ToLower() == ".pdf")
+                if (!File.Exists(fileToVerify))
                 {
-                    // check if that file exists with a .pdf.tif extension
-                    if (File.Exists(fileToVerify + ".tif"))
-                    {
-                        fileToVerify = fileToVerify + ".tif";
-                    }
-                }
+                    Exception fileEx = new FileNotFoundException("File to verify does not exist.");
+                    fileEx.Data.Add("File", fileToVerify);
+                    throw fileEx;
+                };
 
                 var info = new ProcessStartInfo(_runFpsFileLocation,
                     string.Concat("\"", data.FpsFileLocation, "\" \"",
@@ -337,8 +334,20 @@ namespace Extract.SharePoint.Redaction.Utilities
                 var fileName = item["FileLeafRef"].ToString();
                 var pathWithSiteID = Path.Combine(data.WorkingFolder, context.Site.Id.ToString());
                 string workingPath = Path.Combine(pathWithSiteID, data.ListId.ToString());
-                return Path.Combine(workingPath,
+                string fileToVerify = Path.Combine(workingPath,
                                     data.FileId.ToString() + Path.GetExtension(fileName));
+
+                // For pdf files check for rasterized version of the file
+                if (Path.GetExtension(fileToVerify).ToLower() == ".pdf")
+                {
+                    // check if that file exists with a .pdf.tif extension
+                    if (File.Exists(fileToVerify + ".tif"))
+                    {
+                        fileToVerify = fileToVerify + ".tif";
+                    }
+                }
+
+                return fileToVerify;
             }
 
         }

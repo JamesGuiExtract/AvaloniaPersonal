@@ -280,10 +280,13 @@ namespace Extract.SharePoint.Redaction
                     IdShieldHelper.LogException(exception, ErrorCategoryId.IdShieldDiskToSharePoint,
                         "ELI30572");
 
-                    // Update the IDS status column (do this last so that the above exception is still logged
-                    // even if updating the column fails).
-                    item[IdShieldHelper.IdShieldStatusColumn] = failedString;
-                    item.Update();
+                    ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35885", item.File, "IDS Status changed.", () =>
+                    {
+                        // Update the IDS status column (do this last so that the above exception is still logged
+                        // even if updating the column fails).
+                        item[IdShieldHelper.IdShieldStatusColumn] = failedString;
+                        item.Update();
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -310,10 +313,13 @@ namespace Extract.SharePoint.Redaction
                     var pair = ExtractSharePointHelper.BuildListAndFileGuid(fileName);
                     var list = site.RootWeb.Lists[pair.Key];
                     var item = list.GetItemByUniqueId(pair.Value);
-
-                    // Update the IDS status column
-                    item[IdShieldHelper.IdShieldStatusColumn] = queuedString;
-                    item.Update();
+                    
+                    ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35886", item.File, "IDS Status changed", () =>
+                    {
+                        // Update the IDS status column
+                        item[IdShieldHelper.IdShieldStatusColumn] = queuedString;
+                        item.Update();
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -471,10 +477,13 @@ namespace Extract.SharePoint.Redaction
                             }
                             else
                             {
-                                // No redacted file so set status to no redactions
-                                item[IdShieldHelper.IdShieldStatusColumn] =
-                                    ExtractProcessingStatus.NoRedactions.AsString();
-                                item.Update();
+                                ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35887", item.File, "IDS Status changed", () =>
+                                {
+                                    // No redacted file so set status to no redactions
+                                    item[IdShieldHelper.IdShieldStatusColumn] =
+                                        ExtractProcessingStatus.NoRedactions.AsString();
+                                    item.Update();
+                                });
                             }
                         }
                         catch (Exception ex)
@@ -484,9 +493,12 @@ namespace Extract.SharePoint.Redaction
                             {
                                 if (item != null)
                                 {
-                                    item[IdShieldHelper.IdShieldStatusColumn] =
-                                        ExtractProcessingStatus.ProcessingFailed.AsString();
-                                    item.Update();
+                                    ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35888", item.File, "IDS Status changed", () =>
+                                    {
+                                        item[IdShieldHelper.IdShieldStatusColumn] =
+                                            ExtractProcessingStatus.ProcessingFailed.AsString();
+                                        item.Update();
+                                    });
                                 }
                             }
                             catch (Exception e)
@@ -550,10 +562,15 @@ namespace Extract.SharePoint.Redaction
 
                         // Update the original file column with the redacted file location
                         var item = list.GetItemByUniqueId(fileData.OriginalFileId);
-                        item[IdShieldHelper.IdShieldStatusColumn] = ExtractProcessingStatus.Redacted.AsString();
-                        item[IdShieldHelper.IdShieldReferenceColumn] = fileData.DestinationUrl + ", Redacted file";
-                        
-                        item.Update();
+
+                        ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35889", item.File,
+                            "IDS Status and reference file changed", () =>
+                        {
+                            item[IdShieldHelper.IdShieldStatusColumn] = ExtractProcessingStatus.Redacted.AsString();
+                            item[IdShieldHelper.IdShieldReferenceColumn] = fileData.DestinationUrl + ", Redacted file";
+
+                            item.Update();
+                        });
                     }
                     catch (Exception ex)
                     {

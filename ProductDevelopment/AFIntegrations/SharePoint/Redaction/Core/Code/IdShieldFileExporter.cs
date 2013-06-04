@@ -150,58 +150,76 @@ namespace Extract.SharePoint.Redaction
         /// <param name="siteId">The ID for the site to export files from.</param>
         void SearchAndExportFiles(Guid siteId)
         {
-            // Build the path to the working folder
-            var workingFolder = ExtractSharePointHelper.BuildLocalWorkingFolderPath(
-                        siteId, _localWorkingFolder);
-
-            // Create the query to get items ready to be queued
-            var query = ExtractSharePointHelper.BuildFileExportCamlQuery(
-                IdShieldHelper.IdShieldStatusColumn, _minutesToWait);
-
-            using (var site = new SPSite(siteId))
+            try
             {
-                // Loop through all document library collections
-                var web = site.RootWeb;
-                var listCollection = web.GetListsOfType(SPBaseType.DocumentLibrary);
-                foreach (SPList list in listCollection)
+                // Build the path to the working folder
+                var workingFolder = ExtractSharePointHelper.BuildLocalWorkingFolderPath(
+                            siteId, _localWorkingFolder);
+
+                // Create the query to get items ready to be queued
+                var query = ExtractSharePointHelper.BuildFileExportCamlQuery(
+                    IdShieldHelper.IdShieldStatusColumn, _minutesToWait);
+
+                using (var site = new SPSite(siteId))
                 {
-                    // Check if the library has the IDS status column
-                    var field = list.Fields.TryGetFieldByStaticName(IdShieldHelper.IdShieldStatusColumn);
-                    if (field != null)
+                    // Loop through all document library collections
+                    var web = site.RootWeb;
+                    var listCollection = web.GetListsOfType(SPBaseType.DocumentLibrary);
+                    foreach (SPList list in listCollection)
                     {
-                        // Build the output folder path
-                        var outputFolder = Path.Combine(workingFolder, list.ID.ToString());
-                        var items = list.GetItems(query);
-                        string queued = ExtractProcessingStatus.QueuedForProcessing.AsString();
-                        for (int i = items.Count - 1; i >= 0; --i)
+                        // Check if the library has the IDS status column
+                        var field = list.Fields.TryGetFieldByStaticName(IdShieldHelper.IdShieldStatusColumn);
+                        if (field != null)
                         {
-                            SPListItem item = items[i];
-                            if (item.FileSystemObjectType == SPFileSystemObjectType.File)
+                            // Build the output folder path
+                            var outputFolder = Path.Combine(workingFolder, list.ID.ToString());
+                            var items = list.GetItems(query);
+                            string queued = ExtractProcessingStatus.QueuedForProcessing.AsString();
+                            for (int i = items.Count - 1; i >= 0; --i)
                             {
-                                var exportFolder = _randomFolderLength > 0 ? Path.Combine(outputFolder,
-                                    ExtractSharePointHelper.BuildRandomAlphaNumericString(_randomFolderLength))
-                                    : outputFolder;
-
-                                // Create the directory if it does not exist
-                                if (!Directory.Exists(exportFolder))
+                                // Need to process all items even if some cause an exception
+                                try
                                 {
-                                    Directory.CreateDirectory(exportFolder);
+                                    SPListItem item = items[i];
+                                    if (item.FileSystemObjectType == SPFileSystemObjectType.File)
+                                    {
+                                        var exportFolder = _randomFolderLength > 0 ? Path.Combine(outputFolder,
+                                            ExtractSharePointHelper.BuildRandomAlphaNumericString(_randomFolderLength))
+                                            : outputFolder;
+
+                                        // Create the directory if it does not exist
+                                        if (!Directory.Exists(exportFolder))
+                                        {
+                                            Directory.CreateDirectory(exportFolder);
+                                        }
+
+                                        // Write the file to the processing folder
+                                        var file = item.File;
+                                        byte[] bytes = file.OpenBinary(SPOpenBinaryOptions.SkipVirusScan);
+                                        string outFileName = Path.Combine(exportFolder,
+                                            file.UniqueId.ToString() + Path.GetExtension(file.Name));
+                                        File.WriteAllBytes(outFileName, bytes);
+
+                                        ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35884", file, "IDS Status changed.", () =>
+                                        {
+                                            // Mark the item as queued
+                                            item[IdShieldHelper.IdShieldStatusColumn] = queued;
+                                            item.Update();
+                                        });
+                                    }
                                 }
-
-                                // Write the file to the processing folder
-                                var file = item.File;
-                                byte[] bytes = file.OpenBinary(SPOpenBinaryOptions.SkipVirusScan);
-                                string outFileName = Path.Combine(exportFolder,
-                                    file.UniqueId.ToString() + Path.GetExtension(file.Name));
-                                File.WriteAllBytes(outFileName, bytes);
-
-                                // Mark the item as queued
-                                item[IdShieldHelper.IdShieldStatusColumn] = queued;
-                                item.Update();
+                                catch (Exception fileEx)
+                                {
+                                    fileEx.LogExceptionWithHelperApp("ELI35895");
+                                }
                             }
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                ex.LogExceptionWithHelperApp("ELI35894");
             }
         }
 

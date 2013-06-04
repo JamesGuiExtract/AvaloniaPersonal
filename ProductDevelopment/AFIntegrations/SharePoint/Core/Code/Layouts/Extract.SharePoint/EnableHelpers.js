@@ -7,6 +7,9 @@
 var inProgress = false;
 var selectedListID;
 
+// variable to hold the Process Selected wait dialog
+var waitProcessSelected;
+
 // Returns true iff 1 item is selected
 function singleSelectEnabled()
 {
@@ -106,12 +109,22 @@ function processSelected(columnName) {
             var selectedItems = SP.ListOperation.Selection.getSelectedItems();
             selectedListID = SP.ListOperation.Selection.getSelectedList();
             for (var i = 0; i < selectedItems.length; i++) {
-                var listItem = web.get_lists().getById(selectedListID).getItemById(selectedItems[i].id);
-                listItem.set_item(columnName, "To Be Queued");
-                listItem.update();
-
+                try {
+                    var listItem = web.get_lists().getById(selectedListID).getItemById(selectedItems[i].id);
+                    var file = listItem.get_file();
+                    if (file != null) {
+                        file.checkOut();
+                        listItem.set_item(columnName, "To Be Queued");
+                        listItem.update();
+                        file.checkIn("IDS Status changed");
+                    }
+                }
+                catch (ef) {
+                    alert("Error:" + ef);
+                }
             }
             context.executeQueryAsync(Function.createDelegate(this, itemsQueued), Function.createDelegate(this, itemQueuingFailed));
+            waitProcessSelected = SP.UI.ModalDialog.showWaitScreenWithNoClose('Process Selected...', 'Please wait while files are set to be queued', 76, 330);
         }
         catch (e) {
             alert("Error:" + e);
@@ -123,6 +136,10 @@ function processSelected(columnName) {
 // Function that is called if items are queued sucessfully
 function itemsQueued(sender, args) {
     inProgress = false;
+    if (waitProcessSelected != null){
+        waitProcessSelected.close();
+        waitPrcoessSelected = null;
+    };
     window.location.href = window.location.href;
 }
 
@@ -130,6 +147,11 @@ function itemsQueued(sender, args) {
 function itemQueuingFailed() {
     alert("Queuing failed: " + args.get_message());
     inProgress = false;
+    if (waitProcessSelected != null){
+        waitProcessSelected.close();
+        waitPrcoessSelected = null;
+    };
+        
     window.location.href = window.location.href;
 }
 

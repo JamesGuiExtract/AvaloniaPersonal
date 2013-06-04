@@ -116,11 +116,14 @@ namespace Extract.SharePoint.Redaction
 
                     if (shouldBeSetToBeQueued(eventType, folder, pair.Key, fileName, item, pair.Value))
                     {
-                        // Set the field to ToBeQueued
-                        item[IdShieldHelper.IdShieldStatusColumn] =
-                            ExtractProcessingStatus.ToBeQueued.AsString();
+                         ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35883", item.File, "IDS Status changed.", () =>
+                         {
+                            // Set the field to ToBeQueued
+                            item[IdShieldHelper.IdShieldStatusColumn] =
+                                ExtractProcessingStatus.ToBeQueued.AsString();
 
-                        item.Update();
+                            item.Update();
+                         });
 
                         // File was set to ToBeQueuedLater, break from foreach loop
                         break;

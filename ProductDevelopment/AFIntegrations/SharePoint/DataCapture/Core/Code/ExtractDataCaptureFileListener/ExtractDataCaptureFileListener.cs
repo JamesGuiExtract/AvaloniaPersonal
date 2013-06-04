@@ -89,9 +89,12 @@ namespace Extract.SharePoint.DataCapture
                             && pair.Value.DoesFileMatchPattern(fileName)
                         )
                     {
-                        item[DataCaptureHelper.ExtractDataCaptureStatusColumn] =
-                            ExtractProcessingStatus.ToBeQueued.AsString();
-                        item.Update();
+                        ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35904", item.File, "Updated Data Capture status.", () =>
+                        {
+                            item[DataCaptureHelper.ExtractDataCaptureStatusColumn] =
+                                ExtractProcessingStatus.ToBeQueued.AsString();
+                            item.Update();
+                        });
 
                         // File was set to ToBeQueued, break from foreach loop
                         break;
