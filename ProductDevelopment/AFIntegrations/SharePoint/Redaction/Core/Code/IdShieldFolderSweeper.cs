@@ -542,6 +542,17 @@ namespace Extract.SharePoint.Redaction
                 {
                     try
                     {
+                        // Check if there is an existing file
+                        var existingFile = tempWeb.GetFile(fileData.DestinationUrl);
+                        if (existingFile.Exists)
+                        {
+                            // If the destination exists need and a checkout is required, check out the file
+                            if (existingFile.RequiresCheckout)
+                            {
+                                existingFile.CheckOut();
+                            }
+                        }
+
                         // Set the properties collection that will be set when the file is added
                         Hashtable properties = new Hashtable();
                         properties.Add(IdShieldHelper.IdShieldStatusColumn,
@@ -550,7 +561,12 @@ namespace Extract.SharePoint.Redaction
 
                         // Read the redacted file from the disk
                         byte[] bytes = File.ReadAllBytes(fileData.RedactedFile);
-                        spFiles.Add(fileData.DestinationUrl, bytes, properties, true);
+                        var newFile = spFiles.Add(fileData.DestinationUrl, bytes, properties, true);
+
+                        if (newFile.CheckOutType != SPFile.SPCheckOutType.None)
+                        {
+                            newFile.CheckIn("Redacted file added");
+                        }
 
                         // Get the list
                         SPList list = null;
@@ -559,7 +575,7 @@ namespace Extract.SharePoint.Redaction
                             list = tempWeb.Lists[fileData.OriginalListId];
                             lists[fileData.OriginalListId] = list;
                         }
-
+                        
                         // Update the original file column with the redacted file location
                         var item = list.GetItemByUniqueId(fileData.OriginalFileId);
 

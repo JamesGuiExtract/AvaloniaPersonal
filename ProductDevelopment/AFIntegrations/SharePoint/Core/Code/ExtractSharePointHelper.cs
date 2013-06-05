@@ -719,7 +719,7 @@ namespace Extract.SharePoint
 
                 // If the file does not require checkout or is already checked out by the current user 
                 // perform the action and return
-                if (!file.RequiresCheckout || (file.CheckedOutByUser != null && file.CheckedOutByUser.ToString() == currUser.ToString()))
+                if (!file.RequiresCheckout || IsCheckedOutByCurrentUser(file))
                 {
                     action();
                     return;
@@ -736,10 +736,15 @@ namespace Extract.SharePoint
                     // Check in the file
                     file.CheckIn(checkinComment);
                 }
-                finally
+                catch(Exception e)
                 {
-                    // Undo the checkout
-                    file.UndoCheckOut();
+                    // Check if document is checked out
+                    if (IsCheckedOutByCurrentUser(file))
+                    {
+                        // Undo the checkout
+                        file.UndoCheckOut();
+                    }
+                    throw e;
                 }
             }
             catch (Exception ex)
@@ -748,6 +753,16 @@ namespace Extract.SharePoint
             }
         }
 
+        /// <summary>
+        /// Check if the current user has the file checked out
+        /// </summary>
+        /// <param name="file">The file to be checked</param>
+        /// <returns><see langword="true" /> if checked out by current user. <see langword="false"/> otherwise</returns>
+        public static bool IsCheckedOutByCurrentUser(SPFile file)
+        {
+            var currUser = file.Web.CurrentUser;
+            return (file.CheckedOutByUser != null && file.CheckedOutByUser.ToString() == currUser.ToString());
+        }
         #endregion Methods
     }
 

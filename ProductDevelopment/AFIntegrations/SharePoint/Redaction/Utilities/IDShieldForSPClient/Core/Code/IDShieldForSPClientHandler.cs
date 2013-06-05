@@ -184,10 +184,18 @@ namespace Extract.SharePoint.Redaction.Utilities
                 fileCreation.Content = File.ReadAllBytes(fileName);
                 fileCreation.Url = siteUrl + destination;
                 fileCreation.Overwrite = true;
-
+                
                 var file = list.RootFolder.Files.Add(fileCreation);
                 context.Load(file);
                 context.ExecuteQuery();
+
+                // If the file is checked out check it in
+                if (file.CheckOutType != SP.CheckOutType.None)
+                {
+                    // The file will not be checked in if if there is required metadata
+                    file.CheckIn("", SP.CheckinType.MajorCheckIn);
+                    context.ExecuteQuery();
+                }
             }
         }
 
