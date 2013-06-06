@@ -52,7 +52,7 @@
 	<summary>
 		<codepage>1252</codepage>
 		<title>Installation Database</title>
-		<subject>ID Shield for Sharepoint Client</subject>
+		<subject>##ID_STRING5##</subject>
 		<author>##COMPANY_NAME##</author>
 		<keywords>Installer,MSI,Database</keywords>
 		<comments>Contact:  Your local administrator</comments>
@@ -2446,8 +2446,8 @@
 		<col key="yes" def="s72">Property</col>
 		<col def="L255">Value</col>
 		<row><td>Media</td><td>IncludeActionHelp</td><td>1</td></row>
-		<row><td>Media</td><td>ProductName</td><td>ID Shield Sharepoint Client</td></row>
-		<row><td>Media</td><td>SetupFileName</td><td>Install Extract IDShield Sharepoint Client</td></row>
+		<row><td>Media</td><td>ProductName</td><td>ID Shield SharePoint Client</td></row>
+		<row><td>Media</td><td>SetupFileName</td><td>Install Extract IDShield SharePoint Client</td></row>
 		<row><td>Media</td><td>Title</td><td>##ID_STRING2##</td></row>
 	</table>
 
@@ -3818,9 +3818,10 @@
 		<row><td>IDS__TargetReq_DESC_RAM</td><td>1033</td><td>The amount of RAM is not adequate for running [ProductName].</td><td>0</td><td/><td>-1264744032</td></row>
 		<row><td>IDS__TargetReq_DESC_RESOLUTION</td><td>1033</td><td>The screen resolution is not adequate for running [ProductName].</td><td>0</td><td/><td>-1264744032</td></row>
 		<row><td>ID_STRING1</td><td>1033</td><td>http://www.ExtractSystems.com</td><td>0</td><td/><td>1252099305</td></row>
-		<row><td>ID_STRING2</td><td>1033</td><td>ID Shield Sharepoint Client</td><td>0</td><td/><td>1252103819</td></row>
+		<row><td>ID_STRING2</td><td>1033</td><td>ID Shield SharePoint Client</td><td>0</td><td/><td>857837863</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>IDSHIE~1|ID Shield For Sharepoint</td><td>0</td><td/><td>1923185226</td></row>
 		<row><td>ID_STRING4</td><td>1033</td><td>IDSHIE~1|ID Shield For Sharepoint Client</td><td>0</td><td/><td>1923183210</td></row>
+		<row><td>ID_STRING5</td><td>1033</td><td>ID Shield for SharePoint Client</td><td>0</td><td/><td>857815335</td></row>
 		<row><td>IIDS_UITEXT_FeatureUninstalled</td><td>1033</td><td>This feature will remain uninstalled.</td><td>0</td><td/><td>-1264744032</td></row>
 	</table>
 
@@ -4417,7 +4418,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>ProductCode</td><td>{6BF486D7-B930-4B82-A0A0-D8450F5C7BAB}</td><td/></row>
 		<row><td>ProductID</td><td>none</td><td/></row>
 		<row><td>ProductLanguage</td><td>1033</td><td/></row>
-		<row><td>ProductName</td><td>ID Shield for Sharepoint Client</td><td/></row>
+		<row><td>ProductName</td><td>ID Shield for SharePoint Client</td><td/></row>
 		<row><td>ProductVersion</td><td>1.00.0000</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
