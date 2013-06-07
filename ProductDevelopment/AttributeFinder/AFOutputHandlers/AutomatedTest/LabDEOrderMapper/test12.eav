@@ -1,0 +1,9 @@
+Test|N/A
+.Name|TXP EXTERNAL LAB RESULTS
+.Component|WBC
+..OfficialName|WBC (OUTSIDE)
+.Component|WBC, URINE
+..OfficialName|URINE WBCS (OUTSIDE)
+.Component|GLUCOSE BLOOD
+..OfficialName|GLUCOSE (OUTSIDE)
+.EpicCode|TXPEXTLAB
