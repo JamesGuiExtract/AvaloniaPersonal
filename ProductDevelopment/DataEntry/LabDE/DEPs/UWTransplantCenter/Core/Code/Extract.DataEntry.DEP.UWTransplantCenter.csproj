@@ -147,6 +147,7 @@
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>CALL CommonDebugPostBuild.bat "$(TargetPath)"
+COPY "$(TargetPath)" "$(TargetDir)\..\..\Rules\LabDE\UW Transplant\Solution\Bin\$(TargetFileName)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
