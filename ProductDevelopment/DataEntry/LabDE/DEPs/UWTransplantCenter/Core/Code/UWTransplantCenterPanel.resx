@@ -304,9 +304,11 @@
   <data name="_componentFlag.ValidationQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
 	&lt;RegEx Name='Flag' Pattern='^A$'&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt;
-	&lt;!--Allow for value of #, #-#, &gt;#, &lt;#, &gt;=#, &lt;=#, &gt;/=#, &lt;=#--&gt;
+	&lt;!--Allow for value of #, #-#, &gt;#, &lt;#, &gt;=#, &lt;=#, &gt;/=#, &lt;=#, POS, NEG--&gt;
 	&lt;Expression Name='RawValue'&gt;
-		&lt;RegEx Pattern='[\s&amp;gt;&amp;lt;/=]{0,3}[\d\.]+'&gt;&lt;Attribute &gt;../Value&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
+		(&lt;Attribute&gt;../Value&lt;/Attribute&gt; like 'POS') ? '&amp;gt;=0'
+		: (&lt;Attribute&gt;../Value&lt;/Attribute&gt; like 'NEG') ? '-1'
+		: &lt;RegEx Pattern='[\s&amp;gt;&amp;lt;/=]{0,3}-?[\d\.]+'&gt;&lt;Attribute&gt;../Value&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
 	&lt;/Expression&gt;
 	&lt;!--ValueOperator is non-empty if the value is expressed in terms of a range. Example &gt;30--&gt;
 	&lt;Expression Name='ValueOperator'&gt;
@@ -317,9 +319,13 @@
 			: ''
 	&lt;/Expression&gt;
 	&lt;!--After extracting the ValueOperator, convert the value into a single number--&gt;
-	&lt;Expression Name='Value'&gt;&lt;RawValue/&gt;.Replace('&amp;gt;', '').Replace('&amp;lt;', '').Replace(' ', '')&lt;/Expression&gt;
-	&lt;Attribute Name='Range'&gt;../Range&lt;/Attribute&gt;
-	&lt;!--Allow for range of #, #-#, &gt;#, &lt;#, &gt;=#, &lt;=#, &gt;/=#, &lt;=#--&gt;
+	&lt;Expression Name='Value'&gt;&lt;RawValue/&gt;.Replace('&amp;gt;', '').Replace('&amp;lt;', '').Replace('=', '').Replace(' ', '')&lt;/Expression&gt;
+	&lt;Expression Name='Range'&gt;
+		(&lt;Attribute&gt;../Range&lt;/Attribute&gt; like 'POS') ? '&amp;gt;=0'
+		: (&lt;Attribute&gt;../Range&lt;/Attribute&gt; like 'NEG') ? '&amp;lt;0'
+		: &lt;Attribute&gt;../Range&lt;/Attribute&gt;
+	&lt;/Expression&gt;
+	&lt;!--Allow for range of #, #-#, &gt;#, &lt;#, &gt;=#, &lt;=#, &gt;/=#, &lt;=#, POS, NEG--&gt;
 	&lt;Expression Name='MinValueOrEqual' &gt;
 		(&lt;ValueOperator/&gt; == '&amp;gt;')
 			&lt;!--If the value is a "greater than" range, allow the number to be greater then or equal to the min value.--&gt;
@@ -332,6 +338,9 @@
 			? &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
 			: ''
 	&lt;/Expression&gt;
+	&lt;Expression Name='HasMinValue'&gt;
+		!string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) or !string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;)
+	&lt;/Expression&gt;
 	&lt;Expression Name='MaxValueOrEqual' &gt;
 		(&lt;ValueOperator/&gt; == '&amp;lt;')
 			? &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;(\s?/?=)?\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
@@ -342,10 +351,13 @@
 			? &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
 			: ''
 	&lt;/Expression&gt;
+	&lt;Expression Name='HasMaxValue'&gt;
+		!string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) or !string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;)
+	&lt;/Expression&gt;
 	&lt;Expression Name='InRangeLow'&gt;
 		&lt;!--If we don't have a value and a range minimum to compare consider low range boundary validated--&gt;
 		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
-		(string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;)) or
+		(!&lt;HasMinValue Type='bool'/&gt;) or
 		&lt;!--Compare using &gt;= check if appropriate--&gt;
 		(string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) == false and
 			(&lt;Value Type='double'/&gt; &amp;gt;= &lt;MinValueOrEqual Type='double'/&gt;)) or
@@ -356,7 +368,7 @@
 	&lt;Expression Name='InRangeHigh'&gt;
 		&lt;!--If we don't have a value and a range maximum to compare consider high range boundary validated--&gt;
 		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
-		(string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;)) or
+		(!&lt;HasMaxValue Type='bool'/&gt;) or
 		&lt;!--Compare using &gt;= check if appropriate--&gt;
 		(string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) == false and
 			(&lt;Value Type='double'/&gt; &amp;lt;= &lt;MaxValueOrEqual Type='double'/&gt;)) or
@@ -368,6 +380,8 @@
 &lt;Query&gt;[BLANK]&lt;SQL&gt;SELECT * FROM Flag ORDER BY Flag&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query ValidValue='True' ValidationListType='ValidationListOnly' ValidationWarning='1'&gt;
 	&lt;Expression&gt;
+		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or
+		(!&lt;HasMinValue Type='bool'/&gt; and !&lt;HasMaxValue Type='bool'/&gt;) or
 		string.IsNullOrWhitespace(&lt;Flag/&gt;) == (&lt;InRangeHigh/&gt; and &lt;InRangeLow/&gt;)
 	&lt;/Expression&gt;
 &lt;/Query&gt;</value>
