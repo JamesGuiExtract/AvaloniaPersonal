@@ -139,6 +139,7 @@ namespace Extract.LabResultsCustomComponents
             try
             {
                 List<LabTest> result = new List<LabTest>();
+                List<LabTest> bestResult = null;
 
                 // Loop through each node in possibleMappings until one has at least two possible
                 // mappings.
@@ -156,6 +157,7 @@ namespace Extract.LabResultsCustomComponents
                         result.Add(candidateTest);
 
                         // Don't allow this test name to be mapped for any subsequent node.
+                        // Mark this test code as mapped so that it is not returned in any future call.
                         possibleMappings.MarkTestNameAsMapped(candidateTest.Name);
                     }
                     else if (checkingMandatory && isMandatory)
@@ -191,19 +193,21 @@ namespace Extract.LabResultsCustomComponents
                     // mapping.
                     if (subResult != null)
                     {
+                        // Combine the sub result with the result already compiled up to this point.
                         subResult.Add(candidateTest);
+                        subResult.AddRange(result);
 
-                        // If checking for mandatory, we don't need the best mapping, we just
-                        // need one; we can return right away.
-                        if (checkingMandatory)
+                        // Update the best result if this result has more mappings than the last.
+                        if (bestResult == null || subResult.Count > bestResult.Count)
                         {
-                            return subResult;
-                        }
-                        // Otherwise, update the best result if this result has more mappings than
-                        // the last.
-                        else if (result == null || subResult.Count > result.Count)
-                        {
-                            result = subResult;
+                            bestResult = subResult;
+
+                            // If checking for mandatory, we don't need the best mapping, we just
+                            // need one; we can return right away.
+                            if (checkingMandatory)
+                            {
+                                return bestResult;
+                            }
                         }
                     }
 
@@ -224,7 +228,7 @@ namespace Extract.LabResultsCustomComponents
                 }
 
                 // Otherwise we will have found the best mapping; return it.
-                return result;
+                return bestResult ?? result;
             }
             catch (Exception ex)
             {

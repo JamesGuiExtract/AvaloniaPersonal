@@ -29,3 +29,6 @@
 // Test cases 10 & 11 test the case that test names can potentially be mapped to more than one test code.
 <TESTCASE>;Test10.rsd;Empty.txt;;test10.eav
 <TESTCASE>;Test11.rsd;Empty.txt;;test11.eav
+
+// [DataEntry:1258]
+// Test cases 12 & 13 test additional cases that test names can potentially be mapped to more than one test code.
