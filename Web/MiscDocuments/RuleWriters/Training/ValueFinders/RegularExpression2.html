@@ -6,15 +6,83 @@
 <BODY>
 <h1>Regular Expression Value Finder - Part 2</h1>
 <hr>
-	<h3>Uses</h3>
+	<h3>Fuzzy Regular Expressions</h3>
 	<ul>
-		<li>TBD.</li>
+		<li>Fuzzy regular expressions let you to match phrases while allowing a specified number of errors.</li>
+        <li>They are most often used to compensate for bad OCR.</li>
 	</ul>
-
-<hr>
 	<h3>Usage</h3>
 	<ul>
-		<li>TBD.</li>
+        <li>To catch a phrase that has one error, use the syntax <b>(?~&lt&gtLITERAL_EXPRESSION)</b>.
+            <ul>
+                <li>For example, <i>(?~&lt&gtHOUSE)</i> will match <i>HOUSE</i>, <i>HAUSE</i>, <i>HOOSE</i>, etc.</li>
+            </ul>
+        </li>
+        <li>To catch a phrase that has multiple errors, set the <b>error</b> setting to the number of errors you wish to allow.
+            <ul>
+                <li>For example <i>(?~&lterror=2&gtUNICORN)</i> will match <i>UNICORN</i>, <i>ONICORN</i>, <i>OHICORN</i>, <i>UN1COFN</i>, etc. </li>
+            </ul>
+        </li>
+        <li>You can use the <b>xtra_ws</b> setting to allow extra spaces in the found phrase.  To do this, simply set it to the number of extra whitespace characters that you wish to allow.
+            <ul>
+                <li>For example, <i>(?~&lterror=1,xtra_ws=2&gtAPPLE)</i> will match <i>APPLE</i>, <i>ABPLE</i>, <i>AB PLE</i>, <i>AP P IE</i>, etc. </li>
+            </ul>
+        </li>
+        <li>By default, the spatial information found by fuzzy regular expression sometimes does not exactly line up with the location of found words on the page.  For rules objects where spatial information is important, such as <i>Locate Image Region</i> objects, you should set the <b>method</b> setting to <b>better_fit</b>.
+            <ul>
+                <li>For example, using <i>(?~&lterror=3,method=better_fit&gtSocial\x20Security\x20Number)</i> as a clue in your Image Region will ensure that the created region is where you expect it to be. </li>
+            </ul>
+        </li>
+        <li>Inside of fuzzy regular expressions, you are only allowed to use literals, character classes, and fixed ranges.
+            <ul>
+                <p>
+                    <li>Allowed:
+                        <p>
+                            <ul>
+                                <li>(?~&lterror=2&gtMayor\x20Dave)</li>
+                                <li>(?~&lterror=2&gtB[AEIOU]B)</li>
+                                <li>(?~&lterror=5&gtArrive\x20in\d{2}\x20days)</li>
+                            </ul>
+                        </p>
+                    </li>
+                </p>
+                <p>
+                    <li><b>NOT</b> allowed:
+                        <p>
+                            <ul>
+                                <li>(?~&lt&gtGO*AL)</li>
+                                <li>(?~&lterror=2&gtH(is|er))</li>
+                                <li>(?~&lterror=5&gtArrive\x20in\d{1,2}\x20days)</li>
+                            </ul>
+                        </p>
+                    </li>
+                </p>
+            </ul>
+        </li>
+        <li>Combining fuzzy regular expressions with other expressions can sometimes result in extremely long processing times.  To be safe, if you are using a fuzzy regular expression in combination with another expression, put the fuzzy regular expression in a greedy group.
+            <ul>
+                <p>
+                    <li>Dangerous:
+                        <ul>
+                            <p>
+                                <li>Today.{0,12}(?~&lterror=2&gtTimetable)</li>
+                                <li>(?~&lterror=2&gtSocial\x20Security\x20Number)[\s\S]{0,25}(?~&lterror=2&gtDate\x20of\x20Birth)</li>
+                            </p>
+                        </ul>
+                    </li>
+                </p>
+                <p>
+                <li>Safe:
+                    <ul>
+                        <p>
+                            <li>Today.{0,12}(?&gt(?~&lterror=2&gtTimetable))</li>
+                            <li>(?&gt(?~&lterror=2&gtSocial\x20Security\x20Number))[\s\S]{0,25}(?&gt(?~&lterror=2&gtDate\x20of\x20Birth))</li>
+                        </p>
+                    </ul>
+                </li>
+                </p>
+            </ul>
+        </li>
 	</ul>
 
 <hr>
