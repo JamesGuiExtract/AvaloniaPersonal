@@ -41,6 +41,9 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
             Extract.DataEntry.HighlightColor highlightColor1 = new Extract.DataEntry.HighlightColor();
             Extract.DataEntry.HighlightColor highlightColor2 = new Extract.DataEntry.HighlightColor();
             this._labNameLabel = new System.Windows.Forms.Label();
@@ -100,6 +103,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._componentRefRange = new Extract.DataEntry.DataEntryTableColumn();
             this._componentFlag = new Extract.DataEntry.DataEntryTableColumn();
             this._componentOriginalName = new Extract.DataEntry.DataEntryTableColumn();
+            this._filename = new Extract.DataEntry.DataEntryTextBox();
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).BeginInit();
             this._patientInfoGroupBox.SuspendLayout();
@@ -443,6 +447,14 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._epicPatientNameTable.Name = "_epicPatientNameTable";
             this._epicPatientNameTable.ParentDataEntryControl = this._patientInfoGroupBox;
             this._epicPatientNameTable.RowFormattingRuleFile = "Rules\\Swiping\\name.rsd.etf";
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._epicPatientNameTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
             this._epicPatientNameTable.RowSwipingEnabled = true;
             this._epicPatientNameTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this._epicPatientNameTable.Size = new System.Drawing.Size(567, 46);
@@ -496,14 +508,14 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._patientNameTable.AttributeName = "Name";
             this._patientNameTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._patientNameTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientNameTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._patientNameTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
             this._patientNameTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._patientNameTable.ColumnHintsEnabled = false;
             this._patientNameTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -511,19 +523,27 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._patientMiddleNameColumn,
             this._patientLastNameColumn,
             this._patientSuffixColumn});
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this._patientNameTable.DefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._patientNameTable.DefaultCellStyle = dataGridViewCellStyle11;
             this._patientNameTable.Location = new System.Drawing.Point(7, 34);
             this._patientNameTable.MinimumNumberOfRows = 1;
             this._patientNameTable.Name = "_patientNameTable";
             this._patientNameTable.ParentDataEntryControl = this._patientInfoGroupBox;
             this._patientNameTable.RowFormattingRuleFile = "Rules\\Swiping\\name.rsd.etf";
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle12.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._patientNameTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle12;
             this._patientNameTable.RowSwipingEnabled = true;
             this._patientNameTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this._patientNameTable.Size = new System.Drawing.Size(567, 46);
@@ -659,14 +679,14 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._orderingPhysicianTable.AttributeName = "OrderingPhysicianName";
             this._orderingPhysicianTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._orderingPhysicianTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
-            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderingPhysicianTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle13.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._orderingPhysicianTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle13;
             this._orderingPhysicianTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._orderingPhysicianTable.ColumnHintsEnabled = false;
             this._orderingPhysicianTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -675,19 +695,27 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._orderingPhysicianMiddleName,
             this._orderingPhysicianCodeColumn});
             this._orderingPhysicianTable.CompatibleAttributeNames.Add("OtherPhysicianName");
-            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle12.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this._orderingPhysicianTable.DefaultCellStyle = dataGridViewCellStyle12;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle14.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle14.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._orderingPhysicianTable.DefaultCellStyle = dataGridViewCellStyle14;
             this._orderingPhysicianTable.Location = new System.Drawing.Point(6, 19);
             this._orderingPhysicianTable.MinimumNumberOfRows = 1;
             this._orderingPhysicianTable.Name = "_orderingPhysicianTable";
             this._orderingPhysicianTable.ParentDataEntryControl = this._physicianInfoGroupBox;
             this._orderingPhysicianTable.RowFormattingRuleFile = "Rules\\Swiping\\name.rsd.etf";
+            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle15.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._orderingPhysicianTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle15;
             this._orderingPhysicianTable.RowSwipingEnabled = true;
             this._orderingPhysicianTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this._orderingPhysicianTable.Size = new System.Drawing.Size(581, 45);
@@ -885,7 +913,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._messageSequenceNumberFile.AutoUpdateQuery = "<Query><SolutionDirectory/>\\MessageSequenceNumber.txt</Query>";
             this._messageSequenceNumberFile.Location = new System.Drawing.Point(208, 0);
             this._messageSequenceNumberFile.Name = "_messageSequenceNumberFile";
-            this._messageSequenceNumberFile.Size = new System.Drawing.Size(100, 20);
+            this._messageSequenceNumberFile.Size = new System.Drawing.Size(12, 20);
             this._messageSequenceNumberFile.TabIndex = 0;
             this._messageSequenceNumberFile.ValidationErrorMessage = "Invalid value";
             this._messageSequenceNumberFile.Visible = false;
@@ -970,11 +998,31 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._componentOriginalName.ValidationQuery = "";
             this._componentOriginalName.Visible = false;
             // 
+            // _filename
+            // 
+            this._filename.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._filename.AttributeName = "Filename";
+            this._filename.AutoUpdateQuery = "<SourceDocName/>";
+            this._filename.BackColor = System.Drawing.SystemColors.Control;
+            this._filename.ForeColor = System.Drawing.Color.Black;
+            this._filename.Location = new System.Drawing.Point(226, 0);
+            this._filename.Name = "_filename";
+            this._filename.ReadOnly = true;
+            this._filename.Size = new System.Drawing.Size(14, 20);
+            this._filename.SupportsSwiping = false;
+            this._filename.TabIndex = 3;
+            this._filename.TabStop = false;
+            this._filename.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this._filename.ValidationErrorMessage = "";
+            this._filename.Visible = false;
+            // 
             // UWTransplantCenterPanel
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.CommentControl = this._operatorComments;
+            this.Controls.Add(this._filename);
             this.Controls.Add(this._messageSequenceNumberFile);
             this.Controls.Add(this._operatorCommentLabel);
             this.Controls.Add(this._resultStatusLabel);
@@ -1069,5 +1117,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         private DataEntryTableColumn _componentRefRange;
         private DataEntryTableColumn _componentFlag;
         private DataEntryTableColumn _componentOriginalName;
+        private DataEntryTextBox _filename;
     }
 }
