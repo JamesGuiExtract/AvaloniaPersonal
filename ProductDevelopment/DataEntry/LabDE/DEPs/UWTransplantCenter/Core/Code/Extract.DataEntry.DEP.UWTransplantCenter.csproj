@@ -148,6 +148,6 @@
   </ProjectExtensions>
   <PropertyGroup>
     <PostBuildEvent>CALL CommonDebugPostBuild.bat "$(TargetPath)"
-COPY "$(TargetPath)" "$(TargetDir)\..\..\Rules\LabDE\UW Transplant\Solution\Bin\$(TargetFileName)"</PostBuildEvent>
+IF EXIST "$(TargetDir)..\..\Rules\LabDE\UW Transplant\Solution\Bin\" COPY "$(TargetPath)" "$(TargetDir)..\..\Rules\LabDE\UW Transplant\Solution\Bin\$(TargetFileName)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
