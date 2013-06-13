@@ -16,6 +16,11 @@ namespace Extract.Utilities
         /// </summary>
         static readonly string _SOURCE_DOC_NAME_TAG = "<SourceDocName>";
 
+        /// <summary>
+        /// Constant string for the common components directory tag.
+        /// </summary>
+        static readonly string _COMMON_COMPONENTS_DIRECTORY_TAG = "<CommonComponentsDir>";
+
         #endregion Constants
 
         #region SourceDocumentPathTags Constructors
@@ -47,8 +52,9 @@ namespace Extract.Utilities
         /// <returns>The path tags mapped to their expanded form.</returns>
         static Dictionary<string, string> GetTagsToValues(string sourceDocument)
         {
-            Dictionary<string, string> tagsToValues = new Dictionary<string, string>(1);
+            Dictionary<string, string> tagsToValues = new Dictionary<string, string>(2);
             tagsToValues.Add(_SOURCE_DOC_NAME_TAG, sourceDocument);
+            tagsToValues.Add(_COMMON_COMPONENTS_DIRECTORY_TAG, FileSystemMethods.CommonComponentsPath);
             return tagsToValues;
         }
 

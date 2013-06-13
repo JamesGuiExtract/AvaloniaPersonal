@@ -150,9 +150,10 @@ namespace Extract.SQLCDBEditor.Plugins
         {
             get
             {
-                return "SELECT [TestCode], [Name], COUNT(*) AS Count " +
+                return "SELECT [LabTest].[TestCode], [OfficialName] AS [Official Name], [Name] AS [Candidate AKA], COUNT(*) AS Count " +
                             "FROM [CandidateAlternateTestName] " +
-                            "GROUP BY [TestCode], [Name] " +
+                            "INNER JOIN [LabTest] ON [CandidateAlternateTestName].[TestCode] = [LabTest].[TestCode] " +
+                            "GROUP BY [LabTest].[TestCode], [OfficialName], [Name] " +
                             "HAVING MAX(CAST([Ignore] AS INT)) = 0";
             }
         }
@@ -272,7 +273,7 @@ namespace Extract.SQLCDBEditor.Plugins
                 if (_selectedRow != null)
                 {
                     string testCode = (string)_selectedRow.ItemArray[0];
-                    string name = (string)_selectedRow.ItemArray[1];
+                    string name = (string)_selectedRow.ItemArray[2];
 
                     if (MessageBox.Show("Are you sure you wish to add \"" + name +
                         "\" as an AKA for \"" + testCode + "\"?", "Add AKA?",
@@ -321,7 +322,7 @@ namespace Extract.SQLCDBEditor.Plugins
                 if (_selectedRow != null)
                 {
                     string testCode = (string)_selectedRow.ItemArray[0];
-                    string name = (string)_selectedRow.ItemArray[1];
+                    string name = (string)_selectedRow.ItemArray[2];
 
                     if (MessageBox.Show("Are you sure you wish to ingore \"" + name +
                         "\" as an AKA for \"" + testCode + "\"? If ignored this name will not " +
@@ -402,7 +403,7 @@ namespace Extract.SQLCDBEditor.Plugins
                 {
                     // Query for allow rows in CandidateAlternateTestName for this candidate AKA.
                     string testCode = (string)_selectedRow.ItemArray[0];
-                    string name = (string)_selectedRow.ItemArray[1];
+                    string name = (string)_selectedRow.ItemArray[2];
 
                     Dictionary<string, string> parameters = new Dictionary<string, string>();
                     parameters.Add("@TestCode", testCode);

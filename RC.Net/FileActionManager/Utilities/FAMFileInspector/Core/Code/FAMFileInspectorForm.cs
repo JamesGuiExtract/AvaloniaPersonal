@@ -909,6 +909,16 @@ namespace Extract.FileActionManager.Utilities
                 // but still have a tab available to re-open them, cancel the close and collapse the
                 // pane instead.
                 e.Cancel = true;
+
+                // [DotNetRCAndUtils:1059]
+                // If the control is currently floating, re-dock it before collapsing it, otherwise
+                // the floating window will still be visible (but with a blank interior) and may
+                // generate an unhandled exception when clicked.
+                if (e.DockControl.DockSituation == DockSituation.Floating)
+                {
+                    e.DockControl.OpenDocked();
+                }
+                
                 e.DockControl.Collapsed = true;
             }
             catch (Exception ex)

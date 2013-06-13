@@ -220,6 +220,7 @@ namespace Extract.FileActionManager.Utilities
                 FileMatchesSearch = false;
                 ShowTextResults = null;
                 TextMatches = null;
+                DataMatches = null;
             }
             catch (Exception ex)
             {
