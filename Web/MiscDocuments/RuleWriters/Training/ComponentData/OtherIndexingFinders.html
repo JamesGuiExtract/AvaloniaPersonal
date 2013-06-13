@@ -1,0 +1,42 @@
+<HTML>
+    <HEAD>
+        <TITLE>Other Indexing Finders</TITLE>
+        <link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+    </HEAD>
+    <BODY>
+        <h1>Other Indexing Finders</h1>
+        <hr>
+        <h3>Return Address Finder</h3>
+        <ul>
+            <li>The Return Address Finder finds, trims, and splits the return addresses on land record documents.  The return address is the address that the document should be returned to after recording.</li>
+            <li>To use the Return Address Finder, create a Find From RSD File value finder, and configure it to call the <b>it</b> attribute from <b>&ltComponentDataDir&gt\Indexing\AddressFinders\ReturnAddressFinder.rsd.etf.</b></li>
+        </ul>
+        <hr>
+        <h3>Property Address Finder</h3>
+        <ul>
+            <li>The Property Address Finder finds, trims, and splits the address of the property on land record documents.</li>
+            <li>To use the Return Address Finder, create a Find From RSD File value finder, and configure it to call the <b>it</b> attribute from <b>&ltComponentDataDir&gt\Indexing\AddressFinders\PropertyAddressFinder.rsd.etf.</b></li>
+        </ul>
+        <hr>
+        <h3>Cross Reference Finder</h3>
+        <ul>
+            <li>The Cross Reference Finder finds reference to other documents on land records and then splits them into Book and Page and/or Instrument number.</li>
+            <li>To use the Cross Reference Finder, create a Find From RSD File value finder, and configure it to call the <b>CrossReference</b> attribute from <b>&ltComponentDataDir&gt\Indexing\CrossReference\CrossReference.rsd.etf.</b></li>
+        </ul>
+        <hr>
+        <h3>Legal Description Finder</h3>
+        <ul>
+            <li>The Legal Description Finder finds legal descriptions on land record documents. Legal descriptions are formal descriptions of the location of a piece of property.</li>
+            <li>By default, the legal description finder does not split the legal description.  As such, it is almost always used in conjunction with the Legal Description Splitter.</li>
+            <li>To use the Legal Description Finder, create a Find From RSD File value finder, and configure it to call the <b>LegalDescription</b> attribute from <b>&ltComponentDataDir&gt\Indexing\LegalFinder\main.rsd.etf.</b></li>
+        </ul>
+        <hr>
+        <h3>Parcel Number Finder</h3>
+        <ul>
+            <li>The Parcel Number finder finds and trims the assessor parcel number of the property on land records.</li>
+            <li>If there are multiple parcel numbers on a document, each parcel number will be returned as a separate attribute.</li>
+            <li>To use the Parcel Number Finder, create a Find From RSD File value finder, and configure it to call the <b>ParcelIDNumber</b> attribute from <b>&ltComponentDataDir&gt\Indexing\ParcelIDNumber\ParcelIDNumber.rsd.etf.</b></li>
+        </ul>
+        <hr>
+    </BODY>
+</HTML>
