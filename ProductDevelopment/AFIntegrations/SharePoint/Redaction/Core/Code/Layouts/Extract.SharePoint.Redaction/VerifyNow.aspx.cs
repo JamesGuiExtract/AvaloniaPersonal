@@ -60,12 +60,6 @@ namespace Extract.SharePoint.Redaction.Layouts
                     throw new SPException("Unable to parse IP address: " + ipa.ToString());
                 }
 
-                if (!IsFileFolderBeingWatched(siteId, fileId))
-                {
-                    Exception folderWatchedEx = new Exception("The folder is not being watched.");
-                    throw folderWatchedEx;
-                }
-
                 if (!IsFileQueuedForVerify(siteId, fileId))
                 {
                     Exception notQueuedForVerify = new Exception("File must be Queued for Verification");
@@ -130,64 +124,6 @@ namespace Extract.SharePoint.Redaction.Layouts
             {
                 IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldRedactNowHelper, "ELI35868");
             }
-        }
-
-
-        /// <summary>
-        /// Checks if the folder for the file represented by <see paramref="fileID"/> is being watched
-        /// </summary>
-        /// <param name="siteID">String representation of the SiteID</param>
-        /// <param name="fileID">String representation of the file ID</param>
-        /// <returns><see langword="true"/> if the folder the file is in is being watched
-        /// <see langword="false"/> if the folder is not being watched</returns>
-        bool IsFileFolderBeingWatched(string siteID, string fileID)
-        {
-            return !(getFolderSettings(siteID, fileID) == null);
-        }
-
-        /// <summary>
-        /// Gets the folder settings for the site given by <see paramref="siteID"/> and the folder the
-        /// file given by <see paramref="fileID"/>
-        /// </summary>
-        /// <param name="siteID">String representation of the SiteID</param>
-        /// <param name="fileID">String representation of the file ID</param>
-        /// <returns>The folder settings for the files folder.</returns>
-        IdShieldFolderProcessingSettings getFolderSettings(string siteID, string fileID)
-        {
-            Guid siteGUID = new Guid(siteID);
-
-            SiteFolderSettingsCollection folderSettings = IdShieldHelper.GetIdShieldFolderSettings(siteGUID);
-
-            SPFile file = Web.GetFile(new Guid(fileID));
-
-            string folder = file.Item.Url;
-            string fileName = file.Name;
-            folder = (folder[0] != '/' ? folder.Insert(0, "/") : folder).Replace("/" + fileName, "");
-
-            foreach (KeyValuePair<string, IdShieldFolderProcessingSettings> pair in folderSettings)
-            {
-                if (IsFolderBeingWatched(folder, pair.Key, pair.Value.RecurseSubfolders))
-                {
-                    // Since folder is being watched we can assume the output has been set
-                    return pair.Value;
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Checks whether the specified folder is being watched based on the 
-        /// specified watch path and recursion settings.
-        /// </summary>
-        /// <param name="folder">The folder to check.</param>
-        /// <param name="watchPath">The root watch path to compare.</param>
-        /// <param name="recurseSubFolders">Whether sub folders are recursively watched.</param>
-        /// <returns><see langword="true"/> if the folder is being watched and
-        /// <see langword="false"/> otherwise.</returns>
-        static bool IsFolderBeingWatched(string folder, string watchPath, bool recurseSubFolders)
-        {
-            return folder.Equals(watchPath, StringComparison.Ordinal)
-                || (recurseSubFolders && folder.StartsWith(watchPath + "/", StringComparison.Ordinal));
         }
 
         /// <summary>
