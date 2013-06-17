@@ -1808,17 +1808,17 @@
 		<col def="S255">ISComments</col>
 		<col def="S255">ISFeatureCabName</col>
 		<col def="S255">ISProFeatureName</col>
-		<row><td>ID_Shield_for_Sharepoint_Client</td><td/><td>##IDS_FEATURE_DISPLAY_NAME2##</td><td/><td>2</td><td>1</td><td>INSTALLDIR</td><td>0</td><td/><td/><td/><td/></row>
+		<row><td>ID_Shield_for_SharePoint_Client</td><td/><td>##IDS_FEATURE_DISPLAY_NAME2##</td><td/><td>2</td><td>1</td><td>INSTALLDIR</td><td>0</td><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
-		<row><td>ID_Shield_for_Sharepoint_Client</td><td>Extract.ExtensionMethods.dll</td></row>
-		<row><td>ID_Shield_for_Sharepoint_Client</td><td>Extract.SharePoint.Redaction.Utilities.dll</td></row>
-		<row><td>ID_Shield_for_Sharepoint_Client</td><td>Extract.SharePoint.Redaction.dll</td></row>
-		<row><td>ID_Shield_for_Sharepoint_Client</td><td>IDShieldForSPClient.exe</td></row>
-		<row><td>ID_Shield_for_Sharepoint_Client</td><td>RemoveExtractSPColumns.exe</td></row>
+		<row><td>ID_Shield_for_SharePoint_Client</td><td>Extract.ExtensionMethods.dll</td></row>
+		<row><td>ID_Shield_for_SharePoint_Client</td><td>Extract.SharePoint.Redaction.Utilities.dll</td></row>
+		<row><td>ID_Shield_for_SharePoint_Client</td><td>Extract.SharePoint.Redaction.dll</td></row>
+		<row><td>ID_Shield_for_SharePoint_Client</td><td>IDShieldForSPClient.exe</td></row>
+		<row><td>ID_Shield_for_SharePoint_Client</td><td>RemoveExtractSPColumns.exe</td></row>
 	</table>
 
 	<table name="File">
@@ -2705,8 +2705,8 @@
 		<col def="I2">Order</col>
 		<col def="I2">ISSetupLocation</col>
 		<col def="S255">ISReleaseFlags</col>
-		<row><td>_B716E27B_B870_470F_A929_B646D17BC489_</td><td>&lt;ISProductFolder&gt;\SetupPrerequisites\Microsoft Sharepoint 2010 Client Redist 32 bit.prq</td><td/><td/><td/></row>
-		<row><td>_F3F576F8_8A78_4FBE_8E49_748DCECF46EA_</td><td>&lt;ISProductFolder&gt;\SetupPrerequisites\Microsoft Sharepoint 2010 Client Redist (x64).prq</td><td/><td/><td/></row>
+		<row><td>_0AA9884A_6388_4811_8314_77615F062AB3_</td><td>&lt;ISProductFolder&gt;\SetupPrerequisites\Microsoft SharePoint 2010 Client Redist (x64).prq</td><td/><td/><td/></row>
+		<row><td>_B803CED0_DD94_4DE1_83E9_3F9AE8CDC9BB_</td><td>&lt;ISProductFolder&gt;\SetupPrerequisites\Microsoft SharePoint 2010 Client Redist 32 bit.prq</td><td/><td/><td/></row>
 	</table>
 
 	<table name="ISStorages">
@@ -3487,7 +3487,7 @@
 		<row><td>IDS_ERROR_97</td><td>1033</td><td>Could not register font [2].  Verify that you have sufficient permissions to install fonts, and that the system supports this font.</td><td>0</td><td/><td>-1264744032</td></row>
 		<row><td>IDS_ERROR_98</td><td>1033</td><td>Could not unregister font [2]. Verify that you have sufficient permissions to remove fonts.</td><td>0</td><td/><td>-1264744032</td></row>
 		<row><td>IDS_ERROR_99</td><td>1033</td><td>Could not create shortcut [2]. Verify that the destination folder exists and that you can access it.</td><td>0</td><td/><td>-1264744032</td></row>
-		<row><td>IDS_FEATURE_DISPLAY_NAME2</td><td>1033</td><td>ID_Shield_for_Sharepoint_Client</td><td>0</td><td/><td>1252085001</td></row>
+		<row><td>IDS_FEATURE_DISPLAY_NAME2</td><td>1033</td><td>ID_Shield_for_SharePoint_Client</td><td>0</td><td/><td>-1960719257</td></row>
 		<row><td>IDS_INSTALLDIR</td><td>1033</td><td>[INSTALLDIR]</td><td>0</td><td/><td>-1264744032</td></row>
 		<row><td>IDS_INSTALLSHIELD</td><td>1033</td><td>InstallShield</td><td>0</td><td/><td>-1264744032</td></row>
 		<row><td>IDS_INSTALLSHIELD_FORMATTED</td><td>1033</td><td>{&amp;MSSWhiteSerif8}InstallShield</td><td>0</td><td/><td>-1264744032</td></row>
@@ -3819,9 +3819,12 @@
 		<row><td>IDS__TargetReq_DESC_RESOLUTION</td><td>1033</td><td>The screen resolution is not adequate for running [ProductName].</td><td>0</td><td/><td>-1264744032</td></row>
 		<row><td>ID_STRING1</td><td>1033</td><td>http://www.ExtractSystems.com</td><td>0</td><td/><td>1252099305</td></row>
 		<row><td>ID_STRING2</td><td>1033</td><td>ID Shield SharePoint Client</td><td>0</td><td/><td>857837863</td></row>
-		<row><td>ID_STRING3</td><td>1033</td><td>IDSHIE~1|ID Shield For Sharepoint</td><td>0</td><td/><td>1923185226</td></row>
-		<row><td>ID_STRING4</td><td>1033</td><td>IDSHIE~1|ID Shield For Sharepoint Client</td><td>0</td><td/><td>1923183210</td></row>
+		<row><td>ID_STRING3</td><td>1033</td><td>IDSHIE~1|ID Shield For SharePoint</td><td>0</td><td/><td>1931602602</td></row>
+		<row><td>ID_STRING4</td><td>1033</td><td>IDSHIE~1|ID Shield For SharePoint Client</td><td>0</td><td/><td>1931547338</td></row>
 		<row><td>ID_STRING5</td><td>1033</td><td>ID Shield for SharePoint Client</td><td>0</td><td/><td>857815335</td></row>
+		<row><td>ID_STRING6</td><td>1033</td><td>0</td><td>0</td><td/><td>-1960766201</td></row>
+		<row><td>ID_STRING7</td><td>1033</td><td>0</td><td>0</td><td/><td>-1960766201</td></row>
+		<row><td>ID_STRING8</td><td>1033</td><td>0</td><td>0</td><td/><td>-1960766201</td></row>
 		<row><td>IIDS_UITEXT_FeatureUninstalled</td><td>1033</td><td>This feature will remain uninstalled.</td><td>0</td><td/><td>-1264744032</td></row>
 	</table>
 
@@ -4085,7 +4088,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>MigrateFeatureStates</td><td/><td>1200</td><td>MigrateFeatureStates</td><td/></row>
 		<row><td>PatchWelcome</td><td>Installed And PATCH And Not IS_MAJOR_UPGRADE</td><td>1205</td><td>Patch Panel</td><td/></row>
 		<row><td>RMCCPSearch</td><td>Not CCP_SUCCESS And CCP_TEST</td><td>600</td><td>RMCCPSearch</td><td/></row>
-		<row><td>ReadyToInstall</td><td>Not Installed</td><td>1220</td><td/><td/></row>
 		<row><td>ResolveSource</td><td>Not Installed</td><td>990</td><td>ResolveSource</td><td/></row>
 		<row><td>SetAllUsersProfileNT</td><td>VersionNT = 400</td><td>970</td><td/><td/></row>
 		<row><td>SetupCompleteError</td><td/><td>-3</td><td>SetupCompleteError</td><td/></row>
