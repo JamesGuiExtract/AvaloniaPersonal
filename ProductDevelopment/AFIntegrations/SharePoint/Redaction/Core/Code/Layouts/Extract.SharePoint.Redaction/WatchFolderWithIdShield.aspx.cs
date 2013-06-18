@@ -188,7 +188,7 @@ namespace Extract.SharePoint.Redaction.Layouts
                     }
 
                     fieldSelectionList.Enabled = radioByValue.Checked;
-                    fieldSelectionList.Enabled = radioByValue.Checked;
+                    textValue.Enabled = radioByValue.Checked;
                     checkDoNotProcessExisting.Enabled = radioFilesAdded.Checked;
                     
                     ToggleAllOutputLocations();

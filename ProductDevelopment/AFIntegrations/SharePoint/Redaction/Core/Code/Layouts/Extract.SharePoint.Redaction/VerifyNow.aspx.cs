@@ -107,14 +107,14 @@ namespace Extract.SharePoint.Redaction.Layouts
                         var data = new IDSForSPClientData(site.Url, listId, fileId, settings.VerifyFpsFile, settings.LocalWorkingFolder);
                         if (!IdShieldHelper.VerifyNowHelper(data, hiddenLocalMachineIp.Value))
                         {
-                            sb.Append("alert('ID Shield for SP client application could not be found. ");
+                            sb.Append("alert('ID Shield For SharePoint Client application could not be found. ");
                             sb.Append("Please ensure that it is running and try again.'); ");
                         }
                     }
                 }
                 else
                 {
-                    sb.Append("alert('Path to ID Shield for SP Verification FPS file is not set.'); ");
+                    sb.Append("alert('Path to ID Shield for SharePoint Verification FPS file is not set.'); ");
                 }
                 Context.Response.Write(sb.ToString());
                 Context.Response.Flush();

@@ -115,6 +115,9 @@ function processSelected(columnName) {
                     if (file != null) {
                         file.checkOut();
                         listItem.set_item(columnName, "To Be Queued");
+                        if (columnName == "IDShieldStatus") {
+                            listItem.set_item("IDSReference", "");
+                        }
                         listItem.update();
                         file.checkIn("IDS Status changed");
                     }

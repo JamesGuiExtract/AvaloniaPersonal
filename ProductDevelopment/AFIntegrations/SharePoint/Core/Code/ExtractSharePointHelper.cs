@@ -488,7 +488,7 @@ namespace Extract.SharePoint
                 });
             }
 
-            bool checkForEmpty = !string.IsNullOrEmpty(columnToCheckForEmpty);
+            bool checkForEmpty = !string.IsNullOrEmpty(columnToCheckForEmpty) && !reprocessExisting;
 
             camlFieldRef statusColumn = new camlFieldRef(extractStatusColumn);
             camlValues statusValues = new camlValues();
@@ -545,6 +545,10 @@ namespace Extract.SharePoint
                         ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35891", item.File, "IDS Status changed", () =>
                         {
                             item[extractStatusColumn] = toBeQueued;
+                            if (extractStatusColumn == "IDShieldStatus")
+                            {
+                                item["IDSReference"] = "";
+                            }
                             item.Update();
                         });
                     }

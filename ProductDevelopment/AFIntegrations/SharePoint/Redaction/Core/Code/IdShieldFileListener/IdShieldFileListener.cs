@@ -121,6 +121,7 @@ namespace Extract.SharePoint.Redaction
                             // Set the field to ToBeQueued
                             item[IdShieldHelper.IdShieldStatusColumn] =
                                 ExtractProcessingStatus.ToBeQueued.AsString();
+                            item[IdShieldHelper.IdShieldReferenceColumn] = "";
 
                             item.Update();
                          });
