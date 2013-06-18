@@ -2110,8 +2110,11 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo
         long lStartX, lStartY, lEndX, lEndY, lHeight, lPageNum;
         ipZone->GetData(&lStartX, &lStartY, &lEndX, &lEndY, &lHeight, &lPageNum);
         
+		// [FlexIDSCore:5308]
+		// If ipNewPageInfoMap is specified, but doesn't contain an entry for lPageNum, treat
+		// ipNewPageInfoMap as if it were null (use the image coordinates).
         UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipNewPageInfo = __nullptr;
-        if (ipNewPageInfoMap != __nullptr)
+        if (ipNewPageInfoMap != __nullptr && asCppBool(ipNewPageInfoMap->Contains(lPageNum)))
         {
             ipNewPageInfo = ipNewPageInfoMap->GetValue(lPageNum);
             ASSERT_RESOURCE_ALLOCATION("ELI28027", ipNewPageInfo != __nullptr);
