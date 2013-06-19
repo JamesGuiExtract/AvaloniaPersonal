@@ -1223,7 +1223,7 @@ void CAutomatedRuleSetTester::processTestCase(const string& strRSDFile,
 				// find all attributes in the text file
 				m_ipCurrentAttributes = m_ipAttrFinderEngine->FindAttributes( ipAFDoc, 
 					get_bstr_t(strInputFile.c_str()), -1, get_bstr_t(strRSDFile.c_str()), 
-					NULL, VARIANT_FALSE, NULL);
+					NULL, VARIANT_FALSE, "", NULL);
 				ipInputText = ipAFDoc->Text;
 
 				// add document classification information

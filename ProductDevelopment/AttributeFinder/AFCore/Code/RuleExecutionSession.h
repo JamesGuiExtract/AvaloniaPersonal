@@ -36,6 +36,8 @@ public:
 
 	STDMETHOD (SetFKBVersion)(/*[in]*/ BSTR bstrFKBVersion);
 
+	STDMETHOD (SetAlternateComponentDataDir)(/*[in]*/ BSTR bstrAlternateComponentDataDir);
+
 private:
 	// pointer to the singleton rule execution environment object
 	UCLID_AFCORELib::IRuleExecutionEnvPtr m_ipRuleExecutionEnv;

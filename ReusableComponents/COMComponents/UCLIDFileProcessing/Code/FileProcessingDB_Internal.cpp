@@ -1577,6 +1577,7 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrMIN_SLEEP_BETWEEN_DB_CHECKS] = asString(gnDEFAULT_MIN_SLEEP_TIME_BETWEEN_DB_CHECK);
 	mapDefaultValues[gstrMAX_SLEEP_BETWEEN_DB_CHECKS] = asString(gnDEFAULT_MAX_SLEEP_TIME_BETWEEN_DB_CHECK);
 	mapDefaultValues[gstrSTORE_FTP_EVENT_HISTORY] = "1";
+	mapDefaultValues[gstrALTERNATE_COMPONENT_DATA_DIR] = "";
 	try
 	{
 		mapDefaultValues[gstrLAST_DB_INFO_CHANGE] = getSQLServerDateTime(getDBConnection());

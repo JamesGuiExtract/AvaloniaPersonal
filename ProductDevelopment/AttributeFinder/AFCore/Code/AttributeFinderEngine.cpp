@@ -122,6 +122,7 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 													VARIANT varRuleSet,
 													IVariantVector *pvecAttributeNames,
 													VARIANT_BOOL vbUseAFDocText,
+													BSTR bstrAlternateComponentDataDir,
 													IProgressStatus *pProgressStatus,
 													IIUnknownVector** ppAttributes)
 {
@@ -301,7 +302,7 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 		// Find the Attributes (wrap the attribute names vector in smart pointer)
 		IVariantVectorPtr ipvecAttributeNames(pvecAttributeNames);
 		IIUnknownVectorPtr ipAttributes =  findAttributesInText(ipAFDoc, ipRuleSet,
-			ipvecAttributeNames, ipSubProgressStatus);
+			ipvecAttributeNames, bstrAlternateComponentDataDir, ipSubProgressStatus);
 		ASSERT_RESOURCE_ALLOCATION("ELI28079", ipAttributes != __nullptr);
 
 		// Set the return value for the attributes
@@ -444,7 +445,8 @@ string CAttributeFinderEngine::getLegacyFKBVersion()
 //-------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CAttributeFinderEngine::findAttributesInText(
 	const UCLID_AFCORELib::IAFDocumentPtr& ipAFDoc, const UCLID_AFCORELib::IRuleSetPtr& ipRuleSet,
-	const IVariantVectorPtr& ipvecAttributeNames, const IProgressStatusPtr& ipProgressStatus)
+	const IVariantVectorPtr& ipvecAttributeNames, BSTR bstrAlternateComponentDataDir,
+	const IProgressStatusPtr& ipProgressStatus)
 {
 	try
 	{
@@ -453,7 +455,7 @@ IIUnknownVectorPtr CAttributeFinderEngine::findAttributesInText(
 		{		
 			// find all attributes' values through current rule set
 			ipAttributes = ipRuleSet->ExecuteRulesOnText(ipAFDoc, 
-				ipvecAttributeNames, ipProgressStatus);
+				ipvecAttributeNames, bstrAlternateComponentDataDir, ipProgressStatus);
 		}
 		else
 		{
@@ -593,6 +595,11 @@ void CAttributeFinderEngine::getComponentDataFolder(string& rstrFolder)
 
 	string strFKBVersion = trim(asString(m_ipRuleExecutionEnv->FKBVersion), " \t", " \t");
 	string strLegacyFKBVersion = getLegacyFKBVersion();
+	string strAlternateComponentDataRoot = asString(m_ipRuleExecutionEnv->AlternateComponentDataDir);
+	if (!strAlternateComponentDataRoot.empty() && strAlternateComponentDataRoot.back() != '\\')
+	{
+		strAlternateComponentDataRoot += "\\";
+	}
 
 	// If no FKB version has been assigned for this thread or the "Latest" keyword is specified,
 	// use highest installed version number.
@@ -601,28 +608,44 @@ void CAttributeFinderEngine::getComponentDataFolder(string& rstrFolder)
 		ULONGLONG nHighestVersion = 0;
 
 		// Iterate through all component data sub-directories matching the version number pattern.
-		vector<string> vecDirectories;
 		string strRootFolder = rstrFolder + "\\";
 		FileIterator iter(strRootFolder + "*");
-		while (iter.moveNext())
+
+		// Loop a second time to check strAlternateComponentDataRoot (if defined). 
+		for (int i = 0; i < 2; i++)
 		{
-			// Only look at directories matching the version string pattern.
-			if (!iter.isDirectory())
+			while (iter.moveNext())
 			{
-				continue;
+				// Only look at directories matching the version string pattern.
+				if (!iter.isDirectory())
+				{
+					continue;
+				}
+
+				string strFolder = iter.getFileName();
+
+				if (count(strFolder.begin(), strFolder.end(), '.') == 3)
+				{
+					ULONGLONG dwVersion = getVersionAsULONGLONG(iter.getFileName());
+
+					if (dwVersion > nHighestVersion)
+					{
+						nHighestVersion = dwVersion;
+						rstrFolder = strRootFolder + strFolder;
+					}
+				}
 			}
 
-			string strFolder = iter.getFileName();
-
-			if (count(strFolder.begin(), strFolder.end(), '.') == 3)
+			if (strAlternateComponentDataRoot.empty())
 			{
-				ULONGLONG dwVersion = getVersionAsULONGLONG(iter.getFileName());
-
-				if (dwVersion > nHighestVersion)
-				{
-					nHighestVersion = dwVersion;
-					rstrFolder = strRootFolder + strFolder;
-				}
+				// No alternate directory as specified, no need to loop again.
+				break;
+			}
+			else
+			{
+				// Re-define strRootFolder based upon the alternate component data dir.
+				strRootFolder = strAlternateComponentDataRoot;
+				iter = FileIterator(strRootFolder + "*");
 			}
 		}
 		
@@ -641,7 +664,16 @@ void CAttributeFinderEngine::getComponentDataFolder(string& rstrFolder)
 	// Otherwise, use the version number to find the version specific component data path
 	else
 	{
-		rstrFolder += "\\" + strFKBVersion;
+		string strFolder = rstrFolder + "\\" + strFKBVersion;
+		if (!isValidFolder(strFolder) && !strAlternateComponentDataRoot.empty())
+		{
+			// If the specified FKB was not available in the default component data dir, try the
+			// alternate component data dir. (strAlternateComponentDataRoot will already have
+			// trailing backslash)
+			strFolder = strAlternateComponentDataRoot + strFKBVersion;
+		}
+
+		rstrFolder = strFolder;
 	}
 	
 	if (!isValidFolder(rstrFolder))

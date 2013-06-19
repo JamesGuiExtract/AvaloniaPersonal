@@ -319,12 +319,15 @@ library UCLID_AFCORELib
 		//			pvecAttributeNames - A IVariantVector containing the names of attributes for
 		//				which rules should be executed.  If this pointer is NULL, all rules are
 		//				executed.
+		//			bstrAlternateComponentDataDir- An alternate component data root directory to be
+		//				used in addition to the default component data directory.
 		//			pProgressStatus - see note # 1 in the "Notes" section at the top of the document.
 		//			pAttributes - The IIUnknownVector of IAttribute objects returned from this
 		//				method will contain the found hierarchy of attributes.
 		[id(3), helpstring("method ExecuteRulesOnText")] HRESULT ExecuteRulesOnText(
 			[in] IAFDocument* pAFDoc, [in] IVariantVector *pvecAttributeNames, 
-			[in] IProgressStatus *pProgressStatus, [out, retval] IIUnknownVector** pAttributes);
+			[in] BSTR bstrAlternateComponentDataDir, [in] IProgressStatus *pProgressStatus,
+			[out, retval] IIUnknownVector** pAttributes);
 		//-----------------------------------------------------------------------------------------
 		// The method below has been commented out, but left in the IDL file to remind future
 		// developers that id(4) should not be reused for another method or property.
@@ -481,6 +484,8 @@ library UCLID_AFCORELib
 		//					in the IAFDocument object will be used for running rules (even if it
 		//					is blank).  No OCR will be run and even if strSrcDocFileName is a
 		//					USS file or text file, it will not be loaded.
+		//			bstrAlternateComponentDataDir - An alternate component data root directory to
+		//					be used in addition to the default component data directory.
 		//			pProgressStatus - see note # 1 in the "Notes" section at the top of the document.
 		[id(6), helpstring("method FindAttributes")] HRESULT FindAttributes(
 			[in] IAFDocument *pDoc,
@@ -489,6 +494,7 @@ library UCLID_AFCORELib
 			[in] VARIANT varRuleSet, // see important note about this argument
 			[in] IVariantVector* pvecAttributeNames,
 			[in] VARIANT_BOOL vbUseAFDocText,
+			[in] BSTR bstrAlternateComponentDataDir,
 			[in] IProgressStatus *pProgressStatus,
 			[out, retval] IIUnknownVector** pAttributes);
 		//-----------------------------------------------------------------------------------------
@@ -546,6 +552,11 @@ library UCLID_AFCORELib
 		// top-level rule.
 		[propget, id(6), helpstring("property FKBVersion")] HRESULT FKBVersion([out, retval] BSTR *pVal);
 		[propput, id(6), helpstring("property FKBVersion")] HRESULT FKBVersion([in] BSTR newVal);
+		//-----------------------------------------------------------------------------------------
+		// An alternate component data root directory to be used in addition to the default
+		// component data directory.
+		[propget, id(7), helpstring("property AlternateComponentDataDir")] HRESULT AlternateComponentDataDir([out, retval] BSTR *pVal);
+		[propput, id(7), helpstring("property AlternateComponentDataDir")] HRESULT AlternateComponentDataDir([in] BSTR newVal);
 	};
 	
 	//---------------------------------------------------------------------------------------------
@@ -573,6 +584,10 @@ library UCLID_AFCORELib
 
 		// Applies the FKB version number that should be used for the rule session.
 		[id(2), helpstring("method SetFKBVersion")] HRESULT SetFKBVersion([in] BSTR bstrFKBVersion);
+
+		// Applies an alternate component data root directory to be used in addition to the default
+		// component data directory.
+		[id(3), helpstring("method SetAlternateComponentDataDir")] HRESULT SetAlternateComponentDataDir([in] BSTR bstrAlternateComponentDataDir);
 		//-----------------------------------------------------------------------------------------
 	};
 

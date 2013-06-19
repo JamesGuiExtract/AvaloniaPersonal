@@ -469,6 +469,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
                 else
                 {
+                    // [FlexIDSCore:5318]
+                    // Assign any alternate component data directory root defined in the database
+                    // to be used in addition to the default component data directory.
+                    if (pDB != null)
+                    {
+                        DataEntryMethods.AlternateComponentDataDir =
+                            pDB.GetDBInfoSetting("AlternateComponentDataDir", false);
+                    }
+
                     // As long as processing has not been cancelled, open the supplied document in the
                     // data entry form.
                     processingResult = _dataEntryFormManager.ShowDocument(pFileRecord.Name,

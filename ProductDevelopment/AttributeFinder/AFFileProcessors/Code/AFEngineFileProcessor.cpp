@@ -11,6 +11,7 @@
 #include <ComUtils.h>
 #include <Misc.h>
 #include <ComponentLicenseIDs.h>
+#include <FAMUtilsConstants.h>
 
 // add license management password function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
@@ -344,9 +345,23 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 
 		_lastCodePos = "200";
 
+		// [FlexIDSCore:5318]
+        // Assign any alternate component data directory root defined in the database to be used in
+		// addition to the default component data directory.
+		IFileProcessingDBPtr ipDB(pDB);
+		BSTR bstrAlternateComponentDataDir = _bstr_t("");
+		if (ipDB != __nullptr)
+		{
+			bstrAlternateComponentDataDir =
+				ipDB->GetDBInfoSetting(gstrALTERNATE_COMPONENT_DATA_DIR.c_str(), VARIANT_FALSE);
+		}
+
+		_lastCodePos = "205";
+
 		// Execute the rule set
 		getAFEngine()->FindAttributes(ipAFDoc, strInputFile.c_str(), 0, 
-			_varRuleSet, NULL, VARIANT_TRUE, ipProgressStatusToUseForSubTasks);
+			_varRuleSet, NULL, VARIANT_TRUE, bstrAlternateComponentDataDir,
+			ipProgressStatusToUseForSubTasks);
 
 		_lastCodePos = "210";
 

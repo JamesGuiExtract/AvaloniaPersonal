@@ -942,7 +942,8 @@ void CLegalDescSplitter::processMuni( ISpatialStringPtr ipInputText, IIUnknownVe
 
 	// Add the Attribute name to find
 	ipvecAttributeNames->PushBack("Municipality");
-	IIUnknownVectorPtr ipAttributes = m_ipMuniRuleSet->ExecuteRulesOnText( ipAFDoc, ipvecAttributeNames, NULL );
+	IIUnknownVectorPtr ipAttributes =
+		m_ipMuniRuleSet->ExecuteRulesOnText(ipAFDoc, ipvecAttributeNames, "", NULL);
 	
 	//Determine if more than one type and rename Village, City, or Town Subattributes	
 	// Holds the shared attributes
@@ -1603,7 +1604,8 @@ ISpatialStringPtr CLegalDescSplitter::applyModifiers( string strLegalType, strin
 	IRuleSetPtr ipModifierRuleSet = getModifierRuleSet( strLegalType );
 	ASSERT_RESOURCE_ALLOCATION("ELI08471", ipModifierRuleSet != __nullptr );
 
-	IIUnknownVectorPtr ipAttributes = ipModifierRuleSet->ExecuteRulesOnText( ipAFDoc, ipvecAttributeNames, NULL );
+	IIUnknownVectorPtr ipAttributes =
+		ipModifierRuleSet->ExecuteRulesOnText(ipAFDoc, ipvecAttributeNames, "", NULL);
 
 	// Return size is always expected to be <= 1 if not return the input string
 	long nNumAttr = ipAttributes->Size();

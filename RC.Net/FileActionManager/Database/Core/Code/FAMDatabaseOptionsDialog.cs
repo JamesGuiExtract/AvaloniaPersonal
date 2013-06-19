@@ -28,6 +28,7 @@ namespace Extract.FileActionManager.Database
         const string _AUTO_REVERT_NOTIFY_EMAIL_LIST = "AutoRevertNotifyEmailList";
         const string _MIN_TIME_BETWEEN_PROCESSING_DB_CHECK = "MinMillisecondsBetweenCheckForFilesToProcess";
         const string _MAX_TIME_BETWEEN_PROCESSING_DB_CHECK = "MaxMillisecondsBetweenCheckForFilesToProcess";
+        const string _ALTERNATE_COMPONENT_DATA_DIR = "AlternateComponentDataDir";
 
         // Constants for History tab
         const string _UPDATE_FAST_TABLE = "UpdateFileActionStateTransitionTable";
@@ -202,8 +203,11 @@ namespace Extract.FileActionManager.Database
                 // Update the min and max times between DB checks for files
                 _numberMinTimeBetweenChecks.Text =
                     settings.GetValue(_MIN_TIME_BETWEEN_PROCESSING_DB_CHECK);
-                _numberMaxTimeBetweenChecks.Text
-                    = settings.GetValue(_MAX_TIME_BETWEEN_PROCESSING_DB_CHECK);
+                _numberMaxTimeBetweenChecks.Text =
+                    settings.GetValue(_MAX_TIME_BETWEEN_PROCESSING_DB_CHECK);
+
+                _alternateComponentDataDirectoryTextBox.Text =
+                    settings.GetValue(_ALTERNATE_COMPONENT_DATA_DIR);
 
                 // Set the input event history value
                 int dayCount = 0;
@@ -575,6 +579,9 @@ namespace Extract.FileActionManager.Database
 
                 map.Set(_MIN_TIME_BETWEEN_PROCESSING_DB_CHECK, _numberMinTimeBetweenChecks.Text);
                 map.Set(_MAX_TIME_BETWEEN_PROCESSING_DB_CHECK, _numberMaxTimeBetweenChecks.Text);
+
+                map.Set(_ALTERNATE_COMPONENT_DATA_DIR,
+                    _alternateComponentDataDirectoryTextBox.Text.TrimEnd('\\', '/'));
 
                 bool autoRevert = _checkAutoRevertFiles.Checked;
                 if (autoRevert)

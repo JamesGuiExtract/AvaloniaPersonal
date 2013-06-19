@@ -47,6 +47,7 @@ public:
 							  /*[in]*/ VARIANT varRuleSet,
 							  /*[in]*/ IVariantVector* pvecAttributeNames,
 							  /*[in]*/ VARIANT_BOOL vbUseAFDocText,
+							  /*[in]*/ BSTR bstrAlternateComponentDataDir,
 							  /*[in]*/ IProgressStatus *pProgressStatus,
 							  /*[out, retval]*/ IIUnknownVector** pAttributes);
 	STDMETHOD(ShowHelpAboutBox)(/*[in]*/ EHelpAboutType eType, /*[in]*/ BSTR strProductVersion);
@@ -95,7 +96,7 @@ private:
 	//----------------------------------------------------------------------------------------------
 	IIUnknownVectorPtr findAttributesInText(const UCLID_AFCORELib::IAFDocumentPtr& ipAFDoc,
 		const UCLID_AFCORELib::IRuleSetPtr& ipRuleSet, const IVariantVectorPtr& ipvecAttributeNames,
-		const IProgressStatusPtr& ipProgressStatus);
+		BSTR bstrAlternateComponentDataDir, const IProgressStatusPtr& ipProgressStatus);
 	//----------------------------------------------------------------------------------------------
 	IOCREnginePtr getOCREngine();
 	//----------------------------------------------------------------------------------------------

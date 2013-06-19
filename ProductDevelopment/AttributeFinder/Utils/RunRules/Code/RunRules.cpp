@@ -236,7 +236,7 @@ BOOL CRunRulesApp::InitInstance()
 
 				// Find attributes from the source document
 				ipAFEngine->FindAttributes(ipAFDoc, strSourceFileName.c_str(),
-					-1, strRSDFileName.c_str(), NULL, VARIANT_FALSE, NULL);
+					-1, strRSDFileName.c_str(), NULL, VARIANT_FALSE, "", NULL);
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10134");
 		}

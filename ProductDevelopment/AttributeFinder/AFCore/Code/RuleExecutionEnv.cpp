@@ -12,6 +12,7 @@
 // allocate static variables
 map<DWORD, stack<string> > CRuleExecutionEnv::m_mapThreadIDToRSDFileStack;
 map<DWORD, string> CRuleExecutionEnv::m_mapThreadIDToFKBVersion;
+map<DWORD, string> CRuleExecutionEnv::m_mapThreadIDToAlternateComponentDataDir;
 CMutex CRuleExecutionEnv::m_mutex;
 
 //-------------------------------------------------------------------------------------------------
@@ -215,6 +216,35 @@ STDMETHODIMP CRuleExecutionEnv::put_FKBVersion(BSTR newVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32479")
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleExecutionEnv::get_AlternateComponentDataDir(BSTR *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI35913", pVal != __nullptr);
+
+		*pVal = _bstr_t(getAlternateComponentDataDir().c_str()).Detach();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35914")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleExecutionEnv::put_AlternateComponentDataDir(BSTR newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		string& rstrAlternateComponentDataDir = getAlternateComponentDataDir();
+		rstrAlternateComponentDataDir = asString(newVal);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35916")
+}
+//-------------------------------------------------------------------------------------------------
 stack<string>& CRuleExecutionEnv::getCurrentStack(bool bThrowExceptionIfStackEmpty)
 {
 	// protect the stack against simultaneous access
@@ -246,5 +276,16 @@ string& CRuleExecutionEnv::getFKBVersionString()
 	string& rFKBVersion = m_mapThreadIDToFKBVersion[dwThreadID];
 
 	return rFKBVersion;
+}
+//-------------------------------------------------------------------------------------------------
+string& CRuleExecutionEnv::getAlternateComponentDataDir()
+{
+	CSingleLock lg( &m_mutex, TRUE );
+
+	// Get the alternate component data directory for the current thread.
+	DWORD dwThreadID = GetCurrentThreadId();
+	string& rComponentDataDir = m_mapThreadIDToAlternateComponentDataDir[dwThreadID];
+
+	return rComponentDataDir;
 }
 //-------------------------------------------------------------------------------------------------

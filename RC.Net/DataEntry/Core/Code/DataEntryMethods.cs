@@ -176,6 +176,19 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Gets or sets an alternate component data root directory to be used in addition to the
+        /// default component data directory.
+        /// </summary>
+        /// <value>
+        /// The onent data root directory to be used.
+        /// </value>
+        public static string AlternateComponentDataDir
+        {
+            get;
+            set;
+        }
+
         #region Static Methods
 
         /// <summary>
@@ -733,7 +746,7 @@ namespace Extract.DataEntry
                 }
 
                 // Format the data into attribute(s) using the rule.
-                return rule.ExecuteRulesOnText(afDoc, attributeNames, null);
+                return rule.ExecuteRulesOnText(afDoc, attributeNames, AlternateComponentDataDir, null);
             }
             catch (Exception ex)
             {

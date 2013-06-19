@@ -35,8 +35,10 @@
             System.Windows.Forms.Label label5;
             System.Windows.Forms.Label label6;
             System.Windows.Forms.Label label7;
+            System.Windows.Forms.Label label8;
             this._tabControlSettings = new System.Windows.Forms.TabControl();
             this._tabGeneral = new System.Windows.Forms.TabPage();
+            this._alternateComponentDataDirectoryTextBox = new System.Windows.Forms.TextBox();
             this._numberMaxTimeBetweenChecks = new Extract.Utilities.Forms.NumericEntryTextBox();
             this._numberMinTimeBetweenChecks = new Extract.Utilities.Forms.NumericEntryTextBox();
             this._upDownRevertMinutes = new Extract.Utilities.Forms.BetterNumericUpDown();
@@ -49,6 +51,7 @@
             this._checkAutoCreateActions = new System.Windows.Forms.CheckBox();
             this._checkAllowdynamicTagCreation = new System.Windows.Forms.CheckBox();
             this._tabHistory = new System.Windows.Forms.TabPage();
+            this._checkStoreFTPEventHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreDBSettingsChangeHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreDocTagHistory = new System.Windows.Forms.CheckBox();
             this._upDownInputEventHistory = new Extract.Utilities.Forms.BetterNumericUpDown();
@@ -74,7 +77,6 @@
             this._buttonCancel = new System.Windows.Forms.Button();
             this._buttonOK = new System.Windows.Forms.Button();
             this._buttonRefresh = new System.Windows.Forms.Button();
-            this._checkStoreFTPEventHistory = new System.Windows.Forms.CheckBox();
             label2 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -82,6 +84,7 @@
             label5 = new System.Windows.Forms.Label();
             label6 = new System.Windows.Forms.Label();
             label7 = new System.Windows.Forms.Label();
+            label8 = new System.Windows.Forms.Label();
             this._tabControlSettings.SuspendLayout();
             this._tabGeneral.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._upDownRevertMinutes)).BeginInit();
@@ -157,6 +160,15 @@
             label7.TabIndex = 23;
             label7.Text = "Maximum time between checking for files to process (ms)";
             // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new System.Drawing.Point(3, 282);
+            label8.Name = "label8";
+            label8.Size = new System.Drawing.Size(201, 13);
+            label8.TabIndex = 24;
+            label8.Text = "Alternate component data (FKB) directory";
+            // 
             // _tabControlSettings
             // 
             this._tabControlSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -169,11 +181,13 @@
             this._tabControlSettings.Location = new System.Drawing.Point(13, 13);
             this._tabControlSettings.Name = "_tabControlSettings";
             this._tabControlSettings.SelectedIndex = 0;
-            this._tabControlSettings.Size = new System.Drawing.Size(466, 314);
+            this._tabControlSettings.Size = new System.Drawing.Size(466, 351);
             this._tabControlSettings.TabIndex = 0;
             // 
             // _tabGeneral
             // 
+            this._tabGeneral.Controls.Add(this._alternateComponentDataDirectoryTextBox);
+            this._tabGeneral.Controls.Add(label8);
             this._tabGeneral.Controls.Add(this._numberMaxTimeBetweenChecks);
             this._tabGeneral.Controls.Add(this._numberMinTimeBetweenChecks);
             this._tabGeneral.Controls.Add(label7);
@@ -193,15 +207,26 @@
             this._tabGeneral.Location = new System.Drawing.Point(4, 22);
             this._tabGeneral.Name = "_tabGeneral";
             this._tabGeneral.Padding = new System.Windows.Forms.Padding(3);
-            this._tabGeneral.Size = new System.Drawing.Size(458, 288);
+            this._tabGeneral.Size = new System.Drawing.Size(458, 325);
             this._tabGeneral.TabIndex = 0;
             this._tabGeneral.Text = "General";
             this._tabGeneral.ToolTipText = "General FAM database settings";
             this._tabGeneral.UseVisualStyleBackColor = true;
             // 
+            // _alternateComponentDataDirectoryTextBox
+            // 
+            this._alternateComponentDataDirectoryTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._alternateComponentDataDirectoryTextBox.Location = new System.Drawing.Point(6, 298);
+            this._alternateComponentDataDirectoryTextBox.Name = "_alternateComponentDataDirectoryTextBox";
+            this._alternateComponentDataDirectoryTextBox.Size = new System.Drawing.Size(446, 20);
+            this._alternateComponentDataDirectoryTextBox.TabIndex = 25;
+            // 
             // _numberMaxTimeBetweenChecks
             // 
             this._numberMaxTimeBetweenChecks.Location = new System.Drawing.Point(297, 259);
+            this._numberMaxTimeBetweenChecks.MaximumValue = 1.7976931348623157E+308D;
+            this._numberMaxTimeBetweenChecks.MinimumValue = -1.7976931348623157E+308D;
             this._numberMaxTimeBetweenChecks.Name = "_numberMaxTimeBetweenChecks";
             this._numberMaxTimeBetweenChecks.Size = new System.Drawing.Size(55, 20);
             this._numberMaxTimeBetweenChecks.TabIndex = 11;
@@ -210,6 +235,8 @@
             // 
             this._numberMinTimeBetweenChecks.AllowNegative = false;
             this._numberMinTimeBetweenChecks.Location = new System.Drawing.Point(297, 233);
+            this._numberMinTimeBetweenChecks.MaximumValue = 1.7976931348623157E+308D;
+            this._numberMinTimeBetweenChecks.MinimumValue = -1.7976931348623157E+308D;
             this._numberMinTimeBetweenChecks.Name = "_numberMinTimeBetweenChecks";
             this._numberMinTimeBetweenChecks.Size = new System.Drawing.Size(55, 20);
             this._numberMinTimeBetweenChecks.TabIndex = 10;
@@ -338,11 +365,21 @@
             this._tabHistory.Location = new System.Drawing.Point(4, 22);
             this._tabHistory.Name = "_tabHistory";
             this._tabHistory.Padding = new System.Windows.Forms.Padding(3);
-            this._tabHistory.Size = new System.Drawing.Size(458, 288);
+            this._tabHistory.Size = new System.Drawing.Size(458, 325);
             this._tabHistory.TabIndex = 4;
             this._tabHistory.Text = "History";
             this._tabHistory.ToolTipText = "FAM history settings";
             this._tabHistory.UseVisualStyleBackColor = true;
+            // 
+            // _checkStoreFTPEventHistory
+            // 
+            this._checkStoreFTPEventHistory.AutoSize = true;
+            this._checkStoreFTPEventHistory.Location = new System.Drawing.Point(6, 167);
+            this._checkStoreFTPEventHistory.Name = "_checkStoreFTPEventHistory";
+            this._checkStoreFTPEventHistory.Size = new System.Drawing.Size(137, 17);
+            this._checkStoreFTPEventHistory.TabIndex = 21;
+            this._checkStoreFTPEventHistory.Text = "Store FTP event history";
+            this._checkStoreFTPEventHistory.UseVisualStyleBackColor = true;
             // 
             // _checkStoreDBSettingsChangeHistory
             // 
@@ -450,7 +487,7 @@
             this._tabSecurity.Location = new System.Drawing.Point(4, 22);
             this._tabSecurity.Name = "_tabSecurity";
             this._tabSecurity.Padding = new System.Windows.Forms.Padding(3);
-            this._tabSecurity.Size = new System.Drawing.Size(458, 288);
+            this._tabSecurity.Size = new System.Drawing.Size(458, 325);
             this._tabSecurity.TabIndex = 1;
             this._tabSecurity.Text = "Security";
             this._tabSecurity.ToolTipText = "FAM security settings";
@@ -526,7 +563,7 @@
             this._tabProductSpecific.Controls.Add(this._productSpecificLayout);
             this._tabProductSpecific.Location = new System.Drawing.Point(4, 22);
             this._tabProductSpecific.Name = "_tabProductSpecific";
-            this._tabProductSpecific.Size = new System.Drawing.Size(458, 288);
+            this._tabProductSpecific.Size = new System.Drawing.Size(458, 325);
             this._tabProductSpecific.TabIndex = 5;
             this._tabProductSpecific.Text = "Product Specific";
             this._tabProductSpecific.ToolTipText = "Product specific settings";
@@ -598,7 +635,7 @@
             // 
             this._buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._buttonCancel.Location = new System.Drawing.Point(404, 333);
+            this._buttonCancel.Location = new System.Drawing.Point(404, 370);
             this._buttonCancel.Name = "_buttonCancel";
             this._buttonCancel.Size = new System.Drawing.Size(75, 23);
             this._buttonCancel.TabIndex = 3;
@@ -608,7 +645,7 @@
             // _buttonOK
             // 
             this._buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonOK.Location = new System.Drawing.Point(323, 333);
+            this._buttonOK.Location = new System.Drawing.Point(323, 370);
             this._buttonOK.Name = "_buttonOK";
             this._buttonOK.Size = new System.Drawing.Size(75, 23);
             this._buttonOK.TabIndex = 2;
@@ -619,7 +656,7 @@
             // _buttonRefresh
             // 
             this._buttonRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonRefresh.Location = new System.Drawing.Point(242, 333);
+            this._buttonRefresh.Location = new System.Drawing.Point(242, 370);
             this._buttonRefresh.Name = "_buttonRefresh";
             this._buttonRefresh.Size = new System.Drawing.Size(75, 23);
             this._buttonRefresh.TabIndex = 1;
@@ -627,21 +664,11 @@
             this._buttonRefresh.UseVisualStyleBackColor = true;
             this._buttonRefresh.Click += new System.EventHandler(this.HandleRefreshDialog);
             // 
-            // _checkStoreFTPEventHistory
-            // 
-            this._checkStoreFTPEventHistory.AutoSize = true;
-            this._checkStoreFTPEventHistory.Location = new System.Drawing.Point(6, 167);
-            this._checkStoreFTPEventHistory.Name = "_checkStoreFTPEventHistory";
-            this._checkStoreFTPEventHistory.Size = new System.Drawing.Size(137, 17);
-            this._checkStoreFTPEventHistory.TabIndex = 21;
-            this._checkStoreFTPEventHistory.Text = "Store FTP event history";
-            this._checkStoreFTPEventHistory.UseVisualStyleBackColor = true;
-            // 
             // FAMDatabaseOptionsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(491, 368);
+            this.ClientSize = new System.Drawing.Size(491, 405);
             this.Controls.Add(this._buttonRefresh);
             this.Controls.Add(this._buttonOK);
             this.Controls.Add(this._buttonCancel);
@@ -715,6 +742,7 @@
         private Utilities.Forms.NumericEntryTextBox _numberMaxTimeBetweenChecks;
         private Utilities.Forms.NumericEntryTextBox _numberMinTimeBetweenChecks;
         private System.Windows.Forms.CheckBox _checkStoreFTPEventHistory;
+        private System.Windows.Forms.TextBox _alternateComponentDataDirectoryTextBox;
     }
 }
 

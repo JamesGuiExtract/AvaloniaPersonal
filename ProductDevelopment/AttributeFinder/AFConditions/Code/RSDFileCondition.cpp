@@ -185,7 +185,7 @@ STDMETHODIMP CRSDFileCondition::raw_ProcessCondition(IAFDocument *pAFDoc, VARIAN
 
 		// pass the value into the rule set for further extraction
 		IIUnknownVectorPtr ipAttributes 
-			= m_cachedRuleSet.m_obj->ExecuteRulesOnText(ipDocCopy, __nullptr, __nullptr);
+			= m_cachedRuleSet.m_obj->ExecuteRulesOnText(ipDocCopy, __nullptr, "", __nullptr);
 
 		// Clear the cache if necessary
 		if (!m_bCacheRSD)

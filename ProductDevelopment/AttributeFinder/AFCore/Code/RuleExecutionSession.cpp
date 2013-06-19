@@ -73,6 +73,19 @@ STDMETHODIMP CRuleExecutionSession::SetFKBVersion(BSTR bstrFKBVersion)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32480")
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleExecutionSession::SetAlternateComponentDataDir(BSTR bstrAlternateComponentDataDir)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		getRuleExecutionEnv()->AlternateComponentDataDir = bstrAlternateComponentDataDir;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35918")
+}
+//-------------------------------------------------------------------------------------------------
 UCLID_AFCORELib::IRuleExecutionEnvPtr CRuleExecutionSession::getRuleExecutionEnv()
 {
 	if (m_ipRuleExecutionEnv == __nullptr)

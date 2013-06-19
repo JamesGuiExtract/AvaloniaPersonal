@@ -343,7 +343,7 @@ STDMETHODIMP CFindFromRSD::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 
 		// pass the value into the rule set for further extraction
 		IIUnknownVectorPtr ipAttributes 
-			= m_cachedRuleSet.m_obj->ExecuteRulesOnText(ipDocCopy, ipAttributeNames, NULL);
+			= m_cachedRuleSet.m_obj->ExecuteRulesOnText(ipDocCopy, ipAttributeNames, "", NULL);
 
 		// Clear the cache if necessary
 		if (!m_bCacheRSD)

@@ -48,6 +48,8 @@ public:
 		/*[out, retval]*/ VARIANT_BOOL *pbValue);
 	STDMETHOD(get_FKBVersion)(BSTR *pVal);
 	STDMETHOD(put_FKBVersion)(BSTR newVal);
+	STDMETHOD(get_AlternateComponentDataDir)(BSTR *pVal);
+	STDMETHOD(put_AlternateComponentDataDir)(BSTR newVal);
 
 private:
 	// member variable to keep track of which thread is
@@ -64,6 +66,9 @@ private:
 	// The FKB version in use (per thread).
 	static map<DWORD, string> m_mapThreadIDToFKBVersion;
 
+	// The alternate component data directory root in use (per thread).
+	static map<DWORD, string> m_mapThreadIDToAlternateComponentDataDir;
+
 	// method to get the RSD file stack associated with the current thread
 	// If no stack is associated with the current thread, an exception will
 	// be thrown
@@ -73,6 +78,10 @@ private:
 
 	// Gets the FKB version to use for the current thread.
 	string& getFKBVersionString();
+
+	// Gets any alternate component data root directory to be used in addition to the
+	// default component data directory.
+	string& getAlternateComponentDataDir();
 
 	// This Mutex will guard against simultaneous accesses (read or write)
 	// to the stack (m_mapThreadIDToRSDFileStack)

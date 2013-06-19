@@ -37,6 +37,7 @@ static const string gstrMIN_SLEEP_BETWEEN_DB_CHECKS = "MinMillisecondsBetweenChe
 static const string gstrMAX_SLEEP_BETWEEN_DB_CHECKS = "MaxMillisecondsBetweenCheckForFilesToProcess";
 static const string gstrLAST_DB_INFO_CHANGE = "LastDBInfoChange";
 static const string gstrSTORE_FTP_EVENT_HISTORY = "StoreFTPEventHistory";
+static const string gstrALTERNATE_COMPONENT_DATA_DIR = "AlternateComponentDataDir";
 
 // Default Settings
 static const long glDEFAULT_COMMAND_TIMEOUT = 120;

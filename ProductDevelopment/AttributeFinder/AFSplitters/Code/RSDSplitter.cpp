@@ -239,7 +239,7 @@ STDMETHODIMP CRSDSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAFDocumen
 
 		// pass the value into the rule set for further extraction
 		IIUnknownVectorPtr ipSubAttrValues 
-			= getRuleSet(strRSDFile)->ExecuteRulesOnText(ipAFSplitterDoc, NULL, NULL);
+			= getRuleSet(strRSDFile)->ExecuteRulesOnText(ipAFSplitterDoc, NULL, "", NULL);
 
 		// Clear the cache if necessary
 		if (!m_bCacheRSD)

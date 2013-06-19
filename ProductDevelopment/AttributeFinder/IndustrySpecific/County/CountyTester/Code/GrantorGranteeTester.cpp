@@ -1049,7 +1049,7 @@ void CGrantorGranteeTester::processTestCase(const string& strRSDFile,
 			m_ipCurrentAttributes->Clear();
 		}
 		IIUnknownVectorPtr ipFoundAttributes = m_ipAttrFinderEngine->FindAttributes( ipAFDoc, _bstr_t(""), -1, 
-			_bstr_t( strRSDFile.c_str() ), NULL, VARIANT_TRUE, NULL );
+			_bstr_t( strRSDFile.c_str() ), NULL, VARIANT_TRUE, "", NULL );
 		ASSERT_RESOURCE_ALLOCATION("ELI08799", ipFoundAttributes != __nullptr );
 
 		m_ipCurrentAttributes = ipFoundAttributes;

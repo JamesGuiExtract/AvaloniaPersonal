@@ -57,7 +57,8 @@ public:
 
 // IRuleSet
 	STDMETHOD(ExecuteRulesOnText)(IAFDocument* pAFDoc, IVariantVector *pvecAttributeNames,
-		IProgressStatus *pProgressStatus, IIUnknownVector** pAttributes);
+		BSTR bstrAlternateComponentDataDir, IProgressStatus *pProgressStatus,
+		IIUnknownVector** pAttributes);
 	STDMETHOD(Cleanup)();	
 	STDMETHOD(SaveTo)(BSTR strFullFileName, VARIANT_BOOL bClearDirty, VARIANT_BOOL* pbGUIDsRegenerated);
 	STDMETHOD(LoadFrom)(BSTR strFullFileName, VARIANT_BOOL bSetDirtyFlagToTrue);

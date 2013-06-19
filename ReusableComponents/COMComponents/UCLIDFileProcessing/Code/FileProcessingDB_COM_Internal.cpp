@@ -90,7 +90,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 114;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 115;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -668,6 +668,34 @@ int UpdateToSchemaVersion114(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35773");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion115(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 115;
+
+		if (pnNumSteps != __nullptr)
+		{
+			// This update does not require transferring any data.
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		// Add AlternateComponentDataDir DBInfo value.
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrALTERNATE_COMPONENT_DATA_DIR + "', '')");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35919");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -5558,7 +5586,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 111:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion112);
 				case 112:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion113);
 				case 113:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion114);
-				case 114:   break;
+				case 114:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion115);
+				case 115:   break;
 
 				default:
 					{

@@ -280,6 +280,7 @@ STDMETHODIMP CRuleSet::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDirty,
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc, 
 										  IVariantVector *pvecAttributeNames,
+										  BSTR bstrAlternateComponentDataDir,
 										  IProgressStatus *pProgressStatus,
 										  IIUnknownVector **pAttributes)
 {
@@ -368,6 +369,14 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				UCLID_AFCORELib::IRuleExecutionSessionPtr ipSession(CLSID_RuleExecutionSession);
 				ASSERT_RESOURCE_ALLOCATION("ELI07493", ipSession != __nullptr);
 				long nStackSize = ipSession->SetRSDFileName(m_strFileName.c_str());
+
+				// [FlexIDSCore:5318]
+				// If an alternate component data directory root has been specified to be used in
+				// addition to the default component data directory, apply that directory.
+				if (!asString(bstrAlternateComponentDataDir).empty())
+				{
+					ipSession->SetAlternateComponentDataDir(bstrAlternateComponentDataDir);
+				}
 
 				// If the ruleset is marked as an to-be-used-internally ruleset, then ensure 
 				// that stacksize > 1.

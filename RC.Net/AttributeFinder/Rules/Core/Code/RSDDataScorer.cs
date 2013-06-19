@@ -719,7 +719,7 @@ namespace Extract.AttributeFinder.Rules
                 AFDocument afDoc = new AFDocument();
                 afDoc.Attribute = attribute;
 
-                IUnknownVector foundAttributes = ruleSet.ExecuteRulesOnText(afDoc, null, null);
+                IUnknownVector foundAttributes = ruleSet.ExecuteRulesOnText(afDoc, null, "", null);
 
                 return foundAttributes.ToIEnumerable<ComAttribute>();
             }

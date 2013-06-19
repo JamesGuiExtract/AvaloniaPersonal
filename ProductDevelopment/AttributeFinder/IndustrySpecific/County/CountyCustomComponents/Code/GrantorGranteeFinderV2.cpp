@@ -190,7 +190,7 @@ STDMETHODIMP CGrantorGranteeFinderV2::raw_ParseText(IAFDocument* pAFDoc, IProgre
 			ipRuleSet->LoadFrom( _bstr_t( strRSDFile.c_str() ), VARIANT_FALSE );
 
 			// Exercise the rules - for all attributes
-			ipAttributes = ipRuleSet->ExecuteRulesOnText( ipAFDoc, NULL, NULL );
+			ipAttributes = ipRuleSet->ExecuteRulesOnText(ipAFDoc, NULL, "", NULL);
 		}
 
 		// Get the finders for this doc type
