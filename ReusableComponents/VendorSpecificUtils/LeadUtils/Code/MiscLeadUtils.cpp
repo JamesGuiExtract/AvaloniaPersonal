@@ -962,6 +962,18 @@ void confirmImageAreas(const string& strImageFileName, vector<PageRasterZone>& r
 					nRet = L_AnnRealize(&hBitmap, NULL, hFileContainer, FALSE);
 					throwExceptionIfNotSuccess(nRet, "ELI35334", 
 						"Failed to apply validate annotation.", strImageFileName);
+
+					try
+					{
+						// Destroy the annotation container
+						throwExceptionIfNotSuccess(L_AnnDestroy(hFileContainer, ANNFLAG_RECURSE), 
+							"ELI35920",	"Application trace: Unable to destroy annotation container.");
+					}
+					catch(UCLIDException& ex)
+					{
+						ex.log();
+					}
+					hFileContainer = __nullptr;
 				}
 				catch(...)
 				{
@@ -977,7 +989,7 @@ void confirmImageAreas(const string& strImageFileName, vector<PageRasterZone>& r
 						{
 							ex.log();
 						}
-						hFileContainer = NULL;
+						hFileContainer = __nullptr;
 					}
 
 					throw;

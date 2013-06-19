@@ -688,6 +688,27 @@ int UpdateToSchemaVersion115(_ConnectionPtr ipConnection, long* pnNumSteps,
 		// Add AlternateComponentDataDir DBInfo value.
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
 			+ gstrALTERNATE_COMPONENT_DATA_DIR + "', '')");
+		// Add Email settings values.
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrEMAIL_SERVER + "', '')");
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrEMAIL_PORT + "', '')");
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrEMAIL_SENDER + "', '')");
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrEMAIL_SENDER_ADDRESS + "', '')");
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrEMAIL_SIGNATURE + "', '')");
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrEMAIL_REQUIRES_AUTHENTICATION + "', '')");
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrEMAIL_USERNAME + "', '')");
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrEMAIL_PASSWORD + "', '')");
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrEMAIL_TIMEOUT + "', '')");
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrEMAIL_USE_SSL + "', '')");
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 

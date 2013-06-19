@@ -38,6 +38,17 @@ static const string gstrMAX_SLEEP_BETWEEN_DB_CHECKS = "MaxMillisecondsBetweenChe
 static const string gstrLAST_DB_INFO_CHANGE = "LastDBInfoChange";
 static const string gstrSTORE_FTP_EVENT_HISTORY = "StoreFTPEventHistory";
 static const string gstrALTERNATE_COMPONENT_DATA_DIR = "AlternateComponentDataDir";
+static const string gstrEMAIL_SERVER = "EmailServer";
+static const string gstrEMAIL_PORT = "EmailPort";
+static const string gstrEMAIL_SENDER = "EmailSender";
+static const string gstrEMAIL_SENDER_ADDRESS = "EmailSenderAddress";
+static const string gstrEMAIL_SIGNATURE = "EmailSignature";
+static const string gstrEMAIL_REQUIRES_AUTHENTICATION = "EmailRequiresAuthentication";
+static const string gstrEMAIL_USERNAME = "EmailUsername";
+static const string gstrEMAIL_PASSWORD = "EmailPassword";
+static const string gstrEMAIL_TIMEOUT = "EmailTimeout";
+static const string gstrEMAIL_USE_SSL = "EmailUseSSL";
+
 
 // Default Settings
 static const long glDEFAULT_COMMAND_TIMEOUT = 120;

@@ -2,8 +2,8 @@ REM Clean Source folder
 call Clean.bat Test_4
 
 REM Supply Numbered Files for 4 hours - first VOA files, then image files
-START CopyNumberedFiles.exe "ImageWithAnnotations.tif.voa" ".\Source" 1s -h4
-START CopyNumberedFiles.exe "ImageWithAnnotations.tif" ".\Source" 1s -h4
+START CopyNumberedFiles.exe "ImageWithAnnotations.tif.voa" ".\Source" 100ms -h4
+START CopyNumberedFiles.exe "ImageWithAnnotations.tif" ".\Source" 100ms -h4
 
 REM Execute command-line for desired test
 START ProcessFiles.exe MemoryLeak_4.fps /s
