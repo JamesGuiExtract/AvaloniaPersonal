@@ -74,9 +74,12 @@
             this._groupDataEntry = new System.Windows.Forms.GroupBox();
             this._checkDataEntryEnableCounters = new System.Windows.Forms.CheckBox();
             this._checkDataEntryHistory = new System.Windows.Forms.CheckBox();
+            this._tabEmail = new System.Windows.Forms.TabPage();
+            this._emailSettingsControl = new Extract.Utilities.Email.EmailSettingsControl();
             this._buttonCancel = new System.Windows.Forms.Button();
             this._buttonOK = new System.Windows.Forms.Button();
             this._buttonRefresh = new System.Windows.Forms.Button();
+            this._emailTestButton = new System.Windows.Forms.Button();
             label2 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -95,6 +98,7 @@
             this._productSpecificLayout.SuspendLayout();
             this._groupIDShield.SuspendLayout();
             this._groupDataEntry.SuspendLayout();
+            this._tabEmail.SuspendLayout();
             this.SuspendLayout();
             // 
             // label2
@@ -178,11 +182,13 @@
             this._tabControlSettings.Controls.Add(this._tabHistory);
             this._tabControlSettings.Controls.Add(this._tabSecurity);
             this._tabControlSettings.Controls.Add(this._tabProductSpecific);
+            this._tabControlSettings.Controls.Add(this._tabEmail);
             this._tabControlSettings.Location = new System.Drawing.Point(13, 13);
             this._tabControlSettings.Name = "_tabControlSettings";
             this._tabControlSettings.SelectedIndex = 0;
             this._tabControlSettings.Size = new System.Drawing.Size(466, 351);
             this._tabControlSettings.TabIndex = 0;
+            this._tabControlSettings.SelectedIndexChanged += new System.EventHandler(this.HandleTabControl_SelectedIndexChanged);
             // 
             // _tabGeneral
             // 
@@ -577,7 +583,7 @@
             this._productSpecificLayout.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this._productSpecificLayout.Location = new System.Drawing.Point(0, 0);
             this._productSpecificLayout.Name = "_productSpecificLayout";
-            this._productSpecificLayout.Size = new System.Drawing.Size(458, 314);
+            this._productSpecificLayout.Size = new System.Drawing.Size(458, 325);
             this._productSpecificLayout.TabIndex = 1;
             // 
             // _groupIDShield
@@ -631,6 +637,25 @@
             this._checkDataEntryHistory.Text = "Store data entry processing history";
             this._checkDataEntryHistory.UseVisualStyleBackColor = true;
             // 
+            // _tabEmail
+            // 
+            this._tabEmail.Controls.Add(this._emailSettingsControl);
+            this._tabEmail.Location = new System.Drawing.Point(4, 22);
+            this._tabEmail.Name = "_tabEmail";
+            this._tabEmail.Padding = new System.Windows.Forms.Padding(3);
+            this._tabEmail.Size = new System.Drawing.Size(458, 325);
+            this._tabEmail.TabIndex = 6;
+            this._tabEmail.Text = "Email";
+            this._tabEmail.UseVisualStyleBackColor = true;
+            // 
+            // _emailSettingsControl
+            // 
+            this._emailSettingsControl.Location = new System.Drawing.Point(3, 3);
+            this._emailSettingsControl.Name = "_emailSettingsControl";
+            this._emailSettingsControl.Size = new System.Drawing.Size(452, 319);
+            this._emailSettingsControl.TabIndex = 0;
+            this._emailSettingsControl.SettingsChanged += new System.EventHandler<System.EventArgs>(this.HandleEmailSettingsControl_SettingsChanged);
+            // 
             // _buttonCancel
             // 
             this._buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -664,11 +689,23 @@
             this._buttonRefresh.UseVisualStyleBackColor = true;
             this._buttonRefresh.Click += new System.EventHandler(this.HandleRefreshDialog);
             // 
+            // _emailTestButton
+            // 
+            this._emailTestButton.Location = new System.Drawing.Point(132, 370);
+            this._emailTestButton.Name = "_emailTestButton";
+            this._emailTestButton.Size = new System.Drawing.Size(104, 23);
+            this._emailTestButton.TabIndex = 4;
+            this._emailTestButton.Text = "Send test email";
+            this._emailTestButton.UseVisualStyleBackColor = true;
+            this._emailTestButton.Visible = false;
+            this._emailTestButton.Click += new System.EventHandler(this.HandleEmailTestButton_Click);
+            // 
             // FAMDatabaseOptionsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(491, 405);
+            this.Controls.Add(this._emailTestButton);
             this.Controls.Add(this._buttonRefresh);
             this.Controls.Add(this._buttonOK);
             this.Controls.Add(this._buttonCancel);
@@ -696,6 +733,7 @@
             this._groupIDShield.PerformLayout();
             this._groupDataEntry.ResumeLayout(false);
             this._groupDataEntry.PerformLayout();
+            this._tabEmail.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -743,6 +781,9 @@
         private Utilities.Forms.NumericEntryTextBox _numberMinTimeBetweenChecks;
         private System.Windows.Forms.CheckBox _checkStoreFTPEventHistory;
         private System.Windows.Forms.TextBox _alternateComponentDataDirectoryTextBox;
+        private System.Windows.Forms.TabPage _tabEmail;
+        private Utilities.Email.EmailSettingsControl _emailSettingsControl;
+        private System.Windows.Forms.Button _emailTestButton;
     }
 }
 

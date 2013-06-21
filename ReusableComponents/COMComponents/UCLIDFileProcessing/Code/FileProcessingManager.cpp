@@ -1036,6 +1036,12 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 					throw ue;
 				}
 
+				// Check whether or not FAM Session history should be recorded
+				m_bRecordFAMSessions = asString(getFPMDB()->GetDBInfoSetting(
+					gstrSTORE_FAM_SESSION_HISTORY.c_str(), VARIANT_TRUE)) == "1";
+
+				logStatusInfo(kStart, false);
+
 				// Expand the action name (note this also sets the FPSFileDir value for the
 				// tag manager) [LRCAU #5813]
 				_bstr_t bstrActionName(getExpandedActionName().c_str());
@@ -1084,6 +1090,8 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 				}
 
 				getFPMDB()->UnregisterActiveFAM();
+
+				logStatusInfo(kEndStop, false);
 
 				return S_OK;
 			}
@@ -1459,7 +1467,7 @@ bool CFileProcessingManager::isActionNameInDatabase(const string& strAction)
 	return true;		
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus)
+void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus, bool bLogAppTrace/* = true*/)
 {
 	string strMessageName = m_strFPSFileName.empty()
 				? "File Action Manager"
@@ -1473,11 +1481,14 @@ void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus)
 	{
 	case kStart:
 		{
-			// Log the info that processing is starting processing
-			UCLIDException ue("ELI15680",
-				"Application trace: " + strMessageName + " has started processing.");
-			ue.addDebugInfo("FPS File", strFileName);
-			ue.log();
+			if (bLogAppTrace)
+			{
+				// Log the info that processing is starting processing
+				UCLIDException ue("ELI15680",
+					"Application trace: " + strMessageName + " has started processing.");
+				ue.addDebugInfo("FPS File", strFileName);
+				ue.log();
+			}
 
 			if (m_bRecordFAMSessions)
 			{
@@ -1488,20 +1499,26 @@ void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus)
 		break;
 	case kBeginStop:
 		{
-			// Log the info that processing is beginning to stop processing
-			UCLIDException ue("ELI28831",
-				"Application trace: " + strMessageName + " is stopping processing.");
-			ue.addDebugInfo("FPS File", strFileName);
-			ue.log();
+			if (bLogAppTrace)
+			{
+				// Log the info that processing is beginning to stop processing
+				UCLIDException ue("ELI28831",
+					"Application trace: " + strMessageName + " is stopping processing.");
+				ue.addDebugInfo("FPS File", strFileName);
+				ue.log();
+			}
 		}
 		break;
 	case kEndStop:
 		{
-			// Log the info that processing has stopped processing
-			UCLIDException ue("ELI15678",
-				"Application trace: " + strMessageName + " has stopped processing.");
-			ue.addDebugInfo("FPS File", strFileName);
-			ue.log();
+			if (bLogAppTrace)
+			{
+				// Log the info that processing has stopped processing
+				UCLIDException ue("ELI15678",
+					"Application trace: " + strMessageName + " has stopped processing.");
+				ue.addDebugInfo("FPS File", strFileName);
+				ue.log();
+			}
 
 			if (m_bRecordFAMSessions)
 			{

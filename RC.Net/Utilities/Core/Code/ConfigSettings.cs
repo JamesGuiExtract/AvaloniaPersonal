@@ -340,6 +340,10 @@ namespace Extract.Utilities
             {
                 throw ex.AsExtract("ELI32895");
             }
+            finally
+            {
+                Loaded = true;
+            }
         }
 
         /// <summary>

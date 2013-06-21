@@ -1,5 +1,6 @@
 ﻿using Extract.Licensing;
 using Extract.Utilities;
+using Extract.Utilities.Email;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
@@ -93,6 +94,11 @@ namespace Extract.FileActionManager.Database
         DateTime _lastSettingChange;
 
         /// <summary>
+        /// The <see cref="SmtpEmailSettings"/> representing the email settings in the DBInfo table.
+        /// </summary>
+        SmtpEmailSettings _emailSettings = new SmtpEmailSettings();
+
+        /// <summary>
         /// Indicates whether settings where actually updated or not when
         /// the dialog closed.
         /// </summary>
@@ -167,6 +173,11 @@ namespace Extract.FileActionManager.Database
                 db.ResetDBConnection();
 
                 var settings = db.DBInfoSettings;
+
+                // Use a FAMDatabaseSettings instance to persist the email settings so that the
+                // EmailSettingsControl can be re-used to configure the settings.
+                _emailSettings.LoadSettings(
+                    new FAMDatabaseSettings<ExtractSmtp>(db, false, "Email"));
 
                 string lastModifyTime = settings.GetValue(_LAST_DB_INFO_CHANGE);
                 DateTime lastChange;
@@ -251,6 +262,8 @@ namespace Extract.FileActionManager.Database
                             _checkDataEntryEnableCounters);
                     }
                 }
+
+                _emailSettingsControl.LoadSettings(_emailSettings);
 
                 UpdateEnabledStates();
             }
@@ -565,6 +578,12 @@ namespace Extract.FileActionManager.Database
         {
             try
             {
+                // Validate email settings only if it appears the user has attempted to enter  valid settings have been entered.
+                if (_emailSettingsControl.HasSettings && !_emailSettingsControl.ValidateSettings())
+                {
+                    return;
+                }
+
                 // Build a map of settings from the controls
                 StrToStrMap map = new StrToStrMap();
                 foreach (var entry in _keysToCheckBox)
@@ -642,6 +661,14 @@ namespace Extract.FileActionManager.Database
 
                 SettingsUpdated = db.SetDBInfoSettings(map) > 0;
                 db = null;
+
+                // Save the email settings as well.
+                _emailSettingsControl.ApplySettings(_emailSettings);
+                if (_emailSettings.HasUnsavedChanges)
+                {
+                    _emailSettings.SaveSettings();
+                    SettingsUpdated = true;
+                }
 
                 DialogResult = DialogResult.OK;
             }
@@ -1014,6 +1041,62 @@ namespace Extract.FileActionManager.Database
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI32604");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_emailTestButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleEmailTestButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _emailSettingsControl.SendTestEmail();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35929");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="EmailSettingsControl.SettingsChanged"/> event of the
+        /// <see cref="_emailSettingsControl"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleEmailSettingsControl_SettingsChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _emailTestButton.Enabled = _emailSettingsControl.HasSettings;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35930");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="TabControl.SelectedIndexChanged"/> event of the
+        /// <see cref="_tabControlSettings"/> control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleTabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _emailTestButton.Visible = (_tabControlSettings.SelectedTab == _tabEmail);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35944");
             }
         }
 

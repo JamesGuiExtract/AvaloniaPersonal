@@ -53,6 +53,7 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Extract.Encryption, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Linq" />
@@ -74,6 +75,7 @@
     <Compile Include="FAMDatabaseOptionsDialog.designer.cs">
       <DependentUpon>FAMDatabaseOptionsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="FAMDatabaseSettings.cs" />
     <Compile Include="FAMServiceDatabaseManager.cs" />
     <Compile Include="FAMServiceDatabaseMapping.cs" />
     <Compile Include="FpsFileTableData.cs" />
@@ -95,6 +97,10 @@
     <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\Email\Core\Code\Extract.Utilities.Email.csproj">
+      <Project>{1B3DED27-DBF9-478A-9E31-FFA479621F5C}</Project>
+      <Name>Extract.Utilities.Email</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>

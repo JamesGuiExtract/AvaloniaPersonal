@@ -1578,16 +1578,16 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrMAX_SLEEP_BETWEEN_DB_CHECKS] = asString(gnDEFAULT_MAX_SLEEP_TIME_BETWEEN_DB_CHECK);
 	mapDefaultValues[gstrSTORE_FTP_EVENT_HISTORY] = "1";
 	mapDefaultValues[gstrALTERNATE_COMPONENT_DATA_DIR] = "";
+	// Email setting defaults should be kept in sync with Extract.Utilities.Email.ExtractSmtp
 	mapDefaultValues[gstrEMAIL_SERVER] = "";
-	mapDefaultValues[gstrEMAIL_PORT] = "";
-	mapDefaultValues[gstrEMAIL_SENDER] = "";
+	mapDefaultValues[gstrEMAIL_PORT] = "25";
+	mapDefaultValues[gstrEMAIL_SENDER_NAME] = "";
 	mapDefaultValues[gstrEMAIL_SENDER_ADDRESS] = "";
 	mapDefaultValues[gstrEMAIL_SIGNATURE] = "";
-	mapDefaultValues[gstrEMAIL_REQUIRES_AUTHENTICATION] = "";
 	mapDefaultValues[gstrEMAIL_USERNAME] = "";
 	mapDefaultValues[gstrEMAIL_PASSWORD] = "";
-	mapDefaultValues[gstrEMAIL_TIMEOUT] = "";
-	mapDefaultValues[gstrEMAIL_USE_SSL] = "";
+	mapDefaultValues[gstrEMAIL_TIMEOUT] = "0";
+	mapDefaultValues[gstrEMAIL_USE_SSL] = "0";
 	try
 	{
 		mapDefaultValues[gstrLAST_DB_INFO_CHANGE] = getSQLServerDateTime(getDBConnection());

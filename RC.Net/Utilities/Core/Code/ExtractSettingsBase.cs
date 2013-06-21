@@ -102,6 +102,7 @@ namespace Extract.Utilities
                 // Determine whether there are application and/or user scoped properties available.
                 CheckPropertyTypes();
 
+                _settings.SettingChanging += HandleSettingChanging;
                 _settings.PropertyChanged += HandlePropertyChanged;
             }
             catch (Exception ex)
@@ -135,6 +136,21 @@ namespace Extract.Utilities
                 }
 
                 return _settings;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance has unsaved changes.
+        /// </summary>
+        /// <value><see langword="true"/> if this instance has unsaved changes; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool HasUnsavedChanges
+        {
+            get
+            {
+                // If dynamic, changes will always be saved immediately.
+                return (!_dynamic && !_modifiedProperties.IsEmpty);
             }
         }
 
@@ -181,10 +197,16 @@ namespace Extract.Utilities
         {
             try
             {
+                Loaded = false;
+
                 _lastModified = GetLastModifiedTime();
             }
             catch (Exception ex)
             {
+                // If there was an error loading, it is possible this instance could still be used.
+                // Set loaded back to true so that any property changes are still tracked.
+                Loaded = true;
+
                 throw ex.AsExtract("ELI32901");
             }
         }
@@ -197,14 +219,21 @@ namespace Extract.Utilities
         {
             try
             {
+                string[] modifiedProperties = _modifiedProperties.ToArray();
+
+                // Clear _modifiedProperties before saving the properties in the collection to this
+                // point.
+                string property;
+                while (_modifiedProperties.TryTake(out property));
+
                 // If there are no modified properties, there is nothing to do.
-                if (_modifiedProperties.Count == 0)
+                if (modifiedProperties.Length == 0)
                 {
                     return;
                 }
 
                 // Loop through each modified setting and apply them.
-                foreach (string modifiedProperty in _modifiedProperties)
+                foreach (string modifiedProperty in modifiedProperties)
                 {
                     SavePropertyValue(modifiedProperty);
                 }
@@ -244,7 +273,7 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="propertyName">Name of the property to retrieve.</param>
         /// <returns>The value of the specified property as a string.</returns>
-        protected string GetPropertyAsString(string propertyName)
+        protected virtual string GetPropertyAsString(string propertyName)
         {
             try
             {
@@ -400,6 +429,19 @@ namespace Extract.Utilities
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the settings have been loaded. Changes to
+        /// properties will not be tracked when this property is <see langword="false"/>.
+        /// </summary>
+        /// <value><see langword="true"/> if the settings have been loaded; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        protected bool Loaded
+        {
+            get;
+            set;
+        }
+
         #endregion Protected Members
 
         #region Abstract Methods
@@ -429,6 +471,30 @@ namespace Extract.Utilities
         #region Event Handlers
 
         /// <summary>
+        /// Handles the <see cref="ApplicationSettingsBase.SettingChanging"/> event of
+        /// <see cref="_settings"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Configuration.SettingChangingEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleSettingChanging(object sender, SettingChangingEventArgs e)
+        {
+            try
+            {
+                // If the value being applied isn't different that the existing value, ignore the
+                // change so it doesn't needlessly trigger a save or set HasUnsavedChanges.
+                if (Loaded && e.NewValue.Equals(Settings[e.SettingName]))
+                {
+                    e.Cancel = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI35941");
+            }
+        }
+
+        /// <summary>
         /// Handles the case that a _settings property was changed.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
@@ -437,10 +503,13 @@ namespace Extract.Utilities
         {
             try
             {
-                // Refreshing may trigger PropertyChanged events, don't save in this case.
-                if (!_refreshing)
+                // If the settings have not yet finished loading, don't track changes to the values.
+                if (Loaded)
                 {
-                    _modifiedProperties.Add(e.PropertyName);
+                    if (!_modifiedProperties.Contains(e.PropertyName))
+                    {
+                        _modifiedProperties.Add(e.PropertyName);
+                    }
 
                     // If in dynamic mode, save right away.
                     if (_dynamic)

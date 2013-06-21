@@ -26,8 +26,9 @@ namespace Extract.Utilities.Email
         void LoadSettings(bool userSpecific);
 
         /// <summary>
-        /// Saves the settings to the current level as specified by <see cref="UserSettings"/>.
+        /// Saves the settings to the same location from which they were loaded.
         /// </summary>
+        /// <throws><see cref="ExtractException"/> if settings were never loaded.</throws>
         void SaveSettings();
 
         #endregion Methods
@@ -109,10 +110,12 @@ namespace Extract.Utilities.Email
         bool UseSsl { get; set; }
 
         /// <summary>
-        /// Gets or sets whether the current settings are user level settings or global settings.
-        /// If <see langword="true"/> then the settings are user level settings.
+        /// Gets a value indicating whether this instance has unsaved changes.
         /// </summary>
-        bool UserSettings { get; set; }
+        /// <value><see langword="true"/> if this instance has unsaved changes; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        bool HasUnsavedChanges { get; }
 
         #endregion Properties
     }
@@ -157,6 +160,43 @@ namespace Extract.Utilities.Email
 
         #endregion Constants
 
+        #region Fields
+
+        /// <summary>
+        /// The main settings instance used to store the email settings.
+        /// </summary>
+        ExtractSettingsBase<ExtractSmtp> _settings;
+
+        /// <summary>
+        /// If <see cref="_settings"/> has not been supplied, a temporary instance of
+        /// <see cref="_temporarySettings"/> to maintain settings in memory, but that cannot be
+        /// persisted.
+        /// </summary>
+        ExtractSmtp _temporarySettings;
+
+        #endregion Fields
+
+        #region Public Methods
+
+        /// <summary>
+        /// Loads the settings.
+        /// </summary>
+        /// <param name="settings">The <see cref="ExtractSettingsBase{ExtractSmtp}"/> instance from
+        /// which settings should be loaded and persisted.</param>
+        public void LoadSettings(ExtractSettingsBase<ExtractSmtp> settings)
+        {
+            try
+            {
+                _settings = settings;
+            }
+            catch (Exception ex)
+            {
+                ex.AsExtract("ELI35938");
+            }
+        }
+
+        #endregion Public Methods
+
         #region ISmtpEmailSettings Members
 
         /// <summary>
@@ -169,29 +209,8 @@ namespace Extract.Utilities.Email
         {
             try
             {
-                var settings = new ConfigSettings<ExtractSmtp>(
-                    userSpecific ? _USER_SETTINGS : _GLOBAL_SETTINGS, false, true).Settings;
-
-                // Load settings
-                Server = settings.Server ?? string.Empty;
-                Port = settings.Port > 0 ? settings.Port : _DEFAULT_PORT;
-                SenderName = settings.SenderName ?? string.Empty;
-                SenderAddress = settings.SenderAddress ?? string.Empty;
-                EmailSignature = settings.EmailSignature ?? string.Empty;
-                Timeout = settings.Timeout;
-                UseSsl = settings.UseSsl;
-                UserSettings = userSpecific;
-
-                // Load encrypted settings
-                var label = new MapLabel();
-                if (!string.IsNullOrWhiteSpace(settings.UserName))
-                {
-                    UserName = settings.UserName.ExtractDecrypt(label);
-                }
-                if (!string.IsNullOrWhiteSpace(settings.Password))
-                {
-                    Password = settings.Password.ExtractDecrypt(label);
-                }
+                _settings = new ConfigSettings<ExtractSmtp>(
+                    userSpecific ? _USER_SETTINGS : _GLOBAL_SETTINGS, false, true);
             }
             catch (Exception ex)
             {
@@ -206,26 +225,11 @@ namespace Extract.Utilities.Email
         {
             try
             {
-                var config = new ConfigSettings<ExtractSmtp>(
-                    UserSettings ? _USER_SETTINGS : _GLOBAL_SETTINGS, false, true);
-                var settings = config.Settings;
-
-                // Save settings
-                settings.Server = Server;
-                settings.Port = Port;
-                settings.SenderName = SenderName;
-                settings.SenderAddress = SenderAddress;
-                settings.EmailSignature = EmailSignature;
-                settings.Timeout = Timeout;
-                settings.UseSsl = UseSsl;
-
-                // Save encrypted settings
-                var label = new MapLabel();
-                settings.UserName = UserName.ExtractEncrypt(label);
-                settings.Password = Password.ExtractEncrypt(label);
+                ExtractException.Assert("ELI35936", "Settings have not been loaded.",
+                    _settings != null);
 
                 // Save the settings to disk
-                config.Save();
+                _settings.Save();
             }
             catch (Exception ex)
             {
@@ -239,7 +243,18 @@ namespace Extract.Utilities.Email
         /// <value>
         /// The SMTP server.
         /// </value>
-        public string Server { get; set; }
+        public string Server
+        {
+            get
+            {
+                return Settings.Server;
+            }
+
+            set
+            {
+                Settings.Server = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the port for the SMTP server.
@@ -247,7 +262,18 @@ namespace Extract.Utilities.Email
         /// <value>
         /// The port for the SMTP server.
         /// </value>
-        public int Port { get; set; }
+        public int Port
+        {
+            get
+            {
+                return Settings.Port;
+            }
+
+            set
+            {
+                Settings.Port = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the login user name.
@@ -255,7 +281,46 @@ namespace Extract.Utilities.Email
         /// <value>
         /// The login user name.
         /// </value>
-        public string UserName { get; set; }
+        public string UserName
+        {
+            get
+            {
+                try
+                {
+                    // return decrypted username
+                    string userName = Settings.UserName;
+                    if (string.IsNullOrWhiteSpace(userName))
+                    {
+                        return "";
+                    }
+                    else
+                    {
+                        return userName.ExtractDecrypt(new MapLabel());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35932");
+                }
+            }
+
+            set
+            {
+                try
+                {
+                    // Because encryption output may differ for the same input, don't set the
+                    // username unless it has changed to prevent needless saving of data.
+                    if (!UserName.Equals(value, StringComparison.OrdinalIgnoreCase))
+                    {
+                        Settings.UserName = value.ExtractEncrypt(new MapLabel());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35933");
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the login password.
@@ -263,7 +328,46 @@ namespace Extract.Utilities.Email
         /// <value>
         /// The login password.
         /// </value>
-        public string Password { get; set; }
+        public string Password
+        {
+            get
+            {
+                try
+                {
+                    // return decrypted password
+                    string password = Settings.Password;
+                    if (string.IsNullOrWhiteSpace(password))
+                    {
+                        return "";
+                    }
+                    else
+                    {
+                        return password.ExtractDecrypt(new MapLabel());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35934");
+                }
+            }
+
+            set
+            {
+                try
+                {
+                    // Because encryption output may differ for the same input, don't set the
+                    // password unless it has changed to prevent needless saving of data.
+                    if (!Password.Equals(value, StringComparison.OrdinalIgnoreCase))
+                    {
+                        Settings.Password = value.ExtractEncrypt(new MapLabel());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI35935");
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the sender name.
@@ -271,7 +375,18 @@ namespace Extract.Utilities.Email
         /// <value>
         /// The name of the sender.
         /// </value>
-        public string SenderName { get; set; }
+        public string SenderName
+        {
+            get
+            {
+                return Settings.SenderName;
+            }
+
+            set
+            {
+                Settings.SenderName = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the sender address.
@@ -279,7 +394,18 @@ namespace Extract.Utilities.Email
         /// <value>
         /// The sender address.
         /// </value>
-        public string SenderAddress { get; set; }
+        public string SenderAddress
+        {
+            get
+            {
+                return Settings.SenderAddress;
+            }
+
+            set
+            {
+                Settings.SenderAddress = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the email signature.
@@ -287,7 +413,18 @@ namespace Extract.Utilities.Email
         /// <value>
         /// The email signature.
         /// </value>
-        public string EmailSignature { get; set; }
+        public string EmailSignature
+        {
+            get
+            {
+                return Settings.EmailSignature;
+            }
+
+            set
+            {
+                Settings.EmailSignature = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the timeout in milliseconds when connecting to the server.
@@ -295,7 +432,18 @@ namespace Extract.Utilities.Email
         /// <value>
         /// The timeout.
         /// </value>
-        public int Timeout { get; set; }
+        public int Timeout
+        {
+            get
+            {
+                return Settings.Timeout;
+            }
+
+            set
+            {
+                Settings.Timeout = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the email should be sent using SSL.
@@ -305,13 +453,32 @@ namespace Extract.Utilities.Email
         /// <para><b>Note:</b></para>
         /// This requires that the SMTP server supports SSL communication.
         /// </value>
-        public bool UseSsl { get; set; }
+        public bool UseSsl
+        {
+            get
+            {
+                return Settings.UseSsl;
+            }
+
+            set
+            {
+                Settings.UseSsl = value;
+            }
+        }
 
         /// <summary>
-        /// Gets or sets whether the current settings are user level settings or global settings.
-        /// If <see langword="true"/> then the settings are user level settings.
+        /// Gets a value indicating whether this instance has unsaved changes.
         /// </summary>
-        public bool UserSettings { get; set; }
+        /// <value><see langword="true"/> if this instance has unsaved changes; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool HasUnsavedChanges
+        {
+            get
+            {
+                return _settings != null && _settings.HasUnsavedChanges;
+            }
+        }
 
         #endregion
 
@@ -337,5 +504,38 @@ namespace Extract.Utilities.Email
         }
 
         #endregion
+
+        #region Private Members
+
+        /// <summary>
+        /// Gets the <see cref="ExtractSmtp"/> instance to which settings should be loaded from and
+        /// applied.
+        /// </summary>
+        ExtractSmtp Settings
+        {
+            get
+            {
+                // If no permanent settings instance has been provided, use a temporary ExtractSmtp
+                // instance.
+                if (_settings == null)
+                {
+                    if (_temporarySettings == null)
+                    {
+                        _temporarySettings = new ExtractSmtp();
+                    }
+
+                    return _temporarySettings;
+                }
+                // Otherwise, use the setting from the permanent settings instance.
+                else
+                {
+                    return _settings.Settings;
+                }
+            }
+        }
+
+
+        #endregion Private Members
     }
 }
+

@@ -231,7 +231,7 @@ private:
 	bool isActionNameInDatabase(const string& strAction);
 
 	// Log the start and stop processing information
-	void logStatusInfo(EStartStopStatus eStatus);
+	void logStatusInfo(EStartStopStatus eStatus, bool bLogAppTrace = true);
 
 	// Indicates whether user authentication is required to run.
 	bool isUserAuthenticationRequired();

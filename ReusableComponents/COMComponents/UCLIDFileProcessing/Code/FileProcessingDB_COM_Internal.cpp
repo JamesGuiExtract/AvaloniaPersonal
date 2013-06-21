@@ -689,26 +689,25 @@ int UpdateToSchemaVersion115(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
 			+ gstrALTERNATE_COMPONENT_DATA_DIR + "', '')");
 		// Add Email settings values.
+		// Email setting defaults should be kept in sync with Extract.Utilities.Email.ExtractSmtp
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
 			+ gstrEMAIL_SERVER + "', '')");
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
-			+ gstrEMAIL_PORT + "', '')");
+			+ gstrEMAIL_PORT + "', '25')");
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
-			+ gstrEMAIL_SENDER + "', '')");
+			+ gstrEMAIL_SENDER_NAME + "', '')");
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
 			+ gstrEMAIL_SENDER_ADDRESS + "', '')");
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
 			+ gstrEMAIL_SIGNATURE + "', '')");
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
-			+ gstrEMAIL_REQUIRES_AUTHENTICATION + "', '')");
-		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
 			+ gstrEMAIL_USERNAME + "', '')");
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
 			+ gstrEMAIL_PASSWORD + "', '')");
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
-			+ gstrEMAIL_TIMEOUT + "', '')");
+			+ gstrEMAIL_TIMEOUT + "', '0')");
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
-			+ gstrEMAIL_USE_SSL + "', '')");
+			+ gstrEMAIL_USE_SSL + "', '0')");
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
@@ -2470,6 +2469,8 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 
 					// Update the database
 					ipDBInfoSet->Update();
+
+					executeCmdQuery(ipConnection, gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
 				}
 
 				// Commit transaction

@@ -115,7 +115,14 @@ const UPI& UPI::getCurrentProcessUPI()
 			}
 			catch (...)
 			{
-				strAppName = "Unknown";
+				try
+				{
+					strAppName = getFileNameWithoutExtension(getCurrentProcessEXEFullPath());
+				}
+				catch (...)
+				{
+					strAppName = "Unknown";
+				}
 			}
 			strUPI += strAppName + strSLASH;
 
