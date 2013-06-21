@@ -44,6 +44,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DocumentationFile>..\..\..\..\..\Binaries\release\Extract.Utilities.Email.XML</DocumentationFile>
     <RegisterForComInterop>true</RegisterForComInterop>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
