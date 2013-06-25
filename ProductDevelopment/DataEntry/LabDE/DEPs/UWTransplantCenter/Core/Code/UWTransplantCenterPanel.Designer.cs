@@ -430,9 +430,9 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._epicPatientNameTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._epicPatientNameTable.ColumnHintsEnabled = false;
             this._epicPatientNameTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this._epicPatientLastNameColumn,
             this._epicPatientFirstNameColumn,
             this._epicPatientMiddleNameColumn,
-            this._epicPatientLastNameColumn,
             this._epicPatientSuffixColumn});
             dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
@@ -519,9 +519,9 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._patientNameTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._patientNameTable.ColumnHintsEnabled = false;
             this._patientNameTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this._patientLastNameColumn,
             this._patientFirstNameColumn,
             this._patientMiddleNameColumn,
-            this._patientLastNameColumn,
             this._patientSuffixColumn});
             dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Window;
@@ -619,8 +619,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._patientBirthDate.Size = new System.Drawing.Size(283, 20);
             this._patientBirthDate.TabIndex = 3;
             this._patientBirthDate.ValidationErrorMessage = "Date of birth must be a valid date in the format MM/DD/YYYY";
-            this._patientBirthDate.ValidationPattern = "(^$)|(^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(18|19|20)\\d{2}" +
-    "$)";
+            this._patientBirthDate.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(18|19|20)\\d{2}$";
             // 
             // _birthDateLabel
             // 
