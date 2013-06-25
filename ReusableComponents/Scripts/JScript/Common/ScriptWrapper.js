@@ -3,6 +3,8 @@
 //--------------------------------------------------------------------------------------------------
 // Define default error display and debug settings
 var GBoolLogErrorsOnly = false;
+var GBoolSaveErrors = false;
+var GStrExceptionFileName;
 var GBoolShowDebugInfo = false;
 
 // Create FileSystemObject
@@ -65,21 +67,42 @@ if(typeof Array.prototype.has !== 'function') {
 }
 
 // Run the script
-main(parseCommandLineOptions());
+try {
+    main(parseCommandLineOptions());
+}
+catch(err) {
+    if (GBoolSaveErrors) {
+        handleScriptError("ELI35991", "Unhandled Error", err);
+    }
+    else {
+        throw err;
+    }
+}
 
 //--------------------------------------------------------------------------------------------------
 // Parses the command-line arguments for options and returns the remaining arguments.
 // Will set one or more of the following global boolean parameters.
 //    GBoolShowDebugInfo ===> -debug
 //    GBoolLogErrorsOnly ===> -silent
+//    GBoolSaveErrors and GStrExceptionFileName ===> /ef <ExceptionFileName>
 //--------------------------------------------------------------------------------------------------
 function parseCommandLineOptions() {
     var args = WScript.Arguments;
     var filteredArgs = [];
     var strArg;
+    var nextIsErrorFileName = false;
     for (var i=0; i < args.length; i++) {
         strArg = args(i);
-        if (/^[-\/]silent$/i.test(strArg)) {
+        if (/^[-\/]ef$/i.test(strArg)) {
+            GBoolSaveErrors = true;
+            nextIsErrorFileName = true;
+        }
+        else if (nextIsErrorFileName) {
+            GBoolLogErrorsOnly = true;
+            GStrExceptionFileName = strArg;
+            nextIsErrorFileName = false;
+        }
+        else if (/^[-\/]silent$/i.test(strArg)) {
             GBoolLogErrorsOnly = true;
         }
         else if (/^[-\/]debug$/i.test(strArg)) {
@@ -119,6 +142,14 @@ function handleScriptError() {
     for (var i=3; i < arguments.length-1; i+=2) {
         exceptionObject.AddDebugInfo(arguments[i], arguments[i+1]);
     }
+
+    // Save error if desired
+    try {
+        if (GBoolSaveErrors) {
+            exceptionObject.SaveTo(GStrExceptionFileName, false);
+        }
+    }
+    catch (error) {}
 
     // Display the exception if desired
     if (!GBoolLogErrorsOnly) {
