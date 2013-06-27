@@ -64,7 +64,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                 InitializeComponent();
 
-                _pathTags = new FileActionManagerPathTags("", "", null, 0);
+                _pathTags = new FileActionManagerDatabasePathTags("", "", null, 0);
                 _subjectPathTagsButton.PathTags = _pathTags;
                 _bodyPathTagsButton.PathTags = _pathTags;
             }

@@ -78,6 +78,7 @@
     <Compile Include="FAMDatabaseSettings.cs" />
     <Compile Include="FAMServiceDatabaseManager.cs" />
     <Compile Include="FAMServiceDatabaseMapping.cs" />
+    <Compile Include="FileActionManagerDatabasePathTags.cs" />
     <Compile Include="FpsFileTableData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

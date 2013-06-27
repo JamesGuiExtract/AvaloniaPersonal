@@ -163,7 +163,7 @@ namespace Extract.Utilities.Email
 
         /// <summary>
         /// Maps all property names in <see cref="ExtractSmtp"/> to the name of setting in the
-        /// DBInfo table. The type of ILookup is used because it is immutable.//
+        /// DBInfo table. The type of ILookup is used because it is immutable.
         /// </summary>
         // ILookup is immutable
         [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]

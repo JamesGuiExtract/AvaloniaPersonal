@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
-using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.Utilities
 {
@@ -34,21 +33,6 @@ namespace Extract.Utilities
         /// </summary>
         public static readonly string CommonComponentsDirectoryTag = "<CommonComponentsDir>";
 
-        /// <summary>
-        /// Constant string for the action name tag
-        /// </summary>
-        public static readonly string ActionTag = "<ActionName>";
-
-        /// <summary>
-        /// Constant string for the database name tag
-        /// </summary>
-        public static readonly string DatabaseTag = "<DatabaseName>";
-
-        /// <summary>
-        /// Constant string for the database server name tag
-        /// </summary>
-        public static readonly string DatabaseServerTag = "<DatabaseServerName>";
-
         #endregion Constants
 
         #region FileActionManagerPathTags Constructors
@@ -58,6 +42,16 @@ namespace Extract.Utilities
         /// </summary>
         public FileActionManagerPathTags()
             : this("", "")
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileActionManagerPathTags"/> class.
+        /// </summary>
+        /// <param name="tagsToValues">A dictionary that maps path tags to their expanded value.
+        /// </param>
+        public FileActionManagerPathTags(IDictionary<string, string> tagsToValues)
+            : base(tagsToValues)
         {
         }
 
@@ -79,19 +73,6 @@ namespace Extract.Utilities
         /// <param name="remoteSourceDocName">The remote source doc name</param>
         public FileActionManagerPathTags(string sourceDocument, string fpsDirectory, string remoteSourceDocName)
             : base(GetTagsToValues(sourceDocument, fpsDirectory, remoteSourceDocName))
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FileActionManagerPathTags"/> class.
-        /// </summary>
-        /// <param name="sourceDocument">The source document</param>
-        /// <param name="fpsDirectory">The directory of the fps file.</param>
-        /// <param name="fileProcessingDB">The <see cref="IFileProcessingDB"/>.</param>
-        /// <param name="actionId">The current action in <see paramref="fileProcessingDB"/>.</param>
-        public FileActionManagerPathTags(string sourceDocument, string fpsDirectory,
-                IFileProcessingDB fileProcessingDB, int actionId)
-            : base(GetTagsToValues(sourceDocument, fpsDirectory, fileProcessingDB, actionId))
         {
         }
 
@@ -179,31 +160,6 @@ namespace Extract.Utilities
             tagsToValues.Add(CommonComponentsDirectoryTag, FileSystemMethods.CommonComponentsPath);
             return tagsToValues;
         }
-
-        /// <summary>
-        /// Gets the path tags mapped to their expanded form
-        /// </summary>
-        /// <param name="sourceDocument">The source document</param>
-        /// <param name="fpsDirectory">the fps file directory.</param>
-        /// <param name="fileProcessingDB">The <see cref="IFileProcessingDB"/>.</param>
-        /// <param name="actionId">The current action in <see paramref="fileProcessingDB"/>.</param>
-        /// <returns>The path tags mapped to their expanded form.</returns>
-        static Dictionary<string, string> GetTagsToValues(string sourceDocument,
-            string fpsDirectory, IFileProcessingDB fileProcessingDB, int actionId)
-        {
-            Dictionary<string, string> tagsToValues = new Dictionary<string, string>(6);
-            tagsToValues.Add(SourceDocumentTag, sourceDocument);
-            tagsToValues.Add(FpsFileDirectoryTag, fpsDirectory);
-            tagsToValues.Add(ActionTag, (fileProcessingDB == null || actionId == 0)
-                ? "" : fileProcessingDB.GetActionName(actionId));
-            tagsToValues.Add(DatabaseTag, (fileProcessingDB == null)
-                ? "" : fileProcessingDB.DatabaseName);
-            tagsToValues.Add(DatabaseServerTag, (fileProcessingDB == null)
-                ? "" : fileProcessingDB.DatabaseServer);
-            tagsToValues.Add(CommonComponentsDirectoryTag, FileSystemMethods.CommonComponentsPath);
-            return tagsToValues;
-        }
-        
 
         #endregion FileActionManagerPathTags Methods
     }

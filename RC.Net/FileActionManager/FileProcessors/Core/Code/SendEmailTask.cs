@@ -877,7 +877,7 @@ namespace Extract.FileActionManager.FileProcessors
                 string expandedOutput = "";
 
                 // Create the pathTags instance to be used to expand any path tags/functions.
-                FileActionManagerPathTags pathTags = new FileActionManagerPathTags(
+                FileActionManagerPathTags pathTags = new FileActionManagerDatabasePathTags(
                     fileRecord.Name, tagManager.FPSFileDir, fileProcessingDB, actionId);
 
                 // Parse the source text into alternating "matches" where every other "match" is a
