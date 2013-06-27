@@ -981,6 +981,7 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 
 				// Set the status of the connection to not connected
 				m_strCurrentConnectionStatus = gstrNOT_CONNECTED;
+				m_strCurrentConnectionString = "";
 
 				// Create the connection string with the current server and database
 				strConnectionString = createConnectionString(m_strDatabaseServer, 
@@ -1031,6 +1032,7 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 
 				// Connection has been established 
 				m_strCurrentConnectionStatus = gstrCONNECTION_ESTABLISHED;
+				m_strCurrentConnectionString = strConnectionString;
 
 				_lastCodePos = "80";
 
@@ -1054,6 +1056,7 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 		// Update the connection Status string 
 		// TODO:  may want to get more detail as to what is the problem
 		m_strCurrentConnectionStatus = gstrUNABLE_TO_CONNECT_TO_SERVER;
+		m_strCurrentConnectionString = "";
 
 		ue.addDebugInfo("Connection string", strConnectionString, true);
 
@@ -3276,6 +3279,7 @@ void CFileProcessingDB::closeAllDBConnections()
 
 		// Reset the Current connection status to not connected
 		m_strCurrentConnectionStatus = gstrNOT_CONNECTED;
+		m_strCurrentConnectionString = "";
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29885");
 }

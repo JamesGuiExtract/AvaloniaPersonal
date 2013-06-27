@@ -2718,6 +2718,45 @@ STDMETHODIMP CFileProcessingDB::ShowSelectDB(BSTR bstrPrompt, VARIANT_BOOL bAllo
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35755")
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetFileCount(VARIANT_BOOL bUseOracleSyntax, LONGLONG* pnFileCount)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI35770", pnFileCount != __nullptr);
+
+		validateLicense();
+
+		if (!GetFileCount_Internal(false, bUseOracleSyntax, pnFileCount))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			GetFileCount_Internal(true, bUseOracleSyntax, pnFileCount);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35760")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_CurrentConnectionString(BSTR* pbstrConnectionString)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI35945", pbstrConnectionString != __nullptr);
+
+		*pbstrConnectionString = _bstr_t(m_strCurrentConnectionString.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35946");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods
@@ -2747,26 +2786,3 @@ STDMETHODIMP CFileProcessingDB::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	return S_OK;
 }
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetFileCount(VARIANT_BOOL bUseOracleSyntax, LONGLONG* pnFileCount)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-	try
-	{
-		ASSERT_ARGUMENT("ELI35770", pnFileCount != __nullptr);
-
-		validateLicense();
-
-		if (!GetFileCount_Internal(false, bUseOracleSyntax, pnFileCount))
-		{
-			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
-
-			GetFileCount_Internal(true, bUseOracleSyntax, pnFileCount);
-		}
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35760")
-}
-//-------------------------------------------------------------------------------------------------

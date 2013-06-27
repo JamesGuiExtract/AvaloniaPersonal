@@ -236,6 +236,7 @@ public:
 	STDMETHOD(ShowSelectDB)(BSTR bstrPrompt, VARIANT_BOOL bAllowCreation,
 		VARIANT_BOOL bRequireAdminLogin, VARIANT_BOOL* pbConnected);
 	STDMETHOD(GetFileCount)(VARIANT_BOOL bUseOracleSyntax, LONGLONG* pnFileCount);
+	STDMETHOD(get_CurrentConnectionString)(BSTR* pbstrConnectionString);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -338,6 +339,9 @@ private:
 
 	// This string should always contain the current status string
 	string m_strCurrentConnectionStatus;
+
+	// This connection string that was used to connect to the DB.
+	string m_strCurrentConnectionString;
 
 	// The database server to connect to
 	string m_strDatabaseServer;

@@ -41,6 +41,11 @@ namespace Extract.DataEntry
         /// </summary>
         string _parameterMarker;
 
+        /// <summary>
+        /// Indicates whether named parameters are supported by the current database type.
+        /// </summary>
+        bool _useNamedParameters;
+
         #endregion Fields
 
         #region Constructors
@@ -66,10 +71,22 @@ namespace Extract.DataEntry
 
                 _lastDBConnection = dbConnection;
 
-                _parameterMarker = (dbConnection.GetType().ToString()
-                    .IndexOf("Oracle", StringComparison.OrdinalIgnoreCase) == -1)
-                    ? "@"   // MS SQL & SQL CE
-                    : ":";  // Oracle
+                string dbType = dbConnection.GetType().ToString();
+                if (dbType.IndexOf("Oracle", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    _parameterMarker = ":";  // Oracle
+                    _useNamedParameters = true;
+                }
+                else if (dbType.IndexOf("Ole", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    _parameterMarker = "?";  // MS Ole
+                    _useNamedParameters = false;
+                }
+                else
+                {
+                    _parameterMarker = "@";   // MS SQL & SQL CE
+                    _useNamedParameters = true;
+                }
             }
             catch (Exception ex)
             {
@@ -118,7 +135,7 @@ namespace Extract.DataEntry
 
                         cacheKey += value + ":";
                         parameters[key] = value;
-                        sqlQuery.Append(key);
+                        sqlQuery.Append(_useNamedParameters ? key : _parameterMarker);
                     }
                     else
                     {

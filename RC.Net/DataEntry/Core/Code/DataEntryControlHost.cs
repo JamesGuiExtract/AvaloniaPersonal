@@ -4363,9 +4363,8 @@ namespace Extract.DataEntry
 
             try
             {
-                // DataEntry SmartTags require an SQL CE database connection.
-                SqlCeConnection sqlCeConnection = _dbConnection as SqlCeConnection;
-                if (sqlCeConnection == null)
+                // DataEntry SmartTags require a database connection.
+                if (_dbConnection == null)
                 {
                     if (_smartTagManager != null)
                     {
@@ -4377,7 +4376,7 @@ namespace Extract.DataEntry
                 }
 
                 // DataEntry SmartTags require a 'SmartTag' table.
-                queryCommand = DBMethods.CreateDBCommand(sqlCeConnection,
+                queryCommand = DBMethods.CreateDBCommand(_dbConnection,
                         "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'SmartTag'", null);
                 string[] queryResults = DBMethods.ExecuteDBQuery(queryCommand, "\t");
                 if (queryResults.Length == 0)
@@ -4395,7 +4394,7 @@ namespace Extract.DataEntry
                 // Retrieve the smart tags...
                 queryCommand.Dispose();
                 queryCommand = DBMethods.CreateDBCommand(
-                        sqlCeConnection, "SELECT TagName, TagValue FROM [SmartTag]", null);
+                        _dbConnection, "SELECT TagName, TagValue FROM [SmartTag]", null);
                 queryResults = DBMethods.ExecuteDBQuery(queryCommand, "\t");
 
                 // And put them into a dictionary that the SmartTagManager can use

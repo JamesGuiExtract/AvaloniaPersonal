@@ -645,9 +645,8 @@ namespace Extract.AttributeFinder.Rules
                 dbConnection = GetDatabaseConnection(out databaseWorkingCopyFileName, 
                     out originalSQLCEDBFileName);
 
-                // Initialize data and execute the query
-                AttributeStatusInfo.ResetData(sourceDocName, sourceAttributes, dbConnection);
-                InitializeAttributes(sourceAttributes);
+                AttributeStatusInfo.InitializeForQuery(
+                    sourceAttributes, sourceDocName, dbConnection, null);
 
                 DataEntryQuery query = DataEntryQuery.Create(Query, null, dbConnection);
 
@@ -788,22 +787,6 @@ namespace Extract.AttributeFinder.Rules
 
             // A database connection has not been configured.
             return null;
-        }
-
-        /// <summary>
-        /// Initializes the attributes for evaluation by a data query.
-        /// </summary>
-        /// <param name="attributes">The <see cref="IAttribute"/>s to initialize.</param>
-        static void InitializeAttributes(IUnknownVector attributes)
-        {
-            int attributeCount = attributes.Size();
-            for (int i = 0; i < attributeCount; i++)
-            {
-                IAttribute attribute = (IAttribute)attributes.At(i);
-                AttributeStatusInfo.Initialize(attribute, attributes, null);
-
-                InitializeAttributes(attribute.SubAttributes);
-            }
         }
 
         #endregion Private Members

@@ -72,6 +72,8 @@
     <Reference Include="edtFTPnetPRO, Version=7.3.1.20, Culture=neutral, PublicKeyToken=0dce1ad63760d80b, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\EnterpriseDT\Bin\edtFTPnetPRO.dll</HintPath>
     </Reference>
+    <Reference Include="Extract.AttributeFinder, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
+    <Reference Include="Extract.Imaging.Forms, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
     <Reference Include="Leadtools, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.dll</HintPath>
     </Reference>
@@ -157,6 +159,25 @@
     <Compile Include="RasterizePdfTaskSettingsDialog.Designer.cs">
       <DependentUpon>RasterizePdfTaskSettingsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="SendEmailTask.cs" />
+    <Compile Include="SendEmailTaskAdvancedDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SendEmailTaskAdvancedDialog.Designer.cs">
+      <DependentUpon>SendEmailTaskAdvancedDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SendEmailTaskAttachmentsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SendEmailTaskAttachmentsDialog.Designer.cs">
+      <DependentUpon>SendEmailTaskAttachmentsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SendEmailTaskSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SendEmailTaskSettingsDialog.Designer.cs">
+      <DependentUpon>SendEmailTaskSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="SetFilePrioritySettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -169,6 +190,10 @@
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\DataEntry\Core\Code\Extract.DataEntry.csproj">
+      <Project>{55C4FA3A-26C9-4CC0-9F11-A7E607E6ACD2}</Project>
+      <Name>Extract.DataEntry</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Drawing\Core\Code\Extract.Drawing.csproj">
       <Project>{865B9A25-1D27-4445-9CC7-7BF88D736BA8}</Project>
@@ -198,6 +223,10 @@
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\Email\Core\Code\Extract.Utilities.Email.csproj">
+      <Project>{1B3DED27-DBF9-478A-9E31-FFA479621F5C}</Project>
+      <Name>Extract.Utilities.Email</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
@@ -205,6 +234,10 @@
     <ProjectReference Include="..\..\..\..\Utilities\Ftp\Core\Code\Extract.Utilities.Ftp.csproj">
       <Project>{D2DD8D8F-E632-429E-8646-B9489D21295F}</Project>
       <Name>Extract.Utilities.Ftp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Database\Core\Code\Extract.FileActionManager.Database.csproj">
+      <Project>{C15ABD31-ADA3-4EB1-91D5-3392D375FF12}</Project>
+      <Name>Extract.FileActionManager.Database</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
       <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>
@@ -320,6 +353,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="RasterizePdfTaskSettingsDialog.resx">
       <DependentUpon>RasterizePdfTaskSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SendEmailTaskAdvancedDialog.resx">
+      <DependentUpon>SendEmailTaskAdvancedDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SendEmailTaskAttachmentsDialog.resx">
+      <DependentUpon>SendEmailTaskAttachmentsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SendEmailTaskSettingsDialog.resx">
+      <DependentUpon>SendEmailTaskSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SetFilePrioritySettingsDialog.resx">
       <DependentUpon>SetFilePrioritySettingsDialog.cs</DependentUpon>

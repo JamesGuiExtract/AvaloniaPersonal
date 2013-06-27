@@ -37,7 +37,7 @@ namespace Extract.DataEntry
                 bool containsPossiblePathTag = (QueryText.Contains("$") ||
                     QueryText.IndexOf("<SourceDocName>", StringComparison.Ordinal) >= 0);
                 string expandedQuery = containsPossiblePathTag ?
-                    AttributeStatusInfo.SourceDocumentPathTags.Expand(QueryText) : QueryText;
+                    AttributeStatusInfo.PathTags.Expand(QueryText) : QueryText;
 
                 // Treat separate lines as separate values.
                 string[] parsedQuery =

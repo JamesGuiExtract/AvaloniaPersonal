@@ -1,7 +1,10 @@
 ﻿using Extract.Encryption;
 using Extract.Licensing;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using UCLID_COMUTILSLib;
 
@@ -158,6 +161,26 @@ namespace Extract.Utilities.Email
         /// </summary>
         const int _DEFAULT_PORT = 25;
 
+        /// <summary>
+        /// Maps all property names in <see cref="ExtractSmtp"/> to the name of setting in the
+        /// DBInfo table. The type of ILookup is used because it is immutable.//
+        /// </summary>
+        // ILookup is immutable
+        [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
+        public static readonly ILookup<string, string> PropertyNameLookup =
+            (new Dictionary<string, string>()
+            {
+                { "Server", "EmailServer" },
+                { "Port", "EmailPort" },
+                { "UserName", "EmailUserName" },
+                { "Password", "EmailPassword" },
+                { "SenderName", "EmailSenderName" },
+                { "SenderAddress", "EmailSenderAddress" },
+                { "EmailSignature", "EmailSignature" },
+                { "Timeout", "EmailTimeout" },
+                { "UseSsl", "EmailUseSsl" }
+            }).ToLookup(pair => pair.Key, pair => pair.Value);
+
         #endregion Constants
 
         #region Fields
@@ -310,7 +333,7 @@ namespace Extract.Utilities.Email
                 {
                     // Because encryption output may differ for the same input, don't set the
                     // username unless it has changed to prevent needless saving of data.
-                    if (!UserName.Equals(value, StringComparison.OrdinalIgnoreCase))
+                    if (!UserName.Equals(value, StringComparison.Ordinal))
                     {
                         Settings.UserName = value.ExtractEncrypt(new MapLabel());
                     }
@@ -357,7 +380,7 @@ namespace Extract.Utilities.Email
                 {
                     // Because encryption output may differ for the same input, don't set the
                     // password unless it has changed to prevent needless saving of data.
-                    if (!Password.Equals(value, StringComparison.OrdinalIgnoreCase))
+                    if (!Password.Equals(value, StringComparison.Ordinal))
                     {
                         Settings.Password = value.ExtractEncrypt(new MapLabel());
                     }

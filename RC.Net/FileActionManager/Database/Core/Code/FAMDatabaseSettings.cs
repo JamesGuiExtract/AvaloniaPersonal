@@ -3,6 +3,7 @@ using System;
 using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Database
@@ -32,28 +33,14 @@ namespace Extract.FileActionManager.Database
         IFileProcessingDB _FAMDatabase;
 
         /// <summary>
-        /// The prefix that should be added to all property names in <see typeparam="T"/> to obtain
-        /// the name of setting in the DBInfo table.
+        /// Maps all property names in <see typeparam="T"/> to the name of setting in the DBInfo
+        /// table. The type of ILookup is used because it is immutable.
         /// </summary>
-        string _settingPrefix;
+        ILookup<string, string> _propertyLookup;
 
         #endregion Fields
 
         #region Contructors
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FAMDatabaseSettings{T}"/> class.
-        /// </summary>
-        /// <param name="FAMDatabase">The <see cref="IFileProcessingDB"/> to which the settings
-        /// should be persisted.</param>
-        /// <param name="settingPrefix">The prefix that should be added to all property names in
-        /// <see typeparam="T"/> to obtain the name of setting in the DBInfo table.</param>
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "FAM")]
-        public FAMDatabaseSettings(IFileProcessingDB FAMDatabase, string settingPrefix)
-            : this(FAMDatabase, true, settingPrefix)
-        {
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FAMDatabaseSettings&lt;T&gt;"/> class.
@@ -64,17 +51,18 @@ namespace Extract.FileActionManager.Database
         /// soon as they are modified and re-freshed from disk as necessary every time the Settings 
         /// property is accessed. If <see langword="false"/> the properties will only be loaded and
         /// saved to disk when explicitly requested.</param>
-        /// <param name="settingPrefix">The prefix that should be added to all property names in
-        /// <see typeparam="T"/> to obtain the name of setting in the DBInfo table.</param>
+        /// <param name="propertyLookup">Maps all property names in <see typeparam="T"/> to the name
+        /// of setting in the DBInfo table.</param>
         [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "FAM")]
-        public FAMDatabaseSettings(IFileProcessingDB FAMDatabase, bool dynamic, string settingPrefix)
+        public FAMDatabaseSettings(IFileProcessingDB FAMDatabase, bool dynamic,
+            ILookup<string, string> propertyLookup)
             : base(dynamic)
         {
             try 
 	        {	        
 		        _FAMDatabase = FAMDatabase;
-                _settingPrefix = settingPrefix;
+                _propertyLookup = propertyLookup;
 
                 Load();
 
@@ -101,8 +89,8 @@ namespace Extract.FileActionManager.Database
 
                 foreach (SettingsProperty property in Settings.Properties)
                 {
-                    string value =
-                        _FAMDatabase.GetDBInfoSetting(_settingPrefix + property.Name, false);
+                    string value = _FAMDatabase.GetDBInfoSetting(
+                        _propertyLookup[property.Name].Single(), false);
 
                     if (value != null)
                     {
@@ -170,7 +158,8 @@ namespace Extract.FileActionManager.Database
         {
             try
             {
-                _FAMDatabase.SetDBInfoSetting(_settingPrefix + propertyName, value, true);
+                _FAMDatabase.SetDBInfoSetting(
+                    _propertyLookup[propertyName].Single(), value, true);
             }
             catch (Exception ex)
             {

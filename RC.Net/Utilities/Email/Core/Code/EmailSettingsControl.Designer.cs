@@ -85,6 +85,7 @@
             this._textEmailSignature.Location = new System.Drawing.Point(11, 86);
             this._textEmailSignature.Multiline = true;
             this._textEmailSignature.Name = "_textEmailSignature";
+            this._textEmailSignature.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._textEmailSignature.Size = new System.Drawing.Size(340, 110);
             this._textEmailSignature.TabIndex = 2;
             this._textEmailSignature.TextChanged += new System.EventHandler(this.HandleTextBoxTextChanged);

@@ -91,10 +91,10 @@ namespace Extract.Utilities.Forms
         string _fileFilter;
 
         /// <summary>
-        /// The <see cref="TextBox"/> that will be updated by the dialog result if the user
+        /// The <see cref="TextBoxBase"/> that will be updated by the dialog result if the user
         /// selected OK.
         /// </summary>
-        TextBox _textControl;
+        TextBoxBase _textControl;
 
         #endregion Fields
 
@@ -281,7 +281,7 @@ namespace Extract.Utilities.Forms
         /// <value>The text control associated with this <see cref="BrowseButton"/>.</value>
         [DefaultValue(null)]
         [Description("The text control to automatically update when a path is selected.")]
-        public TextBox TextControl
+        public TextBoxBase TextControl
         {
             get
             {

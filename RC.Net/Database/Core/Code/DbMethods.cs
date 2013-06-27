@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -79,10 +80,14 @@ namespace Extract.Database
                         ? DbProviderFactories.GetFactory(_config.Settings.DefaultDBProviderFactoryName)
                         : DbProviderFactories.GetFactory(providerRow);
 
-                    foreach (KeyValuePair<string, string> parameter in parameters)
+                    // In case the parameters are not named, order will be important, so ensure the
+                    // parameters are added in order of their key.
+                    foreach (KeyValuePair<string, string> parameter in parameters
+                        .OrderBy(parameter =>
+                            Int32.Parse(parameter.Key.Substring(1), CultureInfo.InvariantCulture)))
                     {
                         DbParameter dbParameter = providerFactory.CreateParameter();
-                        dbParameter.Direction = System.Data.ParameterDirection.Input;
+                        dbParameter.Direction = ParameterDirection.Input;
                         dbParameter.ParameterName = parameter.Key;
                         dbParameter.Value = parameter.Value;
                         dbCommand.Parameters.Add(dbParameter);

@@ -145,6 +145,11 @@ namespace Extract.Utilities.Email
         List<string> _recipients = new List<string>();
 
         /// <summary>
+        /// The list of carbon copy recipients for the email.
+        /// </summary>
+        List<string> _carbonCopyRecipients = new List<string>();
+
+        /// <summary>
         /// Mutex used to synchronize calls to Send();
         /// </summary>
         object _lock = new object();
@@ -191,6 +196,7 @@ namespace Extract.Utilities.Email
                     sb.AppendLine(EmailSettings.EmailSignature);
                     
                     AddRecipients(message.To);
+                    AddCarbonCopyRecipients(message.CC);
                     message.Subject = Subject;
                     message.Body = sb.ToString();
                     message.From = new MailAddress(
@@ -236,6 +242,7 @@ namespace Extract.Utilities.Email
                 EmailSettings = null;
                 _fileAttachements.Clear();
                 _recipients.Clear();
+                _carbonCopyRecipients.Clear();
                 Subject = string.Empty;
                 Body = string.Empty;
                 
@@ -313,6 +320,28 @@ namespace Extract.Utilities.Email
             catch (Exception ex)
             {
                 throw ex.CreateComVisible("ELI32460", "Unable to add single recipient.");
+            }
+        }
+
+        /// <summary>
+        /// Allows the adding of a single recipient to the recipients list.
+        /// </summary>
+        /// <param name="carbonCopyRecipient">The carbon copy recipient to add to the list.
+        /// </param>
+        public void AddCarbonCopyRecipient(string carbonCopyRecipient)
+        {
+            try
+            {
+                // Add the recipient if they are not in the list already
+                if (!_recipients
+                    .Any(s => s.Equals(carbonCopyRecipient, StringComparison.OrdinalIgnoreCase)))
+                {
+                    _carbonCopyRecipients.Add(carbonCopyRecipient);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI35994", "Unable to add carbon copy recipient.");
             }
         }
 
@@ -433,6 +462,52 @@ namespace Extract.Utilities.Email
         }
 
         /// <summary>
+        /// Gets or sets the carbon copy recipients of the message.
+        /// </summary>
+        /// <value>
+        /// The carbon copy recipients.
+        /// </value>
+        [CLSCompliant(false)]
+        public VariantVector CarbonCopyRecipients
+        {
+            get
+            {
+                try
+                {
+                    var vector = new VariantVector();
+                    foreach (var recipient in _carbonCopyRecipients)
+                    {
+                        vector.PushBack(recipient);
+                    }
+
+                    return vector;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.CreateComVisible("ELI35995",
+                        "Unable to get list of carbon copy recipients.");
+                }
+            }
+            set
+            {
+                try
+                {
+                    var size = value.Size;
+                    _carbonCopyRecipients = new List<string>(size);
+                    for (int i = 0; i < size; i++)
+                    {
+                        _carbonCopyRecipients.Add(value[i].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.CreateComVisible("ELI35996",
+                        "Unable to set list of carbon copy recipients.");
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the sender address.
         /// </summary>
         /// <value>
@@ -461,6 +536,18 @@ namespace Extract.Utilities.Email
         void AddRecipients(MailAddressCollection addresses)
         {
             foreach (var address in _recipients)
+            {
+                addresses.Add(address);
+            }
+        }
+
+        /// <summary>
+        /// Adds the carbon copy recipients to the <see cref="MailAddressCollection"/>.
+        /// </summary>
+        /// <param name="addresses">The collection to add the addresses to.</param>
+        void AddCarbonCopyRecipients(MailAddressCollection addresses)
+        {
+            foreach (var address in _carbonCopyRecipients)
             {
                 addresses.Add(address);
             }

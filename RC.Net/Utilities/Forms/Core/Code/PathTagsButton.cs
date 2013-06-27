@@ -106,10 +106,17 @@ namespace Extract.Utilities.Forms
         public event EventHandler<PathTagsMenuOpeningEventArgs> MenuOpening;
 
         /// <summary>
-        /// Occurs when a tag is selected.
+        /// Occurs when a tag is being selected.
         /// </summary>
         [Category("Action")]
-        [Description("Occurs when a tag is selected.")]
+        [Description("Occurs when a tag is being selected.")]
+        public event EventHandler<TagSelectingEventArgs> TagSelecting;
+
+        /// <summary>
+        /// Occurs when a tag has been selected.
+        /// </summary>
+        [Category("Action")]
+        [Description("Occurs when a tag has been selected.")]
         public event EventHandler<TagSelectedEventArgs> TagSelected;
 
         #endregion PathTagsButton Events
@@ -155,7 +162,7 @@ namespace Extract.Utilities.Forms
         /// <value>The text control associated with this <see cref="PathTagsButton"/>.</value>
         [DefaultValue(null)]
         [Description("The text control to automatically update when a tag is selected.")]
-        public TextBox TextControl { get; set; }
+        public TextBoxBase TextControl { get; set; }
 
         /// <summary>
         /// Gets or sets the path tags that are available for selection.
@@ -444,6 +451,19 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
+        /// Raises the <see cref="TagSelecting"/> event.
+        /// </summary>
+        /// <param name="e">The event data associated with the <see cref="TagSelecting"/> 
+        /// event.</param>
+        protected virtual void OnTagSelecting(TagSelectingEventArgs e)
+        {
+            if (TagSelecting != null)
+            {
+                TagSelecting(this, e);
+            }
+        }
+
+        /// <summary>
         /// Raises the <see cref="TagSelected"/> event.
         /// </summary>
         /// <param name="e">The event data associated with the <see cref="TagSelected"/> 
@@ -488,6 +508,14 @@ namespace Extract.Utilities.Forms
                 string tagName = e.ClickedItem.Text;
                 if (_ownedItems.Contains(e.ClickedItem) && !string.IsNullOrEmpty(tagName))
                 {
+                    var eventArgs = new TagSelectingEventArgs(tagName);
+                    OnTagSelecting(eventArgs);
+
+                    if (eventArgs.Cancel)
+                    {
+                        return;
+                    }
+
                     if (TextControl != null)
                     {
                         int originalSelectionStart = TextControl.SelectionStart;
@@ -530,6 +558,38 @@ namespace Extract.Utilities.Forms
         }
 
         #endregion PathTagsButton Event Handlers
+    }
+
+    /// <summary>
+    /// Provides data for the <see cref="PathTagsButton.TagSelecting"/> event.
+    /// </summary>
+    public class TagSelectingEventArgs : CancelEventArgs
+    {
+        /// <summary>
+        /// The tag that is being selected.
+        /// </summary>
+        readonly string _tag;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TagSelectingEventArgs"/> class.
+        /// </summary>
+        /// <param name="tag">The tag that was selected.</param>
+        public TagSelectingEventArgs(string tag)
+        {
+            _tag = tag;
+        }
+
+        /// <summary>
+        /// Gets the tag that is being selected.
+        /// </summary>
+        /// <returns>The tag that is being selected.</returns>
+        public string Tag
+        {
+            get
+            {
+                return _tag;
+            }
+        }
     }
 
     /// <summary>

@@ -15,7 +15,6 @@ using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
-using System.Threading;
 
 namespace Extract.DataEntry
 {
@@ -136,7 +135,7 @@ namespace Extract.DataEntry
         /// Used to expand path tags.
         /// </summary>
         [ThreadStatic]
-        static SourceDocumentPathTags _sourceDocumentPathTags;
+        static IPathTags _pathTags;
 
         /// <summary>
         /// The active attribute hierarchy.
@@ -553,15 +552,15 @@ namespace Extract.DataEntry
         }
        
         /// <summary>
-        /// Gets a <see cref="SourceDocumentPathTags"/> instance to expands path tags.
+        /// Gets an <see cref="IPathTags"/> instance to expands path tags.
         /// </summary>
-        /// <returns>A <see cref="SourceDocumentPathTags"/> instance.</returns>
+        /// <returns>An <see cref="IPathTags"/> instance.</returns>
         [ComVisible(false)]
-        public static SourceDocumentPathTags SourceDocumentPathTags
+        public static IPathTags PathTags
         {
             get
             {
-                return _sourceDocumentPathTags;
+                return _pathTags;
             }
         }
 
@@ -662,6 +661,26 @@ namespace Extract.DataEntry
         public static void ResetData(string sourceDocName, IUnknownVector attributes,
             DbConnection dbConnection)
         {
+            ResetData(sourceDocName, attributes, dbConnection, null);
+        }
+
+        /// <summary>
+        /// Clears the internal cache used for efficient lookups of <see cref="AttributeStatusInfo"/>
+        /// objects. This should be every time new data is loaded and called with
+        /// <see langword="null"/> every time a document is closed (or <see cref="IAttribute"/>s are
+        /// otherwise unloaded).
+        /// </summary>
+        /// <param name="sourceDocName">The name of the currently open document.</param>
+        /// <param name="attributes">The active <see cref="IAttribute"/> hierarchy.</param>
+        /// <param name="dbConnection">A compact SQL database available for use in validation or
+        /// auto-update queries. (Can be <see langword="null"/> if not required).</param>
+        /// <param name="pathTags">An <see cref="IPathTags"/> instance to be used to expand tags if
+        /// anything other than the SourceDocName tag is needed; Otherwise, <see langword="null"/>.
+        /// </param>
+        [ComVisible(false)]
+        public static void ResetData(string sourceDocName, IUnknownVector attributes,
+            DbConnection dbConnection, IPathTags pathTags)
+        {
             try
             {
                 // Validate the license
@@ -674,9 +693,16 @@ namespace Extract.DataEntry
                 _subAttributesToParentMap.Clear();
                 _attributesBeingModified.Clear();
                 _endEditInProgress = false;
-                _sourceDocumentPathTags = (string.IsNullOrEmpty(_sourceDocName))
-                    ? new SourceDocumentPathTags()
-                    : new SourceDocumentPathTags(AttributeStatusInfo.SourceDocName);
+                if (pathTags != null)
+                {
+                    _pathTags = pathTags;
+                }
+                else
+                {
+                    _pathTags = (string.IsNullOrEmpty(_sourceDocName))
+                        ? new SourceDocumentPathTags()
+                        : new SourceDocumentPathTags(AttributeStatusInfo.SourceDocName);
+                }
 
                 // Ensure data entry queries no longer react to changes in the attribute hierarchy.
                 AttributeQueryNode.UnregisterAll();
@@ -711,6 +737,58 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI25624", ex);
+            }
+        }
+
+        /// <summary>
+        /// Initializes for query (includes resetting the current threads AttributeStatusInfo data).
+        /// </summary>
+        /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s
+        /// to initialize.</param>
+        /// <param name="sourceDocName">The source document name to which the attributes are
+        /// affiliated with.</param>
+        /// <param name="dbConnection">The <see cref="DbConnection"/> to use for the queries.
+        /// </param>
+        /// <param name="pathTags">The <see cref="IPathTags"/> to use if anything more than the
+        /// SourceDocName is needed for the expansion; otherwise, <see langword="null"/>.</param>
+        [ComVisible(false)]
+        public static void InitializeForQuery(IUnknownVector attributes, string sourceDocName,
+            DbConnection dbConnection, IPathTags pathTags)
+        {
+            try
+            {
+                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnection, pathTags);
+                Initialize(attributes);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35962");
+            }
+        }
+
+        /// <summary>
+        /// Initializes an attribute heirarchy unaffiliated with any data entry controls. May be
+        /// called to prepare attributes for use within a <see cref="DataEntryQuery"/>.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IUnknownVector"/> of
+        /// <see cref="IAttribute"/>s to initialize.</param>
+        [ComVisible(false)]
+        public static void Initialize(IUnknownVector attributes)
+        {
+            try
+            {
+                int attributeCount = attributes.Size();
+                for (int i = 0; i < attributeCount; i++)
+                {
+                    IAttribute attribute = (IAttribute)attributes.At(i);
+                    AttributeStatusInfo.Initialize(attribute, attributes, null);
+
+                    Initialize(attribute.SubAttributes);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35963");
             }
         }
 
@@ -2745,9 +2823,9 @@ namespace Extract.DataEntry
         /// </summary>
         static void InitializeStatics()
         {
-            if (_sourceDocumentPathTags == null)
+            if (_pathTags == null)
             {
-                _sourceDocumentPathTags = new SourceDocumentPathTags();
+                _pathTags = new SourceDocumentPathTags();
                 _statusInfoMap = new Dictionary<IAttribute, AttributeStatusInfo>();
                 _subAttributesToParentMap = new Dictionary<IUnknownVector, IAttribute>();
                 _autoUpdateTriggers = new Dictionary<IAttribute, AutoUpdateTrigger>();

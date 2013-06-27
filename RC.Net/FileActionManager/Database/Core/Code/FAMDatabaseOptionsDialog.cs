@@ -177,7 +177,8 @@ namespace Extract.FileActionManager.Database
                 // Use a FAMDatabaseSettings instance to persist the email settings so that the
                 // EmailSettingsControl can be re-used to configure the settings.
                 _emailSettings.LoadSettings(
-                    new FAMDatabaseSettings<ExtractSmtp>(db, false, "Email"));
+                    new FAMDatabaseSettings<ExtractSmtp>(
+                        db, false, SmtpEmailSettings.PropertyNameLookup));
 
                 string lastModifyTime = settings.GetValue(_LAST_DB_INFO_CHANGE);
                 DateTime lastChange;

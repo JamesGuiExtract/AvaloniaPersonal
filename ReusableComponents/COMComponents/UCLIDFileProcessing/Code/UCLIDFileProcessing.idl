@@ -1244,6 +1244,10 @@ library UCLID_FILEPROCESSINGLib
 		// ARGS:	bUseOracleSyntax- Whether Oracle syntax should be used to obtain the file count.
 		// RETURNS: The file count.
 		[id(111)] HRESULT GetFileCount(VARIANT_BOOL bUseOracleSyntax, [out,retval] LONGLONG* pnFileCount);
+		//-----------------------------------------------------------------------------------------
+		// RETURNS: If connected, the connection string used to connect; otherwise, NULL
+		[propget, id(112), helpstring("property CurrentConnectionString")]
+			HRESULT CurrentConnectionString([out, retval] BSTR* pbstrConnectionString);
 };
 
 	[

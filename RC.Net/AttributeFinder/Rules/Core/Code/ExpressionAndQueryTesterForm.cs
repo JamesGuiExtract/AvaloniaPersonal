@@ -496,10 +496,8 @@ namespace Extract.AttributeFinder.Rules
                 ? null
                 : _databaseConnectionControl.DatabaseConnectionInfo.OpenConnection())
             {
-                // Initialize data and execute the query
-                AttributeStatusInfo.ResetData(firstAttribute.Value.SourceDocName,
-                    sourceAttributes, dbConnection);
-                InitializeAttributes(sourceAttributes);
+                AttributeStatusInfo.InitializeForQuery(sourceAttributes,
+                    firstAttribute.Value.SourceDocName, dbConnection, null);
 
                 DataEntryQuery query =
                     DataEntryQuery.Create(queryText, rootAttribute, dbConnection);
@@ -524,22 +522,6 @@ namespace Extract.AttributeFinder.Rules
             string connectionString = "Data Source='" + databaseFileName + "';";
 
             return new SqlCeConnection(connectionString);
-        }
-
-        /// <summary>
-        /// Initializes the attributes.
-        /// </summary>
-        /// <param name="attributes">The attributes.</param>
-        static void InitializeAttributes(IUnknownVector attributes)
-        {
-            int attributeCount = attributes.Size();
-            for (int i = 0; i < attributeCount; i++)
-            {
-                IAttribute attribute = (IAttribute)attributes.At(i);
-                AttributeStatusInfo.Initialize(attribute, attributes, null);
-
-                InitializeAttributes(attribute.SubAttributes);
-            }
         }
 
         #endregion Private Members
