@@ -84,7 +84,7 @@ catch(err) {
 // Will set one or more of the following global boolean parameters.
 //    GBoolShowDebugInfo ===> -debug
 //    GBoolLogErrorsOnly ===> -silent
-//    GBoolSaveErrors and GStrExceptionFileName ===> /ef <ExceptionFileName>
+//    GBoolLogErrorsOnly, GBoolSaveErrors and GStrExceptionFileName ===> /ef <ExceptionFileName>
 //--------------------------------------------------------------------------------------------------
 function parseCommandLineOptions() {
     var args = WScript.Arguments;
@@ -258,11 +258,16 @@ function readAllText(fname) {
     catch(err) {
         handleScriptError("ELI33180", "Unable to open input file!", err, "FileName", fname);
     }
-    // Read from the file
-    if (f.AtEndOfStream)
-        return ("");
-    else
-        return (f.ReadAll());
+    try {
+        // Read from the file
+        if (f.AtEndOfStream)
+            return ("");
+        else
+            return (f.ReadAll());
+    }
+    finally {
+        f.Close();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -277,8 +282,12 @@ function writeText(fname, text) {
         handleScriptError("ELI33181", "Unable to open output file!", err, "FileName", fname);
     }
     // Write to the file
-    f.Write(text);
-    f.Close();
+    try {
+        f.Write(text);
+    }
+    finally {
+        f.Close();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -307,6 +316,15 @@ function getFiles(dirname, recursive) {
      }
   }
   return ret;
+}
+
+//--------------------------------------------------------------------------------------------------
+// Get the name of a temporary file
+//--------------------------------------------------------------------------------------------------
+function getTempFilePath()
+{
+   var TemporaryFolder = 2;
+   return fso.BuildPath(fso.GetSpecialFolder(TemporaryFolder).Path, fso.GetTempName());
 }
 
 //--------------------------------------------------------------------------------------------------
