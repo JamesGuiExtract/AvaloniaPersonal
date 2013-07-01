@@ -201,7 +201,7 @@ namespace Extract.SharePoint.DataCapture
                                     // Mark the item as queued
                                     item[DataCaptureHelper.ExtractDataCaptureStatusColumn] = queued;
                                     item.Update();
-                                });
+                                }, true);
                             }
                         }
                     }

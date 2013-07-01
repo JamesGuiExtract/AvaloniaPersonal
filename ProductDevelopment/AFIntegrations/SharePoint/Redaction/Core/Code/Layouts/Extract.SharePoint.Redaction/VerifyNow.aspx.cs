@@ -2,14 +2,9 @@
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-
-// Using statements to make dealing with folder settings more readable
-using SiteFolderSettingsCollection =
-System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.Redaction.IdShieldFolderProcessingSettings>;
 
 namespace Extract.SharePoint.Redaction.Layouts
 {
@@ -62,7 +57,7 @@ namespace Extract.SharePoint.Redaction.Layouts
 
                 if (!IsFileQueuedForVerify(siteId, fileId))
                 {
-                    Exception notQueuedForVerify = new Exception("File must be Queued for Verification");
+                    Exception notQueuedForVerify = new SPException("File must be Queued for Verification");
                     throw notQueuedForVerify;
                 }
                 hiddenLocalMachineIp.Value = ipAddress;
@@ -94,8 +89,6 @@ namespace Extract.SharePoint.Redaction.Layouts
                 timerClose.Enabled = false;
                 var sb = new StringBuilder("<script type=\"text/javascript\">");
 
-                sb.Append("window.frameElement.commitPopup(); ");
-                sb.Append("</script>");
                 var settings = IdShieldSettings.GetIdShieldSettings(false);
                 if (settings != null && !string.IsNullOrEmpty(settings.VerifyFpsFile))
                 {
@@ -116,6 +109,8 @@ namespace Extract.SharePoint.Redaction.Layouts
                 {
                     sb.Append("alert('Path to ID Shield for SharePoint Verification FPS file is not set.'); ");
                 }
+                sb.Append("window.frameElement.commitPopup(); ");
+                sb.Append("</script>");
                 Context.Response.Write(sb.ToString());
                 Context.Response.Flush();
                 Context.Response.End();

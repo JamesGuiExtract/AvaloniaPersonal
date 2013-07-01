@@ -51,6 +51,11 @@ namespace Extract.SharePoint.Redaction
         /// </summary>
         int _minutesToWait = 0;
 
+        /// <summary>
+        /// HashSet  to track files that had a problem exporting - this is so an exception only gets logged the first time
+        /// </summary>
+        HashSet<string> _filesPreviouslyFailed = new HashSet<string>();
+
         #endregion Fields
 
         #region Constructors
@@ -183,29 +188,50 @@ namespace Extract.SharePoint.Redaction
                                     SPListItem item = items[i];
                                     if (item.FileSystemObjectType == SPFileSystemObjectType.File)
                                     {
-                                        var exportFolder = _randomFolderLength > 0 ? Path.Combine(outputFolder,
-                                            ExtractSharePointHelper.BuildRandomAlphaNumericString(_randomFolderLength))
-                                            : outputFolder;
-
-                                        // Create the directory if it does not exist
-                                        if (!Directory.Exists(exportFolder))
-                                        {
-                                            Directory.CreateDirectory(exportFolder);
-                                        }
-
-                                        // Write the file to the processing folder
+                                        bool didFileProcess = false;
                                         var file = item.File;
-                                        byte[] bytes = file.OpenBinary(SPOpenBinaryOptions.SkipVirusScan);
-                                        string outFileName = Path.Combine(exportFolder,
-                                            file.UniqueId.ToString() + Path.GetExtension(file.Name));
-                                        File.WriteAllBytes(outFileName, bytes);
+                                        bool fileWasPreviouslyAttempted = _filesPreviouslyFailed.Contains(file.Name);
 
+                                        // If checkout is required will want to check out the file to export it - this is needed
+                                        // because if the file is already checked out or another user has it checked out
+                                        // the update of the IDS Status will fail but the file will already have been exported.
                                         ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35884", file, "IDS Status changed.", () =>
                                         {
+                                            var exportFolder = _randomFolderLength > 0 ? Path.Combine(outputFolder,
+                                                ExtractSharePointHelper.BuildRandomAlphaNumericString(_randomFolderLength))
+                                                : outputFolder;
+
+                                            // Create the directory if it does not exist
+                                            if (!Directory.Exists(exportFolder))
+                                            {
+                                                Directory.CreateDirectory(exportFolder);
+                                            }
+
+                                            // Write the file to the processing folder
+                                            byte[] bytes = file.OpenBinary(SPOpenBinaryOptions.SkipVirusScan);
+                                            string outFileName = Path.Combine(exportFolder,
+                                                file.UniqueId.ToString() + Path.GetExtension(file.Name));
+                                            File.WriteAllBytes(outFileName, bytes);
+
                                             // Mark the item as queued
                                             item[IdShieldHelper.IdShieldStatusColumn] = queued;
                                             item.Update();
-                                        });
+                                            didFileProcess = true;
+                                        }, !fileWasPreviouslyAttempted);
+
+                                        // If a file is marked to be queued but is checked out there only should be an exception
+                                        // logged the first time but it should still be attempted everytime
+                                        if (fileWasPreviouslyAttempted)
+                                        {
+                                            if (didFileProcess)
+                                            {
+                                                _filesPreviouslyFailed.Remove(file.Name);
+                                            }
+                                        }
+                                        else if (!didFileProcess)
+                                        {
+                                            _filesPreviouslyFailed.Add(file.Name);
+                                        }
                                     }
                                 }
                                 catch (Exception fileEx)

@@ -94,7 +94,7 @@ namespace Extract.SharePoint.DataCapture
                             item[DataCaptureHelper.ExtractDataCaptureStatusColumn] =
                                 ExtractProcessingStatus.ToBeQueued.AsString();
                             item.Update();
-                        });
+                        }, true);
 
                         // File was set to ToBeQueued, break from foreach loop
                         break;

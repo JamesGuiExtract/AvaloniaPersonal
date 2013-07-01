@@ -205,6 +205,25 @@ namespace Extract
             "ExceptionHelper.exe");
 
         /// <summary>
+        /// The full path to the extract systems common application data folder
+        /// </summary>
+        static readonly string _COMMON_APPLICATION_DATA_PATH = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+            "Extract Systems");
+
+        /// <summary>
+        /// The full path to the LogFile folder 
+        /// </summary>
+        static readonly string _LOGFILES_PATH = Path.Combine(
+            _COMMON_APPLICATION_DATA_PATH, "LogFiles");
+
+        /// <summary>
+        /// The full path to the folder to create tempory exception files
+        /// </summary>
+        static readonly string _TEMP_EXCEPTION_PATH = Path.Combine(
+            _LOGFILES_PATH, "Temp");
+
+        /// <summary>
         /// Displays the exception in a message box.
         /// </summary>
         /// <param name="ex">The exception.</param>
@@ -249,8 +268,12 @@ namespace Extract
                     hexException = new UnableToSerializeException("ELI31492", ex, se)
                         .ToSerializedHexString();
                 }
-
-                tempFile = Path.GetTempFileName();
+                // Make sure the Temp path exists
+                if (!Directory.Exists(_TEMP_EXCEPTION_PATH))
+                {
+                    Directory.CreateDirectory(_TEMP_EXCEPTION_PATH);
+                }
+                tempFile = Path.Combine(_TEMP_EXCEPTION_PATH, Path.GetRandomFileName());
                 File.WriteAllText(tempFile, hexException);
 
                 // Build the arguments for the exception helper app

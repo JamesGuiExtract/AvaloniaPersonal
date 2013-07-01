@@ -58,7 +58,10 @@ namespace Extract.SharePoint.Redaction.Layouts
             {
                 IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldRedactNowHelper,
                     "ELI31506");
-                throw;
+                Label1.Visible = false;
+                ErrorLabel.Text = "Error: " + ex.Message;
+                ErrorLabel.Visible = true;
+                ErrorLabel.Enabled = true;
             }
         }
 

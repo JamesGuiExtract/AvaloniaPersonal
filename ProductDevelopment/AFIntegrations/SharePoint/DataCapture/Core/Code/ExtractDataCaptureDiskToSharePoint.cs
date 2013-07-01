@@ -214,7 +214,7 @@ namespace Extract.SharePoint.DataCapture
                         // even if updating the column fails).
                         item[DataCaptureHelper.ExtractDataCaptureStatusColumn] = failedString;
                         item.Update();
-                    });
+                    }, true);
                 }
                 catch (Exception ex)
                 {
@@ -247,7 +247,7 @@ namespace Extract.SharePoint.DataCapture
                         // Update the data capture status column
                         item[DataCaptureHelper.ExtractDataCaptureStatusColumn] = queuedString;
                         item.Update();
-                    });
+                    }, true);
                 }
                 catch (Exception ex)
                 {
@@ -430,7 +430,7 @@ namespace Extract.SharePoint.DataCapture
                                 item[DataCaptureHelper.ExtractDataCaptureStatusColumn] =
                                     ExtractProcessingStatus.ProcessingComplete.AsString();
                                 item.Update();
-                            });
+                            }, true);
                         }
                         catch (Exception ex)
                         {
@@ -446,7 +446,7 @@ namespace Extract.SharePoint.DataCapture
                                         item[DataCaptureHelper.ExtractDataCaptureStatusColumn] =
                                             ExtractProcessingStatus.ProcessingFailed.AsString();
                                         item.Update();
-                                    });
+                                    }, true);
                                 }
                                 catch
                                 {

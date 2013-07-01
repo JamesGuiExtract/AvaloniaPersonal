@@ -104,10 +104,11 @@ function processSelected(columnName) {
     else {
         try {
             inProgress = true;
+            waitProcessSelected = null
             var context = SP.ClientContext.get_current();
             var web = context.get_web();
             var selectedItems = SP.ListOperation.Selection.getSelectedItems();
-            selectedListID = SP.ListOperation.Selection.getSelectedList();
+            var selectedListID = SP.ListOperation.Selection.getSelectedList();
             for (var i = 0; i < selectedItems.length; i++) {
                 try {
                     var listItem = web.get_lists().getById(selectedListID).getItemById(selectedItems[i].id);
@@ -123,15 +124,20 @@ function processSelected(columnName) {
                     }
                 }
                 catch (ef) {
-                    alert("Error:" + ef);
+                    alert("Error:" + ef.message);
                 }
             }
             context.executeQueryAsync(Function.createDelegate(this, itemsQueued), Function.createDelegate(this, itemQueuingFailed));
             waitProcessSelected = SP.UI.ModalDialog.showWaitScreenWithNoClose('Process Selected...', 'Please wait while files are set to be queued', 76, 330);
         }
         catch (e) {
-            alert("Error:" + e);
             inProgress = false;
+            alert("Error: " + e.message);
+            if (waitProcessSelected != null) {
+                waitProcessSelected.close();
+                waitPrcoessSelected = null;
+            };
+            window.location.href = window.location.href;
         }
     }
 }
@@ -147,30 +153,14 @@ function itemsQueued(sender, args) {
 }
 
 // Function that is called if items fail to be queued
-function itemQueuingFailed() {
-    alert("Queuing failed: " + args.get_message());
+function itemQueuingFailed(sender, args) {
     inProgress = false;
+    alert("Queuing failed: " + args.get_message() + "\r\n\r\nAny selected files after this file have not been queued.");
+        
     if (waitProcessSelected != null){
         waitProcessSelected.close();
         waitPrcoessSelected = null;
     };
-        
     window.location.href = window.location.href;
 }
 
-
-// This function was to be used for Verify button but so far 
-// have not gotten it to work.
-//function singleDocSelectedAndQueuedForVerification(columnName) {
-//    var items = SP.ListOperation.Selection.getSelectedItems();
-//    var count = CountDictionary(items);
-//    if (count != 1) {
-//        return false;
-//    }
-
-//    var listID = SP.ListOperation.Selection.getSelectedList();
-//    var listItem = web.get_lists().getById(listID).getItemById(items[0].id);
-//    var status = listItem.get_item(columnName);
-
-//    return status == 'Queued For Verification';
-//}

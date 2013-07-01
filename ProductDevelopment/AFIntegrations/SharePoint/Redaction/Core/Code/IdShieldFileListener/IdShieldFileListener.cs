@@ -124,7 +124,7 @@ namespace Extract.SharePoint.Redaction
                             item[IdShieldHelper.IdShieldReferenceColumn] = "";
 
                             item.Update();
-                         });
+                         }, true);
 
                         // File was set to ToBeQueuedLater, break from foreach loop
                         break;

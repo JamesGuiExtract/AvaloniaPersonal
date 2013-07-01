@@ -125,6 +125,12 @@ namespace Extract.SharePoint.Redaction
         /// </summary>
         static Regex _findRoot = new Regex(_FIND_ROOT_LIBRARY_REGEX);
 
+        /// <summary>
+        /// HashSet to contain the files that could not be imported previously to keep the 
+        /// exception log from getting multiple exceptions for the same problem
+        /// </summary>
+        HashSet<string> _filesPreviouslyAttempted = new HashSet<string>();
+
         #endregion Fields
 
         #region Constructors
@@ -249,7 +255,7 @@ namespace Extract.SharePoint.Redaction
         /// <param name="fileNames">The failed files to handle.</param>
         /// <param name="workingFolder">The path to the local working folder.</param>
         /// <param name="site">The site to handle failed files for.</param>
-        static void HandleFailedFiles(string[] fileNames, string workingFolder, SPSite site)
+        void HandleFailedFiles(string[] fileNames, string workingFolder, SPSite site)
         {
             var failedString = ExtractProcessingStatus.ProcessingFailed.AsString();
             Dictionary<string, List<string>> filesToClean = new Dictionary<string, List<string>>();
@@ -257,36 +263,52 @@ namespace Extract.SharePoint.Redaction
             {
                 try
                 {
-                    string directory = Path.GetDirectoryName(fileName);
-                    if (!filesToClean.ContainsKey(directory))
-                    {
-                        filesToClean.Add(directory, new List<string>());
-                    }
-
                     var pair = ExtractSharePointHelper.BuildListAndFileGuid(fileName);
                     var list = site.RootWeb.Lists[pair.Key];
                     var item = list.GetItemByUniqueId(pair.Value);
 
-                    string spFileName = site.Url + "/" + item.Url;
-
-                    string fileWithoutExtension =
-                        Path.GetFileNameWithoutExtension(fileName);
-                    filesToClean[directory].Add(fileWithoutExtension);
-
-                    // Log a file failed exception to the exception service
-                    var exception = new ProcessingFailedException("ELI31491", "Failed processing file.");
-                    exception.Data.Add("Exported File Name", fileWithoutExtension);
-                    exception.Data.Add("SP Failed File", spFileName);
-                    IdShieldHelper.LogException(exception, ErrorCategoryId.IdShieldDiskToSharePoint,
-                        "ELI30572");
+                    bool filePreviouslyAttempted = _filesPreviouslyAttempted.Contains(fileName);
+                    bool hasFileCompleted = false;
 
                     ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35885", item.File, "IDS Status changed.", () =>
                     {
+                        string directory = Path.GetDirectoryName(fileName);
+                        if (!filesToClean.ContainsKey(directory))
+                        {
+                            filesToClean.Add(directory, new List<string>());
+                        }
+
+                        string spFileName = site.Url + "/" + item.Url;
+
+                        string fileWithoutExtension =
+                            Path.GetFileNameWithoutExtension(fileName);
+                        filesToClean[directory].Add(fileWithoutExtension);
+
+                        // Log a file failed exception to the exception service
+                        var exception = new ProcessingFailedException("ELI31491", "Failed processing file.");
+                        exception.Data.Add("Exported File Name", fileWithoutExtension);
+                        exception.Data.Add("SP Failed File", spFileName);
+                        IdShieldHelper.LogException(exception, ErrorCategoryId.IdShieldDiskToSharePoint,
+                            "ELI30572");
+
                         // Update the IDS status column (do this last so that the above exception is still logged
                         // even if updating the column fails).
                         item[IdShieldHelper.IdShieldStatusColumn] = failedString;
                         item.Update();
-                    });
+                    }, !filePreviouslyAttempted);
+
+                    // update the _filePreviouslyAttempted HashSet
+                    if (filePreviouslyAttempted)
+                    {
+                        if (hasFileCompleted)
+                        {
+                            _filesPreviouslyAttempted.Remove(fileName);
+                        }
+                    }
+                    else if (!hasFileCompleted)
+                    {
+                        _filesPreviouslyAttempted.Add(fileName);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -303,7 +325,7 @@ namespace Extract.SharePoint.Redaction
         /// </summary>
         /// <param name="fileNames">The queued files to handle.</param>
         /// <param name="site">The site to handle queued files for.</param>
-        static void HandleQueuedVerifiedFiles(string[] fileNames, SPSite site)
+        void HandleQueuedVerifiedFiles(string[] fileNames, SPSite site)
         {
             var queuedString = ExtractProcessingStatus.QueuedForVerification.AsString();
             foreach (string fileName in fileNames)
@@ -314,30 +336,46 @@ namespace Extract.SharePoint.Redaction
                     var list = site.RootWeb.Lists[pair.Key];
                     var item = list.GetItemByUniqueId(pair.Value);
                     
+                    bool filePreviouslyAttempted = _filesPreviouslyAttempted.Contains(fileName);
+                    bool hasFileCompleted = false;
+
                     ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35886", item.File, "IDS Status changed", () =>
                     {
                         // Update the IDS status column
                         item[IdShieldHelper.IdShieldStatusColumn] = queuedString;
                         item.Update();
-                    });
+                        
+                        // Delete the .InVerificationQueue file
+                        try
+                        {
+                            // Delete the file (log exception if unable to delete)
+                            File.Delete(fileName);
+                        }
+                        catch (Exception ex2)
+                        {
+                            IdShieldHelper.LogException(ex2, ErrorCategoryId.IdShieldDiskToSharePoint,
+                                "ELI31526");
+                        }
+                        hasFileCompleted = true;
+                    }, !filePreviouslyAttempted);
+                    
+                    // update the _filePreviouslyAttempted HashSet
+                    if (filePreviouslyAttempted)
+                    {
+                        if (hasFileCompleted)
+                        {
+                            _filesPreviouslyAttempted.Remove(fileName);
+                        }
+                    }
+                    else if (!hasFileCompleted)
+                    {
+                        _filesPreviouslyAttempted.Add(fileName);
+                    }
                 }
                 catch (Exception ex)
                 {
                     IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldDiskToSharePoint,
                         "ELI31525");
-                }
-                finally
-                {
-                    try
-                    {
-                        // Delete the file (log exception if unable to delete)
-                        File.Delete(fileName);
-                    }
-                    catch (Exception ex2)
-                    {
-                        IdShieldHelper.LogException(ex2, ErrorCategoryId.IdShieldDiskToSharePoint,
-                            "ELI31526");
-                    }
                 }
             }
         }
@@ -385,30 +423,7 @@ namespace Extract.SharePoint.Redaction
                         try
                         {
                             string directory = Path.GetDirectoryName(fileName);
-                            if (!filesToClean.ContainsKey(directory))
-                            {
-                                filesToClean.Add(directory, new List<string>());
-                            }
-
-                            string fileWithoutExtension =
-                                Path.GetFileNameWithoutExtension(fileName);
-                            filesToClean[directory].Add(fileWithoutExtension);
                             var listIdFileId = ExtractSharePointHelper.BuildListAndFileGuid(fileName);
-
-                            // Build path to redacted file
-                            string redactedFile = Path.Combine(directory, fileWithoutExtension)
-                                + ".redacted";
-                            if (!File.Exists(redactedFile))
-                            {
-                                string[] redactedFiles = Directory.GetFiles(directory,
-                                    Path.GetFileNameWithoutExtension(fileWithoutExtension)
-                                    + ".*.redacted");
-                                if (redactedFiles.Length == 1)
-                                {
-                                    redactedFile = redactedFiles[0];
-                                }
-                            }
-
                             SPList list = null;
                             try
                             {
@@ -417,8 +432,6 @@ namespace Extract.SharePoint.Redaction
                             }
                             catch
                             {
-                                // Do not clean up this set of files
-                                filesToClean[directory].Remove(fileWithoutExtension);
                                 Exception ee = null;
                                 if (list == null)
                                 {
@@ -440,50 +453,95 @@ namespace Extract.SharePoint.Redaction
 
                                 throw ee;
                             }
-
-                            // Ensure the redacted file exists and the destination
-                            // file name is not null or empty
-                            if (File.Exists(redactedFile))
+                            bool filePreviouslyAttempted = _filesPreviouslyAttempted.Contains(fileName);
+                            bool hasFileCompleted = false;
+                            ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35887", item.File, "IDS Status changed and processing finished.", () =>
                             {
-                                // Build the destination file name
-                                string destinationFileName = GetDestinationFileName(item.Url,
-                                    Path.GetExtension(Path.GetFileNameWithoutExtension(redactedFile)),
-                                    folderSettings);
 
-                                if (string.IsNullOrEmpty(destinationFileName))
+                                if (!filesToClean.ContainsKey(directory))
                                 {
-                                    var ee2 = new FileNotFoundException(
-                                        "Redacted file was found, but could not compute a "
-                                    + "destination folder in SharePoint.");
-                                    ee2.Data.Add("Processed File Name", Path.Combine(
-                                        directory, fileWithoutExtension));
-                                    throw ee2;
+                                    filesToClean.Add(directory, new List<string>());
                                 }
 
-                                string destFolder = destinationFileName.Substring(0,
-                                    destinationFileName.LastIndexOf("/", StringComparison.Ordinal));
+                                string fileWithoutExtension =
+                                   Path.GetFileNameWithoutExtension(fileName);
+                                filesToClean[directory].Add(fileWithoutExtension);
 
-                                // Create the destination folder if necessary
-                                string adjustedDestFolder = EnsureDestinationFolderExists(siteId, destFolder);
+                                // Build path to redacted file
+                                string redactedFile = Path.Combine(directory, fileWithoutExtension)
+                                    + ".redacted";
+                                if (!File.Exists(redactedFile))
+                                {
+                                    string[] redactedFiles = Directory.GetFiles(directory,
+                                        Path.GetFileNameWithoutExtension(fileWithoutExtension)
+                                        + ".*.redacted");
+                                    if (redactedFiles.Length == 1)
+                                    {
+                                        redactedFile = redactedFiles[0];
+                                    }
+                                }
 
-                                // Rebuild the destination name using the adjustedDestFolder
-                                destinationFileName = adjustedDestFolder + destinationFileName.Substring(
-                                    destinationFileName.LastIndexOf("/", StringComparison.Ordinal));
 
-                                // Add the file to sharepoint
-                                filesToAdd.Add(new FileUploadData(listIdFileId.Key,
-                                    listIdFileId.Value, spBaseFileName + item.Url,
-                                    web.Url + destinationFileName, redactedFile));
-                            }
-                            else
-                            {
-                                ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35887", item.File, "IDS Status changed", () =>
+                                // Ensure the redacted file exists and the destination
+                                // file name is not null or empty
+                                if (File.Exists(redactedFile))
+                                {
+                                    // Build the destination file name
+                                    string destinationFileName = GetDestinationFileName(item.Url,
+                                        Path.GetExtension(Path.GetFileNameWithoutExtension(redactedFile)),
+                                        folderSettings);
+
+                                    if (string.IsNullOrEmpty(destinationFileName))
+                                    {
+                                        var ee2 = new FileNotFoundException(
+                                            "Redacted file was found, but could not compute a "
+                                        + "destination folder in SharePoint.");
+                                        ee2.Data.Add("Processed File Name", Path.Combine(
+                                            directory, fileWithoutExtension));
+                                        throw ee2;
+                                    }
+
+                                    string destFolder = destinationFileName.Substring(0,
+                                        destinationFileName.LastIndexOf("/", StringComparison.Ordinal));
+
+                                    // Create the destination folder if necessary
+                                    string adjustedDestFolder = EnsureDestinationFolderExists(siteId, destFolder);
+
+                                    // Rebuild the destination name using the adjustedDestFolder
+                                    destinationFileName = adjustedDestFolder + destinationFileName.Substring(
+                                        destinationFileName.LastIndexOf("/", StringComparison.Ordinal));
+
+                                    FileUploadData fileToUpload = new FileUploadData(listIdFileId.Key,
+                                        listIdFileId.Value, spBaseFileName + item.Url,
+                                        web.Url + destinationFileName, redactedFile);
+
+                                    // Upload the file to sharepoint
+                                    UploadFileToSharePoint(fileToUpload, siteId);
+
+                                    // Add the file to sharepoint
+                                    filesToAdd.Add(fileToUpload);
+                                }
+                                else
                                 {
                                     // No redacted file so set status to no redactions
                                     item[IdShieldHelper.IdShieldStatusColumn] =
                                         ExtractProcessingStatus.NoRedactions.AsString();
                                     item.Update();
-                                });
+                                }
+                                hasFileCompleted = true;
+                            }, !filePreviouslyAttempted);
+
+                            // update the _filePreviouslyAttempted HashSet
+                            if (filePreviouslyAttempted)
+                            {
+                                if (hasFileCompleted)
+                                {
+                                    _filesPreviouslyAttempted.Remove(fileName);
+                                }
+                            }
+                            else if (!hasFileCompleted)
+                            {
+                                _filesPreviouslyAttempted.Add(fileName);
                             }
                         }
                         catch (Exception ex)
@@ -498,7 +556,7 @@ namespace Extract.SharePoint.Redaction
                                         item[IdShieldHelper.IdShieldStatusColumn] =
                                             ExtractProcessingStatus.ProcessingFailed.AsString();
                                         item.Update();
-                                    });
+                                    }, true);
                                 }
                             }
                             catch (Exception e)
@@ -512,7 +570,9 @@ namespace Extract.SharePoint.Redaction
                     }
                 }
 
-                UploadFilesToSharePoint(filesToAdd, siteId);
+                //UploadFilesToSharePoint(filesToAdd, siteId);
+                // Add the list of files to ignore
+                AddFilesToIgnore(filesToAdd, siteId);
                 CleanupLocalFiles(filesToClean, workingFolder);
             }
             catch (Exception ex2)
@@ -570,23 +630,16 @@ namespace Extract.SharePoint.Redaction
 
                         // Get the list
                         SPList list = null;
-                        if (!lists.TryGetValue(fileData.OriginalListId, out list))
-                        {
-                            list = tempWeb.Lists[fileData.OriginalListId];
-                            lists[fileData.OriginalListId] = list;
-                        }
+                        list = tempWeb.Lists[fileData.OriginalListId];
                         
                         // Update the original file column with the redacted file location
                         var item = list.GetItemByUniqueId(fileData.OriginalFileId);
 
-                        ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35889", item.File,
-                            "IDS Status and reference file changed", () =>
-                        {
-                            item[IdShieldHelper.IdShieldStatusColumn] = ExtractProcessingStatus.Redacted.AsString();
-                            item[IdShieldHelper.IdShieldReferenceColumn] = fileData.DestinationUrl + ", Redacted file";
 
-                            item.Update();
-                        });
+                        item[IdShieldHelper.IdShieldStatusColumn] = ExtractProcessingStatus.Redacted.AsString();
+                        item[IdShieldHelper.IdShieldReferenceColumn] = fileData.DestinationUrl + ", Redacted file";
+
+                        item.Update();
                     }
                     catch (Exception ex)
                     {
@@ -598,10 +651,85 @@ namespace Extract.SharePoint.Redaction
                             ErrorCategoryId.IdShieldDiskToSharePoint, "ELI30598");
                     }
                 }
+                
                 tempWeb.Update();
-                lists.Clear();
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fileToAdd"></param>
+        /// <param name="siteId"></param>
+        static void UploadFileToSharePoint(FileUploadData fileToAdd, Guid siteId)
+        {
+            // Upload the redacted file into SharePoint
+            using (SPSite tempSite = new SPSite(siteId))
+            {
+                var lists = new Dictionary<Guid, SPList>();
+                SPWeb tempWeb = tempSite.RootWeb;
+                SPFileCollection spFiles = tempWeb.Files;
+                try
+                {
+                    // Check if there is an existing file
+                    var existingFile = tempWeb.GetFile(fileToAdd.DestinationUrl);
+                    if (existingFile.Exists)
+                    {
+                        // If the destination exists need and a checkout is required, check out the file
+                        if (existingFile.RequiresCheckout)
+                        {
+                            existingFile.CheckOut();
+                        }
+                    }
+
+                    // Set the properties collection that will be set when the file is added
+                    Hashtable properties = new Hashtable();
+                    properties.Add(IdShieldHelper.IdShieldStatusColumn,
+                        ExtractProcessingStatus.NotProcessed.AsString());
+                    properties.Add(IdShieldHelper.IdShieldReferenceColumn, fileToAdd.OriginalFileUrl + ", Original file");
+
+                    // Read the redacted file from the disk
+                    byte[] bytes = File.ReadAllBytes(fileToAdd.RedactedFile);
+                    var newFile = spFiles.Add(fileToAdd.DestinationUrl, bytes, properties, true);
+
+                    if (newFile.CheckOutType != SPFile.SPCheckOutType.None)
+                    {
+                        newFile.CheckIn("Redacted file added");
+                    }
+
+                    // Get the list
+                    SPList list = null;
+                    if (!lists.TryGetValue(fileToAdd.OriginalListId, out list))
+                    {
+                        list = tempWeb.Lists[fileToAdd.OriginalListId];
+                        lists[fileToAdd.OriginalListId] = list;
+                    }
+
+                    // Update the original file column with the redacted file location
+                    var item = list.GetItemByUniqueId(fileToAdd.OriginalFileId);
+
+                    ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35889", item.File,
+                        "IDS Status and reference file changed", () =>
+                        {
+                            item[IdShieldHelper.IdShieldStatusColumn] = ExtractProcessingStatus.Redacted.AsString();
+                            item[IdShieldHelper.IdShieldReferenceColumn] = fileToAdd.DestinationUrl + ", Redacted file";
+
+                            item.Update();
+                        }, true);
+                }
+                catch (Exception ex)
+                {
+                    ex.Data.Add("Site Id", siteId.ToString());
+                    ex.Data.Add("Site Url", tempSite.Url);
+                    ex.Data.Add("Source File", fileToAdd.OriginalFileUrl);
+                    ex.Data.Add("Destination Url", fileToAdd.DestinationUrl);
+                    IdShieldHelper.LogException(ex,
+                        ErrorCategoryId.IdShieldDiskToSharePoint, "ELI30598");
+                }
+
+            }
+        }
+
 
         /// <summary>
         /// Cleans up all files for the current processed file, deleting empty directories

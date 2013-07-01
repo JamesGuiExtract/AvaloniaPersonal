@@ -404,7 +404,7 @@ namespace Extract.SharePoint
                             {
                                 item[fieldName] = defaultStatus;
                                 item.Update();
-                            });
+                            }, true);
                         }
                     }
 
@@ -550,7 +550,7 @@ namespace Extract.SharePoint
                                 item["IDSReference"] = "";
                             }
                             item.Update();
-                        });
+                        }, true);
                     }
                 }
             }
@@ -713,7 +713,9 @@ namespace Extract.SharePoint
         /// <param name="file">The SPFile object of the file perform action on</param>
         /// <param name="checkinComment">Comment to use when checking in the file</param>
         /// <param name="action">The action to perform with check out and check in if required</param>
-        public static void DoWithCheckoutIfRequired(string eliCode, SPFile file, string checkinComment, Action action)
+        /// <param name="logException"></param>
+        public static void DoWithCheckoutIfRequired(string eliCode, SPFile file, string checkinComment, 
+            Action action, bool logException)
         {
             SPUser currUser = null;
             try
@@ -753,7 +755,10 @@ namespace Extract.SharePoint
             }
             catch (Exception ex)
             {
-                ex.LogExceptionWithHelperApp(eliCode);
+                if (logException)
+                {
+                    ex.LogExceptionWithHelperApp(eliCode);
+                }
             }
         }
 

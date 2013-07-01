@@ -33,6 +33,7 @@
     </asp:Panel>
     <asp:Image ID="imageIdShield" runat="server" ImageUrl="/_layouts/images/Extract.SharePoint.Redaction/IdShieldLogo.jpg" ImageAlign="Middle" />
     <asp:Label ID="Label1" runat="server" Text="Please wait while the selected file is exported..." />
+    <asp:Label ID="ErrorLabel" runat="server" Text="" Visible="false" Enabled="false" ForeColor="Red" />
     <asp:Timer ID="timerClose" runat="server" Interval="500" OnTick="HandleTimerTick" Enabled="false" />
 </asp:Content>
 
