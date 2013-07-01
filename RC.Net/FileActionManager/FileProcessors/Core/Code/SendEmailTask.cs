@@ -834,7 +834,7 @@ namespace Extract.FileActionManager.FileProcessors
                 foreach (string missingAttachment in missingAttachments)
                 {
                     emailMessage.Body += string.Format(CultureInfo.CurrentCulture, "\r\n\r\n" +
-                        "ERROR: The file ‘{0}’ was configured to be attached to this email. " +  
+                        "ERROR: The file \"{0}\" was configured to be attached to this email. " +  
                         "However, that file was not found or was not accessible.",
                         missingAttachment);
                     ee.AddDebugData("Attachement", missingAttachment, false);

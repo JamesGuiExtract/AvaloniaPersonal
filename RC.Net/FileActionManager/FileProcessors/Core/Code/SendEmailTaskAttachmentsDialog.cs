@@ -243,6 +243,24 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_clearButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleClearButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _dataGridView.Rows.Clear();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36003");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="Control.Click"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the <see cref="Control.Click"/> event.</param>

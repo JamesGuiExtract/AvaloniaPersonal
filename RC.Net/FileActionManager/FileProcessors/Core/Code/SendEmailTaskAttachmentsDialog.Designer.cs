@@ -37,6 +37,7 @@
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._browseButton = new Extract.Utilities.Forms.BrowseButton();
             this._pathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._clearButton = new System.Windows.Forms.Button();
             label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this._dataGridView)).BeginInit();
             this.SuspendLayout();
@@ -56,7 +57,7 @@
             this._okButton.Location = new System.Drawing.Point(337, 186);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 4;
+            this._okButton.TabIndex = 5;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
@@ -68,7 +69,7 @@
             this._cancelButton.Location = new System.Drawing.Point(418, 186);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 5;
+            this._cancelButton.TabIndex = 6;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
@@ -83,6 +84,7 @@
             this._attachmentsColumn});
             this._dataGridView.Location = new System.Drawing.Point(12, 28);
             this._dataGridView.Name = "_dataGridView";
+            this._dataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this._dataGridView.Size = new System.Drawing.Size(415, 147);
             this._dataGridView.TabIndex = 1;
             this._dataGridView.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.HandleDataGridView_CellValidating);
@@ -125,6 +127,17 @@
             this._pathTagsButton.UseVisualStyleBackColor = true;
             this._pathTagsButton.TagSelecting += new System.EventHandler<Extract.Utilities.Forms.TagSelectingEventArgs>(this.HandlePathTagsButton_TagSelecting);
             // 
+            // _clearButton
+            // 
+            this._clearButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this._clearButton.Location = new System.Drawing.Point(12, 186);
+            this._clearButton.Name = "_clearButton";
+            this._clearButton.Size = new System.Drawing.Size(75, 23);
+            this._clearButton.TabIndex = 4;
+            this._clearButton.Text = "Clear All";
+            this._clearButton.UseVisualStyleBackColor = true;
+            this._clearButton.Click += new System.EventHandler(this.HandleClearButton_Click);
+            // 
             // SendEmailTaskAttachmentsDialog
             // 
             this.AcceptButton = this._okButton;
@@ -132,6 +145,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
             this.ClientSize = new System.Drawing.Size(505, 221);
+            this.Controls.Add(this._clearButton);
             this.Controls.Add(this._browseButton);
             this.Controls.Add(this._pathTagsButton);
             this.Controls.Add(label1);
@@ -161,5 +175,6 @@
         private Utilities.Forms.BrowseButton _browseButton;
         private System.Windows.Forms.DataGridViewTextBoxColumn _attachmentsColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private System.Windows.Forms.Button _clearButton;
     }
 }
