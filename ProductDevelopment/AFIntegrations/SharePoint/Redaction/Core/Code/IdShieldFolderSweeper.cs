@@ -457,15 +457,8 @@ namespace Extract.SharePoint.Redaction
                             bool hasFileCompleted = false;
                             ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35887", item.File, "IDS Status changed and processing finished.", () =>
                             {
-
-                                if (!filesToClean.ContainsKey(directory))
-                                {
-                                    filesToClean.Add(directory, new List<string>());
-                                }
-
                                 string fileWithoutExtension =
                                    Path.GetFileNameWithoutExtension(fileName);
-                                filesToClean[directory].Add(fileWithoutExtension);
 
                                 // Build path to redacted file
                                 string redactedFile = Path.Combine(directory, fileWithoutExtension)
@@ -480,7 +473,6 @@ namespace Extract.SharePoint.Redaction
                                         redactedFile = redactedFiles[0];
                                     }
                                 }
-
 
                                 // Ensure the redacted file exists and the destination
                                 // file name is not null or empty
@@ -517,6 +509,14 @@ namespace Extract.SharePoint.Redaction
 
                                     // Upload the file to sharepoint
                                     UploadFileToSharePoint(fileToUpload, siteId);
+
+                                    // Add files to clean 
+                                    if (!filesToClean.ContainsKey(directory))
+                                    {
+                                        filesToClean.Add(directory, new List<string>());
+                                    }
+
+                                    filesToClean[directory].Add(fileWithoutExtension);
 
                                     // Add the file to sharepoint
                                     filesToAdd.Add(fileToUpload);
@@ -570,7 +570,6 @@ namespace Extract.SharePoint.Redaction
                     }
                 }
 
-                //UploadFilesToSharePoint(filesToAdd, siteId);
                 // Add the list of files to ignore
                 AddFilesToIgnore(filesToAdd, siteId);
                 CleanupLocalFiles(filesToClean, workingFolder);
@@ -582,85 +581,11 @@ namespace Extract.SharePoint.Redaction
             }
         }
 
-        /// <summary>
-        /// Will upload the collection of site urls and local redacted files into SharePoint.
+         /// <summary>
+        /// Uploads the given file to the site.  This assumes the file original file is checked out
         /// </summary>
-        /// <param name="filesToAdd">Collection of site urls to local redacted files.</param>
-        /// <param name="siteId">The guid of the site to upload the files to.</param>
-        static void UploadFilesToSharePoint(List<FileUploadData> filesToAdd, Guid siteId)
-        {
-            // Add the list of files to ignore
-            AddFilesToIgnore(filesToAdd, siteId);
-
-            // Upload the redacted file into SharePoint
-            using (SPSite tempSite = new SPSite(siteId))
-            {
-                var lists = new Dictionary<Guid, SPList>();
-                SPWeb tempWeb = tempSite.RootWeb;
-                SPFileCollection spFiles = tempWeb.Files;
-                foreach (var fileData in filesToAdd)
-                {
-                    try
-                    {
-                        // Check if there is an existing file
-                        var existingFile = tempWeb.GetFile(fileData.DestinationUrl);
-                        if (existingFile.Exists)
-                        {
-                            // If the destination exists need and a checkout is required, check out the file
-                            if (existingFile.RequiresCheckout)
-                            {
-                                existingFile.CheckOut();
-                            }
-                        }
-
-                        // Set the properties collection that will be set when the file is added
-                        Hashtable properties = new Hashtable();
-                        properties.Add(IdShieldHelper.IdShieldStatusColumn,
-                            ExtractProcessingStatus.NotProcessed.AsString());
-                        properties.Add(IdShieldHelper.IdShieldReferenceColumn, fileData.OriginalFileUrl + ", Original file");
-
-                        // Read the redacted file from the disk
-                        byte[] bytes = File.ReadAllBytes(fileData.RedactedFile);
-                        var newFile = spFiles.Add(fileData.DestinationUrl, bytes, properties, true);
-
-                        if (newFile.CheckOutType != SPFile.SPCheckOutType.None)
-                        {
-                            newFile.CheckIn("Redacted file added");
-                        }
-
-                        // Get the list
-                        SPList list = null;
-                        list = tempWeb.Lists[fileData.OriginalListId];
-                        
-                        // Update the original file column with the redacted file location
-                        var item = list.GetItemByUniqueId(fileData.OriginalFileId);
-
-
-                        item[IdShieldHelper.IdShieldStatusColumn] = ExtractProcessingStatus.Redacted.AsString();
-                        item[IdShieldHelper.IdShieldReferenceColumn] = fileData.DestinationUrl + ", Redacted file";
-
-                        item.Update();
-                    }
-                    catch (Exception ex)
-                    {
-                        ex.Data.Add("Site Id", siteId.ToString());
-                        ex.Data.Add("Site Url", tempSite.Url);
-                        ex.Data.Add("Source File", fileData.OriginalFileUrl);
-                        ex.Data.Add("Destination Url", fileData.DestinationUrl);
-                        IdShieldHelper.LogException(ex,
-                            ErrorCategoryId.IdShieldDiskToSharePoint, "ELI30598");
-                    }
-                }
-                
-                tempWeb.Update();
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="fileToAdd"></param>
-        /// <param name="siteId"></param>
+        /// <param name="fileToAdd">The upload data for the file to upload</param>
+        /// <param name="siteId">The site the file is to be uploaded to</param>
         static void UploadFileToSharePoint(FileUploadData fileToAdd, Guid siteId)
         {
             // Upload the redacted file into SharePoint
@@ -669,8 +594,11 @@ namespace Extract.SharePoint.Redaction
                 var lists = new Dictionary<Guid, SPList>();
                 SPWeb tempWeb = tempSite.RootWeb;
                 SPFileCollection spFiles = tempWeb.Files;
+
                 try
                 {
+                    bool previouslyCheckedOut = false;
+
                     // Check if there is an existing file
                     var existingFile = tempWeb.GetFile(fileToAdd.DestinationUrl);
                     if (existingFile.Exists)
@@ -678,23 +606,51 @@ namespace Extract.SharePoint.Redaction
                         // If the destination exists need and a checkout is required, check out the file
                         if (existingFile.RequiresCheckout)
                         {
-                            existingFile.CheckOut();
+                            if (existingFile.CheckOutType == SPFile.SPCheckOutType.None)
+                            {
+                                existingFile.CheckOut();
+                            }
+                            else if (existingFile.CheckedOutByUser.Name == tempWeb.CurrentUser.Name)
+                            {
+                                previouslyCheckedOut = true;
+                            }
+                            else
+                            {
+                                string exceptionString = "Destination file is checked out by " + existingFile.CheckedOutByUser.Name;
+                                throw new SPException(exceptionString);
+                            }
                         }
                     }
 
-                    // Set the properties collection that will be set when the file is added
-                    Hashtable properties = new Hashtable();
-                    properties.Add(IdShieldHelper.IdShieldStatusColumn,
-                        ExtractProcessingStatus.NotProcessed.AsString());
-                    properties.Add(IdShieldHelper.IdShieldReferenceColumn, fileToAdd.OriginalFileUrl + ", Original file");
-
-                    // Read the redacted file from the disk
-                    byte[] bytes = File.ReadAllBytes(fileToAdd.RedactedFile);
-                    var newFile = spFiles.Add(fileToAdd.DestinationUrl, bytes, properties, true);
-
-                    if (newFile.CheckOutType != SPFile.SPCheckOutType.None)
+                    SPFile currFile = existingFile;
+                    try
                     {
-                        newFile.CheckIn("Redacted file added");
+                        // Set the properties collection that will be set when the file is added
+                        Hashtable properties = new Hashtable();
+                        properties.Add(IdShieldHelper.IdShieldStatusColumn,
+                            ExtractProcessingStatus.NotProcessed.AsString());
+                        properties.Add(IdShieldHelper.IdShieldReferenceColumn, fileToAdd.OriginalFileUrl + ", Original file");
+
+                        // Read the redacted file from the disk
+                        byte[] bytes = File.ReadAllBytes(fileToAdd.RedactedFile);
+                        currFile = spFiles.Add(fileToAdd.DestinationUrl, bytes, properties, true);
+     
+                        // if checked out by current user check the file back in
+                        if (currFile != null && currFile.CheckOutType != SPFile.SPCheckOutType.None 
+                            && currFile.CheckedOutByUser.Name == tempWeb.CurrentUser.Name)
+                        {
+                            currFile.CheckIn("Redacted file added");
+                        }
+                    }
+                    catch(Exception uploadEx)
+                    {
+                        // if checked out by current user check the file back in
+                        if (currFile != null && currFile.CheckOutType != SPFile.SPCheckOutType.None
+                            && currFile.CheckedOutByUser.Name == tempWeb.CurrentUser.Name && !previouslyCheckedOut)
+                        {
+                            currFile.UndoCheckOut();
+                        }
+                        throw uploadEx;
                     }
 
                     // Get the list
@@ -708,14 +664,10 @@ namespace Extract.SharePoint.Redaction
                     // Update the original file column with the redacted file location
                     var item = list.GetItemByUniqueId(fileToAdd.OriginalFileId);
 
-                    ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35889", item.File,
-                        "IDS Status and reference file changed", () =>
-                        {
-                            item[IdShieldHelper.IdShieldStatusColumn] = ExtractProcessingStatus.Redacted.AsString();
-                            item[IdShieldHelper.IdShieldReferenceColumn] = fileToAdd.DestinationUrl + ", Redacted file";
+                    item[IdShieldHelper.IdShieldStatusColumn] = ExtractProcessingStatus.Redacted.AsString();
+                    item[IdShieldHelper.IdShieldReferenceColumn] = fileToAdd.DestinationUrl + ", Redacted file";
 
-                            item.Update();
-                        }, true);
+                    item.Update();
                 }
                 catch (Exception ex)
                 {
@@ -723,10 +675,10 @@ namespace Extract.SharePoint.Redaction
                     ex.Data.Add("Site Url", tempSite.Url);
                     ex.Data.Add("Source File", fileToAdd.OriginalFileUrl);
                     ex.Data.Add("Destination Url", fileToAdd.DestinationUrl);
-                    IdShieldHelper.LogException(ex,
-                        ErrorCategoryId.IdShieldDiskToSharePoint, "ELI30598");
-                }
+                    // Rethrow this should be handled in a higher scope
 
+                    throw ex;
+                }
             }
         }
 

@@ -713,7 +713,7 @@ namespace Extract.SharePoint
         /// <param name="file">The SPFile object of the file perform action on</param>
         /// <param name="checkinComment">Comment to use when checking in the file</param>
         /// <param name="action">The action to perform with check out and check in if required</param>
-        /// <param name="logException"></param>
+        /// <param name="logException">Flag to indicate if an exception is thrown should it be logged or not</param>
         public static void DoWithCheckoutIfRequired(string eliCode, SPFile file, string checkinComment, 
             Action action, bool logException)
         {
