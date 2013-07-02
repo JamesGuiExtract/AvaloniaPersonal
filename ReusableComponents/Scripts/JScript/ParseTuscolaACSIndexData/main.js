@@ -21,15 +21,17 @@
 function main(args) {
     var inputFile = fso.getAbsolutePathName(args[0]);
     var outputDir = fso.getAbsolutePathName(args[1]);
-    var imageFiles = fso.GetFolder(fso.BuildPath(fso.getParentFolderName(outputDir), "Images")).Files;
-    var files = new Enumerator(imageFiles);
+    var imageDir = fso.BuildPath(fso.getParentFolderName(outputDir), "Images");
+
+    handleDebug("ImageDir", imageDir);
+    var imageFiles = getFiles(imageDir, true).filter(function(f){return f.Name.match(/\.(tiff?|pdf|\d{3})$/i)});
     var imageMap = {};
-    for (; !files.atEnd(); files.moveNext()) {
-        var f = files.item();
+    for (var i=0; i < imageFiles.length; i++) {
+        handleDebug("Loop", i);
+        var f = imageFiles[i];
         imageMap[f.Name.slice(1,10)] = f;
     }
 
-    
     if (!fso.folderExists(outputDir)) {
         fso.createFolder(outputDir);
     }
@@ -39,27 +41,39 @@ function main(args) {
         handleDebug("CSVLine", i);
         var fields = csvlines[i].split(',').map(function(s){return s.trim()});
         switch(fields[1]){
-            case "DOCUMENT": //makeEAVS_DOCUMENT(fields);
+            case "DOCUMENT": makeEAVS_DOCUMENT(fields);
             break;
-            case "MAILBACK": //makeEAVS_MAILBACK(fields);
+            case "MAILBACK": makeEAVS_MAILBACK(fields);
             break;
             case "PARTIES": makeEAVS_PARTIES(fields);
             break;
-            case "PROPERTY": //makeEAVS_PROPERTY(fields);
+            case "PROPERTY": makeEAVS_PROPERTY(fields);
             break;
-            case "REFERENCE": //makeEAVS_REFERENCE(fields);
+            case "REFERENCE": makeEAVS_REFERENCE(fields);
             break;
         }
     }
 
     function appendText(fname, text) {
         // Open the file
+        var isOpen = false;
+        var attempts = 0;
+
+        // Try to open file up to 50 times before exception
         try {
-            var f = fso.OpenTextFile(fname, 8, true);
+            while(isOpen == false) {
+                attempts++;
+                try {
+                    var f = fso.OpenTextFile(fname, 8, true);
+                    isOpen = true;
+                }
+                catch(err) {
+                    if (attempts == 50) { throw err; }
+                    WScript.Sleep(100);
+                }
+            }
         }
-        catch(err) {
-            handleScriptError("ParseTuscolaACSIndexData_2", "Unable to open output file!", err, "FileName", fname);
-        }
+        catch(err) { handleScriptError("ParseTuscolaACSIndexData_2", "Unable to open output file!", err, "FileName", fname); }
         // Write to the file
         f.Write(text);
         f.Close();
@@ -166,7 +180,7 @@ function main(args) {
         var fname = getEAVName(fields[0], "LegalDescription");
 
         // Resplit because I've noticed commas in the data
-        var data = fields.slice(3).join(",").split(/,(?=[A-Z]+-)/i);
+        var data = fields.slice(3).join(",").split(/,(?=[A-Z]*-|,*$)/i);
         switch(fields[2]) {
             case "SUBDIVISIONS":
                 writeAttr(fname, "LegalDescription", "N/A", "Subdivision", "");
