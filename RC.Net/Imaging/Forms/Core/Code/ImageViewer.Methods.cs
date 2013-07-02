@@ -2235,8 +2235,13 @@ namespace Extract.Imaging.Forms
         /// event.</param>
         void PrintPage(PrintPageEventArgs e)
         {
-            // Get the margin bounds
+            // [IDSD #318], [DotNetRCAndUtils:1078]
+            // The margin bounds should be the margin rectangle intersected with the
+            // printable area offset by the inverse of the top-left of the printable area.
+            var printableArea = Rectangle.Round(e.PageSettings.PrintableArea);
             Rectangle marginBounds = e.MarginBounds;
+            marginBounds.Intersect(printableArea);
+            marginBounds.Offset(-printableArea.X, -printableArea.Y);
 
             Rectangle source;
             if (e.PageSettings.PrinterSettings.PrintRange == PrintRange.Selection)
@@ -2266,10 +2271,6 @@ namespace Extract.Imaging.Forms
             Rectangle destination = new Rectangle(
                 (int)(marginBounds.Left + padding.X), (int)(marginBounds.Top + padding.Y),
                 (int)(marginBounds.Width - padding.X * 2), (int)(marginBounds.Height - padding.Y * 2));
-
-            // Clip the region based on printable area [IDSD #318]
-            RectangleF clip = RectangleF.Intersect(e.PageSettings.PrintableArea, destination);
-            e.Graphics.Clip = new Region(clip);
 
             Matrix unrotatedToPrinter = null;
             Matrix imageToPrinter = null;
