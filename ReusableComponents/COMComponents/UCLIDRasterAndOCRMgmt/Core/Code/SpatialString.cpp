@@ -245,11 +245,19 @@ STDMETHODIMP CSpatialString::UpdatePageNumber(long nPageNumber)
 			break;
 			case kSpatialMode:
 			{
-				// Set the page number for all the Letters in the vector
 				long nNumLetters = m_vecLetters.size();
-				for (long i = 0; i < nNumLetters; i++)
+				if (nNumLetters > 0)
 				{
-					m_vecLetters[i].m_usPageNumber = (unsigned short) nPageNumber;
+					// Set the page number for all the Letters in the vector
+					// [FlexIDSCore:5332]
+					// Profiling has shown accessing the letters out of m_vecLetters one letter at
+					// a time to be significantly time consuming on large spatial strings. Instead
+					// get a direct pointer to access the letters.
+					CPPLetter* pLetters = &m_vecLetters[0];
+					for (long i = 0; i < nNumLetters; i++)
+					{
+						pLetters[i].m_usPageNumber = (unsigned short) nPageNumber;
+					}
 				}
 			}
 			break;

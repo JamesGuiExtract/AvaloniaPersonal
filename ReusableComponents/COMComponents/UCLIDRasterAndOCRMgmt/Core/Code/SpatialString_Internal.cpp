@@ -1419,6 +1419,13 @@ bool CSpatialString::getIsEndOfWord(long nIndex)
 //-------------------------------------------------------------------------------------------------
 bool CSpatialString::getIsEndOfLine(long nIndex)
 {
+	// For compatibility with callers that don't already have m_vecLetters as a direct pointer.
+	CPPLetter* pLetters = &m_vecLetters[0];
+	return getIsEndOfLine(nIndex, pLetters);
+}
+//-------------------------------------------------------------------------------------------------
+bool CSpatialString::getIsEndOfLine(long nIndex, CPPLetter* pLetters)
+{
     // return false if the index is invalid
     if (nIndex < 0 || (unsigned long) nIndex >= m_strString.size())
     {
@@ -1435,11 +1442,12 @@ bool CSpatialString::getIsEndOfLine(long nIndex)
 
     // get the current page of this letter, if it is available (ie. mode is spatial)
     unsigned short usPageNum = 0;
-    if(m_eMode == kSpatialMode && m_vecLetters[nIndex].m_bIsSpatial)
+    if(m_eMode == kSpatialMode && pLetters[nIndex].m_bIsSpatial)
     {
-        usPageNum = m_vecLetters[nIndex].m_usPageNumber;
+        usPageNum = pLetters[nIndex].m_usPageNumber;
     }
 
+	unsigned long nNumLetters = m_vecLetters.size();
     unsigned long nNextPos = nIndex + 1;
 
     while (true)
@@ -1457,9 +1465,9 @@ bool CSpatialString::getIsEndOfLine(long nIndex)
         {
             // need to search for the next spatial letter and check its page number.
             // [LegacyRCAndUtils #4976]
-            for (unsigned long i = nNextPos; i < m_vecLetters.size(); i++)
+            for (unsigned long i = nNextPos; i < nNumLetters; i++)
             {
-                const CPPLetter& nextLetter = m_vecLetters[i];
+                const CPPLetter& nextLetter = pLetters[i];
                 
                 if(nextLetter.m_bIsSpatial)
                 {
@@ -1498,11 +1506,11 @@ bool CSpatialString::getIsEndOfLine(long nIndex)
     }
 }
 //-------------------------------------------------------------------------------------------------
-bool CSpatialString::getIsEndOfLine(size_t index, CRect rectCurrentLineZone)
+bool CSpatialString::getIsEndOfLine(size_t index, CRect rectCurrentLineZone, CPPLetter* pLetters)
 {
 	// Check to see if this is the end of the line based on the char value or page number first.
 	// This will not take into account the spatial location of of the next character.
-    if (getIsEndOfLine(index))
+    if (getIsEndOfLine(index, pLetters))
     {
         return true;
     }
@@ -1512,11 +1520,12 @@ bool CSpatialString::getIsEndOfLine(size_t index, CRect rectCurrentLineZone)
 	// above or below rectCurrentZone or whose right side is less that the right side of
 	// rectCurrentLineZone, this should be considered the end of the line.
 	index++;
-	if (index < m_vecLetters.size() && m_vecLetters[index].m_bIsSpatial)
+	size_t nNumLetters = m_vecLetters.size();
+	if (index < nNumLetters && pLetters[index].m_bIsSpatial)
 	{
 		// Get the spatial area of the next character.
-		CRect rectNextLetter(m_vecLetters[index].m_ulLeft, m_vecLetters[index].m_ulTop,
-			m_vecLetters[index].m_ulRight, m_vecLetters[index].m_ulBottom);
+		CRect rectNextLetter(pLetters[index].m_ulLeft, pLetters[index].m_ulTop,
+			pLetters[index].m_ulRight, pLetters[index].m_ulBottom);
 							
 		if (rectNextLetter.top > rectCurrentLineZone.bottom || 
 			rectNextLetter.bottom < rectCurrentLineZone.top || 
@@ -1618,9 +1627,14 @@ void CSpatialString::reviewSpatialStringAndDowngradeIfNeeded()
         m_eMode = kNonSpatialMode;
 
         // Check each letter to see if any have spatial information
+		// [FlexIDSCore:5332]
+		// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to be
+		// significantly time consuming on large spatial strings. Instead get a direct pointer to
+		// access the letters.
+		CPPLetter* pLetters = &m_vecLetters[0];
         for( int i = 0; i < nLetters; i++)
         {
-            CPPLetter& letter = m_vecLetters[i];
+            CPPLetter& letter = pLetters[i];
             if (letter.m_bIsSpatial)
             {
                 // If there is at least one letter that is spatial, this object is spatial
@@ -1842,9 +1856,21 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
         vector<CRect> vecCurrentLineZones;
         CRect rectCurrentLineZone = grectNULL;
 
+		size_t nNumLetters = m_vecLetters.size();
+		if (nNumLetters == 0)
+		{
+			// If nNumLetters is zero, there is nothing to do.
+			return ipZones;
+		}
+
         // This loop iterates the entire string character by character to build the raster zones.
+		// [FlexIDSCore:5332]
+		// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to be
+		// significantly time consuming on large spatial strings. Instead get a direct pointer to
+		// access the letters.
+		CPPLetter* pLetters = &m_vecLetters[0];
         size_t j = 0;
-        while (j < m_vecLetters.size())
+        while (j < nNumLetters)
         {
             // Declare properties to apply to the next raster zone.
             short sCurrentPage = -1;
@@ -1855,15 +1881,15 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
             bool bEndOfLine = false;
 
             // This loop iterates through all characters belonging to a single raster zone.
-            while (j < m_vecLetters.size())
+            while (j < nNumLetters)
             {
                 // Ignore non-spatial characters.
-                if (!m_vecLetters[j].m_bIsSpatial)
+                if (!pLetters[j].m_bIsSpatial)
                 {
 					// [DataEntry:1119]
 					// Even though this char is non-spatial, still check to see if the subsequent
 					// char(s) indicate that this is the end of a line.
-					if (getIsEndOfLine(j))
+					if (getIsEndOfLine(j, pLetters))
 					{
 						j++;
 						bEndOfLine = true;
@@ -1878,7 +1904,7 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
                 if (sCurrentPage == -1)
                 {
                     // Determine the page the zone will be on.
-                    sCurrentPage = m_vecLetters[j].m_usPageNumber;
+                    sCurrentPage = pLetters[j].m_usPageNumber;
 
                     // Determine the OCR confidence tier this zone belongs to as well as what the upper
                     // and lower boundaries of the tier are by iterating through each tier in ascending
@@ -1892,7 +1918,7 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
 
                         // If the next boundary is greater or equal to the current char confidence, we
                         // have found the appropriate tier.
-                        if (m_vecLetters[j].m_ucCharConfidence <= ucBoundary)
+                        if (pLetters[j].m_ucCharConfidence <= ucBoundary)
                         {
                             ucLowerConfidenceBounds = ucLastBoundary;
                             ucUpperConfidenceBounds = ucBoundary;
@@ -1911,29 +1937,29 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
                 }
                 // If we have changed pages, this is the end of the raster zone as well as the end of
                 // the current line.
-                else if (sCurrentPage != m_vecLetters[j].m_usPageNumber)
+                else if (sCurrentPage != pLetters[j].m_usPageNumber)
                 {
                     bEndOfLine = true;
                     break;
                 }
                 // If the current letter does not fall within the OCR confidence bounds of the current
                 // raster zone, break out of the current raster zone loop.
-                else if (m_vecLetters[j].m_ucCharConfidence <= ucLowerConfidenceBounds ||
-                    m_vecLetters[j].m_ucCharConfidence > ucUpperConfidenceBounds)
+                else if (pLetters[j].m_ucCharConfidence <= ucLowerConfidenceBounds ||
+                    pLetters[j].m_ucCharConfidence > ucUpperConfidenceBounds)
                 {
                     break;
                 }
 
                 // Get the spatial area of the current character.
-                CRect rectLetter(m_vecLetters[j].m_ulLeft, m_vecLetters[j].m_ulTop, 
-                    m_vecLetters[j].m_ulRight, m_vecLetters[j].m_ulBottom);
+                CRect rectLetter(pLetters[j].m_ulLeft, pLetters[j].m_ulTop, 
+                    pLetters[j].m_ulRight, pLetters[j].m_ulBottom);
 
                 // Combine the character's area with the area of the current raster zone as a whole.
                 rectCurrentZone.UnionRect(rectCurrentZone, rectLetter);
 
                 // If this character is the last of the current line, break off the raster zone (but
                 // move on to the next char).
-                if (getIsEndOfLine(j, rectCurrentZone))
+                if (getIsEndOfLine(j, rectCurrentZone, pLetters))
                 {
                     bEndOfLine = true;
                     j++;
@@ -2523,11 +2549,22 @@ void CSpatialString::getLines(vector<pair<long, long>>& rvecLines)
         // Clear the vector first
         rvecLines.clear();
 
+		long nNumLetters = m_strString.size();
+		if (nNumLetters == 0)
+		{
+			// If m_vecLetters is empty, there is nothing to do.
+			return;
+		}
+
+		// [FlexIDSCore:5332]
+		// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to be
+		// significantly time consuming on large spatial strings. Instead get a direct pointer to
+		// access the letters.
+		CPPLetter* pLetters = &m_vecLetters[0];
         long nStartPos = 0;
-        long nNumLetters = m_strString.size();
         for (long i = 0; i < nNumLetters; i++)
         {
-            if (getIsEndOfLine(i)) 
+            if (getIsEndOfLine(i, pLetters)) 
             {
                 // get the line beginning ending with current letter
                 rvecLines.push_back(pair<long, long>(nStartPos, i));
@@ -2600,12 +2637,23 @@ IIUnknownVectorPtr CSpatialString::getParagraphs()
         IIUnknownVectorPtr ipParagraphs(CLSID_IUnknownVector);
         ASSERT_RESOURCE_ALLOCATION("ELI25834", ipParagraphs != __nullptr);
 
+        long nNumLetters = m_vecLetters.size();		
+		if (nNumLetters == 0)
+		{
+			// If nNumLetters is zero, there is nothing to do.
+			return ipParagraphs;
+		}
+
+		// [FlexIDSCore:5332]
+		// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to be
+		// significantly time consuming on large spatial strings. Instead get a direct pointer to
+		// access the letters.
+		CPPLetter* pLetters = &m_vecLetters[0];
         long nStartPos = 0;
-        long nNumLetters = m_vecLetters.size();
         for (long i = 0; i < nNumLetters; i++)
         {
             // Get CPPLetter
-            CPPLetter& letter = m_vecLetters[i];
+            CPPLetter& letter = pLetters[i];
             
             if (letter.m_bIsEndOfParagraph) 
             {
@@ -2653,9 +2701,15 @@ long CSpatialString::getAverageCharHeight()
 
         // Get the average width of all the spatial characters in the string(don't worry about 
         // space between chars)
-        for (unsigned int uiLetter = 0; uiLetter < m_vecLetters.size(); uiLetter++)
+		// [FlexIDSCore:5332]
+		// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to be
+		// significantly time consuming on large spatial strings. Instead get a direct pointer to
+		// access the letters.
+		CPPLetter* pLetters = &m_vecLetters[0];
+		unsigned int nNumLetters = m_vecLetters.size();
+        for (unsigned int uiLetter = 0; uiLetter < nNumLetters; uiLetter++)
         {	
-            CPPLetter& letter = m_vecLetters[uiLetter];
+            CPPLetter& letter = pLetters[uiLetter];
 
             if(!letter.m_bIsSpatial)
             {
@@ -2746,9 +2800,15 @@ long CSpatialString::getAverageCharWidth()
 
             // Get the average width of all the spatial characters in the string(don't worry about 
             // space between chars)
-            for (unsigned int uiLetter = 0; uiLetter < m_vecLetters.size(); uiLetter++)
+			// [FlexIDSCore:5332]
+			// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to
+			// be significantly time consuming on large spatial strings. Instead get a direct
+			// pointer to access the letters.
+			CPPLetter* pLetters = &m_vecLetters[0];
+			unsigned int nNumLetters = m_vecLetters.size();
+            for (unsigned int uiLetter = 0; uiLetter < nNumLetters; uiLetter++)
             {	
-                CPPLetter& letter = m_vecLetters[uiLetter];
+                CPPLetter& letter = pLetters[uiLetter];
 
                 if(!letter.m_bIsSpatial)
                 {
@@ -2812,11 +2872,22 @@ vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr> CSpatialString::getOCRImageRas
         }
         else if (m_eMode == kSpatialMode)
         {
+			long lLettersSize = m_vecLetters.size();
+			if (lLettersSize == 0)
+			{
+				// If lLettersSize is zero, there is nothing to do.
+				return vecZones;
+			}
+
             // Handle kSpatialMode objects. Create a raster zone for each line.
             vector<pair<long, long>> vecLines;
             getLines(vecLines);
 
-            long lLettersSize = m_vecLetters.size();
+			// [FlexIDSCore:5332]
+			// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to
+			// be significantly time consuming on large spatial strings. Instead get a direct
+			// pointer to access the letters.
+			CPPLetter* pLetters = &m_vecLetters[0];
             for (vector<pair<long, long>>::iterator it = vecLines.begin();
                 it != vecLines.end(); it++)
             {
@@ -2835,7 +2906,7 @@ vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr> CSpatialString::getOCRImageRas
                 long lBounds = min(it->second + 1, lLettersSize);
                 for (long i = lIndex+1; i < lBounds; i++)
                 {
-                    const CPPLetter& tempLetter = m_vecLetters[i];
+                    const CPPLetter& tempLetter = pLetters[i];
 
                     // Only look at spatial letters
                     if (!tempLetter.m_bIsSpatial)

@@ -315,12 +315,19 @@ private:
 	// Returns true if the letter at nIndex is the last letter of a line. Considers only the char
 	// value and page, not the spatial location of the next char in determining if nIndex is at the
 	// end of a line.
+	// For compatibility with callers that don't already have m_vecLetters as a direct pointer.
 	bool getIsEndOfLine(long nIndex);
+	//----------------------------------------------------------------------------------------------
+	// Returns true if the letter at nIndex is the last letter of a line. Considers only the char
+	// value and page, not the spatial location of the next char in determining if nIndex is at the
+	// end of a line. pLetters must be pointing to the m_vecLetters array.
+	bool getIsEndOfLine(long nIndex, CPPLetter* pLetters);
 	//----------------------------------------------------------------------------------------------
 	// Returns true if the letter at nIndex is the last letter of a line. Considers the spatial info
 	// for the line up to index (specified by rectCurrentLineZone) to determine if a new line should
 	// be started based upon the location of the next character compared to rectCurrentLineZone.
-	bool getIsEndOfLine(size_t index, CRect rectCurrentLineZone);
+	// pLetters must be pointing to the m_vecLetters array.
+	bool getIsEndOfLine(size_t index, CRect rectCurrentLineZone, CPPLetter* pLetters);
 	//----------------------------------------------------------------------------------------------
 	// UpdateString was an implemented member from the IDL file, but moved here. The 
 	// string is updated, but the m_strSourceDocName remains the same.

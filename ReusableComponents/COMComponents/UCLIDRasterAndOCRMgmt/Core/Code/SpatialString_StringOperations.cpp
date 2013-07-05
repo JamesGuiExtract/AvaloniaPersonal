@@ -416,16 +416,27 @@ STDMETHODIMP CSpatialString::ToLowerCase()
 		// string and letters vector are equal (if the letters vector exists)
 		performConsistencyCheck();
 
+		if (m_strString.empty())
+		{
+			// If m_strString is empty, there is nothing to do.
+			return S_OK;
+		}
+
 		// operate on the string member
 		makeLowerCase(m_strString);
 
 		// if this is a spatial string, then operate on the letters too
 		if (m_eMode == kSpatialMode)
 		{
+			// [FlexIDSCore:5332]
+			// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to
+			// be significantly time consuming on large spatial strings. Instead get a direct
+			// pointer to access the letters.
+			CPPLetter* pLetters = &m_vecLetters[0];
 			long nSize = m_vecLetters.size();
 			for (int n = 0; n < nSize; n++)
 			{
-				m_vecLetters[n].m_usGuess1 = getLowerCaseChar((char) m_vecLetters[n].m_usGuess1);
+				pLetters[n].m_usGuess1 = getLowerCaseChar((char) pLetters[n].m_usGuess1);
 			}
 		}
 
@@ -450,16 +461,27 @@ STDMETHODIMP CSpatialString::ToUpperCase()
 		// string and letters vector are equal (if the letters vector exists)
 		performConsistencyCheck();
 
+		if (m_strString.empty())
+		{
+			// If m_strString is empty, there is nothing to do.
+			return S_OK;
+		}
+
 		// operate on the string member
 		makeUpperCase(m_strString);
 
 		// if this is a spatial string, then operate on the letters too
 		if (m_eMode == kSpatialMode)
 		{
+			// [FlexIDSCore:5332]
+			// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to
+			// be significantly time consuming on large spatial strings. Instead get a direct
+			// pointer to access the letters.
+			CPPLetter* pLetters = &m_vecLetters[0];
 			long nSize = m_vecLetters.size();
 			for (int n = 0; n < nSize; n++)
 			{
-				m_vecLetters[n].m_usGuess1 = getUpperCaseChar((char) m_vecLetters[n].m_usGuess1);
+				pLetters[n].m_usGuess1 = getUpperCaseChar((char) pLetters[n].m_usGuess1);
 			}
 		}
 
@@ -484,10 +506,22 @@ STDMETHODIMP CSpatialString::ToTitleCase()
 		// string and letters vector are equal (if the letters vector exists)
 		performConsistencyCheck();
 
+		unsigned int nNumLetters = m_vecLetters.size();
+		if (nNumLetters == 0)
+		{
+			// If nNumLetters is zero, there is nothing to do.
+			return S_OK;
+		}
+		
 		// make first character of each word into upper case
 		// walk through each character and check if there is 
 		// no character or a non-alphanumeric character to its left
-		for (unsigned int n = 0; n < m_strString.size(); n++)
+		// [FlexIDSCore:5332]
+		// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to be
+		// significantly time consuming on large spatial strings. Instead get a direct pointer to
+		// access the letters.
+		CPPLetter* pLetters = &m_vecLetters[0];
+		for (unsigned int n = 0; n < nNumLetters; n++)
 		{
 			// if current character is a alpha character
 			if (::isalpha((unsigned char) m_strString[n]))
@@ -502,7 +536,7 @@ STDMETHODIMP CSpatialString::ToTitleCase()
 					// convert letter to uppercase if appropriate
 					if (m_eMode == kSpatialMode)
 					{
-						m_vecLetters[n].m_usGuess1 = getUpperCaseChar((char) m_vecLetters[n].m_usGuess1);
+						pLetters[n].m_usGuess1 = getUpperCaseChar((char) pLetters[n].m_usGuess1);
 					}
 				}
 				else
@@ -513,7 +547,7 @@ STDMETHODIMP CSpatialString::ToTitleCase()
 					// convert letter to lowercase if appropriate
 					if (m_eMode == kSpatialMode)
 					{
-						m_vecLetters[n].m_usGuess1 = getLowerCaseChar((char) m_vecLetters[n].m_usGuess1);
+						pLetters[n].m_usGuess1 = getLowerCaseChar((char) pLetters[n].m_usGuess1);
 					}
 				}
 			}

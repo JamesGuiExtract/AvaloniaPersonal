@@ -617,16 +617,16 @@ STDMETHODIMP CStrToObjectMap::CopyFrom(IUnknown * pObject)
 		// Set Casesensitivity to same as source
 		m_bCaseSensitive = asCppBool(ipSource->CaseSensitive);
 
-		long lSize = ipSource->Size;
+		UCLID_COMUTILSLib::IVariantVectorPtr ipKeys = ipSource->GetKeys();
+		long lSize = ipKeys->Size;
 		for(long i = 0; i < lSize; i++)
 		{
-			CComBSTR bstrKey;
-			IUnknownPtr ipUnk;
-			ipSource->GetKeyValue(i, &bstrKey, &ipUnk);
+			_bstr_t bstrKey(ipKeys->Item[i].bstrVal);
+			IUnknownPtr ipUnk = ipSource->GetValue(bstrKey);
 
 			UCLID_COMUTILSLib::ICopyableObjectPtr ipCopier(ipUnk);
 			ASSERT_RESOURCE_ALLOCATION("ELI26047", ipCopier != __nullptr);
-
+			
 			// Create a deep copy of the objects
 			ipUnk = ipCopier->Clone();
 			ASSERT_RESOURCE_ALLOCATION("ELI26048", ipUnk != __nullptr);

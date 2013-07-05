@@ -512,12 +512,12 @@ STDMETHODIMP CLongToObjectMap::CopyFrom(IUnknown * pObject)
 		// Clear this map object
 		clear();
 
-		long lSize = ipSource->Size;
+		UCLID_COMUTILSLib::IVariantVectorPtr ipKeys = ipSource->GetKeys();
+		long lSize = ipKeys->Size;
 		for(long i = 0; i < lSize; i++)
 		{
-			long key;
-			IUnknownPtr ipUnk;
-			ipSource->GetKeyValue(i, &key, &ipUnk);
+			long key = (long)ipKeys->Item[i];
+			IUnknownPtr ipUnk = ipSource->GetValue(key);
 
 			// If this object can be cloned then clone it
 			UCLID_COMUTILSLib::ICopyableObjectPtr ipValue = ipUnk;
