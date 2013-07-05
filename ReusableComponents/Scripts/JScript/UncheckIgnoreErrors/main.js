@@ -48,7 +48,7 @@ function main(args) {
     }
 
     function uncheckAttributeRule(rule) {
-        modified = false;
+        var modified = false;
         if (rule.IgnoreErrors) {
             rule.IgnoreErrors = false;
             modified = true;
@@ -88,7 +88,7 @@ function main(args) {
             handleScriptError("InternalScriptError", "Unable to load ruleset", err, "RSD File", rsdfilename);
         }
 
-        modified = false;
+        var modified = false;
 
         if (ruleset.IgnorePreprocessorErrors) {
             ruleset.IgnorePreprocessorErrors = false;
