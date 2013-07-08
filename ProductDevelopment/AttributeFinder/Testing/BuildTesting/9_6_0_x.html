@@ -1,0 +1,243 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.6.0.x Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.6.0.x Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<UL>
+	<h3>Goals</h3>
+    	<ul>
+		<li>Provide suitable <b>Core: Send email</b> test cases to be merged 
+		with regular checklists.
+		<li>Provide suitable <b>Email settings</b> test cases to be merged 
+		with the existing <b>Database options</b> test cases.
+    	</ul>
+<p>
+	<h3>Core: Send email</h3>
+    	<ul>
+  	   	<LI><b>General</b>
+        	<ul>
+			<li>Confirm that the <b>Core: Send email</b> task is available 
+			with a <b>Server</b> license.
+			<li>Confirm that the <b>Core: Send email</b> task is available 
+			with a <b>Client</b> license.
+        	</ul>
+<p>
+  	   	<LI><b>User Interface</b>
+        	<ul>
+			<li>Confirm that the dialog caption is <b>Core: Send email 
+			settings</b>.
+			<li>Confirm that the dialog includes a <b>To</b> edit box.
+			<li>Confirm that the dialog includes a <b>Cc</b> edit box.
+			<li><b>[DotNetRC #1076] NOT IMPLEMENTED</b> Confirm that the 
+			dialog includes a <b>Bcc</b> edit box.
+			<li>Confirm that the dialog includes a <b>Subject</b> edit box.
+			<ul>
+				<li>Confirm presence of an associated <b>tag selector</b> 
+				button with the usual options available plus:
+				<ul>
+					<li>&lt;ActionName&gt;
+					<li>&lt;DatabaseName&gt;
+					<li>&lt;DatabaseServerName&gt;
+					<li>&lt;CommonComponentsDir&gt;
+				</ul>
+			</ul>
+			<li>Confirm that the dialog includes an <b>Attachments</b> button.
+			<ul>
+				<li>Confirm that the button label includes a number in 
+				parentheses that describes how many attachments have been 
+				defined.
+				<li>Confirm that clicking the <b>Attachments</b> button 
+				displays an <b>Core: Send email attachments</b> dialog.
+				<li>Confirm that the dialog includes an <b>Email 
+				attachments...</b> list.
+				<li>Confirm that the dialog contains a <b>tag selector</b> 
+				button with the usual options available plus:
+				<ul>
+					<li>&lt;ActionName&gt;
+					<li>&lt;DatabaseName&gt;
+					<li>&lt;DatabaseServerName&gt;
+					<li>&lt;CommonComponentsDir&gt;
+				</ul>
+				<li>Confirm that the dialog contains a browse button.
+				<li>Confirm proper behavior of the browse button.
+				<li>Confirm that each attachment is individually saved in 
+				the list.
+				<li>Confirm that attachment filenames can be added via 
+				manual entry.
+				<li>Confirm that <b>OK</b> saves the Attachment settings.
+				<li>Confirm that <b>Cancel</b> retains the previous 
+				Attachment settings.
+				<li>Confirm that the settings are persistent.
+				<li><b>[DotNetRC #1075]</b> Clearing Attachments
+				<ul>
+					<li>Add several attachments.
+					<li>Select one attachment and press <b>DELETE</b> 
+					to remove it from the list.
+					<li>Press <b>DELETE</b> again and confirm that 
+					another attachment is removed from the list.
+				</ul>
+			</ul>
+			<li>Confirm that the dialog includes a multi-line edit box for 
+			the email body.
+			<li>Confirm that the dialog contains an associated <b>tag 
+			selector</b> button with the usual options available plus:
+			<ul>
+				<li>&lt;ActionName&gt;
+				<li>&lt;DatabaseName&gt;
+				<li>&lt;DatabaseServerName&gt;
+				<li>&lt;CommonComponentsDir&gt;
+			</ul>
+			<li>Confirm that the dialog includes an <b>Advanced...</b> 
+			button.
+			<ul>
+				<li>Confirm that clicking the <b>Advanced</b> button 
+				displays a <b>Core: Send email advanced settings</b> 
+				dialog.
+				<li>Confirm that the dialog contains a <b>VOA filename</b> 
+				edit box.
+				<li>Confirm that the default edit box value is 
+				<b>&lt;SourceDocName&gt;.voa</b>.
+				<li>Confirm that the dialog contains a <b>tag 
+				selector</b> button with the usual options available plus:
+				<ul>
+					<li>&lt;ActionName&gt;
+					<li>&lt;DatabaseName&gt;
+					<li>&lt;DatabaseServerName&gt;
+					<li>&lt;CommonComponentsDir&gt;
+				</ul>
+				<li>Confirm that the dialog contains a browse button.
+				<li>Confirm proper behavior of the browse button.
+				<li>Confirm that the settings are persistent.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>Query Expressions</b>
+        	<ul>
+			<li>Exercise the following (or similar) queries against suitable 
+			VOA files.
+			<ul>
+				<li>&lt;/MCData&gt;
+				<li>&lt;/hcdata&gt;
+				<li>&lt;Query&gt;&lt;Attribute&gt;*@SSN 
+				&lt;/Attribute&gt;&lt;/Query&gt;
+				<li>&lt;/ReturnAddress/City&gt;
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>DBInfo Table</b>
+        	<ul>
+			<li>Confirm that the <b>DBInfo</b> table includes the following 
+			fields.
+			<ul>
+				<li>EmailPassword
+				<ul>
+					<li>Confirm that the password is <b>not</b> saved 
+					as clear text.
+				</ul>
+				<li>EmailPort
+				<li>EmailSenderAddress
+				<li>EmailSenderName
+				<li>EmailServer
+				<li>EmailSignature
+				<li>EmailTimeout
+				<li>EmailUsername
+				<ul>
+					<li>Confirm that the user name is <b>not</b> saved 
+					as clear text.
+				</ul>
+				<li>EmailUseSSL
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>Miscellaneous</b>
+        	<ul>
+            		<li>Use <b>SQL Management Studio</b> to clear any existing 
+			<b>email settings</b> from the <b>DBInfo</b> table.
+			<li>Create an FPS file and configure a <b>Core: Send email</b> 
+			task.
+			<li>Save the FPS file.
+			<li>Confirm that a warning message is displayed telling the 
+			user that email settings need to be configured.
+			<ul>
+				<li>Confirm that the warning also indicates how the 
+				settings can be saved.
+			</ul>
+        	</ul>
+    	</ul>
+<p>
+	<h3>Database options</h3>
+    	<ul>
+  	   	<LI>Confirm that an <b>Email</b> tab is available in the 
+		<b>Database options</b> dialog.
+		<li>Confirm that the tab contains a <b>Server settings</b> group box.
+		<ul>
+			<li>Confirm presence of an <b>Outgoing mail (SMTP) server</b> 
+			edit box.
+			<li>Confirm presence of a <b>Port</b> edit box.
+			<li>Confirm presence of a <b>Requires authentication to send</b> 
+			check box.
+			<li>Confirm that the remaining controls are disabled unless the 
+			checkbox is checked.
+			<li>Confirm presence of a <b>User name</b> edit box.
+			<li>Confirm presence of a <b>Password</b> edit box.
+			<ul>
+				<li>Confirm that the password text is not displayed as 
+				clear text.
+			</ul>
+			<li>Confirm presence of a <b>Use SSL (must be supported by SMTP 
+			server)</b> check box.
+		</ul>
+		<li>Confirm that the tab contains a <b>Sender information</b> group box.
+		<ul>
+			<li>Confirm presence of a <b>Sender display name</b> edit box.
+			<li>Confirm presence of a <b>Sender email address</b> edit box.
+			<li>Confirm presence of an <b>Email signature</b> multi-line 
+			edit box.
+		</ul>
+		<li>Confirm presence of a <b>Send test email</b> button.
+		<ul>
+			<li>Confirm that the button is not enabled until all required 
+			settings have been provided.
+			<ul>
+				<li>Confirm that a <b>Possible Invalid Email</b> warning 
+				is displayed if the <b>Sender email address</b> field is 
+				not in a standard email address format.
+			</ul>
+			<li>Confirm that a <b>Send Test Email</b> dialog is displayed.
+			<li>Confirm that the dialog contains a <b>Please enter email 
+			addresses separated by ';'</b> edit box.
+			<li>Confirm that no test email is sent after clicking the 
+			<b>Cancel</b> button.
+			<li>Confirm that a test email is sent after clicking the 
+			<b>OK</b> button.
+			<li>Confirm that the test email can be sent to multiple 
+			recipients.
+			<li>Confirm that the test email includes the following settings:
+			<ul>
+				<li>Sender display name
+				<li>Sender email address
+				<li>Email signature
+			</ul>
+		</ul>
+		<li>Confirm that a <b>Possible Invalid Email</b> warning is displayed if 
+		the <b>Sender email address</b> field is not in a standard email address 
+		format.
+		<ul>
+			<li>Confirm that the invalid address can still be saved.
+		</ul>
+		<li>Confirm that the settings are persistent.
+		<li>Confirm that the settings are saved in the appropriate <b>DBInfo</b> 
+		fields.
+    	</ul>
+</UL>
+</BODY>
+</HTML>
