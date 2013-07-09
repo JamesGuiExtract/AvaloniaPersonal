@@ -294,6 +294,10 @@ namespace Extract.AttributeFinder.Rules
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI33420", _COMPONENT_DESCRIPTION);
 
+                // So that the garbage collector knows of and properly manages the associated
+                // memory.
+                pAttributeToBeModified.ReportMemoryUsage();
+
                 SpatialString attributeValue = pAttributeToBeModified.Value;
 
                 // Convert the attribute value into an enumeration of NumericRanges where commas
@@ -327,6 +331,10 @@ namespace Extract.AttributeFinder.Rules
                 {
                     attributeValue.ReplaceAndDowngradeToNonSpatial(outputValue);
                 }
+
+                // Report memory usage of heirarchy after processing to ensure all COM objects
+                // referenced in final result are reported.
+                pAttributeToBeModified.ReportMemoryUsage();
             }
             catch (Exception ex)
             {

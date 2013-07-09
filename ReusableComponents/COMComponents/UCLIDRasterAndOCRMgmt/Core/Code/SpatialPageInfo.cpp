@@ -4,6 +4,8 @@
 #include "SpatialPageInfo.h"
 #include <UCLIDException.h>
 #include <ByteStreamManipulator.h>
+#include <COMUtils.h>
+
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
@@ -13,6 +15,7 @@ const unsigned long gnCurrentVersion = 1;
 // CSpatialPageInfo
 //-------------------------------------------------------------------------------------------------
 CSpatialPageInfo::CSpatialPageInfo()
+: m_ipMemoryManager(__nullptr)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -20,6 +23,13 @@ CSpatialPageInfo::~CSpatialPageInfo()
 {
 	try
 	{
+		// If memory usage has been resported, report that this instance is no longer using any
+		// memory.
+		if (m_ipMemoryManager != __nullptr)
+		{
+			m_ipMemoryManager->ReportUnmanagedMemoryUsage(0);
+			m_ipMemoryManager = __nullptr;
+		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16538");
 }
@@ -33,7 +43,8 @@ STDMETHODIMP CSpatialPageInfo::InterfaceSupportsErrorInfo(REFIID riid)
 	{
 		&IID_ISpatialPageInfo,
 		&IID_IPersistStream,
-		&IID_ICopyableObject
+		&IID_ICopyableObject,
+		&IID_IManageableMemory
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -449,5 +460,26 @@ STDMETHODIMP CSpatialPageInfo::GetSizeMax(ULARGE_INTEGER *pcbSize)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())	
 	return E_NOTIMPL;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IManageableMemory
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialPageInfo::raw_ReportMemoryUsage(void)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		if (m_ipMemoryManager == __nullptr)
+		{
+			m_ipMemoryManager.CreateInstance(MEMORY_MANAGER_CLASS);
+		}
+		
+		m_ipMemoryManager->ReportUnmanagedMemoryUsage(sizeof(this));
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36026");
 }
 //-------------------------------------------------------------------------------------------------

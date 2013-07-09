@@ -28,6 +28,7 @@ const unsigned long gnCurrentVersion = 1;
 //-------------------------------------------------------------------------------------------------
 CLongToObjectMap::CLongToObjectMap()
 : m_bDirty(false)
+, m_ipMemoryManager(__nullptr)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -36,6 +37,14 @@ CLongToObjectMap::~CLongToObjectMap()
 	try
 	{
 		m_mapKeyToValue.clear();
+
+		// If memory usage has been resported, report that this instance is no longer using any
+		// memory.
+		if (m_ipMemoryManager != __nullptr)
+		{
+			m_ipMemoryManager->ReportUnmanagedMemoryUsage(0);
+			m_ipMemoryManager = __nullptr;
+		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16511");
 }
@@ -50,7 +59,8 @@ STDMETHODIMP CLongToObjectMap::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ILongToObjectMap,
 		&IID_ILicensedComponent,
 		&IID_IShallowCopyable,
-		&IID_ICopyableObject
+		&IID_ICopyableObject,
+		&IID_IManageableMemory
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -590,6 +600,41 @@ STDMETHODIMP CLongToObjectMap::ShallowCopy(IUnknown** pObject)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25731");
+}
+
+//-------------------------------------------------------------------------------------------------
+// IManageableMemory
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CLongToObjectMap::ReportMemoryUsage()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		if (m_ipMemoryManager == __nullptr)
+		{
+			m_ipMemoryManager.CreateInstance(MEMORY_MANAGER_CLASS);
+		}
+		
+		int nSize = sizeof(this);
+		nSize += m_mapKeyToValue.size() * sizeof(long);
+		m_ipMemoryManager->ReportUnmanagedMemoryUsage(nSize);
+
+		long nThisMapSize = m_mapKeyToValue.size();
+		for (auto iter = m_mapKeyToValue.begin(); iter != m_mapKeyToValue.end(); iter++)
+		{
+			if (iter->second != __nullptr)
+			{
+				UCLID_COMUTILSLib::IManageableMemoryPtr ipManageableMemory = iter->second;
+				ASSERT_RESOURCE_ALLOCATION("ELI36022", ipManageableMemory != __nullptr);
+			
+				ipManageableMemory->ReportMemoryUsage();
+			}
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36023");
 }
 
 //-------------------------------------------------------------------------------------------------

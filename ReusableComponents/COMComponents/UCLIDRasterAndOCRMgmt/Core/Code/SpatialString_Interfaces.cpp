@@ -2,6 +2,8 @@
 #include "stdafx.h"
 #include "SpatialString.h"
 #include "UCLIDRasterAndOCRMgmt.h"
+#include "RasterZone.h"
+#include "SpatialPageInfo.h"
 
 #include <UCLIDException.h>
 #include <COMUtils.h>
@@ -23,7 +25,8 @@ STDMETHODIMP CSpatialString::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_IPersistStream,
 		&IID_IComparableObject,
 		&IID_ICopyableObject,
-		&IID_ILicensedComponent
+		&IID_ILicensedComponent,
+		&IID_IManageableMemory
 	};
 
 	for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -924,5 +927,48 @@ STDMETHODIMP CSpatialString::GetSizeMax(ULARGE_INTEGER *pcbSize)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())	
 	return E_NOTIMPL;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IManageableMemory
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::raw_ReportMemoryUsage(void)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		if (m_ipMemoryManager == __nullptr)
+		{
+			m_ipMemoryManager.CreateInstance(MEMORY_MANAGER_CLASS);
+		}
+		
+		int size = sizeof(this);
+		// Report the size of the CPPLetters as well as this class's direct members.
+		size += m_vecLetters.size() * sizeof(CPPLetter);
+		m_ipMemoryManager->ReportUnmanagedMemoryUsage(size);
+
+		// Report the size of the page info map
+		if (m_ipPageInfoMap != __nullptr)
+		{
+			IManageableMemoryPtr ipManageableMemory = m_ipPageInfoMap;
+			ASSERT_RESOURCE_ALLOCATION("ELI36027", ipManageableMemory != __nullptr);
+
+			ipManageableMemory->ReportMemoryUsage();
+		}
+
+		// Report the size of the raster zones.
+		size_t nZoneCount = m_vecRasterZones.size();
+		for (size_t i = 0; i < nZoneCount; i++)
+		{
+			IManageableMemoryPtr ipManageableMemory = m_vecRasterZones[i];
+			ASSERT_RESOURCE_ALLOCATION("ELI36028", ipManageableMemory != __nullptr);
+
+			ipManageableMemory->ReportMemoryUsage();
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36029");
 }
 //-------------------------------------------------------------------------------------------------

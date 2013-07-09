@@ -751,6 +751,7 @@ library UCLID_AFCORELib
 		[default] interface IAttribute;
 		interface ILicensedComponent;
 		interface ICopyableObject;
+		interface IManageableMemory;
 	};
 	[
 		uuid(BBDE6205-9193-4959-8922-630A9F920ADB),

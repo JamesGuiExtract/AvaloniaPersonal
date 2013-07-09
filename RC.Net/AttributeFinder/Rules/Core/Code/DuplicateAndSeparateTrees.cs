@@ -240,6 +240,10 @@ namespace Extract.AttributeFinder.Rules
                 ExtractException.Assert("ELI33496", "Rule is not properly configured.",
                     IsConfigured());
 
+                // So that the garbage collector knows of and properly manages the associated
+                // memory.
+                pAttributes.ReportMemoryUsage();
+
                 // Obtain all attributes specified as candidates to be duplicated.
                 IEnumerable<ComAttribute> selectedAttributes;
                 using (RuleObjectProfiler profiler =
@@ -252,8 +256,15 @@ namespace Extract.AttributeFinder.Rules
                 // Process each of the selected attributes.
                 foreach (ComAttribute attribute in selectedAttributes)
                 {
+                    // So that the garbage collector knows of and properly manages the associated
+                    // memory.
+                    attribute.ReportMemoryUsage();
                     DuplicateAndSeparateTree(pAttributes, attribute);
                 }
+
+                // Report memory usage of heirarchy after processing to ensure all COM objects
+                // referenced in final result are reported.
+                pAttributes.ReportMemoryUsage();
             }
             catch (Exception ex)
             {
@@ -585,7 +596,8 @@ namespace Extract.AttributeFinder.Rules
             List<ComAttribute> nonDividingAttributes = new List<ComAttribute>();
 
             // Loop through all sub-attributes.
-            foreach (ComAttribute subAttribute in originalAttributeTree.ToIEnumerable<ComAttribute>())
+            foreach (ComAttribute subAttribute in originalAttributeTree
+                .ToIEnumerable<ComAttribute>())
             {
                 if (subAttribute.Name.Equals(DividingAttributeName,
                         StringComparison.OrdinalIgnoreCase))

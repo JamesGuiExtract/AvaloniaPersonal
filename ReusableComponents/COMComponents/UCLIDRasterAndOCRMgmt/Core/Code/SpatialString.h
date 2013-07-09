@@ -25,7 +25,8 @@ class ATL_NO_VTABLE CSpatialString :
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IComparableObject, &IID_IComparableObject, &LIBID_UCLID_COMUTILSLib>,
-	public IDispatchImpl<ISpatialString, &IID_ISpatialString, &LIBID_UCLID_RASTERANDOCRMGMTLib>
+	public IDispatchImpl<ISpatialString, &IID_ISpatialString, &LIBID_UCLID_RASTERANDOCRMGMTLib>,
+	public IDispatchImpl<IManageableMemory, &IID_IManageableMemory, &LIBID_UCLID_COMUTILSLib>
 {
 public:
 	CSpatialString();
@@ -43,6 +44,7 @@ BEGIN_COM_MAP(CSpatialString)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(IComparableObject)
+	COM_INTERFACE_ENTRY(IManageableMemory)
 END_COM_MAP()
 
 public:
@@ -170,6 +172,9 @@ public:
 // IComparableObject
 	STDMETHOD(raw_IsEqualTo)(IUnknown * pObj, VARIANT_BOOL * pbValue);
 
+// IManageableMemory
+	STDMETHOD(raw_ReportMemoryUsage)(void);
+
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)( VARIANT_BOOL * pbValue);
 
@@ -217,6 +222,10 @@ private:
 	
 	// Vector of raster zones (only contains zones when the string is hybrid)
 	vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr> m_vecRasterZones;
+
+	// Allows reporting of memory usage to the garabage collector when being referenced by managed
+	// code.
+	IMemoryManagerPtr m_ipMemoryManager;
 
 	// For thread protection 
 	CMutex m_mutex;

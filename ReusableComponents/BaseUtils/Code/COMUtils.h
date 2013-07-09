@@ -9,6 +9,10 @@
 #include <string>
 #include <vector>
 
+// Name of IMemoryManger implmenter to be used to allow IManageableMemory implementers to report
+// their memory usage.
+#define MEMORY_MANAGER_CLASS	"Extract.Interop.MemoryManager"
+
 using namespace std;
 
 //-------------------------------------------------------------------------------------------------

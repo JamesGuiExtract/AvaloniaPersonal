@@ -31,7 +31,8 @@ STDMETHODIMP CIUnknownVector::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IShallowCopyable,
 		&IID_ILicensedComponent,
-		&IID_IComparableObject
+		&IID_IComparableObject,
+		&IID_IManageableMemory
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -45,8 +46,9 @@ STDMETHODIMP CIUnknownVector::InterfaceSupportsErrorInfo(REFIID riid)
 // CIUnknownVector
 //-------------------------------------------------------------------------------------------------
 CIUnknownVector::CIUnknownVector()
-:m_bDirty(false),
- m_bstrStreamName("IUnknownVector")
+: m_bDirty(false)
+, m_bstrStreamName("IUnknownVector")
+, m_ipMemoryManager(__nullptr)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -64,6 +66,14 @@ void CIUnknownVector::FinalRelease()
 	try
 	{
 		m_vecIUnknowns.clear();
+
+		// If memory usage has been resported, report that this instance is no longer using any
+		// memory.
+		if (m_ipMemoryManager != __nullptr)
+		{
+			m_ipMemoryManager->ReportUnmanagedMemoryUsage(0);
+			m_ipMemoryManager = __nullptr;
+		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI31145");
 }
@@ -896,6 +906,39 @@ STDMETHODIMP CIUnknownVector::ShallowCopy(IUnknown** pObject)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25725");
+}
+
+//-------------------------------------------------------------------------------------------------
+// IManageableMemory
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CIUnknownVector::ReportMemoryUsage()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		if (m_ipMemoryManager == __nullptr)
+		{
+			m_ipMemoryManager.CreateInstance(MEMORY_MANAGER_CLASS);
+		}
+		
+		m_ipMemoryManager->ReportUnmanagedMemoryUsage(sizeof(this));
+
+		long nSize = m_vecIUnknowns.size();
+		for (long i = 0; i < nSize; i++)
+		{
+			if (m_vecIUnknowns[i] != __nullptr)
+			{
+				UCLID_COMUTILSLib::IManageableMemoryPtr ipManageableMemory = m_vecIUnknowns[i];
+				ASSERT_RESOURCE_ALLOCATION("ELI36020", ipManageableMemory != __nullptr);
+			
+				ipManageableMemory->ReportMemoryUsage();
+			}
+		}		
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36021");
 }
 
 //-------------------------------------------------------------------------------------------------

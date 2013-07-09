@@ -110,11 +110,18 @@ namespace Extract.AttributeFinder.Rules
         {
             try
             {
+                // So that the garbage collector knows of and properly manages the associated
+                // memory.
+                pDocument.Attribute.ReportMemoryUsage();
                 ICopyableObject copySource = (ICopyableObject)pDocument.Attribute;
                 ComAttribute attribute = (ComAttribute)copySource.Clone();
 
                 IUnknownVector result = new IUnknownVector();
                 result.PushBack(attribute);
+
+                // So that the garbage collector knows of and properly manages the associated
+                // memory (including the new attribute copy).
+                result.ReportMemoryUsage();
 
                 return result;
             }

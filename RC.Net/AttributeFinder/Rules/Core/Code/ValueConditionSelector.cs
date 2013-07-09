@@ -161,6 +161,11 @@ namespace Extract.AttributeFinder.Rules
 
                 IUnknownVector selectedAttributeVector = selectedAttributes.ToIUnknownVector();
 
+                // So that the garbage collector knows of and properly manages the associated
+                // memory.
+                pAttrIn.ReportMemoryUsage();
+                selectedAttributeVector.ReportMemoryUsage();
+
                 return selectedAttributeVector;
             }
             catch (Exception ex)

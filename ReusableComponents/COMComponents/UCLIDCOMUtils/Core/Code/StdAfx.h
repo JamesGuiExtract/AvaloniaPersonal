@@ -24,5 +24,8 @@ extern CComModule _Module;
 #import "..\..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" named_guids 
 using namespace UCLID_COMLMLib;
 
+#import "..\..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.tlb" named_guids
+using namespace Extract_Interfaces;
+
 #import "UCLIDCOMUtils.tlb"
 

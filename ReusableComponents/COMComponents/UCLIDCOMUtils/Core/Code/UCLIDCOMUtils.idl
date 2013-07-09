@@ -1573,6 +1573,30 @@ library UCLID_COMUTILSLib
 			[out, retval] VARIANT_BOOL* pbResult);			
 	}
 
+	[
+		object,
+		uuid(C994FF4C-85A3-4D87-A79F-F99187350C18),
+		dual,
+		nonextensible,
+		helpstring("IManageableMemory Interface"),
+		pointer_default(unique)
+	]
+	interface IManageableMemory : IDispatch
+	{
+		// Requests the object to report its memory usage via the Extract.Interop.MemoryManager
+		// class so that the garbage collector is aware of the unmanaged memory being used.
+		// NOTE: Any implmenting class needs to be sure to follow up with a report of zero bytes
+		// used when the instance is released so the garbage collector doesn't continue to believe
+		// that memory to be in use.
+		// NOTE: Any implementing class needs to call this method on of any IManageableMemory child
+		// when called.
+        // NOTE: Callers should call this method:
+        // 1) Before any operations which may cause some previously existing IManageableMemory child
+        // objects to be unreferenced.
+        // 2) Before leaving the scope in which the object exists or returning it as a return value.
+		[id(3001), helpstring("method ReportMemoryUsage")] HRESULT ReportMemoryUsage();			
+	}
+
 	//---------------------------------------------------------------------------------------------
 	//-C O C L A S S E S --------------------------------------------------------------------------
 	//---------------------------------------------------------------------------------------------
@@ -1586,6 +1610,7 @@ library UCLID_COMUTILSLib
 		interface ILicensedComponent;
 		interface ICopyableObject;
 		interface IShallowCopyable;
+		interface IManageableMemory;
 	};
 	[
 		uuid(90BDF690-D7A8-4AFD-96DF-2816E789CBB3),
@@ -1733,6 +1758,7 @@ library UCLID_COMUTILSLib
 		interface ILicensedComponent;
 		interface ICopyableObject;
 		interface IShallowCopyable;
+		interface IManageableMemory;
 	};
 	[
 		uuid(20430EB0-7AA6-4DA1-A372-8EC38FCBE6AC),

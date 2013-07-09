@@ -18,7 +18,8 @@ class ATL_NO_VTABLE CAttribute :
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IAttribute, &IID_IAttribute, &LIBID_UCLID_AFCORELib>,
 	public IDispatchImpl<IComparableObject, &IID_IComparableObject, &LIBID_UCLID_COMUTILSLib>,
-	public IPersistStream
+	public IPersistStream,
+	public IDispatchImpl<IManageableMemory, &IID_IManageableMemory, &LIBID_UCLID_COMUTILSLib>
 {
 public:
 	CAttribute();
@@ -38,6 +39,7 @@ BEGIN_COM_MAP(CAttribute)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IComparableObject)
 	COM_INTERFACE_ENTRY(IPersistStream)
+	COM_INTERFACE_ENTRY(IManageableMemory)
 END_COM_MAP()
 
 public:
@@ -74,6 +76,9 @@ public:
 // IComparableObject
 	STDMETHOD(raw_IsEqualTo)(IUnknown * pObj, VARIANT_BOOL * pbValue);
 
+// IManageableMemory
+	STDMETHOD(raw_ReportMemoryUsage)(void);
+
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
 	STDMETHOD(IsDirty)(void);
@@ -92,6 +97,7 @@ private:
 	string m_strAttributeName;
 	string m_strAttributeType;
 	IUnknownPtr m_ipDataObject;
+	IMemoryManagerPtr m_ipMemoryManager;
 
 	// flag to keep track of whether this object has been modified
 	// since the last save-to-stream operation

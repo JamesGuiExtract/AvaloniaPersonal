@@ -331,9 +331,17 @@ namespace Extract.AttributeFinder.Rules
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI34683", _COMPONENT_DESCRIPTION);
 
+                // So that the garbage collector knows of and properly manages the
+                // associated memory.
+                pAttributeToBeModified.ReportMemoryUsage();
+
                 // Do not modify recursively since the AF framework already executes all value
                 // modifiers recursively.
                 ModifyAttributeSpatialMode(pAttributeToBeModified, false);
+
+                // Report memory usage of heirarchy after processing to ensure all COM objects
+                // referenced in final result are reported.
+                pAttributeToBeModified.ReportMemoryUsage();
             }
             catch (Exception ex)
             {
@@ -361,10 +369,18 @@ namespace Extract.AttributeFinder.Rules
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI34685", _COMPONENT_DESCRIPTION);
 
+                // So that the garbage collector knows of and properly manages the associated
+                // memory.
+                pAttributes.ReportMemoryUsage();
+
                 foreach (IAttribute attribute in pAttributes.ToIEnumerable<IAttribute>())
                 {
                     ModifyAttributeSpatialMode(attribute, ModifyRecursively);
                 }
+
+                // Report memory usage of heirarchy after processing to ensure all COM objects
+                // referenced in final result are reported.
+                pAttributes.ReportMemoryUsage();
             }
             catch (Exception ex)
             {
@@ -389,7 +405,15 @@ namespace Extract.AttributeFinder.Rules
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI34703", _COMPONENT_DESCRIPTION);
 
+                // So that the garbage collector knows of and properly manages the associated
+                // memory.
+                pDocument.Text.ReportMemoryUsage();
+
                 ModifySpatialStringSpatialMode(pDocument.Text);
+
+                // Report memory usage of heirarchy after processing to ensure all COM objects
+                // referenced in final result are reported.
+                pDocument.Text.ReportMemoryUsage();
             }
             catch (Exception ex)
             {

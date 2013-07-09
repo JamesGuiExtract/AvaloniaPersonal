@@ -51,4 +51,7 @@ using namespace Extract_Utilities_Email;
 #import "..\..\..\..\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Code\Core\SpotRecognitionIR.tlb" named_guids
 using namespace UCLID_SPOTRECOGNITIONIRLib;
 
+#import "..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.tlb" named_guids
+using namespace Extract_Interfaces;
+
 #import "AFCore.tlb"

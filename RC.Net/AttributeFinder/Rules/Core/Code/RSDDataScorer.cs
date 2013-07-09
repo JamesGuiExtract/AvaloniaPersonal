@@ -281,6 +281,10 @@ namespace Extract.AttributeFinder.Rules
         {
             try 
 	        {
+                // So that the garbage collector knows of and properly manages the associated
+                // memory.
+                pAttribute.ReportMemoryUsage();
+
                 RuleSet ruleSet = LoadRuleSet(pAttribute);
 
                 IEnumerable<ComAttribute> foundAttributes = GetFoundAttributes(ruleSet, pAttribute);
@@ -320,7 +324,12 @@ namespace Extract.AttributeFinder.Rules
                 // Create the dictionary used to store the expression variables.
                 InitializeVariables();
 
-                IEnumerable<ComAttribute> sourceAttributes = pAttributes.ToIEnumerable<ComAttribute>();
+                // So that the garbage collector knows of and properly manages the associated
+                // memory.
+                pAttributes.ReportMemoryUsage();
+
+                IEnumerable<ComAttribute> sourceAttributes =
+                    pAttributes.ToIEnumerable<ComAttribute>();
                 if (sourceAttributes.Any())
                 {
                     RuleSet ruleSet = LoadRuleSet(sourceAttributes.First());
@@ -720,6 +729,10 @@ namespace Extract.AttributeFinder.Rules
                 afDoc.Attribute = attribute;
 
                 IUnknownVector foundAttributes = ruleSet.ExecuteRulesOnText(afDoc, null, "", null);
+
+                // So that the garbage collector knows of and properly manages the associated
+                // memory.
+                foundAttributes.ReportMemoryUsage();
 
                 return foundAttributes.ToIEnumerable<ComAttribute>();
             }

@@ -16,7 +16,8 @@ class ATL_NO_VTABLE CLongToObjectMap :
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<ILongToObjectMap, &IID_ILongToObjectMap, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
-	public IDispatchImpl<IShallowCopyable, &IID_IShallowCopyable, &LIBID_UCLID_COMUTILSLib>
+	public IDispatchImpl<IShallowCopyable, &IID_IShallowCopyable, &LIBID_UCLID_COMUTILSLib>,
+	public IDispatchImpl<IManageableMemory, &IID_IManageableMemory, &LIBID_UCLID_COMUTILSLib>
 {
 public:
 	CLongToObjectMap();
@@ -34,6 +35,7 @@ BEGIN_COM_MAP(CLongToObjectMap)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IShallowCopyable)
+	COM_INTERFACE_ENTRY(IManageableMemory)
 END_COM_MAP()
 
 // ISupportsErrorInfo
@@ -67,6 +69,9 @@ END_COM_MAP()
 // IShallowCopyable
 	STDMETHOD(ShallowCopy)(IUnknown** pObject);
 
+// IManageableMemory
+	STDMETHOD(ReportMemoryUsage)();
+
 private:
 	// check license
 	void validateLicense();
@@ -75,6 +80,10 @@ private:
 	void clear();
 
 	std::map<long, IUnknownPtr> m_mapKeyToValue;
+
+	// Allows reporting of memory usage to the garabage collector when being referenced by managed
+	// code.
+	IMemoryManagerPtr m_ipMemoryManager;
 
 	// flag to indicate if this object's state has changed since the last 
 	// save-to-stream operation

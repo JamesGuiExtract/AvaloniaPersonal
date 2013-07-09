@@ -251,10 +251,18 @@ namespace Extract.AttributeFinder.Rules
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI33861", _COMPONENT_DESCRIPTION);
 
+                // So that the garbage collector knows of and properly manages the associated
+                // memory.
+                pAttrIn.ReportMemoryUsage();
+
                 IEnumerable<ComAttribute> selectedAttributes =
                     GetSelectedAttributes(pAttrIn, pAFDoc);
 
                 IUnknownVector selectedAttributeVector = selectedAttributes.ToIUnknownVector();
+
+                // Report memory usage of heirarchy after processing to ensure all COM objects
+                // referenced in final result are reported.
+                selectedAttributeVector.ReportMemoryUsage();
 
                 return selectedAttributeVector;
             }
@@ -284,6 +292,10 @@ namespace Extract.AttributeFinder.Rules
             {
                 return new List<ComAttribute>();
             }
+
+            // So that the garbage collector knows of and properly manages the associated
+            // memory.
+            sourceAttributeVector.ReportMemoryUsage();
 
             HashSet<ComAttribute> sourceAttributes =
                 new HashSet<ComAttribute>(sourceAttributeVector.ToIEnumerable<ComAttribute>());

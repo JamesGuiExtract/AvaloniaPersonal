@@ -25,6 +25,9 @@ using namespace UCLID_COMLMLib;
 #import "..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
 using namespace UCLID_COMUTILSLib;
 
+#import "..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.tlb" named_guids
+using namespace Extract_Interfaces;
+
 #import "UCLIDRasterAndOCRMgmt.tlb" \
 	rename("LoadImage", "UCLIDLoadImage")
 

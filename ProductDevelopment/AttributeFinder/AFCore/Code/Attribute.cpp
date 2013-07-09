@@ -32,6 +32,7 @@ CAttribute::CAttribute()
   m_ipAttributeSplitter(__nullptr),
   m_ipSubAttributes(__nullptr),
   m_ipDataObject(__nullptr),
+  m_ipMemoryManager(__nullptr),
   m_bDirty(false)
 {
 	try
@@ -64,6 +65,14 @@ void CAttribute::FinalRelease()
 		m_ipAttributeSplitter = __nullptr;
 		m_ipInputValidator = __nullptr;
 		m_ipDataObject = __nullptr;
+
+		// If memory usage has been resported, report that this instance is no longer using any
+		// memory.
+		if (m_ipMemoryManager != __nullptr)
+		{
+			m_ipMemoryManager->ReportUnmanagedMemoryUsage(0);
+			m_ipMemoryManager = __nullptr;
+		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI26474");
 }
@@ -79,7 +88,8 @@ STDMETHODIMP CAttribute::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ILicensedComponent,
 		&IID_ICopyableObject,
 		&IID_IComparableObject,
-		&IID_IPersistStream
+		&IID_IPersistStream,
+		&IID_IManageableMemory
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -996,6 +1006,46 @@ stop_checking:
 
 	return S_OK;
 }
+
+//-------------------------------------------------------------------------------------------------
+// IManageableMemory
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttribute::raw_ReportMemoryUsage(void)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		if (m_ipMemoryManager == __nullptr)
+		{
+			m_ipMemoryManager.CreateInstance(MEMORY_MANAGER_CLASS);
+		}
+		
+		m_ipMemoryManager->ReportUnmanagedMemoryUsage(sizeof(this));
+		
+		if (m_ipAttributeValue != __nullptr)
+		{
+			IManageableMemoryPtr ipManageableMemory = m_ipAttributeValue;
+			ASSERT_RESOURCE_ALLOCATION("ELI36014", ipManageableMemory != __nullptr);
+
+			ipManageableMemory->ReportMemoryUsage();
+		}
+
+		IIUnknownVectorPtr ipSubAttributes = getSubAttributes();
+		long lSize = ipSubAttributes->Size();
+		for (long i = 0; i < lSize; i++)
+		{
+			IManageableMemoryPtr ipManageableMemory = ipSubAttributes->At(i);
+			ASSERT_RESOURCE_ALLOCATION("ELI36015", ipManageableMemory != __nullptr);
+
+			ipManageableMemory->ReportMemoryUsage();
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36016");
+}
+
 //-------------------------------------------------------------------------------------------------
 // IPersistStream
 //-------------------------------------------------------------------------------------------------

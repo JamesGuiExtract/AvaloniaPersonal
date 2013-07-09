@@ -1398,6 +1398,7 @@ library UCLID_RASTERANDOCRMGMTLib
 	{
 		[default] interface IRasterZone;
 		interface ILicensedComponent;
+		interface IManageableMemory;
 	};
 	[
 		uuid(D2164333-6191-4317-BA5F-982FBEEA2C17),
@@ -1422,6 +1423,7 @@ library UCLID_RASTERANDOCRMGMTLib
 		//       the string information, not the source document or the spatial
 		//       information.
 		interface IComparableObject;
+		interface IManageableMemory;
 	};
 	[
 		uuid(5F0EF9A8-5F4C-4256-B50F-FF16C953CD34),
@@ -1440,6 +1442,7 @@ library UCLID_RASTERANDOCRMGMTLib
 	{
 		[default] interface ISpatialStringSearcher;
 		interface ILicensedComponent;
+		interface IManageableMemory;
 	};
 	[
 		uuid(A47D5752-12AD-42A6-987F-598DC1B3514E),
@@ -1449,6 +1452,7 @@ library UCLID_RASTERANDOCRMGMTLib
 	{
 		[default] interface ISpatialPageInfo;
 		interface ICopyableObject;
+		interface IManageableMemory;
 	};
 	[
 		uuid(10967FD8-81AB-41A6-AAD5-C470DD5CB78C),

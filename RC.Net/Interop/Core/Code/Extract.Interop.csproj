@@ -51,6 +51,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DocumentationFile>..\..\..\..\Binaries\Debug\Extract.Interop.XML</DocumentationFile>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -80,6 +81,7 @@
     <Compile Include="ISpecifyPropertyPages.cs" />
     <Compile Include="IStreamReader.cs" />
     <Compile Include="IStreamWriter.cs" />
+    <Compile Include="MemoryManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IStreamWrapper.cs" />
   </ItemGroup>
@@ -87,6 +89,10 @@
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
+      <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
+      <Name>Extract.Interfaces</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
@@ -111,6 +117,15 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <COMReference Include="UCLID_AFCORELib">
+      <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
     <COMReference Include="UCLID_COMLMLib">
       <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -122,6 +137,33 @@
     </COMReference>
     <COMReference Include="UCLID_COMUTILSLib">
       <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_INPUTFUNNELLib">
+      <Guid>{775ACC91-32AC-11D6-8259-0050DAD4FF55}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
+      <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_TESTINGFRAMEWORKINTERFACESLib">
+      <Guid>{B12E5F5E-6EC2-4D38-A57A-D55C4BE683C8}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>

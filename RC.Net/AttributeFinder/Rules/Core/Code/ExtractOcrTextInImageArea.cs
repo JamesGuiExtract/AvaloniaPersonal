@@ -297,6 +297,11 @@ namespace Extract.AttributeFinder.Rules
                     sourceString = pOriginInput.Text;
                 }
 
+                // So that the garbage collector knows of and properly manages the associated
+                // memory.
+                sourceString.ReportMemoryUsage();
+                pAttributeToBeModified.ReportMemoryUsage();
+
                 // If there is no image area associated with this attribute, the resulting value
                 // will be null.
                 SpatialString extractedText = null;
@@ -305,11 +310,17 @@ namespace Extract.AttributeFinder.Rules
                 foreach (RasterZone rasterZone in
                     GetZonesToExtract(pAttributeToBeModified.Value, sourceString))
                 {
+                    // So that the garbage collector knows of and properly manages the associated
+                    // memory.
+                    rasterZone.ReportMemoryUsage();
                     int page = rasterZone.PageNumber;
                     LongRectangle bounds = rasterZone.GetRectangularBounds(
                         sourceString.GetOCRImagePageBounds(page));
 
                     SpatialStringSearcher searcher = GetSearcherForPage(page, sourceString);
+                    // So that the garbage collector knows of and properly manages the associated
+                    // memory.
+                    searcher.ReportMemoryUsage();
 
                     // If this is the first zone, initialize extractedText with the result.
                     if (extractedText == null)
@@ -324,6 +335,10 @@ namespace Extract.AttributeFinder.Rules
                 }
 
                 pAttributeToBeModified.Value = extractedText;
+
+                // Report memory usage of heirarchy after processing to ensure all COM objects
+                // referenced in final result are reported.
+                pAttributeToBeModified.ReportMemoryUsage();
             }
             catch (Exception ex)
             {

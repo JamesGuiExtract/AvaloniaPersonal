@@ -135,6 +135,7 @@ void CSpatialStringSearcher::LocalSubstring::combineWith(const LocalSubstring& o
 // CSpatialStringSearcher
 //-------------------------------------------------------------------------------------------------
 CSpatialStringSearcher::CSpatialStringSearcher()
+: m_ipMemoryManager(__nullptr)
 {
 	// Set the default settings
 	m_bIncludeDataOnBoundary = true; 
@@ -158,6 +159,14 @@ void CSpatialStringSearcher::FinalRelease()
 	try
 	{
 		clear();
+
+		// If memory usage has been resported, report that this instance is no longer using any
+		// memory.
+		if (m_ipMemoryManager != __nullptr)
+		{
+			m_ipMemoryManager->ReportUnmanagedMemoryUsage(0);
+			m_ipMemoryManager = __nullptr;
+		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI31137");
 }
@@ -170,7 +179,8 @@ STDMETHODIMP CSpatialStringSearcher::InterfaceSupportsErrorInfo(REFIID riid)
 	static const IID* arr[] = 
 	{
 		&IID_ISpatialStringSearcher,
-		&IID_ILicensedComponent
+		&IID_ILicensedComponent,
+		&IID_IManageableMemory
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -559,6 +569,51 @@ STDMETHODIMP CSpatialStringSearcher::SetBoundaryResolution(ESpatialEntity eResol
 
 	return S_OK;
 }
+
+//-------------------------------------------------------------------------------------------------
+// IManageableMemory
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialStringSearcher::raw_ReportMemoryUsage(void)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		if (m_ipMemoryManager == __nullptr)
+		{
+			m_ipMemoryManager.CreateInstance(MEMORY_MANAGER_CLASS);
+		}
+		
+		int nSize = sizeof(this);
+		// Report the size of all letters, words, and lines.
+		nSize += m_vecLetters.size() * sizeof(LocalLetter);
+		nSize += m_vecWords.size() * sizeof(LocalWord);
+		nSize += m_vecLines.size() * sizeof(LocalLine);
+		m_ipMemoryManager->ReportUnmanagedMemoryUsage(nSize);
+
+		// Report the size of the spatial string.
+		if (m_ipSpatialString != __nullptr)
+		{
+			IManageableMemoryPtr ipManageableMemory = m_ipSpatialString;
+			ASSERT_RESOURCE_ALLOCATION("ELI36030", ipManageableMemory != __nullptr);
+
+			ipManageableMemory->ReportMemoryUsage();
+		}
+
+		// Report the size of the page info map.
+		if (m_ipSpatialPageInfoMap != __nullptr)
+		{
+			IManageableMemoryPtr ipManageableMemory = m_ipSpatialPageInfoMap;
+			ASSERT_RESOURCE_ALLOCATION("ELI36031", ipManageableMemory != __nullptr);
+
+			ipManageableMemory->ReportMemoryUsage();
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36032");
+}
+
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent
 //-------------------------------------------------------------------------------------------------

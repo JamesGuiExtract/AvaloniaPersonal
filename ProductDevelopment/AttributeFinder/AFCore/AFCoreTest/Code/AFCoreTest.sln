@@ -102,6 +102,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TopoUtils", "..\..\..\..\..\ReusableComponents\Geometry\TopoUtils\Code\TopoUtils.vcxproj", "{EBE90516-603A-4562-8B47-51234CBB9903}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDCOMUtils", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcxproj", "{7F591058-6DC9-4787-AE25-5A45AE78E3FA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDDistanceConverter", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDDistanceConverter\Code\UCLIDDistanceConverter.vcxproj", "{C33C299B-7BC9-4303-B42C-59C7510CD86D}"
 EndProject

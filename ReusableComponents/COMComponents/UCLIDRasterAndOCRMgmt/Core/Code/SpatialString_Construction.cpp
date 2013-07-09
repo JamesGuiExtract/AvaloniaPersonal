@@ -22,7 +22,8 @@ CSpatialString::CSpatialString()
 : m_strString(""), 
   m_eMode(kNonSpatialMode), 
   m_strSourceDocName(""),
-  m_strOCREngineVersion("")
+  m_strOCREngineVersion(""),
+  m_ipMemoryManager(__nullptr)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -32,6 +33,14 @@ CSpatialString::~CSpatialString()
 	{
 		// Clear the page info map
 		m_ipPageInfoMap = __nullptr;
+		
+		// If memory usage has been resported, report that this instance is no longer using any
+		// memory.
+		if (m_ipMemoryManager != __nullptr)
+		{
+			m_ipMemoryManager->ReportUnmanagedMemoryUsage(0);
+			m_ipMemoryManager = __nullptr;
+		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16539");
 }

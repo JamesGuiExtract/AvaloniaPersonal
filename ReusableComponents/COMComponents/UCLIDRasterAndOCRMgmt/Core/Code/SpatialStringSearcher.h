@@ -18,7 +18,8 @@ class ATL_NO_VTABLE CSpatialStringSearcher :
 	public CComCoClass<CSpatialStringSearcher, &CLSID_SpatialStringSearcher>,
 	public ISupportErrorInfo,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
-	public IDispatchImpl<ISpatialStringSearcher, &IID_ISpatialStringSearcher, &LIBID_UCLID_RASTERANDOCRMGMTLib>
+	public IDispatchImpl<ISpatialStringSearcher, &IID_ISpatialStringSearcher, &LIBID_UCLID_RASTERANDOCRMGMTLib>,
+	public IDispatchImpl<IManageableMemory, &IID_IManageableMemory, &LIBID_UCLID_COMUTILSLib>
 {
 public:
 	CSpatialStringSearcher();
@@ -35,6 +36,7 @@ BEGIN_COM_MAP(CSpatialStringSearcher)
 	COM_INTERFACE_ENTRY2(IDispatch,ISpatialStringSearcher)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
+	COM_INTERFACE_ENTRY(IManageableMemory)
 END_COM_MAP()
 
 public:
@@ -55,6 +57,9 @@ public:
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
+
+// IManageableMemory
+	STDMETHOD(raw_ReportMemoryUsage)(void);
 
 	////////////
 	// Enumerations
@@ -263,4 +268,8 @@ private:
 	vector<LocalWord> m_vecWords;
 	// Contains all the lines
 	vector<LocalLine> m_vecLines;
+
+	// Allows reporting of memory usage to the garabage collector when being referenced by managed
+	// code.
+	IMemoryManagerPtr m_ipMemoryManager;
 };
