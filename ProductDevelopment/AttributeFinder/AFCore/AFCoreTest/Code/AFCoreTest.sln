@@ -4,10 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFConditions", "..\..\..\AFConditions\Code\AFConditions.vcxproj", "{CCB36FA6-1C27-43AD-AC7A-D49A3DBCE149}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFCore", "..\..\Code\AFCore.vcxproj", "{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}"
-	ProjectSection(ProjectDependencies) = postProject
-		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
-		{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA} = {4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFCoreTest", "AFCoreTest.vcxproj", "{7B9B99C7-E636-48EF-84A8-E963EB8A875A}"
 EndProject
@@ -120,10 +116,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDImageUtils", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.vcxproj", "{CC01AE64-6B4C-4FEE-8A87-B13941098A6A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDRasterAndOCRMgmt", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.vcxproj", "{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}"
-	ProjectSection(ProjectDependencies) = postProject
-		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
-		{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA} = {4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDTestingFramework", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.vcxproj", "{B1376860-A6F2-432F-AA51-C14AEC90AFCF}"
 	ProjectSection(ProjectDependencies) = postProject
