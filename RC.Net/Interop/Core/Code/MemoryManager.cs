@@ -2,9 +2,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
-using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.Interop
 {
@@ -68,15 +66,9 @@ namespace Extract.Interop
         }
 
         #endregion IMemoryManager Members
-    }
 
-    /// <summary>
-    /// Provides extension methods to allow memory usage of unmanaged COM object to be reported
-    /// from managed .Net code.
-    /// </summary>
-    [CLSCompliant(false)]
-    public static class MemoryManagerExtensionMethods
-    {
+        #region Static Methods
+
         /// <summary>
         /// Reports the unmanaged memory usage of <see paramref="comObject"/> to the garbage
         /// collector.
@@ -91,6 +83,7 @@ namespace Extract.Interop
         /// <param name="comObject">The unmanaged COM object whose memory usage is to be reported.
         /// </param>
         [SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", MessageId = "object")]
+        [ComVisible(false)]
         public static void ReportComObjectMemoryUsage(object comObject)
         {
             try
@@ -107,94 +100,6 @@ namespace Extract.Interop
             }
         }
 
-        /// <summary>
-        /// Reports the unmanaged memory usage of <see paramref="comObject"/> to the garbage
-        /// collector.
-        /// <para><b>Note</b></para>
-        /// Calling this will cause memory of any IManageableMemory child objects to be reported as
-        /// well.
-        /// This method should be called:
-        /// 1) Before any operations which may cause some previously existing IManageableMemory
-        /// child objects to be unreferenced.
-        /// 2) Before leaving the scope in which the object exists or returning it as a return value.
-        /// </summary>
-        /// <param name="comObject">The unmanaged COM object whose memory usage is to be reported.
-        /// </param>
-        public static void ReportMemoryUsage(this IAttribute comObject)
-        {
-            ReportComObjectMemoryUsage(comObject);
-        }
-
-        /// <summary>
-        /// Reports the unmanaged memory usage of <see paramref="comObject"/> to the garbage
-        /// collector.
-        /// <para><b>Note</b></para>
-        /// Calling this will cause memory of any IManageableMemory child objects to be reported as
-        /// well.
-        /// This method should be called:
-        /// 1) Before any operations which may cause some previously existing IManageableMemory
-        /// child objects to be unreferenced.
-        /// 2) Before leaving the scope in which the object exists or returning it as a return value.
-        /// </summary>
-        /// <param name="comObject">The unmanaged COM object whose memory usage is to be reported.
-        /// </param>
-        public static void ReportMemoryUsage(this IIUnknownVector comObject)
-        {
-            ReportComObjectMemoryUsage(comObject);
-        }
-
-        /// <summary>
-        /// Reports the unmanaged memory usage of <see paramref="comObject"/> to the garbage
-        /// collector.
-        /// <para><b>Note</b></para>
-        /// Calling this will cause memory of any IManageableMemory child objects to be reported as
-        /// well.
-        /// This method should be called:
-        /// 1) Before any operations which may cause some previously existing IManageableMemory
-        /// child objects to be unreferenced.
-        /// 2) Before leaving the scope in which the object exists or returning it as a return value.
-        /// </summary>
-        /// <param name="comObject">The unmanaged COM object whose memory usage is to be reported.
-        /// </param>
-        public static void ReportMemoryUsage(this SpatialString comObject)
-        {
-            ReportComObjectMemoryUsage(comObject);
-        }
-
-        /// <summary>
-        /// Reports the unmanaged memory usage of <see paramref="comObject"/> to the garbage
-        /// collector.
-        /// <para><b>Note</b></para>
-        /// Calling this will cause memory of any IManageableMemory child objects to be reported as
-        /// well.
-        /// This method should be called:
-        /// 1) Before any operations which may cause some previously existing IManageableMemory
-        /// child objects to be unreferenced.
-        /// 2) Before leaving the scope in which the object exists or returning it as a return value.
-        /// </summary>
-        /// <param name="comObject">The unmanaged COM object whose memory usage is to be reported.
-        /// </param>
-        public static void ReportMemoryUsage(this SpatialStringSearcher comObject)
-        {
-            ReportComObjectMemoryUsage(comObject);
-        }
-
-        /// <summary>
-        /// Reports the unmanaged memory usage of <see paramref="comObject"/> to the garbage
-        /// collector.
-        /// <para><b>Note</b></para>
-        /// Calling this will cause memory of any IManageableMemory child objects to be reported as
-        /// well.
-        /// This method should be called:
-        /// 1) Before any operations which may cause some previously existing IManageableMemory
-        /// child objects to be unreferenced.
-        /// 2) Before leaving the scope in which the object exists or returning it as a return value.
-        /// </summary>
-        /// <param name="comObject">The unmanaged COM object whose memory usage is to be reported.
-        /// </param>
-        public static void ReportMemoryUsage(this RasterZone comObject)
-        {
-            ReportComObjectMemoryUsage(comObject);
-        }
+        #endregion Static Methods
     }
 }

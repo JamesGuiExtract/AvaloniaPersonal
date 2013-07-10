@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -269,6 +269,9 @@
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.csproj">
+      <Project>{8267221b-52c3-490b-a98f-7a51ebeb2a2b}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\RC.Net\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj">
       <Project>{dc72c952-d6ed-42f6-893d-8262bc9d183e}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

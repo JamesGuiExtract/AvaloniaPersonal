@@ -428,6 +428,9 @@
     <ClInclude Include="StringPatternMatcher.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.csproj">
+      <Project>{8267221b-52c3-490b-a98f-7a51ebeb2a2b}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\BaseUtils\Code\BaseUtils.vcxproj">
       <Project>{91b17d62-305c-4ea4-add2-72ac7fe8d0af}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
