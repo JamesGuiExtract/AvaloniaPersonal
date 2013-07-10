@@ -29,7 +29,7 @@ namespace Extract.PrintDocument
                     "ELI36005", "Print document utility");
 
                 // Check the number of command line arguments
-                if (args.Length < 1 || args.Length > 5)
+                if (args.Length < 1 || args.Length > 5 || args[0] == "/?")
                 {
                     ShowUsage();
                     return;
@@ -122,7 +122,7 @@ namespace Extract.PrintDocument
             sb.AppendLine("FileName: Name of file to print");
             sb.AppendLine("PrinterName: Name of the printer to use (default printer is used if not specified)");
             sb.AppendLine("/a+: Print image annotations (default if not specified)");
-            sb.AppendLine("/a-: No not print image annotations");
+            sb.AppendLine("/a-: Do not print image annotations");
             sb.Append("/ef <ExceptionFile>: Log exceptions to the specified file rather than");
             sb.AppendLine(" display them");
 
