@@ -45,9 +45,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         /// <param name="settings"><see cref="SendEmailTask"/> for which attachments are to be
         /// selected.</param>
-        /// <param name="pathTags">The <see cref="IPathTags"/> instance to be used for all path tags
-        /// buttons in the dialog.</param>
-        public SendEmailTaskAttachmentsDialog(SendEmailTask settings, IPathTags pathTags)
+        public SendEmailTaskAttachmentsDialog(SendEmailTask settings)
         {
             try
             {
@@ -58,7 +56,6 @@ namespace Extract.FileActionManager.FileProcessors
                 InitializeComponent();
                 
                 Settings = settings;
-                _pathTagsButton.PathTags = pathTags;
             }
             catch (Exception ex)
             {
@@ -253,6 +250,10 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 _dataGridView.Rows.Clear();
+
+                // [DotNetRCAndUtils:1085]
+                // To allow immediate entry of an attachment after clearing, select the "new" row.
+                _dataGridView.CurrentCell = _dataGridView.Rows[0].Cells[0];
             }
             catch (Exception ex)
             {

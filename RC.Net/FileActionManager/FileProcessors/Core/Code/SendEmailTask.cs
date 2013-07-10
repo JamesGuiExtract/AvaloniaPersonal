@@ -102,7 +102,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Regex that finds all shorthand attribute queries in text.
         /// </summary>
-        static Regex _attributeQueryFinderRegex = new Regex(@"</[\s\S]+>", RegexOptions.Compiled);
+        static Regex _attributeQueryFinderRegex = new Regex(@"</[\s\S]+?>", RegexOptions.Compiled);
 
         #region Fields
 

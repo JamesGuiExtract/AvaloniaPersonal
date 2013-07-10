@@ -35,9 +35,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         /// <param name="settings"><see cref="SendEmailTask"/> for which attachments are to be
         /// selected.</param>
-        /// <param name="pathTags">The <see cref="IPathTags"/> instance to be used for all path tags
-        /// buttons in the dialog.</param>
-        public SendEmailTaskAdvancedDialog(SendEmailTask settings, IPathTags pathTags)
+        public SendEmailTaskAdvancedDialog(SendEmailTask settings)
         {
             try
             {
@@ -48,7 +46,6 @@ namespace Extract.FileActionManager.FileProcessors
                 InitializeComponent();
                 
                 Settings = settings;
-                _pathTagsButton.PathTags = pathTags;
             }
             catch (Exception ex)
             {

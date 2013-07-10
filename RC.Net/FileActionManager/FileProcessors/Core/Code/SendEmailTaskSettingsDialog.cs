@@ -29,15 +29,6 @@ namespace Extract.FileActionManager.FileProcessors
 
         #endregion Constants
 
-        #region Fields
-
-        /// <summary>
-        /// The <see cref="IPathTags"/> instance to be used for all path tags buttons in the dialog.
-        /// </summary>
-        IPathTags _pathTags;
-
-        #endregion Fields
-
         #region Constructors
 
         /// <summary>
@@ -64,9 +55,9 @@ namespace Extract.FileActionManager.FileProcessors
 
                 InitializeComponent();
 
-                _pathTags = new FileActionManagerDatabasePathTags("", "", null, 0);
-                _subjectPathTagsButton.PathTags = _pathTags;
-                _bodyPathTagsButton.PathTags = _pathTags;
+                var pathTags = new FileActionManagerDatabasePathTags("", "", null, 0);
+                _subjectPathTagsButton.PathTags = pathTags;
+                _bodyPathTagsButton.PathTags = pathTags;
             }
             catch (Exception ex)
             {
@@ -133,7 +124,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                using (var dialog = new SendEmailTaskAttachmentsDialog(Settings, _pathTags))
+                using (var dialog = new SendEmailTaskAttachmentsDialog(Settings))
                 {
                     if (dialog.ShowDialog() == DialogResult.OK)
                     {
@@ -157,7 +148,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                using (var dialog = new SendEmailTaskAdvancedDialog(Settings, _pathTags))
+                using (var dialog = new SendEmailTaskAdvancedDialog(Settings))
                 {
                     dialog.ShowDialog();
                 }
