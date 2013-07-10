@@ -72,7 +72,7 @@ namespace Extract.Database
                     DataRow providerRow = DbProviderFactories
                         .GetFactoryClasses()
                         .Rows.Cast<DataRow>()
-                        .SingleOrDefault(row => IsProviderDataRowForConnection(row, dbConnection));
+                        .FirstOrDefault(row => IsProviderDataRowForConnection(row, dbConnection));
 
                     // In case we are not able to identify the correct factory, allow a default that
                     // can be specified in a config file if necessary.

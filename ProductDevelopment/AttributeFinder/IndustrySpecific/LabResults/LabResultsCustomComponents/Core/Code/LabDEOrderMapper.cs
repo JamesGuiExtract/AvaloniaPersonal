@@ -1,3 +1,4 @@
+using Extract.AttributeFinder;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -333,6 +334,10 @@ namespace Extract.LabResultsCustomComponents
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.LabDECoreObjects, "ELI26889", _DEFAULT_OUTPUT_HANDLER_NAME);
 
+                // So that the garbage collector knows of and properly manages the associated
+                // memory.
+                pAttributes.ReportMemoryUsage();
+
                 // Get a database connection for processing (creating a local copy of the database
                 // first, if necessary).
                 dbConnection = GetDatabaseConnection(pDoc);
@@ -391,6 +396,10 @@ namespace Extract.LabResultsCustomComponents
                 // newly mapped collection
                 pAttributes.Clear();
                 pAttributes.CopyFrom(newAttributes);
+
+                // Report memory usage of heirarchy after processing to ensure all COM objects
+                // referenced in final result are reported.
+                pAttributes.ReportMemoryUsage();
             }
             catch (Exception ex)
             {
