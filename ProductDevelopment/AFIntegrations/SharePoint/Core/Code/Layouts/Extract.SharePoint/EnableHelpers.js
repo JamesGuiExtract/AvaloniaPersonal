@@ -4,11 +4,7 @@
 
 // Helper functions used to enable/disable ribbon buttons
 
-var inProgress = false;
 var selectedListID;
-
-// variable to hold the Process Selected wait dialog
-var waitProcessSelected;
 
 // Returns true iff 1 item is selected
 function singleSelectEnabled()
@@ -96,39 +92,44 @@ function getFolderFromUrl(url, siteRoot)
     return folder;
 }
 
+// Variables that are only used as part of process selected.
+var inProgress = false;
+// variable to hold the Process Selected wait dialog
+var waitProcessSelected;
+var numberToProcess;
+var numberProcessed;
+var statusColumnName;
+
 // Function to set all of the selected items to "ToBeQueued"
 function processSelected(columnName) {
+    statusColumnName = columnName;
     if (inProgress) {
         alert("Another request is in progress. Try again later!");
     }
     else {
         try {
             inProgress = true;
-            waitProcessSelected = null
+            waitProcessSelected = SP.UI.ModalDialog.showWaitScreenWithNoClose('Process Selected...', 'Please wait while files are set to be queued', 76, 330);
             var context = SP.ClientContext.get_current();
             var web = context.get_web();
             var selectedItems = SP.ListOperation.Selection.getSelectedItems();
             var selectedListID = SP.ListOperation.Selection.getSelectedList();
+
+            this.numberToProcess = selectedItems.length;
+            this.numberProcessed = 0;
             for (var i = 0; i < selectedItems.length; i++) {
                 try {
                     var listItem = web.get_lists().getById(selectedListID).getItemById(selectedItems[i].id);
-                    var file = listItem.get_file();
-                    if (file != null) {
-                        file.checkOut();
-                        listItem.set_item(columnName, "To Be Queued");
-                        if (columnName == "IDShieldStatus") {
-                            listItem.set_item("IDSReference", "");
-                        }
-                        listItem.update();
-                        file.checkIn("IDS Status changed");
-                    }
+                    context.load(listItem);
+
+                    // Setup call back with the current list item
+                    var itemSuccessCallback = Function.createCallback(processSingleItemSuccess, listItem);
+                    context.executeQueryAsync(Function.createDelegate(this, itemSuccessCallback), Function.createDelegate(this, processSingleFailed));
                 }
                 catch (ef) {
                     alert("Error:" + ef.message);
                 }
             }
-            context.executeQueryAsync(Function.createDelegate(this, itemsQueued), Function.createDelegate(this, itemQueuingFailed));
-            waitProcessSelected = SP.UI.ModalDialog.showWaitScreenWithNoClose('Process Selected...', 'Please wait while files are set to be queued', 76, 330);
         }
         catch (e) {
             inProgress = false;
@@ -142,22 +143,73 @@ function processSelected(columnName) {
     }
 }
 
-// Function that is called if items are queued sucessfully
-function itemsQueued(sender, args) {
-    inProgress = false;
-    if (waitProcessSelected != null){
-        waitProcessSelected.close();
-        waitPrcoessSelected = null;
-    };
-    window.location.href = window.location.href;
+// function that sets the satus to "To Be Queued" if query was successful
+function processSingleItemSuccess(sender, args, listItem) {
+    try {
+        // get the current status for the item
+        var currStatus = listItem.get_item(statusColumnName);
+
+        // Get the file from the Item
+        var file = listItem.get_file();
+
+        // Only change the status if file is currently not processing or queued for verification
+        if ((currStatus != "Queued For Processing") && (currStatus != "Queued For Verification")) {
+            // Check out the file
+            file.checkOut();
+
+            // Set the status
+            listItem.set_item(statusColumnName, "To Be Queued");
+
+            // if this is the IDShieldStatus column need to cleare the IDSReference column
+            if (statusColumnName == "IDShieldStatus") {
+                listItem.set_item("IDSReference", "");
+            }
+
+            // update the listItem
+            listItem.update();
+
+            // check in the change
+            file.checkIn(statusColumnName + " changed");
+            var context = SP.ClientContext.get_current();
+            context.executeQueryAsync(Function.createDelegate(this, singleSuccess), Function.createDelegate(this, processSingleFailed));
+        }
+        else {
+            numberProcessed++;
+
+            alert("Unable to change status of file if status is \"" + currStatus.toString() + "\"");
+            
+            // if not processing thru another async query need to update count and if done cleanup
+            if (numberProcessed >= numberToProcess) {
+                cleanupAfterProcessing();
+            }
+        }
+    }
+    catch (e) {
+        alert("Error: " + e.message);
+    }
 }
 
-// Function that is called if items fail to be queued
-function itemQueuingFailed(sender, args) {
+// function for successful running 2nd async query
+function singleSuccess(sender, args) {
+    numberProcessed++
+    if (numberProcessed >= numberToProcess) {
+        cleanupAfterProcessing();
+    }
+}
+
+// function for failure of Async query
+function processSingleFailed(sender, args) {
+    numberProcessed++;
+    if (numberProcessed >= numberToProcess) {
+        cleanupAfterProcessing();
+    }
+    alert("Failed: " + args.get_message());
+}
+
+// function that resets the inProcess flag, clears the wait page and refreshes the page
+function cleanupAfterProcessing() {
     inProgress = false;
-    alert("Queuing failed: " + args.get_message() + "\r\n\r\nAny selected files after this file have not been queued.");
-        
-    if (waitProcessSelected != null){
+    if (waitProcessSelected != null) {
         waitProcessSelected.close();
         waitPrcoessSelected = null;
     };

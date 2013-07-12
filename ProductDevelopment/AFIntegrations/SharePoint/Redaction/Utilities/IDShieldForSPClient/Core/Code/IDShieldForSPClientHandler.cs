@@ -301,6 +301,8 @@ namespace Extract.SharePoint.Redaction.Utilities
 
                 if (!File.Exists(fileToVerify))
                 {
+                    // Since the file does not exist need to create a .failed file
+                    File.Create(fileToVerify + ".failed").Close();
                     Exception fileEx = new FileNotFoundException("File to verify does not exist.");
                     fileEx.Data.Add("File", fileToVerify);
                     throw fileEx;

@@ -72,6 +72,7 @@ CopyExtractCommonFiles: CleanupExtractCommonFiles ObfuscateFiles
 	@DIR "$(ExtractCommonInstallFilesRootDir)\DotNetFiles\Extract.Utilities.Email.dll" /b >>"$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractCommon.nl
 	@DIR "$(ExtractCommonInstallFilesRootDir)\DotNetFiles\Extract.Interfaces.dll" /b >>"$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractCommon.nl
 	@DIR "$(ExtractCommonInstallFilesRootDir)\DotNetFiles\Extract.Utilities.SecureFileDeleters.dll" /b >>"$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractCommon.nl
+	@DIR "$(ExtractCommonInstallFilesRootDir)\DotNetFiles\Extract.Interop.dll" /b >>"$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractCommon.nl
 	
 CreateExtractCommonMergeModule: CopyExtractCommonFiles  
 	@ECHO Creating ExtractCommon merge module...
