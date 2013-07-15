@@ -95,7 +95,7 @@ function main(args) {
             modified = true;
         }
         if (ruleset.IgnoreOutputHandlerErrors) {
-            rule.IgnoreOutputHandlerErrors = false;
+            ruleset.IgnoreOutputHandlerErrors = false;
             modified = true;
         }
 
