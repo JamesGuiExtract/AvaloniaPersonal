@@ -21,8 +21,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoveExtractSPColumns", "U
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.ExceptionService.WCFInterface", "..\..\..\RC.Net\ExceptionService\WCFInterface\Core\Code\Extract.ExceptionService.WCFInterface.csproj", "{E2701E73-4D37-477B-8359-5614136DFA09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestClientConnection", "UtilityApplications\TestClientConnection\Code\TestClientConnection\TestClientConnection.csproj", "{B60D001D-11E3-4239-8A10-1CB215ED41AF}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -261,30 +259,6 @@ Global
 		{E2701E73-4D37-477B-8359-5614136DFA09}.Testing|Mixed Platforms.Build.0 = Release|Any CPU
 		{E2701E73-4D37-477B-8359-5614136DFA09}.Testing|Win32.ActiveCfg = Release|Any CPU
 		{E2701E73-4D37-477B-8359-5614136DFA09}.Testing|x86.ActiveCfg = Release|Any CPU
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Debug|Win32.ActiveCfg = Debug|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Debug|x86.ActiveCfg = Debug|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Debug|x86.Build.0 = Debug|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Release|Any CPU.ActiveCfg = Release|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Release|Mixed Platforms.Build.0 = Release|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Release|Win32.ActiveCfg = Release|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Release|x86.ActiveCfg = Release|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Release|x86.Build.0 = Release|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Template|Any CPU.ActiveCfg = Release|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Template|Mixed Platforms.ActiveCfg = Release|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Template|Mixed Platforms.Build.0 = Release|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Template|Win32.ActiveCfg = Release|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Template|x86.ActiveCfg = Release|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Template|x86.Build.0 = Release|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Testing|Any CPU.ActiveCfg = Release|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Testing|Mixed Platforms.ActiveCfg = Release|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Testing|Mixed Platforms.Build.0 = Release|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Testing|Win32.ActiveCfg = Release|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Testing|x86.ActiveCfg = Release|x86
-		{B60D001D-11E3-4239-8A10-1CB215ED41AF}.Testing|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
