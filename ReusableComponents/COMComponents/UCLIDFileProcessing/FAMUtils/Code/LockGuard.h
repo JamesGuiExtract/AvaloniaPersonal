@@ -8,6 +8,8 @@ template<class T> class LockGuard
 {
 public:
 	// PROMISE: To lock the database. This will call ipDB->LockDB() 
+	// NOTE: Do not nest usage of LockGuard. If LockDB is called twice on the same thread without
+	// first calling Unlock, it will deadlock.
 	LockGuard(T ipDB, const string& strLockName)
 		: m_strLockName(strLockName)
 	{

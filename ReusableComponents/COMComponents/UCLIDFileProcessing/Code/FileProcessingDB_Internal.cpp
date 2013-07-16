@@ -2603,7 +2603,7 @@ bool CFileProcessingDB::initializeIfBlankDB()
 				"Do you wish to initialize it now?", "Initialize Database?", MB_YESNO);
 			if (iResult == IDYES)
 			{
-				clear();
+				clear(false);
 				return true;
 			}
 
@@ -3273,7 +3273,7 @@ void CFileProcessingDB::closeAllDBConnections()
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29885");
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::clear(bool retainUserValues)
+void CFileProcessingDB::clear(bool bLocked, bool retainUserValues)
 {
 	try
 	{
@@ -3287,18 +3287,21 @@ void CFileProcessingDB::clear(bool retainUserValues)
 			// LegacyRCAndUtils #5940
 			if (doesTableExist(ipConnection, gstrACTIVE_FAM))
 			{
-				// Make sure processing is not active
-				// This check needs to be done with the database locked since it will attempt to revert
-				// timed out FAM's as part of the check for active processing
+				if (!bLocked)
+				{
+					// Make sure processing is not active
+					// This check needs to be done with the database locked since it will attempt to
+					// revert timed out FAM's as part of the check for active processing
+					// Lock the database for this instance
+					LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+						gstrMAIN_DB_LOCK);
 
-				// Lock the database for this instance
-				LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
-					gstrMAIN_DB_LOCK);
-
-				// since we are clearing the database locking
-				// it will really have no effect so pass true so we
-				// can make sure there is no active processing 
-				assertProcessingNotActiveForAnyAction(true);
+					assertProcessingNotActiveForAnyAction(true);
+				}
+				else
+				{
+					assertProcessingNotActiveForAnyAction(true);
+				}
 			}
 		
 			CSingleLock lock(&m_mutex, TRUE);

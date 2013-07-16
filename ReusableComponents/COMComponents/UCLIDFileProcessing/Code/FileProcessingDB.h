@@ -767,7 +767,7 @@ private:
 	void closeAllDBConnections();
 
 	// Internal clear DB function
-	void clear(bool retainUserValues = false);
+	void clear(bool bLocked, bool retainUserValues = false);
 
 	// Internal DB initialization function for the 8.0 schema.
 	void init80DB();

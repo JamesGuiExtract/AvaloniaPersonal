@@ -848,15 +848,13 @@ library UCLID_FILEPROCESSINGLib
 			[in] BSTR bstrSettingName, [in] VARIANT_BOOL vbThrowIfMissing, [out, retval] BSTR* pbstrSettingValue);
 
 		// PROMISE: To lock the specified database lock
-		// NOTE:	This method locks the mutex, adds lock record to the database and sends 
-		//			notification messages to the UI window if it has been set
-		// REQUIRES: The caller must unlock the database on the same thread on which LockDB was called.
+		// NOTE:	LockDB cannot be called twice on the same thread without first calling
+		//			UnlockDB, otherwise the thread will deadlock. UnlockDB can be called on any
+		//			thread, not just the one that locked the DB.
 		[id(39), helpstring("method LockDB")] HRESULT LockDB([in] BSTR bstrLockName);
 
 		// PROMISE: To unlock the specified database lock
-		// NOTE:	This method unlocks the mutex, removes lock record from the database and sends 
-		//			notification messages to the UI window if it has been set
-		// REQUIRES: The caller must unlock the database on the same thread on which LockDB was called.
+		// NOTE:	UnlockDB can be called on any thread, not just the one that locked the DB.
 		[id(40), helpstring("method UnlockDB")] HRESULT UnlockDB([in] BSTR bstrLockName);
 		
 		// PROMISE: To return a recordset opened with the results of the query in bstrQuery
