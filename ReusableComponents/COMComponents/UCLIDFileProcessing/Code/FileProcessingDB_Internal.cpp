@@ -996,7 +996,7 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 					// Log an application trace to indicate this process in connecting with advanced
 					// connection string properties. Only do this once per process unless the
 					// connection string changes.
-					CSingleLock lock(&ms_mutexMainLock, TRUE);
+					CSingleLock lock(&ms_mutexSpecialLoggingLock, TRUE);
 					if (ms_strLastUsedAdvConnStr != strConnectionString)
 					{
 						UCLIDException ue("ELI35133", "Application trace: Attempting connection with "
@@ -2072,7 +2072,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 	int nMaxWaitTime = -1;
 
 	// Get the lock variable for the specified lock name
-	CMutex* pmutexLock = m_mapDbLocks[strLockName];
+	CSemaphore* psemaphoreLock = m_mapDbLocks[strLockName];
 
 	// Lock insertion string for this process
 	string strAddLockSQL = "INSERT INTO LockTable (LockName, UPI) VALUES ('"
@@ -2086,8 +2086,8 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 	// Keep trying to lock the DB until it is locked by this thread
 	while (true)
 	{
-		// Flag to indicate whether this thread got the mutex lock needed to lock the database.
-		bool bGotMutexLock = false;
+		// Flag to indicate whether this thread got the semaphore lock needed to lock the database.
+		bool bGotSemaphoreLock = false;
 
 		// Flag to indicate if the connection is in a good state
 		// this will be determined if the TransactionGuard does not throw an exception
@@ -2102,17 +2102,17 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 			{
 				// [LegacyRCAndUtils:6120]
 				// Multiple threads should not be able to share the same DB lock. If the database is
-				// currently locked by another thread, wait until that thread unlocks the database
-				// before attempting to lock it on this thread.
-				if (!pmutexLock->Lock(m_lDBLockTimeout * 1000))
+				// currently locked, wait until it is unlocked before attempting to lock it on this
+				// thread.
+				if (!psemaphoreLock->Lock(m_lDBLockTimeout * 1000))
 				{
 					throw UCLIDException("ELI34039", "Timeout waiting for DB lock.");
 				}
 
-				bGotMutexLock = true;
+				bGotSemaphoreLock = true;
 
 				// Lock while updating the lock table and m_bDBLocked variable
-				CSingleLock lock(&m_mutex, TRUE);
+				CSingleLock lock2(&m_mutex, TRUE);
 
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
@@ -2161,12 +2161,12 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 						ue.log();
 
 						// [FlexIDSCore:4911]
-						// Unlock the mutex since don't yet have the DB lock and are about to
+						// Unlock the semaphore since we don't yet have the DB lock and are about to
 						// restart this loop.
 						// NOTE: Not sure if the loop does need to be restarted anymore, but since
 						// I don't know the reason it was coded this way, I don't want to change it.
-						bGotMutexLock = false;
-						pmutexLock->Unlock();
+						bGotSemaphoreLock = false;
+						psemaphoreLock->Unlock();
 
 						// Restart the loop since we don't want to assume this instance will 
 						// get the lock
@@ -2196,9 +2196,9 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 		}
 		catch(UCLIDException &ue)
 		{
-			if (!bGotMutexLock)
+			if (!bGotSemaphoreLock)
 			{
-				// If we timed out getting the mutex lock, throw the time out exception.
+				// If we timed out getting the semaphore lock, throw the time out exception.
 				throw;
 			}
 
@@ -2213,8 +2213,8 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 				bAllConnectionsClosed = (m_mapThreadIDtoDBConnections.size() == 0);
 			}
 
-			// Ensure the mutex lock is released if we had it.
-			pmutexLock->Unlock();
+			// Ensure the semaphore lock is released if we had it.
+			psemaphoreLock->Unlock();
 
 			// If all connections have been intentionally closed, return without error.
 			if (bAllConnectionsClosed)
@@ -2267,18 +2267,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::unlockDB(_ConnectionPtr ipConnection, const string& strLockName)
 {
-	CMutex* pmutexLock = m_mapDbLocks[strLockName];
-
-	// Ensure this is the thread that had the lock
-	if (!asCppBool(pmutexLock->Lock(0)))
-	{
-		throw UCLIDException("ELI34036", "Database lock released from the wrong thread.");
-	}
-	else
-	{
-		// This unlock is for the above check to see if this thread had the lock.
-		pmutexLock->Unlock();
-	}
+	CSemaphore* psemaphoreLock = m_mapDbLocks[strLockName];
 
 	try
 	{
@@ -2292,15 +2281,15 @@ void CFileProcessingDB::unlockDB(_ConnectionPtr ipConnection, const string& strL
 			replaceVariable(strDeleteSQL, gstrDB_LOCK_NAME_VAL, strLockName);
 			executeCmdQuery(ipConnection, strDeleteSQL);
 
-			// This releases the mutex and allows the next thread in.
-			pmutexLock->Unlock();
+			// This releases the semaphore and allows the next thread in.
+			psemaphoreLock->Unlock();
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34041");
 	}
 	catch (UCLIDException &ue)
 	{
 		// Even if we failed to remove the lock table entry, allow the next thread to proceed.
-		pmutexLock->Unlock();
+		psemaphoreLock->Unlock();
 
 		throw ue;
 	}

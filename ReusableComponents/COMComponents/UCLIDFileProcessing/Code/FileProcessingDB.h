@@ -283,6 +283,9 @@ private:
 	// the same an ActiveFAM entry.
 	static CMutex ms_mutexPingDBLock;
 
+	// Used to synchronize logging that should occur only once per process.
+	static CMutex ms_mutexSpecialLoggingLock;
+
 	// handle to window that should receive the database status notifications
 	HWND m_hUIWindow;
 
@@ -303,13 +306,16 @@ private:
 	// If 0 there is not a registered UPI
 	int m_nUPIID;
 
-	// Mutexes indicating that this instance has the specified lock on the DB. The mutexes prevent
-	// multiple threads from each instance from sharing the lock.
+	// Semaphores indicating that this instance has the specified lock on the DB. The semaphores
+	// prevent multiple threads from each instance from sharing the lock.
 	// NOTE: If other locks are added, be sure to add the map entry in the constructor for the new
 	// lock.
-	static CMutex ms_mutexMainLock;
-	static CMutex ms_mutexUserCounterLock;
-	map<string, CMutex*> m_mapDbLocks;
+	// [FlexIDSCore:5244]
+	// Semaphores must be used instead of mutexes since it cannot be guaranteed that Lock will be
+	// called on the same thread Unlock even though both calls originate from the same thread.
+	static CSemaphore ms_semaphoreMainLock;
+	static CSemaphore ms_semaphoreUserCounterLock;
+	map<string, CSemaphore*> m_mapDbLocks;
 
 	// Machine username
 	string m_strFAMUserName;
