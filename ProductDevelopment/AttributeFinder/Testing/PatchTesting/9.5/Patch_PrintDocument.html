@@ -1,0 +1,65 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.5 Patch Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.5 Patch Testing<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> UW Health
+   	<LI><b>SCRs:</b> DotNetRC #1078, #1079, #1081, #1082
+   	<LI><b>Issue:</b> Add support for printing a specified image to a desired printer.
+	Also ensure that the entire image is printed without unwanted offset.
+</ul>
+<p>
+<h3>Patch Tests</h3>
+<OL>
+	<LI><b>Test Setup</b>
+	<ul>
+		<LI>Prepare a test machine with <b>FLEX Index 9.5.0.35</b> or <b>ID 
+		Shield 9.5.0.35</b> or <b>LabDE 9.5.0.35</b>.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Tests</b>
+	<ul>
+		<LI><b>Installation</b>
+		<ul>
+			<li>Confirm that the patch installs properly by adding 
+			<b>PrintDocument.exe</b> to <b>CommonComponents</b>.
+       		</ul>
+	   	</LI>
+<p>
+		<LI><b>Functionality</b>
+		<ul>
+			<li>Confirm that <b>PrintDocument.exe</b> will print a specified 
+			image to the default printer.
+			<li>Confirm that <b>PrintDocument.exe</b> will print a specified 
+			image to a specified printer.
+			<li>Confirm that <b>PrintDocument.exe</b> will print a specified 
+			image and that retaining annotations is the default behavior.
+			<li>Confirm that <b>PrintDocument.exe</b> will print a specified 
+			image and discard annotations.
+			<li>Confirm that <b>PrintDocument.exe</b> will log exceptions to 
+			the specified UEX file.
+			<li>Confirm that a usage message is displayed for <b>PrintDocument 
+			/?</b>.
+			<li>Confirm that the usage message specifies <b>Do not print 
+			annotations</b> for the <b>/a-</b> switch.
+			<li>Print <b>TestImage004.tif</b> from <b>Demo_IDShield</b>.
+			<li>Confirm that the entire visible image area is printed.
+	       	</ul>
+   		</LI>
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
