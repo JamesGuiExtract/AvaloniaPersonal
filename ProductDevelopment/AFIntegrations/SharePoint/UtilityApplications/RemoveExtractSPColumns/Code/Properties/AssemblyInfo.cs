@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems, LLC")]
 [assembly: AssemblyProduct("RemoveExtractSPColumns")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems 2012")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

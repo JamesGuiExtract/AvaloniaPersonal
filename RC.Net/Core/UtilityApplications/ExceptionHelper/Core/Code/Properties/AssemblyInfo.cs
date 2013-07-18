@@ -11,7 +11,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("ExceptionHelper")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems 2012")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
