@@ -120,6 +120,38 @@
 			</ul>
         	</ul>
 <p>
+  	   	<LI><b>Expandable Tags</b>
+        	<ul>
+			<li>Exercise the following tags and note proper results.
+			<ul>
+				<li>&lt;<ActionName> failed on $Env(COMPUTERNAME)&gt;
+				<li>&lt;SourceDocName&gt;
+				<li>&lt;Query&gt;&lt;Expression&gt;
+				'$DirOf(&lt;SourceDocName&gt;)'.ToUpper() 
+				&lt;/Expression&gt;&lt;/Query&gt;
+				<li>&lt;Query&gt;&lt;SQL&gt;<br>
+SELECT [ASCName], (SELECT [Meaning] FROM [ActionState] WHERE [ASC_From] = [Code]) + ' -> ' +<br>
+ (SELECT [Meaning] FROM [ActionState] WHERE [ASC_To] = [Code]), <br>
+ [DateTimeStamp], [MachineName], [UserName]<br>
+ FROM [FileActionStateTransition]<br>
+ INNER JOIN [FAMFile] ON [FileActionStateTransition].[FileID] = [FAMFile].[ID]<br>
+ INNER JOIN [Action] ON [FileActionStateTransition].[ActionID] = [Action].[ID]<br>
+ INNER JOIN [Machine] ON [FileActionStateTransition].[MachineID] = [Machine].[ID]<br>
+ INNER JOIN [FAMUser] ON [FileActionStateTransition].[FAMUserID] = [FAMUser].[ID]<br>
+ WHERE [FileName] = &lt;SourceDocName/&gt; <br>
+UNION <br>
+SELECT [ASCName], 'Queued', [DateTimeStamp], [MachineName], [UserName]<br>
+ FROM [QueueEvent]<br>
+ INNER JOIN [FAMFile] ON [QueueEvent].[FileID] = [FAMFile].[ID]<br>
+ INNER JOIN [Action] ON [QueueEvent].[ActionID] = [Action].[ID]<br>
+ INNER JOIN [Machine] ON [QueueEvent].[MachineID] = [Machine].[ID]<br>
+ INNER JOIN [FAMUser] ON [QueueEvent].[FAMUserID] = [FAMUser].[ID]<br>
+ WHERE [FileName] = &lt;SourceDocName/&gt; <br>
+ORDER BY DateTimeStamp<br>
+				&lt;/SQL&gt;&lt;/Query&gt;
+			</ul>
+        	</ul>
+<p>
   	   	<LI><b>Query Expressions</b>
         	<ul>
 			<li>Exercise the following (or similar) queries against suitable 
@@ -130,6 +162,13 @@
 				<li>&lt;Query&gt;&lt;Attribute&gt;*@SSN 
 				&lt;/Attribute&gt;&lt;/Query&gt;
 				<li>&lt;/ReturnAddress/City&gt;
+			</ul>
+			<li><b>[DotNetRC #1084]</b> Bad Query
+			<ul>
+				<li>Create and exercise a collection of queries that 
+				includes at least one invalid query.
+				<li>Confirm that subsequent queries are correctly 
+				expanded and evaluated.
 			</ul>
         	</ul>
 <p>
