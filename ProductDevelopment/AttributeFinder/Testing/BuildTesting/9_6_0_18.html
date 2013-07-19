@@ -1,0 +1,288 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.6.0.18 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.6.0.18 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DotNetRC #1042]</b> CommonComponentsDir Tag
+        	<ul>
+			<li>Exercise the <b>&lt;CommonComponentsDir&gt;</b> path tag.
+			<li>Confirm that it works properly for a 32-bit O/S.
+			<li>Confirm that it works properly for a 64-bit O/S.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1045, #1059]</b> FAM File Inspector
+        	<ul>
+			<li>Open Inspector against a <b>Demo_IDShield</b> database 
+			where all files have VOA files.
+			<li>Run a search against extracted data
+			<li>Delete the VOA file for one of the images.
+			<li>Run the search again.
+			<li>Confirm that the value in the <b>Matches</b> column 
+			reads <b>(No Data)</b>.
+<p>
+			<li>Undock the <b>Search</b> pane.
+			<li>Close the pane.
+			<li>Confirm proper behavior for the Search pane.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1065, #1074, #1075, #1084, #1085, #1087]</b> Send 
+		Email Task
+        	<ul>
+			<li>Exercise <b>9_6_0_x.html</b>
+			<ul>
+				<li>Confirm expected behavior of the <b>Core: Send 
+				email</b> task.
+				<li>Confirm expected behavior of the <b>Email</b> tab 
+				within <b>FAM DBAdmin - Database options</b>.
+			</ul>
+			<li>Confirm that email error text uses basic quotes to identify 
+			a missing file attachment.
+			<li>Confirm that grid selection allows sequential deletion of 
+			file attachments.
+			<li>Confirm that the <b>Query Expressions</b> test cases from 
+			<b>9_6_0_x.html</b> work properly.
+			<li>Confirm that the <b>tag selector</b> button and the 
+			<b>browse</b> button are each enabled after <b>Clear All</b> has 
+			removed all attachments.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1069]</b> SQLCDBEditor AKA Plugin
+        	<ul>
+			<li>Exercise the plugin.
+			<li>Confirm that the table that shows the alternate test name 
+			candidates also shows the official name.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1070]</b> Run FPS File
+        	<ul>
+			<li>Exercise <b>RunFPSFile.exe</b> without the <b>/ignoreDB</b> 
+			switch.
+			<li>Confirm that entries are added to the <b>FAMSession</b> table.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1078]</b> Document Cut Off When Printing
+        	<ul>
+			<li>Print <b>TestImage004.tif</b> from <b>Demo_IDShield</b>.
+			<li>Confirm that the entire visible image area is printed.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1079, #1080, #1081, #1082]</b> PrintDocument.exe
+        	<ul>
+			<li>Confirm that the utility is installed with any of the three 
+			main products.
+			<li>Confirm that <b>PrintDocument.exe</b> will print a specified 
+			image to the default printer.
+			<li>Confirm that <b>PrintDocument.exe</b> will print a specified 
+			image to a specified printer.
+			<li>Confirm that <b>PrintDocument.exe</b> will print a specified 
+			image and that retaining annotations is the default behavior.
+			<li>Confirm that <b>PrintDocument.exe</b> will print a specified 
+			image and discard annotations.
+			<li>Confirm that <b>PrintDocument.exe</b> will log exceptions to 
+			the specified UEX file.
+			<li>Confirm that a usage message is displayed for <b>PrintDocument 
+			/?</b>.
+			<li>Confirm that the usage message specifies <b>Do not print 
+			annotations</b> for the <b>/a-</b> switch.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5175, #5197]</b> Confirm that the <b>Indexing</b> 
+		NRS tests all pass.
+<p>
+  	   	<LI><b>[FlexIDSCore #5318]</b> ComponentData Alternative
+        	<ul>
+			<li>Confirm existence of a <b>ComponentDataDir</b> entry in 
+			the <b>DBInfo</b> table.
+			<ul>
+				<li>Confirm that the setting does not include the 
+				actual version string.
+			</ul>
+			<li>Confirm that directory precedence is as follows:
+			<ul>
+				<li>The RDT override registry value, if defined.
+				<li>The local ComponentDataDirectory will be searched 
+				for the specified version.
+				<li>The directory specified in the FAM database will be 
+				searched for the specified version.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5326]</b> Confirm that the <b>Extract Uninstaller</b> 
+		uninstalls <b>ID Shield for SharePoint Client</b>.
+<p>
+  	   	<LI><b>[FlexIDSCore #5332]</b> Spatial String Performance Issue
+        	<ul>
+			<li>Exercise the rules and image located at 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\5332</b>.
+			<li>Confirm that processing time is reduced compared to a 
+			pre-fix build.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5333]</b> Confirm that the <b>Document Classifier</b> 
+		NRS tests all pass.
+<p>
+  	   	<LI><b>[FlexIntegrations #349, #357, #358]</b> ID Shield for SharePoint 
+		Client
+        	<ul>
+			<li>Install the client.
+			<li>Confirm that a <b>non-admin</b> user can use the client.
+			<li>Confirm that the icon for the <b>Verify</b> button matches 
+			the toolbar button for <b>ID Shield for Laserfiche</b>.
+			<li>Confirm that the button is only enabled when:
+			<ul>
+				<li>An FPS file is set in <b>ID Shield Configuration</b>.
+				<li>A single document is checked.
+				<li>The document status is <b>Queued for Verification</b>.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIntegrations #367]</b> Processing Checked Out Files
+        	<ul>
+			<li>Prepare a library with several documents.
+			<li>Check out one file.
+			<li>Select several files inclusing the checked out file.
+			<li>Confirm that all selected files can be successfully processed.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIntegrations #368, #374]</b> Confirm that a meaningful error 
+		message is presented to a user trying to <b>Redact Now</b> when <b>ID 
+		Shield for SharePoint Client</b> is not running.
+<p>
+  	   	<LI><b>[FlexIntegrations #369, #381]</b> ID Shield for SharePoint
+        	<ul>
+			<li>Confirm that all captions use <b>SharePoint</b> instead of 
+			<b>Sharepoint</b>.
+			<ul>
+				<li>Caption for the installation pages
+				<li>Name of the installation EXE
+				<li>Name of the folder shown in the Start menu
+				<li>Name of the shortcut inside the Start menu folder
+			</ul>
+			<li>Confirm that <b>Value</b> text box is disabled when the 
+			<b>Process any files where the field</b> option is not selected.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIntegrations #371]</b> Reprocessing A Document
+        	<ul>
+			<li>Process a file with redactions and confirm the the <b>IDS 
+			Reference</b> column contains a link to the redacted file.
+			<li>Reprocess the file such that no redactions are found.
+			<li>Confirm that the <b>IDS Reference</b> column is empty.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIntegrations #373]</b> Confirm that the ability to queue a 
+		document based on the value of a field works if document <b>Checkout</b> 
+		is required.
+<p>
+  	   	<LI><b>[FlexIntegrations #375]</b> Verification Access Denied
+        	<ul>
+			<li>Prepare <b>Library A</b> so that a user has contributor 
+			rights (can add and read files).
+			<li>Prepare <b>Library B</b> so that the full user of 
+			<b>Library A</b> has no rights.
+			<li>As an admin user, setup ID Shield to process both libraries.
+			<li>Confirm that the limited user can successfully verify 
+			documents from <b>Library A</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIntegrations #377]</b> Confirm that <b>ID Shield for SharePoint 
+		Client</b> can be installed on a remote machine and successfully connect 
+		to a SharePoint server.
+<p>
+  	   	<LI><b>[FlexIntegrations #378]</b> Reprocess Previously Processed Files
+        	<ul>
+			<li>Modify <b>Folder settings</b> to process any files that are 
+			added plus processing any existing files.
+			<ul>
+				<li>Confirm that all files matching the file 
+				specification are set <b>To Be Queued</b>.
+			</ul>
+			<li>Modify <b>Folder settings</b> to not process existing files.
+			<ul>
+				<li>Confirm that all <b>new</b> files matching the file 
+				specification are set <b>To Be Queued</b>.
+				<li>Confirm that existing files are not processed.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIntegrations #384]</b> Confirm that <b>Process Selected</b> 
+		does not set files to be queued if they are already processing or queued 
+		for verification.
+<p>
+  	   	<LI><b>[LegacyRC #6441, #6446, #6447]</b> DBInfo Table
+        	<ul>
+			<li>Confirm that settings for the <b>Core: Send email</b> task 
+			are persisted in the <b>DBInfo</b> table.
+			<ul>
+				<li>EmailPassword
+				<li>EmailPort
+				<li>EmailSenderAddress
+				<li>EmailSenderName
+				<li>EmailServer
+				<li>EmailSignature
+				<li>EmailTimeout
+				<li>EmailUsername
+				<li>EmailUseSSL
+			</ul>
+			<li>Confirm that the email signature is persisted to the 
+			<b>EmailSignature</b> field.
+			<li>Confirm that the <b>Email signature</b> edit box supports a 
+			vertical scrollbar when needed.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
