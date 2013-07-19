@@ -386,19 +386,13 @@
 	&lt;/Expression&gt;
 &lt;/Query&gt;</value>
   </data>
+  <metadata name="_componentStatusColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
   <metadata name="_componentOriginalName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="_epicPatientFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="_epicPatientMiddleNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="_epicPatientLastNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="_epicPatientSuffixColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="_patientLastNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="_patientFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
@@ -407,37 +401,19 @@
   <metadata name="_patientMiddleNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="_patientLastNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
   <metadata name="_patientSuffixColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="_orderingPhysicianLastNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="_orderingPhysicianLastNameColumn.ValidationQuery" xml:space="preserve">
-    <value>&lt;Query&gt;&lt;SQL&gt;SELECT LastName FROM Physician ORDER BY LastName&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query ValidValue='Valid' ValidationListType='ValidationListOnly'&gt;&lt;SQL&gt;SELECT 'Valid' FROM Physician WHERE LastName LIKE SUBSTRING(&lt;Attribute&gt;../Last&lt;/Attribute&gt;,1,50) + '%' AND FirstName LIKE SUBSTRING(&lt;Attribute&gt;../First&lt;/Attribute&gt;,1,30) + '%' AND (MiddleName IS NULL OR MiddleName = '' OR MiddleName LIKE SUBSTRING(&lt;Attribute&gt;../Middle&lt;/Attribute&gt;,1,30) + '%' )&lt;/SQL&gt;&lt;/Query&gt;</value>
-  </data>
   <metadata name="_orderingPhysicianFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="_orderingPhysicianFirstNameColumn.ValidationQuery" xml:space="preserve">
-    <value>&lt;Query&gt;&lt;SQL&gt;SELECT FirstName FROM Physician WHERE LastName LIKE SUBSTRING(&lt;Attribute&gt;../Last&lt;/Attribute&gt;,1,50) ORDER BY FirstName&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query ValidValue='Valid' ValidationListType='ValidationListOnly'&gt;&lt;SQL&gt;SELECT 'Valid' FROM Physician WHERE LastName LIKE SUBSTRING(&lt;Attribute&gt;../Last&lt;/Attribute&gt;,1,50) + '%' AND FirstName LIKE SUBSTRING(&lt;Attribute&gt;../First&lt;/Attribute&gt;,1,30) + '%' AND (MiddleName IS NULL OR MiddleName = '' OR MiddleName LIKE SUBSTRING(&lt;Attribute&gt;../Middle&lt;/Attribute&gt;,1,30) + '%' )&lt;/SQL&gt;&lt;/Query&gt;</value>
-  </data>
   <metadata name="_orderingPhysicianMiddleName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="_orderingPhysicianMiddleName.ValidationQuery" xml:space="preserve">
-    <value>&lt;Query ValidationListType='AutoCompleteOnly'&gt;&lt;SQL&gt;SELECT MiddleName FROM Physician WHERE LastName LIKE SUBSTRING(&lt;Attribute&gt;../Last&lt;/Attribute&gt;,1,50) AND FirstName LIKE SUBSTRING(&lt;Attribute&gt;../First&lt;/Attribute&gt;,1,30) ORDER BY MiddleName&lt;/SQL&gt;&lt;/Query&gt;
-&lt;Query ValidValue='Valid' ValidationListType='ValidationListOnly'&gt;&lt;SQL&gt;SELECT 'Valid' FROM Physician WHERE LastName LIKE SUBSTRING(&lt;Attribute&gt;../Last&lt;/Attribute&gt;,1,50) + '%' AND FirstName LIKE SUBSTRING(&lt;Attribute&gt;../First&lt;/Attribute&gt;,1,30) + '%' AND (MiddleName IS NULL OR MiddleName = '' OR MiddleName LIKE SUBSTRING(&lt;Attribute&gt;../Middle&lt;/Attribute&gt;,1,30) + '%' )&lt;/SQL&gt;&lt;/Query&gt;</value>
-  </data>
   <metadata name="_orderingPhysicianCodeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="_orderingPhysicianCodeColumn.AutoUpdateQuery" xml:space="preserve">
-    <value>&lt;Query&gt;&lt;SQL&gt;SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(&lt;Attribute&gt;../Last&lt;/Attribute&gt;,1,50) + '%' AND FirstName LIKE SUBSTRING(&lt;Attribute&gt;../First&lt;/Attribute&gt;,1,30) + '%' AND (MiddleName IS NULL OR MiddleName = '' OR MiddleName LIKE SUBSTRING(&lt;Attribute&gt;../Middle&lt;/Attribute&gt;,1,30) + '%') ORDER BY Code&lt;/SQL&gt;&lt;/Query&gt;</value>
-  </data>
 </root>

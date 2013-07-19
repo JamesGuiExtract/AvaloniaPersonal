@@ -38,12 +38,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
             Extract.DataEntry.HighlightColor highlightColor1 = new Extract.DataEntry.HighlightColor();
             Extract.DataEntry.HighlightColor highlightColor2 = new Extract.DataEntry.HighlightColor();
             this._labNameLabel = new System.Windows.Forms.Label();
@@ -61,13 +55,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._labID = new Extract.DataEntry.DataEntryTextBox();
             this._testComponentTable = new Extract.DataEntry.DataEntryTable();
             this._patientInfoGroupBox = new Extract.DataEntry.DataEntryGroupBox();
-            this._epicPatientNameLabel = new System.Windows.Forms.Label();
-            this._labResultPatientNameLabel = new System.Windows.Forms.Label();
-            this._epicPatientNameTable = new Extract.DataEntry.DataEntryTable();
-            this._epicPatientLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._epicPatientFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._epicPatientMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._epicPatientSuffixColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._patientNameTable = new Extract.DataEntry.DataEntryTable();
             this._patientLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._patientFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
@@ -79,8 +66,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._birthDateLabel = new System.Windows.Forms.Label();
             this._patientRecordNum = new Extract.DataEntry.DataEntryTextBox();
             this._patientMRLabel = new System.Windows.Forms.Label();
-            this._physicianInfoGroupBox = new Extract.DataEntry.DataEntryGroupBox();
-            this._orderingPhysicianTable = new Extract.DataEntry.DataEntryTable();
             this._orderingPhysicianLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._orderingPhysicianFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._orderingPhysicianMiddleName = new Extract.DataEntry.DataEntryTableColumn();
@@ -91,8 +76,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._testCommentLabel = new System.Windows.Forms.Label();
             this._testComment = new Extract.DataEntry.DataEntryTextBox();
             this._testsGroupBox = new System.Windows.Forms.GroupBox();
-            this._resultStatus = new Extract.DataEntry.DataEntryComboBox();
-            this._resultStatusLabel = new System.Windows.Forms.Label();
             this._operatorCommentLabel = new System.Windows.Forms.Label();
             this._operatorComments = new Extract.DataEntry.DataEntryTextBox();
             this._messageSequenceNumberFile = new Extract.DataEntry.DataEntryTextBox();
@@ -103,14 +86,12 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._componentUnits = new Extract.DataEntry.DataEntryTableColumn();
             this._componentRefRange = new Extract.DataEntry.DataEntryTableColumn();
             this._componentFlag = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentStatusColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._componentOriginalName = new Extract.DataEntry.DataEntryTableColumn();
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).BeginInit();
             this._patientInfoGroupBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._epicPatientNameTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._patientNameTable)).BeginInit();
-            this._physicianInfoGroupBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._orderingPhysicianTable)).BeginInit();
             this._testDetailsGroupBox.SuspendLayout();
             this._testsGroupBox.SuspendLayout();
             this.SuspendLayout();
@@ -134,7 +115,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._laboratoryIdentifier.Name = "_laboratoryIdentifier";
             this._laboratoryIdentifier.ParentDataEntryControl = this._labInfoPassThrough;
             this._laboratoryIdentifier.Size = new System.Drawing.Size(568, 20);
-            this._laboratoryIdentifier.SupportsSwiping = false;
             this._laboratoryIdentifier.TabIndex = 1;
             this._laboratoryIdentifier.ValidationErrorMessage = "Missing or unknown laboratory name";
             this._laboratoryIdentifier.ValidationPattern = "\\w";
@@ -210,8 +190,8 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._orderNumberColumn.FillWeight = 75F;
             this._orderNumberColumn.HeaderText = "Order Number";
             this._orderNumberColumn.Name = "_orderNumberColumn";
-            this._orderNumberColumn.ValidationErrorMessage = "Order Number must be specified";
-            this._orderNumberColumn.ValidationPattern = "^\\d+\\s?$";
+            this._orderNumberColumn.ValidationErrorMessage = "Order Number missing or invalid";
+            this._orderNumberColumn.ValidationPattern = "^\\d{9,10}\\s?$";
             // 
             // _testName
             // 
@@ -340,6 +320,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._componentUnits,
             this._componentRefRange,
             this._componentFlag,
+            this._componentStatusColumn,
             this._componentOriginalName});
             dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
@@ -371,9 +352,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._patientInfoGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._patientInfoGroupBox.AttributeName = "PatientInfo";
-            this._patientInfoGroupBox.Controls.Add(this._epicPatientNameLabel);
-            this._patientInfoGroupBox.Controls.Add(this._labResultPatientNameLabel);
-            this._patientInfoGroupBox.Controls.Add(this._epicPatientNameTable);
             this._patientInfoGroupBox.Controls.Add(this._patientNameTable);
             this._patientInfoGroupBox.Controls.Add(this._genderLabel);
             this._patientInfoGroupBox.Controls.Add(this._patientGender);
@@ -384,118 +362,10 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._patientInfoGroupBox.Location = new System.Drawing.Point(0, 79);
             this._patientInfoGroupBox.Name = "_patientInfoGroupBox";
             this._patientInfoGroupBox.ParentDataEntryControl = null;
-            this._patientInfoGroupBox.Size = new System.Drawing.Size(593, 192);
+            this._patientInfoGroupBox.Size = new System.Drawing.Size(593, 114);
             this._patientInfoGroupBox.TabIndex = 5;
             this._patientInfoGroupBox.TabStop = false;
             this._patientInfoGroupBox.Text = "Patient Information";
-            // 
-            // _epicPatientNameLabel
-            // 
-            this._epicPatientNameLabel.AutoSize = true;
-            this._epicPatientNameLabel.Location = new System.Drawing.Point(6, 85);
-            this._epicPatientNameLabel.Name = "_epicPatientNameLabel";
-            this._epicPatientNameLabel.Size = new System.Drawing.Size(90, 13);
-            this._epicPatientNameLabel.TabIndex = 14;
-            this._epicPatientNameLabel.Text = "From Health Link:";
-            // 
-            // _labResultPatientNameLabel
-            // 
-            this._labResultPatientNameLabel.AutoSize = true;
-            this._labResultPatientNameLabel.Location = new System.Drawing.Point(6, 16);
-            this._labResultPatientNameLabel.Name = "_labResultPatientNameLabel";
-            this._labResultPatientNameLabel.Size = new System.Drawing.Size(87, 13);
-            this._labResultPatientNameLabel.TabIndex = 13;
-            this._labResultPatientNameLabel.Text = "From Lab Result:";
-            // 
-            // _epicPatientNameTable
-            // 
-            this._epicPatientNameTable.AllowDrop = true;
-            this._epicPatientNameTable.AllowTabbingByRow = true;
-            this._epicPatientNameTable.AllowUserToAddRows = false;
-            this._epicPatientNameTable.AllowUserToDeleteRows = false;
-            this._epicPatientNameTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._epicPatientNameTable.AttributeName = "EpicName";
-            this._epicPatientNameTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this._epicPatientNameTable.ClearClipboardOnPaste = true;
-            this._epicPatientNameTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._epicPatientNameTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
-            this._epicPatientNameTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this._epicPatientNameTable.ColumnHintsEnabled = false;
-            this._epicPatientNameTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this._epicPatientLastNameColumn,
-            this._epicPatientFirstNameColumn,
-            this._epicPatientMiddleNameColumn,
-            this._epicPatientSuffixColumn});
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this._epicPatientNameTable.DefaultCellStyle = dataGridViewCellStyle8;
-            this._epicPatientNameTable.Location = new System.Drawing.Point(7, 101);
-            this._epicPatientNameTable.MinimumNumberOfRows = 1;
-            this._epicPatientNameTable.Name = "_epicPatientNameTable";
-            this._epicPatientNameTable.ParentDataEntryControl = this._patientInfoGroupBox;
-            this._epicPatientNameTable.RowFormattingRuleFile = "Rules\\Swiping\\name.rsd.etf";
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._epicPatientNameTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
-            this._epicPatientNameTable.RowSwipingEnabled = true;
-            this._epicPatientNameTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this._epicPatientNameTable.Size = new System.Drawing.Size(567, 46);
-            this._epicPatientNameTable.TabIndex = 2;
-            // 
-            // _epicPatientLastNameColumn
-            // 
-            this._epicPatientLastNameColumn.AttributeName = "Last";
-            this._epicPatientLastNameColumn.HeaderText = "Last Name";
-            this._epicPatientLastNameColumn.Name = "_epicPatientLastNameColumn";
-            this._epicPatientLastNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._epicPatientLastNameColumn.ValidationErrorMessage = "Patient last name must be specified.";
-            this._epicPatientLastNameColumn.ValidationPattern = "\\S";
-            // 
-            // _epicPatientFirstNameColumn
-            // 
-            this._epicPatientFirstNameColumn.AttributeName = "First";
-            this._epicPatientFirstNameColumn.FillWeight = 75F;
-            this._epicPatientFirstNameColumn.HeaderText = "First Name";
-            this._epicPatientFirstNameColumn.Name = "_epicPatientFirstNameColumn";
-            this._epicPatientFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._epicPatientFirstNameColumn.ValidationErrorMessage = "Patient first name must be specified";
-            this._epicPatientFirstNameColumn.ValidationPattern = "\\S";
-            // 
-            // _epicPatientMiddleNameColumn
-            // 
-            this._epicPatientMiddleNameColumn.AttributeName = "Middle";
-            this._epicPatientMiddleNameColumn.FillWeight = 75F;
-            this._epicPatientMiddleNameColumn.HeaderText = "Middle Name";
-            this._epicPatientMiddleNameColumn.Name = "_epicPatientMiddleNameColumn";
-            this._epicPatientMiddleNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._epicPatientMiddleNameColumn.ValidationErrorMessage = "Bad value";
-            // 
-            // _epicPatientSuffixColumn
-            // 
-            this._epicPatientSuffixColumn.AttributeName = "Suffix";
-            this._epicPatientSuffixColumn.FillWeight = 50F;
-            this._epicPatientSuffixColumn.HeaderText = "Suffix";
-            this._epicPatientSuffixColumn.Name = "_epicPatientSuffixColumn";
-            this._epicPatientSuffixColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._epicPatientSuffixColumn.ValidationErrorMessage = "";
             // 
             // _patientNameTable
             // 
@@ -508,14 +378,14 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._patientNameTable.AttributeName = "Name";
             this._patientNameTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._patientNameTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientNameTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._patientNameTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
             this._patientNameTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._patientNameTable.ColumnHintsEnabled = false;
             this._patientNameTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -523,27 +393,27 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._patientFirstNameColumn,
             this._patientMiddleNameColumn,
             this._patientSuffixColumn});
-            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this._patientNameTable.DefaultCellStyle = dataGridViewCellStyle11;
-            this._patientNameTable.Location = new System.Drawing.Point(7, 34);
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._patientNameTable.DefaultCellStyle = dataGridViewCellStyle8;
+            this._patientNameTable.Location = new System.Drawing.Point(7, 19);
             this._patientNameTable.MinimumNumberOfRows = 1;
             this._patientNameTable.Name = "_patientNameTable";
             this._patientNameTable.ParentDataEntryControl = this._patientInfoGroupBox;
             this._patientNameTable.RowFormattingRuleFile = "Rules\\Swiping\\name.rsd.etf";
-            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle12.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientNameTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle12;
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._patientNameTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
             this._patientNameTable.RowSwipingEnabled = true;
             this._patientNameTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this._patientNameTable.Size = new System.Drawing.Size(567, 46);
@@ -590,7 +460,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             // 
             this._genderLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._genderLabel.AutoSize = true;
-            this._genderLabel.Location = new System.Drawing.Point(310, 150);
+            this._genderLabel.Location = new System.Drawing.Point(310, 68);
             this._genderLabel.Name = "_genderLabel";
             this._genderLabel.Size = new System.Drawing.Size(42, 13);
             this._genderLabel.TabIndex = 10;
@@ -600,7 +470,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             // 
             this._patientGender.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._patientGender.AttributeName = "Gender";
-            this._patientGender.Location = new System.Drawing.Point(313, 166);
+            this._patientGender.Location = new System.Drawing.Point(313, 84);
             this._patientGender.Name = "_patientGender";
             this._patientGender.ParentDataEntryControl = this._patientInfoGroupBox;
             this._patientGender.Size = new System.Drawing.Size(54, 21);
@@ -613,7 +483,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._patientBirthDate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._patientBirthDate.AttributeName = "DOB";
-            this._patientBirthDate.Location = new System.Drawing.Point(7, 166);
+            this._patientBirthDate.Location = new System.Drawing.Point(7, 84);
             this._patientBirthDate.Name = "_patientBirthDate";
             this._patientBirthDate.ParentDataEntryControl = this._patientInfoGroupBox;
             this._patientBirthDate.Size = new System.Drawing.Size(283, 20);
@@ -624,7 +494,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             // _birthDateLabel
             // 
             this._birthDateLabel.AutoSize = true;
-            this._birthDateLabel.Location = new System.Drawing.Point(5, 150);
+            this._birthDateLabel.Location = new System.Drawing.Point(5, 68);
             this._birthDateLabel.Name = "_birthDateLabel";
             this._birthDateLabel.Size = new System.Drawing.Size(66, 13);
             this._birthDateLabel.TabIndex = 0;
@@ -635,136 +505,57 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._patientRecordNum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._patientRecordNum.AttributeName = "MR_Number";
             this._patientRecordNum.ClearClipboardOnPaste = true;
-            this._patientRecordNum.Location = new System.Drawing.Point(388, 166);
+            this._patientRecordNum.Location = new System.Drawing.Point(388, 84);
             this._patientRecordNum.Name = "_patientRecordNum";
             this._patientRecordNum.ParentDataEntryControl = this._patientInfoGroupBox;
             this._patientRecordNum.Size = new System.Drawing.Size(186, 20);
             this._patientRecordNum.TabIndex = 5;
-            this._patientRecordNum.ValidationErrorMessage = "Invalid medical record number";
-            this._patientRecordNum.ValidationPattern = "(?i)^[MZ]?\\d+\\s?$";
+            this._patientRecordNum.ValidationErrorMessage = "MRN missing or invalid";
+            this._patientRecordNum.ValidationPattern = "^\\d{7,8}\\s?$";
             // 
             // _patientMRLabel
             // 
             this._patientMRLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._patientMRLabel.AutoSize = true;
-            this._patientMRLabel.Location = new System.Drawing.Point(385, 150);
+            this._patientMRLabel.Location = new System.Drawing.Point(385, 68);
             this._patientMRLabel.Name = "_patientMRLabel";
-            this._patientMRLabel.Size = new System.Drawing.Size(92, 13);
+            this._patientMRLabel.Size = new System.Drawing.Size(32, 13);
             this._patientMRLabel.TabIndex = 0;
-            this._patientMRLabel.Text = "Medical Record #";
-            // 
-            // _physicianInfoGroupBox
-            // 
-            this._physicianInfoGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._physicianInfoGroupBox.AttributeName = "PhysicianInfo";
-            this._physicianInfoGroupBox.Controls.Add(this._orderingPhysicianTable);
-            this._physicianInfoGroupBox.Location = new System.Drawing.Point(0, 277);
-            this._physicianInfoGroupBox.Name = "_physicianInfoGroupBox";
-            this._physicianInfoGroupBox.ParentDataEntryControl = null;
-            this._physicianInfoGroupBox.Size = new System.Drawing.Size(593, 75);
-            this._physicianInfoGroupBox.TabIndex = 6;
-            this._physicianInfoGroupBox.TabStop = false;
-            this._physicianInfoGroupBox.Text = "Ordering Physician";
-            // 
-            // _orderingPhysicianTable
-            // 
-            this._orderingPhysicianTable.AllowDrop = true;
-            this._orderingPhysicianTable.AllowTabbingByRow = true;
-            this._orderingPhysicianTable.AllowUserToAddRows = false;
-            this._orderingPhysicianTable.AllowUserToDeleteRows = false;
-            this._orderingPhysicianTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._orderingPhysicianTable.AttributeName = "OrderingPhysicianName";
-            this._orderingPhysicianTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this._orderingPhysicianTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
-            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle13.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderingPhysicianTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle13;
-            this._orderingPhysicianTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this._orderingPhysicianTable.ColumnHintsEnabled = false;
-            this._orderingPhysicianTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this._orderingPhysicianLastNameColumn,
-            this._orderingPhysicianFirstNameColumn,
-            this._orderingPhysicianMiddleName,
-            this._orderingPhysicianCodeColumn});
-            this._orderingPhysicianTable.CompatibleAttributeNames.Add("OtherPhysicianName");
-            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle14.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle14.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this._orderingPhysicianTable.DefaultCellStyle = dataGridViewCellStyle14;
-            this._orderingPhysicianTable.Location = new System.Drawing.Point(6, 19);
-            this._orderingPhysicianTable.MinimumNumberOfRows = 1;
-            this._orderingPhysicianTable.Name = "_orderingPhysicianTable";
-            this._orderingPhysicianTable.ParentDataEntryControl = this._physicianInfoGroupBox;
-            this._orderingPhysicianTable.RowFormattingRuleFile = "Rules\\Swiping\\name.rsd.etf";
-            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle15.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderingPhysicianTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle15;
-            this._orderingPhysicianTable.RowSwipingEnabled = true;
-            this._orderingPhysicianTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this._orderingPhysicianTable.Size = new System.Drawing.Size(581, 45);
-            this._orderingPhysicianTable.TabIndex = 1;
+            this._patientMRLabel.Text = "MRN";
             // 
             // _orderingPhysicianLastNameColumn
             // 
             this._orderingPhysicianLastNameColumn.AttributeName = "Last";
-            this._orderingPhysicianLastNameColumn.AutoUpdateQuery = "<SQL>SELECT LastName FROM Physician WHERE Code = SUBSTRING(<Attribute>../Code</At" +
-    "tribute>,1,8)</SQL>";
+            this._orderingPhysicianLastNameColumn.AutoUpdateQuery = "OUTSIDE";
             this._orderingPhysicianLastNameColumn.HeaderText = "Last Name";
             this._orderingPhysicianLastNameColumn.Name = "_orderingPhysicianLastNameColumn";
-            this._orderingPhysicianLastNameColumn.ValidationErrorMessage = "Missing or invalid unknown physician name.";
-            this._orderingPhysicianLastNameColumn.ValidationQuery = resources.GetString("_orderingPhysicianLastNameColumn.ValidationQuery");
+            this._orderingPhysicianLastNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this._orderingPhysicianLastNameColumn.ValidationErrorMessage = ".";
+            this._orderingPhysicianLastNameColumn.ValidationQuery = "";
             // 
             // _orderingPhysicianFirstNameColumn
             // 
             this._orderingPhysicianFirstNameColumn.AttributeName = "First";
-            this._orderingPhysicianFirstNameColumn.AutoUpdateQuery = "<SQL>SELECT FirstName FROM Physician WHERE Code = SUBSTRING(<Attribute>../Code</A" +
-    "ttribute>,1,8)</SQL>";
+            this._orderingPhysicianFirstNameColumn.AutoUpdateQuery = "PROVIDER";
             this._orderingPhysicianFirstNameColumn.FillWeight = 75F;
             this._orderingPhysicianFirstNameColumn.HeaderText = "First Name";
             this._orderingPhysicianFirstNameColumn.Name = "_orderingPhysicianFirstNameColumn";
             this._orderingPhysicianFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderingPhysicianFirstNameColumn.ValidationErrorMessage = "Missing or invalid unknown physician name.";
-            this._orderingPhysicianFirstNameColumn.ValidationQuery = resources.GetString("_orderingPhysicianFirstNameColumn.ValidationQuery");
+            this._orderingPhysicianFirstNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this._orderingPhysicianFirstNameColumn.ValidationErrorMessage = "";
+            this._orderingPhysicianFirstNameColumn.ValidationQuery = "";
             // 
             // _orderingPhysicianMiddleName
             // 
-            this._orderingPhysicianMiddleName.AttributeName = "Middle";
-            this._orderingPhysicianMiddleName.AutoUpdateQuery = "<SQL>SELECT MiddleName FROM Physician WHERE Code = SUBSTRING(<Attribute>../Code</" +
-    "Attribute>,1,8)</SQL>";
-            this._orderingPhysicianMiddleName.FillWeight = 50F;
-            this._orderingPhysicianMiddleName.HeaderText = "Middle Name";
+            this._orderingPhysicianMiddleName.AttributeName = null;
             this._orderingPhysicianMiddleName.Name = "_orderingPhysicianMiddleName";
-            this._orderingPhysicianMiddleName.ValidationErrorMessage = "Missing or invalid unknown physician name.";
-            this._orderingPhysicianMiddleName.ValidationQuery = resources.GetString("_orderingPhysicianMiddleName.ValidationQuery");
+            this._orderingPhysicianMiddleName.ValidationErrorMessage = "Invalid value";
             // 
             // _orderingPhysicianCodeColumn
             // 
-            this._orderingPhysicianCodeColumn.AttributeName = "Code";
-            this._orderingPhysicianCodeColumn.AutoUpdateQuery = resources.GetString("_orderingPhysicianCodeColumn.AutoUpdateQuery");
-            this._orderingPhysicianCodeColumn.FillWeight = 30F;
-            this._orderingPhysicianCodeColumn.HeaderText = "Code";
+            this._orderingPhysicianCodeColumn.AttributeName = null;
             this._orderingPhysicianCodeColumn.Name = "_orderingPhysicianCodeColumn";
-            this._orderingPhysicianCodeColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderingPhysicianCodeColumn.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
-            this._orderingPhysicianCodeColumn.ValidationErrorMessage = "";
-            this._orderingPhysicianCodeColumn.ValidationQuery = "";
-            this._orderingPhysicianCodeColumn.Visible = false;
+            this._orderingPhysicianCodeColumn.ValidationErrorMessage = "Invalid value";
             // 
             // _testDetailsGroupBox
             // 
@@ -779,10 +570,10 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._testDetailsGroupBox.Controls.Add(this._testComment);
             this._testDetailsGroupBox.Controls.Add(this._labID);
             this._testDetailsGroupBox.Controls.Add(this._testComponentTable);
-            this._testDetailsGroupBox.Location = new System.Drawing.Point(0, 487);
+            this._testDetailsGroupBox.Location = new System.Drawing.Point(0, 328);
             this._testDetailsGroupBox.Name = "_testDetailsGroupBox";
             this._testDetailsGroupBox.Size = new System.Drawing.Size(593, 487);
-            this._testDetailsGroupBox.TabIndex = 8;
+            this._testDetailsGroupBox.TabIndex = 9;
             this._testDetailsGroupBox.TabStop = false;
             this._testDetailsGroupBox.Text = "Selected Order Details";
             // 
@@ -843,43 +634,12 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._testsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._testsGroupBox.Controls.Add(this._laboratoryTestTable);
-            this._testsGroupBox.Location = new System.Drawing.Point(0, 358);
+            this._testsGroupBox.Location = new System.Drawing.Point(0, 199);
             this._testsGroupBox.Name = "_testsGroupBox";
             this._testsGroupBox.Size = new System.Drawing.Size(593, 123);
-            this._testsGroupBox.TabIndex = 7;
+            this._testsGroupBox.TabIndex = 8;
             this._testsGroupBox.TabStop = false;
             this._testsGroupBox.Text = "Orders";
-            // 
-            // _resultStatus
-            // 
-            this._resultStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._resultStatus.AttributeName = "ResultStatus";
-            this._resultStatus.AutoUpdateQuery = "<Query Default=\'True\'>Final</Query>";
-            this._resultStatus.DisplayMember = "Original";
-            this._resultStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this._resultStatus.Items.AddRange(new object[] {
-            "Edited",
-            "Final",
-            "Preliminary",
-            "Reviewed"});
-            this._resultStatus.Location = new System.Drawing.Point(387, 27);
-            this._resultStatus.Name = "_resultStatus";
-            this._resultStatus.Size = new System.Drawing.Size(187, 21);
-            this._resultStatus.SupportsSwiping = false;
-            this._resultStatus.TabIndex = 2;
-            this._resultStatus.TabStopMode = Extract.DataEntry.TabStopMode.Never;
-            this._resultStatus.ValidationErrorMessage = "";
-            this._resultStatus.ValueMember = "Original";
-            // 
-            // _resultStatusLabel
-            // 
-            this._resultStatusLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._resultStatusLabel.AutoSize = true;
-            this._resultStatusLabel.Location = new System.Drawing.Point(384, 11);
-            this._resultStatusLabel.Name = "_resultStatusLabel";
-            this._resultStatusLabel.Size = new System.Drawing.Size(70, 13);
-            this._resultStatusLabel.TabIndex = 0;
-            this._resultStatusLabel.Text = "Result Status";
             // 
             // _operatorCommentLabel
             // 
@@ -901,7 +661,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._operatorComments.Name = "_operatorComments";
             this._operatorComments.RemoveNewLineChars = false;
             this._operatorComments.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._operatorComments.Size = new System.Drawing.Size(371, 46);
+            this._operatorComments.Size = new System.Drawing.Size(567, 46);
             this._operatorComments.TabIndex = 1;
             this._operatorComments.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
             this._operatorComments.ValidationErrorMessage = "Invalid value";
@@ -1004,6 +764,17 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._componentFlag.ValidationErrorMessage = "Flag does not correspond with test value and range";
             this._componentFlag.ValidationQuery = resources.GetString("_componentFlag.ValidationQuery");
             // 
+            // _componentStatusColumn
+            // 
+            this._componentStatusColumn.AttributeName = "Status";
+            this._componentStatusColumn.AutoUpdateQuery = "<Query Default=\'True\'>F</Query>";
+            this._componentStatusColumn.FillWeight = 30F;
+            this._componentStatusColumn.HeaderText = "Status";
+            this._componentStatusColumn.Name = "_componentStatusColumn";
+            this._componentStatusColumn.UseComboBoxCells = true;
+            this._componentStatusColumn.ValidationErrorMessage = "Invalid value";
+            this._componentStatusColumn.ValidationQuery = "C\r\nF";
+            // 
             // _componentOriginalName
             // 
             this._componentOriginalName.AttributeName = "OriginalName";
@@ -1024,11 +795,8 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this.Controls.Add(this._filename);
             this.Controls.Add(this._messageSequenceNumberFile);
             this.Controls.Add(this._operatorCommentLabel);
-            this.Controls.Add(this._resultStatusLabel);
-            this.Controls.Add(this._resultStatus);
             this.Controls.Add(this._testsGroupBox);
             this.Controls.Add(this._testDetailsGroupBox);
-            this.Controls.Add(this._physicianInfoGroupBox);
             this.Controls.Add(this._patientInfoGroupBox);
             this.Controls.Add(this._operatorComments);
             highlightColor1.Color = System.Drawing.Color.LightSalmon;
@@ -1040,15 +808,12 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         highlightColor2};
             this.MinimumSize = new System.Drawing.Size(500, 0);
             this.Name = "UWTransplantCenterPanel";
-            this.Size = new System.Drawing.Size(593, 975);
+            this.Size = new System.Drawing.Size(593, 818);
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).EndInit();
             this._patientInfoGroupBox.ResumeLayout(false);
             this._patientInfoGroupBox.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._epicPatientNameTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._patientNameTable)).EndInit();
-            this._physicianInfoGroupBox.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this._orderingPhysicianTable)).EndInit();
             this._testDetailsGroupBox.ResumeLayout(false);
             this._testDetailsGroupBox.PerformLayout();
             this._testsGroupBox.ResumeLayout(false);
@@ -1069,27 +834,16 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         private System.Windows.Forms.Label _birthDateLabel;
         private System.Windows.Forms.Label _genderLabel;
         private Extract.DataEntry.DataEntryComboBox _patientGender;
-        private Extract.DataEntry.DataEntryGroupBox _physicianInfoGroupBox;
         private System.Windows.Forms.GroupBox _testDetailsGroupBox;
         private System.Windows.Forms.GroupBox _testsGroupBox;
         private System.Windows.Forms.Label _testCommentLabel;
         private Extract.DataEntry.DataEntryTextBox _testComment;
-        private Extract.DataEntry.DataEntryComboBox _resultStatus;
-        private System.Windows.Forms.Label _resultStatusLabel;
         private Extract.DataEntry.DataEntryTextBox _laboratoryIdentifier;
         private System.Windows.Forms.Label _labNameLabel;
         private Extract.DataEntry.DataEntryTable _patientNameTable;
         private Extract.DataEntry.DataEntryTextBox _labInfoPassThrough;
-        private System.Windows.Forms.Label _epicPatientNameLabel;
-        private System.Windows.Forms.Label _labResultPatientNameLabel;
-        private Extract.DataEntry.DataEntryTable _epicPatientNameTable;
-        private Extract.DataEntry.DataEntryTable _orderingPhysicianTable;
         private System.Windows.Forms.Label _operatorCommentLabel;
         private Extract.DataEntry.DataEntryTextBox _operatorComments;
-        private Extract.DataEntry.DataEntryTableColumn _epicPatientFirstNameColumn;
-        private Extract.DataEntry.DataEntryTableColumn _epicPatientMiddleNameColumn;
-        private Extract.DataEntry.DataEntryTableColumn _epicPatientLastNameColumn;
-        private Extract.DataEntry.DataEntryTableColumn _epicPatientSuffixColumn;
         private Extract.DataEntry.DataEntryTableColumn _patientFirstNameColumn;
         private Extract.DataEntry.DataEntryTableColumn _patientMiddleNameColumn;
         private Extract.DataEntry.DataEntryTableColumn _patientLastNameColumn;
@@ -1097,6 +851,11 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         private Extract.DataEntry.DataEntryTextBox _messageSequenceNumberFile;
         private System.Windows.Forms.Label label2;
         private DataEntryTextBox _componentComment;
+        private DataEntryTextBox _filename;
+        private DataEntryTableColumn _orderingPhysicianLastNameColumn;
+        private DataEntryTableColumn _orderingPhysicianFirstNameColumn;
+        private DataEntryTableColumn _orderingPhysicianMiddleName;
+        private DataEntryTableColumn _orderingPhysicianCodeColumn;
         private DataEntryTableColumn _orderNumberColumn;
         private DataEntryTableColumn _testName;
         private DataEntryTableColumn _orderCode;
@@ -1105,17 +864,13 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         private DataEntryTableColumn _laboratoryTestTime;
         private DataEntryTableColumn _componentResultDate;
         private DataEntryTableColumn _componentResultTime;
-        private DataEntryTableColumn _orderingPhysicianLastNameColumn;
-        private DataEntryTableColumn _orderingPhysicianFirstNameColumn;
-        private DataEntryTableColumn _orderingPhysicianMiddleName;
-        private DataEntryTableColumn _orderingPhysicianCodeColumn;
-        private DataEntryTextBox _filename;
         private DataEntryTableColumn _componentName;
         private DataEntryTableColumn _testCode;
         private DataEntryTableColumn _componentValue;
         private DataEntryTableColumn _componentUnits;
         private DataEntryTableColumn _componentRefRange;
         private DataEntryTableColumn _componentFlag;
+        private DataEntryTableColumn _componentStatusColumn;
         private DataEntryTableColumn _componentOriginalName;
     }
 }
