@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems, LLC")]
 [assembly: AssemblyProduct("Extract.SharePoint Feature")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2010")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

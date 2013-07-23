@@ -27,6 +27,17 @@ namespace Extract.SharePoint.Redaction.Layouts
             }
             try
             {
+                if (!ExtractSharePointHelper.IsMember(SPContext.Current.Web,
+                        IdShieldHelper.IdShieldVerifiersGroupName))
+                {
+                    Label1.Visible = false;
+                    ErrorLabel.Text = "Error: " + "You must be a member of the "
+                        + IdShieldHelper.IdShieldVerifiersGroupName + " group to use this control.";
+                    ErrorLabel.Visible = true;
+                    ErrorLabel.Enabled = true;
+                    return;
+                }
+                
                 // Make sure there are settings that can be used
                 var settings = IdShieldSettings.GetIdShieldSettings(false);
                 if (string.IsNullOrEmpty(settings.VerifyFpsFile))

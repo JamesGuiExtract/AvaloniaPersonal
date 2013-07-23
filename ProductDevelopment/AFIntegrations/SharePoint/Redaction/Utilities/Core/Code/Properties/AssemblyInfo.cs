@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.SharePoint.Redaction.Utilities")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems 2011")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

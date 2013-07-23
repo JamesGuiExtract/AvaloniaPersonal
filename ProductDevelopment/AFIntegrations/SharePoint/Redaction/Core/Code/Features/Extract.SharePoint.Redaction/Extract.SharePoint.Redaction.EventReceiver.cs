@@ -32,33 +32,12 @@ namespace Extract.SharePoint.Redaction.Features
                 if (site != null)
                 {
                     var web = site.RootWeb;
-                    try
-                    {
-                        // Attempt to get the ID Shield group. If it does not exist
-                        // then add it.
-                        var group = web.SiteGroups[IdShieldHelper.IdShieldAdministratorsGroupName];
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            web.SiteGroups.Add(IdShieldHelper.IdShieldAdministratorsGroupName,
-                                web.CurrentUser, web.CurrentUser, "ID Shield administration group.");
-                            web.AssociatedGroups.Add(web.SiteGroups[IdShieldHelper.IdShieldAdministratorsGroupName]);
-                            web.Update();
-
-                            var assignment = new SPRoleAssignment(web.SiteGroups[IdShieldHelper.IdShieldAdministratorsGroupName]);
-                            var role = web.RoleDefinitions["Read"];
-                            assignment.RoleDefinitionBindings.Add(role);
-                            web.RoleAssignments.Add(assignment);
-                            web.Update();
-                        }
-                        catch (Exception ex)
-                        {
-                            var ee = new SPException("Unable to add ID Shield administrator group.", ex);
-                            IdShieldHelper.LogException(ee, ErrorCategoryId.Feature, "ELI31378");
-                        }
-                    }
+                    CreateGroupIfNeeded(web, IdShieldHelper.IdShieldAdministratorsGroupName, 
+                        IdShieldHelper.IdShieldAdministratorsGroupDescription);
+                    CreateGroupIfNeeded(web, IdShieldHelper.IdShieldDocumentSubmittersGroupName,
+                        IdShieldHelper.IdShieldDocumentSubmittersGroupDescription);
+                    CreateGroupIfNeeded(web, IdShieldHelper.IdShieldVerifiersGroupName,
+                        IdShieldHelper.IdShieldVerifiersGroupDescription);
 
                     var siteId = site.ID;
                     IdShieldSettings.AddActiveFeatureSiteId(siteId);
@@ -73,6 +52,37 @@ namespace Extract.SharePoint.Redaction.Features
             }
 
             base.FeatureActivated(properties);
+        }
+
+        private static void CreateGroupIfNeeded(SPWeb web, string groupName, string groupDescription)
+        {
+            try
+            {
+                // Attempt to get the ID Shield group. If it does not exist
+                // then add it.
+                var group = web.SiteGroups[groupName];
+            }
+            catch
+            {
+                try
+                {
+                    web.SiteGroups.Add(groupName,
+                        web.CurrentUser, web.CurrentUser, groupDescription);
+                    web.AssociatedGroups.Add(web.SiteGroups[groupName]);
+                    web.Update();
+
+                    var assignment = new SPRoleAssignment(web.SiteGroups[groupName]);
+                    var role = web.RoleDefinitions["Read"];
+                    assignment.RoleDefinitionBindings.Add(role);
+                    web.RoleAssignments.Add(assignment);
+                    web.Update();
+                }
+                catch (Exception ex)
+                {
+                    var ee = new SPException("Unable to " + groupDescription, ex);
+                    IdShieldHelper.LogException(ee, ErrorCategoryId.Feature, "ELI31378");
+                }
+            }
         }
 
         /// <summary>

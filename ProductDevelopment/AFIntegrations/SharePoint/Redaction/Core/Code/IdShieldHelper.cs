@@ -17,7 +17,12 @@ namespace Extract.SharePoint.Redaction
 
         // Constant for IDS group name
         internal static readonly string IdShieldAdministratorsGroupName = "Extract ID Shield Administrators";
-
+        internal static readonly string IdShieldAdministratorsGroupDescription = "ID Shield administration group.";
+        internal static readonly string IdShieldDocumentSubmittersGroupName = "Extract ID Shield Document Submitters";
+        internal static readonly string IdShieldDocumentSubmittersGroupDescription = "ID Shield document submitters group.";
+        internal static readonly string IdShieldVerifiersGroupName = "Extract ID Shield Verifiers";
+        internal static readonly string IdShieldVerifiersGroupDescription = "ID Shield verifiers group.";
+        
         // Constants for the ID Shield settings list fields
         internal static readonly string ListId = "ListId";
         internal static readonly string FolderId = "FolderId";

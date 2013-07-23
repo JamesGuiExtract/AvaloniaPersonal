@@ -180,7 +180,7 @@
         <CommandUIHandler
           Command="Extract.Redaction.Command.ProcessSelectedForRedaction"
           CommandAction="javascript: ProcessSelectedForRedaction()"
-          EnabledScript="javascript: atLeastOneSelectEnabled();"
+          EnabledScript="javascript: atLeastOneDocSelectEnabled();"
 				/>
         <CommandUIHandler
 					Command="Extract.Redaction.Command.LaunchVerification"

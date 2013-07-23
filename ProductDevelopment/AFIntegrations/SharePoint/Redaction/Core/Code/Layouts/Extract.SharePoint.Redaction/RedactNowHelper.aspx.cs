@@ -28,6 +28,17 @@ namespace Extract.SharePoint.Redaction.Layouts
                     return;
                 }
 
+                if (!ExtractSharePointHelper.IsMember(SPContext.Current.Web,
+                        IdShieldHelper.IdShieldVerifiersGroupName))
+                {
+                    Label1.Visible = false;
+                    ErrorLabel.Text = "Error: " + "You must be a member of the "
+                        + IdShieldHelper.IdShieldVerifiersGroupName + " group to use this control.";
+                    ErrorLabel.Visible = true;
+                    ErrorLabel.Enabled = true;
+                    return;
+                }
+
                 var siteId = Request.QueryString["siteid"];
                 var listId = Request.QueryString["listidvalue"];
                 var fileId = Request.QueryString["fileid"];

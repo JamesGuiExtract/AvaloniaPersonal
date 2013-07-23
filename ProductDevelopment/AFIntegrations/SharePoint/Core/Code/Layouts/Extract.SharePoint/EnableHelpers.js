@@ -216,3 +216,80 @@ function cleanupAfterProcessing() {
     window.location.href = window.location.href;
 }
 
+
+// The following function was found http://jeffywang.blogspot.com/2012/10/how-to-check-whether-current-user.html
+// Sample usage 
+//        ExecuteOrDelayUntilScriptLoaded(function () {
+//            isCurrentUserInGroup('Approvers',
+//                                 function () {
+//                                     alert('User is in the group.');
+//                                 },
+//                                 function () {
+//                                     alert('User is NOT in the group.');
+//                                 },
+//                                 function () {
+//                                     alert('Group does NOT exist.');
+//                                 },
+//                                 function (sender, args) {
+//                                     alert('Request failed.' + args.get_message() + '\n' + args.get_stackTrace());
+//                                 });
+//        }, "sp.js");
+//
+function isCurrentUserInGroup(groupName, functionUserInGroup, functionUserNotInGroup, functionGroupNotFound, functionOnError) {
+    var ctx = new SP.ClientContext.get_current();
+    //Get info of current user
+    var currentUser = ctx.get_web().get_currentUser();
+    ctx.load(currentUser, 'Id', 'LoginName');
+    //Retrieve all site groups
+    var groups = ctx.get_web().get_siteGroups();
+    ctx.load(groups);
+
+    ctx.executeQueryAsync(function (sender, args) {
+        //See whether the group exists
+        var groupFound = false;
+        var groupEnumerator = groups.getEnumerator();
+        while (groupEnumerator.moveNext() && !groupFound) {
+            var group = groupEnumerator.get_current();
+            if (group.get_title() == groupName) {
+                //Found the group, now try to load users of this group
+                groupFound = true;
+                var users = group.get_users();
+                ctx.load(users);
+                ctx.executeQueryAsync(function (sender, args) {
+                    //See whether the user exists
+                    var userFound = false;
+                    var userEnumerator = users.getEnumerator();
+                    while (userEnumerator.moveNext() && !userFound) {
+                        var user = userEnumerator.get_current();
+                        if (user.get_id() == currentUser.get_id()) {
+                            //User exists in the group
+                            userFound = true;
+
+                            if (functionUserInGroup != null)
+                                functionUserInGroup();
+                        }
+                    }
+
+                    //User doesn't exist in the group
+                    if (!userFound && (functionUserNotInGroup != null))
+                        functionUserNotInGroup();
+
+                }, function (sender, args) {
+                    if (functionOnError != null)
+                        functionOnError(sender, args);
+
+                });
+            }
+        }
+
+        //Group doesn't exist
+        if (!groupFound && (functionGroupNotFound != null))
+            functionGroupNotFound();
+
+    }, function (sender, args) {
+        if (functionOnError != null)
+            functionOnError(sender, args);
+
+    })
+
+}

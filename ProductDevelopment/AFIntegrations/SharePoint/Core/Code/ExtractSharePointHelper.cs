@@ -482,9 +482,7 @@ namespace Extract.SharePoint
                     ExtractProcessingStatus.Redacted,
                     ExtractProcessingStatus.NoRedactions,
                     ExtractProcessingStatus.ProcessingComplete,
-                    ExtractProcessingStatus.ProcessingFailed,
-                    ExtractProcessingStatus.QueuedForProcessing,
-                    ExtractProcessingStatus.QueuedForVerification
+                    ExtractProcessingStatus.ProcessingFailed
                 });
             }
 
