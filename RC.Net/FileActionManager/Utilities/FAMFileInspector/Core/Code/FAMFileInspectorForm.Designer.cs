@@ -30,6 +30,8 @@
             this._logoutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this._exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._splitContainer = new System.Windows.Forms.SplitContainer();
             this._mainToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this._searchStatusStrip = new System.Windows.Forms.StatusStrip();
@@ -37,9 +39,11 @@
             this._searchProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this._searchErrorStatusStripLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this._searchSplitContainer = new System.Windows.Forms.SplitContainer();
+            this._refreshFileListButton = new System.Windows.Forms.Button();
             this._selectFilesButton = new System.Windows.Forms.Button();
             this._fileListPanel = new System.Windows.Forms.Panel();
             this._fileListDataGridView = new System.Windows.Forms.DataGridView();
+            this._fileListFlagColumn = new System.Windows.Forms.DataGridViewImageColumn();
             this._fileListNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._fileListPagesColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._fileListMatchesColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -63,23 +67,21 @@
             this._layerObjectSelectionStatusLabel = new Extract.Imaging.Forms.StatusStripItems.LayerObjectSelectionStatusLabel();
             this._imageViewerErrorStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
+            this._generalImageToolStrip = new System.Windows.Forms.ToolStrip();
+            this._printImageToolStripButton = new Extract.Imaging.Forms.PrintImageToolStripButton();
+            this._viewCommandsImageViewerToolStrip = new Extract.Imaging.Forms.ViewCommandsImageViewerToolStrip();
+            this._navigationToolsImageViewerToolStrip = new Extract.Imaging.Forms.NavigationToolsImageViewerToolStrip();
             this._imageViewerToolsToolStrip = new System.Windows.Forms.ToolStrip();
             this.zoomWindowToolStripButton1 = new Extract.Imaging.Forms.ZoomWindowToolStripButton();
             this.panToolStripButton1 = new Extract.Imaging.Forms.PanToolStripButton();
             this._highlightNavigationToolStrip = new System.Windows.Forms.ToolStrip();
             this._previousLayerObjectToolStripButton = new Extract.Imaging.Forms.PreviousLayerObjectToolStripButton();
             this._nextLayerObjectToolStripButton = new Extract.Imaging.Forms.NextLayerObjectToolStripButton();
-            this._navigationToolsImageViewerToolStrip = new Extract.Imaging.Forms.NavigationToolsImageViewerToolStrip();
-            this._viewCommandsImageViewerToolStrip = new Extract.Imaging.Forms.ViewCommandsImageViewerToolStrip();
-            this._generalImageToolStrip = new System.Windows.Forms.ToolStrip();
-            this._printImageToolStripButton = new Extract.Imaging.Forms.PrintImageToolStripButton();
             this.BottomToolStripPanel = new System.Windows.Forms.ToolStripPanel();
             this.TopToolStripPanel = new System.Windows.Forms.ToolStripPanel();
             this.RightToolStripPanel = new System.Windows.Forms.ToolStripPanel();
             this.LeftToolStripPanel = new System.Windows.Forms.ToolStripPanel();
             this.ContentPanel = new System.Windows.Forms.ToolStripContentPanel();
-            this._helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             groupBox1 = new System.Windows.Forms.GroupBox();
             label1 = new System.Windows.Forms.Label();
             groupBox1.SuspendLayout();
@@ -108,9 +110,9 @@
             this._imageToolStripContainer.TopToolStripPanel.SuspendLayout();
             this._imageToolStripContainer.SuspendLayout();
             this._imageViewerStatusStrip.SuspendLayout();
+            this._generalImageToolStrip.SuspendLayout();
             this._imageViewerToolsToolStrip.SuspendLayout();
             this._highlightNavigationToolStrip.SuspendLayout();
-            this._generalImageToolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -121,7 +123,7 @@
             groupBox1.Controls.Add(this._selectFilesSummaryLabel);
             groupBox1.Location = new System.Drawing.Point(12, 10);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(404, 57);
+            groupBox1.Size = new System.Drawing.Size(404, 60);
             groupBox1.TabIndex = 0;
             groupBox1.TabStop = false;
             // 
@@ -133,7 +135,7 @@
             this._selectFilesSummaryLabel.AutoEllipsis = true;
             this._selectFilesSummaryLabel.Location = new System.Drawing.Point(6, 12);
             this._selectFilesSummaryLabel.Name = "_selectFilesSummaryLabel";
-            this._selectFilesSummaryLabel.Size = new System.Drawing.Size(392, 38);
+            this._selectFilesSummaryLabel.Size = new System.Drawing.Size(392, 41);
             this._selectFilesSummaryLabel.TabIndex = 0;
             // 
             // label1
@@ -170,21 +172,36 @@
             // _logoutToolStripMenuItem
             // 
             this._logoutToolStripMenuItem.Name = "_logoutToolStripMenuItem";
-            this._logoutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._logoutToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this._logoutToolStripMenuItem.Text = "&Logout";
             this._logoutToolStripMenuItem.Click += new System.EventHandler(this.HandleLogoutToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(109, 6);
             // 
             // _exitToolStripMenuItem
             // 
             this._exitToolStripMenuItem.Name = "_exitToolStripMenuItem";
-            this._exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._exitToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this._exitToolStripMenuItem.Text = "E&xit";
             this._exitToolStripMenuItem.Click += new System.EventHandler(this.HandleExitToolStripMenuItem_Click);
+            // 
+            // _helpToolStripMenuItem
+            // 
+            this._helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._aboutToolStripMenuItem});
+            this._helpToolStripMenuItem.Name = "_helpToolStripMenuItem";
+            this._helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this._helpToolStripMenuItem.Text = "&Help";
+            // 
+            // _aboutToolStripMenuItem
+            // 
+            this._aboutToolStripMenuItem.Name = "_aboutToolStripMenuItem";
+            this._aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this._aboutToolStripMenuItem.Text = "&About";
+            this._aboutToolStripMenuItem.Click += new System.EventHandler(this.HandleAboutToolStripMenuItem_Click);
             // 
             // _splitContainer
             // 
@@ -273,6 +290,17 @@
             this._searchErrorStatusStripLabel.Name = "_searchErrorStatusStripLabel";
             this._searchErrorStatusStripLabel.Size = new System.Drawing.Size(233, 17);
             // 
+            // _refreshFileListButton
+            // 
+            this._refreshFileListButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._refreshFileListButton.Location = new System.Drawing.Point(422, 46);
+            this._refreshFileListButton.Name = "_refreshFileListButton";
+            this._refreshFileListButton.Size = new System.Drawing.Size(75, 23);
+            this._refreshFileListButton.TabIndex = 2;
+            this._refreshFileListButton.Text = "Refresh";
+            this._refreshFileListButton.UseVisualStyleBackColor = true;
+            this._refreshFileListButton.Click += new System.EventHandler(this.HandleRefreshFileListButton_Click);
+            // 
             // _selectFilesButton
             // 
             this._selectFilesButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -291,7 +319,7 @@
             this._fileListPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this._fileListPanel.Location = new System.Drawing.Point(0, 185);
             this._fileListPanel.Name = "_fileListPanel";
-            this._fileListPanel.Size = new System.Drawing.Size(500, 329);
+            this._fileListPanel.Size = new System.Drawing.Size(500, 324);
             this._fileListPanel.TabIndex = 1;
             // 
             // _fileListDataGridView
@@ -304,6 +332,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this._fileListDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._fileListDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this._fileListFlagColumn,
             this._fileListNameColumn,
             this._fileListPagesColumn,
             this._fileListMatchesColumn,
@@ -312,10 +341,19 @@
             this._fileListDataGridView.Location = new System.Drawing.Point(0, 29);
             this._fileListDataGridView.Name = "_fileListDataGridView";
             this._fileListDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this._fileListDataGridView.Size = new System.Drawing.Size(500, 297);
+            this._fileListDataGridView.Size = new System.Drawing.Size(500, 292);
             this._fileListDataGridView.TabIndex = 1;
+            this._fileListDataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleFileListDataGridView_CellDoubleClick);
+            this._fileListDataGridView.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.HandleResultsDataGridView_CellPainting);
             this._fileListDataGridView.CurrentCellChanged += new System.EventHandler(this.HandleResultsDataGridView_CurrentCellChanged);
             this._fileListDataGridView.SortCompare += new System.Windows.Forms.DataGridViewSortCompareEventHandler(this.HandleFileListDataGridView_SortCompare);
+            // 
+            // _fileListFlagColumn
+            // 
+            this._fileListFlagColumn.HeaderText = "";
+            this._fileListFlagColumn.Name = "_fileListFlagColumn";
+            this._fileListFlagColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this._fileListFlagColumn.Width = 20;
             // 
             // _fileListNameColumn
             // 
@@ -542,11 +580,11 @@
             // 
             // _imageToolStripContainer.TopToolStripPanel
             // 
+            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._generalImageToolStrip);
+            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommandsImageViewerToolStrip);
+            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._navigationToolsImageViewerToolStrip);
             this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._imageViewerToolsToolStrip);
             this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._highlightNavigationToolStrip);
-            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._navigationToolsImageViewerToolStrip);
-            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommandsImageViewerToolStrip);
-            this._imageToolStripContainer.TopToolStripPanel.Controls.Add(this._generalImageToolStrip);
             // 
             // _imageViewerStatusStrip
             // 
@@ -590,6 +628,46 @@
             this._imageViewer.TabIndex = 0;
             this._imageViewer.TabStop = false;
             // 
+            // _generalImageToolStrip
+            // 
+            this._generalImageToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._generalImageToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this._generalImageToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._printImageToolStripButton});
+            this._generalImageToolStrip.Location = new System.Drawing.Point(716, 0);
+            this._generalImageToolStrip.Name = "_generalImageToolStrip";
+            this._generalImageToolStrip.Size = new System.Drawing.Size(48, 39);
+            this._generalImageToolStrip.TabIndex = 0;
+            // 
+            // _printImageToolStripButton
+            // 
+            this._printImageToolStripButton.BaseToolTipText = "Print image";
+            this._printImageToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._printImageToolStripButton.Enabled = false;
+            this._printImageToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._printImageToolStripButton.ImageViewer = null;
+            this._printImageToolStripButton.Name = "_printImageToolStripButton";
+            this._printImageToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._printImageToolStripButton.Text = "Print image";
+            // 
+            // _viewCommandsImageViewerToolStrip
+            // 
+            this._viewCommandsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._viewCommandsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this._viewCommandsImageViewerToolStrip.Location = new System.Drawing.Point(404, 0);
+            this._viewCommandsImageViewerToolStrip.Name = "_viewCommandsImageViewerToolStrip";
+            this._viewCommandsImageViewerToolStrip.Size = new System.Drawing.Size(312, 39);
+            this._viewCommandsImageViewerToolStrip.TabIndex = 1;
+            // 
+            // _navigationToolsImageViewerToolStrip
+            // 
+            this._navigationToolsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._navigationToolsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this._navigationToolsImageViewerToolStrip.Location = new System.Drawing.Point(171, 0);
+            this._navigationToolsImageViewerToolStrip.Name = "_navigationToolsImageViewerToolStrip";
+            this._navigationToolsImageViewerToolStrip.Size = new System.Drawing.Size(233, 39);
+            this._navigationToolsImageViewerToolStrip.TabIndex = 2;
+            // 
             // _imageViewerToolsToolStrip
             // 
             this._imageViewerToolsToolStrip.Dock = System.Windows.Forms.DockStyle.None;
@@ -601,7 +679,6 @@
             this._imageViewerToolsToolStrip.Name = "_imageViewerToolsToolStrip";
             this._imageViewerToolsToolStrip.Size = new System.Drawing.Size(84, 39);
             this._imageViewerToolsToolStrip.TabIndex = 3;
-            this._imageViewerToolsToolStrip.TabStop = false;
             // 
             // zoomWindowToolStripButton1
             // 
@@ -634,7 +711,6 @@
             this._highlightNavigationToolStrip.Name = "_highlightNavigationToolStrip";
             this._highlightNavigationToolStrip.Size = new System.Drawing.Size(84, 39);
             this._highlightNavigationToolStrip.TabIndex = 4;
-            this._highlightNavigationToolStrip.TabStop = false;
             // 
             // _previousLayerObjectToolStripButton
             // 
@@ -657,49 +733,6 @@
             this._nextLayerObjectToolStripButton.Name = "_nextLayerObjectToolStripButton";
             this._nextLayerObjectToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._nextLayerObjectToolStripButton.Text = "Go to next match";
-            // 
-            // _navigationToolsImageViewerToolStrip
-            // 
-            this._navigationToolsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._navigationToolsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this._navigationToolsImageViewerToolStrip.Location = new System.Drawing.Point(171, 0);
-            this._navigationToolsImageViewerToolStrip.Name = "_navigationToolsImageViewerToolStrip";
-            this._navigationToolsImageViewerToolStrip.Size = new System.Drawing.Size(233, 39);
-            this._navigationToolsImageViewerToolStrip.TabIndex = 2;
-            this._navigationToolsImageViewerToolStrip.TabStop = false;
-            // 
-            // _viewCommandsImageViewerToolStrip
-            // 
-            this._viewCommandsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._viewCommandsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this._viewCommandsImageViewerToolStrip.Location = new System.Drawing.Point(404, 0);
-            this._viewCommandsImageViewerToolStrip.Name = "_viewCommandsImageViewerToolStrip";
-            this._viewCommandsImageViewerToolStrip.Size = new System.Drawing.Size(312, 39);
-            this._viewCommandsImageViewerToolStrip.TabIndex = 1;
-            this._viewCommandsImageViewerToolStrip.TabStop = false;
-            // 
-            // _generalImageToolStrip
-            // 
-            this._generalImageToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._generalImageToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this._generalImageToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._printImageToolStripButton});
-            this._generalImageToolStrip.Location = new System.Drawing.Point(716, 0);
-            this._generalImageToolStrip.Name = "_generalImageToolStrip";
-            this._generalImageToolStrip.Size = new System.Drawing.Size(48, 39);
-            this._generalImageToolStrip.TabIndex = 0;
-            this._generalImageToolStrip.TabStop = false;
-            // 
-            // _printImageToolStripButton
-            // 
-            this._printImageToolStripButton.BaseToolTipText = "Print image";
-            this._printImageToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._printImageToolStripButton.Enabled = false;
-            this._printImageToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._printImageToolStripButton.ImageViewer = null;
-            this._printImageToolStripButton.Name = "_printImageToolStripButton";
-            this._printImageToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._printImageToolStripButton.Text = "Print image";
             // 
             // BottomToolStripPanel
             // 
@@ -737,21 +770,6 @@
             // 
             this.ContentPanel.Size = new System.Drawing.Size(515, 582);
             // 
-            // _helpToolStripMenuItem
-            // 
-            this._helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._aboutToolStripMenuItem});
-            this._helpToolStripMenuItem.Name = "_helpToolStripMenuItem";
-            this._helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
-            this._helpToolStripMenuItem.Text = "&Help";
-            // 
-            // _aboutToolStripMenuItem
-            // 
-            this._aboutToolStripMenuItem.Name = "_aboutToolStripMenuItem";
-            this._aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this._aboutToolStripMenuItem.Text = "&About";
-            this._aboutToolStripMenuItem.Click += new System.EventHandler(this.HandleAboutToolStripMenuItem_Click);
-            // 
             // _searchSplitContainer
             // 
             this._searchSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -762,16 +780,17 @@
             // 
             // _searchSplitContainer.Panel1
             // 
+            this._searchSplitContainer.Panel1.Controls.Add(this._refreshFileListButton);
             this._searchSplitContainer.Panel1.Controls.Add(groupBox1);
             this._searchSplitContainer.Panel1.Controls.Add(this._selectFilesButton);
-            this._searchSplitContainer.Panel1MinSize = 47;
+            this._searchSplitContainer.Panel1MinSize = 78;
             // 
             // _searchSplitContainer.Panel2
             // 
             this._searchSplitContainer.Panel2.Controls.Add(this._fileListPanel);
             this._searchSplitContainer.Panel2.Controls.Add(this._dockContainer);
             this._searchSplitContainer.Size = new System.Drawing.Size(500, 591);
-            this._searchSplitContainer.SplitterDistance = 73;
+            this._searchSplitContainer.SplitterDistance = 78;
             this._searchSplitContainer.TabIndex = 0;
             this._searchSplitContainer.TabStop = false;
             // 
@@ -824,12 +843,12 @@
             this._imageToolStripContainer.PerformLayout();
             this._imageViewerStatusStrip.ResumeLayout(false);
             this._imageViewerStatusStrip.PerformLayout();
+            this._generalImageToolStrip.ResumeLayout(false);
+            this._generalImageToolStrip.PerformLayout();
             this._imageViewerToolsToolStrip.ResumeLayout(false);
             this._imageViewerToolsToolStrip.PerformLayout();
             this._highlightNavigationToolStrip.ResumeLayout(false);
             this._highlightNavigationToolStrip.PerformLayout();
-            this._generalImageToolStrip.ResumeLayout(false);
-            this._generalImageToolStrip.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -861,10 +880,6 @@
         private System.Windows.Forms.DataGridView _fileListDataGridView;
         private Extract.Imaging.Forms.ImageViewer _imageViewer;
         private TD.SandDock.DockContainer _dockContainer;
-        private System.Windows.Forms.DataGridViewTextBoxColumn _fileListNameColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn _fileListPagesColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn _fileListMatchesColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn _fileListFolderColumn;
         private System.Windows.Forms.CheckBox _showOnlyMatchesCheckBox;
         private System.Windows.Forms.Panel _fileListPanel;
         private System.Windows.Forms.DataGridView _dataSearchTermsDataGridView;
@@ -892,6 +907,12 @@
         private System.Windows.Forms.ToolStripStatusLabel _imageViewerErrorStripStatusLabel;
         private System.Windows.Forms.ToolStripMenuItem _helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _aboutToolStripMenuItem;
+        private System.Windows.Forms.Button _refreshFileListButton;
+        private System.Windows.Forms.DataGridViewImageColumn _fileListFlagColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _fileListNameColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _fileListPagesColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _fileListMatchesColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _fileListFolderColumn;
 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using ADODB;
 using Extract.Drawing;
+using Extract.FileActionManager.Utilities.Properties;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Licensing;
@@ -64,10 +65,16 @@ namespace Extract.FileActionManager.Utilities
             "24440334-DE0C-46C1-920F-45D064A10DBF";
 
         /// <summary>
+        /// The column from <see cref="_fileListDataGridView"/> that represents whether the file is
+        /// flagged.
+        /// </summary>
+        internal static int _FILE_LIST_FLAG_COLUMN_INDEX = 0;
+
+        /// <summary>
         /// The column from <see cref="_fileListDataGridView"/> that represents the results of the
         /// most recent search.
         /// </summary>
-        internal static int _FILE_LIST_MATCH_COLUMN_INDEX = 2;
+        internal static int _FILE_LIST_MATCH_COLUMN_INDEX = 3;
 
         /// <summary>
         /// The color of highlights to show found search terms in documents.
@@ -275,6 +282,16 @@ namespace Extract.FileActionManager.Utilities
             new Dictionary<ToolStripMenuItem, AppLaunchItem>();
 
         /// <summary>
+        /// Context menu option that allows rows in the file list to be flagged.
+        /// </summary>
+        ToolStripMenuItem _setFlagMenuItem = new ToolStripMenuItem("Set flag");
+
+        /// <summary>
+        /// Context menu option that allows the flagged rows in the file list to be cleared.
+        /// </summary>
+        ToolStripMenuItem _clearFlagMenuItem = new ToolStripMenuItem("Clear flag");
+
+        /// <summary>
         /// A <see cref="Task"/> that performs database query operations on a background thread.
         /// </summary>
         volatile Task _queryTask;
@@ -390,6 +407,10 @@ namespace Extract.FileActionManager.Utilities
                 _searchDockableWindow.PopupSize = 1;
 
                 LayerObject.SelectionPen = ExtractPens.GetThickDashedPen(_SELECTION_BORDER_COLOR);
+
+                // This prevents the "missing image" icon from showing up for rows that aren't flagged.
+                _fileListDataGridView.Columns[_FILE_LIST_FLAG_COLUMN_INDEX].DefaultCellStyle
+                    .NullValue = null;
             }
             catch (Exception ex)
             {
@@ -619,23 +640,27 @@ namespace Extract.FileActionManager.Utilities
                     queryResults.MoveNext();
                 }
 
-                // If there is at least one enabled context menu option, attach the menu to
-                // _fileListDataGridView
+                // Add set/clear flag menu options
                 if (newContextMenuStrip.Items.Count > 0)
                 {
                     newContextMenuStrip.Items.Add(new ToolStripSeparator());
-                    newContextMenuStrip.Items.Add(new ToolStripMenuItem("Cancel"));
-
-                    _fileListDataGridView.ContextMenuStrip = newContextMenuStrip;
-
-                    // Handle the opening of the context menu so that the available options can be
-                    // enabled/disabled appropriately.
-                    newContextMenuStrip.Opening += HandleContextMenuStrip_Opening;
                 }
-                else
-                {
-                    newContextMenuStrip.Dispose();
-                }
+
+                newContextMenuStrip.Items.Add(_setFlagMenuItem);
+                newContextMenuStrip.Items.Add(_clearFlagMenuItem);
+
+                _setFlagMenuItem.Click += HandleSetFlagMenuItem_Click;
+                _clearFlagMenuItem.Click += HandleClearFlagMenuItem_Click;
+
+                // Add cancel menu option.
+                newContextMenuStrip.Items.Add(new ToolStripSeparator());
+                newContextMenuStrip.Items.Add(new ToolStripMenuItem("Cancel"));
+
+                _fileListDataGridView.ContextMenuStrip = newContextMenuStrip;
+
+                // Handle the opening of the context menu so that the available options can be
+                // enabled/disabled appropriately.
+                newContextMenuStrip.Opening += HandleContextMenuStrip_Opening;
             }
             catch (Exception ex)
             {
@@ -866,6 +891,18 @@ namespace Extract.FileActionManager.Utilities
                     _appLaunchItems = null;
                 }
 
+                if (_setFlagMenuItem != null)
+                {
+                    _setFlagMenuItem.Dispose();
+                    _setFlagMenuItem = null;
+                }
+
+                if (_clearFlagMenuItem != null)
+                {
+                    _clearFlagMenuItem.Dispose();
+                    _clearFlagMenuItem = null;
+                }
+
                 if (components != null)
                 {
                     components.Dispose();
@@ -1004,6 +1041,24 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_refreshFileListButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleRefreshFileListButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                GenerateFileList();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36039");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="ComboBox.SelectedIndexChanged"/> event of the
         /// <see cref="_searchTypeComboBox"/>.
         /// </summary>
@@ -1044,6 +1099,43 @@ namespace Extract.FileActionManager.Utilities
 	        {
 		        ex.ExtractDisplay("ELI35718");
 	        }
+        }
+
+        /// <summary>
+        /// Handles the CellPainting event of the _fileListDataGridView control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.DataGridViewCellPaintingEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleResultsDataGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            try
+            {
+                // If this is the column header for the flag column and the foreground is to be
+                // drawn.
+                if (e.ColumnIndex == _FILE_LIST_FLAG_COLUMN_INDEX && e.RowIndex == -1 &&
+                    e.PaintParts.HasFlag(DataGridViewPaintParts.ContentForeground))
+                {
+                    // First paint the column header as it would normally be painted except for the
+                    // content background which paints the sort order arrow that would overlap with
+                    // the column header flag image.
+                    var paintParts = e.PaintParts & ~DataGridViewPaintParts.ContentBackground;
+                    e.Paint(e.CellBounds, paintParts);
+
+                    // Then draw the flag icon on top.
+                    GraphicsUnit pageUnit = e.Graphics.PageUnit;
+                    RectangleF bounds = Resources.FlagImage.GetBounds(ref pageUnit);
+                    bounds.Offset(e.CellBounds.X + (e.CellBounds.Width - bounds.Width) / 2F,
+                                  e.CellBounds.Y + (e.CellBounds.Height - bounds.Height) / 2F);
+                    e.Graphics.DrawImage(Resources.FlagImage, bounds);
+
+                    e.Handled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36040");
+            }
         }
 
         /// <summary>
@@ -1095,7 +1187,7 @@ namespace Extract.FileActionManager.Utilities
 
         /// <summary>
         /// Handles the <see cref="DataGridView.SortCompare"/> event of the
-        /// <see cref="_fileListDataGridView"/> control.
+        /// <see cref="_fileListDataGridView"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.Windows.Forms.DataGridViewSortCompareEventArgs"/>
@@ -1115,6 +1207,72 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35739");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataGridView.CellContentDoubleClick"/> event of the
+        /// <see cref="_fileListDataGridView"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.DataGridViewCellEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleFileListDataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                // If a flag cell is double clicked, toggle the flagged status.
+                if (e.ColumnIndex == _FILE_LIST_FLAG_COLUMN_INDEX && e.RowIndex != -1 &&
+                    _fileListDataGridView.Rows.Count > 0)
+                {
+                    var row = _fileListDataGridView.Rows[e.RowIndex];
+                    var cell = row.Cells[_FILE_LIST_FLAG_COLUMN_INDEX];
+                    bool setFlag = cell.Value == null;
+                    cell.Value = setFlag ? Resources.FlagImage : null;
+                    _fileListDataGridView.InvalidateCell(cell);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36041");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event of the
+        /// <see cref="_setFlagMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleSetFlagMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SetRowFlag(_fileListDataGridView.SelectedRows.OfType<DataGridViewRow>(), true);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36042");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event of the
+        /// <see cref="_clearFlagMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleClearFlagMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SetRowFlag(_fileListDataGridView.SelectedRows.OfType<DataGridViewRow>(), false);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36043");
             }
         }
 
@@ -1202,6 +1360,18 @@ namespace Extract.FileActionManager.Utilities
                         app.Key.Enabled = true;
                     }
                 }
+
+                // Enable/disable the set/clear flag options depending on the flag status of the
+                // selected rows.
+                _setFlagMenuItem.Enabled = _fileListDataGridView.SelectedRows
+                    .OfType<DataGridViewRow>()
+                    .Where(row => row.Cells[_FILE_LIST_FLAG_COLUMN_INDEX].Value == null)
+                    .Any();
+
+                _clearFlagMenuItem.Enabled = _fileListDataGridView.SelectedRows
+                    .OfType<DataGridViewRow>()
+                    .Where(row => row.Cells[_FILE_LIST_FLAG_COLUMN_INDEX].Value != null)
+                    .Any();
             }
             catch (Exception ex)
             {
@@ -1221,6 +1391,11 @@ namespace Extract.FileActionManager.Utilities
             try
             {
                 AppLaunchItem appLaunchItem = _appLaunchItems[(ToolStripMenuItem)sender];
+
+                // [DotNetRCAndUtils:1064]
+                // Flag any rows for which an app launch item was run to make it easier for the user
+                // to keep track of for which files an action was taken.
+                SetRowFlag(_fileListDataGridView.SelectedRows.OfType<DataGridViewRow>(), true);
 
                 // Convert the selected files to an array so that the file list is a snapshot that
                 // won't change after processing has begun.
@@ -1590,7 +1765,7 @@ namespace Extract.FileActionManager.Utilities
                         // Invoke the new row to be added on the UI thread.
                         this.SafeBeginInvoke("ELI35725", () =>
                         {
-                            _fileListDataGridView.Rows.Add(fileName, pageCount, fileData,
+                            _fileListDataGridView.Rows.Add(null, fileName, pageCount, fileData,
                                 directory);
                         });
                     }
@@ -2418,6 +2593,23 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35845");
+            }
+        }
+
+        /// <summary>
+        /// Sets the flag on the specified row(s) of the <see cref="_fileListDataGridView"/>.
+        /// </summary>
+        /// <param name="rows">The <see cref="DataGridViewRow"/>s on which the flag should be set or
+        /// cleared.</param>
+        /// <param name="setFlag"><see langword="true"/> to set the flag; otherwise,
+        /// <see langword="false"/>.</param>
+        void SetRowFlag(IEnumerable<DataGridViewRow> rows, bool setFlag)
+        {
+            foreach (var row in rows)
+            {
+                var cell = row.Cells[_FILE_LIST_FLAG_COLUMN_INDEX];
+                cell.Value = setFlag ? Resources.FlagImage : null;
+                _fileListDataGridView.InvalidateCell(cell);
             }
         }
 
