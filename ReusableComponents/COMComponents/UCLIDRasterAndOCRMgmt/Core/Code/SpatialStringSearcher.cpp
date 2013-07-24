@@ -670,34 +670,23 @@ void CSpatialStringSearcher::createLocalLetters()
 	unsigned int iCurrLine = 0;
 	unsigned int iCurrParagraph = 0;
 	unsigned int iCurrZone = 0;
-	long numLetters = 0;
 
 	// populate the list of local letters and add them to the spatial data structure
 	vector<CPPLetter> vecCppLetters;
 	{
+		long numLetters;
 		CPPLetter* pLetters = NULL;
 		m_ipSpatialString->GetOCRImageLetterArray(&numLetters, (void**)&pLetters);
 		ASSERT_RESOURCE_ALLOCATION("ELI25990", pLetters != __nullptr);
-
-		if (numLetters == 0)
-		{
-			// If numLetters is zero, there is nothing to do.
-			return;
-		}
 
 		// Copy the letters to a local vector
 		vecCppLetters.resize(numLetters);
 		memcpy(&(vecCppLetters[0]), pLetters, numLetters * sizeof(CPPLetter));
 	}
 
-	// [FlexIDSCore:5332]
-	// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to be
-	// significantly time consuming on large spatial strings. Instead get a direct pointer to
-	// access the letters.
-	CPPLetter* pCppLetters = &vecCppLetters[0];
-	for (size_t i = 0; i < (size_t)numLetters; i++)
+	for (size_t i = 0; i < vecCppLetters.size(); i++)
 	{
-		const CPPLetter& letter = pCppLetters[i];
+		const CPPLetter& letter = vecCppLetters[i];
 
 		m_vecLetters.push_back(LocalLetter(i, iCurrZone, iCurrParagraph, iCurrLine, iCurrWord));
 		LocalLetter& rLocalLetter = m_vecLetters[i];
@@ -777,21 +766,9 @@ void CSpatialStringSearcher::createLocalWords()
 	// be set when the next spatial character is reached
 	bool setWordStart = true;
 
-	unsigned int nNumLetters = m_vecLetters.size();
-	if (nNumLetters == 0)
+	for (unsigned int ui = 0; ui < m_vecLetters.size(); ui++)
 	{
-		// If nNumLetters is 0, there is nothing to do.
-		return;
-	}
-
-	// [FlexIDSCore:5332]
-	// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to be
-	// significantly time consuming on large spatial strings. Instead get a direct pointer to
-	// access the letters.
-	LocalLetter* pLetters = &m_vecLetters[0];
-	for (unsigned int ui = 0; ui < nNumLetters; ui++)
-	{
-		LocalLetter& rLocalLetter = pLetters[ui];
+		LocalLetter& rLocalLetter = m_vecLetters[ui];
 
 		// Ignore non-spatial characters
 		if (!rLocalLetter.letter.m_bIsSpatial)
@@ -862,21 +839,9 @@ void CSpatialStringSearcher::createLocalLines()
 	// be set when the next spatial character is reached
 	bool setLineStart = true;
 
-	unsigned int nNumLetters = m_vecLetters.size();
-	if (nNumLetters == 0)
+	for (unsigned int ui = 0; ui < m_vecLetters.size(); ui++)
 	{
-		// If nNumLetters is 0, there is nothing to do.
-		return;
-	}
-
-	// [FlexIDSCore:5332]
-	// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to be
-	// significantly time consuming on large spatial strings. Instead get a direct pointer to
-	// access the letters.
-	LocalLetter* pLetters = &m_vecLetters[0];
-	for (unsigned int ui = 0; ui < nNumLetters; ui++)
-	{
-		LocalLetter& rLocalLetter = pLetters[ui];
+		LocalLetter& rLocalLetter = m_vecLetters[ui];
 
 		// Ignore non-spatial characters
 		if (!rLocalLetter.letter.m_bIsSpatial)
@@ -966,29 +931,20 @@ void CSpatialStringSearcher::getUnsortedLettersInRegion(ILongRectanglePtr ipRect
 
 		if (m_eBoundaryResolution == kCharacter)
 		{
-			unsigned long nNumLetters = m_vecLetters.size();
-			if (nNumLetters > 0)
+			for (unsigned long ui = 0; ui < m_vecLetters.size(); ui++)
 			{
-				// [FlexIDSCore:5332]
-				// Profiling has shown accessing the letters out of m_vecLetters one letter at a
-				// time to be significantly time consuming on large spatial strings. Instead get a
-				// direct pointer to access the letters.
-				LocalLetter* pLetters = &m_vecLetters[0];
-				for (unsigned long ui = 0; ui < nNumLetters; ui++)
+				LocalLetter& rLetter = m_vecLetters[ui];
+				if (!rLetter.letter.m_bIsSpatial)
 				{
-					LocalLetter& rLetter = pLetters[ui];
-					if (!rLetter.letter.m_bIsSpatial)
-					{
-						continue;
-					}
-					// Test the rLetter against the region
-					EIntersection eIntersection = region.intersect(rLetter);
+					continue;
+				}
+				// Test the rLetter against the region
+				EIntersection eIntersection = region.intersect(rLetter);
 
-					if( (m_bIncludeDataOnBoundary && eIntersection > kNotIntersecting) ||
-						(!m_bIncludeDataOnBoundary && eIntersection == kContains) )
-					{
-						rvecLetters.push_back(ui);
-					}
+				if( (m_bIncludeDataOnBoundary && eIntersection > kNotIntersecting) ||
+					(!m_bIncludeDataOnBoundary && eIntersection == kContains) )
+				{
+					rvecLetters.push_back(ui);
 				}
 			}
 		}

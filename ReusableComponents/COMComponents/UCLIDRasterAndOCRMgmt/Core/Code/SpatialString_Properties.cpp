@@ -500,7 +500,7 @@ STDMETHODIMP CSpatialString::GetSpecifiedPages(long nStartPageNum, long nEndPage
 				return S_OK;
 			}
 			// if specified start page number <= total number
-			else if (nNumLetters > 0 && nStartPageNum <= nLastPageNumber)
+			else if (nStartPageNum <= nLastPageNumber)
 			{
 				// create a vector to hold letter on those pages
 				vector<CPPLetter> vecLetters;
@@ -519,14 +519,9 @@ STDMETHODIMP CSpatialString::GetSpecifiedPages(long nStartPageNum, long nEndPage
 				// index
 				long nLastSpatialPageNum = tempLetter.m_usPageNumber;
 
-				// [FlexIDSCore:5332]
-				// Profiling has shown accessing the letters out of m_vecLetters one letter at a
-				// time to be significantly time consuming on large spatial strings. Instead get a
-				// direct pointer to access the letters.
-				CPPLetter* pLetters = &m_vecLetters[0];
 				for (long n = 0; n < nNumLetters; n++)
 				{
-					CPPLetter& letter = pLetters[n];
+					CPPLetter& letter = m_vecLetters[n];
 
 					long nCurrentPageNumber =
 						letter.m_bIsSpatial ? letter.m_usPageNumber : nLastSpatialPageNum;
@@ -633,14 +628,9 @@ STDMETHODIMP CSpatialString::GetRelativePages(long nStartPageNum, long nEndPageN
 			long nTotalPageNum=0;
 
 			// following For block calculates the actual total number of pages for this string
-			// [FlexIDSCore:5332]
-			// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to
-			// be significantly time consuming on large spatial strings. Instead get a direct
-			// pointer to access the letters.
-			CPPLetter* pLetters = &m_vecLetters[0];
 			for (long i = 0; i < nNumLetters; i++)
 			{
-				CPPLetter& letter = pLetters[i];
+				CPPLetter& letter = m_vecLetters[i];
 
 				// what's the original page number for this letter
 				long nOriginPageNumber = letter.m_usPageNumber;
@@ -684,7 +674,7 @@ STDMETHODIMP CSpatialString::GetRelativePages(long nStartPageNum, long nEndPageN
 				vector<CPPLetter> vecLetters;
 				for (long i = 0; i < nNumLetters; i++)
 				{
-					CPPLetter& tempLetter = pLetters[i];
+					CPPLetter& tempLetter = m_vecLetters[i];
 
 					// what's the original page number for this letter
 					long nOriginPageNumber =
@@ -749,8 +739,6 @@ STDMETHODIMP CSpatialString::GetPages(IIUnknownVector **pvecPages)
 		IIUnknownVectorPtr ipPages(CLSID_IUnknownVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI07482", ipPages != __nullptr);
 
-		long nNumLetters = m_vecLetters.size();
-
 		if (m_eMode == kHybridMode)
 		{
 			map<long, vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr>> mapZonesToPages;
@@ -790,7 +778,7 @@ STDMETHODIMP CSpatialString::GetPages(IIUnknownVector **pvecPages)
 				ipPages->PushBack(ipString);
 			}
 		}
-		else if (m_eMode == kSpatialMode && nNumLetters > 0)
+		else if (m_eMode == kSpatialMode)
 		{
 			// Get the first spatial letter (since string is spatial we are guaranteed that
 			// there is at least 1 spatial letter)
@@ -805,15 +793,11 @@ STDMETHODIMP CSpatialString::GetPages(IIUnknownVector **pvecPages)
 
 			// Loop over the letters of the spatial string and create substrings
 			// when each new page is encountered
-			// [FlexIDSCore:5332]
-			// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to
-			// be significantly time consuming on large spatial strings. Instead get a direct
-			// pointer to access the letters.
-			CPPLetter* pLetters = &m_vecLetters[0];
+			long nNumLetters = m_vecLetters.size();
 			for (long i = 0; i < nNumLetters; i++)
 			{
 				// Get Letter
-				CPPLetter& tempLetter = pLetters[i];
+				CPPLetter& tempLetter = m_vecLetters[i];
 
 				if(!tempLetter.m_bIsSpatial)
 				{
@@ -964,14 +948,8 @@ STDMETHODIMP CSpatialString::GetAverageLineHeight(long *lpHeight)
 				totalParagraphLineHeight += (lHeight + (lGap > 0 ? lGap : 0));
 				numUsedLines++;
 			}
-
-			unsigned int nNumLetters = m_vecLetters.size();
-			if (nNumLetters == 0)
-			{
-				// if nNumLetters is zero, there is nothing to do
-				lpHeight = 0;
-			}
-			else if (numUsedLines > 0)
+			
+			if (numUsedLines > 0)
 			{
 				// return the height based on the average distance between lines
 				*lpHeight = totalParagraphLineHeight / numUsedLines;
@@ -988,14 +966,9 @@ STDMETHODIMP CSpatialString::GetAverageLineHeight(long *lpHeight)
 				// This is the height of the tallest character in the string
 				int maxCharHeight = 0;
 
-				// [FlexIDSCore:5332]
-				// Profiling has shown accessing the letters out of m_vecLetters one letter at a
-				// time to be significantly time consuming on large spatial strings. Instead get a
-				// direct pointer to access the letters.
-				CPPLetter* pLetters = &m_vecLetters[0];
-				for (unsigned int uiLetter = 0; uiLetter < nNumLetters; uiLetter++)
+				for (unsigned int uiLetter = 0; uiLetter < m_vecLetters.size(); uiLetter++)
 				{
-					CPPLetter& letter = pLetters[uiLetter];
+					CPPLetter& letter = m_vecLetters[uiLetter];
 					char c = (char) letter.m_usGuess1;
 					if ((c >= 'A' && c <= 'Z') || // if c is a 'tall' character
 						c == 'l' ||
@@ -1844,23 +1817,16 @@ STDMETHODIMP CSpatialString::GetCharConfidence(long* pnMinConfidence, long* pnMa
 		long nMaxConfidence = 0;
 		long nAvgConfidence = 0;
 
-		unsigned int nNumLetters = m_vecLetters.size();
-
 		// For a kSpatialMode object
-		if (m_eMode == kSpatialMode && nNumLetters > 0)
+		if (m_eMode == kSpatialMode)
 		{
 			long nTotalConfidence = 0;
 			long nTotalLetters = 0;
 
 			// For each letter, calculate the total confidence of it
-			// [FlexIDSCore:5332]
-			// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to
-			// be significantly time consuming on large spatial strings. Instead get a direct
-			// pointer to access the letters.
-			CPPLetter* pLetters = &m_vecLetters[0];
-			for (unsigned int i = 0; i < nNumLetters; i++)
+			for (unsigned int i = 0; i < m_vecLetters.size(); i++)
 			{
-				const CPPLetter& letter = pLetters[i];
+				const CPPLetter& letter = m_vecLetters[i];
 				if (letter.m_bIsSpatial && !isWhitespaceChar(letter.m_usGuess1))
 				{
 					// Add the confidence for the letter and increment the number of letters
@@ -1937,25 +1903,18 @@ STDMETHODIMP CSpatialString::GetFontSizeDistribution(ILongToLongMap** ppMap)
 
 		map<long, long> mapFontSizeToCount;
 
-		unsigned int nNumLetters = m_vecLetters.size();
-
 		// Non spatial mode and hybrid mode don't have a letters vector to use
 		// so they are treated as a special case.
-		if( (m_eMode == kNonSpatialMode) || (m_eMode == kHybridMode) || nNumLetters == 0)
+		if( (m_eMode == kNonSpatialMode) || (m_eMode == kHybridMode) )
 		{
 			mapFontSizeToCount[0] = m_strString.size();
 		}
 		else
 		{
 			// Mode must be spatial to utilize this method
-			// [FlexIDSCore:5332]
-			// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to
-			// be significantly time consuming on large spatial strings. Instead get a direct
-			// pointer to access the letters.
-			CPPLetter* pLetters = &m_vecLetters[0];
-			for (unsigned int i = 0; i < nNumLetters; i++)
+			for (unsigned int i = 0; i < m_vecLetters.size(); i++)
 			{
-				CPPLetter& letter = pLetters[i];
+				CPPLetter& letter = m_vecLetters[i];
 				mapFontSizeToCount[letter.m_ucFontSize]++;
 			}
 		}
@@ -1997,65 +1956,56 @@ STDMETHODIMP CSpatialString::GetFontInfo(long nMinPercentage, VARIANT_BOOL* pbIt
 			nNumProportional = 0, nNumUnderline = 0, nNumSuperScript = 0, nNumSubScript = 0;
 		long nNumSpatialChars = 0;
 
-		unsigned int nNumLetters = m_vecLetters.size();
-		if (nNumLetters > 0)
+		for (unsigned int i = 0; i < m_vecLetters.size(); i++)
 		{
-			// [FlexIDSCore:5332]
-			// Profiling has shown accessing the letters out of m_vecLetters one letter at a time to
-			// be significantly time consuming on large spatial strings. Instead get a direct
-			// pointer to access the letters.
-			CPPLetter* pLetters = &m_vecLetters[0];
-			for (unsigned int i = 0; i < nNumLetters; i++)
+			// Get the letter
+			CPPLetter& letter = m_vecLetters[i];
+			if(!letter.m_bIsSpatial)
 			{
-				// Get the letter
-				CPPLetter& letter = pLetters[i];
-				if(!letter.m_bIsSpatial)
-				{
-					continue;
-				}
+				continue;
+			}
 
-				nNumSpatialChars++;
+			nNumSpatialChars++;
 
-				// Check the flags for each font possibility
-				if(letter.isItalic())
-				{
-					nNumItalic++;
-				}
+			// Check the flags for each font possibility
+			if(letter.isItalic())
+			{
+				nNumItalic++;
+			}
 
-				if(letter.isBold())
-				{
-					nNumBold++;
-				}
+			if(letter.isBold())
+			{
+				nNumBold++;
+			}
 
-				if(letter.isSansSerif())
-				{
-					nNumSansSerif++;
-				}
+			if(letter.isSansSerif())
+			{
+				nNumSansSerif++;
+			}
 
-				if(letter.isSerif())
-				{
-					nNumSerif++;
-				}
+			if(letter.isSerif())
+			{
+				nNumSerif++;
+			}
 
-				if(letter.isProportional())
-				{
-					nNumProportional++;
-				}
+			if(letter.isProportional())
+			{
+				nNumProportional++;
+			}
 
-				if(letter.isUnderline())
-				{
-					nNumUnderline++;
-				}
+			if(letter.isUnderline())
+			{
+				nNumUnderline++;
+			}
 
-				if(letter.isSuperScript())
-				{
-					nNumSuperScript++;
-				}
+			if(letter.isSuperScript())
+			{
+				nNumSuperScript++;
+			}
 
-				if(letter.isSubScript())
-				{
-					nNumSubScript++;
-				}
+			if(letter.isSubScript())
+			{
+				nNumSubScript++;
 			}
 		}
 
