@@ -811,6 +811,7 @@ namespace Extract.SQLCDBEditor
             // not interpreted as edits by the user.
             if (QueryAndResultsType == QueryAndResultsType.Table)
             {
+                _resultsTable.TableNewRow -= HandleTableNewRow;
                 _resultsTable.ColumnChanged -= HandleColumnChanged;
                 _resultsTable.RowChanged -= HandleRowChanged;
             }
@@ -824,6 +825,7 @@ namespace Extract.SQLCDBEditor
             if (QueryAndResultsType == QueryAndResultsType.Table)
             {
                 // Re-register to get data changed events.
+                _resultsTable.TableNewRow += HandleTableNewRow;
                 _resultsTable.ColumnChanged += HandleColumnChanged;
                 _resultsTable.RowChanged += HandleRowChanged;
             }
@@ -1178,6 +1180,7 @@ namespace Extract.SQLCDBEditor
                 // continue to exist in the table until.
                 RemoveConstraints(_resultsTable);
 
+                _resultsTable.TableNewRow += HandleTableNewRow;
                 _resultsTable.ColumnChanged += HandleColumnChanged;
                 _resultsTable.RowChanged += HandleRowChanged;
 
@@ -1340,6 +1343,27 @@ namespace Extract.SQLCDBEditor
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI34633");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataTable.TableNewRow"/> event of <see cref="_resultsTable"/>.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.Data.DataTableNewRowEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleTableNewRow(object sender, DataTableNewRowEventArgs e)
+        {
+            try
+            {
+                // [DotNetRCAndUtils:837]
+                // Manually validate the correct auto-increment values with the DB to prevent these
+                // values from getting out-of-sync with the database.
+                SetAutoIncrementValues(e.Row);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36044");
             }
         }
 
@@ -1787,6 +1811,18 @@ namespace Extract.SQLCDBEditor
         [SuppressMessage("Microsoft.Globalization", "CA1306:SetLocaleForDataTypes")]
         void LoadTableFromDatabase(SqlCeConnection connection, string tableName)
         {
+            if (_adapter != null)
+            {
+                _adapter.Dispose();
+                _adapter = null;
+            }
+
+            if (_commandBuilder != null)
+            {
+                _commandBuilder.Dispose();
+                _commandBuilder = null;
+            }
+
             // Setup dataAdapter to get the data
             _adapter = new SqlCeDataAdapter("SELECT * FROM " + tableName, connection);
 
@@ -2028,6 +2064,50 @@ namespace Extract.SQLCDBEditor
                 {
                     column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
                     column.MinimumWidth = 25;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets any auto-increment column values by querying the DB directly for the next
+        /// auto-increment value. This avoids the auto-increment values from getting out-of-sync
+        /// with the database.
+        /// </summary>
+        /// <param name="row">The <see cref="DataRow"/> for which auto-increment values should be
+        /// set.</param>
+        void SetAutoIncrementValues(DataRow row)
+        {
+            // Iterate all auto-increment columns in the DB.
+            foreach (DataColumn dataColumn in _resultsTable.Columns
+                .OfType<DataColumn>()
+                .Where(column => column.AutoIncrement))
+            {
+                // Query the next auto-increment value for this column from the DB.
+                var parameters = new Dictionary<string, string>();
+                parameters["@0"] = _tableName;
+                parameters["@1"] = dataColumn.ColumnName;
+                using (var sqlCommand = DBMethods.CreateDBCommand(_connection,
+                    "SELECT AUTOINC_NEXT FROM INFORMATION_SCHEMA.COLUMNS " +
+                        "WHERE TABLE_NAME = @0 AND COLUMN_NAME = @1",
+                    parameters))
+                using (var queryResult = sqlCommand.ExecuteReader())
+                {
+                    // Get the first record in the result set - should only be one
+                    if (queryResult.Read())
+                    {
+                        var nextValue = Convert.ChangeType(queryResult.GetValue(0), dataColumn.DataType);
+
+                        // If the row's auto-increment value is out of sync with the DB, apply the
+                        // correct value to the row.
+                        if (!nextValue.Equals(row[dataColumn.Ordinal]))
+                        {
+                            // Since an auto-increment column is going to be read-only, apply
+                            // the new auto-increment value via a separate array variable.
+                            object[] rowData = row.ItemArray;
+                            rowData[dataColumn.Ordinal] = nextValue;
+                            row.ItemArray = rowData;
+                        }
+                    }
                 }
             }
         }
