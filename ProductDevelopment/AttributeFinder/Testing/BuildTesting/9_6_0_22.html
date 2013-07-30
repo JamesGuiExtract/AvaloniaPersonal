@@ -1,0 +1,131 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.6.0.22 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.6.0.22 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DataEntry #1265]</b> Data Entry Queries With .NET 4.5
+        	<ul>
+			<li>Start with bare O/S for Windows 8 or Server 2012.
+			<li>Exercise <b>Demo_LabDE</b> verification.
+			<li>Update the installation such that the following are installed:
+			<ul>
+				<li><b>.NET 4.5</b>
+				<li><b>SQL Compact 3.5</b>
+				<li><b>SQL Compact 4.0</b>
+			</ul>
+			<li>Exercise <b>Demo_LabDE</b> verification.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1064]</b> FAM File Inspector
+        	<ul>
+			<li>Open Inspector against a <b>Demo_IDShield</b> database 
+			where all files have VOA files.
+			<li>Confirm that a <b>Refresh</b> button exists below the 
+			<b>Change</b> button.
+			<li>Confirm that a <b>Flag</b> column exists in the file list.
+			<li>Confirm that exercising a <b>LaunchApp</b> definition for 
+			a file sets the <b>Flag</b> item for that file.
+			<li>Confirm that repeating a <b>Search</b> clears the <b>Flag</b> 
+			column.
+			<li>Confirm that a user can manually <b>Clear</b> a <b>Flag</b>.
+			<li>Confirm that a user can manually <b>Set</b> a <b>Flag</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1088, FlexIDSCore #5334]</b> Input Finder Memory Leak Test
+        	<ul>
+			<li>Confirm that <b>test #1</b> works without error.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5333]</b> Confirm that the <b>Document Classifer 
+		NRS</b> tests all pass.
+<p>
+  	   	<LI><b>[FlexIntegrations #351]</b> Confirm that the <b>Data Capture 
+		Administration Configuration Page</b> is properly named.
+<p>
+  	   	<LI><b>[FlexIntegrations #379, #380]</b> SharePoint Permissions
+        	<ul>
+			<li>Confirm presence of an <b>Extract ID Shield Verifiers</b> group.
+			<li>Confirm that only members of this group are allowed to use 
+			the <b>Verify</b> button.
+			<li>Confirm that only members of this group are allowed to use 
+			the <b>Redact Now</b> button.
+<p>
+			<li>Confirm presence of an <b>Extract ID Shield Document 
+			Submitters</b> group.
+			<li>Confirm that only members of this group are allowed to use 
+			the <b>Process Selected</b> button.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIntegrations #388]</b> Confirm that the <b>Process Selected</b> 
+		button is disabled if a folder is selected.
+<p>
+  	   	<LI><b>[FlexIntegrations #390]</b> Confirm that the copyright date for 
+		<b>ID Shield for SharePoint</b> is current.
+<p>
+  	   	<LI><b>[FlexIntegrations #391]</b> Reprocess Previously Processed Files 
+        	<ul>
+			<li>Process some files.
+			<li>Confirm that one or more files have <b>Queued For Processing</b> 
+			or <b>Queued For Verification</b> status.
+			<li>Change settings to include <b>Reprocess previously processed 
+			files</b>.
+			<li>Confirm that the files that are in the above <b>Queued...</b> 
+			statuses are not reprocessed.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
