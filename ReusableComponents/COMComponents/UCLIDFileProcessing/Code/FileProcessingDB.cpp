@@ -126,7 +126,8 @@ m_bValidatingOrUpdatingSchema(false),
 m_bProductSpecificDBSchemasAreValid(false),
 m_bRevertInProgress(false),
 m_bRetryOnTimeout(true),
-m_nActiveActionID(-1)
+m_nActiveActionID(-1),
+m_bLoggedInAsAdmin(false)
 {
 	try
 	{
@@ -874,8 +875,16 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 			return S_OK;
 		}
 
+		bool bLoginValid = isPasswordValid(string(dlgLogin.m_zPassword), bUseAdmin);
+
+		// If login was successful, set m_bLoggedInAsAdmin as appropriate.
+		if (bLoginValid)
+		{
+			m_bLoggedInAsAdmin = bUseAdmin;
+		}
+
 		// Validate password
-		*pbLoginValid = asVariantBool(isPasswordValid(string(dlgLogin.m_zPassword), bUseAdmin));
+		*pbLoginValid = asVariantBool(bLoginValid);
 	
 		return S_OK;
 	}
@@ -2757,6 +2766,23 @@ STDMETHODIMP CFileProcessingDB::get_CurrentConnectionString(BSTR* pbstrConnectio
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35946");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_LoggedInAsAdmin(VARIANT_BOOL* pbLoggedInAsAdmin)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI36046", pbLoggedInAsAdmin != __nullptr);
+
+		*pbLoggedInAsAdmin = asVariantBool(m_bLoggedInAsAdmin);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36047");
 }
 
 //-------------------------------------------------------------------------------------------------

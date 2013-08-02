@@ -1246,6 +1246,10 @@ library UCLID_FILEPROCESSINGLib
 		// RETURNS: If connected, the connection string used to connect; otherwise, NULL
 		[propget, id(112), helpstring("property CurrentConnectionString")]
 			HRESULT CurrentConnectionString([out, retval] BSTR* pbstrConnectionString);
+		//-----------------------------------------------------------------------------------------
+		// RETURNS: VARIANT_TRUE if the whether the user has entered valide admin credentials.
+		[propget, id(113), helpstring("property LoggedInAsAdmin")]
+			HRESULT LoggedInAsAdmin([out, retval] VARIANT_BOOL* pbLoggedInAsAdmin);
 };
 
 	[

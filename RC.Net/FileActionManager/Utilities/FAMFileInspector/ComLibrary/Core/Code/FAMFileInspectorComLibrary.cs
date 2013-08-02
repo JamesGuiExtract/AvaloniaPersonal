@@ -82,6 +82,10 @@ namespace Extract.FileActionManager.Utilities
                         {
                             _fileInspectorForm.Invoke((MethodInvoker)(() =>
                             {
+                                // Uses fileProcessingDB.LoggedInAsAdmin to determine whether
+                                // _fileInspectorForm should run in admin mode.
+                                _fileInspectorForm.SetLogOnMode(fileProcessingDB);
+
                                 // Because the FileProcessingDB may be re-configured to connect to
                                 // a new DB from within this app and because we don't want that
                                 // affecting an outside caller still using it (DBAdmin), just copy
@@ -105,7 +109,7 @@ namespace Extract.FileActionManager.Utilities
 
                                 _fileInspectorForm.Restore();
                                 _fileInspectorForm.Activate();
-                                _fileInspectorForm.GenerateFileList();
+                                _fileInspectorForm.GenerateFileList(false);
                             }));
                         }
                         catch (Exception ex)
@@ -135,6 +139,10 @@ namespace Extract.FileActionManager.Utilities
                         {
                             // A new form is needed.
                             _fileInspectorForm = new FAMFileInspectorForm();
+
+                            // Uses fileProcessingDB.LoggedInAsAdmin to determine whether
+                            // _fileInspectorForm should run in admin mode.
+                            _fileInspectorForm.SetLogOnMode(fileProcessingDB);
 
                             // Because the FileProcessingDB may be re-configured to connect to
                             // a new DB from within this app and because we don't want that

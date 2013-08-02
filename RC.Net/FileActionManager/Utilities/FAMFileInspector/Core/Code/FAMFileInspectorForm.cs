@@ -9,6 +9,7 @@ using Extract.Utilities.Forms;
 using Extract.Utilities.Parsers;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
@@ -282,6 +283,21 @@ namespace Extract.FileActionManager.Utilities
             new Dictionary<ToolStripMenuItem, AppLaunchItem>();
 
         /// <summary>
+        /// Context menu option to copy selected file names as text.
+        /// </summary>
+        ToolStripMenuItem _copyFileNamesMenuItem = new ToolStripMenuItem("Copy filename(s)");
+
+        /// <summary>
+        /// Context menu option to copy selected files as files.
+        /// </summary>
+        ToolStripMenuItem _copyFilesMenuItem = new ToolStripMenuItem("Copy file(s)");
+
+        /// <summary>
+        /// Context menu option to copy selected files and associated data as files.
+        /// </summary>
+        ToolStripMenuItem _copyFilesAndDataMenuItem = new ToolStripMenuItem("Copy file(s) and data");
+
+        /// <summary>
         /// Context menu option that allows rows in the file list to be flagged.
         /// </summary>
         ToolStripMenuItem _setFlagMenuItem = new ToolStripMenuItem("Set flag");
@@ -326,6 +342,46 @@ namespace Extract.FileActionManager.Utilities
         /// Indicates how many calls to <see cref="OpenImageInvoked"/> are pending.
         /// </summary>
         volatile int _pendingOpenImageCount;
+
+        /// <summary>
+        /// The point where a <see cref="Control.MouseDown"/> event took place that may be the start
+        /// of a drag/drop operation.
+        /// </summary>
+        Point? _dragDropMouseDownPoint;
+
+        /// <summary>
+        /// Indicates that a selection change on mouse down has been temporarily suppressed. This is
+        /// to allow drag events to be started without clearing multi-row selection.
+        /// </summary>
+        bool _suppressedSelectionChange;
+
+        /// <summary>
+        /// The <see cref="DataGridViewRow"/>s that were last selected. Use to override selection
+        /// changes in certain <see cref="Control.MouseDown"/> events.
+        /// </summary>
+        DataGridViewRow[] _lastSelectedRows;
+
+        /// <summary>
+        /// Indicates if the instance in currently in admin mode.
+        /// </summary>
+        bool _inAdminMode;
+
+        /// <summary>
+        /// Indicates whether the option to enable selected file names to be copied as text is
+        /// enabled.
+        /// </summary>
+        bool? _copyFileNamesEnabled;
+
+        /// <summary>
+        /// Indicates whether the option to enable selected files to be copied as files is enabled.
+        /// </summary>
+        bool? _copyFilesEnabled;
+
+        /// <summary>
+        /// Indicates whether the option to enable selected files as well as associated data files
+        /// to be copied as files is enabled.
+        /// </summary>
+        bool? _copyFilesAndDataEnabled;
 
         /// <summary>
         /// Indicates if the host is in design mode or not.
@@ -553,7 +609,11 @@ namespace Extract.FileActionManager.Utilities
         /// Generates the displayed file list based on the <see cref="FileSelector"/>'s current
         /// settings.
         /// </summary>
-        public void GenerateFileList()
+        /// <param name="preserveFlags"><see langword="true"/> if the state of the flag column of
+        /// files should be maintained after the refresh; <see langword="false"/> if the flag value
+        /// should be reset for all rows after the reset.</param>
+        [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Flags")]
+        public void GenerateFileList(bool preserveFlags)
         {
             try
             {
@@ -567,6 +627,17 @@ namespace Extract.FileActionManager.Utilities
 
                 UpdateFileSelectionSummary();
 
+                // [DotNetRCAndUtils:1095]
+                // If specified, preserve any flags so that they are not cleared when the file list
+                // is refreshed.
+                string[] flaggedFileNames = preserveFlags
+                    ? _fileListDataGridView.Rows
+                        .OfType<DataGridViewRow>()
+                        .Where(row => row.Cells[_FILE_LIST_FLAG_COLUMN_INDEX].Value != null)
+                        .Select(row => row.GetFileData().FileName)
+                        .ToArray()
+                    : null;
+
                 _fileListDataGridView.Rows.Clear();
 
                 // If generating a new file list, the previous search results don't apply anymore.
@@ -579,12 +650,33 @@ namespace Extract.FileActionManager.Utilities
                     " ORDER BY [FAMFile].[ID]");
 
                 // Run the query on a background thread so the UI remains responsive as rows are loaded.
-                StartBackgroundOperation(() => RunDatabaseQuery(query, _queryCanceler.Token));
+                StartBackgroundOperation(() =>
+                    RunDatabaseQuery(query, flaggedFileNames, _queryCanceler.Token));
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35792");
             }
+        }
+
+        /// <summary>
+        /// Sets whether this instance should be in admin mode based on the specified
+        /// <see paramref="fileProcessingDB"/>'s <see cref="T:IFileProcessingDB.LoggedInAsAdmin"/>
+        /// state.
+        /// </summary>
+        /// <param name="fileProcessingDB">The <see cref="IFileProcessingDB"/> to use to
+        /// determine the current log-on mode.</param>
+        [CLSCompliant(false)]
+        public void SetLogOnMode(IFileProcessingDB fileProcessingDB)
+        {
+            try 
+	        {
+                InAdminMode = (fileProcessingDB != null && fileProcessingDB.LoggedInAsAdmin);
+	        }
+	        catch (Exception ex)
+	        {
+		        throw ex.AsExtract("ELI36048");
+	        }
         }
 
         /// <summary>
@@ -606,12 +698,15 @@ namespace Extract.FileActionManager.Utilities
 
                 var newContextMenuStrip = new ContextMenuStrip();
 
-                // Populate context menu options for all enabled items from the database's AppLaunch
-                // table.
+                // Populate context menu options for all enabled items available with the current
+                // log-on mode from the database's AppLaunch table.
                 queryResults = FileProcessingDB.GetResultsForQuery(
                     "SELECT [AppName], [ApplicationPath], [Arguments], [AllowMultipleFiles], " +
                         "[SupportsErrorHandling], [Blocking] " +
-                    "FROM [LaunchApp] WHERE [Enabled] = 1 ORDER BY [AppName]");
+                    "FROM [LaunchApp] WHERE [Enabled] = 1 " +
+                    (InAdminMode ? "" : "AND [AdminOnly] = 0 ") +
+                    "ORDER BY [AppName]");
+
                 while (!queryResults.EOF)
                 {
                     // Create an AppLaunchItem instance representing the settings of this item.
@@ -638,6 +733,38 @@ namespace Extract.FileActionManager.Utilities
                     newContextMenuStrip.Items.Add(menuItem);
 
                     queryResults.MoveNext();
+                }
+
+                // Add feature menu options
+                var featureMenuItems = new List<ToolStripItem>();
+
+                if (CopyFileNamesEnabled)
+                {
+                    featureMenuItems.Add(_copyFileNamesMenuItem);
+                    _copyFileNamesMenuItem.Click += HandleCopyFileNames;
+                    _copyFileNamesMenuItem.ShortcutKeyDisplayString = "Ctrl + C";
+                }
+
+                if (CopyFilesEnabled)
+                {
+                    featureMenuItems.Add(_copyFilesMenuItem);
+                    _copyFilesMenuItem.Click += HandleCopyFiles;
+                }
+
+                if (CopyFilesAndDataEnabled)
+                {
+                    featureMenuItems.Add(_copyFilesAndDataMenuItem);
+                    _copyFilesAndDataMenuItem.Click += HandleCopyFilesAndData;
+                }
+
+                if (featureMenuItems.Count > 0)
+                {
+                    if (newContextMenuStrip.Items.Count > 0)
+                    {
+                        newContextMenuStrip.Items.Add(new ToolStripSeparator());
+                    }
+
+                    newContextMenuStrip.Items.AddRange(featureMenuItems.ToArray());
                 }
 
                 // Add set/clear flag menu options
@@ -732,7 +859,7 @@ namespace Extract.FileActionManager.Utilities
                 ResetSearch();
 
                 InitializeContextMenu();
-                GenerateFileList();
+                GenerateFileList(false);
             }
             catch (Exception ex)
             {
@@ -1031,7 +1158,7 @@ namespace Extract.FileActionManager.Utilities
                     "SELECT [Filename] FROM [FAMFile]"))
                 {
                     ClearSearchResults();
-                    GenerateFileList();
+                    GenerateFileList(false);
                 }
             }
             catch (Exception ex)
@@ -1050,7 +1177,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                GenerateFileList();
+                GenerateFileList(true);
             }
             catch (Exception ex)
             {
@@ -1239,6 +1366,252 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Handles the <see cref="Control.KeyDown"/> event of the
+        /// <see cref="_fileListDataGridView"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.KeyEventArgs"/> instance containing
+        /// the event data.</param>
+        void HandleFileListDataGridView_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            try
+            {
+                if (e.Modifiers == Keys.Control && e.KeyCode == Keys.C)
+                {
+                    if (CopyFileNamesEnabled)
+                    {
+                        CopySelectedFileNames();
+                        e.Handled = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36052");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataGridView.SelectionChanged"/> event of the
+        /// <see cref="_fileListDataGridView"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleFileListDataGridView_SelectionChanged(object sender, System.EventArgs e)
+        {
+            try
+            {
+                // Keep track of each selection change that occurs when the left mouse button is not
+                // down so that selection changes on MouseDown can be "suppressed" in some cases by
+                // restoring the previous selection.
+                if (!MouseButtons.HasFlag(MouseButtons.Left))
+                {
+                    _lastSelectedRows = _fileListDataGridView.SelectedRows
+                        .OfType<DataGridViewRow>()
+                        .ToArray();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36053");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.MouseDown "/> event of the
+        /// <see cref="_fileListDataGridView"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleFileListDataGridView_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            try
+            {
+                if (e.Button.HasFlag(MouseButtons.Left))
+                {
+                    System.Windows.Forms.DataGridView.HitTestInfo hit =
+                            _fileListDataGridView.HitTest(e.X, e.Y);
+                    
+                    // If a table row was clicked
+                    if (hit.RowIndex >= 0)
+                    {
+                        // If the clicked row is already selected and shift or control keys are not
+                        // pressed, suppress the MouseDown event until the mouse button is released
+                        // to maintain the current selection for any potential drag and drop
+                        // operation.
+                        if (_lastSelectedRows != null &&
+                            _fileListDataGridView.Rows[hit.RowIndex].Selected == true &&
+                            !ModifierKeys.HasFlag(Keys.Shift) && !ModifierKeys.HasFlag(Keys.Control))
+                        {
+                            _suppressedSelectionChange = true;
+
+                            // Invoke selection of the rows in _lastSelectedRows on the message
+                            // queue so that immediately after clearing the last selection, it gets
+                            // restored (transparent to user).
+                            _fileListDataGridView.SafeBeginInvoke("ELI36054", () =>
+                            {
+                                foreach (var row in _lastSelectedRows)
+                                {
+                                    row.Selected = true;
+                                }
+                            });
+                        }
+
+                        // Keep track of the mouse-down point for use in determining whether to
+                        // start drag/drop operations.
+                        _dragDropMouseDownPoint = e.Location;
+                        return;
+                    }
+                }
+
+                // If a row was not clicked, _tableMouseDownPoint can be reset as a drag an drop
+                // operation cannot be started from this location.
+                _dragDropMouseDownPoint = null;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36055");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.MouseUp"/> event of the
+        /// <see cref="_fileListDataGridView"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleFileListDataGridView_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            try
+            {
+                // If the left mouse button is being released.
+                if (e.Button.HasFlag(MouseButtons.Left))
+                {
+                    _dragDropMouseDownPoint = null;
+
+                    // If selection change had been suppressed on the corresponding MouseDown, apply
+                    // the selection change that would have occured now.
+                    if (_suppressedSelectionChange)
+                    {
+                        _suppressedSelectionChange = false;
+
+                        System.Windows.Forms.DataGridView.HitTestInfo hit =
+                            _fileListDataGridView.HitTest(e.X, e.Y);
+
+                        if (hit.RowIndex >= 0)
+                        {
+                            _fileListDataGridView.ClearSelection();
+                            _fileListDataGridView.Rows[hit.RowIndex].Selected = true;
+                        }
+                    }
+
+                    // Keep track of the current selection so that selection changes on the next
+                    // MouseDown can be suppressed if necessary.
+                    _lastSelectedRows = _fileListDataGridView.SelectedRows
+                        .OfType<DataGridViewRow>()
+                        .ToArray();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36056");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.MouseMove"/> event of the
+        /// <see cref="_fileListDataGridView"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleFileListDataGridView_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            try
+            {
+                // If the left mouse button is down and the mouse is in a different location than when
+                // the mouse button was pressed begin a drag and drop operation.
+                if (_dragDropMouseDownPoint != null && e.Location != _dragDropMouseDownPoint.Value)
+                {
+                    _dragDropMouseDownPoint = null;
+                    DataObject dragData = new DataObject();
+                    StringCollection fileCollection = new StringCollection();
+                    fileCollection.AddRange(GetSelectedFileNames());
+                    dragData.SetFileDropList(fileCollection);
+
+                    DoDragDrop(dragData, DragDropEffects.Copy);
+
+                    // If a drag/drop event was started, go ahead and consider the current selection
+                    // permanent and eligible to use in the next selection "suppression".
+                    _lastSelectedRows = _fileListDataGridView.SelectedRows
+                        .OfType<DataGridViewRow>()
+                        .ToArray();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36057");
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that the option to copy selected file names as text was invoked.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleCopyFileNames(object sender, EventArgs e)
+        {
+            try
+            {
+                CopySelectedFileNames();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36049");
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that the option to copy selected files as files was invoked.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleCopyFiles(object sender, EventArgs e)
+        {
+            try
+            {
+                CopySelectedFiles();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36050");
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that the option to copy selected files and associated data to the
+        /// clipboard as files was invoked.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleCopyFilesAndData(object sender, EventArgs e)
+        {
+            try
+            {
+                CopySelectedFilesAndData();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36051");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="ToolStripItem.Click"/> event of the
         /// <see cref="_setFlagMenuItem"/>.
         /// </summary>
@@ -1328,14 +1701,21 @@ namespace Extract.FileActionManager.Utilities
                 Point mouseLocation = _fileListDataGridView.PointToClient(MousePosition);
                 System.Windows.Forms.DataGridView.HitTestInfo hit =
                     _fileListDataGridView.HitTest(mouseLocation.X, mouseLocation.Y);
-
-                // If the row under the right-click is not selected, do not present the menu to
-                // avoid confusion as to whether any action taken should be applied to a
-                // non-selected row beneath the context menu origin.
-                if (hit.RowIndex < 0 || !_fileListDataGridView.Rows[hit.RowIndex].Selected)
+                
+                // If the click was not on a row, don't present the context menu.
+                if (hit.RowIndex < 0)
                 {
-                    e.Cancel = true;
                     return;
+                }
+
+                // [DotNetRCAndUtils:1093]
+                // If the row under the right-click is not selected, clear the current selection
+                // and select the clicked row instead.
+                DataGridViewRow clickedRow = _fileListDataGridView.Rows[hit.RowIndex];
+                if (!clickedRow.Selected)
+                {
+                    _fileListDataGridView.ClearSelection();
+                    _fileListDataGridView.CurrentCell = clickedRow.Cells[0];
                 }
 
                 int selectionCount = _fileListDataGridView.SelectedRows.Count;
@@ -1397,13 +1777,9 @@ namespace Extract.FileActionManager.Utilities
                 // to keep track of for which files an action was taken.
                 SetRowFlag(_fileListDataGridView.SelectedRows.OfType<DataGridViewRow>(), true);
 
-                // Convert the selected files to an array so that the file list is a snapshot that
-                // won't change after processing has begun.
-                var fileNames = _fileListDataGridView.SelectedRows
-                    .OfType<DataGridViewRow>()
-                    .OrderBy(row => row.Index)
-                    .Select(row => row.GetFileData().FileName)
-                    .ToArray();
+                // Get the selected files to an array so that the file list is a snapshot that won't
+                // change after processing has begun.
+                string[] fileNames = GetSelectedFileNames();
 
                 if (appLaunchItem.Blocking)
                 {
@@ -1550,6 +1926,40 @@ namespace Extract.FileActionManager.Utilities
 
         /// <summary>
         /// Handles the <see cref="Control.Click"/> event of the
+        /// <see cref="_adminModeToolStripMenuItem"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleAdminModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Repeatedly show login dialog until successful or the user cancels.
+            while (true)
+            {
+                bool cancelled;
+                if (FileProcessingDB.ShowLogin(true, out cancelled))
+                {
+                    // The admin login credentials were validated.
+                    InAdminMode = true;
+
+                    // Checks schema
+                    Show();
+                    InitializeContextMenu();
+                    break;
+                }
+                else if (cancelled)
+                {
+                    break;
+                }
+                else
+                {
+                    UtilityMethods.ShowMessageBox("The specified credentials were not valid.",
+                        "Login failed", true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the
         /// <see cref="_logoutToolStripMenuItem"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -1565,15 +1975,18 @@ namespace Extract.FileActionManager.Utilities
                     // Hide the main form until the user connects to a database.
                     Hide();
 
-                    if (FileProcessingDB.ShowSelectDB("Select database", false, true))
+                    if (FileProcessingDB.ShowSelectDB("Select database", false, false))
                     {
+                        // After switching database, user will need to re-enter admin mode.
+                        InAdminMode = false;
+
                         // Checks schema
                         FileProcessingDB.ResetDBConnection();
                         ResetFileSelectionSettings();
                         ResetSearch();
                         Show();
                         InitializeContextMenu();
-                        GenerateFileList();
+                        GenerateFileList(false);
                     }
                     else
                     {
@@ -1633,6 +2046,89 @@ namespace Extract.FileActionManager.Utilities
         #region Private Members
 
         /// <summary>
+        /// Gets or sets a value indicating whether this instance in currently running in admin mode.
+        /// </summary>
+        /// <value><see langword="true"/> if this instance in currently running in admin mode;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        bool InAdminMode
+        {
+            get
+            {
+                return _inAdminMode;
+            }
+
+            set
+            {
+                if (value != _inAdminMode)
+                {
+                    _inAdminMode = value;
+                    _adminModeToolStripMenuItem.Enabled = !_inAdminMode;
+                    UpdateApplicationTitle();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the option to enable selected file names to be copied
+        /// as text is enabled.
+        /// </summary>
+        /// <value><see langword="true"/> if the option to enable selected file names to be copied
+        /// as text is enabled; otherwise, <see langword="false"/>.</value>
+        bool CopyFileNamesEnabled
+        {
+            get
+            {
+                if (!_copyFileNamesEnabled.HasValue)
+                {
+                    _copyFileNamesEnabled = true;
+                }
+
+                return _copyFileNamesEnabled.Value;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the option to enable selected files to be copied as
+        /// files is enabled.
+        /// </summary>
+        /// <value><see langword="true"/> if the option to enable selected files to be copied as
+        /// files is enabled; otherwise, <see langword="false"/>.
+        /// </value>
+        bool CopyFilesEnabled
+        {
+            get
+            {
+                if (!_copyFilesEnabled.HasValue)
+                {
+                    _copyFilesEnabled = true;
+                }
+
+                return _copyFilesEnabled.Value;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the option to enable selected files as well as
+        /// associated data files to be copied as files is enabled.
+        /// </summary>
+        /// <value><see langword="true"/> if the option to enable selected files as well as
+        /// associated data files to be copied as files is enabled.; otherwise,
+        /// <see langword="false"/>.</value>
+        bool CopyFilesAndDataEnabled
+        {
+            get
+            {
+                if (!_copyFilesAndDataEnabled.HasValue)
+                {
+                    _copyFilesAndDataEnabled = true;
+                }
+
+                return _copyFilesAndDataEnabled.Value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether a background database query or file search is
         /// currently active.
         /// </summary>
@@ -1666,6 +2162,55 @@ namespace Extract.FileActionManager.Utilities
                 UpdateStatusLabel();
                 Update();
             }
+        }
+
+        /// <summary>
+        /// Gets the currently selected file names.
+        /// </summary>
+        /// <returns>The currently selected file names.</returns>
+        string[] GetSelectedFileNames()
+        {
+            var fileNames = _fileListDataGridView.SelectedRows
+                .OfType<DataGridViewRow>()
+                .OrderBy(row => row.Index)
+                .Select(row => row.GetFileData().FileName)
+                .ToArray();
+            return fileNames;
+        }
+
+        /// <summary>
+        /// Copies the selected file names to the clipboard as text.
+        /// </summary>
+        void CopySelectedFileNames()
+        {
+            Clipboard.SetText(string.Join("\r\n", GetSelectedFileNames()));
+        }
+
+        /// <summary>
+        /// Copies the selected files to the clipboard as files.
+        /// </summary>
+        void CopySelectedFiles()
+        {
+            StringCollection fileCollection = new StringCollection();
+            fileCollection.AddRange(GetSelectedFileNames());
+            Clipboard.SetFileDropList(fileCollection);
+        }
+
+        /// <summary>
+        /// Copies the selected files and associated data to the clipboard as files.
+        /// </summary>
+        void CopySelectedFilesAndData()
+        {
+            StringCollection fileCollection = new StringCollection();
+            fileCollection.AddRange(GetSelectedFileNames()
+                .SelectMany(fileName => new[] { fileName }
+                    .Concat(Directory.EnumerateFiles(
+                        Path.GetDirectoryName(fileName),
+                        Path.GetFileName(fileName) + "*")
+                        .Where(dataFileName =>
+                            dataFileName.StartsWith(fileName + ".", StringComparison.OrdinalIgnoreCase))))
+                .ToArray());
+            Clipboard.SetFileDropList(fileCollection);
         }
 
         /// <summary>
@@ -1732,9 +2277,11 @@ namespace Extract.FileActionManager.Utilities
         /// Runs a database query to build the file list on a background thread.
         /// </summary>
         /// <param name="query">The query used to generate the file list.</param>
+        /// <param name="flaggedFileNames">If not <see langword="null"/>, indicates files for which
+        /// should be marked as flagged in the newly popluated list.</param>
         /// <param name="cancelToken">The <see cref="CancellationToken"/> that should be checked
         /// after adding each file to the list to ensure the operation hasn't been canceled.</param>
-        void RunDatabaseQuery(string query, CancellationToken cancelToken)
+        void RunDatabaseQuery(string query, string[] flaggedFileNames, CancellationToken cancelToken)
         {
             Recordset queryResults = null;
 
@@ -1758,6 +2305,11 @@ namespace Extract.FileActionManager.Utilities
                         string fileName = (string)queryResults.Fields["FileName"].Value;
                         var fileData = new FAMFileData(fileName);
 
+                        Bitmap flagValue =
+                            (flaggedFileNames != null && flaggedFileNames.Contains(fileName))
+                            ? Resources.FlagImage
+                            : null;
+
                         string directory = Path.GetDirectoryName(fileName);
                         fileName = Path.GetFileName(fileName);
                         int pageCount = (int)queryResults.Fields["Pages"].Value;
@@ -1765,7 +2317,7 @@ namespace Extract.FileActionManager.Utilities
                         // Invoke the new row to be added on the UI thread.
                         this.SafeBeginInvoke("ELI35725", () =>
                         {
-                            _fileListDataGridView.Rows.Add(null, fileName, pageCount, fileData,
+                            _fileListDataGridView.Rows.Add(flagValue, fileName, pageCount, fileData,
                                 directory);
                         });
                     }
@@ -2706,17 +3258,29 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         void UpdateFileSelectionSummary()
         {
-            Text = _APPLICATION_TITLE;
-            if (FileProcessingDB.IsConnected)
-            {
-                Text = DatabaseName + " on " + DatabaseServer + " - " + Text;
-            }
+            UpdateApplicationTitle();
 
             string summaryText = FileSelector.GetSummaryString();
             _selectFilesSummaryLabel.Text = "Listing ";
             _selectFilesSummaryLabel.Text +=
                 summaryText.Substring(0, 1).ToLower(CultureInfo.CurrentCulture);
             _selectFilesSummaryLabel.Text += summaryText.Substring(1);
+        }
+
+        /// <summary>
+        /// Updates the application title.
+        /// </summary>
+        void UpdateApplicationTitle()
+        {
+            Text = _APPLICATION_TITLE;
+            if (FileProcessingDB.IsConnected)
+            {
+                Text = DatabaseName + " on " + DatabaseServer + " - " + Text;
+                if (InAdminMode)
+                {
+                    Text += " (Admin mode)";
+                }
+            }
         }
 
         #endregion Private Members

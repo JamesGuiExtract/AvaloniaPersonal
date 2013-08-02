@@ -237,6 +237,7 @@ public:
 		VARIANT_BOOL bRequireAdminLogin, VARIANT_BOOL* pbConnected);
 	STDMETHOD(GetFileCount)(VARIANT_BOOL bUseOracleSyntax, LONGLONG* pnFileCount);
 	STDMETHOD(get_CurrentConnectionString)(BSTR* pbstrConnectionString);
+	STDMETHOD(get_LoggedInAsAdmin)(VARIANT_BOOL* pbLoggedInAsAdmin);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -443,6 +444,9 @@ private:
 
 	// Indicates whether the user was denied permission to run the fast file count query.
 	bool m_bDeniedFastCountPermission;
+
+	// Indicates whether the user has entered valide admin credentials.
+	bool m_bLoggedInAsAdmin;
 
 	//-------------------------------------------------------------------------------------------------
 	// Methods

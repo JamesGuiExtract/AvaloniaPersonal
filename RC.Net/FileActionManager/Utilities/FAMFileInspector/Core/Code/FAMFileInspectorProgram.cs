@@ -45,7 +45,7 @@ namespace Extract.FileActionManager.Utilities
                     try
                     {
                         if (famFileInspectorForm.FileProcessingDB.ShowSelectDB(
-                                        "Select database", false, true))
+                                        "Select database", false, false))
                         {
                             // Checks schema
                             famFileInspectorForm.FileProcessingDB.ResetDBConnection();
