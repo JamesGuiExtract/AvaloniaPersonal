@@ -331,45 +331,41 @@
 	&lt;RegEx Name='Flag' Pattern='^A$'&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt;
 	&lt;!--Allow for value of #, #-#, &gt;#, &lt;#, &gt;=#, &lt;=#, &gt;/=#, &lt;=#, POS, NEG--&gt;
 	&lt;Expression Name='RawValue'&gt;
-		(&lt;Attribute&gt;../Value&lt;/Attribute&gt; like 'POS') ? '&amp;gt;=0'
-		: (&lt;Attribute&gt;../Value&lt;/Attribute&gt; like 'NEG') ? '-1'
-		: &lt;RegEx Pattern='[\s&amp;gt;&amp;lt;/=]{0,3}-?[\d\.]+'&gt;&lt;Attribute&gt;../Value&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
+		(&lt;Attribute&gt;../Value&lt;/Attribute&gt; matches '(?i)\bPOS(ITIVE)?\b') ? '&amp;gt;=0'
+		: (&lt;Attribute&gt;../Value&lt;/Attribute&gt; matches '(?i)\bNEG(ATIVE)?\b') ? '-1'
+		: &lt;RegEx Pattern='[\s&amp;gt;&amp;lt;/=]{0,3}-?[\d\.\-\s]+'&gt;&lt;Attribute&gt;../Value&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','').Replace(' ','')
 	&lt;/Expression&gt;
-	&lt;!--ValueOperator is non-empty if the value is expressed in terms of a range. Example &gt;30--&gt;
-	&lt;Expression Name='ValueOperator'&gt;
-		&lt;RawValue/&gt;.Contains('&amp;gt;') 
-		? '&amp;gt;'
-		: &lt;RawValue/&gt;.Contains('&amp;lt;') 
-			? '&amp;lt;'
-			: ''
+	&lt;Expression Name='Value'&gt;&lt;RegEx Pattern='-?[\d\.,]+'&gt;&lt;RawValue/&gt;&lt;/RegEx&gt;.Replace(',', '')&lt;/Expression&gt;
+	&lt;!--If the value is a range, extract the low and/or high limit of the range--&gt;
+	&lt;Expression Name='TempLowValue'&gt;
+		&lt;RegEx Pattern='([\d\.,]+(?=\s?-\s?\d+))|((?&amp;lt;=&amp;gt;\s?/?=?\s?)[\d\.,]+)'&gt;&lt;RawValue/&gt;&lt;/RegEx&gt;.Replace(',','')
 	&lt;/Expression&gt;
-	&lt;!--After extracting the ValueOperator, convert the value into a single number--&gt;
-	&lt;Expression Name='Value'&gt;&lt;RawValue/&gt;.Replace('&amp;gt;', '').Replace('&amp;lt;', '').Replace('=', '').Replace(' ', '')&lt;/Expression&gt;
+	&lt;Expression Name='ValueHasRangeMin'&gt;(&lt;TempLowValue/&gt; != '')&lt;/Expression&gt;
+	&lt;Expression Name='LowValue'&gt; (&lt;TempLowValue/&gt; == '') ? &lt;Value/&gt; : &lt;TempLowValue/&gt;&lt;/Expression&gt;
+	&lt;Expression Name='TempHighValue'&gt;
+		&lt;RegEx Pattern='((?&amp;lt;=\d+\s?-\s?)[\d\.,]+)|((?&amp;lt;=&amp;lt;\s?/?=?\s?)[\d\.,]+)'&gt;&lt;RawValue/&gt;&lt;/RegEx&gt;.Replace(',','')
+	&lt;/Expression&gt;
+	&lt;Expression Name='ValueHasRangeMax'&gt;(&lt;TempHighValue/&gt; != '')&lt;/Expression&gt;
+	&lt;Expression Name='HighValue'&gt; (&lt;TempHighValue/&gt; == '') ? &lt;Value/&gt; : &lt;TempHighValue/&gt;&lt;/Expression&gt;
 	&lt;Expression Name='Range'&gt;
-		(&lt;Attribute&gt;../Range&lt;/Attribute&gt; like 'POS') ? '&amp;gt;=0'
-		: (&lt;Attribute&gt;../Range&lt;/Attribute&gt; like 'NEG') ? '&amp;lt;0'
+		(&lt;Attribute&gt;../Range&lt;/Attribute&gt; matches '(?i)\bPOS(ITIVE)?\b') ? '&amp;gt;=0'
+		: (&lt;Attribute&gt;../Range&lt;/Attribute&gt; matches '(?i)\bNEG(ATIVE)?\b') ? '&amp;lt;0'
 		: &lt;Attribute&gt;../Range&lt;/Attribute&gt;
 	&lt;/Expression&gt;
 	&lt;!--Allow for range of #, #-#, &gt;#, &lt;#, &gt;=#, &lt;=#, &gt;/=#, &lt;=#, POS, NEG--&gt;
 	&lt;Expression Name='MinValueOrEqual' &gt;
-		(&lt;ValueOperator/&gt; == '&amp;gt;')
-			&lt;!--If the value is a "greater than" range, allow the number to be greater then or equal to the min value.--&gt;
-			? &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;(\s?/?=)?\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
-			&lt;!--Otherwise, --&gt;
-			: &lt;RegEx Pattern='(^\s*([\d\.,]+)\s*$)|([\d\.,]+(?=\s?-\s?\d+))|((?&amp;lt;=&amp;gt;\s?/?=\s?)[\d\.,]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
+		&lt;RegEx Pattern='(^\s*([\d\.,]+)\s*$)|([\d\.,]+(?=\s?-\s?\d+))|((?&amp;lt;=&amp;gt;\s?/?=\s?)[\d\.,]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
 	&lt;/Expression&gt;
 	&lt;Expression Name='MinValueNotEqual'&gt;
-		string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;)
+		(&lt;MinValueOrEqual/&gt; == '')
 			? &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
 			: ''
 	&lt;/Expression&gt;
 	&lt;Expression Name='HasMinValue'&gt;
-		!string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) or !string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;)
+		(&lt;MinValueOrEqual/&gt; != '') or (&lt;MinValueNotEqual/&gt; != '')
 	&lt;/Expression&gt;
 	&lt;Expression Name='MaxValueOrEqual' &gt;
-		(&lt;ValueOperator/&gt; == '&amp;lt;')
-			? &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;(\s?/?=)?\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
-			: &lt;RegEx Pattern='(^\s*([\d\.,]+)\s*$)|((?&amp;lt;=\d+\s?-\s?)[\d\.,]+)|((?&amp;lt;=&amp;lt;\s?/?=\s?)[\d\.,]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
+		&lt;RegEx Pattern='(^\s*([\d\.,]+)\s*$)|((?&amp;lt;=\d+\s?-\s?)[\d\.,]+)|((?&amp;lt;=&amp;lt;\s?/?=\s?)[\d\.,]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
 	&lt;/Expression&gt;
 	&lt;Expression Name='MaxValueNotEqual'&gt;
 		string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;)
@@ -381,25 +377,33 @@
 	&lt;/Expression&gt;
 	&lt;Expression Name='InRangeLow'&gt;
 		&lt;!--If we don't have a value and a range minimum to compare consider low range boundary validated--&gt;
-		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
-		(!&lt;HasMinValue Type='bool'/&gt;) or
+		(&lt;LowValue/&gt; == '') or (!&lt;HasMinValue/&gt;) or
 		&lt;!--Compare using &gt;= check if appropriate--&gt;
-		(string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) == false and
-			(&lt;Value Type='double'/&gt; &amp;gt;= &lt;MinValueOrEqual Type='double'/&gt;)) or
+		(&lt;MinValueOrEqual/&gt; != '' and
+			(&lt;LowValue Type='double'/&gt; &amp;gt;= &lt;MinValueOrEqual Type='double'/&gt;)) or
 		&lt;!--Compare using &gt; check if appropriate--&gt;
-		(string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;) == false and
-			(&lt;Value Type='double'/&gt; &amp;gt; &lt;MinValueNotEqual Type='double'/&gt;))
+		(&lt;MinValueNotEqual/&gt; != '' and
+			(&lt;LowValue Type='double'/&gt; &amp;gt; &lt;MinValueNotEqual Type='double'/&gt;))
+	&lt;/Expression&gt;
+	&lt;Expression Name='AmbiguousLowValue'&gt;
+		&lt;HasMinValue/&gt; and (&lt;ValueHasRangeMin/&gt; or &lt;ValueHasRangeMax/&gt;) and 
+			(((&lt;MinValueOrEqual/&gt; != '') and (!&lt;ValueHasRangeMax/&gt; or &lt;HighValue/&gt; &amp;gt;= &lt;MinValueOrEqual/&gt;) and (!&lt;ValueHasRangeMin/&gt; or &lt;LowValue/&gt; &amp;lt; &lt;MinValueOrEqual/&gt;)) or
+			 ((&lt;MinValueNotEqual/&gt; != '') and (!&lt;ValueHasRangeMax/&gt; or &lt;HighValue/&gt; &amp;gt; &lt;MinValueNotEqual/&gt;) and (!&lt;ValueHasRangeMin/&gt; or &lt;LowValue/&gt; &amp;lt;= &lt;MinValueNotEqual/&gt;)))
 	&lt;/Expression&gt;
 	&lt;Expression Name='InRangeHigh'&gt;
 		&lt;!--If we don't have a value and a range maximum to compare consider high range boundary validated--&gt;
-		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
-		(!&lt;HasMaxValue Type='bool'/&gt;) or
+		(&lt;HighValue/&gt; == '') or  (!&lt;HasMaxValue/&gt;) or
 		&lt;!--Compare using &gt;= check if appropriate--&gt;
-		(string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) == false and
-			(&lt;Value Type='double'/&gt; &amp;lt;= &lt;MaxValueOrEqual Type='double'/&gt;)) or
+		(&lt;MaxValueOrEqual/&gt; != '' and
+			(&lt;HighValue Type='double'/&gt; &amp;lt;= &lt;MaxValueOrEqual Type='double'/&gt;)) or
 		&lt;!--Compare using &gt; check if appropriate--&gt;
-		(string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;) == false and
-			(&lt;Value Type='double'/&gt; &amp;lt; &lt;MaxValueNotEqual Type='double'/&gt;))
+		(&lt;MaxValueNotEqual/&gt; != '' and
+			(&lt;HighValue Type='double'/&gt; &amp;lt; &lt;MaxValueNotEqual Type='double'/&gt;))
+	&lt;/Expression&gt;
+	&lt;Expression Name='AmbiguousHighValue'&gt;
+		&lt;HasMaxValue/&gt; and (&lt;ValueHasRangeMin/&gt; or &lt;ValueHasRangeMax/&gt;) and 
+			(((&lt;MaxValueOrEqual/&gt; != '') and (!&lt;ValueHasRangeMin/&gt; or &lt;LowValue/&gt; &amp;lt;= &lt;MaxValueOrEqual/&gt;) and (!&lt;ValueHasRangeMax/&gt; or &lt;HighValue/&gt; &amp;gt; &lt;MaxValueOrEqual/&gt;)) or
+			 ((&lt;MaxValueNotEqual/&gt; != '') and (!&lt;ValueHasRangeMin/&gt; or &lt;LowValue/&gt; &amp;lt; &lt;MaxValueNotEqual/&gt;) and (!&lt;ValueHasRangeMax/&gt; or &lt;HighValue/&gt; &amp;gt;= &lt;MaxValueNotEqual/&gt;)))
 	&lt;/Expression&gt;
 &lt;/Declarations&gt;
 &lt;Query&gt;[BLANK]&lt;SQL&gt;SELECT * FROM Flag ORDER BY Flag&lt;/SQL&gt;&lt;/Query&gt;
@@ -407,6 +411,7 @@
 	&lt;Expression&gt;
 		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or
 		(!&lt;HasMinValue Type='bool'/&gt; and !&lt;HasMaxValue Type='bool'/&gt;) or
+		(&lt;AmbiguousLowValue/&gt; or &lt;AmbiguousHighValue/&gt;) or
 		string.IsNullOrWhitespace(&lt;Flag/&gt;) == (&lt;InRangeHigh/&gt; and &lt;InRangeLow/&gt;)
 	&lt;/Expression&gt;
 &lt;/Query&gt;</value>
