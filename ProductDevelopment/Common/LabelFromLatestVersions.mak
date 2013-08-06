@@ -1,5 +1,3 @@
-InitBuildEnv.bat
-
 !include LatestComponentVersions.mak
 
 Label="$(PROGRAM_ROOT)\SourceGear\Vault Client\vault" LABEL -server $(VAULT_SERVER) -repository "Extract"
