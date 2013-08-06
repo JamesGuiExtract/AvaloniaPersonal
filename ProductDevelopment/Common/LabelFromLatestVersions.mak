@@ -1,11 +1,6 @@
+InitBuildEnv.bat
 
 !include LatestComponentVersions.mak
-
-IF "$(PROCESSOR_ARCHITECTURE)"=="AMD64" (
-	SET PROGRAM_ROOT=$(ProgramFiles(x86))
-) ELSE (
-	SET PROGRAM_ROOT=$(ProgramFiles)
-)
 
 Label="$(PROGRAM_ROOT)\SourceGear\Vault Client\vault" LABEL -server $(VAULT_SERVER) -repository "Extract"
 
