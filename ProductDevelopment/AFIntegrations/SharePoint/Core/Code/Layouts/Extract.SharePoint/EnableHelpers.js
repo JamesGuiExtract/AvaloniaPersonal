@@ -132,13 +132,8 @@ function processSelected(columnName) {
             }
         }
         catch (e) {
-            inProgress = false;
             alert("Error: " + e.message);
-            if (waitProcessSelected != null) {
-                waitProcessSelected.close();
-                waitPrcoessSelected = null;
-            };
-            window.location.href = window.location.href;
+            cleanupAfterProcessing();
         }
     }
 }
@@ -174,19 +169,17 @@ function processSingleItemSuccess(sender, args, listItem) {
             context.executeQueryAsync(Function.createDelegate(this, singleSuccess), Function.createDelegate(this, processSingleFailed));
         }
         else {
-            numberProcessed++;
-
             alert("Unable to change status of file if status is \"" + currStatus.toString() + "\"");
-            
-            // if not processing thru another async query need to update count and if done cleanup
-            if (numberProcessed >= numberToProcess) {
-                cleanupAfterProcessing();
-            }
         }
     }
     catch (e) {
-        alert("Error: " + e.message);
+        alert("Unable to update the " + statusColumnName + " column.");
     }
+    numberProcessed++;
+    if (numberProcessed >= numberToProcess) {
+        cleanupAfterProcessing();
+    }
+
 }
 
 // function for successful running 2nd async query

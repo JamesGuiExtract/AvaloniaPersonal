@@ -190,9 +190,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx" />
-    <Content Include="ADMIN\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="ADMIN\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx" />
     <Content Include="Layouts\Extract.SharePoint.Redaction\VerifyNow.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
