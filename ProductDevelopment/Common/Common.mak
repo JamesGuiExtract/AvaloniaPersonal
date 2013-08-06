@@ -26,7 +26,7 @@ BuildRootDirectory=$(BUILD_DRIVE)$(BUILD_DIRECTORY)\$(ProductRootDirName)
 EngineeringRootDirectory=$(BuildRootDirectory)\Engineering
 ReusableComponentsRootDirectory=$(EngineeringRootDirectory)\ReusableComponents
 CommonDirectory=$(EngineeringRootDirectory)\ProductDevelopment\Common
-FXCopAppDirectory=C:\Program Files\Microsoft FxCop 1.36
+FXCopAppDirectory=$(FX_COP)
 MergeModuleDir=C:\InstallShield 2010 Projects\MergeModules
 StrongNameKeyDir=P:\StrongNameKey
 RCNETDir=$(EngineeringRootDirectory)\RC.Net
@@ -40,7 +40,7 @@ VcppLibDirs=$(VCPP_DIR)\ATLMFC\LIB;$(VCPP_DIR)\LIB;$(WINDOWS_SDK)\lib
 IncludeDirs=$(VcppIncludeDirs)
 LibDirs=$(VcppLibDirs)
 
-Label="C:\Program Files\SourceGear\Vault Client\vault" LABEL -server $(VAULT_SERVER) -repository "Extract"
+Label="$(VAULT_DIR)\vault" LABEL -server $(VAULT_SERVER) -repository "Extract"
 DelOptions=/Q /F /S
 ISCompile=Compile
 ISCompileOptions=-I"$(INSTALL_SHIELD_DIR)\Include"

@@ -1,7 +1,13 @@
 
 !include LatestComponentVersions.mak
 
-Label="C:\Program Files\SourceGear\Vault Client\vault" LABEL -server $(VAULT_SERVER) -repository "Extract"
+IF "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
+	SET PROGRAM_ROOT=%ProgramFiles(x86)%
+) ELSE (
+	SET PROGRAM_ROOT=%ProgramFiles%
+)
+
+Label="$(PROGRAM_ROOT)\SourceGear\Vault Client\vault" LABEL -server $(VAULT_SERVER) -repository "Extract"
 
 LabelCommonDir:
 	$(Label) "$$$(Branch)/Engineering/ProductDevelopment" "$(FlexIndexVersion)"
