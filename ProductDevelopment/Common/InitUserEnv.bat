@@ -1,8 +1,10 @@
 ECHO OFF
 
-IF "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
-	SET PROGRAM_ROOT=%ProgramFiles(x86)%
-) ELSE (
+REM This set before the check since the "(" in the environment variable cause problems in an IF statement
+REM when it they are expanded
+SET PROGRAM_ROOT=%ProgramFiles(x86)%
+
+IF NOT "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 	SET PROGRAM_ROOT=%ProgramFiles%
 )
 
