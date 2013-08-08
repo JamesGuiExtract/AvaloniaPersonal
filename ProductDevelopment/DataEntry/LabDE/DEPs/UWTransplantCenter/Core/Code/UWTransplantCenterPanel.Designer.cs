@@ -511,7 +511,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._patientRecordNum.Size = new System.Drawing.Size(186, 20);
             this._patientRecordNum.TabIndex = 5;
             this._patientRecordNum.ValidationErrorMessage = "MRN missing or invalid";
-            this._patientRecordNum.ValidationPattern = "^\\d{8,10}\\s?$";
+            this._patientRecordNum.ValidationPattern = "^\\d{7,8}\\s?$";
             // 
             // _patientMRLabel
             // 
