@@ -572,7 +572,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._testDetailsGroupBox.Controls.Add(this._testComponentTable);
             this._testDetailsGroupBox.Location = new System.Drawing.Point(0, 328);
             this._testDetailsGroupBox.Name = "_testDetailsGroupBox";
-            this._testDetailsGroupBox.Size = new System.Drawing.Size(593, 487);
+            this._testDetailsGroupBox.Size = new System.Drawing.Size(593, 566);
             this._testDetailsGroupBox.TabIndex = 9;
             this._testDetailsGroupBox.TabStop = false;
             this._testDetailsGroupBox.Text = "Selected Order Details";
@@ -598,7 +598,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._componentComment.ParentDataEntryControl = this._testComponentTable;
             this._componentComment.RemoveNewLineChars = false;
             this._componentComment.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._componentComment.Size = new System.Drawing.Size(569, 47);
+            this._componentComment.Size = new System.Drawing.Size(569, 128);
             this._componentComment.TabIndex = 8;
             this._componentComment.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
             this._componentComment.ValidationErrorMessage = "";
@@ -808,7 +808,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         highlightColor2};
             this.MinimumSize = new System.Drawing.Size(500, 0);
             this.Name = "UWTransplantCenterPanel";
-            this.Size = new System.Drawing.Size(593, 818);
+            this.Size = new System.Drawing.Size(593, 898);
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).EndInit();
             this._patientInfoGroupBox.ResumeLayout(false);
