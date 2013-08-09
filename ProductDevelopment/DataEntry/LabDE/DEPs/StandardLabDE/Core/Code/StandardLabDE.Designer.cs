@@ -29,6 +29,19 @@ namespace Extract.DataEntry.DEP.StandardLabDE
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StandardLabDEPanel));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
             Extract.DataEntry.HighlightColor highlightColor1 = new Extract.DataEntry.HighlightColor();
             Extract.DataEntry.HighlightColor highlightColor2 = new Extract.DataEntry.HighlightColor();
             this._labNameLabel = new System.Windows.Forms.Label();
@@ -76,6 +89,8 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._physicianMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._physicianCode = new Extract.DataEntry.DataEntryTableColumn();
             this._testDetailsGroupBox = new System.Windows.Forms.GroupBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this._componentCommentTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._orderNumberLabel = new System.Windows.Forms.Label();
             this._orderNumber = new Extract.DataEntry.DataEntryTextBox();
             this._testCommentLabel = new System.Windows.Forms.Label();
@@ -93,8 +108,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._filename = new Extract.DataEntry.DataEntryTextBox();
             this._copyButton = new Extract.DataEntry.DataEntryCopyButton();
             this._messageSequenceNumberFile = new Extract.DataEntry.DataEntryTextBox();
-            this._componentCommentTextBox = new Extract.DataEntry.DataEntryTextBox();
-            this.label2 = new System.Windows.Forms.Label();
             this._componentName = new Extract.DataEntry.DataEntryTableColumn();
             this._testCode = new Extract.DataEntry.DataEntryTableColumn();
             this._componentValue = new Extract.DataEntry.DataEntryTableColumn();
@@ -158,6 +171,14 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._laboratoryTestTable.AttributeName = "Test";
             this._laboratoryTestTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._laboratoryTestTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._laboratoryTestTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this._laboratoryTestTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._laboratoryTestTable.ColumnHintsEnabled = false;
             this._laboratoryTestTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -166,6 +187,14 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._testID,
             this._componentDate,
             this._laboratoryTestTime});
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._laboratoryTestTable.DefaultCellStyle = dataGridViewCellStyle2;
             this._laboratoryTestTable.Location = new System.Drawing.Point(6, 19);
             this._laboratoryTestTable.Name = "_laboratoryTestTable";
             this._laboratoryTestTable.ParentDataEntryControl = null;
@@ -267,6 +296,14 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._testComponentTable.AttributeName = "Component";
             this._testComponentTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._testComponentTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._testComponentTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this._testComponentTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._testComponentTable.ColumnHintsEnabled = false;
             this._testComponentTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -277,6 +314,14 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._componentRefRange,
             this._componentFlag,
             this._componentOriginalName});
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._testComponentTable.DefaultCellStyle = dataGridViewCellStyle4;
             this._testComponentTable.Location = new System.Drawing.Point(6, 163);
             this._testComponentTable.Name = "_testComponentTable";
             this._testComponentTable.ParentDataEntryControl = this._laboratoryTestTable;
@@ -339,6 +384,14 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._epicPatientNameTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._epicPatientNameTable.ClearClipboardOnPaste = true;
             this._epicPatientNameTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._epicPatientNameTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             this._epicPatientNameTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._epicPatientNameTable.ColumnHintsEnabled = false;
             this._epicPatientNameTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -346,6 +399,14 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._epicPatientMiddleNameColumn,
             this._epicPatientLastNameColumn,
             this._epicPatientSuffixColumn});
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._epicPatientNameTable.DefaultCellStyle = dataGridViewCellStyle6;
             this._epicPatientNameTable.Location = new System.Drawing.Point(7, 101);
             this._epicPatientNameTable.MinimumNumberOfRows = 1;
             this._epicPatientNameTable.Name = "_epicPatientNameTable";
@@ -404,6 +465,14 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._patientNameTable.AttributeName = "Name";
             this._patientNameTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._patientNameTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._patientNameTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
             this._patientNameTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._patientNameTable.ColumnHintsEnabled = false;
             this._patientNameTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -411,6 +480,14 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._patientMiddleNameColumn,
             this._patientLastNameColumn,
             this._patientSuffixColumn});
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._patientNameTable.DefaultCellStyle = dataGridViewCellStyle8;
             this._patientNameTable.Location = new System.Drawing.Point(7, 34);
             this._patientNameTable.MinimumNumberOfRows = 1;
             this._patientNameTable.Name = "_patientNameTable";
@@ -572,6 +649,14 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._orderingPhysicianTable.AttributeName = "OrderingPhysicianName";
             this._orderingPhysicianTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._orderingPhysicianTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._orderingPhysicianTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle9;
             this._orderingPhysicianTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._orderingPhysicianTable.ColumnHintsEnabled = false;
             this._orderingPhysicianTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -580,6 +665,14 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._orderingPhysicianMiddleName,
             this._orderingPhysicianCodeColumn});
             this._orderingPhysicianTable.CompatibleAttributeNames.Add("OtherPhysicianName");
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._orderingPhysicianTable.DefaultCellStyle = dataGridViewCellStyle10;
             this._orderingPhysicianTable.Location = new System.Drawing.Point(6, 32);
             this._orderingPhysicianTable.MinimumNumberOfRows = 1;
             this._orderingPhysicianTable.Name = "_orderingPhysicianTable";
@@ -647,6 +740,14 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._physicianTable.AttributeName = "OtherPhysicianName";
             this._physicianTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._physicianTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
+            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._physicianTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle11;
             this._physicianTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._physicianTable.ColumnHintsEnabled = false;
             this._physicianTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -655,10 +756,26 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._physicianMiddleNameColumn,
             this._physicianCode});
             this._physicianTable.CompatibleAttributeNames.Add("OrderingPhysicianName");
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle12.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._physicianTable.DefaultCellStyle = dataGridViewCellStyle12;
             this._physicianTable.Location = new System.Drawing.Point(6, 96);
             this._physicianTable.Name = "_physicianTable";
             this._physicianTable.ParentDataEntryControl = this._physicianInfoGroupBox;
             this._physicianTable.RowFormattingRuleFile = "Rules\\Swiping\\name.rsd.etf";
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle13.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._physicianTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle13;
             this._physicianTable.RowSwipingEnabled = true;
             this._physicianTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._physicianTable.Size = new System.Drawing.Size(581, 90);
@@ -738,6 +855,32 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._testDetailsGroupBox.TabIndex = 8;
             this._testDetailsGroupBox.TabStop = false;
             this._testDetailsGroupBox.Text = "Selected Order Details";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(6, 454);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(51, 13);
+            this.label2.TabIndex = 11;
+            this.label2.Text = "Comment";
+            // 
+            // _componentCommentTextBox
+            // 
+            this._componentCommentTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._componentCommentTextBox.AttributeName = "Comment";
+            this._componentCommentTextBox.AutoUpdateQuery = "";
+            this._componentCommentTextBox.Location = new System.Drawing.Point(3, 470);
+            this._componentCommentTextBox.Multiline = true;
+            this._componentCommentTextBox.Name = "_componentCommentTextBox";
+            this._componentCommentTextBox.ParentDataEntryControl = this._testComponentTable;
+            this._componentCommentTextBox.RemoveNewLineChars = false;
+            this._componentCommentTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._componentCommentTextBox.Size = new System.Drawing.Size(569, 47);
+            this._componentCommentTextBox.TabIndex = 8;
+            this._componentCommentTextBox.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
+            this._componentCommentTextBox.ValidationErrorMessage = "";
             // 
             // _orderNumberLabel
             // 
@@ -958,32 +1101,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._messageSequenceNumberFile.TabIndex = 0;
             this._messageSequenceNumberFile.ValidationErrorMessage = "Invalid value";
             this._messageSequenceNumberFile.Visible = false;
-            // 
-            // _componentCommentTextBox
-            // 
-            this._componentCommentTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._componentCommentTextBox.AttributeName = "Comment";
-            this._componentCommentTextBox.AutoUpdateQuery = "";
-            this._componentCommentTextBox.Location = new System.Drawing.Point(3, 470);
-            this._componentCommentTextBox.Multiline = true;
-            this._componentCommentTextBox.Name = "_componentCommentTextBox";
-            this._componentCommentTextBox.ParentDataEntryControl = this._testComponentTable;
-            this._componentCommentTextBox.RemoveNewLineChars = false;
-            this._componentCommentTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._componentCommentTextBox.Size = new System.Drawing.Size(569, 47);
-            this._componentCommentTextBox.TabIndex = 8;
-            this._componentCommentTextBox.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
-            this._componentCommentTextBox.ValidationErrorMessage = "";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 454);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(51, 13);
-            this.label2.TabIndex = 11;
-            this.label2.Text = "Comment";
             // 
             // _componentName
             // 

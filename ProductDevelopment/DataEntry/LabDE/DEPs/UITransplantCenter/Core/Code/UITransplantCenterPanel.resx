@@ -320,85 +320,114 @@
   </metadata>
   <data name="_testFlagColumn.ValidationQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
-	&lt;Attribute Name='Flag'&gt;.&lt;/Attribute&gt;
-	&lt;!--Allow for value of #, #-#, &gt;#, &lt;#, &gt;=#, &lt;=#, &gt;/=#, &lt;=#--&gt;
-	&lt;Expression Name='RawValue'&gt;
-		&lt;RegEx Pattern='[\s&amp;gt;&amp;lt;/=]{0,3}[\d\.]+'&gt;&lt;Attribute &gt;../Value&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
+	&lt;RegEx Name='Flag' Pattern='^(H|HH|L|LL|A|AA)$'&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt;
+	&lt;!--Attempt to parse a numerical expression from the value field--&gt;
+	&lt;!--Allow for value of #, #-#, &gt;#, &lt;#, &gt;=#, &lt;=#, &gt;/=#, &lt;/=#, POS, NEG, POSITIVE, NEGATIVE--&gt;
+	&lt;Expression Name='Value'&gt;
+		(&lt;Attribute&gt;../Value&lt;/Attribute&gt; matches '(?i)\bPOS(ITIVE)?\b') ? '&amp;gt;0'
+		: (&lt;Attribute&gt;../Value&lt;/Attribute&gt; matches '(?i)\bNEG(ATIVE)?\b') ? '0'
+		: &lt;RegEx Pattern='^[\s&amp;gt;&amp;lt;/=]{0,5}?((?&amp;lt;=\d),\d{3}(?!=\d)|\d|\.|\-|\s)+$'&gt;&lt;Attribute&gt;../Value&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','').Replace(' ','')
 	&lt;/Expression&gt;
-	&lt;!--ValueOperator is non-empty if the value is expressed in terms of a range. Example &gt;30--&gt;
-	&lt;Expression Name='ValueOperator'&gt;
-		&lt;RawValue/&gt;.Contains('&amp;gt;') 
-		? '&amp;gt;'
-		: &lt;RawValue/&gt;.Contains('&amp;lt;') 
-			? '&amp;lt;'
-			: ''
+	&lt;!--Attempt to parse the minimum value as a value that may be equal--&gt;
+	&lt;RegEx Name='TempValueMin' Pattern='(^([\d\.]+)$)|([\d\.]+(?=-\d+))|((?&amp;lt;=&amp;gt;/?=)[\d\.]+)'&gt;&lt;Value/&gt;&lt;/RegEx&gt;
+	&lt;!--Bias 0 = must be less than, Bias 1 = may be equal to, Bias 2 = must be greater than--&gt;
+	&lt;Expression Name='ValueMinBias'&gt;(&lt;TempValueMin/&gt; == '') ? 2 : 1&lt;/Expression&gt;
+	&lt;!--If not parsed as a value that may be equal, parse as one that must be greater--&gt;
+	&lt;Expression Name='ValueMin'&gt;(&lt;TempValueMin/&gt; != '')
+		? &lt;TempValueMin/&gt;
+		: &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;)[\d\.]+'&gt;&lt;Value/&gt;&lt;/RegEx&gt;
 	&lt;/Expression&gt;
-	&lt;!--After extracting the ValueOperator, convert the value into a single number--&gt;
-	&lt;Expression Name='Value'&gt;&lt;RawValue/&gt;.Replace('&amp;gt;', '').Replace('&amp;lt;', '').Replace(' ', '')&lt;/Expression&gt;
-	&lt;Attribute Name='Range'&gt;../Range&lt;/Attribute&gt;
-	&lt;!--Allow for range of #, #-#, &gt;#, &lt;#, &gt;=#, &lt;=#, &gt;/=#, &lt;=#--&gt;
-	&lt;Expression Name='MinValueOrEqual' &gt;
-		(&lt;ValueOperator/&gt; == '&amp;gt;')
-			&lt;!--If the value is a "greater than" range, allow the number to be greater then or equal to the min value.--&gt;
-			? &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;(\s?/?=)?\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
-			&lt;!--Otherwise, --&gt;
-			: &lt;RegEx Pattern='(^\s*([\d\.,]+)\s*$)|([\d\.,]+(?=\s?-\s?\d+))|((?&amp;lt;=&amp;gt;\s?/?=\s?)[\d\.,]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
+	&lt;!--Attempt to parse the maximum value as a value that may be equal--&gt;
+	&lt;RegEx Name='TempValueMax' Pattern='(^([\d\.]+)$)|((?&amp;lt;=\d+-)[\d\.]+)|((?&amp;lt;=&amp;lt;/?=)[\d\.]+)'&gt;&lt;Value/&gt;&lt;/RegEx&gt;
+	&lt;!--Bias 0 = must be less than, Bias 1 = may be equal to, Bias 2 = must be greater than--&gt;
+	&lt;Expression Name='ValueMaxBias'&gt;(&lt;TempValueMax/&gt; == '') ? 0 : 1&lt;/Expression&gt;
+	&lt;!--If not parsed as a value that may be equal, parse as one that must be less--&gt;
+	&lt;Expression Name='ValueMax'&gt;(&lt;TempValueMax/&gt; != '')
+		? &lt;TempValueMax/&gt;
+		: &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;)[\d\.]+'&gt;&lt;Value/&gt;&lt;/RegEx&gt;
 	&lt;/Expression&gt;
-	&lt;Expression Name='MinValueNotEqual'&gt;
-		string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;)
-			? &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
-			: ''
+	&lt;!--Attempt to parse a numerical expression from the value field--&gt;
+	&lt;!--Allow for value of #, #-#, &gt;#, &lt;#, &gt;=#, &lt;=#, &gt;/=#, &lt;/=#, POS, NEG, POSITIVE, NEGATIVE--&gt;
+	&lt;Expression Name='Range'&gt;
+		(&lt;Attribute&gt;../Range&lt;/Attribute&gt; matches '(?i)\bPOS(ITIVE)?\b') ? '&amp;gt;0'
+		: (&lt;Attribute&gt;../Range&lt;/Attribute&gt; matches '(?i)\bNEG(ATIVE)?\b') ? '0'
+		: &lt;RegEx Pattern='^[\s&amp;gt;&amp;lt;/=]{0,5}?((?&amp;lt;=\d),\d{3}(?!=\d)|\d|\.|\-|\s)+$'&gt;&lt;Attribute&gt;../Range&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','').Replace(' ','')
 	&lt;/Expression&gt;
-	&lt;Expression Name='MaxValueOrEqual' &gt;
-		(&lt;ValueOperator/&gt; == '&amp;lt;')
-			? &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;(\s?/?=)?\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
-			: &lt;RegEx Pattern='(^\s*([\d\.,]+)\s*$)|((?&amp;lt;=\d+\s?-\s?)[\d\.,]+)|((?&amp;lt;=&amp;lt;\s?/?=\s?)[\d\.,]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','').Replace('/','')
+	&lt;!--Attempt to parse the minimum range as a value that may be equal--&gt;
+	&lt;RegEx Name='TempRangeMin' Pattern='(^([\d\.]+)$)|([\d\.]+(?=-\d+))|((?&amp;lt;=&amp;gt;/?=)[\d\.]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
+	&lt;!--Bias 0 = must be less than, Bias 1 = may be equal to, Bias 2 = must be greater than--&gt;
+	&lt;Expression Name='RangeMinBias'&gt;(&lt;TempRangeMin/&gt; == '') ? 2 : 1&lt;/Expression&gt;
+	&lt;!--If not parsed as a value that may be equal, parse as one that must be greater--&gt;
+	&lt;Expression Name='RangeMin'&gt;(&lt;TempRangeMin/&gt; != '')
+		? &lt;TempRangeMin/&gt;
+		: &lt;RegEx Pattern='(?&amp;lt;=&amp;gt;)[\d\.]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
 	&lt;/Expression&gt;
-	&lt;Expression Name='MaxValueNotEqual'&gt;
-		string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;)
-			? &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;\s?)[\d\.,]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;.Replace(',','')
-			: ''
+	&lt;!--Attempt to parse the maximum value as a value that may be equal--&gt;
+	&lt;RegEx Name='TempRangeMax' Pattern='(^([\d\.]+)$)|((?&amp;lt;=\d+-)[\d\.]+)|((?&amp;lt;=&amp;lt;/?=)[\d\.]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
+	&lt;!--Bias 0 = must be less than, Bias 1 = may be equal to, Bias 2 = must be greater than--&gt;
+	&lt;Expression Name='RangeMaxBias'&gt;(&lt;TempRangeMax/&gt; == '') ? 0 : 1&lt;/Expression&gt;
+	&lt;!--If not parsed as a value that may be equal, parse as one that must be less--&gt;
+	&lt;Expression Name='RangeMax'&gt;(&lt;TempRangeMax/&gt; != '')
+		? &lt;TempRangeMax/&gt;
+		: &lt;RegEx Pattern='(?&amp;lt;=&amp;lt;)[\d\.]+'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
 	&lt;/Expression&gt;
-	&lt;RegEx Name='LowFlag' Pattern='^L|^A$'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
-	&lt;RegEx Name='HighFlag' Pattern='^H|^A$'&gt;&lt;Flag/&gt;&lt;/RegEx&gt;
-	&lt;Expression Name='HasProperLowFlag'&gt;
+	&lt;Expression Name='InRangeLow'&gt;
 		&lt;!--If we don't have a value and a range minimum to compare consider low range boundary validated--&gt;
-		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
-		(string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;)) or
-		&lt;!--Compare using &gt;= check if appropriate--&gt;
-		(string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) == false and
-		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;gt;= &lt;MinValueOrEqual Type='double'/&gt;))) or
-		&lt;!--Compare using &gt; check if appropriate--&gt;
-		(string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;) == false and
-		(string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;gt; &lt;MinValueNotEqual Type='double'/&gt;)))
+		(&lt;RangeMin/&gt; == '') or ((&lt;ValueMin/&gt; != '') and
+			&lt;!--Compare using &gt;= check if appropriate--&gt;
+			(((&lt;ValueMinBias/&gt; &amp;gt;= &lt;RangeMinBias/&gt;) and (&lt;ValueMin Type='double'/&gt; &amp;gt;= &lt;RangeMin Type='double'/&gt;)) or 
+			&lt;!--Compare using &gt; check if appropriate--&gt;
+			((&lt;ValueMinBias/&gt; &amp;lt; &lt;RangeMinBias/&gt;) and (&lt;ValueMin Type='double'/&gt; &amp;gt; &lt;RangeMin Type='double'/&gt;))))
 	&lt;/Expression&gt;
-	&lt;Expression Name='HasProperHighFlag'&gt;
+	&lt;Expression Name='AmbiguousValueMin'&gt;
+		&lt;!--Ambiguous if value spans the range minimum--&gt;
+		(&lt;RangeMin/&gt; != '') and
+		&lt;!--Value min must not be set or be less than range min--&gt;
+		((&lt;ValueMin/&gt; == '') or 
+			(((&lt;ValueMinBias/&gt; &amp;gt;= &lt;RangeMinBias/&gt;) and (&lt;ValueMin/&gt; &amp;lt; &lt;RangeMin/&gt;)) or
+			 ((&lt;ValueMinBias/&gt; &amp;lt; &lt;RangeMinBias/&gt;) and (&lt;ValueMin/&gt; &amp;lt;= &lt;RangeMin/&gt;))))
+			 and
+		&lt;!--Value max must not be set or be within the range min--&gt;
+		((&lt;ValueMax/&gt; == '') or 
+			(((&lt;ValueMaxBias/&gt; &amp;gt;= &lt;RangeMinBias/&gt;) and (&lt;ValueMax/&gt; &amp;gt;= &lt;RangeMin/&gt;)) or
+			 ((&lt;ValueMaxBias/&gt; &amp;lt; &lt;RangeMinBias/&gt;) and (&lt;ValueMax/&gt; &amp;gt; &lt;RangeMin/&gt;))))	
+	&lt;/Expression&gt;
+	&lt;Expression Name='InRangeHigh'&gt;
 		&lt;!--If we don't have a value and a range maximum to compare consider high range boundary validated--&gt;
-		string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
-		(string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;)) or
-		&lt;!--Compare using &gt;= check if appropriate--&gt;
-		(string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) == false and
-		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;lt;= &lt;MaxValueOrEqual Type='double'/&gt;))) or
-		&lt;!--Compare using &gt; check if appropriate--&gt;
-		(string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;) == false and
-		(string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) == (&lt;Value Type='double'/&gt; &amp;lt; &lt;MaxValueNotEqual Type='double'/&gt;)))
+		(&lt;RangeMax/&gt; == '') or ((&lt;ValueMax/&gt; != '') and
+			&lt;!--Compare using &gt;= check if appropriate--&gt;
+			(((&lt;ValueMaxBias/&gt; &amp;gt; &lt;RangeMaxBias/&gt;) and (&lt;ValueMax Type='double'/&gt; &amp;lt; &lt;RangeMax Type='double'/&gt;)) or 
+			&lt;!--Compare using &gt; check if appropriate--&gt;
+			((&lt;ValueMaxBias/&gt; &amp;lt;= &lt;RangeMaxBias/&gt;) and (&lt;ValueMax Type='double'/&gt; &amp;lt;= &lt;RangeMax Type='double'/&gt;))))
 	&lt;/Expression&gt;
-	&lt;!--Prevents use of inappropriate flag when the range has only a min or a max value--&gt;
-	&lt;Expression Name='SpecialRangeCheck'&gt;
-		&lt;!--Consider the special range check validated if there is no value or range specified--&gt;
-		(string.IsNullOrWhiteSpace(&lt;Value/&gt;) or 
-		 (string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;) and
-		  string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) and string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;))) or
-		  &lt;!--Disallow a low flag if no range minimum is specified--&gt;
-		((string.IsNullOrWhiteSpace(&lt;LowFlag/&gt;) or !string.IsNullOrWhiteSpace(&lt;MinValueOrEqual/&gt;) or !string.IsNullOrWhiteSpace(&lt;MinValueNotEqual/&gt;)) and
-		  &lt;!--Disallow a high flag if no range maximum is specified--&gt;
-		 (string.IsNullOrWhiteSpace(&lt;HighFlag/&gt;) or !string.IsNullOrWhiteSpace(&lt;MaxValueOrEqual/&gt;) or !string.IsNullOrWhiteSpace(&lt;MaxValueNotEqual/&gt;)))
+	&lt;Expression Name='AmbiguousValueMax'&gt;
+		&lt;!--Ambiguous if value spans the range maximum--&gt;
+		(&lt;RangeMax/&gt; != '') and
+		&lt;!--Value min must not be set or be within than range max--&gt;
+		((&lt;ValueMin/&gt; == '') or 
+			(((&lt;ValueMinBias/&gt; &amp;gt; &lt;RangeMaxBias/&gt;) and (&lt;ValueMin/&gt; &amp;lt; &lt;RangeMax/&gt;)) or
+			 ((&lt;ValueMinBias/&gt; &amp;lt;= &lt;RangeMaxBias/&gt;) and (&lt;ValueMin/&gt; &amp;lt;= &lt;RangeMax/&gt;))))
+			 and
+		&lt;!--Value max must not be set or be greater than range max--&gt;
+		((&lt;ValueMax/&gt; == '') or 
+			(((&lt;ValueMaxBias/&gt; &amp;gt; &lt;RangeMaxBias/&gt;) and (&lt;ValueMax/&gt; &amp;gt;= &lt;RangeMax/&gt;)) or
+			 ((&lt;ValueMaxBias/&gt; &amp;lt;= &lt;RangeMaxBias/&gt;) and (&lt;ValueMax/&gt; &amp;gt; &lt;RangeMax/&gt;))))
 	&lt;/Expression&gt;
 &lt;/Declarations&gt;
 &lt;Query&gt;[BLANK]&lt;SQL&gt;SELECT * FROM Flag ORDER BY Flag&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query ValidValue='True' ValidationListType='ValidationListOnly' ValidationWarning='1'&gt;
 	&lt;Expression&gt;
-		&lt;HasProperLowFlag Type='bool'/&gt; and &lt;HasProperHighFlag Type='bool'/&gt; and &lt;SpecialRangeCheck Type='bool'/&gt;
+		&lt;!--Don't warn if either the value or range could not be interpreted as a mathematical expression--&gt;
+		((&lt;ValueMin/&gt; == '') and (&lt;ValueMax/&gt; == '')) or
+		((&lt;RangeMin/&gt; == '') and (&lt;RangeMax/&gt; == '')) or
+		&lt;!--Don't warn if the flag is missing and the value is within the range min and max either explicitly or ambiguously--&gt;
+		((&lt;Flag/&gt; == '') and (&lt;InRangeLow Type='bool'/&gt; or &lt;AmbiguousValueMin/&gt;) and (&lt;InRangeHigh Type='bool'/&gt; or &lt;AmbiguousValueMax/&gt;)) or
+		&lt;!--Don't warn if the flag is low and the value is outside range min or is ambiguously within the range min--&gt;
+		((&lt;Flag/&gt;.StartsWith('L')) and (!&lt;InRangeLow Type='bool'/&gt; or &lt;AmbiguousValueMin/&gt;)) or 
+		&lt;!--Don't warn if the flag is high and the value is outside range max or is ambiguously within the range max--&gt;
+		((&lt;Flag/&gt;.StartsWith('H')) and (!&lt;InRangeHigh Type='bool'/&gt; or &lt;AmbiguousValueMax/&gt;)) or 
+		&lt;!--Don't warn if the flag is abnormal and the value outside of either the range min or max or is ambiguously within either--&gt;
+		((&lt;Flag/&gt;.StartsWith('A')) and (!&lt;InRangeLow Type='bool'/&gt; or &lt;AmbiguousValueMin/&gt; or !&lt;InRangeHigh Type='bool'/&gt; or &lt;AmbiguousValueMax/&gt;))
 	&lt;/Expression&gt;
 &lt;/Query&gt;</value>
   </data>
