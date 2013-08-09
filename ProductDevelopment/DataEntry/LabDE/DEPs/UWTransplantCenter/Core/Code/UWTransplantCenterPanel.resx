@@ -334,7 +334,8 @@
 	&lt;Expression Name='Value'&gt;
 		(&lt;Attribute&gt;../Value&lt;/Attribute&gt; matches '(?i)\bPOS(ITIVE)?\b') ? '&amp;gt;0'
 		: (&lt;Attribute&gt;../Value&lt;/Attribute&gt; matches '(?i)\bNEG(ATIVE)?\b') ? '0'
-		: &lt;RegEx Pattern='^[\s&amp;gt;&amp;lt;/=]{0,5}?((?&amp;lt;=\d),\d{3}(?!=\d)|\d|\.|\-|\s)+$'&gt;&lt;Attribute&gt;../Value&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','').Replace(' ','')
+		: &lt;RegEx Pattern='^[\s&amp;gt;&amp;lt;/=]{0,5}?((?&amp;lt;=\d),\d{3}(?!=\d)|\d|\.|\s)+$|^\s*(((?&amp;lt;=\d),\d{3}(?!=\d)|\d|\.|\s)+-?){2}\s*$'&gt;
+			&lt;Attribute&gt;../Value&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','').Replace(' ','')
 	&lt;/Expression&gt;
 	&lt;!--Attempt to parse the minimum value as a value that may be equal--&gt;
 	&lt;RegEx Name='TempValueMin' Pattern='(^([\d\.]+)$)|([\d\.]+(?=-\d+))|((?&amp;lt;=&amp;gt;/?=)[\d\.]+)'&gt;&lt;Value/&gt;&lt;/RegEx&gt;
@@ -359,7 +360,8 @@
 	&lt;Expression Name='Range'&gt;
 		(&lt;Attribute&gt;../Range&lt;/Attribute&gt; matches '(?i)\bPOS(ITIVE)?\b') ? '&amp;gt;0'
 		: (&lt;Attribute&gt;../Range&lt;/Attribute&gt; matches '(?i)\bNEG(ATIVE)?\b') ? '0'
-		: &lt;RegEx Pattern='^[\s&amp;gt;&amp;lt;/=]{0,5}?((?&amp;lt;=\d),\d{3}(?!=\d)|\d|\.|\-|\s)+$'&gt;&lt;Attribute&gt;../Range&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','').Replace(' ','')
+		: &lt;RegEx Pattern='^[\s&amp;gt;&amp;lt;/=]{0,5}?((?&amp;lt;=\d),\d{3}(?!=\d)|\d|\.|\s)+$|^\s*(((?&amp;lt;=\d),\d{3}(?!=\d)|\d|\.|\s)+-?){2}\s*$'&gt;
+			&lt;Attribute&gt;../Range&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(',','').Replace(' ','')
 	&lt;/Expression&gt;
 	&lt;!--Attempt to parse the minimum range as a value that may be equal--&gt;
 	&lt;RegEx Name='TempRangeMin' Pattern='(^([\d\.]+)$)|([\d\.]+(?=-\d+))|((?&amp;lt;=&amp;gt;/?=)[\d\.]+)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;
