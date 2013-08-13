@@ -83,7 +83,7 @@ namespace Extract.ReportViewer
         /// <summary>
         /// The <see cref="ReportDocument"/> for this <see cref="ExtractReport"/> instance.
         /// </summary>
-        ReportDocument _report = new ReportDocument();
+        ReportDocument _report;
 
         /// <summary>
         /// The collection of parameters for this report.
@@ -133,6 +133,7 @@ namespace Extract.ReportViewer
                 ExtractException.Assert("ELI23717", "File does not exist!",
                     File.Exists(fileName), "Report File Name", fileName);
 
+                _report = new ReportDocument();
                 _serverName = serverName;
                 _databaseName = databaseName;
                 _reportFileName = fileName;
@@ -148,9 +149,65 @@ namespace Extract.ReportViewer
             }
         }
 
+        /// <overloads>Initializes a new <see cref="ExtractReport"/> class.</overloads>
+        /// <summary>
+        /// Initializes a new <see cref="ExtractReport"/> class without a database.
+        /// <para><b>Note</b></para>
+        /// If this constructor is used, <see cref="Initialize"/> must be called against the target
+        /// database before the report can be run.
+        /// </summary>
+        /// <param name="fileName">The name of the report file to load.</param>
+        public ExtractReport(string fileName)
+        {
+            try
+            {
+                // Ensure that a valid file has been specified
+                ExtractException.Assert("ELI23716", "File name cannot be null or empty!",
+                    !string.IsNullOrEmpty(fileName));
+                ExtractException.Assert("ELI23717", "File does not exist!",
+                    File.Exists(fileName), "Report File Name", fileName);
+
+                _reportFileName = fileName;
+
+                ParseParameterXml(false);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36066");
+            }
+        }
+
         #endregion Constructors
 
         #region Properties
+
+        /// <summary>
+        /// Gets the database server name.
+        /// </summary>
+        /// <value>
+        /// The database server name.
+        /// </value>
+        public string DatabaseServer
+        {
+            get
+            {
+                return _serverName;
+            }
+        }
+
+        /// <summary>
+        /// Gets the name of the database.
+        /// </summary>
+        /// <value>
+        /// The name of the database.
+        /// </value>
+        public string DatabaseName
+        {
+            get
+            {
+                return _databaseName;
+            }
+        }
 
         /// <summary>
         /// Gets the report file name.
@@ -330,6 +387,40 @@ namespace Extract.ReportViewer
         }
 
         /// <summary>
+        /// Initializes the report against the specified database.
+        /// </summary>
+        /// <param name="serverName">The server to connect to.</param>
+        /// <param name="databaseName">The database to connect to.</param>
+        /// <param name="promptForParameters">Whether to prompt the user to
+        /// enter in new values for the parameters or to use the values
+        /// stored in the XML file.</param>
+        public void Initialize(string serverName, string databaseName, bool promptForParameters)
+        {
+            try
+            {
+                if (_report == null)
+                {
+                    _report = new ReportDocument();
+                    _report.FileName = _reportFileName;
+                }
+                else
+                {
+                    _report.Refresh();
+                }
+
+                _serverName = serverName;
+                _databaseName = databaseName;
+
+                SetDatabaseConnection();
+                _canceledInitialization = !SetParameters(promptForParameters, true);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36067");
+            }
+        }
+
+        /// <summary>
         /// Refreshes the report so that it reflects up-to-date data in the database.
         /// </summary>
         public void Refresh()
@@ -381,22 +472,7 @@ namespace Extract.ReportViewer
         {
             try
             {
-                // Show the wait cursor while parsing the parameter file
-                using (Extract.Utilities.Forms.TemporaryWaitCursor waitCursor
-                    = new Extract.Utilities.Forms.TemporaryWaitCursor())
-                {
-                    // If the user had previously specified parameters for this report, start with those.
-                    if (isRefresh && !string.IsNullOrEmpty(_activeParametersXml))
-                    {
-                        ParseParameterXml(_activeParametersXml);
-                    }
-                    // Otherwise load defaults from the permanent XML file.
-                    else
-                    {
-                        // Parse the parameter file
-                        ParseParameterFile();
-                    }
-                }
+                ParseParameterXml(isRefresh);
 
                 // Check if prompting
                 if (promptForParameters)
@@ -512,6 +588,31 @@ namespace Extract.ReportViewer
                 ExtractException ee = ExtractException.AsExtractException("ELI25075", ex);
                 ee.AddDebugData("Report File Name", _reportFileName, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Parses the parameter XML.
+        /// </summary>
+        /// <param name="isRefresh"><see langword="true"/> parameters are being set for a report
+        /// refresh, <see langword="false"/> if they are being set for the inital load.</param>
+        void ParseParameterXml(bool isRefresh)
+        {
+            // Show the wait cursor while parsing the parameter file
+            using (Extract.Utilities.Forms.TemporaryWaitCursor waitCursor
+                = new Extract.Utilities.Forms.TemporaryWaitCursor())
+            {
+                // If the user had previously specified parameters for this report, start with those.
+                if (isRefresh && !string.IsNullOrEmpty(_activeParametersXml))
+                {
+                    ParseParameterXml(_activeParametersXml);
+                }
+                // Otherwise load defaults from the permanent XML file.
+                else
+                {
+                    // Parse the parameter file
+                    ParseParameterFile();
+                }
             }
         }
 
@@ -716,18 +817,32 @@ namespace Extract.ReportViewer
                     xmlReader.MoveToAttribute("Name");
                     string paramName = xmlReader.Value;
 
-                    // Move to the default attribute and store it (ensure the default
-                    // attribute exists)
-                    xmlReader.MoveToAttribute("Default");
-                    if (!xmlReader.Name.Equals("Default", StringComparison.OrdinalIgnoreCase))
+                    string defaultVal = null;
+                    object existingValue = null;
+
+                    // Check whether the parameter already has a value. If so, it will be assigned
+                    // in place of any default value.
+                    IExtractReportParameter existingParameter = null;
+                    if (ParametersCollection.TryGetValue(paramName, out existingParameter)
+                        && existingParameter.HasValueSet())
                     {
-                        ExtractException ee = new ExtractException("ELI23851",
-                            "No 'Default' attribute for the current parameter!");
-                        ee.AddDebugData("Parameter Type", paramType, false);
-                        ee.AddDebugData("Parameter Name", paramName, false);
-                        throw ee;
+                        existingValue = existingParameter.Value;
                     }
-                    string defaultVal = xmlReader.Value;
+                    else
+                    {
+                        // Move to the default attribute and store it (ensure the default
+                        // attribute exists)
+                        xmlReader.MoveToAttribute("Default");
+                        if (!xmlReader.Name.Equals("Default", StringComparison.OrdinalIgnoreCase))
+                        {
+                            ExtractException ee = new ExtractException("ELI23851",
+                                "No 'Default' attribute for the current parameter!");
+                            ee.AddDebugData("Parameter Type", paramType, false);
+                            ee.AddDebugData("Parameter Name", paramName, false);
+                            throw ee;
+                        }
+                        defaultVal = xmlReader.Value;
+                    }
 
                     try
                     {
@@ -864,8 +979,12 @@ namespace Extract.ReportViewer
                                         throw ee;
                                     }
 
+                                    // If the report has not been initialized, allow the parameter
+                                    // value to be set without verification that it is a valid value
+                                    // for now. Validity of the value will be confirmed during the
+                                    // call to Initialize.
                                     param = new ValueListParameter(paramName, values, defaultVal,
-                                        allowOtherValues);
+                                        allowOtherValues || (_report == null));
                                 }
                                 break;
 
@@ -876,6 +995,12 @@ namespace Extract.ReportViewer
                                     ee.AddDebugData("Parameter Type", xmlReader.Name, false);
                                     throw ee;
                                 }
+                        }
+
+                        // If the paramter had an existing value, set it.
+                        if (existingValue != null)
+                        {
+                            param.Value = existingValue;
                         }
 
                         // Add the parameter to the collection
@@ -901,6 +1026,13 @@ namespace Extract.ReportViewer
         /// <returns>A collection of strings.</returns>
         string[] BuildValueListFromQuery(string query)
         {
+            // If the database connection has not yet been set, we cannot load the value list.
+            if (string.IsNullOrWhiteSpace(_serverName) ||
+                string.IsNullOrWhiteSpace(_databaseName))
+            {
+                return new string[] { "[No Values Found]" };
+            }
+
             SqlConnection connection = null;
             SqlDataAdapter adapter = null;
             DataTable table = null;

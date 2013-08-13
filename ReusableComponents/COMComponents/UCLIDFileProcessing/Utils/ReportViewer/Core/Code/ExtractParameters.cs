@@ -25,10 +25,23 @@ namespace Extract.ReportViewer
     public interface IExtractReportParameter
     {
         /// <summary>
-        /// Writes the report parameter object to the <see cref="XmlWriter"/>.
+        /// Gets the name of the parameter.
         /// </summary>
-        /// <param name="writer">The <see cref="XmlWriter"/> to write the object to.</param>
-        void WriteToXml(XmlWriter writer);
+        /// <returns>The parameter name.</returns>
+        string ParameterName
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets or sets the value of the parameter.
+        /// </summary>
+        /// <value>The value of the parameter.</value>
+        object Value
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Return <see langword="true"/> if there is a current value set.
@@ -38,13 +51,19 @@ namespace Extract.ReportViewer
         bool HasValueSet();
 
         /// <summary>
-        /// Gets the name of the parameter.
+        /// Sets the value of the parameter with the <see langword="string"/>
+        /// <see paramref="value"/>.
         /// </summary>
-        /// <returns>The parameter name.</returns>
-        string ParameterName
-        {
-            get;
-        }
+        /// <param name="value">The <see langword="string"/> that specifies the new value of the
+        /// parameter. Must be a value that can be converted to the type of the current parameter.
+        /// </param>
+        void SetValueFromString(string value);
+
+        /// <summary>
+        /// Writes the report parameter object to the <see cref="XmlWriter"/>.
+        /// </summary>
+        /// <param name="writer">The <see cref="XmlWriter"/> to write the object to.</param>
+        void WriteToXml(XmlWriter writer);
     }
 
     /// <summary>
@@ -152,6 +171,35 @@ namespace Extract.ReportViewer
         #region IReportParameter Members
 
         /// <summary>
+        /// Gets the name of the parameter.
+        /// </summary>
+        /// <returns>The name of the parameter.</returns>
+        public string ParameterName
+        {
+            get
+            {
+                return _parameterName;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the value of the parameter.
+        /// </summary>
+        /// <value>The value of the parameter.</value>
+        public virtual object Value
+        {
+            get
+            {
+                return ParameterValue;
+            }
+
+            set
+            {
+                ParameterValue = (T)value;
+            }
+        }
+
+        /// <summary>
         /// Writes the <see cref="ExtractReportParameter{T}"/> to the specified
         /// <see cref="XmlWriter"/>.
         /// </summary>
@@ -172,18 +220,14 @@ namespace Extract.ReportViewer
         }
 
         /// <summary>
-        /// Gets the name of the parameter.
+        /// Sets the value of the parameter with the <see langword="string"/>
+        /// <see paramref="value"/>.
         /// </summary>
-        /// <returns>The name of the parameter.</returns>
-        public string ParameterName
-        {
-            get
-            {
-                return _parameterName;
-            }
-        }
+        /// <param name="value">The <see langword="string"/> that specifies the new value of the
+        /// parameter. Must be a value that can be converted to type <see typeref="T"/>.</param>
+        public abstract void SetValueFromString(string value);
 
-        #endregion
+        #endregion IReportParameter Members
     }
 
     /// <summary>
@@ -250,6 +294,24 @@ namespace Extract.ReportViewer
         }
 
         /// <summary>
+        /// Sets the value of the parameter with the <see langword="string"/>
+        /// <see paramref="value"/>.
+        /// </summary>
+        /// <param name="value">The <see langword="string"/> that specifies the new value of the
+        /// parameter.</param>
+        public override void SetValueFromString(string value)
+        {
+            try
+            {
+                ParameterValue = value;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36061");
+            }
+        }
+
+        /// <summary>
         /// Writes the <see cref="TextParameter"/> to the specified
         /// <see cref="XmlWriter"/>.
         /// </summary>
@@ -295,6 +357,25 @@ namespace Extract.ReportViewer
         public NumberParameter(string name, double defaultValue)
             : base(name, defaultValue)
         {
+        }
+
+        /// <summary>
+        /// Sets the value of the parameter with the <see langword="string"/>
+        /// <see paramref="value"/>.
+        /// </summary>
+        /// <param name="value">The <see langword="string"/> that specifies the new value of the
+        /// parameter. Must be a value that can be converted to type <see langword="double"/>.
+        /// </param>
+        public override void SetValueFromString(string value)
+        {
+            try
+            {
+                ParameterValue = Convert.ToDouble(value, CultureInfo.CurrentCulture);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36062");
+            }
         }
 
         /// <summary>
@@ -359,6 +440,24 @@ namespace Extract.ReportViewer
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Sets the value of the parameter with the <see langword="string"/>
+        /// <see paramref="value"/>.
+        /// </summary>
+        /// <param name="value">The <see langword="string"/> that specifies the new value of the
+        /// parameter. Must be a value that can be converted to type <see cref="DateTime"/>.</param>
+        public override void SetValueFromString(string value)
+        {
+            try
+            {
+                ParameterValue = Convert.ToDateTime(value, CultureInfo.InvariantCulture);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36063");
+            }
         }
 
         /// <summary>
@@ -1010,6 +1109,25 @@ namespace Extract.ReportViewer
         }
 
         /// <summary>
+        /// Sets the value of the parameter with the <see langword="string"/>
+        /// <see paramref="value"/>.
+        /// </summary>
+        /// <param name="value">The <see langword="string"/> that specifies the new value of the
+        /// parameter. Must be a value that can be converted to type <see cref="DateRangeValue"/>.
+        /// </param>
+        public override void SetValueFromString(string value)
+        {
+            try
+            {
+                ParameterValue = DateRangeValueTypeHelper.ParseString(value);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36064");
+            }
+        }
+
+        /// <summary>
         /// Writes the <see cref="DateRangeParameter"/> to the specified
         /// <see cref="XmlWriter"/>.
         /// </summary>
@@ -1180,6 +1298,24 @@ namespace Extract.ReportViewer
             set
             {
                 _allowOtherValues = value;
+            }
+        }
+
+        /// <summary>
+        /// Sets the value of the parameter with the <see langword="string"/>
+        /// <see paramref="value"/>.
+        /// </summary>
+        /// <param name="value">The <see langword="string"/> that specifies the new value of the
+        /// parameter.</param>
+        public override void SetValueFromString(string value)
+        {
+            try
+            {
+                ParameterValue = value;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36065");
             }
         }
 

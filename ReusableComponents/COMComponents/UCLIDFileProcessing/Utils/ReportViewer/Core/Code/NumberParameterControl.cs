@@ -249,8 +249,7 @@ namespace Extract.ReportViewer
 
                 if (_numberParameter != null)
                 {
-                    _numberParameter.ParameterValue =
-                        Convert.ToDouble(_parameterValue.Text, CultureInfo.CurrentCulture);
+                    _numberParameter.SetValueFromString(_parameterValue.Text);
                 }
             }
             catch (Exception ex)

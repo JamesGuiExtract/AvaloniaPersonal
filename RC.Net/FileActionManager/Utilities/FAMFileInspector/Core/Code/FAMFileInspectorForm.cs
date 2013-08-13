@@ -4,6 +4,7 @@ using Extract.FileActionManager.Utilities.Properties;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Licensing;
+using Extract.ReportViewer;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using Extract.Utilities.Parsers;
@@ -88,9 +89,9 @@ namespace Extract.FileActionManager.Utilities
         static readonly Color _SELECTION_BORDER_COLOR = Color.Red;
 
         /// <summary>
-        /// The maximum number of files to display at once.
+        /// The default value for <see cref="MaxFilesToDisplay"/>.
         /// </summary>
-        public static readonly int MaxFilesToDisplay = 1000;
+        public static readonly int DefaultMaxFilesToDisplay = 1000;
 
         #endregion Constants
 
@@ -283,6 +284,18 @@ namespace Extract.FileActionManager.Utilities
             new Dictionary<ToolStripMenuItem, AppLaunchItem>();
 
         /// <summary>
+        /// Maps context menu options to a DocumentName based <see cref="ExtractReport"/> for the
+        /// currently selected file.
+        /// </summary>
+        Dictionary<ToolStripMenuItem, ExtractReport> _reportMenuItems =
+            new Dictionary<ToolStripMenuItem, ExtractReport>();
+
+        /// <summary>
+        /// Context menu option that is a parent to all menu items in <see cref="_reportMenuItems"/>.
+        /// </summary>
+        ToolStripMenuItem _reportMainMenuItem = new ToolStripMenuItem("Reports");
+
+        /// <summary>
         /// Context menu option to copy selected file names as text.
         /// </summary>
         ToolStripMenuItem _copyFileNamesMenuItem = new ToolStripMenuItem("Copy filename(s)");
@@ -384,6 +397,11 @@ namespace Extract.FileActionManager.Utilities
         bool? _copyFilesAndDataEnabled;
 
         /// <summary>
+        /// Indicates whether reports are available to be run as a context menu option.
+        /// </summary>
+        bool? _reportsEnabled;
+
+        /// <summary>
         /// Indicates if the host is in design mode or not.
         /// </summary>
         readonly bool _inDesignMode;
@@ -434,6 +452,8 @@ namespace Extract.FileActionManager.Utilities
 
                 // License SandDock before creating the form.
                 SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
+
+                MaxFilesToDisplay = DefaultMaxFilesToDisplay;
 
                 FileProcessingDB = new FileProcessingDB();
                 FileSelector = new FAMFileSelector();
@@ -537,6 +557,18 @@ namespace Extract.FileActionManager.Utilities
             {
                 FileProcessingDB.DatabaseName = value;
             }
+        }
+
+        /// <summary>
+        /// Gets the maximum number of files to display at once.
+        /// </summary>
+        /// <value>
+        /// The maximum number of files to display at once.
+        /// </value>
+        public int MaxFilesToDisplay
+        {
+            get;
+            set;
         }
 
         #endregion Properties
@@ -765,6 +797,18 @@ namespace Extract.FileActionManager.Utilities
                     }
 
                     newContextMenuStrip.Items.AddRange(featureMenuItems.ToArray());
+                }
+
+                // Add report menu items.
+                if (ReportsEnabled)
+                {
+                    _reportMenuItems = CreateReportMenuItems();
+                    if (_reportMenuItems.Count > 0)
+                    {
+                        newContextMenuStrip.Items.Add(new ToolStripSeparator());
+                        _reportMainMenuItem.DropDownItems.AddRange(_reportMenuItems.Keys.ToArray());
+                        newContextMenuStrip.Items.Add(_reportMainMenuItem);
+                    }
                 }
 
                 // Add set/clear flag menu options
@@ -1016,6 +1060,18 @@ namespace Extract.FileActionManager.Utilities
                     }
 
                     _appLaunchItems = null;
+                }
+
+                if (_reportMenuItems != null)
+                {
+                    CollectionMethods.ClearAndDisposeKeysAndValues(_reportMenuItems);
+                    _reportMenuItems = null;
+                }
+
+                if (_reportMainMenuItem != null)
+                {
+                    _reportMainMenuItem.Dispose();
+                    _reportMainMenuItem = null;
                 }
 
                 if (_setFlagMenuItem != null)
@@ -1741,6 +1797,12 @@ namespace Extract.FileActionManager.Utilities
                     }
                 }
 
+                // Report context menu options should be available for single selection only.
+                if (_reportMainMenuItem != null)
+                {
+                    _reportMainMenuItem.Enabled = (selectionCount == 1);
+                }
+
                 // Enable/disable the set/clear flag options depending on the flag status of the
                 // selected rows.
                 _setFlagMenuItem.Enabled = _fileListDataGridView.SelectedRows
@@ -1859,6 +1921,45 @@ namespace Extract.FileActionManager.Utilities
             {
                 ex.ExtractDisplay("ELI35823");
             }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of a <see cref="ToolStripMenuItem"/> for
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleReportMenuItem_Click(object sender, EventArgs e)
+        {
+            try 
+	        {
+                using (new TemporaryWaitCursor())
+                {
+                    ExtractReport report = _reportMenuItems[(ToolStripMenuItem)sender];
+
+                    string fileName = GetSelectedFileNames().Single();
+                    report.ParametersCollection["DocumentName"].SetValueFromString(fileName);
+
+                    // If the report takes any parameters in addition to DocumentName, display a
+                    // prompt so the user can specify them.
+                    bool promptForParameters = report.ParametersCollection.Count > 1;
+                    report.Initialize(DatabaseServer, DatabaseName, promptForParameters);
+
+                    // Show report on another thread so that the report is not modal to the FFI. The
+                    // thread needs to be STA
+                    ThreadingMethods.RunInBackgroundThread("ELI36059", () =>
+                    {
+                        using (ReportViewerForm reportViewer = new ReportViewerForm(report))
+                        {
+                            reportViewer.ShowDialog();
+                        }
+                    }, true, ApartmentState.STA);
+                }
+	        }
+	        catch (Exception ex)
+	        {
+		        ex.ExtractDisplay("ELI36060");
+	        }
         }
 
         /// <summary>
@@ -2129,6 +2230,25 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Gets a value indicating whether reports are available to be run as a context menu
+        /// option.
+        /// </summary>
+        /// <value><see langword="true"/> if reports are available to be run as a context menu
+        /// option; otherwise, <see langword="false"/>.</value>
+        bool ReportsEnabled
+        {
+            get
+            {
+                if (!_reportsEnabled.HasValue)
+                {
+                    _reportsEnabled = true;
+                }
+
+                return _reportsEnabled.Value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether a background database query or file search is
         /// currently active.
         /// </summary>
@@ -2271,6 +2391,40 @@ namespace Extract.FileActionManager.Utilities
                         "Showing {0:D} files", _fileListDataGridView.Rows.Count);
                 }
             }
+        }
+
+        /// <summary>
+        /// Creates a <see cref="ToolStripMenuItem"/> for every available report with a DocumentName
+        /// parameter.
+        /// </summary>
+        Dictionary<ToolStripMenuItem, ExtractReport> CreateReportMenuItems()
+        {
+            Dictionary<ToolStripMenuItem, ExtractReport> reportMenuItems =
+                new Dictionary<ToolStripMenuItem, ExtractReport>();
+
+            // Search all standard and saved reports
+            foreach (string reportFileName in
+                Directory.EnumerateFiles(ExtractReport.StandardReportFolder, "*.rpt", SearchOption.AllDirectories)
+                .Union(Directory.EnumerateFiles(ExtractReport.SavedReportFolder, "*.rpt", SearchOption.AllDirectories)))
+            {
+                var report = new ExtractReport(reportFileName);
+
+                // If the report takes a "DocumentName" parameter that is not specified by default,
+                // this report is eligible to be available via a context menu option.
+                IExtractReportParameter documentNameParameter = null;
+                if (report.ParametersCollection.TryGetValue("DocumentName", out documentNameParameter) &&
+                    !documentNameParameter.HasValueSet())
+                {
+                    // Create a context menu option and add a handler for it.
+                    string reportName = Path.GetFileNameWithoutExtension(reportFileName);
+                    var menuItem = new ToolStripMenuItem(reportName);
+                    menuItem.Click += HandleReportMenuItem_Click;
+
+                    reportMenuItems[menuItem] = report;
+                }
+            }
+
+            return reportMenuItems;
         }
 
         /// <summary>

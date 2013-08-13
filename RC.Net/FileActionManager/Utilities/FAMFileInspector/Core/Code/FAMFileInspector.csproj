@@ -119,6 +119,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\ReportViewer\Core\Code\ReportViewer.csproj">
+      <Project>{5853AB0D-6C4B-452E-A576-F85361C3A769}</Project>
+      <Name>ReportViewer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
       <Project>{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}</Project>
       <Name>Extract.Imaging.Forms</Name>

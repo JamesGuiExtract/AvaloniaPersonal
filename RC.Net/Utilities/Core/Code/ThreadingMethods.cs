@@ -173,6 +173,49 @@ namespace Extract.Utilities
             }
         }
 
+        /// <summary>
+        /// Runs the specified <see paramref="action"/> asynchronously within a try/catch handler
+        /// that will display or log any exceptions.
+        /// </summary>
+        /// <param name="eliCode">The ELI code to associate with any exception.</param>
+        /// <param name="action">The <see cref="Action"/> to be executed.</param>
+        /// <param name="displayExceptions"><see langword="true"/> to display any exception caught;
+        /// <see langword="false"/> to log instead.</param>
+        /// <param name="apartmentState">The <see cref="ApartmentState"/> in which the thread should
+        /// run.</param>
+        public static void RunInBackgroundThread(string eliCode, Action action,
+            bool displayExceptions, ApartmentState apartmentState)
+        {
+            try 
+	        {	        
+		        var thread = new Thread(new ThreadStart(() =>
+                {
+                    try
+                    {
+                        action();
+                    }
+                    catch (Exception ex)
+                    {
+                        if (displayExceptions)
+                        {
+                            ex.ExtractDisplay(eliCode);
+                        }
+                        else
+                        {
+                            ex.ExtractLog(eliCode);
+                        }
+                    }
+                }));
+
+                thread.SetApartmentState(apartmentState);
+                thread.Start();
+	        }
+	        catch (Exception ex)
+	        {
+		        throw ex.AsExtract("ELI36068");
+	        }
+        }
+
         #endregion Methods
     }
 }

@@ -17,7 +17,7 @@ namespace Extract.ReportViewer
     /// <summary>
     /// A form for displaying a crystal report document.
     /// </summary>
-    internal partial class ReportViewerForm : Form
+    public partial class ReportViewerForm : Form
     {
         #region Constants
 
@@ -100,6 +100,16 @@ namespace Extract.ReportViewer
         /// </summary>
         /// <param name="report">The <see cref="ExtractReport"/> report to
         /// attach to.</param>
+        public ReportViewerForm(ExtractReport report)
+            : this (report, report.DatabaseServer, report.DatabaseName)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReportViewerForm"/> class.
+        /// </summary>
+        /// <param name="report">The <see cref="ExtractReport"/> report to
+        /// attach to.</param>
         /// <param name="serverName">The database server to attach the report to.</param>
         /// <param name="databaseName">The database name to attach the report to.</param>
         public ReportViewerForm(ExtractReport report, string serverName, string databaseName)
@@ -117,7 +127,7 @@ namespace Extract.ReportViewer
                     "ELI23504", _OBJECT_NAME);
 
                 InitializeComponent();
-
+                
                 _report = report;
 
                 // Store the report and database information
