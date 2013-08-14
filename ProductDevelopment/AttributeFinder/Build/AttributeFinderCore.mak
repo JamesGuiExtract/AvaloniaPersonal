@@ -324,6 +324,9 @@ CleanupPreviousBuildFolders: CleanUpMergeModulesFromPreviousBuilds
 	@IF NOT EXIST "$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles" @MKDIR "$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles"
 	@IF NOT EXIST "$(RequiredInstallsDir)\LogicNP" @MKDIR "$(RequiredInstallsDir)\LogicNP"
     @IF NOT EXIST "$(AFCoreInstallFilesRootDir)\ProgramDataFiles" @MKDIR "$(AFCoreInstallFilesRootDir)\ProgramDataFiles"
+	@IF NOT EXIST "$(IDShieldInstallFilesRootDir)\SelfRegIDShieldComponents" @MKDIR "$(IDShieldInstallFilesRootDir)\SelfRegIDShieldComponents"
+	@IF NOT EXIST "$(IDShieldInstallFilesRootDir)\Reports" @MKDIR "$(IDShieldInstallFilesRootDir)\Reports"
+	@IF NOT EXIST "$(IDShieldInstallFilesRootDir)\ExemptionCodes" @MKDIR "$(IDShieldInstallFilesRootDir)\ExemptionCodes"
 	
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\SelfRegFiles\*.*"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\*.*"
