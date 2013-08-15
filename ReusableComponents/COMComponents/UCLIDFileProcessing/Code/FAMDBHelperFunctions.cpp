@@ -1,6 +1,7 @@
 
 #include "stdafx.h"
 #include "FAMDBHelperFunctions.h"
+#include "FAMUtilsConstants.h"
 
 #include <UCLIDException.h>
 #include <StringTokenizer.h>
@@ -37,5 +38,32 @@ vector<string> getTableNamesFromCreationQueries(vector<string> vecCreationQuerie
 	}
 
 	return vecTableNames;
+}
+//-------------------------------------------------------------------------------------------------
+vector<string> getFeatureDefinitionQueries()
+{
+	vector<string> vecFeatureDefinitions;
+
+	CString zSQL;
+	CString zSQLTemplate = "INSERT INTO [Feature] "
+		"([Enabled], [FeatureName], [FeatureDescription], [AdminOnly]) VALUES(%u, '%s', '%s', '%u')";
+
+	zSQL.Format(zSQLTemplate, 1, gstrFEATURE_FILE_HANDLER_COPY_NAMES.c_str(),
+		"Allows filenames to be copied as text from a file list.", 1);
+	vecFeatureDefinitions.push_back((LPCTSTR)zSQL);
+
+	zSQL.Format(zSQLTemplate, 1, gstrFEATURE_FILE_HANDLER_COPY_FILES.c_str(),
+		"Allows documents to be copied or dragged as files from a file list.", 1);
+	vecFeatureDefinitions.push_back((LPCTSTR)zSQL);
+
+	zSQL.Format(zSQLTemplate, 1, gstrFEATURE_FILE_HANDLER_COPY_FILES_AND_DATA.c_str(),
+		"Allows documents and associated data to be copied or dragged as files from a file list.", 1);
+	vecFeatureDefinitions.push_back((LPCTSTR)zSQL);
+
+	zSQL.Format(zSQLTemplate, 1, gstrFEATURE_FILE_RUN_DOCUMENT_SPECIFIC_REPORTS.c_str(),
+		"Allows document specific reports to be run.", 1);
+	vecFeatureDefinitions.push_back((LPCTSTR)zSQL);
+
+	return vecFeatureDefinitions;
 }
 //-------------------------------------------------------------------------------------------------

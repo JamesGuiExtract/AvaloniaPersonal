@@ -1017,6 +1017,9 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 				// Reset the schema version to indicate that it needs to be read from DB
 				m_iDBSchemaVersion = 0;
 
+				// After every successful connection, re-check the enabled features from the DB.
+				m_bCheckedFeatures = false;
+
 				// Add the connection to the map
 				m_mapThreadIDtoDBConnections[dwThreadID] = ipConnection;
 
@@ -1033,6 +1036,15 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 				// Connection has been established 
 				m_strCurrentConnectionStatus = gstrCONNECTION_ESTABLISHED;
 				m_strCurrentConnectionString = strConnectionString;
+
+				// Ensure that if we have connected to a different DB that we last connected to,
+				// user will need to re-authenticate.
+				if (strConnectionString != m_strLastConnectionString)
+				{
+					m_bLoggedInAsAdmin = false;
+				}
+
+				m_strLastConnectionString = strConnectionString;
 
 				_lastCodePos = "80";
 
@@ -1118,7 +1130,8 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 			eraseFromVector(vecTables, gstrUSER_CREATED_COUNTER);
 			eraseFromVector(vecTables, gstrLOGIN);
 			eraseFromVector(vecTables, gstrDB_FIELD_SEARCH);
-			eraseFromVector(vecTables, gstrDB_LAUNCH_APP);
+			eraseFromVector(vecTables, gstrDB_FILE_HANDLER);
+			eraseFromVector(vecTables, gstrDB_FEATURE);
 		}
 
 		// Drop the tables in the vector
@@ -1311,7 +1324,8 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 		vecQueries.push_back(gstrCREATE_FAM_TAG_TABLE);
 		vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_TABLE);
 		vecQueries.push_back(gstrCREATE_FIELD_SEARCH_TABLE);
-		vecQueries.push_back(gstrCREATE_LAUNCH_APP_TABLE);
+		vecQueries.push_back(gstrCREATE_FILE_HANDLER_TABLE);
+		vecQueries.push_back(gstrCREATE_FEATURE_TABLE);
 	}
 
 	// Add queries to create tables to the vector
@@ -1402,6 +1416,11 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 					iterDBInfoValues->first + "', '" + iterDBInfoValues->second + "')";
 				vecQueries.push_back(strSQL);
 			}
+
+			// Add the queries to populate the features table.
+			vector<string> vecFeatureDefinitionQueries = getFeatureDefinitionQueries();
+			vecQueries.insert(vecQueries.end(),
+				vecFeatureDefinitionQueries.begin(), vecFeatureDefinitionQueries.end());
 		}
 
 		// Execute all of the queries
@@ -1602,6 +1621,17 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	}
 
 	return mapDefaultValues;
+}
+//-------------------------------------------------------------------------------------------------
+vector<string> CFileProcessingDB::getFeatureNames()
+{
+	vector<string> vecFeatureNames;
+	vecFeatureNames.push_back(gstrFEATURE_FILE_HANDLER_COPY_NAMES);
+	vecFeatureNames.push_back(gstrFEATURE_FILE_HANDLER_COPY_FILES);
+	vecFeatureNames.push_back(gstrFEATURE_FILE_HANDLER_COPY_FILES_AND_DATA);
+	vecFeatureNames.push_back(gstrFEATURE_FILE_RUN_DOCUMENT_SPECIFIC_REPORTS);
+
+	return vecFeatureNames;
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, const string& strFrom, 
@@ -2649,7 +2679,8 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrDB_FTP_EVENT_HISTORY);
 	vecTables.push_back(gstrDB_QUEUED_ACTION_STATUS_CHANGE);
 	vecTables.push_back(gstrDB_FIELD_SEARCH);
-	vecTables.push_back(gstrDB_LAUNCH_APP);
+	vecTables.push_back(gstrDB_FILE_HANDLER);
+	vecTables.push_back(gstrDB_FEATURE);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)
@@ -2937,6 +2968,43 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18146");
 }
 //--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::checkFeatures(_ConnectionPtr ipConnection)
+{
+	try
+	{
+		// If the feature data has already been retrieved, no need to do it again.
+		if (!m_bCheckedFeatures)
+		{
+			m_mapEnabledFeatures.clear();
+
+			_RecordsetPtr ipResultSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI36078", ipResultSet != __nullptr);
+
+			ipResultSet->Open(gstrGET_ENABLED_FEATURES_QUERY.c_str(),
+				_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockOptimistic, adCmdText);
+
+			// Loop through each feature to collect the data for the feature.
+			while (!asCppBool(ipResultSet->adoEOF))
+			{
+				FieldsPtr ipFields = ipResultSet->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI36079", ipFields != __nullptr);
+			
+				string strFeatureName = getStringField(ipFields, "FeatureName");			
+				bool bAdminOnly = getBoolField(ipFields, "AdminOnly");
+
+				m_mapEnabledFeatures[strFeatureName] = bAdminOnly;
+
+				ipResultSet->MoveNext();
+			}
+
+			ipResultSet->Close();
+
+			m_bCheckedFeatures = true;
+		}
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI36080");
+}
+//--------------------------------------------------------------------------------------------------
 HWND CFileProcessingDB::getAppMainWndHandle()
 {
 	// try to use this application's main window as the parent for the messagebox below
@@ -3200,13 +3268,16 @@ void CFileProcessingDB::resetDBConnection()
 
 		CSingleLock lock(&m_mutex, TRUE);
 
+		bool bDBSpecified = (!m_strDatabaseServer.empty() && !m_strDatabaseName.empty());
+
 		// Close all the DB connections and clear the map [LRCAU# 5659]
-		closeAllDBConnections();
+		// The close is only temporary if the db has been specified.
+		closeAllDBConnections(bDBSpecified);
 
 		_lastCodePos = "40";
 
 		// If there is a non empty server and database name get a connection and validate
-		if (!m_strDatabaseServer.empty() && !m_strDatabaseName.empty())
+		if (bDBSpecified)
 		{
 			// This will create a new connection for this thread and initialize the schema
 			getDBConnection();
@@ -3220,7 +3291,7 @@ void CFileProcessingDB::resetDBConnection()
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26869");
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::closeAllDBConnections()
+void CFileProcessingDB::closeAllDBConnections(bool bTemporaryClose)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI03275");
 	try
@@ -3265,6 +3336,12 @@ void CFileProcessingDB::closeAllDBConnections()
 		// Clear all of the connections in all of the threads
 		m_mapThreadIDtoDBConnections.clear();
 		_lastCodePos = "35";
+
+		// If the close is not temporary, don't carry any credentials over to the next connection.
+		if (!bTemporaryClose)
+		{
+			m_bLoggedInAsAdmin = false;
+		}
 
 		// Reset the Current connection status to not connected
 		m_strCurrentConnectionStatus = gstrNOT_CONNECTED;
@@ -4819,6 +4896,31 @@ set<string> getDBInfoRowNames(const _ConnectionPtr& ipConnection)
 	return setDBInfoRows;
 }
 //-------------------------------------------------------------------------------------------------
+set<string> getDBFeatureNames(const _ConnectionPtr& ipConnection)
+{
+	set<string> setDBInfoRows;
+
+	_RecordsetPtr ipResultSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI31392", ipResultSet != __nullptr);
+
+	// Query for all rows in the Feature table
+	string strFeaturesQuery = "SELECT [FeatureName] FROM [" + gstrDB_FEATURE + "]";
+	ipResultSet->Open(strFeaturesQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+		adOpenStatic, adLockReadOnly, adCmdText);
+
+	// Loop through all Feature table rows to compile a list of the names (in uppercase).
+	while (!asCppBool(ipResultSet->adoEOF))
+	{
+		string strRowName = getStringField(ipResultSet->Fields, "FeatureName");
+		makeUpperCase(strRowName);
+		setDBInfoRows.insert(strRowName);
+
+		ipResultSet->MoveNext();
+	}
+
+	return setDBInfoRows;
+}
+//-------------------------------------------------------------------------------------------------
 // WARNING: If any DBInfo row or table is removed, this code needs to be modified so that it does
 // not treat the removed element(s) on old schema versions as unrecognized.
 vector<string> CFileProcessingDB::findUnrecognizedSchemaElements(const _ConnectionPtr& ipConnection)
@@ -4833,6 +4935,13 @@ vector<string> CFileProcessingDB::findUnrecognizedSchemaElements(const _Connecti
 	if (setTableNames.find("DBINFO") != setTableNames.end())
 	{
 		setDBInfoRows = getDBInfoRowNames(ipConnection);
+	}
+
+	// Get an uppercase list of the names of all features currently in the database.
+	set<string> setFeatureNames;
+	if (setTableNames.find("FEATURE") != setTableNames.end())
+	{
+		setFeatureNames = getDBFeatureNames(ipConnection);
 	}
 
 	// Retrieve a list of all tables the FAM DB has managed since version 23
@@ -4867,8 +4976,21 @@ vector<string> CFileProcessingDB::findUnrecognizedSchemaElements(const _Connecti
 		setDBInfoRows.erase(strDBInfoValueName);
 	}
 
-	// If both lists are now empty, there is no need to check with product specific databases.
-	if (setTableNames.size() == 0 && setDBInfoRows.size() == 0)
+	// Retrieve a list of all features in the Feature table.
+	vector<string> vecFeatureNames = getFeatureNames();
+	size_t nFeatureCount = vecFeatureNames.size();
+
+	// Remove all features known to the FAM DB from the names features found in the DB to leave a
+	// list of features in the DB unknown to the FAM DB.
+	for (size_t i = 0; i < nFeatureCount; i++)
+	{
+		string strDBFeatureName = vecFeatureNames[i];
+		makeUpperCase(strDBFeatureName);
+		setFeatureNames.erase(strDBFeatureName);
+	}
+
+	// If all lists are now empty, there is no need to check with product specific databases.
+	if (setTableNames.size() == 0 && setDBInfoRows.size() == 0 && setFeatureNames.size() == 0)
 	{
 		return vecUnrecognizedElements;
 	}
@@ -4943,6 +5065,8 @@ void CFileProcessingDB::addOldTables(vector<string>& vecTables)
 {
 	// Version 110 - ProcessingFAM has become ActiveFAM
 	vecTables.push_back(gstrPROCESSING_FAM);
+	// Version 116 - LaunchApp has become FileListHandlers
+	vecTables.push_back(gstrDB_LAUNCH_APP);
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::executeProdSpecificSchemaUpdateFuncs(_ConnectionPtr ipConnection,

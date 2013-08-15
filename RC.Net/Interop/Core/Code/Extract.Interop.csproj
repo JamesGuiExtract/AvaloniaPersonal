@@ -76,6 +76,7 @@
     <Compile Include="ComObjectReleaser.cs" />
     <Compile Include="ComUtils.cs" />
     <Compile Include="ExtractCategories.cs" />
+    <Compile Include="ExtractFeatures.cs" />
     <Compile Include="HResult.cs" />
     <Compile Include="IPersistStream.cs" />
     <Compile Include="ISpecifyPropertyPages.cs" />

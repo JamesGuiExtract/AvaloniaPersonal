@@ -48,6 +48,11 @@ static const string gstrEMAIL_PASSWORD = "EmailPassword";
 static const string gstrEMAIL_TIMEOUT = "EmailTimeout";
 static const string gstrEMAIL_USE_SSL = "EmailUseSSL";
 
+// Feature names
+static const string gstrFEATURE_FILE_HANDLER_COPY_NAMES = "Files: Copy filenames";
+static const string gstrFEATURE_FILE_HANDLER_COPY_FILES = "Files: Copy files";
+static const string gstrFEATURE_FILE_HANDLER_COPY_FILES_AND_DATA = "Files: Copy files and data";
+static const string gstrFEATURE_FILE_RUN_DOCUMENT_SPECIFIC_REPORTS = "Reports: Run document specific";
 
 // Default Settings
 static const long glDEFAULT_COMMAND_TIMEOUT = 120;

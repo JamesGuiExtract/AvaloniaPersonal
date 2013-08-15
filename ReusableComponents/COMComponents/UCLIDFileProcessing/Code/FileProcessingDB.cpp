@@ -66,6 +66,7 @@ using namespace ADODB;
 				if (((!bTimeout || !m_bRetryOnTimeout) && bConnectionAlive) \
 					|| nRetryCount >= m_iNumberOfRetries) \
 				{ \
+					m_bLoggedInAsAdmin = false; \
 					throw ue; \
 				}\
 				if (!bRetryExceptionLogged) \
@@ -127,7 +128,8 @@ m_bProductSpecificDBSchemasAreValid(false),
 m_bRevertInProgress(false),
 m_bRetryOnTimeout(true),
 m_nActiveActionID(-1),
-m_bLoggedInAsAdmin(false)
+m_bLoggedInAsAdmin(false),
+m_bCheckedFeatures(false)
 {
 	try
 	{
@@ -756,7 +758,7 @@ STDMETHODIMP CFileProcessingDB::CloseAllDBConnections()
 		validateLicense();
 
 		// Call the internal close all DB connections
-		closeAllDBConnections();
+		closeAllDBConnections(false);
 
 		return S_OK;
 	}
@@ -2784,6 +2786,68 @@ STDMETHODIMP CFileProcessingDB::get_LoggedInAsAdmin(VARIANT_BOOL* pbLoggedInAsAd
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36047");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::IsFeatureEnabled(BSTR bstrFeatureName, VARIANT_BOOL* pbFeatureIsEnabled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI36070", pbFeatureIsEnabled != __nullptr);
+
+		validateLicense();
+
+		if (!IsFeatureEnabled_Internal(false, bstrFeatureName, pbFeatureIsEnabled))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			IsFeatureEnabled_Internal(true, bstrFeatureName, pbFeatureIsEnabled);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36071")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::DuplicateConnection(IFileProcessingDB *pConnectionSource)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipConnectionSource(pConnectionSource);
+		ASSERT_ARGUMENT("ELI36072", ipConnectionSource != __nullptr);
+
+		validateLicense();
+
+		// Ensure this instance doesn't have any open connections
+		closeAllDBConnections(false);
+
+		// Copy the connection information from ipConnectionSource
+		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipThis = getThisAsCOMPtr();
+		ipThis->DatabaseServer = ipConnectionSource->DatabaseServer;
+		ipThis->DatabaseName = ipConnectionSource->DatabaseName;
+		ipThis->AdvancedConnectionStringProperties =
+			ipConnectionSource->AdvancedConnectionStringProperties;
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		_ConnectionPtr ipConnection = __nullptr;
+		
+		BEGIN_CONNECTION_RETRY();
+		
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI36073");
+
+		// Inherit the credentials of the source connection.
+		m_bLoggedInAsAdmin = asCppBool(ipConnectionSource->LoggedInAsAdmin);
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36074")
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

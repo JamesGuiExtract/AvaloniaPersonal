@@ -65,6 +65,7 @@ using namespace ADODB;
 				if (((!bTimeout || !m_bRetryOnTimeout) && bConnectionAlive) \
 					|| nRetryCount >= m_iNumberOfRetries) \
 				{ \
+					m_bLoggedInAsAdmin = false; \
 					throw ue; \
 				}\
 				if (!bRetryExceptionLogged) \
@@ -90,7 +91,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 115;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 116;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -716,6 +717,36 @@ int UpdateToSchemaVersion115(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35919");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion116(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 116;
+
+		if (pnNumSteps != __nullptr)
+		{
+			// This update does not require transferring any data.
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		vecQueries.push_back("EXEC sp_rename '" + gstrDB_LAUNCH_APP + "', '" + gstrDB_FILE_HANDLER + "'");
+		vecQueries.push_back(gstrCREATE_FEATURE_TABLE);
+		vector<string> vecFeatureDefinitionQueries = getFeatureDefinitionQueries();
+		vecQueries.insert(vecQueries.end(),
+			vecFeatureDefinitionQueries.begin(), vecFeatureDefinitionQueries.end());
+		
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+		
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36075");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -5609,7 +5640,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 112:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion113);
 				case 113:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion114);
 				case 114:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion115);
-				case 115:   break;
+				case 115:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion116);
+				case 116:	break;
 
 				default:
 					{
@@ -6142,6 +6174,52 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 			END_CONNECTION_RETRY(ipConnection, "ELI35766");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35767");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::IsFeatureEnabled_Internal(bool bDBLocked, BSTR bstrFeatureName,
+												  VARIANT_BOOL* pbFeatureIsEnabled)
+{
+	try
+	{
+		try
+		{
+			// If feature data has not been retrieved from the DB, it needs to be done now.
+			if (!m_bCheckedFeatures)
+			{
+				// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+				ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+				BEGIN_CONNECTION_RETRY();
+
+				ipConnection = getDBConnection();
+
+				checkFeatures(ipConnection);
+
+				END_CONNECTION_RETRY(ipConnection, "ELI36076");
+			}
+
+			// Determine whether the specified feature is enabled by checking m_mapEnabledFeatures.
+			string strFeatureName = asString(bstrFeatureName);
+			bool bFeatureEnabled = false;
+
+			if (m_mapEnabledFeatures.find(strFeatureName) != m_mapEnabledFeatures.end())
+			{
+				bFeatureEnabled = m_bLoggedInAsAdmin || !m_mapEnabledFeatures[strFeatureName];
+			}
+
+			*pbFeatureIsEnabled = asVariantBool(bFeatureEnabled);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36077");
 	}
 	catch(UCLIDException &ue)
 	{

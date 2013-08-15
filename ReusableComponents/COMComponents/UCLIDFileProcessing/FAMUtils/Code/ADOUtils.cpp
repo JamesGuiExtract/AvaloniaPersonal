@@ -107,6 +107,44 @@ long long getLongLongField( const FieldsPtr& ipFields, const string& strFieldNam
 	}
 }
 //-------------------------------------------------------------------------------------------------
+bool getBoolField(const FieldsPtr& ipFields, const string& strFieldName)
+{
+	// Use double try catch so that the field name can be added to the debug info
+	try
+	{
+		// Make user ipFields is not NULL
+		ASSERT_ARGUMENT("ELI36081", ipFields != __nullptr );
+
+		try
+		{
+			// Get the Field from the fields list
+			FieldPtr ipItem = ipFields->Item[strFieldName.c_str()];
+			ASSERT_RESOURCE_ALLOCATION("ELI36082", ipItem != __nullptr );
+
+			// get the value
+			variant_t vtItem = ipItem->Value;
+			
+			// The value should be bool type
+			if ( vtItem.vt != VT_BOOL )
+			{
+				UCLIDException ue("ELI36083", "Value is not a bool type.");
+				ue.addDebugInfo("Type", vtItem.vt);
+				throw ue;
+			}
+			
+			// return the bool value of the variant
+			return asCppBool(vtItem.boolVal);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36084");
+	}
+	catch(UCLIDException& ue)
+	{
+		// Add FieldName to the debug info
+		ue.addDebugInfo("FieldName", strFieldName);
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
 string getStringField( const FieldsPtr& ipFields, const string& strFieldName )
 {
 	// Use double try catch so that the field name can be added to the debug info

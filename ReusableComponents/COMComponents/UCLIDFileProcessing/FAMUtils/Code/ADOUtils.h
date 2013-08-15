@@ -154,6 +154,11 @@ FAMUTILS_API long getLongField( const FieldsPtr& ipFields, const string& strFiel
 //			if the field is of the wrong type an exception will be thrown
 FAMUTILS_API long long getLongLongField( const FieldsPtr& ipFields, const string& strFieldName );
 
+// PROMISE: To return the bool value of the field named strFieldName in the ipFields collection
+//			if the field does not exist an exception will be thrown
+//			if the field is of the wrong type an exception will be thrown
+FAMUTILS_API bool getBoolField(const FieldsPtr& ipFields, const string& strFieldName);
+
 // PROMISE: To return the string value of the field named strFieldName in the ipFields collection
 //			if the field does not exist an exception will be thrown
 //			if the field is of the wrong type an exception will be thrown

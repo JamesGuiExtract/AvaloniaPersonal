@@ -64,7 +64,9 @@ static const string gstrDB_FTP_ACCOUNT = "FTPAccount";
 static const string gstrDB_FTP_EVENT_HISTORY = "FTPEventHistory";
 static const string gstrDB_QUEUED_ACTION_STATUS_CHANGE = "QueuedActionStatusChange";
 static const string gstrDB_FIELD_SEARCH = "FieldSearch";
-static const string gstrDB_LAUNCH_APP= "LaunchApp";
+static const string gstrDB_LAUNCH_APP= "LaunchApp"; // No long exists, but keep for schema updates
+static const string gstrDB_FILE_HANDLER= "FileHandler";
+static const string gstrDB_FEATURE= "Feature";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
@@ -238,6 +240,8 @@ public:
 	STDMETHOD(GetFileCount)(VARIANT_BOOL bUseOracleSyntax, LONGLONG* pnFileCount);
 	STDMETHOD(get_CurrentConnectionString)(BSTR* pbstrConnectionString);
 	STDMETHOD(get_LoggedInAsAdmin)(VARIANT_BOOL* pbLoggedInAsAdmin);
+	STDMETHOD(IsFeatureEnabled)(BSTR bstrFeatureName, VARIANT_BOOL* pbFeatureIsEnabled);
+	STDMETHOD(DuplicateConnection)(IFileProcessingDB *pConnectionSource);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -350,6 +354,10 @@ private:
 	// This connection string that was used to connect to the DB.
 	string m_strCurrentConnectionString;
 
+	// The connection string used on the last successful login. Used to ensure credentials
+	// are not carried over from one DB to another.
+	string m_strLastConnectionString;
+
 	// The database server to connect to
 	string m_strDatabaseServer;
 
@@ -447,6 +455,10 @@ private:
 
 	// Indicates whether the user has entered valide admin credentials.
 	bool m_bLoggedInAsAdmin;
+
+	// A map of all enabled features to a boolean that indicates whether the feature should be
+	// available for admin users only.
+	map<string, bool> m_mapEnabledFeatures;
 
 	//-------------------------------------------------------------------------------------------------
 	// Methods
@@ -622,6 +634,9 @@ private:
 	// PROMISE: Gets the default values for each of the DBInfo values managed by the FAM DB.
 	map<string, string> getDBInfoDefaultValues();
 
+	// Creates a vector of all features that can be managed from the FAM DB.
+	vector<string> getFeatureNames();
+
 	// PROMISE: To copy the status from the strFrom action to the strTo action
 	//			if bAddTransRecords is true records will be added to the transition table
 	//			using the connection provided.
@@ -731,6 +746,12 @@ private:
 	// so that this function will always return	
 	void loadDBInfoSettings(_ConnectionPtr ipConnection);
 
+	// Indicates whether the feature data has been retrieved from the database.
+	bool m_bCheckedFeatures;
+
+	// Retrieves data for all features enabled in the database.
+	void checkFeatures(_ConnectionPtr ipConnection);
+
 	// Returns the running apps main window handle if can't get the main window returns NULL;
 	HWND getAppMainWndHandle();
 
@@ -767,8 +788,9 @@ private:
 	// Internal reset DB connection function
 	void resetDBConnection();
 
-	// Internal close all DB connections
-	void closeAllDBConnections();
+	// Internal close all DB connections. Credentials will be maintained if bTemporaryClose is used
+	// as long as the re-connection is to the same database.
+	void closeAllDBConnections(bool bTemporaryClose);
 
 	// Internal clear DB function
 	void clear(bool bLocked, bool retainUserValues = false);
@@ -1014,6 +1036,7 @@ private:
 		BSTR bstrUserName, BSTR bstrArg1, BSTR bstrArg2, long nRetries, BSTR bstrException);
 	bool IsAnyFAMActive_Internal(bool bDBLocked, VARIANT_BOOL* pvbFAMIsActive);
 	bool GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseOracleSyntax, LONGLONG* pnFileCount);
+	bool IsFeatureEnabled_Internal(bool bDBLocked, BSTR bstrFeatureName, VARIANT_BOOL* pbFeatureIsEnabled);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

@@ -1250,6 +1250,17 @@ library UCLID_FILEPROCESSINGLib
 		// RETURNS: VARIANT_TRUE if the whether the user has entered valide admin credentials.
 		[propget, id(113), helpstring("property LoggedInAsAdmin")]
 			HRESULT LoggedInAsAdmin([out, retval] VARIANT_BOOL* pbLoggedInAsAdmin);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Determines whether a specified feature is enabled using the current credentials.
+		// RETURNS: VARIANT_TRUE if the feature is available with the current credentials,
+		//			VARIANT_TRUE if it is not.
+		[id(114), helpstring("method IsFeatureEnabled")] HRESULT IsFeatureEnabled(
+			[in] BSTR bstrFeatureName, [out, retval] VARIANT_BOOL* pbFeatureIsEnabled);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Creates an independent connection to the same DB pConnectionSource is connected
+		//			to. The connection inherits the same credentials pConnectionSource is using.
+		[id(115), helpstring("method DuplicateConnection")] HRESULT DuplicateConnection(
+			[in] IFileProcessingDB *pConnectionSource);
 };
 
 	[

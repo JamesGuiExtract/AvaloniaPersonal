@@ -297,6 +297,8 @@ static const string gstrCREATE_FIELD_SEARCH_TABLE =
 	"[FieldName] [nvarchar](64) NOT NULL UNIQUE,"
 	"[AttributeQuery] [nvarchar](256) NOT NULL)";
 
+// FileHandlers table used to be named LaunchApp; LaunchApp table definition needs to be kept
+// for the schema update process.
 static const string gstrCREATE_LAUNCH_APP_TABLE =
 	"CREATE TABLE [dbo].[LaunchApp]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_LaunchApp] PRIMARY KEY CLUSTERED,"
@@ -309,6 +311,28 @@ static const string gstrCREATE_LAUNCH_APP_TABLE =
 	"[AllowMultipleFiles] [bit] NOT NULL DEFAULT 0,"
 	"[SupportsErrorHandling] [bit] NOT NULL DEFAULT 0,"
 	"[Blocking] [bit] NOT NULL DEFAULT 1)";
+
+// Was LaunchApp in versions 114 and 115
+static const string gstrCREATE_FILE_HANDLER_TABLE =
+	"CREATE TABLE [dbo].[FileHandler]("
+	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_LaunchApp] PRIMARY KEY CLUSTERED,"
+	"[Enabled] [bit] NOT NULL DEFAULT 1,"
+	"[AppName] [nvarchar](64) NOT NULL UNIQUE,"
+	"[IconPath] [nvarchar](260),"
+	"[ApplicationPath] [nvarchar](260) NOT NULL,"
+	"[Arguments] [ntext],"
+	"[AdminOnly] [bit] NOT NULL DEFAULT 0,"
+	"[AllowMultipleFiles] [bit] NOT NULL DEFAULT 0,"
+	"[SupportsErrorHandling] [bit] NOT NULL DEFAULT 0,"
+	"[Blocking] [bit] NOT NULL DEFAULT 1)";
+
+static const string gstrCREATE_FEATURE_TABLE =
+	"CREATE TABLE [dbo].[Feature]("
+	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_Feature] PRIMARY KEY CLUSTERED,"
+	"[Enabled] [bit] NOT NULL DEFAULT 1,"
+	"[FeatureName] [nvarchar](64) NOT NULL UNIQUE,"
+	"[FeatureDescription] [nvarchar](max),"
+	"[AdminOnly] [bit] NOT NULL DEFAULT 1)";
 
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
@@ -1084,3 +1108,6 @@ const string gstrSTANDARD_TOTAL_FAMFILE_QUERY = "SELECT COUNT(*) AS " + gstrTOTA
 	" FROM [FAMFile]";
 const string gstrSTANDARD_TOTAL_FAMFILE_QUERY_ORACLE = "SELECT COUNT(*) AS \"" + 
 	gstrTOTAL_FILECOUNT_FIELD + "\" FROM \"FAMFile\"";
+// Queries for all currently enabled features.
+const string gstrGET_ENABLED_FEATURES_QUERY = "SELECT [FeatureName], [AdminOnly] FROM [" +
+	gstrDB_FEATURE + "] WHERE [Enabled] = 1";

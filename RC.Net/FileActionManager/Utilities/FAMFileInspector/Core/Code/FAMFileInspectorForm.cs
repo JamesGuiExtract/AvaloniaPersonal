@@ -3,6 +3,7 @@ using Extract.Drawing;
 using Extract.FileActionManager.Utilities.Properties;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
+using Extract.Interop;
 using Extract.Licensing;
 using Extract.ReportViewer;
 using Extract.Utilities;
@@ -140,9 +141,9 @@ namespace Extract.FileActionManager.Utilities
         #region Structs
 
         /// <summary>
-        /// Represents an entry from the FAM DB's AppLaunch table
+        /// Represents an entry from the FAM DB's FileHandler table
         /// </summary>
-        struct AppLaunchItem
+        struct FileHandlerItem
         {
             /// <summary>
             /// Gets or sets the name the application should be presented to the user as.
@@ -276,12 +277,12 @@ namespace Extract.FileActionManager.Utilities
         Dictionary<string, string> _dataSearchQueries = new Dictionary<string, string>();
 
         /// <summary>
-        /// All application launch items that should be available as context menu options in
-        /// <see cref="_fileListDataGridView"/> and the <see cref="AppLaunchItem"/> that defines the
+        /// All custom file handlers that should be available as context menu options in
+        /// <see cref="_fileListDataGridView"/> and the <see cref="FileHandlerItem"/> that defines the
         /// option's behavior.
         /// </summary>
-        Dictionary<ToolStripMenuItem, AppLaunchItem> _appLaunchItems =
-            new Dictionary<ToolStripMenuItem, AppLaunchItem>();
+        Dictionary<ToolStripMenuItem, FileHandlerItem> _fileHandlerItems =
+            new Dictionary<ToolStripMenuItem, FileHandlerItem>();
 
         /// <summary>
         /// Maps context menu options to a DocumentName based <see cref="ExtractReport"/> for the
@@ -331,15 +332,15 @@ namespace Extract.FileActionManager.Utilities
         volatile CancellationTokenSource _queryCanceler;
 
         /// <summary>
-        /// Allows background non-blocking app launch operations to be cancelled before processing
+        /// Allows background non-blocking file handler operations to be cancelled before processing
         /// any additional files.
         /// </summary>
-        CancellationTokenSource _appLaunchCanceler = new CancellationTokenSource();
+        CancellationTokenSource _fileHandlerCanceler = new CancellationTokenSource();
 
         /// <summary>
-        /// Tracks how many app launch operations are currently executing.
+        /// Tracks how many file handler operations are currently executing.
         /// </summary>
-        CountdownEvent _appLaunchCountdownEvent = new CountdownEvent(0);
+        CountdownEvent _fileHandlerCountdownEvent = new CountdownEvent(0);
 
         /// <summary>
         /// Allows any overlay text on the image viewer to be canceled.
@@ -373,11 +374,6 @@ namespace Extract.FileActionManager.Utilities
         /// changes in certain <see cref="Control.MouseDown"/> events.
         /// </summary>
         DataGridViewRow[] _lastSelectedRows;
-
-        /// <summary>
-        /// Indicates if the instance in currently in admin mode.
-        /// </summary>
-        bool _inAdminMode;
 
         /// <summary>
         /// Indicates whether the option to enable selected file names to be copied as text is
@@ -499,7 +495,7 @@ namespace Extract.FileActionManager.Utilities
         #region Properties
 
         /// <summary>
-        /// Gets or sets the <see cref="FileProcessingDB"/> whose files are being inspected.
+        /// Gets the <see cref="FileProcessingDB"/> whose files are being inspected.
         /// </summary>
         /// <value>
         /// The <see cref="FileProcessingDB"/> whose files are being inspected.
@@ -508,7 +504,7 @@ namespace Extract.FileActionManager.Utilities
         public FileProcessingDB FileProcessingDB
         {
             get;
-            set;
+            private set;
         }
 
         /// <summary>
@@ -655,6 +651,10 @@ namespace Extract.FileActionManager.Utilities
                 if (!FileProcessingDB.IsConnected)
                 {
                     FileProcessingDB.ResetDBConnection();
+                    
+                    // After connecting, make sure the context menu options match whether the
+                    // connection is now in admin mode.
+                    InitializeContextMenu();
                 }
 
                 UpdateFileSelectionSummary();
@@ -692,28 +692,8 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Sets whether this instance should be in admin mode based on the specified
-        /// <see paramref="fileProcessingDB"/>'s <see cref="T:IFileProcessingDB.LoggedInAsAdmin"/>
-        /// state.
-        /// </summary>
-        /// <param name="fileProcessingDB">The <see cref="IFileProcessingDB"/> to use to
-        /// determine the current log-on mode.</param>
-        [CLSCompliant(false)]
-        public void SetLogOnMode(IFileProcessingDB fileProcessingDB)
-        {
-            try 
-	        {
-                InAdminMode = (fileProcessingDB != null && fileProcessingDB.LoggedInAsAdmin);
-	        }
-	        catch (Exception ex)
-	        {
-		        throw ex.AsExtract("ELI36048");
-	        }
-        }
-
-        /// <summary>
         /// Initializes the context menu of the file list based on the current
-        /// <see cref="FileProcessingDB"/>'s AppLaunch table.
+        /// <see cref="FileProcessingDB"/>'s FileHandler table.
         /// </summary>
         public void InitializeContextMenu()
         {
@@ -731,37 +711,37 @@ namespace Extract.FileActionManager.Utilities
                 var newContextMenuStrip = new ContextMenuStrip();
 
                 // Populate context menu options for all enabled items available with the current
-                // log-on mode from the database's AppLaunch table.
+                // log-on mode from the database's FileHandler table.
                 queryResults = FileProcessingDB.GetResultsForQuery(
                     "SELECT [AppName], [ApplicationPath], [Arguments], [AllowMultipleFiles], " +
                         "[SupportsErrorHandling], [Blocking] " +
-                    "FROM [LaunchApp] WHERE [Enabled] = 1 " +
+                    "FROM [FileHandler] WHERE [Enabled] = 1 " +
                     (InAdminMode ? "" : "AND [AdminOnly] = 0 ") +
                     "ORDER BY [AppName]");
 
                 while (!queryResults.EOF)
                 {
-                    // Create an AppLaunchItem instance representing the settings of this item.
-                    var appLaunchItem = new AppLaunchItem();
-                    appLaunchItem.Name = (string)queryResults.Fields["AppName"].Value;
-                    appLaunchItem.ApplicationPath =
+                    // Create an FileHandlerItem instance representing the settings of this item.
+                    var fileHandlerItem = new FileHandlerItem();
+                    fileHandlerItem.Name = (string)queryResults.Fields["AppName"].Value;
+                    fileHandlerItem.ApplicationPath =
                         (string)queryResults.Fields["ApplicationPath"].Value;
                     if (!(queryResults.Fields[2].Value is System.DBNull))
                     {
-                        appLaunchItem.Arguments =
+                        fileHandlerItem.Arguments =
                             (string)(queryResults.Fields["Arguments"].Value ?? string.Empty);
                     }
-                    appLaunchItem.AllowMultipleFiles =
+                    fileHandlerItem.AllowMultipleFiles =
                         (bool)queryResults.Fields["AllowMultipleFiles"].Value;
-                    appLaunchItem.SupportsErrorHandling =
+                    fileHandlerItem.SupportsErrorHandling =
                         (bool)queryResults.Fields["SupportsErrorHandling"].Value;
-                    appLaunchItem.Blocking = (bool)queryResults.Fields["Blocking"].Value;
+                    fileHandlerItem.Blocking = (bool)queryResults.Fields["Blocking"].Value;
 
                     // Create a context menu option and add a handler for it.
-                    var menuItem = new ToolStripMenuItem(appLaunchItem.Name);
-                    menuItem.Click += HandleLaunchAppMenuItem_Click;
+                    var menuItem = new ToolStripMenuItem(fileHandlerItem.Name);
+                    menuItem.Click += HandleFileHandlerMenuItem_Click;
 
-                    _appLaunchItems.Add(menuItem, appLaunchItem);
+                    _fileHandlerItems.Add(menuItem, fileHandlerItem);
                     newContextMenuStrip.Items.Add(menuItem);
 
                     queryResults.MoveNext();
@@ -769,6 +749,8 @@ namespace Extract.FileActionManager.Utilities
 
                 // Add feature menu options
                 var featureMenuItems = new List<ToolStripItem>();
+
+                CheckAvailableFeatures();
 
                 if (CopyFileNamesEnabled)
                 {
@@ -990,8 +972,8 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                // Check to see if any app launch operation is still running.
-                if (!_appLaunchCountdownEvent.Wait(0))
+                // Check to see if any file handler operation is still running.
+                if (!_fileHandlerCountdownEvent.Wait(0))
                 {
                     if (DialogResult.OK == MessageBox.Show(
                         "One or more operations are still running.\r\n\r\n" +
@@ -1000,13 +982,13 @@ namespace Extract.FileActionManager.Utilities
                         "Stop operation?", MessageBoxButtons.OKCancel,
                         MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2, 0))
                     {
-                        _appLaunchCanceler.Cancel();
+                        _fileHandlerCanceler.Cancel();
                         try
                         {
                             // While waiting for the background process(es) to stop, display a modal
                             // message box.
                             ShowMessageBoxWhileBlocking("Waiting for operation(s) to stop...",
-                                () => _appLaunchCountdownEvent.Wait());
+                                () => _fileHandlerCountdownEvent.Wait());
                         }
                         catch { }
                     }
@@ -1040,7 +1022,7 @@ namespace Extract.FileActionManager.Utilities
         // http://stackoverflow.com/questions/6960520/when-to-dispose-cancellationtokensource
         [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "_queryCanceler")]
         [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "_overlayTextCanceler")]
-        [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "_appLaunchCanceler")]
+        [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "_fileHandlerCanceler")]
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -1052,14 +1034,14 @@ namespace Extract.FileActionManager.Utilities
                     _formStateManager = null;
                 }
 
-                if (_appLaunchItems != null)
+                if (_fileHandlerItems != null)
                 {
-                    foreach (ToolStripMenuItem menuItem in _appLaunchItems.Keys)
+                    foreach (ToolStripMenuItem menuItem in _fileHandlerItems.Keys)
                     {
                         menuItem.Dispose();
                     }
 
-                    _appLaunchItems = null;
+                    _fileHandlerItems = null;
                 }
 
                 if (_reportMenuItems != null)
@@ -1098,10 +1080,10 @@ namespace Extract.FileActionManager.Utilities
                     _queryTask = null;
                 }
 
-                if (_appLaunchCountdownEvent != null)
+                if (_fileHandlerCountdownEvent != null)
                 {
-                    _appLaunchCountdownEvent.Dispose();
-                    _appLaunchCountdownEvent = null;
+                    _fileHandlerCountdownEvent.Dispose();
+                    _fileHandlerCountdownEvent = null;
                 }
             }
 
@@ -1437,8 +1419,12 @@ namespace Extract.FileActionManager.Utilities
                     if (CopyFileNamesEnabled)
                     {
                         CopySelectedFileNames();
-                        e.Handled = true;
                     }
+
+                    // Whether or not copy file names is enabled, consider the event handled so that
+                    // Ctrl + C doesn't copy test from the grid row using the DataGridView default
+                    // handler.
+                    e.Handled = true;
                 }
             }
             catch (Exception ex)
@@ -1485,7 +1471,9 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                if (e.Button.HasFlag(MouseButtons.Left))
+                // If the left mouse button was pressed and the copy files feature is enabled,
+                // prepare for a possible drag operation.
+                if (CopyFilesEnabled && e.Button.HasFlag(MouseButtons.Left))
                 {
                     System.Windows.Forms.DataGridView.HitTestInfo hit =
                             _fileListDataGridView.HitTest(e.X, e.Y);
@@ -1776,9 +1764,9 @@ namespace Extract.FileActionManager.Utilities
 
                 int selectionCount = _fileListDataGridView.SelectedRows.Count;
 
-                // Enable/disable each app launch item in the context menu based on the current
+                // Enable/disable each file handler item in the context menu based on the current
                 // selection.
-                foreach (KeyValuePair<ToolStripMenuItem, AppLaunchItem> app in _appLaunchItems)
+                foreach (KeyValuePair<ToolStripMenuItem, FileHandlerItem> app in _fileHandlerItems)
                 {
                     if (selectionCount == 0)
                     {
@@ -1823,19 +1811,19 @@ namespace Extract.FileActionManager.Utilities
 
         /// <summary>
         /// Handles the <see cref="Control.Click"/> event of a <see cref="ToolStripMenuItem"/> for
-        /// one of the app launch context menu options.
+        /// one of the custom file handler context menu options.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        void HandleLaunchAppMenuItem_Click(object sender, EventArgs e)
+        void HandleFileHandlerMenuItem_Click(object sender, EventArgs e)
         {
             try
             {
-                AppLaunchItem appLaunchItem = _appLaunchItems[(ToolStripMenuItem)sender];
+                FileHandlerItem fileHandlerItem = _fileHandlerItems[(ToolStripMenuItem)sender];
 
                 // [DotNetRCAndUtils:1064]
-                // Flag any rows for which an app launch item was run to make it easier for the user
+                // Flag any rows for which a file handler was run to make it easier for the user
                 // to keep track of for which files an action was taken.
                 SetRowFlag(_fileListDataGridView.SelectedRows.OfType<DataGridViewRow>(), true);
 
@@ -1843,13 +1831,13 @@ namespace Extract.FileActionManager.Utilities
                 // change after processing has begun.
                 string[] fileNames = GetSelectedFileNames();
 
-                if (appLaunchItem.Blocking)
+                if (fileHandlerItem.Blocking)
                 {
                     // If blocking, use a modal message box to block rather than calling
                     // RunApplication on this thread; the latter causes the for to report "not
                     // responding" in some circumstances.
-                    ShowMessageBoxWhileBlocking("Running " + appLaunchItem.Name.Quote() + "...",
-                        () => RunApplication(appLaunchItem, fileNames, _appLaunchCanceler.Token));
+                    ShowMessageBoxWhileBlocking("Running " + fileHandlerItem.Name.Quote() + "...",
+                        () => RunApplication(fileHandlerItem, fileNames, _fileHandlerCanceler.Token));
                 }
                 else
                 {
@@ -1857,22 +1845,22 @@ namespace Extract.FileActionManager.Utilities
                     // thread to continue.
                     try
                     {
-                        // Increment the current _appLaunchCountdownEvent to prevent the form from
-                        // closing while the app launch item is still running. (AddCount cannot be
+                        // Increment the current _fileHandlerCountdownEvent to prevent the form from
+                        // closing while the file handler item is still running. (AddCount cannot be
                         // called when the CurrentCount is already zero.)
-                        if (!_appLaunchCountdownEvent.TryAddCount())
+                        if (!_fileHandlerCountdownEvent.TryAddCount())
                         {
-                            _appLaunchCountdownEvent.Reset(1);
+                            _fileHandlerCountdownEvent.Reset(1);
                         }
                         
                         Task.Factory.StartNew(() =>
-                            RunApplication(appLaunchItem, fileNames, _appLaunchCanceler.Token),
-                                _appLaunchCanceler.Token)
+                            RunApplication(fileHandlerItem, fileNames, _fileHandlerCanceler.Token),
+                                _fileHandlerCanceler.Token)
                         .ContinueWith((task) =>
                             {
-                                // Regardless of whether there was a failure, indicate that the app
-                                // launch process has finished.
-                                _appLaunchCountdownEvent.Signal();
+                                // Regardless of whether there was a failure, indicate that the file
+                                // handler process has finished.
+                                _fileHandlerCountdownEvent.Signal();
 
                                 // Handle any failure launching the operation to prevent unhandled
                                 // exceptions from crashing the application.
@@ -1891,16 +1879,16 @@ namespace Extract.FileActionManager.Utilities
                     }
                     catch
                     {
-                        // In case the app launch task was never started, return
-                        // _appLaunchCountdownEvent to its previous value.
-                        _appLaunchCountdownEvent.Signal();
+                        // In case the file handler task was never started, return
+                        // _fileHandlerCountdownEvent to its previous value.
+                        _fileHandlerCountdownEvent.Signal();
                         throw;
                     }
 
                     // Since a non-blocking app will continue to run in the background, use the
                     // status bar to indicate the application is being launched. After 5 seconds,
                     // revert to the normal status message.
-                    _searchStatusLabel.Text = "Started " + appLaunchItem.Name.Quote() + "...";
+                    _searchStatusLabel.Text = "Started " + fileHandlerItem.Name.Quote() + "...";
                     Task.Factory.StartNew(() =>
                     {
                         Thread.Sleep(5000);
@@ -2039,8 +2027,7 @@ namespace Extract.FileActionManager.Utilities
                 bool cancelled;
                 if (FileProcessingDB.ShowLogin(true, out cancelled))
                 {
-                    // The admin login credentials were validated.
-                    InAdminMode = true;
+                    ShowConnectionState();
 
                     // Checks schema
                     Show();
@@ -2076,11 +2063,13 @@ namespace Extract.FileActionManager.Utilities
                     // Hide the main form until the user connects to a database.
                     Hide();
 
+                    // Explicitly close the previous DB connection to clear the credentials.
+                    // Otherwise if reconnecting to the same DB it may be in admin mode though the
+                    // has not been re-prompted
+                    FileProcessingDB.CloseAllDBConnections();
+
                     if (FileProcessingDB.ShowSelectDB("Select database", false, false))
                     {
-                        // After switching database, user will need to re-enter admin mode.
-                        InAdminMode = false;
-
                         // Checks schema
                         FileProcessingDB.ResetDBConnection();
                         ResetFileSelectionSettings();
@@ -2147,7 +2136,7 @@ namespace Extract.FileActionManager.Utilities
         #region Private Members
 
         /// <summary>
-        /// Gets or sets a value indicating whether this instance in currently running in admin mode.
+        /// Gets a value indicating whether this instance in currently running in admin mode.
         /// </summary>
         /// <value><see langword="true"/> if this instance in currently running in admin mode;
         /// otherwise, <see langword="false"/>.
@@ -2156,17 +2145,7 @@ namespace Extract.FileActionManager.Utilities
         {
             get
             {
-                return _inAdminMode;
-            }
-
-            set
-            {
-                if (value != _inAdminMode)
-                {
-                    _inAdminMode = value;
-                    _adminModeToolStripMenuItem.Enabled = !_inAdminMode;
-                    UpdateApplicationTitle();
-                }
+                return FileProcessingDB.LoggedInAsAdmin;
             }
         }
 
@@ -2182,7 +2161,8 @@ namespace Extract.FileActionManager.Utilities
             {
                 if (!_copyFileNamesEnabled.HasValue)
                 {
-                    _copyFileNamesEnabled = true;
+                    _copyFileNamesEnabled =
+                        FileProcessingDB.IsFeatureEnabled(ExtractFeatures.FileHandlerCopyNames);
                 }
 
                 return _copyFileNamesEnabled.Value;
@@ -2202,7 +2182,8 @@ namespace Extract.FileActionManager.Utilities
             {
                 if (!_copyFilesEnabled.HasValue)
                 {
-                    _copyFilesEnabled = true;
+                    _copyFilesEnabled =
+                        FileProcessingDB.IsFeatureEnabled(ExtractFeatures.FileHandlerCopyFiles);
                 }
 
                 return _copyFilesEnabled.Value;
@@ -2222,7 +2203,8 @@ namespace Extract.FileActionManager.Utilities
             {
                 if (!_copyFilesAndDataEnabled.HasValue)
                 {
-                    _copyFilesAndDataEnabled = true;
+                    _copyFilesAndDataEnabled =
+                        FileProcessingDB.IsFeatureEnabled(ExtractFeatures.FileHandlerCopyFilesAndData);
                 }
 
                 return _copyFilesAndDataEnabled.Value;
@@ -2241,7 +2223,8 @@ namespace Extract.FileActionManager.Utilities
             {
                 if (!_reportsEnabled.HasValue)
                 {
-                    _reportsEnabled = true;
+                    _reportsEnabled =
+                        FileProcessingDB.IsFeatureEnabled(ExtractFeatures.RunDocumentSpecificReports);
                 }
 
                 return _reportsEnabled.Value;
@@ -2957,14 +2940,14 @@ namespace Extract.FileActionManager.Utilities
 
         /// <summary>
         /// Launches the specified <see paramref="fileNames"/> in the application defined by
-        /// <see paramref="appLaunchItem"/>.
+        /// <see paramref="fileHanderItem"/>.
         /// </summary>
-        /// <param name="appLaunchItem">The <see cref="AppLaunchItem"/> defining the application to
+        /// <param name="fileHanderItem">The <see cref="FileHandlerItem"/> defining the application to
         /// be run.</param>
         /// <param name="fileNames">The files to be run in <see paramref="appLaunchItem"/></param>
         /// <param name="cancelToken">A <see cref="CancellationToken"/> the that should be checked
         /// before each file to see if the operation has been canceled.</param>
-        void RunApplication(AppLaunchItem appLaunchItem, IEnumerable<string> fileNames,
+        void RunApplication(FileHandlerItem fileHanderItem, IEnumerable<string> fileNames,
             CancellationToken cancelToken)
         {
             try
@@ -2982,19 +2965,19 @@ namespace Extract.FileActionManager.Utilities
                         // Expand the command line arguments using path tags/functions.
                         SourceDocumentPathTags pathTags = new SourceDocumentPathTags(fileName);
 
-                        string applicationPath = appLaunchItem.ApplicationPath;
+                        string applicationPath = fileHanderItem.ApplicationPath;
                         if (!string.IsNullOrEmpty(applicationPath))
                         {
                             applicationPath = pathTags.Expand(applicationPath);
                         }
 
-                        string arguments = appLaunchItem.Arguments;
+                        string arguments = fileHanderItem.Arguments;
                         if (!string.IsNullOrEmpty(arguments))
                         {
                             arguments = pathTags.Expand(arguments);
                         }
 
-                        if (appLaunchItem.SupportsErrorHandling)
+                        if (fileHanderItem.SupportsErrorHandling)
                         {
                             SystemMethods.RunExtractExecutable(applicationPath, arguments);
                         }
@@ -3030,7 +3013,7 @@ namespace Extract.FileActionManager.Utilities
                         }
                         exceptions.Add(new ExtractException("ELI35819",
                             string.Format(CultureInfo.CurrentCulture,
-                            "{0:D} file(s) failed {1}", exceptionCount, appLaunchItem.Name.Quote())));
+                            "{0:D} file(s) failed {1}", exceptionCount, fileHanderItem.Name.Quote())));
                         throw ExtractException.AsAggregateException(exceptions);
                     }
                 }
@@ -3053,7 +3036,7 @@ namespace Extract.FileActionManager.Utilities
                     
                     // If there was an error launching a non-blocking app, ensure the status label is
                     // returned
-                    if (!appLaunchItem.Blocking)
+                    if (!fileHanderItem.Blocking)
                     {
                         UpdateStatusLabel();
                     }
@@ -3408,11 +3391,22 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Causes the availability of features to be re-checked against the database.
+        /// </summary>
+        void CheckAvailableFeatures()
+        {
+            _copyFileNamesEnabled = null;
+            _copyFilesEnabled = null;
+            _copyFilesAndDataEnabled = null;
+            _reportsEnabled = null;
+        }
+
+        /// <summary>
         /// Updates the file selection summary label.
         /// </summary>
         void UpdateFileSelectionSummary()
         {
-            UpdateApplicationTitle();
+            ShowConnectionState();
 
             string summaryText = FileSelector.GetSummaryString();
             _selectFilesSummaryLabel.Text = "Listing ";
@@ -3422,9 +3416,9 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Updates the application title.
+        /// Updates UI elements that reflect the current connection state.
         /// </summary>
-        void UpdateApplicationTitle()
+        void ShowConnectionState()
         {
             Text = _APPLICATION_TITLE;
             if (FileProcessingDB.IsConnected)
@@ -3435,6 +3429,8 @@ namespace Extract.FileActionManager.Utilities
                     Text += " (Admin mode)";
                 }
             }
+
+            _adminModeToolStripMenuItem.Enabled = FileProcessingDB.IsConnected && !InAdminMode;
         }
 
         #endregion Private Members
