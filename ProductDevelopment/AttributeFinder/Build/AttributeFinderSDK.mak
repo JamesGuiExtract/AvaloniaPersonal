@@ -93,7 +93,7 @@ BuildAttributeFinderCore:
 	
 CopyFilesToInstallFolder: 
     @ECHO Copying the AttributeFinder files to installation directory...
-	@DeleteFiles "$(AFInstallFilesRootDir)\NonSelfRegSDKComponents\*.*" /S /Q
+	@IF NOT EXIST "$(AFInstallFilesRootDir)\Redist" @MKDIR "$(AFInstallFilesRootDir)\Redist"
 	@DeleteFiles "$(AFInstallFilesRootDir)\Redist"\*.*" /S /Q
     @COPY /v "$(MergeModuleRootDir)\ExtractCommonMM.msm" "$(AFInstallFilesRootDir)\Redist"
     @COPY /v "$(MergeModuleRootDir)\UCLIDFlexIndex.msm" "$(AFInstallFilesRootDir)\Redist"
