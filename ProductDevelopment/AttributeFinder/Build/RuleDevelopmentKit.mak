@@ -59,7 +59,13 @@ BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
 # B U I L D    T A R G E T S
 #
 
-CopyFilesToInstallFolder: 
+CreateDestinationFolders:
+	@IF NOT EXIST "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents" @MKDIR "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"
+	@IF NOT EXIST "$(RDTInstallFilesRootDir)\SelfRegRDTComponents" @MKDIR "$(RDTInstallFilesRootDir)\SelfRegRDTComponents"
+	@IF NOT EXIST "$(RDTInstallFilesRootDir)\SelfRegCommonComponents" @MKDIR "$(RDTInstallFilesRootDir)\SelfRegCommonComponents"
+	@IF NOT EXIST "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" @MKDIR "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
+
+CopyFilesToInstallFolder: CreateDestinationFolders
     @ECHO Copying the TCL files to installation directory...
 	@DeleteFiles "$(RDTInstallFilesRootDir)\SelfRegRDTComponents\*.*" /S
 	@DeleteFiles "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents\*.*" /S
