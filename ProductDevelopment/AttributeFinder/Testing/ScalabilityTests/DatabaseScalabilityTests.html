@@ -88,6 +88,42 @@ to install FLEX Index.
         	<li>On each processing machine, start the test FPS file.
 	</ul>
 </ul>
+<p>
+<h2>Test #3 - Database Performance</h2>
+<ul>
+	<li><b>Purpose & Machine Setup</b>
+	<ul>
+		<li>Confirm that FAM processing and <b>DB Admin</b> can handle an extremely 
+		large database.
+		<li>Select a test machine to serve as the image and database host.
+		<li>Install and license the <b>full</b> version of SQL Server.
+		<li>Exercise <b>Setup.bat</b> from the <b>DB_Scalability</b> folder.
+		<li>Confirm presence of required database.
+		<ul>
+			<li>Name = <b>DB_Scalability</b>
+			<li>Action = <b>Action1</b>
+			<li>Action = <b>Action2</b>
+			<li>Action = <b>Action3</b>
+		</ul>
+		<li>Confirm presence of 1000 image files in the <b>Images</b> folder.
+		<li>Confirm that each FPS file opens without error.
+		<ul>
+			<li>Queue.fps
+			<li>Action1.fps
+			<li>Action2.fps
+			<li>Action3.fps
+		</ul>
+		<li>Configure the FAM service to execute each of the FPS files.
+	</ul>
+<p>
+	<li><b>Test Execution</b>
+	<ul>
+		<li>Start the FAM service.
+		<li>Confirm that processing continues automatically.
+		<li>Track the total number of completed files for each day of processing.
+		<li>Confirm that no unusual items are found in the exception log.
+	</ul>
+</ul>
 </ol>
 </body>
 </html>
