@@ -70,8 +70,7 @@ CreateFlexLMInstall: BuildExtractLMInstall
     @IF NOT EXIST "$(AFExtractLMBleedingEdgeDir)" MKDIR "$(AFExtractLMBleedingEdgeDir)"
     @XCOPY "$(ExtractLMInstallMediaDir)\*.*" "$(AFExtractLMBleedingEdgeDir)" /v /s /e /y
     $(VerifyDir) "$(ExtractLMInstallMediaDir)" "$(AFExtractLMBleedingEdgeDir)"
-	@COPY /v "$(LMInstallFilesRootDir)\64BitDrivers\*.*" "$(AFExtractLMBleedingEdgeDir)"
-    @DeleteFiles "$(AFExtractLMBleedingEdgeDir)\vssver.scc"
+	@DeleteFiles "$(AFExtractLMBleedingEdgeDir)\vssver.scc"
     @ECHO.
     @DATE /T
     @TIME /T

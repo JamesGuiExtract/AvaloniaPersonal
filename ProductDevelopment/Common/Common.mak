@@ -40,6 +40,8 @@ VcppLibDirs=$(VCPP_DIR)\ATLMFC\LIB;$(VCPP_DIR)\LIB;$(WINDOWS_SDK)\lib
 IncludeDirs=$(VcppIncludeDirs)
 LibDirs=$(VcppLibDirs)
 
+CScriptProgram=$(CSCRIPT_PATH)\cscript
+
 Label="$(VAULT_DIR)\vault" LABEL -server $(VAULT_SERVER) -repository "Extract"
 DelOptions=/Q /F /S
 ISCompile=Compile
@@ -47,7 +49,7 @@ ISCompileOptions=-I"$(INSTALL_SHIELD_DIR)\Include"
 InstallBuilder=ISBuild
 PerlInterpreter=$(PERL_BIN_DIR)\Perl.exe
 VerifyDir=$(EngineeringRootDirectory)\ProductDevelopment\Common\VerifyDir.bat
-SetProductVerScript=CScript "$(CommonDirectory)\SetProductVersion.vbs"
+SetProductVerScript=$(CScriptProgram) "$(CommonDirectory)\SetProductVersion.vbs"
 UpdateFileVersion="I:\Common\Engineering\Tools\Utils\UpdateFileVersion\UpdateFileVersion.exe"
 
 !IF "$(BUILD_FROM_SVN)" == "YES"

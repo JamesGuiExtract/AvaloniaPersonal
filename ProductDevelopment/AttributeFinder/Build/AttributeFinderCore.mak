@@ -84,7 +84,7 @@ BuildAttributeFinderCore:
     @CD "$(AFRootDirectory)\AFCore\AFCoreTest\Code"
     @devenv AFCoreTest.sln /BUILD $(BuildConfig)
 	@DeleteFiles "$(BinariesFolder)\DataEntryApplication.exe.config"
-	cscript "$(CommonDirectory)\Make DEPs Compatible.vbs" "$(BinariesFolder)"
+	$(CScriptProgram) "$(CommonDirectory)\Make DEPs Compatible.vbs" "$(BinariesFolder)"
 	
 UnregisterClearImage5_7:
 	@ECHO Unregistering ClearImage 5_7...

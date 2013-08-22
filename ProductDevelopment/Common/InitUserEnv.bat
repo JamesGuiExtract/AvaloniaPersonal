@@ -3,9 +3,11 @@ ECHO OFF
 REM This set before the check since the "(" in the environment variable cause problems in an IF statement
 REM when it they are expanded
 SET PROGRAM_ROOT=%ProgramFiles(x86)%
+SET CSCRIPT_PATH=%SystemRoot%\syswow64
 
 IF NOT "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 	SET PROGRAM_ROOT=%ProgramFiles%
+	SET CSCRIPT_PATH=%SystemRoot%\System32
 )
 
 IF DEFINED BUILD_LOCAL (
@@ -25,7 +27,8 @@ SET WINDOWS_SDK=C:\Program Files\Microsoft SDKs\Windows\v7.1
 
 SET VAULT_DIR=%PROGRAM_ROOT%\SourceGear\Vault Client
 
-SET DEV_STUDIO_DIR=%PROGRAM_ROOT%\InstallShield\2010
+SET DEV_STUDIO_DIR=%PROGRAM_ROOT%\InstallShield\2013 SAB
+SET DOTFUSCATOR=%PROGRAM_ROOT%\PreEmptive Solutions\Dotfuscator Professional Edition 4.10
+SET INSTALLSHIELD_PROJECTS_DIR=C:\InstallShield 2013 Projects
 
-SET DOTFUSCATOR=%PROGRAM_ROOT%\PreEmptive Solutions\Dotfuscator Professional Edition 4.9
 SET FX_COP=%PROGRAM_ROOT%\Microsoft FxCop 1.36

@@ -154,6 +154,7 @@ CreateFLEXCustomerRDTInstallCD: BuildFLEXCustomerRDTInstall
 	
 CopyTestFiles:
 	@ECHO Copying Automated Test Files
+	@IF NOT EXIST "$(TestingFilesDirectory)" @MKDIR "$(TestingFilesDirectory)"
     @DeleteFiles /S /Q "$(TestingFilesDirectory)\*.*"
 	@XCOPY "$(AFRootDirectory)\AFConditions\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFConditions\AutomatedTest" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\AFCore\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\" /s /e /y /I

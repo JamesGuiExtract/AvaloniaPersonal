@@ -52,7 +52,7 @@ Sub Main
     end if
 	
 	Dim pProject
-	Set pProject = CreateObject ("IswiAuto16.ISWiProject")
+	Set pProject = CreateObject ("IswiAuto20.ISWiProject")
 
 	'Open Project
 	pProject.OpenProject sProjectName, False

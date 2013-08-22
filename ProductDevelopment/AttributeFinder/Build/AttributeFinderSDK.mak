@@ -42,7 +42,7 @@ FlexIndexInstallDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)\FlexIndexInstall
 IDShieldInstallDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)\IDShieldInstall
 DotNetFiles=P:\AttributeFinder\CoreInstallation\Files\DotNetGAC
 
-MergeModuleRootDir=C:\InstallShield 2010 Projects\MergeModules
+MergeModuleRootDir=$(INSTALLSHIELD_PROJECTS_DIR)\MergeModules
 FlexIndexSDKInstallRootDir=$(PDRootDir)\AttributeFinder\Installation\UCLID FlexIndex SDK
 FlexIndexSDKInstallMediaDir=$(FlexIndexSDKInstallRootDir)\Media\CD-ROM\DiskImages\DISK1
 
