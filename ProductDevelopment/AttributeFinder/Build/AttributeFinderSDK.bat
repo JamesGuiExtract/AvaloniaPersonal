@@ -35,14 +35,16 @@ SET BuildScriptTarget=DoEverythingNoGet
 CALL InitUserEnv.Bat
 CALL InitBuildEnv.Bat
 REM vcvars32 initializes command-line build vars so that editbin can be called to re-apply properties post-obfuscation
-CALL "%VCPP_DIR%\Bin\vcvars32.bat"
+REM Not needed because the correct path already gets included in the Path
+REM CALL "%VCPP_DIR%\Bin\vcvars32.bat"
 GOTO no_get
 
 :init_build
 CALL InitUserEnv.Bat
 CALL InitBuildEnv.Bat
 REM vcvars32 initializes command-line build vars so that editbin can be called to re-apply properties post-obfuscation
-CALL "%VCPP_DIR%\Bin\vcvars32.bat"
+REM Not needed because the correct path already gets included in the Path
+REM CALL "%VCPP_DIR%\Bin\vcvars32.bat"
 
 REM Don't need to get the common and AttributeFinder build folders because either they will have been gotten manually or thru
 REM the LabeFromLatestAndBuild.bat file that calls this
