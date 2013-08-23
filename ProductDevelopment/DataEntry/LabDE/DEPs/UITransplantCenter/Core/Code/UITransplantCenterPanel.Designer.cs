@@ -1007,6 +1007,7 @@
             this._orderNumberColumn.SupportsSwiping = false;
             this._orderNumberColumn.ValidationErrorMessage = "Order number is required";
             this._orderNumberColumn.ValidationPattern = "^(\\d{8,})|(pr)\\s?$";
+            this._orderNumberColumn.ValidationQuery = resources.GetString("_orderNumberColumn.ValidationQuery");
             // 
             // _testName
             // 
