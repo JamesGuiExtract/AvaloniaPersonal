@@ -399,13 +399,13 @@
 		(&lt;RangeMin/&gt; != '') and
 		&lt;!--Value min must not be set or be less than range min--&gt;
 		((&lt;ValueMin/&gt; == '') or 
-			(((&lt;ValueMinBias/&gt; &amp;gt;= &lt;RangeMinBias/&gt;) and (&lt;ValueMin/&gt; &amp;lt; &lt;RangeMin/&gt;)) or
-			 ((&lt;ValueMinBias/&gt; &amp;lt; &lt;RangeMinBias/&gt;) and (&lt;ValueMin/&gt; &amp;lt;= &lt;RangeMin/&gt;))))
+			(((&lt;ValueMinBias/&gt; &amp;gt;= &lt;RangeMinBias/&gt;) and (&lt;ValueMin Type='double'/&gt; &amp;lt; &lt;RangeMin Type='double'/&gt;)) or
+			 ((&lt;ValueMinBias/&gt; &amp;lt; &lt;RangeMinBias/&gt;) and (&lt;ValueMin Type='double'/&gt; &amp;lt;= &lt;RangeMin Type='double'/&gt;))))
 			 and
 		&lt;!--Value max must not be set or be within the range min--&gt;
 		((&lt;ValueMax/&gt; == '') or 
-			(((&lt;ValueMaxBias/&gt; &amp;gt;= &lt;RangeMinBias/&gt;) and (&lt;ValueMax/&gt; &amp;gt;= &lt;RangeMin/&gt;)) or
-			 ((&lt;ValueMaxBias/&gt; &amp;lt; &lt;RangeMinBias/&gt;) and (&lt;ValueMax/&gt; &amp;gt; &lt;RangeMin/&gt;))))	
+			(((&lt;ValueMaxBias/&gt; &amp;gt;= &lt;RangeMinBias/&gt;) and (&lt;ValueMax Type='double'/&gt; &amp;gt;= &lt;RangeMin Type='double'/&gt;)) or
+			 ((&lt;ValueMaxBias/&gt; &amp;lt; &lt;RangeMinBias/&gt;) and (&lt;ValueMax Type='double'/&gt; &amp;gt; &lt;RangeMin Type='double'/&gt;))))	
 	&lt;/Expression&gt;
 	&lt;Expression Name='InRangeHigh'&gt;
 		&lt;!--If we don't have a value and a range maximum to compare consider high range boundary validated--&gt;
@@ -420,13 +420,13 @@
 		(&lt;RangeMax/&gt; != '') and
 		&lt;!--Value min must not be set or be within than range max--&gt;
 		((&lt;ValueMin/&gt; == '') or 
-			(((&lt;ValueMinBias/&gt; &amp;gt; &lt;RangeMaxBias/&gt;) and (&lt;ValueMin/&gt; &amp;lt; &lt;RangeMax/&gt;)) or
-			 ((&lt;ValueMinBias/&gt; &amp;lt;= &lt;RangeMaxBias/&gt;) and (&lt;ValueMin/&gt; &amp;lt;= &lt;RangeMax/&gt;))))
+			(((&lt;ValueMinBias/&gt; &amp;gt; &lt;RangeMaxBias/&gt;) and (&lt;ValueMin Type='double'/&gt; &amp;lt; &lt;RangeMax Type='double'/&gt;)) or
+			 ((&lt;ValueMinBias/&gt; &amp;lt;= &lt;RangeMaxBias/&gt;) and (&lt;ValueMin Type='double'/&gt; &amp;lt;= &lt;RangeMax Type='double'/&gt;))))
 			 and
 		&lt;!--Value max must not be set or be greater than range max--&gt;
 		((&lt;ValueMax/&gt; == '') or 
-			(((&lt;ValueMaxBias/&gt; &amp;gt; &lt;RangeMaxBias/&gt;) and (&lt;ValueMax/&gt; &amp;gt;= &lt;RangeMax/&gt;)) or
-			 ((&lt;ValueMaxBias/&gt; &amp;lt;= &lt;RangeMaxBias/&gt;) and (&lt;ValueMax/&gt; &amp;gt; &lt;RangeMax/&gt;))))
+			(((&lt;ValueMaxBias/&gt; &amp;gt; &lt;RangeMaxBias/&gt;) and (&lt;ValueMax Type='double'/&gt; &amp;gt;= &lt;RangeMax Type='double'/&gt;)) or
+			 ((&lt;ValueMaxBias/&gt; &amp;lt;= &lt;RangeMaxBias/&gt;) and (&lt;ValueMax Type='double'/&gt; &amp;gt; &lt;RangeMax Type='double'/&gt;))))
 	&lt;/Expression&gt;
 &lt;/Declarations&gt;
 &lt;Query&gt;[BLANK]&lt;SQL&gt;SELECT * FROM Flag ORDER BY Flag&lt;/SQL&gt;&lt;/Query&gt;
