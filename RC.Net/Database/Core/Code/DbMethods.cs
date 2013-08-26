@@ -80,11 +80,16 @@ namespace Extract.Database
                         ? DbProviderFactories.GetFactory(_config.Settings.DefaultDBProviderFactoryName)
                         : DbProviderFactories.GetFactory(providerRow);
 
+                    // [DataEntry:1273]
                     // In case the parameters are not named, order will be important, so ensure the
-                    // parameters are added in order of their key.
+                    // parameters are added in order of their key (interpreted as a number, if possible).
+                    int intValue = 0;
                     foreach (KeyValuePair<string, string> parameter in parameters
                         .OrderBy(parameter =>
-                            Int32.Parse(parameter.Key.Substring(1), CultureInfo.InvariantCulture)))
+                            (parameter.Key.Length > 1 && 
+                             int.TryParse(parameter.Key.Substring(1), out intValue))
+                                ? (IComparable)intValue
+                                : (IComparable)parameter.Key))
                     {
                         DbParameter dbParameter = providerFactory.CreateParameter();
                         dbParameter.Direction = ParameterDirection.Input;
