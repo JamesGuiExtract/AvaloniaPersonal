@@ -13,6 +13,47 @@
 // their memory usage.
 #define MEMORY_MANAGER_CLASS	"Extract.Interop.MemoryManager"
 
+// [LegacyRCAndUtils:6460]
+// This macro releases the specified IMemoryManagerPtr, but ignores exception 0x8007042b
+// (The process terminated unexpectedly). While this issue should be fixed properly at some point,
+// in the meantime I can't figure out why this is occuring and if the process has terminated, there
+// is no need to report memory usage to the garbage collector.
+#define RELEASE_MEMORY_MANAGER(ipMemoryManager, strELI) \
+	try \
+	{ \
+		try \
+		{ \
+			if (ipMemoryManager != __nullptr) \
+			{ \
+				ipMemoryManager->ReportUnmanagedMemoryUsage(0); \
+				ipMemoryManager = __nullptr; \
+			} \
+		} \
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION(strELI) \
+	} \
+	catch (UCLIDException &ue) \
+	{ \
+		const vector<NamedValueTypePair>& vecDebugInfo = ue.getDebugVector(); \
+		bool bIsProcessTerminatedException = false; \
+		for (unsigned long n = 0; n < vecDebugInfo.size(); n++) \
+		{ \
+			const NamedValueTypePair& data = vecDebugInfo[n]; \
+			if (data.GetName() == "HRESULT") \
+			{ \
+				const ValueTypePair& debugValue = data.GetPair(); \
+				if (debugValue.getType() == ValueTypePair::kString && \
+					debugValue.getStringValue() == "0x8007042b") \
+				{ \
+					bIsProcessTerminatedException = true; \
+				} \
+			} \
+		} \
+		if (!bIsProcessTerminatedException) \
+		{ \
+			throw ue; \
+		} \
+	}
+
 using namespace std;
 
 //-------------------------------------------------------------------------------------------------

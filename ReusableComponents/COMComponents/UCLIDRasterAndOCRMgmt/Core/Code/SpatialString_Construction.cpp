@@ -34,13 +34,9 @@ CSpatialString::~CSpatialString()
 		// Clear the page info map
 		m_ipPageInfoMap = __nullptr;
 		
-		// If memory usage has been resported, report that this instance is no longer using any
+		// If memory usage has been reported, report that this instance is no longer using any
 		// memory.
-		if (m_ipMemoryManager != __nullptr)
-		{
-			m_ipMemoryManager->ReportUnmanagedMemoryUsage(0);
-			m_ipMemoryManager = __nullptr;
-		}
+		RELEASE_MEMORY_MANAGER(m_ipMemoryManager, "ELI36091");
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16539");
 }
