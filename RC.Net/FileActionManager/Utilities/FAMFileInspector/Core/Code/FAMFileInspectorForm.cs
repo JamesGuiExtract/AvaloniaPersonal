@@ -602,6 +602,9 @@ namespace Extract.FileActionManager.Utilities
                 _searchModifierComboBox.SelectEnumValue(SearchModifier.Any);
                 _textSearchTermsDataGridView.Rows.Clear();
                 _dataSearchTermsDataGridView.Rows.Clear();
+                _caseSensitiveSearchCheckBox.Checked = false;
+                _regexSearchCheckBox.Checked = false;
+                _fuzzySearchCheckBox.Checked = false;
 
                 // Populate all pre-defined search terms from the database's FieldSearch table.
                 queryResults = FileProcessingDB.GetResultsForQuery(
@@ -1300,6 +1303,34 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI36040");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="CheckBox.CheckedChanged"/> event of the
+        /// <see cref="_fuzzySearchCheckBox"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleFuzzySearchCheckBox_CheckedChanged(object sender, System.EventArgs e)
+        {
+            try
+            {
+                // Fuzzy search is not supported for regular expressions in general.
+                if (_fuzzySearchCheckBox.Checked)
+                {
+                    _regexSearchCheckBox.Checked = false;
+                    _regexSearchCheckBox.Enabled = false;
+                }
+                else
+                {
+                    _regexSearchCheckBox.Enabled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36093");
             }
         }
 
@@ -2506,16 +2537,7 @@ namespace Extract.FileActionManager.Utilities
             var regexParsers = new List<Regex>();
             foreach (string searchTerm in searchTerms)
             {
-                DotNetRegexParser regexParser = new DotNetRegexParser();
-                if (searchTerm.StartsWith("~", StringComparison.Ordinal))
-                {
-                    regexParser.Pattern = searchTerm.Substring(1);
-                }
-                else
-                {
-                    regexParser.Pattern = Regex.Escape(searchTerm);
-                }
-                regexParser.RegexOptions |= RegexOptions.Compiled;
+                DotNetRegexParser regexParser = PrepareSearchRegex(searchTerm);
                 regexParsers.Add(regexParser.Regex);
             }
 
@@ -2684,16 +2706,7 @@ namespace Extract.FileActionManager.Utilities
             var regexParsers = new Dictionary<string, Regex>();
             foreach (KeyValuePair<string, string> searchTerm in searchTerms)
             {
-                DotNetRegexParser regexParser = new DotNetRegexParser();
-                if (searchTerm.Value.StartsWith("~", StringComparison.Ordinal))
-                {
-                    regexParser.Pattern = searchTerm.Value.Substring(1);
-                }
-                else
-                {
-                    regexParser.Pattern = Regex.Escape(searchTerm.Value);
-                }
-                regexParser.RegexOptions |= RegexOptions.Compiled;
+                DotNetRegexParser regexParser = PrepareSearchRegex(searchTerm.Value);
                 regexParsers.Add(searchTerm.Key, regexParser.Regex);
             }
 
@@ -2815,6 +2828,40 @@ namespace Extract.FileActionManager.Utilities
                     ExtractException.AsAggregateException(exceptions).Display();
                 }
             }));
+        }
+
+        /// <summary>
+        /// Prepares a <see cref="DotNetRegexParser"/> instance to search for the
+        /// <see paramref="searchTerm"/> based on the currently selected search options.
+        /// </summary>
+        /// <param name="searchTerm">The search term.</param>
+        /// <returns>A <see cref="DotNetRegexParser"/> instance to search for the
+        /// <see paramref="searchTerm"/>.
+        /// </returns>
+        DotNetRegexParser PrepareSearchRegex(string searchTerm)
+        {
+            DotNetRegexParser regexParser = new DotNetRegexParser();
+
+            // If the search term is not a regex, escape the search term for use as a regex.
+            regexParser.Pattern = _regexSearchCheckBox.Checked 
+                ? searchTerm
+                : Regex.Escape(searchTerm);
+
+            if (_fuzzySearchCheckBox.Checked)
+            {
+                // Allow one wrong char per 3 chars in the search term and 1 extra whitespace char
+                // per 2 chars in the search term.
+                int errorAllowance = searchTerm.Length / 3;
+                int whiteSpaceAllowance = searchTerm.Length / 2;
+
+                regexParser.Pattern = string.Format(CultureInfo.InvariantCulture,
+                    "(?~<method=better_fit,error={0:D},xtra_ws={1:D}>{2})",
+                    errorAllowance, whiteSpaceAllowance, regexParser.Pattern);
+            }
+
+            regexParser.IgnoreCase = !_caseSensitiveSearchCheckBox.Checked;
+            regexParser.RegexOptions |= RegexOptions.Compiled;
+            return regexParser;
         }
 
         /// <summary>

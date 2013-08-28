@@ -1,5 +1,6 @@
 ﻿using Extract.Licensing;
 using System;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
@@ -44,6 +45,11 @@ namespace Extract.FileActionManager.Utilities
         /// status condition.
         /// </summary>
         static string _actionStatus;
+
+        /// <summary>
+        /// An SQL query to be used to limit the initial file selection.
+        /// </summary>
+        static string _queryFilename;
 
         /// <summary>
         /// The number of files that may be displayed in the file list at once, or
@@ -108,9 +114,9 @@ namespace Extract.FileActionManager.Utilities
 
                             famFileInspectorForm.ResetFileSelectionSettings();
 
-                            // If an action status condition was specified via command-line
-                            // arguments, apply it.
-                            ApplyActionStatusCondition(famFileInspectorForm);
+                            // If any conditions were specified via command-line arguments, apply
+                            // them.
+                            ApplyConditions(famFileInspectorForm);
 
                             famFileInspectorForm.ResetSearch();
 
@@ -144,22 +150,62 @@ namespace Extract.FileActionManager.Utilities
         #region Private Methods
 
         /// <summary>
+        /// Applies condition(s) specified in the command-line args (if any).
+        /// </summary>
+        /// <param name="famFileInspectorForm">The <see cref="FAMFileInspectorForm"/> to which the
+        /// condition(s) should be applied.</param>
+        static void ApplyConditions(FAMFileInspectorForm famFileInspectorForm)
+        {
+            ApplyActionStatusCondition(famFileInspectorForm);
+            ApplyQueryCondition(famFileInspectorForm);
+        }
+
+        /// <summary>
         /// Applies the action status condition specified in the command-line args (if any).
         /// </summary>
         /// <param name="famFileInspectorForm">The <see cref="FAMFileInspectorForm"/> to which the
         /// condition should be applied.</param>
         static void ApplyActionStatusCondition(FAMFileInspectorForm famFileInspectorForm)
-        {
+        {   
+            int actionId = -1;
+            EActionStatus status = EActionStatus.kActionUnattempted;
+
             try
             {
                 if (!string.IsNullOrWhiteSpace(_actionName))
                 {
-                    int actionId =
-                        famFileInspectorForm.FileProcessingDB.GetActionID(_actionName);
+                    actionId = famFileInspectorForm.FileProcessingDB.GetActionID(_actionName);
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = new ExtractException("ELI36098",
+                    "Unable to apply action status condition: Invalid action name", ex);
+                ee.AddDebugData("Action", _actionName, false);
+                ee.Display();
+                return;
+            }
 
-                    EActionStatus status =
-                        famFileInspectorForm.FileProcessingDB.AsEActionStatus(_actionStatus);
-                    
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(_actionName))
+                {
+                    status = famFileInspectorForm.FileProcessingDB.AsEActionStatus(_actionStatus);
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = new ExtractException("ELI36099",
+                    "Unable to apply action status condition: Invalid action status", ex);
+                ee.AddDebugData("Status", _actionStatus, false);
+                ee.Display();
+                return;
+            }
+
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(_actionName))
+                {
                     famFileInspectorForm.FileSelector.AddActionStatusCondition(
                         famFileInspectorForm.FileProcessingDB, actionId, status);
                 }
@@ -169,6 +215,31 @@ namespace Extract.FileActionManager.Utilities
                 var ee = new ExtractException("ELI36069", "Unable to apply action status condition", ex);
                 ee.AddDebugData("Action", _actionName, false);
                 ee.AddDebugData("Status", _actionStatus, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Applies the query condition specified in the command-line args (if any).
+        /// </summary>
+        /// <param name="famFileInspectorForm">The <see cref="FAMFileInspectorForm"/> to which the
+        /// condition should be applied.</param>
+        static void ApplyQueryCondition(FAMFileInspectorForm famFileInspectorForm)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(_queryFilename))
+                {
+                    string query = File.ReadAllText(_queryFilename);
+
+                    famFileInspectorForm.FileSelector.AddQueryCondition(
+                        famFileInspectorForm.FileProcessingDB, query);
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = new ExtractException("ELI36094", "Unable to apply query condition", ex);
+                ee.AddDebugData("Query filename", _queryFilename, false);
                 ee.Display();
             }
         }
@@ -215,6 +286,23 @@ namespace Extract.FileActionManager.Utilities
                 else if (!_fileCount.HasValue && i == 1)
                 {
                     _databaseName = argument;
+                }
+                else if (argument.Equals("/query", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (string.IsNullOrWhiteSpace(_databaseName))
+                    {
+                        ShowUsage("Query condition cannot be specified without a " +
+                            "database server and name.");
+                    }
+
+                    i++;
+                    if (i == args.Length)
+                    {
+                        ShowUsage("SQL query filename expected.");
+                        return false;
+                    }
+
+                    _queryFilename = args[i];
                 }
                 else if (argument.Equals("/action", StringComparison.OrdinalIgnoreCase))
                 {
@@ -322,7 +410,8 @@ namespace Extract.FileActionManager.Utilities
 
             usage.Append(Environment.GetCommandLineArgs()[0]);
             usage.AppendLine(" /? | [/filecount <count>] | <ServerName> <DatabaseName> " +
-                "[/action <actionName> /status <statusName>] [/filecount <count>]");
+                "[/action <actionName> /status <statusName>] [/query <queryFileName>] " +
+                "[/filecount <count>]");
             usage.AppendLine();
             usage.AppendLine("ServerName: The name of the database server to connect to.");
             usage.AppendLine();
@@ -335,6 +424,9 @@ namespace Extract.FileActionManager.Utilities
             usage.AppendLine("/status <statusName>: The target status when limiting the " +
                 "initial file selection based on a file action status condition. Must be used " +
                 "in conjuntion with the /status argument.");
+            usage.AppendLine();
+            usage.AppendLine("/query <queryFileName>: An file containing an SQL query to be " +
+                "used to limit the initial file selection.");
             usage.AppendLine();
             usage.AppendLine("/filecount <count>: Specifies number of files that may be " +
                 "displayed in the file list at once.");
