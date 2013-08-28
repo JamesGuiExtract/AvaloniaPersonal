@@ -13,8 +13,8 @@
 <hr>
 
 <h2>Each operating system shall be tested from a clean Clonezilla image or Virtual Machine.</h2>
-<h2>The .NET and SQL Server installations can be exercised from either the FLEX Index or the ID 
-Shield DemoShield application.</h2>
+<h2>The .NET and SQL Server installations can be exercised from either the LabDE, FLEX Index 
+or the ID Shield DemoShield application.</h2>
 <p>
 <UL>
     	<LI><b>.NET 3.5 and 4.0 Installation</b>
@@ -38,7 +38,7 @@ Shield DemoShield application.</h2>
         	</ul></li>
     	</ul></li>
 <p>
-    	<LI>Create a license file for <b>FLEX Index</b> and <b>ID Shield</b>.
+    	<LI>Create a license file for <b>LabDE</b>, <b>FLEX Index</b> and <b>ID Shield</b>.
 	<LI>Create a local user on the test machine.  Do <b>not</b> add the user to the 
 	<b>Administrators</b> group.
 	<li>Add the new user to the <b>Remote Desktop Users</b> group.
@@ -91,8 +91,8 @@ Shield DemoShield application.</h2>
 			<li>ExtractFlexCommonMM.msm
 			<li>UCLIDFlexIndex.msm
 		</ul>
-		<li>Confirm via the <b>Control Panel</b> that the following <b>external</b> programs 
-		have been installed along with FLEX Index.
+		<li>Confirm via the <b>Control Panel</b> that the following <b>external</b>
+		programs have been installed along with FLEX Index.
         	<ul>
             		<li>ClearImage 7 PDK</li>
             		<li>Crystal Reports 2008 Runtime SP1</li>
@@ -122,8 +122,10 @@ Shield DemoShield application.</h2>
                 		<li>Convert FAM Database</li>
                 		<li>Convert FPS File</li>
                 		<li>Detect and Report Failure</li>
+                		<li>FAM File Inspector</li>
                 		<li>FAM Network Manager</li>
                 		<li>Image Viewer</li>
+                		<li>Pagination Utility</li>
                 		<li>Rule Tester</li>
                 		<li>Test Text Function Expander</li>
                 		<li>USS File Viewer</li>
@@ -187,11 +189,74 @@ Shield DemoShield application.</h2>
                 		<li>Convert FAM Database</li>
                 		<li>Convert FPS File</li>
                 		<li>Detect and Report Failure</li>
+                		<li>FAM File Inspector</li>
                 		<li>FAM Network Manager</li>
 				<li>ID Shield Statistics Reporter</li>
                 		<li>Image Viewer</li>
+                		<li>Pagination Utility</li>
                 		<li>Rule Tester</li>
                 		<li>Test Text Function Expander</li>
+                		<li>USS File Viewer</li>
+                		<li>View Exception Log</li>
+                		<li>VOA File Viewer</li>
+            		</ul></li>
+        	</ul></li>
+    	</ul></li>
+<p>
+    	<LI><b>LabDE Installation</b>
+    	<ul>
+        	<li>Confirm that the <b>Demo Shield</b> text fields do not overlap when 
+		selecting other items.</li>
+<p>
+        	<li>Confirm that the following items are available from the <b>Demo Shield</b> 
+		install.  Also confirm that an appropriate message is provided in the right-hand 
+		pane after a mouse-over event on the product name.
+        	<ul>
+            		<li>Microsoft .NET 3.5 and 4.0</li>
+            		<li>SQL Server Applications
+            		<ul>
+                		<li>Windows Installer 4.5</li>
+                		<li>SQL Server 2008</li>
+                		<li>SQL Management Studio</li>
+            		</ul></li>
+            		<li>Install LabDE</li>
+            		<li>Extract Systems License Manager</li>
+            		<li>HL7 Integration Engine</li>
+        	</ul></li>
+<p>
+        	<LI>Confirm that copyright dates include the appropriate year for the following
+        	<ul>
+                	<li>LabDE installation splash screen</li>
+                	<li>LabDE installation licensing page</li>
+        	</ul></li>
+		<li>Confirm that <b>LabDE</b> can be installed without error.
+<p>
+		<li>Confirm via the <b>Control Panel</b> that the following <b>external</b> 
+		programs have been installed along with LabDE.
+        	<ul>
+            		<li>ClearImage 7 PDK</li>
+            		<li>Crystal Reports 2008 Runtime SP1</li>
+            		<li>Microsoft SQL Server Compact 3.5 SP2</li>
+        	</ul></li>
+    	</ul></li>
+<p>
+    	<LI><b>LabDE Start Menu</b>
+    	<ul>
+        	<li>Confirm that the following items are available from the <b>Extract Systems 
+		LabDE</b> Start menu.  Note that functionality is tested in the Sanity Test.
+        	<ul>
+            		<li>DB Administration</li>
+            		<li>File Action Manager</li>
+            		<li>LabDE Help</li>
+            		<li>USB License Key Manager</li>
+            		<li>User License</li>
+            		<li>Utilities
+            		<ul>
+                		<li>Configure FAM Service</li>
+                		<li>Detect and Report Failure</li>
+                		<li>FAM File Inspector</li>
+                		<li>Image Viewer</li>
+                		<li>Rule Tester</li>
                 		<li>USS File Viewer</li>
                 		<li>View Exception Log</li>
                 		<li>VOA File Viewer</li>
@@ -203,7 +268,8 @@ Shield DemoShield application.</h2>
     	<ul>
 		<li>Confirm that <b>Extract Systems LM</b> can be installed without error.
         	<li>Confirm that the following items are available from the <b>Extract
-        	Systems LM</b> Start menu.  Note that functionality is tested in the Sanity Test.
+        	Systems LM</b> Start menu.  Note that functionality is tested in the Sanity 
+		Test.
         	<ul>
             		<li>File Activation Utility</li>
             		<li>USB License Key Manager</li>
@@ -214,73 +280,83 @@ Shield DemoShield application.</h2>
     	<LI><b>FLEX Index RDT Start Menu</b>
     	<ul>
         	<li>Confirm that the following items are available from the <b>Extract Systems 
-		FLEX Index RDT</b> Start menu.  Note that functionality is tested in the Sanity Test.
+		FLEX Index RDT</b> Start menu.  Note that functionality is tested in the Sanity 
+		Test.
         	<ul>
-            		<li>Automated Tests
-            		<ul>
-                		<li>Run All Tests</li>
-            		</ul></li>
             		<li>Image Cleanup Settings Editor</li>
             		<li>Index Converter</li>
             		<li>RDT Configuration</li>
             		<li>Rule Set Editor</li>
             		<li>Test Harness</li>
+            		<li>Automated Tests
+            		<ul>
+                		<li>Run All Tests</li>
+            		</ul></li>
         	</ul></li>
     	</ul></li>
 <p>
     	<LI><b>Uninstalls</b>
     	<ul>
 		<li>Login as a user that is a member of the <b>Administrators</b> group.
-        	<li>Confirm that <b>RDT</b>, <b>FLEX Index</b>, <b>ID Shield</b> and <b>Extract Systems 
-		LM</b> are installed.</li>
+        	<li>Confirm that <b>RDT</b>, <b>LabDE</b>, <b>FLEX Index</b>, <b>ID Shield</b> 
+		and <b>Extract Systems LM</b> are installed.</li>
         	<li>Confirm that the appropriate <b>FKB</b> version is also installed.</li>
 		<li>Confirm that <b>FLEX Index</b> cannot be uninstalled.
 		<li>Confirm that <b>ID Shield</b> cannot be uninstalled.
+		<li>Confirm that <b>LabDE</b> cannot be uninstalled.
         	<li>Confirm that the <b>FKB update</b> uninstalls without error.</li>
         	<li>Confirm that <b>RDT</b> uninstalls without error.</li>
-        	<li>With <b>FLEX Index</b>, <b>ID Shield</b> and <b>Extract Systems LM</b> installed, 
-		confirm that <b>Extract Systems LM</b> uninstalls without error.</li>
+		<li>Uninstall <b>LabDE</b>.
+        	<li>With <b>FLEX Index</b>, <b>ID Shield</b> and <b>Extract Systems LM</b> 
+		installed, confirm that <b>Extract Systems LM</b> uninstalls without error.</li>
 		<ul>
 			<li>Confirm that <b>DB Administration</b> still runs.
 			<li>Confirm that <b>File Action Manager</b> still runs.
 			<li>Confirm that <b>USB License Key Manager</b> still runs.
 		</ul>
 <p>
-        	<li>If necessary, create and use an evaluation license for <b>ID Shield</b>. Any 
-		non-expiring licenses should be renamed or deleted.</li>
+        	<li>If necessary, create and use an evaluation license for <b>ID Shield</b>. 
+		Any non-expiring licenses should be renamed or deleted.</li>
         	<li>Confirm that <b>DB Administration</b> still runs.</li>
         	<li>Confirm that <b>ExtractTRP2.exe</b> is running.</li>
 		<li>Close <b>DB Administration</b>.
         	<li>Uninstall <b>ID Shield</b>.</li>
 <p>
-        	<li>Confirm that <b>FLEX Index Help</b> is still accessible from the Start menu.</li>
+        	<li>Confirm that <b>FLEX Index Help</b> is still accessible from the Start 
+		menu.</li>
         	<li>Confirm that <b>File Action Manager</b> still runs.</li>
         	<li>Uninstall <b>FLEX Index</b>.</li>
 		<ul>
-			<li>Confirm that a prompt is presented about uninstalling <b>Crystal Reports</b>.
+			<li>Confirm that a prompt is presented about uninstalling <b>Crystal 
+			Reports</b>.
 			<ul>
-				<li>Confirm that <b>Crystal Reports</b> is uninstalled if selected.
+				<li>Confirm that <b>Crystal Reports</b> is uninstalled 
+				if selected.
 			</ul>
-			<li>Confirm that a prompt is presented about uninstalling <b>SQL Compact 
-			Edition</b>.
+			<li>Confirm that a prompt is presented about uninstalling <b>SQL 
+			Compact Edition</b>.
 			<ul>
-				<li>Confirm that <b>SQL Compact Edition</b> is uninstalled if selected.
+				<li>Confirm that <b>SQL Compact Edition</b> is uninstalled 
+				if selected.
 			</ul>
-			<li>Confirm that a prompt is presented about uninstalling <b>ClearImage</b>.
+			<li>Confirm that a prompt is presented about uninstalling 
+			<b>ClearImage</b>.
 			<ul>
-				<li>Confirm that <b>ClearImage 7 PDK</b> is uninstalled without error.
+				<li>Confirm that <b>ClearImage 7 PDK</b> is uninstalled 
+				without error.
 			</ul>
 		</ul>
-        	<li>Confirm that when you uninstall all Extract Systems software, all Extract Systems
- 		services (FAM service, FDRS service, IPC, exception service) are uninstalled.</li>
+        	<li>Confirm that when you uninstall all Extract Systems software, all 
+		Extract Systems services (FAM service, FDRS service, IPC, exception service) 
+		are uninstalled.</li>
 	</ul></li>
 <p>
     	<LI><b>Miscellaneous</b>
     	<ul>
-	   	<LI><b>[LegacyRC #6272]</b> Confirm that OCR functionality remains licensed after 
-		uninstalling Extract Systems software and then reinstalling it without a reboot.  
-		Previous problems were resolved by stopping and then restarting the <b>Nuance Licensing</b> 
-		service.
+	   	<LI><b>[LegacyRC #6272]</b> Confirm that OCR functionality remains licensed 
+		after uninstalling Extract Systems software and then reinstalling it without 
+		a reboot.  Previous problems were resolved by stopping and then restarting 
+		the <b>Nuance Licensing</b> service.
     	</ul>
 </UL>
 </BODY>
