@@ -278,7 +278,9 @@ namespace Extract.DataEntry
                 // not enabled.
                 // [DataEntry:1186]
                 // ... or auto-update queries if auto-update queries are paused.
-                if (dataEntryQuery.Disabled ||
+                // [DataEntry:1271]
+                // ... or attributes that are not initialized (in the process of being deleted).
+                if (dataEntryQuery.Disabled || !AttributeStatusInfo.GetStatusInfo(_targetAttribute).IsInitialized ||
                     (_validationTrigger && !AttributeStatusInfo.ValidationTriggersEnabled) ||
                     (AttributeStatusInfo.PauseAutoUpdateQueries && !_validationTrigger))
                 {

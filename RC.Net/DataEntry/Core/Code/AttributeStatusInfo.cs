@@ -1262,7 +1262,7 @@ namespace Extract.DataEntry
 
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
-                statusInfo._initialized = false;
+                MarkAsUnInitialized(attribute);
 
                 // Dispose of any auto-update trigger for the attribute.
                 AutoUpdateTrigger autoUpdateTrigger = null;
@@ -2833,6 +2833,27 @@ namespace Extract.DataEntry
                 _attributesBeingModified =
                     new Dictionary<IAttribute, KeyValuePair<bool, SpatialString>>();
                 _undoManager = new UndoManager();
+            }
+        }
+
+        /// <summary>
+        /// Marks the specified <see pararef="attribute"/> and as uninitialized as well as all its
+        /// descendants since an attribute cannot be initialize if its parent is not.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> to mark as uninitialized.</param>
+        static void MarkAsUnInitialized(IAttribute attribute)
+        {
+            AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+            statusInfo._initialized = false;
+
+            IUnknownVector subAttributes = attribute.SubAttributes;
+
+            // Recursively mark all sub-attributes as uninitialized
+            int count = subAttributes.Size();
+            for (int i = 0; i < count; i++)
+            {
+                MarkAsUnInitialized((IAttribute)subAttributes.At(i));
             }
         }
 
