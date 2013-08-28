@@ -1505,7 +1505,7 @@ namespace Extract.SQLCDBEditor
                 // refreshes that should be ignored; ActiveControl being set is an indicator that
                 // this control is loaded and is being modified by the user.
                 if (QueryAndResultsType == QueryAndResultsType.Table &&
-                    IsLoaded && ActiveControl != null)
+                    IsLoaded && ActiveControl != null && _resultsTable.Rows.Count > e.RowIndex)
                 {
                     row = _resultsTable.Rows[e.RowIndex];
                     _adapter.Update(new[] { row });

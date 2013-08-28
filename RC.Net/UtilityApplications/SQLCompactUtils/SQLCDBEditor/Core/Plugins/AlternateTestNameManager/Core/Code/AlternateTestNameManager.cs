@@ -557,10 +557,18 @@ namespace Extract.SQLCDBEditor.Plugins
             }
 
             // Load the document and page for the new example, and create an highlight for it.
-            AKAExample example = _examples[index];
+            AKAExample example = _examples[index];     
 
             string imageFile = example.FileName;
             _imageViewer.OpenImage(imageFile, false);
+
+            // [DataEntry:1269]
+            // A page number of zero indicates no spatial info exists for the current example.
+            if (example.Page == 0)
+            {
+                return;
+            }
+
             _imageViewer.PageNumber = example.Page;
 
             // The image viewer's default zoom will be for the full page. But as part of this plugin,
