@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Extract.Imaging
 {
@@ -239,6 +240,21 @@ namespace Extract.Imaging
                     
                 if (!string.IsNullOrEmpty(printerName))
                 {
+                    // [DotNetRCAndUtils:1089]
+                    // Interpret printer names that end with " on [MachineName]" to be equal to
+                    // "\\[MachineName]\[PrinterName]".
+                    if (!printerName.StartsWith(@"\\", StringComparison.Ordinal))
+                    {
+                        Regex printerPathRegex = new Regex(@"(\son\s)([\s\S]+)$");
+                        Match machineNameMatch = printerPathRegex.Match(printerName);
+                        if (machineNameMatch.Success)
+                        {
+                            string machineName = machineNameMatch.Groups[2].Value;
+                            printerName = string.Format(@"\\{0}\{1}", machineName,
+                                printerName.Substring(0, machineNameMatch.Index));
+                        }
+                    }
+
                     printDocument.PrinterSettings.PrinterName = printerName;
                     ExtractException.Assert("ELI36007", "Printer not found.",
                         printDocument.PrinterSettings.IsValid, "Printer name", printerName);
