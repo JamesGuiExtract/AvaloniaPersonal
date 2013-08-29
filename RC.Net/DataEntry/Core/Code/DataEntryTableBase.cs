@@ -471,6 +471,20 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or set the <see cref="DataGridViewCell"/> for which an auto-complete list is
+        /// currently displayed, or <see langword="null"/> if no auto-complete list is currently
+        /// displayed.
+        /// </summary>
+        /// <value>The <see cref="DataGridViewCell"/> for which an auto-complete list is currently
+        /// displayed, or <see langword="null"/> if no auto-complete list is currently displayed.
+        /// </value>
+        protected DataGridViewCell AutoCompleteCell
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets the name identifying the <see cref="IAttribute"/>(s) to be associated with 
         /// the table.</summary>
         /// <value>Sets the name identifying the <see cref="IAttribute"/>(s) to be associated with 
@@ -1122,6 +1136,30 @@ namespace Extract.DataEntry
                 ExtractException ee = ExtractException.AsExtractException("ELI26706", ex);
                 ee.AddDebugData("Event Data", drgevent, false);
                 ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.DataGridView.CurrentCellChanged"/> event.
+        /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.
+        /// </param>
+        protected override void OnCurrentCellChanged(EventArgs e)
+        {
+            try
+            {
+                // Whenever the current cell initially changes, auto-complete will no longer be
+                // active.
+                if (AutoCompleteCell != null)
+                {
+                    AutoCompleteCell = null;
+                }
+
+                base.OnCurrentCellChanged(e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36100");
             }
         }
 
@@ -2650,6 +2688,17 @@ namespace Extract.DataEntry
                     // Since DataGridViewCells are not normally modified in real-time as text is
                     // changed, apply changes from the editing control to the cell here.
                     base.CurrentCell.Value = _editingControl.Text;
+                }
+
+                // Set AutoCompleteCell depending on whether the auto-complete is active for the
+                // current cell.
+                if (AutoCompleteCell == null && FormsMethods.IsAutoCompleteDisplayed())
+                {
+                    AutoCompleteCell = CurrentCell;
+                }
+                else if (AutoCompleteCell != null && !FormsMethods.IsAutoCompleteDisplayed())
+                {
+                    AutoCompleteCell = null;
                 }
             }
             catch (Exception ex)

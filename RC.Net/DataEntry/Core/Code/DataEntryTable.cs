@@ -3867,7 +3867,20 @@ namespace Extract.DataEntry
                     newRowIndex++;
                 }
 
-                CurrentCell = Rows[newRowIndex].Cells[_carriageReturnColumn];
+                if (AutoCompleteCell == null)
+                {
+                    CurrentCell = Rows[newRowIndex].Cells[_carriageReturnColumn];
+                }
+                // [DataEntry:759]
+                // If an auto-complete list is currently displayed, do not advance the selection to
+                // the next row.
+                else 
+                {
+                    // Since enter will close the auto-complete list, AutoCompleteCell should be
+                    // set back to null.
+                    AutoCompleteCell = null;
+                }
+
                 return true;
             }
             else
