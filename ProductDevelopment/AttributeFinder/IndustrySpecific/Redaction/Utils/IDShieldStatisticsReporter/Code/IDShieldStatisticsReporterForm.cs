@@ -965,7 +965,11 @@ namespace Extract.IDShieldStatisticsReporter
                 // Otherwise display the test output for the selected file.
                 if (!string.IsNullOrEmpty(sourceDocName))
                 {
-                    string foundDataFile = sourceDocName + ".testoutput.voa";
+                    // [FlexIDSCore:3039]
+                    // So that output from one test isn't overwritten by a subsequent test, the test
+                    // output voa files are written into the _currentResultsFolder.
+                    string foundDataFile = Path.Combine(_currentResultsFolder, "TestOutput",
+                        Path.GetFileName(sourceDocName) + ".voa");
                     ExtractException.Assert("ELI28668",
                         "Cannot find data file '" + foundDataFile + "'", File.Exists(foundDataFile));
 
@@ -1337,6 +1341,12 @@ namespace Extract.IDShieldStatisticsReporter
 
             // We want output files to be created.
             _testerSettings.CreateTestOutputVoaFiles = true;
+
+            // [FlexIDSCore:3039]
+            // The output files should go in the analysis folder so the are not overwritten in
+            // subsequent runs.
+            _testerSettings.TestOutputVoaPath =
+                @"<OutputFilesFolder>\TestOutput\$FileOf(<SourceDocName>).voa";
 
             // Initialize the found and expected data locations as necessary.
             if (string.IsNullOrEmpty(_testFolder.FoundDataLocation))

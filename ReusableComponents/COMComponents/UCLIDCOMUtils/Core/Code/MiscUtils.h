@@ -7,6 +7,10 @@
 #include <IConfigurationSettingsPersistenceMgr.h>
 #include <afxmt.h>
 
+#include <string>
+#include <map>
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // CMiscUtils
 class ATL_NO_VTABLE CMiscUtils : 
@@ -102,6 +106,7 @@ public:
 	STDMETHOD(GetExpandedTags)(BSTR bstrString, BSTR bstrSourceDocName, BSTR* pbstrExpanded);
 	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, ITagUtility *pTagUtility,
 		BSTR bstrSourceDocName, IUnknown *pData, BSTR* pbstrOutput);
+	STDMETHOD(AddCustomTag)(BSTR bstrTagName, BSTR bstrTagValue);
 
 	// PROMISE:	Determines whether the specified object supports configuration either via
 	//			ISpecifyPropertyPages or IConfigurableObject
@@ -114,6 +119,9 @@ private:
 	//----------------------------------------------------------------------------------------------
 	void validateLicense(); // validate license of this component 
 	void validateETFEngineLicense(); // validate license for encryption component
+
+	// Programatically added path tags.
+	map<string, string> m_mapCustomTags;
 
 	// persistence mgr
 	std::unique_ptr<IConfigurationSettingsPersistenceMgr> m_apSettings;

@@ -1083,6 +1083,14 @@ library UCLID_COMUTILSLib
 		[id(26), helpstring("method ExpandTagsAndFunctions")] HRESULT ExpandTagsAndFunctions(
 			[in] BSTR bstrInput, [in] ITagUtility *pTagUtility, [in] BSTR bstrSourceDocName,
 			[in] IUnknown *pData, [out, retval] BSTR* pbstrOutput);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Allows for additional path tags to be added programatically. May be called
+		//			repeatedly for the same bstrTagName to update the expansion value.
+		// PARAMS:	bstrTagName - The name of the tag (not including the angle brackets that are
+		//						  used to denote path tags).
+		//			bstrTagValue - The text that should replace the tag during path tag expansion.
+		[id(27), helpstring("method AddCustomTag")] HRESULT AddCustomTag(
+			[in] BSTR bstrTagName, [in] BSTR bstrTagValue);
 	};
 	[
 		object,

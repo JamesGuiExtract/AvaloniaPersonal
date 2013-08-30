@@ -688,6 +688,12 @@ namespace Extract.Redaction
             new IDShieldTesterSetting<bool>("CreateTestOutputVOAFiles");
 
         /// <summary>
+        /// Specifies the path to which test output voa files should be written.
+        /// </summary>
+        IDShieldTesterSetting<string> _testOutputVoaPath =
+            new IDShieldTesterSetting<string>("TestOutputVoaPath");
+
+        /// <summary>
         /// Specifies whether to generate attribute name file lists.
         /// </summary>
         IDShieldTesterSetting<bool> _outputAttributeNamesFileLists =
@@ -785,6 +791,7 @@ namespace Extract.Redaction
                 _parameters.Add(_automatedConditionQuantifier);
                 _parameters.Add(_docTypesToRedact);
                 _parameters.Add(_createTestOutputVoaFiles);
+                _parameters.Add(_testOutputVoaPath);
                 _parameters.Add(_outputAttributeNamesFileLists);
                 _parameters.Add(_outputFinalStatsOnly);
                 _parameters.Add(_outputHybridStats);
@@ -943,6 +950,24 @@ namespace Extract.Redaction
             set
             {
                 _docTypesToRedact.Value = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the path to which test output voa files should be written.
+        /// </summary>
+        /// <value>The path to which test output voa files should be written.</value>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Voa")]
+        public string TestOutputVoaPath
+        {
+            get
+            {
+                return _testOutputVoaPath.Value;
+            }
+
+            set
+            {
+                _testOutputVoaPath.Value = value;
             }
         }
 

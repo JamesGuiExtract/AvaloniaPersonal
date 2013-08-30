@@ -204,14 +204,17 @@ m_bOutputAttributeNameFilesList(false),
 m_bOutputDirectoryInitialized(false),
 m_ipTestOutputVOAVector(NULL),
 m_ipAFUtility(CLSID_AFUtility),
-m_ipFAMTagManager(CLSID_FAMTagManager),
+m_ipMiscUtils(CLSID_MiscUtils),
 m_ipAttrFinderEngine(CLSID_AttributeFinderEngine)
 {
 	try
 	{
 		ASSERT_RESOURCE_ALLOCATION("ELI15178", m_ipAFUtility != __nullptr);
-		ASSERT_RESOURCE_ALLOCATION("ELI35184", m_ipFAMTagManager != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI35184", m_ipMiscUtils != __nullptr);
 		ASSERT_RESOURCE_ALLOCATION("ELI15206", m_ipAttrFinderEngine != __nullptr);
+
+		m_ipTagUtility = m_ipMiscUtils;
+		ASSERT_RESOURCE_ALLOCATION("ELI36104", m_ipTagUtility != __nullptr);
 
 		// Map the result fields to names for use by custom reports.
 		m_mapStatisticFields["TotalExpectedRedactions"] = &m_ulTotalExpectedRedactions;
@@ -261,7 +264,8 @@ CIDShieldTester::~CIDShieldTester()
 	try
 	{
 		m_ipAFUtility = __nullptr;
-		m_ipFAMTagManager = __nullptr;
+		m_ipMiscUtils = __nullptr;
+		m_ipTagUtility = __nullptr;
 		m_ipAttrFinderEngine = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16555");
@@ -457,6 +461,7 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			automatedStatistics.reset();
 			verificationStatistics.reset();
 			m_bOutputDirectoryInitialized = false;
+			m_strTestOutputPath = "$InsertBeforeExt(<FoundVoaFile>,.testoutput)";
 
 			IVariantVectorPtr ipParams(pParams);
 			ASSERT_RESOURCE_ALLOCATION("ELI15258", ipParams != __nullptr);
@@ -781,6 +786,11 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 				ASSERT_RESOURCE_ALLOCATION("ELI18360", m_ipTestOutputVOAVector != __nullptr);
 			}
 		}
+		// [FlexIDSCore:3039]
+		else if (vecTokens[0] == "TestOutputVoaPath")
+		{
+			m_strTestOutputPath = vecTokens[1];
+		}
 		// [p16 #2552 - JDS]
 		else if (vecTokens[0] == "OutputAttributeNamesFileLists")
 		{
@@ -989,10 +999,10 @@ void CIDShieldTester::handleTestFolder(const string& strRulesFile, const string&
 			strOCRResults = strImageFileName;
 		}
 
-		string strFoundVOAFileWithExpandedTags = asString(m_ipFAMTagManager->ExpandTagsAndFunctions(
-			strFoundVOAFileWithTags.c_str(), strImageFileName.c_str()));
-		string strExpectedVOAFileWithExpandedTags = asString(m_ipFAMTagManager->ExpandTagsAndFunctions(
-			strExpectedVOAFileWithTags.c_str(), strImageFileName.c_str()));
+		string strFoundVOAFileWithExpandedTags =
+			expandTagsAndFunctions(strFoundVOAFileWithTags, strImageFileName);
+		string strExpectedVOAFileWithExpandedTags = 
+			expandTagsAndFunctions(strExpectedVOAFileWithTags, strImageFileName);
 		
 		// Execute the test case.
 		handleTestCase( strAbsoluteRulesFile, strImageFileName, strOCRResults, 
@@ -1010,6 +1020,11 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 	{
 		try
 		{
+			// Create custom path tags to be used to evaluate m_strTestOutputPath
+			m_ipMiscUtils->AddCustomTag("OutputFilesFolder", m_strOutputFileDirectory.c_str());
+			m_ipMiscUtils->AddCustomTag("FoundVoaFile", strFoundVOAFile.c_str());
+			m_ipMiscUtils->AddCustomTag("ExpectedVOAFile", strExpectedVOAFile.c_str());
+
 			string strNoteFile = strImageFile + ".nte";
 
 			// Start the test case labeling it as the .dat file
@@ -1157,9 +1172,16 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 
 			countDocTypes(ipFoundAttributes, strImageFile, ipAFDoc, bCalculatedFoundValues);
 
+			// [FlexIDSCore:3039]
+			// If generating a testoutput VOA file, the path should be based upon strFoundVOAFile,
+			// or m_strTestOutputPath not strSourceDoc.
+			string strTestOutputVOAFile = (m_ipTestOutputVOAVector == __nullptr)
+				? ""
+				: expandTagsAndFunctions(m_strTestOutputPath, strImageFile);
+
 			// update internal stats and determine whether this test case passed
 			bool bResult = updateStatisticsAndDetermineTestCaseResult(ipExpectedAttributes, 
-				ipFoundAttributes, strImageFile);
+				ipFoundAttributes, strImageFile, strTestOutputVOAFile);
 
 			// Append the text of the note at the end of the test case
 			string strNote = "";
@@ -1197,7 +1219,8 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 //-------------------------------------------------------------------------------------------------
 bool CIDShieldTester::updateStatisticsAndDetermineTestCaseResult(IIUnknownVectorPtr ipExpectedAttributes,
 																 IIUnknownVectorPtr ipFoundAttributes,
-																 const string& strSourceDoc)
+																 const string& strSourceDoc,
+																 const string& strTestOutputVOAFile)
 {
 	ASSERT_ARGUMENT("ELI19879", ipExpectedAttributes != __nullptr);
 	ASSERT_ARGUMENT("ELI19880", ipFoundAttributes != __nullptr);
@@ -1327,14 +1350,14 @@ bool CIDShieldTester::updateStatisticsAndDetermineTestCaseResult(IIUnknownVector
 		// Analyze the attributes for automated redaction. Also process files not selected for
 		// review if computing only automated stats
 		return analyzeDataForAutomatedRedaction(ipExpectedAttributes, ipFoundAttributes,
-			bSelectedForAutomatedProcess, strSourceDoc);
+			bSelectedForAutomatedProcess, strSourceDoc, strTestOutputVOAFile);
 	}
 	else
 	{
 		// Analyze the attributes for verification based redaction. Include documents that were
 		// not otherwise selected for either process in hybrid mode.
 		return analyzeDataForVerificationBasedRedaction(ipExpectedAttributes, ipFoundAttributes,
-				bSelectedForVerification, strSourceDoc, ulNumPages);
+				bSelectedForVerification, strSourceDoc, strTestOutputVOAFile, ulNumPages);
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -1406,6 +1429,7 @@ bool CIDShieldTester::analyzeDataForVerificationBasedRedaction(
 														IIUnknownVectorPtr ipFoundAttributes,
 														bool bSelectedForVerification,
 														const string& strSourceDoc,
+														const string& strTestOutputVOAFile,
 														unsigned long ulNumPagesInDoc)
 {
 	ASSERT_ARGUMENT("ELI18507", ipExpectedAttributes != __nullptr);
@@ -1421,7 +1445,7 @@ bool CIDShieldTester::analyzeDataForVerificationBasedRedaction(
 	// analyze the expected and found attributes 
 	CIDShieldTester::TestCaseStatistics testCaseStatistics = analyzeExpectedAndFoundAttributes(
 		ipExpectedAttributes, ipFoundAttributes, ulExpectedAttributesOnSelectedPages,
-		bSelectedForVerification, strSourceDoc);
+		bSelectedForVerification, strSourceDoc, strTestOutputVOAFile);
 
 	// update total statistics
 	verificationStatistics += testCaseStatistics;
@@ -1470,7 +1494,8 @@ bool CIDShieldTester::analyzeDataForVerificationBasedRedaction(
 bool CIDShieldTester::analyzeDataForAutomatedRedaction(IIUnknownVectorPtr ipExpectedAttributes,
 													   IIUnknownVectorPtr ipFoundAttributes,
 													   bool bSelectedForAutomatedProcess,
-													   const string& strSourceDoc)
+													   const string& strSourceDoc,
+													   const string& strTestOutputVOAFile)
 {
 	ASSERT_ARGUMENT("ELI18509", ipExpectedAttributes != __nullptr);
 	ASSERT_ARGUMENT("ELI18510", ipFoundAttributes != __nullptr);
@@ -1478,7 +1503,7 @@ bool CIDShieldTester::analyzeDataForAutomatedRedaction(IIUnknownVectorPtr ipExpe
 	// analyze the expected and found attributes 
 	CIDShieldTester::TestCaseStatistics testCaseStatistics = analyzeExpectedAndFoundAttributes(
 		ipExpectedAttributes, ipFoundAttributes, 0, bSelectedForAutomatedProcess,
-		strSourceDoc);
+		strSourceDoc, strTestOutputVOAFile);
 
 	// update total statistics
 	automatedStatistics += testCaseStatistics;
@@ -1610,7 +1635,7 @@ bool CIDShieldTester::spatiallyMatches(ISpatialStringPtr ipExpectedSS,
 CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttributes(
 	IIUnknownVectorPtr ipExpectedAttributes, IIUnknownVectorPtr ipFoundAttributes,
 	unsigned long ulExpectedAttributesOnSelectedPages,
-	bool bDocumentSelected, const string& strSourceDoc)
+	bool bDocumentSelected, const string& strSourceDoc, const string& strTestOutputVOAFile)
 {
 	ASSERT_ARGUMENT("ELI18511", ipExpectedAttributes != __nullptr);
 	ASSERT_ARGUMENT("ELI18512", ipFoundAttributes != __nullptr);
@@ -1836,17 +1861,16 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 	}
 
 	// check for output test voa file
-	if (m_ipTestOutputVOAVector != __nullptr)
+	if (!strTestOutputVOAFile.empty())
 	{
 		// write the testoutput.voa file
-		string strTestOutputFile = strSourceDoc + ".testoutput.voa";
-		m_ipTestOutputVOAVector->SaveTo(strTestOutputFile.c_str(), VARIANT_TRUE);
+		m_ipTestOutputVOAVector->SaveTo(strTestOutputVOAFile.c_str(), VARIANT_TRUE);
 
 		// clear the vector
 		m_ipTestOutputVOAVector->Clear();
 
 		// add a link to the output data
-		m_ipResultLogger->AddTestCaseFile(strTestOutputFile.c_str());
+		m_ipResultLogger->AddTestCaseFile(strTestOutputVOAFile.c_str());
 	}
 
 	// test case is considered failed if:
@@ -3092,6 +3116,14 @@ string CIDShieldTester::getSetAsDelimitedList(const set<string>& setValues)
 	}
 
 	return strList;
+}
+//-------------------------------------------------------------------------------------------------
+string CIDShieldTester::expandTagsAndFunctions(const string& strInput, const string& strSourceDoc)
+{
+	string strExpanded = asString(m_ipMiscUtils->ExpandTagsAndFunctions(
+		strInput.c_str(), m_ipTagUtility, _bstr_t(strSourceDoc.c_str()).Detach(), __nullptr));
+
+	return strExpanded;
 }
 //-------------------------------------------------------------------------------------------------
 CIDShieldTester::TestCaseStatistics::TestCaseStatistics()

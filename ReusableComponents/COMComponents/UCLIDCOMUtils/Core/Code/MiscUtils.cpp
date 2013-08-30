@@ -1185,6 +1185,17 @@ STDMETHODIMP CMiscUtils::ExpandTags(BSTR bstrInput, BSTR bstrSourceDocName, IUnk
 			replaceVariable(strInput, strCOMMON_COMPONENTS_DIR_TAG, strCommonComponentsDir);
 		}
 
+		// Expand any custom tags.
+		for (map<string, string>::iterator iter = m_mapCustomTags.begin();
+			 iter != m_mapCustomTags.end();
+			 iter++)
+		{
+			string strTag = iter->first;
+			string strValue = iter->second;
+
+			replaceVariable(strInput, strTag, strValue);
+		}
+
 		*pbstrOutput = _bstr_t(strInput.c_str()).Detach();
 
 		return S_OK;
@@ -1252,6 +1263,25 @@ STDMETHODIMP CMiscUtils::ExpandTagsAndFunctions(BSTR bstrInput,
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35212");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::AddCustomTag(BSTR bstrTagName, BSTR bstrTagValue)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI36101", bstrTagName != __nullptr);
+		ASSERT_ARGUMENT("ELI36102", bstrTagValue != __nullptr);
+
+		validateLicense();
+
+		string strTag = "<" + asString(bstrTagName) + ">";
+		m_mapCustomTags[strTag] = asString(bstrTagValue);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36103");
 }
 
 //-------------------------------------------------------------------------------------------------

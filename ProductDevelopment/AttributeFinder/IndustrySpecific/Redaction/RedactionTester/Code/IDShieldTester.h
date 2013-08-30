@@ -148,7 +148,8 @@ private:
 
 	IAFUtilityPtr m_ipAFUtility;
 
-	IFAMTagManagerPtr m_ipFAMTagManager;
+	IMiscUtilsPtr m_ipMiscUtils;
+	ITagUtilityPtr m_ipTagUtility;
 
 	// Object to find attributes if necessary
 	IAttributeFinderEnginePtr	m_ipAttrFinderEngine;
@@ -212,6 +213,9 @@ private:
 
 	// vector to hold attributes for the test output VOA vector
 	IIUnknownVectorPtr m_ipTestOutputVOAVector;
+
+	// Path to which TestOutput files should be written.
+	string m_strTestOutputPath;
 
 	// flag to check whether the OuptputAttributeNameFileList setting is on or off
 	bool m_bOutputAttributeNameFilesList;
@@ -293,9 +297,12 @@ private:
 	// PROMISE: This method uses the expected and found attribute vectors to increment the count
 	//			of m_ulTotalFilesProcessed, update the m_ulTotalExpectedRedactions,
 	//			update m_ulNumFilesWithExpectedRedactions, and then calls the two analyze methods.
+	//			If strTestOutputVOAFile is specified, a testoutput voa file will be written to this
+	//			path.
 	bool updateStatisticsAndDetermineTestCaseResult(IIUnknownVectorPtr ipExpectedAttributes,
 													 IIUnknownVectorPtr ipFoundAttributes,
-													 const string& strSourceDoc);
+													 const string& strSourceDoc,
+													 const string& strTestOutputVOAFile);
 
 	// PROMISE: This method counts all expected attributes that are on a page that has at least one
 	//			HC/MC/LC/Clue attribute on the same page.
@@ -306,10 +313,13 @@ private:
 	// PROMISE: This method updates the count for m_ulNumFilesSelectedForReview 
 	//			and m_ulNumExpectedRedactionsInReviewedFiles. Returns true if the
 	//			file would have been verified.
+	//			If strTestOutputVOAFile is specified, a testoutput voa file will be written to this
+	//			path.
 	bool analyzeDataForVerificationBasedRedaction(IIUnknownVectorPtr ipExpectedAttributes,
 												  IIUnknownVectorPtr ipFoundAttributes,
 												  bool bSelectedForVerification,
 												  const string& strSourceDoc,
+												  const string& strTestOutputVOAFile,
 												  unsigned long ulNumPagesInDoc);
 
 	// PROMISE: This method updates m_ulNumCorrectRedactions and m_ulNumFalsePositives using
@@ -317,10 +327,13 @@ private:
 	//			Returns true if there were no false positives OR the ulNumCorrectlyFound is equal to
 	//			the number of expected attributes
 	//			Returns false otherwise.
+	//			If strTestOutputVOAFile is specified, a testoutput voa file will be written to this
+	//			path.
 	bool analyzeDataForAutomatedRedaction(IIUnknownVectorPtr ipExpectedAttributes,
 										  IIUnknownVectorPtr ipFoundAttributes,
 										  bool bSelectedForAutomatedProcess,
-										  const string& strSourceDoc);
+										  const string& strSourceDoc,
+										  const string& strTestOutputVOAFile);
 
 	// PROMISE: This method compares two spatial strings using the GetAreaOverlappingWith method from 
 	//          IRasterZone. If the two spatial strings overlap within the percentage specified in the 
@@ -334,13 +347,16 @@ private:
 	//			ipExpectedAttributesOnSelectedPages indicates that when stats are being generated
 	//			based on verifiers visiting only pages containing senstive data, what expected
 	//			attributes exist on those pages. It can be null if ByPage stats are not needed.
+	//			If strTestOutputVOAFile is specified, a testoutput voa file will be written to this
+	//			path.
 	// RETURNS: The statistics calculated from running the analysis.
 	CIDShieldTester::TestCaseStatistics analyzeExpectedAndFoundAttributes(
 											IIUnknownVectorPtr ipExpectedAttributes, 
 											IIUnknownVectorPtr ipFoundAttributes,
 											unsigned long ulExpectedAttributesOnSelectedPages,
 											bool bDocumentSelected,
-											const string& strSourceDoc);
+											const string& strSourceDoc,
+											const string& strTestOutputVOAFile);
 
 	// PROMISE: Determines whether the found redaction at the specified index of the array is an
 	//			over-redaction by comparing it to all expected attributes. This method assumes
@@ -418,6 +434,8 @@ private:
 
 	// PROMISE: To convert a set of strings into a comma delimited list.
 	string getSetAsDelimitedList(const set<string>& setValues);
+
+	string expandTagsAndFunctions(const string& strInput, const string& strSourceDoc);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(IDShieldTester), CIDShieldTester)
