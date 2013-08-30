@@ -421,6 +421,10 @@ private:
 	//			specified type
 	IIUnknownVectorPtr filterAttributesByType(IIUnknownVectorPtr ipAttributeVector);
 
+	// PROMISE: To return all attributes from ipAttributeVector except for DocumentType
+	//			attributes.
+	IIUnknownVectorPtr filterDocumentTypeAttributes(IIUnknownVectorPtr ipAttributeVector);
+
 	// PROMISE: To update the verification AttributeTester so that it is ready to
 	//			be used in the testAttributeCondition.
 	void updateVerificationAttributeTester();

@@ -1092,16 +1092,30 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 				throw ue;
 			}
 
-			// Add the file to the list in the appropriate log file
-			if( ipExpectedAttributes->Size() > 0 )
+			// [FlexIDSCore:4948]
+			// If there is a type string to filter by, filter the attributes before compiling any
+			// file lists.
+			if (!m_setTypesToBeTested.empty())
 			{
-				appendToFile( strImageFile, 
-					m_strOutputFileDirectory + gstrFILES_WITH_EXPECTED_REDACTIONS );
+				// filter the expected and found attributes by the specified type
+				ipExpectedAttributes = filterAttributesByType(ipExpectedAttributes);
+			}
+
+			// Attribute counts reported should not include the DocumentType attribute
+			IIUnknownVectorPtr ipExpectedAttributesWithoutType =
+				filterDocumentTypeAttributes(ipExpectedAttributes);
+			ASSERT_RESOURCE_ALLOCATION("ELI36107", ipExpectedAttributesWithoutType != __nullptr);
+
+			// Add the file to the list in the appropriate log file
+			if( ipExpectedAttributesWithoutType->Size() > 0 )
+			{
+				appendToFile(strImageFile, 
+					m_strOutputFileDirectory + gstrFILES_WITH_EXPECTED_REDACTIONS);
 			}
 			else
 			{
-				appendToFile( strImageFile, 
-					m_strOutputFileDirectory + gstrFILES_WITH_NO_EXPECTED_REDACTIONS );
+				appendToFile(strImageFile, 
+					m_strOutputFileDirectory + gstrFILES_WITH_NO_EXPECTED_REDACTIONS);
 			}
 
 			// Load the found attributes from the VOA file if it exists, otherwise run the rules to compute them
@@ -1151,16 +1165,28 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 				bCalculatedFoundValues = true;
 			}
 
-			// Add this file to the list in the appropriate log file
-			if( ipFoundAttributes->Size() > 0 )
+			// If there is a type string to filter by, filter the attributes
+			if (!m_setTypesToBeTested.empty())
 			{
-				appendToFile( strImageFile, 
-					m_strOutputFileDirectory + gstrFILES_WITH_FOUND_REDACTIONS );
+				// filter the expected and found attributes by the specified type
+				ipFoundAttributes = filterAttributesByType(ipFoundAttributes);
+			}
+
+			// Attribute counts reported should not include the DocumentType attribute
+			IIUnknownVectorPtr ipFoundAttributesWithoutType =
+				filterDocumentTypeAttributes(ipFoundAttributes);
+			ASSERT_RESOURCE_ALLOCATION("ELI36108", ipFoundAttributesWithoutType != __nullptr);
+
+			// Add this file to the list in the appropriate log file
+			if(ipFoundAttributesWithoutType->Size() > 0)
+			{
+				appendToFile(strImageFile, 
+					m_strOutputFileDirectory + gstrFILES_WITH_FOUND_REDACTIONS);
 			}
 			else
 			{
-				appendToFile( strImageFile, 
-					m_strOutputFileDirectory + gstrFILES_WITH_NO_FOUND_REDACTIONS );
+				appendToFile(strImageFile, 
+					m_strOutputFileDirectory + gstrFILES_WITH_NO_FOUND_REDACTIONS);
 			}
 
 			// display found and expected attributes side by side
@@ -1227,14 +1253,6 @@ bool CIDShieldTester::updateStatisticsAndDetermineTestCaseResult(IIUnknownVector
 
 	// increment the total number of files processed
 	m_ulTotalFilesProcessed++;
-
-	// if there is a type string to filter by, filter the attributes
-	if (!m_setTypesToBeTested.empty())
-	{
-		// filter the expected and found attributes by the specified type
-		ipExpectedAttributes = filterAttributesByType(ipExpectedAttributes);
-		ipFoundAttributes = filterAttributesByType(ipFoundAttributes);
-	}
 
 	// get size of expected attributes vector
 	long lExpectedSize = ipExpectedAttributes->Size();
@@ -1450,15 +1468,20 @@ bool CIDShieldTester::analyzeDataForVerificationBasedRedaction(
 	// update total statistics
 	verificationStatistics += testCaseStatistics;
 
+	// Attribute counts reported should not include the DocumentType attribute
+	IIUnknownVectorPtr ipExpectedAttributesWithoutType =
+		filterDocumentTypeAttributes(ipExpectedAttributes);
+	ASSERT_RESOURCE_ALLOCATION("ELI36109", ipExpectedAttributesWithoutType != __nullptr);
+
+	// Get the size of the expected attribute collection
+	long lExpectedSize = ipExpectedAttributesWithoutType->Size();
+
 	if (bSelectedForVerification)
 	{
 		// increment the number of files and pages that would be selected for review
 		m_ulNumFilesSelectedForReview++;
 		m_ulNumPagesInFilesSelectedForReview += ulNumPagesInDoc;
 		m_ulNumPagesSelectedForReview += ulSelectedPages;
-
-		// Get the size of the expected attribute collection
-		long lExpectedSize = ipExpectedAttributes->Size();
 
 		// increment the number of expected redactions in files selected for review
 		m_ulNumExpectedRedactionsInReviewedFiles += lExpectedSize;
@@ -1478,7 +1501,7 @@ bool CIDShieldTester::analyzeDataForVerificationBasedRedaction(
 	else
 	{
 		// The document has no found attributes, but it does have an expected attribute
-		if (ipExpectedAttributes->Size() > 0)
+		if (lExpectedSize > 0)
 		{
 			appendToFile( strSourceDoc, m_strOutputFileDirectory + gstrFILES_MISSED_BEING_SELECTED_FOR_REVIEW);
 		}
@@ -1508,12 +1531,17 @@ bool CIDShieldTester::analyzeDataForAutomatedRedaction(IIUnknownVectorPtr ipExpe
 	// update total statistics
 	automatedStatistics += testCaseStatistics;
 
+	// Attribute counts reported should not include the DocumentType attribute
+	IIUnknownVectorPtr ipExpectedAttributesWithoutType =
+		filterDocumentTypeAttributes(ipExpectedAttributes);
+	ASSERT_RESOURCE_ALLOCATION("ELI36110", ipExpectedAttributesWithoutType != __nullptr);
+
+	// Get the size of the expected attribute collection
+	long lExpectedSize = ipExpectedAttributesWithoutType->Size();
+
 	if (bSelectedForAutomatedProcess)
 	{
 		m_ulNumFilesAutomaticallyRedacted++;
-		
-		// Get the size of the expected attribute collection
-		long lExpectedSize = ipExpectedAttributes->Size();
 
 		// increment the number of expected redactions in files selected for redaction
 		m_ulNumExpectedRedactionsInRedactedFiles += lExpectedSize;
@@ -1536,7 +1564,7 @@ bool CIDShieldTester::analyzeDataForAutomatedRedaction(IIUnknownVectorPtr ipExpe
 	{
 		// The document has no found attributes, but it does have an expected attribute
 		// and we are not outputting hybrid statistics
-		if(ipExpectedAttributes->Size() > 0)
+		if(lExpectedSize > 0)
 		{
 			appendToFile(strSourceDoc,
 				m_strOutputFileDirectory + gstrFILES_MISSED_BEING_SELECTED_FOR_REDACTION);
@@ -2983,6 +3011,37 @@ IIUnknownVectorPtr CIDShieldTester::filterAttributesByType(IIUnknownVectorPtr ip
 					break;
 				}
 			}
+		}
+	}
+
+	// return the new vector
+	return ipNewVector;
+}
+//-------------------------------------------------------------------------------------------------
+IIUnknownVectorPtr CIDShieldTester::filterDocumentTypeAttributes(IIUnknownVectorPtr ipAttributeVector)
+{
+	ASSERT_ARGUMENT("ELI36105", ipAttributeVector != __nullptr);
+
+	// create a new vector
+	IIUnknownVectorPtr ipNewVector(CLSID_IUnknownVector);
+	ASSERT_RESOURCE_ALLOCATION("ELI36106", ipNewVector != __nullptr);
+
+	// get the current vector size
+	long lSize = ipAttributeVector->Size();
+
+	// loop through each element of the attribute vector to look for DocumentType attributes.
+	for (long i=0; i < lSize; i++)
+	{				   
+		IAttributePtr ipAttribute = ipAttributeVector->At(i);
+		ASSERT_RESOURCE_ALLOCATION("ELI36112", ipAttribute != __nullptr);
+
+		string strName = asString(ipAttribute->Name);
+		makeLowerCase(strName);
+
+		// if the attribute contains the specified type, add it to the vector
+		if (strName != "documenttype")
+		{
+			ipNewVector->PushBack(ipAttribute);
 		}
 	}
 
