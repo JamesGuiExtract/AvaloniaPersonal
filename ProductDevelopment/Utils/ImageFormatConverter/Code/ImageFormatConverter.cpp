@@ -13,6 +13,7 @@
 #include <l_bitmap.h>		// LeadTools Imaging library
 #include <ltkey.h>
 #include <ComponentLicenseIDs.h>
+#include <Misc.h>
 #include <MiscLeadUtils.h>
 #include <LeadtoolsBitmapFreeer.h>
 #include <StringCSIS.h>
@@ -26,6 +27,10 @@
 #include "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\OcrConstants.h"
 #include "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\OcrMethods.h"
 #include "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\ScansoftErr.h"
+
+#include <string>
+#include <set>
+using namespace std;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -336,7 +341,7 @@ void initNuanceEngineAndLicense()
 //-------------------------------------------------------------------------------------------------
 // Will perform the image conversion
 void nuanceConvertImage(const string strInputFileName, const string strOutputFileName, 
-				  EConverterFileType eOutputType)
+				  EConverterFileType eOutputType, string strPagesToRemove)
 {
 	// [LegacyRCAndUtils:6275]
 	// Since we will be using the Nuance engine, ensure we are licensed for it.
@@ -409,8 +414,22 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 				throw UCLIDException("ELI34293", "Cannot output multi-page image in jpg format.");
 			}
 
+			// [LegacyRCAndUtils:6461]
+			// Do not include any pages from strPagesToRemove in the output.
+			set<int> setPagesToRemove;
+			if (!strPagesToRemove.empty())
+			{
+				vector<int> vecPagesToRemove = getPageNumbers(nPageCount, strPagesToRemove);
+				setPagesToRemove = set<int>(vecPagesToRemove.begin(), vecPagesToRemove.end());
+			}
+
 			for (nPage = 0; nPage < nPageCount; nPage++)
 			{
+				if (setPagesToRemove.find(nPage + 1) != setPagesToRemove.end())
+				{
+					continue;
+				}
+
 				// NOTE: RecAPI uses zero-based page number indexes
 				HPAGE hImagePage;
 				loadPageFromImageHandle(strInputFileName, hInputImage, nPage, &hImagePage);
@@ -467,7 +486,7 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 void convertImage(const string strInputFileName, const string strOutputFileName, 
 				  EConverterFileType eOutputType, bool bRetainAnnotations, HINSTANCE hInst,
 				  const string& strUserPassword, const string& strOwnerPassword, long nPermissions,
-				  long nViewPerspective)
+				  long nViewPerspective, string strPagesToRemove)
 {
 	HANNOBJECT hFileContainer = NULL;
 	ANNENUMCALLBACK pfnCallBack = NULL;
@@ -567,10 +586,25 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 			bool bExpandForPdfConversion =
 				eOutputType == kFileType_Pdf && expandImageWhenConvertingPdf();
 
+			// [LegacyRCAndUtils:6461]
+			// Do not include any pages from strPagesToRemove in the output.
+			set<int> setPagesToRemove;
+			if (!strPagesToRemove.empty())
+			{
+				vector<int> vecPagesToRemove = getPageNumbers(nPages, strPagesToRemove);
+				setPagesToRemove = set<int>(vecPagesToRemove.begin(), vecPagesToRemove.end());
+			}
+
 			// Handle pages individually to deal with situation where existing annotations
 			// need to be retained
+			int nOutputPageNum = 0;
 			for (int i = 1; i <= nPages; i++)
 			{
+				if (setPagesToRemove.find(i) != setPagesToRemove.end())
+				{
+					continue;
+				}
+
 				// Set FILEINFO_FORMATVALID (this will speed up the L_LoadBitmap calls)
 				fileInfo = GetLeadToolsSizedStruct<FILEINFO>(FILEINFO_FORMATVALID);
 				fileInfo.Format = iFormat;
@@ -689,8 +723,12 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 					}
 				}
 
+				// If any pages are specified in strPagesToRemove, the output page number will
+				// differ from the source page number.
+				nOutputPageNum++;
+
 				// Set the page number
-				sfOptions.PageNumber = i;
+				sfOptions.PageNumber = nOutputPageNum;
 
 				// Save the image page
 				saveImagePage(hBitmap, strTempOut, nType, nQFactor, nBitsPerPixel, sfOptions);
@@ -709,7 +747,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 
 			// Check for a matching page count
 			long nOutPages = getNumberOfPagesInImage(strTempOut);
-			if (nPages != nOutPages)
+			if ((nPages - setPagesToRemove.size()) != nOutPages)
 			{
 				UCLIDException uex("ELI28839", "Output page count mismatch.");
 				uex.addDebugInfo("Input File", strInputFileName);
@@ -793,16 +831,20 @@ void usage()
 					"The optional argument /vp [perspective_id] will set the view perspective of "
 					"the output to the specified value (1-8) or to 1 (top-left) if the "
 					"perspective_id is not specified.\n"
-					"The optional argument /am will use an alternate method to perform the \n"
-					"conversion. This option is not compatible with any other optional argument \n"
-					" except '/ef'. \n"
+					"The optional argument /am will use an alternate method to perform \n"
+					"the conversion. This option is not compatible with any other optional \n"
+					" argument except '/RemovePages' or '/ef'. \n"
+					"The optional argument /RemovePages will exclude the specified pages \n"
+					"from the output. The pages can be specified as an individual page number, \n"
+					"a comma seperates list, a range of pages denoted with a hypen, or a \n"
+					"minus by a number to indicate the last x pages should be removed. \n"
 					"The optional argument (/ef <filename>) fully specifies the location \n"
 					"of an exception log that will store any thrown exception.  Without \n"
 					"an exception log, any thrown exception will be displayed.\n\n";
 		strUsage += "Usage:\n";
 		strUsage += "ImageFormatConverter.exe <strInput> <strOutput> <out_type> [/retain] "
 					"[/user \"<Password>\"] [/owner \"<Password>\" <Permissions>] [/vp [perspective_id]] "
-					"[/am] [/ef <filename>]\n"
+					"[/am] [/RemovePages \"<Pages>\"] [/ef <filename>]\n"
 					"where:\n"
 					"out_type is /pdf, /tif or /jpg,\n"
 					"<Password> is the password to apply (user and/or owner) to the PDF (requires out_type = /pdf).\n"
@@ -903,6 +945,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 				bool bEncryptedPasswords = false;
 				long nViewPerspective = 0;
 				bool bUseNuance = false;
+				string strPagesToRemove;
 				for (size_t i=3; i < uiParamCount; i++)
 				{
 					string strTemp = vecParams[i];
@@ -982,6 +1025,19 @@ BOOL CImageFormatConverterApp::InitInstance()
 					{
 						bUseNuance = true;
 					}
+					// [LegacyRCAndUtils:6461]
+					// Allows specified pages to be excluded from the output
+					else if (strTemp == "/RemovePages")
+					{
+						i++;
+						if (i >= uiParamCount)
+						{
+							usage();
+							return FALSE;
+						}
+						
+						strPagesToRemove = vecParams[i];
+					}
 					else if (strTemp == "/ef")
 					{
 						i++;
@@ -1045,7 +1101,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 						return FALSE;
 					}
 
-					nuanceConvertImage(strInputName, strOutputName, eOutputType);
+					nuanceConvertImage(strInputName, strOutputName, eOutputType, strPagesToRemove);
 				}
 				else
 				{
@@ -1062,7 +1118,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 					// Convert the file
 					convertImage(strInputName, strOutputName, eOutputType, bRetainAnnotations,
 						this->m_hInstance, strUserPassword, strOwnerPassword, nOwnerPermissions,
-						nViewPerspective);
+						nViewPerspective, strPagesToRemove);
 				}
 
 				// No UI needed, just return
