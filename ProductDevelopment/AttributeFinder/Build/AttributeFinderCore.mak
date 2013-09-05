@@ -76,15 +76,31 @@ LabelCommonFolder:
 
 BuildPDUtils: BuildAttributeFinderCore
 	@ECHO Building PD Utils...
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
     @CD "$(PDUtilsRootDir)\UCLIDUtilApps\Code"
     @devenv Utils.sln /BUILD $(BuildConfig) 
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 
 BuildAttributeFinderCore:  
 	@ECHO Building AFCore...
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
     @CD "$(AFRootDirectory)\AFCore\AFCoreTest\Code"
     @devenv AFCoreTest.sln /BUILD $(BuildConfig)
 	@DeleteFiles "$(BinariesFolder)\DataEntryApplication.exe.config"
 	$(CScriptProgram) "$(CommonDirectory)\Make DEPs Compatible.vbs" "$(BinariesFolder)"
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	
 UnregisterClearImage5_7:
 	@ECHO Unregistering ClearImage 5_7...
@@ -98,6 +114,10 @@ RegisterClearImage_7_0: UnregisterClearImage5_7
 	
 ObfuscateFiles: BuildAttributeFinderCore
 	@ECHO Obfuscating for FlexIndex...
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 #	Copy the strong naming key to location dotfuscator xml file expects
 	@IF NOT EXIST "$(StrongNameKeyDir)" @MKDIR "$(StrongNameKeyDir)"
 	@COPY /V "$(RCNETDir)\Core\Code\ExtractInternalKey.snk" "$(StrongNameKeyDir)"
@@ -161,13 +181,29 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe  /in:"$(BinariesFolder)\FAMFileInspector.exe" /mapout:"$(BinariesFolder)\Map\mapFAMFileInspector.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.FileActionManager.FAMFileInspector.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.FileActionManager.FAMFileInspector.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\PrintDocument.exe" /mapout:"$(BinariesFolder)\Map\mapPrintDocument.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 
 CopyCommonFiles:
 	@ECHO Copying common .NET files to installation build folders...
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	@XCOPY "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles" "$(AFCoreInstallFilesRootDir)\DotNetGAC" /Y/E
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	
 CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
     @ECHO Copying the AttributeFinderCore files to installation directory...
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	@COPY /v  "$(BinariesFolder)\UCLIDAFConditions.dll" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
     @COPY /v  "$(BinariesFolder)\UCLIDAFCore.dll" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
     @COPY /v  "$(BinariesFolder)\UCLIDAFDataScorers.dll" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
@@ -309,9 +345,17 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\vssver.scc"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\mssccprj.scc"
 	@DeleteFiles "$(ClearImageInstallFilesDir)\vssver.scc"
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	
 CleanupPreviousBuildFolders: CleanUpMergeModulesFromPreviousBuilds
 	@ECHO Removing files from previous builds...
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	@IF NOT EXIST "$(AFCoreInstallFilesRootDir)\SelfRegFiles" @MKDIR "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
     @IF NOT EXIST "$(AFCoreInstallFilesRootDir)\SelfRegFiles" @MKDIR "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
     @IF NOT EXIST "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" @MKDIR "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
@@ -344,6 +388,10 @@ CleanupPreviousBuildFolders: CleanUpMergeModulesFromPreviousBuilds
 	@Deletefiles "$(AFCoreInstallFilesRootDir)\OfficeRedist\*.*"	
 	@Deletefiles "$(RequiredInstallsDir)\LogicNP\*.*"
 	@Deletefiles "$(AFCoreInstallFilesRootDir)\ProgramDataFiles\*.*"
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	
 CleanUpMergeModulesFromPreviousBuilds: 
 	@ECHO Deleting old merge modules....
@@ -354,39 +402,88 @@ CleanUpMergeModulesFromPreviousBuilds:
 
 MakeExtractBaseMergeModule: BuildPDUtils
 	@ECHO Making ExtractBaseMM...
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	@CD "$(PDCommonDir)"
     @nmake /F ExtractBase.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" CreateExtractBaseMergeModule
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	
 MakeExtractCommonMergeModule: MakeExtractBaseMergeModule
 	@ECHO Making ExtractCommonMM...
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	@CD "$(PDCommonDir)"
     @nmake /F ExtractCommon.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" CreateExtractCommonMergeModule
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 
 MakeExtractFlexCommonMergeModule: MakeExtractCommonMergeModule
 	@ECHO Making ExtractFlexCommonMM...
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
     @CD "$(AFRootDirectory)\Build
     @nmake /F ExtractFlexCommon.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" CreateExtractFlexCommonMergeModule
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	
 BuildFKBUpdateIfRequired:
 	@IF NOT EXIST "$(FKBUpdateReleaseDir)" (
+		@ECHO Building FKB update
+		@ECHO.
+		@DATE /T
+		@TIME /T
+		@ECHO.
 		@CD "$(AFRootDirectory)\Build"
 		@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_18\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\bin;;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages
 		NMAKE /F FKBUpdate.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" CreateFKBInstall
 		@IF NOT EXIST "$(AFCoreInstallFilesRootDir)\FKBInstall" @MKDIR "$(AFCoreInstallFilesRootDir)\FKBInstall"
 		@COPY "$(FKBUpdateReleaseDir)\*.*" "$(AFCoreInstallFilesRootDir)\FKBInstall"
+		@ECHO.
+		@DATE /T
+		@TIME /T
+		@ECHO.
 	)
 	
 BuildAFCoreMergeModule: CleanupPreviousBuildFolders MakeExtractFlexCommonMergeModule CopyFilesToInstallFolder  
     @ECHO Buliding the UCLIDFlexIndex Merge Module installation...
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_18\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\bin;;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(AFCoreMergeModuleInstallRoot)\UCLID FlexIndex.ism" "$(FlexIndexVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(AFCoreMergeModuleInstallRoot)\UCLID FlexIndex.ism"
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 
 BuildDataEntryMergeModule: BuildAFCoreMergeModule
     @ECHO Building Extract Systems DataEntry Merge Module...
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_18\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Bin;;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Dotnet
 	$(SetProductVerScript) "$(LabDEInstallRootDir)\DataEntry\DataEntry.ism" "$(FlexIndexVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(LabDEInstallRootDir)\DataEntry\DataEntry.ism"
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 
 GetAllFiles: GetEngineering
 

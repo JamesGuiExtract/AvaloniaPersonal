@@ -30,21 +30,50 @@ GetOptions=-server $(VAULT_SERVER) -repository $(VAULT_REPOSITORY) -makewritable
 
 GetProductDevelopment:
 	@ECHO Getting ProductDevelopment for $(FlexIndexVersion)
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	@IF NOT EXIST "$(EngineeringRootDirectory)\ProductDevelopment" MKDIR "$(EngineeringRootDirectory)\ProductDevelopment"
 	$(Get) $(GetOptions) -nonworkingfolder "$(EngineeringRootDirectory)\ProductDevelopment" $$$(Branch)/Engineering/ProductDevelopment  "$(FlexIndexVersion)"
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
+	
 	
 GetRCDotNET:
 	@ECHO Getting RC.Net for $(FlexIndexVersion)
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	@IF NOT EXIST "$(EngineeringRootDirectory)\RC.Net" MKDIR "$(EngineeringRootDirectory)\RC.Net"
 	$(Get) $(GetOptions) -nonworkingfolder "$(EngineeringRootDirectory)\RC.Net" $$$(Branch)/Engineering/RC.Net  "$(FlexIndexVersion)"
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 
 GetReusableComponents:
 	@ECHO Getting ReusableComponents for $(FlexIndexVersion)
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	@IF NOT EXIST "$(EngineeringRootDirectory)\ReusableComponents" MKDIR "$(EngineeringRootDirectory)\ReusableComponents"
 	$(Get) $(GetOptions) -nonworkingfolder "$(EngineeringRootDirectory)\ReusableComponents" $$$(Branch)/Engineering/ReusableComponents  "$(FlexIndexVersion)"
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 
 GetRules:
 	@ECHO Getting Rules needed for $(FlexIndexVersion)
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	@IF NOT EXIST "$(RulesDir)\ComponentData" MKDIR "$(RulesDir)\ComponentData"
 	$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\ComponentData" "$$$(Branch)/Engineering/Rules/ComponentData"  "$(FKBVersion)"
 	@IF NOT EXIST "$(RulesDir)\FLEXIndex\Demo_FLEXIndex" MKDIR "$(RulesDir)\FLEXIndex\Demo_FLEXIndex"
@@ -53,9 +82,17 @@ GetRules:
 	$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\IDShield\Demo_IDShield" "$$$(Branch)/Engineering/Rules/IDShield/Demo_IDShield"  "$(FlexIndexVersion)" Rules/IDShield/Demo_IDShield
 	@IF NOT EXIST "$(RulesDir)\LabDE\Demo_LabDE" MKDIR "$(RulesDir)\LabDE\Demo_LabDE"
 	$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\LabDE\Demo_LabDE" "$$$(Branch)/Engineering/Rules/LabDE/Demo_LabDE"  "$(FlexIndexVersion)" Rules/LabDE/Demo_LabDE
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 
 GetEngineering: GetProductDevelopment GetRCDotNET GetReusableComponents GetRules
-	@ECHO Getting Engineering for $(FlexIndexVersion)
+	@ECHO Updating Versions for $(FlexIndexVersion)
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	@IF NOT EXIST "$(EngineeringRootDirectory)" MKDIR "$(EngineeringRootDirectory)"
 	$(BUILD_DRIVE)
 	@CD "$(EngineeringRootDirectory)"
@@ -69,5 +106,9 @@ GetEngineering: GetProductDevelopment GetRCDotNET GetReusableComponents GetRules
 	@SendFilesAsArgumentToApplication *.resx 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
 	@CD "$(DataEntryDir)\LabDE"
 	@SendFilesAsArgumentToApplication *.resx 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
 	
 
