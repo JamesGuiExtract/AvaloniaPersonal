@@ -1,0 +1,73 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.5 Patch Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.5 Patch Testing<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> UW Health
+   	<LI><b>SCRs:</b> LegacyRC #6461
+   	<LI><b>Issue:</b> Add support for removal of specified pages from a multi-page 
+	document.
+</ul>
+<p>
+<h3>Patch Tests</h3>
+<OL>
+	<LI><b>Test Setup</b>
+	<ul>
+		<LI>Prepare a test machine with <b>FLEX Index 9.5.0.35</b> or <b>ID 
+		Shield 9.5.0.35</b> or <b>LabDE 9.5.0.35</b>.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Tests</b>
+	<ul>
+		<LI><b>Installation</b>
+		<ul>
+			<li>Confirm that the patch installs properly by adding 
+			<b>ImageFormatConverter.exe</b> to <b>CommonComponents</b>.
+       		</ul>
+	   	</LI>
+<p>
+		<LI><b>Functionality</b>
+		<ul>
+			<li>Confirm that <b>ImageFormatConverter.exe</b> has an updated 
+			<b>usage</b> message.
+			<li>Confirm that <b>ImageFormatConverter</b> supports the 
+			following <b>/RemovePages</b> options when modifying a <b>TIF</b> 
+			image.
+			<ul>
+				<li><b>PageNumber</b> as /RemovePages 4
+				<li><b>PageNumberRange</b> as /RemovePages 4-6
+				<li><b>CommaSeparatedPageList</b> as /RemovePages 4,6,8
+				<li><b>MinusFollowedByANumber</b> as /RemovePages -2
+			</ul>
+			<li>Confirm that <b>ImageFormatConverter</b> supports the 
+			following <b>/RemovePages</b> options when modifying a <b>PDF</b> 
+			image.
+			<ul>
+				<li><b>PageNumber</b> as /RemovePages 4
+				<li><b>PageNumberRange</b> as /RemovePages 4-6
+				<li><b>CommaSeparatedPageList</b> as /RemovePages 4,6,8
+				<li><b>MinusFollowedByANumber</b> as /RemovePages -2
+			</ul>
+			<li>Confirm that pages can be removed from a TIF image using 
+			the <b>alternate</b> method.
+			<li>Confirm that pages can be removed from a PDF image using 
+			the <b>alternate</b> method.
+	       	</ul>
+   		</LI>
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
