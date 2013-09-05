@@ -1025,8 +1025,12 @@ void SafeNetLicenseMgr::validateUSBLicense()
 		QueryResponsePair qrpQR = m_rusblLicense.getQRPair(iQryNumber);
 		if ( !queryLicense( qrpQR ) )
 		{
-			// The license is not good so release it - this will stop heartbeat thread and reset every thing.
-			releaseLicense("ELI29819");
+			// [FlexIDSCore:5359]
+			// Don't call releaseLicense here because releaseLicense waits for the heartbeat thread
+			// to exit and this is called from the heartbeat thread.
+			// Instead, just throw this exception to end the heartbeat thread. This will trigger
+			// releaseLicense when the next call to getLicense discovers that the heartbeat thread
+			// is not running.
 			UCLIDException ue("ELI12112", "USB License not valid." );
 			throw ue;
 		}
