@@ -419,16 +419,19 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 			set<int> setPagesToRemove;
 			if (!strPagesToRemove.empty())
 			{
-				vector<int> vecPagesToRemove = getPageNumbers(nPageCount, strPagesToRemove);
+				vector<int> vecPagesToRemove = getPageNumbers(nPageCount, strPagesToRemove, true);
 				setPagesToRemove = set<int>(vecPagesToRemove.begin(), vecPagesToRemove.end());
 			}
 
+			bool bOuputAtLeastOnePage = false;
 			for (nPage = 0; nPage < nPageCount; nPage++)
 			{
 				if (setPagesToRemove.find(nPage + 1) != setPagesToRemove.end())
 				{
 					continue;
 				}
+
+				bOuputAtLeastOnePage = true;
 
 				// NOTE: RecAPI uses zero-based page number indexes
 				HPAGE hImagePage;
@@ -447,6 +450,17 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 					THROW_UE_ON_ERROR("ELI34292", "Cannot save to image page in the specified format.",
 						kRecSaveImg(0, *uphOutputImage, nFormat, hImagePage, II_CURRENT, TRUE));
 				}
+			}
+
+			// [ImageFormatConverter:6469]
+			// If all pages were removed via the /RemovePages option, throw an exception.
+			if (!bOuputAtLeastOnePage)
+			{
+				UCLIDException uex("ELI36148", "RemovePages option not valid; all pages removed");
+				uex.addDebugInfo("Input File", strInputFileName);
+				uex.addDebugInfo("Input Page Count", nPageCount);
+				uex.addDebugInfo("RemovePages option", strPagesToRemove);
+				throw uex;
 			}
 
 			nPage = -1;
@@ -591,7 +605,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 			set<int> setPagesToRemove;
 			if (!strPagesToRemove.empty())
 			{
-				vector<int> vecPagesToRemove = getPageNumbers(nPages, strPagesToRemove);
+				vector<int> vecPagesToRemove = getPageNumbers(nPages, strPagesToRemove, true);
 				setPagesToRemove = set<int>(vecPagesToRemove.begin(), vecPagesToRemove.end());
 			}
 
@@ -742,6 +756,17 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 				}
 			}	// end for each page
 
+			// [ImageFormatConverter:6469]
+			// If all pages were removed via the /RemovePages option, throw an exception.
+			if (nOutputPageNum == 0)
+			{
+				UCLIDException uex("ELI36148", "RemovePages option not valid; all pages removed");
+				uex.addDebugInfo("Input File", strInputFileName);
+				uex.addDebugInfo("Input Page Count", nPages);
+				uex.addDebugInfo("RemovePages option", strPagesToRemove);
+				throw uex;
+			}
+				
 			// Wait for the file to be readable before continuing
 			waitForFileToBeReadable(strTempOut);
 

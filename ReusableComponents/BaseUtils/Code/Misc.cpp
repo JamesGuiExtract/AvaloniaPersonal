@@ -91,12 +91,22 @@ void updatePageNumbers(vector<int>& rvecPageNubmers,
 					   bool bThrowExceptionOnPageOutOfRange)
 {
 	bool bEndOutOfRange = nEndPage > nTotalNumberOfPages;
-	if (bEndOutOfRange && bThrowExceptionOnPageOutOfRange)
+	if (bThrowExceptionOnPageOutOfRange)
 	{
-		UCLIDException ue("ELI29980", "Specified end page number is out of range.");
-		ue.addDebugInfo("End Page Number", nEndPage);
-		ue.addDebugInfo("Total Number Of Pages", nTotalNumberOfPages);
-		throw ue;
+		if (bEndOutOfRange)
+		{
+			UCLIDException ue("ELI29980", "Specified end page number is out of range.");
+			ue.addDebugInfo("End Page Number", nEndPage);
+			ue.addDebugInfo("Total Number Of Pages", nTotalNumberOfPages);
+			throw ue;
+		}
+		else if (nStartPage > nTotalNumberOfPages)
+		{
+			UCLIDException ue("ELI36147", "Specified start page number is out of range.");
+			ue.addDebugInfo("Start Page Number", nStartPage);
+			ue.addDebugInfo("Total Number Of Pages", nTotalNumberOfPages);
+			throw ue;
+		}
 	}
 
 	int nLastPageNumber = (!bEndOutOfRange && nEndPage > 0)? nEndPage : nTotalNumberOfPages;
