@@ -693,7 +693,7 @@ namespace Extract.FileActionManager.FileProcessors
                 else
                 {
                     tags = new FileActionManagerPathTags(
-                       Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir);
+                       Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
                 }
 
                 if (ActionToPerform != EFTPAction.kDeleteFileFromFtpServer)

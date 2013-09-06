@@ -68,6 +68,11 @@ public:
 	CStatic m_staticSkipped;
 	CButton m_btnAdvancedSettings;
 	CEdit m_editExecuteTask;
+	CButton	m_btnSendErrorEmail;
+	BOOL m_bSendErrorEmail;
+	CEdit m_editErrorEmailRecipients;
+	CString	m_zErrorEmailRecipients;
+	CButton	m_btnConfigureErrorEmail;
 
 // Overrides
 	// ClassWizard generate virtual function overrides
@@ -97,6 +102,9 @@ protected:
 	afx_msg void OnEnChangeEditErrorLog();
 	afx_msg void OnBtnErrorSelectDocTag();
 	afx_msg void OnBtnBrowseErrorLog();
+	afx_msg void OnCheckSendErrorEmail();
+	afx_msg void OnEnChangeErrorEmailRecipients();
+	afx_msg void OnBtnConfigureErrorEmail();
 	afx_msg void OnCheckExecuteErrorTask();
 	afx_msg void OnBtnAddErrorTask();
 	afx_msg void OnBtnProcessAllOrSkipped();

@@ -37,11 +37,13 @@ namespace Extract.FileActionManager.Database
         /// </summary>
         /// <param name="sourceDocument">The source document</param>
         /// <param name="fpsDirectory">The directory of the fps file.</param>
+        /// <param name="fpsFileName">The full filename of the fps file.</param>
         /// <param name="fileProcessingDB">The <see cref="IFileProcessingDB"/>.</param>
         /// <param name="actionId">The current action in <see paramref="fileProcessingDB"/>.</param>
         public FileActionManagerDatabasePathTags(string sourceDocument, string fpsDirectory,
-                IFileProcessingDB fileProcessingDB, int actionId)
-            : base(GetTagsToValues(sourceDocument, fpsDirectory, fileProcessingDB, actionId))
+                string fpsFileName, IFileProcessingDB fileProcessingDB, int actionId)
+            : base(GetTagsToValues(
+                sourceDocument, fpsDirectory, fpsFileName, fileProcessingDB, actionId))
         {
         }
 
@@ -54,15 +56,18 @@ namespace Extract.FileActionManager.Database
         /// </summary>
         /// <param name="sourceDocument">The source document</param>
         /// <param name="fpsDirectory">the fps file directory.</param>
+        /// <param name="fpsFileName">The full filename of the fps file.</param>
         /// <param name="fileProcessingDB">The <see cref="IFileProcessingDB"/>.</param>
         /// <param name="actionId">The current action in <see paramref="fileProcessingDB"/>.</param>
         /// <returns>The path tags mapped to their expanded form.</returns>
         static Dictionary<string, string> GetTagsToValues(string sourceDocument,
-            string fpsDirectory, IFileProcessingDB fileProcessingDB, int actionId)
+            string fpsDirectory, string fpsFileName, IFileProcessingDB fileProcessingDB,
+            int actionId)
         {
-            Dictionary<string, string> tagsToValues = new Dictionary<string, string>(6);
+            Dictionary<string, string> tagsToValues = new Dictionary<string, string>(7);
             tagsToValues.Add(SourceDocumentTag, sourceDocument);
             tagsToValues.Add(FpsFileDirectoryTag, fpsDirectory);
+            tagsToValues.Add(FpsFileNameTag, fpsFileName);
             tagsToValues.Add(ActionTag, (fileProcessingDB == null || actionId == 0)
                 ? "" : fileProcessingDB.GetActionName(actionId));
             tagsToValues.Add(DatabaseTag, (fileProcessingDB == null)

@@ -29,6 +29,15 @@ namespace Extract.FileActionManager.FileProcessors
 
         #endregion Constants
 
+        #region Fields
+
+        /// <summary>
+        /// Indicates if <see paramref="Settings"/> instance is being configured as an error handler.
+        /// </summary>
+        bool _errorEmailMode;
+
+        #endregion Fields
+
         #region Constructors
 
         /// <summary>
@@ -44,6 +53,17 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         /// <param name="settings"><see cref="SendEmailTask"/> to be configured.</param>
         public SendEmailTaskSettingsDialog(SendEmailTask settings)
+            : this(settings, false)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SendEmailTaskSettingsDialog"/> class.
+        /// </summary>
+        /// <param name="settings"><see cref="SendEmailTask"/> to be configured.</param>
+        /// <param name="errorEmailMode"><see langword="true"/> if the <see paramref="settings"/>
+        /// instance is being configured as an error handler.</param>
+        public SendEmailTaskSettingsDialog(SendEmailTask settings, bool errorEmailMode)
         {
             try
             {
@@ -55,9 +75,15 @@ namespace Extract.FileActionManager.FileProcessors
 
                 InitializeComponent();
 
-                var pathTags = new FileActionManagerDatabasePathTags("", "", null, 0);
+                var pathTags = new FileActionManagerDatabasePathTags("", "", "", null, 0);
                 _subjectPathTagsButton.PathTags = pathTags;
                 _bodyPathTagsButton.PathTags = pathTags;
+
+                _errorEmailMode = errorEmailMode;
+                if (errorEmailMode)
+                {
+                    _resetErrorSettingsButton.Visible = true;
+                }
             }
             catch (Exception ex)
             {
@@ -94,15 +120,7 @@ namespace Extract.FileActionManager.FileProcessors
                 base.OnLoad(e);
 
                 // Apply Settings values to the UI.
-                if (Settings != null)
-                {
-                    _recipientTextBox.Text = Settings.Recipient;
-                    _carbonCopyRecipient.Text = Settings.CarbonCopyRecipient;
-                    _subjectTextBox.Text = Settings.Subject;
-                    _bodyTextBox.Text = Settings.Body;
-                }
-
-                UpdateAttachmentButtonText();
+                UpdateUI();
             }
             catch (Exception ex)
             {
@@ -124,7 +142,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                using (var dialog = new SendEmailTaskAttachmentsDialog(Settings))
+                using (var dialog = new SendEmailTaskAttachmentsDialog(Settings, _errorEmailMode))
                 {
                     if (dialog.ShowDialog() == DialogResult.OK)
                     {
@@ -160,6 +178,27 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the
+        /// <see cref="_resetErrorSettingsButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleResetErrorSettingsButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Settings.ApplyDefaultErrorEmailSettings();
+                
+                UpdateUI();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36118");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="Control.Click"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the <see cref="Control.Click"/> event.</param>
@@ -190,6 +229,22 @@ namespace Extract.FileActionManager.FileProcessors
         #endregion Event Handlers
 
         #region Private Members
+
+        /// <summary>
+        /// Updates the UI controls to reflect the current data in <see cref="Settings"/>.
+        /// </summary>
+        void UpdateUI()
+        {
+            if (Settings != null)
+            {
+                _recipientTextBox.Text = Settings.Recipient;
+                _carbonCopyRecipient.Text = Settings.CarbonCopyRecipient;
+                _subjectTextBox.Text = Settings.Subject;
+                _bodyTextBox.Text = Settings.Body;
+            }
+
+            UpdateAttachmentButtonText();
+        }
 
         /// <summary>
         /// Updates the the text of the attachment button based on the current number of attachments.

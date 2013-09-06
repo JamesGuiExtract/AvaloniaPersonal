@@ -632,6 +632,7 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 					UCLIDException uexOuter("ELI17697",strMsg, ue);
 					uexOuter.addDebugInfo("File", strSourceDocName);
 					uexOuter.addDebugInfo("Task", strCurrentTaskName);
+					uexOuter.addDebugInfo("FPS", asString(m_ipFAMTagManager->FPSFileName));
 
 					throw uexOuter;
 				}

@@ -456,7 +456,8 @@ namespace Extract.FileActionManager.FileProcessors
                     "ELI31836", _COMPONENT_DESCRIPTION);
 
                 FileActionManagerPathTags pathTags =
-                    new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir);
+                    new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir,
+                        pFAMTM.FPSFileName);
                 string fileName = pathTags.Expand(_fileName);
                 string fileContents = pathTags.Expand(_fileContents);
 

@@ -244,6 +244,24 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Gets the current replacement value for the specified <see paramref="tag"/>.
+        /// </summary>
+        /// <param name="tag">The tag.</param>
+        /// <returns>The current replacement value for the specified <see paramref="tag"/>.
+        /// </returns>
+        public virtual string GetTagValue(string tag)
+        {
+            try
+            {
+                return _tagsToValues[tag];
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36121");
+            }
+        }
+
+        /// <summary>
         /// Adds a custom tag to be expanded with <see paramref="expandTagMethod"/>.
         /// <para><b>Note</b></para>
         /// Unlike standard tag, custom tags will not be expanded until after the path tag functions

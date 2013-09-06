@@ -43,4 +43,7 @@ using namespace Extract_Utilities_Email;
 	rename ("EOF", "adoEOF")
 using namespace ADODB;
 
+#import "..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.tlb" named_guids
+using namespace Extract_Interfaces;
+
 #import "UCLIDFileProcessing.tlb" 

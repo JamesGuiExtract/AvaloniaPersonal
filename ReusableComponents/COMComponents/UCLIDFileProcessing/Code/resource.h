@@ -176,6 +176,9 @@
 #define IDC_SPIN_NUM_FILES              361
 #define IDC_SPIN_MAX_NUM_RECORDS        362
 #define IDC_CHECK_AUTO_SAVE_FPS         363
+#define IDC_CHECK_SEND_ERROR_EMAIL      364
+#define IDC_EDIT_ERROR_EMAIL_RECIPIENTS 365
+#define IDC_BTN_CONFIGURE_ERROR_EMAIL   366
 
 // Database Page ID's
 // These ID's need to be the same in every .h project that uses the Database Page object

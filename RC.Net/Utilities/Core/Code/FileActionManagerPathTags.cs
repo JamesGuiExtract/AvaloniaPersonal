@@ -24,6 +24,11 @@ namespace Extract.Utilities
         public static readonly string FpsFileDirectoryTag = "<FPSFileDir>";
 
         /// <summary>
+        /// Constant string for the FPS filename tag.
+        /// </summary>
+        public static readonly string FpsFileNameTag = "<FPSFileName>";
+
+        /// <summary>
         /// Constant string for the remote source doc tag.
         /// </summary>
         public static readonly string RemoteSourceDocumentTag = "<RemoteSourceDocName>";
@@ -41,7 +46,7 @@ namespace Extract.Utilities
         /// Initializes a new instance of the <see cref="FileActionManagerPathTags"/> class.
         /// </summary>
         public FileActionManagerPathTags()
-            : this("", "")
+            : this("", "", "")
         {
         }
 
@@ -60,8 +65,10 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="sourceDocument">The source document.</param>
         /// <param name="fpsDirectory">The directory of the fps file.</param>
-        public FileActionManagerPathTags(string sourceDocument, string fpsDirectory)
-            : base(GetTagsToValues(sourceDocument, fpsDirectory))
+        /// <param name="fpsFileName">The full filename of the fps file.</param>
+        public FileActionManagerPathTags(string sourceDocument, string fpsDirectory,
+            string fpsFileName)
+            : base(GetTagsToValues(sourceDocument, fpsDirectory, fpsFileName))
         {
         }
 
@@ -70,9 +77,12 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="sourceDocument">The source document</param>
         /// <param name="fpsDirectory">The directory of the fps file.</param>
+        /// <param name="fpsFileName">The full filename of the fps file.</param>
         /// <param name="remoteSourceDocName">The remote source doc name</param>
-        public FileActionManagerPathTags(string sourceDocument, string fpsDirectory, string remoteSourceDocName)
-            : base(GetTagsToValues(sourceDocument, fpsDirectory, remoteSourceDocName))
+        public FileActionManagerPathTags(string sourceDocument, string fpsDirectory,
+            string fpsFileName, string remoteSourceDocName)
+            : base(GetTagsToValues(
+                sourceDocument, fpsDirectory, fpsFileName, remoteSourceDocName))
         {
         }
 
@@ -87,11 +97,13 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="sourceDocument">The current source document.</param>
         /// <param name="fpsDirectory">The current FPS directory.</param>
-        public void UpdateTagValues(string sourceDocument, string fpsDirectory)
+        /// <param name="fpsFileName">The full filename of the fps file.</param>
+        public void UpdateTagValues(string sourceDocument, string fpsDirectory, string fpsFileName)
         {
             try
             {
-                Dictionary<string, string> newTagValues = GetTagsToValues(sourceDocument, fpsDirectory);
+                Dictionary<string, string> newTagValues =
+                    GetTagsToValues(sourceDocument, fpsDirectory, fpsFileName);
                 foreach (KeyValuePair<string, string> tagValue in newTagValues)
                 {
                     SetTagValue(tagValue.Key, tagValue.Value);
@@ -108,14 +120,16 @@ namespace Extract.Utilities
         /// <see paramref="fpsDirectory"/> and <see paramref="remoteSourceDocName"/>.
         /// </summary>
         /// <param name="sourceDocument">The current source document.</param>
-        /// <param name="fpsDirectory">The current  FPS directory.</param>
+        /// <param name="fpsDirectory">The current FPS directory.</param>
+        /// <param name="fpsFileName">The full filename of the fps file.</param>
         /// <param name="remoteSourceDocName">The current remote source document.</param>
-        public void UpdateTagValues(string sourceDocument, string fpsDirectory, string remoteSourceDocName)
+        public void UpdateTagValues(string sourceDocument, string fpsDirectory, string fpsFileName,
+            string remoteSourceDocName)
         {
             try
             {
                 Dictionary<string, string> newTagValues =
-                    GetTagsToValues(sourceDocument, fpsDirectory, remoteSourceDocName);
+                    GetTagsToValues(sourceDocument, fpsDirectory, fpsFileName, remoteSourceDocName);
                 foreach (KeyValuePair<string, string> tagValue in newTagValues)
                 {
                     SetTagValue(tagValue.Key, tagValue.Value);
@@ -132,13 +146,15 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="sourceDocument">The source document name.</param>
         /// <param name="fpsDirectory">The fps file.</param>
+        /// <param name="fpsFileName">The full filename of the fps file.</param>
         /// <returns>The path tags mapped to their expanded form.</returns>
         static Dictionary<string, string> GetTagsToValues(string sourceDocument,
-            string fpsDirectory)
+            string fpsDirectory, string fpsFileName)
         {
-            Dictionary<string, string> tagsToValues = new Dictionary<string,string>(3);
+            Dictionary<string, string> tagsToValues = new Dictionary<string,string>(4);
             tagsToValues.Add(SourceDocumentTag, sourceDocument);
             tagsToValues.Add(FpsFileDirectoryTag, fpsDirectory);
+            tagsToValues.Add(FpsFileNameTag, fpsFileName);
             tagsToValues.Add(CommonComponentsDirectoryTag, FileSystemMethods.CommonComponentsPath);
             return tagsToValues;
         }
@@ -148,14 +164,16 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="sourceDocument">The source document</param>
         /// <param name="fpsDirectory">the fps file directory.</param>
+        /// <param name="fpsFileName">The full filename of the fps file.</param>
         /// <param name="remoteSourceDocName">The remote source document</param>
         /// <returns>The path tags mapped to their expanded form.</returns>
         static Dictionary<string, string> GetTagsToValues(string sourceDocument,
-            string fpsDirectory, string remoteSourceDocName)
+            string fpsDirectory, string fpsFileName, string remoteSourceDocName)
         {
-            Dictionary<string, string> tagsToValues = new Dictionary<string, string>(4);
+            Dictionary<string, string> tagsToValues = new Dictionary<string, string>(5);
             tagsToValues.Add(SourceDocumentTag, sourceDocument);
             tagsToValues.Add(FpsFileDirectoryTag, fpsDirectory);
+            tagsToValues.Add(FpsFileNameTag, fpsFileName);
             tagsToValues.Add(RemoteSourceDocumentTag, remoteSourceDocName);
             tagsToValues.Add(CommonComponentsDirectoryTag, FileSystemMethods.CommonComponentsPath);
             return tagsToValues;

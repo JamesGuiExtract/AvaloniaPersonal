@@ -382,7 +382,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                 // Create a tag manager and expand the tags in the file name
                 var tags = new FileActionManagerPathTags(
-                    Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir);
+                    Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
                 fileName = tags.Expand(_fileName);
 
                 int count = pDB.SetPriorityForFiles(

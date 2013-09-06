@@ -45,7 +45,9 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         /// <param name="settings"><see cref="SendEmailTask"/> for which attachments are to be
         /// selected.</param>
-        public SendEmailTaskAttachmentsDialog(SendEmailTask settings)
+        /// <param name="errorEmailMode"><see langword="true"/> if the <see paramref="settings"/>
+        /// instance is being configured as an error handler.</param>
+        public SendEmailTaskAttachmentsDialog(SendEmailTask settings, bool errorEmailMode)
         {
             try
             {
@@ -56,6 +58,11 @@ namespace Extract.FileActionManager.FileProcessors
                 InitializeComponent();
                 
                 Settings = settings;
+
+                if (errorEmailMode)
+                {
+                    _pathTagsButton.PathTags.SetTagValue(SendEmailTask.ExceptionFileTag, null);
+                }
             }
             catch (Exception ex)
             {

@@ -118,6 +118,11 @@ void FileProcessingDlgTaskPage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO_SKIPPED_SCOPE, m_comboSkipped);
 	DDX_Control(pDX, IDC_STATIC_SKIPPED, m_staticSkipped);
 	DDX_Control(pDX, IDC_BUTTON_TASK_ADVANCED_SETTINGS, m_btnAdvancedSettings);
+	DDX_Control(pDX, IDC_CHECK_SEND_ERROR_EMAIL, m_btnSendErrorEmail);
+	DDX_Check(pDX, IDC_CHECK_SEND_ERROR_EMAIL, m_bSendErrorEmail);
+	DDX_Control(pDX, IDC_EDIT_ERROR_EMAIL_RECIPIENTS, m_editErrorEmailRecipients);
+	DDX_Text(pDX, IDC_EDIT_ERROR_EMAIL_RECIPIENTS, m_zErrorEmailRecipients);
+	DDX_Control(pDX, IDC_BTN_CONFIGURE_ERROR_EMAIL, m_btnConfigureErrorEmail);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(FileProcessingDlgTaskPage, CPropertyPage)
@@ -132,6 +137,9 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgTaskPage, CPropertyPage)
 	ON_EN_CHANGE(IDC_EDIT_ERROR_LOG, &FileProcessingDlgTaskPage::OnEnChangeEditErrorLog)
 	ON_BN_CLICKED(IDC_BTN_SELECT_DOC_TAG, OnBtnErrorSelectDocTag)
 	ON_BN_CLICKED(IDC_BTN_BROWSE_LOG, OnBtnBrowseErrorLog)
+	ON_BN_CLICKED(IDC_CHECK_SEND_ERROR_EMAIL, &FileProcessingDlgTaskPage::OnCheckSendErrorEmail)
+	ON_EN_CHANGE(IDC_EDIT_ERROR_EMAIL_RECIPIENTS, &FileProcessingDlgTaskPage::OnEnChangeErrorEmailRecipients)
+	ON_BN_CLICKED(IDC_BTN_CONFIGURE_ERROR_EMAIL, &FileProcessingDlgTaskPage::OnBtnConfigureErrorEmail)
 	ON_BN_CLICKED(IDC_CHECK_EXECUTE_TASK, OnCheckExecuteErrorTask)
 	ON_BN_CLICKED(IDC_BTN_SELECT_ERROR_TASK, OnBtnAddErrorTask)
 	ON_MESSAGE(WM_TASK_GRID_DBLCLICK, OnGridDblClick)
@@ -517,6 +525,63 @@ void FileProcessingDlgTaskPage::OnBtnBrowseErrorLog()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16031")
 }
 //--------------------------------------------------------------------------------------------------
+void FileProcessingDlgTaskPage::OnCheckSendErrorEmail()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
+
+	try
+	{
+		UpdateData(TRUE);
+
+		// Provide new setting to File Processing Mgmt Role object
+		getFPMgmtRole()->SendErrorEmail = asVariantBool(m_bSendErrorEmail);
+
+		// Enable / disable controls as appropriate
+		setButtonStates();
+		updateUI();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI36128")
+}
+//--------------------------------------------------------------------------------------------------
+void FileProcessingDlgTaskPage::OnEnChangeErrorEmailRecipients()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
+	try
+	{
+		UpdateData(TRUE);
+
+		IErrorEmailTaskPtr ipErrorEmailTask = getFPMgmtRole()->ErrorEmailTask;
+		ASSERT_RESOURCE_ALLOCATION("ELI36129", ipErrorEmailTask != __nullptr);
+
+		// Update the error email recipients
+		ipErrorEmailTask->Recipient = get_bstr_t(m_zErrorEmailRecipients);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI36130");
+}
+//--------------------------------------------------------------------------------------------------
+void FileProcessingDlgTaskPage::OnBtnConfigureErrorEmail()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
+
+	try
+	{
+		IErrorEmailTaskPtr ipErrorEmailTask = getFPMgmtRole()->ErrorEmailTask;
+		ASSERT_RESOURCE_ALLOCATION("ELI36131", ipErrorEmailTask != __nullptr);
+
+		if (asCppBool(ipErrorEmailTask->ConfigureErrorEmail()))
+		{
+			// If the user okay'd the configuration, apply the current recipients from the email
+			// task to the recipients edit box.
+			m_zErrorEmailRecipients = asString(ipErrorEmailTask->Recipient).c_str();
+			UpdateData(FALSE);
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI36132")
+}
+//--------------------------------------------------------------------------------------------------
 void FileProcessingDlgTaskPage::OnCheckExecuteErrorTask()
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
@@ -609,8 +674,9 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 
 		CRect rectDlg, rectDownButton, rectList;
 		CRect rectAddButton, rectUpButton, rectDeleteButton, rectModifyButton;
-		CRect rectErrorGrp, rectCheckLogError, rectEditErrorLog, rectCheckExecuteTask, rectEditExecuteTask, 
-			rectDocTag, rectBrowse, rectSelect;
+		CRect rectErrorGrp, rectCheckLogError, rectEditErrorLog, rectCheckErrorEmail,
+			rectEditErrorEmailRecipients, rectConfigureEmailButton, rectCheckExecuteTask,
+			rectEditExecuteTask, rectDocTag, rectBrowse, rectSelect;
 		CRect rectProcessScopeGrp, rectProcessAll, rectProcessSkipped, rectComboSkippedScope, rectSkippedText;
 		CRect rectAdvancedButton;
 
@@ -639,6 +705,12 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		ScreenToClient(&rectDocTag);
 		m_btnBrowseErrorLog.GetWindowRect(&rectBrowse);
 		ScreenToClient(&rectBrowse);
+		m_btnSendErrorEmail.GetWindowRect(&rectCheckErrorEmail);
+		ScreenToClient(&rectCheckErrorEmail);
+		m_editErrorEmailRecipients.GetWindowRect(&rectEditErrorEmailRecipients);
+		ScreenToClient(&rectEditErrorEmailRecipients);
+		m_btnConfigureErrorEmail.GetWindowRect(&rectConfigureEmailButton);
+		ScreenToClient(&rectConfigureEmailButton);
 		m_btnExecuteErrorTask.GetWindowRect(&rectCheckExecuteTask);
 		ScreenToClient(&rectCheckExecuteTask);
 		m_editExecuteTask.GetWindowRect(&rectEditExecuteTask);
@@ -733,8 +805,10 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		int nButtonToEditVerticalAdjustment = rectEditErrorLog.top - rectBrowse.top;
 		nGroupHeight = rectErrorGrp.Height();
 		nSpace = rectEditErrorLog.top - rectErrorGrp.top;
-		int nSpace2 = rectCheckExecuteTask.top - rectErrorGrp.top;
-		int nSpace3 = rectSelect.top - rectErrorGrp.top;
+		int nSpaceErrorEmailCheck = rectCheckErrorEmail.top - rectErrorGrp.top;
+		int nSpaceErrorEmailEdit = rectEditErrorEmailRecipients.top - rectErrorGrp.top;
+		int nSpaceExecuteTask = rectCheckExecuteTask.top - rectErrorGrp.top;
+		int nSpaceErrorGroup = rectSelect.top - rectErrorGrp.top;
 		rectErrorGrp.bottom = rectProcessScopeGrp.top - nLen4;
 		rectErrorGrp.top = rectErrorGrp.bottom - nGroupHeight;
 		rectErrorGrp.right =  rectList.right;
@@ -760,16 +834,32 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		rectDocTag.top = rectBrowse.top;
 		rectDocTag.bottom = rectBrowse.bottom;
 		rectEditErrorLog.right = rectDocTag.left - nLen2;
+		
+		nHeight = rectCheckErrorEmail.Height();
+		rectCheckErrorEmail.top = rectErrorGrp.top + nSpaceErrorEmailCheck;
+		rectCheckErrorEmail.bottom = rectCheckErrorEmail.top + nHeight;
+
+		nHeight = rectEditErrorEmailRecipients.Height();
+		rectEditErrorEmailRecipients.top = rectErrorGrp.top + nSpaceErrorEmailEdit;
+		rectEditErrorEmailRecipients.bottom = rectEditErrorEmailRecipients.top + nHeight;
+
+		nWidth = rectConfigureEmailButton.Width();
+		nHeight = rectConfigureEmailButton.Height();
+		rectConfigureEmailButton.right = rectErrorGrp.right - nLen2 - nGROUPBOX_LINE_WIDTH;
+		rectConfigureEmailButton.left = rectConfigureEmailButton.right - nWidth;
+		rectConfigureEmailButton.top = rectEditErrorEmailRecipients.top - nButtonToEditVerticalAdjustment;
+		rectConfigureEmailButton.bottom = rectConfigureEmailButton.top + nHeight;
+		rectEditErrorEmailRecipients.right = rectConfigureEmailButton.left - nLen2;
 
 		nHeight = rectCheckExecuteTask.Height();
-		rectCheckExecuteTask.top = rectErrorGrp.top + nSpace2;
+		rectCheckExecuteTask.top = rectErrorGrp.top + nSpaceExecuteTask;
 		rectCheckExecuteTask.bottom = rectCheckExecuteTask.top + nHeight;
 
 		nHeight = rectSelect.Height();
 		nWidth = rectSelect.Width();
 		rectSelect.right = rectErrorGrp.right - nLen2 - nGROUPBOX_LINE_WIDTH;
 		rectSelect.left = rectSelect.right - nWidth;
-		rectSelect.top = rectErrorGrp.top + nSpace3;
+		rectSelect.top = rectErrorGrp.top + nSpaceErrorGroup;
 		rectSelect.bottom = rectSelect.top + nHeight;
 
 		nHeight = rectEditExecuteTask.Height();
@@ -798,6 +888,9 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		m_editErrorLog.MoveWindow(&rectEditErrorLog);
 		m_btnErrorSelectTag.MoveWindow(&rectDocTag);
 		m_btnBrowseErrorLog.MoveWindow(&rectBrowse);
+		m_btnSendErrorEmail.MoveWindow(&rectCheckErrorEmail);
+		m_editErrorEmailRecipients.MoveWindow(&rectEditErrorEmailRecipients);
+		m_btnConfigureErrorEmail.MoveWindow(&rectConfigureEmailButton);
 		m_btnExecuteErrorTask.MoveWindow(&rectCheckExecuteTask);
 		m_btnSelectErrorTask.MoveWindow(&rectSelect);
 		m_editExecuteTask.MoveWindow(&rectEditExecuteTask);
@@ -1313,6 +1406,14 @@ void FileProcessingDlgTaskPage::refresh()
 	m_bLogErrorDetails = asMFCBool( ipMgmtRole->LogErrorDetails );
 	m_zErrorLog = asString( ipMgmtRole->ErrorLogName ).c_str();
 
+	// Update error email UI elements
+	m_bSendErrorEmail = asMFCBool(getFPMgmtRole()->SendErrorEmail);
+
+	IErrorEmailTaskPtr ipErrorEmailTask = getFPMgmtRole()->ErrorEmailTask;
+	m_zErrorEmailRecipients = (ipErrorEmailTask == __nullptr)
+		? ""
+		: asString(ipErrorEmailTask->Recipient).c_str();
+
 	// Update error task items
 	m_bExecuteErrorTask = asMFCBool( ipMgmtRole->ExecuteErrorTask );
 
@@ -1354,6 +1455,11 @@ void FileProcessingDlgTaskPage::setEnabled(bool bEnabled)
 		m_btnErrorSelectTag.EnableWindow(FALSE);
 		m_btnBrowseErrorLog.EnableWindow(FALSE);
 
+		// Error email controls
+		m_btnSendErrorEmail.EnableWindow(FALSE);
+		m_editErrorEmailRecipients.EnableWindow(FALSE);
+		m_btnConfigureErrorEmail.EnableWindow(FALSE);
+
 		// Scope controls
 		m_radioProcessAll.EnableWindow(FALSE);
 		m_radioProcessSkipped.EnableWindow(FALSE);
@@ -1377,6 +1483,14 @@ void FileProcessingDlgTaskPage::setEnabled(bool bEnabled)
 			m_editErrorLog.EnableWindow(TRUE);
 			m_btnErrorSelectTag.EnableWindow(TRUE);
 			m_btnBrowseErrorLog.EnableWindow(TRUE);
+		}
+
+		// Error email controls
+		m_btnSendErrorEmail.EnableWindow(TRUE);
+		if (m_bSendErrorEmail)
+		{
+			m_editErrorEmailRecipients.EnableWindow(TRUE);
+			m_btnConfigureErrorEmail.EnableWindow(TRUE);
 		}
 
 		// Scope controls
@@ -1593,6 +1707,13 @@ void FileProcessingDlgTaskPage::setButtonStates()
 	m_editErrorLog.EnableWindow(m_bLogErrorDetails);
 	m_btnErrorSelectTag.EnableWindow(m_bLogErrorDetails);
 	m_btnBrowseErrorLog.EnableWindow(m_bLogErrorDetails);
+
+	// Can always check/uncheck send error email
+	m_btnSendErrorEmail.EnableWindow(TRUE);
+
+	// Enable / disable controls for configuring error email
+	m_editErrorEmailRecipients.EnableWindow(m_bSendErrorEmail);
+	m_btnConfigureErrorEmail.EnableWindow(m_bSendErrorEmail);
 
 	// Can always check/uncheck error task
 	m_btnExecuteErrorTask.EnableWindow(TRUE);

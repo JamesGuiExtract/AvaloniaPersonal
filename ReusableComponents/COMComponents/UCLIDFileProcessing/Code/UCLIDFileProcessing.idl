@@ -19,6 +19,7 @@ library UCLID_FILEPROCESSINGLib
 	importlib("..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
 	importlib("..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
 	importlib("Common Files\System\ADO\msado27.tlb");
+	importlib("..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.tlb");
 	
 	/////////////////////////
 	// forward declarations
@@ -1530,6 +1531,15 @@ library UCLID_FILEPROCESSINGLib
 		//-----------------------------------------------------------------------------------------
 		[propget, id(16), helpstring("property FPDB")] HRESULT FPDB([out, retval] IFileProcessingDB** ppFPDB);
 		[propput, id(16), helpstring("property FPDB")] HRESULT FPDB([in] IFileProcessingDB* pFPDB);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Specifies whether an email is to be sent upon a processing failure.
+		[propget, id(17), helpstring("property SendErrorEmail")] HRESULT SendErrorEmail([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(17), helpstring("property SendErrorEmail")] HRESULT SendErrorEmail([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: The IErrorEmailTask to use to send an email upon processing failure. May be NULL
+		//			if not currently configured to send an email upon failure.
+		[propget, id(18), helpstring("property ErrorEmailTask")] HRESULT ErrorEmailTask([out, retval] IErrorEmailTask** pVal);
+		[propput, id(18), helpstring("property ErrorEmailTask")] HRESULT ErrorEmailTask([in] IErrorEmailTask * newVal);
 	};
 
 	[
@@ -1563,7 +1573,7 @@ library UCLID_FILEPROCESSINGLib
 	]
 	interface IFAMTagManager : IDispatch
 	{
-		// FPS file full name
+		// FPS file directory name
 		[propget, id(1), helpstring("property FPSFileDir")] HRESULT FPSFileDir([out, retval] BSTR *strFPSFileDir);
 		[propput, id(1), helpstring("property FPSFileDir")] HRESULT FPSFileDir([in] BSTR strFPSFileDir);
 		//-----------------------------------------------------------------------------------------
@@ -1591,7 +1601,10 @@ library UCLID_FILEPROCESSINGLib
 		// different thread will have different source doc name [P13: 3901]
 		[id(8), helpstring("method ExpandTagsAndFunctions")] HRESULT ExpandTagsAndFunctions(
 			[in] BSTR bstrInput, [in] BSTR bstrSourceName, [out, retval] BSTR* pbstrOutput);
-
+		//-----------------------------------------------------------------------------------------
+		// FPS file full name
+		[propget, id(9), helpstring("property FPSFileName")] HRESULT FPSFileName([out, retval] BSTR *strFPSFileName);
+		[propput, id(9), helpstring("property FPSFileName")] HRESULT FPSFileName([in] BSTR strFPSFileName);
 	};
 
 	[

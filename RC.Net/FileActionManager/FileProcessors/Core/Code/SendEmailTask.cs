@@ -1,5 +1,6 @@
 ﻿using Extract.DataEntry;
 using Extract.FileActionManager.Database;
+using Extract.Interfaces;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -69,7 +70,7 @@ namespace Extract.FileActionManager.FileProcessors
     [ComVisible(true)]
     [Guid("0A4F188F-CF04-4871-9010-230F73FAC966")]
     [ProgId("Extract.FileActionManager.FileProcessors.SendEmailTask")]
-    public class SendEmailTask : ISendEmailTask
+    public class SendEmailTask : ISendEmailTask, IErrorEmailTask
     {
         #region Constants
 
@@ -87,6 +88,13 @@ namespace Extract.FileActionManager.FileProcessors
         /// The license id to validate in licensing calls
         /// </summary>
         const LicenseIdName _LICENSE_ID = LicenseIdName.FileActionManagerObjects;
+
+        /// <summary>
+        /// A special tag that provides a path to a temporary copy of an
+        /// <see cref="ExtractException"/> for the <see cref="Attachments"/> field when
+        /// <see cref="StringizedException"/> has been specified.
+        /// </summary>
+        public static readonly string ExceptionFileTag = "<ExceptionFile>";
 
         #endregion Constants
 
@@ -109,7 +117,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The primary email recipient(s) (multiple addresses should be delimited by ';' or ',')
         /// </summary>
-        string _recipeint = "";
+        string _recipient = "";
 
         /// <summary>
         /// The email recipient(s) to be copied (multiple addresses should be delimited by ';' or ',')
@@ -212,13 +220,13 @@ namespace Extract.FileActionManager.FileProcessors
         {
             get
             {
-                return _recipeint;
+                return _recipient;
             }
 
             set
             {
-                _dirty |= !string.Equals(_recipeint, value, StringComparison.Ordinal);
-                _recipeint = value;
+                _dirty |= !string.Equals(_recipient, value, StringComparison.Ordinal);
+                _recipient = value;
             }
         }
 
@@ -327,6 +335,72 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         #endregion ISendEmailTask Members
+
+        #region IErrorEmailTask Members
+
+        /// <summary>
+        /// When this task is being used as an error handling option, this property specifies the
+        /// <see cref="ExtractException"/> that triggered the error (in stringized form).
+        /// </summary>
+        public string StringizedException
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Allows configuration of this instance in the context of and error handler.
+        /// </summary>
+        public bool ConfigureErrorEmail()
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI36114", _COMPONENT_DESCRIPTION);
+
+                // Make a clone to update settings and only copy if ok
+                var cloneOfThis = (SendEmailTask)Clone();
+
+                using (var dialog = new SendEmailTaskSettingsDialog(cloneOfThis, true))
+                {
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        CopyFrom(dialog.Settings);
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.CreateComVisible("ELI36115",
+                    "Error running configuration.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Applies the default settings for an email to be sent as an error handler.
+        /// <para><b>Note</b></para>
+        /// The <see cref="Recipient"/> and <see cref="CarbonCopyRecipient"/> fields are not
+        /// modified by this call.
+        /// </summary>
+        public void ApplyDefaultErrorEmailSettings()
+        {
+            try
+            {
+                Subject = "ERROR: A file failed in action \"<ActionName>\" on $Env(COMPUTERNAME)";
+                Body = "Filename: <SourceDocName>\r\nFPS: <FPSFileName>";
+                Attachments = new[] { ExceptionFileTag };
+                DataFileName = "<SourceDocName>.voa";
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI36116", "Error applying default email settings.");
+            }
+        }
+
+        #endregion IErrorEmailTask Members
 
         #region ICategorizedComponent Members
 
@@ -540,6 +614,10 @@ namespace Extract.FileActionManager.FileProcessors
             int nActionID, FAMTagManager pFAMTM, FileProcessingDB pDB,
             ProgressStatus pProgressStatus, bool bCancelRequested)
         {
+            // If the StringizedException is to be attached to this email, tempExceptionFile will
+            // specify it's temporary location on disk.
+            TemporaryFile tempExceptionFile = null;
+
             try
             {
                 _queryDataInitialized = false;
@@ -564,23 +642,28 @@ namespace Extract.FileActionManager.FileProcessors
                     emailSettings.LoadSettings(false);
                 }
 
+                // Create the pathTags instance to be used to expand any path tags/functions.
+                FileActionManagerPathTags pathTags = new FileActionManagerDatabasePathTags(
+                    pFileRecord.Name, pFAMTM.FPSFileDir, pFAMTM.FPSFileName, pDB, nActionID);
+
                 // Create and fill in the properties of an ExtractEmailMessage.
                 ExtractEmailMessage emailMessage = new ExtractEmailMessage();
                 emailMessage.EmailSettings = emailSettings;
                 string expandedRecipients =
-                    ExpandText(Recipient, pFileRecord, nActionID, pFAMTM, pDB);
+                    ExpandText(Recipient, pFileRecord, pathTags, pDB);
                 emailMessage.Recipients =
                     expandedRecipients
                     .Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries)
                     .ToVariantVector();
                 string expandedCcRecipients =
-                    ExpandText(CarbonCopyRecipient, pFileRecord, nActionID, pFAMTM, pDB);
+                    ExpandText(CarbonCopyRecipient, pFileRecord, pathTags, pDB);
                 emailMessage.CarbonCopyRecipients = expandedCcRecipients
                     .Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries)
                     .ToVariantVector();
-                emailMessage.Subject = ExpandText(Subject, pFileRecord, nActionID, pFAMTM, pDB);
-                emailMessage.Body = ExpandText(Body, pFileRecord, nActionID, pFAMTM, pDB);
-                PrepareAttachments(emailMessage, pFileRecord, nActionID, pFAMTM, pDB);
+                emailMessage.Subject = ExpandText(Subject, pFileRecord, pathTags, pDB);
+                emailMessage.Body = ExpandText(Body, pFileRecord, pathTags, pDB);
+
+                PrepareAttachments(emailMessage, pFileRecord, pathTags, pDB, ref tempExceptionFile);
 
                 // If there is any text that could not be properly expanded because of a missing VOA
                 // file or DB connection, add error text to the email as well as logging an error.
@@ -593,6 +676,8 @@ namespace Extract.FileActionManager.FileProcessors
                         "text in an email could not be found; some email text may be missing/invalid.");
                     ee.AddDebugData("Data file", DataFileName, false);
                     ee.AddDebugData("SourceDocName", pFileRecord.Name, false);
+                    ee.AddDebugData("FPS",
+                        pathTags.GetTagValue(FileActionManagerPathTags.FpsFileNameTag), false);
                     ee.Log();
                 }
 
@@ -605,6 +690,8 @@ namespace Extract.FileActionManager.FileProcessors
                         "to expand text in an email; some email text may be missing/invalid.");
                     ee.AddDebugData("Data file", DataFileName, false);
                     ee.AddDebugData("SourceDocName", pFileRecord.Name, false);
+                    ee.AddDebugData("FPS",
+                        pathTags.GetTagValue(FileActionManagerPathTags.FpsFileNameTag), false);
                     ee.Log();
                 }
 
@@ -622,6 +709,12 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     _dbConnection.Dispose();
                     _dbConnection = null;
+                }
+
+                if (tempExceptionFile != null)
+                {
+                    tempExceptionFile.Dispose();
+                    tempExceptionFile = null;
                 }
             }
         }
@@ -697,7 +790,7 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 using (IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION))
                 {
-                    _recipeint = reader.ReadString();
+                    _recipient = reader.ReadString();
                     _carbonCopyRecipient = reader.ReadString();
                     _subject = reader.ReadString();
                     _body = reader.ReadString();
@@ -730,7 +823,7 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
-                    writer.Write(_recipeint);
+                    writer.Write(_recipient);
                     writer.Write(_carbonCopyRecipient);
                     writer.Write(_subject);
                     writer.Write(_body);
@@ -811,17 +904,28 @@ namespace Extract.FileActionManager.FileProcessors
         /// attachments should be attached.</param>
         /// <param name="fileRecord">The <see cref="FileRecord"/> relating to the
         /// <see paramref="emailMessage"/></param>
-        /// <param name="actionId">The ID of the action being processed.</param>
-        /// <param name="tagManager">The <see cref="FAMTagManager"/> to use to expand path tags and
-        /// functions.</param>
+        /// <param name="pathTags">The <see cref="FileActionManagerPathTags"/> instance to use to
+        /// expand path tags and functions in the filenames.</param>
         /// <param name="fileProcessingDB">The File Action Manager database being used for
         /// processing.</param>
+        /// <param name="tempExceptionFile"></param>
         void PrepareAttachments(ExtractEmailMessage emailMessage, FileRecord fileRecord,
-            int actionId, FAMTagManager tagManager, IFileProcessingDB fileProcessingDB)
+            FileActionManagerPathTags pathTags, IFileProcessingDB fileProcessingDB,
+            ref TemporaryFile tempExceptionFile)
         {
+            if (!string.IsNullOrEmpty(StringizedException))
+            {
+                tempExceptionFile = new TemporaryFile(
+                    null, Path.GetFileName(fileRecord.Name) + ".uex", null, false);
+                string exceptionFileName = tempExceptionFile.FileName;
+                var ee = ExtractException.FromStringizedByteStream("ELI36117", StringizedException);
+                ee.Log(exceptionFileName);
+                pathTags.SetTagValue(ExceptionFileTag, exceptionFileName);
+            }
+
             var expandedAttachmentPaths = Attachments
                 .Select(attachment => ExpandText(
-                    attachment, fileRecord, actionId, tagManager, fileProcessingDB));
+                    attachment, fileRecord, pathTags, fileProcessingDB));
 
             var missingAttachments = expandedAttachmentPaths
                 .Where(filePath => !File.Exists(filePath));
@@ -837,7 +941,9 @@ namespace Extract.FileActionManager.FileProcessors
                         "ERROR: The file \"{0}\" was configured to be attached to this email. " +  
                         "However, that file was not found or was not accessible.",
                         missingAttachment);
-                    ee.AddDebugData("Attachement", missingAttachment, false);
+                    ee.AddDebugData("Attachment", missingAttachment, false);
+                    ee.AddDebugData("FPS", 
+                        pathTags.GetTagValue(FileActionManagerPathTags.FpsFileNameTag), false);
                 }
 
                 ee.Log();
@@ -856,15 +962,14 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="text">The text to be expanded.</param>
         /// <param name="fileRecord">The <see cref="FileRecord"/> relating to the text to be
         /// expanded.</param>
-        /// <param name="actionId">The ID of the action being processed.</param>
-        /// <param name="tagManager">The <see cref="FAMTagManager"/> to use to expand path tags and
-        /// functions.</param>
+        /// <param name="pathTags">The <see cref="FileActionManagerPathTags"/> instance to use to
+        /// expand path tags and functions in the <see paramref="text"/>.</param>
         /// <param name="fileProcessingDB">The File Action Manager database being used for
         /// processing.</param>
         /// <returns><see paramref="text"/> with all path tags/functions as well as data queries
         /// expanced.</returns>
-        string ExpandText(string text, FileRecord fileRecord,
-            int actionId, FAMTagManager tagManager, IFileProcessingDB fileProcessingDB)
+        string ExpandText(string text, FileRecord fileRecord, FileActionManagerPathTags pathTags,
+            IFileProcessingDB fileProcessingDB)
         {
             try
             {
@@ -875,10 +980,6 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 string expandedOutput = "";
-
-                // Create the pathTags instance to be used to expand any path tags/functions.
-                FileActionManagerPathTags pathTags = new FileActionManagerDatabasePathTags(
-                    fileRecord.Name, tagManager.FPSFileDir, fileProcessingDB, actionId);
 
                 // Parse the source text into alternating "matches" where every other "match" is a
                 // query and the "matches" in-between are non-query text.
@@ -970,6 +1071,8 @@ namespace Extract.FileActionManager.FileProcessors
                                 "Unable to expand data query in email", ex);
                             ee.AddDebugData("Query", match.Value, false);
                             ee.AddDebugData("SourceDocName", fileRecord.Name, false);
+                            ee.AddDebugData("FPS",
+                                pathTags.GetTagValue(FileActionManagerPathTags.FpsFileNameTag), false);
                             ee.Log();
                         }
                     }
@@ -1062,7 +1165,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="task">The <see cref="SendEmailTask"/> from which to copy.</param>
         void CopyFrom(SendEmailTask task)
         {
-            _recipeint = task._recipeint;
+            _recipient = task._recipient;
             _carbonCopyRecipient = task._carbonCopyRecipient;
             _subject = task._subject;
             _body = task._body;

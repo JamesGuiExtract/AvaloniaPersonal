@@ -20,7 +20,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 5;
+const unsigned long gnCurrentVersion = 6;
 
 // Strings associated with logging errors to a text file
 const string gstrERROR_SUMMARY_HEADER = "****Error Summary****";
@@ -944,6 +944,17 @@ STDMETHODIMP CFileProcessingMgmtRole::IsDirty(void)
 			}
 		}
 
+		// check if the error task is dirty
+		if (m_ipErrorEmailTask != __nullptr)
+		{
+			IPersistStreamPtr ipFPStream = m_ipErrorEmailTask;
+			ASSERT_RESOURCE_ALLOCATION("ELI36133", ipFPStream != __nullptr);
+			if (ipFPStream->IsDirty() == S_OK)
+			{
+				return S_OK;
+			}
+		}
+
 		// if we reached here, it means that the object is not dirty
 		// indicate to the caller that this object is not dirty
 		return S_FALSE;
@@ -957,6 +968,8 @@ STDMETHODIMP CFileProcessingMgmtRole::IsDirty(void)
 //	 Added persistence for skipped file processing
 // Version 5:
 //	 Added persistence for the processing schedule
+// Version 6:
+//	 Added persistence for error condition emails
 STDMETHODIMP CFileProcessingMgmtRole::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -1041,6 +1054,23 @@ STDMETHODIMP CFileProcessingMgmtRole::Load(IStream *pStream)
 			}
 		}
 
+		// Load error handling email task
+		if (nDataVersion > 5)
+		{
+			dataReader >> m_bSendErrorEmail;
+			
+			bool bLoadErrorEmailTask = true;
+			dataReader >> bLoadErrorEmailTask;
+
+			// Read in the task object only if it was saved.
+			if (bLoadErrorEmailTask)
+			{
+				IPersistStreamPtr ipErrorEmailTaskObj;
+				readObjectFromStream(ipErrorEmailTaskObj, pStream, "ELI36134");
+				m_ipErrorEmailTask = ipErrorEmailTaskObj;
+			}
+		}
+
 		// Error handling task
 		if (nDataVersion > 2)
 		{
@@ -1120,6 +1150,10 @@ STDMETHODIMP CFileProcessingMgmtRole::Save(IStream *pStream, BOOL fClearDirty)
 			}
 		}
 
+		dataWriter << m_bSendErrorEmail;
+		bool bSaveErrorEmailTask = (m_ipErrorEmailTask != __nullptr);
+		dataWriter << bSaveErrorEmailTask;
+
 		// Write these items to the byte stream
 		dataWriter.flushToByteStream();
 
@@ -1127,6 +1161,14 @@ STDMETHODIMP CFileProcessingMgmtRole::Save(IStream *pStream, BOOL fClearDirty)
 		long nDataLength = data.getLength();
 		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
 		pStream->Write( data.getData(), nDataLength, NULL );
+
+		// Save the error email task if it exists. (Don't create an email task until needed.)
+		if (bSaveErrorEmailTask)
+		{
+			IPersistStreamPtr ipErrorEmailTaskObj = getErrorEmailTask();
+			ASSERT_RESOURCE_ALLOCATION("ELI36135", ipErrorEmailTaskObj != __nullptr);
+			writeObjectToStream(ipErrorEmailTaskObj, pStream, "ELI36136", fClearDirty);
+		}
 
 		// Save the error handling task
 		IPersistStreamPtr ipErrorTaskObj = getErrorHandlingTask();
@@ -1399,6 +1441,95 @@ STDMETHODIMP CFileProcessingMgmtRole::put_FPDB(IFileProcessingDB* pFPDB)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34345");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::get_SendErrorEmail(VARIANT_BOOL* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		// Check license and verify argument
+		validateLicense();
+		ASSERT_ARGUMENT("ELI36137", pVal != __nullptr );
+
+		*pVal = asVariantBool(m_bSendErrorEmail);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36138")
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::put_SendErrorEmail(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		bool bSendErrorEmail = asCppBool(newVal);
+
+		// Update the setting and set dirty flag if changed
+		if (bSendErrorEmail != m_bSendErrorEmail)
+		{
+			m_bSendErrorEmail = bSendErrorEmail;
+			
+			// Ensure the error email task is created when the user enables the option.
+			if (m_bSendErrorEmail)
+			{
+				getErrorEmailTask();
+			}
+
+			m_bDirty = true;
+		}
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36139")
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::get_ErrorEmailTask(IErrorEmailTask **pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		if (m_ipErrorEmailTask == __nullptr)
+		{
+			// Don't create an email task until needed.
+			*pVal = __nullptr;
+		}
+		else
+		{
+			// Provide shallow copy to caller
+			IErrorEmailTaskPtr ipShallowCopy = getErrorEmailTask();
+			*pVal = ipShallowCopy.Detach();
+		}
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36140")
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::put_ErrorEmailTask(IErrorEmailTask *newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		m_ipErrorEmailTask = newVal;
+
+		// Set dirty flag
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36141")
+
+	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1771,6 +1902,24 @@ void CFileProcessingMgmtRole::handleProcessingError(FileProcessingRecord &task,
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18003");
 
+	try
+	{
+		if (m_bSendErrorEmail)
+		{
+			IObjectWithDescriptionPtr ipErrorEmailTaskWrapper(CLSID_ObjectWithDescription);
+			ASSERT_RESOURCE_ALLOCATION("ELI36142", ipErrorEmailTaskWrapper != __nullptr );
+
+			IErrorEmailTaskPtr ipErrorEmailTask = getErrorEmailTask();
+			ASSERT_RESOURCE_ALLOCATION("ELI36143", ipErrorEmailTask != __nullptr );
+
+			ipErrorEmailTask->StringizedException = rUE.asStringizedByteStream().c_str();
+			ipErrorEmailTaskWrapper->Object = ipErrorEmailTask;
+
+			executeErrorTask(task, pThreadData, ipErrorEmailTaskWrapper);
+		}
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI36144");
+
 	// Run task in a separate try block so that an exception while logging does not
 	// prevent the error task from executing
 	try
@@ -1780,36 +1929,7 @@ void CFileProcessingMgmtRole::handleProcessingError(FileProcessingRecord &task,
 			// Should error task be executed
 			if (isErrorHandlingTaskEnabled())
 			{
-				ASSERT_ARGUMENT("ELI18007", pThreadData != __nullptr);
-
-				UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipExecutor = 
-					pThreadData->m_ipErrorTaskExecutor;
-				ASSERT_RESOURCE_ALLOCATION("ELI18008", ipExecutor != __nullptr);
-
-				task.notifyRunningErrorTask();
-
-				// Create an error task "list" that contains the error task to run
-				IIUnknownVectorPtr ipErrorTaskList(CLSID_IUnknownVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI17993", ipErrorTaskList != __nullptr);
-
-				ipErrorTaskList->PushBack(getErrorHandlingTask());
-
-				// Run the task
-				UCLID_FILEPROCESSINGLib::EFileProcessingResult eResult = ipExecutor->InitProcessClose(
-					task.getFileRecord(), ipErrorTaskList, 
-					task.getActionID(), getFPMDB(), getFAMTagManager(), 
-					task.m_ipProgressStatus, VARIANT_FALSE);
-
-				// Log a cancellation during error task execution
-				if (eResult == kProcessingCancelled)
-				{
-					UCLIDException ue("ELI18060","Application trace: Processing cancelled while executing error task.");
-					ue.addDebugInfo("File", task.getFileName());
-					ue.addDebugInfo("Task", asString(getErrorHandlingTask()->Description));
-					ue.log();
-				}
-
-				task.notifyErrorTaskCompleted();
+				executeErrorTask(task, pThreadData, getErrorHandlingTask());
 			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18013")
@@ -1822,6 +1942,42 @@ void CFileProcessingMgmtRole::handleProcessingError(FileProcessingRecord &task,
 
 		uexOuter.log();
 	}
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingMgmtRole::executeErrorTask(FileProcessingRecord &task,
+											   const ProcessingThreadData* pThreadData,
+											   IObjectWithDescriptionPtr fileProcessingTask)
+{
+	ASSERT_ARGUMENT("ELI18007", pThreadData != __nullptr);
+
+	UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipExecutor = 
+		pThreadData->m_ipErrorTaskExecutor;
+	ASSERT_RESOURCE_ALLOCATION("ELI18008", ipExecutor != __nullptr);
+
+	task.notifyRunningErrorTask();
+
+	// Create an error task "list" that contains the error task to run
+	IIUnknownVectorPtr ipErrorTaskList(CLSID_IUnknownVector);
+	ASSERT_RESOURCE_ALLOCATION("ELI17993", ipErrorTaskList != __nullptr);
+
+	ipErrorTaskList->PushBack(fileProcessingTask);
+
+	// Run the task
+	UCLID_FILEPROCESSINGLib::EFileProcessingResult eResult = ipExecutor->InitProcessClose(
+		task.getFileRecord(), ipErrorTaskList, 
+		m_pRecordMgr->getActionID(), getFPMDB(), getFAMTagManager(), 
+		task.m_ipProgressStatus, VARIANT_FALSE);
+
+	// Log a cancellation during error task execution
+	if (eResult == kProcessingCancelled)
+	{
+		UCLIDException ue("ELI18060","Application trace: Processing cancelled while executing error task.");
+		ue.addDebugInfo("File", task.getFileName());
+		ue.addDebugInfo("Task", asString(getErrorHandlingTask()->Description));
+		ue.log();
+	}
+
+	task.notifyErrorTaskCompleted();
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingMgmtRole::writeErrorDetailsText(const string& strLogFile, 
@@ -1880,6 +2036,10 @@ void CFileProcessingMgmtRole::clear()
 	// Clear the error log items
 	m_bLogErrorDetails = false;
 	m_strErrorLogFile.clear();
+
+	// Clear the error email task
+	m_bSendErrorEmail = false;
+	m_ipErrorEmailTask = __nullptr;
 
 	// Clear the error task
 	m_ipErrorTask = __nullptr;
@@ -1993,6 +2153,19 @@ DWORD CFileProcessingMgmtRole::getActionID(const string & strAct)
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14934");
 	
 	return dwActionID;
+}
+//-------------------------------------------------------------------------------------------------
+IErrorEmailTaskPtr CFileProcessingMgmtRole::getErrorEmailTask()
+{
+	if (m_ipErrorEmailTask == __nullptr)
+	{
+		m_ipErrorEmailTask.CreateInstance("Extract.FileActionManager.FileProcessors.SendEmailTask");
+		ASSERT_RESOURCE_ALLOCATION("ELI36145", m_ipErrorEmailTask != __nullptr );
+
+		m_ipErrorEmailTask->ApplyDefaultErrorEmailSettings();
+	}
+
+	return m_ipErrorEmailTask;
 }
 //-------------------------------------------------------------------------------------------------
 IObjectWithDescriptionPtr CFileProcessingMgmtRole::getErrorHandlingTask()

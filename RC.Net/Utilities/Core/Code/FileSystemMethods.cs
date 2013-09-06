@@ -323,6 +323,60 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Creates an empty folder in the specified parent folder.
+        /// <para><b>Note:</b></para>
+        /// The caller is responsible for deleting the temporary folder. After
+        /// calling this function the returned folder will exist on the system.
+        /// </summary>
+        /// <param name="parentFolder">The folder in which to create the temporary file. Must
+        /// not be <see langword="null"/> or empty string. The folder must exist
+        /// on the current system.</param>
+        /// <returns>The name of the temporary file that was created.</returns>
+        public static string GetTemporaryFolderName(string parentFolder)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(parentFolder))
+                {
+                    parentFolder = Path.GetTempPath();
+                }
+                else
+                {
+                    ExtractException.Assert("ELI36119", "Specified folder cannot be found.",
+                        Directory.Exists(parentFolder),
+                        "Folder Name", parentFolder ?? "NULL");
+                }
+
+                // Generate a temp folder name
+                string folderName = Path.Combine(parentFolder, Path.GetRandomFileName());
+
+                // Protect the folder creation section with mutex
+                _tempFileLock.WaitOne();
+
+                // If the folder name already exists, generate a new folder name
+                while (File.Exists(folderName))
+                {
+                    folderName = Path.Combine(parentFolder, Path.GetRandomFileName());
+                }
+
+                // Folder name does not exist, create the folder
+                Directory.CreateDirectory(folderName);
+
+                // Return the temporary folder name
+                return folderName;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI36120",
+                    "Failed generating temporary folder name.", ex);
+            }
+            finally
+            {
+                _tempFileLock.ReleaseMutex();
+            }
+        }
+
+        /// <summary>
         /// Moves a file providing the option to overwrite if necessary.
         /// <para><b>Note</b></para>
         /// The value of the SecureDeleteAllSensitiveFiles registry entry will dictate whether the

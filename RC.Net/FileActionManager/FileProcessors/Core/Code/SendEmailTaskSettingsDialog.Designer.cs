@@ -44,6 +44,7 @@
             this._subjectPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
             this._recipientPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
             this._carbonCopyPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._resetErrorSettingsButton = new System.Windows.Forms.Button();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -82,7 +83,7 @@
             this._okButton.Location = new System.Drawing.Point(480, 361);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 13;
+            this._okButton.TabIndex = 14;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
@@ -94,7 +95,7 @@
             this._cancelButton.Location = new System.Drawing.Point(561, 361);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 14;
+            this._cancelButton.TabIndex = 15;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
@@ -204,6 +205,17 @@
             this._carbonCopyPathTagsButton.TextControl = this._carbonCopyRecipient;
             this._carbonCopyPathTagsButton.UseVisualStyleBackColor = true;
             // 
+            // _resetErrorSettingsButton
+            // 
+            this._resetErrorSettingsButton.Location = new System.Drawing.Point(128, 361);
+            this._resetErrorSettingsButton.Name = "_resetErrorSettingsButton";
+            this._resetErrorSettingsButton.Size = new System.Drawing.Size(151, 23);
+            this._resetErrorSettingsButton.TabIndex = 13;
+            this._resetErrorSettingsButton.Text = "Reset to default settings";
+            this._resetErrorSettingsButton.UseVisualStyleBackColor = true;
+            this._resetErrorSettingsButton.Visible = false;
+            this._resetErrorSettingsButton.Click += new System.EventHandler(this.HandleResetErrorSettingsButton_Click);
+            // 
             // SendEmailTaskSettingsDialog
             // 
             this.AcceptButton = this._okButton;
@@ -211,6 +223,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
             this.ClientSize = new System.Drawing.Size(648, 396);
+            this.Controls.Add(this._resetErrorSettingsButton);
             this.Controls.Add(this._carbonCopyPathTagsButton);
             this.Controls.Add(this._recipientPathTagsButton);
             this.Controls.Add(this._advancedButton);
@@ -253,5 +266,6 @@
         private System.Windows.Forms.Button _advancedButton;
         private Utilities.Forms.PathTagsButton _recipientPathTagsButton;
         private Utilities.Forms.PathTagsButton _carbonCopyPathTagsButton;
+        private System.Windows.Forms.Button _resetErrorSettingsButton;
     }
 }

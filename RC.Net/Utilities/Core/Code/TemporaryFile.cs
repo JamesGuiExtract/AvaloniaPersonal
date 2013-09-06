@@ -32,6 +32,12 @@ namespace Extract.Utilities
         string _fileName;
 
         /// <summary>
+        /// Indicates whether the folder the temporary file is contained in is temporary and needs
+        /// to be deleted along with the file.
+        /// </summary>
+        bool _deleteFolder;
+
+        /// <summary>
         /// Indicates whether the contents of the temporary file may be sensitive.
         /// </summary>
         bool _sensitive;
@@ -96,6 +102,58 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI25512", ex);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new <see cref="TemporaryFile"/> class. The resulting temporary
+        /// file will be created in the folder specified by <paramref name="folder"/>
+        /// and have the extension specified by <paramref name="extension"/>.
+        /// </summary>
+        /// <param name="folder">The folder to create the temporary file in. If
+        /// <see langword="null"/>, the file will be created in the current user's temporary folder.
+        /// </param>
+        /// <param name="fileName">The filename the temporary file should have. If specified, the
+        /// file will be generated within a randomly name sub-folder of <see paramref="folder"/>
+        /// rather than in the root. This sub-folder will be deleted along with the file when the
+        /// instance is disposed.</param>
+        /// <param name="extension">The extension for the temporary file.
+        /// <para><b>Note</b></para>
+        /// Cannot be used if <see paramref="filename"/> is specified.</param>
+        /// <param name="sensitive"><see langword="true"/>if the contents of the temporary file
+        /// may be sensitive; otherwise, <see langword="false"/>.</param>
+        public TemporaryFile(string folder, string fileName, string extension, bool sensitive)
+        {
+            try
+            {
+                // If a folder was not specified, use the current user's temporary file by default.
+                if (folder == null)
+                {
+                    folder = Path.GetTempPath();
+                }
+
+                // If the filename was not specified, generate a randomly named filename.
+                if (fileName == null)
+                {
+                    _fileName = FileSystemMethods.GetTemporaryFileName(folder, extension);
+                }
+                // If the filename was specified, generate the file in a randomly named sub-folder.
+                else
+                {
+                    ExtractException.Assert("ELI36122",
+                        "If temporary filename is specified, the extension cannot be.",
+                        string.IsNullOrEmpty(extension));
+
+                    _fileName = Path.Combine(FileSystemMethods.GetTemporaryFolderName(folder),
+                        fileName);
+                    _deleteFolder = true;
+                }
+
+                _sensitive = sensitive;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36123");
             }
         }
 
@@ -255,9 +313,23 @@ namespace Extract.Utilities
 
                         if (deleteSucceeded)
                         {
-                            _fileName = null;
+                            try
+                            {
+                                if (_deleteFolder)
+                                {
+                                    Directory.Delete(Path.GetDirectoryName(_fileName));
+                                }
+
+                                _fileName = null;
+                                ex = null;
+                            }
+                            catch (Exception e)
+                            {
+                                ex = e.AsExtract("ELI36113");
+                            }
                         }
-                        else
+
+                        if (ex != null)
                         {
                             ExtractException.Log("ELI25511", ex);
                         }
@@ -269,6 +341,10 @@ namespace Extract.Utilities
                         // Secure deletion would cause memory allocation as well. (really, the file
                         // should have been deleted along with the managed resources).
                         FileSystemMethods.DeleteFile(_fileName, false, false, true);
+                        if (_deleteFolder)
+                        {
+                            Directory.Delete(Path.GetDirectoryName(_fileName));
+                        }
                     }
                 }
             }

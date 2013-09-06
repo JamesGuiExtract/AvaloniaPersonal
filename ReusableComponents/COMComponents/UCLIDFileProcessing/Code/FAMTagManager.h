@@ -59,6 +59,8 @@ public:
 // IFAMTagManager
 	STDMETHOD(get_FPSFileDir)(BSTR *strFPSDir);
 	STDMETHOD(put_FPSFileDir)(BSTR strFPSDir);
+	STDMETHOD(get_FPSFileName)(BSTR *strFPSFileName);
+	STDMETHOD(put_FPSFileName)(BSTR strFPSFileName);
 	STDMETHOD(ExpandTags)(BSTR bstrInput, BSTR bstrSourceName, BSTR *pbstrOutput);
 	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, BSTR bstrSourceName, BSTR *pbstrOutput);
 	STDMETHOD(StringContainsInvalidTags)(BSTR strInput, VARIANT_BOOL *pbValue);
@@ -71,6 +73,7 @@ private:
 	//////////
 
 	std::string m_strFPSDir;
+	std::string m_strFPSFileName;
 
 	// pointer to the utility object to use for path function expansion.
 	IMiscUtilsPtr m_ipMiscUtils;

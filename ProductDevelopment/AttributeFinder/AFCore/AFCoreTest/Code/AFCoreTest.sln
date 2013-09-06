@@ -113,6 +113,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDDistanceConverter", ".
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDFileProcessing", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFileProcessing.vcxproj", "{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}"
 	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
 		{5C786BC2-6C22-4A5C-9C41-30F49780D966} = {5C786BC2-6C22-4A5C-9C41-30F49780D966}
 	EndProjectSection
 EndProject

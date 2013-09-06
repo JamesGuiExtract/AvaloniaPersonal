@@ -349,7 +349,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                 // Create a tag manager and expand the tags in the file name
                 var tags = new FileActionManagerPathTags(
-                    Path.GetFullPath(fileName), pFAMTM.FPSFileDir);
+                    Path.GetFullPath(fileName), pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
 
                 // Get the new name for the file in the database
                 newFileNameInDB = tags.Expand(_renameFileTo);

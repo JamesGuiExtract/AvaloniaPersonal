@@ -408,7 +408,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                 // Create a tag manager and expand the tags in the file name
                 FileActionManagerPathTags tags = new FileActionManagerPathTags(
-                    Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir);
+                    Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
                 fileName = Path.GetFullPath(tags.Expand(_fileName));
 
                 // Apply the bates number based on the format settings

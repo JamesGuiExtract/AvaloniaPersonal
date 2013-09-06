@@ -27,6 +27,14 @@ namespace Extract.Utilities
         void SetTagValue(string tag, string value);
 
         /// <summary>
+        /// Gets the current replacement value for the specified <see paramref="tag"/>.
+        /// </summary>
+        /// <param name="tag">The tag.</param>
+        /// <returns>The current replacement value for the specified <see paramref="tag"/>.
+        /// </returns>
+        string GetTagValue(string tag);
+
+        /// <summary>
         /// Adds a custom tag to be expanded with <see paramref="expandTagMethod"/>.
         /// <para><b>Note</b></para>
         /// Unlike standard tag, custom tags will not be expanded until after the path tag functions

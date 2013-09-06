@@ -538,7 +538,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                 // Initialize the path tag instances with sourceDocName.
                 string dataFileName = pFAMTM.ExpandTagsAndFunctions(DataFileName, sourceDocName);
-                OutputPathTags.UpdateTagValues(sourceDocName, pFAMTM.FPSFileDir);
+                OutputPathTags.UpdateTagValues(sourceDocName, pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
 
                 // Extract image areas.
                 foreach (RasterZone rasterZone in GetZonesToExtract(dataFileName))

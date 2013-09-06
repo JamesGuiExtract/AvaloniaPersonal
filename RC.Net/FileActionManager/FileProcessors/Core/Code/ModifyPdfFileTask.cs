@@ -411,7 +411,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // Get the file name and initialize a path tags class
                 string fileName = Path.GetFullPath(pFileRecord.Name);
                 FileActionManagerPathTags pathTags =
-                    new FileActionManagerPathTags(fileName, pFAMTM.FPSFileDir);
+                    new FileActionManagerPathTags(fileName, pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
 
                 // Expand any path tags in the file name
                 string pdfFile = pathTags.Expand(_settings.PdfFile);

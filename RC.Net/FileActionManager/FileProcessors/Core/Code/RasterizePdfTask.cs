@@ -567,7 +567,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                 // Create a tag manager and expand the tags in the file name
                 var tags = new FileActionManagerPathTags(
-                    Path.GetFullPath(fileName), pFAMTM.FPSFileDir);
+                    Path.GetFullPath(fileName), pFAMTM.FPSFileDir, pFAMTM.FPSFileName);
 
                 // Get the source and destination files
                 pdfFile = Path.GetFullPath(tags.Expand(_pdfFile));

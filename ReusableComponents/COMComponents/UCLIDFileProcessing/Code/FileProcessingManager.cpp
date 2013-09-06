@@ -1377,7 +1377,8 @@ UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr CFileProcessingManager::getActio
 //-------------------------------------------------------------------------------------------------
 string CFileProcessingManager::getExpandedActionName()
 {
-	// Set the FPS file directory for tag manager
+	// Set the FPS filename and directory for tag manager
+	m_ipFAMTagManager->FPSFileName = m_strFPSFileName.c_str();
 	m_ipFAMTagManager->FPSFileDir = getDirectoryFromFullPath(m_strFPSFileName).c_str();
 
 	// Expand the tags

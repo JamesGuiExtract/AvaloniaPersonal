@@ -155,6 +155,10 @@ public:
 		IFAMTagManager* pFAMTagManager);
 	STDMETHOD(get_FPDB)(IFileProcessingDB** ppFPDB);
 	STDMETHOD(put_FPDB)(IFileProcessingDB* pFPDB);
+	STDMETHOD(get_SendErrorEmail)(VARIANT_BOOL* pVal);
+	STDMETHOD(put_SendErrorEmail)(VARIANT_BOOL newVal);
+	STDMETHOD(get_ErrorEmailTask)(IErrorEmailTask** pVal);
+	STDMETHOD(put_ErrorEmailTask)(IErrorEmailTask* newVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID* pClassID);
@@ -271,6 +275,10 @@ private:
 	bool m_bLogErrorDetails;
 	string m_strErrorLogFile;
 
+	// Specifies email to be sent upon a task failure.
+	bool m_bSendErrorEmail;
+	IErrorEmailTaskPtr m_ipErrorEmailTask;
+
 	// Execute this task if an error occurs ( depending on the built-in Enabled flag )
 	IObjectWithDescriptionPtr m_ipErrorTask;
 
@@ -348,12 +356,21 @@ private:
 							   const ProcessingThreadData* pThreadData,
 							   const UCLIDException &rUE);
 
+	// Executes an IFileProcessingTask wrapped in an IObjectWithDescription as part of handling an
+	// error in the specified task.
+	void executeErrorTask(FileProcessingRecord &task,
+		const ProcessingThreadData* pThreadData,
+		IObjectWithDescriptionPtr fileProcessingTask);
+
 	// Writes specially formatted error information to the specified text file.
 	void writeErrorDetailsText(const string& strLogFile, const string& strSourceDocument, 
 		const UCLIDException &rUE);
 
 	// internal method to clear data
 	void clear();
+
+	// Returns the task to send an email as an error handler creating the object if needed.
+	IErrorEmailTaskPtr getErrorEmailTask();
 
 	// Returns error-handling task, creating the object if needed
 	IObjectWithDescriptionPtr getErrorHandlingTask();
