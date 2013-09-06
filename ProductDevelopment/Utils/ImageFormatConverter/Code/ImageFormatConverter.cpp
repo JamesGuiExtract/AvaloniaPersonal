@@ -836,8 +836,8 @@ void usage()
 					" argument except '/RemovePages' or '/ef'. \n"
 					"The optional argument /RemovePages will exclude the specified pages \n"
 					"from the output. The pages can be specified as an individual page number, \n"
-					"a comma seperates list, a range of pages denoted with a hypen, or a \n"
-					"minus by a number to indicate the last x pages should be removed. \n"
+					"a comma-separated list, a range of pages denoted with a hypen, or a \n"
+					"dash followed by a number to indicate the last x pages should be removed. \n"
 					"The optional argument (/ef <filename>) fully specifies the location \n"
 					"of an exception log that will store any thrown exception.  Without \n"
 					"an exception log, any thrown exception will be displayed.\n\n";

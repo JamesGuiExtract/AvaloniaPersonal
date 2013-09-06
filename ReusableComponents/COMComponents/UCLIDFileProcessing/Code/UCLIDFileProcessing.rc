@@ -149,7 +149,7 @@ BEGIN
     EDITTEXT        IDC_EDIT_ERROR_LOG,26,140,163,12,ES_AUTOHSCROLL
     PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DOC_TAG,195,139,10,14,BS_ICON
     PUSHBUTTON      "...",IDC_BTN_BROWSE_LOG,211,139,15,14
-    CONTROL         "Send an email  (separate email addresses with a semi-colon)",IDC_CHECK_SEND_ERROR_EMAIL,
+    CONTROL         "Send an email  (separate email addresses with a semicolon)",IDC_CHECK_SEND_ERROR_EMAIL,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,159,204,10
     EDITTEXT        IDC_EDIT_ERROR_EMAIL_RECIPIENTS,26,173,127,12,ES_AUTOHSCROLL
     PUSHBUTTON      "Configure email...",IDC_BTN_CONFIGURE_ERROR_EMAIL,159,173,66,14
