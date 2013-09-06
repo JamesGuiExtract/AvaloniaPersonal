@@ -456,7 +456,7 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 			// If all pages were removed via the /RemovePages option, throw an exception.
 			if (!bOuputAtLeastOnePage)
 			{
-				UCLIDException uex("ELI36148", "RemovePages option not valid; all pages removed");
+				UCLIDException uex("ELI36149", "RemovePages option not valid; all pages removed");
 				uex.addDebugInfo("Input File", strInputFileName);
 				uex.addDebugInfo("Input Page Count", nPageCount);
 				uex.addDebugInfo("RemovePages option", strPagesToRemove);
