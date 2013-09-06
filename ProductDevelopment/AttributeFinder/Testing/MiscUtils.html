@@ -21,7 +21,8 @@
 <ul>
    	<li>Double-click on the EXE within the CommonComponents folder.  Confirm that a usage 
 	message is provided.
-   	<li>Confirm that a DOS Window does not appear on the task bar when the application is running.
+   	<li>Confirm that a DOS Window does not appear on the task bar when the application 
+	is running.
 	<li>Use image files from the <b>./ReusableComponents/COMComponents/UCLIDFileProcessing/
 	AutomatedTest/MemoryLeak/ConvertToSearchablePDF</b> folder for the following tests.
 	<ul>
@@ -42,8 +43,8 @@
    		<li>Confirm that <b>ESConvertToPDF PDF_Image_ABC.pdf PDF_Image2.pdf</b> 
 		displays an error message and does not create a searchable PDF file.
    		<li>Confirm that <b>ESConvertToPDF PDF_Image_ABC.pdf PDF_Image2.pdf 
-		/ef C:\PDF_Error.uex</b> creates the UEX file, does not display an error message 
-		and does not create a searchable PDF file.
+		/ef C:\PDF_Error.uex</b> creates the UEX file, does not display an error 
+		message and does not create a searchable PDF file.
    		<li>Make an extra copy of <b>PDF_Image.pdf</b>.
    		<li>Confirm that <b>ESConvertToPDF PDF_Image.pdf PDF_Image2.pdf /R</b> 
 		creates the searchable PDF file and deletes the original PDF image.
@@ -93,9 +94,11 @@
    		<li>Confirm that a <b>USB key</b> is required to run the application.
 	</ul>
    	<li>Confirm that a non-default icon is provided for the application.
-   	<li>Confirm that a DOS Window does not appear on the task bar when the application is running.
-	<li>Use image files from the RedactionDemo folder for the following tests.  The application 
-	should be exercised via <b>LaunchApplication</b> from the File Action Manager.
+   	<li>Confirm that a DOS Window does not appear on the task bar when the application 
+	is running.
+	<li>Use image files from the RedactionDemo folder for the following tests.  The 
+	application should be exercised via <b>LaunchApplication</b> from the File Action 
+	Manager.
 	<ul>
    		<li>Confirm that <b>ESConvertUSSToTXT &lt;SourceDocName&gt;.uss 
 		&lt;SourceDocName&gt;.txt</b> successfully creates output text files.
@@ -115,11 +118,11 @@
 		output file created for the missing USS file.
    		<li>Delete the previous <b>TXT</b> files. 
    		<li>Confirm that <b>ESConvertUSSToTXT &lt;SourceDocName&gt;.uss 
-		&lt;SourceDocName&gt;.txt /ef C:\errortest.uex</b> processes successfully without an 
-		output file created for the missing USS file.
+		&lt;SourceDocName&gt;.txt /ef C:\errortest.uex</b> processes successfully 
+		without an output file created for the missing USS file.
    		<li>Confirm that <b>C:\errortest.uex</b> exists and contains one entry.
-   		<li>Run the same test again and confirm that <b>C:\errortest.uex</b> exists and 
-		contains two entries.
+   		<li>Run the same test again and confirm that <b>C:\errortest.uex</b> exists 
+		and contains two entries.
 	</ul>
 <p>
 	<LI><b>Specified USB Counters</b>
@@ -158,14 +161,17 @@
   	<ul>
     		<li>Confirm that <b>TwoPages.tif</b> displays <b>Must be single-page 
 		image</b> exception.</li>
-    		<li>Confirm that <b>TooTall.tif</b> displays <b>Image is too tall</b> exception.</li>
-    		<li>Confirm that <b>TooWide.tif</b> displays <b>Image is too wide</b> exception.</li>
+    		<li>Confirm that <b>TooTall.tif</b> displays <b>Image is too tall</b> 
+		exception.</li>
+    		<li>Confirm that <b>TooWide.tif</b> displays <b>Image is too wide</b> 
+		exception.</li>
 <p>
     		<li>Confirm that <b>TooWide.tif</b> does not display an exception 
 		if the <b>/se</b> argument is used.</li>
-    		<li>Also confirm that <b>TooWide.tif</b> with the <b>/se</b> argument does not 
-		create an output file.</li>
-		<li>Confirm that even when exceptions are thrown ESOCR does not throw an <b>MFC error</b>.</li>
+    		<li>Also confirm that <b>TooWide.tif</b> with the <b>/se</b> argument does 
+		not create an output file.</li>
+		<li>Confirm that even when exceptions are thrown ESOCR does not throw an 
+		<b>MFC error</b>.</li>
   	</ul></li>
 <p>
   	<li><h2>Success Case</h2></li>
@@ -182,24 +188,28 @@
    	<li>Confirm that the title bar reads <b>FAMDBLockChecker</b>.</li>
     	<li>Confirm the presence of an editable <b>Server</b> text box.</li>
     	<li>Confirm the presence of an editable <b>Database</b> text box.</li>
-    	<li>Confirm the presence of an editable <b>Check lock on average once every</b> text box.</li>
+    	<li>Confirm the presence of an editable <b>Check lock on average once every</b> 
+	text box.</li>
     	<li>Confirm the presence of a <b>Run</b> button.</li>
-    	<li>Confirm the presence of read-only edit boxes for <b># Checks</b>, <b># Locks seen</b>, and
-    	<b>%</b>.</li>
+    	<li>Confirm the presence of read-only edit boxes for <b># Checks</b>, <b># Locks 
+	seen</b>, and <b>%</b>.</li>
 <p>
     	<li>Confirm that the utility can connect to and monitor a local database.</li>
     	<li>Confirm that the utility can connect to and monitor a remote database.</li>
-    	<li>Confirm that the utility gracefully handles it when disconnected from the database.</li>
+    	<li>Confirm that the utility gracefully handles it when disconnected from the 
+	database.</li>
 <p>
     	<li>Queue a nontrivial number of files for an action.</li>
     	<li>Set up an FPS file to process those files with a short sleep task.</li> 
     	<li>Set up the FAMDBLockChecker to monitor the database.</li>
-    	<li>Run the FPS file while the DB lock checker is monitoring and note how many locks are seen.</li>
-    	<li>Requeue the files and reconfigure the FPS file to run an Apply Bates Number task.</li>
-    	<li>Run the FPS file while the DB lock checker is monitoring and note how many locks are 
-    	seen.</li>
-    	<li>Confirm that the database is locked more frequently with the Bates number task than the
-    	sleep task.</li>
+    	<li>Run the FPS file while the DB lock checker is monitoring and note how many locks 
+	are seen.</li>
+    	<li>Requeue the files and reconfigure the FPS file to run an Apply Bates Number 
+	task.</li>
+    	<li>Run the FPS file while the DB lock checker is monitoring and note how many locks 
+	are seen.</li>
+    	<li>Confirm that the database is locked more frequently with the Bates number task 
+	than the sleep task.</li>
 </ul>
 </li>
 <p>
@@ -209,9 +219,10 @@
 <ul>
   	<li><b>General</b>
     	<ul>
-                <li>Confirm that <b>FindString</b> requires a suitable license file. (RDT License)
-                <li>Confirm that FindString displays a <b>usage</b> message if other than 2-10 arguments 
-		are provided on the command-line.
+                <li>Confirm that <b>FindString</b> requires a suitable license file. (RDT 
+		License)
+                <li>Confirm that FindString displays a <b>usage</b> message if other than 
+		2-10 arguments are provided on the command-line.
             </ul>
         </li>
 <p>
@@ -223,12 +234,13 @@
 		<li>Follow the instructions that appear on the command line after running 
 		<b>FindString_Test.bat</b>.</li>
 		<li>For each compare case, confirm that there are <b>no differences</b>.</li>
-		<li>For each usage display confirm that there is a <b>console message</b> matching the
-		expected message.</li>
+		<li>For each usage display confirm that there is a <b>console message</b> 
+		matching the expected message.</li>
 		<li>For each exception dialog, ensure the exception text <b>matches</b> the
 		expected message.</li>
-		<li>For the exception log, (which is written to the <b>same directory</b> as the 
-		FindString_Test.bat file) confirm its existence with a <b>current</b> timestamp.</li>
+		<li>For the exception log, (which is written to the <b>same directory</b> as 
+		the FindString_Test.bat file) confirm its existence with a <b>current</b> 
+		timestamp.</li>
 	</ul>
 </ul>
 </li>
@@ -240,8 +252,8 @@
         <li><b>General</b>
         <ul>
 		<li>Confirm that <b>GetWordLengthDist</b> requires an <b>RDT</b> license file.
-		<li>Confirm that GetWordLengthDist displays a <b>usage</b> message if other than 
-		2-6 arguments are provided on the command-line.
+		<li>Confirm that GetWordLengthDist displays a <b>usage</b> message if other 
+		than 2-6 arguments are provided on the command-line.
 	</ul>
 	</li>
 <p>
@@ -250,15 +262,17 @@
 		<li>Run <b>GetWordLengthDist_Test.bat</b>.</li>
 		<li>Follow the instructions that appear on the command line</li>
 		<ul>
-			<li>For each compare case, confirm that there are <b>no differences</b>.</li>
+			<li>For each compare case, confirm that there are <b>no 
+			differences</b>.</li>
 			<li>For each csv case, confirm that there are <b>no differences</b>.</li>
 		</ul>
-		<li>For each usage display confirm that there is a <b>console message</b> matching 
-		the expected message.</li>
+		<li>For each usage display confirm that there is a <b>console message</b> 
+		matching the expected message.</li>
 		<li>For each exception dialog, ensure the exception text <b>matches</b> 
 		the expected message.</li>
 		<li>For the exception log, (which is written to the <b>same directory</b> as the 
-		GetWordLengthDist_Test.bat file) confirm its existence with a <b>current</b> timestamp.</li>
+		GetWordLengthDist_Test.bat file) confirm its existence with a <b>current</b> 
+		timestamp.</li>
 	</ul>
 </ul>
 </li>
@@ -269,68 +283,78 @@
 <ul>
    	<li>Confirm that <b>ImageCleanupSettingsEditor.exe</b> is installed only with the 
 	<b>RDT</b>.</li>
-   	<li>Confirm that <b>ImageCleanupSettingsEditor.exe</b> requires an <b>RDT</b> license.</li>
+   	<li>Confirm that <b>ImageCleanupSettingsEditor.exe</b> requires an <b>RDT</b> 
+	license.</li>
 <p>
 	<li><b>Menus</b>
 	<ul>
-	   	<li>Confirm that the <b>File</b> menu includes items for <b>New</b>, <b>Open...</b>, 
-		<b>Save</b>, <b>Save As...</b>, <b>Recent Files</b> and <b>Exit</b>.
+	   	<li>Confirm that the <b>File</b> menu includes items for <b>New</b>, 
+		<b>Open...</b>, <b>Save</b>, <b>Save As...</b>, <b>Recent Files</b> 
+		and <b>Exit</b>.
 		<ul>
-		   	<li>Confirm that <b>New</b> clears the settings presents an empty dialog.
-		   	<li>Confirm that <b>New</b> prompts the user to save changes if necessary.
+		   	<li>Confirm that <b>New</b> clears the settings presents an empty 
+			dialog.
+		   	<li>Confirm that <b>New</b> prompts the user to save changes if 
+			necessary.
 		   	<li>Confirm that <b>Ctrl + N</b> is a shortcut for <b>New</b>.
 <p>
 		   	<li>Confirm that <b>Open...</b> displays a File - Open dialog.  
-			<li>Confirm that image cleanup settings files (*.ics; *.ics.etf) is the 
-			default file type.
-		   	<li>Confirm that <b>Open...</b> prompts the user to save changes if necessary.
+			<li>Confirm that image cleanup settings files (*.ics; *.ics.etf) is 
+			the default file type.
+		   	<li>Confirm that <b>Open...</b> prompts the user to save changes if 
+			necessary.
 		   	<li>Confirm that <b>Ctrl + O</b> is a shortcut for <b>Open...</b>.
 <p>
 		   	<li>Confirm that <b>Save...</b> displays a File - Save dialog.  
 		   	<li>Confirm that <b>Save...</b> is enabled only when settings have 
 			been defined.  
 		   	<li>Confirm that <b>Ctrl + S</b> is a shortcut for <b>Save</b>.
-		   	<li><b>[LegacyRC #4764]</b> Open an <b>existing</b> ICS file.  Modify an existing cleanup 
-			operation such as Despeckle.  Confirm that <b>Save...</b> is enabled and 
-			that the change can be saved.  
+		   	<li><b>[LegacyRC #4764]</b> Open an <b>existing</b> ICS file.  Modify 
+			an existing cleanup operation such as Despeckle.  Confirm that 
+			<b>Save...</b> is enabled and that the change can be saved.  
 <p>
 		   	<li>Confirm that <b>Save As...</b> displays a File - Save dialog.  
 		   	<li>Confirm that <b>Save As...</b> is enabled only when settings have 
 			been defined.  
 <p>
-		   	<li>Confirm that <b>Recent Files</b> displays a popup menu with a list of 
-			recently opened settings files.
+		   	<li>Confirm that <b>Recent Files</b> displays a popup menu with a list 
+			of recently opened settings files.
 		   	<li>Confirm that selecting one of the settings files opens the file.  
 <p>
 		   	<li>Confirm that <b>Exit</b> closes the application.  
-		   	<li>Confirm that <b>Exit</b> prompts the user to save changes if necessary.
+		   	<li>Confirm that <b>Exit</b> prompts the user to save changes if 
+			necessary.
 		</ul>
 <p>
-	   	<li>Confirm that the <b>Tools</b> menu includes an item for <b>Check for new components</b>.
-	   	<li>Confirm that <b>Check for new components</b> updates <b>Extract Image Cleanup 
-		Operations.lst</b>.
+	   	<li>Confirm that the <b>Tools</b> menu includes an item for <b>Check for 
+		new components</b>.
+	   	<li>Confirm that <b>Check for new components</b> updates <b>Extract Image 
+		Cleanup Operations.lst</b>.
 <p>
-	   	<li>Confirm that the <b>Help</b> menu includes an item for <b>About Image Cleanup 
-		Settings Editor...</b>.
-	   	<li>Confirm that <b>About Image Cleanup Settings Editor...</b> displays an About box.
+	   	<li>Confirm that the <b>Help</b> menu includes an item for <b>About Image 
+		Cleanup Settings Editor...</b>.
+	   	<li>Confirm that <b>About Image Cleanup Settings Editor...</b> displays an 
+		About box.
 	   	<li>Confirm that the <b>About box</b> includes the current version number.
 	</ul>
 <p>
 	<li><b>Cleanup operations to perform</b>
 	<ul>
-	   	<li>Confirm that the list box includes columns for <b>Run</b> and <b>Cleanup Operation</b>.
-   		<li>Confirm presence of associated buttons for <b>Add...</b>, <b>Remove</b> and <b>Commands 
-		&gt;</b>.
-   		<li>Confirm presence of associated <b>Up</b> arrow and <b>Down</b> arrow buttons. 
+	   	<li>Confirm that the list box includes columns for <b>Run</b> and <b>Cleanup 
+		Operation</b>.
+   		<li>Confirm presence of associated buttons for <b>Add...</b>, <b>Remove</b> 
+		and <b>Commands &gt;</b>.
+   		<li>Confirm presence of associated <b>Up</b> arrow and <b>Down</b> arrow 
+		buttons. 
 <p>
 	   	<li>Confirm that the <b>Add...</b> button is always enabled.
-   		<li>Confirm that the <b>Remove</b> button is only enabled when one or more list items 
-		is selected.
-   		<li>Confirm that the <b>Remove</b> button provides a confirmation dialog before removing 
-		items from the list.
+   		<li>Confirm that the <b>Remove</b> button is only enabled when one or more 
+		list items is selected.
+   		<li>Confirm that the <b>Remove</b> button provides a confirmation dialog 
+		before removing items from the list.
    		<li>Confirm that the <b>Remove</b> button can remove multiple items at once.
-	   	<li>Confirm that the <b>Commands &gt;</b> button is only enabled when one list item 
-		is selected.
+	   	<li>Confirm that the <b>Commands &gt;</b> button is only enabled when one 
+		list item is selected.
 	   	<li>Confirm that the <b>Up</b> arrow is only enabled when one list item 
 		is selected and it is not already the top item in the list.
 	   	<li>Confirm that the <b>Down</b> arrow is only enabled when one list item 
@@ -338,11 +362,12 @@
 <p>
 	   	<li>Add a cleanup operation such as <b>Delete lines and repair</b> that has a 
 		configuration page.
-	   	<li>Confirm that <b>double-click</b> on the list item displays the configuration dialog.
-   		<li>Confirm that <b>Ctrl + double-click</b> on the list item displays the <b>Select 
-		Task</b> dialog.
-   		<li>Confirm that <b>Alt + double-click</b> on the list item displays the <b>Configure 
-		description</b> dialog.
+	   	<li>Confirm that <b>double-click</b> on the list item displays the 
+		configuration dialog.
+   		<li>Confirm that <b>Ctrl + double-click</b> on the list item displays the 
+		<b>Select Task</b> dialog.
+   		<li>Confirm that <b>Alt + double-click</b> on the list item displays the 
+		<b>Configure description</b> dialog.
 	</ul>
 <p>
 	<li><b>Scope of cleaning</b>
@@ -357,30 +382,33 @@
 		when the radio button is selected. 
    		<li>Confirm that the edit box associated with <b>Last pages</b> accepts only 
 		numeric input.
-   		<li>Confirm that the edit box associated with <b>Selected pages</b> is enabled only 
-		when the radio button is selected. 
-   		<li>Confirm that the edit box associated with <b>Selected pages</b> displays an error 
-		message if alphabetic characters are provided.
+   		<li>Confirm that the edit box associated with <b>Selected pages</b> is enabled 
+		only when the radio button is selected. 
+   		<li>Confirm that the edit box associated with <b>Selected pages</b> displays 
+		an error message if alphabetic characters are provided.
 	</ul>
 <p>
 	<li><b>Test</b>
 	<ul>
 	   	<li>Confirm presence of an <b>Input file:</b> edit box.
-   		<li>Confirm presence of associated buttons for <b>...</b> ( Browse ) and <b>Test</b>.
-	   	<li>Confirm that selecting the Browse button displays a File - Open dialog.
+   		<li>Confirm presence of associated buttons for <b>...</b> ( Browse ) 
+		and <b>Test</b>.
+	   	<li>Confirm that selecting the Browse button displays a <b>File - Open</b> 
+		dialog.
 	   	<li>Confirm that selecting an input file enables the <b>Test</b> button and 
 		populates the <b>Output file:</b> edit box.
 	   	<li>Confirm that the default <b>Output file:</b> includes the full path to the 
-		input file with the addition of <b>.clean</b> before the original file extension.
+		input file with the addition of <b>.clean</b> before the original file 
+		extension.
 <p>
 	   	<li>Confirm presence of an <b>Overwrite output file if it exists</b> check box.
 	   	<li>Confirm presence of an <b>Override output filename</b> check box.
 	   	<li>Confirm that checking the <b>Override output filename</b> check box clears 
 		the default text and enables both the edit box and the associated <b>...</b> 
 		( Browse ) button.
-	   	<li>Confirm that unchecking the <b>Override output filename</b> check box restores 
-		the default text and disables both the edit box and the associated <b>...</b> 
-		( Browse ) button.
+	   	<li>Confirm that unchecking the <b>Override output filename</b> check box 
+		restores the default text and disables both the edit box and the associated 
+		<b>...</b> ( Browse ) button.
 	   	<li>With the <b>Override output filename</b> check box checked, confirm that 
 		the Browse button displays a File - Open dialog.
 	   	<li>Confirm that the name of the selected file is displayed in the <b>Override 
@@ -390,20 +418,23 @@
 	   	<li>Confirm presence of an <b>Open Output</b> button.
 	   	<li>Confirm that the <b>Open Output</b> button is enabled only when a filename 
 		is present in the <b>Override output filename</b> edit box.
-	   	<li>Confirm presence of associated radio buttons for <b>Use Extract Systems image 
-		window</b> and <b>Use registered application</b>.
+	   	<li>Confirm presence of associated radio buttons for <b>Use Extract Systems 
+		image window</b> and <b>Use registered application</b>.
 		<ul>
-	   		<li>Confirm that with <b>Use Extract Systems image window</b> selected, the 
-			<b>Open Input</b> button opens the input file in the Image Viewer.
-	   		<li>Confirm that with <b>Use Extract Systems image window</b> selected, the 
-			<b>Open Output</b> button opens the output file in the Image Viewer.
+	   		<li>Confirm that with <b>Use Extract Systems image window</b> selected, 
+			the <b>Open Input</b> button opens the input file in the Image Viewer.
+	   		<li>Confirm that with <b>Use Extract Systems image window</b> selected, 
+			the <b>Open Output</b> button opens the output file in the Image Viewer.
 	   		<li>Confirm that with <b>Use registered application</b> selected, the 
-			<b>Open Input</b> button opens the input file in the registered application.
+			<b>Open Input</b> button opens the input file in the registered 
+			application.
 	   		<li>Confirm that with <b>Use registered application</b> selected, the 
-			<b>Open Output</b> button opens the output file in the registered application.
-			<li><b>[LegacyRC #5483]</b> Confirm that with <b>Use Extract Systems image 
-			window</b> selected, clicking either <b>Open Input</b> or <b>Open Output</b> 
-			does not display an <b>Invalid argument</b> exception.
+			<b>Open Output</b> button opens the output file in the registered 
+			application.
+			<li><b>[LegacyRC #5483]</b> Confirm that with <b>Use Extract Systems 
+			image window</b> selected, clicking either <b>Open Input</b> or 
+			<b>Open Output</b> does not display an <b>Invalid argument</b> 
+			exception.
 		</ul>
 	</ul>
 </ul>
@@ -414,8 +445,8 @@
 <li><h2>Image Cleanup Settings Editor - Functionality</h2>
 <ul>
    	<li>Confirm that the following cleanup operations are available in the editor: 
-	<b>Clean borders</b>, <b>Delete lines and repair</b>, <b>Despeckle</b>, <b>Fill stripes</b>, 
-	<b>Remove halftones</b> and <b>Smooth characters</b>.</li>
+	<b>Clean borders</b>, <b>Delete lines and repair</b>, <b>Despeckle</b>, 
+	<b>Fill stripes</b>, <b>Remove halftones</b> and <b>Smooth characters</b>.</li>
 	<li>Use FPS files and image files from the 
 	UCLIDFileProcessing/AutomatedTest/MemoryLeak/CleanupImage 
 	folder for the following tests.  A local <b>MEMORY_LEAK</b> database is required with a 
@@ -442,11 +473,12 @@
 		<b>BorderSmoothDeleteDespeckle.clean.tif</b> 
 		in separate Spot Recognition Windows.
 		<ul>
-			<li>Confirm that the black border areas on the left and the bottom of the 
-			image were removed.
-			<li>Zoom in and review the <b>STATE of UTAH</b> address block in each image. 
-			Confirm that the edges of the <b>P</b> and the <b>4</b> in the PO BOX line 
-			have been smoothed.
+			<li>Confirm that the black border areas on the left and the bottom 
+			of the image were removed.
+			<li>Zoom in and review the <b>STATE of UTAH</b> address block in 
+			each image. 
+			Confirm that the edges of the <b>P</b> and the <b>4</b> in the PO BOX 
+			line have been smoothed.
 			<li>Confirm that the signature lines were removed.
 			<li>Confirm that the three specks near the top left corner of the image 
 			were removed.  Confirm that most periods and commas were also removed.
@@ -459,8 +491,8 @@
 <!-- *********************************************** -->
 <li><h2>Image Format Converter - Functionality</h2>
 <ul>
-   	<li>Execute the following test cases from a command window.  Single-page TIF and PDF images 
-	will be needed for these tests.</li>
+   	<li>Execute the following test cases from a command window.  Single-page TIF and 
+	PDF images will be needed for these tests.</li>
    	<li>Confirm that <b>ImageFormatConverter</b> without additional arguments provides 
 	a usage message.</li>
    	<li>Confirm that <b>ImageFormatConverter &lt;TIF_File.tif&gt; &lt;TIF_File.pdf&gt; 
@@ -476,23 +508,83 @@
 <p>
 	<li><b>Command-line options</b>
 	<ul>
-		<li><b>/user &quot;&lt;password&gt;&quot;</b> for specifying a user password
-		<li><b>/owner &quot;&lt;password&gt;&quot; &lt;Permissions&gt;</b> for 
-		specifying an owner password and permissions
+		<li><b>/User</b> and <b>/Owner</b> permissions
 		<ul>
-			<li><b>0</b> for no permissions
-			<li><b>1</b> to allow low quality printing
-			<li><b>2</b> to allow high quality printing
-			<li><b>4</b> to allow document modifications
-			<li><b>8</b> to allow copying/extraction of contents
-			<li><b>16</b> to allow accessibility access to contents
-			<li><b>32</b> to allow adding/modifying text annotations
-			<li><b>64</b> to allow filling in form fields
-			<li><b>128</b> to allow document assembly
-			<li><b>255</b> to allow all permissions
+			<li><b>/user &quot;&lt;password&gt;&quot;</b> for specifying a 
+			user password
+			<li><b>/owner &quot;&lt;password&gt;&quot; &lt;Permissions&gt;</b> 
+			for specifying an owner password and permissions
+			<ul>
+				<li><b>0</b> for no permissions
+				<li><b>1</b> to allow low quality printing
+				<li><b>2</b> to allow high quality printing
+				<li><b>4</b> to allow document modifications
+				<li><b>8</b> to allow copying/extraction of contents
+				<li><b>16</b> to allow accessibility access to contents
+				<li><b>32</b> to allow adding/modifying text annotations
+				<li><b>64</b> to allow filling in form fields
+				<li><b>128</b> to allow document assembly
+				<li><b>255</b> to allow all permissions
+			</ul>
+			<li><b>/enc</b> to indicate that the specified passwords are 
+			encrypted.  Note that the <b>/enc</b> switch is only for private use.
 		</ul>
-		<li><b>/enc</b> to indicate that the specified passwords are encrypted.  
-		Note that the <b>/enc</b> switch is only for private use.
+<p>
+		<li><b>/RemovePages</b> support
+		<ul>
+			<li>Confirm that <b>ImageFormatConverter</b> supports the 
+			following <b>/RemovePages</b> options when modifying a <b>TIF</b> 
+			image.
+			<ul>
+				<li><b>PageNumber</b> as /RemovePages 4
+				<li><b>PageNumberRange</b> as /RemovePages 4-6
+				<li><b>CommaSeparatedPageList</b> as /RemovePages 4,6,8
+				<li><b>MinusFollowedByANumber</b> as /RemovePages -2
+			</ul>
+			<li>Confirm that <b>ImageFormatConverter</b> supports the 
+			following <b>/RemovePages</b> options when modifying a <b>PDF</b> 
+			image.
+			<ul>
+				<li><b>PageNumber</b> as /RemovePages 4
+				<li><b>PageNumberRange</b> as /RemovePages 4-6
+				<li><b>CommaSeparatedPageList</b> as /RemovePages 4,6,8
+				<li><b>MinusFollowedByANumber</b> as /RemovePages -2
+			</ul>
+			<li>Confirm that pages can be removed from a TIF image using 
+			the <b>alternate</b> method.
+			<li>Confirm that pages can be removed from a PDF image using 
+			the <b>alternate</b> method.
+		</ul>
+<p>
+		<li><b>/Retain</b> support
+		<ul>
+			<li>Confirm that <b>redaction annotations</b> from a <b>TIF</b> 
+			input image are burned in to a <b>PDF</b> output image.
+			<li>Confirm that <b>redaction annotations</b> from a <b>TIF</b> 
+			input image are retained as annotations for a <b>TIF</b> output 
+			image.
+			<li>Confirm that <b>other annotations</b> from a <b>TIF</b> 
+			input image are retained as annotations for a <b>TIF</b> output 
+			image.
+		</ul>
+<p>
+		<li><b>/Vp</b> support
+		<ul>
+			<li>Confirm that an image can be saved with each of the following 
+			view perspectives
+			<ul>
+				<li>1
+				<li>2
+				<li>3
+				<li>4
+				<li>5
+				<li>6
+				<li>7
+				<li>8
+			</ul>
+			<li>Confirm that <b>1</b> for a top-left view perspective is the 
+			default if an ID is not specified.
+		</ul>
 	</ul>
 <p>
 	<li><b>Image conversion for same type</b>
@@ -519,8 +611,8 @@
 <!-- *********************************************** -->
 <li><h2>Image Format Converter - Error Logging</h2>
 <ul>
-   	<li>Execute the following test cases from a command window.  A TIF image and a PDF image 
-	will be needed for these tests.</li>
+   	<li>Execute the following test cases from a command window.  A TIF image and a PDF 
+	image will be needed for these tests.</li>
    	<li>Confirm that <b>ImageFormatConverter &lt;TIF_File.tif&gt; &lt;TIF_File.pdf&gt; 
 	/pABC /ef C:\tiflog.uex</b> does not create a the desired PDF file and creates a 
 	non-empty <b>C:\tiflog.uex</b> log file.</li>
@@ -529,17 +621,18 @@
    	<li>Re-run the same ImageFormatConverter command and confirm that the existing 
 	<b>C:\tiflog.uex</b> log is not overwritten.</li>
 <p>
-   	<li>Execute the following test cases from the File Action Manager.  A folder containing 
-	3 or more PDF images will be needed for these tests.</li>
-   	<li>Create a separate FPS file to supply the PDF images from the test folder.  Confirm that 
-	running this FPS file successfully supplies the files to the database.</li>
-   	<li>Create a separate FPS file to perform auto-redaction on the previously supplied PDF 
-	images.  Before running this FPS file, rename two of the images.</li>
+   	<li>Execute the following test cases from the File Action Manager.  A folder 
+	containing 3 or more PDF images will be needed for these tests.</li>
+   	<li>Create a separate FPS file to supply the PDF images from the test folder.  
+	Confirm that running this FPS file successfully supplies the files to the 
+	database.</li>
+   	<li>Create a separate FPS file to perform auto-redaction on the previously supplied 
+	PDF images.  Before running this FPS file, rename two of the images.</li>
    	<li>Run the auto-redaction FPS file.</li>
 	<ul>
 	   	<li>Confirm that the two renamed files fail processing.</li>
-	   	<li>Confirm that the exceptions associated with the failures complain about the 
-		file not being found.</li>
+	   	<li>Confirm that the exceptions associated with the failures complain about 
+		the file not being found.</li>
 	   	<li>Confirm that the remaining files are processed without error.</li>
 	</ul>
 </ul>
@@ -577,11 +670,13 @@
 <!-- *********************************************** -->
 <li><h2>Office To TIF</h2>
 <ul>
-   	<li>Confirm that <b>Office2007ToTif.exe</b> and <b>OfficeToTif.exe</b> are installed.</li>
-    	<li>Confirm that running <b>OfficeToTif.exe /?</b> on the command line displays an appropriate
-    	usage message.</li>
-    	<li>On a machine with <b>Office 2007</b> and the <b>print to PDF</b> extension installed, 
-    	confirm that OfficeToTif.exe can convert the following document types to TIF:
+   	<li>Confirm that <b>Office2007ToTif.exe</b> and <b>OfficeToTif.exe</b> are 
+	installed.</li>
+    	<li>Confirm that running <b>OfficeToTif.exe /?</b> on the command line displays 
+	an appropriate usage message.</li>
+    	<li>On a machine with <b>Office 2007</b> and the <b>print to PDF</b> extension 
+	installed, confirm that OfficeToTif.exe can convert the following document types 
+	to TIF:
     	<ul>
         	<li>.doc</li>
         	<li>.docx</li>
@@ -590,8 +685,8 @@
         	<li>.xls</li>
         	<li>.xlsx</li>
     	</ul></li>
-    	<li>On a machine with <b>Office 2010</b> installed, confirm that OfficeToTif.exe can convert
-    	the following document types to TIF:
+    	<li>On a machine with <b>Office 2010</b> installed, confirm that OfficeToTif.exe 
+	can convert the following document types to TIF:
     	<ul>
         	<li>.doc</li>
         	<li>.docx</li>
@@ -601,7 +696,8 @@
         	<li>.xlsx</li>
     	</ul></li>
 <p>
-   	<LI><b>[DotNet #785]</b> Confirm that <b>OfficeToTif.exe</b> works with a PDF document.
+   	<LI><b>[DotNet #785]</b> Confirm that <b>OfficeToTif.exe</b> works with a PDF 
+	document.
 </ul>
 </li>
 <p>
@@ -618,13 +714,15 @@
 <p>
         <li><b>SetOperations - Interactive testing</b>
         <ul>
-            <li>Run <b>SetOp_Test.bat</b>.</li>
-            <li>For each test case that is diff'ed, confirm that <b>FC: no differences 
-            encountered</b> is displayed in the command window.</li>
-            <li>Confirm that odd-numbered tests print the text <b>List of duplicates: red</b>.</li>
-            <li>For the exception log, confirm its existence with a <b>current</b> timestamp.</li>
-            <li>Confirm that the exception complains about the presence of duplicate items in one
-            of the lists.</li>
+            	<li>Run <b>SetOp_Test.bat</b>.</li>
+            	<li>For each test case that is diff'ed, confirm that <b>FC: no differences 
+            	encountered</b> is displayed in the command window.</li>
+            	<li>Confirm that odd-numbered tests print the text <b>List of duplicates: 
+		red</b>.</li>
+            	<li>For the exception log, confirm its existence with a <b>current</b> 
+		timestamp.</li>
+            	<li>Confirm that the exception complains about the presence of duplicate 
+		items in one of the lists.</li>
         </ul>
 <p>
         <li><b>Fixed SCRs</b>
@@ -635,7 +733,8 @@
             <li><b>[DotNetRC #621]</b> Leaking temporary database files
             <ul>
                 <li>Set up SetOperations to perform an operation that will take some time.</li>
-                <li>While it is processing, hit Ctrl+C or Ctrl+Break in the console to cancel.</li>
+                <li>While it is processing, hit Ctrl+C or Ctrl+Break in the console to 
+		cancel.</li>
                 <li>Confirm that any temporary database files are cleaned up when the app 
                 exits.</li>
             </ul></li>
