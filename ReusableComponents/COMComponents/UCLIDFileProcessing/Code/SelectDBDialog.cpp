@@ -11,6 +11,7 @@
 #include <UCLIDException.h>
 #include <DialogAdvanced.h>
 #include <ADOUtils.h>
+#include <FAMUtilsConstants.h>
 
 //-------------------------------------------------------------------------------------------------
 // SelectDBDialog dialog
@@ -240,9 +241,21 @@ void SelectDBDialog::OnOK()
 		}
 		catch(UCLIDException ue)
 		{
-			UCLIDException uexOuter("ELI17537", 
-				"The database may not exist. Verify the server and database and try again.", ue);
-			uexOuter.display();
+			// [DotNetRCAndUtils:993]
+			// If the database was found, but is not initialized or has the wrong schema, the
+			// existing top-level exception message will be most appropriate.
+			string strConnectionStatus = asString(m_ipFAMDB->GetCurrentConnectionStatus());
+			if (strConnectionStatus == gstrDB_NOT_INITIALIZED ||
+				strConnectionStatus == gstrWRONG_SCHEMA)
+			{
+				ue.display();
+			}
+			else
+			{
+				UCLIDException uexOuter("ELI17537", 
+					"The database may not exist. Verify the server and database and try again.", ue);
+				uexOuter.display();
+			}
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI17465");

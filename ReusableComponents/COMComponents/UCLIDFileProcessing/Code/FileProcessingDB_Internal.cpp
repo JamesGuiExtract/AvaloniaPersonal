@@ -3284,6 +3284,19 @@ void CFileProcessingDB::resetDBConnection()
 
 			_lastCodePos = "50";
 
+			// Ensure the database has been initialized.
+			if (isBlankDB())
+			{
+				m_strCurrentConnectionStatus = gstrDB_NOT_INITIALIZED;
+				
+				UCLIDException ue("ELI36146", "The database has not been initialized.");
+				ue.addDebugInfo("Database Name", m_strDatabaseName);
+				ue.addDebugInfo("Database Server", m_strDatabaseServer);
+				throw ue;
+			}
+
+			_lastCodePos = "60";
+
 			// Validate the schema
 			validateDBSchemaVersion();
 		}
