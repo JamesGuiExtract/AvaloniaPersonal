@@ -34,7 +34,6 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UITransplantCenterPanel));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -44,13 +43,10 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UITransplantCenterPanel));
             Extract.DataEntry.HighlightColor highlightColor1 = new Extract.DataEntry.HighlightColor();
             Extract.DataEntry.HighlightColor highlightColor2 = new Extract.DataEntry.HighlightColor();
             this._panelTable = new Extract.DataEntry.DataEntryTable();
-            this._collectionDateColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._collectionTimeColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._resultDateColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._resultTimeColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._labID = new Extract.DataEntry.DataEntryTextBox();
             this._laboratoryIdentifier = new Extract.DataEntry.DataEntryTextBox();
             this._labIDLabel = new System.Windows.Forms.Label();
@@ -80,6 +76,15 @@
             this._originalNameTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._testNameTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._laboratoryTestTable = new Extract.DataEntry.DataEntryTable();
+            this._orderNumberColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._testName = new Extract.DataEntry.DataEntryTableColumn();
+            this._testDisplayName = new Extract.DataEntry.DataEntryTableColumn();
+            this._testID = new Extract.DataEntry.DataEntryTableColumn();
+            this._testValueColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._testUnitsColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._testRefRangeColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._testFlagColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._resultStatusColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._componentLevelStatus = new Extract.DataEntry.DataEntryTextBox();
             this._componentLevelFlag = new Extract.DataEntry.DataEntryTextBox();
             this._componentLevelRange = new Extract.DataEntry.DataEntryTextBox();
@@ -101,15 +106,10 @@
             this._testsGroupBox = new System.Windows.Forms.GroupBox();
             this._defaultLabID = new Extract.DataEntry.DataEntryTextBox();
             this._defaultLabIdentifier = new Extract.DataEntry.DataEntryTextBox();
-            this._orderNumberColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._testName = new Extract.DataEntry.DataEntryTableColumn();
-            this._testDisplayName = new Extract.DataEntry.DataEntryTableColumn();
-            this._testID = new Extract.DataEntry.DataEntryTableColumn();
-            this._testValueColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._testUnitsColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._testRefRangeColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._testFlagColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._resultStatusColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._collectionDateColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._collectionTimeColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._resultDateColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._resultTimeColumn = new Extract.DataEntry.DataEntryTableColumn();
             _resultCodeLabel = new System.Windows.Forms.Label();
             _testNameLabel = new System.Windows.Forms.Label();
             panelGroupBox = new System.Windows.Forms.GroupBox();
@@ -202,53 +202,6 @@
             this._panelTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this._panelTable.Size = new System.Drawing.Size(669, 72);
             this._panelTable.TabIndex = 0;
-            // 
-            // _collectionDateColumn
-            // 
-            this._collectionDateColumn.AttributeName = "CollectionDate";
-            this._collectionDateColumn.AutoUpdateQuery = "";
-            this._collectionDateColumn.FillWeight = 95.86145F;
-            this._collectionDateColumn.FormattingRuleFile = "Rules\\Swiping\\CollectionDate.rsd.etf";
-            this._collectionDateColumn.HeaderText = "Collection Date";
-            this._collectionDateColumn.Name = "_collectionDateColumn";
-            this._collectionDateColumn.ValidationErrorMessage = "Collection date must be a valid date formatted MM/DD/YYYY";
-            this._collectionDateColumn.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(19|20)\\d{2}$";
-            // 
-            // _collectionTimeColumn
-            // 
-            this._collectionTimeColumn.AttributeName = "CollectionTime";
-            this._collectionTimeColumn.AutoUpdateQuery = "<Expression>\r\n\t(String.IsNullOrEmpty(<RegEx Pattern=\'^[0-2]?\\d[0-5]\\d$\'><Attribut" +
-    "e Name=\'Value\'>.</Attribute></RegEx>))\r\n\t\t? <Value/>\r\n\t\t: <Value/>.Insert(<Value" +
-    "/>.Length - 2, \':\')\r\n</Expression>";
-            this._collectionTimeColumn.FillWeight = 100.7867F;
-            this._collectionTimeColumn.FormattingRuleFile = "Rules\\Swiping\\CollectionTime.rsd.etf";
-            this._collectionTimeColumn.HeaderText = "Collection Time";
-            this._collectionTimeColumn.Name = "_collectionTimeColumn";
-            this._collectionTimeColumn.ValidationErrorMessage = "Collection time must be a valid time formatted HH:MM";
-            this._collectionTimeColumn.ValidationPattern = "^((0?[0-9])|(1[0-9])|(2[0-3])):[0-5][0-9]$";
-            // 
-            // _resultDateColumn
-            // 
-            this._resultDateColumn.AttributeName = "ResultDate";
-            this._resultDateColumn.FillWeight = 103.1914F;
-            this._resultDateColumn.FormattingRuleFile = "Rules\\Swiping\\ResultDate.rsd.etf";
-            this._resultDateColumn.HeaderText = "Result Date";
-            this._resultDateColumn.Name = "_resultDateColumn";
-            this._resultDateColumn.ValidationErrorMessage = "Result date must be a valid date formatted MM/DD/YYYY";
-            this._resultDateColumn.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(19|20)\\d{2}$";
-            // 
-            // _resultTimeColumn
-            // 
-            this._resultTimeColumn.AttributeName = "ResultTime";
-            this._resultTimeColumn.AutoUpdateQuery = "<Expression>\r\n\t(String.IsNullOrEmpty(<RegEx Pattern=\'^[0-2]?\\d[0-5]\\d$\'><Attribut" +
-    "e Name=\'Value\'>.</Attribute></RegEx>))\r\n\t\t? <Value/>\r\n\t\t: <Value/>.Insert(<Value" +
-    "/>.Length - 2, \':\')\r\n</Expression>";
-            this._resultTimeColumn.FillWeight = 100.1605F;
-            this._resultTimeColumn.FormattingRuleFile = "Rules\\Swiping\\ResultTime.rsd.etf";
-            this._resultTimeColumn.HeaderText = "Result Time";
-            this._resultTimeColumn.Name = "_resultTimeColumn";
-            this._resultTimeColumn.ValidationErrorMessage = "Result time must be a valid time formatted HH:MM";
-            this._resultTimeColumn.ValidationPattern = "^((0?[0-9])|(1[0-9])|(2[0-3])):[0-5][0-9]$";
             // 
             // _labID
             // 
@@ -728,6 +681,115 @@
             this._laboratoryTestTable.Size = new System.Drawing.Size(666, 178);
             this._laboratoryTestTable.TabIndex = 0;
             // 
+            // _orderNumberColumn
+            // 
+            this._orderNumberColumn.AttributeName = "OrderNumber";
+            this._orderNumberColumn.FillWeight = 50F;
+            this._orderNumberColumn.HeaderText = "Order #";
+            this._orderNumberColumn.Name = "_orderNumberColumn";
+            this._orderNumberColumn.SupportsSwiping = false;
+            this._orderNumberColumn.ValidationErrorMessage = "Order number is required";
+            this._orderNumberColumn.ValidationPattern = "^(\\d{8,})|(pr)\\s?$";
+            this._orderNumberColumn.ValidationQuery = resources.GetString("_orderNumberColumn.ValidationQuery");
+            // 
+            // _testName
+            // 
+            this._testName.AttributeName = "Name";
+            this._testName.AutoUpdateQuery = "<Query><SQL>SELECT Name FROM LabOrder WHERE Code = SUBSTRING(<Attribute>../EpicCo" +
+    "de</Attribute>,1,25)</SQL></Query>\r\n";
+            this._testName.FillWeight = 1F;
+            this._testName.HeaderText = "Official Name";
+            this._testName.Name = "_testName";
+            this._testName.ValidationErrorMessage = "";
+            this._testName.ValidationQuery = "";
+            this._testName.Visible = false;
+            // 
+            // _testDisplayName
+            // 
+            this._testDisplayName.AttributeName = "DisplayName";
+            this._testDisplayName.AutoUpdateQuery = resources.GetString("_testDisplayName.AutoUpdateQuery");
+            this._testDisplayName.FillWeight = 120F;
+            this._testDisplayName.HeaderText = "Order Name";
+            this._testDisplayName.Name = "_testDisplayName";
+            this._testDisplayName.SmartHintsEnabled = true;
+            this._testDisplayName.ValidationErrorMessage = "Order name is not recognized.";
+            this._testDisplayName.ValidationQuery = resources.GetString("_testDisplayName.ValidationQuery");
+            // 
+            // _testID
+            // 
+            this._testID.AttributeName = "EpicCode";
+            this._testID.AutoUpdateQuery = "<SQL>SELECT Code FROM LabOrder WHERE DisplayName = SUBSTRING(<Attribute>../Displa" +
+    "yName</Attribute>,1,50)</SQL>";
+            this._testID.FillWeight = 45F;
+            this._testID.HeaderText = "Epic Code";
+            this._testID.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.Last;
+            this._testID.Name = "_testID";
+            this._testID.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this._testID.ValidationErrorMessage = "Order code is not recognized.";
+            this._testID.ValidationQuery = "<SQL>SELECT EpicCode FROM LabOrder WHERE EpicCode IS NOT NULL ORDER BY EpicCode</" +
+    "SQL>";
+            this._testID.Visible = false;
+            // 
+            // _testValueColumn
+            // 
+            this._testValueColumn.AttributeName = "Value";
+            this._testValueColumn.AutoUpdateQuery = "<Query Default=\'true\'><Attribute SelectionMode=\'First\'>../Component/Value</Attrib" +
+    "ute></Query>";
+            this._testValueColumn.FillWeight = 70F;
+            this._testValueColumn.HeaderText = "Value";
+            this._testValueColumn.Name = "_testValueColumn";
+            this._testValueColumn.SmartHintsEnabled = true;
+            this._testValueColumn.ValidationErrorMessage = "Invalid value";
+            // 
+            // _testUnitsColumn
+            // 
+            this._testUnitsColumn.AttributeName = "Units";
+            this._testUnitsColumn.AutoUpdateQuery = "<Query Default=\'true\'><Attribute SelectionMode=\'First\'>../Component/Units</Attrib" +
+    "ute></Query>";
+            this._testUnitsColumn.FillWeight = 40F;
+            this._testUnitsColumn.HeaderText = "Units";
+            this._testUnitsColumn.Name = "_testUnitsColumn";
+            this._testUnitsColumn.SmartHintsEnabled = true;
+            this._testUnitsColumn.ValidationCorrectsCase = false;
+            this._testUnitsColumn.ValidationErrorMessage = "Invalid value";
+            this._testUnitsColumn.ValidationQuery = "<Query ValidationListType=\'ValidationListOnly\'>\r\n[BLANK]\r\n<SQL>SELECT Unit FROM U" +
+    "nit ORDER BY Unit</SQL>\r\n</Query>";
+            // 
+            // _testRefRangeColumn
+            // 
+            this._testRefRangeColumn.AttributeName = "Range";
+            this._testRefRangeColumn.AutoUpdateQuery = resources.GetString("_testRefRangeColumn.AutoUpdateQuery");
+            this._testRefRangeColumn.FillWeight = 70F;
+            this._testRefRangeColumn.HeaderText = "Ref. Range";
+            this._testRefRangeColumn.Name = "_testRefRangeColumn";
+            this._testRefRangeColumn.SmartHintsEnabled = true;
+            this._testRefRangeColumn.ValidationErrorMessage = "Invalid value";
+            // 
+            // _testFlagColumn
+            // 
+            this._testFlagColumn.AttributeName = "Flag";
+            this._testFlagColumn.AutoUpdateQuery = "<Query Default=\'true\'><Attribute SelectionMode=\'First\'>../Component/Flag</Attribu" +
+    "te></Query>";
+            this._testFlagColumn.FillWeight = 50F;
+            this._testFlagColumn.HeaderText = "Flag";
+            this._testFlagColumn.Name = "_testFlagColumn";
+            this._testFlagColumn.SmartHintsEnabled = true;
+            this._testFlagColumn.UseComboBoxCells = true;
+            this._testFlagColumn.ValidationErrorMessage = "Invalid value";
+            this._testFlagColumn.ValidationQuery = resources.GetString("_testFlagColumn.ValidationQuery");
+            // 
+            // _resultStatusColumn
+            // 
+            this._resultStatusColumn.AttributeName = "Status";
+            this._resultStatusColumn.AutoUpdateQuery = "<Query Default=\'True\'>F</Query>";
+            this._resultStatusColumn.FillWeight = 40F;
+            this._resultStatusColumn.HeaderText = "Status";
+            this._resultStatusColumn.Name = "_resultStatusColumn";
+            this._resultStatusColumn.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this._resultStatusColumn.UseComboBoxCells = true;
+            this._resultStatusColumn.ValidationErrorMessage = "Invalid value";
+            this._resultStatusColumn.ValidationQuery = "C\r\nF\r\nP\r\nR\r\nX";
+            // 
             // _componentLevelStatus
             // 
             this._componentLevelStatus.AttributeName = "Status";
@@ -1001,114 +1063,54 @@
             this._defaultLabIdentifier.ValidationQuery = "";
             this._defaultLabIdentifier.Visible = false;
             // 
-            // _orderNumberColumn
+            // _collectionDateColumn
             // 
-            this._orderNumberColumn.AttributeName = "OrderNumber";
-            this._orderNumberColumn.FillWeight = 50F;
-            this._orderNumberColumn.HeaderText = "Order #";
-            this._orderNumberColumn.Name = "_orderNumberColumn";
-            this._orderNumberColumn.SupportsSwiping = false;
-            this._orderNumberColumn.ValidationErrorMessage = "Order number is required";
-            this._orderNumberColumn.ValidationPattern = "^(\\d{8,})|(pr)\\s?$";
-            this._orderNumberColumn.ValidationQuery = resources.GetString("_orderNumberColumn.ValidationQuery");
+            this._collectionDateColumn.AttributeName = "CollectionDate";
+            this._collectionDateColumn.AutoUpdateQuery = "";
+            this._collectionDateColumn.FillWeight = 95.86145F;
+            this._collectionDateColumn.FormattingRuleFile = "Rules\\Swiping\\CollectionDate.rsd.etf";
+            this._collectionDateColumn.HeaderText = "Collection Date";
+            this._collectionDateColumn.Name = "_collectionDateColumn";
+            this._collectionDateColumn.ValidationErrorMessage = "Collection date must be a valid date formatted MM/DD/YYYY";
+            this._collectionDateColumn.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(19|20)\\d{2}$";
             // 
-            // _testName
+            // _collectionTimeColumn
             // 
-            this._testName.AttributeName = "Name";
-            this._testName.AutoUpdateQuery = "<Query><SQL>SELECT Name FROM LabOrder WHERE Code = SUBSTRING(<Attribute>../EpicCo" +
-    "de</Attribute>,1,25)</SQL></Query>\r\n";
-            this._testName.FillWeight = 1F;
-            this._testName.HeaderText = "Official Name";
-            this._testName.Name = "_testName";
-            this._testName.ValidationErrorMessage = "";
-            this._testName.ValidationQuery = "";
-            this._testName.Visible = false;
+            this._collectionTimeColumn.AttributeName = "CollectionTime";
+            this._collectionTimeColumn.AutoUpdateQuery = "<Expression>\r\n\t(String.IsNullOrEmpty(<RegEx Pattern=\'^[0-2]?\\d[0-5]\\d$\'><Attribut" +
+    "e Name=\'Value\'>.</Attribute></RegEx>))\r\n\t\t? <Value/>\r\n\t\t: <Value/>.Insert(<Value" +
+    "/>.Length - 2, \':\')\r\n</Expression>";
+            this._collectionTimeColumn.FillWeight = 100.7867F;
+            this._collectionTimeColumn.FormattingRuleFile = "Rules\\Swiping\\CollectionTime.rsd.etf";
+            this._collectionTimeColumn.HeaderText = "Collection Time";
+            this._collectionTimeColumn.Name = "_collectionTimeColumn";
+            this._collectionTimeColumn.ValidationErrorMessage = "Collection time must be a valid time formatted HH:MM";
+            this._collectionTimeColumn.ValidationPattern = "^((0?[0-9])|(1[0-9])|(2[0-3])):[0-5][0-9]$";
             // 
-            // _testDisplayName
+            // _resultDateColumn
             // 
-            this._testDisplayName.AttributeName = "DisplayName";
-            this._testDisplayName.AutoUpdateQuery = resources.GetString("_testDisplayName.AutoUpdateQuery");
-            this._testDisplayName.FillWeight = 120F;
-            this._testDisplayName.HeaderText = "Order Name";
-            this._testDisplayName.Name = "_testDisplayName";
-            this._testDisplayName.SmartHintsEnabled = true;
-            this._testDisplayName.ValidationErrorMessage = "Order name is not recognized.";
-            this._testDisplayName.ValidationQuery = resources.GetString("_testDisplayName.ValidationQuery");
+            this._resultDateColumn.AttributeName = "ResultDate";
+            this._resultDateColumn.FillWeight = 103.1914F;
+            this._resultDateColumn.FormattingRuleFile = "Rules\\Swiping\\ResultDate.rsd.etf";
+            this._resultDateColumn.HeaderText = "Result Date";
+            this._resultDateColumn.Name = "_resultDateColumn";
+            this._resultDateColumn.ValidationErrorMessage = "Result date must be a valid date formatted MM/DD/YYYY";
+            this._resultDateColumn.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(19|20)\\d{2}$";
+            this._resultDateColumn.ValidationQuery = resources.GetString("_resultDateColumn.ValidationQuery");
             // 
-            // _testID
+            // _resultTimeColumn
             // 
-            this._testID.AttributeName = "EpicCode";
-            this._testID.AutoUpdateQuery = "<SQL>SELECT Code FROM LabOrder WHERE DisplayName = SUBSTRING(<Attribute>../Displa" +
-    "yName</Attribute>,1,50)</SQL>";
-            this._testID.FillWeight = 45F;
-            this._testID.HeaderText = "Epic Code";
-            this._testID.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.Last;
-            this._testID.Name = "_testID";
-            this._testID.TabStopMode = Extract.DataEntry.TabStopMode.Never;
-            this._testID.ValidationErrorMessage = "Order code is not recognized.";
-            this._testID.ValidationQuery = "<SQL>SELECT EpicCode FROM LabOrder WHERE EpicCode IS NOT NULL ORDER BY EpicCode</" +
-    "SQL>";
-            this._testID.Visible = false;
-            // 
-            // _testValueColumn
-            // 
-            this._testValueColumn.AttributeName = "Value";
-            this._testValueColumn.AutoUpdateQuery = "<Query Default=\'true\'><Attribute SelectionMode=\'First\'>../Component/Value</Attrib" +
-    "ute></Query>";
-            this._testValueColumn.FillWeight = 70F;
-            this._testValueColumn.HeaderText = "Value";
-            this._testValueColumn.Name = "_testValueColumn";
-            this._testValueColumn.SmartHintsEnabled = true;
-            this._testValueColumn.ValidationErrorMessage = "Invalid value";
-            // 
-            // _testUnitsColumn
-            // 
-            this._testUnitsColumn.AttributeName = "Units";
-            this._testUnitsColumn.AutoUpdateQuery = "<Query Default=\'true\'><Attribute SelectionMode=\'First\'>../Component/Units</Attrib" +
-    "ute></Query>";
-            this._testUnitsColumn.FillWeight = 40F;
-            this._testUnitsColumn.HeaderText = "Units";
-            this._testUnitsColumn.Name = "_testUnitsColumn";
-            this._testUnitsColumn.SmartHintsEnabled = true;
-            this._testUnitsColumn.ValidationCorrectsCase = false;
-            this._testUnitsColumn.ValidationErrorMessage = "Invalid value";
-            this._testUnitsColumn.ValidationQuery = "<Query ValidationListType=\'ValidationListOnly\'>\r\n[BLANK]\r\n<SQL>SELECT Unit FROM U" +
-    "nit ORDER BY Unit</SQL>\r\n</Query>";
-            // 
-            // _testRefRangeColumn
-            // 
-            this._testRefRangeColumn.AttributeName = "Range";
-            this._testRefRangeColumn.AutoUpdateQuery = resources.GetString("_testRefRangeColumn.AutoUpdateQuery");
-            this._testRefRangeColumn.FillWeight = 70F;
-            this._testRefRangeColumn.HeaderText = "Ref. Range";
-            this._testRefRangeColumn.Name = "_testRefRangeColumn";
-            this._testRefRangeColumn.SmartHintsEnabled = true;
-            this._testRefRangeColumn.ValidationErrorMessage = "Invalid value";
-            // 
-            // _testFlagColumn
-            // 
-            this._testFlagColumn.AttributeName = "Flag";
-            this._testFlagColumn.AutoUpdateQuery = "<Query Default=\'true\'><Attribute SelectionMode=\'First\'>../Component/Flag</Attribu" +
-    "te></Query>";
-            this._testFlagColumn.FillWeight = 50F;
-            this._testFlagColumn.HeaderText = "Flag";
-            this._testFlagColumn.Name = "_testFlagColumn";
-            this._testFlagColumn.SmartHintsEnabled = true;
-            this._testFlagColumn.UseComboBoxCells = true;
-            this._testFlagColumn.ValidationErrorMessage = "Invalid value";
-            this._testFlagColumn.ValidationQuery = resources.GetString("_testFlagColumn.ValidationQuery");
-            // 
-            // _resultStatusColumn
-            // 
-            this._resultStatusColumn.AttributeName = "Status";
-            this._resultStatusColumn.AutoUpdateQuery = "<Query Default=\'True\'>F</Query>";
-            this._resultStatusColumn.FillWeight = 40F;
-            this._resultStatusColumn.HeaderText = "Status";
-            this._resultStatusColumn.Name = "_resultStatusColumn";
-            this._resultStatusColumn.TabStopMode = Extract.DataEntry.TabStopMode.Never;
-            this._resultStatusColumn.UseComboBoxCells = true;
-            this._resultStatusColumn.ValidationErrorMessage = "Invalid value";
-            this._resultStatusColumn.ValidationQuery = "C\r\nF\r\nP\r\nR\r\nX";
+            this._resultTimeColumn.AttributeName = "ResultTime";
+            this._resultTimeColumn.AutoUpdateQuery = "<Expression>\r\n\t(String.IsNullOrEmpty(<RegEx Pattern=\'^[0-2]?\\d[0-5]\\d$\'><Attribut" +
+    "e Name=\'Value\'>.</Attribute></RegEx>))\r\n\t\t? <Value/>\r\n\t\t: <Value/>.Insert(<Value" +
+    "/>.Length - 2, \':\')\r\n</Expression>";
+            this._resultTimeColumn.FillWeight = 100.1605F;
+            this._resultTimeColumn.FormattingRuleFile = "Rules\\Swiping\\ResultTime.rsd.etf";
+            this._resultTimeColumn.HeaderText = "Result Time";
+            this._resultTimeColumn.Name = "_resultTimeColumn";
+            this._resultTimeColumn.ValidationErrorMessage = "Result time must be a valid time formatted HH:MM";
+            this._resultTimeColumn.ValidationPattern = "^((0?[0-9])|(1[0-9])|(2[0-3])):[0-5][0-9]$";
+            this._resultTimeColumn.ValidationQuery = resources.GetString("_resultTimeColumn.ValidationQuery");
             // 
             // UITransplantCenterPanel
             // 
@@ -1198,10 +1200,6 @@
         private DataEntryTableColumn _epicPatientSuffixColumn;
         private DataEntryTextBox _defaultLabID;
         private DataEntryTextBox _defaultLabIdentifier;
-        private DataEntryTableColumn _collectionDateColumn;
-        private DataEntryTableColumn _collectionTimeColumn;
-        private DataEntryTableColumn _resultDateColumn;
-        private DataEntryTableColumn _resultTimeColumn;
         private DataEntryTextBox _componentLevelStatus;
         private DataEntryTextBox _componentLevelFlag;
         private DataEntryTextBox _componentLevelRange;
@@ -1221,5 +1219,9 @@
         private DataEntryTableColumn _testRefRangeColumn;
         private DataEntryTableColumn _testFlagColumn;
         private DataEntryTableColumn _resultStatusColumn;
+        private DataEntryTableColumn _collectionDateColumn;
+        private DataEntryTableColumn _collectionTimeColumn;
+        private DataEntryTableColumn _resultDateColumn;
+        private DataEntryTableColumn _resultTimeColumn;
     }
 }
