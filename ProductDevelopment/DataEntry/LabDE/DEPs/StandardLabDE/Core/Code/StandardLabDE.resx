@@ -453,4 +453,32 @@
   <data name="_physicianCode.ValidationQuery" xml:space="preserve">
     <value>&lt;SQL&gt;SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(&lt;Attribute&gt;../Last&lt;/Attribute&gt;,1,50) + '%' AND FirstName LIKE SUBSTRING(&lt;Attribute&gt;../First&lt;/Attribute&gt;,1,30) + '%' AND (MiddleName IS NULL OR MiddleName = '' OR MiddleName LIKE SUBSTRING(&lt;Attribute&gt;../Middle&lt;/Attribute&gt;,1,30) + '%') ORDER BY Code&lt;/SQL&gt;</value>
   </data>
+  <data name="_testResultTime.ValidationQuery" xml:space="preserve">
+    <value>&lt;Declarations&gt;
+	&lt;Composite Name='ValidationMessage'&gt;Result date/time must be greater than or equal to the collection date/time.&lt;/Composite&gt;
+&lt;/Declarations&gt;
+&lt;Query ValidValue='True' ValidationMessage='ValidationMessage'&gt;
+	&lt;Expression&gt;
+		DateTime.TryParse(&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;, null) and
+		DateTime.TryParse(&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;, null) and
+		(date(&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;) &amp;gt;=
+		date(&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;))
+	&lt;/Expression&gt;
+&lt;/Query&gt;
+</value>
+  </data>
+  <data name="_testResultDate.ValidationQuery" xml:space="preserve">
+    <value>&lt;Declarations&gt;
+	&lt;Composite Name='ValidationMessage'&gt;Result date/time must be greater than or equal to the collection date/time.&lt;/Composite&gt;
+&lt;/Declarations&gt;
+&lt;Query ValidValue='True' ValidationMessage='ValidationMessage'&gt;
+	&lt;Expression&gt;
+		DateTime.TryParse(&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;, null) and
+		DateTime.TryParse(&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;, null) and
+		(date(&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;) &amp;gt;=
+		date(&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;))
+	&lt;/Expression&gt;
+&lt;/Query&gt;
+</value>
+  </data>
 </root>

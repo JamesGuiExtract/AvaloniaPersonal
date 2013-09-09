@@ -29,6 +29,7 @@ namespace Extract.Utilities.Test
         const string _TEST_FILE_PATH = _TEST_DIR + "\\" + _FILE_NAME + "." + _TEST_EXT;
         const string _TEST_FILE_NO_EXT = @"C:\temp1\temp2\filename";
         const string _FPS_FILE_DIR = @"C:\folder1\folder2\fpsFiles";
+        const string _FPS_FILE_NAME = @"C:\folder1\folder2\fpsFiles\test.fps";
 
         #endregion Constants
 
@@ -38,7 +39,7 @@ namespace Extract.Utilities.Test
         /// A <see cref="FileActionManagerPathTags"/> object used to test tag expansion.
         /// </summary>
         FileActionManagerPathTags _fileTags =
-            new FileActionManagerPathTags(_TEST_FILE_PATH, _FPS_FILE_DIR);
+            new FileActionManagerPathTags(_TEST_FILE_PATH, _FPS_FILE_DIR, _FPS_FILE_NAME);
 
         #endregion Fields
 
@@ -75,6 +76,16 @@ namespace Extract.Utilities.Test
         {
             string tag = "<FPSFileDir>";
             Assert.That(_fileTags.Expand(tag).Equals(_FPS_FILE_DIR));
+        }
+
+        /// <summary>
+        /// Tests that FPSFileName is expanded correctly.
+        /// </summary>
+        [Test, Category("Automated")]
+        public void FpsFileName()
+        {
+            string tag = "<FPSFileName>";
+            Assert.That(_fileTags.Expand(tag).Equals(_FPS_FILE_NAME));
         }
 
         /// <summary>
