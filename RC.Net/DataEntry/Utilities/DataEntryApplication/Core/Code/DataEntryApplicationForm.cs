@@ -1219,11 +1219,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     new ToolStripItem[] { _redoToolStripButton, _redoToolStripMenuItem },
                     false, true, false);
 
-                // [DataEntry:1242]
-                // Because of an exception (which should now be correct in the commented-out
-                // ToggleAutoZoom method), plus general inconsistent/flakey behavior of this
-                // feature, it is being held back from the 9.1 release.
-                //_imageViewer.Shortcuts[Keys.F6] = ToggleAutoZoom;
+                _imageViewer.Shortcuts[Keys.F6] = ToggleAutoZoom;
 
                 // Disable the OpenImageToolStripSplitButton if this is not stand alone mode
                 if (!_standAloneMode)
@@ -3550,16 +3546,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             OnShowAllHighlightsChanged();
         }
 
-//        /// <summary>
-//        /// Toggles whether the view is auto-zoomed to the current selection.
-//        /// </summary>
-//        void ToggleAutoZoom()
-//        {
-//            if (_dataEntryControlHost != null)
-//            {
-//                _dataEntryControlHost.ToggleZoomToSelection();
-//            }
-//        }
+        /// <summary>
+        /// Toggles whether the view is auto-zoomed to the current selection.
+        /// </summary>
+        void ToggleAutoZoom()
+        {
+            if (_dataEntryControlHost != null)
+            {
+                _dataEntryControlHost.ToggleZoomToSelection();
+            }
+        }
 
         /// <summary>
         /// Toggles whether tabbing should allow groups (rows) of attributes to be
