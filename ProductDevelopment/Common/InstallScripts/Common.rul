@@ -395,16 +395,23 @@ end;
 //  Purpose: This function uninstalls the drivers for the Inlite Key
 ///////////////////////////////////////////////////////////////////////////////
 function UninstallInliteKeyDrivers()
-	string szProgram;
+	string szProgram, clearImagePath;
 begin       
   	SdShowMsg("Setup is Uninstalling Inlite drivers.", TRUE);
    
    	szProgram = SUPPORTDIR ^ "\\CBSetup.exe";
 	LaunchAppAndWait(szProgram, "/Q /U /CRYPTOKEN", LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
 
-	// Call the unwise.exe in the program folder for Inlite
-	//szProgram = SUPPORTDIR ^ "\Uninstall_inlite.bat";
-	//LaunchAppAndWait(szProgram, "",LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS );     
+	// Call uninstall for ClearImage on 32 bit
+	clearImagePath = "C:\\Program Files\\Inlite\\ClearImage 7 PDK\\INSTALL.LOG";
+	LongPathToShortPath(clearImagePath);
+	LaunchAppAndWait("\"C:\\Program Files\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s " + clearImagePath, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+
+	// Call uninstall for ClearImage on 64 bit
+	clearImagePath = "C:\\Program Files (x86)\\Inlite\\ClearImage 7 PDK\\INSTALL.LOG";
+	LongPathToShortPath(clearImagePath);
+	LaunchAppAndWait("\"C:\\Program Files (x86)\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s " + clearImagePath, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+
 	UninstallApplication("ClearImage 7 PDK" , "/S /A /U", LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS );
 	
  	SdShowMsg("Setup is Uninstalling Inlite drivers.", FALSE);

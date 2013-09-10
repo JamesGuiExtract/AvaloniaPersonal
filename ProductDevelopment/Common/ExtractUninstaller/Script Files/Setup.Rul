@@ -140,7 +140,7 @@ end;
 // completed successfully.
 //---------------------------------------------------------------------------
 function OnFirstUIAfter()
-    STRING szTitle, szMsg1, szMsg2, szOpt1, szOpt2;
+    STRING szTitle, szMsg1, szMsg2, szOpt1, szOpt2, clearImagePath;
     NUMBER bOpt1, bOpt2;
 begin
 	Disable(STATUSEX);  
@@ -166,8 +166,15 @@ begin
 	// SQL Server 2008 Native Client
 	LaunchAppAndWait("MsiExec.exe", "/x{C79A7EAB-9D6F-4072-8A6D-F8F54957CD93} /qn", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
 
-	LaunchAppAndWait("\"C:\\Program Files\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s INSTALL.LOG", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
-	LaunchAppAndWait("\"C:\\Program Files (x86)\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s INSTALL.LOG", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+	// Call uninstall for ClearImage on 32 bit
+	clearImagePath = "C:\\Program Files\\Inlite\\ClearImage 7 PDK\\INSTALL.LOG";
+	LongPathToShortPath(clearImagePath);
+	LaunchAppAndWait("\"C:\\Program Files\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s " + clearImagePath, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+
+	// Call uninstall for ClearImage on 64 bit
+	clearImagePath = "C:\\Program Files (x86)\\Inlite\\ClearImage 7 PDK\\INSTALL.LOG";
+	LongPathToShortPath(clearImagePath);
+	LaunchAppAndWait("\"C:\\Program Files (x86)\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s " + clearImagePath, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
  	 
     RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
 
