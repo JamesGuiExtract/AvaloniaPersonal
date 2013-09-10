@@ -8,6 +8,7 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Extract.BaseUtils.Testing
 {
@@ -21,9 +22,9 @@ namespace Extract.BaseUtils.Testing
         static readonly string _DEFAULT_SOURCE_DOC = @"C:\InputFiles\TestImage01.tif";
 
         /// <summary>
-        /// The default FPS file directory
+        /// The default FPS file name
         /// </summary>
-        static readonly string _DEFAULT_FPS_FILE_DIR = @"C:\FPSFiles";
+        static readonly string _DEFAULT_FPS_FILE_NAME = @"C:\FPSFiles\TestFpsFile.fps";
 
         /// <summary>
         /// The name of this object.
@@ -46,7 +47,7 @@ namespace Extract.BaseUtils.Testing
 
                 // Set the default SourceDocName and FPSFileDir
                 _textSourceDoc.Text = _DEFAULT_SOURCE_DOC;
-                _textFpsFileDir.Text = _DEFAULT_FPS_FILE_DIR;
+                _textFpsFileName.Text = _DEFAULT_FPS_FILE_NAME;
             }
             catch (Exception ex)
             {
@@ -77,7 +78,7 @@ namespace Extract.BaseUtils.Testing
 
                 // Get a tag manager to use for expanding the tags
                 FileActionManagerPathTags tags = new FileActionManagerPathTags(
-                    _textSourceDoc.Text, _textFpsFileDir.Text);
+                    _textSourceDoc.Text,Path.GetDirectoryName(_textFpsFileName.Text), _textFpsFileName.Text );
 
                 // Expand the value and place it in the expansion result box
                 _textExpansion.Text = tags.Expand(_textValue.Text);

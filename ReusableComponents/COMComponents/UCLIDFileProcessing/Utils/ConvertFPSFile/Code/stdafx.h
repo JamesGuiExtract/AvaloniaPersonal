@@ -35,6 +35,9 @@ using namespace ADODB;
 #import "..\..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids 
 using namespace UCLID_COMUTILSLib;
 
+#import "..\..\..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.tlb" named_guids
+using namespace Extract_Interfaces;
+
 #import "..\..\..\Code\UCLIDFileProcessing.tlb" named_guids 
 using namespace UCLID_FILEPROCESSINGLib;
 

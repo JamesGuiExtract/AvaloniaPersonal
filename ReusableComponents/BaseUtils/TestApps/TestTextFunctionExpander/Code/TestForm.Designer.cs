@@ -36,7 +36,7 @@ namespace Extract.BaseUtils.Testing
             this._textSourceDoc = new System.Windows.Forms.TextBox();
             this._buttonClear = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
-            this._textFpsFileDir = new System.Windows.Forms.TextBox();
+            this._textFpsFileName = new System.Windows.Forms.TextBox();
             this._textValue = new System.Windows.Forms.TextBox();
             this._textExpansion = new System.Windows.Forms.TextBox();
             this._browseSourceDoc = new Extract.Utilities.Forms.BrowseButton();
@@ -105,14 +105,14 @@ namespace Extract.BaseUtils.Testing
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(68, 13);
             this.label4.TabIndex = 10;
-            this.label4.Text = "<FPSFileDir>";
+            this.label4.Text = "<FPSFileName>";
             // 
-            // _textFpsFileDir
+            // _textFpsFile
             // 
-            this._textFpsFileDir.Location = new System.Drawing.Point(12, 64);
-            this._textFpsFileDir.Name = "_textFpsFileDir";
-            this._textFpsFileDir.Size = new System.Drawing.Size(417, 20);
-            this._textFpsFileDir.TabIndex = 11;
+            this._textFpsFileName.Location = new System.Drawing.Point(12, 64);
+            this._textFpsFileName.Name = "_textFpsFile";
+            this._textFpsFileName.Size = new System.Drawing.Size(417, 20);
+            this._textFpsFileName.TabIndex = 11;
             // 
             // _textValue
             // 
@@ -152,7 +152,7 @@ namespace Extract.BaseUtils.Testing
             this._browseFpsDir.Size = new System.Drawing.Size(27, 20);
             this._browseFpsDir.TabIndex = 15;
             this._browseFpsDir.Text = "...";
-            this._browseFpsDir.TextControl = this._textFpsFileDir;
+            this._browseFpsDir.TextControl = this._textFpsFileName;
             this._browseFpsDir.UseVisualStyleBackColor = true;
             // 
             // pathTagsButton1
@@ -176,7 +176,7 @@ namespace Extract.BaseUtils.Testing
             this.Controls.Add(this._browseSourceDoc);
             this.Controls.Add(this._textExpansion);
             this.Controls.Add(this._textValue);
-            this.Controls.Add(this._textFpsFileDir);
+            this.Controls.Add(this._textFpsFileName);
             this.Controls.Add(this.label4);
             this.Controls.Add(this._buttonClear);
             this.Controls.Add(this._textSourceDoc);
@@ -200,7 +200,7 @@ namespace Extract.BaseUtils.Testing
         private System.Windows.Forms.TextBox _textSourceDoc;
         private System.Windows.Forms.Button _buttonClear;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox _textFpsFileDir;
+        private System.Windows.Forms.TextBox _textFpsFileName;
         private System.Windows.Forms.TextBox _textValue;
         private System.Windows.Forms.TextBox _textExpansion;
         private Extract.Utilities.Forms.BrowseButton _browseSourceDoc;

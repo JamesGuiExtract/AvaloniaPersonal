@@ -38,6 +38,9 @@ using namespace UCLID_IMAGEUTILSLib;
 	rename ("EOF", "adoEOF")
 using namespace ADODB;
 
+#import "..\..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.tlb" named_guids
+using namespace Extract_Interfaces;
+
 #import "..\..\..\UCLIDFileProcessing\Code\UCLIDFileProcessing.tlb" named_guids
 using namespace UCLID_FILEPROCESSINGLib;
 
