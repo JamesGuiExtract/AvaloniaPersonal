@@ -9,6 +9,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFCore", "..\..\Code\AFCore
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFCoreTest", "AFCoreTest.vcxproj", "{7B9B99C7-E636-48EF-84A8-E963EB8A875A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFCppUtils", "..\..\..\AFCppUtils\Code\AFCppUtils.vcxproj", "{1BDB2A4E-7678-42C1-9828-5EF4F522AB21}"
 EndProject
@@ -17,8 +20,14 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFDataScorersTest", "..\..\..\AFDataScorers\AFDataScorersTest\Code\AFDataScorersTest.vcxproj", "{C7DE2780-FA83-4949-8184-4ED52073908A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFFileProcessors", "..\..\..\AFFileProcessors\Code\AFFileProcessors.vcxproj", "{F13286FD-B486-4266-97C5-9DAA62527A2E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFOutputHandlers", "..\..\..\AFOutputHandlers\Code\AFOutputHandlers.vcxproj", "{835D9667-E21E-460F-BC05-EE5E39551CFA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFPreProcessors", "..\..\..\AFPreProcessors\Code\AFPreProcessors.vcxproj", "{C2101648-5B5C-4AD9-9710-46452425335C}"
 EndProject
@@ -60,6 +69,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EncryptTextFile", "..\..\..\..\Utils\EncryptTextFile\Code\EncryptTextFile.vcxproj", "{23286748-A945-43F3-96DE-608B982703B4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FileProcessors", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FileProcessors\Code\FileProcessors.vcxproj", "{44715879-9B87-4701-8CCB-B2FFE04789D3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GenericDisplay2", "..\..\..\..\..\ReusableComponents\OcxAndDlls\UCLIDGenericDisplay2\Code\GenericDisplay2.vcxproj", "{CAE2C57D-2BDB-4E14-ADAA-19BF0304F155}"
 EndProject
@@ -70,10 +82,16 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LeadUtils", "..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code\LeadUtils.vcxproj", "{08CC1AFB-7B9D-42E5-B823-DC72CDC06631}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProcessFiles", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\ProcessFiles\Code\ProcessFiles.vcxproj", "{222BD67A-2D34-45A5-888D-53B3FB0BD7D5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RDTConfig", "..\..\..\Utils\RDTConfig\Code\RDTConfig.vcxproj", "{7BF2A843-7233-4788-9F20-99F2D6E80402}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RedactionCustomComponents", "..\..\..\IndustrySpecific\Redaction\RedactionCustomComponents\Code\RedactionCustomComponents.vcxproj", "{D3FEDB6F-D1FC-4098-8C18-BBF6C28803A9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RuleSetEditor", "..\..\..\Utils\RuleSetEditor\Code\RuleSetEditor.vcxproj", "{E9767F3E-0644-44D8-85F5-A4289D0B9CD2}"
 EndProject
@@ -144,20 +162,31 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CreateMultiPageImage", "..\..\..\..\Utils\CreateMultiPageImage\Code\CreateMultiPageImage.vcxproj", "{480FCA0D-4008-4368-8151-EDAD064E27E4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConvertFPSFile", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\ConvertFPSFile\Code\ConvertFPSFile.vcxproj", "{F2A3839E-107D-4AE8-91D9-A2097B80DDA5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FAMDBAdmin", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\FAMDBAdmin\Code\FAMDBAdmin.vcxproj", "{62DB32BA-115B-427C-A12E-E031C33B3FB2}"
 	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
 		{01578DD9-C725-4028-AC48-0CDE1EC000D5} = {01578DD9-C725-4028-AC48-0CDE1EC000D5}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RedactionTester", "..\..\..\IndustrySpecific\Redaction\RedactionTester\Code\RedactionTester.vcxproj", "{D693947D-722C-4D98-8DA9-B60A90206526}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RasterZoneTester", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\RasterZoneTester\Code\RasterZoneTester.vcxproj", "{1B546E8F-BC8A-4BD2-BA7C-E14F6D02F21D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESFileSuppliers", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\ESFileSuppliers\Code\ESFileSuppliers.vcxproj", "{C0338948-9E74-4A31-957E-079544C9C29D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESFAMConditions", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\ESSkipConditions\Code\ESSkipConditions.vcxproj", "{6EC454B7-CC66-4629-B171-81E964ED6B4C}"
 	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
 		{5A74ECB3-8B17-42B5-B77F-44C35D489A64} = {5A74ECB3-8B17-42B5-B77F-44C35D489A64}
 	EndProjectSection
 EndProject
@@ -178,6 +207,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CleanupImage", "..\..\..\..\..\ReusableComponents\COMComponents\ESImageCleanup\Utils\CleanupImage\Code\CleanupImage.vcxproj", "{BB7CC9E2-7890-4450-8FEA-144567226142}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConvertFAMDB", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\ConvertFAMDB\Code\ConvertFAMDB.vcxproj", "{2B24BD4C-C093-4B9D-BFAD-99511F66D5C1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESConvertToPDF", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Utils\ESConvertToPDF\Code\ESConvertToPDF.vcxproj", "{85C608A6-E2D6-439C-A3A8-ED75140E771C}"
 EndProject
@@ -307,6 +339,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Imaging.Utilities", "..\..\..\..\..\RC.Net\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj", "{E610E652-0891-40D4-B5CA-A622B87C7979}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FAMProcess", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\FAMProcess\Code\FAMProcess.vcxproj", "{E07E00CC-656A-424A-977E-27B8B8D2C286}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SplitMultiPageImage", "..\..\..\..\Utils\SplitMultiPageImage\Code\SplitMultiPageImage.csproj", "{E881002C-231B-481A-A7DE-75843A23483A}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -350,6 +385,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.F
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataEntryCustomComponents", "..\..\..\IndustrySpecific\DataEntry\DataEntryCustomComponents\Code\DataEntryCustomComponents.vcxproj", "{63FCAC1B-4562-469C-B7C3-DF1D4386FB45}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry", "..\..\..\..\..\RC.Net\DataEntry\Core\Code\Extract.DataEntry.csproj", "{55C4FA3A-26C9-4CC0-9F11-A7E607E6ACD2}"
 	ProjectSection(ProjectDependencies) = postProject
