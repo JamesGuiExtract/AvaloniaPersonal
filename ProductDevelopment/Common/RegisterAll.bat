@@ -11,6 +11,17 @@ if not [%1]==[/s] (
 	echo.
 )
 
+::Change current folder to common components folder
+setlocal
+
+SET PROGRAM_ROOT=%ProgramFiles(x86)%
+
+IF NOT "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
+	SET PROGRAM_ROOT=%ProgramFiles%
+)
+
+pushd %PROGRAM_ROOT%\Extract Systems\CommonComponents
+
 for /R .\ %%r in (*.rl,*.nl) do (
 	for /F "tokens=1 delims=," %%i in (%%~sr) do (
 		if "%%~xr" == ".rl" (
@@ -30,6 +41,9 @@ for /R .\ %%r in (*.rl,*.nl) do (
 		)
 	)
 )
+popd
+
+endlocal
 
 if not [%1]==[/s] (
 	echo.
