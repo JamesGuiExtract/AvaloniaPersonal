@@ -568,8 +568,9 @@ namespace Extract.Redaction
                 source.LoadFrom(pFileRecord.Name + ".uss", false);
 
                 // Load the redactions
-                FileActionManagerPathTags pathTags = 
-                    new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir);
+                FileActionManagerPathTags pathTags =
+                    new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir,
+                        pFAMTM.FPSFileName);
                 string voaFile = pathTags.Expand(_settings.DataFile);
                 _voaLoader.LoadFrom(voaFile, pFileRecord.Name);
 

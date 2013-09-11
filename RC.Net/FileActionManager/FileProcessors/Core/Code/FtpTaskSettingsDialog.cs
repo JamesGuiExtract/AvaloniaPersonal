@@ -75,9 +75,10 @@ namespace Extract.FileActionManager.FileProcessors
         {
             InitializeComponent();
 
-            // Initialize the Path tags buttons to have <SourceDocName>, <FPSFileDir> and <RemoteSourceDocName> tags
-            _localFileNamePathTagsButton.PathTags = new FileActionManagerPathTags("", "", "");
-            _remoteFileNamePathTagsButton.PathTags = new FileActionManagerPathTags("", "", "");
+            // Initialize the Path tags buttons to have <SourceDocName>, <FPSFileDir> <FPSFileName>
+            // and <RemoteSourceDocName> tags
+            _localFileNamePathTagsButton.PathTags = new FileActionManagerPathTags("", "", "", "");
+            _remoteFileNamePathTagsButton.PathTags = new FileActionManagerPathTags("", "", "", "");
 
             _settings = settings ?? new FtpTask();
         }

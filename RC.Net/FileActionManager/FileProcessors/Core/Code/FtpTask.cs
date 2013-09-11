@@ -688,7 +688,8 @@ namespace Extract.FileActionManager.FileProcessors
 
                     // Create a tag manager and expand the tags in the file name
                     tags = new FileActionManagerPathTags(
-                       Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir, downloadFileInfo.RemoteSourceDocName);
+                        Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir, pFAMTM.FPSFileName,
+                            downloadFileInfo.RemoteSourceDocName);
                 }
                 else
                 {

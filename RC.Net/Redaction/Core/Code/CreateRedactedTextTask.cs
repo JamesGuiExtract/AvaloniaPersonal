@@ -290,7 +290,8 @@ namespace Extract.Redaction
 
                 // Load the redactions
                 FileActionManagerPathTags pathTags =
-                    new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir);
+                    new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir,
+                        pFAMTM.FPSFileName);
                 string voaFile = pathTags.Expand(_settings.DataFile);
 
                 if (!File.Exists(voaFile))

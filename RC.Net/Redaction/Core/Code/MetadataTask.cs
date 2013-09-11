@@ -1025,7 +1025,8 @@ namespace Extract.Redaction
 					_COMPONENT_DESCRIPTION);
 
                 FileActionManagerPathTags tags = 
-                    new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir);
+                    new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir,
+                        pFAMTM.FPSFileName);
 
                 // Load voa
                 string voaFileName = tags.Expand(_settings.DataFile);

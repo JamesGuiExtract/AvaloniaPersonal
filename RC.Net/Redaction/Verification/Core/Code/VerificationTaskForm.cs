@@ -3709,7 +3709,8 @@ namespace Extract.Redaction.Verification
 
                     // Create the saved memento
                     FileActionManagerPathTags pathTags =
-                        new FileActionManagerPathTags(fullPath, _tagManager.FPSFileDir);
+                        new FileActionManagerPathTags(fullPath, _tagManager.FPSFileDir,
+                            _tagManager.FPSFileName);
                     _savedMemento = CreateSavedMemento(fullPath, 0, 0, pathTags);
 
                     // If the thumbnail viewer is not visible when a document is opened, don't load the
@@ -3835,8 +3836,9 @@ namespace Extract.Redaction.Verification
                 _tagManager = tagManager ?? _tagManager;
 
                 // Create the path tags
-                FileActionManagerPathTags pathTags = 
-                    new FileActionManagerPathTags(fullPath, _tagManager.FPSFileDir);
+                FileActionManagerPathTags pathTags =
+                    new FileActionManagerPathTags(fullPath, _tagManager.FPSFileDir,
+                        _tagManager.FPSFileName);
 
                 // Create the saved memento
                 _savedMemento = CreateSavedMemento(fullPath, fileID, actionID, pathTags);

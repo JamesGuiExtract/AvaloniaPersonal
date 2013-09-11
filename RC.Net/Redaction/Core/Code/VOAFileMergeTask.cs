@@ -538,7 +538,8 @@ namespace Extract.Redaction
 
                 // Load the redactions
                 FileActionManagerPathTags pathTags =
-                    new FileActionManagerPathTags(sourceDocName, pFAMTM.FPSFileDir);
+                    new FileActionManagerPathTags(sourceDocName, pFAMTM.FPSFileDir,
+                        pFAMTM.FPSFileName);
                 dataFile1 = pathTags.Expand(settings.DataFile1);
                 dataFile2 = pathTags.Expand(settings.DataFile2);
 
