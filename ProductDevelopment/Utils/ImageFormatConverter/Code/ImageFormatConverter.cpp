@@ -1117,6 +1117,12 @@ BOOL CImageFormatConverterApp::InitInstance()
 				LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 				validateLicense();
 
+				// [LegacyRCAndUtils:6471]
+				if (!strPagesToRemove.empty())
+				{
+					VALIDATE_LICENSE(gnREMOVE_IMAGE_PAGES, "ELI36150", "RemovePages" );
+				}
+
 				if (bUseNuance)
 				{
 					if (bRetainAnnotations || !strUserPassword.empty() || !strOwnerPassword.empty() ||

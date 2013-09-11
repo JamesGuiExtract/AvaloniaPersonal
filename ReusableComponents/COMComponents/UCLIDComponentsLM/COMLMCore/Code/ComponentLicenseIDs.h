@@ -234,6 +234,9 @@ const unsigned int gnFTP_SFTP_FILE_TRANSFER				= gnBASE_OFFSET + 83;
 // Special ID for the search capability of the FAM File Inspector
 const unsigned int gnFILE_INSPECTOR_SEARCH				= gnBASE_OFFSET + 84;
 
+// For the /RemovePages option on ImageFormatConverter.
+const unsigned int gnREMOVE_IMAGE_PAGES					= gnBASE_OFFSET + 85;
+
 //-------------------------------------------------------------------------------------------------
 // Constants for items licensed for FLEX Index / ID Shield integration
 //-------------------------------------------------------------------------------------------------

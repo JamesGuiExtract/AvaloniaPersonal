@@ -71,6 +71,7 @@
 6082,Pegasus_PdfXpress_Modify_Pdf
 6083,FTP_SFTP_File_Transfer
 6084,FileInspectorSearch
+6085,RemoveImagePages
 
 // IDs for FLEX Index / ID Shield integration efforts
 6101,Laserfiche_Integration_Verification

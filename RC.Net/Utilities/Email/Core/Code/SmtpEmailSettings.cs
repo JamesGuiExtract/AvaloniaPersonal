@@ -515,7 +515,7 @@ namespace Extract.Utilities.Email
         {
             try
             {
-                using (var dialog = new SmtpEmailSettingsDialog())
+                using (var dialog = new SmtpEmailSettingsDialog(this))
                 {
                     return dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK;
                 }

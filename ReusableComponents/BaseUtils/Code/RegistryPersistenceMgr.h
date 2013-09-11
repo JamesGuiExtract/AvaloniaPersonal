@@ -27,9 +27,12 @@ class EXPORT_BaseUtils RegistryPersistenceMgr : public IConfigurationSettingsPer
 public:
 	//==============================================================================================
 	// PURPOSE:	create persistence manager for a specific registry key
-	//
+	// ARGS:	bFullAccessRequired - If true, failures to write to registry entries outside of
+	//			HKEY_CURRENT_USER will generate an exception. (otherwise, by default, such errors
+	//			are ignored).
 	RegistryPersistenceMgr(HKEY hkeyRoot, 
-		const string &strRootWin32RegistryKeyFullPath);
+		const string &strRootWin32RegistryKeyFullPath,
+		bool bFullAccessRequired = false);
 	//==============================================================================================
 	// PURPOSE:	
 	//
@@ -145,4 +148,8 @@ private:
 
 	// the root persistence store location (such as HKEY_LOCAL_MACHINE)
 	HKEY m_hkeyRoot;
+
+	// If true, failures to write to registry entries outside of HKEY_CURRENT_USER will generate an
+	// exception. (otherwise, by default, such errors are ignored). 
+	bool m_bFullAccessRequired;
 };

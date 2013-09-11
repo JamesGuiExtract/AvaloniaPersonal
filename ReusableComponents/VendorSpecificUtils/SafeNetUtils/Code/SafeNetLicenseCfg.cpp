@@ -34,7 +34,7 @@ SafeNetLicenseCfg::SafeNetLicenseCfg()
 {
 	// create instance of the persistence mgr
 	ma_pUserCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(new 
-		RegistryPersistenceMgr( HKEY_LOCAL_MACHINE, gstrREG_ROOT_KEY ));
+		RegistryPersistenceMgr( HKEY_LOCAL_MACHINE, gstrREG_ROOT_KEY, true ));
 	ASSERT_RESOURCE_ALLOCATION( "ELI11312", ma_pUserCfgMgr.get() != __nullptr );
 }
 //-------------------------------------------------------------------------------------------------
@@ -66,14 +66,20 @@ string SafeNetLicenseCfg::getContactServerName()
 //-------------------------------------------------------------------------------------------------
 void SafeNetLicenseCfg::setServerName(string strServerName)
 {
-	ma_pUserCfgMgr->setKeyValue( gstrSAFENET_UTILS_CFG_FOLDER, 
-		gstrSAFENET_SERVER_NAME, strServerName );
+	if (strServerName != getContactServerName())
+	{
+		ma_pUserCfgMgr->setKeyValue( gstrSAFENET_UTILS_CFG_FOLDER, 
+			gstrSAFENET_SERVER_NAME, strServerName );
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void SafeNetLicenseCfg::setAlertToList( string strAlertToList )
 {
-	ma_pUserCfgMgr->setKeyValue( gstrSAFENET_UTILS_CFG_FOLDER, 
-		"AlertToList", strAlertToList );
+	if (strAlertToList != getAlertToList())
+	{
+		ma_pUserCfgMgr->setKeyValue( gstrSAFENET_UTILS_CFG_FOLDER, 
+			"AlertToList", strAlertToList );
+	}
 }
 //-------------------------------------------------------------------------------------------------
 string SafeNetLicenseCfg::getAlertToList ()
@@ -92,15 +98,18 @@ string SafeNetLicenseCfg::getAlertToList ()
 //-------------------------------------------------------------------------------------------------
 void SafeNetLicenseCfg::setSendAlert( bool bSendAlert )
 {
-	if ( bSendAlert )
+	if (bSendAlert != getSendAlert())
 	{
-		ma_pUserCfgMgr->setKeyValue( gstrSAFENET_UTILS_CFG_FOLDER, 
-			"SendAlert", "1");
-	}
-	else
-	{
-		ma_pUserCfgMgr->setKeyValue( gstrSAFENET_UTILS_CFG_FOLDER, 
-			"SendAlert", "0");
+		if ( bSendAlert )
+		{
+			ma_pUserCfgMgr->setKeyValue( gstrSAFENET_UTILS_CFG_FOLDER, 
+				"SendAlert", "1");
+		}
+		else
+		{
+			ma_pUserCfgMgr->setKeyValue( gstrSAFENET_UTILS_CFG_FOLDER, 
+				"SendAlert", "0");
+		}
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -125,17 +134,18 @@ bool SafeNetLicenseCfg::getSendAlert()
 //-------------------------------------------------------------------------------------------------
 void SafeNetLicenseCfg::setCounterAlertLevel( string strCounterName, DWORD nAlertLevel )
 {
-	ma_pUserCfgMgr->setKeyValue( gstrSAFENET_UTILS_CFG_FOLDER + "\\" + strCounterName, 
-		"AlertLevel", asString(nAlertLevel));
+	if (nAlertLevel != getCounterAlertLevel(strCounterName))
+	{
+		ma_pUserCfgMgr->setKeyValue( gstrSAFENET_UTILS_CFG_FOLDER + "\\" + strCounterName, 
+			"AlertLevel", asString(nAlertLevel));
+	}
 }
 //-------------------------------------------------------------------------------------------------
 DWORD SafeNetLicenseCfg::getCounterAlertLevel( string strCounterName )
 {
 	try
 	{
-		string strAlertLevel;
-		ma_pUserCfgMgr->createFolder( gstrSAFENET_UTILS_CFG_FOLDER + "\\" + strCounterName );
-		strAlertLevel = ma_pUserCfgMgr->getKeyValue( 
+		string strAlertLevel = ma_pUserCfgMgr->getKeyValue(
 			gstrSAFENET_UTILS_CFG_FOLDER + "\\" + strCounterName, "AlertLevel", "0" );
 		return asUnsignedLong(strAlertLevel);
 	}
@@ -148,18 +158,18 @@ DWORD SafeNetLicenseCfg::getCounterAlertLevel( string strCounterName )
 //-------------------------------------------------------------------------------------------------
 void SafeNetLicenseCfg::setCounterAlertMultiple( string strCounterName, DWORD nAlertMultiple )
 {
-	ma_pUserCfgMgr->setKeyValue( gstrSAFENET_UTILS_CFG_FOLDER + "\\" + strCounterName, 
-		"AlertMultiple", asString(nAlertMultiple));
+	if (nAlertMultiple != getCounterAlertMultiple(strCounterName))
+	{
+		ma_pUserCfgMgr->setKeyValue( gstrSAFENET_UTILS_CFG_FOLDER + "\\" + strCounterName, 
+			"AlertMultiple", asString(nAlertMultiple));
+	}
 }
 //-------------------------------------------------------------------------------------------------
 DWORD SafeNetLicenseCfg::getCounterAlertMultiple( string strCounterName )
 {
 	try
 	{
-
-		string strAlertMultiple;
-		ma_pUserCfgMgr->createFolder( gstrSAFENET_UTILS_CFG_FOLDER + "\\" + strCounterName );
-		strAlertMultiple = ma_pUserCfgMgr->getKeyValue( 
+		string strAlertMultiple = ma_pUserCfgMgr->getKeyValue(
 			gstrSAFENET_UTILS_CFG_FOLDER + "\\" + strCounterName, "AlertMultiple", "0" );
 		return asUnsignedLong(strAlertMultiple);
 	}
@@ -210,15 +220,18 @@ string SafeNetLicenseCfg::getAlertSendDisplay()
 //-------------------------------------------------------------------------------------------------
 void SafeNetLicenseCfg::setSendToExtract( bool bSendToExtract )
 {
-	if ( bSendToExtract )
+	if (bSendToExtract != getSendToExtract())
 	{
-		ma_pUserCfgMgr->setKeyValue( gstrSAFENET_UTILS_CFG_FOLDER, 
-			"SendToExtract", "1");
-	}
-	else
-	{
-		ma_pUserCfgMgr->setKeyValue( gstrSAFENET_UTILS_CFG_FOLDER, 
-			"SendToExtract", "0");
+		if ( bSendToExtract )
+		{
+			ma_pUserCfgMgr->setKeyValue( gstrSAFENET_UTILS_CFG_FOLDER, 
+				"SendToExtract", "1");
+		}
+		else
+		{
+			ma_pUserCfgMgr->setKeyValue( gstrSAFENET_UTILS_CFG_FOLDER, 
+				"SendToExtract", "0");
+		}
 	}
 }
 //-------------------------------------------------------------------------------------------------

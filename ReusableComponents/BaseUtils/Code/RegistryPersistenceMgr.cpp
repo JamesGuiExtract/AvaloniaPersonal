@@ -20,12 +20,16 @@
 using namespace std;
 
 //-------------------------------------------------------------------------------------------------
-RegistryPersistenceMgr::RegistryPersistenceMgr(HKEY hkeyRoot, const std::string &strRootWin32RegistryKeyFullPath)
-:m_strRootKeyFullPath(strRootWin32RegistryKeyFullPath), m_hkeyRoot(hkeyRoot)
+RegistryPersistenceMgr::RegistryPersistenceMgr(HKEY hkeyRoot,
+	const std::string &strRootWin32RegistryKeyFullPath, bool bFullAccessRequired /*= false*/)
+: m_strRootKeyFullPath(strRootWin32RegistryKeyFullPath)
+, m_hkeyRoot(hkeyRoot)
+, m_bFullAccessRequired(bFullAccessRequired)
 {
 }
 //-------------------------------------------------------------------------------------------------
 RegistryPersistenceMgr::RegistryPersistenceMgr(const RegistryPersistenceMgr& registryPersistenceMgr)
+: m_bFullAccessRequired(false)
 {
 	m_strRootKeyFullPath = registryPersistenceMgr.m_strRootKeyFullPath;
 	m_hkeyRoot = registryPersistenceMgr.m_hkeyRoot;
@@ -35,6 +39,7 @@ RegistryPersistenceMgr& RegistryPersistenceMgr::operator=(const RegistryPersiste
 {
 	m_strRootKeyFullPath = registryPersistenceMgr.m_strRootKeyFullPath;
 	m_hkeyRoot = registryPersistenceMgr.m_hkeyRoot;
+	m_bFullAccessRequired = registryPersistenceMgr.m_bFullAccessRequired;
 
 	return *this;
 }
@@ -444,7 +449,9 @@ void RegistryPersistenceMgr::createKey(const string& strFolderFullPath,
 		// Ignore errors regardless of the error code if not in current user; it seems it is
 		// possible to get other errors such as ERROR_FILE_NOT_FOUND when the user doesn't have
 		// needed permissions.
-		if (m_hkeyRoot != HKEY_CURRENT_USER)
+		// [LegacyRCAndUtils:6448]
+		// But do not ignore errors if caller is expecting success regardless of where the key is.
+		if (!m_bFullAccessRequired && m_hkeyRoot != HKEY_CURRENT_USER)
 		{
 			return;
 		}
@@ -516,7 +523,9 @@ void RegistryPersistenceMgr::createKey(const string& strFolderFullPath,
 		// Ignore errors regardless of the error code if not in current user; it seems it is
 		// possible to get other errors such as ERROR_FILE_NOT_FOUND when the user doesn't have
 		// needed permissions.
-		if (m_hkeyRoot != HKEY_CURRENT_USER)
+		// [LegacyRCAndUtils:6448]
+		// But do not ignore errors if caller is expecting success regardless of where the key is.
+		if (!m_bFullAccessRequired && m_hkeyRoot != HKEY_CURRENT_USER)
 		{
 			return;
 		}
