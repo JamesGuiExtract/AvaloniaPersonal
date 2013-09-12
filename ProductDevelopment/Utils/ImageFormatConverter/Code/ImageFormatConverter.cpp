@@ -974,7 +974,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 				for (size_t i=3; i < uiParamCount; i++)
 				{
 					string strTemp = vecParams[i];
-					string strLower = strTemp;
+					makeLowerCase(strTemp);
 					if (strTemp == "/retain")
 					{
 						bRetainAnnotations = true;
@@ -1052,7 +1052,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 					}
 					// [LegacyRCAndUtils:6461]
 					// Allows specified pages to be excluded from the output
-					else if (strTemp == "/RemovePages")
+					else if (strTemp == "/removepages")
 					{
 						i++;
 						if (i >= uiParamCount)
