@@ -35,8 +35,8 @@
     	<li>Confirm the Processing Setup tab has a <b>If any of the above tasks fail</b> 
 	groupbox.</li>
     	<ul> 
-        	<li>Confirm existence of a <b>Log the details of the error to the following file</b> 
-        	checkbox.
+        	<li>Confirm existence of a <b>Log the details of the error to the following 
+		file</b> checkbox.
         	<li>Confirm that the check box is enabled during setup.
         	<li>Confirm that the checkbox is unchecked by default.
         	<li>Confirm that the associated edit box is enabled only when the checkbox is 
@@ -45,6 +45,30 @@
 		checkbox is checked.
         	<li>Confirm that the associated <b>...</b> ( Browse ) button is enabled only when 
 		the checkbox is checked.
+<p>
+        	<li>Confirm existence of a <b>Send an email (separate email addresses with 
+		a semicolon)</b> checkbox.
+        	<li>Confirm that the check box is enabled during setup.
+        	<li>Confirm that the checkbox is unchecked by default.
+        	<li>Confirm that the associated edit box is enabled only when the checkbox is 
+		checked.
+        	<li>Confirm that the associated <b>Configure email...</b> button is enabled 
+		only when the checkbox is checked.
+		<ul>
+			<li>Confirm that the <b>Core: Send email settings</b> dialog is 
+			displayed.
+			<li>Confirm that the default Subject is <b>ERROR: A file failed in 
+			action &quot;&lt;ActionName&gt;&quot; on $Env(COMPUTERNAME)</b>.
+			<li>Confirm that the default file attachment is 
+			<b>&lt;ExceptionFile&gt;</b>.
+			<li>Confirm that the default message body contains the following 
+			lines:
+			<ul>
+				<li>Filename: &lt;SourceDocName&gt;
+				<li>FPS: &lt;FPSFileName&gt;
+			</ul>
+			<li>Confirm presence of a <b>Reset to default settings</b> button.
+		</ul>
 <p>
         	<li>Confirm existence of a <b>Execute the following task</b> checkbox.
         	<li>Confirm that the checkbox is unchecked by default.
