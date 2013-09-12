@@ -1824,12 +1824,16 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: Limits the file selected to a subset of those meeting the currently configured
 		//			conditions.
 		// ARGS:	bRandomSubset- VARIANT_TRUE if the subset should be random.
+		//			bTopSubset- VARIANT_TRUE if the subset should be selected from the start of the
+		//				overall set of files, VARIANT_FALSE if it should be selected from the end
+		//				of the overall set of files. Ignored when bRandomSubset is VARIANT_TRUE.
 		//			bUsePercentage- VARIANT_TRUE if the subset size is a percentage, VARIANT_FALSE
 		//				if it is the record count.
 		//			nSubsetSize- The size the subset should be (percentage or count per
 		//				bUsePercentage).
 		[id(7), helpstring("method LimitToSubset")] HRESULT LimitToSubset(
-			 [in] VARIANT_BOOL bRandomSubset, [in] VARIANT_BOOL bUsePercentage, [in] LONG nSubsetSize);
+			 [in] VARIANT_BOOL bRandomSubset, [in] VARIANT_BOOL bTopSubset,
+			 [in] VARIANT_BOOL bUsePercentage, [in] LONG nSubsetSize);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Adds a query condition to the current settings.
 		// ARGS:	pFAMDB- The IFileProcessingDB the condition relates to.

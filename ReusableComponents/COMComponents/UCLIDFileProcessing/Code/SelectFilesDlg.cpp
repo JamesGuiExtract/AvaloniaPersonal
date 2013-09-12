@@ -354,10 +354,12 @@ bool CSelectFilesDlg::saveSettings()
 		// Check for narrowing scope
 		long nSubsetSize = -1;
 		bool bUseRandom = true;
+		bool bUseTop = false;
 		bool bUsePercentage = true;
 		if (m_checkSubset.GetCheck() == BST_CHECKED)
 		{
 			bUseRandom = (m_comboSubsetMethod.GetCurSel() == 0);
+			bUseTop = (m_comboSubsetMethod.GetCurSel() == 1);
 
 			CString zMessageUnits;
 
@@ -415,6 +417,7 @@ bool CSelectFilesDlg::saveSettings()
 		if (nSubsetSize != -1)
 		{
 			m_settings.setSubsetIsRandom(bUseRandom);
+			m_settings.setSubsetIsTop(bUseTop);
 			m_settings.setSubsetUsePercentage(bUsePercentage);
 			m_settings.setSubsetSize(nSubsetSize);
 		}
@@ -484,7 +487,8 @@ void CSelectFilesDlg::setControlsFromSettings()
 		{
 			// Set the check box and update the text in the edit control
 			m_checkSubset.SetCheck(BST_CHECKED);
-			m_comboSubsetMethod.SetCurSel(m_settings.getSubsetIsRandom() ? 0 : 1);
+			m_comboSubsetMethod.SetCurSel(m_settings.getSubsetIsRandom() ? 0 
+				: m_settings.getSubsetIsTop() ? 1 : 2);
 			m_comboSubsetUnits.SetCurSel(m_settings.getSubsetUsePercentage() ? 0 : 1);
 			m_editSubsetSize.SetWindowText(asString(m_settings.getSubsetSize()).c_str());
 		}

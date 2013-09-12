@@ -57,6 +57,12 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         static int? _fileCount;
 
+        /// <summary>
+        /// The <see cref="T:SubsetType"/> specifying the method a limited subset should be
+        /// selected from the overall set of files by default.
+        /// </summary>
+        static SubsetType? _subsetType;
+
         #endregion Fields
 
         #region Main
@@ -96,6 +102,10 @@ namespace Extract.FileActionManager.Utilities
                 if (_fileCount.HasValue)
                 {
                     famFileInspectorForm.MaxFilesToDisplay = _fileCount.Value;
+                }
+                if (_subsetType.HasValue)
+                {
+                    famFileInspectorForm.SubsetType = _subsetType.Value;
                 }
 
                 bool loggedIn = false;
@@ -269,6 +279,23 @@ namespace Extract.FileActionManager.Utilities
                         return false;
                     }
 
+                    argument = args[i];
+                    if (argument.Equals("top", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _subsetType = SubsetType.Top;
+                        i++;
+                    }
+                    else if (argument.Equals("bottom", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _subsetType = SubsetType.Bottom;
+                        i++;
+                    }
+                    else if (argument.Equals("random", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _subsetType = SubsetType.Random;
+                        i++;
+                    }
+
                     int fileCount = 0;
                     if (int.TryParse(args[i], out fileCount))
                     {
@@ -411,7 +438,7 @@ namespace Extract.FileActionManager.Utilities
             usage.Append(Environment.GetCommandLineArgs()[0]);
             usage.AppendLine(" /? | [/filecount <count>] | <ServerName> <DatabaseName> " +
                 "[/action <actionName> /status <statusName>] [/query <queryFileName>] " +
-                "[/filecount <count>]");
+                "[/filecount [top|bottom|random] <count>]");
             usage.AppendLine();
             usage.AppendLine("ServerName: The name of the database server to connect to.");
             usage.AppendLine();
@@ -428,8 +455,9 @@ namespace Extract.FileActionManager.Utilities
             usage.AppendLine("/query <queryFileName>: An file containing an SQL query to be " +
                 "used to limit the initial file selection.");
             usage.AppendLine();
-            usage.AppendLine("/filecount <count>: Specifies number of files that may be " +
-                "displayed in the file list at once.");
+            usage.AppendLine("/filecount [top|bottom|random] <count>: Specifies number of files that may be " +
+                "displayed in the file list at once and, optionally, how the subset should be selected from " +
+                "the overall set of files by default. If top/bottom/random is omitted, the default is top.");
 
             MessageBox.Show(usage.ToString(), isError ? "Error" : "Usage", MessageBoxButtons.OK,
                 isError ? MessageBoxIcon.Error : MessageBoxIcon.Information,

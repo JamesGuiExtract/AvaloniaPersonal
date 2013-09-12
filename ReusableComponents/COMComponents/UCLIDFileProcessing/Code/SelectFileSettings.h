@@ -25,8 +25,10 @@ private:
 	bool m_bAnd;
 
 	// Values for the random subset selection restriction
-	bool m_bLimitToSubset; // Whether to narrow the selection to a subset (random or top)
+	bool m_bLimitToSubset; // Whether to narrow the selection to a subset (random, top or bottom)
 	bool m_bSubsetIsRandom; // Whether the subset should be random or in order.
+	bool m_bTopSubset; // Whether a non-random subset should be the first results (as opposed to the
+					   // last). Used only when m_bSubsetIsRandom is false.
 	bool m_bSubsetUsePercentage; // Whether to narrow by percentage or file count
 	int m_nSubsetSize; // The size of the subset (percentage or filecount)
 
@@ -54,6 +56,10 @@ public:
 	void setSubsetIsRandom(bool bSubsetIsRandom) { m_bSubsetIsRandom = bSubsetIsRandom; }
 	bool getSubsetIsRandom() { return m_bSubsetIsRandom; }
 
+	// Ignored unless SubsetIsRandom is false
+	void setSubsetIsTop(bool bTopSubset) { m_bTopSubset = bTopSubset; }
+	bool getSubsetIsTop() { return m_bTopSubset; }
+
 	void setSubsetUsePercentage(bool bUsePercentage) { m_bSubsetUsePercentage = bUsePercentage; }
 	bool getSubsetUsePercentage() { return m_bSubsetUsePercentage; }
 
@@ -74,7 +80,7 @@ public:
 	// strSelect = "FAMFile.ID, FAMFile.Priority", etc
 	// NOTE2: It can be assumed that the FAMFile table will be included in the query.
 	string buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
-					  const string& strSelect, const string& strOrderByClause);
+					  const string& strSelect, string strOrderByClause);
 
 	UCLID_FILEPROCESSINGLib::IRandomMathConditionPtr getRandomCondition();
 };

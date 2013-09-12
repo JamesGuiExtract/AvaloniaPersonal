@@ -11,6 +11,7 @@ SelectFileSettings::SelectFileSettings() :
 m_bAnd(true),
 m_bLimitToSubset(false),
 m_bSubsetIsRandom(true),
+m_bTopSubset(true),
 m_bSubsetUsePercentage(true),
 m_nSubsetSize(0)
 {
@@ -38,6 +39,7 @@ SelectFileSettings& SelectFileSettings::operator =(const SelectFileSettings &sou
 	m_bAnd = source.m_bAnd;
 	m_bLimitToSubset = source.m_bLimitToSubset;
 	m_bSubsetIsRandom = source.m_bSubsetIsRandom;
+	m_bTopSubset = source.m_bTopSubset;
 	m_bSubsetUsePercentage = source.m_bSubsetUsePercentage;
 	m_nSubsetSize = source.m_nSubsetSize;
 
@@ -93,7 +95,9 @@ string SelectFileSettings::getSummaryString()
 
 	if (m_bLimitToSubset)
 	{
-		string strMethod = m_bSubsetIsRandom ? " a random " : " the top ";
+		string strMethod = m_bSubsetIsRandom
+			? " a random "
+			: (m_bTopSubset ? " the top " : " the bottom ");
 
 		if (m_vecConditions.empty())
 		{
@@ -117,8 +121,39 @@ string SelectFileSettings::getSummaryString()
 	return strSummary;
 }
 //--------------------------------------------------------------------------------------------------
+void reverseOrderByClause(string& strOrderByClause)
+{
+	if (strOrderByClause.empty())
+	{
+		strOrderByClause = " ORDER BY [FAMFile].[ID] DESC";
+	}
+	else
+	{
+		strOrderByClause = trim(strOrderByClause, "", " \t\r\n");
+		makeUpperCase(strOrderByClause);
+		if (strOrderByClause.length() > 4 &&
+			isWhitespaceChar(strOrderByClause[strOrderByClause.length() - 4]) &&
+			strOrderByClause.substr(strOrderByClause.length() - 3) == "ASC")
+		{
+			strOrderByClause =
+				strOrderByClause.substr(0, strOrderByClause.length() - 3) + "DESC";
+		}
+		else if (strOrderByClause.length() > 5 &&
+			isWhitespaceChar(strOrderByClause[strOrderByClause.length() - 5]) &&
+			strOrderByClause.substr(strOrderByClause.length() - 4) == "DESC")
+		{
+			strOrderByClause =
+				strOrderByClause.substr(0, strOrderByClause.length() - 4) + " ASC";
+		}
+		else
+		{
+			strOrderByClause += " DESC";
+		}
+	}
+}
+//--------------------------------------------------------------------------------------------------
 string SelectFileSettings::buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
-									  const string& strSelect, const string& strOrderByClause)
+									  const string& strSelect, string strOrderByClause)
 {
 	ASSERT_ARGUMENT("ELI27722", ipFAMDB != __nullptr);
 	
@@ -268,10 +303,20 @@ string SelectFileSettings::buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDB
 		// [FlexIDSCore:6431]
 		// If using a percentage, the subset size can't be determined up front because it wouldn't
 		// be taking into account conditions which will have limited the result set already.
-		if (!m_bSubsetUsePercentage)
+		if (m_bTopSubset && !m_bSubsetUsePercentage)
 		{
 			strQueryPart1 =
 				"SELECT DISTINCT TOP " + asString(m_nSubsetSize) + " " + strSelect + " FROM ";
+		}
+
+		string strOriginalOrderByClause;
+		if (!m_bTopSubset)
+		{
+			strOriginalOrderByClause = strOrderByClause;
+			
+			// If selecting the subset from the bottom, we need to reverse the order in order to
+			// grab the "top" X files from the bottom.
+			reverseOrderByClause(strOrderByClause);
 		}
 
 		string strTopQuery =
@@ -308,10 +353,13 @@ string SelectFileSettings::buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDB
 			// results: 50% of 28 = 15)
 			"SET @rowsToReturn = " + (m_bSubsetUsePercentage ? 
 				"CEILING(@@ROWCOUNT * " + asString(m_nSubsetSize)+ ".0 / 100) " :
-				asString(m_nSubsetSize)) + "\r\n"
-			"SELECT " + strSelect + 
-			" FROM (SELECT TOP (@rowsToReturn) * FROM #OriginalResults AS FAMFile) AS FAMFile " +
-			strOrderByClause + "\r\n"
+				asString(m_nSubsetSize)) + "\r\n" + 
+			string(m_bTopSubset ? "SELECT " : "SELECT * FROM (\r\nSELECT TOP (@rowsToReturn) ") +
+			strSelect + " FROM (SELECT " +
+			string(m_bTopSubset ? "TOP (@rowsToReturn) " : "") +
+			"* FROM #OriginalResults AS FAMFile) AS FAMFile " +
+			strOrderByClause + "\r\n" +
+			string(m_bTopSubset ? "" : "\r\n) AS FAMFile " + strOriginalOrderByClause) +
 			"\r\n"
 			"DROP TABLE #OriginalResults\r\n"
 			"\r\n"

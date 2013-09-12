@@ -133,7 +133,7 @@ STDMETHODIMP CFAMFileSelector::AddQueryCondition(IFileProcessingDB *pFAMDB, BSTR
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36097");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFAMFileSelector::LimitToSubset(VARIANT_BOOL bRandomSubset,
+STDMETHODIMP CFAMFileSelector::LimitToSubset(VARIANT_BOOL bRandomSubset, VARIANT_BOOL bTopSubset,
 											 VARIANT_BOOL bUsePercentage, LONG nSubsetSize)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -144,6 +144,7 @@ STDMETHODIMP CFAMFileSelector::LimitToSubset(VARIANT_BOOL bRandomSubset,
 
 		m_settings.setLimitToSubset(true);
 		m_settings.setSubsetIsRandom(asCppBool(bRandomSubset));
+		m_settings.setSubsetIsTop(asCppBool(bTopSubset));
 		m_settings.setSubsetUsePercentage(asCppBool(bUsePercentage));
 		m_settings.setSubsetSize(nSubsetSize);
 

@@ -31,6 +31,31 @@ using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.FileActionManager.Utilities
 {
+    #region Enums
+
+    /// <summary>
+    /// Represents the various methods a limited subset can be selected from a larger pool of files.
+    /// </summary>
+    public enum SubsetType
+    {
+        /// <summary>
+        /// The subset will start at the beginning of the overall set of files.
+        /// </summary>
+        Top = 0,
+
+        /// <summary>
+        /// The subset will come from the end of the overall set of files.
+        /// </summary>
+        Bottom = 1,
+
+        /// <summary>
+        /// The subset will be a random selection from the overall set of files.
+        /// </summary>
+        Random = 2
+    }
+
+    #endregion Enums
+
     /// <summary>
     /// A <see cref="Form"/> that allows searching and inspection of files in a File Action Manager database
     /// based on database conditions, OCR content and data content.
@@ -93,6 +118,11 @@ namespace Extract.FileActionManager.Utilities
         /// The default value for <see cref="MaxFilesToDisplay"/>.
         /// </summary>
         public static readonly int DefaultMaxFilesToDisplay = 1000;
+
+        /// <summary>
+        /// The method a limited subset should be selected from the overall set of files.
+        /// </summary>
+        public static readonly SubsetType DefaultSubsetType = SubsetType.Top;
 
         #endregion Constants
 
@@ -450,6 +480,7 @@ namespace Extract.FileActionManager.Utilities
                 SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
 
                 MaxFilesToDisplay = DefaultMaxFilesToDisplay;
+                SubsetType = DefaultSubsetType;
 
                 FileProcessingDB = new FileProcessingDB();
                 FileSelector = new FAMFileSelector();
@@ -556,12 +587,26 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Gets the maximum number of files to display at once.
+        /// Gets or sets the maximum number of files to display at once.
         /// </summary>
         /// <value>
         /// The maximum number of files to display at once.
         /// </value>
         public int MaxFilesToDisplay
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the method a limited subset should be selected from the overall set of
+        /// files.
+        /// </summary>
+        /// <value>
+        /// The <see cref="T:SubsetType"/> specifying the method a limited subset should be
+        /// selected from the overall set of files.
+        /// </value>
+        public SubsetType SubsetType
         {
             get;
             set;
@@ -579,7 +624,8 @@ namespace Extract.FileActionManager.Utilities
             try
             {
                 FileSelector.Reset();
-                FileSelector.LimitToSubset(false, false, MaxFilesToDisplay);
+                FileSelector.LimitToSubset(SubsetType == SubsetType.Random,
+                    SubsetType == SubsetType.Top, false, MaxFilesToDisplay);
             }
             catch (Exception ex)
             {
