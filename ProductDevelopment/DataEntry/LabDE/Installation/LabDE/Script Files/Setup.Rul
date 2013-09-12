@@ -42,6 +42,8 @@ function OnFirstUIAfter()
     BOOL bOpt1, bOpt2;    
 begin
 	if (gbInstalled) then
+		LAAW_SHELLEXECUTEVERB = "runas";
+		
 		// Removed Corepoint install because not sure if silent install works properley
    		//InstallCorepoint();
    		InstallMSMQ();    

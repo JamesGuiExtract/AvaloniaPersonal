@@ -15,6 +15,8 @@ function OnFirstUIAfter()
 begin
    	// Rename the uex file
    	RenameUEXFile();
+
+   	LAAW_SHELLEXECUTEVERB = "runas";
                                                                                                                               
     // Register Dlls
 	szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\RegisterAll.bat\"";
