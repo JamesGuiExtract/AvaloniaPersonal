@@ -376,10 +376,11 @@ function InstallInliteKeyDrivers()
 begin    
 	SdShowMsg("Setup is Installing Inlite drivers.", TRUE);
 	szProgram = SUPPORTDIR ^ "\\CbSetup.exe";
-	LaunchAppAndWait(szProgram, "/Q /CRYPTOKEN", LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);
+	LAAW_SHELLEXECUTEVERB = "runas";
+	LaunchAppAndWait(szProgram, "/Q /CRYPTOKEN", LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);
 	
 	szProgram = SUPPORTDIR ^ INLITE_INSTALLER_EXE;
-	LaunchAppAndWait(szProgram, "/S ", LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);    
+	LaunchAppAndWait(szProgram, "/S ", LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);    
 	
 	// Remove the Nuance Start Menu item  
 	DeleteDir( StartMenuFolder ^ "Programs\\ClearImage 7 PDK", ALLCONTENTS); 
@@ -399,18 +400,21 @@ function UninstallInliteKeyDrivers()
 begin       
   	SdShowMsg("Setup is Uninstalling Inlite drivers.", TRUE);
    
+	LAAW_SHELLEXECUTEVERB = "runas";
    	szProgram = SUPPORTDIR ^ "\\CBSetup.exe";
-	LaunchAppAndWait(szProgram, "/Q /U /CRYPTOKEN", LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
+	LaunchAppAndWait(szProgram, "/Q /U /CRYPTOKEN", LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
 
 	// Call uninstall for ClearImage on 32 bit
 	clearImagePath = "C:\\Program Files\\Inlite\\ClearImage 7 PDK\\INSTALL.LOG";
 	LongPathToShortPath(clearImagePath);
-	LaunchAppAndWait("\"C:\\Program Files\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s " + clearImagePath, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+	LaunchAppAndWait("\"C:\\Program Files\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s " + clearImagePath, 
+		LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
 
 	// Call uninstall for ClearImage on 64 bit
 	clearImagePath = "C:\\Program Files (x86)\\Inlite\\ClearImage 7 PDK\\INSTALL.LOG";
 	LongPathToShortPath(clearImagePath);
-	LaunchAppAndWait("\"C:\\Program Files (x86)\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s " + clearImagePath, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
+	LaunchAppAndWait("\"C:\\Program Files (x86)\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s " + clearImagePath, 
+		LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
 
 	UninstallApplication("ClearImage 7 PDK" , "/S /A /U", LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS );
 	
@@ -429,11 +433,12 @@ STRING szProgram, szCmdLine;
 int nResult, svServiceState;
 begin
 	SdShowMsg("Setup is Installing Crystal Reports 12 Runtime", TRUE);
+	LAAW_SHELLEXECUTEVERB = "runas";
 	
 	// Install Crystal Reports
 	szProgram = "msiexec";
 	szCmdLine = " /qn /i " + SUPPORTDIR ^ "\\CRRuntime_12_1_mlb.msi";
-	LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
+	LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
 	
 	SdShowMsg("Setup is Installing Crystal Reports 12 Runtime", FALSE);
 end;
