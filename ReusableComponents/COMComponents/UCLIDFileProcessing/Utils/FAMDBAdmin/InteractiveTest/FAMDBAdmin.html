@@ -22,18 +22,18 @@
 <h2>Database Selection - Part 1</h2>
 <ul>
     	<li>A <b>Database server name</b> combo box is presented.</li>
-    	<li>If both a <b>Server</b> and a <b>Database name</b> have been previously selected, confirm 
-    	that both names are preloaded into the combo boxes.</li>
-    	<li>Confirm that the combo box includes <b>(local)</b> as a option if SQL Server has been 
-    	installed or not if only the native client was installed.
+    	<li>If both a <b>Server</b> and a <b>Database name</b> have been previously selected, 
+confirm that both names are preloaded into the combo boxes.</li>
+    	<li>Confirm that the combo box includes <b>(local)</b> as a option if SQL Server has 
+	been installed or not if only the native client was installed.
     	<ul>
-        	<li>If SQL Server Express 2005/2008/2008 R2 is not installed on the test machine, confirm 
-        	that <b>(local)</b> is not included in the combo box.</li>
-        	<li>If SQL Server Express 2005/2008/2008 R2 is installed on the test machine, confirm that 
-        	<b>(local)</b> is included in the combo box.</li>
-        	<li>If SQL Server Express 2005/2008/2008 R2 is installed on the test machine with a named
-        	instance specified, confirm that <b>(local)\&lt;instanceName&gt;</b> is included in the
-        	combo box.</li>
+        	<li>If SQL Server Express 2005/2008/2008 R2 is not installed on the test machine, 
+		confirm that <b>(local)</b> is not included in the combo box.</li>
+        	<li>If SQL Server Express 2005/2008/2008 R2 is installed on the test machine, 
+		confirm that <b>(local)</b> is included in the combo box.</li>
+        	<li>If SQL Server Express 2005/2008/2008 R2 is installed on the test machine with 
+		a named instance specified, confirm that <b>(local)\&lt;instanceName&gt;</b> is 
+		included in the combo box.</li>
     	</ul></li>
     	<li>A <b>&lt;Browse...&gt;</b> item is available in the combo box.</li>
     	<li>Selection of the <b>Browse</b> item changes the cursor to a wait cursor.</li>
@@ -95,12 +95,13 @@
         	<li>Use SQL Management Studio to modify the schema version</li>
         	<LI>Login to the database.</li>
         	<li>Select the <b>Summary</b> tab.</li>
-        	<li>Confirm that an error message is displayed about the incorrect schema version.</li>
-        	<li>Confirm that you are prompted to update the schema and confirm that regardless of 
-		your response, the UI is still in a good state.</li>
+        	<li>Confirm that an error message is displayed about the incorrect schema 
+		version.</li>
+        	<li>Confirm that you are prompted to update the schema and confirm that 
+		regardless of your response, the UI is still in a good state.</li>
         	<li>Confirm that an application trace is logged when you update the schema.</li>
-        	<li>Confirm that if you do not update the schema, only the following menu items are
-        	enabled:
+        	<li>Confirm that if you do not update the schema, only the following menu items 
+		are enabled:
         	<ul>
             		<li>Database &gt; Clear</li>
             		<li>Database &gt; Update database schema</li>
@@ -178,19 +179,20 @@
 
 <h2>FAM DB Admin Database Tab</h2>
 <ul>
-    	<li>Confirm that the Database tab contains edit boxes for <b>Database Server</b>, <b>Database 
-    	Name</b>, and <b>Connection Status</b>.</li>
+    	<li>Confirm that the Database tab contains edit boxes for <b>Database Server</b>, 
+	<b>Database Name</b>, and <b>Connection Status</b>.</li>
     	<li>Confirm that the three edit boxes are populated.</li>
-    	<li>Confirm that the <b>browse</b> buttons for Database Server and Database Name are disabled.</li>
+    	<li>Confirm that the <b>browse</b> buttons for Database Server and Database Name are 
+	disabled.</li>
     	<li>Confirm that the <b>Refresh</b> button for Connection Status is enabled.</li>
-    	<li>Confirm that menus are provided for <b>Database</b>, <b>Manage</b>, <b>Tools</b>, and
-    	<b>Help</b>.</li>
+    	<li>Confirm that menus are provided for <b>Database</b>, <b>Manage</b>, <b>Tools</b>, 
+	and <b>Help</b>.</li>
 </ul>
 
 <h2>FAM DB Admin Summary Tab</h2>
 <ul>
-    	<li>Confirm that the Summary tab contains an edit box for <b>Total number of files referenced
-    	in the database</b>.</li>
+    	<li>Confirm that the Summary tab contains an edit box for <b>Total number of files 
+	referenced in the database</b>.</li>
     	<li>Confirm that the Summary tab contains an associated button for <b>Refresh</b>.</li>
     	<li>Confirm that the Summary tab contains a grid for Actions and counts.</li>
     	<li>Confirm that columns are provided for <b>Action</b>, <b>Unattempted</b>, <b>Pending</b>,
@@ -218,12 +220,15 @@
     	<li>Confirm that right-clicking in a populated cell in the summary tab provides a context
     	menu.
     	<ul>
-        	<li>Confirm that <b>Manually set action status...</b> brings up the set action status 
-        	dialog with the scope prepopulated to include the files in the relevant cell.</li>
-        	<li>Confirm that <b>Export file list...</b> brings up the file list export dialog with 
-		the scope prepopulated to export a list of the files in the relevant cell.</li>
-        	<li>Confirm that <b>View exceptions for failed files...</b> brings up a temporary UEX 
-		log displaying the exceptions associated with failures for the relevant action.</li>
+        	<li>Confirm that <b>Manually set action status...</b> brings up the set action 
+		status dialog with the scope prepopulated to include the files in the relevant 
+		cell.</li>
+        	<li>Confirm that <b>Export file list...</b> brings up the file list export 
+		dialog with the scope prepopulated to export a list of the files in the 
+		relevant cell.</li>
+        	<li>Confirm that <b>View exceptions for failed files...</b> brings up a 
+		temporary UEX log displaying the exceptions associated with failures for 
+		the relevant action.</li>
     	</ul></li>
 <p>
    	<LI><b>[LegacyRC #6106]</b> Confirm that the <b>Unattempted</b> column on the 
@@ -290,9 +295,10 @@
 		<li>Modify database options to <b>Revert file status</b> after <b>5</b> minutes of 
 		inactivity.
         	<li>To put the database in a locked state, set the <b>File Action Manager</b> to 
-		Queue a large number of files. While files are being queued, kill the ProcessFiles.exe 
-		process from <b>Windows Task Manager</b>. This will add an entry to the <b>dbo.ActiveFAM</b> 
-		and <b>dbo.FAMSession</b> tables in the database.</li>
+		Queue a large number of files. While files are being queued, kill the 
+		ProcessFiles.exe process from <b>Windows Task Manager</b>. This will add an 
+		entry to the <b>dbo.ActiveFAM</b> and <b>dbo.FAMSession</b> tables in the 
+		database.</li>
         	<li>Confirm that successful login is possible when the database is locked.</li>
 		<li>Confirm that the database cannot be cleared while the database is locked.</li>
 		<li>Wait until the inactivity timeout has passed.
@@ -303,16 +309,18 @@
 <p> 
     	<li><b>Update database schema...</b>
     	<ul>
-        	<li>Confirm that the <b>Update database schema</b> menu item is enabled only when you are
-        	connected to a database with an out-of-date schema version.</li>
-        	<li>Confirm that when you select that menu item, the schema is updated appropriately.</li>
+        	<li>Confirm that the <b>Update database schema</b> menu item is enabled only 
+		when you are connected to a database with an out-of-date schema version.</li>
+        	<li>Confirm that when you select that menu item, the schema is updated 
+		appropriately.</li>
         	<li>Confirm that the schema will be updated for any 8.0 database or later.</li>
-        	<li>Confirm that appropriate error messages are seen attempting to update 5.0, 6.0, or 7.0
-        	databases.</li>
-        	<li>Confirm that an appropriate error message is seen attempting to update a database with
-        	a schema version that is higher than the current schema version.</li>
-        	<li>Confirm that all and only the components currently licensed are updated (i.e., confirm
-        	that product-specific tables are not affected by the schema updater).</li>
+        	<li>Confirm that appropriate error messages are seen attempting to update 5.0, 
+		6.0, or 7.0 databases.</li>
+        	<li>Confirm that an appropriate error message is seen attempting to update a 
+		database with a schema version that is higher than the current schema version.</li>
+        	<li>Confirm that all and only the components currently licensed are updated 
+		(i.e., confirm that product-specific tables are not affected by the schema 
+		updater).</li>
     	</ul></li>
 <p>
     	<li><b>Database options</b>
@@ -327,8 +335,8 @@
                 		<li>Automatically delete file action comments on completion</li>
                 		<li>Automatically revert locked files</li>                
             		</ul></li>
-            		<li>Confirm that there is a spin control for the number of minutes of inactivity 
-			after which to revert files.</li>
+            		<li>Confirm that there is a spin control for the number of minutes of 
+			inactivity after which to revert files.</li>
 			<ul>
 	            		<li>Confirm that the spin control has a minimum of <b>5</b> and a 
 				maximum of <b>1440</b>.</li>
@@ -341,13 +349,13 @@
                 		<li>Confirm that the spin control works correctly with large, small, 
 				and non-integer values.</li>
             		</ul></li>
-            		<li>Confirm that there is a spin control for <b>Minimum time between checking for
-            		files to process</b>.</li>
-            		<li>Confirm that there is a spin control for <b>Maximum time between checking for
-            		files to process</b>.</li>
+            		<li>Confirm that there is a spin control for <b>Minimum time between 
+			checking for files to process</b>.</li>
+            		<li>Confirm that there is a spin control for <b>Maximum time between 
+			checking for files to process</b>.</li>
             		<li>Confirm that both controls work as expected.</li>
-            		<li>Confirm that all settings are correctly propagated back to the <b>DBInfo</b>
-            		table.</li>
+            		<li>Confirm that all settings are correctly propagated back to the 
+			<b>DBInfo</b> table.</li>
   	   		<LI><b>[LegacyRC #6292]</b> Confirm that the FAM can process files when 
 			<b>auto-revert of stuck files</b> is disabled.
         	</ul></li>
@@ -370,39 +378,101 @@
                 		<li>Store database settings change history</li>
                 		<li>Store FTP event history</li>
             		</ul></li>
-            		<li>Confirm that all settings are correctly propagated back to the <b>DBInfo</b>
-            		table.</li>
+            		<li>Confirm that all settings are correctly propagated back to the 
+			<b>DBInfo</b> table.</li>
         	</ul></li>
         	<li><b>Security tab</b>
         	<ul>
             		<li>Confirm that there are checkboxes for:
             		<ul>
-                		<li>Require FAM database administrator password to process all skipped 
-				files.</li>
+                		<li>Require FAM database administrator password to process all 
+				skipped files.</li>
                 		<li>Require authentication to run.</li>
             		</ul></li>
-            		<li>Confirm that there is a list box with associated Add, Modify, and Remove 
-			buttons for <b>Skip authentication when running as a service on the following 
-            		machines:</b></li>
-            		<li>Confirm that all settings are correctly propagated back to the <b>DBInfo</b>
-            		table.</li>
+            		<li>Confirm that there is a list box with associated Add, Modify, and 
+			Remove buttons for <b>Skip authentication when running as a service 
+			on the following machines:</b></li>
+            		<li>Confirm that all settings are correctly propagated back to the 
+			<b>DBInfo</b> table.</li>
         	</ul></li>
         	<li><b>Product Specific tab</b>
         	<ul>
-            		<li>Confirm that items on this tab are shown if and only if they were licensed 
-			when the database was created.</li>
-            		<li>Confirm that the <b>ID Shield</b> group box contains a <b>Store ID Shield
-            		processing history</b> checkbox.</li>
+            		<li>Confirm that items on this tab are shown if and only if they were 
+			licensed when the database was created.</li>
+            		<li>Confirm that the <b>ID Shield</b> group box contains a <b>Store ID 
+			Shield processing history</b> checkbox.</li>
             		<li>Confirm that the <b>Data Entry</b> group box contains two checkboxes:
             		<ul>
                 		<li>Store data entry processing history</li>
                 		<li>Enable data entry counters</li>
             		</ul></li>
-            		<li>Confirm that all settings are correctly propagated back to the <b>DBInfo</b>
-            		table.</li>
+            		<li>Confirm that all settings are correctly propagated back to the 
+			<b>DBInfo</b> table.</li>
         	</ul></li>
-        	<li>Confirm that changes made in the Database options dialog are logged in Application
-        	Traces.</li>
+        	<li><b>Email tab</b>
+        	<ul>
+			<li>Confirm that the tab contains a <b>Server settings</b> group box.
+			<ul>
+				<li>Confirm presence of an <b>Outgoing mail (SMTP) server</b> 
+				edit box.
+				<li>Confirm presence of a <b>Port</b> edit box.
+				<li>Confirm presence of a <b>Requires authentication to send</b> 
+				check box.
+				<li>Confirm that the remaining controls are disabled unless the 
+				checkbox is checked.
+				<li>Confirm presence of a <b>User name</b> edit box.
+				<li>Confirm presence of a <b>Password</b> edit box.
+				<ul>
+					<li>Confirm that the password text is not displayed as 
+					clear text.
+				</ul>
+				<li>Confirm presence of a <b>Use SSL (must be supported by SMTP 
+				server)</b> check box.
+			</ul>
+			<li>Confirm that the tab contains a <b>Sender information</b> group box.
+			<ul>
+				<li>Confirm presence of a <b>Sender display name</b> edit box.
+				<li>Confirm presence of a <b>Sender email address</b> edit box.
+				<li>Confirm presence of an <b>Email signature</b> multi-line 
+				edit box.
+			</ul>
+			<li>Confirm presence of a <b>Send test email</b> button.
+			<ul>
+				<li>Confirm that the button is not enabled until all required 
+				settings have been provided.
+				<ul>
+					<li>Confirm that a <b>Possible Invalid Email</b> warning 
+					is displayed if the <b>Sender email address</b> field is 
+					not in a standard email address format.
+				</ul>
+				<li>Confirm that a <b>Send Test Email</b> dialog is displayed.
+				<li>Confirm that the dialog contains a <b>Please enter email 
+				addresses separated by ';'</b> edit box.
+				<li>Confirm that no test email is sent after clicking the 
+				<b>Cancel</b> button.
+				<li>Confirm that a test email is sent after clicking the 
+				<b>OK</b> button.
+				<li>Confirm that the test email can be sent to multiple 
+				recipients.
+				<li>Confirm that the test email includes the following settings:
+				<ul>
+					<li>Sender display name
+					<li>Sender email address
+					<li>Email signature
+				</ul>
+			</ul>
+			<li>Confirm that a <b>Possible Invalid Email</b> warning is displayed if 
+			the <b>Sender email address</b> field is not in a standard email address 
+			format.
+			<ul>
+				<li>Confirm that the invalid address can still be saved.
+			</ul>
+			<li>Confirm that the settings are persistent.
+			<li>Confirm that the settings are saved in the appropriate <b>DBInfo</b> 
+			fields.
+        	</ul></li>
+        	<li>Confirm that changes made in the Database options dialog are logged in 
+		Application Traces.</li>
         	<li>Confirm that all settings are correctly persisted.</li>
 <p>
   	   	<LI><b>[LegacyRC #6193]</b> Database Options
@@ -878,16 +948,16 @@
 <p>
 <h2>Help Menu</h2>
 <ul>
-    	<li>Confirm that <b>File Action Manager Help...</b>, and <b>About this application...</b> items
-    	exist in the menu.</li>
+    	<li>Confirm that <b>File Action Manager Help...</b>, and <b>About this application...</b> 
+	items exist in the menu.</li>
     	<li>Confirm that all menu items are enabled.</li>
 <p>
-    	<li>Confirm that clicking on <b>File Action Manager Help</b> displays the <b>FLEX Index</b> or
-    	<b>ID Shield</b> or <b>LabDE</b> help file.</li>
+    	<li>Confirm that clicking on <b>File Action Manager Help</b> displays the <b>FLEX 
+	Index</b> or <b>ID Shield</b> or <b>LabDE</b> help file.</li>
     	<li>Confirm that clicking on <b>About this application...</b> displays the <b>About 
     	FAMDBAdmin</b> dialog box.</li>
-    	<li>Confirm that the <b>About FAMDBAdmin</b> dialog box displays proper version number and
-    	copyright information.</li>
+    	<li>Confirm that the <b>About FAMDBAdmin</b> dialog box displays proper version number 
+	and copyright information.</li>
 </ul>
 <p>
 <h2>Select File Dialog - UI</h2>
@@ -983,50 +1053,81 @@
 		<li>Confirm that one or more selected conditions are deleted from the list.
 	</ul>
 <p>
-    	<li>Confirm that a group box exists for <b>Random subset selection</b>.</li>
-    	<li>Confirm that the group box contains a check box for <b>Further narrow the above selected
-    	scope of files to a random</b>.</li>
-    	<li>Confirm that a combo box exists allowing selection of <b>percent</b> or 
+    	<li>Confirm that a group box exists for <b>Subset selection</b>.</li>
+    	<li>Confirm that the group box contains a check box for <b>Further narrow the above 
+	selected scope of files to a</b>.</li>
+    	<li>Confirm that a combo box exists allowing selection of <b>a random</b> or 
+    	<b>the top</b> or <b>the bottom</b>. </li>
+    	<li>Confirm that another combo box exists allowing selection of <b>percent</b> or 
     	<b>files(s)</b>. </li>
-    	<li>Confirm that an associated edit box exists for definition of the percentage or count.</li>
+    	<li>Confirm that an associated edit box exists for definition of the percentage or 
+	count.</li>
     	<li>Confirm that the check box is always enabled.</li>
-    	<li>Confirm that the edit box and combo box are only enabled when the check box is checked.</li>
+    	<li>Confirm that the edit box and combo boxes are only enabled when the check box is 
+	checked.</li>
 </ul>
 <p>
 <h2>Select File Dialog - Functionality</h2>
 <ul>
-    	<li>Confirm that <b>All files referenced in the database</b> works as expected <b>without</b>
-    	random subset selection.</li>
-    	<li>Confirm that <b>All files referenced in the database</b> works as expected <b>with</b>
-    	random subset selection.</li>
+    	<li>Confirm that <b>All files referenced in the database</b> works as expected 
+	<b>without</b> subset selection.</li>
+    	<li>Confirm that <b>All files referenced in the database</b> works as expected 
+	with <b>random</b> subset selection.</li>
+    	<li>Confirm that <b>All files referenced in the database</b> works as expected 
+	with <b>the top</b> subset selection.</li>
+    	<li>Confirm that <b>All files referenced in the database</b> works as expected 
+	with <b>the bottom</b> subset selection.</li>
 <p>
-    	<li>Confirm that <b>All files for which</b> works as expected <b>without</b> random subset
+    	<li>Confirm that <b>All files for which</b> works as expected <b>without</b> subset
     	selection.</li>
-    	<li>Confirm that <b>All files for which</b> works as expected <b>with</b> random subset 
+    	<li>Confirm that <b>All files for which</b> works as expected with <b>random</b> subset 
     	selection.</li>
+    	<li>Confirm that <b>All files for which</b> works as expected with <b>the top</b> subset 
+    	selection.</li>
+    	<li>Confirm that <b>All files for which</b> works as expected with <b>the bottom</b> 
+	subset selection.</li>
 <p>
     	<li>Confirm that <b>All files associated with Any</b> works as expected <b>without</b> 
-	random subset selection.</li>
-    	<li>Confirm that <b>All files associated with Any</b> works as expected <b>with</b> random
-    	subset selection.</li>
-    	<li>Confirm that <b>All files associated with All</b> works as expected <b>without</b> random
-    	subset selection.</li>
-    	<li>Confirm that <b>All files associated with All</b> works as expected <b>with</b> random
-    	subset selection.</li>
-    	<li>Confirm that <b>All files associated with None</b> works as expected <b>without</b> random
-    	subset selection.</li>
-    	<li>Confirm that <b>All files associated with None</b> works as expected <b>with</b> random
-    	subset selection.</li>
+	subset selection.</li>
+    	<li>Confirm that <b>All files associated with Any</b> works as expected with 
+	<b>random</b> subset selection.</li>
+    	<li>Confirm that <b>All files associated with Any</b> works as expected with 
+	<b>the top</b> subset selection.</li>
+    	<li>Confirm that <b>All files associated with Any</b> works as expected with 
+	<b>the bottom</b> subset selection.</li>
+    	<li>Confirm that <b>All files associated with All</b> works as expected <b>without</b>     	subset selection.</li>
+    	<li>Confirm that <b>All files associated with All</b> works as expected with 
+	<b>random</b> subset selection.</li>
+    	<li>Confirm that <b>All files associated with All</b> works as expected with 
+	<b>the top</b> subset selection.</li>
+    	<li>Confirm that <b>All files associated with All</b> works as expected with 
+	<b>the bottom</b> subset selection.</li>
+    	<li>Confirm that <b>All files associated with None</b> works as expected <b>without</b> 
+	subset selection.</li>
+    	<li>Confirm that <b>All files associated with None</b> works as expected with 
+	<b>random</b> subset selection.</li>
+    	<li>Confirm that <b>All files associated with None</b> works as expected with 
+	<b>the top</b> subset selection.</li>
+    	<li>Confirm that <b>All files associated with None</b> works as expected with 
+	<b>the bottom</b> subset selection.</li>
 <p>
     	<li>Confirm that <b>All files that result from this SQL query</b> works as expected 
-    	<b>without</b> random subset selection.</li>
-    	<li>Confirm that <b>All files that result from this SQL query</b> works as expected <b>with</b>
-    	random subset selection.</li>
+    	<b>without</b> subset selection.</li>
+    	<li>Confirm that <b>All files that result from this SQL query</b> works as expected 
+	with <b>random</b> subset selection.</li>
+    	<li>Confirm that <b>All files that result from this SQL query</b> works as expected 
+	with <b>the top</b> subset selection.</li>
+    	<li>Confirm that <b>All files that result from this SQL query</b> works as expected 
+	with <b>the bottom</b> subset selection.</li>
 <p>
-    	<li>Confirm that <b>All files that have the file processing priority of</b> works as expected
-    	<b>without</b> random subset selection.</li>
-    	<li>Confirm that <b>All files that have the file processing priority of</b> works as expected
-    	<b>with</b> random subset selection.</li>
+    	<li>Confirm that <b>All files that have the file processing priority of</b> works as 
+	expected <b>without</b> subset selection.</li>
+    	<li>Confirm that <b>All files that have the file processing priority of</b> works as 
+	expected with <b>random</b> subset selection.</li>
+    	<li>Confirm that <b>All files that have the file processing priority of</b> works as 
+	expected with <b>the top</b> subset selection.</li>
+    	<li>Confirm that <b>All files that have the file processing priority of</b> works as 
+	expected with <b>the bottom</b> subset selection.</li>
 <p>
     	<li>Confirm that when a <b>percentage</b> from a large group is chosen, that the actual 
     	selected percentage is correct.</li>
