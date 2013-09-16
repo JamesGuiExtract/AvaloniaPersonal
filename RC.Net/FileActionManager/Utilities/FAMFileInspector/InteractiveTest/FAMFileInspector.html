@@ -226,6 +226,8 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 				<li>using a Random count
 				<li><b>[LegacyRC #6431]</b> using a Top percent
 				<li>using a Top count
+				<li><b>[LegacyRC #6475]</b> using a Bottom percent
+				<li><b>[LegacyRC #6475]</b> using a Bottom count
 			</ul>
 		</ul>
 		<li><b>Sorting Search Results</b>
@@ -475,6 +477,16 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			</ul>
         	</ul>
 <p>
+  	   	<LI><b>[DotNetRC #991, #992]</b> FAM File Inspector Search Options
+        	<ul>
+			<li>Inspect some files.
+			<li>Exercise the <b>Match case</b> option.
+			<li>Exercise the <b>Regular expression</b> option.
+			<li>Exercise the <b>Fuzzy search</b> option.
+			<li>Confirm that the <b>Regular expression</b> option and the 
+			<b>Fuzzy search</b> option are mutually exclusive.
+        	</ul>
+<p>
 		<li><b>[DotNetRC #993]</b> Database Schema Error
 		<ul>
 			<li>Inspect a database with an out-of-date schema.
@@ -636,15 +648,70 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			the Flag for each item.
         	</ul>
 <p>
-  	   	<LI><b>[DotNetRC #1097] NOT FIXED</b> FAM File Inspector Options
+  	   	<LI><b>[DotNetRC #1096]</b> FAM File Inspector Admin Mode
+        	<ul>
+			<li>Confirm that the <b>Database</b> menu includes an 
+			<b>Admin mode</b> option.
+			<ul>
+				<li>Confirm that the menu item is enabled if the utility 
+				is started from the command line.
+				<li>Confirm that the menu item is disabled if the utility 
+				is started from <b>DB Admin</b>.
+				<li>Confirm that the menu item is disabled if the utility 
+				is running in <b>Admin</b> mode.
+			</ul>
+			<li>Add one or more entries the <b>LaunchApp</b> table such 
+			that <b>AdminOnly</b> is False.
+			<li>Confirm that each of the entries is visible in the context 
+			menu when running in <b>Admin</b> mode and <b>non-Admin</b> mode.
+			<li>Modify a <b>LaunchApp</b> entry such that <b>AdminOnly</b> 
+			is True.
+			<li>Confirm that the entry is visible in the context menu when 
+			running in <b>Admin</b> mode.
+			<li>Confirm that the entry is not visible in the context menu when 
+			running in <b>non-Admin</b> mode.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1097, #1101, #1103]</b> FAM File Inspector Options
         	<ul>
 			<li>Confirm that the following command-line options are supported.
 			<ul>
-				<li>/DBServer &lt;ServerName&gt;
-				<li>/DBName &lt;DBName&gt;
+				<li>&lt;ServerName&gt;
+				<li>&lt;DBName&gt;
 				<li>/Action &lt;ActionName&gt;
 				<li>/Status &lt;ActionStatus&gt;
+				<li>/Query &lt;QueryFileName&gt;
+				<li>/filecount [top|bottom|random] &lt;count&gt;
 			</ul>
+			<li>Confirm that a meaningful error message is presented if 
+			an incorrect action name is used.
+			<li>Confirm that a meaningfule error message is presented if 
+			an incorrect status is used.
+			<li>Confirm that the parameter following <b>/query</b> is a 
+			fully-qualified path to a text file containing a SQL query.
+			<li>Confirm that a meaningful error message is presented if the 
+			query is not fully formed.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1098]</b> FAM File Inspector Copying Files and Data
+        	<ul>
+			<li>Confirm that the following context menu options are supported.
+			<ul>
+				<li>Copy filename(s)
+				<li>Copy file(s)
+				<li>Copy file(s) and data
+			</ul>
+			<li>Confirm that <b>Copy filename(s)</b> adds text information 
+			to the Clipboard such that the fully-qualified paths to each of the 
+			selected files can be pasted into a text document or an email 
+			message body.
+			<li>Confirm that <b>Copy file(s)</b> adds file-list information 
+			to the Clipboard such that copies of each of the selected files 
+			can be pasted into an Explorer window or as email attachments.
+			<li>Confirm that <b>Copy file(s) and data</b> adds file-list 
+			information to the Clipboard such that copies of each of the 
+			selected files along with associated USS, VOA, and XML files can 
+			be pasted into an Explorer window or as email attachments.
         	</ul>
   	</ul>
 </ol>
