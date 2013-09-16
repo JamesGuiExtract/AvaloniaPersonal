@@ -67,7 +67,7 @@ ObfuscateFiles:
 	@IF NOT EXIST "$(IDShieldOfficeInstallFilesRootDir)\StrongNameKey" @MKDIR "$(IDShieldOfficeInstallFilesRootDir)\StrongNameKey"
 	@COPY /V "$(RCNETDir)\Core\Code\ExtractInternalKey.snk" "$(IDShieldOfficeInstallFilesRootDir)\StrongNameKey"
 	@IF NOT EXIST "$(BinariesFolder)\Obfuscated" @MKDIR "$(BinariesFolder)\Obfuscated"
-	dotfuscator.exe  /in:+"$(BinariesFolder)\IDShieldOffice.exe" /mapout:"$(BinariesFolder)\Map\mapIDShieldOffice.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(IDShieldOfficeBuildDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:+"$(BinariesFolder)\IDShieldOffice.exe" /mapout:"$(BinariesFolder)\Map\mapIDShieldOffice.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(IDShieldOfficeBuildDir)\ObfuscateConfig.xml
 	
 EncryptRuleFiles: CopyFilesToBuildInstall
 	@ECHO Encrypting Rules files and copying to installation directory...
