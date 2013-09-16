@@ -1407,6 +1407,193 @@
             deleted.</lI>
         </ul></li>
 <p>
+	<li><b>Core: Send email</b></li>
+    	<ul>
+		<li>Confirm that the <b>Core: Send email</b> task is available 
+		with a <b>Server</b> license.
+		<li>Confirm that the <b>Core: Send email</b> task is available 
+		with a <b>Client</b> license.
+<p>
+  	   	<LI><b>User Interface</b>
+        	<ul>
+			<li>Confirm that the dialog caption is <b>Core: Send email 
+			settings</b>.
+			<li>Confirm that the dialog includes a <b>To</b> edit box.
+			<ul>
+				<li>Confirm presence of an associated <b>tag selector</b> 
+				button with the usual options.
+			</ul>
+			<li>Confirm that the dialog includes a <b>Cc</b> edit box.
+			<ul>
+				<li>Confirm presence of an associated <b>tag selector</b> 
+				button with the usual options.
+			</ul>
+			<li><b>[DotNetRC #1076] NOT IMPLEMENTED</b> Confirm that the 
+			dialog includes a <b>Bcc</b> edit box.
+			<li>Confirm that the dialog includes a <b>Subject</b> edit box.
+			<ul>
+				<li>Confirm presence of an associated <b>tag selector</b> 
+				button with the usual options available plus:
+				<ul>
+					<li>&lt;FPSFileName&gt;
+					<li>&lt;ActionName&gt;
+					<li>&lt;DatabaseName&gt;
+					<li>&lt;DatabaseServerName&gt;
+					<li>&lt;CommonComponentsDir&gt;
+				</ul>
+			</ul>
+			<li>Confirm that the dialog includes an <b>Attachments</b> button.
+			<ul>
+				<li>Confirm that the button label includes a number in 
+				parentheses that describes how many attachments have been 
+				defined.
+				<li>Confirm that clicking the <b>Attachments</b> button 
+				displays an <b>Core: Send email attachments</b> dialog.
+				<li>Confirm that the dialog includes an <b>Email 
+				attachments...</b> list.
+				<li>Confirm that the dialog contains a <b>tag selector</b> 
+				button with the usual options available.
+				<li>Confirm that the dialog contains a browse button.
+				<li>Confirm proper behavior of the browse button.
+				<li>Confirm that each attachment is individually saved in 
+				the list.
+				<li>Confirm that attachment filenames can be added via 
+				manual entry.
+				<li>Confirm that <b>OK</b> saves the Attachment settings.
+				<li>Confirm that <b>Cancel</b> retains the previous 
+				Attachment settings.
+				<li>Confirm that the settings are persistent.
+				<li><b>[DotNetRC #1075]</b> Clearing Attachments
+				<ul>
+					<li>Add several attachments.
+					<li>Select one attachment and press <b>DELETE</b> 
+					to remove it from the list.
+					<li>Press <b>DELETE</b> again and confirm that 
+					another attachment is removed from the list.
+				</ul>
+			</ul>
+			<li>Confirm that the dialog includes a multi-line edit box for 
+			the email body.
+			<li>Confirm that the dialog contains an associated <b>tag 
+			selector</b> button with the usual options available plus:
+			<ul>
+				<li>&lt;FPSFileName&gt;
+				<li>&lt;ActionName&gt;
+				<li>&lt;DatabaseName&gt;
+				<li>&lt;DatabaseServerName&gt;
+				<li>&lt;CommonComponentsDir&gt;
+			</ul>
+			<li>Confirm that the dialog includes an <b>Advanced...</b> 
+			button.
+			<ul>
+				<li>Confirm that clicking the <b>Advanced</b> button 
+				displays a <b>Core: Send email advanced settings</b> 
+				dialog.
+				<li>Confirm that the dialog contains a <b>VOA filename</b> 
+				edit box.
+				<li>Confirm that the default edit box value is 
+				<b>&lt;SourceDocName&gt;.voa</b>.
+				<li>Confirm that the dialog contains a <b>tag 
+				selector</b> button with the usual options available.
+				<li>Confirm that the dialog contains a browse button.
+				<li>Confirm proper behavior of the browse button.
+				<li>Confirm that the settings are persistent.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>Expandable Tags</b>
+        	<ul>
+			<li>Exercise the following tags and note proper results.
+			<ul>
+				<li>&lt;&lt;ActionName&gt; failed on $Env(COMPUTERNAME)&gt;
+				<li>&lt;SourceDocName&gt;
+				<li>&lt;Query&gt;&lt;Expression&gt;
+				'$DirOf(&lt;SourceDocName&gt;)'.ToUpper() 
+				&lt;/Expression&gt;&lt;/Query&gt;
+				<li>&lt;Query&gt;&lt;SQL&gt;<br>
+SELECT [ASCName], (SELECT [Meaning] FROM [ActionState] WHERE [ASC_From] = [Code]) + ' -> ' +<br>
+ (SELECT [Meaning] FROM [ActionState] WHERE [ASC_To] = [Code]), <br>
+ [DateTimeStamp], [MachineName], [UserName]<br>
+ FROM [FileActionStateTransition]<br>
+ INNER JOIN [FAMFile] ON [FileActionStateTransition].[FileID] = [FAMFile].[ID]<br>
+ INNER JOIN [Action] ON [FileActionStateTransition].[ActionID] = [Action].[ID]<br>
+ INNER JOIN [Machine] ON [FileActionStateTransition].[MachineID] = [Machine].[ID]<br>
+ INNER JOIN [FAMUser] ON [FileActionStateTransition].[FAMUserID] = [FAMUser].[ID]<br>
+ WHERE [FileName] = &lt;SourceDocName/&gt; <br>
+UNION <br>
+SELECT [ASCName], 'Queued', [DateTimeStamp], [MachineName], [UserName]<br>
+ FROM [QueueEvent]<br>
+ INNER JOIN [FAMFile] ON [QueueEvent].[FileID] = [FAMFile].[ID]<br>
+ INNER JOIN [Action] ON [QueueEvent].[ActionID] = [Action].[ID]<br>
+ INNER JOIN [Machine] ON [QueueEvent].[MachineID] = [Machine].[ID]<br>
+ INNER JOIN [FAMUser] ON [QueueEvent].[FAMUserID] = [FAMUser].[ID]<br>
+ WHERE [FileName] = &lt;SourceDocName/&gt; <br>
+ORDER BY DateTimeStamp<br>
+				&lt;/SQL&gt;&lt;/Query&gt;
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>Query Expressions</b>
+        	<ul>
+			<li>Exercise the following (or similar) queries against suitable 
+			VOA files.
+			<ul>
+				<li>&lt;/MCData&gt;
+				<li>&lt;/hcdata&gt;
+				<li>&lt;Query&gt;&lt;Attribute&gt;*@SSN 
+				&lt;/Attribute&gt;&lt;/Query&gt;
+				<li>&lt;/ReturnAddress/City&gt;
+			</ul>
+			<li><b>[DotNetRC #1084]</b> Bad Query
+			<ul>
+				<li>Create and exercise a collection of queries that 
+				includes at least one invalid query.
+				<li>Confirm that subsequent queries are correctly 
+				expanded and evaluated.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>DBInfo Table</b>
+        	<ul>
+			<li>Confirm that the <b>DBInfo</b> table includes the following 
+			fields.
+			<ul>
+				<li>EmailPassword
+				<ul>
+					<li>Confirm that the password is <b>not</b> saved 
+					as clear text.
+				</ul>
+				<li>EmailPort
+				<li>EmailSenderAddress
+				<li>EmailSenderName
+				<li>EmailServer
+				<li>EmailSignature
+				<li>EmailTimeout
+				<li>EmailUsername
+				<ul>
+					<li>Confirm that the user name is <b>not</b> saved 
+					as clear text.
+				</ul>
+				<li>EmailUseSSL
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>Miscellaneous</b>
+        	<ul>
+            		<li>Use <b>SQL Management Studio</b> to clear any existing 
+			<b>email settings</b> from the <b>DBInfo</b> table.
+			<li>Create an FPS file and configure a <b>Core: Send email</b> 
+			task.
+			<li>Save the FPS file.
+			<li>Confirm that a warning message is displayed telling the 
+			user that email settings need to be configured.
+			<ul>
+				<li>Confirm that the warning also indicates how the 
+				settings can be saved.
+			</ul>
+        	</ul>
+    	</ul>
+<p>
         <li><b>Core: Set file action status in database</b>
         <ul> 
             <li>Use the Add button to select <b>Core: Set file-action status in database</b> as
