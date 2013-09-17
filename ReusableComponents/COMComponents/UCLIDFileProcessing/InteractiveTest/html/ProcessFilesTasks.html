@@ -1530,6 +1530,14 @@ SELECT [ASCName], 'Queued', [DateTimeStamp], [MachineName], [UserName]<br>
  WHERE [FileName] = &lt;SourceDocName/&gt; <br>
 ORDER BY DateTimeStamp<br>
 				&lt;/SQL&gt;&lt;/Query&gt;
+<p>
+				<li>Note that the simple query requires the single quotes 
+				and requires the angle brackets to be encoded.
+				<li>Note that the complex query requires the two 
+				<b>&lt;SourceDocName/&gt;</b> items to have actual angle 
+				brackets in the text.  The greater-than symbol on the first 
+				line must be encoded.  Whitespace must be provided after 
+				the first <b>&lt;SourceDocName/&gt;</b>.
 			</ul>
         	</ul>
 <p>
