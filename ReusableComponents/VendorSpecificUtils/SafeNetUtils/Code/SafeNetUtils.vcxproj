@@ -184,6 +184,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SafeNetErr.h" />
     <ClInclude Include="SafeNetLicenseCfg.h" />
     <ClInclude Include="SafeNetLicenseMgr.h" />
@@ -208,6 +209,9 @@
       <Project>{7f591058-6dc9-4787-ae25-5a45ae78e3fa}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SafeNetUtils.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

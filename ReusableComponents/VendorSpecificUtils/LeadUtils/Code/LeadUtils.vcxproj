@@ -195,6 +195,7 @@
     <ClInclude Include="LineRect.h" />
     <ClInclude Include="MiscLeadUtils.h" />
     <ClInclude Include="PasteImage.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -206,6 +207,9 @@
       <Project>{6fa06b83-ac26-49b7-8138-9342792eacc4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="LeadUtils.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

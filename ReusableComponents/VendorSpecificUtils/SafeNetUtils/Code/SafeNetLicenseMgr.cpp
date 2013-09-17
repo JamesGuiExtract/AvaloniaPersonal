@@ -65,17 +65,12 @@ DataCell gdcellFlexPaginationCounter(k32BitDataCell, SP_PAGINATIONCOUNTER_INTEGE
 DataCell gdcellIDShieldRedactionCounter(k32BitDataCell, SP_REDACTIONCOUNTER_INTEGER, SP_FLEXCOUNTERLOCK_INTEGER, "Redaction");
 DataCell gdcellCounterIncrementAmount(k32BitDataCell, SP_COUNTERINCAMOUNT_INTEGER, SP_FLEXCOUNTERLOCK_INTEGER, "Counter");
 DataCell gdcellCounterToIncrement(k16BitDataCell, SP_COUNTERTOINCREMENT_INTEGER, SP_FLEXCOUNTERLOCK_INTEGER, "Increment");
-DataCell gdcellIcoMapUserLimit(k16BitDataCell, SP_ICOMAP_FULLLICENSE_USER_LIMIT, 0, "IcoMap User Limit");
-DataCell gdcellFlexIndexUserLimit(k16BitDataCell, SP_FLEXINDEX_FULLLICENSE_USER_LIMIT, 0, "IcoMap User Limit");
+DataCell gdcellFlexIndexUserLimit(k16BitDataCell, SP_FLEXINDEX_FULLLICENSE_USER_LIMIT, 0, "FlexIndex User Limit");
 
 
 USBLicense gusblFlexIndex(SP_FLEXINDEX_FULLLICENSE, SP_FLEXINDEX_FULLLICENSE_USER_LIMIT, 
 							(unsigned char *)QUERY_SP_FLEXINDEX_FULLLICENSE, 
 							(unsigned char *)RESPONSE_SP_FLEXINDEX_FULLLICENSE, SP_NUM_OF_QR);
-USBLicense gusblIcoMap(SP_ICOMAP_FULLLICENSE, SP_ICOMAP_FULLLICENSE_USER_LIMIT, 
-							(unsigned char *)QUERY_SP_ICOMAP_FULLLICENSE, 
-							(unsigned char *)RESPONSE_SP_ICOMAP_FULLLICENSE, SP_NUM_OF_QR);
-
 
 // Only used internally
 DataCell gdcellSerialNumber(k32BitDataCell, SP_SERIAL_NUMBER_INTEGER, SP_FLEXCOUNTERLOCK_INTEGER, "SerialNumber");
@@ -551,17 +546,9 @@ void SafeNetLicenseMgr::getLicense()
 							throw ue;
 						}
 
-						// If IcoMap license check for terminal services and if Flex turn it off
-						if ( gusblIcoMap.m_dwLicenseAddr == m_rusblLicense.m_dwLicenseAddr)
-						{
-							// Turn on the check for terminal services
-							spsStatus = SFNTsntlCheckTerminalservice(&m_Packet, SP_TERM_SERV_CHECK_ON);
-						}
-						else
-						{
-							// Turn off the check for terminal services
-							spsStatus = SFNTsntlCheckTerminalservice(&m_Packet, SP_TERM_SERV_CHECK_OFF);
-						}
+
+						// Turn off the check for terminal services
+						spsStatus = SFNTsntlCheckTerminalservice(&m_Packet, SP_TERM_SERV_CHECK_OFF);
 
 						// 		#define SP_STANDALONE_MODE     "SP_STANDALONE_MODE"
 						//		#define SP_DRIVER_MODE         "SP_DRIVER_MODE"

@@ -185,6 +185,10 @@ begin
     DeleteDir( StartMenuFolder ^ "Programs\\Extract Systems Flex Index RDT", ALLCONTENTS); 
     DeleteDir( StartMenuFolder ^ "Programs\\Extract Systems ID Shield", ALLCONTENTS); 
     
+    // Delete all remaining dlls and exes from the CommonComponents folder
+    DeleteFile(PROGRAMFILES ^ "Extract Systems\\CommonComponents\\*.dll");
+    DeleteFile(PROGRAMFILES ^ "Extract Systems\\CommonComponents\\*.exe");
+    
     //if ( BATCH_INSTALL ) then
     //	SdFinishReboot ( szTitle , szMsg1 , SYS_BOOTMACHINE , szMsg2 , 0 );
     //else

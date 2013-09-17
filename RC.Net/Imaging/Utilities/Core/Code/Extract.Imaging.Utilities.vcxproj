@@ -141,6 +141,7 @@
     <ClCompile Include="UnlockLeadtools.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="UnlockLeadtools.h" />
   </ItemGroup>
@@ -159,6 +160,9 @@
     <ProjectReference Include="..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212e31d9-5f02-43aa-8625-bcb86b15cf8f}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Extract.Imaging.Utilities.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
