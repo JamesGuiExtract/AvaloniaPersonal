@@ -39,10 +39,11 @@ namespace Extract.DataEntry
                 string expandedQuery = containsPossiblePathTag ?
                     AttributeStatusInfo.PathTags.Expand(QueryText) : QueryText;
 
-                // Treat separate lines as separate values.
-                string[] parsedQuery =
-                    expandedQuery.Split(new string[] { Environment.NewLine },
-                    StringSplitOptions.RemoveEmptyEntries);
+                // Treat separate lines as separate values unless TreatNewLinesAsWhiteSpace is true.
+                string[] parsedQuery = TreatNewLinesAsWhiteSpace
+                    ? new[] { expandedQuery }
+                    : expandedQuery.Split(new string[] { Environment.NewLine },
+                        StringSplitOptions.RemoveEmptyEntries);
 
                 return new QueryResult(this, parsedQuery);
             }

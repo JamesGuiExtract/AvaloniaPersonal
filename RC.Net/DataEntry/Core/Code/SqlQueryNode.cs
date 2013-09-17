@@ -62,6 +62,14 @@ namespace Extract.DataEntry
         {
             try
             {
+                // [DataEntry:1236]
+                // By default, multiple lines from a Composite query will be treated as separate
+                // results; when those results are subsequently combined before evaluation, there
+                // will be no whitespace where the carriage return was. Since it can be assumed that
+                // literal newline chars are not intended to delineate multiple results for an SQL
+                // query, allow newline chars to be treated as liternal newline chars.
+                TreatNewLinesAsWhiteSpace = true;
+
                 // If the connection has changed since the last SqlQueryNode was created, the static
                 // cache needs to be cleared.
                 if (_lastDBConnection != dbConnection)

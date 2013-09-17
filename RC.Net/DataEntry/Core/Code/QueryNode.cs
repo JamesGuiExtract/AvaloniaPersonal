@@ -605,6 +605,19 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Indicates whether new line characters in literal text should be treated as delimiters
+        /// between returned results or as literal whitespace.
+        /// </summary>
+        /// <value><see langword="true"/> to treat new line characters as literal whitespace;
+        /// <see langword="false"/> to treat new line charaters are delimeters between returned
+        /// results.</value>
+        public bool TreatNewLinesAsWhiteSpace
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Evaluates the query.
         /// </summary>
         /// <returns>A <see cref="QueryResult"/> representing the result of the query.</returns>

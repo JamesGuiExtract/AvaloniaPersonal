@@ -46,6 +46,13 @@ namespace Extract.DataEntry
         public ExpressionQueryNode(IAttribute rootAttribute, DbConnection dbConnection)
             : base(rootAttribute, dbConnection)
         {
+            // [DataEntry:1236]
+            // By default, multiple lines from a Composite query will be treated as separate
+            // results; when those results are subsequently combined before evaluation, there
+            // will be no whitespace where the carriage return was. Since it can be assumed that
+            // literal newline chars are not intended to delineate multiple results for an
+            // expression, allow newline chars to be treated as liternal newline chars.
+            TreatNewLinesAsWhiteSpace = true;
         }
 
         #endregion Constructors

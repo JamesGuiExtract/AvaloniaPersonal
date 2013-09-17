@@ -256,6 +256,13 @@ namespace Extract.DataEntry
                     {
                         if (compositeNamedQuery != null)
                         {
+                            // [DataEntry:1238]
+                            // The referencing query may have already been evaluated without the
+                            // reference having yet been hooked up. Ensure the referencingQuery is
+                            // initialized using the current value of referencedQuery.
+                            referencingQuery.HandleQueryValueModified(
+                                referencedQuery, new QueryValueModifiedEventArgs(false));
+
                             compositeNamedQuery.QueryValueModified +=
                                 referencingQuery.HandleQueryValueModified;
                         }
@@ -452,7 +459,11 @@ namespace Extract.DataEntry
                     // If the node is text, initialize a LiteralQueryNode node.
                     if (childNode.NodeType == XmlNodeType.Text)
                     {
-                        ChildNodes.Add(new LiteralQueryNode(childNode.InnerText));
+                        // Any literal text nodes should respect this node's
+                        // TreatNewLinesAsWhiteSpace setting.
+                        QueryNode childQueryNode = new LiteralQueryNode(childNode.InnerText);
+                        childQueryNode.TreatNewLinesAsWhiteSpace = TreatNewLinesAsWhiteSpace;
+                        ChildNodes.Add(childQueryNode);
                     }
                     else if (childNode.NodeType == XmlNodeType.Element)
                     {
@@ -585,11 +596,21 @@ namespace Extract.DataEntry
                     }
                 }
 
+                // [DataEntry:1225]
+                // If there is a single result that is the combination of multiple child nodes, and
+                // at least one of the child nodes is using the distinct selection mode, combine the
+                // results from the result set as a single result. This prevents a query that
+                // returns distinct results from behaving differently when there is only one
+                // result set versus multiple.
+                bool flatternDistinctResult = resultList.Count == 1 && ChildNodes.Count > 1 &&
+                    ChildNodes.Any(node => node.SelectionMode == MultipleQueryResultSelectionMode.Distinct);
+                    
                 // The resultList may contain > 1 results if the selection mode of any QueryNode was
                 // distinct. (Note each result may contain multiple values).
-                // If there is more than 1 result, discard any saptial or attribute values and
-                // instead convert each result into a simple string.
-                QueryResult result = (resultList.Count == 1)
+                // If there is more than 1 result or the result is to be handled as a single distinct
+                // result, discard any spatial or attribute values and instead convert each result
+                // into a simple string.
+                QueryResult result = (resultList.Count == 1 && !flatternDistinctResult)
                     ? resultList.First()
                     : new QueryResult(this, resultList
                         .Select(distinctResult => distinctResult.ToString()).ToArray());

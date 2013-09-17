@@ -1,3 +1,8 @@
+// Enable to test performance. Use with a config file that sets PreventSave to True.
+// When enabled, the UI will automatically move to the next document after each is loaded.
+// When processing stops and the UI is closed, it will log an exception with total run time.
+//#define PERFORMANCE_TESTING
+
 using Extract.Database;
 using Extract.Drawing;
 using Extract.Imaging;
@@ -583,12 +588,6 @@ namespace Extract.DataEntry
         Size _lastManualZoomSize;
 
         /// <summary>
-        /// The size of the visible image region (in image coordinates) the last time the view
-        /// was zoomed to the current selection either via the F2 shortcut or the auto-zoom mode.
-        /// </summary>
-        Size _lastZoomToSelectionSize;
-
-        /// <summary>
         /// Indicates whether the image viewer is currently being zoomed automatically per AutoZoom
         /// settings or by programmatically changing pages.
         /// </summary>
@@ -596,7 +595,7 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Indicates whether the view is currently zoomed to the current selection either via the
-        /// F2 shortcut or the auto-zoom mode.
+        /// F6 shortcut or the auto-zoom mode.
         /// </summary>
         bool _zoomedToSelection;
 
@@ -698,6 +697,13 @@ namespace Extract.DataEntry
         /// Indicates whether the form as been loaded.
         /// </summary>
         bool _isLoaded;
+
+#if PERFORMANCE_TESTING
+        /// <summary>
+        /// Keeps track of the start time when measuring performance.
+        /// </summary>
+        DateTime? _performanceTestingStartTime;
+#endif
 
         #endregion Fields
 
@@ -1683,6 +1689,11 @@ namespace Extract.DataEntry
                     // ImageFileChanged event is complete. Use BeginInvoke to schedule
                     // FinalizeDocumentLoad at the end of the current message queue.
                     this.SafeBeginInvoke("ELI34448", () => FinalizeDocumentLoad());
+
+// If testing performance, send the shortcut key to save as soon as each document is loaded.
+#if PERFORMANCE_TESTING
+                    ExecuteOnIdle("ELI36156", () => SendKeys.Send("^s"));
+#endif
                 }
             }
             catch (Exception ex)
@@ -2231,18 +2242,32 @@ namespace Extract.DataEntry
                     {
                         Rectangle currentViewRegion = _imageViewer.GetTransformedRectangle(
                             _imageViewer.GetVisibleImageArea(), true);
+                        Rectangle selectionViewRegion;
+                        _selectionBounds.TryGetValue(_imageViewer.PageNumber, out selectionViewRegion);
 
                         if (_selectionBounds.Count > 0 &&
-                            (!_selectionBounds.Keys.Contains(_imageViewer.PageNumber) ||
-                             !currentViewRegion.Contains(_selectionBounds[_imageViewer.PageNumber])))
+                            (selectionViewRegion == null || !currentViewRegion.Contains(selectionViewRegion)))
                         {
                             _zoomedToSelection = false;
                         }
                         else
                         {
+                            if (_lastNonZoomedToSelectionViewArea.HasValue)
+                            {
+                                // Ensure an F6 toggle out of auto-zoom will always zoom out at
+                                // least 5% compared to the current auto-zoom level.
+                                var intersection = Rectangle.Intersect(
+                                    _lastNonZoomedToSelectionViewArea.Value, currentViewRegion);
+                                Size lastSize = _lastNonZoomedToSelectionViewArea.Value.Size;
+                                if ((((double)lastSize.Width / (double)currentViewRegion.Width) < 1.05) &&
+                                    (((double)lastSize.Height / (double)currentViewRegion.Height) < 1.05))
+                                {
+                                    return;
+                                }
+                            }
+                            else
                             // If _lastNonZoomedToSelectionViewArea has not yet been set, default to
                             // zooming out to the full page.
-                            if (!_lastNonZoomedToSelectionViewArea.HasValue)
                             {
                                 _lastNonZoomedToSelectionViewArea = new Rectangle(0, 0,
                                     _imageViewer.ImageWidth, _imageViewer.ImageHeight);
@@ -2252,12 +2277,31 @@ namespace Extract.DataEntry
                             // and there is a _lastNonZoomedToSelectionViewArea, restore the view
                             // area to _lastNonZoomedToSelectionViewArea.
                             _performingProgrammaticZoom = true;
+                            
+                            // [DataEntry:1187]
+                            // If the current field will not visible after restoring
+                            // _lastNonZoomedToSelectionViewArea, center
+                            // _lastNonZoomedToSelectionViewArea on the selected field first.
+                            if (!_lastNonZoomedToSelectionViewArea.Value.Contains(selectionViewRegion))
+                            {
+                                Size size = _lastNonZoomedToSelectionViewArea.Value.Size;
+                                Point location = new Point(
+                                    selectionViewRegion.X +
+                                        ((selectionViewRegion.Width - size.Width) / 2),
+                                    selectionViewRegion.Y +
+                                        ((selectionViewRegion.Height - size.Height) / 2));
+
+                                _lastNonZoomedToSelectionViewArea = new Rectangle(location, size);
+                            }
+
                             Rectangle viewRegion =
                                 _imageViewer.GetTransformedRectangle(
                                     _lastNonZoomedToSelectionViewArea.Value, false);
+
                             _imageViewer.ZoomToRectangle(viewRegion);
 
-                            // If there was a fit mode in effect before the zoom to selection, restore it as well.
+                            // If there was a fit mode in effect before the zoom to selection,
+                            // restore it as well.
                             if (_lastNonZoomedToSelectionFitMode.HasValue)
                             {
                                 _imageViewer.FitMode = _lastNonZoomedToSelectionFitMode.Value;
@@ -2498,6 +2542,14 @@ namespace Extract.DataEntry
 
                 if (!_inDesignMode)
                 {
+// If testing performance, record the start time when the form is loaded.
+#if PERFORMANCE_TESTING
+                    if (!_performanceTestingStartTime.HasValue)
+                    {
+                        _performanceTestingStartTime = DateTime.Now;
+                    }
+#endif
+
                     ExtractException.Assert("ELI30678", "Application data not initialized.",
                         _dataEntryApp != null);
 
@@ -2583,6 +2635,25 @@ namespace Extract.DataEntry
 
             _regainingFocus = true;
         }
+
+// If testing performance, when the verification UI is hidden (closed), record the total run time.
+#if PERFORMANCE_TESTING
+        /// <summary>
+        /// Raises the <see cref="Control.VisibleChanged"/> event.
+        /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
+        protected override void OnVisibleChanged(EventArgs e)
+        {
+            base.OnVisibleChanged(e);
+
+            if (!Visible && _performanceTestingStartTime.HasValue)
+            {
+                new ExtractException("ELI36157", "TotalTime: " +
+                    (DateTime.Now - _performanceTestingStartTime.Value).ToString("g")).Log();
+                _performanceTestingStartTime = null;
+            }
+        }
+#endif
 
         /// <summary> 
         /// Clean up any resources being used.
@@ -3739,14 +3810,8 @@ namespace Extract.DataEntry
                         _lastManualZoomSize = zoomSize;
                         _zoomedToSelection = false;
                         _manuallyZoomedToSelection = false;
-
-                        // Ensure an F2 toggle out of auto-zoom will always zoom out compared to the
-                        // last auto-zoom level.
-                        if (zoomSize.Width > _lastZoomToSelectionSize.Width)
-                        {
-                            _lastNonZoomedToSelectionViewArea = viewArea;
-                            _lastNonZoomedToSelectionFitMode = _imageViewer.FitMode;
-                        }
+                        _lastNonZoomedToSelectionViewArea = viewArea;
+                        _lastNonZoomedToSelectionFitMode = _imageViewer.FitMode;
                     }
                 }
             }
@@ -3774,14 +3839,8 @@ namespace Extract.DataEntry
                     Rectangle viewArea = _imageViewer.GetTransformedRectangle(
                         _imageViewer.GetVisibleImageArea(), true);
                     _lastManualZoomSize = viewArea.Size;
-
-                    // Ensure an F2 toggle out of auto-zoom will always zoom out compared to the
-                    // last auto-zoom level.
-                    if (viewArea.Size.Width > _lastZoomToSelectionSize.Width)
-                    {
-                        _lastNonZoomedToSelectionViewArea = viewArea;
-                        _lastNonZoomedToSelectionFitMode = _imageViewer.FitMode;
-                    }
+                    _lastNonZoomedToSelectionViewArea = viewArea;
+                    _lastNonZoomedToSelectionFitMode = _imageViewer.FitMode;
                 }
             }
             catch (Exception ex)
@@ -5235,7 +5294,7 @@ namespace Extract.DataEntry
                 if (newViewRegion != currentViewRegion || xPadAmount != 0 || yPadAmount != 0)
                 {
                     // Update the zoomed-to-selection state variables.
-                    _zoomedToSelection = (autoZoomMode != AutoZoomMode.NoZoom);
+                    _zoomedToSelection = (autoZoomMode == AutoZoomMode.AutoZoom);
                     _manuallyZoomedToSelection = forceZoomToSelection || (_zoomedToSelection && _manuallyZoomedToSelection);
                     if (_zoomedToSelection)
                     {
@@ -5249,8 +5308,6 @@ namespace Extract.DataEntry
                         // Apply the padding.
                         Rectangle transformedViewRegion = _imageViewer.PadViewingRectangle(
                             newViewRegion, xPadAmount, yPadAmount, true);
-
-                        _lastZoomToSelectionSize = newViewRegion.Size;
 
                         // Translate the image coordinates into client coordinates.
                         transformedViewRegion =

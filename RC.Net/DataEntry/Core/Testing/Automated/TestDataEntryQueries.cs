@@ -173,6 +173,39 @@ namespace Extract.DataEntry.Test
         }
 
         /// <summary>
+        /// Tests that the <see cref="AttributeQueryNode"/> can use a relative query.
+        /// <para><b>Tests</b></para>
+        /// DataEntry:1238
+        /// </summary>
+        [Test, Category("AttributeQueryNode")]
+        public static void TestAttributeRelativeQuery()
+        {
+            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
+
+            string xml = "<Attribute SelectionMode='First' Exclude='True' Name='Sale'>/Wagon/Sale</Attribute>\r\n" +
+                "<Attribute Root='Sale'>Customer</Attribute>\r\n" +
+                "<Attribute Root='Sale'>DateTime</Attribute>\r\n" +
+                "<Attribute Root='Sale'>Price</Attribute>\r\n" +
+                "<Attribute Root='Sale'>../Specs/Weight</Attribute>\r\n" +
+                "<Attribute Root='Sale'>../Specs/Height</Attribute>\r\n" +
+                "<Attribute Root='Sale'>../Specs/Width</Attribute>\r\n" +
+                "<Attribute Root='Sale'>../Specs/Length</Attribute>\r\n";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 7);
+            Assert.That(results[0].ToString() == "Bob");
+            Assert.That(results[1].ToString() == "2/6/2012 12:01:00");
+            Assert.That(results[2].ToString() == "$39.99");
+            Assert.That(results[3].ToString() == "12lb 6oz");
+            Assert.That(results[4].ToString() == "18in");
+            Assert.That(results[5].ToString() == "23in");
+            Assert.That(results[6].ToString() == "3ft 2in");
+        }
+
+        /// <summary>
         /// Tests the SpatialField attribute.
         /// </summary>
         [Test, Category("AttributeQueryNode")]
@@ -781,36 +814,38 @@ namespace Extract.DataEntry.Test
         /// <summary>
         /// A test to find missing AKA values using a variety of query features.
         /// </summary>
+        /// <para><b>Tests</b></para>
+        /// DataEntry:1263
         [Test, Category("Composite")]
         public static void TestCompositeFindMissingAlternateTestNames()
         {
             string sourceDocName = _testImages.GetFile(_LABDE_DATA_FILE);
             LoadDataFile(sourceDocName, null);
 
-            string xml = @"<SQL>" +
-                        @"SELECT VOAFileData.* FROM " +
-                        @"(" +
-                            @"<Composite Parameterize='false' StringList=' UNION '> " +
-                                @"SELECT " +
-                                    @"'<Attribute SelectionMode='Distinct' Name='OriginalName'>Test/Component/OriginalName</Attribute>' AS OriginalName, " +
-                                    @"'<Attribute Root='OriginalName'>../TestCode</Attribute>' AS TestCode, " +
-                                    @"'<SourceDocName/>' AS SourceDocName, " +
-                                    @"'<OriginalName SpatialField='Page'/>' AS Page, " +
-                                    @"'<OriginalName SpatialField='StartX'/>' AS StartX, " +
-                                    @"'<OriginalName SpatialField='StartY'/>' AS StartY, " +
-                                    @"'<OriginalName SpatialField='EndX'/>' AS EndX, " +
-                                    @"'<OriginalName SpatialField='EndY'/>' AS EndY, " +
-                                    @"'<OriginalName SpatialField='Height'/>' AS Height " +
-                            @"</Composite> " +
-                        @") AS VOAFileData " +
-                        @"INNER JOIN LabOrderTest ON LabOrderTest.TestCode = VOAFileData.TestCode " +
-                        @"INNER JOIN LabTest ON LabTest.TestCode = VOAFileData.TestCode " +
-                        @"WHERE LabTest.OfficialName &lt;&gt; VOAFileData.OriginalName " +
-                        @"AND LabOrderTest.TestCode &lt;&gt; VOAFileData.OriginalName " +
-                        @"AND NOT VOAFileData.OriginalName IN " +
-                        @"( " +
-                            @"SELECT [Name] FROM AlternateTestName WHERE TestCode = VOAFileData.TestCode " +
-                        @") " +
+            string xml = @"<SQL>" + Environment.NewLine +
+                        @"SELECT VOAFileData.* FROM" + Environment.NewLine +
+                        @"(" + Environment.NewLine +
+                            @"<Composite Parameterize='false' StringList=' UNION '>" + Environment.NewLine +
+                                @"SELECT" + Environment.NewLine +
+                                    @"'<Attribute SelectionMode='Distinct' Name='OriginalName'>Test/Component/OriginalName</Attribute>' AS OriginalName," + Environment.NewLine +
+                                    @"'<Attribute Root='OriginalName'>../TestCode</Attribute>' AS TestCode," + Environment.NewLine +
+                                    @"'<SourceDocName/>' AS SourceDocName," + Environment.NewLine +
+                                    @"'<OriginalName SpatialField='Page'/>' AS Page," + Environment.NewLine +
+                                    @"'<OriginalName SpatialField='StartX'/>' AS StartX," + Environment.NewLine +
+                                    @"'<OriginalName SpatialField='StartY'/>' AS StartY," + Environment.NewLine +
+                                    @"'<OriginalName SpatialField='EndX'/>' AS EndX," + Environment.NewLine +
+                                    @"'<OriginalName SpatialField='EndY'/>' AS EndY," + Environment.NewLine +
+                                    @"'<OriginalName SpatialField='Height'/>' AS Height" + Environment.NewLine +
+                            @"</Composite>" + Environment.NewLine +
+                        @") AS VOAFileData" + Environment.NewLine +
+                        @"INNER JOIN LabOrderTest ON LabOrderTest.TestCode = VOAFileData.TestCode" + Environment.NewLine +
+                        @"INNER JOIN LabTest ON LabTest.TestCode = VOAFileData.TestCode" + Environment.NewLine +
+                        @"WHERE LabTest.OfficialName &lt;&gt; VOAFileData.OriginalName" + Environment.NewLine +
+                        @"AND LabOrderTest.TestCode &lt;&gt; VOAFileData.OriginalName" + Environment.NewLine +
+                        @"AND NOT VOAFileData.OriginalName IN" + Environment.NewLine +
+                        @"(" + Environment.NewLine +
+                            @"SELECT [Name] FROM AlternateTestName WHERE TestCode = VOAFileData.TestCode" + Environment.NewLine +
+                        @")" + Environment.NewLine +
                         @"</SQL>";
 
             using (DbConnection dbConnection =
@@ -1066,6 +1101,30 @@ namespace Extract.DataEntry.Test
             Assert.That(results[1].ToString() == "A2");
             Assert.That(results[2].ToString() == "B1");
             Assert.That(results[3].ToString() == "B2");
+        }
+
+        /// <summary>
+        /// A test of how results combine based on the selection mode.
+        /// <para><b>Tests</b></para>
+        /// DataEntry:1225
+        /// </summary>
+        [Test, Category("SelectionMode")]
+        public static void TestSingleDistinct()
+        {
+            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
+
+            string xml = "A\r\n" +
+                        "<Composite SelectionMode='Distinct'>\r\n" +
+                        "1\r\n" +
+                        "</Composite>\r\n" +
+                        "B\r\n";
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, null);
+
+            string[] results = query.Evaluate().ToStringArray();
+
+            Assert.That(results.Length == 1);
+            Assert.That(results[0].ToString() == "A1B");
         }
 
         /// <summary>
