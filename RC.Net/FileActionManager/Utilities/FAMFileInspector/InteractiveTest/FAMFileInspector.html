@@ -115,6 +115,7 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 					<li>Confirm that the following columns are provided in 
 					the file list.
 					<ul>
+						<li>Flag
 						<li>Filename
 						<li>Pages
 						<li>Matches
@@ -153,8 +154,8 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 						information that is updated as the selection 
 						changes.
 					</ul>
-					<li>Confirm that executing a <b>Search</b> clears the 
-					<b>Flag</b> column.
+					<li>Confirm that executing a <b>new file search</b> 
+					clears the <b>Flag</b> column.
 				</ul>
 <p>
 				<li><u>Searching for Extracted Data</u>
@@ -172,10 +173,10 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			Also confirm that each button works correctly if the utility starts 
 			from <b>CommonComponents</b> or from <b>DB Admin</b>.
 			<ul>
-				<li>Zoom window
-				<li>Pan
 				<li>Go to previous match
 				<li>Go to next match
+				<li>Zoom window
+				<li>Pan
 				<li>First page
 				<li>Previous page
 				<li>Specified page
@@ -195,6 +196,8 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			displays that image in the Image Window.
 			<li>Confirm that selection of multiple image files in the file list 
 			displays the last-selected image in the Image Window.
+			<li>Deselect an image from a multiple selection and confirm that the 
+			deselected image is shown in the Image Window.
 		</ul>
   	</ul>
 <p>
@@ -264,23 +267,41 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 				the database.
 			</ul>
 		</ul>
+		<li><b>Case Sensitive Searching</b>
+		<ul>
+			<li>Confirm that case-sensitive searches work properly 
+			if the <b>Match case</b> checkbox is checked.
+		</ul>
 		<li><b>Searching via Regular Expressions</b>
 		<ul>
 			<li>Confirm that searching for words allows regular expressions 
-			that are preceded by a <b>~</b> (tilde) character.
+			if the <b>Regular expression</b> checkbox is checked.
 			<li>Confirm that searching for extracted data allows regular 
-			expressions in the <b>Value</b> column that are preceded by a 
-			<b>~</b> (tilde) character.
+			expressions in the <b>Value</b> column if the <b>Regular 
+			expression</b> checkbox is checked.
+		</ul>
+		<li><b>Fuzzy Searching</b>
+		<ul>
+			<li>Confirm that searching for words allows regular expressions 
+			if the <b>Regular expression</b> checkbox is checked.
+			<li>Confirm that searching for extracted data allows regular 
+			expressions in the <b>Value</b> column if the <b>Regular 
+			expression</b> checkbox is checked.
+			<li>Confirm that the <b>Regular expression</b> checkbox is 
+			disabled if the <b>Fuzzy search</b> checkbox is checked.
 		</ul>
 		<li><b>Searching via Attribute Queries</b>
 		<ul>
-			<li>Confirm that <b>&lt;field_name&gt;</b> in the <b>Field</b> 
+			<li>Confirm that <b>field_name</b> in the <b>Field</b> 
 			column finds all attributes with an appropriate value among 
 			the file list.
-			<li>Confirm that <b>&lt;field_name&gt;/*</b> in the <b>Field</b> 
+			<li>Confirm that <b>/field_name</b> in the <b>Field</b> 
+			column finds all attributes with an appropriate value among 
+			the file list.
+			<li>Confirm that <b>field_name/*</b> in the <b>Field</b> 
 			column finds all sub-attributes with an appropriate value among 
 			the file list.
-			<li>Confirm that <b>*@&lt;type_name&gt;</b> in the <b>Field</b> 
+			<li>Confirm that <b>*@type_name&gt;</b> in the <b>Field</b> 
 			column finds attributes with an appropriate value among the 
 			file list.
 		</ul>
@@ -304,14 +325,25 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 		</ul>
 		<li><b>Context menu</b>
 		<ul>
-			<li>Confirm that any <b>LaunchApp</b> items are at the top of 
+			<li>Confirm that any <b>FileHandler</b> items are at the top of 
 			the context menu and followed by a separator.
-			<li>Confirm that the following menu items are available.
+			<li>Confirm that the following menu items are available in 
+			<b>Admin</b> mode.
 			<ul>
 				<li>Copy filename(s) Ctrl + C
 				<li>Copy file(s)
 				<li>Copy file(s) and data
 				<li><u>Separator</u>
+				<li>Reports
+				<li><u>Separator</u>
+				<li>Set flag
+				<li>Clear flag
+				<li><u>Separator</u>
+				<li>Cancel
+			</ul>
+			<li>Confirm that the following menu items are available in 
+			<b>non-Admin</b> mode.
+			<ul>
 				<li>Set flag
 				<li>Clear flag
 				<li><u>Separator</u>
@@ -330,6 +362,11 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			selected files along with associated USS, VOA, and XML files can 
 			be pasted into an Explorer window or as email attachments.
 <p>
+			<li>Confirm that each available report displays properly and uses 
+			the selected file as the required parameter.
+			<li>Confirm that the <b>Reports</b> are only enabled for a single 
+			file selection.
+<p>
 			<li>Confirm that <b>Set flag</b> adds a flag to the <b>Flag</b> 
 			column for one or more selected files.
 			<li>Confirm that <b>Clear flag</b> removes a flag from the 
@@ -339,11 +376,11 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 		</ul>
   	</ul>
 <p>
-  	<li><h2>Launch App</h2></li>
+  	<li><h2>FileHandler</h2></li>
   	<ul>
 		<li><b>Database Setup</b>
 		<ul>
-			<li>Confirm that the <b>LaunchApp</b> table contains the 
+			<li>Confirm that the <b>FileHandler</b> table contains the 
 			following columns.
 			<ul>
 				<li>ID
@@ -374,6 +411,8 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 					&quot;Edit Text&quot;...</b> as text.
 					<li>Confirm that a Notepad instance is started to 
 					edit <b>D:\a.txt</b>.
+					<li>Confirm that the <b>Flag</b> column is set for the 
+					selected item.
 				</ul>
 				<li>Highlight multiple files in the file list and select the 
 				same <b>Edit Text</b> item.
@@ -384,6 +423,8 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 					since the <b>Blocking</b> option is <b>True</b>.
 					<li>Confirm that the <b>FAM File Inspector</b> dialog 
 					is also displayed.
+					<li>Confirm that the <b>Flag</b> column is set for the 
+					selected items.
 				</ul>
 				<li>Modify the <b>Blocking</b> option to <b>False</b>.
 				<li>Repeat the multiple selection test noted above.
@@ -393,6 +434,8 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 					<li>Confirm that the <b>FAM File Inspector</b> dialog 
 					is not displayed.
 					<li>Confirm that the FAM File Inspector is responsive.
+					<li>Confirm that the <b>Flag</b> column is set for the 
+					selected items.
 				</ul>
 				<li>Modify the <b>Enabled</b> option to <b>False</b>.
 				<ul>
@@ -419,11 +462,6 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 				option on the command line.
 			</ul>
 		</ul>
-		<li><b>Miscellaneous</b>
-		<ul>
-			<li>Confirm that exercising a <b>LaunchApp</b> definition for 
-			a file sets the <b>Flag</b> item for that file.
-		</ul>
   	</ul>
 <p>
   	<li><h2>Field Search</h2></li>
@@ -445,8 +483,9 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 				<li>Confirm that a <b>High Confidence</b> item is 
 				pre-defined (with an empty Value cell) under the 
 				<b>extracted data</b> Search.
-				<li>Confirm that adding <b>~\d{4}</b> to the Value cell 
-				yields appropriate results for a Search.
+				<li>Confirm that adding <b>\d{4}</b> to the Value cell 
+				yields appropriate results for a Search if the 
+				<b>Regular expression</b> checkbox is checked.
 				<li>Confirm that modifying the <b>AttributeQuery</b> 
 				string to <b>Clues|*/Clues</b> yields Search results 
 				for Clues attributes.
@@ -508,12 +547,13 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 		<li><b>[DotNetRC #998]</b> Invalid Index
 		<ul>
 			<li>Inspect <b>Demo_IDShield</b> database.
-			<li>Prepare two search items for extarcted data.
+			<li>Prepare two search items for extracted data.  Check the 
+			<b>Regular expression</b> checkbox.
 			<ul>
-				<li>Field = <b>Clues</b>, Value = <b>~.*</b>
-				<li>Field = <b>MCData</b>, Value = <b>~.*</b>
+				<li>Field = <b>Clues</b>, Value = <b>.*</b>
+				<li>Field = <b>MCData</b>, Value = <b~.*</b>
 			</ul>
-			<li>Click <b>Search</b>
+			<li>Click <b>Search</b>.
 			<li>Confirm that search results are found.
 			<li>Confirm that no <b>ELI06463: Invalid index!</b> exception 
 			is displayed.
@@ -522,7 +562,7 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 		<li><b>[DotNetRC #1000]</b> Connection Is No Longer Good
 		<ul>
 			<li>Restore an 8.0 database (i.e. 80_Database from Testing folder).
-			<li>Start Fam File Inspector from CommonComponents.
+			<li>Start FAM File Inspector from CommonComponents.
 			<li>Log in to the 8.0 database.
 			<li>Confirm that a meaningful error about database schema is 
 			displayed.
@@ -577,39 +617,30 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			message is displayed describing how many errors were noted for the search.
 		</ul>
 <p>
-		<li><b>[DotNetRC #1028]</b> LaunchApp With NULL Arguments
-		<ul>
-			<li>Exercise the following test cases with an appropriate entry 
-			in the <b>LaunchApp</b> table (i.e. &lt;blank&gt;, True, 
-			Edit Text, &lt;blank&gt;, &quot;C:\Windows\System32\Notepad.exe&quot;, 
-			&lt;blank&gt;, True, True, False, True against a Demo_IDShield 
-			database).
-			<ul>
-				<li>Inspect the Demo_IDShield database.
-				<li>Select a file and right-click.
-				<li>Confirm that selecting <b>Edit Text</b> brings up an 
-				empty Notepad instance.
-				<li>Confirm that no error is displayed.
-			</ul>
-		</ul>
-<p>
 		<li><b>[DotNetRC #1029]</b> Crash Situations
 		<ul>
-			<li>Configure a <b>LaunchApp</b> table to include one or more 
+			<li>Configure a <b>FileHandler</b> table to include one or more 
 			definitions.
 			<li>Exercise the following situations and confirm that no crash occurs.
 			<ul>
 				<li>Pass images to ImageFormatConverter with correct arguments 
 				except that the images are invalid.
-				<li>Close FFI while an expected exception is still open.
-				<li>Close FFI while a LaunchApp operation is in progress.
+				<li>Confirm that FFI cannot be closed while the expected 
+				exception is still open.
+				<li>Close FFI while a FileHandler operation is in progress.
+				<ul>
+					<li>Confirm that an appropriate warning message is 
+					provided.
+					<li>Confirm that FFI closes after the FileHandler 
+					operation is completed.
+				</ul>
 				<li>Close FFI while a search is in progress.
 			</ul>
 		</ul>
 <p>
 		<li><b>[DotNetRC #1036]</b> FAM Inspector Locks Up
 		<ul>
-			<li>Configure a <b>LaunchApp</b> table to include one or more 
+			<li>Configure a <b>FileHandler</b> table to include one or more 
 			definitions.
 			<li>Configure an item that will fail for at least one file and set 
 			<b>Blocking = True</b>.
@@ -626,8 +657,7 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			<li>Run a search against extracted data
 			<li>Delete the VOA file for one of the images.
 			<li>Run the search again.
-			<li>Confirm that the value in the <b>Matches</b> column 
-			reads <b>(No Data)</b>.
+			<li>Confirm that a meaningful message is provided in the status pane.
 <p>
 			<li>Undock the <b>Search</b> pane.
 			<li>Close the pane.
@@ -660,7 +690,7 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 				<li>Confirm that the menu item is disabled if the utility 
 				is running in <b>Admin</b> mode.
 			</ul>
-			<li>Add one or more entries the <b>LaunchApp</b> table such 
+			<li>Add one or more entries the <b>FileHandler</b> table such 
 			that <b>AdminOnly</b> is False.
 			<li>Confirm that each of the entries is visible in the context 
 			menu when running in <b>Admin</b> mode and <b>non-Admin</b> mode.
@@ -685,7 +715,7 @@ href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc
 			</ul>
 			<li>Confirm that a meaningful error message is presented if 
 			an incorrect action name is used.
-			<li>Confirm that a meaningfule error message is presented if 
+			<li>Confirm that a meaningful error message is presented if 
 			an incorrect status is used.
 			<li>Confirm that the parameter following <b>/query</b> is a 
 			fully-qualified path to a text file containing a SQL query.
