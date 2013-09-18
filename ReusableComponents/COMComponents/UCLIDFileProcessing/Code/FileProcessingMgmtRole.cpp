@@ -452,6 +452,19 @@ STDMETHODIMP CFileProcessingMgmtRole::ValidateStatus(void)
 				}
 			}
 
+			// Check for defined error email task
+			if (m_bSendErrorEmail)
+			{
+				IErrorEmailTaskPtr ipErrorEmailTask = getErrorEmailTask();
+				if (ipErrorEmailTask == __nullptr)
+				{
+					UCLIDException ue("ELI36166", "Error validating error email settings!");
+					throw ue;
+				}
+
+				ipErrorEmailTask->ValidateErrorEmailConfiguration();
+			}
+
 			// Check for defined error task
 			if (asCppBool(getErrorHandlingTask()->Enabled))
 			{

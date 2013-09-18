@@ -45,5 +45,10 @@ namespace Extract.Interfaces
         /// Applies the default settings for the email.
         /// </summary>
         void ApplyDefaultErrorEmailSettings();
+
+        /// <summary>
+        /// Validates that proper settings exist for use as an <see cref="IErrorEmailTask"/>.
+        /// </summary>
+        void ValidateErrorEmailConfiguration();
     }
 }

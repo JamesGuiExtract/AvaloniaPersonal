@@ -400,6 +400,49 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
+        /// <summary>
+        /// Validates that proper settings exist for use as an <see cref="IErrorEmailTask"/>.
+        /// </summary>
+        public void ValidateErrorEmailConfiguration()
+        {
+            try
+            {
+                ExtractException.Assert("ELI36159", "Error email recipient has not been specified.",
+                    !string.IsNullOrWhiteSpace(Recipient));
+
+                ExtractException.Assert("ELI36161",
+                    "Error email subject has not been specified.",
+                    !string.IsNullOrWhiteSpace(Subject));
+
+                string emailServer = "";
+                try
+                {
+                    FileProcessingDB fileProcessingDB = new FileProcessingDB();
+                    fileProcessingDB.ConnectLastUsedDBThisProcess();
+
+                    var emailSettings =
+                        new FAMDatabaseSettings<ExtractSmtp>(
+                            fileProcessingDB, false, SmtpEmailSettings.PropertyNameLookup);
+                    emailServer = emailSettings.Settings.Server;
+                }
+                catch (Exception ex)
+                {
+                    var ee = new ExtractException("ELI36163",
+                        "Unable to validate database email settings", ex);
+                    throw ee;
+                }
+
+                ExtractException.Assert("ELI36162",
+                    "Error email task cannot be used until outbound email settings are configured " +
+                    "in the DB Administration utility's database options.",
+                    !string.IsNullOrWhiteSpace(emailServer));
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI36164", ex.Message);
+            }
+        }
+
         #endregion IErrorEmailTask Members
 
         #region ICategorizedComponent Members
@@ -643,8 +686,17 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 // Create the pathTags instance to be used to expand any path tags/functions.
+                // [DotNetRCAndUtils:1109]
+                // Use fallback values for the FPS file/dir in case the FPS has not yet been saved.
                 FileActionManagerPathTags pathTags = new FileActionManagerDatabasePathTags(
-                    pFileRecord.Name, pFAMTM.FPSFileDir, pFAMTM.FPSFileName, pDB, nActionID);
+                    pFileRecord.Name,
+                    string.IsNullOrWhiteSpace(pFAMTM.FPSFileDir)
+                        ? "<Unknown FPS Directory>"
+                        : pFAMTM.FPSFileDir,
+                    string.IsNullOrWhiteSpace(pFAMTM.FPSFileName)
+                        ? "<Unknown FPS Filename>"
+                        : pFAMTM.FPSFileName,
+                       pDB, nActionID);
 
                 // Create and fill in the properties of an ExtractEmailMessage.
                 ExtractEmailMessage emailMessage = new ExtractEmailMessage();

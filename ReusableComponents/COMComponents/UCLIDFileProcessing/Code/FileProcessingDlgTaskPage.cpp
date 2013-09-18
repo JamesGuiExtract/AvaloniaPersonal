@@ -557,6 +557,9 @@ void FileProcessingDlgTaskPage::OnEnChangeErrorEmailRecipients()
 
 		// Update the error email recipients
 		ipErrorEmailTask->Recipient = get_bstr_t(m_zErrorEmailRecipients);
+		
+		// Error email may now be valid; enable run/save if appropriate.
+		updateUI();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI36130");
 }
@@ -577,6 +580,9 @@ void FileProcessingDlgTaskPage::OnBtnConfigureErrorEmail()
 			// task to the recipients edit box.
 			m_zErrorEmailRecipients = asString(ipErrorEmailTask->Recipient).c_str();
 			UpdateData(FALSE);
+
+			// Error email may now be valid; enable run/save if appropriate.
+			updateUI();
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI36132")
