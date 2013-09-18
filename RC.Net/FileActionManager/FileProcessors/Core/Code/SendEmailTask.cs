@@ -413,7 +413,23 @@ namespace Extract.FileActionManager.FileProcessors
                 ExtractException.Assert("ELI36161",
                     "Error email subject has not been specified.",
                     !string.IsNullOrWhiteSpace(Subject));
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI36164", ex.Message);
+            }
+        }
 
+        /// <summary>
+        /// Checks that proper outbound email server settings exist to be able to use an
+        /// <see cref="IErrorEmailTask"/>.
+        /// </summary>
+        /// <returns><see langword="true"/> if proper email server settings exist; otherwise,
+        /// <see langword="false"/>.</returns>
+        public bool IsEmailServerConfigured()
+        {
+            try
+            {
                 string emailServer = "";
                 try
                 {
@@ -432,14 +448,11 @@ namespace Extract.FileActionManager.FileProcessors
                     throw ee;
                 }
 
-                ExtractException.Assert("ELI36162",
-                    "Error email task cannot be used until outbound email settings are configured " +
-                    "in the DB Administration utility's database options.",
-                    !string.IsNullOrWhiteSpace(emailServer));
+                return !string.IsNullOrWhiteSpace(emailServer);
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI36164", ex.Message);
+                throw ex.CreateComVisible("ELI36168", ex.Message);
             }
         }
 

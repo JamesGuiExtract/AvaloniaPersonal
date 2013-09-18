@@ -50,5 +50,13 @@ namespace Extract.Interfaces
         /// Validates that proper settings exist for use as an <see cref="IErrorEmailTask"/>.
         /// </summary>
         void ValidateErrorEmailConfiguration();
+
+        /// <summary>
+        /// Checks that proper outbound email server settings exist to be able to use an
+        /// <see cref="IErrorEmailTask"/>.
+        /// </summary>
+        /// <returns><see langword="true"/> if proper email server settings exist; otherwise,
+        /// <see langword="false"/>.</returns>
+        bool IsEmailServerConfigured();
     }
 }

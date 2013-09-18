@@ -537,6 +537,27 @@ void FileProcessingDlgTaskPage::OnCheckSendErrorEmail()
 		// Provide new setting to File Processing Mgmt Role object
 		getFPMgmtRole()->SendErrorEmail = asVariantBool(m_bSendErrorEmail);
 
+		if (m_bSendErrorEmail)
+		{
+			IErrorEmailTaskPtr ipErrorEmailTask = getFPMgmtRole()->ErrorEmailTask;
+			ASSERT_RESOURCE_ALLOCATION("ELI36169", ipErrorEmailTask != __nullptr);
+
+			if (!asCppBool(ipErrorEmailTask->IsEmailServerConfigured()))
+			{
+				m_bSendErrorEmail = false;
+				getFPMgmtRole()->SendErrorEmail = VARIANT_FALSE;
+
+				UpdateData(FALSE);
+
+				MessageBox("Before configuring email notification of errors, outbound email server "
+                    "settings need to be configured in the FAM database.\r\n\r\n"
+                    "In the DB Administration utility, select the \"Database | Database "
+					"options...\" menu option, then use the \"Email\" tab to configure the "
+					"outbound email server.", "Outbound email server not configured",
+					MB_ICONWARNING | MB_OK);
+			}
+		}
+
 		// Enable / disable controls as appropriate
 		setButtonStates();
 		updateUI();
