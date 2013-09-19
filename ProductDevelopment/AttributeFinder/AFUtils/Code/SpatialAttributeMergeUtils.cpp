@@ -55,6 +55,8 @@ CSpatialAttributeMergeUtils::~CSpatialAttributeMergeUtils()
 		m_ipQualifiedMerges = __nullptr;
 		m_mapChildToParentAttributes.clear();
 		m_mapAttributeInfo.clear();
+		m_mapSet1AttributesPerPage.clear();
+		m_mapSet2AttributesPerPage.clear();
 		m_mapSpatialInfos.clear();
 		m_ipValueMergePriority = __nullptr;
 		m_ipTypeMergePriority = __nullptr;
@@ -79,6 +81,8 @@ void CSpatialAttributeMergeUtils::FinalRelease()
 		m_ipQualifiedMerges = __nullptr;
 		m_mapChildToParentAttributes.clear();
 		m_mapAttributeInfo.clear();
+		m_mapSet1AttributesPerPage.clear();
+		m_mapSet2AttributesPerPage.clear();
 		m_mapSpatialInfos.clear();
 		m_ipValueMergePriority = __nullptr;
 		m_ipTypeMergePriority = __nullptr;
@@ -741,7 +745,15 @@ STDMETHODIMP CSpatialAttributeMergeUtils::FindQualifiedMerges(IIUnknownVector* p
 
 		initialize(ipAttributes);
 
-		findQualifiedMerges(ipAttributes, ipAttributes);
+		// [FlexIDSCore:5362]
+		// Since the algorithm in findQualifiedMerges is of magnitude O(n^2), run it for each page
+		// separately to avoid excessively poor excution time for large documents with hundreds(+)
+		// of attributes.
+		for (map<long, IIUnknownVectorPtr>::iterator iter = m_mapSet1AttributesPerPage.begin();
+			 iter != m_mapSet1AttributesPerPage.end(); iter++)
+		{
+			findQualifiedMerges(iter->second, iter->second);
+		}
 
 		return S_OK;
 	}
@@ -774,8 +786,23 @@ STDMETHODIMP CSpatialAttributeMergeUtils::CompareAttributeSets(IIUnknownVector* 
 		// Initialize for a comparison
 		initialize(ipAttributeSet1, ipAttributeSet2);
 
-		// Compare for qualified merges.
-		findQualifiedMerges(ipAttributeSet1, ipAttributeSet2);
+		// [FlexIDSCore:5362]
+		// Since the algorithm in findQualifiedMerges is of magnitude O(n^2), run it for each page
+		// separately to avoid excessively poor excution time for large documents with hundreds(+)
+		// of attributes.
+		for (map<long, IIUnknownVectorPtr>::iterator iter = m_mapSet1AttributesPerPage.begin();
+			 iter != m_mapSet1AttributesPerPage.end(); iter++)
+		{
+			// Find the attributes from set2 from the same page that the current set1 attributes
+			// are on.
+			IIUnknownVectorPtr ipSet2 = m_mapSet2AttributesPerPage[iter->first];
+
+			if (ipSet2 != __nullptr)
+			{
+				// Compare for qualified merges.
+				findQualifiedMerges(iter->second, ipSet2);
+			}
+		}
 
 		// The attribute sets match if every spatial attribute in both sets have an associated
 		// merge result.
@@ -848,6 +875,8 @@ void CSpatialAttributeMergeUtils::initialize(IIUnknownVectorPtr ipAttributeSet1,
 
 	// Ensure the attribute info cache is cleared.
 	m_mapAttributeInfo.clear();
+	m_mapSet1AttributesPerPage.clear();
+	m_mapSet2AttributesPerPage.clear();
 
 	// Ensure the standardized page info cache is cleared.
 	m_mapSpatialInfos.clear();
@@ -864,7 +893,7 @@ void CSpatialAttributeMergeUtils::initialize(IIUnknownVectorPtr ipAttributeSet1,
 		ISpatialStringPtr ipValue = ipAttribute->Value;
 		if (ipValue != __nullptr && asCppBool(ipValue->HasSpatialInfo()))
 		{
-			loadAttributeInfo(ipAttribute);
+			loadAttributeInfo(ipAttribute, &m_mapSet1AttributesPerPage);
 		}
 	}
 
@@ -882,7 +911,7 @@ void CSpatialAttributeMergeUtils::initialize(IIUnknownVectorPtr ipAttributeSet1,
 			ISpatialStringPtr ipValue = ipAttribute->Value;
 			if (ipValue != __nullptr && asCppBool(ipValue->HasSpatialInfo()))
 			{
-				loadAttributeInfo(ipAttribute);
+				loadAttributeInfo(ipAttribute, &m_mapSet2AttributesPerPage);
 			}
 		}
 	}
@@ -1152,7 +1181,8 @@ double CSpatialAttributeMergeUtils::calculateOverlap(IAttributePtr ipAttribute1,
 	}
 }
 //--------------------------------------------------------------------------------------------------
-void CSpatialAttributeMergeUtils::loadAttributeInfo(IAttributePtr ipAttribute)
+void CSpatialAttributeMergeUtils::loadAttributeInfo(IAttributePtr ipAttribute,
+								map<long, IIUnknownVectorPtr>* pmapAttribtesPerPage/* = __nullptr*/)
 {
 	ASSERT_ARGUMENT("ELI23055", ipAttribute != __nullptr);
 
@@ -1217,6 +1247,22 @@ void CSpatialAttributeMergeUtils::loadAttributeInfo(IAttributePtr ipAttribute)
 		{
 			// Add this page to attribute's page set only after it is confirmed it contains raster zones
 			m_mapAttributeInfo[ipAttribute].setPages.insert(nPage);
+
+			// If provided, collect the attribute in a map that sorts that attributes by page.
+			// This allows for main algorithm to be run per-page rather than for the document as a
+			// whole.
+			if (pmapAttribtesPerPage != __nullptr)
+			{
+				IIUnknownVectorPtr ipPageAttributes(__nullptr);
+				if ((*pmapAttribtesPerPage)[nPage] == __nullptr)
+				{
+					(*pmapAttribtesPerPage)[nPage] = IIUnknownVectorPtr(CLSID_IUnknownVector);
+				}
+				ipPageAttributes = (*pmapAttribtesPerPage)[nPage];
+				ASSERT_RESOURCE_ALLOCATION("ELI36170", ipPageAttributes != __nullptr);
+
+				ipPageAttributes->PushBack(ipAttribute);
+			}
 		}
 	}
 }

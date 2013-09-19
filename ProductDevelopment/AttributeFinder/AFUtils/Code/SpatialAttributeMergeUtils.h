@@ -167,6 +167,11 @@ private:
 	// A cache of spatial information for all eligible attributes.
 	map<IAttribute*, AttributeInfo> m_mapAttributeInfo;
 
+	// Groups attributes by page so that that findQualifiedMerges's O(n^2) algorithm can be run per
+	// page rather than for all attributes in the document at once.
+	map<long, IIUnknownVectorPtr> m_mapSet1AttributesPerPage;
+	map<long, IIUnknownVectorPtr> m_mapSet2AttributesPerPage;
+
 	// The set of qualified merges that have been found via FindQualifiedMerges.
 	IIUnknownVectorPtr m_ipQualifiedMerges;
 
@@ -222,7 +227,8 @@ private:
 	double calculateOverlap(IAttributePtr ipAttribute1, IAttributePtr ipAttribute2, long nPage);
 
 	// Load page & spatial information from this ipAttribute into the m_mapAttributeInfo info cache.
-	void loadAttributeInfo(IAttributePtr ipAttribute);
+	void loadAttributeInfo(IAttributePtr ipAttribute,
+						   map<long, IIUnknownVectorPtr>* pmapAttribtesPerPage = __nullptr);
 
 	// Combines ipAttribute1 and ipAttribute2 on nPage and returns the merged result. If
 	// both attributes were part of separate existing merged results, ipRemovedAttribute will
