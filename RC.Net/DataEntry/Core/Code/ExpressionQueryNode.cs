@@ -68,11 +68,10 @@ namespace Extract.DataEntry
         protected override QueryResult Evaluate(IEnumerable<QueryResult> childQueryResults)
         {
             StringBuilder expressionBuilder = new StringBuilder();
+            Dictionary<string, object> variables = new Dictionary<string, object>();
 
             try
             {
-                Dictionary<string, object> variables = new Dictionary<string, object>();
-
                 int variableNum = 0;
                 foreach (QueryResult childQueryResult in childQueryResults)
                 {
@@ -199,6 +198,10 @@ namespace Extract.DataEntry
             {
                 ExtractException ee = ex.AsExtract("ELI31983");
                 ee.AddDebugData("Expression", expressionBuilder.ToString(), false);
+                foreach (var variable in variables)
+                {
+                    ee.AddDebugData(variable.Key, variable.Value.ToString(), false);
+                }
                 throw ee;
             }
         }

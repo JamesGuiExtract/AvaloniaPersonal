@@ -459,10 +459,11 @@
 &lt;/Declarations&gt;
 &lt;Query ValidValue='True' ValidationMessage='ValidationMessage'&gt;
 	&lt;Expression&gt;
-		DateTime.TryParse(&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;, null) and
-		DateTime.TryParse(&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;, null) and
-		(date(&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;) &amp;gt;=
-		date(&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;))
+		(#DateSeqIsCorrect =
+			{|cd, rd| DateTime.TryParse($cd, null) and DateTime.TryParse($rd, null) and date($rd) &amp;gt; date($cd) };
+		#DateSeqIsCorrect(
+			&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;,
+			&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;))
 	&lt;/Expression&gt;
 &lt;/Query&gt;
 </value>
@@ -473,10 +474,11 @@
 &lt;/Declarations&gt;
 &lt;Query ValidValue='True' ValidationMessage='ValidationMessage'&gt;
 	&lt;Expression&gt;
-		DateTime.TryParse(&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;, null) and
-		DateTime.TryParse(&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;, null) and
-		(date(&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;) &amp;gt;=
-		date(&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;))
+		(#DateSeqIsCorrect =
+			{|cd, rd| DateTime.TryParse($cd, null) and DateTime.TryParse($rd, null) and date($rd) &amp;gt; date($cd) };
+		#DateSeqIsCorrect(
+			&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;,
+			&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;))
 	&lt;/Expression&gt;
 &lt;/Query&gt;
 </value>

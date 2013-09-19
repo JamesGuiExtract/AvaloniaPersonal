@@ -117,52 +117,53 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="_resultCodeLabel.GenerateMember" type="System.Boolean, mscorlib">
+  <metadata name="_resultCodeLabel.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
-  </data>
-  <data name="_testNameLabel.GenerateMember" type="System.Boolean, mscorlib">
+  </metadata>
+  <metadata name="_testNameLabel.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
-  </data>
-  <data name="panelGroupBox.GenerateMember" type="System.Boolean, mscorlib">
+  </metadata>
+  <metadata name="panelGroupBox.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
-  </data>
-  <data name="_collectionDateColumn.UserAddedColumn" type="System.Boolean, mscorlib">
+  </metadata>
+  <metadata name="_collectionDateColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
-  </data>
-  <data name="_collectionTimeColumn.UserAddedColumn" type="System.Boolean, mscorlib">
+  </metadata>
+  <metadata name="_collectionTimeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
-  </data>
-  <data name="_resultDateColumn.UserAddedColumn" type="System.Boolean, mscorlib">
+  </metadata>
+  <metadata name="_resultDateColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
-  </data>
+  </metadata>
   <data name="_resultDateColumn.ValidationQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
 	&lt;Composite Name='ValidationMessage'&gt;Result date/time must be greater than or equal to the collection date/time.&lt;/Composite&gt;
 &lt;/Declarations&gt;
 &lt;Query ValidValue='True' ValidationMessage='ValidationMessage'&gt;
-	&lt;Expression&gt;
-		DateTime.TryParse(&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;, null) and
-		DateTime.TryParse(&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;, null) and
-		(date(&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;) &amp;gt;=
-		date(&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;))
-	&lt;/Expression&gt;
+&lt;Expression&gt;
+	(#DateSeqIsCorrect =
+		{|cd, rd| DateTime.TryParse($cd, null) and DateTime.TryParse($rd, null) and date($rd) &amp;gt; date($cd) };
+	#DateSeqIsCorrect(
+		&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;,
+		&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;))
+&lt;/Expression&gt;
 &lt;/Query&gt;</value>
   </data>
-  <data name="_resultTimeColumn.UserAddedColumn" type="System.Boolean, mscorlib">
+  <metadata name="_resultTimeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
-  </data>
+  </metadata>
   <data name="_resultTimeColumn.ValidationQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
 	&lt;Composite Name='ValidationMessage'&gt;Result date/time must be greater than or equal to the collection date/time.&lt;/Composite&gt;
 &lt;/Declarations&gt;
 &lt;Query ValidValue='True' ValidationMessage='ValidationMessage'&gt;
-	&lt;Expression&gt;
-		DateTime.TryParse(&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;, null) and
-		DateTime.TryParse(&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;, null) and
-		(date(&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;) &amp;gt;=
-		date(&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;))
-	&lt;/Expression&gt;
+&lt;Expression&gt;
+	(#DateSeqIsCorrect =
+		{|cd, rd| DateTime.TryParse($cd, null) and DateTime.TryParse($rd, null) and date($rd) &amp;gt; date($cd) };
+	#DateSeqIsCorrect(
+		&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;,
+		&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;))
+&lt;/Expression&gt;
 &lt;/Query&gt;</value>
   </data>
   <data name="_laboratoryIdentifier.AutoUpdateQuery" xml:space="preserve">
@@ -306,9 +307,9 @@
 &lt;Query&gt;&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest, AlternateTestName, LabOrderTest WHERE LabTest.TestCode = AlternateTestName.TestCode AND LabTest.TestCode = LabOrderTest.TestCode AND LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) AND AlternateTestName.Name = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,50)&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) AND LabTest.TestCode = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;</value>
   </data>
-  <data name="_orderNumberColumn.UserAddedColumn" type="System.Boolean, mscorlib">
+  <metadata name="_orderNumberColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
-  </data>
+  </metadata>
   <data name="_orderNumberColumn.ValidationQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
 	&lt;Composite Name='ValidationMessage'&gt;This order number has been used for multiple orders&lt;/Composite&gt;
@@ -317,9 +318,9 @@
 	&lt;Expression&gt;&lt;Attribute Type='string[]'&gt;/Panel/Test/OrderNumber&lt;/Attribute&gt;.?{#this == &lt;Attribute&gt;.&lt;/Attribute&gt;}.count()&lt;/Expression&gt;
 &lt;/Query&gt;</value>
   </data>
-  <data name="_testDisplayName.UserAddedColumn" type="System.Boolean, mscorlib">
+  <metadata name="_testDisplayName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
-  </data>
+  </metadata>
   <data name="_testDisplayName.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query&gt;
 &lt;SQL SpatialMode='IfNotBlank'&gt;SELECT DisplayName FROM LabOrder WHERE Code = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,25)
@@ -341,23 +342,23 @@
 	&lt;/Expression&gt;
 &lt;/Query&gt;</value>
   </data>
-  <data name="_testValueColumn.UserAddedColumn" type="System.Boolean, mscorlib">
+  <metadata name="_testValueColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
-  </data>
-  <data name="_testUnitsColumn.UserAddedColumn" type="System.Boolean, mscorlib">
+  </metadata>
+  <metadata name="_testUnitsColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
-  </data>
-  <data name="_testRefRangeColumn.UserAddedColumn" type="System.Boolean, mscorlib">
+  </metadata>
+  <metadata name="_testRefRangeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
-  </data>
+  </metadata>
   <data name="_testRefRangeColumn.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query Default='true'&gt;&lt;Attribute SelectionMode='First'&gt;../Component/Range&lt;/Attribute&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;RegEx Pattern='(?&amp;lt;=^\s*\[)[\s\S]*(?=\]\s*$)'&gt;&lt;Attribute Name='Range'&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;RegEx Pattern='[\s\S]*'&gt;&lt;Range/&gt;&lt;/RegEx&gt;&lt;/Query&gt;</value>
   </data>
-  <data name="_testFlagColumn.UserAddedColumn" type="System.Boolean, mscorlib">
+  <metadata name="_testFlagColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
-  </data>
+  </metadata>
   <data name="_testFlagColumn.ValidationQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
 	&lt;RegEx Name='Flag' Pattern='^(H|HH|L|LL|A|AA)$'&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt;
@@ -473,9 +474,9 @@
 	&lt;/Expression&gt;
 &lt;/Query&gt;</value>
   </data>
-  <data name="_resultStatusColumn.UserAddedColumn" type="System.Boolean, mscorlib">
+  <metadata name="_resultStatusColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
-  </data>
+  </metadata>
   <data name="_testNameTextBox.ValidationQuery" xml:space="preserve">
     <value>&lt;Query ValidationListType='ValidationListOnly'&gt;
 &lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = SUBSTRING(&lt;Attribute&gt;../OrderCode&lt;/Attribute&gt;,1,25) ORDER BY LabTest.OfficialName&lt;/SQL&gt;
