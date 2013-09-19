@@ -3871,14 +3871,22 @@ namespace Extract.DataEntry
                 {
                     CurrentCell = Rows[newRowIndex].Cells[_carriageReturnColumn];
                 }
-                // [DataEntry:759]
+                // [DataEntry:759, 1281]
                 // If an auto-complete list is currently displayed, do not advance the selection to
-                // the next row.
-                else 
+                // the next row if the enter key is not actually down (a mouse click on the
+                // auto-complete results in an enter keystroke being processed even thought the
+                // enter key was not actually pressed).
+                else if (!DataEntryControlHost.IsKeyDown(Keys.Enter))
                 {
                     // Since enter will close the auto-complete list, AutoCompleteCell should be
                     // set back to null.
                     AutoCompleteCell = null;
+                }
+                else
+                {
+                    // If the enter key was pressed while the auto-complete list was displayed,
+                    // allow the table to process the keystroke as it normally would.
+                    return false;
                 }
 
                 return true;

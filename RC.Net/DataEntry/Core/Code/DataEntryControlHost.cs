@@ -431,6 +431,11 @@ namespace Extract.DataEntry
         bool _tabKeyDown;
 
         /// <summary>
+        /// Keeps track of all keys that are currently depressed.
+        /// </summary>
+        HashSet<Keys> _depressedKeys = new HashSet<Keys>();
+
+        /// <summary>
         /// Inidicates when a manual focus change is taking place (tab key was pressed or a
         /// highlight was selected in the image viewer).
         /// </summary>
@@ -1362,6 +1367,15 @@ namespace Extract.DataEntry
 
                 if (m.Msg == WindowsMessage.KeyDown || m.Msg == WindowsMessage.KeyUp)
                 {
+                    if (m.Msg == WindowsMessage.KeyDown)
+                    {
+                        _depressedKeys.Add((Keys)m.WParam);
+                    }
+                    else
+                    {
+                        _depressedKeys.Remove((Keys)m.WParam);
+                    }
+
                     // [DataEntry:1230]
                     // If a modifier key is going down or up, notify image viewer to update cursor
                     // to prevent cases where the active tool gets stuck in an inappropriate state.
@@ -4223,6 +4237,24 @@ namespace Extract.DataEntry
                 OnItemSelectionChanged();
 
                 _currentlySelectedGroupAttribute = selectionState.SelectedGroupAttribute;
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether the specified <see paramref="key"/> is currently depressed.
+        /// </summary>
+        /// <param name="key">The <see cref="Keys"/> value to check if down.</param>
+        /// <returns><see langword="true"/> if the specified key is currently down; otherwise,
+        /// <see langword="false"/>.</returns>
+        internal bool IsKeyDown(Keys key)
+        {
+            try
+            {
+                return _depressedKeys.Contains(key);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36172");
             }
         }
 
