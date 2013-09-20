@@ -2270,8 +2270,6 @@ namespace Extract.DataEntry
                             {
                                 // Ensure an F6 toggle out of auto-zoom will always zoom out at
                                 // least 5% compared to the current auto-zoom level.
-                                var intersection = Rectangle.Intersect(
-                                    _lastNonZoomedToSelectionViewArea.Value, currentViewRegion);
                                 Size lastSize = _lastNonZoomedToSelectionViewArea.Value.Size;
                                 if ((((double)lastSize.Width / (double)currentViewRegion.Width) < 1.05) &&
                                     (((double)lastSize.Height / (double)currentViewRegion.Height) < 1.05))
@@ -2347,6 +2345,14 @@ namespace Extract.DataEntry
 
                     // Force an auto-zoom to the selection bounds on the current page.
                     EnforceAutoZoomSettings(true);
+
+                    // [DataEntry:1286]
+                    // In the case where a user has pressed F6 to zoom in on a particular field,
+                    // the new zoom level should be considered "manual" so that subsequent zoom out
+                    // if necessary logic is based on this zoom level, not the previous zoom level.
+                    Rectangle viewArea = _imageViewer.GetTransformedRectangle(
+                        _imageViewer.GetVisibleImageArea(), true);
+                    _lastManualZoomSize = viewArea.Size;
                 }
             }
             catch (Exception ex)
@@ -5240,9 +5246,7 @@ namespace Extract.DataEntry
                 }
                 else if (autoZoomMode == AutoZoomMode.ZoomOutIfNecessary)
                 {
-                    // If the user has used F2 to zoom in, don't jump back to _lastManualZoomSize
-                    // when changing selection.
-                    if (!_manuallyZoomedToSelection && !_lastManualZoomSize.IsEmpty)
+                    if (!_lastManualZoomSize.IsEmpty)
                     {
                         // Determine the amount the current view must be resized to get back to the last
                         // manual zoom level.
