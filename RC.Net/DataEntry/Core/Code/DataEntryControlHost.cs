@@ -2320,6 +2320,8 @@ namespace Extract.DataEntry
                             }
 
                             _lastViewArea = _lastNonZoomedToSelectionViewArea.Value;
+                            // [DataEntry:1286] Consider this the last manual zoom size.
+                            _lastManualZoomSize = _lastViewArea.Size;
                             _zoomedToSelection = false;
                             _manuallyZoomedToSelection = false;
                             return;
