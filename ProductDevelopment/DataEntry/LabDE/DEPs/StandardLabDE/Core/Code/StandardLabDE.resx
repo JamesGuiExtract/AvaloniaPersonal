@@ -460,7 +460,7 @@
 &lt;Query ValidValue='True' ValidationMessage='ValidationMessage'&gt;
 	&lt;Expression&gt;
 		(#DateSeqIsCorrect =
-			{|cd, rd| DateTime.TryParse($cd, null) and DateTime.TryParse($rd, null) and date($rd) &amp;gt; date($cd) };
+			{|cd, rd| DateTime.TryParse($cd, null) and DateTime.TryParse($rd, null) and date($rd) &amp;gt;= date($cd) };
 		#DateSeqIsCorrect(
 			&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;,
 			&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;))
@@ -475,7 +475,7 @@
 &lt;Query ValidValue='True' ValidationMessage='ValidationMessage'&gt;
 	&lt;Expression&gt;
 		(#DateSeqIsCorrect =
-			{|cd, rd| DateTime.TryParse($cd, null) and DateTime.TryParse($rd, null) and date($rd) &amp;gt; date($cd) };
+			{|cd, rd| DateTime.TryParse($cd, null) and DateTime.TryParse($rd, null) and date($rd) &amp;gt;= date($cd) };
 		#DateSeqIsCorrect(
 			&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;,
 			&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt; + ' ' + &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;))
