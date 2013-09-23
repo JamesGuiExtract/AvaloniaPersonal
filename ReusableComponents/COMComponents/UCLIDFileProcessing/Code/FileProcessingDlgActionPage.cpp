@@ -170,7 +170,7 @@ void FileProcessingDlgActionPage::OnBnClickedBtnSelAction()
 		CWaitCursor wait;
 
 		// Reset the DB Connection
-		getDBPointer()->ResetDBConnection();
+		getDBPointer()->ResetDBConnection(VARIANT_FALSE);
 
 		// Check if there is no action inside the datebase;
 		IStrToStrMapPtr ipMapActions = getDBPointer()->GetActions();

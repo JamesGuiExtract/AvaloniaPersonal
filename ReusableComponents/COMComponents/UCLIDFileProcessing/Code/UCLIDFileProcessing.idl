@@ -794,7 +794,8 @@ library UCLID_FILEPROCESSINGLib
 
 		// PROMISE: To close any existing open connection and reopen with the current settings  
 		//			DatebaseServer and DatabaseName 
-		[id(26), helpstring("method ResetDBConnection")] HRESULT ResetDBConnection(void);
+		// PARAMS:  bResetCredentials- VARIANT_TRUE to force any credentials associated with the current connection.
+		[id(26), helpstring("method ResetDBConnection")] HRESULT ResetDBConnection(VARIANT_BOOL bResetCredentials);
 
 		// PROMISE: To send all database connection status and access status update events
 		//			to the window represented by the handle nHandle

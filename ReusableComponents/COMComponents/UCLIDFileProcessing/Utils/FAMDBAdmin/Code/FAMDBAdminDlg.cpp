@@ -497,7 +497,7 @@ void CFAMDBAdminDlg::OnDatabaseSetOptions()
 			uex.log();
 
 			// Reset the connection to update the cached settings in the FAMDB pointer
-			m_ipFAMDB->ResetDBConnection();
+			m_ipFAMDB->ResetDBConnection(VARIANT_FALSE);
 
 			MessageBox("Database settings have been updated.", "Settings Updated");
 		}
@@ -906,7 +906,7 @@ void CFAMDBAdminDlg::OnDBConfigChanged(const std::string& strServer, const std::
 		m_ipFAMDB->DatabaseName = strDatabase.c_str();
 
 		// Attempt to connect with the new settings
-		m_ipFAMDB->ResetDBConnection();
+		m_ipFAMDB->ResetDBConnection(VARIANT_FALSE);
 
 		// Set the connection is good to true
 		m_bIsDBGood = true;

@@ -140,7 +140,7 @@ public:
 		IRandomMathCondition* pRandomCondition,long* pnNumRecordsOutput);
 	STDMETHOD(ResetDBLock)(void);
 	STDMETHOD(GetActionID)(BSTR bstrActionName, long* pnActionID);
-	STDMETHOD(ResetDBConnection)(void);
+	STDMETHOD(ResetDBConnection)(VARIANT_BOOL bResetCredentials);
 	STDMETHOD(SetNotificationUIWndHandle)(long nHandle);
 	STDMETHOD(ShowLogin)(VARIANT_BOOL bShowAdmin, VARIANT_BOOL* pbLoginCancelled, 
 		VARIANT_BOOL* pbLoginValid);

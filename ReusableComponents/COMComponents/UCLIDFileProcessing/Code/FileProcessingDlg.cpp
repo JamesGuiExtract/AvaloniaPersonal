@@ -350,7 +350,7 @@ void FileProcessingDlg::OnBtnRun()
 	try
 	{
 		// Reset the db connection
-		getDBPointer()->ResetDBConnection();
+		getDBPointer()->ResetDBConnection(VARIANT_FALSE);
 		
 		// set all parameters for file proc manager
 		// if saving a setting fails we will not run
@@ -1688,7 +1688,7 @@ void FileProcessingDlg::OnDBConfigChanged(const std::string& strServer,
 		getFPM()->AdvancedConnectionStringProperties = strAdvConnStrProperties.c_str();
 
 		// Reset the database connection
-		getDBPointer()->ResetDBConnection();
+		getDBPointer()->ResetDBConnection(VARIANT_FALSE);
 	}
 	catch ( ... )
 	{

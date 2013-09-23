@@ -194,7 +194,7 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		m_bCancelling = false;
 
 		// Reset the DB Connection
-		getFPMDB()->ResetDBConnection();
+		getFPMDB()->ResetDBConnection(VARIANT_FALSE);
 
 		// Check whether or not FAM Session history should be recorded
 		m_bRecordFAMSessions = asString(
@@ -1423,7 +1423,7 @@ void CFileProcessingManager::clear()
 		getFPMDB()->DatabaseServer = "";
 		getFPMDB()->DatabaseName = "";
 		getFPMDB()->AdvancedConnectionStringProperties = "";
-		getFPMDB()->ResetDBConnection();
+		getFPMDB()->ResetDBConnection(VARIANT_TRUE);
 
 		m_nMaxFilesFromDB = gnMAX_NUMBER_OF_FILES_FROM_DB;
 

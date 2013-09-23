@@ -66,7 +66,6 @@ using namespace ADODB;
 				if (((!bTimeout || !m_bRetryOnTimeout) && bConnectionAlive) \
 					|| nRetryCount >= m_iNumberOfRetries) \
 				{ \
-					m_bLoggedInAsAdmin = false; \
 					throw ue; \
 				}\
 				if (!bRetryExceptionLogged) \
@@ -731,7 +730,7 @@ STDMETHODIMP CFileProcessingDB::GetActionID(BSTR bstrActionName, long* pnActionI
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14986")
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::ResetDBConnection()
+STDMETHODIMP CFileProcessingDB::ResetDBConnection(VARIANT_BOOL bResetCredentials)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	
@@ -739,6 +738,15 @@ STDMETHODIMP CFileProcessingDB::ResetDBConnection()
 	{
 		// Validate the license
 		validateLicense();
+
+		// [DotNetRCAndUtils:1113]
+		// m_bLoggedInAsAdmin is no longer being reset when a connection is lost. Instead, callers
+		// will set bResetCredentials to clear the credentials whenever a new connection is to be
+		// obtained (as opposed to restoring a lost/failed connection).
+		if (asCppBool(bResetCredentials))
+		{
+			m_bLoggedInAsAdmin = false;
+		}
 
 		// Call the internal reset db connection
 		resetDBConnection();

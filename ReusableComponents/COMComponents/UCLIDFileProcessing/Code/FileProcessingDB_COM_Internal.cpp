@@ -65,7 +65,6 @@ using namespace ADODB;
 				if (((!bTimeout || !m_bRetryOnTimeout) && bConnectionAlive) \
 					|| nRetryCount >= m_iNumberOfRetries) \
 				{ \
-					m_bLoggedInAsAdmin = false; \
 					throw ue; \
 				}\
 				if (!bRetryExceptionLogged) \
