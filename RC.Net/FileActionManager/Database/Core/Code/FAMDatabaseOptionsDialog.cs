@@ -170,7 +170,7 @@ namespace Extract.FileActionManager.Database
                 db.DatabaseServer = _server;
                 db.DatabaseName = _database;
 
-                db.ResetDBConnection();
+                db.ResetDBConnection(false);
 
                 var settings = db.DBInfoSettings;
 
@@ -645,7 +645,7 @@ namespace Extract.FileActionManager.Database
                 FileProcessingDB db = (FileProcessingDB)Activator.CreateInstance(mgrType);
                 db.DatabaseServer = _server;
                 db.DatabaseName = _database;
-                db.ResetDBConnection();
+                db.ResetDBConnection(true);
 
                 // Check last db info update time
                 string lastTime = db.GetDBInfoSetting(_LAST_DB_INFO_CHANGE, true);

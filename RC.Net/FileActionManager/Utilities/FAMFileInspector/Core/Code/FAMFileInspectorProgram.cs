@@ -119,7 +119,7 @@ namespace Extract.FileActionManager.Utilities
                                         "Select database", false, false))
                         {
                             // Checks schema
-                            famFileInspectorForm.FileProcessingDB.ResetDBConnection();
+                            famFileInspectorForm.FileProcessingDB.ResetDBConnection(true);
                             loggedIn = true;
 
                             famFileInspectorForm.ResetFileSelectionSettings();

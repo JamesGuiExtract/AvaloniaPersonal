@@ -699,7 +699,7 @@ namespace Extract.FileActionManager.Utilities
 
                 if (!FileProcessingDB.IsConnected)
                 {
-                    FileProcessingDB.ResetDBConnection();
+                    FileProcessingDB.ResetDBConnection(false);
                     
                     // After connecting, make sure the context menu options match whether the
                     // connection is now in admin mode.
@@ -2148,7 +2148,7 @@ namespace Extract.FileActionManager.Utilities
                     if (FileProcessingDB.ShowSelectDB("Select database", false, false))
                     {
                         // Checks schema
-                        FileProcessingDB.ResetDBConnection();
+                        FileProcessingDB.ResetDBConnection(true);
                         ResetFileSelectionSettings();
                         ResetSearch();
                         Show();
