@@ -1567,8 +1567,11 @@ namespace Extract.DataEntry
         /// Handles the case that there was an error displaying data in a table cell. Any error that
         /// would display is converted to and displayed as an <see cref="ExtractException"/>.
         /// </summary>
-        /// <param name="displayErrorDialogIfNoHandler"></param>
-        /// <param name="e"></param>
+        /// <param name="displayErrorDialogIfNoHandler">true to display an error dialog box if there
+        /// is no handler for the <see cref="E:System.Windows.Forms.DataGridView.DataError"/> event.
+        /// </param>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.DataGridViewDataErrorEventArgs"/>
+        /// that contains the event data.</param>
         protected override void OnDataError(bool displayErrorDialogIfNoHandler, DataGridViewDataErrorEventArgs e)
         {
             try
@@ -1583,11 +1586,20 @@ namespace Extract.DataEntry
                 ee.AddDebugData("Row index", e.RowIndex, false);
                 ee.AddDebugData("Column index", e.ColumnIndex, false);
                 ee.AddDebugData("Context", e.Context.ToString(), false);
-                ee.Display();
+                
+                // [DataEntry:1290]
+                // For the 9.6 release only, this is being changed from a display into a log. For
+                // any subsequent release, an as-yet-to-be-implemented system that allows for
+                // exceptions to be displayed internally but not at customer sites should be used.
+                ee.Log();
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI35075");
+                // [DataEntry:1290]
+                // For the 9.6 release only, this is being changed from a display into a log. For
+                // any subsequent release, an as-yet-to-be-implemented system that allows for
+                // exceptions to be displayed internally but not at customer sites should be used.
+                ex.ExtractLog("ELI35075");
             }
         }
 
