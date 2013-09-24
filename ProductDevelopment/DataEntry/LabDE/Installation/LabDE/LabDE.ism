@@ -3303,7 +3303,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>ISUSSignature</td><td>{7B93F92A-DF94-4C80-AEF7-BB3796DBC7F0}</td></row>
 		<row><td>MsiExecCmdLineOptions</td><td/></row>
 		<row><td>MsiLogFile</td><td/></row>
-		<row><td>OnUpgrade</td><td>1</td></row>
+		<row><td>OnUpgrade</td><td>0</td></row>
 		<row><td>Owner</td><td/></row>
 		<row><td>PatchFamily</td><td>MyPatchFamily1</td></row>
 		<row><td>PatchSequence</td><td>1.0.0</td></row>
