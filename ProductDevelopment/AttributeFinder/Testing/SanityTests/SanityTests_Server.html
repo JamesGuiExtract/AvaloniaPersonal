@@ -71,8 +71,8 @@
 			<ul>
                 		<li>Run DB Admin <b>as Administrator</b> and connect to the database 
 				<b>sanity_test</b>.</li>
-                		<li>When prompted to update the database to the current schema, click
-				<b>No</b>.</li>
+                		<li>When prompted to update the database to the current schema, 
+				click <b>No</b>.</li>
                 		<li>Confirm that <b>only</b> the following menu items are enabled.
                 		<ul>
                     			<li>Database - <b>Clear</b>, <b>Update database schema</b>, 
@@ -82,23 +82,27 @@
                     			<li>Help - <b>File Action Manager Help</b> and <b>About this 
 					application</b>.</li>
                 		</ul></li>
-                		<li>Select the <b>Database - Update database schema</b> menu item.</li>
+                		<li>Select the <b>Database - Update database schema</b> menu 
+				item.</li>
                 		<li>Confirm that the database is successfully updated.</li>
 				<li>Open <b>Compute.fps</b> and start processing.
-				<li>Confirm that a meaningful error message appears and that processing 
-				does not start.
+				<li>Confirm that a meaningful error message appears and that 
+				processing does not start.
 				<li>Add the logged-in user via <b>DB Admin</b>.
 				<li>Confirm that processing starts without error.
-				<li>Stop processing and remove the logged-in user via <b>DB Admin</b>.
+				<li>Stop processing and remove the logged-in user via 
+				<b>DB Admin</b>.
 				<li>Modify <b>Skip authentication when running as a service on 
-				the following machines</b> within the <b>Database Options</b> dialog to 
-				include the test machine.
+				the following machines</b> within the <b>Database Options</b> 
+				dialog to include the test machine.
                 		<li>Confirm that processing still does not start.
                 		<li>Configure the FAM service to run <b>Compute.fps</b>.
 				<ul>
-					<li>Confirm that the service starts without delay and without 
-					error, ignoring the <b>SleepTimeOnStart</b> setting.
-					<li>Stop the service and configure it for <b>Manual</b> start.
+					<li>Confirm that the service starts without delay and 
+					without error, ignoring the <b>SleepTimeOnStart</b> 
+					setting.
+					<li>Stop the service and configure it for <b>Manual</b> 
+					start.
 					<li>Restart the machine.
 					<li>Start the service and confirm that the 
 					<b>SleepTimeOnStart</b> setting is respected.
@@ -120,12 +124,12 @@
 			<li>Use the <b>File Action Manager Database Administration</b> utility to 
 			display the <b>Summary</b> tab.  Confirm that the various counts are 
 			changing.
-            		<li>Try to <b>Clear</b> the database and confirm that you are not allowed to 
-			clear the database while files are being processed.</li>
-            		<li>Try to <b>Recalculate summary statistics</b> and confirm that this is not 
-			allowed while files are being processed.</li>
-			<li><b>Test3</b> can be started while <b>Test2</b> is executing.  Note that 
-			<b>Test3</b> cannot be completed until after Test2 has completed.
+            		<li>Try to <b>Clear</b> the database and confirm that you are not allowed 
+			to clear the database while files are being processed.</li>
+            		<li>Try to <b>Recalculate summary statistics</b> and confirm that this 
+			is not allowed while files are being processed.</li>
+			<li><b>Test3</b> can be started while <b>Test2</b> is executing.  Note 
+			that <b>Test3</b> cannot be completed until after Test2 has completed.
 			<li>Confirm via <b>FAMDBAdmin</b> that several files are ready for 
 			verification before starting <b>Test3</b>.
 		</ul>
@@ -167,10 +171,11 @@
 			<li>Provide comments for some files during verification.
 			<li>Confirm that reports correctly indicate which files were <b>skipped</b>.
 			<li>Confirm that reports correctly indicate which files were <b>tagged</b>.
-			<li>Confirm that reports correctly indicate which <b>comments</b> are defined.
+			<li>Confirm that reports correctly indicate which <b>comments</b> are 
+			defined.
 			<li>Modify the FPS file to process the skipped files.
-			<li>Finish verifying the sensitive documents and confirm that the verification 
-			UI automatically closes.
+			<li>Finish verifying the sensitive documents and confirm that the 
+			verification UI automatically closes.
 		</ul>
 <p>
 		<li><b>Test4 - Special images</b>
@@ -247,14 +252,19 @@
         	</ul>
         	<li><b>Rotated</b>
         	<ul>
-            		<li>Confirm that you see reasonable behavior regardless of image orientation; 
-			note that most view perspective examples will fail processing.</li>
+            		<li>Confirm that you see reasonable behavior regardless of image 
+			orientation; note that most view perspective examples will fail 
+			processing.</li>
         	</ul>
     	</ul>
 <p>
 	<li><h2>FLEX Index - Demo</h2>
 	<ul>
 		<li>Copy the <b>Demo_FlexIndex</b> folder to the test machine.
+		<li>Run <b>Clean.bat</b> as local administrator.
+		<li>Use <b>SQL Management Studio</b> to grant <u>db_datareader</u> and 
+		<u>db_datawriter</u> privileges to Domain Users for the <b>Demo_FLEXIndex</b> 
+		database.
 		<li>Exercise <b>ExtractData.fps</b>
 		<ul>
 			<li>Confirm that all images are processed.
@@ -264,9 +274,11 @@
 		<ul>
 			<li>Confirm that appropriate data were found for each image.
 			<li>Confirm that each field type can be swiped using the <b>angular 
-			redaction</b> tool.
+			highlight</b> tool.
 			<li>Confirm that each field type can be swiped using the <b>rectangular 
-			redaction</b> tool.
+			highlight</b> tool.
+			<li>Confirm that each field type can be swiped using the <b>word 
+			highlight</b> tool.
 		</ul>
 	</ul>
 <p>
@@ -286,11 +298,11 @@
 		<ul>
 			<li>Confirm that appropriate data are found for each image.
 			<li>Confirm that data can be swiped using the <b>angular 
-			redaction</b> tool.
+			highlight</b> tool.
 			<li>Confirm that data can be swiped using the <b>rectangular 
-			redaction</b> tool.
+			highlight</b> tool.
 			<li>Confirm that data can be swiped using the <b>word 
-			redaction</b> tool.
+			highlight</b> tool.
 		</ul>
 	</ul>
 <p>
@@ -298,13 +310,13 @@
 	<ul>
 		<li><b>Database Administration</b>
 		<ul>
-			<li>Confirm that <b>Database server name</b> is prepopulated with the previously 
-			selected server.
-			<li>Confirm that <b>Database name</b> is prepopulated with the previously 
-			selected database name.
+			<li>Confirm that <b>Database server name</b> is prepopulated with the 
+			previously selected server.
+			<li>Confirm that <b>Database name</b> is prepopulated with the 
+			previously selected database name.
 			<li>Confirm that <b>Database server name</b> includes a 
-			<b>&lt;Browse...&gt;</b> choice that populates the combo box with names of 
-			all reachable SQL Server machines.
+			<b>&lt;Browse...&gt;</b> choice that populates the combo box with names 
+			of all reachable SQL Server machines.
 			<li>Confirm that <b>Database name</b> includes a <b>&lt;Browse...&gt;</b> 
 			choice that populates the combo box with names of all databases available 
 			on the selected server.
@@ -346,6 +358,8 @@
 			</ul>
 			<li>Confirm that the <b>File Action Manager</b> can be started from the 
 			<b>Tools</b> menu and that the active database is preselected.
+			<li>Confirm that the <b>FAM File Inspector</b> can be started from the 
+			<b>Tools</b> menu and that the active database is preselected.
 			<li>Confirm that a file list can be <b>exported</b>.
 			<li>Confirm that each available <b>Report</b> can be generated.
             		<li>Confirm that <b>Database options</b> can be modified.</li>
@@ -354,30 +368,34 @@
 		<li><b>Help File</b>
 		<ul>
 			<li>Confirm that the <b>ID Shield</b> help file opens without error.
-			<li>Confirm that the <b>ID Shield</b> help file contains the expected contents.
+			<li>Confirm that the <b>ID Shield</b> help file contains the expected 
+			contents.
 			<li>Confirm that the <b>FLEX Index</b> help file opens without error.
-			<li>Confirm that the <b>FLEX Index</b> help file contains the expected contents.
+			<li>Confirm that the <b>FLEX Index</b> help file contains the expected 
+			contents.
 			<li>Confirm that the <b>LabDE</b> help file opens without error.
-			<li>Confirm that the <b>LabDE</b> help file contains the expected contents.
+			<li>Confirm that the <b>LabDE</b> help file contains the expected 
+			contents.
 		</ul>
 <p>
 		<li><b>USB License Key Manager</b>
 		<ul>
-			<li>Confirm that connecting to a USB key on a remote machine (i.e. <b>LISA</b>) 
+			<li>Confirm that connecting to a USB key on a remote machine (i.e. 			<b>LISA</b>) 
 			populates the appropriate fields.
 			<li>Confirm that connecting to a USB key on the <b>local</b> machine 
 			populates the appropriate fields.
-			<li>Confirm that clicking the <b>Server Status</b> button displays a browser 
-			window with details about the local key.  Note that <b>Java</b> may need to 
-			be installed before the details are displayed.
+			<li>Confirm that clicking the <b>Server Status</b> button displays a 
+			browser window with details about the local key.  Note that <b>Java</b> 
+			may need to be installed before the details are displayed.
 		</ul>
 <p>
 		<li><b>User License</b>
 		<ul>
-			<li>Confirm that the <b>User License</b> application when selected from the 
-			Start menu starts with empty <b>Name</b>, <b>Company Name</b>, <b>Phone 
-			Number</b> and <b>Email</b> fields.
-			<li>Confirm that the <b>User License Key</b> field is populated and read-only.
+			<li>Confirm that the <b>User License</b> application when selected from 
+			the Start menu starts with empty <b>Name</b>, <b>Company Name</b>, 
+			<b>Phone Number</b> and <b>Email</b> fields.
+			<li>Confirm that the <b>User License Key</b> field is populated and 
+			read-only.
 			<li>Confirm that one or more of the Extract Systems software products is 
 			available for selection.
 			<li>Confirm that the selected software product includes the appropriate 
@@ -415,17 +433,19 @@
 <p>
 		<li><b>Detect and Report Failure</b>
 		<ul>
-			<li>Confirm that <b>FDRS</b> starts and leaves a green icon in the system tray.
+			<li>Confirm that <b>FDRS</b> starts and leaves a green icon in the 
+			system tray.
 			<li>Confirm that <b>FDRS</b> displays a context menu.
-			<li>Confirm that <b>Configure - Automatic notifications</b> displays an INI 
-			file with application settings.
-			<li>Confirm that <b>Exit</b> closes the application and removes the icon from 
-			the system tray.
+			<li>Confirm that <b>Configure - Automatic notifications</b> displays an 
+			INI file with application settings.
+			<li>Confirm that <b>Exit</b> closes the application and removes the 
+			icon from the system tray.
 		</ul>
 <p>
 		<li><b>FAM Network Manager</b>
 		<ul>
-			<li>Follow the instructions in the <b>Help</b> file for proper machine setup.
+			<li>Follow the instructions in the <b>Help</b> file for proper 
+			machine setup.
 			<li>Add the current test machine and confirm that <b>FAM Status</b> and 
 			<b>FDRS Status</b> are both correct.
 			<li>Add a non-existent machine and confirm that status values are <b>Not 
@@ -437,7 +457,8 @@
 			<li>Click the <b>Auto refresh status</b> toolbar button
 			<ul>
 				<li>Confirm that <b>CPU</b> status changes at a regular frequency.
-				<li>Confirm that the <b>Refresh status</b> toolbar button is disabled.
+				<li>Confirm that the <b>Refresh status</b> toolbar button is 
+				disabled.
 			</ul>
 			<li>Stop the FAM Service on the test machine and confirm that FAM Status 
 			changes to <b>Stopped</b>.
@@ -447,8 +468,8 @@
 		<ul>
 	      		<li>Prepare a set of images for verification.
 			<li>Collect feedback during verification.  Note that <b>Verify.fps</b> from 
-			<b>Test3</b> is configured to collect feedback to an <b>ExpectedRedactions</b> 
-			subfolder.
+			<b>Test3</b> is configured to collect feedback to an 
+			<b>ExpectedRedactions</b> subfolder.
 			<li>Confirm that a <b>Start menu</b> shortcut exists 
 			under <b>Utilities</b>.
 <p>
