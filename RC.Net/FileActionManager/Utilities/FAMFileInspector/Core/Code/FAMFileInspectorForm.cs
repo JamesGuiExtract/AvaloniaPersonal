@@ -1526,9 +1526,7 @@ namespace Extract.FileActionManager.Utilities
                 // restoring the previous selection.
                 if (!MouseButtons.HasFlag(MouseButtons.Left))
                 {
-                    _lastSelectedRows = _fileListDataGridView.SelectedRows
-                        .OfType<DataGridViewRow>()
-                        .ToArray();
+                    _lastSelectedRows = SelectedRows.ToArray();
                 }
             }
             catch (Exception ex)
@@ -1631,9 +1629,7 @@ namespace Extract.FileActionManager.Utilities
 
                     // Keep track of the current selection so that selection changes on the next
                     // MouseDown can be suppressed if necessary.
-                    _lastSelectedRows = _fileListDataGridView.SelectedRows
-                        .OfType<DataGridViewRow>()
-                        .ToArray();
+                    _lastSelectedRows = SelectedRows.ToArray();
                 }
             }
             catch (Exception ex)
@@ -1667,9 +1663,7 @@ namespace Extract.FileActionManager.Utilities
 
                     // If a drag/drop event was started, go ahead and consider the current selection
                     // permanent and eligible to use in the next selection "suppression".
-                    _lastSelectedRows = _fileListDataGridView.SelectedRows
-                        .OfType<DataGridViewRow>()
-                        .ToArray();
+                    _lastSelectedRows = SelectedRows.ToArray();
                 }
             }
             catch (Exception ex)
@@ -1743,7 +1737,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                SetRowFlag(_fileListDataGridView.SelectedRows.OfType<DataGridViewRow>(), true);
+                SetRowFlag(SelectedRows, true);
             }
             catch (Exception ex)
             {
@@ -1762,7 +1756,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                SetRowFlag(_fileListDataGridView.SelectedRows.OfType<DataGridViewRow>(), false);
+                SetRowFlag(SelectedRows, false);
             }
             catch (Exception ex)
             {
@@ -1839,7 +1833,7 @@ namespace Extract.FileActionManager.Utilities
                     _fileListDataGridView.CurrentCell = clickedRow.Cells[0];
                 }
 
-                int selectionCount = _fileListDataGridView.SelectedRows.Count;
+                int selectionCount = SelectedRows.Count();
 
                 // Enable/disable each file handler item in the context menu based on the current
                 // selection.
@@ -1870,13 +1864,11 @@ namespace Extract.FileActionManager.Utilities
 
                 // Enable/disable the set/clear flag options depending on the flag status of the
                 // selected rows.
-                _setFlagMenuItem.Enabled = _fileListDataGridView.SelectedRows
-                    .OfType<DataGridViewRow>()
+                _setFlagMenuItem.Enabled = SelectedRows
                     .Where(row => row.Cells[_FILE_LIST_FLAG_COLUMN_INDEX].Value == null)
                     .Any();
 
-                _clearFlagMenuItem.Enabled = _fileListDataGridView.SelectedRows
-                    .OfType<DataGridViewRow>()
+                _clearFlagMenuItem.Enabled = SelectedRows
                     .Where(row => row.Cells[_FILE_LIST_FLAG_COLUMN_INDEX].Value != null)
                     .Any();
             }
@@ -1902,7 +1894,7 @@ namespace Extract.FileActionManager.Utilities
                 // [DotNetRCAndUtils:1064]
                 // Flag any rows for which a file handler was run to make it easier for the user
                 // to keep track of for which files an action was taken.
-                SetRowFlag(_fileListDataGridView.SelectedRows.OfType<DataGridViewRow>(), true);
+                SetRowFlag(SelectedRows, true);
 
                 // Get the selected files to an array so that the file list is a snapshot that won't
                 // change after processing has begun.
@@ -2345,13 +2337,28 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Gets the currently visible and selected <see cref="DataGridViewRow"/>s from
+        /// <see cref="_fileListDataGridView"/>.
+        /// </summary>
+        // [DotNetRCAndUtils:1114]
+        // Hidden rows should not be included in the rows considered selected.
+        IEnumerable<DataGridViewRow> SelectedRows
+        {
+            get
+            {
+                return _fileListDataGridView.SelectedRows
+                    .OfType<DataGridViewRow>()
+                    .Where(row => row.Visible);
+            }
+        }
+
+        /// <summary>
         /// Gets the currently selected file names.
         /// </summary>
         /// <returns>The currently selected file names.</returns>
         string[] GetSelectedFileNames()
         {
-            var fileNames = _fileListDataGridView.SelectedRows
-                .OfType<DataGridViewRow>()
+            var fileNames = SelectedRows
                 .OrderBy(row => row.Index)
                 .Select(row => row.GetFileData().FileName)
                 .ToArray();
@@ -3229,9 +3236,9 @@ namespace Extract.FileActionManager.Utilities
         {
             rowToUpdate.Visible =
                 rowData.FileMatchesSearch || !_showOnlyMatchesCheckBox.Checked;
-            if (rowToUpdate.Visible && _fileListDataGridView.SelectedRows.Count == 1)
+            if (rowToUpdate.Visible && SelectedRows.Count() == 1)
             {
-                if (_fileListDataGridView.SelectedRows[0] == rowToUpdate &&
+                if (SelectedRows.First() == rowToUpdate &&
                     _fileListDataGridView.CurrentRow != rowToUpdate)
                 {
                     _fileListDataGridView.CurrentCell = rowToUpdate.Cells[0];
