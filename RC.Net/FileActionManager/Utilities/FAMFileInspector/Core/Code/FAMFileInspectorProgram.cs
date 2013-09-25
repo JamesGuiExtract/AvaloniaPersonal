@@ -377,7 +377,8 @@ namespace Extract.FileActionManager.Utilities
                     {
                         _actionStatus = "R";
                     }
-                    else if (_actionStatus.Equals("Completed", StringComparison.OrdinalIgnoreCase))
+                    else if (_actionStatus.Equals("Complete", StringComparison.OrdinalIgnoreCase) ||
+                             _actionStatus.Equals("Completed", StringComparison.OrdinalIgnoreCase))
                     {
                         _actionStatus = "C";
                     }
