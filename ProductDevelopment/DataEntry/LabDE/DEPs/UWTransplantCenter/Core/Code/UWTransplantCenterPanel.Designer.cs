@@ -744,7 +744,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             // _componentRefRange
             // 
             this._componentRefRange.AttributeName = "Range";
-            this._componentRefRange.AutoUpdateQuery = "";
+            this._componentRefRange.AutoUpdateQuery = resources.GetString("_componentRefRange.AutoUpdateQuery");
             this._componentRefRange.FillWeight = 65F;
             this._componentRefRange.HeaderText = "Ref. Range";
             this._componentRefRange.Name = "_componentRefRange";

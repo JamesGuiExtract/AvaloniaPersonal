@@ -326,6 +326,11 @@
   <metadata name="_componentRefRange.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="_componentRefRange.AutoUpdateQuery" xml:space="preserve">
+    <value>&lt;Query&gt;&lt;RegEx Pattern='(?&amp;lt;=^\s*\[)[\s\S]*(?=\]\s*$)'&gt;&lt;Attribute Name='Range'&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;RegEx Pattern='(?&amp;lt;=^\s*\()[\s\S]*(?=\)\s*$)'&gt;&lt;Range/&gt;&lt;/RegEx&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;RegEx Pattern='[\s\S]*'&gt;&lt;Range/&gt;&lt;/RegEx&gt;&lt;/Query&gt;</value>
+  </data>
   <data name="_componentFlag.ValidationQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
 	&lt;RegEx Name='Flag' Pattern='^A$'&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt;
