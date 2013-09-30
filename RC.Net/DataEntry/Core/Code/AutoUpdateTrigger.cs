@@ -2,6 +2,8 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_RASTERANDOCRMGMTLib;
 
@@ -57,9 +59,42 @@ namespace Extract.DataEntry
         /// </summary>
         bool _updatingValue;
 
+        /// <summary>
+        /// Indicates whether <see cref="IDisposable.Dispose"/> has been called on this instance.
+        /// </summary>
+        bool _isDisposed;
+
+        /// <summary>
+        /// Keeps track of all queries for which updates were triggered while an
+        /// <see cref="AttributeStatusInfo.EndEdit"/> or <see cref="UndoManager"/> undo/redo call is
+        /// in progress. These triggers are batched until the end of the operation to prevent
+        /// excessive recalculations as various parts of complex queries are updated.
+        /// </summary>
+        [ThreadStatic]
+        static Queue<Tuple<AutoUpdateTrigger, DataEntryQuery>> _queriesPendingUpdate =
+            new Queue<Tuple<AutoUpdateTrigger, DataEntryQuery>>();
+
         #endregion Fields
 
-        #region Contructors
+        #region Constructors
+
+        /// <summary>
+        /// Provides static initializatoin for the <see cref="AutoUpdateTrigger"/> class.
+        /// </summary>
+        // FXCop believes static members are being initialized here.
+        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
+        static AutoUpdateTrigger()
+        {
+            try
+            {
+                AttributeStatusInfo.EditEnded += HandleAttributeStatusInfo_EditEnded;
+                AttributeStatusInfo.UndoManager.OperationEnded += HandleUndoManager_OperationEnded;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36173");
+            }
+        }
 
         /// <summary>
         /// Initializes a new <see cref="AutoUpdateTrigger"/> instance.
@@ -134,14 +169,15 @@ namespace Extract.DataEntry
             }
         }
 
-        #endregion Contructors
+        #endregion Constructors
 
         #region Methods
 
         /// <summary>
         /// Updates the target attribute's value by executing the query.
         /// </summary>
-        /// <returns></returns>
+        /// <returns><see langword="true"/> if the call resulted in the target getting updated;
+        /// otherwise, <see langword="false"/>.</returns>
         public bool UpdateValue()
         {
             try
@@ -199,6 +235,8 @@ namespace Extract.DataEntry
         /// resources; <see langword="false"/> to release only unmanaged resources.</param> 
         protected virtual void Dispose(bool disposing)
         {
+            _isDisposed = true;
+
             if (disposing)
             {
                 if (_defaultQuery != null)
@@ -214,6 +252,46 @@ namespace Extract.DataEntry
         #endregion  IDisposable Members
 
         #region EventHandlers
+
+        /// <summary>
+        /// Handles the <see cref="AttributeStatusInfo.EditEnded"/> event of the
+        /// <see cref="AttributeStatusInfo"/> class.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        static void HandleAttributeStatusInfo_EditEnded(object sender, EventArgs e)
+        {
+            try
+            {
+                // Execute all pending AutoUpdateTriggers that fired during an EndEdit call.
+                ExecuteAllPendingTriggers();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36174");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="UndoManager.OperationEnded"/> event of
+        /// <see cref="AttributeStatusInfo"/>'s <see cref="UndoManager"/> instance.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        static void HandleUndoManager_OperationEnded(object sender, EventArgs e)
+        {
+            try
+            {
+                // Execute all pending AutoUpdateTriggers that fired during an undo/redo operation.
+                ExecuteAllPendingTriggers();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36175");
+            }
+        }
 
         /// <summary>
         /// Handles the case that data behind the query has been modified thereby likely changing
@@ -233,18 +311,41 @@ namespace Extract.DataEntry
                 {
                     DataEntryQuery dataEntryQuery = (DataEntryQuery)sender;
 
-                    // Always ensure a default query applies updates as part of a full
-                    // auto-update trigger to ensure normal auto-update triggers can apply
-                    // their updates on top of any default value.
-                    if (dataEntryQuery.DefaultQuery)
+                    // [DataEntry:1283, 1284, 1289]
+                    // If the query was modified during an EndEdit call, during an undo/redo
+                    // operation or while processing the backlog of triggers that fired during
+                    // either of those calls, postpone the update until all changes are registered.
+                    // This prevents excessive recalculations as various parts of complex queries
+                    // are updated.
+                    if (AttributeStatusInfo.EndEditInProgress ||
+                        AttributeStatusInfo.UndoManager.InUndoOperation ||
+                        AttributeStatusInfo.UndoManager.InRedoOperation ||
+                        _queriesPendingUpdate.Count > 0)
                     {
-                        UpdateValue();
+                        // If this query has already been scheduled to be updated, don't schedule
+                        // another update.
+                        if (!_queriesPendingUpdate.Any(
+                                pendingTrigger => pendingTrigger.Item2 == dataEntryQuery))
+                        {
+                            _queriesPendingUpdate.Enqueue(
+                                new Tuple<AutoUpdateTrigger, DataEntryQuery>(this, dataEntryQuery));
+                        }
                     }
-                    // If not a default auto-update trigger, update using only the modified query,
-                    // not the entire trigger.
                     else
                     {
-                        UpdateValue(dataEntryQuery);
+                        // Always ensure a default query applies updates as part of a full
+                        // auto-update trigger to ensure normal auto-update triggers can apply
+                        // their updates on top of any default value.
+                        if (dataEntryQuery.DefaultQuery)
+                        {
+                            UpdateValue();
+                        }
+                        // If not a default auto-update trigger, update using only the modified
+                        // query, not the entire trigger.
+                        else
+                        {
+                            UpdateValue(dataEntryQuery);
+                        }
                     }
                 }
             }
@@ -421,6 +522,42 @@ namespace Extract.DataEntry
             else
             {
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Executes all <see cref="AutoUpdateTrigger"/>s that were triggered and postponed while an
+        /// <see cref="AttributeStatusInfo.EndEdit"/> or <see cref="UndoManager"/> undo/redo call
+        /// was in progress.
+        /// </summary>
+        static void ExecuteAllPendingTriggers()
+        {
+            while (_queriesPendingUpdate.Count > 0)
+            {
+                var pendingTrigger = _queriesPendingUpdate.Dequeue();
+                
+                // Ensure that a field and/or it's autoupdate trigger(s) haven't been deleted or
+                // disposed of since the query modification occured.
+                AutoUpdateTrigger autoUpdateQuery = pendingTrigger.Item1;
+                if (autoUpdateQuery._isDisposed ||
+                    !AttributeStatusInfo.GetStatusInfo(autoUpdateQuery._targetAttribute).IsInitialized)
+                {
+                    continue;
+                }
+
+                DataEntryQuery dataEntryQuery = pendingTrigger.Item2;
+
+                // Always ensure a default query applies updates as part of a full
+                // auto-update trigger to ensure normal auto-update triggers can apply
+                // their updates on top of any default value.
+                if (dataEntryQuery.DefaultQuery)
+                {
+                    autoUpdateQuery.UpdateValue();
+                }
+                else
+                {
+                    autoUpdateQuery.UpdateValue(dataEntryQuery);
+                }
             }
         }
 

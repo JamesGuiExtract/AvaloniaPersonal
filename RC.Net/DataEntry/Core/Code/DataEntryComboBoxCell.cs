@@ -360,7 +360,10 @@ namespace Extract.DataEntry
                     // Don't consider spatial info changed if an attribute is being applied for the
                     // first time; this only happens during the initial load. Treating this case
                     // as spatialInfoChanged will erroneously clear accepted text.
-                    if (_attribute != null && attribute.Value.HasSpatialInfo())
+                    // Also don't consider spatial info changed if the incoming attribute is the
+                    // same as the existing one.
+                    if (_attribute != null && _attribute != attribute &&
+                        attribute.Value.HasSpatialInfo())
                     {
                         spatialInfoChanged = true;
                     }

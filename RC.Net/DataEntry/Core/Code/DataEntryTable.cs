@@ -2758,9 +2758,11 @@ namespace Extract.DataEntry
                         {
                             MapAttribute(dataEntryCell.Attribute, dataEntryCell);
 
-                            // Re-validate the cells when being re-displayed in case validation
-                            // status changed while the cell was not displayed.
-                            ValidateCell(dataEntryCell, false);
+                            // Set the value in case the attribute has been modified since it was
+                            // last displayed. This will trigger the value to be re-validated as
+                            // well in case validation status changed while the cell was not
+                            // displayed.
+                            cell.Value = dataEntryCell.Attribute;
                         }
 
                         // The cell style may need to be updated in case the enabled status of the

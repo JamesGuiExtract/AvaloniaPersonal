@@ -186,6 +186,11 @@ namespace Extract.Utilities
         /// </summary>
         public event EventHandler<EventArgs> RedoAvailabilityChanged;
 
+        /// <summary>
+        /// Indicates when an <see cref="Undo"/> or <see cref="Redo"/> operation has completed.
+        /// </summary>
+        public event EventHandler<EventArgs> OperationEnded;
+
         #endregion Events
 
         #region Properties
@@ -542,6 +547,8 @@ namespace Extract.Utilities
                     _redoStack.Push(_currentOperation);
                 }
 
+                OnOperationEnded();
+
                 if (_redoStack.Count == 1)
                 {
                     OnRedoAvailabilityChanged();
@@ -628,6 +635,8 @@ namespace Extract.Utilities
                     // Add all mementos recorded during the redo operation as an undo operation.
                     _undoStack.Push(_currentOperation);
                 }
+
+                OnOperationEnded();
 
                 if (_undoStack.Count == 1)
                 {
@@ -738,21 +747,34 @@ namespace Extract.Utilities
         /// </summary>
         void OnUndoAvailabilityChanged()
         {
-            if (UndoAvailabilityChanged != null)
+            var eventHandler = UndoAvailabilityChanged;
+            if (eventHandler != null)
             {
                 UndoAvailabilityChanged(this, new EventArgs());
             }
         }
-
 
         /// <summary>
         /// Raises the <see cref="RedoAvailabilityChanged"/> event.
         /// </summary>
         void OnRedoAvailabilityChanged()
         {
-            if (RedoAvailabilityChanged != null)
+            var eventHandler = RedoAvailabilityChanged;
+            if (eventHandler != null)
             {
                 RedoAvailabilityChanged(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="OperationEnded"/> event.
+        /// </summary>
+        void OnOperationEnded()
+        {
+            var eventHandler = OperationEnded;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
             }
         }
 

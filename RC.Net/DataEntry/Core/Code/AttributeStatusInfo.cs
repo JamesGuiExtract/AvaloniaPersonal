@@ -516,6 +516,19 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Indicates whether an <see cref="EndEdit"/> call is currently being processed.
+        /// </summary>
+        /// <returns><see langword="false"/> if an EndEdit call is currently being processed; otherwise,
+        /// <see langword="false"/>.</returns>
+        public static bool EndEditInProgress
+        {
+            get
+            {
+                return _endEditInProgress;
+            }
+        }
+
         #endregion Properties
 
         #region Static Members
