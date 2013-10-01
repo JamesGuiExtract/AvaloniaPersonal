@@ -2852,12 +2852,21 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     if (!_standAloneMode && _fileProcessingDb != null && !string.IsNullOrEmpty(
                             _activeDataEntryConfig.Config.Settings.SkipValidationIfDocTaggedAs))
                     {
+                        // [DataEntry:1294]
+                        // Support multiple tags to allow validation to be skipped delimited by
+                        // a comma or semi-colon.
+                        IEnumerable<string> tagsToBeSkipped =
+                            _activeDataEntryConfig.Config.Settings.SkipValidationIfDocTaggedAs
+                                .Split(new[] { ',', ';' })
+                                .Select(tagName => tagName.Trim())
+                                .Where(tagName => !string.IsNullOrWhiteSpace(tagName));
+
                         VariantVector appliedTags = _fileProcessingDb.GetTagsOnFile(_fileId);
                         int tagCount = appliedTags.Size;
                         for (int i = 0; i < tagCount; i++)
                         {
-                            if (_activeDataEntryConfig.Config.Settings.SkipValidationIfDocTaggedAs.Equals(
-                                    (string)appliedTags[i], StringComparison.OrdinalIgnoreCase))
+                            if (tagsToBeSkipped.Any(tagName => tagName.Equals(
+                                (string)appliedTags[i], StringComparison.OrdinalIgnoreCase)))
                             {
                                 commitData = false;
                                 break;
