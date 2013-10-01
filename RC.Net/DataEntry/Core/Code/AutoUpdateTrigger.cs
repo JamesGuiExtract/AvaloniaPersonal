@@ -71,8 +71,7 @@ namespace Extract.DataEntry
         /// excessive recalculations as various parts of complex queries are updated.
         /// </summary>
         [ThreadStatic]
-        static Queue<Tuple<AutoUpdateTrigger, DataEntryQuery>> _queriesPendingUpdate =
-            new Queue<Tuple<AutoUpdateTrigger, DataEntryQuery>>();
+        static Queue<Tuple<AutoUpdateTrigger, DataEntryQuery>> _queriesPendingUpdate;
 
         #endregion Fields
 
@@ -121,6 +120,15 @@ namespace Extract.DataEntry
                 ExtractException.Assert("ELI26111", "Null argument exception!",
                     targetAttribute != null);
                 ExtractException.Assert("ELI26112", "Null argument exception!", query != null);
+
+                // [DataEntry:1292]
+                // Since _queriesPendingUpdate is ThreadStatic, it needs to be constructed as needed
+                // in every thread rather than with a default constructor (otherwise it will be null
+                // in subsequent verification sessions.
+                if (_queriesPendingUpdate == null)
+                {
+                    _queriesPendingUpdate = new Queue<Tuple<AutoUpdateTrigger, DataEntryQuery>>();
+                }
 
                 // Initialize the fields.
                 _targetAttribute = targetAttribute;
@@ -532,6 +540,15 @@ namespace Extract.DataEntry
         /// </summary>
         static void ExecuteAllPendingTriggers()
         {
+            // [DataEntry:1292]
+            // Since _queriesPendingUpdate is ThreadStatic, it needs to be constructed as needed
+            // in every thread rather than with a default constructor (otherwise it will be null
+            // in subsequent verification sessions.
+            if (_queriesPendingUpdate == null)
+            {
+                _queriesPendingUpdate = new Queue<Tuple<AutoUpdateTrigger, DataEntryQuery>>();
+            }
+
             while (_queriesPendingUpdate.Count > 0)
             {
                 var pendingTrigger = _queriesPendingUpdate.Dequeue();
