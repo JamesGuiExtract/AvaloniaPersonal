@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Extract.Imaging
@@ -79,7 +80,7 @@ namespace Extract.Imaging
             try
             {
                 var imagePrinter = new ImagePrinter();
-                imagePrinter.PrintHelper(fileName, null, true);
+                imagePrinter.PrintHelper(fileName, null, true, true);
             }
             catch (Exception ex)
             {
@@ -93,18 +94,24 @@ namespace Extract.Imaging
         /// <param name="fileName">Name of the file to print.</param>
         /// <param name="printerName">Name of the printer to print to or <see langword="null"/> to
         /// use the default printer.</param>
+        /// <param name="useInstalledPrinterList"><see langword="true"/> if
+        /// <see paramref="printerName"/> should be explicitly validated against the installed
+        /// printers list; <see langword="false"/> to allow the printer to be discovered on the
+        /// network even when it is not currently on the installed printers list.</param>
         /// <param name="printAnnotations"> <see langword="true"/> to print annotations annotations;
         /// otherwise, <see langword="false"/>.
         /// <para><b>Note</b></para>
         /// If a failure occurs trying to print annotations, the document will still be printed, but
         /// an exception will be logged.
         /// </param>
-        public static void Print(string fileName, string printerName, bool printAnnotations)
+        public static void Print(string fileName, string printerName, bool useInstalledPrinterList,
+            bool printAnnotations)
         {
             try
             {
                 var imagePrinter = new ImagePrinter();
-                imagePrinter.PrintHelper(fileName, printerName, printAnnotations);
+                imagePrinter.PrintHelper(fileName, printerName, useInstalledPrinterList,
+                    printAnnotations);
             }
             catch (Exception ex)
             {
@@ -215,9 +222,14 @@ namespace Extract.Imaging
         /// <param name="fileName">Name of the file to print.</param>
         /// <param name="printerName">Name of the printer to print to or <see langword="null"/> to
         /// use the default printer.</param>
+        /// <param name="useInstalledPrinterList"><see langword="true"/> if
+        /// <see paramref="printerName"/> should be explicitly validated against the installed
+        /// printers list; <see langword="false"/> to allow the printer to be discovered on the
+        /// network even when it is not currently on the installed printers list.</param>
         /// <param name="printAnnotations"> <see langword="true"/> to print annotations annotations;
         /// otherwise, <see langword="false"/>.</param>
-        void PrintHelper(string fileName, string printerName, bool printAnnotations)
+        void PrintHelper(string fileName, string printerName, bool useInstalledPrinterList,
+            bool printAnnotations)
         {
             if (fileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
             {
@@ -253,6 +265,18 @@ namespace Extract.Imaging
                             printerName = string.Format(@"\\{0}\{1}", machineName,
                                 printerName.Substring(0, machineNameMatch.Index));
                         }
+                    }
+
+                    if (useInstalledPrinterList &&
+                        !PrinterSettings.InstalledPrinters
+                            .OfType<string>()
+                            .Any(printer =>
+                                printer.Equals(printerName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        var ee = new ExtractException("ELI36176",
+                            "The specified printer not in the local installed printers list.");
+                        ee.AddDebugData("Printer name", printerName, false);
+                        throw ee;
                     }
 
                     printDocument.PrinterSettings.PrinterName = printerName;

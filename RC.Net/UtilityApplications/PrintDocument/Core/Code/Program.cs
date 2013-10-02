@@ -18,7 +18,8 @@ namespace Extract.PrintDocument
             string exceptionFile = "";
             string fileName = "";
             string printerName = "";
-            bool? _printAnnotations = null;
+            bool printAnnotations = true;
+            bool useInstalledPrinterList = true;
 
             try
             {
@@ -29,7 +30,7 @@ namespace Extract.PrintDocument
                     "ELI36005", "Print document utility");
 
                 // Check the number of command line arguments
-                if (args.Length < 1 || args.Length > 5 || args[0] == "/?")
+                if (args.Length < 1 || args[0] == "/?")
                 {
                     ShowUsage();
                     return;
@@ -52,18 +53,22 @@ namespace Extract.PrintDocument
                     }
                     else if (arg.Equals("/a+", StringComparison.OrdinalIgnoreCase))
                     {
-                        _printAnnotations = true;
+                        printAnnotations = true;
                     }
                     else if (arg.Equals("/a-", StringComparison.OrdinalIgnoreCase))
                     {
-                        _printAnnotations = false;
+                        printAnnotations = false;
+                    }
+                    else if (arg.Equals("/x", StringComparison.OrdinalIgnoreCase))
+                    {
+                        useInstalledPrinterList = false;
                     }
                     else if (arg.Equals("/ef", StringComparison.OrdinalIgnoreCase))
                     {
                         i++;
                         if (i >= args.Length)
                         {
-                            ShowUsage();
+                            ShowUsage("Log filename expected.");
                             return;
                         }
                         
@@ -75,17 +80,18 @@ namespace Extract.PrintDocument
                     }
                     else
                     {
-                        ShowUsage();
+                        ShowUsage("Unrecognized option: \"" + arg + "\"");
                         return;
                     }
                 }
 
-                if (!_printAnnotations.HasValue)
+                if (!useInstalledPrinterList && string.IsNullOrWhiteSpace(printerName))
                 {
-                    _printAnnotations = true;
+                    ShowUsage("/x option is not valid if a printer name has not been specified.");
+                    return;
                 }
 
-                ImagePrinter.Print(fileName, printerName, _printAnnotations.Value);
+                ImagePrinter.Print(fileName, printerName, useInstalledPrinterList, printAnnotations);
             }
             catch (Exception ex)
             {
@@ -113,21 +119,26 @@ namespace Extract.PrintDocument
         /// <summary>
         /// Displays a usage message to the user
         /// </summary>
-        static void ShowUsage()
+        /// <param name="error">If specified, describes a problem with the specified command-line
+        /// arguments.</param>
+        static void ShowUsage(string error = null)
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("Usage:");
+            sb.AppendLine(error ?? "Usage:");
             sb.AppendLine("------------");
-            sb.AppendLine("PrintDocument.exe <FileName> [PrinterName] [/a+|/a-] [/ef <ExceptionFile>]");
+            sb.AppendLine("PrintDocument.exe <FileName> [PrinterName [/x]] [/a+|/a-] [/ef <ExceptionFile>]");
             sb.AppendLine("FileName: Name of file to print");
             sb.AppendLine("PrinterName: Name of the printer to use (default printer is used if not specified)");
+            sb.AppendLine("/x: Perform extended search for printers on the network but not currently in the " +
+                "installed printers list.");
             sb.AppendLine("/a+: Print image annotations (default if not specified)");
             sb.AppendLine("/a-: Do not print image annotations");
             sb.Append("/ef <ExceptionFile>: Log exceptions to the specified file rather than");
             sb.AppendLine(" display them");
 
             MessageBox.Show(sb.ToString(), "PrintDocument Usage", MessageBoxButtons.OK,
-                MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
+                string.IsNullOrEmpty(error) ? MessageBoxIcon.Information : MessageBoxIcon.Error,
+                MessageBoxDefaultButton.Button1, 0);
         }
     }
 }
