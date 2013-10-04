@@ -85,7 +85,7 @@ function main(args) {
     function writeAttr(fname, aname, avalue, atype, indent) {
         if (avalue!=undefined && avalue!="" && !(/^0+$/.test(avalue))) {
             if (fso.fileExists(fname)) {
-                indent = "\n"+indent;
+                indent = "\r\n"+indent;
             }
             appendText(fname, indent+aname+"|"+avalue+(atype? "|"+atype : ""));
         }
