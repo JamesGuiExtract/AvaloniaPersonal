@@ -428,6 +428,11 @@ namespace Extract.FileActionManager.Utilities
         bool? _reportsEnabled;
 
         /// <summary>
+        /// Keeps track of whether ProcessCmdKey is currently being handled to prevent recusion.
+        /// </summary>
+        bool _processingCmdKey;
+
+        /// <summary>
         /// Indicates if the host is in design mode or not.
         /// </summary>
         readonly bool _inDesignMode;
@@ -951,8 +956,16 @@ namespace Extract.FileActionManager.Utilities
         /// otherwise, <see langword="false"/>.</returns>
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
+            // Prevent recursion via PreProcessControlMessage call below.
+            if (_processingCmdKey)
+            {
+                return false;
+            }
+
             try
             {
+                _processingCmdKey = true;
+
                 if (keyData.HasFlag(Keys.Tab))
                 {
                     bool forward = !keyData.HasFlag(Keys.Shift);
@@ -1001,12 +1014,36 @@ namespace Extract.FileActionManager.Utilities
                     return true;
                 }
 
+                // [DotNetRCAndUtils:1117]
+                // To prevent against the Ctrl + C shortcut to copy file names not working when the
+                // user expects it to, check to see if the currently focused control is either a
+                // TextBox control or wants to handle the Ctrl + C message. If not, treat the
+                // shortcut as a copy of filenames from the file list.
+                if (CopyFileNamesEnabled && keyData.HasFlag(Keys.C) && keyData.HasFlag(Keys.Control))
+                {
+                    var focusedControl = this.GetFocusedControl();
+
+                    if (focusedControl != null && !(focusedControl is TextBoxBase))
+                    {
+                        PreProcessControlState state = focusedControl.PreProcessControlMessage(ref msg);
+                        if (state == PreProcessControlState.MessageNotNeeded)
+                        {
+                            CopySelectedFileNames();
+                            return true;
+                        }
+                    }
+                }
+
                 // This key was not processed, bubble it up to the base class.
                 return base.ProcessCmdKey(ref msg, keyData);
             }
             catch (Exception ex)
             {
                 ExtractException.Display("ELI35841", ex);
+            }
+            finally
+            {
+                _processingCmdKey = false;
             }
 
             return true;
@@ -2368,9 +2405,25 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// Copies the selected file names to the clipboard as text.
         /// </summary>
-        void CopySelectedFileNames()
+        /// <param name="filenames">The filenames to place on the clipboard if already known;
+        /// otherwise <see langword="null"/> to used the currently selected filenames.</param>
+        /// <param name="attempt">The current attempt number. After 3 failed attempts an exception
+        /// will be displayed.</param>
+        void CopySelectedFileNames(string filenames = null, int attempt = 0)
         {
-            Clipboard.SetText(string.Join("\r\n", GetSelectedFileNames()));
+            filenames = filenames ?? string.Join("\r\n", GetSelectedFileNames()); 
+
+            Clipboard.SetText(filenames);
+
+            if (Clipboard.GetText() != filenames)
+            {
+                ExtractException.Assert("ELI36183", "Failed to set clipboard text.", attempt < 3);
+
+                // Retry copying the file list to the clipboard in a subsequent message handler
+                // after a slight delay.
+                Thread.Sleep(100);
+                this.SafeBeginInvoke("ELI36182",() => CopySelectedFileNames(filenames, attempt + 1));
+            }
         }
 
         /// <summary>
