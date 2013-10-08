@@ -759,10 +759,10 @@ private:
 	IIUnknownVectorPtr getLicensedProductSpecificMgrs();
 
 	// Removes the schema for each of the licensed product specific managers
-	void removeProductSpecificDB();
+	void removeProductSpecificDB(bool bRetainUserTables);
 
 	// Adds the schema for each of the licensed product specific managers
-	void addProductSpecificDB();
+	void addProductSpecificDB(bool bAddUserTables);
 
 	// Adds the schema for each of the licensed product specific managers with the schema that
 	// existed as of the release of Flex/IDS 8.0.

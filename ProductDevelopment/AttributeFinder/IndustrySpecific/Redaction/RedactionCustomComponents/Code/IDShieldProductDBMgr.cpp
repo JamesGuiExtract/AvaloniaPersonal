@@ -185,7 +185,8 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_IsLicensed(VARIANT_BOOL  * pbValue)
 //-------------------------------------------------------------------------------------------------
 // IProductSpecificDBMgr Methods
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CIDShieldProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB *pDB)
+STDMETHODIMP CIDShieldProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB *pDB,
+																 VARIANT_BOOL bAddUserTables)
 {
 	try
 	{
@@ -288,7 +289,8 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_AddProductSpecificSchema80(IFileProcessi
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CIDShieldProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcessingDB *pDB)
+STDMETHODIMP CIDShieldProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcessingDB *pDB,
+																	VARIANT_BOOL bRetainUserTables)
 {
 	try
 	{

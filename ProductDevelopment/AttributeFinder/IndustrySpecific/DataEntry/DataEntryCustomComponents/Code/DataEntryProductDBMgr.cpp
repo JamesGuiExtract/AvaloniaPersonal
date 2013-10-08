@@ -15,6 +15,8 @@
 #include <TransactionGuard.h>
 #include <ADOUtils.h>
 #include <FAMDBHelperFunctions.h>
+#include <VectorOperations.h>
+#include <cpputil.h>
 
 using namespace ADODB;
 using namespace std;
@@ -176,7 +178,8 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_IsLicensed(VARIANT_BOOL  * pbValue)
 //-------------------------------------------------------------------------------------------------
 // IProductSpecificDBMgr Methods
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB *pDB)
+STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB *pDB,
+																  VARIANT_BOOL bAddUserTables)
 {
 	try
 	{
@@ -199,7 +202,7 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema(IFileProcessin
 		ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
 
 		// Retrieve the queries for creating DataEntry DB table(s).
-		const vector<string> vecTableCreationQueries = getTableCreationQueries();
+		const vector<string> vecTableCreationQueries = getTableCreationQueries(asCppBool(bAddUserTables));
 		vector<string> vecCreateQueries(vecTableCreationQueries.begin(), vecTableCreationQueries.end());
 
 		// Add the queries to create keys/constraints.
@@ -293,7 +296,8 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema80(IFileProcess
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34260");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CDataEntryProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcessingDB *pDB)
+STDMETHODIMP CDataEntryProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcessingDB *pDB,
+																	VARIANT_BOOL bRetainUserTables)
 {
 	try
 	{
@@ -317,6 +321,11 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_RemoveProductSpecificSchema(IFileProces
 
 		vector<string> vecTables;
 		getDataEntryTables(vecTables);
+
+		if (asCppBool(bRetainUserTables))
+		{
+			eraseFromVector(vecTables, gstrDATAENTRY_DATA_COUNTER_DEFINITION);
+		}
 
 		dropTablesInVector(ipDBConnection, vecTables);
 
@@ -385,7 +394,7 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_GetTables(IVariantVector** ppTables)
 		IVariantVectorPtr ipTables(CLSID_VariantVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI31426", ipTables != __nullptr);
 
-		const vector<string> vecTableCreationQueries = getTableCreationQueries();
+		const vector<string> vecTableCreationQueries = getTableCreationQueries(true);
 		vector<string> vecTablesNames = getTableNamesFromCreationQueries(vecTableCreationQueries);
 		for (vector<string>::iterator iter = vecTablesNames.begin();
 			 iter != vecTablesNames.end();
@@ -838,7 +847,7 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* 
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-const vector<string> CDataEntryProductDBMgr::getTableCreationQueries()
+const vector<string> CDataEntryProductDBMgr::getTableCreationQueries(bool bAddUserTables)
 {
 	vector<string> vecQueries;
 
@@ -846,7 +855,10 @@ const vector<string> CDataEntryProductDBMgr::getTableCreationQueries()
 	// findUnrecognizedSchemaElements does not treat the element on old schema versions as
 	// unrecognized.
 	vecQueries.push_back(gstrCREATE_DATAENTRY_DATA);
-	vecQueries.push_back(gstrCREATE_DATAENTRY_COUNTER_DEFINITION);
+	if (bAddUserTables)
+	{
+		vecQueries.push_back(gstrCREATE_DATAENTRY_COUNTER_DEFINITION);
+	}
 	vecQueries.push_back(gstrCREATE_DATAENTRY_COUNTER_TYPE);
 	vecQueries.push_back(gstrCREATE_DATAENTRY_COUNTER_VALUE);
 

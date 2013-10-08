@@ -1116,7 +1116,7 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 	try
 	{
 		// First remove all Product Specific stuff
-		removeProductSpecificDB();
+		removeProductSpecificDB(bRetainUserTables);
 
 		// Get the list of tables
 		vector<string> vecTables; 
@@ -3057,7 +3057,7 @@ IIUnknownVectorPtr CFileProcessingDB::getLicensedProductSpecificMgrs()
 	return ipProdSpecMgrs;
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::removeProductSpecificDB()
+void CFileProcessingDB::removeProductSpecificDB(bool bRetainUserTables)
 {
 	try
 	{
@@ -3073,13 +3073,13 @@ void CFileProcessingDB::removeProductSpecificDB()
 			ASSERT_RESOURCE_ALLOCATION("ELI18952", ipMgr != __nullptr);
 
 			// Remove the schema for the product specific manager
-			ipMgr->RemoveProductSpecificSchema(getThisAsCOMPtr());
+			ipMgr->RemoveProductSpecificSchema(getThisAsCOMPtr(), asVariantBool(bRetainUserTables));
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27610")
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::addProductSpecificDB()
+void CFileProcessingDB::addProductSpecificDB(bool bAddUserTables)
 {
 	try
 	{
@@ -3095,7 +3095,7 @@ void CFileProcessingDB::addProductSpecificDB()
 			ASSERT_RESOURCE_ALLOCATION("ELI19791", ipMgr != __nullptr);
 
 			// Add the schema from the product specific db manager
-			ipMgr->AddProductSpecificSchema(getThisAsCOMPtr());
+			ipMgr->AddProductSpecificSchema(getThisAsCOMPtr(), asVariantBool(bAddUserTables));
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27608")
@@ -3454,7 +3454,7 @@ void CFileProcessingDB::clear(bool bLocked, bool retainUserValues)
 			tg.CommitTrans();
 
 			// Add the Product specific db after the base tables have been committed
-			addProductSpecificDB();
+			addProductSpecificDB(!retainUserValues);
 
 			// Reset the database connection
 			resetDBConnection();
