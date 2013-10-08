@@ -14,6 +14,14 @@
 #include "ifx.h"
                              
 #define EXTRACT_DIR "\\Extract Systems\\CommonComponents"
+#define FLEX_INDEX_PRODUCT_CODE "{A7DFE34D-A07E-4D57-A624-B758E42A69D4}"
+#define IDSHIELD_PRODUCT_CODE "{158160CD-7B55-462F-8477-7E18B2937D40}"  
+#define LASERFICHE_PRODUCT_CODE "{74E1DF54-C96E-479F-915D-A0A721F9AC8B}"
+#define IDSHIELDOFFICE_PRODUCT_CODE "{A8DDFDC1-069D-42DE-AF69-A78FC232A86A}"
+#define EXTRACT_LM_PRODUCT_CODE "{EB8DE231-8B66-4DE6-A56D-39452D8CF35F}"
+#define LABDE_PRODUCT_CODE "{0E412937-E4FA-4737-A321-00AED69497C7}"
+#define RDT_PRODUCT_CODE "{735E1622-3990-445F-9E5D-B0D7FDE292A3}"
+
 // Note: In order to have your InstallScript function executed as a custom
 // action by the Windows Installer, it must be prototyped as an 
 // entry-point function.
@@ -179,7 +187,14 @@ begin
     RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
 
     RegDBDeleteKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\InstallShield_" + PRODUCT_GUID);                      
-    
+    RegDBDeleteKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\InstallShield_" + FLEX_INDEX_PRODUCT_CODE);                      
+    RegDBDeleteKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\InstallShield_" + IDSHIELD_PRODUCT_CODE);                      
+    RegDBDeleteKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\InstallShield_" + LASERFICHE_PRODUCT_CODE);                      
+    RegDBDeleteKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\InstallShield_" + IDSHIELDOFFICE_PRODUCT_CODE);                      
+    RegDBDeleteKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\InstallShield_" + EXTRACT_LM_PRODUCT_CODE);                      
+    RegDBDeleteKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\InstallShield_" + LABDE_PRODUCT_CODE);   
+    RegDBDeleteKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\InstallShield_" + RDT_PRODUCT_CODE);   
+          
     DeleteDir( StartMenuFolder ^ "Programs\\Extract Systems LM", ALLCONTENTS); 
     DeleteDir( StartMenuFolder ^ "Programs\\Extract Systems FLEX Index", ALLCONTENTS); 
     DeleteDir( StartMenuFolder ^ "Programs\\Extract Systems Flex Index RDT", ALLCONTENTS); 
