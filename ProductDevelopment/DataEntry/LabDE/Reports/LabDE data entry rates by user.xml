@@ -1,5 +1,13 @@
 <ExtractReportParameterData Version="2">
 	<ReportParameters>
 		<DateRangeParameter Name="ReportingPeriod" Default="" />
+		<ValueListParameter Name="InclusionAction1" Query="SELECT ASCName FROM Action UNION SELECT '&lt;Not specified&gt;'" Default="&lt;Not specified&gt;" />
+		<ValueListParameter Name="InclusionAction2" Query="SELECT ASCName FROM Action UNION SELECT '&lt;Not specified&gt;'" Default="&lt;Not specified&gt;" />
+		<ValueListParameter Name="InclusionAction3" Query="SELECT ASCName FROM Action UNION SELECT '&lt;Not specified&gt;'" Default="&lt;Not specified&gt;" />
+		<ValueListParameter Name="ExclusionTag1" Query="SELECT TagName FROM Tag UNION SELECT '&lt;Not specified&gt;'" Default="&lt;Not specified&gt;" />
+		<ValueListParameter Name="ExclusionTag2" Query="SELECT TagName FROM Tag UNION SELECT '&lt;Not specified&gt;'" Default="&lt;Not specified&gt;" />
+		<ValueListParameter Name="ExclusionTag3" Query="SELECT TagName FROM Tag UNION SELECT '&lt;Not specified&gt;'" Default="&lt;Not specified&gt;" />
+		<ValueListParameter Name="ExclusionTag4" Query="SELECT TagName FROM Tag UNION SELECT '&lt;Not specified&gt;'" Default="&lt;Not specified&gt;" />
+		<ValueListParameter Name="ExclusionTag5" Query="SELECT TagName FROM Tag UNION SELECT '&lt;Not specified&gt;'" Default="&lt;Not specified&gt;" />
 	</ReportParameters>
 </ExtractReportParameterData>
