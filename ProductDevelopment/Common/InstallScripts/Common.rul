@@ -95,6 +95,7 @@
 	prototype InstallNuanceLicense(); 
 	prototype SetNuanceServicePermissions();     
 	prototype SetDCOMPermissions();
+	prototype InstallReadme();
 
     // your global variables
     BOOL gbInstalled;
@@ -823,4 +824,28 @@ begin
 	LaunchAppAndWait( szDCOMPerm, "-aa {08463A92-A444-48AF-8822-693C4F6E1F08} set users permit level:l", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
 	LaunchAppAndWait( szDCOMPerm, "-al {752139E2-5977-4AD2-9E26-BE3B9235524C} set users permit level:l", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
 	LaunchAppAndWait( szDCOMPerm, "-aa {752139E2-5977-4AD2-9E26-BE3B9235524C} set users permit level:l", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+end;
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: InstallReadme
+//
+//  Purpose: This copies the appropriate License file to readme(<product>).txt
+//			 
+///////////////////////////////////////////////////////////////////////////////
+function InstallReadme()
+	string szReadmeName;
+begin
+	// Determine name of readme based on version
+	if (PRODUCT_GUID == IDSHIELD_PRODUCT_CODE) then
+		szReadmeName = "Readme(IDShield).txt";
+	elseif (PRODUCT_GUID == FLEX_INDEX_PRODUCT_CODE) then
+		szReadmeName = "Readme(FlexIndex).txt";
+	elseif (PRODUCT_GUID == LABDE_PRODUCT_CODE) then
+		szReadmeName = "Readme(LabDE).txt";
+	endif;
+	
+	CopyFile(SUPPORTDIR ^ "license.txt", PROGRAMFILES + EXTRACT_DIR ^ szReadmeName);
+	
 end;

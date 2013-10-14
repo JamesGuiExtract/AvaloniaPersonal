@@ -50,6 +50,9 @@ begin
 	// Install the Nuance licenses
 	InstallNuanceLicense();
 	
+	// Install the readme file
+	InstallReadme();
+	
     Disable(STATUSEX);
 
 	if ( gbInstalled ) then

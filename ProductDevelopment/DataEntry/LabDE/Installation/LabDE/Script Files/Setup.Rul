@@ -87,6 +87,9 @@ begin
 		// Install the Nuance licenses
 		InstallNuanceLicense();
 		
+		// Install the readme file
+		InstallReadme();
+		
     endif;
     
     Disable(STATUSEX);
