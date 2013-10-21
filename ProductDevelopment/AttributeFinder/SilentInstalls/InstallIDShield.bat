@@ -1,7 +1,7 @@
 @ECHO OFF
 
 @ECHO Uninstalling all Extract Systems applications...
-start /wait "" "%~dp0..\ExtractUninstaller\ExtractUninstaller" /s /f2nul
+call "%~dp0UninstallExtract.bat"
 
 IF "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 	set ISSFILE="%~dp0IDShield64.iss"
