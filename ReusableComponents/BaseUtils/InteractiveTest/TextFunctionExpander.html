@@ -21,10 +21,11 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
 <p>
 	<li>Confirm that you are logged in to the test machine as a user that has a <b>Full 
 	Name</b>.  Note that the <b>Administrator</b> account does not have a Full Name.
-	<li>Navigate to <b>D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\</b>.</li> 
+	<li>Add the CommonComponents folder to the system path.
+	<li>Navigate to <b>C:\ProgramData\ExtractSystems\TestingFiles\ReusableComponents\BaseUtils\InteractiveTest\</b>.</li> 
         <li>Run <b>TestFunctionExpanderTest.bat</b>. The test will create files in the directory 
-	<b>D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\</b>. and a few files 
-	under <b>H:\</b>.</li>
+	<b>C:\ProgramData\ExtractSystems\TestingFiles\ReusableComponents\BaseUtils\InteractiveTest\</b>. 
+	and a few files under <b>H:\</b>.</li>
 	<li>Review <b>testResults.txt</b> and note any <b>not created</b> items.
 	<li>Review the testing results for the <u>Specific Functions</u> discussed below.  These 
 	functions are not well suited for automated testing.
@@ -96,9 +97,10 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
 	</ul>
 </ul>
 <p>
-	<li>The test is complete. Run <b>clean.bat</b> to remove the files created by the test.</li>
-	<li>Remove the <b>Test&nbsp;&nbsp;Image.tif.xml</b> file in the appropriate subfolder under 
-	drive <b>H:\</b> as created by the test.</li>
+	<li>The test is complete. Run <b>clean.bat</b> to remove the files created by the 
+	test.</li>
+	<li>Remove the <b>Test&nbsp;&nbsp;Image.tif.xml</b> file in the appropriate subfolder 
+	under drive <b>H:\</b> as created by the test.</li>
 	<li>Remove the drive mapping for <b>H:\</b>.</li>
 </ol>
 <p>
@@ -133,13 +135,14 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
 		<li>Confirm that the edit box is empty by default.
 		<li>Confirm that an associated <b>tag selector</b> button is provided.
 		<li>Confirm that clicking the tag selector button drops down the 
-		complete set of $ functions, preceded by &lt;SourceDocName&gt; and 
-		&lt;FPSFileDir&gt;.
-        <li>Confirm that the parameters for each function are provided in the dropdown.</li>
+		complete set of $ functions, preceded by &lt;SourceDocName&gt;, 
+		&lt;FPSFileDir&gt;, &lt;FPSFileName&gt; and &lt;CommonComponentsDir&gt;.
+        	<li>Confirm that the parameters for each function are provided in the 
+		dropdown.</li>
 		<li>Confirm that the selected tag is displayed in the <b>Value</b> edit 
 		box and that it replaces the currently selected text in the edit box.
-        <li>Confirm that the cursor is placed in the parentheses after inserting a tag 
-        function.</li>
+        	<li>Confirm that the cursor is placed in the parentheses after inserting a 
+		tag function.</li>
 		<li>Confirm that an <b>Expansion</b> label is provided.
 		<li>Confirm that an associated read-only multi-line edit box is provided.
 		<li>Confirm that the edit box is empty by default.
