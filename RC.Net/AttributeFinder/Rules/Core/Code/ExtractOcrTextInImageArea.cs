@@ -127,6 +127,19 @@ namespace Extract.AttributeFinder.Rules
             new Dictionary<int, SpatialStringSearcher>();
 
         /// <summary>
+        /// Cached original OCR data that has been read from a uss file.
+        /// </summary>
+        [ThreadStatic]
+        static SpatialString _cachedOcrData;
+
+        /// <summary>
+        /// When original OCR data is read from disk, keep track of the file information from which
+        /// it was read so that cached OCR data need not be re-read unless the uss file changes.
+        /// </summary>
+        [ThreadStatic]
+        static FileInfo _cachedUSSFileInfo;
+
+        /// <summary>
         /// <see langword="true"/> if changes have been made to <see cref="ExtractOcrTextInImageArea"/>
         /// since it was created; <see langword="false"/> if no changes have been made since it was
         /// created.
@@ -274,23 +287,17 @@ namespace Extract.AttributeFinder.Rules
         /// to indicate progress.</param>
         public void ModifyValue(ComAttribute pAttributeToBeModified, AFDocument pOriginInput, ProgressStatus pProgressStatus)
         {
-            SpatialString sourceString = null;
-
             try
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI33710", _COMPONENT_DESCRIPTION);
 
+                SpatialString sourceString = null;
+
                 // Initialize sourceString either from the uss file or from pOriginInput.
                 if (UseOriginalDocumentOcr)
                 {
-                    string ussFileName = pOriginInput.Text.SourceDocName + ".uss";
-                    ExtractException.Assert("ELI33721",
-                        "Cannot find original OCR for document \"" +
-                        pOriginInput.Text.SourceDocName + "\"", File.Exists(ussFileName));
-
-                    sourceString = new SpatialString();
-                    sourceString.LoadFrom(ussFileName, false);
+                    sourceString = GetOriginalOcrData(pOriginInput);
                 }
                 else
                 {
@@ -347,23 +354,6 @@ namespace Extract.AttributeFinder.Rules
             finally
             {
                 _searchers.Clear();
-
-                // [FlexIDSCore:5143]
-                // Though the interwebs has lots of advice stating not to used FinalReleaseComObject
-                // (and instead leave it up to garbage collection), garbage collection seems not to
-                // be able to keep up in some usages of this rule. Since there is no risk of
-                // sourceString being used, use a heavy hand to release it here. 
-                try
-                {
-                    if (sourceString != null && UseOriginalDocumentOcr)
-                    {
-                        Marshal.FinalReleaseComObject(sourceString);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ex.ExtractLog("ELI35305");
-                }
             }
         }
 
@@ -617,6 +607,56 @@ namespace Extract.AttributeFinder.Rules
             SpatialEntityType = source.SpatialEntityType;
 
             _dirty = true;
+        }
+
+        /// <summary>
+        /// Gets the original OCR data for <see paramref="pOriginInput"/> from the uss file if
+        /// necessary or from a cache, if possible.
+        /// </summary>
+        /// <param name="pOriginInput">The <see cref="AFDocument"/> for which the OCR data is
+        /// needed.</param>
+        /// <returns>A <see cref="SpatialString"/> representing the OCR data for
+        /// <see paramref="pOriginInput"/>.</returns>
+        static SpatialString GetOriginalOcrData(AFDocument pOriginInput)
+        {
+            string ussFileName = pOriginInput.Text.SourceDocName + ".uss";
+
+            ExtractException.Assert("ELI33721",
+                "Cannot find original OCR for document \"" +
+                pOriginInput.Text.SourceDocName + "\"", File.Exists(ussFileName));
+
+            SpatialString sourceString = null;
+
+            // If we already have cached OCR data for this file on this thread, use it.
+            FileInfo fileInfo = new FileInfo(ussFileName);
+            if (_cachedUSSFileInfo != null &&
+                _cachedUSSFileInfo.FullName == ussFileName &&
+                fileInfo.LastWriteTime == _cachedUSSFileInfo.LastWriteTime)
+            {
+                sourceString = _cachedOcrData;
+            }
+            // Need to read the OCR data from the uss file.
+            else
+            {
+                // [FlexIDSCore:5143]
+                // Though the interwebs has lots of advice stating not to used FinalReleaseComObject
+                // (and instead leave it up to garbage collection), garbage collection seems not to
+                // be able to keep up in some usages of this rule. Since there is no risk of
+                // sourceString being used, use a heavy hand to release it here. 
+                if (_cachedOcrData != null)
+                {
+                    Marshal.FinalReleaseComObject(_cachedOcrData);
+                }
+
+                sourceString = new SpatialString();
+                sourceString.LoadFrom(ussFileName, false);
+
+                _cachedUSSFileInfo = fileInfo;
+                _cachedOcrData = sourceString;
+                _cachedOcrData.ReportMemoryUsage();
+            }
+
+            return sourceString;
         }
 
         /// <summary>

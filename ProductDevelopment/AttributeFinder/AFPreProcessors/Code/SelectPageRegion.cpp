@@ -670,12 +670,8 @@ STDMETHODIMP CSelectPageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressStat
 			bool bPageSpecified = find(vecPageNumbers.begin(), vecPageNumbers.end(), 
 				i) != vecPageNumbers.end();
 
-			ISpatialStringPtr ipPageText = (eMode == kNonSpatialMode)
-				? ipInputText
-				: ipInputText->GetSpecifiedPages(i, i);
-
 			// Get the appropriate content for this page
-			ISpatialStringPtr ipContentFromThisPage = getRegionContent(ipPageText, strSourceDoc,
+			ISpatialStringPtr ipContentFromThisPage = getRegionContent(ipInputText, strSourceDoc,
 				bPageSpecified, bRestrictionDefined, i);
 
 			// Provide non-NULL content to an Attribute to be included in the collection
@@ -758,11 +754,7 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 			bool bPageSpecified = find(vecActualPageNumbers.begin(), vecActualPageNumbers.end(), 
 				i) != vecActualPageNumbers.end();
 
-			ISpatialStringPtr ipPageText = (eMode == kNonSpatialMode)
-				? ipInputText
-				: ipInputText->GetSpecifiedPages(i, i);
-
-			ISpatialStringPtr ipContentFromThisPage = getRegionContent(ipPageText,
+			ISpatialStringPtr ipContentFromThisPage = getRegionContent(ipInputText,
 				strSourceDoc, bPageSpecified, bRestrictionDefined, i);
 
 			// Append non-NULL content to the result string
@@ -1685,7 +1677,7 @@ IOCREnginePtr CSelectPageRegion::getOCREngine()
 	return ipOCREngine;
 }
 //-------------------------------------------------------------------------------------------------
-ISpatialStringPtr CSelectPageRegion::getRegionContent(const ISpatialStringPtr& ipPageText, 
+ISpatialStringPtr CSelectPageRegion::getRegionContent(const ISpatialStringPtr& ipInputText, 
 	const string& strSourceDoc, bool bPageSpecified, bool bRestrictionDefined, long nPageNum)
 {
 	// Get the desired Spatial String portion for this page depending on:
@@ -1701,9 +1693,15 @@ ISpatialStringPtr CSelectPageRegion::getRegionContent(const ISpatialStringPtr& i
 	// 3. Restriction is defined AND Excluding the region
 	if ((m_bIncludeRegion == bPageSpecified) || (bRestrictionDefined && !m_bIncludeRegion))
 	{
+		ESpatialStringMode eMode = ipInputText->GetMode();
+
+		ISpatialStringPtr ipPageText = (eMode == kNonSpatialMode)
+			? ipInputText
+			: ipInputText->GetSpecifiedPages(nPageNum, nPageNum);
+
 		// If including and the page is specified OR excluding and the page is not
 		// specified, then return the contents of the page based on the current settings
-		ipSS = getIndividualPageContent( ipPageText, strSourceDoc, nPageNum, bPageSpecified);
+		ipSS = getIndividualPageContent(ipPageText, strSourceDoc, nPageNum, bPageSpecified);
 	}
 
 	// Return the appropriate Spatial String

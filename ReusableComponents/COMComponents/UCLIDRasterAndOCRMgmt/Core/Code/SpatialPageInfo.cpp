@@ -467,12 +467,19 @@ STDMETHODIMP CSpatialPageInfo::raw_ReportMemoryUsage(void)
 
 	try
 	{
-		if (m_ipMemoryManager == __nullptr)
-		{
-			m_ipMemoryManager.CreateInstance(MEMORY_MANAGER_CLASS);
-		}
-		
-		m_ipMemoryManager->ReportUnmanagedMemoryUsage(sizeof(this));
+		// [FlexIDSCore:5373]
+		// For reasons not yet understood (but that likely relates to the multiple SpatialStrings
+		// reporting memory usage for the same SpatialPageInfo instances), performance is
+		// significantly worse in some cases with SpatialPageInfo memory being reported (both speed
+		// and memory usage). For the 9.6 release, reporting of SpatialPageInfo memory is being
+		// disabled.
+
+//		if (m_ipMemoryManager == __nullptr)
+//		{
+//			m_ipMemoryManager.CreateInstance(MEMORY_MANAGER_CLASS);
+//		}
+//		
+//		m_ipMemoryManager->ReportUnmanagedMemoryUsage(sizeof(this));
 
 		return S_OK;
 	}

@@ -223,7 +223,7 @@ private:
 	IOCREnginePtr getOCREngine();
 
 	// based on the specific page and selection, get the actual string out
-	ISpatialStringPtr getRegionContent(const ISpatialStringPtr& ipPageText, const string& strSourceDoc,
+	ISpatialStringPtr getRegionContent(const ISpatialStringPtr& ipInputText, const string& strSourceDoc,
 		bool bPageSpecified, bool bRestrictionDefined, long nPageNum=0);
 
 	// check the horizontal and vertical restrictions to see if at least one

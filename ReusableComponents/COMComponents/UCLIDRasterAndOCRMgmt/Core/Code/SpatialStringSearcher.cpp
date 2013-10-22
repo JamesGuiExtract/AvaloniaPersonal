@@ -596,14 +596,20 @@ STDMETHODIMP CSpatialStringSearcher::raw_ReportMemoryUsage(void)
 			ipManageableMemory->ReportMemoryUsage();
 		}
 
-		// Report the size of the page info map.
-		if (m_ipSpatialPageInfoMap != __nullptr)
-		{
-			IManageableMemoryPtr ipManageableMemory = m_ipSpatialPageInfoMap;
-			ASSERT_RESOURCE_ALLOCATION("ELI36031", ipManageableMemory != __nullptr);
-
-			ipManageableMemory->ReportMemoryUsage();
-		}
+		// [FlexIDSCore:5373]
+		// For reasons not yet understood (but that likely relates to the multiple SpatialStrings
+		// reporting memory usage for the same SpatialPageInfo instances), performance is
+		// significantly worse in some cases with SpatialPageInfo memory being reported (both speed
+		// and memory usage). For the 9.6 release, reporting of SpatialPageInfo memory is being
+		// disabled.
+//		// Report the size of the page info map.
+//		if (m_ipSpatialPageInfoMap != __nullptr)
+//		{
+//			IManageableMemoryPtr ipManageableMemory = m_ipSpatialPageInfoMap;
+//			ASSERT_RESOURCE_ALLOCATION("ELI36031", ipManageableMemory != __nullptr);
+//
+//			ipManageableMemory->ReportMemoryUsage();
+//		}
 
 		return S_OK;
 	}
