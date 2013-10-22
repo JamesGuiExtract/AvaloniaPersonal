@@ -53,7 +53,8 @@ LabelCommonFolder:
 BuildExtractSharePoint:
 	@ECHO Building Extract.SharePoint...
     @CD "$(SharePointRootDir)"
-    @devenv Extract.SharePoint.sln /BUILD $(BuildConfig) /USEENV
+ 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\bin;;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages;$(DOTFUSCATOR)
+	@devenv Extract.SharePoint.sln /BUILD $(BuildConfig) /USEENV
 	
 CopyOriginalFilesBeforeObfuscating: BuildExtractSharePoint
 	@ECHO Saving orignal assemblies before obfuscating...
