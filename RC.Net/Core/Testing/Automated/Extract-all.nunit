@@ -1,0 +1,22 @@
+﻿<NUnitProject>
+  <Settings activeconfig="Release"/>
+  <Config name="Debug" binpathtype="Auto" runtimeFramework="any" appbase="D:\Engineering\binaries\debug">
+    <assembly path="Extract.DataEntry.Test.dll" />
+    <assembly path="Extract.Imaging.Forms.Test.dll" />
+    <assembly path="Extract.FileActionManager.Database.Test.dll" />
+    <assembly path="Extract.Utilities.Test.dll" />
+    <assembly path="Extract.Encryption.Test.dll" />
+    <assembly path="Extract.Test.dll" />
+    <assembly path="Extract.SetOperations.Test.dll" />
+    <assembly path="Extract.DataEntry.DEP.StandardLabDE.Test.dll" />
+  </Config>
+  <Config name="Release" binpathtype="Auto" runtimeFramework="any">
+    <assembly path="Extract.DataEntry.Test.dll" />
+    <assembly path="Extract.Imaging.Forms.Test.dll" />
+    <assembly path="Extract.FileActionManager.Database.Test.dll" />
+    <assembly path="Extract.Utilities.Test.dll" />
+    <assembly path="Extract.Encryption.Test.dll" />
+    <assembly path="Extract.Test.dll" />
+    <assembly path="Extract.SetOperations.Test.dll" />
+  </Config>
+</NUnitProject>
