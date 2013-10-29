@@ -16,6 +16,7 @@
 #include <StringTokenizer.h>
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
+#include <Misc.h>
 
 /////////////
 // Key Names
@@ -55,7 +56,7 @@ CAFUtility::CAFUtility()
 {
 	try
 	{
-		ASSERT_RESOURCE_ALLOCATION( "ELI19181", ma_pUserCfgMgr.get() != __nullptr );
+		ASSERT_RESOURCE_ALLOCATION("ELI19181", ma_pUserCfgMgr.get() != __nullptr );
 		ASSERT_RESOURCE_ALLOCATION("ELI07623", m_ipMiscUtils != __nullptr);
 		ASSERT_RESOURCE_ALLOCATION("ELI32488", m_ipEngine != __nullptr);
 	}
@@ -566,7 +567,9 @@ STDMETHODIMP CAFUtility::ApplyAttributeModifier(IIUnknownVector *pvecAttributes,
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFUtility::ExpandFormatString(IAttribute *pAttribute, BSTR bstrFormat, ISpatialString** pRetVal)
+STDMETHODIMP CAFUtility::ExpandFormatString(IAttribute *pAttribute, BSTR bstrFormat,
+											long nEndScopeChar, long *pnEndScopePos,
+											ISpatialString** pRetVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -585,11 +588,19 @@ STDMETHODIMP CAFUtility::ExpandFormatString(IAttribute *pAttribute, BSTR bstrFor
 		ASSERT_RESOURCE_ALLOCATION("ELI17019", ipOutputSS != __nullptr);
 
 		// get the expanded string
-		ISpatialStringPtr ipExpandedSS = getReformattedName(asString(bstrFormat), ipAttribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI17020", ipExpandedSS != __nullptr);
+		string strOriginalFormat = asString(bstrFormat);
+		string strFormat = strOriginalFormat;
+		ISpatialStringPtr ipExpandedSS =
+			getReformattedName(strFormat, ipAttribute, false, (char)nEndScopeChar);
 
+		if (ipExpandedSS == __nullptr)
+		{
+			// The format string could not be expanded due to a missing variable. Return an empty
+			// SpatialString.
+			ipOutputSS->Clear();
+		}
 		// replace the original string's value with the expanded string's value
-		if (ipExpandedSS->HasSpatialInfo() == VARIANT_TRUE)
+		else if (ipExpandedSS->HasSpatialInfo() == VARIANT_TRUE)
 		{
 			// The expanded string has spatial info. Use this info to replace the original string.
 			// [FlexIDSCore #3089]
@@ -605,6 +616,20 @@ STDMETHODIMP CAFUtility::ExpandFormatString(IAttribute *pAttribute, BSTR bstrFor
 			// spatial info.
 			ipOutputSS->Replace(ipOutputSS->String, ipExpandedSS->String, VARIANT_TRUE, 
 				0, NULL);
+		}
+
+		// If within a scope delimited by custom chars, indicate the position at which the scope
+		// ended in the originally supplied bstrFormat.
+		if (pnEndScopePos != __nullptr)
+		{
+			if (strFormat.empty())
+			{
+				*pnEndScopePos = -1;
+			}
+			else
+			{
+				*pnEndScopePos = strOriginalFormat.length() - strFormat.length();
+			}
 		}
 
 		// return the expanded spatial string
@@ -910,6 +935,38 @@ STDMETHODIMP CAFUtility::ValidateAsExplicitPath(BSTR bstrEliCode, BSTR bstrFilen
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33845");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFUtility::GetNewRegExpParser(IAFDocument *pDoc, IRegularExprParser **ppRegExParser)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		ASSERT_ARGUMENT("ELI36218", ppRegExParser != __nullptr);
+		ASSERT_ARGUMENT("ELI36223", pDoc != __nullptr);
+
+		IRegularExprParserPtr ipRegExParser = m_ipMiscUtils->GetNewRegExpParserInstance("");
+		ASSERT_RESOURCE_ALLOCATION("ELI36219", ipRegExParser != __nullptr);
+
+		UCLID_AFUTILSLib::IAFExpressionFormatterPtr ipAFFormatter(CLSID_AFExpressionFormatter);
+		ASSERT_RESOURCE_ALLOCATION("ELI36220", ipAFFormatter != __nullptr);
+
+		ipAFFormatter->AFDocument = pDoc;
+
+		IExpressionFormatterPtr ipFormatter(ipAFFormatter);
+		ASSERT_RESOURCE_ALLOCATION("ELI36221", ipFormatter != __nullptr);
+
+		ipRegExParser->ExpressionFormatter = ipFormatter;
+
+		*ppRegExParser = ipRegExParser.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36222");
+}
+//-------------------------------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent
@@ -1484,131 +1541,465 @@ void CAFUtility::loadAttributesFromEavFile(const IIUnknownVectorPtr& ipAttribute
 	}
 }
 //-------------------------------------------------------------------------------------------------
-ISpatialStringPtr CAFUtility::getReformattedName(const string& strFormat,
-												 const IAttributePtr& ipAttribute)
+ISpatialStringPtr CAFUtility::getReformattedName(string& strFormat,
+												 const IAttributePtr& ipAttribute,
+												 bool bScopeCloseExpected/* = false*/,
+												 char cEndScopeChar/* = '\0'*/)
 {
-	ISpatialStringPtr ipNewName(CLSID_SpatialString);
-	ASSERT_RESOURCE_ALLOCATION("ELI19187", ipNewName != __nullptr);
+	string strOriginalFormat = strFormat;
 
-	unsigned int ui;
-	unsigned int uiLength = strFormat.length();
-
-	for (ui = 0; ui < uiLength; ui++)
+	try
 	{
-		char c = strFormat.at(ui);
-		if (c == '<')
+		try
 		{
-			// a new scope is being opened
-			// to process it we will get the entire scope as a substring 
-			// and recurse adding the sub string wherever it is supposed to go
-			unsigned long ulClosePos = getCloseScopePos(strFormat, ui, '<', '>');
+			ISpatialStringPtr ipNewName(CLSID_SpatialString);
+			ASSERT_RESOURCE_ALLOCATION("ELI19187", ipNewName != __nullptr);
 
-			if (ulClosePos == string::npos)
+			// If cEndScopeChar was specified, a scope close is expected whether bScopeCloseExpected was
+			// set or not.
+			bScopeCloseExpected |= (cEndScopeChar != '\0');
+			unsigned int ui;
+			unsigned int uiLength = strFormat.length();
+			bool bEscapeNextChar = false;
+			bool bIgnoreResult = false;
+			bool bFoundScopeClose = false;
+
+			for (ui = 0; ui < uiLength; ui++)
 			{
-				UCLIDException ue("ELI19188", "Unmatched \'<\' in name formatting pattern.");
-				throw ue;
-			}
+				char c = strFormat.at(ui);
 
-			// ulClosePos is the index that immediately follows the closing > of
-			// the scope and we want the string between < and > exclusive
-			unsigned long ulStart = ui+1;
-			unsigned long ulLength = (ulClosePos - 1) - ulStart;
-			string strNewFormat = strFormat.substr( ui+1, ulLength );
-			ISpatialStringPtr ipScopeStr = getReformattedName(strNewFormat, ipAttribute);
-
-			if (ipScopeStr != __nullptr)
-			{
-				ipNewName->Append(ipScopeStr);
-			}
-			// -1 because i will auto increment (for loop) 
-			ui = ulClosePos - 1;
-		}
-		else if (c == '%')
-		{
-			// % must be followed by a valid identifier that is the name of an attribute
-			// it must be either %First, %Last, %Middle... 
-			// there can optionally be a number between % and the identifier which is the 
-			// number of characters to use
-			long nNumChars = -1;
-
-			unsigned long ulIdentStartPos = ui + 1;
-			unsigned long ulIdentEndPos = strFormat.find("%", ulIdentStartPos);
-			unsigned long ulLength = ulIdentEndPos - ulIdentStartPos;
-
-			// if no terminating "%" is found
-			if ((ulIdentEndPos == string::npos) || (ulIdentStartPos == ulIdentEndPos))
-			{
-				UCLIDException ue("ELI09765", "Invalid Variable in Format String.");
-				ue.addDebugInfo("Variable", strFormat.substr(ui, ulLength));
-				throw ue;
-			}
-
-			// if character after starting "%" is digit extract the number from the identifier
-			if (ulIdentStartPos < uiLength && isDigitChar(strFormat[ulIdentStartPos]))
-			{
-				unsigned long ulNumberEndPos = strFormat.find_first_not_of("0123456789", ulIdentStartPos);
-
-				// confirm that the string contains something other than digits as an identifier name
-				if (ulNumberEndPos != ulIdentEndPos)
+				// A new scope has been opened
+				if (!bEscapeNextChar && c == '<')
 				{
-					string strNum = strFormat.substr( ulIdentStartPos, ulNumberEndPos - ulIdentStartPos );
-					nNumChars = asLong( strNum.c_str() );
-					ulLength = ulLength - (ulNumberEndPos - ulIdentStartPos);
-					ulIdentStartPos = ulNumberEndPos;
+					string strScopeFormat = strFormat.substr(ui + 1);
+					ISpatialStringPtr ipScopeStr = getReformattedName(strScopeFormat, ipAttribute, true);
+					if (ipScopeStr != __nullptr)
+					{
+						ipNewName->Append(ipScopeStr);
+					}
+
+					// Pick up processing for the format string where the explicit scope ended.
+					strFormat = strFormat.substr(0, ui) + strScopeFormat;
+					uiLength = strFormat.length();
+					// Reprocess at the position where the format string scope had been.
+					ui--;
+				}
+				// The existing scope has been closed.
+				else if (!bEscapeNextChar && (c == '>' || c == cEndScopeChar))
+				{
+					if (!bScopeCloseExpected)
+					{
+						UCLIDException ue("ELI36224",
+							"An unexpected character was encountered in a format string.");
+						ue.addDebugInfo("Character", c);
+						throw ue;
+					}
+
+					bFoundScopeClose = true;
+					// Remove the scope close char from the input format string before returning.
+					strFormat = strFormat.substr(ui + 1);
+					break;
+				}
+				// A variable
+				else if (!bEscapeNextChar && c == '%')
+				{
+					string strVariableFormat = strFormat.substr(ui + 1);
+					ISpatialStringPtr ipValue = parseVariableValue(strVariableFormat, ipAttribute);
+
+					// Pick up processing for the format string where the variable definition ended.
+					strFormat = strFormat.substr(0, ui) + strVariableFormat;
+					uiLength = strFormat.length();
+					// Reprocess at the position where the variable had been.
+					ui--;
+
+					if (ipValue == __nullptr)
+					{
+						// If the returned value is null, nothing should be returned for the current scope.
+						bIgnoreResult = true;
+					}
+					else
+					{
+						ipNewName->Append(ipValue);
+					}
 				}
 				else
 				{
-					UCLIDException ue(UCLIDException("ELI12972", "Invalid Variable - Variable identifier cannot be only digits."));
-					ue.addDebugInfo("Variable", strFormat.substr(ui, ulLength));
-					throw ue;
-				}
-			}
-			
-			string strIdent = strFormat.substr( ulIdentStartPos, ulLength );
-			ISpatialStringPtr ipText = getVariableValue(strIdent, ipAttribute);
-
-			if (ipText == __nullptr)
-			{
-				// If the %var has no value we can either ignore it and continue
-				// or invalidate the entire scope and return an empty string
-				ISpatialStringPtr ipEmpty( CLSID_SpatialString );
-				ASSERT_RESOURCE_ALLOCATION("ELI17546", ipEmpty != __nullptr);
-				return ipEmpty;
-			}
-			else
-			{
-				if (nNumChars > 0)
-				{
-					long nLength = ipText->Size;
-
-					if (nNumChars < nLength)
+					if (!bEscapeNextChar && c == '\\')
 					{
-						ipText = ipText->GetSubString( 0, nNumChars - 1 );
+						// The character following an escape char should be treated as the literal char.
+						bEscapeNextChar = true;
+					}
+					else
+					{
+						// Any other chars should just be appended to the result
+						string str;
+						str += c;
+						ipNewName->AppendString(_bstr_t(str.c_str()));
+						bEscapeNextChar = false;
 					}
 				}
-				ipNewName->Append(ipText);
 			}
-			// don't forget to jump ahead in the string
-			ui = ulIdentEndPos;
+
+			if (bScopeCloseExpected && !bFoundScopeClose)
+			{
+				UCLIDException ue("ELI36224", "A format string scope was not properly closed.");
+				throw ue;
+			}
+
+			return bIgnoreResult ? __nullptr : ipNewName;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36244");
+	}
+	catch (UCLIDException &ue)
+	{
+		UCLIDException ueOuter("ELI36245", "Unable to parse format string.", ue);
+		ueOuter.addDebugInfo("Format string", strOriginalFormat, true);
+		throw ueOuter;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+ISpatialStringPtr CAFUtility::parseVariableValue(string& strVariable, const IAttributePtr& ipAttribute)
+{
+	string strOriginalVariable = strVariable;
+
+	try
+	{
+		try
+		{
+			unsigned int ui;
+			unsigned int uiLength = strVariable.length();
+			bool bEscapeNextChar = false;
+			bool bFoundClosingChar = false;
+			string strQuery;
+			string strSelection;
+			string strDelim;
+			bool bBuildingQuery = true;
+			bool bBuildingSelector = false;
+			bool bBuildingDelimiter = false;
+			int nMaxValueLen = -1;
+
+			// The expanded result.
+			ISpatialStringPtr ipText(__nullptr);
+			// A vector to hold the results of attributes expanded via a nested format string.
+			IIUnknownVectorPtr ipNestedValues(__nullptr);
+
+			for (ui = 0; ui < uiLength; ui++)
+			{
+				char c = strVariable.at(ui);
+
+				// The variable scope has ended.
+				if (!bEscapeNextChar && c == '%')
+				{
+					bFoundClosingChar = true;
+					break;
+				}
+				// The query term of the variable has ended.
+				else if (!bEscapeNextChar && bBuildingQuery && c == '<')
+				{
+					if (ui == uiLength - 1)
+					{
+						UCLIDException ue("ELI36225", "Unexpected end of format string variable.");
+						throw ue;
+					}
+
+					// See if the expanded value is to be truncated after a specified number of chars.
+					nMaxValueLen = getMaxValueLen(strQuery);
+
+					// Get the attributes to be expanded.
+					IIUnknownVectorPtr ipSubAttributes = (ipAttribute == __nullptr)
+						? IIUnknownVectorPtr(CLSID_IUnknownVector)
+						: getCandidateAttributes(ipAttribute->SubAttributes, strQuery, false);
+
+					// Check for the case that the nested format string is not specified.
+					if (strVariable[ui + 1] == '>')
+					{
+						// Resume processing after the closing bracket.
+						strVariable = strVariable.substr(0, ui) + strVariable.substr(ui);
+						uiLength = strVariable.length();
+						ui++;
+					}
+					// A nested format string to expand the reference attribute(s) follows.
+					else
+					{
+						// Create a vector to hold the results of attributes expanded via a nested
+						// format string.
+						ipNestedValues.CreateInstance(CLSID_IUnknownVector);
+						ASSERT_RESOURCE_ALLOCATION("ELI36226", ipNestedValues != __nullptr);
+
+						string strNestedFormat = strVariable.substr(ui + 1);
+						string strTempNestedFormat = strNestedFormat;
+				
+						// If there are not attributes to expand, getReformattedName still needs to
+						// be called in order to trim the term from strTempNestedFormat.
+						size_t nCount = ipSubAttributes->Size();
+						if (nCount == 0)
+						{
+							getReformattedName(strTempNestedFormat, __nullptr, true);
+						}
+						// Iterate all attributes to be expanded and expand them into ipNestedValues.
+						else
+						{
+							for (size_t nIndex = 0; nIndex < nCount; nIndex++)
+							{
+								IAttributePtr ipSubAttribute = ipSubAttributes->At(nIndex);
+								ASSERT_RESOURCE_ALLOCATION("ELI36227", ipSubAttribute != __nullptr);
+
+								strTempNestedFormat = strNestedFormat;
+								ISpatialStringPtr ipValue =
+									getReformattedName(strTempNestedFormat, ipSubAttribute, true);
+
+								if (ipValue != __nullptr)
+								{
+									ipNestedValues->PushBack(ipValue);
+								}
+							}
+						}
+
+						// Resume processing after the nested format string.
+						strVariable = strVariable.substr(0, ui) + strTempNestedFormat;
+						uiLength = strVariable.length();
+						// Reprocess at the position where the nested format string had been.
+						ui--;
+					}
+
+					bBuildingQuery = false;
+					bBuildingSelector = true;
+				}
+				// The selection term of the variable has ended.
+				else if (!bEscapeNextChar && bBuildingSelector && c == ':')
+				{
+					bBuildingSelector = false;
+					bBuildingDelimiter = true;
+				}
+				// Any other chars should be appended to either the query, selector or the delimiter
+				// term .(whichever is currently being built)
+				else
+				{
+					if (!bEscapeNextChar && c == '\\')
+					{
+						bEscapeNextChar = true;
+					}
+					else
+					{
+						if (bBuildingQuery)
+						{
+							strQuery += c;
+						}
+						else if (bBuildingSelector)
+						{
+							strSelection += c;
+						}
+						else if (bBuildingDelimiter)
+						{
+							strDelim += c;
+						}
+						else
+						{
+							THROW_LOGIC_ERROR_EXCEPTION("ELI36235");
+						}
+
+						bEscapeNextChar = false;
+					}
+				}
+			}
+
+			if (!bFoundClosingChar || strQuery.empty())
+			{
+				UCLIDException ue("ELI36228", "Invalid variable in Format String.");
+				ue.addDebugInfo("Variable", strVariable);
+				throw ue;
+			}
+
+			// If variables haven't been expanded with a nested format string, get the variable value.
+			if (ipNestedValues == __nullptr)
+			{
+				ipText = getVariableValue(strQuery, ipAttribute, strSelection, strDelim);
+			}
+			// If variables have been expanded with a nested format string, get the variable value.
+			else
+			{
+				IIUnknownVectorPtr ipSelectedValues = getSelectedItems(ipNestedValues, strSelection);
+				size_t nCount = ipSelectedValues->Size();
+
+				bool bUniqueOnly = _strcmpi(strSelection.c_str(), "uniq") == 0 ||
+								   _strcmpi(strSelection.c_str(), "unique") == 0;
+				set<string> setUsedValues;
+
+				IIUnknownVectorPtr ipValues(CLSID_IUnknownVector);
+				ASSERT_RESOURCE_ALLOCATION("ELI36248", ipValues != __nullptr);
+
+				// Iterate through all selected attributes in order to collect values to concatenate.
+				for (size_t ui = 0; ui < nCount; ui++)
+				{
+					ISpatialStringPtr ipValue = ipSelectedValues->At(ui);
+					ASSERT_RESOURCE_ALLOCATION("ELI36229", ipValue != __nullptr);
+
+					if (bUniqueOnly)
+					{
+						string strValue = asString(ipValue->String);
+						if (setUsedValues.find(strValue) != setUsedValues.end())
+						{
+							continue;
+						}
+
+						setUsedValues.insert(strValue);
+					}
+		
+					ICopyableObjectPtr ipSource = (ICopyableObjectPtr)ipValue;
+					ASSERT_RESOURCE_ALLOCATION("ELI36230", ipSource != __nullptr);
+
+					ISpatialStringPtr ipValueCopy = (ISpatialStringPtr)ipSource->Clone();
+					ipValues->PushBack(ipValueCopy);
+				}
+
+				// Iterate through all selected values, and concatenate (delimiting as specified).
+				nCount = ipValues->Size();
+				for (size_t ui = 0; ui < nCount; ui++)
+				{
+					ISpatialStringPtr ipValue = ipValues->At(ui);
+					ASSERT_RESOURCE_ALLOCATION("ELI36247", ipValue != __nullptr);
+
+					if (ipText == nullptr)
+					{
+						ipText = ipValue;
+					}
+					else
+					{
+						ipText->Append(ipValue);
+					}
+
+					// Add the delimiter if not the last value
+					if (ui < nCount - 1 && !strDelim.empty())
+					{
+						ipText->AppendString(strDelim.c_str());
+					}
+				}
+			}
+
+			// Truncate the result to the specified number of chars if necessary.
+			if (ipText != __nullptr)
+			{
+				if (nMaxValueLen > 0 && ipText->Size > nMaxValueLen)
+				{
+					ipText = ipText->GetSubString(0, nMaxValueLen - 1);
+				}
+				else if (nMaxValueLen == 0)
+				{
+					ipText.CreateInstance(CLSID_SpatialString);
+					ASSERT_RESOURCE_ALLOCATION("ELI36232", ipText != __nullptr);
+				}
+			}
+
+			// Trim the return value so that it no longer contains the processed variable.
+			strVariable = strVariable.substr(ui + 1);
+			return ipText;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36242");
+	}
+	catch (UCLIDException &ue)
+	{
+		UCLIDException ueOuter("ELI36243", "Unable to parse format string variable.", ue);
+		ueOuter.addDebugInfo("Variable", strOriginalVariable, true);
+		throw ueOuter;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+long CAFUtility::getMaxValueLen(string& strQuery)
+{
+	string strNum;
+
+	// All leading digits should be interpreted as the maximum expanded length (if the expanded
+	// value is longer, it shall be truncated).
+	while (!strQuery.empty())
+	{
+		char c = strQuery[0];
+		if (isdigit(c))
+		{
+			strNum += c;
+			strQuery = strQuery.substr(1);
 		}
 		else
 		{
-			// Add this character to the string
-			string str;
-			str += c;
-			ipNewName->AppendString(_bstr_t(str.c_str()));
+			break;
 		}
 	}
-	return ipNewName;
+
+	if (strNum.empty())
+	{
+		return -1;
+	}
+	else
+	{
+		return asLong(strNum);
+	}
 }
 //-------------------------------------------------------------------------------------------------
-ISpatialStringPtr CAFUtility::getVariableValue(const string& strVariable,
-											   const IAttributePtr& ipAttribute)
+IIUnknownVectorPtr CAFUtility::getSelectedItems(const IIUnknownVectorPtr& ipItems,
+												string strSelection)
+{
+	try
+	{
+		try
+		{
+			size_t nCount = ipItems->Size();
+
+			IIUnknownVectorPtr ipSelectedItems(CLSID_IUnknownVector);
+			ASSERT_RESOURCE_ALLOCATION("ELI36236", ipSelectedItems != __nullptr);
+
+			if(nCount > 0)
+			{
+				// Handle special selection keywords
+				if (strSelection.empty() || _strcmpi(strSelection.c_str(), "first") == 0)
+				{
+					strSelection = "1";
+				}
+				else if (_strcmpi(strSelection.c_str(), "last") == 0)
+				{
+					strSelection = "-1";
+				}
+				else if (_strcmpi(strSelection.c_str(), "all") == 0 ||
+						 _strcmpi(strSelection.c_str(), "uniq") == 0 ||
+						 _strcmpi(strSelection.c_str(), "unique") == 0)
+				{
+					strSelection = "1-";
+				}
+
+				// getPageNumbers was written with 1-based sequences in mind, not 0-based sequences.
+				// It can be used, but nCount should be considered the "last page" and the returned
+				// indices must then be decremented before use.
+				vector<int> vecIndices = getPageNumbers(nCount, strSelection);
+				nCount = vecIndices.size();
+
+				for (size_t ui = 0; ui < nCount; ui++)
+				{
+					// Decrement each index to account for getPageNumbers being written for 1-based
+					// sequences.
+					long nIndex = vecIndices[ui] - 1;
+
+					ipSelectedItems->PushBack(ipItems->At(nIndex));
+				}
+			}
+
+			return ipSelectedItems;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36240");
+	}
+	catch (UCLIDException &ue)
+	{
+		UCLIDException ueOuter("ELI36241", "Unable to parse format string selection term.", ue);
+		ueOuter.addDebugInfo("Selection term", strSelection, true);
+		throw ueOuter;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+ISpatialStringPtr CAFUtility::getVariableValue(const string& strQuery,
+											   const IAttributePtr& ipAttribute,
+											   const string& strSelection, const string& strDelim)
 {
 	// TODO: check the cache
 	bool bFound = false;
 	vector<string> vecTokens;
-	StringTokenizer::sGetTokens(strVariable, ".", vecTokens);
+	StringTokenizer::sGetTokens(strQuery, ".", vecTokens);
 	// There should only be a max of 2 tokens 
 	// Token 1 should be an xpath query
 	// Token 2 should be either "Value" or "Name"
@@ -1618,10 +2009,17 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strVariable,
 	if(vecTokens.size() > 2)
 	{
 		UCLIDException ue("ELI09677", "Invalid Variable Query.");
-		ue.addDebugInfo("Invalid Variable", strVariable);
+		ue.addDebugInfo("Invalid Variable", strQuery);
 		throw ue;
 	}
-	string strQuery = vecTokens[0];
+
+	// If the specified attribute is null, return null regardless of what the variable query is.
+	if (ipAttribute == __nullptr)
+	{
+		return __nullptr;
+	}
+
+	string strQueryPart1 = vecTokens[0];
 	if(vecTokens.size() == 2)
 	{
 		if(vecTokens[1] == "Type")
@@ -1639,51 +2037,120 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strVariable,
 		}
 	}
 	ISpatialStringPtr ipNewString = __nullptr;
-	if(strQuery == "Type")
+	if(strQueryPart1 == "Type")
 	{
 		// This means that the variable is %Type which is just the Type of the
 		// Selected Attribute
+
 		ipNewString.CreateInstance(CLSID_SpatialString);
 		ASSERT_RESOURCE_ALLOCATION("ELI09707", ipNewString != __nullptr);
 		string str = asString(ipAttribute->Type);
 		if(str == "")
 		{
-			return NULL;
+			return __nullptr;
 		}
 		ipNewString->CreateNonSpatialString(str.c_str(), "");
 	}
-	else if(strQuery == "Value")
+	else if(strQueryPart1 == "Value")
 	{
-		// This means that the variable is %Value which is just the Value of the
-		// Selected Attribute
 		ipNewString = ipAttribute->Value;
 	}
 	else
 	{
-		IIUnknownVectorPtr ipSubAttributes = getCandidateAttributes(ipAttribute->SubAttributes,
-			strQuery, false);
+		IIUnknownVectorPtr ipSubAttributes =
+			getCandidateAttributes(ipAttribute->SubAttributes, strQueryPart1, false);
 		ASSERT_RESOURCE_ALLOCATION("ELI25948", ipSubAttributes != __nullptr);
 
-		// Now we will just arbitrarily choose the first match
-		if(ipSubAttributes->Size() <= 0)
+		IIUnknownVectorPtr ipSelectedAttributes = getSelectedItems(ipSubAttributes, strSelection);
+		size_t nCount = ipSelectedAttributes->Size();
+
+		// If there are no attributes matching the query, return null so that the current scope
+		// evaluates to nothing.
+		if(nCount == 0)
 		{
-			return NULL;
+			return __nullptr;
 		}
-		
-		IAttributePtr ipFoundAttr = ipSubAttributes->At(0);
-		ASSERT_RESOURCE_ALLOCATION("ELI09706", ipFoundAttr != __nullptr);
-		
-		if(bGetType)
+
+		bool bUniqueOnly = _strcmpi(strSelection.c_str(), "uniq") == 0 ||
+						   _strcmpi(strSelection.c_str(), "unique") == 0;
+		set<string> setUsedValues;
+
+		IIUnknownVectorPtr ipValues(CLSID_IUnknownVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI36246", ipValues != __nullptr);
+
+		// Iterate through all selected attributes in order to collect values to concatenate.
+		for (size_t ui = 0; ui < nCount; ui++)
 		{
-			ipNewString.CreateInstance(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI19189", ipNewString != __nullptr);
-			ipNewString->CreateNonSpatialString(ipFoundAttr->Type, "");
+			IAttributePtr ipFoundAttr = ipSelectedAttributes->At(ui);
+			ASSERT_RESOURCE_ALLOCATION("ELI09706", ipFoundAttr != __nullptr);
+		
+			if(bGetType)
+			{
+				if (bUniqueOnly)
+				{
+					string strType = asString(ipFoundAttr->Type);
+					if (setUsedValues.find(strType) != setUsedValues.end())
+					{
+						continue;
+					}
+
+					setUsedValues.insert(strType);
+				}
+
+				ISpatialStringPtr ipValue(CLSID_SpatialString);
+				ASSERT_RESOURCE_ALLOCATION("ELI19189", ipValue != __nullptr);
+				ipValue->CreateNonSpatialString(ipFoundAttr->Type, "");
+				ipValues->PushBack(ipValue);
+			}
+			else
+			{
+				ISpatialStringPtr ipValue = ipFoundAttr->Value;
+				ASSERT_RESOURCE_ALLOCATION("ELI36237", ipValue != __nullptr);
+
+				if (bUniqueOnly)
+				{
+					string strValue = asString(ipValue->String);
+					if (setUsedValues.find(strValue) != setUsedValues.end())
+					{
+						continue;
+					}
+
+					setUsedValues.insert(strValue);
+				}
+
+				ICopyableObjectPtr ipSource = (ICopyableObjectPtr)ipValue;
+				ASSERT_RESOURCE_ALLOCATION("ELI36238", ipSource != __nullptr);
+
+				ISpatialStringPtr ipValueCopy = (ISpatialStringPtr)ipSource->Clone();
+				ASSERT_RESOURCE_ALLOCATION("ELI36239", ipValueCopy != __nullptr);
+				ipValues->PushBack(ipValueCopy);
+			}
 		}
-		else
+
+		// Iterate through all selected values, and concatenate (delimiting as specified).
+		nCount = ipValues->Size();
+		for (size_t ui = 0; ui < nCount; ui++)
 		{
-			ipNewString = ipFoundAttr->Value;
+			ISpatialStringPtr ipValue = ipValues->At(ui);
+			ASSERT_RESOURCE_ALLOCATION("ELI36247", ipValue != __nullptr);
+
+			if (ipNewString == nullptr)
+			{
+				ipNewString = ipValue;
+			}
+			else
+			{
+				ipNewString->Append(ipValue);
+			}
+
+			// Add the delimiter if not the last value
+			if (ui < nCount - 1 && !strDelim.empty())
+			{
+				ipNewString->AppendString(strDelim.c_str());
+			}
 		}
 	}
+
 	return ipNewString;
 }
 //-------------------------------------------------------------------------------------------------

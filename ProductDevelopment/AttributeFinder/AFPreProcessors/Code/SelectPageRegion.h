@@ -162,8 +162,8 @@ private:
 	// Utility Functions
 	ITagUtilityPtr m_ipAFTagUtility;
 
-	// For RegEx parser.
-	IMiscUtilsPtr m_ipMiscUtils;
+	// For regex parser
+	IAFUtilityPtr m_ipAFUtility;
 
 	// For regular expression searching
 	// The string to match which may or may not be a regular expression

@@ -147,7 +147,7 @@ private:
 	bool m_bDirty;
 
 	// Misc utils used to get regex parser
-	IMiscUtilsPtr m_ipMiscUtils;
+	IAFUtilityPtr m_ipAFUtility;
 
 	///////////
 	// Methods

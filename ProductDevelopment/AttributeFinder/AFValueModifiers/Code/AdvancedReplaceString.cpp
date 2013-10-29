@@ -35,7 +35,10 @@ CAdvancedReplaceString::CAdvancedReplaceString()
 	try
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13055", m_ipMiscUtils != __nullptr );
+		ASSERT_RESOURCE_ALLOCATION("ELI13055", m_ipMiscUtils != __nullptr);
+
+		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
+		ASSERT_RESOURCE_ALLOCATION("ELI36196", m_ipAFUtility != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI06795")
 }
@@ -45,6 +48,7 @@ CAdvancedReplaceString::~CAdvancedReplaceString()
 	try
 	{
 		m_ipMiscUtils = __nullptr;
+		m_ipAFUtility = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16353");
 }
@@ -691,7 +695,10 @@ void CAdvancedReplaceString::modifyValue(ISpatialString* pText, IAFDocument* pAF
 	IRegularExprParserPtr ipParser = __nullptr;
 	if (m_bAsRegularExpression)
 	{
-		ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("AdvancedReplaceString");
+		IAFDocumentPtr ipAFDoc(pAFDoc);
+		ASSERT_RESOURCE_ALLOCATION("ELI36197", ipAFDoc);
+
+		IRegularExprParserPtr ipParser = m_ipAFUtility->GetNewRegExpParser(ipAFDoc);
 		ASSERT_RESOURCE_ALLOCATION("ELI06796", ipParser != __nullptr);
 	}
 
@@ -708,13 +715,9 @@ void CAdvancedReplaceString::getStringsFromFiles(IAFDocument* pAFDoc, std::strin
 	// Define a tag manager object to expand tags
 	AFTagManager tagMgr;
 
-	// Define an IMiscUtilsPtr object used to get string from file
-	IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-	ASSERT_RESOURCE_ALLOCATION("ELI14529", ipMiscUtils != __nullptr );
-
 	// Try to remove the header if the string is a file name, 
 	// otherwise simply return the original string.
-	string strAfterRemoveHeader = asString( ipMiscUtils->GetFileNameWithoutHeader(_bstr_t(strFind.c_str())) );
+	string strAfterRemoveHeader = asString(m_ipMiscUtils->GetFileNameWithoutHeader(_bstr_t(strFind.c_str())));
 
 	// Expand tags only happens when the string is a file name
 	// if it is not, all tags will be treated as common strings [P16: 2118]
@@ -726,7 +729,7 @@ void CAdvancedReplaceString::getStringsFromFiles(IAFDocument* pAFDoc, std::strin
 		strFind = tagMgr.expandTagsAndFunctions(strAfterRemoveHeader, ipAFDoc);
 
 		// perform any appropriate auto-encrypt actions on the file that contains the string
-		ipMiscUtils->AutoEncryptFile(get_bstr_t(strFind.c_str()),
+		m_ipMiscUtils->AutoEncryptFile(get_bstr_t(strFind.c_str()),
 			get_bstr_t(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str()));
 
 		// If the header has been removed, call getFindString() to load the strings inside the file
@@ -735,7 +738,7 @@ void CAdvancedReplaceString::getStringsFromFiles(IAFDocument* pAFDoc, std::strin
 
 	// Try to remove the header if the string is a file name, 
 	// otherwise simply return the original string.
-	strAfterRemoveHeader = asString( ipMiscUtils->GetFileNameWithoutHeader(_bstr_t(strReplaced.c_str())) );
+	strAfterRemoveHeader = asString(m_ipMiscUtils->GetFileNameWithoutHeader(_bstr_t(strReplaced.c_str())));
 	// Compare the new string with the original string
 	if (strReplaced != strAfterRemoveHeader)
 	{
@@ -743,7 +746,7 @@ void CAdvancedReplaceString::getStringsFromFiles(IAFDocument* pAFDoc, std::strin
 		strReplaced = tagMgr.expandTagsAndFunctions(strAfterRemoveHeader, ipAFDoc);
 
 		// perform any appropriate auto-encrypt actions on the file that contains the string
-		ipMiscUtils->AutoEncryptFile(get_bstr_t(strReplaced.c_str()),
+		m_ipMiscUtils->AutoEncryptFile(get_bstr_t(strReplaced.c_str()),
 			get_bstr_t(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str()));
 
 		// If the header has been removed, call getReplaceString() to load the strings inside the file

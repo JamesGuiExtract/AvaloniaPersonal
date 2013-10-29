@@ -864,7 +864,7 @@ IIUnknownVectorPtr CRegExprRule::parseText(IAFDocumentPtr ipAFDoc)
 	try
 	{
 		// Get the parser
-		IRegularExprParserPtr ipParser = getParser();
+		IRegularExprParserPtr ipParser = getParser(ipAFDoc);
 		ASSERT_RESOURCE_ALLOCATION("ELI29403", ipParser != __nullptr);
 
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
@@ -945,12 +945,12 @@ IIUnknownVectorPtr CRegExprRule::parseText(IAFDocumentPtr ipAFDoc)
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29405");
 }
 //-------------------------------------------------------------------------------------------------	
-IRegularExprParserPtr CRegExprRule::getParser()
+IRegularExprParserPtr CRegExprRule::getParser(IAFDocumentPtr ipAFDocument)
 {
 	try
 	{
 		// create the regular expression parser object
-		IRegularExprParserPtr ipParser = getMiscUtils()->GetNewRegExpParserInstance("RegExprRule");
+		IRegularExprParserPtr ipParser = getAFUtility()->GetNewRegExpParser(ipAFDocument);
 		ASSERT_RESOURCE_ALLOCATION("ELI04223",ipParser != __nullptr);
 
 		return ipParser;

@@ -33,7 +33,6 @@ CREPMFinder::CREPMFinder()
   m_bStoreRuleWorked(false),
   m_strRulesFileName(""),
   m_strRuleWorkedName(""),
-  m_ipMiscUtils(__nullptr),
   m_ipRegExpParser(__nullptr),
   m_ipAFUtility(__nullptr),
   m_eReturnMatchType(eDEFAULT_RETURN_MATCH_TYPE),
@@ -48,7 +47,6 @@ CREPMFinder::~CREPMFinder()
 {
 	try
 	{
-		m_ipMiscUtils = __nullptr;
 		m_ipRegExpParser = __nullptr;
 		m_ipAFUtility = __nullptr;
 	}
@@ -94,7 +92,7 @@ STDMETHODIMP CREPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pP
 		IAFDocumentPtr ipAFDoc(pAFDoc);
 		ASSERT_ARGUMENT("ELI33223", ipAFDoc != __nullptr);
 
-		getRegExParser()->IgnoreCase = m_bCaseSensitive ? VARIANT_FALSE : VARIANT_TRUE;
+		getRegExParser(ipAFDoc)->IgnoreCase = m_bCaseSensitive ? VARIANT_FALSE : VARIANT_TRUE;
 
 		// return vec of attributes
 		IIUnknownVectorPtr ipRetAttributes(CLSID_IUnknownVector);
@@ -149,7 +147,7 @@ STDMETHODIMP CREPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pP
 		// for each pattern string, look for match
 		string strPatternID("");
 		UCLID_AFVALUEFINDERSLib::IREPMFinderPtr ipThis(this);
-		if (patternInterpreter.foundPattern(getRegExParser(), ipThis, ipInputText,
+		if (patternInterpreter.foundPattern(getRegExParser(ipAFDoc), ipThis, ipInputText,
 			ipRetAttributes, strPatternID))
 		{
 			// store the rule that works in AFDocument if required
@@ -861,19 +859,10 @@ IAFUtilityPtr CREPMFinder::getAFUtility()
 	return m_ipAFUtility;
 }
 //-------------------------------------------------------------------------------------------------
-IRegularExprParserPtr CREPMFinder::getRegExParser()
+IRegularExprParserPtr CREPMFinder::getRegExParser(IAFDocumentPtr ipAFDoc)
 {
-	if (m_ipMiscUtils == __nullptr)
-	{
-		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI33353", m_ipMiscUtils != __nullptr);
-	}
-
-	if (m_ipRegExpParser == __nullptr)
-	{
-		m_ipRegExpParser = m_ipMiscUtils->GetNewRegExpParserInstance("REPM");
-		ASSERT_RESOURCE_ALLOCATION("ELI33224", m_ipRegExpParser != __nullptr);
-	}
+	IRegularExprParserPtr ipParser = getAFUtility()->GetNewRegExpParser(ipAFDoc);
+	ASSERT_RESOURCE_ALLOCATION("ELI33224", m_ipRegExpParser != __nullptr);
 
 	return m_ipRegExpParser;
 }

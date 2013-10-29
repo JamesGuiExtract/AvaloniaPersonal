@@ -32,6 +32,7 @@ IDR_DOCUMENTSORTER      REGISTRY                "DocumentSorter.rgs"
 IDR_AFUTILITY           REGISTRY                "AFUtility.rgs"
 IDR_DOCUMENTCLASSIFIERPP REGISTRY                "DocumentClassifierPP.rgs"
 IDR_SPATIALATTRIBUTEMERGEUTILS REGISTRY                "SpatialAttributeMergeUtils.rgs"
+IDR_AFEXPRESSIONFORMATTER REGISTRY              "AFExpressionFormatter.rgs"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

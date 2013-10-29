@@ -33,8 +33,8 @@ CBlockFinder::CBlockFinder()
 {
 	try
 	{
-		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI19416", m_ipMiscUtils != __nullptr );
+		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
+		ASSERT_RESOURCE_ALLOCATION("ELI36185", m_ipAFUtility != __nullptr);
 
 		m_ipClues.CreateInstance(CLSID_VariantVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI05740", m_ipClues != __nullptr);
@@ -46,6 +46,8 @@ CBlockFinder::~CBlockFinder()
 {
 	try
 	{
+		m_ipClues = __nullptr;
+		m_ipAFUtility = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16339");
 }
@@ -712,7 +714,7 @@ STDMETHODIMP CBlockFinder::GetBlockScore(BSTR strBlockText, IAFDocument* pAFDoc,
 		// Not required to be non-NULL
 
 		// Get a regular expression parser
-		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("BlockFinder");
+		IRegularExprParserPtr ipParser = m_ipAFUtility->GetNewRegExpParser(ipAFDoc);
 		ASSERT_RESOURCE_ALLOCATION("ELI05738", ipParser != __nullptr);
 
 		// All comparisons are case insensitive

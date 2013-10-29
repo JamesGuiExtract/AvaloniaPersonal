@@ -139,7 +139,7 @@ private:
 
 	bool m_bDirty;
 
-	IMiscUtilsPtr m_ipMisc;
+	IAFUtilityPtr m_ipAFUtility;
 
 	// Clue list (vector of BSTRs)
 	IVariantVectorPtr m_ipClues;

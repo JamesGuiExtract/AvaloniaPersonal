@@ -1242,9 +1242,9 @@ namespace Extract.Imaging.Forms.Test
             imageViewer.PageNumber = 3;
 
             // Go to the previous tile (on page 2)
-            PreviousTileToolStripMenuItem PreviousTile =
+            PreviousTileToolStripMenuItem previousTile =
                 FormMethods.GetFormComponent<PreviousTileToolStripMenuItem>(_imageViewerForm);
-            PreviousTile.PerformClick();
+            imageViewer.PerformClick(previousTile);
 
             // Ensure that there is only one zoom history entry for this page
             Assert.That(!imageViewer.CanZoomPrevious && !imageViewer.CanZoomNext);
@@ -1273,7 +1273,7 @@ namespace Extract.Imaging.Forms.Test
             // Go to the previous tile
             PreviousTileToolStripMenuItem previousTile =
                 FormMethods.GetFormComponent<PreviousTileToolStripMenuItem>(_imageViewerForm);
-            previousTile.PerformClick();
+            imageViewer.PerformClick(previousTile);
 
             // This should be the entire previous page
             Assert.That(imageViewer.PageNumber == 3);
@@ -1285,7 +1285,7 @@ namespace Extract.Imaging.Forms.Test
             imageViewer.FitMode = FitMode.FitToWidth;
 
             // Go to the previous tile
-            previousTile.PerformClick();
+            imageViewer.PerformClick(previousTile);
 
             // This should be the bottom tile of the second page
             Assert.That(imageViewer.PageNumber == 2);
@@ -1324,13 +1324,13 @@ namespace Extract.Imaging.Forms.Test
             // Go to the previous tile
             PreviousTileToolStripMenuItem previousTile =
                 FormMethods.GetFormComponent<PreviousTileToolStripMenuItem>(_imageViewerForm);
-            previousTile.PerformClick();
+            imageViewer.PerformClick(previousTile);
 
             // Ensure that exactly one ZoomChanged and PageChanged event were raised
             Assert.That(eventCounters.EventCounter == 1 && eventCounters.EventCounter2 == 1);
 
             // Go to the previous tile
-            previousTile.PerformClick();
+            imageViewer.PerformClick(previousTile);
 
             // Ensure that exactly one more ZoomChanged event was raised
             Assert.That(eventCounters.EventCounter == 2 && eventCounters.EventCounter2 == 1);
@@ -1415,7 +1415,7 @@ namespace Extract.Imaging.Forms.Test
 
             // Go to the next tile
             NextTileToolStripMenuItem nextTile = FormMethods.GetFormComponent<NextTileToolStripMenuItem>(_imageViewerForm);
-            nextTile.PerformClick();
+            imageViewer.PerformClick(nextTile);
 
             // Ensure that there is only one zoom history entry for this page
             Assert.That(!imageViewer.CanZoomPrevious && !imageViewer.CanZoomNext);
@@ -1440,7 +1440,7 @@ namespace Extract.Imaging.Forms.Test
 
             // Go to the next three tile
             NextTileToolStripMenuItem nextTile = FormMethods.GetFormComponent<NextTileToolStripMenuItem>(_imageViewerForm);
-            nextTile.PerformClick();
+            imageViewer.PerformClick(nextTile);
 
             // This should be the next page
             Assert.That(imageViewer.PageNumber == 2);
@@ -1452,10 +1452,10 @@ namespace Extract.Imaging.Forms.Test
             imageViewer.FitMode = FitMode.FitToWidth;
 
             // Go to the next four tiles
-            nextTile.PerformClick();
-            nextTile.PerformClick();
-            nextTile.PerformClick();
-            nextTile.PerformClick();
+            imageViewer.PerformClick(nextTile);
+            imageViewer.PerformClick(nextTile);
+            imageViewer.PerformClick(nextTile);
+            imageViewer.PerformClick(nextTile);
 
             // This should be the top tile of the third page
             Assert.That(imageViewer.PageNumber == 3);
@@ -1490,25 +1490,25 @@ namespace Extract.Imaging.Forms.Test
 
             // Go to the next tile
             NextTileToolStripMenuItem nextTile = FormMethods.GetFormComponent<NextTileToolStripMenuItem>(_imageViewerForm);
-            nextTile.PerformClick();
+            imageViewer.PerformClick(nextTile);
 
             // Ensure that exactly one ZoomChanged event was raised
             Assert.That(eventCounters.EventCounter == 1 && eventCounters.EventCounter2 == 0);
 
             // Go to the next tile
-            nextTile.PerformClick();
+            imageViewer.PerformClick(nextTile);
 
             // Ensure that exactly one more ZoomChanged event was raised
             Assert.That(eventCounters.EventCounter == 2 && eventCounters.EventCounter2 == 0);
 
             // Go to the next tile
-            nextTile.PerformClick();
+            imageViewer.PerformClick(nextTile);
 
             // Ensure that exactly one more ZoomChanged event was raised
             Assert.That(eventCounters.EventCounter == 3 && eventCounters.EventCounter2 == 0);
 
             // Go to the next tile
-            nextTile.PerformClick();
+            imageViewer.PerformClick(nextTile);
 
             // Ensure that exactly one more ZoomChanged event and one more PageChanged event was 
             // raised.

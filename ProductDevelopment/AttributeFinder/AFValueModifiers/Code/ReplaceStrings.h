@@ -118,7 +118,7 @@ private:
 	bool m_bAsRegExpr;
 	IIUnknownVectorPtr m_ipReplaceInfos;
 
-	IMiscUtilsPtr m_ipMiscUtils;
+	IAFUtilityPtr m_ipAFUtility;
 
 	bool m_bDirty;
 
@@ -149,8 +149,8 @@ private:
 	void	modifyValue(ISpatialString* pText, IAFDocument* pDocument, 
 		IProgressStatus* pProgressStatus);
 	// Local method to do the replacement of the string list
-	void	replaceValue(ISpatialStringPtr ipInputText, IIUnknownVectorPtr ipReplaceInfos, 
-		IProgressStatus* pProgressStatus);
+	void	replaceValue(IAFDocumentPtr ipAFDoc, ISpatialStringPtr ipInputText,
+		IIUnknownVectorPtr ipReplaceInfos, IProgressStatus* pProgressStatus);
 
 	void validateLicense();
 };

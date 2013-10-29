@@ -166,7 +166,7 @@ private:
 	// list of clues defined
 	IVariantVectorPtr m_ipClues;
 
-	IMiscUtilsPtr m_ipMiscUtils;
+	IAFUtilityPtr m_ipAFUtility;
 
 	// Cached list loader object to read clues from files
 	CCachedListLoader m_cachedListLoader;

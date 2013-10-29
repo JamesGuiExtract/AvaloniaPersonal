@@ -61,8 +61,8 @@ CEntityNameSplitter::CEntityNameSplitter()
 		m_bMoveTrustName = (ma_pENSConfigMgr->getMoveNames() > 0) ? true : false;
 
 		// Get Misc Utils pointer to get an instance of the regular expression parser
-		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI22438", m_ipMiscUtils != __nullptr );
+		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
+		ASSERT_RESOURCE_ALLOCATION("ELI36193", m_ipAFUtility != __nullptr );
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI06028")
 }
@@ -73,7 +73,7 @@ CEntityNameSplitter::~CEntityNameSplitter()
 	{
 		m_ipFinder = __nullptr;
 		m_ipKeys = __nullptr;
-		m_ipMiscUtils = __nullptr;
+		m_ipAFUtility = __nullptr;
 		m_ipRegExprParser = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28855");
@@ -137,7 +137,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 			IAFDocumentPtr ipAFDoc(pAFDoc);
 
 			// Get a new parser (we will release this parser when the method exits)
-			m_ipRegExprParser = getParser();
+			m_ipRegExprParser = getParser(ipAFDoc);
 
 			// Set search to ignore case
 			m_ipRegExprParser->IgnoreCase = VARIANT_TRUE;

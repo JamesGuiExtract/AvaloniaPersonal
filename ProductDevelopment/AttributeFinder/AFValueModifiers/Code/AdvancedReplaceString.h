@@ -130,6 +130,8 @@ private:
 
 	IMiscUtilsPtr m_ipMiscUtils;
 
+	IAFUtilityPtr m_ipAFUtility;
+
 	//////////////
 	// Methods
 	//////////////

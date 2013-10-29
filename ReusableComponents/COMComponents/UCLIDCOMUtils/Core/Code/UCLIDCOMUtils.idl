@@ -25,6 +25,7 @@ library UCLID_COMUTILSLib
 	//-Forward declarations -----------------------------------------------------------------------
 	//---------------------------------------------------------------------------------------------
 	interface ITagUtility;
+	interface IExpressionFormatter;
 
 	//---------------------------------------------------------------------------------------------
 	//-E N U M S ----------------------------------------------------------------------------------
@@ -349,6 +350,14 @@ library UCLID_COMUTILSLib
 		//				only; VARIANT_FALSE to return the named groups for all matches.
 		[id(9), helpstring("method FindNamedGroups")] HRESULT FindNamedGroups([in] BSTR strInput, 
 			[in] VARIANT_BOOL bFindFirstMatchOnly, [out, retval] IIUnknownVector **ippMatchTokens);
+		//-----------------------------------------------------------------------------------------
+		// Specifies an IExpressionFormatter that should be used to perform custom formatting of the
+		// Pattern before use.
+		[propget, id(10), helpstring("property ExpressionFormatter")] HRESULT ExpressionFormatter(
+			[out, retval] IExpressionFormatter **ppVal);
+		[propput, id(10), helpstring("property ExpressionFormatter")] HRESULT ExpressionFormatter(
+			[in] IExpressionFormatter *pNewVal);
+		
 	};
 	[
 		object,
@@ -1603,6 +1612,21 @@ library UCLID_COMUTILSLib
         // objects to be unreferenced.
         // 2) Before leaving the scope in which the object exists or returning it as a return value.
 		[id(3001), helpstring("method ReportMemoryUsage")] HRESULT ReportMemoryUsage();			
+	}
+
+	[
+		object,
+		uuid(BB95C831-913A-42B6-9009-E32AB91A5C14),
+		dual,
+		nonextensible,
+		helpstring("IExpressionFormatter Interface"),
+		pointer_default(unique)
+	]
+	interface IExpressionFormatter : IDispatch
+	{
+		// PURPOSE:	Provides custom formatting of bstrExpression
+		[id(1), helpstring("method FormatExpression")] HRESULT FormatExpression(
+			[in] BSTR bstrExpression, [out, retval] BSTR* pbstrFormatedExpression);		
 	}
 
 	//---------------------------------------------------------------------------------------------

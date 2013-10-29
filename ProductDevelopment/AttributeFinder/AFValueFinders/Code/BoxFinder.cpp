@@ -57,8 +57,8 @@ CBoxFinder::CBoxFinder() :
 		m_ipClues.CreateInstance(CLSID_VariantVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI19742", m_ipClues != __nullptr);
 
-		m_ipMisc.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI22432", m_ipMisc != __nullptr);
+		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
+		ASSERT_RESOURCE_ALLOCATION("ELI36186", m_ipAFUtility != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29473");
 }
@@ -70,7 +70,7 @@ CBoxFinder::~CBoxFinder()
 		m_ipClues = __nullptr;
 		m_ipImageLineUtility = __nullptr;
 		m_ipSpatialStringSearcher = __nullptr;
-		m_ipMisc = __nullptr;
+		m_ipAFUtility = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI19219");
 }
@@ -749,7 +749,7 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 		ASSERT_RESOURCE_ALLOCATION("ELI19223", ipAttributes != __nullptr );
 
 		// Get a regular expression parser
-		IRegularExprParserPtr ipParser = m_ipMisc->GetNewRegExpParserInstance("BoxFinder");
+		IRegularExprParserPtr ipParser = m_ipAFUtility->GetNewRegExpParser(ipAFDoc);
 		ASSERT_RESOURCE_ALLOCATION("ELI22433", ipParser != __nullptr);
 
 		// Populate a vector of ints that indicates which pages

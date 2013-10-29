@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFUtils.AFExpressionFormatter.1 = s 'AFExpressionFormatter Class'
+	{
+		CLSID = s '{F965B71A-5BD6-494F-9B47-1FD93A21EB52}'
+	}
+	UCLIDAFUtils.AFExpressionFormatter = s 'AFExpressionFormatter Class'
+	{
+		CLSID = s '{F965B71A-5BD6-494F-9B47-1FD93A21EB52}'
+		CurVer = s 'UCLIDAFUtils.AFExpressionFormatter.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {F965B71A-5BD6-494F-9B47-1FD93A21EB52} = s 'AFExpressionFormatter Class'
+		{
+			ProgID = s 'UCLIDAFUtils.AFExpressionFormatter.1'
+			VersionIndependentProgID = s 'UCLIDAFUtils.AFExpressionFormatter'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{18CF5BEC-2929-43DD-86E0-7D50F152663A}'
+		}
+	}
+}

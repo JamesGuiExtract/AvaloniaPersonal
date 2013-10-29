@@ -1839,8 +1839,8 @@ namespace Extract.Imaging.Forms.Test
             imageViewer.PageNumber = 3;
 
             // Go to the previous tile
-            PreviousTileToolStripButton PreviousTile = FormMethods.GetFormComponent<PreviousTileToolStripButton>(_imageViewerForm);
-            PreviousTile.PerformClick();
+            PreviousTileToolStripButton previousTile = FormMethods.GetFormComponent<PreviousTileToolStripButton>(_imageViewerForm);
+            imageViewer.PerformClick(previousTile);
 
             // Ensure that there is only one zoom history entry for this page
             Assert.That(!imageViewer.CanZoomPrevious && !imageViewer.CanZoomNext);
@@ -1868,7 +1868,7 @@ namespace Extract.Imaging.Forms.Test
 
             // Go to the previous tile
             PreviousTileToolStripButton previousTile = FormMethods.GetFormComponent<PreviousTileToolStripButton>(_imageViewerForm);
-            previousTile.PerformClick();
+            imageViewer.PerformClick(previousTile);
 
             // This should be the previous page
             Assert.That(imageViewer.PageNumber == 3);
@@ -1880,7 +1880,7 @@ namespace Extract.Imaging.Forms.Test
             imageViewer.FitMode = FitMode.FitToWidth;
 
             // Go to the previous tile
-            previousTile.PerformClick();
+            imageViewer.PerformClick(previousTile);
 
             // This should be the second page
             Assert.That(imageViewer.PageNumber == 2);
@@ -1919,13 +1919,13 @@ namespace Extract.Imaging.Forms.Test
             // Go to the previous tile
             PreviousTileToolStripButton previousTile = 
                 FormMethods.GetFormComponent<PreviousTileToolStripButton>(_imageViewerForm);
-            previousTile.PerformClick();
+            imageViewer.PerformClick(previousTile);
 
             // Ensure that exactly one ZoomChanged and PageChanged event were raised
             Assert.That(eventCounters.EventCounter == 1 && eventCounters.EventCounter2 == 1);
 
             // Go to the previous tile
-            previousTile.PerformClick();
+            imageViewer.PerformClick(previousTile);
 
             // Ensure that exactly one more ZoomChanged event was raised
             Assert.That(eventCounters.EventCounter == 2 && eventCounters.EventCounter2 == 1);
@@ -2010,7 +2010,7 @@ namespace Extract.Imaging.Forms.Test
 
             // Go to the next tile
             NextTileToolStripButton nextTile = FormMethods.GetFormComponent<NextTileToolStripButton>(_imageViewerForm);
-            nextTile.PerformClick();
+            imageViewer.PerformClick(nextTile);
 
             // Ensure that there is only one zoom history entry for this page
             Assert.That(!imageViewer.CanZoomPrevious && !imageViewer.CanZoomNext);
@@ -2035,7 +2035,7 @@ namespace Extract.Imaging.Forms.Test
 
             // Go to the next three tile
             NextTileToolStripButton nextTile = FormMethods.GetFormComponent<NextTileToolStripButton>(_imageViewerForm);
-            nextTile.PerformClick();
+            imageViewer.PerformClick(nextTile);
 
             // This should be the next page
             Assert.That(imageViewer.PageNumber == 2);
@@ -2047,10 +2047,10 @@ namespace Extract.Imaging.Forms.Test
             imageViewer.FitMode = FitMode.FitToWidth;
 
             // Go to the next four tiles
-            nextTile.PerformClick();
-            nextTile.PerformClick();
-            nextTile.PerformClick();
-            nextTile.PerformClick();
+            imageViewer.PerformClick(nextTile);
+            imageViewer.PerformClick(nextTile);
+            imageViewer.PerformClick(nextTile);
+            imageViewer.PerformClick(nextTile);
 
             // This should be the third page
             Assert.That(imageViewer.PageNumber == 3);
@@ -2085,25 +2085,25 @@ namespace Extract.Imaging.Forms.Test
 
             // Go to the next tile
             NextTileToolStripButton nextTile = FormMethods.GetFormComponent<NextTileToolStripButton>(_imageViewerForm);
-            nextTile.PerformClick();
+            imageViewer.PerformClick(nextTile);
 
             // Ensure that exactly one ZoomChanged event was raised
             Assert.That(eventCounters.EventCounter == 1 && eventCounters.EventCounter2 == 0);
 
             // Go to the next tile
-            nextTile.PerformClick();
+            imageViewer.PerformClick(nextTile);
 
             // Ensure that exactly one more ZoomChanged event was raised
             Assert.That(eventCounters.EventCounter == 2 && eventCounters.EventCounter2 == 0);
 
             // Go to the next tile
-            nextTile.PerformClick();
+            imageViewer.PerformClick(nextTile);
 
             // Ensure that exactly one more ZoomChanged event was raised
             Assert.That(eventCounters.EventCounter == 3 && eventCounters.EventCounter2 == 0);
 
             // Go to the next tile
-            nextTile.PerformClick();
+            imageViewer.PerformClick(nextTile);
 
             // Ensure that exactly one more ZoomChanged event and one more PageChanged event was 
             // raised.
@@ -3451,7 +3451,7 @@ namespace Extract.Imaging.Forms.Test
             OpenTestImage(imageViewer);
 
             // Set a different cursor tool
-            imageViewer.CursorTool = CursorTool.ZoomWindow;
+            imageViewer.CursorTool = CursorTool.Pan;
             
             // Declare event counters class for counting the events
             EventCounters eventCounters = new EventCounters();
@@ -3460,9 +3460,9 @@ namespace Extract.Imaging.Forms.Test
             imageViewer.CursorToolChanged += eventCounters.CountEvent<CursorToolChangedEventArgs>;
 
             // Click the ZoomWindowToolStripButton
-            ZoomWindowToolStripButton clickMe =
+            ZoomWindowToolStripButton zoomWindowToolButton =
                 FormMethods.GetFormComponent<ZoomWindowToolStripButton>(_imageViewerForm);
-            clickMe.PerformClick();
+            imageViewer.PerformClick(zoomWindowToolButton);
 
             // Check that exactly one CursorToolChanged event was raised
             Assert.That(eventCounters.EventCounter == 1);

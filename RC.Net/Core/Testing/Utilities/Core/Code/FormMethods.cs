@@ -233,6 +233,30 @@ namespace Extract.Testing.Utilities
             }
         }
 
+        /// <summary>
+        /// Peforms a click of the specified <see cref="ToolStripItem"/> in a way that ensures all
+        /// processing that may be triggered by an internal <see cref="Control.BeginInvoke"/> call
+        /// happens before this call exists.
+        /// </summary>
+        /// <param name="control">The <see cref="Control"/> that should be used to invoke the click.
+        /// </param>
+        /// <param name="toolStripItem">The <see cref="ToolStripItem"/> to be clicked.</param>
+        public static void PerformClick(this Control control, ToolStripItem toolStripItem)
+        {
+            try
+            {
+                control.Invoke((MethodInvoker)(() =>
+                {
+                    toolStripItem.PerformClick();
+                    Application.DoEvents();
+                }));
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36184");
+            }
+        }
+
         #endregion Methods
     }
 }

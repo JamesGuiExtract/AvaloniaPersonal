@@ -476,6 +476,8 @@ library UCLID_AFUTILSLib
 		[id(21), helpstring("method ExpandFormatString")] HRESULT ExpandFormatString(
 			[in] IAttribute *pAttribute, 
 			[in] BSTR bstrFormat,
+			[in] long nEndScopeChar,
+			[out] long *pnEndScopePos,
 			[out, retval] ISpatialString** pRetVal);
 		//-----------------------------------------------------------------------------------------
 		[id(22), helpstring("method IsValidQuery")] HRESULT IsValidQuery( [in] BSTR bstrQuery,
@@ -514,6 +516,12 @@ library UCLID_AFUTILSLib
 		// based on a tag (and not a relative path for which the base directory may not be clear).
 		[id(33), helpstring("method ValidateAsExplicitPath")] HRESULT ValidateAsExplicitPath(
 			[in] BSTR bstrEliCode, [in] BSTR bstrFilename);
+		//-----------------------------------------------------------------------------------------
+		// Gets a new IRegularExprParser instance that can expand backreferencing format strings
+		// in the format: (?~%FormatString). The specified pDoc's Attribute field will be used as
+		// the attribute context available for back-referencing.
+		[id(34), helpstring("method GetNewRegExpParser")] HRESULT GetNewRegExpParser(
+			[in] IAFDocument *pDoc, [out, retval] IRegularExprParser **ppRegExParser);
 	};
 	[
 		object,
@@ -564,6 +572,22 @@ library UCLID_AFUTILSLib
 			[in] VARIANT_BOOL bAllowMultipleSelection, [in] VARIANT_BOOL bAllowSpecialTags, 
 			[in] VARIANT_BOOL bAllowMultiplyClassified, [out, retval] IVariantVector** ppTypes);
 		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+        object,
+        uuid(E33C7DF2-ABBA-4186-9F92-34A49A32C0DD),
+        dual,
+        nonextensible,
+        helpstring("IAFExpressionFormatter Interface"),
+        pointer_default(unique)
+    ]
+	interface IAFExpressionFormatter : IDispatch
+	{
+		// The AFDocument that provides the attribute context for attributes referenced within
+		// format strings.
+		[propget, id(1), helpstring("property AFDocument")] HRESULT AFDocument([out, retval] IAFDocument **ppDoc);
+		[propput, id(1), helpstring("property AFDocument")] HRESULT AFDocument([in] IAFDocument *pDoc);
 	};
 
 	[
@@ -764,5 +788,15 @@ library UCLID_AFUTILSLib
     coclass SpatialAttributeMergeUtils
     {
         [default] interface ISpatialAttributeMergeUtils;
+    };
+
+	[
+        uuid(F965B71A-5BD6-494F-9B47-1FD93A21EB52),
+        helpstring("AFExpressionFormatter Class")
+    ]
+    coclass AFExpressionFormatter
+    {
+        [default] interface IAFExpressionFormatter;
+		interface IExpressionFormatter;
     };
 };

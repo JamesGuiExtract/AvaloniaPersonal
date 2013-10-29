@@ -233,6 +233,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="AFExpressionFormatter.cpp" />
     <ClCompile Include="MERSHandler.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -264,6 +265,7 @@
     <None Include="DocumentSorter.rgs" />
     <None Include="EntityFinder.rgs" />
     <None Include="EntityKeywords.rgs" />
+    <None Include="AFExpressionFormatter.rgs" />
     <None Include="MERSHandler.rgs" />
     <None Include="SpatialAttributeMergeUtils.rgs" />
   </ItemGroup>
@@ -298,6 +300,7 @@
     <ClInclude Include="EntityFinder.h" />
     <ClInclude Include="EntityFinderConfigMgr.h" />
     <ClInclude Include="EntityKeywords.h" />
+    <ClInclude Include="AFExpressionFormatter.h" />
     <ClInclude Include="MERSHandler.h" />
     <ClInclude Include="PatternHolder.h" />
     <ClInclude Include="SpatialAttributeMergeUtils.h" />

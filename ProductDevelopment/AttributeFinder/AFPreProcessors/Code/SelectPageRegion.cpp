@@ -61,8 +61,8 @@ CSelectPageRegion::CSelectPageRegion()
 	m_ipAFTagUtility.CreateInstance(CLSID_AFUtility);
 	ASSERT_RESOURCE_ALLOCATION("ELI09753", m_ipAFTagUtility != __nullptr);
 
-	m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-	ASSERT_RESOURCE_ALLOCATION("ELI32932", m_ipMiscUtils != __nullptr);
+	m_ipAFUtility.CreateInstance(CLSID_AFUtility);
+	ASSERT_RESOURCE_ALLOCATION("ELI36192", m_ipAFUtility != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CSelectPageRegion::~CSelectPageRegion()
@@ -70,7 +70,7 @@ CSelectPageRegion::~CSelectPageRegion()
 	try
 	{
 		m_ipAFTagUtility = __nullptr;
-		m_ipMiscUtils = __nullptr;
+		m_ipAFUtility = __nullptr;
 		m_ipSpatialStringSearcher = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16326");
@@ -1380,8 +1380,7 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 bool CSelectPageRegion::isRegExFoundOnPage(string strPageText, const IAFDocumentPtr& ipAFDoc)
 {
 	// Find with a regular expression pattern
-	IRegularExprParserPtr ipRegExpParser =
-		m_ipMiscUtils->GetNewRegExpParserInstance("SelectPageRegion");
+	IRegularExprParserPtr ipRegExpParser = m_ipAFUtility->GetNewRegExpParser(ipAFDoc);
 	ASSERT_RESOURCE_ALLOCATION("ELI09378", ipRegExpParser != __nullptr);
 
 	string strRootFolder = "";

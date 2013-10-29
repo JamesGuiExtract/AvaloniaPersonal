@@ -249,7 +249,7 @@ private:
 	// Cached list loader object to read clues from files
 	CCachedListLoader m_cachedListLoader;
 
-	IMiscUtilsPtr m_ipMisc;
+	IAFUtilityPtr m_ipAFUtility;
 
 	// Map of page numbers to cached X and Y resolution for the page.
 	map<int, pair<int, int>> m_mapPageResolutions;

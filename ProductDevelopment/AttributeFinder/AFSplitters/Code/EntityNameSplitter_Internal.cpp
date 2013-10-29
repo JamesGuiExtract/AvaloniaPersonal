@@ -3065,13 +3065,12 @@ void CEntityNameSplitter::trimTrailingWord(ISpatialStringPtr& ripEntity, string 
 	ripEntity->Trim( _bstr_t( " -,." ), _bstr_t( " -," ) );
 }
 //-------------------------------------------------------------------------------------------------
-IRegularExprParserPtr CEntityNameSplitter::getParser()
+IRegularExprParserPtr CEntityNameSplitter::getParser(IAFDocumentPtr ipAFDoc)
 {
 	try
 	{
 		// Get a regular expression parser
-		IRegularExprParserPtr ipParser =
-			m_ipMiscUtils->GetNewRegExpParserInstance("EntityNameSplitter");
+		IRegularExprParserPtr ipParser = m_ipAFUtility->GetNewRegExpParser(ipAFDoc);
 		ASSERT_RESOURCE_ALLOCATION( "ELI22439", ipParser != __nullptr );
 
 		return ipParser;

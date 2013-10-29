@@ -470,8 +470,8 @@ m_cachedRegExLoader(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str())
 		m_mapRotations[180] = true;
 		m_mapRotations[270] = true;
 
-		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI29475", m_ipMiscUtils != __nullptr);
+		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
+		ASSERT_RESOURCE_ALLOCATION("ELI36189", m_ipAFUtility != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29476");
 }
@@ -480,7 +480,7 @@ CMicrFinder::~CMicrFinder()
 {
 	try
 	{
-		m_ipMiscUtils = __nullptr;
+		m_ipAFUtility = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI24338");
 }
@@ -562,7 +562,7 @@ STDMETHODIMP CMicrFinder::raw_ParseText(IAFDocument * pAFDoc, IProgressStatus *p
 			}
 
 			// Find the MICR zones
-			findMICRZones(ipSS, vecPages, ipAttributes);
+			findMICRZones(ipSS, vecPages, ipAttributes, ipAFDoc);
 		}
 		*pAttributes = ipAttributes.Detach();
 	}
@@ -1111,7 +1111,7 @@ STDMETHODIMP CMicrFinder::get_InstanceGUID(GUID *pVal)
 // Private functions
 //-------------------------------------------------------------------------------------------------
 void CMicrFinder::findMICRZones(ISpatialStringPtr ipSpatialString, const vector<long>& vecPages,
-											IIUnknownVectorPtr ipAttributes)
+								IIUnknownVectorPtr ipAttributes, IAFDocumentPtr ipAFDoc)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI02313");
 	try
@@ -1376,7 +1376,7 @@ void CMicrFinder::findMICRZones(ISpatialStringPtr ipSpatialString, const vector<
 		_lastCodePos = "120";
 
 		IIUnknownVectorPtr ipNewAttributes =
-			buildAttributesFromPages(mapMicrPages, strImageName, ipSpatialString);
+			buildAttributesFromPages(mapMicrPages, strImageName, ipSpatialString, ipAFDoc);
 		ASSERT_RESOURCE_ALLOCATION("ELI25032", ipNewAttributes != __nullptr);
 
 		// Append the new attributes
@@ -1478,7 +1478,7 @@ bool CMicrFinder::buildMicrZone(_CcMicrInfoPtr ipMicrInfo, int nRotation,
 }
 //-------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CMicrFinder::buildAttributesFromPages(const map<long, MicrPage>& mapPages,
-											const string& strImageName, ISpatialStringPtr ipSS)
+						const string& strImageName, ISpatialStringPtr ipSS, IAFDocumentPtr ipAFDoc)
 {
 	try
 	{
@@ -1586,7 +1586,7 @@ IIUnknownVectorPtr CMicrFinder::buildAttributesFromPages(const map<long, MicrPag
 							// Create a bounding rectangle to search for the other routing number
 							RECT rectArea = getOtherRoutingSearchZone(vecLines, micrZone, micrPage);
 							IAttributePtr ipOtherRouting = findOtherRoutingNumber(ipSSTemp,
-								routingZone.m_strMicrText, rectArea);
+								routingZone.m_strMicrText, rectArea, ipAFDoc);
 							if (ipOtherRouting != __nullptr)
 							{
 								ipSubAttributes->PushBack(ipOtherRouting);
@@ -1630,7 +1630,8 @@ IIUnknownVectorPtr CMicrFinder::buildAttributesFromPages(const map<long, MicrPag
 //-------------------------------------------------------------------------------------------------
 IAttributePtr CMicrFinder::findOtherRoutingNumber(ISpatialStringPtr ipSpatialString,
 												  const string &strRoutingNumber,
-												  const RECT& rectToSearch)
+												  const RECT& rectToSearch,
+												  IAFDocumentPtr ipAFDoc)
 {
 	ASSERT_ARGUMENT("ELI24944", ipSpatialString != __nullptr);
 
@@ -1697,7 +1698,7 @@ IAttributePtr CMicrFinder::findOtherRoutingNumber(ISpatialStringPtr ipSpatialStr
 			{
 				// Look for the other routing number
 				IIUnknownVectorPtr ipMatches =
-					getOtherRoutingNumberRegexParser()->Find(ipSS->String,
+					getOtherRoutingNumberRegexParser(ipAFDoc)->Find(ipSS->String,
 					VARIANT_TRUE, VARIANT_TRUE);
 				ASSERT_RESOURCE_ALLOCATION("ELI24949", ipMatches != __nullptr);
 
@@ -1748,7 +1749,7 @@ IAttributePtr CMicrFinder::findOtherRoutingNumber(ISpatialStringPtr ipSpatialStr
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI24953");
 }
 //-------------------------------------------------------------------------------------------------
-IRegularExprParserPtr CMicrFinder::getOtherRoutingNumberRegexParser()
+IRegularExprParserPtr CMicrFinder::getOtherRoutingNumberRegexParser(IAFDocumentPtr ipAFDoc)
 {
 	try
 	{
@@ -1772,7 +1773,7 @@ IRegularExprParserPtr CMicrFinder::getOtherRoutingNumberRegexParser()
 		}
 
 		// Get a regular expression parser
-		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("");
+		IRegularExprParserPtr ipParser = m_ipAFUtility->GetNewRegExpParser(ipAFDoc);
 		ASSERT_RESOURCE_ALLOCATION("ELI24948", ipParser != __nullptr );
 
 		// Load the regex pattern into the parser

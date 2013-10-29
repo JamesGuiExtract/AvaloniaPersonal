@@ -46,8 +46,8 @@ CReplaceStrings::CReplaceStrings()
 	{
 		ASSERT_RESOURCE_ALLOCATION("ELI06628", m_ipReplaceInfos != __nullptr);
 
-		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13085", m_ipMiscUtils != __nullptr );
+		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
+		ASSERT_RESOURCE_ALLOCATION("ELI36202", m_ipAFUtility != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI06629")
 }
@@ -56,7 +56,7 @@ CReplaceStrings::~CReplaceStrings()
 {
 	try
 	{
-		m_ipMiscUtils = __nullptr;
+		m_ipAFUtility = __nullptr;
 		m_ipReplaceInfos = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16364");
@@ -729,13 +729,15 @@ void CReplaceStrings::modifyValue(ISpatialString* pText, IAFDocument* pDocument,
 		m_ipReplaceInfos, ';', ipAFDoc);
 	ASSERT_RESOURCE_ALLOCATION("ELI30068", ipExpandedReplaceList != __nullptr);
 
-	replaceValue(ipInputText, ipExpandedReplaceList, pProgressStatus);
+	replaceValue(ipAFDoc, ipInputText, ipExpandedReplaceList, pProgressStatus);
 }
 //-------------------------------------------------------------------------------------------------
-void CReplaceStrings::replaceValue(ISpatialStringPtr ipInputText, IIUnknownVectorPtr ipReplaceInfos, 
+void CReplaceStrings::replaceValue(IAFDocumentPtr ipAFDoc, ISpatialStringPtr ipInputText,
+								   IIUnknownVectorPtr ipReplaceInfos,
 								   IProgressStatus* pProgressStatus)
 {
 	// ensure valid arguments
+	ASSERT_ARGUMENT("ELI36201", ipAFDoc != __nullptr);
 	ASSERT_ARGUMENT("ELI14560", ipInputText != __nullptr);
 	ASSERT_ARGUMENT("ELI14561", ipReplaceInfos != __nullptr);
 
@@ -773,7 +775,7 @@ void CReplaceStrings::replaceValue(ISpatialStringPtr ipInputText, IIUnknownVecto
 		IRegularExprParserPtr ipParser = __nullptr;
 		if (m_bAsRegExpr)
 		{
-			ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("ReplaceStrings");
+			IRegularExprParserPtr ipParser = m_ipAFUtility->GetNewRegExpParser(ipAFDoc);
 			ASSERT_RESOURCE_ALLOCATION("ELI06627", ipParser != __nullptr);
 		}
 		ipInputText->Replace(_bstrToBeReplace, _bstrReplacement,

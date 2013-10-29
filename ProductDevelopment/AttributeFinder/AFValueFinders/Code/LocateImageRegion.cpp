@@ -57,8 +57,8 @@ CLocateImageRegion::CLocateImageRegion()
 
 		ASSERT_RESOURCE_ALLOCATION("ELI07919", m_ipSpatialStringSearcher != __nullptr);
 
-		m_ipMisc.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI22434", m_ipMisc != __nullptr);
+		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
+		ASSERT_RESOURCE_ALLOCATION("ELI36188", m_ipAFUtility != __nullptr);
 
 		// For getImageXAndYResolution
 		initPDFSupport();
@@ -71,7 +71,7 @@ CLocateImageRegion::~CLocateImageRegion()
 	 try
 	 {
 		 m_ipSpatialStringSearcher = __nullptr;
-		 m_ipMisc = __nullptr;
+		 m_ipAFUtility = __nullptr;
 	 }
 	 CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16346");
 }
@@ -1175,7 +1175,8 @@ IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipInp
 	IVariantVectorPtr ipCopy[4];
 	
 	// Create a regex parser
-	IRegularExprParserPtr ipParser = m_ipMisc->GetNewRegExpParserInstance("LocateImageRegion");
+	IRegularExprParserPtr ipParser = m_ipAFUtility->GetNewRegExpParser(ipAFDoc);
+
 	ASSERT_RESOURCE_ALLOCATION("ELI22435", ipParser != __nullptr);
 
 	// Loop through all items in the map of clue lists

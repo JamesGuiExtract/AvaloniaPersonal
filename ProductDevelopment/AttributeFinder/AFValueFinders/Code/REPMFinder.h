@@ -129,7 +129,6 @@ private:
 	std::string m_strRuleWorkedName;
 	IRegularExprParserPtr m_ipRegExpParser;
 	IAFUtilityPtr m_ipAFUtility;
-	IMiscUtilsPtr m_ipMiscUtils;
 	IObjectWithDescriptionPtr m_ipDataScorer;
 
 	bool m_bIgnoreInvalidTags;
@@ -150,7 +149,7 @@ private:
 	bool containsValidDocTypeTag(const std::string& strFileName);
 
 	IAFUtilityPtr getAFUtility();
-	IRegularExprParserPtr getRegExParser();
+	IRegularExprParserPtr getRegExParser(IAFDocumentPtr ipAFDoc);
 
 	// Replace all <DocType> with current document type name,
 	// auto encrypt file into .etf file if required, put prefix

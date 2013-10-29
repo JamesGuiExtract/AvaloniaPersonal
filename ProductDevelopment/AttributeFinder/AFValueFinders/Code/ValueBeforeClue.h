@@ -142,7 +142,7 @@ private:
 	// whether or not specified string is treated as a regular expression
 	bool m_bClueToStringAsRegExpr;
 
-	IMiscUtilsPtr m_ipMiscUtils;
+	IAFUtilityPtr m_ipAFUtility;
 
 	// whether the current object is modified
 	bool m_bDirty;

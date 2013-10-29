@@ -96,8 +96,8 @@ private:
 	// Data
 	///////
 
-	// Misc utils object used to get the parser
-	IMiscUtilsPtr m_ipMiscUtils;
+	// AFUtility used to get the parser
+	IAFUtilityPtr m_ipAFUtility;
 
 	// Regular Expression parser to be used internally
 	IRegularExprParserPtr m_ipRegExprParser;
@@ -243,7 +243,7 @@ private:
 	bool	doLeadingWordTrim(ISpatialStringPtr& ripEntity, string strTrim);
 
 	// Gets a new regular expression parser
-	IRegularExprParserPtr getParser();
+	IRegularExprParserPtr getParser(IAFDocumentPtr ipAFDoc);
 
 	// ensure that this component is licensed
 	void validateLicense();

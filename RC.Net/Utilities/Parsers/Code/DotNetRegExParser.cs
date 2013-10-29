@@ -106,6 +106,19 @@ namespace Extract.Utilities.Parsers
             }
         }
 
+        /// <summary>
+        /// Gets or sets an expression formatter that provides custom formatting of the regex
+        /// expression priorty to use.
+        /// </summary>
+        /// <value>
+        /// The <see cref="IExpressionFormatter"/> to provide custom formatting.
+        /// </value>
+        public IExpressionFormatter ExpressionFormatter
+        {
+            get;
+            set;
+        }
+
         #endregion IRegularExprParser Properties
 
         #region Public Properties
@@ -566,8 +579,14 @@ namespace Extract.Utilities.Parsers
                 // if internal variable is null, create a new parser with the pattern and options.
                 if (_regexParser == null)
                 {
+                    // If an ExpressionFormatter has been specified, use it to do any necessary
+                    // custom formatting of the pattern.
+                    expandedPattern = (ExpressionFormatter == null)
+                        ? _pattern
+                        : ExpressionFormatter.FormatExpression(_pattern);
+
                     // Expand any fuzzy search terms into the equivalent regular expression.
-                    expandedPattern = FuzzySearchRegexBuilder.ExpandFuzzySearchExpressions(_pattern);
+                    expandedPattern = FuzzySearchRegexBuilder.ExpandFuzzySearchExpressions(expandedPattern);
 
                     _regexParser = new Regex(expandedPattern, RegexOptions);
                 }

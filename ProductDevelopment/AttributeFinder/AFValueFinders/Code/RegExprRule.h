@@ -153,7 +153,7 @@ private:
 	IAttributePtr createAttribute(ITokenPtr ipToken, ISpatialStringPtr ipInput);
 
 	// Gets the regular expression parser
-	IRegularExprParserPtr getParser();
+	IRegularExprParserPtr getParser(IAFDocumentPtr ipAFDocument);
 
 	// Parses the text and returns an IUnknownVector of attributes
 	IIUnknownVectorPtr parseText(IAFDocumentPtr ipAFDoc);

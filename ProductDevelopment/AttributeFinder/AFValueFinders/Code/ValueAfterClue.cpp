@@ -42,8 +42,8 @@ CValueAfterClue::CValueAfterClue()
 {
 	try
 	{
-		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13047", m_ipMiscUtils != __nullptr );
+		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
+		ASSERT_RESOURCE_ALLOCATION("ELI36190", m_ipAFUtility != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI13049")
 }
@@ -52,7 +52,7 @@ CValueAfterClue::~CValueAfterClue()
 {
 	try
 	{
-		m_ipMiscUtils = __nullptr;
+		m_ipAFUtility = __nullptr;
 		m_ipClues = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16350");
@@ -132,7 +132,7 @@ STDMETHODIMP CValueAfterClue::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus
 			_bstrCluesPattern += _bstr_t(strClue.c_str());
 		}
 
-		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("ValueAfterClue");
+		IRegularExprParserPtr ipParser = m_ipAFUtility->GetNewRegExpParser(ipAFDoc);
 		ASSERT_RESOURCE_ALLOCATION("ELI13048", ipParser != __nullptr);
 
 		// find all clues in the input string

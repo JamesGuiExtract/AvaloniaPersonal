@@ -464,7 +464,8 @@ STDMETHODIMP CModifyAttributeValueOH::raw_ProcessOutput(IIUnknownVector* pAttrib
 				if (m_bSetAttributeValue)
 				{
 					// replace the old attribute value with the new attribute value
-					ipUpdateAttr->Value = m_ipAFUtil->ExpandFormatString(ipMatchedAttr, m_strAttributeValue.c_str());
+					ipUpdateAttr->Value = m_ipAFUtil->ExpandFormatString(
+						ipMatchedAttr, m_strAttributeValue.c_str(), '\0', __nullptr);
 				}
 
 				if (m_bSetAttributeType)

@@ -10,6 +10,7 @@
 #include <afxmt.h>
 #include <string>
 #include <vector>
+#include <set>
 #include <map>
 #include <memory>
 
@@ -128,6 +129,8 @@ public:
 	STDMETHOD(ExpandFormatString)(
 		/*[in]*/ IAttribute *pAttribute, 
 		/*[in]*/ BSTR bstrFormat,
+		/*[in]*/ long nEndScopeChar,
+		/*[out]*/ long *pnEndScopePos,
 		/*[out, retval]*/ ISpatialString** pRetVal);
 	STDMETHOD(IsValidQuery)(
 		/*[in]*/ BSTR bstrQuery,
@@ -142,6 +145,7 @@ public:
 		IIdentifiableRuleObject *pRuleObject, long nSubID, long* pnHandle);
 	STDMETHOD(StopProfilingRule)(long nHandle);
 	STDMETHOD(ValidateAsExplicitPath)(BSTR bstrEliCode, BSTR bstrFilename);
+	STDMETHOD(GetNewRegExpParser)(IAFDocument *pDoc, IRegularExprParser **ppRegExParser);
 
 private:
 	//////////////////
@@ -247,9 +251,39 @@ private:
 	// PURPOSE:	To expand the tags in the specified string (note rstrInput will be modified)
 	void expandTags(string& rstrInput, IAFDocumentPtr ipDoc);
 	//---------------------------------------------------------------------------------------------
-	ISpatialStringPtr getReformattedName(const string& strFormat, const IAttributePtr& ipAttribute);
+	// PURPOSE:	To return a reformated version of the format string specified by strFormat using
+	//			the supplied ipAttribute as the context used to expand variables. strFormat will
+	//			be modified so that following the call, only the text not processed will remain.
+	//			bScopeCloseExpected- Indicates the current format string is being expanded within
+	//			an explicitly defined scope (<scope>), and therefore a greater than char is
+	//			expected to close out the current format string.
+	//			cEndScopeChar- Indicates the current format string is being expanded within
+	//			an explicitly defined scope defined by custom chars. The specified char should end
+	//			the scope.
+	ISpatialStringPtr getReformattedName(string& strFormat, const IAttributePtr& ipAttribute,
+										 bool bScopeCloseExpected = false,
+										 char cEndScopeChar = '\0');
 	//---------------------------------------------------------------------------------------------
-	ISpatialStringPtr getVariableValue(const string& strVariable, const IAttributePtr& ipAttribute);
+	// PURPOSE:	Parses a variables out of the specified strVariable using the specified
+	//			attribute as the context for expanding the variable values. strVariable will be
+	//			modified so that following the call, only the text not processed will remain.
+	ISpatialStringPtr parseVariableValue(string& strVariable, const IAttributePtr& ipAttribute);
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Determines if a maximum length has been provided. (after which the expanded value
+	//			should be truncated). A return value of >=0 indicates the maximum length whereas
+	//			-1 indicates the expanded value should not be truncated.
+	long getMaxValueLen(string& strQuery);
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Returns an IUnknownVector of items from ipItems that are selected using
+	//			strSelection. Valid selection values are first, last, all, uniq, unique and
+	//			1-based numerical ranges.
+	IIUnknownVectorPtr getSelectedItems(const IIUnknownVectorPtr& ipItems, string strSelection);
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Expands the specified variable, using the specified attribute as context. 
+	//			strSelection defines which attributes returned if strQuery selects multiple.
+	//			strDelim should be used to delimit multiple values. 
+	ISpatialStringPtr getVariableValue(const string& strQuery, const IAttributePtr& ipAttribute,
+									   const string& strSelection, const string& strDelim);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE:	To return a Variant vector containing the built in doc tags
 	IVariantVectorPtr getBuiltInTags();
