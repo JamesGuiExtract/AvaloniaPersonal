@@ -10,7 +10,7 @@
 //--------------------------------------------------------------------------------------------------
 // CAFExpressionFormatter
 //--------------------------------------------------------------------------------------------------
-const string _strEXPRESSION_DELIMITER = "(?~%";
+const string _strEXPRESSION_DELIMITER = "(?%";
 
 //--------------------------------------------------------------------------------------------------
 // CAFExpressionFormatter
@@ -130,7 +130,7 @@ STDMETHODIMP CAFExpressionFormatter::raw_FormatExpression(BSTR bstrExpression, B
 			// Replace the format string with expanded result
 			nEndPos = (nEndPos == -1) ? -1 : nEndPos + _strEXPRESSION_DELIMITER.length();
 			strExpression.erase(nPos, nEndPos);
-			if (nPos >= strExpression.length())
+			if (nPos >= (long)strExpression.length())
 			{
 				strExpression += asString(ipFormattedString->String);
 			}
