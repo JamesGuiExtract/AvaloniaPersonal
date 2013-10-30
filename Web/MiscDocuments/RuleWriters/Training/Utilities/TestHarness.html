@@ -81,10 +81,12 @@
 									<li>Each of these .dat files contains the configuration for a single test.</li>
 									<li>The lines in the .tcl file have the following syntax:
 										<ul>
-											<li><b>EXTRACTRedactionTester.IDShieldTester.1;;</b>{ Name of .dat file }</li>
+											<li><b>EXTRACTRedactionTester.IDShieldTester.1;</b>{ optional path }<b>;</b>{ Name of .dat file }
 												<ul>
+													<li>{ optional path }: Where the test harness xml output file will be saved to. Example: <pre>Set002\Mortgage\$(DateTimeStamp)</pre> I saw it in use for FlexIndex  (UCLIDAFCoreTest.AutomatedRuleSetTester), I haven't tried it for EXTRACTRedactionTester.IDShieldTester.1 but it probably would work there too.</li>
 													<li>{ Name of .dat file }: The filename of the .dat file that contains the configuration for the test you want to run.</li>
 												</ul>
+											</li>
 										</ul>
 									</li>
 									<li>You can have multiple lines in the .tcl file which allows you to run multiple tests in a row.</li>
