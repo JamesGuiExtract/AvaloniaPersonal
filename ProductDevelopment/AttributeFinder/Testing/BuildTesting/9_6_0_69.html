@@ -1,0 +1,312 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.6.0.69 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.6.0.69 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DataEntry #1187]</b> Zoom In / Zoom Out
+        	<ul>
+			<li>Exercise <b>F6</b> zoom in / zoom out behavior during 
+			verification.
+			<li>Confirm that viewing area always properly displays the 
+			currently selected field.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1225]</b> Query Results
+        	<ul>
+			<li>Exercise the following query.
+			<ul>
+				<li>A<br>
+&lt;Composite SelectionMode='Distinct'&gt;<br>
+1<br>
+2<br>
+&lt;/Composite&gt;<br>
+B
+			</ul>
+			<li>Confirm two results.
+<p>
+			<li>Exercise the following query.
+			<ul>
+				<li>A<br>
+&lt;Composite SelectionMode='Distinct'&gt;<br>
+1<br>
+&lt;/Composite&gt;<br>
+B
+			</ul>
+			<li>Confirm two results.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1238]</b> Root Relative Attribute Query
+        	<ul>
+			<li>Confirm that the following query references 
+			<b>CollectionDate</b>.
+			<ul>
+				<li>&lt;Query&gt;Please see &lt;Attribute 
+				SelectionMode='First' 
+				Name='OrderName'&gt;/Test/Name&lt;/Attribute&gt; 
+				from &lt;Attribute 
+				Root='OrderName'&gt;../CollectionDate&lt;/Attribute&gt; 
+				for scanned report. - reviewed.&lt;/Query&gt;
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1263]</b> SQL Queries
+        	<ul>
+			<li>Create a multi-line SQL query that <b>does not</b> contain 
+			blank spaces at the end of each line.
+			<li>Confirm proper execution of the query.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1281]</b> Enter Key
+        	<ul>
+			<li>Exercise data entry verification.
+			<li>Select a table cell that provides an auto-complete list.
+			<li>Confirm that clicking <b>ENTER</b> is effective for the 
+			first key press.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1282]</b> Validation Query
+        	<ul>
+			<li>Exercise data entry verification.
+			<li>Confirm that result date and time for an order must be the 
+			same or later than the collection date and time.
+			<li>Confirm that <b>Undo works properly during this testing</b>.
+			<li>Confirm that date and time that exactly matches is valid.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1283, #1284, #1289]</b> Data Entry Queries
+        	<ul>
+			<li>Exercise data entry verification for an Order with many tests.
+			<li>Delete the Order and <b>Undo</b> the delete.
+			<li>Confirm that the delay for Undo is not excessive.
+<p>
+			<li>Tab through test results.
+			<li>Confirm that an excessive delay is not seen moving from the 
+			<b>Value</b> cell to the <b>Units</b> cell.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1286]</b> Auto Zoom
+        	<ul>
+			<li>Exercise data entry verification.
+			<li>Set the <b>auto-zoom</b> option to zoom out if necessary.
+			<li>Use <b>F6</b> to zoom in.
+			<li>Confirm that switching fields does not automatically zoom 
+			back in or back out.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1290] TEMP CHANGE!</b> Demo_LabDE
+        	<ul>
+			<li>Exercise LabDE verification with <b>Z352.tif</b>.
+			<li>Select the third of three Orders.
+			<li>Confirm that an exception (about not recognizing <b>||</b> 
+			as a Flag value) is logged.
+			<li>Confirm that the exception is not displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1291]</b> LabDE Reports
+        	<ul>
+			<li>Exercise the <b>LabDE data entry rates by user</b> report.
+			<li>Exercise the <b>LabDE data entry rates by user excluding 
+			tag</b> report.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1292]</b> Confirm that verification can be restarted 
+		from the same FAM instance without exception.
+<p>
+  	   	<LI><b>[DataEntry #1294]</b> SkipValidationIfDocTaggedAs
+        	<ul>
+			<li>Confirm that <b>Extract.DataEntry.Properties.Settings</b> in 
+			the config file supports multiple tags delimited by comma or 
+			semicolon.
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1299]</b> Confirm that the 
+		<b>DataEntryCounterDefinition</b> table is not cleared if the database is 
+		cleared with the <b>Retain actions...</b> option checked.
+<p>
+  	   	<LI><b>[DotNetRC #1109]</b> Send Email Task
+        	<ul>
+			<li>Confirm that <b>&lt;FPSFileDir&gt;</b> is expanded to 
+			<b>&lt;Unknown FPS Directory&gt;</b> for an unsaved FPS file.
+			<li>Confirm that <b>&lt;FPSFileName&gt;</b> is expanded to 
+			<b>&lt;Unknown FPS Filename&gt;</b> for an unsaved FPS file.
+			<li>Confirm that validation tests are not executed for each 
+			keystroke.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1113]</b> Confirm that <b>FAM File Inspector</b> is 
+		always started in admin mode from <b>DB Admin</b>.
+<p>
+  	   	<LI><b>[DotNetRC #1114]</b> FAM File Inspector
+        	<ul>
+			<li>Inspect <b>Demo_IDShield</b>.
+			<li>Do a search (i.e. John) that selects a subset of the images.
+			<li>Confirm that only a subset of images are listed.
+			<li>Open an Explorer window to receive drag-and-drop files.
+			<li>Drag two neighboring files (002.tif and 006.tif) to the 
+			Explorer window.
+			<li>Confirm that the in-between files do not get pasted to the 
+			Explorer window.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1115]</b> Confirm that <b>/x</b> is supported by 
+		<b>PrintDocument.exe</b>.
+<p>
+  	   	<LI><b>[DotNetRC #1117]</b> FAM File Inspector
+        	<ul>
+			<li>Exercise <b>Ctrl+C</b> and <b>context menu</b> options to 
+			copy files to the Clipboard.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5349, #5369]</b> Company Address and Phone Numbers
+        	<ul>
+			<li>Confirm that the <b>FLEX Index</b> readme file contains 
+			the new company address and phone number.
+			<li>Confirm that the <b>ID Shield</b> readme file contains 
+			the new company address and phone number.
+			<li>Confirm that the <b>LabDE</b> readme file contains 
+			the new company address and phone number.
+			<li>Confirm that the readme files are installed to the 
+			<b>CommonComponents</b> folder.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5356]</b> Installation Errors
+        	<ul>
+			<li>Confirm that EXEs and DLLs left over under the <b>Extract 
+			Systems</b> folder are not removed after uninstall.
+			<li>Confirm that if the <b>Setup Launcher Unicode</b> error 
+			message is displayed, the registry is cleaned up so that 
+			subsequent installs work properly.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5362]</b> Merge Attributes OH
+        	<ul>
+			<li>Exercise the image found at 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\5362</b> 
+			using <b>OH - Cuyahoga Probate Court - Proware</b> rules.
+			<li>Confirm that processing time is approximately one day 
+			instead of more than three days.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5365]</b> Confirm that <b>LabDE</b> installation 
+		does not support a direct version upgrade.
+<p>
+  	   	<LI><b>[FlexIDSCore #5368]</b> Confirm that <b>About Rule Tester</b> 
+		supports displaying more than two rows of FKB updates.
+<p>
+  	   	<LI><b>[FlexIntegrations #351]</b> TBD
+        	<ul>
+			<li>TBD
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6468]</b> Version Information
+        	<ul>
+			<li>Confirm that <b>Extract</b>-installed DLLs and EXEs each 
+			include correct version information.
+			<li>Confirm version information for 
+			<b>Extract.Imaging.Utilities.dll</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6479]</b> Sending Error Emails
+        	<ul>
+			<li>Confirm that an FPS file cannot be saved or run if an error 
+			email has been specified but not correctly configured.
+			<li>Confirm that an FPS file cannot be saved or run if an error 
+			email has been specified but email server settings have not been 
+			saved in the database.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6485, #6486]</b> Confirm that 
+		<b>Extract.Utilities.SecureFileDeleters.dll</b> is registered at install 
+		so that <b>Extract.FileActionManager.FileSuppliers.dll</b> is registered.  
+		This will manifest as Context Menu file supplier being available.
+<p>
+  	   	<LI><b>[LegacyRC #6489]</b> Confirm that <b>SQL Native Client</b> is 
+		correctly installed via silent install.
+    	</ul>
+<p>
+	<LI><h3>Miscellaneous</h3>
+   	<ul>
+  	   	<LI><b>Demo_LabDE</b>
+	    	<ul>
+            		<li>Confirm that the <b>InsertAKAs</b> query works with the 
+			<b>OrderMapping</b> database.
+       		</ul>
+<p>
+  	   	<LI><b>FAM File Inspector</b>
+        	<ul>
+			<li>Confirm that <b>Complete</b> can be used as a command-line 
+			status option.
+			<li>Confirm that <b>Completed</b> can be used as a command-line 
+			status option.
+        	</ul>
+<p>
+  	   	<LI><b>LabDE Rates Report</b>
+        	<ul>
+			<li>Confirm that the report allows up to <b>5</b> tags to exclude.
+			<li>Confirm that the report allows up to <b>3</b> actions to 
+			include.
+			<li>Confirm that the report displays the new specifications.
+			<li>Confirm that documents are not counted twice if they were 
+			verified by multiple users.
+			<li>Confirm that the rates in the <b>Totals</b> column are overall 
+			organization-wide rates.
+			<li>Confirm that <b>fine print</b> about report information has 
+			been added to the report.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

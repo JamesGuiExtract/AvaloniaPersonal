@@ -1,0 +1,502 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.6.0.43 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.6.0.43 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DataEntry #759]</b> Auto Complete List
+		<ul>
+			<li>Open a document for data entry verification.
+			<li>Select one of the middle rowa in a <b>Tests</b> table 
+			that contains multiple rows.
+			<li>Delete the test name in the first column.
+			<li>Start typing the test name again.
+			<li>Wait for the auto-complete list to appear and select the 
+			appropriate entry using the mouse.
+			<li>Confirm that the active cell becomes the next cell in the 
+			current row.
+		</ul>
+<p>
+  	   	<LI><b>[DataEntry #1187]</b> Toggle Zoom
+		<ul>
+			<li>Open a document for data entry verification.
+			<li>Step through fields, adding data and undoing changes.
+			<li>Select a <b>Recipient</b> field.
+			<li>Click <b>F2</b> to zoom in.
+			<li>Click <b>F2</b> to revert the zoom.
+			<li>Confirm that the final zoom level is appropriate.
+		</ul>
+<p>
+  	   	<LI><b>[DataEntry #1242]</b> Auto Zoom
+		<ul>
+			<li>Open a document for data entry verification.
+			<li>Play with auto-zoom settings along with zoom-in and zoom-out.
+			<li>Confirm that no exceptions are displayed.
+		</ul>
+<p>
+  	   	<LI><b>[DataEntry #1258]</b> Order Mapper Database
+		<ul>
+			<li>Exercise the RSD files found at 
+			<b>I:\Common\Testing\PVCS_Testing\DataEntry\1258</b> while 
+			using the associated Order Mapper database.
+			<li>Confirm that no exceptions are thrown.
+		</ul>
+<p>
+  	   	<LI><b>[DataEntry #1267]</b> Flag Validation
+		<ul>
+			<li>Exercise the PDF and VOA files found at 
+			<b>I:\Common\Testing\PVCS_Testing\DataEntry\1267</b>.
+			<li>Confirm that flag validation is as expected.
+		</ul>
+<p>
+  	   	<LI><b>[DataEntry #1269] NOT FIXED</b> AKA Plugin
+        	<ul>
+			<li>Open the SDF file attached to the SCR.
+			<li>Review the <b>Add AKAs</b> plugin.
+			<li>Step through the various items.
+			<ul>
+				<li>Confirm that some items have spatial information.
+				<li>Confirm that some items do not show any image at all.
+				<li>Confirm that some items have an image but no 
+				spatial data.
+				<ul>
+					<li>Confirm that no exception is displayed.
+					<li><b>NOT FIXED for 9.6.</b> Confirm that 
+					a warning is presented to the user about a lack 
+					of spatial information.
+				</ul>
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[DataEntry #1270]</b> Confirm that the <b>Corepoint Health 
+		Solutions</b> installation has a <b>05.01.000</b> version number.
+<p>
+  	   	<LI><b>[DataEntry #1271]</b> Confirm that deleting rows from a grid 
+		does not require an excessive length of time.
+<p>
+  	   	<LI><b>[DataEntry #1273]</b> Confirm that the <b>Add AKAs</b> plugin 
+		works in SQLCDBEditor without throwing exceptions.
+<p>
+  	   	<LI><b>[DataEntry #1275]</b> Auto Zoom
+		<ul>
+			<li>Open a document for data entry verification.
+			<li>Select a field with spatial information.
+			<li>Set the auto-zoom context to <b>least context</b>.
+			<li>Do not leave the auto-zoom mode on <b>automatic</b>.
+			<li>Confirm that <b>F6</b> zooms in correctly.
+			<li>Confirm that <b>F6</b> zooms back out.
+			<li>Change to a different page.
+			<li>Click <b>F6</b>.
+			<li>Confirm that the zoom properly accounts for the tooltip 
+			width.
+		</ul>
+<p>
+  	   	<LI><b>[DataEntry #1276]</b> Auto Zoom
+		<ul>
+			<li>Open a document for data entry verification.
+			<li>Set the auto-zoom mode to <b>automatic</b> with medium 
+			or greater context.
+			<li>Select a different field and confirm that the zoom is 
+			automatically set.
+			<li>Change the auto-zoom mode to <b>zoom out when necessary</b>.
+			<li>Select another field with text on the same page but not 
+			currently in view.
+			<li>Confirm that the image <b>is not</b> zoomed all the way in 
+			to the newly selected field.
+		</ul>
+<p>
+  	   	<LI><b>[DataEntry #1277]</b> Auto Zoom
+		<ul>
+			<li>Open a document for data entry verification.
+			<li>Set the auto-zoom mode to <b>zoom out if necessary</b> with 
+			least context.
+			<li>Select a different field.
+			<li>Confirm that the tooltip does not extend beyond and underneath 
+			the scrollbar.
+			<li>Press <b>F6</b> again.
+			<li>Confirm that zoom returns to its previous level.
+		</ul>
+<p>
+  	   	<LI><b>[DataEntry #1278]</b> Confirm that the <b>LabDE Data Entry Rates 
+		By User</b> report includes counts only once per file even if the file is 
+		verified by more than one user.
+<p>
+  	   	<LI><b>[DotNetRC #508]</b> FAM File Inspector Drag And Drop
+        	<ul>
+			<li>Open <b>ESFAMService.sdf</b>.
+			<li>Add one or more FPS files.
+			<li>Delete the entries until the list is empty.
+			<li>Sort the empty list by clicking on the <b>FileName</b> header.
+			<li>Confirm that no exception is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #837]</b> SQLCDBEditor Concurrency Error
+        	<ul>
+			<li>Open an empty ESFAMService database.
+			<li>Copy an FPS filename to the Clipboard.
+			<li>Click on the filename cell in row 1 until it enters edit mode.
+			<li>Paste the filename into the cell.
+			<li>Click <b>Enter</b> so that the selected cell is now the 
+			filename cell of the second row.
+			<li>Switch to another application.
+			<li>Click on the filename cell in row 2 until it enters edit mode.
+			<li>Paste the filename into the cell.
+			<li>Switch to another application.
+			<li>Click on the <b>Instances</b> cell in row 2.
+			<li>Change the value to <b>2</b>.
+			<li>Press <b>SHIFT+TAB</b> to move focus to the filename cell in 
+			row 2.
+			<li>Confirm that no exception is displayed.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #990]</b> FAM File Inspector Drag And Drop
+        	<ul>
+			<li>Inspect some files.
+			<li>Confirm that single files can be dragged and dropped as follows.
+			<ul>
+				<li>To an <b>Explorer</b> window to be copied to the 
+				destination folder.
+				<li>To an email to be added as an attachment.
+			</ul>
+			<li>Confirm that multiple files can be dragged and dropped as follows.
+			<ul>
+				<li>To an <b>Explorer</b> window to be copied to the 
+				destination folder.
+				<li>To an email to be added as attachments.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #991, #992]</b> FAM File Inspector Search Options
+        	<ul>
+			<li>Inspect some files.
+			<li>Exercise the <b>Match case</b> option.
+			<li>Exercise the <b>Regular expression</b> option.
+			<li>Exercise the <b>Fuzzy search</b> option.
+			<li>Confirm that the <b>Regular expression</b> option and the 
+			<b>Fuzzy search</b> option are mutually exclusive.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1067]</b> Confirm that memory leak tests for the 
+		<b>Core: Send email</b> task are installed with RDT.
+<p>
+  	   	<LI><b>[DotNetRC #1089]</b> Print Document
+        	<ul>
+			<li>Confirm that a printer can be specified in each of the 
+			following ways.
+			<ul>
+				<li>\\fnp2\Xerox Global Print Driver PS
+				<li>Xerox Global Print Driver PS on FNP2
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1093]</b> Confirm that right-clicking on a non-selected row 
+		selects the row and displays an appropriate context menu.
+<p>
+  	   	<LI><b>[DotNetRC #1095]</b> FAM File Inspector Flag
+        	<ul>
+			<li>Confirm that the <b>Refresh</b> button does not clear 
+			any existing <b>Flag</b> settings.
+			<li>Confirm that <b>OK</b> from the file list configuration 
+			via the <b>Change</b> button does clear any existing <b>Flag</b> 
+			settings.
+			<li>Confirm that exercising a <b>LaunchApp</b> item <b>sets</b> 
+			the Flag for each item.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1096]</b> FAM File Inspector Admin Mode
+        	<ul>
+			<li>Confirm that the <b>Database</b> menu includes an 
+			<b>Admin mode</b> option.
+			<ul>
+				<li>Confirm that the menu item is enabled if the utility 
+				is started from the command line.
+				<li>Confirm that the menu item is disabled if the utility 
+				is started from <b>DB Admin</b>.
+				<li>Confirm that the menu item is disabled if the utility 
+				is running in <b>Admin</b> mode.
+			</ul>
+			<li>Add one or more entries the <b>LaunchApp</b> table such 
+			that <b>AdminOnly</b> is False.
+			<li>Confirm that each of the entries is visible in the context 
+			menu when running in <b>Admin</b> mode and <b>non-Admin</b> mode.
+			<li>Modify a <b>LaunchApp</b> entry such that <b>AdminOnly</b> 
+			is True.
+			<li>Confirm that the entry is visible in the context menu when 
+			running in <b>Admin</b> mode.
+			<li>Confirm that the entry is not visible in the context menu when 
+			running in <b>non-Admin</b> mode.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1097, #1101]</b> FAM File Inspector Options
+        	<ul>
+			<li>Confirm that the following command-line options are supported.
+			<ul>
+				<li>/DBServer &lt;ServerName&gt;
+				<li>/DBName &lt;DBName&gt;
+				<li>/Action &lt;ActionName&gt;
+				<li>/Status &lt;ActionStatus&gt;
+			</ul>
+			<li>Confirm that a meaningfule error message is presented if 
+			an incorrect action name is used.
+			<li>Confirm that a meaningfule error message is presented if 
+			an incorrect status is used.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1098]</b> FAM File Inspector Copying Files and Data
+        	<ul>
+			<li>Confirm that the following context menu options are supported.
+			<ul>
+				<li>Copy filename(s)
+				<li>Copy file(s)
+				<li>Copy file(s) and data
+			</ul>
+			<li>Confirm that <b>Copy filename(s)</b> adds text information 
+			to the Clipboard such that the fully-qualified paths to each of the 
+			selected files can be pasted into a text document or an email 
+			message body.
+			<li>Confirm that <b>Copy file(s)</b> adds file-list information 
+			to the Clipboard such that copies of each of the selected files 
+			can be pasted into an Explorer window or as email attachments.
+			<li>Confirm that <b>Copy file(s) and data</b> adds file-list 
+			information to the Clipboard such that copies of each of the 
+			selected files along with associated USS, VOA, and XML files can 
+			be pasted into an Explorer window or as email attachments.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1103]</b> FAM File Inspector /Query Option
+        	<ul>
+			<li>Exercise the <b>/query</b> option on the command-line.
+			<li>Confirm that the following parameter is a fully-qualified 
+			path to a text file containing a SQL query.
+			<li>Confirm that a meaningful error message is presented if the 
+			query is not fully formed.
+			<li>Confirm that the file selection is affected by the query.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3039, #4948]</b> Test Harness, IDShieldTester, and 
+		IDShieldStatisticsReporter
+        	<ul>
+			<li>Confirm that IDShieldTester supports a 
+			<b>TestOutputVoaPath</b> DAT file parameter.
+			<li>Confirm that the default location for IDShieldTester output 
+			is <b>$InsertBeforeExt(&lt;FoundVoaFile&gt;,.testoutput)</b>.
+			<li>Confirm that the default location for 
+			<b>IDShieldStatisticsReporter</b> output files is 
+			<b>&lt;OutputFilesFolder&gt;\TestOutput\$FileOf
+			(&lt;SourceDocName&gt;).voa</b>
+			<ul>
+				<li>Confirm that output files from one run do not overwrite 
+				output files from another run.
+			</ul>
+			<li>Confirm that all <b>IDShieldTester</b> file lists respect 
+			the <b>TypesToBeTested</b> setting.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5190]</b> SQL CDB Editor
+        	<ul>
+			<li>Open <b>OrderMapper.sdf</b> from <b>Demo_LabDE</b>.
+			<li>Open the <b>AlternateTestName</b> table.
+			<li>Click in the <b>TestCode</b> column of the new row and 
+			enter a value.
+			<li>Change focus to another application such that the 
+			<b>Name</b> cell in the new row remains visible.
+			<li>Click directly on the <b>Name</b> cell to bring SQLCDBEditor 
+			into focus.
+			<li>Click again to enter edit mode.
+			<li>Type a new name into the cell.
+			<li>Tab back to the <b>TestCode</b> cell.
+			<li>Confirm that the new row remains valid.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5223]</b> 2013 Copyrights
+        	<ul>
+			<li>Confirm that license text files include <b>2013</b> as 
+			a copyright.
+			<li>Confirm that splash screens include <b>2013</b> as 
+			a copyright.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5321]</b> Confirm that the <b>Create Redacted 
+		Text</b> memory leak tests include an appropriate skip condition for 
+		each FPS file.
+<p>
+  	   	<LI><b>[FlexIDSCore #5324]</b> Confirm that the <b>Execute_Test_2</b> 
+		batch file for the <b>Select Page Region</b> memory leak tests writes 
+		the process statistics to the proper folder.
+<p>
+  	   	<LI><b>[FlexIDSCore #5336]</b> Demo Databases
+        	<ul>
+			<li>Confirm that the <b>Demo_FLEXIndex</b> database has 
+			a current schema.
+			<li>Confirm that the <b>Demo_IDShield</b> database has 
+			a current schema.
+			<li>Confirm that the <b>Demo_LabDE</b> database has 
+			a current schema.
+			<li>Confirm that the <b>Demo_RedactionGame</b> database has 
+			a current schema.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5342]</b> Confirm that all <b>NRS 
+		Redaction</b> tests pass.
+<p>
+  	   	<LI><b>[FlexIDSCore #5343, #5355]</b> Confirm that all <b>NRS 
+		Indexing - Party Finder</b> tests pass.
+<p>
+  	   	<LI><b>[FlexIDSCore #5350]</b> Confirm that the licensing copyright is 
+		correct for RDT installation.
+<p>
+  	   	<LI><b>[FlexIDSCore #5351]</b> Confirm that all <b>NRS Document 
+		Classification</b> tests pass.
+<p>
+  	   	<LI><b>[FlexIDSCore #5354]</b> Confirm that the FKB update is properly 
+		installed using the appropriate version string.
+<p>
+  	   	<LI><b>[FlexIDSCore #5357]</b> Confirm that <b>SQL Server Native Client</b> 
+		is installed with ID Shield or FLEX Index when SQL Server is not installed.
+<p>
+  	   	<LI><b>[FlexIDSCore #5361]</b> Confirm that no Wise uninstall error is seen 
+		when exercising a silent install of a newer version.
+<p>
+  	   	<LI><b>[FlexIntegrations #389]</b> Process Selected
+        	<ul>
+			<li>Create a new library for <b>ID Shield</b>.
+			<li>Add some documents.
+			<li>Select one document.
+			<li>Click the <b>Process Selected</b> button.
+			<li>Confirm that a meaningful error message about missing 
+			settings is presented.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIntegrations #393]</b> Confirm that the SharePoint Client 
+		install works properly.
+<p>
+  	   	<LI><b>[LegacyRC #6448]</b> USB License Key Manager
+        	<ul>
+			<li>Exercise <b>USB License Key Manager</b> on XP or 
+			Server 2003 while logged in as a non-admin user.
+			<li>Confirm that a meaningful exception is displayed.
+			<li>Exercise <b>USB License Key Manager</b> on XP or 
+			Server 2003 while logged in as an admin user.
+			<li>Confirm that settings changes are retained.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6450]</b> USB License Key Manager
+        	<ul>
+			<li>Clear any previously defined email settings by deleting the 
+			relevant XML file under <b>ProgramData</b>.
+			<li>Open <b>USB License Key Manager</b>.
+			<li>Connect to a USB key.
+			<li>Set <b>Alert Level</b> and <b>Alert Multiple</b> levels 
+			for the <b>Indexing</b> and <b>Pagination</b> counters.
+			<li>Click <b>OK</b> and note that exception about a lack of 
+			Email Settings.
+			<li>Click the <b>Email Settings...</b> button and configure 
+			appropriate settings.
+			<li>Send a test email.
+			<li>Click <b>OK</b> to save email settings.
+			<li>Click <b>OK</b> again to save <b>Alert Level</b> and 
+			<b>Alert Multiple</b> settings.
+			<li>Confirm that the settings are saved correctly. 
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6451]</b> Confirm that <b>&lt;FPSFileName&gt;</b> 
+		is supported by the <b>Core: Send email</b> task.
+<p>
+  	   	<LI><b>[LegacyRC #6461, #6465, #6469, #6471, #6473]</b> 
+		Image Format Converter
+        	<ul>
+			<li>Exercise new <b>/removePages</b> option
+			<ul>
+				<li>PageNumber
+				<li>PageNumberRange
+				<li>CommaSeparatedPageList
+				<li>MinusFollowedByANumber
+			</ul>
+			<li>Test against <b>TIF</b> images and <b>PDF</b> images.
+			<li>Test using the <b>alternate</b> method.
+			<li>Confirm that the <b>usage</b> message is updated correctly.
+			<li>Confirm that the <b>documentation</b> is updated correctly.
+			<li>Confirm that a meaningful exception is thrown if 
+			<b>/RemovePages</b> tries to remove a page that isn't there.
+			<li>Confirm that a meaningful exception is thrown if 
+			<b>/RemovePages</b> tries to remove too many pages.
+	  	   	<LI>Confirm that the /RemovePages command-line option requires 
+			a special license file.
+			<li>Confirm that command-line options are case-insensitive.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6462]</b> Confirm that COM objects are properly 
+		registered after installation.
+<p>
+  	   	<LI><b>[LegacyRC #6467]</b> Automatic Send Email On Error
+        	<ul>
+			<li>Confirm that the <b>Processing Setup</b> tab has new UI 
+			elements to support configuration and sending of an email if 
+			a task fails.
+			<li>Confirm expected functionality.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6475]</b> Select Files Dialog
+        	<ul>
+			<li>Confirm that <b>the bottom</b> is an option for subset 
+			selection.
+			<li>Confirm expected functionality.
+			<li>Confirm that the <b>FAM File Inspector</b> also supports 
+			this functionality via command-line option.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
