@@ -775,7 +775,7 @@ void CReplaceStrings::replaceValue(IAFDocumentPtr ipAFDoc, ISpatialStringPtr ipI
 		IRegularExprParserPtr ipParser = __nullptr;
 		if (m_bAsRegExpr)
 		{
-			IRegularExprParserPtr ipParser = m_ipAFUtility->GetNewRegExpParser(ipAFDoc);
+			ipParser = m_ipAFUtility->GetNewRegExpParser(ipAFDoc);
 			ASSERT_RESOURCE_ALLOCATION("ELI06627", ipParser != __nullptr);
 		}
 		ipInputText->Replace(_bstrToBeReplace, _bstrReplacement,

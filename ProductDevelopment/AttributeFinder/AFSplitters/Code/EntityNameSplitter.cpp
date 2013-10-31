@@ -135,6 +135,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 			// This does not need to be non-NULL since the Entity Name Splitter does 
 			// not use the AFDocument object
 			IAFDocumentPtr ipAFDoc(pAFDoc);
+			ASSERT_RESOURCE_ALLOCATION("ELI36249", ipAFDoc != __nullptr);
 
 			// Get a new parser (we will release this parser when the method exits)
 			m_ipRegExprParser = getParser(ipAFDoc);

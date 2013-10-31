@@ -92,7 +92,8 @@ STDMETHODIMP CREPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pP
 		IAFDocumentPtr ipAFDoc(pAFDoc);
 		ASSERT_ARGUMENT("ELI33223", ipAFDoc != __nullptr);
 
-		getRegExParser(ipAFDoc)->IgnoreCase = m_bCaseSensitive ? VARIANT_FALSE : VARIANT_TRUE;
+		IRegularExprParserPtr ipParser = getRegExParser(ipAFDoc);
+		ipParser->IgnoreCase = m_bCaseSensitive ? VARIANT_FALSE : VARIANT_TRUE;
 
 		// return vec of attributes
 		IIUnknownVectorPtr ipRetAttributes(CLSID_IUnknownVector);
@@ -147,7 +148,7 @@ STDMETHODIMP CREPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pP
 		// for each pattern string, look for match
 		string strPatternID("");
 		UCLID_AFVALUEFINDERSLib::IREPMFinderPtr ipThis(this);
-		if (patternInterpreter.foundPattern(getRegExParser(ipAFDoc), ipThis, ipInputText,
+		if (patternInterpreter.foundPattern(ipParser, ipThis, ipInputText,
 			ipRetAttributes, strPatternID))
 		{
 			// store the rule that works in AFDocument if required
@@ -862,9 +863,9 @@ IAFUtilityPtr CREPMFinder::getAFUtility()
 IRegularExprParserPtr CREPMFinder::getRegExParser(IAFDocumentPtr ipAFDoc)
 {
 	IRegularExprParserPtr ipParser = getAFUtility()->GetNewRegExpParser(ipAFDoc);
-	ASSERT_RESOURCE_ALLOCATION("ELI33224", m_ipRegExpParser != __nullptr);
+	ASSERT_RESOURCE_ALLOCATION("ELI33224", ipParser != __nullptr);
 
-	return m_ipRegExpParser;
+	return ipParser;
 }
 //-------------------------------------------------------------------------------------------------
 string CREPMFinder::getInputFileName(const string& strInputFile, IAFDocumentPtr ipAFDoc)

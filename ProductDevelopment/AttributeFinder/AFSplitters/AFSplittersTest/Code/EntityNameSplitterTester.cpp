@@ -309,12 +309,15 @@ void CEntityNameSplitterTester::doTest(std::string strLabel, IAttributePtr ipTes
 		ASSERT_ARGUMENT("ELI20477", ipTest != __nullptr);
 		ASSERT_ARGUMENT("ELI20478", ipExpected != __nullptr);
 
+		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
+		ASSERT_RESOURCE_ALLOCATION("ELI36250", ipAFDoc != __nullptr);
+
 		// Call Entity Name Splitter
 		try
 		{
 			try
 			{
-				m_ipNameSplitter->SplitAttribute( ipTest, NULL, NULL );
+				m_ipNameSplitter->SplitAttribute(ipTest, ipAFDoc, NULL );
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20479");
 		}

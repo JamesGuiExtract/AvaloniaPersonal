@@ -1702,14 +1702,6 @@ ISpatialStringPtr CAFUtility::parseVariableValue(string& strVariable, const IAtt
 						throw ue;
 					}
 
-					// See if the expanded value is to be truncated after a specified number of chars.
-					nMaxValueLen = getMaxValueLen(strQuery);
-
-					// Get the attributes to be expanded.
-					IIUnknownVectorPtr ipSubAttributes = (ipAttribute == __nullptr)
-						? IIUnknownVectorPtr(CLSID_IUnknownVector)
-						: getCandidateAttributes(ipAttribute->SubAttributes, strQuery, false);
-
 					// Check for the case that the nested format string is not specified.
 					if (strVariable[ui + 1] == '>')
 					{
@@ -1728,6 +1720,14 @@ ISpatialStringPtr CAFUtility::parseVariableValue(string& strVariable, const IAtt
 
 						string strNestedFormat = strVariable.substr(ui + 1);
 						string strTempNestedFormat = strNestedFormat;
+
+						// See if the expanded value is to be truncated after a specified number of chars.
+						nMaxValueLen = getMaxValueLen(strQuery);
+
+						// Get the attributes to be expanded.
+						IIUnknownVectorPtr ipSubAttributes = (ipAttribute == __nullptr)
+							? IIUnknownVectorPtr(CLSID_IUnknownVector)
+							: getCandidateAttributes(ipAttribute->SubAttributes, strQuery, false);
 				
 						// If there are not attributes to expand, getReformattedName still needs to
 						// be called in order to trim the term from strTempNestedFormat.
@@ -1813,6 +1813,8 @@ ISpatialStringPtr CAFUtility::parseVariableValue(string& strVariable, const IAtt
 			// If variables haven't been expanded with a nested format string, get the variable value.
 			if (ipNestedValues == __nullptr)
 			{
+				// See if the expanded value is to be truncated after a specified number of chars.
+				nMaxValueLen = getMaxValueLen(strQuery);
 				ipText = getVariableValue(strQuery, ipAttribute, strSelection, strDelim);
 			}
 			// If variables have been expanded with a nested format string, get the variable value.

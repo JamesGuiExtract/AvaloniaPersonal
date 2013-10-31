@@ -698,7 +698,7 @@ void CAdvancedReplaceString::modifyValue(ISpatialString* pText, IAFDocument* pAF
 		IAFDocumentPtr ipAFDoc(pAFDoc);
 		ASSERT_RESOURCE_ALLOCATION("ELI36197", ipAFDoc);
 
-		IRegularExprParserPtr ipParser = m_ipAFUtility->GetNewRegExpParser(ipAFDoc);
+		ipParser = m_ipAFUtility->GetNewRegExpParser(ipAFDoc);
 		ASSERT_RESOURCE_ALLOCATION("ELI06796", ipParser != __nullptr);
 	}
 
