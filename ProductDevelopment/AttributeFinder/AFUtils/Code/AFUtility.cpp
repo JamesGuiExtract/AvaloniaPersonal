@@ -1564,6 +1564,10 @@ ISpatialStringPtr CAFUtility::getReformattedName(string& strFormat,
 			bool bIgnoreResult = false;
 			bool bFoundScopeClose = false;
 
+			// Since calls to SpatialString::AppendString are expensive, rather than add all
+			// literal chars to the 
+			string strPendingChars;
+
 			for (ui = 0; ui < uiLength; ui++)
 			{
 				char c = strFormat.at(ui);
@@ -1575,6 +1579,12 @@ ISpatialStringPtr CAFUtility::getReformattedName(string& strFormat,
 					ISpatialStringPtr ipScopeStr = getReformattedName(strScopeFormat, ipAttribute, true);
 					if (ipScopeStr != __nullptr)
 					{
+						if (!strPendingChars.empty())
+						{
+							ipNewName->AppendString(strPendingChars.c_str());
+							strPendingChars = "";
+						}
+
 						ipNewName->Append(ipScopeStr);
 					}
 
@@ -1619,6 +1629,12 @@ ISpatialStringPtr CAFUtility::getReformattedName(string& strFormat,
 					}
 					else
 					{
+						if (!strPendingChars.empty())
+						{
+							ipNewName->AppendString(strPendingChars.c_str());
+							strPendingChars = "";
+						}
+
 						ipNewName->Append(ipValue);
 					}
 				}
@@ -1632,9 +1648,7 @@ ISpatialStringPtr CAFUtility::getReformattedName(string& strFormat,
 					else
 					{
 						// Any other chars should just be appended to the result
-						string str;
-						str += c;
-						ipNewName->AppendString(_bstr_t(str.c_str()));
+						strPendingChars += c;
 						bEscapeNextChar = false;
 					}
 				}
@@ -1646,7 +1660,20 @@ ISpatialStringPtr CAFUtility::getReformattedName(string& strFormat,
 				throw ue;
 			}
 
-			return bIgnoreResult ? __nullptr : ipNewName;
+			if (bIgnoreResult)
+			{
+				return __nullptr;
+			}
+			else
+			{
+				if (!strPendingChars.empty())
+				{
+					ipNewName->AppendString(strPendingChars.c_str());
+					strPendingChars = "";
+				}
+
+				return ipNewName;
+			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36244");
 	}
@@ -1810,6 +1837,15 @@ ISpatialStringPtr CAFUtility::parseVariableValue(string& strVariable, const IAtt
 				throw ue;
 			}
 
+			if (strSelection.empty() && !strDelim.empty())
+			{
+				UCLIDException ue("ELI36252",
+					"Unexpected delimiter without selection in Format String");
+				ue.addDebugInfo("Selector", strSelection);
+				ue.addDebugInfo("Delimiter", strDelim);
+				throw ue;
+			}
+
 			// If variables haven't been expanded with a nested format string, get the variable value.
 			if (ipNestedValues == __nullptr)
 			{
@@ -1964,6 +2000,20 @@ IIUnknownVectorPtr CAFUtility::getSelectedItems(const IIUnknownVectorPtr& ipItem
 						 _strcmpi(strSelection.c_str(), "unique") == 0)
 				{
 					strSelection = "1-";
+				}
+				else
+				{
+					// If the selection term is not a keyword, ensure it is a numerical list or range.
+					for (size_t i = 0; i < strSelection.length(); i++)
+					{
+						char c = strSelection[i];
+						if (!isDigitChar(c) && !isWhitespaceChar(c) && c != '-' && c != ',')
+						{
+							UCLIDException ue("ELI36251", "Invalid format string selection term.");
+							ue.addDebugInfo("Selection term", strSelection, true);
+							throw ue;
+						}
+					}
 				}
 
 				// getPageNumbers was written with 1-based sequences in mind, not 0-based sequences.
