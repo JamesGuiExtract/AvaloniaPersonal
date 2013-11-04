@@ -1565,7 +1565,8 @@ ISpatialStringPtr CAFUtility::getReformattedName(string& strFormat,
 			bool bFoundScopeClose = false;
 
 			// Since calls to SpatialString::AppendString are expensive, rather than add all
-			// literal chars to the 
+			// literal chars to ipNewName one-by-one as they are encountered, buffer them until the
+			// next nested scope, variable, or the end of the format string is encountered.
 			string strPendingChars;
 
 			for (ui = 0; ui < uiLength; ui++)
@@ -1669,7 +1670,6 @@ ISpatialStringPtr CAFUtility::getReformattedName(string& strFormat,
 				if (!strPendingChars.empty())
 				{
 					ipNewName->AppendString(strPendingChars.c_str());
-					strPendingChars = "";
 				}
 
 				return ipNewName;
