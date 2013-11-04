@@ -154,9 +154,12 @@ CreateFLEXCustomerRDTInstallCD: BuildFLEXCustomerRDTInstall
 	
 CopyTestFiles:
 	@ECHO Copying Automated Test Files
-	@IF NOT EXIST "$(TestingFilesDirectory)" @MKDIR "$(TestingFilesDirectory)"
-    @DeleteFiles /S /Q "$(TestingFilesDirectory)\*.*"
-	@XCOPY "$(AFRootDirectory)\AFConditions\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFConditions\AutomatedTest" /s /e /y /I
+	@DeleteFiles "$(TestingFilesDirectory)\*.*" /S /Q 
+	@IF EXIST "$(TestingFilesDirectory)\ProductDevelopment" @RMDIR "$(TestingFilesDirectory)\ProductDevelopment" /S /Q
+    @IF EXIST "$(TestingFilesDirectory)\ReusableComponents" @RMDIR "$(TestingFilesDirectory)\ReusableComponents" /S /Q
+    @IF EXIST "$(TestingFilesDirectory)\FileActionManager" @RMDIR "$(TestingFilesDirectory)\FileActionManager" /S /Q
+    @IF EXIST "$(TestingFilesDirectory)\RC.Net" @RMDIR "$(TestingFilesDirectory)\RC.Net" /S /Q
+    @XCOPY "$(AFRootDirectory)\AFConditions\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFConditions\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\AFCore\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\AFDataScorers\AFDataScorersTest\TestFiles\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFDataScorers\AFDataScorersTest\TestFiles\" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\AFOutputHandlers\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFOutputHandlers\AutomatedTest\" /s /e /y /I

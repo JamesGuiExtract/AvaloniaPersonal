@@ -1595,7 +1595,6 @@
 		<row><td>ISProjectDataFolder</td><td>1</td><td/><td>1</td></row>
 		<row><td>ISProjectFolder</td><td/><td/><td>1</td></row>
 		<row><td>PATH_TO_COMMON_SCRIPT_FILES</td><td>&lt;ISPROJECTDIR&gt;..\..\..\..\Common\InstallScripts</td><td/><td>2</td></row>
-		<row><td>PATH_TO_COREPOINT_INSTALL</td><td>\\jake\Applications\CorePoint Integration Engine</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CRYSTAL_REPORTS_INSTALL</td><td>P:\AttributeFinder\RequiredInstalls\CrystalReports12</td><td/><td>2</td></row>
 		<row><td>PATH_TO_DATAENTRY_MISC</td><td>P:\DataEntry\CoreInstallation\Files\Misc</td><td/><td>2</td></row>
 		<row><td>PATH_TO_DOT_NET_35</td><td>P:\AttributeFinder\RequiredInstalls\DotNet 3.5 Framework</td><td/><td>2</td></row>
