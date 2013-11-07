@@ -1681,6 +1681,8 @@ IRegularExprParserPtr CSelectPageRegion::getParser(IAFDocumentPtr ipAFDocument)
 
 	ipRegExpParser->Pattern = strRegExp.c_str();
 	ipRegExpParser->IgnoreCase = asVariantBool(!m_bIsCaseSensitive);
+
+	return ipRegExpParser;
 }
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CSelectPageRegion::getRegionContent(const ISpatialStringPtr& ipInputText, 
