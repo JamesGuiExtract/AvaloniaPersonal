@@ -108,6 +108,10 @@ library UCLID_AFCORELib
 		[propput, id(3), helpstring("property ObjectTags")] HRESULT ObjectTags([in] IStrToObjectMap* newVal);
 		[propget, id(4), helpstring("property Attribute")] HRESULT Attribute([out, retval] IAttribute* *pVal);
 		[propput, id(4), helpstring("property Attribute")] HRESULT Attribute([in] IAttribute* newVal);
+		// Clones all members except Text (if bCloneAttributes is VARIANT_TRUE) or the sub-attributes of
+		// Attribute (if bCloneAttributes is VARIANT_FALSE).
+		[id(5), helpstring("method PartialClone")] HRESULT PartialClone([in] VARIANT_BOOL bCloneAttributes,
+			[out, retval] IAFDocument **pAFDoc);
 	};
 	[
 		object,

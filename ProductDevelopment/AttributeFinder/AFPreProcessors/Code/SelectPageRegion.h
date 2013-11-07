@@ -210,7 +210,7 @@ private:
 	
 	// Determines whether m_strPattern when interpreted as a regular expression is found within
 	// strPageText.
-	bool isRegExFoundOnPage(string strPageText, const IAFDocumentPtr& ipAFDoc);
+	bool isRegExFoundOnPage(IRegularExprParserPtr ipRegExpParser, string strPageText);
 
 	// Determines whether m_strPattern when interpreted as a literal string is found within
 	// strPageText.
@@ -221,6 +221,9 @@ private:
 		const string& strSourceDoc, long nPageNum, bool bPageSpecified);
 
 	IOCREnginePtr getOCREngine();
+
+	// Gets the regular expression parser
+	IRegularExprParserPtr getParser(IAFDocumentPtr ipAFDocument);
 
 	// based on the specific page and selection, get the actual string out
 	ISpatialStringPtr getRegionContent(const ISpatialStringPtr& ipInputText, const string& strSourceDoc,

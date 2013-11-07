@@ -21,8 +21,27 @@ CAFDocument::~CAFDocument()
 {
 	try
 	{
+		m_ipAttribute = __nullptr;
+		m_ipStringTags = __nullptr;
+		m_ipObjectTags = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16298");
+}
+//-------------------------------------------------------------------------------------------------
+HRESULT CAFDocument::FinalConstruct()
+{
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+void CAFDocument::FinalRelease()
+{
+	try
+	{
+		m_ipAttribute = __nullptr;
+		m_ipStringTags = __nullptr;
+		m_ipObjectTags = __nullptr;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI36206");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -184,6 +203,65 @@ STDMETHODIMP CAFDocument::put_Attribute(IAttribute *newVal)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34804");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFDocument::PartialClone(VARIANT_BOOL vbCloneAttributes, IAFDocument **pAFDoc)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_RESOURCE_ALLOCATION("ELI36254", pAFDoc != __nullptr);
+		bool bCloneAttributes = asCppBool(vbCloneAttributes);
+
+		// Create a new IAFDocument object
+		UCLID_AFCORELib::IAFDocumentPtr ipDocCopy(CLSID_AFDocument);
+		ASSERT_RESOURCE_ALLOCATION("ELI36255", ipDocCopy != __nullptr);
+	
+		if (m_ipAttribute != __nullptr)
+		{
+			// Clone the attribute hierarchy beneath the top-level document attribute, but not the
+			// document text.
+			if (bCloneAttributes)
+			{
+				ipDocCopy->Attribute = UCLID_AFCORELib::IAttributePtr(CLSID_Attribute);
+				ICopyableObjectPtr ipCopyObj(m_ipAttribute->SubAttributes);
+				ASSERT_RESOURCE_ALLOCATION("ELI36256", ipCopyObj != __nullptr);
+				ipDocCopy->Attribute->SubAttributes = IIUnknownVectorPtr(ipCopyObj->Clone());
+				ipDocCopy->Attribute->Value = m_ipAttribute->Value;
+			}
+			// Clone the document text but not the attribute hierarchy beneath the top-level
+			// document attribute.
+			else
+			{
+				ipDocCopy->Attribute = UCLID_AFCORELib::IAttributePtr(CLSID_Attribute);
+				ICopyableObjectPtr ipCopyObj(m_ipAttribute->Value);
+				ASSERT_RESOURCE_ALLOCATION("ELI36257", ipCopyObj != __nullptr);
+				ipDocCopy->Attribute->Value = ISpatialStringPtr(ipCopyObj->Clone());
+				ipDocCopy->Attribute->SubAttributes = m_ipAttribute->SubAttributes;
+			}
+		}
+		if (m_ipStringTags != __nullptr)
+		{
+			ICopyableObjectPtr ipCopyObj(m_ipStringTags);
+			ASSERT_RESOURCE_ALLOCATION("ELI36258", ipCopyObj != __nullptr);
+			ipDocCopy->StringTags = IStrToStrMapPtr(ipCopyObj->Clone());
+		}
+		if (m_ipObjectTags != __nullptr)
+		{
+			ICopyableObjectPtr ipCopyObj(m_ipObjectTags);
+			ASSERT_RESOURCE_ALLOCATION("ELI36259", ipCopyObj != __nullptr);
+			ipDocCopy->ObjectTags = IStrToObjectMapPtr(ipCopyObj->Clone());
+		}
+
+		// Return the new object to the caller
+		*pAFDoc = (IAFDocument *)ipDocCopy.Detach();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36260");
 }
 
 //-------------------------------------------------------------------------------------------------

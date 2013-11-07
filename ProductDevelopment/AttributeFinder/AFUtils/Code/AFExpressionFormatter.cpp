@@ -17,11 +17,10 @@ const string _strEXPRESSION_DELIMITER = "(?%";
 //--------------------------------------------------------------------------------------------------
 CAFExpressionFormatter::CAFExpressionFormatter()
 : m_ipAFDocument(__nullptr)
-, m_ipAFUtility(CLSID_AFUtility)
+, m_ipAFUtility(__nullptr)
 {
 	try
 	{
-		ASSERT_RESOURCE_ALLOCATION("ELI36203", m_ipAFUtility != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36204");
 }
@@ -99,13 +98,6 @@ STDMETHODIMP CAFExpressionFormatter::raw_FormatExpression(BSTR bstrExpression, B
 
 		ASSERT_ARGUMENT("ELI36210", pbstrFormatedExpression != __nullptr);
 
-		if (m_ipAFDocument == __nullptr)
-		{
-			UCLIDException ue("ELI36217", "A document has not been provided as context to allow "
-				"for format string expansion.");
-			throw ue;
-		}
-
 		// Look for any nested format strings that need expansion.
 		string strExpression = asString(bstrExpression);
 		long nPos = strExpression.find(_strEXPRESSION_DELIMITER);
@@ -118,10 +110,17 @@ STDMETHODIMP CAFExpressionFormatter::raw_FormatExpression(BSTR bstrExpression, B
 				throw ue;
 			}
 
+			if (m_ipAFDocument == __nullptr)
+			{
+				UCLIDException ue("ELI36217", "A document has not been provided as context to allow "
+					"for format string expansion.");
+				throw ue;
+			}
+
 			// Expand the nested format string.
 			string strFormatString = strExpression.substr(nPos + _strEXPRESSION_DELIMITER.length());
 			long nEndPos = -1;
-			ISpatialStringPtr ipFormattedString = m_ipAFUtility->ExpandFormatString(
+			ISpatialStringPtr ipFormattedString = getAFUtility()->ExpandFormatString(
 				m_ipAFDocument->Attribute, strFormatString.c_str(), ')', &nEndPos);
 			ASSERT_RESOURCE_ALLOCATION("ELI36212", ipFormattedString != __nullptr);
 
@@ -151,6 +150,27 @@ STDMETHODIMP CAFExpressionFormatter::raw_FormatExpression(BSTR bstrExpression, B
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36213");
 }
 
+//-------------------------------------------------------------------------------------------------
+// IManageableMemory
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFExpressionFormatter::raw_ReportMemoryUsage(void)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		if (m_ipAFDocument != __nullptr)
+		{
+			IManageableMemoryPtr ipManageableMemory = m_ipAFDocument->Attribute;
+			ASSERT_RESOURCE_ALLOCATION("ELI36261", ipManageableMemory != __nullptr);
+
+			ipManageableMemory->ReportMemoryUsage();
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36262");
+}
 
 //---------------------------------------------------------------------------------------------------
 // ISupportsErrorInfo
@@ -163,7 +183,8 @@ STDMETHODIMP CAFExpressionFormatter::InterfaceSupportsErrorInfo(REFIID riid)
 		{
 			&IID_IAFExpressionFormatter,
 			&IID_IExpressionFormatter,
-			&IID_ILicensedComponent
+			&IID_ILicensedComponent,
+			&IID_IManageableMemory
 		};
 
 		for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -177,6 +198,17 @@ STDMETHODIMP CAFExpressionFormatter::InterfaceSupportsErrorInfo(REFIID riid)
 
 //-------------------------------------------------------------------------------------------------
 // Private methods
+//-------------------------------------------------------------------------------------------------
+UCLID_AFUTILSLib::IAFUtilityPtr CAFExpressionFormatter::getAFUtility()
+{
+	if (m_ipAFUtility == __nullptr)
+	{
+		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
+		ASSERT_RESOURCE_ALLOCATION("ELI36263", m_ipAFUtility != __nullptr);
+	}
+	
+	return m_ipAFUtility;
+}
 //-------------------------------------------------------------------------------------------------
 void CAFExpressionFormatter::validateLicense()
 {

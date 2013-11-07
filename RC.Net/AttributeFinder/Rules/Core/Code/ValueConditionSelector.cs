@@ -189,15 +189,19 @@ namespace Extract.AttributeFinder.Rules
 
             foreach (ComAttribute attribute in sourceAttributeVector.ToIEnumerable<ComAttribute>())
             {
+                // So that the garbage collector knows of and properly manages the associated
+                // memory.
+                attribute.ReportMemoryUsage();
+
                 // Create a new AFDocument for each attribute whose text is the value of the
                 // attribute being tested.
-                AFDocument afDocClone = (AFDocument)docCopySource.Clone();
-                afDocClone.Text = attribute.Value;
+                AFDocument afDocument = new AFDocument();
+                afDocument.Text = attribute.Value;
 
                 using (RuleObjectProfiler profiler = new RuleObjectProfiler("", "", Condition, 0))
                 {
                     // Select all attributes that meet the condition.
-                    if (Condition.ProcessCondition(afDocClone))
+                    if (Condition.ProcessCondition(afDocument))
                     {
                         yield return attribute;
                     }

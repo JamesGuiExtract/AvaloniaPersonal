@@ -1,3 +1,4 @@
+using Extract.Interop;
 using Extract.Licensing;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -33,6 +34,11 @@ namespace Extract.Utilities.Parsers
         /// The <see cref="RegexOptions"/> that should be used for the underlying <see cref="Regex"/>.
         /// </summary>
         RegexOptions _regexOptions = RegexOptions.Multiline | RegexOptions.IgnoreCase;
+
+        /// <summary>
+        /// An expression formatter that provides custom formatting of the regex expression.
+        /// </summary>
+        IExpressionFormatter _expressionFormatter = null;
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
@@ -107,16 +113,41 @@ namespace Extract.Utilities.Parsers
         }
 
         /// <summary>
-        /// Gets or sets an expression formatter that provides custom formatting of the regex
-        /// expression priorty to use.
+        /// Gets or sets an expression formatter that provides custom formatting of the regex.
         /// </summary>
         /// <value>
         /// The <see cref="IExpressionFormatter"/> to provide custom formatting.
         /// </value>
         public IExpressionFormatter ExpressionFormatter
         {
-            get;
-            set;
+            get
+            {
+                return _expressionFormatter;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _expressionFormatter)
+                    {
+                        _expressionFormatter = value;
+
+                        // Report memory usage of the expression formatter to compel .Net garbage
+                        // collection to release the expression formatter when no longer used. Memory
+                        // can be an issue with the expression formatter when an AFExpressionFormatter
+                        // has an AFDocument with a large attribute hierarchy attached.
+                        if (_expressionFormatter != null)
+                        {
+                            MemoryManager.ReportComObjectMemoryUsage(_expressionFormatter);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.CreateComVisible("ELI36265", "Unable to set ExpressionFormatter.");
+                }
+            }
         }
 
         #endregion IRegularExprParser Properties

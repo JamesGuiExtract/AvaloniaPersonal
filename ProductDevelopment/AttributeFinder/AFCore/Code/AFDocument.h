@@ -22,6 +22,9 @@ DECLARE_REGISTRY_RESOURCEID(IDR_AFDOCUMENT)
 
 DECLARE_PROTECT_FINAL_CONSTRUCT()
 
+	HRESULT FinalConstruct();
+	void FinalRelease();
+
 BEGIN_COM_MAP(CAFDocument)
 	COM_INTERFACE_ENTRY(IAFDocument)
 	COM_INTERFACE_ENTRY2(IDispatch,IAFDocument)
@@ -43,6 +46,7 @@ public:
 	STDMETHOD(put_Text)(/*[in]*/ ISpatialString* newVal);
 	STDMETHOD(get_Attribute)(/*[out, retval]*/ IAttribute* *pVal);
 	STDMETHOD(put_Attribute)(/*[in]*/ IAttribute* newVal);
+	STDMETHOD(PartialClone)(VARIANT_BOOL vbCloneAttributes, IAFDocument **pAFDoc);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown ** pObject);

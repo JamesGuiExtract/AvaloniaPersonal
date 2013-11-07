@@ -452,12 +452,13 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 						nNUM_PROGRESS_ITEMS_INITIALIZE);
 				}
 
-				// use a copy of the document as we want all changes made to the document
-				// to be local to this rule
+				// Use a copy of the document text as we want all changes made to the document text
+				// to be local to this rule. Allow a shallow copy of the sub-attributes to prevent
+				// excess memory usage when a large number of attributes are passed in. These
+				// attributes will not be modified except when invoked via the InputFinder, but the
+				// InputFinder will clone the attribute hierarchy at the time of invocation.
 				UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(pAFDoc);
-				ICopyableObjectPtr ipCopyObj = ipAFDoc;
-				ASSERT_RESOURCE_ALLOCATION("ELI15665", ipCopyObj != __nullptr);
-				UCLID_AFCORELib::IAFDocumentPtr ipAFDocCopy = ipCopyObj->Clone();
+				UCLID_AFCORELib::IAFDocumentPtr ipAFDocCopy = ipAFDoc->PartialClone(VARIANT_FALSE);
 				ASSERT_RESOURCE_ALLOCATION("ELI15666", ipAFDocCopy != __nullptr);
 
 				try

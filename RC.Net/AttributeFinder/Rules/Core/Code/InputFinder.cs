@@ -113,8 +113,12 @@ namespace Extract.AttributeFinder.Rules
                 // So that the garbage collector knows of and properly manages the associated
                 // memory.
                 pDocument.Attribute.ReportMemoryUsage();
-                ICopyableObject copySource = (ICopyableObject)pDocument.Attribute;
-                ComAttribute attribute = (ComAttribute)copySource.Clone();
+                // Create an AFDocument copy that clones only the attribute hierarchy and not the
+                // document text. The AttributeRule class will have clone the document text already,
+                // but not the attribute hierarchy. We don't want the downstream rules to be able to
+                // inadvertently modify the AFDocument attribute hierarchy.
+                AFDocument afDocCopy = pDocument.PartialClone(true);
+                IAttribute attribute = afDocCopy.Attribute;
 
                 IUnknownVector result = new IUnknownVector();
                 result.PushBack(attribute);

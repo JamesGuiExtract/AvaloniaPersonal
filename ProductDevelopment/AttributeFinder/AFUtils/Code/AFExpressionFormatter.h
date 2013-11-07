@@ -16,6 +16,7 @@ class ATL_NO_VTABLE CAFExpressionFormatter :
 	public CComCoClass<CAFExpressionFormatter, &CLSID_AFExpressionFormatter>,
 	public IDispatchImpl<IAFExpressionFormatter, &IID_IAFExpressionFormatter, &LIBID_UCLID_AFUTILSLib>,
 	public IDispatchImpl<IExpressionFormatter, &IID_IExpressionFormatter, &LIBID_UCLID_COMUTILSLib>,
+	public IDispatchImpl<IManageableMemory, &IID_IManageableMemory, &LIBID_UCLID_COMUTILSLib>,
 	public ISupportErrorInfo
 {
 	public:
@@ -34,6 +35,7 @@ class ATL_NO_VTABLE CAFExpressionFormatter :
 		COM_INTERFACE_ENTRY2(IDispatch, IAFExpressionFormatter)
 		COM_INTERFACE_ENTRY(IExpressionFormatter)
 		COM_INTERFACE_ENTRY(ISupportErrorInfo)
+		COM_INTERFACE_ENTRY(IManageableMemory)
 	END_COM_MAP()
 
 	// IAFExpressionFormatter
@@ -42,6 +44,9 @@ class ATL_NO_VTABLE CAFExpressionFormatter :
 
 	// IExpressionFormatter
 	STDMETHOD(raw_FormatExpression)(BSTR bstrExpression, BSTR* pbstrFormatedExpression);
+
+	// IManageableMemory
+	STDMETHOD(raw_ReportMemoryUsage)(void);
 
 	// ISupportsErrorInfo
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
@@ -61,6 +66,8 @@ private:
 	/////////////////
 	// Methods
 	/////////////////
+
+	UCLID_AFUTILSLib::IAFUtilityPtr getAFUtility();
 
 	// Validate license.
 	void validateLicense();	

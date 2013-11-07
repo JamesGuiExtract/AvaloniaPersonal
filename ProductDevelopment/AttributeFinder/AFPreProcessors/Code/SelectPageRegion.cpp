@@ -1342,6 +1342,9 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 				}
 			}
 		}
+
+		// Create a single regex parser to use to search the text on all pages.
+		IRegularExprParserPtr ipRegExpParser = m_bIsRegExp ? getParser(ipAFDoc) : __nullptr;
 		
 		// Loop for each page in the document (whether there is OCR text or not).
 		for (int i = 0; i < nLastPageNumber; i++)
@@ -1354,7 +1357,7 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 
 			// Is m_strPattern found on this page?
 			bool bFoundOnPage = m_bIsRegExp
-				? isRegExFoundOnPage(strPageText, ipAFDoc) 
+				? isRegExFoundOnPage(ipRegExpParser, strPageText) 
 				: isStringFoundOnPage(strPageText);
 
 			if (bFoundOnPage)
@@ -1377,31 +1380,8 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 	}
 }
 //-------------------------------------------------------------------------------------------------
-bool CSelectPageRegion::isRegExFoundOnPage(string strPageText, const IAFDocumentPtr& ipAFDoc)
+bool CSelectPageRegion::isRegExFoundOnPage(IRegularExprParserPtr ipRegExpParser, string strPageText)
 {
-	// Find with a regular expression pattern
-	IRegularExprParserPtr ipRegExpParser = m_ipAFUtility->GetNewRegExpParser(ipAFDoc);
-	ASSERT_RESOURCE_ALLOCATION("ELI09378", ipRegExpParser != __nullptr);
-
-	string strRootFolder = "";
-
-	// We eat the exception that will be thrown if the RSDFileDir tag does not exist 
-	// because we can still run the regexp providing of course that the regexp contains no
-	// #import statements
-	try
-	{
-		string rootTag = "<RSDFileDir>";
-		strRootFolder = m_ipAFTagUtility->ExpandTags(rootTag.c_str(), "", ipAFDoc);
-	}
-	catch(...)
-	{
-	}
-	string strRegExp = getRegExpFromText(m_strPattern, strRootFolder, true,
-		gstrAF_AUTO_ENCRYPT_KEY_PATH);
-
-	ipRegExpParser->Pattern = strRegExp.c_str();
-	ipRegExpParser->IgnoreCase = asVariantBool(!m_bIsCaseSensitive);
-
 	IIUnknownVectorPtr ipFound = ipRegExpParser->Find(strPageText.c_str(), VARIANT_TRUE, VARIANT_FALSE);
 	ASSERT_RESOURCE_ALLOCATION("ELI28169", ipFound != __nullptr);
 
@@ -1674,6 +1654,33 @@ IOCREnginePtr CSelectPageRegion::getOCREngine()
 	ipScansoftEngine->InitPrivateLicense(LICENSE_MGMT_PASSWORD.c_str());
 
 	return ipOCREngine;
+}
+//-------------------------------------------------------------------------------------------------
+IRegularExprParserPtr CSelectPageRegion::getParser(IAFDocumentPtr ipAFDocument)
+{
+	IRegularExprParserPtr ipRegExpParser = m_ipAFUtility->GetNewRegExpParser(ipAFDocument);
+	ASSERT_RESOURCE_ALLOCATION("ELI36264", ipRegExpParser != __nullptr);
+
+	string strRootFolder = "";
+
+	// We eat the exception that will be thrown if the RSDFileDir tag does not exist 
+	// because we can still run the regexp providing of course that the regexp contains no
+	// #import statements
+	try
+	{
+		string rootTag = "<RSDFileDir>";
+		strRootFolder = m_ipAFTagUtility->ExpandTags(rootTag.c_str(), "", ipAFDocument);
+	}
+	catch(...)
+	{
+
+	}
+
+	string strRegExp = getRegExpFromText(m_strPattern, strRootFolder, true,
+		gstrAF_AUTO_ENCRYPT_KEY_PATH);
+
+	ipRegExpParser->Pattern = strRegExp.c_str();
+	ipRegExpParser->IgnoreCase = asVariantBool(!m_bIsCaseSensitive);
 }
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CSelectPageRegion::getRegionContent(const ISpatialStringPtr& ipInputText, 
