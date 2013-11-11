@@ -224,9 +224,8 @@ const unsigned int gnSCANSOFT_OEM_OCR_FEATURE			= gnBASE_OFFSET + 80;
 // Special ID for the Inlite Check21 engine in FLEX Index / ID Shield.
 const unsigned int gnMICR_FINDING_ENGINE_FEATURE		= gnBASE_OFFSET + 81;
 
-// Special ID for the Pegasus PdfXpress toolkit that is used to
-// modify PDF files (currently only using to remove PDF annotations)
-const unsigned int gnPEGASUS_PDFXPRESS_MODIFY_PDF		= gnBASE_OFFSET + 82;
+// Special ID to modify PDF files (remove annotations or add hyperlinks)
+const unsigned int gnMODIFY_PDF							= gnBASE_OFFSET + 82;
 
 // Special ID for the FTP/SFTP file transfer features that use edtFTPnet/PRO SDK
 const unsigned int gnFTP_SFTP_FILE_TRANSFER				= gnBASE_OFFSET + 83;

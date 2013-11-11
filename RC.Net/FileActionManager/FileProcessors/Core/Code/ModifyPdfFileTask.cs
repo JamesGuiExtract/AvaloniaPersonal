@@ -35,8 +35,11 @@ namespace Extract.FileActionManager.FileProcessors
 
         /// <summary>
         /// Current task version.
+        /// Version 2:
+        /// Added AddHyperlinks, HyperlinkAttributes, UseValueAsAddress, HyperlinkAddress and
+        /// DataFileName
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
 
         /// <summary>
         /// The path to the modify pdf file executable (looks for the exe alongside this assembly).
@@ -205,7 +208,7 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.PegasusPdfxpressModifyPdf,
+                LicenseUtilities.ValidateLicense(LicenseIdName.ModifyPdf,
                     "ELI29648", _COMPONENT_DESCRIPTION);
 
                 // Allow the user to set the modify pdf file settings
@@ -373,7 +376,7 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.PegasusPdfxpressModifyPdf,
+                LicenseUtilities.ValidateLicense(LicenseIdName.ModifyPdf,
                     "ELI29653", _COMPONENT_DESCRIPTION);
             }
             catch (Exception ex)
@@ -405,7 +408,7 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.PegasusPdfxpressModifyPdf,
+                LicenseUtilities.ValidateLicense(LicenseIdName.ModifyPdf,
                     "ELI29655", _COMPONENT_DESCRIPTION);
 
                 // Get the file name and initialize a path tags class
@@ -427,12 +430,37 @@ namespace Extract.FileActionManager.FileProcessors
                     {
                         args.Add("/ra");
                     }
+                    if (_settings.AddHyperlinks)
+                    {
+                        args.Add("/h");
+                        args.Add(_settings.HyperlinkAttributes);
 
-                    // Run the modify pdf executable
-                    SystemMethods.RunExtractExecutable(_MODIFY_PDF, args);
+                        args.Add("/voa");
+                        args.Add(pathTags.Expand(_settings.DataFileName));
 
-                    // All was successful, move the temporary file back to the source file.
-                    FileSystemMethods.MoveFile(tempFile.FileName, pdfFile, true);
+                        if (!_settings.UseValueAsAddress)
+                        {
+                            args.Add("/ha");
+                            args.Add(_settings.HyperlinkAddress);
+                        }
+                    }
+
+                    try
+                    {
+                        // Run the modify pdf executable
+                        SystemMethods.RunExtractExecutable(_MODIFY_PDF, args);
+                    }
+                    finally
+                    {
+                        // The operation may have partially succeeded and produced output. Go ahead
+                        // and copy any output to pdfDest regardless of whether an exception
+                        // occurred.
+                        var fileinfo = new FileInfo(tempFile.FileName);
+                        if (fileinfo.Exists && fileinfo.Length > 0)
+                        {
+                            FileSystemMethods.MoveFile(tempFile.FileName, pdfFile, true);
+                        }
+                    }
                 }
 
                 return EFileProcessingResult.kProcessingSuccessful;
@@ -474,7 +502,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                return LicenseUtilities.IsLicensed(LicenseIdName.PegasusPdfxpressModifyPdf);
+                return LicenseUtilities.IsLicensed(LicenseIdName.ModifyPdf);
             }
             catch (Exception ex)
             {

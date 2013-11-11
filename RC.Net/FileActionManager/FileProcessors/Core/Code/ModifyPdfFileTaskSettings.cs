@@ -30,6 +30,35 @@ namespace Extract.FileActionManager.FileProcessors
         bool _removeAnnotations;
 
         /// <summary>
+        /// Indicates whether hyperlinks should be added or not.
+        /// </summary>
+        bool _addHyperlinks;
+
+        /// <summary>
+        /// If <see cref="AddHyperlinks"/> is <see langword="true"/>, the names of the attributes
+        /// for which hyperlinks should be added.
+        /// </summary>
+        string _hyperlinkAttributes;
+
+        /// <summary>
+        /// <see langword="true"/> if the attributes' values are the addresses to use,
+        /// <see langword="false"/> if <see cref="HyperlinkAddress"/> specifies the address for all
+        /// hyperlinks.
+        /// </summary>
+        bool _useValueAsAddress = true;
+
+        /// <summary>
+        /// If <see cref="UseValueAsAddress"/> is <see langword="false"/>, the address to use for
+        /// all hyperlinks.
+        /// </summary>
+        string _hyperlinkAddress;
+
+        /// <summary>
+        /// The VOA file containing the attributes to use to create the hyperlinks.
+        /// </summary>
+        string _dataFileName = "<SourceDocName>.voa";
+
+        /// <summary>
         /// Whether the object is dirty or not.
         /// </summary>
         bool _dirty;
@@ -45,7 +74,6 @@ namespace Extract.FileActionManager.FileProcessors
         /// Initializes a new instance of the <see cref="ModifyPdfFileTaskSettings"/> class.
         /// </summary>
         public ModifyPdfFileTaskSettings()
-            : this(null, true)
         {
         }
 
@@ -55,27 +83,20 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="settings">Another <see cref="ModifyPdfFileTaskSettings"/>
         /// to copy the settings from.</param>
         public ModifyPdfFileTaskSettings(ModifyPdfFileTaskSettings settings)
-            : this(settings.PdfFile, settings.RemoveAnnotations)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ModifyPdfFileTaskSettings"/> class.
-        /// </summary>
-        /// <param name="pdfFile">The pdf file to process.</param>
-        /// <param name="removeAnnotations">Whether annotations should be removed
-        /// from the pdf file or not.</param>
-        public ModifyPdfFileTaskSettings(string pdfFile, bool removeAnnotations)
         {
             try
             {
-                _pdfFile = pdfFile;
-                _removeAnnotations = removeAnnotations;
+                _pdfFile = settings.PdfFile;
+                _removeAnnotations = settings.RemoveAnnotations;
+                _addHyperlinks = settings.AddHyperlinks;
+                _hyperlinkAttributes = settings.HyperlinkAttributes;
+                _useValueAsAddress = settings.UseValueAsAddress;
+                _hyperlinkAddress = settings.HyperlinkAddress;
+                _dataFileName = settings.DataFileName;
             }
             catch (Exception ex)
             {
-                throw ExtractException.CreateComVisible("ELI29639",
-                    "Failed to initialize Modify Pdf task settings.", ex);
+                throw ex.AsExtract("ELI36278");
             }
         }
 
@@ -93,10 +114,21 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 return _pdfFile;
             }
+
             set
             {
-                _pdfFile = value;
-                _dirty = true;
+                try
+                {
+                    if (value != _pdfFile)
+                    {
+                        _pdfFile = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI36279");
+                }
             }
         }
 
@@ -111,10 +143,173 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 return _removeAnnotations;
             }
+
             set
             {
-                _removeAnnotations = value;
-                _dirty = true;
+                try
+                {
+                    if (value != _removeAnnotations)
+                    {
+                        _removeAnnotations = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI36280");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether hyperlinks should be added or not.
+        /// </summary>
+        /// <value><see langword="true"/> if hyperlinks should be added to the PDF; otherwise,
+        /// <see langword="false"/>.</value>
+        public bool AddHyperlinks
+        {
+            get
+            {
+                return _addHyperlinks;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _addHyperlinks)
+                    {
+                        _addHyperlinks = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI36281");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the names of the attributes for which hyperlinks should be added. 
+        /// </summary>
+        /// <value>
+        /// The names of the attributes for which hyperlinks should be added. 
+        /// </value>
+        public string HyperlinkAttributes
+        {
+            get
+            {
+                return _hyperlinkAttributes;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _hyperlinkAttributes)
+                    {
+                        _hyperlinkAttributes = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI36282");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether to use the attributes' values as the hyperlink addresses.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the attributes' values are the addresses to use,
+        /// <see langword="false"/> if <see cref="HyperlinkAddress"/> specifies the address for all
+        /// hyperlinks.
+        /// </value>
+        public bool UseValueAsAddress
+        {
+            get
+            {
+                return _useValueAsAddress;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _useValueAsAddress)
+                    {
+                        _useValueAsAddress = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI36283");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the address to use for all hyperlinks if <see cref="UseValueAsAddress"/>
+        /// is <see langword="false"/>
+        /// </summary>
+        /// <value>
+        /// The address to use for all hyperlinks.
+        /// </value>
+        public string HyperlinkAddress
+        {
+            get
+            {
+                return _hyperlinkAddress;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _hyperlinkAddress)
+                    {
+                        _hyperlinkAddress = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI36284");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the VOA file containing the attributes to use to create the hyperlinks.
+        /// </summary>
+        /// <value>
+        /// The VOA file containing the attributes to use to create the hyperlinks.
+        /// </value>
+        public string DataFileName
+        {
+            get
+            {
+                return _dataFileName;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _dataFileName)
+                    {
+                        _dataFileName = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI36285");
+                }
             }
         }
 
@@ -130,11 +325,28 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 try
                 {
+                    var tagManager = new FAMTagManagerClass();
+
                     // Settings are valid iff:
                     // 1. A pdf file name is defined
                     // 2. The pdf file name does not contain any invalid doc tags
+                    // 3. Either annotations are configured to be removed or hyperlinks are
+                    //  configured to be added.
+                    // 4. If hyperlinks are being added, both the attribute names and data file have
+                    //  been specified.
+                    // 5. If configured to use a hard-coded hyperlink address, the address has been
+                    //  specified.
                     bool valid = !string.IsNullOrEmpty(_pdfFile)
-                        && !(new FAMTagManagerClass().StringContainsInvalidTags(_pdfFile));
+                        && !(tagManager.StringContainsInvalidTags(_pdfFile))
+                        && (_removeAnnotations || _addHyperlinks);
+
+                    if (valid && _addHyperlinks)
+                    {
+                        valid &= !string.IsNullOrEmpty(_hyperlinkAttributes);
+                        valid &= !string.IsNullOrEmpty(_dataFileName) &&
+                            !tagManager.StringContainsInvalidTags(_dataFileName);
+                        valid &= _useValueAsAddress || !string.IsNullOrWhiteSpace(_hyperlinkAddress);
+                    }
 
                     return valid;
                 }
@@ -175,10 +387,20 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 // Read the settings from the stream
-                string pdfFile = reader.ReadString();
-                bool removeAnnotations = reader.ReadBoolean();
+                var settings = new ModifyPdfFileTaskSettings();
+                settings.PdfFile = reader.ReadString();
+                settings.RemoveAnnotations = reader.ReadBoolean();
 
-                return new ModifyPdfFileTaskSettings(pdfFile, removeAnnotations);
+                if (reader.Version >= 2)
+                {
+                    settings.AddHyperlinks = reader.ReadBoolean();
+                    settings.HyperlinkAttributes = reader.ReadString();
+                    settings.UseValueAsAddress = reader.ReadBoolean();
+                    settings.HyperlinkAddress = reader.ReadString();
+                    settings.DataFileName = reader.ReadString();
+                }
+
+                return settings;
             }
             catch (Exception ex)
             {
@@ -201,6 +423,11 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 writer.Write(_pdfFile);
                 writer.Write(_removeAnnotations);
+                writer.Write(_addHyperlinks);
+                writer.Write(_hyperlinkAttributes);
+                writer.Write(_useValueAsAddress);
+                writer.Write(_hyperlinkAddress);
+                writer.Write(_dataFileName);
 
                 if (clearDirty)
                 {
