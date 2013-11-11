@@ -943,35 +943,25 @@ STDMETHODIMP CSpatialString::raw_ReportMemoryUsage(void)
 			m_ipMemoryManager.CreateInstance(MEMORY_MANAGER_CLASS);
 		}
 		
-		int size = sizeof(this);
+		int size = sizeof(*this);
 		// Report the size of the CPPLetters as well as this class's direct members.
 		size += m_vecLetters.size() * sizeof(CPPLetter);
-		m_ipMemoryManager->ReportUnmanagedMemoryUsage(size);
 
 		// [FlexIDSCore:5373]
-		// For reasons not yet understood (but that likely relates to the multiple SpatialStrings
-		// reporting memory usage for the same SpatialPageInfo instances), performance is
-		// significantly worse in some cases with SpatialPageInfo memory being reported (both speed
-		// and memory usage). For the 9.6 release, reporting of SpatialPageInfo memory is being
-		// disabled.
-//		// Report the size of the page info map
+		// For nested COM classes that are of a known or calculatable size such as SpatialPageInfo
+		// and RasterZone, don't make nested calls into IMemoryManager's for each of those
+		// instances as this will cause excessive COM calls hurting performance and using more
+		// memory that necessary. Instead, just report their likely sizes here.
+		size += m_vecRasterZones.size() * sizeof(CRasterZone);
+
+		// Since page info instances are currently being shallow copied, don't report them as part
+		// of the size of this instance.
 //		if (m_ipPageInfoMap != __nullptr)
 //		{
-//			IManageableMemoryPtr ipManageableMemory = m_ipPageInfoMap;
-//			ASSERT_RESOURCE_ALLOCATION("ELI36027", ipManageableMemory != __nullptr);
-//
-//			ipManageableMemory->ReportMemoryUsage();
+//			size += m_ipPageInfoMap->Size * (sizeof(long) + sizeof(CSpatialPageInfo));
 //		}
 
-		// Report the size of the raster zones.
-		size_t nZoneCount = m_vecRasterZones.size();
-		for (size_t i = 0; i < nZoneCount; i++)
-		{
-			IManageableMemoryPtr ipManageableMemory = m_vecRasterZones[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI36028", ipManageableMemory != __nullptr);
-
-			ipManageableMemory->ReportMemoryUsage();
-		}
+		m_ipMemoryManager->ReportUnmanagedMemoryUsage(size);
 
 		return S_OK;
 	}

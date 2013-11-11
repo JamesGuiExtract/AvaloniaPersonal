@@ -1017,7 +1017,9 @@ STDMETHODIMP CAttribute::raw_ReportMemoryUsage(void)
 			m_ipMemoryManager.CreateInstance(MEMORY_MANAGER_CLASS);
 		}
 		
-		m_ipMemoryManager->ReportUnmanagedMemoryUsage(sizeof(this));
+		IIUnknownVectorPtr ipSubAttributes = getSubAttributes();
+		long nAttributeCount = ipSubAttributes->Size();
+		m_ipMemoryManager->ReportUnmanagedMemoryUsage(sizeof(*this) + nAttributeCount);
 		
 		if (m_ipAttributeValue != __nullptr)
 		{
@@ -1027,9 +1029,7 @@ STDMETHODIMP CAttribute::raw_ReportMemoryUsage(void)
 			ipManageableMemory->ReportMemoryUsage();
 		}
 
-		IIUnknownVectorPtr ipSubAttributes = getSubAttributes();
-		long lSize = ipSubAttributes->Size();
-		for (long i = 0; i < lSize; i++)
+		for (long i = 0; i < nAttributeCount; i++)
 		{
 			IManageableMemoryPtr ipManageableMemory = ipSubAttributes->At(i);
 			ASSERT_RESOURCE_ALLOCATION("ELI36015", ipManageableMemory != __nullptr);

@@ -46,7 +46,8 @@ public:
 	STDMETHOD(put_Text)(/*[in]*/ ISpatialString* newVal);
 	STDMETHOD(get_Attribute)(/*[out, retval]*/ IAttribute* *pVal);
 	STDMETHOD(put_Attribute)(/*[in]*/ IAttribute* newVal);
-	STDMETHOD(PartialClone)(VARIANT_BOOL vbCloneAttributes, IAFDocument **pAFDoc);
+	STDMETHOD(PartialClone)(VARIANT_BOOL vbCloneAttributes, VARIANT_BOOL vbCloneText,
+		IAFDocument **pAFDoc);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown ** pObject);

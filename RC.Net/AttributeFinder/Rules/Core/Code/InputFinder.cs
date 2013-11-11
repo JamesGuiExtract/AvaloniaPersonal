@@ -114,10 +114,10 @@ namespace Extract.AttributeFinder.Rules
                 // memory.
                 pDocument.Attribute.ReportMemoryUsage();
                 // Create an AFDocument copy that clones only the attribute hierarchy and not the
-                // document text. The AttributeRule class will have clone the document text already,
-                // but not the attribute hierarchy. We don't want the downstream rules to be able to
-                // inadvertently modify the AFDocument attribute hierarchy.
-                AFDocument afDocCopy = pDocument.PartialClone(true);
+                // document text. The AttributeRule class will have cloned the document text
+                // already, but not the attribute hierarchy. We don't want the downstream rules to
+                // be able to inadvertently modify the AFDocument attribute hierarchy.
+                AFDocument afDocCopy = pDocument.PartialClone(true, false);
                 IAttribute attribute = afDocCopy.Attribute;
 
                 IUnknownVector result = new IUnknownVector();

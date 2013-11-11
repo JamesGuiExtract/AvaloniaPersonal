@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "UCLIDRasterAndOCRMgmt.h"
 #include "SpatialStringSearcher.h"
+#include "SpatialPageInfo.h"
 #include "CPPLetter.h"
 
 #include <UCLIDException.h>
@@ -580,11 +581,22 @@ STDMETHODIMP CSpatialStringSearcher::raw_ReportMemoryUsage(void)
 			m_ipMemoryManager.CreateInstance(MEMORY_MANAGER_CLASS);
 		}
 		
-		int nSize = sizeof(this);
+		int nSize = sizeof(*this);
 		// Report the size of all letters, words, and lines.
 		nSize += m_vecLetters.size() * sizeof(LocalLetter);
 		nSize += m_vecWords.size() * sizeof(LocalWord);
 		nSize += m_vecLines.size() * sizeof(LocalLine);
+
+		// [FlexIDSCore:5373]
+		// For nested COM classes that are of a known or calculatable size such as SpatialPageInfo,
+		// don't make nested calls into IMemoryManager's for each of those instances as this will
+		// cause excessive COM calls hurting performance and using more memory that necessary.
+		// Instead, just report their likely sizes here.
+		if (m_ipSpatialPageInfoMap != __nullptr)
+		{
+			nSize += m_ipSpatialPageInfoMap->Size * (sizeof(long) + sizeof(CSpatialPageInfo));
+		}
+
 		m_ipMemoryManager->ReportUnmanagedMemoryUsage(nSize);
 
 		// Report the size of the spatial string.
@@ -595,21 +607,6 @@ STDMETHODIMP CSpatialStringSearcher::raw_ReportMemoryUsage(void)
 
 			ipManageableMemory->ReportMemoryUsage();
 		}
-
-		// [FlexIDSCore:5373]
-		// For reasons not yet understood (but that likely relates to the multiple SpatialStrings
-		// reporting memory usage for the same SpatialPageInfo instances), performance is
-		// significantly worse in some cases with SpatialPageInfo memory being reported (both speed
-		// and memory usage). For the 9.6 release, reporting of SpatialPageInfo memory is being
-		// disabled.
-//		// Report the size of the page info map.
-//		if (m_ipSpatialPageInfoMap != __nullptr)
-//		{
-//			IManageableMemoryPtr ipManageableMemory = m_ipSpatialPageInfoMap;
-//			ASSERT_RESOURCE_ALLOCATION("ELI36031", ipManageableMemory != __nullptr);
-//
-//			ipManageableMemory->ReportMemoryUsage();
-//		}
 
 		return S_OK;
 	}

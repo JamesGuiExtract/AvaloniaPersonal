@@ -13,8 +13,7 @@ class ATL_NO_VTABLE CSpatialPageInfo :
 	public ISupportErrorInfo,
 	public IPersistStream,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
-	public IDispatchImpl<ISpatialPageInfo, &IID_ISpatialPageInfo, &LIBID_UCLID_RASTERANDOCRMGMTLib>,
-	public IDispatchImpl<IManageableMemory, &IID_IManageableMemory, &LIBID_UCLID_COMUTILSLib>
+	public IDispatchImpl<ISpatialPageInfo, &IID_ISpatialPageInfo, &LIBID_UCLID_RASTERANDOCRMGMTLib>
 {
 public:
 	CSpatialPageInfo();
@@ -30,7 +29,6 @@ BEGIN_COM_MAP(CSpatialPageInfo)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IPersistStream)
-	COM_INTERFACE_ENTRY(IManageableMemory)
 END_COM_MAP()
 
 // ISupportsErrorInfo
@@ -67,19 +65,12 @@ public:
 	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
 
-// IManageableMemory
-	STDMETHOD(raw_ReportMemoryUsage)(void);
-
 private:
 	UCLID_RASTERANDOCRMGMTLib::EOrientation m_eOrientation;
 	double m_fDeskew;
 
 	long m_nWidth;
 	long m_nHeight;
-
-	// Allows reporting of memory usage to the garabage collector when being referenced by managed
-	// code.
-	IMemoryManagerPtr m_ipMemoryManager;
 
 	bool m_bDirty;
 };

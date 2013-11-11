@@ -458,7 +458,8 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 				// attributes will not be modified except when invoked via the InputFinder, but the
 				// InputFinder will clone the attribute hierarchy at the time of invocation.
 				UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(pAFDoc);
-				UCLID_AFCORELib::IAFDocumentPtr ipAFDocCopy = ipAFDoc->PartialClone(VARIANT_FALSE);
+				UCLID_AFCORELib::IAFDocumentPtr ipAFDocCopy =
+					ipAFDoc->PartialClone(VARIANT_FALSE, VARIANT_TRUE);
 				ASSERT_RESOURCE_ALLOCATION("ELI15666", ipAFDocCopy != __nullptr);
 
 				try

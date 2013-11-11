@@ -317,9 +317,6 @@ namespace Extract.AttributeFinder.Rules
                 foreach (RasterZone rasterZone in
                     GetZonesToExtract(pAttributeToBeModified.Value, sourceString))
                 {
-                    // So that the garbage collector knows of and properly manages the associated
-                    // memory.
-                    rasterZone.ReportMemoryUsage();
                     int page = rasterZone.PageNumber;
                     LongRectangle bounds = rasterZone.GetRectangularBounds(
                         sourceString.GetOCRImagePageBounds(page));

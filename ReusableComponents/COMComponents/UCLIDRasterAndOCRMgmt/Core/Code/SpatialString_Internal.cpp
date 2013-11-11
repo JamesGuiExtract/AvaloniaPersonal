@@ -1245,6 +1245,8 @@ void CSpatialString::processLetters(CPPLetter* letters, long nNumLetters)
     // Reset all the member variables except for the source doc name and the page info
     reset(false, false);
 
+	m_strString.reserve(nNumLetters);
+
     // iterate through each letter to determine
     // the state of the String and IsSpatial attributes
     for (long i = 0; i < nNumLetters; i++)
@@ -3361,11 +3363,14 @@ void CSpatialString::copyFromSpatialString(UCLID_RASTERANDOCRMGMTLib::ISpatialSt
         // copy the spatial page info map
         if (eSourceMode != kNonSpatialMode)
         {
-            ICopyableObjectPtr ipCopyObj = ipSource->SpatialPageInfos;
-            ASSERT_RESOURCE_ALLOCATION("ELI25777", ipCopyObj != __nullptr);
+			// Experimental
+            m_ipPageInfoMap = ipSource->SpatialPageInfos;
 
-            m_ipPageInfoMap = ipCopyObj->Clone();
-            ASSERT_RESOURCE_ALLOCATION("ELI25778", m_ipPageInfoMap != __nullptr);
+//			ICopyableObjectPtr ipCopyObj = ipSource->SpatialPageInfos;
+//            ASSERT_RESOURCE_ALLOCATION("ELI25777", ipCopyObj != __nullptr);
+//
+//            m_ipPageInfoMap = ipCopyObj->Clone();
+//            ASSERT_RESOURCE_ALLOCATION("ELI25778", m_ipPageInfoMap != __nullptr);
         }
 
         // Downgrade the spatial mode if needed

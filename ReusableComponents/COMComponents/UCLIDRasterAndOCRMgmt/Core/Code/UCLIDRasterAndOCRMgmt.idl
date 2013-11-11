@@ -1398,7 +1398,6 @@ library UCLID_RASTERANDOCRMGMTLib
 	{
 		[default] interface IRasterZone;
 		interface ILicensedComponent;
-		interface IManageableMemory;
 	};
 	[
 		uuid(D2164333-6191-4317-BA5F-982FBEEA2C17),
@@ -1452,7 +1451,6 @@ library UCLID_RASTERANDOCRMGMTLib
 	{
 		[default] interface ISpatialPageInfo;
 		interface ICopyableObject;
-		interface IManageableMemory;
 	};
 	[
 		uuid(10967FD8-81AB-41A6-AAD5-C470DD5CB78C),

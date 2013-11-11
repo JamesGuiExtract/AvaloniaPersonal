@@ -1790,7 +1790,6 @@ library UCLID_COMUTILSLib
 		interface ILicensedComponent;
 		interface ICopyableObject;
 		interface IShallowCopyable;
-		interface IManageableMemory;
 	};
 	[
 		uuid(20430EB0-7AA6-4DA1-A372-8EC38FCBE6AC),

@@ -205,7 +205,8 @@ STDMETHODIMP CAFDocument::put_Attribute(IAttribute *newVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34804");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFDocument::PartialClone(VARIANT_BOOL vbCloneAttributes, IAFDocument **pAFDoc)
+STDMETHODIMP CAFDocument::PartialClone(VARIANT_BOOL vbCloneAttributes, VARIANT_BOOL vbCloneText,
+									   IAFDocument **pAFDoc)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -214,7 +215,6 @@ STDMETHODIMP CAFDocument::PartialClone(VARIANT_BOOL vbCloneAttributes, IAFDocume
 		validateLicense();
 
 		ASSERT_RESOURCE_ALLOCATION("ELI36254", pAFDoc != __nullptr);
-		bool bCloneAttributes = asCppBool(vbCloneAttributes);
 
 		// Create a new IAFDocument object
 		UCLID_AFCORELib::IAFDocumentPtr ipDocCopy(CLSID_AFDocument);
@@ -222,6 +222,9 @@ STDMETHODIMP CAFDocument::PartialClone(VARIANT_BOOL vbCloneAttributes, IAFDocume
 	
 		if (m_ipAttribute != __nullptr)
 		{
+			bool bCloneAttributes = asCppBool(vbCloneAttributes);
+			bool bCloneText = asCppBool(vbCloneText);
+
 			// Clone the attribute hierarchy beneath the top-level document attribute, but not the
 			// document text.
 			if (bCloneAttributes)
@@ -234,7 +237,7 @@ STDMETHODIMP CAFDocument::PartialClone(VARIANT_BOOL vbCloneAttributes, IAFDocume
 			}
 			// Clone the document text but not the attribute hierarchy beneath the top-level
 			// document attribute.
-			else
+			if (bCloneText)
 			{
 				ipDocCopy->Attribute = UCLID_AFCORELib::IAttributePtr(CLSID_Attribute);
 				ICopyableObjectPtr ipCopyObj(m_ipAttribute->Value);

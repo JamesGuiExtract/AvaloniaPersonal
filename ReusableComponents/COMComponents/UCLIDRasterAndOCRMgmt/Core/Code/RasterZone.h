@@ -14,8 +14,7 @@ class ATL_NO_VTABLE CRasterZone :
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IRasterZone, &IID_IRasterZone, &LIBID_UCLID_RASTERANDOCRMGMTLib>,
 	public IDispatchImpl<IComparableObject, &IID_IComparableObject, &LIBID_UCLID_COMUTILSLib>,
-	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
-	public IDispatchImpl<IManageableMemory, &IID_IManageableMemory, &LIBID_UCLID_COMUTILSLib>
+	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>
 {
 public:
 	CRasterZone();
@@ -34,7 +33,6 @@ BEGIN_COM_MAP(CRasterZone)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IComparableObject)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
-	COM_INTERFACE_ENTRY(IManageableMemory)
 END_COM_MAP()
 
 public:
@@ -87,15 +85,8 @@ public:
 	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
 
-// IManageableMemory
-	STDMETHOD(raw_ReportMemoryUsage)(void);
-
 private:
 	long m_nStartX, m_nStartY, m_nEndX, m_nEndY, m_nHeight, m_nPage;
-
-	// Allows reporting of memory usage to the garabage collector when being referenced by managed
-	// code.
-	IMemoryManagerPtr m_ipMemoryManager;
 
 	bool m_bDirty;
 

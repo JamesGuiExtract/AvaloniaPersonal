@@ -918,9 +918,9 @@ STDMETHODIMP CIUnknownVector::ReportMemoryUsage()
 			m_ipMemoryManager.CreateInstance(MEMORY_MANAGER_CLASS);
 		}
 		
-		m_ipMemoryManager->ReportUnmanagedMemoryUsage(sizeof(this));
-
 		long nSize = m_vecIUnknowns.size();
+		m_ipMemoryManager->ReportUnmanagedMemoryUsage(sizeof(*this) + nSize);
+
 		for (long i = 0; i < nSize; i++)
 		{
 			if (m_vecIUnknowns[i] != __nullptr)

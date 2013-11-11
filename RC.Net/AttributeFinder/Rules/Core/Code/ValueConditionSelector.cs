@@ -185,8 +185,6 @@ namespace Extract.AttributeFinder.Rules
         IEnumerable<ComAttribute> GetSelectedAttributes(IUnknownVector sourceAttributeVector,
             AFDocument afDoc)
         {
-            ICopyableObject docCopySource = (ICopyableObject)afDoc;
-
             foreach (ComAttribute attribute in sourceAttributeVector.ToIEnumerable<ComAttribute>())
             {
                 // So that the garbage collector knows of and properly manages the associated
@@ -194,8 +192,9 @@ namespace Extract.AttributeFinder.Rules
                 attribute.ReportMemoryUsage();
 
                 // Create a new AFDocument for each attribute whose text is the value of the
-                // attribute being tested.
-                AFDocument afDocument = new AFDocument();
+                // attribute being tested. (No need to clone the document text since it is being
+                // replaced.)
+                AFDocument afDocument = afDoc.PartialClone(false, false);
                 afDocument.Text = attribute.Value;
 
                 using (RuleObjectProfiler profiler = new RuleObjectProfiler("", "", Condition, 0))
