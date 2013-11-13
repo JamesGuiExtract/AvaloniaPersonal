@@ -83,3 +83,6 @@
 //the string specified:", "Above defined string will be treatd as a Regular Expression",
 //and "All strings defined in this window are case-sensitive" checkboxes are checked.
 <TESTCASE>;Test19.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test19.eav
+
+// Attribute Referencing test case
+<TESTCASE>;TestBF1.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF1.eav
