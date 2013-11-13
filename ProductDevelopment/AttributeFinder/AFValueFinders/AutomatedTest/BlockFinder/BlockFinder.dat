@@ -49,3 +49,6 @@
 //checked, and "Find all blocks" is selected to test the validity of "if no block separator is found,
 //assume that the entire input text is one block". 
 <TESTCASE>;Test14.rsd;Input.txt;;Test14.eav
+
+// Attribute Referencing test case
+<TESTCASE>;TestBF1.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF1.eav
