@@ -241,3 +241,10 @@
 
 // Exclude Image Region With No OCR
 <TESTCASE>;ExcludeImageRegionNoOcr.rsd;..\..\..\AFCore\AutomatedTest\images\image1.noocr.tif.uss;;ExcludeImageRegionNoOcr.voa
+
+//*********************************************************************************
+// Test Attribute Referencing
+//*********************************************************************************
+
+// Include Region Found via simple attribute reference
+<TESTCASE>;TestBF1.rsd;..\..\..\AFCore\AutomatedTest\images\TestImage002.tif.uss;;TestBF1.voa
