@@ -86,3 +86,6 @@
 
 //Multiple captured subexpression replacements. [FlexIDSCore #3114]
 <TESTCASE>;AdvRplcStr25.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr25.eav
+
+// Attribute Referencing test case
+<TESTCASE>;TestBF1.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF1.eav
