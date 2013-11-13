@@ -75,3 +75,6 @@
 //checkboxes are selected checked. The tags in Clue List 3 and Clue List 4 are written
 //as "File://" and "FILE://" to test case insensitivity.
 <TESTCASE>;Test23.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test23.eav
+
+// Attribute Referencing test case
+<TESTCASE>;TestBF1.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF1.eav
