@@ -125,3 +125,19 @@
 //test40 First match only set.
 //[FlexIDSCore:4072]
 <TESTCASE>;Test40.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test40.eav
+
+////////////////////////
+// Attribute Referencing
+////////////////////////
+
+// Basic test
+<TESTCASE>;TestBF1.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF1.eav
+
+// Model Use test
+<TESTCASE>;TestBF2.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF2.eav
+
+// Combining Into Larger Regex test
+<TESTCASE>;TestBF3.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF3.eav
+
+// Fuzzy search test
+<TESTCASE>;TestBF4.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF4.eav
