@@ -97,3 +97,6 @@
 //test22 Everything is same as test21 except the entry for "Inclue all strings between the string
 //specified and clue text:" is of different case.
 <TESTCASE>;Test22.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test22.eav
+
+// Attribute Referencing test case
+<TESTCASE>;TestBF1.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF1.eav
