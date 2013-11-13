@@ -27,8 +27,8 @@ CPersonNameSplitter::CPersonNameSplitter()
 		m_ipKeys.CreateInstance( CLSID_EntityKeywords );
 		ASSERT_RESOURCE_ALLOCATION( "ELI06473", m_ipKeys != __nullptr );
 		
-		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI36195", m_ipAFUtility != __nullptr);
+		m_ipMisc.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI22557", m_ipMisc != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI06474")
 }
@@ -38,7 +38,7 @@ CPersonNameSplitter::~CPersonNameSplitter()
 	try
 	{
 		m_ipKeys = __nullptr;
-		m_ipAFUtility = __nullptr;
+		m_ipMisc = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29465");
 }
@@ -87,11 +87,8 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 		// This was probably an OCR error and should have been an ampersand
 		ipEntity->Trim( _bstr_t( "8" ), _bstr_t( "" ) );
 
-		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI36194", ipAFDoc != __nullptr);
-
 		// Get a regex parser
-		IRegularExprParserPtr ipParser = getParser(ipAFDoc);
+		IRegularExprParserPtr ipParser = getParser();
 
 		// Set to ignore case
 		ipParser->IgnoreCase = VARIANT_TRUE;
@@ -954,11 +951,11 @@ STDMETHODIMP CPersonNameSplitter::get_InstanceGUID(GUID *pVal)
 //-------------------------------------------------------------------------------------------------
 // private / helper methods
 //-------------------------------------------------------------------------------------------------
-IRegularExprParserPtr CPersonNameSplitter::getParser(IAFDocumentPtr ipAFDoc)
+IRegularExprParserPtr CPersonNameSplitter::getParser()
 {
 	try
 	{
-		IRegularExprParserPtr ipParser = m_ipAFUtility->GetNewRegExpParser(ipAFDoc);
+		IRegularExprParserPtr ipParser = m_ipMisc->GetNewRegExpParserInstance("PersonNameSplitter");
 		ASSERT_RESOURCE_ALLOCATION("ELI29467", ipParser != __nullptr);
 		
 		return ipParser;

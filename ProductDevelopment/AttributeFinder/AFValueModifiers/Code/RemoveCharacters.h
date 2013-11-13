@@ -132,7 +132,7 @@ private:
 	bool m_bTrimLeading;
 	bool m_bTrimTrailing;
 
-	IAFUtilityPtr m_ipAFUtility;
+	IMiscUtilsPtr m_ipMiscUtils;
 
 	bool m_bDirty;
 };

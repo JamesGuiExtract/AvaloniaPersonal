@@ -1573,7 +1573,7 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 				// an orientation of kRotNone and a skew of 0.0
 				ISpatialPageInfoPtr ipPageInfo(CLSID_SpatialPageInfo);
 				ASSERT_RESOURCE_ALLOCATION("ELI28173", ipPageInfo != __nullptr);
-				ipPageInfo->SetPageInfo(nWidth, nHeight, kRotNone, 0.0);
+				ipPageInfo->Initialize(nWidth, nHeight, kRotNone, 0.0);
 
 				ipPageInfos.CreateInstance(CLSID_LongToObjectMap);
 				ASSERT_RESOURCE_ALLOCATION("ELI28174", ipPageInfos != __nullptr);

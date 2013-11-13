@@ -52,6 +52,7 @@ END_COM_MAP()
 	STDMETHOD(Set)(/*[in]*/ long key, /*[in]*/ IUnknown* pObject);
 	STDMETHOD(GetKeyValue)(/*[in]*/ long nIndex, /*[out]*/ long *pstrKey, /*[out]*/ IUnknown* *pObject);
 	STDMETHOD(RenameKey)(/*[in]*/ long strKey, /*[in]*/ long strNewKeyName);
+	STDMETHOD(SetReadonly)();
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -75,6 +76,10 @@ private:
 	void clear();
 
 	std::map<long, IUnknownPtr> m_mapKeyToValue;
+
+	// Indicates if this instance has been made read-only. Once read-only, this instance will throw
+	// an exception if a caller attempts to modify any members.
+	bool m_bReadonly;
 
 	// flag to indicate if this object's state has changed since the last 
 	// save-to-stream operation

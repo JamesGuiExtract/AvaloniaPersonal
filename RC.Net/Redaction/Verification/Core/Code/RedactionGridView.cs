@@ -1485,7 +1485,7 @@ namespace Extract.Redaction.Verification
                     SpatialPageInfo pageInfo = new SpatialPageInfo();
                     int width = pageProperties.Width;
                     int height = pageProperties.Height;
-                    pageInfo.SetPageInfo(width, height, EOrientation.kRotNone, 0);
+                    pageInfo.Initialize(width, height, EOrientation.kRotNone, 0);
 
                     // Add it to the map
                     _pageInfoMap.Set(i, pageInfo);

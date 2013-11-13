@@ -1664,7 +1664,7 @@ void CTestSpatialString::runTestCase19()
 	// Create a spatial page info map for the string
 	ISpatialPageInfoPtr ipInfo(CLSID_SpatialPageInfo);
 	ASSERT_RESOURCE_ALLOCATION("ELI25901", ipInfo != __nullptr);
-	ipInfo->SetPageInfo(2000, 3000, kRotNone, 0.0);
+	ipInfo->Initialize(2000, 3000, kRotNone, 0.0);
 
 	ILongToObjectMapPtr ipPageInfoMap(CLSID_LongToObjectMap);
 	ASSERT_RESOURCE_ALLOCATION("ELI25902", ipPageInfoMap != __nullptr);
@@ -1881,7 +1881,7 @@ void CTestSpatialString::runTestCase21()
 	// Create a spatial page info map for the string
 	ISpatialPageInfoPtr ipInfo(CLSID_SpatialPageInfo);
 	ASSERT_RESOURCE_ALLOCATION("ELI25903", ipInfo != __nullptr);
-	ipInfo->SetPageInfo(2000, 3000, kRotNone, 0.0);
+	ipInfo->Initialize(2000, 3000, kRotNone, 0.0);
 
 	ILongToObjectMapPtr ipPageInfoMap(CLSID_LongToObjectMap);
 	ASSERT_RESOURCE_ALLOCATION("ELI25904", ipPageInfoMap != __nullptr);

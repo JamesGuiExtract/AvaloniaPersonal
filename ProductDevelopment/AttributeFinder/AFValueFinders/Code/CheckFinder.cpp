@@ -470,10 +470,8 @@ IAttributePtr CCheckFinder::buildAttribute(const string& strImageName, long lPag
 		// Create a spatial page info
 		ISpatialPageInfoPtr ipInfo(CLSID_SpatialPageInfo);
 		ASSERT_RESOURCE_ALLOCATION("ELI24510", ipInfo != __nullptr);
-		ipInfo->Width = checkData.width;
-		ipInfo->Height = checkData.height;
-		ipInfo->Deskew = 0.0;
-		ipInfo->Orientation = kRotNone;
+
+		ipInfo->Initialize(checkData.width, checkData.height, kRotNone, 0.0);
 		_lastCodePos = "10";
 
 		// Create a spatial page info map

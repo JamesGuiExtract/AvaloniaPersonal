@@ -155,7 +155,7 @@ HRESULT CEAVGeneratorDlg::NotifyInputReceived(ITextInput* pTextInput)
 			// create the spatial page info for this raster zone
 			ISpatialPageInfoPtr ipPageInfo(CLSID_SpatialPageInfo);
 			ASSERT_RESOURCE_ALLOCATION("ELI20246", ipPageInfo != __nullptr);
-			ipPageInfo->SetPageInfo(iWidth, iHeight, kRotNone, 0.0);
+			ipPageInfo->Initialize(iWidth, iHeight, kRotNone, 0.0);
 			
 			// create the spatial page info map
 			ILongToObjectMapPtr ipPageInfoMap(CLSID_LongToObjectMap);

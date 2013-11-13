@@ -519,33 +519,40 @@ STDMETHODIMP CSpatialString::GetSpecifiedPages(long nStartPageNum, long nEndPage
 				// index
 				long nLastSpatialPageNum = tempLetter.m_usPageNumber;
 
-				for (long n = 0; n < nNumLetters; n++)
+				// Jump right to the requested page...
+				long nStartPos = getNextOCRImageSpatialLetterStartingOnPage(
+					nStartPageNum, nLastPageNumber, tempLetter);
+
+				if (nStartPos != -1)
 				{
-					CPPLetter& letter = m_vecLetters[n];
-
-					long nCurrentPageNumber =
-						letter.m_bIsSpatial ? letter.m_usPageNumber : nLastSpatialPageNum;
-
-					// break out of the loop if current page is beyond end page
-					if (nCurrentPageNumber > nEndPageNum)
+					for (long n = nStartPos; n < nNumLetters; n++)
 					{
-						break;
+						CPPLetter& letter = m_vecLetters[n];
+
+						long nCurrentPageNumber =
+							letter.m_bIsSpatial ? letter.m_usPageNumber : nLastSpatialPageNum;
+
+						// break out of the loop if current page is beyond end page
+						if (nCurrentPageNumber > nEndPageNum)
+						{
+							break;
+						}
+						// only get letters from specified starting to ending page
+						else if (nCurrentPageNumber >= nStartPageNum)
+						{
+							vecLetters.push_back(letter);
+						}
+
+						// Update the last spatial page number
+						nLastSpatialPageNum = nCurrentPageNumber;
 					}
-					// only get letters from specified starting to ending page
-					else if (nCurrentPageNumber >= nStartPageNum)
+
+					// Set the return string from the vector of letters
+					if (vecLetters.size() > 0)
 					{
-						vecLetters.push_back(letter);
+						ipReturn->CreateFromLetterArray(vecLetters.size(), &(vecLetters[0]),
+							m_strSourceDocName.c_str(), m_ipPageInfoMap);
 					}
-
-					// Update the last spatial page number
-					nLastSpatialPageNum = nCurrentPageNumber;
-				}
-
-				// Set the return string from the vector of letters
-				if (vecLetters.size() > 0)
-				{
-					ipReturn->CreateFromLetterArray(vecLetters.size(), &(vecLetters[0]),
-						m_strSourceDocName.c_str(), m_ipPageInfoMap);
 				}
 			}
 		}
@@ -667,46 +674,61 @@ STDMETHODIMP CSpatialString::GetRelativePages(long nStartPageNum, long nEndPageN
 				long nFirstSpatialLetter = getNextOCRImageSpatialLetter(0, letter);
 				nLastOrigSpatialPageNum = letter.m_usPageNumber;
 
-				nCurrentPageNum = -1;
-				// the physical page number, not necessarily equals to the oringial page number
-				long nCurrentPhysicalPageNumber = 0;
-				// create a vector to hold letter on those pages
-				vector<CPPLetter> vecLetters;
-				for (long i = 0; i < nNumLetters; i++)
+				// Jump right to the requested page...
+				long nStartPos = getNextOCRImageSpatialLetterStartingOnPage(
+					nStartPageNum, letter);
+
+				if (nStartPos != -1)
 				{
-					CPPLetter& tempLetter = m_vecLetters[i];
-
-					// what's the original page number for this letter
-					long nOriginPageNumber =
-						tempLetter.m_bIsSpatial ? tempLetter.m_usPageNumber : nLastOrigSpatialPageNum;
-
-					if (nCurrentPageNum != nOriginPageNumber)
+					// the physical page number, not necessarily equals to the oringial page number
+					// Increment the page number by the number of pages found prior to nStartPos;
+					long nCurrentPhysicalPageNumber = 0;
+					for (map<long, long>::iterator iter = m_mapLetterIndex.begin();
+						 iter != m_mapLetterIndex.end() && iter->first < nStartPageNum;
+						 iter++)
 					{
-						// increment the physical page number
 						nCurrentPhysicalPageNumber++;
-						nCurrentPageNum = nOriginPageNumber;
 					}
 
-					// break out of the loop if start page is beyond end page
-					if (nCurrentPhysicalPageNumber > nEndPageNum)
+					nCurrentPageNum = -1;
+				
+					// create a vector to hold letter on those pages
+					vector<CPPLetter> vecLetters;
+					for (long i = nStartPos; i < nNumLetters; i++)
 					{
-						break;
+						CPPLetter& tempLetter = m_vecLetters[i];
+
+						// what's the original page number for this letter
+						long nOriginPageNumber =
+							tempLetter.m_bIsSpatial ? tempLetter.m_usPageNumber : nLastOrigSpatialPageNum;
+
+						if (nCurrentPageNum != nOriginPageNumber)
+						{
+							// increment the physical page number
+							nCurrentPhysicalPageNumber++;
+							nCurrentPageNum = nOriginPageNumber;
+						}
+
+						// break out of the loop if start page is beyond end page
+						if (nCurrentPhysicalPageNumber > nEndPageNum)
+						{
+							break;
+						}
+
+						// only get letters from specified starting to ending page
+						if (nCurrentPhysicalPageNumber >= nStartPageNum)
+						{
+							vecLetters.push_back(tempLetter);
+						}
+
+						nLastOrigSpatialPageNum = nOriginPageNumber;
 					}
 
-					// only get letters from specified starting to ending page
-					if (nCurrentPhysicalPageNumber >= nStartPageNum 
-						&& nCurrentPhysicalPageNumber <= nEndPageNum)
+					if (vecLetters.size() > 0)
 					{
-						vecLetters.push_back(tempLetter);
+						ipReturn->CreateFromLetterArray(vecLetters.size(), &(vecLetters[0]),
+							m_strSourceDocName.c_str(), m_ipPageInfoMap);
 					}
-
-					nLastOrigSpatialPageNum = nOriginPageNumber;
-				}
-
-				if (vecLetters.size() > 0)
-				{
-					ipReturn->CreateFromLetterArray(vecLetters.size(), &(vecLetters[0]),
-						m_strSourceDocName.c_str(), m_ipPageInfoMap);
 				}
 			}
 		}		
@@ -1680,8 +1702,21 @@ STDMETHODIMP CSpatialString::SetPageInfo(long nPageNum, ISpatialPageInfo* pPageI
 			UCLIDException ue( "ELI14752", "SetPageInfo() requires a spatial string with spatial information!");
 			throw ue;
 		}
+
+		// m_ipPageInfoMap will be read-only. Need to create a new copy to make it writable.
+		// Shallow copy because the PageInfo instances themselves are immutable and don't need
+		// to be cloned.
+		IShallowCopyablePtr ipSourcePageInfoMap(getPageInfoMap());
+		ASSERT_RESOURCE_ALLOCATION("ELI36304", ipSourcePageInfoMap != __nullptr);
+		
+		m_ipPageInfoMap = ipSourcePageInfoMap->ShallowCopy();
+		ASSERT_RESOURCE_ALLOCATION("ELI36305", m_ipPageInfoMap != __nullptr);
 		 
-		getPageInfoMap()->Set(nPageNum, (IUnknown*)pPageInfo);
+		m_ipPageInfoMap->Set(nPageNum, (IUnknown*)pPageInfo);
+
+		// After being assigned to a SpatialString, the page info map must not be modifed, otherwise
+		// it may affect other SpatialStrings that share these page infos.
+		m_ipPageInfoMap->SetReadonly();
 
 		return S_OK;
 	}

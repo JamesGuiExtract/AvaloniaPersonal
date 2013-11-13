@@ -761,6 +761,10 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 			::readObjectFromStream(ipObj, pStream, "ELI09984");
 			ASSERT_RESOURCE_ALLOCATION("ELI15279", ipObj != __nullptr);
 			m_ipPageInfoMap = ipObj;
+
+			// After being assigned to a SpatialString, the page info map must not be modifed, otherwise
+			// it may affect other SpatialStrings that share these page infos.
+			m_ipPageInfoMap->SetReadonly();
 		}
 		
 		// after we're done loading the string, do a consistency check
@@ -786,11 +790,12 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 					{
 						UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo(CLSID_SpatialPageInfo);
 						ASSERT_RESOURCE_ALLOCATION("ELI19466", ipPageInfo != __nullptr);
-						ipPageInfo->SetPageInfo(0, 0,
-							(UCLID_RASTERANDOCRMGMTLib::EOrientation)0, 0.0);
+						ipPageInfo->Initialize(0, 0, (UCLID_RASTERANDOCRMGMTLib::EOrientation)0, 0.0);
 
 						m_ipPageInfoMap->Set(nPage, ipPageInfo);
 						nCurrPage = nPage;
+
+						m_mapLetterIndex[nPage] = i;
 					}
 				}
 			}
@@ -943,25 +948,21 @@ STDMETHODIMP CSpatialString::raw_ReportMemoryUsage(void)
 			m_ipMemoryManager.CreateInstance(MEMORY_MANAGER_CLASS);
 		}
 		
-		int size = sizeof(*this);
+		int nSize = sizeof(*this);
 		// Report the size of the CPPLetters as well as this class's direct members.
-		size += m_vecLetters.size() * sizeof(CPPLetter);
+		nSize += m_vecLetters.size() * sizeof(CPPLetter);
 
 		// [FlexIDSCore:5373]
 		// For nested COM classes that are of a known or calculatable size such as SpatialPageInfo
 		// and RasterZone, don't make nested calls into IMemoryManager's for each of those
 		// instances as this will cause excessive COM calls hurting performance and using more
 		// memory that necessary. Instead, just report their likely sizes here.
-		size += m_vecRasterZones.size() * sizeof(CRasterZone);
+		nSize += m_vecRasterZones.size() * sizeof(CRasterZone);
 
-		// Since page info instances are currently being shallow copied, don't report them as part
+		// Since page info instances are shallow copied in most cases, don't report them as part
 		// of the size of this instance.
-//		if (m_ipPageInfoMap != __nullptr)
-//		{
-//			size += m_ipPageInfoMap->Size * (sizeof(long) + sizeof(CSpatialPageInfo));
-//		}
 
-		m_ipMemoryManager->ReportUnmanagedMemoryUsage(size);
+		m_ipMemoryManager->ReportUnmanagedMemoryUsage(nSize);
 
 		return S_OK;
 	}

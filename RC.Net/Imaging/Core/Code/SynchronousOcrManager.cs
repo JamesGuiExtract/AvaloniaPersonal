@@ -689,8 +689,6 @@ namespace Extract.Imaging
         static void PositionAsHybridSpatialString(ref SpatialString spatialString,
             RasterImage sourceImage, int orientation, double skew, Size offset)
         {
-            SpatialPageInfo pageInfo = spatialString.GetPageInfo(1);
-
             // Create a matrix to translate the string's raster zone coordinates into the
             // coordinate system of sourceImage.
             using (Matrix transform = new Matrix())
@@ -749,7 +747,8 @@ namespace Extract.Imaging
                 }
 
                 // Adjust the SpatialPageInfo to reflect the size of the source image
-                pageInfo.SetPageInfo(sourceImage.Width, sourceImage.Height, EOrientation.kRotNone, 0);
+                ISpatialPageInfo pageInfo = new SpatialPageInfo();
+                pageInfo.Initialize(sourceImage.Width, sourceImage.Height, EOrientation.kRotNone, 0);
 
                 // Rebuild spatialString as a hybrid string using the converted raster zones.
                 spatialString.CreateHybridString(rasterZones, spatialString.String,
@@ -796,43 +795,37 @@ namespace Extract.Imaging
                 return false;
             }
 
-            // Adjust the SpatialPageInfo to reflect the size of the source image
-            SpatialPageInfo pageInfo = spatialString.GetPageInfo(1);
-            pageInfo.Width = sourceImage.Width;
-            pageInfo.Height = sourceImage.Height;
+            // Create a new SpatialPageInfo to reflect the size of the source image.
+            SpatialPageInfo pageInfo = new SpatialPageInfo();
 
             // Get the deskew of the OCR'd text within the extracted raster zone image area
             // before updating the deskew.
             double ocrDeskew = pageInfo.Deskew;
             
-            // Apply deskew to the text's page info so that the OCR text's spatial area will
-            // be depicted in terms of the skew of the original swipe.
-            pageInfo.Deskew = skew;
-
             // Apply the specified page orientation to the page info.
             switch (orientation)
             {
                 case 0:
                     {
-                        pageInfo.SetPageInfo(
+                        pageInfo.Initialize(
                             sourceImage.Width, sourceImage.Height, EOrientation.kRotNone, skew);
                     }
                     break;
                 case 90:
                     {
-                        pageInfo.SetPageInfo(
+                        pageInfo.Initialize(
                             sourceImage.Width, sourceImage.Height, EOrientation.kRotLeft, skew);
                     }
                     break;
                 case 180:
                     {
-                        pageInfo.SetPageInfo(
+                        pageInfo.Initialize(
                             sourceImage.Width, sourceImage.Height, EOrientation.kRotDown, skew);
                     }
                     break;
                 case 270:
                     {
-                        pageInfo.SetPageInfo(
+                        pageInfo.Initialize(
                             sourceImage.Width, sourceImage.Height, EOrientation.kRotRight, skew);
                     }
                     break;
@@ -843,6 +836,9 @@ namespace Extract.Imaging
                         throw ee;
                     }
             }
+
+            // Apply the updated pageInfo to the spatialString.
+            spatialString.SetPageInfo(1, pageInfo);
 
             // Convert the coordinates of the OCR'd text so that the text appears at the
             // correct location in the source image.
@@ -893,7 +889,13 @@ namespace Extract.Imaging
 
                     // Apply the offset and updated deskew
                     spatialString.Offset(offset.Width, offset.Height);
-                    pageInfo.Deskew += ocrDeskew;
+
+                    // SpatialPageInfo instances cannot be modified after having been initialized.
+                    // Create a new SpatialPageInfo value with the original ocrDeskew.
+                    SpatialPageInfo finalPageInfo = new SpatialPageInfo();
+                    finalPageInfo.Initialize(pageInfo.Width, pageInfo.Height, pageInfo.Orientation,
+                        pageInfo.Deskew + ocrDeskew);
+                    spatialString.SetPageInfo(1, finalPageInfo);
                 }
             }
 

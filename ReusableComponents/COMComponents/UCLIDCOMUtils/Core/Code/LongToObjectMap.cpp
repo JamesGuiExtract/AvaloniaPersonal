@@ -28,6 +28,7 @@ const unsigned long gnCurrentVersion = 1;
 //-------------------------------------------------------------------------------------------------
 CLongToObjectMap::CLongToObjectMap()
 : m_bDirty(false)
+, m_bReadonly(false)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -103,8 +104,6 @@ STDMETHODIMP CLongToObjectMap::IsDirty(void)
 		return hr;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04775")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CLongToObjectMap::Load(IStream *pStream)
@@ -165,10 +164,10 @@ STDMETHODIMP CLongToObjectMap::Load(IStream *pStream)
 
 		// set the dirty flag to false as we've just loaded the object
 		m_bDirty = false;
+
+		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04698");
-	
-	return S_OK;
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04698");	
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CLongToObjectMap::Save(IStream *pStream, BOOL fClearDirty)
@@ -221,11 +220,10 @@ STDMETHODIMP CLongToObjectMap::Save(IStream *pStream, BOOL fClearDirty)
 		{
 			m_bDirty = false;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04699");
-
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CLongToObjectMap::GetSizeMax(ULARGE_INTEGER *pcbSize)
@@ -247,15 +245,20 @@ STDMETHODIMP CLongToObjectMap::Set(long key, IUnknown *pObject)
 
 		// validate license
 		validateLicense();
+
+		if (m_bReadonly)
+		{
+			throw UCLIDException("ELI36293", "Cannot modify readonly object map.");
+		}
 		
 		// set value in map for specified key
 		m_mapKeyToValue[key] = pObject;
 
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04369");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CLongToObjectMap::GetValue(long key, IUnknown **pObject)
@@ -282,10 +285,10 @@ STDMETHODIMP CLongToObjectMap::GetValue(long key, IUnknown **pObject)
 			ue.addDebugInfo("Key", key);
 			throw ue;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04368");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CLongToObjectMap::Contains(long key, VARIANT_BOOL *bFound)
@@ -301,10 +304,10 @@ STDMETHODIMP CLongToObjectMap::Contains(long key, VARIANT_BOOL *bFound)
 		
 		// return true if the specified key is found in the map
 		*bFound = asVariantBool(m_mapKeyToValue.find(key) != m_mapKeyToValue.end());
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04367");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CLongToObjectMap::RemoveItem(long key)
@@ -315,6 +318,11 @@ STDMETHODIMP CLongToObjectMap::RemoveItem(long key)
 	{
 		// validate license
 		validateLicense();
+
+		if (m_bReadonly)
+		{
+			throw UCLIDException("ELI36294", "Cannot modify readonly object map.");
+		}
 		
 		// remove the specified entry from the map.
 		// if it already doesn't exist in the map, then just return
@@ -325,10 +333,10 @@ STDMETHODIMP CLongToObjectMap::RemoveItem(long key)
 			m_mapKeyToValue.erase(it);
 			m_bDirty = true;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04366");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CLongToObjectMap::Clear()
@@ -340,11 +348,16 @@ STDMETHODIMP CLongToObjectMap::Clear()
 		// validate license
 		validateLicense();
 
+		if (m_bReadonly)
+		{
+			throw UCLIDException("ELI36295", "Cannot modify readonly object map.");
+		}
+
 		clear();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04365");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CLongToObjectMap::GetKeys(IVariantVector **pKeys)
@@ -372,10 +385,10 @@ STDMETHODIMP CLongToObjectMap::GetKeys(IVariantVector **pKeys)
 		}
 
 		*pKeys = (IVariantVector*) ipKeys.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04364");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CLongToObjectMap::get_Size(long *pVal)
@@ -387,10 +400,10 @@ STDMETHODIMP CLongToObjectMap::get_Size(long *pVal)
 		// validate license and return size of current map
 		validateLicense();
 		*pVal = m_mapKeyToValue.size();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04363");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CLongToObjectMap::GetKeyValue(long nIndex, long *pstrKey, IUnknown* *pObject)
@@ -424,10 +437,10 @@ STDMETHODIMP CLongToObjectMap::GetKeyValue(long nIndex, long *pstrKey, IUnknown*
 		*pstrKey = iter->first;
 		IUnknownPtr ipShallowCopy = iter->second;
 		*pObject = ipShallowCopy.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04475");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CLongToObjectMap::RenameKey(long key, long newKeyName)
@@ -438,6 +451,11 @@ STDMETHODIMP CLongToObjectMap::RenameKey(long key, long newKeyName)
 	{
 		// validate the license first
 		validateLicense();
+
+		if (m_bReadonly)
+		{
+			throw UCLIDException("ELI36296", "Cannot modify readonly object map.");
+		}
 		
 		// only process this request if the new key and the old key are different
 		if (key != newKeyName)
@@ -469,10 +487,26 @@ STDMETHODIMP CLongToObjectMap::RenameKey(long key, long newKeyName)
 
 			m_bDirty = true;
 		}
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04534");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CLongToObjectMap::SetReadonly()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
-	return S_OK;
+	try
+	{
+		// validate the license first
+		validateLicense();
+
+		m_bReadonly = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36297");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -509,6 +543,11 @@ STDMETHODIMP CLongToObjectMap::CopyFrom(IUnknown * pObject)
 		UCLID_COMUTILSLib::ILongToObjectMapPtr ipSource( pObject );
 		ASSERT_RESOURCE_ALLOCATION("ELI08212", ipSource != __nullptr);
 
+		if (m_bReadonly)
+		{
+			throw UCLIDException("ELI36298", "Cannot modify readonly object map.");
+		}
+
 		// Clear this map object
 		clear();
 
@@ -533,10 +572,10 @@ STDMETHODIMP CLongToObjectMap::CopyFrom(IUnknown * pObject)
 				m_mapKeyToValue[key] = ipUnk;
 			}
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08213");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CLongToObjectMap::Clone(IUnknown * * pObject)
@@ -559,10 +598,10 @@ STDMETHODIMP CLongToObjectMap::Clone(IUnknown * * pObject)
 
 		// Return the new map to the caller
 		*pObject = ipObjCopy.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05026");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------

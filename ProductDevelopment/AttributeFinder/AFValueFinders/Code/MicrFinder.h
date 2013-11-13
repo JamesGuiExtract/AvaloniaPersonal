@@ -183,7 +183,7 @@ private:
 	// searching for MICR
 	map<int, bool> m_mapRotations;
 
-	IAFUtilityPtr m_ipAFUtility;
+	IMiscUtilsPtr m_ipMiscUtils;
 
 	// Use CachedObjectFromFile so that the regular expression is re-loaded from disk only when the
 	// RegEx file is modified.
@@ -194,7 +194,7 @@ private:
 	//----------------------------------------------------------------------------------------------
 	// Searches each page in the vector of pages and attempts to find all the MICR zones
 	void findMICRZones(ISpatialStringPtr ipSpatialString, const vector<long>& vecPages,
-		IIUnknownVectorPtr ipAttributes, IAFDocumentPtr ipAFDoc);
+		IIUnknownVectorPtr ipAttributes);
 	//----------------------------------------------------------------------------------------------
 	// Builds a new attribute from a MICR line
 	// ARGS:
@@ -217,17 +217,17 @@ private:
 	//----------------------------------------------------------------------------------------------
 	// Builds an IUnknownVector of attributes from the provided map of MicrPage's.
 	IIUnknownVectorPtr buildAttributesFromPages(const map<long, MicrPage>& mapPages,
-						const string& strImageName, ISpatialStringPtr ipSS, IAFDocumentPtr ipAFDoc);
+											const string& strImageName, ISpatialStringPtr ipSS);
 	//----------------------------------------------------------------------------------------------
 	// Searches the specified rectangle for the other routing number.
 	// The search first tries to match the text exactly by splitting the routing number,
 	// if that doesn't work it attempts a regular expression search in the specified
 	// area.
 	IAttributePtr findOtherRoutingNumber(ISpatialStringPtr ipSpatialString,
-		const string& strRoutingNumber, const RECT& rectToSearch, IAFDocumentPtr ipAFDoc);
+		const string& strRoutingNumber, const RECT& rectToSearch);
 	//----------------------------------------------------------------------------------------------
 	// Gets/creates a regex parser for finding the other routing number
-	IRegularExprParserPtr getOtherRoutingNumberRegexParser(IAFDocumentPtr ipAFDoc);
+	IRegularExprParserPtr getOtherRoutingNumberRegexParser();
 	//----------------------------------------------------------------------------------------------
 	// Resets the settings for the MICR finder object to defaults
 	void resetSettings();

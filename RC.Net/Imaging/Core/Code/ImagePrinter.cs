@@ -7,6 +7,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -262,7 +263,8 @@ namespace Extract.Imaging
                         if (machineNameMatch.Success)
                         {
                             string machineName = machineNameMatch.Groups[2].Value;
-                            printerName = string.Format(@"\\{0}\{1}", machineName,
+                            printerName = string.Format(CultureInfo.InvariantCulture, 
+                                @"\\{0}\{1}", machineName,
                                 printerName.Substring(0, machineNameMatch.Index));
                         }
                     }

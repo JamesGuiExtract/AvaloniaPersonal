@@ -204,6 +204,11 @@ private:
 	// (though one is a long and the other is a char)
 	vector<CPPLetter> m_vecLetters;
 
+	// When m_eMode = kSpatialMode, a map from each page in the SpatialString to the index of the
+	// first letter in m_vecLetters on that page. If m_eMode != kSpatialMode, the contents of this
+	// map is undefined.
+	map<long, long> m_mapLetterIndex;
+
 	// the page info map and a method to access it that guarantees that the map
 	// object is never null (i.e. the method will initialize m_ipPageInfoMap to an empty map
 	// if m_ipPageInfoMap is NULL)
@@ -522,6 +527,17 @@ private:
 	//			start position.  If no letter is found then will return -1.  If a letter is
 	//			found then rLetter will contain the found letter.
 	long getNextOCRImageSpatialLetter(long nStart, CPPLetter& rLetter);
+	//----------------------------------------------------------------------------------------------
+	// PURPOSE: To return the next spatial letter from the spatial string on or after the specified
+	//			nStartPage. If no such letter is found then will return -1. If a letter is found
+	//			then rLetter will contain the found letter.
+	long getNextOCRImageSpatialLetterStartingOnPage(long nStartPage, CPPLetter& rLetter);
+	//----------------------------------------------------------------------------------------------
+	// PURPOSE: To return the next spatial letter from the spatial string on or after the specified
+	//			nStartPage but no after nLastPage. If no such letter is found then will return -1.
+	//			If a letter is found then rLetter will contain the found letter.
+	long getNextOCRImageSpatialLetterStartingOnPage(long nStartPage, long nLastPage,
+													CPPLetter& rLetter);
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE: To return an IUnknownVector of spatial strings containing the current spatial
 	//			string divided by words.

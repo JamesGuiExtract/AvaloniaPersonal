@@ -290,20 +290,16 @@ library UCLID_RASTERANDOCRMGMTLib
 	interface ISpatialPageInfo : IDispatch
 	{
 		[propget, id(1), helpstring("property Deskew")] HRESULT Deskew([out, retval] double *pVal);
-		[propput, id(1), helpstring("property Deskew")] HRESULT Deskew([in] double newVal);
-
 		[propget, id(2), helpstring("property Orientation")] HRESULT Orientation([out, retval] EOrientation *pVal);
-		[propput, id(2), helpstring("property Orientation")] HRESULT Orientation([in] EOrientation newVal);
-
 		[propget, id(3), helpstring("property Width")] HRESULT Width([out, retval] long *pVal);
-		[propput, id(3), helpstring("property Width")] HRESULT Width([in] long newVal);
-
 		[propget, id(4), helpstring("property Height")] HRESULT Height([out, retval] long *pVal);
-		[propput, id(4), helpstring("property Height")] HRESULT Height([in] long newVal);
 
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To set all the page info in a single call
-		[id(5), helpstring("method SetPageInfo")] HRESULT SetPageInfo(
+		// PURPOSE: To set initialize the page info.
+		// NOTE:	The ISpatialPageInfo class will for the most part behave as immutable. Any call
+		//			to Initialize will fail on an instance that has been read from disk or that has
+		//			already had Initialize called against it.
+		[id(5), helpstring("method Initialize")] HRESULT Initialize(
 			[in] long lWidth, [in] long lHeight, [in] EOrientation eOrientation, [in] double dDeskew);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To get both the width and height of the page in a single call

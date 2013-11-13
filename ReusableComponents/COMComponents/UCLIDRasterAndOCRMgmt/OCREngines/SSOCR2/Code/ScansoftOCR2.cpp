@@ -458,11 +458,8 @@ void CScansoftOCR2::validateLicense()
 	throw ue;
 }
 //-------------------------------------------------------------------------------------------------
-void CScansoftOCR2::updateOrientation(int nRotationInDegrees, IMG_ROTATE &rimgRotate, 
-									  ISpatialPageInfoPtr ipPageInfo)
+EOrientation CScansoftOCR2::getOrientation(int nRotationInDegrees, IMG_ROTATE &rimgRotate)
 {
-	ASSERT_ARGUMENT( "ELI16661", ipPageInfo != __nullptr);
-
 	// Update rimgRotate or retain the value from automatic decomposition
 	switch (nRotationInDegrees)
 	{
@@ -496,24 +493,20 @@ void CScansoftOCR2::updateOrientation(int nRotationInDegrees, IMG_ROTATE &rimgRo
 		}
 	}
 
-	// Update ipPageInfo
+	// Update return the EOrientation value corresponding to rimgRotate
 	switch (rimgRotate)
 	{
 	case ROT_NO:
-		ipPageInfo->Orientation = kRotNone;
-		break;
+		return kRotNone;
 
 	case ROT_RIGHT:
-		ipPageInfo->Orientation = kRotRight;
-		break;
+		return kRotRight;
 
 	case ROT_DOWN:
-		ipPageInfo->Orientation = kRotDown;
-		break;
+		return kRotDown;
 
 	case ROT_LEFT:
-		ipPageInfo->Orientation = kRotLeft;
-		break;
+		return kRotLeft;
 
 	default:
 		// Other orientations are not supported
@@ -1596,13 +1589,8 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 	THROW_UE_ON_ERROR("ELI12719", "Unable to detect image skew in the OCR engine!",
 			kRecDetectImgSkew(0, m_hPage, &slope, &imgRotate));
 
-	// Create SpatialPageInfo object to hold orientation and skew
-	ISpatialPageInfoPtr ipPageInfo(CLSID_SpatialPageInfo);
-	ASSERT_RESOURCE_ALLOCATION("ELI12722", ipPageInfo != __nullptr);
-
-	// Set orientation if image needs to be rotated
-	// Update orientation for SpatialPageInfo
-	updateOrientation( nRotationInDegrees, imgRotate, ipPageInfo );
+	// Get the orientation to use based on nRotationInDegrees.
+	EOrientation orientation = getOrientation(nRotationInDegrees, imgRotate);
 
 	// Define a new zone from pZone info
 	// NOTE: Handwriting recognition is handled after rotation and deskew
@@ -1650,8 +1638,6 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 	IMG_INFO info;
 	THROW_UE_ON_ERROR("ELI12724", "Unable to get image info in the OCR engine!",
 			kRecGetImgInfo(0, m_hPage, II_CURRENT, &info));
-	ipPageInfo->Width = info.Size.cx;
-	ipPageInfo->Height = info.Size.cy;
 
 	// calculate the deskew in degrees
 	double dDeskew = convertRadiansToDegrees(atan2((double) slope, 1000.0));
@@ -1668,10 +1654,13 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 		// no deskew will be applied
 		dDeskew = 0;
 	}
-		
-	// store the deskew applied
-	ipPageInfo->Deskew = dDeskew;
 
+	// Create a SpatialPageInfo object to hold the gathered page data.
+	ISpatialPageInfoPtr ipPageInfo(CLSID_SpatialPageInfo);
+	ASSERT_RESOURCE_ALLOCATION("ELI12722", ipPageInfo != __nullptr);
+
+	ipPageInfo->Initialize(info.Size.cx, info.Size.cy, orientation, dDeskew);
+		
 	// rotate the image
 	THROW_UE_ON_ERROR("ELI12723", "Unable to rotate image.",
 		kRecRotateImg(0, m_hPage, imgRotate));

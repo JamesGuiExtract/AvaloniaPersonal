@@ -344,15 +344,13 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Updates imgRotate if nRotationInDegrees != 0 and updates ipPageInfo with final
 	//			orientation value
-	// REQUIRE: ipPageInfo != __nullptr
-	//			nRotationInDegrees = 
+	// RETURNS: The EOrientation corresponding to the rotation to use.
 	//				  0 - retain automatic orientation from rimgRotate
 	//				 90 - update rimgRotate to ROT_RIGHT
 	//				180 - update rimgRotate to ROT_DOWN
 	//				270 - update rimgRotate to ROT_LEFT
 	//				360 - update rimgRotate to ROT_NONE
-	void updateOrientation(int nRotationInDegrees, IMG_ROTATE &rimgRotate, 
-		ISpatialPageInfoPtr ipPageInfo);
+	EOrientation getOrientation(int nRotationInDegrees, IMG_ROTATE &rimgRotate);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns whether RecAPI is able to apply the given deskew to the image with the 
 	//			specified image info.

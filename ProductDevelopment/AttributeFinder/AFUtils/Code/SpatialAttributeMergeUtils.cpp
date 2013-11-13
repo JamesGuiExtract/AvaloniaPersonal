@@ -1567,16 +1567,15 @@ ISpatialStringPtr CSpatialAttributeMergeUtils::createMergedValue(string strText,
 	{
 		// We want to modify the existing page's PageInfo for the attribute, but we don't want
 		// to affect the existing page, so obtain a copy.
-		ICopyableObjectPtr ipCloneThis = m_ipDocText->GetPageInfo(nPage);
-		ASSERT_RESOURCE_ALLOCATION("ELI25268", ipCloneThis != __nullptr);
+		ISpatialPageInfoPtr ipPageInfo = m_ipDocText->GetPageInfo(nPage);
+		ASSERT_RESOURCE_ALLOCATION("ELI36299", ipPageInfo != __nullptr);
 
-		ISpatialPageInfoPtr ipPageInfoClone = ipCloneThis->Clone();
+		ISpatialPageInfoPtr ipPageInfoClone(CLSID_SpatialPageInfo);
 		ASSERT_RESOURCE_ALLOCATION("ELI25269", ipPageInfoClone != __nullptr);
 		
 		// Remove any skew and orientation since the retrieved bounding rectangles will be in terms
 		// of literal page coordinates.
-		ipPageInfoClone->Deskew = 0;
-		ipPageInfoClone->Orientation = kRotNone;
+		ipPageInfoClone->Initialize(ipPageInfo->Width, ipPageInfo->Height, kRotNone, 0);
 
 		m_mapSpatialInfos[nPage] = ipPageInfoClone;
 	}

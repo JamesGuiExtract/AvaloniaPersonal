@@ -3337,7 +3337,7 @@ namespace Extract.DataEntry
                                 // hybrid string.
                                 var spatialPageInfos = new LongToObjectMap();
                                 var spatialPageInfo = new SpatialPageInfo();
-                                spatialPageInfo.SetPageInfo(_imageViewer.ImageWidth, _imageViewer.ImageHeight, 0, 0);
+                                spatialPageInfo.Initialize(_imageViewer.ImageWidth, _imageViewer.ImageHeight, 0, 0);
                                 spatialPageInfos.Set(_imageViewer.PageNumber, spatialPageInfo);
 
                                 // Create the hyrid result using the spatial data from the swipe

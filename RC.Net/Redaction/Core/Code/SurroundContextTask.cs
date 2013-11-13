@@ -324,7 +324,7 @@ namespace Extract.Redaction
             pageInfo.GetWidthAndHeight(out width, out height);
 
             SpatialPageInfo newPageInfo = new SpatialPageInfo();
-            newPageInfo.SetPageInfo(width, height, EOrientation.kRotNone, 0);
+            newPageInfo.Initialize(width, height, EOrientation.kRotNone, 0);
 
             return newPageInfo;
         }

@@ -86,10 +86,10 @@ private:
 	// Provides collections of person and company keywords
 	IEntityKeywordsPtr	m_ipKeys;
 
-	IAFUtilityPtr m_ipAFUtility;
+	IMiscUtilsPtr m_ipMisc;
 
 	// Gets a new instance of the regular expression parser
-	IRegularExprParserPtr getParser(IAFDocumentPtr ipAFDoc);
+	IRegularExprParserPtr getParser();
 
 	// ensure that this component is licensed
 	void validateLicense();

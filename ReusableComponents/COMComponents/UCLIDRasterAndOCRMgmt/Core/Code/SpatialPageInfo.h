@@ -37,17 +37,10 @@ END_COM_MAP()
 // ISpatialPageInfo
 public:
 	STDMETHOD(get_Deskew)(double *pVal);
-	STDMETHOD(put_Deskew)(double newVal);
-
 	STDMETHOD(get_Orientation)(EOrientation *pVal);
-	STDMETHOD(put_Orientation)(EOrientation newVal);
-
 	STDMETHOD(get_Width)(long *pVal);
-	STDMETHOD(put_Width)(long newVal);
-
 	STDMETHOD(get_Height)(long *pVal);
-	STDMETHOD(put_Height)(long newVal);
-	STDMETHOD(SetPageInfo)(long lWidth, long lHeight, EOrientation eOrientation, double dDeskew);
+	STDMETHOD(Initialize)(long lWidth, long lHeight, EOrientation eOrientation, double dDeskew);
 	STDMETHOD(GetWidthAndHeight)(long* plWidth, long* plHeight);
 	STDMETHOD(GetPageInfo)(long* plWidth, long* plHeight,
 		EOrientation* peOrientation, double* pdDeskew);
@@ -71,6 +64,10 @@ private:
 
 	long m_nWidth;
 	long m_nHeight;
+
+	// Indicates whether this instance's data has been initialized. Once initialized, an instance
+	// should be considered immutable and will thrown an exception if Initialize is called again.
+	bool m_bInitialized;
 
 	bool m_bDirty;
 };

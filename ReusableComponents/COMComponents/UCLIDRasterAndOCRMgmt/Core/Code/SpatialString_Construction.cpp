@@ -196,6 +196,10 @@ STDMETHODIMP CSpatialString::CreatePseudoSpatialString(IRasterZone *pZone, BSTR 
 		// Set the page info map
 		// NOTE: This must be set before the call to getPageBounds.
 		m_ipPageInfoMap = pPageInfoMap;
+		
+		// After being assigned to a SpatialString, the page info map must not be modifed, otherwise
+		// it may affect other SpatialStrings that share these page infos.
+		m_ipPageInfoMap->SetReadonly();
 
 		// Get the page bounds (for use by GetRectangularBounds)
 		ILongRectanglePtr ipPageBounds = getPageBounds(ipZone->PageNumber, true);
@@ -368,6 +372,10 @@ STDMETHODIMP CSpatialString::CreateFromLetterArray(long nNumLetters, void* pLett
 
 		// Copy the page info map
 		m_ipPageInfoMap = pPageInfoMap;
+
+		// After being assigned to a SpatialString, the page info map must not be modifed, otherwise
+		// it may affect other SpatialStrings that share these page infos.
+		m_ipPageInfoMap->SetReadonly();
 		
 		// compute the string from the letters, and 
 		// downgrade to non-spatial string if necessary.

@@ -29,8 +29,8 @@ CRemoveCharacters::CRemoveCharacters()
 {
 	try
 	{
-		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI36199", m_ipAFUtility != __nullptr );
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI13056", m_ipMiscUtils != __nullptr );
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06656")
 }
@@ -39,7 +39,7 @@ CRemoveCharacters::~CRemoveCharacters()
 {
 	try
 	{
-		m_ipAFUtility = __nullptr;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16363");
 }
@@ -91,11 +91,9 @@ STDMETHODIMP CRemoveCharacters::raw_ModifyValue(IAttribute* pAttribute, IAFDocum
 		string strCharacters = translateToRegExString(m_strCharactersDefined);
 		string strPattern = "[" + strCharacters + "]+";
 
-		IAFDocumentPtr ipInputDoc(pOriginInput);
-		ASSERT_RESOURCE_ALLOCATION("ELI36198", ipInputDoc);
-
 		// Get a regular expression parser
-		IRegularExprParserPtr ipParser = m_ipAFUtility->GetNewRegExpParser(ipInputDoc);
+		IRegularExprParserPtr ipParser =
+			m_ipMiscUtils->GetNewRegExpParserInstance("RemoveCharacters");
 		ASSERT_RESOURCE_ALLOCATION("ELI06655", ipParser != __nullptr);
 
 		if (m_bRemoveAll)

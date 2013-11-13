@@ -330,9 +330,11 @@ STDMETHODIMP CFindFromRSD::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 		// make a copy of the AFDocument for the doc to run on
 		IAFDocumentPtr ipAFDoc(pAFDoc);
 		ASSERT_RESOURCE_ALLOCATION("ELI10921", ipAFDoc != __nullptr);
-		ICopyableObjectPtr ipCopyObj = ipAFDoc;
-		ASSERT_RESOURCE_ALLOCATION("ELI10922", ipCopyObj != __nullptr);
-		IAFDocumentPtr ipDocCopy = ipCopyObj->Clone();
+
+		// There is no need to clone the AFDoc attribute hierarchy which can only ever be modified
+		// if InputFinder is used and InputFinder will return a clone of the attributes, not the
+		// attributes themselves.
+		IAFDocumentPtr ipDocCopy = ipAFDoc->PartialClone(VARIANT_FALSE, VARIANT_TRUE);
 		ASSERT_RESOURCE_ALLOCATION("ELI10923", ipDocCopy != __nullptr);
 
 		IVariantVectorPtr ipAttributeNames(CLSID_VariantVector);

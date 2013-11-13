@@ -354,7 +354,7 @@ void CSpatialString::updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMap
 {
     try
     {
-        if (ipPageInfoMap == __nullptr)
+        if (ipPageInfoMap == __nullptr || m_ipPageInfoMap == ipPageInfoMap)
         {
             // Nothing to add, just return
             return;
@@ -364,6 +364,10 @@ void CSpatialString::updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMap
         if (m_ipPageInfoMap == __nullptr)
         {
             m_ipPageInfoMap = ipPageInfoMap;
+
+			// After being assigned to a SpatialString, the page info map must not be modifed, otherwise
+			// it may affect other SpatialStrings that share these page infos.
+			m_ipPageInfoMap->SetReadonly();
         }
         // Else - merge the info maps (validating compatible pages)
         else
@@ -372,6 +376,14 @@ void CSpatialString::updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMap
             // keys one at a time and add any that the target is missing. [P13 #4728]
             IVariantVectorPtr ipKeys( ipPageInfoMap->GetKeys() );
             ASSERT_RESOURCE_ALLOCATION("ELI25807", ipKeys != __nullptr);
+
+			// m_ipPageInfoMap will be read-only. Need to create a new copy to make it readable.
+			// Shallow copy because the PageInfo instances themselves are immutable and don't need
+			// to be cloned.
+			IShallowCopyablePtr ipCopyThis(m_ipPageInfoMap);
+			ASSERT_RESOURCE_ALLOCATION("ELI36300", ipCopyThis != __nullptr);
+			ILongToObjectMapPtr ipMergedPageInfos = ipCopyThis->ShallowCopy();
+			ASSERT_RESOURCE_ALLOCATION("ELI36301", ipMergedPageInfos != __nullptr);
 
             // iterate through each of source's keys
             long lSize = ipKeys->Size;
@@ -385,15 +397,15 @@ void CSpatialString::updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMap
                 ASSERT_RESOURCE_ALLOCATION("ELI25808", ipSourceInfo != __nullptr);
 
                 // if the target doesn't have this key, add it
-                if(m_ipPageInfoMap->Contains(lKey) == VARIANT_FALSE)
+                if(ipMergedPageInfos->Contains(lKey) == VARIANT_FALSE)
                 {
-                    m_ipPageInfoMap->Set(lKey, ipSourceInfo);
+                    ipMergedPageInfos->Set(lKey, ipSourceInfo);
                 }
                 // else the target has the key so need to validate that the infos are compatible
                 else
                 {
                     UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipCurrentInfo =
-                        m_ipPageInfoMap->GetValue(lKey);
+                        ipMergedPageInfos->GetValue(lKey);
                     ASSERT_RESOURCE_ALLOCATION("ELI25809", ipCurrentInfo != __nullptr);
 
                     // Check that the spatial page infos are compatible
@@ -432,6 +444,12 @@ void CSpatialString::updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMap
                     }
                 }
             }
+
+			m_ipPageInfoMap = ipMergedPageInfos;
+
+			// After being assigned to a SpatialString, the page info map must not be modifed, otherwise
+			// it may affect other SpatialStrings that share these page infos.
+			m_ipPageInfoMap->SetReadonly();
         }
     }
     CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25811");
@@ -483,38 +501,7 @@ bool CSpatialString::isMultiPage()
             break;
             case kSpatialMode:
             {
-                // iterate through each of the letters and check to see if 
-                // there exists two spatial letter objects on different pages
-                long nCurrPage = -1;
-                long nNumLetters = m_vecLetters.size();
-                for (int i = 0; i < nNumLetters; i++)
-                {
-                    // get the letter object at this position
-                    CPPLetter& letter = m_vecLetters[i];
-
-                    if (letter.m_bIsSpatial)
-                    {
-                        // if we found the first spatial character, then
-                        // remember its page number
-                        if (nCurrPage < 0)
-                        {
-                            nCurrPage = letter.m_usPageNumber;
-                        }
-                        else
-                        {
-                            // this is a subsequent spatial character
-                            // we have come across.  If it is on the same
-                            // page as all previous spatial chars, then 
-                            // just keep searching.  If it is on a different
-                            // page, then immediately return true.
-                            if (letter.m_usPageNumber != nCurrPage)
-                            {
-                                bReturn = true;
-                                break;
-                            }
-                        }
-                    }
-                }
+                return m_mapLetterIndex.size() > 1;
             }
             break;
 
@@ -1087,10 +1074,7 @@ void CSpatialString::loadTextWithPositionalData(const string& strFileName)
 	// high.
 	UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo(CLSID_SpatialPageInfo);
 	ASSERT_RESOURCE_ALLOCATION("ELI31685", ipPageInfo != __nullptr);
-	ipPageInfo->Width = length;
-	ipPageInfo->Height = 1;
-	ipPageInfo->Deskew = 0.0;
-	ipPageInfo->Orientation = UCLID_RASTERANDOCRMGMTLib::kRotNone;
+	ipPageInfo->Initialize(length, 1, UCLID_RASTERANDOCRMGMTLib::kRotNone, 0.0);
 
 	// Create a spatial page info map
 	ILongToObjectMapPtr ipPageInfoMap(CLSID_LongToObjectMap);
@@ -1217,6 +1201,7 @@ void CSpatialString::reset(bool bResetSourceDocName, bool bResetPageInfoMap)
         m_strOCREngineVersion = "";
 
         m_vecRasterZones.clear();
+		m_mapLetterIndex.clear();
 
         // Clear the spatial page info map
         if( m_ipPageInfoMap != __nullptr && bResetPageInfoMap)
@@ -1247,6 +1232,8 @@ void CSpatialString::processLetters(CPPLetter* letters, long nNumLetters)
 
 	m_strString.reserve(nNumLetters);
 
+	long nCurrPage = -1;
+
     // iterate through each letter to determine
     // the state of the String and IsSpatial attributes
     for (long i = 0; i < nNumLetters; i++)
@@ -1265,6 +1252,13 @@ void CSpatialString::processLetters(CPPLetter* letters, long nNumLetters)
         if (letter.m_bIsSpatial)
         {
             m_eMode = kSpatialMode;
+
+			long nPage = (long)letter.m_usPageNumber;
+			if (nPage != nCurrPage)
+			{
+				m_mapLetterIndex[nPage] = i;
+				nCurrPage = nPage;
+			}
         }
     }
 
@@ -2271,6 +2265,7 @@ void CSpatialString::downgradeToHybrid()
 
             // Clear the Letters vector
             m_vecLetters.clear();
+			m_mapLetterIndex.clear();
 
             // Set the new mode
             m_eMode = kHybridMode;
@@ -2297,6 +2292,7 @@ void CSpatialString::downgradeToNonSpatial()
         // No matter what mode this object is in, clear the spatial 
         // information and set it to non-spatial mode
         m_vecLetters.clear();
+		m_mapLetterIndex.clear();
 
         m_vecRasterZones.clear();
 
@@ -2354,17 +2350,14 @@ long CSpatialString::getFirstPageNumber()
         }
         else if( m_eMode == kSpatialMode )
         {
-            CPPLetter letter;
-            long nIndex = getNextOCRImageSpatialLetter(0, letter);
-
             // We know this is a spatial string so nIndex should be valid
             // because there must be at least one spatial character
-            if (nIndex < 0 || (unsigned long) nIndex >= m_vecLetters.size())
+            if (m_mapLetterIndex.size() == 0)
             {
                 THROW_LOGIC_ERROR_EXCEPTION("ELI10468");
             }
 
-            nFirstPage = letter.m_usPageNumber;
+            nFirstPage = m_mapLetterIndex.begin()->first;
         }
         else
         {
@@ -2410,14 +2403,14 @@ long CSpatialString::getLastPageNumber()
         }
         else if ( m_eMode == kSpatialMode )
         {
-            for (long i = m_vecLetters.size() - 1; i >= 0; i--)
+            // We know this is a spatial string so nIndex should be valid
+            // because there must be at least one spatial character
+            if (m_mapLetterIndex.size() == 0)
             {
-                if (m_vecLetters[i].m_bIsSpatial)
-                {
-                    nLastPage = m_vecLetters[i].m_usPageNumber;
-                    break;
-                }
+                THROW_LOGIC_ERROR_EXCEPTION("ELI36302");
             }
+
+            nLastPage = m_mapLetterIndex.crbegin()->first;
         }
         else
         {
@@ -2429,6 +2422,39 @@ long CSpatialString::getLastPageNumber()
         return nLastPage;
     }
     CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25827");
+}
+//-------------------------------------------------------------------------------------------------
+long CSpatialString::getNextOCRImageSpatialLetterStartingOnPage(long nStartPage, CPPLetter& rLetter)
+{
+	return getNextOCRImageSpatialLetterStartingOnPage(nStartPage, -1, rLetter);
+}
+//-------------------------------------------------------------------------------------------------
+long CSpatialString::getNextOCRImageSpatialLetterStartingOnPage(long nStartPage, long nLastPage,
+															    CPPLetter& rLetter)
+{
+	if (nLastPage == -1)
+	{
+		nLastPage = getLastPageNumber();
+	}
+
+	for (long nPage = nStartPage; nPage <= nLastPage; nPage++)
+	{
+		map<long, long>::iterator iter = m_mapLetterIndex.find(nPage);
+		if (iter != m_mapLetterIndex.end())
+		{
+			int nIndex = iter->second;
+			rLetter = m_vecLetters[nIndex];
+
+			if (!rLetter.m_bIsSpatial)
+			{
+				THROW_LOGIC_ERROR_EXCEPTION("ELI36303");
+			}
+
+			return nIndex;
+		}
+	}
+
+	return -1;
 }
 //-------------------------------------------------------------------------------------------------
 long CSpatialString::getNextOCRImageSpatialLetter(long nStart, CPPLetter& rLetter)
@@ -3046,19 +3072,23 @@ void CSpatialString::remove(long nStart, long nEnd)
 
             // Get the first spatial letter in the string. If the letter is before the start of the remove
             // operation OR after the end of the remove operation, then the string will remain spatial. 
+			// Track which pages letters are deleted from so m_mapLetterIndex can be updated.
             CPPLetter letter;
             long nPos = getNextOCRImageSpatialLetter(0, letter);
+			long nFirstPage = (long)letter.m_usPageNumber;
+			long nLastPos = getNextOCRImageSpatialLetter(nEnd, letter);
+			long nLastPage = (long)letter.m_usPageNumber;
+			bool bRemainsSpatial = true;
+			bool bIndexRemoved = false;
 
             if( nPos >= nStart && nPos <= nEnd )
             {
                 // However, if the first spatial letter is within the remove area, check to see if there
                 // is a spatial letter after the remove area. If there is NOT, then we need to get the raster
                 // zones from this object and change it to a hybrid string.
-                nPos = getNextOCRImageSpatialLetter(nEnd, letter);
-
-                // If there is not at least 1 spatial letter present after the removal spot
-                if( nPos == -1 )
+                if(nLastPos == -1)
                 {
+					bRemainsSpatial = false;
                     downgradeToHybrid();
                 }
                 else
@@ -3076,9 +3106,51 @@ void CSpatialString::remove(long nStart, long nEnd)
                 m_vecLetters.erase(m_vecLetters.begin() + nStart, m_vecLetters.begin() + nEnd + 1);
             }
 
+			if (bRemainsSpatial)
+			{
+				if (nFirstPage != -1)
+				{
+					// Remove any indicies from m_mapLetterIndex that reference removed characters
+					for (long nPage = nFirstPage; nLastPage == -1 || nPage <= nLastPage; nPage++)
+					{
+						long nIndex = m_mapLetterIndex[nPage];
+						if (nIndex >= nStart && nIndex <= nEnd)
+						{
+							m_mapLetterIndex.erase(nPage);
+							bIndexRemoved = true;
+						}
+					}
+
+					// Adjust any subsequent indicies to account for the removed characters.
+					for (map<long, long>::iterator iter = m_mapLetterIndex.begin();
+						 iter != m_mapLetterIndex.end(); iter++)
+					{
+						if (iter->second >= nStart)
+						{
+							iter->second = iter->second - (nEnd - nStart + 1);
+						}
+					}
+				}
+			}
+
             // Remove the letters from the string. This must be done AFTER the calls to GetNextSpatialLetter()
             // to prevent an exception from mismatched string / vector length.
             m_strString.erase(nStart, nEnd - nStart + 1);
+
+			// If any indicies were removed, set the index for the first page after the
+			// letters that were removed.
+			// NOTE: This must be done following m_strString.erase so that the lengths of
+			// m_strString and m_vecLetters match; otherwise getNextOCRImageSpatialLetter will
+			// throw and exception.
+			if (bIndexRemoved && nStart < (long)m_vecLetters.size())
+			{
+				long nIndex = getNextOCRImageSpatialLetter(nStart, letter);
+				if (nIndex != -1)
+				{
+					long nPage = (long)letter.m_usPageNumber;
+					m_mapLetterIndex[nPage] = nIndex;
+				}
+			}
 
             // because we modified the spatial string, we need to check
             // if the string is still spatial
@@ -3317,16 +3389,8 @@ void CSpatialString::copyFromSpatialString(UCLID_RASTERANDOCRMGMTLib::ISpatialSt
             CPPLetter* letters = NULL;
             long nNumLetters = 0;
             ipSource->GetOCRImageLetterArray(&nNumLetters, (void**)&letters);
-            m_vecLetters.resize(nNumLetters);
             
-            if(nNumLetters > 0)
-            {
-				// Since the m_vecLetters was just resized to nNumLetters the copy size 
-				// is the same
-				long lCopySize = sizeof(CPPLetter) * nNumLetters;
-
-				memcpy_s(&(m_vecLetters[0]), lCopySize, letters, lCopySize);
-            }
+			updateLetters(letters, nNumLetters);
         }
         // If the object is hybrid, get the raster zone(s)
         else if( eSourceMode == kHybridMode )
@@ -3363,14 +3427,9 @@ void CSpatialString::copyFromSpatialString(UCLID_RASTERANDOCRMGMTLib::ISpatialSt
         // copy the spatial page info map
         if (eSourceMode != kNonSpatialMode)
         {
-			// Experimental
+			// The SpatialPageInfo class can be treated as immutable. No need to clone; just make a
+			// shallow copy.
             m_ipPageInfoMap = ipSource->SpatialPageInfos;
-
-//			ICopyableObjectPtr ipCopyObj = ipSource->SpatialPageInfos;
-//            ASSERT_RESOURCE_ALLOCATION("ELI25777", ipCopyObj != __nullptr);
-//
-//            m_ipPageInfoMap = ipCopyObj->Clone();
-//            ASSERT_RESOURCE_ALLOCATION("ELI25778", m_ipPageInfoMap != __nullptr);
         }
 
         // Downgrade the spatial mode if needed
@@ -3429,14 +3488,14 @@ void CSpatialString::autoConvertLegacyHybridString()
             // Get the image dimensions and set the page info
             int nWidth(0), nHeight(0);
             getImagePixelHeightAndWidth(m_strSourceDocName, nHeight, nWidth, *it);
-            ipInfo->SetPageInfo(nWidth, nHeight,
+            ipInfo->Initialize(nWidth, nHeight,
                 (UCLID_RASTERANDOCRMGMTLib::EOrientation) kRotNone, 0.0);
 
             // Update both the new info map and the original info map
             // (Need to update both maps for this case since the page info is not
             // contained in the original map either)
             ipPageInfoMap->Set(*it, ipInfo);
-            m_ipPageInfoMap->Set(*it, ipInfo);
+			getThisAsCOMPtr()->SetPageInfo(*it, ipInfo);
         }
     }
     else
@@ -3448,8 +3507,13 @@ void CSpatialString::autoConvertLegacyHybridString()
                 m_ipPageInfoMap->GetValue(ipKeys->GetItem(i));
             ASSERT_RESOURCE_ALLOCATION("ELI29756", ipPageInfo != __nullptr);
 
-            ipPageInfo->Deskew = 0;
-            ipPageInfo->Orientation = (UCLID_RASTERANDOCRMGMTLib::EOrientation)0;
+			UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipNewPageInfo(CLSID_SpatialPageInfo);
+			ASSERT_RESOURCE_ALLOCATION("ELI36292", ipNewPageInfo != __nullptr);
+
+			// Assign a new spatial page info without orientation or deskew.
+			ipNewPageInfo->Initialize(ipPageInfo->Width, ipPageInfo->Height,
+				(UCLID_RASTERANDOCRMGMTLib::EOrientation)0, 0);
+			getThisAsCOMPtr()->SetPageInfo(ipKeys->GetItem(i), ipNewPageInfo);
         }
     }
 

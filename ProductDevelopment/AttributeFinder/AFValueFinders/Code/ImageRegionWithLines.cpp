@@ -920,10 +920,9 @@ IAttributePtr CImageRegionWithLines::createSpatialAttribute(ILongRectanglePtr ip
 
 	// We want to modify the existing page's PageInfo for the attribute, but we don't want
 	// to affect the existing page, so obtain a copy.
-	ICopyableObjectPtr ipCloneThis = ipDocText->GetPageInfo(nPageNum);
-	ASSERT_RESOURCE_ALLOCATION("ELI25257", ipCloneThis != __nullptr);
+	ISpatialPageInfoPtr ipPageInfo = ipDocText->GetPageInfo(nPageNum);
 
-	ISpatialPageInfoPtr ipPageInfoClone = ipCloneThis->Clone();
+	ISpatialPageInfoPtr ipPageInfoClone(CLSID_SpatialPageInfo);
 	ASSERT_RESOURCE_ALLOCATION("ELI25258", ipPageInfoClone != __nullptr);
 	
 	// [FlexIDSCore:3185]
@@ -931,7 +930,7 @@ IAttributePtr CImageRegionWithLines::createSpatialAttribute(ILongRectanglePtr ip
 	// not rotated coordinates.  Therefore use no rotation to ensure the attribute appears in the 
 	// correct location.  Do not touch the deskew value since we already accounted for skew by passing
 	// the deskew value into the FindLines call.
-	ipPageInfoClone->Orientation = kRotNone;
+	ipPageInfoClone->Initialize(ipPageInfo->Width, ipPageInfo->Height, kRotNone, ipPageInfo->Deskew);
 
 	// create a spatial page info map for the new spatial string
 	ILongToObjectMapPtr ipPageInfoMap(CLSID_LongToObjectMap);

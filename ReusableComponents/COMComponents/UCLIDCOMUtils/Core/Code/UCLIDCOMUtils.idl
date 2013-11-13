@@ -1150,6 +1150,7 @@ library UCLID_COMUTILSLib
 			[out] long *pstrKey, [out] IUnknown* *pObject);
 		[id(9), helpstring("method RenameKey")] HRESULT RenameKey([in] long strKey, 
 			[in] long strNewKeyName);
+		[id(10), helpstring("method SetReadonly")] HRESULT SetReadonly();
 	};
 	[
 		object,

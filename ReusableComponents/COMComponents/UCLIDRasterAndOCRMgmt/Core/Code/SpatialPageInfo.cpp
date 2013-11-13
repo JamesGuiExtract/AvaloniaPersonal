@@ -15,6 +15,7 @@ const unsigned long gnCurrentVersion = 1;
 // CSpatialPageInfo
 //-------------------------------------------------------------------------------------------------
 CSpatialPageInfo::CSpatialPageInfo()
+: m_bInitialized(false)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -62,19 +63,6 @@ STDMETHODIMP CSpatialPageInfo::get_Deskew(double *pVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25745");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSpatialPageInfo::put_Deskew(double newVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-	try
-	{
-		m_fDeskew = newVal;
-		m_bDirty = true;
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25746");
-}
-//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialPageInfo::get_Orientation(EOrientation *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -87,19 +75,6 @@ STDMETHODIMP CSpatialPageInfo::get_Orientation(EOrientation *pVal)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25748");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSpatialPageInfo::put_Orientation(EOrientation newVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-	try
-	{
-		m_eOrientation = (UCLID_RASTERANDOCRMGMTLib::EOrientation) newVal;
-		m_bDirty = true;
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25749");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialPageInfo::get_Width(long *pVal)
@@ -116,19 +91,6 @@ STDMETHODIMP CSpatialPageInfo::get_Width(long *pVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25751");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSpatialPageInfo::put_Width(long newVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-	try
-	{
-		m_nWidth = newVal;
-		m_bDirty = true;
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25752");
-}
-//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialPageInfo::get_Height(long *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -143,31 +105,26 @@ STDMETHODIMP CSpatialPageInfo::get_Height(long *pVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25754");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSpatialPageInfo::put_Height(long newVal)
+STDMETHODIMP CSpatialPageInfo::Initialize(long lWidth, long lHeight,
+										  EOrientation eOrientation, double dDeskew)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		m_nHeight = newVal;
-		m_bDirty = true;
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25755");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSpatialPageInfo::SetPageInfo(long lWidth, long lHeight,
-										   EOrientation eOrientation, double dDeskew)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+		if (m_bInitialized)
+		{
+			throw UCLIDException("ELI36287",
+				"SpatialPageInfos are immutable and cannot be modified.");
+		}
 
-	try
-	{
 		// Set the values
 		m_nWidth = lWidth;
 		m_nHeight = lHeight;
 		m_eOrientation = (UCLID_RASTERANDOCRMGMTLib::EOrientation)eOrientation;
 		m_fDeskew = dDeskew;
+
+		m_bInitialized = true;
 
 		// Set the dirty flag
 		m_bDirty = true;
@@ -310,8 +267,16 @@ STDMETHODIMP CSpatialPageInfo::raw_CopyFrom(IUnknown * pObject)
 		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipSource = pObject;
 		ASSERT_RESOURCE_ALLOCATION("ELI09148", ipSource != __nullptr);
 
+		if (m_bInitialized)
+		{
+			throw UCLIDException("ELI36291",
+				"SpatialPageInfos are immutable and cannot be modified.");
+		}
+
 		// Get the values from the source object
 		ipSource->GetPageInfo(&m_nWidth, &m_nHeight, &m_eOrientation, &m_fDeskew);
+
+		m_bInitialized = true;
 
 		m_bDirty = true;
 	}
@@ -400,6 +365,8 @@ STDMETHODIMP CSpatialPageInfo::Load(IStream *pStream)
 			ue.addDebugInfo( "Version to Load", nDataVersion );
 			throw ue;
 		}
+
+		m_bInitialized = true;
 
 		// clear the dirty flag as we just loaded a fresh object
 		m_bDirty = false;

@@ -251,6 +251,12 @@ STDMETHODIMP CSpatialString::UpdatePageNumber(long nPageNumber)
 				{
 					m_vecLetters[i].m_usPageNumber = (unsigned short) nPageNumber;
 				}
+
+				m_mapLetterIndex.clear();
+				if (nNumLetters > 0)
+				{
+					m_mapLetterIndex[nPageNumber] = 0;
+				}
 			}
 			break;
 			case kHybridMode:
@@ -291,7 +297,20 @@ STDMETHODIMP CSpatialString::UpdatePageNumber(long nPageNumber)
 			// If the keys do not match, set the current page number to the new page number
 			if( nCurrentPageNumber != nPageNumber )
 			{
+				// m_ipPageInfoMap will be read-only. Need to create a new copy to make it writable.
+				// Shallow copy because the PageInfo instances themselves are immutable and don't
+				// need to be cloned.
+				IShallowCopyablePtr ipSourcePageInfoMap(getPageInfoMap());
+				ASSERT_RESOURCE_ALLOCATION("ELI36304", ipSourcePageInfoMap != __nullptr);
+		
+				m_ipPageInfoMap = ipSourcePageInfoMap->ShallowCopy();
+				ASSERT_RESOURCE_ALLOCATION("ELI36305", m_ipPageInfoMap != __nullptr);
+		 
 				m_ipPageInfoMap->RenameKey( nCurrentPageNumber, nPageNumber );
+
+				// After being assigned to a SpatialString, the page info map must not be modifed, otherwise
+				// it may affect other SpatialStrings that share these page infos.
+				m_ipPageInfoMap->SetReadonly();
 			}
 		}
 
