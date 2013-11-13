@@ -47,3 +47,104 @@
 // Include the type in the new value
 <TESTCASE>;Test16.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test16.eav
 
+/////////////////////////////
+// BACKREFERENCING TEST CASES
+/////////////////////////////
+
+// Second and third SSNs, separated by comma
+<TESTCASE>;TestBF1.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF1.eav
+
+// Second thru end SSNs, separated by comma
+<TESTCASE>;TestBF2.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF2.eav
+
+// Last three SSNs, separated by comma
+<TESTCASE>;TestBF3.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF3.eav
+
+// First SSN, trailing comma (?)
+<TESTCASE>;TestBF4.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF4.eav
+
+// Last SSNs, trailing comma (?)
+<TESTCASE>;TestBF5.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF5.eav
+
+// Second and Fourth SSNs, separated by comma
+<TESTCASE>;TestBF6.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF6.eav
+
+// First, Third, Fifth SSNs, separated by comma
+<TESTCASE>;TestBF7.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF7.eav
+
+// All SSNs, separated by comma
+<TESTCASE>;TestBF8.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF8.eav
+
+// All unique SSNs, separated by comma
+<TESTCASE>;TestBF9.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF9.eav
+
+// All unique SSNs, separated by comma
+<TESTCASE>;TestBF10.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF10.eav
+
+// SSN but no further specification, defaults to first
+<TESTCASE>;TestBF11.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF11.eav
+
+// All SSNs, no separation
+<TESTCASE>;TestBF12.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF12.eav
+
+// Type of first MCData item
+<TESTCASE>;TestBF13.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF13.eav
+
+// Types of all MCData items, separated by comma
+<TESTCASE>;TestBF14.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF14.eav
+
+// Unique Types of all MCData items, separated by comma
+<TESTCASE>;TestBF15.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF15.eav
+
+// Types of all MCData items, separated by comma
+<TESTCASE>;TestBF16.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF16.eav
+
+// First digit (sub-attribute) of first attribute of type SSN
+<TESTCASE>;TestBF17.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF17.eav
+
+// First digit (sub-attribute) of all attributes of type SSN
+<TESTCASE>;TestBF18.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF18.eav
+
+// First digit (sub-attribute) of all attributes of type SSN, pipe separated
+<TESTCASE>;TestBF19.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF19.eav
+
+// All digit (sub-attributes) of unique attributes of type SSN, pipe separated
+<TESTCASE>;TestBF20.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF20.eav
+
+// Unique digit (sub-attributes) of all attributes of type SSN, pipe separated
+<TESTCASE>;TestBF21.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF21.eav
+
+// Unique digit values of all attributes of type SSN, pipe separated
+<TESTCASE>;TestBF22.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF22.eav
+
+// Unique digit types of all attributes of type SSN, pipe separated
+<TESTCASE>;TestBF23.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF23.eav
+
+// All digit values of all unique attributes of type SSN, pipe separated
+<TESTCASE>;TestBF24.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF24.eav
+
+// Special formatting around first digit of first attribute of type SSN
+<TESTCASE>;TestBF25.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF25.eav
+
+// Special formatting around first digit of unique attributes of type SSN, pipe separated
+<TESTCASE>;TestBF26.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF26.eav
+
+// Special formatting around all digits of unique attributes of type SSN, pipe separated
+<TESTCASE>;TestBF27.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF27.eav
+
+// Special formatting around and between all digits of unique attributes of type 
+// SSN, pipe separated
+<TESTCASE>;TestBF28.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF28.eav
+
+// First 15 digits of all concatenated attributes of type SSN
+<TESTCASE>;TestBF29.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF29.eav
+
+// First 15 digits of attribute of type SSN with .? separations between digits
+<TESTCASE>;TestBF30.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF30.eav
+
+// First 15 characters of attribute of type SSN with .? separations between digits 
+// where pipe separator is inserted after 10 characters
+<TESTCASE>;TestBF31.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF31.eav
+
+// Both HCData attributes with % chars between attributes and : chars between digits
+<TESTCASE>;TestBF32.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF32.eav
