@@ -62,3 +62,6 @@
 
 //test20 Multiple captured subexpression replacements. [FlexIDSCore #3114]
 <TESTCASE>;Test20.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test20.eav
+
+// Attribute Referencing test case
+<TESTCASE>;TestBF1.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF1.eav
