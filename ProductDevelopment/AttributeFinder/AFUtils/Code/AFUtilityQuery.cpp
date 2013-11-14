@@ -690,6 +690,61 @@ IIUnknownVectorPtr CAFUtility::getCandidateAttributes(const IIUnknownVectorPtr& 
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26425");
 }
 //-------------------------------------------------------------------------------------------------
+IIUnknownVectorPtr CAFUtility::getCandidateAttributesEnhanced(const IAttributePtr& ipAttribute,
+															  const string& strMainQuery)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI36306", ipAttribute != __nullptr);
+
+		// An equals sign indicates the query is using a regex rather than an AFQuery.
+		if (!strMainQuery.empty() && strMainQuery[0] == '=')
+		{
+			IIUnknownVectorPtr ipResults(CLSID_IUnknownVector);
+			ASSERT_RESOURCE_ALLOCATION("ELI36307", ipResults != __nullptr);
+
+			// The regex pattern is everything after the equal sign.
+			getParser()->Pattern = strMainQuery.substr(1).c_str();
+
+			ISpatialStringPtr ipValue = ipAttribute->Value;
+			ASSERT_RESOURCE_ALLOCATION("ELI36308", ipValue != __nullptr);
+
+			// Use the regular expression engine to parse the attribute's value and find matches
+			// matches using the specified regular expression.
+			IIUnknownVectorPtr ipMatches = getParser()->Find(
+				ipValue->String, VARIANT_FALSE, VARIANT_FALSE);
+			ASSERT_RESOURCE_ALLOCATION("ELI36309", ipMatches != __nullptr);
+
+			// Iterate through the matches and populate the return vector.
+			long nNumMatches = ipMatches->Size();
+			for (int i = 0; i < nNumMatches; i++)
+			{
+				// Each item in the ipMatches is of type IObjectPair.
+				IObjectPairPtr ipObjPair = ipMatches->At(i);
+
+				// Token is the first object in the object pair
+				ITokenPtr ipToken = ipObjPair->Object1;
+				if (ipToken)
+				{	
+					// create an attribute to store the value
+					IAttributePtr ipAttribute = createAttribute(ipToken, ipValue);
+					ASSERT_RESOURCE_ALLOCATION("ELI36310", ipAttribute != __nullptr);
+
+					// Put the found attribute on the attributes list
+					ipResults->PushBack(ipAttribute);
+				}
+			}
+
+			return ipResults;
+		}
+		else
+		{
+			return getCandidateAttributes(ipAttribute->SubAttributes, strMainQuery, false);
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36311");
+}
+//-------------------------------------------------------------------------------------------------
 void CAFUtility::removeAttribute(const IIUnknownVectorPtr& ipAttributes,
 								 const IAttributePtr& ipAttribute)
 {
@@ -770,5 +825,41 @@ void CAFUtility::removeMetadataAttributes(const IIUnknownVectorPtr &ripAttribute
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28493");
+}
+//-------------------------------------------------------------------------------------------------	
+IAttributePtr CAFUtility::createAttribute(ITokenPtr ipToken, ISpatialStringPtr ipInput)
+{
+	ASSERT_ARGUMENT("ELI36312", ipToken != __nullptr);
+	ASSERT_ARGUMENT("ELI36313", ipInput != __nullptr);
+
+	long nStart, nEnd;
+	ipToken->GetTokenInfo(&nStart, &nEnd, NULL, NULL);
+
+	IAttributePtr ipAttribute(CLSID_Attribute);
+	ASSERT_RESOURCE_ALLOCATION("ELI36314", ipAttribute != __nullptr);
+
+	ISpatialStringPtr ipValue;
+	if (nStart != -1 && nEnd != -1)
+	{
+		// The attribute value is created from the input using the token to specify which part of
+		// the input.
+		ipValue = ipInput->GetSubString(nStart, nEnd);
+		ASSERT_RESOURCE_ALLOCATION("ELI36315", ipValue != __nullptr);
+	}
+
+	ipAttribute->Value = ipValue;
+
+	return ipAttribute;
+}
+//-------------------------------------------------------------------------------------------------
+IRegularExprParserPtr CAFUtility::getParser()
+{
+	if (m_ipParser == __nullptr)
+	{
+		m_ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("");
+		ASSERT_RESOURCE_ALLOCATION("ELI36316", m_ipParser != __nullptr);
+	}
+
+	return m_ipParser;
 }
 //-------------------------------------------------------------------------------------------------

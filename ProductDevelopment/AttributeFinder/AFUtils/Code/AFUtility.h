@@ -201,6 +201,14 @@ private:
 	//---------------------------------------------------------------------------------------------
 	IIUnknownVectorPtr getCandidateAttributes(const IIUnknownVectorPtr& ipAttributes,
 		const string& strQuery, bool bRemoveMatches);
+	//---------------------------------------------------------------------------------------------	
+	// Same as getCandidateAttributes except that:
+	// - Rather than supply the domain as a vector of attributes, the parent attribute is supplied.
+	// - strQuery supports a regular expression prefixed by an equal sign (=) in place of an
+	//		AFQuery. In this case, rather than search existing sub-attributes, an unnamed attribute
+	//		will be returned for each match, the attribute value containing the match value.
+	IIUnknownVectorPtr getCandidateAttributesEnhanced(const IAttributePtr& ipAttribute,
+		const string& strQuery);
 	//---------------------------------------------------------------------------------------------
 	void splitQuery(const string& strQuery, vector<QueryPattern>& rvecPatterns,
 		vector<QueryPattern>& rvecNonSelectPatterns);
@@ -317,6 +325,13 @@ private:
 	//			that begin with an underscore).
 	void removeMetadataAttributes(const IIUnknownVectorPtr &ripAttributeVector);
 	//---------------------------------------------------------------------------------------------
+	// Creates an (unnamed) attribute using the token from an IRegularExprParser match and the
+	// original input string.
+	IAttributePtr createAttribute(ITokenPtr ipToken, ISpatialStringPtr ipInput);
+	//---------------------------------------------------------------------------------------------
+	// Gets a IRegularExprParser instance.
+	IRegularExprParserPtr getParser();
+	//---------------------------------------------------------------------------------------------
 
 	/////////////
 	// Variables
@@ -343,4 +358,6 @@ private:
 
 	// Engine instance used to retrieve component data folder.
 	IAttributeFinderEnginePtr m_ipEngine;
+	
+	IRegularExprParserPtr m_ipParser;
 };

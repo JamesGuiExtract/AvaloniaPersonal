@@ -53,6 +53,7 @@ CAFUtility::CAFUtility()
 : ma_pUserCfgMgr(new RegistryPersistenceMgr(HKEY_CURRENT_USER, gstrAF_REG_ROOT_FOLDER_PATH))
 , m_ipMiscUtils(CLSID_MiscUtils)
 , m_ipEngine(CLSID_AttributeFinderEngine)
+, m_ipParser(__nullptr)
 {
 	try
 	{
@@ -69,6 +70,7 @@ CAFUtility::~CAFUtility()
 	{
 		m_ipMiscUtils = __nullptr;
 		m_ipEngine = __nullptr;
+		m_ipParser = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20389")
 }
@@ -1754,7 +1756,7 @@ ISpatialStringPtr CAFUtility::parseVariableValue(string& strVariable, const IAtt
 						// Get the attributes to be expanded.
 						IIUnknownVectorPtr ipSubAttributes = (ipAttribute == __nullptr)
 							? IIUnknownVectorPtr(CLSID_IUnknownVector)
-							: getCandidateAttributes(ipAttribute->SubAttributes, strQuery, false);
+							: getCandidateAttributesEnhanced(ipAttribute, strQuery);
 				
 						// If there are not attributes to expand, getReformattedName still needs to
 						// be called in order to trim the term from strTempNestedFormat.
@@ -2109,8 +2111,7 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strQuery,
 	}
 	else
 	{
-		IIUnknownVectorPtr ipSubAttributes =
-			getCandidateAttributes(ipAttribute->SubAttributes, strQueryPart1, false);
+		IIUnknownVectorPtr ipSubAttributes = getCandidateAttributesEnhanced(ipAttribute, strQuery);
 		ASSERT_RESOURCE_ALLOCATION("ELI25948", ipSubAttributes != __nullptr);
 
 		IIUnknownVectorPtr ipSelectedAttributes = getSelectedItems(ipSubAttributes, strSelection);
@@ -2423,3 +2424,4 @@ const char* CAFUtility::getINIFileName()
 	return ms_strINIFileName.c_str();
 }
 //-------------------------------------------------------------------------------------------------
+
