@@ -519,40 +519,33 @@ STDMETHODIMP CSpatialString::GetSpecifiedPages(long nStartPageNum, long nEndPage
 				// index
 				long nLastSpatialPageNum = tempLetter.m_usPageNumber;
 
-				// Jump right to the requested page...
-				long nStartPos = getNextOCRImageSpatialLetterStartingOnPage(
-					nStartPageNum, nLastPageNumber, tempLetter);
-
-				if (nStartPos != -1)
+				for (long n = 0; n < nNumLetters; n++)
 				{
-					for (long n = nStartPos; n < nNumLetters; n++)
+					CPPLetter& letter = m_vecLetters[n];
+
+					long nCurrentPageNumber =
+						letter.m_bIsSpatial ? letter.m_usPageNumber : nLastSpatialPageNum;
+
+					// break out of the loop if current page is beyond end page
+					if (nCurrentPageNumber > nEndPageNum)
 					{
-						CPPLetter& letter = m_vecLetters[n];
-
-						long nCurrentPageNumber =
-							letter.m_bIsSpatial ? letter.m_usPageNumber : nLastSpatialPageNum;
-
-						// break out of the loop if current page is beyond end page
-						if (nCurrentPageNumber > nEndPageNum)
-						{
-							break;
-						}
-						// only get letters from specified starting to ending page
-						else if (nCurrentPageNumber >= nStartPageNum)
-						{
-							vecLetters.push_back(letter);
-						}
-
-						// Update the last spatial page number
-						nLastSpatialPageNum = nCurrentPageNumber;
+						break;
+					}
+					// only get letters from specified starting to ending page
+					else if (nCurrentPageNumber >= nStartPageNum)
+					{
+						vecLetters.push_back(letter);
 					}
 
-					// Set the return string from the vector of letters
-					if (vecLetters.size() > 0)
-					{
-						ipReturn->CreateFromLetterArray(vecLetters.size(), &(vecLetters[0]),
-							m_strSourceDocName.c_str(), m_ipPageInfoMap);
-					}
+					// Update the last spatial page number
+					nLastSpatialPageNum = nCurrentPageNumber;
+				}
+
+				// Set the return string from the vector of letters
+				if (vecLetters.size() > 0)
+				{
+					ipReturn->CreateFromLetterArray(vecLetters.size(), &(vecLetters[0]),
+						m_strSourceDocName.c_str(), m_ipPageInfoMap);
 				}
 			}
 		}
@@ -674,61 +667,47 @@ STDMETHODIMP CSpatialString::GetRelativePages(long nStartPageNum, long nEndPageN
 				long nFirstSpatialLetter = getNextOCRImageSpatialLetter(0, letter);
 				nLastOrigSpatialPageNum = letter.m_usPageNumber;
 
-				// Jump right to the requested page...
-				long nStartPos = getNextOCRImageSpatialLetterStartingOnPage(
-					nStartPageNum, letter);
+				nCurrentPageNum = -1;
+				// the physical page number, not necessarily equals to the oringial page number
+				long nCurrentPhysicalPageNumber = 0;
 
-				if (nStartPos != -1)
+				// create a vector to hold letter on those pages
+				vector<CPPLetter> vecLetters;
+				for (long i = 0; i < nNumLetters; i++)
 				{
-					// the physical page number, not necessarily equals to the oringial page number
-					// Increment the page number by the number of pages found prior to nStartPos;
-					long nCurrentPhysicalPageNumber = 0;
-					for (map<long, long>::iterator iter = m_mapLetterIndex.begin();
-						 iter != m_mapLetterIndex.end() && iter->first < nStartPageNum;
-						 iter++)
+					CPPLetter& tempLetter = m_vecLetters[i];
+
+					// what's the original page number for this letter
+					long nOriginPageNumber =
+						tempLetter.m_bIsSpatial ? tempLetter.m_usPageNumber : nLastOrigSpatialPageNum;
+
+					if (nCurrentPageNum != nOriginPageNumber)
 					{
+						// increment the physical page number
 						nCurrentPhysicalPageNumber++;
+						nCurrentPageNum = nOriginPageNumber;
 					}
 
-					nCurrentPageNum = -1;
-				
-					// create a vector to hold letter on those pages
-					vector<CPPLetter> vecLetters;
-					for (long i = nStartPos; i < nNumLetters; i++)
+					// break out of the loop if start page is beyond end page
+					if (nCurrentPhysicalPageNumber > nEndPageNum)
 					{
-						CPPLetter& tempLetter = m_vecLetters[i];
-
-						// what's the original page number for this letter
-						long nOriginPageNumber =
-							tempLetter.m_bIsSpatial ? tempLetter.m_usPageNumber : nLastOrigSpatialPageNum;
-
-						if (nCurrentPageNum != nOriginPageNumber)
-						{
-							// increment the physical page number
-							nCurrentPhysicalPageNumber++;
-							nCurrentPageNum = nOriginPageNumber;
-						}
-
-						// break out of the loop if start page is beyond end page
-						if (nCurrentPhysicalPageNumber > nEndPageNum)
-						{
-							break;
-						}
-
-						// only get letters from specified starting to ending page
-						if (nCurrentPhysicalPageNumber >= nStartPageNum)
-						{
-							vecLetters.push_back(tempLetter);
-						}
-
-						nLastOrigSpatialPageNum = nOriginPageNumber;
+						break;
 					}
 
-					if (vecLetters.size() > 0)
+					// only get letters from specified starting to ending page
+					if (nCurrentPhysicalPageNumber >= nStartPageNum 
+						&& nCurrentPhysicalPageNumber <= nEndPageNum)
 					{
-						ipReturn->CreateFromLetterArray(vecLetters.size(), &(vecLetters[0]),
-							m_strSourceDocName.c_str(), m_ipPageInfoMap);
+						vecLetters.push_back(tempLetter);
 					}
+
+					nLastOrigSpatialPageNum = nOriginPageNumber;
+				}
+
+				if (vecLetters.size() > 0)
+				{
+					ipReturn->CreateFromLetterArray(vecLetters.size(), &(vecLetters[0]),
+						m_strSourceDocName.c_str(), m_ipPageInfoMap);
 				}
 			}
 		}		

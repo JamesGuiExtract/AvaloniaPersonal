@@ -501,7 +501,38 @@ bool CSpatialString::isMultiPage()
             break;
             case kSpatialMode:
             {
-                return m_mapLetterIndex.size() > 1;
+                // iterate through each of the letters and check to see if 
+                // there exists two spatial letter objects on different pages
+                long nCurrPage = -1;
+                long nNumLetters = m_vecLetters.size();
+                for (int i = 0; i < nNumLetters; i++)
+                {
+                    // get the letter object at this position
+                    CPPLetter& letter = m_vecLetters[i];
+
+                    if (letter.m_bIsSpatial)
+                    {
+                        // if we found the first spatial character, then
+                        // remember its page number
+                        if (nCurrPage < 0)
+                        {
+                            nCurrPage = letter.m_usPageNumber;
+                        }
+                        else
+                        {
+                            // this is a subsequent spatial character
+                            // we have come across.  If it is on the same
+                            // page as all previous spatial chars, then 
+                            // just keep searching.  If it is on a different
+                            // page, then immediately return true.
+                            if (letter.m_usPageNumber != nCurrPage)
+                            {
+                                bReturn = true;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
             break;
 
@@ -1201,7 +1232,6 @@ void CSpatialString::reset(bool bResetSourceDocName, bool bResetPageInfoMap)
         m_strOCREngineVersion = "";
 
         m_vecRasterZones.clear();
-		m_mapLetterIndex.clear();
 
         // Clear the spatial page info map
         if( m_ipPageInfoMap != __nullptr && bResetPageInfoMap)
@@ -1232,8 +1262,6 @@ void CSpatialString::processLetters(CPPLetter* letters, long nNumLetters)
 
 	m_strString.reserve(nNumLetters);
 
-	long nCurrPage = -1;
-
     // iterate through each letter to determine
     // the state of the String and IsSpatial attributes
     for (long i = 0; i < nNumLetters; i++)
@@ -1252,13 +1280,6 @@ void CSpatialString::processLetters(CPPLetter* letters, long nNumLetters)
         if (letter.m_bIsSpatial)
         {
             m_eMode = kSpatialMode;
-
-			long nPage = (long)letter.m_usPageNumber;
-			if (nPage != nCurrPage)
-			{
-				m_mapLetterIndex[nPage] = i;
-				nCurrPage = nPage;
-			}
         }
     }
 
@@ -2265,7 +2286,6 @@ void CSpatialString::downgradeToHybrid()
 
             // Clear the Letters vector
             m_vecLetters.clear();
-			m_mapLetterIndex.clear();
 
             // Set the new mode
             m_eMode = kHybridMode;
@@ -2292,7 +2312,6 @@ void CSpatialString::downgradeToNonSpatial()
         // No matter what mode this object is in, clear the spatial 
         // information and set it to non-spatial mode
         m_vecLetters.clear();
-		m_mapLetterIndex.clear();
 
         m_vecRasterZones.clear();
 
@@ -2350,14 +2369,17 @@ long CSpatialString::getFirstPageNumber()
         }
         else if( m_eMode == kSpatialMode )
         {
+            CPPLetter letter;
+            long nIndex = getNextOCRImageSpatialLetter(0, letter);
+
             // We know this is a spatial string so nIndex should be valid
             // because there must be at least one spatial character
-            if (m_mapLetterIndex.size() == 0)
+            if (nIndex < 0 || (unsigned long) nIndex >= m_vecLetters.size())
             {
                 THROW_LOGIC_ERROR_EXCEPTION("ELI10468");
             }
 
-            nFirstPage = m_mapLetterIndex.begin()->first;
+            nFirstPage = letter.m_usPageNumber;
         }
         else
         {
@@ -2403,14 +2425,14 @@ long CSpatialString::getLastPageNumber()
         }
         else if ( m_eMode == kSpatialMode )
         {
-            // We know this is a spatial string so nIndex should be valid
-            // because there must be at least one spatial character
-            if (m_mapLetterIndex.size() == 0)
+            for (long i = m_vecLetters.size() - 1; i >= 0; i--)
             {
-                THROW_LOGIC_ERROR_EXCEPTION("ELI36302");
+                if (m_vecLetters[i].m_bIsSpatial)
+                {
+                    nLastPage = m_vecLetters[i].m_usPageNumber;
+                    break;
+                }
             }
-
-            nLastPage = m_mapLetterIndex.crbegin()->first;
         }
         else
         {
@@ -2422,39 +2444,6 @@ long CSpatialString::getLastPageNumber()
         return nLastPage;
     }
     CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25827");
-}
-//-------------------------------------------------------------------------------------------------
-long CSpatialString::getNextOCRImageSpatialLetterStartingOnPage(long nStartPage, CPPLetter& rLetter)
-{
-	return getNextOCRImageSpatialLetterStartingOnPage(nStartPage, -1, rLetter);
-}
-//-------------------------------------------------------------------------------------------------
-long CSpatialString::getNextOCRImageSpatialLetterStartingOnPage(long nStartPage, long nLastPage,
-															    CPPLetter& rLetter)
-{
-	if (nLastPage == -1)
-	{
-		nLastPage = getLastPageNumber();
-	}
-
-	for (long nPage = nStartPage; nPage <= nLastPage; nPage++)
-	{
-		map<long, long>::iterator iter = m_mapLetterIndex.find(nPage);
-		if (iter != m_mapLetterIndex.end())
-		{
-			int nIndex = iter->second;
-			rLetter = m_vecLetters[nIndex];
-
-			if (!rLetter.m_bIsSpatial)
-			{
-				THROW_LOGIC_ERROR_EXCEPTION("ELI36303");
-			}
-
-			return nIndex;
-		}
-	}
-
-	return -1;
 }
 //-------------------------------------------------------------------------------------------------
 long CSpatialString::getNextOCRImageSpatialLetter(long nStart, CPPLetter& rLetter)
@@ -3072,23 +3061,19 @@ void CSpatialString::remove(long nStart, long nEnd)
 
             // Get the first spatial letter in the string. If the letter is before the start of the remove
             // operation OR after the end of the remove operation, then the string will remain spatial. 
-			// Track which pages letters are deleted from so m_mapLetterIndex can be updated.
             CPPLetter letter;
             long nPos = getNextOCRImageSpatialLetter(0, letter);
-			long nFirstPage = (long)letter.m_usPageNumber;
-			long nLastPos = getNextOCRImageSpatialLetter(nEnd, letter);
-			long nLastPage = (long)letter.m_usPageNumber;
-			bool bRemainsSpatial = true;
-			bool bIndexRemoved = false;
 
             if( nPos >= nStart && nPos <= nEnd )
             {
                 // However, if the first spatial letter is within the remove area, check to see if there
                 // is a spatial letter after the remove area. If there is NOT, then we need to get the raster
                 // zones from this object and change it to a hybrid string.
-                if(nLastPos == -1)
+                nPos = getNextOCRImageSpatialLetter(nEnd, letter);
+
+                // If there is not at least 1 spatial letter present after the removal spot
+                if( nPos == -1 )
                 {
-					bRemainsSpatial = false;
                     downgradeToHybrid();
                 }
                 else
@@ -3106,51 +3091,9 @@ void CSpatialString::remove(long nStart, long nEnd)
                 m_vecLetters.erase(m_vecLetters.begin() + nStart, m_vecLetters.begin() + nEnd + 1);
             }
 
-			if (bRemainsSpatial)
-			{
-				if (nFirstPage != -1)
-				{
-					// Remove any indicies from m_mapLetterIndex that reference removed characters
-					for (long nPage = nFirstPage; nLastPage == -1 || nPage <= nLastPage; nPage++)
-					{
-						long nIndex = m_mapLetterIndex[nPage];
-						if (nIndex >= nStart && nIndex <= nEnd)
-						{
-							m_mapLetterIndex.erase(nPage);
-							bIndexRemoved = true;
-						}
-					}
-
-					// Adjust any subsequent indicies to account for the removed characters.
-					for (map<long, long>::iterator iter = m_mapLetterIndex.begin();
-						 iter != m_mapLetterIndex.end(); iter++)
-					{
-						if (iter->second >= nStart)
-						{
-							iter->second = iter->second - (nEnd - nStart + 1);
-						}
-					}
-				}
-			}
-
             // Remove the letters from the string. This must be done AFTER the calls to GetNextSpatialLetter()
             // to prevent an exception from mismatched string / vector length.
             m_strString.erase(nStart, nEnd - nStart + 1);
-
-			// If any indicies were removed, set the index for the first page after the
-			// letters that were removed.
-			// NOTE: This must be done following m_strString.erase so that the lengths of
-			// m_strString and m_vecLetters match; otherwise getNextOCRImageSpatialLetter will
-			// throw and exception.
-			if (bIndexRemoved && nStart < (long)m_vecLetters.size())
-			{
-				long nIndex = getNextOCRImageSpatialLetter(nStart, letter);
-				if (nIndex != -1)
-				{
-					long nPage = (long)letter.m_usPageNumber;
-					m_mapLetterIndex[nPage] = nIndex;
-				}
-			}
 
             // because we modified the spatial string, we need to check
             // if the string is still spatial
@@ -3390,7 +3333,16 @@ void CSpatialString::copyFromSpatialString(UCLID_RASTERANDOCRMGMTLib::ISpatialSt
             long nNumLetters = 0;
             ipSource->GetOCRImageLetterArray(&nNumLetters, (void**)&letters);
             
-			updateLetters(letters, nNumLetters);
+			m_vecLetters.resize(nNumLetters);
+            
+            if(nNumLetters > 0)
+            {
+				// Since the m_vecLetters was just resized to nNumLetters the copy size 
+				// is the same
+				long lCopySize = sizeof(CPPLetter) * nNumLetters;
+
+				memcpy_s(&(m_vecLetters[0]), lCopySize, letters, lCopySize);
+            }
         }
         // If the object is hybrid, get the raster zone(s)
         else if( eSourceMode == kHybridMode )

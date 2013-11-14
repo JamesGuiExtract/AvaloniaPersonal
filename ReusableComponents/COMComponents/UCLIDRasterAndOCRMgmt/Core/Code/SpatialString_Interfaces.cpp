@@ -794,8 +794,6 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 
 						m_ipPageInfoMap->Set(nPage, ipPageInfo);
 						nCurrPage = nPage;
-
-						m_mapLetterIndex[nPage] = i;
 					}
 				}
 			}

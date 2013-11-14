@@ -251,12 +251,6 @@ STDMETHODIMP CSpatialString::UpdatePageNumber(long nPageNumber)
 				{
 					m_vecLetters[i].m_usPageNumber = (unsigned short) nPageNumber;
 				}
-
-				m_mapLetterIndex.clear();
-				if (nNumLetters > 0)
-				{
-					m_mapLetterIndex[nPageNumber] = 0;
-				}
 			}
 			break;
 			case kHybridMode:

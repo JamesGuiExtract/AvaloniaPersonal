@@ -896,31 +896,49 @@ void CDocumentClassifier::loadDocTypeFiles(const string& strSpecificIndustryName
 //-------------------------------------------------------------------------------------------------
 bool CDocumentClassifier::useExistingResults(IAFDocumentPtr ipAFDoc)
 {
-	IStrToObjectMapPtr ipObjectTags(ipAFDoc->ObjectTags);
-	if (ipObjectTags != __nullptr)
+	bool bReRunClassifier = m_bReRunClassifier;
+	IStrToStrMapPtr ipStringTags(ipAFDoc->StringTags);
+	
+	if (!bReRunClassifier)
 	{
-		if (asCppBool(ipObjectTags->Contains(get_bstr_t(DOC_TYPE))))
+		// [FlexIDSCore:4753]
+		// If the document classifier has already been run on ipAFDoc, it will have a
+		// DOC_PROBABILITY string tag whether or not it had been able to be classified with a
+		// DocTag object tag.
+		if (ipStringTags != __nullptr &&
+			!asCppBool(ipStringTags->Contains(get_bstr_t(DOC_PROBABILITY))))
 		{
-			if (m_bReRunClassifier)
-			{
-				ipObjectTags->RemoveItem(get_bstr_t(DOC_TYPE));
-				ipObjectTags->RemoveItem(get_bstr_t(DCC_BLOCK_ID_TAG));
-				ipObjectTags->RemoveItem(get_bstr_t(DCC_RULE_ID_TAG));
-
-				IStrToStrMapPtr ipStringTags(ipAFDoc->StringTags);
-				if (ipStringTags != __nullptr)
-				{
-					ipStringTags->RemoveItem(get_bstr_t(DOC_PROBABILITY));
-				}
-			}
-			else
-			{
-				return true;
-			}
+			// If the classifier has not been run on the current document, force the classfier to
+			// run even if m_bReRunClassifier is false.
+			bReRunClassifier = true;
 		}
 	}
 
-	return false;
+	if (bReRunClassifier)
+	{
+		// If re-running the classifer, clear existing document classification tags.
+		if (ipStringTags != __nullptr)
+		{
+			ipStringTags->RemoveItem(get_bstr_t(DOC_PROBABILITY));
+		}
+
+		IStrToObjectMapPtr ipObjectTags(ipAFDoc->ObjectTags);
+		if (ipObjectTags != __nullptr &&
+			asCppBool(ipObjectTags->Contains(get_bstr_t(DOC_TYPE))))
+		{
+			ipObjectTags->RemoveItem(get_bstr_t(DOC_TYPE));
+			ipObjectTags->RemoveItem(get_bstr_t(DCC_BLOCK_ID_TAG));
+			ipObjectTags->RemoveItem(get_bstr_t(DCC_RULE_ID_TAG));
+		}
+
+		// Don't use existing results.
+		return false;
+	}
+	else
+	{
+		// Use existing results.
+		return true;
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void CDocumentClassifier::validateLicense()
