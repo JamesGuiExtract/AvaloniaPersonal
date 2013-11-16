@@ -752,9 +752,6 @@ const string TextFunctionExpander::expandReplace(vector<string>& vecParameters) 
 			throw ue;
 		}
 
-		// Do the string replacement
-		replaceVariable( strSource, strSearch, strReplace );
-
 		// [FlexIDSCore:5240]
 		// Removed use of replaceVariable call here so that the search can be made case-insensitive.
 		stringCSIS csisSource(strSource, false);

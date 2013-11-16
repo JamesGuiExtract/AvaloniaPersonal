@@ -2111,7 +2111,8 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strQuery,
 	}
 	else
 	{
-		IIUnknownVectorPtr ipSubAttributes = getCandidateAttributesEnhanced(ipAttribute, strQuery);
+		IIUnknownVectorPtr ipSubAttributes =
+			getCandidateAttributesEnhanced(ipAttribute, strQueryPart1);
 		ASSERT_RESOURCE_ALLOCATION("ELI25948", ipSubAttributes != __nullptr);
 
 		IIUnknownVectorPtr ipSelectedAttributes = getSelectedItems(ipSubAttributes, strSelection);
