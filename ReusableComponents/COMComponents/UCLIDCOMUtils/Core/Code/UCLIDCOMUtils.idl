@@ -169,8 +169,13 @@ library UCLID_COMUTILSLib
 			[in] long nEnd);
 		[id(17), helpstring("method LoadFrom")] HRESULT LoadFrom([in] BSTR strFullFileName, 
 			[in] VARIANT_BOOL bSetDirtyFlagToTrue);
+		// If guidStorageManagerIID is not GUID_NULL, an instance of the indicated IStorageManager
+		// implementation will be used to persist the data. If the storage manager also implements
+		// IPersistStream the instance will be persisted along with the IUnknownVector so that it
+		// can prepare the vector when it is read back from disk. If guidStorageManagerIID is
+		// GUID_NULL, the data will be persisted directly to disk without any special preparation.
 		[id(18), helpstring("method SaveTo")] HRESULT SaveTo([in] BSTR strFullFileName, 
-			[in] VARIANT_BOOL bClearDirty);
+			[in] VARIANT_BOOL bClearDirty, [in] GUID guidStorageManagerIID);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To remove all entries from the vector that are equal
 		//			to pObj
@@ -1628,6 +1633,29 @@ library UCLID_COMUTILSLib
 		// PURPOSE:	Provides custom formatting of bstrExpression
 		[id(1), helpstring("method FormatExpression")] HRESULT FormatExpression(
 			[in] BSTR bstrExpression, [out, retval] BSTR* pbstrFormatedExpression);		
+	}
+
+	[
+		object,
+		uuid(034D92B7-C439-4BF9-B327-EC6B7CD17CE8),
+		dual,
+		nonextensible,
+		helpstring("IStorageManager Interface"),
+		pointer_default(unique)
+	]
+	interface IStorageManager : IDispatch
+	{
+		// PURPOSE: To prepare the pDataToStore to be persisted.
+		// ARGS:	pDataToStore - The IUnknownVector of objects that require special preparation
+		//				before storage.
+		[id(1), helpstring("method PrepareForStorage")] HRESULT PrepareForStorage(
+			[in] IIUnknownVector *pDataToStore);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To initialize the loaded pDataToInit.
+		// ARGS:	pDataToInit - The IUnknownVector of objects that have just been loaded, but
+		//				need special initializaton having been persisted using an IStorageManager.
+		[id(2), helpstring("method InitFromStorage")] HRESULT InitFromStorage(
+			[in] IIUnknownVector *pDataToInit);
 	}
 
 	//---------------------------------------------------------------------------------------------

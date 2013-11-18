@@ -1807,7 +1807,8 @@ namespace Extract.DataEntry
                             PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
 
                             // If all attributes passed validation, save the data.
-                            _mostRecentlySaveAttributes.SaveTo(_imageViewer.ImageFile + ".voa", true);
+                            _mostRecentlySaveAttributes.SaveTo(_imageViewer.ImageFile + ".voa",
+                                true, typeof(AttributeStorageManagerClass).GUID);
 
                             _dirty = false;
                         }

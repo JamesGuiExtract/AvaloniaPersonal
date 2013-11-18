@@ -53,7 +53,8 @@ END_COM_MAP()
 	STDMETHOD(ShallowCopy)(IUnknown** pObject);
 
 // IIUnknownVector
-	STDMETHOD(SaveTo)(/*[in]*/ BSTR strFullFileName, /*[in]*/ VARIANT_BOOL bClearDirty);
+	STDMETHOD(SaveTo)(/*[in]*/ BSTR strFullFileName, /*[in]*/ VARIANT_BOOL bClearDirty,
+		/*[in]*/ GUID guidStorageManager);
 	STDMETHOD(LoadFrom)(/*[in]*/ BSTR strFullFileName, /*[in]*/ VARIANT_BOOL bSetDirtyFlagToTrue);
 	STDMETHOD(Append)(/*[in]*/ IIUnknownVector *pVector);
 	STDMETHOD(Remove)(/*[in]*/ long nIndex);

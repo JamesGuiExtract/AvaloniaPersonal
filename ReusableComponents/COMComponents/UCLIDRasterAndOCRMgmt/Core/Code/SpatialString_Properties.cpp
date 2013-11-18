@@ -126,6 +126,30 @@ STDMETHODIMP CSpatialString::get_SpatialPageInfos(ILongToObjectMap** pVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09134")
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::put_SpatialPageInfos(ILongToObjectMap *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI36319", pVal != __nullptr);
+
+		// Check license
+		validateLicense();
+
+		// Make sure this string is spatial
+		if(m_eMode == kNonSpatialMode)
+		{
+			UCLIDException ue("ELI36317", 
+				"GetSpatialPageInfos() requires a string with spatial info!");
+			throw ue;
+		}
+
+		m_ipPageInfoMap = pVal;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36318")
+}
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetOCRImageLetter(long nIndex, ILetter **pLetter)
 {

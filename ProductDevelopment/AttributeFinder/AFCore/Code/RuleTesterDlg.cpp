@@ -757,7 +757,8 @@ void RuleTesterDlg::OnButtonVoa()
 			CString zFileName = dlgSave.GetPathName();
 
 			// Save the Attributes to the file
-			m_ipAttributes->SaveTo( get_bstr_t( LPCTSTR(zFileName) ), VARIANT_TRUE );
+			m_ipAttributes->SaveTo(get_bstr_t( LPCTSTR(zFileName) ), VARIANT_TRUE,
+				CLSID_AttributeStorageManager);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08795")

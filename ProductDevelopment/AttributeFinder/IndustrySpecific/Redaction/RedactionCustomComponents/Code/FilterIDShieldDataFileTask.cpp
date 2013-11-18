@@ -161,7 +161,7 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_ProcessFile(IFileRecord* pFileReco
 		}
 
 		// Now save the filtered attributes
-		ipNewAttributes->SaveTo(strVOAToWrite.c_str(), TRUE);
+		ipNewAttributes->SaveTo(strVOAToWrite.c_str(), TRUE, CLSID_AttributeStorageManager);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI24792")
 }

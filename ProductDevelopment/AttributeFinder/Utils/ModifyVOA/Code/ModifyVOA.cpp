@@ -211,7 +211,7 @@ void changeAttributePath(const string& strNewPath, const vector<string>& vecVOAF
 			}
 
 			// save the modified IUnknownVector back to the VOA file
-			ipAttributes->SaveTo(bstrVOAFileName, VARIANT_TRUE);
+			ipAttributes->SaveTo(bstrVOAFileName, VARIANT_TRUE, CLSID_AttributeStorageManager);
 			_lastCodePos = "110";
 		}
 	}

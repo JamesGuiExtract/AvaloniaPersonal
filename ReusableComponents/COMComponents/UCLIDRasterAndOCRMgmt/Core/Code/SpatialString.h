@@ -109,6 +109,7 @@ public:
 	STDMETHOD(GetPageInfo)( long nPageNum,  ISpatialPageInfo** ppPageInfo);
 	STDMETHOD(SetPageInfo)( long nPageNum,  ISpatialPageInfo* pPageInfo);
 	STDMETHOD(get_SpatialPageInfos)( ILongToObjectMap **pVal);
+	STDMETHOD(put_SpatialPageInfos)(ILongToObjectMap *pVal);
 	STDMETHOD(GetOriginalImageRasterZones)( IIUnknownVector** ppRasterZones);
 	STDMETHOD(IsMultiPage)( VARIANT_BOOL *pbRet);
 	STDMETHOD(GetFirstPageNumber)( long *pRet);

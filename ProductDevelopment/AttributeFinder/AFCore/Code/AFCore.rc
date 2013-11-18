@@ -100,6 +100,7 @@ IDR_RULETESTERUI        REGISTRY                "RuleTesterUI.rgs"
 IDR_ATTRIBUTEFINDERENGINEPP REGISTRY                "AttributeFinderEnginePP.rgs"
 IDR_CONDITIONALRULEPP   REGISTRY                "ConditionalRulePP.rgs"
 IDR_SPATIALLYCOMPAREATTRIBUTES REGISTRY                "SpatiallyCompareAttributes.rgs"
+IDR_ATTRIBUTESTORAGEMANAGER REGISTRY                "AttributeStorageManager.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //

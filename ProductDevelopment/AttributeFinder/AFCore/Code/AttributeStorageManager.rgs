@@ -1,0 +1,26 @@
+HKCR
+{
+	AFCore.AttributeStorageManager.1 = s 'AttributeStorageManager Class'
+	{
+		CLSID = s '{98E07967-AFEB-4AEB-80F1-263F6429D0E8}'
+	}
+	AFCore.AttributeStorageManager = s 'AttributeStorageManager Class'
+	{
+		CLSID = s '{98E07967-AFEB-4AEB-80F1-263F6429D0E8}'
+		CurVer = s 'AFCore.AttributeStorageManager.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {98E07967-AFEB-4AEB-80F1-263F6429D0E8} = s 'AttributeStorageManager Class'
+		{
+			ProgID = s 'UCLIDAFCore.AttributeStorageManager.1'
+			VersionIndependentProgID = s 'UCLIDAFCore.AttributeStorageManager'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{69D40760-8162-4822-85D6-C10B02044E9D}'
+		}
+	}
+}

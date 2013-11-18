@@ -2020,7 +2020,7 @@ void CRedactionTask::storeMetaData(const string& strVoaFile, IIUnknownVectorPtr 
         ipAttributes->PushBack(ipMetaData);
 
         // Save the voa with the new metadata
-        ipAttributes->SaveTo(strVoaFile.c_str(), false);
+        ipAttributes->SaveTo(strVoaFile.c_str(), false, CLSID_AttributeStorageManager);
     }
     CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28350")
 }

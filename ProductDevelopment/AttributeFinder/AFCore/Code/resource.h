@@ -177,6 +177,7 @@
 #define IDC_CHK_PROVIDE_INPUT           339
 #define IDC_EDIT_INPUT_DATA             340
 #define IDC_BTN_BROWSE_DATA_INPUT       341
+#define IDR_ATTRIBUTESTORAGEMANAGER		342
 #define ID_FILE_SAVEAS                  32768
 #define ID_FILE_EXIT                    32769
 #define ID_TOOLS_TEST                   32770
@@ -219,9 +220,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        342
+#define _APS_NEXT_RESOURCE_VALUE        343
 #define _APS_NEXT_COMMAND_VALUE         32800
-#define _APS_NEXT_CONTROL_VALUE         342
+#define _APS_NEXT_CONTROL_VALUE         343
 #define _APS_NEXT_SYMED_VALUE           134
 #endif
 #endif

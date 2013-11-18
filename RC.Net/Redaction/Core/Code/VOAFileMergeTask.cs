@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Windows.Forms;
+using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
@@ -704,7 +705,7 @@ namespace Extract.Redaction
                         new List<ComAttribute>(set1NonSpatial), new List<ComAttribute>(set2NonSpatial));
                     outputAttributes.Append(mergedNonSpatialAttributes.ToIUnknownVector<ComAttribute>());
 
-                    outputAttributes.SaveTo(outputFile, false);
+                    outputAttributes.SaveTo(outputFile, false, typeof(AttributeStorageManagerClass).GUID);
 
                     // Load the output using the RedactionFileLoader in order to add the metadata for
                     // this session.

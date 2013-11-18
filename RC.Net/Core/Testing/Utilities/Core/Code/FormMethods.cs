@@ -235,8 +235,8 @@ namespace Extract.Testing.Utilities
 
         /// <summary>
         /// Peforms a click of the specified <see cref="ToolStripItem"/> in a way that ensures all
-        /// processing that may be triggered by an internal <see cref="Control.BeginInvoke"/> call
-        /// happens before this call exists.
+        /// processing that may be triggered by an internal
+        /// <see cref="Control.BeginInvoke(Delegate)"/> call happens before this call exists.
         /// </summary>
         /// <param name="control">The <see cref="Control"/> that should be used to invoke the click.
         /// </param>

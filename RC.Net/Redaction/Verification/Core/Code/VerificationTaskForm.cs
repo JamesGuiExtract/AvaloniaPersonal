@@ -20,6 +20,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using TD.SandDock;
+using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_FILEPROCESSORSLib;
@@ -1134,7 +1135,8 @@ namespace Extract.Redaction.Verification
                         // Otherwise save a new empty voa file as the found data to ensure we don't
                         // save verified data as found data at a later point in time.
                         IUnknownVector emptyVector = new IUnknownVector();
-                        emptyVector.SaveTo(memento.FoundAttributesFileName, false);
+                        emptyVector.SaveTo(memento.FoundAttributesFileName, false,
+                            typeof(AttributeStorageManagerClass).GUID);
                     }
                 }
             }

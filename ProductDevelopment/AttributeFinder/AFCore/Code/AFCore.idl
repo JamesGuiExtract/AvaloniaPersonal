@@ -830,4 +830,14 @@ library UCLID_AFCORELib
 		interface ISortCompare;
 		interface ILicensedComponent;
 	};
+
+	[
+        uuid(98E07967-AFEB-4AEB-80F1-263F6429D0E8),
+        helpstring("AttributeStorageManager Class")
+    ]
+    coclass AttributeStorageManager
+    {
+        [default] interface IStorageManager;
+		interface ILicensedComponent;
+    };
 };

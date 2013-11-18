@@ -748,12 +748,31 @@ STDMETHODIMP CIUnknownVector::LoadFrom(BSTR strFullFileName, VARIANT_BOOL bSetDi
 	{
 		// validate license first
 		validateLicense();
+		
+		UCLID_COMUTILSLib::IIUnknownVectorPtr ipThis = getThisAsCOMPtr();
+		ASSERT_RESOURCE_ALLOCATION("ELI36345", ipThis != __nullptr);
 
 		// Load the vector from the file
-		IPersistStreamPtr ipPersistStream = getThisAsCOMPtr();
+		IPersistStreamPtr ipPersistStream = ipThis;
 		ASSERT_RESOURCE_ALLOCATION("ELI16908", ipPersistStream != __nullptr);
 		readObjectFromFile(ipPersistStream, strFullFileName, m_bstrStreamName, false, 
 			gstrIUNKOWNVECTOR_FILE_SIGNATURE);
+
+		// If there was at least one item loaded, attempt to cast the last item in the vector as an
+		// IStorageManager. If the last item is an IStorageManager instance, use it to prepare the
+		// just loaded data.
+		if (m_vecIUnknowns.size() > 0)
+		{
+			UCLID_COMUTILSLib::IStorageManagerPtr ipStorageManager = m_vecIUnknowns.back();
+			if (ipStorageManager != __nullptr)
+			{
+				// If the last instance was an IStorageManager, it is only to be used to
+				// initialize the data and should not remain as part of the loaded data.
+				m_vecIUnknowns.pop_back();
+
+				ipStorageManager->InitFromStorage(ipThis);
+			}
+		}
 
 		// Mark this object as dirty depending upon bSetDirtyFlagToTrue
 		m_bDirty = (bSetDirtyFlagToTrue == VARIANT_TRUE);
@@ -766,7 +785,8 @@ STDMETHODIMP CIUnknownVector::LoadFrom(BSTR strFullFileName, VARIANT_BOOL bSetDi
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CIUnknownVector::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDirty)
+STDMETHODIMP CIUnknownVector::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDirty,
+									 GUID guidStorageManager)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -775,9 +795,40 @@ STDMETHODIMP CIUnknownVector::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDi
 		// Validate license first
 		validateLicense();
 
-		// Write this object to the file
-		writeObjectToFile(this, strFullFileName, m_bstrStreamName, asCppBool(bClearDirty), 
-			gstrIUNKOWNVECTOR_FILE_SIGNATURE);
+		// If a storage manager was specified, use it to prepare the data before persisting it.
+		if (guidStorageManager != GUID_NULL)
+		{
+			UCLID_COMUTILSLib::IStorageManagerPtr ipStorageManager(guidStorageManager);
+			ASSERT_RESOURCE_ALLOCATION("ELI36346", ipStorageManager != __nullptr);
+			
+			// We don't want the preparation to have side-effects on the data, so clone the vector
+			// first.
+			UCLID_COMUTILSLib::ICopyableObjectPtr ipCopySource(getThisAsCOMPtr());
+			ASSERT_RESOURCE_ALLOCATION("ELI36347", ipCopySource != __nullptr);
+			UCLID_COMUTILSLib::IIUnknownVectorPtr ipClone = ipCopySource->Clone();
+			ASSERT_RESOURCE_ALLOCATION("ELI36348", ipClone != __nullptr);
+
+			ipStorageManager->PrepareForStorage(ipClone);
+
+			// After preparing the cloned data for storage, include the storage manager itself in
+			// the vector to be persisted if it implements IPersistStream. This is so that it can
+			// be used to perform special initialization on the data as it is loaded back from disk.
+			IPersistStreamPtr ipPersistStream(ipStorageManager);
+			if (ipPersistStream != __nullptr)
+			{
+				ipClone->PushBack(ipStorageManager);
+			}
+
+			// Write this prepared data to the file
+			writeObjectToFile(ipClone, strFullFileName, m_bstrStreamName, asCppBool(bClearDirty), 
+				gstrIUNKOWNVECTOR_FILE_SIGNATURE);
+		}
+		else
+		{
+			// Write this object to the file
+			writeObjectToFile(this, strFullFileName, m_bstrStreamName, asCppBool(bClearDirty), 
+				gstrIUNKOWNVECTOR_FILE_SIGNATURE);
+		}
 
 		// Mark this object as dirty depending upon bClearDirty
 		if (bClearDirty == VARIANT_TRUE)

@@ -791,6 +791,10 @@ library UCLID_RASTERANDOCRMGMTLib
 		[propget, id(57), helpstring("property SpatialPageInfos")] HRESULT SpatialPageInfos([out, retval] ILongToObjectMap **pVal);
 		//-----------------------------------------------------------------------------------------
 		// REQUIRE: HasSpatialInfo == VARIANT_TRUE
+		// PROMISE: Assigns a new SpatialPageInfo map.
+		[propput, id(57), helpstring("property SpatialPageInfos")] HRESULT SpatialPageInfos([in] ILongToObjectMap *pVal);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: HasSpatialInfo == VARIANT_TRUE
 		// PURPOSE: Returns a vector of IRasterZones that represent the spatial string.
 		//			If GetMode() == kSpatialMode, raster zones are computed and returned for each line of this
 		//			spatial string.

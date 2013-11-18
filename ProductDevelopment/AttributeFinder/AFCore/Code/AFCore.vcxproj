@@ -234,6 +234,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="AttributeStorageManager.cpp" />
     <ClCompile Include="ConditionalRulePP.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -353,6 +354,7 @@
     <None Include="AttributeFinderEnginePP.rgs" />
     <None Include="AttributeFindInfo.rgs" />
     <None Include="AttributeRule.rgs" />
+    <None Include="AttributeStorageManager.rgs" />
     <None Include="res\bitmap_p.bmp" />
     <None Include="ConditionalRulePP.rgs" />
     <None Include="..\..\IndustrySpecific\Redaction\RedactionCustomComponents\Code\res\DataAreaDialog.ico" />
@@ -401,6 +403,7 @@
     <ClInclude Include="AttributeFinderEngine.h" />
     <ClInclude Include="AttributeFindInfo.h" />
     <ClInclude Include="AttributeRule.h" />
+    <ClInclude Include="AttributeStorageManager.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="ConditionalRulePP.h" />
     <ClInclude Include="Export.h" />

@@ -2095,7 +2095,8 @@ namespace Extract.SQLCDBEditor
                     // Get the first record in the result set - should only be one
                     if (queryResult.Read())
                     {
-                        var nextValue = Convert.ChangeType(queryResult.GetValue(0), dataColumn.DataType);
+                        var nextValue = Convert.ChangeType(queryResult.GetValue(0),
+                            dataColumn.DataType, CultureInfo.InvariantCulture);
 
                         // If the row's auto-increment value is out of sync with the DB, apply the
                         // correct value to the row.
