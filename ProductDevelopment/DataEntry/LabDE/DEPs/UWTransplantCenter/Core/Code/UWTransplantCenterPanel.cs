@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Data;
 using System.Text;
 using System.Windows.Forms;
+using Extract.Drawing;
 
 namespace Extract.DataEntry.DEP.UWTransplantCenter
 {
@@ -53,5 +54,47 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         }
 
         #endregion Constructors
+
+        /// <summary>
+        /// Handles the DrawItem event of the Handle_HasCoverPageComboBox control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.DrawItemEventArgs"/> instance containing the event data.</param>
+        void HandleHasCoverPageComboBox_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            try
+            {
+                ComboBox combo = (ComboBox)sender;
+
+                if ((e.State & DrawItemState.Disabled) == DrawItemState.Disabled)
+                {
+                    e.Graphics.FillRectangle(
+                        ExtractBrushes.GetSolidBrush(SystemColors.Control), e.Bounds);
+                }
+                else if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                {
+                    e.Graphics.FillRectangle(
+                        ExtractBrushes.GetSolidBrush(Color.LightGreen), e.Bounds);
+                }
+                else
+                {
+                    e.Graphics.FillRectangle(
+                        ExtractBrushes.GetSolidBrush(combo.BackColor), e.Bounds);
+                }
+
+                if (e.Index != -1)
+                {
+                    e.Graphics.DrawString(combo.Items[e.Index].ToString(), e.Font,
+                        ExtractBrushes.GetSolidBrush(combo.ForeColor),
+                        new Point(e.Bounds.X, e.Bounds.Y));
+                }
+
+                e.DrawFocusRectangle();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36349");
+            }
+        }
     }
 }

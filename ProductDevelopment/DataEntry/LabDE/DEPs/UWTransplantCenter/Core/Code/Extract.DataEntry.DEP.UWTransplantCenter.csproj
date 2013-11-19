@@ -109,6 +109,10 @@
       <Project>{55C4FA3A-26C9-4CC0-9F11-A7E607E6ACD2}</Project>
       <Name>Extract.DataEntry</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Drawing\Core\Code\Extract.Drawing.csproj">
+      <Project>{865B9A25-1D27-4445-9CC7-7BF88D736BA8}</Project>
+      <Name>Extract.Drawing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
       <Project>{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}</Project>
       <Name>Extract.Imaging.Forms</Name>

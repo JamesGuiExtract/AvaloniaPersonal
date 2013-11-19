@@ -117,6 +117,24 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <metadata name="Name.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="label1.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="label3.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="label6.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="_componentCommentLabel.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="label2.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
   <data name="_laboratoryIdentifier.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
 &lt;Regex Name='Digits' SelectionMode='FIRST' Pattern='[\d]+'&gt;&lt;Attribute&gt;../../../LabInfo/Address/Address1&lt;/Attribute&gt;&lt;/Regex&gt;
@@ -152,6 +170,8 @@
 &lt;!-- Add spatial info to address fields --&gt;
 &lt;Query Default='True'&gt;&lt;Attribute SpatialMode='Only'&gt;../../../LabInfo/Name&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only'&gt;../../../LabInfo/Address/City&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only'&gt;../../../LabInfo/Address/State&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only'&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;&lt;/Query&gt;
 
+&lt;Query&gt;&lt;Expression&gt;(&lt;Attribute&gt;../NameFilter&lt;/Attribute&gt; != '' or &lt;Attribute&gt;../CityFilter&lt;/Attribute&gt; != '' or &lt;Attribute&gt;../StreetFilter&lt;/Attribute&gt; != '') ? '[BLANK]' : &lt;Attribute TriggerUpdate='False'&gt;.&lt;/Attribute&gt;&lt;/Expression&gt;&lt;/Query&gt;
+ 
 &lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabCode IS NOT NULL AND LabCode = SUBSTRING(&lt;Attribute&gt;../LabCode&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
 			
 &lt;!-- Look for exact name match --&gt;
@@ -214,7 +234,9 @@
 &lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Zip LIKE LOWER(&lt;Attribute&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;) + '%'&lt;/SQL&gt;&lt;/Query&gt;
 
 &lt;!-- Look for just first 5 of ZipCode in extracted Zip for match --&gt;
-&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Zip LIKE SUBSTRING(&lt;Attribute&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;</value>
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Zip LIKE SUBSTRING(&lt;Attribute&gt;../../../LabInfo/Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+
+&lt;Query&gt;&lt;Expression&gt;string.IsNullOrWhiteSpace(&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt;) ? '[BLANK]' : &lt;Value/&gt;&lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>
   <metadata name="_orderNumberColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -296,6 +318,20 @@
 			: &lt;Value/&gt;.Substring(0, 5)
 		: &lt;Value/&gt;.Insert(&lt;Value/&gt;.Length - 2, ':'))
 &lt;/Expression&gt;</value>
+  </data>
+  <data name="_laboratoryIdentifier.ValidationQuery" xml:space="preserve">
+    <value>&lt;Query ValidationListType='ValidationListOnly'&gt;[BLANK]
+&lt;SQL&gt;SELECT LabName FROM LabAddresses ORDER BY LabName&lt;/SQL&gt;
+&lt;/Query&gt;
+&lt;Query ValidationListType='AutoCompleteOnly'&gt;
+[BLANK]
+&lt;SQL&gt;SELECT LabName FROM LabAddresses
+WHERE [LabName] LIKE '%' + SUBSTRING(&lt;Attribute&gt;../NameFilter&lt;/Attribute&gt;,1,100) + '%'
+AND [City] LIKE '%' + SUBSTRING(&lt;Attribute&gt;../CityFilter&lt;/Attribute&gt;,1,100) + '%'
+AND [Address1] LIKE '%' + SUBSTRING(&lt;Attribute&gt;../StreetFilter&lt;/Attribute&gt;,1,100) + '%'
+ORDER BY LabName
+&lt;/SQL&gt;
+&lt;/Query&gt;</value>
   </data>
   <metadata name="_componentName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>

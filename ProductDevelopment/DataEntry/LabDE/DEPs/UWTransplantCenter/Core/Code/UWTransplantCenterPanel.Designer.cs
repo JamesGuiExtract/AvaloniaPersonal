@@ -28,16 +28,13 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.Label Name;
+            System.Windows.Forms.Label label1;
+            System.Windows.Forms.Label label3;
+            System.Windows.Forms.Label label6;
+            System.Windows.Forms.Label _componentCommentLabel;
+            System.Windows.Forms.Label label2;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UWTransplantCenterPanel));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
             Extract.DataEntry.HighlightColor highlightColor1 = new Extract.DataEntry.HighlightColor();
             Extract.DataEntry.HighlightColor highlightColor2 = new Extract.DataEntry.HighlightColor();
             this._labNameLabel = new System.Windows.Forms.Label();
@@ -54,6 +51,14 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._componentResultTime = new Extract.DataEntry.DataEntryTableColumn();
             this._labID = new Extract.DataEntry.DataEntryTextBox();
             this._testComponentTable = new Extract.DataEntry.DataEntryTable();
+            this._componentName = new Extract.DataEntry.DataEntryTableColumn();
+            this._testCode = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentValue = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentUnits = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentRefRange = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentFlag = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentStatusColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentOriginalName = new Extract.DataEntry.DataEntryTableColumn();
             this._patientInfoGroupBox = new Extract.DataEntry.DataEntryGroupBox();
             this._patientNameTable = new Extract.DataEntry.DataEntryTable();
             this._patientLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
@@ -71,8 +76,10 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._orderingPhysicianMiddleName = new Extract.DataEntry.DataEntryTableColumn();
             this._orderingPhysicianCodeColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._testDetailsGroupBox = new System.Windows.Forms.GroupBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this._labStreetFilterTextBox = new Extract.DataEntry.DataEntryTextBox();
+            this._labCityFilterTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._componentComment = new Extract.DataEntry.DataEntryTextBox();
+            this._labNameFilterTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._testCommentLabel = new System.Windows.Forms.Label();
             this._testComment = new Extract.DataEntry.DataEntryTextBox();
             this._testsGroupBox = new System.Windows.Forms.GroupBox();
@@ -80,14 +87,13 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._operatorComments = new Extract.DataEntry.DataEntryTextBox();
             this._messageSequenceNumberFile = new Extract.DataEntry.DataEntryTextBox();
             this._filename = new Extract.DataEntry.DataEntryTextBox();
-            this._componentName = new Extract.DataEntry.DataEntryTableColumn();
-            this._testCode = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentValue = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentUnits = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentRefRange = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentFlag = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentStatusColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentOriginalName = new Extract.DataEntry.DataEntryTableColumn();
+            this._hasCoverPageComboBox = new Extract.DataEntry.DataEntryComboBox();
+            Name = new System.Windows.Forms.Label();
+            label1 = new System.Windows.Forms.Label();
+            label3 = new System.Windows.Forms.Label();
+            label6 = new System.Windows.Forms.Label();
+            _componentCommentLabel = new System.Windows.Forms.Label();
+            label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).BeginInit();
             this._patientInfoGroupBox.SuspendLayout();
@@ -96,12 +102,68 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._testsGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
+            // Name
+            // 
+            Name.AutoSize = true;
+            Name.Location = new System.Drawing.Point(71, 20);
+            Name.Name = "Name";
+            Name.Size = new System.Drawing.Size(40, 13);
+            Name.TabIndex = 0;
+            Name.Text = "Name";
+            // 
+            // label1
+            // 
+            label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(263, 20);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(30, 13);
+            label1.TabIndex = 12;
+            label1.Text = "City";
+            // 
+            // label3
+            // 
+            label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            label3.AutoSize = true;
+            label3.Location = new System.Drawing.Point(408, 20);
+            label3.Name = "label3";
+            label3.Size = new System.Drawing.Size(42, 13);
+            label3.TabIndex = 14;
+            label3.Text = "Street";
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Location = new System.Drawing.Point(6, 39);
+            label6.Name = "label6";
+            label6.Size = new System.Drawing.Size(59, 13);
+            label6.TabIndex = 18;
+            label6.Text = "Lab Filter";
+            // 
+            // _componentCommentLabel
+            // 
+            _componentCommentLabel.AutoSize = true;
+            _componentCommentLabel.Location = new System.Drawing.Point(4, 461);
+            _componentCommentLabel.Name = "_componentCommentLabel";
+            _componentCommentLabel.Size = new System.Drawing.Size(63, 13);
+            _componentCommentLabel.TabIndex = 19;
+            _componentCommentLabel.Text = "Comment";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new System.Drawing.Point(6, 83);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(235, 13);
+            label2.TabIndex = 10;
+            label2.Text = "Does the document have a cover page?";
+            // 
             // _labNameLabel
             // 
             this._labNameLabel.AutoSize = true;
-            this._labNameLabel.Location = new System.Drawing.Point(5, 16);
+            this._labNameLabel.Location = new System.Drawing.Point(5, 61);
             this._labNameLabel.Name = "_labNameLabel";
-            this._labNameLabel.Size = new System.Drawing.Size(56, 13);
+            this._labNameLabel.Size = new System.Drawing.Size(64, 13);
             this._labNameLabel.TabIndex = 3;
             this._labNameLabel.Text = "Lab Name";
             // 
@@ -111,14 +173,14 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             | System.Windows.Forms.AnchorStyles.Right)));
             this._laboratoryIdentifier.AttributeName = "LabIdentifier";
             this._laboratoryIdentifier.AutoUpdateQuery = resources.GetString("_laboratoryIdentifier.AutoUpdateQuery");
-            this._laboratoryIdentifier.Location = new System.Drawing.Point(6, 32);
+            this._laboratoryIdentifier.Location = new System.Drawing.Point(6, 77);
             this._laboratoryIdentifier.Name = "_laboratoryIdentifier";
             this._laboratoryIdentifier.ParentDataEntryControl = this._labInfoPassThrough;
-            this._laboratoryIdentifier.Size = new System.Drawing.Size(568, 20);
-            this._laboratoryIdentifier.TabIndex = 1;
+            this._laboratoryIdentifier.Size = new System.Drawing.Size(568, 21);
+            this._laboratoryIdentifier.TabIndex = 4;
             this._laboratoryIdentifier.ValidationErrorMessage = "Missing or unknown laboratory name";
             this._laboratoryIdentifier.ValidationPattern = "\\w";
-            this._laboratoryIdentifier.ValidationQuery = "[BLANK]\r\n<SQL>SELECT LabName FROM LabAddresses ORDER BY LabName</SQL>";
+            this._laboratoryIdentifier.ValidationQuery = resources.GetString("_laboratoryIdentifier.ValidationQuery");
             // 
             // _labInfoPassThrough
             // 
@@ -126,7 +188,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._labInfoPassThrough.Location = new System.Drawing.Point(351, 6);
             this._labInfoPassThrough.Name = "_labInfoPassThrough";
             this._labInfoPassThrough.ParentDataEntryControl = this._laboratoryTestTable;
-            this._labInfoPassThrough.Size = new System.Drawing.Size(16, 20);
+            this._labInfoPassThrough.Size = new System.Drawing.Size(16, 21);
             this._labInfoPassThrough.SupportsSwiping = false;
             this._labInfoPassThrough.TabIndex = 5;
             this._labInfoPassThrough.ValidationErrorMessage = "";
@@ -140,14 +202,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._laboratoryTestTable.AttributeName = "Test";
             this._laboratoryTestTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._laboratoryTestTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._laboratoryTestTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this._laboratoryTestTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._laboratoryTestTable.ColumnHintsEnabled = false;
             this._laboratoryTestTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -159,26 +213,10 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._laboratoryTestTime,
             this._componentResultDate,
             this._componentResultTime});
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this._laboratoryTestTable.DefaultCellStyle = dataGridViewCellStyle2;
             this._laboratoryTestTable.Location = new System.Drawing.Point(6, 19);
             this._laboratoryTestTable.Name = "_laboratoryTestTable";
             this._laboratoryTestTable.ParentDataEntryControl = null;
             this._laboratoryTestTable.RowFormattingRuleFile = "Rules\\Swiping\\TestRow.rsd.etf";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._laboratoryTestTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this._laboratoryTestTable.RowSwipingEnabled = true;
             this._laboratoryTestTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._laboratoryTestTable.Size = new System.Drawing.Size(581, 95);
@@ -284,7 +322,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._labID.Location = new System.Drawing.Point(466, 6);
             this._labID.Name = "_labID";
             this._labID.ParentDataEntryControl = this._labInfoPassThrough;
-            this._labID.Size = new System.Drawing.Size(11, 20);
+            this._labID.Size = new System.Drawing.Size(11, 21);
             this._labID.SupportsSwiping = false;
             this._labID.TabIndex = 2;
             this._labID.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
@@ -303,14 +341,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._testComponentTable.AttributeName = "Component";
             this._testComponentTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._testComponentTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._testComponentTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this._testComponentTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._testComponentTable.ColumnHintsEnabled = false;
             this._testComponentTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -322,379 +352,14 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._componentFlag,
             this._componentStatusColumn,
             this._componentOriginalName});
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this._testComponentTable.DefaultCellStyle = dataGridViewCellStyle5;
-            this._testComponentTable.Location = new System.Drawing.Point(5, 125);
+            this._testComponentTable.Location = new System.Drawing.Point(5, 170);
             this._testComponentTable.Name = "_testComponentTable";
             this._testComponentTable.ParentDataEntryControl = this._laboratoryTestTable;
             this._testComponentTable.RowFormattingRuleFile = "Rules\\Swiping\\ComponentRow.rsd.etf";
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._testComponentTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this._testComponentTable.RowSwipingEnabled = true;
             this._testComponentTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._testComponentTable.Size = new System.Drawing.Size(581, 288);
             this._testComponentTable.TabIndex = 7;
-            // 
-            // _patientInfoGroupBox
-            // 
-            this._patientInfoGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._patientInfoGroupBox.AttributeName = "PatientInfo";
-            this._patientInfoGroupBox.Controls.Add(this._patientNameTable);
-            this._patientInfoGroupBox.Controls.Add(this._genderLabel);
-            this._patientInfoGroupBox.Controls.Add(this._patientGender);
-            this._patientInfoGroupBox.Controls.Add(this._patientBirthDate);
-            this._patientInfoGroupBox.Controls.Add(this._birthDateLabel);
-            this._patientInfoGroupBox.Controls.Add(this._patientRecordNum);
-            this._patientInfoGroupBox.Controls.Add(this._patientMRLabel);
-            this._patientInfoGroupBox.Location = new System.Drawing.Point(0, 79);
-            this._patientInfoGroupBox.Name = "_patientInfoGroupBox";
-            this._patientInfoGroupBox.ParentDataEntryControl = null;
-            this._patientInfoGroupBox.Size = new System.Drawing.Size(593, 114);
-            this._patientInfoGroupBox.TabIndex = 5;
-            this._patientInfoGroupBox.TabStop = false;
-            this._patientInfoGroupBox.Text = "Patient Information";
-            // 
-            // _patientNameTable
-            // 
-            this._patientNameTable.AllowDrop = true;
-            this._patientNameTable.AllowTabbingByRow = true;
-            this._patientNameTable.AllowUserToAddRows = false;
-            this._patientNameTable.AllowUserToDeleteRows = false;
-            this._patientNameTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._patientNameTable.AttributeName = "Name";
-            this._patientNameTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this._patientNameTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientNameTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
-            this._patientNameTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this._patientNameTable.ColumnHintsEnabled = false;
-            this._patientNameTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this._patientLastNameColumn,
-            this._patientFirstNameColumn,
-            this._patientMiddleNameColumn,
-            this._patientSuffixColumn});
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this._patientNameTable.DefaultCellStyle = dataGridViewCellStyle8;
-            this._patientNameTable.Location = new System.Drawing.Point(7, 19);
-            this._patientNameTable.MinimumNumberOfRows = 1;
-            this._patientNameTable.Name = "_patientNameTable";
-            this._patientNameTable.ParentDataEntryControl = this._patientInfoGroupBox;
-            this._patientNameTable.RowFormattingRuleFile = "Rules\\Swiping\\name.rsd.etf";
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientNameTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
-            this._patientNameTable.RowSwipingEnabled = true;
-            this._patientNameTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this._patientNameTable.Size = new System.Drawing.Size(567, 46);
-            this._patientNameTable.TabIndex = 1;
-            // 
-            // _patientLastNameColumn
-            // 
-            this._patientLastNameColumn.AttributeName = "Last";
-            this._patientLastNameColumn.HeaderText = "Last Name";
-            this._patientLastNameColumn.Name = "_patientLastNameColumn";
-            this._patientLastNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientLastNameColumn.ValidationErrorMessage = "Patient last name must be specified.";
-            this._patientLastNameColumn.ValidationPattern = "\\S";
-            // 
-            // _patientFirstNameColumn
-            // 
-            this._patientFirstNameColumn.AttributeName = "First";
-            this._patientFirstNameColumn.FillWeight = 75F;
-            this._patientFirstNameColumn.HeaderText = "First Name";
-            this._patientFirstNameColumn.Name = "_patientFirstNameColumn";
-            this._patientFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientFirstNameColumn.ValidationErrorMessage = "Patient first name must be specified";
-            this._patientFirstNameColumn.ValidationPattern = "\\S";
-            // 
-            // _patientMiddleNameColumn
-            // 
-            this._patientMiddleNameColumn.AttributeName = "Middle";
-            this._patientMiddleNameColumn.FillWeight = 75F;
-            this._patientMiddleNameColumn.HeaderText = "Middle Name";
-            this._patientMiddleNameColumn.Name = "_patientMiddleNameColumn";
-            this._patientMiddleNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientMiddleNameColumn.ValidationErrorMessage = "Bad value";
-            // 
-            // _patientSuffixColumn
-            // 
-            this._patientSuffixColumn.AttributeName = "Suffix";
-            this._patientSuffixColumn.FillWeight = 50F;
-            this._patientSuffixColumn.HeaderText = "Suffix";
-            this._patientSuffixColumn.Name = "_patientSuffixColumn";
-            this._patientSuffixColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientSuffixColumn.ValidationErrorMessage = "";
-            // 
-            // _genderLabel
-            // 
-            this._genderLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._genderLabel.AutoSize = true;
-            this._genderLabel.Location = new System.Drawing.Point(310, 68);
-            this._genderLabel.Name = "_genderLabel";
-            this._genderLabel.Size = new System.Drawing.Size(42, 13);
-            this._genderLabel.TabIndex = 10;
-            this._genderLabel.Text = "Gender";
-            // 
-            // _patientGender
-            // 
-            this._patientGender.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._patientGender.AttributeName = "Gender";
-            this._patientGender.Location = new System.Drawing.Point(313, 84);
-            this._patientGender.Name = "_patientGender";
-            this._patientGender.ParentDataEntryControl = this._patientInfoGroupBox;
-            this._patientGender.Size = new System.Drawing.Size(54, 21);
-            this._patientGender.TabIndex = 4;
-            this._patientGender.ValidationErrorMessage = "Specify \"M\" for male, \"F\" for female or \"U\" for unknown";
-            this._patientGender.ValidationQuery = "<SQL>SELECT * FROM Gender</SQL>";
-            // 
-            // _patientBirthDate
-            // 
-            this._patientBirthDate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._patientBirthDate.AttributeName = "DOB";
-            this._patientBirthDate.Location = new System.Drawing.Point(7, 84);
-            this._patientBirthDate.Name = "_patientBirthDate";
-            this._patientBirthDate.ParentDataEntryControl = this._patientInfoGroupBox;
-            this._patientBirthDate.Size = new System.Drawing.Size(283, 20);
-            this._patientBirthDate.TabIndex = 3;
-            this._patientBirthDate.ValidationErrorMessage = "Date of birth must be a valid date in the format MM/DD/YYYY";
-            this._patientBirthDate.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(18|19|20)\\d{2}$";
-            // 
-            // _birthDateLabel
-            // 
-            this._birthDateLabel.AutoSize = true;
-            this._birthDateLabel.Location = new System.Drawing.Point(5, 68);
-            this._birthDateLabel.Name = "_birthDateLabel";
-            this._birthDateLabel.Size = new System.Drawing.Size(66, 13);
-            this._birthDateLabel.TabIndex = 0;
-            this._birthDateLabel.Text = "Date of Birth";
-            // 
-            // _patientRecordNum
-            // 
-            this._patientRecordNum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._patientRecordNum.AttributeName = "MR_Number";
-            this._patientRecordNum.ClearClipboardOnPaste = true;
-            this._patientRecordNum.Location = new System.Drawing.Point(388, 84);
-            this._patientRecordNum.Name = "_patientRecordNum";
-            this._patientRecordNum.ParentDataEntryControl = this._patientInfoGroupBox;
-            this._patientRecordNum.Size = new System.Drawing.Size(186, 20);
-            this._patientRecordNum.TabIndex = 5;
-            this._patientRecordNum.ValidationErrorMessage = "MRN missing or invalid";
-            this._patientRecordNum.ValidationPattern = "^\\d{7,8}\\s?$";
-            // 
-            // _patientMRLabel
-            // 
-            this._patientMRLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._patientMRLabel.AutoSize = true;
-            this._patientMRLabel.Location = new System.Drawing.Point(385, 68);
-            this._patientMRLabel.Name = "_patientMRLabel";
-            this._patientMRLabel.Size = new System.Drawing.Size(32, 13);
-            this._patientMRLabel.TabIndex = 0;
-            this._patientMRLabel.Text = "MRN";
-            // 
-            // _orderingPhysicianLastNameColumn
-            // 
-            this._orderingPhysicianLastNameColumn.AttributeName = "Last";
-            this._orderingPhysicianLastNameColumn.AutoUpdateQuery = "OUTSIDE";
-            this._orderingPhysicianLastNameColumn.HeaderText = "Last Name";
-            this._orderingPhysicianLastNameColumn.Name = "_orderingPhysicianLastNameColumn";
-            this._orderingPhysicianLastNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.Never;
-            this._orderingPhysicianLastNameColumn.ValidationErrorMessage = ".";
-            this._orderingPhysicianLastNameColumn.ValidationQuery = "";
-            // 
-            // _orderingPhysicianFirstNameColumn
-            // 
-            this._orderingPhysicianFirstNameColumn.AttributeName = "First";
-            this._orderingPhysicianFirstNameColumn.AutoUpdateQuery = "PROVIDER";
-            this._orderingPhysicianFirstNameColumn.FillWeight = 75F;
-            this._orderingPhysicianFirstNameColumn.HeaderText = "First Name";
-            this._orderingPhysicianFirstNameColumn.Name = "_orderingPhysicianFirstNameColumn";
-            this._orderingPhysicianFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderingPhysicianFirstNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.Never;
-            this._orderingPhysicianFirstNameColumn.ValidationErrorMessage = "";
-            this._orderingPhysicianFirstNameColumn.ValidationQuery = "";
-            // 
-            // _orderingPhysicianMiddleName
-            // 
-            this._orderingPhysicianMiddleName.AttributeName = null;
-            this._orderingPhysicianMiddleName.Name = "_orderingPhysicianMiddleName";
-            this._orderingPhysicianMiddleName.ValidationErrorMessage = "Invalid value";
-            // 
-            // _orderingPhysicianCodeColumn
-            // 
-            this._orderingPhysicianCodeColumn.AttributeName = null;
-            this._orderingPhysicianCodeColumn.Name = "_orderingPhysicianCodeColumn";
-            this._orderingPhysicianCodeColumn.ValidationErrorMessage = "Invalid value";
-            // 
-            // _testDetailsGroupBox
-            // 
-            this._testDetailsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._testDetailsGroupBox.Controls.Add(this.label2);
-            this._testDetailsGroupBox.Controls.Add(this._componentComment);
-            this._testDetailsGroupBox.Controls.Add(this._labInfoPassThrough);
-            this._testDetailsGroupBox.Controls.Add(this._labNameLabel);
-            this._testDetailsGroupBox.Controls.Add(this._laboratoryIdentifier);
-            this._testDetailsGroupBox.Controls.Add(this._testCommentLabel);
-            this._testDetailsGroupBox.Controls.Add(this._testComment);
-            this._testDetailsGroupBox.Controls.Add(this._labID);
-            this._testDetailsGroupBox.Controls.Add(this._testComponentTable);
-            this._testDetailsGroupBox.Location = new System.Drawing.Point(0, 328);
-            this._testDetailsGroupBox.Name = "_testDetailsGroupBox";
-            this._testDetailsGroupBox.Size = new System.Drawing.Size(593, 566);
-            this._testDetailsGroupBox.TabIndex = 9;
-            this._testDetailsGroupBox.TabStop = false;
-            this._testDetailsGroupBox.Text = "Selected Order Details";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(5, 416);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(51, 13);
-            this.label2.TabIndex = 9;
-            this.label2.Text = "Comment";
-            // 
-            // _componentComment
-            // 
-            this._componentComment.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._componentComment.AttributeName = "Comment";
-            this._componentComment.AutoUpdateQuery = "";
-            this._componentComment.Location = new System.Drawing.Point(5, 432);
-            this._componentComment.Multiline = true;
-            this._componentComment.Name = "_componentComment";
-            this._componentComment.ParentDataEntryControl = this._testComponentTable;
-            this._componentComment.RemoveNewLineChars = false;
-            this._componentComment.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._componentComment.Size = new System.Drawing.Size(569, 128);
-            this._componentComment.TabIndex = 8;
-            this._componentComment.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
-            this._componentComment.ValidationErrorMessage = "";
-            // 
-            // _testCommentLabel
-            // 
-            this._testCommentLabel.AutoSize = true;
-            this._testCommentLabel.Location = new System.Drawing.Point(5, 56);
-            this._testCommentLabel.Name = "_testCommentLabel";
-            this._testCommentLabel.Size = new System.Drawing.Size(51, 13);
-            this._testCommentLabel.TabIndex = 7;
-            this._testCommentLabel.Text = "Comment";
-            // 
-            // _testComment
-            // 
-            this._testComment.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._testComment.AttributeName = "Comment";
-            this._testComment.AutoUpdateQuery = "<Query Default=\'1\'>Verified by $FullUserName() on $Now(%m/%d/%Y).</Query>";
-            this._testComment.Location = new System.Drawing.Point(5, 72);
-            this._testComment.Multiline = true;
-            this._testComment.Name = "_testComment";
-            this._testComment.ParentDataEntryControl = this._laboratoryTestTable;
-            this._testComment.RemoveNewLineChars = false;
-            this._testComment.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._testComment.Size = new System.Drawing.Size(569, 47);
-            this._testComment.TabIndex = 6;
-            this._testComment.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
-            this._testComment.ValidationErrorMessage = "";
-            // 
-            // _testsGroupBox
-            // 
-            this._testsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._testsGroupBox.Controls.Add(this._laboratoryTestTable);
-            this._testsGroupBox.Location = new System.Drawing.Point(0, 199);
-            this._testsGroupBox.Name = "_testsGroupBox";
-            this._testsGroupBox.Size = new System.Drawing.Size(593, 123);
-            this._testsGroupBox.TabIndex = 8;
-            this._testsGroupBox.TabStop = false;
-            this._testsGroupBox.Text = "Orders";
-            // 
-            // _operatorCommentLabel
-            // 
-            this._operatorCommentLabel.AutoSize = true;
-            this._operatorCommentLabel.Location = new System.Drawing.Point(6, 11);
-            this._operatorCommentLabel.Name = "_operatorCommentLabel";
-            this._operatorCommentLabel.Size = new System.Drawing.Size(146, 13);
-            this._operatorCommentLabel.TabIndex = 6;
-            this._operatorCommentLabel.Text = "Comments (for operator\'s use)";
-            // 
-            // _operatorComments
-            // 
-            this._operatorComments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._operatorComments.AttributeName = "OperatorComments";
-            this._operatorComments.Enabled = false;
-            this._operatorComments.Location = new System.Drawing.Point(7, 27);
-            this._operatorComments.Multiline = true;
-            this._operatorComments.Name = "_operatorComments";
-            this._operatorComments.RemoveNewLineChars = false;
-            this._operatorComments.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._operatorComments.Size = new System.Drawing.Size(567, 46);
-            this._operatorComments.TabIndex = 1;
-            this._operatorComments.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
-            this._operatorComments.ValidationErrorMessage = "Invalid value";
-            // 
-            // _messageSequenceNumberFile
-            // 
-            this._messageSequenceNumberFile.AttributeName = "MessageSequenceNumberFile";
-            this._messageSequenceNumberFile.AutoUpdateQuery = "<Query><SolutionDirectory/>\\MessageSequenceNumber.txt</Query>";
-            this._messageSequenceNumberFile.Location = new System.Drawing.Point(208, 0);
-            this._messageSequenceNumberFile.Name = "_messageSequenceNumberFile";
-            this._messageSequenceNumberFile.Size = new System.Drawing.Size(12, 20);
-            this._messageSequenceNumberFile.TabIndex = 0;
-            this._messageSequenceNumberFile.ValidationErrorMessage = "Invalid value";
-            this._messageSequenceNumberFile.Visible = false;
-            // 
-            // _filename
-            // 
-            this._filename.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._filename.AttributeName = "Filename";
-            this._filename.AutoUpdateQuery = "<SourceDocName/>";
-            this._filename.BackColor = System.Drawing.SystemColors.Control;
-            this._filename.ForeColor = System.Drawing.Color.Black;
-            this._filename.Location = new System.Drawing.Point(226, 0);
-            this._filename.Name = "_filename";
-            this._filename.ReadOnly = true;
-            this._filename.Size = new System.Drawing.Size(14, 20);
-            this._filename.SupportsSwiping = false;
-            this._filename.TabIndex = 3;
-            this._filename.TabStop = false;
-            this._filename.TabStopMode = Extract.DataEntry.TabStopMode.Never;
-            this._filename.ValidationErrorMessage = "";
-            this._filename.Visible = false;
             // 
             // _componentName
             // 
@@ -788,11 +453,399 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._componentOriginalName.ValidationQuery = "";
             this._componentOriginalName.Visible = false;
             // 
+            // _patientInfoGroupBox
+            // 
+            this._patientInfoGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._patientInfoGroupBox.AttributeName = "PatientInfo";
+            this._patientInfoGroupBox.Controls.Add(this._patientNameTable);
+            this._patientInfoGroupBox.Controls.Add(this._genderLabel);
+            this._patientInfoGroupBox.Controls.Add(this._patientGender);
+            this._patientInfoGroupBox.Controls.Add(this._patientBirthDate);
+            this._patientInfoGroupBox.Controls.Add(this._birthDateLabel);
+            this._patientInfoGroupBox.Controls.Add(this._patientRecordNum);
+            this._patientInfoGroupBox.Controls.Add(this._patientMRLabel);
+            this._patientInfoGroupBox.Location = new System.Drawing.Point(0, 107);
+            this._patientInfoGroupBox.Name = "_patientInfoGroupBox";
+            this._patientInfoGroupBox.ParentDataEntryControl = null;
+            this._patientInfoGroupBox.Size = new System.Drawing.Size(593, 114);
+            this._patientInfoGroupBox.TabIndex = 5;
+            this._patientInfoGroupBox.TabStop = false;
+            this._patientInfoGroupBox.Text = "Patient Information";
+            // 
+            // _patientNameTable
+            // 
+            this._patientNameTable.AllowDrop = true;
+            this._patientNameTable.AllowTabbingByRow = true;
+            this._patientNameTable.AllowUserToAddRows = false;
+            this._patientNameTable.AllowUserToDeleteRows = false;
+            this._patientNameTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._patientNameTable.AttributeName = "Name";
+            this._patientNameTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this._patientNameTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+            this._patientNameTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this._patientNameTable.ColumnHintsEnabled = false;
+            this._patientNameTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this._patientLastNameColumn,
+            this._patientFirstNameColumn,
+            this._patientMiddleNameColumn,
+            this._patientSuffixColumn});
+            this._patientNameTable.Location = new System.Drawing.Point(7, 19);
+            this._patientNameTable.MinimumNumberOfRows = 1;
+            this._patientNameTable.Name = "_patientNameTable";
+            this._patientNameTable.ParentDataEntryControl = this._patientInfoGroupBox;
+            this._patientNameTable.RowFormattingRuleFile = "Rules\\Swiping\\name.rsd.etf";
+            this._patientNameTable.RowSwipingEnabled = true;
+            this._patientNameTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
+            this._patientNameTable.Size = new System.Drawing.Size(567, 46);
+            this._patientNameTable.TabIndex = 1;
+            // 
+            // _patientLastNameColumn
+            // 
+            this._patientLastNameColumn.AttributeName = "Last";
+            this._patientLastNameColumn.HeaderText = "Last Name";
+            this._patientLastNameColumn.Name = "_patientLastNameColumn";
+            this._patientLastNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._patientLastNameColumn.ValidationErrorMessage = "Patient last name must be specified.";
+            this._patientLastNameColumn.ValidationPattern = "\\S";
+            // 
+            // _patientFirstNameColumn
+            // 
+            this._patientFirstNameColumn.AttributeName = "First";
+            this._patientFirstNameColumn.FillWeight = 75F;
+            this._patientFirstNameColumn.HeaderText = "First Name";
+            this._patientFirstNameColumn.Name = "_patientFirstNameColumn";
+            this._patientFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._patientFirstNameColumn.ValidationErrorMessage = "Patient first name must be specified";
+            this._patientFirstNameColumn.ValidationPattern = "\\S";
+            // 
+            // _patientMiddleNameColumn
+            // 
+            this._patientMiddleNameColumn.AttributeName = "Middle";
+            this._patientMiddleNameColumn.FillWeight = 75F;
+            this._patientMiddleNameColumn.HeaderText = "Middle Name";
+            this._patientMiddleNameColumn.Name = "_patientMiddleNameColumn";
+            this._patientMiddleNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._patientMiddleNameColumn.ValidationErrorMessage = "Bad value";
+            // 
+            // _patientSuffixColumn
+            // 
+            this._patientSuffixColumn.AttributeName = "Suffix";
+            this._patientSuffixColumn.FillWeight = 50F;
+            this._patientSuffixColumn.HeaderText = "Suffix";
+            this._patientSuffixColumn.Name = "_patientSuffixColumn";
+            this._patientSuffixColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._patientSuffixColumn.ValidationErrorMessage = "";
+            // 
+            // _genderLabel
+            // 
+            this._genderLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._genderLabel.AutoSize = true;
+            this._genderLabel.Location = new System.Drawing.Point(310, 68);
+            this._genderLabel.Name = "_genderLabel";
+            this._genderLabel.Size = new System.Drawing.Size(49, 13);
+            this._genderLabel.TabIndex = 10;
+            this._genderLabel.Text = "Gender";
+            // 
+            // _patientGender
+            // 
+            this._patientGender.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._patientGender.AttributeName = "Gender";
+            this._patientGender.Location = new System.Drawing.Point(313, 84);
+            this._patientGender.Name = "_patientGender";
+            this._patientGender.ParentDataEntryControl = this._patientInfoGroupBox;
+            this._patientGender.Size = new System.Drawing.Size(54, 21);
+            this._patientGender.TabIndex = 4;
+            this._patientGender.ValidationErrorMessage = "Specify \"M\" for male, \"F\" for female or \"U\" for unknown";
+            this._patientGender.ValidationQuery = "<SQL>SELECT * FROM Gender</SQL>";
+            // 
+            // _patientBirthDate
+            // 
+            this._patientBirthDate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._patientBirthDate.AttributeName = "DOB";
+            this._patientBirthDate.Location = new System.Drawing.Point(7, 84);
+            this._patientBirthDate.Name = "_patientBirthDate";
+            this._patientBirthDate.ParentDataEntryControl = this._patientInfoGroupBox;
+            this._patientBirthDate.Size = new System.Drawing.Size(283, 21);
+            this._patientBirthDate.TabIndex = 3;
+            this._patientBirthDate.ValidationErrorMessage = "Date of birth must be a valid date in the format MM/DD/YYYY";
+            this._patientBirthDate.ValidationPattern = "^((0?[1-9])|(1[0-2]))/((0?[1-9])|(1[0-9])|(2[0-9])|(3[01]))/(18|19|20)\\d{2}$";
+            // 
+            // _birthDateLabel
+            // 
+            this._birthDateLabel.AutoSize = true;
+            this._birthDateLabel.Location = new System.Drawing.Point(5, 68);
+            this._birthDateLabel.Name = "_birthDateLabel";
+            this._birthDateLabel.Size = new System.Drawing.Size(80, 13);
+            this._birthDateLabel.TabIndex = 0;
+            this._birthDateLabel.Text = "Date of Birth";
+            // 
+            // _patientRecordNum
+            // 
+            this._patientRecordNum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._patientRecordNum.AttributeName = "MR_Number";
+            this._patientRecordNum.ClearClipboardOnPaste = true;
+            this._patientRecordNum.Location = new System.Drawing.Point(388, 84);
+            this._patientRecordNum.Name = "_patientRecordNum";
+            this._patientRecordNum.ParentDataEntryControl = this._patientInfoGroupBox;
+            this._patientRecordNum.Size = new System.Drawing.Size(186, 21);
+            this._patientRecordNum.TabIndex = 5;
+            this._patientRecordNum.ValidationErrorMessage = "MRN missing or invalid";
+            this._patientRecordNum.ValidationPattern = "^\\d{7,8}\\s?$";
+            // 
+            // _patientMRLabel
+            // 
+            this._patientMRLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._patientMRLabel.AutoSize = true;
+            this._patientMRLabel.Location = new System.Drawing.Point(385, 68);
+            this._patientMRLabel.Name = "_patientMRLabel";
+            this._patientMRLabel.Size = new System.Drawing.Size(32, 13);
+            this._patientMRLabel.TabIndex = 0;
+            this._patientMRLabel.Text = "MRN";
+            // 
+            // _orderingPhysicianLastNameColumn
+            // 
+            this._orderingPhysicianLastNameColumn.AttributeName = "Last";
+            this._orderingPhysicianLastNameColumn.AutoUpdateQuery = "OUTSIDE";
+            this._orderingPhysicianLastNameColumn.HeaderText = "Last Name";
+            this._orderingPhysicianLastNameColumn.Name = "_orderingPhysicianLastNameColumn";
+            this._orderingPhysicianLastNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this._orderingPhysicianLastNameColumn.ValidationErrorMessage = ".";
+            this._orderingPhysicianLastNameColumn.ValidationQuery = "";
+            // 
+            // _orderingPhysicianFirstNameColumn
+            // 
+            this._orderingPhysicianFirstNameColumn.AttributeName = "First";
+            this._orderingPhysicianFirstNameColumn.AutoUpdateQuery = "PROVIDER";
+            this._orderingPhysicianFirstNameColumn.FillWeight = 75F;
+            this._orderingPhysicianFirstNameColumn.HeaderText = "First Name";
+            this._orderingPhysicianFirstNameColumn.Name = "_orderingPhysicianFirstNameColumn";
+            this._orderingPhysicianFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._orderingPhysicianFirstNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this._orderingPhysicianFirstNameColumn.ValidationErrorMessage = "";
+            this._orderingPhysicianFirstNameColumn.ValidationQuery = "";
+            // 
+            // _orderingPhysicianMiddleName
+            // 
+            this._orderingPhysicianMiddleName.AttributeName = null;
+            this._orderingPhysicianMiddleName.Name = "_orderingPhysicianMiddleName";
+            this._orderingPhysicianMiddleName.ValidationErrorMessage = "Invalid value";
+            // 
+            // _orderingPhysicianCodeColumn
+            // 
+            this._orderingPhysicianCodeColumn.AttributeName = null;
+            this._orderingPhysicianCodeColumn.Name = "_orderingPhysicianCodeColumn";
+            this._orderingPhysicianCodeColumn.ValidationErrorMessage = "Invalid value";
+            // 
+            // _testDetailsGroupBox
+            // 
+            this._testDetailsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._testDetailsGroupBox.Controls.Add(_componentCommentLabel);
+            this._testDetailsGroupBox.Controls.Add(label6);
+            this._testDetailsGroupBox.Controls.Add(this._labStreetFilterTextBox);
+            this._testDetailsGroupBox.Controls.Add(label3);
+            this._testDetailsGroupBox.Controls.Add(this._labCityFilterTextBox);
+            this._testDetailsGroupBox.Controls.Add(this._componentComment);
+            this._testDetailsGroupBox.Controls.Add(label1);
+            this._testDetailsGroupBox.Controls.Add(this._labInfoPassThrough);
+            this._testDetailsGroupBox.Controls.Add(this._labNameFilterTextBox);
+            this._testDetailsGroupBox.Controls.Add(this._labNameLabel);
+            this._testDetailsGroupBox.Controls.Add(Name);
+            this._testDetailsGroupBox.Controls.Add(this._laboratoryIdentifier);
+            this._testDetailsGroupBox.Controls.Add(this._testCommentLabel);
+            this._testDetailsGroupBox.Controls.Add(this._testComment);
+            this._testDetailsGroupBox.Controls.Add(this._labID);
+            this._testDetailsGroupBox.Controls.Add(this._testComponentTable);
+            this._testDetailsGroupBox.Location = new System.Drawing.Point(0, 356);
+            this._testDetailsGroupBox.Name = "_testDetailsGroupBox";
+            this._testDetailsGroupBox.Size = new System.Drawing.Size(593, 613);
+            this._testDetailsGroupBox.TabIndex = 9;
+            this._testDetailsGroupBox.TabStop = false;
+            this._testDetailsGroupBox.Text = "Selected Order Details";
+            // 
+            // _labStreetFilterTextBox
+            // 
+            this._labStreetFilterTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._labStreetFilterTextBox.AttributeName = "StreetFilter";
+            this._labStreetFilterTextBox.AutoUpdateQuery = "";
+            this._labStreetFilterTextBox.Location = new System.Drawing.Point(411, 36);
+            this._labStreetFilterTextBox.Name = "_labStreetFilterTextBox";
+            this._labStreetFilterTextBox.ParentDataEntryControl = this._labInfoPassThrough;
+            this._labStreetFilterTextBox.PersistAttribute = false;
+            this._labStreetFilterTextBox.Size = new System.Drawing.Size(163, 21);
+            this._labStreetFilterTextBox.TabIndex = 3;
+            this._labStreetFilterTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this._labStreetFilterTextBox.ValidationErrorMessage = "";
+            this._labStreetFilterTextBox.ValidationQuery = "";
+            // 
+            // _labCityFilterTextBox
+            // 
+            this._labCityFilterTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._labCityFilterTextBox.AttributeName = "CityFilter";
+            this._labCityFilterTextBox.AutoUpdateQuery = "";
+            this._labCityFilterTextBox.Location = new System.Drawing.Point(266, 36);
+            this._labCityFilterTextBox.Name = "_labCityFilterTextBox";
+            this._labCityFilterTextBox.ParentDataEntryControl = this._labInfoPassThrough;
+            this._labCityFilterTextBox.PersistAttribute = false;
+            this._labCityFilterTextBox.Size = new System.Drawing.Size(139, 21);
+            this._labCityFilterTextBox.TabIndex = 2;
+            this._labCityFilterTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this._labCityFilterTextBox.ValidationErrorMessage = "";
+            this._labCityFilterTextBox.ValidationQuery = "";
+            // 
+            // _componentComment
+            // 
+            this._componentComment.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._componentComment.AttributeName = "Comment";
+            this._componentComment.AutoUpdateQuery = "";
+            this._componentComment.Location = new System.Drawing.Point(5, 477);
+            this._componentComment.Multiline = true;
+            this._componentComment.Name = "_componentComment";
+            this._componentComment.ParentDataEntryControl = this._testComponentTable;
+            this._componentComment.RemoveNewLineChars = false;
+            this._componentComment.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._componentComment.Size = new System.Drawing.Size(569, 128);
+            this._componentComment.TabIndex = 8;
+            this._componentComment.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
+            this._componentComment.ValidationErrorMessage = "";
+            // 
+            // _labNameFilterTextBox
+            // 
+            this._labNameFilterTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._labNameFilterTextBox.AttributeName = "NameFilter";
+            this._labNameFilterTextBox.AutoUpdateQuery = "";
+            this._labNameFilterTextBox.Location = new System.Drawing.Point(74, 36);
+            this._labNameFilterTextBox.Name = "_labNameFilterTextBox";
+            this._labNameFilterTextBox.ParentDataEntryControl = this._labInfoPassThrough;
+            this._labNameFilterTextBox.PersistAttribute = false;
+            this._labNameFilterTextBox.Size = new System.Drawing.Size(186, 21);
+            this._labNameFilterTextBox.TabIndex = 1;
+            this._labNameFilterTextBox.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this._labNameFilterTextBox.ValidationErrorMessage = "";
+            this._labNameFilterTextBox.ValidationQuery = "";
+            // 
+            // _testCommentLabel
+            // 
+            this._testCommentLabel.AutoSize = true;
+            this._testCommentLabel.Location = new System.Drawing.Point(5, 101);
+            this._testCommentLabel.Name = "_testCommentLabel";
+            this._testCommentLabel.Size = new System.Drawing.Size(63, 13);
+            this._testCommentLabel.TabIndex = 7;
+            this._testCommentLabel.Text = "Comment";
+            // 
+            // _testComment
+            // 
+            this._testComment.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._testComment.AttributeName = "Comment";
+            this._testComment.AutoUpdateQuery = "<Query Default=\'1\'>Verified by $FullUserName() on $Now(%m/%d/%Y).</Query>";
+            this._testComment.Location = new System.Drawing.Point(5, 117);
+            this._testComment.Multiline = true;
+            this._testComment.Name = "_testComment";
+            this._testComment.ParentDataEntryControl = this._laboratoryTestTable;
+            this._testComment.RemoveNewLineChars = false;
+            this._testComment.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._testComment.Size = new System.Drawing.Size(569, 47);
+            this._testComment.TabIndex = 6;
+            this._testComment.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
+            this._testComment.ValidationErrorMessage = "";
+            // 
+            // _testsGroupBox
+            // 
+            this._testsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._testsGroupBox.Controls.Add(this._laboratoryTestTable);
+            this._testsGroupBox.Location = new System.Drawing.Point(0, 227);
+            this._testsGroupBox.Name = "_testsGroupBox";
+            this._testsGroupBox.Size = new System.Drawing.Size(593, 123);
+            this._testsGroupBox.TabIndex = 8;
+            this._testsGroupBox.TabStop = false;
+            this._testsGroupBox.Text = "Orders";
+            // 
+            // _operatorCommentLabel
+            // 
+            this._operatorCommentLabel.AutoSize = true;
+            this._operatorCommentLabel.Location = new System.Drawing.Point(6, 11);
+            this._operatorCommentLabel.Name = "_operatorCommentLabel";
+            this._operatorCommentLabel.Size = new System.Drawing.Size(185, 13);
+            this._operatorCommentLabel.TabIndex = 6;
+            this._operatorCommentLabel.Text = "Comments (for operator\'s use)";
+            // 
+            // _operatorComments
+            // 
+            this._operatorComments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._operatorComments.AttributeName = "OperatorComments";
+            this._operatorComments.Enabled = false;
+            this._operatorComments.Location = new System.Drawing.Point(7, 27);
+            this._operatorComments.Multiline = true;
+            this._operatorComments.Name = "_operatorComments";
+            this._operatorComments.RemoveNewLineChars = false;
+            this._operatorComments.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._operatorComments.Size = new System.Drawing.Size(567, 46);
+            this._operatorComments.TabIndex = 1;
+            this._operatorComments.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
+            this._operatorComments.ValidationErrorMessage = "Invalid value";
+            // 
+            // _messageSequenceNumberFile
+            // 
+            this._messageSequenceNumberFile.AttributeName = "MessageSequenceNumberFile";
+            this._messageSequenceNumberFile.AutoUpdateQuery = "<Query><SolutionDirectory/>\\MessageSequenceNumber.txt</Query>";
+            this._messageSequenceNumberFile.Location = new System.Drawing.Point(208, 0);
+            this._messageSequenceNumberFile.Name = "_messageSequenceNumberFile";
+            this._messageSequenceNumberFile.Size = new System.Drawing.Size(12, 21);
+            this._messageSequenceNumberFile.TabIndex = 0;
+            this._messageSequenceNumberFile.ValidationErrorMessage = "Invalid value";
+            this._messageSequenceNumberFile.Visible = false;
+            // 
+            // _filename
+            // 
+            this._filename.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._filename.AttributeName = "Filename";
+            this._filename.AutoUpdateQuery = "<SourceDocName/>";
+            this._filename.BackColor = System.Drawing.SystemColors.Control;
+            this._filename.ForeColor = System.Drawing.Color.Black;
+            this._filename.Location = new System.Drawing.Point(226, 0);
+            this._filename.Name = "_filename";
+            this._filename.ReadOnly = true;
+            this._filename.Size = new System.Drawing.Size(14, 21);
+            this._filename.SupportsSwiping = false;
+            this._filename.TabIndex = 3;
+            this._filename.TabStop = false;
+            this._filename.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this._filename.ValidationErrorMessage = "";
+            this._filename.Visible = false;
+            // 
+            // _hasCoverPageComboBox
+            // 
+            this._hasCoverPageComboBox.AttributeName = "ClueOnFirstPage";
+            this._hasCoverPageComboBox.AutoUpdateQuery = "<Expression>(<Attribute Name=\'Value\'>.</Attribute>==\'Yes\' or <Value/>==\'No\') ? <V" +
+    "alue/> : \'[BLANK]\'</Expression>";
+            this._hasCoverPageComboBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this._hasCoverPageComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._hasCoverPageComboBox.FormattingEnabled = true;
+            this._hasCoverPageComboBox.Location = new System.Drawing.Point(247, 80);
+            this._hasCoverPageComboBox.Name = "_hasCoverPageComboBox";
+            this._hasCoverPageComboBox.Size = new System.Drawing.Size(64, 22);
+            this._hasCoverPageComboBox.TabIndex = 2;
+            this._hasCoverPageComboBox.ValidationErrorMessage = "Specify whether the first page is a cover page";
+            this._hasCoverPageComboBox.ValidationPattern = "Yes|No";
+            this._hasCoverPageComboBox.ValidationQuery = "<Query ValidationListType=\'AutoCompleteOnly\'>\r\n[BLANK]\r\nYes\r\nNo\r\n</Query>";
+            this._hasCoverPageComboBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.HandleHasCoverPageComboBox_DrawItem);
+            // 
             // UWTransplantCenterPanel
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.CommentControl = this._operatorComments;
+            this.Controls.Add(this._hasCoverPageComboBox);
+            this.Controls.Add(label2);
             this.Controls.Add(this._filename);
             this.Controls.Add(this._messageSequenceNumberFile);
             this.Controls.Add(this._operatorCommentLabel);
@@ -800,6 +853,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this.Controls.Add(this._testDetailsGroupBox);
             this.Controls.Add(this._patientInfoGroupBox);
             this.Controls.Add(this._operatorComments);
+            this.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             highlightColor1.Color = System.Drawing.Color.LightSalmon;
             highlightColor1.MaxOcrConfidence = 89;
             highlightColor2.Color = System.Drawing.Color.LightGreen;
@@ -809,7 +863,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         highlightColor2};
             this.MinimumSize = new System.Drawing.Size(500, 0);
             this.Name = "UWTransplantCenterPanel";
-            this.Size = new System.Drawing.Size(593, 898);
+            this.Size = new System.Drawing.Size(593, 971);
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).EndInit();
             this._patientInfoGroupBox.ResumeLayout(false);
@@ -850,7 +904,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         private Extract.DataEntry.DataEntryTableColumn _patientLastNameColumn;
         private Extract.DataEntry.DataEntryTableColumn _patientSuffixColumn;
         private Extract.DataEntry.DataEntryTextBox _messageSequenceNumberFile;
-        private System.Windows.Forms.Label label2;
         private DataEntryTextBox _componentComment;
         private DataEntryTextBox _filename;
         private DataEntryTableColumn _orderingPhysicianLastNameColumn;
@@ -873,5 +926,9 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         private DataEntryTableColumn _componentFlag;
         private DataEntryTableColumn _componentStatusColumn;
         private DataEntryTableColumn _componentOriginalName;
+        private DataEntryTextBox _labStreetFilterTextBox;
+        private DataEntryTextBox _labCityFilterTextBox;
+        private DataEntryTextBox _labNameFilterTextBox;
+        private DataEntryComboBox _hasCoverPageComboBox;
     }
 }
