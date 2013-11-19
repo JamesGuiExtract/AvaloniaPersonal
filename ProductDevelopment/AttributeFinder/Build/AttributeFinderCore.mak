@@ -252,7 +252,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V "$(BinariesFolder)\Interop.*.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v "$(BinariesFolder)\Extract.ExceptionService.exe" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v "$(BinariesFolder)\Extract.ExceptionService.WCFInterface.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
-	@COPY "$(RCNETDir)\APIs\Accusoft\PDFExpress\bin\PegasusImaging.WinForms.PdfXpress3.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
+	@COPY "$(RCNETDir)\APIs\Aspose\Aspose.Pdf for .NET\Bin\net4.0\Aspose.Pdf.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
 	@COPY "$(RCNETDir)\APIs\Spring.NET\1.3.1\bin\net\4.0\release\Spring.Core.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
 	@COPY "$(RCNETDir)\APIs\Spring.NET\1.3.1\bin\net\4.0\release\Common.Logging.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
 	@COPY "$(RCNETDir)\APIs\Spring.NET\1.3.1\bin\net\4.0\release\SpringFrameworkLicense.txt" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
