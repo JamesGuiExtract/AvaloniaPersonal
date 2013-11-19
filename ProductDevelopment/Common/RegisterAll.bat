@@ -23,7 +23,7 @@ IF NOT "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 pushd %PROGRAM_ROOT%\Extract Systems\CommonComponents
 
 for /R .\ %%r in (*.rl,*.nl) do (
-	for /F "tokens=1 delims=," %%i in (%%~sr) do (
+	for /F "tokens=1 delims=," %%i in (%%~nxr) do (
 		if "%%~xr" == ".rl" (
 			if not [%1]==[/s] (
 				echo Registering %%~dpr%%i...
