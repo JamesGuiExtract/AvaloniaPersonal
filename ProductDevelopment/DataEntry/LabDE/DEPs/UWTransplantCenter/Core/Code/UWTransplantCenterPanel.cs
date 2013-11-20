@@ -1,10 +1,12 @@
 using Extract.DataEntry;
 using Extract.Licensing;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Data;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Extract.Drawing;
@@ -55,6 +57,32 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
 
         #endregion Constructors
 
+        #region Overloads
+
+        /// <summary>
+        /// Raises the Load event. 
+        /// </summary>
+        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
+        protected override void OnLoad(EventArgs e)
+        {
+            try
+            {
+                base.OnLoad(e);
+
+                // To enforce the UW request that all text be selected when text boxes gain focus,
+                // register for the GotFocus event from all DataEntryTextBoxes.
+                RegisterGotFocusEvents(Controls);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36352");
+            }
+        }
+
+        #endregion Overloads
+
+        #region Event Handlers
+
         /// <summary>
         /// Handles the DrawItem event of the Handle_HasCoverPageComboBox control.
         /// </summary>
@@ -96,5 +124,81 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
                 ex.ExtractDisplay("ELI36349");
             }
         }
+
+        /// <summary>
+        /// Handles the GotFocus event of a TextBox control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleTextBox_GotFocus(object sender, EventArgs e)
+        {
+            try
+            {
+                var textBox = (DataEntryTextBox)sender;
+
+                if (Control.MouseButtons.HasFlag(MouseButtons.Left))
+                {
+                    // The sequence of events that occur during a mouse click that gives a control
+                    // focus as well as any intervening mouse movement events prior to the mouse up
+                    // event clears any selection we give it here. Wait until the mouse up to select
+                    // all text.
+                    textBox.MouseUp += HandleTextBox_MouseUp;
+                }
+                else
+                {
+                    textBox.SelectAll();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36351");
+            }
+        }
+
+        /// <summary>
+        /// Handles the MouseUp event of a TextBox control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleTextBox_MouseUp(object sender, MouseEventArgs e)
+        {
+            try
+            {
+                var textBox = (DataEntryTextBox)sender;
+
+                textBox.MouseUp -= HandleTextBox_MouseUp;
+                textBox.SelectAll();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36353");
+            }
+        }
+
+        #endregion Event Handlers
+
+        #region Private Members
+
+        /// <summary>
+        /// Registers the got focus events.
+        /// </summary>
+        /// <param name="controls">The controls.</param>
+        void RegisterGotFocusEvents(ControlCollection controls)
+        {
+            foreach (var control in controls.OfType<Control>())
+            {
+                var textBox = control as DataEntryTextBox;
+                if (textBox != null)
+                {
+                    textBox.GotFocus += HandleTextBox_GotFocus;
+                }
+
+                RegisterGotFocusEvents(control.Controls);
+            }
+        }
+
+        #endregion Private Members
     }
 }
