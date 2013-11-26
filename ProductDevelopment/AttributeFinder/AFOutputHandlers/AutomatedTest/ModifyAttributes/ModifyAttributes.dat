@@ -148,3 +148,8 @@
 
 // Both HCData attributes with % chars between attributes and : chars between digits
 <TESTCASE>;TestBF32.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF32.eav
+
+// Unique three-digit sections of attributes of type SSN with .? separations between sections and 
+// commas between attributes.
+// Exercising ability to replace an AFQuery with a regular expression if prefaced by '='
+<TESTCASE>;TestBF33.rsd;..\..\..\AFCore\AutomatedTest\Images\TestImage002.tif.uss;;TestBF33.eav
