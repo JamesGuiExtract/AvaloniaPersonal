@@ -61,10 +61,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._componentOriginalName = new Extract.DataEntry.DataEntryTableColumn();
             this._patientInfoGroupBox = new Extract.DataEntry.DataEntryGroupBox();
             this._patientNameTable = new Extract.DataEntry.DataEntryTable();
-            this._patientLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._patientFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._patientMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._patientSuffixColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._genderLabel = new System.Windows.Forms.Label();
             this._patientGender = new Extract.DataEntry.DataEntryComboBox();
             this._patientBirthDate = new Extract.DataEntry.DataEntryTextBox();
@@ -88,6 +84,11 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._messageSequenceNumberFile = new Extract.DataEntry.DataEntryTextBox();
             this._filename = new Extract.DataEntry.DataEntryTextBox();
             this._hasCoverPageComboBox = new Extract.DataEntry.DataEntryComboBox();
+            this._patientLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._patientFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._patientMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._patientSuffixColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._patientFullNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             Name = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -490,7 +491,8 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._patientLastNameColumn,
             this._patientFirstNameColumn,
             this._patientMiddleNameColumn,
-            this._patientSuffixColumn});
+            this._patientSuffixColumn,
+            this._patientFullNameColumn});
             this._patientNameTable.Location = new System.Drawing.Point(7, 19);
             this._patientNameTable.MinimumNumberOfRows = 1;
             this._patientNameTable.Name = "_patientNameTable";
@@ -500,43 +502,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._patientNameTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this._patientNameTable.Size = new System.Drawing.Size(567, 46);
             this._patientNameTable.TabIndex = 1;
-            // 
-            // _patientLastNameColumn
-            // 
-            this._patientLastNameColumn.AttributeName = "Last";
-            this._patientLastNameColumn.HeaderText = "Last Name";
-            this._patientLastNameColumn.Name = "_patientLastNameColumn";
-            this._patientLastNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientLastNameColumn.ValidationErrorMessage = "Patient last name must be specified.";
-            this._patientLastNameColumn.ValidationPattern = "\\S";
-            // 
-            // _patientFirstNameColumn
-            // 
-            this._patientFirstNameColumn.AttributeName = "First";
-            this._patientFirstNameColumn.FillWeight = 75F;
-            this._patientFirstNameColumn.HeaderText = "First Name";
-            this._patientFirstNameColumn.Name = "_patientFirstNameColumn";
-            this._patientFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientFirstNameColumn.ValidationErrorMessage = "Patient first name must be specified";
-            this._patientFirstNameColumn.ValidationPattern = "\\S";
-            // 
-            // _patientMiddleNameColumn
-            // 
-            this._patientMiddleNameColumn.AttributeName = "Middle";
-            this._patientMiddleNameColumn.FillWeight = 75F;
-            this._patientMiddleNameColumn.HeaderText = "Middle Name";
-            this._patientMiddleNameColumn.Name = "_patientMiddleNameColumn";
-            this._patientMiddleNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientMiddleNameColumn.ValidationErrorMessage = "Bad value";
-            // 
-            // _patientSuffixColumn
-            // 
-            this._patientSuffixColumn.AttributeName = "Suffix";
-            this._patientSuffixColumn.FillWeight = 50F;
-            this._patientSuffixColumn.HeaderText = "Suffix";
-            this._patientSuffixColumn.Name = "_patientSuffixColumn";
-            this._patientSuffixColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientSuffixColumn.ValidationErrorMessage = "";
             // 
             // _genderLabel
             // 
@@ -839,6 +804,52 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._hasCoverPageComboBox.ValidationQuery = "<Query ValidationListType=\'AutoCompleteOnly\'>\r\n[BLANK]\r\nYes\r\nNo\r\n</Query>";
             this._hasCoverPageComboBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.HandleHasCoverPageComboBox_DrawItem);
             // 
+            // _patientLastNameColumn
+            // 
+            this._patientLastNameColumn.AttributeName = "Last";
+            this._patientLastNameColumn.HeaderText = "Last Name";
+            this._patientLastNameColumn.Name = "_patientLastNameColumn";
+            this._patientLastNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._patientLastNameColumn.ValidationErrorMessage = "Patient last name must be specified.";
+            this._patientLastNameColumn.ValidationPattern = "\\S";
+            // 
+            // _patientFirstNameColumn
+            // 
+            this._patientFirstNameColumn.AttributeName = "First";
+            this._patientFirstNameColumn.FillWeight = 75F;
+            this._patientFirstNameColumn.HeaderText = "First Name";
+            this._patientFirstNameColumn.Name = "_patientFirstNameColumn";
+            this._patientFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._patientFirstNameColumn.ValidationErrorMessage = "Patient first name must be specified";
+            this._patientFirstNameColumn.ValidationPattern = "\\S";
+            // 
+            // _patientMiddleNameColumn
+            // 
+            this._patientMiddleNameColumn.AttributeName = "Middle";
+            this._patientMiddleNameColumn.FillWeight = 75F;
+            this._patientMiddleNameColumn.HeaderText = "Middle Name";
+            this._patientMiddleNameColumn.Name = "_patientMiddleNameColumn";
+            this._patientMiddleNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._patientMiddleNameColumn.ValidationErrorMessage = "Bad value";
+            // 
+            // _patientSuffixColumn
+            // 
+            this._patientSuffixColumn.AttributeName = "Suffix";
+            this._patientSuffixColumn.FillWeight = 50F;
+            this._patientSuffixColumn.HeaderText = "Suffix";
+            this._patientSuffixColumn.Name = "_patientSuffixColumn";
+            this._patientSuffixColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._patientSuffixColumn.ValidationErrorMessage = "";
+            // 
+            // _patientFullNameColumn
+            // 
+            this._patientFullNameColumn.AttributeName = ".";
+            this._patientFullNameColumn.AutoUpdateQuery = "<Expression>(<Attribute>.</Attribute> == \'\') ? \'N/A\' : \'N/A\'</Expression>";
+            this._patientFullNameColumn.HeaderText = "Full Name";
+            this._patientFullNameColumn.Name = "_patientFullNameColumn";
+            this._patientFullNameColumn.ValidationErrorMessage = "Invalid value";
+            this._patientFullNameColumn.Visible = false;
+            // 
             // UWTransplantCenterPanel
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -899,10 +910,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         private Extract.DataEntry.DataEntryTextBox _labInfoPassThrough;
         private System.Windows.Forms.Label _operatorCommentLabel;
         private Extract.DataEntry.DataEntryTextBox _operatorComments;
-        private Extract.DataEntry.DataEntryTableColumn _patientFirstNameColumn;
-        private Extract.DataEntry.DataEntryTableColumn _patientMiddleNameColumn;
-        private Extract.DataEntry.DataEntryTableColumn _patientLastNameColumn;
-        private Extract.DataEntry.DataEntryTableColumn _patientSuffixColumn;
         private Extract.DataEntry.DataEntryTextBox _messageSequenceNumberFile;
         private DataEntryTextBox _componentComment;
         private DataEntryTextBox _filename;
@@ -930,5 +937,10 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         private DataEntryTextBox _labCityFilterTextBox;
         private DataEntryTextBox _labNameFilterTextBox;
         private DataEntryComboBox _hasCoverPageComboBox;
+        private DataEntryTableColumn _patientLastNameColumn;
+        private DataEntryTableColumn _patientFirstNameColumn;
+        private DataEntryTableColumn _patientMiddleNameColumn;
+        private DataEntryTableColumn _patientSuffixColumn;
+        private DataEntryTableColumn _patientFullNameColumn;
     }
 }
