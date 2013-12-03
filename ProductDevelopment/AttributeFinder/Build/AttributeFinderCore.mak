@@ -247,6 +247,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /v  "$(BinariesFolder)\Obfuscated\DataEntryPrompt.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\PaginationUtility.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\PrintDocument.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY "$(RCNETDir)\APIs\Aspose\Aspose.Pdf for .NET\License\Aspose.Pdf.lic" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" 
 	@COPY /v  "$(BinariesFolder)\Obfuscated\*.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\*.exe" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V  "$(BinariesFolder)\Extract.DataEntry.DEP.DemoFlexIndex.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
