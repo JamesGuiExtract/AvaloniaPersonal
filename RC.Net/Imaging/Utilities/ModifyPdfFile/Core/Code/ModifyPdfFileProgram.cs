@@ -147,6 +147,11 @@ namespace Extract.Utilities
                     throw ee;
                 }
 
+                // Load the license for the Aspose PDF API
+                License license = new License();
+                license.SetLicense(
+                    Path.Combine(FileSystemMethods.CommonComponentsPath, "Aspose.Pdf.lic"));
+
                 using (var tempFile = new TemporaryFile(".pdf", true))
                 {
                     bool modified = false;
