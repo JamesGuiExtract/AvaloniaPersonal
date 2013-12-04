@@ -325,11 +325,11 @@
 &lt;/Query&gt;
 &lt;Query ValidationListType='AutoCompleteOnly'&gt;
 [BLANK]
-&lt;SQL&gt;SELECT LabName FROM LabAddresses
-WHERE [LabName] LIKE '%' + SUBSTRING(&lt;Attribute&gt;../NameFilter&lt;/Attribute&gt;,1,100) + '%'
-AND [City] LIKE '%' + SUBSTRING(&lt;Attribute&gt;../CityFilter&lt;/Attribute&gt;,1,100) + '%'
-AND [Address1] LIKE '%' + SUBSTRING(&lt;Attribute&gt;../StreetFilter&lt;/Attribute&gt;,1,100) + '%'
-ORDER BY LabName
+&lt;SQL&gt;SELECT LabName FROM LabAddresses 
+WHERE [LabName] LIKE '%' + SUBSTRING(&lt;Attribute&gt;../NameFilter&lt;/Attribute&gt;,1,100) + '%' 
+AND [City] LIKE '%' + SUBSTRING(&lt;Attribute&gt;../CityFilter&lt;/Attribute&gt;,1,100) + '%' 
+AND [Address1] LIKE '%' + SUBSTRING(&lt;Attribute&gt;../StreetFilter&lt;/Attribute&gt;,1,100) + '%' 
+ORDER BY LabName 
 &lt;/SQL&gt;
 &lt;/Query&gt;</value>
   </data>
