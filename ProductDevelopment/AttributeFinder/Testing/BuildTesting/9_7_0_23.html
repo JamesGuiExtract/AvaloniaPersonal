@@ -1,0 +1,242 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.7.0.23 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield / LabDE <br>Build 9.7.0.23 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[DataEntry #1265]</b> TBD
+        	<ul>
+			<li>TBD
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1121]</b> $Replace()
+        	<ul>
+			<li>Use <b>Test Text Function Expander</b> utility to exercise 
+			the <b>$Replace()</b> function.
+			<li>Start with a PDF source document and replace the PDF file 
+			extension with TIF.
+			<li>Confirm that the output does not include a double TIF.
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1122]</b> Confirm that <b>ASPose.pdf.dll</b> is 
+		installed and <b>PegasusImaging.WinForms.PdfXpress3.dll</b> is not 
+		installed.
+<p>
+  	   	<LI><b>[DotNetRC #1125, LegacyRC #6495]</b> Extract Systems Application 
+		Monitor service
+        	<ul>
+			<li>Confirm that the service <b>is not</b> installed by default.
+			<li>Confirm that <b>Install ESAppMonitorService.bat</b> is 
+			present in the <b>CommonComponents</b> folder.
+			<li>Confirm that the batch file installs the service.
+			<li><u>Functionality</u>
+			<ul>
+				<li>Start the <b>ESAppMonitor</b> service.
+				<li>Queue some files for processing.
+				<li>Process some file with <b>Core: OCR document</b> and 
+				<b>Keep processing files as they are added to the queue</b>.
+				<li>Use <b>TaskManager.exe</b> to confirm that 
+				<b>SSOCR2.exe</b> instances remain running while the 
+				processing FPS file waits for new documents.
+				<li>Confirm that the unused SSOCR2 instances are 
+				automatically killed after approximately 5 minutes of 
+				waiting.
+				<li>Add the <b>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\
+				Extract Systems\ESAppMonitorService\OCRProcessTimeout</b> 
+				registry key and set it to something other than the default 
+				of 300 seconds.
+				<li>Run the test again and confirm that the new timeout 
+				setting is used.
+			</ul>
+        	</ul>
+<p>
+  	   	<LI><b>[DotNetRC #1126]</b> Modify Pdf Licensing
+        	<ul>
+			<li>Confirm that <b>Aspose.pdf.dll</b> and <b>Aspose.pdf.lic</b> 
+			are installed to the <b>CommonComponents</b> folder.
+			<li>Confirm that the <b>Core: Modify PDF</b> task is available.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5317]</b> Confirm that the installed <b>Testing 
+		Files</b> do not contain files for obsolete objects.
+<p>
+  	   	<LI><b>[FlexIDSCore #5378]</b> Confirm that the <b>ConvertFAMDB</b> 
+		Start Menu shortcut is correct for FLEX Index.
+<p>
+  	   	<LI><b>[FlexIDSCore #5379, #5381]</b> Format Strings and Attribute 
+		Referencing
+        	<ul>
+			<li>Confirm that the <b>rule object</b> automated tests all 
+			pass without error.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5382, #5383]</b> Demo Shield Install Issues
+		<ul>
+			<li>Confirm proper spelling and text on the <b>Exit</b> page.
+			<li>Confirm that the <b>Contact Us</b> page includes correct 
+			address and phone number information.
+			<li>Confirm that <b>LabDE</b> is included on the <b>Other 
+			Products</b> page for FLEX Index and ID Shield.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #5386]</b> Confirm that the <b>Modify Attributes</b> 
+		automated tests all pass without error.
+<p>
+  	   	<LI><b>[FlexIDSCore #5387]</b> Enhanced VOA Files
+		<ul>
+			<li>Confirm that empty VOA files can be loaded.
+			<li>Confirm that empty VOA files can be saved.
+			<li>Confirm that old VOA files can be loaded.
+			<li>Confirm that new VOA files cannot be loaded on a pre-9.7 build.
+			<li>Confirm that saving, reloading, modifying and resaving VOA 
+			files does not increase their size unless new data is added.
+			<li>Confirm that reverifying a file will increase the size of a 
+			VOA file due to additional metadata.
+			<li>Confirm that the following sources can successfully load 
+			and save VOA files.
+			<ul>
+				<li>Core: Convert VOA to XML
+				<li>Data entry: Verify extracted data
+				<ul>
+					<li>Angular highlight tool
+					<li>Rectangular highlight tool
+					<li>Word highlight tool
+				</ul>
+				<li>Modify VOA
+				<li>Output to VOA OH
+				<li>Redaction Tester
+				<li>Redaction: Create redacted image
+				<li>Redaction: Filter ID Shield data file
+				<li>Redaction: Merge ID Shield data files
+				<li>Redaction: Verify sensitive data
+				<ul>
+					<li>Angular redaction tool
+					<li>Rectangular redaction tool
+					<li>Word redaction tool
+				</ul>
+				<li>Rule Tester
+				<li>VOA File Viewer
+			</ul>
+			<li>Confirm that spatial, non-spatial and hybrid spatial strings 
+			are properly read to and written from a VOA file.
+			<li>Confirm that nested attribute hierarchies are properly read 
+			to and written from a VOA file.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5912]</b> RegisterAll.bat
+        	<ul>
+			<li>Start with a clean test machine.
+			<li>Turn off support for short filenames via <b>fsutil 
+			8dot3name set 1</b>.
+			<li>Install an older build.
+			<li>Run the installed (old) <b>RegisterAll.bat</b>.
+			<ul>
+				<li>Confirm that errors are seen.
+			</ul>
+			<li>Uninstall the older build.
+			<ul>
+				<li>Confirm that errors are seen.
+			</ul>
+			<li>Install a new build.
+			<li>Exercise <b>RegisterAll.bat</b>.
+			<li>Confirm that no errors are seen.
+			<li>Confirm that <b>USB License Key Manager</b> runs without 
+			error.
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Miscellaneous</h3>
+   	<ul>
+  	   	<LI><b>Format String</b>
+	    	<ul>
+            		<li>Confirm that format string expansion code does not take an 
+			excessive amount of time to run for a large amount of literal 
+			text.
+	      		<li>Confirm that validation code provides useful debug 
+			information for formatting syntax errors.
+			<li>Confirm that a regex can be used in place of an AFQuery of 
+			a variable.
+       		</ul>
+  	   	<LI><b>Modify PDF</b>
+	    	<ul>
+            		<li>Confirm that the <b>ModifyPDFFile</b> utility is properly 
+			built and installed.
+			<li>Confirm that the <b>Core: Modify PDF</b> task can do the 
+			following:
+			<ul>
+				<li>Remove existing annotations from a PDF.
+				<li>Add a hyperlink based on attribute value to a PDF.
+				<li>Add a hard-coded hyperlink to a PDF.
+				<li>Remove existing annotations and add a hyperlink to 
+				a PDF.
+			</ul>
+       		</ul>
+  	   	<LI><b>UW DEP</b>
+	    	<ul>
+            		<li>Confirm that the <b>PatientInfo/Name</b> field is always 
+			set to <b>N/A</b> after verification.
+	      		<li>Confirm that initially all text is selected when clicking 
+			on a text box field.
+			<li>Confirm that the <b>Cover Page</b> combo box shows a green 
+			background when selected if using the Aero theme in Vista or 
+			Windows 7.
+			<li>Confirm proper tab order between fields.
+			<li>Confirm that the filtering fields are not tab stops.
+			<li>Confirm that the filtering fields work properly.
+       		</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
