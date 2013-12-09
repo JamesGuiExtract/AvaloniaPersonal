@@ -88,7 +88,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._patientFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._patientMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._patientSuffixColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._patientFullNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             Name = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -491,8 +490,7 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._patientLastNameColumn,
             this._patientFirstNameColumn,
             this._patientMiddleNameColumn,
-            this._patientSuffixColumn,
-            this._patientFullNameColumn});
+            this._patientSuffixColumn});
             this._patientNameTable.Location = new System.Drawing.Point(7, 19);
             this._patientNameTable.MinimumNumberOfRows = 1;
             this._patientNameTable.Name = "_patientNameTable";
@@ -841,15 +839,6 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
             this._patientSuffixColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this._patientSuffixColumn.ValidationErrorMessage = "";
             // 
-            // _patientFullNameColumn
-            // 
-            this._patientFullNameColumn.AttributeName = ".";
-            this._patientFullNameColumn.AutoUpdateQuery = "<Expression>(<Attribute>.</Attribute> == \'\') ? \'N/A\' : \'N/A\'</Expression>";
-            this._patientFullNameColumn.HeaderText = "Full Name";
-            this._patientFullNameColumn.Name = "_patientFullNameColumn";
-            this._patientFullNameColumn.ValidationErrorMessage = "Invalid value";
-            this._patientFullNameColumn.Visible = false;
-            // 
             // UWTransplantCenterPanel
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -941,6 +930,5 @@ namespace Extract.DataEntry.DEP.UWTransplantCenter
         private DataEntryTableColumn _patientFirstNameColumn;
         private DataEntryTableColumn _patientMiddleNameColumn;
         private DataEntryTableColumn _patientSuffixColumn;
-        private DataEntryTableColumn _patientFullNameColumn;
     }
 }
