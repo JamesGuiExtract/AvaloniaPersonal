@@ -271,7 +271,14 @@
     <value>True</value>
   </metadata>
   <data name="_componentDate.AutoUpdateQuery" xml:space="preserve">
-    <value>&lt;Expression&gt;(&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt; matches '^\d{1,2}[-/\\]\d{1,2}[-/\\](\d{2}|\d{4})$')
+    <value>&lt;Expression&gt;
+	(&lt;Expression Name='Value'&gt;
+		((&lt;Attribute Name='Time'&gt;../CollectionTime&lt;/Attribute&gt;.Length &gt;= 3) and
+		 (&lt;RegEx Pattern='(?&amp;lt;=^.*\d{2}\s)\d{1}.*'&gt;&lt;Attribute Name='RawValue'&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(':', '')
+			.StartsWith(&lt;Time/&gt;.Replace(':', ''))))
+			? &lt;RegEx Pattern='^.*\d{2}(?=\s\d{1})'&gt;&lt;RawValue/&gt;&lt;/RegEx&gt;
+			: &lt;RawValue/&gt;
+	 &lt;/Expression&gt; matches '^\d{1,2}[-/\\]\d{1,2}[-/\\](\d{2}|\d{4})$')
 	?	&lt;Expression&gt;
 			((&lt;RegEx Pattern='^\d{1,2}(?=[-/\\])' Name='Month'&gt;&lt;Value/&gt;&lt;/RegEx&gt;).Length == 2)
 				? &lt;Month/&gt;
@@ -291,18 +298,23 @@
 		&lt;/Expression&gt;
 	: 	&lt;Expression&gt;&lt;Value/&gt; matches '\d{8}'
 			? &lt;Value/&gt;.Substring(0,2) + '/' + &lt;Value/&gt;.Substring(2,2) + '/' + &lt;Value/&gt;.Substring(4,4)
-			: &lt;Value/&gt;
+			: ''
 		&lt;/Expression&gt;
 &lt;/Expression&gt;</value>
   </data>
   <data name="_laboratoryTestTime.AutoUpdateQuery" xml:space="preserve">
-    <value>&lt;Expression&gt;
-	((String.IsNullOrEmpty(&lt;RegEx Pattern='^[0-2]?\d[0-5]\d$'&gt;&lt;Attribute Name='Value'&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt;))
-		? (String.IsNullOrEmpty(&lt;RegEx Pattern='^[0-2]?\d:[0-5]\d:\d{2}$'&gt;&lt;Value/&gt;&lt;/RegEx&gt;))
-			? &lt;Value/&gt;
-			: &lt;Value/&gt;.Substring(0, 5)
-		: &lt;Value/&gt;.Insert(&lt;Value/&gt;.Length - 2, ':'))
-&lt;/Expression&gt;</value>
+    <value>&lt;Query&gt;&lt;Expression&gt;
+	(&lt;RegEx Name='Value'
+		Pattern='^[0-2]?\d:?[0-5]\d(?=(:\d{2})?$)'&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt; matches '^\d{3,4}$')
+		? &lt;Value/&gt;.Insert(&lt;Value/&gt;.Length - 2, ':')
+		: &lt;Value/&gt;
+&lt;/Expression&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;Expression&gt;
+	(&lt;RegEx Name='Time'
+		Pattern='(?&amp;lt;=^((\d{1,2}[-/\\]\d{1,2}[-/\\](\d{2}|\d{4}))|(\d{8}))\s)[0-2]?\d:?[0-5]\d(?=(:\d{2})?$)'&gt;&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt;&lt;/RegEx&gt; matches '^\d{3,4}$')
+		? &lt;Time/&gt;.Insert(&lt;Time/&gt;.Length - 2, ':')
+		: &lt;Time/&gt;
+&lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>
   <metadata name="_componentResultDate.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -359,6 +371,14 @@ ORDER BY LabName
   <metadata name="_componentUnits.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="_componentUnits.AutoUpdateQuery" xml:space="preserve">
+    <value>&lt;Query&gt;
+&lt;Expression&gt;&lt;Attribute TriggerUpdate='False' Name='Units'&gt;.&lt;/Attribute&gt; == ''
+? &lt;SQL&gt;SELECT [DefaultUnit] FROM LabTest WHERE [TestCode] = &lt;Attribute&gt;../TestCode&lt;/Attribute&gt;&lt;/SQL&gt;
+: &lt;Units/&gt;
+&lt;/Expression&gt;
+&lt;/Query&gt;</value>
+  </data>
   <metadata name="_componentRefRange.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -494,9 +514,6 @@ ORDER BY LabName
     <value>True</value>
   </metadata>
   <metadata name="_patientSuffixColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="_patientFullNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="_orderingPhysicianLastNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
