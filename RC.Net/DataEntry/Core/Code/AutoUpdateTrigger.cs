@@ -172,7 +172,7 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI26108", ex);
-                ee.AddDebugData("Query", query, false);
+                ee.AddDebugData("Query", query, true);
                 throw ee;
             }
         }
@@ -467,7 +467,7 @@ namespace Extract.DataEntry
                     "Failed to apply updated value!", ex);
                 try
                 {
-                    ee.AddDebugData("Query", dataEntryQuery.QueryText, false);
+                    ee.AddDebugData("Query", dataEntryQuery.QueryText, true);
                     ee.AddDebugData("Validation", _validationTrigger ? "True" : "False", false);
                     ee.AddDebugData("Target", _targetAttribute.Name, false);
                     ee.AddDebugData("Result", (queryResult == null) 

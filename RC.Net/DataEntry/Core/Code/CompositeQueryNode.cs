@@ -244,7 +244,7 @@ namespace Extract.DataEntry
                     {
                         ExtractException ee = new ExtractException("ELI26726",
                             "Unrecognized element in query.");
-                        ee.AddDebugData("Element Name", resultName, false);
+                        ee.AddDebugData("Element Name", resultName, true);
                         throw ee;
                     }
 
@@ -699,8 +699,8 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI26729", ex);
-                ee.AddDebugData("Query node type", GetType().Name, false);
-                ee.AddDebugData("Query", QueryText ?? "null", false);
+                ee.AddDebugData("Query node type", GetType().Name, true);
+                ee.AddDebugData("Query", QueryText ?? "null", true);
                 throw ee;
             }
         }

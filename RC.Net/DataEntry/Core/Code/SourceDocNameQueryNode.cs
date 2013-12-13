@@ -71,8 +71,8 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI34485", ex);
-                ee.AddDebugData("Query node type", GetType().Name, false);
-                ee.AddDebugData("Query", QueryText ?? "null", false);
+                ee.AddDebugData("Query node type", GetType().Name, true);
+                ee.AddDebugData("Query", QueryText ?? "null", true);
                 throw ee;
             }
         }

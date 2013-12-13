@@ -197,10 +197,10 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ExtractException ee = ex.AsExtract("ELI31983");
-                ee.AddDebugData("Expression", expressionBuilder.ToString(), false);
+                ee.AddDebugData("Expression", expressionBuilder.ToString(), true);
                 foreach (var variable in variables)
                 {
-                    ee.AddDebugData(variable.Key, variable.Value.ToString(), false);
+                    ee.AddDebugData(variable.Key, variable.Value.ToString(), true);
                 }
                 throw ee;
             }

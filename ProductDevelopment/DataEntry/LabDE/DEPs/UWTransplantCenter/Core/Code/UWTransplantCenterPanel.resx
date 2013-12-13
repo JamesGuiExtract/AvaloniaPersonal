@@ -271,12 +271,19 @@
     <value>True</value>
   </metadata>
   <data name="_componentDate.AutoUpdateQuery" xml:space="preserve">
-    <value>&lt;Expression&gt;
+    <value>&lt;Query&gt;&lt;Expression&gt;
 	(&lt;Expression Name='Value'&gt;
 		((&lt;Attribute Name='Time'&gt;../CollectionTime&lt;/Attribute&gt;.Length &gt;= 3) and
-		 (&lt;RegEx Pattern='(?&amp;lt;=^.*\d{2}\s)\d{1}.*'&gt;&lt;Attribute Name='RawValue'&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt;.Replace(':', '')
-			.StartsWith(&lt;Time/&gt;.Replace(':', ''))))
-			? &lt;RegEx Pattern='^.*\d{2}(?=\s\d{1})'&gt;&lt;RawValue/&gt;&lt;/RegEx&gt;
+		(&lt;Time/&gt; == &lt;Expression&gt;
+			(&lt;RegEx Name='TimeValue' Pattern='(?&amp;lt;=\s)[0-2]?\d:?[0-5]\d(?::\d{2})?(\s?(AM|PM))?$'&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt; != '')
+				? date(&lt;Expression&gt;
+					(&lt;RegEx Name='Part1' Pattern='^[^\sA-Za-z]*'&gt;&lt;TimeValue/&gt;&lt;/RegEx&gt; matches '^\d{3,4}$')
+						? &lt;Part1/&gt;.Insert(&lt;Part1/&gt;.Length - 2, ':')
+						: &lt;Part1/&gt;
+				  &lt;/Expression&gt; + &lt;RegEx Pattern ='\s?(AM|PM)$'&gt;&lt;TimeValue/&gt;&lt;/RegEx&gt;).ToString('HH:mm')
+				: '' 
+			&lt;/Expression&gt;))
+			? &lt;RegEx Pattern='^.*\d{2}(?=\s\d{1})'&gt;&lt;Attribute Name='RawValue'&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt;
 			: &lt;RawValue/&gt;
 	 &lt;/Expression&gt; matches '^\d{1,2}[-/\\]\d{1,2}[-/\\](\d{2}|\d{4})$')
 	?	&lt;Expression&gt;
@@ -296,24 +303,33 @@
 				? &lt;Year/&gt;
 				: '20' + &lt;Year/&gt;
 		&lt;/Expression&gt;
-	: 	&lt;Expression&gt;&lt;Value/&gt; matches '\d{8}'
-			? &lt;Value/&gt;.Substring(0,2) + '/' + &lt;Value/&gt;.Substring(2,2) + '/' + &lt;Value/&gt;.Substring(4,4)
-			: ''
+	: 	&lt;Expression&gt;&lt;Value/&gt; matches '^\d{8}$'
+			? &lt;Value/&gt;.Substring(0,2) + '/' + &lt;Value/&gt;.Substring(2,2) + '/' + &lt;Value/&gt;.Substring(4)
+			: &lt;Expression&gt;&lt;Value/&gt; matches '^\d{6}$'
+				? &lt;Value/&gt;.Substring(0,2) + '/' + &lt;Value/&gt;.Substring(2,2) + '/' + '20' + &lt;Value/&gt;.Substring(4,2)
+				: ''
+			  &lt;/Expression&gt;
 		&lt;/Expression&gt;
-&lt;/Expression&gt;</value>
+&lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>
   <data name="_laboratoryTestTime.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query&gt;&lt;Expression&gt;
-	(&lt;RegEx Name='Value'
-		Pattern='^[0-2]?\d:?[0-5]\d(?=(:\d{2})?$)'&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt; matches '^\d{3,4}$')
-		? &lt;Value/&gt;.Insert(&lt;Value/&gt;.Length - 2, ':')
-		: &lt;Value/&gt;
+	(&lt;RegEx Name='Value' Pattern='^[0-2]?\d:?[0-5]\d(?::\d{2})?(\s?(AM|PM))?$'&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;&lt;/RegEx&gt; != '')
+		? date(&lt;Expression&gt;
+			(&lt;RegEx Name='Part1' Pattern='^[^\sA-Za-z]*'&gt;&lt;Value/&gt;&lt;/RegEx&gt; matches '^\d{3,4}$')
+				? &lt;Part1/&gt;.Insert(&lt;Part1/&gt;.Length - 2, ':')
+				: &lt;Part1/&gt;
+		  &lt;/Expression&gt; + &lt;RegEx Pattern ='\s?(AM|PM)$'&gt;&lt;Value/&gt;&lt;/RegEx&gt;).ToString('HH:mm')
+		: '' 
 &lt;/Expression&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;Expression&gt;
-	(&lt;RegEx Name='Time'
-		Pattern='(?&amp;lt;=^((\d{1,2}[-/\\]\d{1,2}[-/\\](\d{2}|\d{4}))|(\d{8}))\s)[0-2]?\d:?[0-5]\d(?=(:\d{2})?$)'&gt;&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt;&lt;/RegEx&gt; matches '^\d{3,4}$')
-		? &lt;Time/&gt;.Insert(&lt;Time/&gt;.Length - 2, ':')
-		: &lt;Time/&gt;
+	(&lt;RegEx Name='Time' Pattern='(?&amp;lt;=^((\d{1,2}[-/\\]\d{1,2}[-/\\](\d{2}|\d{4}))|\d{6}|\d{8})\s)[0-2]?\d:?[0-5]\d(?::\d{2})?(\s?(AM|PM))?$'&gt;&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt;&lt;/RegEx&gt; != '')
+		? date(&lt;Expression&gt;
+			(&lt;RegEx Name='TimePart1' Pattern='^[^\sA-Za-z]*'&gt;&lt;Time/&gt;&lt;/RegEx&gt; matches '^\d{3,4}$')
+				? &lt;TimePart1/&gt;.Insert(&lt;TimePart1/&gt;.Length - 2, ':')
+				: &lt;TimePart1/&gt;
+		  &lt;/Expression&gt; + &lt;RegEx Pattern ='\s?(AM|PM)$'&gt;&lt;Time/&gt;&lt;/RegEx&gt;).ToString('HH:mm')
+		: '' 
 &lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>
   <metadata name="_componentResultDate.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">

@@ -539,7 +539,7 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI26756", ex);
-                ee.AddDebugData("XML", xmlNode.InnerXml, false);
+                ee.AddDebugData("XML", xmlNode.InnerXml, true);
                 throw ee;
             }
         }
