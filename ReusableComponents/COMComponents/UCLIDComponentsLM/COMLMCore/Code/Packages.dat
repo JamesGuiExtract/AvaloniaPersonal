@@ -25,7 +25,7 @@
 //   FLEX Index & ID Shield 7.0             3000
 //   LabDE 1.0                              4000
 //   FLEX Index & ID Shield 8.0             5000
-//   FLEX Index & ID Shield 9.0/LabDE 2.0   6000
+//   FLEX Index & ID Shield & LabDE 9.0     6000
 //
 // TODO: remove private license for ObjSelectorUI and ObjPropertiesDlg
 // and implemented standard ID based licensing.
@@ -40,8 +40,8 @@
 ///////////
 !ExtractCore,6001
 !InputFunnelCore,6002:6070:$ExtractCore
-!FlexIndexAndIDShieldCore,6003:6076:$RuleWritingCore
-!FlexIndex,6004:$FlexIndexAndIDShieldCore:$DataEntryCore
+!FlexIndexAndIDShieldCore,6003:6076:$RuleWritingCore:$DataEntryCore
+!FlexIndex,6004:$FlexIndexAndIDShieldCore
 !RedactionCore,6010
 !IDShield,6005:$FlexIndexAndIDShieldCore:$RedactionCore
 
