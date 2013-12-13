@@ -11,7 +11,6 @@
 //   Component IDs include a base offset that is modified for each major release
 //          MAJOR BUILD                     OFFSET
 //   FLEX Index & ID Shield 5.0             1000
-//          IcoMap 4.2                      1000
 //   FLEX Index & ID Shield 6.0             2000
 //   ID Shield for Laserfiche 1.0           2000
 //   ID Shield Office 1.0                   2000
@@ -29,8 +28,6 @@
 6004,FlexIndex_Core_Objects
 6005,IDShield_Core_Objects
 6006,Rule_Development_Toolkit_Objects
-6007,IcoMap_Core_Objects
-6008,IcoMap_ArcGIS_Objects
 6010,Redaction_Core_Objects
 
 // IDs for core features

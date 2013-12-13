@@ -19,7 +19,6 @@
 //   Component IDs include a base offset that is modified for each major release
 //          MAJOR BUILD                     OFFSET
 //   FLEX Index & ID Shield 5.0             1000
-//          IcoMap 4.2                      1000
 //   FLEX Index & ID Shield 6.0             2000
 //   ID Shield for Laserfiche 1.0           2000
 //   ID Shield Office 1.0                   2000
@@ -45,10 +44,6 @@
 !FlexIndex,6004:$FlexIndexAndIDShieldCore:$DataEntryCore
 !RedactionCore,6010
 !IDShield,6005:$FlexIndexAndIDShieldCore:$RedactionCore
-!IcoMapCore,6007:$InputFunnelCore
-
-// NOT !IcoMapForArcGIS,6008:$IcoMapCore because IcoMapCore is licensed separately
-!IcoMapForArcGIS,6008
 
 // RDT = special components + FlexServer + IDShieldServer + IDShieldClient + RuleSetEditor
 !RuleDevelopmentToolkit,6006:$FlexServer:$IDShield:6026:6027:6044:6045:6046:6077:6081
@@ -114,14 +109,6 @@ ID Shield for Laserfiche,0
 
 NetDMS Integration,0
 -    NetDMS Components,6110
-
-// Remove the IcoMap lines when placing this file in the license generator folder
-IcoMap for ArcGIS,0
--    IcoMap 4.2,$IcoMapForArcGIS
--    IcoMap Tester,$IcoMapCore
-//-    IcoMap Core 4.2 (internal use),$IcoMapCore:$OCROnClient:6070:6073
--    Grid Generator,6075
--    Query Feature Tool,6074
 
 Other,0
 -    FLEX Index Rule Writing (Simple Rules passwords!),$RuleWritingCore:6027:6046:$OCROnClient
