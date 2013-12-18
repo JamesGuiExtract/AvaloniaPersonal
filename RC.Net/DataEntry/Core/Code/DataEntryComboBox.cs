@@ -766,6 +766,14 @@ namespace Extract.DataEntry
                             _originalValue = null;
                         }
                     }
+                    else if (!_updatingComboBoxItems)
+                    {
+                        // [DataEntry:1302]
+                        // If the combo box value is being cleared, clear the _originalValue as well
+                        // so that it does not inappropriately populate the combo box at a later
+                        // time.
+                        _originalValue = null;
+                    }
 
                     base.Text = value;
                 }
@@ -1363,7 +1371,17 @@ namespace Extract.DataEntry
         /// </summary>
         public void ClearCachedData()
         {
-            // Nothing to do.
+            try
+            {
+                // [DataEntry:1302]
+                // Ensure _originalValue is reset whenever a document is closed to ensure it does
+                // not inappropriately set the combo box value for subsequent documents.
+                _originalValue = null;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI36355");
+            }
         }
 
         /// <summary>
