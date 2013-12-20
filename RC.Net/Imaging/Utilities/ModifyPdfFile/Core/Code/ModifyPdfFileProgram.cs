@@ -335,21 +335,21 @@ namespace Extract.Utilities
 
                     // If an attribute spans pages, add a hyperlink for the attribute area on each
                     // page the attribute spans.
-                    foreach (var pageValue in
-                        attribute.Value.GetPages().ToIEnumerable<SpatialString>())
+                    foreach (var line in
+                        attribute.Value.GetLines().ToIEnumerable<SpatialString>())
                     {
                         // Get the correct page from the PDF file.
-                        int pageNum = pageValue.GetFirstPageNumber();
+                        int pageNum = line.GetFirstPageNumber();
                         Page page = pdfDocument.Pages[pageNum];
 
                         // Convert the SpatialString coordinates to Aspose API coordinates.
                         Aspose.Pdf.Rectangle asposeRect = page.GetPageRect(false);
                         LongRectangle attributePageBounds =
-                            pageValue.GetOriginalImagePageBounds(pageNum);
+                            line.GetOriginalImagePageBounds(pageNum);
                         double xFactor = asposeRect.Width / (double)attributePageBounds.Right;
                         double yFactor = asposeRect.Height / (double)attributePageBounds.Bottom;
 
-                        LongRectangle attributeBounds = pageValue.GetOriginalImageBounds();
+                        LongRectangle attributeBounds = line.GetOriginalImageBounds();
 
                         // NOTE: The coordinate origin in the Apose API is the bottom left.
                         double left = attributeBounds.Left * xFactor;
