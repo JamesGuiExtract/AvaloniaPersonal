@@ -1207,48 +1207,79 @@
 <p>
         <li><b>Core: Modify PDF file</b>
         <ul> 
-            <li>Confirm that an <b>Core: Modify PDF file</b> task exists.
-            <li>Confirm that the <b>Core: Modify PDF file</b> task requires all of the following
-            licensing packages:
-            <ul>
-                <li>a <b>general</b> Extract Systems license
-                <li>a PDF read/write license
-                <li>a <b>Pegasus PDF toolkit (remove PDF annotations)</b> license
-            </ul>
-            <li>Confirm that the <b>Core: Modify PDF file</b> property page includes a <b>General
-            settings</b> group box.
-            <li>Confirm that the group box contains an edit box for specification of the PDF file
-            to be modified.
-            <li>Confirm that the group box contains an associated <b>tag selector</b> button.
-            <li>Confirm that the tag selector button provides <b>&lt;FPSFileDir&gt;</b> and 
-            <b>&lt;SourceDocName&gt;</b>.
-            <li>Confirm that the tag selector button provides the usual $ functions.
-            <li>Test one of the functions and confirm that it works as expected.
-            <li>Confirm that selections from the tag selector button are correctly applied to the
-            edit box.
-            <li>Confirm that the group box contains an associated <b>...</b> browse button.
-            <li>Confirm that the browse button displays an <b>Open File</b> dialog.
-            <li>Confirm that selections from the browse button are correctly applied to the edit
-            box.
-            <li>Confirm that the <b>Core: Modify PDF file</b> property page includes an 
-            <b>Annotations</b> group box.
-            <li>Confirm that the group box contains a <b>Remove all annotations from the PDF 
-            file</b> check box.
-            <li>Confirm that the check box is checked by default.
+            	<li>Confirm that an <b>Core: Modify PDF file</b> task exists.
+            	<li>Confirm that the <b>Core: Modify PDF file</b> task requires all of the 
+		following licensing packages:
+            	<ul>
+                	<li>a <b>general</b> Extract Systems license
+                	<li>a PDF read/write license
+                	<li>a <b>Modify PDF</b> license
+            	</ul>
+            	<li>Confirm that the <b>Core: Modify PDF file</b> property page includes a 
+		<b>General settings</b> group box.
+            	<li>Confirm that the group box contains an edit box for specification of the 
+		PDF file to be modified.
+            	<li>Confirm that the group box contains an associated <b>tag selector</b> 
+		button.
+            	<li>Confirm that the tag selector button provides <b>&lt;FPSFileDir&gt;</b> 
+		and <b>&lt;SourceDocName&gt;</b>.
+            	<li>Confirm that the tag selector button provides the usual $ functions.
+            	<li>Test one of the functions and confirm that it works as expected.
+            	<li>Confirm that selections from the tag selector button are correctly 
+		applied to the edit box.
+            	<li>Confirm that the group box contains an associated <b>...</b> browse button.
+            	<li>Confirm that the browse button displays an <b>Open File</b> dialog.
+            	<li>Confirm that selections from the browse button are correctly applied to 
+		the edit box.
+            	<li>Confirm that the <b>Core: Modify PDF file</b> property page includes an 
+            	<b>Annotations</b> group box.
+            	<li>Confirm that the group box contains a <b>Remove all pre-existing annotations 
+		and hyperlinks from the PDF file</b> check box.
+            	<li>Confirm that the check box is unchecked by default.
+            	<li>Confirm that the <b>Core: Modify PDF file</b> property page includes a 
+            	<b>Hyperlinks</b> group box.
+            	<li>Confirm that the group box contains an <b>Add hyperlinks to attributes with 
+		any of the following names (comma delimited)</b> check box.
+            	<li>Confirm that the check box is unchecked by default.
+		<li>Confirm that the associated edit box is only enabled when the checkbox 
+		is checked.
+		<li>Confirm that the following radio buttons are only enabled when the checkbox 
+		is checked.
+		<ul>
+			<li>Use the attribute value as the hyperlink address
+			<li>Use the following address for the hyperlink
+		</ul>
+		<li>Confirm that using the attribute value is the default choice.
+		<li>Confirm that the following address option includes an associated edit box.
+		<li>Confirm that the edit box is enabled only when the radio button is 
+		selected.
+		<li>Confirm that the group box contains a <b>Data filename</b> edit box.
+		<li>Confirm presence of an associated <b>tag selector</b> button with the 
+		usual options.
+		<li>Confirm presence of an associated <b>...</b> browse button.
+		<li>Confirm that the default filename is <b>&lt;SourceDocName&gt;.voa</b>.
 <p>
-            <li>Confirm that an informative exception is thrown if the specified PDF file does not
-            exist.
-            <li>Confirm that annotations are correctly <b>removed from</b> the PDF file.
+            	<li>Confirm that an informative exception is thrown if the specified PDF 
+		file does not exist.
+		<li>Confirm that the <b>Core: Modify PDF</b> task can do the 
+		following:
+		<ul>
+			<li>Remove existing annotations from a PDF.
+			<li>Add a hyperlink based on attribute value to a PDF.
+			<li>Add a hard-coded hyperlink to a PDF.
+			<li>Remove existing annotations and add a hyperlink to 
+			a PDF.
+		</ul>
 <p>
-            <li><b>[DotNet #398, #597]</b> Single threading
-            <ul>
-                <li>Confirm that even with multiple threads processing in a single FAM, only one
-                PDF file is being modified at a time.
-                <li>Confirm that with multiple FAMs exercising the <b>Core: Modify pdf file</b>
-                task, only one PDF file is being modified at a time.
-                <li>Confirm that trying to run the task multi-threaded does not cause the FAM to
-                crash.</li>
-            </ul>
+            	<li><b>[DotNet #398, #597]</b> Single threading
+            	<ul>
+                	<li>Confirm that even with multiple threads processing in a single FAM, 
+			only one PDF file is being modified at a time.
+                	<li>Confirm that with multiple FAMs exercising the <b>Core: Modify 
+			pdf file</b> task, only one PDF file is being modified at a time.
+                	<li>Confirm that trying to run the task multi-threaded does not cause 
+			the FAM to crash.</li>
+            	</ul>
         </ul> 
 <p>
         <li><b>Core: Modify Source Document Name in Database</b>
