@@ -795,12 +795,12 @@ namespace Extract.Imaging
                 return false;
             }
 
-            // Create a new SpatialPageInfo to reflect the size of the source image.
-            SpatialPageInfo pageInfo = new SpatialPageInfo();
-
             // Get the deskew of the OCR'd text within the extracted raster zone image area
             // before updating the deskew.
-            double ocrDeskew = pageInfo.Deskew;
+            double ocrDeskew = spatialString.GetPageInfo(1).Deskew;
+
+            // Create a new SpatialPageInfo to reflect the size of the source image.
+            SpatialPageInfo pageInfo = new SpatialPageInfo();
             
             // Apply the specified page orientation to the page info.
             switch (orientation)
