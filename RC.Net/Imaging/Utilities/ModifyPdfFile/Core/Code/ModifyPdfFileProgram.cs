@@ -24,6 +24,51 @@ namespace Extract.Utilities
     static class ModifyPdfFileProgram
     {
         /// <summary>
+        /// The width (in pixels) the underlines for hyperlinks should be drawn with.
+        /// </summary>
+        const int _HYPERLINK_UNDERLINE_WIDTH = 2;
+        
+        /// <summary>
+        /// The distance below the attribute zone the underline should be drawn (in inches).
+        /// This offset is to prevent the underline from being drawn across the bottom of the text
+        /// being underlined.
+        /// </summary>
+        const double _HYPERLINK_UNDERLINE_OFFSET = .04;
+
+        /// <summary>
+        /// The distance below the attribute zone the underline should be drawn (in Aspose image
+        /// coordinates). This offset is to prevent the underline from being drawn across the bottom
+        /// of the text being underlined.
+        /// </summary>
+        static double? _hyperlinkUnderlineOffset;
+
+        /// <summary>
+        /// Gets the distance below the attribute zone the underline should be drawn (in Aspose
+        /// image coordinates). This offset is to prevent the underline from being drawn across the
+        /// bottom of the text being underlined.
+        /// </summary>
+        static double HyperlinkUnderlineOffset
+        {
+            get
+            {
+                if (!_hyperlinkUnderlineOffset.HasValue)
+                {
+                    // In order to calculate the distance in Aspose coordinates an underline should 
+                    // be drawn, we need to know the DPI Aspose is using for the image.
+                    // Unfortunately, I can't find a way to get this number directly. The Aspose
+                    // forums indicate that 72 can be assumed... I think one step better than this
+                    // assumption is to assume that the default VectorGraphicsRenderingDPI value for
+                    // an Aspose.Pdf.Generator.Image is the same DPI for the pages in the pdfDocument.
+                    var testImage = new Aspose.Pdf.Generator.Image();
+                    double defaultDPI = (double)testImage.VectorGraphicsRenderingDPI;
+                    _hyperlinkUnderlineOffset = _HYPERLINK_UNDERLINE_OFFSET * defaultDPI;
+                }
+
+                return _hyperlinkUnderlineOffset.Value;
+            }
+        }
+
+        /// <summary>
         /// The main entry point for the application.
         /// </summary>
         /// <param name="args">The args.</param>
@@ -356,12 +401,14 @@ namespace Extract.Utilities
                         double top = asposeRect.URY - (attributeBounds.Top * yFactor);
                         double right = attributeBounds.Right * xFactor;
                         double bottom = asposeRect.URY - (attributeBounds.Bottom * yFactor);
+                        bottom = Math.Max(bottom - HyperlinkUnderlineOffset, 0);
 
                         // Create the hyperlink annotation.
                         LinkAnnotation link = new LinkAnnotation(
                             page, new Aspose.Pdf.Rectangle(left, bottom, right, top));
                         link.Border = new Border(link);
                         link.Border.Style = BorderStyle.Underline;
+                        link.Border.Width = _HYPERLINK_UNDERLINE_WIDTH;
                         link.Color = Aspose.Pdf.Color.FromRgb(System.Drawing.Color.Blue);
                         link.Action = new GoToURIAction(
                             string.IsNullOrWhiteSpace(hyperlinkAddress)
