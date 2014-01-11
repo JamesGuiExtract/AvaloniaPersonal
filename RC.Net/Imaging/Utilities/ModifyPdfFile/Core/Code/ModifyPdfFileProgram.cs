@@ -33,7 +33,7 @@ namespace Extract.Utilities
         /// This offset is to prevent the underline from being drawn across the bottom of the text
         /// being underlined.
         /// </summary>
-        const double _HYPERLINK_UNDERLINE_OFFSET = .04;
+        const double _HYPERLINK_UNDERLINE_OFFSET = .03;
 
         /// <summary>
         /// The distance below the attribute zone the underline should be drawn (in Aspose image
@@ -403,11 +403,29 @@ namespace Extract.Utilities
                         double bottom = asposeRect.URY - (attributeBounds.Bottom * yFactor);
                         bottom = Math.Max(bottom - HyperlinkUnderlineOffset, 0);
 
+                        SpatialPageInfo pageInfo = line.GetPageInfo(pageNum);
+                        // If the page is rotated, we will need to add a border on all sides rather
+                        // than just an underline (so the "underline" doesn't end up on the right,
+                        // top or bottom). Accordingly, expand the other boundaries out by the
+                        // HyperlinkUnderlineOffset distance so the border is not drawn on top of
+                        // the text.
+                        if (pageInfo.Orientation != EOrientation.kRotNone)
+                        {
+                            left = Math.Max(left - HyperlinkUnderlineOffset, 0);
+                            top = Math.Min(top + HyperlinkUnderlineOffset, asposeRect.Height);
+                            right = Math.Min(right + HyperlinkUnderlineOffset, asposeRect.Width);
+                        }
+
                         // Create the hyperlink annotation.
                         LinkAnnotation link = new LinkAnnotation(
                             page, new Aspose.Pdf.Rectangle(left, bottom, right, top));
                         link.Border = new Border(link);
-                        link.Border.Style = BorderStyle.Underline;
+                        // If the page is rotated, we will need to add a border on all sides rather
+                        // than just an underline (so the "underline" doesn't end up on the right,
+                        // top or bottom).
+                        link.Border.Style = (pageInfo.Orientation == EOrientation.kRotNone)
+                            ? BorderStyle.Underline
+                            : BorderStyle.Solid;
                         link.Border.Width = _HYPERLINK_UNDERLINE_WIDTH;
                         link.Color = Aspose.Pdf.Color.FromRgb(System.Drawing.Color.Blue);
                         link.Action = new GoToURIAction(
