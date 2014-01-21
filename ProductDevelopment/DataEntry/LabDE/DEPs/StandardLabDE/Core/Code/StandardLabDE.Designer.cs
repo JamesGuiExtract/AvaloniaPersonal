@@ -641,6 +641,7 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._patientBirthDate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._patientBirthDate.AttributeName = "DOB";
+            this._patientBirthDate.AutoUpdateQuery = resources.GetString("_patientBirthDate.AutoUpdateQuery");
             this._patientBirthDate.Location = new System.Drawing.Point(7, 166);
             this._patientBirthDate.Name = "_patientBirthDate";
             this._patientBirthDate.ParentDataEntryControl = this._patientInfoGroupBox;
