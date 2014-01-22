@@ -1,3 +1,40 @@
+// Run the WOW64 wscript if OS is 64 bit
+
+var shell = WScript.CreateObject("WScript.Shell");
+var cpu = shell.ExpandEnvironmentStrings("%PROCESSOR_ARCHITECTURE%").toLowerCase();
+var host = WScript.FullName.toLowerCase();
+
+// check to see if we are on an AMD64 processor and running the
+// wrong version of the scripting host.
+
+if(host.indexOf("system32") != -1 && cpu == "amd64") {
+    var syswow64Host = host.replace(/system32/g, "syswow64");
+    var newCmd = syswow64Host + " \"" +
+        WScript.ScriptFullName + "\" //Nologo";
+
+    // ATTEMPT to pass all the same command
+    //  line args to the new process
+
+    var args = WScript.Arguments;
+    for(i=0; i<args.length; i++)
+        newCmd += " " + args(i);
+
+//    WScript.Echo("Running the syswow64 bit version instead...\n  " + newCmd + "\n");
+
+    // launch the new script and echo all the output
+    var exec = shell.Exec(newCmd);
+    while(exec.Status == 0) {
+        if(!exec.StdOut.AtEndOfStream)
+            WScript.Echo(exec.StdOut.ReadAll());
+        WScript.Sleep(100);
+    }
+
+    if(!exec.StdOut.AtEndOfStream)
+        WScript.Echo(exec.StdOut.ReadAll());
+
+    WScript.Quit(exec.ExitCode);
+}
+
 //--------------------------------------------------------------------------------------------------
 // Extract Systems Utility Subroutines
 //--------------------------------------------------------------------------------------------------
