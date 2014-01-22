@@ -60,7 +60,13 @@ namespace Extract.DataEntry.DEP.Lincoln
             this._dateFiledTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._dateOfInstrumentTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._granteeTable = new Extract.DataEntry.DataEntryTable();
+            this._granteeNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._granteeDeceasedColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._granteeFormattedColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._grantorTable = new Extract.DataEntry.DataEntryTable();
+            this._grantorNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._grantorDeceasedColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._grantorFormattedColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._subdivisionTable = new Extract.DataEntry.DataEntryTable();
             this._unitLotBlockColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._subdivisionOtherColumn = new Extract.DataEntry.DataEntryTableColumn();
@@ -68,12 +74,6 @@ namespace Extract.DataEntry.DEP.Lincoln
             this._townRangeSectionTable = new Extract.DataEntry.DataEntryTable();
             this._townRangeSectionColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._descriptionColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._granteeNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._granteeDeceasedColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._granteeFormattedColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._grantorNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._grantorDeceasedColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._grantorFormattedColumn = new Extract.DataEntry.DataEntryTableColumn();
             _pageLabel = new System.Windows.Forms.Label();
             _docTypeLabel = new System.Windows.Forms.Label();
             _bookLabel = new System.Windows.Forms.Label();
@@ -147,7 +147,7 @@ namespace Extract.DataEntry.DEP.Lincoln
             // _granteeLabel
             // 
             _granteeLabel.AutoSize = true;
-            _granteeLabel.Location = new System.Drawing.Point(0, 81);
+            _granteeLabel.Location = new System.Drawing.Point(0, 193);
             _granteeLabel.Name = "_granteeLabel";
             _granteeLabel.Size = new System.Drawing.Size(45, 13);
             _granteeLabel.TabIndex = 17;
@@ -156,7 +156,7 @@ namespace Extract.DataEntry.DEP.Lincoln
             // _grantorLabel
             // 
             _grantorLabel.AutoSize = true;
-            _grantorLabel.Location = new System.Drawing.Point(0, 193);
+            _grantorLabel.Location = new System.Drawing.Point(0, 81);
             _grantorLabel.Name = "_grantorLabel";
             _grantorLabel.Size = new System.Drawing.Size(42, 13);
             _grantorLabel.TabIndex = 19;
@@ -273,7 +273,7 @@ namespace Extract.DataEntry.DEP.Lincoln
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this._granteeTable.DefaultCellStyle = dataGridViewCellStyle2;
-            this._granteeTable.Location = new System.Drawing.Point(3, 97);
+            this._granteeTable.Location = new System.Drawing.Point(3, 209);
             this._granteeTable.Name = "_granteeTable";
             this._granteeTable.ParentDataEntryControl = null;
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -285,7 +285,42 @@ namespace Extract.DataEntry.DEP.Lincoln
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this._granteeTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this._granteeTable.Size = new System.Drawing.Size(611, 93);
-            this._granteeTable.TabIndex = 5;
+            this._granteeTable.TabIndex = 6;
+            // 
+            // _granteeNameColumn
+            // 
+            this._granteeNameColumn.AttributeName = "Name";
+            this._granteeNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this._granteeNameColumn.AutoUpdateQuery = resources.GetString("_granteeNameColumn.AutoUpdateQuery");
+            this._granteeNameColumn.HeaderText = "Name (Last First Middle Suffix)";
+            this._granteeNameColumn.Name = "_granteeNameColumn";
+            this._granteeNameColumn.PersistAttribute = false;
+            this._granteeNameColumn.ValidationErrorMessage = "Invalid value";
+            // 
+            // _granteeDeceasedColumn
+            // 
+            this._granteeDeceasedColumn.AttributeName = "Deceased";
+            this._granteeDeceasedColumn.AutoUpdateQuery = "<Expression><Attribute>../Formatted</Attribute>.EndsWith(\'DEC\'\'D\') ? \'DEC\'\'D\' : \'" +
+    "\'</Expression>";
+            this._granteeDeceasedColumn.HeaderText = "Deceased?";
+            this._granteeDeceasedColumn.MinimumWidth = 75;
+            this._granteeDeceasedColumn.Name = "_granteeDeceasedColumn";
+            this._granteeDeceasedColumn.PersistAttribute = false;
+            this._granteeDeceasedColumn.UseComboBoxCells = true;
+            this._granteeDeceasedColumn.ValidationErrorMessage = "Invalid value";
+            this._granteeDeceasedColumn.ValidationQuery = "[BLANK]\r\nDEC\'D";
+            this._granteeDeceasedColumn.Width = 75;
+            // 
+            // _granteeFormattedColumn
+            // 
+            this._granteeFormattedColumn.AttributeName = "Formatted";
+            this._granteeFormattedColumn.AutoUpdateQuery = "<Query StringList=\' \'><Attribute>../Name</Attribute><Expression>(<Attribute>../De" +
+    "ceased</Attribute> == \'\') ? \'\' : (\'DEC\'\'D\')</Expression></Query>";
+            this._granteeFormattedColumn.HeaderText = "Formatted";
+            this._granteeFormattedColumn.Name = "_granteeFormattedColumn";
+            this._granteeFormattedColumn.TabStopMode = Extract.DataEntry.TabStopMode.Never;
+            this._granteeFormattedColumn.ValidationErrorMessage = "Invalid value";
+            this._granteeFormattedColumn.Visible = false;
             // 
             // _grantorTable
             // 
@@ -314,7 +349,7 @@ namespace Extract.DataEntry.DEP.Lincoln
             dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this._grantorTable.DefaultCellStyle = dataGridViewCellStyle5;
-            this._grantorTable.Location = new System.Drawing.Point(3, 209);
+            this._grantorTable.Location = new System.Drawing.Point(3, 97);
             this._grantorTable.Name = "_grantorTable";
             this._grantorTable.ParentDataEntryControl = null;
             dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -326,7 +361,41 @@ namespace Extract.DataEntry.DEP.Lincoln
             dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this._grantorTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this._grantorTable.Size = new System.Drawing.Size(611, 93);
-            this._grantorTable.TabIndex = 6;
+            this._grantorTable.TabIndex = 5;
+            // 
+            // _grantorNameColumn
+            // 
+            this._grantorNameColumn.AttributeName = "Name";
+            this._grantorNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this._grantorNameColumn.AutoUpdateQuery = resources.GetString("_grantorNameColumn.AutoUpdateQuery");
+            this._grantorNameColumn.HeaderText = "Name (Last First Middle Suffix)";
+            this._grantorNameColumn.Name = "_grantorNameColumn";
+            this._grantorNameColumn.PersistAttribute = false;
+            this._grantorNameColumn.ValidationErrorMessage = "Invalid value";
+            // 
+            // _grantorDeceasedColumn
+            // 
+            this._grantorDeceasedColumn.AttributeName = "Deceased";
+            this._grantorDeceasedColumn.AutoUpdateQuery = "<Expression><Attribute>../Formatted</Attribute>.EndsWith(\'DEC\'\'D\') ? \'DEC\'\'D\' : \'" +
+    "\'</Expression>";
+            this._grantorDeceasedColumn.HeaderText = "Deceased?";
+            this._grantorDeceasedColumn.MinimumWidth = 75;
+            this._grantorDeceasedColumn.Name = "_grantorDeceasedColumn";
+            this._grantorDeceasedColumn.PersistAttribute = false;
+            this._grantorDeceasedColumn.UseComboBoxCells = true;
+            this._grantorDeceasedColumn.ValidationErrorMessage = "Invalid value";
+            this._grantorDeceasedColumn.ValidationQuery = "[BLANK]\r\nDEC\'D";
+            this._grantorDeceasedColumn.Width = 75;
+            // 
+            // _grantorFormattedColumn
+            // 
+            this._grantorFormattedColumn.AttributeName = "Formatted";
+            this._grantorFormattedColumn.AutoUpdateQuery = "<Query StringList=\' \'><Attribute>../Name</Attribute><Expression>(<Attribute>../De" +
+    "ceased</Attribute> == \'\') ? \'\' : (\'DEC\'\'D\')</Expression></Query>";
+            this._grantorFormattedColumn.HeaderText = "Formatted";
+            this._grantorFormattedColumn.Name = "_grantorFormattedColumn";
+            this._grantorFormattedColumn.ValidationErrorMessage = "Invalid value";
+            this._grantorFormattedColumn.Visible = false;
             // 
             // _subdivisionTable
             // 
@@ -464,75 +533,6 @@ namespace Extract.DataEntry.DEP.Lincoln
             this._descriptionColumn.MinimumWidth = 10;
             this._descriptionColumn.Name = "_descriptionColumn";
             this._descriptionColumn.ValidationErrorMessage = "Invalid value";
-            // 
-            // _granteeNameColumn
-            // 
-            this._granteeNameColumn.AttributeName = "Name";
-            this._granteeNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this._granteeNameColumn.AutoUpdateQuery = resources.GetString("_granteeNameColumn.AutoUpdateQuery");
-            this._granteeNameColumn.HeaderText = "Name (Last First Middle Suffix)";
-            this._granteeNameColumn.Name = "_granteeNameColumn";
-            this._granteeNameColumn.PersistAttribute = false;
-            this._granteeNameColumn.ValidationErrorMessage = "Invalid value";
-            // 
-            // _granteeDeceasedColumn
-            // 
-            this._granteeDeceasedColumn.AttributeName = "Deceased";
-            this._granteeDeceasedColumn.AutoUpdateQuery = "<Expression><Attribute>../Formatted</Attribute>.EndsWith(\'DEC\'\'D\') ? \'DEC\'\'D\' : \'" +
-    "\'</Expression>";
-            this._granteeDeceasedColumn.HeaderText = "Deceased?";
-            this._granteeDeceasedColumn.MinimumWidth = 75;
-            this._granteeDeceasedColumn.Name = "_granteeDeceasedColumn";
-            this._granteeDeceasedColumn.PersistAttribute = false;
-            this._granteeDeceasedColumn.UseComboBoxCells = true;
-            this._granteeDeceasedColumn.ValidationErrorMessage = "Invalid value";
-            this._granteeDeceasedColumn.ValidationQuery = "[BLANK]\r\nDEC\'D";
-            this._granteeDeceasedColumn.Width = 75;
-            // 
-            // _granteeFormattedColumn
-            // 
-            this._granteeFormattedColumn.AttributeName = "Formatted";
-            this._granteeFormattedColumn.AutoUpdateQuery = "<Query StringList=\' \'><Attribute>../Name</Attribute><Expression>(<Attribute>../De" +
-    "ceased</Attribute> == \'\') ? \'\' : (\'DEC\'\'D\')</Expression></Query>";
-            this._granteeFormattedColumn.HeaderText = "Formatted";
-            this._granteeFormattedColumn.Name = "_granteeFormattedColumn";
-            this._granteeFormattedColumn.TabStopMode = Extract.DataEntry.TabStopMode.Never;
-            this._granteeFormattedColumn.ValidationErrorMessage = "Invalid value";
-            this._granteeFormattedColumn.Visible = false;
-            // 
-            // _grantorNameColumn
-            // 
-            this._grantorNameColumn.AttributeName = "Name";
-            this._grantorNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this._grantorNameColumn.AutoUpdateQuery = resources.GetString("_grantorNameColumn.AutoUpdateQuery");
-            this._grantorNameColumn.HeaderText = "Name (Last First Middle Suffix)";
-            this._grantorNameColumn.Name = "_grantorNameColumn";
-            this._grantorNameColumn.PersistAttribute = false;
-            this._grantorNameColumn.ValidationErrorMessage = "Invalid value";
-            // 
-            // _grantorDeceasedColumn
-            // 
-            this._grantorDeceasedColumn.AttributeName = "Deceased";
-            this._grantorDeceasedColumn.AutoUpdateQuery = "<Expression><Attribute>../Formatted</Attribute>.EndsWith(\'DEC\'\'D\') ? \'DEC\'\'D\' : \'" +
-    "\'</Expression>";
-            this._grantorDeceasedColumn.HeaderText = "Deceased?";
-            this._grantorDeceasedColumn.MinimumWidth = 75;
-            this._grantorDeceasedColumn.Name = "_grantorDeceasedColumn";
-            this._grantorDeceasedColumn.PersistAttribute = false;
-            this._grantorDeceasedColumn.UseComboBoxCells = true;
-            this._grantorDeceasedColumn.ValidationErrorMessage = "Invalid value";
-            this._grantorDeceasedColumn.ValidationQuery = "[BLANK]\r\nDEC\'D";
-            this._grantorDeceasedColumn.Width = 75;
-            // 
-            // _grantorFormattedColumn
-            // 
-            this._grantorFormattedColumn.AttributeName = "Formatted";
-            this._grantorFormattedColumn.AutoUpdateQuery = "<Query StringList=\' \'><Attribute>../Name</Attribute><Expression>(<Attribute>../De" +
-    "ceased</Attribute> == \'\') ? \'\' : (\'DEC\'\'D\')</Expression></Query>";
-            this._grantorFormattedColumn.HeaderText = "Formatted";
-            this._grantorFormattedColumn.Name = "_grantorFormattedColumn";
-            this._grantorFormattedColumn.ValidationErrorMessage = "Invalid value";
-            this._grantorFormattedColumn.Visible = false;
             // 
             // LincolnPanel
             // 
