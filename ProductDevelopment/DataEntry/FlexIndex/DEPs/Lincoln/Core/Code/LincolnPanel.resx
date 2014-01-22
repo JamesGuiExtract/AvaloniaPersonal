@@ -230,14 +230,11 @@
   </metadata>
   <data name="_grantorNameColumn.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
-	&lt;Expression Name='MaxLength'&gt;(&lt;Attribute&gt;../Deceased&lt;/Attribute&gt; == 'DEC''D') ? 27 : 32&lt;/Expression&gt;
 	&lt;Expression Name='Name1'&gt;&lt;Attribute&gt;../Formatted&lt;/Attribute&gt;.ToUpper().Replace('DEC''D', '').Replace('''', '').Replace(',', '').Replace('.', '').Replace('-', '')&lt;/Expression&gt;
-	&lt;Expression Name='Name2'&gt;&lt;Name1/&gt;.Length &amp;gt; &lt;MaxLength Type='Int32'/&gt; ? &lt;Name1/&gt;.Substring(0, &lt;MaxLength Type='Int32'/&gt;) : &lt;Name1/&gt;&lt;/Expression&gt;
-	&lt;Expression Name='Name3'&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;.ToUpper().Replace('DEC''D', '').Replace('''', '').Replace(',', '').Replace('.', '').Replace('-', '')&lt;/Expression&gt;
-	&lt;Expression Name='Name4'&gt;&lt;Name3/&gt;.Length &amp;gt; &lt;MaxLength Type='Int32'/&gt; ? &lt;Name3/&gt;.Substring(0, &lt;MaxLength Type='Int32'/&gt;) : &lt;Name3/&gt;&lt;/Expression&gt;
+	&lt;Expression Name='Name2'&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;.ToUpper().Replace('DEC''D', '').Replace('''', '').Replace(',', '').Replace('.', '').Replace('-', '')&lt;/Expression&gt;
 &lt;/Declarations&gt;
-&lt;Query Default='True'&gt;&lt;Name2/&gt;&lt;/Query&gt;
-&lt;Query&gt;&lt;Name4/&gt;&lt;/Query&gt;</value>
+&lt;Query Default='True'&gt;&lt;Name1/&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;Name2/&gt;&lt;/Query&gt;</value>
   </data>
   <metadata name="_grantorDeceasedColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -245,7 +242,24 @@
   <metadata name="_grantorFormattedColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="_unitLotBlockColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="_unitColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="_unitColumn.ValidationQuery" xml:space="preserve">
+    <value>&lt;Query ValidValue='True'&gt;
+	&lt;Expression&gt;
+		(2 +
+		&lt;Attribute&gt;../Unit&lt;/Attribute&gt;.Length + 
+		&lt;Attribute&gt;../Lot&lt;/Attribute&gt;.Length + 
+		&lt;Attribute&gt;../Block&lt;/Attribute&gt;.Length)
+		&amp;lt;= 32
+	&lt;/Expression&gt;
+&lt;/Query&gt;</value>
+  </data>
+  <metadata name="_blockColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="_lotColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="_subdivisionOtherColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
@@ -257,6 +271,23 @@
   <metadata name="_townRangeSectionColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="_townRangeSectionColumn.ValidationQuery" xml:space="preserve">
+    <value>&lt;Declarations&gt;
+	&lt;Composite Name='TooLong'&gt;Town/Range/Section cannot contain more than 32 chars.&lt;/Composite&gt;
+	&lt;Composite Name='Subdivision'&gt;Town/Range/Section cannot be specified if a subdivision has been.&lt;/Composite&gt;
+&lt;/Declarations&gt;
+&lt;Query ValidValue='True' ValidationMessage = 'TooLong'&gt;
+	&lt;Expression&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;.Length &amp;lt;= 32&lt;/Expression&gt;
+&lt;/Query&gt;
+&lt;Query ValidValue='True' ValidationMessage = 'Subdivision'&gt;
+	&lt;Expression&gt;
+		&lt;Attribute&gt;/Subdivision/Unit&lt;/Attribute&gt; + 
+		&lt;Attribute&gt;/Subdivision/Lot&lt;/Attribute&gt; + 
+		&lt;Attribute&gt;/Subdivision/Block&lt;/Attribute&gt;
+		== ''
+	&lt;/Expression&gt;
+&lt;/Query&gt;</value>
+  </data>
   <metadata name="_descriptionColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
