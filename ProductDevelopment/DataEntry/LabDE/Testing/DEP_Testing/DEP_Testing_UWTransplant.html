@@ -1,0 +1,209 @@
+<HTML>
+
+<HEAD>
+<TITLE>UW Transplant DEP Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> DEP Testing - UW Transplant <br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>DEP Layout</h3>
+       	<ul>
+		<LI>Confirm that the DEP includes a <b>Comments (for operator's use)</b> 
+		multi-line edit box.
+		<li>Confirm that the DEP includes a <b>Does the document have a cover 
+		page</b> drop-down combo box with the following entries available.
+		<ul>
+			<li>&lt;blank&gt;
+			<li>Yes
+			<li>No
+		</ul>
+		<li>Confirm that <b>&lt;blank&gt;</b> is the default option.
+		<li>Confirm that the DEP includes a <b>Patient Information</b> group box.
+		<ul>
+			<li>a single-row table with column headings 
+			for:
+			<ul>
+				<li>Last Name
+				<li>First Name
+			</ul>
+			<li>a <b>Date of Birth</b> edit box.
+			<li>a <b>MRN</b> edit box.
+			<li>Confirm that a red warning icon is next to each empty edit box.
+		</ul>
+		<li>Confirm that the DEP includes an <b>Orders</b> group box.
+		<ul>
+			<li>a multiple-row table with column headings for:
+			<ul>
+				<li>Order Number
+				<li>Collection Date
+				<li>Collection Time
+			</ul>
+		</ul>
+		<li>Confirm that the DEP includes a <b>Selected Order Details</b> group box.
+		<ul>
+			<li>a <b>Lab Filter</b> section with edit boxes for:
+			<ul>
+				<li>Name
+				<li>City
+				<li>Street
+			</ul>
+			<li>a <b>Lab Name</b> edit box.
+			<li>a multiple-line <b>Comment</b> edit box.
+			<li>a multiple-row table with column headings for:
+			<ul>
+				<li>Test Name
+				<li>Value
+				<li>Units
+				<li>Ref. Range
+				<li>Flag
+				<ul>
+					<li>&lt;blank&gt;
+					<li>A
+				</ul>
+				<li>Status
+				<ul>
+					<li>F
+					<li>C
+				</ul>
+			</ul>
+			<li>another <b>Comment</b> multi-line edit box.
+		</ul>
+       	</ul>
+<p>
+	<li><h3>Validation</h3></li>
+	<UL>
+		<li>Confirm that the image cannot be saved and committed while one or more red 
+		warning icons remain visible.
+		<li>Confirm that a <b>Medical Record Number</b> (MRN) is required.
+		<li>Confirm that each <b>Order</b> requires the following.
+		<ul>
+			<li>Order Number
+			<li>Collection Date
+			<li>Collection Time
+		</ul>
+		<li>Confirm that a valid <b>Order Number</b> includes: 8, 9, or 10 digits.
+		<ul>
+			<li>Confirm that a single trailing space character is also allowed.
+		</ul>
+		<li>Confirm that each of the following fields are required for each <b>Selected 
+		Order Details</b> item.
+		<ul>
+			<li>Lab Name
+		</ul>
+       	</ul>
+<p>
+	<li><h3>Auto-Update Queries</h3></li>
+	<ul>
+		<li>TBD
+       	</ul>
+<p>
+	<LI><h3>9.7.0.31 Change Forms</h3>
+       	<ul>
+		<LI><u>Hematocrit Unit</u>
+	       	<ul>
+	       		<li>Verify the <b>AE168825.PDF.tif</b> image.
+			<li>Select a new Test row.
+			<li>Swipe the <b>Hematocrit</b> test and its results.
+			<li>Confirm that the unit field for <b>Hematocrit</b> is <b>%</b>.
+			<li>Confirm that the Flag value is <b>A</b>.
+	       	</ul>
+		<LI><u>Data Entry For Date Field</u>
+	       	<ul>
+	       		<li>Verify the <b>AE168E8F.PDF.tif</b> image.
+			<li>Confirm that the <b>Collection Date</b> field can be manually 
+			entered using a <b>MMDDYYYY</b> format.
+			<li>Confirm that <b>/</b> characters are added automatically.
+	       		<li>Verify the <b>AE168C2D.PDF.tif</b> image.
+			<li>Confirm that the <b>Date of Birth</b> field can be manually 
+				entered using a <b>MMDDYYYY</b> format.
+			<li>Confirm that <b>/</b> characters are added automatically.
+	       	</ul>
+		<LI><u>Send To Extract Systems Tag</u>
+	       	<ul>
+			<li>Confirm that a <b>Send To Extract Systems</b> tag is defined.
+	       		<li>Verify <b>any</b> image.
+			<li>Tag the image.
+			<li>Confirm that an email to <b>support@extractsystems.com</b> 
+			is automatically sent.
+			<li>Confirm that the email contains appropriate content.
+	       	</ul>
+		<LI><u>CBC - Tests To Be Ignored</u>
+	       	<ul>
+	       		<li>Verify the <b>AE16FE68.PDF.tif</b> image.
+			<li>Confirm that the following tests <b>are not</b> captured 
+			by the rules.
+			<ul>
+				<li>MCV
+				<li>MCH
+				<li>RBC Count
+				<li>MCHC
+				<li>RDW
+			</ul>
+	       	</ul>
+		<LI><u>Automatic Zero Insert</u>
+	       	<ul>
+	       		<li>Verify the <b>AE168E22.PDF.tif</b> image.
+			<li>Create a new <b>Test</b> record.
+			<li>Swipe the <b>LYMPH#</b> text.
+			<li>Tab to the <b>Value</b> cell and type the <b>.5</b> text.
+			<li>Confirm that the displayed value is <b>0.5</b>.
+	       	</ul>
+		<LI><u>Remove Fields For Middle Initial, Suffix, Gender</u>
+	       	<ul>
+	       		<li>Verify <b>any</b> image.
+			<li>Confirm that the <b>Patient Information</b> section contains 
+			only the following columns
+			<ul>
+				<li>First
+				<li>Last
+			</ul>
+			<li>Confirm that a field is not defined for patient <b>Gender</b>.
+	       	</ul>
+		<LI><u>Automatic Update For Abnormal Flag</u>
+	       	<ul>
+	       		<li>Verify <b>any</b> image.
+			<li>Confirm that manual modification of <b>Value</b> data will 
+			automatically update the <b>Flag</b> cell.
+			<li>Confirm that manual modification of <b>Reference Range</b> 
+			data will automatically update the <b>Flag</b> cell.
+	       	</ul>
+		<LI><u>eGFR Unit</u>
+	       	<ul>
+	       		<li>Verify the <b>AE168825.PDF.tif</b> image.
+			<li>Confirm that the unit field for <b>eGFR</b> is 
+			always <b>ml/min</b>.
+	       	</ul>
+		<LI><u>Remove Differential Components</u>
+	       	<ul>
+	       		<li>Verify the <b>AE168825.PDF.tif</b> image.
+			<li>Confirm that <b>WBC > 3</b>.
+			<li>Confirm that the following <b>Differential</b> components 
+			are not displayed.
+			<ul>
+				<li>% Neutrophils
+				<li>% Lymphs
+				<li>% Monos
+				<li>% Eos
+				<li>% Basos
+				<li>Neutrophils
+				<li>Lymphocytes
+				<li>Monocytes
+				<li>Eosinophils
+				<li>Basophils
+			</ul>
+	       		<li>Verify the <b>AE168E22.PDF.tif</b> image.
+			<li>Confirm that <b>WBC < 3</b>.
+			<li>Confirm that the above <b>Differential</b> components are 
+			displayed.
+	       	</ul>
+	</ul>
+</OL>
+</BODY>
+</HTML>
