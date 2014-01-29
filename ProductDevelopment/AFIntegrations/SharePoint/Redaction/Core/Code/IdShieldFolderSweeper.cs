@@ -246,7 +246,7 @@ namespace Extract.SharePoint.Redaction
             // Handle queued for verify files
             fileNames = Directory.GetFiles(path,
                 "*.InVerificationQueue", SearchOption.AllDirectories);
-            HandleQueuedVerifiedFiles(fileNames, site);
+            HandleQueuedVerifiedFiles(fileNames, path, site);
         }
 
         /// <summary>
@@ -261,6 +261,13 @@ namespace Extract.SharePoint.Redaction
             Dictionary<string, List<string>> filesToClean = new Dictionary<string, List<string>>();
             foreach (string fileName in fileNames)
             {
+                // Need for cleaning files
+                string directory = Path.GetDirectoryName(fileName);
+                if (!filesToClean.ContainsKey(directory))
+                {
+                    filesToClean.Add(directory, new List<string>());
+                }
+                string fileWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
                 try
                 {
                     var pair = ExtractSharePointHelper.BuildListAndFileGuid(fileName);
@@ -272,16 +279,8 @@ namespace Extract.SharePoint.Redaction
 
                     ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35885", item.File, "IDS Status changed.", () =>
                     {
-                        string directory = Path.GetDirectoryName(fileName);
-                        if (!filesToClean.ContainsKey(directory))
-                        {
-                            filesToClean.Add(directory, new List<string>());
-                        }
-
                         string spFileName = site.Url + "/" + item.Url;
 
-                        string fileWithoutExtension =
-                            Path.GetFileNameWithoutExtension(fileName);
                         filesToClean[directory].Add(fileWithoutExtension);
 
                         // Log a file failed exception to the exception service
@@ -314,6 +313,7 @@ namespace Extract.SharePoint.Redaction
                 {
                     IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldDiskToSharePoint,
                         "ELI30573");
+                    filesToClean[directory].Add(fileWithoutExtension);
                 }
             }
 
@@ -324,12 +324,20 @@ namespace Extract.SharePoint.Redaction
         /// Handles a collection of files that have been queued to verify.
         /// </summary>
         /// <param name="fileNames">The queued files to handle.</param>
+        /// <param name="workingFolder">The working folder.</param>
         /// <param name="site">The site to handle queued files for.</param>
-        void HandleQueuedVerifiedFiles(string[] fileNames, SPSite site)
+        void HandleQueuedVerifiedFiles(string[] fileNames, string workingFolder, SPSite site)
         {
+            // Used to clean up files in the working folder if the files can no longer be found
+            // in SharePoint
+            Dictionary<string, List<string>> filesToClean = new Dictionary<string, List<string>>();
             var queuedString = ExtractProcessingStatus.QueuedForVerification.AsString();
             foreach (string fileName in fileNames)
             {
+                // set fileWithoutExtension and directory so that they can be added
+                // to files to clean if there is an exception finding the file.
+                string fileWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+                string directory = Path.GetDirectoryName(fileName);
                 try
                 {
                     var pair = ExtractSharePointHelper.BuildListAndFileGuid(fileName);
@@ -376,8 +384,18 @@ namespace Extract.SharePoint.Redaction
                 {
                     IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldDiskToSharePoint,
                         "ELI31525");
+                    
+                    // To keep this from trying to import a file that is no longer valid 
+                    // set the files to be cleaned up
+                    if (!filesToClean.ContainsKey(directory))
+                    {
+                        filesToClean.Add(directory, new List<string>());
+                    }
+
+                    filesToClean[directory].Add(fileWithoutExtension);
                 }
             }
+            CleanupLocalFiles(filesToClean, workingFolder);
         }
 
         /// <summary>
@@ -422,6 +440,8 @@ namespace Extract.SharePoint.Redaction
                     {
                         try
                         {
+                            string fileWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+
                             string directory = Path.GetDirectoryName(fileName);
                             var listIdFileId = ExtractSharePointHelper.BuildListAndFileGuid(fileName);
                             SPList list = null;
@@ -451,15 +471,21 @@ namespace Extract.SharePoint.Redaction
                                 }
                                 ee.Data.Add("Source Document ID", listIdFileId.Value);
 
+                                // To keep this from trying to import a file that is no longer valid 
+                                // set the files to be cleaned up
+                                if (!filesToClean.ContainsKey(directory))
+                                {
+                                    filesToClean.Add(directory, new List<string>());
+                                }
+
+                                filesToClean[directory].Add(fileWithoutExtension);
+
                                 throw ee;
                             }
                             bool filePreviouslyAttempted = _filesPreviouslyAttempted.Contains(fileName);
                             bool hasFileCompleted = false;
                             ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35887", item.File, "IDS Status changed and processing finished.", () =>
                             {
-                                string fileWithoutExtension =
-                                   Path.GetFileNameWithoutExtension(fileName);
-
                                 // Build path to redacted file
                                 string redactedFile = Path.Combine(directory, fileWithoutExtension)
                                     + ".redacted";
@@ -510,14 +536,6 @@ namespace Extract.SharePoint.Redaction
                                     // Upload the file to sharepoint
                                     UploadFileToSharePoint(fileToUpload, siteId);
 
-                                    // Add files to clean 
-                                    if (!filesToClean.ContainsKey(directory))
-                                    {
-                                        filesToClean.Add(directory, new List<string>());
-                                    }
-
-                                    filesToClean[directory].Add(fileWithoutExtension);
-
                                     // Add the file to sharepoint
                                     filesToAdd.Add(fileToUpload);
                                 }
@@ -528,6 +546,13 @@ namespace Extract.SharePoint.Redaction
                                         ExtractProcessingStatus.NoRedactions.AsString();
                                     item.Update();
                                 }
+                                // Add files to clean 
+                                if (!filesToClean.ContainsKey(directory))
+                                {
+                                    filesToClean.Add(directory, new List<string>());
+                                }
+
+                                filesToClean[directory].Add(fileWithoutExtension);
                                 hasFileCompleted = true;
                             }, !filePreviouslyAttempted);
 

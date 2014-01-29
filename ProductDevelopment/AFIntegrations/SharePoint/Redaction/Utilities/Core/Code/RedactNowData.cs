@@ -62,6 +62,12 @@ namespace Extract.SharePoint.Redaction.Utilities
         [DataMember(IsRequired=true)]
         public string WorkingFolder { get; set; }
 
+        /// <summary>
+        /// Gets or sets the file reference
+        /// </summary>
+        [DataMember(IsRequired=true)]
+        public string FileRef { get; set; }
+
         #endregion Fields
 
         #region Constructors
@@ -82,6 +88,7 @@ namespace Extract.SharePoint.Redaction.Utilities
             SiteUrl = data.SiteUrl;
             ListId = data.ListId;
             FileId = data.FileId;
+            FileRef = data.FileRef;
             FpsFileLocation = data.FpsFileLocation;
             WorkingFolder = data.WorkingFolder;
         }
@@ -92,11 +99,12 @@ namespace Extract.SharePoint.Redaction.Utilities
         /// <param name="siteUrl">The site URL.</param>
         /// <param name="listId">The list id.</param>
         /// <param name="fileId">The file id.</param>
+        /// <param name="fileRef">The file reference</param>
         /// <param name="fpsFileLocation">The FPS file location.</param>
         /// <param name="workingFolder">The working folder that contains the file to be verifyed for the verify process</param>
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId="0#")]
-        public IDSForSPClientData(string siteUrl, string listId, string fileId, string fpsFileLocation, string workingFolder = "")
-            : this(siteUrl, new Guid(listId), new Guid(fileId), fpsFileLocation, workingFolder)
+        public IDSForSPClientData(string siteUrl, string listId, string fileId, string fileRef, string fpsFileLocation, string workingFolder = "")
+            : this(siteUrl, new Guid(listId), new Guid(fileId), fileRef, fpsFileLocation, workingFolder)
         {
         }
 
@@ -106,14 +114,16 @@ namespace Extract.SharePoint.Redaction.Utilities
         /// <param name="siteUrl">The site URL.</param>
         /// <param name="listId">The list id.</param>
         /// <param name="fileId">The file id.</param>
+        /// <param name="fileRef">The file reference</param>
         /// <param name="fpsFileLocation">The FPS file location.</param>
         /// <param name="workingFolder">The working folder that contains the file to be verifyed for the verify process</param>
         [SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId="0#")]
-        public IDSForSPClientData(string siteUrl, Guid listId, Guid fileId, string fpsFileLocation, string workingFolder = "")
+        public IDSForSPClientData(string siteUrl, Guid listId, Guid fileId, string fileRef, string fpsFileLocation, string workingFolder = "")
         {
             SiteUrl = siteUrl;
             ListId = listId;
             FileId = fileId;
+            FileRef = fileRef;
             FpsFileLocation = fpsFileLocation;
             WorkingFolder = workingFolder;
         }

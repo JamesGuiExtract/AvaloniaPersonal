@@ -249,9 +249,8 @@ namespace Extract.SharePoint.Redaction.Utilities
             using (var context = new SP.ClientContext(data.SiteUrl))
             {
                 // Get the data from the items
-                var item = GetListItemOfFile(context, data);
-                var fileName = item["FileLeafRef"].ToString();
-                var url = item["FileRef"].ToString();
+                var fileName = Path.GetFileName(data.FileRef);
+                var url = data.FileRef;
 
                 var fileInfo = SP.File.OpenBinaryDirect(context, url);
                 var source = fileInfo.Stream;
@@ -340,8 +339,11 @@ namespace Extract.SharePoint.Redaction.Utilities
         {
             using (var context = new SP.ClientContext(data.SiteUrl))
             {
-                var item = GetListItemOfFile(context, data);
-                var fileName = item["FileLeafRef"].ToString();
+                // Load the site into the context
+                context.Load(context.Site);
+                context.ExecuteQuery();
+                
+                var fileName = Path.GetFileName(data.FileRef);
                 var pathWithSiteID = Path.Combine(data.WorkingFolder, context.Site.Id.ToString());
                 string workingPath = Path.Combine(pathWithSiteID, data.ListId.ToString());
                 string fileToVerify = Path.Combine(workingPath,

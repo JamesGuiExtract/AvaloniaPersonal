@@ -22,6 +22,7 @@
     <asp:HiddenField ID="hiddenSiteId" runat="server" />
     <asp:HiddenField ID="hiddenListId" runat="server" />
     <asp:HiddenField ID="hiddenFileId" runat="server" />
+    <asp:HiddenField ID="hiddenFileRef" runat="server" />
     <asp:HiddenField ID="hiddenLocalMachineIp" runat="server" />
 
     <asp:Panel ID="panelMessage" runat="server" Visible="false">

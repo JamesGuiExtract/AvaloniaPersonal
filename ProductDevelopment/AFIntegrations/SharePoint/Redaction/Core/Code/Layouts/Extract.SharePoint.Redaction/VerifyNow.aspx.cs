@@ -50,6 +50,8 @@ namespace Extract.SharePoint.Redaction.Layouts
                 var siteId = Request.QueryString["siteid"];
                 var listId = Request.QueryString["listidvalue"];
                 var fileId = Request.QueryString["fileid"];
+                var fileRef = Request.QueryString["fileref"];
+
                 string ipAddress = string.Empty;
                 var ipa = IPAddress.Parse(Request.UserHostAddress);
                 if (ipa.AddressFamily == AddressFamily.InterNetwork)
@@ -75,6 +77,7 @@ namespace Extract.SharePoint.Redaction.Layouts
                 hiddenSiteId.Value = siteId;
                 hiddenListId.Value = listId;
                 hiddenFileId.Value = fileId;
+                hiddenFileRef.Value = fileRef;
 
                 timerClose.Enabled = true;
             }
@@ -106,9 +109,10 @@ namespace Extract.SharePoint.Redaction.Layouts
                     var siteId = hiddenSiteId.Value;
                     var listId = hiddenListId.Value;
                     var fileId = hiddenFileId.Value;
+                    var fileRef = hiddenFileRef.Value;
                     using (var site = new SPSite(new Guid(siteId)))
                     {
-                        var data = new IDSForSPClientData(site.Url, listId, fileId, settings.VerifyFpsFile, settings.LocalWorkingFolder);
+                        var data = new IDSForSPClientData(site.Url, listId, fileId, fileRef, settings.VerifyFpsFile, settings.LocalWorkingFolder);
                         if (!IdShieldHelper.VerifyNowHelper(data, hiddenLocalMachineIp.Value))
                         {
                             sb.Append("alert('ID Shield For SharePoint Client application could not be found. ");

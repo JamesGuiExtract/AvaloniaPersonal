@@ -63,7 +63,7 @@ function singleFileContext() {
         // Load the items from the web context
         context.load(this.site, 'Id');
         context.load(this.web);
-        context.load(this.listItem, 'UniqueId');
+        context.load(this.listItem, 'UniqueId', 'FileRef');
     }
     catch (ef) {
         alert("Error:" + ef.message);
@@ -76,10 +76,11 @@ function OnShowRedactNowHelperSuccess(sender, args) {
     try {
         var siteId = this.site.get_id();
         var fileid = this.listItem.get_item('UniqueId');
+        var fileRef = this.listItem.get_item('FileRef');
         var options =
         {
             url: '/_layouts/Extract.SharePoint.Redaction/RedactNowHelper.aspx?'
-                + 'listidvalue=' + listid + '&fileid=' + fileid + '&siteid=' + siteId,
+                + 'listidvalue=' + listid + '&fileid=' + fileid + '&siteid=' + siteId + '&fileref=' + fileRef,
             title: 'Redact Now',
             allowMaximize: false,
             showClose: true
@@ -248,10 +249,11 @@ function OnShowVerifyNowHelperSuccess(sender, args) {
     try {
         var siteId = this.site.get_id();
         var fileid = this.listItem.get_item('UniqueId');
+        var fileRef = this.listItem.get_item('FileRef');
         var options =
         {
             url: '/_layouts/Extract.SharePoint.Redaction/VerifyNow.aspx?'
-                + 'listidvalue=' + listid + '&fileid=' + fileid + '&siteid=' + siteId,
+                + 'listidvalue=' + listid + '&fileid=' + fileid + '&siteid=' + siteId + '&fileref=' + fileRef,
             title: 'Verify',
             allowMaximize: false,
             showClose: true
