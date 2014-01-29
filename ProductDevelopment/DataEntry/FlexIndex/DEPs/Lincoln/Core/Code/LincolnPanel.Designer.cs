@@ -69,13 +69,13 @@ namespace Extract.DataEntry.DEP.Lincoln
             this._grantorNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._grantorDeceasedColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._grantorFormattedColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._unitColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._townRangeSectionColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._descriptionColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._blockColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._lotColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._subdivisionOtherColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._subdivisionSubdivisionColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._townRangeSectionColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._descriptionColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._unitColumn = new Extract.DataEntry.DataEntryTableColumn();
             _pageLabel = new System.Windows.Forms.Label();
             _docTypeLabel = new System.Windows.Forms.Label();
             _bookLabel = new System.Windows.Forms.Label();
@@ -383,11 +383,11 @@ namespace Extract.DataEntry.DEP.Lincoln
             this._subdivisionTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
             this._subdivisionTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._subdivisionTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this._unitColumn,
             this._blockColumn,
             this._lotColumn,
             this._subdivisionOtherColumn,
-            this._subdivisionSubdivisionColumn});
+            this._subdivisionSubdivisionColumn,
+            this._unitColumn});
             dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
             dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -488,16 +488,28 @@ namespace Extract.DataEntry.DEP.Lincoln
             this._grantorFormattedColumn.ValidationErrorMessage = "Invalid value";
             this._grantorFormattedColumn.Visible = false;
             // 
-            // _unitColumn
+            // _townRangeSectionColumn
             // 
-            this._unitColumn.AttributeName = "Unit";
-            this._unitColumn.AutoUpdateQuery = "<Expression><Attribute>.</Attribute>.ToUpper()</Expression>";
-            this._unitColumn.FillWeight = 12F;
-            this._unitColumn.HeaderText = "Unit";
-            this._unitColumn.MinimumWidth = 10;
-            this._unitColumn.Name = "_unitColumn";
-            this._unitColumn.ValidationErrorMessage = "Unit, block and lot cannot have more than 30 chars combined.";
-            this._unitColumn.ValidationQuery = resources.GetString("_unitColumn.ValidationQuery");
+            this._townRangeSectionColumn.AttributeName = "TownRangeSection";
+            this._townRangeSectionColumn.AutoUpdateQuery = "<Expression><Attribute>.</Attribute>.ToUpper()</Expression>";
+            this._townRangeSectionColumn.FillWeight = 50F;
+            this._townRangeSectionColumn.HeaderText = "Town Range Section";
+            this._townRangeSectionColumn.MinimumWidth = 10;
+            this._townRangeSectionColumn.Name = "_townRangeSectionColumn";
+            this._townRangeSectionColumn.ValidationErrorMessage = "Invalid value";
+            this._townRangeSectionColumn.ValidationQuery = resources.GetString("_townRangeSectionColumn.ValidationQuery");
+            // 
+            // _descriptionColumn
+            // 
+            this._descriptionColumn.AttributeName = "Description";
+            this._descriptionColumn.AutoUpdateQuery = "<Expression><Attribute>.</Attribute>.ToUpper()</Expression>";
+            this._descriptionColumn.FillWeight = 50F;
+            this._descriptionColumn.HeaderText = "Description";
+            this._descriptionColumn.MinimumWidth = 10;
+            this._descriptionColumn.Name = "_descriptionColumn";
+            this._descriptionColumn.ValidationErrorMessage = "Description cannot contain more than 32 chars.";
+            this._descriptionColumn.ValidationQuery = "<Query ValidValue=\'True\'>\r\n<Expression><Attribute>.</Attribute>.Length &lt;= 32</" +
+    "Expression>\r\n</Query>";
             // 
             // _blockColumn
             // 
@@ -507,7 +519,8 @@ namespace Extract.DataEntry.DEP.Lincoln
             this._blockColumn.HeaderText = "Block";
             this._blockColumn.MinimumWidth = 10;
             this._blockColumn.Name = "_blockColumn";
-            this._blockColumn.ValidationErrorMessage = "Invalid value";
+            this._blockColumn.ValidationErrorMessage = "Block should contain only numerical chars";
+            this._blockColumn.ValidationPattern = "^\\d*$";
             // 
             // _lotColumn
             // 
@@ -543,28 +556,16 @@ namespace Extract.DataEntry.DEP.Lincoln
             this._subdivisionSubdivisionColumn.ValidationErrorMessage = "Invalid value";
             this._subdivisionSubdivisionColumn.ValidationQuery = "<SQL>SELECT Name FROM Subdivision ORDER BY Name</SQL>Unknown";
             // 
-            // _townRangeSectionColumn
+            // _unitColumn
             // 
-            this._townRangeSectionColumn.AttributeName = "TownRangeSection";
-            this._townRangeSectionColumn.AutoUpdateQuery = "<Expression><Attribute>.</Attribute>.ToUpper()</Expression>";
-            this._townRangeSectionColumn.FillWeight = 50F;
-            this._townRangeSectionColumn.HeaderText = "Town Range Section";
-            this._townRangeSectionColumn.MinimumWidth = 10;
-            this._townRangeSectionColumn.Name = "_townRangeSectionColumn";
-            this._townRangeSectionColumn.ValidationErrorMessage = "Invalid value";
-            this._townRangeSectionColumn.ValidationQuery = resources.GetString("_townRangeSectionColumn.ValidationQuery");
-            // 
-            // _descriptionColumn
-            // 
-            this._descriptionColumn.AttributeName = "Description";
-            this._descriptionColumn.AutoUpdateQuery = "<Expression><Attribute>.</Attribute>.ToUpper()</Expression>";
-            this._descriptionColumn.FillWeight = 50F;
-            this._descriptionColumn.HeaderText = "Description";
-            this._descriptionColumn.MinimumWidth = 10;
-            this._descriptionColumn.Name = "_descriptionColumn";
-            this._descriptionColumn.ValidationErrorMessage = "Description cannot contain more than 32 chars.";
-            this._descriptionColumn.ValidationQuery = "<Query ValidValue=\'True\'>\r\n<Expression><Attribute>.</Attribute>.Length &lt;= 32</" +
-    "Expression>\r\n</Query>";
+            this._unitColumn.AttributeName = "Unit";
+            this._unitColumn.AutoUpdateQuery = "<Expression><Attribute>.</Attribute>.ToUpper()</Expression>";
+            this._unitColumn.FillWeight = 12F;
+            this._unitColumn.HeaderText = "Unit";
+            this._unitColumn.MinimumWidth = 10;
+            this._unitColumn.Name = "_unitColumn";
+            this._unitColumn.ValidationErrorMessage = "Unit, block and lot cannot have more than 30 chars combined.";
+            this._unitColumn.ValidationQuery = resources.GetString("_unitColumn.ValidationQuery");
             // 
             // LincolnPanel
             // 
@@ -625,12 +626,12 @@ namespace Extract.DataEntry.DEP.Lincoln
         private DataEntryTableColumn _grantorNameColumn;
         private DataEntryTableColumn _grantorDeceasedColumn;
         private DataEntryTableColumn _grantorFormattedColumn;
-        private DataEntryTableColumn _unitColumn;
+        private DataEntryTableColumn _townRangeSectionColumn;
+        private DataEntryTableColumn _descriptionColumn;
         private DataEntryTableColumn _blockColumn;
         private DataEntryTableColumn _lotColumn;
         private DataEntryTableColumn _subdivisionOtherColumn;
         private DataEntryTableColumn _subdivisionSubdivisionColumn;
-        private DataEntryTableColumn _townRangeSectionColumn;
-        private DataEntryTableColumn _descriptionColumn;
+        private DataEntryTableColumn _unitColumn;
     }
 }
