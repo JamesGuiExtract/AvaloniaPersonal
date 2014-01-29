@@ -1,0 +1,120 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.7.1 Patch Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.7.1 Patch Testing<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> Florida Supreme Court
+   	<LI><b>SCRs:</b> N/A
+   	<LI><b>Issues:</b>
+	<ul>
+		<li>No automatic cleanup of <b>.Processed</b> files if there is no 
+		<b>.Redacted</b> file.
+		<li>Document deleted from SharePoint while being processed in the 
+		working folder.
+		<li>Error using <b>RedactNow</b> or <b>Verify</b> button if more files 
+		are present in the Document Library than the List View Threshold.
+	</ul>
+</ul>
+<p>
+<h3>Patch Tests</h3>
+<OL>
+	<LI><b>Server Machine Setup</b>
+	<ul>
+		<LI>Install <b>ID Shield 9.7.0.31</b>.
+		<li>Install and configure the standard <b>SharePoint</b> server software.
+		<li>Install <b>ID Shield for SharePoint 9.7.1.1</b>.
+       	</ul>
+<p>
+	<LI><b>Client Machine Setup</b>
+	<ul>
+		<LI>Install <b>ID Shield 9.7.0.31</b>.
+		<li>Install <b>ID Shield for SharePoint 9.7.1.1</b>.
+       	</ul>
+<p>
+	<LI><b>Tests</b>
+	<ul>
+		<LI><b>Installation</b>
+		<ul>
+			<li>Confirm that the patch installs properly on the server.
+			<li>Confirm that the patch installs properly on the client.
+       		</ul>
+	   	</LI>
+<p>
+		<LI><b>Automatic Cleanup</b>
+		<ul>
+			<li>Create a document library.
+			<li>Add some files to the library including several files that 
+			do not contain sensitive data.
+			<li>Process the files.
+			<li>Confirm that each file is processed.
+			<li>Confirm that redacted output files are created for each 
+			sensitive file.
+			<li>Confirm that redacted output files are not created for each 
+			non-sensitive file.
+			<li>Confirm that all intermediate files are deleted for each file.
+			<ul>
+				<li>.uss
+				<li>.voa
+				<li>.Processed
+				<li>.Redacted
+			</ul>
+       		</ul>
+	   	</LI>
+<p>
+		<LI><b>Document Deletion</b>
+		<ul>
+			<li>Create a document library.
+			<li>Add a few documents to the library.
+			<li>Process the documents to confirm that the workflow is 
+			correct.
+			<li>Stop the FAM Service processing.
+			<li>Add a few more documents to the library.
+			<li>Confirm that status changes to <b>Queued for Processing</b>.
+			<li>Delete all but one of the new files from SharePoint.
+			<li>Start the FAM Service processing.
+			<li>Confirm that the remaining new file is correctly processed.
+			<li>Confirm that only one <b>ELI31525</b> exception is logged for 
+			each deleted file.
+       		</ul>
+	   	</LI>
+<p>
+		<LI><b>List View Threshold</b>
+		<ul>
+			<li>Create a document library.
+			<li>Adjust the <b>List View Threshold</b> to the minimum 2000.
+			<ul>
+				<li>Open <b>SharePoint Central Administration</b>.
+				<li>Select <b>Application Management</b>.
+				<li>Select <b>Manage web applications</b>.
+				<li>Select <b>SharePoint - 80</b>.
+				<li>Select <b>Resource Throttling</b> under the 
+				<b>General Settings</b> dropdown menu.
+				<li>Adjust <b>List View Threshold</b> and <b>List View 
+				Threshold for Auditors and Administrators</b>.
+			</ul>
+			<li>Add more than 2000 documents to the library.
+			<li>Process some documents.
+			<ul>
+				<li>Confirm that <b>RedactNow</b> processes the selected 
+				file without error.
+				<li>Confirm that <b>Verify</b> processes the selected 
+				file without error.
+			</ul>
+	       	</ul>
+   		</LI>
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
