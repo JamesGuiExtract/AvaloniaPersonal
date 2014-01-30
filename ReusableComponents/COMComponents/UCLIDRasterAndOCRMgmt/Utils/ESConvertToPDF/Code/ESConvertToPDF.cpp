@@ -177,6 +177,9 @@ void CESConvertToPDFApp::convertToSearchablePDF()
 
 	string strOutputFormat = pszOutputFormat;
 
+	// Use the more accurate 3-way voting engine (rather than the default 2-way voting engine).
+	setBoolSetting("Kernel.OcrMgr.PreferAccurateEngine", true);
+
 	// If either password is defined, enable 128 bit security
 	if (!m_strUserPassword.empty() || !m_strOwnerPassword.empty())
 	{
@@ -337,6 +340,31 @@ void CESConvertToPDFApp::convertToSearchablePDF()
 			{
 				try
 				{
+					// Because zones recognized as "black" have the undesireble side-effect of
+					// rendering as black in the output, do not process any zones recognized as
+					// black
+					// See: http://nuance-community.custhelp.com/posts/ab79d13e82
+					RECERR rc = kRecLocateZones(0, hPage);
+
+					int nZoneCount;
+					rc = kRecGetOCRZoneCount(hPage, &nZoneCount);
+					
+					for (int j = 0; j < nZoneCount; j++)
+					{
+						ZONEDATA zoneData = {0};
+						rc = kRecGetOCRZoneData(hPage, II_ORIGINAL, &zoneData, j);
+
+						// If zone is "black", make the OCR engine to ignore it.
+						if (zoneData.color == 0)
+						{
+							ZONE zone = {0};
+							rc = kRecGetOCRZoneInfo(hPage, II_ORIGINAL, &zone, j);
+
+							zone.fm = FM_NO_OCR;
+							rc = kRecUpdateOCRZone(hPage, II_ORIGINAL, &zone, j);
+						}
+					}
+
 					// recognize the text on this page
 					rc = kRecRecognize(0, hPage, 0);
 					if (rc != REC_OK && rc != NO_TXT_WARN && rc != ZONE_NOTFOUND_ERR)
