@@ -116,17 +116,21 @@ namespace Extract.SharePoint.Redaction
 
                     if (shouldBeSetToBeQueued(eventType, folder, pair.Key, fileName, item, pair.Value))
                     {
-                         ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35883", item.File, "IDS Status changed.", () =>
-                         {
+                        ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35883", item.File, "IDS Status changed.", () =>
+                        {
                             // Set the field to ToBeQueued
                             item[IdShieldHelper.IdShieldStatusColumn] =
                                 ExtractProcessingStatus.ToBeQueued.AsString();
                             item[IdShieldHelper.IdShieldReferenceColumn] = "";
 
-                            item.Update();
-                         }, true);
+                            // Update without triggering events
+                            using (new DisabledItemEventsScope())
+                            {
+                                item.Update();
+                            }
+                        }, true);
 
-                        // File was set to ToBeQueuedLater, break from foreach loop
+                        // File was set to ToBeQueued, break from foreach loop
                         break;
                     }
                 } // End foreach loop
@@ -175,7 +179,7 @@ namespace Extract.SharePoint.Redaction
             IdShieldFolderProcessingSettings settings)
         {
             // If this is not an event we are handling file should not be queued
-            if ((settings.EventTypes & eventType) == 0)
+            if ((settings.EventTypes & eventType) == 0 )
             {
                 return false;
             }
@@ -192,15 +196,21 @@ namespace Extract.SharePoint.Redaction
                 return false;
             }
 
+            ////File is currently not checked out even the current user.
+            //if (item.File.CheckedOutByUser != null)
+            //{
+            //    return false;
+            //}
+
             // Check if the QueueWithFieldValue settings should be checked
             if (settings.QueueWithFieldValue)
             {
-                // if event is not the file modified event the file should not be queued
+                //if event is not the file modified event the file should not be queued
                 if (eventType != FileEventType.FileModified)
                 {
                     return false;
                 }
-
+               
                 // if the value of the field does not match value we are looking for file should not be queued
                 if (!ExtractSharePointHelper.IsFieldEqual(item, settings))
                 {

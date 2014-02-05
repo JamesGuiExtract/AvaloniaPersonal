@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CamlQueryHelper.cs" />
+    <Compile Include="DisabledItemEventsScope.cs" />
     <Compile Include="ExtractProcessingFeatureSettings.cs" />
     <Compile Include="ExtractSharePointHelper.cs" />
     <Compile Include="ExtractSharePointLoggingService.cs" />

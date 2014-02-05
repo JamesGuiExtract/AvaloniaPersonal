@@ -84,7 +84,7 @@ namespace Extract.SharePoint.Redaction
             IdShieldOutputLocation outputLocation, string outputLocationString,
             bool queueOnValue, string nameOfValueField, string valueToQueueOn)
             : this(listId, folderId, folderPath, fileExtensions, recurse, reprocess, added,
-            false, processExisting, outputLocation, outputLocationString, 
+            queueOnValue, processExisting, outputLocation, outputLocationString, 
             queueOnValue, nameOfValueField, valueToQueueOn)
         {
         }
@@ -113,7 +113,7 @@ namespace Extract.SharePoint.Redaction
             bool processExisting, IdShieldOutputLocation outputLocation, string outputLocationString,
             bool queueOnValue, string fieldForQueuing, string valueToQueueOn)
             : base(listId, folderId, folderPath, fileExtensions, recurse, reprocess, added,
-            modified, processExisting, queueOnValue, fieldForQueuing, valueToQueueOn)
+            modified || queueOnValue, processExisting, queueOnValue, fieldForQueuing, valueToQueueOn)
         {
             _outputLocation = outputLocation;
             _outputLocationString = outputLocationString;

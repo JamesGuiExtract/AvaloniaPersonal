@@ -229,8 +229,7 @@ namespace Extract.SharePoint.Redaction
                 }
 
                 // If processing existing files, get all files that match the criteria and set their status to be queued
-                if ((folderSettings.ProcessAddedFiles && folderSettings.ProcessExisting) 
-                    || folderSettings.QueueWithFieldValue)
+                if ((folderSettings.ProcessAddedFiles || folderSettings.QueueWithFieldValue ) && folderSettings.ProcessExisting)
                 {
                     ExtractSharePointHelper.MarkFilesToBeQueued(siteId, folderSettings, IdShieldStatusColumn,
                         IdShieldReferenceColumn);

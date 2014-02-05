@@ -538,7 +538,7 @@ namespace Extract.SharePoint
                     SPListItem item = items[i];
 
                     if (folderSettings.DoesFileMatchPattern(item.File.Name) && 
-                        (!folderSettings.QueueWithFieldValue) || IsFieldEqual(item, folderSettings))
+                        (!folderSettings.QueueWithFieldValue || IsFieldEqual(item, folderSettings)))
                     {
                         ExtractSharePointHelper.DoWithCheckoutIfRequired("ELI35891", item.File, "IDS Status changed", () =>
                         {
@@ -606,7 +606,7 @@ namespace Extract.SharePoint
 
             // Get the folder name
             SPFolder folder = web.GetFolder(folderSettings.FolderId);
-            string folderName = folder.Name;
+            string folderName = folder.ServerRelativeUrl;
 
             // Set up for the value to check for
             camlValue valueToQuery = new camlValue(GetFieldType(web, folderName, field), value);

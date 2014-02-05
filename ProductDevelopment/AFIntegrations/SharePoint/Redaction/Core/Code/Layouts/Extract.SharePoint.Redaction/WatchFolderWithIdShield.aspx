@@ -114,33 +114,8 @@
         <table>
             <tr>
                 <td>
-                    <asp:CheckBox ID="checkReprocess" runat="server" ForeColor="Black"
-                        Text="Reprocess previously processed files" AutoPostBack="false" />
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <asp:CheckBox ID="checkRecursively" runat="server" ForeColor="Black"
-                        Text="Recursively process files from any sub folders"
-                        AutoPostBack="false" />
-                </td>
-            </tr>
-            <tr>
-                <td>
-                </td>
-            </tr>
-            <tr>
-                <td>
                     <asp:RadioButton ID="radioFilesAdded" runat="server" GroupName="radioAddedOrByValue" Text="Process any files that are added"
                         ForeColor="Black" OnCheckedChanged="RadioAddedOrByValueChanged" AutoPostBack="true" />
-                </td>
-            </tr>
-             <tr>
-                <td>
-                    <%--Indent the checkbox--%>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <asp:CheckBox ID="checkDoNotProcessExisting" runat="server" ForeColor="Black"
-                        Text="Do not process existing files" AutoPostBack="false" />
                 </td>
             </tr>
             <tr>
@@ -163,7 +138,32 @@
                     <asp:RadioButton ID="radioManualSelect" runat="server" GroupName="radioAddedOrByValue" Text="I will select files to process."
                         ForeColor="Black" OnCheckedChanged="RadioAddedOrByValueChanged" AutoPostBack="true" />
                 </td>
-            </tr>        </table>
+            </tr>
+            <tr>
+                <td>
+                </td>
+            </tr> 
+            <tr>
+                <td>
+                    <asp:CheckBox ID="checkRecursively" runat="server" ForeColor="Black"
+                        Text="Recursively process files from any sub folders"
+                        AutoPostBack="false" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:CheckBox ID="checkReprocess" runat="server" ForeColor="Black"
+                        Text="Reprocess previously processed files" AutoPostBack="false" />
+                </td>
+            </tr>
+
+             <tr>
+                <td>
+                    <asp:CheckBox ID="checkDoNotProcessExisting" runat="server" ForeColor="Black"
+                        Text="Do not process existing files" AutoPostBack="false" />
+                </td>
+            </tr>
+        </table>
     </asp:Panel>
     <br />
     <asp:Panel ID="panelOutputSettings" runat="server" GroupingText="Output settings"

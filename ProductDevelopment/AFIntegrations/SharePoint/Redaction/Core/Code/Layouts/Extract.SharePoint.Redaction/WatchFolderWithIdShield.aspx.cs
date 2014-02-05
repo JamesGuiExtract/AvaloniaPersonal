@@ -76,6 +76,7 @@ namespace Extract.SharePoint.Redaction.Layouts
                         radioParallel.Checked = true;
                         radioFilesAdded.Checked = true;
                         checkDoNotProcessExisting.Enabled = true;
+                        checkReprocess.Enabled = true;
                         fieldSelectionList.Enabled = false;
                         textValue.Enabled = false;
                         ToggleAllOutputLocations();
@@ -129,6 +130,7 @@ namespace Extract.SharePoint.Redaction.Layouts
                     {
                         checkRecursively.Enabled = false;
                     }
+                    bool processAddedOrByFieldValue = temp.ProcessAddedFiles || temp.QueueWithFieldValue;
                     if (watchingCurrentFolder)
                     {
                         if (checkRecursively.Enabled)
@@ -137,13 +139,13 @@ namespace Extract.SharePoint.Redaction.Layouts
                         }
                         textFileExtension.Text = temp.FileExtensions;
                         checkReprocess.Checked = temp.Reprocess;
-                        bool processAdded = temp.ProcessAddedFiles;
-                        if (!processAdded && !temp.QueueWithFieldValue)
+                        
+                        if (!processAddedOrByFieldValue)
                         {
                             radioManualSelect.Checked = true; ;
                         }
-                        radioFilesAdded.Checked = processAdded;
-                        if (processAdded)
+                        radioFilesAdded.Checked = temp.ProcessAddedFiles;
+                        if (processAddedOrByFieldValue)
                         {
                             checkDoNotProcessExisting.Checked = !temp.ProcessExisting;
                         }
@@ -189,7 +191,8 @@ namespace Extract.SharePoint.Redaction.Layouts
 
                     fieldSelectionList.Enabled = radioByValue.Checked;
                     textValue.Enabled = radioByValue.Checked;
-                    checkDoNotProcessExisting.Enabled = radioFilesAdded.Checked;
+                    checkDoNotProcessExisting.Enabled = processAddedOrByFieldValue;
+                    checkReprocess.Enabled = processAddedOrByFieldValue;
                     
                     ToggleAllOutputLocations();
                 }
@@ -309,7 +312,9 @@ namespace Extract.SharePoint.Redaction.Layouts
         {
             try
             {
-                checkDoNotProcessExisting.Enabled = radioFilesAdded.Checked;
+                bool addedOrByValue = radioFilesAdded.Checked || radioByValue.Checked;
+                checkDoNotProcessExisting.Enabled = addedOrByValue;
+                checkReprocess.Enabled = addedOrByValue;
                 fieldSelectionList.Enabled = radioByValue.Checked;
                 textValue.Enabled = radioByValue.Checked;
             }

@@ -130,24 +130,6 @@ namespace Extract.SharePoint.Redaction.Layouts {
         protected global::System.Web.UI.WebControls.Panel panelFolderSettings;
         
         /// <summary>
-        /// checkReprocess control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox checkReprocess;
-        
-        /// <summary>
-        /// checkRecursively control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox checkRecursively;
-        
-        /// <summary>
         /// radioFilesAdded control.
         /// </summary>
         /// <remarks>
@@ -155,15 +137,6 @@ namespace Extract.SharePoint.Redaction.Layouts {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.RadioButton radioFilesAdded;
-        
-        /// <summary>
-        /// checkDoNotProcessExisting control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox checkDoNotProcessExisting;
         
         /// <summary>
         /// radioByValue control.
@@ -209,6 +182,33 @@ namespace Extract.SharePoint.Redaction.Layouts {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.RadioButton radioManualSelect;
+        
+        /// <summary>
+        /// checkRecursively control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox checkRecursively;
+        
+        /// <summary>
+        /// checkReprocess control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox checkReprocess;
+        
+        /// <summary>
+        /// checkDoNotProcessExisting control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox checkDoNotProcessExisting;
         
         /// <summary>
         /// panelOutputSettings control.
