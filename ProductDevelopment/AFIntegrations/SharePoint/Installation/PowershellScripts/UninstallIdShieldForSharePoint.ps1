@@ -21,12 +21,22 @@ if (Check-SolutionExists $IDShieldSP)
 	{
 		Write-Host "Undeploying ID Shield for SharePoint..." -ForegroundColor Green
 		Uninstall-SPSolution $IDShieldSP -Confirm:$false -ErrorAction Stop
-		iisreset
+		
+		while (Check-SolutionDeployed $IDShieldSP)
+		{
+			Start-Sleep 30
+			Write-Host "--> Checking if ID Shield for SharePoint has been undeployed..." -ForegroundColor Gray
+		}
 	}
 	
 	Write-Host "Removing ID Shield for SharePoint..." -ForegroundColor Green
 	Remove-SPSolution $IDShieldSP -Confirm:$false -ErrorAction Stop
-	iisreset
+	
+	while (Check-SolutionExists $IDShieldSP)
+	{
+		Start-Sleep 30
+		Write-Host "--> Checking if ID Shield for SharePoint has been removed..." -ForegroundColor Gray
+	}
 }
 
 # Do not remove Extract.SharePoint unless data capture is not installed
@@ -37,12 +47,22 @@ if ((-not (Check-SolutionExists $ExtractDCSP)) `
 	{
 		Write-Host "Undeploying Extract Systems common feature..." -ForegroundColor Green
 		Uninstall-SPSolution $ExtractSP -Confirm:$false -ErrorAction Stop
-		Start-Sleep 30
-		iisreset
+		
+		while (Check-SolutionDeployed $ExtractSP)
+		{
+			Start-Sleep 30
+			Write-Host "--> Checking if Extract Systems common feature has been undeployed..." -ForegroundColor Gray
+		}
 	}
 	
 	Write-Host "Removing Extract Systems common feature..." -ForegroundColor Green
 	Remove-SPSolution $ExtractSP -Confirm:$false -ErrorAction Stop
+	
+	while (Check-SolutionExists $ExtractSP)
+	{
+		Start-Sleep 30
+		Write-Host "--> Checking if Extract Systems common feature has been removed..." -ForegroundColor Gray
+	}
 }
 
 iisreset
