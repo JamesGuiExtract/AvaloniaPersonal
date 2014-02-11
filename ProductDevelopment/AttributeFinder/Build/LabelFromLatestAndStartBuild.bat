@@ -33,7 +33,7 @@ cscript IncrementBuildVersion.vbs
 vault COMMIT -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% "%BATCH_COMMON_PATH%/LatestComponentVersions.mak"
 
 :: Label
-nmake /F LabelFromLatestVersions.mak
+nmake /F LabelFromLatestVersions.mak Branch=%Branch%
 
 :: Get the version to build from the LatestComponentVersion.mak files
 for /F "tokens=2 delims==" %%i in ( 'findstr FlexIndex LatestComponentVersions.mak') do set VersionToBuild=%%i
