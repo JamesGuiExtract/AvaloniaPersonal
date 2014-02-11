@@ -10,7 +10,7 @@ IF "%~2"=="/noget" GOTO no_get_build
 ECHO.
 ECHO Setting Branch to %~2
 SET Branch=%2
-GOTO init_build
+GOTO normal_build
 
 :missing_version_number_error
 ECHO.

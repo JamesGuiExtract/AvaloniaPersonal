@@ -16,13 +16,8 @@ SET Branch=%~1
 SET BATCH_WORKING_FOLDER=%~dp0
 IF %BATCH_WORKING_FOLDER:~-1%==\ SET BATCH_WORKING_FOLDER=%BATCH_WORKING_FOLDER:~0,-1%
 
-IF "Branch"=="" (
-	SET BATCH_COMMON_PATH=$/Engineering/ProductDevelopment/Common
-	SET BATCH_ATTRIBUTE_BUILD=$/Engineering/ProductDevelopment/AttributeFinder/Build
-) ELSE (
-	SET BATCH_COMMON_PATH=$%Branch%/Engineering/ProductDevelopment/Common
-	SET BATCH_ATTRIBUTE_BUILD=$%Branch%/Engineering/ProductDevelopment/AttributeFinder/Build
-)
+SET BATCH_COMMON_PATH=$%Branch%/Engineering/ProductDevelopment/Common
+SET BATCH_ATTRIBUTE_BUILD=$%Branch%/Engineering/ProductDevelopment/AttributeFinder/Build
 
 cd "%~p0..\..\Common"
 :: Get build folders from vault to make sure they are the most current
