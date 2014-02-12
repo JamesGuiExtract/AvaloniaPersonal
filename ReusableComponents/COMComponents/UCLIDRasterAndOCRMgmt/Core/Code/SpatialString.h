@@ -165,6 +165,7 @@ public:
 	STDMETHOD(GetOriginalImagePageBounds)(long nPageNum, ILongRectangle** ppBounds);
 	STDMETHOD(GetOCRImagePageBounds)(long nPageNum, ILongRectangle** ppBounds);
 	STDMETHOD(ContainsCharacterOutsideFontRange)(long nFontMin, long nFontMax, VARIANT_BOOL* pbResult);
+	STDMETHOD(GetFirstCharPositionOfPage)(long nPageNum, long *pFirstCharPos);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown **pObject);
@@ -582,5 +583,12 @@ private:
 	//			to append except that the method will compensate for differing page infos which
 	//			would otherwise cause an exception in append.
 	void mergeAsHybridString(UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipStringToMerge);
+	//----------------------------------------------------------------------------------------------
+	// Used by the GetFirstCharPositionOfPage to get the first position on a page
+	// this returns the first character on a page with the assumption that the
+	// non spatial characters after the last spatial character on the previous page and the first 
+	// spatial character on the page specified are on the specified page. If the page is not found,
+	// the last position on what would be the previous page will be returned.
+	long getFirstCharPositionOfPage(long nPageNumber);
 	//----------------------------------------------------------------------------------------------
 };

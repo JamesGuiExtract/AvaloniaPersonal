@@ -529,11 +529,15 @@ STDMETHODIMP CSpatialString::GetSpecifiedPages(long nStartPageNum, long nEndPage
 				// create a vector to hold letter on those pages
 				vector<CPPLetter> vecLetters;
 
+				// To save time with larger documents get the first character of the 
+				// start page as the string position in the letter array
+				long nStartPos = getFirstCharPositionOfPage(nStartPageNum);
+
 				// any non-spatial characters preceeding the first spatial character should be
 				// set to have the same page as the first spatial character
 				// to do this we must here calculate the page number of the first spatial character
 				CPPLetter tempLetter;
-				long nFirstSpatialLetter = getNextOCRImageSpatialLetter(0, tempLetter);
+				long nFirstSpatialLetter = getNextOCRImageSpatialLetter(nStartPos, tempLetter);
 
 				// this will hold the page number of the most recently processed 
 				// spatial character for use in assigning the page number of 
@@ -543,7 +547,7 @@ STDMETHODIMP CSpatialString::GetSpecifiedPages(long nStartPageNum, long nEndPage
 				// index
 				long nLastSpatialPageNum = tempLetter.m_usPageNumber;
 
-				for (long n = 0; n < nNumLetters; n++)
+				for (long n = nFirstSpatialLetter; n < nNumLetters; n++)
 				{
 					CPPLetter& letter = m_vecLetters[n];
 
@@ -2556,3 +2560,18 @@ STDMETHODIMP CSpatialString::ContainsCharacterOutsideFontRange(long nMinFont, lo
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32562");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::GetFirstCharPositionOfPage(long nPageNum, long *pFirstCharPos)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		
+		ASSERT_ARGUMENT("ELI36358", pFirstCharPos != __nullptr);
+		*pFirstCharPos = getFirstCharPositionOfPage(nPageNum);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36357");
+}

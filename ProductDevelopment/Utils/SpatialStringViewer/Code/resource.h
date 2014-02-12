@@ -14,6 +14,7 @@
 #define IDD_DLG_FONTSIZEDISTRIBUTION    133
 #define IDD_DLG_PROPERTY                135
 #define IDD_DLG_WORDLENGTHDISTRIBUTION  136
+#define IDR_TOOLBAR                     137
 #define IDC_EDIT_TEXT                   1000
 #define IDC_BTN_FIND                    1001
 #define IDC_EDIT_EXPRS                  1002
@@ -56,11 +57,16 @@
 #define IDC_FONT_UNDERLINE              1049
 #define IDC_FONT_SUPERSCRIPT            1050
 #define IDC_FONT_SUBSCRIPT              1051
-#define IDC_LIST_WORD_LENGTH_DIST		1052
-#define IDC_TEXT_NUMWORDS				1053
-#define IDC_EDIT_OCR_VERSION			1055
-#define IDC_FIND_PREVIOUS				1056
-#define IDC_FIND_RESET_FIND				1057
+#define IDC_LIST_WORD_LENGTH_DIST       1052
+#define IDC_TEXT_NUMWORDS               1053
+#define IDC_EDIT_OCR_VERSION            1055
+#define IDC_FIND_PREVIOUS               1056
+#define IDC_FIND_RESET_FIND             1057
+#define IDC_BUTTON_FIRST_PAGE            1058
+#define IDC_BUTTON_PREV_PAGE             1059
+#define IDC_BUTTON_GOTO_PAGE             1060
+#define IDC_BUTTON_LAST_PAGE             1061
+#define IDC_BUTTON_NEXT_PAGE             1062
 #define ID_FILE_EXIT                    32773
 #define ID_HELP_ABOUTUCLIDSPATIALSTRINGVIEWER 32774
 #define ID_FILE_PROPERTIES              32775
@@ -70,7 +76,7 @@
 #define ID_TOOLS_CHARACTERINFO          32780
 #define ID_MNU_OPEN_CHAR_INFO           32781
 #define ID_MNU_CHAR_INFO                32783
-#define ID_MNU_WORDLENGTHDISTRIBUTION	32784
+#define ID_MNU_WORDLENGTHDISTRIBUTION   32784
 #define ID_INDICATOR_START              59138
 #define ID_INDICATOR_END                59139
 #define ID_INDICATOR_PERCENT            59140
@@ -78,15 +84,16 @@
 #define ID_INDICATOR_FONTSIZE           59142
 #define ID_INDICATOR_CHARCONFIDENCE     59143
 #define ID_INDICATOR_FONT               59144
-#define ID_INDICATOR_CONFIDENCE			59145
+#define ID_INDICATOR_CONFIDENCE         59145
+#define ID_INDICATOR_PAGE_CONFIDENCE    59146
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        137
+#define _APS_NEXT_RESOURCE_VALUE        141
 #define _APS_NEXT_COMMAND_VALUE         32785
-#define _APS_NEXT_CONTROL_VALUE         1058
+#define _APS_NEXT_CONTROL_VALUE         1063
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

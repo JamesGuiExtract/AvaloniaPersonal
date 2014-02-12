@@ -158,6 +158,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CharInfoDlg.cpp" />
+    <ClCompile Include="EditWithPageIndicators.cpp" />
     <ClCompile Include="FindRegExDlg.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -170,6 +171,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="PageRulerStatic.cpp" />
     <ClCompile Include="SpatialStringViewer.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -197,6 +199,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="USSPropertyDlg.cpp" />
+    <ClCompile Include="USSViewerToolBar.cpp" />
     <ClCompile Include="WordLengthDistributionDlg.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -207,19 +210,23 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CharInfoDlg.h" />
+    <ClInclude Include="EditWithPageIndicators.h" />
     <ClInclude Include="FindRegExDlg.h" />
     <ClInclude Include="FontSizeDistributionDlg.h" />
+    <ClInclude Include="PageRulerStatic.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SpatialStringViewer.h" />
     <ClInclude Include="SpatialStringViewerCfg.h" />
     <ClInclude Include="SpatialStringViewerDlg.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="USSPropertyDlg.h" />
+    <ClInclude Include="USSViewerToolBar.h" />
     <ClInclude Include="WordLengthDistributionDlg.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\SpatialStringViewer.ico" />
     <None Include="res\SpatialStringViewer.rc2" />
+    <None Include="res\toolbar1.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\ReusableComponents\BaseUtils\Code\BaseUtils.vcxproj">

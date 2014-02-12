@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -73,7 +71,7 @@ IDR_MAINFRAME           ICON                    "res\\SpatialStringViewer.ico"
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOG  0, 0, 272, 57
+IDD_ABOUTBOX DIALOG 0, 0, 272, 57
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About USS File Viewer"
 FONT 8, "MS Sans Serif"
@@ -91,10 +89,10 @@ CAPTION "Extract Systems USS File Viewer"
 MENU IDR_MAIN_MENU
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    EDITTEXT        IDC_EDIT_TEXT,0,0,275,257,ES_MULTILINE | ES_NOHIDESEL | ES_READONLY | NOT WS_BORDER | WS_VSCROLL | WS_HSCROLL | NOT WS_TABSTOP
+    EDITTEXT        IDC_EDIT_TEXT,0,0,275,257,ES_MULTILINE | ES_NOHIDESEL | ES_READONLY | WS_VSCROLL | WS_HSCROLL | NOT WS_TABSTOP,WS_EX_CLIENTEDGE
 END
 
-IDD_DLG_FIND_REGEXPR DIALOG  0, 0, 334, 156
+IDD_DLG_FIND_REGEXPR DIALOG 0, 0, 334, 156
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Find"
 FONT 8, "MS Sans Serif"
@@ -122,7 +120,7 @@ BEGIN
     PUSHBUTTON      "&Reset",IDC_FIND_RESET_FIND,281,55,48,14
 END
 
-IDD_DLG_FONTSIZEDISTRIBUTION DIALOG  0, 0, 187, 194
+IDD_DLG_FONTSIZEDISTRIBUTION DIALOG 0, 0, 187, 194
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Font Sizes"
 FONT 8, "MS Sans Serif"
@@ -142,8 +140,8 @@ BEGIN
     LTEXT           "Source Document:",IDC_STATIC,7,7,60,8
     LTEXT           "Original Source Document:",IDC_STATIC,7,42,86,8
     EDITTEXT        IDC_EDIT_ORIGINAL,7,52,307,14,ES_AUTOHSCROLL | ES_READONLY,WS_EX_CLIENTEDGE
-	LTEXT			"OCR Engine Version",IDC_STATIC,7,74,70,10
-	EDITTEXT		IDC_EDIT_OCR_VERSION,7,84,307,14,ES_AUTOHSCROLL | ES_READONLY, WS_EX_CLIENTEDGE
+    LTEXT           "OCR Engine Version",IDC_STATIC,7,74,70,10
+    EDITTEXT        IDC_EDIT_OCR_VERSION,7,84,307,14,ES_AUTOHSCROLL | ES_READONLY,WS_EX_CLIENTEDGE
     CONTROL         "",IDC_LIST_PAGE_INFO,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,116,307,98
     LTEXT           "Page Information:",IDC_STATIC,7,106,59,10
 END
@@ -196,16 +194,16 @@ BEGIN
     CHECKBOX        "",IDC_FONT_SUBSCRIPT,200,101,8,13,BS_VCENTER | WS_DISABLED
 END
 
-IDD_DLG_WORDLENGTHDISTRIBUTION DIALOG  0, 0, 237, 194
+IDD_DLG_WORDLENGTHDISTRIBUTION DIALOG 0, 0, 237, 194
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Word Lengths"
 FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,180,175,50,14
-    CONTROL         "",IDC_LIST_WORD_LENGTH_DIST,"SysListView32",
-		LVS_REPORT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,5,20,225,150
+    CONTROL         "",IDC_LIST_WORD_LENGTH_DIST,"SysListView32",LVS_REPORT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,5,20,225,150
     LTEXT           "Total Number of Words",IDC_TEXT_NUMWORDS,5,5,175,10
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -252,7 +250,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
@@ -262,9 +260,12 @@ BEGIN
         BOTTOMMARGIN, 50
     END
 
+    IDD_SPATIALSTRINGVIEWER_DIALOG, DIALOG
+    BEGIN
+    END
+
     IDD_DLG_FIND_REGEXPR, DIALOG
     BEGIN
-        BOTTOMMARGIN, 176
     END
 
     IDD_DLG_FONTSIZEDISTRIBUTION, DIALOG
@@ -299,7 +300,7 @@ END
 // Menu
 //
 
-IDR_MAIN_MENU MENU 
+IDR_MAIN_MENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -314,8 +315,8 @@ BEGIN
     BEGIN
         MENUITEM "&Find...\tCtrl+F",            ID_MNU_FIND_REGEXPR
         MENUITEM "&Character Info\tCtrl+I",     ID_MNU_OPEN_CHAR_INFO
-        MENUITEM "Font &Size Distribution...",   ID_MNU_FONTSIZEDISTRIBUTION
-		MENUITEM "&Word Length Distribution...", ID_MNU_WORDLENGTHDISTRIBUTION
+        MENUITEM "Font &Size Distribution...",  ID_MNU_FONTSIZEDISTRIBUTION
+        MENUITEM "&Word Length Distribution...", ID_MNU_WORDLENGTHDISTRIBUTION
     END
     POPUP "&Help"
     BEGIN
@@ -329,7 +330,7 @@ END
 // Accelerator
 //
 
-IDR_ACCELERATORS ACCELERATORS 
+IDR_ACCELERATORS ACCELERATORS
 BEGIN
     "F",            ID_MNU_FIND_REGEXPR,    VIRTKEY, CONTROL, NOINVERT
     "I",            ID_MNU_OPEN_CHAR_INFO,  VIRTKEY, CONTROL, NOINVERT
@@ -338,24 +339,47 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Toolbar
+//
+
+IDR_TOOLBAR TOOLBAR 16, 15
+BEGIN
+    BUTTON      IDC_BUTTON_FIRST_PAGE
+    BUTTON      IDC_BUTTON_PREV_PAGE
+    BUTTON      IDC_BUTTON_GOTO_PAGE
+    BUTTON      IDC_BUTTON_NEXT_PAGE
+    BUTTON      IDC_BUTTON_LAST_PAGE
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_TOOLBAR             BITMAP                  "res\\toolbar1.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "&About USS File Viewer..."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     ID_INDICATOR_START      "Start Pos : %d               "
     ID_INDICATOR_END        "End Pos : %d                        "
     ID_INDICATOR_PERCENT    "%d%% "
-    ID_INDICATOR_PAGE       "Page: %d"
-	ID_INDICATOR_CONFIDENCE "Con: %d%%"
+    ID_INDICATOR_PAGE       "Page: %d      "
+    ID_INDICATOR_CONFIDENCE "Con: %d%%"
+    ID_INDICATOR_PAGE_CONFIDENCE "Page Con: %d%%"
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -3542,3 +3542,87 @@ void CSpatialString::mergeAsHybridString(UCLID_RASTERANDOCRMGMTLib::ISpatialStri
     append(ipStringToMergeCopy);
 }
 //-------------------------------------------------------------------------------------------------
+long CSpatialString::getFirstCharPositionOfPage(long nPageNum)
+{
+	long nFirstCharPos = 0;
+
+	// if the string is not spatial there is no way to determine the page number so return 0 
+	// for the first position
+	if (m_eMode != kSpatialMode)
+	{
+		return nFirstCharPos;
+	}
+
+	long nFirstPageNumber = getFirstPageNumber();
+	long nLastPageNumber = getLastPageNumber();
+
+	// if the first page number in the string is less than or the page number requested
+	// return 0
+	if (nPageNum <= nFirstPageNumber) 
+	{
+		return nFirstCharPos;
+	}
+
+	// if the page is higher than the last page return the last character position
+	if ( nPageNum > nLastPageNumber) 
+	{
+		for (long i = m_vecLetters.size() - 1; i >= 0; i--)
+		{
+			if (m_vecLetters[i].m_bIsSpatial)
+			{
+				nFirstCharPos = i;
+				break;
+			}
+		}
+		return  nFirstCharPos;
+	}
+
+	// Search for the page using a binary search of the letters
+	long nHigh = m_vecLetters.size() -1;
+	long nLow = 0;
+	long nDiff = nHigh - nLow;
+	long nMiddle;
+	long nHighPage = nLastPageNumber;
+	long nLowPage = nFirstPageNumber;
+	while (nDiff > 1)
+	{
+		nMiddle = nHigh - nDiff/2;
+		CPPLetter &currLetter = m_vecLetters[nMiddle];
+		long nMiddlePageNumber;
+		if (currLetter.m_bIsSpatial)
+		{
+			nMiddlePageNumber = currLetter.m_usPageNumber;
+		}
+		else
+		{
+			// get the page number for the middle from the next spatial character
+			long i = nMiddle;
+			do
+			{
+				i++;
+				currLetter = m_vecLetters[i];
+			}
+			while (i < nHigh && !currLetter.m_bIsSpatial);
+
+			nMiddlePageNumber = (i == nHigh) ? nHighPage : currLetter.m_usPageNumber;
+		}
+
+		// Reset the High and Low based on the where the middle falls
+		if (nMiddlePageNumber >= nPageNum)
+		{
+			nHighPage = nMiddlePageNumber;
+			nHigh = nMiddle;
+		}
+		else
+		{
+			nLowPage = nMiddlePageNumber;
+			nLow = nMiddle;
+		}
+
+		// Calculate the difference between the high and low for the next trip through the loop
+		nDiff = nHigh - nLow;
+	}
+
+	// After the loop the high will be the first position on the page
+	return nHigh;
+}

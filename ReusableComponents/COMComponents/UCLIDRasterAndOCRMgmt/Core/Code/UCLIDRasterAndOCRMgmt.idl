@@ -1170,6 +1170,15 @@ library UCLID_RASTERANDOCRMGMTLib
 		[id(98), helpstring("method ContainsCharacterOutsideFontRange")] HRESULT
 			ContainsCharacterOutsideFontRange([in] long nMinFont, [in] long nMaxFont,
 			[out, retval] VARIANT_BOOL* pbResult);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE:	GetMode() == kSpatialMode
+		// PURPOSE: To return the position of the first character on the specified page
+		//			with the assumption that the non spatial characters after the last spatial 
+		//			character on the previous page and the first spatial character on the page 
+		//			specified are on the specified page. If the page is not found, the last 
+		//			position on what would be the previous page will be returned.
+		[id(99), helpstring("method GetFirstCharPositionOfPage")] HRESULT GetFirstCharPositionOfPage(
+			[in] long nPageNum, [out, retval] long *pFirstCharPos);
 	};
 
 	[

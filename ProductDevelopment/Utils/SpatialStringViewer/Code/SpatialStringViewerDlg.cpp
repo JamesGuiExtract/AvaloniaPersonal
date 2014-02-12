@@ -11,6 +11,7 @@
 #include "USSPropertyDlg.h"
 #include "CharInfoDlg.h"
 #include "WordLengthDistributionDlg.h"
+#include "USSViewerToolBar.h"
 
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
@@ -50,6 +51,7 @@ static UINT indicators[] =
 {
 	//	ID_SEPARATOR,           // status line indicator
 	ID_INDICATOR_PAGE,
+	ID_INDICATOR_PAGE_CONFIDENCE,
 	ID_INDICATOR_START,
 	ID_INDICATOR_END,
 	ID_INDICATOR_CONFIDENCE,
@@ -161,6 +163,12 @@ m_nTotalNumChars(0)
 		m_ipSpatialString.CreateInstance(CLSID_SpatialString);
 		ASSERT_RESOURCE_ALLOCATION("ELI06719", m_ipSpatialString != __nullptr);
 
+	    // Set the spatial string for the edit control
+		m_editText.m_ipSpatialString = m_ipSpatialString;
+
+		// Set last page number to -1
+		m_nLastPageNumber = -1;
+
 		// parse the command line argument and obtain the name of the USS file
 		/*		if (__argc > 2)
 		{
@@ -237,6 +245,11 @@ BEGIN_MESSAGE_MAP(CSpatialStringViewerDlg, CDialog)
 	ON_COMMAND(ID_MNU_FONTSIZEDISTRIBUTION, OnMnuFontsizedistribution)
 	ON_COMMAND(ID_MNU_WORDLENGTHDISTRIBUTION, OnMnuWordLengthDistribution)
 	ON_COMMAND(ID_MNU_OPEN_CHAR_INFO, &CSpatialStringViewerDlg::OnMnuOpenCharInfo)
+	ON_COMMAND(IDC_BUTTON_FIRST_PAGE, OnButtonFirstPage)
+	ON_COMMAND(IDC_BUTTON_NEXT_PAGE, OnButtonNextPage)
+	ON_EN_CHANGE(IDC_BUTTON_GOTO_PAGE, OnChangeGotoPage)
+	ON_COMMAND(IDC_BUTTON_PREV_PAGE, OnButtonPrevPage)
+	ON_COMMAND(IDC_BUTTON_LAST_PAGE, OnButtonLastPage)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -308,6 +321,10 @@ BOOL CSpatialStringViewerDlg::OnInitDialog()
 		m_statusBar.SetIndicators(indicators, sizeof(indicators)/sizeof(UINT));
 		RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
 
+		// Create the toolbar control, this needs to be created before resizing the edit
+		// control so that the edit control is sized properly
+		createToolBar();
+
 		// resize the edit control to be the size of the client area of
 		// this window
 		resizeEditControl();
@@ -324,8 +341,9 @@ BOOL CSpatialStringViewerDlg::OnInitDialog()
 		}
 
 		loadSpatialStringFromFile();
+		configureToolBarButtons();
 
-		// Clear any selection
+		// Set focus to edit text control
 		m_editText.SetFocus();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06733");
@@ -658,166 +676,19 @@ BOOL CSpatialStringViewerDlg::PreTranslateMessage(MSG* pMsg)
 			return TRUE;
 		}
 
-		// only if the message is for the edit box
-		if (pMsg->hwnd == m_editText.m_hWnd)
+		// only if the message is for the edit box and
+		// do not do anything if the Goto page edit box has focus so that the selection
+		// does not get reset when the mouse is moved.
+		if (pMsg->hwnd == m_editText.m_hWnd && 
+			!m_apToolBar->gotoPageHasFocus())
 		{
-			long nPage = -1;
-			long nFontSize = 0;
-			long nConfidence = 100;
-			long nTop(0), nBottom(0), nLeft(0), nRight(0);
-			bool bEndOfParagraph(false), bEndOfZone(false);
-			unsigned short usGuess1(0), usGuess2(0), usGuess3(0);
-
-			int nStart, nEnd;
-			m_editText.GetSel(nStart, nEnd);
-
-			CString zPage(""), zStart(""), zEnd(""), zConfidence(""), zPercentage("");
-
-			// refresh the current word length distribution if it is visible
-			if (ma_pWordLengthDistDlg.get() && asCppBool(ma_pWordLengthDistDlg->IsWindowVisible()))
-			{
-				ma_pWordLengthDistDlg->refreshDistribution(nStart, nEnd);
-			}
-
-			// if there is spatial information, then collect that information
-			if (m_ipSpatialString->GetMode() == kSpatialMode)
-			{
-				// Get the page number of the character following the cursor
-				if(nEnd < m_ipSpatialString->Size)
-				{
-					ILetterPtr ipLetter = __nullptr;
-					m_ipSpatialString->GetNextOCRImageSpatialLetter(nEnd, &ipLetter);
-
-					if(ipLetter != __nullptr)
-					{
-						nPage = ipLetter->GetPageNumber();
-					}
-				}
-
-				// check for a difference between -1 and 1 which indicates a single
-				// character is selected
-				int nDifference = nEnd - nStart;
-				if (nDifference == -1 || nDifference == 1 || nDifference == 0)
-				{
-					if (nEnd < m_ipSpatialString->Size)
-					{
-						// set the character we should get to be nStart
-						// then check to see if the selection was right to left
-						// in which case the character we want is at nEnd, not
-						// nStart.
-						int nCharacter = nDifference == -1 ? nEnd : nStart;
-
-						ILetterPtr ipLetter = m_ipSpatialString->GetOCRImageLetter(nCharacter);
-
-						// check to be sure we have a letter
-						if (ipLetter != __nullptr)
-						{
-							nConfidence = ipLetter->CharConfidence;
-
-							// update the Character Info window if it is visible
-							if (ma_pCharInfoDlg.get() && 
-								asCppBool(ma_pCharInfoDlg->IsWindowVisible()))
-							{
-								ma_pCharInfoDlg->setCharacterData(ipLetter);
-							}
-						}
-					}
-				}
-				// check to see if looking at a selection of multiple characters
-				else if(nStart < nEnd &&
-					nStart >= 0 && nEnd <= m_ipSpatialString->Size)
-				{
-					// Get the mode font size and mean confidence of the selected text
-					ISpatialStringPtr ipSubString = m_ipSpatialString->GetSubString(nStart, nEnd-1);
-					ASSERT_RESOURCE_ALLOCATION("ELI20673", ipSubString != __nullptr);
-
-					if(ipSubString->HasSpatialInfo() == VARIANT_TRUE)
-					{
-						// Get the confidence
-						ipSubString->GetCharConfidence(NULL, NULL, &nConfidence);
-						// calculate the mode font size of the characters
-						ILongToLongMapPtr ipMap = ipSubString->GetFontSizeDistribution();
-
-						long nModeFontSize = 0;
-						long nMaxNumChars = 0;
-
-						long nMapSize = ipMap->Size;
-						int i;
-						for (i = 0; i < nMapSize; i++)
-						{
-							long nFontSize, nNumFontChars;
-							ipMap->GetKeyValue(i, &nFontSize, &nNumFontChars);
-							// DO NOT count Non-Spatial characters
-							if(nFontSize == 0)
-							{
-								continue;
-							}
-							if(nModeFontSize == 0 || nMaxNumChars < nNumFontChars)
-							{
-								nModeFontSize = nFontSize;
-								nMaxNumChars = nNumFontChars;
-							}
-						}
-						nFontSize = nModeFontSize;
-
-						// Get the font attributes
-						VARIANT_BOOL bItalic, bBold, bSansSerif, bSerif, bProportional, bUnderline, 
-							bSuperScript, bSubScript;
-						ipSubString->GetFontInfo(1, &bItalic, &bBold, &bSansSerif, &bSerif, 
-							&bProportional, &bUnderline, &bSuperScript, &bSubScript);
-
-						// now set our font string based on the return values
-						CString zFont = "";
-						zFont.AppendChar( asCppBool(bItalic) ? gcITALIC : gcBLANK );
-						zFont.AppendChar( asCppBool(bBold) ? gcBOLD : gcBLANK );
-						zFont.AppendChar( asCppBool(bSansSerif) ? gcSANSERIF : gcBLANK );
-						zFont.AppendChar( asCppBool(bSerif) ? gcSERIF : gcBLANK );
-						zFont.AppendChar( asCppBool(bProportional) ? gcPROPORTIONAL : gcBLANK ); 
-						zFont.AppendChar( asCppBool(bUnderline) ? gcUNDERLINE : gcBLANK );
-						zFont.AppendChar( asCppBool(bSuperScript) ? gcSUPERSCRIPT : gcBLANK );
-						zFont.AppendChar( asCppBool(bSubScript) ? gcSUBSCRIPT : gcBLANK );
-
-						// update the Character Info window if it is visible
-						if (ma_pCharInfoDlg.get() && asCppBool(ma_pCharInfoDlg->IsWindowVisible()))
-						{
-							ma_pCharInfoDlg->setCharacterData(nModeFontSize, nConfidence, 
-								nPage, zFont);
-						}
-					}
-				}
-			}
-
-			// Update page number
-			zPage.Format(ID_INDICATOR_PAGE, nPage);
-
-			// comma format and update the start and end position
-			string strStartAndEndString("Start Pos: ");
-			strStartAndEndString += commaFormatNumber(static_cast<LONGLONG>(nStart));
-			zStart = strStartAndEndString.c_str();
-			strStartAndEndString = "End Pos: ";
-			strStartAndEndString += commaFormatNumber(static_cast<LONGLONG>(nEnd));
-			zEnd = strStartAndEndString.c_str();
-
-			int nLastPos = m_nTotalNumChars;
-			if (nLastPos <= 0)
-			{
-				nLastPos = 1;
-			}
-
-			// Format the confidence
-			zConfidence.Format(ID_INDICATOR_CONFIDENCE, nConfidence);
-
-			// Compute and update the percentage
-			int nPercentage = (int)(((double)nStart/(double)nLastPos) * 100);
-			zPercentage.Format(ID_INDICATOR_PERCENT, nPercentage);
-
-			// Update the status bar
-			setStatusBarText(zPage, zStart, zEnd, zConfidence, zPercentage);
+			// update the status bar
+			updateStatusBar();
 
 			return CDialog::PreTranslateMessage(pMsg);
 		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI10627");
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI10627");
 	return bRetCode;
 }
 //-------------------------------------------------------------------------------------------------
@@ -829,6 +700,144 @@ BOOL CSpatialStringViewerDlg::OnHelpInfo(HELPINFO* pHelpInfo)
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16844")
 	// Do not show any Help
 	return TRUE;
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringViewerDlg::OnButtonFirstPage()
+{
+	try
+	{
+		// Select first character on first page
+		m_editText.SetSel(0,0);
+		
+		updateStatusBar();
+		
+		m_editText.SetFocus();
+		
+		configureToolBarButtons();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI36356");
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringViewerDlg::OnChangeGotoPage()
+{
+	try
+	{
+		// Get the text in the GoTo page edit box on the toolbar
+		string strCurrentGoToPageText = m_apToolBar->getCurrentGoToPageText();
+
+		// if the text is the same as the last saved text, the ENTER key was pressed
+		// and the new page number should be set
+		if (m_strLastGoToPageText == strCurrentGoToPageText)
+		{
+			// If the GoTo page edit box is empty nothing to do
+			if (!strCurrentGoToPageText.empty())
+			{
+				// Get the first position that is not a number
+				long nNumberEnd = strCurrentGoToPageText.find_first_not_of("0123456789", 0);
+
+				// if no numbers at the beginning of the string nothing to do
+				if (nNumberEnd != 0)
+				{
+					// Get the number at the beginning of the GoTo page string
+					string strFirstNumber = strCurrentGoToPageText.substr(0, nNumberEnd);
+
+					// Convert the number
+					long nPage = asLong(strFirstNumber);
+
+					// Check that the number is valid for the loaded document
+					if (nPage > 0 && nPage <= m_nLastPageNumber)
+					{
+						// Get the starting position of the new page
+						int newPos = m_ipSpatialString->GetFirstCharPositionOfPage(nPage);
+
+						// Set the cursor to the starting position of the new page
+						m_editText.SetSel(newPos, newPos);
+
+						// Reposition to first char of next line
+						repositionToFirstCharOfNextLine();
+					}
+					// Update the status bar
+					updateStatusBar();
+					m_editText.SetFocus();	
+					configureToolBarButtons();
+				}
+			}
+		}
+		else
+		{
+			m_strLastGoToPageText = strCurrentGoToPageText;
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI36362");
+	
+}
+
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringViewerDlg::OnButtonLastPage()
+{
+	try
+	{
+		// Go to first character on last page
+		long nFirstCharOnLastPage = m_ipSpatialString->GetFirstCharPositionOfPage(m_nLastPageNumber);
+		m_editText.SetSel(nFirstCharOnLastPage, nFirstCharOnLastPage);
+		
+		// Reposition to first char of next line
+		repositionToFirstCharOfNextLine();
+		
+		updateStatusBar();
+		m_editText.SetFocus();
+		
+		configureToolBarButtons();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI36359");
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringViewerDlg::OnButtonNextPage()
+{
+	try
+	{
+		// Go to next page
+		long nCurrPage = getCurrentPage();
+
+		if (nCurrPage > 0 && nCurrPage != m_ipSpatialString->GetLastPageNumber())
+		{
+			int newPos = m_ipSpatialString->GetFirstCharPositionOfPage(nCurrPage + 1);
+
+			m_editText.SetSel(newPos, newPos);
+
+			// Reposition to first char of next line
+			repositionToFirstCharOfNextLine();
+		}
+		
+		updateStatusBar();
+		m_editText.SetFocus();
+
+		configureToolBarButtons();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI36360");
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringViewerDlg::OnButtonPrevPage()
+{
+	try
+	{
+		long nCurrPage = getCurrentPage();
+
+		if (nCurrPage > 1)
+		{
+			int newPos = m_ipSpatialString->GetFirstCharPositionOfPage(nCurrPage - 1);
+			m_editText.SetSel(newPos, newPos);
+
+			// Reposition to first char of next line
+			repositionToFirstCharOfNextLine();
+		}
+		
+		updateStatusBar();
+		m_editText.SetFocus();
+
+		configureToolBarButtons();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI36361");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -860,6 +869,7 @@ string CSpatialStringViewerDlg::getEntireDocumentText()
 void CSpatialStringViewerDlg::selectText(int nStartPos, int nEndPos)
 {
 	m_editText.SetSel(nStartPos, nEndPos);
+	updateStatusBar();
 }
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CSpatialStringViewerDlg::getSpatialString()
@@ -932,6 +942,7 @@ void CSpatialStringViewerDlg::loadSpatialStringFromFile()
 			{
 				m_strOriginalSourceDoc = m_ipSpatialString->LoadFrom(
 					get_bstr_t(m_strUSSFileName), VARIANT_FALSE);
+
 				// get the size of current document
 				m_nTotalNumChars = m_ipSpatialString->String.length();
 			}
@@ -944,9 +955,19 @@ void CSpatialStringViewerDlg::loadSpatialStringFromFile()
 				m_nTotalNumChars = 0;
 			}
 
+			// Set the last page number to -1
+			m_nLastPageNumber = -1;
+
+			// Get the last page number if the string has spatial info
+			if (asCppBool(m_ipSpatialString->HasSpatialInfo()))
+			{
+				m_nLastPageNumber = m_ipSpatialString->GetLastPageNumber();
+			}
+
 			// Update the caption
 			updateWindowCaption( m_strUSSFileName );
-
+			configureToolBarButtons();
+			resetGoToPageText();
 		}
 		catch (...)
 		{
@@ -959,6 +980,9 @@ void CSpatialStringViewerDlg::loadSpatialStringFromFile()
 			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI25969");
 
 			m_strOriginalSourceDoc = "";
+
+			// Reset the last page to -1
+			m_nLastPageNumber = -1;
 			throw;
 		}
 	}
@@ -976,9 +1000,13 @@ void CSpatialStringViewerDlg::loadSpatialStringFromFile()
 void CSpatialStringViewerDlg::resizeEditControl()
 {
 	// resize the editbox to be the size of the client area
-	CRect rect;
+	CRect rect, toolBarRect;
 	GetClientRect(rect);
+	m_apToolBar->GetClientRect(toolBarRect);
+
 	rect.bottom = rect.Height() - g_nStatusBarHeight;
+	rect.top = toolBarRect.Height() + 2;
+
 	m_editText.MoveWindow(rect);
 
 	// make sure the status bar exists before accessing it
@@ -990,6 +1018,7 @@ void CSpatialStringViewerDlg::resizeEditControl()
 }
 //-------------------------------------------------------------------------------------------------
 void CSpatialStringViewerDlg::setStatusBarText(const CString& zPage,
+											   const CString& zPageConfidence,
 											   const CString& zStartPos, 
 											   const CString& zEndPos,
 											   const CString& zConfidence,
@@ -999,6 +1028,7 @@ void CSpatialStringViewerDlg::setStatusBarText(const CString& zPage,
 	if (asCppBool(::IsWindow(m_statusBar.m_hWnd)))
 	{
 		m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_PAGE), zPage);
+		m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_PAGE_CONFIDENCE), zPageConfidence);
 		m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_START), zStartPos);
 		m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_END), zEndPos);
 		m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_CONFIDENCE), zConfidence);
@@ -1025,5 +1055,299 @@ void CSpatialStringViewerDlg::updateWindowCaption(const string& strFileName)
 
 	// Update the window caption
 	SetWindowText( strResult.c_str() );
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringViewerDlg::createToolBar()
+{
+	m_apToolBar = unique_ptr<USSViewerToolBar>(new USSViewerToolBar());
+
+	if (m_apToolBar->CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP 
+    | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) )
+	{
+		m_apToolBar->LoadToolBar(IDR_TOOLBAR);
+	}
+	
+	m_apToolBar->SetBarStyle(m_apToolBar->GetBarStyle() |
+		CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC);
+
+	// must set TBSTYLE_TOOLTIPS here in order to get tool tips
+	m_apToolBar->ModifyStyle(0, TBSTYLE_TOOLTIPS);
+
+    // put separators around the Goto Page button so there is room for the edit box
+	static UINT nButtonIds[] = {
+		IDC_BUTTON_FIRST_PAGE,
+		IDC_BUTTON_PREV_PAGE,
+		ID_SEPARATOR,
+		IDC_BUTTON_GOTO_PAGE,
+		ID_SEPARATOR,
+		IDC_BUTTON_NEXT_PAGE,
+		IDC_BUTTON_LAST_PAGE
+	};
+
+	// number of buttons (including sperators) for toolbar buttons
+	int nNumButtons = sizeof(nButtonIds)/sizeof(nButtonIds[0]);
+
+	m_apToolBar->SetButtons(nButtonIds, nNumButtons);
+
+	// create the edit control in the toolbar for navigating to a certain page.
+	m_apToolBar->createGoToPageEditBox();
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringViewerDlg::configureToolBarButtons()
+{
+	if (!m_bInitialized)
+	{
+		return;
+	}
+
+	long currPage = getCurrentPage();
+	bool bEnable = m_nLastPageNumber > 1;
+
+	m_apToolBar->GetToolBarCtrl().EnableButton(IDC_BUTTON_FIRST_PAGE, asMFCBool(bEnable && currPage > 1));
+	m_apToolBar->GetToolBarCtrl().EnableButton(IDC_BUTTON_PREV_PAGE, asMFCBool(bEnable && currPage > 1));
+	m_apToolBar->GetToolBarCtrl().EnableButton(IDC_BUTTON_GOTO_PAGE, asMFCBool(bEnable));
+	m_apToolBar->GetToolBarCtrl().EnableButton(IDC_BUTTON_NEXT_PAGE, asMFCBool(bEnable && currPage < m_nLastPageNumber));
+	m_apToolBar->GetToolBarCtrl().EnableButton(IDC_BUTTON_LAST_PAGE, asMFCBool(bEnable && currPage < m_nLastPageNumber));
+	m_apToolBar->enableGoToEditBox(bEnable);
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringViewerDlg::resetGoToPageText()
+{
+	try
+	{
+		// GoTo page text should be blank if no document loaded
+		string strGoToPageText = "";
+		
+		// Check if document is loaded
+		if (!m_strUSSFileName.empty())
+		{
+			// Get the page at the current cursor location
+			long nCurrPage = getCurrentPage();
+
+			// Page should be greater than 0
+			if (nCurrPage > 0 )
+			{
+				// Get the last page of the doc
+				long lastPage = m_ipSpatialString->GetLastPageNumber();
+				strGoToPageText = asString(nCurrPage) + " of " + asString(lastPage);
+			}
+		}
+		m_apToolBar->setCurrentGoToPageText(strGoToPageText);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36373");
+}
+//-------------------------------------------------------------------------------------------------
+long CSpatialStringViewerDlg::getCurrentPage()
+{
+	try
+	{
+		int currentStartPos, currentLastPos;
+		m_editText.GetSel(currentStartPos, currentLastPos);
+
+		return getPageAtPos(currentStartPos);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36374");
+}
+//-------------------------------------------------------------------------------------------------
+long CSpatialStringViewerDlg::getPageAtPos(long nPos)
+{
+	try
+	{
+		//  Return -1 if nPos is not within the bounds of the loaded document
+		if (!asCppBool(m_ipSpatialString->HasSpatialInfo()) || nPos < 0)
+		{
+			return -1;
+		}
+		else if (nPos >= m_ipSpatialString->Size)
+		{
+			return m_nLastPageNumber;
+		}
+
+		// Default to the last page
+		long nCurrPage = m_nLastPageNumber;
+		ILetterPtr ipLetter = m_ipSpatialString->GetOCRImageLetter(nPos);
+		if (ipLetter != __nullptr)
+		{
+			if (ipLetter->IsSpatialChar == VARIANT_FALSE)
+			{
+				m_ipSpatialString->GetNextOCRImageSpatialLetter(nPos, &ipLetter);
+			}
+			nCurrPage = ipLetter->GetPageNumber();
+		}
+		return nCurrPage;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36377");
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringViewerDlg::updateStatusBar()
+{
+	long nPage = -1;
+	long nFontSize = 0;
+	long nConfidence = 100;
+	long nTop(0), nBottom(0), nLeft(0), nRight(0);
+	bool bEndOfParagraph(false), bEndOfZone(false);
+	unsigned short usGuess1(0), usGuess2(0), usGuess3(0);
+
+	int nStart, nEnd;
+	m_editText.GetSel(nStart, nEnd);
+
+	CString zPage(""), zStart(""), zEnd(""), zConfidence(""), zPercentage("");
+
+	// refresh the current word length distribution if it is visible
+	if (ma_pWordLengthDistDlg.get() && asCppBool(ma_pWordLengthDistDlg->IsWindowVisible()))
+	{
+		ma_pWordLengthDistDlg->refreshDistribution(nStart, nEnd);
+	}
+
+	// if there is spatial information, then collect that information
+	if (m_ipSpatialString->GetMode() == kSpatialMode)
+	{
+		// Get the page number of the character following the cursor
+		nPage = getPageAtPos(nEnd);
+
+		// check for a difference between -1 and 1 which indicates a single
+		// character is selected
+		int nDifference = nEnd - nStart;
+		if (nDifference == -1 || nDifference == 1 || nDifference == 0)
+		{
+			if (nEnd < m_ipSpatialString->Size)
+			{
+				// set the character we should get to be nStart
+				// then check to see if the selection was right to left
+				// in which case the character we want is at nEnd, not
+				// nStart.
+				int nCharacter = nDifference == -1 ? nEnd : nStart;
+
+				ILetterPtr ipLetter = m_ipSpatialString->GetOCRImageLetter(nCharacter);
+
+				// check to be sure we have a letter
+				if (ipLetter != __nullptr)
+				{
+					nConfidence = ipLetter->CharConfidence;
+
+					// update the Character Info window if it is visible
+					if (ma_pCharInfoDlg.get() && 
+						asCppBool(ma_pCharInfoDlg->IsWindowVisible()))
+					{
+						ma_pCharInfoDlg->setCharacterData(ipLetter);
+					}
+				}
+			}
+		}
+		// check to see if looking at a selection of multiple characters
+		else if(nStart < nEnd &&
+			nStart >= 0 && nEnd <= m_ipSpatialString->Size)
+		{
+			// Get the mode font size and mean confidence of the selected text
+			ISpatialStringPtr ipSubString = m_ipSpatialString->GetSubString(nStart, nEnd-1);
+			ASSERT_RESOURCE_ALLOCATION("ELI20673", ipSubString != __nullptr);
+
+			if(ipSubString->HasSpatialInfo() == VARIANT_TRUE)
+			{
+				// Get the confidence
+				ipSubString->GetCharConfidence(NULL, NULL, &nConfidence);
+				// calculate the mode font size of the characters
+				ILongToLongMapPtr ipMap = ipSubString->GetFontSizeDistribution();
+
+				long nModeFontSize = 0;
+				long nMaxNumChars = 0;
+
+				long nMapSize = ipMap->Size;
+				int i;
+				for (i = 0; i < nMapSize; i++)
+				{
+					long nFontSize, nNumFontChars;
+					ipMap->GetKeyValue(i, &nFontSize, &nNumFontChars);
+					// DO NOT count Non-Spatial characters
+					if(nFontSize == 0)
+					{
+						continue;
+					}
+					if(nModeFontSize == 0 || nMaxNumChars < nNumFontChars)
+					{
+						nModeFontSize = nFontSize;
+						nMaxNumChars = nNumFontChars;
+					}
+				}
+				nFontSize = nModeFontSize;
+
+				// Get the font attributes
+				VARIANT_BOOL bItalic, bBold, bSansSerif, bSerif, bProportional, bUnderline, 
+					bSuperScript, bSubScript;
+				ipSubString->GetFontInfo(1, &bItalic, &bBold, &bSansSerif, &bSerif, 
+					&bProportional, &bUnderline, &bSuperScript, &bSubScript);
+
+				// now set our font string based on the return values
+				CString zFont = "";
+				zFont.AppendChar( asCppBool(bItalic) ? gcITALIC : gcBLANK );
+				zFont.AppendChar( asCppBool(bBold) ? gcBOLD : gcBLANK );
+				zFont.AppendChar( asCppBool(bSansSerif) ? gcSANSERIF : gcBLANK );
+				zFont.AppendChar( asCppBool(bSerif) ? gcSERIF : gcBLANK );
+				zFont.AppendChar( asCppBool(bProportional) ? gcPROPORTIONAL : gcBLANK ); 
+				zFont.AppendChar( asCppBool(bUnderline) ? gcUNDERLINE : gcBLANK );
+				zFont.AppendChar( asCppBool(bSuperScript) ? gcSUPERSCRIPT : gcBLANK );
+				zFont.AppendChar( asCppBool(bSubScript) ? gcSUBSCRIPT : gcBLANK );
+
+				// update the Character Info window if it is visible
+				if (ma_pCharInfoDlg.get() && asCppBool(ma_pCharInfoDlg->IsWindowVisible()))
+				{
+					ma_pCharInfoDlg->setCharacterData(nModeFontSize, nConfidence, 
+						nPage, zFont);
+				}
+			}
+		}
+	}
+	
+	// Update page number
+	zPage.Format(ID_INDICATOR_PAGE, nPage);
+
+	// comma format and update the start and end position
+	string strStartAndEndString("Start Pos: ");
+	strStartAndEndString += commaFormatNumber(static_cast<LONGLONG>(nStart));
+	zStart = strStartAndEndString.c_str();
+	strStartAndEndString = "End Pos: ";
+	strStartAndEndString += commaFormatNumber(static_cast<LONGLONG>(nEnd));
+	zEnd = strStartAndEndString.c_str();
+
+	int nLastPos = m_nTotalNumChars;
+	if (nLastPos <= 0)
+	{
+		nLastPos = 1;
+	}
+
+	// Format the confidence
+	zConfidence.Format(ID_INDICATOR_CONFIDENCE, nConfidence);
+
+	// Compute and update the percentage
+	int nPercentage = (int)(((double)nStart/(double)nLastPos) * 100);
+	zPercentage.Format(ID_INDICATOR_PERCENT, nPercentage);
+
+	// Get the current page confidence
+	long nPageConfidence = 100;
+	if (nPage > 0 )
+	{
+		ISpatialStringPtr ipPageText = m_ipSpatialString->GetSpecifiedPages(nPage, nPage);
+		ASSERT_RESOURCE_ALLOCATION("ELI36378", ipPageText != __nullptr);
+
+		ipPageText->GetCharConfidence( __nullptr,__nullptr, &nPageConfidence);
+	}
+
+	CString zPageConfidence("");
+
+	zPageConfidence.Format(ID_INDICATOR_PAGE_CONFIDENCE, nPageConfidence);
+	resetGoToPageText();
+
+	// Update the status bar
+	setStatusBarText(zPage, zPageConfidence, zStart, zEnd, zConfidence, zPercentage);
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringViewerDlg::repositionToFirstCharOfNextLine()
+{
+	int nCurrentLine = m_editText.LineFromChar();
+	if(nCurrentLine < m_editText.GetLineCount() && nCurrentLine != 0)
+	{
+		int newPos = m_editText.LineIndex(nCurrentLine + 1);
+		m_editText.SetSel(newPos, newPos);
+	}
 }
 //-------------------------------------------------------------------------------------------------
