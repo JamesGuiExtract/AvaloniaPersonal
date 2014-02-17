@@ -66,6 +66,7 @@ protected:
 	afx_msg void OnButtonNextPage();
 	afx_msg void OnButtonLastPage();
 	afx_msg void OnChangeGotoPage();
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 	virtual BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	//{{AFX_INSERT_LOCATION}}
 	//}}AFX_MSG

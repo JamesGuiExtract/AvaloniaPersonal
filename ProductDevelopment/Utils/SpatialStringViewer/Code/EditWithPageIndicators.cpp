@@ -138,7 +138,7 @@ int CEditWithPageIndicators::GetLastVisibleLine()
 	long lineHeight =  textMetrics.tmHeight;
 	long displayedLines = min( clientRect.bottom / lineHeight, lineCount - firstVisibleLine);
 
-	return firstVisibleLine + displayedLines - 1;
+	return (displayedLines <= 1) ? firstVisibleLine : firstVisibleLine + displayedLines - 1;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -165,7 +165,8 @@ void CEditWithPageIndicators::UpdatePageRuler()
 
 		int nLastVisibleLine = GetLastVisibleLine();
 
-		nLastPos = LineIndex(nLastVisibleLine) -1;
+        // Get the last position on the last visible line
+		nLastPos = LineIndex(nLastVisibleLine) + LineLength(nLastVisibleLine) - 1;
 	
 		int nCurrPage = getPageAtPos(nFirstPos);
 		int nTopPage = nCurrPage;

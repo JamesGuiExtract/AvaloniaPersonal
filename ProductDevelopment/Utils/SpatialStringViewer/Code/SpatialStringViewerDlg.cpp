@@ -34,6 +34,7 @@ static char THIS_FILE[] = __FILE__;
 const string strWINDOW_TITLE = "USS File Viewer";
 
 static const int g_nStatusBarHeight = 18;
+static const int g_nToolBarHeight = 24;
 
 // font constants
 const char gcBLANK = '_';
@@ -236,6 +237,7 @@ BEGIN_MESSAGE_MAP(CSpatialStringViewerDlg, CDialog)
 	ON_WM_QUERYDRAGICON()
 	ON_WM_SIZE()
 	ON_WM_HELPINFO()
+    ON_WM_GETMINMAXINFO()
 	ON_COMMAND(ID_FILE_CLOSE, OnFileClose)
 	ON_COMMAND(ID_FILE_EXIT, OnFileExit)
 	ON_COMMAND(ID_FILE_OPEN, OnFileOpen)
@@ -839,6 +841,17 @@ void CSpatialStringViewerDlg::OnButtonPrevPage()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI36361");
 }
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringViewerDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
+{
+	try
+	{
+		lpMMI->ptMinTrackSize.x = 500;
+		lpMMI->ptMinTrackSize.y = 200;
+		CDialog::OnGetMinMaxInfo(lpMMI);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI36669");
+}
 
 //-------------------------------------------------------------------------------------------------
 // Public methods
@@ -968,6 +981,7 @@ void CSpatialStringViewerDlg::loadSpatialStringFromFile()
 			updateWindowCaption( m_strUSSFileName );
 			configureToolBarButtons();
 			resetGoToPageText();
+			updateStatusBar();
 		}
 		catch (...)
 		{
@@ -1002,6 +1016,12 @@ void CSpatialStringViewerDlg::resizeEditControl()
 	// resize the editbox to be the size of the client area
 	CRect rect, toolBarRect;
 	GetClientRect(rect);
+
+    // Only resize the edit control when client height and width are not 0
+	if (rect.Height() == 0 && rect.Width() == 0)
+	{
+		return;
+	}
 	m_apToolBar->GetClientRect(toolBarRect);
 
 	rect.bottom = rect.Height() - g_nStatusBarHeight;
@@ -1088,6 +1108,12 @@ void CSpatialStringViewerDlg::createToolBar()
 	int nNumButtons = sizeof(nButtonIds)/sizeof(nButtonIds[0]);
 
 	m_apToolBar->SetButtons(nButtonIds, nNumButtons);
+
+	// Resize the toolbar to the proper height
+	RECT clientRect;
+	GetClientRect(&clientRect);
+	clientRect.bottom = g_nToolBarHeight;
+	m_apToolBar->MoveWindow(&clientRect);
 
 	// create the edit control in the toolbar for navigating to a certain page.
 	m_apToolBar->createGoToPageEditBox();
