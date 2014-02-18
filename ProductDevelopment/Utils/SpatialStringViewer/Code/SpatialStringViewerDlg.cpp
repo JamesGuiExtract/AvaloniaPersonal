@@ -758,11 +758,17 @@ void CSpatialStringViewerDlg::OnChangeGotoPage()
 						// Reposition to first char of next line
 						repositionToFirstCharOfNextLine();
 					}
-					// Update the status bar
-					updateStatusBar();
-					m_editText.SetFocus();	
-					configureToolBarButtons();
 				}
+				else
+				{
+					// If a number was not found reset the text
+					resetGoToPageText();
+				}
+				
+                // Update the status bar
+				updateStatusBar();
+				m_editText.SetFocus();	
+				configureToolBarButtons();
 			}
 		}
 		else
