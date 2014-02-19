@@ -3812,11 +3812,11 @@ long CSpatialString::getFirstCharPositionOfPage(long nPageNum)
 	while (nDiff > 1)
 	{
 		nMiddle = nHigh - nDiff/2;
-		CPPLetter &currLetter = m_vecLetters[nMiddle];
+		CPPLetter *pCurrLetter = &m_vecLetters[nMiddle];
 		long nMiddlePageNumber;
-		if (currLetter.m_bIsSpatial)
+		if (pCurrLetter->m_bIsSpatial)
 		{
-			nMiddlePageNumber = currLetter.m_usPageNumber;
+			nMiddlePageNumber = pCurrLetter->m_usPageNumber;
 		}
 		else
 		{
@@ -3825,11 +3825,11 @@ long CSpatialString::getFirstCharPositionOfPage(long nPageNum)
 			do
 			{
 				i++;
-				currLetter = m_vecLetters[i];
+				pCurrLetter = &m_vecLetters[i];
 			}
-			while (i < nHigh && !currLetter.m_bIsSpatial);
+			while (i < nHigh && !pCurrLetter->m_bIsSpatial);
 
-			nMiddlePageNumber = (i == nHigh) ? nHighPage : currLetter.m_usPageNumber;
+			nMiddlePageNumber = (i == nHigh) ? nHighPage : pCurrLetter->m_usPageNumber;
 		}
 
 		// Reset the High and Low based on the where the middle falls
