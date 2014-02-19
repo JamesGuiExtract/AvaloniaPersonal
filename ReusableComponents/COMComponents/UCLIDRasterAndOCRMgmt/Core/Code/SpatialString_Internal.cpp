@@ -1226,7 +1226,7 @@ void CSpatialString::reset(bool bResetSourceDocName, bool bResetPageInfoMap)
 {
     try
     {
-        // clear all its contents
+		// clear all its contents
         m_strString = "";
         m_vecLetters.clear();
         m_strOCREngineVersion = "";
@@ -1816,8 +1816,51 @@ long CSpatialString::findFirstInstanceOfStringCS(const string& strSearchString, 
     return strMaster.find( strSearchMaster.c_str(), nStartPos );
 }
 //-------------------------------------------------------------------------------------------------
-IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
-    IVariantVectorPtr ipVecOCRConfidenceBoundaries, IVariantVectorPtr &ipZoneOCRConfidenceTiers)
+void getConfidenceTier(const CPPLetter& letter, const vector<unsigned char>& vecBoundaries,
+	long &nConfidenceTier, unsigned char &ucLowerConfidenceBounds,
+	unsigned char &ucUpperConfidenceBounds, bool bAllowHigherTier)
+{
+	long nOriginalTier = nConfidenceTier;
+	long nConfidenceTierCount = vecBoundaries.size();
+
+	// Determine the OCR confidence tier this zone belongs to as well as what the upper
+    // and lower boundaries of the tier are by iterating through each tier in ascending
+    // order until the correct one is found (if none is found, it will be in the top 
+    // tier with a upper OCR bound of 100).
+    unsigned char ucLastBoundary = 0;
+    for (long k = 0; k < nConfidenceTierCount; k++)
+    {
+		if (!bAllowHigherTier && k == nConfidenceTier)
+		{
+			return;
+		}
+
+        // Retrieve the next boundary.
+        unsigned char ucBoundary = vecBoundaries[k];
+
+        // If the next boundary is greater or equal to the current char confidence, we
+        // have found the appropriate tier.
+        if (letter.m_ucCharConfidence <= ucBoundary)
+        {
+            ucLowerConfidenceBounds = ucLastBoundary;
+            ucUpperConfidenceBounds = ucBoundary;
+            nConfidenceTier = k;
+            return;
+        }
+
+        ucLastBoundary = ucBoundary;
+    }
+
+	// Otherwise update the ucLowerConfidenceBounds in case there are no more tiers
+    // to search (which would mean the character belongs in the top tier).
+	ucLowerConfidenceBounds = ucLastBoundary;
+	ucUpperConfidenceBounds = 100;
+	nConfidenceTier = nConfidenceTierCount;
+}
+//-------------------------------------------------------------------------------------------------
+IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(bool bByWord,
+    IVariantVectorPtr ipVecOCRConfidenceBoundaries, IVariantVectorPtr &ipZoneOCRConfidenceTiers,
+	IVariantVectorPtr &ipIndices)
 {
     try
     {
@@ -1858,10 +1901,22 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
         vector<pair<int, CRect> > vecAllZones;
         vector<CRect> vecCurrentLineZones;
         CRect rectCurrentLineZone = grectNULL;
+		bool bStartingNewWord = true;
+		long nLastWordConfidence = -1;
+		// Keeps track of the start of each zones in order to populate ipIndices
+		long nZoneStart = -1;
+		long nLastZoneStart = 0;
+		// When bByWord is true, keep track of the data for the next zone to be added (but that is
+		// not done being compiled.
+		CRect rectPendingWordZone = grectNULL;
+		bool bPendingEndOfZone = false;
+		long nPendingWordConfidence = -1;
+		long nPendingZoneStart = 0;
+		short sPendingPage = -1;
 
         // This loop iterates the entire string character by character to build the raster zones.
         size_t j = 0;
-        while (j < m_vecLetters.size())
+        while (j < m_vecLetters.size() || rectPendingWordZone != grectNULL)
         {
             // Declare properties to apply to the next raster zone.
             short sCurrentPage = -1;
@@ -1869,10 +1924,31 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
             unsigned char ucUpperConfidenceBounds = 100;
             long nConfidenceTier = nConfidenceTierCount;
             CRect rectCurrentZone = grectNULL;
-            bool bEndOfLine = false;
+            bool bEndOfZone = false;
+			// If bByWord, this zones aggregates consecutive words of matching confidence tiers.
+			CRect rectCombinedWordZone = grectNULL;
+
+			// If there is a existing word zone that was not included in the last returned raster
+			// because of a character in a different confidence tier, initialize a new zone for the
+			// pending word.
+			if (rectPendingWordZone != grectNULL)
+			{
+				rectCombinedWordZone = rectPendingWordZone;
+				rectCurrentZone = rectPendingWordZone;
+				rectPendingWordZone = grectNULL;
+				nLastWordConfidence = nPendingWordConfidence;
+				nLastZoneStart = nPendingZoneStart;
+
+				bEndOfZone = bPendingEndOfZone;
+				if (bEndOfZone)
+				{
+					sCurrentPage = sPendingPage;
+				}
+				bPendingEndOfZone = false;
+			}
 
             // This loop iterates through all characters belonging to a single raster zone.
-            while (j < m_vecLetters.size())
+            while (!bEndOfZone && j < m_vecLetters.size())
             {
                 // Ignore non-spatial characters.
                 if (!m_vecLetters[j].m_bIsSpatial)
@@ -1883,7 +1959,7 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
 					if (getIsEndOfLine(j))
 					{
 						j++;
-						bEndOfLine = true;
+						bEndOfZone = true;
 						break;
 					}
 
@@ -1891,48 +1967,39 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
                     continue;
                 }
 
+				// When bByWord, new zones may start only on the first character of a word.
+				if (bByWord && bStartingNewWord)
+				{
+					nZoneStart = j;
+				}
+
                 // If sCurrentPage is -1, we are starting a new zone.  Initialize the zones properties.
                 if (sCurrentPage == -1)
                 {
                     // Determine the page the zone will be on.
                     sCurrentPage = m_vecLetters[j].m_usPageNumber;
 
-                    // Determine the OCR confidence tier this zone belongs to as well as what the upper
-                    // and lower boundaries of the tier are by iterating through each tier in ascending
-                    // order until the correct one is found (if none is found, it will be in the top 
-                    // tier with a upper OCR bound of 100).
-                    unsigned char ucLastBoundary = 0;
-                    for (long k = 0; k < nConfidenceTierCount; k++)
-                    {
-                        // Retrieve the next boundary.
-                        unsigned char ucBoundary = vecBoundaries[k];
-
-                        // If the next boundary is greater or equal to the current char confidence, we
-                        // have found the appropriate tier.
-                        if (m_vecLetters[j].m_ucCharConfidence <= ucBoundary)
-                        {
-                            ucLowerConfidenceBounds = ucLastBoundary;
-                            ucUpperConfidenceBounds = ucBoundary;
-                            nConfidenceTier = k;
-                            break;
-                        }
-                        // Otherwise update the ucLowerConfidenceBounds in case there are no more tiers
-                        // to search (which would mean the character belongs in the top tier).
-                        else
-                        {
-                            ucLowerConfidenceBounds = ucBoundary;
-                        }
-
-                        ucLastBoundary = ucBoundary;
-                    }
+					nZoneStart = j;
+					getConfidenceTier(m_vecLetters[j], vecBoundaries, nConfidenceTier,
+						ucLowerConfidenceBounds, ucUpperConfidenceBounds, true);
+					bStartingNewWord = false;
                 }
-                // If we have changed pages, this is the end of the raster zone as well as the end of
-                // the current line.
+                // If we have changed pages, this is the end of the raster zone
                 else if (sCurrentPage != m_vecLetters[j].m_usPageNumber)
                 {
-                    bEndOfLine = true;
+                    bEndOfZone = true;
                     break;
                 }
+				// If bByWord, check each letter's confidence to see if it lowers the confidence
+				// tier of the word as a whole.
+				else if (bByWord)
+				{
+					// Will only allow confidence tier to be lowered, not raised, unless this is the
+					// first char of a new word
+					getConfidenceTier(m_vecLetters[j], vecBoundaries,
+						nConfidenceTier, ucLowerConfidenceBounds, ucUpperConfidenceBounds, bStartingNewWord);
+					bStartingNewWord = false;
+				}
                 // If the current letter does not fall within the OCR confidence bounds of the current
                 // raster zone, break out of the current raster zone loop.
                 else if (m_vecLetters[j].m_ucCharConfidence <= ucLowerConfidenceBounds ||
@@ -1948,11 +2015,46 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
                 // Combine the character's area with the area of the current raster zone as a whole.
                 rectCurrentZone.UnionRect(rectCurrentZone, rectLetter);
 
+				// Got to the end of the word when grouping zones by word. Determine whether to
+				// break off a zone at this point.
+				if (bByWord && getIsEndOfWord(j))
+				{
+					bStartingNewWord = true;
+
+					// If this was the first word of a new zone, initialize.
+					if (rectCombinedWordZone == grectNULL)
+					{
+						nLastZoneStart = nZoneStart;
+						nLastWordConfidence = nConfidenceTier;
+						rectCombinedWordZone = rectCurrentZone;
+					}
+					// If the confidence tier was the same, extend the current word zone.
+					else if (nConfidenceTier == nLastWordConfidence)
+					{
+						rectCombinedWordZone.UnionRect(rectCombinedWordZone, rectCurrentZone);
+					}
+					// If the confidence for this word differed from the first word.
+					else
+					{
+						bPendingEndOfZone = true;
+						rectPendingWordZone = rectCurrentZone;
+						nPendingWordConfidence = nConfidenceTier;
+						nPendingZoneStart = nZoneStart;
+						sPendingPage = sCurrentPage;
+						
+						rectCurrentZone = grectNULL;
+						j++;
+						break;
+					}
+
+					rectCurrentZone = grectNULL;
+				}
+
                 // If this character is the last of the current line, break off the raster zone (but
                 // move on to the next char).
                 if (getIsEndOfLine(j, rectCurrentZone))
                 {
-                    bEndOfLine = true;
+                    bEndOfZone = true;
                     j++;
                     break;
                 }
@@ -1960,16 +2062,24 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
                 j++;
             }
 
+			// When bByWord, use the current aggregated word zone
+			if (bByWord)
+			{
+				rectCurrentZone = rectCombinedWordZone;
+				nConfidenceTier = nLastWordConfidence;
+			}
+
             // As long as a raster zone was initialized, apply the properties to ipZoneOCRConfidenceTiers,
             // vecCurrentLineZones and vecAllZones.
             if (sCurrentPage != -1)
             {
                 // Record the confidence tier of the zone.
                 ipZoneOCRConfidenceTiers->PushBack(nConfidenceTier);
+				ipIndices->PushBack(nLastZoneStart);
 
                 // Make sure the left side of the zone extends all the way back to the zone that
                 // preceeded it on the same line to prevent gaps between the zones.
-                if (rectCurrentLineZone != grectNULL)
+                if (!bByWord && rectCurrentLineZone != grectNULL)
                 {
                     rectCurrentZone.left = rectCurrentLineZone.right;
                 }
@@ -1979,9 +2089,10 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
                 vecCurrentLineZones.push_back(rectCurrentZone);
 
                 // Check to see if the current line's raster zones need to be finalized.
-                // [LegacyRCAndUtils:5412] getEndOfLine doesn't always end up getting set to true.
-                // If this is the last character, it is the EOL.
-                if (bEndOfLine || j == m_vecLetters.size())
+                // [LegacyRCAndUtils:5412] getEndOfLine doesn't always end up getting set to true
+				// for the last character in the SpatialString. If this is the last character, it
+				// is the end of the zone.
+                if (bEndOfZone || j == m_vecLetters.size())
                 {	
                     // If more than one raster zone shares the same line, ensure the top and bottom
                     // borders are all the same.
@@ -2013,9 +2124,6 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
                     // Update the overall bounds for the current line.
                     rectCurrentLineZone.UnionRect(rectCurrentLineZone, rectCurrentZone);
                 }
-
-                // Reset rectCurrentZone so it can be used by the next zone. 
-                rectCurrentZone = grectNULL;
             }
         }
 
@@ -2055,14 +2163,15 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
     CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25816");
 }
 //-------------------------------------------------------------------------------------------------
-IIUnknownVectorPtr CSpatialString::getOriginalImageRasterZonesGroupedByConfidence(
-    IVariantVectorPtr ipVecOCRConfidenceBoundaries, IVariantVectorPtr &ipZoneOCRConfidenceTiers)
+IIUnknownVectorPtr CSpatialString::getOriginalImageRasterZonesGroupedByConfidence(bool bByWord,
+	IVariantVectorPtr ipVecOCRConfidenceBoundaries, IVariantVectorPtr &ipZoneOCRConfidenceTiers,
+	IVariantVectorPtr &ipIndices)
 {
     try
     {
         // Get the untranslated zones (OCR image zones)
-        IIUnknownVectorPtr ipZones = getOCRImageRasterZonesGroupedByConfidence(
-            ipVecOCRConfidenceBoundaries, ipZoneOCRConfidenceTiers);
+        IIUnknownVectorPtr ipZones = getOCRImageRasterZonesGroupedByConfidence(bByWord,
+            ipVecOCRConfidenceBoundaries, ipZoneOCRConfidenceTiers, ipIndices);
         ASSERT_RESOURCE_ALLOCATION("ELI25817", ipZones != __nullptr);
 
         // Create a new return vector
@@ -2103,6 +2212,122 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToOriginalIma
         return translateToOriginalImageZone(lStartX, lStartY, lEndX, lEndY, lHeight, lPageNum);
     }
     CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25822");
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialString::translateToNewPageInfo(CPPLetter *pLetters, long nNumLetters,
+	ILongToObjectMapPtr ipNewPageInfoMap/* = __nullptr*/)
+{
+    try
+    {
+        ASSERT_ARGUMENT("ELI36399", m_eMode != kNonSpatialMode);
+
+		long nCurrentPage = -1;
+		double theta = 0;
+		CPoint pointOrigCenter;
+		CPoint pointDestCenter;
+		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipOrigPageInfo = __nullptr;
+		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipNewPageInfo = __nullptr;
+
+		for (long i = 0; i < nNumLetters; i++)
+		{
+			CPPLetter& letter = pLetters[i];
+
+			if (!letter.m_bIsSpatial)
+			{
+				continue;
+			}
+
+			// Obtain the original page info associated with this spatial string.
+			if (nCurrentPage != (long)letter.m_usPageNumber)
+			{
+				nCurrentPage = (long)letter.m_usPageNumber;
+				ipOrigPageInfo = m_ipPageInfoMap->GetValue(nCurrentPage);
+				ASSERT_RESOURCE_ALLOCATION("ELI36400", ipOrigPageInfo != __nullptr);
+
+				ipNewPageInfo = (ipNewPageInfoMap == __nullptr) 
+					? __nullptr
+					: ipNewPageInfoMap->GetValue(nCurrentPage);
+
+				// Get the page information
+				UCLID_RASTERANDOCRMGMTLib::EOrientation eOrient;
+				double deskew;
+				long nWidth, nHeight;
+				ipOrigPageInfo->GetPageInfo(&nWidth, &nHeight, &eOrient, &deskew);
+				bool bInvertOrigCoordinates = (eOrient == kRotLeft || eOrient == kRotRight);
+				// The bounding box's coordinates are relative to the rotated image.
+				// The original image coordinates need to be inverted to obtain the center point of an
+				// image that has been rotated to the left or right.
+				pointOrigCenter = getImageCenterPoint(nWidth, nHeight, bInvertOrigCoordinates);
+
+				if (ipNewPageInfo == __nullptr)
+				{
+					// If translating to image coordinates and the original orientation was rotated left
+					// or right, width and height need to be swapped before translating the rotated
+					// coordinates back into their final positions.
+					if (bInvertOrigCoordinates)
+					{
+						long nTemp = nWidth;
+						nWidth = nHeight;
+						nHeight = nTemp;
+					}
+				}
+				else
+				{
+					ipNewPageInfo->GetPageInfo(&nWidth, &nHeight, &eOrient, &deskew);
+				}
+
+				pointDestCenter = getImageCenterPoint(nWidth, nHeight, bInvertOrigCoordinates);
+
+				// The angle associated with the current coordinate system.
+				double dOrigTheta = ipOrigPageInfo->GetTheta();
+
+				// The angle associated with the coordinate system we are converting to.
+				double dNewTheta = (ipNewPageInfo == __nullptr) ? 0 : ipNewPageInfo->GetTheta();
+
+				// The angle difference between the new and old coordinate systems.
+				theta = dNewTheta - dOrigTheta;
+			}
+
+			// turn the bounding box into a start and end point
+			// using the rotated image's top-left coordinate system
+			double p1X = (double)letter.m_ulLeft;
+			double p1Y = (double)letter.m_ulTop;
+			double p2X = (double)letter.m_ulRight;
+			double p2Y = (double)letter.m_ulBottom;
+
+			// Translate the center of the page to the origin
+			// (ie. convert bounding box's coordinates to Cartesian 
+			// coordinate system with center of image at the origin).
+			p1X -= pointOrigCenter.x;
+			p1Y = pointOrigCenter.y - p1Y;
+			p2X -= pointOrigCenter.x;
+			p2Y = pointOrigCenter.y - p2Y;
+
+			// rotate the start and end point counter-clockwise about the origin
+			double sintheta = sin(theta);
+			double costheta = cos(theta);
+			double np1X = p1X*costheta - p1Y*sintheta;
+			double np1Y = p1X*sintheta + p1Y*costheta;
+			double np2X = p2X*costheta - p2Y*sintheta;
+			double np2Y = p2X*sintheta + p2Y*costheta;
+
+			// ensure that the points fit within the bounds of the original image
+			fitPointsWithinBounds(np1X, np1Y, np2X, np2Y, pointDestCenter.x, pointDestCenter.y);
+
+			// convert coordinates from Cartesian coordinate system to
+			// original image's top-left coordinate system
+			np1X += pointDestCenter.x;
+			np1Y = pointDestCenter.y - np1Y;
+			np2X += pointDestCenter.x;
+			np2Y = pointDestCenter.y - np2Y;
+
+			letter.m_ulLeft = (long)np1X;
+			letter.m_ulTop = (long)np1Y;
+			letter.m_ulRight = (long)np2X;
+			letter.m_ulBottom = (long)np2Y;
+		}
+    }
+    CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36401");
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToOriginalImageZone(
@@ -3625,4 +3850,183 @@ long CSpatialString::getFirstCharPositionOfPage(long nPageNum)
 
 	// After the loop the high will be the first position on the page
 	return nHigh;
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialString::setSurroundingWhitespace(UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipString,
+											  long& rnPos)
+{
+	long nPage = ipString->GetFirstPageNumber();
+	if (nPage != ipString->GetLastPageNumber())
+	{
+		UCLIDException ue("ELI36428",
+			"Cannot adjust surrounding whitespace for a multi-page string");
+		throw ue;
+	}
+
+	ILongRectanglePtr ipBounds = ipString->GetOCRImageBounds();
+	long nLeft;
+	long nTop;
+	long nRight;
+	long nBottom;
+	ipBounds->GetBounds(&nLeft, &nTop, &nRight, &nBottom);
+	long nCount = m_vecLetters.size();
+
+	// Whitespace that already exists before/after the insertion position.
+	set<long> setExistingWS;
+	set<long> setLettersToRemove;
+	bool bExistingLF = false;
+	// How much space should be allowed between the inserted chars and any existing, neighboring
+	// spatial chars before a space character should be inserted between them.
+	long nSpaceAllowance = ipString->GetAverageCharWidth() / 2 + 1;
+
+	// Start at the insertion position and work backwards looking for whitespace following the
+	// last preceeding spatial character. 
+	for (int nPrevPos = rnPos - 1; nPrevPos >= 0; nPrevPos--)
+	{
+		CPPLetter &prevLetter = m_vecLetters[nPrevPos];
+
+		if (prevLetter.m_bIsSpatial)
+		{
+			// Check for a new page
+			if (prevLetter.m_usPageNumber != nPage)
+			{
+				break;
+			}
+			// Check for a new line using the spatial info of the string to be inserted
+			int nVerticalMidPoint = (prevLetter.m_ulTop + prevLetter.m_ulBottom) / 2;
+			int nHorizontalMidPoint = (prevLetter.m_ulLeft + prevLetter.m_ulRight) / 2;
+			if (nVerticalMidPoint < nTop || 
+				nVerticalMidPoint > nBottom || 
+				nHorizontalMidPoint > nLeft)
+			{
+				if (!bExistingLF)
+				{
+					// If ipString should be on a separate line from the preceding chars but there
+					// is no existing preceding whitespace, insert a newline before ipString.
+					ipString->InsertString(0, "\r\n");
+				}
+			}
+			// Check for a new word based on the spatial info of the string to be inserted
+			else if ((long)prevLetter.m_ulRight + nSpaceAllowance < nLeft)
+			{
+				if (setExistingWS.empty())
+				{
+					// If ipString should be a separate word from the preceeding text but there is
+					// no existing preceeding whitespace, insert a space before ipString.
+					ipString->InsertString(0, " ");
+				}
+			}
+			// Spatially ipString appears to be part of the preceeding word; remove any intervening
+			// whitespace chars.
+			else
+			{
+				setLettersToRemove.insert(setExistingWS.begin(), setExistingWS.end());
+			}
+
+			break;
+		}
+		else 
+		{
+			setExistingWS.insert(nPrevPos);
+
+			if (prevLetter.m_usGuess1 == '\r' || prevLetter.m_usGuess1 == '\n')
+			{
+				bExistingLF = true;
+			}
+		}
+	}
+
+	// If any preceding whitespace was removed, the index at which ipString should be inserted needs
+	// to be adjusted.
+	int nPosAdjustment = setLettersToRemove.size();
+	
+	// Reset to check trailing whitespace.
+	setExistingWS.clear();
+	bExistingLF = false;
+
+	// Start at the insertion position and work forwards looking for whitespace preceeding the
+	// last next spatial character. 
+	for (int nNextPos = rnPos; nNextPos < nCount; nNextPos++)
+	{
+		CPPLetter &nextLetter = m_vecLetters[nNextPos];
+
+		if (nextLetter.m_bIsSpatial)
+		{
+			// Check for a new page
+			if (nextLetter.m_usPageNumber != nPage)
+			{
+				break;
+			}
+			// Check for a new line using the spatial info of the string to be inserted
+			int nVerticalMidPoint = (nextLetter.m_ulTop + nextLetter.m_ulBottom) / 2;
+			int nHorizontalMidPoint = (nextLetter.m_ulLeft + nextLetter.m_ulRight) / 2;
+			if (nVerticalMidPoint < nTop || 
+				nVerticalMidPoint > nBottom || 
+				nHorizontalMidPoint < nRight)
+			{
+				if (!bExistingLF)
+				{
+					// If ipString should be on a separate line from the following chars but there
+					// is no existing trailing whitespace, insert a newline after ipString.
+					ipString->AppendString("\r\n");
+				}
+			}
+			// Check for a new word based on the spatial info of the string to be inserted
+			else if ((long)nextLetter.m_ulLeft - nSpaceAllowance > nRight)
+			{
+				if (setExistingWS.empty())
+				{
+					// If ipString should be a separate word from the following chars but there is
+					// no existing trailing whitespace, insert a space after ipString.
+					ipString->AppendString(" ");
+				}
+			}
+			// Spatially ipString appears to be part of the following word; remove any intervening
+			// whitespace chars.
+			else
+			{
+				setLettersToRemove.insert(setExistingWS.begin(), setExistingWS.end());
+			}
+
+			break;
+		}
+		else
+		{
+			setExistingWS.insert(nNextPos);
+
+			if (nextLetter.m_usGuess1 == '\r' || nextLetter.m_usGuess1 == '\n')
+			{
+				bExistingLF = true;
+			}
+		}
+	}
+
+	// Remove any whitepsace chars identified for removal.
+	if (!setLettersToRemove.empty())
+	{
+		// Copy all the the chars to be removed to a new CPPLetter vector.
+		vector<CPPLetter> vecNewLetters;
+		long nNewLetterCount = nCount - setLettersToRemove.size();
+		vecNewLetters.reserve(nNewLetterCount);
+		for (long i = 0; i < nCount; i++)
+		{
+			if (setLettersToRemove.find(i) == setLettersToRemove.end())
+			{
+				vecNewLetters.push_back(m_vecLetters[i]);
+			}
+		}
+
+		if (nNewLetterCount == 0)
+		{
+			reset(false, false);
+		}
+		else
+		{
+			CPPLetter *pNewLetters = &vecNewLetters[0];
+			updateLetters(pNewLetters, nNewLetterCount);
+		}
+
+		rnPos -= nPosAdjustment;
+		m_bDirty = true;
+	}
 }

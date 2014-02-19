@@ -49,11 +49,13 @@ public:
 	STDMETHOD(GetDataOutOfRegion)(ILongRectangle* ipRect, ISpatialString** ipReturnString);
 	STDMETHOD(GetDataInRegion)(ILongRectangle *ipRect, VARIANT_BOOL bRotateRectanglePerOCR, 
 		ISpatialString** ipReturnString);
-	STDMETHOD(InitSpatialStringSearcher)(ISpatialString* pSpatialString);
+	STDMETHOD(InitSpatialStringSearcher)(ISpatialString* pSpatialString,
+		VARIANT_BOOL vbUseOriginalImageCoordinates);
 	STDMETHOD(ExtendDataInRegion)(ILongRectangle *pRect, long lNumWordsToExtend, 
 		VARIANT_BOOL vbExtendHeight, ISpatialString** ppFound);
 	STDMETHOD(GetLeftWord)(ILongRectangle* ipRect, ISpatialString** ipReturnString);
 	STDMETHOD(GetRightWord)(ILongRectangle* ipRect, ISpatialString** ipReturnString);
+	STDMETHOD(SetUseMidpointsOnly)(VARIANT_BOOL newVal);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
@@ -69,7 +71,7 @@ public:
 	{
 		kNotIntersecting,
 		kTouching,
-		kIntersecting,
+		kOverlapping,
 		kContained,
 		kContains	
 	};
@@ -211,6 +213,9 @@ private:
 	void createLocalWords();
 	void createLocalLines();
 
+	// Indicates whether the specified intersection level meets the configured criteria.
+	bool intersectionMeetsCriteria(EIntersection eIntersection);
+
 	// This method returns a list of all the letters(indexes) in the specified region
 	// it is used by GetDataInRegion and GetDataOutOfRegion
 	void getUnsortedLettersInRegion(ILongRectanglePtr ipRect, vector<int> &pvecLetters);
@@ -257,6 +262,14 @@ private:
 	// if this is true features that lie on a defined boundary will count as 
 	// being inside the boundary
 	bool m_bIncludeDataOnBoundary;
+
+	// If true, all searches will assume the specified coordinates are in image coordinates; if
+	// false all searches will be made assuming the specified coordinates are in OCR coordinates.
+	bool m_bUseOriginalImageCoordinates;
+
+	// If true, only the midpoint of the characters/words/lines will be tested for
+	// inclusion/exclusion rather than using the entire area.
+	bool m_bUseMidpointsOnly;
 
 	// determines the type of feature that will be checked 
 	// for boundary intersection

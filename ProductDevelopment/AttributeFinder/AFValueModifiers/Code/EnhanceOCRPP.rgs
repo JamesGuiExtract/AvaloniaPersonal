@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFValueModifiers.EnhanceOCRPP.1 = s 'EnhanceOCRPP Class'
+	{
+		CLSID = s '{B8E6B54E-A1A1-4067-91A5-AF6FA62E26C7}'
+	}
+	UCLIDAFValueModifiers.EnhanceOCRPP = s 'EnhanceOCRPP Class'
+	{
+		CLSID = s '{B8E6B54E-A1A1-4067-91A5-AF6FA62E26C7}'
+		CurVer = s 'AFValueModifiers.EnhanceOCRPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {B8E6B54E-A1A1-4067-91A5-AF6FA62E26C7} = s 'EnhanceOCRPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

@@ -125,7 +125,7 @@ STDMETHODIMP CAddressFinder::raw_ParseText(IAFDocument * pAFDoc, IProgressStatus
 			ASSERT_RESOURCE_ALLOCATION("ELI15591", ipTmpLines != __nullptr);
 			ipPage->CreateFromLines(ipTmpLines);
 			
-			ipSearcher->InitSpatialStringSearcher(ipPage);
+			ipSearcher->InitSpatialStringSearcher(ipPage, VARIANT_FALSE);
 
 			// Get the bounds of the state and zip code
 			ILongRectanglePtr ipRect = ipSuffixString->GetOCRImageBounds();

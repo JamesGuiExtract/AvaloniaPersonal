@@ -1042,17 +1042,25 @@ library UCLID_RASTERANDOCRMGMTLib
 		//			will be considered to be on the same side of the boundary with as those with 
 		//			lower confidence levels. (ie. A boundary of 90 will group characters with OCR
 		//			confidence values 0 - 90 and 91 - 100.
-		//			ipZoneOCRConfidenceTiers- Returns a vector that specifies which level of OCR
+		//			vbByWord- If VARIANT_TRUE, each word will be returned as a zone having the
+		//			confidence of its least confident letter. For example, if a 5 letter word has
+		//			letter confidence values of 50, 60, 70, 80, and 90 it will be treated as if all
+		//			characters have a confidence of 50.
+		//			ppZoneOCRConfidenceTiers- Returns a vector that specifies which level of OCR
 		//			confidence each raster zone is associated with as the index of the next higher
 		//			boundary in pVecOCRConfidenceBoundaries. For example, if a boundaries of 70 and
 		//			90 are specified, and a string contains 5 chars with confidences of 0, 69, 70,
 		//			71 and 90, three zones will be returned with first 2 chars in the first zone,
 		//			the third and fourth char in the second zone, and the last char in the third
 		//			zone.  ppZoneOCRConfidenceLevels will have 3 entries: 0, 1 and 2.
+		//			ppZoneIndices- Returns the character indicies of the start of each new zone
+		//			returned beginning with the index of the first spatial character in the string.
 		[id(84), helpstring("method GetOriginalImageRasterZonesGroupedByConfidence")] 
 			HRESULT GetOriginalImageRasterZonesGroupedByConfidence(
 				[in] IVariantVector* pVecOCRConfidenceBoundaries,
-				[out] IVariantVector** ppZoneOCRConfidenceTiers, 
+				[in] VARIANT_BOOL vbByWord,
+				[out] IVariantVector** ppZoneOCRConfidenceTiers,
+				[out] IVariantVector** ppZoneIndices, 
 				[out, retval] IIUnknownVector** ppRasterZones);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To create a non-spatial string with the specified text and specified
@@ -1080,6 +1088,10 @@ library UCLID_RASTERANDOCRMGMTLib
 		//			will be considered to be on the same side of the boundary with as those with 
 		//			lower confidence levels. (ie. A boundary of 90 will group characters with OCR
 		//			confidence values 0 - 90 and 91 - 100.
+		//			vbByWord- If VARIANT_TRUE, each word will be returned as a zone having the
+		//			confidence of its least confident letter. For example, if a 5 letter word has
+		//			letter confidence values of 50, 60, 70, 80, and 90 it will be treated as if all
+		//			characters have a confidence of 50.
 		//			ipZoneOCRConfidenceTiers- Returns a vector that specifies which level of OCR
 		//			confidence each raster zone is associated with as the index of the next higher
 		//			boundary in pVecOCRConfidenceBoundaries. For example, if a boundaries of 70 and
@@ -1087,10 +1099,14 @@ library UCLID_RASTERANDOCRMGMTLib
 		//			71 and 90, three zones will be returned with first 2 chars in the first zone,
 		//			the third and fourth char in the second zone, and the last char in the third
 		//			zone.  ppZoneOCRConfidenceLevels will have 3 entries: 0, 1 and 2.
+		//			ppZoneIndices- Returns the character indicies of the start of each new zone
+		//			returned beginning with the index of the first spatial character in the string.
 		[id(88), helpstring("method GetOCRImageRasterZonesGroupedByConfidence")] 
 			HRESULT GetOCRImageRasterZonesGroupedByConfidence(
 				[in] IVariantVector* pVecOCRConfidenceBoundaries,
+				[in] VARIANT_BOOL vbByWord,
 				[out] IVariantVector** ppZoneOCRConfidenceTiers, 
+				[out] IVariantVector** ppZoneIndices,
 				[out, retval] IIUnknownVector** ppRasterZones);
 		//-----------------------------------------------------------------------------------------
 		// REQUIRE: HasSpatialInfo == VARIANT_TRUE
@@ -1179,6 +1195,52 @@ library UCLID_RASTERANDOCRMGMTLib
 		//			position on what would be the previous page will be returned.
 		[id(99), helpstring("method GetFirstCharPositionOfPage")] HRESULT GetFirstCharPositionOfPage(
 			[in] long nPageNum, [out, retval] long *pFirstCharPos);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() == kSpatialMode
+		// PROMISE: Returns a vector of letters in original image coordinates. See
+		//			GetOCRImageLetterArray for details on the data returned.
+		[id(100), helpstring("method GetOriginalImageLetterArray")] HRESULT
+			GetOriginalImageLetterArray([in, out] long* pnNumLetters,
+				[in, out] void** ppLetters);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() == kSpatialMode
+		// PROMISE: Removes all characters from pTextToRemove that match characters in this string
+		//			(including the letter font coordinates and confidence). Non-white space
+		//			characters are removed only if they fall between matching spatial characters.
+		// RETURNS: The positon of the first character removed or -1 if no characters were removed.
+		[id(101), helpstring("method RemoveText")] HRESULT
+			RemoveText([in] ISpatialString* pTextToRemove, [out, retval] long* nPos);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() == kSpatialMode
+		//			pString->GetMode() == kSpatialMode
+		//			pString is not a multi-page string.
+		// PROMISE: Inserts pString into the current string according to the spatial locaton of
+		//			pString.
+		// ARGS:	pString- The string to insert.
+		//			vbAllowOverlappingInsertion- Whether the string should be inserted if it
+		//			to overlaps with existing spatial characters.
+		// RETURNS:	VARIANT_TRUE if pString was inserted, VARIANT_FALSE if it was not because it
+		//			overlapped with existing text.
+		[id(102), helpstring("method InsertBySpatialPosition")] HRESULT InsertBySpatialPosition(
+			[in] ISpatialString *pString, [in] VARIANT_BOOL vbAllowOverlappingInsertion,
+			[out, retval] VARIANT_BOOL *pbStringWasInserted);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: pString->GetMode() == kSpatialMode
+		//			pString is not a multi-page string.
+		// PROMISE: Removes whitespace in this string and/or appends whitespace around pString in
+		//			order to allow pString to be added at position nPos and have appropriate
+		//			whitespace surrounding it.
+		// RETURNS: The position a which pString is prepared to be added following the adjustments
+		//			in whitespace.
+		[id(103), helpstring("method SetSurroundingWhitespace")] HRESULT SetSurroundingWhitespace(
+			[in] ISpatialString *pString, [in] long nPos, [out, retval] long* pnNewPos);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() == kSpatialMode
+		// PROMISE: Applies a new SpatialPageInfos value and translates the existing letter
+		//			coordinates such that the coordinates remain the same in terms of the original
+		//			image.
+		[id(104), helpstring("method TranslateToNewPageInfo")] HRESULT TranslateToNewPageInfo(
+			[in] ILongToObjectMap* pPageInfoMap);
 	};
 
 	[
@@ -1354,8 +1416,13 @@ library UCLID_RASTERANDOCRMGMTLib
 	]
 	interface ISpatialStringSearcher : IDispatch
 	{
+		// PROMISE: Initializes the SpatialStringSearcher. Must be called before searching.
+		// ARGS:	- pSpatialString: The SpatialString to search.
+		//			- vbUseOriginalImageCoordinates: VARIANT_TRUE if regions to search will be
+		//			specified in terms of original image coordinates, VARIANT_FALSE if they will
+		//			be specified in terms of OCR coordinates.
 		[id(1), helpstring("method InitSpatialStringSearcher")] HRESULT InitSpatialStringSearcher(
-			[in] ISpatialString* pSpatialString);
+			[in] ISpatialString* pSpatialString, [in] VARIANT_BOOL vbUseOriginalImageCoordinates);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE : Return a spatial string that contains all and only the data inside the
 		// specified rectangle.  If a boundary is negative the edge of the document is used
@@ -1383,6 +1450,9 @@ library UCLID_RASTERANDOCRMGMTLib
 		[id(8), helpstring("method GetRightWord")] HRESULT GetRightWord(
 			[in] ILongRectangle* ipRect, [out, retval] ISpatialString** ipReturnString);
 		//-----------------------------------------------------------------------------------------
+		// PROMISE: If VARIANT_TRUE, only the midpoint of the characters/words/lines will be tested
+		// for inclusion/exclusion rather than using the entire area.
+		[id(9), helpstring("method SetUseMidpointsOnly")] HRESULT SetUseMidpointsOnly([in] VARIANT_BOOL newVal);
 	};
 
 	[

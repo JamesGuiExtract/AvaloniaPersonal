@@ -6173,6 +6173,7 @@ namespace Extract.DataEntry
                 new List<CompositeHighlightLayerObject>();
 
             VariantVector zoneConfidenceTiers = null;
+            VariantVector zoneIndices = null;
             IUnknownVector comRasterZones = null;
             List<RasterZone> rasterZones = null;
 
@@ -6181,7 +6182,7 @@ namespace Extract.DataEntry
             if (attribute.Value.GetMode() == ESpatialStringMode.kSpatialMode && !isAccepted)
             {
                 comRasterZones = attribute.Value.GetOriginalImageRasterZonesGroupedByConfidence(
-                    _confidenceBoundaries, out zoneConfidenceTiers);
+                    _confidenceBoundaries, false, out zoneConfidenceTiers, out zoneIndices);
             }
             // Otherwise the default highlight color will be used-- no need for confidence tiers.
             else if (!isHint)

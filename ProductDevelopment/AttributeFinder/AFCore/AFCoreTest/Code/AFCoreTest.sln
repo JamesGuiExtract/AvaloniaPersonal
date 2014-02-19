@@ -22,6 +22,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFFileProcessors", "..\..\..\AFFileProcessors\Code\AFFileProcessors.vcxproj", "{F13286FD-B486-4266-97C5-9DAA62527A2E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
+		{1AF05090-95C1-48BF-8E74-3F05844B63B0} = {1AF05090-95C1-48BF-8E74-3F05844B63B0}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFOutputHandlers", "..\..\..\AFOutputHandlers\Code\AFOutputHandlers.vcxproj", "{835D9667-E21E-460F-BC05-EE5E39551CFA}"
@@ -698,12 +699,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.UWTransplantCenter", "..\..\..\..\DataEntry\LabDE\DEPs\UWTransplantCenter\Core\Code\Extract.DataEntry.DEP.UWTransplantCenter.csproj", "{F2480F46-F4F2-40DD-8139-90E9E575B61C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.Lincoln", "..\..\..\..\DataEntry\FlexIndex\DEPs\Lincoln\Core\Code\Extract.DataEntry.DEP.Lincoln.csproj", "{4B182ED1-F380-419E-8F7A-E2A9D0339715}"
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://EngSvr.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 182
+		ProjectCount = 183
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcxproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcxproj
@@ -886,6 +889,7 @@ Global
 		ProjectRelativeDiskPath180 = ..\..\..\..\..\RC.Net\FileActionManager\Utilities\FAMFileInspector\Core\Code\FAMFileInspector.csproj
 		ProjectRelativeDiskPath181 = ..\..\..\..\..\RC.Net\FileActionManager\Utilities\FAMFileInspector\ComLibrary\Core\Code\Extract.FileActionManager.FAMFileInspector.csproj
 		ProjectRelativeDiskPath182 = ..\..\..\..\DataEntry\LabDE\DEPs\UWTransplantCenter\Core\Code\Extract.DataEntry.DEP.UWTransplantCenter.csproj
+		ProjectRelativeDiskPath183 = ..\..\..\..\DataEntry\FlexIndex\DEPs\Lincoln\Core\Code\Extract.DataEntry.DEP.Lincoln.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -3070,6 +3074,18 @@ Global
 		{F2480F46-F4F2-40DD-8139-90E9E575B61C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{F2480F46-F4F2-40DD-8139-90E9E575B61C}.Release|Win32.ActiveCfg = Release|Any CPU
 		{F2480F46-F4F2-40DD-8139-90E9E575B61C}.Release|x86.ActiveCfg = Release|Any CPU
+		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Release|Win32.ActiveCfg = Release|Any CPU
+		{4B182ED1-F380-419E-8F7A-E2A9D0339715}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -3087,6 +3103,7 @@ Global
 		{7EE21844-B318-4203-A593-6306B6BB6234} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{8600FF47-6098-4462-95FE-60CACF8DC886} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{F2480F46-F4F2-40DD-8139-90E9E575B61C} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
+		{4B182ED1-F380-419E-8F7A-E2A9D0339715} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{139729CD-0F06-48E8-9F4A-08E78BB6575F} = {4CAFD9CC-640F-4836-B388-D370B6219488}
 		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA} = {4CAFD9CC-640F-4836-B388-D370B6219488}
 		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31} = {4CAFD9CC-640F-4836-B388-D370B6219488}

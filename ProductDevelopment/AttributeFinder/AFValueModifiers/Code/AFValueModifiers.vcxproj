@@ -107,6 +107,8 @@
       <ImportLibrary>.\..\Release/UCLIDAFValueModifiers.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <RegisterOutput>true</RegisterOutput>
+      <AdditionalLibraryDirectories>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ltwvc_a.lib;ltfil_u.lib;ltkrn_u.lib;ltdis_u.lib;ltimgefx_u.lib;ltimgcor_u.lib;ltimgclr_u.lib</AdditionalDependencies>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -159,6 +161,8 @@
       <ImportLibrary>.\..\Debug/UCLIDAFValueModifiers.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <RegisterOutput>true</RegisterOutput>
+      <AdditionalLibraryDirectories>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ltwvc_a.lib;ltfil_u.lib;ltkrn_u.lib;ltdis_u.lib;ltimgefx_u.lib;ltimgcor_u.lib;ltimgclr_u.lib</AdditionalDependencies>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -166,6 +170,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\SpatialStringLoader.cpp" />
     <ClCompile Include="AdvancedReplaceString.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -203,6 +208,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="..\..\AFUtils\Code\Helper.cpp" />
+    <ClCompile Include="EnhanceOCRPP.cpp" />
     <ClCompile Include="InsertCharacters.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -287,6 +293,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="EnhanceOCR.cpp" />
     <ClCompile Include="ReplaceStrings.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -358,6 +365,7 @@
     <None Include="..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\Res\icon_dynamic_list.ico" />
     <None Include="..\..\..\..\ReusableComponents\BaseUtils\Code\res\icon_info.ico" />
     <None Include="..\..\AFCore\Code\res\icon_up.ico" />
+    <None Include="EnhanceOCRPP.rgs" />
     <None Include="InsertCharacters.rgs" />
     <None Include="InsertCharactersPP.rgs" />
     <None Include="LimitAsLeftPart.rgs" />
@@ -372,6 +380,7 @@
     <None Include="PadValuePP.rgs" />
     <None Include="RemoveCharacters.rgs" />
     <None Include="RemoveCharactersPP.rgs" />
+    <None Include="EnhanceOCR.rgs" />
     <None Include="ReplaceStrings.rgs" />
     <None Include="ReplaceStringsPP.rgs" />
     <None Include="res\SelectDocTagArrow.ico" />
@@ -405,12 +414,14 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\SpatialStringLoader.h" />
     <ClInclude Include="AdvancedReplaceString.h" />
     <ClInclude Include="AdvancedReplaceStringPP.h" />
     <ClInclude Include="ChangeCase.h" />
     <ClInclude Include="ChangeCasePP.h" />
     <ClInclude Include="ConditionalAttributeModifier.h" />
     <ClInclude Include="..\..\AFUtils\Code\Helper.h" />
+    <ClInclude Include="EnhanceOCRPP.h" />
     <ClInclude Include="InsertCharacters.h" />
     <ClInclude Include="InsertCharactersPP.h" />
     <ClInclude Include="LimitAsLeftPart.h" />
@@ -425,6 +436,7 @@
     <ClInclude Include="PadValuePP.h" />
     <ClInclude Include="RemoveCharacters.h" />
     <ClInclude Include="RemoveCharactersPP.h" />
+    <ClInclude Include="EnhanceOCR.h" />
     <ClInclude Include="ReplaceStrings.h" />
     <ClInclude Include="ReplaceStringsPP.h" />
     <ClInclude Include="Resource.h" />

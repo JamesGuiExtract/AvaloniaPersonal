@@ -251,7 +251,7 @@ void CSpatialStringSearcherTester::processTestCase(std::vector<std::string>& vec
 		}
 
 		ISpatialStringSearcherPtr ipSearcher(CLSID_SpatialStringSearcher);
-		ipSearcher->InitSpatialStringSearcher(ipPage);
+		ipSearcher->InitSpatialStringSearcher(ipPage, VARIANT_FALSE);
 
 		if (m_bIncludeDataOnBoundary)
 		{

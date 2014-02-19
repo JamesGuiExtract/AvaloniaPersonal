@@ -19,6 +19,7 @@ library UCLID_AFFILEPROCESSORSLib
 	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
 	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
 	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFILEPROCESSING.tlb");
+	importlib("..\..\AFValueModifiers\Code\AFValueModifiers.tlb");
 
 	//////////////
 	// Enums
@@ -93,6 +94,44 @@ library UCLID_AFFILEPROCESSORSLib
 			XMLOutputHandler([in] IUnknown* pXMLOutputHandler);
 	};
 
+	[
+	object,
+	uuid(D297FDF5-F4F9-4A4E-BB84-C06084BB9882),
+	dual,
+	nonextensible,
+	helpstring("IEnhanceOCRTask Interface"),
+	pointer_default(unique)
+	]
+	interface IEnhanceOCRTask : IDispatch
+	{
+		// The OCR confidence level below which characters will be enhanced (when possible).
+		[propget, id(1), helpstring("property ConfidenceCriteria")] HRESULT ConfidenceCriteria([out, retval] long *pVal);
+		[propput, id(1), helpstring("property ConfidenceCriteria")] HRESULT ConfidenceCriteria([in] long newVal);
+
+		// The the set of image filters that will be used against the document.
+		[propget, id(2), helpstring("property FilterPackage")] HRESULT FilterPackage([out, retval] EFilterPackage *pVal);
+		[propput, id(2), helpstring("property FilterPackage")] HRESULT FilterPackage([in] EFilterPackage newVal);
+		
+		// A custom defined filter package to use.
+		[propget, id(3), helpstring("property CustomFilterPackage")] HRESULT CustomFilterPackage([out, retval] BSTR *pVal);
+		[propput, id(3), helpstring("property CustomFilterPackage")] HRESULT CustomFilterPackage([in] BSTR newVal);
+
+		// The regex (or path of a regex file) that specifies formats that are preferred and should be
+		// used over other formats. The final result will contain this pattern unless the confidence of
+		// the possibility(ies) containing this pattern are very substantially outweighed by a
+		// possibility that does not contain this pattern.
+		[propget, id(4), helpstring("property PreferredFormatRegex")] HRESULT PreferredFormatRegex([out, retval] BSTR *pVal);
+		[propput, id(4), helpstring("property PreferredFormatRegex")] HRESULT PreferredFormatRegex([in] BSTR newVal);
+
+		// Any chars in this string will be prevented from being created by the EnhanceOCR process.
+		[propget, id(5), helpstring("property CharsToIgnore")] HRESULT CharsToIgnore([out, retval] BSTR *pVal);
+		[propput, id(5), helpstring("property CharsToIgnore")] HRESULT CharsToIgnore([in] BSTR newVal);
+
+		// Indicates whether copies of the filtered images should be output (for debug purposes).
+		[propget, id(6), helpstring("property OutputFilteredImages")] HRESULT OutputFilteredImages([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(6), helpstring("property OutputFilteredImages")] HRESULT OutputFilteredImages([in] VARIANT_BOOL newVal);
+	};
+
 	//////////////
 	// CoClasses
 	//////////////
@@ -138,5 +177,28 @@ library UCLID_AFFILEPROCESSORSLib
 	coclass AFConvertVOAToXMLTaskPP
 	{
 		interface IUnknown;
+	};
+
+	[
+		uuid(DD0C00F0-50F9-4B48-A3FB-E0E22FB8BE7A),
+		helpstring("EnhanceOCRTask Class")
+	]
+	coclass EnhanceOCRTask
+	{
+		[default] interface IEnhanceOCRTask;
+		interface IFileProcessingTask;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+	};
+
+	[
+		uuid(73A7E2C0-9BBE-415F-8149-E1C2FE39F6AC),
+		helpstring("EnhanceOCRTaskPP Class")
+	]
+	coclass EnhanceOCRTaskPP
+	{
+		[default] interface IUnknown;
 	};
 };

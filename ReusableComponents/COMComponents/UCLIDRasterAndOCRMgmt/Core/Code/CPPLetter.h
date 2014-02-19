@@ -105,6 +105,25 @@ public:
 		return *this;
 	}
 
+	bool operator== (const CPPLetter& letter)
+	{
+		// Don't check m_bIsEndOfZone or m_bIsEndOfParagraph, because that depends on the context of
+		// the surrounding letters, not just this one.
+		return 
+			m_usGuess1 == letter.m_usGuess1 &&
+			m_usGuess2 == letter.m_usGuess2 &&
+			m_usGuess3 == letter.m_usGuess2 &&
+			m_ulTop == letter.m_ulTop &&
+			m_ulBottom == letter.m_ulBottom &&
+			m_ulLeft == letter.m_ulLeft &&
+			m_ulRight == letter.m_ulRight &&
+			m_usPageNumber == letter.m_usPageNumber &&
+			m_bIsSpatial == letter.m_bIsSpatial &&
+			m_ucFontSize == letter.m_ucFontSize &&
+			m_ucCharConfidence == letter.m_ucCharConfidence &&
+			m_ucFont == letter.m_ucFont;
+	}
+
 	inline bool isItalic() const { return (m_ucFont & LTR_ITALIC) != 0; }
 	inline bool isBold() const { return (m_ucFont & LTR_BOLD) != 0; }
 	inline bool isSansSerif() const { return (m_ucFont & LTR_SANSSERIF) != 0; }

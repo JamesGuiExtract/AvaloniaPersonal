@@ -1726,7 +1726,7 @@ ISpatialStringPtr CLocateImageRegion::getFinalResultString(ISpatialStringPtr ipP
 	if (ipRegionBounds != __nullptr)
 	{
 		// initialize the spatial searcher with found page text
-		m_ipSpatialStringSearcher->InitSpatialStringSearcher(ipPageText);
+		m_ipSpatialStringSearcher->InitSpatialStringSearcher(ipPageText, VARIANT_FALSE);
 		m_ipSpatialStringSearcher->SetIncludeDataOnBoundary( asVariantBool(m_bIncludeIntersecting) );
 		m_ipSpatialStringSearcher->SetBoundaryResolution(m_eIntersectingEntity);
 
@@ -1757,7 +1757,7 @@ ISpatialStringPtr CLocateImageRegion::getStringWithinBoundary(ISpatialStringPtr 
 	ISpatialStringPtr ipRet = __nullptr;
 	if (!m_mapBorderToPosition.empty())
 	{
-		m_ipSpatialStringSearcher->InitSpatialStringSearcher(ipInput);
+		m_ipSpatialStringSearcher->InitSpatialStringSearcher(ipInput, VARIANT_FALSE);
 		m_ipSpatialStringSearcher->SetIncludeDataOnBoundary(
 										asVariantBool(m_bIncludeIntersecting) );
 		m_ipSpatialStringSearcher->SetBoundaryResolution(m_eIntersectingEntity);

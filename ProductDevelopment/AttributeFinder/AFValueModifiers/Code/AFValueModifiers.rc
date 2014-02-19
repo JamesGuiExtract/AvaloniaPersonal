@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -119,6 +117,8 @@ IDR_OCRAREA             REGISTRY                "OCRArea.rgs"
 IDR_PROPPAGE_OCRAREA    REGISTRY                "OCRAreaPP.rgs"
 IDR_SPLITREGIONINTOCONTENTAREAS REGISTRY                "SplitRegionIntoContentAreas.rgs"
 IDR_SPLITREGIONINTOCONTENTAREASPP REGISTRY                "SplitRegionIntoContentAreasPP.rgs"
+IDR_ENHANCEOCR          REGISTRY                "EnhanceOCR.rgs"
+IDR_ENHANCEOCRPP        REGISTRY                "EnhanceOCRPP.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -411,6 +411,46 @@ BEGIN
     LTEXT           "Sub-attribute name:",IDC_STATIC,18,209,114,8
 END
 
+IDD_ENHANCEOCRPP DIALOGEX 0, 0, 323, 230
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Find text not previously in OCR or enhance existing text up to a confidence level of:",IDC_STATIC,8,7,273,8
+    EDITTEXT        IDC_EDIT_CONFIDENCE_CRITERIA,282,5,24,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "%",IDC_STATIC,308,7,8,8
+    GROUPBOX        "Enhancement technique",IDC_STATIC,6,20,309,130
+    CONTROL         "Use general enhancement techniques",IDC_RADIO_GENERAL_FILTERS,
+                    "Button",BS_AUTORADIOBUTTON,12,31,136,10
+    CONTROL         "",IDC_FILTER_LEVEL,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | WS_TABSTOP,41,41,233,25
+    CONTROL         "Focus enhancement on halftone or speckled regions",IDC_RADIO_HALFTONE_FILTERS,
+                    "Button",BS_AUTORADIOBUTTON,12,90,182,10
+    CONTROL         "Focus enhancement on aliased or diffuse text",IDC_RADIO_ALIASED_FILTERS,
+                    "Button",BS_AUTORADIOBUTTON,12,104,182,10
+    CONTROL         "Focus enhancement on text with smudges or lines",IDC_RADIO_SMUDGED_FILTERS,
+                    "Button",BS_AUTORADIOBUTTON,12,118,182,10
+    CONTROL         "Use custom enhancement:",IDC_RADIO_CUSTOM_FILTERS,
+                    "Button",BS_AUTORADIOBUTTON,12,132,97,10
+	LTEXT           "Min enhancement",IDC_STATIC_FILTER_LABEL1,21,66,57,8
+    LTEXT           "Medium",IDC_STATIC_FILTER_LABEL3,110,66,24,8
+    LTEXT           "High",IDC_STATIC_FILTER_LABEL4,187,66,13,8
+    LTEXT           "Max enhancement",IDC_STATIC_FILTER_LABEL5,235,66,59,8
+    LTEXT           "(fast)",IDC_STATIC_FILTER_LABEL2,40,75,18,8
+    LTEXT           "(slow)",IDC_STATIC_FILTER_LABEL6,254,75,22,8
+    EDITTEXT        IDC_EDIT_CUSTOM_FILTERS,111,131,162,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_CUSTOM_FILTERS_DOC_TAG,279,130,10,14,BS_ICON | NOT WS_TABSTOP
+    PUSHBUTTON      "...",IDC_BTN_CUSTOM_FILTERS_BROWSE,294,130,15,14
+    LTEXT           "Prefer text containing a match for the regex format:",IDC_STATIC,8,155,169,8
+    ICON            IDI_ICON_INFO,IDC_PREFERRED_REGEX_INFO,180,155,21,20,SS_NOTIFY | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_PREFERRED_FORMAT,7,167,266,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_PREFERRED_FORMAT_DOC_TAG,279,165,10,14,BS_ICON | NOT WS_TABSTOP
+    PUSHBUTTON      "...",IDC_BTN_PREFERRED_FORMAT_BROWSE,294,165,15,14
+    LTEXT           "Prevent enhancement from adding any of the following characters:",IDC_STATIC,8,183,281,8
+    EDITTEXT        IDC_EDIT_CHARS_TO_IGNORE,7,195,289,12,ES_AUTOHSCROLL
+    CONTROL         "Ouput filtered images alongside original (debug)",IDC_CHK_OUTPUT_FILTERED_IMAGES,
+                    "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,7,212,288,10
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -418,7 +458,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_LIMITASLEFTPARTPP, DIALOG
     BEGIN
@@ -460,6 +500,14 @@ BEGIN
         RIGHTMARGIN, 247
     END
 
+    IDD_INSERTCHARACTERSPP, DIALOG
+    BEGIN
+    END
+
+    IDD_STRINGTOKENIZERMODIFIERPP, DIALOG
+    BEGIN
+    END
+
     IDD_PADVALUEPP, DIALOG
     BEGIN
         LEFTMARGIN, 5
@@ -483,6 +531,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 270
     END
+
+    IDD_ENHANCEOCRPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 316
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 223
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -505,7 +561,7 @@ IDI_ICON_DYNAMIC_LIST   ICON                    "..\\..\\..\\..\\ReusableCompone
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_PROJNAME            "AFValueModifiers"
     IDS_TITLELimitAsLeftPartPP "Title"
@@ -513,7 +569,7 @@ BEGIN
     IDS_DOCSTRINGLimitAsLeftPartPP "Your Help String"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TITLELimitAsMidPartPP "LimitAsMidPart"
     IDS_HELPFILELimitAsMidPartPP "Help File Name"
@@ -523,7 +579,7 @@ BEGIN
     IDS_DOCSTRINGLimitAsRightPartPP "Your Help String"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TITLERemoveCharactersPP "RemoveCharacters"
     IDS_HELPFILERemoveCharactersPP "Help File Name"
@@ -536,7 +592,7 @@ BEGIN
     IDS_DOCSTRINGTranslateValuePP "Your Help String"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TITLETranslateToClosestValueInListPP "TranslateToClosestValueInList"
     IDS_HELPFILETranslateToClosestValueInListPP "Help File Name"
@@ -549,7 +605,7 @@ BEGIN
     IDS_DOCSTRINGInsertCharactersPP "InsertCharactersPP"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TITLEStringTokenizerModifierPP "StringTokenizerModifierPP"
     IDS_HELPFILEStringTokenizerModifierPP "StringTokenizerModifierPP"
@@ -560,7 +616,7 @@ BEGIN
     IDS_TITLEPadValuePP     "&Title"
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

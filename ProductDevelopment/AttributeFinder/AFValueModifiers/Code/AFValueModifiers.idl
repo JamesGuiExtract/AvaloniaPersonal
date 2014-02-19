@@ -40,6 +40,32 @@ library UCLID_AFVALUEMODIFIERSLib
 		kGreaterThan = 5,
 		kNotEqual = 6
 	} EInsertCharsLengthType;
+
+	// Specifies the filter package that should be used for processing.
+	typedef
+	[
+		uuid(7B00D283-BB61-408F-9DF4-7D31C71EC251), 
+		helpstring("EFilterPackage")
+	]
+	enum
+	{
+		// Fast, but lowest quality.
+		kLow = 0,
+		// Medium speed and quality.
+		kMedium = 1,
+		// Slow, but good quality.
+		kHigh = 2,
+		// Very slow, best quality.
+		kMax = 3,
+		// Medium speed, tailored for best results halftone or speckled areas.
+		kHalftoneSpeckled = 4,
+		// Medium speed, tailored for best results aliased or diffuse text.
+		kAliasedDiffuse = 5,
+		// Medium speed, tailored for best results on smudged text or text with lines through it.
+		kLinesSmudged = 6,
+		// A custom filter set is to be used.
+		kCustom = 7
+	} EFilterPackage;
 	
 	// This enum is used in AdvancedReplaceStrings
 	typedef
@@ -416,6 +442,52 @@ library UCLID_AFVALUEMODIFIERSLib
 		// required to delineate separate content areas on the same line.
 		[propget, id(15), helpstring("property RequiredHorizontalSeparation")] HRESULT RequiredHorizontalSeparation([out, retval] long *pVal);
 		[propput, id(15), helpstring("property RequiredHorizontalSeparation")] HRESULT RequiredHorizontalSeparation([in] long newVal);
+
+		// Shrinks the specified pRect to pixel content on the specified page of the specified document.
+		[id(16), helpstring("method ShrinkToFit")] HRESULT ShrinkToFit([in] BSTR bstrSourceDocName, [in] long nPage,
+			[in, out] ILongRectangle* pRect);
+	};
+
+	[
+	object,
+	uuid(CDD4B6FE-5A7C-4C0D-9C14-80701BB60CFC),
+	dual,
+	nonextensible,
+	helpstring("IEnhanceOCR Interface"),
+	pointer_default(unique)
+	]
+	interface IEnhanceOCR : IDispatch
+	{
+		// The OCR confidence level below which characters will be enhanced (when possible).
+		[propget, id(1), helpstring("property ConfidenceCriteria")] HRESULT ConfidenceCriteria([out, retval] long *pVal);
+		[propput, id(1), helpstring("property ConfidenceCriteria")] HRESULT ConfidenceCriteria([in] long newVal);
+
+		// The the set of image filters that will be used against the document.
+		[propget, id(2), helpstring("property FilterPackage")] HRESULT FilterPackage([out, retval] EFilterPackage *pVal);
+		[propput, id(2), helpstring("property FilterPackage")] HRESULT FilterPackage([in] EFilterPackage newVal);
+		
+		// A custom defined filter package to use.
+		[propget, id(3), helpstring("property CustomFilterPackage")] HRESULT CustomFilterPackage([out, retval] BSTR *pVal);
+		[propput, id(3), helpstring("property CustomFilterPackage")] HRESULT CustomFilterPackage([in] BSTR newVal);
+
+		// The regex (or path of a regex file) that specifies formats that are preferred and should be
+		// used over other formats. The final result will contain this pattern unless the confidence of
+		// the possibility(ies) containing this pattern are very substantially outweighed by a
+		// possibility that does not contain this pattern.
+		[propget, id(4), helpstring("property PreferredFormatRegex")] HRESULT PreferredFormatRegex([out, retval] BSTR *pVal);
+		[propput, id(4), helpstring("property PreferredFormatRegex")] HRESULT PreferredFormatRegex([in] BSTR newVal);
+
+		// Any chars in this string will be prevented from being created by the EnhanceOCR process.
+		[propget, id(5), helpstring("property CharsToIgnore")] HRESULT CharsToIgnore([out, retval] BSTR *pVal);
+		[propput, id(5), helpstring("property CharsToIgnore")] HRESULT CharsToIgnore([in] BSTR newVal);
+
+		// Indicates whether copies of the filtered images should be output (for debug purposes).
+		[propget, id(6), helpstring("property OutputFilteredImages")] HRESULT OutputFilteredImages([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(6), helpstring("property OutputFilteredImages")] HRESULT OutputFilteredImages([in] VARIANT_BOOL newVal);
+
+		// An API call to allow the specified document text to be enhanced.
+		[id(7), helpstring("method EnhanceDocument")] HRESULT EnhanceDocument([in] IAFDocument* pDocument,
+			IProgressStatus *pProgressStatus);
 	};
 
 	//////////////////
@@ -744,6 +816,31 @@ library UCLID_AFVALUEMODIFIERSLib
 		helpstring("SplitRegionIntoContentAreasPP Class")
 	]
 	coclass SplitRegionIntoContentAreasPP
+	{
+		[default] interface IUnknown;
+	};
+
+	[
+		uuid(DAD17420-E782-47FF-A194-A3185098D5FD),
+		helpstring("EnhanceOCR Class")
+	]
+	coclass EnhanceOCR
+	{
+		[default] interface IEnhanceOCR;
+		interface IAttributeModifyingRule;
+		interface IDocumentPreprocessor;
+		interface IOutputHandler;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+	};
+
+	[
+		uuid(B8E6B54E-A1A1-4067-91A5-AF6FA62E26C7),
+		helpstring("EnhanceOCRPP Class")
+	]
+	coclass EnhanceOCRPP
 	{
 		[default] interface IUnknown;
 	};

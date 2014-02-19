@@ -277,6 +277,36 @@ STDMETHODIMP CSpatialString::GetOCRImageLetterArray(long* pnNumLetters, void** p
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10463")
 }
 //--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::GetOriginalImageLetterArray(long* pnNumLetters, void** ppLetters)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI36403", pnNumLetters != __nullptr);
+		ASSERT_ARGUMENT("ELI36404", ppLetters != __nullptr);
+
+		// Check license
+		validateLicense();
+
+		// Make sure this string is spatial
+		verifySpatialness();
+
+		m_vecOrignalImageLetters.clear();
+		m_vecOrignalImageLetters.reserve(m_vecLetters.size());
+		m_vecOrignalImageLetters.insert(m_vecOrignalImageLetters.begin(),
+			m_vecLetters.begin(), m_vecLetters.end());
+
+		*pnNumLetters = m_vecOrignalImageLetters.size();
+		*ppLetters = &(m_vecOrignalImageLetters[0]);
+
+		translateToNewPageInfo((CPPLetter *)*ppLetters, *pnNumLetters, __nullptr);
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36405")
+}
+//--------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetOriginalImageBounds(ILongRectangle **pBounds)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -2238,8 +2268,8 @@ STDMETHODIMP CSpatialString::GetWordLengthDist(long* plTotalWords, ILongToLongMa
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetOCRImageRasterZonesGroupedByConfidence(
-					IVariantVector* pVecOCRConfidenceBoundaries, 
-					IVariantVector** ppZoneOCRConfidenceTiers,
+					IVariantVector* pVecOCRConfidenceBoundaries, VARIANT_BOOL vbByWord,
+					IVariantVector** ppZoneOCRConfidenceTiers, IVariantVector** ppZoneIndices,
 					IIUnknownVector** ppRasterZones)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -2249,6 +2279,7 @@ STDMETHODIMP CSpatialString::GetOCRImageRasterZonesGroupedByConfidence(
 		IVariantVectorPtr ipVecOCRConfidenceBoundaries(pVecOCRConfidenceBoundaries);
 		ASSERT_ARGUMENT("ELI25369", ipVecOCRConfidenceBoundaries != __nullptr);
 		ASSERT_ARGUMENT("ELI25370", ppZoneOCRConfidenceTiers != __nullptr);
+		ASSERT_ARGUMENT("ELI36406", ppZoneIndices != __nullptr);
 		ASSERT_ARGUMENT("ELI25371", ppRasterZones != __nullptr);
 
 		// Check license
@@ -2257,15 +2288,20 @@ STDMETHODIMP CSpatialString::GetOCRImageRasterZonesGroupedByConfidence(
 		IVariantVectorPtr ipZoneOCRConfidenceTiers(CLSID_VariantVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI25372", ipZoneOCRConfidenceTiers != __nullptr);
 
+		IVariantVectorPtr ipZoneIndices(CLSID_VariantVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI36407", ipZoneIndices != __nullptr);
+
 		// Retrieve a list like GetRasterZones, except that raster zones are split between letters
 		// on opposite sides of a specified OCR confidence boundary.
 		IIUnknownVectorPtr ipZones = getOCRImageRasterZonesGroupedByConfidence(
-			ipVecOCRConfidenceBoundaries, ipZoneOCRConfidenceTiers);
+			asCppBool(vbByWord), ipVecOCRConfidenceBoundaries, ipZoneOCRConfidenceTiers,
+			ipZoneIndices);
 		ASSERT_RESOURCE_ALLOCATION("ELI25367", ipZones != __nullptr);
 
 		// Return the raster zones as well as a vector specifying the OCR confidence tier of each
 		// zone.
 		*ppZoneOCRConfidenceTiers = ipZoneOCRConfidenceTiers.Detach();
+		*ppZoneIndices = ipZoneIndices.Detach();
 		*ppRasterZones = ipZones.Detach();
 	
 		return S_OK;
@@ -2274,8 +2310,8 @@ STDMETHODIMP CSpatialString::GetOCRImageRasterZonesGroupedByConfidence(
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetOriginalImageRasterZonesGroupedByConfidence(
-					IVariantVector* pVecOCRConfidenceBoundaries, 
-					IVariantVector** ppZoneOCRConfidenceTiers,
+					IVariantVector* pVecOCRConfidenceBoundaries, VARIANT_BOOL vbByWord,
+					IVariantVector** ppZoneOCRConfidenceTiers, IVariantVector** ppZoneIndices,
 					IIUnknownVector** ppRasterZones)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -2285,23 +2321,29 @@ STDMETHODIMP CSpatialString::GetOriginalImageRasterZonesGroupedByConfidence(
 		IVariantVectorPtr ipVecOCRConfidenceBoundaries(pVecOCRConfidenceBoundaries);
 		ASSERT_ARGUMENT("ELI25705", ipVecOCRConfidenceBoundaries != __nullptr);
 		ASSERT_ARGUMENT("ELI25706", ppZoneOCRConfidenceTiers != __nullptr);
+		ASSERT_ARGUMENT("ELI36408", ppZoneIndices != __nullptr);
 		ASSERT_ARGUMENT("ELI25707", ppRasterZones != __nullptr);
 
 		// Check license
 		validateLicense();
 
 		IVariantVectorPtr ipZoneOCRConfidenceTiers(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI25708", ipZoneOCRConfidenceTiers != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI36409", ipZoneOCRConfidenceTiers != __nullptr);
+
+		IVariantVectorPtr ipZoneIndices(CLSID_VariantVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI36410", ipZoneIndices != __nullptr);
 
 		// Retrieve a list like GetRasterZones, except that raster zones are split between letters
 		// on opposite sides of a specified OCR confidence boundary.
 		IIUnknownVectorPtr ipZones = getOriginalImageRasterZonesGroupedByConfidence(
-			ipVecOCRConfidenceBoundaries, ipZoneOCRConfidenceTiers);
-		ASSERT_RESOURCE_ALLOCATION("ELI25709", ipZones != __nullptr);
+			asCppBool(vbByWord), ipVecOCRConfidenceBoundaries, ipZoneOCRConfidenceTiers,
+			ipZoneIndices);
+		ASSERT_RESOURCE_ALLOCATION("ELI36411", ipZones != __nullptr);
 
 		// Return the raster zones as well as a vector specifying the OCR confidence tier of each
 		// zone.
 		*ppZoneOCRConfidenceTiers = ipZoneOCRConfidenceTiers.Detach();
+		*ppZoneIndices = ipZoneIndices.Detach();
 		*ppRasterZones = ipZones.Detach();
 	
 		return S_OK;

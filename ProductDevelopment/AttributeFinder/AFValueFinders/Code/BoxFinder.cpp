@@ -1512,7 +1512,7 @@ IIUnknownVectorPtr CBoxFinder::getCluesOnPage(IVariantVectorPtr ipClues, ISpatia
 	{
 		// If we found clues on this page, and we are going to return text (meaning we will need
 		// to search for text in a box), point the string searcher to the current page
-		getSpatialStringSearcher()->InitSpatialStringSearcher(ipPage);
+		getSpatialStringSearcher()->InitSpatialStringSearcher(ipPage, VARIANT_FALSE);
 	}
 
 	return ipFoundClues;

@@ -315,7 +315,7 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 						ASSERT_RESOURCE_ALLOCATION("ELI15601", ipPage != __nullptr);
 
 						// prepare to extract a region of text from the page
-						ipSearcher->InitSpatialStringSearcher(ipPage);
+						ipSearcher->InitSpatialStringSearcher(ipPage, VARIANT_FALSE);
 						lCurrPage = lPageNum;
 					}
 

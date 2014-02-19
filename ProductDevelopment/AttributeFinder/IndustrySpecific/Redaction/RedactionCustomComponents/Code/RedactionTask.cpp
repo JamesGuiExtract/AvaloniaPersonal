@@ -217,7 +217,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 				ipSearcher.CreateInstance(CLSID_SpatialStringSearcher);
 				ASSERT_RESOURCE_ALLOCATION("ELI31677", ipSearcher != __nullptr);
 
-				ipSearcher->InitSpatialStringSearcher(ipText);
+				ipSearcher->InitSpatialStringSearcher(ipText, VARIANT_FALSE);
 
 				// This searcher will be used to search the context for each
 				// attribute and will be initialized with the expanded context
@@ -474,7 +474,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 								ASSERT_RESOURCE_ALLOCATION("ELI31681", ipTemp != __nullptr);
 
 								// Initialize the attribute searcher with this string
-								ipAttrSearcher->InitSpatialStringSearcher(ipTemp);
+								ipAttrSearcher->InitSpatialStringSearcher(ipTemp, VARIANT_FALSE);
 								_lastCodePos = "280_17";
 
 								// Look left and right, if empty in either direction, expand
@@ -493,7 +493,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 									ipTemp = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
 									ASSERT_RESOURCE_ALLOCATION("ELI31682", ipTemp != __nullptr);
 
-									ipAttrSearcher->InitSpatialStringSearcher(ipTemp);
+									ipAttrSearcher->InitSpatialStringSearcher(ipTemp, VARIANT_FALSE);
 
 									// Get the new left and right words
 									ipLeftWord = ipAttrSearcher->GetLeftWord(ipOrigRect);

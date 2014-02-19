@@ -1411,7 +1411,7 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 			ASSERT_RESOURCE_ALLOCATION("ELI08022", m_ipSpatialStringSearcher != __nullptr);
 		}
 
-		m_ipSpatialStringSearcher->InitSpatialStringSearcher(ipOriginPage);
+		m_ipSpatialStringSearcher->InitSpatialStringSearcher(ipOriginPage, VARIANT_FALSE);
 
 		ISpatialStringPtr ipResult(NULL);
 

@@ -18,7 +18,7 @@ const UCHAR gucFIRST_BIT = 0x80;
 // LeadToolsBitmap
 //-------------------------------------------------------------------------------------------------
 LeadToolsBitmap::LeadToolsBitmap(const string strImageFileName, unsigned long ulPage, 
-								 double dRotation/* = 0*/)
+								 double dRotation/* = 0*/, int nBitsPerPixel/* = 1*/)
 : m_bitmapFreeer(m_hBitmap, true)
 , m_strImageFileName(strImageFileName)
 {
@@ -31,7 +31,7 @@ LeadToolsBitmap::LeadToolsBitmap(const string strImageFileName, unsigned long ul
 
 		// Load the image using the specified number of bits per pixel.
 		L_INT nRet = L_LoadBitmap((char*) m_strImageFileName.c_str(), &m_hBitmap, 
-			sizeof(BITMAPHANDLE), 1, ORDER_RGB, &lfo, &m_FileInfo);
+			sizeof(BITMAPHANDLE), nBitsPerPixel, ORDER_RGB, &lfo, &m_FileInfo);
 		throwExceptionIfNotSuccess(nRet, "ELI22243", 
 			"Internal error: Unable to load image.", m_strImageFileName);
 

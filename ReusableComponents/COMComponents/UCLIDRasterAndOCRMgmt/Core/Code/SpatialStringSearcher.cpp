@@ -50,8 +50,18 @@ CSpatialStringSearcher::EIntersection CSpatialStringSearcher::LocalEntity::inter
 	{
 		return kContained;
 	}
+	else
+	{
+		CPoint ptMiddle = CPoint((rEnt.m_lLeft + rEnt.m_lRight) / 2, (rEnt.m_lTop + rEnt.m_lBottom) / 2);
+
+		if (ptMiddle.x >= m_lLeft && ptMiddle.x <= m_lRight &&
+			ptMiddle.y >= m_lTop && ptMiddle.y <= m_lBottom)
+		{
+			return kOverlapping;
+		}
+	}
 	
-	return kIntersecting;
+	return kTouching;
 }
 //-------------------------------------------------------------------------------------------------
 // LocalLetter
@@ -140,6 +150,8 @@ CSpatialStringSearcher::CSpatialStringSearcher()
 {
 	// Set the default settings
 	m_bIncludeDataOnBoundary = true; 
+	m_bUseOriginalImageCoordinates = false;
+	m_bUseMidpointsOnly = false;
 	m_eBoundaryResolution = kCharacter; 
 	
 	// Initialize all the values 
@@ -190,7 +202,8 @@ STDMETHODIMP CSpatialStringSearcher::InterfaceSupportsErrorInfo(REFIID riid)
 //-------------------------------------------------------------------------------------------------
 // ISpatialStringSearcher
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSpatialStringSearcher::InitSpatialStringSearcher(ISpatialString* pSpatialString)
+STDMETHODIMP CSpatialStringSearcher::InitSpatialStringSearcher(ISpatialString* pSpatialString,
+													VARIANT_BOOL vbUseOriginalImageCoordinates)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -204,6 +217,8 @@ STDMETHODIMP CSpatialStringSearcher::InitSpatialStringSearcher(ISpatialString* p
 
 		// Clear out the information from any previously set string
 		clear();
+
+		m_bUseOriginalImageCoordinates = asCppBool(vbUseOriginalImageCoordinates);
 
 		// assign our string to the new string
 		m_ipSpatialString = ipSpatialString;
@@ -566,6 +581,21 @@ STDMETHODIMP CSpatialStringSearcher::SetBoundaryResolution(ESpatialEntity eResol
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialStringSearcher::SetUseMidpointsOnly(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		m_bUseMidpointsOnly = asCppBool(newVal);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36398");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IManageableMemory
@@ -671,25 +701,34 @@ void CSpatialStringSearcher::createLocalLetters()
 	unsigned int iCurrZone = 0;
 
 	// populate the list of local letters and add them to the spatial data structure
-	vector<CPPLetter> vecCppLetters;
+	vector<CPPLetter> vecImageCppLetters;
+	vector<CPPLetter> vecOCRCppLetters;
+	long numLetters = 0;
 	{
-		long numLetters;
+		// Copy the letters in original image coordinates to an array.
 		CPPLetter* pLetters = NULL;
-		m_ipSpatialString->GetOCRImageLetterArray(&numLetters, (void**)&pLetters);
-		ASSERT_RESOURCE_ALLOCATION("ELI25990", pLetters != __nullptr);
+		m_ipSpatialString->GetOriginalImageLetterArray(&numLetters, (void**)&pLetters);
+		ASSERT_RESOURCE_ALLOCATION("ELI36396", pLetters != __nullptr);
 
-		// Copy the letters to a local vector
-		vecCppLetters.resize(numLetters);
-		memcpy(&(vecCppLetters[0]), pLetters, numLetters * sizeof(CPPLetter));
+		vecImageCppLetters.resize(numLetters);
+		memcpy(&(vecImageCppLetters[0]), pLetters, numLetters * sizeof(CPPLetter));
+
+		// Copy the letters in OCR coordinates to an array.
+		m_ipSpatialString->GetOCRImageLetterArray(&numLetters, (void**)&pLetters);
+		ASSERT_RESOURCE_ALLOCATION("ELI36397", pLetters != __nullptr);
+
+		vecOCRCppLetters.resize(numLetters);
+		memcpy(&(vecOCRCppLetters[0]), pLetters, numLetters * sizeof(CPPLetter));
 	}
 
-	for (size_t i = 0; i < vecCppLetters.size(); i++)
+	for (long i = 0; i < numLetters; i++)
 	{
-		const CPPLetter& letter = vecCppLetters[i];
+		const CPPLetter& imageLetter = vecImageCppLetters[i];
+		const CPPLetter& OCRLetter = vecOCRCppLetters[i];
 
 		m_vecLetters.push_back(LocalLetter(i, iCurrZone, iCurrParagraph, iCurrLine, iCurrWord));
 		LocalLetter& rLocalLetter = m_vecLetters[i];
-		rLocalLetter.letter = letter;
+		rLocalLetter.letter = OCRLetter;
 		
 		// if this is the last letter in a word
 		if (m_ipSpatialString->GetIsEndOfWord(i) == VARIANT_TRUE)
@@ -704,29 +743,41 @@ void CSpatialStringSearcher::createLocalLetters()
 			rLocalLetter.m_lEndFlags |= kEOL;
 		}
 		// if this is the last letter in a Paragraph
-		if (letter.m_bIsEndOfParagraph)
+		if (OCRLetter.m_bIsEndOfParagraph)
 		{
 			iCurrParagraph++;
 			rLocalLetter.m_lEndFlags |= kEOP;
 		}
 		// if this is the last letter in a Zone
-		if (letter.m_bIsEndOfZone)
+		if (OCRLetter.m_bIsEndOfZone)
 		{
 			iCurrZone++;
 			rLocalLetter.m_lEndFlags |= kEOZ;
 		}
 
 		//ONLY SPATIAL LETTERS MAY PROCEED BEYOND THIS POINT
-		if (!letter.m_bIsSpatial)
+		if (!OCRLetter.m_bIsSpatial)
 		{
 			continue;
 		}
 
-		// Set the bounds
-		rLocalLetter.m_lLeft = letter.m_ulLeft;
-		rLocalLetter.m_lRight = letter.m_ulRight;
-		rLocalLetter.m_lTop = letter.m_ulTop;
-		rLocalLetter.m_lBottom = letter.m_ulBottom;
+		// Set the letter's bounds according to whether the caller wishes to search according to OCR
+		// or original image coordinates.
+		if (m_bUseOriginalImageCoordinates)
+		{
+			// Set the bounds
+			rLocalLetter.m_lLeft = imageLetter.m_ulLeft;
+			rLocalLetter.m_lRight = imageLetter.m_ulRight;
+			rLocalLetter.m_lTop = imageLetter.m_ulTop;
+			rLocalLetter.m_lBottom = imageLetter.m_ulBottom;
+		}
+		else
+		{
+			rLocalLetter.m_lLeft = OCRLetter.m_ulLeft;
+			rLocalLetter.m_lRight = OCRLetter.m_ulRight;
+			rLocalLetter.m_lTop = OCRLetter.m_ulTop;
+			rLocalLetter.m_lBottom = OCRLetter.m_ulBottom;
+		}
 
 		// Create the document boundaries
 		if (rLocalLetter.m_lLeft < m_lStringLeft || m_lStringLeft < 0)
@@ -894,6 +945,26 @@ void CSpatialStringSearcher::createLocalLines()
 	}
 }
 //-------------------------------------------------------------------------------------------------
+bool CSpatialStringSearcher::intersectionMeetsCriteria(EIntersection eIntersection)
+{
+	if (m_bUseMidpointsOnly)
+	{
+		// kOverlapping indicates that the midpoint of the entity is included in the specified
+		// bounds.
+		if (eIntersection >= kOverlapping)
+		{
+			return true;
+		}
+	}
+	else if ((m_bIncludeDataOnBoundary && eIntersection > kNotIntersecting) ||
+			 (!m_bIncludeDataOnBoundary && eIntersection == kContains) )
+	{
+		return true;
+	}
+
+	return false;
+}
+//-------------------------------------------------------------------------------------------------
 void CSpatialStringSearcher::getUnsortedLettersInRegion(ILongRectanglePtr ipRect, 
 														vector<int> &rvecLetters)
 {
@@ -940,8 +1011,7 @@ void CSpatialStringSearcher::getUnsortedLettersInRegion(ILongRectanglePtr ipRect
 				// Test the rLetter against the region
 				EIntersection eIntersection = region.intersect(rLetter);
 
-				if( (m_bIncludeDataOnBoundary && eIntersection > kNotIntersecting) ||
-					(!m_bIncludeDataOnBoundary && eIntersection == kContains) )
+				if (intersectionMeetsCriteria(eIntersection))
 				{
 					rvecLetters.push_back(ui);
 				}
@@ -956,8 +1026,7 @@ void CSpatialStringSearcher::getUnsortedLettersInRegion(ILongRectanglePtr ipRect
 				// test the word against the region
 				EIntersection eIntersection =  region.intersect(rWord);
 
-				if ((m_bIncludeDataOnBoundary && eIntersection > kNotIntersecting) ||
-					(!m_bIncludeDataOnBoundary && eIntersection == kContains) )
+				if (intersectionMeetsCriteria(eIntersection))
 				{
 					for (unsigned int uiLetter = rWord.m_uiStart; uiLetter < rWord.m_uiEnd; uiLetter++)
 					{
@@ -980,8 +1049,7 @@ void CSpatialStringSearcher::getUnsortedLettersInRegion(ILongRectanglePtr ipRect
 				// test the word against the region
 				EIntersection eIntersection =  region.intersect(rLine);
 
-				if ((m_bIncludeDataOnBoundary && eIntersection > kNotIntersecting) ||
-					(!m_bIncludeDataOnBoundary && eIntersection == kContains) )
+				if (intersectionMeetsCriteria(eIntersection))
 				{
 					for (unsigned int uiLetter = rLine.m_uiStart;
 						uiLetter < rLine.m_uiEnd; uiLetter++)

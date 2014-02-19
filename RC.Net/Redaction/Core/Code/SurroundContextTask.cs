@@ -172,7 +172,7 @@ namespace Extract.Redaction
                 if (currentPage != loadedPage)
                 {
                     SpatialString page = source.GetSpecifiedPages(currentPage, currentPage);
-                    searcher.InitSpatialStringSearcher(page);
+                    searcher.InitSpatialStringSearcher(page, false);
                     loadedPage = currentPage;
                 }
 

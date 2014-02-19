@@ -716,7 +716,7 @@ namespace Extract.AttributeFinder.Rules
             if (!_searchers.TryGetValue(page, out searcher))
             {
                 searcher = new SpatialStringSearcher();
-                searcher.InitSpatialStringSearcher(sourceString.GetSpecifiedPages(page, page));
+                searcher.InitSpatialStringSearcher(sourceString.GetSpecifiedPages(page, page), false);
                 searcher.SetIncludeDataOnBoundary(IncludeTextOnBoundary);
                 searcher.SetBoundaryResolution(SpatialEntityType);
             }

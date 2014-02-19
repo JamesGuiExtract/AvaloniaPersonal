@@ -552,6 +552,36 @@ STDMETHODIMP CSplitRegionIntoContentAreas::put_RequiredHorizontalSeparation(long
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28023")
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSplitRegionIntoContentAreas::ShrinkToFit(BSTR bstrSourceDocName, long nPage,
+													   ILongRectangle* pRect)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ILongRectanglePtr ipRect(pRect);
+		ASSERT_ARGUMENT("ELI36431", ipRect != __nullptr);
+
+		validateLicense();
+
+		CRect rect;
+		ipRect->GetBounds(&rect.left, &rect.top, &rect.right, &rect.bottom);
+
+		m_apPageBitmap.reset(new LeadToolsBitmap(asString(bstrSourceDocName), nPage, 0));
+		ASSERT_RESOURCE_ALLOCATION("ELI36432", m_apPageBitmap.get() != __nullptr);
+
+		m_rectCurrentPage.SetRect(0, 0,
+			m_apPageBitmap->m_hBitmap.Width, m_apPageBitmap->m_hBitmap.Height);
+
+		shrinkToFit(rect);
+
+		ipRect->SetBounds(rect.left, rect.top, rect.right, rect.bottom);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36433")
+}
 
 //--------------------------------------------------------------------------------------------------
 // IAttributeModifyingRule
@@ -3093,7 +3123,7 @@ ISpatialStringSearcherPtr CSplitRegionIntoContentAreas::getSpatialStringSearcher
 		m_ipSpatialStringSearcher.CreateInstance(CLSID_SpatialStringSearcher);
 		ASSERT_RESOURCE_ALLOCATION("ELI22100", m_ipSpatialStringSearcher != __nullptr);
 
-		m_ipSpatialStringSearcher->InitSpatialStringSearcher(ipPageText);
+		m_ipSpatialStringSearcher->InitSpatialStringSearcher(ipPageText, VARIANT_FALSE);
 	}
 
 	return m_ipSpatialStringSearcher;

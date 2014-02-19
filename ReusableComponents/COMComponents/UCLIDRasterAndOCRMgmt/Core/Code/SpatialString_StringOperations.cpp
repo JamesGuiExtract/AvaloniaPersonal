@@ -7,6 +7,8 @@
 #include <cpputil.h>
 #include <COMUtils.h>
 
+#include <set>
+
 //-------------------------------------------------------------------------------------------------
 // ISpatialString - String operations
 //-------------------------------------------------------------------------------------------------
@@ -718,5 +720,360 @@ STDMETHODIMP CSpatialString::FindFirstItemInRegExpVector(IVariantVector* pList,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI06358")
 
 	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::RemoveText(ISpatialString* pTextToRemove, long* pnPos)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipTextToRemove = pTextToRemove;
+		ASSERT_ARGUMENT("ELI36412", ipTextToRemove != __nullptr);
+		ASSERT_ARGUMENT("ELI36413", pnPos != __nullptr);
+
+		// Check license
+		validateLicense();
+
+		// Make sure this string is spatial
+		verifySpatialness();
+
+		if (ipTextToRemove->GetMode() != kSpatialMode)
+		{
+			UCLIDException ue("ELI36414", "RemoveText requires a spatial string.");
+			throw ue;
+		}
+
+		long nNumLettersToRemove = 0;
+		CPPLetter *pLettersToRemove = __nullptr;
+		ipTextToRemove->GetOCRImageLetterArray(&nNumLettersToRemove, (void **)&pLettersToRemove);
+
+		long nLetterCount = m_vecLetters.size();
+		long nPosition = 0;
+		long nFirstPosition = -1;
+		long nLastPosition = nLetterCount;
+		set<long> setLettersToRemove;
+		bool bLastLetterRemoved = false;
+
+		// Loop through each letter to remove
+		for (long i = 0; i < nNumLettersToRemove; i++)
+		{
+			// May need to restart loop of existing chars if the last letter to remove could not be
+			// found at a position after the last character was found.
+			if (nPosition == nLetterCount)
+			{
+				nPosition = 0;
+			}
+
+			CPPLetter &letterToRemove = pLettersToRemove[i];
+
+			// If the next letter to remove is non-spatial, it should be removed only if the
+			// preceding spatial character was removed. (otherwise there is no good way of telling
+			// one non-spatial character from another).
+			if (!letterToRemove.m_bIsSpatial)
+			{
+				if (bLastLetterRemoved && letterToRemove == m_vecLetters[nPosition])
+				{
+					setLettersToRemove.insert(nPosition);
+					nLastPosition = nPosition;
+
+					if (nLastPosition == nLetterCount)
+					{
+						bLastLetterRemoved = false;
+					}
+				}
+				else
+				{
+					bLastLetterRemoved = false;
+				}
+
+				nPosition++;
+				continue;
+			}
+
+			bLastLetterRemoved = false;
+			
+			// Continuing from the last point in the string where a character has been identified
+			// for removal, continue searching for a character that matches the current
+			// letterToRemove (in most cases letters to remove will be found sequentially).
+			while (nPosition != nLastPosition)
+			{
+				// If we've searched to the end of the string, loop back to the start until reaching
+				// the last index from which a character was identified for removal.
+				if (nPosition == nLetterCount)
+				{
+					nPosition = 0;
+					bLastLetterRemoved = false;
+				}
+
+				CPPLetter &currentLetter = m_vecLetters[nPosition];
+
+				// If this character is equivalent to the letter to remove, add it to
+				// setLettersToRemove then start looking for the next letter to remove
+				if (letterToRemove == currentLetter)
+				{
+					setLettersToRemove.insert(nPosition);
+					
+					// Keep track of the index at which the first char to remove was found (the
+					// return value).
+					if (nFirstPosition == -1)
+					{
+						nFirstPosition = nPosition;
+					}
+
+					nLastPosition = nPosition;
+					bLastLetterRemoved = true;
+					nPosition++;
+					break;
+				}
+				
+				nPosition++;
+			}
+		}
+
+		// If at least one character was found to remove, remove the characters in
+		// setLettersToRemove.
+		if (nFirstPosition != -1)
+		{
+			long nNewLetterCount = nLetterCount - setLettersToRemove.size();
+			vector<CPPLetter> vecNewLetters;
+			vecNewLetters.reserve(nNewLetterCount);
+			for (long k = 0; k < nLetterCount; k++)
+			{
+				if (setLettersToRemove.find(k) == setLettersToRemove.end())
+				{
+					vecNewLetters.push_back(m_vecLetters[k]);
+				}
+			}
+
+			if (nNewLetterCount == 0)
+			{
+				reset(false, false);
+			}
+			else
+			{
+				CPPLetter *pNewLetters = &vecNewLetters[0];
+				updateLetters(pNewLetters, nNewLetterCount);
+			}
+
+			m_bDirty = true;
+		}
+
+		*pnPos = nFirstPosition;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36415")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::InsertBySpatialPosition(ISpatialString *pString,
+													 VARIANT_BOOL vbAllowOverlappingInsertion,
+													 VARIANT_BOOL *pbStringWasInserted)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipString(pString);
+		ASSERT_ARGUMENT("ELI36416", ipString != __nullptr);
+		ASSERT_ARGUMENT("ELI36430", pbStringWasInserted != __nullptr);
+		*pbStringWasInserted = VARIANT_FALSE;
+
+		if (ipString->GetMode() != kSpatialMode)
+		{
+			UCLIDException ue("ELI36417", "Cannot insert non-spatial string by spatial position");
+			throw ue;
+		}
+
+		long nPage = ipString->GetFirstPageNumber();
+		if (nPage != ipString->GetLastPageNumber())
+		{
+			UCLIDException ue("ELI36418", "Cannot insert multi-page string by spatial position");
+			throw ue;
+		}
+
+		ILongRectanglePtr ipBounds = ipString->GetOCRImageBounds();
+		long nLeft;
+		long nTop;
+		long nRight;
+		long nBottom;
+		ipBounds->GetBounds(&nLeft, &nTop, &nRight, &nBottom);
+
+		bool bStartOfNewWord = true;
+		long nPos;
+		long nContingencyPos = -1;
+		bool bNewLineContingency = false;
+		bool bContingencyInMiddleOfWord = false;
+		long nCount = m_vecLetters.size();
+
+		// Loop through each positon in the string starting on the target page.
+		for (nPos = getFirstCharPositionOfPage(nPage); nPos < nCount; nPos++)
+		{
+			CPPLetter& letter = m_vecLetters[nPos];
+			if (!letter.m_bIsSpatial)
+			{
+				continue;
+			}
+
+			if ((long)letter.m_usPageNumber == nPage)
+			{
+				// Compare the middle of the current letter to the area of the string to be added.
+				CPoint ptMiddleOfLetter(
+					(letter.m_ulLeft + letter.m_ulRight) / 2,
+					(letter.m_ulTop + letter.m_ulBottom) / 2);
+
+				// If this letter is in-line or below the string to be added and to the right of the
+				// new string, this is the spot the new string should be added.
+				if (ptMiddleOfLetter.y > nTop && ptMiddleOfLetter.x >= nRight)
+				{
+					break;
+				}
+				// If this letter is a normal height char that is completely below the string to be
+				// added, this is the positon to add it.
+				else if ((long)letter.m_ulTop > nBottom && letter.m_usGuess1 != '.' &&
+					letter.m_usGuess1 != ',' && letter.m_usGuess1 != '_')
+				{
+					break;
+				}
+				// If the letter appears that it may be in line at or below the string to add, set
+				// up a contingency index which will be used as the insertion point if a more
+				// definitive position is not subsequently found.
+				else if (ptMiddleOfLetter.y > nTop && !bNewLineContingency)
+				{
+					if (bStartOfNewWord && ptMiddleOfLetter.y > nBottom)
+					{
+						// If we've gotten to a position where it appears this char may be the
+						// start of a new word on a line below the new string, keep track of this
+						// position as the position to insert if a more definitive location is not
+						// found.
+						nContingencyPos = nPos;
+						// This contingency location appears to be on a new line, it won't be
+						// updated from this point; either it will or won't be the insertion
+						// position.
+						bNewLineContingency = true;
+					}
+					else if (ptMiddleOfLetter.x >= nLeft)
+					{
+						// The current char appears likely to be in-line, but to the left of the
+						// string to be added. The new string should be inserted after this
+						// one unless another such char is found further to the right.
+						nContingencyPos = nPos + 1;
+						// If this letter isn't at the end of a word, this contingency is
+						// suggesting insertion into the middle of a word.
+						bContingencyInMiddleOfWord = !getIsEndOfWord(nPos);
+					}
+				}
+
+				bStartOfNewWord = getIsEndOfWord(nPos);
+			}
+			// We're past the page on which the string is to be inserted. The string should be
+			// inserted here unless a contingency position has been found.
+			else
+			{
+				if (nContingencyPos != -1)
+				{
+					nPos = nContingencyPos;
+					nContingencyPos = -1;
+				}
+
+				break;
+			}
+		}
+
+		// If the insertion position is in the middle of an existing word, the inserted string
+		// appears to overlap with existing text. Do not insert unless explicitly indicated.
+		if (!bStartOfNewWord && bContingencyInMiddleOfWord &&
+			!asCppBool(vbAllowOverlappingInsertion))
+		{
+			return S_OK;
+		}
+
+		// Ensure surrounding whitespace allows for a natural final result.
+		setSurroundingWhitespace(ipString, nPos);
+
+		// Insert the string at the calculated position.
+		if (nPos == nCount)
+		{
+			getThisAsCOMPtr()->Append(ipString);
+		}
+		else
+		{
+			getThisAsCOMPtr()->Insert(nPos, ipString);
+		}
+
+		*pbStringWasInserted = VARIANT_TRUE;
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36419")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::SetSurroundingWhitespace(ISpatialString *pString, long nPos, 
+													  long *pnNewPos)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipString(pString);
+		ASSERT_ARGUMENT("ELI36420", ipString != __nullptr);
+		ASSERT_ARGUMENT("ELI36421", pnNewPos != __nullptr);
+
+		*pnNewPos = nPos;
+		setSurroundingWhitespace(ipString, *pnNewPos);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36422")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::TranslateToNewPageInfo(ILongToObjectMap* pPageInfoMap)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		ILongToObjectMapPtr ipPageInfoMap = pPageInfoMap;
+		ASSERT_ARGUMENT("ELI36423", ipPageInfoMap != __nullptr);
+
+		// Make sure this string is spatial
+		if( m_eMode == kNonSpatialMode )
+		{
+			UCLIDException ue("ELI36424", 
+				"TranslateToNewPageInfo() requires a spatial string with spatial information!");
+			throw ue;
+		}
+
+		// m_ipPageInfoMap will be read-only. Need to create a new copy to make it writable.
+		// Shallow copy because the PageInfo instances themselves are immutable and don't need
+		// to be cloned.
+		IShallowCopyablePtr ipSourcePageInfoMap(getPageInfoMap());
+		ASSERT_RESOURCE_ALLOCATION("ELI36425", ipSourcePageInfoMap != __nullptr);
+		
+		m_ipPageInfoMap = ipSourcePageInfoMap->ShallowCopy();
+		ASSERT_RESOURCE_ALLOCATION("ELI36426", m_ipPageInfoMap != __nullptr);
+
+		if (m_eMode == kHybridMode)
+		{
+			for each (UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipRasterZone in m_vecRasterZones)
+			{
+				translateToNewPageInfo(ipRasterZone, ipPageInfoMap);
+			}
+		}
+		else
+		{
+			translateToNewPageInfo(&m_vecLetters[0], m_vecLetters.size(), ipPageInfoMap);
+		}
+
+		m_ipPageInfoMap = ipPageInfoMap;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36427")
 }
 //-------------------------------------------------------------------------------------------------

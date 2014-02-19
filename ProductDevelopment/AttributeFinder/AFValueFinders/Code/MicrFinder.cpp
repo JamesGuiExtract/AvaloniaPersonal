@@ -1665,7 +1665,7 @@ IAttributePtr CMicrFinder::findOtherRoutingNumber(ISpatialStringPtr ipSpatialStr
 		// Create a spatial string searcher and initialize it
 		ISpatialStringSearcherPtr ipSSSearcher(CLSID_SpatialStringSearcher);
 		ASSERT_RESOURCE_ALLOCATION("ELI24946", ipSSSearcher != __nullptr);
-		ipSSSearcher->InitSpatialStringSearcher(ipSpatialString);
+		ipSSSearcher->InitSpatialStringSearcher(ipSpatialString, VARIANT_FALSE);
 		ipSSSearcher->SetIncludeDataOnBoundary(VARIANT_TRUE);
 
 		// Get a substring from the spatial string searcher (do not rotate the rectangle)

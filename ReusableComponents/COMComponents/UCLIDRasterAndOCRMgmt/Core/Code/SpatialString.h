@@ -148,12 +148,14 @@ public:
 		ILongToObjectMap *pPageInfoMap);
 	STDMETHOD(GetWordLengthDist)(long* plTotalWords, ILongToLongMap** ppWordLengthMap);
 	STDMETHOD(GetOriginalImageRasterZonesGroupedByConfidence)(IVariantVector* pVecOCRConfidenceBoundaries,
-		IVariantVector** ppZoneOCRConfidenceTiers, IIUnknownVector** ppRasterZones);
+		VARIANT_BOOL vbByWord, IVariantVector** ppZoneOCRConfidenceTiers, 
+		IVariantVector** ppZoneIndices, IIUnknownVector** ppRasterZones);
 	STDMETHOD(CreateNonSpatialString)(BSTR bstrText, BSTR bstrSourceDocName);
 	STDMETHOD(ReplaceAndDowngradeToNonSpatial)(BSTR bstrText);
 	STDMETHOD(GetOCRImageRasterZones)(IIUnknownVector** ppRasterZones);
 	STDMETHOD(GetOCRImageRasterZonesGroupedByConfidence)(IVariantVector* pVecOCRConfidenceBoundaries,
-		IVariantVector** ppZoneOCRConfidenceTiers, IIUnknownVector** ppRasterZones);
+		VARIANT_BOOL vbByWord, IVariantVector** ppZoneOCRConfidenceTiers, 
+		IVariantVector** ppZoneIndices, IIUnknownVector** ppRasterZones);
 	STDMETHOD(GetOCRImageBounds)(ILongRectangle** ppBounds);
 	STDMETHOD(InsertString)(long nPos, BSTR bstrText);
 	STDMETHOD(GetTranslatedImageRasterZones)(ILongToObjectMap* pPageInfoMap,
@@ -166,6 +168,12 @@ public:
 	STDMETHOD(GetOCRImagePageBounds)(long nPageNum, ILongRectangle** ppBounds);
 	STDMETHOD(ContainsCharacterOutsideFontRange)(long nFontMin, long nFontMax, VARIANT_BOOL* pbResult);
 	STDMETHOD(GetFirstCharPositionOfPage)(long nPageNum, long *pFirstCharPos);
+	STDMETHOD(GetOriginalImageLetterArray)(long* pnNumLetters, void** ppLetters);
+	STDMETHOD(RemoveText)(ISpatialString* pTextToRemove, long* nPos);
+	STDMETHOD(InsertBySpatialPosition)(ISpatialString *pString,
+		VARIANT_BOOL vbAllowOverlappingInsertion, VARIANT_BOOL* pbStringWasInserted);
+	STDMETHOD(SetSurroundingWhitespace)(ISpatialString *pString, long nPos, long* pnNewPos);
+	STDMETHOD(TranslateToNewPageInfo)(ILongToObjectMap* pPageInfoMap);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown **pObject);
@@ -200,11 +208,15 @@ private:
 	// The OCR engine version
 	string m_strOCREngineVersion;
 
-	// A Vector of letters containing spatial information about each letter in the string
+	// A vector of letters containing spatial information about each letter in the string
 	// This only necessarily exists when m_bIsSpatial == true
 	// letter[i].m_lGuess1 should always correspond directly with m_strString.at(i)
 	// (though one is a long and the other is a char)
 	vector<CPPLetter> m_vecLetters;
+
+	// A vector of letters containing spatial information about each letter in the string in
+	// original image coordinates rather than in OCR coordinates (as m_vecLetters is)
+	vector<CPPLetter> m_vecOrignalImageLetters;
 
 	// the page info map and a method to access it that guarantees that the map
 	// object is never null (i.e. the method will initialize m_ipPageInfoMap to an empty map
@@ -425,6 +437,12 @@ private:
 	UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr translateToOriginalImageZone(
 		UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone);
 	//----------------------------------------------------------------------------------------------
+	// REQUIRE: GetMode == kSpatialMode
+	// PURPOSE: Translates the coordinates of pLetters so that their original image coordinates
+	//			would remain the same with ipNewPageInfo rather than the current spatial page info.
+	void translateToNewPageInfo(CPPLetter *pLetters, long nNumLetters,
+		ILongToObjectMapPtr ipNewPageInfoMap = __nullptr);
+	//----------------------------------------------------------------------------------------------
 	// REQUIRE: GetMode != kNonSpatialMode, ipPageInfoMap contains an entry the page the spatial
 	//			string is on.
 	// PURPOSE: Adjusts the coordinates of the raster zone so they are relative to the specified
@@ -480,6 +498,10 @@ private:
 	//			will be considered to be on the same side of the boundary with as those with 
 	//			lower confidence levels. (ie. A boundary of 90 will group characters with OCR
 	//			confidence values 0 - 90 and 91 - 100.
+	//			vbByWord- If VARIANT_TRUE, each word will be returned as a zone having the
+	//			confidence of its least confident letter. For example, if a 5 letter word has
+	//			letter confidence values of 50, 60, 70, 80, and 90 it will be treated as if all
+	//			characters have a confidence of 50.
 	//			ipZoneOCRConfidenceTiers- Returns a vector that specifies which level of OCR
 	//			confidence each raster zone is associated with as the index of the next higher
 	//			boundary in pVecOCRConfidenceBoundaries. For example, if a boundaries of 70 and
@@ -487,8 +509,11 @@ private:
 	//			71 and 90, three zones will be returned with first 2 chars in the first zone,
 	//			the third and fourth char in the second zone, and the last char in the third
 	//			zone.  ppZoneOCRConfidenceLevels will have 3 entries: 0, 1 and 2.
-	IIUnknownVectorPtr getOCRImageRasterZonesGroupedByConfidence(
-		IVariantVectorPtr ipVecOCRConfidenceBoundaries, IVariantVectorPtr &ipZoneOCRConfidenceTiers);
+	//			ppZoneIndices- Returns the character indicies of the start of each new zone
+	//			returned beginning with the index of the first spatial character in the string.
+	IIUnknownVectorPtr getOCRImageRasterZonesGroupedByConfidence(bool bByWord,
+		IVariantVectorPtr ipVecOCRConfidenceBoundaries,
+		IVariantVectorPtr &ipZoneOCRConfidenceTiers, IVariantVectorPtr &ipIndices);
 	//----------------------------------------------------------------------------------------------
 	// REQUIRE: GetMode == kSpatialMode
 	// PURPOSE: Returns a vector of IRasterZones that represent the spatial string where the
@@ -501,6 +526,10 @@ private:
 	//			will be considered to be on the same side of the boundary with as those with 
 	//			lower confidence levels. (ie. A boundary of 90 will group characters with OCR
 	//			confidence values 0 - 90 and 91 - 100.
+	//			vbByWord- If VARIANT_TRUE, each word will be returned as a zone having the
+	//			confidence of its least confident letter. For example, if a 5 letter word has
+	//			letter confidence values of 50, 60, 70, 80, and 90 it will be treated as if all
+	//			characters have a confidence of 50.
 	//			ipZoneOCRConfidenceTiers- Returns a vector that specifies which level of OCR
 	//			confidence each raster zone is associated with as the index of the next higher
 	//			boundary in pVecOCRConfidenceBoundaries. For example, if a boundaries of 70 and
@@ -508,8 +537,11 @@ private:
 	//			71 and 90, three zones will be returned with first 2 chars in the first zone,
 	//			the third and fourth char in the second zone, and the last char in the third
 	//			zone.  ppZoneOCRConfidenceLevels will have 3 entries: 0, 1 and 2.
-	IIUnknownVectorPtr getOriginalImageRasterZonesGroupedByConfidence(
-		IVariantVectorPtr ipVecOCRConfidenceBoundaries, IVariantVectorPtr &ipZoneOCRConfidenceTiers);
+	//			ppZoneIndices- Returns the character indicies of the start of each new zone
+	//			returned beginning with the index of the first spatial character in the string.
+	IIUnknownVectorPtr getOriginalImageRasterZonesGroupedByConfidence(bool bByWord,
+		IVariantVectorPtr ipVecOCRConfidenceBoundaries,
+		IVariantVectorPtr &ipZoneOCRConfidenceTiers, IVariantVectorPtr &ipIndices);
 	//----------------------------------------------------------------------------------------------
 	// REQUIRE: m_eMode != kNonSpatialMode
 	// PURPOSE: To return the first page number for the spatial string
@@ -590,5 +622,11 @@ private:
 	// spatial character on the page specified are on the specified page. If the page is not found,
 	// the last position on what would be the previous page will be returned.
 	long getFirstCharPositionOfPage(long nPageNumber);
+	//----------------------------------------------------------------------------------------------
+	// Removes whitespace in this string and/or appends whitespace around pString in order to allow
+	// pString to be added at position nPos and have appropriate whitespace surrounding it.
+	// Returns the position at which pString is prepared to be added following the adjustments in
+	//whitespace.
+	void setSurroundingWhitespace(UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipString, long& rnPos);
 	//----------------------------------------------------------------------------------------------
 };

@@ -80,7 +80,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\AFCore\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\AFCore\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code;..\..\AFCppUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -131,7 +131,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\AFCore\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\AFCore\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code;..\..\AFCppUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -168,6 +168,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\AFUtils\Code\Helper.cpp" />
     <ClCompile Include="AFConvertVOAToXMLTask.cpp" />
     <ClCompile Include="AFConvertVOAToXMLTaskPP.cpp" />
     <ClCompile Include="AFEngineFileProcessor.cpp">
@@ -189,6 +190,8 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="AFFileProcessorsUtils.cpp" />
+    <ClCompile Include="EnhanceOCRTask.cpp" />
+    <ClCompile Include="EnhanceOCRTaskPP.cpp" />
     <ClCompile Include="RuleSetLoader.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -206,6 +209,8 @@
     <None Include="AFEngineFileProcessor.rgs" />
     <None Include="AFEngineFileProcessorPP.rgs" />
     <None Include="..\..\..\..\ReusableComponents\BaseUtils\Code\res\icon_info.ico" />
+    <None Include="EnhanceOCRTask.rgs" />
+    <None Include="EnhanceOCRTaskPP.rgs" />
     <None Include="res\SelectDocTagArrow.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -229,11 +234,14 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\AFUtils\Code\Helper.h" />
     <ClInclude Include="AFConvertVOAToXMLTask.h" />
     <ClInclude Include="AFConvertVOAToXMLTaskPP.h" />
     <ClInclude Include="AFEngineFileProcessor.h" />
     <ClInclude Include="AFEngineFileProcessorPP.h" />
     <ClInclude Include="AFFileProcessorsUtils.h" />
+    <ClInclude Include="EnhanceOCRTask.h" />
+    <ClInclude Include="EnhanceOCRTaskPP.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>

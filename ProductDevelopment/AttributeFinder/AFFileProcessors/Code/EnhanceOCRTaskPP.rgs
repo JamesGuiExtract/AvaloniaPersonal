@@ -1,0 +1,23 @@
+HKCR
+{
+	AFFileProcessors.EnhanceOCRTaskPP.1 = s 'EnhanceOCRTaskPP Class'
+	{
+		CLSID = s '{73A7E2C0-9BBE-415F-8149-E1C2FE39F6AC}'
+	}
+	AFFileProcessors.EnhanceOCRTaskPP = s 'EnhanceOCRTaskPP Class'
+	{
+		CLSID = s '{73A7E2C0-9BBE-415F-8149-E1C2FE39F6AC}'
+		CurVer = s 'AFFileProcessors.EnhanceOCRTaskPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {73A7E2C0-9BBE-415F-8149-E1C2FE39F6AC} = s 'EnhanceOCRTaskPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

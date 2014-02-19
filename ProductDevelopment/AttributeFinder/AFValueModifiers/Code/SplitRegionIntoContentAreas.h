@@ -108,6 +108,7 @@ public:
 	STDMETHOD(put_IncludeOCRAsTrueSpatialString)(VARIANT_BOOL newVal);
 	STDMETHOD(get_RequiredHorizontalSeparation)(long *pVal);
 	STDMETHOD(put_RequiredHorizontalSeparation)(long newVal);
+	STDMETHOD(ShrinkToFit)(BSTR bstrSourceDocName, long nPage, ILongRectangle* pRect);
 
 // IAttributeModifyingRule
 	STDMETHOD(raw_ModifyValue)(IAttribute *pAttribute, IAFDocument *pOriginInput,
