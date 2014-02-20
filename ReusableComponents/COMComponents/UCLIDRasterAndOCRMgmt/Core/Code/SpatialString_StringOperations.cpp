@@ -802,8 +802,12 @@ STDMETHODIMP CSpatialString::RemoveText(ISpatialString* pTextToRemove, long* pnP
 				// the last index from which a character was identified for removal.
 				if (nPosition == nLetterCount)
 				{
+					if (nLastPosition == 0)
+					{
+						break;
+					}
+
 					nPosition = 0;
-					bLastLetterRemoved = false;
 				}
 
 				CPPLetter &currentLetter = m_vecLetters[nPosition];

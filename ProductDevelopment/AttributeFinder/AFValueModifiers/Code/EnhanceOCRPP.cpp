@@ -75,9 +75,6 @@ LRESULT CEnhanceOCRPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 		m_labelFilterLevel1					= GetDlgItem(IDC_STATIC_FILTER_LABEL1);
 		m_labelFilterLevel2					= GetDlgItem(IDC_STATIC_FILTER_LABEL2);
 		m_labelFilterLevel3					= GetDlgItem(IDC_STATIC_FILTER_LABEL3);
-		m_labelFilterLevel4					= GetDlgItem(IDC_STATIC_FILTER_LABEL4);
-		m_labelFilterLevel5					= GetDlgItem(IDC_STATIC_FILTER_LABEL5);
-		m_labelFilterLevel6					= GetDlgItem(IDC_STATIC_FILTER_LABEL6);
 		m_editCustomerFilters				= GetDlgItem(IDC_EDIT_CUSTOM_FILTERS);
 		m_btnCustomFiltersDocTag			= GetDlgItem(IDC_BTN_CUSTOM_FILTERS_DOC_TAG);
 		m_btnCustomFiltersDocTag.SetIcon(
@@ -96,7 +93,7 @@ LRESULT CEnhanceOCRPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 			m_chkOutputFilteredImages.ShowWindow(SW_SHOW);
 		}
 
-		m_sliderFilterLevel.SetRange(0, 3, TRUE);
+		m_sliderFilterLevel.SetRange(0, 2, TRUE);
 
 		// Load the rule values into the property page.
 		m_editConfidenceCriteria.SetWindowText(asString(ipRule->ConfidenceCriteria).c_str());
@@ -115,11 +112,6 @@ LRESULT CEnhanceOCRPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 			case kHigh:
 				m_radioGeneralFilters.SetCheck(BST_CHECKED);
 				m_sliderFilterLevel.SetPos(2);
-				break;
-
-			case kMax:
-				m_radioGeneralFilters.SetCheck(BST_CHECKED);
-				m_sliderFilterLevel.SetPos(3);
 				break;
 
 			case kHalftoneSpeckled:
@@ -378,7 +370,6 @@ EFilterPackage CEnhanceOCRPP::getSelectedFilterPackage()
 			case 0:	return kLow;
 			case 1:	return kMedium;
 			case 2:	return kHigh;
-			case 3:	return kMax;
 		}
 	}
 	else if (asCppBool(m_radioHalftoneSpeckledFilters.GetCheck() == BST_CHECKED))
@@ -403,14 +394,11 @@ EFilterPackage CEnhanceOCRPP::getSelectedFilterPackage()
 //-------------------------------------------------------------------------------------------------
 void CEnhanceOCRPP::updateUI()
 {
-	bool bEnableFilterSlider = getSelectedFilterPackage() <= kMax;
+	bool bEnableFilterSlider = getSelectedFilterPackage() <= kHigh;
 	m_sliderFilterLevel.EnableWindow(asMFCBool(bEnableFilterSlider));
 	m_labelFilterLevel1.EnableWindow(asMFCBool(bEnableFilterSlider));
 	m_labelFilterLevel2.EnableWindow(asMFCBool(bEnableFilterSlider));
 	m_labelFilterLevel3.EnableWindow(asMFCBool(bEnableFilterSlider));
-	m_labelFilterLevel4.EnableWindow(asMFCBool(bEnableFilterSlider));
-	m_labelFilterLevel5.EnableWindow(asMFCBool(bEnableFilterSlider));
-	m_labelFilterLevel6.EnableWindow(asMFCBool(bEnableFilterSlider));
 
 	bool bEnableCustomFields = (getSelectedFilterPackage() == kCustom);
 	m_editCustomerFilters.EnableWindow(asMFCBool(bEnableCustomFields));

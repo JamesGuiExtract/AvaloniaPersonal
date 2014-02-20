@@ -86,7 +86,7 @@ string g_arrL2Filters[] = {
 	"medium-45",				// Versatile
 	"despeckle",				// Versatile
 	"small-20",					// Aliased diffuse
-	"medium-85"};				// For very diffuse/broken text
+	"medium-85"};				// For heavily shaded regions (see note above)
 //-------------------------------------------------------------------------------------------------
 // Level 3 (or high setting) filter package
 // NOTE: Though the filters medium-85 or medium-15 are not likely to produce good OCR, for the
@@ -103,25 +103,6 @@ string g_arrL3Filters[] = {
 	"small-60",					// Smudged text or text with lines
 	"despeckle",				// Versatile
 	"small-20"};
-//-------------------------------------------------------------------------------------------------
-// Level 4 (or max setting) filter package
-// NOTE: Though the filters medium-85 or medium-15 are not likely to produce good OCR, for the
-// zones they do improve, best results are obtained by running them before most others since
-// running other filters on these zones first sometimes produces incorrect results that have high
-// enough confidence to prevent the correct result from being used later on. These two filters
-// rarely produce OCR results for zones that aren't helped by these filters so they tend to do
-// little harm by being run earlier in the sequence-- the biggest harm is slower performance since
-// these two filters end up being run for any zones that they do not improve.
-string g_arrL4Filters[] = {
-	"medium-45",				// Versatile
-	"medium-85",				// For heavily shaded regions (see note above)
-	"medium-15",				// For very diffuse/broken text (see note above)
-	"small-60",					// Smudged text or text with lines
-	"despeckle",				// Versatile
-	"small-20",					// For aliased or diffuse text.
-	"gaussian-1+medium-15",		// For aliased or diffuse text.
-	"medium-55+large-45",		// Smudged text or text with lines
-	"gaussian-4"};				// Smudged text or text with lines
 //-------------------------------------------------------------------------------------------------
 // Filter package tailored to work best on regions with halftones or speckles.
 string g_arrHalftoneSpeckledFilters[] = {
@@ -959,7 +940,8 @@ ISpatialStringPtr CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc, long nPage)
 
 			// Since the page text will be used against a 1 page filtered copy of the current page,
 			// set as page 1.
-			if (nPage != -1)
+			bool bHasSpatialInfo = asCppBool(ipPageText->HasSpatialInfo());
+			if (bHasSpatialInfo && nPage != -1)
 			{
 				ipPageText->UpdatePageNumber(1);
 				ipPageText->SetPageInfo(1, m_ipCurrentPageInfo);
@@ -971,7 +953,7 @@ ISpatialStringPtr CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc, long nPage)
 
 			// Identify the zones on the the current page to enhance.
 			vector<ILongRectanglePtr> vecRectsToEnhance;
-			if (asCppBool(ipPageText->HasSpatialInfo()))
+			if (bHasSpatialInfo)
 			{
 				vector<ILongRectanglePtr> &vecHighConfZones = removeHighConfidenceText(ipPageText);
 
@@ -1038,18 +1020,25 @@ void CEnhanceOCR::enhanceOCR(IIUnknownVector *pAttributes, IAFDocument *pDoc)
 			continue;
 		}
 
-		IIUnknownVectorPtr ipAttributeLines = ipAttributeValue->GetLines();
-		ASSERT_RESOURCE_ALLOCATION("ELI36515", ipAttributeLines != __nullptr);
+		IIUnknownVectorPtr ipAttributeZones = ipAttributeValue->GetOriginalImageRasterZones();
+		ASSERT_RESOURCE_ALLOCATION("ELI36515", ipAttributeZones != __nullptr);
 
-		// Loop through all lines to sort each by the page on which it is located.
-		long nLineCount = ipAttributeLines->Size();
-		for (long nLine = 0; nLine < nLineCount; nLine++)
+		// Loop through all zones to sort each by the page on which it is located.
+		long nZoneCount = ipAttributeZones->Size();
+		for (long nZone = 0; nZone < nZone; nZone++)
 		{
-			ISpatialStringPtr ipLineValue = ipAttributeLines->At(nLine);
+			IRasterZonePtr ipRasterZone = ipAttributeZones->At(nZone);
+			ASSERT_RESOURCE_ALLOCATION("ELI36678", ipRasterZone != __nullptr);
 
-			long nPage = ipLineValue->GetFirstPageNumber();
+			long nPage = ipRasterZone->GetPageNumber();
 
-			ILongRectanglePtr ipRect = ipLineValue->GetOriginalImageBounds();
+			ILongRectanglePtr ipPageRect(CLSID_LongRectangle);
+			ASSERT_RESOURCE_ALLOCATION("ELI36679", ipPageRect != __nullptr);
+
+			ipPageRect = ipAttributeValue->GetOriginalImagePageBounds(nPage);
+			ASSERT_RESOURCE_ALLOCATION("ELI36680", ipPageRect != __nullptr);
+
+			ILongRectanglePtr ipRect = ipRasterZone->GetRectangularBounds(ipPageRect);
 			ASSERT_RESOURCE_ALLOCATION("ELI36516", ipRect != __nullptr);
 
 			mapZonesToEnhance[nPage].push_back(ipRect);
@@ -1108,6 +1097,15 @@ void CEnhanceOCR::enhanceOCR(IIUnknownVector *pAttributes, IAFDocument *pDoc)
 			}
 
 			applyZoneResults(ipAttributeValue, zoneData);
+
+			if (asCppBool(ipAttributeValue->IsEmpty()))
+			{
+				copyFile(m_strSourceDocName + ".uss", m_strSourceDocName + "output.uss");
+			}
+			else
+			{
+				ipAttributeValue->SaveTo((m_strSourceDocName + "output.uss").c_str(), VARIANT_TRUE, VARIANT_FALSE);
+			}
 		}
 	}
 }
@@ -1240,11 +1238,6 @@ void CEnhanceOCR::initializeFilters()
 		case kHigh:
 			m_pFilters = g_arrL3Filters;
 			m_nFilterCount = sizeof(g_arrL3Filters) / sizeof(string);
-			break;
-
-		case kMax:
-			m_pFilters = g_arrL4Filters;
-			m_nFilterCount = sizeof(g_arrL4Filters) / sizeof(string);
 			break;
 
 		case kHalftoneSpeckled:
@@ -1393,16 +1386,21 @@ ISpatialStringPtr CEnhanceOCR::setCurrentPage(IAFDocumentPtr ipDoc, long nPage)
 		m_cachedDocText.loadObjectFromFile(strUSSFilename);
 
 		// Retrieve the page text (or create an empty value if no page text exists).
-		if (asCppBool(m_cachedDocText.m_obj->HasSpatialInfo()))
+		bool bExistingSpatialInfo = asCppBool(m_cachedDocText.m_obj->HasSpatialInfo());
+		if (bExistingSpatialInfo)
 		{
 			m_ipCurrentPageText = m_cachedDocText.m_obj->GetSpecifiedPages(m_nCurrentPage, m_nCurrentPage);
 			ASSERT_RESOURCE_ALLOCATION("ELI36524", m_ipCurrentPageText != __nullptr);
 
-			m_nAvgPageCharWidth = m_ipCurrentPageText->GetAverageCharWidth();
-
-			m_ipPageInfoMap = m_cachedDocText.m_obj->SpatialPageInfos;
+			bExistingSpatialInfo = asCppBool(m_ipCurrentPageText->HasSpatialInfo());
+			if (bExistingSpatialInfo)
+			{
+				m_nAvgPageCharWidth = m_ipCurrentPageText->GetAverageCharWidth();
+				m_ipPageInfoMap = m_cachedDocText.m_obj->SpatialPageInfos;
+			}
 		}
-		else
+		
+		if (!bExistingSpatialInfo)
 		{
 			m_ipCurrentPageText.CreateInstance(CLSID_SpatialString);
 			ASSERT_RESOURCE_ALLOCATION("ELI36525", m_ipCurrentPageText != __nullptr);
@@ -1667,14 +1665,14 @@ void CEnhanceOCR::eraseImageZones(LeadToolsBitmap &ltBitmap,
 	ltDC.createFromBitmapHandle(ltBitmap.m_hBitmap);
 
 	// Get a white brush and pen.
-	HBRUSH hBrush = CreateSolidBrush(gnCOLOR_WHITE);
+	HBRUSH hBrush = m_brushes.getColoredBrush(gnCOLOR_WHITE);
 	if (SelectObject(ltDC.m_hDC, hBrush) == NULL)
 	{
 		UCLIDException ue("ELI36543", "Failed to set fill color.");
 		ue.addWin32ErrorInfo();
 		throw ue;
 	}
-	HPEN hPen = CreatePen(PS_SOLID, 1, gnCOLOR_WHITE);
+	HPEN hPen = m_pens.getColoredPen(gnCOLOR_WHITE);
 	if (SelectObject(ltDC.m_hDC, hPen) == NULL)
 	{
 		UCLIDException ue("ELI36544", "Failed to set border color.");
@@ -1755,8 +1753,13 @@ void CEnhanceOCR::generateFilteredImage(string strFilter, set<ILongRectanglePtr>
 	L_GetDefaultSaveFileOption(&sfOptions, sizeof(sfOptions));
 	sfOptions.PageNumber = 1;
 
+	// The OCR engine is able to process bitonal images faster and, in most cases, more accurately.
+	// It does seem on some testing that it is more accurate to output in grayscale in some cases
+	// such as for aliased of diffuse text, so this may be worth revisiting if trying to fine-tune
+	// performance.
+	L_INT nCompression = getCompressionFactor(m_apPageBitmap->m_FileInfo.Format);
 	saveImagePage(hBitmapCopy, m_apFilteredBitmapFileName->getName().c_str(),
-		m_apPageBitmap->m_FileInfo, sfOptions);
+		m_apPageBitmap->m_FileInfo.Format, nCompression, 1, sfOptions);
 }
 //--------------------------------------------------------------------------------------------------
 void CEnhanceOCR::applyFilters(pBITMAPHANDLE phBitmap, string strFilters, ILongRectanglePtr ipRect)
@@ -2772,7 +2775,7 @@ void CEnhanceOCR::reset()
 {
 	// Return configurable variables to their default values.
 	m_nConfidenceCriteria = 60;
-	m_eFilterPackage = (UCLID_AFVALUEMODIFIERSLib::EFilterPackage)kHigh;
+	m_eFilterPackage = (UCLID_AFVALUEMODIFIERSLib::EFilterPackage)kMedium;
 	m_strCustomFilterPackage = "";
 	m_strPreferredFormatRegex = "";
 	m_strCharsToIgnore = "_";

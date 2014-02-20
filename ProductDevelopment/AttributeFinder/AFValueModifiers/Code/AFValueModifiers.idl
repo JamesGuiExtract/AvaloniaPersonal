@@ -53,10 +53,8 @@ library UCLID_AFVALUEMODIFIERSLib
 		kLow = 0,
 		// Medium speed and quality.
 		kMedium = 1,
-		// Slow, but good quality.
+		// Slow, but best quality.
 		kHigh = 2,
-		// Very slow, best quality.
-		kMax = 3,
 		// Medium speed, tailored for best results halftone or speckled areas.
 		kHalftoneSpeckled = 4,
 		// Medium speed, tailored for best results aliased or diffuse text.

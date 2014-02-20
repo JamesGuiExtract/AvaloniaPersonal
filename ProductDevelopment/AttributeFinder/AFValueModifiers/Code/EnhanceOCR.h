@@ -14,6 +14,7 @@
 #include <CachedObjectFromFile.h>
 #include <StringLoader.h>
 #include <CommentedTextFileReader.h>
+#include <MiscLeadUtils.h>
 
 #include <string>
 #include <memory>
@@ -394,6 +395,9 @@ private:
 
 	// Used get the regex parser.
 	IMiscUtilsPtr m_ipMiscUtils;
+
+	BrushCollection m_brushes;
+	PenCollection m_pens;
 
 	bool m_bDirty;
 

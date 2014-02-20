@@ -82,9 +82,6 @@ private:
 	ATLControls::CStatic m_labelFilterLevel1;
 	ATLControls::CStatic m_labelFilterLevel2;
 	ATLControls::CStatic m_labelFilterLevel3;
-	ATLControls::CStatic m_labelFilterLevel4;
-	ATLControls::CStatic m_labelFilterLevel5;
-	ATLControls::CStatic m_labelFilterLevel6;
 	ATLControls::CEdit m_editCustomerFilters;
 	ATLControls::CButton m_btnCustomFiltersDocTag;
 	ATLControls::CButton m_btnCustomFiltersBrowse;
