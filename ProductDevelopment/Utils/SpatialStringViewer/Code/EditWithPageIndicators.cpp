@@ -165,8 +165,9 @@ void CEditWithPageIndicators::UpdatePageRuler()
 
 		int nLastVisibleLine = GetLastVisibleLine();
 
-        // Get the last position on the last visible line
-		nLastPos = LineIndex(nLastVisibleLine) + LineLength(nLastVisibleLine) - 1;
+        // Get the first character of the last line since just interested in the page number
+		// all the characters on the last line will have the same page number
+		nLastPos =  LineIndex(nLastVisibleLine);
 	
 		int nCurrPage = getPageAtPos(nFirstPos);
 		int nTopPage = nCurrPage;

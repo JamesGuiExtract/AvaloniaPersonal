@@ -345,6 +345,9 @@ BOOL CSpatialStringViewerDlg::OnInitDialog()
 		loadSpatialStringFromFile();
 		configureToolBarButtons();
 
+        // Set the postion to the first character
+		m_editText.SetSel(0,0);
+
 		// Set focus to edit text control
 		m_editText.SetFocus();
 	}
@@ -982,7 +985,7 @@ void CSpatialStringViewerDlg::loadSpatialStringFromFile()
 			{
 				m_nLastPageNumber = m_ipSpatialString->GetLastPageNumber();
 			}
-
+			
 			// Update the caption
 			updateWindowCaption( m_strUSSFileName );
 			configureToolBarButtons();
@@ -1014,6 +1017,10 @@ void CSpatialStringViewerDlg::loadSpatialStringFromFile()
 		{
 			string strText = m_ipSpatialString->String;
 			m_editText.SetWindowText(strText.c_str());
+
+            // Set position to first character and set focus to edit control
+			m_editText.SetSel(0,0);
+			m_editText.SetFocus();
 		}
 }
 //-------------------------------------------------------------------------------------------------
