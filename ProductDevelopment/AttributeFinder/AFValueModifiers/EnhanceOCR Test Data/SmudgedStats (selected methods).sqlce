@@ -1,0 +1,28 @@
+SELECT Process.Name, AVG(TestResult.Accuracy) AS Accuracy, AVG(TestResult.Confidence) AS Confidence,
+	MAX(TestResult.Accuracy - OriginalResult.Accuracy) AS MaxImprovement,
+	SUM(CASE WHEN TestResult.Accuracy > OriginalResult.Accuracy THEN 1 ELSE 0 END) AS CountImproved
+		FROM TestResult
+	INNER JOIN Process ON ProcessID = Process.ID
+	INNER JOIN (SELECT Accuracy, TestID FROM TestResult WHERE ProcessID = 1)
+		AS OriginalResult ON OriginalResult.TestID = TestResult.TestID
+	WHERE TestCategoryID = 5
+	GROUP BY Process.Name
+	HAVING Process.Name = 'medium-45'
+	OR Process.Name = 'median-3'
+	OR Process.Name = 'gaussian-1+medium-15'
+	OR Process.Name = 'small-60'
+	OR Process.Name = 'small-20'
+	OR Process.Name = 'gaussian-8->medium-55'
+	OR Process.Name = 'gaussian-1'
+	OR Process.Name = 'gaussian-2'
+	OR Process.Name = 'gaussian-4'
+	OR Process.Name = 'medium-55->large-45'
+	OR Process.Name = 'medium-45+large-55'
+	OR Process.Name = 'medium-30'
+	OR Process.Name = 'medium-40'
+	OR Process.Name = 'medium-50'
+	OR Process.Name = 'medium-55'
+	OR Process.Name = 'small-25'
+	OR Process.Name = 'small-50'
+	OR Process.Name = 'original'
+	OR Process.Name LIKE 'EnhanceOCR%'

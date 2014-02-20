@@ -1,0 +1,1 @@
+If Patient is African American multiply result by 1.21

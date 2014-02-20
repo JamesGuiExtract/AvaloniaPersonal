@@ -1,0 +1,9 @@
+SELECT Process.Name, AVG(TestResult.Accuracy) AS Accuracy, AVG(TestResult.Confidence) AS Confidence,
+	MAX(TestResult.Accuracy - OriginalResult.Accuracy) AS MaxImprovement,
+	SUM(CASE WHEN TestResult.Accuracy > OriginalResult.Accuracy THEN 1 ELSE 0 END) AS CountImproved
+		FROM TestResult
+	INNER JOIN Process ON ProcessID = Process.ID
+	INNER JOIN (SELECT Accuracy, TestID FROM TestResult WHERE ProcessID = 1)
+		AS OriginalResult ON OriginalResult.TestID = TestResult.TestID
+	WHERE TestCategoryID = 4
+	GROUP BY Process.Name
