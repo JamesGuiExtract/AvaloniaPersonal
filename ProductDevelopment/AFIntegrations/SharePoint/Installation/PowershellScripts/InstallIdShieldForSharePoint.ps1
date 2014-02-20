@@ -14,37 +14,43 @@ if (-not (Check-SolutionExists $ExtractSP))
 {
 	Write-Host "Adding Extract common feature to the farm..." -ForegroundColor Green
 	Add-SPSolution $ExtractSPfp -ErrorAction Stop | Out-Null
-	iisreset
 }
 
 if (-not (Check-SolutionDeployed $ExtractSP))
 {
 	Write-Host "Deploying Extract common feature..." -ForegroundColor Green
 	Install-SPSolution $ExtractSP -GACDeployment -Confirm:$false  -ErrorAction Stop
-	iisreset
+	
+	#Wait for solution to be deployed
+	while (-not (Check-SolutionDeployed $ExtractSP))
+	{
+		Start-Sleep -Seconds 30
+		Write-Host "--> Checking if Extract Systems common feature has been deployed..." -ForegroundColor Yellow
+	}
 }
 
 if (-not (Check-SolutionExists $IDShieldSP))
 {
 	Write-Host "Adding ID Shield for SharePoint to farm..." -ForegroundColor Green
 	Add-SPSolution $IDShieldSPfp  -ErrorAction Stop | Out-Null
-	iisreset
 }
 
 if (-not (Check-SolutionDeployed $IDShieldSP))
 {
 	Write-Host "Deploying ID Shield for SharePoint..." -ForegroundColor Green
 	Install-SPSolution $IDShieldSP -GACDeployment -Confirm:$false  -ErrorAction Stop
-	iisreset
+	
+	#Wait for solution to be deployed
+	while (-not (Check-SolutionDeployed $IDShieldSP))
+	{
+		Start-Sleep -Seconds 30
+		Write-Host "--> Checking if Extract Systems ID Shield feature has been deployed..." -ForegroundColor Yellow
+	}
 }
-
-iisreset
-
-Stop-TimerService
 
 Write-Host "Installing ID Shield timer jobs..." -ForegroundColor Green
 Create-NewTimerJob "Extract.SharePoint.Redaction" "Extract.SharePoint.Redaction.IDShieldFolderSweeper" "ID Shield Disk To SharePoint"
 Create-NewTimerJob "Extract.SharePoint.Redaction" "Extract.SharePoint.Redaction.IDShieldFileExporter" "ID Shield SharePoint To Disk"
 Write-Host "ID Shield timer jobs installed..." -ForegroundColor Green
-Start-TimerService
+
 

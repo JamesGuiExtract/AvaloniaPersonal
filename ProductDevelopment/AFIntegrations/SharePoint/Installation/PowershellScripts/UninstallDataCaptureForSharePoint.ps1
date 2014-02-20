@@ -26,7 +26,7 @@ if (Check-SolutionExists $ExtractDCSP)
 		while (Check-SolutionDeployed $ExtractDCSP)
 		{
 			Start-Sleep 30
-			Write-Host "--> Checking if Extract Data Capture for SharePoint has been undeployed..." -ForegroundColor Gray
+			Write-Host "--> Checking if Extract Data Capture for SharePoint has been undeployed..." -ForegroundColor Yellow
 		}
 	}
 	
@@ -36,7 +36,7 @@ if (Check-SolutionExists $ExtractDCSP)
 	while (Check-SolutionExists $ExtractDCSP)
 	{
 		Start-Sleep 30
-		Write-Host "--> Checking if Extract Data Capture for SharePoint has been removed..." -ForegroundColor Gray
+		Write-Host "--> Checking if Extract Data Capture for SharePoint has been removed..." -ForegroundColor Yellow
 	}
 }
 
@@ -52,7 +52,7 @@ if ((-not (Check-SolutionExists $IDShieldSP)) `
 		while (Check-SolutionDeployed $ExtractSP)
 		{
 			Start-Sleep 30
-			Write-Host "--> Checking if Extract Systems common feature has been undeployed..." -ForegroundColor Gray
+			Write-Host "--> Checking if Extract Systems common feature has been undeployed..." -ForegroundColor Yellow
 		}
 	}
 	
@@ -62,8 +62,7 @@ if ((-not (Check-SolutionExists $IDShieldSP)) `
 	while (Check-SolutionExists $ExtractSP)
 	{
 		Start-Sleep 30
-		Write-Host "--> Checking if Extract Systems common feature has been removed..." -ForegroundColor Gray
+		Write-Host "--> Checking if Extract Systems common feature has been removed..." -ForegroundColor Yellow
 	}
 }
 
-iisreset

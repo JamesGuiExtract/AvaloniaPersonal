@@ -8,12 +8,10 @@ $ExtractSP = "Extract.SharePoint.wsp"
 $IDShieldSP = "Extract.SharePoint.Redaction.wsp"
 $ExtractDCSP = "Extract.SharePoint.DataCapture.wsp"
 
-Stop-TimerService
 Write-Host "Removing ID Shield timer jobs..." -ForegroundColor Green
 Delete-TimerJob "ID Shield Disk To SharePoint"
 Delete-TimerJob "ID Shield SharePoint To Disk"
 Write-Host "ID Shield timer jobs removed..." -ForegroundColor Green
-Start-TimerService
 
 if (Check-SolutionExists $IDShieldSP)
 {
@@ -25,7 +23,7 @@ if (Check-SolutionExists $IDShieldSP)
 		while (Check-SolutionDeployed $IDShieldSP)
 		{
 			Start-Sleep 30
-			Write-Host "--> Checking if ID Shield for SharePoint has been undeployed..." -ForegroundColor Gray
+			Write-Host "--> Checking if ID Shield for SharePoint has been undeployed..." -ForegroundColor Yellow
 		}
 	}
 	
@@ -35,7 +33,7 @@ if (Check-SolutionExists $IDShieldSP)
 	while (Check-SolutionExists $IDShieldSP)
 	{
 		Start-Sleep 30
-		Write-Host "--> Checking if ID Shield for SharePoint has been removed..." -ForegroundColor Gray
+		Write-Host "--> Checking if ID Shield for SharePoint has been removed..." -ForegroundColor Yellow
 	}
 }
 
@@ -51,7 +49,7 @@ if ((-not (Check-SolutionExists $ExtractDCSP)) `
 		while (Check-SolutionDeployed $ExtractSP)
 		{
 			Start-Sleep 30
-			Write-Host "--> Checking if Extract Systems common feature has been undeployed..." -ForegroundColor Gray
+			Write-Host "--> Checking if Extract Systems common feature has been undeployed..." -ForegroundColor Yellow
 		}
 	}
 	
@@ -61,8 +59,7 @@ if ((-not (Check-SolutionExists $ExtractDCSP)) `
 	while (Check-SolutionExists $ExtractSP)
 	{
 		Start-Sleep 30
-		Write-Host "--> Checking if Extract Systems common feature has been removed..." -ForegroundColor Gray
+		Write-Host "--> Checking if Extract Systems common feature has been removed..." -ForegroundColor Yellow
 	}
 }
 
-iisreset
