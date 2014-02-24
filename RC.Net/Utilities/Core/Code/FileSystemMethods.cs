@@ -1408,10 +1408,22 @@ namespace Extract.Utilities
                     {
                         // Get the values from the registry
                         var key = Registry.LocalMachine.OpenSubKey(_FILE_ACCESS_KEY);
-                        var accessRetries = key.GetValue("FileAccessRetries", "50").ToString();
-                        _fileAccessRetries = int.Parse(accessRetries, CultureInfo.InvariantCulture);
-                        var sleepTime = key.GetValue("FileAccessTimeout", "250").ToString();
-                        _fileAccessRetrySleepTime = int.Parse(sleepTime, CultureInfo.InvariantCulture);
+                        if (key == null)
+                        {
+                            // [ISSUE-11999]
+                            // If _FILE_ACCESS_KEY is missing, use default values. Otherwise
+                            // unprivileged users will get exceptions if administrator users haven't
+                            // already run applications that generated the key.
+                            _fileAccessRetries = 50;
+                            _fileAccessRetrySleepTime = 250;
+                        }
+                        else
+                        {
+                            var accessRetries = key.GetValue("FileAccessRetries", "50").ToString();
+                            _fileAccessRetries = int.Parse(accessRetries, CultureInfo.InvariantCulture);
+                            var sleepTime = key.GetValue("FileAccessTimeout", "250").ToString();
+                            _fileAccessRetrySleepTime = int.Parse(sleepTime, CultureInfo.InvariantCulture);
+                        }
                     }
                 }
             }

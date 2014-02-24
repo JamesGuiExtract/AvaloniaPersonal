@@ -1025,7 +1025,7 @@ void CEnhanceOCR::enhanceOCR(IIUnknownVector *pAttributes, IAFDocument *pDoc)
 
 		// Loop through all zones to sort each by the page on which it is located.
 		long nZoneCount = ipAttributeZones->Size();
-		for (long nZone = 0; nZone < nZone; nZone++)
+		for (long nZone = 0; nZone < nZoneCount; nZone++)
 		{
 			IRasterZonePtr ipRasterZone = ipAttributeZones->At(nZone);
 			ASSERT_RESOURCE_ALLOCATION("ELI36678", ipRasterZone != __nullptr);
@@ -1097,15 +1097,6 @@ void CEnhanceOCR::enhanceOCR(IIUnknownVector *pAttributes, IAFDocument *pDoc)
 			}
 
 			applyZoneResults(ipAttributeValue, zoneData);
-
-			if (asCppBool(ipAttributeValue->IsEmpty()))
-			{
-				copyFile(m_strSourceDocName + ".uss", m_strSourceDocName + "output.uss");
-			}
-			else
-			{
-				ipAttributeValue->SaveTo((m_strSourceDocName + "output.uss").c_str(), VARIANT_TRUE, VARIANT_FALSE);
-			}
 		}
 	}
 }
@@ -1506,16 +1497,13 @@ vector<ILongRectanglePtr> CEnhanceOCR::removeHighConfidenceText(ISpatialStringPt
 	// to treat letters on this boundary as having good enough OCR, so subtract 1.
 	ipBoundaries->PushBack(_variant_t(m_nConfidenceCriteria - 1));
 
-	IVariantVector *pTiers;
-	IVariantVector *pIndices;
+	IVariantVectorPtr ipTiers(__nullptr);
+	IVariantVectorPtr ipIndices(__nullptr);
 	IIUnknownVectorPtr ipZones =
 		ipPageText->GetOriginalImageRasterZonesGroupedByConfidence(ipBoundaries,
-		VARIANT_TRUE, &pTiers, &pIndices);
+		VARIANT_TRUE, &ipTiers, &ipIndices);
 
-	IVariantVectorPtr ipTiers(pTiers);
 	ASSERT_RESOURCE_ALLOCATION("ELI36535", ipTiers != __nullptr);
-
-	IVariantVectorPtr ipIndices(pIndices);
 	ASSERT_RESOURCE_ALLOCATION("ELI36536", ipIndices != __nullptr);
 
 	// Iterate each returned section of text in order to sort into high and low confidence; the
@@ -1933,7 +1921,8 @@ void CEnhanceOCR::applyFilter(pBITMAPHANDLE pBitmap, L_INT nDim, const L_INT pFi
 {
 	long nCells = nDim * nDim;
 	long nStructSize = SPATIALFLTSIZE(nDim);
-	pSPATIALFLT pSpatialFilter = (pSPATIALFLT) new char[nStructSize];
+	unique_ptr<char> apSpatialFilter(new char[nStructSize]);
+	pSPATIALFLT pSpatialFilter = (pSPATIALFLT)apSpatialFilter.get();
 	ZeroMemory(pSpatialFilter, nStructSize);
 	pSpatialFilter->uStructSize = sizeof(SPATIALFLT);
 	pSpatialFilter->fltDim = nDim;
