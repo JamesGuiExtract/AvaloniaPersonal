@@ -377,7 +377,11 @@ function InstallInliteKeyDrivers()
 begin    
 	SdShowMsg("Setup is Installing Inlite drivers.", TRUE);
 	szProgram = SUPPORTDIR ^ "\\CbSetup.exe";
-	LAAW_SHELLEXECUTEVERB = "runas";
+    
+	if (SYSINFO.nOSMajor >= 6)  then
+		LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
+	endif
+		
 	LaunchAppAndWait(szProgram, "/Q /CRYPTOKEN", LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);
 	
 	szProgram = SUPPORTDIR ^ INLITE_INSTALLER_EXE;
@@ -401,7 +405,10 @@ function UninstallInliteKeyDrivers()
 begin       
   	SdShowMsg("Setup is Uninstalling Inlite drivers.", TRUE);
    
-	LAAW_SHELLEXECUTEVERB = "runas";
+	if (SYSINFO.nOSMajor >= 6)  then
+		LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
+	endif
+	
    	szProgram = SUPPORTDIR ^ "\\CBSetup.exe";
 	LaunchAppAndWait(szProgram, "/Q /U /CRYPTOKEN", LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
 
@@ -434,8 +441,11 @@ STRING szProgram, szCmdLine;
 int nResult, svServiceState;
 begin
 	SdShowMsg("Setup is Installing Crystal Reports 12 Runtime", TRUE);
-	LAAW_SHELLEXECUTEVERB = "runas";
-	
+
+	if (SYSINFO.nOSMajor >= 6)  then
+		LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
+	endif
+		
 	// Install Crystal Reports
 	szProgram = "msiexec";
 	szCmdLine = " /qn /i " + SUPPORTDIR ^ "\\CRRuntime_12_1_mlb.msi";

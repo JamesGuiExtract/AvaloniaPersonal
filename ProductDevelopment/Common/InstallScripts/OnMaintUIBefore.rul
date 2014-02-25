@@ -102,8 +102,10 @@ Dlg_SdFeatureTree:
 		    	// Delete all lst files
   			  	DeleteFile(PROGRAMFILES + EXTRACT_DIR + "\\*.LST");
 
-				LAAW_SHELLEXECUTEVERB = "runas";  
-  
+				if (SYSINFO.nOSMajor >= 6)  then
+					LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
+				endif  
+				
 			    // Unregister Dlls
 				szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\UnegisterAll.bat\"";
 				szCmd = "cmd";

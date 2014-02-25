@@ -42,7 +42,9 @@ function OnFirstUIAfter()
     BOOL bOpt1, bOpt2;    
 begin
 	if (gbInstalled) then
-		LAAW_SHELLEXECUTEVERB = "runas";
+	    if (SYSINFO.nOSMajor >= 6)  then
+			LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
+		endif
 		
 		// Removed Corepoint install because not sure if silent install works properley
    		//InstallCorepoint();
@@ -55,8 +57,11 @@ begin
 
 	   	// Rename the uex file
  	  	RenameUEXFile();
-                                                                                                                              
-        LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
+        
+        if (SYSINFO.nOSMajor >= 6)  then
+			LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
+		endif
+		
 	    // Register Dlls
 		szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\RegisterAll.bat\"";
 		szCmd = "cmd";

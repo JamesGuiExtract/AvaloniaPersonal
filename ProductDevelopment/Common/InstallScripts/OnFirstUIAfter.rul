@@ -16,8 +16,10 @@ begin
    	// Rename the uex file
    	RenameUEXFile();
 
-   	LAAW_SHELLEXECUTEVERB = "runas";
-                                                                                                                              
+	if (SYSINFO.nOSMajor >= 6)  then
+		LAAW_SHELLEXECUTEVERB = "runas";
+    endif
+	
     // Register Dlls
 	szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\RegisterAll.bat\"";
 	szCmd = "cmd";
