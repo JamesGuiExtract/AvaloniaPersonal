@@ -60,6 +60,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PageCountCondition.cs" />
+    <Compile Include="PageCountConditionSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PageCountConditionSettingsDialog.Designer.cs">
+      <DependentUpon>PageCountConditionSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="FileTimestampCondition.cs" />
     <Compile Include="DocumentTypeCondition.cs" />
     <Compile Include="DocumentTypeConditionSettingsDialog.cs">
@@ -126,6 +133,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="PageCountConditionSettingsDialog.resx">
+      <DependentUpon>PageCountConditionSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DocumentTypeConditionSettingsDialog.resx">
       <DependentUpon>DocumentTypeConditionSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
