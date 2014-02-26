@@ -380,7 +380,7 @@ begin
     
 	if (SYSINFO.nOSMajor >= 6)  then
 		LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
-	endif
+	endif;
 		
 	LaunchAppAndWait(szProgram, "/Q /CRYPTOKEN", LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);
 	
@@ -407,7 +407,7 @@ begin
    
 	if (SYSINFO.nOSMajor >= 6)  then
 		LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
-	endif
+	endif;
 	
    	szProgram = SUPPORTDIR ^ "\\CBSetup.exe";
 	LaunchAppAndWait(szProgram, "/Q /U /CRYPTOKEN", LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
@@ -444,7 +444,7 @@ begin
 
 	if (SYSINFO.nOSMajor >= 6)  then
 		LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
-	endif
+	endif;
 		
 	// Install Crystal Reports
 	szProgram = "msiexec";

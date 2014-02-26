@@ -18,7 +18,7 @@ begin
 
 	if (SYSINFO.nOSMajor >= 6)  then
 		LAAW_SHELLEXECUTEVERB = "runas";
-    endif
+    endif;
 	
     // Register Dlls
 	szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\RegisterAll.bat\"";

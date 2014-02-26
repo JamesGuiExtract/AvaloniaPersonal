@@ -44,7 +44,7 @@ begin
 	if (gbInstalled) then
 	    if (SYSINFO.nOSMajor >= 6)  then
 			LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
-		endif
+		endif;
 		
 		// Removed Corepoint install because not sure if silent install works properley
    		//InstallCorepoint();
@@ -60,7 +60,7 @@ begin
         
         if (SYSINFO.nOSMajor >= 6)  then
 			LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
-		endif
+		endif;
 		
 	    // Register Dlls
 		szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\RegisterAll.bat\"";

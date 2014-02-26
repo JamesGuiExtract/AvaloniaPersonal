@@ -104,7 +104,7 @@ Dlg_SdFeatureTree:
 
 				if (SYSINFO.nOSMajor >= 6)  then
 					LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
-				endif  
+				endif; 
 				
 			    // Unregister Dlls
 				szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\UnegisterAll.bat\"";
