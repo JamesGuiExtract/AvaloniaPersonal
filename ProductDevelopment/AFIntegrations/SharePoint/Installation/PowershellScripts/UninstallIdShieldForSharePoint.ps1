@@ -13,6 +13,10 @@ Delete-TimerJob "ID Shield Disk To SharePoint"
 Delete-TimerJob "ID Shield SharePoint To Disk"
 Write-Host "ID Shield timer jobs removed..." -ForegroundColor Green
 
+#Restart the timer service - this is to clear the old timer jobs from the cache
+Stop-TimerService
+Start-TimerService
+
 if (Check-SolutionExists $IDShieldSP)
 {
 	if (Check-SolutionDeployed $IDShieldSP)
@@ -20,11 +24,7 @@ if (Check-SolutionExists $IDShieldSP)
 		Write-Host "Undeploying ID Shield for SharePoint..." -ForegroundColor Green
 		Uninstall-SPSolution $IDShieldSP -Confirm:$false -ErrorAction Stop
 		
-		while (Check-SolutionDeployed $IDShieldSP)
-		{
-			Start-Sleep 30
-			Write-Host "--> Checking if ID Shield for SharePoint has been undeployed..." -ForegroundColor Yellow
-		}
+		WaitForJobToFinish($IDShieldSP)
 	}
 	
 	Write-Host "Removing ID Shield for SharePoint..." -ForegroundColor Green
@@ -45,12 +45,8 @@ if ((-not (Check-SolutionExists $ExtractDCSP)) `
 	{
 		Write-Host "Undeploying Extract Systems common feature..." -ForegroundColor Green
 		Uninstall-SPSolution $ExtractSP -Confirm:$false -ErrorAction Stop
-		
-		while (Check-SolutionDeployed $ExtractSP)
-		{
-			Start-Sleep 30
-			Write-Host "--> Checking if Extract Systems common feature has been undeployed..." -ForegroundColor Yellow
-		}
+
+		WaitForJobToFinish($ExtractSP)
 	}
 	
 	Write-Host "Removing Extract Systems common feature..." -ForegroundColor Green

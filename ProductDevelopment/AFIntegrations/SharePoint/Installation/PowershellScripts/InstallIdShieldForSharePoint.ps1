@@ -21,12 +21,7 @@ if (-not (Check-SolutionDeployed $ExtractSP))
 	Write-Host "Deploying Extract common feature..." -ForegroundColor Green
 	Install-SPSolution $ExtractSP -GACDeployment -Confirm:$false  -ErrorAction Stop
 	
-	#Wait for solution to be deployed
-	while (-not (Check-SolutionDeployed $ExtractSP))
-	{
-		Start-Sleep -Seconds 30
-		Write-Host "--> Checking if Extract Systems common feature has been deployed..." -ForegroundColor Yellow
-	}
+	WaitForJobToFinish($ExtractSP)
 }
 
 if (-not (Check-SolutionExists $IDShieldSP))
@@ -40,12 +35,7 @@ if (-not (Check-SolutionDeployed $IDShieldSP))
 	Write-Host "Deploying ID Shield for SharePoint..." -ForegroundColor Green
 	Install-SPSolution $IDShieldSP -GACDeployment -Confirm:$false  -ErrorAction Stop
 	
-	#Wait for solution to be deployed
-	while (-not (Check-SolutionDeployed $IDShieldSP))
-	{
-		Start-Sleep -Seconds 30
-		Write-Host "--> Checking if Extract Systems ID Shield feature has been deployed..." -ForegroundColor Yellow
-	}
+	WaitForJobToFinish($IDShieldSP)
 }
 
 Write-Host "Installing ID Shield timer jobs..." -ForegroundColor Green

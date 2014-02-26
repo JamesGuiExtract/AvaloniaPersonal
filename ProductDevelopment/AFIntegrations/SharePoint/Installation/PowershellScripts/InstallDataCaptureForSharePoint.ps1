@@ -21,12 +21,7 @@ if (-not (Check-SolutionDeployed $ExtractSP))
 	Write-Host "Deploying Extract common feature..." -ForegroundColor Green
 	Install-SPSolution $ExtractSP -GACDeployment -Confirm:$false -ErrorAction Stop
 	
-	#Wait for solution to be deployed
-	while (-not (Check-SolutionDeployed $ExtractSP))
-	{
-		Start-Sleep -Seconds 30
-		Write-Host "--> Checking if Extract Systems common feature has been deployed..." -ForegroundColor Yellow
-	}
+	WaitForJobToFinish($ExtractSP)
 }
 
 if (-not (Check-SolutionExists $ExtractDCSP))
@@ -40,12 +35,7 @@ if (-not (Check-SolutionDeployed $ExtractDCSP))
 	Write-Host "Deploying Data Capture for SharePoint..." -ForegroundColor Green
 	Install-SPSolution $ExtractDCSP -GACDeployment -Confirm:$false -ErrorAction Stop
 	
-	#Wait for solution to be deployed
-	while (-not (Check-SolutionDeployed $ExtractDCSP))
-	{
-		Start-Sleep -Seconds 30
-		Write-Host "--> Checking if Extract Systems Data Capture feature has been deployed..." -ForegroundColor Yellow
-	}
+	WaitForJobToFinish($ExtractDCSP)
 }
 
 Write-Host "Installing Data Capture timer jobs..." -ForegroundColor Green

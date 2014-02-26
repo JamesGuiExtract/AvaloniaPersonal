@@ -8,11 +8,14 @@ $ExtractSP = "Extract.SharePoint.wsp"
 $IDShieldSP = "Extract.SharePoint.Redaction.wsp"
 $ExtractDCSP = "Extract.SharePoint.DataCapture.wsp"
 
-Stop-TimerService
+
 Write-Host "Removing Data Capture timer jobs..." -ForegroundColor Green
 Delete-TimerJob "Data Capture Disk To SharePoint"
 Delete-TimerJob "Data Capture SharePoint To Disk"
 Write-Host "Data Capture timer jobs removed..." -ForegroundColor Green
+
+# Restart the timer service to unload the deleted jobs
+Stop-TimerService
 Start-TimerService
 
 
@@ -22,12 +25,8 @@ if (Check-SolutionExists $ExtractDCSP)
 	{
 		Write-Host "Undeploying Extract Data Capture for SharePoint..." -ForegroundColor Green
 		Uninstall-SPSolution $ExtractDCSP -Confirm:$false -ErrorAction Stop
-				
-		while (Check-SolutionDeployed $ExtractDCSP)
-		{
-			Start-Sleep 30
-			Write-Host "--> Checking if Extract Data Capture for SharePoint has been undeployed..." -ForegroundColor Yellow
-		}
+		
+		WaitForJobToFinish($ExtractDCSP)
 	}
 	
 	Write-Host "Removing Extract Data Capture for SharePoint..." -ForegroundColor Green
@@ -49,11 +48,7 @@ if ((-not (Check-SolutionExists $IDShieldSP)) `
 		Write-Host "Undeploying Extract Systems common feature..." -ForegroundColor Green
 		Uninstall-SPSolution $ExtractSP -Confirm:$false -ErrorAction Stop
 		
-		while (Check-SolutionDeployed $ExtractSP)
-		{
-			Start-Sleep 30
-			Write-Host "--> Checking if Extract Systems common feature has been undeployed..." -ForegroundColor Yellow
-		}
+		WaitForJobToFinish($ExtractSP)
 	}
 	
 	Write-Host "Removing Extract Systems common feature..." -ForegroundColor Green

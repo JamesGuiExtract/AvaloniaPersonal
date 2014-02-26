@@ -67,7 +67,7 @@ function Stop-TimerService()
 	Stop-Service "SPTimerV4"
 	while ((Get-Service -Name "SPTimerV4").Status -ne "Stopped")
 	{
-		Write-Host "Waiting for timer service to stop..." -ForegroundColor Green
+		Write-Host "Waiting for timer service to stop..." -ForegroundColor Yellow
 		Start-Sleep 2
 	}
 }
@@ -79,7 +79,7 @@ function Start-TimerService()
 	Start-Service "SPTimerV4"
 	while((Get-Service -Name "SPTimerV4").Status -ne "Running")
 	{
-		Write-Host "Waiting for timer service to start..." -ForegroundColor Green
+		Write-Host "Waiting for timer service to start..." -ForegroundColor Yellow
 		Start-Sleep 2
 	}
 }
@@ -125,5 +125,33 @@ function Create-NewTimerJob([string]$assemblyName, [string]$timerJobClass, [stri
 		$sched.Interval = 1
 		$job.Schedule = $sched
 		$job.Update()
+	}
+}
+
+# Create WaitForJobToFinish Function/
+function WaitForJobToFinish([string]$SolutionFileName)
+{
+	$JobName = "*solution-deployment*$SolutionFileName*"
+	$job = Get-SPTimerJob | ?{ $_.Name -like $JobName}
+	$JobName = $job.Name	
+	
+	Write-Host -f yellow "JobName: " $JobName
+
+	if ($job -eq $null)
+	{ 
+		Write-Host -f yellow '-->Job has already finished.' 
+	}
+	else
+	{
+		$JobFullName = $job.Name
+		Write-Host -f yellow -NoNewLine "-->Waiting to finish job $JobFullName"
+		
+		while ((Get-SPTimerJob $JobFullName) -ne $null)
+		{ 
+			Write-Host -f yellow -NoNewLine "."
+			Start-Sleep -Seconds 2
+		}
+		Write-Host -f Yellow ""
+		Write-Host -f yellow "Finished waiting for job.."
 	}
 }
