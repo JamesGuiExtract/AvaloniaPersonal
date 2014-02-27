@@ -1,7 +1,9 @@
-﻿using Extract.Interop;
+﻿using Extract.Imaging;
+using Extract.Interop;
 using Extract.Licensing;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
@@ -76,6 +78,14 @@ namespace Extract.FileActionManager.Conditions
         /// The <see langword="int"/> that should be compared to a document's page count.
         /// </value>
         int PageCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the page count from the database should be used, if available.
+        /// </summary>
+        /// <value> <see langword="true"/> if the page count from the database should be used;
+        /// <see langword="false"/> if the condition should always check the file itself.
+        /// </value>
+        bool UseDBPageCount { get; set; }
     }
 
     /// <summary>
@@ -84,7 +94,7 @@ namespace Extract.FileActionManager.Conditions
     [ComVisible(true)]
     [Guid("5AE230C8-2375-44CD-8F20-EE0D089BF07B")]
     [ProgId("Extract.FileActionManager.Conditions.PageCountCondition")]
-    public class PageCountCondition : IPageCountCondition
+    public class PageCountCondition : IPageCountCondition, IDisposable
     {
         #region Constants
 
@@ -95,8 +105,9 @@ namespace Extract.FileActionManager.Conditions
 
         /// <summary>
         /// Current task version.
+        /// Version 2: Added UseDBPageCount
         /// </summary>
-        internal const int _CURRENT_VERSION = 1;
+        internal const int _CURRENT_VERSION = 2;
 
         #endregion Constants
 
@@ -114,11 +125,22 @@ namespace Extract.FileActionManager.Conditions
         int _pageCount;
 
         /// <summary>
+        /// Indicates whether the page count from the database should be used, if available.
+        /// </summary>
+        bool _useDBPageCount = true;
+
+        /// <summary>
         /// <see langword="true"/> if changes have been made to
         /// <see cref="PageCountCondition"/> since it was created;
         /// <see langword="false"/> if no changes have been made since it was created.
         /// </summary>
         bool _dirty;
+
+        /// <summary>
+        /// An <see cref="ImageCodecs"/> instance used to check page count if the associated
+        /// <see cref="FileRecord"/> does not contain the page count.
+        /// </summary>
+        ImageCodecs _codecs;
 
         #endregion Fields
 
@@ -222,6 +244,36 @@ namespace Extract.FileActionManager.Conditions
             }
         }
 
+        /// <summary>
+        /// Gets or sets whether the page count from the database should be used, if available.
+        /// </summary>
+        /// <value> <see langword="true"/> if the page count from the database should be used;
+        /// <see langword="false"/> if the condition should always check the file itself.
+        /// </value>
+        public bool UseDBPageCount
+        {
+            get
+            {
+                return _useDBPageCount;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _useDBPageCount)
+                    {
+                        _useDBPageCount = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI36707");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Public Methods
@@ -276,32 +328,58 @@ namespace Extract.FileActionManager.Conditions
 
                 ValidateSettings();
 
+                int documentPageCount = UseDBPageCount ? pFileRecord.Pages : 0;
+
+                // https://extract.atlassian.net/browse/ISSUE-12030
+                // When the condition is being used during queuing or the page count check was
+                // skipped during queuing we will need to manually check for the number of pages.
+                if (documentPageCount == 0)
+                {
+                    if (!File.Exists(pFileRecord.Name))
+                    {
+                        var ee = new ExtractException("ELI36706",
+                            "Cannot check page count of non-existant document.");
+                        ee.AddDebugData("SourceDocName", pFileRecord.Name, false);
+                        throw ee;
+                    }
+
+                    if (_codecs == null)
+                    {
+                        _codecs = new ImageCodecs();
+                    }
+
+                    using (var imageReader = _codecs.CreateReader(pFileRecord.Name))
+                    {
+                        documentPageCount = imageReader.PageCount;
+                    }
+                }
+
                 bool conditionMet = false;
 
                 switch (PageCountComparisonOperator)
                 {
                     case PageCountComparisonOperator.Equal:
-                        conditionMet = pFileRecord.Pages == _pageCount;
+                        conditionMet = documentPageCount == PageCount;
                         break;
 
                     case PageCountComparisonOperator.NotEqual:
-                        conditionMet = pFileRecord.Pages != _pageCount;
+                        conditionMet = documentPageCount != PageCount;
                         break;
 
                     case PageCountComparisonOperator.LessThan:
-                        conditionMet = pFileRecord.Pages < _pageCount;
+                        conditionMet = documentPageCount < PageCount;
                         break;
 
                     case PageCountComparisonOperator.LessThanOrEqual:
-                        conditionMet = pFileRecord.Pages <= _pageCount;
+                        conditionMet = documentPageCount <= PageCount;
                         break;
 
                     case PageCountComparisonOperator.GreaterThan:
-                        conditionMet = pFileRecord.Pages > _pageCount;
+                        conditionMet = documentPageCount > PageCount;
                         break;
 
                     case PageCountComparisonOperator.GreaterThanOrEqual:
-                        conditionMet = pFileRecord.Pages >= _pageCount;
+                        conditionMet = documentPageCount >= PageCount;
                         break;
 
                     default:
@@ -511,6 +589,7 @@ namespace Extract.FileActionManager.Conditions
                 {
                     PageCountComparisonOperator = (PageCountComparisonOperator)reader.ReadInt32();
                     PageCount = reader.ReadInt32();
+                    UseDBPageCount = (reader.Version >= 2) ? reader.ReadBoolean() : true;
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -541,6 +620,7 @@ namespace Extract.FileActionManager.Conditions
                 {
                     writer.Write((int)PageCountComparisonOperator);
                     writer.Write(PageCount);
+                    writer.Write(UseDBPageCount);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -569,6 +649,40 @@ namespace Extract.FileActionManager.Conditions
         }
 
         #endregion IPersistStream Members
+
+        #region IDisposable Members
+
+        /// <summary>
+        /// Releases all resources used by the <see cref="PageCountCondition"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <overloads>Releases resources used by the <see cref="PageCountCondition"/>.
+        /// </overloads>
+        /// <summary>
+        /// Releases all resources used by the <see cref="PageCountCondition"/>.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_codecs != null)
+                {
+                    _codecs.Dispose();
+                    _codecs = null;
+                }
+            }
+
+            // Dispose of ummanaged resources
+        }
+
+        #endregion IDisposable Members
 
         #region Private Members
 
@@ -605,6 +719,7 @@ namespace Extract.FileActionManager.Conditions
         {
             PageCountComparisonOperator = source.PageCountComparisonOperator;
             PageCount = source.PageCount;
+            UseDBPageCount = source.UseDBPageCount;
 
             _dirty = true;
         }

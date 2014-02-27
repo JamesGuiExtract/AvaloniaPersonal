@@ -102,6 +102,7 @@ namespace Extract.FileActionManager.Conditions
                 {
                     _comparisonComboBox.SelectEnumValue(Settings.PageCountComparisonOperator);
                     _pageCountUpDown.Value = Settings.PageCount;
+                    _useDBPageCountCheckBox.Checked = Settings.UseDBPageCount;
                 }
             }
             catch (Exception ex)
@@ -135,6 +136,7 @@ namespace Extract.FileActionManager.Conditions
                 Settings.PageCountComparisonOperator =
                     _comparisonComboBox.ToEnumValue<PageCountComparisonOperator>();
                 Settings.PageCount = (int)_pageCountUpDown.Value;
+                Settings.UseDBPageCount = _useDBPageCountCheckBox.Checked;
                 
                 DialogResult = DialogResult.OK;
             }
