@@ -228,14 +228,17 @@
 #define IDC_STATIC_FILTER_LABEL3        335
 #define IDC_PREFERRED_REGEX_INFO        339
 #define IDC_BTN_PREFERRED_FORMAT_BROWSE 340
+#define IDB_BITMAP_HALFTONE_SPECKLED    341
+#define IDB_BITMAP_ALIASED_DIFFUSE      342
+#define IDB_BITMAP_SMUDGED              343
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        341
+#define _APS_NEXT_RESOURCE_VALUE        344
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         341
+#define _APS_NEXT_CONTROL_VALUE         344
 #define _APS_NEXT_SYMED_VALUE           188
 #endif
 #endif

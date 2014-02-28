@@ -383,7 +383,10 @@
     <None Include="EnhanceOCR.rgs" />
     <None Include="ReplaceStrings.rgs" />
     <None Include="ReplaceStringsPP.rgs" />
+    <None Include="res\AliasedDiffuse.bmp" />
+    <None Include="res\HalftoneSpeckled.bmp" />
     <None Include="res\SelectDocTagArrow.ico" />
+    <None Include="res\Smudged.bmp" />
     <None Include="SplitRegionIntoContentAreas.rgs" />
     <None Include="SplitRegionIntoContentAreasPP.rgs" />
     <None Include="StringTokenizerModifier.rgs" />

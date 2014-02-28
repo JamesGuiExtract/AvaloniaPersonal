@@ -211,7 +211,10 @@
     <None Include="..\..\..\..\ReusableComponents\BaseUtils\Code\res\icon_info.ico" />
     <None Include="EnhanceOCRTask.rgs" />
     <None Include="EnhanceOCRTaskPP.rgs" />
+    <None Include="res\AliasedDiffuse.bmp" />
+    <None Include="res\HalftoneSpeckled.bmp" />
     <None Include="res\SelectDocTagArrow.ico" />
+    <None Include="res\Smudged.bmp" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="AFFileProcessors.idl">

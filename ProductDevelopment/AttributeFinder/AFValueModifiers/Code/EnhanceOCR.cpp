@@ -84,9 +84,9 @@ string g_arrL1Filters[] = {
 // Level 2 (or medium setting) filter package
 string g_arrL2Filters[] = {
 	"medium-45",				// Versatile
-	"despeckle",				// Versatile
+	"despeckle",				// For speckles
 	"small-20",					// Aliased diffuse
-	"medium-85"};				// For heavily shaded regions (see note above)
+	"medium-85"};				// For heavily shaded regions
 //-------------------------------------------------------------------------------------------------
 // Level 3 (or high setting) filter package
 // NOTE: Though the filters medium-85 or medium-15 are not likely to produce good OCR, for the
@@ -100,30 +100,26 @@ string g_arrL3Filters[] = {
 	"medium-45",				// Versatile
 	"medium-85",				// For heavily shaded regions (see note above)
 	"medium-15",				// For very diffuse/broken text (see note above)
-	"small-60",					// Smudged text or text with lines
-	"despeckle",				// Versatile
+	"small-60",					// Smudged or overexposed text
+	"despeckle",				// For speckles
 	"small-20"};
 //-------------------------------------------------------------------------------------------------
 // Filter package tailored to work best on regions with halftones or speckles.
 string g_arrHalftoneSpeckledFilters[] = {
 	"medium-45",				// Versatile
 	"medium-85",				// For heavily shaded regions
-	"despeckle",				// For speckles
-	"medium-55"};				// For somewhat heavily shaded regions
+	"medium-55->large-45"};		// For speckles
 //-------------------------------------------------------------------------------------------------
 // Filter package tailored to work best on regions with aliased or diffuse text
 string g_arrAliasedDiffuseFilters[] = {
 	"small-20",					// For aliased or diffuse text.
-	"gaussian-1+medium-15",		// For aliased or diffuse text.
 	"medium-40",				// Versatile
 	"small-25"};				// For aliased or diffuse text.
 //-------------------------------------------------------------------------------------------------
-// Filter package tailored to work best on regions with smudged text or lines through the text
-string g_arrLinesSmudgedFilters[] = {
-	"small-60",					// Smudged text or text with lines
-	"gaussian-1",				// Smudged text or text with lines
-	"medium-55+large-45",		// Smudged text or text with lines
-	"gaussian-4"};				// Smudged text or text with lines
+// Filter package tailored to work best on regions with smudged or overexposed text
+string g_arrSmudgedFilters[] = {
+	"small-60",					// Smudged or overexposed text
+	"gaussian-1"};				// Smudged or overexposed text
 //-------------------------------------------------------------------------------------------------
 // A factor to be used to normalize character widths based upon the general effect various filters
 // have on the resulting character width.
@@ -1242,8 +1238,8 @@ void CEnhanceOCR::initializeFilters()
 			break;
 
 		case kLinesSmudged:
-			m_pFilters = g_arrLinesSmudgedFilters;
-			m_nFilterCount = sizeof(g_arrLinesSmudgedFilters) / sizeof(string);
+			m_pFilters = g_arrSmudgedFilters;
+			m_nFilterCount = sizeof(g_arrSmudgedFilters) / sizeof(string);
 			break;
 
 		case kCustom:
@@ -1266,9 +1262,17 @@ void CEnhanceOCR::initializeCustomFilters()
 			m_vecCustomFilterPackage.push_back(strLine);
 
 			// Parse out the individual filter(s) to be used.
+			bool bMergePasses = false;
 			vector<string> vecFilters;
 			StringTokenizer	st('+');
 			st.parse(strLine, vecFilters);
+
+			if (vecFilters.size() == 1)
+			{
+				// Check if sequencing passes rather than combining them.
+				StringTokenizer	st2("->");
+				st2.parse(strLine, vecFilters);
+			}
 
 			long nFilterCount = vecFilters.size();
 			for (long nFilterIndex = 0; nFilterIndex < nFilterCount; nFilterIndex++)
@@ -1294,12 +1298,6 @@ void CEnhanceOCR::initializeCustomFilters()
 					{
 						initializeCustomFilter(strFilter, strFilterFilename);
 					}
-				}
-				else if (g_mapALGORITHM_WIDTH_FACTOR.find(strFilter) == g_mapALGORITHM_WIDTH_FACTOR.end())
-				{
-					UCLIDException ue("ELI36521", "Undefined image filter.");
-					ue.addDebugInfo("Filter", strFilter, true);
-					throw ue;
 				}
 			}
 		}
@@ -1780,9 +1778,21 @@ void CEnhanceOCR::applyFilters(pBITMAPHANDLE phBitmap, string strFilters, ILongR
 	unique_ptr<LeadToolsBitmapFreeer> apBitmapCopy;
 
 	// Parse out the individual filter(s) to be used.
+	bool bCombinePasses = false;
 	vector<string> vecFilters;
 	StringTokenizer	st('+');
 	st.parse(strFilters, vecFilters);
+
+	if (vecFilters.size() == 1)
+	{
+		// Check if sequencing passes rather than combining them.
+		StringTokenizer	st2("->");
+		st2.parse(strFilters, vecFilters);
+	}
+	else
+	{
+		bCombinePasses = true;
+	}
 
 	// Iterate each filter to be used.
 	pBITMAPHANDLE phCurrentBitmap;
@@ -1797,8 +1807,8 @@ void CEnhanceOCR::applyFilters(pBITMAPHANDLE phBitmap, string strFilters, ILongR
 		st.parse(strFilter, vecParameters);
 		strFilter = vecParameters[0];
 
-		// If using a filter combination, we will apply the first filter to hBitmapCopy.
-		if (nFilterIndex == 0 && vecFilters.size() > 1)
+		// If combining the results of two filters, we will apply the first filter to hBitmapCopy.
+		if (bCombinePasses && nFilterIndex == 0)
 		{
 			apBitmapCopy.reset(new LeadToolsBitmapFreeer(hBitmapCopy, true));
 			ASSERT_RESOURCE_ALLOCATION("ELI36548", apBitmapCopy.get() != __nullptr);
@@ -1892,16 +1902,18 @@ void CEnhanceOCR::applyFilters(pBITMAPHANDLE phBitmap, string strFilters, ILongR
 		}
 		else
 		{
-			THROW_LOGIC_ERROR_EXCEPTION("ELI36553");
+			UCLIDException ue("ELI36553", "Undefined image filter.");
+			ue.addDebugInfo("Filter", strFilter, true);
+			throw ue;
 		}
 
 		throwExceptionIfNotSuccess(nRet, "ELI36554", strFilter);
 	}
 
 	// If a filter combination is being used, combine the results of the two passes.
-	if (apBitmapCopy.get() != __nullptr)
+	if (bCombinePasses)
 	{
-		L_INT nRet = L_CombineBitmap(&hBitmapFilterCopy, hBitmapFilterCopy.Left,
+		nRet = L_CombineBitmap(&hBitmapFilterCopy, hBitmapFilterCopy.Left,
 			hBitmapFilterCopy.Top, hBitmapFilterCopy.Width,
 			hBitmapFilterCopy.Height, phCurrentBitmap,
 			hBitmapFilterCopy.Left, hBitmapFilterCopy.Top,
