@@ -83,10 +83,10 @@ REM Copy the license file to the release folder for EncryptFile will work
 IF NOT EXIST %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%\Engineering\Binaries\Release MKDIR %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%\Engineering\Binaries\Release
 copy %BUILD_DRIVE%\BuildMachine_RDT*.lic %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%\Engineering\Binaries\Release\
 
-nmake /F AttributeFinderSDK.mak BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" %BuildScriptTarget% 2>&1 | tee "%LOGFILE%"
+nmake /F AttributeFinderSDK.mak Branch=%Branch% BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" %BuildScriptTarget% 2>&1 | tee "%LOGFILE%"
 
 IF "%BuildScriptTarget%"=="DoBuilds" GOTO exit_script
-nmake /F RuleDevelopmentKit.mak BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" DoEverything 2>&1 | tee "%LOGFILE2%"
+nmake /F RuleDevelopmentKit.mak Branch=%Branch% BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" DoEverything 2>&1 | tee "%LOGFILE2%"
 
 :exit_script
 
