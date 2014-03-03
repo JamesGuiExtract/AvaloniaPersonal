@@ -35,7 +35,7 @@ GetCommon:
     @ECHO.
 	@IF NOT EXIST "$(EngineeringRootDirectory)\ProductDevelopment\Common" MKDIR "$(EngineeringRootDirectory)\ProductDevelopment\Common"
 	$(Get) $(GetOptions) -nonworkingfolder "$(EngineeringRootDirectory)\ProductDevelopment\Common" $$$(Branch)/Engineering/ProductDevelopment/Common  "$(FlexIndexVersion)"
-	@nmake /F "$(EngineeringRootDirectory)\ProductDevelopment\Common\CompareVersions.mak" ProductVersion="$(FlexIndexVersion)" DoCheck
+	@nmake /F "$(EngineeringRootDirectory)\ProductDevelopment\Common\CompareVersions.mak" ProductVersion="$(FlexIndexVersion)" PDRootDir="$(PDRootDir)" DoCheck
 	@ECHO.
     @DATE /T
     @TIME /T

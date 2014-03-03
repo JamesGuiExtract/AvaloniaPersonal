@@ -4,9 +4,6 @@
 # LatestComponentsVersions.mak file that is in the tree that has been 
 # retrieved from vault.
 
-BuildRootDirectory=$(BUILD_DRIVE)$(BUILD_DIRECTORY)\$(ProductRootDirName)
-EngineeringRootDirectory=$(BuildRootDirectory)\Engineering
-PDRootDir=$(EngineeringRootDirectory)\ProductDevelopment
 
 !include $(PDRootDir)\Common\LatestComponentVersions.mak
 
