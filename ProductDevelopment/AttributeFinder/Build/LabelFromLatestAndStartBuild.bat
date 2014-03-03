@@ -22,8 +22,21 @@ SET BATCH_ATTRIBUTE_BUILD=$%Branch%/Engineering/ProductDevelopment/AttributeFind
 cd "%~p0..\..\Common"
 :: Get build folders from vault to make sure they are the most current
 vault GET -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -merge overwrite -workingfolder "%BATCH_WORKING_FOLDER%\..\..\Common" "%BATCH_COMMON_PATH%"
+
+IF %ERRORLEVEL% NEQ 0 (
+	Echo Vault exited with error.
+	Echo.
+	goto Exit_Batch
+)
+
 CD "%~p0"
 vault GET -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -merge overwrite -workingfolder "%BATCH_WORKING_FOLDER%" "%BATCH_ATTRIBUTE_BUILD%"
+
+IF %ERRORLEVEL% NEQ 0 (
+	Echo Vault exited with error.
+	Echo.
+	goto Exit_Batch
+)
 
 cd "%~p0..\..\Common"
 
@@ -31,6 +44,12 @@ cscript IncrementBuildVersion.vbs
 
 :: Commit the modified LatestComponentVersions.mak file
 vault COMMIT -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% "%BATCH_COMMON_PATH%/LatestComponentVersions.mak"
+
+IF %ERRORLEVEL% NEQ 0 (
+	Echo Vault exited with error.
+	Echo.
+	goto Exit_Batch
+)
 
 :: Label
 nmake /F LabelFromLatestVersions.mak Branch=%Branch%
@@ -46,4 +65,8 @@ if "%Branch%"=="" (
 ) else (
 	call AttributeFinderSDK.bat "%VersionToBuild%" "%Branch%"
 )
+
+:Exit_Batch
+
+cd "%~p0"
 

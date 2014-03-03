@@ -27,7 +27,20 @@ RulesDir=$(EngineeringRootDirectory)\Rules
 Get="$(VAULT_DIR)\vault" GETLABEL 
 GetOptions=-server $(VAULT_SERVER) -repository $(VAULT_REPOSITORY) -makewritable 
 
-
+GetCommon:
+	@ECHO Getting Common ...
+	@ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
+	@IF NOT EXIST "$(EngineeringRootDirectory)\ProductDevelopment\Common" MKDIR "$(EngineeringRootDirectory)\ProductDevelopment\Common"
+	$(Get) $(GetOptions) -nonworkingfolder "$(EngineeringRootDirectory)\ProductDevelopment\Common" $$$(Branch)/Engineering/ProductDevelopment/Common  "$(FlexIndexVersion)"
+	@nmake /F "$(EngineeringRootDirectory)\ProductDevelopment\Common\CompareVersions.mak" ProductVersion="$(FlexIndexVersion)" DoCheck
+	@ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
+	
 GetProductDevelopment:
 	@ECHO Getting ProductDevelopment for $(FlexIndexVersion)
     @ECHO.
@@ -87,7 +100,7 @@ GetRules:
     @TIME /T
     @ECHO.
 
-GetEngineering: GetProductDevelopment GetRCDotNET GetReusableComponents GetRules
+GetEngineering: GetCommon GetProductDevelopment GetRCDotNET GetReusableComponents GetRules
 	@ECHO Updating Versions for $(FlexIndexVersion)
     @ECHO.
     @DATE /T
