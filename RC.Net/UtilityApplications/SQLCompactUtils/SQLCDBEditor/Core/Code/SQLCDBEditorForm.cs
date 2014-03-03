@@ -1671,8 +1671,9 @@ namespace Extract.SQLCDBEditor
                 _connection.Close();
 
                 FileAttributes originalFileAttributes = File.GetAttributes(_databaseFileName);
-                FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
-                    File.Copy(_databaseWorkingCopyFileName, _databaseFileName, true));
+                FileSystemMethods.PerformFileOperationWithRetry(() =>
+                    File.Copy(_databaseWorkingCopyFileName, _databaseFileName, true),
+                    true);
                 // Apply the same attributes the primary database had originally.
                 File.SetAttributes(_databaseFileName, originalFileAttributes);
 
@@ -1800,8 +1801,9 @@ namespace Extract.SQLCDBEditor
                 }
 
                 // Create a new working copy.
-                FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
-                    File.Copy(_databaseFileName, _databaseWorkingCopyFileName));
+                FileSystemMethods.PerformFileOperationWithRetry(() =>
+                    File.Copy(_databaseFileName, _databaseWorkingCopyFileName),
+                    true);
                 File.SetAttributes(_databaseWorkingCopyFileName, FileAttributes.Hidden);
                 _databaseLastModifiedTime = File.GetLastWriteTime(_databaseFileName);
 

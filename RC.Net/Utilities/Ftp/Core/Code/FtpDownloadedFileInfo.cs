@@ -92,9 +92,9 @@ namespace Extract.Utilities.Ftp
             {
                 ExtractException.Assert("ELI32655", ".info file name cannot be empty", !string.IsNullOrEmpty(InfoFileName));
 
-                // Load the info file within a retry do deal with sharing violations.
+                // Load the info file within a retry to deal with sharing violations.
                 // [DotNetRCAndUtils:879]
-                FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
+                FileSystemMethods.PerformFileOperationWithRetry(() =>
                 {
                     XmlTextWriter xmlWriter = new XmlTextWriter(InfoFileName, Encoding.ASCII);
                     try
@@ -119,7 +119,8 @@ namespace Extract.Utilities.Ftp
                     {
                         xmlWriter.Close();
                     }
-                });
+                },
+                true);
             }
             catch (Exception ex)
             {
@@ -149,10 +150,11 @@ namespace Extract.Utilities.Ftp
                 // [DotNetRCAndUtils:879]
                 // Load the info file within a retry do deal with sharing violations.
                 string xml = "";
-                FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
+                FileSystemMethods.PerformFileOperationWithRetry(() =>
                     {
                         xml = File.ReadAllText(InfoFileName, Encoding.ASCII);
-                    });
+                    },
+                    true);
 
                 // Parse the XML file
                 using (StringReader reader = new StringReader(xml))

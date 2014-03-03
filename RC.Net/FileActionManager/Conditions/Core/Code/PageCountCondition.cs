@@ -48,7 +48,12 @@ namespace Extract.FileActionManager.Conditions
         /// <summary>
         /// Tests whether the page count is greater than or equal to the specified value.
         /// </summary>
-        GreaterThanOrEqual = 5
+        GreaterThanOrEqual = 5,
+
+        /// <summary>
+        /// The operator to use has not been defined.
+        /// </summary>
+        NotDefined = 6,
     }
 
     /// <summary>
@@ -117,12 +122,12 @@ namespace Extract.FileActionManager.Conditions
         /// Specifies the <see cref="PageCountComparisonOperator"/> to use when comparing a
         /// document's page count to the specified <see cref="PageCount"/>.
         /// </summary>
-        PageCountComparisonOperator _pageCountConditionOperator = PageCountComparisonOperator.Equal;
+        PageCountComparisonOperator _pageCountConditionOperator = PageCountComparisonOperator.NotDefined;
 
         /// <summary>
         /// Specifies the <see langword="int"/> that should be compared to a document's page count.
         /// </summary>
-        int _pageCount;
+        int _pageCount = 1;
 
         /// <summary>
         /// Indicates whether the page count from the database should be used, if available.
@@ -286,10 +291,7 @@ namespace Extract.FileActionManager.Conditions
         {
             try
             {
-                // If the operator and page count are still on their default values (which don't
-                // represent a meaningful condition), consider this instance as not configured.
-                if (PageCountComparisonOperator == Conditions.PageCountComparisonOperator.Equal &&
-                    PageCount == 0)
+                if (PageCountComparisonOperator == Conditions.PageCountComparisonOperator.NotDefined)
                 {
                     throw new ExtractException("ELI36705", _COMPONENT_DESCRIPTION + 
                         " has not been configured.");

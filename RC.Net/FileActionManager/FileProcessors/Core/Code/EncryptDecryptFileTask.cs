@@ -581,7 +581,7 @@ namespace Extract.FileActionManager.FileProcessors
                         FileAccess.ReadWrite, FileShare.None);
 
                     // Open the input stream
-                    FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
+                    FileSystemMethods.PerformFileOperationWithRetry(() =>
                     {
                         try
                         {
@@ -598,7 +598,8 @@ namespace Extract.FileActionManager.FileProcessors
 
                             throw;
                         }
-                    });
+                    },
+                    true);
 
                     if (_encryptFile)
                     {

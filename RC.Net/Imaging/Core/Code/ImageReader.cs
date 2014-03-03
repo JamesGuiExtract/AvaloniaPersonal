@@ -112,8 +112,8 @@ namespace Extract.Imaging
                 FileShare sharing = RegistryManager.LockFiles
                                         ? FileShare.Read : FileShare.ReadWrite | FileShare.Delete;
 
-                FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
-                    _stream = File.Open(fileName, FileMode.Open, FileAccess.Read, sharing));
+                FileSystemMethods.PerformFileOperationWithRetry(() =>
+                    _stream = File.Open(fileName, FileMode.Open, FileAccess.Read, sharing), true);
 
                 // Log that the image reader was created if necessary
                 if (RegistryManager.LogFileLocking)
@@ -131,12 +131,25 @@ namespace Extract.Imaging
                 {
                     try
                     {
-                        using (CodecsImageInfo info = _codecs.GetInformation(_stream, true))
+                        int pageCount = 0;
+                        RasterImageFormat format = RasterImageFormat.Unknown;
+                        // https://extract.atlassian.net/browse/ISSUE-11972
+                        // To avoid problems with network hiccups, after the initial load of an
+                        // image, allow retries for any windows error code, not just sharing
+                        // violations.
+                        FileSystemMethods.PerformFileOperationWithRetry(() =>
                         {
-                            _pageCount = info.TotalPages;
-                            _format = info.Format;
-                            break;
-                        }
+                            using (CodecsImageInfo info = _codecs.GetInformation(_stream, true))
+                            {
+                                pageCount = info.TotalPages;
+                                format = info.Format;
+                            }
+                        },
+                        false);
+
+                        _pageCount = pageCount;
+                        _format = format;
+                        break;
                     }
                     catch (RasterException re)
                     {
@@ -221,8 +234,14 @@ namespace Extract.Imaging
                 {
                     if (!_loadedImages.TryGetValue(pageNumber, out image))
                     {
-                        image = _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray,
-                            pageNumber, pageNumber);
+                        // https://extract.atlassian.net/browse/ISSUE-11972
+                        // To avoid problems with network hiccups, after the initial load of an
+                        // image, allow retries for any windows error code, not just sharing
+                        // violations.
+                        FileSystemMethods.PerformFileOperationWithRetry(() =>
+                            image = _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray,
+                                pageNumber, pageNumber),
+                                false);
 
                         // If loading PDF as bitonal and this file is a PDF, set bits per pixel to 1
                         if (_loadPdfAsBitonal && IsPdf)
@@ -267,8 +286,14 @@ namespace Extract.Imaging
                     }
                     else
                     {
-                        image = _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray,
-                            pageNumber, pageNumber);
+                        // https://extract.atlassian.net/browse/ISSUE-11972
+                        // To avoid problems with network hiccups, after the initial load of an
+                        // image, allow retries for any windows error code, not just sharing
+                        // violations.
+                        FileSystemMethods.PerformFileOperationWithRetry(() =>
+                            image = _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray,
+                                pageNumber, pageNumber),
+                                false);
 
                         // If loading PDF as bitonal and this file is a PDF, set bits per pixel
                         // to 1
@@ -432,7 +457,14 @@ namespace Extract.Imaging
                         {
                             _currentProbe.Item2.Dispose();
                         }
-                        image = _codecs.Load(_stream, 1, CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber);
+                        // https://extract.atlassian.net/browse/ISSUE-11972
+                        // To avoid problems with network hiccups, after the initial load of an
+                        // image, allow retries for any windows error code, not just sharing
+                        // violations.
+                        FileSystemMethods.PerformFileOperationWithRetry(() =>
+                            image = _codecs.Load(
+                                _stream, 1, CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber),
+                            false);
                         var probe = new PixelProbe(image);
                         image = null;
                         _currentProbe = new Tuple<int, PixelProbe>(pageNumber, probe);

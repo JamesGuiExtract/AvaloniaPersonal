@@ -10,6 +10,7 @@ using Extract.Utilities;
 using Extract.Utilities.Forms;
 using Extract.Utilities.Parsers;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -2648,10 +2649,10 @@ namespace Extract.FileActionManager.Utilities
             }
 
             int notSearchedCount = 0;
-            var exceptions = new List<ExtractException>();
+            var exceptions = new ConcurrentQueue<ExtractException>();
 
             // Search each file in the file list.
-            foreach (DataGridViewRow row in _fileListDataGridView.Rows)
+            Parallel.ForEach(_fileListDataGridView.Rows.OfType<DataGridViewRow>(), row =>
             {
                 // Abort if the user cancelled.
                 cancelToken.ThrowIfCancellationRequested();
@@ -2665,7 +2666,7 @@ namespace Extract.FileActionManager.Utilities
                     SpatialString ocrText = rowData.OcrText;
                     if (ocrText == null)
                     {
-                        notSearchedCount++;
+                        Interlocked.Add(ref notSearchedCount, 1);
                     }
                     else
                     {
@@ -2703,9 +2704,9 @@ namespace Extract.FileActionManager.Utilities
                 }
                 catch (Exception ex)
                 {
-                    notSearchedCount++;
+                    Interlocked.Add(ref notSearchedCount, 1);
                     rowData.Exception = ex.AsExtract("ELI35852");
-                    exceptions.Add(ex.AsExtract("ELI35857"));
+                    exceptions.Enqueue(ex.AsExtract("ELI35857"));
                 }
 
                 // Use a separate variable in the below, invoked call to update the row in the UI,
@@ -2721,7 +2722,7 @@ namespace Extract.FileActionManager.Utilities
                     // Update the progress bar
                     _searchProgressBar.Value++;
                 });
-            }
+            });
 
             // [DotNetRCAndUtils:1029]
             // Exceptions should be displayed on the UI thread, blocking it which prevents the form
@@ -2749,16 +2750,12 @@ namespace Extract.FileActionManager.Utilities
                     // Aggregating a large number of exceptions can bog down, potentially
                     // making the quickly making the app appear hung. Aggregate a maximum of 10
                     // exceptions.
-                    if (exceptionCount > 10)
-                    {
-                        exceptions.RemoveRange(10, exceptionCount - 10);
-                    }
-                    exceptions.Add(new ExtractException("ELI35853",
+                    var exceptionsToAggregate = exceptions.Take(10).Union(new [] {
+                        new ExtractException("ELI35853",
                         string.Format(CultureInfo.CurrentCulture,
-                        "There were error(s) searching {0:D} file(s).", exceptionCount)));
+                        "There were error(s) searching {0:D} file(s).", exceptionCount)) });
 
-
-                    ExtractException.AsAggregateException(exceptions).Display();
+                    ExtractException.AsAggregateException(exceptionsToAggregate).Display();
                 }
             }));
         }
@@ -2817,10 +2814,10 @@ namespace Extract.FileActionManager.Utilities
             }
 
             int notSearchedCount = 0;
-            var exceptions = new List<ExtractException>();
+            var exceptions = new ConcurrentQueue<ExtractException>();
 
             // Search each file in the file list.
-            foreach (DataGridViewRow row in _fileListDataGridView.Rows)
+            Parallel.ForEach(_fileListDataGridView.Rows.OfType<DataGridViewRow>(), row =>
             {
                 // Abort if the user cancelled.
                 cancelToken.ThrowIfCancellationRequested();
@@ -2834,7 +2831,7 @@ namespace Extract.FileActionManager.Utilities
                     IUnknownVector attributes = rowData.Attributes;
                     if (attributes == null)
                     {
-                        notSearchedCount++;
+                        Interlocked.Add(ref notSearchedCount, 1);
                     }
                     else
                     {
@@ -2877,9 +2874,9 @@ namespace Extract.FileActionManager.Utilities
                 }
                 catch (Exception ex)
                 {
-                    notSearchedCount++;
+                    Interlocked.Add(ref notSearchedCount, 1);
                     rowData.Exception = ex.AsExtract("ELI35855");
-                    exceptions.Add(ex.AsExtract("ELI35858"));
+                    exceptions.Enqueue(ex.AsExtract("ELI35858"));
                 }
 
                 // Use a separate variable in the below, invoked call to update the row in the UI,
@@ -2895,7 +2892,7 @@ namespace Extract.FileActionManager.Utilities
                     // Update the progress bar
                     _searchProgressBar.Value++;
                 });
-            }
+            });
 
             // [DotNetRCAndUtils:1029]
             // Exceptions should be displayed on the UI thread, blocking it which prevents the form
@@ -2923,15 +2920,12 @@ namespace Extract.FileActionManager.Utilities
                     // Aggregating a large number of exceptions can bog down, potentially
                     // making the quickly making the app appear hung. Aggregate a maximum of 10
                     // exceptions.
-                    if (exceptionCount > 10)
-                    {
-                        exceptions.RemoveRange(10, exceptionCount - 10);
-                    }
-                    exceptions.Add(new ExtractException("ELI35856",
+                    var exceptionsToAggregate = exceptions.Take(10).Union(new [] {
+                       new ExtractException("ELI35856",
                         string.Format(CultureInfo.CurrentCulture,
-                        "There were error(s) searching {0:D} file(s).", exceptionCount)));
-
-                    ExtractException.AsAggregateException(exceptions).Display();
+                        "There were error(s) searching {0:D} file(s).", exceptionCount)) });
+                    
+                    ExtractException.AsAggregateException(exceptionsToAggregate).Display();
                 }
             }));
         }
@@ -3160,14 +3154,12 @@ namespace Extract.FileActionManager.Utilities
                         // Aggregating a large number of exceptions can bog down, potentially
                         // making the quickly making the app appear hung. Aggregate a maximum of 10
                         // exceptions.
-                        if (exceptionCount > 10)
-                        {
-                            exceptions.RemoveRange(10, exceptionCount - 10);
-                        }
-                        exceptions.Add(new ExtractException("ELI35819",
-                            string.Format(CultureInfo.CurrentCulture,
-                            "{0:D} file(s) failed {1}", exceptionCount, fileHanderItem.Name.Quote())));
-                        throw ExtractException.AsAggregateException(exceptions);
+                        var exceptionsToAggregate = exceptions.Take(10).Union(new [] {
+                            new ExtractException("ELI35819",
+                                string.Format(CultureInfo.CurrentCulture,
+                                "{0:D} file(s) failed {1}", exceptionCount, fileHanderItem.Name.Quote())) });
+
+                        throw ExtractException.AsAggregateException(exceptionsToAggregate);
                     }
                 }
             }

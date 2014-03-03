@@ -39,6 +39,7 @@ namespace Extract.FileActionManager.Conditions
                 PageCountComparisonOperator.LessThanOrEqual.SetReadableValue("less than or equal to");
                 PageCountComparisonOperator.GreaterThan.SetReadableValue("greater than");
                 PageCountComparisonOperator.GreaterThanOrEqual.SetReadableValue("greater than or equal to");
+                PageCountComparisonOperator.NotDefined.SetReadableValue("");
             }
             catch (Exception ex)
             {
@@ -160,13 +161,11 @@ namespace Extract.FileActionManager.Conditions
             ExtractException.Assert("ELI36701",
                 "Page count condition settings have not been provided.", Settings != null);
 
-            // If the operator and page count are still on their default values (which don't
-            // represent a meaningful condition), consider this instance as not configured.
-            if (_pageCountUpDown.Value == 0 &&
-                _comparisonComboBox.ToEnumValue<PageCountComparisonOperator>() == PageCountComparisonOperator.Equal)
+            if (_comparisonComboBox.ToEnumValue<PageCountComparisonOperator>() ==
+                    PageCountComparisonOperator.NotDefined)
             {
-                UtilityMethods.ShowMessageBox("Please specify a meaningful condition.",
-                    "Invalid configuration", true);
+                UtilityMethods.ShowMessageBox(
+                    "Select a comparison operator.", "Invalid configuration", true);
                 _pageCountUpDown.Focus();
 
                 return true;

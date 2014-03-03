@@ -1531,10 +1531,11 @@ namespace Extract.FileActionManager.FileSuppliers
                                     // [DotNetRCAndUtils:745]
                                     // Ensure the .info file is readable before calling NotifyFileAdded. Otherwise a
                                     // processing task needing to access the .info file may fail.
-                                    FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
+                                    FileSystemMethods.PerformFileOperationWithRetry(() =>
                                     {
                                         using (new FileStream(ftpInfoFileName, FileMode.Open)) { };
-                                    });
+                                    },
+                                    true);
 
                                     // Assign the FileRecord for the recorder so that it knows which
                                     // file the FTP event relates to.

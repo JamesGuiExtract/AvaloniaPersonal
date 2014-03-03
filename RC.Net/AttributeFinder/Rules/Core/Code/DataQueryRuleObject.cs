@@ -669,8 +669,9 @@ namespace Extract.AttributeFinder.Rules
                         true);
 
                     // Apply the same attributes the primary database had originally.
-                    FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
-                        File.SetAttributes(originalSQLCEDBFileName, originalFileAttributes));
+                    FileSystemMethods.PerformFileOperationWithRetry(() =>
+                        File.SetAttributes(originalSQLCEDBFileName, originalFileAttributes),
+                        true);
                 }
 
                 return result;
@@ -752,8 +753,9 @@ namespace Extract.AttributeFinder.Rules
                     // Create the new working copy.
                     string sourceFileName = originalFileName;
                     string destinationFileName = workingCopyFileName;
-                    FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
-                        File.Copy(sourceFileName, destinationFileName));
+                    FileSystemMethods.PerformFileOperationWithRetry(() =>
+                        File.Copy(sourceFileName, destinationFileName),
+                        true);
                     File.SetAttributes(workingCopyFileName, FileAttributes.Hidden);
 
                     // Set the new connection string.

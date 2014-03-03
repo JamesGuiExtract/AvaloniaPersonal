@@ -447,8 +447,8 @@ namespace Extract.Utilities
                 // Attempt to overwrite the file with a copy. This is slower than moving the file.
                 if (doRetries)
                 {
-                    PerformFileOperationWithRetryOnSharingViolation(() =>
-                        File.Copy(source, destination, true));
+                    PerformFileOperationWithRetry(() =>
+                        File.Copy(source, destination, true), true);
                 }
                 else
                 {
@@ -983,7 +983,7 @@ namespace Extract.Utilities
                     {
                         // The secure file deleter takes care of sharing violation retires, so the
                         // retry logic here should encapsulate only normal deletions.
-                        PerformFileOperationWithRetryOnSharingViolation(() => File.Delete(fileName));
+                        PerformFileOperationWithRetry(() => File.Delete(fileName), true);
                     }
                     else
                     {
@@ -1432,11 +1432,15 @@ namespace Extract.Utilities
         }
 
         /// <summary>
-        /// Performs the specified file operation within a looping structure to retry the operation
-        /// if the failure is due to a sharing violation.
+        /// Performs the specified file operation within a looping structure to retry a failed file
+        /// operation.
         /// </summary>
+        /// <param name="onlyOnSharingViolation"><see langword="true"/> if the retries should be
+        /// performed only in the case of a sharing violation; <see langword="false"/> if retries
+        /// should be performed no matter the exception.</param>
         /// <param name="fileOperation">The operation to perform.</param>
-        public static void PerformFileOperationWithRetryOnSharingViolation(Action fileOperation)
+        public static void PerformFileOperationWithRetry(Action fileOperation,
+            bool onlyOnSharingViolation)
         {
             try
             {
@@ -1453,7 +1457,13 @@ namespace Extract.Utilities
                     }
                     catch (IOException ex)
                     {
-                        if (ex.GetWindowsErrorCode() != Win32ErrorCode.SharingViolation)
+                        // https://extract.atlassian.net/browse/ISSUE-11972
+                        // Allow for retries for errors other than a sharing violation if
+                        // onlyOnSharingViolation is false and there is a windows error code
+                        // associated with the exception.
+                        if ((onlyOnSharingViolation &&
+                                ex.GetWindowsErrorCode() != Win32ErrorCode.SharingViolation) ||
+                            ex.GetWindowsErrorCode() == Win32ErrorCode.Success)
                         {
                             throw ex.AsExtract("ELI32411");
                         }

@@ -190,10 +190,11 @@ namespace Extract.Utilities.SecureFileDeleters
 
                 if (doRetries)
                 {
-                    FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
+                    FileSystemMethods.PerformFileOperationWithRetry(() =>
                     {
                         SecureDeleteFileHelper(fileName, throwIfUnableToDeleteSecurely, exceptions);
-                    });
+                    },
+                    true);
                 }
                 else
                 {

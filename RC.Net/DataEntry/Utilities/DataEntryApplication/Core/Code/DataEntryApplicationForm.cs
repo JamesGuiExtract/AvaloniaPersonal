@@ -3883,8 +3883,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                                 oldDbCopy.Dispose();
                             }
 
-                            FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
-                                File.Copy(_dataSourcePath, localDbCopy.FileName, true));
+                            FileSystemMethods.PerformFileOperationWithRetry(() =>
+                                File.Copy(_dataSourcePath, localDbCopy.FileName, true),
+                                true);
 
                             _localDbCopies[_dataSourcePath] = localDbCopy;
                             _lastDbModificationTimes[_dataSourcePath] = File.GetLastWriteTime(_dataSourcePath);

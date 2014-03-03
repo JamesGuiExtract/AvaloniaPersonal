@@ -494,8 +494,9 @@ namespace Extract.FileActionManager.FileProcessors
                 if (_conflictResolution == CreateFileConflictResolution.Append)
                 {
                     // Perform the append operation in a retry block
-                    FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(
-                        () => { File.AppendAllText(fileName, fileContents); });
+                    FileSystemMethods.PerformFileOperationWithRetry(
+                        () => File.AppendAllText(fileName, fileContents),
+                        true);
                 }
                 else
                 {

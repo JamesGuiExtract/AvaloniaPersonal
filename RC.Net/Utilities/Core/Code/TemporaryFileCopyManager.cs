@@ -73,8 +73,9 @@ namespace Extract.Utilities
 
                     _sensitive = sensitive;
                     _localTemporaryFile = new TemporaryFile(sensitive);
-                    FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
-                        File.Copy(originalDatabaseFileName, _localTemporaryFile.FileName, true));
+                    FileSystemMethods.PerformFileOperationWithRetry(() =>
+                        File.Copy(originalDatabaseFileName, _localTemporaryFile.FileName, true),
+                        true);
 
                     AddReference(referencingInstance);
                 }
@@ -112,8 +113,9 @@ namespace Extract.Utilities
                         _localTemporaryFile = new TemporaryFile(_sensitive);
 
                         _lastModificationTime = modificationTime;
-                        FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
-                            File.Copy(_originalDatabaseFileName, _localTemporaryFile.FileName, true));
+                        FileSystemMethods.PerformFileOperationWithRetry(() =>
+                            File.Copy(_originalDatabaseFileName, _localTemporaryFile.FileName, true),
+                            true);
                     }
 
                     // Update the reference for the specified orderMapperInstance so that it
