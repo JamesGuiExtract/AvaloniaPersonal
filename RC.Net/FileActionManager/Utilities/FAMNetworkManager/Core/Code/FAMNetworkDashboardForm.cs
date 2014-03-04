@@ -932,20 +932,16 @@ namespace Extract.FileActionManager.Utilities
                     return;
                 }
 
-                using (TemporaryFile tempDb = new TemporaryFile(".sdf", false))
+                // https://extract.atlassian.net/browse/ISSUE-1937
+                // Because the SQLCDBEditorForm now uses it's own temporary file copy that
+                // overwrites the master copy only when explicity saved, just open the DB in place.
+                // This also prevents multiple users from trying to edit the DB at the same time.
+                using (SQLCDBEditorForm editor = new SQLCDBEditorForm(dbFile, false))
                 {
-                    File.Copy(dbFile, tempDb.FileName, true);
-                    using (SQLCDBEditorForm editor = new SQLCDBEditorForm(tempDb.FileName, false))
-                    {
-                        editor.CustomTitle = SQLCDBEditorForm.DefaultTitle + " - "
-                            + machineName + ": FAM Service Database";
-                        editor.StartPosition = FormStartPosition.CenterParent;
-                        editor.ShowDialog();
-                        if (editor.FileSaved)
-                        {
-                            File.Copy(tempDb.FileName, dbFile, true);
-                        }
-                    }
+                    editor.CustomTitle = SQLCDBEditorForm.DefaultTitle + " - "
+                        + machineName + ": FAM Service Database";
+                    editor.StartPosition = FormStartPosition.CenterParent;
+                    editor.ShowDialog();
                 }
             }
             catch (Exception ex)

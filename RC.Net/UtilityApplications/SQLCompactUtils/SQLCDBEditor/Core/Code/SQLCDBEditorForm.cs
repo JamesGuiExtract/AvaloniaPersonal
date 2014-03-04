@@ -152,11 +152,6 @@ namespace Extract.SQLCDBEditor
         bool _standAlone;
 
         /// <summary>
-        /// Indicates whether the file that was open has been saved.
-        /// </summary>
-        bool _fileSaved;
-
-        /// <summary>
         /// A custom value to display in the title bar.
         /// </summary>
         string _customTitle;
@@ -1752,12 +1747,6 @@ namespace Extract.SQLCDBEditor
                     // reopening the current database.
                     currentlyOpenTable = _tablesListBox.Text;
                 }
-                else
-                {
-                    // [DotNetRCAndUtils:774]
-                    // Do not reset _fileSaved tag if we have re-opened the same database.
-                    _fileSaved = false;
-                }
 
                 // Reset the schema updater
                 _schemaUpdater = null;
@@ -2385,20 +2374,6 @@ namespace Extract.SQLCDBEditor
             set
             {
                 _customTitle = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the open file has been saved.
-        /// </summary>
-        /// <value>
-        /// <see langword="true"/> if the open file has been saved; otherwise, <see langword="false"/>.
-        /// </value>
-        public bool FileSaved
-        {
-            get
-            {
-                return _fileSaved;
             }
         }
 
