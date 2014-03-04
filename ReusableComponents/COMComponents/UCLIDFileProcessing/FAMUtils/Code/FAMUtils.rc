@@ -156,7 +156,7 @@ BEGIN
             VALUE "FileDescription", "FAM Utilities"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "FAMUtils.dll"
-            VALUE "LegalCopyright", "Copyright (C) 2013"
+            VALUE "LegalCopyright", "Copyright (C) 2014"
             VALUE "OriginalFilename", "FAMUtils.dll"
             VALUE "ProductName", "FAMUtils.dll"
             VALUE "ProductVersion", "1.0.0.1"

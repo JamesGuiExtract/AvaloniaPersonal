@@ -86,7 +86,7 @@ BEGIN
             VALUE "FileDescription", "GetFullUserName Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "GetFullUserName"
-            VALUE "LegalCopyright", "Copyright (C) 2013"
+            VALUE "LegalCopyright", "Copyright (C) 2014"
             VALUE "OriginalFilename", "GetFullUserName.exe"
             VALUE "ProductName", "GetFullUserName"
             VALUE "ProductVersion", "1, 0, 0, 1"

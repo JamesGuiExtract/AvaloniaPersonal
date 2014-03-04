@@ -12,7 +12,7 @@ using System;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Microsoft")]
 [assembly: AssemblyProduct("Extract.DataEntry.Test")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2013")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

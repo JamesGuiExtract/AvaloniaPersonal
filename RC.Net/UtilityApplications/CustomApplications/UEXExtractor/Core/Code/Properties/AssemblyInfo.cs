@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract System, LLC")]
 [assembly: AssemblyProduct("ExtractDebugData")]
-[assembly: AssemblyCopyright("Copyright © Extract System, LLC 2013")]
+[assembly: AssemblyCopyright("Copyright © Extract System, LLC 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -16,7 +16,7 @@ using namespace System::Security::Permissions;
 [assembly:AssemblyConfigurationAttribute("")];
 [assembly:AssemblyCompanyAttribute("Extract Systems, LLC")];
 [assembly:AssemblyProductAttribute("ExceptionUtilities")];
-[assembly:AssemblyCopyrightAttribute("Copyright (c)  2013")];
+[assembly:AssemblyCopyrightAttribute("Copyright (c)  2014")];
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("")];
 

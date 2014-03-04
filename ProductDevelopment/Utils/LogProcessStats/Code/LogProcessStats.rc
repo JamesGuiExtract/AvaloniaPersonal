@@ -70,7 +70,7 @@ BEGIN
             VALUE "FileDescription", "LogProcessStats.exe"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "LogProcessStats.exe"
-            VALUE "LegalCopyright", "Copyright (C) 2013"
+            VALUE "LegalCopyright", "Copyright (C) 2014"
             VALUE "OriginalFilename", "LogProcessStats.exe"
             VALUE "ProductName", "LogProcessStats.exe"
             VALUE "ProductVersion", "1.0.0.1"
