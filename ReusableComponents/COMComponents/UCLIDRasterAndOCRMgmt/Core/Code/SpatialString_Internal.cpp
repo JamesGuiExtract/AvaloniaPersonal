@@ -3863,13 +3863,19 @@ void CSpatialString::setSurroundingWhitespace(UCLID_RASTERANDOCRMGMTLib::ISpatia
 		throw ue;
 	}
 
+	long nCount = m_vecLetters.size();
+	if (rnPos > nCount)
+	{
+		UCLIDException ue("ELI36713", "Invalid SpatialString insertion position.");
+		throw ue;
+	}
+
 	ILongRectanglePtr ipBounds = ipString->GetOCRImageBounds();
 	long nLeft;
 	long nTop;
 	long nRight;
 	long nBottom;
 	ipBounds->GetBounds(&nLeft, &nTop, &nRight, &nBottom);
-	long nCount = m_vecLetters.size();
 
 	// Whitespace that already exists before/after the insertion position.
 	set<long> setExistingWS;

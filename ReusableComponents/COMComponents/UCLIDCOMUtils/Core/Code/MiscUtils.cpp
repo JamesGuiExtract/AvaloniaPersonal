@@ -1283,6 +1283,44 @@ STDMETHODIMP CMiscUtils::AddCustomTag(BSTR bstrTagName, BSTR bstrTagValue)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36103");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::IsImageFileExtension(BSTR bstrFileName,  VARIANT_BOOL* pvbValue)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI36708", pvbValue != __nullptr);
+
+		validateLicense();
+
+		string strFileName = asString(bstrFileName);
+		bool bIsImageExt = isImageFileExtension(strFileName);
+		*pvbValue = asVariantBool(bIsImageExt);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36709");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::IsNumericFileExtension(BSTR bstrFileName,  VARIANT_BOOL* pvbValue)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI36710", pvbValue != __nullptr);
+
+		validateLicense();
+
+		string strFileName = asString(bstrFileName);
+		bool bIsNumericExt = isNumericExtension(strFileName);
+		*pvbValue = asVariantBool(bIsNumericExt);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36711");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent

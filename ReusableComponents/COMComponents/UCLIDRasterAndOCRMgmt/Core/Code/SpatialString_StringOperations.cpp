@@ -820,7 +820,7 @@ STDMETHODIMP CSpatialString::RemoveText(ISpatialString* pTextToRemove, long* pnP
 					
 					// Keep track of the index at which the first char to remove was found (the
 					// return value).
-					if (nFirstPosition == -1)
+					if (nFirstPosition == -1 || nPosition < nFirstPosition)
 					{
 						nFirstPosition = nPosition;
 					}

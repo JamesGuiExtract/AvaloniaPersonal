@@ -1105,6 +1105,16 @@ library UCLID_COMUTILSLib
 		//			bstrTagValue - The text that should replace the tag during path tag expansion.
 		[id(27), helpstring("method AddCustomTag")] HRESULT AddCustomTag(
 			[in] BSTR bstrTagName, [in] BSTR bstrTagValue);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Indicates whether the extension of bstrFileName is one typically used for image
+		//			files.
+		[id(28), helpstring("method IsImageFileExtension")] HRESULT IsImageFileExtension(
+			[in] BSTR bstrFileName, [out, retval] VARIANT_BOOL* pvbValue);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Indicates whether the extension of bstrFileName is numeric (sometimes used for
+		//			image files).
+		[id(29), helpstring("method IsNumericFileExtension")] HRESULT IsNumericFileExtension(
+			[in] BSTR bstrFileName, [out, retval] VARIANT_BOOL* pvbValue);
 	};
 	[
 		object,

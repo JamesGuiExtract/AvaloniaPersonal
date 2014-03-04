@@ -147,6 +147,11 @@ namespace Extract.FileActionManager.Conditions
         /// </summary>
         ImageCodecs _codecs;
 
+        /// <summary>
+        /// Used to check  for image file extensions.
+        /// </summary>
+        MiscUtils _miscUtils;
+
         #endregion Fields
 
         #region Constructors
@@ -337,11 +342,13 @@ namespace Extract.FileActionManager.Conditions
                 // skipped during queuing we will need to manually check for the number of pages.
                 if (documentPageCount == 0)
                 {
-                    if (!File.Exists(pFileRecord.Name))
+                    string sourceDocName = pFileRecord.Name;
+
+                    if (!File.Exists(sourceDocName))
                     {
                         var ee = new ExtractException("ELI36706",
-                            "Cannot check page count of non-existant document.");
-                        ee.AddDebugData("SourceDocName", pFileRecord.Name, false);
+                            "Cannot check page count of non-existent document.");
+                        ee.AddDebugData("SourceDocName", sourceDocName, false);
                         throw ee;
                     }
 
@@ -350,9 +357,33 @@ namespace Extract.FileActionManager.Conditions
                         _codecs = new ImageCodecs();
                     }
 
-                    using (var imageReader = _codecs.CreateReader(pFileRecord.Name))
+                    try
                     {
-                        documentPageCount = imageReader.PageCount;
+                        using (var imageReader = _codecs.CreateReader(pFileRecord.Name))
+                        {
+                            documentPageCount = imageReader.PageCount;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (_miscUtils == null)
+                        {
+                            _miscUtils = new MiscUtils();
+                        }
+
+                        // https://extract.atlassian.net/browse/ISSUE-12044
+                        // If the document has an image or numeric extension, throw an exception
+                        // because we should be able to get a page count. But if the document does
+                        // not appear to be an image, ignore this error and let the page count be
+                        // zero.
+                        if (_miscUtils.IsImageFileExtension(sourceDocName) ||
+                            _miscUtils.IsNumericFileExtension(sourceDocName))
+                        {
+                            var ee = new ExtractException("ELI36712",
+                                "Unable to get page count of document.", ex);
+                            ee.AddDebugData("SourceDocName", sourceDocName, false);
+                            throw ee;
+                        }
                     }
                 }
 
