@@ -108,8 +108,8 @@ public:
 		BSTR bstrSourceDocName, IUnknown *pData, BSTR* pbstrOutput);
 	STDMETHOD(AddCustomTag)(BSTR bstrTagName, BSTR bstrTagValue);
 
-	STDMETHOD(IsImageFileExtension)(BSTR bstrFileName, VARIANT_BOOL* pvbValue);
-	STDMETHOD(IsNumericFileExtension)(BSTR bstrFileName, VARIANT_BOOL* pvbValue);
+	STDMETHOD(HasImageFileExtension)(BSTR bstrFileName, VARIANT_BOOL* pvbValue);
+	STDMETHOD(HasNumericFileExtension)(BSTR bstrFileName, VARIANT_BOOL* pvbValue);
 
 	// PROMISE:	Determines whether the specified object supports configuration either via
 	//			ISpecifyPropertyPages or IConfigurableObject

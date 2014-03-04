@@ -1108,12 +1108,12 @@ library UCLID_COMUTILSLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Indicates whether the extension of bstrFileName is one typically used for image
 		//			files.
-		[id(28), helpstring("method IsImageFileExtension")] HRESULT IsImageFileExtension(
+		[id(28), helpstring("method IsImageFileExtension")] HRESULT HasImageFileExtension(
 			[in] BSTR bstrFileName, [out, retval] VARIANT_BOOL* pvbValue);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Indicates whether the extension of bstrFileName is numeric (sometimes used for
 		//			image files).
-		[id(29), helpstring("method IsNumericFileExtension")] HRESULT IsNumericFileExtension(
+		[id(29), helpstring("method IsNumericFileExtension")] HRESULT HasNumericFileExtension(
 			[in] BSTR bstrFileName, [out, retval] VARIANT_BOOL* pvbValue);
 	};
 	[

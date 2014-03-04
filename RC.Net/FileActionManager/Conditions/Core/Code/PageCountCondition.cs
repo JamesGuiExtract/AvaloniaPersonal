@@ -376,8 +376,8 @@ namespace Extract.FileActionManager.Conditions
                         // because we should be able to get a page count. But if the document does
                         // not appear to be an image, ignore this error and let the page count be
                         // zero.
-                        if (_miscUtils.IsImageFileExtension(sourceDocName) ||
-                            _miscUtils.IsNumericFileExtension(sourceDocName))
+                        if (_miscUtils.HasImageFileExtension(sourceDocName) ||
+                            _miscUtils.HasNumericFileExtension(sourceDocName))
                         {
                             var ee = new ExtractException("ELI36712",
                                 "Unable to get page count of document.", ex);

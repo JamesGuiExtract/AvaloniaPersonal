@@ -1284,7 +1284,7 @@ STDMETHODIMP CMiscUtils::AddCustomTag(BSTR bstrTagName, BSTR bstrTagValue)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36103");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CMiscUtils::IsImageFileExtension(BSTR bstrFileName,  VARIANT_BOOL* pvbValue)
+STDMETHODIMP CMiscUtils::HasImageFileExtension(BSTR bstrFileName, VARIANT_BOOL* pvbValue)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -1295,7 +1295,8 @@ STDMETHODIMP CMiscUtils::IsImageFileExtension(BSTR bstrFileName,  VARIANT_BOOL* 
 		validateLicense();
 
 		string strFileName = asString(bstrFileName);
-		bool bIsImageExt = isImageFileExtension(strFileName);
+		string strExtension = getExtensionFromFullPath(strFileName);
+		bool bIsImageExt = isImageFileExtension(strExtension);
 		*pvbValue = asVariantBool(bIsImageExt);
 
 		return S_OK;
@@ -1303,7 +1304,7 @@ STDMETHODIMP CMiscUtils::IsImageFileExtension(BSTR bstrFileName,  VARIANT_BOOL* 
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36709");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CMiscUtils::IsNumericFileExtension(BSTR bstrFileName,  VARIANT_BOOL* pvbValue)
+STDMETHODIMP CMiscUtils::HasNumericFileExtension(BSTR bstrFileName, VARIANT_BOOL* pvbValue)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -1314,7 +1315,8 @@ STDMETHODIMP CMiscUtils::IsNumericFileExtension(BSTR bstrFileName,  VARIANT_BOOL
 		validateLicense();
 
 		string strFileName = asString(bstrFileName);
-		bool bIsNumericExt = isNumericExtension(strFileName);
+		string strExtension = getExtensionFromFullPath(strFileName);
+		bool bIsNumericExt = isNumericExtension(strExtension);
 		*pvbValue = asVariantBool(bIsNumericExt);
 
 		return S_OK;
