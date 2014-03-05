@@ -159,7 +159,7 @@ Names|Mr. John Smith, With Rights
 
 <TESTCASE>|Name With A Corporation|ACME Explosives Inc., A Corporation
 Names|ACME Explosives Inc., A Corporation
-.Company|ACME Explosives Inc.
+.Company|ACME Explosives Inc
 
 <TESTCASE>|Name With Et Al|Mr. John Smith, Et Al
 Names|Mr. John Smith, Et Al
