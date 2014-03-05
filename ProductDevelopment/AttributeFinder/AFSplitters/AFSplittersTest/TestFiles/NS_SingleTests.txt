@@ -60,14 +60,6 @@ Names|Dr. John Henry Smith III, A Baron Sole
 ..Last|Smith
 ..Middle|Henry
 
-<TESTCASE>|Name with Solely|Mr John Q. Smith, Solely
-Names|Mr John Q. Smith, Solely
-.Person|Mr John Q. Smith
-..Title|Mr
-..First|John
-..Last|Smith
-..Middle|Q.
-
 <TESTCASE>|Name with Who Is|John Q. Smith who is married
 Names|John Q. Smith who is married
 .Person|John Q. Smith
