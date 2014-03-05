@@ -62,15 +62,3 @@
 
 // Pre-processor, remove, recurive N/A,for multiple zone attributes only
 <TESTFOLDER>;.\Test19.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test19.voa
-
-// Multi-page attribute, OutputHandler, pseudo-spatial, Top-level only, no condition.
-<TESTFOLDER>;.\Test20.rsd;.\Declaration of Independence\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test20.voa
-
-// Multi-page attribute, OutputHandler, pseudo-spatial, Top-level only, single page condition keeps as hybrid.
-<TESTFOLDER>;.\Test21.rsd;.\Declaration of Independence\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test21.voa
-
-// Multi-page attribute, OutputHandler, pseudo-spatial, Top-level only, multi-zone condition.
-<TESTFOLDER>;.\Test22.rsd;.\Declaration of Independence\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test22.voa
-
-// Single-page, multi-zone attribute, OutputHandler, pseudo-spatial, Top-level only, single page condition.
-<TESTFOLDER>;.\Test23.rsd;.\Declaration of Independence\;;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test23.voa
