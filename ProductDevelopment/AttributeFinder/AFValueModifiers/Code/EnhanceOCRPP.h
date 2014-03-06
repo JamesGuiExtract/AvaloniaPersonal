@@ -45,7 +45,6 @@ public:
 		COMMAND_HANDLER(IDC_RADIO_CUSTOM_FILTERS, BN_CLICKED, OnFilterRadioButton)
 		COMMAND_HANDLER(IDC_BTN_CUSTOM_FILTERS_DOC_TAG, BN_CLICKED, OnClickedCustomFiltersDocTag)
 		COMMAND_HANDLER(IDC_BTN_CUSTOM_FILTERS_BROWSE, BN_CLICKED, OnClickedCustomFiltersBrowse)
-		COMMAND_HANDLER(IDC_PREFERRED_REGEX_INFO, STN_CLICKED, OnClickedPreferredRegexHelp)
 		COMMAND_HANDLER(IDC_BTN_PREFERRED_FORMAT_DOC_TAG, BN_CLICKED, OnClickedPreferredFormatDocTag)
 		COMMAND_HANDLER(IDC_BTN_PREFERRED_FORMAT_BROWSE, BN_CLICKED, OnClickedPreferredFormatBrowse)
 
@@ -56,7 +55,6 @@ public:
 	LRESULT OnFilterRadioButton(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedCustomFiltersDocTag(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedCustomFiltersBrowse(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
-	LRESULT OnClickedPreferredRegexHelp(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedPreferredFormatDocTag(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedPreferredFormatBrowse(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
@@ -85,7 +83,7 @@ private:
 	ATLControls::CEdit m_editCustomerFilters;
 	ATLControls::CButton m_btnCustomFiltersDocTag;
 	ATLControls::CButton m_btnCustomFiltersBrowse;
-	ATLControls::CEdit m_editPreferredFormatRegex;
+	ATLControls::CEdit m_editPreferredFormatRegexFile;
 	ATLControls::CButton m_btnPreferredFormatDocTag;
 	ATLControls::CButton m_btnPreferredFormatBrowse;
 	ATLControls::CEdit m_editCharsToIgnore;

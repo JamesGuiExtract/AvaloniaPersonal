@@ -11,6 +11,7 @@
 #include <StringTokenizer.h>
 #include <RegExLoader.h>
 #include <RuleSetProfiler.h>
+#include <AFTagManager.h>
 
 // add license management function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
@@ -163,6 +164,7 @@ CEnhanceOCR::CEnhanceOCR()
 , m_pFilters(__nullptr)
 , m_nFilterCount(0)
 , m_ipProgressStatus(__nullptr)
+, m_ipTagUtility(__nullptr)
 , m_ipCurrentDoc(__nullptr)
 , m_bProcessFullDoc(false)
 , m_nCurrentPage(0)
@@ -193,6 +195,7 @@ CEnhanceOCR::~CEnhanceOCR()
 	try
 	{
 		m_ipProgressStatus = __nullptr;
+		m_ipTagUtility = __nullptr;
 		m_ipCurrentDoc = __nullptr;
 		m_apPageBitmap.reset(__nullptr);
 		m_apFilteredBitmapFileName.reset(__nullptr);
@@ -322,7 +325,7 @@ STDMETHODIMP CEnhanceOCR::put_CustomFilterPackage(BSTR newVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36466")
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CEnhanceOCR::get_PreferredFormatRegex(BSTR *pVal)
+STDMETHODIMP CEnhanceOCR::get_PreferredFormatRegexFile(BSTR *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -332,14 +335,14 @@ STDMETHODIMP CEnhanceOCR::get_PreferredFormatRegex(BSTR *pVal)
 
 		validateLicense();
 
-		*pVal = get_bstr_t(m_strPreferredFormatRegex).Detach();
+		*pVal = get_bstr_t(m_strPreferredFormatRegexFile).Detach();
 
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36468")
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CEnhanceOCR::put_PreferredFormatRegex(BSTR newVal)
+STDMETHODIMP CEnhanceOCR::put_PreferredFormatRegexFile(BSTR newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -347,7 +350,7 @@ STDMETHODIMP CEnhanceOCR::put_PreferredFormatRegex(BSTR newVal)
 	{
 		validateLicense();
 
-		m_strPreferredFormatRegex = asString(newVal);
+		m_strPreferredFormatRegexFile = asString(newVal);
 
 		m_bDirty = true;
 
@@ -424,7 +427,8 @@ STDMETHODIMP CEnhanceOCR::put_OutputFilteredImages(VARIANT_BOOL newVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36475")
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CEnhanceOCR::EnhanceDocument(IAFDocument* pDocument, IProgressStatus *pProgressStatus)
+STDMETHODIMP CEnhanceOCR::EnhanceDocument(IAFDocument* pDocument, ITagUtility* pTagUtility, 
+										  IProgressStatus *pProgressStatus)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -436,6 +440,9 @@ STDMETHODIMP CEnhanceOCR::EnhanceDocument(IAFDocument* pDocument, IProgressStatu
 
 		IAFDocumentPtr ipAFDoc(pDocument);
 		ASSERT_RESOURCE_ALLOCATION("ELI36666", ipAFDoc != __nullptr);
+
+		m_ipTagUtility = pTagUtility;
+		ASSERT_RESOURCE_ALLOCATION("ELI36721", m_ipTagUtility != __nullptr);
 
 		m_ipProgressStatus = pProgressStatus;
 
@@ -506,7 +513,6 @@ STDMETHODIMP CEnhanceOCR::raw_ModifyValue(IAttribute* pAttribute,
 				throw ue;
 			}
 		}
-		while (!bRetried);
 
 		return S_OK;
 	}
@@ -535,7 +541,7 @@ STDMETHODIMP CEnhanceOCR::raw_ProcessOutput(IIUnknownVector * pAttributes, IAFDo
 		// At this point it seems unlikely we will be able to find and fix the underlying cause
 		// in time for the 9.8 release. For now, add one retry to (hopefully) mask the issue.
 		bool bRetried = false;
-		do
+		while (true)
 		{
 			try
 			{
@@ -563,7 +569,6 @@ STDMETHODIMP CEnhanceOCR::raw_ProcessOutput(IIUnknownVector * pAttributes, IAFDo
 				throw ue;
 			}
 		}
-		while (!bRetried);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36480");
 
@@ -656,12 +661,12 @@ STDMETHODIMP CEnhanceOCR::raw_CopyFrom(IUnknown *pObject)
 		UCLID_AFVALUEMODIFIERSLib::IEnhanceOCRPtr ipCopyThis = pObject;
 		ASSERT_ARGUMENT("ELI36487", ipCopyThis != __nullptr);
 
-		m_nConfidenceCriteria		= ipCopyThis->ConfidenceCriteria;
-		m_eFilterPackage			= ipCopyThis->FilterPackage;
-		m_strCustomFilterPackage	= asString(ipCopyThis->CustomFilterPackage);
-		m_strPreferredFormatRegex	= asString(ipCopyThis->PreferredFormatRegex);
-		m_strCharsToIgnore			= asString(ipCopyThis->CharsToIgnore);
-		m_bOutputFilteredImages		= asCppBool(ipCopyThis->OutputFilteredImages);
+		m_nConfidenceCriteria			= ipCopyThis->ConfidenceCriteria;
+		m_eFilterPackage				= ipCopyThis->FilterPackage;
+		m_strCustomFilterPackage		= asString(ipCopyThis->CustomFilterPackage);
+		m_strPreferredFormatRegexFile	= asString(ipCopyThis->PreferredFormatRegexFile);
+		m_strCharsToIgnore				= asString(ipCopyThis->CharsToIgnore);
+		m_bOutputFilteredImages			= asCppBool(ipCopyThis->OutputFilteredImages);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36488");
 
@@ -764,7 +769,7 @@ STDMETHODIMP CEnhanceOCR::Load(IStream *pStream)
 		dataReader >> nTemp;
 		m_eFilterPackage = (UCLID_AFVALUEMODIFIERSLib::EFilterPackage)nTemp;
 		dataReader >> m_strCustomFilterPackage;
-		dataReader >> m_strPreferredFormatRegex;
+		dataReader >> m_strPreferredFormatRegexFile;
 		dataReader >> m_strCharsToIgnore;
 		dataReader >> m_bOutputFilteredImages;
 
@@ -800,7 +805,7 @@ STDMETHODIMP CEnhanceOCR::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_nConfidenceCriteria;
 		dataWriter << (long)m_eFilterPackage;
 		dataWriter << m_strCustomFilterPackage;
-		dataWriter << m_strPreferredFormatRegex;
+		dataWriter << m_strPreferredFormatRegexFile;
 		dataWriter << m_strCharsToIgnore;
 		dataWriter << m_bOutputFilteredImages;
 
@@ -919,7 +924,8 @@ void CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc)
 	{
 		try
 		{
-			m_strSourceDocName = "";
+			m_ipCurrentDoc = ipAFDoc;
+			ASSERT_RESOURCE_ALLOCATION("ELI36722", m_ipCurrentDoc != __nullptr);
 
 			ISpatialStringPtr ipDocText = ipAFDoc->Text;
 			ASSERT_RESOURCE_ALLOCATION("ELI36504", ipDocText != __nullptr);
@@ -1097,6 +1103,9 @@ ISpatialStringPtr CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc, long nPage)
 //--------------------------------------------------------------------------------------------------
 void CEnhanceOCR::enhanceOCR(IIUnknownVector *pAttributes, IAFDocument *pDoc)
 {
+	m_ipCurrentDoc = pDoc;
+	ASSERT_RESOURCE_ALLOCATION("ELI36723", m_ipCurrentDoc != __nullptr);
+
 	unlockDocumentSupport();
 
 	initializeFilters();
@@ -1353,7 +1362,18 @@ void CEnhanceOCR::initializeFilters()
 			break;
 
 		case kCustom:
-			initializeCustomFilters();
+			try
+			{
+				try
+				{
+					initializeCustomFilters();
+				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36724");
+			}
+			catch (UCLIDException &ue)
+			{
+				throw UCLIDException("ELI36725", "Failed to initialize custom filters.", ue);
+			}
 			break;
 		}
 	}
@@ -1361,7 +1381,8 @@ void CEnhanceOCR::initializeFilters()
 //-------------------------------------------------------------------------------------------------
 void CEnhanceOCR::initializeCustomFilters()
 {
-	CommentedTextFileReader& fileReader = getFileReader(m_strCustomFilterPackage);
+	string strExpandedFileName = expandPathTagsAndFunctions(m_strCustomFilterPackage);
+	CommentedTextFileReader& fileReader = getFileReader(strExpandedFileName);
 
 	while (!fileReader.reachedEndOfStream())
 	{
@@ -1395,7 +1416,7 @@ void CEnhanceOCR::initializeCustomFilters()
 				st.parse(strFilter, vecParameters);
 				strFilter = vecParameters[0];
 
-				string strFilterFilename = getDirectoryFromFullPath(m_strCustomFilterPackage) +
+				string strFilterFilename = getDirectoryFromFullPath(strExpandedFileName) +
 					"\\" + strFilter + ".dat";
 				if (!isValidFile(strFilterFilename))
 				{
@@ -1419,7 +1440,8 @@ void CEnhanceOCR::initializeCustomFilters()
 //-------------------------------------------------------------------------------------------------
 void CEnhanceOCR::initializeCustomFilter(string strFilterName, string strFilterFilename)
 {
-	CommentedTextFileReader& fileReader = getFileReader(strFilterFilename);
+	string strExpandedFileName = expandPathTagsAndFunctions(strFilterFilename);
+	CommentedTextFileReader& fileReader = getFileReader(strExpandedFileName);
 				
 	string strFilterDefinition;
 	while (!fileReader.reachedEndOfStream())
@@ -2838,35 +2860,41 @@ UCLID_AFVALUEMODIFIERSLib::ISplitRegionIntoContentAreasPtr CEnhanceOCR::getSRICA
 //--------------------------------------------------------------------------------------------------
 IRegularExprParserPtr CEnhanceOCR::getPreferredFormatRegex()
 {
-	if (m_ipPreferredFormatParser == __nullptr && !m_strPreferredFormatRegex.empty())
+	if (m_ipPreferredFormatParser == __nullptr && !m_strPreferredFormatRegexFile.empty())
 	{
+		string strExpandedFileName = expandPathTagsAndFunctions(m_strPreferredFormatRegexFile);
+		m_cachedRegexLoader.loadObjectFromFile(strExpandedFileName);
+
 		// Use AF Utility instead? (to be able to parse attribute references)
 		m_ipPreferredFormatParser = m_ipMiscUtils->GetNewRegExpParserInstance("");
 		ASSERT_RESOURCE_ALLOCATION("ELI36583", m_ipPreferredFormatParser != __nullptr);
-
-		// Try to remove the file:// prefix if the string is a file name.
-		string strAfterRemoveHeader =
-			asString(m_ipMiscUtils->GetFileNameWithoutHeader(m_strPreferredFormatRegex.c_str()));
-
-		// Expand tags only happens when the string is a file name if it is not, all tags will be
-		// treated as common strings [P16: 2118]
-		if (m_strPreferredFormatRegex == strAfterRemoveHeader)
-		{
-			m_ipPreferredFormatParser->Pattern = m_strPreferredFormatRegex.c_str();
-		}
-		else
-		{
-			m_cachedRegexLoader.loadObjectFromFile(strAfterRemoveHeader);
-			m_ipPreferredFormatParser->Pattern = m_cachedRegexLoader.m_obj.c_str();
-		}
+		
+		m_ipPreferredFormatParser->Pattern = m_cachedRegexLoader.m_obj.c_str();
 	}
 
 	return m_ipPreferredFormatParser;
 }
 //--------------------------------------------------------------------------------------------------
+string CEnhanceOCR::expandPathTagsAndFunctions(string strFileName)
+{
+	if (m_ipTagUtility != __nullptr)
+	{
+		// If a tag manager has been passed in via EnhanceDocument, use it.
+		return asString(m_ipTagUtility->ExpandTagsAndFunctions(
+			strFileName.c_str(), m_strSourceDocName.c_str(), __nullptr));
+	}
+	else
+	{
+		// Otherwise a rule object execution context is assumed; use an AFTagManager to expand tags.
+		AFTagManager tagMgr;
+		return tagMgr.expandTagsAndFunctions(strFileName, m_ipCurrentDoc);
+	}
+}
+//--------------------------------------------------------------------------------------------------
 CommentedTextFileReader CEnhanceOCR::getFileReader(const string& strFilename)
 {
-	CachedObjectFromFile<string, StringLoader>& filterLoader = m_cachedFileLoaders[strFilename];
+	CachedObjectFromFile<string, StringLoader>& filterLoader =
+		m_cachedFileLoaders[strFilename];
 	
 	filterLoader.loadObjectFromFile(strFilename);
 
@@ -2884,7 +2912,7 @@ void CEnhanceOCR::reset()
 	m_nConfidenceCriteria = 60;
 	m_eFilterPackage = (UCLID_AFVALUEMODIFIERSLib::EFilterPackage)kMedium;
 	m_strCustomFilterPackage = "";
-	m_strPreferredFormatRegex = "";
+	m_strPreferredFormatRegexFile = "";
 	m_strCharsToIgnore = "_";
 	m_bOutputFilteredImages = false;
 }

@@ -147,7 +147,7 @@ STDMETHODIMP CEnhanceOCRTask::put_CustomFilterPackage(BSTR newVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36597")
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CEnhanceOCRTask::get_PreferredFormatRegex(BSTR *pVal)
+STDMETHODIMP CEnhanceOCRTask::get_PreferredFormatRegexFile(BSTR *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -157,14 +157,14 @@ STDMETHODIMP CEnhanceOCRTask::get_PreferredFormatRegex(BSTR *pVal)
 
 		validateLicense();
 
-		*pVal = m_ipEnhanceOCR->PreferredFormatRegex.Detach();
+		*pVal = m_ipEnhanceOCR->PreferredFormatRegexFile.Detach();
 
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36599")
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CEnhanceOCRTask::put_PreferredFormatRegex(BSTR newVal)
+STDMETHODIMP CEnhanceOCRTask::put_PreferredFormatRegexFile(BSTR newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -172,7 +172,7 @@ STDMETHODIMP CEnhanceOCRTask::put_PreferredFormatRegex(BSTR newVal)
 	{
 		validateLicense();
 
-		m_ipEnhanceOCR->PreferredFormatRegex = newVal;
+		m_ipEnhanceOCR->PreferredFormatRegexFile = newVal;
 
 		return S_OK;
 	}
@@ -271,6 +271,9 @@ STDMETHODIMP CEnhanceOCRTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAc
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI36670", ipFileRecord != __nullptr);
 
+		ITagUtilityPtr ipTagUtility(pTagManager);
+		ASSERT_ARGUMENT("ELI36720", ipTagUtility != __nullptr);
+
 		string strSourceDocName = asString(ipFileRecord->GetName());
 		string strUssFilename = strSourceDocName + ".uss";
 
@@ -282,7 +285,7 @@ STDMETHODIMP CEnhanceOCRTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAc
 			ipAFDoc->Text->LoadFrom(strUssFilename.c_str(), VARIANT_FALSE);
 		}
 		
-		m_ipEnhanceOCR->EnhanceDocument(ipAFDoc, pProgressStatus);
+		m_ipEnhanceOCR->EnhanceDocument(ipAFDoc, ipTagUtility, pProgressStatus);
 
 		ipAFDoc->Text->SaveTo(strUssFilename.c_str(), VARIANT_TRUE, VARIANT_TRUE);
 	}
@@ -430,12 +433,12 @@ STDMETHODIMP CEnhanceOCRTask::raw_CopyFrom(IUnknown *pObject)
 		UCLID_AFFILEPROCESSORSLib::IEnhanceOCRTaskPtr ipCopyThis = pObject;
 		ASSERT_ARGUMENT("ELI36611", ipCopyThis != __nullptr);
 
-		m_ipEnhanceOCR->ConfidenceCriteria		= ipCopyThis->ConfidenceCriteria;
-		m_ipEnhanceOCR->FilterPackage			= ipCopyThis->FilterPackage;
-		m_ipEnhanceOCR->CustomFilterPackage		= ipCopyThis->CustomFilterPackage;
-		m_ipEnhanceOCR->PreferredFormatRegex	= ipCopyThis->PreferredFormatRegex;
-		m_ipEnhanceOCR->CharsToIgnore			= ipCopyThis->CharsToIgnore;
-		m_ipEnhanceOCR->OutputFilteredImages	= ipCopyThis->OutputFilteredImages;
+		m_ipEnhanceOCR->ConfidenceCriteria			= ipCopyThis->ConfidenceCriteria;
+		m_ipEnhanceOCR->FilterPackage				= ipCopyThis->FilterPackage;
+		m_ipEnhanceOCR->CustomFilterPackage			= ipCopyThis->CustomFilterPackage;
+		m_ipEnhanceOCR->PreferredFormatRegexFile	= ipCopyThis->PreferredFormatRegexFile;
+		m_ipEnhanceOCR->CharsToIgnore				= ipCopyThis->CharsToIgnore;
+		m_ipEnhanceOCR->OutputFilteredImages		= ipCopyThis->OutputFilteredImages;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36612");
 

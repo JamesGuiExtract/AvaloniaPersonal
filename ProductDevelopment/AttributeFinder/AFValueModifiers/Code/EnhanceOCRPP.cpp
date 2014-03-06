@@ -8,7 +8,6 @@
 #include <LicenseMgmt.h>
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
-#include <AFTagManager.h>
 #include <DocTagUtils.h>
 
 #include <string>
@@ -80,7 +79,7 @@ LRESULT CEnhanceOCRPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 		m_btnCustomFiltersDocTag.SetIcon(
 			::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
 		m_btnCustomFiltersBrowse			= GetDlgItem(IDC_BTN_CUSTOM_FILTERS_BROWSE);
-		m_editPreferredFormatRegex			= GetDlgItem(IDC_EDIT_PREFERRED_FORMAT);
+		m_editPreferredFormatRegexFile		= GetDlgItem(IDC_EDIT_PREFERRED_FORMAT);
 		m_btnPreferredFormatDocTag			= GetDlgItem(IDC_BTN_PREFERRED_FORMAT_DOC_TAG);
 		m_btnPreferredFormatDocTag.SetIcon(
 			::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
@@ -131,7 +130,7 @@ LRESULT CEnhanceOCRPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 				break;
 		}
 		m_editCustomerFilters.SetWindowText(asString(ipRule->CustomFilterPackage).c_str());
-		m_editPreferredFormatRegex.SetWindowText(asString(ipRule->PreferredFormatRegex).c_str());
+		m_editPreferredFormatRegexFile.SetWindowText(asString(ipRule->PreferredFormatRegexFile).c_str());
 		m_editCharsToIgnore.SetWindowText(asString(ipRule->CharsToIgnore).c_str());
 		m_chkOutputFilteredImages.SetCheck(asBSTChecked(ipRule->OutputFilteredImages));
 		
@@ -200,27 +199,6 @@ LRESULT CEnhanceOCRPP::OnClickedCustomFiltersBrowse(WORD wNotifyCode, WORD wID, 
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------
-LRESULT CEnhanceOCRPP::OnClickedPreferredRegexHelp(WORD wNotifyCode, WORD wID, HWND hWndCtl,
-												   BOOL& bHandled)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		// show tooltip info
-		CString zText("- Dynamically loading a string from a file is supported\n"
-					  "- For example, if the String to find edit box contains\n"
-					  "  file://D:\\find.dat, the contents of the file will be\n"
-					  "  loaded dynamically at run time for finding.\n\n"
-					  "- The string should begin with \"file://\" and users can\n"
-					  "  browse or use tags to define the file name.\n");
-		m_infoTip.Show(zText);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI36443");
-
-	return 0;
-}
-//-------------------------------------------------------------------------------------------------
 LRESULT CEnhanceOCRPP::OnClickedPreferredFormatDocTag(WORD wNotifyCode, WORD wID, HWND hWndCtl,
 													  BOOL& bHandled)
 {
@@ -228,8 +206,8 @@ LRESULT CEnhanceOCRPP::OnClickedPreferredFormatDocTag(WORD wNotifyCode, WORD wID
 
 	try
 	{
-		ChooseDocTagForEditBox(
-			ITagUtilityPtr(CLSID_AFUtility), m_btnPreferredFormatDocTag, m_editPreferredFormatRegex);
+		ChooseDocTagForEditBox(ITagUtilityPtr(CLSID_AFUtility), m_btnPreferredFormatDocTag,
+			m_editPreferredFormatRegexFile);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI36444");
 
@@ -259,7 +237,7 @@ LRESULT CEnhanceOCRPP::OnClickedPreferredFormatBrowse(WORD wNotifyCode, WORD wID
 			// get the file name
 			CString zFullFileName = CString(
 				asString(m_ipMiscUtils->GetFileHeader()).c_str() + fileDlg.GetPathName());
-			m_editPreferredFormatRegex.SetWindowText(zFullFileName);
+			m_editPreferredFormatRegexFile.SetWindowText(zFullFileName);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI36445");
@@ -306,10 +284,13 @@ STDMETHODIMP CEnhanceOCRPP::Apply(void)
 			}
 			ipRule->CustomFilterPackage = _bstr_t(bstrCustomFilter);
 
-			CComBSTR bstrPreferredFormatRegex;
-			m_editPreferredFormatRegex.GetWindowText(bstrPreferredFormatRegex.m_str);
-			AFTagManager::validateDynamicFilePath("ELI36449", asString(bstrPreferredFormatRegex));
-			ipRule->PreferredFormatRegex = _bstr_t(bstrPreferredFormatRegex);
+			CComBSTR bstrPreferredFormatRegexFile;
+			m_editPreferredFormatRegexFile.GetWindowText(bstrPreferredFormatRegexFile.m_str);
+			if (bstrPreferredFormatRegexFile.Length() > 0)
+			{
+				m_ipAFUtility->ValidateAsExplicitPath("ELI36449", _bstr_t(bstrPreferredFormatRegexFile));
+			}
+			ipRule->PreferredFormatRegexFile = _bstr_t(bstrPreferredFormatRegexFile);
 			
 			CComBSTR bstrCharsToIgnore;
 			m_editCharsToIgnore.GetWindowText(bstrCharsToIgnore.m_str);

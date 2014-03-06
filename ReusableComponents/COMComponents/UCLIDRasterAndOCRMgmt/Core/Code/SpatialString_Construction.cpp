@@ -565,7 +565,13 @@ STDMETHODIMP CSpatialString::SaveTo(BSTR strFullFileName, VARIANT_BOOL bCompress
 			string strSourceDocName = m_strSourceDocName;
 			try
 			{
-				m_strSourceDocName = ::getUNCPath(strSourceDocName);
+				// https://extract.atlassian.net/browse/ISSUE-12052
+				// If there is no source doc name (empty spatial string), don't try to get the UNC
+				// path... it will result in an exception.
+				if (!strSourceDocName.empty())
+				{
+					m_strSourceDocName = ::getUNCPath(strSourceDocName);
+				}
 
 				writeObjectToFile(this, _bstr_t(strOutputFileName.c_str()), 
 					gbstrSPATIAL_STRING_STREAM_NAME, asCppBool(bClearDirty), 

@@ -64,8 +64,8 @@ class ATL_NO_VTABLE CEnhanceOCRTask :
 	STDMETHOD(put_FilterPackage)(EFilterPackage newVal);
 	STDMETHOD(get_CustomFilterPackage)(BSTR *pVal);
 	STDMETHOD(put_CustomFilterPackage)(BSTR newVal);
-	STDMETHOD(get_PreferredFormatRegex)(BSTR *pVal);
-	STDMETHOD(put_PreferredFormatRegex)(BSTR newVal);
+	STDMETHOD(get_PreferredFormatRegexFile)(BSTR *pVal);
+	STDMETHOD(put_PreferredFormatRegexFile)(BSTR newVal);
 	STDMETHOD(get_CharsToIgnore)(BSTR *pVal);
 	STDMETHOD(put_CharsToIgnore)(BSTR newVal);
 	STDMETHOD(get_OutputFilteredImages)(VARIANT_BOOL *pVal);

@@ -468,12 +468,12 @@ library UCLID_AFVALUEMODIFIERSLib
 		[propget, id(3), helpstring("property CustomFilterPackage")] HRESULT CustomFilterPackage([out, retval] BSTR *pVal);
 		[propput, id(3), helpstring("property CustomFilterPackage")] HRESULT CustomFilterPackage([in] BSTR newVal);
 
-		// The regex (or path of a regex file) that specifies formats that are preferred and should be
-		// used over other formats. The final result will contain this pattern unless the confidence of
-		// the possibility(ies) containing this pattern are very substantially outweighed by a
-		// possibility that does not contain this pattern.
-		[propget, id(4), helpstring("property PreferredFormatRegex")] HRESULT PreferredFormatRegex([out, retval] BSTR *pVal);
-		[propput, id(4), helpstring("property PreferredFormatRegex")] HRESULT PreferredFormatRegex([in] BSTR newVal);
+		// A regex file that specifies formats that are preferred and should be used over other formats.
+		// The final result will contain this pattern unless the confidence of the possibility(ies)
+		// containing this pattern are very substantially outweighed by a possibility that does not
+		// contain this pattern.
+		[propget, id(4), helpstring("property PreferredFormatRegexFile")] HRESULT PreferredFormatRegexFile([out, retval] BSTR *pVal);
+		[propput, id(4), helpstring("property PreferredFormatRegexFile")] HRESULT PreferredFormatRegexFile([in] BSTR newVal);
 
 		// Any chars in this string will be prevented from being created by the EnhanceOCR process.
 		[propget, id(5), helpstring("property CharsToIgnore")] HRESULT CharsToIgnore([out, retval] BSTR *pVal);
@@ -485,7 +485,7 @@ library UCLID_AFVALUEMODIFIERSLib
 
 		// An API call to allow the specified document text to be enhanced.
 		[id(7), helpstring("method EnhanceDocument")] HRESULT EnhanceDocument([in] IAFDocument* pDocument,
-			IProgressStatus *pProgressStatus);
+			[in] ITagUtility* pTagUtility, [in] IProgressStatus *pProgressStatus);
 	};
 
 	//////////////////

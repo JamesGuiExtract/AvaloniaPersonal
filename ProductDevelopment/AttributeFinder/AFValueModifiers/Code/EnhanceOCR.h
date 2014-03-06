@@ -84,13 +84,14 @@ class ATL_NO_VTABLE CEnhanceOCR :
 	STDMETHOD(put_FilterPackage)(EFilterPackage newVal);
 	STDMETHOD(get_CustomFilterPackage)(BSTR *pVal);
 	STDMETHOD(put_CustomFilterPackage)(BSTR newVal);
-	STDMETHOD(get_PreferredFormatRegex)(BSTR *pVal);
-	STDMETHOD(put_PreferredFormatRegex)(BSTR newVal);
+	STDMETHOD(get_PreferredFormatRegexFile)(BSTR *pVal);
+	STDMETHOD(put_PreferredFormatRegexFile)(BSTR newVal);
 	STDMETHOD(get_CharsToIgnore)(BSTR *pVal);
 	STDMETHOD(put_CharsToIgnore)(BSTR newVal);
 	STDMETHOD(get_OutputFilteredImages)(VARIANT_BOOL *pVal);
 	STDMETHOD(put_OutputFilteredImages)(VARIANT_BOOL newVal);
-	STDMETHOD(EnhanceDocument)(IAFDocument* pDocument, IProgressStatus *pProgressStatus);
+	STDMETHOD(EnhanceDocument)(
+		IAFDocument* pDocument, ITagUtility* pTagUtility, IProgressStatus *pProgressStatus);
 
 // IAttributeModifyingRule
 	STDMETHOD(raw_ModifyValue)(IAttribute *pAttribute, IAFDocument *pOriginInput,
@@ -304,11 +305,11 @@ private:
 	// A custom defined filter package to use.
 	string m_strCustomFilterPackage;
 
-	// The regex (or path of a regex file) that specifies formats that are preferred and should be
-	// used over other formats. The final result will contain this pattern unless the confidence of
-	// the possibility(ies) containing this pattern are very substantially outweighed by a
-	// possibility that does not contain this pattern.
-	string m_strPreferredFormatRegex;
+	// A regex file that specifies formats that are preferred and should be used over other formats.
+	// The final result will contain this pattern unless the confidence of the possibility(ies)
+	// containing this pattern are very substantially outweighed by a possibility that does not
+	// contain this pattern.
+	string m_strPreferredFormatRegexFile;
 
 	// Any chars in this string will be prevented from being created by the EnhanceOCR process.
 	string m_strCharsToIgnore;
@@ -334,7 +335,7 @@ private:
 	// Used by m_cachedFileLoaders.
 	map<string, vector<string>> m_cachedFileLines;
 
-	// This object may used to read m_strPreferredFormatRegex from a file.
+	// This object may used to read m_strPreferredFormatRegexFile.
 	CachedObjectFromFile<std::string, StringLoader> m_cachedRegexLoader;
 
 	// Used to load the original document text.
@@ -342,6 +343,9 @@ private:
 
 	// Progress status
 	IProgressStatusPtr m_ipProgressStatus;
+
+	// Used to expand m_strPreferredFormatRegexFile.
+	ITagUtilityPtr m_ipTagUtility;
 
 	// The name of the document currently being processed.
 	string m_strSourceDocName;
@@ -387,7 +391,7 @@ private:
 	// The split region into content areas object used to locate image zones to enhance.
 	UCLID_AFVALUEMODIFIERSLib::ISplitRegionIntoContentAreasPtr m_ipSRICA;
 
-	// The Regex parser used to evaluate m_strPreferredFormatRegex.
+	// The Regex parser used to evaluate the regex from m_strPreferredFormatRegexFile.
 	IRegularExprParserPtr m_ipPreferredFormatParser;
 
 	// The OCR engine used to recognize text from filtered images.
@@ -523,6 +527,10 @@ private:
 
 	// Gets a regex parser to determine if a value is in a preferred format.
 	IRegularExprParserPtr getPreferredFormatRegex();
+
+	// Expands path tags and functions using either the m_ipTagUtility provided in a task execution
+	// context or AFTagManager in a rule object execution context.
+	string expandPathTagsAndFunctions(string strFileName);
 	
 	// Gets a CommentedTextFileReader for the specified filename. All decryption/auto-encryption
 	// and caching is handled automatically.
