@@ -611,7 +611,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 		// in time for the 9.0 release. For now, add one retry nested on top of the fillImageArea
 		// retries that aren't happening to (hopefully) mask the issue.
 		bool bRetried = false;
-		do
+		while (true)
 		{
 			try
 			{
@@ -637,12 +637,12 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 						uexOuter.log();
 
 					bRetried = true;
+					continue;
 				}
 
 				throw ue;
 			}
 		}
-		while (!bRetried);
 
         // Stop the stop watch
         swProcessingTime.stop();

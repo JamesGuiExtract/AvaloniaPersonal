@@ -471,7 +471,42 @@ STDMETHODIMP CEnhanceOCR::raw_ModifyValue(IAttribute* pAttribute,
 
 		ipVector->PushBack(ipAttribute);
 
-		enhanceOCR(ipVector, pOriginInput);
+		// [https://extract.atlassian.net/browse/ISSUE-12051]
+		// There appears to be a possible corruption issue perhaps related to underlying
+		// LeadTools code. We get random failures when trying to create DC instances on
+		// images (ELI24891) and when trying to find lines within SRICA (MLI03285.20).
+		// At this point it seems unlikely we will be able to find and fix the underlying cause
+		// in time for the 9.8 release. For now, add one retry to (hopefully) mask the issue.
+		bool bRetried = false;
+		while (true)
+		{
+			try
+			{
+				try
+				{
+					enhanceOCR(ipVector, pOriginInput);
+
+					// If the call succeeded, break out of the retry loop.
+					break;
+				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36718");
+			}
+			catch (UCLIDException &ue)
+			{
+				if (!bRetried)
+				{
+					UCLIDException uexOuter("ELI36719",
+						"Enhance OCR attempt failed; retrying...", ue);
+						uexOuter.log();
+
+					bRetried = true;
+					continue;
+				}
+
+				throw ue;
+			}
+		}
+		while (!bRetried);
 
 		return S_OK;
 	}
@@ -493,7 +528,42 @@ STDMETHODIMP CEnhanceOCR::raw_ProcessOutput(IIUnknownVector * pAttributes, IAFDo
 
 		m_bProcessFullDoc = false;
 
-		enhanceOCR(pAttributes, pDoc);
+		// [https://extract.atlassian.net/browse/ISSUE-12051]
+		// There appears to be a possible corruption issue perhaps related to underlying
+		// LeadTools code. We get random failures when trying to create DC instances on
+		// images (ELI24891) and when trying to find lines within SRICA (MLI03285.20).
+		// At this point it seems unlikely we will be able to find and fix the underlying cause
+		// in time for the 9.8 release. For now, add one retry to (hopefully) mask the issue.
+		bool bRetried = false;
+		do
+		{
+			try
+			{
+				try
+				{
+					enhanceOCR(pAttributes, pDoc);
+
+					// If the call succeeded, break out of the retry loop.
+					break;
+				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36716");
+			}
+			catch (UCLIDException &ue)
+			{
+				if (!bRetried)
+				{
+					UCLIDException uexOuter("ELI36717",
+						"Enhance OCR attempt failed; retrying...", ue);
+						uexOuter.log();
+
+					bRetried = true;
+					continue;
+				}
+
+				throw ue;
+			}
+		}
+		while (!bRetried);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36480");
 
@@ -875,7 +945,47 @@ void CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc)
 			ISpatialStringPtr ipResult = __nullptr;
 			for (long nPage = 1; nPage <= nPageCount; nPage++)
 			{
-				ISpatialStringPtr ipPageText = enhanceOCR(ipAFDoc, nPage);
+				ISpatialStringPtr ipPageText(__nullptr);
+
+				// [https://extract.atlassian.net/browse/ISSUE-12051]
+				// There appears to be a possible corruption issue perhaps related to underlying
+				// LeadTools code. We get random failures when trying to create DC instances on
+				// images (ELI24891) and when trying to find lines within SRICA (MLI03285.20).
+				// At this point it seems unlikely we will be able to find and fix the underlying cause
+				// in time for the 9.8 release. For now, add one retry to (hopefully) mask the issue.
+				bool bRetried = false;
+				while (true)
+				{
+					try
+					{
+						try
+						{
+							ipPageText = enhanceOCR(ipAFDoc, nPage);
+
+							// If the call succeeded, break out of the retry loop.
+							break;
+						}
+						CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36714");
+					}
+					catch (UCLIDException &ue)
+					{
+						// We really don't know where we are at progress-wise at this point; don't
+						// update the progress status any further.
+						m_ipProgressStatus = __nullptr;
+
+						if (!bRetried)
+						{
+							UCLIDException uexOuter("ELI36715",
+								"Enhance OCR attempt failed; retrying...", ue);
+								uexOuter.log();
+
+							bRetried = true;
+							continue;
+						}
+
+						throw ue;
+					}
+				}
 
 				// Append the resulting text to the overall result.
 				if (ipPageText != __nullptr && ipPageText->HasSpatialInfo())
@@ -1335,97 +1445,93 @@ ISpatialStringPtr CEnhanceOCR::setCurrentPage(IAFDocumentPtr ipDoc, long nPage)
 {
 	ASSERT_ARGUMENT("ELI36522", ipDoc != __nullptr);
 
-	// Lazy initiation of data for the current page.
-	if (ipDoc != m_ipCurrentDoc || nPage != m_nCurrentPage)
-	{
-		// Reset any all variables tied to the current page.
-		m_nCurrentPage = nPage;
-		m_apPageBitmap.reset(__nullptr);
-		m_apFilteredBitmapFileName.reset(__nullptr);
-		m_ipPageInfoMap = __nullptr;
-		m_ipCurrentPageText = __nullptr;
-		m_ipCurrentPageInfo = __nullptr;
-		m_ipPageRasterZone = __nullptr;			
-		m_nAvgPageCharWidth = 0;
-		m_ipSpatialStringSearcher = __nullptr;
-		m_vecResults.clear();
+	// Reset any all variables tied to the current page.
+	m_nCurrentPage = nPage;
+	m_apPageBitmap.reset(__nullptr);
+	m_apFilteredBitmapFileName.reset(__nullptr);
+	m_ipPageInfoMap = __nullptr;
+	m_ipCurrentPageText = __nullptr;
+	m_ipCurrentPageInfo = __nullptr;
+	m_ipPageRasterZone = __nullptr;			
+	m_nAvgPageCharWidth = 0;
+	m_ipSpatialStringSearcher = __nullptr;
+	m_vecResults.clear();
 
-		ISpatialStringPtr ipDocText = ipDoc->Text;
-		ASSERT_RESOURCE_ALLOCATION("ELI36523", ipDocText != __nullptr);
+	ISpatialStringPtr ipDocText = ipDoc->Text;
+	ASSERT_RESOURCE_ALLOCATION("ELI36523", ipDocText != __nullptr);
 
-		m_strSourceDocName = ipDocText->SourceDocName;
-		m_ipCurrentDoc = ipDoc;
+	m_strSourceDocName = ipDocText->SourceDocName;
+	m_ipCurrentDoc = ipDoc;
 
-		string strUSSFilename = m_strSourceDocName + ".uss";
+	string strUSSFilename = m_strSourceDocName + ".uss";
 			
-		if (!isValidFile(strUSSFilename))
-		{
-			UCLIDException ue("ELI36673", "USS file is required for Enhance OCR task.");
-			ue.addDebugInfo("Filename", strUSSFilename);
-			throw ue;
-		}
+	if (!isValidFile(strUSSFilename))
+	{
+		UCLIDException ue("ELI36673", "USS file is required for Enhance OCR task.");
+		ue.addDebugInfo("Filename", strUSSFilename);
+		throw ue;
+	}
 
-		// create the rule set if necessary
-		if(m_cachedDocText.m_obj == __nullptr)
-		{
-			m_cachedDocText.m_obj.CreateInstance(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI36674", m_cachedDocText.m_obj != __nullptr);
-		}
+	// create the rule set if necessary
+	if(m_cachedDocText.m_obj == __nullptr)
+	{
+		m_cachedDocText.m_obj.CreateInstance(CLSID_SpatialString);
+		ASSERT_RESOURCE_ALLOCATION("ELI36674", m_cachedDocText.m_obj != __nullptr);
+	}
 
-		m_cachedDocText.loadObjectFromFile(strUSSFilename);
+	m_cachedDocText.loadObjectFromFile(strUSSFilename);
 
-		// Retrieve the page text (or create an empty value if no page text exists).
-		bool bExistingSpatialInfo = asCppBool(m_cachedDocText.m_obj->HasSpatialInfo());
+	// Retrieve the page text (or create an empty value if no page text exists).
+	bool bExistingSpatialInfo = asCppBool(m_cachedDocText.m_obj->HasSpatialInfo());
+	if (bExistingSpatialInfo)
+	{
+		m_ipCurrentPageText = m_cachedDocText.m_obj->GetSpecifiedPages(m_nCurrentPage, m_nCurrentPage);
+		ASSERT_RESOURCE_ALLOCATION("ELI36524", m_ipCurrentPageText != __nullptr);
+
+		bExistingSpatialInfo = asCppBool(m_ipCurrentPageText->HasSpatialInfo());
 		if (bExistingSpatialInfo)
 		{
-			m_ipCurrentPageText = m_cachedDocText.m_obj->GetSpecifiedPages(m_nCurrentPage, m_nCurrentPage);
-			ASSERT_RESOURCE_ALLOCATION("ELI36524", m_ipCurrentPageText != __nullptr);
-
-			bExistingSpatialInfo = asCppBool(m_ipCurrentPageText->HasSpatialInfo());
-			if (bExistingSpatialInfo)
-			{
-				m_nAvgPageCharWidth = m_ipCurrentPageText->GetAverageCharWidth();
-				m_ipPageInfoMap = m_cachedDocText.m_obj->SpatialPageInfos;
-			}
+			m_nAvgPageCharWidth = m_ipCurrentPageText->GetAverageCharWidth();
+			m_ipPageInfoMap = m_cachedDocText.m_obj->SpatialPageInfos;
 		}
-		
-		if (!bExistingSpatialInfo)
-		{
-			m_ipCurrentPageText.CreateInstance(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI36525", m_ipCurrentPageText != __nullptr);
-
-			if (m_ipPageInfoMap == __nullptr)
-			{
-				m_ipPageInfoMap.CreateInstance(CLSID_LongToObjectMap);
-				ASSERT_RESOURCE_ALLOCATION("ELI36526", m_ipPageInfoMap != __nullptr);
-			}
-		}
-
-		// Initialize the page info for the current page.
-		bool bExistingPageInfo = asCppBool(m_ipPageInfoMap->Contains(nPage));
-		if (bExistingPageInfo)
-		{
-			m_ipCurrentPageInfo = m_ipPageInfoMap->GetValue(nPage);
-			ASSERT_RESOURCE_ALLOCATION("ELI36527", m_ipCurrentPageInfo != __nullptr);
-		}
-		else
-		{
-			int nWidth = 0;
-			int nHeight = 0;
-			getImagePixelHeightAndWidth(m_strSourceDocName, nHeight, nWidth, nPage);
-
-			m_ipCurrentPageInfo.CreateInstance(CLSID_SpatialPageInfo);
-			ASSERT_RESOURCE_ALLOCATION("ELI36528", m_ipCurrentPageInfo != __nullptr);
-
-			m_ipCurrentPageInfo->Initialize(nWidth, nHeight, kRotNone, 0);
-
-			m_ipPageInfoMap->Set(nPage, m_ipCurrentPageInfo);
-		}
-
-		// Load the current page's image.
-		m_apPageBitmap.reset(new LeadToolsBitmap(m_strSourceDocName, nPage, 0));
-		ASSERT_RESOURCE_ALLOCATION("ELI36529", m_apPageBitmap.get() != __nullptr);
 	}
+		
+	if (!bExistingSpatialInfo)
+	{
+		m_ipCurrentPageText.CreateInstance(CLSID_SpatialString);
+		ASSERT_RESOURCE_ALLOCATION("ELI36525", m_ipCurrentPageText != __nullptr);
+
+		if (m_ipPageInfoMap == __nullptr)
+		{
+			m_ipPageInfoMap.CreateInstance(CLSID_LongToObjectMap);
+			ASSERT_RESOURCE_ALLOCATION("ELI36526", m_ipPageInfoMap != __nullptr);
+		}
+	}
+
+	// Initialize the page info for the current page.
+	bool bExistingPageInfo = asCppBool(m_ipPageInfoMap->Contains(nPage));
+	if (bExistingPageInfo)
+	{
+		m_ipCurrentPageInfo = m_ipPageInfoMap->GetValue(nPage);
+		ASSERT_RESOURCE_ALLOCATION("ELI36527", m_ipCurrentPageInfo != __nullptr);
+	}
+	else
+	{
+		int nWidth = 0;
+		int nHeight = 0;
+		getImagePixelHeightAndWidth(m_strSourceDocName, nHeight, nWidth, nPage);
+
+		m_ipCurrentPageInfo.CreateInstance(CLSID_SpatialPageInfo);
+		ASSERT_RESOURCE_ALLOCATION("ELI36528", m_ipCurrentPageInfo != __nullptr);
+
+		m_ipCurrentPageInfo->Initialize(nWidth, nHeight, kRotNone, 0);
+
+		m_ipPageInfoMap->Set(nPage, m_ipCurrentPageInfo);
+	}
+
+	// Load the current page's image.
+	m_apPageBitmap.reset(new LeadToolsBitmap(m_strSourceDocName, nPage, 0));
+	ASSERT_RESOURCE_ALLOCATION("ELI36529", m_apPageBitmap.get() != __nullptr);
 
 	return m_ipCurrentPageText;
 }
