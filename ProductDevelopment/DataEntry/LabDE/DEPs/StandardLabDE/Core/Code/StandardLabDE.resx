@@ -442,7 +442,7 @@
 			 ((&lt;ValueMaxBias/&gt; &amp;lt;= &lt;RangeMaxBias/&gt;) and (&lt;ValueMax Type='double'/&gt; &amp;gt; &lt;RangeMax Type='double'/&gt;))))
 	&lt;/Expression&gt;
 &lt;/Declarations&gt;
-&lt;Query&gt;[BLANK]&lt;SQL&gt;SELECT * FROM Flag ORDER BY Flag&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;[BLANK]&lt;SQL&gt;SELECT Flag FROM Flag ORDER BY Flag&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query ValidValue='True' ValidationListType='ValidationListOnly' ValidationWarning='1'&gt;
 	&lt;Expression&gt;
 		&lt;!--Don't warn if either the value or range could not be interpreted as a mathematical expression--&gt;

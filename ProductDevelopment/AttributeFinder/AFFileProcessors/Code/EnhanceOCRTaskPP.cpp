@@ -237,8 +237,7 @@ LRESULT CEnhanceOCRTaskPP::OnClickedPreferredFormatBrowse(WORD wNotifyCode, WORD
 		if (fileDlg.DoModal() == IDOK)
 		{
 			// get the file name
-			CString zFullFileName = CString(
-				asString(m_ipMiscUtils->GetFileHeader()).c_str() + fileDlg.GetPathName());
+			CString zFullFileName = fileDlg.GetPathName();
 			m_editPreferredFormatRegexFile.SetWindowText(zFullFileName);
 		}
 	}
