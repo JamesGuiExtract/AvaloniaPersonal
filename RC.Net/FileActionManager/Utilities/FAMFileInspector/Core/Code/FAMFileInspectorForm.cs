@@ -2652,7 +2652,11 @@ namespace Extract.FileActionManager.Utilities
             var exceptions = new ConcurrentQueue<ExtractException>();
 
             // Search each file in the file list.
-            Parallel.ForEach(_fileListDataGridView.Rows.OfType<DataGridViewRow>(), row =>
+            var parallelOptions = new ParallelOptions();
+            parallelOptions.CancellationToken = cancelToken;
+            parallelOptions.MaxDegreeOfParallelism = System.Environment.ProcessorCount;
+            Parallel.ForEach(_fileListDataGridView.Rows.OfType<DataGridViewRow>(), parallelOptions, 
+                row =>
             {
                 // Abort if the user cancelled.
                 cancelToken.ThrowIfCancellationRequested();
@@ -2817,7 +2821,11 @@ namespace Extract.FileActionManager.Utilities
             var exceptions = new ConcurrentQueue<ExtractException>();
 
             // Search each file in the file list.
-            Parallel.ForEach(_fileListDataGridView.Rows.OfType<DataGridViewRow>(), row =>
+            var parallelOptions = new ParallelOptions();
+            parallelOptions.CancellationToken = cancelToken;
+            parallelOptions.MaxDegreeOfParallelism = System.Environment.ProcessorCount;
+            Parallel.ForEach(_fileListDataGridView.Rows.OfType<DataGridViewRow>(), parallelOptions,
+                row =>
             {
                 // Abort if the user cancelled.
                 cancelToken.ThrowIfCancellationRequested();
