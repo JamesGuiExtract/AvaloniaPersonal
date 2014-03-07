@@ -575,23 +575,6 @@ Date&lt;/Attribute&gt;&lt;/RegEx&gt; != '')
 		: '' 
 &lt;/Expression&gt;&lt;/Query&gt;</value>
   </data>
-  <data name="_testResultTime.ValidationQuery" xml:space="preserve">
-    <value>&lt;Declarations&gt;
-	&lt;Composite Name='ValidationMessage'&gt;Result date/time must be greater than or equal to the collection date/time.&lt;/Composite&gt;
-&lt;/Declarations&gt;
-&lt;Query ValidValue='True' ValidationMessage='ValidationMessage'&gt;
-	&lt;Expression&gt;(
-		#Combine =
-		   {|d, t, b| $d + (string.IsNullOrWhiteSpace($t) ? ($b ? ' 00:00' : ' 23:59') : ' ' + $t)};
-		#DateSeqIsCorrect =
-		   {|cd, rd| DateTime.TryParse($cd, null) and DateTime.TryParse($rd, null) and date($cd) &amp;lt;= date($rd) };
-		#DateSeqIsCorrect(
-		   #Combine(&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt;, &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;, true),
-		   #Combine(&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt;, &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;, false))
-	)&lt;/Expression&gt; 
-&lt;/Query&gt;
-</value>
-  </data>
   <data name="_testResultDate.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Query Default='1'&gt;&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;Attribute&gt;../../ResultDate&lt;/Attribute&gt;&lt;/Query&gt;
@@ -637,22 +620,5 @@ Date&lt;/Attribute&gt;&lt;/RegEx&gt; != '')
 			  &lt;/Expression&gt;
 		&lt;/Expression&gt;
 &lt;/Expression&gt;&lt;/Query&gt;</value>
-  </data>
-  <data name="_testResultDate.ValidationQuery" xml:space="preserve">
-    <value>&lt;Declarations&gt;
-	&lt;Composite Name='ValidationMessage'&gt;Result date/time must be greater than or equal to the collection date/time.&lt;/Composite&gt;
-&lt;/Declarations&gt;
-&lt;Query ValidValue='True' ValidationMessage='ValidationMessage'&gt;
-	&lt;Expression&gt;(
-		#Combine =
-		   {|d, t, b| $d + (string.IsNullOrWhiteSpace($t) ? ($b ? ' 00:00' : ' 23:59') : ' ' + $t)};
-		#DateSeqIsCorrect =
-		   {|cd, rd| DateTime.TryParse($cd, null) and DateTime.TryParse($rd, null) and date($cd) &amp;lt;= date($rd) };
-		#DateSeqIsCorrect(
-		   #Combine(&lt;Attribute&gt;../CollectionDate&lt;/Attribute&gt;, &lt;Attribute&gt;../CollectionTime&lt;/Attribute&gt;, true),
-		   #Combine(&lt;Attribute&gt;../ResultDate&lt;/Attribute&gt;, &lt;Attribute&gt;../ResultTime&lt;/Attribute&gt;, false))
-	)&lt;/Expression&gt; 
-&lt;/Query&gt;
-</value>
   </data>
 </root>
