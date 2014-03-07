@@ -102,14 +102,7 @@ Dlg_SdFeatureTree:
 		    	// Delete all lst files
   			  	DeleteFile(PROGRAMFILES + EXTRACT_DIR + "\\*.LST");
 
-				if (SYSINFO.nOSMajor >= 6)  then
-					LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
-				endif; 
-				
-			    // Unregister Dlls
-				szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\UnegisterAll.bat\"";
-				szCmd = "cmd";
-				LaunchAppAndWait( szRegAllCmdLine, "/s", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+				UnRegisterAll();
 				
 			endif;
   			FeatureRemoveAll();

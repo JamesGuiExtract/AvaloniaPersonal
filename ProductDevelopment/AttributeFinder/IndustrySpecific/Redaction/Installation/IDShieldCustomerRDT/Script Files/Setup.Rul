@@ -120,10 +120,7 @@ function OnFirstUIAfter()
 begin
                                                                                                                                   
     // Register Dlls
-	szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\RegisterAll.bat\"";
-	szCmd = "cmd";
-	LaunchAppAndWait( szRegAllCmdLine, "/s", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
-
+	RunRegisterAll();
     Disable(STATUSEX);
 	
     bOpt1  = FALSE;

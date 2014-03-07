@@ -58,18 +58,8 @@ begin
 	   	// Rename the uex file
  	  	RenameUEXFile();
         
-        if (SYSINFO.nOSMajor >= 6)  then
-			LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
-		endif;
-		
-	    // Register Dlls
-		szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\RegisterAll.bat\"";
-		szCmd = "cmd";
-		LaunchAppAndWait( szRegAllCmdLine, "/s", LAAW_OPTION_USE_SHELLEXECUTE |
-												LAAW_OPTION_CHANGEDIRECTORY | 
-												LAAW_OPTION_WAIT | 
-												LAAW_OPTION_HIDDEN | 
-												LAAW_OPTION_SHOW_HOURGLASS );
+        // Register
+		RunRegisterAll();
  
 	 	// Install FKB 
 		InstallFKB();

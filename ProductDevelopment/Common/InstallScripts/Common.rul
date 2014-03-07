@@ -96,6 +96,8 @@
 	prototype SetNuanceServicePermissions();     
 	prototype SetDCOMPermissions();
 	prototype InstallReadme();
+	prototype RunRegisterAll();
+	prototype UnRegisterAll();
 
     // your global variables
     BOOL gbInstalled;
@@ -858,4 +860,60 @@ begin
 	
 	CopyFile(SUPPORTDIR ^ "license.txt", PROGRAMFILES + EXTRACT_DIR ^ szReadmeName);
 	
+end;
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+// Function: RunRegisterAll
+//
+// Purpose: Run RegisterAll.bat file in CommonComponents
+//
+/////////////////////////////////////////////////////////////////////////////////
+function RunRegisterAll()
+	string szPathForRegisterAll, szRegAllCmdLine, szResult;
+	INT nResult;
+begin
+       
+	if (SYSINFO.nOSMajor >= 6)  then
+		LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
+	endif;
+	
+	szPathForRegisterAll = PROGRAMFILES ^ EXTRACT_DIR;
+		
+	szRegAllCmdLine = "\"" + szPathForRegisterAll + "\\RegisterAll.bat\"";
+	
+	// Register Dlls
+	nResult = LaunchApplication( szRegAllCmdLine, "/s", szPathForRegisterAll, SW_HIDE, 
+		INFINITE, LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_CHANGEDIRECTORY | 
+					LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | 
+					LAAW_OPTION_SHOW_HOURGLASS );
+
+end;
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+// Function: UnRegisterAll
+//
+// Purpose: Run UnRegisterAll.bat file in CommonComponents
+//
+/////////////////////////////////////////////////////////////////////////////////
+function UnRegisterAll()
+	string szPathForUnRegisterAll, szRegAllCmdLine, szResult;
+	INT nResult;
+begin
+       
+	if (SYSINFO.nOSMajor >= 6)  then
+		LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
+	endif;
+	
+	szPathForUnRegisterAll = PROGRAMFILES ^ EXTRACT_DIR;
+		
+	szRegAllCmdLine = "\"" + szPathForUnRegisterAll + "\\UnRegisterAll.bat\"";
+	
+	// Register Dlls
+	nResult = LaunchApplication( szRegAllCmdLine, "/s", szPathForUnRegisterAll, SW_HIDE, 
+		INFINITE, LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_CHANGEDIRECTORY | 
+					LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | 
+					LAAW_OPTION_SHOW_HOURGLASS );
+
 end;
