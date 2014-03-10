@@ -1617,6 +1617,7 @@
 		<row><td>PATH_TO_AUTOMATEDTESTIN_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\AutomatedTesting</td><td/><td>2</td></row>
 		<row><td>PATH_TO_HELP_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\Help</td><td/><td>2</td></row>
 		<row><td>PATH_TO_HELP_FILES1</td><td>P:\AttributeFinder\SDKInstallation\Files\Help</td><td/><td>2</td></row>
+		<row><td>PATH_TO_INSTALLSCRIPTS_FILES</td><td>&lt;ISPROJECTDIR&gt;..\..\..\..\..\..\Common\InstallScripts</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCOMMO_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\NonSelfRegCommonComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCOMPO_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\NonSelfRegComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGRDTCO_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\NonSelfRegRDTComponents</td><td/><td>2</td></row>
@@ -1886,6 +1887,7 @@
 	<table name="ISScriptFile">
 		<col key="yes" def="s255">ISScriptFile</col>
 		<row><td>&lt;ISProjectDataFolder&gt;\Script Files\Setup.Rul</td></row>
+		<row><td>&lt;PATH_TO_INSTALLSCRIPTS_FILES&gt;\Common.rul</td></row>
 	</table>
 
 	<table name="ISSearchReplace">

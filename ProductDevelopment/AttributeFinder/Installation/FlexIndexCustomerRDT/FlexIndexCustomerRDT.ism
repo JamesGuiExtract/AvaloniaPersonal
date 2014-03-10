@@ -1592,7 +1592,7 @@
 		<row><td>ISProductFolder</td><td>1</td><td/><td>1</td></row>
 		<row><td>ISProjectDataFolder</td><td>1</td><td/><td>1</td></row>
 		<row><td>ISProjectFolder</td><td/><td/><td>1</td></row>
-		<row><td>PATH_TO_INSTALLSCRIPTS_FIL</td><td>D:\William\Engineering\ProductDevelopment\Common\InstallScripts</td><td/><td>2</td></row>
+		<row><td>PATH_TO_INSTALLSCRIPTS_FIL</td><td>&lt;ISPROJECTDIR&gt;..\..\..\..\..\Common\InstallScripts</td><td/><td>2</td></row>
 		<row><td>PATH_TO_RELEASE</td><td>&lt;ISPROJECTDIR&gt;..\..\..\..\..\Binaries\Release</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SELFREGRDTCOMPO_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\SelfRegRDTComponents</td><td/><td>2</td></row>
 		<row><td>ProgramFilesFolder</td><td/><td/><td>1</td></row>

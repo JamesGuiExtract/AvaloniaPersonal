@@ -13,6 +13,8 @@
 // Include header files /////////////////////////////////////////////////////
 #include "ifx.h"
 
+#include "..\..\..\..\..\..\Common\InstallScripts\Common.rul"
+
 ////////////////////// string defines ////////////////////////////
     #define EXTRACT_DIR "\\Extract Systems\\CommonComponents"
 //////////////////// installation declarations ///////////////////
