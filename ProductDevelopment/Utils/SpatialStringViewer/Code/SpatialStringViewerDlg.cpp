@@ -1066,6 +1066,7 @@ void CSpatialStringViewerDlg::setStatusBarText(const CString& zPage,
 		m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_END), zEndPos);
 		m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_CONFIDENCE), zConfidence);
 		m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_PERCENT), zPercentage);
+		configureToolBarButtons();
 	}
 }
 //-------------------------------------------------------------------------------------------------
