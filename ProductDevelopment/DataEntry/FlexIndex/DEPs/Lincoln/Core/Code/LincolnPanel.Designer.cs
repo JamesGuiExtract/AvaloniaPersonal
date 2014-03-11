@@ -66,9 +66,6 @@ namespace Extract.DataEntry.DEP.Lincoln
             this._grantorTable = new Extract.DataEntry.DataEntryTable();
             this._subdivisionTable = new Extract.DataEntry.DataEntryTable();
             this._townRangeSectionTable = new Extract.DataEntry.DataEntryTable();
-            this._grantorNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._grantorDeceasedColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._grantorFormattedColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._townRangeSectionColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._descriptionColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._blockColumn = new Extract.DataEntry.DataEntryTableColumn();
@@ -76,6 +73,9 @@ namespace Extract.DataEntry.DEP.Lincoln
             this._subdivisionOtherColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._subdivisionSubdivisionColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._unitColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._grantorNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._grantorDeceasedColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._grantorFormattedColumn = new Extract.DataEntry.DataEntryTableColumn();
             _pageLabel = new System.Windows.Forms.Label();
             _docTypeLabel = new System.Windows.Forms.Label();
             _bookLabel = new System.Windows.Forms.Label();
@@ -452,42 +452,6 @@ namespace Extract.DataEntry.DEP.Lincoln
             this._townRangeSectionTable.Size = new System.Drawing.Size(611, 93);
             this._townRangeSectionTable.TabIndex = 8;
             // 
-            // _grantorNameColumn
-            // 
-            this._grantorNameColumn.AttributeName = "Name";
-            this._grantorNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this._grantorNameColumn.AutoUpdateQuery = resources.GetString("_grantorNameColumn.AutoUpdateQuery");
-            this._grantorNameColumn.HeaderText = "Name (Last First Middle Suffix)";
-            this._grantorNameColumn.Name = "_grantorNameColumn";
-            this._grantorNameColumn.PersistAttribute = false;
-            this._grantorNameColumn.ValidationErrorMessage = "Name (including optional \"DEC\'D\" flag) cannot exceed 32 chars.";
-            this._grantorNameColumn.ValidationQuery = "<Query ValidValue=\'True\'>\r\n\t<Expression>\r\n\t\t<Attribute>../Formatted</Attribute>.L" +
-    "ength &lt;= 32\r\n\t</Expression>\r\n</Query>";
-            // 
-            // _grantorDeceasedColumn
-            // 
-            this._grantorDeceasedColumn.AttributeName = "Deceased";
-            this._grantorDeceasedColumn.AutoUpdateQuery = "<Expression><Attribute>../Formatted</Attribute>.EndsWith(\'DEC\'\'D\') ? \'DEC\'\'D\' : \'" +
-    "\'</Expression>";
-            this._grantorDeceasedColumn.HeaderText = "Deceased?";
-            this._grantorDeceasedColumn.MinimumWidth = 75;
-            this._grantorDeceasedColumn.Name = "_grantorDeceasedColumn";
-            this._grantorDeceasedColumn.PersistAttribute = false;
-            this._grantorDeceasedColumn.UseComboBoxCells = true;
-            this._grantorDeceasedColumn.ValidationErrorMessage = "Invalid value";
-            this._grantorDeceasedColumn.ValidationQuery = "[BLANK]\r\nDEC\'D";
-            this._grantorDeceasedColumn.Width = 75;
-            // 
-            // _grantorFormattedColumn
-            // 
-            this._grantorFormattedColumn.AttributeName = "Formatted";
-            this._grantorFormattedColumn.AutoUpdateQuery = "<Query StringList=\' \'><Attribute>../Name</Attribute><Expression>(<Attribute>../De" +
-    "ceased</Attribute> == \'\') ? \'\' : (\'DEC\'\'D\')</Expression></Query>";
-            this._grantorFormattedColumn.HeaderText = "Formatted";
-            this._grantorFormattedColumn.Name = "_grantorFormattedColumn";
-            this._grantorFormattedColumn.ValidationErrorMessage = "Invalid value";
-            this._grantorFormattedColumn.Visible = false;
-            // 
             // _townRangeSectionColumn
             // 
             this._townRangeSectionColumn.AttributeName = "TownRangeSection";
@@ -519,8 +483,8 @@ namespace Extract.DataEntry.DEP.Lincoln
             this._blockColumn.HeaderText = "Block";
             this._blockColumn.MinimumWidth = 10;
             this._blockColumn.Name = "_blockColumn";
-            this._blockColumn.ValidationErrorMessage = "Block should contain only numerical chars";
-            this._blockColumn.ValidationPattern = "^\\d*$";
+            this._blockColumn.ValidationErrorMessage = "Block should contain only alpha-numeric chars";
+            this._blockColumn.ValidationPattern = "^[\\d,A-Z,a-z]*$";
             // 
             // _lotColumn
             // 
@@ -566,6 +530,42 @@ namespace Extract.DataEntry.DEP.Lincoln
             this._unitColumn.Name = "_unitColumn";
             this._unitColumn.ValidationErrorMessage = "Unit, block and lot cannot have more than 30 chars combined.";
             this._unitColumn.ValidationQuery = resources.GetString("_unitColumn.ValidationQuery");
+            // 
+            // _grantorNameColumn
+            // 
+            this._grantorNameColumn.AttributeName = "Name";
+            this._grantorNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this._grantorNameColumn.AutoUpdateQuery = resources.GetString("_grantorNameColumn.AutoUpdateQuery");
+            this._grantorNameColumn.HeaderText = "Name (Last First Middle Suffix)";
+            this._grantorNameColumn.Name = "_grantorNameColumn";
+            this._grantorNameColumn.PersistAttribute = false;
+            this._grantorNameColumn.ValidationErrorMessage = "Name (including optional \"DEC\'D\" flag) cannot exceed 32 chars.";
+            this._grantorNameColumn.ValidationQuery = "<Query ValidValue=\'True\'>\r\n\t<Expression>\r\n\t\t<Attribute>../Formatted</Attribute>.L" +
+    "ength &lt;= 32\r\n\t</Expression>\r\n</Query>";
+            // 
+            // _grantorDeceasedColumn
+            // 
+            this._grantorDeceasedColumn.AttributeName = "Deceased";
+            this._grantorDeceasedColumn.AutoUpdateQuery = "<Expression><Attribute>../Formatted</Attribute>.EndsWith(\'DEC\'\'D\') ? \'DEC\'\'D\' : \'" +
+    "\'</Expression>";
+            this._grantorDeceasedColumn.HeaderText = "Deceased?";
+            this._grantorDeceasedColumn.MinimumWidth = 75;
+            this._grantorDeceasedColumn.Name = "_grantorDeceasedColumn";
+            this._grantorDeceasedColumn.PersistAttribute = false;
+            this._grantorDeceasedColumn.UseComboBoxCells = true;
+            this._grantorDeceasedColumn.ValidationErrorMessage = "Invalid value";
+            this._grantorDeceasedColumn.ValidationQuery = "[BLANK]\r\nDEC\'D";
+            this._grantorDeceasedColumn.Width = 75;
+            // 
+            // _grantorFormattedColumn
+            // 
+            this._grantorFormattedColumn.AttributeName = "Formatted";
+            this._grantorFormattedColumn.AutoUpdateQuery = "<Query StringList=\' \'><Attribute>../Name</Attribute><Expression>(<Attribute>../De" +
+    "ceased</Attribute> == \'\') ? \'\' : (\'DEC\'\'D\')</Expression></Query>";
+            this._grantorFormattedColumn.HeaderText = "Formatted";
+            this._grantorFormattedColumn.Name = "_grantorFormattedColumn";
+            this._grantorFormattedColumn.ValidationErrorMessage = "Invalid value";
+            this._grantorFormattedColumn.Visible = false;
             // 
             // LincolnPanel
             // 
@@ -623,9 +623,6 @@ namespace Extract.DataEntry.DEP.Lincoln
         private DataEntryTableColumn _granteeNameColumn;
         private DataEntryTableColumn _granteeDeceasedColumn;
         private DataEntryTableColumn _granteeFormattedColumn;
-        private DataEntryTableColumn _grantorNameColumn;
-        private DataEntryTableColumn _grantorDeceasedColumn;
-        private DataEntryTableColumn _grantorFormattedColumn;
         private DataEntryTableColumn _townRangeSectionColumn;
         private DataEntryTableColumn _descriptionColumn;
         private DataEntryTableColumn _blockColumn;
@@ -633,5 +630,8 @@ namespace Extract.DataEntry.DEP.Lincoln
         private DataEntryTableColumn _subdivisionOtherColumn;
         private DataEntryTableColumn _subdivisionSubdivisionColumn;
         private DataEntryTableColumn _unitColumn;
+        private DataEntryTableColumn _grantorNameColumn;
+        private DataEntryTableColumn _grantorDeceasedColumn;
+        private DataEntryTableColumn _grantorFormattedColumn;
     }
 }

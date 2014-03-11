@@ -230,8 +230,8 @@
   </metadata>
   <data name="_grantorNameColumn.AutoUpdateQuery" xml:space="preserve">
     <value>&lt;Declarations&gt;
-	&lt;Expression Name='Name1'&gt;&lt;Attribute&gt;../Formatted&lt;/Attribute&gt;.ToUpper().Replace('DEC''D', '').Replace('''', '').Replace(',', '').Replace('.', '').Replace('-', '')&lt;/Expression&gt;
-	&lt;Expression Name='Name2'&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;.ToUpper().Replace('DEC''D', '').Replace('''', '').Replace(',', '').Replace('.', '').Replace('-', '')&lt;/Expression&gt;
+	&lt;Expression Name='Name1'&gt;&lt;Attribute&gt;../Formatted&lt;/Attribute&gt;.ToUpper().Replace('DEC''D', '').Replace('''', '').Replace(',', '').Replace('.', '')&lt;/Expression&gt;
+	&lt;Expression Name='Name2'&gt;&lt;Attribute&gt;.&lt;/Attribute&gt;.ToUpper().Replace('DEC''D', '').Replace('''', '').Replace(',', '').Replace('.', '')&lt;/Expression&gt;
 &lt;/Declarations&gt;
 &lt;Query Default='True'&gt;&lt;Name1/&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;Name2/&gt;&lt;/Query&gt;</value>
