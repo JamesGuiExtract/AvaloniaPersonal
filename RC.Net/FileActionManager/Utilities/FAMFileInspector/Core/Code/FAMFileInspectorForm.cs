@@ -125,6 +125,11 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         public static readonly SubsetType DefaultSubsetType = SubsetType.Top;
 
+        /// <summary>
+        /// The maximum number of threads that should be used for searching
+        /// </summary>
+        internal static int _MAX_THREADS_FOR_DATA_SEARCH = 4;
+
         #endregion Constants
 
         #region Enums
@@ -2823,7 +2828,8 @@ namespace Extract.FileActionManager.Utilities
             // Search each file in the file list.
             var parallelOptions = new ParallelOptions();
             parallelOptions.CancellationToken = cancelToken;
-            parallelOptions.MaxDegreeOfParallelism = System.Environment.ProcessorCount;
+            parallelOptions.MaxDegreeOfParallelism = Math.Min(_MAX_THREADS_FOR_DATA_SEARCH,
+                System.Environment.ProcessorCount);
             Parallel.ForEach(_fileListDataGridView.Rows.OfType<DataGridViewRow>(), parallelOptions,
                 row =>
             {
