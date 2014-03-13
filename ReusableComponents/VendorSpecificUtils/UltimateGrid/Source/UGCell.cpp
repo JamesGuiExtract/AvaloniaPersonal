@@ -481,7 +481,7 @@ LPCTSTR	CUGCell::GetText()
 		// create a 'proper' localized string representation of the numeric value
 		if (!( m_propSetFlags&UGCELL_DONOT_LOCALIZE ))
 		{
-			TCHAR szBuffer[256];
+			TCHAR szBuffer[256] = {0};
 			NUMBERFMT nformat;
 
 			// Determine the number of decimal places
@@ -502,11 +502,11 @@ LPCTSTR	CUGCell::GetText()
 
 			nformat.Grouping = 3;
 
-			TCHAR szDecimalSep[4];
+			TCHAR szDecimalSep[4] = {0};
 			GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SDECIMAL, szDecimalSep, 4);
 			nformat.lpDecimalSep = szDecimalSep;
 
-			TCHAR szThousandSep[4];
+			TCHAR szThousandSep[4] = {0};
 			GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, szThousandSep, 4);
 			nformat.lpThousandSep = szThousandSep;
 
@@ -1786,16 +1786,16 @@ int CUGCell::StringToNumber(CString *string,double *number)
 	CString tempString;
 	tempString = *string;
 	// remove localized thousand separators
-	TCHAR szThousandSep[4];
+	TCHAR szThousandSep[4] = {0};
 	GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, szThousandSep, 4);
 	tempString.Replace( szThousandSep, _T("") );
 	// remove localized currency indicators
-	TCHAR szCurrencyMark[6];
+	TCHAR szCurrencyMark[6] = {0};
 	GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SCURRENCY, szCurrencyMark, 6);
 	tempString.Replace( szCurrencyMark, _T("") );
 	// Replace the localized decimal separator with the standard, which is
 	// understood by the _ttol function
-	TCHAR szDecimalSep[4];
+	TCHAR szDecimalSep[4] = {0};
 	GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SDECIMAL, szDecimalSep, 4);
 	tempString.Replace( szDecimalSep, _T(".") );
 
