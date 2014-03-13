@@ -213,6 +213,11 @@ private:
 	// REQUIRE: ipUnknown must implement the IFileActionMgmtRole interface
 	UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr getActionMgmtRole(IUnknownPtr ipUnknown);
 
+	// Applies a new m_strFPSFileName. Should be used whenever m_strFPSFileName needs to be
+	// updated. Added as a temporary workaround to a crash:
+	// https://extract.atlassian.net/browse/ISSUE-12055
+	void setNewFPSFileName(string strFPSFileName);
+
 	// Returns the action name with the tags expanded
 	// NOTE: This method also sets the FPSFileDir value for the tag manager
 	string getExpandedActionName();

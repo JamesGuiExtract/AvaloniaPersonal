@@ -57,10 +57,12 @@ void CZipper::GetFileInfo(Z_FileInfo& info)
 bool CZipper::ZipFile(LPCTSTR szFilePath)
 {
 	// make zip path
-	char szDrive[_MAX_DRIVE], szFolder[MAX_PATH], szName[_MAX_FNAME];
+	char szDrive[_MAX_DRIVE] = {0};
+	char szFolder[MAX_PATH] = {0};
+	char szName[_MAX_FNAME] = {0};
 	_splitpath(szFilePath, szDrive, szFolder, szName, NULL);
 
-	char szZipPath[MAX_PATH];
+	char szZipPath[MAX_PATH] = {0};
 	_makepath(szZipPath, szDrive, szFolder, szName, "zip");
 
 	CZipper zip;
@@ -74,10 +76,12 @@ bool CZipper::ZipFile(LPCTSTR szFilePath)
 bool CZipper::ZipFolder(LPCTSTR szFilePath, bool bIgnoreFilePath)
 {
 	// make zip path
-	char szDrive[_MAX_DRIVE], szFolder[MAX_PATH], szName[_MAX_FNAME];
+	char szDrive[_MAX_DRIVE] = {0};
+	char szFolder[MAX_PATH] = {0};
+	char szName[_MAX_FNAME] = {0};
 	_splitpath(szFilePath, szDrive, szFolder, szName, NULL);
 
-	char szZipPath[MAX_PATH];
+	char szZipPath[MAX_PATH] = {0};
 	_makepath(szZipPath, szDrive, szFolder, szName, "zip");
 
 	CZipper zip;
@@ -102,7 +106,7 @@ bool CZipper::AddFileToZip(LPCTSTR szFilePath, bool bIgnoreFilePath)
 	bool bFullPath = (strchr(szFilePath, ':') != NULL);
 
 	// if the file is relative then we need to append the root before opening
-	char szFullFilePath[MAX_PATH];
+	char szFullFilePath[MAX_PATH] = {0};
 	
 	lstrcpy(szFullFilePath, szFilePath);
 	PrepareSourcePath(szFullFilePath);
@@ -112,7 +116,8 @@ bool CZipper::AddFileToZip(LPCTSTR szFilePath, bool bIgnoreFilePath)
 
 	if (bIgnoreFilePath)
 	{
-		char szName[_MAX_FNAME], szExt[_MAX_EXT];
+		char szName[_MAX_FNAME] = {0};
+		char szExt[_MAX_EXT] = {0};
 		_splitpath(szFilePath, NULL, NULL, szName, szExt);
 
 		_makepath(szFileName, NULL, NULL, szName, szExt);
@@ -214,7 +219,7 @@ bool CZipper::AddFileToZip(LPCTSTR szFilePath, LPCTSTR szRelFolderPath)
 		return FALSE;
 
 	// if the file is relative then we need to append the root before opening
-	char szFullFilePath[MAX_PATH];
+	char szFullFilePath[MAX_PATH] = {0};
 	
 	lstrcpy(szFullFilePath, szFilePath);
 	PrepareSourcePath(szFullFilePath);
@@ -251,11 +256,12 @@ bool CZipper::AddFileToZip(LPCTSTR szFilePath, LPCTSTR szRelFolderPath)
 		return FALSE;
 
 	// strip drive info off filepath
-	char szName[_MAX_FNAME], szExt[_MAX_EXT];
+	char szName[_MAX_FNAME] = {0};
+	char szExt[_MAX_EXT] = {0};
 	_splitpath(szFilePath, NULL, NULL, szName, szExt);
 
 	// prepend new folder path 
-	char szFileName[MAX_PATH];
+	char szFileName[MAX_PATH] = {0};
 	_makepath(szFileName, NULL, szRelFolderPath, szName, szExt);
 
 	// open the file in the zip making sure we remove any leading '\'
@@ -305,7 +311,7 @@ bool CZipper::AddFolderToZip(LPCTSTR szFolderPath, bool bIgnoreFilePath)
 	m_info.nFolderCount++;
 
 	// if the path is relative then we need to append the root before opening
-	char szFullPath[MAX_PATH];
+	char szFullPath[MAX_PATH] = {0};
 	
 	lstrcpy(szFullPath, szFolderPath);
 	PrepareSourcePath(szFullPath);
@@ -364,11 +370,13 @@ bool CZipper::AddFolderToZip(LPCTSTR szFolderPath, bool bIgnoreFilePath)
 	zipCloseFileInZip(m_uzFile);
 
 	// build searchspec
-	char szDrive[_MAX_DRIVE], szFolder[MAX_PATH], szName[_MAX_FNAME];
+	char szDrive[_MAX_DRIVE] = {0};
+	char szFolder[MAX_PATH] = {0};
+	char szName[_MAX_FNAME] = {0};
 	_splitpath(szFullPath, szDrive, szFolder, szName, NULL);
 	lstrcat(szFolder, szName);
 
-	char szSearchSpec[MAX_PATH];
+	char szSearchSpec[MAX_PATH] = {0};
 	_makepath(szSearchSpec, szDrive, szFolder, "*", "*");
 
 	WIN32_FIND_DATA finfo;
@@ -380,7 +388,7 @@ bool CZipper::AddFolderToZip(LPCTSTR szFolderPath, bool bIgnoreFilePath)
 		{
 			if (finfo.cFileName[0] != '.') 
 			{
-				char szItem[MAX_PATH];
+				char szItem[MAX_PATH] = {0};
 				_makepath(szItem, szDrive, szFolder, finfo.cFileName, NULL);
 				
 				if (finfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
@@ -408,7 +416,7 @@ bool CZipper::OpenZip(LPCTSTR szFilePath, LPCTSTR szRootFolder, bool bAppend)
 		return false;
 
 	// convert szFilePath to fully qualified path 
-	char szFullPath[MAX_PATH];
+	char szFullPath[MAX_PATH] = {0};
 
 	if (!GetFullPathName(szFilePath, MAX_PATH, szFullPath, NULL))
 		return false;
@@ -423,7 +431,8 @@ bool CZipper::OpenZip(LPCTSTR szFilePath, LPCTSTR szRootFolder, bool bAppend)
 	{
 		if (!szRootFolder)
 		{
-			char szDrive[_MAX_DRIVE], szFolder[MAX_PATH];
+			char szDrive[_MAX_DRIVE] = {0};
+			char szFolder[MAX_PATH] = {0};
 			_splitpath(szFullPath, szDrive, szFolder, NULL, NULL);
 
 			_makepath(m_szRootFolder, szDrive, szFolder, NULL, NULL);
@@ -444,7 +453,7 @@ void CZipper::PrepareSourcePath(LPTSTR szPath)
 	// if the file is relative then we need to append the root before opening
 	if (!bFullPath)
 	{
-		char szTemp[MAX_PATH];
+		char szTemp[MAX_PATH] = {0};
 		lstrcpy(szTemp, szPath);
 
 		_makepath(szPath, NULL, m_szRootFolder, szTemp, NULL);

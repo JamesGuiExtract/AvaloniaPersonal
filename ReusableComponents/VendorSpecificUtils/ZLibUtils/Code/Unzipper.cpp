@@ -106,7 +106,7 @@ bool CUnzipper::OpenZip(LPCTSTR szFilePath)
 		return false;
 
 	// convert szFilePath to fully qualified path 
-	char szFullPath[MAX_PATH];
+	char szFullPath[MAX_PATH] = {0};
 	
 	if (!GetFullPathName(szFilePath, MAX_PATH, szFullPath, NULL))
 		return false;
@@ -115,7 +115,9 @@ bool CUnzipper::OpenZip(LPCTSTR szFilePath)
 	
 	if (m_uzFile)
 	{
-		char szDrive[_MAX_DRIVE], szFolder[MAX_PATH], szFName[_MAX_FNAME];
+		char szDrive[_MAX_DRIVE] = {0};
+		char szFolder[MAX_PATH] = {0};
+		char szFName[_MAX_FNAME] = {0};
 		
 		_splitpath(szFullPath, szDrive, szFolder, szFName, NULL);
 		_makepath(m_szOutputFolder, szDrive, szFolder, szFName, NULL);
@@ -193,7 +195,7 @@ bool CUnzipper::GotoFirstFile(LPCTSTR szExt)
 			return FALSE;
 
 		// test extension
-		char szFExt[_MAX_EXT];
+		char szFExt[_MAX_EXT] = {0};
 		_splitpath(info.szFileName, NULL, NULL, NULL, szFExt);
 
 		if (szFExt)
@@ -225,7 +227,7 @@ bool CUnzipper::GotoNextFile(LPCTSTR szExt)
 			return FALSE;
 
 		// test extension
-		char szFExt[_MAX_EXT];
+		char szFExt[_MAX_EXT] = {0};
 		_splitpath(info.szFileName, NULL, NULL, NULL, szFExt);
 
 		if (szFExt)
@@ -296,18 +298,19 @@ bool CUnzipper::UnzipFile(LPCTSTR szFolder, bool bIgnoreFilePath)
 	// if the item is a folder then create it and return 'TRUE'
 	if (info.bFolder)
 	{
-		char szFolderPath[MAX_PATH];
+		char szFolderPath[MAX_PATH] = {0};
 		_makepath(szFolderPath, NULL, m_szOutputFolder, info.szFileName, NULL);
 
 		return CreateFolder(szFolderPath);
 	}
 
 	// build the output filename
-	char szFilePath[MAX_PATH];
+	char szFilePath[MAX_PATH] = {0};
 
 	if (bIgnoreFilePath)
 	{
-		char szFName[_MAX_FNAME], szExt[_MAX_EXT];
+		char szFName[_MAX_FNAME] = {0};
+		char szExt[_MAX_EXT] = {0};
 
 		_splitpath(info.szFileName, NULL, NULL, szFName, szExt);
 		_makepath(info.szFileName, NULL, NULL, szFName, szExt);

@@ -36,8 +36,8 @@ using namespace std;
 
 // Global Variables:
 HINSTANCE hInst;								// current instance
-TCHAR szTitle[MAX_LOADSTRING];					// The title bar text
-TCHAR szWindowClass[MAX_LOADSTRING];			// the main window class name
+TCHAR szTitle[MAX_LOADSTRING] = {0};			// The title bar text
+TCHAR szWindowClass[MAX_LOADSTRING] = {0};		// the main window class name
 
 // Entry point function
 int APIENTRY _tWinMain(HINSTANCE hInstance,

@@ -152,7 +152,7 @@ STDMETHODIMP CGrantorGranteeTester::raw_RunAutomatedTests(IVariantVector* pParam
 			}
 
 			// Convert time to string and add to note text
-			char szTime[32];
+			char szTime[32] = {0};
 			if (asctime_s( szTime, sizeof(szTime), &pTime ) != 0)
 			{
 				throw UCLIDException ("ELI12927", "Unable to convert local time to string.");

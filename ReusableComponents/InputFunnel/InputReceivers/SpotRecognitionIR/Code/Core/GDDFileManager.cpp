@@ -106,7 +106,7 @@ void GDDFileManager::saveAs(const string& strGDDFileName)
 		UCLIDException uclidException("ELI03226", "Failed to open GDD file for writing.");
 		uclidException.addDebugInfo("GDD File", strGDDFileName);
 
-		TCHAR szError[1024];
+		TCHAR szError[1024] = {0};
 		fileException.GetErrorMessage(szError, 1024);
 		
 		CString zError;

@@ -162,7 +162,7 @@ string RegistryPersistenceMgr::getKeyValue(const string& strFolderFullPath,
 							  &hKey);				 // handle to open key
 
 	// set max length to be 500
-	TCHAR szValue[500];
+	TCHAR szValue[500] = {0};
 	DWORD dwBufLen = 500;
 
 	// if key doesn't exist, return the default value
@@ -229,7 +229,7 @@ vector<string> RegistryPersistenceMgr::getKeyMultiStringValue(const std::string&
 							  &hKey);				 // handle to open key
 
 	// set max length to be 500
-	TCHAR szValue[500];
+	TCHAR szValue[500] = {0};
 	DWORD dwBufLen = 500;
 
 	// Initialize the return vector
@@ -397,7 +397,7 @@ bool RegistryPersistenceMgr::keyExists(const string& strFolderFullPath, const st
 		return false;
 	}
 
-	TCHAR szValue[500];
+	TCHAR szValue[500] = {0};
 	DWORD dwBufLen = 500;
 
 	ret = ::RegQueryValueEx(hKey,
@@ -584,7 +584,7 @@ vector<string> RegistryPersistenceMgr::getKeysInFolder(const string& strFolderFu
 		return vecKeys;
 	}
 
-	char szValueName[256];
+	char szValueName[256] = {0};
 	DWORD bufsize = sizeof(szValueName);
 
 	DWORD index = 0;
@@ -648,7 +648,7 @@ vector<string> RegistryPersistenceMgr::getSubFolders(const string& strParentFold
 		return vecSubFolders;
 	}
 
-	char szSubKeyName[256];
+	char szSubKeyName[256] = {0};
 	DWORD bufsize = sizeof(szSubKeyName);
 	PFILETIME lpftLastWriteTime = NULL;
 

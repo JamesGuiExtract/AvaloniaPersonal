@@ -177,12 +177,6 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 			}
 		}
 
-		// Make sure that the FPS file includes directory information (P13 #4502)
-		if ((m_strFPSFileName != "") && (!isAbsolutePath(m_strFPSFileName)))
-		{
-			m_strFPSFileName = buildAbsolutePath(m_strFPSFileName);
-		}
-
 		// Expand the action name
 		string strExpandedAction = getExpandedActionName();
 
@@ -396,7 +390,7 @@ STDMETHODIMP CFileProcessingManager::LoadFrom(BSTR strFullFileName, VARIANT_BOOL
 		readObjectFromFile(ipPersistStream, strFullFileName, _bstrStreamName);
 
 		// Update the filename associated with this File Action Manager
-		m_strFPSFileName = strFileName;
+		setNewFPSFileName(strFileName);
 
 		// mark this object as dirty depending upon bSetDirtyFlagToTrue
 		m_bDirty = asCppBool(bSetDirtyFlagToTrue);
@@ -429,7 +423,7 @@ STDMETHODIMP CFileProcessingManager::SaveTo(BSTR strFullFileName, VARIANT_BOOL b
 			// true because this method gets called for "temporary saving" 
 			// with the auto-save-on-timer feature.  The auto-save method
 			// calls to this method will have bClearDirty set to false.
-			m_strFPSFileName = asString(strFullFileName);
+			setNewFPSFileName(asString(strFullFileName));
 		}
 
 		// Wait until the file is readable
@@ -465,9 +459,7 @@ STDMETHODIMP CFileProcessingManager::put_FPSFileName(BSTR newVal)
 	{
 		validateLicense();
 
-		_bstr_t tmp(newVal);
-
-		m_strFPSFileName = tmp;
+		setNewFPSFileName(asString(newVal));
 
 		// NOTE: we do not need to set the dirty flag because we did not change
 		// any persistent data members.
@@ -1046,12 +1038,12 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 				// tag manager) [LRCAU #5813]
 				_bstr_t bstrActionName(getExpandedActionName().c_str());
 
+				// Validate that the action name exists in the database (auto-create if that setting is set)
+				getFPMDB()->AutoCreateAction(bstrActionName);
+
 				// Register as an active FAM (allows for stuck files to be reverted)
 				long nActionId = getFPMDB()->GetActionID(bstrActionName);
 				getFPMDB()->RegisterActiveFAM(nActionId, vbQueue, vbProcess);
-
-				// Validate that the action name exists in the database (auto-create if that setting is set)
-				getFPMDB()->AutoCreateAction(bstrActionName);
 
 				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord = __nullptr;
 				if (bQueue)
@@ -1375,12 +1367,29 @@ UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr CFileProcessingManager::getActio
 	return ipMgmtRole;
 }
 //-------------------------------------------------------------------------------------------------
-string CFileProcessingManager::getExpandedActionName()
+void CFileProcessingManager::setNewFPSFileName(string strFPSFileName)
 {
+	// https://extract.atlassian.net/browse/ISSUE-12055
+	// Reproducible crashes seem to have been introduced with the checkin on 9/6/2013 where the
+	// FAMTagManager::FPSFileName property was added. Not setting this property seems to avoid the
+	// crash, as does re-structuring the code in which this property is set (i.e., setting the tag
+	// manager properties in this method). While this is by no means a fix and is just sweeping the
+	// problem under the rug, this restructuring will be used as a workaround in the short term.
+	m_strFPSFileName = strFPSFileName;
+
+	// Make sure that the FPS file includes directory information (P13 #4502)
+	if ((m_strFPSFileName != "") && (!isAbsolutePath(m_strFPSFileName)))
+	{
+		m_strFPSFileName = buildAbsolutePath(m_strFPSFileName);
+	}
+
 	// Set the FPS filename and directory for tag manager
 	m_ipFAMTagManager->FPSFileName = m_strFPSFileName.c_str();
 	m_ipFAMTagManager->FPSFileDir = getDirectoryFromFullPath(m_strFPSFileName).c_str();
-
+}
+//-------------------------------------------------------------------------------------------------
+string CFileProcessingManager::getExpandedActionName()
+{
 	// Expand the tags
 	return CFileProcessingUtils::ExpandTagsAndTFE(m_ipFAMTagManager, m_strAction, "");
 }
@@ -1414,7 +1423,7 @@ void CFileProcessingManager::clear()
 		m_bDisplayOfStatisticsEnabled = false;
 
 		// reset the file name
-		m_strFPSFileName = "";
+		setNewFPSFileName("");
 
 		// reset the record manager
 		m_recordMgr.clear(true);

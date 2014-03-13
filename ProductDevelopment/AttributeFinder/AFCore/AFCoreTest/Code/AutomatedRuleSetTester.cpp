@@ -1713,7 +1713,7 @@ void CAutomatedRuleSetTester::addAttributeResultCase()
 	int iError = _localtime64_s( &pTime, &currTime );
 
 	// Convert time to string
-	char szTime[32];
+	char szTime[32] = {0};
 	iError = asctime_s( szTime, sizeof(szTime), &pTime );
 	string strTimeNote = trim( szTime, "", "\r\n" );
 	m_ipResultLogger->StartTestCase(strTimeNote.c_str(), "Summary of Attribute Statistics:", kSummaryTestCase);

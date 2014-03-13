@@ -349,7 +349,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
         // Assign any alternate component data directory root defined in the database to be used in
 		// addition to the default component data directory.
 		IFileProcessingDBPtr ipDB(pDB);
-		BSTR bstrAlternateComponentDataDir = _bstr_t("");
+		_bstr_t bstrAlternateComponentDataDir = "";
 		if (ipDB != __nullptr)
 		{
 			bstrAlternateComponentDataDir =
