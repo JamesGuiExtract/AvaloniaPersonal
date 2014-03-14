@@ -15,10 +15,10 @@
 		source control. <br>
        		<b>$/Engineering/ReusableComponents/COM 
 		Components/UCLIDFileProcessing/ESSkipConditions/InteractiveTest</b></li> 
-   		<li>The FPS files use <b>(local)</b> and <b>FAM_Condition</b> as the database server and 
-		database name, respectively.</li> 
-   		<li>For this testing checklist, use only a <b>Server</b> license file, not an <b>RDT</b> 
-		license file.</li> 
+   		<li>The FPS files use <b>(local)</b> and <b>FAM_Condition</b> as the database 
+		server and database name, respectively.</li> 
+   		<li>For this testing checklist, use only a <b>Server</b> license file, not an 
+		<b>RDT</b> license file.</li> 
 	</ul>
 <p>
    	<li><h3>Logical Conditions Functionality</h3>
@@ -29,53 +29,61 @@
  	   	<LI>Confirm that the label above the bottom edit box is <b>Do not queue any file 
 		that meets the following condition</b>.
    		<li>Confirm that pressing the associated <b>Commands &gt;</b> button for brings up 
-		a drop-down menu with <b>Select Condition...</b> and then brings up the dialog.</li> 
+		a drop-down menu with <b>Select Condition...</b> and then brings up the 
+		dialog.</li> 
    		<li>Confirm that the <b>Select Condition</b> dialog has three active buttons: 
        		Configure..., OK, Cancel.  There should also be an edit box for <i>FAM Condition 
        		description</i>, and a droplist for <i>Select Condition</i>.</li>
    		<ul> 
-      			<li>Confirm the droplist for Select Condition includes: <b>&ltNone&gt</b>.</li>
+      			<li>Confirm the droplist for Select Condition includes: 
+			<b>&ltNone&gt</b>.</li>
 	      		<ul> 
-        	 		<li>Confirm that when <b>None</b> is selected, it disables the Configure 
-				button in the Select Condition dialog.</li> 
-         			<li>Clear the database, then double-click on <b>Skip_None.fps</b> in 
-				the FPS folder. 
-				Confirm that an <b>Action not Found</b> error message is displayed.</li> 
+        	 		<li>Confirm that when <b>None</b> is selected, it disables the 
+				Configure button in the Select Condition dialog.</li> 
+         			<li>Clear the database, then double-click on <b>Skip_None.fps</b> 
+				in the FPS folder. 
+				Confirm that an <b>Action not Found</b> error message is 
+				displayed.</li> 
         	 		<li>Add action <b>skip_basedonnone</b> to the database.</li> 
-         			<li>Select the action <b>skip_basedonnone</b> in the Action tab of the
-             			File Action Manager for Skip_None.fps.
+         			<li>Select the action <b>skip_basedonnone</b> in the Action tab 
+				of the File Action Manager for Skip_None.fps.
 	         		<li>Press the <b>Start processing</b> button.
-        	 		<li>Confirm that the Name column of the <i>Files added or updated in the 
-				queue recently</i> display area of Queue Log shows <b>TestImage.tif</b>, 
-				<b>TestImage005.tif</b>, <b>TestImage009.tif</b>, <b>TestImage015.tif</b>,
-				<b>TestImage020.tif</b>, and <b>TestImageB.tif</b>, each in a separate row.
+        	 		<li>Confirm that the Name column of the <i>Files added or updated 
+				in the queue recently</i> display area of Queue Log shows 
+				<b>TestImage.tif</b>, <b>TestImage005.tif</b>, 
+				<b>TestImage009.tif</b>, <b>TestImage015.tif</b>,
+				<b>TestImage020.tif</b>, and <b>TestImageB.tif</b>, each in a 
+				separate row.
       			</ul>
 <p>
 	     		<li>Confirm the droplist for the Select Condition dialog includes: 
         	  	<b>AND multiple conditions</b>.
       			<ul> 
-         			<li>Confirm when <b>AND multiple conditions</b> is selected, and the 
-				Configure button is pressed, it brings up the <b>AND multiple 
+         			<li>Confirm when <b>AND multiple conditions</b> is selected, and 
+				the Configure button is pressed, it brings up the <b>AND multiple 
 				conditions settings</b> dialog.
          			<ul> 
-            				<li>Confirm that the <b>AND multiple conditions settings</b> 
-					dialog has <b>Add...</b>, <b>Delete</b>, <b>Command &gt;</b> 
-					buttons, an <b>Up</b> arrow, a <b>Down</b> arrow, an <b>OK</b> 
-					button and a <b>Cancel</b> button. 
+            				<li>Confirm that the <b>AND multiple conditions 
+					settings</b> dialog has <b>Add...</b>, <b>Delete</b>, 
+					<b>Command &gt;</b> buttons, an <b>Up</b> arrow, a 
+					<b>Down</b> arrow, an <b>OK</b> button and a 
+					<b>Cancel</b> button. 
         		    		<li>Confirm that only the <b>Add...</b>, <b>OK</b> and 
 					<b>Cancel</b> buttons are initially enabled.
-      		  	    		<li>Confirm that pressing the <b>Add...</b> button brings up a 
-					<b>Select FAM Condition</b> dialog.
+      		  	    		<li>Confirm that pressing the <b>Add...</b> button brings 
+					up a <b>Select FAM Condition</b> dialog.
             				<li>Insert several conditions into the <b>Configure AND 
 					multiple conditions</b> dialog. 
-        				<li><b>[FIDSC #4919]</b> Confirm that the Add button for the 
-					multiple conditions FAM condition inserts new objects <b>after</b> 
-					the currently selected item in the list.</li>
-	        	    		<li>Confirm that the initial state for all the FAM conditions has the 
-					<b>Enabled</b> checkbox checked.
-            				<li>Confirm that when none of the FAM conditions are highlighted, 
-					the <b>Delete</b> button, <b>Command &gt;</b> button, <b>Up</b> 
-					arrow and <b>Down</b> arrow are all disabled.
+        				<li><b>[FIDSC #4919]</b> Confirm that the Add button for 
+					the multiple conditions FAM condition inserts new 
+					objects <b>after</b> the currently selected item in the 
+					list.</li>
+	        	    		<li>Confirm that the initial state for all the FAM 
+					conditions has the <b>Enabled</b> checkbox checked.
+            				<li>Confirm that when none of the FAM conditions are 
+					highlighted, the <b>Delete</b> button, <b>Command 
+					&gt;</b> button, <b>Up</b> arrow and <b>Down</b> arrow 
+					are all disabled.
 	            			<li>Confirm that highlighting a FAM condition activates the 
 					<b>Delete</b> and <b>Command &gt;</b> buttons.
             				<li>Confirm that <b>SHIFT+Left Click</b> allows for multiple 
@@ -335,7 +343,8 @@
 			dialog.</li>
        	    		<li>Confirm there is an edit box with an associated <b>Tag Selector</b> 
 			button.</li> 
-       			<li>Confirm that the default filename in the edit box is <b>&lt;SourceDocName&gt;</b>.
+       			<li>Confirm that the default filename in the edit box is 
+			<b>&lt;SourceDocName&gt;</b>.
             		<li>Confirm that the <b>Tag Selector</b> button brings up a context 
 			menu.</li>
             		<li>Confirm that the context menu includes <b>&ltSourceDocName&gt</b>,
@@ -391,8 +400,8 @@
       		<li>Confirm the droplist for the Select Condition dialog includes: 
        	  	<b>File timestamp condition</b>.</li>
 		<ul> 
-       			<li>Confirm clicking on the Configure button brings up the <b>File timestamp 
-			condition settings</b> dialog.
+       			<li>Confirm clicking on the Configure button brings up the <b>File 
+			timestamp condition settings</b> dialog.
        	    		<li>Confirm that the dialog has a droplist with entries of <b>met</b> 
 			and <b>not met</b> as the fill-in text for <b>Consider condition as  
 			met|not met if the following file:</b>. 
@@ -402,8 +411,9 @@
 			<b>&ltSourceDocName&gt</b>.
        			<li>Confirm that the <b>Tag Selector</b> button displays a context 
                		menu to the immediate right of the button.
-            		<li>Confirm that the items in the context menu include <b>&ltSourceDocName&gt</b>,
-       	        	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.
+            		<li>Confirm that the items in the context menu include 
+			<b>&ltSourceDocName&gt</b>, <b>&ltFPSFileDir&gt</b>, and a set of 
+			functions that start with $.
        			<li>Confirm that when an item is chosen it either inserts text at 
 			the cursor position or replaces the highlighted text in the edit box. 
             		<li>Confirm that the <b>...</b> ( Browse ) button brings up 
@@ -452,7 +462,8 @@
 					<li>a <b>today</b> combo box
 					<li>the <b>modified</b> timestamp of this file: combo box
 				</ul>
-				<li>Confirm that the date and time radio button is selected by default.
+				<li>Confirm that the date and time radio button is selected by 
+				default.
 <p>
 				<li>Confirm that selecting the timestamp radio button enables the 
 				associated combo box.
@@ -469,12 +480,14 @@
 				spinner control and combo box.
 				<li>Confirm that the associated controls are only enabled when the 
 				radio button is selected.
-				<li>Confirm that the computed date and time are added after <b>ago</b> 
-				after the radio button is selected.
-				<li>Confirm that the minimum value allowed by the spinner is <b>0</b>.
-				<li>Confirm that a meaningful error message is presented if a large number 
-				is selected.
-				<li>Confirm that the following options are available in the combo box.
+				<li>Confirm that the computed date and time are added after 
+				<b>ago</b> after the radio button is selected.
+				<li>Confirm that the minimum value allowed by the spinner is 
+				<b>0</b>.
+				<li>Confirm that a meaningful error message is presented if a 
+				large number is selected.
+				<li>Confirm that the following options are available in the 
+				combo box.
 				<ul>
 					<li>seconds
 					<li>minutes
@@ -485,9 +498,10 @@
 					<li>years
 				</ul>
 <p>
-				<li>Confirm that the <b>today</b> combo box is only enabled when the 
-				associated radio button is selected.
-				<li>Confirm that the following options are available in the combo box.
+				<li>Confirm that the <b>today</b> combo box is only enabled when 
+				the associated radio button is selected.
+				<li>Confirm that the following options are available in the 
+				combo box.
 				<ul>
 					<li>this minute
 					<li>last minute
@@ -503,22 +517,24 @@
 					<li>last year
 				</ul>
 <p>
-				<li>Confirm that the <b>modified</b> combo box is only enabled when the 
-				associated radio button is selected.
-				<li>Confirm that the following options are available in the combo box.
+				<li>Confirm that the <b>modified</b> combo box is only enabled 
+				when the associated radio button is selected.
+				<li>Confirm that the following options are available in the 
+				combo box.
 				<ul>
 					<li>created
 					<li>modified
 				</ul>
-				<li>Confirm that an edit box along with a tag selector and browse button 
-				are also enabled when the radio button is selected.
+				<li>Confirm that an edit box along with a tag selector and 
+				browse button are also enabled when the radio button is selected.
 	       			<li>Confirm that the <b>Tag Selector</b> button displays a context 
         	       		menu to the immediate right of the button.
             			<li>Confirm that the items in the context menu include 
 				<b>&ltSourceDocName&gt</b>, <b>&ltFPSFileDir&gt</b>, and a set of 
 				functions that start with $.
        				<li>Confirm that when an item is chosen it either inserts text at 
-				the cursor position or replaces the highlighted text in the edit box. 
+				the cursor position or replaces the highlighted text in the edit 
+				box. 
             			<li>Confirm that the <b>...</b> ( Browse ) button brings up 
        	        		an <b>Open</b> dialog. 
        				<li>Confirm that a file selected in the <b>Open</b> dialog replaces 
@@ -527,10 +543,11 @@
 <p>
 		        <li><b>[DotNetRC #697, #700, #704, #705]</b>
         		<ul>
-	            		<li>Confirm that a file timestamp condition can be used to conditionally 
-				delete a file when the created date is within a specified range.
-				<li>Confirm that a file timestamp condition cannot be used based on 
-				an <b>accessed</b> timestamp.
+	            		<li>Confirm that a file timestamp condition can be used to 
+				conditionally delete a file when the created date is within 
+				a specified range.
+				<li>Confirm that a file timestamp condition cannot be used based 
+				on an <b>accessed</b> timestamp.
 				<li>Exercise use of relative timestamps.
 				<ul>
 					<li>Confirm that <b>0 days ago</b> works as expected.
@@ -609,6 +626,51 @@
 		      		<li>Confirm that the files fail to queue.
 				<li>Confirm that a meaningful exception is provided.
 		       	</ul>
+		</ul> 
+<p>
+      		<li>Confirm the droplist for the Select Condition dialog includes: 
+       	  	<b>Page count condition</b>.</li>
+		<ul> 
+       			<li>Confirm that pressing the Configure button in the Select 
+			Condition dialog brings up the <b>Page count condition settings</b> 
+			dialog.</li>
+			<li>Confirm that the dialog contains a dropdown combo box with the 
+			following entries.
+			<ul>
+				<li>equal to
+				<li>not equal to
+				<li>less than
+				<li>less than or equal to
+				<li>greater than
+				<li>greater than or equal to
+				<li>&lt;blank&gt;
+			</ul>
+			<li>Confirm that <b>&lt;blank&gt;</b> is the default option.
+			<li>Confirm that the dialog contains a spinner control.
+			<ul>
+				<li>Confirm that the default is <b>1</b>.
+				<li>Confirm that the range is <b>0</b> to <b>999,999</b>.
+			</ul>
+			<li>Confirm that the dialog includes a <b>Use the page count from the 
+			database if available. (faster)</b> checkbox.
+			<li>Confirm that the checkbox is checked by default.
+			<li>Confirm that valid settings require an operator to be defined.
+<p>
+			<li>Confirm that each of the following operators works correctly 
+			as a <b>skip condition</b>.
+			<ul>
+				<li>equal to
+				<li>not equal to
+				<li>less than
+				<li>less than or equal to
+				<li>greater than
+				<li>greater than or equal to
+			</ul>
+			<li>Confirm that using a page count of zero works to queue or skip 
+			files (such as USS files) without a page count.
+			<li>Confirm that images can be queued without a page count and then 
+			the page count can be determined during execution of the page count 
+			condition.
 		</ul> 
 <p>
       		<li>Confirm the droplist for the Select Condition dialog includes: 
