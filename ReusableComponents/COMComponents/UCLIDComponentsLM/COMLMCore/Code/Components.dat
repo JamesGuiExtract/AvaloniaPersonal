@@ -51,14 +51,13 @@
 6049,IDShield_Office_Object
 6050,LabDE_Verification_UI_Object
 6051,Pagination_UI_Object
+6052,Enhance_OCR_Object
 
 // IDs for individually licensed features
 6070,Anti_Aliasing_Feature
 6071,IgnoreUSB_IDCheck_Feature
 6072,IgnoreUSB_Decrement_Feature
 6073,PDF_ReadWrite_Feature
-6074,GridTool_Query_Feature
-6075,GridTool_Draw_Feature
 6076,RotatedImages_And_Annotation_Feature
 6077,Image_Cleanup_Engine_Feature
 6078,Handwriting_Recognition_Feature

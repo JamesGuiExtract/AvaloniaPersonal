@@ -16,6 +16,9 @@
 // add license management function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 
+static CMutex gMutex;
+static bool gbLoggedUnlicensedException = false;
+
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
@@ -1050,6 +1053,15 @@ ISpatialStringPtr CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc, long nPage)
 			ISpatialStringPtr ipPageText = ipCopyThis->Clone();
 			ASSERT_RESOURCE_ALLOCATION("ELI36508", ipPageText != __nullptr);
 
+			// https://extract.atlassian.net/browse/ISSUE-12087
+			// So that the Enhance OCR rule object can be used in re-usable contexts but only
+			// provide benefit when licensed, when not licensed simply return the existing page
+			// text.
+			if (!isEnhanceOCRLicensed())
+			{
+				return ipPageText;
+			}
+
 			// Since the page text will be used against a 1 page filtered copy of the current page,
 			// set as page 1.
 			bool bHasSpatialInfo = asCppBool(ipPageText->HasSpatialInfo());
@@ -1171,20 +1183,27 @@ void CEnhanceOCR::enhanceOCR(IIUnknownVector *pAttributes, IAFDocument *pDoc)
 		// Initialize this page for processing.
 		setCurrentPage(ipDocument, nPage);
 
-		// Shrink each rect down to it's pixel content to minimize the amount of processing that
-		// needs to be done.
-		for each (ILongRectanglePtr ipRect in vecRectsToEnhance)
+		// https://extract.atlassian.net/browse/ISSUE-12087
+		// So that the Enhance OCR rule object can be used in re-usable contexts but only
+		// provide benefit when licensed, when not licensed simply return the existing page
+		// text.
+		if (isEnhanceOCRLicensed())
 		{
-			ASSERT_RESOURCE_ALLOCATION("ELI36517", ipRect != __nullptr);
+			// Shrink each rect down to it's pixel content to minimize the amount of processing that
+			// needs to be done.
+			for each (ILongRectanglePtr ipRect in vecRectsToEnhance)
+			{
+				ASSERT_RESOURCE_ALLOCATION("ELI36517", ipRect != __nullptr);
 
-			UCLID_AFVALUEMODIFIERSLib::ISplitRegionIntoContentAreasPtr ipSRICA = getSRICA();
-			ASSERT_RESOURCE_ALLOCATION("ELI36518", ipSRICA != __nullptr);
+				UCLID_AFVALUEMODIFIERSLib::ISplitRegionIntoContentAreasPtr ipSRICA = getSRICA();
+				ASSERT_RESOURCE_ALLOCATION("ELI36518", ipSRICA != __nullptr);
 
-			ipSRICA->ShrinkToFit(m_strSourceDocName.c_str(), nPage, ipRect);
-		}
+				ipSRICA->ShrinkToFit(m_strSourceDocName.c_str(), nPage, ipRect);
+			}
 		
-		// Remove all but vecRectsToEnhance from the image page. 
-		prepareImagePage(vecRectsToEnhance);
+			// Remove all but vecRectsToEnhance from the image page. 
+			prepareImagePage(vecRectsToEnhance);
+		}
 
 		// Used to get the original text associated with a given zone.
 		ISpatialStringSearcherPtr ipSearcher = getSpatialStringSearcher();
@@ -1193,7 +1212,10 @@ void CEnhanceOCR::enhanceOCR(IIUnknownVector *pAttributes, IAFDocument *pDoc)
 		vector<ZoneData> vecZonesToEnhance = createZonesFromRects(vecRectsToEnhance, ipSearcher);
 
 		// Process the zones.
-		enhanceOCR(vecZonesToEnhance);
+		if (isEnhanceOCRLicensed())
+		{
+			enhanceOCR(vecZonesToEnhance);
+		}
 
 		// Loop through each zone to apply the result back to the original attribute's value.
 		set<IAttributePtr> setModifiedAttributes;
@@ -2920,6 +2942,29 @@ void CEnhanceOCR::reset()
 void CEnhanceOCR::validateLicense()
 {
 	VALIDATE_LICENSE(gnFLEXINDEX_IDSHIELD_CORE_OBJECTS, "ELI36584", "Enhance OCR");
+}
+//--------------------------------------------------------------------------------------------------
+bool CEnhanceOCR::isEnhanceOCRLicensed()
+{
+	if (LicenseManagement::isLicensed(gnENHANCE_OCR))
+	{
+		return true;
+	}
+	else
+	{
+		CSingleLock lg(&gMutex, TRUE);
+
+		if (!gbLoggedUnlicensedException)
+		{
+			UCLIDException ue("ELI36729",
+				"Application trace: Enhance OCR is not licensed. OCR text is not being enhanced.");
+			ue.log();
+
+			gbLoggedUnlicensedException = true;
+		}
+
+		return false;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -66,16 +66,6 @@ const unsigned int gnIDSHIELD_CORE_OBJECTS				= gnBASE_OFFSET + 5;
 // use in Simple Rule Writing.
 const unsigned int gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS	= gnBASE_OFFSET + 6;
 
-// The IcoMapCore package is for all components that are used to make
-// IcoMap functional in a theoretical backend GIS/CAD system.  Examples
-// of included components are the IcoMap control, the bearing/distance
-// input validators, the UCLIDFeatureMgmt classes, etc.
-const unsigned int gnICOMAP_CORE_OBJECTS				= gnBASE_OFFSET + 7;
-
-// The IcoMapForArcGIS package is for all components that make IcoMap
-// work in the ArcGIS environment.
-const unsigned int gnICOMAP_ARCGIS_OBJECTS				= gnBASE_OFFSET + 8;
-
 // The InputFunnelSDK package is for all components that are not part of the
 // core InputFunnel package, but are delivered to customers who will be 
 // integrating the InputFunnel technology at the COM object level.
@@ -168,6 +158,9 @@ const unsigned int gnLABDE_VERIFICATION_UI_OBJECT		= gnBASE_OFFSET + 50;
 // Special ID for the pagination UI (Pagination Utility)
 const unsigned int gnPAGINATION_UI_OBJECT				= gnBASE_OFFSET + 51;
 
+// Special ID for the Enhance OCR task and rule object
+const unsigned int gnENHANCE_OCR						= gnBASE_OFFSET + 52;
+
 
 //-------------------------------------------------------------------------------------------------
 // Constants for individually licensed items
@@ -189,12 +182,6 @@ const unsigned int gnIGNORE_USB_DECREMENT_FEATURE		= gnBASE_OFFSET + 72;
 
 // Special ID for reading and writing PDF files within the Spot Recognition Window.
 const unsigned int gnPDF_READWRITE_FEATURE				= gnBASE_OFFSET + 73;
-
-// Special ID for the Query feature of the IcoMap Grid Tool.
-const unsigned int gnGRIDTOOL_QUERY_FEATURE				= gnBASE_OFFSET + 74;
-
-// Special ID for the Drawing feature of the IcoMap Grid Tool.
-const unsigned int gnGRIDTOOL_DRAW_FEATURE				= gnBASE_OFFSET + 75;
 
 // Special ID for reading and writing annotations.  This package is useful 
 // for ID Shield customers who: have images with pre-existing annotations that 

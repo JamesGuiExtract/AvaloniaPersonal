@@ -390,5 +390,6 @@ void CEnhanceOCRTaskPP::updateUI()
 void CEnhanceOCRTaskPP::validateLicense()
 {
 	VALIDATE_LICENSE(gnFILE_ACTION_MANAGER_OBJECTS, "ELI36649", "Enhance OCR Task PP");
+	VALIDATE_LICENSE(gnENHANCE_OCR, "ELI36728", "Enhance OCR Task");
 }
 //-------------------------------------------------------------------------------------------------

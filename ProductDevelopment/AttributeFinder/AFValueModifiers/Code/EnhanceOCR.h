@@ -540,6 +540,11 @@ private:
 	void reset();
 
 	void validateLicense();
+
+	// Checks to see if Enhance OCR is licensed. If not, Enhance OCR rule objects will be allowed to
+	// "run", but will not enhance the OCR; it will return the original text from the uss file.
+	// An application trace to this effect will be logged once per process.
+	bool isEnhanceOCRLicensed();
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(EnhanceOCR), CEnhanceOCR)

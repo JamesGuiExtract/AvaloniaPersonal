@@ -89,6 +89,7 @@ FLEX Index / ID Shield Utilities,0
 // Do not place the Disable USB counters line in the copy of this file placed in license generator folder
 //-    Disable USB Counters (locked to PC),6072
 -    Disable USB Key Serial Numbers,6071
+-    Enhance OCR,6052
 -    File Inspector Search,6084
 -    FTP/SFTP file transfer,6083
 -    Handwriting Recognition,6078

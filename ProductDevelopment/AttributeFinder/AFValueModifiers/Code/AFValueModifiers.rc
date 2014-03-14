@@ -411,7 +411,7 @@ BEGIN
     LTEXT           "Sub-attribute name:",IDC_STATIC,18,209,114,8
 END
 
-IDD_ENHANCEOCRPP DIALOGEX 0, 0, 340, 253
+IDD_ENHANCEOCRPP DIALOGEX 0, 0, 340, 272
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -448,6 +448,7 @@ BEGIN
     EDITTEXT        IDC_EDIT_CHARS_TO_IGNORE,7,220,318,12,ES_AUTOHSCROLL
     CONTROL         "Ouput filtered images alongside original (debug)",IDC_CHK_OUTPUT_FILTERED_IMAGES,
                     "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,7,236,288,10
+    LTEXT           "NOTE: When the processing machine is not licensed for Enhance OCR, this rule object will ""run"" but not attempt to enhance the text. The text from the uss file will be used as-is.",IDC_STATIC,7,249,326,16
 END
 
 
@@ -536,7 +537,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 333
         TOPMARGIN, 7
-        BOTTOMMARGIN, 246
+        BOTTOMMARGIN, 265
     END
 END
 #endif    // APSTUDIO_INVOKED

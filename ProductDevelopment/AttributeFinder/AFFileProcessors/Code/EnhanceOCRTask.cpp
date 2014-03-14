@@ -649,4 +649,5 @@ STDMETHODIMP CEnhanceOCRTask::InterfaceSupportsErrorInfo(REFIID riid)
 void CEnhanceOCRTask::validateLicense()
 {
 	VALIDATE_LICENSE(gnFLEXINDEX_IDSHIELD_SERVER_CORE, "ELI36627", "Enhance OCR Task");
+	VALIDATE_LICENSE(gnENHANCE_OCR, "ELI36727", "Enhance OCR Task");
 }
