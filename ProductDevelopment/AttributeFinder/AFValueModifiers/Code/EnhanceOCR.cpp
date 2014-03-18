@@ -177,6 +177,7 @@ CEnhanceOCR::CEnhanceOCR()
 , m_ipCurrentPageText(__nullptr)
 , m_ipCurrentPageInfo(__nullptr)
 , m_ipPageRasterZone(__nullptr)
+, m_ipPageRect(__nullptr)
 , m_nAvgPageCharWidth(0)
 , m_ipSpatialStringSearcher(__nullptr)
 , m_ipSRICA(__nullptr)
@@ -206,6 +207,7 @@ CEnhanceOCR::~CEnhanceOCR()
 		m_ipCurrentPageText = __nullptr;
 		m_ipCurrentPageInfo = __nullptr;
 		m_ipPageRasterZone = __nullptr;
+		m_ipPageRect = __nullptr;
 		m_ipSpatialStringSearcher = __nullptr;
 		m_ipSRICA =__nullptr;
 		m_ipPreferredFormatParser = __nullptr;
@@ -1044,7 +1046,18 @@ ISpatialStringPtr CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc, long nPage)
 			vector<OCRResult*> vecBestResults;
 
 			// Initialize variable for processsing nPage.
-			ICopyableObjectPtr ipCopyThis = setCurrentPage(ipAFDoc, nPage);
+			ISpatialStringSearcherPtr ipSearcher = setCurrentPage(ipAFDoc, nPage);
+
+			ILongRectanglePtr ipRectToProcess = getPageRect();
+			
+			// If there is no area on the current page to be processed return right away.
+			if (ipRectToProcess == __nullptr)
+			{
+				return __nullptr;
+			}
+
+			// Get the text in the area of the page to process.
+			ICopyableObjectPtr ipCopyThis = ipSearcher->GetDataInRegion(ipRectToProcess, VARIANT_FALSE);
 			ASSERT_RESOURCE_ALLOCATION("ELI36507", ipCopyThis != __nullptr);
 
 			// Clone this page's text so that it can be manipulated without affecting the original document
@@ -1087,9 +1100,6 @@ ISpatialStringPtr CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc, long nPage)
 			{
 				vecRectsToEnhance = prepareImagePage(ipPageText, vector<ILongRectanglePtr>());
 			}
-
-			// Use to get the original text associated with a given zone.
-			ISpatialStringSearcherPtr ipSearcher = getSpatialStringSearcher();
 
 			// Initialize zones for each area identified for enhancement.
 			vector<ZoneData> vecZonesToEnhance = createZonesFromRects(vecRectsToEnhance, ipSearcher);
@@ -1181,7 +1191,7 @@ void CEnhanceOCR::enhanceOCR(IIUnknownVector *pAttributes, IAFDocument *pDoc)
 		vector<ILongRectanglePtr> vecRectsToEnhance = pageIter->second;
 
 		// Initialize this page for processing.
-		setCurrentPage(ipDocument, nPage);
+		ISpatialStringSearcherPtr ipSearcher = setCurrentPage(ipDocument, nPage);
 
 		// https://extract.atlassian.net/browse/ISSUE-12087
 		// So that the Enhance OCR rule object can be used in re-usable contexts but only
@@ -1204,9 +1214,6 @@ void CEnhanceOCR::enhanceOCR(IIUnknownVector *pAttributes, IAFDocument *pDoc)
 			// Remove all but vecRectsToEnhance from the image page. 
 			prepareImagePage(vecRectsToEnhance);
 		}
-
-		// Used to get the original text associated with a given zone.
-		ISpatialStringSearcherPtr ipSearcher = getSpatialStringSearcher();
 
 		// Initialize zones for each area identified for enhancement.
 		vector<ZoneData> vecZonesToEnhance = createZonesFromRects(vecRectsToEnhance, ipSearcher);
@@ -1485,7 +1492,7 @@ void CEnhanceOCR::initializeCustomFilter(string strFilterName, string strFilterF
 	}
 }
 //-------------------------------------------------------------------------------------------------
-ISpatialStringPtr CEnhanceOCR::setCurrentPage(IAFDocumentPtr ipDoc, long nPage)
+ISpatialStringSearcherPtr CEnhanceOCR::setCurrentPage(IAFDocumentPtr ipDoc, long nPage)
 {
 	ASSERT_ARGUMENT("ELI36522", ipDoc != __nullptr);
 
@@ -1497,6 +1504,7 @@ ISpatialStringPtr CEnhanceOCR::setCurrentPage(IAFDocumentPtr ipDoc, long nPage)
 	m_ipCurrentPageText = __nullptr;
 	m_ipCurrentPageInfo = __nullptr;
 	m_ipPageRasterZone = __nullptr;			
+	m_ipPageRect = __nullptr;
 	m_nAvgPageCharWidth = 0;
 	m_ipSpatialStringSearcher = __nullptr;
 	m_vecResults.clear();
@@ -1577,28 +1585,29 @@ ISpatialStringPtr CEnhanceOCR::setCurrentPage(IAFDocumentPtr ipDoc, long nPage)
 	m_apPageBitmap.reset(new LeadToolsBitmap(m_strSourceDocName, nPage, 0));
 	ASSERT_RESOURCE_ALLOCATION("ELI36529", m_apPageBitmap.get() != __nullptr);
 
-	return m_ipCurrentPageText;
+	ISpatialStringSearcherPtr ipSearcher = getSpatialStringSearcher();
+	ASSERT_RESOURCE_ALLOCATION("ELI36735", ipSearcher != __nullptr);
+
+	return ipSearcher;
 }
 //--------------------------------------------------------------------------------------------------
-IRasterZonePtr CEnhanceOCR::getPageRasterZone()
+ILongRectanglePtr CEnhanceOCR::getPageRect()
 {
-	if (m_ipPageRasterZone == __nullptr)
+	if (m_ipPageRect == __nullptr)
 	{
-		ILongRectanglePtr ipPageRect;
-
 		if (m_bProcessFullDoc)
 		{
-			ipPageRect.CreateInstance(CLSID_LongRectangle);
-			ASSERT_RESOURCE_ALLOCATION("ELI36677", ipPageRect != __nullptr);
+			m_ipPageRect.CreateInstance(CLSID_LongRectangle);
+			ASSERT_RESOURCE_ALLOCATION("ELI36677", m_ipPageRect != __nullptr);
 
 			if (m_ipCurrentPageInfo->Orientation == kRotNone ||
 				m_ipCurrentPageInfo->Orientation == kRotDown)
 			{
-				ipPageRect->SetBounds(0, 0, m_ipCurrentPageInfo->Width, m_ipCurrentPageInfo->Height);
+				m_ipPageRect->SetBounds(0, 0, m_ipCurrentPageInfo->Width, m_ipCurrentPageInfo->Height);
 			}
 			else
 			{
-				ipPageRect->SetBounds(0, 0, m_ipCurrentPageInfo->Height, m_ipCurrentPageInfo->Width);
+				m_ipPageRect->SetBounds(0, 0, m_ipCurrentPageInfo->Height, m_ipCurrentPageInfo->Width);
 			}
 		}
 		else
@@ -1607,11 +1616,34 @@ IRasterZonePtr CEnhanceOCR::getPageRasterZone()
 			ISpatialStringPtr ipAFDocText = m_ipCurrentDoc->Text;
 			ASSERT_RESOURCE_ALLOCATION("ELI36675", ipAFDocText != __nullptr);
 
-			ISpatialStringPtr ipPageText = ipAFDocText->GetSpecifiedPages(m_nCurrentPage, m_nCurrentPage);
+			ISpatialStringPtr ipPageText =
+				ipAFDocText->GetSpecifiedPages(m_nCurrentPage, m_nCurrentPage);
 			ASSERT_RESOURCE_ALLOCATION("ELI36676", ipPageText != __nullptr);
 
-			ipPageRect = ipPageText->GetOriginalImageBounds();
-			ASSERT_RESOURCE_ALLOCATION("ELI36530", ipPageRect != __nullptr);
+			// https://extract.atlassian.net/browse/ISSUE-12093
+			// If there is not spatial info on the specified given page, return __nullptr to
+			// indicate there is nothing to be processed on this page.
+			if (!asCppBool(ipPageText->HasSpatialInfo()))
+			{
+				return __nullptr;
+			}
+
+			m_ipPageRect = ipPageText->GetOriginalImageBounds();
+			ASSERT_RESOURCE_ALLOCATION("ELI36530", m_ipPageRect != __nullptr);
+		}
+	}
+
+	return m_ipPageRect;
+}
+//--------------------------------------------------------------------------------------------------
+IRasterZonePtr CEnhanceOCR::getPageRasterZone()
+{
+	if (m_ipPageRasterZone == __nullptr)
+	{
+		ILongRectanglePtr ipPageRect = getPageRect();
+		if (ipPageRect == __nullptr)
+		{
+			return __nullptr;
 		}
 
 		m_ipPageRasterZone.CreateInstance(CLSID_RasterZone);
@@ -2120,7 +2152,12 @@ vector<ILongRectanglePtr> CEnhanceOCR::getRectsToEnhance(ISpatialStringPtr ipLow
 	ASSERT_RESOURCE_ALLOCATION("ELI36560", ipRasterZones != __nullptr);
 
 	IRasterZonePtr ipPageRasterZone = getPageRasterZone();
-	ASSERT_RESOURCE_ALLOCATION("ELI36561", ipPageRasterZone != __nullptr);
+
+	// If there is no spatial info for this page, return an empty vector.
+	if (ipPageRasterZone == __nullptr)
+	{
+		return vector<ILongRectanglePtr>();
+	}
 
 	ipRasterZones->PushBack(ipPageRasterZone);
 
@@ -2849,8 +2886,7 @@ IOCREnginePtr CEnhanceOCR::getOCREngine()
 //--------------------------------------------------------------------------------------------------
 ISpatialStringSearcherPtr CEnhanceOCR::getSpatialStringSearcher()
 {
-	if (m_ipSpatialStringSearcher == __nullptr && m_ipCurrentPageText != __nullptr &&
-		asCppBool(m_ipCurrentPageText->HasSpatialInfo()))
+	if (m_ipSpatialStringSearcher == __nullptr)
 	{
 		m_ipSpatialStringSearcher.CreateInstance(CLSID_SpatialStringSearcher);
 		ASSERT_RESOURCE_ALLOCATION("ELI36581", m_ipSpatialStringSearcher != __nullptr);

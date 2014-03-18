@@ -375,7 +375,10 @@ private:
 	// The SpatialPageInfo of the current document page.
 	ISpatialPageInfoPtr m_ipCurrentPageInfo;
 
-	// A raster zone encapsulating the entire 
+	// A rectangle encapsulating the area of the current page to process.
+	ILongRectanglePtr m_ipPageRect;
+
+	// A raster zone encapsulating the area of the current page to process.
 	IRasterZonePtr m_ipPageRasterZone;
 
 	// The average character width for the current page.
@@ -430,9 +433,12 @@ private:
 	void initializeCustomFilter(string strFilterName, string strFilterFilename);
 
 	// Initializes variables for the specified page.
-	ISpatialStringPtr setCurrentPage(IAFDocumentPtr ipDoc, long nPage);
+	ISpatialStringSearcherPtr setCurrentPage(IAFDocumentPtr ipDoc, long nPage);
 
-	// Gets a raster zone representing the area of the current page.
+	// Gets a rectangle representing the area of the current page to process.
+	ILongRectanglePtr getPageRect();
+
+	// Gets a raster zone representing the area of the current page to process.
 	IRasterZonePtr getPageRasterZone();
 
 	// Removes all words from the specified ipPageText that do not contain any characters below
