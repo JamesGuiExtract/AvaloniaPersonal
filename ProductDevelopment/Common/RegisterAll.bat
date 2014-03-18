@@ -3,7 +3,7 @@
 ::listed in files with the extension rl & all .Net assemblies listed in files with the extension nl
 
 ::Set path so CommonComponents is on the path (assumes these files are in commoncomponents directory)
-set PATH=%PATH%;%~p0;%~p0..\FlexIndexComponents\Bin;%~p0..\InputFunnelComponents\Bin;%~p0..\IcoMap for ArcGIS\Bin
+set PATH=%PATH%;%~p0
 
 if not [%1]==[/s] (
 	echo Press any key to start file registration process...
