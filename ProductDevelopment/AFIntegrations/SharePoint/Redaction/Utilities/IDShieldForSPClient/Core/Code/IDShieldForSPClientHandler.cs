@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.ServiceModel;
 using System.Threading;
 using System.Windows.Forms;
@@ -105,12 +106,7 @@ namespace Extract.SharePoint.Redaction.Utilities
                     string.Concat("\"", data.FpsFileLocation, "\" \"",
                     fileInformation.Key, "\" /ignoreDb"));
 
-                using (var process = new Process())
-                {
-                    process.StartInfo = info;
-                    process.Start();
-                    process.WaitForExit();
-                }
+                RunProcess(info);
 
                 var redactedFile = Path.Combine(Path.GetDirectoryName(fileInformation.Key),
                     Path.GetFileNameWithoutExtension(fileInformation.Key)) + ".redacted"
@@ -311,13 +307,7 @@ namespace Extract.SharePoint.Redaction.Utilities
                     string.Concat("\"", data.FpsFileLocation, "\" \"",
                     fileToVerify, "\" /process"));
 
-                using (var process = new Process())
-                {
-                    process.StartInfo = info;
-                    process.Start();
-                    process.WaitForExit();
-                }
-
+                RunProcess(info);
             }
             catch (Exception ex)
             {
@@ -400,6 +390,31 @@ namespace Extract.SharePoint.Redaction.Utilities
                 throw ee;
             }
             return items[0];
+        }
+
+        /// <summary>
+        /// Runs the process defined by <paramref name="info"/> and will give focus to the 
+        /// started process.
+        /// </summary>
+        /// <param name="info">The information on the process to start</param>
+        private static void RunProcess(ProcessStartInfo info)
+        {
+            // Set to minimized to help give focus after verification window starts
+            info.WindowStyle = ProcessWindowStyle.Minimized;
+
+            using (var process = new Process())
+            {
+                process.StartInfo = info;
+                process.Start();
+
+                // Get the main window handle
+                IntPtr handle = process.MainWindowHandle;
+                NativeMethods.SetForegroundWindow(handle);
+
+                // Restore the window by setting to show normal
+                NativeMethods.ShowWindow(handle, NativeMethods.SW_SHOWNORMAL);
+                process.WaitForExit();
+            }
         }
 
         #endregion Methods

@@ -112,6 +112,7 @@
     <Compile Include="IdShieldSPClientAboutBox.Designer.cs">
       <DependentUpon>IdShieldSPClientAboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="IdShieldSPClientAboutBox.resx">
       <DependentUpon>IdShieldSPClientAboutBox.cs</DependentUpon>
