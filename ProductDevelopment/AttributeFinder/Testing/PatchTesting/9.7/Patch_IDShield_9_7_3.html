@@ -1,0 +1,114 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.7.3 Patch Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.7.3 Patch Testing<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> Two different customers
+   	<LI><b>SCRs:</b> 12034
+   	<LI><b>Issues:</b>
+	<ul>
+		<li>When performing a 9.7 installation on a clean machine, some COM 
+		objects are not completely registered.
+		<ul>
+			<li>Install <b>ID Shield 9.7.0.31</b> on <b>Server 2012</b>.
+			<li>Install <b>LabDE 9.7.0.31</b> on <b>Windows 7</b>.
+		</ul>
+		<li>Exercising <b>RegisterAll.bat</b> is effective but should not be 
+		necessary.
+	</ul>
+<p>
+   	<LI><b>SCRs:</b> 12021
+	<ul>
+		<li>Installing via <b>Launch.exe</b> or silent install on <b>Windows 
+		XP</b> results in modal dialogs asking for privilege elevation for 
+		installation of external products.
+		<li>Each installation should run without a request for elevation.
+	</ul>
+<p>
+   	<LI><b>SCRs:</b> 7255, 11981, 12039
+	<ul>
+		<li>Update make files for build to work against a branch.
+	</ul>
+<p>
+   	<LI><b>SCRs:</b> 12055
+	<ul>
+		<li><b>OH - Montgomery - Recorder</b> has an ID Shield 9.7 verification 
+		machine that periodically crashes.
+		<li>Steve was able to reproduce this crash by exercising <b>Redaction: 
+		Verify sensitive data</b> ML test #1 on Cheddar and on his development PC.
+		<li>Wayne was unable to reproduce this error on any of several test 
+		machines.
+		<li>Some code was found in FAMTagManager that was not thread-safe.  This 
+		has been corrected.  Steve can no longer reproduce the error with new code.
+	</ul>
+</ul>
+<p>
+<h3>Patch Tests</h3>
+<OL>
+	<LI><b>XP Machine</b>
+	<ul>
+		<LI>Install <b>LabDE 9.7.3</b>.
+		<ul>
+			<li>Confirm that no elevation request is presented.
+			<li>Add a license file.
+			<li>Confirm that all tasks and conditions are available.
+		</ul>
+		<li>Install <b>ID Shield 9.7.3</b> via silent install.
+		<ul>
+			<li>Confirm that no elevation request is presented.
+			<li>Confirm that all tasks and conditions are available.
+		</ul>
+		<li>Install <b>RDT 9.7.3</b>.
+		<ul>
+			<li>Add a license file.
+			<li>Exercise Memory Leak test #1 for <b>Redaction: Verify 
+			sensitive data</b>.
+			<li>Confirm that no FAM crash occurs.
+		</ul>
+       	</ul>
+<p>
+	<LI><b>Windows 7 Machine</b>
+	<ul>
+		<LI>Install <b>ID Shield 9.7.3</b>.
+		<ul>
+			<li>Add a license file.
+			<li>Confirm that all tasks and conditions are available.
+		</ul>
+		<li>Install <b>RDT 9.7.3</b>.
+		<ul>
+			<li>Add a license file.
+			<li>Exercise Memory Leak test #1 for <b>Redaction: Verify 
+			sensitive data</b>.
+			<li>Confirm that no FAM crash occurs.
+		</ul>
+       	</ul>
+<p>
+	<LI><b>Server 2012 Machine</b>
+	<ul>
+		<LI>Install <b>ID Shield 9.7.3</b>.
+		<ul>
+			<li>Add a license file.
+			<li>Confirm that all tasks and conditions are available.
+		</ul>
+		<li>Install <b>RDT 9.7.3</b>.
+		<ul>
+			<li>Add a license file.
+			<li>Exercise Memory Leak test #1 for <b>Redaction: Verify 
+			sensitive data</b>.
+			<li>Confirm that no FAM crash occurs.
+		</ul>
+       	</ul>
+</OL>
+</BODY>
+</HTML>

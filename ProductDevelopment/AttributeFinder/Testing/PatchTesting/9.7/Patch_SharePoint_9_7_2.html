@@ -1,0 +1,109 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.7.2 Patch Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.7.2 Patch Testing<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> Florida Supreme Court
+   	<LI><b>SCRs:</b> 11953
+   	<LI><b>Issues:</b>
+	<ul>
+		<li>When setting the settings for Queuing files based on the value of a 
+		field, all files that have the correct field are set <b>To Be Queued</b>.
+		<li>The file specification should be effective but is not.
+		<li>The <b>[redacted]</b> label that is applied to redactions in PDF 
+		documents is sometimes not seen.  This was traced to the searchable text 
+		being written over the top of the white label text.
+	</ul>
+</ul>
+<p>
+<h3>Patch Tests</h3>
+<OL>
+	<LI><b>Server Machine Setup</b>
+	<ul>
+		<LI>Install <b>ID Shield 9.7.2.1</b>.
+		<li>Install and configure the standard <b>SharePoint</b> server software.
+		<li>Install <b>ID Shield for SharePoint Client 9.7.2.1</b>.
+       	</ul>
+<p>
+	<LI><b>Client Machine Setup</b>
+	<ul>
+		<LI>Install <b>ID Shield 9.7.2.1</b>.
+		<li>Install <b>ID Shield for SharePoint Client 9.7.2.1</b>.
+       	</ul>
+<p>
+	<LI><b>Tests</b>
+	<ul>
+		<LI><b>Installation</b>
+		<ul>
+			<li>Confirm that <b>9.7.2.1</b> installs properly on the server.
+			<li>Confirm that <b>9.7.2.1</b> installs properly on the client.
+       		</ul>
+	   	</LI>
+<p>
+		<LI><b>Process Folder</b>
+		<ul>
+			<li>Create a document library.
+			<li>Add a custom column to the library.
+			<li>Add some files to the library including several files that 
+			do not contain sensitive data and several files with a different 
+			file extension.
+			<li>Apply data to the custom column for some of the added files, 
+			including files with different file extensions.
+			<li>Click the <b>Process folder</b> button.
+			<ul>
+				<li>Confirm the Folder settings group box contains three 
+				radio buttons.
+				<ul>
+					<li>Process any files that are added
+					<li>Process any files where the field has a value of
+					<li>I will select files to process
+				</ul>
+				<li>Confirm the Folder settings group box contains three 
+				check boxes.
+				<ul>
+					<li>Recursively process files from any sub folders
+					<li>Reprocess previously process files
+					<li>Do not process existing files
+				</ul>
+			</ul>
+			<li>Process the files for which the custom column data has a 
+			specified value.
+			<li>Confirm that each file processed matches the following.
+			<ul>
+				<li>the specified file extension
+				<li>the specified value in the custom column
+			</ul>
+			<li>Confirm that no other files were processed.
+       		</ul>
+	   	</LI>
+<p>
+		<LI><b>ESConvertToPDF</b>
+		<ul>
+			<li>Exercise <b>Demo_IDShield</b> images.
+			<li>Modify <b>Verify Redactions.fps</b> to include a 
+			<b>Core: Convert to searchable PDF</b> task that converts the 
+			redacted output image.
+			<li>Verify a few files.
+			<li>Open the redacted PDF images and search for <b>SSN</b> as 
+			the text inside the black redactions.
+			<li>Confirm that the white SSN text is present in every black box.
+			<li>Confirm that <b>SSN</b> is found in only some of the black 
+			boxes.
+       		</ul>
+	   	</LI>
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
