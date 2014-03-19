@@ -12,6 +12,10 @@ REM Map I drive if not mapped
 net use i:
 if ERRORLEVEL 1 net use i: \\fnp2\internal
 
+REM Map m drive if not mapped
+net use m:
+if ERRORLEVEL 1 net use m: \\engsvr\internal
+
 REM p: should be mapped to the base location that the files will be placed for Install shield to build the install
 REM r: should be mapped to the base location that the install will be moved after it is completed
 IF DEFINED BUILD_FINISHED_INSTALL (
