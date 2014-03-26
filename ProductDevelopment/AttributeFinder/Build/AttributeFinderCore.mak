@@ -345,6 +345,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 
 #    @COPY /V "$(BinariesFolder)\sit_grammar.xml" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V "$(BinariesFolder)\ImageViewer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY "$(ReusableComponentsRootDirectory)\APIs\Nuance_18\NuanceLicensing.msm" "$(MERGE_MODULE_DIR)"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\vssver.scc"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\mssccprj.scc"
 	@DeleteFiles "$(ClearImageInstallFilesDir)\vssver.scc"
@@ -390,6 +391,7 @@ CleanupPreviousBuildFolders: CleanUpMergeModulesFromPreviousBuilds
 	@Deletefiles "$(AFCoreInstallFilesRootDir)\OfficeRedist\*.*"	
 	@Deletefiles "$(RequiredInstallsDir)\LogicNP\*.*"
 	@Deletefiles "$(AFCoreInstallFilesRootDir)\ProgramDataFiles\*.*"
+	@Deletefiles "$(MERGE_MODULE_DIR)\NuanceLicensing.msm"
     @ECHO.
     @DATE /T
     @TIME /T
