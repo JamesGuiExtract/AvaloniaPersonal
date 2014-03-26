@@ -52,5 +52,8 @@ private:
 	// PURPOSE: To gather the CPU usage for either the specified PID, specified process names
 	//			or if "_Total" is passed in for pProcessName gathers the total CPU usage
 	//			on the current system.
+	// RETURNS: The percentage of the CPU being used for the PID or system, or -1 if the call was
+	//			unable to read the CPU usage (lack of permissions or the performance counters are
+	//			disabled).
 	int GetCpuUsage(DWORD dwProcessID, LPCTSTR pProcessName, bool bTotal = false);
 };

@@ -1,25 +1,68 @@
 #include "stdafx.h"
 #include "IdleProcessKiller.h"
 #include "UCLIDException.h"
+#include "cpputil.h"
 
 #include <Psapi.h>
 
 //-------------------------------------------------------------------------------------------------
-IdleProcessKiller::IdleProcessKiller(unsigned long ulProcessId, int iTimeOut, int iInterval)
+// Constants
+//-------------------------------------------------------------------------------------------------
+const string gstrTIME_OUT_VALUE_NAME = "IdleProcessTimeout";
+const string gstrDEFAULT_TIME_OUT = "120000";
+const string gstrINTERVAL_VALUE_NAME = "IdleProcessInterval";
+const string gstrDEFAULT_INTERVAL = "2000";
+const string gstrREG_KEY = "SOFTWARE\\Extract Systems\\ReusableComponents\\BaseUtils";
+
+//-------------------------------------------------------------------------------------------------
+// Static members
+//-------------------------------------------------------------------------------------------------
+bool IdleProcessKiller::ms_bLoggedCpuInfoError = false;
+CMutex IdleProcessKiller::ms_Mutex;
+
+//-------------------------------------------------------------------------------------------------
+IdleProcessKiller::IdleProcessKiller(unsigned long ulProcessId,
+									 int iTimeOut/* = 0*/, int iInterval/* = 0*/)
 	: m_ulProcessId(ulProcessId),
 	  m_iInterval(iInterval),
+	  m_iTimeOut(iTimeOut),
 	  m_iZeroCpuCount(0),
 	  m_iMaxZeroCpuCount(0),
-	  m_bKilledProcess(false)
+	  m_bKilledProcess(false),
+	  m_nRetryCount(0),
+	  m_registryManager(HKEY_LOCAL_MACHINE, gstrREG_KEY)
 {
 	try
 	{
-		// Ensure the arguments are valid
-		ASSERT_ARGUMENT("ELI25213", iInterval > 0);
-		ASSERT_ARGUMENT("ELI25207", iTimeOut >= iInterval);
+		if (m_iTimeOut == 0)
+		{
+			string strTimeOut =
+				m_registryManager.getKeyValue("", gstrTIME_OUT_VALUE_NAME, gstrDEFAULT_TIME_OUT);
+			if (strTimeOut.empty())
+			{
+				strTimeOut = gstrDEFAULT_TIME_OUT;
+			}
+
+			m_iTimeOut = asLong(strTimeOut);
+		}
+
+		if (m_iInterval == 0)
+		{
+			string strInterval =
+				m_registryManager.getKeyValue("", gstrINTERVAL_VALUE_NAME, gstrDEFAULT_INTERVAL);
+			if (strInterval.empty())
+			{
+				strInterval = gstrDEFAULT_INTERVAL;
+			}
+
+			m_iInterval = asLong(strInterval);
+		}
+			
+		ASSERT_ARGUMENT("ELI25213", m_iInterval > 0);
+		ASSERT_ARGUMENT("ELI25207", m_iTimeOut >= m_iInterval);
 
 		// Round up to the nearest integer
-		m_iMaxZeroCpuCount = (iTimeOut + iInterval - 1) / iInterval;
+		m_iMaxZeroCpuCount = (m_iTimeOut + m_iInterval - 1) / m_iInterval;
 
 		// Create a thread to monitor the process
 		if( !AfxBeginThread(monitorProcessLoop, this) )
@@ -79,8 +122,49 @@ void IdleProcessKiller::monitorProcess()
 	INIT_EXCEPTION_AND_TRACING("MLI03274");
 	try
 	{
+		_lastCodePos = "1";
 		// Check if there is zero cpu usage
-		if (m_cpuUsage.GetCpuUsage(m_ulProcessId) > 0)
+		int nCpuUsage = m_cpuUsage.GetCpuUsage(m_ulProcessId);
+
+		_lastCodePos = "5";
+
+		// -1 indicates that GetCpuUsage failed to obtain data, likely either due to lack of
+		// necessary permissions or the "Disable Performance Counters" registry values being
+		// set.
+		if (nCpuUsage < 0)
+		{
+			// Periodically there can be failures to read CPU usage that are not indicative of
+			// a permanent issue, especially as a process is starting. Make 3 attempts before
+			// determining that the CPU usage cannot be read.
+			if (m_nRetryCount < 3)
+			{
+				m_nRetryCount++;
+				return;
+			}
+
+			if (!ms_bLoggedCpuInfoError)
+			{
+				CSingleLock lg(&ms_Mutex, TRUE);
+				// Recheck ms_bLoggedCpuInfoError after getting the lock.
+				if (!ms_bLoggedCpuInfoError)
+				{
+					UCLIDException("ELI36742", "Application trace: Unable to obatin CPU usage data; "
+						"hung processes will not be detected.").log();
+					ms_bLoggedCpuInfoError = true;
+				}
+			}
+
+			// No need to let monitorProcessLoop continue if we can't read the CPU usage.
+			m_eventStopping.signal();
+			return;
+		}
+		
+		// We've succeeded in reading the CPU usage; reset the retry count.
+		m_nRetryCount = 0;
+
+		_lastCodePos = "8";
+
+		if (nCpuUsage > 0)
 		{
 			// Process isn't idle. Reset the zero cpu count.
 			m_iZeroCpuCount = 0;

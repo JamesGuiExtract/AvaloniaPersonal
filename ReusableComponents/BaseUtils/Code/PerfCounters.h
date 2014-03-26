@@ -18,19 +18,18 @@ public:
 	{
 	}
 
-	T GetCounterValue(PERF_DATA_BLOCK **pPerfData, DWORD dwObjectIndex, DWORD dwCounterIndex, LPCTSTR pInstanceName = NULL)
+	T GetCounterValue(unique_ptr<PERF_DATA_BLOCK> &rapPerfData, DWORD dwObjectIndex, DWORD dwCounterIndex, LPCTSTR pInstanceName = NULL)
 	{
-		QueryPerformanceData(pPerfData, dwObjectIndex, dwCounterIndex);
+		QueryPerformanceData(rapPerfData, dwObjectIndex, dwCounterIndex);
 
-	    PPERF_OBJECT_TYPE pPerfObj = NULL;
-		T lnValue = {0};
+		T lnValue = -1;
 
 		// Get the first object type.
-		pPerfObj = FirstObject( *pPerfData );
+		PPERF_OBJECT_TYPE pPerfObj = FirstObject( rapPerfData.get() );
 
 		// Look for the given object index
 
-		for( DWORD i=0; i < (*pPerfData)->NumObjectTypes; i++ )
+		for( DWORD i=0; i < rapPerfData->NumObjectTypes; i++ )
 		{
 
 			if (pPerfObj->ObjectNameTitleIndex == dwObjectIndex)
@@ -44,19 +43,17 @@ public:
 		return lnValue;
 	}
 
-	T GetCounterValueForProcessID(PERF_DATA_BLOCK **pPerfData, DWORD dwObjectIndex, DWORD dwCounterIndex, DWORD dwProcessID)
+	T GetCounterValueForProcessID(unique_ptr<PERF_DATA_BLOCK> &rapPerfData, DWORD dwObjectIndex, DWORD dwCounterIndex, DWORD dwProcessID)
 	{
-		QueryPerformanceData(pPerfData, dwObjectIndex, dwCounterIndex);
+		QueryPerformanceData(rapPerfData, dwObjectIndex, dwCounterIndex);
 
-	    PPERF_OBJECT_TYPE pPerfObj = NULL;
-		T lnValue = {0};
+		T lnValue = -1;
 
 		// Get the first object type.
-		pPerfObj = FirstObject( *pPerfData );
+		PPERF_OBJECT_TYPE pPerfObj = FirstObject( rapPerfData.get() );
 
 		// Look for the given object index
-
-		for( DWORD i=0; i < (*pPerfData)->NumObjectTypes; i++ )
+		for( DWORD i=0; i < rapPerfData->NumObjectTypes; i++ )
 		{
 
 			if (pPerfObj->ObjectNameTitleIndex == dwObjectIndex)
@@ -72,44 +69,6 @@ public:
 
 protected:
 
-	class CBuffer
-	{
-	public:
-		CBuffer(UINT Size)
-		{
-			m_Size = Size;
-			m_pBuffer = (LPBYTE) malloc( Size*sizeof(BYTE) );
-		}
-		~CBuffer()
-		{
-			free(m_pBuffer);
-		}
-		void *Realloc(UINT Size)
-		{
-			m_Size = Size;
-			m_pBuffer = (LPBYTE) realloc( m_pBuffer, Size );
-			return m_pBuffer;
-		}
-
-		void Reset()
-		{
-			memset(m_pBuffer,NULL,m_Size);
-		}
-		operator LPBYTE ()
-		{
-			return m_pBuffer;
-		}
-
-		UINT GetSize()
-		{
-			return m_Size;
-		}
-	public:
-		LPBYTE m_pBuffer;
-	private:
-		UINT m_Size;
-	};
-
 	//
 	//	The performance data is accessed through the registry key 
 	//	HKEY_PEFORMANCE_DATA.
@@ -123,36 +82,33 @@ protected:
 	//	performance data.
 	//
 	//
-	void QueryPerformanceData(PERF_DATA_BLOCK **pPerfData, DWORD dwObjectIndex, DWORD dwCounterIndex)
+	void QueryPerformanceData(unique_ptr<PERF_DATA_BLOCK> &rapPerfData, DWORD dwObjectIndex, DWORD dwCounterIndex)
 	{
 		dwCounterIndex;		// unused parameter
-		//
-		// Since i want to use the same allocated area for each query,
-		// i declare CBuffer as static.
-		// The allocated is changed only when RegQueryValueEx return ERROR_MORE_DATA
-		//
-		static CBuffer Buffer(TOTALBYTES);
+		
+		DWORD dwBufferSize = TOTALBYTES;
+		rapPerfData.reset((PPERF_DATA_BLOCK)new BYTE[dwBufferSize]);
+		ZeroMemory(rapPerfData.get(), dwBufferSize);
 
-		DWORD BufferSize = Buffer.GetSize();
 		LONG lRes;
 
 		char keyName[32];
 		sprintf_s(keyName, sizeof(keyName) * sizeof(char), "%d", dwObjectIndex);
 
-		Buffer.Reset();
 		while( (lRes = RegQueryValueEx( HKEY_PERFORMANCE_DATA,
 								   keyName,
 								   NULL,
 								   NULL,
-								   Buffer,
-								   &BufferSize )) == ERROR_MORE_DATA )
+								   (LPBYTE)rapPerfData.get(),
+								   &dwBufferSize )) == ERROR_MORE_DATA )
 		{
-			// Get a buffer that is big enough.
-
-			BufferSize += BYTEINCREMENT;
-			Buffer.Realloc(BufferSize);
+			// Increase the size of the buffer and try again.
+			dwBufferSize += BYTEINCREMENT;
+			rapPerfData.reset((PPERF_DATA_BLOCK)new BYTE[dwBufferSize]);
+			ZeroMemory(rapPerfData.get(), dwBufferSize);
 		}
-		*pPerfData = (PPERF_DATA_BLOCK) Buffer.m_pBuffer;
+
+		RegCloseKey(HKEY_PERFORMANCE_DATA);
 	}
 
 	//

@@ -87,6 +87,8 @@ EXPORT_BaseUtils string getComputerName();
 //-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils string getCurrentProcessID();
 //-------------------------------------------------------------------------------------------------
+EXPORT_BaseUtils bool isProcessAlive(DWORD dwProcessID);
+//-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils unsigned long	getDiskSerialNumber();
 //-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils string	getMACAddress();
@@ -458,8 +460,8 @@ EXPORT_BaseUtils DWORD runExeWithProcessKiller(const string& strExeFullFileName,
 											   bool bIsExtractExe,
 											   string strParameters = "",
 											   const string& strWorkingDirectory = "",
-											   int iIdleTimeout=120000,
-											   int iIdleCheckInterval=2000);
+											   int iIdleTimeout = 0,
+											   int iIdleCheckInterval = 0);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the directory associated with hModule.  The returned string will not have
 //			a trailing slash character.

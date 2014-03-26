@@ -137,7 +137,7 @@ int CCpuUsage::GetCpuUsage(DWORD dwProcessID, LPCTSTR pProcessName, bool bTotal)
 	// initialize variables
 	int				CpuUsage = 0;
 	LONGLONG		lnNewValue = 0;
-	PPERF_DATA_BLOCK pPerfData = NULL;
+	unique_ptr<PERF_DATA_BLOCK> apPerfData(__nullptr);
 	LARGE_INTEGER	NewPerfTime100nSec = {0};
 
 	// check process name, if NULL then get data for specified PID
@@ -150,17 +150,32 @@ int CCpuUsage::GetCpuUsage(DWORD dwProcessID, LPCTSTR pProcessName, bool bTotal)
 		strcpy_s(szInstance, sizeof(szInstance) * sizeof(char), pProcessName);
 
 		// get the CPU usage counter value
-		lnNewValue = PerfCounters.GetCounterValue(&pPerfData, dwObjectIndex, 
+		lnNewValue = PerfCounters.GetCounterValue(apPerfData, dwObjectIndex, 
 			dwCpuUsageIndex, szInstance);
 	}
 	else
 	{
 		// get the CPU usage counter value
-		lnNewValue = PerfCounters.GetCounterValueForProcessID(&pPerfData, dwObjectIndex, 
+		lnNewValue = PerfCounters.GetCounterValueForProcessID(apPerfData, dwObjectIndex, 
 			dwCpuUsageIndex, dwProcessID);
 	}
 
-	NewPerfTime100nSec = pPerfData->PerfTime100nSec;
+	if (lnNewValue == -1)
+	{		
+		// If the process is still alive, it indicates in inability to read the performance data
+		// counters for the process. Return -1 to indicate failure.
+		if (isProcessAlive(dwProcessID))
+		{
+			return -1;
+		}
+		else
+		{
+			// If the process has has exited, zero is a legitimate CPU usage to report.
+			lnNewValue = 0;
+		}
+	}
+
+	NewPerfTime100nSec = apPerfData->PerfTime100nSec;
 
 	// if this is the first iteration, just store the values and return 0
 	if (m_bFirstTime)

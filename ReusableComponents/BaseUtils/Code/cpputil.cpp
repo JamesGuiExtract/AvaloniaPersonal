@@ -316,6 +316,21 @@ string getCurrentProcessID()
 	return asString(GetCurrentProcessId());
 }
 //-------------------------------------------------------------------------------------------------
+bool isProcessAlive(DWORD dwProcessID)
+{
+	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwProcessID);
+	if (hProcess == NULL)
+	{
+		return false;
+	}
+
+	DWORD dwExitCode = 0;
+	GetExitCodeProcess(hProcess, &dwExitCode);
+	CloseHandle(hProcess); 
+
+	return (dwExitCode == STILL_ACTIVE);
+}
+//-------------------------------------------------------------------------------------------------
 string getPrivateProfileString(const string& strAppName, 
 							   const string& strKeyName, 
 							   const string& strDefault, 
@@ -654,15 +669,12 @@ void runExtractEXE(const string& strExeFullFileName, const string& strParameters
 //-------------------------------------------------------------------------------------------------
 DWORD runExeWithProcessKiller(const string& strExeFullFileName, bool bIsExtractExe,
 							  string strParameters, const string& strWorkingDirectory,
-							  int iIdleTimeout, int iIdleCheckInterval)
+							  int iIdleTimeout/* = 0*/, int iIdleCheckInterval/* = 0*/)
 {
 	try
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI28886", iIdleCheckInterval > 0);
-			ASSERT_ARGUMENT("ELI28887", iIdleTimeout >= iIdleCheckInterval);
-
 			unique_ptr<TemporaryFileName> apTempFile;
 
 			// If running an extract exe, add the /ef <ExceptionFile> argument
@@ -694,8 +706,8 @@ DWORD runExeWithProcessKiller(const string& strExeFullFileName, bool bIsExtractE
 			if (idleKiller.killedProcess())
 			{
 				UCLIDException uex("ELI28888", "Process killed by idle process killer.");
-				uex.addDebugInfo("Idle Timeout", iIdleTimeout);
-				uex.addDebugInfo("Timeout Interval", iIdleCheckInterval);
+				uex.addDebugInfo("Idle Timeout", idleKiller.getTimeOut());
+				uex.addDebugInfo("Timeout Interval", idleKiller.getInterval());
 				throw uex;
 			}
 
