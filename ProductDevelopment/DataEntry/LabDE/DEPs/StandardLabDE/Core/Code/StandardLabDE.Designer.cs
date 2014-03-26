@@ -1187,6 +1187,9 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             // _componentUnits
             // 
             this._componentUnits.AttributeName = "Units";
+            this._componentUnits.AutoUpdateQuery = "<Expression><Attribute TriggerUpdate=\'False\' Name=\'Units\'>.</Attribute> == \'\'\r\n? " +
+    "<SQL>SELECT [Unit] FROM LabTest WHERE [TestCode] = <Attribute>../TestCode</Attri" +
+    "bute></SQL>\r\n: <Units/>\r\n</Expression>";
             this._componentUnits.FillWeight = 40F;
             this._componentUnits.HeaderText = "Units";
             this._componentUnits.Name = "_componentUnits";
