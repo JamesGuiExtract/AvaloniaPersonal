@@ -1,0 +1,312 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.7.4 Patch Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.7.4 Patch Testing<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> Dallas
+   	<LI><b>SCRs:</b> 12027, 12028, 12100
+   	<LI><b>Issues:</b>
+	<ul>
+		<li>When processing certain sample images from Dallas, the following 
+		issues have been observed. 
+		<ul>
+			<li>Extra redactions have been seen, typically close to existing 
+			redactions.
+			<li>Core: Create searchable PDF sometimes obscures the white text 
+			drawn on top of a black redaction box.
+		</ul>
+		<li>The issues appear to be resolved when using an evaluation copy of 
+		Nuance OCR version 19.
+	</ul>
+<p>
+   	<LI><b>SCRs:</b> 12109
+   	<LI><b>Issues:</b>
+	<ul>
+		<li>The <b>Idle Process Killer</b> fails some <b>Core: Convert to 
+		searchable PDF</b> tasks when processing PDF documents on a <b>Server 
+		2008 R2</b> test machine.
+	</ul>
+</ul>
+<p>
+<h3>Patch Tests</h3>
+<OL>
+	<LI><b>Demo Testing</b>
+	<ul>
+		<LI>Exercise <b>Demo_FLEXIndex</b>.
+		<ul>
+			<li>Confirm that existing rules find appropriate text.
+			<li>Confirm that found text is as expected.
+			<li>Confirm that swiping works.
+			<ul>
+				<li>Angle highlighter
+				<li>Rectangle highlighter
+				<li>Word highlighter
+			</ul>
+			<li>Completed <b>03/27/2014</b>
+		</ul>
+		<LI>Exercise <b>Demo_IDShield</b>.
+		<ul>
+			<li>Confirm that existing rules find appropriate text.
+			<li>Confirm that found text is as expected.
+			<li>Confirm that swiping works.
+			<ul>
+				<li>Angle redaction tool
+				<li>Rectangle redaction tool
+				<li>Word redaction tool
+			</ul>
+			<li>Completed <b>03/27/2014</b>
+		</ul>
+		<LI>Exercise <b>Demo_LabDE</b>.
+		<ul>
+			<li>Confirm that existing rules find appropriate text.
+			<li>Confirm that found text is as expected.
+			<li>Confirm that swiping works.
+			<ul>
+				<li>Angle highlighter
+				<li>Rectangle highlighter
+				<li>Word highlighter
+			</ul>
+			<li>Completed <b>03/28/2014</b>
+		</ul>
+	</ul>
+<p>
+	<LI><b>OCR Testing</b>
+	<ul>
+		<li><u>Exercise Automated Tests</u>
+		<ul>
+			<li>Exercise <b>Run All Tests</b>.
+			<li>Document any new failures.
+			<ul>
+				<li>The ideal situation would be that the new OCR engine 
+				fixes some of the previous OCR errors, requiring changes 
+				to EAV files.
+			</ul>
+			<li>Completed <b>03/27/2014</b>
+		</ul>
+		<li><u>Exercise National Rule Set tests</u>
+		<ul>
+			<li>Exercise each NRS TCL file and document new failures
+			<ul>
+				<li>NRS Indexing
+				<ul>
+					<li>Completed <b>03/27/2014</b>
+				</ul>
+				<li>NRS Document Classification
+				<ul>
+					<li>Completed <b>03/27/2014</b>
+				</ul>
+				<li>NRS Redaction
+				<ul>
+					<li>Completed <b>03/27/2014</b>
+				</ul>
+			</ul>
+		</ul>
+		<li><u>Memory Leak testing</u>
+		<ul>
+			<li>Convert To Searchable PDF #1 - completed <b>03/24/2014</b>
+			<li>Convert To Searchable PDF #2 - completed <b>03/24/2014</b>
+			<li>Convert To Searchable PDF #3 - completed <b>03/25/2014</b>
+			<li>Convert To Searchable PDF #4 - completed <b>03/25/2014</b>
+			<li>Convert To Searchable PDF #4 - completed <b>03/31/2014</b>
+			<li>Convert To Searchable PDF #5 - completed <b>03/26/2014</b>
+			<li>OCR Document #1 - completed <b>03/21/2014</b>
+			<li>OCR Document #2 - completed <b>03/22/2014</b>
+			<li>OCR Document #3 - completed <b>03/23/2014</b>
+		</ul>
+		<li><u>Core: Convert to searchable PDF with Idle Process Killer</u>
+		<ul>
+			<li>Add the <b>Services</b> user to <b>Performance Log Users</b> 
+			group.
+			<li>Process all Dallas PDF samples via FAM Service using the 
+			Services account.
+			<li>Confirm that all files process without error.
+			<li>Confirm that no extra redactions are present.
+			<ul>
+				<li>Tested by Wayne.
+				<li>Files processed by local administrator account
+			</ul>
+<p>
+			<li>Remove the <b>Services</b> user from <b>Performance Log 
+			Users</b> group.
+			<li>Process all Dallas PDF samples via FAM Service using a 
+			non-administrator account.
+			<li>Confirm that an application trace is logged that CPU usage 
+			cannot be checked and that idle processes will not be killed.
+			<li>Confirm that all files process without error.
+			<ul>
+				<li>Tested by Steve.
+			</ul>
+		</ul>
+		<li><u>Idle Process Killer</u>
+		<ul>
+			<li>Test #0
+			<ul>
+				<li>Configure <b>HKLM\SOFTWARE\Wow6432Node\
+				Extract Systems\ReusableComponents\BaseUtils\
+				IdleProcessTimeout</b> to be 200 ms.
+				<li>Configure <b>HKLM\SOFTWARE\Wow6432Node\
+				Extract Systems\ReusableComponents\BaseUtils\
+				IdleProcessInterval</b> to be 500 ms.
+				<li>Prepare files to test <b>Core: Convert to searchable 
+				PDF</b>.
+				<li>Start processing.
+				<li>Confirm that files fail due to an invalid 
+				timeout and interval.
+				<ul>
+					<li>Tested - completed <b>03/28/2014</b>.
+				</ul>
+			</ul>
+			<li>Test #1
+			<ul>
+				<li>Retain default settings for <b>HKLM\SOFTWARE\Wow6432Node\
+				Extract Systems\ReusableComponents\BaseUtils\
+				IdleProcessTimeout</b>.
+				<li>Retain default settings for <b>HKLM\SOFTWARE\Wow6432Node\
+				Extract Systems\ReusableComponents\BaseUtils\
+				IdleProcessInterval</b>.
+				<li>Prepare files to test <b>Core: Convert to searchable 
+				PDF</b>.
+				<li>Start processing.
+				<li>Attach to ESConvertToPDF instance with WinDbg.exe.
+				<li>Confirm that processing pauses.
+				<li>Confirm that the idle process is killed and the file 
+				fails processing after the ESConvertToPDF instance is 
+				detached from WinDbg.
+				<ul>
+					<li>Tested - completed <b>03/28/2014</b>.
+				</ul>
+			</ul>
+			<li>Test #2
+			<ul>
+				<li>Retain default settings for <b>HKLM\SOFTWARE\Wow6432Node\
+				Extract Systems\ReusableComponents\BaseUtils\
+				IdleProcessTimeout</b>.
+				<li>Retain default settings for <b>HKLM\SOFTWARE\Wow6432Node\
+				Extract Systems\ReusableComponents\BaseUtils\
+				IdleProcessInterval</b>.
+				<li>Prepare files to test <b>Core: OCR document</b>.
+				<li>Start processing.
+				<li>Attach to SSOCR2 instance with WinDbg.exe.
+				<li>Confirm that processing pauses and that the idle 
+				process is killed.
+				<li>Confirm that a new SSOCR2 instance starts automatically 
+				and finishes processing the image.
+				<ul>
+					<li>Tested - completed <b>03/28/2014</b>.
+				</ul>
+			</ul>
+		</ul>
+		<li><u>Utility testing</u>
+		<ul>
+			<li>ImageFormatConverter using alternate method
+			<ul>
+				<li>Tested - completed <b>03/31/2014</b>.
+			</ul>
+			<li>Rasterize PDF using alternate method
+			<ul>
+				<li>Tested - completed <b>03/31/2014</b>.
+			</ul>
+		</ul>
+       	</ul>
+<p>
+	<LI><b>Miscellaneous Testing</b>
+	<ul>
+		<li>Background OCR during ID Shield verification
+		<ul>
+			<li>Tested - completed <b>03/27/2014</b>.
+		</ul>
+		<li>Background OCR during LabDE verification
+		<ul>
+			<li>Tested - completed <b>03/28/2014</b>.
+		</ul>
+		<li>Sanity Test
+		<ul>
+			<li>To exercise <b>PDF Security</b> with pre-existing FPS file
+			<li>Tested - completed <b>03/31/2014</b>.
+		</ul>
+		<li>Dallas Sample Images
+		<ul>
+			<li><b>10</b> police department images
+			<li>Processed via <b>Core: Convert to searchable PDF</b>
+			<li>No extra redactions found
+			<li>Completed <b>03/21/2014</b> on <b>beast-w2k8r2-1</b>
+		</ul>
+		<li>Idle Process Killer
+		<ul>
+			<li>Prepare Queuing and Processing FPS files on a 
+			Server 2008 R2 test machine
+			<li>Add some files to the Listening folder and confirm 
+			that queuing is successful.
+			<li>Confirm that all files are processed without any errors.
+			<li>Run another test where WinDbg attaches to SSOCR2 instances 
+			or ESConvertToPDF instances.
+			<ul>
+				<li>ESConvertToPDF - confirm that the idle process is killed.
+				<li>SSOCR2 - confirm that the idle process is killed.
+			</ul>
+			<li>Tested by Steve.
+		</ul>
+		<li>Installation Testing
+		<ul>
+			<li>Install <b>9.7.4</b> on a clean test machine
+			<ul>
+				<li>Confirm that <b>Nuance Licensing Tool</b> is 
+				installed as <b>NuanceLT.exe</b> under %PROGRAM_FILES%\
+				Common Files\Nuance\Licensing.
+				<li>Confirm that <b>Nuance.lcxz</b> is installed.
+				<li>Confirm that <b>Nuance Licensing</b> is not available 
+				from the Start Menu.
+				<li>Confirm that automatic licensing repair works when 
+				running OCR after stopping <b>Nuance Licensing Service</b>.
+				<li>Confirm that automatic licensing repair works when 
+				running OCR after removing the Nuance license.
+				<li>Confirm that OCR works without error.
+				<ul>
+					<li>Tested by Steve.
+				</ul>
+			</ul>
+			<li>Install <b>9.7.4</b> as a version upgrade
+			<ul>
+				<li>Confirm that <b>Nuance Licensing Tool</b> is 
+				installed.
+				<li>Confirm that <b>Nuance.lcxz</b> is installed.
+				<li>Confirm that <b>Nuance Licensing</b> is not available 
+				from the Start Menu.
+				<li>Confirm that automatic licensing repair works when 
+				running OCR after stopping <b>Nuance Licensing Service</b>.
+				<ul>
+					<li>Tested with 9.7.4.3 - completed <b>03/28/2014</b>.
+				</ul>
+				<li>Confirm that automatic licensing repair works when 
+				running OCR after removing the Nuance license.
+				<ul>
+					<li>Tested with 9.7.4.3 - completed <b>03/28/2014</b>.
+					<li>Works if <b>Nuance Licensing</b> service is running.
+					<li>Fails if <b>Nuance Licensing</b> service not running.
+				</ul>
+				<li>Confirm that OCR works without error.
+			</ul>
+		</ul>
+<p>
+		<li><b>[JIRA #12110]</b> FAM Service Hangs With Convert To Searchable PDF
+		<ul>
+			<li>Prepare test files on a 24-core machine.
+			<li>Exercise <b>Core: Convert to searchable PDF</b>.
+			<li>Confirm that all files are processed without any errors.
+			<li>Tested by Steve <b>03/27/2014</b>, could not reproduce.
+		</ul>
+       	</ul>
+</OL>
+</BODY>
+</HTML>
