@@ -1,0 +1,119 @@
+<HTML>
+
+<HEAD>
+<TITLE>NM - Lincoln DEP Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> DEP Testing - NM - Lincoln <br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>DEP Layout</h3>
+       	<ul>
+		<LI>Confirm that the DEP includes a <b>Book</b> edit box.
+		<LI>Confirm that the DEP includes a <b>Page</b> edit box.
+		<LI>Confirm that the DEP includes a <b>Date Filed</b> edit box.
+		<LI>Confirm that the DEP includes a <b>Date of Instrument</b> edit box.
+		<li>Confirm that the DEP includes a <b>Document Type</b> drop-down combo box 
+		with a large number of entries available.
+		<ul>
+			<li>Confirm that <b>Lincoln.sdf</b> includes a <b>DocumentType</b> 
+			table with the associated entries.
+		</ul>
+		<li>Confirm that the DEP includes a <b>Grantor</b> group box.
+		<ul>
+			<li>a table with column headings for:
+			<ul>
+				<li>Name (Last First Middle Suffix)
+				<li>Deceased?
+			</ul>
+		</ul>
+		<li>Confirm that the DEP includes a <b>Grantee</b> group box.
+		<ul>
+			<li>a table with column headings for:
+			<ul>
+				<li>Name (Last First Middle Suffix)
+				<li>Deceased?
+			</ul>
+		</ul>
+		<li>Confirm that the DEP includes a <b>Subdivision</b> group box.
+		<ul>
+			<li>a table with column headings for:
+			<ul>
+				<li>Block
+				<li>Lot
+				<li>Other
+				<li>Subdivision
+				<li>Unit
+			</ul>
+			<li>Confirm that the <b>Subdivision</b> cell is a drop-down 
+			combo box.
+			<li>Confirm that <b>Lincoln.sdf</b> includes a <b>Subdivision</b> 
+			table with the associated entries.
+		</ul>
+		<li>Confirm that the DEP includes a <b>Town Range Section</b> group box.
+		<ul>
+			<li>a table with column headings for:
+			<ul>
+				<li>Town Range Section
+				<li>Description
+			</ul>
+		</ul>
+       	</ul>
+<p>
+	<li><h3>Validation</h3></li>
+	<UL>
+		<li>Confirm that the following validations exist when verifying the rules 
+		results from a <b>blank</b> file.
+		<ul>
+			<li>The rules find <b>Document Type</b> as <b>VOID</b>.
+			<li>The <b>Book</b> field must be empty.
+			<li>The <b>Page</b> field must be empty.
+			<li>The <b>Date Filed</b> field must be empty.
+			<li>The <b>Date of Instrument</b> field must be empty.
+			<li>The <b>Grantor</b> field must be empty.
+			<li>The <b>Grantee</b> field must be empty.
+			<li>The <b>Subdivision/Block</b> field must be empty.
+			<li>The <b>Subdivision/Lot</b> field must be empty.
+			<li>The <b>Subdivision/Other</b> field must be empty.
+			<li>The <b>Subdivision/Unit</b> field must be empty.
+			<li>The <b>Town Range Section</b> field must be empty.
+			<li>The <b>Description</b> field must be empty.
+		</ul>
+		<li>Confirm that the following validations exist when verifying the rules 
+		results from a <b>non-blank</b> file.
+		<ul>
+			<li>The <b>Subdivision/Block + Lot + Unit</b> field is limited 
+			to <b>30</b> characters.
+			<li>The <b>Town Range Section</b> field cannot be specified if 
+			<b>Subdivision/Block or Lot or Other or Unit</b> is defined.
+			<li>The <b>Description</b> field cannot be specified if 
+			<b>Subdivision/Block or Lot or Other or Unit</b> is defined.
+			<li>The <b>Grantor</b> field is limited to <b>32</b> characters 
+			if <b>Deceased?</b> is false.
+			<li>The <b>Grantor</b> field is limited to <b>26</b> characters 
+			if <b>Deceased?</b> is true.
+			<li>The <b>Grantee</b> field is limited to <b>32</b> characters 
+			if <b>Deceased?</b> is false.
+			<li>The <b>Grantee</b> field is limited to <b>26</b> characters 
+			if <b>Deceased?</b> is true.
+		</ul>
+       	</ul>
+<p>
+	<li><h3>Auto-Update Queries</h3></li>
+	<ul>
+		<li>TBD
+       	</ul>
+<p>
+	<LI><h3>Miscellaneous</h3>
+       	<ul>
+		<LI>TBD
+	</ul>
+</OL>
+</BODY>
+</HTML>
