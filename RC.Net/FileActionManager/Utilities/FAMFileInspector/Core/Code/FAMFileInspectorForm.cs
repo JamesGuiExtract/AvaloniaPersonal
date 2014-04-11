@@ -31,7 +31,6 @@ using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
-using Leadtools.ImageProcessing.Color;
 using Leadtools.WinForms;
 
 namespace Extract.FileActionManager.Utilities
@@ -2409,15 +2408,13 @@ namespace Extract.FileActionManager.Utilities
         /// </param>
         void HandleInvertColorsButton_Click(object sender, EventArgs e)
         {
-            DataGridViewRow currentRow = _fileListDataGridView.CurrentRow;
-
-            if (currentRow != null)
+            try
             {
-                FAMFileData fileData = currentRow.GetFileData();
-                PageState pageState = fileData.PageData[_imageViewer.PageNumber - 1];
-                pageState.Inverted = !pageState.Inverted;
-                InvertThumbnail(_imageViewer.PageNumber);
-                toolStripButton1.Enabled = fileData.Dirty; // Save button
+                _thumbnailViewer.InvertColors = _invertColorsToolStripButton.Checked;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI36795");
             }
         }
 
@@ -2446,6 +2443,11 @@ namespace Extract.FileActionManager.Utilities
                     {
                         _imageViewer.Rotate(pageState.Orientation - _imageViewer.Orientation, false, true);
                     }
+
+                    if (_invertColorsToolStripButton.Checked)
+                    {
+                        _imageViewer.InvertColors();
+                    }
                 }
                 finally
                 {
@@ -2453,10 +2455,6 @@ namespace Extract.FileActionManager.Utilities
                 }
 
                 SetThumbnailOrientation(e.PageNumber, pageState.Orientation, true);
-                if (pageState.Inverted)
-                {
-                    _imageViewer.InvertColors();
-                }
             }
         }
 
@@ -2519,10 +2517,6 @@ namespace Extract.FileActionManager.Utilities
                 FAMFileData fileData = currentRow.GetFileData();
                 PageState pageState = fileData.PageData[e.PageNumber - 1];
                 SetThumbnailOrientation(e.PageNumber, pageState.Orientation, true);
-                if (pageState.Inverted)
-                {
-                    InvertThumbnail(e.PageNumber);
-                }
             }
         }
 
@@ -3018,6 +3012,11 @@ namespace Extract.FileActionManager.Utilities
                     }
                 }
             }
+            catch (OperationCanceledException)
+            {
+                // If canceled, the user didn't want to wait around for the operation to complete;
+                // they don't need to see an excepton about the operation being canceled.
+            }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35726");
@@ -3069,6 +3068,11 @@ namespace Extract.FileActionManager.Utilities
 
                     _fileSelectionCount++;
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                // If canceled, the user didn't want to wait around for the operation to complete;
+                // they don't need to see an excepton about the operation being canceled.
             }
             catch (Exception ex)
             {
@@ -4138,19 +4142,7 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Inverts the thumbnail.
-        /// </summary>
-        /// <param name="pageNumber">The page number.</param>
-        void InvertThumbnail(int pageNumber)
-        {
-            if (_thumbnailViewer.Active)
-            {
-                _thumbnailViewer.InvertThumbnailColors(pageNumber);
-            }
-        }
-
-        /// <summary>
-        /// Inverts the thumbnail.
+        ///
         /// </summary>
         /// <param name="pageNumber">The page number.</param>
         /// <param name="orientation"></param>

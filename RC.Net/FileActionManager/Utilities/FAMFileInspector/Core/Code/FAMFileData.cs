@@ -403,7 +403,6 @@ namespace Extract.FileActionManager.Utilities
     internal class PageState
     {
         bool _dirty;
-        bool _inverted;
         int _orientation;
 
         /// <summary>
@@ -414,26 +413,6 @@ namespace Extract.FileActionManager.Utilities
             get
             {
                 return _dirty;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public bool Inverted
-        {
-            get
-            {
-                return _inverted;
-            }
-
-            set
-            {
-                if (value != _inverted)
-                {
-                    _inverted = value;
-                    _dirty = true;
-                }
             }
         }
 

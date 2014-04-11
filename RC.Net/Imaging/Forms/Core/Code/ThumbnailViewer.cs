@@ -52,6 +52,16 @@ namespace Extract.Imaging.Forms
         bool _active = true;
 
         /// <summary>
+        /// 
+        /// </summary>
+        bool _invertColors;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        bool _pendingInvertColors;
+
+        /// <summary>
         /// The current pagenumber of the <see cref="ImageViewer"/>
         /// </summary>
         int _currentPage;
@@ -119,6 +129,12 @@ namespace Extract.Imaging.Forms
 
                         if (_active && _imageViewer.IsImageAvailable)
                         {
+                            if (_pendingInvertColors)
+                            {
+                                InvertAllLoadedThumbnails();
+                                _pendingInvertColors = false;
+                            }
+
                             // If _imageList hasn't been initialized, do it now.
                             if (_imageList == null || _imageList.Items.Count == 0)
                             {
@@ -141,6 +157,46 @@ namespace Extract.Imaging.Forms
                 catch (Exception ex)
                 {
                     throw ExtractException.AsExtractException("ELI30743", ex);
+                }
+            }
+        }
+
+
+
+        /// <summary>
+        /// Gets or sets a value indicating whether [invert colors].
+        /// </summary>
+        /// <value>
+        /// 	<see langword="true"/> if [invert colors]; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool InvertColors
+        {
+            get
+            {
+                return _invertColors;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _invertColors)
+                    {
+                        _invertColors = value;
+
+                        if (Active && _imageViewer.IsImageAvailable)
+                        {
+                            InvertAllLoadedThumbnails();
+                        }
+                        else if (_imageViewer.IsImageAvailable)
+                        {
+                            _pendingInvertColors = true;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI36794");
                 }
             }
         }
@@ -192,6 +248,8 @@ namespace Extract.Imaging.Forms
 
             // Dispose and clear the thumbnails
             DisposeThumbnails();
+
+            _pendingInvertColors = false;
         }
 
         /// <summary>
@@ -316,12 +374,20 @@ namespace Extract.Imaging.Forms
                     else
                     {
                         item.Image = image;
+
+                        if (InvertColors)
+                        {
+                            var invertCommand = new InvertCommand();
+                            invertCommand.Run(item.Image);
+                        }
+
                         _originalViewPerspectives[i] = item.Image.ViewPerspective;
                         if (_pendingViewPerspectives[i] != 0)
                         {
                             item.Image.RotateViewPerspective(_pendingViewPerspectives[i]);
                             _pendingViewPerspectives[i] = 0;
                         }
+
                         item.Invalidate();
 
                         OnThumbnailLoaded(i + 1);
@@ -382,25 +448,6 @@ namespace Extract.Imaging.Forms
                 // Select this item
                 item.Selected = true;
                 item.Invalidate();
-            }
-        }
-
-        /// <summary>
-        /// Inverts the thumbnail colors.
-        /// </summary>
-        /// <param name="pageNumber">The page number.</param>
-        public void InvertThumbnailColors(int pageNumber)
-        {
-            try
-            {
-                RasterImageListItem item = _imageList.Items[pageNumber - 1];
-                var invertCommand = new InvertCommand();
-                invertCommand.Run(item.Image);
-                item.Invalidate();
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI0");
             }
         }
 
@@ -610,6 +657,24 @@ namespace Extract.Imaging.Forms
         }
 
         #endregion IImageViewerControl Members
+
+        /// <summary>
+        /// Inverts all currently loaded thumbnails.
+        /// </summary>
+        void InvertAllLoadedThumbnails()
+        {
+            for (int i = 0; i < _imageViewer.PageCount; i++)
+            {
+                RasterImageListItem item = _imageList.Items[i];
+                if (item.Image != null && item.Image != _LOADING_IMAGE)
+                {
+                    var invertCommand = new InvertCommand();
+                    invertCommand.Run(item.Image);
+
+                    item.Invalidate();
+                }
+            }
+        }
 
         /// <summary>
         /// Raises the <see cref="E:ThumbnailLoaded"/> event.
