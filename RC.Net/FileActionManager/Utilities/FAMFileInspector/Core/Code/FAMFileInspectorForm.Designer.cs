@@ -915,7 +915,7 @@
             this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton1.Name = "toolStripButton1";
             this.toolStripButton1.Size = new System.Drawing.Size(36, 36);
-            this.toolStripButton1.Text = "_saveToolStripButton";
+            this.toolStripButton1.Text = "Save";
             // 
             // _previousLayerObjectToolStripButton
             // 
@@ -996,14 +996,14 @@
             // 
             // invertColorsToolStripButton1
             // 
-            this.invertColorsToolStripButton1.BaseToolTipText = "Rotate clockwise";
+            this.invertColorsToolStripButton1.BaseToolTipText = "Invert colors";
             this.invertColorsToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.invertColorsToolStripButton1.Enabled = false;
             this.invertColorsToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.invertColorsToolStripButton1.ImageViewer = null;
             this.invertColorsToolStripButton1.Name = "invertColorsToolStripButton1";
             this.invertColorsToolStripButton1.Size = new System.Drawing.Size(36, 36);
-            this.invertColorsToolStripButton1.Text = "Rotate clockwise";
+            this.invertColorsToolStripButton1.Text = "Invert colors";
             this.invertColorsToolStripButton1.Click += new System.EventHandler(this.HandleInvertColorsButton_Click);
             // 
             // _generalImageToolStrip
