@@ -978,7 +978,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             // 
             this._imageViewerStatusStrip.Location = new System.Drawing.Point(0, 542);
             this._imageViewerStatusStrip.Name = "_imageViewerStatusStrip";
-            this._imageViewerStatusStrip.ShowBackgroundProcessStatus = false;
             this._imageViewerStatusStrip.Size = new System.Drawing.Size(792, 24);
             this._imageViewerStatusStrip.TabIndex = 2;
             this._imageViewerStatusStrip.Text = "_imageViewerStatusStrip";
