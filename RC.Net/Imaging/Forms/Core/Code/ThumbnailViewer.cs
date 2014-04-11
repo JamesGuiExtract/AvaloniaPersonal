@@ -663,7 +663,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         void InvertAllLoadedThumbnails()
         {
-            for (int i = 0; i < _imageViewer.PageCount; i++)
+            for (int i = 0; i < _imageList.Items.Count; i++)
             {
                 RasterImageListItem item = _imageList.Items[i];
                 if (item.Image != null && item.Image != _LOADING_IMAGE)
