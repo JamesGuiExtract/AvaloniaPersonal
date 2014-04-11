@@ -82,6 +82,9 @@
     <Reference Include="Leadtools.Drawing">
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.Drawing.dll</HintPath>
     </Reference>
+    <Reference Include="Leadtools.ImageProcessing.Color, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="Leadtools.WinForms, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.WinForms.dll</HintPath>
@@ -116,6 +119,12 @@
     </Compile>
     <Compile Include="Controls\AngularRedactionToolStripButton.Designer.cs">
       <DependentUpon>AngularRedactionToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\InvertColorsToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\InvertColorsToolStripButton.Designer.cs">
+      <DependentUpon>InvertColorsToolStripButton.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\OneToOneZoomToolStripButton.cs">
       <SubType>Component</SubType>
@@ -1041,6 +1050,7 @@
     <EmbeddedResource Include="Resources\MagnifierWindowButton.png" />
     <EmbeddedResource Include="Resources\OneToOneZoomButton.png" />
     <EmbeddedResource Include="Resources\OneToOneZoomButtonSmall.png" />
+    <EmbeddedResource Include="Resources\InvertColorsButton.png" />
     <Content Include="Resources\WordHighlightButtonSmall.png" />
     <Content Include="Resources\WordRedactionButtonSmall.png" />
   </ItemGroup>

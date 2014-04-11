@@ -66,8 +66,6 @@ namespace Extract.Imaging.Forms
         protected override Keys[] GetKeys()
         {
             return null;
-//            return base.ImageViewer == null ? null :
-//                base.ImageViewer.Shortcuts.GetKeys(base.ImageViewer.ToggleOneToOneZoomMode);
         }
 
         #endregion OneToOneZoomToolStripButton Methods

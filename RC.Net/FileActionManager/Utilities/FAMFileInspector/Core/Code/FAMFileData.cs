@@ -17,6 +17,15 @@ namespace Extract.FileActionManager.Utilities
     /// </summary>
     internal class FAMFileData : IComparable<FAMFileData>
     {
+        #region Fields
+
+        /// <summary>
+        /// 
+        /// </summary>
+        List<PageState> _pageData = new List<PageState>();
+
+        #endregion Fields
+
         #region Constructors
 
         /// <summary>
@@ -40,6 +49,17 @@ namespace Extract.FileActionManager.Utilities
         #region Properties
 
         /// <summary>
+        /// 
+        /// </summary>
+        public bool Dirty
+        {
+            get
+            {
+                return PageData.Any(page => page.Dirty);
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the name of the file to which this instance pertains.
         /// </summary>
         /// <value>
@@ -61,6 +81,15 @@ namespace Extract.FileActionManager.Utilities
         /// <see langword="null"/> for neither.
         /// </value>
         public bool? ShowTextResults
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool Flagged
         {
             get;
             set;
@@ -205,6 +234,40 @@ namespace Extract.FileActionManager.Utilities
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<PageState> PageData
+        {
+            get
+            {
+                return _pageData;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the page count.
+        /// </summary>
+        /// <value>
+        /// The page count.
+        /// </value>
+        public int PageCount
+        {
+            get
+            {
+                return _pageData.Count;
+            }
+
+            set
+            {
+                if (value != _pageData.Count)
+                {
+                    _pageData = 
+                        Enumerable.Range(0, value).Select(i => new PageState()).ToList();
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -330,6 +393,67 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35746");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    internal class PageState
+    {
+        bool _dirty;
+        bool _inverted;
+        int _orientation;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool Dirty
+        {
+            get
+            {
+                return _dirty;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool Inverted
+        {
+            get
+            {
+                return _inverted;
+            }
+
+            set
+            {
+                if (value != _inverted)
+                {
+                    _inverted = value;
+                    _dirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int Orientation
+        {
+            get
+            {
+                return _orientation;
+            }
+
+            set
+            {
+                if (value != _orientation)
+                {
+                    _orientation = value;
+                    _dirty = true;
+                }
             }
         }
     }

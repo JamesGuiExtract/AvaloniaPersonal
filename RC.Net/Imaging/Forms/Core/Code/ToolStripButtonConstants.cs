@@ -547,6 +547,12 @@ namespace Extract.Imaging.Forms
             "Rotate counterclockwise";
 
         /// <summary>
+        /// 
+        /// </summary>
+        public const string _INVERT_COLOR_BUTTON_IMAGE =
+            "Resources.InvertColorsButton.png";
+
+        /// <summary>
         /// Constant string for the fit to width button image.
         /// </summary>
         public const string _FIT_TO_WIDTH_BUTTON_IMAGE =

@@ -31,6 +31,8 @@ using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
+using Leadtools.ImageProcessing.Color;
+using Leadtools.WinForms;
 
 namespace Extract.FileActionManager.Utilities
 {
@@ -887,12 +889,11 @@ namespace Extract.FileActionManager.Utilities
                 // [DotNetRCAndUtils:1095]
                 // If specified, preserve any flags so that they are not cleared when the file list
                 // is refreshed.
-                string[] flaggedFileNames = preserveFlags
-                    ? _fileListDataGridView.Rows
+                Dictionary<string, FAMFileData> preservedData = preserveFlags
+                    ?  _fileListDataGridView.Rows
                         .OfType<DataGridViewRow>()
-                        .Where(row => row.Cells[_FILE_LIST_FLAG_COLUMN_INDEX].Value != null)
-                        .Select(row => row.GetFileData().FileName)
-                        .ToArray()
+                        .Select(row => row.GetFileData())
+                        .ToDictionary(data => data.FileName)
                     : null;
 
                 _fileListDataGridView.Rows.Clear();
@@ -912,7 +913,7 @@ namespace Extract.FileActionManager.Utilities
                     // Run the query on a background thread so the UI remains responsive as rows are
                     // loaded.
                     StartBackgroundOperation(() =>
-                        RunDatabaseQuery(query, flaggedFileNames, _queryCanceler.Token));
+                        RunDatabaseQuery(query, preservedData, _queryCanceler.Token));
                 }
                 else
                 {
@@ -927,7 +928,7 @@ namespace Extract.FileActionManager.Utilities
                     // Run the enumeration on a background thread so the UI remains responsive as
                     // rows are loaded.
                     StartBackgroundOperation(() =>
-                        RunFileEnumeration(fileEnumerable, flaggedFileNames, _queryCanceler.Token));
+                        RunFileEnumeration(fileEnumerable, preservedData, _queryCanceler.Token));
                 }
             }
             catch (Exception ex)
@@ -1070,6 +1071,16 @@ namespace Extract.FileActionManager.Utilities
             try
             {
                 base.OnLoad(e);
+
+                // Temp hack.
+                if (!_thumbnailDockableWindow.Collapsed)
+                {
+                    this.SafeBeginInvoke("ELI0", () =>
+                        {
+                            _thumbnailViewerToolStripButton.PerformClick();
+                            _thumbnailViewerToolStripButton.PerformClick();
+                        }, false);
+                }
 
                 // If not using a FAM DB, the admin mode and logout options are not applicable.
                 if (FileProcessingDB == null)
@@ -1626,10 +1637,8 @@ namespace Extract.FileActionManager.Utilities
                     _fileListDataGridView.Rows.Count > 0)
                 {
                     var row = _fileListDataGridView.Rows[e.RowIndex];
-                    var cell = row.Cells[_FILE_LIST_FLAG_COLUMN_INDEX];
-                    bool setFlag = cell.Value == null;
-                    cell.Value = setFlag ? Resources.FlagImage : null;
-                    _fileListDataGridView.InvalidateCell(cell);
+
+                    SetRowFlag(row, !row.GetFileData().Flagged);
                 }
             }
             catch (Exception ex)
@@ -2022,13 +2031,9 @@ namespace Extract.FileActionManager.Utilities
 
                 // Enable/disable the set/clear flag options depending on the flag status of the
                 // selected rows.
-                _setFlagMenuItem.Enabled = SelectedRows
-                    .Where(row => row.Cells[_FILE_LIST_FLAG_COLUMN_INDEX].Value == null)
-                    .Any();
+                _setFlagMenuItem.Enabled = SelectedRows.Any(row => !row.GetFileData().Flagged);
 
-                _clearFlagMenuItem.Enabled = SelectedRows
-                    .Where(row => row.Cells[_FILE_LIST_FLAG_COLUMN_INDEX].Value != null)
-                    .Any();
+                _clearFlagMenuItem.Enabled = SelectedRows.Any(row => row.GetFileData().Flagged);
             }
             catch (Exception ex)
             {
@@ -2393,6 +2398,131 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI36776");
+            }
+        }
+
+        /// <summary>
+        /// Handles the Click event of the HandleInvertColorsButton control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleInvertColorsButton_Click(object sender, EventArgs e)
+        {
+            DataGridViewRow currentRow = _fileListDataGridView.CurrentRow;
+
+            if (currentRow != null)
+            {
+                FAMFileData fileData = currentRow.GetFileData();
+                PageState pageState = fileData.PageData[_imageViewer.PageNumber - 1];
+                pageState.Inverted = !pageState.Inverted;
+                InvertThumbnail(_imageViewer.PageNumber);
+                toolStripButton1.Enabled = fileData.Dirty; // Save button
+            }
+        }
+
+        bool _resettingOrientation = false;
+
+        /// <summary>
+        /// Handles the PageChanged event of the HandleImageViewer control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.PageChangedEventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleImageViewer_PageChanged(object sender, Imaging.Forms.PageChangedEventArgs e)
+        {
+            DataGridViewRow currentRow = _fileListDataGridView.CurrentRow;
+
+            if (currentRow != null)
+            {
+                FAMFileData fileData = currentRow.GetFileData();
+                PageState pageState = fileData.PageData[_imageViewer.PageNumber - 1];
+                _lastOrientation = pageState.Orientation;
+
+                try
+                {
+                    _resettingOrientation = true;
+                    if (_imageViewer.Orientation != pageState.Orientation)
+                    {
+                        _imageViewer.Rotate(pageState.Orientation - _imageViewer.Orientation, false, true);
+                    }
+                }
+                finally
+                {
+                    _resettingOrientation = false;
+                }
+
+                SetThumbnailOrientation(e.PageNumber, pageState.Orientation, true);
+                if (pageState.Inverted)
+                {
+                    _imageViewer.InvertColors();
+                }
+            }
+        }
+
+        int _lastOrientation = 0;
+
+        /// <summary>
+        /// Handles the OrientationChanged event of the _imageViewer control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.OrientationChangedEventArgs"/> instance containing the event data.</param>
+        void HandleImageViewer_OrientationChanged(object sender, Imaging.Forms.OrientationChangedEventArgs e)
+        {
+            DataGridViewRow currentRow = _fileListDataGridView.CurrentRow;
+
+            if (currentRow != null && !_resettingOrientation)
+            {
+                FAMFileData fileData = currentRow.GetFileData();
+                PageState pageState;
+
+                if (Control.ModifierKeys.HasFlag(Keys.Control))
+                {
+                    int orientationChange = ((e.Orientation - _lastOrientation) + 360) % 360;
+
+                    for (int page = 1; page <= _imageViewer.PageCount; page++)
+                    {
+                        if (page == _imageViewer.PageNumber)
+                        {
+                            continue;
+                        }
+
+                        pageState = fileData.PageData[page - 1];
+
+                        pageState.Orientation += orientationChange;
+                        SetThumbnailOrientation(page, orientationChange, false);
+                    }
+                }
+
+                pageState = fileData.PageData[_imageViewer.PageNumber - 1];
+                pageState.Orientation = e.Orientation;
+
+                SetThumbnailOrientation(_imageViewer.PageNumber, e.Orientation, true);
+
+                toolStripButton1.Enabled = fileData.Dirty; // Save button
+            }
+
+            _lastOrientation = e.Orientation;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void HandleThumbnailViewer_ThumbnailLoaded(object sender, PageChangedEventArgs e)
+        {
+            DataGridViewRow currentRow = _fileListDataGridView.CurrentRow;
+
+            if (currentRow != null)
+            {
+                FAMFileData fileData = currentRow.GetFileData();
+                PageState pageState = fileData.PageData[e.PageNumber - 1];
+                SetThumbnailOrientation(e.PageNumber, pageState.Orientation, true);
+                if (pageState.Inverted)
+                {
+                    InvertThumbnail(e.PageNumber);
+                }
             }
         }
 
@@ -2842,11 +2972,11 @@ namespace Extract.FileActionManager.Utilities
         /// Runs a database query to build the file list on a background thread.
         /// </summary>
         /// <param name="query">The query used to generate the file list.</param>
-        /// <param name="flaggedFileNames">If not <see langword="null"/>, indicates files for which
+        /// <param name="preservedData">If not <see langword="null"/>, indicates files for which
         /// should be marked as flagged in the newly popluated list.</param>
         /// <param name="cancelToken">The <see cref="CancellationToken"/> that should be checked
         /// after adding each file to the list to ensure the operation hasn't been canceled.</param>
-        void RunDatabaseQuery(string query, string[] flaggedFileNames, CancellationToken cancelToken)
+        void RunDatabaseQuery(string query, Dictionary<string, FAMFileData> preservedData, CancellationToken cancelToken)
         {
             try
             {
@@ -2864,21 +2994,22 @@ namespace Extract.FileActionManager.Utilities
                         {
                             // Retrieve the fields necessary for the results table.
                             string fileName = (string)row["FileName"];
-                            var fileData = new FAMFileData(fileName);
 
-                            Bitmap flagValue =
-                                (flaggedFileNames != null && flaggedFileNames.Contains(fileName))
-                                ? Resources.FlagImage
-                                : null;
+                            // Retrieve the data for the results table.
+                            var fileData = (preservedData != null && preservedData.ContainsKey(fileName))
+                                ? preservedData[fileName]
+                                : new FAMFileData(fileName);
+
+                            Bitmap flagValue = fileData.Flagged ? Resources.FlagImage : null;
 
                             string directory = Path.GetDirectoryName(fileName);
                             fileName = Path.GetFileName(fileName);
-                            int pageCount = (int)row["Pages"];
+                            fileData.PageCount = (int)row["Pages"];
 
                             // Invoke the new row to be added on the UI thread.
                             this.SafeBeginInvoke("ELI35725", () =>
                             {
-                                _fileListDataGridView.Rows.Add(flagValue, fileName, pageCount,
+                                _fileListDataGridView.Rows.Add(flagValue, fileName, fileData.PageCount,
                                     fileData, directory);
                             });
                         }
@@ -2899,11 +3030,11 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         /// <param name="fileEnumerable">The <see cref="IEnumerable{T}"/> of <see cref="string"/>s
         /// containing the files to be in the file list.</param>
-        /// <param name="flaggedFileNames">If not <see langword="null"/>, indicates files for which
+        /// <param name="preservedData">If not <see langword="null"/>, indicates files for which
         /// should be marked as flagged in the newly popluated list.</param>
         /// <param name="cancelToken">The <see cref="CancellationToken"/> that should be checked
         /// after adding each file to the list to ensure the operation hasn't been canceled.</param>
-        void RunFileEnumeration(IEnumerable<string> fileEnumerable, string[] flaggedFileNames,
+        void RunFileEnumeration(IEnumerable<string> fileEnumerable, Dictionary<string, FAMFileData> preservedData,
             CancellationToken cancelToken)
         {
             try
@@ -2917,35 +3048,22 @@ namespace Extract.FileActionManager.Utilities
                     // results to obtain the overall number of files selected.
                     if (_fileSelectionCount < MaxFilesToDisplay)
                     {
-                        // Retrieve the fields necessary for the results table.
-                        var fileData = new FAMFileData(filePath);
+                        // Retrieve the data for the results table.
+                        var fileData = (preservedData != null && preservedData.ContainsKey(filePath))
+                            ? preservedData[filePath]
+                            : new FAMFileData(filePath);
 
-                        Bitmap flagValue =
-                            (flaggedFileNames != null && flaggedFileNames.Contains(filePath))
-                            ? Resources.FlagImage
-                            : null;
+                        Bitmap flagValue = fileData.Flagged ? Resources.FlagImage : null;
 
                         string directory = Path.GetDirectoryName(filePath);
                         string fileName = Path.GetFileName(filePath);
-                        
-                        // Obtain the page count for the file.
-                        int pageCount = 0;
-                        try
-                        {
-                            using (var reader = Codecs.CreateReader(filePath))
-                            {
-                                pageCount = reader.PageCount;
-                            }
-                        }
-                        // If we fail to get the page count for a file, just ignore the exception.
-                        // This is not a critical error (the file may not even be an image).
-                        catch { }
-                        
+                        fileData.PageCount = GetPageCount(filePath);
+
                         // Invoke the new row to be added on the UI thread.
                         this.SafeBeginInvoke("ELI36789", () =>
                         {
                             _fileListDataGridView.Rows.Add(
-                                flagValue, fileName, pageCount, fileData, directory);
+                                flagValue, fileName, fileData.PageCount, fileData, directory);
                         });
                     }
 
@@ -3661,6 +3779,7 @@ namespace Extract.FileActionManager.Utilities
                 _overlayTextCanceler = null;
             }
 
+            toolStripButton1.Enabled = false; // Save button
             FAMFileData fileData = (currentRow == null) ? null : currentRow.GetFileData();
 
             if (fileData != null && File.Exists(fileData.FileName))
@@ -3670,6 +3789,8 @@ namespace Extract.FileActionManager.Utilities
                     // Open the image associated with fileData and highlight all search terms found int
                     // it.
                     OpenImage(fileData);
+
+                    toolStripButton1.Enabled = fileData.Dirty; // Save button
                 }
                 catch (Exception ex)
                 {
@@ -3818,6 +3939,28 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Gets the page count.
+        /// </summary>
+        /// <param name="fileName">Name of the file.</param>
+        /// <returns></returns>
+        int GetPageCount(string fileName)
+        {
+            int pageCount = 0;
+            try
+            {
+                using (var reader = Codecs.CreateReader(fileName))
+                {
+                    pageCount = reader.PageCount;
+                }
+            }
+            // If we fail to get the page count for a file, just ignore the exception.
+            // This is not a critical error (the file may not even be an image).
+            catch { }
+
+            return pageCount;
+        }
+
+        /// <summary>
         /// Sets the flag on the specified row(s) of the <see cref="_fileListDataGridView"/>.
         /// </summary>
         /// <param name="rows">The <see cref="DataGridViewRow"/>s on which the flag should be set or
@@ -3828,10 +3971,21 @@ namespace Extract.FileActionManager.Utilities
         {
             foreach (var row in rows)
             {
-                var cell = row.Cells[_FILE_LIST_FLAG_COLUMN_INDEX];
-                cell.Value = setFlag ? Resources.FlagImage : null;
-                _fileListDataGridView.InvalidateCell(cell);
+                SetRowFlag(row, setFlag);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="setFlag"></param>
+        void SetRowFlag(DataGridViewRow row, bool setFlag)
+        {
+            row.GetFileData().Flagged = setFlag;
+            var cell = row.Cells[_FILE_LIST_FLAG_COLUMN_INDEX];
+            cell.Value = setFlag ? Resources.FlagImage : null;
+            _fileListDataGridView.InvalidateCell(cell);
         }
 
         /// <summary>
@@ -3980,6 +4134,32 @@ namespace Extract.FileActionManager.Utilities
                 }
 
                 _adminModeToolStripMenuItem.Enabled = FileProcessingDB.IsConnected && !InAdminMode;
+            }
+        }
+
+        /// <summary>
+        /// Inverts the thumbnail.
+        /// </summary>
+        /// <param name="pageNumber">The page number.</param>
+        void InvertThumbnail(int pageNumber)
+        {
+            if (_thumbnailViewer.Active)
+            {
+                _thumbnailViewer.InvertThumbnailColors(pageNumber);
+            }
+        }
+
+        /// <summary>
+        /// Inverts the thumbnail.
+        /// </summary>
+        /// <param name="pageNumber">The page number.</param>
+        /// <param name="orientation"></param>
+        /// <param name="absolute"></param>
+        void SetThumbnailOrientation(int pageNumber, int orientation, bool absolute)
+        {
+            if (_thumbnailViewer.Active)
+            {
+                _thumbnailViewer.SetThumbnailOrientation(pageNumber, orientation, absolute);
             }
         }
 

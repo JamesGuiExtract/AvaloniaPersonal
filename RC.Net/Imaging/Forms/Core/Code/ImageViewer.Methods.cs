@@ -20,6 +20,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using UCLID_RASTERANDOCRMGMTLib;
+using Leadtools.ImageProcessing.Color;
 
 namespace Extract.Imaging.Forms
 {
@@ -5658,6 +5659,22 @@ namespace Extract.Imaging.Forms
             catch (Exception ex)
             {
                 ExtractException.Display("ELI24072", ex);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void InvertColors()
+        {
+            try
+            {
+                var invertCommand = new InvertCommand();
+                invertCommand.Run(base.Image);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI0");
             }
         }
 

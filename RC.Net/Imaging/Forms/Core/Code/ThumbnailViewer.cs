@@ -7,6 +7,9 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
+using System.Collections.Generic;
+using Leadtools.ImageProcessing.Color;
+using System.Linq;
 
 namespace Extract.Imaging.Forms
 {
@@ -53,6 +56,12 @@ namespace Extract.Imaging.Forms
         /// </summary>
         int _currentPage;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        List<RasterViewPerspective> _originalViewPerspectives = new List<RasterViewPerspective>();
+        List<int> _pendingViewPerspectives = new List<int>();
+
         #endregion Fields
 
         #region Constructors
@@ -75,6 +84,15 @@ namespace Extract.Imaging.Forms
         }
 
         #endregion Constructors
+
+        #region Events
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event EventHandler<PageChangedEventArgs> ThumbnailLoaded;
+
+        #endregion Events
 
         #region Properties
 
@@ -207,6 +225,16 @@ namespace Extract.Imaging.Forms
         /// </summary>
         void LoadDefaultThumbnails()
         {
+            _originalViewPerspectives =
+                Enumerable.Range(0, _imageViewer.PageCount)
+                .Select(i => new RasterViewPerspective())
+                .ToList();
+
+            _pendingViewPerspectives =
+                Enumerable.Range(0, _imageViewer.PageCount)
+                .Select(i => 0)
+                .ToList();
+
             // Create a default entry for each page
             for (int i = 1; i <= _imageViewer.PageCount; i++)
             {
@@ -288,7 +316,15 @@ namespace Extract.Imaging.Forms
                     else
                     {
                         item.Image = image;
+                        _originalViewPerspectives[i] = item.Image.ViewPerspective;
+                        if (_pendingViewPerspectives[i] != 0)
+                        {
+                            item.Image.RotateViewPerspective(_pendingViewPerspectives[i]);
+                            _pendingViewPerspectives[i] = 0;
+                        }
                         item.Invalidate();
+
+                        OnThumbnailLoaded(i + 1);
                     }
                 }
             }
@@ -346,6 +382,57 @@ namespace Extract.Imaging.Forms
                 // Select this item
                 item.Selected = true;
                 item.Invalidate();
+            }
+        }
+
+        /// <summary>
+        /// Inverts the thumbnail colors.
+        /// </summary>
+        /// <param name="pageNumber">The page number.</param>
+        public void InvertThumbnailColors(int pageNumber)
+        {
+            try
+            {
+                RasterImageListItem item = _imageList.Items[pageNumber - 1];
+                var invertCommand = new InvertCommand();
+                invertCommand.Run(item.Image);
+                item.Invalidate();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI0");
+            }
+        }
+
+        /// <summary>
+        /// Sets the thumbnail orientation.
+        /// </summary>
+        /// <param name="pageNumber">The page number.</param>
+        /// <param name="orientation">The orientation.</param>
+        /// <param name="absolute"></param>
+        public void SetThumbnailOrientation(int pageNumber, int orientation, bool absolute)
+        {
+            try
+            {
+                int index = pageNumber - 1;
+                RasterImageListItem item = _imageList.Items[index];
+                if (_originalViewPerspectives[index] != 0)
+                {
+                    if (absolute)
+                    {
+                        item.Image.ViewPerspective = _originalViewPerspectives[index];
+                    }
+                    item.Image.RotateViewPerspective(orientation);
+                    item.Invalidate();
+                }
+                else
+                {
+                    _pendingViewPerspectives[index] = orientation;
+                }    
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI0");
             }
         }
 
@@ -523,5 +610,18 @@ namespace Extract.Imaging.Forms
         }
 
         #endregion IImageViewerControl Members
+
+        /// <summary>
+        /// Raises the <see cref="E:ThumbnailLoaded"/> event.
+        /// </summary>
+        /// <param name="pageNumber"></param>
+        void OnThumbnailLoaded(int pageNumber)
+        {
+            var eventHandler = ThumbnailLoaded;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new PageChangedEventArgs(pageNumber));
+            }
+        }
     }
 }
