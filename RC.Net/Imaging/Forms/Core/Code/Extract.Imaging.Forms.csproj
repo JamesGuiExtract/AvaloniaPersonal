@@ -84,6 +84,7 @@
     </Reference>
     <Reference Include="Leadtools.ImageProcessing.Color, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
+	  <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.ImageProcessing.Color.dll</HintPath>
     </Reference>
     <Reference Include="Leadtools.WinForms, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
